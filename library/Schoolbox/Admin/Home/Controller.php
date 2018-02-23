@@ -204,7 +204,11 @@ class Controller extends Base
             }
         }
 
-        $kamiConnector = new Kami\Connector($this->getConfigLoader(), new GuzzleHttp\Client());
+        $kamiConnector = new Kami\Connector(
+            new GuzzleHttp\Client(),
+            $this->getConfigLoader()->get('kami_api_key'),
+            $this->getConfigLoader()->get('site_school_code')
+        );
 
         // Get the navigation
 

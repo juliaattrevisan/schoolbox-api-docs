@@ -15,8 +15,6 @@ use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
-use Schoolbox\Config\TestLoader;
-use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\InlineGrader\Kami\Connector;
 use Schoolbox\Learning\InlineGrader\Kami\MockConnector;
 use Schoolbox\Resource\Storage;
@@ -27,24 +25,26 @@ class ConnectorTest extends TestCase
 
     /**
      * @dataProvider providerDisabledConnector
-     * @param IConfigLoader $configLoader
+     * @param null|string $apiKey
+     * @throws \PHPUnit_Framework_AssertionFailedError
      */
-    public function testDisabled(IConfigLoader $configLoader): void
+    public function testDisabled(?string $apiKey): void
     {
         // This method must not hit Kami API
-        $connector = new Connector($configLoader, $this->getMockClientWithConnectException());
+        $connector = new Connector($this->getMockClientWithConnectException(), $apiKey, 'TESTING');
         $this->assertFalse($connector->isEnabled());
     }
 
 
     /**
      * @dataProvider providerEnabledConnector
-     * @param IConfigLoader $configLoader
+     * @param null|string $apiKey
+     * @throws \PHPUnit_Framework_AssertionFailedError
      */
-    public function testEnabled(IConfigLoader $configLoader): void
+    public function testEnabled(?string $apiKey): void
     {
         // This method must not hit Kami API
-        $connector = new Connector($configLoader, $this->getMockClientWithConnectException());
+        $connector = new Connector($this->getMockClientWithConnectException(), $apiKey, 'TESTING');
         $this->assertTrue($connector->isEnabled());
     }
 
@@ -70,12 +70,14 @@ class ConnectorTest extends TestCase
      *
      * @dataProvider providerDisabledConnector
      *
-     * @param IConfigLoader $configLoader
+     * @param null|string $apiKey
+     * @throws \PHPUnit_Framework_AssertionFailedError
+     * @throws \Schoolbox\Learning\InlineGrader\Kami\Exception\ResponseDecodeException
      */
-    public function testOnlineDisabled(IConfigLoader $configLoader): void
+    public function testOnlineDisabled(?string $apiKey): void
     {
         // This method must not hit Kami API
-        $connector = new Connector($configLoader, $this->getMockClientWithConnectException());
+        $connector = new Connector($this->getMockClientWithConnectException(), $apiKey, 'TESTING');
         $this->assertFalse($connector->isOnline());
     }
 
@@ -261,12 +263,18 @@ class ConnectorTest extends TestCase
      * @dataProvider providerDisabledConnector
      * @expectedException \Schoolbox\Learning\InlineGrader\Kami\Exception\EmptyApiKeyException
      *
-     * @param IConfigLoader $configLoader
+     * @param null|string $apiKey
+     * @throws \InvalidArgumentException
+     * @throws \Schoolbox\Learning\InlineGrader\Kami\Exception\ApiException
+     * @throws \Schoolbox\Learning\InlineGrader\Kami\Exception\EmptyApiKeyException
+     * @throws \Schoolbox\Learning\InlineGrader\Kami\Exception\InvalidStatusException
+     * @throws \Schoolbox\Learning\InlineGrader\Kami\Exception\NotFound
+     * @throws \Schoolbox\Learning\InlineGrader\Kami\Exception\ResponseDecodeException
      */
-    public function testGetDocumentNotEnabled(IConfigLoader $configLoader): void
+    public function testGetDocumentNotEnabled(?string $apiKey): void
     {
         // This method must not hit Kami API
-        $connector = new Connector($configLoader, $this->getMockClientWithConnectException());
+        $connector = new Connector($this->getMockClientWithConnectException(), $apiKey, 'TESTING');
         $connector->getDocument('asdfghjkl');
     }
 
@@ -628,8 +636,8 @@ class ConnectorTest extends TestCase
     public function providerDisabledConnector(): array
     {
         return [
-            [new TestLoader([Connector::CONFIG_KEY_KAMI_API_KEY => null])],
-            [new TestLoader([Connector::CONFIG_KEY_KAMI_API_KEY => ''])],
+            [null],
+            [''],
         ];
     }
 
@@ -637,9 +645,9 @@ class ConnectorTest extends TestCase
     public function providerEnabledConnector(): array
     {
         return [
-            [new TestLoader([Connector::CONFIG_KEY_KAMI_API_KEY => 'some invalid val'])],
-            [new TestLoader([Connector::CONFIG_KEY_KAMI_API_KEY => '123'])],
-            [new TestLoader([Connector::CONFIG_KEY_KAMI_API_KEY => 'Hisohslfd92382923'])],
+            ['some invalid val', 'TESTING'],
+            ['123', 'TESTING'],
+            ['Hisohslfd92382923'],
         ];
     }
 

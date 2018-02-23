@@ -19,8 +19,7 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 use Schoolbox\GenericCollection;
-use Schoolbox\IConfigLoader;
-use Schoolbox\Learning\InlineGrader\Kami\Exception\EmptySiteSchoolCode;
+use Schoolbox\Learning\InlineGrader\Kami\Exception;
 use Schoolbox\Resource\Storage\IStorage;
 use Alaress_Date_Format;
 use Alaress_Date_NullDate;
@@ -42,8 +41,6 @@ class Connector implements IConnector
     public const PATH_GET_DOCUMENT = 'embed/documents/';
     public const PATH_DELETE_DOCUMENT = 'embed/documents/';
 
-    public const CONFIG_KEY_KAMI_API_KEY = 'kami_api_key';
-
     // How long should view sessions last for by default?
     public const DEFAULT_SESSION_EXPIRY_HOURS = 1;
 
@@ -51,23 +48,35 @@ class Connector implements IConnector
     public const EXPORT_TYPE_ANNOTATION = 'annotation'; // Annotations embedded into the document as PDF Annotations.
     public const EXPORT_TYPE_INLINE = 'inline';         // Annotations drawn on to document. Useful for printing.
 
-    /**
-     * @var IConfigLoader
-     */
-    private $config;
-
     /** @var Client */
     private $client;
 
+    /**
+     * Shared by all schoolbox instances. There is an alternative api-key available for testing to keep
+     * test documents out of the production kami account. See SA-4489
+     *
+     * @var string
+     */
+    private $apiKey;
 
     /**
-     * @param IConfigLoader   $config
-     * @param ClientInterface $client
+     * Prepended to schoolbox user.id to form a kami comment author.id to uniquely identify schoolbox users in Kami
+     *
+     * @var string
      */
-    public function __construct(IConfigLoader $config, ClientInterface $client)
+    private $siteSchoolCode;
+
+
+    /**
+     * @param ClientInterface $client
+     * @param null|string     $apiKey
+     * @param null|string     $siteSchoolCode
+     */
+    public function __construct(ClientInterface $client, ?string $apiKey, ?string $siteSchoolCode)
     {
-        $this->config = $config;
-        $this->client = $client;
+        $this->client         = $client;
+        $this->apiKey         = null === $apiKey ? '' : trim($apiKey);
+        $this->siteSchoolCode = null === $siteSchoolCode ? '' : trim($siteSchoolCode);
     }
 
 
@@ -79,12 +88,17 @@ class Connector implements IConnector
     public function isEnabled(): bool
     {
         // Any non-empty value is considered 'enabled', regardless of whether it is 'valid'
-        return (bool)$this->getApiKey();
+        return '' !== $this->apiKey;
     }
 
 
     /**
      * Is Kami online?
+     *
+     * Will be false if:
+     * - api key is empty, or
+     * - api key is invalid, or
+     * - we cannot connect to the Kami API
      *
      * @return bool
      * @throws Exception\ResponseDecodeException If unable to decode a server response
@@ -263,7 +277,7 @@ class Connector implements IConnector
      * @param bool                     $showMenu  Hides the menu button
      * @return Session
      * @throws Exception\ResponseDecodeException If unable to decode a server response
-     * @throws EmptySiteSchoolCode If 'site_school_code' is empty
+     * @throws Exception\EmptySiteSchoolCode If 'site_school_code' is empty
      * @throws Exception\ApiException If API response is unable to be processed by us
      * @throws Exception\EmptyApiKeyException If API key not configured
      * @throws \InvalidArgumentException If cannot convert the request or response to a string
@@ -281,13 +295,11 @@ class Connector implements IConnector
         bool $showMenu = true
     ): Session {
         $this->assertEnabled();
+        $this->assertValidSiteSchoolCode();
+
         // When should the view session expire?
         if (!$expires) {
             $expires = Alaress_Date_Format::now()->addHours(self::DEFAULT_SESSION_EXPIRY_HOURS);
-        }
-        $siteSchoolCode = trim($this->config->get('site_school_code'));
-        if (empty($siteSchoolCode)) {
-            throw new EmptySiteSchoolCode("'site_school_code' cannot be empty");
         }
         $options  = [
             RequestOptions::HEADERS => ['Content-Type' => 'application/json'],
@@ -295,7 +307,7 @@ class Connector implements IConnector
                 'document_identifier' => $documentId,
                 'user'                => [
                     'name'    => "{$user->getFirstname()} {$user->getLastname()}",
-                    'user_id' => "{$siteSchoolCode}-{$user->getId()}",
+                    'user_id' => "{$this->siteSchoolCode}-{$user->getId()}",
                 ],
                 'expires_at'          => $expires->getUsingFormat(Alaress_Date_Format::FORMAT_DATETIME_UTC),
                 'viewer_options'      => [
@@ -396,33 +408,13 @@ class Connector implements IConnector
 
 
     /**
-     * Get the configured API key
-     *
-     * Returns scalar NULL if not configured.
-     *
-     * @return null|string
-     */
-    private function getApiKey(): ?string
-    {
-        // eg
-        // [null, ' '] => null
-        // ['value', ' value '] => 'value'
-        $apiKey = $this->config->get(self::CONFIG_KEY_KAMI_API_KEY);
-        if (!is_string($apiKey) || '' === trim($apiKey)) {
-            return null;
-        }
-        return trim($apiKey);
-    }
-
-
-    /**
      * Get the authorisation header to use for all requests
      *
      * @return string[]
      */
     private function getHeaderAuthorisation(): array
     {
-        return ['Authorization' => "Token {$this->getApiKey()}"];
+        return ['Authorization' => "Token {$this->apiKey}"];
     }
 
 
@@ -490,6 +482,20 @@ class Connector implements IConnector
     {
         if (!$this->isEnabled()) {
             throw new Exception\EmptyApiKeyException('Kami is not enabled. Api key is empty.');
+        }
+    }
+
+
+    /**
+     * Ensure configured 'site_school_code' is not empty so we can generate unique kami comment author id
+     *
+     * @throws Exception\EmptySiteSchoolCode If ''site_school_code' not configured
+     */
+    private function assertValidSiteSchoolCode(): void
+    {
+        // Ensure this is not empty so we can generate a unique comment author identifier in Kami
+        if ('' === $this->siteSchoolCode) {
+            throw new Exception\EmptySiteSchoolCode("'site_school_code' cannot be empty");
         }
     }
 
