@@ -46,17 +46,9 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
         staff_replacement.Title     AS ReplacementStaffTitle
     ";
     private $baseRoomSelect = "
-        CASE WHEN tcir.TimetableClassRoomID IS NULL
-            THEN 1
-            ELSE 0
-        END                         AS UseBaseRoom,
         room_base.Code              AS BaseRoom
     ";
     private $replacementRoomSelect = "
-        CASE WHEN room_replacement.Code IS NOT NULL
-            THEN 1
-            ELSE 0
-        END                         AS UseReplacementRoom,
         room_replacement.Code       AS ReplacementRoom
     ";
     private $timetableJoin = "INNER JOIN fc.Timetable t ON ts.TimetableID = t.ID";
@@ -407,20 +399,21 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
                 'ClassCode'      => $row['ClassCode'],
                 'ClassName'      => $row['ClassName'],
             ];
-            $newRow['RoomCode'] = $row['UseBaseRoom']
-                ? $row['BaseRoom']
-                : $row['ReplacementRoom'];
-            if ($row['UseBaseStaff']) {
-                $newRow['StaffID']            = $row['BaseStaffID'];
-                $newRow['StaffTitle']         = $row['BaseStaffTitle'];
-                $newRow['StaffPreferredName'] = $row['BaseStaffPreferredName'];
-                $newRow['StaffSurname']       = $row['BaseStaffSurname'];
-            } else {
+            $newRow['RoomCode'] = $row['ReplacementRoom'] ?? $row['BaseRoom'] ?? '';
+
+            if ($row['UseReplacementStaff']) {
                 $newRow['StaffID']            = $row['ReplacementStaffID'];
                 $newRow['StaffTitle']         = $row['ReplacementStaffTitle'];
                 $newRow['StaffPreferredName'] = $row['ReplacementStaffPreferredName'];
                 $newRow['StaffSurname']       = $row['ReplacementStaffSurname'];
             }
+            else if ($row['UseBaseStaff']) {
+                $newRow['StaffID']            = $row['BaseStaffID'];
+                $newRow['StaffTitle']         = $row['BaseStaffTitle'];
+                $newRow['StaffPreferredName'] = $row['BaseStaffPreferredName'];
+                $newRow['StaffSurname']       = $row['BaseStaffSurname'];
+            }
+
             $row = $newRow;
         }
         unset($row);
@@ -627,24 +620,22 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
             'description'    => $timetabledClass['ClassName'],
             'code'           => $timetabledClass['ClassCode'],
             'campus'         => $timetabledClass['ClassCampus'],
-            'room'           => isset($timetabledClass['ReplacementRoom'])
-                ? $timetabledClass['ReplacementRoom']
-                : $timetabledClass['BaseRoom'],
+            'room'           => $timetabledClass['ReplacementRoom'] ?? $timetabledClass['BaseRoom'] ?? '',
         ];
-        if ($timetabledClass['UseBaseStaff']) {
+        if ($timetabledClass['UseReplacementStaff']) {
+            $parts[$classCode.'-'.$timetabledClass['ReplacementStaffID']] = $basePart + [
+                    'staffID'        => $timetabledClass['ReplacementStaffID'],
+                    'staffFirstname' => $timetabledClass['ReplacementStaffPreferredName'],
+                    'staffSurname'   => $timetabledClass['ReplacementStaffSurname'],
+                    'staffTitle'     => $timetabledClass['ReplacementStaffTitle'],
+                ];
+        }
+        else if ($timetabledClass['UseBaseStaff']) {
             $parts[$classCode.'-'.$timetabledClass['BaseStaffID']] = $basePart + [
                 'staffID'        => $timetabledClass['BaseStaffID'],
                 'staffFirstname' => $timetabledClass['BaseStaffPreferredName'],
                 'staffSurname'   => $timetabledClass['BaseStaffSurname'],
                 'staffTitle'     => $timetabledClass['BaseStaffTitle'],
-            ];
-        }
-        if ($timetabledClass['UseReplacementStaff']) {
-            $parts[$classCode.'-'.$timetabledClass['ReplacementStaffID']] = $basePart + [
-                'staffID'        => $timetabledClass['ReplacementStaffID'],
-                'staffFirstname' => $timetabledClass['ReplacementStaffPreferredName'],
-                'staffSurname'   => $timetabledClass['ReplacementStaffSurname'],
-                'staffTitle'     => $timetabledClass['ReplacementStaffTitle'],
             ];
         }
         return $parts;
@@ -693,6 +684,8 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
         } else {
             return [];
         }
+
+
         $result = $this->database->getAll($query);
         return is_array($result) ? $result : [];
     }
@@ -717,7 +710,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
 
             -- Join onto blocked classes
             INNER JOIN fc.TimetableClass         tc   ON ts.ID = tc.TimetableSubjectID
-            INNER JOIN fc.TimetableClassInstance tci  ON tc.ID = tci.TimetableClassID
+            INNER JOIN fc.TimetableClassInstance tci  ON tc.ID = tci.TimetableClassID AND tci.Active = 1
             INNER JOIN fc.TimetableBlockInstance tbi  ON tci.TimetableBlockInstanceID = tbi.ID
 
             -- Periods for blocked classes
@@ -762,7 +755,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
 
             -- Join onto non-blocked classes
             INNER JOIN fc.TimetableClass         tc   ON ts.ID = tc.TimetableSubjectID
-            INNER JOIN fc.TimetableClassInstance tci  ON tc.ID = tci.TimetableClassID
+            INNER JOIN fc.TimetableClassInstance tci  ON tc.ID = tci.TimetableClassID  AND tci.Active = 1
                                                       AND tci.TimetableBlockInstanceID IS NULL
 
             -- Periods for non-blocked classes
@@ -805,7 +798,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
             FROM       fc.TimetableSubject       ts
             -- Join onto student via subject choice
             INNER JOIN fc.TimetableClass         tc   ON ts.ID             = tc.TimetableSubjectID
-            INNER JOIN fc.TimetableClassInstance tci  ON tc.ID             = tci.TimetableClassID
+            INNER JOIN fc.TimetableClassInstance tci  ON tc.ID             = tci.TimetableClassID  AND tci.Active = 1
             INNER JOIN fc.TimetableSubjectChoice tsc  ON tc.ID             = tsc.TimetableClassID
             INNER JOIN dbo.Student               s    ON tsc.PersonID      = s.PersonID
             -- Expand period
@@ -848,7 +841,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
             INNER JOIN fc.YearLevelSubStudent    ylss ON yls.ID            = ylss.YearLevelSubID
             INNER JOIN dbo.Student               s    ON ylss.PersonID     = s.PersonID
             -- Expand period
-            INNER JOIN fc.TimetableClassInstance tci  ON tc.ID                 = tci.TimetableClassID
+            INNER JOIN fc.TimetableClassInstance tci  ON tc.ID             = tci.TimetableClassID  AND tci.Active = 1
             INNER JOIN fc.TimetablePeriod        tp   ON tci.TimetablePeriodID = tp.ID
             CROSS APPLY fc.PeriodExpand(tci.TimetablePeriodID, tci.Consecutive) tpe
             INNER JOIN fc.TimetableDay           td   ON tpe.TimetableDayID    = td.ID

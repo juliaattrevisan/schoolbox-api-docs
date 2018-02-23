@@ -214,13 +214,16 @@ foreach ($userList as $user) {
                                             case 'maze':
                                             case 'synergetic':
                                             case 'isams':
+                                            case 'schooledge':
                                             case 'schoolbox':
-                                                $period_staff = $userHandler->formatName(
-                                                    array(
-                                                        'title'    => $class['staffTitle'],
-                                                        'lastname' => $class['staffSurname']
-                                                    )
-                                                );
+                                                if ($class['staffSurname']) {
+                                                    $period_staff = $userHandler->formatName(
+                                                        array(
+                                                            'title'    => $class['staffTitle'],
+                                                            'lastname' => $class['staffSurname']
+                                                        )
+                                                    );
+                                                }
                                                 break;
                                             case 'tass':
                                                 $period_staff = $class['staffCode'];
