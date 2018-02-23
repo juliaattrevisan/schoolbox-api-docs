@@ -247,8 +247,8 @@
                 submitHandler: function (form) {
                     // Find the submit button for this form and disable it,
                     // to avoid accidental multiple requests
-                    var submitButton = $(form).find('#eotc-modify-submit');
-                    $(submitButton).prop("disabled", true);
+                    var $submitButton = $(form).find('#eotc-modify-submit');
+                    $submitButton.prop("disabled", true);
 
                     var multi = $('#repeat-reminder, [data-repeat-reminder]').length != 0;
                     if (multi) {
