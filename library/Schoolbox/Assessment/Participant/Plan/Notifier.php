@@ -281,8 +281,8 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         foreach ($assessments as $assessment) {
             // Go thru each plan and raise in THAT context
             foreach ($assessment->getPlans() as $domainModelPlan) {
-                $openDate = $domainModelPlan->getOpenDate() ?? $assessment->getOpenAt();
-                $dueDate  = $domainModelPlan->getDueDate()  ?? $assessment->getDueAt();
+                $openDate = $this->coalesceDates($domainModelPlan->getOpenDate(), $assessment->getOpenAt());
+                $dueDate  = $this->coalesceDates($domainModelPlan->getDueDate(), $assessment->getDueAt());
 
                 // Finagle the domain-object plan to a model-object plan,
                 // so it can be used in notifiers
@@ -309,9 +309,9 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
                 $c = $c
                     ->merge(new Collection($this->internalNotifyOpen($assessment, $dataModelPlan, $assessment->getCreator())
-                                                ->getAll($openDate)))
+                                                ->getAll($openDate ? $openDate->getUnixTimeStamp() : null)))
                     ->merge(new Collection($this->internalNotifyClosed($assessment, $dataModelPlan)
-                                                ->getAll($dueDate)));
+                                                ->getAll($dueDate ? $dueDate->getUnixTimeStamp() : null)));
             }
         }
 
