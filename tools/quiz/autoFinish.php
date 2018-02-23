@@ -29,7 +29,6 @@ $log             = $kernel->logger();
 $attemptMapper   = QuizAttemptMapper::getInstance();
 $responseHandler = new Assess_Response();
 
-$taskMapper      = new Task\CompletionMapper();
 $expiredAttempts = $attemptMapper->findUnfinishedExpiredAttempts();
 $updatedAttempts = [];
 
@@ -94,14 +93,4 @@ foreach ($expiredAttempts as $attempt) {
 if (count($updatedAttempts) > 0) {
     $log->notice(sprintf("Saving %d expired attempts", count($updatedAttempts)));
     $attemptMapper->save($updatedAttempts);
-}
-
-// Complete associated tasks as well
-foreach ($expiredAttempts as $attempt) {
-    $taskId = $attempt->getQuiz()->getTaskInstance()->getId();
-    $userId = $attempt->getUser()->getId();
-    if (!empty($taskId) && !empty($userId)) {
-        $log->notice(sprintf("Saving associated task completion for attempt #%d...", $attempt->getId()));
-        $taskMapper->markAsCompleted($taskId, $userId);
-    }
 }
