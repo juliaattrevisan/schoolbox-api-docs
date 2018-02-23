@@ -8,7 +8,6 @@
 
 namespace Schoolbox\Learning\Assessment;
 
-use Alaress\Diff\Differ;
 use Alaress\Web;
 use Aura\Di\Exception\ServiceNotFound;
 use DomainException;
