@@ -50,7 +50,15 @@
             // Default to not ignoring validation on any fields, even if hidden
             ignore: false,
             ignoreTitle: true,
-            errorPlacement: $.alaressValidate.defaultErrorPlacement
+            errorPlacement: $.alaressValidate.defaultErrorPlacement,
+            // Add to  line 51 in jquery.alaressValidate.js
+            submitHandler: function(form) {
+                // Find the submit button for this form and disable it,
+                // to avoid accidental multiple requests
+                var submitButton = $(form).find('input[type="submit"]');
+                $(submitButton).prop("disabled", true);
+                form.submit();
+            }
         };
         var config = $.extend({}, defaults, options || {});
         return this.validate(config);
