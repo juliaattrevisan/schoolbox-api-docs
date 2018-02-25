@@ -101,11 +101,6 @@ class MapperProxy
         $this->translator            = $translator;
         $this->participantDataSource = $participantDataSource;
         $this->model                 = IAssessable::class;
-        $this->notifier              = new NotifierProxy(
-            $this,
-            $participantDataSource->getPlanMapper(),
-            $participantDataSource->getParticipantMapper()
-        );
     }
 
 
@@ -1191,6 +1186,13 @@ class MapperProxy
      */
     public function getNotifier(): NotifierProxy
     {
+        if (!$this->notifier instanceof NotifierProxy) {
+            $this->notifier = new NotifierProxy(
+                $this,
+                $this->participantDataSource->getPlanMapper(),
+                $this->participantDataSource->getParticipantMapper()
+            );
+        }
         return $this->notifier;
     }
 }
