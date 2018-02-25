@@ -12,7 +12,6 @@ use Alaress\Application\Kernel;
 use Alaress\Authorizer\Rule;
 use Alaress\Database\Exception as AlaressDatabaseException;
 use Alaress\Database\Factory as AlaressDatabaseFactory;
-use Alaress\Diff\Differ;
 use Alaress\Module\Loader as ModuleLoader;
 use Alaress\Redis;
 use Alaress\Twig\Loader\ChainLoader;
@@ -34,8 +33,6 @@ use Schoolbox\L10n\Mapper as L10nMapper;
 use Schoolbox\L10n\RosettaStoneFactory;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
-use Schoolbox\Learning\Assessment\DataModel\NotifierProxy as AssessmentNotifier;
-use Schoolbox\Learning\Assessment\Dehydrator;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
@@ -702,16 +699,6 @@ abstract class AbstractBootstrap implements BootstrapInterface
             'participantDataSource' => $di->lazyGet('participantDataSource'),
         ];
         $di->set('assessmentDataSource', $di->lazyNew(AssessmentDataSource::class));
-
-        // Register assessment notifier
-        $di->params[AssessmentNotifier::class] = [
-            'assessmentDataSource' => $di->lazyGet('assessmentDataSource'),
-            'planMapper'           => $mapperFactory->getLazy(\Schoolbox\Assessment\Participant\Plan\Mapper::class),
-            'participantMapper'    => $mapperFactory->getLazy(\Schoolbox\Assessment\Participant\Mapper::class),
-            'dehydrator'           => $di->lazyNew(Dehydrator::class),
-            'differ'               => $di->lazyNew(Differ::class),
-        ];
-        $di->set('assessmentNotifier', $di->lazyNew(AssessmentNotifier::class));
 
         // Register participant data source (with responses and feedback)
         $di->params[ParticipantDataSource::class] = [

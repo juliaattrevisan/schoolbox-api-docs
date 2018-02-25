@@ -8,10 +8,8 @@
 namespace Schoolbox\Learning\Assessment\Exporter;
 
 use Alaress\Web\Controller\Base as BaseController;
-use Schoolbox\Assessment\Participant\Plan\Mapper as PlanMapper;
 use Schoolbox\Filter\BrokenFilterException;
 use Schoolbox\GenericCollection;
-use Schoolbox\Learning\Assessment\DataModel\NotifierProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\Redirect;
@@ -298,9 +296,8 @@ class Controller extends BaseController
             ->setCloseAt($closeDate);
 
         // Replicate (and notify)!
-        $notifier       = new NotifierProxy($this->assessmentDataSource, PlanMapper::getInstance());
         $assessmentImpl = $this->replicator->replicateInNewContext($assessmentSpec, $context, $this->getUser(), $sequence);
-        $notifier->notify($assessmentImpl, $this->getUser(), []);
+        $this->assessmentDataSource->getNotifier()->notify($assessmentImpl, $this->getUser(), []);
 
         // Recursive case
         if ($assessmentSpec instanceof Project) {

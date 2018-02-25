@@ -79,6 +79,13 @@ class MapperProxy
     private $model;
 
     /**
+     * A notifier for changes to assessments.
+     *
+     * @var NotifierProxy
+     */
+    private $notifier;
+
+    /**
      * Constructor
      *
      * @param Mapper                $baseMapper
@@ -94,6 +101,11 @@ class MapperProxy
         $this->translator            = $translator;
         $this->participantDataSource = $participantDataSource;
         $this->model                 = IAssessable::class;
+        $this->notifier              = new NotifierProxy(
+            $this,
+            $participantDataSource->getPlanMapper(),
+            $participantDataSource->getParticipantMapper()
+        );
     }
 
 
@@ -1167,5 +1179,18 @@ class MapperProxy
     public function getModel()
     {
         return $this->model;
+    }
+
+    /**
+     * Retrieves the notifier that the mapper proxy uses.
+     *
+     * Currently, notifications must still be manually triggered using this
+     * notifier.
+     *
+     * @return NotifierProxy
+     */
+    public function getNotifier(): NotifierProxy
+    {
+        return $this->notifier;
     }
 }

@@ -18,7 +18,6 @@ use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Error;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
-use Schoolbox\Learning\Assessment\DataModel\NotifierProxy;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
@@ -335,7 +334,7 @@ class ListController extends Web\Controller\Base
          */
         try {
             // Create a notifier proxy so that I may notify about assessment changes
-            $notifier = new NotifierProxy($this->assessmentMapper, $this->participantDataSource->getPlanMapper());
+            $notifier = $this->assessmentMapper->getNotifier();
             $before   = $notifier->dehydrate($assessment);
 
             /* Figure out what kind of assessment was chosen
