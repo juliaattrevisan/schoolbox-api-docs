@@ -179,10 +179,13 @@ abstract class AbstractTreeBuilder
         } else {
             // Child nodes
             foreach ($this->getNodeFolders($folderId) as $folder) {
-                try {
-                    $output[] = $this->buildFolderNode($folder, $mustInclude);
-                } catch (Resource\Exception $e) {
-                    continue;
+
+                if($folder->getFolderType() != 'course' &&  $folder->getFolderType() != 'unit') {
+                    try {
+                        $output[] = $this->buildFolderNode($folder, $mustInclude);
+                    } catch (Resource\Exception $e) {
+                        continue;
+                    }
                 }
             }
             // include files (which only works if a file locator was given)
