@@ -86,18 +86,18 @@ class NotifierProxy
     /**
      * Send notifications for this assessment.
      *
-     * @param IAssessable $assessment
+     * @param IAssessable $assessment The assessment to notify about.
+     *                                It should contain an entire complement of
+     *                                participants, so that users whose
+     *                                participation changes can be notified.
      * @param User        $effector   Who triggered the action
      * @param array       $before     What was the state of `$assessment`
      *                                before it was saved?
-     * @throws \Schoolbox\Mapper\Exception\Deleted
      */
     public function notify(IAssessable $assessment, User $effector, array $before): void
     {
-        // Retrieve assessment, as I need the assessment's participation
-        $assessment = $this->assessmentDataSource->findByIdForReview($assessment->getId());
-        $action     = empty($before) ? PlanMapper::METHOD_CREATE : PlanMapper::METHOD_UPDATE;
-        $after      = $this->dehydrate($assessment);
+        $action = empty($before) ? PlanMapper::METHOD_CREATE : PlanMapper::METHOD_UPDATE;
+        $after  = $this->dehydrate($assessment);
 
         // Now, trigger notifiers
         // Participant object has little idea of whether assessment was created or updated,

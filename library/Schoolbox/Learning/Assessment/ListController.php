@@ -356,6 +356,9 @@ class ListController extends Web\Controller\Base
 
             $this->saveParticipationData($plans, $postData['participant-include'] ?? [], $postData['participant-plan'] ?? []);
 
+            // Retrieve assessment, as I need the assessment's participation
+            $assessment = $this->assessmentMapper->findByIdForReview($assessment->getId());
+
             // And send notifications
             $notifier->notify($assessment, $this->getUser(), $before);
         }
