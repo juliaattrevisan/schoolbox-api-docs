@@ -9,7 +9,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\DataModel;
 
 use Alaress\Diff\Differ;
-use Schoolbox\Assessment\Participant\Model as ParticipantModel;
+use Schoolbox\Assessment\Participant\Mapper as ParticipantMapper;
 use Schoolbox\Assessment\Participant\Plan\Mapper as PlanMapper;
 use Schoolbox\Learning\Assessment\Dehydrator;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -40,6 +40,11 @@ class NotifierProxy
     private $planMapper;
 
     /**
+     * @var ParticipantMapper
+     */
+    private $participantMapper;
+
+    /**
      * @var Dehydrator
      */
     private $dehydrator;
@@ -52,13 +57,18 @@ class NotifierProxy
     /**
      * Constructor
      *
-     * @param MapperProxy $assessmentDataSource
-     * @param PlanMapper  $planMapper
+     * @param MapperProxy       $assessmentDataSource
+     * @param PlanMapper        $planMapper
+     * @param ParticipantMapper $participantMapper
      */
-    public function __construct(MapperProxy $assessmentDataSource, PlanMapper $planMapper)
-    {
+    public function __construct(
+        MapperProxy $assessmentDataSource,
+        PlanMapper $planMapper,
+        ParticipantMapper $participantMapper
+    ) {
         $this->assessmentDataSource = $assessmentDataSource;
         $this->planMapper           = $planMapper;
+        $this->participantMapper    = $participantMapper;
         // Consider injecting these, but it's not necessary
         $this->dehydrator           = new Dehydrator();
         $this->differ               = new Differ();
@@ -123,8 +133,7 @@ class NotifierProxy
                       ->setAssessment($assessmentModel);
             // Set participants too
             foreach ($plan->getParticipants() as $participant) {
-                $participantModel = (new ParticipantModel())
-                    ->setId($participant->getId())
+                $participantModel = $this->participantMapper->createModel($participant->getId())
                     ->setUser($participant->getUser())
                     ->setExcludedAt($participant->getExcludedAt());
                 $planModel->getParticipants()->setOffset($participant->getUser()->getId(), $participantModel);
