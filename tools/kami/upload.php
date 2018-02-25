@@ -153,7 +153,7 @@ $kernel->run(function (Di\Container $di,
 
     $connector = $dryRun
         ? new Kami\MockConnector($client)
-        : new Kami\Connector($client, $this->getConfigLoader()->get('kami_api_key'), $this->getConfigLoader()->get('site_school_code'));
+        : new Kami\Connector($client, $config->get('kami_api_key'), $config->get('site_school_code'));
 
     if(!$connector->isEnabled()) {
         $log->warning('Kami has not been enabled by puppet for this instance. Aborting');
