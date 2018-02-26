@@ -311,7 +311,7 @@ abstract class AbstractBootstrap implements BootstrapInterface
             $sitepage = new SitePage(false);
             $sitepage->setDi($di);
             return $sitepage;
-        }));;
+        }));
 
         $di->set('sitePage',     $di->lazy(function() use ($di) {
             $sitepage = new SitePage();
