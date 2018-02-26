@@ -98,7 +98,7 @@ $(function () {
                             }
                         })
                     });
-                    
+
                     var completed  = false;
                     //TO DO: Inject route when file is pluginerised
                     var saveRoute = '/tour/url/save';

@@ -122,24 +122,6 @@ class Controller extends Base
         /** @var User $user */
         $user          = $this->getUser();
 
-        //Delete previous status
-        if ($post['oldStep'] !== null) {
-            try {
-                $oldTourStatus = $this->tourStatusMapper->findByColumnList([
-                    'current_step' => $post['oldStep'],
-                    'url' => $post['url'],
-                    'user_id' => $user->getId()
-                ]);
-
-                $this->tourStatusMapper->delete($oldTourStatus);
-            } catch (Mapper\Exception $e) {
-                //Could not find old step in db...
-                $this->getResponse()->content->set($this->buildJsonOutput('Could not find previous status to delete. Will not save next status.'));
-                $this->getResponse()->status->set(404);
-                return;
-            }
-        }
-
         //Save new status
         $newStep = $this->tourStepMapper->createModel();
         $newStep->setUuid($post['newStep']);
