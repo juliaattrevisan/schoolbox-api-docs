@@ -19,7 +19,7 @@
     {% set humanReadableMark = '' %}
 {% endif %}
 
-{% if humanReadableMark // 1 != humanReadableMark %}
+{% if humanReadableMark != '' and humanReadableMark // 1 != humanReadableMark %}
   {% set humanReadableMark = humanReadableMark| number_format(2) %}
 {% else %}
   {% set humanReadableMark = humanReadableMark | number_format(0) %}
