@@ -680,8 +680,8 @@ class ConnectorTest extends TestCase
     public function providerEnabledConnector(): array
     {
         return [
-            ['some invalid val', 'TESTING'],
-            ['123', 'TESTING'],
+            ['some invalid val'],
+            ['123'],
             ['Hisohslfd92382923'],
         ];
     }
