@@ -123,20 +123,18 @@ class Controller extends Base
         $user          = $this->getUser();
 
         //Save new status
-        $newStep = $this->tourStepMapper->createModel();
-        $newStep->setUuid($post['newStep']);
+        $newTour = $this->tourStepMapper->createModel();
+        $newTour->setUuid($post['tour_uuid']);
 
         $newTourStatus = $this->tourStatusMapper->createModel();
-        $newTourStatus->setTourStep($newStep)
+        $newTourStatus->setTour($newTour)
                       ->setUser($user)
-                      ->setUrl($post['url'])
                       ->setStatus($post['status']);
-
         try {
-            //Check if the corresponding step exists
-            $this->tourStepMapper->findOneByColumn("uuid", $post['newStep']);
+            //Save it real good
             $this->tourStatusMapper->save($newTourStatus);
             $this->getResponse()->status->set(204);
+
         } catch (Mapper\Exception $e) {
             //Attempted to save invalid data
             $this->getResponse()->content->set($this->buildJsonOutput('Invalid status data. Did not save status.'));
