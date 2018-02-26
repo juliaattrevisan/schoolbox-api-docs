@@ -218,7 +218,7 @@ class Model extends AbstractAssessment
     public function canLearnerCreateResponse(User $learner)
     {
         // Not open ?
-        if(!$this->isOpen()){
+        if(!$this->isOpen($learner)){
             return false;
         }
 
@@ -247,7 +247,7 @@ class Model extends AbstractAssessment
             /* Check whether the most recent response is officially submitted
              * You should be allowed to resume the draft/in-progress attempt
              */
-            if (!$mostRecentResponse->isSubmitted()) {
+            if ($mostRecentResponse && !$mostRecentResponse->isSubmitted()) {
                 return true;
             }
         }
