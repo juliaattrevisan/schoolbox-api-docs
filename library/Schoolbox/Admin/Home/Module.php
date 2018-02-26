@@ -41,9 +41,13 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initControllers(ContainerInterface $injector) {
-        $injector->set('controller:'.$this->basename, $injector->lazyNew(Controller::class));
+    public function initControllers(ContainerInterface $injector)
+    {
+        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class, [
+            $this->getInjector()->lazyGet('kamiConnector'),
+        ]));
     }
+
 
     /**
      * {@inheritdoc}

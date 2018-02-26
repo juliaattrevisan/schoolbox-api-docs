@@ -801,8 +801,9 @@ abstract class AbstractBootstrap implements BootstrapInterface
         );
 
         $di->set('kamiConnector', $di->lazyNew(Kami\Connector::class, [
-            'config' => $di->get('config'),
-            'client' => $di->lazyNew(GuzzleHttp\Client::class),
+            'client'         => $di->lazyNew(GuzzleHttp\Client::class),
+            'apiKey'         => $di->get('config')->get('kami_api_key'),
+            'siteSchoolCode' => $di->get('config')->get('site_school_code'),
         ]));
 
         // injectable module auth rules
