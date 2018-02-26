@@ -336,9 +336,7 @@ abstract class AbstractMailer implements IMailer
                     self::$transport->setPassword($conf->get('mail_smtp_password'));
                 }
             } else {
-                throw new Swift_SwiftException(
-                    'Swift_MailTransport is no longer supported; SMTP must be configured'
-                );
+                self::$transport = new \Swift_NullTransport();
             }
         }
         return self::$transport;
