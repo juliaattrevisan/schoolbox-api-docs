@@ -98,7 +98,7 @@ $(function () {
                             }
                         })
                     });
-                    
+
                     var oldStep = null;
                     var completed  = false;
                     var tourUrl = window.location.pathname;

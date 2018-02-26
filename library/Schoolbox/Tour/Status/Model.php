@@ -8,6 +8,7 @@
 namespace Schoolbox\Tour\Status;
 
 use Schoolbox\User;
+use Schoolbox\Tour;
 use Schoolbox\Tour\Step;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 
@@ -15,14 +16,17 @@ class Model implements \JsonSerializable
 {
     use CreatedAtDate;
 
-    /** User has not interacted with this step/step in the joyride */
-    public const STATUS_UNACTIONED = 'unactioned';
+    /** User has started the joyride */
+    public const STATUS_STARTED = 'started';
+
+    /** User has dismissed the joyride- and presumably never wants to see the damn thing again */
+    public const STATUS_DISMISSED = 'dismissed';
 
     /** User has completed the joyride */
     public const STATUS_COMPLETED = 'completed';
 
-    /** User has dismissed the joyride- and presumably never wants to see the damn thing again */
-    public const STATUS_DISMISSED = 'dismissed';
+    /** User has not interacted with this step/step in the joyride */
+    public const STATUS_DISABLED = 'disabled';
 
     /**
      * @var User|null
@@ -30,14 +34,9 @@ class Model implements \JsonSerializable
     protected $user;
 
     /**
-     * @var String|null
+     * @var Tour\Model|null
      */
-    protected $url;
-
-    /**
-     * @var Step\Model|null
-     */
-    protected $tourStep;
+    protected $tour;
 
     /**
      * @var String|null
@@ -82,43 +81,22 @@ class Model implements \JsonSerializable
         return $this;
     }
 
-
     /**
-     * @return null|String
+     * @return null|Tour\Model
      */
-    public function getUrl()
+    public function getTour()
     {
-        return $this->url;
+        return $this->tour;
     }
 
 
     /**
-     * @param null|String $url
+     * @param null|Tour\Model $tour
      * @return $this
      */
-    public function setUrl($url)
+    public function setTour($tour)
     {
-        $this->url = $url;
-        return $this;
-    }
-
-
-    /**
-     * @return null|Step\Model
-     */
-    public function getTourStep()
-    {
-        return $this->tourStep;
-    }
-
-
-    /**
-     * @param null|Step\Model $tourStep
-     * @return $this
-     */
-    public function setTourStep($tourStep)
-    {
-        $this->tourStep = $tourStep;
+        $this->tour = $tour;
         return $this;
     }
 
@@ -135,9 +113,8 @@ class Model implements \JsonSerializable
     {
         return [
             'user'      => $this->getUser(),
-            'url'       => $this->getUrl(),
             'status'    => $this->getStatus(),
-            'tourStep'  => $this->getTourStep()
+            'tourStep'  => $this->getTour()
         ];
     }
 }
