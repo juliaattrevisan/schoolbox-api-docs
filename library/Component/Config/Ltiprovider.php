@@ -9,7 +9,6 @@
 
 use Schoolbox\LTI\Provider\Mapper as ProviderMapper;
 use Schoolbox\LTI\Provider\Model as ProviderModel;
-use Schoolbox\Mapper\Exception as MapperException;
 
 class Component_Config_LTIProvider extends Component_Config_Abstract
 {

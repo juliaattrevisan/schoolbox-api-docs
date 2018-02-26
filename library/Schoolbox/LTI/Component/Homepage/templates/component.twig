@@ -102,25 +102,20 @@
                     ).success(function (result) {
 
                         {# Hide preloader #}
-
                         $('#lti-select-preloader{{ componentInstanceId }}').hide();
 
                         $toaster.toastTimeout({text:'Component loaded'});
 
                         {# Update selected provider name in component configuration settings #}
-
-                        component.find('.ltiprovider').find('p').html(result.providerName);
+                        $('#component{{ componentInstanceId }}-ltiprovider').val(providerId);
 
                         {# Update heading #}
-
                         component.find('input[name="componentname"]').val(result.providerName);
 
                         {# Update component heading #}
-
                         component.find('h2').html(result.providerName);
 
                         {# Launch LTI in the iframe and make it visibile #}
-
                         var iframe = $('#lti-frame{{ componentInstanceId }}');
 
                         iframe.attr('src', '{{ routeLookup('ltiConsumer.getLaunch', {
@@ -132,7 +127,6 @@
                         iframe.show();
                     }).fail(function () {
                         {# This shouldn't happen, but just in case something goes wrong #}
-
                         $('#lti-select-preloader{{ componentInstanceId }}').hide();
                         $('#lti-select-provider{{ componentInstanceId }}').show();
 
