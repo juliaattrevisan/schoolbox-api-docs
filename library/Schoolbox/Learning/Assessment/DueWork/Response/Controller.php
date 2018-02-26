@@ -260,20 +260,13 @@ class Controller extends Base
 
         $file = $response ? $this->getFile($response, $this->getRequest()->query['hash']) : null;
 
-        // Work with the correct feedback for this response.
-        // * Most recent feedback for the response
-        // * Most recent for the participant
-        // * Nothing
-        $latestFeedback = null;
-        if ($response) {
-            $latestFeedback = $response->findMostRecentInstructorGivenFeedback();
-        }
-        $latestFeedback = $latestFeedback ?? $participant->findMostRecentInstructorGivenFeedback();
+        // Authoritative feedback, draft or published
+        $feedback = $participant->findMostRecentInstructorGivenFeedback();
 
         // The zone which contains the files
         $attachZoneFactory = new Attachzone\Factory();
         $attachZone        = $attachZoneFactory->buildForDueWorkFeedback(
-            $latestFeedback instanceof Feedback ? $latestFeedback : null
+            $feedback instanceof Feedback ? $feedback : null
         );
 
         // Is the page being displayed in readonly mode?
@@ -286,7 +279,7 @@ class Controller extends Base
                 ->add(['Inline Grader', '']),
             'response' => $response,
             'isMostRecentResponse' => $isMostRecentResponse,
-            'latestFeedback' => $latestFeedback,
+            'feedback' => $feedback,
             'attachzone' => $attachZone->getTwigContext(),
             'selectedFileHash' => $this->getRequest()->query['hash'],
             'markSchemeName' => $this->deriveSchemeName($assessment->getMarkScheme()),

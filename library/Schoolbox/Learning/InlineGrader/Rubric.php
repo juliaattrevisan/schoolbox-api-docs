@@ -86,10 +86,6 @@ class Rubric
             return [
                 'rubricContext' => $this->rubricContext->generate($this->assessment, $this->participant->getUser(), $this->currentUser, Access::getInstance(), false)
             ];
-        } elseif ($this->response) {
-            return [
-                'rubricContext' => $this->rubricContext->generateMarkableForResponse($this->assessment, $this->participant->getUser(), $this->response->getId())
-            ];
         } else {
             return [
                 'rubricContext' => $this->rubricContext->generateMarkable($this->assessment, $this->participant->getUser())
