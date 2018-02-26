@@ -33,12 +33,13 @@ class ConnectorTest extends TestCase
      * @throws \Schoolbox\Learning\InlineGrader\Kami\Exception\EmptyApiKeyException
      * @throws \Schoolbox\Learning\InlineGrader\Kami\Exception\NotFound
      * @throws \Schoolbox\Learning\InlineGrader\Kami\Exception\ResponseDecodeException
+     * @throws \PHPUnit\Framework\Exception
      */
     public function testInvalidSiteSchoolCode(?string $siteSchoolCode): void
     {
         // This method must not hit Kami API
         $connector = new Connector($this->getMockClientWithConnectException(), 'TEST_API_KEY', $siteSchoolCode);
-        $this->setExpectedException(EmptySiteSchoolCode::class);
+        $this->expectException(EmptySiteSchoolCode::class);
         $connector->viewSession('kamiDocId', new User());
     }
 
