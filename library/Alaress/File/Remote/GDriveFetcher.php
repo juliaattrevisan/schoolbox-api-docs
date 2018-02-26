@@ -191,8 +191,8 @@ class GDriveFetcher implements FetcherInterface
     {
         $titleLen = strlen($title);
         $extLen   = strlen($ext);
-        if ($extLen > $titleLen) {
-            throw new OutOfBoundsException("Extension '$ext' is longer than the title '$title'.");
+        if ($titleLen < 1) {
+            throw new OutOfBoundsException("Title must contain characters");
         }
 
         // true if the extension is already suffixed
