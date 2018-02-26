@@ -143,7 +143,7 @@ $(function () {
 
                         //Save the status
                         $.post(saveRoute, {
-                            tour_uuid: tourCurrent.uuid,
+                            tour_uuid: uuid,
                             status: status
                         });
                     });
@@ -153,14 +153,12 @@ $(function () {
 
                         //onexit triggers when oncomplete triggers, so need check
                         if(!completed) {
-                            var newStep = currentStep.uuid;
-
                             //This matches the consts on the Status/Model - to be updated when this file is a plugin
                             var status = "dismissed";
 
                             //Save the status
                             $.post(saveRoute, {
-                                tour_uuid: tourCurrent.uuid,
+                                tour_uuid: uuid,
                                 status: status
                             });
                         }
@@ -183,7 +181,7 @@ $(function () {
 
                     //Save the status
                     $.post(saveRoute, {
-                        tour_uuid: tourCurrent.uuid,
+                        tour_uuid: uuid,
                         status: 'started'
                     });
 
