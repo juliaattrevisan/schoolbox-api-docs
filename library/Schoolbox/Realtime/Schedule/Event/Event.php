@@ -13,6 +13,7 @@ namespace Schoolbox\Realtime\Schedule\Event;
 
 use JsonSerializable;
 use RuntimeException;
+use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Mapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -147,9 +148,65 @@ class Event implements CrudEventInterface, Serializable, JsonSerializable {
         // because this object could have already been hydrated in this request.
         $this->mapper->invalidateHydrateCache($array['o']['i']);
 
-		$this->object   = $this->getMapper()->hydrate($array['o']['i']);
+        $this->object = $this->hydrate($array['o']['i'], $this->mapper);
+
 		$this->diff     = $array['d'];
 	}
+
+
+    /**
+     * Attempt to convert the serialised array into a model object.
+     *
+     * If the class structure/signature has changed during serialisation, overlay serialised data over
+     * current model if possible and model is white-listed
+     *
+     * @param mixed[] $instanceData
+     * @param Mapper  $mapper
+     * @return mixed
+     * @throws Mapper\Exception
+     * @throws Mapper\Exception\Deleted
+     * @throws \TypeError
+     */
+    private function hydrate(array $instanceData, Mapper $mapper)
+    {
+        try {
+            return $mapper->hydrate($instanceData);
+        } catch (\TypeError $e) {
+            // It's possible the model's class has changed since the object was serialised, and the serialised data
+            // is no longer able to hydrate the model correctly. In this case, fall back to the current version of this model
+            // stored in the DB, and overlay as much as we can.
+            $identifier = $mapper->getIdentifier();
+            if (!$identifier) {
+                // No Identifier? Not much we can do.
+                throw $e;
+            }
+            // White list of models that are known to have this issue, and which we are confident this implementation will work.
+            $knownIssueClasses = [SubmissionBox::class,];
+            if (!\in_array($mapper->getModel(), $knownIssueClasses, true)) {
+                throw $e;
+            }
+            // Convert from indexed-by-property to indexed-by-column
+            $mapsByColumn = $mapper->getMap()
+                                   ->filter(function (array $map) {
+                                       // Reverse joins don't have a column
+                                       return array_key_exists('column', $map);
+                                   })
+                                   ->indexByCallback(function (array $map) {
+                                       return $map['column'];
+                                   });
+            // Get object as it exists currently in DB
+            $object = $mapper->findById($instanceData[$mapper->getIdentifierColumn()]);
+            // Overlay serialized values
+            foreach ($instanceData as $column => $value) {
+                // Check the serialised column still exists on the model (eg submission_box.deleted no longer exists in 18.0)
+                if($mapsByColumn->keyExists($column)){
+                    $mapper->setModelProperty($object, $mapsByColumn[$column]['property'], $value);
+                }
+
+            }
+            return $object;
+        }
+    }
 
     /**
      * Specify data which should be serialized to JSON
