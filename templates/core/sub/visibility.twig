@@ -7,7 +7,7 @@
 %}
 
 {% spaceless %}
-<label>Visibility <span data-tooltip class="hint has-tip tip-top"  title="This controls what roles will be able to view the grades for this assessment.">?</span>
+<label>Visibility <span data-tooltip class="hint has-tip tip-top"  title="This controls who will be able to view the grades for this assessment.">?</span>
     <select name="visibility">
         {% for currentOption, label in allOptions %}
             <option value="{{ currentOption }}"
