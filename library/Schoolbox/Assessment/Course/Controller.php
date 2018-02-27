@@ -1561,11 +1561,16 @@ class Controller extends Base\Base
             $mime = "*/*";
         }
 
-        $courseTreeBuilder = new CourseTreeBuilder(new ILocator(), $this->getUser());
+        $treeBuilder = new CourseTreeBuilder(
+            FolderMapper::getInstance(),
+            $_SESSION['user'],
+            'Courses'
+        );
+
 
         $this->getResponse()->content->set([
             'format' => 'json',
-            'data'   => $courseTreeBuilder->buildChildNodes($folderId, [], $mime)
+            'data'   => $treeBuilder->buildChildNodes($folderId, [], $mime)
         ]);
     }
 }
