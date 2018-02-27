@@ -35,12 +35,15 @@ class Controller extends Base
     {
         // And render this thing out
         $reports = $this->externalDocument->getAcademicReportsForStudent($student);
+        $wysiwyg_value = $this->getConfigLoader()->get('academic_reports_wysiwyg');
+
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@profileDocumentManagement/index.twig',
                 [
                     'student' => $student,
                     'reports' => $reports,
+                    'wysiwyg_content' => $wysiwyg_value
                 ],
                 'Academic Reports for '.$student->formatName()
             )
