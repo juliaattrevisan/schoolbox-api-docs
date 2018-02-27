@@ -165,4 +165,98 @@ class External_Smcs_User_Class extends External_Synergetic_User
 
         return $this->getConnector()->executeQuery($query)->fetchAll();
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function getPortrait($externalUserId)
+    {
+        // Make sure a valid external ID was passed
+
+        if (!$this->isExternalIdValid($externalUserId)) {
+            return false;
+        }
+
+        // Get path on Schoolbox server to cached photos. These stupidly have a .JPG extension regardless of what
+        // they really are- so don't pay much attention that the type
+
+        $photoPath = realpath($this->config->get('portrait_dir')) . "/{$externalUserId}.jpg";
+
+        // Check if the configuration options have SIS photo imporing disabled
+
+        if ($this->config->get('photo_sis_import') == 0) {
+
+            // Not allowed to import photos. If one exists locally we can use it, otherwise we will just fail
+
+            if (file_exists($photoPath)) {
+                return $photoPath;
+            } else {
+                return false;
+            }
+        }
+
+        // Do a query to get the photos modification date in the SIS. We don't pull the actual photo at this time
+
+        $queryPhoto = $this->getConnector()->executeQuery(
+            "SELECT uvPhotos.ModifiedDate FROM dbo.uvPhotos uvPhotos WHERE uvPhotos.ID = :externalId",
+            ['externalId' => $externalUserId]
+        );
+
+        // Check if we found a photo in the SIS
+
+        if ($photo = $queryPhoto->fetch()) {
+
+            // Check we can read the file
+
+            if (is_readable($photoPath)) {
+
+                // If the file is empty, or does not contain a valid image we want to replace it regardless of its date
+
+                if (filesize($photoPath) == 0 || !exif_imagetype($photoPath)) {
+
+                    $downloadImage = true;
+
+                } else {
+
+                    // File on disk was a valid image- check the modification date to see if we want to redownload
+
+                    $downloadImage = filemtime($photoPath) < strtotime($photo['ModifiedDate']);
+                }
+            } else {
+
+                // File was not readable
+
+                $downloadImage = true;
+            }
+
+            if ($downloadImage) {
+
+                // Do a query to retrieve the actual photo from the database
+                unset($queryPhoto);
+                $queryPhoto = $this->getConnector()->executeQuery(
+                    "SELECT uvPhotos.Photo FROM dbo.uvPhotos uvPhotos WHERE uvPhotos.ID = :externalId",
+                    ['externalId' => $externalUserId]
+                );
+
+                $photo = $queryPhoto->fetch();
+
+                // The cache has expired, overwrite it with the one from the SIS
+
+                $photoHandle = fopen($photoPath, "w");
+                fwrite($photoHandle, $photo['Photo']);
+                fclose($photoHandle);
+            }
+
+            return $photoPath;
+        }
+
+        // There was no photo in the SIS, so we don't want to display the cached image either- delete it from
+        // disk so it doesn't magically appear later after they'd specifically deleted it from Synergetic
+
+        if (file_exists($photoPath)) {
+            unlink($photoPath);
+        }
+
+        return false;
+    }
 }
