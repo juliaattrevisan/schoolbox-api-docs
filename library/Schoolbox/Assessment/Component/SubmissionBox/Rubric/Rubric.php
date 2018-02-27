@@ -10,6 +10,8 @@ namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 
 use Alaress_Date_Format;
 use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
+use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
 use Schoolbox\Assessment\Rubric as Core;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper;
@@ -494,7 +496,13 @@ class Rubric extends Core\Rubric
             return '';
         }
 
-        $marksheet = \Marksheet_Factory::build($this->box->getMarkType()->getSlug(), $this->box);
+        $markType = $this->box->getMarkType();
+
+        if ($markType === null) {
+            $markType = MarkTypeMapper::getInstance()->createModel(MarkType::SLUG_PERCENT);
+        }
+
+        $marksheet = \Marksheet_Factory::build($markType->getSlug(), $this->box);
         $value = $marksheet->convertRawMark($percentage * 100, $total, true, false);
 
         return $value;
