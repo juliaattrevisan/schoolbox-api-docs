@@ -454,6 +454,7 @@ class External_Synergetic_User implements External_UserInterface
             SELECT      SchoolStaffCode,
                         luBuilding.Description AS StaffBuilding,
                         StaffRoom,
+                        luHouse.Description AS StaffHouseDescription,
                         StaffExtension,
                         StaffMobilePhone,
                         StaffDefaultMobilePhone,
@@ -462,6 +463,7 @@ class External_Synergetic_User implements External_UserInterface
                         luDepartment.Description AS StaffDepartment,
                         StaffVoiceMail
              FROM       dbo.vStaff vStaff
+             LEFT JOIN  dbo.luHouse ON luHouse.Code = vStaff.StaffHouse
              LEFT JOIN  dbo.luBuilding ON StaffBuilding = luBuilding.Code
              LEFT JOIN  dbo.luDepartment ON StaffDepartment = luDepartment.Code
              WHERE      vStaff.StaffID = :externalId
