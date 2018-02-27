@@ -6,11 +6,14 @@
         feedback:           IFeedback
         tabindex:           int
         readonly:           bool            Should textarea be rendered as readonly?
+        selfAssessment:     bool            Is this being viewed in a self assessment context?
         selfReflection:     bool            Is this being viewed in a self reflection context?
     ]
 #}
 
-{% if selfReflection %}
+{% if selfAssessment %}
+    {% set placeholder = 'Your ' ~ locale.selfAssessment %}
+{% elseif selfReflection %}
     {% set placeholder = 'Your ' ~ locale.selfReflection %}
 {% elseif readonly %}
     {% set placeholder = '(no comment given)' %}
