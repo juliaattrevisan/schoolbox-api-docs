@@ -49,32 +49,31 @@ if (isset($type) && isset($id)) {
     if (substr_count(strtolower(php_sapi_name()),'apache') > 0) { apache_setenv('no-gzip', 1); }
 
     $filename = $video->getFileLocation();
-    // Get mimetype of encoded file, not from upload
-//    $fileinfo = new finfo(FILEINFO_MIME_TYPE);
-//    $mimetype = $fileinfo->file($filename);
-//    unset($fileinfo);
-    switch (pathinfo($filename, PATHINFO_EXTENSION)) {
-        case 'mp3':
-            $mimetype = 'audio/mpeg';
-            break;
-        case 'mp4':
-            $mimetype = 'video/mp4';
-            break;
-        default:
-            // assume it wasn't encoded at all
-            $mimetype = $video->getFile()->getMimeType()->getMime();
-            break;
-    }
-
-    if ($type == \Schoolbox\Video\QueueMapper::FILE_TYPE_SBFS) {
-        if ($video->getFile() instanceof Schoolbox\Resource\File\Model) {
-            LogMapper::getInstance()->logRead($video->getFile(), $_SESSION['user']);
-        }
-    }
 
     if (is_readable($filename)) {
         $filesize = @filesize($filename);
         if ($filesize) {
+
+            // Get mimetype of encoded file, not from upload
+            switch (pathinfo($filename, PATHINFO_EXTENSION)) {
+                case 'mp3':
+                    $mimetype = 'audio/mpeg';
+                    break;
+                case 'mp4':
+                    $mimetype = 'video/mp4';
+                    break;
+                default:
+                    // assume it wasn't encoded at all
+                    $mimetype = 'application/octet-stream';
+                    break;
+            }
+
+            if ($type == \Schoolbox\Video\QueueMapper::FILE_TYPE_SBFS) {
+                if ($video->getFile() instanceof Schoolbox\Resource\File\Model) {
+                    LogMapper::getInstance()->logRead($video->getFile(), $_SESSION['user']);
+                }
+            }
+
             $byteOffset = 0;
             $byteLength = $filesize;
 
