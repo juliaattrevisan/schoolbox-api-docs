@@ -515,8 +515,8 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         }
 
         // Build a box type
-        $workType = $assessment->getWorkType();
-        $boxType  = mb_strtolower($workType ? $workType->getName() : '');
+        $boxType       = $assessment->getTypeName();
+        $parentBoxType = mb_strtolower($boxType);
 
         // All updated notifs have the same icon, namespace, severity
         $bob = $this->buildGenericBuilder($assessment, $effector)
@@ -575,8 +575,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 // Students
                 // TODO iterate particiapnts and students separately?
                 $bob = $this->targetBuilderToStudent($bob, $assessment, $participant)
-                            ->setTitle(':author renamed :oldname to :assessment in :cat')
-                            ->setParam('author', new UserParam($effector))
+                            ->setTitle("$boxType was renamed from :oldname to :assessment in :cat")
                             ->setParam('oldname', new Param($oldName))
                             ->setTopics(["$topicStub.renamed"]);
                 $envelope->targetToUser($participant->getUser(), $bob->build());
@@ -584,8 +583,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 // Parents
                 if ($this->isParentTargetable()) {
                     $bob = $this->targetBuilderToParents($bob, $assessment, $participant)
-                                ->setTitle(":child's $boxType was renamed from :oldname to :assessment in :cat")
-                                ->unsetParam('author');
+                                ->setTitle(":child's $parentBoxType was renamed from :oldname to :assessment in :cat");
                     $envelope->targetToParent($participant->getUser(), $bob->build());
                 }
 
@@ -605,8 +603,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
                 // Students
                 $bob = $this->targetBuilderToStudent($bob, $assessment, $participant)
-                            ->setTitle(":author $verb :assessment to :date in :cat")
-                            ->setParam('author', new UserParam($effector))
+                            ->setTitle("$boxType :assessment closing date was $verb to :date in :cat")
                             ->setParam('date', new Param($dateformat))
                             ->setTopics(["$topicStub.datechanged"]);
                 $envelope->targetToUser($participant->getUser(), $bob->build());
@@ -614,8 +611,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 // Parents
                 if ($this->isParentTargetable()) {
                     $bob = $this->targetBuilderToParents($bob, $assessment, $participant)
-                                ->setTitle(":child's $boxType :assessment closing date was $verb to :date in :cat")
-                                ->unsetParam('author');
+                                ->setTitle(":child's $parentBoxType :assessment closing date was $verb to :date in :cat");
                     $envelope->targetToParent($participant->getUser(), $bob->build());
                 }
 
@@ -651,16 +647,14 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             if (!$notificationRaisedForParticipant) {
                 // Students
                 $bob = $this->targetBuilderToStudent($bob, $assessment, $participant)
-                            ->setTitle(':author updated :assessment in :cat')
-                            ->setParam('author', new UserParam($effector))
+                            ->setTitle("$boxType :assessment was updated in :cat")
                             ->setTopics(["$topicStub.updated"]);
                 $envelope->targetToUser($participant->getUser(), $bob->build());
 
                 // Parents
                 if ($this->isParentTargetable()) {
                     $bob = $this->targetBuilderToParents($bob, $assessment, $participant)
-                                ->setTitle(":child's $boxType :assessment was updated in :cat")
-                                ->unsetParam('author');
+                                ->setTitle(":child's $parentBoxType :assessment was updated in :cat");
                     $envelope->targetToParent($participant->getUser(), $bob->build());
                 }
             }
