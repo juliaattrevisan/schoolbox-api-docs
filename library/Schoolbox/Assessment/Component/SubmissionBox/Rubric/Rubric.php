@@ -494,6 +494,11 @@ class Rubric extends Core\Rubric
             return '';
         }
 
+        // TODO box is full of nulls - why?
+        $box = $this->box;
+        $markType = $this->box->getMarkType();
+
+        // TODO error here in getSlug
         $marksheet = \Marksheet_Factory::build($this->box->getMarkType()->getSlug(), $this->box);
         $value = $marksheet->convertRawMark($percentage * 100, $total, true, false);
 

@@ -195,8 +195,6 @@ class Controller extends BaseController
      */
     public function import(File $file)
     {
-        // TODO this 2D array does not contain any data except for the folder ID,
-        // but we're expecting to get data from it later
         $post = $this->getRequest()->post;
 
         try {
@@ -209,7 +207,6 @@ class Controller extends BaseController
                 $folderId = $box->getCategory()->getId();
 
             } elseif ($folderId = $post->get('folderId')) {
-                // TODO remove this comment - This code path is getting executed
                 $box = SubmissionBoxMapper::getInstance()->createModel()->setId(0);
 
             } else {
@@ -231,7 +228,6 @@ class Controller extends BaseController
             return;
         }
 
-        // TODO rubric error is happening here
         $context = [
             'formField' => $post->get('formField', 'rb'),
             'rubric'    => $grid->toContext()
