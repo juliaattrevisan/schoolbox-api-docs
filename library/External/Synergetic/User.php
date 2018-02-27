@@ -454,6 +454,7 @@ class External_Synergetic_User implements External_UserInterface
             SELECT      SchoolStaffCode,
                         luBuilding.Description AS StaffBuilding,
                         StaffRoom,
+                        StaffHouse,
                         StaffExtension,
                         StaffMobilePhone,
                         StaffDefaultMobilePhone,
