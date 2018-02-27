@@ -258,12 +258,11 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      * identical apart from topic.
      *
      * @param Model $plan
-     * @param User  $effector
      * @return Envelope
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \Schoolbox\Mapper\Exception\Deleted
      */
-    public function notifyOpen(Model $plan, User $effector): Envelope
+    public function notifyOpen(Model $plan): Envelope
     {
         $assessment = $this->retrieveAssessmentDomainModel($plan);
         $envelope   = new Envelope();
@@ -489,9 +488,10 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         return $envelope;
     }
 
-
     /**
      * Participant gets notified when an assessment is updated.
+     *
+     * @noinspection PhpUnusedParameterInspection
      *
      * @param Model      $plan
      * @param User       $effector
