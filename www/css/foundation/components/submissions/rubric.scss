@@ -5,23 +5,7 @@ table.rb {
     &.markable {
         td {
             padding: 0;
-            label {
-                box-sizing: content-box;
-                width: 100%;
-                height: 100%;
-                position: relative;
-                span {
-                    margin: $table-row-padding;
-                }
-            }
-
-            /* So that in readonly view, absolute elements end up in the correct location
-             * such as the student's avatar in Self Reflection
-             */
-            .rb-self-reflection-choice {
-                bottom: $table-row-padding / 2;
-                right: $table-row-padding / 2;
-            }
+            position: relative;
         }
         input[type=checkbox], input[type=radio] {
             &:checked {
@@ -39,6 +23,25 @@ table.rb {
             }
         }
     }
+
+    label {
+        box-sizing: content-box;
+        width: 100%;
+        height: 100%;
+        position: relative;
+        span {
+            margin: $table-row-padding;
+        }
+    }
+
+    // Self Reflection
+    .rb-self-reflection-choice {
+        border-radius: 50%;
+        position: absolute;
+        bottom: 3px;
+        right: 3px;
+    }
+
     a {
         white-space: nowrap;
         line-height: 2.75rem;
@@ -80,13 +83,6 @@ table.rb {
          */
         div {
             position: relative;
-        }
-
-        .rb-self-reflection-choice {
-            border-radius: 50%;
-            position: absolute;
-            bottom: -$table-row-padding / 2;
-            right: -$table-row-padding / 2;
         }
     }
     textarea {
@@ -186,8 +182,8 @@ table.rb {
     line-height: 2.875rem;
 }
 .rb-selected {
-    background-color: $input-focus-border-color !important;
-    color: calc-text-color($input-focus-border-color);
+    background-color: $content-ui-selected!important;
+    color: calc-text-color($content-ui-selected);
 }
 .rb-blank {
     background-color: #FFEFEB !important;

@@ -250,9 +250,9 @@
 	@for $i from 0 through $count {
 
 		$derived: hsl(
-			$iHue + ($i - 1) * $dHue,
-			$iSat + ($i - 1) * $dSat,
-			$iLight + ($i - 1) * $dLight
+			$iHue + $i * $dHue,
+			$iSat + $i * $dSat,
+			$iLight + $i * $dLight
 		);
 
 		.#{$prefix}-#{$i} {
@@ -260,8 +260,7 @@
 		}
 		.#{$prefix}-#{$i}-bg {
 			background-color: $derived;
-			color: calc-text-color($derived, $light, $dark);
-
+			color: $white;
 		}
 	}
 }

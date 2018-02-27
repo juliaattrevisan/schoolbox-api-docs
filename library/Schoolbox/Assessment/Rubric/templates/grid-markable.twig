@@ -6,55 +6,51 @@
 {% set showRubricTotal = showRubricTotal ? true : false %}
 
 <div class="scrollable">
-<table class="rb markable stack-for-medium-down" id="{{ rubricId }}">
+    <table class="rb markable stack-for-medium-down" id="{{ rubricId }}">
 
-    {# Suppress level headings if none have names #}
-    {% set hasLevels = false %}
-    {% for level in rubric.levels if level.name | trim | length %}
-        {% set hasLevels = true %}
-    {% endfor %}
-    {% if hasLevels  %}
-    <thead>
-    <tr>
-        <th colspan="2">&nbsp;</th>
-        {% for level in rubric.levels %}
-        <th>{{ level.name }}</th>
+        {# Suppress level headings if none have names #}
+        {% set hasLevels = false %}
+        {% for level in rubric.levels if level.name | trim | length %}
+            {% set hasLevels = true %}
         {% endfor %}
-    </tr>
-    </thead>
-    {% endif %}
-    <tbody>
-
-    {% for groupIndex, group in rubric.groups %}
-
-        {# Use rowspans when group total is visible, otherwise don't need it
-         # This is only off when self-reflecting with a grid that doesn't show descriptor points
-         # and groups - here, it never shows the group subtotal, and rowspan calcs are off
-         #}
-        {% set rowspan = group.criteria|length %}
-
-        {% if self != 'selfReflection' and showGroupTotal %}
-            {% set rowspan = group.criteria|length + (group.total ? 1 : 0) %}
+        {% if hasLevels  %}
+        <thead>
+            <tr>
+                <th colspan="2">&nbsp;</th>
+                {% for level in rubric.levels %}
+                <th>{{ level.name }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
         {% endif %}
+        <tbody>
+            {% for groupIndex, group in rubric.groups %}
 
-        {% for critIndex, crit in group.criteria %}
-    <tr data-group="{{ rubricId }}-{{ group.id }}">
-        {# yay html tables... -_-; #}
-        {% if rowspan %}
-            <th class="rb-group-name" rowspan="{{ rowspan }}"><span>{{ group.name }}</span></th>
-            {% set rowspan = 0 %}
-        {% endif %}
+            {# Use rowspans when group total is visible, otherwise don't need it
+             # This is only off when self-reflecting with a grid that doesn't show descriptor points
+             # and groups - here, it never shows the group subtotal, and rowspan calcs are off
+             #}
+            {% set rowspan = group.criteria|length %}
 
-        <th class="rb-criterion-name">{{ crit.name }}</th>
+            {% if self != 'selfReflection' and showGroupTotal %}
+                {% set rowspan = group.criteria|length + (group.total ? 1 : 0) %}
+            {% endif %}
 
+            {% for critIndex, crit in group.criteria %}
+            <tr data-group="{{ rubricId }}-{{ group.id }}">
+                {# yay html tables... -_-; #}
+                {% if rowspan %}
+                <th class="rb-group-name" rowspan="{{ rowspan }}"><span>{{ group.name }}</span></th>
+                {% set rowspan = 0 %}
+                {% endif %}
 
-        <input name="saveEmpty" value="true" type="hidden"/>
+                <th class="rb-criterion-name">{{ crit.name }}</th>
 
-            {% for levelIndex, level in rubric.levels %}
+                <input name="saveEmpty" value="true" type="hidden"/>
 
-                {% set descriptor = rubric.descriptors[crit.id][levelIndex] %}
-
-                {% if descriptor %}
+                {% for levelIndex, level in rubric.levels %}
+                    {% set descriptor = rubric.descriptors[crit.id][levelIndex] %}
+                    {% if descriptor %}
 
                     {% set inputId %}{{ formField }}[{{ crit.id }}][{{ level.id }}]{% endset %}
 
@@ -72,40 +68,63 @@
                                {% if descriptor.selected %}checked="checked"{% endif %}
                         />
                         <label for="{{ inputId }}">
-                            <span class="rb-description">
-                                {{- descriptor.text|nl2br -}}
-                            </span>
+                        <span class="rb-description">
+                            {{- descriptor.text|nl2br -}}
+                        </span>
 
-                            {% if descriptor.value is not null and showDescriptorValue and (config.rubric_show_points or not studentView) %}
-                                <span class="rb-value">
-                                    {{- descriptor.value -}}
-                                </span>
-                            {% endif %}
-                            {% if learnerSelected %}
-                                <img class="rb-self-reflection-choice"
-                                     src="/portrait.php?userId={{ learner.externalId }}&amp;size=square32"
-                                     title="{% if latestSelfReflectedFeedback.normalisedMark != null %}{{ locale.selfAssessment.proper }}{% else %}{{ locale.selfReflection.proper }}{% endif %} choice" />
+                        {% if descriptor.value is not null and showDescriptorValue and (config.rubric_show_points or not studentView) %}
+                        <span class="rb-value">
+                            {{- descriptor.value -}}
+                        </span>
                             {% endif %}
                         </label>
+                        {% if learnerSelected %}
+                            <img class="rb-self-reflection-choice"
+                                 src="/portrait.php?userId={{ learner.externalId }}&amp;size=square32"
+                                 title="{% if latestSelfReflectedFeedback.normalisedMark != null %}{{ locale.selfAssessment.proper }}{% else %}{{ locale.selfReflection.proper }}{% endif %} choice" />
+                        {% endif %}
                     </td>
 
-                {% else %}
+                    {% else %}
                     <td class="rb-blank">&nbsp;</td>
-                {% endif %}
-
+                    {% endif %}
+                {% endfor %}
+            </tr>
             {% endfor %}
 
-    </tr>
-        {% endfor %}
+            {% if group.total and showGroupTotal %}
+            <tr>
+                {% if config.rubric_show_points or not studentView %}
+                    <th class="rb-group-summary" colspan="{{ rubric.levels|length + 1 }}">
+                        <span data-group-summary="{{ rubricId }}-{{ group.id }}"
+                            data-numerator="{{ group.sum }}"
+                            data-denominator="{{ group.total }}">
+                            {{ group.humanReadableMark }}
+                        </span>
 
-        {% if group.total and showGroupTotal %}
-        <tr>
-            {% if config.rubric_show_points or not studentView %}
-                <th class="rb-group-summary" colspan="{{ rubric.levels|length + 1 }}">
-                    <span data-group-summary="{{ rubricId }}-{{ group.id }}"
-                        data-numerator="{{ group.sum }}"
-                        data-denominator="{{ group.total }}">
-                    {{ group.humanReadableMark }}
+                        {# Self-Assessment #}
+                        {% if learnerRubric %}
+                            {% if latestSelfReflectedFeedback.isSelfGrading %}
+                                {% set selfReflectionName = locale.selfAssessment.proper %}
+                            {% else %}
+                                {% set selfReflectionName = locale.selfReflection.proper %}
+                            {% endif %}
+
+                            ({{ learnerRubric.groups[groupIndex].humanReadableMark }} given in {{ selfReflectionName }})
+                        {% endif %}
+                    </th>
+                {% endif %}
+            </tr>
+            {% endif %}
+            {% endfor %}
+
+            {% if rubric.total and showRubricTotal and (config.rubric_show_points or not studentView) %}
+            <tr>
+                <th class="rb-final-summary" colspan="{{ rubric.levels|length + 2 }}">
+                    <span data-final-summary="{{ rubricId }}"
+                        data-numerator="{{ rubric.sum }}"
+                        data-denominator="{{ rubric.total }}">
+                        {{ rubric.humanReadableMark }}
                     </span>
 
                     {# Self-Assessment #}
@@ -116,39 +135,13 @@
                             {% set selfReflectionName = locale.selfReflection.proper %}
                         {% endif %}
 
-                        ({{ learnerRubric.groups[groupIndex].humanReadableMark }} given in {{ selfReflectionName }})
+                        ({{ learnerRubric.humanReadableMark }} given in {{ selfReflectionName }})
                     {% endif %}
                 </th>
+            </tr>
             {% endif %}
-        </tr>
-        {% endif %}
-
-    {% endfor %}
-
-    {% if rubric.total and showRubricTotal and (config.rubric_show_points or not studentView) %}
-    <tr>
-        <th class="rb-final-summary" colspan="{{ rubric.levels|length + 2 }}">
-            <span data-final-summary="{{ rubricId }}"
-                data-numerator="{{ rubric.sum }}"
-                data-denominator="{{ rubric.total }}">
-                {{ rubric.humanReadableMark }}
-            </span>
-
-            {# Self-Assessment #}
-            {% if learnerRubric %}
-                {% if latestSelfReflectedFeedback.isSelfGrading %}
-                    {% set selfReflectionName = locale.selfAssessment.proper %}
-                {% else %}
-                    {% set selfReflectionName = locale.selfReflection.proper %}
-                {% endif %}
-
-                ({{ learnerRubric.humanReadableMark }} given in {{ selfReflectionName }})
-            {% endif %}
-        </th>
-    </tr>
-    {% endif %}
-    </tbody>
-</table>
+        </tbody>
+    </table>
 </div>
 {# js specific to the rubric we just injected to...wherever we injected it #}
 <script type="text/javascript" src="/javascript/shared/submissions/jquery.dynagrade.js"></script>
@@ -222,20 +215,20 @@
 
         // If not multi-select, simulate radio behaviour per row (simpler to do this than intercept radio checked event!)
         {% if not rubric.multiSelect %}
-            // Can't delegate this, as auto-mark will run before it can un-check siblings
-            $('[data-rubric-descriptor]').on('change', function(event){
+        // Can't delegate this, as auto-mark will run before it can un-check siblings
+        $('[data-rubric-descriptor]').on('change', function(event){
 
-                var $descriptorInput = $(this);
-                var $checkboxGroup   = $descriptorInput.closest('[data-group]');
-                var $descriptors     = $checkboxGroup.find('[data-rubric-descriptor]');
+            var $descriptorInput = $(this);
+            var $checkboxGroup   = $descriptorInput.closest('[data-group]');
+            var $descriptors     = $checkboxGroup.find('[data-rubric-descriptor]');
 
-                $descriptors.each(function(idx, elem){
-                    var $otherDescriptor = $(elem);
-                    if($otherDescriptor.data('rubric-descriptor') != $descriptorInput.data('rubric-descriptor')){
-                        $otherDescriptor.prop('checked', false);
-                    }
-                });
+            $descriptors.each(function(idx, elem){
+                var $otherDescriptor = $(elem);
+                if($otherDescriptor.data('rubric-descriptor') != $descriptorInput.data('rubric-descriptor')){
+                    $otherDescriptor.prop('checked', false);
+                }
             });
+        });
         {% endif %}
 
         /**

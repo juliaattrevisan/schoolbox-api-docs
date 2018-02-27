@@ -29,9 +29,9 @@ Usage:
  # Don't remove this; it'll cause javascript Undefined errors
  #}
 {% block nextUrl %}
-<script>
-    var nextUrl = '';
-</script>
+    <script>
+        var nextUrl = '';
+    </script>
 {% endblock %}
 
 {# Vars required in both contexts
@@ -106,11 +106,11 @@ Usage:
 
 {# A subheading for the grading part #}
 {% block subheading %}
-<div class="row">
-    <div class="small-12 island">
-        <h2 class="subheader">Feedback</h2>
+    <div class="row">
+        <div class="small-12 island">
+            <h2 class="subheader">Feedback</h2>
+        </div>
     </div>
-</div>
 {% endblock %}
 
 {# No instructions for the inline grader screen #}
@@ -118,26 +118,26 @@ Usage:
 
 {# Not the most recent response? Say so, and give a CTA to show the most recent. #}
 {% block mightBeOutofDate %}
-{% if not isMostRecentResponse %}
-    <div class="row">
-        <div class="small-12 columns">
-            <div class="alert-box warning">
-                This is not the most recent response for this due work.
-                {% set mostRecentResponseRoute = routeLookup('learningDueWorkResponse.getParticularResponse', {assessmentId: response.assessable.id, studentId: response.submittedOnBehalfOf.id}) %}
-                {% if not readonly %}
-                    You should consider giving feedback for <a href="{{ mostRecentResponseRoute }}">the most recent response</a> instead.
-                {% else %}
-                    <a href="{{ mostRecentResponseRoute }}">View the most recent response</a>.
-                {% endif %}
+    {% if not isMostRecentResponse %}
+        <div class="row">
+            <div class="small-12 columns">
+                <div class="alert-box warning">
+                    This is not the most recent response for this due work.
+                    {% set mostRecentResponseRoute = routeLookup('learningDueWorkResponse.getParticularResponse', {assessmentId: response.assessable.id, studentId: response.submittedOnBehalfOf.id}) %}
+                    {% if not readonly %}
+                        You should consider giving feedback for <a href="{{ mostRecentResponseRoute }}">the most recent response</a> instead.
+                    {% else %}
+                        <a href="{{ mostRecentResponseRoute }}">View the most recent response</a>.
+                    {% endif %}
+                </div>
             </div>
         </div>
-    </div>
-{% endif %}
+    {% endif %}
 {% endblock %}
 
 {# Grading logic and structure #}
 <div class="row mark-scheme" id="assessment-status" data-participant>
-    <fieldset class="small-12 island">
+    <div class="small-12 island">
         <form method="post" data-feedback-form action="{{ routeLookupIfAuthorized('learningDueWorkFeedback.postResponseFeedback', {
             assessmentId: assessment.id,
             studentId:    participant.user.id,
@@ -185,28 +185,39 @@ Usage:
                     {% if latestSelfReflectedFeedback %}
                         {% import '@learning/macro/urgency.twig' as urgency %}
                         <fieldset class="content">
-                            <ul class="information-list threaded">
-                                <li>
-                                    <h2 class="subheader">{% spaceless %}
+                            <div class="small-12 columns">
+                                <fieldset>
+                                    <legend>
+                                        {% spaceless %}
                                             {% if latestSelfReflectedFeedback.isSelfGrading %}
                                                 {{ locale.selfAssessment.proper }}
                                             {% else %}
                                                 {{ locale.selfReflection.proper }}
                                             {% endif %}
-                                        {% endspaceless %}</h2>
-
-                                    <ul class="information-list reply">
-                                        <li>
-                                            <div class="list-item flex-grade">
-                                                <div class="grade">
-                                                    <span class="{{ urgency.marks(latestSelfReflectedFeedback.normalisedMark) }}">{{ latestSelfReflectedFeedback.humanReadableMark }}</span>
-                                                </div>
-                                            </div>
-                                            <article>{{ latestSelfReflectedFeedback.comment|nl2br }}</article>
-                                        </li>
-                                    </ul>
-                                </li>
-                            </ul>
+                                        {% endspaceless %}
+                                    </legend>
+                                    <div class="flex-grade">
+                                        <ul class="information-list threaded sibling">
+                                            <li>
+                                                <ul class="information-list reply">
+                                                    <li>
+                                                        <div class="card small-12">
+                                                            <a href="/search/user/{{ participant.user.id }}">
+                                                                <img src="/portrait.php?userId={{ participant.user.externalId }}&amp;size=square32" title="{{ participant.user.fullname }}" />
+                                                                <p>{{ participant.user.fullname }}<span class="pipe meta">{{ latestSelfReflectedFeedback.publishedAt.short }}</span></p>
+                                                            </a>
+                                                        </div>
+                                                        <article>{{ latestSelfReflectedFeedback.comment|nl2br }}</article>
+                                                    </li>
+                                                </ul>
+                                            </li>
+                                        </ul>
+                                        <div class="grade {{ urgency.marks(latestSelfReflectedFeedback.normalisedMark) }}-bg">
+                                            <span>{{ latestSelfReflectedFeedback.humanReadableMark }}</span>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                            </div>
                         </fieldset>
                     {% endif %}
                 {% endblock %}
@@ -239,14 +250,14 @@ Usage:
 
                     {# Feedback comment textarea #}
                     {% block comment %}
-                    <div class="small-12{% if 'none' != markSchemeName | lower %} medium-9{% endif %} column">
-                        {% include '@learningAssessment/dueWork/comment.twig' with {
+                        <div class="small-12{% if 'none' != markSchemeName | lower %} medium-9{% endif %} column">
+                            {% include '@learningAssessment/dueWork/comment.twig' with {
                             participant: participant,
                             feedback: latestFeedback,
                             tabIndex: 2,
                             readonly: readonly
-                        } only %}
-                    </div>
+                            } only %}
+                        </div>
                     {% endblock %}
                 </fieldset>
 
@@ -255,7 +266,7 @@ Usage:
                     {% if attachzone and not readonly %}
                         <fieldset class="content">
                             <div class="small-12 columns">
-                            {% include 'sub/attachzone.twig' with {attachzone: attachzone} only %}
+                                {% include 'sub/attachzone.twig' with {attachzone: attachzone} only %}
                             </div>
                         </fieldset>
                     {% endif %}
@@ -280,8 +291,8 @@ Usage:
                     {% endspaceless %}
 
                     {% include '@learningAssessment/fragments/actionBar.twig' with {
-                        actionStyle:  '',
-                        buttons: buttons
+                    actionStyle:  '',
+                    buttons: buttons
                     } only %}
                 {% endblock %}
             </section>

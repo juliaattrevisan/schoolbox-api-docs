@@ -349,16 +349,3 @@
 		background-color: $content-ui-hover;
 	}
 }
-
-// Grades that sit along side of cards
-.flex-grade{
-	display: flex;
-	align-items: center;
-	.grade{
-		flex: 1 0 auto;
-		padding: 0 1rem;
-	}
-	@media #{$small-only} {
-		flex-wrap: wrap;
-	}
-}
