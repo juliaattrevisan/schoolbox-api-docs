@@ -59,6 +59,7 @@ class Module extends BaseModule
                 '/list/ajax'                           => 'courseListAjax',
                 '/new{/name}'                          => 'newCourse',
                 '/parent{/folderId}'                   => 'parentList',
+                '/{folderId}/nodes'                    => 'listNodes',
             ],
             'POST' => [
                 '/finalise'         => 'persistCourse',

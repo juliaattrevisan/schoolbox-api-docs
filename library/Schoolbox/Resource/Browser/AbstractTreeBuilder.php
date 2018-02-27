@@ -180,7 +180,7 @@ abstract class AbstractTreeBuilder
             // Child nodes
             foreach ($this->getNodeFolders($folderId) as $folder) {
 
-                if($folder->getFolderType() != 'course' &&  $folder->getFolderType() != 'unit') {
+                if($this->filterFolder($folder)) {
                     try {
                         $output[] = $this->buildFolderNode($folder, $mustInclude);
                     } catch (Resource\Exception $e) {
@@ -584,4 +584,12 @@ abstract class AbstractTreeBuilder
      * @return string
      */
     protected abstract function getFolderCoverImage(IFolder $folder);
+
+    /**
+     * Class specific filter for which folders appear in the tree
+     *
+     * @param IFolder $folder
+     * @return bool
+     */
+    protected abstract function filterFolder(IFolder $folder);
 }
