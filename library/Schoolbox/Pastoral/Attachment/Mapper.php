@@ -41,6 +41,7 @@ class Mapper extends BaseMapper
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'syncToPastoralUploadQueue']);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'postDelete']);
     }
 
     /**
@@ -128,5 +129,13 @@ class Mapper extends BaseMapper
             $queue->setStatus(PastoralUploadQueueMapper::UPLOAD_STATUS_PENDING);
             $pastoralUploadQueueMapper->save($queue);
         }
+    }
+
+    /** Delete corresponding pastoral uploads
+    */
+    private function postDelete(Model $object) {
+
+        $uploadMapper = PastoralUploadQueueMapper::getInstance();
+        $uploadMapper->deleteByColumnList(['pastoral_id' => $object->getPastoral()->getId(), 'hash' => $object->getHash()]);
     }
 }
