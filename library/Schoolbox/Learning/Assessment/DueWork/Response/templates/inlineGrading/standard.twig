@@ -9,7 +9,7 @@ Usage:
     assessment        DueWork\Model                  The DueWork being assessed
     breadcrumbs       Collection|string[][]          An array of label + URL pairs
     response          null|DueWork\Submission
-    latestFeedback    null|DueWork\Feedback
+    feedback    null|DueWork\Feedback
     attachzone        array
     selectedFileHash  string
     markSchemeName    string
@@ -161,6 +161,7 @@ Usage:
                             ? 'grid.twig'
                             : 'grid-markable.twig'
                             %}
+
                             {% include '@rubric/' ~ rubricTemplate with {
                                 rubric: rubricContext.rubric,
                                 learnerRubric: learnerRubricContext.rubric,
@@ -230,7 +231,7 @@ Usage:
                                 <label>{{ locale.grades.proper }}
                                     {% include '@learningMarkScheme/'~markSchemeName~'.twig' with {
                                         participant: participant,
-                                        feedback: latestFeedback,
+                                        feedback: feedback,
                                         markScheme: assessment.markScheme,
                                         tabIndex: 1,
                                         errors: errors,
@@ -253,7 +254,7 @@ Usage:
                         <div class="small-12{% if 'none' != markSchemeName | lower %} medium-9{% endif %} column">
                             {% include '@learningAssessment/dueWork/comment.twig' with {
                             participant: participant,
-                            feedback: latestFeedback,
+                            feedback: feedback,
                             tabIndex: 2,
                             readonly: readonly
                             } only %}
@@ -273,8 +274,8 @@ Usage:
                 {% endblock %}
 
                 {# Action Bar #}
-                {% set isDraftFeedback     = latestFeedback and not latestFeedback.published %}
-                {% set isPublishedFeedback = latestFeedback and latestFeedback.published %}
+                {% set isDraftFeedback     = feedback and not feedback.published %}
+                {% set isPublishedFeedback = feedback and feedback.published %}
 
                 {% block actionButtons %}
                     {% spaceless %}
@@ -297,7 +298,7 @@ Usage:
                 {% endblock %}
             </section>
         </form>
-    </div>
+    </fieldset>
 </div>
 
 <script src="/javascript/shared/submissions/jquery.combobox.js" type="text/javascript"></script>
