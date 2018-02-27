@@ -141,6 +141,11 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         // Trigger different notifs depending on what assessment type was saved
         $assessment = $plan->getAssessment();
 
+        // Projects cause too many problems to not shortcut out immediately
+        if ($assessment->getProject()) {
+            return;
+        }
+
         $method = $bundle->getMethod();
         if ($method === Mapper::METHOD_DELETE) {
             $bundle->detachEach([
