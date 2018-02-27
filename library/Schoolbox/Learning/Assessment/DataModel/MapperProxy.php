@@ -851,8 +851,9 @@ class MapperProxy
         // TODO If at all possible, trigger the assessment notifier here so that it contains all assessment information
         // Will need to move participant persistence here before that can happen though.
 
-        // Load the dynamic participation record if this is new
-        if ($isCreate) {
+        // Load the dynamic participation record if this is new.
+        // Don't waste time and raise errors for projects for now though.
+        if ($isCreate && !$assessable instanceof ProjectObject) {
             $this->participantDataSource->loadParticipationIntoAssessment($assessable);
         }
     }
