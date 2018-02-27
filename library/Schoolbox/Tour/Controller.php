@@ -120,7 +120,7 @@ class Controller extends Base
         $post = $this->getRequest()->post;
 
         /** @var User $user */
-        $user          = $this->getUser();
+        $user = $this->getUser();
 
         //Save new status
         $newTour = $this->tourMapper->createModel();
@@ -153,7 +153,7 @@ class Controller extends Base
         $this->getResponse()->content->set($this->buildJsonOutput(null));
 
         /** @var User $user */
-        $user          = $this->getUser();
+        $user = $this->getUser();
 
         //Find step that has status
         try {
