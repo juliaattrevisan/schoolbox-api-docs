@@ -288,7 +288,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         $boxType = $assessment->getTypeName();
 
         // Build generic builder
-        $bob = $this->buildGenericBuilder($assessment, $effector)
+        $bob = $this->buildGenericBuilder($assessment)
                     ->setTitle("$boxType :assessment opened in :cat")
                     ->addTopic("$topicStub.$topicSuffix")
                     ->setSeverity(Logger::NOTICE);
@@ -519,7 +519,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         $parentBoxType = mb_strtolower($boxType);
 
         // All updated notifs have the same icon, namespace, severity
-        $bob = $this->buildGenericBuilder($assessment, $effector)
+        $bob = $this->buildGenericBuilder($assessment)
                     ->setSeverity(Logger::ERROR);
 
         // Figure out who's actually targeted
@@ -822,16 +822,13 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      * Builds a builder with generic parameters set.
      *
      * @param IAssessable $assessment The assessment to build a builder for.
-     * @param null|User   $effector   The user whose portrait to show as the icon, or null for a generic icon
      * @return Builder
      */
-    private function buildGenericBuilder(IAssessable $assessment, ?User $effector = null): Builder
+    private function buildGenericBuilder(IAssessable $assessment): Builder
     {
         $bob    = new Builder();
         $folder = $assessment->getBaseContext()->getFolder();
-        $icon   = $effector
-            ? "/portrait?" . http_build_query(['userId' => $effector->getExternalId(), 'size' => $this->iconSize,])
-            : "/images/icon?" . http_build_query(['size' => $this->iconSize, 'icon' => 'work']);
+        $icon   = "/images/icon?" . http_build_query(['size' => $this->iconSize, 'icon' => 'work']);
 
         // Namespace depends on kind of assessment
         $namespace = null;
