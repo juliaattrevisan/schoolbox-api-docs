@@ -270,8 +270,9 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
         // Forgive my usage of getInstance, or don't;
         // it's going to happen regardless.
+        $now     = Alaress_Date_Format::now();
         $access  = Access::getInstance();
-        $mutator = new Participant\AssessmentListMutator($user, new Visibility($access), Alaress_Date_Format::now(), true);
+        $mutator = new Participant\AssessmentListMutator($user, new Visibility($access), $now, true);
 
         /** @var IAssessable[] $assessments */
         $assessments = $this->assessmentDataSource->findAllByFolderIdForReview($context, $user)
@@ -315,18 +316,25 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             }
         }
 
+
         // Determine which notifications are actually relevant to $user.
-
-        // Do I have write access?
-        // Am I this student?
-        // Am I a parent of this student?
-
+        // This includes:
+        // * targeted directly to $user
+        // * targeted to one of $user's children
+        // * targeted to a folder which $user is a part of
         $childIds = [];
         foreach ($user->getChildren() as $child) {
             $childIds[$child->getId()] = true;
         }
 
-        $filter = function (Instance $item, $key) use ($user, $access, $childIds) {
+        $ts     = $now->getUnixTimeStamp();
+        $filter = function (Instance $item, $key) use ($user, $access, $childIds, $ts) {
+
+            // For some reason I get notifications for future events?
+            // Filter those out.
+            if ($item->getTime() > $ts) {
+                return false;
+            }
 
             // notify.user.$userId: am I this user?
             if (preg_match('/^notify\\.user\\.(?P<userId>\\d+)/', $key, $matches)) {
@@ -352,6 +360,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         };
 
         return $c->filter($filter)
+                 ->sortBy('time', 'desc')
                  ->slice($offset, $limit);
     }
 
