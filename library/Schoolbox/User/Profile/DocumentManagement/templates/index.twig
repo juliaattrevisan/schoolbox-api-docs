@@ -10,6 +10,12 @@
         <h1>Academic Reports</h1>
     </div>
 
+    {% if has_wysiwyg_content %}
+    <div class="small-12 island">
+        <!-- TODO pull wysiwyg data in here -->
+    </div>
+    {% endif %}
+
     {% if reports|length %}
         {% set previousFileYear = -1 %}
         {% for report in reports %}
