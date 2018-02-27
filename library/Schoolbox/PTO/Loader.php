@@ -10,7 +10,6 @@
  */
 namespace Schoolbox\PTO;
 
-use DomainException;
 use Schoolbox\User;
 use Schoolbox\Config\Loader as ConfigLoader;
 
