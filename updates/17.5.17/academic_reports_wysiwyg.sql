@@ -1,0 +1,7 @@
+INSERT INTO `config` (`name`, `value`, `title`, `description`, `field_id`, `options`, `type_id`, `editable`, `hidden`, `required`)
+VALUES ('academic_reports_wysiwyg', '', 'Academic Reports page info box', 'If content is provided, WYSIWYG content will be shown on the Academic Reports page', 8, '', 20, true, false, false);
+
+# Only put content in if the school is PCI
+UPDATE `config`
+SET value = IF(@sitelocation = 'pci', 'Click here to view reporting support documentation.<br\><a href="http://space.pc.wa.edu.au/homepage/3528">http://space.pc.wa.edu.au/homepage/3528</a>', value)
+WHERE name = 'academic_reports_wysiwyg';
