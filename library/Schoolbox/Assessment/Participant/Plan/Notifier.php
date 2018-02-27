@@ -285,13 +285,20 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             return $envelope;
         }
 
-        // Build generic builder
+        // All this to figure out an indefinite article!
         $workType     = $assessment->getWorkType();
-        $boxType      = mb_strtolower($workType ? $workType->getName() : '');
-        $indefArticle = $boxType ?
-            in_array(strtolower($boxType[0]), ['a', 'e', 'i', 'o', 'u'], true) ? 'an' : 'a'
-            : '';
+        $boxType      = '';
+        $indefArticle = '';
+        if ($workType) {
+            $boxType = trim($workType->getName());
+            if (\strlen($boxType) > 0) {
+                $indefArticle = \in_array(mb_substr($boxType, 0, 1), ['a', 'e', 'i', 'o', 'u'], true)
+                    ? 'an'
+                    : 'a';
+            }
+        }
 
+        // Build generic builder
         $bob = $this->buildGenericBuilder($assessment, $effector)
                     ->setTitle(":author opened $indefArticle $boxType :assessment in :cat")
                     ->setParam('author', new UserParam($effector, ParameterInterface::STACKING_REPLACE))
