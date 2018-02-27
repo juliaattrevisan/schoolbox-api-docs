@@ -1,0 +1,9 @@
+{% extends "@core/user/staff.twig" %}
+
+{% block house %}
+    HOUSE WILL GO HERE
+    {% if externalUser.StaffHouse %}
+        <dt class="small-12 medium-3">Campus:</dt>
+        <dd class="small-12 medium-9">{{ externalUser.StaffHouse }}</dd>
+    {% endif %}
+{% endblock %}
