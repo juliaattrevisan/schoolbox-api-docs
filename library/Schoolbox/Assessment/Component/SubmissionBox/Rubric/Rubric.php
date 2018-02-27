@@ -10,6 +10,8 @@ namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 
 use Alaress_Date_Format;
 use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
+use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
 use Schoolbox\Assessment\Rubric as Core;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper;
@@ -494,12 +496,13 @@ class Rubric extends Core\Rubric
             return '';
         }
 
-        // TODO box is full of nulls - why?
-        $box = $this->box;
         $markType = $this->box->getMarkType();
 
-        // TODO error here in getSlug
-        $marksheet = \Marksheet_Factory::build($this->box->getMarkType()->getSlug(), $this->box);
+        if ($markType == null) {
+            $markType = MarkTypeMapper::getInstance()->createModel(MarkType::TYPE_NONE);
+        }
+
+        $marksheet = \Marksheet_Factory::build($markType->getSlug(), $this->box);
         $value = $marksheet->convertRawMark($percentage * 100, $total, true, false);
 
         return $value;
