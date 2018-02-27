@@ -79,7 +79,7 @@
 
 {# Comment box #}
 {% block comment %}
-    <div class="small-12 column">
+    <div class="small-12{% if 'none' != markSchemeName | lower %} medium-9{% endif %} column">
         {% include '@learningAssessment/dueWork/comment.twig' with {
         tabIndex: 2,
         readonly: readonly,
