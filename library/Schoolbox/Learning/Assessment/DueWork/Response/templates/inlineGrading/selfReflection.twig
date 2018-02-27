@@ -84,9 +84,9 @@
 {% block comment %}
     <div class="small-12 column">
         {% include '@learningAssessment/dueWork/comment.twig' with {
-            participant: participant,
             tabIndex: 2,
-            readonly: readonly
+            readonly: readonly,
+            selfReflection: true
         } only %}
     </div>
 {% endblock %}

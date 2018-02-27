@@ -2,18 +2,30 @@
     Renders an input where teachers can insert feedback comment
 
     Usage: [
-        participant:  Participant
-        feedback:     IFeedback
-        tabindex:     int
-        readonly:     bool           Should textarea be rendered as readonly?
+        participant:        Participant
+        feedback:           IFeedback
+        tabindex:           int
+        readonly:           bool            Should textarea be rendered as readonly?
+        selfAssessment:     bool            Is this being viewed in a self assessment context?
+        selfReflection:     bool            Is this being viewed in a self reflection context?
     ]
 #}
+
+{% if selfAssessment %}
+    {% set placeholder = 'Your ' ~ locale.selfAssessment %}
+{% elseif selfReflection %}
+    {% set placeholder = 'Your ' ~ locale.selfReflection %}
+{% elseif readonly %}
+    {% set placeholder = '(no comment given)' %}
+{% else %}
+    {% set placeholder = 'Feedback for ' ~ participant.user.firstName %}
+{% endif %}
 
 <label>Comment
     <textarea
             tabindex="{{ tabIndex }}"
             name="comment"
-            placeholder="{% if readonly %}(no comment given){% else %}Feedback for {{ participant.user.firstName }}{% endif %}"
+            placeholder="{{ placeholder }}"
             rows="3"
             {% if readonly %}readonly{% endif %}
     >{{ feedback.comment }}</textarea>
