@@ -6,7 +6,7 @@
  * @link        http://www.alaress.com.au/
  */
 
-class External_Smcs_User_Class extends External_Synergetic_User
+class External_Synergetic_Smcs_User extends External_Synergetic_User
 {
     /**
      * @inheritdoc

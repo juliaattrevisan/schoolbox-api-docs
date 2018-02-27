@@ -12,7 +12,7 @@ use Schoolbox\Pastoral\Log\Model as PastoralLog;
 use Schoolbox\Pastoral\Access\Model as PastoralAccess;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 
-class External_Smcs_Pastoral_Class extends External_Synergetic_Pastoral
+class External_Synergetic_Smcs_Pastoral extends External_Synergetic_Pastoral
 {
     /** @var string $sqlPastoralSelect */
     private $sqlPastoralSelect = "
