@@ -308,7 +308,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 }
 
                 $c = $c
-                    ->merge(new Collection($this->internalNotifyOpen($assessment, $dataModelPlan, $assessment->getCreator())
+                    ->merge(new Collection($this->internalNotifyOpen($assessment, $dataModelPlan)
                                                 ->getAll($openDate ? $openDate->getUnixTimeStamp() : null)))
                     ->merge(new Collection($this->internalNotifyClosed($assessment, $dataModelPlan)
                                                 ->getAll($dueDate ? $dueDate->getUnixTimeStamp() : null)));
@@ -343,7 +343,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      */
     public function notifyOpen(Model $plan): Envelope
     {
-        return $this->internalNotifyOpen($this->retrieveAssessmentDomainModel($plan), $plan, $effector);
+        return $this->internalNotifyOpen($this->retrieveAssessmentDomainModel($plan), $plan);
     }
 
 
@@ -353,10 +353,9 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      *
      * @param IAssessable $assessment
      * @param Model       $plan
-     * @param User        $effector
      * @return Envelope
      */
-    private function internalNotifyOpen(IAssessable $assessment, Model $plan, User $effector): Envelope
+    private function internalNotifyOpen(IAssessable $assessment, Model $plan): Envelope
     {
         $envelope = new Envelope();
         $topicStub  = $this->retrieveAssessmentTopicStub($assessment);
