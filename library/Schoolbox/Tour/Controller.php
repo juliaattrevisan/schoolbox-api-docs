@@ -152,12 +152,12 @@ class Controller extends Base
     {
         $this->getResponse()->content->set($this->buildJsonOutput(null));
 
-        //Get all steps for tour
-        $steps = $this->tourStepMapper->findByColumnList(["tour_uuid" => $tour_uuid]);
+        /** @var User $user */
+        $user          = $this->getUser();
 
         //Find step that has status
         try {
-            $status     = $this->tourStatusMapper->findOneByColumnList(["current_step" => $steps->getPropertyValues("uuid")]);
+            $status     = $this->tourStatusMapper->findOneByColumnList(["tour_uuid" => $tour_uuid, "user_id" => $user->getId()]);
             $serialized = $status->jsonSerialize();
             $this->getResponse()->content->set($this->buildJsonOutput($serialized));
         } catch (Mapper\Exception $e) {
