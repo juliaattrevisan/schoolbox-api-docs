@@ -499,7 +499,7 @@ class Rubric extends Core\Rubric
         $markType = $this->box->getMarkType();
 
         if ($markType == null) {
-            $markType = MarkTypeMapper::getInstance()->createModel(MarkType::TYPE_NONE);
+            $markType = MarkTypeMapper::getInstance()->createModel(MarkType::SLUG_NONE);
         }
 
         $marksheet = \Marksheet_Factory::build($markType->getSlug(), $this->box);
