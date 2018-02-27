@@ -128,5 +128,7 @@ if (isset($type) && isset($id)) {
                 }
             }
         }
+    } else {
+        error(Schoolbox\Error\Mapper::ERROR_FILE_NOT_FOUND, '', 404);
     }
 }
