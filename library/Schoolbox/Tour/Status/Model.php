@@ -114,7 +114,7 @@ class Model implements \JsonSerializable
         return [
             'user'      => $this->getUser(),
             'status'    => $this->getStatus(),
-            'tourStep'  => $this->getTour()
+            'tour'      => $this->getTour()
         ];
     }
 }
