@@ -498,7 +498,7 @@ class Rubric extends Core\Rubric
 
         $markType = $this->box->getMarkType();
 
-        if ($markType == null) {
+        if ($markType === null) {
             $markType = MarkTypeMapper::getInstance()->createModel(MarkType::SLUG_PERCENT);
         }
 
