@@ -101,13 +101,20 @@ class Controller extends Base {
          */
         $factory  = new Factory();
         $twigData = $factory->produceTemplateData($rulesetId);
+
         if ($this->getSession()->getSegment(static::class)->getFlash('hasDryRun')) {
             // Dry run flash msg
             $twigData['hasDryRun'] = true;
         }
 
+        if ($this->getSession()->getSegment(static::class)->getFlash('hasPerformUpdate')) {
+            // Live run flash msg
+            $twigData['hasPerformUpdate'] = true;
+        }
+
         // Obnoxious message if .log file type doesn't exist
         $twigData['logExtensionExists'] = true;
+
         try {
             $this->mimetypeMapper->getByFilename('log.log');
         } catch (\Schoolbox\File\Exception $e) {
@@ -477,7 +484,33 @@ class Controller extends Base {
         $this->getResponse()->content->set([
             'postOutput' => [
                 function() use ($rulesetId, $provisioner) {
-                    $this->dryRunCallback($rulesetId, $provisioner);
+                    $this->syncCallback($rulesetId, $provisioner, false);
+                }
+            ],
+        ]);
+    }
+
+    /**
+     * Perform live UPS run
+     *
+     * @param string      $rulesetId
+     * @param Provisioner $provisioner
+     */
+    public function performUpdate($rulesetId, Provisioner $provisioner)
+    {
+        // Redirect back to ruleset page, with either an alert message on the page or in notifications
+        $this->getSession()->getSegment(static::class)->setFlash('hasPerformUpdate', true);
+        $this->getResponse()->redirect->to(
+            $this->getRouter()->generate(
+                'upsRuleset.read',
+                ['rulesetId' => $rulesetId]
+            )
+        );
+        // Not the best place to put it but it will do for now
+        $this->getResponse()->content->set([
+            'postOutput' => [
+                function() use ($rulesetId, $provisioner) {
+                    $this->syncCallback($rulesetId, $provisioner, true);
                 }
             ],
         ]);
@@ -488,12 +521,13 @@ class Controller extends Base {
      *
      * @param string      $rulesetId
      * @param Provisioner $provisioner
+     * @param bool        $performUpdate
      */
-    public function dryRunCallback($rulesetId, Provisioner $provisioner)
+    public function syncCallback($rulesetId, Provisioner $provisioner, $performUpdate = false)
     {
         // perform the actual dry run (only for $rulesetId)
         try {
-            $provisioner->run(false, $rulesetId);
+            $provisioner->run($performUpdate, $rulesetId);
         } catch (\Exception $e) {
             // the client has already detached - not much we can do
         }
