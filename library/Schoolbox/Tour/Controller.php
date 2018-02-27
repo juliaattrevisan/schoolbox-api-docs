@@ -123,7 +123,7 @@ class Controller extends Base
         $user          = $this->getUser();
 
         //Save new status
-        $newTour = $this->tourStepMapper->createModel();
+        $newTour = $this->tourMapper->createModel();
         $newTour->setUuid($post['tour_uuid']);
 
         $newTourStatus = $this->tourStatusMapper->createModel();
