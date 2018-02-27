@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Schoolbox\Assessment\Participant\Plan;
 
 use Alaress\Async\Notification\Instance\Builder;
+use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\Parameter\Param;
 use Alaress_Date_Format;
 use Monolog\Logger;
@@ -275,8 +276,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         /** @var IAssessable[] $assessments */
         $assessments = $this->assessmentDataSource->findAllByFolderIdForReview($context, $user)
             ->map([$mutator, 'map'])
-            ->filter([$mutator, 'filter'])
-            ->slice($offset, $limit);
+            ->filter([$mutator, 'filter']);
 
         foreach ($assessments as $assessment) {
             // Go thru each plan and raise in THAT context
@@ -315,7 +315,18 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             }
         }
 
-        return $c;
+        // Determine which notifications are actually relevant to $user.
+
+        // Do I have write access?
+        // Am I this student?
+        // Am I a parent of this student?
+        $filter = function (Instance $i, $key) use ($user) {
+            // Need the key, not item, for comparison
+            return true;
+        };
+
+        return $c->filter($filter)
+                 ->slice($offset, $limit);
     }
 
 
