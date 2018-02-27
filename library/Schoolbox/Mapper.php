@@ -765,7 +765,7 @@ abstract class Mapper implements IMapper, Serializable
                 $treeList->add($node);
             }
             $node->$setChildren(
-                $collection->filterByCallback(
+                $collection->filter(
                     function ($childNode) use ($nodeId, $getParent, $getId) {
                         return $childNode->$getParent()->$getId() == $nodeId;
                     }

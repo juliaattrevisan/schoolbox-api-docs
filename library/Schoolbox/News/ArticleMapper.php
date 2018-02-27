@@ -470,7 +470,7 @@ class ArticleMapper extends Mapper implements Searchable
         }
 
         // filter by archive status, year, and month (as specified)
-        $c = $this->findByColumnList($columns)->filterByCallback(
+        $c = $this->findByColumnList($columns)->filter(
             function ($item) use ($archive, $year, $month) {
                 /** @var Article $item */
                 $publishDate = $item->getPublishDate();

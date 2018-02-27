@@ -881,35 +881,13 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
     public function filterBy($field, $value)
     {
         $getField = $this->getGetMethodName($field);
-        return $this->filterByCallback(
+        return $this->filter(
             function ($item) use ($getField, $value) {
                 return $item->$getField() == $value;
             }
         );
     }
 
-
-    /**
-     * Filters out elements from this collection based on the given callback
-     *
-     * @deprecated use filter() instead
-     * @param callable $callback {
-     *                      param $item
-     *                      return bool
-     *                 }
-     *
-     * @return static
-     */
-    public function filterByCallback($callback)
-    {
-        $result = $this->emptyClone();
-        foreach ($this as $item) {
-            if (call_user_func($callback, $item)) {
-                $result->add($item);
-            }
-        }
-        return $result;
-    }
 
     /**
      * Specify data which should be serialized to JSON. Currently, attempts to
