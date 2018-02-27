@@ -37,7 +37,11 @@ use Schoolbox\Role;
 use Schoolbox\User;
 
 /**
+ * Notifier for due work assessments.
+ *
  * @method SubmissionBoxMapper getMapper()
+ * @deprecated Due work notifications are handled by `\Schoolbox\Assessment\Participant\Plan\Notifier`
+ * @todo delete this in 18.1, when no more bundled triggers exist for this notifier
  */
 class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInterface
 {

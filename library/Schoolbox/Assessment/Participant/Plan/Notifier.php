@@ -38,7 +38,16 @@ use Schoolbox\Role;
 use Schoolbox\User;
 
 /**
- * Class Notifier
+ * Notifier for participation plans.
+ *
+ * This functions as the notifier for all assessment types. This is because the
+ * participation plan, not the assessment itself, holds the details for:
+ * * who is participating in the assessment
+ * * whether they're excluded or not
+ * * when the assessment opens for each participant
+ *
+ * Notifications for the various feedback and response types are not handled by
+ * this notifier.
  */
 class Notifier extends AbstractModuleNotifier implements SourceInterface
 {

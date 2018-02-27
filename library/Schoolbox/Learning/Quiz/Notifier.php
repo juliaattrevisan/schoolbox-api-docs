@@ -37,7 +37,11 @@ use Schoolbox\User;
 use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 
 /**
+ * Notifier for quiz assessments. (Presumably doesn't handle surveys?)
+ *
  * @method Mapper getMapper()
+ * @deprecated Quiz notifications are handled by `\Schoolbox\Assessment\Participant\Plan\Notifier`
+ * @todo delete this in 18.1, when no more bundled triggers exist for this notifier
  */
 class Notifier extends AbstractModuleNotifier implements SourceInterface
 {
