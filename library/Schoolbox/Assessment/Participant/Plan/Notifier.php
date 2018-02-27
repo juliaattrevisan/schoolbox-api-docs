@@ -320,9 +320,35 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         // Do I have write access?
         // Am I this student?
         // Am I a parent of this student?
-        $filter = function (Instance $i, $key) use ($user) {
-            // Need the key, not item, for comparison
-            return true;
+
+        $childIds = [];
+        foreach ($user->getChildren() as $child) {
+            $childIds[$child->getId()] = true;
+        }
+
+        $filter = function (Instance $item, $key) use ($user, $access, $childIds) {
+
+            // notify.user.$userId: am I this user?
+            if (preg_match('/^notify\\.user\\.(?P<userId>\\d+)/', $key, $matches)) {
+                $userId = (int)$matches['userId'];
+                return $userId === $user->getId();
+            }
+
+            // notify.parent.$userId: am I a parent of this user?
+            if (preg_match('/^notify\\.parent\\.(?P<childId>\\d+)/', $key, $matches)) {
+                $childId = (int)$matches['childId'];
+                return $childIds[$childId] ?? false;
+            }
+
+            // notify.service.1.$folderId.$level: do I have $access to $folderId at $level?
+            if (preg_match('/^notify\\.service\\.1\\.(?P<folderId>\\d+).(?P<level>\\d+)/', $key, $matches)) {
+                $folderId = (int)$matches['folderId'];
+                $level    = (int)$matches['level'];
+                return $access->getFolderAccess($user, $folderId) >= $level;
+            }
+
+            // None of the above: filter out
+            return false;
         };
 
         return $c->filter($filter)
