@@ -651,17 +651,21 @@ class Controller extends Base\Base
             return;
         }
 
-        // Is this a creation from the spec ?
+        $notifier = $this->assessmentMapperProxy->getNotifier();
+
         if (!$implId) {
+            // This is a creation from the spec
             $assessment = $this->assessmentMapperProxy->findById($specId);
-        } // Else we have been passed the Assessment Impl
-        else {
+            $before     = [];
+        } else {
+            // We have been passed the Assessment Impl
             // Retrieve AssessmentImpl from UnitImpl
             $filter     = function ($impl) use ($implId) {
                 /** @var IAssessable $impl */
                 return (int)$impl->getId() === $implId;
             };
             $assessment = $context->getAssessables()->filter($filter)->first();
+            $before     = $notifier->dehydrate($assessment);
         }
 
         // Base Case #2 - Is item unselected ? (and already imported)
@@ -675,15 +679,13 @@ class Controller extends Base\Base
         // Apply dates regardless of whether it is a Spec or Impl. (If Spec, they will be cloned to the Impl)
         $assessment = $this->applyDates($assessment, $dateData);
 
-        $notifier = $this->assessmentMapperProxy->getNotifier();
         if (!$implId) {
             // INSERT - Create Impl from Spec
             $newAssessment = $this->replicator->replicateInNewContext($assessment, $context, $this->getUser());
-            $notifier->notify($newAssessment, $this->getUser(), []);
+            $notifier->notify($newAssessment, $this->getUser(), $before);
         } else {
             // UPDATE
             $newAssessment = null;
-            $before        = $notifier->dehydrate($assessment);
             $this->assessmentMapperProxy->save($assessment);
             $notifier->notify($assessment, $this->getUser(), $before);
         }
