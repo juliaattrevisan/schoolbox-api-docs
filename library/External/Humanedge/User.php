@@ -282,7 +282,8 @@ class External_Humanedge_User implements External_UserInterface
          * StaffCampusDescription,
          * StaffCategoryDescription,
          * StaffDepartment,
-         * StaffVoiceMail
+         * StaffVoiceMail,
+         * StaffHouseDescription
          *
          * @param $externalUserId
          * @return array

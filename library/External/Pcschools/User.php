@@ -669,7 +669,8 @@ class External_Pcschools_User implements External_UserInterface
      * StaffCampusDescription,
      * StaffCategoryDescription,
      * StaffDepartment,
-     * StaffVoiceMail
+     * StaffVoiceMail,
+     * StaffHouseDescription
      *
      * @importance high - used on staff profile page.
      *
