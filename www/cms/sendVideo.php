@@ -70,29 +70,13 @@ if (isset($type) && isset($id)) {
     $storage = $video->getStorage();
 
     // ----------------------------------------------------------------------------------------------------------------
-    // Retrieve mime type
-    // ----------------------------------------------------------------------------------------------------------------
-
-    /** @var string $mimeType */
-    if ($storage->getMimeType()->isAudio()) {
-        // If audio trancode, assume transcode format is audio/mpeg (mp3)
-        $mimeType = 'audio/mpeg';
-    } elseif ($storage->getMimeType()->isVideo()) {
-        // If video trancode, assume transcode format is video/mp4 (mp4)
-        $mimetype = 'video/mp4';
-    } else {
-        // If unknown, just flail about and choose the original file mimetype
-        $mimetype = $storage->getMimeType()->getMime();
-    }
-
-    // ----------------------------------------------------------------------------------------------------------------
     // Use explicitly the transcoded version of the audio/video, and transcode size
     // ----------------------------------------------------------------------------------------------------------------
     $storage->setPath($storage->getPath() . "-transcode");
 
     /** @var Filesystem $fileSystem */
     $fileSystem = $storage->getFilesystem();
-    $storage->setSize($fileSystem->getSize($storage->getPath()));
+    $videoSize = $fileSystem->getSize($storage->getPath());
 
     // ----------------------------------------------------------------------------------------------------------------
     // Retrieve stream
@@ -119,6 +103,22 @@ if (isset($type) && isset($id)) {
         }
     } catch (FileNotFoundException $e) {
         fail();
+    }
+
+    // ----------------------------------------------------------------------------------------------------------------
+    // Retrieve mime type
+    // ----------------------------------------------------------------------------------------------------------------
+
+    /** @var string $mimeType */
+    if ($storage->getMimeType()->isAudio()) {
+        // If audio trancode, assume transcode format is audio/mpeg (mp3)
+        $mimeType = 'audio/mpeg';
+    } elseif ($storage->getMimeType()->isVideo()) {
+        // If video trancode, assume transcode format is video/mp4 (mp4)
+        $mimetype = 'video/mp4';
+    } else {
+        // If unknown, just flail about and choose the original file mimetype
+        $mimetype = 'application/octet-stream';
     }
 
     // ----------------------------------------------------------------------------------------------------------------
