@@ -13,6 +13,7 @@ use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use OutOfBoundsException;
 use Schoolbox\Learning\Authorizer\Rule\AssessmentNotDeleted;
+use Schoolbox\Learning\Authorizer\Rule\CanAcknowledgeAssessment;
 use Schoolbox\Learning\Authorizer\Rule\CanPreview;
 use Schoolbox\Learning\Authorizer\Rule\CanRespondToAssessment;
 use Schoolbox\Learning\Authorizer\Rule\CanSeeParticipation;
@@ -514,12 +515,14 @@ class Module extends BaseModule
             new Rule\Any(
                 new Rule\All(
                     new Rule\IsSuperuser(),
-                    new ParticipantHasNoInteractions()
+                    new ParticipantHasNoInteractions(),
+                    new CanRespondToAssessment($this->getAccess())
                 ),
                 new Rule\All(
                     new Rule\HasRole(Role::STAFF),
                     $this->buildAuthRuleHomepageAccess(UserAccess::ACCESS_WRITE),
                     new IsInteractionUnLocked(new LockedChecker($this->getTermMapper())),
+                    new CanRespondToAssessment($this->getAccess()),
                     new ParticipantHasNoInteractions()
                 ),
                 // Participants may now acknowledge their own submissions.
@@ -527,6 +530,7 @@ class Module extends BaseModule
                     new Rule\IsUser('studentId'),
                     new IsInteractionUnLocked(new LockedChecker($this->getTermMapper())),
                     new IsAssessmentOpen(),
+                    new CanAcknowledgeAssessment($this->getAccess()),
                     new ParticipantHasNoInteractions()
                 )
             )

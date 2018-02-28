@@ -134,7 +134,6 @@ interface IAssessable extends ISoftDeletable
      */
     public function canLearnerCreateResponse(User $learner);
 
-
     /**
      * Can the specified instructor (a user with WRITE+ perms) create a response for themself,
      * or a submission-on-behalf-of for another user ?

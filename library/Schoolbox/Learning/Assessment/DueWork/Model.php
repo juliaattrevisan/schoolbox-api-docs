@@ -381,6 +381,51 @@ class Model extends AbstractAssessment implements ISelfAssessable
         return false;
     }
 
+    /**
+     * Can the specified learner acknowledge submitting in person?
+     *
+     * @param User $learner A user with WRITE+ perm to this assessment's folder context
+     * @return bool
+     */
+    public function canLearnerCreateAcknowledgement(User $learner)
+    {
+        // Not open ?
+        if(!$this->isOpen($learner)){
+            return false;
+        }
+
+        // Not a participant ?
+        $participant = $this->getParticipantIfExtant($learner);
+        if (!$participant) {
+            return false;
+        }
+
+        // Has student submitted their single permitted response ?
+        if ($participant->hasSubmittedResponse()) {
+            return false;
+        }
+
+        // Is this due work self assessable AND doesn't accept online submissions?
+        if ($this->isAcceptNone() && $this->isAcceptNone()) {
+            return true;
+        }
+
+        /* TODO most of this is redundant if the method is only used in the appropriate context */
+
+        // Does this DueWork not accept online responses ?
+        if ($this->isAcceptNone()) {
+            return false;
+        }
+
+        if ($this->isAcceptMulti()) {
+            return true;
+        }
+
+
+        // Logically impossible - but be defensive
+        return false;
+    }
+
 
     /**
      * @inheritdoc
