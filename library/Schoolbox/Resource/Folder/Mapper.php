@@ -812,7 +812,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * @return Collection|Model[]
      * @throws DefinitionException if join $name isn't on this mapper
      */
-    public function searchByName($keyword, $userGroupsOnly = false)
+    public function searchByName($keyword, $userGroupsOnly = false, $folderIds = [])
     {
         $builder = $this->getPredicateBuilder();
 
@@ -827,6 +827,13 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             ->like('cc.code', "%{$this->database->escapeForLike($keyword)}%");
 
         $builder->any($subBuilder);
+
+        /* If a list of folder ids was provided to restrict the set of results, use it
+         */
+        if (\count($folderIds)) {
+            $builder->in('id', $folderIds);
+        }
+
         $options = ['order' => ["{$this->getTable()}.name" => 'ASC']];
 
         $folders = $this->findByPredicates($builder, $options);
@@ -846,6 +853,62 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         }
 
         return $folders;
+    }
+
+
+    /**
+     * Find destinations into which a course can be imported
+     *
+     * @param $keyword
+     * @return Collection|Model[]
+     * @throws DefinitionException
+     */
+    public function searchByNameImportable($keyword)
+    {
+        return $this->searchByName($keyword, false, $this->findGroupsAndClassesScalar());
+    }
+
+    /**
+     * A uniquified list of folders which are either a group or have a class code, or both
+     * Returns a scalar list of ids for these folders so you can use it with other predicates
+     *
+     * Sorry about the name
+     *
+     * @return array
+     */
+    private function findGroupsAndClassesScalar(): array
+    {
+        /* This actually turns out to be more performant than the COALESCE() version
+         * The folder ids found by this query are the valid ids to which a course can be imported
+         *
+            SELECT f.id, folder_id, cid, COALESCE(folder_id, cid)
+            FROM folder f
+            LEFT JOIN folder_code fc ON f.id = fc.folder_id
+            LEFT JOIN userGroups ug ON f.id = ug.cid
+            WHERE f.deleted_at IS NULL
+            AND fc.deleted_at IS NULL
+            AND (folder_id IS NOT NULL OR cid IS NOT NULL)  
+        */
+        $query = "
+            (SELECT f.id 
+            FROM {$this->table} f
+            INNER JOIN folder_code fc ON f.id = fc.folder_id
+            AND fc.deleted_at IS NULL)
+            UNION
+            (SELECT f.id
+            FROM {$this->table} f
+            INNER JOIN userGroups ug ON f.id = ug.cid) 
+         ";
+
+        $stmt = $this->database->query($query);
+
+        $ids = [];
+
+        while ($r = $stmt->fetch(\PDO::FETCH_ASSOC)) {
+            $ids[$r['id']] = $r['id'];
+        }
+
+        return array_values($ids);
     }
 
     /**
