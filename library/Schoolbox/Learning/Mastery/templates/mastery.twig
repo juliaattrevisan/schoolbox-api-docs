@@ -48,7 +48,7 @@
                             <th>
                                 <div>
                                 <span>
-                                    <a href="{{ routeLookup('learningAssessment.getStatus', {assessmentId: assessment.id}) }}">{{ assessment.title }}</a><br>
+                                    <a href="{{ routeLookupIfAuthorized('learningAssessment.getStatus', {assessmentId: assessment.id}) }}">{{ assessment.title }}</a><br>
                                     <span class="meta">{{ assessment.typeName }}</span>
                                 </span>
                                 </div>
