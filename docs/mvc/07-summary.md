@@ -71,3 +71,5 @@ This is a collection of takeaways from each of the sections, distilled from thei
 * Check the `/pantry` for user interface elements that you can use, and their interactions with other elements and styles.
 
 * Note that when you add javascript to the compilation step (look in your `Gruntfile.js`) you're making it globally available at the cost of increasing the minified file's size.
+
+* Don't forget to sanitise content upon rendering.

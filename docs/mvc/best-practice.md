@@ -62,4 +62,6 @@ Basic statements on what to do. For specific reasoning, see links next to each s
 * Twig can access php methods - be mindful when using twig vars that might be making expensive database accesses. [(more)](06-view.md#62-twig-syntax)
 * Break large twig templates into smaller ones, just like php methods and php classes. [(more)](06-view.md#63-reusable-fragments)
 * Use twig macros to your advantage. [(more)](06-view.md#63-reusable-fragments)
-* The Pantry contains samples for user interface elements and basic styling/layout. Use them instead of making up your own, where possible. [(more)](06-view.md#64-the-pantry) 
+* The Pantry contains samples for user interface elements and basic styling/layout. Use them instead of making up your own, where possible. [(more)](06-view.md#64-the-pantry)
+* Sanitise data on rendering to prevent javascript-based attacks. PHPLib and Twig do this differently. [(more)](06-view.md#66-data-sanitisation-escaping-dangerous-content)
+ 
