@@ -16,16 +16,16 @@ class Model implements \JsonSerializable
 {
     use CreatedAtDate;
 
-    /** User has started the joyride */
+    /** User has started the tour */
     public const STATUS_STARTED = 'started';
 
-    /** User has dismissed the joyride- and presumably never wants to see the damn thing again */
+    /** User has dismissed the tour- and presumably never wants to see the damn thing again */
     public const STATUS_DISMISSED = 'dismissed';
 
-    /** User has completed the joyride */
+    /** User has completed the tour */
     public const STATUS_COMPLETED = 'completed';
 
-    /** User has not interacted with this step/step in the joyride */
+    /** User has had the tour disabled for them (likely by Alaress based on login logs) */
     public const STATUS_DISABLED = 'disabled';
 
     /**
