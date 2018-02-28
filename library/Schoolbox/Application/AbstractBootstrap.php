@@ -303,7 +303,13 @@ abstract class AbstractBootstrap implements BootstrapInterface
             'setRouter'     => $di->lazyGet('router'),
             'setAuthorizer' => $di->lazyGet('authorizer'),
             'setDi'         => $di,
-            'setExceptionGenerator' => $di->get('mapperFactory')->getLazy(Error\Mapper::class)
+            'setExceptionGenerator' => $di->get('mapperFactory')->getLazy(Error\Mapper::class),
+            'setSentry'     => $di->lazy(
+                // Use lazy function to insulate from service registration sequencing
+                function () use ($di) {
+                    return $di->has('sentry') ? $di->get('sentry') : null;
+                }
+            ),
         );
 
         // inject web params (yep, even Sitepage!)
