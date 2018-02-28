@@ -19,10 +19,12 @@
     {% set humanReadableMark = '' %}
 {% endif %}
 
-{% if humanReadableMark != '' and humanReadableMark // 1 != humanReadableMark %}
-  {% set humanReadableMark = humanReadableMark| number_format(2) %}
-{% else %}
-  {% set humanReadableMark = humanReadableMark | number_format(0) %}
+{% if totalMark %}
+    {% if humanReadableMark != '' and humanReadableMark // 1 != humanReadableMark %}
+      {% set humanReadableMark = humanReadableMark| number_format(2) %}
+    {% else %}
+      {% set humanReadableMark = humanReadableMark | number_format(0) %}
+    {% endif %}
 {% endif %}
 
 <input
@@ -33,7 +35,7 @@
         id="mark-{{ participant.user.id }}" name="mark"
         type="text"
         maxlength="{{ maxLength }}"
-        value="{{ humanReadableMark }} / {{ limit }}"
+        value="{{ humanReadableMark }} {% if totalMark %} / {{ limit }} {% endif %} "
         title="{{ inputTitle }}"
         data-mark-input
         data-combobox

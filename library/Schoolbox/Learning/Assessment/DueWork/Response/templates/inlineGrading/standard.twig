@@ -239,7 +239,6 @@ Usage:
                                         readonly: readonly
                                     } only %}
                                 </label>
-
                                 {% if assessment.useRubric and rubricContext and not readonly %}
                                     {% include '@learningDueWorkResponse/inlineGrading/fragments/assignFromRubricButton.twig' with {
                                         locale: locale,
