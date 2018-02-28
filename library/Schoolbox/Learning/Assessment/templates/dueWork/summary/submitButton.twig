@@ -25,7 +25,6 @@ Data:
                 <a class="submit button expand" href="{{ submitRoute }}">{{ submitText }}</a>
             {% endif %}
         {% elseif not acknowlegementBlocked %}
-            {# TODO self acknowledge route is false when it shouldn't be #}
             {% if selfAcknowledgeRoute %}
                 {% if USER.id == student.id %}
                     {% set requiresReflection = assessment.isSelfAssessable %}
