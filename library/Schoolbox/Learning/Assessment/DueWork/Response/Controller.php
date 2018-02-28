@@ -24,7 +24,6 @@ use Schoolbox\Learning\InlineGrader;
 use Schoolbox\Learning\InlineGrader\SelfReflection;
 use Schoolbox\Learning\InlineGrader\StudentCarousel;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
-use Schoolbox\Permission\Access\Access;
 use \Schoolbox\Learning\Assessment\Attachzone;
 use \Schoolbox\Learning\Assessment\DueWork\Feedback\Model as Feedback;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as SubmissionFile;
@@ -468,10 +467,16 @@ class Controller extends Base
                 $this->kamiMapper,
                 $this->kamiConnector
             ))->produce($file, $this->getUser());
-        }
-        catch (Kami\Exception\IKamiException $e) {
+        } catch (Kami\Exception\IKamiException $e) {
+            $this->captureException($e);
             // Kami Exceptions
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PROCESSING, null, $e->getMessage());
+            return [
+                'strategy' => 'kami_error.twig',
+                'data'     => [
+                    'reason' => $e->getMessage(),
+                    'date'   => \Alaress_Date_Format::now(),
+                ],
+            ];
         }
     }
 
