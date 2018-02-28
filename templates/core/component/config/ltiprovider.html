@@ -1,1 +1,6 @@
-<p>{COMPONENT_LTI_PROVIDER_NAME}</p>
+<select name="ltiprovider" id="component{COMPONENT_INSTANCE_ID}-ltiprovider">
+    <option value="">None Selected</option>
+    <!-- BEGIN config_provider -->
+    <option value="{PROVIDER_ID}" {PROVIDER_SELECTED}>{PROVIDER_NAME}</option>
+    <!-- END config_provider -->
+</select>

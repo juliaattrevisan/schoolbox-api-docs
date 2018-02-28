@@ -8,7 +8,7 @@
  */
 
 use Schoolbox\LTI\Provider\Mapper as ProviderMapper;
-use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\LTI\Provider\Model as ProviderModel;
 
 class Component_Config_LTIProvider extends Component_Config_Abstract
 {
@@ -17,12 +17,21 @@ class Component_Config_LTIProvider extends Component_Config_Abstract
         /** @var ProviderMapper $providerMapper */
         $providerMapper = $page->getDi()->get('mapperFactory')->get(\Schoolbox\LTI\Provider\Mapper::class);
 
-        try {
-            $provider = $providerMapper->findById($configValue);
-            $page->setVar('COMPONENT_LTI_PROVIDER_NAME', Scrub::text($provider->getName()));
-            $page->setVar('COMPONENT_LTI_PROVIDER_ID', $configValue);
-        } catch (MapperException $e) {
-            $page->setVar('COMPONENT_LTI_PROVIDER_NAME', 'None Selected');
+        $page->setBlock($keyblock, 'config_provider', 'config_provider_block');
+
+        $providers = $providerMapper->findAll([
+            'order' => ['name' => 'asc']
+        ]);
+
+        foreach ($providers as $provider) {
+            /** @var $provider ProviderModel */
+            $page->setVar([
+                'PROVIDER_ID' => $provider->getId(),
+                'PROVIDER_NAME' => $provider->getName(),
+                'PROVIDER_SELECTED' => (int)$configValue === $provider->getId() ? 'selected' : '',
+            ]);
+
+            $page->parse('config_provider_block', 'config_provider', true);
         }
 
     }
