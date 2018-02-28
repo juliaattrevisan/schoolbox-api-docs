@@ -92,15 +92,27 @@
             </tr>
             {% endfor %}
 
-            {% if group.total and showGroupTotal %}
-            <tr>
-                {% if config.rubric_show_points or not studentView %}
-                    <th class="rb-group-summary" colspan="{{ rubric.levels|length + 1 }}">
-                        <span data-group-summary="{{ rubricId }}-{{ group.id }}"
-                            data-numerator="{{ group.sum }}"
-                            data-denominator="{{ group.total }}">
-                            {{ group.humanReadableMark }}
-                        </span>
+        {% if group.total and showGroupTotal %}
+        <tr>
+            {% if config.rubric_show_points or not studentView %}
+                <th class="rb-group-summary" colspan="{{ rubric.levels|length + 1 }}">
+                    <span data-group-summary="{{ rubricId }}-{{ group.id }}"
+                        {% if group.sum // 1 != group.sum %}
+                            {% set groupSumFormat = 2 %}
+                        {% else %}
+                            {% set groupSumFormat = 0 %}
+                        {% endif %}
+                        {% if group.total // 1 != group.total %}
+                            {% set groupTotalFormat = 2 %}
+                        {% else %}
+                            {% set groupTotalFormat = 0 %}
+                        {% endif %}
+
+                        data-numerator="{{ group.sum | number_format(groupSumFormat) }}"
+                        data-denominator="{{ group.total | number_format(groupTotalFormat) }}">
+
+                        {{ group.sum | number_format(groupSumFormat) }} / {{ group.total | number_format(groupTotalFormat) }}
+                    </span>
 
                         {# Self-Assessment #}
                         {% if learnerRubric %}
@@ -118,14 +130,26 @@
             {% endif %}
             {% endfor %}
 
-            {% if rubric.total and showRubricTotal and (config.rubric_show_points or not studentView) %}
-            <tr>
-                <th class="rb-final-summary" colspan="{{ rubric.levels|length + 2 }}">
-                    <span data-final-summary="{{ rubricId }}"
-                        data-numerator="{{ rubric.sum }}"
-                        data-denominator="{{ rubric.total }}">
-                        {{ rubric.humanReadableMark }}
-                    </span>
+    {% if rubric.total and showRubricTotal and (config.rubric_show_points or not studentView) %}
+    <tr>
+        <th class="rb-final-summary" colspan="{{ rubric.levels|length + 2 }}">
+            <span data-final-summary="{{ rubricId }}"
+                {% if rubric.sum // 1 != rubric.sum %}
+                    {% set rubricSumFormat = 2 %}
+                {% else %}
+                    {% set rubricSumFormat = 0 %}
+                {% endif %}
+                {% if rubric.total // 1 != rubric.total %}
+                    {% set rubricTotalFormat = 2 %}
+                {% else %}
+                    {% set rubricTotalFormat = 0 %}
+                {% endif %}
+
+                data-numerator="{{ rubric.sum | number_format(rubricSumFormat) }}"
+                data-denominator="{{ rubric.total | number_format(rubricTotalFormat) }}">
+
+                {{ rubric.sum | number_format(rubricSumFormat) }} / {{ rubric.total | number_format(rubricTotalFormat) }}
+            </span>
 
                     {# Self-Assessment #}
                     {% if learnerRubric %}
@@ -210,7 +234,11 @@
                 }
             });
 
-            return groupSum.toFixed(2);
+            if(groupSum % 1 != 0){
+                groupSum = groupSum.toFixed(2);
+            }
+
+            return groupSum;
         }
 
         // If not multi-select, simulate radio behaviour per row (simpler to do this than intercept radio checked event!)
