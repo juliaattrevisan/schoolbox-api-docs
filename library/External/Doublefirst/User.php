@@ -452,7 +452,8 @@ class External_Doublefirst_User implements External_UserInterface
                             '' AS StaffCampusDescription,
                             cat.Description AS StaffCategoryDescription,
                             '' AS StaffDepartment,
-                            '' AS StaffVoiceMail
+                            '' AS StaffVoiceMail,
+                            '' AS StaffHouseDescription
             FROM            StaffPersonalDetails s
 		    JOIN            CurrentStaff cs ON cs.StaffID = s.StaffID
             LEFT JOIN       LookupDetails cat ON cat.LookupID = 1203 AND cat.LookupDetailsID = s.StaffCategory

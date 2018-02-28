@@ -669,7 +669,8 @@ class External_Pcschools_User implements External_UserInterface
      * StaffCampusDescription,
      * StaffCategoryDescription,
      * StaffDepartment,
-     * StaffVoiceMail
+     * StaffVoiceMail,
+     * StaffHouseDescription
      *
      * @importance high - used on staff profile page.
      *
@@ -691,7 +692,8 @@ class External_Pcschools_User implements External_UserInterface
                     T_CAMPUS.DESCRIPTION AS StaffCampusDescription,
                     T.STATUS AS StaffCategoryDescription,
                     '' AS StaffDepartment,
-                    '' AS StaffVoiceMail
+                    '' AS StaffVoiceMail,
+                    '' AS StaffHouseDescription
                 FROM TEACHER T
                 LEFT JOIN CODEMAST AS T_CAMPUS ON T.CAMPUS = T_CAMPUS.CODE AND T_CAMPUS.TYPE = 'CAMPUS'
                 WHERE T.TEACHER_CODE = {$this->getDatabase()->smartQuote($externalUserId)}
