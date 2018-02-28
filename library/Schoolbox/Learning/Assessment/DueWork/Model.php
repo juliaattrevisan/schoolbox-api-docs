@@ -406,7 +406,7 @@ class Model extends AbstractAssessment implements ISelfAssessable
         }
 
         // Is this due work self assessable AND doesn't accept online submissions?
-        if ($this->isAcceptNone() && $this->isAcceptNone()) {
+        if ($this->isSelfAssessable() && $this->isAcceptNone()) {
             return true;
         }
 
