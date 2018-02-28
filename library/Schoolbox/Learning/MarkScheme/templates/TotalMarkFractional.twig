@@ -10,28 +10,20 @@
 #}
 
 {% if markScheme.totalMark // 1 != markScheme.totalMark %}
-    {% include '@learningMarkScheme/fragments/text-input.twig' with {
-    participant: participant,
-    feedback:    feedback,
-    tabIndex:    tabIndex,
-    placeholder: readonly ? '(no mark given)' : 'Mark out of ' ~ markScheme.totalMark | number_format(2),
-    limit:       markScheme.totalMark  | number_format(2),
-    maxLength:   16,
-    inputTitle:  'Maximum Mark: ' ~ markScheme.totalMark | number_format(2),
-    errors:      errors,
-    readonly:    readonly
-    } only %}
+    {% set formattedMark = markScheme.totalMark | number_format(2) %}
 {% else %}
-    {% include '@learningMarkScheme/fragments/text-input.twig' with {
-    participant: participant,
-    feedback:    feedback,
-    tabIndex:    tabIndex,
-    placeholder: readonly ? '(no mark given)' : 'Mark out of ' ~ markScheme.totalMark | number_format(0),
-    limit:       markScheme.totalMark | number_format(0),
-    maxLength:   16,
-    inputTitle:  'Maximum Mark: ' ~ markScheme.totalMark | number_format(0),
-    errors:      errors,
-    readonly:    readonly
-    } only %}
+    {% set formattedMark = markScheme.totalMark | number_format(0) %}
 {% endif %}
+
+{% include '@learningMarkScheme/fragments/text-input.twig' with {
+participant: participant,
+feedback:    feedback,
+tabIndex:    tabIndex,
+placeholder: readonly ? '(no mark given)' : 'Mark out of ' ~ formattedMark,
+limit:       formattedMark,
+maxLength:   16,
+inputTitle:  'Maximum Mark: ' ~ formattedMark,
+errors:      errors,
+readonly:    readonly
+} only %}
 
