@@ -410,7 +410,7 @@ class External_Maze_User implements External_UserInterface
 				'' AS StaffCampusDescription,
 				SF_POSITION AS StaffCategoryDescription,
 				'' AS StaffDepartment,
-				'' AS StaffHouseDescription,
+				'' AS StaffHouseDescription
 			FROM SF
 			LEFT JOIN KSC ON SF.POS_CODE = KSC.KSCKEY
 			WHERE SFKEY = '{$synId}'
