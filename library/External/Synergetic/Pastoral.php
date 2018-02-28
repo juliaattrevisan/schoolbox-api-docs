@@ -91,7 +91,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
     // Deduplicate query
 
     /** @var string $sqlPastoralSelect */
-    private $sqlPastoralSelect = "
+    protected $sqlPastoralSelect = "
         SELECT        dbo.tPastoralCare.PastoralCareSeq, 
                       dbo.tPastoralCare.ID, 
                       dbo.tPastoralCare.ClassCode, 
