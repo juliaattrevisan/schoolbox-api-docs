@@ -62,9 +62,9 @@ class Factory
         if ($context instanceof Project) {
             if($user->getRole()->isStaff()) {
                 $path = $this->router->generate('learningAssessment.getStatus', ['assessmentId' => $context->getId()]);
-            } else (
+            } else {
                 $path = $this->router->generate('learningAssessment.getSummary', ['assessmentId' => $context->getId()]);
-            )
+            }
 
             $trail = $this->produceFromAssessment($context, $user);
 
