@@ -808,11 +808,14 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * Search by name
      *
      * @param string $keyword
-     * @param bool $userGroupsOnly
+     * @param bool   $userGroupsOnly
+     * @param array  $folderIds
      * @return Collection|Model[]
+     * @throws Alaress\Database\Predicate\InvalidColumnException
      * @throws DefinitionException if join $name isn't on this mapper
+     * @throws \UnderflowException
      */
-    public function searchByName($keyword, $userGroupsOnly = false, $folderIds = [])
+    public function searchByName($keyword, $userGroupsOnly = false, array $folderIds = [])
     {
         $builder = $this->getPredicateBuilder();
 
