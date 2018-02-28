@@ -34,12 +34,15 @@ class Destinations
         $this->folderMapper = $folderMapper;
     }
 
+
     /**
      * Find destinations into which a course can be imported
      *
      * @param $keyword
      * @return Collection|Model[]
      * @throws DefinitionException
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \UnderflowException
      */
     public function findImportable($keyword)
     {
