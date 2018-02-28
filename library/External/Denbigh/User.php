@@ -290,7 +290,8 @@ class External_Denbigh_User implements External_UserInterface
                           p.title, 
                           p.gender, 
                           p.dateOfBirth,
-                          s.staffCode
+                          s.staffCode,
+                          '' AS StaffHouseDescription
                 FROM      People p
                 LEFT JOIN Staff s ON s.peopleDenbighID = p.denbighID
                 WHERE     p.denbighID = :externalId

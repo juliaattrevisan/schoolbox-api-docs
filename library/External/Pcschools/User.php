@@ -124,7 +124,7 @@ class External_Pcschools_User implements External_UserInterface
                 '' AS StudentSpecialNeedsFlag,
                 '' AS StudentStudiesCode,
                 S.ALERT AS AlertMessage,
-                0 AS countIndividualEducationPlans
+                0 AS countIndividualEducationPlans,
             FROM STUDENT S
             LEFT JOIN CODEMAST AS S_HOUSE ON S.HOUSE = S_HOUSE.CODE AND S_HOUSE.TYPE = 'HOUSE'
             LEFT JOIN CODEMAST AS S_CLASS ON S.HOME_CLASS = S_CLASS.CODE AND S_CLASS.TYPE = 'CLASS'
@@ -691,7 +691,8 @@ class External_Pcschools_User implements External_UserInterface
                     T_CAMPUS.DESCRIPTION AS StaffCampusDescription,
                     T.STATUS AS StaffCategoryDescription,
                     '' AS StaffDepartment,
-                    '' AS StaffVoiceMail
+                    '' AS StaffVoiceMail,
+                    '' AS StaffHouseDescription,
                 FROM TEACHER T
                 LEFT JOIN CODEMAST AS T_CAMPUS ON T.CAMPUS = T_CAMPUS.CODE AND T_CAMPUS.TYPE = 'CAMPUS'
                 WHERE T.TEACHER_CODE = {$this->getDatabase()->smartQuote($externalUserId)}

@@ -409,7 +409,8 @@ class External_Maze_User implements External_UserInterface
 				'' AS StaffVoiceMail,
 				'' AS StaffCampusDescription,
 				SF_POSITION AS StaffCategoryDescription,
-				'' AS StaffDepartment
+				'' AS StaffDepartment,
+				'' AS StaffHouseDescription,
 			FROM SF
 			LEFT JOIN KSC ON SF.POS_CODE = KSC.KSCKEY
 			WHERE SFKEY = '{$synId}'

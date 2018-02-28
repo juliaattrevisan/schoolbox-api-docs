@@ -298,7 +298,8 @@ class External_Humanedge_User implements External_UserInterface
                 '' AS StaffCampusDescription,
                 '' AS StaffCategoryDescription,
                 '' AS StaffDepartment,
-                '' AS StaffVoiceMail
+                '' AS StaffVoiceMail,
+                '' AS StaffHouseDescription
             FROM Staff t
             WHERE t.Code = {$this->getDatabase()->smartQuote($externalUserId)}
         ";

@@ -200,7 +200,8 @@ class External_Isams_User implements External_UserInterface
                             Campus              AS StaffCampusDescription,
                             DivisionID          AS StaffCategoryDescription,
                             ''                  AS StaffDepartment,
-                            ''                  AS StaffVoiceMail
+                            ''                  AS StaffVoiceMail,
+                            ''                  AS StaffHouseDescription
             FROM            V_Staff
             WHERE           StaffID = :external_user_id
         ";
