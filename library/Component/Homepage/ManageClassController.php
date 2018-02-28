@@ -72,7 +72,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
 
 
         // If context is not a group, unit or class, render nothing
-        if (!$isGroupPage && !$isClassPage && !$wasClassPage && !$isUnitPage) {
+        if (!$isGroupPage && !$isClassPage && !$wasClassPage && !$isUnitPage && !$isCoursePage) {
             return false;
         }
 
@@ -154,7 +154,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
          * - user is staff, and
          * - has WRITE+ perm
          */
-        if (($isClassPage || $isGroupPage || $isUnitPage) && $this->getContentPermission() >= UserAccess::ACCESS_WRITE
+        if (($isClassPage || $isGroupPage || $isUnitPage || $isCoursePage) && $this->getContentPermission() >= UserAccess::ACCESS_WRITE
             && $this->getUser()->getRole()->isStaff()) {
             $this->parse('manage_criteria_block', 'manage_criteria');
             $hasClassActions = true;
