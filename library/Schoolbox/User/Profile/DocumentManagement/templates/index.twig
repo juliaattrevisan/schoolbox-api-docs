@@ -13,7 +13,7 @@
     {% if wysiwyg_content | length > 0 %}
     <div class="small-12 island">
         <p>
-            {{ wysiwyg_content | raw }}
+            {{ wysiwyg_content | purify }}
         </p>
     </div>
     {% endif %}
