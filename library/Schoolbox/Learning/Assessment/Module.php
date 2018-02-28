@@ -514,14 +514,12 @@ class Module extends BaseModule
             new Rule\Any(
                 new Rule\All(
                     new Rule\IsSuperuser(),
-                    new ParticipantHasNoInteractions(),
-                    new CanRespondToAssessment($this->getAccess())
+                    new ParticipantHasNoInteractions()
                 ),
                 new Rule\All(
                     new Rule\HasRole(Role::STAFF),
                     $this->buildAuthRuleHomepageAccess(UserAccess::ACCESS_WRITE),
                     new IsInteractionUnLocked(new LockedChecker($this->getTermMapper())),
-                    new CanRespondToAssessment($this->getAccess()),
                     new ParticipantHasNoInteractions()
                 ),
                 // Participants may now acknowledge their own submissions.
@@ -529,7 +527,6 @@ class Module extends BaseModule
                     new Rule\IsUser('studentId'),
                     new IsInteractionUnLocked(new LockedChecker($this->getTermMapper())),
                     new IsAssessmentOpen(),
-                    new CanRespondToAssessment($this->getAccess()),
                     new ParticipantHasNoInteractions()
                 )
             )
