@@ -124,7 +124,7 @@ class External_Pcschools_User implements External_UserInterface
                 '' AS StudentSpecialNeedsFlag,
                 '' AS StudentStudiesCode,
                 S.ALERT AS AlertMessage,
-                0 AS countIndividualEducationPlans,
+                0 AS countIndividualEducationPlans
             FROM STUDENT S
             LEFT JOIN CODEMAST AS S_HOUSE ON S.HOUSE = S_HOUSE.CODE AND S_HOUSE.TYPE = 'HOUSE'
             LEFT JOIN CODEMAST AS S_CLASS ON S.HOME_CLASS = S_CLASS.CODE AND S_CLASS.TYPE = 'CLASS'
