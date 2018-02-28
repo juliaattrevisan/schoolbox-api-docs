@@ -10,6 +10,7 @@ namespace Schoolbox\Tour\Status;
 use PDOStatement;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Tour\Step\Mapper as StepMapper;
+use Schoolbox\Tour\Mapper as TourMapper;
 use Schoolbox\UserMapper;
 
 /**
@@ -31,8 +32,7 @@ class Mapper extends BaseMapper
         $this->hasTable('tour_status');
         $this->hasModel(Model::class);
         $this->joins('user_id', UserMapper::class, 'id', null, null, 'user', 'user');
-        $this->joins('current_step', StepMapper::class, 'uuid', null, null, 'tourStep', 'tourStep');
-        $this->uses('url', self::TYPE_STRING);
+        $this->joins('tour_uuid', TourMapper::class, 'uuid', null, null, 'tour', 'tour');
         $this->uses('status', self::TYPE_STRING);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
     }
@@ -40,25 +40,21 @@ class Mapper extends BaseMapper
 
     protected function getSelectString()
     {
-        $x = "
+        return "
             SELECT      {$this->getColumnString()},
                         {$this->getJoinColumnString('user', 'u')},
-                        {$this->getJoinColumnString('tourStep', 't')}
+                        {$this->getJoinColumnString('tour', 't')}
             ";
-
-        return $x;
     }
 
 
     protected function getFromString()
     {
-        $x = "
+        return "
             FROM      {$this->table} 
             JOIN      {$this->getJoinSql('user','', 'u')}
-            JOIN      {$this->getJoinSql('tourStep', '', 't')}
+            JOIN      {$this->getJoinSql('tour', '', 't')}
             ";
-
-        return $x;
     }
 
 
@@ -72,8 +68,8 @@ class Mapper extends BaseMapper
             $user = $this->hydrateJoin($row, "user", "u");
             $model->setUser($user);
 
-            $tourStep = $this->hydrateJoin($row, "tourStep", "t");
-            $model->setTourStep($tourStep);
+            $tour = $this->hydrateJoin($row, "tour", "t");
+            $model->setTour($tour);
 
             $collection->add($model);
         }

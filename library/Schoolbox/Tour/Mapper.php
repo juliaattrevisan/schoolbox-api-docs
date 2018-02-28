@@ -174,9 +174,8 @@ class Mapper extends BaseMapper
             $sql = $sql. "AND
                             tour.uuid NOT IN (
                             SELECT tour_uuid
-                            FROM tour_step ts
-                            LEFT JOIN tour_status tst ON ts.uuid = tst.current_step
-                            WHERE tst.user_id = :user_id)";
+                            FROM tour_status
+                            WHERE user_id = :user_id)";
         }
 
         $statement = $this->getDatabase()->prepare($sql);

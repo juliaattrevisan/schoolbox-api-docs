@@ -99,10 +99,7 @@ $(function () {
                         })
                     });
 
-
-                    var oldStep = null;
                     var completed  = false;
-                    var tourUrl = window.location.pathname;
                     //TO DO: Inject route when file is pluginerised
                     var saveRoute = '/tour/url/save';
 
@@ -136,70 +133,17 @@ $(function () {
                         if (stepNext !== undefined && stepNext.jsEvents !== null && tourCurrent._direction === 'backward') {
                             runStepEvents(stepNext.jsEvents, 'close');
                         }
-
-                        // Update the status in the DB
-                        var newStep = stepCurrent.uuid;
-                        var status = "unactioned"; // TODO: use const from Status/Model when this is made into a plugin
-
-                        //Save the status
-                        $.post(saveRoute, {
-                            url: tourUrl,
-                            oldStep: oldStep,
-                            newStep: newStep,
-                            status: status
-                        });
-
-                        oldStep         = newStep;
                     });
 
                     tourCurrent.oncomplete(function(targetElement) {
                         completed = true;
-
-                        var newStep     = tourCurrent._introItems[tourCurrent._currentStep].uuid;
 
                         //This matches the consts on the Status/Model - to be updated when this file is a plugin
                         var status      = "completed";
 
                         //Save the status
                         $.post(saveRoute, {
-                            url: tourUrl,
-                            oldStep: oldStep,
-                            newStep: newStep,
-                            status: status
-                        });
-                    });
-
-                    tourCurrent.onexit(function(targetElement) {
-                        //onexit triggers when oncomplete triggers, so need check
-                        if(!completed) {
-                            var newStep = tourCurrent._introItems[tourCurrent._currentStep].uuid;
-
-                            //This matches the consts on the Status/Model - to be updated when this file is a plugin
-                            var status = "dismissed";
-
-                            //Save the status
-                            $.post(saveRoute, {
-                                url: tourUrl,
-                                oldStep: oldStep,
-                                newStep: newStep,
-                                status: status
-                            });
-                        }
-                    });
-
-                    tourCurrent.oncomplete(function(targetElement) {
-                        completed = true;
-
-                        var newStep     = tourCurrent._introItems[tourCurrent._currentStep].uuid;
-
-                        //This matches the consts on the Status/Model - to be updated when this file is a plugin
-                        var status      = "completed";
-
-                        //Save the status
-                        $.post(saveRoute, {
-                            url: tourUrl,
-                            oldStep: oldStep,
-                            newStep: newStep,
+                            tour_uuid: uuid,
                             status: status
                         });
                     });
@@ -209,16 +153,12 @@ $(function () {
 
                         //onexit triggers when oncomplete triggers, so need check
                         if(!completed) {
-                            var newStep = currentStep.uuid;
-
                             //This matches the consts on the Status/Model - to be updated when this file is a plugin
                             var status = "dismissed";
 
                             //Save the status
                             $.post(saveRoute, {
-                                url: tourUrl,
-                                oldStep: oldStep,
-                                newStep: newStep,
+                                tour_uuid: uuid,
                                 status: status
                             });
                         }
@@ -231,13 +171,18 @@ $(function () {
 
                     });
 
-
                     //You can retrieve the tour status as follows
-                    var getRoute    = '/tour/status/{tour_uuid}';
-                    var getUrl      = getRoute.replace("{tour_uuid}", tour["uuid"]);
+                    // var getRoute    = '/tour/status/{tour_uuid}';
+                    // var getUrl      = getRoute.replace("{tour_uuid}", tour["uuid"]);
+                    //
+                    // $.get(getUrl, null, function (data, status) {
+                    //     //Do whatever you like with data
+                    // });
 
-                    $.get(getUrl, null, function (data, status) {
-                        //Do whatever you like with data
+                    //Save the status
+                    $.post(saveRoute, {
+                        tour_uuid: uuid,
+                        status: 'started'
                     });
 
                     // Fire the tour

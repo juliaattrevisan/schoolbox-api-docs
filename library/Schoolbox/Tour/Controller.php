@@ -120,41 +120,21 @@ class Controller extends Base
         $post = $this->getRequest()->post;
 
         /** @var User $user */
-        $user          = $this->getUser();
-
-        //Delete previous status
-        if ($post['oldStep'] !== null) {
-            try {
-                $oldTourStatus = $this->tourStatusMapper->findByColumnList([
-                    'current_step' => $post['oldStep'],
-                    'url' => $post['url'],
-                    'user_id' => $user->getId()
-                ]);
-
-                $this->tourStatusMapper->delete($oldTourStatus);
-            } catch (Mapper\Exception $e) {
-                //Could not find old step in db...
-                $this->getResponse()->content->set($this->buildJsonOutput('Could not find previous status to delete. Will not save next status.'));
-                $this->getResponse()->status->set(404);
-                return;
-            }
-        }
+        $user = $this->getUser();
 
         //Save new status
-        $newStep = $this->tourStepMapper->createModel();
-        $newStep->setUuid($post['newStep']);
+        $newTour = $this->tourMapper->createModel();
+        $newTour->setUuid($post['tour_uuid']);
 
         $newTourStatus = $this->tourStatusMapper->createModel();
-        $newTourStatus->setTourStep($newStep)
+        $newTourStatus->setTour($newTour)
                       ->setUser($user)
-                      ->setUrl($post['url'])
                       ->setStatus($post['status']);
-
         try {
-            //Check if the corresponding step exists
-            $this->tourStepMapper->findOneByColumn("uuid", $post['newStep']);
+            //Save it real good
             $this->tourStatusMapper->save($newTourStatus);
             $this->getResponse()->status->set(204);
+
         } catch (Mapper\Exception $e) {
             //Attempted to save invalid data
             $this->getResponse()->content->set($this->buildJsonOutput('Invalid status data. Did not save status.'));
@@ -172,12 +152,12 @@ class Controller extends Base
     {
         $this->getResponse()->content->set($this->buildJsonOutput(null));
 
-        //Get all steps for tour
-        $steps = $this->tourStepMapper->findByColumnList(["tour_uuid" => $tour_uuid]);
+        /** @var User $user */
+        $user = $this->getUser();
 
         //Find step that has status
         try {
-            $status     = $this->tourStatusMapper->findOneByColumnList(["current_step" => $steps->getPropertyValues("uuid")]);
+            $status     = $this->tourStatusMapper->findOneByColumnList(["tour_uuid" => $tour_uuid, "user_id" => $user->getId()]);
             $serialized = $status->jsonSerialize();
             $this->getResponse()->content->set($this->buildJsonOutput($serialized));
         } catch (Mapper\Exception $e) {
