@@ -111,7 +111,11 @@
                         data-numerator="{{ group.sum | number_format(groupSumFormat) }}"
                         data-denominator="{{ group.total | number_format(groupTotalFormat) }}">
 
-                        {{ group.sum | number_format(groupSumFormat) }} / {{ group.total | number_format(groupTotalFormat) }}
+                        {% if markSchemeName == 'TotalMarkFractional' %}
+                            {{ group.sum | number_format(groupSumFormat) }} / {{ group.total | number_format(groupTotalFormat) }}
+                        {% else %}
+                            {{ group.humanReadableMark }}
+                        {% endif %}
                     </span>
 
                         {# Self-Assessment #}
@@ -148,7 +152,11 @@
                 data-numerator="{{ rubric.sum | number_format(rubricSumFormat) }}"
                 data-denominator="{{ rubric.total | number_format(rubricTotalFormat) }}">
 
-                {{ rubric.sum | number_format(rubricSumFormat) }} / {{ rubric.total | number_format(rubricTotalFormat) }}
+                {% if markSchemeName == 'TotalMarkFractional' %}
+                   {{ rubric.sum | number_format(rubricSumFormat) }} / {{ rubric.total | number_format(rubricTotalFormat) }}
+                {% else %}
+                   {{ rubric.humanReadableMark }}
+                {% endif %}
             </span>
 
                     {# Self-Assessment #}
