@@ -244,6 +244,7 @@ class FactoryTest extends TestCase
                 LetterGrade::class,
             ],
             [(new DueWork())->setMarkType($this->getDummyMarkType(MarkType::TYPE_TOTAL))->setMaxMark(50), TotalMarkFractional::class],
+            [(new DueWork())->setMarkType($this->getDummyMarkType(MarkType::TYPE_TOTAL))->setMaxMark(49.99), TotalMarkFractional::class],
             [(new DueWork())->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE)), None::class],
         ];
     }
