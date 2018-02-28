@@ -11,6 +11,7 @@ namespace Schoolbox\Assessment\Course\Import;
 use Alaress\Web\Controller as Base;
 use Alaress\Authorizer\Failure\Unauthorized;
 use Component_Instance;
+use Schoolbox\Assessment\Course\Import\Destinations;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Redirect;
@@ -223,8 +224,7 @@ class Controller extends Base\Base
     public function searchClasses()
     {
         $query          = $this->getRequest()->query->get('query');
-        $userGroupsOnly = false;
-        $folders        = $this->folderMapper->searchByName($query, $userGroupsOnly);
+        $folders        = (new Destinations($this->folderMapper))->findImportable($query);
 
         /* Swap keys for selectize compatibility -_-
          */

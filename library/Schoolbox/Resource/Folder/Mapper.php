@@ -808,11 +808,14 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * Search by name
      *
      * @param string $keyword
-     * @param bool $userGroupsOnly
+     * @param bool   $userGroupsOnly
+     * @param array  $folderIds
      * @return Collection|Model[]
+     * @throws Alaress\Database\Predicate\InvalidColumnException
      * @throws DefinitionException if join $name isn't on this mapper
+     * @throws \UnderflowException
      */
-    public function searchByName($keyword, $userGroupsOnly = false)
+    public function searchByName($keyword, $userGroupsOnly = false, array $folderIds = [])
     {
         $builder = $this->getPredicateBuilder();
 
@@ -827,6 +830,13 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             ->like('cc.code', "%{$this->database->escapeForLike($keyword)}%");
 
         $builder->any($subBuilder);
+
+        /* If a list of folder ids was provided to restrict the set of results, use it
+         */
+        if (\count($folderIds)) {
+            $builder->in('id', $folderIds);
+        }
+
         $options = ['order' => ["{$this->getTable()}.name" => 'ASC']];
 
         $folders = $this->findByPredicates($builder, $options);
@@ -847,6 +857,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
         return $folders;
     }
+
 
     /**
      * Helper method for hydrating a result from a query created by getFindQuery().
