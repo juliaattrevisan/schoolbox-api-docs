@@ -8,7 +8,7 @@
         {% set viewRoute = routeLookupIfAuthorized('learningAssessment.getSummary', {assessmentId: event.assessment.id, assessment: event.assessment, studentId: renderer.user.id, student: renderer.user }) %}
     {% endif %}
     {% if viewRoute %}
-        <a class="button icon-due-work" href="{{ viewRoute }}">View More Dfffetails</a>
+        <a class="button icon-due-work" href="{{ viewRoute }}">View More Details</a>
     {% endif %}
     {% set modifyRoute = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: event.assessment.id, assessment: event.assessment}) %}
     {% if modifyRoute %}
