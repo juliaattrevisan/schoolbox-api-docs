@@ -66,25 +66,30 @@ if (isset($type) && isset($id)) {
         fail();
     }
 
-    /** @noinspection PhpUndefinedVariableInspection */
     $storage = $video->getStorage();
-
-    // ----------------------------------------------------------------------------------------------------------------
-    // Use explicitly the transcoded version of the audio/video, and transcode size
-    // ----------------------------------------------------------------------------------------------------------------
-    $storage->setPath($storage->getPath() . "-transcode");
-
-    /** @var Filesystem $fileSystem */
     $fileSystem = $storage->getFilesystem();
-    $videoSize = $fileSystem->getSize($storage->getPath());
 
     // ----------------------------------------------------------------------------------------------------------------
     // Retrieve stream
     // ----------------------------------------------------------------------------------------------------------------
 
-    $videoStream = getStream($storage);
+    // Open a video stream using the appropriate method based on the underlying storage
 
-    if (!$videoStream) {
+    // Flysystem does not allow chunking of data (given that it has to support a multitude of different underlying
+    // storage structures, some of which may not support chunking). We need to work around this for S3 (and other
+    // future adapters we use) and open our own stream which we can stream back to the user.
+
+    $videoStream = null;
+
+    if ($fileSystem->getAdapter() instanceof AwsS3Adapter) {
+        // AWS S3
+        $videoStream = S3Stream::open($storage->getTranscodePath());
+    } elseif (($localFilename = getLocalFilesystemPath($storage)) !== false) {
+        // Local Disk
+        $videoStream = fopen($localFilename, "r");
+    }
+
+    if (is_resource($videoStream)) {
         fail();
     }
 
@@ -94,7 +99,7 @@ if (isset($type) && isset($id)) {
 
     try {
         /** @var int $videoSize */
-        $videoSize = $storage->getSize();
+        $videoSize = $fileSystem->getSize($storage->getTranscodePath());
 
         // Make sure the video actually had content
 
@@ -218,43 +223,6 @@ function setResponseOptions()
 }
 
 /**
- * Retrieve a chunkable stream from the given storage object
- *
- * @param Storage $storage
- *
- * @return bool|resource
- */
-function getStream(Storage $storage)
-{
-    /** @var Filesystem $fileSystem */
-    $fileSystem = $storage->getFilesystem();
-
-    // Open a video stream using the appropriate method based on the underlying storage
-
-    // Flysystem does not allow chunking of data (given that it has to support a multitude of different underlying
-    // storage structures, some of which may not support chunking). We need to work around this for S3 (and other
-    // future adapters we use) and open our own stream which we can stream back to the user.
-
-    $videoStream = null;
-
-    if ($fileSystem->getAdapter() instanceof AwsS3Adapter) {
-        // AWS S3
-        $videoStream = S3Stream::open($storage);
-    } elseif (($localFilename = getLocalFilesystemPath($storage)) !== false) {
-        // Local Disk
-        $videoStream = fopen($localFilename, "r");
-    }
-
-    if (is_resource($videoStream)) {
-        return $videoStream;
-    }
-
-    // Couldn't retrieve a valid stream
-
-    return false;
-}
-
-/**
  * Retrieve the path where the video would be stored on local filesystem. Returns false if the file is not readable.
  *
  * @param Storage $storage
@@ -263,7 +231,7 @@ function getStream(Storage $storage)
  */
 function getLocalFilesystemPath(Storage $storage)
 {
-    $filename = ConfigMapper::getInstance()->get("storage_dir") . "/{$storage->getPath()}";
+    $filename = ConfigMapper::getInstance()->get("storage_dir") . '/'.$storage->getTranscodePath();
 
     if (is_readable($filename)) {
         return $filename;

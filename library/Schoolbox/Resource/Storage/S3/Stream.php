@@ -15,18 +15,17 @@ namespace Schoolbox\Resource\Storage\S3;
 
 use Aws\S3\S3Client;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\Resource\Storage\Model as Storage;
 
 class Stream
 {
     /**
      * Open a file located on AWS S3 storage as a stream
      *
-     * @param Storage $storage
+     * @param string $path
      *
      * @return bool|resource
      */
-    public static function open(Storage $storage)
+    public static function open($path)
     {
         // Grab mappers
 
@@ -64,6 +63,6 @@ class Stream
 
         // Return seekable stream
 
-        return fopen("s3://{$basePath}/{$storage->getPath()}", "r", false, $context);
+        return fopen("s3://{$basePath}/{$path}", "r", false, $context);
     }
 }
