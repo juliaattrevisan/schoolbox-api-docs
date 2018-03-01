@@ -484,7 +484,7 @@ class External_Synergetic_User implements External_UserInterface
 
         // Search for a particular year level
 
-        if (strlen($yearLevel)>0) {
+        if (strlen($yearLevel) > 0) {
 
             $bindings['yearDescription'] = $yearLevel;
 
@@ -507,7 +507,7 @@ class External_Synergetic_User implements External_UserInterface
             }
         }
 
-        if (!empty($name)) {
+        if (strlen($name) > 0 ) {
 
             $splitNames = explode(' ', $name);
 
@@ -537,7 +537,7 @@ class External_Synergetic_User implements External_UserInterface
 
         // Search for a particular form
 
-        if (!empty($form)) {
+        if (strlen($form) > 0) {
             $bindings['form'] = $form;
             $filters .= " AND StudentForm = :form";
         }
