@@ -20,12 +20,13 @@ use Schoolbox\Video\QueueMapper;
 
 $type = $_GET['type'];
 $id   = $_GET['id'];
-$size = $_GET['size'];
 
-// If no size was specified, assume thumbnail
-
-if (strlen($size) === 0) {
-    $size = VideoQueue::TYPE_THUMBNAIL;
+// If no size was specified, assume thumbnail else poster
+if (strlen($_GET['size']) === 0) {
+    $size = 'thumbnail';
+}
+else {
+    $size = 'poster';
 }
 
 // TODO: Destroy these shenanigans
@@ -75,7 +76,12 @@ if (isset($type) && isset($id)) {
     try {
         // Try to find a video record with associated poster and thumbnail links
 
-        $imageFilename = "{$videoQueue->getStorage()->getPath()}-{$size}";
+        if($size == 'poster') {
+            $imageFilename = $videoQueue->getStorage()->getPosterPath();
+        }
+        else {
+            $imageFilename = $videoQueue->getStorage()->getThumbnailPath();
+        }
 
         /** @var \League\Flysystem\FilesystemInterface $filesystem */
         $filesystem = $videoQueue->getStorage()->getFilesystem();
@@ -99,42 +105,7 @@ if (isset($type) && isset($id)) {
 
         SitePage::redirectToBrokenImageOfSize(64, 64, 500);
         exit;
-    } catch (MapperException $e) {
-        // No video record could be found, try local file system
 
-        $configMapper = ConfigMapper::getInstance();
-
-        // Try to find in legacy location
-
-        $fileName = "{$configMapper->get("video_dir")}/{$videoQueue->getStorage()->getHash()}";
-
-        if ($size == VideoQueue::TYPE_POSTER) {
-            $fileName .= "-poster.jpg";
-        } else {
-            $fileName .= "-64.jpg";
-        }
-
-        // Check if it was readable in legacy location
-
-        if (is_readable($fileName)) {
-            // Check it had a valid file size
-
-            $fileSize = filesize($fileName);
-
-            if ($fileSize == false) {
-                SitePage::redirectToBrokenImageOfSize(64, 64, 500);
-            }
-
-            // Load it in from local disk
-
-            header('Cache-Control: max-age=10800, private');
-            header('Expires: ' . date(DATE_RFC822, strtotime(' 2 day')));
-            header('Pragma: private');
-            header('Content-Type: image/jpeg');
-            header("Content-Length: {$fileSize}");
-            readfile($fileName);
-            exit;
-        }
     } catch (Exception $e) {
         // If anything else goes wrong, fall through to sad mountain
 
