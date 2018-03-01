@@ -15,18 +15,20 @@ use Schoolbox\Resource\Browser\Resources\TreeBuilder;
 
 class CourseTreeBuilder extends TreeBuilder
 {
+
     /**
      * Class specific filter for which folders appear in the tree
      *
      * @param IFolder $folder
      * @return bool
      */
-    protected function filterFolder(IFolder $folder) {
+    protected function filterFolder(IFolder $folder)
+    {
 
-         if($folder->getFolderType() == 'course' || $folder->getFolderType() == 'unit') {
-             return false;
-         }
+        if ($folder->getFolderType() == 'course' || $folder->getFolderType() == 'unit') {
+            return false;
+        }
 
-         return true;
+        return true;
     }
 }
