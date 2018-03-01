@@ -44,8 +44,8 @@ class ResourceVideo
     private const POSTER = '-poster';
 
     /**
-    * Creates object and sets up sub-objects.
-    */
+     * Creates object and sets up sub-objects.
+     */
     public function __construct()
     {
         $this->setConfig(new ConfigLoader());
@@ -59,7 +59,7 @@ class ResourceVideo
      */
     public function getStatusImage($type = 'video')
     {
-        return "/images/core/component/$type-thumbnail-".strtolower($this->getStatus()).".gif";
+        return "/images/core/component/$type-thumbnail-" . strtolower($this->getStatus()) . ".gif";
     }
 
     /**
@@ -109,6 +109,7 @@ class ResourceVideo
     {
         return $this->config;
     }
+
     /**
      * @param IConfigLoader $config
      * @return self
@@ -209,8 +210,9 @@ class ResourceVideo
      * Note this will only exist if the object is a video/audio and it has been transcoded so test before use
      * @return string
      */
-    public function getTranscodePath() {
-        return $this->getStorage()->getPath().self::TRANSCODE;
+    public function getTranscodePath()
+    {
+        return $this->getStorage()->getPath() . self::TRANSCODE;
     }
 
     /**
@@ -218,8 +220,9 @@ class ResourceVideo
      * Note this will only exist if the object is a video and it has been transcoded so test before use
      * @return string
      */
-    public function getPosterPath() {
-        return $this->getStorage()->getPath().self::POSTER;
+    public function getPosterPath()
+    {
+        return $this->getStorage()->getPath() . self::POSTER;
     }
 
     /**
@@ -227,7 +230,8 @@ class ResourceVideo
      * Note this will only exist if the object is a video and it has been transcoded so test before use
      * @return string
      */
-    public function getThumbnailPath() {
-        return $this->getStorage()->getPath().self::THUMBNAIL;
+    public function getThumbnailPath()
+    {
+        return $this->getStorage()->getPath() . self::THUMBNAIL;
     }
 }

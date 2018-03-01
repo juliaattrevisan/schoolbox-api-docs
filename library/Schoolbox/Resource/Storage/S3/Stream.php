@@ -42,7 +42,7 @@ class Stream
 
         // Create the base path for the S3 storage
 
-        $basePath = "{$bucket}/{$prefix}" . INSTANCE_ID;;
+        $basePath = "{$bucket}/{$prefix}" . INSTANCE_ID;
 
         // Connect to Amazon S3
 
