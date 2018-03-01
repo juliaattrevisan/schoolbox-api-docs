@@ -24,10 +24,6 @@ class Queue extends ResourceVideo
     use CreatedAtDate;
     use UpdatedAtDate;
 
-    const TYPE_VIDEO     = 'video';
-    const TYPE_POSTER    = 'poster';
-    const TYPE_THUMBNAIL = 'thumbnail';
-
     /** Define external application names we will use */
     const APPLICATION_AVCONV = 'avconv';
     const APPLICATION_AVPROBE = 'ffprobe';

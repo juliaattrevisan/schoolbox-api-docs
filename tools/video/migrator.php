@@ -129,7 +129,7 @@ try {
         // Videos need to be migrated first so that the thumbnails/posters have something to be associated with
 
         $log->info("Processing videos...");
-        $results = uploadArrayToStorage($log, $videos, $storageMapper, Queue::TYPE_VIDEO);
+        $results = uploadArrayToStorage($log, $videos, $storageMapper, 'video');
 
         $success += $results["success"];
         $failed  += $results["failed"];
@@ -151,7 +151,7 @@ try {
         // ------------------------------------------------------------------------------------------------------------
 
         $log->info("Processing posters...");
-        $results = uploadArrayToStorage($log, $posters, $storageMapper, Queue::TYPE_POSTER);
+        $results = uploadArrayToStorage($log, $posters, $storageMapper, 'poster');
 
         $success += $results["success"];
         $failed  += $results["failed"];
@@ -161,7 +161,7 @@ try {
         // ------------------------------------------------------------------------------------------------------------
 
         $log->info("Processing thumbnails...");
-        $results = uploadArrayToStorage($log, $thumbnails, $storageMapper, Queue::TYPE_THUMBNAIL);
+        $results = uploadArrayToStorage($log, $thumbnails, $storageMapper, 'thumbnail');
 
         $success += $results["success"];
         $failed  += $results["failed"];
@@ -254,7 +254,7 @@ function uploadToStorage(LoggerInterface $log, $filename, StorageMapper $storage
     // Extract the hash from the filename
 
     try {
-        if ($type == Queue::TYPE_VIDEO) {
+        if ($type == 'video') {
             $filenameArray = explode(".mp4", $filename);
         } elseif ($type == 'audio') {
             $filenameArray = explode(".mp3", $filename);
@@ -279,7 +279,7 @@ function uploadToStorage(LoggerInterface $log, $filename, StorageMapper $storage
 
     try {
 
-            $suffix = $type == Queue::TYPE_VIDEO || $type == 'audio' ? 'transcode' : $type;
+            $suffix = $type == 'video' || $type == 'audio' ? 'transcode' : $type;
             $filenameImage = "/vagrant/data/storage/{$videoStorage->getPath()}-{$suffix}";
             $log->info("    - Filename:      {$filename}");
             $log->info("    - Uploaded Filename:      {$filenameImage}");
