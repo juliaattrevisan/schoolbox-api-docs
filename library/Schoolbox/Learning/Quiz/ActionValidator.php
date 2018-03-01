@@ -10,6 +10,7 @@ namespace Schoolbox\Learning\Quiz;
 
 use Schoolbox\Permission\Access\Access;
 use Alaress_Date_Format;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 use Schoolbox\Learning\Assessment\Quiz;
 
@@ -54,7 +55,8 @@ class ActionValidator
      */
     public function canSeeQuiz(User $user, Quiz\Model $quiz): bool
     {
-        $isInstructor = $this->accessHelper->isInstructor($user, $quiz->getBaseContext()->getFolder());
+        $folder       = $quiz->getBaseContext()->getFolder();
+        $isInstructor = $this->accessHelper->isInstructor($user, $folder);
         $isStaff      = $user->getRole()->isStaff();
 
         // Instructors/Staff can always view the assessment (regardless of whether they can interact with it)
@@ -78,6 +80,16 @@ class ActionValidator
         // * I have access to its folder
         // * I'm not blocked by config.restrict_student_submissions
         // * one of my kids is a participant
+        if ($this->accessHelper->getFolderAccess($user, $folder->getId()) >= UserAccess::ACCESS_READ) {
+            foreach ($quiz->getAllParticipants() as $participant) {
+                if ($participant->isExcluded() || $participant->getPublishDate()->isFuture()) {
+                    continue;
+                }
+                if ($user->isParentOf($participant->getUser())) {
+                    return true;
+                }
+            }
+        }
 
         // Not an instructor/staff, and no participation record.
         return false;
