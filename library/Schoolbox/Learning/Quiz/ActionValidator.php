@@ -54,7 +54,7 @@ class ActionValidator
      */
     public function canSeeQuiz(User $user, Quiz\Model $quiz): bool
     {
-        $isInstructor = $this->accessHelper->isInstructor($user, $quiz->getContext()->getFolder());
+        $isInstructor = $this->accessHelper->isInstructor($user, $quiz->getBaseContext()->getFolder());
         $isStaff      = $user->getRole()->isStaff();
 
         // Instructors/Staff can always view the assessment (regardless of whether they can interact with it)
@@ -72,6 +72,12 @@ class ActionValidator
             // Non-excluded Learners can only see assessment after publishing
             return $this->now->gte($participant->getPublishDate());
         }
+
+        // Am I a parent?
+        // I can see the quiz if:
+        // * I have access to its folder
+        // * I'm not blocked by config.restrict_student_submissions
+        // * one of my kids is a participant
 
         // Not an instructor/staff, and no participation record.
         return false;
@@ -120,6 +126,44 @@ class ActionValidator
 
         // Only instructors can review, and reviewee cannot be excluded.
         return $isInstructor && $isParticipant;
+    }
+
+
+    /**
+     * Can `$user` see attempts made by `$student` on `$quiz`?
+     *
+     * @param User       $user
+     * @param User       $student
+     * @param Quiz\Model $quiz
+     * @return bool
+     */
+    public function canSeeAttempts(User $user, User $student, Quiz\Model $quiz): bool
+    {
+        // Is student even participating?
+        $participant = $quiz->getParticipantIfExtant($student);
+        if (!$participant || $participant->isExcluded()) {
+            return false;
+        }
+
+        // Instructors can see attempts, as long as student is participating
+        if ($this->accessHelper->isInstructor($user, $quiz->getBaseContext()->getFolder())) {
+            return true;
+        }
+
+        // Anyone else:
+        // Can't see participation if it's not published yet
+        if ($participant->getPublishDate()->isFuture()) {
+            return false;
+        }
+
+        // Student may view their own attempts
+        if ($user->getId() === $student->getId()) {
+            return true;
+        }
+
+        // Parent of student may view participation
+        // (as long as config.restrict_student_submissions is off)
+        return $user->isParentOf($student);
     }
 
 
