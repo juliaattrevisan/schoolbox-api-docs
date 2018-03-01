@@ -1,3 +1,5 @@
+{% import '@learningMarkScheme/macro/limitDecimal.twig' as limit_decimal %}
+
 {% set formField = 'rubric' %}
 {% set rubricId = 'rb-' ~ rubric.id %}
 {% set markType = markType ?: { mode: 'raw' } %}
@@ -97,22 +99,12 @@
             {% if config.rubric_show_points or not studentView %}
                 <th class="rb-group-summary" colspan="{{ rubric.levels|length + 1 }}">
                     <span data-group-summary="{{ rubricId }}-{{ group.id }}"
-                        {% if group.sum // 1 != group.sum %}
-                            {% set groupSumFormat = 2 %}
-                        {% else %}
-                            {% set groupSumFormat = 0 %}
-                        {% endif %}
-                        {% if group.total // 1 != group.total %}
-                            {% set groupTotalFormat = 2 %}
-                        {% else %}
-                            {% set groupTotalFormat = 0 %}
-                        {% endif %}
 
-                        data-numerator="{{ group.sum | number_format(groupSumFormat) }}"
-                        data-denominator="{{ group.total | number_format(groupTotalFormat) }}">
+                        data-numerator="{{ limit_decimal.limit(group.sum, 2) }}"
+                        data-denominator="{{ limit_decimal.limit(group.total, 2) }}">
 
                         {% if markSchemeName == 'TotalMarkFractional' %}
-                            {{ group.sum | number_format(groupSumFormat) }} / {{ group.total | number_format(groupTotalFormat) }}
+                            {{ limit_decimal.limit(group.sum, 2) }} / {{ limit_decimal.limit(group.total, 2) }}
                         {% else %}
                             {{ group.humanReadableMark }}
                         {% endif %}
@@ -138,22 +130,12 @@
     <tr>
         <th class="rb-final-summary" colspan="{{ rubric.levels|length + 2 }}">
             <span data-final-summary="{{ rubricId }}"
-                {% if rubric.sum // 1 != rubric.sum %}
-                    {% set rubricSumFormat = 2 %}
-                {% else %}
-                    {% set rubricSumFormat = 0 %}
-                {% endif %}
-                {% if rubric.total // 1 != rubric.total %}
-                    {% set rubricTotalFormat = 2 %}
-                {% else %}
-                    {% set rubricTotalFormat = 0 %}
-                {% endif %}
 
                 data-numerator="{{ rubric.sum | number_format(rubricSumFormat) }}"
                 data-denominator="{{ rubric.total | number_format(rubricTotalFormat) }}">
 
                 {% if markSchemeName == 'TotalMarkFractional' %}
-                   {{ rubric.sum | number_format(rubricSumFormat) }} / {{ rubric.total | number_format(rubricTotalFormat) }}
+                   {{ limit_decimal.limit(rubric.sum, 2) }} / {{ limit_decimal.limit(rubric.total, 2) }}
                 {% else %}
                    {{ rubric.humanReadableMark }}
                 {% endif %}

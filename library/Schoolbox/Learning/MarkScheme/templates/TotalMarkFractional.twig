@@ -8,21 +8,16 @@
         readonly:    bool           Should this form input be rendered as readonly?
     ]
 #}
-
-{% if markScheme.totalMark // 1 != markScheme.totalMark %}
-    {% set formattedMark = markScheme.totalMark | number_format(2) %}
-{% else %}
-    {% set formattedMark = markScheme.totalMark | number_format(0) %}
-{% endif %}
+{% import '@learningMarkScheme/macro/limitDecimal.twig' as limit_decimal %}
 
 {% include '@learningMarkScheme/fragments/text-input.twig' with {
 participant: participant,
 feedback:    feedback,
 tabIndex:    tabIndex,
-placeholder: readonly ? '(no mark given)' : 'Mark out of ' ~ formattedMark,
-limit:       formattedMark,
+placeholder: readonly ? '(no mark given)' : 'Mark out of ' ~ limit_decimal.limit(markScheme.totalMark, 2),
+limit:       limit_decimal.limit(markScheme.totalMark, 2),
 maxLength:   16,
-inputTitle:  'Maximum Mark: ' ~ formattedMark,
+inputTitle:  'Maximum Mark: ' ~ limit_decimal.limit(markScheme.totalMark, 2),
 errors:      errors,
 readonly:    readonly,
 totalMark: 1,
