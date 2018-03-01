@@ -195,7 +195,7 @@ class Queue extends ResourceVideo
         // ------------------------------------------------------------------------------------------------------------
 
         $filenameSource         = $this->getLocalFilename($this->getStorage());
-        $filenameTranscodeAudio = $this->getTempFilename("{$this->getStorage()->getFilename()}-transcode", "mp3");
+        $filenameTranscodeAudio = $this->getTempFilename($this->getStorage()->getTranscodePath(), "mp3");
 
         // Remember all the temporary files we create so when we error out or finish we can unlink them
 
@@ -259,9 +259,9 @@ class Queue extends ResourceVideo
         // ------------------------------------------------------------------------------------------------------------
 
         $filenameSource             = $this->getLocalFilename($this->getStorage());
-        $filenameTranscodeVideo     = $this->getTempFilename("{$this->getStorage()->getFilename()}-transcode", "mp4");
-        $filenameTranscodeThumbnail = $this->getTempFilename("{$this->getStorage()->getFilename()}-thumbnail", "jpg");
-        $filenameTranscodePoster    = $this->getTempFilename("{$this->getStorage()->getFilename()}-poster", "jpg");
+        $filenameTranscodeVideo     = $this->getTempFilename($this->getStorage()->getTranscodePath(), "mp4");
+        $filenameTranscodeThumbnail = $this->getTempFilename($this->getStorage()->getThumbnailPath(), "jpg");
+        $filenameTranscodePoster    = $this->getTempFilename($this->getStorage()->getPosterPath(), "jpg");
 
         // Remember all the temporary files we create so when we error out or finish we can unlink them
 
@@ -356,7 +356,7 @@ class Queue extends ResourceVideo
             // Upload thumbnail to storage
 
             $this->log("Uploading video thumbnail");
-            $this->uploadPreviewImage($filenameTranscodeThumbnail, self::TYPE_THUMBNAIL);
+            $this->uploadPreviewImage($filenameTranscodeThumbnail, $this->getStorage()->getThumbnailPath());
 
             // Create poster
 
@@ -377,7 +377,7 @@ class Queue extends ResourceVideo
             // Upload poster to storage
 
             $this->log("Uploading video poster");
-            $this->uploadPreviewImage($filenameTranscodePoster, self::TYPE_POSTER);
+            $this->uploadPreviewImage($filenameTranscodePoster, $this->getStorage()->getPosterPath());
         } else {
             $this->log("Skipping thumbnail and poster generation");
         }
@@ -398,9 +398,7 @@ class Queue extends ResourceVideo
     private function uploadTranscode($filename)
     {
         $this->log("Saving transcode to storage");
-        $this->getStorage()->getFilesystem()->put($this->getStorage()->getPath() . "-transcode", file_get_contents($filename));
-        $this->getStorage()->setSize(filesize($filename));
-        $this->storageMapper->save($this->storage);
+        $this->getStorage()->getFilesystem()->put($this->getStorage()->getTranscodePath(), file_get_contents($filename));
 
         $this->log("Deleting local transcode file");
         unlink($filename);
@@ -468,26 +466,25 @@ class Queue extends ResourceVideo
      * Upload preview image to storage
      *
      * @param string $fileName Local filename to be uploaded
-     * @param string $size     Size constant
+     * @param string $destinationPath  Destination to which the image should be uploaded
      *
      * @throws \League\Flysystem\FileExistsException
      * @throws \League\Flysystem\FileNotFoundException
      */
-    private function uploadPreviewImage(string $fileName, string $size)
+    private function uploadPreviewImage(string $fileName, string $destinationPath)
     {
-        $imageFilename = $this->getStorage()->getPath() . "-{$size}";
 
         // If it already exists we have to update, otherwise write
 
-        if ($this->getStorage()->getFilesystem()->has($imageFilename)) {
-            $this->getStorage()->getFilesystem()->update($imageFilename, file_get_contents($fileName));
+        if ($this->getStorage()->getFilesystem()->has($destinationPath)) {
+            $this->getStorage()->getFilesystem()->update($destinationPath, file_get_contents($fileName));
         } else {
-            $this->getStorage()->getFilesystem()->write($imageFilename, file_get_contents($fileName));
+            $this->getStorage()->getFilesystem()->write($destinationPath, file_get_contents($fileName));
         }
 
         // Remove the thumbnail
 
-        $this->log("Deleting temporary {$size} file from disk.");
+        $this->log("Deleting temporary preview image file from disk.");
         unlink($fileName);
     }
 
