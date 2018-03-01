@@ -1180,6 +1180,14 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         }
     }
 
+
+    /**
+     * Is this participant notifiable for this label?
+     *
+     * @param Participant $participant
+     * @param string      $label
+     * @return bool
+     */
     private function isParticipantNotifiable(Participant $participant, string $label): bool
     {
         switch ($label) {
