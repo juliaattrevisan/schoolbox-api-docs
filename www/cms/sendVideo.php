@@ -64,6 +64,12 @@ if (isset($type) && isset($id)) {
         fail();
     }
 
+    // ----------------------------------------------------------------------------------------------------------------
+    // Prepare for streaming
+    // ----------------------------------------------------------------------------------------------------------------
+
+    setResponseOptions();
+
     $storage = $video->getStorage();
     /** @var Filesystem $fileSystem */
     $fileSystem = $storage->getFilesystem();
@@ -82,13 +88,13 @@ if (isset($type) && isset($id)) {
 
     if ($fileSystem->getAdapter() instanceof AwsS3Adapter) {
         // AWS S3
-        $videoStream = S3Stream::open($storage->getTranscodePath());
-    } elseif (($localFilename = getLocalFilesystemPath($storage)) !== false) {
+        $videoStream = S3Stream::open($video->getTranscodePath());
+    } elseif (($localFilename = getLocalFilesystemPath($video)) !== false) {
         // Local Disk
         $videoStream = fopen($localFilename, "r");
     }
 
-    if (is_resource($videoStream)) {
+    if (!is_resource($videoStream)) {
         fail();
     }
 
@@ -97,7 +103,7 @@ if (isset($type) && isset($id)) {
     // ----------------------------------------------------------------------------------------------------------------
 
     /** @var int $videoSize */
-    $videoSize = $fileSystem->getSize($storage->getTranscodePath());
+    $videoSize = $fileSystem->getSize($video->getTranscodePath());
 
     // Make sure the video actually had content
 
@@ -121,11 +127,7 @@ if (isset($type) && isset($id)) {
         $mimetype = 'application/octet-stream';
     }
 
-    // ----------------------------------------------------------------------------------------------------------------
-    // Prepare for streaming
-    // ----------------------------------------------------------------------------------------------------------------
 
-    setResponseOptions();
 
     // ----------------------------------------------------------------------------------------------------------------
     // Determine range of request for streaming protocol
@@ -220,13 +222,13 @@ function setResponseOptions()
 /**
  * Retrieve the path where the video would be stored on local filesystem. Returns false if the file is not readable.
  *
- * @param Storage $storage
+ * @param ResourceVideo $video
  *
  * @return string|bool
  */
-function getLocalFilesystemPath(Storage $storage)
+function getLocalFilesystemPath(\Schoolbox\Video\ResourceVideo $video)
 {
-    $filename = ConfigMapper::getInstance()->get("storage_dir") . '/'.$storage->getTranscodePath();
+    $filename = ConfigMapper::getInstance()->get("storage_dir") . '/'.$video->getTranscodePath();
 
     if (is_readable($filename)) {
         return $filename;

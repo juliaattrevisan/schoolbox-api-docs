@@ -31,180 +31,175 @@ $kernel = new Schoolbox\Application\Daemon\Kernel('Media Transcode', [
     'verbose' => [false, false, false],
 ]);
 
-try {
-    $kernel->run(function ($di, $loop, $log, $opts) {
-        /**
-         * @var Injector        $di
-         * @var LoopInterface   $loop
-         * @var LoggerInterface $log
-         * @var array           $opts
-         */
 
-        // ------------------------------------------------------------------------------------------------------------
-        // Get mappers
-        // ------------------------------------------------------------------------------------------------------------
+$kernel->run(function ($di, $loop, $log, $opts) {
+    /**
+     * @var Injector        $di
+     * @var LoopInterface   $loop
+     * @var LoggerInterface $log
+     * @var array           $opts
+     */
 
-        try {
-            /** @var IConfigLoader $configLoader */
-            $configLoader = $di->get('config');
+    // ------------------------------------------------------------------------------------------------------------
+    // Get mappers
+    // ------------------------------------------------------------------------------------------------------------
 
-            /** @var MapperFactory $mapperFactory */
-            $mapperFactory = $di->get('mapperFactory');
-        } catch (ServiceNotFound $e) {
-            $log->critical("Unknown service requested");
+    try {
+        /** @var IConfigLoader $configLoader */
+        $configLoader = $di->get('config');
+
+        /** @var MapperFactory $mapperFactory */
+        $mapperFactory = $di->get('mapperFactory');
+    } catch (ServiceNotFound $e) {
+        $log->critical("Unknown service requested");
+        exit(1);
+    }
+
+    /** @var QueueMapper $queueMapper */
+    $queueMapper = $mapperFactory->get(QueueMapper::class);
+
+    // ------------------------------------------------------------------------------------------------------------
+    // Let kernel decide how to handle dead child processes
+    // ------------------------------------------------------------------------------------------------------------
+
+    pcntl_signal(SIGCHLD, SIG_DFL);
+
+    // ------------------------------------------------------------------------------------------------------------
+    // Allow only a single migration at a time
+    // ------------------------------------------------------------------------------------------------------------
+
+    $lock = new Alaress_Lock($configLoader->get('video_dir') . '/.transcode.lock');
+
+    if (!$lock->acquire()) {
+        $log->warning("Video processor is already running, checking timeout...");
+
+        // Check timeout
+
+        $timeout = (int)$configLoader->get('video_processing_timeout');
+
+        if ($timeout <= 0) {
+            $log->alert("Unable to proceed, timeout of media processing is disabled");
+            exit(1);
+        } elseif (($num_timed_out = $queueMapper->markAllProcessingAsTimedOut($timeout)) > 0) {
+            $log->error("Error: {$num_timed_out} media item(s) timed out");
+            $lock->killProcess();
+            $lock->acquire();
+        } else {
+            $log->info("Unable to proceed, existing transcode still within timeout period");
             exit(1);
         }
+    }
 
-        /** @var QueueMapper $queueMapper */
-        $queueMapper = $mapperFactory->get(QueueMapper::class);
+    // ------------------------------------------------------------------------------------------------------------
+    // Check if there was anything to process
+    // ------------------------------------------------------------------------------------------------------------
 
-        // ------------------------------------------------------------------------------------------------------------
-        // Let kernel decide how to handle dead child processes
-        // ------------------------------------------------------------------------------------------------------------
+    /** @var GenericCollection $pendingQueue */
+    $pendingQueue = $queueMapper->getPending();
 
-        pcntl_signal(SIGCHLD, SIG_DFL);
+    if ($pendingQueue->count() == 0) {
+        $log->info("No pending media to transcode");
+        $lock->release();
+        exit;
+    }
 
-        // ------------------------------------------------------------------------------------------------------------
-        // Allow only a single migration at a time
-        // ------------------------------------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------------------------------------
+    // Iterate through all videos pending transcode
+    // ------------------------------------------------------------------------------------------------------------
 
-        $lock = new Alaress_Lock($configLoader->get('video_dir') . '/.transcode.lock');
+    $log->info("Processing {$pendingQueue->count()} pending media transcode(s)...");
 
-        if (!$lock->acquire()) {
-            $log->warning("Video processor is already running, checking timeout...");
+    $countCurrent = 1;
+    $countTotal   = $pendingQueue->count();
+    $failed       = 0;
+    $success      = 0;
 
-            // Check timeout
+    /** @var Queue $mediaCurrent */
+    foreach ($pendingQueue as $mediaCurrent) {
+        $hash = $mediaCurrent->getHash();
 
-            $timeout = (int)$configLoader->get('video_processing_timeout');
+        if (empty($hash)) {
+            // No storage hash recorded, unrecoverable error
 
-            if ($timeout <= 0) {
-                $log->alert("Unable to proceed, timeout of media processing is disabled");
-                exit(1);
-            } elseif (($num_timed_out = $queueMapper->markAllProcessingAsTimedOut($timeout)) > 0) {
-                $log->error("Error: {$num_timed_out} media item(s) timed out");
-                $lock->killProcess();
-                $lock->acquire();
-            } else {
-                $log->info("Unable to proceed, existing transcode still within timeout period");
-                exit(1);
-            }
-        }
+            $log->error("Failed ({$mediaCurrent->getId()}): No valid file hash");
+            $mediaCurrent->setMessage("Unrecoverable Error: No known file hash");
+            $mediaCurrent->setStatus(QueueMapper::STATUS_FAILED);
+            $queueMapper->save($mediaCurrent);
+            $failed++;
+        } else {
+            try {
+                // ------------------------------------------------------------------------------------------------
+                // Display details of file being processed
+                // ------------------------------------------------------------------------------------------------
 
-        // ------------------------------------------------------------------------------------------------------------
-        // Check if there was anything to process
-        // ------------------------------------------------------------------------------------------------------------
+                $storage = $mediaCurrent->getStorage();
 
-        /** @var GenericCollection $pendingQueue */
-        $pendingQueue = $queueMapper->getPending();
+                /** @noinspection PhpUndefinedMethodInspection */
+                $fileSystem = get_class($storage->getFilesystem()->getAdapter());
+                $fileName   = "{$storage->getFilename()}.{$storage->getExtension()}";
+                $filePath   = $storage->getPath();
 
-        if ($pendingQueue->count() == 0) {
-            $log->info("No pending media to transcode");
-            $lock->release();
-            exit;
-        }
+                $log->info("");
+                $log->info("    - Processing Item:        {$countCurrent}/{$countTotal}");
+                $log->info("    - Media Queue ID:         {$mediaCurrent->getId()}");
+                $log->info("    - Storage Hash:           {$hash}");
+                $log->info("    - Storage Filesystem:     {$fileSystem}");
+                $log->info("    - Source File:            {$fileName}");
+                $log->info("    - Source Path:            {$filePath}");
 
-        // ------------------------------------------------------------------------------------------------------------
-        // Iterate through all videos pending transcode
-        // ------------------------------------------------------------------------------------------------------------
+                $log->info(getDisplayFileSize($storage));
+                $log->info(getDisplayFileMime($storage));
 
-        $log->info("Processing {$pendingQueue->count()} pending media transcode(s)...");
+                // Update video to indicate processing has begun
 
-        $countCurrent = 1;
-        $countTotal   = $pendingQueue->count();
-        $failed       = 0;
-        $success      = 0;
-
-        /** @var Queue $mediaCurrent */
-        foreach ($pendingQueue as $mediaCurrent) {
-            $hash = $mediaCurrent->getHash();
-
-            if (empty($hash)) {
-                // No storage hash recorded, unrecoverable error
-
-                $log->error("Failed ({$mediaCurrent->getId()}): No valid file hash");
-                $mediaCurrent->setMessage("Unrecoverable Error: No known file hash");
-                $mediaCurrent->setStatus(QueueMapper::STATUS_FAILED);
+                $mediaCurrent->setStatus(QueueMapper::STATUS_PROCESSING);
                 $queueMapper->save($mediaCurrent);
+
+                // ------------------------------------------------------------------------------------------------
+                // Process the video
+                // ------------------------------------------------------------------------------------------------
+
+                if ($mediaCurrent->process($log) == true) {
+                    $mediaCurrent->setStatus(QueueMapper::STATUS_COMPLETED);
+                } else {
+                    $mediaCurrent->setStatus(QueueMapper::STATUS_FAILED);
+                }
+            } catch (Exception $e) {
+                $log->error($e->getMessage(), [$e]);
+                $mediaCurrent->setStatus(QueueMapper::STATUS_FAILED);
+            } finally {
+                $queueMapper->save($mediaCurrent);
+                $countCurrent++;
+            }
+
+            if ($mediaCurrent->getStatus() === QueueMapper::STATUS_FAILED) {
+                $log->error("    - Transcode failed");
                 $failed++;
             } else {
-                try {
-                    // ------------------------------------------------------------------------------------------------
-                    // Display details of file being processed
-                    // ------------------------------------------------------------------------------------------------
-
-                    $storage = $mediaCurrent->getStorage();
-
-                    /** @noinspection PhpUndefinedMethodInspection */
-                    $fileSystem = get_class($storage->getFilesystem()->getAdapter());
-                    $fileName   = "{$storage->getFilename()}.{$storage->getExtension()}";
-                    $filePath   = $storage->getPath();
-
-                    $log->info("");
-                    $log->info("    - Processing Item:        {$countCurrent}/{$countTotal}");
-                    $log->info("    - Media Queue ID:         {$mediaCurrent->getId()}");
-                    $log->info("    - Storage Hash:           {$hash})");
-                    $log->info("    - Storage Filesystem:     {$fileSystem}");
-                    $log->info("    - Source File:            {$fileName}");
-                    $log->info("    - Source Path:            {$filePath}");
-
-                    $log->info(getDisplayFileSize($storage));
-                    $log->info(getDisplayFileMime($storage));
-
-                    // Update video to indicate processing has begun
-
-                    $mediaCurrent->setStatus(QueueMapper::STATUS_PROCESSING);
-                    $queueMapper->save($mediaCurrent);
-
-                    // ------------------------------------------------------------------------------------------------
-                    // Process the video
-                    // ------------------------------------------------------------------------------------------------
-
-                    if ($mediaCurrent->process($log) == true) {
-                        $mediaCurrent->setStatus(QueueMapper::STATUS_COMPLETED);
-                    } else {
-                        $mediaCurrent->setStatus(QueueMapper::STATUS_FAILED);
-                    }
-                } catch (Exception $e) {
-                    $log->error($e->getMessage(), [$e]);
-                    $mediaCurrent->setStatus(QueueMapper::STATUS_FAILED);
-                } finally {
-                    $queueMapper->save($mediaCurrent);
-                    $countCurrent++;
-                }
-
-                if ($mediaCurrent->getStatus() === QueueMapper::STATUS_FAILED) {
-                    $log->error("    - Transcode failed");
-                    $failed++;
-                } else {
-                    $log->info("    - Transcode completed successfully");
-                    $success++;
-                }
+                $log->info("    - Transcode completed successfully");
+                $success++;
             }
         }
+    }
 
-        // ------------------------------------------------------------------------------------------------------------
-        // Display results
-        // ------------------------------------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------------------------------------
+    // Display results
+    // ------------------------------------------------------------------------------------------------------------
 
-        $log->info("");
+    $log->info("");
 
-        if ($failed > 0) {
-            $log->info("Processing completed with errors: {$success} succeeded, {$failed} failed");
-        } else {
-            $log->info("Processing completed: {$success} media items processed");
-        }
+    if ($failed > 0) {
+        $log->info("Processing completed with errors: {$success} succeeded, {$failed} failed");
+    } else {
+        $log->info("Processing completed: {$success} media items processed");
+    }
 
-        // ------------------------------------------------------------------------------------------------------------
-        // Release file lock
-        // ------------------------------------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------------------------------------
+    // Release file lock
+    // ------------------------------------------------------------------------------------------------------------
 
-        $lock->release();
-    });
-} catch (Throwable $e) {
-    // Don't actually know where this exception is coming from- but PhpStorm complains if I don't do a catch all here
-
-    $log->critical("Unhandled exception error: {$e->getMessage()}", [$e]);
-}
+    $lock->release();
+});
 
 // --------------------------------------------------------------------------------------------------------------------
 // Helper functions

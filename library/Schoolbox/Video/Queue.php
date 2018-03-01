@@ -191,7 +191,7 @@ class Queue extends ResourceVideo
         // ------------------------------------------------------------------------------------------------------------
 
         $filenameSource         = $this->getLocalFilename($this->getStorage());
-        $filenameTranscodeAudio = $this->getTempFilename($this->getStorage()->getTranscodePath(), "mp3");
+        $filenameTranscodeAudio = $this->getTempFilename($this->getStorage()->getHash(), "mp3");
 
         // Remember all the temporary files we create so when we error out or finish we can unlink them
 
@@ -255,9 +255,9 @@ class Queue extends ResourceVideo
         // ------------------------------------------------------------------------------------------------------------
 
         $filenameSource             = $this->getLocalFilename($this->getStorage());
-        $filenameTranscodeVideo     = $this->getTempFilename($this->getStorage()->getTranscodePath(), "mp4");
-        $filenameTranscodeThumbnail = $this->getTempFilename($this->getStorage()->getThumbnailPath(), "jpg");
-        $filenameTranscodePoster    = $this->getTempFilename($this->getStorage()->getPosterPath(), "jpg");
+        $filenameTranscodeVideo     = $this->getTempFilename($this->getStorage()->getHash(), "mp4");
+        $filenameTranscodeThumbnail = $this->getTempFilename($this->getStorage()->getHash().'-thumbnail', "jpg");
+        $filenameTranscodePoster    = $this->getTempFilename($this->getStorage()->getHash().'-poster', "jpg");
 
         // Remember all the temporary files we create so when we error out or finish we can unlink them
 
@@ -352,7 +352,7 @@ class Queue extends ResourceVideo
             // Upload thumbnail to storage
 
             $this->log("Uploading video thumbnail");
-            $this->uploadPreviewImage($filenameTranscodeThumbnail, $this->getStorage()->getThumbnailPath());
+            $this->uploadPreviewImage($filenameTranscodeThumbnail, $this->getThumbnailPath());
 
             // Create poster
 
@@ -373,7 +373,7 @@ class Queue extends ResourceVideo
             // Upload poster to storage
 
             $this->log("Uploading video poster");
-            $this->uploadPreviewImage($filenameTranscodePoster, $this->getStorage()->getPosterPath());
+            $this->uploadPreviewImage($filenameTranscodePoster, $this->getPosterPath());
         } else {
             $this->log("Skipping thumbnail and poster generation");
         }
@@ -394,7 +394,7 @@ class Queue extends ResourceVideo
     private function uploadTranscode($filename)
     {
         $this->log("Saving transcode to storage");
-        $this->getStorage()->getFilesystem()->put($this->getStorage()->getTranscodePath(), file_get_contents($filename));
+        $this->getStorage()->getFilesystem()->put($this->getTranscodePath(), file_get_contents($filename));
 
         $this->log("Deleting local transcode file");
         unlink($filename);
@@ -433,7 +433,7 @@ class Queue extends ResourceVideo
 
             $this->log("Media Source Location:  Flysystem");
             $this->log("Downloading file to local disk");
-            $mediaFilename = $this->getTempFilename("{$storage->getFilename()}-source", "{$storage->getExtension()}");
+            $mediaFilename = $this->getTempFilename("{$storage->getHash()}-source", "{$storage->getExtension()}");
             $mediaFileOut  = fopen($mediaFilename, "w");
             $this->getStorage()->pipe($mediaFileOut);
             fclose($mediaFileOut);

@@ -47,15 +47,6 @@ class Model extends File implements IStorage
     /** @var string $extension */
     protected $extension;
 
-    /** @const string TRANSCODE Location of compressed transcode (video or audio only) version of file */
-    private const TRANSCODE = '-transcode';
-
-    /** @const string THUMBNAIL Location of small thumbnail representing compressed video */
-    private const THUMBNAIL = '-thumbnail';
-
-    /** @const string POSTER Location of poster for compressed video */
-    private const POSTER = '-poster';
-
     /**
      * @return string
      */
@@ -287,30 +278,4 @@ class Model extends File implements IStorage
         return $size;
     }
 
-    /**
-     * Returns the path of the storage objects trancoded video or audio file
-     * Note this will only exist if the object is a video/audio and it has been transcoded so test before use
-     * @return string
-     */
-    public function getTranscodePath() {
-        return $this->getPath().self::TRANSCODE;
-    }
-
-    /**
-     * Returns the path of the storage objects poster for the transcoded video
-     * Note this will only exist if the object is a video and it has been transcoded so test before use
-     * @return string
-     */
-    public function getPosterPath() {
-        return $this->getPath().self::POSTER;
-    }
-
-    /**
-     * Returns the path of the storage objects thumbnail for the transcoded video
-     * Note this will only exist if the object is a video and it has been transcoded so test before use
-     * @return string
-     */
-    public function getThumbnailPath() {
-        return $this->getPath().self::POSTER;
-    }
 }

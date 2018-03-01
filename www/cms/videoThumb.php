@@ -77,10 +77,10 @@ if (isset($type) && isset($id)) {
         // Try to find a video record with associated poster and thumbnail links
 
         if($size == 'poster') {
-            $imageFilename = $videoQueue->getStorage()->getPosterPath();
+            $imageFilename = $videoQueue->getPosterPath();
         }
         else {
-            $imageFilename = $videoQueue->getStorage()->getThumbnailPath();
+            $imageFilename = $videoQueue->getThumbnailPath();
         }
 
         /** @var \League\Flysystem\FilesystemInterface $filesystem */
