@@ -206,6 +206,7 @@ class External_Tass_User implements External_UserInterface
                       pa.home_phone       AS StudentContactPhoneActual,
                       pa.bus_phone        AS StudentContactOccupPhone,
                       pa.e_mail           AS StudentContactDefaultEmail,
+                      ''                  AS StudentContactSpouseID,
                       CASE
                           WHEN
                                RTRIM(pa.mobile1) IS NOT NULL
