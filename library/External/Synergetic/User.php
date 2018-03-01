@@ -484,7 +484,7 @@ class External_Synergetic_User implements External_UserInterface
 
         // Search for a particular year level
 
-        if (!empty($yearLevel)) {
+        if (strlen($yearLevel)>0) {
 
             $bindings['yearDescription'] = $yearLevel;
 
