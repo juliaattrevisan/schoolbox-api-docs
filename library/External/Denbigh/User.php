@@ -309,6 +309,7 @@ class External_Denbigh_User implements External_UserInterface
             'StaffCampusDescription'   => '',
             'StaffCategoryDescription' => '',
             'StaffDepartment'          => '',
+            'StaffHouseDescription'    => '',
         ];
 
         if (!empty($staff)) {
