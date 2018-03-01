@@ -16,7 +16,8 @@ Usage:
                     {% if assessment.context is project %}
                         <a href="/homepage/{{ assessment.context.context.folder.id }}">{{ assessment.context.context.folder.title }}</a> >
                         <a href="/homepage/{{ assessment.context.context.folder.id }}">{{ assessment.context.context.title }}</a> >
-                        <a href="/learning/assessments/{{ assessment.context.id }}">{{ assessment.context.title }}</a>
+                        <a href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: USER.id}) }}">
+                        {{ assessment.context.title }}</a>
                         {{ assessment.typeName }}
                     {% elseif assessment.context is unitImplementation %}
                         <a href="/homepage/{{ assessment.context.folder.id }}">{{ assessment.context.folder.title }}</a> >
