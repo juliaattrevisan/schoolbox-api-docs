@@ -311,7 +311,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 $c = $c
                     ->merge(new Collection($this->internalNotifyOpen($assessment, $dataModelPlan, true)
                                                 ->getAll($openDate ? $openDate->getUnixTimeStamp() : null)))
-                    ->merge(new Collection($this->internalNotifyClosed($assessment, $dataModelPlan)
+                    ->merge(new Collection($this->internalNotifyClosed($assessment, $dataModelPlan, true)
                                                 ->getAll($dueDate ? $dueDate->getUnixTimeStamp() : null)));
             }
         }
@@ -668,7 +668,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      */
     public function notifyClosed(Model $plan): Envelope
     {
-        return $this->internalNotifyClosed($this->retrieveAssessmentDomainModel($plan), $plan);
+        return $this->internalNotifyClosed($this->retrieveAssessmentDomainModel($plan), $plan, false);
     }
 
 
@@ -678,9 +678,10 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      *
      * @param IAssessable $assessment
      * @param Model       $plan
+     * @param bool        $forFeed Is this for the feed? If so, notify parents and students
      * @return Envelope
      */
-    private function internalNotifyClosed(IAssessable $assessment, Model $plan): Envelope
+    private function internalNotifyClosed(IAssessable $assessment, Model $plan, bool $forFeed): Envelope
     {
         $envelope  = new Envelope();
         $topicStub = $this->retrieveAssessmentTopicStub($assessment);
@@ -691,13 +692,9 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             return $envelope;
         }
 
-        // Send a single notification for total # students not submitted
-        $href = $this->buildAssessmentRoute($assessment);
-        $bob  = $this->buildGenericBuilder($assessment)
-                     ->setHref($href)
-                     ->setParam('assessment', new Param($assessment->getTitle(), $href))
-                     ->setSeverity(Logger::ERROR)
-                     ->addTopic("$topicStub.closed");
+        $bob = $this->buildGenericBuilder($assessment)
+                    ->setSeverity(Logger::ERROR)
+                    ->addTopic("$topicStub.closed");
 
         // Figure out how many need to submit
         $totalUnsubmitted = 0;
@@ -712,9 +709,32 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             if ($allowsResponse) {
                 $totalUnsubmitted++;
             }
+
+            // Feed only
+            if ($forFeed) {
+                // build for student
+                $bob = $this->targetBuilderToStudent($bob, $assessment, $participant)
+                            ->setTitle(":assessment in :cat has closed");
+                $envelope->targetToUser($participant->getUser(), $bob->build());
+
+                // build for parent, only if they're allowed
+                if (!$this->isParentTargetable()) {
+                    continue;
+                }
+                $bob = $this->targetBuilderToParents($bob, $assessment, $participant)
+                            ->setTitle(":assessment in :cat has closed for :child");
+                $envelope->targetToParent($participant->getUser(), $bob->build());
+            }
         }
 
-        // Always broadcast this message, even if it doesn't accept submission
+        // build for staff
+        $href = $this->buildAssessmentRoute($assessment);
+        $bob  = $this->buildGenericBuilder($assessment)
+                     ->setHref($href)
+                     ->setParam('assessment', new Param($assessment->getTitle(), $href))
+                     ->setSeverity(Logger::ERROR)
+                     ->addTopic("$topicStub.closed");
+
         if ($totalUnsubmitted === 0) {
             $bob->setTitle(":assessment in :cat has closed");
         } else {
