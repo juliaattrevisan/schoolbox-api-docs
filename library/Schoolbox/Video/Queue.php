@@ -427,8 +427,6 @@ class Queue extends ResourceVideo
 
         $mediaFilename = $this->getSourceLocation($storage);
 
-        clearstatcache();
-
         if (!file_exists($mediaFilename) || filesize($mediaFilename) <= 0) {
             // Try to retrieve the media file using Flysystem (may be located off-site on S3) and copy across to the
             // local disk in a temporary file
@@ -445,9 +443,6 @@ class Queue extends ResourceVideo
             $this->temporaryFiles[] = $mediaFilename;
 
             // If the file is zero bytes we have nothing to transcode, so bomb out
-
-            clearstatcache();
-
             if (filesize($mediaFilename) <= 0) {
                 throw new RuntimeException("Unable to locate media file for processing");
             }
