@@ -694,7 +694,6 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         // Send a single notification for total # students not submitted
         $href = $this->buildAssessmentRoute($assessment);
         $bob  = $this->buildGenericBuilder($assessment)
-                     ->setTitle(":assessment in :cat has closed and :number did not submit work")
                      ->setHref($href)
                      ->setParam('assessment', new Param($assessment->getTitle(), $href))
                      ->setSeverity(Logger::ERROR)
@@ -702,23 +701,34 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
         // Figure out how many need to submit
         $totalUnsubmitted = 0;
+        $allowsResponse   = ($assessment instanceof DueWork && !$assessment->isAcceptNone());
         foreach ($this->retrieveParticipantsFromPlan($plan, $assessment) as $participant) {
             if (!$this->isParticipantNotifiable($participant, self::TRIGGER_CLOSED)) {
                 continue;
             }
-            $totalUnsubmitted++;
+
+            // Is this a due work which doesn't accept online?
+            // Don't count $participant as unsubmitted
+            if ($allowsResponse) {
+                $totalUnsubmitted++;
+            }
         }
-        if ($totalUnsubmitted > 0) {
+
+        // Always broadcast this message, even if it doesn't accept submission
+        if ($totalUnsubmitted === 0) {
+            $bob->setTitle(":assessment in :cat has closed");
+        } else {
+            $bob->setTitle(":assessment in :cat has closed and :number did not submit work");
             $bob->setParam(
                 'number',
                 new Param(sprintf('%s student%s', $totalUnsubmitted, $totalUnsubmitted === 1 ? '' : 's'))
             );
-            $envelope->broadcastToCategory(
-                $assessment->getBaseContext()->getFolder(),
-                UserAccess::ACCESS_WRITE,
-                $bob->build()
-            );
         }
+        $envelope->broadcastToCategory(
+            $assessment->getBaseContext()->getFolder(),
+            UserAccess::ACCESS_WRITE,
+            $bob->build()
+        );
 
         return $envelope;
     }
@@ -1135,12 +1145,12 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         switch ($label) {
             case self::TRIGGER_OPEN:
             case self::TRIGGER_UPDATED:
-                // Open and updated notifs are always sent
+            case self::TRIGGER_CLOSED:
+                // Open, updated and closed notifs are always sent
                 return true;
 
             case self::TRIGGER_UPCOMING:
             case self::TRIGGER_OVERDUE:
-            case self::TRIGGER_CLOSED:
             default:
                 // All other notifs are not sent for due works that don't
                 // accept online, because action isn't necessary for them.
