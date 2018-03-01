@@ -315,7 +315,7 @@
         var disableSubmitButton = function(event) {
             // Find the submit button for the form that triggered this event
             $(this).find("input[type='submit']").prop('disabled', true);
-        }
+        };
 
         c.getForm('createEvent').find('input[name="title"]')
             .on('change', toggleCreateButtonState)
