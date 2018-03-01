@@ -17,8 +17,6 @@ use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\MapperFactory;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
-use Schoolbox\Resource\Storage\Model as Storage;
-use Schoolbox\Video\Queue;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
@@ -277,19 +275,13 @@ function uploadToStorage(LoggerInterface $log, $filename, StorageMapper $storage
     // Upload the file to storage
     // ----------------------------------------------------------------------------------------------------------------
 
-    try {
+    $suffix = $type == 'video' || $type == 'audio' ? 'transcode' : $type;
+    $filenameImage = "/vagrant/data/storage/{$videoStorage->getPath()}-{$suffix}";
+    $log->info("    - Filename:      {$filename}");
+    $log->info("    - Uploaded Filename:      {$filenameImage}");
+    rename($filename, $filenameImage);
 
-            $suffix = $type == 'video' || $type == 'audio' ? 'transcode' : $type;
-            $filenameImage = "/vagrant/data/storage/{$videoStorage->getPath()}-{$suffix}";
-            $log->info("    - Filename:      {$filename}");
-            $log->info("    - Uploaded Filename:      {$filenameImage}");
-            rename($filename, $filenameImage);
 
-    } catch (MapperException $e) {
-        $log->error("    - Failed:                 Unable to upload to storage");
-
-        return false;
-    }
 
     return true;
 }

@@ -9,9 +9,7 @@
  */
 
 use League\Flysystem\AwsS3v3\AwsS3Adapter;
-use League\Flysystem\FileNotFoundException;
 use League\Flysystem\Filesystem;
-use League\Flysystem\FilesystemInterface;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\File\Mapper as FileMapper;
@@ -67,6 +65,7 @@ if (isset($type) && isset($id)) {
     }
 
     $storage = $video->getStorage();
+    /** @var Filesystem $fileSystem */
     $fileSystem = $storage->getFilesystem();
 
     // ----------------------------------------------------------------------------------------------------------------
@@ -97,16 +96,12 @@ if (isset($type) && isset($id)) {
     // Retrieve video size
     // ----------------------------------------------------------------------------------------------------------------
 
-    try {
-        /** @var int $videoSize */
-        $videoSize = $fileSystem->getSize($storage->getTranscodePath());
+    /** @var int $videoSize */
+    $videoSize = $fileSystem->getSize($storage->getTranscodePath());
 
-        // Make sure the video actually had content
+    // Make sure the video actually had content
 
-        if ($videoSize <= 0) {
-            fail();
-        }
-    } catch (FileNotFoundException $e) {
+    if ($videoSize <= 0) {
         fail();
     }
 
