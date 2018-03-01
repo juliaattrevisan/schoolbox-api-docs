@@ -312,6 +312,11 @@
         var toggleCreateButtonState = function(event) {
             toggleFormState($(this).closest('form'));
         };
+        var disableSubmitButton = function(event) {
+            // Find the submit button for the form that triggered this event
+            $(this).find("[data-modal-submit]").prop('disabled', true);
+        };
+
         c.getForm('createEvent').find('input[name="title"]')
             .on('change', toggleCreateButtonState)
             .on('keyup', toggleCreateButtonState)
@@ -320,6 +325,12 @@
             .on('change', toggleCreateButtonState)
             .on('keyup', toggleCreateButtonState)
         ;
+
+        // Prevent multiple form submissions
+        c.getForm('createEvent').on('submit', disableSubmitButton);
+        c.getForm('createTask').on('submit', disableSubmitButton);
+        c.getForm('editTask').on('submit', disableSubmitButton);
+
 
         /* When you switch panels, preserve some data
          */
@@ -575,7 +586,7 @@
                 </section>
                 <div class="row">
                     <div class="small-12 columns no-pad">
-                        <input type="submit" disabled value="Create Event" />
+                        <input type="submit" data-modal-submit disabled value="Create Event" />
                         <a href="#" id="edit-full" class="button icon-modify">Edit Event</a>
                     </div>
                 </div>
@@ -603,7 +614,7 @@
                 </section>
                 <div class="row">
                     <div class="small-12 columns no-pad">
-                        <input type="submit" disabled value="Create Task" />
+                        <input type="submit" data-modal-submit disabled value="Create Task" />
                     </div>
                 </div>
             </form>
@@ -681,7 +692,7 @@
             <textarea id="modifyTaskBubbleDetail" name="detail"></textarea>
         </label>
 
-        <input type="submit" value="Update Task" />
+        <input type="submit" data-modal-submit value="Update Task" />
         <span class="deleteLink" data-is-html="1"></span>
     </form>
 

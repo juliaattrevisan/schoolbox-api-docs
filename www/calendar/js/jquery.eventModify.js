@@ -39,7 +39,6 @@
 
 		/* Form validator
 		 */
-		setupFormActions();
 		setupEventValidation();
 
 		/* Show/hide repeat event options (after validation)
@@ -243,16 +242,6 @@
 		//	}
 		//}
 
-		/**
-		 * Apply button actions
-		 *
-		 * Now, all #b{action} change the form's action.
-		 */
-		function setupFormActions() {
-			config.element.find(':submit[id^="b"]').on('click', function() {
-				config.element.find('#action').val(this.id.substr(1));
-			});
-		}
 
 		/**
 		 * Applies delete actions to the delete button.
@@ -437,7 +426,11 @@
 					}
 				},
 				submitHandler: function(form) {
-					var multi = $('#repeat-reminder, [data-repeat-reminder]').length != 0;
+                    // Find the submit button for this form and disable it,
+                    // to avoid accidental multiple requests
+                    $('#calendar-modify-submit').prop("disabled", true);
+
+                    var multi = $('#repeat-reminder, [data-repeat-reminder]').length != 0;
 					if (multi) {
 						// series - show a dialog
 						var dialog = $('[data-dialog="bulk-modify"]');
