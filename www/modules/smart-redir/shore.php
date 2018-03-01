@@ -180,7 +180,7 @@ break;
 
 case "worldbook":
 	$form="loginForm";
-	$action="http://www.worldbookonline.com/wb/Home";
+	$action="https://www.worldbookonline.com/wb/Home";
 	$method="POST";
     $formArray['subacct']="AU01024";
 	$formArray['uid']="shore1";
