@@ -353,7 +353,9 @@ class UserMapper extends Mapper
 
         $pb = $this->getPredicateBuilder();
 
-        $pb->equals('synergy_id', $id);
+        if (!$id === null) {
+            $pb->equals('synergy_id', $id);
+        }
 
         if ($roleType) {
             $pb->equals('g.group_type', $roleType);
