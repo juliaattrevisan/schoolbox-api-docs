@@ -309,7 +309,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 }
 
                 $c = $c
-                    ->merge(new Collection($this->internalNotifyFeedOpen($assessment, $dataModelPlan)
+                    ->merge(new Collection($this->internalNotifyOpen($assessment, $dataModelPlan, true)
                                                 ->getAll($openDate ? $openDate->getUnixTimeStamp() : null)))
                     ->merge(new Collection($this->internalNotifyClosed($assessment, $dataModelPlan)
                                                 ->getAll($dueDate ? $dueDate->getUnixTimeStamp() : null)));
@@ -378,7 +378,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      */
     public function notifyOpen(Model $plan): Envelope
     {
-        return $this->internalNotifyOpen($this->retrieveAssessmentDomainModel($plan), $plan);
+        return $this->internalNotifyOpen($this->retrieveAssessmentDomainModel($plan), $plan, false);
     }
 
 
@@ -388,9 +388,10 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      *
      * @param IAssessable $assessment
      * @param Model       $plan
+     * @param bool        $forFeed Is this for the feed? If so, notify parents and staff
      * @return Envelope
      */
-    private function internalNotifyOpen(IAssessable $assessment, Model $plan): Envelope
+    private function internalNotifyOpen(IAssessable $assessment, Model $plan, bool $forFeed): Envelope
     {
         $envelope = new Envelope();
         $topicStub  = $this->retrieveAssessmentTopicStub($assessment);
@@ -442,15 +443,17 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
         // Build generic builder
         $bob = $this->buildGenericBuilder($assessment)
-                    ->setTitle("$boxType :assessment opened in :cat")
                     ->addTopic("$topicStub.$topicSuffix")
                     ->setSeverity(Logger::NOTICE);
 
         // Customise and send to every participant in this plan only
+        $participantCount = 0;
         foreach ($this->retrieveParticipantsFromPlan($plan, $assessment) as $participant) {
             if (!$this->isParticipantNotifiable($participant, self::TRIGGER_OPEN)) {
                 continue;
             }
+
+            $participantCount++;
 
             // build for student
             $bob = $this->targetBuilderToStudent($bob, $assessment, $participant)
@@ -468,9 +471,27 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             $bob = $this->targetBuilderToParents($bob, $assessment, $participant)
                         ->setTitle("$boxType :assessment opened in :cat for :child");
             $envelope->targetToParent($participant->getUser(), $bob->build());
+        }
 
-            // build for staff
-            // count participants for whom it's due for
+        // For feed only: build for staff
+        if ($forFeed && $participantCount > 0) {
+            $href = $this->buildAssessmentRoute($assessment);
+            $bob  = $this->buildGenericBuilder($assessment)
+                         ->addTopic("$topicStub.$topicSuffix")
+                         ->setSeverity(Logger::NOTICE)
+                         ->setTitle(":assessment in :cat has opened for :number")
+                         ->setHref($href)
+                         ->setParam('assessment', new Param($assessment->getTitle(), $href))
+                         ->setSeverity(Logger::ERROR);
+            $bob->setParam(
+                'number',
+                new Param(sprintf('%s student%s', $participantCount, $participantCount === 1 ? '' : 's'))
+            );
+            $envelope->broadcastToCategory(
+                $assessment->getBaseContext()->getFolder(),
+                UserAccess::ACCESS_WRITE,
+                $bob->build()
+            );
         }
 
         return $envelope;
