@@ -148,10 +148,7 @@
 <fieldset>
     <legend>{{ locale.grading.proper }}</legend>
 
-    <label>
-        Weight
-        <input type="number" name="weight" value="{{ assessment.weight }}">
-    </label>
+    {% include '@learningAssessment/fragments/weight.twig' %}
 
     {% import 'sub/visibility.twig' as visibility %}
     {{ visibility.dropdown(markVisibility, availableVisibilities) }}

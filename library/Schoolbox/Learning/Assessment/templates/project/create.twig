@@ -21,10 +21,7 @@
     <textarea name="description">{{ assessment.description }}</textarea>
 </label>
 
-<label>
-    Weight
-    <input type="number" name="weight" value="{{ assessment.weight }}">
-</label>
+{% include '@learningAssessment/fragments/weight.twig' %}
 
 {% if context.baseContext is not unitSpecification %}
     {% include '@learningAssessment/fragments/dates.twig' %}
