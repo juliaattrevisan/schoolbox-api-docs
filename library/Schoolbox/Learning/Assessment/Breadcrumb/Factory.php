@@ -60,7 +60,11 @@ class Factory
         $context = $assessment->getContext();
 
         if ($context instanceof Project) {
-            $path = $this->router->generate('learningAssessment.getAssessment', ['assessmentId' => $context->getId()]);
+            if($user->getRole()->isStaff()) {
+                $path = $this->router->generate('learningAssessment.getStatus', ['assessmentId' => $context->getId()]);
+            } else {
+                $path = $this->router->generate('learningAssessment.getSummary', ['assessmentId' => $context->getId()]);
+            }
 
             $trail = $this->produceFromAssessment($context, $user);
 

@@ -255,38 +255,6 @@ abstract class Controller extends ListController implements IAssessmentControlle
         }
     }
 
-
-    /**
-     * Redirect method
-     *
-     * Sends you to a status, summary, or preview screen depending on who is
-     * currently logged in and what they are viewing
-     *
-     * @api GET /learning/assessment/:assessmentId
-     * @param IAssessable $assessment
-     * @throws RouteNotFound If unable to generate a requested route
-     * @throws InvalidStatusCode If we attempt to set an invalid HTTP response code
-     * @deprecated
-     * @todo This route is very fragile. Its auth check (loggedIn) is potentially misleading.
-     *       Callers are the best informed on whether they wish to view a single user's intersection with
-     *       the assessment (summary), or a group of users (create/modify/markbook/status etc)
-     */
-    public function getAssessment(IAssessable $assessment)
-    {
-        try {
-            $redirect      = $this->determineGetAssessmentRedirect($assessment);
-            $redirOverride = $this->getRequest()->query->get(Redirect::RETURN_URL);
-            if ($redirOverride) {
-                $redirect .= '?' . Redirect::RETURN_URL . "={$redirOverride}";
-            }
-            $this->getResponse()->redirect->to($redirect);
-        } catch (ApplicationException\Exception $e) {
-            // As far as this user is concerned, this resource does not exist.
-            $this->getResponse()->status->setCode(404);
-        }
-    }
-
-
     /**
      * @param AssessmentContext $context
      * @param IAssessable       $assessment
@@ -454,62 +422,5 @@ abstract class Controller extends ListController implements IAssessmentControlle
     protected function getTermMapper()
     {
         return $this->termMapper;
-    }
-
-
-    /**
-     * Returns a redirect route, or throw an exception.
-     *
-     * Order of preference:
-     * * A spec?          => Summary (must be able to simulate participation, but not create interactions)
-     * * Status viewable? => Status
-     * * A participant?   => Summary
-     *
-     * @param IAssessable $assessment
-     * @return string
-     * @throws RouteNotFound If unable to generate a requested route
-     * @throws ApplicationException\Exception If current user should not have permission to view this page
-     */
-    private function determineGetAssessmentRedirect(IAssessable $assessment): string
-    {
-        // Is status page viewable?
-        $statusRoute = $this->getRouteIfAuthorized('learningAssessment.getStatus', [
-            'assessment'   => $assessment,
-            'assessmentId' => $assessment->getId(),
-        ], $this->getUser());
-        if ($statusRoute) {
-            return $statusRoute;
-        }
-
-
-        // Participants should go to their summary page
-        if ($assessment->isParticipant($this->getUser())) {
-            $summaryRoute = $this->getRouteIfAuthorized('learningAssessment.getSummary', [
-                'assessmentId' => $assessment->getId(),
-                'assessment'   => $assessment,
-                'studentId'    => $this->getUser()->getId(),
-                'student'      => $this->getUser(),
-            ]);
-            if ($summaryRoute) {
-                return $summaryRoute;
-            }
-        }
-
-        // If a parent of a participant, go to the summary page of the first non-excluded participant, if parents can READ+ folder context
-        // TODO - this is not ideal. Consider a teacher has N children participating in the assessment
-        /** @var mixed[][] $children */
-        foreach ($this->getUser()->getChildren() as $child) {
-            $childSummaryRoute = $this->getRouteIfAuthorized('learningAssessment.getSummary', [
-                'assessmentId' => $assessment->getId(),
-                'assessment'   => $assessment,
-                'studentId'    => $child->getId(),
-                'student'      => $child,
-            ]);
-            if ($childSummaryRoute) {
-                return $childSummaryRoute;
-            }
-        }
-
-        throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
     }
 }

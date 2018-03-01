@@ -51,16 +51,6 @@ interface IAssessmentController
     public function postCreateAssessment(AssessmentContext $context);
 
     /**
-     * @api   GET /learning/assessments/:assessmentId
-     * @level 165
-     *
-     * @param IAssessable $assessment
-     * @throws NotFound
-     * @return void
-     */
-    public function getAssessment(IAssessable $assessment);
-
-    /**
      * @api   POST /learning/assessments/:assessmentId
      * @level 165
      *
