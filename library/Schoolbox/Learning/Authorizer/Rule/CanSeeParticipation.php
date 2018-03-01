@@ -104,15 +104,12 @@ class CanSeeParticipation extends AbstractParticipationRule
             throw new Unauthorized();
         }
 
-        // if we got passed a participant there's one last check we can do...
-        if ($accessLevel >= UserAccess::ACCESS_READ) {
-            // ...after we magically hit an external database
-            $student->loadParents();
-            if ($user->isParentOf($student)) {
-                return true;
-            }
-        }
+        $student->loadParents();
 
+        if ($user->isParentOf($student)) {
+            return true;
+        }
+        
         throw new Unauthorized();
     }
 
