@@ -97,7 +97,7 @@ if (isset($type) && isset($id)) {
             /** @noinspection PhpUndefinedMethodInspection */
             header("Content-Length: {$image->getSize()}");
             /** @noinspection PhpUndefinedMethodInspection */
-            echo $image->read();
+            fpassthru($image->readStream());
             exit;
         }
 
