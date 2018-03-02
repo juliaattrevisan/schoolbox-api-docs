@@ -16,8 +16,10 @@ class PercentageTest extends TestCase
 
     /**
      * @dataProvider provider_normalisedToHumanReadable
-     * @param float $normalised
+     * @param float  $normalised
      * @param string $expected
+     * @throws RangeException
+     * @throws \InvalidArgumentException
      */
     public function test_getHumanReadable_Valid($normalised, $expected)
     {
@@ -28,10 +30,13 @@ class PercentageTest extends TestCase
 
     }
 
+
     /**
      * @dataProvider provider_humanReadableToNormalised
      * @param string $humanReadable
-     * @param float $expected
+     * @param float  $expected
+     * @throws RangeException
+     * @throws \InvalidArgumentException
      */
     public function test_getNormalised_Valid($humanReadable, $expected)
     {

@@ -97,11 +97,15 @@ class TotalMarkFractionalTest extends TestCase
         $markScheme->getNormalisedMark($humanReadable, $this->getDummyQuizAttempt($totalMark));
     }
 
+
     /**
      * @dataProvider provider_humanReadableToNormalised
      * @param string $humanReadable
-     * @param float $totalMark
-     * @param float $expected
+     * @param float  $totalMark
+     * @param float  $expected
+     * @throws InvalidArgumentException
+     * @throws \DomainException
+     * @throws \RangeException
      */
     public function test_getNormalised($humanReadable, $totalMark, $expected)
     {
@@ -111,11 +115,15 @@ class TotalMarkFractionalTest extends TestCase
         $this->assertEquals($expected, $actual, $message);
     }
 
+
     /**
      * @dataProvider provider_humanReadableToRecurringNormalised
      * @param string $humanReadable
-     * @param float $totalMark
-     * @param float $expected
+     * @param float  $totalMark
+     * @param float  $expected
+     * @throws InvalidArgumentException
+     * @throws \DomainException
+     * @throws \RangeException
      */
     public function test_getRecurringNormalised($humanReadable, $totalMark, $expected)
     {
@@ -126,11 +134,15 @@ class TotalMarkFractionalTest extends TestCase
         $this->assertLessThan($delta, abs($expected - $actual), $message);
     }
 
+
     /**
      * @dataProvider provider_normalisedToHumanReadable
      * @param float  $normalised
      * @param float  $totalMark
      * @param string $humanReadable
+     * @throws InvalidArgumentException
+     * @throws \DomainException
+     * @throws \RangeException
      */
     public function test_getHumanReadable($normalised, $totalMark, $humanReadable)
     {
@@ -140,11 +152,15 @@ class TotalMarkFractionalTest extends TestCase
         $this->assertEquals($humanReadable, $actual, $message);
     }
 
+
     /**
      * @dataProvider provider_normalisedToHumanReadableRecurring
      * @param float  $normalised
      * @param float  $totalMark
      * @param string $humanReadable
+     * @throws InvalidArgumentException
+     * @throws \DomainException
+     * @throws \RangeException
      */
     public function test_getHumanReadableFromRecurring($normalised, $totalMark, $humanReadable)
     {

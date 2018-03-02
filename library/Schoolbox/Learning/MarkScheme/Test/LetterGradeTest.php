@@ -28,10 +28,13 @@ class LetterGradeTest extends TestCase
         $markScheme->getNormalisedMark($humanReadable);
     }
 
+
     /**
      * @dataProvider provider_normalisedToHumanReadable
-     * @param float $normalised
+     * @param float  $normalised
      * @param string $expected
+     * @throws InvalidArgumentException
+     * @throws \RangeException
      */
     public function test_getHumanReadable($normalised, $expected)
     {
@@ -42,10 +45,12 @@ class LetterGradeTest extends TestCase
         $this->assertEquals($expected, $actual, $message);
     }
 
+
     /**
      * @dataProvider provider_humanReadableToNormalised
      * @param string $humanReadable
-     * @param float $expected
+     * @param float  $expected
+     * @throws InvalidArgumentException
      */
     public function test_getNormalised($humanReadable, $expected)
     {

@@ -74,9 +74,11 @@ class CompletionTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
+
     /**
      * @dataProvider provider_normalised
      * @param mixed $normalised
+     * @throws \InvalidArgumentException
      */
     public function test_getHumanReadable_teacherMarkedResponseIncomplete($normalised)
     {
@@ -93,6 +95,7 @@ class CompletionTest extends TestCase
     /**
      * @dataProvider provider_normalised
      * @param mixed $normalised
+     * @throws \InvalidArgumentException
      */
     public function test_getHumanReadable_teacherMarkedResponseComplete($normalised)
     {
@@ -214,7 +217,8 @@ class CompletionTest extends TestCase
 
 
     /**
-     * @return mixed[][]
+     * @return \mixed[][]
+     * @throws \InvalidArgumentException
      */
     public function provider_humanReadable_withResponse()
     {
@@ -268,8 +272,10 @@ class CompletionTest extends TestCase
             ->setMarkedComplete(true);
     }
 
+
     /**
      * @return TaskResponse
+     * @throws \InvalidArgumentException
      */
     private function getTeacherAssessedResponseMarkedAsIncomplete()
     {
@@ -290,8 +296,10 @@ class CompletionTest extends TestCase
         return $response;
     }
 
+
     /**
      * @return TaskResponse
+     * @throws \InvalidArgumentException
      */
     private function getTeacherAssessedResponseMarkedAsComplete()
     {
