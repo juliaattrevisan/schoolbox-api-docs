@@ -93,7 +93,7 @@ if (isset($type) && isset($id)) {
         $videoStream = S3Stream::open($video->getTranscodePath(), $config);
     } elseif (($localFilename = getLocalFilesystemPath($video, $config)) !== false) {
         // Local Disk
-        $videoStream = fopen($localFilename, "r");
+        $videoStream = fopen($localFilename, "rb");
     }
 
     if (!is_resource($videoStream)) {
