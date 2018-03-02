@@ -9,8 +9,6 @@ namespace Schoolbox\Learning\MarkScheme\Test;
 
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Learning\MarkScheme\None;
-use \InvalidArgumentException;
-use \RangeException;
 
 class NoneTest extends TestCase
 {

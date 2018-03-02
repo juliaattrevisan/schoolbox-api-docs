@@ -12,7 +12,6 @@ use PHPUnit\Framework\TestCase;
 use Schoolbox\Learning\MarkScheme\LetterGrade;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Model as GradeLevel;
-use \RangeException;
 use \InvalidArgumentException;
 
 class LetterGradeTest extends TestCase
