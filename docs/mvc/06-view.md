@@ -55,3 +55,27 @@ There's a menagerie of user interface elements in `/pantry` which you can use as
 We use compilers for css and javascript to manage imports and minify the result. If you're experiencing stylistic oddities or behavioural weirdness, try recompiling your styles and javascript files. This is respectively known as `grunt sass` and `grunt uglify`.
 
 > Note that when you add javascript to the compilation step (look in your `Gruntfile.js`) you're making it globally available at the cost of increasing the minified file's size.
+
+## 6.6 Data sanitisation, escaping dangerous content
+There are various philosophies regarding approach, but the one we use here is: we accept whatever the end user supplies (even if it's dangerous html/javascript content etc) and we "defuse" or colloquially, `scrub`, rendering this content harmless when outputting to the user.
+
+```php
+<?php
+$this->setVar([
+    'TITLE' => Scrub::text($model->getTitle()),  // render title as text-only
+    'DESCRIPTION' => Scrub::html($model->getDescription()), // render description as html-capable
+]);
+```
+
+Twig-based locations are a bit more advanced - it does some stuff for you. However, use the `| purify` filter to achieve the same as `Scrub::html`. A twig equivalent to the above would be something like this:
+
+```twig
+{{ model.title }}
+{{ model.description | purify }}
+```
+
+* Always `scrub` on output. 
+* Never `scrub` on input.
+
+You can read more in `scrub.md`
+
