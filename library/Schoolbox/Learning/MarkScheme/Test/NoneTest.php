@@ -18,8 +18,13 @@ class NoneTest extends TestCase
     public function test_getHumanReadable_Null()
     {
         $normalised = null;
+        $expected = null;
         $markScheme = new None();
-        $markScheme->getHumanReadableMark($normalised);
+
+        $actual = $markScheme->getHumanReadableMark($normalised);
+
+        $message = "Failed asserting equality. Input: $normalised, Expected: $expected, Actual: $actual";
+        $this->assertEquals($expected, $actual, $message);
     }
 
 
