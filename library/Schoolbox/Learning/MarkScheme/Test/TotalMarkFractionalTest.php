@@ -14,7 +14,7 @@ use Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizFeedback;
 use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
 use \InvalidArgumentException;
 
-class TotalMarkWholeNumberTest extends TestCase
+class TotalMarkFractionalTest extends TestCase
 {
 
     /**
