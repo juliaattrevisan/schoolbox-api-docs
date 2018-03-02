@@ -14,6 +14,7 @@
 namespace Schoolbox\Resource\Storage\S3;
 
 use Aws\S3\S3Client;
+use Schoolbox\IConfigLoader;
 
 class Stream
 {
@@ -21,10 +22,10 @@ class Stream
      * Open a file located on AWS S3 storage as a stream
      *
      * @param string $path
-     * @param \Config $config
+     * @param IConfigLoader $config
      * @return bool|resource
      */
-    public static function open($path, $config)
+    public static function open($path, IConfigLoader $config)
     {
         // Retrieve AWS S3 configuration from database
 

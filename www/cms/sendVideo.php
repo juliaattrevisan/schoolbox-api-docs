@@ -10,12 +10,12 @@
 
 use League\Flysystem\AwsS3v3\AwsS3Adapter;
 use League\Flysystem\Filesystem;
-use Schoolbox\Config\ConfigMapper;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\File\Mapper as FileMapper;
-use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\Resource\Storage\S3\Stream as S3Stream;
 use Schoolbox\Video\Factory\Video as VideoFactory;
+use Schoolbox\Video\ResourceVideo;
 use Schoolbox\Video\ResourceVideoMapper;
 
 require_once __DIR__ . '/../../conf/core/require.php';
@@ -73,6 +73,8 @@ if (isset($type) && isset($id)) {
     $storage = $video->getStorage();
     /** @var Filesystem $fileSystem */
     $fileSystem = $storage->getFilesystem();
+    /** @var IConfigLoader $config */
+    $config = $kernel->getDependencyInjector()->get('config');
 
     // ----------------------------------------------------------------------------------------------------------------
     // Retrieve stream
@@ -88,8 +90,8 @@ if (isset($type) && isset($id)) {
 
     if ($fileSystem->getAdapter() instanceof AwsS3Adapter) {
         // AWS S3
-        $videoStream = S3Stream::open($video->getTranscodePath(), $kernel->getDependencyInjector()->get('config'));
-    } elseif (($localFilename = getLocalFilesystemPath($video)) !== false) {
+        $videoStream = S3Stream::open($video->getTranscodePath(), $config);
+    } elseif (($localFilename = getLocalFilesystemPath($video, $config)) !== false) {
         // Local Disk
         $videoStream = fopen($localFilename, "r");
     }
@@ -223,12 +225,13 @@ function setResponseOptions()
  * Retrieve the path where the video would be stored on local filesystem. Returns false if the file is not readable.
  *
  * @param ResourceVideo $video
+ * @param IConfigLoader $config
  *
  * @return string|bool
  */
-function getLocalFilesystemPath(\Schoolbox\Video\ResourceVideo $video)
+function getLocalFilesystemPath(ResourceVideo $video, IConfigLoader $config)
 {
-    $filename = ConfigMapper::getInstance()->get("storage_dir") . '/'.$video->getTranscodePath();
+    $filename = $config->get("storage_dir") . '/'.$video->getTranscodePath();
 
     if (is_readable($filename)) {
         return $filename;
