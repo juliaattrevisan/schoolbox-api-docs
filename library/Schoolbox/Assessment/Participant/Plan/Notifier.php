@@ -590,30 +590,36 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
             // due date change
             if (!empty($diff['participants'][$participant->getUser()->getId()]['dueDate'])) {
-                $oldDate = strtotime($diff['participants'][$participant->getUser()->getId()]['dueDate'][1]);
-                $newDate = strtotime($diff['participants'][$participant->getUser()->getId()]['dueDate'][0]);
-                $verb = $newDate > $oldDate ? 'extended' : 'changed';
+                // Only diff if both times exist.
+                // New time doesn't exist? participant no longer has a time, so don't notify yet (consider later)
+                // Old time doesn't exist? this is new participation, so user will have been notified earlier
+                [$oldStamp, $newStamp] = $diff['participants'][$participant->getUser()->getId()]['dueDate'];
+                if ($oldStamp && $newStamp) {
+                    $oldDate = strtotime($oldStamp);
+                    $newDate = strtotime($newStamp);
+                    $verb = $newDate > $oldDate ? 'extended' : 'changed';
 
-                $dateformat = $participant->getDueDate()->getLongDateOnly();
-                if (!$participant->getDueDate()->isAtEndOfDay()) {
-                    $dateformat = $participant->getDueDate()->getTimeOnly() .' on '. $dateformat;
+                    $dateformat = $participant->getDueDate()->getLongDateOnly();
+                    if (!$participant->getDueDate()->isAtEndOfDay()) {
+                        $dateformat = $participant->getDueDate()->getTimeOnly() .' on '. $dateformat;
+                    }
+
+                    // Students
+                    $bob = $this->targetBuilderToStudent($bob, $assessment, $participant)
+                                ->setTitle("$boxType :assessment closing date was $verb to :date in :cat")
+                                ->setParam('date', new Param($dateformat))
+                                ->setTopics(["$topicStub.datechanged"]);
+                    $envelope->targetToUser($participant->getUser(), $bob->build());
+
+                    // Parents
+                    if ($this->isParentTargetable()) {
+                        $bob = $this->targetBuilderToParents($bob, $assessment, $participant)
+                                    ->setTitle(":child's $parentBoxType :assessment closing date was $verb to :date in :cat");
+                        $envelope->targetToParent($participant->getUser(), $bob->build());
+                    }
+
+                    $notificationRaisedForParticipant = true;
                 }
-
-                // Students
-                $bob = $this->targetBuilderToStudent($bob, $assessment, $participant)
-                            ->setTitle("$boxType :assessment closing date was $verb to :date in :cat")
-                            ->setParam('date', new Param($dateformat))
-                            ->setTopics(["$topicStub.datechanged"]);
-                $envelope->targetToUser($participant->getUser(), $bob->build());
-
-                // Parents
-                if ($this->isParentTargetable()) {
-                    $bob = $this->targetBuilderToParents($bob, $assessment, $participant)
-                                ->setTitle(":child's $parentBoxType :assessment closing date was $verb to :date in :cat");
-                    $envelope->targetToParent($participant->getUser(), $bob->build());
-                }
-
-                $notificationRaisedForParticipant = true;
             }
 
             // accept online
