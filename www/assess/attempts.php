@@ -13,6 +13,7 @@
  */
 use Schoolbox\Breadcrumbs;
 use Schoolbox\Error;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Quiz\ActionValidator;
 use Schoolbox\Mapper;
@@ -32,8 +33,10 @@ $assess = $assessHandler->getByID($quizId);
 /**
  * @var SitePage $this
  * @var Assessment\MapperProxy $assessmentMapperProxy
+ * @var IConfigLoader          $config
  */
 $assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
+$config                = $this->getDi()->get('config');
 
 if (!$assess) {
     error(112);
@@ -80,7 +83,7 @@ catch (Mapper\Exception $e) {
  */
 $quiz            = $assessmentMapperProxy->findByQuizId($assess['assess_id'], $user);
 $actionValidator = new ActionValidator(Alaress_Date_Format::now(), Access::getInstance());
-if (!$actionValidator->canSeeAttempts($_SESSION['user'], $user, $quiz)) {
+if (!$actionValidator->canSeeAttempts($_SESSION['user'], $user, $quiz, $config->get('restrict_student_submissions'))) {
     $this->pageNotFound();
 }
 

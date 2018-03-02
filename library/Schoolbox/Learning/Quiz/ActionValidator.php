@@ -51,9 +51,10 @@ class ActionValidator
      *
      * @param User       $user
      * @param Quiz\Model $quiz
+     * @param bool       $restrictStudentSubmissions Are parents restricted from viewing student submissions?
      * @return bool
      */
-    public function canSeeQuiz(User $user, Quiz\Model $quiz): bool
+    public function canSeeQuiz(User $user, Quiz\Model $quiz, bool $restrictStudentSubmissions): bool
     {
         $folder       = $quiz->getBaseContext()->getFolder();
         $isInstructor = $this->accessHelper->isInstructor($user, $folder);
@@ -80,7 +81,9 @@ class ActionValidator
         // * I have access to its folder
         // * I'm not blocked by config.restrict_student_submissions
         // * one of my kids is a participant
-        if ($this->accessHelper->getFolderAccess($user, $folder->getId()) >= UserAccess::ACCESS_READ) {
+        if (!$restrictStudentSubmissions
+            && $this->accessHelper->getFolderAccess($user, $folder->getId()) >= UserAccess::ACCESS_READ
+        ) {
             foreach ($quiz->getAllParticipants() as $participant) {
                 if ($participant->isExcluded() || $participant->getPublishDate()->isFuture()) {
                     continue;
@@ -147,9 +150,10 @@ class ActionValidator
      * @param User       $user
      * @param User       $student
      * @param Quiz\Model $quiz
+     * @param bool       $restrictStudentSubmissions Are parents restricted from viewing student submissions?
      * @return bool
      */
-    public function canSeeAttempts(User $user, User $student, Quiz\Model $quiz): bool
+    public function canSeeAttempts(User $user, User $student, Quiz\Model $quiz, bool $restrictStudentSubmissions): bool
     {
         // Is student even participating?
         $participant = $quiz->getParticipantIfExtant($student);
@@ -175,7 +179,7 @@ class ActionValidator
 
         // Parent of student may view participation
         // (as long as config.restrict_student_submissions is off)
-        return $user->isParentOf($student);
+        return !$restrictStudentSubmissions && $user->isParentOf($student);
     }
 
 

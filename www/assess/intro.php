@@ -12,6 +12,7 @@
 
 use Schoolbox\Breadcrumbs;
 use Schoolbox\Error;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Quiz\ActionValidator;
 use Schoolbox\Mapper;
@@ -28,8 +29,10 @@ $userHandler = new User();
 /**
  * @var SitePage $this
  * @var AssessmentDataSource $assessmentDataSource
+ * @var IConfigLoader        $config
  */
 $assessmentDataSource = $this->getDi()->get('assessmentDataSource');
+$config               = $this->getDi()->get('config');
 
 if (!is_numeric($this->arg[0])) {
     error(112);
@@ -76,7 +79,7 @@ $plan = [];
 
 // Check the current session user is permitted to visit this page
 $actionValidator = new ActionValidator(Alaress_Date_Format::now(), Access::getInstance());
-if (!$actionValidator->canSeeQuiz($sessionUser, $assessment)) {
+if (!$actionValidator->canSeeQuiz($sessionUser, $assessment, $config->get('restrict_student_submissions'))) {
     $this->pageNotFound();
 }
 
