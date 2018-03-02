@@ -68,9 +68,11 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         $isClassPage  = $this->getContext()->isClass();
         $wasClassPage = $this->getContext()->wasClass();
         $isUnitPage   = $this->getContext()->hasUnitSpecification();
+        $isCoursePage = $this->getContext()->hasCourseSpecification();
+
 
         // If context is not a group, unit or class, render nothing
-        if (!$isGroupPage && !$isClassPage && !$wasClassPage && !$isUnitPage) {
+        if (!$isGroupPage && !$isClassPage && !$wasClassPage && !$isUnitPage && !$isCoursePage) {
             return false;
         }
 
@@ -81,6 +83,8 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
             $classActionsHeading = "Class Actions";
         } elseif ($isUnitPage) {
             $classActionsHeading = "Unit Actions";
+        } elseif ($isCoursePage) {
+            $classActionsHeading = "Course Actions";
         } elseif ($isGroupPage) {
             $classActionsHeading = "Group Actions";
         }
@@ -92,11 +96,11 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
          * this heading is parsed
          */
         $hasClassActions = false;
-
         $this->setBlock($templateHandle, 'student_grades', 'student_grades_block');
         $this->setBlock($templateHandle, 'class_list', 'class_list_block');
         $this->setBlock($templateHandle, 'markbook_link', 'markbook_link_block');
         $this->setBlock($templateHandle, 'manage_criteria', 'manage_criteria_block');
+        $this->setBlock($templateHandle, 'course_link', 'course_link_block');
 
         // Determine the term for the grades link
         $currentTerm = $this->termMapper->findForToday();
@@ -140,16 +144,25 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
 
         /*
          * Render link to manage criteria if:
-         * - folder is current class, group, or unit (ignore ex-classes)
+         * - folder is current class, group, unit or course (ignore ex-classes)
          * - user is staff, and
          * - has WRITE+ perm
          */
-        if (($isClassPage || $isGroupPage || $isUnitPage) && $this->getContentPermission() >= UserAccess::ACCESS_WRITE
+        if (($isClassPage || $isGroupPage || $isUnitPage || $isCoursePage) && $this->getContentPermission() >= UserAccess::ACCESS_WRITE
             && $this->getUser()->getRole()->isStaff()) {
             $this->parse('manage_criteria_block', 'manage_criteria');
             $hasClassActions = true;
         } else {
             $this->setVar('manage_criteria_block');
+        }
+
+        // Output course modify link if course page
+        if ($isCoursePage) {
+            $this->setVar('PAGE_COURSE_ID', (string)$this->getContext()->getCourseSpecification()->getId());
+            $this->parse('course_link_block', 'course_link');
+            $hasClassActions = true;
+        } else {
+            $this->setVar('course_link_block', '');
         }
 
         return $hasClassActions;
