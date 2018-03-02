@@ -1,134 +1,250 @@
 <?php
 /**
- * This page fetches and sends video files that have been transcoded into a web view format
+ * This page streams a video to the browser
  *
  * @author      James Leckie <jleckie@alaress.com.au>
- * @copyright   Copyright 2013, Alaress Pty Ltd
+ * @author      Damian Sloane <dsloane@alaress.com.au>
+ * @copyright   Copyright 2017, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
 
-use Schoolbox\Resource\LogMapper;
+use League\Flysystem\AwsS3v3\AwsS3Adapter;
+use League\Flysystem\Filesystem;
+use Schoolbox\IConfigLoader;
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Resource\File\Mapper as FileMapper;
+use Schoolbox\Resource\Storage\S3\Stream as S3Stream;
+use Schoolbox\Video\Factory\Video as VideoFactory;
+use Schoolbox\Video\ResourceVideo;
+use Schoolbox\Video\ResourceVideoMapper;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 spl_autoload_call('Schoolbox\\Application\\BasicRequest');
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
 
-$type = $_GET['type'];
-$id   = $_GET['id'];
+// --------------------------------------------------------------------------------------------------------------------
+// Brownhole
+// --------------------------------------------------------------------------------------------------------------------
+
 if (isset($_GET['hash'])) {
-    // Old URL for brownhole videos: ?hash={brownholeHash}
-    // If you get one of these, permanent redirect to the new one.
-    $params         = $_GET;
-    $params['type'] = 'storage';
-    $params['id']   = $_GET['hash'];
-    unset($params['hash']);
+    $params = [
+        'type' => 'storage',
+        'id'   => $_GET['hash'],
+    ];
+
     SitePage::localRedir('/cms/sendVideo.php?' . http_build_query($params), false, 301);
 }
+
+// --------------------------------------------------------------------------------------------------------------------
+// OTFS
+// --------------------------------------------------------------------------------------------------------------------
+
+$type = $_GET['type'];
+$id   = $_GET['id'];
+
 if (isset($type) && isset($id)) {
-    $page             = new SitePage;
-    $groupHandler     = new Group;
-    $fileMapper       = Schoolbox\Resource\File\Mapper::getInstance();
-    $videoQueueMapper = new \Schoolbox\Video\ResourceVideoMapper();
+    $page         = new SitePage;
+    $groupHandler = new Group;
+
+    // ----------------------------------------------------------------------------------------------------------------
+    // Grab mappers
+    // ----------------------------------------------------------------------------------------------------------------
+
+    $fileMapper       = FileMapper::getInstance();
+    $videoQueueMapper = ResourceVideoMapper::getInstance();
+
+    // ----------------------------------------------------------------------------------------------------------------
+    // Get video storage object
+    // ----------------------------------------------------------------------------------------------------------------
 
     try {
-        $videoFactory = new \Schoolbox\Video\Factory\Video($id, $type);
+        $videoFactory = new VideoFactory($id, $type);
         $video        = $videoFactory->produce();
-    } catch (Schoolbox\Mapper\Exception $e) {
-        /* Video not found */
-        exit;
+    } catch (MapperException $e) {
+        fail();
     }
 
-    /*Close session so streaming does not prevent other requests to session due to locking
-     *http://konrness.com/php5/how-to-prevent-blocking-php-requests/
-     */
+    // ----------------------------------------------------------------------------------------------------------------
+    // Prepare for streaming
+    // ----------------------------------------------------------------------------------------------------------------
+
+    setResponseOptions();
+
+    $storage = $video->getStorage();
+    /** @var Filesystem $fileSystem */
+    $fileSystem = $storage->getFilesystem();
+    /** @var IConfigLoader $config */
+    $config = $kernel->getDependencyInjector()->get('config');
+
+    // ----------------------------------------------------------------------------------------------------------------
+    // Retrieve stream
+    // ----------------------------------------------------------------------------------------------------------------
+
+    // Open a video stream using the appropriate method based on the underlying storage
+
+    // Flysystem does not allow chunking of data (given that it has to support a multitude of different underlying
+    // storage structures, some of which may not support chunking). We need to work around this for S3 (and other
+    // future adapters we use) and open our own stream which we can stream back to the user.
+
+    $videoStream = null;
+
+    if ($fileSystem->getAdapter() instanceof AwsS3Adapter) {
+        // AWS S3
+        $videoStream = S3Stream::open($video->getTranscodePath(), $config);
+    } elseif (($localFilename = getLocalFilesystemPath($video, $config)) !== false) {
+        // Local Disk
+        $videoStream = fopen($localFilename, "rb");
+    }
+
+    if (!is_resource($videoStream)) {
+        fail();
+    }
+
+    // ----------------------------------------------------------------------------------------------------------------
+    // Retrieve video size
+    // ----------------------------------------------------------------------------------------------------------------
+
+    /** @var int $videoSize */
+    $videoSize = $fileSystem->getSize($video->getTranscodePath());
+
+    // Make sure the video actually had content
+
+    if ($videoSize <= 0) {
+        fail();
+    }
+
+    // ----------------------------------------------------------------------------------------------------------------
+    // Retrieve mime type
+    // ----------------------------------------------------------------------------------------------------------------
+
+    /** @var string $mimeType */
+    if ($storage->getMimeType()->isAudio()) {
+        // If audio trancode, assume transcode format is audio/mpeg (mp3)
+        $mimeType = 'audio/mpeg';
+    } elseif ($storage->getMimeType()->isVideo()) {
+        // If video trancode, assume transcode format is video/mp4 (mp4)
+        $mimetype = 'video/mp4';
+    } else {
+        // If unknown, just flail about and choose the original file mimetype
+        $mimetype = 'application/octet-stream';
+    }
+
+
+
+    // ----------------------------------------------------------------------------------------------------------------
+    // Determine range of request for streaming protocol
+    // ----------------------------------------------------------------------------------------------------------------
+
+    $byteOffset = 0;
+    $byteLength = $videoSize;
+
+    if ($_SERVER['HTTP_RANGE']) {
+        $ranges = explode(',', substr($_SERVER['HTTP_RANGE'], 6));
+        $parts  = explode('-', $ranges[0]);
+
+        // Offset signifies where we should begin to read the file
+
+        $byteOffset = (int)$parts[0];
+
+        // Length is how long we should read the file according to the browser, and can never go beyond the file size
+
+        if (isset($parts[1]) && $parts[1] != '' && $parts[1] < $videoSize) {
+            $byteLength = (int)$parts[1];
+        } else {
+            $byteLength = $videoSize - 1;
+        }
+
+        // Make sure the requested range is satisfiable
+
+        if ($byteOffset > $byteLength) {
+            http_response_code(416);
+            header("Content-Range: bytes */{$videoSize}");
+            exit;
+        }
+
+        // Partial content
+
+        http_response_code(206);
+
+        // Decrease by 1 on byte-length since this definition is zero-based index of bytes being sent
+
+        header(sprintf('Content-Range: bytes %d-%d/%d', $byteOffset, $byteLength, $videoSize));
+    }
+
+    // ----------------------------------------------------------------------------------------------------------------
+    // Set HTTP headers
+    // ----------------------------------------------------------------------------------------------------------------
+
+    $byteRange = $byteLength - $byteOffset + 1;
+
+    header_remove("Cache-Control");
+    header_remove("Pragma");
+
+    header("Content-Type: {$mimeType}", true);
+    header("Accept-Ranges: bytes", true);
+    header("Content-Length: {$byteRange}", true);
+
+    fseek($videoStream, $byteOffset, SEEK_SET);
+    $readTill = $byteLength;
+
+    // ----------------------------------------------------------------------------------------------------------------
+    // Stream the video
+    // ----------------------------------------------------------------------------------------------------------------
+
+    while (!feof($videoStream) && ftell($videoStream) <= $byteLength) {
+        $sendLength = $byteLength < 8192 ? $byteLength : 8192;
+        echo fread($videoStream, $sendLength);
+        flush();
+        ob_flush();
+    }
+}
+
+/**
+ * Disable compression and multi-byte encoding in output
+ */
+function setResponseOptions()
+{
+    // Close session so streaming does not prevent other requests to session due to locking
+
     session_write_close();
 
-    /* Prevent multibyte encoding as it might mess with video stream */
-    mb_http_output("pass");
-    ini_set('zlib.output_compression', 0);
-    if (substr_count(strtolower(php_sapi_name()),'apache') > 0) { apache_setenv('no-gzip', 1); }
+    // Prevent multi-byte encoding as it might mess with video stream
 
-    $filename = $video->getFileLocation();
+    mb_http_output("pass");
+
+    // Disable output compression
+
+    ini_set('zlib.output_compression', 0);
+
+    if (substr_count(strtolower(php_sapi_name()), 'apache') > 0) {
+        apache_setenv('no-gzip', 1);
+    }
+}
+
+/**
+ * Retrieve the path where the video would be stored on local filesystem. Returns false if the file is not readable.
+ *
+ * @param ResourceVideo $video
+ * @param IConfigLoader $config
+ *
+ * @return string|bool
+ */
+function getLocalFilesystemPath(ResourceVideo $video, IConfigLoader $config)
+{
+    $filename = $config->get("storage_dir") . '/'.$video->getTranscodePath();
 
     if (is_readable($filename)) {
-        $filesize = @filesize($filename);
-        if ($filesize) {
-
-            // Get mimetype of encoded file, not from upload
-            switch (pathinfo($filename, PATHINFO_EXTENSION)) {
-                case 'mp3':
-                    $mimetype = 'audio/mpeg';
-                    break;
-                case 'mp4':
-                    $mimetype = 'video/mp4';
-                    break;
-                default:
-                    // assume it wasn't encoded at all
-                    $mimetype = 'application/octet-stream';
-                    break;
-            }
-
-            if ($type == \Schoolbox\Video\QueueMapper::FILE_TYPE_SBFS) {
-                if ($video->getFile() instanceof Schoolbox\Resource\File\Model) {
-                    LogMapper::getInstance()->logRead($video->getFile(), $_SESSION['user']);
-                }
-            }
-
-            $byteOffset = 0;
-            $byteLength = $filesize;
-
-            /* Determine range of request for streaming protocol */
-            if ($_SERVER['HTTP_RANGE']) {
-                $ranges = explode(',', substr($_SERVER['HTTP_RANGE'], 6));
-                $parts  = explode('-', $ranges[0]);
-
-
-                // Offset signifies where we should begin to read the file
-                $byteOffset = (int)$parts[0];
-
-                // Length is for how long we should read the file according to the browser,
-                // and can never go beyond the file size
-                if (isset($parts[1]) && $parts[1] != '' && $parts[1] < $filesize) {
-                    $byteLength = (int)$parts[1];
-                } else {
-                    $byteLength = $filesize - 1;
-                }
-
-                if ($byteOffset > $byteLength) {
-                    // Requested Range Not Satisfiable
-                    http_response_code(416);
-                    header('Content-Range: bytes */' . $filesize); // Required in 416.
-                    exit;
-                }
-
-                // Partial content
-                http_response_code(206);
-                // Decrease by 1 on byte-length since this definition is zero-based index of bytes being sent
-                header(sprintf('Content-Range: bytes %d-%d/%d', $byteOffset, $byteLength, $filesize));
-            }
-
-            /* Set initial basic headers */
-            header('Content-Type: ' . $mimetype, true);
-            header_remove('Cache-Control');
-            header_remove('Pragma');
-            header('Accept-Ranges: bytes', true);
-
-            $byteRange = $byteLength - $byteOffset + 1;
-            header('Content-Length: ' . $byteRange, true);
-
-            if ($handle = fopen($filename, 'rb')) {
-                fseek($handle, $byteOffset, SEEK_SET);
-                $readTill = $byteLength;
-
-                while (!feof($handle) && ftell($handle) <= $byteLength) {
-                    $sendLength = $byteLength < 8192 ? $byteLength : 8192;
-                    echo fread($handle, $sendLength);
-                    flush();
-                    ob_flush();
-                }
-            }
-        }
-    } else {
-        error(Schoolbox\Error\Mapper::ERROR_FILE_NOT_FOUND, '', 404);
+        return $filename;
     }
+
+    return false;
+}
+
+/**
+ * If we are unable to stream the video this is where we will end up, for now it just fails. We may want to change this
+ * to something more meaningful or a placeholder failed video.
+ */
+function fail()
+{
+    exit;
 }

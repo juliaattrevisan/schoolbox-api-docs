@@ -13,7 +13,6 @@ use League\Flysystem\Filesystem;
 use League\Flysystem\ZipArchive\ZipArchiveAdapter;
 use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\File\MimetypeMapper;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 

@@ -1,10 +1,8 @@
 <?php
 /**
- *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2015, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 
 namespace Schoolbox\Resource\Storage;
@@ -14,41 +12,40 @@ use League\Flysystem\File;
 use League\Flysystem\FileNotFoundException;
 use RuntimeException;
 use Schoolbox\File\Mimetype;
+use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 
 /**
  * Class Model
- *
  * Not explicitly a "Schoolbox file entity".
- * This object ONLY represents the file on disk, and needs to be wrapped in other classes for actual Schoolbox functionality.
+ * This object ONLY represents the file on disk, and needs to be wrapped in other classes for actual Schoolbox
+ * functionality.
  *
  * @package Schoolbox\Resource\Storage
  */
 class Model extends File implements IStorage
 {
-    /** @var string */
+    use CreatedAtDate;
+
+    /** @var string $filename */
     protected $filename;
 
-    /** @var string */
+    /** @var string $hash */
     protected $hash;
 
-    /** @var Mimetype */
+    /** @var Mimetype $mimetype */
     protected $mimetype;
 
-    /** @var int */
+    /** @var int $size */
     protected $size;
 
-    /** @var Alaress_Date_Format */
-    protected $createdAt;
-
-    /** @var Alaress_Date_Format */
+    /** @var Alaress_Date_Format $lastAccessed */
     protected $lastAccessed;
 
-    /** @var bool */
+    /** @var bool $public */
     protected $public;
 
-    /** @var string */
+    /** @var string $extension */
     protected $extension;
-
 
     /**
      * @return string
@@ -58,17 +55,17 @@ class Model extends File implements IStorage
         return $this->filename;
     }
 
-
     /**
      * @param string $filename
+     *
      * @return static
      */
     public function setFilename($filename)
     {
         $this->filename = $filename;
+
         return $this;
     }
-
 
     /**
      * @return string
@@ -80,14 +77,14 @@ class Model extends File implements IStorage
 
     /**
      * @param string $basename
+     *
      * @return $this
      */
     public function setBasename($basename)
     {
         return $this
             ->setFilename(mb_pathinfo($basename, PATHINFO_FILENAME))
-            ->setExtension(mb_pathinfo($basename, PATHINFO_EXTENSION))
-        ;
+            ->setExtension(mb_pathinfo($basename, PATHINFO_EXTENSION));
     }
 
     /**
@@ -95,31 +92,35 @@ class Model extends File implements IStorage
      */
     public function getHash()
     {
-        // calculate hash if not known
+        // Calculate hash if not known
+
         if (!$this->hash) {
             // Don't calc it if no path
+
             if (!$this->path) {
                 return null;
             }
+
             $stream = $this->readStream();
             $hp     = hash_init('sha1');
             hash_update_stream($hp, $stream);
             $this->setHash(hash_final($hp));
         }
+
         return $this->hash;
     }
 
-
     /**
      * @param string $hash
+     *
      * @return self
      */
     public function setHash($hash)
     {
         $this->hash = $hash;
+
         return $this;
     }
-
 
     /**
      * @return Mimetype
@@ -129,22 +130,23 @@ class Model extends File implements IStorage
         return $this->mimetype;
     }
 
-
     /**
      * @param Mimetype $mimetype
+     *
      * @return self
      */
     public function setMimetype(Mimetype $mimetype)
     {
         $this->mimetype = $mimetype;
+
         return $this;
     }
-
 
     /**
      * Returns the full mime string for the file
      *
-     * @param  bool   $detect
+     * @param bool $detect
+     *
      * @return string
      */
     public function getMime($detect = false)
@@ -152,9 +154,9 @@ class Model extends File implements IStorage
         if ($detect) {
             return parent::getMimetype();
         }
+
         return $this->getMimetype()->getMime();
     }
-
 
     /**
      * @return int
@@ -162,7 +164,8 @@ class Model extends File implements IStorage
      */
     public function getSize()
     {
-        // calculate size if not known
+        // Calculate size if not known
+
         if (!$this->size) {
             try {
                 $this->setSize(parent::getSize());
@@ -170,39 +173,21 @@ class Model extends File implements IStorage
                 throw new FileNotFoundException($this->getPath(), 0, $e);
             }
         }
+
         return $this->size;
     }
 
     /**
      * @param int $size
+     *
      * @return self
      */
     public function setSize($size)
     {
         $this->size = $size;
+
         return $this;
     }
-
-
-    /**
-     * @return Alaress_Date_Format
-     */
-    public function getCreatedAt()
-    {
-        return $this->createdAt;
-    }
-
-
-    /**
-     * @param Alaress_Date_Format $createdAt
-     * @return self
-     */
-    public function setCreatedAt($createdAt)
-    {
-        $this->createdAt = $createdAt;
-        return $this;
-    }
-
 
     /**
      * @return Alaress_Date_Format
@@ -212,17 +197,17 @@ class Model extends File implements IStorage
         return $this->lastAccessed;
     }
 
-
     /**
      * @param Alaress_Date_Format $lastAccessed
+     *
      * @return self
      */
     public function setLastAccessed($lastAccessed)
     {
         $this->lastAccessed = $lastAccessed;
+
         return $this;
     }
-
 
     /**
      * @return boolean
@@ -231,7 +216,6 @@ class Model extends File implements IStorage
     {
         return $this->public;
     }
-
 
     /**
      * @deprecated mapper compat
@@ -244,14 +228,15 @@ class Model extends File implements IStorage
 
     /**
      * @param boolean $public
+     *
      * @return self
      */
     public function setPublic($public)
     {
         $this->public = $public;
+
         return $this;
     }
-
 
     /**
      * @return string
@@ -261,22 +246,23 @@ class Model extends File implements IStorage
         return $this->extension;
     }
 
-
     /**
      * @param string $extension
+     *
      * @return self
      */
     public function setExtension($extension)
     {
         $this->extension = $extension;
+
         return $this;
     }
-
 
     /**
      * Pipe the readstream of this file to some other stream resource
      *
      * @param resource $to
+     *
      * @return int
      */
     public function pipe($to)

@@ -1,113 +1,250 @@
+#!/usr/bin/php
 <?php
 /**
  * Video encoder and processor
- *
- * This script should be run regularily by cron, it picks up any videos in the queue
- * automatically converts them into playable videos
+ * This script should be run regularly by cron, it picks up any videos in the queue automatically converts them
+ * into playable videos
  *
  * @author      James Leckie <james.leckie@alaress.com.au>
- * @copyright   2013 Alaress Pty Ltd
+ * @author      Damian Sloane <damian.sloane@alaress.com.au>
+ * @copyright   2017 Alaress Pty Ltd
  * @link        http://www.alaress.com.au
  */
 
-use Schoolbox\Video\Queue;
-use Schoolbox\Video\QueueMapper;
-use Aura\Di;
+use Aura\Di\Container as Injector;
+use Aura\Di\Exception\ServiceNotFound as ServiceNotFound;
+use League\Flysystem\FileNotFoundException;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
+use Schoolbox\GenericCollection;
+use Schoolbox\IConfigLoader;
+use Schoolbox\MapperFactory;
+use Schoolbox\Resource\Storage\Model as Storage;
+use Schoolbox\Video\Queue;
+use Schoolbox\Video\QueueMapper;
 
 require_once __DIR__ . '/../../conf/core/require.php';
+
 spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
-$kernel = new Schoolbox\Application\Daemon\Kernel('Video', array(
-    'verbose' => array(false,false,false),
-));
+$kernel = new Schoolbox\Application\Daemon\Kernel('Media Transcode', [
+    'verbose' => [false, false, false],
+]);
 
 
-// CREATE DIGEST APP
-$kernel->run(function($di, $loop, $log, $opts) {
-
-
+$kernel->run(function ($di, $loop, $log, $opts) {
     /**
-     * @var Di\Container $di
-     * @var LoopInterface $loop
+     * @var Injector        $di
+     * @var LoopInterface   $loop
      * @var LoggerInterface $log
-     * @var array $opts
+     * @var array           $opts
      */
+
+    // ------------------------------------------------------------------------------------------------------------
+    // Get mappers
+    // ------------------------------------------------------------------------------------------------------------
+
+    try {
+        /** @var IConfigLoader $configLoader */
+        $configLoader = $di->get('config');
+
+        /** @var MapperFactory $mapperFactory */
+        $mapperFactory = $di->get('mapperFactory');
+    } catch (ServiceNotFound $e) {
+        $log->critical("Unknown service requested");
+        exit(1);
+    }
+
+    /** @var QueueMapper $queueMapper */
+    $queueMapper = $mapperFactory->get(QueueMapper::class);
+
+    // ------------------------------------------------------------------------------------------------------------
+    // Let kernel decide how to handle dead child processes
+    // ------------------------------------------------------------------------------------------------------------
 
     pcntl_signal(SIGCHLD, SIG_DFL);
 
-    $mapper = new QueueMapper();
-    $lock = new Alaress_Lock(Cfg::get('video_dir') . '/.lock');
+    // ------------------------------------------------------------------------------------------------------------
+    // Allow only a single migration at a time
+    // ------------------------------------------------------------------------------------------------------------
+
+    $lock = new Alaress_Lock($configLoader->get('video_dir') . '/.transcode.lock');
+
     if (!$lock->acquire()) {
-        $log->critical("A video processor is already running, checking timeout");
-        // Check timeout: if any processing video has been processing for more than
-        // x minutes, then kill their process, mark as failed and start over.
-        // (Should never be more than one video processing at once (per server)).
-        $timeout = intval(Config::get('video_processing_timeout'));
+        $log->warning("Video processor is already running, checking timeout...");
+
+        // Check timeout
+
+        $timeout = (int)$configLoader->get('video_processing_timeout');
+
         if ($timeout <= 0) {
-            $log->alert("Timeout of video processing is disabled.");
-            exit;
-        } elseif (($num_timed_out = $mapper->markAllProcessingAsTimedOut($timeout)) > 0) {
-            $log->warning("Processing of $num_timed_out video(s) has timed out - marking these as failed, and continuing");
+            $log->alert("Unable to proceed, timeout of media processing is disabled");
+            exit(1);
+        } elseif (($num_timed_out = $queueMapper->markAllProcessingAsTimedOut($timeout)) > 0) {
+            $log->error("Error: {$num_timed_out} media item(s) timed out");
             $lock->killProcess();
             $lock->acquire();
         } else {
-            $log->info("No video processing has timed out");
-            exit;
+            $log->info("Unable to proceed, existing transcode still within timeout period");
+            exit(1);
         }
     }
-    $log->info("Processing of videos started");
 
-    /** @var Queue[] $pendingQueue */
-    $pendingQueue = $mapper->getPending();
+    // ------------------------------------------------------------------------------------------------------------
+    // Check if there was anything to process
+    // ------------------------------------------------------------------------------------------------------------
 
-    $failed = 0;
-    $success = 0;
+    /** @var GenericCollection $pendingQueue */
+    $pendingQueue = $queueMapper->getPending();
 
-    foreach ($pendingQueue as $vid) {
+    if ($pendingQueue->count() == 0) {
+        $log->info("No pending media to transcode");
+        $lock->release();
+        exit;
+    }
 
-        $file_id = $vid->getHash();
+    // ------------------------------------------------------------------------------------------------------------
+    // Iterate through all videos pending transcode
+    // ------------------------------------------------------------------------------------------------------------
 
-        if (empty($file_id)) {
+    $log->info("Processing {$pendingQueue->count()} pending media transcode(s)...");
 
-            $log->error("Process of media queue item #{$vid->getId()} failed. No file hash specified.");
-            $vid->setMessage("Unrecoverable Error: Media file could not be located");
-            $vid->setStatus(QueueMapper::STATUS_FAILED);
-            $mapper->save($vid);
+    $countCurrent = 1;
+    $countTotal   = $pendingQueue->count();
+    $failed       = 0;
+    $success      = 0;
+
+    /** @var Queue $mediaCurrent */
+    foreach ($pendingQueue as $mediaCurrent) {
+        $hash = $mediaCurrent->getHash();
+
+        if (empty($hash)) {
+            // No storage hash recorded, unrecoverable error
+
+            $log->error("Failed ({$mediaCurrent->getId()}): No valid file hash");
+            $mediaCurrent->setMessage("Unrecoverable Error: No known file hash");
+            $mediaCurrent->setStatus(QueueMapper::STATUS_FAILED);
+            $queueMapper->save($mediaCurrent);
             $failed++;
-
         } else {
-
-            /* Update video to indicate processing has begun */
-            $log->info("Starting process of media #$file_id");
-            //$vid->setStatus(QueueMapper::STATUS_PROCESSING);
-            //$mapper->save($vid);
-
-            /* Process video */
             try {
-                if ($vid->process() == true) {
-                    $vid->setStatus(QueueMapper::STATUS_COMPLETED);
+                // ------------------------------------------------------------------------------------------------
+                // Display details of file being processed
+                // ------------------------------------------------------------------------------------------------
+
+                $storage = $mediaCurrent->getStorage();
+
+                /** @noinspection PhpUndefinedMethodInspection */
+                $fileSystem = get_class($storage->getFilesystem()->getAdapter());
+                $fileName   = "{$storage->getFilename()}.{$storage->getExtension()}";
+                $filePath   = $storage->getPath();
+
+                $log->info("");
+                $log->info("    - Processing Item:        {$countCurrent}/{$countTotal}");
+                $log->info("    - Media Queue ID:         {$mediaCurrent->getId()}");
+                $log->info("    - Storage Hash:           {$hash}");
+                $log->info("    - Storage Filesystem:     {$fileSystem}");
+                $log->info("    - Source File:            {$fileName}");
+                $log->info("    - Source Path:            {$filePath}");
+
+                $log->info(getDisplayFileSize($storage));
+                $log->info(getDisplayFileMime($storage));
+
+                // Update video to indicate processing has begun
+
+                $mediaCurrent->setStatus(QueueMapper::STATUS_PROCESSING);
+                $queueMapper->save($mediaCurrent);
+
+                // ------------------------------------------------------------------------------------------------
+                // Process the video
+                // ------------------------------------------------------------------------------------------------
+
+                if ($mediaCurrent->process($log) == true) {
+                    $mediaCurrent->setStatus(QueueMapper::STATUS_COMPLETED);
                 } else {
-                    $vid->setStatus(QueueMapper::STATUS_FAILED);
+                    $mediaCurrent->setStatus(QueueMapper::STATUS_FAILED);
                 }
             } catch (Exception $e) {
-                $log->error("$e", array($e));
-                $vid->setStatus(QueueMapper::STATUS_FAILED);
+                $log->error($e->getMessage(), [$e]);
+                $mediaCurrent->setStatus(QueueMapper::STATUS_FAILED);
+            } finally {
+                $queueMapper->save($mediaCurrent);
+                $countCurrent++;
             }
 
-            if ($vid->getStatus() === QueueMapper::STATUS_FAILED) {
-                $log->error("Process of media #$file_id failed");
+            if ($mediaCurrent->getStatus() === QueueMapper::STATUS_FAILED) {
+                $log->error("    - Transcode failed");
                 $failed++;
             } else {
-                $log->info("Process of media #$file_id completed\n");
+                $log->info("    - Transcode completed successfully");
                 $success++;
             }
         }
-
-        $mapper->save($vid);
     }
 
+    // ------------------------------------------------------------------------------------------------------------
+    // Display results
+    // ------------------------------------------------------------------------------------------------------------
+
+    $log->info("");
+
+    if ($failed > 0) {
+        $log->info("Processing completed with errors: {$success} succeeded, {$failed} failed");
+    } else {
+        $log->info("Processing completed: {$success} media items processed");
+    }
+
+    // ------------------------------------------------------------------------------------------------------------
+    // Release file lock
+    // ------------------------------------------------------------------------------------------------------------
+
     $lock->release();
-    $log->info("Processing of videos completed: $success succeeded, $failed failed");
 });
+
+// --------------------------------------------------------------------------------------------------------------------
+// Helper functions
+// --------------------------------------------------------------------------------------------------------------------
+
+/**
+ * Get pretty file size for display
+ *
+ * @param Storage $storage
+ *
+ * @return string
+ */
+function getDisplayFileSize(Storage $storage)
+{
+    try {
+        $fileSize = $storage->getSize();
+    } catch (FileNotFoundException $e) {
+        return "";
+    }
+
+    $alaressByteFormat = new Alaress_Byte_Format();
+    $alaressByteFormat->bytesToString($fileSize);
+
+    return "    - Source File Size:       {$fileSize}";
+}
+
+/**
+ * Get pretty file mime type for display
+ *
+ * @param Storage $storage
+ *
+ * @return string
+ */
+function getDisplayFileMime(Storage $storage)
+{
+    $fileMime     = "    - Detected Media Type:    ";
+    $fileMimeType = "({$storage->getMimetype()->getMime()})";
+
+    if ($storage->getMimetype()->isAudio()) {
+        return "{$fileMime}Audio {$fileMimeType}";
+    } elseif ($storage->getMimetype()->isVideo()) {
+        return "{$fileMime}Video {$fileMimeType}";
+    } elseif ($storage->getMimetype()->isImage()) {
+        return "{$fileMime}Image {$fileMimeType}";
+    }
+
+    return "Unknown {$fileMimeType}";
+}

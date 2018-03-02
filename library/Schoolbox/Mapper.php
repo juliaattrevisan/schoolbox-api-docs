@@ -1,6 +1,6 @@
 <?php
 /**
- * Description of the file and what its purpose is
+ * Base mapper
  *
  * @author      James Leckie <james.leckie@alaress.com.au>
  * @copyright   2013 Alaress Pty Ltd
@@ -1347,9 +1347,10 @@ abstract class Mapper implements IMapper, Serializable
      * Overrides delete() method to call softDelete if a soft delete field was
      * set up, or hardDelete() method if it wasn't.
      *
-     * @param object|Collection $object
+     * @param $object|Collection
      *
      * @return bool
+     * @throws Exception
      */
     public function delete($object)
     {
@@ -1394,6 +1395,7 @@ abstract class Mapper implements IMapper, Serializable
      * @param object|Collection $object Model or collection of models to delete
      *
      * @return bool
+     * @throws Exception
      */
     public function hardDelete($object)
     {
