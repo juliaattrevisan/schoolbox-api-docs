@@ -18,7 +18,7 @@ $(function () {
     };
 
     // Only show tours windows larger than medium (has sidebar showing)
-    if (typeof(window.tourUrl) !== 'undefined' && !windowIsMediumDown()) {
+    if (typeof(window.tourUrl) !== 'undefined' && window.tourUrl && !windowIsMediumDown()) {
         $.get(window.tourUrl).done(function (tours) {
 
             // Function to initiate a joyride

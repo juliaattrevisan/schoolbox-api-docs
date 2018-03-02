@@ -1542,8 +1542,12 @@ class SitePage extends Page
     public function routeLookup($name, $params = [])
     {
         /** @var Router $router */
-        $router = $this->getDi()->get('router');
-
-        return $router->generate($name, $params);
+        try {
+            $router = $this->getDi()->get('router');
+            return $router->generate($name, $params);
+        }
+        catch (\Aura\Di\Exception\ServiceNotFound $e) {
+            return '';
+        }
     }
 }

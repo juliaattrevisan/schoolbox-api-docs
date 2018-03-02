@@ -29,7 +29,7 @@ function error($ec, $message="", $code = 400) {
         $this->setDi($kernel->getDependencyInjector());
         $this->error($ec, $message, $code);
     } else {
-        $page = $kernel->getDependencyInjector()->get('sitePage');
+        $page = $kernel->getDependencyInjector()->get('layoutEngine');
         $page->error($ec, $message, $code);
     }
 }

@@ -10,7 +10,6 @@
 
 namespace Schoolbox\Application\BasicRequest;
 
-use Alaress\Csrf\HeaderCheck;
 use Aura\Di;
 use Autoloader;
 use Config;
@@ -29,9 +28,21 @@ use Schoolbox\L10n\RosettaStoneFactory;
 use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\Notifactory;
 use Schoolbox\Application\AbstractBootstrap;
-use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Application\WebRequest\ShutdownHandler;
+use SitePage;
+use Twig_Environment;
+use Alaress\Twig\Method as TwigMethod;
+use Twig_Extension_Debug;
+use Twig_Extensions_Extension_Text;
+use Twig_Loader_Filesystem;
+use Twig_SimpleFilter;
+use Schoolbox\Admin\Navigation\Renderer as AdminNavigationRenderer;
+use Alaress_Date_Locale_Config;
+use Alaress_Date_Format;
+use Schoolbox\Learning\Assessment\Redirect;
+
+
 
 class Bootstrap extends AbstractBootstrap {
 
@@ -278,7 +289,161 @@ class Bootstrap extends AbstractBootstrap {
         // initialise session
         $di->get('session')->start();
 
+        // install sentry
+        $sentryToken = \defined('SENTRY_TOKEN') ? SENTRY_TOKEN : '';
+        $sentryProject = \defined('SENTRY_PROJECT') ? SENTRY_PROJECT : '';
+        $sentryClient = null;
+        if (\strlen($sentryToken) && \strlen($sentryProject)) {
+            try {
+                /** @var \Schoolbox\Instance $sb */
+                $sb = $di->get('instance');
+                // fall back to site_location if site_school_code not set
+                $options = [
+                    'environment' => $sb->getType(),
+                    'tags' => [
+                        'php_version' => PHP_VERSION,
+                        'site_version' => $sb->getVersion(),
+                        'site_school_code' => $sb->getSchoolCode() ?: $sb->getLocation()
+                    ]
+                ];
+                $sentryClient = new \Raven_Client("https://{$sentryToken}@sentry.io/{$sentryProject}", $options);
+                $sentryClient->install();
+            } catch (\Raven_Exception $e) {
+                // do nothing; sentry is not installed
+            } catch (Di\Exception\ServiceNotFound $e) {
+                // do nothing; sentry is not installed
+            }
 
+            // add sentry to the DI
+            $di->set('sentry', $sentryClient);
+        }
+
+        $di->set('layoutEngine', $di->lazy(function() use ($di) {
+            $sitepage = new SitePage(false);
+            $sitepage->setDi($di);
+            return $sitepage;
+        }));
+
+        $di->set(
+            'templateEngine',
+            $di->lazy(
+                function () use ($di) {
+                    /** @var IConfigLoader $config */
+                    $config = $di->get('config');
+
+                    $options = [
+                        'debug' => $config->get('debug_templates'),
+                    ];
+
+                    // do not cache when in debug mode
+                    if (!$config->get('debug_mode')) {
+                        $options['cache'] = $config->get('stream_dir') . '/templates/';
+                    }
+
+                    $twig = new Twig_Environment($di->get('templateEngine:loader'), $options);
+
+                    $twig->addExtension(new Twig_Extension_Debug());
+                    $twig->addExtension(new Twig_Extensions_Extension_Text());
+                    $twig->addExtension(new AdminNavigationRenderer());
+
+                    // HTML Purifier filter - known to output safe HTML
+
+                    $twig->addFilter(
+                        new Twig_SimpleFilter(
+                            'purify',
+                            array('Scrub', 'html'),
+                            array('is_safe' => array('html'))
+                        )
+                    );
+
+                    // HTML2Text filter
+                    $twig->addFilter(
+                        new Twig_SimpleFilter(
+                            'html2text',
+                            array('Scrub', 'html2text')
+                        )
+                    );
+
+                    // Cut sentence filter
+                    $twig->addFilter(
+                        new Twig_SimpleFilter(
+                            'cutSentence',
+                            array('TextFormatter', 'cutSentence')
+                        )
+                    );
+
+                    // Bytes to string filter
+                    $twig->addFilter(
+                        new Twig_SimpleFilter(
+                            'bytes',
+                            array('Alaress_Byte_Format', 'bytesToString')
+                        )
+                    );
+
+                    $twig->addFilter(
+                        new Twig_SimpleFilter(
+                            'column',
+                            [ Collection::class, 'array_column' ]
+                        )
+                    );
+
+                    // Global access to config object and localisation
+                    $twig->addGlobal('config', $config);
+                    $twig->addGlobal('locale',  $di->get('l10n'));
+                    $dateFormats = new Alaress_Date_Locale_Config();
+                    $dateFormats->setConfig($config);
+                    $twig->addGlobal('dateFormats', $dateFormats);
+                    $twig->addGlobal('NOW', Alaress_Date_Format::now());
+                    $twig->addGlobal('USER', $_SESSION['user']);
+
+                    // Global access to returnUrl vars
+                    $encodedUrl = Redirect::encode($_GET["page"]);
+                    $twig->addGlobal(
+                        'RETURN_URL',
+                        [
+                            'name'     => Redirect::RETURN_URL,
+                            'current'  => $encodedUrl,
+                            'previous' => (isset($_REQUEST[Redirect::RETURN_URL])
+                                ? $_REQUEST[Redirect::RETURN_URL]
+                                : $encodedUrl),
+                        ]
+                    );
+
+                    return $twig;
+                }
+            )
+        );
+
+        // Template engine and functions
+        // Template loader: sets up link to templates without a namespace.
+        $di->set(
+            'templateEngine:loader',
+            $di->lazy(
+                function () use ($di) {
+                    $config      = $di->get('config');
+                    $baseLoader  = new Twig_Loader_Filesystem(array());
+                    // Paths: prefer templates/{site_location} over templates/core
+                    $basePath     = $config->get('siteRoot').'/templates/';
+                    $overridePath = $basePath.$config->get('site_location');
+                    $corePath     = $basePath.'core';
+                    if (is_dir($overridePath)) {
+                        $baseLoader->addPath($overridePath);
+                    }
+                    $baseLoader->addPath($corePath);
+                    // Core path: always uses templates/core, even if templates/{site_location} exists
+                    // Used as a base for default path templates to inherit from.
+                    $baseLoader->addPath($corePath, 'core');
+                    return $baseLoader;
+                }
+            )
+        );
+
+        $di->params[TwigMethod\RequireModule::class]['di'] = $di;
+        $di->set('templateEngine:requireModule', $di->lazyNew(TwigMethod\RequireModule::class));
+
+
+        // load dependencies into the kernel itself
+        $this->getKernel()->setDependencyInjector($di);
     }
 
 
