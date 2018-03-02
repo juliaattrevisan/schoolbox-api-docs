@@ -85,10 +85,10 @@ class ActionValidator
             && $this->accessHelper->getFolderAccess($user, $folder->getId()) >= UserAccess::ACCESS_READ
         ) {
             foreach ($quiz->getAllParticipants() as $participant) {
-                if ($participant->isExcluded() || $participant->getPublishDate()->isFuture()) {
+                if ($participant->isExcluded() || $this->now->lt($participant->getPublishDate())) {
                     continue;
                 }
-                if ($user->isParentOf($participant->getUser())) {
+                if ($this->now->gte($participant->getPublishDate()) && $user->isParentOf($participant->getUser())) {
                     return true;
                 }
             }
@@ -169,7 +169,7 @@ class ActionValidator
 
         // Anyone else:
         // Can't see participation if it's not published yet
-        if ($participant->getPublishDate()->isFuture()) {
+        if ($this->now->lt($participant->getPublishDate())) {
             return false;
         }
 
