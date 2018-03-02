@@ -5,14 +5,17 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Learning\Assessment\Test;
+namespace Schoolbox\Learning\MarkScheme\Test;
 
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
 use Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizFeedback;
+use Schoolbox\Learning\Assessment\Test\ParticipantLinker;
 use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
 use \InvalidArgumentException;
+use Schoolbox\User;
+
 
 class TotalMarkFractionalTest extends TestCase
 {
@@ -97,11 +100,15 @@ class TotalMarkFractionalTest extends TestCase
         $markScheme->getNormalisedMark($humanReadable, $this->getDummyQuizAttempt($totalMark));
     }
 
+
     /**
      * @dataProvider provider_humanReadableToNormalised
      * @param string $humanReadable
-     * @param float $totalMark
-     * @param float $expected
+     * @param float  $totalMark
+     * @param float  $expected
+     * @throws InvalidArgumentException
+     * @throws \DomainException
+     * @throws \RangeException
      */
     public function test_getNormalised($humanReadable, $totalMark, $expected)
     {
@@ -111,11 +118,15 @@ class TotalMarkFractionalTest extends TestCase
         $this->assertEquals($expected, $actual, $message);
     }
 
+
     /**
      * @dataProvider provider_humanReadableToRecurringNormalised
      * @param string $humanReadable
-     * @param float $totalMark
-     * @param float $expected
+     * @param float  $totalMark
+     * @param float  $expected
+     * @throws InvalidArgumentException
+     * @throws \DomainException
+     * @throws \RangeException
      */
     public function test_getRecurringNormalised($humanReadable, $totalMark, $expected)
     {
@@ -126,11 +137,15 @@ class TotalMarkFractionalTest extends TestCase
         $this->assertLessThan($delta, abs($expected - $actual), $message);
     }
 
+
     /**
      * @dataProvider provider_normalisedToHumanReadable
      * @param float  $normalised
      * @param float  $totalMark
      * @param string $humanReadable
+     * @throws InvalidArgumentException
+     * @throws \DomainException
+     * @throws \RangeException
      */
     public function test_getHumanReadable($normalised, $totalMark, $humanReadable)
     {
@@ -140,11 +155,15 @@ class TotalMarkFractionalTest extends TestCase
         $this->assertEquals($humanReadable, $actual, $message);
     }
 
+
     /**
      * @dataProvider provider_normalisedToHumanReadableRecurring
      * @param float  $normalised
      * @param float  $totalMark
      * @param string $humanReadable
+     * @throws InvalidArgumentException
+     * @throws \DomainException
+     * @throws \RangeException
      */
     public function test_getHumanReadableFromRecurring($normalised, $totalMark, $humanReadable)
     {
@@ -155,6 +174,12 @@ class TotalMarkFractionalTest extends TestCase
     }
 
 
+    /**
+     * @throws InvalidArgumentException
+     * @throws \DomainException
+     * @throws \RangeException
+     * @throws \UnexpectedValueException
+     */
     public function test_getNormalised_Quiz()
     {
         $quiz = $this->getDummyQuiz();
@@ -173,6 +198,13 @@ class TotalMarkFractionalTest extends TestCase
         $this->assertEquals($expected, $actual, $message);
     }
 
+
+    /**
+     * @throws InvalidArgumentException
+     * @throws \DomainException
+     * @throws \RangeException
+     * @throws \UnexpectedValueException
+     */
     public function test_getNormalised_Quiz_OriginalTotalExceedsAttemptTotal()
     {
         $quiz = $this->getDummyQuiz();
@@ -191,6 +223,12 @@ class TotalMarkFractionalTest extends TestCase
         $this->assertEquals($expected, $actual, $message);
     }
 
+
+    /**
+     * @throws InvalidArgumentException
+     * @throws \DomainException
+     * @throws \RangeException
+     */
     public function test_getNormalised_Quiz_Total()
     {
         $humanReadable = 1;
@@ -206,6 +244,13 @@ class TotalMarkFractionalTest extends TestCase
         $this->assertLessThan($delta, abs($expected - $actual), $message);
     }
 
+
+    /**
+     * @throws InvalidArgumentException
+     * @throws \DomainException
+     * @throws \RangeException
+     * @throws \UnexpectedValueException
+     */
     public function test_getHumanReadable_Quiz()
     {
         $quiz = $this->getDummyQuiz();
@@ -222,6 +267,13 @@ class TotalMarkFractionalTest extends TestCase
         $this->assertEquals($expected, $actual, $message);
     }
 
+
+    /**
+     * @throws InvalidArgumentException
+     * @throws \DomainException
+     * @throws \RangeException
+     * @throws \UnexpectedValueException
+     */
     public function test_getHumanReadable_Quiz_Fractional()
     {
         $quiz = $this->getDummyQuiz();
@@ -259,7 +311,10 @@ class TotalMarkFractionalTest extends TestCase
 
     // ==================== Data Providers ====================
 
-    public function provider_invalidTotalMarks()
+    /**
+     * @return array
+     */
+    public function provider_invalidTotalMarks(): array
     {
         return [
             [null],
@@ -273,7 +328,11 @@ class TotalMarkFractionalTest extends TestCase
         ];
     }
 
-    public function provider_humanReadableToRecurringNormalised()
+
+    /**
+     * @return array
+     */
+    public function provider_humanReadableToRecurringNormalised(): array
     {
         $totalMark = 3.0;
         return [
@@ -285,7 +344,11 @@ class TotalMarkFractionalTest extends TestCase
         ];
     }
 
-    public function provider_setValidTotal()
+
+    /**
+     * @return array
+     */
+    public function provider_setValidTotal(): array
     {
         $originalTotalMark = 50;
         return [
@@ -303,7 +366,11 @@ class TotalMarkFractionalTest extends TestCase
         ];
     }
 
-    public function provider_humanReadableToNormalised()
+
+    /**
+     * @return array
+     */
+    public function provider_humanReadableToNormalised(): array
     {
         $totalMark = 100;
         return [
@@ -323,7 +390,11 @@ class TotalMarkFractionalTest extends TestCase
         ];
     }
 
-    public function provider_normalisedToHumanReadable()
+
+    /**
+     * @return array
+     */
+    public function provider_normalisedToHumanReadable(): array
     {
         $totalMark = 100;
         return [
@@ -337,7 +408,11 @@ class TotalMarkFractionalTest extends TestCase
         ];
     }
 
-    public function provider_normalisedToHumanReadableRecurring()
+
+    /**
+     * @return array
+     */
+    public function provider_normalisedToHumanReadableRecurring(): array
     {
         $totalMark = 3;
         return [
@@ -454,7 +529,7 @@ class TotalMarkFractionalTest extends TestCase
      * @param int $totalMark
      * @return QuizAttempt
      */
-    private function getDummyQuizAttempt($totalMark)
+    private function getDummyQuizAttempt($totalMark): QuizAttempt
     {
         return (new QuizAttempt())->setMarksAvailable($totalMark);
     }
@@ -468,6 +543,6 @@ class TotalMarkFractionalTest extends TestCase
      */
     private function getDummyQuizAttempter()
     {
-        return (new \Schoolbox\User())->setId(19);
+        return (new User())->setId(19);
     }
 }

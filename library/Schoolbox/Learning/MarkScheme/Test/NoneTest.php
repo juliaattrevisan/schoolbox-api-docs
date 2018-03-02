@@ -5,20 +5,26 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Learning\Assessment\Test;
+namespace Schoolbox\Learning\MarkScheme\Test;
 
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Learning\MarkScheme\None;
-use \InvalidArgumentException;
-use \RangeException;
 
 class NoneTest extends TestCase
 {
+    /**
+     * Humanreadable is null
+     */
     public function test_getHumanReadable_Null()
     {
         $normalised = null;
+        $expected = null;
         $markScheme = new None();
-        $markScheme->getHumanReadableMark($normalised);
+
+        $actual = $markScheme->getHumanReadableMark($normalised);
+
+        $message = "Failed asserting equality. Input: $normalised, Expected: $expected, Actual: $actual";
+        $this->assertEquals($expected, $actual, $message);
     }
 
 
@@ -37,7 +43,9 @@ class NoneTest extends TestCase
     }
 
 
-
+    /**
+     * Normalised mark is null
+     */
     public function test_GetNormalised_Null()
     {
         $humanReadable = null;
@@ -48,6 +56,10 @@ class NoneTest extends TestCase
         $this->assertEquals($expected, $actual, $message);
     }
 
+
+    /**
+     * Normalised mark is empty
+     */
     public function test_GetNormalised_Empty()
     {
         $humanReadable = '';
@@ -75,7 +87,10 @@ class NoneTest extends TestCase
 
     // ==================== Data Providers ====================
 
-    public function provider_normalised()
+    /**
+     * @return array
+     */
+    public function provider_normalised(): array
     {
         return [
             [0],
@@ -88,7 +103,10 @@ class NoneTest extends TestCase
     }
 
 
-    public function provider_humanReadable()
+    /**
+     * @return array
+     */
+    public function provider_humanReadable(): array
     {
         return [
             [null],

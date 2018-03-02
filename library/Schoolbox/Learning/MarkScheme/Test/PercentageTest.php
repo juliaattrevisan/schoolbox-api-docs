@@ -5,7 +5,7 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Learning\Assessment\Test;
+namespace Schoolbox\Learning\MarkScheme\Test;
 
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Learning\MarkScheme\Percentage;
@@ -16,8 +16,10 @@ class PercentageTest extends TestCase
 
     /**
      * @dataProvider provider_normalisedToHumanReadable
-     * @param float $normalised
+     * @param float  $normalised
      * @param string $expected
+     * @throws RangeException
+     * @throws \InvalidArgumentException
      */
     public function test_getHumanReadable_Valid($normalised, $expected)
     {
@@ -28,10 +30,13 @@ class PercentageTest extends TestCase
 
     }
 
+
     /**
      * @dataProvider provider_humanReadableToNormalised
      * @param string $humanReadable
-     * @param float $expected
+     * @param float  $expected
+     * @throws RangeException
+     * @throws \InvalidArgumentException
      */
     public function test_getNormalised_Valid($humanReadable, $expected)
     {
@@ -64,7 +69,10 @@ class PercentageTest extends TestCase
 
     // ==================== Data Providers ====================
 
-    public function provider_humanReadableToNormalised()
+    /**
+     * @return array
+     */
+    public function provider_humanReadableToNormalised(): array
     {
         return [
             ['  0 %',      0.0],
@@ -92,7 +100,11 @@ class PercentageTest extends TestCase
         ];
     }
 
-    public function provider_normalisedToHumanReadable()
+
+    /**
+     * @return array
+     */
+    public function provider_normalisedToHumanReadable(): array
     {
         return [
             [-0.0001,     '0 %'],

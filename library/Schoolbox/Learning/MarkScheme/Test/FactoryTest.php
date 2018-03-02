@@ -5,7 +5,7 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Learning\Assessment\Test;
+namespace Schoolbox\Learning\MarkScheme\Test;
 
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Learning\Assessment\Summator\Average;
@@ -13,6 +13,7 @@ use Schoolbox\Learning\Assessment\Summator\ISummator;
 use Schoolbox\Learning\Assessment\Summator\Maximum;
 use Schoolbox\Learning\Assessment\Summator\Minimum;
 use Schoolbox\Learning\Assessment\Summator\WeightedAverage;
+use Schoolbox\Learning\Assessment\Test\ParticipantLinker;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Learning\MarkScheme\None;
 use Schoolbox\Learning\MarkScheme\Completion;

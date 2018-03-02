@@ -5,14 +5,13 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Learning\Assessment\Test;
+namespace Schoolbox\Learning\MarkScheme\Test;
 
 
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Learning\MarkScheme\LetterGrade;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Model as GradeLevel;
-use \RangeException;
 use \InvalidArgumentException;
 
 class LetterGradeTest extends TestCase
@@ -29,10 +28,13 @@ class LetterGradeTest extends TestCase
         $markScheme->getNormalisedMark($humanReadable);
     }
 
+
     /**
      * @dataProvider provider_normalisedToHumanReadable
-     * @param float $normalised
+     * @param float  $normalised
      * @param string $expected
+     * @throws InvalidArgumentException
+     * @throws \RangeException
      */
     public function test_getHumanReadable($normalised, $expected)
     {
@@ -43,10 +45,12 @@ class LetterGradeTest extends TestCase
         $this->assertEquals($expected, $actual, $message);
     }
 
+
     /**
      * @dataProvider provider_humanReadableToNormalised
      * @param string $humanReadable
-     * @param float $expected
+     * @param float  $expected
+     * @throws InvalidArgumentException
      */
     public function test_getNormalised($humanReadable, $expected)
     {
@@ -59,7 +63,10 @@ class LetterGradeTest extends TestCase
 
     // ==================== Data Providers ====================
 
-    public function provider_normalisedToHumanReadable()
+    /**
+     * @return array
+     */
+    public function provider_normalisedToHumanReadable(): array
     {
         return [
             [-5,     'Needs Attention'],
@@ -76,7 +83,11 @@ class LetterGradeTest extends TestCase
         ];
     }
 
-    public function provider_humanReadableToNormalised()
+
+    /**
+     * @return array
+     */
+    public function provider_humanReadableToNormalised(): array
     {
         return [
             ['Needs Attention', 20.0],
@@ -90,7 +101,7 @@ class LetterGradeTest extends TestCase
     /**
      * @return GradeGroup
      */
-    private function getDummyLetterGradeGroup()
+    private function getDummyLetterGradeGroup(): GradeGroup
     {
         $gradeGroup = new GradeGroup();
         $gradeGroup->setId(3);
