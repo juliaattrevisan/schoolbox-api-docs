@@ -63,7 +63,10 @@ class LetterGradeTest extends TestCase
 
     // ==================== Data Providers ====================
 
-    public function provider_normalisedToHumanReadable()
+    /**
+     * @return array
+     */
+    public function provider_normalisedToHumanReadable(): array
     {
         return [
             [-5,     'Needs Attention'],
@@ -80,7 +83,11 @@ class LetterGradeTest extends TestCase
         ];
     }
 
-    public function provider_humanReadableToNormalised()
+
+    /**
+     * @return array
+     */
+    public function provider_humanReadableToNormalised(): array
     {
         return [
             ['Needs Attention', 20.0],
@@ -94,7 +101,7 @@ class LetterGradeTest extends TestCase
     /**
      * @return GradeGroup
      */
-    private function getDummyLetterGradeGroup()
+    private function getDummyLetterGradeGroup(): GradeGroup
     {
         $gradeGroup = new GradeGroup();
         $gradeGroup->setId(3);
