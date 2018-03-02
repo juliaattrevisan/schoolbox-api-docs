@@ -69,7 +69,10 @@ class PercentageTest extends TestCase
 
     // ==================== Data Providers ====================
 
-    public function provider_humanReadableToNormalised()
+    /**
+     * @return array
+     */
+    public function provider_humanReadableToNormalised(): array
     {
         return [
             ['  0 %',      0.0],
@@ -97,7 +100,11 @@ class PercentageTest extends TestCase
         ];
     }
 
-    public function provider_normalisedToHumanReadable()
+
+    /**
+     * @return array
+     */
+    public function provider_normalisedToHumanReadable(): array
     {
         return [
             [-0.0001,     '0 %'],
