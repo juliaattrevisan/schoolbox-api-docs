@@ -555,7 +555,7 @@ class External_Synergetic_User implements External_UserInterface
 
         $query = "
             SELECT      StudentID,
-                        StudentGiven1,
+                        StudentPreferred,
                         StudentSurname,
                         StudentYearLevel,
                         House.Description AS StudentHouse,

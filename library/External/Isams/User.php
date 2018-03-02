@@ -222,7 +222,7 @@ class External_Isams_User implements External_UserInterface
         $query = "
             SELECT      
                         V_Student.StudentID           AS StudentID,
-                        V_Student.StudentFirstName    AS StudentGiven1,
+                        V_Student.StudentFirstName    AS StudentPreferred,
                         V_Student.StudentSurname      AS StudentSurname,
                         V_Student.Grade               AS StudentYearLevel,
                         ''                            AS StudentHouse,

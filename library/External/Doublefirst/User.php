@@ -482,7 +482,7 @@ class External_Doublefirst_User implements External_UserInterface
         $query =
             "
             SELECT      p.PupilID AS StudentID,
-                        p.ForeName AS StudentGiven1,
+                        p.ForeName AS StudentPreferred,
                         p.Surname AS StudentSurname,
                         p.YearGroup AS StudentYearLevel,
                         p.House AS StudentHouse,

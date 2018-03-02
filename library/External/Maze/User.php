@@ -486,7 +486,7 @@ class External_Maze_User implements External_UserInterface
         $query = "
 			SELECT
 				ST.STKEY AS StudentID,
-				ST.FIRST_NAME AS StudentGiven1,
+				ST.FIRST_NAME AS StudentPreferred,
 				ST.SURNAME AS StudentSurname,
 				REPLACE(REPLACE(ST.SCHOOL_YEAR, 'Y0', ''), 'Y', '') AS StudentYearLevel,
 				ST.HOUSE AS StudentHouse,
