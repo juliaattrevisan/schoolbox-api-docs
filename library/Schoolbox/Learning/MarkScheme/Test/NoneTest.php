@@ -12,6 +12,9 @@ use Schoolbox\Learning\MarkScheme\None;
 
 class NoneTest extends TestCase
 {
+    /**
+     * Humanreadable is null
+     */
     public function test_getHumanReadable_Null()
     {
         $normalised = null;
@@ -35,7 +38,9 @@ class NoneTest extends TestCase
     }
 
 
-
+    /**
+     * Normalised mark is null
+     */
     public function test_GetNormalised_Null()
     {
         $humanReadable = null;
@@ -46,6 +51,10 @@ class NoneTest extends TestCase
         $this->assertEquals($expected, $actual, $message);
     }
 
+
+    /**
+     * Normalised mark is empty
+     */
     public function test_GetNormalised_Empty()
     {
         $humanReadable = '';
@@ -73,7 +82,10 @@ class NoneTest extends TestCase
 
     // ==================== Data Providers ====================
 
-    public function provider_normalised()
+    /**
+     * @return array
+     */
+    public function provider_normalised(): array
     {
         return [
             [0],
@@ -86,7 +98,10 @@ class NoneTest extends TestCase
     }
 
 
-    public function provider_humanReadable()
+    /**
+     * @return array
+     */
+    public function provider_humanReadable(): array
     {
         return [
             [null],
