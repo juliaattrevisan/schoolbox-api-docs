@@ -161,7 +161,6 @@ Usage:
                             ? 'grid.twig'
                             : 'grid-markable.twig'
                             %}
-
                             {% include '@rubric/' ~ rubricTemplate with {
                                 rubric: rubricContext.rubric,
                                 learnerRubric: learnerRubricContext.rubric,
@@ -172,7 +171,8 @@ Usage:
                                 showGroupTotal: showGroupTotal,
                                 showRubricTotal: showRubricTotal,
                                 latestSelfReflectedFeedback: latestSelfReflectedFeedback,
-                                self: self
+                                self: self,
+                                markSchemeName: markSchemeName
                             } only %}
                         </fieldset>
                     {% endif %}

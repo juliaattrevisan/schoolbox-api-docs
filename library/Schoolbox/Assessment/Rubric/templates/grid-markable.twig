@@ -1,3 +1,5 @@
+{% import '@learningMarkScheme/macro/limitDecimal.twig' as limit_decimal %}
+
 {% set formField = 'rubric' %}
 {% set rubricId = 'rb-' ~ rubric.id %}
 {% set markType = markType ?: { mode: 'raw' } %}
@@ -92,15 +94,21 @@
             </tr>
             {% endfor %}
 
-            {% if group.total and showGroupTotal %}
-            <tr>
-                {% if config.rubric_show_points or not studentView %}
-                    <th class="rb-group-summary" colspan="{{ rubric.levels|length + 1 }}">
-                        <span data-group-summary="{{ rubricId }}-{{ group.id }}"
-                            data-numerator="{{ group.sum }}"
-                            data-denominator="{{ group.total }}">
+        {% if group.total and showGroupTotal %}
+        <tr>
+            {% if config.rubric_show_points or not studentView %}
+                <th class="rb-group-summary" colspan="{{ rubric.levels|length + 1 }}">
+                    <span data-group-summary="{{ rubricId }}-{{ group.id }}"
+
+                        data-numerator="{{ limit_decimal.limit(group.sum, 2) }}"
+                        data-denominator="{{ limit_decimal.limit(group.total, 2) }}">
+
+                        {% if markSchemeName == 'TotalMarkFractional' %}
+                            {{ limit_decimal.limit(group.sum, 2) }} / {{ limit_decimal.limit(group.total, 2) }}
+                        {% else %}
                             {{ group.humanReadableMark }}
-                        </span>
+                        {% endif %}
+                    </span>
 
                         {# Self-Assessment #}
                         {% if learnerRubric %}
@@ -118,14 +126,20 @@
             {% endif %}
             {% endfor %}
 
-            {% if rubric.total and showRubricTotal and (config.rubric_show_points or not studentView) %}
-            <tr>
-                <th class="rb-final-summary" colspan="{{ rubric.levels|length + 2 }}">
-                    <span data-final-summary="{{ rubricId }}"
-                        data-numerator="{{ rubric.sum }}"
-                        data-denominator="{{ rubric.total }}">
-                        {{ rubric.humanReadableMark }}
-                    </span>
+    {% if rubric.total and showRubricTotal and (config.rubric_show_points or not studentView) %}
+    <tr>
+        <th class="rb-final-summary" colspan="{{ rubric.levels|length + 2 }}">
+            <span data-final-summary="{{ rubricId }}"
+
+                data-numerator="{{ limit_decimal.limit(rubric.sum, 2) }}"
+                data-denominator="{{ limit_decimal.limit(rubric.total, 2) }}">
+
+                {% if markSchemeName == 'TotalMarkFractional' %}
+                   {{ limit_decimal.limit(rubric.sum, 2) }} / {{ limit_decimal.limit(rubric.total, 2) }}
+                {% else %}
+                   {{ rubric.humanReadableMark }}
+                {% endif %}
+            </span>
 
                     {# Self-Assessment #}
                     {% if learnerRubric %}
@@ -209,6 +223,10 @@
                     }
                 }
             });
+
+            if(groupSum % 1 != 0){
+                groupSum = groupSum.toFixed(2);
+            }
 
             return groupSum;
         }

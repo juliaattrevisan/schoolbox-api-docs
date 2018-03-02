@@ -1,0 +1,25 @@
+{#
+    Text-input for 'total-mark' markScheme.
+
+    Usage: [
+        markScheme:  MarkScheme\TotalMarkFractional
+        tabIndex:    int
+        errors:      string[]       Admin-configured submission states
+        readonly:    bool           Should this form input be rendered as readonly?
+    ]
+#}
+{% import '@learningMarkScheme/macro/limitDecimal.twig' as limit_decimal %}
+
+{% include '@learningMarkScheme/fragments/text-input.twig' with {
+participant: participant,
+feedback:    feedback,
+tabIndex:    tabIndex,
+placeholder: readonly ? '(no mark given)' : 'Mark out of ' ~ limit_decimal.limit(markScheme.totalMark, 2),
+limit:       limit_decimal.limit(markScheme.totalMark, 2),
+maxLength:   16,
+inputTitle:  'Maximum Mark: ' ~ limit_decimal.limit(markScheme.totalMark, 2),
+errors:      errors,
+readonly:    readonly,
+totalMark: 1,
+} only %}
+

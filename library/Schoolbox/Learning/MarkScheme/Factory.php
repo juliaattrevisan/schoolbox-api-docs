@@ -31,7 +31,7 @@ class Factory
     private static $markTypesDueWork = [
         MarkType::TYPE_PERCENT => Percentage::TITLE,
         MarkType::TYPE_NONE    => None::TITLE,
-        MarkType::TYPE_TOTAL   => TotalMarkWholeNumber::TITLE,
+        MarkType::TYPE_TOTAL   => TotalMarkFractional::TITLE,
         MarkType::TYPE_LETTER  => LetterGrade::TITLE
     ];
 
@@ -113,7 +113,7 @@ class Factory
             case MarkType::TYPE_NONE:
                 return new None();
             case MarkType::TYPE_TOTAL:
-                return new TotalMarkWholeNumber($dueWork->getMaxMark());
+                return new TotalMarkFractional($dueWork->getMaxMark());
             case MarkType::TYPE_LETTER:
                 return new LetterGrade($dueWork->getGradeGroup());
             default:

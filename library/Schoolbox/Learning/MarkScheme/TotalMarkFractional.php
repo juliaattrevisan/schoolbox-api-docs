@@ -30,8 +30,8 @@ use RangeException;
  */
 class TotalMarkFractional extends TotalMarkAbstract
 {
-    const GRANULARITY_NUMERATOR   = 0.05;
-    const GRANULARITY_DENOMINATOR = 0.05;
+    const GRANULARITY_NUMERATOR   = 0.01;
+    const GRANULARITY_DENOMINATOR = 0.01;
 
 
     /**
