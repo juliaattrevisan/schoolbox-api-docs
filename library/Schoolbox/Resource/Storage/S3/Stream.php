@@ -14,7 +14,6 @@
 namespace Schoolbox\Resource\Storage\S3;
 
 use Aws\S3\S3Client;
-use Schoolbox\Config\ConfigMapper;
 
 class Stream
 {
@@ -22,23 +21,19 @@ class Stream
      * Open a file located on AWS S3 storage as a stream
      *
      * @param string $path
-     *
+     * @param \Config $config
      * @return bool|resource
      */
-    public static function open($path)
+    public static function open($path, $config)
     {
-        // Grab mappers
-
-        $configMapper = ConfigMapper::getInstance();
-
         // Retrieve AWS S3 configuration from database
 
-        $region  = $configMapper->get('otfs_s3_region');
-        $version = $configMapper->get('otfs_s3_version');
-        $key     = $configMapper->get('otfs_s3_cred_key');
-        $secret  = $configMapper->get('otfs_s3_cred_secret');
-        $bucket  = $configMapper->get('otfs_s3_bucket');
-        $prefix  = $configMapper->get('otfs_s3_prefix');
+        $region  = $config->get('otfs_s3_region');
+        $version = $config->get('otfs_s3_version');
+        $key     = $config->get('otfs_s3_cred_key');
+        $secret  = $config->get('otfs_s3_cred_secret');
+        $bucket  = $config->get('otfs_s3_bucket');
+        $prefix  = $config->get('otfs_s3_prefix');
 
         // Create the base path for the S3 storage
 

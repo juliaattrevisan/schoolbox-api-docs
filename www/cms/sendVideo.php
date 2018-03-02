@@ -88,7 +88,7 @@ if (isset($type) && isset($id)) {
 
     if ($fileSystem->getAdapter() instanceof AwsS3Adapter) {
         // AWS S3
-        $videoStream = S3Stream::open($video->getTranscodePath());
+        $videoStream = S3Stream::open($video->getTranscodePath(), $kernel->getDependencyInjector()->get('config'));
     } elseif (($localFilename = getLocalFilesystemPath($video)) !== false) {
         // Local Disk
         $videoStream = fopen($localFilename, "r");
