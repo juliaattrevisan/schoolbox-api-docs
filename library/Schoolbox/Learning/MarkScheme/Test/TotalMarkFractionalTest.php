@@ -529,7 +529,7 @@ class TotalMarkFractionalTest extends TestCase
      * @param int $totalMark
      * @return QuizAttempt
      */
-    private function getDummyQuizAttempt($totalMark): \Schoolbox\Learning\Assessment\Quiz\Attempt\Model
+    private function getDummyQuizAttempt($totalMark): QuizAttempt
     {
         return (new QuizAttempt())->setMarksAvailable($totalMark);
     }
