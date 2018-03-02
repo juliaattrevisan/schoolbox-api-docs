@@ -80,7 +80,7 @@ catch (Mapper\Exception $e) {
  */
 $quiz            = $assessmentMapperProxy->findByQuizId($assess['assess_id'], $user);
 $actionValidator = new ActionValidator(Alaress_Date_Format::now(), Access::getInstance());
-if (!$actionValidator->canSeeQuiz($_SESSION['user'], $quiz)) {
+if (!$actionValidator->canSeeAttempts($_SESSION['user'], $user, $quiz)) {
     $this->pageNotFound();
 }
 
