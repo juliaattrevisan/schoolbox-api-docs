@@ -131,8 +131,8 @@
         <th class="rb-final-summary" colspan="{{ rubric.levels|length + 2 }}">
             <span data-final-summary="{{ rubricId }}"
 
-                data-numerator="{{ rubric.sum | number_format(rubricSumFormat) }}"
-                data-denominator="{{ rubric.total | number_format(rubricTotalFormat) }}">
+                data-numerator="{{ limit_decimal.limit(rubric.sum, 2) }}"
+                data-denominator="{{ limit_decimal.limit(rubric.total, 2) }}">
 
                 {% if markSchemeName == 'TotalMarkFractional' %}
                    {{ limit_decimal.limit(rubric.sum, 2) }} / {{ limit_decimal.limit(rubric.total, 2) }}
