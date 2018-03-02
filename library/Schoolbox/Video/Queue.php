@@ -632,7 +632,7 @@ class Queue extends ResourceVideo
 
         $outputString = implode("\n", $outputArray);
 
-        $this->setMessage("{$message}\n{$command}\n{$outputString}");
+        $this->setMessage("{$message}\n{$command}\n{$outputString}\n----\n");
 
         if ($return != 0) {
             throw new RuntimeException("{$command}\n{$outputString}");
