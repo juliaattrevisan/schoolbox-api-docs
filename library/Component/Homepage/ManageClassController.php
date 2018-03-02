@@ -96,12 +96,6 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
          * this heading is parsed
          */
         $hasClassActions = false;
-
-        // If context is not a group, unit or class, render nothing
-        if (!$isGroupPage && !$isClassPage && !$isUnitPage && !$isCoursePage) {
-            return false;
-        }
-
         $this->setBlock($templateHandle, 'student_grades', 'student_grades_block');
         $this->setBlock($templateHandle, 'class_list', 'class_list_block');
         $this->setBlock($templateHandle, 'markbook_link', 'markbook_link_block');
