@@ -1,0 +1,12 @@
+{% extends '@core/user/student.twig' %}
+
+{% block buttons_documents %}
+    {% if config.external_document_report_enabled %}
+        {% set routeAcademicReports = routeLookupIfAuthorized('profileDocumentManagement.getIndex', {studentId: user.id}) %}
+        {% if routeAcademicReports %}
+            <li>
+                <a href="{{ routeAcademicReports }}" class="icon-document">Medical Documents</a>
+            </li>
+        {% endif %}
+    {% endif %}
+{% endblock buttons_documents %}
