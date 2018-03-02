@@ -156,13 +156,14 @@ class ActionValidator
     public function canSeeAttempts(User $user, User $student, Quiz\Model $quiz, bool $restrictStudentSubmissions): bool
     {
         // Is student even participating?
+        $folder      = $quiz->getBaseContext()->getFolder();
         $participant = $quiz->getParticipantIfExtant($student);
         if (!$participant || $participant->isExcluded()) {
             return false;
         }
 
         // Instructors can see attempts, as long as student is participating
-        if ($this->accessHelper->isInstructor($user, $quiz->getBaseContext()->getFolder())) {
+        if ($this->accessHelper->isInstructor($user, $folder)) {
             return true;
         }
 
@@ -179,7 +180,9 @@ class ActionValidator
 
         // Parent of student may view participation
         // (as long as config.restrict_student_submissions is off)
-        return !$restrictStudentSubmissions && $user->isParentOf($student);
+        return !$restrictStudentSubmissions
+            && $user->isParentOf($student)
+            && $this->accessHelper->getFolderAccess($user, $folder->getId()) >= UserAccess::ACCESS_READ;
     }
 
 
