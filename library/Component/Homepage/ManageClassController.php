@@ -144,7 +144,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
 
         /*
          * Render link to manage criteria if:
-         * - folder is current class, group, or unit (ignore ex-classes)
+         * - folder is current class, group, unit or course (ignore ex-classes)
          * - user is staff, and
          * - has WRITE+ perm
          */
