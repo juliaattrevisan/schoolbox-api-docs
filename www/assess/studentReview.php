@@ -108,13 +108,7 @@ if ($quizVisibility->isStaff() && $groupHandler->isStaff()) {
     error(129);
 }
 
-/* Find out which attempt was made
- */
-if (is_numeric($this->arg[2])) {
-    $attemptId = $this->arg[2];
-} else {
-    error(114);
-}
+$attemptId = $this->arg[2];
 
 /* Set up template
  */
