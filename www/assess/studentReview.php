@@ -63,6 +63,12 @@ if (!$section) {
     error(115);
 }
 
+if (!$attempt) {
+    error(128);
+} else {
+    $attempt['totalAvailableMarks'] = $attemptHandler->getTotalMarks($this->arg[0], $this->arg[2]);
+}
+
 /* Check the folder exists meaningfully
  */
 try {
@@ -72,11 +78,6 @@ catch (Mapper\Exception $e) {
     error(Error\Mapper::ERROR_SELECT_QUIZ_GROUP);
 }
 
-if (!$attempt) {
-    error(128);
-} else {
-    $attempt['totalAvailableMarks'] = $attemptHandler->getTotalMarks($this->arg[0], $this->arg[2]);
-}
 
 /* Check access rights:
  * Allow owner of attempt to review
