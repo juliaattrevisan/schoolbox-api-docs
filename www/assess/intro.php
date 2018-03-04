@@ -96,12 +96,6 @@ if ($accessLevel < UserAccess::ACCESS_WRITE) {
         error(19);
     }
 
-    // If we are here, either user is learner staff, or a learner participant
-    if (!$sessionUser->getRole()->isStaff() && (!$participant || Alaress_Date_Format::now()->gt($participant->getCloseDate()))) {
-        // In addition to being able to see the existence of the assessment, non-staff Learners cannot visit this page after their close date
-        $this->pageNotFound();
-    }
-
     // I can't start this if I have too many attempts
     $numAttempts = $attemptHandler->userHasAttempted($assess['assess_id'], $_SESSION['id']);
     $attempt     = $attemptHandler->getLatestResumableForUser($assess['assess_id'], $_SESSION['id']);
