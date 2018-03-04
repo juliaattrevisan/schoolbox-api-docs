@@ -147,7 +147,7 @@ if (is_array($allAttempts) && count($allAttempts)) {
      * Since it's phplib, kinda do it the awkward way
      */
     $reviewUrl = 'studentReview';
-    if ($studentReviewable) {
+    if ($reviewable) {
         $reviewUrl = 'review';
     }
 
