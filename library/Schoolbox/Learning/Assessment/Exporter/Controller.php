@@ -199,7 +199,10 @@ class Controller extends BaseController
             if ($assessmentImpl->getId()) {
                 // Does the system permit destructive re-export?
                 if ($enableReimport) {
+                    $notifier = $this->assessmentDataSource->getNotifier();
+                    $before   = $notifier->dehydrate($assessmentImpl);
                     $this->assessmentDataSource->delete($assessmentImpl);
+                    $notifier->notify($assessmentImpl, $this->getUser(), $before);
                 } else {
                     continue;
                 }

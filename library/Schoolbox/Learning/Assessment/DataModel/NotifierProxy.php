@@ -106,7 +106,11 @@ class NotifierProxy
      */
     public function notify(IAssessable $assessment, User $effector, array $before): void
     {
-        $action = empty($before) ? PlanMapper::METHOD_CREATE : PlanMapper::METHOD_UPDATE;
+        if ($assessment->isDeleted()) {
+            $action = PlanMapper::METHOD_DELETE;
+        } else {
+            $action = empty($before) ? PlanMapper::METHOD_CREATE : PlanMapper::METHOD_UPDATE;
+        }
         $after  = $this->dehydrate($assessment);
 
         // Now, trigger notifiers

@@ -671,6 +671,7 @@ class Controller extends Base\Base
         // Base Case #2 - Is item unselected ? (and already imported)
         if (!$isChecked) {
             $this->assessmentMapperProxy->delete($assessment);
+            $notifier->notify($assessment, $this->getUser(), $before);
             return;
         }
 
