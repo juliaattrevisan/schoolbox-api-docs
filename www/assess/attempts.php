@@ -87,6 +87,15 @@ if (!$actionValidator->canSeeAttempts($_SESSION['user'], $user, $quiz, $config->
     $this->pageNotFound();
 }
 
+// Determine if this user can review or student-review attempts too
+$reviewable        = $actionValidator->canReviewAttempts($_SESSION['user'], $user, $quiz);
+$studentReviewable = $actionValidator->canReviewAttemptsReadonly(
+    $_SESSION['user'],
+    $user,
+    $quiz,
+    $config->get('restrict_student_submissions')
+);
+
 $this->setFile(TEMPLATE_content, 'assess/attempts.html');
 $this->setBlock(TEMPLATE_content, 'has_preview_action', 'has_preview_action_block');
 $this->setBlock(TEMPLATE_content, 'has_preview_link', 'has_preview_link_block');
@@ -134,18 +143,20 @@ $allAttempts = $attemptHandler->getListForUser($quizId, $userId);
 if (is_array($allAttempts) && count($allAttempts)) {
     $i = 0;
 
+    /* Teacher Review link goes to a different url than the Student Review
+     * Since it's phplib, kinda do it the awkward way
+     */
+    $reviewUrl = 'studentReview';
+    if ($studentReviewable) {
+        $reviewUrl = 'review';
+    }
+
     foreach ($allAttempts as $currentAttempt) {
-        $finishDateValue = null;
-        $timeTaken = null;
-
-        /* Teacher Review link goes to a different url than the Student Review
-         * Since it's phplib, kinda do it the awkward way
-         */
-        $canReview = false;
+        $finishDateValue  = null;
+        $timeTaken        = null;
+        $canReview        = false;
         $canStudentReview = false;
-        $reviewUrl = 'studentReview';
-
-        $firstSection = $sectionHandler->getFirst($quizId);
+        $firstSection     = $sectionHandler->getFirst($quizId);
 
         $this->setVar(array(
             'ATTEMPT_ASSESS_ID' => $quizId,
@@ -169,35 +180,8 @@ if (is_array($allAttempts) && count($allAttempts)) {
 
 			/* Parse review link
 			 */
-			/* Check visibility
-			  */
-			$quizVisibility = new \Assess\Visibility();
-			$quizVisibility->setId($assess['mark_visibility']);
-
-			/* Mostly do nothing
-			 */
-			if ($quizVisibility->isStaff() && $groupHandler->isStaff()) {
-				$canReview = true;
-                $reviewUrl = 'review';
-			}
-			elseif ($quizVisibility->isStaffStudent()) {
-                if ($groupHandler->isStaff()) {
-                    $canReview = true;
-                    $reviewUrl = 'review';
-                }
-                elseif ($groupHandler->isStudent()) {
-                    $canStudentReview = true;
-                }
-			}
-			elseif ($quizVisibility->isStaffStudentParent()) {
-                if ($groupHandler->isStaff()) {
-                    $canReview = true;
-                    $reviewUrl = 'review';
-                }
-                elseif ($groupHandler->isStudent() || $groupHandler->isParentOfChild($userId)) {
-                    $canStudentReview = true;
-                }
-			}
+            $canReview        = $reviewable;
+            $canStudentReview = $studentReviewable;
         }
 
         /* Misc details
