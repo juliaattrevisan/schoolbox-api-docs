@@ -32,30 +32,30 @@ $groupHandler    = new Group;
  * @var AssessmentDataSource $assessmentDataSource
  */
 $assessmentDataSource = $this->getDi()->get('assessmentDataSource');
-
-if (!is_numeric($this->arg[0])) {
+[$quizId, $sectionId, $attemptId] = $this->arg;
+if (!is_numeric($quizId)) {
     error(112);
 }
 
-if (!is_numeric($this->arg[1])) {
+if (!is_numeric($sectionId)) {
     error(115);
 }
 
-if (!is_numeric($this->arg[2])) {
+if (!is_numeric($attemptId)) {
     error(128);
 }
 
-$assess  = $assessHandler->getByID($this->arg[0]);
-$section = $sectionHandler->getByID($this->arg[1]);
+$assess  = $assessHandler->getByID($quizId);
+$section = $sectionHandler->getByID($sectionId);
 // getListByAssessAndAttempt gets a rowset for some reason!
-$attemptList = $attemptHandler->getListByAssessAndAttempt($this->arg[0], $this->arg[2]);
+$attemptList = $attemptHandler->getListByAssessAndAttempt($quizId, $attemptId);
 $attempt     = array_pop($attemptList);
 
-if (!$assessHandler->isValidUrlAccess($this->arg[0])) {
+if (!$assessHandler->isValidUrlAccess($quizId)) {
     $this->pageNotFound();
 }
 
-if ($assessHandler->isDeleted($this->arg[0])) {
+if ($assessHandler->isDeleted($quizId)) {
     error(112);
 }
 
@@ -66,7 +66,7 @@ if (!$section) {
 if (!$attempt) {
     error(128);
 } else {
-    $attempt['totalAvailableMarks'] = $attemptHandler->getTotalMarks($this->arg[0], $this->arg[2]);
+    $attempt['totalAvailableMarks'] = $attemptHandler->getTotalMarks($quizId, $attemptId);
 }
 
 /* Check the folder exists meaningfully
@@ -84,7 +84,7 @@ catch (Mapper\Exception $e) {
  * Allow staff access
  * Allow parent of child access
  */
-if (!$attemptHandler->isOwner($this->arg[2])
+if (!$attemptHandler->isOwner($attemptId)
     && !$groupHandler->isStaff()
     && !($groupHandler->isParentOfChild($attempt['user_id']) && !Config::get('restrict_parent_duework_access'))
 ) {
@@ -107,8 +107,6 @@ if ($quizVisibility->isStaff() && $groupHandler->isStaff()) {
 } else {
     error(129);
 }
-
-$attemptId = $this->arg[2];
 
 /* Set up template
  */
@@ -260,8 +258,8 @@ if ($allQuestions) {
 
 /* Render Previous, Next and Finish buttons where appropriate
  */
-$nextSection = $sectionHandler->getAfter($this->arg[0], $section['sequence']);
-$prevSection = $sectionHandler->getBefore($this->arg[0], $section['sequence']);
+$nextSection = $sectionHandler->getAfter($quizId, $section['sequence']);
+$prevSection = $sectionHandler->getBefore($quizId, $section['sequence']);
 
 /* If there is no next section and no previous section, this was a one-section
  * assessment and should only have the Finish button
