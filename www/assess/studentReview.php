@@ -130,12 +130,12 @@ $this->setBlock(TEMPLATE_content, 'nextSection', 'nextSection_block');
 $this->setBlock(TEMPLATE_content, 'prevSection', 'prevSection_block');
 $this->setTitle('Assessment: ' . Scrub::text($assess['title']));
 
-try {
-    $folder = Schoolbox\Resource\Folder\Mapper::getInstance()->findById($assess['category_id']);
-} catch (Schoolbox\Mapper\Exception $e) {
-    error(112);
-    exit;
-}
+//try {
+//    $folder = Schoolbox\Resource\Folder\Mapper::getInstance()->findById($assess['category_id']);
+//} catch (Schoolbox\Mapper\Exception $e) {
+//    error(112);
+//    exit;
+//}
 
 try {
     $userMapper = \Schoolbox\UserMapper::getInstance();
