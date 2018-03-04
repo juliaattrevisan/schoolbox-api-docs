@@ -12,6 +12,11 @@ namespace Assess;
 use Schoolbox\Learning\Assessment\AbstractAssessment;
 use Schoolbox\Learning\Assessment\IAssessable;
 
+/**
+ * Determine visibility for an assessment.
+ *
+ * @deprecated use `\Schoolbox\Learning\Assessment\IAssessable::isFeedbackVisibleToUser` instead
+ */
 class Visibility {
 
 	/**
