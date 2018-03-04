@@ -19,6 +19,11 @@ use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
 
+/**
+ * ClassStatistics
+ *
+ * @deprecated AFAICT this is used nowhere
+ */
 class ClassStatistics {
 
 	/**
