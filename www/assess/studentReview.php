@@ -14,7 +14,9 @@
  */
 
 use Schoolbox\Error;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
+use Schoolbox\Learning\Quiz\ActionValidator;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
@@ -30,8 +32,10 @@ $groupHandler    = new Group;
 /**
  * @var SitePage $this
  * @var AssessmentDataSource $assessmentDataSource
+ * @var IConfigLoader        $config
  */
 $assessmentDataSource = $this->getDi()->get('assessmentDataSource');
+$config               = $this->getDi()->get('config');
 [$quizId, $sectionId, $attemptId] = $this->arg;
 if (!is_numeric($quizId)) {
     error(112);
@@ -69,7 +73,7 @@ if (!$attempt) {
     $attempt['totalAvailableMarks'] = $attemptHandler->getTotalMarks($quizId, $attemptId);
 }
 
-/* Check the folder exists meaningfully
+/* Check the folder and user exists meaningfully
  */
 try {
     $folder = Folder\Mapper::getInstance()->findById($assess['category_id']);
@@ -78,35 +82,30 @@ catch (Mapper\Exception $e) {
     error(Error\Mapper::ERROR_SELECT_QUIZ_GROUP);
 }
 
-
-/* Check access rights:
- * Allow owner of attempt to review
- * Allow staff access
- * Allow parent of child access
- */
-if (!$attemptHandler->isOwner($attemptId)
-    && !$groupHandler->isStaff()
-    && !($groupHandler->isParentOfChild($attempt['user_id']) && !Config::get('restrict_parent_duework_access'))
-) {
-    error(129);
+try {
+    $userMapper = \Schoolbox\UserMapper::getInstance();
+    $user       = $userMapper->findById($attempt['user_id']);
+} catch (Schoolbox\Mapper\Exception $e) {
+    error(19);
+    exit;
 }
 
-/* Check visibility
- */
-$quizVisibility = new \Assess\Visibility();
-$quizVisibility->setId($assess['mark_visibility']);
+/** @var \Schoolbox\User $sessionUser */
+$sessionUser = $_SESSION['user'];
+$assessment  = $assessmentDataSource->findByQuizId($assess['assess_id'], $sessionUser);
 
-/* Mostly do nothing
- */
-if ($quizVisibility->isStaff() && $groupHandler->isStaff()) {
-    // noop
-} elseif ($quizVisibility->isStaffStudent() && ($groupHandler->isStaff() || $groupHandler->isStudent())) {
-    // noop
-} elseif ($quizVisibility->isStaffStudentParent()) {
-    // noop
-} else {
-    error(129);
+// Check access rights
+// Rules are the same as seeing an attempt
+$actionValidator = new ActionValidator(Alaress_Date_Format::now(), Access::getInstance());
+if (!$actionValidator->canReviewAttemptsReadonly(
+    $sessionUser,
+    $user,
+    $assessment,
+    $config->get('restrict_student_submissions')
+)) {
+    $this->pageNotFound();
 }
+
 
 /* Set up template
  */
@@ -122,28 +121,9 @@ $this->setBlock(TEMPLATE_content, 'nextSection', 'nextSection_block');
 $this->setBlock(TEMPLATE_content, 'prevSection', 'prevSection_block');
 $this->setTitle('Assessment: ' . Scrub::text($assess['title']));
 
-//try {
-//    $folder = Schoolbox\Resource\Folder\Mapper::getInstance()->findById($assess['category_id']);
-//} catch (Schoolbox\Mapper\Exception $e) {
-//    error(112);
-//    exit;
-//}
-
-try {
-    $userMapper = \Schoolbox\UserMapper::getInstance();
-    $user       = $userMapper->findById($attempt['user_id']);
-} catch (Schoolbox\Mapper\Exception $e) {
-    error(19);
-    exit;
-}
-
 /* Show current Section's data, and other mandatory tokens needed to complete
  * the Assessment.
  */
-
-/** @var \Schoolbox\User $sessionUser */
-$sessionUser = $_SESSION['user'];
-$assessment = $assessmentDataSource->findByQuizId($assess['assess_id'], $sessionUser);
 
 // Does session user have a participation? If so, use CAP details.
 $participant = $assessment->getParticipantIfExtant($sessionUser);

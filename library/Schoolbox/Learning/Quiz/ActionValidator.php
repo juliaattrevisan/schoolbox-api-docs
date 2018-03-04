@@ -147,6 +147,10 @@ class ActionValidator
     /**
      * Can `$user` see attempts made by `$student` on `$quiz`?
      *
+     * This covers only whether `$user` can see that attempts exist; it doesn't
+     * cover whether they can view the attempt itself.
+     * (@see `canReviewAttemptsReadonly` for that)
+     *
      * @param User       $user
      * @param User       $student
      * @param Quiz\Model $quiz
@@ -183,6 +187,28 @@ class ActionValidator
         return !$restrictStudentSubmissions
             && $user->isParentOf($student)
             && $this->accessHelper->getFolderAccess($user, $folder->getId()) >= UserAccess::ACCESS_READ;
+    }
+
+
+    /**
+     * Can `$user` read-only review an attempt made by `$student` on `$quiz`?
+     *
+     * @param User       $user
+     * @param User       $student
+     * @param Quiz\Model $quiz
+     * @param bool       $restrictStudentSubmissions Are parents restricted from viewing student submissions?
+     * @return bool
+     */
+    public function canReviewAttemptsReadonly(
+        User $user,
+        User $student,
+        Quiz\Model $quiz,
+        bool $restrictStudentSubmissions
+    ): bool
+    {
+        return
+            $quiz->isFeedbackVisibleToUser($user)
+            && $this->canSeeAttempts($user, $student, $quiz, $restrictStudentSubmissions);
     }
 
 
