@@ -558,18 +558,15 @@ class RubricMapper
                 $workingGroupName = $row[0];
             }
 
-            if ($row[1]) {
+            // copy the groupname into the row
+            $row[0] = $workingGroupName;
 
-                // copy the groupname into the row
-                $row[0] = $workingGroupName;
-
-                // extract the criterion uniquely
-                $workingCritName                               = $row[1];
-                $criteria[$workingGroupName][$workingCritName] = [
-                    'id'   => null,
-                    'name' => $workingCritName,
-                ];
-            }
+            // extract the criterion uniquely (can be blank)
+            $workingCritName                               = $row[1];
+            $criteria[$workingGroupName][$workingCritName] = [
+                'id'   => null,
+                'name' => $workingCritName,
+            ];
 
             $square[] = $row;
         }
