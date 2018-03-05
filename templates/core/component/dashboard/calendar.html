@@ -1,7 +1,16 @@
 <div id="component{COMPONENT_INSTANCE_ID}" class="component-container {COMPONENT_CLASS}" data-component>
     <script type="text/javascript">
         $(function() {
-            $('#component{COMPONENT_INSTANCE_ID}').calendarAttendance();
+            $('#component{COMPONENT_INSTANCE_ID}').calendarAttendance({
+                element: $('#rsvp'),
+                getFormData: function() {
+                    return {
+                        event: {
+                            id: $('#rsvp').find('input[name="eventId"]').val()
+                        }
+                    }
+                }
+            });
         });
     </script>
 

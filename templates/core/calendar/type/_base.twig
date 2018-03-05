@@ -59,8 +59,8 @@
             {% block eventBubbleButtons %}
             <div>
                 {% if event.attendance %}
-                    <form method="post">
-                        <input name="event[id]" type="hidden" value="{{ event.eventId }}">
+                    <form method="post" id="rsvp">
+                        <input name="eventId" type="hidden" value="{{ event.eventId }}">
                         {% if renderer.attendanceStatus() %}
                         <a class="button icon-undo" data-attendance-request href="#">Unattend</a>
                         {% else %}
