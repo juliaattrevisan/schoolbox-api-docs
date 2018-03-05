@@ -671,7 +671,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
             // Is this a due work which doesn't accept online?
             // Don't count $participant as unsubmitted
-            if ($allowsResponse) {
+            if ($allowsResponse && $participant->isResponseRequired()) {
                 $totalUnsubmitted++;
             }
 
