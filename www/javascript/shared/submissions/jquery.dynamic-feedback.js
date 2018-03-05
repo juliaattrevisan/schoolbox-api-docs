@@ -136,7 +136,7 @@
                 e.preventDefault();
 
                 // Allow no other save actions nao whilst this one is running
-                window.clearTimeout(tt);
+                window.clearTimeout(timeoutHandle);
 
                 var $participant = $(this).closest('[data-participant]'),
                     $form        = $participant.find('[data-feedback-form]'),
