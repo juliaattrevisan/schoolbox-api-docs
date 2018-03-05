@@ -104,7 +104,7 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
         if ($post instanceof \SocialStream_Post_Url) {
             /** @param \SocialStream_Post_Url $post **/
             if($matches = $post->determineIcon()) {
-                return '/images/mime/'.$matches[1];
+                return '/images/mime/'.$matches;
             }
             else if( $post->hasThumbnail() ) {
                 return "/socialstream/image.php?size={$this->iconSize}&id=" . $post->getPostId();
