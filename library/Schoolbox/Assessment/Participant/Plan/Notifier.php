@@ -1157,7 +1157,8 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     {
         switch ($label) {
             case self::TRIGGER_OPEN:
-                // Open notifs are always sent to non-excluded
+            case self::TRIGGER_CLOSED:
+                // Open and closed notifs are always sent to non-excluded
                 return !$participant->isExcluded();
 
             case self::TRIGGER_UPDATED:
@@ -1166,7 +1167,6 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
             case self::TRIGGER_UPCOMING:
             case self::TRIGGER_OVERDUE:
-            case self::TRIGGER_CLOSED:
             default:
                 // All other notifs:
                 // participant is included, and still needs to respond
