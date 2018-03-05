@@ -586,6 +586,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 }
 
                 $notificationRaisedForParticipant = true;
+                $bob->unsetParam('oldname');
             }
 
             // due date change
