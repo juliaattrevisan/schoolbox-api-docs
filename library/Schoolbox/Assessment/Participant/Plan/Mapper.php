@@ -119,7 +119,7 @@ class Mapper extends BaseMapper
 
         /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-            $plan = $this->hydrate($row);
+            $plan = $plans[$row['id']] ?? $this->hydrate($row);
 
             // Did the query join onto participants?
             if (array_key_exists('p.id', $row)) {
