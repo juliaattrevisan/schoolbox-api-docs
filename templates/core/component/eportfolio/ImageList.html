@@ -1,5 +1,4 @@
 <div id='component{COMPONENT_INSTANCE_ID}' class='component-container {COMPONENT_CLASS}' data-component>
-    <!-- Custom javascript -->
 
     {CONFIGURATION}
 
@@ -12,26 +11,24 @@
                         <form class="dropzone" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/myFileForm.php?ajax=1" method="post" data-accepts="image">
                             <input type="hidden" name="user" value="{EPORTFOLIO_PAGE_USER_ID}" />
                         </form>
-                        <ul data-dz-template class="hide">
-                           <li>
-                               <img data-dz-thumbnail width="16" height="16" src="/images/foundation/preloader.gif" />
-                               <div class="progress dz-progress">
-                                   <span class="meter dz-upload" style="width:0;"></span>
-                               </div>
-                           </li>
+                        <ul class="hide" data-dz-template>
+                            <li>
+                                <img data-dz-thumbnail src="/images/foundation/preloader.gif"/>
+                                <div class="progress dz-progress">
+                                    <span class="meter dz-upload" style="width:0;"></span>
+                                </div>
+                            </li>
                         </ul>
                         <!-- END dropzone -->
-                        <div data-dz-container>
-                            <ul class="inline-list">
-                                <!-- BEGIN list_item -->
-                                <li>
-                                    <a href="/cms/myImage.php?id={IMAGE_ID}&key=eportfolioImageGalleryLarge" rel="lightbox[eportfolio-{COMPONENT_INSTANCE_ID}]" title='{IMAGE_DESCRIPTION}'>
-                                        <img src="/cms/myImage.php?id={IMAGE_ID}&key=eportfolioImageGalleryThumbnail" alt="{IMAGE_DESCRIPTION}" border="0" />
-                                    </a>
-                                </li>
-                                <!-- END list_item -->
-                            </ul>
-                        </div>
+                        <ul class="inline-list img-gallery" data-dz-container data-image-gallery>
+                            <!-- BEGIN list_item -->
+                            <li>
+                                <a href="/cms/myImage.php?id={IMAGE_ID}&key=eportfolioImageGalleryLarge" rel="lightbox[eportfolio-{COMPONENT_INSTANCE_ID}]" title='{IMAGE_DESCRIPTION}'>
+                                    <img src="/cms/myImage.php?id={IMAGE_ID}&key=eportfolioImageGalleryThumbnail" alt="{IMAGE_DESCRIPTION}" border="0" />
+                                </a>
+                            </li>
+                            <!-- END list_item -->
+                        </ul>
                     </div>
                 </div>
 
