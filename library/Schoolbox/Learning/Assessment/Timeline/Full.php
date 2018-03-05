@@ -338,10 +338,12 @@ class Full
         } elseif ($interaction instanceof IFeedback) {
             if (!$interaction->getPublishedAt()->isNull()) {
                 return $interaction->getPublishedAt();
+            } elseif (!$interaction->getUpdatedAt()->isNull())  {
+                return $interaction->getUpdatedAt();
             }
         }
 
-        // still draft; sift to the top of any list
+        //Item had none of the above dates... We'll try "now"?
         return Alaress_Date_Format::now();
     }
 
