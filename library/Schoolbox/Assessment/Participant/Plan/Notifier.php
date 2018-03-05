@@ -394,36 +394,6 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     private function internalNotifyOpen(IAssessable $assessment, Model $plan, bool $forFeed): Envelope
     {
         $envelope = new Envelope();
-        $topicStub  = $this->retrieveAssessmentTopicStub($assessment);
-        if (!$topicStub) {
-            return $envelope;
-        }
-        if (!$this->isNotifiableAtAll($assessment, self::TRIGGER_OPEN)) {
-            return $envelope;
-        }
-
-        // Customise and send to every participant in this plan only
-        foreach ($this->retrieveParticipantsFromPlan($plan, $assessment) as $participant) {
-            if (!$this->isParticipantNotifiable($participant, self::TRIGGER_OPEN)) {
-                continue;
-            }
-            $this->internalNotifyOpen($envelope, $participant, $topicStub);
-        }
-
-        return $envelope;
-    }
-
-
-    /**
-     * Method for creating a set of notifications for a feed.
-     *
-     * @param IAssessable $assessment
-     * @param Model       $plan
-     * @return Envelope
-     */
-    private function internalNotifyFeedOpen(IAssessable $assessment, Model $plan): Envelope
-    {
-        $envelope = new Envelope();
         if ($assessment instanceof DueWork) {
             $topicSuffix = "open";
         } elseif ($assessment instanceof Quiz) {
@@ -436,8 +406,9 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         if (!$topicStub) {
             return $envelope;
         }
-
-        // Feed assessments are always notifiable, even ones that don't accept submission.
+        if (!$this->isNotifiableAtAll($assessment, self::TRIGGER_OPEN)) {
+            return $envelope;
+        }
 
         $boxType = $assessment->getTypeName();
 
@@ -456,16 +427,10 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             $participantCount++;
 
             // build for student
-            $bob = $this->targetBuilderToStudent($bob, $assessment, $participant)
-                        ->setTitle("$boxType :assessment opened in :cat")
-                        ->setBody($participant->getDescription())
-                        ->setByline("Due {$participant->getDueDate()->getCalendarDateTime()}");
-            $envelope->targetToUser($participant->getUser(), $bob->build());
+            $this->internalNotifyStudentOpen($envelope, $participant, $topicStub);
 
-            // build for parent
-            // This notification goes nowhere, but is not listened to;
-            // it's for the feed only.
-            if (!$this->isParentTargetable()) {
+            // For feed only: build for parent
+            if (!($forFeed && $this->isParentTargetable())) {
                 continue;
             }
             $bob = $this->targetBuilderToParents($bob, $assessment, $participant)
@@ -505,7 +470,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      * @param Participant $participant
      * @param string      $topicStub
      */
-    private function internalNotifyOpen(Envelope $envelope, Participant $participant, string $topicStub): void
+    private function internalNotifyStudentOpen(Envelope $envelope, Participant $participant, string $topicStub): void
     {
         // Get assessment and build
         $assessment = $participant->getAssessable();
@@ -868,7 +833,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 if (!$isExcluded) {
                     // Same as notifyOpen
                     if ($this->isParticipantNotifiable($participant, self::TRIGGER_OPEN)) {
-                        $this->internalNotifyOpen($envelope, $participant, $topicStub);
+                        $this->internalNotifyStudentOpen($envelope, $participant, $topicStub);
                     }
                 }
 
