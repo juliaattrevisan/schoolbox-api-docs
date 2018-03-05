@@ -4,10 +4,11 @@ require_once dirname(__FILE__) . '/../../library/Bootstrap.php';
 use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use \Schoolbox\Forum\PostMapper;
 use \Schoolbox\Forum\ThreadMapper;
+use \Schoolbox\Permission\Access\UserAccess;
+use \Schoolbox\Permission\Access\UserAccessMapper;
 
 $page = new SitePage();
 $forumHandler = new Forum();
-$groupHandler = new Group();
 
 if (is_numeric($_POST['categoryID'])) {
 
@@ -27,10 +28,15 @@ if (is_numeric($_POST['categoryID'])) {
 
 	/* check permissions
 	 */
-	if (($permission = $groupHandler->getPermission($_POST['categoryID'])) < READ_ACCESS) {
-		error(19);
-	}
-	if ($groupHandler->hasChildAccessOnly($_POST['categoryID'])) {
+    $userAccessMapper = UserAccessMapper::getInstance();
+
+    try {
+        $accessLevel = $userAccessMapper->getAccess($_SESSION['user'], $folder->getId());
+    } catch (\Schoolbox\Mapper\Exception $e ) {
+        error(19);
+    }
+
+	if ($accessLevel->getAccessLevel() < UserAccess::ACCESS_READ) {
 		error(19);
 	}
 
@@ -48,7 +54,7 @@ if (is_numeric($_POST['categoryID'])) {
 
 		/* check user owns post
 		 */
-		if ($post->getOwner()->getId() != $_SESSION['id'] && $permission < WRITE_ACCESS) {
+		if ($post->getOwner()->getId() != $_SESSION['id'] && $accessLevel->getAccessLevel() < UserAccess::ACCESS_WRITE) {
 			error(19);
 		}
 
@@ -61,7 +67,7 @@ if (is_numeric($_POST['categoryID'])) {
 
 		/* check locked
 		 */
-		if ($thread->isLocked() && $permission < WRITE_ACCESS) {
+		if ($thread->isLocked() && $accessLevel < UserAccess::ACCESS_WRITE) {
 			error(19);
 		}
 
@@ -103,7 +109,7 @@ if (is_numeric($_POST['categoryID'])) {
 
 			/* check locked
 			 */
-			if ($thread->isLocked() && $permission < WRITE_ACCESS) {
+			if ($accessLevel->getAccessLevel() < UserAccess::ACCESS_WRITE && $thread->isLocked()) {
 				error(19);
 			}
 		}
@@ -152,12 +158,15 @@ else if (is_numeric($_GET['toggleLock'])) {
 
 	/* check permissions
 	 */
-	if ($groupHandler->getPermission($thread->getCategory()->getId()) < WRITE_ACCESS) {
-		error(19);
-	}
-	if ($groupHandler->hasChildAccessOnly($thread->getCategory()->getId())) {
-		error(19);
-	}
+    try {
+        $accessLevel = $userAccessMapper->getAccess($_SESSION['user'], $thread->getCategory()->getId());
+    } catch (\Schoolbox\Mapper\Exception $e ) {
+        error(19);
+    }
+
+    if ($accessLevel->getAccessLevel() < UserAccess::ACCESS_WRITE) {
+        error(19);
+    }
 
     $thread->setLocked($thread->isLocked()?false:true);
 
@@ -184,12 +193,15 @@ else if (is_numeric($_GET['deleteThread'])) {
 
 	/* check permissions
 	 */
-	if ($groupHandler->getPermission($thread->getCategory()->getId()) < WRITE_ACCESS) {
-		error(19);
-	}
-	if ($groupHandler->hasChildAccessOnly($thread->getCategory()->getId())) {
-		error(19);
-	}
+    try {
+        $accessLevel = $userAccessMapper->getAccess($_SESSION['user'], $thread->getCategory()->getId());
+    } catch (\Schoolbox\Mapper\Exception $e ) {
+        error(19);
+    }
+
+    if ($accessLevel->getAccessLevel() < UserAccess::ACCESS_WRITE) {
+        error(19);
+    }
 
     ThreadMapper::getInstance()->delete($thread);
 
@@ -205,12 +217,15 @@ else if (is_array($_POST['deleteThreads'])) {
 
 			/* check permissions
 			 */
-			if ($groupHandler->getPermission($thread->getCategory()->getId()) < WRITE_ACCESS) {
-				error(19);
-			}
-			if ($groupHandler->hasChildAccessOnly($thread->getCategory()->getId())) {
-				error(19);
-			}
+            try {
+                $accessLevel = $userAccessMapper->getAccess($_SESSION['user'], $thread->getCategory()->getId());
+            } catch (\Schoolbox\Mapper\Exception $e ) {
+                error(19);
+            }
+
+            if ($accessLevel->getAccessLevel() < UserAccess::ACCESS_WRITE) {
+                error(19);
+            }
 
             $categoryID = $thread->getCategory()->getId();
 
@@ -235,20 +250,24 @@ else if (is_numeric($_GET['deletePost'])) {
         error(2);
     }
 
-	/* check locked
-	 */
-	if ($thread->isLocked() && $groupHandler->getPermission($thread->getCategory()->getId()) < WRITE_ACCESS) {
-		error(19);
-	}
 
 	/* check permissions
 	 */
-	if ($post->getOwner()->getId() != $_SESSION['id'] && $groupHandler->getPermission($thread->getCategory()->getId()) < WRITE_ACCESS) {
-		error(19);
-	}
-	if ($groupHandler->hasChildAccessOnly($thread->getCategory()->getId())) {
-		error(19);
-	}
+    try {
+        $accessLevel = $userAccessMapper->getAccess($_SESSION['user'], $thread->getCategory()->getId());
+    } catch (\Schoolbox\Mapper\Exception $e ) {
+        error(19);
+    }
+
+    if ($accessLevel->getAccessLevel() < UserAccess::ACCESS_WRITE) {
+        error(19);
+    }
+
+    /* check locked
+    */
+    if ($accessLevel->getAccessLevel() <  UserAccess::ACCESS_WRITE && $thread->isLocked() ) {
+        error(19);
+    }
 
 	$pageNumber = $forumHandler->getPageNumber($post->getId());
 
