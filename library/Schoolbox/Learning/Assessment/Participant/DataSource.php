@@ -191,6 +191,9 @@ class DataSource
      */
     protected function findForAssessmentCollection(GenericCollection $assessments, User $user = null): void
     {
+        // Clear all participation from $assessments
+        $this->clearParticipants($assessments);
+
         $this->loadPlansAndParticipants($assessments);
 
         $dynamicPlans = new GenericCollection(PlanObject::class);
@@ -241,6 +244,19 @@ class DataSource
                     continue;
                 }
                 $dynamicPlan->getParticipants()[$user->getId()] = new ParticipantObject($user, $dynamicPlan);
+            }
+        }
+    }
+
+
+    /**
+     * @param GenericCollection|IAssessable[] $assessments
+     */
+    private function clearParticipants(GenericCollection $assessments): void
+    {
+        foreach ($assessments as $assessment) {
+            foreach ($assessment->getAllParticipants() as $participant) {
+                $assessment->unsetUserParticipation($participant->getUser());
             }
         }
     }
