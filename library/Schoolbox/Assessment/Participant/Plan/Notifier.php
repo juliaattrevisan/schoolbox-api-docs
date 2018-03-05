@@ -591,14 +591,14 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
             // due date change
             if (!empty($diff['participants'][$participant->getUser()->getId()]['dueDate'])) {
-                // Only diff if both times exist.
-                // New time doesn't exist? participant no longer has a time, so don't notify yet (consider later)
-                // Old time doesn't exist? this is new participation, so user will have been notified earlier
                 [$newStamp, $oldStamp] = $diff['participants'][$participant->getUser()->getId()]['dueDate'];
-                if ($oldStamp && $newStamp) {
-                    $oldDate = strtotime($oldStamp);
-                    $newDate = strtotime($newStamp);
-                    $verb = $newDate > $oldDate ? 'extended' : 'changed';
+                if ($newStamp) {
+                    $oldDate = strtotime((string)$oldStamp);
+                    $newDate = strtotime((string)$newStamp);
+                    $verb    = 'changed';
+                    if ($oldDate !== false && $newDate !== false && $newDate > $oldDate) {
+                        $verb = 'extended';
+                    }
 
                     $dateformat = $participant->getDueDate()->getLongDateOnly();
                     if (!$participant->getDueDate()->isAtEndOfDay()) {
