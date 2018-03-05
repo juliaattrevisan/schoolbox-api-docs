@@ -88,12 +88,20 @@ class Dehydrator
      */
     public function dehydrateAssessmentIntoPlans(IAssessable $assessment): array
     {
-        $dehydrated = [];
+        $dehydrated   = [];
+        $participants = [];
         foreach ($assessment->getPlans() as $plan) {
             // Is this plan persisted yet?
             // Ignore it for the purpose of dehydration?
             $dehydrated[$plan->getId()] = $this->dehydratePlan($plan);
+            $participants += $dehydrated[$plan->getId()]['participants'];
         }
+
+        // Copy participants into each plan
+        foreach ($dehydrated as $planId => $dehydratedPlan) {
+            $dehydrated[$planId]['participants'] = $participants;
+        }
+
         return $dehydrated;
     }
 
