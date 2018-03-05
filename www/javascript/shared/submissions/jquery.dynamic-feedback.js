@@ -19,9 +19,24 @@
     /**
      * Draft-saving timeout
      *
-     * @var {number} tt
+     * @var {number}
      */
-    var tt;
+    var timeoutHandle;
+
+    /**
+     * Is a draft currently being auto-saved for a student?
+     *
+     * @type {boolean[]} Indexed by user.id
+     */
+    var autoSaveInProgress = [];
+
+    /**
+     * Has a student made more changes during a draft auto-save?
+     *
+     * @type {boolean[]} Indexed by user.id
+     */
+    var autoSavePending = [];
+
 
     /**
      * Plugin
@@ -47,6 +62,7 @@
         function init(options, element) {
             var defaults = {
                 element: element,
+                timeoutDurationMs: 600, // After how many milliseconds should we auto-save user input
 
                 /* Label to indicate current status of action being undertaken
                  */
@@ -86,7 +102,6 @@
 
         /**
          * Set up pre-values
-         * Also populate the comboboxes with Feedback States
          */
         function setupPreValues() {
             // setup pre-values
@@ -108,7 +123,7 @@
                 .on('keydown paste keypress', 'textarea', timeoutUpdate)
                 .on('change', ':input', timeoutUpdate)
                 .on('change', '[data-rubric-descriptor]', timeoutUpdate)
-                .on('blur', ':input:not([data-rubric-descriptor])', doASaveActionNao)
+                .on('blur', ':input:not([data-rubric-descriptor])', onFeedbackChanged)
                 .on('success.attachzone', '.attachzone', timeoutUpdate)
                 .on('removedfile.attachzone', '.attachzone', timeoutUpdate);
         }
@@ -121,7 +136,7 @@
                 e.preventDefault();
 
                 // Allow no other save actions nao whilst this one is running
-                window.clearTimeout(tt);
+                window.clearTimeout(timeoutHandle);
 
                 var $participant = $(this).closest('[data-participant]'),
                     $form        = $participant.find('[data-feedback-form]'),
@@ -199,11 +214,11 @@
          */
         function timeoutUpdate() {
             var input = this;
-            window.clearTimeout(tt);
+            window.clearTimeout(timeoutHandle);
 
-            tt = window.setTimeout(function () {
-                doASaveActionNao.apply(input);
-            }, 600);
+            timeoutHandle = window.setTimeout(function () {
+                onFeedbackChanged.apply(input);
+            }, config.timeoutDurationMs);
 
             if ($(this).val() == $(this).data('preval')) {
                 return;
@@ -215,13 +230,17 @@
         }
 
         /**
-         * Save Draft Feedback contents upon blur or after timeout
+         * Callback invoked when the user changes feedback form input.
+         * May auto-save a draft, or schedule an auto-save of a draft.
          */
-        function doASaveActionNao() {
+        function onFeedbackChanged() {
             // do a preval comparison to find out if we can skip AJAX
             // (Do not skip attachzones)
             var $this = $(this);
-            if ((! ($this.is('.attachzone') || ($this.attr('name') && $this.attr('name').indexOf('rubric') === 0 ))) && $this.val() == $this.data('preval')) {
+
+            // Ignore if not an attach-zone or rubric mark, and the value has not changed since previously saved
+            var isAttachZoneOrRubricMark = $this.is('.attachzone') || ($this.attr('name') && $this.attr('name').indexOf('rubric') === 0 );
+            if (!isAttachZoneOrRubricMark && $this.val() == $this.data('preval')) {
                 return;
             }
 
@@ -229,10 +248,34 @@
             $this.data('preval', $this.val());
 
             var $participant = $this.closest('[data-participant]'),
-                $form        = $participant.find('[data-feedback-form]'),
+                userId       = $participant.data('participant');
+
+            // Is an auto-save in progress?
+            if(userId in autoSaveInProgress && autoSaveInProgress[userId]){
+                // Don't overlap requests, but indicate we have unsaved changes that must be auto-saved
+                autoSavePending[userId] = true;
+                return;
+            }
+
+            // No auto-saves currently queued for participant - so initiate a draft auto-save.
+            autoSaveDraft($participant);
+        }
+
+        /**
+         * Save the specified $participant's form contents as a draft feedback
+         *
+         * @param {jQuery} $participant
+         */
+        function autoSaveDraft($participant)
+        {
+            var $form        = $participant.find('[data-feedback-form]'),
                 $actionBar   = $participant.find('[data-action-bar]'),
                 $btnDrafted  = $actionBar.find('[data-draft=drafted]'),
-                $btnPublish  = $actionBar.find('[data-draft=publish]');
+                $btnPublish  = $actionBar.find('[data-draft=publish]'),
+                userId       = $participant.data('participant');
+
+            // Register that an auto-save is in progress for this participant
+            autoSaveInProgress[userId] = true;
 
             var data = {
                 type: $form.attr('method'),
@@ -277,6 +320,13 @@
                 })
                 .always(function () {
                     $btnPublish.removeAttr("disabled");
+                    autoSaveInProgress[userId] = false;
+                    // Did the user make more changes while the draft auto-save was in progress?
+                    if(userId in autoSavePending && autoSavePending[userId]){
+                        // Clear the flag and save those pending changes.
+                        autoSavePending[userId] = false;
+                        autoSaveDraft($participant);
+                    }
                 });
         }
 
