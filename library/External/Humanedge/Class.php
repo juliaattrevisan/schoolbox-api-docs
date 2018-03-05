@@ -47,6 +47,11 @@ class External_Humanedge_Class implements External_ClassInterface
      */
     public function getStudents($classCode)
     {
+        if (!$classCode) {
+            /* Dont bother if you got no code */
+            return false;
+        }
+
         $db    = $this->loadAPlusDatabase();
         // Period join is required even though it's unused - this filters out
         // students who actually don't have periods for this class.
@@ -99,6 +104,11 @@ class External_Humanedge_Class implements External_ClassInterface
      */
     public function getTeacherName($classCode)
     {
+        if (!$classCode) {
+            /* Dont bother if you got no code */
+            return false;
+        }
+
         $roomJoin = ($this->requireClassTeachersHaveRooms ? 'INNER JOIN tblRoom r on r.ID = b.RoomID' : '');
         $db       = $this->loadAPlusDatabase();
         $query    = "

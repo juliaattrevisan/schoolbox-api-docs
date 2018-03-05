@@ -43,6 +43,10 @@ class External_Doublefirst_Class implements External_ClassInterface
      */
     public function getStudents($subCode)
     {
+        if (!$subCode) {
+            /* Dont bother if you got no code */
+            return false;
+        }
 
         $year = date("Y");
 
@@ -103,6 +107,11 @@ class External_Doublefirst_Class implements External_ClassInterface
      */
     public function getTeacherName($subCode, $user = null)
     {
+        if (!$subCode) {
+            /* Dont bother if you got no code */
+            return false;
+        }
+
         $year = date("Y");
 
         $classQuery = $this->getClassCodeQuery($subCode);

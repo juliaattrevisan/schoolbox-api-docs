@@ -49,6 +49,11 @@ class External_Schooledge_Class extends External_Humanedge_Class implements Exte
      */
     public function getStudents($classCode)
     {
+        if (!$classCode) {
+            /* Dont bother if you got no code */
+            return false;
+        }
+
         $classQuery = $this->getClassCodeQuery($classCode);
 
         // 1st part: blocked classes
@@ -109,6 +114,11 @@ class External_Schooledge_Class extends External_Humanedge_Class implements Exte
      */
     public function getTeacherName($classCode)
     {
+        if (!$classCode) {
+            /* Dont bother if you got no code */
+            return false;
+        }
+
         $classQuery = $this->getClassCodeQuery($classCode);
         $teachers = [];
 
