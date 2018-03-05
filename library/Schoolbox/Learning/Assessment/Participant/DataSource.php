@@ -468,8 +468,19 @@ class DataSource
 
 
             foreach ($planModel->getParticipants() as $participantModel) {
+                // Is this student already participating?
+                // Don't load them if they are already, otherwise remove
+                // from existing participation.
+                $user                = $participantModel->getUser();
+                $existingParticipant = $assessable->getParticipantIfExtant($user);
+                if ($existingParticipant) {
+                    if ($existingParticipant->getUpdatedAt()->gt($participantModel->getUpdatedAt())) {
+                        continue;
+                    }
+                    $assessable->unsetUserParticipation($user);
+                }
+
                 // Create a Participant Domain object
-                $user                                          = $participantModel->getUser();
                 $participantObject                             = new ParticipantObject($user, $planObject);
                 $planObject->getParticipants()[$user->getId()] = $participantObject;
 
