@@ -15,7 +15,7 @@
                 {# raw HTML reluctantly sanctioned - this should be passed to template as raw, then json_encode|raw #}
                 cache: {{ treedata | raw }},
                 ajaxParams: {
-                    url: '{{ routeLookup('resourceBrowser' ~ '.listNodes') }}?mime=none',
+                    url: '{{ routeLookup('course' ~ '.listNodes') }}?mime=none',
                     token: '{folderId}'
                 }
             }

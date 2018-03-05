@@ -101,5 +101,13 @@ class TreeBuilder extends AbstractTreeBuilder
         return $folder->getCoverImage();
     }
 
-
+    /**
+     * Class specific filter for which folders appear in the tree
+     *
+     * @param IFolder $folder
+     * @return bool
+     */
+    protected function filterFolder(IFolder $folder) {
+        return true;
+    }
 }

@@ -35,11 +35,12 @@ use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
-use Schoolbox\Resource\Browser\Resources\TreeBuilder;
+use Schoolbox\Assessment\Course\CourseTreeBuilder;
 use Schoolbox\Resource\Folder\Ancestry;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Folder\Controller as FolderController;
+use Schoolbox\Resource\Folder\ILocator;
 use Schoolbox\Resource\HomepageConfigMapper;
 use Schoolbox\Resource\HomepageTemplate;
 use Schoolbox\Resource\HomepageTemplateMapper;
@@ -1001,7 +1002,7 @@ class Controller extends Base\Base
             $folderId = $this->getCourseSpecificationMapper()->getFacultyRootFolder()->getId();
         }
 
-        $treeBuilder = new TreeBuilder(
+        $treeBuilder = new CourseTreeBuilder(
             FolderMapper::getInstance(),
             $_SESSION['user'],
             'Courses'
@@ -1544,5 +1545,32 @@ class Controller extends Base\Base
     {
         $this->curriculumNodeMapper = $curriculumNodeMapper;
         return $this;
+    }
+
+    /**
+     * @api GET /course/:folderId/nodes
+     * @level 155
+     *
+     * @param int $folderId
+     */
+    public function listNodes($folderId)
+    {
+        $mime = $this->getRequest()->query["mime"];
+
+        if (empty($mime)) {
+            $mime = "*/*";
+        }
+
+        $treeBuilder = new CourseTreeBuilder(
+            FolderMapper::getInstance(),
+            $_SESSION['user'],
+            'Courses'
+        );
+
+
+        $this->getResponse()->content->set([
+            'format' => 'json',
+            'data'   => $treeBuilder->buildChildNodes($folderId, [], $mime)
+        ]);
     }
 }

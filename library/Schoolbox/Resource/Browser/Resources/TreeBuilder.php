@@ -9,14 +9,11 @@
 
 namespace Schoolbox\Resource\Browser\Resources;
 
-use Schoolbox\Assessment\Course\Unit\DeprecatedMapper as UnitMapper;
 use Schoolbox\Collection;
-use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource;
 use Schoolbox\Resource\Browser\AbstractTreeBuilder;
-use Schoolbox\Resource\File;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\IFolder;
 use Schoolbox\User;
@@ -222,4 +219,13 @@ class TreeBuilder extends AbstractTreeBuilder
         }
     }
 
+    /**
+    * Class specific filter for which folders appear in the tree
+    *
+    * @param IFolder $folder
+    * @return bool
+    */
+    protected function filterFolder(IFolder $folder) {
+        return true;
+    }
 }
