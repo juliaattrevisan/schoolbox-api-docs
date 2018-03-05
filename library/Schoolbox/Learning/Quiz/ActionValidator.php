@@ -10,6 +10,7 @@ namespace Schoolbox\Learning\Quiz;
 
 use Schoolbox\Permission\Access\Access;
 use Alaress_Date_Format;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 use Schoolbox\Learning\Assessment\Quiz;
 
@@ -50,11 +51,13 @@ class ActionValidator
      *
      * @param User       $user
      * @param Quiz\Model $quiz
+     * @param bool       $restrictStudentSubmissions Are parents restricted from viewing student submissions?
      * @return bool
      */
-    public function canSeeQuiz(User $user, Quiz\Model $quiz): bool
+    public function canSeeQuiz(User $user, Quiz\Model $quiz, bool $restrictStudentSubmissions): bool
     {
-        $isInstructor = $this->accessHelper->isInstructor($user, $quiz->getContext()->getFolder());
+        $folder       = $quiz->getBaseContext()->getFolder();
+        $isInstructor = $this->accessHelper->isInstructor($user, $folder);
         $isStaff      = $user->getRole()->isStaff();
 
         // Instructors/Staff can always view the assessment (regardless of whether they can interact with it)
@@ -71,6 +74,24 @@ class ActionValidator
             }
             // Non-excluded Learners can only see assessment after publishing
             return $this->now->gte($participant->getPublishDate());
+        }
+
+        // Am I a parent?
+        // I can see the quiz if:
+        // * I have access to its folder
+        // * I'm not blocked by config.restrict_student_submissions
+        // * one of my kids is a participant
+        if (!$restrictStudentSubmissions
+            && $this->accessHelper->getFolderAccess($user, $folder->getId()) >= UserAccess::ACCESS_READ
+        ) {
+            foreach ($quiz->getAllParticipants() as $participant) {
+                if ($participant->isExcluded() || $this->now->lt($participant->getPublishDate())) {
+                    continue;
+                }
+                if ($this->now->gte($participant->getPublishDate()) && $user->isParentOf($participant->getUser())) {
+                    return true;
+                }
+            }
         }
 
         // Not an instructor/staff, and no participation record.
@@ -120,6 +141,74 @@ class ActionValidator
 
         // Only instructors can review, and reviewee cannot be excluded.
         return $isInstructor && $isParticipant;
+    }
+
+
+    /**
+     * Can `$user` see attempts made by `$student` on `$quiz`?
+     *
+     * This covers only whether `$user` can see that attempts exist; it doesn't
+     * cover whether they can view the attempt itself.
+     * (@see `canReviewAttemptsReadonly` for that)
+     *
+     * @param User       $user
+     * @param User       $student
+     * @param Quiz\Model $quiz
+     * @param bool       $restrictStudentSubmissions Are parents restricted from viewing student submissions?
+     * @return bool
+     */
+    public function canSeeAttempts(User $user, User $student, Quiz\Model $quiz, bool $restrictStudentSubmissions): bool
+    {
+        // Is student even participating?
+        $folder      = $quiz->getBaseContext()->getFolder();
+        $participant = $quiz->getParticipantIfExtant($student);
+        if (!$participant || $participant->isExcluded()) {
+            return false;
+        }
+
+        // Instructors can see attempts, as long as student is participating
+        if ($this->accessHelper->isInstructor($user, $folder)) {
+            return true;
+        }
+
+        // Anyone else:
+        // Can't see participation if it's not published yet
+        if ($this->now->lt($participant->getPublishDate())) {
+            return false;
+        }
+
+        // Student may view their own attempts
+        if ($user->getId() === $student->getId()) {
+            return true;
+        }
+
+        // Parent of student may view participation
+        // (as long as config.restrict_student_submissions is off)
+        return !$restrictStudentSubmissions
+            && $user->isParentOf($student)
+            && $this->accessHelper->getFolderAccess($user, $folder->getId()) >= UserAccess::ACCESS_READ;
+    }
+
+
+    /**
+     * Can `$user` read-only review an attempt made by `$student` on `$quiz`?
+     *
+     * @param User       $user
+     * @param User       $student
+     * @param Quiz\Model $quiz
+     * @param bool       $restrictStudentSubmissions Are parents restricted from viewing student submissions?
+     * @return bool
+     */
+    public function canReviewAttemptsReadonly(
+        User $user,
+        User $student,
+        Quiz\Model $quiz,
+        bool $restrictStudentSubmissions
+    ): bool
+    {
+        return
+            $quiz->isFeedbackVisibleToUser($user)
+            && $this->canSeeAttempts($user, $student, $quiz, $restrictStudentSubmissions);
     }
 
 

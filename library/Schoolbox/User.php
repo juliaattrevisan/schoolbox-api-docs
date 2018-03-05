@@ -142,7 +142,7 @@ class User implements JsonSerializable, ISoftDeletable
     protected $subject_collection;
 
     /** @var Collection */
-    protected $parent_collection;
+    protected $parents;
 
     /** @var Collection|UserAccess[] */
     protected $accessList;
@@ -215,6 +215,7 @@ class User implements JsonSerializable, ISoftDeletable
         $this->setLinkedUser(new Collection(array()));
         $this->setRole(new Role());
         $this->children = new GenericCollection(self::class);
+        $this->parents  = new GenericCollection(self::class);
     }
 
     /**
@@ -1066,7 +1067,6 @@ class User implements JsonSerializable, ISoftDeletable
      */
     public function loadParents()
     {
-        $this->parent_collection = new Collection();
         $DEPRECATED_EXTERNAL_USER = new \External_User();
         $allParents               = $DEPRECATED_EXTERNAL_USER->getStudentContactList($this->externalId);
 
@@ -1077,7 +1077,7 @@ class User implements JsonSerializable, ISoftDeletable
                 if (!empty($currentParent['StudentContactID'])) {
                     try {
                         $parent = UserMapper::getInstance()->findByExternalId($currentParent['StudentContactID'], Role::PARENT);
-                        $this->parent_collection->add($parent);
+                        $this->parents->add($parent);
                     } catch (Mapper\Exception $e ) {
                         //noop
                     }
@@ -1088,7 +1088,7 @@ class User implements JsonSerializable, ISoftDeletable
 
                     try {
                         $spouse = UserMapper::getInstance()->findByExternalId($currentParent['StudentContactSpouseID'], Role::PARENT);
-                        $this->parent_collection->add($spouse);
+                        $this->parents->add($spouse);
                     } catch (Mapper\Exception $e ) {
                         //noop
                     }
@@ -1105,7 +1105,7 @@ class User implements JsonSerializable, ISoftDeletable
      */
     public function getParents()
     {
-        return $this->parent_collection;
+        return $this->parents;
     }
 
     /**

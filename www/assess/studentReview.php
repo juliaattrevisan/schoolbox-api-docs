@@ -14,7 +14,9 @@
  */
 
 use Schoolbox\Error;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
+use Schoolbox\Learning\Quiz\ActionValidator;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
@@ -30,32 +32,34 @@ $groupHandler    = new Group;
 /**
  * @var SitePage $this
  * @var AssessmentDataSource $assessmentDataSource
+ * @var IConfigLoader        $config
  */
 $assessmentDataSource = $this->getDi()->get('assessmentDataSource');
-
-if (!is_numeric($this->arg[0])) {
+$config               = $this->getDi()->get('config');
+[$quizId, $sectionId, $attemptId] = $this->arg;
+if (!is_numeric($quizId)) {
     error(112);
 }
 
-if (!is_numeric($this->arg[1])) {
+if (!is_numeric($sectionId)) {
     error(115);
 }
 
-if (!is_numeric($this->arg[2])) {
+if (!is_numeric($attemptId)) {
     error(128);
 }
 
-$assess  = $assessHandler->getByID($this->arg[0]);
-$section = $sectionHandler->getByID($this->arg[1]);
+$assess  = $assessHandler->getByID($quizId);
+$section = $sectionHandler->getByID($sectionId);
 // getListByAssessAndAttempt gets a rowset for some reason!
-$attemptList = $attemptHandler->getListByAssessAndAttempt($this->arg[0], $this->arg[2]);
+$attemptList = $attemptHandler->getListByAssessAndAttempt($quizId, $attemptId);
 $attempt     = array_pop($attemptList);
 
-if (!$assessHandler->isValidUrlAccess($this->arg[0])) {
+if (!$assessHandler->isValidUrlAccess($quizId)) {
     $this->pageNotFound();
 }
 
-if ($assessHandler->isDeleted($this->arg[0])) {
+if ($assessHandler->isDeleted($quizId)) {
     error(112);
 }
 
@@ -63,7 +67,13 @@ if (!$section) {
     error(115);
 }
 
-/* Check the folder exists meaningfully
+if (!$attempt) {
+    error(128);
+} else {
+    $attempt['totalAvailableMarks'] = $attemptHandler->getTotalMarks($quizId, $attemptId);
+}
+
+/* Check the folder and user exists meaningfully
  */
 try {
     $folder = Folder\Mapper::getInstance()->findById($assess['category_id']);
@@ -72,48 +82,30 @@ catch (Mapper\Exception $e) {
     error(Error\Mapper::ERROR_SELECT_QUIZ_GROUP);
 }
 
-if (!$attempt) {
-    error(128);
-} else {
-    $attempt['totalAvailableMarks'] = $attemptHandler->getTotalMarks($this->arg[0], $this->arg[2]);
+try {
+    $userMapper = \Schoolbox\UserMapper::getInstance();
+    $user       = $userMapper->findById($attempt['user_id']);
+} catch (Schoolbox\Mapper\Exception $e) {
+    error(19);
+    exit;
 }
 
-/* Check access rights:
- * Allow owner of attempt to review
- * Allow staff access
- * Allow parent of child access
- */
-if (!$attemptHandler->isOwner($this->arg[2])
-    && !$groupHandler->isStaff()
-    && !($groupHandler->isParentOfChild($attempt['user_id']) && !Config::get('restrict_parent_duework_access'))
-) {
-    error(129);
+/** @var \Schoolbox\User $sessionUser */
+$sessionUser = $_SESSION['user'];
+$assessment  = $assessmentDataSource->findByQuizId($assess['assess_id'], $sessionUser);
+
+// Check access rights
+// Rules are the same as seeing an attempt
+$actionValidator = new ActionValidator(Alaress_Date_Format::now(), Access::getInstance());
+if (!$actionValidator->canReviewAttemptsReadonly(
+    $sessionUser,
+    $user,
+    $assessment,
+    $config->get('restrict_student_submissions')
+)) {
+    $this->pageNotFound();
 }
 
-/* Check visibility
- */
-$quizVisibility = new \Assess\Visibility();
-$quizVisibility->setId($assess['mark_visibility']);
-
-/* Mostly do nothing
- */
-if ($quizVisibility->isStaff() && $groupHandler->isStaff()) {
-    // noop
-} elseif ($quizVisibility->isStaffStudent() && ($groupHandler->isStaff() || $groupHandler->isStudent())) {
-    // noop
-} elseif ($quizVisibility->isStaffStudentParent()) {
-    // noop
-} else {
-    error(129);
-}
-
-/* Find out which attempt was made
- */
-if (is_numeric($this->arg[2])) {
-    $attemptId = $this->arg[2];
-} else {
-    error(114);
-}
 
 /* Set up template
  */
@@ -129,28 +121,9 @@ $this->setBlock(TEMPLATE_content, 'nextSection', 'nextSection_block');
 $this->setBlock(TEMPLATE_content, 'prevSection', 'prevSection_block');
 $this->setTitle('Assessment: ' . Scrub::text($assess['title']));
 
-try {
-    $folder = Schoolbox\Resource\Folder\Mapper::getInstance()->findById($assess['category_id']);
-} catch (Schoolbox\Mapper\Exception $e) {
-    error(112);
-    exit;
-}
-
-try {
-    $userMapper = \Schoolbox\UserMapper::getInstance();
-    $user       = $userMapper->findById($attempt['user_id']);
-} catch (Schoolbox\Mapper\Exception $e) {
-    error(19);
-    exit;
-}
-
 /* Show current Section's data, and other mandatory tokens needed to complete
  * the Assessment.
  */
-
-/** @var \Schoolbox\User $sessionUser */
-$sessionUser = $_SESSION['user'];
-$assessment = $assessmentDataSource->findByQuizId($assess['assess_id'], $sessionUser);
 
 // Does session user have a participation? If so, use CAP details.
 $participant = $assessment->getParticipantIfExtant($sessionUser);
@@ -265,8 +238,8 @@ if ($allQuestions) {
 
 /* Render Previous, Next and Finish buttons where appropriate
  */
-$nextSection = $sectionHandler->getAfter($this->arg[0], $section['sequence']);
-$prevSection = $sectionHandler->getBefore($this->arg[0], $section['sequence']);
+$nextSection = $sectionHandler->getAfter($quizId, $section['sequence']);
+$prevSection = $sectionHandler->getBefore($quizId, $section['sequence']);
 
 /* If there is no next section and no previous section, this was a one-section
  * assessment and should only have the Finish button
