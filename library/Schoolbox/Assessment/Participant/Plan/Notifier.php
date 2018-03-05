@@ -594,7 +594,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 // Only diff if both times exist.
                 // New time doesn't exist? participant no longer has a time, so don't notify yet (consider later)
                 // Old time doesn't exist? this is new participation, so user will have been notified earlier
-                [$oldStamp, $newStamp] = $diff['participants'][$participant->getUser()->getId()]['dueDate'];
+                [$newStamp, $oldStamp] = $diff['participants'][$participant->getUser()->getId()]['dueDate'];
                 if ($oldStamp && $newStamp) {
                     $oldDate = strtotime($oldStamp);
                     $newDate = strtotime($newStamp);
