@@ -37,10 +37,16 @@ use Schoolbox\Mapper\Exception;
  */
 function getConnectorId(string $className)
 {
-    $connectorConfig = Calendar_Api_Config_Mapper::getInstance()->findOneForClass($className);
-    if (Calendar_Api_Config_Record::ACTIVE !== $connectorConfig->getStatus()) {
-        throw new UnexpectedValueException("Calendar connector is not configured as active: $className");
+    try {
+        $connectorConfig = Calendar_Api_Config_Mapper::getInstance()->findOneForClass($className);
+        if (Calendar_Api_Config_Record::ACTIVE !== $connectorConfig->getStatus()) {
+            throw new UnexpectedValueException("Calendar connector is not configured as active: $className");
+        }
     }
+    catch (\Schoolbox\Mapper\Exception $e) {
+        throw new UnexpectedValueException("Calendar connector configuration record is missing: $className");
+    }
+
     return $connectorConfig->getId();
 }
 
