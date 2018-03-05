@@ -254,7 +254,7 @@ class Controller extends Base
                 AssessmentFilters\TemporalState\Definition::KEY_CLOSED,
             ]
         ];
-        $assessments = $this->findByFiltersWithParticipants($filters, $viewee);
+        $assessments = $this->findByFiltersWithParticipants($filters, $viewee, false);
         $markbook    = new Markbook($assessments, $this->defaultGradeGroup, $this->getUser());
 
         // Load conversation history (this also implicitly loads folder's teachers)
@@ -328,8 +328,6 @@ class Controller extends Base
             ]
         ]);
 
-        $assessments = $this->findByFiltersWithParticipants($filters, $viewee);
-
         // Show the graph for:
         // * instructors (always)
         // * students (if the config var is on, and their personal grade average setting is on)
@@ -338,13 +336,16 @@ class Controller extends Base
             || ($viewee->getDisplayGradeGraph() && $this->getConfigLoader()
                                                         ->get('display_grade_graph'));
 
+        // Need to load other participants if we can see graph to get assessment mark statistics
+        $assessments = $this->findByFiltersWithParticipants($filters, $viewee, $canSeeGraph);
+
         // Only show the "send to showcase" trophy button to teachers and students, not parents
         $canSeeShowcaseButton = $this->getUser()->getRole()->isStaff() || $this->getUser()->getRole()->isStudent();
 
         // Let markbook calculate the statistics
         $filteredMarkbook = (new Markbook($assessments, $this->defaultGradeGroup, $this->getUser()))->sortAssessables();
 
-        $graph = $this->buildGraph($canSeeGraph, $filteredMarkbook, $viewee);
+        $graph = $canSeeGraph ? $this->buildGraph($filteredMarkbook, $viewee) : [];
 
         $longitudinalRubric = $this->getLongitudinalRubricData($assessments, $viewee);
 
@@ -388,7 +389,6 @@ class Controller extends Base
     /**
      * Builds an array of data used by twig to render the assessment box-and-whiskers graph
      *
-     * @param bool     $canSeeGraph
      * @param Markbook $markbook
      * @param User     $viewee
      * @return mixed[][] $graph
@@ -397,12 +397,8 @@ class Controller extends Base
      * @var string     $graph ['data']         json encoded
      * @var string     $graph ['scatter']      json encoded
      */
-    private function buildGraph($canSeeGraph, Markbook $markbook, User $viewee)
+    private function buildGraph(Markbook $markbook, User $viewee): array
     {
-        if(!$canSeeGraph) {
-            return [];
-        }
-
         // Get the data for the graph
         $graphInfo        = [];
         $graphAssessments = [];
@@ -516,6 +512,7 @@ class Controller extends Base
     /**
      * @param array $filters
      * @param User  $viewee
+     * @param bool  $loadOtherParticipantInteractions
      * @return GenericCollection|IAssessable[]|static
      * @throws DomainException If MarkType is invalid for the assessment, or user has interaction but not participant record
      * @throws InvalidArgumentException If assessment class not registered
@@ -523,13 +520,14 @@ class Controller extends Base
      * @throws DefinitionException If unable to locate a specified mapper join
      * @throws UnexpectedValueException If unable to merge student collections
      */
-    private function findByFiltersWithParticipants(array $filters, User $viewee)
+    private function findByFiltersWithParticipants(array $filters, User $viewee, bool $loadOtherParticipantInteractions)
     {
         $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters);
 
         // Fetch assessments & participants
+        $user        = $loadOtherParticipantInteractions ? null : $viewee;
         $assessments = $this->assessmentMapperProxy->findAllByIds($assessmentIds);
-        $assessments = $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessments, $viewee)
+        $assessments = $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessments, $user)
                                                    ->filter(function (IAssessable $a) use ($viewee) {
                                                        return $a->isParticipant($viewee);
                                                    });
