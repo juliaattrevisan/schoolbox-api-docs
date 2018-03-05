@@ -266,15 +266,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     {
         $assessment = $this->retrieveAssessmentDomainModel($plan);
         $envelope   = new Envelope();
-        if ($assessment instanceof DueWork) {
-            $topicSuffix = "open";
-        } elseif ($assessment instanceof Quiz) {
-            $topicSuffix = "upcoming";
-        }  else {
-            return $envelope;
-        }
-
-        $topicStub = $this->retrieveAssessmentTopicStub($assessment);
+        $topicStub  = $this->retrieveAssessmentTopicStub($assessment);
         if (!$topicStub) {
             return $envelope;
         }
@@ -282,28 +274,46 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             return $envelope;
         }
 
-        $boxType = $assessment->getTypeName();
-
-        // Build generic builder
-        $bob = $this->buildGenericBuilder($assessment)
-                    ->setTitle("$boxType :assessment opened in :cat")
-                    ->addTopic("$topicStub.$topicSuffix")
-                    ->setSeverity(Logger::NOTICE);
-
         // Customise and send to every participant in this plan only
         foreach ($this->retrieveParticipantsFromPlan($plan, $assessment) as $participant) {
             if (!$this->isParticipantNotifiable($participant, self::TRIGGER_OPEN)) {
                 continue;
             }
-
-            // build for student
-            $bob = $this->targetBuilderToStudent($bob, $assessment, $participant)
-                        ->setBody($participant->getDescription())
-                        ->setByline("Due {$participant->getDueDate()->getCalendarDateTime()}");
-            $envelope->targetToUser($participant->getUser(), $bob->build());
+            $this->internalNotifyOpen($envelope, $participant, $topicStub);
         }
 
         return $envelope;
+    }
+
+
+    /**
+     * Internal method for building open assessment message.
+     *
+     * @param Envelope    $envelope
+     * @param Participant $participant
+     * @param string      $topicStub
+     */
+    private function internalNotifyOpen(Envelope $envelope, Participant $participant, string $topicStub): void
+    {
+        // Get assessment and build
+        $assessment = $participant->getAssessable();
+        $boxType    = $assessment->getTypeName();
+        if ($assessment instanceof DueWork) {
+            $topicSuffix = "open";
+        } elseif ($assessment instanceof Quiz) {
+            $topicSuffix = "upcoming";
+        } else {
+            return;
+        }
+
+        $bob = $this->buildGenericBuilder($assessment)
+                    ->setTitle("$boxType :assessment opened in :cat")
+                    ->addTopic("$topicStub.$topicSuffix")
+                    ->setSeverity(Logger::NOTICE);
+        $bob = $this->targetBuilderToStudent($bob, $assessment, $participant)
+                    ->setBody($participant->getDescription())
+                    ->setByline("Due {$participant->getDueDate()->getCalendarDateTime()}");
+        $envelope->targetToUser($participant->getUser(), $bob->build());
     }
 
 
@@ -571,7 +581,6 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 [, $oldName] = $diff['assessment']['title'];
 
                 // Students
-                // TODO iterate particiapnts and students separately?
                 $bob = $this->targetBuilderToStudent($bob, $assessment, $participant)
                             ->setTitle("$boxType was renamed from :oldname to :assessment in :cat")
                             ->setParam('oldname', new Param($oldName))
@@ -587,6 +596,19 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
                 $notificationRaisedForParticipant = true;
                 $bob->unsetParam('oldname');
+            }
+
+            // include/exclude change:
+            // When participant is included, trigger notifyOpen
+            if (!empty($diff['participants'][$participant->getUser()->getId()]['excluded'])) {
+                [$isExcluded, ] = $diff['participants'][$participant->getUser()->getId()]['excluded'];
+                if (!$isExcluded) {
+                    // Same as notifyOpen
+                    if ($this->isParticipantNotifiable($participant, self::TRIGGER_OPEN)) {
+                        $this->internalNotifyOpen($envelope, $participant, $topicStub);
+                        $notificationRaisedForParticipant = true;
+                    }
+                }
             }
 
             // due date change
