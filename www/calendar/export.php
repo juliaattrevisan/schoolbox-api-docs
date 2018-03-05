@@ -18,7 +18,6 @@ use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Calendar\Event\Collection\Exporter;
 use Calendar\Event\Collection\CSVExporter;
 use EOTC\ConfigMapper as EOTCConfigMapper;
-use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\UserMapper;
