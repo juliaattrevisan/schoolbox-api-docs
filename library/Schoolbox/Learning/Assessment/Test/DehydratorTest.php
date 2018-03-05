@@ -500,43 +500,58 @@ class DehydratorTest extends TestCase
             $customPlan
         );
 
-        // Only care about plans here
+        // Only care about plans, but verify all participants are in all plans
+        $participantList = [
+            $participantA->getUser()->getId() => [
+                'description' => $participantA->getDescription(),
+                'publishDate' => $participantA->getPublishDate()->getDatabase(),
+                'openDate'    => $participantA->getOpenDate()->getDatabase(),
+                'dueDate'     => $participantA->getDueDate()->getDatabase(),
+                'closeDate'   => $participantA->getCloseDate()->getDatabase(),
+                'excluded'    => $participantA->isExcluded(),
+                'user'          => [
+                    'id'        => $participantA->getUser()->getId(),
+                    'title'     => $participantA->getUser()->getTitle(),
+                    'firstname' => $participantA->getUser()->getFirstname(),
+                    'lastname'  => $participantA->getUser()->getLastname(),
+                ],
+            ],
+            $participantB->getUser()->getId() => [
+                'description' => $participantB->getDescription(),
+                'publishDate' => $participantB->getPublishDate()->getDatabase(),
+                'openDate'    => $participantB->getOpenDate()->getDatabase(),
+                'dueDate'     => $participantB->getDueDate()->getDatabase(),
+                'closeDate'   => $participantB->getCloseDate()->getDatabase(),
+                'excluded'    => $participantB->isExcluded(),
+                'user'          => [
+                    'id'        => $participantB->getUser()->getId(),
+                    'title'     => $participantB->getUser()->getTitle(),
+                    'firstname' => $participantB->getUser()->getFirstname(),
+                    'lastname'  => $participantB->getUser()->getLastname(),
+                ],
+            ],
+            $participantC->getUser()->getId() => [
+                'description' => $participantC->getDescription(),
+                'publishDate' => $participantC->getPublishDate()->getDatabase(),
+                'openDate'    => $participantC->getOpenDate()->getDatabase(),
+                'dueDate'     => $participantC->getDueDate()->getDatabase(),
+                'closeDate'   => $participantC->getCloseDate()->getDatabase(),
+                'excluded'    => $participantC->isExcluded(),
+                'user'          => [
+                    'id'        => $participantC->getUser()->getId(),
+                    'title'     => $participantC->getUser()->getTitle(),
+                    'firstname' => $participantC->getUser()->getFirstname(),
+                    'lastname'  => $participantC->getUser()->getLastname(),
+                ],
+            ],
+        ];
         $expected = [
             1 => [
                 'id'           => $dynamicPlan->getId(),
                 'name'         => $dynamicPlan->getName(),
                 'dynamic'      => $dynamicPlan->getIsDynamic(),
-                'participants' => [
-                    $participantA->getUser()->getId() => [
-                        'description' => $participantA->getDescription(),
-                        'publishDate' => $participantA->getPublishDate()->getDatabase(),
-                        'openDate'    => $participantA->getOpenDate()->getDatabase(),
-                        'dueDate'     => $participantA->getDueDate()->getDatabase(),
-                        'closeDate'   => $participantA->getCloseDate()->getDatabase(),
-                        'excluded'    => $participantA->isExcluded(),
-                        'user'          => [
-                            'id'        => $participantA->getUser()->getId(),
-                            'title'     => $participantA->getUser()->getTitle(),
-                            'firstname' => $participantA->getUser()->getFirstname(),
-                            'lastname'  => $participantA->getUser()->getLastname(),
-                        ],
-                    ],
-                    $participantB->getUser()->getId() => [
-                        'description' => $participantB->getDescription(),
-                        'publishDate' => $participantB->getPublishDate()->getDatabase(),
-                        'openDate'    => $participantB->getOpenDate()->getDatabase(),
-                        'dueDate'     => $participantB->getDueDate()->getDatabase(),
-                        'closeDate'   => $participantB->getCloseDate()->getDatabase(),
-                        'excluded'    => $participantB->isExcluded(),
-                        'user'          => [
-                            'id'        => $participantB->getUser()->getId(),
-                            'title'     => $participantB->getUser()->getTitle(),
-                            'firstname' => $participantB->getUser()->getFirstname(),
-                            'lastname'  => $participantB->getUser()->getLastname(),
-                        ],
-                    ],
-                ],
-                'assessment' => [
+                'participants' => $participantList,
+                'assessment'   => [
                     'id'                => $dueWork->getId(),
                     'type'              => $dueWork->getFamilyName(),
                     'title'             => $dueWork->getTitle(),
@@ -551,23 +566,8 @@ class DehydratorTest extends TestCase
                 'id'           => $customPlan->getId(),
                 'name'         => $customPlan->getName(),
                 'dynamic'      => $customPlan->getIsDynamic(),
-                'participants' => [
-                    $participantC->getUser()->getId() => [
-                        'description' => $participantC->getDescription(),
-                        'publishDate' => $participantC->getPublishDate()->getDatabase(),
-                        'openDate'    => $participantC->getOpenDate()->getDatabase(),
-                        'dueDate'     => $participantC->getDueDate()->getDatabase(),
-                        'closeDate'   => $participantC->getCloseDate()->getDatabase(),
-                        'excluded'    => $participantC->isExcluded(),
-                        'user'          => [
-                            'id'        => $participantC->getUser()->getId(),
-                            'title'     => $participantC->getUser()->getTitle(),
-                            'firstname' => $participantC->getUser()->getFirstname(),
-                            'lastname'  => $participantC->getUser()->getLastname(),
-                        ],
-                    ],
-                ],
-                'assessment' => [
+                'participants' => $participantList,
+                'assessment'   => [
                     'id'                => $dueWork->getId(),
                     'type'              => $dueWork->getFamilyName(),
                     'title'             => $dueWork->getTitle(),
