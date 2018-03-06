@@ -105,10 +105,13 @@ Usage: upload.php -v[vv] --dry-run|--perform [--retry-failed] [--max-attempts=3]
 HELP;
     exit;
 }
-
-/** @noinspection PhpUnusedParameterInspection */
-$kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $options) {
-
+/** @noinspection PhpUnhandledExceptionInspection */
+$kernel->run(function (Di\Container $di,
+    /** @noinspection PhpUnusedParameterInspection */
+    LoopInterface $loop,
+    LoggerInterface $log,
+    array $options
+) {
     $dryRun      = $options['dryRun'];
     $retryFailed = $options['retryFailed'];
     $batchSize   = $options['batchSize'];
@@ -148,7 +151,9 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $l
         ? new GuzzleHttp\Client()
         : new UnreliableClient($failureRate, new Random\FloatGenerator());
 
-    $connector = $dryRun ? new Kami\MockConnector($client) : new Kami\Connector($config, $client);
+    $connector = $dryRun
+        ? new Kami\MockConnector($client)
+        : new Kami\Connector($client, $config->get('kami_api_key'), $config->get('site_school_code'));
 
     if(!$connector->isEnabled()) {
         $log->warning('Kami has not been enabled by puppet for this instance. Aborting');

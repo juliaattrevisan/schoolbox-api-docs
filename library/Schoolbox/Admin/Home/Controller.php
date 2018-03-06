@@ -16,10 +16,23 @@ use Schoolbox\Config\ConfigMapper;
 use Proxy\Server as ProxyServer;
 use Healthcheck;
 use Schoolbox\Learning\InlineGrader\Kami;
-use GuzzleHttp;
 
 class Controller extends Base
 {
+
+    /** @var Kami\IConnector */
+    private $kamiConnector;
+
+
+    /**
+     * @param Kami\IConnector $kamiConnector
+     */
+    public function __construct(Kami\IConnector $kamiConnector)
+    {
+        $this->kamiConnector = $kamiConnector;
+    }
+
+
     /**
      * Display admin settings homepage
      */
@@ -204,8 +217,6 @@ class Controller extends Base
             }
         }
 
-        $kamiConnector = new Kami\Connector($this->getConfigLoader(), new GuzzleHttp\Client());
-
         // Get the navigation
 
         // Render this thing out
@@ -235,8 +246,8 @@ class Controller extends Base
                     'www_light' => $www_light,
                     'www_status' => $www_status,
                     'logs' => $logs,
-                    'kamiEnabled' => $kamiConnector->isEnabled(),
-                    'kamiOnline' => $kamiConnector->isOnline(),
+                    'kamiEnabled' => $this->kamiConnector->isEnabled(),
+                    'kamiOnline' => $this->kamiConnector->isOnline(),
 
                 ),
             )

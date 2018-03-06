@@ -169,6 +169,7 @@ mysql --defaults-extra-file=/root/.my.cnf schoolbox < /vagrant/data/schoolbox.sq
 mysql --defaults-extra-file=/root/.my.cnf schoolbox -e "UPDATE config SET value='$external_db' WHERE name='external_type'";
 mysql --defaults-extra-file=/root/.my.cnf schoolbox -e "UPDATE config SET value='$external_db_host' WHERE name='external_db_host'";
 mysql --defaults-extra-file=/root/.my.cnf schoolbox -e "UPDATE config SET value='$external_db_db' WHERE name='external_db_db'";
+mysql --defaults-extra-file=/root/.my.cnf schoolbox -e "UPDATE config SET value='vagrant' WHERE name='site_school_code'";
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Creating Schoolbox conf file";
 cp -f /vagrant/www/conf/tarball.conf.php /vagrant/www/conf/conf.php;

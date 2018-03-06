@@ -71,6 +71,7 @@ class ResponseFile
      * @throws \LogicException If attempting to update the status of a kami doc that is not processing.
      * @throws \PDOException If something went wrong when saving the kami document's status
      * @throws \UnexpectedValueException If unexpected status change is reported from Kami API
+     * @throws Kami\Exception\EmptySiteSchoolCode
      */
     public function produce(SubmissionFile $file, User $user): array
     {
@@ -169,6 +170,7 @@ class ResponseFile
      * @throws \LogicException If attempting to update the status of a kami doc that is not processing.
      * @throws \PDOException If something went wrong when saving the kami document's status
      * @throws \UnexpectedValueException If unexpected status change is reported from Kami API
+     * @throws Kami\Exception\EmptySiteSchoolCode
      */
     private function getKamiViewSession(SubmissionFile $file, User $user): ?Kami\Session
     {

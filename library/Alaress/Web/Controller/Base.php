@@ -20,6 +20,7 @@ use Alaress\Session\Session;
 use Alaress\Authorizer\Authorizer;
 use Schoolbox\IConfigLoader;
 use Schoolbox\User;
+use Raven_Client;
 
 abstract class Base {
     /**
@@ -54,6 +55,13 @@ abstract class Base {
 
     /** @var IExceptionGenerator */
     private $eg;
+
+    /**
+     * Null if the SB instance is not configured to use Sentry, or if unable to instantiate Sentry.
+     *
+     * @var null|Raven_Client
+     */
+    private $sentry;
 
     /** @var bool */
     private $allowBackToTheFuture = true;
@@ -436,4 +444,35 @@ abstract class Base {
         $this->eg = $eg;
     }
 
+
+    /**
+     * @param null|Raven_Client $sentry
+     */
+    public function setSentry(?Raven_Client $sentry)
+    {
+        $this->sentry = $sentry;
+    }
+
+
+    /**
+     * Send exception off to whoever may be listening so we can fix it.
+     *
+     * Returns whether exception was able to be reported.
+     *
+     * Method signature is intentionally vague to abstract away exception reporting implementation
+     * in the event we want to switch it out in the future.
+     *
+     * @param \Exception $e    The exception you wish to report
+     * @param array|null $data Any extra data you wish to include in report
+     * @return bool
+     */
+    protected function captureException(\Exception $e, array $data = null): bool
+    {
+        // Not installed?
+        if (!$this->sentry instanceof Raven_Client) {
+            return false;
+        }
+        $this->sentry->captureException($e, $data);
+        return true;
+    }
 }

@@ -1,0 +1,24 @@
+{#
+    Informs user why we are unable to display expected Kami iFrame.
+
+    Data:
+        data.reason      string
+        data.resolution  null|string
+        data.date        null|AlaressDateFormat
+#}
+<div class="row">
+    <div class="small-12 columns">
+        <div class="empty-state">
+            <i class="icon-info"></i>
+            <h2>Sorry, we are unable to display this Kami document</h2>
+
+            <p>Processing failed for the following reason: {{ data.reason }}</p>
+
+            {% if data.resolution %}<p>{{ data.resolution }}</p>{% endif %}
+
+            {% if data.date and not data.date.isNull %}
+                <p><br>Issue occurred at {{ data.date.long }}, further information has been logged.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
