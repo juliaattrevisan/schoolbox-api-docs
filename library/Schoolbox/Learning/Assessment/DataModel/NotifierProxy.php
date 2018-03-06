@@ -89,7 +89,7 @@ class NotifierProxy
     public function dehydrate(?IAssessable $assessment): array
     {
         return $assessment && $assessment->getId()
-            ? $this->dehydrator->dehydrateAssessmentIntoPlans($assessment)
+            ? $this->dehydrator->dehydrateAssessmentIntoParticipants($assessment)
             : [];
     }
 
@@ -111,7 +111,7 @@ class NotifierProxy
         } else {
             $action = empty($before) ? PlanMapper::METHOD_CREATE : PlanMapper::METHOD_UPDATE;
         }
-        $after  = $this->dehydrate($assessment);
+        $diff = $this->differ->diff($this->dehydrate($assessment), $before);
 
         // Now, trigger notifiers
         // Participant object has little idea of whether assessment was created or updated,
@@ -120,9 +120,6 @@ class NotifierProxy
         $assessmentModel = $this->assessmentDataSource->translateToDataModel($assessment);
 
         foreach ($assessment->getPlans() as $plan) {
-            $beforePlan = $before[$plan->getId()] ?? [];
-            $afterPlan  = $after[$plan->getId()]  ?? [];
-
             // Finagle together a plan model with the minimum amount of info I
             // can get away with
             // TODO consider a translation layer
@@ -148,7 +145,7 @@ class NotifierProxy
                 $action,
                 $planModel,
                 $this->planMapper,
-                $this->differ->diff($afterPlan, $beforePlan)
+                $diff
             );
         }
     }
