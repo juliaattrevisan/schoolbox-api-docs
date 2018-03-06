@@ -48,7 +48,7 @@ function getConnector(string $className)
 try {
     $token = $_GET['token'];
     $export_type = $_GET['export'];
-    $api = null;
+    $api = new Calendar_Api_Composite();
     $filename = 'calendar';
     $resourceId = $_GET['resource_id'];
     $resourceCategoryId = $_GET['resource_category_id'];
