@@ -56,14 +56,14 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     private const TRIGGER_CLOSED   = 'closed';
 
     /**
-     * Days in advance to inform a user that due work is upcoming.
+     * Hours in advance to inform a user that due work is upcoming.
      *
      * TODO make this configurable
      */
     private const DUEWORK_UPCOMING_WINDOW = 2;
 
     /**
-     * *Hours* in advance to inform a user that quiz is upcoming.
+     * Hours in advance to inform a user that quiz is upcoming.
      *
      * TODO make this configurable separately from DUEWORK_UPCOMING_WINDOW
      */
@@ -188,7 +188,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                     if ($assessment->getQuiz()) {
                         $upcomingDate = (clone $dueDate)->addHours(-self::QUIZ_UPCOMING_WINDOW);
                     } elseif ($assessment->getDueWork()) {
-                        $upcomingDate = (clone $dueDate)->addDays(-self::DUEWORK_UPCOMING_WINDOW);
+                        $upcomingDate = (clone $dueDate)->addHours(-self::DUEWORK_UPCOMING_WINDOW);
                     }
                     // if the upcoming date is before the open date, push upcoming to 1 minute after open,
                     // rounded to the nearest 5 minutes?
