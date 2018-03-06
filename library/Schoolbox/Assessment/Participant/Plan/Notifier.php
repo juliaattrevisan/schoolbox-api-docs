@@ -581,10 +581,12 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 [, $oldName] = $diff['assessment']['title'];
 
                 // Students
-                $bob = $this->targetBuilderToStudent($bob, $assessment, $participant)
-                            ->setTitle("$boxType was renamed from :oldname to :assessment in :cat")
-                            ->setParam('oldname', new Param($oldName))
-                            ->setTopics(["$topicStub.renamed"]);
+                // Topic depends on type of assessment
+                $suffix = $assessment instanceof Quiz ? 'updated' : 'renamed';
+                $bob    = $this->targetBuilderToStudent($bob, $assessment, $participant)
+                               ->setTitle("$boxType was renamed from :oldname to :assessment in :cat")
+                               ->setParam('oldname', new Param($oldName))
+                               ->setTopics(["$topicStub.$suffix"]);
                 $envelope->targetToUser($participant->getUser(), $bob->build());
 
                 // Parents
@@ -628,10 +630,12 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                     }
 
                     // Students
-                    $bob = $this->targetBuilderToStudent($bob, $assessment, $participant)
-                                ->setTitle("$boxType :assessment closing date was $verb to :date in :cat")
-                                ->setParam('date', new Param($dateformat))
-                                ->setTopics(["$topicStub.datechanged"]);
+                    // Topic depends on type of assessment
+                    $suffix = $assessment instanceof Quiz ? 'updated' : 'datechanged';
+                    $bob    = $this->targetBuilderToStudent($bob, $assessment, $participant)
+                                   ->setTitle("$boxType :assessment closing date was $verb to :date in :cat")
+                                   ->setParam('date', new Param($dateformat))
+                                   ->setTopics(["$topicStub.$suffix"]);
                     $envelope->targetToUser($participant->getUser(), $bob->build());
 
                     // Parents
