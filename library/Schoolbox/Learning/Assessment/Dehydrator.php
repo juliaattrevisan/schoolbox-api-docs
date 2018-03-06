@@ -110,6 +110,31 @@ class Dehydrator
 
 
     /**
+     * Dehydrates assessment into a set of participants.
+     *
+     * @todo add tests
+     *
+     * @param IAssessable $assessment
+     * @return array
+     */
+    public function dehydrateAssessmentIntoParticipants(IAssessable $assessment): array
+    {
+        $dehydrated = [];
+        $dehydrated['assessment'] = $this->internalDehydrateAssessment($assessment);
+        foreach ($assessment->getPlans() as $plan) {
+            $dehydratedPlan = $this->internalDehydratePlan($plan);
+            foreach ($plan->getParticipants() as $participant) {
+                $dehydratedParticipant         = $this->internalDehydrateParticipant($participant);
+                $dehydratedParticipant['user'] = $this->internalDehydrateUser($participant->getUser());
+                $dehydratedParticipant['plan'] = $dehydratedPlan;
+                $dehydrated['participants'][$participant->getUser()->getId()] = $dehydratedParticipant;
+            }
+        }
+        return $dehydrated;
+    }
+
+
+    /**
      * Helper for dehydrating an assessment.
      *
      * @param IAssessable $assessment
