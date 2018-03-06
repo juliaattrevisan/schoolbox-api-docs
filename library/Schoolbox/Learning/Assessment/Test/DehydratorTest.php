@@ -456,131 +456,79 @@ class DehydratorTest extends TestCase
      */
     public function testDehydrateAssessmentIntoPlans(): void
     {
-        $dueWork = (new DueWork())
-            ->setDescription('This is a description of a test due work')
-            ->setPublishAt(new \Alaress_Date_Format('2018-01-01 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setOpenAt(new \Alaress_Date_Format('2018-01-02 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setDueAt(new \Alaress_Date_Format('2018-01-03 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setCloseAt(new \Alaress_Date_Format('2018-01-04 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT));
-
-        $dynamicPlan = $this->linker->createAndLinkPlan($dueWork, true)
-                                    ->setId(1)
-                                    ->setName('Dynamic Plan');
-        $participantA = $this->linker->createAndLinkParticipant(
-            (new User())
-                ->setId(1)
-                ->setFirstname('Aaron')
-                ->setLastname('Aaronson'),
-            $dynamicPlan
-        );
-
-        // Boot out Barry
-        $participantB = $this->linker->createAndLinkParticipant(
-            (new User())
-                ->setId(2)
-                ->setFirstname('Barry')
-                ->setLastname('Barryson'),
-            $dynamicPlan
-        );
-        $participantB->setExcludedAt(\Alaress_Date_Format::now());
-
-        $customPlan = $this->linker->createAndLinkPlan($dueWork, false)
-                                   ->setId(2)
-                                   ->setName('Custom Plan')
-                                   ->setDescription('This is a custom description')
-                                   ->setPublishDate(new \Alaress_Date_Format('2018-02-01 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
-                                   ->setOpenDate(new \Alaress_Date_Format('2018-02-02 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
-                                   ->setDueDate(new \Alaress_Date_Format('2018-02-03 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
-                                   ->setCloseDate(new \Alaress_Date_Format('2018-02-04 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT));
-        $participantC = $this->linker->createAndLinkParticipant(
-            (new User())
-                ->setId(3)
-                ->setFirstname('Custom')
-                ->setLastname('Customson'),
-            $customPlan
-        );
-
-        // Only care about plans, but verify all participants are in all plans
-        $participantList = [
-            $participantA->getUser()->getId() => [
-                'description' => $participantA->getDescription(),
-                'publishDate' => $participantA->getPublishDate()->getDatabase(),
-                'openDate'    => $participantA->getOpenDate()->getDatabase(),
-                'dueDate'     => $participantA->getDueDate()->getDatabase(),
-                'closeDate'   => $participantA->getCloseDate()->getDatabase(),
-                'excluded'    => $participantA->isExcluded(),
-                'user'          => [
-                    'id'        => $participantA->getUser()->getId(),
-                    'title'     => $participantA->getUser()->getTitle(),
-                    'firstname' => $participantA->getUser()->getFirstname(),
-                    'lastname'  => $participantA->getUser()->getLastname(),
+        $assessment = $this->getTestAssessment();
+        $expectedAssessment = [
+            'id'                => 1,
+            'type'              => 'dueWork',
+            'title'             => 'Test Due Work',
+            'weight'            => 0,
+            'markVisibility'    => DueWork::MARK_VISIBILITY_PARENT_STUDENT,
+            'workType'          => null,
+            'acceptOnline'      => DueWork::ACCEPT_ONLINE_MULTI,
+            'selfReviewability' => SubmissionBox::SELF_REVIEWABILITY_NONE,
+        ];
+        $expectedParticipants = [
+            1 => [
+                'description' => 'This is a description of a test due work',
+                'publishDate' => '2018-01-01 00:00:00',
+                'openDate'    => '2018-01-02 00:00:00',
+                'dueDate'     => '2018-01-03 00:00:00',
+                'closeDate'   => '2018-01-04 00:00:00',
+                'excluded'    => false,
+                'user'        => [
+                    'id'        => 1,
+                    'title'     => '',
+                    'firstname' => 'Aaron',
+                    'lastname'  => 'Aaronson',
                 ],
             ],
-            $participantB->getUser()->getId() => [
-                'description' => $participantB->getDescription(),
-                'publishDate' => $participantB->getPublishDate()->getDatabase(),
-                'openDate'    => $participantB->getOpenDate()->getDatabase(),
-                'dueDate'     => $participantB->getDueDate()->getDatabase(),
-                'closeDate'   => $participantB->getCloseDate()->getDatabase(),
-                'excluded'    => $participantB->isExcluded(),
-                'user'          => [
-                    'id'        => $participantB->getUser()->getId(),
-                    'title'     => $participantB->getUser()->getTitle(),
-                    'firstname' => $participantB->getUser()->getFirstname(),
-                    'lastname'  => $participantB->getUser()->getLastname(),
+            2 => [
+                'description' => 'This is a description of a test due work',
+                'publishDate' => '2018-01-01 00:00:00',
+                'openDate'    => '2018-01-02 00:00:00',
+                'dueDate'     => '2018-01-03 00:00:00',
+                'closeDate'   => '2018-01-04 00:00:00',
+                'excluded'    => true,
+                'user'        => [
+                    'id'        => 2,
+                    'title'     => '',
+                    'firstname' => 'Barry',
+                    'lastname'  => 'Barryson',
                 ],
             ],
-            $participantC->getUser()->getId() => [
-                'description' => $participantC->getDescription(),
-                'publishDate' => $participantC->getPublishDate()->getDatabase(),
-                'openDate'    => $participantC->getOpenDate()->getDatabase(),
-                'dueDate'     => $participantC->getDueDate()->getDatabase(),
-                'closeDate'   => $participantC->getCloseDate()->getDatabase(),
-                'excluded'    => $participantC->isExcluded(),
-                'user'          => [
-                    'id'        => $participantC->getUser()->getId(),
-                    'title'     => $participantC->getUser()->getTitle(),
-                    'firstname' => $participantC->getUser()->getFirstname(),
-                    'lastname'  => $participantC->getUser()->getLastname(),
+            3 => [
+                'description' => 'This is a custom description',
+                'publishDate' => '2018-02-01 00:00:00',
+                'openDate'    => '2018-02-02 00:00:00',
+                'dueDate'     => '2018-02-03 00:00:00',
+                'closeDate'   => '2018-02-04 00:00:00',
+                'excluded'    => false,
+                'user'        => [
+                    'id'        => 3,
+                    'title'     => '',
+                    'firstname' => 'Custom',
+                    'lastname'  => 'Customson',
                 ],
             ],
         ];
         $expected = [
             1 => [
-                'id'           => $dynamicPlan->getId(),
-                'name'         => $dynamicPlan->getName(),
-                'dynamic'      => $dynamicPlan->getIsDynamic(),
-                'participants' => $participantList,
-                'assessment'   => [
-                    'id'                => $dueWork->getId(),
-                    'type'              => $dueWork->getFamilyName(),
-                    'title'             => $dueWork->getTitle(),
-                    'weight'            => $dueWork->getWeight(),
-                    'markVisibility'    => $dueWork->getMarkVisibility(),
-                    'workType'          => null,
-                    'acceptOnline'      => $dueWork->getAcceptOnline(),
-                    'selfReviewability' => $dueWork->getSelfReviewability(),
-                ],
+                'id'           => 1,
+                'name'         => 'Dynamic Plan',
+                'dynamic'      => true,
+                'participants' => $expectedParticipants,
+                'assessment'   => $expectedAssessment,
             ],
             2 => [
-                'id'           => $customPlan->getId(),
-                'name'         => $customPlan->getName(),
-                'dynamic'      => $customPlan->getIsDynamic(),
-                'participants' => $participantList,
-                'assessment'   => [
-                    'id'                => $dueWork->getId(),
-                    'type'              => $dueWork->getFamilyName(),
-                    'title'             => $dueWork->getTitle(),
-                    'weight'            => $dueWork->getWeight(),
-                    'markVisibility'    => $dueWork->getMarkVisibility(),
-                    'workType'          => null,
-                    'acceptOnline'      => $dueWork->getAcceptOnline(),
-                    'selfReviewability' => $dueWork->getSelfReviewability(),
-                ],
-            ]
+                'id'           => 2,
+                'name'         => 'Custom Plan',
+                'dynamic'      => false,
+                'participants' => $expectedParticipants,
+                'assessment'   => $expectedAssessment,
+            ],
         ];
 
-        $this->assertEquals($expected, $this->dehydrator->dehydrateAssessmentIntoPlans($dueWork));
+        $this->assertEquals($expected, $this->dehydrator->dehydrateAssessmentIntoPlans($assessment));
     }
 
 
@@ -619,7 +567,7 @@ class DehydratorTest extends TestCase
                 'closeDate'   => '2018-01-04 00:00:00',
                 'excluded'    => false,
                 'plan'        => $expectedDynamicPlan,
-                'user'          => [
+                'user'        => [
                     'id'        => 1,
                     'title'     => '',
                     'firstname' => 'Aaron',
@@ -634,7 +582,7 @@ class DehydratorTest extends TestCase
                 'closeDate'   => '2018-01-04 00:00:00',
                 'excluded'    => true,
                 'plan'        => $expectedDynamicPlan,
-                'user'          => [
+                'user'        => [
                     'id'        => 2,
                     'title'     => '',
                     'firstname' => 'Barry',
@@ -649,7 +597,7 @@ class DehydratorTest extends TestCase
                 'closeDate'   => '2018-02-04 00:00:00',
                 'excluded'    => false,
                 'plan'        => $expectedCustomPlan,
-                'user'          => [
+                'user'        => [
                     'id'        => 3,
                     'title'     => '',
                     'firstname' => 'Custom',
