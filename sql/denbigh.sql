@@ -1,23 +1,27 @@
-/*
-SQLyog Ultimate v12.11 (64 bit)
-MySQL - 5.5.37-0ubuntu0.12.04.1 : Database - denbigh
-*********************************************************************
-*/
+-- MySQL dump 10.16  Distrib 10.1.31-MariaDB, for debian-linux-gnu (x86_64)
+--
+-- Host: localhost    Database: denbigh
+-- ------------------------------------------------------
+-- Server version	10.1.31-MariaDB-1~trusty
 
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
 /*!40101 SET NAMES utf8 */;
-
-/*!40101 SET SQL_MODE=''*/;
-
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
-CREATE DATABASE /*!32312 IF NOT EXISTS*/`denbigh` /*!40100 DEFAULT CHARACTER SET latin1 */;
 
-/*Table structure for table `Addresses` */
+--
+-- Table structure for table `Addresses`
+--
 
 DROP TABLE IF EXISTS `Addresses`;
-
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `Addresses` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `addressType` varchar(255) CHARACTER SET latin1 DEFAULT NULL,
@@ -33,53 +37,69 @@ CREATE TABLE `Addresses` (
   PRIMARY KEY (`id`),
   KEY `familyDenbighID` (`familyDenbighID`),
   CONSTRAINT `Addresses_ibfk_1` FOREIGN KEY (`familyDenbighID`) REFERENCES `Family` (`familyDenbighID`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=1969 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
-/*Table structure for table `Classes` */
+--
+-- Table structure for table `Classes`
+--
 
 DROP TABLE IF EXISTS `Classes`;
-
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `Classes` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `courseCode` varchar(16) CHARACTER SET latin1 NOT NULL,
+  `courseCode` varchar(32) CHARACTER SET latin1 NOT NULL,
   `staffCode` varchar(16) CHARACTER SET latin1 DEFAULT NULL,
-  `classCode` varchar(16) CHARACTER SET latin1 NOT NULL,
+  `classCode` varchar(32) CHARACTER SET latin1 NOT NULL,
   PRIMARY KEY (`id`),
   KEY `courseCode` (`courseCode`,`staffCode`,`classCode`),
   KEY `courseCode_2` (`courseCode`),
   KEY `staffCode` (`staffCode`),
   KEY `classCode` (`classCode`)
-) ENGINE=InnoDB AUTO_INCREMENT=2710 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
-/*Table structure for table `Courses` */
+--
+-- Table structure for table `Courses`
+--
 
 DROP TABLE IF EXISTS `Courses`;
-
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `Courses` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `courseCode` varchar(16) CHARACTER SET latin1 NOT NULL,
+  `courseCode` varchar(32) CHARACTER SET latin1 NOT NULL,
   `subjectName` varchar(255) CHARACTER SET latin1 NOT NULL,
   PRIMARY KEY (`id`),
   KEY `courseCode` (`courseCode`)
-) ENGINE=InnoDB AUTO_INCREMENT=2492 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
-/*Table structure for table `Enrolments` */
+--
+-- Table structure for table `Enrolments`
+--
 
 DROP TABLE IF EXISTS `Enrolments`;
-
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `Enrolments` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `classCode` varchar(16) CHARACTER SET latin1 NOT NULL,
+  `classCode` varchar(32) CHARACTER SET latin1 NOT NULL,
   `studentID` varchar(16) CHARACTER SET latin1 NOT NULL,
   PRIMARY KEY (`id`),
   KEY `classCode` (`classCode`,`studentID`),
   KEY `studentID` (`studentID`)
-) ENGINE=InnoDB AUTO_INCREMENT=44731 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
-/*Table structure for table `Family` */
+--
+-- Table structure for table `Family`
+--
 
 DROP TABLE IF EXISTS `Family`;
-
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `Family` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `familyDenbighID` varchar(16) CHARACTER SET latin1 NOT NULL,
@@ -95,29 +115,39 @@ CREATE TABLE `Family` (
   `EmergencyEmail2` text,
   PRIMARY KEY (`id`),
   KEY `familyDenbighID` (`familyDenbighID`)
-) ENGINE=InnoDB AUTO_INCREMENT=550 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
-/*Table structure for table `Houses` */
+--
+-- Table structure for table `Houses`
+--
 
 DROP TABLE IF EXISTS `Houses`;
-
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `Houses` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `house` varchar(128) CHARACTER SET latin1 DEFAULT NULL,
   `house_abbreviation` varchar(6) CHARACTER SET latin1 DEFAULT NULL,
   `housemaster_id` varchar(16) CHARACTER SET latin1 DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
-/*Table structure for table `Lessons` */
+--
+-- Table structure for table `Lessons`
+--
 
 DROP TABLE IF EXISTS `Lessons`;
-
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `Lessons` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `day` int(11) NOT NULL,
   `period` int(11) NOT NULL,
-  `classCode` varchar(16) CHARACTER SET latin1 DEFAULT NULL,
+  `startTime` time DEFAULT NULL,
+  `endTime` time DEFAULT NULL,
+  `classCode` varchar(32) CHARACTER SET latin1 DEFAULT NULL,
   `staffCode` varchar(16) CHARACTER SET latin1 DEFAULT NULL,
   `room` varchar(255) CHARACTER SET latin1 DEFAULT NULL,
   `staff_TT_Desc` varchar(255) CHARACTER SET latin1 DEFAULT NULL,
@@ -128,12 +158,16 @@ CREATE TABLE `Lessons` (
   KEY `classCode` (`classCode`,`staffCode`,`room`),
   KEY `staffCode` (`staffCode`),
   KEY `room` (`room`)
-) ENGINE=InnoDB AUTO_INCREMENT=6693 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
-/*Table structure for table `Parents` */
+--
+-- Table structure for table `Parents`
+--
 
 DROP TABLE IF EXISTS `Parents`;
-
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `Parents` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `peopleDenbighID` varchar(16) CHARACTER SET latin1 DEFAULT NULL,
@@ -146,12 +180,16 @@ CREATE TABLE `Parents` (
   PRIMARY KEY (`id`),
   KEY `familyDenbighID` (`familyDenbighID`),
   KEY `peopleDenbighID` (`peopleDenbighID`)
-) ENGINE=InnoDB AUTO_INCREMENT=1103 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
-/*Table structure for table `People` */
+--
+-- Table structure for table `People`
+--
 
 DROP TABLE IF EXISTS `People`;
-
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `People` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `denbighID` varchar(16) CHARACTER SET latin1 NOT NULL,
@@ -165,45 +203,83 @@ CREATE TABLE `People` (
   `email` varchar(255) CHARACTER SET latin1 DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `denbighID` (`denbighID`)
-) ENGINE=InnoDB AUTO_INCREMENT=1896 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
-/*Table structure for table `Rooms` */
+--
+-- Table structure for table `Rooms`
+--
 
 DROP TABLE IF EXISTS `Rooms`;
-
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `Rooms` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `room` varchar(255) CHARACTER SET latin1 NOT NULL,
   PRIMARY KEY (`id`),
   KEY `room` (`room`)
-) ENGINE=InnoDB AUTO_INCREMENT=102 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
-/*Table structure for table `Staff` */
+--
+-- Temporary table structure for view `Schoolbox_Students`
+--
+
+DROP TABLE IF EXISTS `Schoolbox_Students`;
+/*!50001 DROP VIEW IF EXISTS `Schoolbox_Students`*/;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
+/*!50001 CREATE TABLE `Schoolbox_Students` (
+  `surname` tinyint NOT NULL,
+  `firstname` tinyint NOT NULL,
+  `birthdate` tinyint NOT NULL,
+  `deltalinkID` tinyint NOT NULL,
+  `username` tinyint NOT NULL,
+  `cohort` tinyint NOT NULL,
+  `academicYear` tinyint NOT NULL,
+  `tutorGroup` tinyint NOT NULL,
+  `denbighID` tinyint NOT NULL,
+  `familyDenbighID` tinyint NOT NULL,
+  `boardingStatus` tinyint NOT NULL,
+  `email` tinyint NOT NULL,
+  `house` tinyint NOT NULL,
+  `cateringHouse` tinyint NOT NULL
+) ENGINE=MyISAM */;
+SET character_set_client = @saved_cs_client;
+
+--
+-- Table structure for table `Staff`
+--
 
 DROP TABLE IF EXISTS `Staff`;
-
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `Staff` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `peopleDenbighID` varchar(24) CHARACTER SET latin1 NOT NULL,
-  `staffCode` varchar(24) CHARACTER SET latin1 NOT NULL,
+  `peopleDenbighID` varchar(24) CHARACTER SET latin1 DEFAULT NULL,
+  `staffCode` varchar(24) CHARACTER SET latin1 DEFAULT NULL,
   `tutorGroup` varchar(32) CHARACTER SET latin1 DEFAULT NULL,
-  `campus` varchar(24) CHARACTER SET latin1 DEFAULT NULL,
-  `username` varchar(255) CHARACTER SET latin1 DEFAULT NULL,
+  `campus` varchar(24) DEFAULT NULL,
+  `username` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `peopleDenbighID` (`peopleDenbighID`),
   KEY `staffCode` (`staffCode`)
-) ENGINE=InnoDB AUTO_INCREMENT=126 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
-/*Table structure for table `Students` */
+--
+-- Table structure for table `Students`
+--
 
 DROP TABLE IF EXISTS `Students`;
-
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `Students` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `peopleDenbighID` varchar(16) CHARACTER SET latin1 DEFAULT NULL,
   `familyDenbighID` varchar(16) CHARACTER SET latin1 DEFAULT NULL,
   `academicYear` int(11) DEFAULT NULL,
-  `tutorGroup` varchar(16) CHARACTER SET latin1 DEFAULT NULL,
+  `tutorGroup` varchar(32) CHARACTER SET latin1 DEFAULT NULL,
   `house` varchar(255) CHARACTER SET latin1 DEFAULT NULL,
   `residentialHouse` varchar(255) CHARACTER SET latin1 DEFAULT NULL,
   `cohort` varchar(25) CHARACTER SET latin1 DEFAULT NULL,
@@ -215,40 +291,35 @@ CREATE TABLE `Students` (
   KEY `familyDenbighID` (`familyDenbighID`),
   CONSTRAINT `Students_ibfk_1` FOREIGN KEY (`peopleDenbighID`) REFERENCES `People` (`denbighID`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `Students_ibfk_2` FOREIGN KEY (`familyDenbighID`) REFERENCES `Family` (`familyDenbighID`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=779 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
-/*Table structure for table `Schoolbox_Students` */
+--
+-- Final view structure for view `Schoolbox_Students`
+--
 
-DROP TABLE IF EXISTS `Schoolbox_Students`;
-
-/*!50001 DROP VIEW IF EXISTS `Schoolbox_Students` */;
-/*!50001 DROP TABLE IF EXISTS `Schoolbox_Students` */;
-
-/*!50001 CREATE TABLE  `Schoolbox_Students`(
- `surname` varchar(255) ,
- `firstname` varchar(255) ,
- `birthdate` date ,
- `deltalinkID` varchar(16) ,
- `username` varchar(100) ,
- `cohort` varchar(25) ,
- `academicYear` int(11) ,
- `tutorGroup` varchar(16) ,
- `denbighID` varchar(16) ,
- `familyDenbighID` varchar(16) ,
- `boardingStatus` varchar(100) ,
- `email` varchar(255) ,
- `house` varchar(255) ,
- `cateringHouse` varchar(255) 
-)*/;
-
-/*View structure for view Schoolbox_Students */
-
-/*!50001 DROP TABLE IF EXISTS `Schoolbox_Students` */;
-/*!50001 DROP VIEW IF EXISTS `Schoolbox_Students` */;
-
-/*!50001 CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `Schoolbox_Students` AS select `People`.`surname` AS `surname`,`People`.`preferred_name` AS `firstname`,`People`.`dateOfBirth` AS `birthdate`,`People`.`deltalinkID` AS `deltalinkID`,`Students`.`loginIDforIT` AS `username`,`Students`.`cohort` AS `cohort`,`Students`.`academicYear` AS `academicYear`,`Students`.`tutorGroup` AS `tutorGroup`,`People`.`denbighID` AS `denbighID`,`Students`.`familyDenbighID` AS `familyDenbighID`,`Students`.`boardingStatus` AS `boardingStatus`,`People`.`email` AS `email`,`Students`.`house` AS `house`,`Students`.`cateringHouse` AS `cateringHouse` from (`People` join `Students`) where ((`Students`.`peopleDenbighID` = `People`.`denbighID`) and (`Students`.`loginIDforIT` is not null)) */;
+/*!50001 DROP TABLE IF EXISTS `Schoolbox_Students`*/;
+/*!50001 DROP VIEW IF EXISTS `Schoolbox_Students`*/;
+/*!50001 SET @saved_cs_client          = @@character_set_client */;
+/*!50001 SET @saved_cs_results         = @@character_set_results */;
+/*!50001 SET @saved_col_connection     = @@collation_connection */;
+/*!50001 SET character_set_client      = utf8 */;
+/*!50001 SET character_set_results     = utf8 */;
+/*!50001 SET collation_connection      = utf8_general_ci */;
+/*!50001 CREATE ALGORITHM=UNDEFINED */
+/*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
+/*!50001 VIEW `Schoolbox_Students` AS select `People`.`surname` AS `surname`,`People`.`preferred_name` AS `firstname`,`People`.`dateOfBirth` AS `birthdate`,`People`.`deltalinkID` AS `deltalinkID`,`Students`.`loginIDforIT` AS `username`,`Students`.`cohort` AS `cohort`,`Students`.`academicYear` AS `academicYear`,`Students`.`tutorGroup` AS `tutorGroup`,`People`.`denbighID` AS `denbighID`,`Students`.`familyDenbighID` AS `familyDenbighID`,`Students`.`boardingStatus` AS `boardingStatus`,`People`.`email` AS `email`,`Students`.`house` AS `house`,`Students`.`cateringHouse` AS `cateringHouse` from (`People` join `Students`) where (`Students`.`peopleDenbighID` = `People`.`denbighID`) */;
+/*!50001 SET character_set_client      = @saved_cs_client */;
+/*!50001 SET character_set_results     = @saved_cs_results */;
+/*!50001 SET collation_connection      = @saved_col_connection */;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2018-03-06 10:50:12
