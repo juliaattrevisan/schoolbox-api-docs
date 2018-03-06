@@ -87,6 +87,8 @@ $kernel->run(function ($di, $loop, $log, $opts) {
                 $pastoralUploadQueueMapper->save($file);
             } catch (PDOException $e) {
                 $log->alert("File '{$hash}' failed:".$e->getMessage());
+                $failed++;
+                continue;
             }
 
             // Upload file to DocMan
