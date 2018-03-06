@@ -93,8 +93,11 @@ class Dehydrator
         foreach ($assessment->getPlans() as $plan) {
             // Is this plan persisted yet?
             // Ignore it for the purpose of dehydration?
-            $dehydrated[$plan->getId()] = $this->dehydratePlan($plan);
-            $participants += $dehydrated[$plan->getId()]['participants'];
+            $planId              = $plan->getId();
+            $dehydrated[$planId] = $this->dehydratePlan($plan);
+            if (\is_array($dehydrated[$planId]['participants'])) {
+                $participants += $dehydrated[$planId]['participants'];
+            }
         }
 
         // Copy participants into each plan
