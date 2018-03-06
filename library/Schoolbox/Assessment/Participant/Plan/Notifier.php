@@ -536,13 +536,14 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 continue;
             }
 
-            // Track diff individually for each participant
-            $participantDiff = $diff;
+            // Most tests ara against the assessment diff
+            $assessmentDiff = $diff['assessment'] ?? [];
+
 
             // INCREASE in mark visibility (box can be closed in this instance)
             // doesn't actually create messages, just triggers for others to be created
-            if (isset($participantDiff['assessment']['markVisibility'])) {
-                [$new, $old] = $participantDiff['assessment']['markVisibility'];
+            if (isset($assessmentDiff['markVisibility'])) {
+                [$new, $old] = $assessmentDiff['markVisibility'];
                 if ($new > $old) {
 
                     // Trigger notification about this item
@@ -569,7 +570,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                     }
                 }
             }
-            unset($participantDiff['assessment']['markVisibility']);
+            unset($assessmentDiff['markVisibility']);
 
 
             // Due date is passed: trigger no more
@@ -579,8 +580,8 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
 
             // renamed
-            if (!empty($participantDiff['assessment']['title'])) {
-                [, $oldName] = $participantDiff['assessment']['title'];
+            if (!empty($assessmentDiff['title'])) {
+                [, $oldName] = $assessmentDiff['title'];
 
                 // Students
                 // Topic depends on type of assessment
@@ -600,14 +601,15 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
                 $bob->unsetParam('oldname');
             }
-            unset($participantDiff['assessment']['title']);
+            unset($assessmentDiff['title']);
 
 
             // Participation include/exclude or due date change:
             // When participant is included, trigger notifyOpen
             // Otherwise if due date changes, notify appropriately
-            if (!empty($participantDiff['participants'][$participant->getUser()->getId()]['excluded'])) {
-                [$isExcluded, ] = $participantDiff['participants'][$participant->getUser()->getId()]['excluded'];
+            $participantDiff = $diff['participants'][$participant->getUser()->getId()] ?? [];
+            if (!empty($participantDiff['excluded'])) {
+                [$isExcluded, ] = $participantDiff['excluded'];
                 if (!$isExcluded) {
                     // Same as notifyOpen
                     if ($this->isParticipantNotifiable($participant, self::TRIGGER_OPEN)) {
@@ -615,8 +617,8 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                     }
                 }
 
-            } elseif (!empty($participantDiff['participants'][$participant->getUser()->getId()]['dueDate'])) {
-                [$newStamp, $oldStamp] = $participantDiff['participants'][$participant->getUser()->getId()]['dueDate'];
+            } elseif (!empty($participantDiff['dueDate'])) {
+                [$newStamp, $oldStamp] = $participantDiff['dueDate'];
                 if ($newStamp) {
                     $oldDate = strtotime((string)$oldStamp);
                     $newDate = strtotime((string)$newStamp);
@@ -649,13 +651,10 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                     $bob->unsetParam('date');
                 }
             }
-            // Clear entire participation diff: it contains all participants,
-            // not just this user.
-            unset($participantDiff['participants']);
 
 
             // accept online
-            if ($assessment instanceof DueWork && !empty($participantDiff['assessment']['acceptOnline'])) {
+            if ($assessment instanceof DueWork && !empty($assessmentDiff['acceptOnline'])) {
                 // Students
                 $m = $assessment->isAcceptNone()
                     ? 'You no longer need to submit online for :assessment in :cat'
@@ -675,15 +674,12 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                     $envelope->targetToParent($participant->getUser(), $bob->build());
                 }
             }
-            unset($participantDiff['assessment']['acceptOnline']);
+            unset($assessmentDiff['acceptOnline']);
 
 
             // generic: only if there's something left in the diff.
             // Not sure if there's any point to this notif, but raise it anyway
-            if (empty($participantDiff['assessment'])) {
-                unset($participantDiff['assessment']);
-            }
-            if (!empty($participantDiff)) {
+            if (!empty($assessmentDiff)) {
                 // Students
                 $bob = $this->targetBuilderToStudent($bob, $assessment, $participant)
                             ->setTitle("$boxType :assessment was updated in :cat")
