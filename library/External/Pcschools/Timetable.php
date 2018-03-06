@@ -716,11 +716,4 @@ class External_Pcschools_Timetable implements External_TimetableInterface
 
         return $this;
     }
-
-    /**
-     * @param $timetable
-     */
-    private function filterSubstituteClasses($timetable) {
-
-    }
 }
