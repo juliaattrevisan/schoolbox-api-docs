@@ -58,9 +58,9 @@ class Mapper extends BaseMapper
                         {$this->getJoinMapper('storage')->getColumnString('s')},
 				        {$this->getJoinMapper('storage')->getJoinColumnString('allowedFileExtension', 'mime')}
             FROM        {$this->getTable()} 
-            LEFT JOIN   {$this->getJoinSql('pastoral', '', 'p')}
-			LEFT JOIN   {$this->getJoinSql('storage', '', 's')}
-			LEFT JOIN   {$this->getJoinMapper('storage')->getJoinSql('allowedFileExtension', 's', 'mime', true)}
+            INNER JOIN  {$this->getJoinSql('pastoral', '', 'p', true)}
+			INNER JOIN  {$this->getJoinSql('storage', '', 's')}
+			LEFT JOIN   {$this->getJoinMapper('storage')->getJoinSql('allowedFileExtension', 's', 'mime')}
         ";
     }
 

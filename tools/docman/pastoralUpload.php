@@ -82,7 +82,14 @@ $kernel->run(function ($di, $loop, $log, $opts) {
             // Mark file as processing so another daemon get started and try to duplicate processing
 
             $file->setStatus(PastoralUploadQueueMapper::UPLOAD_STATUS_PROCESSING);
-            $pastoralUploadQueueMapper->save($file);
+
+            try {
+                $pastoralUploadQueueMapper->save($file);
+            } catch (PDOException $e) {
+                $log->alert("File '{$hash}' failed:".$e->getMessage());
+                $failed++;
+                continue;
+            }
 
             // Upload file to DocMan
 
