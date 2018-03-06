@@ -99,7 +99,7 @@ try {
             break;
 
         case 'group':
-            $export_id = intval($_GET['group']);
+            $export_id = (int)$_GET['group'];
             if ($export_id <= 0) {
                 throw new SchoolboxException('A group ID must be provided', 400);
             }
@@ -112,7 +112,7 @@ try {
             break;
 
         case 'campus':
-            $export_id = intval($_GET['campus']);
+            $export_id = (int)$_GET['campus'];
             if ($export_id <= 0) {
                 throw new SchoolboxException('A campus ID must be provided', 400);
             }
