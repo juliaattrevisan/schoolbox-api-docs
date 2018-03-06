@@ -536,12 +536,13 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 continue;
             }
 
-            $notificationRaisedForParticipant = false;
+            // Track diff individually for each participant
+            $participantDiff = $diff;
 
             // INCREASE in mark visibility (box can be closed in this instance)
             // doesn't actually create messages, just triggers for others to be created
-            if (isset($diff['assessment']['markVisibility'])) {
-                [$new, $old] = $diff['assessment']['markVisibility'];
+            if (isset($participantDiff['assessment']['markVisibility'])) {
+                [$new, $old] = $participantDiff['assessment']['markVisibility'];
                 if ($new > $old) {
 
                     // Trigger notification about this item
@@ -564,11 +565,12 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                                 $feedbackMapper->findById($authoritativeFeedback->getId()),
                                 $feedbackMapper
                             );
-                            $notificationRaisedForParticipant = true;
                         }
                     }
                 }
             }
+            unset($participantDiff['assessment']['markVisibility']);
+
 
             // Due date is passed: trigger no more
             if ($participant->getDueDate()->isPast()) {
@@ -577,8 +579,8 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
 
             // renamed
-            if (!empty($diff['assessment']['title'])) {
-                [, $oldName] = $diff['assessment']['title'];
+            if (!empty($participantDiff['assessment']['title'])) {
+                [, $oldName] = $participantDiff['assessment']['title'];
 
                 // Students
                 // Topic depends on type of assessment
@@ -596,26 +598,25 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                     $envelope->targetToParent($participant->getUser(), $bob->build());
                 }
 
-                $notificationRaisedForParticipant = true;
                 $bob->unsetParam('oldname');
             }
+            unset($participantDiff['assessment']['title']);
 
-            // include/exclude change:
+
+            // Participation include/exclude or due date change:
             // When participant is included, trigger notifyOpen
-            if (!empty($diff['participants'][$participant->getUser()->getId()]['excluded'])) {
-                [$isExcluded, ] = $diff['participants'][$participant->getUser()->getId()]['excluded'];
+            // Otherwise if due date changes, notify appropriately
+            if (!empty($participantDiff['participants'][$participant->getUser()->getId()]['excluded'])) {
+                [$isExcluded, ] = $participantDiff['participants'][$participant->getUser()->getId()]['excluded'];
                 if (!$isExcluded) {
                     // Same as notifyOpen
                     if ($this->isParticipantNotifiable($participant, self::TRIGGER_OPEN)) {
                         $this->internalNotifyOpen($envelope, $participant, $topicStub);
-                        $notificationRaisedForParticipant = true;
                     }
                 }
-            }
 
-            // due date change
-            if (!empty($diff['participants'][$participant->getUser()->getId()]['dueDate'])) {
-                [$newStamp, $oldStamp] = $diff['participants'][$participant->getUser()->getId()]['dueDate'];
+            } elseif (!empty($participantDiff['participants'][$participant->getUser()->getId()]['dueDate'])) {
+                [$newStamp, $oldStamp] = $participantDiff['participants'][$participant->getUser()->getId()]['dueDate'];
                 if ($newStamp) {
                     $oldDate = strtotime((string)$oldStamp);
                     $newDate = strtotime((string)$newStamp);
@@ -645,13 +646,16 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                         $envelope->targetToParent($participant->getUser(), $bob->build());
                     }
 
-                    $notificationRaisedForParticipant = true;
                     $bob->unsetParam('date');
                 }
             }
+            // Clear entire participation diff: it contains all participants,
+            // not just this user.
+            unset($participantDiff['participants']);
+
 
             // accept online
-            if ($assessment instanceof DueWork && !empty($diff['assessment']['acceptOnline'])) {
+            if ($assessment instanceof DueWork && !empty($participantDiff['assessment']['acceptOnline'])) {
                 // Students
                 $m = $assessment->isAcceptNone()
                     ? 'You no longer need to submit online for :assessment in :cat'
@@ -670,13 +674,16 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                                 ->setTitle($m);
                     $envelope->targetToParent($participant->getUser(), $bob->build());
                 }
-
-                $notificationRaisedForParticipant = true;
             }
+            unset($participantDiff['assessment']['acceptOnline']);
 
-            // generic: only if no others raised
+
+            // generic: only if there's something left in the diff.
             // Not sure if there's any point to this notif, but raise it anyway
-            if (!$notificationRaisedForParticipant) {
+            if (empty($participantDiff['assessment'])) {
+                unset($participantDiff['assessment']);
+            }
+            if (!empty($participantDiff)) {
                 // Students
                 $bob = $this->targetBuilderToStudent($bob, $assessment, $participant)
                             ->setTitle("$boxType :assessment was updated in :cat")
