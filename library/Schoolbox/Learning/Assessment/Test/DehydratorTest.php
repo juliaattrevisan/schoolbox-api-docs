@@ -582,4 +582,145 @@ class DehydratorTest extends TestCase
 
         $this->assertEquals($expected, $this->dehydrator->dehydrateAssessmentIntoPlans($dueWork));
     }
+
+
+    /**
+     * Test dehydration of an assessment into participants
+     */
+    public function testDehydrateAssessmentIntoParticipants(): void
+    {
+        $assessment = $this->getTestAssessment();
+        $expectedAssessment = [
+            'id'                => 1,
+            'type'              => 'dueWork',
+            'title'             => 'Test Due Work',
+            'weight'            => 0,
+            'markVisibility'    => DueWork::MARK_VISIBILITY_PARENT_STUDENT,
+            'workType'          => null,
+            'acceptOnline'      => DueWork::ACCEPT_ONLINE_MULTI,
+            'selfReviewability' => SubmissionBox::SELF_REVIEWABILITY_NONE,
+        ];
+        $expectedDynamicPlan = [
+            'id'           => 1,
+            'name'         => 'Dynamic Plan',
+            'dynamic'      => true,
+        ];
+        $expectedCustomPlan = [
+            'id'           => 2,
+            'name'         => 'Custom Plan',
+            'dynamic'      => false,
+        ];
+        $expectedParticipants = [
+            1 => [
+                'description' => 'This is a description of a test due work',
+                'publishDate' => '2018-01-01 00:00:00',
+                'openDate'    => '2018-01-02 00:00:00',
+                'dueDate'     => '2018-01-03 00:00:00',
+                'closeDate'   => '2018-01-04 00:00:00',
+                'excluded'    => false,
+                'plan'        => $expectedDynamicPlan,
+                'user'          => [
+                    'id'        => 1,
+                    'title'     => '',
+                    'firstname' => 'Aaron',
+                    'lastname'  => 'Aaronson',
+                ],
+            ],
+            2 => [
+                'description' => 'This is a description of a test due work',
+                'publishDate' => '2018-01-01 00:00:00',
+                'openDate'    => '2018-01-02 00:00:00',
+                'dueDate'     => '2018-01-03 00:00:00',
+                'closeDate'   => '2018-01-04 00:00:00',
+                'excluded'    => true,
+                'plan'        => $expectedDynamicPlan,
+                'user'          => [
+                    'id'        => 2,
+                    'title'     => '',
+                    'firstname' => 'Barry',
+                    'lastname'  => 'Barryson',
+                ],
+            ],
+            3 => [
+                'description' => 'This is a custom description',
+                'publishDate' => '2018-02-01 00:00:00',
+                'openDate'    => '2018-02-02 00:00:00',
+                'dueDate'     => '2018-02-03 00:00:00',
+                'closeDate'   => '2018-02-04 00:00:00',
+                'excluded'    => false,
+                'plan'        => $expectedCustomPlan,
+                'user'          => [
+                    'id'        => 3,
+                    'title'     => '',
+                    'firstname' => 'Custom',
+                    'lastname'  => 'Customson',
+                ],
+            ],
+        ];
+        $expected = [
+            'participants' => $expectedParticipants,
+            'assessment'   => $expectedAssessment,
+        ];
+
+        $this->assertEquals($expected, $this->dehydrator->dehydrateAssessmentIntoParticipants($assessment));
+    }
+
+
+    /**
+     * Get an assessment for testing participant and plan dehydration
+     *
+     * @return DueWork
+     */
+    private function getTestAssessment(): DueWork
+    {
+        $dueWork = (new DueWork())
+            ->setId(1)
+            ->setAcceptsMultiple()
+            ->setSelfReviewability(SubmissionBox::SELF_REVIEWABILITY_NONE)
+            ->setMarkVisibility(DueWork::MARK_VISIBILITY_PARENT_STUDENT)
+            ->setTitle('Test Due Work')
+            ->setDescription('This is a description of a test due work')
+            ->setPublishAt(new \Alaress_Date_Format('2018-01-01 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setOpenAt(new \Alaress_Date_Format('2018-01-02 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setDueAt(new \Alaress_Date_Format('2018-01-03 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setCloseAt(new \Alaress_Date_Format('2018-01-04 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT));
+
+        $dynamicPlan = $this->linker->createAndLinkPlan($dueWork, true)
+                                    ->setId(1)
+                                    ->setName('Dynamic Plan');
+        $this->linker->createAndLinkParticipant(
+            (new User())
+                ->setId(1)
+                ->setFirstname('Aaron')
+                ->setLastname('Aaronson'),
+            $dynamicPlan
+        );
+
+        // Boot out Barry
+        $participantB = $this->linker->createAndLinkParticipant(
+            (new User())
+                ->setId(2)
+                ->setFirstname('Barry')
+                ->setLastname('Barryson'),
+            $dynamicPlan
+        );
+        $participantB->setExcludedAt(\Alaress_Date_Format::now());
+
+        $customPlan = $this->linker->createAndLinkPlan($dueWork, false)
+                                   ->setId(2)
+                                   ->setName('Custom Plan')
+                                   ->setDescription('This is a custom description')
+                                   ->setPublishDate(new \Alaress_Date_Format('2018-02-01 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
+                                   ->setOpenDate(new \Alaress_Date_Format('2018-02-02 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
+                                   ->setDueDate(new \Alaress_Date_Format('2018-02-03 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
+                                   ->setCloseDate(new \Alaress_Date_Format('2018-02-04 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT));
+        $this->linker->createAndLinkParticipant(
+            (new User())
+                ->setId(3)
+                ->setFirstname('Custom')
+                ->setLastname('Customson'),
+            $customPlan
+        );
+        return $dueWork;
+    }
 }
