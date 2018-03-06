@@ -160,7 +160,7 @@ Data:
                                 ? routeLookupIfAuthorized('learningDueWorkResponse.getKamiView', {
                                 kamiId:       currentFile.kami.id,
                                 assessment:   assessment,
-                                participant:  participant,
+                                student:      participant.user,
                                 feedback:     currentFeedback,
                                 })
                                 : null
@@ -183,7 +183,7 @@ Data:
                             ? routeLookupIfAuthorized('learningDueWorkResponse.getKamiExport', {
                             kamiId:       currentFile.kami.id,
                             assessment:   assessment,
-                            participant:  participant,
+                            student:      participant.user,
                             feedback:     currentFeedback,
                             })
                             : null
