@@ -133,7 +133,7 @@ class Mapper extends BaseMapper
 
     /** Delete corresponding pastoral uploads
     */
-    private function postDelete(Model $object) {
+    public function postDelete(Model $object) {
 
         $uploadMapper = PastoralUploadQueueMapper::getInstance();
         $uploadMapper->deleteByColumnList(['pastoral_id' => $object->getPastoral()->getId(), 'hash' => $object->getHash()]);
