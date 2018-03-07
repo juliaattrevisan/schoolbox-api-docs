@@ -500,6 +500,32 @@ class Mapper extends BaseMapper implements FeedableMapperInterface
 
 
     /**
+     * Closes any attempts in $quiz that have expired.
+     *
+     * @param Model                $quiz
+     * @param \Alaress_Date_Format $now
+     * @throws BaseMapper\Exception
+     */
+    public function closeExpiredAttempts(Model $quiz, \Alaress_Date_Format $now): void
+    {
+        if ($quiz->isDurationUnlimited()) {
+            return;
+        }
+        $duration = $quiz->getDuration();
+        foreach ($quiz->getAttempts() as $attempt) {
+            if (!$attempt->isFinished()) {
+                // Has it passed its duration?
+                $expiry = (clone $attempt->getStart())->addSeconds($duration);
+                if ($expiry->lt($now)) {
+                    $attempt->setFinish($expiry);
+                    $this->getJoinMapper('attempt')->save($attempt);
+                }
+            }
+        }
+    }
+
+
+    /**
      * Loads sections and their questions into this quiz.
      *
      * @param Model $quiz

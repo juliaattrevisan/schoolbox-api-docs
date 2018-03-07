@@ -224,9 +224,13 @@ class Controller extends Assessment\Controller
             }
         }
 
+        // Close expired attempts as well
+        $now = Alaress_Date_Format::now();
+        $this->quizMapper->closeExpiredAttempts($quiz, $now);
+
         // Can I attempt this?
         // TODO this should eventually be route permission based
-        $actionValidator = new ActionValidator(Alaress_Date_Format::now(), $this->getAccess());
+        $actionValidator = new ActionValidator($now, $this->getAccess());
 
         $twigData = [
             'breadcrumbs'       => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([ $assessment->getTitle(), '' ]),
