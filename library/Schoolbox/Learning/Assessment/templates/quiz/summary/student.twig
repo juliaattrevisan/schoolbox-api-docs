@@ -84,6 +84,9 @@
 
 {# If I'm here I can view attempts #}
 {% if quiz.attempts | length %}
+
+    {% set deleteRoute = routeLookupIfAuthorized('learningQuiz.postAttemptDelete') %}
+
     <div class="row">
         <div class="small-12 columns">
             <h2 class="subheader">Attempts ({{ quiz.attempts | length }} / {{ assessment.attemptsUnlimited ? 'Unlimited' : assessment.maxAttempts }})</h2>
@@ -108,9 +111,9 @@
                         <td>{# TODO add marks #}</td>
                         <td class="actions-small-3">
                             <nav>
-                                {#<!-- BEGIN attempt_delete -->#}
-                                {#<a href='/learning/quiz/attempts/delete' class="icon-delete" title="Delete Attempt" data-delete="{ATTEMPT_ATTEMPT_ID}"></a>#}
-                                {#<!-- END attempt_delete -->#}
+                                {% if deleteRoute %}
+                                    <a href="{{ deleteRoute }}" class="icon-delete" title="Delete Attempt" data-delete="{{ attempt.id }}"></a>
+                                {% endif %}
                                 {% if canReview %}
                                     <a href="/assess/review/{{ quiz.id }}/{{ quiz.sections.first.id }}/{{ attempt.id }}/{% if returnUrl %}?{{ RETURN_URL.name }}={{ returnUrl|escape('url') }}{% endif %}" class="icon-view" title="Review"></a>
                                 {% elseif canStudentReview %}
