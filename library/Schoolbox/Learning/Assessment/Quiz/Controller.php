@@ -8,6 +8,7 @@
 
 namespace Schoolbox\Learning\Assessment\Quiz;
 
+use Alaress\Date\Interval;
 use Alaress_Date_Format;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -222,7 +223,7 @@ class Controller extends Assessment\Controller
     {
         // $assessment doesn't contain quiz questions, get something that does.
         /** @var Quiz $quiz */
-        $quiz     = $this->quizMapper->findOneByColumn('assessment_id', $assessment->getId());
+        $quiz = $this->quizMapper->findOneByColumn('assessment_id', $assessment->getId());
         $quiz->setSections($this->quizSectionMapper->findByColumn(
             'assess_id',
             $quiz->getId(),
@@ -256,6 +257,7 @@ class Controller extends Assessment\Controller
             'quiz'        => $quiz,
             'returnUrl'   => $this->getRequest()->query->get(Redirect::RETURN_URL),
             'canAttempt'  => $actionValidator->canAttemptQuiz($this->getUser(), $assessment),
+            'duration'    => $assessment->isDurationUnlimited() ? null : new Interval($assessment->getDuration()),
         ];
 
         $this->getResponse()->content->set(

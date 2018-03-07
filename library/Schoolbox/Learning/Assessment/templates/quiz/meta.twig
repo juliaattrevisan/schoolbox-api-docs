@@ -2,8 +2,8 @@
  # assessment   an IAssesssable instance
  # student      the student currently being viewed
  # icon         a css class representing the assessable
+ # duration     an Alaress\Date\Interval object representing the quiz's duration
  #}
-{% import '@learning/macro/dueDate.twig' as dueDate %}
 <ul class="meta">
     {% include '@learning/fragments/meta/dueDate.twig' %}
     {% include '@learning/fragments/meta/workType.twig' %}
@@ -12,11 +12,20 @@
     {% endif %}
     <li class="icon-time-value" title="Allowed Time">
         Allowed time:
-        {% if assessment.durationUnlimited %}
-            <time>Unlimited</time>
-        {% else %}
-            <time></time>
-        {% endif %}
+        <time>
+            {% if duration %}
+                {% set hours   = duration.hourTotal %}
+                {% set minutes = duration.minuteRemainder %}
+                {% if hours %}
+                    {{ hours }} {{ hours == 1 ? 'hour' : 'hours' }}{% if minutes %},{% endif %}
+                {% endif %}
+                {% if minutes %}
+                    {{ minutes }} {{ minutes == 1 ? 'minute' : 'minutes' }}
+                {% endif %}
+            {% else %}
+                Unlimited
+            {% endif %}
+        </time>
     </li>
     {% if submissionsBlocked %}
     <li class="icon-upload">{{ submissionsBlocked }}</li>
