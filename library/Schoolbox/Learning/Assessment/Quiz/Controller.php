@@ -208,11 +208,22 @@ class Controller extends Assessment\Controller
      */
     public function getSummary(IAssessable $assessment, User $student): void
     {
-        $returnUrl       = $this->getRequest()->query->get(Redirect::RETURN_URL);
-        $returnUrlSuffix = $returnUrl ? '?' . Redirect::RETURN_URL . "={$returnUrl}" : '';
-        $redirect        = $this->determineSummaryRedirect($assessment, $student);
+        $twigData = [];
 
-        $this->getResponse()->redirect->to($redirect . $returnUrlSuffix);
+        $this->getResponse()->content->set(
+            $this->buildHtmlOutput(
+                "@learningAssessment/quiz/summary/student.twig",
+                $twigData,
+                "Status of {$assessment->getTitle()}",
+                'submission'
+            )
+        );
+
+//        $returnUrl       = $this->getRequest()->query->get(Redirect::RETURN_URL);
+//        $returnUrlSuffix = $returnUrl ? '?' . Redirect::RETURN_URL . "={$returnUrl}" : '';
+//        $redirect        = $this->determineSummaryRedirect($assessment, $student);
+//
+//        $this->getResponse()->redirect->to($redirect . $returnUrlSuffix);
     }
 
 
