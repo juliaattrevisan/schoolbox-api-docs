@@ -130,83 +130,14 @@ class Controller extends Assessment\Controller
 
 
     /**
-     * Returns the URL that a user should be redirected to when visiting a Quiz summary page.
-     * Options include:
-     * - Continue in-progress attempt                    /assess/attempt/{quizId}/{firstSectionId}
-     * - View list of attempts                           /assess/attempts/{quizId}/{userId}
-     * - View quiz details. Optional 'Begin Quiz' button /assess/intro/{quizId}
-     *
-     * @param Model $assessment
-     * @param User  $student
-     * @return string
-     * @throws \Aura\Router\Exception\RouteNotFound
-     * @throws \Schoolbox\Application\Exception\Exception
-     */
-    private function determineSummaryRedirect(Model $assessment, User $student): string
-    {
-        // Is this a spec?
-        if ($assessment->getBaseContext()->isSpecificationContext()) {
-            // Go to intro page (where you can see details of the quiz, but cannot 'Begin Quiz')
-            return $this->getRouter()->generate('learningQuiz.getQuizIntro', ['assessmentId' => $assessment->getId()]);
-        }
-
-        $access = $this->getAccess()->getFolderAccess($this->getUser(), $assessment->getContext()->getFolder()->getId());
-        $participant = $assessment->getParticipantIfExtant($student);
-        $now = \Alaress_Date_Format::now();
-
-        // A participant, but not staff or instructor, and we're past the close date?
-        if ($participant && $access <= UserAccess::ACCESS_WRITE && !$student->getRole()->isStaff() && $now->gt($participant->getCloseDate())) {
-            $quiz = $this->getQuizForAssessmentId($assessment->getId());
-            return "/assess/attempts/{$quiz->getId()}/{$student->getId()}";
-        }
-
-        // Not a participant? But you still had access to this page?
-        if (!$participant || $participant->isExcluded()) {
-            // Go to intro page (you may or may not see a 'Begin Quiz' button
-            return $this->getRouter()->generate('learningQuiz.getQuizIntro', ['assessmentId' => $assessment->getId()]);
-        }
-
-        // User is a participant and quiz is not a spec. Have they attempted the quiz yet?
-        $latestResponse = $participant->findMostRecentResponse();
-        $latestAttempt  = $latestResponse ? $this->quizAttemptMapper->findById($latestResponse->getId()) : null;
-
-        // Is there an attempt in progress? And user is looking at themself?
-        if ($latestAttempt && !$latestAttempt->isFinished() && $this->getUser()->getId() == $student->getId()) {
-            // redirect to a place where they can continue the attempt
-            $quiz         = $latestAttempt->getQuiz();
-            $firstSection = $this->findFirstQuizSection($quiz);
-            return "/assess/attempt/{$quiz->getId()}/{$firstSection->getId()}";
-        }
-
-        // Is session user an instructor?
-
-        if ($latestAttempt && $access >= UserAccess::ACCESS_WRITE) {
-            // Note that if an instructor is looking at their own summary, and has attempt/s, and wishes to re-attempt,
-            // that action is available from attempts-list page.
-            $quiz = $latestAttempt ? $latestAttempt->getQuiz() : $this->getQuizForAssessmentId($assessment->getId());
-            return "/assess/attempts/{$quiz->getId()}/{$student->getId()}";
-        }
-
-        return $this->getRouter()->generate('learningQuiz.getQuizIntro', [ 'assessmentId' => $assessment->getId() ]);
-    }
-
-
-    /**
-     * Redirect method
-     *
-     * Sends you to a page depending on the user's role and progress in a Quiz
-     *
-     *     if(user has no attempts || latest attempt is finished)
-     *         Display Quiz Intro
-     *     else(user's latest attempt is unfinished)
-     *         Display latest attempt, first section
-     *
      * @api   GET /learning/assessments/:assessmentId/:userId
      * @level 165
-     * @param IAssessable|Model $assessment
-     * @param User              $student
-     * @throws \Schoolbox\Application\Exception\Exception
-     * @throws \Aura\Router\Exception\RouteNotFound
+     *
+     * @param IAssessable $assessment
+     * @param User        $student
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\Deleted
      */
     public function getSummary(IAssessable $assessment, User $student): void
     {
@@ -343,26 +274,5 @@ class Controller extends Assessment\Controller
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
         }
         return $quiz;
-    }
-
-
-    /**
-     * Returns a quiz's first section
-     *
-     * @param Quiz $quiz
-     * @return QuizSection
-     */
-    private function findFirstQuizSection(Quiz $quiz): QuizSection
-    {
-        $sections = $this->quizSectionMapper->findByColumn('assess_id', $quiz->getId());
-
-        /** @var QuizSection $firstSection */
-        $firstSection = null;
-        foreach ($sections as $section) {
-            if (null === $firstSection || $section->getSequence() < $firstSection->getSequence()) {
-                $firstSection = $section;
-            }
-        }
-        return $firstSection;
     }
 }
