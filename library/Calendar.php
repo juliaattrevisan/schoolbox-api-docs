@@ -6,17 +6,6 @@ use Schoolbox\Calendar\Event as EventModel;
 
 class Calendar extends DeprecatedModel
 {
-
-    private const ATTENDANCE_STATUS_PENDING = 1;
-
-    private const ATTENDANCE_STATUS_APPROVED = 2;
-
-    private const ATTENDANCE_STATUS_REJECTED = 3;
-
-    private const ACCESS_PERSONAL = 1;
-    private const ACCESS_GROUP = 2;
-    private const ACCESS_CAMPUS = 3;
-
     function __construct()
     {
 
