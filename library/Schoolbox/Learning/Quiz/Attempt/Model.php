@@ -77,6 +77,50 @@ class Model implements ISoftDeletable
     }
 
     /**
+     * The mark that the user has received for this attempt.
+     *
+     * @return float
+     */
+    public function getMark(): float
+    {
+        $mark = 0;
+        foreach ($this->answers as $answer) {
+            $mark += $answer->getMark();
+        }
+        return $mark;
+    }
+
+    /**
+     * The total number of marks available for this attempt.
+     *
+     * @return float
+     */
+    public function getTotalMark(): float
+    {
+        $totalMark = 0;
+        foreach ($this->answers as $answer) {
+            $totalMark += $answer->getQuestion()->getMarks();
+        }
+        return $totalMark;
+    }
+
+    /**
+     * The total mark value of this attempt which has been graded.
+     *
+     * @return float
+     */
+    public function getTotalMarkGraded(): float
+    {
+        $totalMark = 0;
+        foreach ($this->answers as $answer) {
+            if ($answer->getAutoMarked()) {
+                $totalMark += $answer->getQuestion()->getMarks();
+            }
+        }
+        return $totalMark;
+    }
+
+    /**
      * Is this deleted?
      *
      * @return bool

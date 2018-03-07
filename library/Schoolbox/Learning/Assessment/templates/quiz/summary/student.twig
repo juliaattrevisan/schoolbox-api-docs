@@ -125,7 +125,18 @@
                                 —
                             {% endif %}
                         </td>
-                        <td>{# TODO add marks #}</td>
+                        <td>
+                            {% if finished %}
+                                {% set totalMark       = attempt.totalMark %}
+                                {% set totalMarkGraded = attempt.totalMarkGraded %}
+                                {{ attempt.mark }}/{{ totalMark }}
+                                {% if totalMarkGraded < totalMark %}
+                                    ({{ totalMarkGraded/totalMark*100|round }}% graded)
+                                {% endif %}
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
                         <td class="actions-small-2">
                             <nav>
                                 {% if deleteRoute %}
