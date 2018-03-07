@@ -10,12 +10,14 @@
  * @link        http://www.alaress.com.au/
  */
 
+use Calendar\Api\ModuleChecker;
 use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 
 /**
  * @method Calendar_Api_Config_Record findOneByColumnList($columnList, $order = [], $options = [])
+ * @method Calendar_Api_Config_Record[] findByColumnList($columnList, $options = [])
  */
 class Calendar_Api_Config_Mapper extends BaseMapper
 {
@@ -85,24 +87,23 @@ class Calendar_Api_Config_Mapper extends BaseMapper
     /**
      * Retrieves a list of sources for the calendar.
      *
+     * @param ModuleChecker $moduleChecker
      * @return array
      *   name: a name for this source
      *   id:   a comma-separated list of source IDs
      */
-    public function getSourceListForCalendar()
+    public function getSourceListForCalendar(ModuleChecker $moduleChecker): array
     {
         $configs = $this->getAllConfigRecords();
         $sourceList = [];
 
         foreach ($configs as $record) {
-            /** @var Calendar_Api_Config_Record $record */
-            try {
+            $config = $record->decodeConfig();
+            if($moduleChecker->isEnabled($config)){
                 $sourceList[] = [
                     'id'   => $record->getId(),
-                    'name' => $record->decodeConfig()->getLabel()
+                    'name' => $config->getLabel()
                 ];
-            } catch (DomainException $e) {
-                //config does not exist or is disabled
             }
         }
 
@@ -133,17 +134,19 @@ class Calendar_Api_Config_Mapper extends BaseMapper
         return array_values($sourceList);
     }
 
+    /** @noinspection PhpDocRedundantThrowsInspection - MapperException masked by findByColumnList method annotation */
     /**
      * Return a set of decoded config objects for the specified event_type and connector_class
      *
      * @param $currentEventType
      * @param $currentConnector
+     * @param ModuleChecker $moduleChecker
      * @return Calendar_Api_Config_Connector_Interface[]
      * @throws MapperException
      */
-    public function getAllConfigs($currentEventType, $currentConnector)
+    public function getAllConfigs($currentEventType, $currentConnector, ModuleChecker $moduleChecker)
     {
-        $configs = Calendar_Api_Config_Mapper::getInstance()->findByColumnList([
+        $configs = $this->findByColumnList([
             'event_type'      => $currentEventType,
             'connector_class' => $currentConnector,
             'status'          => 1
@@ -152,15 +155,10 @@ class Calendar_Api_Config_Mapper extends BaseMapper
         $allConfigs = [];
 
         foreach ($configs as $currentConfig) {
-            try {
-                /* @var $currentConfig Calendar_Api_Config_Record */
-                $config = $currentConfig->decodeConfig();
-                /** @var Calendar_Api_Config_Connector_Abstract $config */
+            $config = $currentConfig->decodeConfig();
+            if($moduleChecker->isEnabled($config)){
                 $config->setId($currentConfig->getId());
-
                 $allConfigs[] = $config;
-            } catch (DomainException $e) {
-                //config does not exist or is disabled
             }
         }
 

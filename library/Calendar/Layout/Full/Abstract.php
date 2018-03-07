@@ -7,6 +7,7 @@
  * @link        http://www.alaress.com.au/
  */
 
+use Calendar\Api\ModuleChecker;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -36,6 +37,9 @@ abstract class Calendar_Layout_Full_Abstract
     /** @var  Schoolbox\User $viewer   Who is currently viewing the Calendar */
     protected $viewer;
 
+    /** @var ModuleChecker */
+    private $moduleChecker;
+
     /**
      * Constructor
      *
@@ -44,8 +48,9 @@ abstract class Calendar_Layout_Full_Abstract
      * @param $date
      * @param User $viewer
      * @param Calendar_Api_Factory $factory
+     * @param ModuleChecker        $moduleChecker
      */
-    public function __construct($page, User $user, $date, User $viewer, Calendar_Api_Factory $factory)
+    public function __construct($page, User $user, $date, User $viewer, Calendar_Api_Factory $factory, ModuleChecker $moduleChecker)
     {
         $api = $factory->produceForUser($user);
 
@@ -54,6 +59,7 @@ abstract class Calendar_Layout_Full_Abstract
         /* Still used for perms and stuff
          */
         $this->setCalendarHandler(new Calendar());
+        $this->moduleChecker = $moduleChecker;
 
         $this->setUser($user);
         $this->setViewer($viewer);
@@ -164,7 +170,7 @@ abstract class Calendar_Layout_Full_Abstract
     protected function setupMovementButtons()
     {
         // Load sources
-        $sourceList = Calendar_Api_Config_Mapper::getInstance()->getSourceListForCalendar();
+        $sourceList = Calendar_Api_Config_Mapper::getInstance()->getSourceListForCalendar($this->moduleChecker);
 
         // select all types
         $typeList = \Schoolbox\Calendar\EventTypeMapper::getInstance()->findAll();

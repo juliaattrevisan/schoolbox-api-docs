@@ -15,8 +15,8 @@
  * @version     SVN: $Id$
  */
 
+use Calendar\Api\ModuleChecker;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
-use Schoolbox\Learning\Assessment\Participant;
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\External\Connector\Factory as ExternalConnectorFactory;
 use Schoolbox\Config;
@@ -25,6 +25,7 @@ use Schoolbox\Permission\Access\Access;
 
 class Calendar_Api_Factory
 {
+
     /**
      * A list of all the possible event types to display
      *
@@ -39,9 +40,6 @@ class Calendar_Api_Factory
      */
     private $assessmentDataSource;
 
-    /** @var Participant\DataSource */
-    private $participantDataSource;
-
     /** @var null|IConnector */
     private $databaseExternal;
 
@@ -50,17 +48,16 @@ class Calendar_Api_Factory
      * Constructor
      *
      * @param Assessment\MapperProxy $assessmentDataSource
-     * @param Participant\DataSource $participantDataSource
+     * @param ModuleChecker          $moduleChecker
      * @param null|IConnector        $databaseExternal
      */
     public function __construct(
         Assessment\MapperProxy $assessmentDataSource,
-        Participant\DataSource $participantDataSource,
+        ModuleChecker $moduleChecker,
         IConnector $databaseExternal = null
     ) {
-        $this->assessmentDataSource  = $assessmentDataSource;
-        $this->participantDataSource = $participantDataSource;
-        $this->databaseExternal      = $databaseExternal;
+        $this->assessmentDataSource = $assessmentDataSource;
+        $this->databaseExternal     = $databaseExternal;
 
         $allConfigRecords = Calendar_Api_Config_Mapper::getInstance()->getAllConfigRecords();
 
@@ -68,19 +65,15 @@ class Calendar_Api_Factory
          * http://stackoverflow.com/questions/4264270/unserialize-sometimes-returns-false
          */
         foreach ($allConfigRecords as $currentConfig) {
-            try {
-                $config = $currentConfig->decodeConfig();
 
+            $config = $currentConfig->decodeConfig();
+
+            if ($moduleChecker->isEnabled($config)) {
                 /* Update $config so it knows the calendar_connector id from whence it came
                  * This is used in produce() and passed to each unique/default implementation
                  */
                 $config->setId($currentConfig->getId());
-
                 $this->allTypes[] = $config;
-
-            } catch (DomainException $e) {
-
-                //Calendar not enabled, dont add
             }
         }
     }
@@ -99,12 +92,7 @@ class Calendar_Api_Factory
         $compositeApi = new Calendar_Api_Composite();
 
         foreach ($this->allTypes as $config) {
-            try {
-                $compositeApi->add($this->produceFromConfig($config, $user));
-            } catch (DomainException $e) {
-                // Calendar API has an issue. Skip to next.
-                continue;
-            }
+            $compositeApi->add($this->produceFromConfig($config, $user));
             // InvalidArgumentException or ReflectionException: NOT caught
         }
 

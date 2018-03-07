@@ -16,6 +16,7 @@ use Alaress\Module\Loader as ModuleLoader;
 use Alaress\Redis;
 use Alaress\Twig\Loader\ChainLoader;
 use Alaress\Twig\Method as TwigMethod;
+use Calendar\Api\ModuleChecker;
 use Calendar_Api_Factory;
 use Alaress\Session\Factory;
 use Alaress\Web\Output;
@@ -838,9 +839,9 @@ abstract class AbstractBootstrap implements BootstrapInterface
 
                     /** @var AssessmentDataSource $assessmentDataSource */
                     $assessmentDataSource  = $di->get('assessmentDataSource');
-                    /** @var ParticipantDataSource $participantDataSource */
-                    $participantDataSource = $di->get('participantDataSource');
-                    return new Calendar_Api_Factory($assessmentDataSource, $participantDataSource, $databaseExternal);
+                    /** @var IConfigLoader $config */
+                    $config = $di->get('config');
+                    return new Calendar_Api_Factory($assessmentDataSource, new ModuleChecker($config), $databaseExternal);
                 }
             )
         );

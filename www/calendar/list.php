@@ -8,8 +8,10 @@
  */
 
 use Alaress\Database\Exception as AlaressDatabaseException;
+use Calendar\Api\ModuleChecker;
 use Calendar\Event\Collection\Lister;
 use Schoolbox\Calendar\EventTypeMapper;
+use Schoolbox\Config\ConfigMapper;
 
 $userMapper = new \Schoolbox\UserMapper();
 
@@ -136,7 +138,8 @@ $campus_list = $calendarHandler->getFilterCampusList($user->getId());
 
 // Load sources
 
-$sourceList = Calendar_Api_Config_Mapper::getInstance()->getSourceListForCalendar();
+$moduleChecker = new ModuleChecker(ConfigMapper::getInstance());
+$sourceList = Calendar_Api_Config_Mapper::getInstance()->getSourceListForCalendar($moduleChecker);
 
 // Select all types
 

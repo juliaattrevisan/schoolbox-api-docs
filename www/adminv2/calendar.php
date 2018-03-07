@@ -1,6 +1,7 @@
 <?php
 
 use Calendar\Api\ApiHierarchyGenerator;
+use Calendar\Api\ModuleChecker;
 use Schoolbox\Calendar\Relation;
 use Schoolbox\Config\ConfigMapper;
 
@@ -106,8 +107,9 @@ foreach ($typeList as $type) {
 
         /* Subscribe page
          */
-        $generator    = new ApiHierarchyGenerator(ConfigMapper::getInstance());
-        $availableApi = $generator->generateApiHierarchy();
+        $moduleChecker = new ModuleChecker(ConfigMapper::getInstance());
+        $generator     = new ApiHierarchyGenerator($moduleChecker);
+        $availableApi  = $generator->generateApiHierarchy();
 
         /* All calendar subscription options go here
          */
@@ -141,7 +143,8 @@ foreach ($typeList as $type) {
                  */
                 $allConfigs = Calendar_Api_Config_Mapper::getInstance()->getAllConfigs(
                     $currentEventType,
-                    $currentConnector
+                    $currentConnector,
+                    $moduleChecker
                 );
 
                 if (count($allConfigs)) {
