@@ -8,6 +8,7 @@
 
 namespace Schoolbox\Learning\Assessment\Quiz;
 
+use Alaress_Date_Format;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment;
@@ -16,6 +17,7 @@ use Schoolbox\Learning\Assessment\DataModel;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Transactor;
+use Schoolbox\Learning\Quiz\ActionValidator;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
@@ -241,6 +243,10 @@ class Controller extends Assessment\Controller
             }
         }
 
+        // Can I attempt this?
+        // TODO this should eventually be route permission based
+        $actionValidator = new ActionValidator(Alaress_Date_Format::now(), $this->getAccess());
+
         // load all of the questions here too
         $twigData = [
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([ $assessment->getTitle(), '' ]),
@@ -249,6 +255,7 @@ class Controller extends Assessment\Controller
             'participant' => $assessment->getParticipantIfExtant($student),
             'quiz'        => $quiz,
             'returnUrl'   => $this->getRequest()->query->get(Redirect::RETURN_URL),
+            'canAttempt'  => $actionValidator->canAttemptQuiz($this->getUser(), $assessment),
         ];
 
         $this->getResponse()->content->set(
