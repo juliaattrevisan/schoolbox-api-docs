@@ -246,9 +246,11 @@ class Controller extends Assessment\Controller
 
 
         // Load attempts
-        $quizAttempts = $this->quizAttemptMapper->findByColumnList(
-            ['assess_id' => $quiz->getId(), 'user_id'   => $student->getId(),],
-            ['order' => ['start' => 'desc']]
+        $quiz->setAttempts(
+            $this->quizAttemptMapper->findByColumnList(
+                ['assess_id' => $quiz->getId(), 'user_id'   => $student->getId(),],
+                ['order' => ['start' => 'desc']]
+            )
         );
 
 
@@ -267,7 +269,6 @@ class Controller extends Assessment\Controller
             'canAttempt'  => $student->getId() === $this->getUser()->getId()
                 && $actionValidator->canAttemptQuiz($this->getUser(), $assessment),
             'duration'    => $assessment->isDurationUnlimited() ? null : new Interval($assessment->getDuration()),
-            'attempts'    => $quizAttempts,
         ];
 
         $this->getResponse()->content->set(

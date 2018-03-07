@@ -75,6 +75,7 @@
     <div class="row">
         <div class="small-12 column">
             <p>
+                {# TODO allow this to resume an attempt in progress #}
                 <a href="/assess/init/{{ quiz.id }}/{{ quiz.sections.first.id }}/{% if returnUrl %}?{{ RETURN_URL.name }}={{ returnUrl|escape('url') }}{% endif %}" class="button expand submit">Begin Quiz</a>
             </p>
         </div>
@@ -82,10 +83,10 @@
 {% endif %}
 
 {# If I'm here I can view attempts #}
-{% if attempts | length %}
+{% if quiz.attempts | length %}
     <div class="row">
         <div class="small-12 columns">
-            <h2 class="subheader">Attempts ({{ attempts | length }} / {{ assessment.attemptsUnlimited ? 'Unlimited' : assessment.maxAttempts }})</h2>
+            <h2 class="subheader">Attempts ({{ quiz.attempts | length }} / {{ assessment.attemptsUnlimited ? 'Unlimited' : assessment.maxAttempts }})</h2>
             <table id="attempts">
                 <thead>
                 <tr>
@@ -98,7 +99,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                {% for attempt in attempts %}
+                {% for attempt in quiz.attempts %}
                     <tr data-attempt>
                         <td>{{ attempt.start.short }}</td>
                         <td>{{ attempt.finish and not attempt.finish.null ? attempt.finish.short : 'Unfinished' }}</td>
