@@ -51,7 +51,14 @@ class External_Schooledge_Class extends External_Humanedge_Class implements Exte
      */
     protected function getTimetableCodes() {
         $allCampusCodes = \Schoolbox\CampusMapper::getInstance()->findDistinct('ext_timetable_code');
-        return "IN( '". implode("','", $allCampusCodes)."')";
+
+        foreach($allCampusCodes as $code) {
+            if(strlen($code)) {
+                $quotedCode[$code] = "'" . $this->getDatabase()->quote($code) . "'";
+            }
+        }
+
+        return 'IN('. implode(',', $quotedCode).')';
     }
 
     /**
