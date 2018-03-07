@@ -292,7 +292,7 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
         $statement->bindParam(":eventId", $eventId);
         $statement->bindParam(":userId", $userId);
         $statement->bindParam(":status", $statusPending);
-        $statement->bindParam(":intent", $intentPresent);
+        $statement->bindParam(":intention", $intentPresent);
 
         $statement->execute();
     }
