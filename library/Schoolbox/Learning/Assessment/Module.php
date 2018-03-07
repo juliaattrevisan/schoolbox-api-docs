@@ -13,6 +13,7 @@ use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use OutOfBoundsException;
 use Schoolbox\Learning\Authorizer\Rule\AssessmentNotDeleted;
+use Schoolbox\Learning\Authorizer\Rule\CanAcknowledgeAssessment;
 use Schoolbox\Learning\Authorizer\Rule\CanPreview;
 use Schoolbox\Learning\Authorizer\Rule\CanRespondToAssessment;
 use Schoolbox\Learning\Authorizer\Rule\CanSeeParticipation;
@@ -528,8 +529,7 @@ class Module extends BaseModule
                     new Rule\IsUser('studentId'),
                     new IsInteractionUnLocked(new LockedChecker($this->getTermMapper())),
                     new IsAssessmentOpen(),
-                    new CanRespondToAssessment($this->getAccess()),
-                    new ParticipantHasNoInteractions()
+                    new CanAcknowledgeAssessment($this->getAccess())
                 )
             )
         );

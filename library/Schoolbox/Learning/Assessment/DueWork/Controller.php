@@ -182,8 +182,9 @@ class Controller extends Assessment\Controller
      * @level 165
      *
      * @param IAssessable|Model $assessment
-     * @param User        $student
+     * @param User              $student
      * @throws ServiceNotFound
+     * @throws RouteNotFound
      */
     public function getSummary(IAssessable $assessment, User $student): void
     {
@@ -231,18 +232,20 @@ class Controller extends Assessment\Controller
             'authoritativeFeedback' => $participant ? $participant->findAuthoritativeVisibleFeedback($this->getUser()) : null,
         ];
 
+        $routeArgs = [
+            'assessment' => $assessment,
+            'assessmentId' => $assessment->getId(),
+            'student' => $student,
+            'studentId' => $student->getId()
+        ];
+
+        $twigData['acknowlegementBlocked'] = false === $this->getRouteIfAuthorized('learningAssessment.postSelfAcknowledge', $routeArgs);
+
         // TODO SA-6125 - this duplicates module route auth logic. Need to find a way to define this logic in one place only.
-        $twigData['submissionsBlocked']    = false;
-        $twigData['acknowlegementBlocked'] = false;
         try {
             $assessment->assertAcceptSubmission($participant);
         } catch (DomainException $e) {
             $twigData['submissionsBlocked'] = $this->getErrorMapper()->generateException($e->getCode())->getMessage();
-            try {
-                $assessment->assertAcceptAcknowledgement($participant);
-            } catch (DomainException $e) {
-                $twigData['acknowlegementBlocked'] = $this->getErrorMapper()->generateException($e->getCode())->getMessage();
-            }
         }
 
         $this->getResponse()->content->set(

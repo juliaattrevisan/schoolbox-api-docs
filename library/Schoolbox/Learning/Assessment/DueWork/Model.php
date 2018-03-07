@@ -383,6 +383,53 @@ class Model extends AbstractAssessment implements ISelfAssessable
 
 
     /**
+     * Is the given user allowed to acknowledge that they have submitted work offline?
+     *
+     * @param User $learner
+     * @throws UnexpectedValueException
+     * @return bool
+     */
+    public function canLearnerCreateAcknowledgement(User $learner)
+    {
+        // if self-assess is off, use the same rules as response-create
+        if (!$this->isSelfAssessable()) {
+            return $this->canLearnerCreateResponse($learner);
+        }
+
+        // ok, rules for self-assess
+
+        // not allowed if the DW isn't open for the user yet (or ever)
+        if(!$this->isOpen($learner)){
+            return false;
+        }
+
+        // not allowed if you're not a participant
+        $participant = $this->getParticipantIfExtant($learner);
+        if (!$participant) {
+            return false;
+        }
+
+        /*
+         * ** Rules **
+         * Accept None: ack as often as you like
+         * Accept One: ack once
+         * Accept Multi: ack as often as you like
+         */
+
+        if ($this->isAcceptMulti() || $this->isAcceptNone()) {
+            return true;
+        }
+
+        // not submitted a response yet? ok you can ACK
+        if (!$participant->hasSubmittedResponse()) {
+            return true;
+        }
+
+        return false;
+    }
+
+
+    /**
      * @inheritdoc
      */
     public function canInstructorCreateResponse(User $instructor, User $submittedOnBehalfOf)
