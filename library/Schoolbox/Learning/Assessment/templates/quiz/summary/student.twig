@@ -13,7 +13,7 @@
         } only %}
     </div>
     {% set viewRoute = routeLookupIfAuthorized('learningAssessment.getStatus', {assessmentId: assessment.id, assessment: assessment}) %}
-    {% set modifyRoute = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id, assessment: assessment}) %}
+    {% set modifyRoute = routeLookupIfAuthorized('learningQuiz.getQuizSummary', {assessmentId: assessment.id, assessment: assessment}) %}
     {% if viewRoute or modifyRoute %}
         <nav>
             <a href="#" class="icon-more" data-dropdown="header-options" title="Actions"></a>
