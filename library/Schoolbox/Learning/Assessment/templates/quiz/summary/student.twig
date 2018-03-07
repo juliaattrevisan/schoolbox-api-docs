@@ -118,7 +118,13 @@
                                 <em>{{ duration.secondsToHoursAndMinutes(attempt.start.diffInSeconds(NOW, true)) }}</em>
                             {% endif %}
                         </td>
-                        <td>{{ attempt.reviewed.short }}</td>
+                        <td>
+                            {% if attempt.reviewed and not attempt.reviewed.null %}
+                                {{ attempt.reviewed.short }}
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
                         <td>{# TODO add marks #}</td>
                         <td class="actions-small-2">
                             <nav>
