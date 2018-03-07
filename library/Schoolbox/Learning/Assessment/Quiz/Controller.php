@@ -208,11 +208,18 @@ class Controller extends Assessment\Controller
      */
     public function getSummary(IAssessable $assessment, User $student): void
     {
+        // $assessment doesn't contain quiz questions, get something that does.
+        /** @var Quiz $quiz */
+        $quiz     = $this->quizMapper->findOneByColumn('assessment_id', $assessment->getId());
+        $quiz->setSections($this->quizSectionMapper->findByColumn('assess_id', $quiz->getId()));
+
+        // load all of the questions here too
         $twigData = [
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([ $assessment->getTitle(), '' ]),
             'assessment'  => $assessment,
             'student'     => $student,
             'participant' => $assessment->getParticipantIfExtant($student),
+            'quiz'        => $quiz,
         ];
 
         $this->getResponse()->content->set(

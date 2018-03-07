@@ -29,18 +29,46 @@
     {% endif %}
 </div>
 
-{% set description = (participant and not participant.isExcluded) ? participant.description : assessment.description  %}
-{% if description|length %}
-    <div class="row">
-        <div class="small-12 island">
+<div class="row">
+    <div class="small-12 island">
+        {% set description = (participant and not participant.isExcluded) ? participant.description : assessment.description  %}
+        {% if description|length %}
             <section>
                 <article class="content">
                     {{ description | purify }}
                 </article>
             </section>
+        {% endif %}
+
+        <div class="scrollable">
+            <table>
+                <thead>
+                <tr>
+                    <th>Section</th>
+                    <th>Number of questions</th>
+                </tr>
+                </thead>
+                <tbody>
+
+
+                {% for section in quiz.sections %}
+                <tr>
+                    <td>{{ section.title }}</td>
+                    <td>
+                        {% set questionCount = section.questions | length %}
+                        {% if section.pool %}
+                            {{ min(questionCount, section.pool) }}
+                        {% else %}
+                            {{ questionCount }}
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
-{% endif %}
+</div>
 
 {# show authoritative feedback if it's there #}{#
 
