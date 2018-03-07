@@ -37,6 +37,7 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
         ]);
     }
     catch (Mapper\Exception $e) {
+
         $config = new Calendar_Api_Config_Connector_Booking();
         $config->setConnectorClass('Booking');
         $config->setId(-1);
@@ -44,15 +45,15 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
         $config->setEventType('ResourceBooking');
         $config->setLuEventType(1);
 
-        /* Replaces TzozNzoiQ2FsZW5kYXJfQXBpX0NvbmZpZ19Db25uZWN0b3JfQm9va2luZyI6Njp7czoxNzoiACoAY29ubmVjdG9yQ2xhc3MiO3M6NzoiQm9va2luZyI7czo1OiIAKgBpZCI7aTotMTtzOjg6IgAqAGxhYmVsIjtzOjE2OiJSZXNvdXJjZSBCb29raW5nIjtzOjEyOiIAKgBldmVudFR5cGUiO3M6MTU6IlJlc291cmNlQm9va2luZyI7czoxNDoiACoAbHVFdmVudFR5cGUiO3M6MToiMSI7czoxNzoiACoAaGFzUGVybWlzc2lvbnMiO2I6MDt9
-         */
-        $encodedConfig = base64_encode(serialize($config));
-
         $newRecord = new Calendar_Api_Config_Record();
         $newRecord->setEventType('ResourceBooking');
         $newRecord->setConnectorClass('Booking');
-        $newRecord->setConfig($encodedConfig);
         $newRecord->setStatus($status);
+
+        /* Replaces TzozNzoiQ2FsZW5kYXJfQXBpX0NvbmZpZ19Db25uZWN0b3JfQm9va2luZyI6Njp7czoxNzoiACoAY29ubmVjdG9yQ2xhc3MiO3M6NzoiQm9va2luZyI7czo1OiIAKgBpZCI7aTotMTtzOjg6IgAqAGxhYmVsIjtzOjE2OiJSZXNvdXJjZSBCb29raW5nIjtzOjEyOiIAKgBldmVudFR5cGUiO3M6MTU6IlJlc291cmNlQm9va2luZyI7czoxNDoiACoAbHVFdmVudFR5cGUiO3M6MToiMSI7czoxNzoiACoAaGFzUGVybWlzc2lvbnMiO2I6MDt9
+         */
+        $newRecord->updateConfig($config);
+
         $mapper->save($newRecord);
     }
 
@@ -72,15 +73,15 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
         $config->setEventType('ResourceBooking');
         $config->setLuEventType(1);
 
-        /* Replaces Tzo0MDoiQ2FsZW5kYXJfQXBpX0NvbmZpZ19Db25uZWN0b3JfTW9kZXJhdGlvbiI6Njp7czoxNzoiACoAY29ubmVjdG9yQ2xhc3MiO3M6MTA6Ik1vZGVyYXRpb24iO3M6NToiACoAaWQiO2k6LTE7czo4OiIAKgBsYWJlbCI7czoxOToiUmVzb3VyY2UgTW9kZXJhdGlvbiI7czoxMjoiACoAZXZlbnRUeXBlIjtzOjE1OiJSZXNvdXJjZUJvb2tpbmciO3M6MTQ6IgAqAGx1RXZlbnRUeXBlIjtzOjE6IjEiO3M6MTc6IgAqAGhhc1Blcm1pc3Npb25zIjtiOjA7fQ==
-         */
-        $encodedConfig = base64_encode(serialize($config));
-
         $newRecord = new Calendar_Api_Config_Record();
         $newRecord->setEventType('ResourceBooking');
         $newRecord->setConnectorClass('Moderation');
-        $newRecord->setConfig($encodedConfig);
         $newRecord->setStatus($status);
+
+        /* Replaces Tzo0MDoiQ2FsZW5kYXJfQXBpX0NvbmZpZ19Db25uZWN0b3JfTW9kZXJhdGlvbiI6Njp7czoxNzoiACoAY29ubmVjdG9yQ2xhc3MiO3M6MTA6Ik1vZGVyYXRpb24iO3M6NToiACoAaWQiO2k6LTE7czo4OiIAKgBsYWJlbCI7czoxOToiUmVzb3VyY2UgTW9kZXJhdGlvbiI7czoxMjoiACoAZXZlbnRUeXBlIjtzOjE1OiJSZXNvdXJjZUJvb2tpbmciO3M6MTQ6IgAqAGx1RXZlbnRUeXBlIjtzOjE6IjEiO3M6MTc6IgAqAGhhc1Blcm1pc3Npb25zIjtiOjA7fQ==
+         */
+        $newRecord->updateConfig($config);
+
         $mapper->save($newRecord);
     }
 });
