@@ -69,6 +69,8 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
         $newRecord = new Calendar_Api_Config_Record();
         $newRecord->setConfig($config);
 
+        $log->info('Respawning Booking config record.');
+
         $db->query("
             INSERT INTO `calendar_connector` (event_type, connector_class, config, status) 
             VALUES (\"ResourceBooking\", \"Booking\", \"{$newRecord->encodeConfig()}\", \"{$status}\")
@@ -98,6 +100,8 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
         $newRecord = new Calendar_Api_Config_Record();
         $newRecord->setConfig($config);
 
+        $log->info('Respawning Moderation config record.');
+
         $db->query("
             INSERT INTO `calendar_connector` (event_type, connector_class, config, status) 
             VALUES (\"ResourceBooking\", \"Moderation\", \"{$newRecord->encodeConfig()}\", \"{$status}\")
@@ -111,5 +115,4 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
         SET value = {$status} WHERE name = 'resource_booking_enabled'
         LIMIT 1
     ");
-
 });
