@@ -91,7 +91,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
     // Deduplicate query
 
     /** @var string $sqlPastoralSelect */
-    private $sqlPastoralSelect = "
+    protected $sqlPastoralSelect = "
         SELECT        dbo.tPastoralCare.PastoralCareSeq, 
                       dbo.tPastoralCare.ID, 
                       dbo.tPastoralCare.ClassCode, 
@@ -184,7 +184,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
      *
      * @return int
      */
-    private function getNewImportId()
+    protected function getNewImportId()
     {
         return (int)date("U");
     }
@@ -841,7 +841,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
      *
      * @return null|PastoralSeverity
      */
-    private function getPastoralSeverity()
+    protected function getPastoralSeverity()
     {
         if ($this->config->get('pastoral_severity')) {
             // Default all imported items to the lowest priority as there is no concept of this in Synergetic
@@ -1009,7 +1009,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
      *
      * @return null|User
      */
-    private function getSchoolboxUser($externalId)
+    protected function getSchoolboxUser($externalId)
     {
         // Check the cache first
 
@@ -1031,7 +1031,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
      *
      * @return PastoralType
      */
-    private function getPastoralType($record)
+    protected function getPastoralType($record)
     {
         // Check the cache first
 
@@ -1063,7 +1063,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
      * @return PastoralSubType
      * @throws MapperException
      */
-    private function getPastoralSubType(array $record)
+    protected function getPastoralSubType(array $record)
     {
         // Check the cache first
 
