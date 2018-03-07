@@ -254,6 +254,9 @@ class Controller extends Assessment\Controller
         );
 
 
+        // Load answers into quiz attempts
+
+
         // Can I attempt this?
         // TODO this should eventually be route permission based
         $actionValidator = new ActionValidator(Alaress_Date_Format::now(), $this->getAccess());
@@ -266,9 +269,17 @@ class Controller extends Assessment\Controller
             'participant' => $assessment->getParticipantIfExtant($student),
             'quiz'        => $quiz,
             'returnUrl'   => $this->getRequest()->query->get(Redirect::RETURN_URL),
+            'duration'    => $assessment->isDurationUnlimited() ? null : new Interval($assessment->getDuration()),
+            // User may only attempt quiz from here if viewing own summary
             'canAttempt'  => $student->getId() === $this->getUser()->getId()
                 && $actionValidator->canAttemptQuiz($this->getUser(), $assessment),
-            'duration'    => $assessment->isDurationUnlimited() ? null : new Interval($assessment->getDuration()),
+            'canReview'       => $actionValidator->canReviewAttempts($this->getUser(), $student, $assessment),
+            'canStudentReview'=> $actionValidator->canReviewAttemptsReadonly(
+                $this->getUser(),
+                $student,
+                $assessment,
+                $this->getConfigLoader()->get('restrict_student_submissions')
+            ),
         ];
 
         $this->getResponse()->content->set(
