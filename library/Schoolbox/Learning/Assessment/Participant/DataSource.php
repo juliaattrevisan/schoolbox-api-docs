@@ -191,6 +191,9 @@ class DataSource
      */
     protected function findForAssessmentCollection(GenericCollection $assessments, User $user = null): void
     {
+        // Clear all participation from $assessments
+        $this->clearParticipants($assessments);
+
         $this->loadPlansAndParticipants($assessments);
 
         $dynamicPlans = new GenericCollection(PlanObject::class);
@@ -241,6 +244,19 @@ class DataSource
                     continue;
                 }
                 $dynamicPlan->getParticipants()[$user->getId()] = new ParticipantObject($user, $dynamicPlan);
+            }
+        }
+    }
+
+
+    /**
+     * @param GenericCollection|IAssessable[] $assessments
+     */
+    private function clearParticipants(GenericCollection $assessments): void
+    {
+        foreach ($assessments as $assessment) {
+            foreach ($assessment->getAllParticipants() as $participant) {
+                $assessment->unsetUserParticipation($participant->getUser());
             }
         }
     }
@@ -452,8 +468,19 @@ class DataSource
 
 
             foreach ($planModel->getParticipants() as $participantModel) {
+                // Is this student already participating?
+                // Don't load them if they are already, otherwise remove
+                // from existing participation.
+                $user                = $participantModel->getUser();
+                $existingParticipant = $assessable->getParticipantIfExtant($user);
+                if ($existingParticipant) {
+                    if ($existingParticipant->getUpdatedAt()->gt($participantModel->getUpdatedAt())) {
+                        continue;
+                    }
+                    $assessable->unsetUserParticipation($user);
+                }
+
                 // Create a Participant Domain object
-                $user                                          = $participantModel->getUser();
                 $participantObject                             = new ParticipantObject($user, $planObject);
                 $planObject->getParticipants()[$user->getId()] = $participantObject;
 
