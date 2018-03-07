@@ -221,7 +221,11 @@ class Controller extends Assessment\Controller
         // $assessment doesn't contain quiz questions, get something that does.
         /** @var Quiz $quiz */
         $quiz     = $this->quizMapper->findOneByColumn('assessment_id', $assessment->getId());
-        $quiz->setSections($this->quizSectionMapper->findByColumn('assess_id', $quiz->getId()));
+        $quiz->setSections($this->quizSectionMapper->findByColumn(
+            'assess_id',
+            $quiz->getId(),
+            ['order' => ['sequence' => 'asc']]
+        ));
 
         $quizQuestions = $this->quizQuestionMapper
             ->findByColumn(
