@@ -5,11 +5,11 @@
 <div class="row actions-small-1">
     <div class="small-12 columns">
         <h1>{{ assessment.title }}</h1>
-        {% include '@learningAssessment/meta.twig' with {
+        {% include '@learningAssessment/quiz/meta.twig' with {
             assessment: assessment,
             submissionsBlocked: submissionsBlocked,
             student: student,
-            icon: 'icon-due-work'
+            icon: 'icon-quiz'
         } only %}
     </div>
     {% set viewRoute = routeLookupIfAuthorized('learningAssessment.getStatus', {assessmentId: assessment.id, assessment: assessment}) %}

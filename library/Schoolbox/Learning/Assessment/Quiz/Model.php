@@ -308,6 +308,16 @@ class Model extends AbstractAssessment
     }
 
     /**
+     * Is this quiz unlimited duration?
+     *
+     * @return bool
+     */
+    public function isDurationUnlimited(): bool
+    {
+        return $this->duration === self::DURATION_UNLIMITED;
+    }
+
+    /**
      * @return int
      */
     public function getMaxAttempts()
