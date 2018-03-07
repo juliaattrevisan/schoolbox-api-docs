@@ -1,1 +1,79 @@
-<h1>TODO quiz/summaryStudent.twig</h1>
+
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(breadcrumbs) }}
+
+<div class="row actions-small-1">
+    <div class="small-12 columns">
+        <h1>{{ assessment.title }}</h1>
+        {% include '@learningAssessment/meta.twig' with {
+            assessment: assessment,
+            submissionsBlocked: submissionsBlocked,
+            student: student,
+            icon: 'icon-due-work'
+        } only %}
+    </div>
+    {% set viewRoute = routeLookupIfAuthorized('learningAssessment.getStatus', {assessmentId: assessment.id, assessment: assessment}) %}
+    {% set modifyRoute = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id, assessment: assessment}) %}
+    {% if viewRoute or modifyRoute %}
+        <nav>
+            <a href="#" class="icon-more" data-dropdown="header-options" title="Actions"></a>
+        </nav>
+        <ul data-dropdown-content id="header-options" class="f-dropdown">
+            {% if viewRoute %}
+                <li><a class="icon-progress" href="{{ viewRoute }}">View Status</a></li>
+            {% endif %}
+            {% if modifyRoute %}
+                <li><a href="{{ modifyRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" class="icon-modify">Modify</a></li>
+            {% endif %}
+        </ul>
+    {% endif %}
+</div>
+
+{#
+
+<div class="row">
+    <div class="small-12 island">
+        {% include '@learningAssessment/dueWork/summary/description.twig' with {assessment: assessment, participant: participant} only %}
+    </div>
+</div>
+
+#}
+{# show authoritative feedback if it's there #}{#
+
+{% if authoritativeFeedback %}
+    {% include '@learningAssessment/dueWork/summary/mark.twig' with {
+        feedback: authoritativeFeedback,
+        participant: participant,
+    } %}
+{% else %}
+    {% include '@learningAssessment/dueWork/summary/markingGuide.twig' with {
+        rubricContext: emptyRubricContext,
+        participant: participant,
+    } %}
+{% endif %}
+
+#}
+{# Submit button: goes underneath history if it's empty, above history if not #}{#
+
+{% if timeline is not empty %}
+    {% include '@learningAssessment/dueWork/summary/submitButton.twig' with {
+        submissionsBlocked: submissionsBlocked,
+        acknowlegementBlocked: acknowlegementBlocked,
+        selfAcknowledgeRoute: selfAcknowledgeRoute,
+        assessment: assessment,
+        student: student
+    } only%}
+{% endif %}
+
+{% include '@learningAssessment/dueWork/history.twig' %}
+
+{% if timeline is empty %}
+    {% include '@learningAssessment/dueWork/summary/submitButton.twig' with {
+        submissionsBlocked: submissionsBlocked,
+        acknowlegementBlocked: acknowlegementBlocked,
+        selfAcknowledgeRoute: selfAcknowledgeRoute,
+        assessment: assessment,
+        student: student
+    } only %}
+{% endif %}
+#}

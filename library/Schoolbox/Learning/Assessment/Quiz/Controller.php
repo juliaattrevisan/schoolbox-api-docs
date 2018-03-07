@@ -208,7 +208,11 @@ class Controller extends Assessment\Controller
      */
     public function getSummary(IAssessable $assessment, User $student): void
     {
-        $twigData = [];
+        $twigData = [
+            'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([ $assessment->getTitle(), '' ]),
+            'assessment'  => $assessment,
+            'student'     => $student,
+        ];
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
