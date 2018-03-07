@@ -50,20 +50,18 @@
                 </tr>
                 </thead>
                 <tbody>
-
-
                 {% for section in quiz.sections %}
-                <tr>
-                    <td>{{ section.title }}</td>
-                    <td>
-                        {% set questionCount = section.questions | length %}
-                        {% if section.pool %}
-                            {{ min(questionCount, section.pool) }}
-                        {% else %}
-                            {{ questionCount }}
-                        {% endif %}
-                    </td>
-                </tr>
+                    <tr>
+                        <td>{{ section.title }}</td>
+                        <td>
+                            {% set questionCount = section.questions | length %}
+                            {% if section.pool %}
+                                {{ min(questionCount, section.pool) }}
+                            {% else %}
+                                {{ questionCount }}
+                            {% endif %}
+                        </td>
+                    </tr>
                 {% endfor %}
                 </tbody>
             </table>
@@ -106,7 +104,7 @@
                     {% set finished = attempt.finish and not attempt.finish.null %}
                     <tr data-attempt>
                         <td>{{ attempt.start.short }}</td>
-                        <td>{{ finished ? attempt.finish.short : 'Unfinished' }}</td>
+                        <td>{{ finished ? attempt.finish.short : 'In Progress' }}</td>
                         <td>
                             {% if finished %}
                                 {{ duration.secondsToHoursAndMinutes(attempt.start.diffInSeconds(attempt.finish, true)) }}

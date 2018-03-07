@@ -8,7 +8,6 @@
 
 namespace Schoolbox\Learning\Assessment\Quiz;
 
-use Alaress\Date\Interval;
 use Alaress_Date_Format;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -269,7 +268,6 @@ class Controller extends Assessment\Controller
             'participant' => $assessment->getParticipantIfExtant($student),
             'quiz'        => $quiz,
             'returnUrl'   => $this->getRequest()->query->get(Redirect::RETURN_URL),
-            'duration'    => $assessment->isDurationUnlimited() ? null : new Interval($assessment->getDuration()),
             // User may only attempt quiz from here if viewing own summary
             'canAttempt'  => $student->getId() === $this->getUser()->getId()
                 && $actionValidator->canAttemptQuiz($this->getUser(), $assessment),
