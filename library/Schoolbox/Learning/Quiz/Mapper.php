@@ -556,8 +556,8 @@ class Mapper extends BaseMapper implements FeedableMapperInterface
         }
         $quiz->setAttempts($attemptMapper->findByColumnList($attemptFilter, $attemptOrder));
 
-        // Load responses into attempts
-        // TODO response mapper should be part of attempt mapper
+        // Load answers (which include questions) into attempts
+        // TODO answer mapper should be part of attempt mapper
         $answerMapper   = QuizAnswerMapper::getInstance();
         $attemptAnswers = $answerMapper
             ->findByColumn(
