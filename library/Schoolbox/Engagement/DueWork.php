@@ -22,8 +22,8 @@ class DueWork
     }
 
     public function created(\Alaress_Date_Format $start, \Alaress_Date_Format $end) {
-        $query = "SELECT COUNT(*) FROM submission_box
-                      WHERE created >= :start AND created <= :end ";
+        $query = "SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id
+                      WHERE created_at >= :start AND created_at <= :end ";
 
         $statement = $this->database->prepare($query);
         $statement->bindParam(':start', $start->getDatabaseDate());
@@ -58,8 +58,8 @@ class DueWork
     }
 
     public function visibility(\Alaress_Date_Format $start, \Alaress_Date_Format $end) {
-        $query = "SELECT mark_visibility, COUNT(*) AS total FROM submission_box
-                  WHERE created >= :start AND created <= :end
+        $query = "SELECT mark_visibility, COUNT(*) AS total FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id
+                  WHERE created_at >= :start AND created_at <= :end
                   GROUP BY mark_visibility";
 
         $statement = $this->database->prepare($query);
