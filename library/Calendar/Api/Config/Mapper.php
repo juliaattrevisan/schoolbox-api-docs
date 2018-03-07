@@ -208,49 +208,4 @@ class Calendar_Api_Config_Mapper extends BaseMapper
 
         return $this;
     }
-
-    /**
-     * Generate a tree of EventSource/Connector pairs
-     *
-     * @return array
-     */
-    public function generateApiHierarchy()
-    {
-        /* Figure out which Event Sources are around, and which Connectors
-         * are available for each Event Sources.
-         */
-        $path = '../library/Calendar/Api/EventType';
-
-        $allApi = [];
-
-        /* Just get the dir names (these correspond to event types)
-         */
-        foreach (array_filter(glob("$path/*"), 'is_dir') as $dirname) {
-            $eventTypeFilename = basename($dirname);
-
-            /* Path to connectors
-             */
-            $subpath = "$path/$eventTypeFilename";
-
-            foreach (array_filter(glob("$subpath/*"), 'is_dir') as $subdirname) {
-                $connectorClassFilename = basename($subdirname);
-
-                // Check module is not disabled
-                try{
-                    $className = 'Calendar_Api_Config_Connector_' . $connectorClassFilename;
-
-                    /* Module is not disabled. Augment that array
-                     */
-                    $allApi[$eventTypeFilename][$connectorClassFilename] = new $className;
-                }
-                catch (DomainException $e){
-
-                    // Expected if module is disabled.
-                    continue;
-                }
-            }
-        }
-
-        return $allApi;
-    }
 }
