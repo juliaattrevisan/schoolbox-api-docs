@@ -598,11 +598,11 @@ class Calendar extends DeprecatedModel
 			LEFT JOIN user ON event.author_id = user.id
 			LEFT JOIN luEventType ON type = eventTypeID
 			LEFT JOIN resource_booking ON event.id = resource_booking.event_id
-			LEFT JOIN event_user ON event.id = event_user.event_id AND access = ".self::ACCESS_PERSONAL."
-			LEFT JOIN event_category ON event.id = event_category.event_id AND access = ".self::ACCESS_GROUP."
+			LEFT JOIN event_user ON event.id = event_user.event_id AND access = ".EventModel::ACCESS_PERSONAL."
+			LEFT JOIN event_category ON event.id = event_category.event_id AND access = ".EventModel::ACCESS_GROUP."
 			LEFT JOIN folder ON event_category.category_id = folder.id AND event_category.category_id IS NOT NULL
-			LEFT JOIN event_group ON event.id = event_group.event_id AND access = ".self::ACCESS_CAMPUS."
-			LEFT JOIN event_campus ON event.id = event_campus.event_id AND access = ".self::ACCESS_CAMPUS."
+			LEFT JOIN event_group ON event.id = event_group.event_id AND access = ".EventModel::ACCESS_CAMPUS."
+			LEFT JOIN event_campus ON event.id = event_campus.event_id AND access = ".EventModel::ACCESS_CAMPUS."
 			WHERE
 			    event.deleted_at is NULL AND
 				resource_booking.id IS NULL
