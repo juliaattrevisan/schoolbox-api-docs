@@ -25,8 +25,6 @@ use Schoolbox\UserMapper;
 use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
-use Schoolbox\Learning\Quiz\Section\Question\Mapper as QuizQuestionMapper;
-use Schoolbox\Learning\Quiz\Section\Question\Model as QuizQuestionModel;
 use Schoolbox\Learning\Quiz\Section\Model as QuizSection;
 use Schoolbox\Learning\Quiz\Section\Mapper as QuizSectionMapper;
 use Schoolbox\Learning\Assessment\Redirect;
@@ -55,11 +53,6 @@ class Controller extends Assessment\Controller
     private $quizSectionMapper;
 
     /**
-     * @var QuizQuestionMapper
-     */
-    private $quizQuestionMapper;
-
-    /**
      * @var QuizAttemptMapper
      */
     private $quizAttemptMapper;
@@ -77,7 +70,6 @@ class Controller extends Assessment\Controller
      * @param BreadcrumbFactory      $bakery
      * @param QuizMapper             $quizMapper
      * @param QuizSectionMapper      $quizSectionMapper
-     * @param QuizQuestionMapper     $quizQuestionMapper
      * @param QuizAttemptMapper      $quizAttemptMapper
      * @param Term\Mapper            $termMapper
      * @param Participant\DataSource $participantDataSource
@@ -92,16 +84,14 @@ class Controller extends Assessment\Controller
         BreadcrumbFactory $bakery,
         QuizMapper $quizMapper,
         QuizSectionMapper $quizSectionMapper,
-        QuizQuestionMapper $quizQuestionMapper,
         QuizAttemptMapper $quizAttemptMapper,
         Term\Mapper $termMapper,
         Participant\DataSource $participantDataSource
     ) {
         parent::__construct($userMapper, $errorMapper, $assessmentMapper, $workTypeMapper, $access, $transactor, $bakery, $termMapper, $participantDataSource);
-        $this->quizMapper         = $quizMapper;
-        $this->quizSectionMapper  = $quizSectionMapper;
-        $this->quizQuestionMapper = $quizQuestionMapper;
-        $this->quizAttemptMapper  = $quizAttemptMapper;
+        $this->quizMapper        = $quizMapper;
+        $this->quizSectionMapper = $quizSectionMapper;
+        $this->quizAttemptMapper = $quizAttemptMapper;
     }
 
 
@@ -220,51 +210,15 @@ class Controller extends Assessment\Controller
      */
     public function getSummary(IAssessable $assessment, User $student): void
     {
-        // $assessment doesn't contain quiz questions, get something that does.
         /** @var Quiz $quiz */
         $quiz = $this->quizMapper->findOneByColumn('assessment_id', $assessment->getId());
         $quiz = $this->quizMapper->loadSectionsAndQuestions($quiz);
         $quiz = $this->quizMapper->loadAttemptsAndAnswers($quiz, $student);
 
-//        $quiz->setSections($this->quizSectionMapper->findByColumn(
-//            'assess_id',
-//            $quiz->getId(),
-//            ['order' => ['sequence' => 'asc']]
-//        ));
-//
-//        $quizQuestions = $this->quizQuestionMapper
-//            ->findByColumn(
-//                'section_id',
-//                $quiz->getSections()->getPropertyValues('id')
-//            )
-//            ->groupByCallback(function(QuizQuestionModel $q) {
-//                return $q->getSection()->getId();
-//            });
-//        foreach ($quiz->getSections() as $section) {
-//            if (isset($quizQuestions[$section->getId()])) {
-//                $section->setQuestions($quizQuestions[$section->getId()]);
-//            }
-//        }
-//
-//
-//        // Load attempts
-//        $quiz->setAttempts(
-//            $this->quizAttemptMapper->findByColumnList(
-//                ['assess_id' => $quiz->getId(), 'user_id'   => $student->getId(),],
-//                ['order' => ['start' => 'desc']]
-//            )
-//        );
-
-
-        // Load answers into quiz attempts
-
-
-
         // Can I attempt this?
         // TODO this should eventually be route permission based
         $actionValidator = new ActionValidator(Alaress_Date_Format::now(), $this->getAccess());
 
-        // load all of the questions here too
         $twigData = [
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([ $assessment->getTitle(), '' ]),
             'assessment'  => $assessment,

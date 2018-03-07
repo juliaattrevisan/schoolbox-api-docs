@@ -328,10 +328,9 @@ class Module extends BaseModule
 
         // quiz specific
         $qc =& $injector->params[Assessment\Quiz\Controller::class];
-        $qc['quizMapper']         = $this->getMapperFactory()->getLazy(QuizMapper::class);
-        $qc['quizSectionMapper']  = $this->getMapperFactory()->getLazy(QuizSectionMapper::class);
-        $qc['quizQuestionMapper'] = $this->getMapperFactory()->getLazy(QuizQuestionMapper::class);
-        $qc['quizAttemptMapper']  = $this->getMapperFactory()->getLazy(QuizAttemptMapper::class);
+        $qc['quizMapper']        = $this->getMapperFactory()->getLazy(QuizMapper::class);
+        $qc['quizSectionMapper'] = $this->getMapperFactory()->getLazy(QuizSectionMapper::class);
+        $qc['quizAttemptMapper'] = $this->getMapperFactory()->getLazy(QuizAttemptMapper::class);
 
         // task specific
         $tc =& $injector->params[Assessment\Task\Controller::class];
