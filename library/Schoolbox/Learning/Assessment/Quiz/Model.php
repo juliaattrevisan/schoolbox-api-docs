@@ -336,6 +336,16 @@ class Model extends AbstractAssessment
     }
 
     /**
+     * Does this quiz allow unlimited attempts?
+     *
+     * @return bool
+     */
+    public function isAttemptsUnlimited(): bool
+    {
+        return $this->maxAttempts === self::ATTEMPTS_UNLIMITED;
+    }
+
+    /**
      * @return string
      */
     public function getCompletionMessage()

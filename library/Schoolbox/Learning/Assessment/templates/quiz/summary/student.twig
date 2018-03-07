@@ -85,7 +85,7 @@
 {% if attempts | length %}
     <div class="row">
         <div class="small-12 columns">
-            <h2 class="subheader">Attempts</h2>
+            <h2 class="subheader">Attempts ({{ attempts | length }} / {{ assessment.attemptsUnlimited ? 'Unlimited' : assessment.maxAttempts }})</h2>
             <table id="attempts">
                 <thead>
                 <tr>
