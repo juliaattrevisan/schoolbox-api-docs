@@ -9,6 +9,7 @@ use \Schoolbox\Permission\Access\UserAccessMapper;
 
 $page = new SitePage();
 $forumHandler = new Forum();
+$userAccessMapper = UserAccessMapper::getInstance();
 
 if (is_numeric($_POST['categoryID'])) {
 
@@ -28,7 +29,6 @@ if (is_numeric($_POST['categoryID'])) {
 
 	/* check permissions
 	 */
-    $userAccessMapper = UserAccessMapper::getInstance();
 
     try {
         $accessLevel = $userAccessMapper->getAccess($_SESSION['user'], $folder->getId());
