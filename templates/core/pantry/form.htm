@@ -35,62 +35,82 @@
             <section>
                 <fieldset class="content">
                     <legend>In Most Cases, Single Column Works Best</legend>
-
-                        <div class="small-12 columns">
-                            <p>
-                                The <code>&lt;fieldset/&gt;</code> has been given the same styles as <code>.row</code>. The implication of this is that you should put
-                                <code>.columns</code> directly into fieldsets (after the <code>&lt;fieldset/&gt;</code>, if you're using one.)
-                            </p>
+                    <div class="small-12 columns">
+                        <p>
+                            The <code>&lt;fieldset/&gt;</code> has been given the same styles as <code>.row</code>. The implication of this is that you should put
+                            <code>.columns</code> directly into fieldsets (after the <code>&lt;fieldset/&gt;</code>, if you're using one.)
+                        </p>
+                    </div>
+                    <div class="small-12 columns">
+                        <label>Input Label
+                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="I'm here to display the description of the current field.">?</span>
+                            <input type="text" placeholder="Put some text here" />
+                        </label>
+                    </div>
+                    <div class="small-12 columns">
+                        <label>Input Number
+                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="This field only allows numbers">?</span>
+                            <input type="number" value="20" required />
+                        </label>
+                    </div>
+                    <div class="small-12 columns">
+                        <label>Input Group</label>
+                        <div class="input-group">
+                            <input type="text" placeholder="https://" />
+                            <a href="#" class="button icon-folder">Browser Resources</a>
                         </div>
-
-                        <div class="small-12 columns">
-                            <label>Input Label
-                                <span data-tooltip class="hint has-tip tip-top" data-width="200" title="I'm here to display the description of the current field.">?</span>
-                                <input type="text" placeholder="Put some text here" />
-                            </label>
-                        </div>
-                        <div class="small-12 columns">
-                            <label>Input Number
-                                <span data-tooltip class="hint has-tip tip-top" data-width="200" title="This field only allows numbers">?</span>
-                                <input type="number" value="20" required />
-                            </label>
-                        </div>
-                        <div class="small-12 columns">
-                            <label>Input Group</label>
-                            <div class="input-group">
-                                <input type="text" placeholder="https://" />
-                                <a href="#" class="button icon-folder">Browser Resources</a>
-                            </div>
-                        </div>
-                        <div class="small-12 columns">
-                            <label>Select Box
-                                <select>
-                                    <option value="husker">Husker</option>
-                                    <option value="starbuck">Starbuck</option>
-                                    <option value="hotdog">Hot Dog</option>
-                                    <option value="apollo">Apollo</option>
-                                </select>
-                            </label>
-                        </div>
-                        <div class="small-12 columns">
-                            <label>Textarea Label
-                                <span data-tooltip class="hint has-tip tip-top" data-width="200" title="I'm here to display the description of the current field.">?</span>
-                                <textarea>
-                                    <p>Hey look! <b>WYSIWYG</b> content.</p>
-                                    <p>XOXO cold-pressed roof party butcher banh mi, tilde single-origin coffee Odd Future. Heirloom farm-to-table authentic keffiyeh. Put a bird on it PBR health goth, cold-pressed deep v Pitchfork 3 wolf moon kale chips Blue Bottle. Pinterest street art butcher, irony single-origin coffee hashtag Truffaut. Williamsburg normcore chambray ethical pickled pour-over lo-fi. Distillery readymade flannel chia, fingerstache Marfa fashion axe pug asymmetrical disrupt beard Truffaut single-origin coffee. Kale chips irony blog skateboard tousled, paleo Austin tofu PBR&B taxidermy PBR trust fund Marfa organic cold-pressed.</p>
-                                    <p>Hashtag locavore wolf, meh typewriter put a bird on it keffiyeh fashion axe crucifix heirloom fixie readymade 90's Helvetica High Life. Echo Park keytar heirloom deep v trust fund meh, squid small batch. Hashtag cold-pressed you probably haven't heard of them, normcore gastropub chillwave Helvetica biodiesel. Irony occupy cold-pressed, mustache master cleanse mumblecore fap direct trade keytar hoodie High Life distillery. Ennui biodiesel organic vegan, 90's blog Truffaut meditation fap single-origin coffee squid Schlitz seitan craft beer. Literally farm-to-table tilde, Brooklyn Bushwick cardigan Vice. Gastropub farm-to-table Helvetica, chia XOXO whatever Shoreditch small batch Truffaut narwhal Marfa disrupt American Apparel.</p>
-                                    <p>Taxidermy seitan Bushwick, cronut roof party messenger bag occupy. Selfies mustache distillery, plaid YOLO tilde mumblecore keffiyeh. Gastropub Marfa plaid, irony hashtag banjo mumblecore. Health goth disrupt bespoke, craft beer Odd Future cardigan Williamsburg. Echo Park listicle pickled VHS DIY. Freegan health goth four dollar toast swag Blue Bottle Echo Park. Thundercats butcher four dollar toast, flexitarian meditation cliche letterpress kitsch.</p>
-                                    <p>Narwhal Pinterest four loko heirloom cliche ethical. Wes Anderson Carles try-hard sartorial. Wayfarers chillwave VHS, Bushwick hella bicycle rights pickled skateboard art party paleo cardigan readymade. Lomo tattooed mumblecore, pickled health goth drinking vinegar scenester Neutra skateboard. Cray Wes Anderson hella beard try-hard health goth wolf. Banh mi distillery Vice pickled blog Portland. PBR&B small batch lomo actually.</p>
-                                </textarea>
-                            </label>
-                            <script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
-                            <script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
-                            <script type="text/javascript">
-                                $(function () {
-                                    $.fn.alaressEditor();
-                                });
-                            </script>
-                        </div>
+                    </div>
+                    <div class="small-12 columns">
+                        <label>Select Box
+                            <select>
+                                <option value="husker">Husker</option>
+                                <option value="starbuck">Starbuck</option>
+                                <option value="hotdog">Hot Dog</option>
+                                <option value="apollo">Apollo</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div class="small-12 columns">
+                        <label>Textarea Label
+                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="I'm here to display the description of the current field.">?</span>
+                            <textarea>
+                                <p>Hey look! <b>WYSIWYG</b> content.</p>
+                                <p>XOXO cold-pressed roof party butcher banh mi, tilde single-origin coffee Odd Future. Heirloom farm-to-table authentic keffiyeh. Put a bird on it PBR health goth, cold-pressed deep v Pitchfork 3 wolf moon kale chips Blue Bottle. Pinterest street art butcher, irony single-origin coffee hashtag Truffaut. Williamsburg normcore chambray ethical pickled pour-over lo-fi. Distillery readymade flannel chia, fingerstache Marfa fashion axe pug asymmetrical disrupt beard Truffaut single-origin coffee. Kale chips irony blog skateboard tousled, paleo Austin tofu PBR&B taxidermy PBR trust fund Marfa organic cold-pressed.</p>
+                                <p>Hashtag locavore wolf, meh typewriter put a bird on it keffiyeh fashion axe crucifix heirloom fixie readymade 90's Helvetica High Life. Echo Park keytar heirloom deep v trust fund meh, squid small batch. Hashtag cold-pressed you probably haven't heard of them, normcore gastropub chillwave Helvetica biodiesel. Irony occupy cold-pressed, mustache master cleanse mumblecore fap direct trade keytar hoodie High Life distillery. Ennui biodiesel organic vegan, 90's blog Truffaut meditation fap single-origin coffee squid Schlitz seitan craft beer. Literally farm-to-table tilde, Brooklyn Bushwick cardigan Vice. Gastropub farm-to-table Helvetica, chia XOXO whatever Shoreditch small batch Truffaut narwhal Marfa disrupt American Apparel.</p>
+                                <p>Taxidermy seitan Bushwick, cronut roof party messenger bag occupy. Selfies mustache distillery, plaid YOLO tilde mumblecore keffiyeh. Gastropub Marfa plaid, irony hashtag banjo mumblecore. Health goth disrupt bespoke, craft beer Odd Future cardigan Williamsburg. Echo Park listicle pickled VHS DIY. Freegan health goth four dollar toast swag Blue Bottle Echo Park. Thundercats butcher four dollar toast, flexitarian meditation cliche letterpress kitsch.</p>
+                                <p>Narwhal Pinterest four loko heirloom cliche ethical. Wes Anderson Carles try-hard sartorial. Wayfarers chillwave VHS, Bushwick hella bicycle rights pickled skateboard art party paleo cardigan readymade. Lomo tattooed mumblecore, pickled health goth drinking vinegar scenester Neutra skateboard. Cray Wes Anderson hella beard try-hard health goth wolf. Banh mi distillery Vice pickled blog Portland. PBR&B small batch lomo actually.</p>
+                            </textarea>
+                        </label>
+                        <script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
+                        <script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
+                        <script type="text/javascript">
+                            $(function () {
+                                $.fn.alaressEditor();
+                            });
+                        </script>
+                    </div>
+                    <div class="small-12 medium-4 columns">
+                        <label>Disabled Input
+                            <input type="text" placeholder="You cant type here" disabled />
+                        </label>
+                    </div>
+                    <div class="small-12 medium-4 columns">
+                        <label>Disabled Textarea
+                            <textarea disabled>
+                                You cant type here either
+                            </textarea>
+                        </label>
+                    </div>
+                    <div class="small-12 medium-4 columns">
+                        <label>Disabled Select
+                            <select disabled>
+                                <option value="husker">Husker</option>
+                                <option value="starbuck">Starbuck</option>
+                                <option value="hotdog">Hot Dog</option>
+                                <option value="apollo">Apollo</option>
+                            </select>
+                        </label>
+                    </div>
                 </fieldset>
                 <fieldset class="content" data-equalizer>
                     <legend>Use Two Columns Judiciously (and make sure they fall down into fewer columns on small displays)</legend>
@@ -131,6 +151,10 @@
                             <input id="exampleCheckboxSwitch" type="checkbox">
                             <label for="exampleCheckboxSwitch"></label>
                         </div>
+                        <div class="switch">
+                            <input id="disbledCheckboxSwitch" type="checkbox" disabled>
+                            <label for="disbledCheckboxSwitch"></label>
+                        </div>
                     </div>
 
                     <div class="small-12 medium-6 columns">
@@ -143,36 +167,39 @@
                                 <span>Off</span>
                             </label>
                         </div>
-
-                        <div class="long switch round">
+                        <div class="switch round">
                             <input id="checkboxGroup2" type="checkbox" data-checkbox-group="example" />
                             <label for="checkboxGroup2">
+                                <span class="icon-approve"></span>
+                                <span class="icon-cancel"></span>
+                            </label>
+                        </div>
+                        <div class="long switch round">
+                            <input id="checkboxGroup3" type="checkbox" data-checkbox-group="example" />
+                            <label for="checkboxGroup3">
                                 <span>Locked</span>
                                 <span>Unlocked</span>
                             </label>
                         </div>
-
                         <div class="long switch round">
-                            <input id="checkboxGroup3" type="checkbox" data-checkbox-group="example" />
-                            <label for="checkboxGroup3">
+                            <input id="checkboxGroup4" type="checkbox" data-checkbox-group="example" />
+                            <label for="checkboxGroup4">
                                 <span>Readonly</span>
                                 <span>Editable</span>
                             </label>
                         </div>
-
                         <div class="long switch round">
-                            <input id="checkboxGroup4" type="checkbox" data-checkbox-group="example" />
-                            <label for="checkboxGroup4">
+                            <input id="checkboxGroup5" type="checkbox" data-checkbox-group="example" />
+                            <label for="checkboxGroup5">
                                 <span>Admin</span>
                                 <span>Member</span>
                             </label>
                         </div>
-
-                        <div class="switch round">
-                            <input id="checkboxGroup5" type="checkbox" data-checkbox-group="example" />
-                            <label for="checkboxGroup5">
-                                <span class="icon-approve"></span>
-                                <span class="icon-cancel"></span>
+                        <div class="long switch round">
+                            <input id="checkboxGroup6" type="checkbox" data-checkbox-group="example" disabled />
+                            <label for="checkboxGroup6">
+                                <span>Admin</span>
+                                <span>Disabled</span>
                             </label>
                         </div>
                     </div>
@@ -197,7 +224,7 @@
 
                 <fieldset class="content">
                     <legend>Checkbox toggle with Icons</legend>
-                    <div class="small-12 columns">
+                    <div class="small-6 columns">
                         <input id="iconCheckboxToggle0" type="checkbox" />
                         <label for="iconCheckboxToggle0" class="input-toggle" title="Remove From Group">
                             <span class="icon-close alert"></span>
@@ -211,8 +238,22 @@
                             <span class="icon-modify"></span>
                         </label>
                     </div>
+                    <div class="small-6 columns">
+                        <input id="iconCheckboxToggle3" type="checkbox" disabled />
+                        <label for="iconCheckboxToggle3" class="input-toggle" title="Remove From Group">
+                            <span class="icon-close alert"></span>
+                        </label>
+                        <input id="iconCheckboxToggle4" type="checkbox" disabled />
+                        <label for="iconCheckboxToggle4" class="input-toggle" title="Remove From Group">
+                            <span class="icon-eye"></span>
+                        </label>
+                        <input id="iconCheckboxToggle5" type="checkbox" disabled />
+                        <label for="iconCheckboxToggle5" class="input-toggle" title="Remove From Group">
+                            <span class="icon-modify"></span>
+                        </label>
+                    </div>
                     <legend>Radio toggle with Icons</legend>
-                    <div class="small-12 columns">
+                    <div class="small-6 columns">
                         <input id="iconRadioToggle00" type="radio" name="icons" />
                         <label for="iconRadioToggle00" class="input-toggle" title="Remove From Group">
                             <span class="icon-close alert"></span>
@@ -226,8 +267,22 @@
                             <span class="icon-modify"></span>
                         </label>
                     </div>
+                    <div class="small-6 columns">
+                        <input id="iconRadioToggle33" type="radio" name="icons" disabled />
+                        <label for="iconRadioToggle33" class="input-toggle" title="Remove From Group">
+                            <span class="icon-close alert"></span>
+                        </label>
+                        <input id="iconRadioToggle44" type="radio" name="icons" disabled />
+                        <label for="iconRadioToggle44" class="input-toggle" title="Remove From Group">
+                            <span class="icon-eye"></span>
+                        </label>
+                        <input id="iconRadioToggle55" type="radio" name="icons" disabled />
+                        <label for="iconRadioToggle55" class="input-toggle" title="Remove From Group">
+                            <span class="icon-modify"></span>
+                        </label>
+                    </div>
                     <legend>Checkbox Switch with Text</legend>
-                    <div class="small-12 columns">
+                    <div class="small-12 medium-6 columns">
                         <input id="textCheckboxToggle" type="checkbox">
                         <label for="textCheckboxToggle" class="input-toggle">V</label>
                         <input id="textCheckboxToggle2" type="checkbox">
@@ -246,6 +301,24 @@
                         <label for="textCheckboxToggle8" class="input-toggle">V</label>
                         <input id="textCheckboxToggle9" type="checkbox">
                         <label for="textCheckboxToggle9" class="input-toggle">E</label>
+                    </div>
+                    <div class="small-12 medium-6 columns">
+                        <input id="textCheckboxToggle10" type="checkbox" disabled>
+                        <label for="textCheckboxToggle10" class="input-toggle">D</label>
+                        <input id="textCheckboxToggle11" type="checkbox" disabled>
+                        <label for="textCheckboxToggle11" class="input-toggle">I</label>
+                        <input id="textCheckboxToggle12" type="checkbox" disabled>
+                        <label for="textCheckboxToggle12" class="input-toggle">S</label>
+                        <input id="textCheckboxToggle13" type="checkbox" disabled>
+                        <label for="textCheckboxToggle13" class="input-toggle">A</label>
+                        <input id="textCheckboxToggle14" type="checkbox" disabled>
+                        <label for="textCheckboxToggle14" class="input-toggle">B</label>
+                        <input id="textCheckboxToggle15" type="checkbox" disabled>
+                        <label for="textCheckboxToggle15" class="input-toggle">L</label>
+                        <input id="textCheckboxToggle16" type="checkbox" disabled>
+                        <label for="textCheckboxToggle16" class="input-toggle">E</label>
+                        <input id="textCheckboxToggle17" type="checkbox" disabled>
+                        <label for="textCheckboxToggle17" class="input-toggle">D</label>
                     </div>
                 </fieldset>
 

@@ -19,23 +19,18 @@ $form-label-bottom-margin: 0;
 $input-font-color: $black;
 $input-font-size: $paragraph-font-size;
 $input-height: $global-button-input-height;
-
 $input-bg-color: $white;
-
 $input-focus-bg-color: $form-bg-hover-color;
 $input-focus-color: calc-text-color($input-focus-bg-color);
-
 $input-border-color: $form-border-color !default;
 $input-focus-border-color: darken($form-border-color, 15%);
-
 $input-hover-bg-color: $form-bg-hover-color;
 $input-hover-color: $black;
-
 $input-border-style: solid;
 $input-border-width: .0625rem;
 $input-border-radius: $global-radius;
 $input-disabled-bg: rgba($input-focus-bg-color, 0.05);
-// $input-disabled-cursor: $cursor-default-value;
+$input-disabled-cursor: $cursor-default-value;
 $input-box-shadow: none;
 
 // We use these to style the fieldset border and spacing.
@@ -132,13 +127,13 @@ $switch-negative-color: tint($secondary-color, 74%);
 //
 form {
 	@include placeholder-color($base, $font-weight-normal);
-	@include placeholder-hover-color($content-ui-foreground);
 	margin: 0 0 $form-spacing / 2 0;
 }
 
 input,
 textarea,
 select{
+	@include placeholder-hover-color($content-ui-foreground);
 	@include single-transition(all, 0.15s, linear);
 	min-height: $global-button-input-height;
 	line-height: inherit;
@@ -156,6 +151,21 @@ select{
 	}
 }
 
+input:disabled:hover,
+textarea:disabled:hover,
+select:disabled:hover,
+input:read-only:hover,
+textarea:read-only:hover {
+	background-color: $input-bg-color;
+	cursor: $cursor-default-value
+}
+
+input:disabled {
+	form & {
+		@include placeholder-hover-color(transparent);
+	}
+}
+
 input[type="checkbox"],
 input[type="radio"]{
 	min-height: 1.5rem;
@@ -163,11 +173,6 @@ input[type="radio"]{
 
 input[type="number"]{
   	padding: 0 0 0 $form-spacing / 2;
-}
-
-input,
-textarea{
-	padding-left: 0.75rem;
 }
 
 select {
@@ -360,20 +365,20 @@ input[type=radio]{
 			line-height: 1;
 		}
 		&:hover{
-			//border: 1px solid $content-ui-foreground;
 			background-color: $content-ui-background;
 			color: $content-ui-foreground;
 		}
 	}
-	&:checked{
-		+ .block{
-			background-color: $content-ui-foreground;
-			border: $input-border-width solid $content-ui-foreground;
+	&:checked + .block{
+		background-color: $content-ui-foreground;
+		border: $input-border-width solid $content-ui-foreground;
+		color: $content-ui-selected;
+		i {
 			color: $content-ui-selected;
-			i{
-				color: $content-ui-selected;
-			}
 		}
+	}
+	&:disabled + .block {
+		background-color: $white;
 	}
 }
 
@@ -497,7 +502,9 @@ input[type=radio]:not(.plain) + label {
 input[type=checkbox]:not(.plain):disabled,
 input[type=radio]:not(.plain):disabled{
 	& + label{
-	opacity: 0.5;
+		cursor: $cursor-default-value;
+		opacity: 0.5;
+
 		&:after{
 			opacity: 0.5;
 		}
@@ -506,7 +513,7 @@ input[type=radio]:not(.plain):disabled{
 
 input[type=checkbox]:not(.plain):disabled:checked + label,
 input[type=radio]:not(.plain):disabled:checked + label{
-  opacity: 0.5;
+	opacity: 0.5;
 }
 
 select.visibility {

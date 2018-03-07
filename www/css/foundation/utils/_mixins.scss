@@ -179,29 +179,13 @@
 }
 
 @mixin placeholder-hover-color($color) {
-	input:focus::-webkit-input-placeholder,
-	textarea:focus::-webkit-input-placeholder	{ color: $color; }
+	&:focus::-webkit-input-placeholder	{ color: $color; }
+	&:focus:-moz-placeholder			{ color: $color; }
+	&:focus:-ms-input-placeholder		{ color: $color; }
 
-	input:focus:-moz-placeholder,				{ color: $color; }
-	textarea:focus:-moz-placeholder,			{ color: $color; }
-
-	input:focus::-moz-placeholder,				{ color: $color; }
-	textarea:focus::-moz-placeholder			{ color: $color; }
-
-	input:focus:-ms-input-placeholder,			{ color: $color; }
-	textarea:focus:-ms-input-placeholder		{ color: $color; }
-
-	input:hover::-webkit-input-placeholder,		{ color: $color; }
-	textarea:hover::-webkit-input-placeholder	{ color: $color; }
-
-	input:hover:-moz-placeholder,				{ color: $color; }
-	textarea:hover:-moz-placeholder				{ color: $color; }
-
-	input:hover::-moz-placeholder,				{ color: $color; }
-	textarea:hover::-moz-placeholder			{ color: $color; }
-
-	input:hover:-ms-input-placeholder,			{ color: $color; }
-	textarea:hover:-ms-input-placeholder		{ color: $color; }
+	&:hover::-webkit-input-placeholder	{ color: $color; }
+	&:hover::-moz-placeholder			{ color: $color; }
+	&:hover:-ms-input-placeholder		{ color: $color; }
 }
 
 @mixin responsive-sides($multiplier: 1, $property: padding, $small-adjust: 8, $medium-adjust: 4, $large-adjust: 0, $importance: "") {
