@@ -381,48 +381,50 @@ class Model extends AbstractAssessment implements ISelfAssessable
         return false;
     }
 
+
     /**
-     * Can the specified learner acknowledge submitting in person?
+     * Is the given user allowed to acknowledge that they have submitted work offline?
      *
-     * @param User $learner A user with WRITE+ perm to this assessment's folder context
+     * @param User $learner
+     * @throws UnexpectedValueException
      * @return bool
      */
     public function canLearnerCreateAcknowledgement(User $learner)
     {
-        // Not open ?
+        // if self-assess is off, use the same rules as response-create
+        if (!$this->isSelfAssessable()) {
+            return $this->canLearnerCreateResponse($learner);
+        }
+
+        // ok, rules for self-assess
+
+        // not allowed if the DW isn't open for the user yet (or ever)
         if(!$this->isOpen($learner)){
             return false;
         }
 
-        // Not a participant ?
+        // not allowed if you're not a participant
         $participant = $this->getParticipantIfExtant($learner);
         if (!$participant) {
             return false;
         }
 
-        // Has student submitted their single permitted response ?
-        if ($participant->hasSubmittedResponse()) {
-            return false;
-        }
+        /*
+         * ** Rules **
+         * Accept None: ack as often as you like
+         * Accept One: ack once
+         * Accept Multi: ack as often as you like
+         */
 
-        // Is this due work self assessable AND doesn't accept online submissions?
-        if ($this->isSelfAssessable() && $this->isAcceptNone()) {
+        if ($this->isAcceptMulti() || $this->isAcceptNone()) {
             return true;
         }
 
-        /* TODO most of this is redundant if the method is only used in the appropriate context */
-
-        // Does this DueWork not accept online responses ?
-        if ($this->isAcceptNone()) {
-            return false;
-        }
-
-        if ($this->isAcceptMulti()) {
+        // not submitted a response yet? ok you can ACK
+        if (!$participant->hasSubmittedResponse()) {
             return true;
         }
 
-
-        // Logically impossible - but be defensive
         return false;
     }
 

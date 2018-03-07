@@ -7,7 +7,8 @@
 
 namespace Schoolbox\Learning\Authorizer\Rule;
 
-use Alaress\Authorizer\Failure\Unauthorized;
+use Alaress\Authorizer\Failure;
+use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\User;
 use InvalidArgumentException;
@@ -34,12 +35,17 @@ class CanAcknowledgeAssessment extends AbstractParticipationRule
      * @param array     $params
      * @param User|null $user
      * @return bool
-     * @throws Unauthorized If unable to respond because student has reached response limit
+     * @throws Failure\Base If unable to respond because student has reached response limit
      * @throws InvalidArgumentException If unable to locate an IAssessable or User instance in route params
      */
     public function authorize(array $params = [], User $user = null)
     {
         $assessment = $this->findAssessable($params);
+
+        if (!$assessment instanceof DueWork\Model) {
+            throw new Failure\InvalidPath();
+        }
+
         $folder     = $assessment->getBaseContext()->getFolder();
         $student    = $this->findStudent($params);
 
@@ -55,6 +61,6 @@ class CanAcknowledgeAssessment extends AbstractParticipationRule
             return true;
         }
 
-        throw new Unauthorized();
+        throw new Failure\Unauthorized();
     }
 }

@@ -530,8 +530,7 @@ class Module extends BaseModule
                     new Rule\IsUser('studentId'),
                     new IsInteractionUnLocked(new LockedChecker($this->getTermMapper())),
                     new IsAssessmentOpen(),
-                    new CanAcknowledgeAssessment($this->getAccess()),
-                    new ParticipantHasNoInteractions()
+                    new CanAcknowledgeAssessment($this->getAccess())
                 )
             )
         );
