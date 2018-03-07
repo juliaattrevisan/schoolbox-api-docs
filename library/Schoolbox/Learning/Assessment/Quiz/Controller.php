@@ -229,18 +229,18 @@ class Controller extends Assessment\Controller
         $actionValidator = new ActionValidator(Alaress_Date_Format::now(), $this->getAccess());
 
         $twigData = [
-            'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([ $assessment->getTitle(), '' ]),
-            'assessment'  => $assessment,
-            'student'     => $student,
-            'participant' => $assessment->getParticipantIfExtant($student),
-            'quiz'        => $quiz,
+            'breadcrumbs'       => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([ $assessment->getTitle(), '' ]),
+            'assessment'        => $assessment,
+            'student'           => $student,
+            'participant'       => $assessment->getParticipantIfExtant($student),
+            'quiz'              => $quiz,
             'attemptInProgress' => $attemptInProgress,
-            'returnUrl'   => $this->getRequest()->query->get(Redirect::RETURN_URL),
+            'returnUrl'         => $this->getRequest()->query->get(Redirect::RETURN_URL),
             // User may only attempt quiz from here if viewing own summary
-            'canAttempt'  => $student->getId() === $this->getUser()->getId()
-                && $actionValidator->canAttemptQuiz($this->getUser(), $assessment),
-            'canReview'       => $actionValidator->canReviewAttempts($this->getUser(), $student, $assessment),
-            'canStudentReview'=> $actionValidator->canReviewAttemptsReadonly(
+            'canAttempt'        => $student->getId() === $this->getUser()->getId()
+                                   && $actionValidator->canAttemptQuiz($this->getUser(), $assessment),
+            'canReview'         => $actionValidator->canReviewAttempts($this->getUser(), $student, $assessment),
+            'canStudentReview'  => $actionValidator->canReviewAttemptsReadonly(
                 $this->getUser(),
                 $student,
                 $assessment,
