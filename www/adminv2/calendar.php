@@ -1,6 +1,8 @@
 <?php
 
+use Calendar\Api\ApiHierarchyGenerator;
 use Schoolbox\Calendar\Relation;
+use Schoolbox\Config\ConfigMapper;
 
 if (!$_SESSION['user']->isSuperuser()) {
     error(19);
@@ -104,11 +106,12 @@ foreach ($typeList as $type) {
 
         /* Subscribe page
          */
-        $allApi = Calendar_Api_Config_Mapper::getInstance()->generateApiHierarchy();
+        $generator    = new ApiHierarchyGenerator(ConfigMapper::getInstance());
+        $availableApi = $generator->generateApiHierarchy();
 
         /* All calendar subscription options go here
          */
-        foreach ($allApi as $currentEventType => $allConnectors) {
+        foreach ($availableApi as $currentEventType => $allConnectors) {
 
             /* Render titles etc
              * Put a space between 'CamelCase' names so they become 'Camel Case'

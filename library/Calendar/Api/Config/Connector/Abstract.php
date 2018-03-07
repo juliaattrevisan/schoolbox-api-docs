@@ -59,32 +59,6 @@ abstract class Calendar_Api_Config_Connector_Abstract implements Calendar_Api_Co
      */
     protected $hasPermissions = false;
 
-    /**
-     * Used when previously saved config is unserialised from DB record.
-     */
-    public function __wakeup()
-    {
-        $this->checkModuleEnabled();
-    }
-
-    /**
-     * Used when config is created for the first time.
-     */
-    public function __construct()
-    {
-        $this->checkModuleEnabled();
-    }
-
-    /**
-     * Checks if relevant module is enabled. If not, throw Exception.
-     *
-     * @throws DomainException
-     * @return true If no exception thrown
-     */
-    protected function checkModuleEnabled(){
-        // Default. Descendants to override with module-specific logic.
-        return true;
-    }
 
     /**
      * Gets a sensible default label for this connector.

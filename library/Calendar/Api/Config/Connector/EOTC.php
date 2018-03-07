@@ -32,7 +32,6 @@ class Calendar_Api_Config_Connector_EOTC extends Calendar_Api_Config_Connector_A
         // TODO inject RosettaStone
         $stoneFactory = new RosettaStoneFactory();
         $this->stone  = $stoneFactory->build(Schoolbox\L10n\Mapper::getInstance());
-        parent::__construct();
     }
 
     /**
@@ -43,20 +42,6 @@ class Calendar_Api_Config_Connector_EOTC extends Calendar_Api_Config_Connector_A
         return $this->stone->translate('eotc', false, true);
     }
 
-    /**
-     * Checks if EOTC module is enabled. If not, throw Exception.
-     * @throws DomainException
-     * @return true If no exception thrown
-     */
-    protected function checkModuleEnabled()
-    {
-        //Ensure EOTC module is enabled
-        $configMapper = \Schoolbox\Config\ConfigMapper::getInstance();
-        if(0 == $configMapper->get('eotc_enabled')){
-            throw new DomainException(sprintf('%s Module is disabled', $this->stone->translate('eotc', false, false)));
-        }
-        return true;
-    }
 
     /**
      * Render configs into admin screen
