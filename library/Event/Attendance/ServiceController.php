@@ -16,32 +16,27 @@ class Event_Attendance_ServiceController extends Controller
         $this->setCalendarHandler( new Calendar );
     }
 
-    public function processToggleAttendance ($data) {
-        $event = $this->getCalendarHandler()->getByID($data['event']['id']);
+    public function setAttendance ($data) {
+        
+        $eventMapper = \Schoolbox\Calendar\EventMapper::getInstance();
 
-        if ( !is_array($event) ) {
-            return json_encode( array(
-                'error' => 34 // @todo Create error message for event not found
-            ) );
+        if($data['status'] === 'add') {
+            try {
+                $eventMapper->addAttendance($data['event']['id'], $_SESSION['id']);
+                return json_encode( "Attendance for event ".$data['event']['id']." added." );
+            } catch (PDOException $e) {
+                return json_encode( "No event with id: ".$data['event']['id']." exists."  );
+            }
+        } else if ($data['status'] === 'remove') {
+            try {
+                $eventMapper->removeAttendance($data['event']['id'], $_SESSION['id']);
+                return json_encode( "Attendance for event ".$data['event']['id']." removed." );
+            } catch (Exception $e) {
+
+            }
+        } else {
+            return json_encode( "No status was given." );
         }
-
-        $attendance = $this->getCalendarHandler()->getAttendanceByEventAndUser($event['id'], $_SESSION['id']);
-
-        if ( !is_array($attendance) ) {
-            $attendance = array(
-                'event_id' => $event['id'],
-                'user_id' => $_SESSION['id'],
-                'status' => Calendar::ATTENDANCE_STATUS_PENDING,
-                'intention' => Calendar::ATTENDANCE_INTENTION_PRESENT
-            );
-
-            $this->getCalendarHandler()->createAttendance($attendance);
-        }
-        else {
-            $this->getCalendarHandler()->removeAttendance($attendance['id']);
-        }
-
-        return json_encode( array() );
     }
 
     /**

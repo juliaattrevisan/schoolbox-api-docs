@@ -32,7 +32,7 @@
 
                 /* The controller to deal with the attendance
                  */
-                url: '/service/attendance/processToggleAttendance',
+                url: '/service/attendance/setAttendance',
 
                 /* Text strings for button label states
                  */
@@ -67,9 +67,15 @@
 
                 var data = config.getFormData(button);
 
+                if (button.text() === config.text.rsvp) {
+                    data['status'] = 'add';
+                } else {
+                    data['status'] = 'remove';
+                }
+
                 $.post(config.url, data, function (data) {
                     if (data.error == undefined) {
-                        if (button.text() == config.text.rsvp) {
+                        if (button.text() === config.text.rsvp) {
                             button.html(config.text.unattend);
                         }
                         else {
