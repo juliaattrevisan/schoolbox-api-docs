@@ -25,12 +25,19 @@ $kernel = new Schoolbox\Application\Daemon\Kernel('Create Missing Resource Booki
 ]);
 
 $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
-    $status = (int)Config::getInstance()->get('resource_booking_enabled');
-    $mapper = Calendar_Api_Config_Mapper::getInstance();
+    $db = Database::getInstance();
+
+    $status = (int)$db->query("
+        SELECT value 
+        FROM `config`
+        WHERE name = 'resource_booking_enabled'
+        LIMIT 1
+    ")->fetch()['value'];
 
     /* Install the Resource Booking "Booking" config if it doesn't already exist
      */
     try {
+
         $mapper->findOneByColumnList([
             'event_type' => 'ResourceBooking',
             'connector_class' => 'Booking'
