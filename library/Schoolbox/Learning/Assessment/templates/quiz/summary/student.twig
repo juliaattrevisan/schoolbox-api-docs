@@ -134,7 +134,7 @@
                                 {% set totalMarkGraded = attempt.totalMarkGraded %}
                                 {{ attempt.mark }}/{{ totalMark }}
                                 {% if totalMarkGraded < totalMark %}
-                                    ({{ totalMarkGraded/totalMark*100|round }}% graded)
+                                    ({{ (totalMarkGraded/totalMark*100) | round }}% graded)
                                 {% endif %}
                             {% else %}
                                 —
