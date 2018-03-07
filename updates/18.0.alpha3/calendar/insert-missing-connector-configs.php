@@ -28,8 +28,6 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
     $db = Database::getInstance();
 
     /* Force respawn of missing records
-     * The models are very powerful in their awareness of feature flags, so force-activate Resource Booking,
-     * spawn the missing rows, then restore Resource Booking to its original state
      */
     $status = (int)$db->query("
         SELECT value 
@@ -37,14 +35,6 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
         WHERE name = 'resource_booking_enabled'
         LIMIT 1
     ")->fetch()['value'];
-
-    /* Forcibly activate Resource Booking
-     */
-    $db->query("
-        UPDATE `config` 
-        SET value = 1 WHERE name = 'resource_booking_enabled'
-        LIMIT 1
-    ");
 
     /* Install the Resource Booking "Booking" config if it doesn't already exist
      */
@@ -107,12 +97,4 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
             VALUES (\"ResourceBooking\", \"Moderation\", \"{$newRecord->encodeConfig()}\", \"{$status}\")
         ");
     }
-
-    /* Forcibly restore Resource Booking to its former glory
-     */
-    $db->query("
-        UPDATE `config` 
-        SET value = {$status} WHERE name = 'resource_booking_enabled'
-        LIMIT 1
-    ");
 });
