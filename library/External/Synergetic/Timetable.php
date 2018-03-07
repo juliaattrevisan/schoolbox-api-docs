@@ -539,7 +539,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
                     'SubstitutedFlag' => $spRow['SubstitutedFlag'],
                     'AttendanceMarked' => $spRow['IsMarkedFlag'],
                     'AttendanceEnabled' => $spRow['AttendanceEntryEnabledFlag'],
-                    'ClassCancelled' => $spRow['ClassCancelled'],
+                    'ClassCancelled' => $spRow['ClassCancelledFlag'],
 
                 );
             }
@@ -585,7 +585,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
                         'SubstituteFlag'    => $desc['SubstituteFlag'],
                         'SubstitutedFlag'   => $desc['SubstitutedFlag'],
                         'AttendanceMarked'  => $desc['AttendanceMarked'],
-                        'AttendanceEnabled' => ($desc['AttendanceEnabled'] || !$desc['ClassCancelled']) ? true : false,
+                        'AttendanceEnabled' => ($desc['AttendanceEnabled'] && !$desc['ClassCancelled']) ? true : false,
                         'ClassCancelled'    => $desc['ClassCancelled'],
                     );
                     break;

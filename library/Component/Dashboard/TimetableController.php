@@ -255,7 +255,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
 
                                 $this->setVar('PERIOD_DESC', $description);
 
-                                if($class['classCancelled']) {
+                                if($class['ClassCancelled']) {
                                     $this->setVar('CLASS_CANCELLED', 'strike');
                                 }
                                 else {
