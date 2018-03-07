@@ -104,10 +104,18 @@
                     {% set finished = attempt.finish and not attempt.finish.null %}
                     <tr data-attempt>
                         <td>{{ attempt.start.short }}</td>
-                        <td>{{ finished ? attempt.finish.short : 'In Progress' }}</td>
+                        <td>
+                            {% if finished %}
+                                {{ attempt.finish.short }}
+                            {% else %}
+                                <em>Attempt in progress</em>
+                            {% endif %}
+                        </td>
                         <td>
                             {% if finished %}
                                 {{ duration.secondsToHoursAndMinutes(attempt.start.diffInSeconds(attempt.finish, true)) }}
+                            {% else %}
+                                <em>{{ duration.secondsToHoursAndMinutes(attempt.start.diffInSeconds(NOW, true)) }}</em>
                             {% endif %}
                         </td>
                         <td>{{ attempt.reviewed.short }}</td>
