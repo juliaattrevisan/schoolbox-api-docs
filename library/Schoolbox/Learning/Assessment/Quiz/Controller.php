@@ -215,6 +215,15 @@ class Controller extends Assessment\Controller
         $quiz = $this->quizMapper->loadSectionsAndQuestions($quiz);
         $quiz = $this->quizMapper->loadAttemptsAndAnswers($quiz, $student);
 
+        // Which attempt is in progress? Show a CTA to resume that if there is one
+        $attemptInProgress = null;
+        foreach ($quiz->getAttempts() as $attempt) {
+            if (!$attempt->isFinished()) {
+                $attemptInProgress = $attempt;
+                break;
+            }
+        }
+
         // Can I attempt this?
         // TODO this should eventually be route permission based
         $actionValidator = new ActionValidator(Alaress_Date_Format::now(), $this->getAccess());
@@ -225,6 +234,7 @@ class Controller extends Assessment\Controller
             'student'     => $student,
             'participant' => $assessment->getParticipantIfExtant($student),
             'quiz'        => $quiz,
+            'attemptInProgress' => $attemptInProgress,
             'returnUrl'   => $this->getRequest()->query->get(Redirect::RETURN_URL),
             // User may only attempt quiz from here if viewing own summary
             'canAttempt'  => $student->getId() === $this->getUser()->getId()
