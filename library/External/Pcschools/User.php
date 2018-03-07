@@ -880,13 +880,15 @@ class External_Pcschools_User implements External_UserInterface
             // Add classes for each day into it
             /** @noinspection PhpAssignmentInConditionInspection */
             while ($dayClass = $statement->fetch()) {
-                $code = $timePeriod . '/' . $dayClass['YEAR'] . $dayClass['ABBREV'] . $dayClass['CLASS'];
-                $classes[$code] = [
-                    'code'       => $code,
-                    'name'       => $dayClass['DESC'],
-                    'classType'  => '',
-                    'campusCode' => $timePeriod,
-                ];
+                if ($dayClass['SUPERDATE'] == null || $dayClass['SUPERDATE'] == date("Y-m-d") . " 00:00:00.000") {
+                    $code = $timePeriod . '/' . $dayClass['YEAR'] . $dayClass['ABBREV'] . $dayClass['CLASS'];
+                    $classes[$code] = [
+                        'code'       => $code,
+                        'name'       => $dayClass['DESC'],
+                        'classType'  => '',
+                        'campusCode' => $timePeriod,
+                    ];
+                }
             }
             $statement->close();
         }

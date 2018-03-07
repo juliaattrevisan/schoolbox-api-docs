@@ -272,19 +272,21 @@ class External_Pcschools_Timetable implements External_TimetableInterface
 
         // Add classes for each day into it
         foreach ($dayClasses as $dayClass) {
-            // TODO: Remove hardcoded day one once Schoolbox supports different day/times
-            $period = "01." . str_pad($dayClass['PERIOD'], 2, '0');
+            if ($dayClass['SUPERDATE'] == null || $dayClass['SUPERDATE'] == date("Y-m-d") . " 00:00:00.000") {
+                // TODO: Remove hardcoded day one once Schoolbox supports different day/times
+                $period = "01." . str_pad($dayClass['PERIOD'], 2, '0');
 
-            $classCode = $timePeriod . '/' . $dayClass['YEAR'] . $dayClass['ABBREV'] . $dayClass['CLASS'];
+                $classCode = $timePeriod . '/' . $dayClass['YEAR'] . $dayClass['ABBREV'] . $dayClass['CLASS'];
 
-            if ($dayNumber == $dayClass['DAY']) {
-                $timetable[$period]['class'][$classCode] = [
-                    'description'        => $dayClass['DESC'],
-                    'code'               => $classCode,
-                    'campus'             => $timePeriod,
-                    'room'               => $dayClass['ROOM'],
-                    'StaffPreferredName' => $dayClass['NAME_FOR_REPORT'],
-                ];
+                if ($dayNumber == $dayClass['DAY']) {
+                    $timetable[$period]['class'][$classCode] = [
+                        'description'        => $dayClass['DESC'],
+                        'code'               => $classCode,
+                        'campus'             => $timePeriod,
+                        'room'               => $dayClass['ROOM'],
+                        'StaffPreferredName' => $dayClass['NAME_FOR_REPORT'],
+                    ];
+                }
             }
         }
 
@@ -401,19 +403,21 @@ class External_Pcschools_Timetable implements External_TimetableInterface
 
         // Add classes for each day into it
         foreach ($dayClasses as $dayClass) {
-            // TODO: Remove hardcoded day one once Schoolbox supports different day/times
-            $period = "01." . str_pad($dayClass['PERIOD'], 2, '0');
+            if ($dayClass['SUPERDATE'] == null || $dayClass['SUPERDATE'] == date("Y-m-d") . " 00:00:00.000") {
+                // TODO: Remove hardcoded day one once Schoolbox supports different day/times
+                $period = "01." . str_pad($dayClass['PERIOD'], 2, '0');
 
-            $classCode = $timePeriod . '/' . $dayClass['YEAR'] . $dayClass['ABBREV'] . $dayClass['CLASS'];
+                $classCode = $timePeriod . '/' . $dayClass['YEAR'] . $dayClass['ABBREV'] . $dayClass['CLASS'];
 
-            if ($dayNumber == $dayClass['DAY']) {
-                $timetable[$period]['class'][$classCode] = [
-                    'description'        => "{$period} {$dayClass['DESC']}",
-                    'code'               => $classCode,
-                    'campus'             => $timePeriod,
-                    'room'               => $dayClass['ROOM'],
-                    'StaffPreferredName' => $dayClass['NAME_FOR_REPORT'],
-                ];
+                if ($dayNumber == $dayClass['DAY']) {
+                    $timetable[$period]['class'][$classCode] = [
+                        'description'        => "{$period} {$dayClass['DESC']}",
+                        'code'               => $classCode,
+                        'campus'             => $timePeriod,
+                        'room'               => $dayClass['ROOM'],
+                        'StaffPreferredName' => $dayClass['NAME_FOR_REPORT'],
+                    ];
+                }
             }
         }
 
@@ -533,19 +537,22 @@ class External_Pcschools_Timetable implements External_TimetableInterface
 
         // Add classes for each day into it
         foreach ($dayClasses as $dayClass) {
-            $day = $dayClass['DAY'];
-            // TODO: Remove hardcoded day one once Schoolbox supports different day/times
-            $period = "01." . str_pad($dayClass['PERIOD'], 2, '0');
+            if ($dayClass['SUPERDATE'] == null || $dayClass['SUPERDATE'] == date("Y-m-d") . " 00:00:00.000") {
+                $day = $dayClass['DAY'];
 
-            $classCode = $timePeriod . '/' . $dayClass['YEAR'] . $dayClass['ABBREV'] . $dayClass['CLASS'];
+                // TODO: Remove hardcoded day one once Schoolbox supports different day/times
+                $period = "01." . str_pad($dayClass['PERIOD'], 2, '0');
 
-            $timetable[$period]['day'][$day][$classCode] = [
-                'description'        => $dayClass['DESC'],
-                'code'               => $classCode,
-                'campus'             => $timePeriod,
-                'room'               => $dayClass['ROOM'],
-                'StaffPreferredName' => $dayClass['NAME_FOR_REPORT'],
-            ];
+                $classCode = $timePeriod . '/' . $dayClass['YEAR'] . $dayClass['ABBREV'] . $dayClass['CLASS'];
+
+                $timetable[$period]['day'][$day][$classCode] = [
+                    'description'        => $dayClass['DESC'],
+                    'code'               => $classCode,
+                    'campus'             => $timePeriod,
+                    'room'               => $dayClass['ROOM'],
+                    'StaffPreferredName' => $dayClass['NAME_FOR_REPORT'],
+                ];
+            }
         }
 
         usort($timetable, function ($a, $b) {
