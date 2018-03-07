@@ -108,19 +108,19 @@ class EventRelations {
             switch ($this->getLevel()) {
                 /* Access Type 1 (Personal)
                  */
-                case EventMapper::ACCESS_PERSONAL:
+                case Event::ACCESS_PERSONAL:
                     $this->savePersonalRelation($this->getEvent());
                     break;
 
                 /* Access Type 2 (Category)
                  */
-                case EventMapper::ACCESS_GROUP:
+                case Event::ACCESS_GROUP:
                     $this->saveFolderRelation($this->getEvent(), $this->getGroup());
                     break;
 
                 /* Access Type 3 (Campus)
                  */
-                case EventMapper::ACCESS_CAMPUS:
+                case Event::ACCESS_CAMPUS:
                     foreach ($this->getRoles() as $currentRole) {
                         $roleRelation = new Role();
                         $roleRelation->setEventId($this->getEvent()->getId());

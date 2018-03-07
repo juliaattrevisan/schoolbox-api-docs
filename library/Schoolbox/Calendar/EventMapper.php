@@ -30,11 +30,6 @@ use Schoolbox\GenericCollection;
  */
 class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanable
 {
-    const ACCESS_PERSONAL = 1;
-    const ACCESS_GROUP = 2;
-    const ACCESS_CAMPUS = 3;
-
-
     /**
     * @return void
     */
@@ -273,6 +268,52 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
 
         $statement = $this->database->prepare($query);
         $statement->bindParam(":eventId", $event->getId());
+        $statement->execute();
+    }
+
+
+    /**
+     * Add a users attendance for event
+     *
+     * @param $eventId
+     * @param $userId
+     */
+    public function addAttendance($eventId, $userId)
+    {
+        $query = "
+			INSERT INTO event_attendance
+			VALUES (null, :eventId, :userId, :status, :intention)
+		";
+
+        $statusPending = Event::ATTENDANCE_STATUS_PENDING;
+        $intentPresent = Event::ATTENDANCE_INTENTION_PRESENT;
+
+        $statement = $this->database->prepare($query);
+        $statement->bindParam(":eventId", $eventId);
+        $statement->bindParam(":userId", $userId);
+        $statement->bindParam(":status", $statusPending);
+        $statement->bindParam(":intent", $intentPresent);
+
+        $statement->execute();
+    }
+
+
+    /**
+     * Remove a users attendance for event
+     *
+     * @param $eventId
+     * @param $userId
+     */
+    public function removeAttendance($eventId, $userId)
+    {
+        $query = "
+			DELETE FROM event_attendance
+			WHERE event_id = :eventId AND user_id = :userId
+			";
+
+        $statement = $this->database->prepare($query);
+        $statement->bindParam(":eventId", $eventId);
+        $statement->bindParam(":userId", $userId);
         $statement->execute();
     }
 

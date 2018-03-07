@@ -493,7 +493,7 @@ class Controller extends Base
                         $event,
                         $period,
                         new Calendar\EventRelations(
-                            Calendar\EventMapper::ACCESS_PERSONAL,
+                            Calendar\Event::ACCESS_PERSONAL,
                             [],
                             []
                         )
@@ -556,7 +556,7 @@ class Controller extends Base
         // bookings for other people.
         $event->setOwner($this->getUser());
         $event->setAuthor($this->getUser());
-        $event->setAccess(Calendar\EventMapper::ACCESS_PERSONAL);
+        $event->setAccess(Calendar\Event::ACCESS_PERSONAL);
         // Currently role and campus must be set to empty collections.
         $event->setRoleCollection(new Collection());
         $event->setCampusCollection(new Collection());

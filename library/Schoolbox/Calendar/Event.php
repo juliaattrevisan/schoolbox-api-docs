@@ -30,6 +30,14 @@ class Event implements ISoftDeletable
     const ACCESS_GROUP = 2;
     const ACCESS_CAMPUS = 3;
 
+    const ATTENDANCE_STATUS_PENDING = 1;
+    const ATTENDANCE_STATUS_APPROVED = 2;
+    const ATTENDANCE_STATUS_REJECTED = 3;
+
+    const ATTENDANCE_INTENTION_PENDING = 1;
+    const ATTENDANCE_INTENTION_PRESENT = 2;
+    const ATTENDANCE_INTENTION_ABSENT = 3;
+
     /**
      * Event id
      *

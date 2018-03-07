@@ -1,5 +1,6 @@
 <?php
 
+use Schoolbox\Calendar\Event;
 /**
  * @deprecated - did this ever work??
  * Class Event_Attendance_Controller
@@ -239,19 +240,19 @@ class Event_Attendance_Controller extends Controller
                         'ATTENDING_USER_ID' => $attendee['user_id'],
                     ) );
 
-                    if ( $attendee['status'] == Calendar::ATTENDANCE_STATUS_PENDING ) {
+                    if ( $attendee['status'] == Event::ATTENDANCE_STATUS_PENDING ) {
                         $this->getPage()->parse('pending_attendee_block', 'pending_attendee', true);
 
                         $pendingAttendeeCount++;
                     }
 
-                    elseif ( $attendee['status'] == Calendar::ATTENDANCE_STATUS_APPROVED ) {
+                    elseif ( $attendee['status'] == Event::ATTENDANCE_STATUS_APPROVED ) {
                           $this->getPage()->parse('approved_attendee_block', 'approved_attendee', true);
 
                         $approvedAttendeeCount++;
                     }
 
-                    elseif ( $attendee['status'] == Calendar::ATTENDANCE_STATUS_REJECTED ) {
+                    elseif ( $attendee['status'] == Event::ATTENDANCE_STATUS_REJECTED ) {
                         $this->getPage()->parse('rejected_attendee_block', 'rejected_attendee', true);
 
                         $rejectedAttendeeCount++;
@@ -308,7 +309,7 @@ class Event_Attendance_Controller extends Controller
                 $attendance = $this->getCalendarHandler()->getAttendance($attendance['id']);
 
                 if ( isset($data['approve']) ) {
-                    $attendance['status'] = Calendar::ATTENDANCE_STATUS_APPROVED;
+                    $attendance['status'] = Event::ATTENDANCE_STATUS_APPROVED;
 
 					/* Check if Border Leave is enabled first, before doing this
 					 */
@@ -317,7 +318,7 @@ class Event_Attendance_Controller extends Controller
 					}
                 }
                 elseif ( isset($data['reject']) ) {
-                    $attendance['status'] = Calendar::ATTENDANCE_STATUS_REJECTED;
+                    $attendance['status'] = Event::ATTENDANCE_STATUS_REJECTED;
                 }
 
                 $this->getCalendarHandler()->updateAttendance($attendance);

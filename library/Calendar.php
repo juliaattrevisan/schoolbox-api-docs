@@ -2,25 +2,20 @@
 
 use Calendar\Event\Collection;
 use Calendar\Event\Type\Day\Event;
+use Schoolbox\Calendar\Event as EventModel;
 
 class Calendar extends DeprecatedModel
 {
 
-    const ATTENDANCE_STATUS_PENDING = 1;
+    private const ATTENDANCE_STATUS_PENDING = 1;
 
-    const ATTENDANCE_STATUS_APPROVED = 2;
+    private const ATTENDANCE_STATUS_APPROVED = 2;
 
-    const ATTENDANCE_STATUS_REJECTED = 3;
+    private const ATTENDANCE_STATUS_REJECTED = 3;
 
-    const ATTENDANCE_INTENTION_PENDING = 1;
-
-    const ATTENDANCE_INTENTION_PRESENT = 2;
-
-    const ATTENDANCE_INTENTION_ABSENT = 3;
-
-    const ACCESS_PERSONAL = 1;
-    const ACCESS_GROUP = 2;
-    const ACCESS_CAMPUS = 3;
+    private const ACCESS_PERSONAL = 1;
+    private const ACCESS_GROUP = 2;
+    private const ACCESS_CAMPUS = 3;
 
     function __construct()
     {
@@ -102,7 +97,7 @@ class Calendar extends DeprecatedModel
      */
     public function getPending($eventId)
     {
-        return $this->getByStatus($eventId, self::ATTENDANCE_STATUS_PENDING);
+        return $this->getByStatus($eventId, EventModel::ATTENDANCE_STATUS_PENDING);
     }
 
     /**
@@ -114,7 +109,7 @@ class Calendar extends DeprecatedModel
      */
     public function getAttending($eventId)
     {
-        return $this->getByStatus($eventId, self::ATTENDANCE_STATUS_APPROVED);
+        return $this->getByStatus($eventId, EventModel::ATTENDANCE_STATUS_APPROVED);
     }
 
     /**
@@ -126,7 +121,7 @@ class Calendar extends DeprecatedModel
      */
     public function getRejected($eventId)
     {
-        return $this->getByStatus($eventId, self::ATTENDANCE_STATUS_REJECTED);
+        return $this->getByStatus($eventId, EventModel::ATTENDANCE_STATUS_REJECTED);
     }
 
     public function getAttendeeList($eventId)
@@ -168,14 +163,14 @@ class Calendar extends DeprecatedModel
         return $this->db->getRow($query);
     }
 
-    public function createAttendance($attendance)
-    {
-        return $this->db->insert('event_attendance', $attendance);
-    }
-
     public function updateAttendance($attendance)
     {
         return $this->db->update('event_attendance', 'id', $attendance);
+    }
+
+    public function removeAttendanceByEvent($eventId)
+    {
+        return $this->db->delete('event_attendance', 'event_id', $eventId);
     }
 
     public function removeAttendance($attendanceId)
@@ -222,7 +217,7 @@ class Calendar extends DeprecatedModel
              * If I'm a student or parent, I only have read access to events I
              * didn't create.
              */
-            case self::ACCESS_PERSONAL:
+            case EventModel::ACCESS_PERSONAL:
                 if ($event['author_id'] == $_SESSION['id']) {
                     return 2;
                 }
@@ -231,7 +226,7 @@ class Calendar extends DeprecatedModel
                 }
                 return 0;
 
-            case self::ACCESS_GROUP:
+            case EventModel::ACCESS_GROUP:
                 // Need to check all groups, not just one.
                 if (is_array($event['categoryList'])) {
                     $categoryList = $event['categoryList'];
@@ -247,7 +242,7 @@ class Calendar extends DeprecatedModel
                 $this->groupHandler->setService(CALENDAR_SERVICE);
                 return max($permissions);
 
-            case self::ACCESS_CAMPUS:
+            case EventModel::ACCESS_CAMPUS:
 
                 if (is_array($event['campusList'])) {
                     $campusList = $event['campusList'];
@@ -512,7 +507,7 @@ class Calendar extends DeprecatedModel
             /* If there are no groups prevent sql error
              */
             if (count($groupList)) {
-                $groupQuery = "OR (access = " . self::ACCESS_GROUP . " AND event_category.category_id IN (" . implode(
+                $groupQuery = "OR (access = " . EventModel::ACCESS_GROUP . " AND event_category.category_id IN (" . implode(
                         ',',
                         $groupList
                     ) . "))";
@@ -540,12 +535,12 @@ class Calendar extends DeprecatedModel
         $filter_query = array();
 
         if ($filter['campus']) {
-            $filter_query[] = 'access = ' . self::ACCESS_CAMPUS;
+            $filter_query[] = 'access = ' . EventModel::ACCESS_CAMPUS;
             $filter_query[] = 'event_campus.campus_id = ' . intval($filter['campus']);
         }
 
         if ($filter['group']) {
-            $filter_query[] = 'access = ' . self::ACCESS_GROUP;
+            $filter_query[] = 'access = ' . EventModel::ACCESS_GROUP;
             $filter_query[] = 'event_category.category_id = ' . intval($filter['group']);
         }
 
@@ -554,7 +549,7 @@ class Calendar extends DeprecatedModel
         }
 
         if ($filter['personal']) {
-            $filter_query[] = 'access = ' . self::ACCESS_PERSONAL;
+            $filter_query[] = 'access = ' . EventModel::ACCESS_PERSONAL;
             $filter_query[] = 'event_user.user_id = ' . intval($filter['personal']);
         }
 
@@ -569,9 +564,9 @@ class Calendar extends DeprecatedModel
         }
 
         $access_query = "AND (
-            (access = " . self::ACCESS_PERSONAL . " AND owner = '{$user->getId()}')
+            (access = " . EventModel::ACCESS_PERSONAL . " AND owner = '{$user->getId()}')
             $groupQuery
-            OR (access = " . self::ACCESS_CAMPUS . " AND $campusQuery $groupChunk OR owner = '{$user->getId()}')
+            OR (access = " . EventModel::ACCESS_CAMPUS . " AND $campusQuery $groupChunk OR owner = '{$user->getId()}')
         )";
 
         // Build the date query
