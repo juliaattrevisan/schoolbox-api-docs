@@ -40,6 +40,7 @@ use Schoolbox\Learning\Assessment\DueWork\Response\MapperProxy as DueWorkRespons
 use Schoolbox\Learning\Assessment\Task\Response\MapperProxy as TaskResponseDataSource;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
+use Schoolbox\Learning\Quiz\Section\Question\Mapper as QuizQuestionMapper;
 use Schoolbox\Learning\Quiz\Section\Mapper as QuizSectionMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
@@ -327,9 +328,10 @@ class Module extends BaseModule
 
         // quiz specific
         $qc =& $injector->params[Assessment\Quiz\Controller::class];
-        $qc['quizMapper']        = $this->getMapperFactory()->getLazy(QuizMapper::class);
-        $qc['quizSectionMapper'] = $this->getMapperFactory()->getLazy(QuizSectionMapper::class);
-        $qc['quizAttemptMapper'] = $this->getMapperFactory()->getLazy(QuizAttemptMapper::class);
+        $qc['quizMapper']         = $this->getMapperFactory()->getLazy(QuizMapper::class);
+        $qc['quizSectionMapper']  = $this->getMapperFactory()->getLazy(QuizSectionMapper::class);
+        $qc['quizQuestionMapper'] = $this->getMapperFactory()->getLazy(QuizQuestionMapper::class);
+        $qc['quizAttemptMapper']  = $this->getMapperFactory()->getLazy(QuizAttemptMapper::class);
 
         // task specific
         $tc =& $injector->params[Assessment\Task\Controller::class];

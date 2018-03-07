@@ -23,6 +23,8 @@ use Schoolbox\UserMapper;
 use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
+use Schoolbox\Learning\Quiz\Section\Question\Mapper as QuizQuestionMapper;
+use Schoolbox\Learning\Quiz\Section\Question\Model as QuizQuestionModel;
 use Schoolbox\Learning\Quiz\Section\Model as QuizSection;
 use Schoolbox\Learning\Quiz\Section\Mapper as QuizSectionMapper;
 use Schoolbox\Learning\Assessment\Redirect;
@@ -51,6 +53,11 @@ class Controller extends Assessment\Controller
     private $quizSectionMapper;
 
     /**
+     * @var QuizQuestionMapper
+     */
+    private $quizQuestionMapper;
+
+    /**
      * @var QuizAttemptMapper
      */
     private $quizAttemptMapper;
@@ -68,6 +75,7 @@ class Controller extends Assessment\Controller
      * @param BreadcrumbFactory      $bakery
      * @param QuizMapper             $quizMapper
      * @param QuizSectionMapper      $quizSectionMapper
+     * @param QuizQuestionMapper     $quizQuestionMapper
      * @param QuizAttemptMapper      $quizAttemptMapper
      * @param Term\Mapper            $termMapper
      * @param Participant\DataSource $participantDataSource
@@ -82,14 +90,16 @@ class Controller extends Assessment\Controller
         BreadcrumbFactory $bakery,
         QuizMapper $quizMapper,
         QuizSectionMapper $quizSectionMapper,
+        QuizQuestionMapper $quizQuestionMapper,
         QuizAttemptMapper $quizAttemptMapper,
         Term\Mapper $termMapper,
         Participant\DataSource $participantDataSource
     ) {
         parent::__construct($userMapper, $errorMapper, $assessmentMapper, $workTypeMapper, $access, $transactor, $bakery, $termMapper, $participantDataSource);
-        $this->quizMapper = $quizMapper;
-        $this->quizSectionMapper = $quizSectionMapper;
-        $this->quizAttemptMapper = $quizAttemptMapper;
+        $this->quizMapper         = $quizMapper;
+        $this->quizSectionMapper  = $quizSectionMapper;
+        $this->quizQuestionMapper = $quizQuestionMapper;
+        $this->quizAttemptMapper  = $quizAttemptMapper;
     }
 
 
@@ -212,6 +222,20 @@ class Controller extends Assessment\Controller
         /** @var Quiz $quiz */
         $quiz     = $this->quizMapper->findOneByColumn('assessment_id', $assessment->getId());
         $quiz->setSections($this->quizSectionMapper->findByColumn('assess_id', $quiz->getId()));
+
+        $quizQuestions = $this->quizQuestionMapper
+            ->findByColumn(
+                'section_id',
+                $quiz->getSections()->getPropertyValues('id')
+            )
+            ->groupByCallback(function(QuizQuestionModel $q) {
+                return $q->getSection()->getId();
+            });
+        foreach ($quiz->getSections() as $section) {
+            if (isset($quizQuestions[$section->getId()])) {
+                $section->setQuestions($quizQuestions[$section->getId()]);
+            }
+        }
 
         // load all of the questions here too
         $twigData = [
