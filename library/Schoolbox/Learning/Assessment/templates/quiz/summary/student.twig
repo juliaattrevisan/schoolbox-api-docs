@@ -1,5 +1,6 @@
 
 {% import 'sub/breadcrumbs.twig' as bread %}
+{% import '@learningAssessment/fragments/macro/duration.twig' as duration %}
 {{ bread.crumbsArray(breadcrumbs) }}
 
 <div class="row actions-small-1">
@@ -9,7 +10,6 @@
             assessment: assessment,
             submissionsBlocked: submissionsBlocked,
             student: student,
-            duration: duration,
             icon: 'icon-quiz'
         } only %}
     </div>
@@ -103,10 +103,15 @@
                 </thead>
                 <tbody>
                 {% for attempt in quiz.attempts %}
+                    {% set finished = attempt.finish and not attempt.finish.null %}
                     <tr data-attempt>
                         <td>{{ attempt.start.short }}</td>
-                        <td>{{ attempt.finish and not attempt.finish.null ? attempt.finish.short : 'Unfinished' }}</td>
-                        <td>{# TODO build interval macro #}</td>
+                        <td>{{ finished ? attempt.finish.short : 'Unfinished' }}</td>
+                        <td>
+                            {% if finished %}
+                                {{ duration.secondsToHoursAndMinutes(attempt.start.diffInSeconds(attempt.finish, true)) }}
+                            {% endif %}
+                        </td>
                         <td>{{ attempt.reviewed.short }}</td>
                         <td>{# TODO add marks #}</td>
                         <td class="actions-small-2">
