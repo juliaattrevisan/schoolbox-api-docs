@@ -36,15 +36,15 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
 
     /* Install the Resource Booking "Booking" config if it doesn't already exist
      */
-    try {
+    $existing = (int)$db->query("
+        SELECT COUNT(*) AS value
+        FROM `calendar_connector`
+        WHERE event_type = 'ResourceBooking'
+        AND connector_class = 'Booking'
+        LIMIT 1
+    ")->fetch()['value'];
 
-        $mapper->findOneByColumnList([
-            'event_type' => 'ResourceBooking',
-            'connector_class' => 'Booking'
-        ]);
-    }
-    catch (Mapper\Exception $e) {
-
+    if (!$existing) {
         $config = new Calendar_Api_Config_Connector_Booking();
         $config->setConnectorClass('Booking');
         $config->setId(-1);
@@ -52,16 +52,15 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
         $config->setEventType('ResourceBooking');
         $config->setLuEventType(1);
 
-        $newRecord = new Calendar_Api_Config_Record();
-        $newRecord->setEventType('ResourceBooking');
-        $newRecord->setConnectorClass('Booking');
-        $newRecord->setStatus($status);
-
         /* Replaces TzozNzoiQ2FsZW5kYXJfQXBpX0NvbmZpZ19Db25uZWN0b3JfQm9va2luZyI6Njp7czoxNzoiACoAY29ubmVjdG9yQ2xhc3MiO3M6NzoiQm9va2luZyI7czo1OiIAKgBpZCI7aTotMTtzOjg6IgAqAGxhYmVsIjtzOjE2OiJSZXNvdXJjZSBCb29raW5nIjtzOjEyOiIAKgBldmVudFR5cGUiO3M6MTU6IlJlc291cmNlQm9va2luZyI7czoxNDoiACoAbHVFdmVudFR5cGUiO3M6MToiMSI7czoxNzoiACoAaGFzUGVybWlzc2lvbnMiO2I6MDt9
          */
-        $newRecord->updateConfig($config);
+        $newRecord = new Calendar_Api_Config_Record();
+        $newRecord->setConfig($config);
 
-        $mapper->save($newRecord);
+        $db->query("
+            INSERT INTO `calendar_connector` (event_type, connector_class, config, status) 
+            VALUES (\"ResourceBooking\", \"Booking\", \"{$newRecord->encodeConfig()}\", \"{$status}\")
+        ");
     }
 
     /* Install the Resource Booking "Moderation" config if it doesn't already exist
