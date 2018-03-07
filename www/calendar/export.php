@@ -267,8 +267,6 @@ try {
         case 'all':
 
             // All day events, but exclude other sources
-            $api = new Calendar_Api_Composite();
-
             $configuration = getConnector(Calendar_Api_EventType_Event_Schoolbox_Default::class);
 
             if ($configuration->isActive()) {
