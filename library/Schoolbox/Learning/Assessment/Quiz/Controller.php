@@ -244,6 +244,14 @@ class Controller extends Assessment\Controller
             }
         }
 
+
+        // Load attempts
+        $quizAttempts = $this->quizAttemptMapper->findByColumnList(
+            ['assess_id' => $quiz->getId(), 'user_id'   => $student->getId(),],
+            ['order' => ['start' => 'desc']]
+        );
+
+
         // Can I attempt this?
         // TODO this should eventually be route permission based
         $actionValidator = new ActionValidator(Alaress_Date_Format::now(), $this->getAccess());
@@ -256,8 +264,10 @@ class Controller extends Assessment\Controller
             'participant' => $assessment->getParticipantIfExtant($student),
             'quiz'        => $quiz,
             'returnUrl'   => $this->getRequest()->query->get(Redirect::RETURN_URL),
-            'canAttempt'  => $actionValidator->canAttemptQuiz($this->getUser(), $assessment),
+            'canAttempt'  => $student->getId() === $this->getUser()->getId()
+                && $actionValidator->canAttemptQuiz($this->getUser(), $assessment),
             'duration'    => $assessment->isDurationUnlimited() ? null : new Interval($assessment->getDuration()),
+            'attempts'    => $quizAttempts,
         ];
 
         $this->getResponse()->content->set(
@@ -268,12 +278,6 @@ class Controller extends Assessment\Controller
                 'submission'
             )
         );
-
-//        $returnUrl       = $this->getRequest()->query->get(Redirect::RETURN_URL);
-//        $returnUrlSuffix = $returnUrl ? '?' . Redirect::RETURN_URL . "={$returnUrl}" : '';
-//        $redirect        = $this->determineSummaryRedirect($assessment, $student);
-//
-//        $this->getResponse()->redirect->to($redirect . $returnUrlSuffix);
     }
 
 

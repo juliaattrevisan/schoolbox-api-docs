@@ -81,6 +81,61 @@
     </div>
 {% endif %}
 
+{# If I'm here I can view attempts #}
+{% if attempts | length %}
+    <div class="row">
+        <div class="small-12 columns">
+            <h2 class="subheader">Attempts</h2>
+            <table id="attempts">
+                <thead>
+                <tr>
+                    <th>Start</th>
+                    <th>Finish</th>
+                    <th>Time Taken</th>
+                    <th>Reviewed</th>
+                    <th>Grade</th>
+                    <th>&nbsp;</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for attempt in attempts %}
+                    <tr data-attempt>
+                        <td>{{ attempt.start.short }}</td>
+                        <td>{{ attempt.finish and not attempt.finish.null ? attempt.finish.short : 'Unfinished' }}</td>
+                        <td>{# TODO build interval macro #}</td>
+                        <td>{{ attempt.reviewed.short }}</td>
+                        <td>{# TODO add marks #}</td>
+                        <td class="actions-small-3">
+                            <nav>
+                                {#<!-- BEGIN attempt_delete -->#}
+                                {#<a href='/learning/quiz/attempts/delete' class="icon-delete" title="Delete Attempt" data-delete="{ATTEMPT_ATTEMPT_ID}"></a>#}
+                                {#<!-- END attempt_delete -->#}
+                                {#<!-- BEGIN attempt_review -->#}
+                                {#<a href='/assess/{ATTEMPT_REVIEW_URL}/{ATTEMPT_ASSESS_ID}/{ATTEMPT_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}{RETURN_URL_SUFFIX}' class="icon-view" title="Review"></a>#}
+                                {#<!-- END attempt_review -->#}
+                                {#<!-- BEGIN attempt_resume -->#}
+                                {#<a href='/assess/attempt/{ATTEMPT_ASSESS_ID}/{ATTEMPT_SECTION_ID}{RETURN_URL_SUFFIX}' class="icon-next" title="Resume"></a>#}
+                                {#<!-- END attempt_resume -->#}
+                            </nav>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+{% elseif not canAttempt %}
+    <div class="row">
+        <div class="small-12 columns">
+            <div class="empty-state">
+                <i class="icon-quiz"></i>
+                <p>There has not been any activity on this {{ locale.assessment }} yet.</p>
+            </div>
+        </div>
+    </div>
+{% endif %}
+
 {# show authoritative feedback if it's there #}{#
 
 {% if authoritativeFeedback %}
