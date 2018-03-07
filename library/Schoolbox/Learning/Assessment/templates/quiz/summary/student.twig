@@ -29,15 +29,19 @@
     {% endif %}
 </div>
 
-{#
-
-<div class="row">
-    <div class="small-12 island">
-        {% include '@learningAssessment/dueWork/summary/description.twig' with {assessment: assessment, participant: participant} only %}
+{% set description = (participant and not participant.isExcluded) ? participant.description : assessment.description  %}
+{% if description|length %}
+    <div class="row">
+        <div class="small-12 island">
+            <section>
+                <article class="content">
+                    {{ description | purify }}
+                </article>
+            </section>
+        </div>
     </div>
-</div>
+{% endif %}
 
-#}
 {# show authoritative feedback if it's there #}{#
 
 {% if authoritativeFeedback %}

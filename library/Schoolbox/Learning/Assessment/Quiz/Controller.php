@@ -212,6 +212,7 @@ class Controller extends Assessment\Controller
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([ $assessment->getTitle(), '' ]),
             'assessment'  => $assessment,
             'student'     => $student,
+            'participant' => $assessment->getParticipantIfExtant($student),
         ];
 
         $this->getResponse()->content->set(
