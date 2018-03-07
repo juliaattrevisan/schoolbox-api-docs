@@ -248,6 +248,7 @@ class Controller extends Assessment\Controller
             'student'     => $student,
             'participant' => $assessment->getParticipantIfExtant($student),
             'quiz'        => $quiz,
+            'returnUrl'   => $this->getRequest()->query->get(Redirect::RETURN_URL),
         ];
 
         $this->getResponse()->content->set(
