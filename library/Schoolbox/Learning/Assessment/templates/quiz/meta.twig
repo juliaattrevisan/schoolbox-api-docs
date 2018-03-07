@@ -6,10 +6,6 @@
  #}
 <ul class="meta">
     {% include '@learning/fragments/meta/dueDate.twig' %}
-    {% include '@learning/fragments/meta/workType.twig' %}
-    {% if student.id != USER.id %}
-    <li class="icon-staff-students">{{ student.fullname }}</li>
-    {% endif %}
     <li class="icon-time-value" title="Allowed Time">
         Allowed time:
         <time>
@@ -27,6 +23,10 @@
             {% endif %}
         </time>
     </li>
+    {% include '@learning/fragments/meta/workType.twig' %}
+    {% if student.id != USER.id %}
+    <li class="icon-staff-students">{{ student.fullname }}</li>
+    {% endif %}
     {% if submissionsBlocked %}
     <li class="icon-upload">{{ submissionsBlocked }}</li>
     {% endif %}
