@@ -5,9 +5,10 @@ use Schoolbox\Forum\PostMapper;
 use Schoolbox\Forum\ThreadMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Breadcrumbs;
+use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Permission\Access\UserAccess;
 
 $forumHandler = new Forum();
-$groupHandler = new Group();
 
 $this->setFile(TEMPLATE_content, 'forum/modify.html');
 $this->setBlock(TEMPLATE_content, 'title', 'title_block');
@@ -36,10 +37,16 @@ if (is_numeric($this->arg[0])) {
 
     /* Check permissions
      */
-    if ($groupHandler->getPermission($folder->getId()) < READ_ACCESS) {
+
+    $userAccessMapper = UserAccessMapper::getInstance();
+
+    try {
+        $accessLevel = $userAccessMapper->getAccess($_SESSION['user'], $folder->getId());
+    } catch (\Schoolbox\Mapper\Exception $e ) {
         error(19);
     }
-    if ($groupHandler->hasChildAccessOnly($folder->getId())) {
+
+    if ($accessLevel->getAccessLevel() < UserAccess::ACCESS_READ) {
         error(19);
     }
 
@@ -74,15 +81,14 @@ if (is_numeric($this->arg[0])) {
 
         /* Check user owns post
          */
-        if ($post->getOwner()->getId() != $_SESSION['id']
-            && $groupHandler->getPermission($folder->getId()) < FULL_ACCESS
+        if ($post->getOwner()->getId() != $_SESSION['id'] && $accessLevel->getAccessLevel() < UserAccess::ACCESS_WRITE
         ) {
             error(19);
         }
 
         /* check locked
          */
-        if ($thread->isLocked() && $groupHandler->getPermission($folder->getId()) < FULL_ACCESS) {
+        if ($thread->isLocked() && $accessLevel->getAccessLevel() < UserAccess::ACCESS_WRITE) {
             error(19);
         }
 
@@ -137,7 +143,7 @@ if (is_numeric($this->arg[0])) {
 
         /* Check locked
          */
-        if ($thread->isLocked() && $groupHandler->getPermission($folder->getId()) < FULL_ACCESS) {
+        if ($thread->isLocked() && $accessLevel->getAccessLevel() < UserAccess::ACCESS_WRITE) {
             error(19);
         }
 
