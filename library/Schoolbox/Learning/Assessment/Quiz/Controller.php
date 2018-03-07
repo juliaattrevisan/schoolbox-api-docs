@@ -223,37 +223,41 @@ class Controller extends Assessment\Controller
         // $assessment doesn't contain quiz questions, get something that does.
         /** @var Quiz $quiz */
         $quiz = $this->quizMapper->findOneByColumn('assessment_id', $assessment->getId());
-        $quiz->setSections($this->quizSectionMapper->findByColumn(
-            'assess_id',
-            $quiz->getId(),
-            ['order' => ['sequence' => 'asc']]
-        ));
+        $quiz = $this->quizMapper->loadSectionsAndQuestions($quiz);
+        $quiz = $this->quizMapper->loadAttemptsAndAnswers($quiz, $student);
 
-        $quizQuestions = $this->quizQuestionMapper
-            ->findByColumn(
-                'section_id',
-                $quiz->getSections()->getPropertyValues('id')
-            )
-            ->groupByCallback(function(QuizQuestionModel $q) {
-                return $q->getSection()->getId();
-            });
-        foreach ($quiz->getSections() as $section) {
-            if (isset($quizQuestions[$section->getId()])) {
-                $section->setQuestions($quizQuestions[$section->getId()]);
-            }
-        }
-
-
-        // Load attempts
-        $quiz->setAttempts(
-            $this->quizAttemptMapper->findByColumnList(
-                ['assess_id' => $quiz->getId(), 'user_id'   => $student->getId(),],
-                ['order' => ['start' => 'desc']]
-            )
-        );
+//        $quiz->setSections($this->quizSectionMapper->findByColumn(
+//            'assess_id',
+//            $quiz->getId(),
+//            ['order' => ['sequence' => 'asc']]
+//        ));
+//
+//        $quizQuestions = $this->quizQuestionMapper
+//            ->findByColumn(
+//                'section_id',
+//                $quiz->getSections()->getPropertyValues('id')
+//            )
+//            ->groupByCallback(function(QuizQuestionModel $q) {
+//                return $q->getSection()->getId();
+//            });
+//        foreach ($quiz->getSections() as $section) {
+//            if (isset($quizQuestions[$section->getId()])) {
+//                $section->setQuestions($quizQuestions[$section->getId()]);
+//            }
+//        }
+//
+//
+//        // Load attempts
+//        $quiz->setAttempts(
+//            $this->quizAttemptMapper->findByColumnList(
+//                ['assess_id' => $quiz->getId(), 'user_id'   => $student->getId(),],
+//                ['order' => ['start' => 'desc']]
+//            )
+//        );
 
 
         // Load answers into quiz attempts
+
 
 
         // Can I attempt this?
