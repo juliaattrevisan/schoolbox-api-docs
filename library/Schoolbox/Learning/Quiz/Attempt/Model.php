@@ -111,6 +111,10 @@ class Model implements ISoftDeletable
      */
     public function getTotalMarkGraded(): float
     {
+        // Is this reviewed? If so then 100% of marks are graded.
+        if ($this->isReviewed()) {
+            return $this->getTotalMark();
+        }
         $totalMark = 0;
         foreach ($this->answers as $answer) {
             if ($answer->getAutoMarked()) {
