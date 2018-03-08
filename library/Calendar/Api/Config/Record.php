@@ -120,6 +120,16 @@ class Calendar_Api_Config_Record
         $this->setStatus(self::INACTIVE);
     }
 
+    /**
+     * This connector active?
+     *
+     * @return bool
+     */
+    public function isActive(): bool
+    {
+        return $this->getStatus() === self::ACTIVE;
+    }
+
     /* Getters/Setters
      */
 
