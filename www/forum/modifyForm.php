@@ -1,6 +1,7 @@
 <?php
 require_once dirname(__FILE__) . '/../../library/Bootstrap.php';
 
+use Schoolbox\Permission\Access\Access;
 use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use \Schoolbox\Forum\PostMapper;
 use \Schoolbox\Forum\ThreadMapper;
@@ -9,7 +10,7 @@ use \Schoolbox\Permission\Access\UserAccessMapper;
 
 $page = new SitePage();
 $forumHandler = new Forum();
-$userAccessMapper = UserAccessMapper::getInstance();
+$access = Access::getInstance();
 
 if (is_numeric($_POST['categoryID'])) {
 
@@ -29,16 +30,10 @@ if (is_numeric($_POST['categoryID'])) {
 
 	/* check permissions
 	 */
-
-    try {
-        $accessLevel = $userAccessMapper->getAccess($_SESSION['user'], $folder->getId());
-    } catch (\Schoolbox\Mapper\Exception $e ) {
+    $accessLevel = $access->getFolderAccess($_SESSION['user'], $folder->getId());
+    if ($accessLevel < UserAccess::ACCESS_READ) {
         error(19);
     }
-
-	if ($accessLevel->getAccessLevel() < UserAccess::ACCESS_READ) {
-		error(19);
-	}
 
 	/* modify post
 	 */
@@ -54,7 +49,7 @@ if (is_numeric($_POST['categoryID'])) {
 
 		/* check user owns post
 		 */
-		if ($post->getOwner()->getId() != $_SESSION['id'] && $accessLevel->getAccessLevel() < UserAccess::ACCESS_WRITE) {
+		if ($post->getOwner()->getId() != $_SESSION['id'] && $accessLevel < UserAccess::ACCESS_WRITE) {
 			error(19);
 		}
 
@@ -109,7 +104,7 @@ if (is_numeric($_POST['categoryID'])) {
 
 			/* check locked
 			 */
-			if ($accessLevel->getAccessLevel() < UserAccess::ACCESS_WRITE && $thread->isLocked()) {
+			if ($accessLevel < UserAccess::ACCESS_WRITE && $thread->isLocked()) {
 				error(19);
 			}
 		}
@@ -158,13 +153,8 @@ else if (is_numeric($_GET['toggleLock'])) {
 
 	/* check permissions
 	 */
-    try {
-        $accessLevel = $userAccessMapper->getAccess($_SESSION['user'], $thread->getCategory()->getId());
-    } catch (\Schoolbox\Mapper\Exception $e ) {
-        error(19);
-    }
-
-    if ($accessLevel->getAccessLevel() < UserAccess::ACCESS_WRITE) {
+    $accessLevel = $access->getFolderAccess($_SESSION['user'], $thread->getCategory()->getId());
+    if ($accessLevel < UserAccess::ACCESS_WRITE) {
         error(19);
     }
 
@@ -193,13 +183,8 @@ else if (is_numeric($_GET['deleteThread'])) {
 
 	/* check permissions
 	 */
-    try {
-        $accessLevel = $userAccessMapper->getAccess($_SESSION['user'], $thread->getCategory()->getId());
-    } catch (\Schoolbox\Mapper\Exception $e ) {
-        error(19);
-    }
-
-    if ($accessLevel->getAccessLevel() < UserAccess::ACCESS_WRITE) {
+    $accessLevel = $access->getFolderAccess($_SESSION['user'], $thread->getCategory()->getId());
+    if ($accessLevel < UserAccess::ACCESS_WRITE) {
         error(19);
     }
 
@@ -217,13 +202,8 @@ else if (is_array($_POST['deleteThreads'])) {
 
 			/* check permissions
 			 */
-            try {
-                $accessLevel = $userAccessMapper->getAccess($_SESSION['user'], $thread->getCategory()->getId());
-            } catch (\Schoolbox\Mapper\Exception $e ) {
-                error(19);
-            }
-
-            if ($accessLevel->getAccessLevel() < UserAccess::ACCESS_WRITE) {
+            $accessLevel = $access->getFolderAccess($_SESSION['user'], $thread->getCategory()->getId());
+            if ($accessLevel < UserAccess::ACCESS_WRITE) {
                 error(19);
             }
 
@@ -253,19 +233,14 @@ else if (is_numeric($_GET['deletePost'])) {
 
 	/* check permissions
 	 */
-    try {
-        $accessLevel = $userAccessMapper->getAccess($_SESSION['user'], $thread->getCategory()->getId());
-    } catch (\Schoolbox\Mapper\Exception $e ) {
-        error(19);
-    }
-
-    if ($accessLevel->getAccessLevel() < UserAccess::ACCESS_WRITE) {
+    $accessLevel = $access->getFolderAccess($_SESSION['user'], $thread->getCategory()->getId());
+    if ($accessLevel < UserAccess::ACCESS_WRITE) {
         error(19);
     }
 
     /* check locked
     */
-    if ($accessLevel->getAccessLevel() <  UserAccess::ACCESS_WRITE && $thread->isLocked() ) {
+    if ($accessLevel < UserAccess::ACCESS_WRITE && $thread->isLocked() ) {
         error(19);
     }
 

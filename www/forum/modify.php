@@ -37,7 +37,6 @@ if (is_numeric($this->arg[0])) {
 
     /* Check permissions
      */
-
     $access      = Access::getInstance();
     $accessLevel = $access->getFolderAccess($_SESSION['user'], $folder->getId());
     if ($accessLevel < UserAccess::ACCESS_READ) {
