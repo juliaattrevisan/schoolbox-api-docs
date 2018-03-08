@@ -207,7 +207,10 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
             // Generic updated trigger
             if ($method === Mapper::METHOD_UPDATE) {
-                $bundle->attach(self::TRIGGER_UPDATED, self::IMMEDIATELY);
+                $publishDate = $this->coalesceDates($plan->getPublishDate(), $assessment->getPublishDate());
+                if ($publishDate && $publishDate->isPast()) {
+                    $bundle->attach(self::TRIGGER_UPDATED, self::IMMEDIATELY);
+                }
             }
         }
     }
