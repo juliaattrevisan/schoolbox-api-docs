@@ -286,7 +286,7 @@ abstract class Mapper implements IMapper, Serializable
      * @deprecated under pain of death DO NOT USE THIS; refactor the Mapper instead
      * @return Di\ContainerInterface
      */
-    protected static function getDi()
+    public static function getDi()
     {
         return self::$di;
     }

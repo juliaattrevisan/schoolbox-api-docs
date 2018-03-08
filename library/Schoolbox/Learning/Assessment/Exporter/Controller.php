@@ -199,7 +199,10 @@ class Controller extends BaseController
             if ($assessmentImpl->getId()) {
                 // Does the system permit destructive re-export?
                 if ($enableReimport) {
+                    $notifier = $this->assessmentDataSource->getNotifier();
+                    $before   = $notifier->dehydrate($assessmentImpl);
                     $this->assessmentDataSource->delete($assessmentImpl);
+                    $notifier->notify($assessmentImpl, $this->getUser(), $before);
                 } else {
                     continue;
                 }
@@ -295,8 +298,9 @@ class Controller extends BaseController
             ->setDueAt($dueDate)
             ->setCloseAt($closeDate);
 
-        // Replicate !
+        // Replicate (and notify)!
         $assessmentImpl = $this->replicator->replicateInNewContext($assessmentSpec, $context, $this->getUser(), $sequence);
+        $this->assessmentDataSource->getNotifier()->notify($assessmentImpl, $this->getUser(), []);
 
         // Recursive case
         if ($assessmentSpec instanceof Project) {

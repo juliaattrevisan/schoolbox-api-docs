@@ -33,7 +33,6 @@ use Schoolbox\Instance;
 use Schoolbox\L10n\Mapper as L10nMapper;
 use Schoolbox\L10n\RosettaStoneFactory;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
-use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
 use Schoolbox\Learning\Assessment\Redirect;
@@ -695,12 +694,12 @@ abstract class AbstractBootstrap implements BootstrapInterface
         );
 
         // Register assessment data source
-        $di->params[AssessmentMapperProxy::class] = [
+        $di->params[AssessmentDataSource::class] = [
             'baseMapper'            => $mapperFactory->getLazy(AssessmentMapper::class),
             'translator'            => $di->lazyGet('assessmentTranslator'),
             'participantDataSource' => $di->lazyGet('participantDataSource'),
         ];
-        $di->set('assessmentDataSource', $di->lazyNew(AssessmentMapperProxy::class));
+        $di->set('assessmentDataSource', $di->lazyNew(AssessmentDataSource::class));
 
         // Register participant data source (with responses and feedback)
         $di->params[ParticipantDataSource::class] = [

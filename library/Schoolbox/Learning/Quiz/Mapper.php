@@ -493,4 +493,18 @@ class Mapper extends BaseMapper implements FeedableMapperInterface
         return $quiz;
     }
 
+
+    /**
+     * Any notifications related to assessments must be deferred until all
+     * its plans and constituent participation records are saved.
+     *
+     * @param object      $object
+     * @param string      $verb
+     * @param object|null $previous
+     * @return bool
+     */
+    protected function raiseNotification($object, $verb, $previous = null)
+    {
+        return true;
+    }
 }

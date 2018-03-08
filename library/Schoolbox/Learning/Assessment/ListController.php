@@ -333,6 +333,9 @@ class ListController extends Web\Controller\Base
          * Controller must return early for that to happen
          */
         try {
+            // Create a notifier proxy so that I may notify about assessment changes
+            $notifier = $this->assessmentMapper->getNotifier();
+            $before   = $notifier->dehydrate($assessment);
 
             /* Figure out what kind of assessment was chosen
              * and spawn a new instance of it to manipulate
@@ -351,6 +354,12 @@ class ListController extends Web\Controller\Base
             $plans = $this->savePlanData($assessment, $postData['plans'] ?? []);
 
             $this->saveParticipationData($plans, $postData['participant-include'] ?? [], $postData['participant-plan'] ?? []);
+
+            // Retrieve assessment, as I need the assessment's participation
+            $assessment = $this->assessmentMapper->findByIdForReview($assessment->getId());
+
+            // And send notifications
+            $notifier->notify($assessment, $this->getUser(), $before);
         }
         catch (RangeException|InvalidArgumentException|UnexpectedValueException|PDOException $e) {
             // cast

@@ -237,7 +237,10 @@ abstract class Controller extends ListController implements IAssessmentControlle
     {
         // If not already deleted?
         if (!$assessment->isDeleted()) {
+            $notifier = $this->getAssessmentMapper()->getNotifier();
+            $before   = $notifier->dehydrate($assessment);
             $this->getAssessmentMapper()->delete($assessment);
+            $notifier->notify($assessment, $this->getUser(), $before);
         }
 
         $folder = $assessment->getContext()->getFolder();

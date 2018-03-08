@@ -79,6 +79,13 @@ class MapperProxy
     private $model;
 
     /**
+     * A notifier for changes to assessments.
+     *
+     * @var NotifierProxy
+     */
+    private $notifier;
+
+    /**
      * Constructor
      *
      * @param Mapper                $baseMapper
@@ -840,6 +847,14 @@ class MapperProxy
         if (!$isCreate) {
             $this->baseMapper->save($dataModel);
         }
+
+        // TODO If at all possible, trigger the assessment notifier here so that it contains all assessment information
+        // Will need to move participant persistence here before that can happen though.
+
+        // Load the dynamic participation record if this is new.
+        if ($isCreate) {
+            $this->participantDataSource->loadParticipationIntoAssessment($assessable);
+        }
     }
 
     /**
@@ -1164,5 +1179,25 @@ class MapperProxy
     public function getModel()
     {
         return $this->model;
+    }
+
+    /**
+     * Retrieves the notifier that the mapper proxy uses.
+     *
+     * Currently, notifications must still be manually triggered using this
+     * notifier.
+     *
+     * @return NotifierProxy
+     */
+    public function getNotifier(): NotifierProxy
+    {
+        if (!$this->notifier instanceof NotifierProxy) {
+            $this->notifier = new NotifierProxy(
+                $this,
+                $this->participantDataSource->getPlanMapper(),
+                $this->participantDataSource->getParticipantMapper()
+            );
+        }
+        return $this->notifier;
     }
 }

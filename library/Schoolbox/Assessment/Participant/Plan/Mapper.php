@@ -119,7 +119,10 @@ class Mapper extends BaseMapper
 
         /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-            $plan = $this->hydrate($row);
+            $plan = $plans[$row['id']] ?? $this->hydrate($row);
+            if (!$plan) {
+                continue;
+            }
 
             // Did the query join onto participants?
             if (array_key_exists('p.id', $row)) {
@@ -135,5 +138,19 @@ class Mapper extends BaseMapper
             $plans[$plan->getId()] = $plan;
         }
         return $plans;
+    }
+
+    /**
+     * Any notifications related to assessment participations must be deferred
+     * until all participations are saved.
+     *
+     * @param object      $object
+     * @param string      $verb
+     * @param object|null $previous
+     * @return bool
+     */
+    protected function raiseNotification($object, $verb, $previous = null)
+    {
+        return true;
     }
 }

@@ -1153,4 +1153,18 @@ class Mapper extends BaseMapper
             throw new \DomainException("Activity Duration cannot be less than zero");
         }
     }
+
+    /**
+     * Any notifications related to assessments must be deferred until all
+     * its plans and constituent participation records are saved.
+     *
+     * @param object      $object
+     * @param string      $verb
+     * @param object|null $previous
+     * @return bool
+     */
+    protected function raiseNotification($object, $verb, $previous = null)
+    {
+        return true;
+    }
 }
