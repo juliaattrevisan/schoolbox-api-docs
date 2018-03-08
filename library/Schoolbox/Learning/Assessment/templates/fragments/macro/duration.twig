@@ -1,0 +1,21 @@
+{##
+ # Render seconds as hours and minutes.
+ # Parameters:
+ # * seconds: number of seconds of duration
+ #}
+{% macro secondsToHoursAndMinutes(seconds) %}
+    {% spaceless %}
+        {% set hours           = seconds // 3600 %}
+        {% set minuteRemainder = (seconds // 60) % 60 %}
+        {% set secondRemainder = seconds % 60 %}
+        {% if hours %}
+            {{ hours }} {{ hours == 1 ? 'hour' : 'hours' }}{% if minuteRemainder or secondRemainder %},{% endif %}
+        {% endif %}
+        {% if minuteRemainder %}
+            {{ minuteRemainder }} {{ minuteRemainder == 1 ? 'minute' : 'minutes' }}{% if secondRemainder %},{% endif %}
+        {% endif %}
+        {% if secondRemainder %}
+            {{ secondRemainder }} {{ secondRemainder == 1 ? 'second' : 'seconds' }}
+        {% endif %}
+    {% endspaceless %}
+{% endmacro %}

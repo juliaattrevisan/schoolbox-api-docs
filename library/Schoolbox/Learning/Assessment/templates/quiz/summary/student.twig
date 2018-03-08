@@ -1,1 +1,218 @@
-<h1>TODO quiz/summaryStudent.twig</h1>
+
+{% import 'sub/breadcrumbs.twig' as bread %}
+{% import '@learningAssessment/fragments/macro/duration.twig' as duration %}
+{{ bread.crumbsArray(breadcrumbs) }}
+
+<div class="row actions-small-1">
+    <div class="small-12 columns">
+        <h1>{{ assessment.title }}</h1>
+        {% include '@learningAssessment/quiz/meta.twig' with {
+            assessment: assessment,
+            submissionsBlocked: submissionsBlocked,
+            student: student,
+            icon: 'icon-quiz'
+        } only %}
+    </div>
+    {% set viewRoute = routeLookupIfAuthorized('learningAssessment.getStatus', {assessmentId: assessment.id, assessment: assessment}) %}
+    {% set modifyRoute = routeLookupIfAuthorized('learningQuiz.getQuizSummary', {assessmentId: assessment.id, assessment: assessment}) %}
+    {% if viewRoute or modifyRoute %}
+        <nav>
+            <a href="#" class="icon-more" data-dropdown="header-options" title="Actions"></a>
+        </nav>
+        <ul data-dropdown-content id="header-options" class="f-dropdown">
+            {% if viewRoute %}
+                <li><a class="icon-progress" href="{{ viewRoute }}">View Status</a></li>
+            {% endif %}
+            {% if modifyRoute %}
+                <li><a href="{{ modifyRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" class="icon-modify">Modify</a></li>
+            {% endif %}
+        </ul>
+    {% endif %}
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        {% set description = (participant and not participant.isExcluded) ? participant.description : assessment.description  %}
+        {% if description|length %}
+            <section>
+                <article class="content">
+                    {{ description | purify }}
+                </article>
+            </section>
+        {% endif %}
+
+        <div class="scrollable">
+            <table>
+                <thead>
+                <tr>
+                    <th>Section</th>
+                    <th>Number of questions</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for section in quiz.sections %}
+                    <tr>
+                        <td>{{ section.title }}</td>
+                        <td>
+                            {% set questionCount = section.questions | length %}
+                            {% if section.pool %}
+                                {{ min(questionCount, section.pool) }}
+                            {% else %}
+                                {{ questionCount }}
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% if canAttempt %}
+    <div class="row">
+        <div class="small-12 column">
+            <p>
+                {% if attemptInProgress %}
+                    <a href="/assess/attempt/{{ quiz.id }}/{{ quiz.sections.first.id }}/{% if returnUrl %}?{{ RETURN_URL.name }}={{ returnUrl|escape('url') }}{% endif %}" class="button expand submit">Resume Quiz</a>
+                {% else %}
+                    <a href="/assess/init/{{ quiz.id }}/{{ quiz.sections.first.id }}/{% if returnUrl %}?{{ RETURN_URL.name }}={{ returnUrl|escape('url') }}{% endif %}" class="button expand submit">Begin Quiz</a>
+                {% endif %}
+            </p>
+        </div>
+    </div>
+{% endif %}
+
+{# If I'm here I can view attempts #}
+{% if quiz.attempts | length %}
+
+    {% set deleteRoute = routeLookupIfAuthorized('learningQuiz.postAttemptDelete') %}
+
+    <div class="row">
+        <div class="small-12 columns">
+            <h2 class="subheader">Attempts ({{ quiz.attempts | length }} / {{ assessment.attemptsUnlimited ? 'Unlimited' : assessment.maxAttempts }})</h2>
+            <table id="attempts">
+                <thead>
+                <tr>
+                    <th>Start</th>
+                    <th>Finish</th>
+                    <th>Time Taken</th>
+                    <th>Reviewed</th>
+                    <th>Grade</th>
+                    <th>&nbsp;</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for attempt in quiz.attempts %}
+                    {% set finished = attempt.finish and not attempt.finish.null %}
+                    <tr data-attempt>
+                        <td>{{ attempt.start.short }}</td>
+                        <td>
+                            {% if finished %}
+                                {{ attempt.finish.short }}
+                            {% else %}
+                                <em>Attempt in progress</em>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if finished %}
+                                {{ duration.secondsToHoursAndMinutes(attempt.start.diffInSeconds(attempt.finish, true)) }}
+                            {% else %}
+                                <em>{{ duration.secondsToHoursAndMinutes(attempt.start.diffInSeconds(NOW, true)) }}</em>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if attempt.reviewed and not attempt.reviewed.null %}
+                                {{ attempt.reviewed.short }}
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if finished %}
+                                {% set totalMark       = attempt.totalMark %}
+                                {% set totalMarkGraded = attempt.totalMarkGraded %}
+                                {{ attempt.mark }}/{{ totalMark }}
+                                {% if totalMarkGraded < totalMark %}
+                                    ({{ (totalMarkGraded/totalMark*100) | round }}% graded)
+                                {% endif %}
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
+                        <td class="actions-small-2">
+                            <nav>
+                                {% if deleteRoute %}
+                                    <a href="{{ deleteRoute }}" class="icon-delete" title="Delete Attempt" data-delete="{{ attempt.id }}"></a>
+                                {% endif %}
+                                {% if finished %}
+                                    {% if canReview %}
+                                        <a href="/assess/review/{{ quiz.id }}/{{ quiz.sections.first.id }}/{{ attempt.id }}/{% if returnUrl %}?{{ RETURN_URL.name }}={{ returnUrl|escape('url') }}{% endif %}" class="icon-view" title="Review"></a>
+                                    {% elseif canStudentReview %}
+                                        <a href="/assess/studentReview/{{ quiz.id }}/{{ quiz.sections.first.id }}/{{ attempt.id }}/{% if returnUrl %}?{{ RETURN_URL.name }}={{ returnUrl|escape('url') }}{% endif %}" class="icon-view" title="Review"></a>
+                                    {% endif %}
+                                {% elseif canAttempt %}
+                                    <a href='/assess/attempt/{{ quiz.id }}/{{ quiz.sections.first.id }}/{% if returnUrl %}?{{ RETURN_URL.name }}={{ returnUrl|escape('url') }}{% endif %}' class="icon-next" title="Resume"></a>
+                                {% endif %}
+                            </nav>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+{% elseif not canAttempt %}
+    <div class="row">
+        <div class="small-12 columns">
+            <div class="empty-state">
+                <i class="icon-quiz"></i>
+                <p>There has not been any activity on this {{ locale.assessment }} yet.</p>
+            </div>
+        </div>
+    </div>
+{% endif %}
+
+<div id="attempt-toast" class="toast"></div>
+
+<script type="text/javascript">
+    $(function() {
+        // Delete attempts script
+        $('#attempts').find('[data-delete]').click(function (event) {
+            event.preventDefault();
+
+            var element = $(this);
+
+            $(this).confirmDialog({
+                text: 'Are you sure you want to delete this attempt?',
+                confirmEvent: function () {
+                    var attemptList = $('#attempts');
+                    var listItem = $(element).parents('[data-attempt]');
+
+                    var toast = $('#attempt-toast');
+                    toast.toastActivate({text: 'Deleting attempt...'});
+
+                    $.post(element.attr('href'), {attemptId: element.attr('data-delete')})
+                        .success(function() {
+                            toast.toastTimeout({text: 'Attempt deleted.', css: 'success'});
+
+                            listItem.fadeOut({
+                                done: function() {
+                                    listItem.remove();
+
+                                    if (!attemptList.find('tbody tr').length) {
+                                        $('#attempts').hide();
+                                        $('#attempt-list-empty-state').removeClass('hide');
+                                    }
+                                }
+                            });
+                        })
+                        .error(function() {
+                            toast.toastTimeout({text: 'Could not delete attempt', css: 'alert'});
+                        });
+                }
+            });
+        });
+    });
+</script>

@@ -1,0 +1,26 @@
+{##
+ # assessment   an IAssesssable instance
+ # student      the student currently being viewed
+ # icon         a css class representing the assessable
+ #}
+{% import '@learningAssessment/fragments/macro/duration.twig' as duration %}
+<ul class="meta">
+    {% include '@learning/fragments/meta/dueDate.twig' %}
+    <li class="icon-time-value" title="Allowed Time">
+        Allowed time:
+        <time>
+            {% if assessment.durationUnlimited %}
+                Unlimited
+            {% else %}
+                {{ duration.secondsToHoursAndMinutes(assessment.duration) }}
+            {% endif %}
+        </time>
+    </li>
+    {% include '@learning/fragments/meta/workType.twig' %}
+    {% if student.id != USER.id %}
+    <li class="icon-staff-students">{{ student.fullname }}</li>
+    {% endif %}
+    {% if submissionsBlocked %}
+    <li class="icon-upload">{{ submissionsBlocked }}</li>
+    {% endif %}
+</ul>

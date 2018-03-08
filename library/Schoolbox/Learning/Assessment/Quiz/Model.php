@@ -308,6 +308,16 @@ class Model extends AbstractAssessment
     }
 
     /**
+     * Is this quiz unlimited duration?
+     *
+     * @return bool
+     */
+    public function isDurationUnlimited(): bool
+    {
+        return $this->duration === self::DURATION_UNLIMITED;
+    }
+
+    /**
      * @return int
      */
     public function getMaxAttempts()
@@ -323,6 +333,16 @@ class Model extends AbstractAssessment
     {
         $this->maxAttempts = $maxAttempts;
         return $this;
+    }
+
+    /**
+     * Does this quiz allow unlimited attempts?
+     *
+     * @return bool
+     */
+    public function isAttemptsUnlimited(): bool
+    {
+        return $this->maxAttempts === self::ATTEMPTS_UNLIMITED;
     }
 
     /**

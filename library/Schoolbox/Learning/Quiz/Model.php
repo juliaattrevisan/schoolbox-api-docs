@@ -42,6 +42,24 @@ class Model implements ISoftDeletable, IAssessableDataModel
     const AVAILABILITY_SURVEY = 'survey';
 
     /**
+     * Possible value for `$this->attempts`.
+     *
+     * This value specifies that a participant may make an unlimited number of attempts at this quiz.
+     *
+     * @var int
+     */
+    const ATTEMPTS_UNLIMITED = 0;
+
+    /**
+     * Possible value for `$this->duration`.
+     *
+     * This value specifies that a participant may take an unlimited amount of time to complete this quiz.
+     *
+     * @var int
+     */
+    const DURATION_UNLIMITED = -1;
+
+    /**
     * @var Folder
     */
     protected $category;
@@ -197,6 +215,26 @@ class Model implements ISoftDeletable, IAssessableDataModel
             return true;
         }
         return false;
+    }
+
+    /**
+     * Is this quiz unlimited duration?
+     *
+     * @return bool
+     */
+    public function isDurationUnlimited(): bool
+    {
+        return $this->duration === self::DURATION_UNLIMITED;
+    }
+
+    /**
+     * Does this quiz allow unlimited attempts?
+     *
+     * @return bool
+     */
+    public function isAttemptsUnlimited(): bool
+    {
+        return $this->attempts === self::ATTEMPTS_UNLIMITED;
     }
 
     /**

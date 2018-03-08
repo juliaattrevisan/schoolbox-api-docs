@@ -1,8 +1,6 @@
 <?php
 /**
- * Assessment commencement. If the Assessment allows people to re-sit the test,
- * then clear the current attempt_id. Otherwise, remember it so people can't
- * reset the assessment timer by repeatedly refreshing the intro page.
+ * Formerly page for quiz commencement; now redirects to quiz summary.
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   2010 Alaress Pty Ltd
@@ -10,237 +8,263 @@
  * @version     SVN: $Id$
  */
 
-use Schoolbox\Breadcrumbs;
-use Schoolbox\Error;
-use Schoolbox\IConfigLoader;
+use Aura\Router\Router;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
-use Schoolbox\Learning\Quiz\ActionValidator;
-use Schoolbox\Mapper;
-use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Permission\Access\Access;
-use Schoolbox\Resource\Folder;
-use Schoolbox\UserMapper;
-
-$assessHandler = new Assess_Main();
-$sectionHandler = new Assess_Section();
-$attemptHandler = new Assess_Attempt();
-$userHandler = new User();
+use Schoolbox\User;
 
 /**
- * @var SitePage $this
+ * @var SitePage             $this
  * @var AssessmentDataSource $assessmentDataSource
- * @var IConfigLoader        $config
+ * @var Router               $router
+ * @var User                 $sessionUser
  */
+[$quizId]             = $this->arg;
 $assessmentDataSource = $this->getDi()->get('assessmentDataSource');
-$config               = $this->getDi()->get('config');
-
-if (!is_numeric($this->arg[0])) {
-    error(112);
-}
-if (!$assessHandler->isValidUrlAccess($this->arg[0])) {
-    $this->pageNotFound();
-}
-
-/* Get intro summary for the assessment
- */
-$assess = $assessHandler->getIntro($this->arg[0]);
-
-if (!$assess) {
-    error(112);
-}
-
-if ($assessHandler->isDeleted($assess['assess_id'])) {
-    error(112);
-}
-
-/* Check the folder exists meaningfully
- */
-try {
-    $folder = Folder\Mapper::getInstance()->findById($assess['category_id']);
-}
-catch (Mapper\Exception $e) {
-    error(Error\Mapper::ERROR_SELECT_QUIZ_GROUP);
-}
-
-/* Check if you are in this category, so you can't submit other category's
- * online assessments unless you are a part of that category.
- */
-/** @var \Schoolbox\User $sessionUser */
-$sessionUser      =  $_SESSION['user'];
-$assessment       = $assessmentDataSource->findByQuizId($assess['assess_id'], $sessionUser);
-$assessmentFolder = $assessment->getBaseContext()->getFolder();
-$accessLevel      = Access::getInstance()->getFolderAccess($sessionUser, $assessmentFolder->getId());
-$readOnly         = true;
-
-/* Special case: participation isn't guaranteed at this point
- * so we can't get a Plan in all cases e.g. visiting from Course Import as an instructor
- */
-$plan = [];
-
-// Check the current session user is permitted to visit this page
-$actionValidator = new ActionValidator(Alaress_Date_Format::now(), Access::getInstance());
-if (!$actionValidator->canSeeQuiz($sessionUser, $assessment, $config->get('restrict_student_submissions'))) {
-    $this->pageNotFound();
-}
-
-// Does session user have a participation? If so, use CAP details.
-$participant         = $assessment->getParticipantIfExtant($sessionUser);
-$plan['description'] = trim($participant ? $participant->getDescription() : $assessment->getDescription());
-$plan['start']       = $participant ? $participant->getOpenDate() : $assessment->getOpenAt();
-$plan['finish']      = $participant ? $participant->getDueDate() : $assessment->getDueAt();
-$plan['close']       = $participant ? $participant->getCloseDate() : $assessment->getCloseAt();
-
-if ($accessLevel < UserAccess::ACCESS_WRITE) {
-    // I can't attempt a spec assessment
-    if ($assessment->isSpecification()) {
-        error(19);
-    }
-
-    // I can't start this if I have too many attempts
-    $numAttempts = $attemptHandler->userHasAttempted($assess['assess_id'], $_SESSION['id']);
-    $attempt     = $attemptHandler->getLatestResumableForUser($assess['assess_id'], $_SESSION['id']);
-    if ($attempt) {
-        // Check if Attempt ran out of time
-        // If it did, give the student another attempt, if they have one.
-        $attemptStartTime     = strtotime($attempt['start']);
-        $attemptTimeRemaining = $attemptStartTime + $assess['duration'] - time();
-        $attemptEndTime       = $attemptStartTime + $assess['duration'];
-        if (($attemptTimeRemaining < 0)
-            && ($attemptStartTime > 0)
-            && ($assess['duration'] != Assess_Main::UNLIMITED_DURATION)
-        ) {
-            // Close off the last attempt first (at the time it would have ended naturally)
-            $closeTime = new Alaress_Date_Format($attemptEndTime, 'U');
-            $attemptHandler->update(array(
-                'attempt_id' => $attempt['attempt_id'],
-                'finish'     => $closeTime->getDatabase(),
-            ));
-
-            // Now am I out of attempts?
-            if (($assess['max_attempts'] > 0) && ($numAttempts >= $assess['max_attempts'])) {
-                error(122);
-            }
-        }
-    } else {
-        // Am I already out of attempts?
-        if (($assess['max_attempts'] > 0) && ($numAttempts >= $assess['max_attempts'])) {
-
-            /* Redirect to the Attempts List screen
-             */
-            $this->localRedir("/assess/attempts/{$assess['assess_id']}/{$_SESSION['user']->getId()}");
-        }
-    }
-}
-
-// Hide the CTA if session user is not permitted to attempt
-$readOnly = !$actionValidator->canAttemptQuiz($sessionUser, $assessment);
-
-
-/* Continue once you get past checks
- */
-$author = UserMapper::getInstance()->findByIdWithFallback($assess['user_id']);
-
-$allSummary = $assessHandler->getIntroSummary($assess['assess_id']);
-$allSections = $sectionHandler->getList($assess['assess_id']);
-
-$this->setFile(TEMPLATE_content, 'assess/intro.html');
-$this->setBlock(TEMPLATE_content, 'section', 'section_block');
-$this->setBlock(TEMPLATE_content, 'startTest', 'startTest_block');
-$this->setBlock(TEMPLATE_content, 'has_assess_description', 'has_assess_description_block');
-$this->setBlock(TEMPLATE_content, 'has_assess_due', 'has_assess_due_block');
-$this->setBlock(TEMPLATE_content, 'author_link_open', 'author_link_open_block');
-$this->setBlock(TEMPLATE_content, 'author_link_close', 'author_link_close_block');
-
-$this->setTitle('Assessment: ' . Scrub::text($assess['title']));
-
-if ($author->isDeleted()) {
-    $this->setVar('author_link_open_block', '');
-    $this->setVar('author_link_close_block', '');
-} else {
-    $this->parse('author_link_open_block', 'author_link_open');
-    $this->parse('author_link_close_block', 'author_link_close');
-}
-
-$this->setVar(array(
-    'RETURN_URL_SUFFIX' => isset($_GET['returnUrl']) ? '?returnUrl=' . $_GET['returnUrl'] : '',
-    'ASSESS_ASSESS_ID' => $assess['assess_id'],
-    'ASSESS_TITLE' => Scrub::text($assess['title']),
-    'ASSESS_DESCRIPTION' => Scrub::html($plan['description']),
-    'ASSESS_START' => $plan['start']->getShort(),
-    'ASSESS_FINISH' => $plan['finish']->getShort(),
-    'FIRST_SECTION' => $allSections[0]['section_id'],
-    'ASSESS_AUTHOR' => Scrub::text($author->formatName()),
-    'ASSESS_AUTHOR_ID' => $author->getId(),
-    'ASSESS_AUTHOR_EXT_ID' => $author->getExternalId(),
-    'ASSESS_AUTHOR_ROLE' => $author->getRole()->getName(),
-    'ASSESS_FOLDER' => Scrub::text($folder->getName() . ($folder->getCodeString() ? ' ('.$folder->getCodeString().')': '')),
-    'ASSESS_FOLDER_ID' => $folder->getId(),
-    'ASSESS_DURATION' => (int)$assess['duration'] === Assess_Main::UNLIMITED_DURATION ? 'Unlimited' : $assessHandler->sec2hms((int)$assess['duration']),
-    'READ_ONLY' => $readOnly,
-));
-
-if ($assessment->isImplementation()) {
-    $this->parse('has_assess_due_block', 'has_assess_due');
-} else {
-    $this->setVar('has_assess_due_block', '');
-}
-
-if ('' === $plan['description']) {
-    $this->setVar('has_assess_description_block', '');
-} else {
-    $this->parse('has_assess_description_block', 'has_assess_description', true);
-}
-
-/* Section list and question count
- */
-if (is_array($allSummary) && count($allSummary)) {
-    $numQuestions = 0;
-
-    foreach ($allSummary as $currentSummary) {
-        if ($currentSummary['pool'] > 0 && $currentSummary['pool'] < $currentSummary['numQuestions']) {
-            $numQuestions = $currentSummary['pool'];
-        } else {
-            $numQuestions = $currentSummary['numQuestions'];
-        }
-
-        $this->setVar(array(
-            'SECTION_SEQUENCE' => $currentSummary['sequence'],
-            'SECTION_TITLE' => Scrub::text($currentSummary['title']),
-            'SECTION_NUMQUESTIONS' => $numQuestions,
-        ));
-
-        $this->parse('section_block', 'section', true);
-    }
-
-    $this->parse('startTest_block', 'startTest');
-
-    if ($readOnly) {
-        $this->setVar('startTest_block', '');
-    }
-} else {
-    $this->setVar('section_block', '');
-    $this->setVar('startTest_block', '');
-}
-
-$trail = new Breadcrumbs();
-$term  = Schoolbox\Assessment\Term\Mapper::getInstance()->findForDate(
-    new Alaress_Date_Format($assess['finish'], Alaress_Date_Format::DATABASE_FORMAT)
+$router               = $this->getDi()->get('router');
+$sessionUser          = $_SESSION['user'];
+$assessment           = $assessmentDataSource->findByQuizId($quizId, $sessionUser);
+$this::localRedir(
+    $router->generate(
+        'learningAssessment.getSummary',
+        [
+            'assessmentId' => $assessment->getId(),
+            'studentId'    => $sessionUser->getId(),
+        ]
+    )
 );
+exit;
 
-$trail->renderIntoSitePage($this, 'BREADCRUMB', [
-    [
-        'text'  => 'Learning',
-        'href'  => '/learning/classes',
-        'class' => ''
-    ],
-    [
-        'text'  => $folder->getName(),
-        'href'  => '/homepage/'.$folder->getId(),
-        'class' => ''
-    ],
-    [
-        'text'  => $assess['title'],
-        'href'  => '/assess/intro/' . $assess['assess_id'],
-        'class' => 'active'
-    ],
-]);
+//use Schoolbox\Breadcrumbs;
+//use Schoolbox\Error;
+//use Schoolbox\IConfigLoader;
+//use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
+//use Schoolbox\Learning\Quiz\ActionValidator;
+//use Schoolbox\Mapper;
+//use Schoolbox\Permission\Access\UserAccess;
+//use Schoolbox\Permission\Access\Access;
+//use Schoolbox\Resource\Folder;
+//use Schoolbox\UserMapper;
+//
+//$assessHandler = new Assess_Main();
+//$sectionHandler = new Assess_Section();
+//$attemptHandler = new Assess_Attempt();
+//$userHandler = new User();
+//
+///**
+// * @var SitePage $this
+// * @var AssessmentDataSource $assessmentDataSource
+// * @var IConfigLoader        $config
+// */
+//$assessmentDataSource = $this->getDi()->get('assessmentDataSource');
+//$config               = $this->getDi()->get('config');
+//
+//if (!is_numeric($this->arg[0])) {
+//    error(112);
+//}
+//if (!$assessHandler->isValidUrlAccess($this->arg[0])) {
+//    $this->pageNotFound();
+//}
+//
+///* Get intro summary for the assessment
+// */
+//$assess = $assessHandler->getIntro($this->arg[0]);
+//
+//if (!$assess) {
+//    error(112);
+//}
+//
+//if ($assessHandler->isDeleted($assess['assess_id'])) {
+//    error(112);
+//}
+//
+///* Check the folder exists meaningfully
+// */
+//try {
+//    $folder = Folder\Mapper::getInstance()->findById($assess['category_id']);
+//}
+//catch (Mapper\Exception $e) {
+//    error(Error\Mapper::ERROR_SELECT_QUIZ_GROUP);
+//}
+//
+///* Check if you are in this category, so you can't submit other category's
+// * online assessments unless you are a part of that category.
+// */
+///** @var \Schoolbox\User $sessionUser */
+//$sessionUser      =  $_SESSION['user'];
+//$assessment       = $assessmentDataSource->findByQuizId($assess['assess_id'], $sessionUser);
+//$assessmentFolder = $assessment->getBaseContext()->getFolder();
+//$accessLevel      = Access::getInstance()->getFolderAccess($sessionUser, $assessmentFolder->getId());
+//$readOnly         = true;
+//
+///* Special case: participation isn't guaranteed at this point
+// * so we can't get a Plan in all cases e.g. visiting from Course Import as an instructor
+// */
+//$plan = [];
+//
+//// Check the current session user is permitted to visit this page
+//$actionValidator = new ActionValidator(Alaress_Date_Format::now(), Access::getInstance());
+//if (!$actionValidator->canSeeQuiz($sessionUser, $assessment, $config->get('restrict_student_submissions'))) {
+//    $this->pageNotFound();
+//}
+//
+//// Does session user have a participation? If so, use CAP details.
+//$participant         = $assessment->getParticipantIfExtant($sessionUser);
+//$plan['description'] = trim($participant ? $participant->getDescription() : $assessment->getDescription());
+//$plan['start']       = $participant ? $participant->getOpenDate() : $assessment->getOpenAt();
+//$plan['finish']      = $participant ? $participant->getDueDate() : $assessment->getDueAt();
+//$plan['close']       = $participant ? $participant->getCloseDate() : $assessment->getCloseAt();
+//
+//if ($accessLevel < UserAccess::ACCESS_WRITE) {
+//    // I can't attempt a spec assessment
+//    if ($assessment->isSpecification()) {
+//        error(19);
+//    }
+//
+//    // I can't start this if I have too many attempts
+//    $numAttempts = $attemptHandler->userHasAttempted($assess['assess_id'], $_SESSION['id']);
+//    $attempt     = $attemptHandler->getLatestResumableForUser($assess['assess_id'], $_SESSION['id']);
+//    if ($attempt) {
+//        // Check if Attempt ran out of time
+//        // If it did, give the student another attempt, if they have one.
+//        $attemptStartTime     = strtotime($attempt['start']);
+//        $attemptTimeRemaining = $attemptStartTime + $assess['duration'] - time();
+//        $attemptEndTime       = $attemptStartTime + $assess['duration'];
+//        if (($attemptTimeRemaining < 0)
+//            && ($attemptStartTime > 0)
+//            && ($assess['duration'] != Assess_Main::UNLIMITED_DURATION)
+//        ) {
+//            // Close off the last attempt first (at the time it would have ended naturally)
+//            $closeTime = new Alaress_Date_Format($attemptEndTime, 'U');
+//            $attemptHandler->update(array(
+//                'attempt_id' => $attempt['attempt_id'],
+//                'finish'     => $closeTime->getDatabase(),
+//            ));
+//
+//            // Now am I out of attempts?
+//            if (($assess['max_attempts'] > 0) && ($numAttempts >= $assess['max_attempts'])) {
+//                error(122);
+//            }
+//        }
+//    } else {
+//        // Am I already out of attempts?
+//        if (($assess['max_attempts'] > 0) && ($numAttempts >= $assess['max_attempts'])) {
+//
+//            /* Redirect to the Attempts List screen
+//             */
+//            $this->localRedir("/assess/attempts/{$assess['assess_id']}/{$_SESSION['user']->getId()}");
+//        }
+//    }
+//}
+//
+//// Hide the CTA if session user is not permitted to attempt
+//$readOnly = !$actionValidator->canAttemptQuiz($sessionUser, $assessment);
+//
+//
+///* Continue once you get past checks
+// */
+//$author = UserMapper::getInstance()->findByIdWithFallback($assess['user_id']);
+//
+//$allSummary = $assessHandler->getIntroSummary($assess['assess_id']);
+//$allSections = $sectionHandler->getList($assess['assess_id']);
+//
+//$this->setFile(TEMPLATE_content, 'assess/intro.html');
+//$this->setBlock(TEMPLATE_content, 'section', 'section_block');
+//$this->setBlock(TEMPLATE_content, 'startTest', 'startTest_block');
+//$this->setBlock(TEMPLATE_content, 'has_assess_description', 'has_assess_description_block');
+//$this->setBlock(TEMPLATE_content, 'has_assess_due', 'has_assess_due_block');
+//$this->setBlock(TEMPLATE_content, 'author_link_open', 'author_link_open_block');
+//$this->setBlock(TEMPLATE_content, 'author_link_close', 'author_link_close_block');
+//
+//$this->setTitle('Assessment: ' . Scrub::text($assess['title']));
+//
+//if ($author->isDeleted()) {
+//    $this->setVar('author_link_open_block', '');
+//    $this->setVar('author_link_close_block', '');
+//} else {
+//    $this->parse('author_link_open_block', 'author_link_open');
+//    $this->parse('author_link_close_block', 'author_link_close');
+//}
+//
+//$this->setVar(array(
+//    'RETURN_URL_SUFFIX' => isset($_GET['returnUrl']) ? '?returnUrl=' . $_GET['returnUrl'] : '',
+//    'ASSESS_ASSESS_ID' => $assess['assess_id'],
+//    'ASSESS_TITLE' => Scrub::text($assess['title']),
+//    'ASSESS_DESCRIPTION' => Scrub::html($plan['description']),
+//    'ASSESS_START' => $plan['start']->getShort(),
+//    'ASSESS_FINISH' => $plan['finish']->getShort(),
+//    'FIRST_SECTION' => $allSections[0]['section_id'],
+//    'ASSESS_AUTHOR' => Scrub::text($author->formatName()),
+//    'ASSESS_AUTHOR_ID' => $author->getId(),
+//    'ASSESS_AUTHOR_EXT_ID' => $author->getExternalId(),
+//    'ASSESS_AUTHOR_ROLE' => $author->getRole()->getName(),
+//    'ASSESS_FOLDER' => Scrub::text($folder->getName() . ($folder->getCodeString() ? ' ('.$folder->getCodeString().')': '')),
+//    'ASSESS_FOLDER_ID' => $folder->getId(),
+//    'ASSESS_DURATION' => (int)$assess['duration'] === Assess_Main::UNLIMITED_DURATION ? 'Unlimited' : $assessHandler->sec2hms((int)$assess['duration']),
+//    'READ_ONLY' => $readOnly,
+//));
+//
+//if ($assessment->isImplementation()) {
+//    $this->parse('has_assess_due_block', 'has_assess_due');
+//} else {
+//    $this->setVar('has_assess_due_block', '');
+//}
+//
+//if ('' === $plan['description']) {
+//    $this->setVar('has_assess_description_block', '');
+//} else {
+//    $this->parse('has_assess_description_block', 'has_assess_description', true);
+//}
+//
+///* Section list and question count
+// */
+//if (is_array($allSummary) && count($allSummary)) {
+//    $numQuestions = 0;
+//
+//    foreach ($allSummary as $currentSummary) {
+//        if ($currentSummary['pool'] > 0 && $currentSummary['pool'] < $currentSummary['numQuestions']) {
+//            $numQuestions = $currentSummary['pool'];
+//        } else {
+//            $numQuestions = $currentSummary['numQuestions'];
+//        }
+//
+//        $this->setVar(array(
+//            'SECTION_SEQUENCE' => $currentSummary['sequence'],
+//            'SECTION_TITLE' => Scrub::text($currentSummary['title']),
+//            'SECTION_NUMQUESTIONS' => $numQuestions,
+//        ));
+//
+//        $this->parse('section_block', 'section', true);
+//    }
+//
+//    $this->parse('startTest_block', 'startTest');
+//
+//    if ($readOnly) {
+//        $this->setVar('startTest_block', '');
+//    }
+//} else {
+//    $this->setVar('section_block', '');
+//    $this->setVar('startTest_block', '');
+//}
+//
+//$trail = new Breadcrumbs();
+//$term  = Schoolbox\Assessment\Term\Mapper::getInstance()->findForDate(
+//    new Alaress_Date_Format($assess['finish'], Alaress_Date_Format::DATABASE_FORMAT)
+//);
+//
+//$trail->renderIntoSitePage($this, 'BREADCRUMB', [
+//    [
+//        'text'  => 'Learning',
+//        'href'  => '/learning/classes',
+//        'class' => ''
+//    ],
+//    [
+//        'text'  => $folder->getName(),
+//        'href'  => '/homepage/'.$folder->getId(),
+//        'class' => ''
+//    ],
+//    [
+//        'text'  => $assess['title'],
+//        'href'  => '/assess/intro/' . $assess['assess_id'],
+//        'class' => 'active'
+//    ],
+//]);

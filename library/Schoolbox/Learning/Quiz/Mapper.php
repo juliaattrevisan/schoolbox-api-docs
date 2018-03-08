@@ -18,12 +18,17 @@ use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
+use Schoolbox\Learning\Quiz\Attempt\Model as QuizAttemptModel;
+use Schoolbox\Learning\Quiz\Attempt\Answer\Mapper as QuizAnswerMapper;
+use Schoolbox\Learning\Quiz\Attempt\Answer\Model as QuizAnswerModel;
 use Schoolbox\Learning\Quiz\Section\Mapper as QuizSectionMapper;
 use Schoolbox\Learning\Quiz\Section\Question\Mapper as QuizQuestionMapper;
+use Schoolbox\Learning\Quiz\Section\Question\Model as QuizQuestionModel;
 use Schoolbox\Learning\Quiz\Section\Question\Solution\Model as QuizSolution;
 use Schoolbox\Learning\Quiz\Section\Question\Solution\Mapper as QuizSolutionMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 /**
@@ -489,6 +494,110 @@ class Mapper extends BaseMapper implements FeedableMapperInterface
         $this->throwIfDeleted($quiz);
 
         $quiz->setCurriculumNodes(new Collection(array_values($curriculumNodes)));
+
+        return $quiz;
+    }
+
+
+    /**
+     * Closes any attempts in $quiz that have expired.
+     *
+     * @param Model                $quiz
+     * @param \Alaress_Date_Format $now
+     * @throws BaseMapper\Exception
+     */
+    public function closeExpiredAttempts(Model $quiz, \Alaress_Date_Format $now): void
+    {
+        if ($quiz->isDurationUnlimited()) {
+            return;
+        }
+        $duration = $quiz->getDuration();
+        foreach ($quiz->getAttempts() as $attempt) {
+            if (!$attempt->isFinished()) {
+                // Has it passed its duration?
+                $expiry = (clone $attempt->getStart())->addSeconds($duration);
+                if ($expiry->lt($now)) {
+                    $attempt->setFinish($expiry);
+                    $this->getJoinMapper('attempt')->save($attempt);
+                }
+            }
+        }
+    }
+
+
+    /**
+     * Loads sections and their questions into this quiz.
+     *
+     * @param Model $quiz
+     * @return Model
+     */
+    public function loadSectionsAndQuestions(Model $quiz): Model
+    {
+        // Load sections
+        $sectionMapper = $this->getJoinMapper('sections');
+        $quiz->setSections(
+            $sectionMapper->findByColumn(
+                'assess_id',
+                $quiz->getId(),
+                ['order' => ['sequence' => 'asc']]
+            )
+        );
+
+        // Load questions into sections
+        // TODO question mapper should be part of section mapper
+        $questionMapper   = QuizQuestionMapper::getInstance();
+        $sectionQuestions = $questionMapper
+            ->findByColumn(
+                'section_id',
+                $quiz->getSections()->getPropertyValues('id')
+            )
+            ->groupByCallback(function(QuizQuestionModel $q) {
+                return $q->getSection()->getId();
+            });
+        foreach ($quiz->getSections() as $section) {
+            if (isset($sectionQuestions[$section->getId()])) {
+                $section->setQuestions($sectionQuestions[$section->getId()]);
+            }
+        }
+
+        return $quiz;
+    }
+
+
+    /**
+     * Loads attempts and answers into this quiz.
+     *
+     * @param Model     $quiz
+     * @param null|User $student If set, only load attempts made by this student.
+     * @return Model
+     */
+    public function loadAttemptsAndAnswers(Model $quiz, ?User $student = null): Model
+    {
+        // Load attempts
+        $attemptMapper = $this->getJoinMapper('attempt');
+        $attemptFilter = ['assess_id' => $quiz->getId(),];
+        $attemptOrder  = ['order' => ['start' => 'desc']];
+        if ($student) {
+            $attemptFilter['user_id'] = $student->getId();
+        }
+        $quiz->setAttempts($attemptMapper->findByColumnList($attemptFilter, $attemptOrder));
+
+        // Load answers (which include questions) into attempts
+        // TODO answer mapper should be part of attempt mapper
+        $answerMapper   = QuizAnswerMapper::getInstance();
+        $attemptAnswers = $answerMapper
+            ->findByColumn(
+                'attempt_id',
+                $quiz->getAttempts()->getPropertyValues('id')
+            )
+            ->groupByCallback(function(QuizAnswerModel $a) {
+                return $a->getAttempt()->getId();
+            });
+        foreach ($quiz->getAttempts() as $attempt) {
+            if (isset($attemptAnswers[$attempt->getId()])) {
+                $attempt->setAnswers($attemptAnswers[$attempt->getId()]);
+            }
+        }
 
         return $quiz;
     }
