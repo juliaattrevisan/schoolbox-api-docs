@@ -196,7 +196,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                         if ($upcomingDate->lt($openDate)) {
                             $upcomingDate = (clone $openDate)->addMinutes(1);
                         }
-                        if (!$upcomingDate->isPast()) {
+                        if ($upcomingDate->isFuture()) {
                             $bundle->attach(self::TRIGGER_UPCOMING, $upcomingDate->getUnixTimeStamp());
                         }
                     }
