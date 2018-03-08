@@ -12,9 +12,11 @@
 
     {% if wysiwyg_content | length > 0 %}
     <div class="small-12 island">
-        <p>
-            {{ wysiwyg_content | purify }}
-        </p>
+        <section class="content">
+            <article>
+                {{- wysiwyg_content | purify -}}
+            </article>
+        </section>
     </div>
     {% endif %}
 
