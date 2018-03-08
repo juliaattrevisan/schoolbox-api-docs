@@ -8,7 +8,7 @@
 $form-spacing: rem-calc(($base-font-size));
 
 // We use these to style the labels in different ways
-// $form-label-pointer: pointer;
+$form-label-pointer: $cursor-default-value;
 $form-label-font-size: rem-calc(($base-font-size - 2));
 $form-label-font-weight: $font-weight-semibold;
 $form-label-line-height: 1.4rem;
@@ -133,7 +133,7 @@ form {
 input,
 textarea,
 select{
-	@include placeholder-hover-color($content-ui-foreground);
+	@include placeholder-hover-color($base);
 	@include single-transition(all, 0.15s, linear);
 	min-height: $global-button-input-height;
 	line-height: inherit;
@@ -157,12 +157,12 @@ select:disabled:hover,
 input:read-only:hover,
 textarea:read-only:hover {
 	background-color: $input-bg-color;
-	cursor: $cursor-default-value
 }
 
-input:disabled {
-	form & {
-		@include placeholder-hover-color(transparent);
+input:disabled,
+input:read-only {
+	label:hover & {
+		@include placeholder-hover-color($base);
 	}
 }
 
