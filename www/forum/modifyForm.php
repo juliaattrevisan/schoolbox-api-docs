@@ -247,7 +247,7 @@ else if (is_numeric($_GET['deletePost'])) {
 	/* check permissions
 	 */
     $accessLevel = $access->getFolderAccess($_SESSION['user'], $thread->getCategory()->getId());
-    if ($accessLevel < UserAccess::ACCESS_WRITE && $thread->getUser()->getId() !== $_SESSION['user']->getId()) {
+    if ($accessLevel < UserAccess::ACCESS_WRITE && $post->getOwner()->getId() !== $_SESSION['user']->getId()) {
         error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
     }
 
