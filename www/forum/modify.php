@@ -1,6 +1,7 @@
 <?php
 require_once(dirname(__FILE__) . '/../../library/Bootstrap.php');
 
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Forum\PostMapper;
 use Schoolbox\Forum\ThreadMapper;
 use Schoolbox\Permission\Access\Access;
@@ -27,7 +28,7 @@ if (is_numeric($this->arg[0])) {
         /** @var \Schoolbox\Resource\Folder\Model $folder */
         $folder = FolderMapper::getInstance()->findById($this->arg[0]);
     } catch (Exception $e) {
-        error(2);
+        error(ErrorMapper::ERROR_INFORMATION_MISSING);
     }
 
     /* Forum exists
@@ -41,10 +42,10 @@ if (is_numeric($this->arg[0])) {
     $access      = Access::getInstance();
     $accessLevel = $access->getFolderAccess($_SESSION['user'], $folder->getId());
     if ($accessLevel < UserAccess::ACCESS_READ) {
-        error(19);
+        error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
     }
     if ($groupHandler->hasChildAccessOnly($folder->getId(), $_SESSION['user']->getId())) {
-        error(19);
+        error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
     }
 
     $this->setTitle(Scrub::text($folder->getName() . ' Forum'));
@@ -73,19 +74,19 @@ if (is_numeric($this->arg[0])) {
             //There is cases where you need to edit deleted stuff so letting this go through..
         }
         catch (Exception $e) {
-            error(2);
+            error(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
 
         /* Check user owns post
          */
         if ($post->getOwner()->getId() != $_SESSION['id'] && $accessLevel < UserAccess::ACCESS_WRITE) {
-            error(19);
+            error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
         }
 
         /* check locked
          */
         if ($thread->isLocked() && $accessLevel < UserAccess::ACCESS_WRITE) {
-            error(19);
+            error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
         }
 
         // first!
@@ -134,13 +135,13 @@ if (is_numeric($this->arg[0])) {
             //There is cases where you need to edit deleted stuff so letting this go through..
         }
         catch (Exception $e) {
-            error(2);
+            error(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
 
         /* Check locked
          */
         if ($accessLevel < UserAccess::ACCESS_WRITE && $thread->isLocked()) {
-            error(19);
+            error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
         }
 
         /* Only inject a blockquote when creating a new reply
@@ -227,5 +228,5 @@ if (is_numeric($this->arg[0])) {
     $this->setVar($output);
 }
 else {
-    error(2);
+    error(ErrorMapper::ERROR_INFORMATION_MISSING);
 }
