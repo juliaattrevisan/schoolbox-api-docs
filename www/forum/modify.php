@@ -9,6 +9,7 @@ use Schoolbox\Breadcrumbs;
 use Schoolbox\Permission\Access\UserAccess;
 
 $forumHandler = new Forum();
+$groupHandler = new Group();
 
 $this->setFile(TEMPLATE_content, 'forum/modify.html');
 $this->setBlock(TEMPLATE_content, 'title', 'title_block');
@@ -40,6 +41,9 @@ if (is_numeric($this->arg[0])) {
     $access      = Access::getInstance();
     $accessLevel = $access->getFolderAccess($_SESSION['user'], $folder->getId());
     if ($accessLevel < UserAccess::ACCESS_READ) {
+        error(19);
+    }
+    if ($groupHandler->hasChildAccessOnly($folder->getId(), $_SESSION['user']->getId())) {
         error(19);
     }
 

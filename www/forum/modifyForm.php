@@ -6,10 +6,10 @@ use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use \Schoolbox\Forum\PostMapper;
 use \Schoolbox\Forum\ThreadMapper;
 use \Schoolbox\Permission\Access\UserAccess;
-use \Schoolbox\Permission\Access\UserAccessMapper;
 
 $page = new SitePage();
 $forumHandler = new Forum();
+$groupHandler = new Group();
 $access = Access::getInstance();
 
 if (is_numeric($_POST['categoryID'])) {
@@ -34,6 +34,9 @@ if (is_numeric($_POST['categoryID'])) {
     if ($accessLevel < UserAccess::ACCESS_READ) {
         error(19);
     }
+	if ($groupHandler->hasChildAccessOnly($_POST['categoryID'], $_SESSION['user']->getId())) {
+		error(19);
+	}
 
 	/* modify post
 	 */
@@ -157,6 +160,9 @@ else if (is_numeric($_GET['toggleLock'])) {
     if ($accessLevel < UserAccess::ACCESS_WRITE) {
         error(19);
     }
+	if ($groupHandler->hasChildAccessOnly($thread->getCategory()->getId(), $_SESSION['user']->getId())) {
+		error(19);
+	}
 
     $thread->setLocked($thread->isLocked()?false:true);
 
@@ -187,6 +193,9 @@ else if (is_numeric($_GET['deleteThread'])) {
     if ($accessLevel < UserAccess::ACCESS_WRITE) {
         error(19);
     }
+	if ($groupHandler->hasChildAccessOnly($thread->getCategory()->getId(), $_SESSION['user']->getId())) {
+		error(19);
+	}
 
     ThreadMapper::getInstance()->delete($thread);
 
@@ -206,6 +215,9 @@ else if (is_array($_POST['deleteThreads'])) {
             if ($accessLevel < UserAccess::ACCESS_WRITE) {
                 error(19);
             }
+			if ($groupHandler->hasChildAccessOnly($thread->getCategory()->getId(), $_SESSION['user']->getId())) {
+				error(19);
+			}
 
             $categoryID = $thread->getCategory()->getId();
 
@@ -243,6 +255,9 @@ else if (is_numeric($_GET['deletePost'])) {
     if ($accessLevel < UserAccess::ACCESS_WRITE && $thread->isLocked() ) {
         error(19);
     }
+	if ($groupHandler->hasChildAccessOnly($thread->getCategory()->getId(), $_SESSION['user']->getId())) {
+		error(19);
+	}
 
 	$pageNumber = $forumHandler->getPageNumber($post->getId());
 
