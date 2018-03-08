@@ -357,24 +357,6 @@ class Event_Attendance_Controller extends Controller
         catch (Schoolbox\Mapper\Exception $e) {}
     }
 
-    public function processRemoveAttendance ($attendanceId) {
-        $attendance = $this->getCalendarHandler()->getAttendance($attendanceId);
-
-        if ( !is_array($attendance) ) {
-            $this->getPage()->error(34); // @todo Create error for attendee not found
-        }
-
-        $event = $this->getCalendarHandler()->getByID($attendance['event_id']);
-
-        if ( !is_array($event) ) {
-            $this->getPage()->error(34); // @todo Create error for event not found
-        }
-
-        $this->getCalendarHandler()->removeAttendance($attendanceId);
-
-        $this->getPage()->localRedir("/calendar/attendance/list/{$event['id']}");
-    }
-
     public function setCalendarHandler($calendarHandler)
     {
         $this->calendarHandler = $calendarHandler;

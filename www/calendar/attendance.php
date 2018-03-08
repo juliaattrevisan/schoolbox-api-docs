@@ -17,11 +17,15 @@ elseif ( $method == 'processModifyAttendanceList' && !empty($_POST) ) {
     $attendanceController->processModifyAttendanceList($data);
 }
 
-elseif ( $method == 'processRemoveAttendance' && is_numeric($this->arg[1]) ) {
-    $attendanceId = $this->arg[1];
+elseif ( $method == 'processRemoveAttendance' && is_numeric($this->arg[1]) && is_numeric($this->arg[2])) {
+    $eventId = $this->arg[1];
+    $userId = $this->arg[2];
 
-    $attendanceController->processRemoveAttendance($attendanceId);
+    \Schoolbox\Calendar\EventMapper::getInstance()->removeAttendance($eventId, $userId);
+
+    header('Location: '."/calendar/attendance/list/".$eventId);
 }
+
 /* Show all upcoming events with the number of attendees
  */
 else if ($method == 'upcomingEvents') {
