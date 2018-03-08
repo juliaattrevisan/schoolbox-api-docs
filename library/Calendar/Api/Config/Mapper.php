@@ -99,11 +99,15 @@ class Calendar_Api_Config_Mapper extends BaseMapper
 
         foreach ($configs as $record) {
             $config = $record->decodeConfig();
-            if($moduleChecker->isEnabled($config)){
-                $sourceList[] = [
-                    'id'   => $record->getId(),
-                    'name' => $config->getLabel()
-                ];
+            try {
+                if($moduleChecker->isEnabled($config)){
+                    $sourceList[] = [
+                        'id'   => $record->getId(),
+                        'name' => $config->getLabel()
+                    ];
+                }
+            } catch (\TypeError $e) {
+                // I will not buy this record; it is scratched
             }
         }
 
@@ -156,9 +160,13 @@ class Calendar_Api_Config_Mapper extends BaseMapper
 
         foreach ($configs as $currentConfig) {
             $config = $currentConfig->decodeConfig();
-            if($moduleChecker->isEnabled($config)){
-                $config->setId($currentConfig->getId());
-                $allConfigs[] = $config;
+            try {
+                if($moduleChecker->isEnabled($config)){
+                    $config->setId($currentConfig->getId());
+                    $allConfigs[] = $config;
+                }
+            } catch (\TypeError $e) {
+                // I will not buy this record; it is scratched
             }
         }
 

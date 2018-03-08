@@ -68,12 +68,16 @@ class Calendar_Api_Factory
 
             $config = $currentConfig->decodeConfig();
 
-            if ($moduleChecker->isEnabled($config)) {
-                /* Update $config so it knows the calendar_connector id from whence it came
-                 * This is used in produce() and passed to each unique/default implementation
-                 */
-                $config->setId($currentConfig->getId());
-                $this->allTypes[] = $config;
+            try {
+                if ($moduleChecker->isEnabled($config)) {
+                    /* Update $config so it knows the calendar_connector id from whence it came
+                     * This is used in produce() and passed to each unique/default implementation
+                     */
+                    $config->setId($currentConfig->getId());
+                    $this->allTypes[] = $config;
+                }
+            } catch (\TypeError $e) {
+                // I will not buy this record; it is scratched
             }
         }
     }
