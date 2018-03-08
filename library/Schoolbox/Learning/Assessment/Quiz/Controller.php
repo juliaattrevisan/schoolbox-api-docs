@@ -133,8 +133,8 @@ class Controller extends Assessment\Controller
      * @api   GET /learning/assessments/:assessmentId/:userId
      * @level 165
      *
-     * @param IAssessable $assessment
-     * @param User        $student
+     * @param IAssessable|Model $assessment
+     * @param User              $student
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\Deleted
@@ -146,7 +146,11 @@ class Controller extends Assessment\Controller
         $quiz = $this->quizMapper->loadSectionsAndQuestions($quiz);
         $quiz = $this->quizMapper->loadAttemptsAndAnswers($quiz, $student);
 
-        // Which attempt is in progress? Show a CTA to resume that if there is one
+        // Close any expired attempts before checking for in-progress
+        $now = Alaress_Date_Format::now();
+        $this->quizMapper->closeExpiredAttempts($quiz, $now);
+
+        // Is an attempt in progress? Show a CTA to resume that if there is one
         $attemptInProgress = null;
         foreach ($quiz->getAttempts() as $attempt) {
             if (!$attempt->isFinished()) {
@@ -155,13 +159,13 @@ class Controller extends Assessment\Controller
             }
         }
 
-        // Close expired attempts as well
-        $now = Alaress_Date_Format::now();
-        $this->quizMapper->closeExpiredAttempts($quiz, $now);
-
         // Can I attempt this?
         // TODO this should eventually be route permission based
         $actionValidator = new ActionValidator($now, $this->getAccess());
+
+        // TODO this will produce a false-positive if there is an attempt unfinished but the time limit on it has expired
+        $canAttempt = $student->getId() === $this->getUser()->getId()
+            && $actionValidator->canAttemptQuiz($this->getUser(), $assessment);
 
         $twigData = [
             'breadcrumbs'       => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([ $assessment->getTitle(), '' ]),
@@ -172,8 +176,7 @@ class Controller extends Assessment\Controller
             'attemptInProgress' => $attemptInProgress,
             'returnUrl'         => $this->getRequest()->query->get(Redirect::RETURN_URL),
             // User may only attempt quiz from here if viewing own summary
-            'canAttempt'        => $student->getId() === $this->getUser()->getId()
-                                   && $actionValidator->canAttemptQuiz($this->getUser(), $assessment),
+            'canAttempt'        => $canAttempt,
             'canReview'         => $actionValidator->canReviewAttempts($this->getUser(), $student, $assessment),
             'canStudentReview'  => $actionValidator->canReviewAttemptsReadonly(
                 $this->getUser(),

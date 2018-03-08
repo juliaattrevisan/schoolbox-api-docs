@@ -117,8 +117,14 @@ class ActionValidator
             if ($participant->isExcluded()) {
                 return false;
             }
-            // Instructors are not bound by dates, Learners are.
-            return $isInstructor || ($this->now->gte($participant->getOpenDate()) && $this->now->lt($participant->getCloseDate()));
+
+            // Instructors are not bound by the normal rules
+            if ($isInstructor) {
+                return true;
+            }
+
+            // let the quiz decide the user's fate
+            return $quiz->canLearnerCreateResponse($user);
         }
 
         // Users with no participation can attempt they are instructors, and a dynamic plan is available
