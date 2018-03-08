@@ -93,7 +93,11 @@
          * @returns {*}
          */
         function defaultGetFormData(button) {
-            return button.parent('form').serialize();
+            return {
+                event: {
+                    id: button.parent('form').find('input[name="eventId"]').val()
+                }
+            };
         }
     }
 

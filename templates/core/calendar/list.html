@@ -115,7 +115,11 @@
 
         /* Attendance
          */
-        $('#calendar-list').calendarAttendance();
+        var allEvents = $('.calendar-list').find('[data-reveal-id]');
+
+        $.each(allEvents, function(index, element) {
+            $('#' + $(element).attr('data-reveal-id')).calendarAttendance();
+        });
 	});
 </script>
 <!-- END custom_head -->
