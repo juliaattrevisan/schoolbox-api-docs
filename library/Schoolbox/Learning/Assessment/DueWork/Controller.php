@@ -239,13 +239,20 @@ class Controller extends Assessment\Controller
             'studentId' => $student->getId()
         ];
 
-        $twigData['acknowlegementBlocked'] = false === $this->getRouteIfAuthorized('learningAssessment.postSelfAcknowledge', $routeArgs);
+        if ($assessment->isSelfAssessable()) {
+            $twigData['acknowlegementBlocked'] = false === $this->getRouteIfAuthorized('learningAssessment.postSelfAcknowledge', $routeArgs);
+        } else {
+            // if not self-assessable, the ack routes are always blocked
+            $twigData['acknowlegementBlocked'] = true;
+        }
 
         // TODO SA-6125 - this duplicates module route auth logic. Need to find a way to define this logic in one place only.
         try {
             $assessment->assertAcceptSubmission($participant);
         } catch (DomainException $e) {
             $twigData['submissionsBlocked'] = $this->getErrorMapper()->generateException($e->getCode())->getMessage();
+            // also block acknowledgements in this case
+            $twigData['acknowlegementBlocked'] = true;
         }
 
         $this->getResponse()->content->set(
