@@ -1,14 +1,16 @@
 <?php
 require_once(dirname(__FILE__) . '/../../library/Bootstrap.php');
 
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Forum\PostMapper;
 use Schoolbox\Forum\ThreadMapper;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Breadcrumbs;
-use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Permission\Access\UserAccess;
 
 $forumHandler = new Forum();
+$groupHandler = new Group();
 
 $this->setFile(TEMPLATE_content, 'forum/modify.html');
 $this->setBlock(TEMPLATE_content, 'title', 'title_block');
@@ -26,7 +28,7 @@ if (is_numeric($this->arg[0])) {
         /** @var \Schoolbox\Resource\Folder\Model $folder */
         $folder = FolderMapper::getInstance()->findById($this->arg[0]);
     } catch (Exception $e) {
-        error(2);
+        error(ErrorMapper::ERROR_INFORMATION_MISSING);
     }
 
     /* Forum exists
@@ -37,17 +39,13 @@ if (is_numeric($this->arg[0])) {
 
     /* Check permissions
      */
-
-    $userAccessMapper = UserAccessMapper::getInstance();
-
-    try {
-        $accessLevel = $userAccessMapper->getAccess($_SESSION['user'], $folder->getId());
-    } catch (\Schoolbox\Mapper\Exception $e ) {
-        error(19);
+    $access      = Access::getInstance();
+    $accessLevel = $access->getFolderAccess($_SESSION['user'], $folder->getId());
+    if ($accessLevel < UserAccess::ACCESS_READ) {
+        error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
     }
-
-    if ($accessLevel->getAccessLevel() < UserAccess::ACCESS_READ) {
-        error(19);
+    if ($groupHandler->hasChildAccessOnly($folder->getId(), $_SESSION['user']->getId())) {
+        error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
     }
 
     $this->setTitle(Scrub::text($folder->getName() . ' Forum'));
@@ -76,20 +74,19 @@ if (is_numeric($this->arg[0])) {
             //There is cases where you need to edit deleted stuff so letting this go through..
         }
         catch (Exception $e) {
-            error(2);
+            error(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
 
         /* Check user owns post
          */
-        if ($post->getOwner()->getId() != $_SESSION['id'] && $accessLevel->getAccessLevel() < UserAccess::ACCESS_WRITE
-        ) {
-            error(19);
+        if ($post->getOwner()->getId() != $_SESSION['id'] && $accessLevel < UserAccess::ACCESS_WRITE) {
+            error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
         }
 
         /* check locked
          */
-        if ($thread->isLocked() && $accessLevel->getAccessLevel() < UserAccess::ACCESS_WRITE) {
-            error(19);
+        if ($thread->isLocked() && $accessLevel < UserAccess::ACCESS_WRITE) {
+            error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
         }
 
         // first!
@@ -138,13 +135,13 @@ if (is_numeric($this->arg[0])) {
             //There is cases where you need to edit deleted stuff so letting this go through..
         }
         catch (Exception $e) {
-            error(2);
+            error(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
 
         /* Check locked
          */
-        if ($thread->isLocked() && $accessLevel->getAccessLevel() < UserAccess::ACCESS_WRITE) {
-            error(19);
+        if ($accessLevel < UserAccess::ACCESS_WRITE && $thread->isLocked()) {
+            error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
         }
 
         /* Only inject a blockquote when creating a new reply
@@ -231,5 +228,5 @@ if (is_numeric($this->arg[0])) {
     $this->setVar($output);
 }
 else {
-    error(2);
+    error(ErrorMapper::ERROR_INFORMATION_MISSING);
 }
