@@ -47,7 +47,6 @@ function getConnector(string $className)
 
 
 function buildApiClass(
-    string $connectorClass,
     string $apiClass,
     array $apiConstructorParams,
     bool $enabled
@@ -58,7 +57,7 @@ function buildApiClass(
     }
 
     try {
-        $configuration = getConnector($connectorClass);
+        $configuration = getConnector($apiClass);
     } catch (UnexpectedValueException $e) {
         // Config missing: this is not fine, log to Sentry. Response code: 500
         return [new Calendar_Api_Composite(), 500];
