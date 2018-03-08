@@ -133,8 +133,8 @@ class Controller extends Assessment\Controller
      * @api   GET /learning/assessments/:assessmentId/:userId
      * @level 165
      *
-     * @param IAssessable $assessment
-     * @param User        $student
+     * @param IAssessable|Model $assessment
+     * @param User              $student
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\Deleted
