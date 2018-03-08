@@ -123,11 +123,6 @@ try {
                 [$user],
                 true
             );
-//            $configuration = getConnector(Calendar_Api_EventType_Event_Schoolbox_Personal::class);
-//
-//            if ($configuration->isActive()) {
-//                $api = new Calendar_Api_EventType_Event_Schoolbox_Personal($configuration->getId(), $user);
-//            }
 
             $filename = 'personal';
             break;
@@ -137,17 +132,12 @@ try {
             if ($export_id <= 0) {
                 throw new SchoolboxException('A group ID must be provided', 400);
             }
+
             [$api, $responseCode] = buildApiClass(
                 Calendar_Api_EventType_Event_Schoolbox_Group::class,
                 [$user, $export_id],
                 true
             );
-
-//            $configuration = getConnector(Calendar_Api_EventType_Event_Schoolbox_Group::class);
-//
-//            if ($configuration->isActive()) {
-//                $api = new Calendar_Api_EventType_Event_Schoolbox_Group($configuration->getId(), $user, $export_id);
-//            }
 
             $filename = sprintf('group%d', $export_id);
             break;
@@ -164,17 +154,10 @@ try {
                 true
             );
 
-//            $configuration = getConnector(Calendar_Api_EventType_Event_Schoolbox_Campus::class);
-//
-//            if ($configuration->isActive()) {
-//                $api = new Calendar_Api_EventType_Event_Schoolbox_Campus($configuration->getId(), $user, $export_id);
-//            }
-
             $filename = sprintf('campus%d', $export_id);
             break;
 
         case 'duework':
-
             $page = new SitePage(false);
             $page->setDi($kernel->getDependencyInjector());
 
@@ -188,16 +171,6 @@ try {
                 true
             );
 
-//            $configuration = getConnector(Calendar_Api_EventType_Submission_Schoolbox_Default::class);
-//
-//            if ($configuration->isActive()) {
-//                $api = new Calendar_Api_EventType_Submission_Schoolbox_Default(
-//                    $configuration->getId(),
-//                    $user,
-//                    $assessmentDataSource,
-//                    $visibility
-//                );
-//            }
             $filename = 'duework';
             break;
 
@@ -207,12 +180,6 @@ try {
                 [$user],
                 true
             );
-
-//            $configuration = getConnector(Calendar_Api_EventType_Timetable_ExternalConstrained_Default::class);
-//
-//            if ($configuration->isActive()) {
-//                $api = new Calendar_Api_EventType_Timetable_ExternalConstrained_Default($configuration->getId(), $user);
-//            }
 
             $filename = 'timetable';
             $start = $_SERVER['REQUEST_TIME'];
@@ -225,11 +192,6 @@ try {
                 [$user],
                 true
             );
-//            $configuration = getConnector(Calendar_Api_EventType_TimetableDays_External_Default::class);
-//
-//            if ($configuration->isActive()) {
-//                $api = new Calendar_Api_EventType_TimetableDays_External_Default($configuration->getId(), $user);
-//            }
 
             $filename = 'timetabledays';
             $start = $_SERVER['REQUEST_TIME'];
@@ -244,19 +206,11 @@ try {
                 [$user],
                 (bool)ConfigMapper::getInstance()->get('resource_booking_enabled')
             );
-//            if ((int)ConfigMapper::getInstance()->get('resource_booking_enabled')) {
-//                $configuration = getConnector(Calendar_Api_EventType_ResourceBooking_Booking_Default::class);
-//
-//                if ($configuration->isActive()) {
-//                    $api = new Calendar_Api_EventType_ResourceBooking_Booking_Default($configuration->getId(), $user);
-//                }
-//            }
 
             $filename = 'resources';
             break;
 
         case 'resource':
-
             /* Only include this api if Resource Booking is enabled by Feature Flag
              */
             [$api, $responseCode] = buildApiClass(
@@ -265,19 +219,10 @@ try {
                 (bool)ConfigMapper::getInstance()->get('resource_booking_enabled')
             );
 
-//            if ((int)ConfigMapper::getInstance()->get('resource_booking_enabled')) {
-//                $configuration = getConnector(Calendar_Api_EventType_ResourceBooking_Booking_ForItem::class);
-//
-//                if ($configuration->isActive()) {
-//                    $api = new Calendar_Api_EventType_ResourceBooking_Booking_ForItem($configuration->getId(), $user, $resourceId);
-//                }
-//            }
-
             $filename = sprintf('resource%d', $resourceId);
             break;
 
         case 'resource_category':
-
             /* Only include this api if Resource Booking is enabled by Feature Flag
              */
             [$api, $responseCode] = buildApiClass(
@@ -285,13 +230,6 @@ try {
                 [$user, $resourceCategoryId],
                 (bool)ConfigMapper::getInstance()->get('resource_booking_enabled')
             );
-//            if ((int)ConfigMapper::getInstance()->get('resource_booking_enabled')) {
-//                $configuration = getConnector(Calendar_Api_EventType_ResourceBooking_Booking_ForCategory::class);
-//
-//                if ($configuration->isActive()) {
-//                    $api = new Calendar_Api_EventType_ResourceBooking_Booking_ForCategory($configuration->getId(), $user, $resourceCategoryId);
-//                }
-//            }
 
             $filename = sprintf('resourceCategory%d', $resourceCategoryId);
             break;
@@ -302,11 +240,6 @@ try {
                 [$user, $eventTypeId],
                 true
             );
-//            $configuration = getConnector(Calendar_Api_EventType_Event_Schoolbox_Type::class);
-//
-//            if ($configuration->isActive()) {
-//                $api = new Calendar_Api_EventType_Event_Schoolbox_Type($configuration->getId(), $user, $eventTypeId);
-//            }
 
             $filename = sprintf('eventType%d', $eventTypeId);
             break;
@@ -323,38 +256,17 @@ try {
                 true
             );
 
-//            $configuration = getConnector(Calendar_Api_EventType_Event_External_Default::class);
-//
-//            if ($configuration->isActive()) {
-//                $api = new Calendar_Api_EventType_Event_External_Default($configuration->getId(), $user, $externalEvents);
-//            }
-
             $filename = 'external';
             break;
 
         /* All EOTC Events
          */
         case 'eotc_all':
-
             [$api, $responseCode] = buildApiClass(
                 Calendar_Api_EventType_Custom_EOTC_Default::class,
                 [$user],
                 (int)ConfigMapper::getInstance()->get('eotc_enabled')
             );
-
-//            if (EOTCConfigMapper::getInstance()->isSubscriptionEnabled()) {
-//                $api = new Calendar_Api_EventType_Custom_EOTC_Default(
-//                    getConnector(Calendar_Api_EventType_Custom_EOTC_Default::class)->getId(),
-//                    $user
-//                );
-//                $filename = 'eotc_all';
-//            } else {
-//
-//                /* Normally you wouldn't get here because the ui option is hidden when
-//                 * eotc isn't available - the only way you'd get here is direct url access
-//                 */
-//                throw new SchoolboxException('EOTC module not enabled', 400);
-//            }
 
             break;
 
