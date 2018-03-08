@@ -1,4 +1,7 @@
 <?php
+use Schoolbox\File\MimetypeMapper;
+
+
 /**
  * SocialStream_Post_Url
  *
@@ -7,6 +10,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+use \Schoolbox\File\Exception as FileException;
 
 class SocialStream_Post_Url extends SocialStream_Post_Abstract {
 
@@ -14,26 +18,21 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
 	 * Determine whether this should display an icon or something
 	 * via the image transform
 	 * 
-	 * @return bool
+	 * @return string
 	 */
-	public function determineIcon() {
+	public function determineIcon(): string
+    {
+        $defaultIcon = 'application-octet-stream.svg';
 
-
+        /* Load the current icon as set by Admin > Allowed Files because sysadmins can choose their own icons
+         * If the filetype is indeterminate, return a default icon rather than nothing
+         */
         try {
-            if (preg_match('#^icon:html.png#', $this->getThumbnail(), $matches)) {
-                return 'application-x-extension-html.svg';
-            }
-            else if (preg_match('#^icon:(.*)#', $this->getThumbnail(), $matches)) {
-                $file = \Schoolbox\File\MimetypeMapper::getInstance()->getByFilename($this->getExternalTitle());
-                return $file->getIconFile();
-            }
-
-
-
-        } catch (Schoolbox\File\Exception $e) {
-            return false;
+            return MimetypeMapper::getInstance()->getByFilename($this->getExternalTitle())->getIconFile();
         }
-        return false;
+        catch (FileException $e) {
+            return $defaultIcon;
+        }
 	}
 
 	/**
