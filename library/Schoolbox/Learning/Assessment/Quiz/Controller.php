@@ -146,7 +146,11 @@ class Controller extends Assessment\Controller
         $quiz = $this->quizMapper->loadSectionsAndQuestions($quiz);
         $quiz = $this->quizMapper->loadAttemptsAndAnswers($quiz, $student);
 
-        // Which attempt is in progress? Show a CTA to resume that if there is one
+        // Close any expired attempts before checking for in-progress
+        $now = Alaress_Date_Format::now();
+        $this->quizMapper->closeExpiredAttempts($quiz, $now);
+
+        // Is an attempt in progress? Show a CTA to resume that if there is one
         $attemptInProgress = null;
         foreach ($quiz->getAttempts() as $attempt) {
             if (!$attempt->isFinished()) {
@@ -154,10 +158,6 @@ class Controller extends Assessment\Controller
                 break;
             }
         }
-
-        // Close expired attempts as well
-        $now = Alaress_Date_Format::now();
-        $this->quizMapper->closeExpiredAttempts($quiz, $now);
 
         // Can I attempt this?
         // TODO this should eventually be route permission based
