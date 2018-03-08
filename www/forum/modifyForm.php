@@ -234,7 +234,7 @@ else if (is_numeric($_GET['deletePost'])) {
 	/* check permissions
 	 */
     $accessLevel = $access->getFolderAccess($_SESSION['user'], $thread->getCategory()->getId());
-    if ($accessLevel < UserAccess::ACCESS_WRITE) {
+    if ($accessLevel < UserAccess::ACCESS_WRITE && $thread->getUser()->getId() !== $_SESSION['user']->getId()) {
         error(19);
     }
 
