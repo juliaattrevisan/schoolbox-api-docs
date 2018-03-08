@@ -39,10 +39,39 @@ function getConnector(string $className)
         $connectorConfig = Calendar_Api_Config_Mapper::getInstance()->findOneForClass($className);
     }
     catch (\Schoolbox\Mapper\Exception $e) {
-        throw new UnexpectedValueException("Calendar connector configuration record is missing: $className");
+        throw new UnexpectedValueException("Calendar connector configuration record is missing: $className", $e->getCode(), $e);
     }
 
     return $connectorConfig;
+}
+
+
+function buildApiClass(
+    string $connectorClass,
+    string $apiClass,
+    array $apiConstructorParams,
+    bool $enabled
+): array {
+    if (!$enabled) {
+        // Not enabled; this is fine. Response code: 404
+        return [new Calendar_Api_Composite(), 404];
+    }
+
+    try {
+        $configuration = getConnector($connectorClass);
+    } catch (UnexpectedValueException $e) {
+        // Config missing: this is not fine, log to Sentry. Response code: 500
+        return [new Calendar_Api_Composite(), 500];
+    }
+
+    if ($configuration->isActive()) {
+        // Active: build API class. Response code: 200
+        $constructorParams = array_merge([$configuration->getId()], $apiConstructorParams);
+        return [call_user_func_array([$apiClass, '__construct'], $constructorParams), 200];
+    }
+
+    // Inactive: this is fine. Response code: 404
+    return [new Calendar_Api_Composite(), 404];
 }
 
 try {
