@@ -343,7 +343,7 @@ try {
     }
 
     $exporter->renderAll();
-} catch (SchoolboxException|UnexpectedValueException|ServiceNotFound|RuntimeException $e) {
+} catch (SchoolboxException|UnexpectedValueException|ServiceNotFound|RuntimeException|DomainException $e) {
     $code = $e->getCode();
     switch ($code) {
         case 400:
