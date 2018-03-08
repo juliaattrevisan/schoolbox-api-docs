@@ -8,6 +8,9 @@
  * @version	 SVN: $Id$
  */
 
+use Calendar\Api\ModuleChecker;
+use Schoolbox\Config\ConfigMapper;
+
 /** @var SitePage $this */
 $user_mapper = new \Schoolbox\UserMapper();
 $user = $user_mapper->findById($_GET['userId']);
@@ -27,6 +30,7 @@ $calendar = new Calendar_Layout_Full_Ajax_JSON(
     $user,
     $this->arg[0],
     $viewer,
-    $factory
+    $factory,
+    new ModuleChecker(ConfigMapper::getInstance())
 );
 $calendar->render();

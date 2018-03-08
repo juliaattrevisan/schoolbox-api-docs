@@ -8,12 +8,7 @@ declare(strict_types=1);
 
 namespace Calendar\Api;
 
-use Calendar_Api_Config_Connector_Booking;
-use Calendar_Api_Config_Connector_EOTC;
 use Calendar_Api_Config_Connector_Interface;
-use Calendar_Api_Config_Connector_Moderation;
-use Schoolbox\IConfigLoader;
-
 
 /**
  * Responsible for determining which calender connections are enabled for this SB instance
@@ -21,16 +16,16 @@ use Schoolbox\IConfigLoader;
 class ApiHierarchyGenerator
 {
 
-    /** @var IConfigLoader */
-    private $config;
+    /** @var ModuleChecker */
+    private $moduleChecker;
 
 
     /**
-     * @param IConfigLoader $config
+     * @param ModuleChecker $moduleChecker
      */
-    public function __construct(IConfigLoader $config)
+    public function __construct(ModuleChecker $moduleChecker)
     {
-        $this->config = $config;
+        $this->moduleChecker = $moduleChecker;
     }
 
 
@@ -65,33 +60,14 @@ class ApiHierarchyGenerator
                 $connectorClassFilename = basename($subDirName);
 
                 $className = "Calendar_Api_Config_Connector_{$connectorClassFilename}";
+                $config    = new $className();
 
-                if ($this->isEnabled($className)) {
-                    $allApi[$eventTypeFilename][$connectorClassFilename] = new $className();
+                if ($this->moduleChecker->isEnabled($config)) {
+                    $allApi[$eventTypeFilename][$connectorClassFilename] = $config;
                 }
             }
         }
 
         return $allApi;
-    }
-
-
-    /**
-     * Returns whether the specified config's API is enabled.
-     *
-     * @param string $className
-     * @return bool
-     */
-    private function isEnabled(string $className): bool
-    {
-        switch ($className) {
-            case Calendar_Api_Config_Connector_Booking::class:
-            case Calendar_Api_Config_Connector_Moderation::class:
-                return 1 === (int)$this->config->get('resource_booking_enabled');
-            case Calendar_Api_Config_Connector_EOTC::class:
-                return 1 === (int)$this->config->get('eotc_enabled');
-            default:
-                return true;
-        }
     }
 }

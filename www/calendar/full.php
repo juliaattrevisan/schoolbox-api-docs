@@ -7,7 +7,10 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
+
+use Calendar\Api\ModuleChecker;
 use Schoolbox\Calendar\EventMapper;
+use Schoolbox\Config\ConfigMapper;
 
 $user_mapper = new \Schoolbox\UserMapper();
 $eventMapper = EventMapper::getInstance();
@@ -56,7 +59,8 @@ $calendar = new Calendar_Layout_Full_Javascript(
     $user,
     $selectedDate,
     $_SESSION['user'],
-    $factory
+    $factory,
+    new ModuleChecker(ConfigMapper::getInstance())
 );
 $calendar->render();
 
