@@ -265,49 +265,46 @@ try {
             [$api, $responseCode] = buildApiClass(
                 Calendar_Api_EventType_Custom_EOTC_Default::class,
                 [$user],
-                (int)ConfigMapper::getInstance()->get('eotc_enabled')
+                (bool)ConfigMapper::getInstance()->get('eotc_enabled')
             );
 
             break;
 
         case 'all':
-
             // All day events, but exclude other sources
-            $configuration = getConnector(Calendar_Api_EventType_Event_Schoolbox_Default::class);
+            $api = new Calendar_Api_Composite();
+            [$subApi] = buildApiClass(
+                Calendar_Api_EventType_Event_Schoolbox_Default::class,
+                [$user],
+                true
+            );
+            $api->add($subApi);
 
-            if ($configuration->isActive()) {
-                $api->add(new Calendar_Api_EventType_Event_Schoolbox_Default($configuration->getId(), $user));
+            // Only include these api if Resource Booking is enabled by Feature Flag
+            $resourceBookingEnabled = (bool)ConfigMapper::getInstance()->get('resource_booking_enabled');
+            if ($resourceBookingEnabled) {
+                [$subApi] = buildApiClass(
+                    Calendar_Api_EventType_ResourceBooking_Booking_Default::class,
+                    [$user],
+                    true
+                );
+                $api->add($subApi);
+                [$subApi] = buildApiClass(
+                    Calendar_Api_EventType_ResourceBooking_Moderation_Default::class,
+                    [$user],
+                    true
+                );
+                $api->add($subApi);
             }
 
-            try {
-                // Resource bookings too for now, as there's no other place for them
-
-                /* Only include these api if Resource Booking is enabled by Feature Flag
-                 */
-                if ((int)ConfigMapper::getInstance()->get('resource_booking_enabled')) {
-                    $configuration = getConnector(Calendar_Api_EventType_ResourceBooking_Booking_Default::class);
-
-                    if ($configuration->isActive()) {
-                        $api->add(new Calendar_Api_EventType_ResourceBooking_Booking_Default($configuration->getId(), $user));
-                    }
-
-                    $configuration = getConnector(Calendar_Api_EventType_ResourceBooking_Moderation_Default::class);
-
-                    if ($configuration->isActive()) {
-                        $api->add(new Calendar_Api_EventType_ResourceBooking_Moderation_Default($configuration->getId(), $user));
-                    }
-                }
-
-                if (EOTCConfigMapper::getInstance()->isSubscriptionEnabled()) {
-                    $api->add(
-                        new Calendar_Api_EventType_Custom_EOTC_Default(
-                            getConnector(Calendar_Api_EventType_Custom_EOTC_Default::class)->getId(),
-                            $user
-                        )
-                    );
-                }
-            } catch (DomainException $e) {
-                // Do nothing. This is expected if Resource Booking is disabled
+            // Only include EOTC if enabled
+            $eotcEnabled = (bool)ConfigMapper::getInstance()->get('eotc_enabled');
+            if ($eotcEnabled) {
+                [$subApi] = buildApiClass(
+                    Calendar_Api_EventType_Custom_EOTC_Default::class,
+                    [$user],
+                    true
+                );
             }
             break;
 
