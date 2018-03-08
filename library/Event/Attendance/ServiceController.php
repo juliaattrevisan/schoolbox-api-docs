@@ -6,38 +6,44 @@
  */
 class Event_Attendance_ServiceController extends Controller
 {
+
     private $calendarHandler;
 
-    public function __construct ($page) {
+
+    public function __construct($page)
+    {
         parent::__construct($page);
 
         $this->getPage()->setAjax(true);
 
-        $this->setCalendarHandler( new Calendar );
+        $this->setCalendarHandler(new Calendar);
     }
 
-    public function setAttendance ($data) {
-        
+
+    public function setAttendance($data)
+    {
+
         $eventMapper = \Schoolbox\Calendar\EventMapper::getInstance();
 
-        if($data['status'] === 'add') {
+        if ($data['status'] === 'add') {
             try {
                 $eventMapper->addAttendance($data['event']['id'], $_SESSION['id']);
-                return json_encode( "Attendance for event ".$data['event']['id']." added." );
+                return json_encode("Attendance for event " . $data['event']['id'] . " added.");
             } catch (PDOException $e) {
-                return json_encode( "No event with id: ".$data['event']['id']." exists."  );
+                return json_encode("No event with id: " . $data['event']['id'] . " exists.");
             }
-        } else if ($data['status'] === 'remove') {
+        } elseif ($data['status'] === 'remove') {
             try {
                 $eventMapper->removeAttendance($data['event']['id'], $_SESSION['id']);
-                return json_encode( "Attendance for event ".$data['event']['id']." removed." );
+                return json_encode("Attendance for event " . $data['event']['id'] . " removed.");
             } catch (Exception $e) {
 
             }
         } else {
-            return json_encode( "No status was given." );
+            return json_encode("No status was given.");
         }
     }
+
 
     /**
      * @param Calendar $calendarHandler
@@ -46,6 +52,7 @@ class Event_Attendance_ServiceController extends Controller
     {
         $this->calendarHandler = $calendarHandler;
     }
+
 
     /**
      * @return Calendar
