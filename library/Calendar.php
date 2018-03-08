@@ -167,11 +167,6 @@ class Calendar extends DeprecatedModel
         return $this->db->delete('event_attendance', 'id', $attendanceId);
     }
 
-    public function removeAttendanceByEvent($eventId)
-    {
-        return $this->db->delete('event_attendance', 'event_id', $eventId);
-    }
-
     function displayColour($id)
     {
         if (!is_array($this->colourSet)) {
