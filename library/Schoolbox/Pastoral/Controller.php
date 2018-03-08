@@ -413,6 +413,8 @@ class Controller extends Base
         $attachmentsPublic  = $record->getAttachments()->filterBy('private', false);
         $attachmentsPrivate = $record->getAttachments()->filterBy('private', true);
 
+        $access = $record->getAccessLevel($this->getUser());
+
         // Lets render this thing
 
         $this->getResponse()->content->set([
@@ -426,6 +428,7 @@ class Controller extends Base
                 'moderator'          => $moderator,
                 'user'               => $this->getUser(),
                 'showSeverity'       => $this->getConfigLoader()->get('pastoral_severity'),
+                'access'             => $access,
             ],
             'title' => $record->getHeading(),
         ]);

@@ -8,7 +8,7 @@
     {% set attachments = attachmentsPrivate %}
 {% endif %}
 
-{% if not (body is empty and attachments is empty) %}
+{% if (recordType == 'public' and access > 0) or (recordType == 'private' and access > 1) %}
 
     {% set commentInsertRoute = routeLookupIfAuthorized('pastoral.postCommentInsert', {'recordId': record.id}) %}
     {% set commentDeleteRoute = routeLookupIfAuthorized('pastoral.postCommentDelete', {'recordId': record.id, 'commentId': comment.id}) %}

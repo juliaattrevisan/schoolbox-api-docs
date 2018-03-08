@@ -8,7 +8,7 @@
     {% set attachments = attachmentsPrivate %}
 {% endif %}
 
-{% if not (body is empty and attachments is empty) %}
+{% if (recordType == 'public' and access > 0 ) or (recordType == 'private' and access > 1)  %}
 
     {% import '@pastoral/macros/profile.twig' as profile %}
     
@@ -18,25 +18,27 @@
                 <h2 class="subheader">{{ heading }}</h2>
             {% endif %}
 
-            <section class="content">
-                {{ body | purify }}
-                {% if attachments | length %}
-                    {% for attachment in attachments %}
-                        {% set recordRoute = routeLookup('pastoral.getStudentRecordAttachment', { recordId: record.id, studentId: record.student.id, attachmentId: attachment.id }) %}
-                        <div class="card small-12">
-                            <a href="{{ recordRoute }}" target="_blank">
-                                {% if attachment.storage.mimetype.isImage %}
-                                    <img src="/storage/image.php?hash={{ attachment.storage.hash }}&size=square64">
-                                {% else %}
-                                    <img src="/ajax/mime/{{ attachment.storage.mime }}" alt="Attachment" class="mime {{ attachment.storage.mimetype }}"/>
-                                {% endif %}
-                                {{ attachment.storage.filename }}
-                            </a>
-                            <p class="meta">{{ attachment.storage.size | bytes }}</p>
-                        </div>
-                    {% endfor %}
-                {% endif %}
-            </section>
+            {% if not (body is empty and attachments is empty) %}
+                <section class="content">
+                    {{ body | purify }}
+                    {% if attachments | length %}
+                        {% for attachment in attachments %}
+                            {% set recordRoute = routeLookup('pastoral.getStudentRecordAttachment', { recordId: record.id, studentId: record.student.id, attachmentId: attachment.id }) %}
+                            <div class="card small-12">
+                                <a href="{{ recordRoute }}" target="_blank">
+                                    {% if attachment.storage.mimetype.isImage %}
+                                        <img src="/storage/image.php?hash={{ attachment.storage.hash }}&size=square64">
+                                    {% else %}
+                                        <img src="/ajax/mime/{{ attachment.storage.mime }}" alt="Attachment" class="mime {{ attachment.storage.mimetype }}"/>
+                                    {% endif %}
+                                    {{ attachment.storage.filename }}
+                                </a>
+                                <p class="meta">{{ attachment.storage.size | bytes }}</p>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                </section>
+            {% endif %}
         </div>
     </div>
 
