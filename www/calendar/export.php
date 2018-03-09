@@ -15,16 +15,16 @@ $kernel = require_once(dirname(__FILE__) . '/../../library/Bootstrap.php');
 
 use Alaress\Application\Kernel;
 use Alaress\Database\Connector\IConnector;
-use Schoolbox\Application\Exception\Exception as SchoolboxException;
-use Calendar\Event\Collection\Exporter;
 use Calendar\Event\Collection\CSVExporter;
-use Schoolbox\Learning\Assessment\Visibility;
-use Schoolbox\Permission\Access\Access;
-use Schoolbox\UserMapper;
+use Calendar\Event\Collection\Exporter;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\External\Connector\Factory as ExternalConnectorFactory;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
+use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Mapper\Exception;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\UserMapper;
 
 /**
  * Returns the config id for the specified calendar connector.
@@ -37,9 +37,9 @@ function getConnector(string $className)
 {
     try {
         $connectorConfig = Calendar_Api_Config_Mapper::getInstance()->findOneForClass($className);
-    }
-    catch (\Schoolbox\Mapper\Exception $e) {
-        throw new UnexpectedValueException("Calendar connector configuration record is missing: $className", $e->getCode(), $e);
+    } catch (\Schoolbox\Mapper\Exception $e) {
+        throw new UnexpectedValueException("Calendar connector configuration record is missing: $className",
+            $e->getCode(), $e);
     }
 
     return $connectorConfig;
@@ -57,7 +57,8 @@ function getConnector(string $className)
  * @return array
  * @throws ReflectionException if $class doesn't exist
  */
-function buildApiClass(string $class, array $params, bool $enabled, ?Raven_Client $sentry): array {
+function buildApiClass(string $class, array $params, bool $enabled, ?Raven_Client $sentry): array
+{
     if (!$enabled) {
         // Not enabled; this is fine. Response code: 404
         return [new Calendar_Api_Composite(), 404];
@@ -117,17 +118,17 @@ try {
     }
     $viewer = $user;
 
-    $back = (int)ConfigMapper::getInstance()->get('calendar_export_start');
-    $forward = (int)ConfigMapper::getInstance()->get('calendar_export_end');
+    $back              = (int)ConfigMapper::getInstance()->get('calendar_export_start');
+    $forward           = (int)ConfigMapper::getInstance()->get('calendar_export_end');
     $timetable_forward = (int)ConfigMapper::getInstance()->get('timetable_export_end');
 
-    $back = $back ? abs($back) : 1;
-    $forward = $forward ? abs($forward) : 12;
+    $back              = $back ? abs($back) : 1;
+    $forward           = $forward ? abs($forward) : 12;
     $timetable_forward = $timetable_forward ? abs($timetable_forward) : 3;
 
     // Default start and end times
     $start = strtotime("-{$back} months", $_SERVER['REQUEST_TIME']);
-    $end = strtotime("+{$forward} months", $_SERVER['REQUEST_TIME']);
+    $end   = strtotime("+{$forward} months", $_SERVER['REQUEST_TIME']);
 
     // Report errors in this thing
     /** @var Raven_Client|null $sentry */
@@ -184,8 +185,8 @@ try {
             $page->setDi($kernel->getDependencyInjector());
 
             /** @var MapperProxy $assessmentDataSource */
-            $assessmentDataSource  = $page->getDi()->get('assessmentDataSource');
-            $visibility            = new Visibility(Access::getInstance());
+            $assessmentDataSource = $page->getDi()->get('assessmentDataSource');
+            $visibility           = new Visibility(Access::getInstance());
 
             [$api, $code] = buildApiClass(
                 Calendar_Api_EventType_Submission_Schoolbox_Default::class,
@@ -206,8 +207,8 @@ try {
             );
 
             $filename = 'timetable';
-            $start = $_SERVER['REQUEST_TIME'];
-            $end = strtotime("+{$timetable_forward} months", $_SERVER['REQUEST_TIME']);
+            $start    = $_SERVER['REQUEST_TIME'];
+            $end      = strtotime("+{$timetable_forward} months", $_SERVER['REQUEST_TIME']);
             break;
 
         case 'timetabledays':
@@ -219,8 +220,8 @@ try {
             );
 
             $filename = 'timetabledays';
-            $start = $_SERVER['REQUEST_TIME'];
-            $end = strtotime("+{$timetable_forward} months", $_SERVER['REQUEST_TIME']);
+            $start    = $_SERVER['REQUEST_TIME'];
+            $end      = strtotime("+{$timetable_forward} months", $_SERVER['REQUEST_TIME']);
             break;
 
         case 'resources':
@@ -276,8 +277,9 @@ try {
         case 'external':
             /** @var IConnector $databaseExternal */
             $databaseExternal = $kernel->getDependencyInjector()->get('databaseExternal');
-            $factory = new ExternalConnectorFactory();
-            $externalEvents = $factory->build(new \Schoolbox\Config\Loader(), $databaseExternal, ExternalConnectorFactory::EXTERNAL_EVENTS);
+            $factory          = new ExternalConnectorFactory();
+            $externalEvents   = $factory->build(new \Schoolbox\Config\Loader(), $databaseExternal,
+                ExternalConnectorFactory::EXTERNAL_EVENTS);
 
             [$api, $code] = buildApiClass(
                 Calendar_Api_EventType_Event_Schoolbox_Type::class,
