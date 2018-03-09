@@ -51,32 +51,32 @@ function getConnector(string $className)
  *
  * @todo move this to a factory class; but there already is one, Calendar_Api_Factory
  *
- * @param string $apiClass
- * @param array  $apiConstructorParams
- * @param bool   $enabled
- * @return array [$api, $responseCode]
+ * @param string            $class   The class to build
+ * @param array             $params  Params to pass into its constructor
+ * @param bool              $enabled Is this class enabled? 404 if not
+ * @param null|Raven_Client $sentry  If something goes wrong, report it here
+ * @return array
  */
-function buildApiClass(
-    string $apiClass,
-    array $apiConstructorParams,
-    bool $enabled
-): array {
+function buildApiClass(string $class, array $params, bool $enabled, ?Raven_Client $sentry): array {
     if (!$enabled) {
         // Not enabled; this is fine. Response code: 404
         return [new Calendar_Api_Composite(), 404];
     }
 
     try {
-        $configuration = getConnector($apiClass);
+        $configuration = getConnector($class);
     } catch (UnexpectedValueException $e) {
         // Config missing: this is not fine, log to Sentry. Response code: 500
+        if ($sentry) {
+            $sentry->captureException($e);
+        }
         return [new Calendar_Api_Composite(), 500];
     }
 
     if ($configuration->isActive()) {
         // Active: build API class. Response code: 200
-        $constructorParams = array_merge([$configuration->getId()], $apiConstructorParams);
-        return [call_user_func_array([$apiClass, '__construct'], $constructorParams), 200];
+        $constructorParams = array_merge([$configuration->getId()], $params);
+        return [call_user_func_array([$class, '__construct'], $constructorParams), 200];
     }
 
     // Inactive: this is fine. Response code: 404
@@ -137,7 +137,8 @@ try {
             [$api, $code] = buildApiClass(
                 Calendar_Api_EventType_Event_Schoolbox_Personal::class,
                 [$user],
-                true
+                true,
+                $sentry
             );
 
             $filename = 'personal';
@@ -152,7 +153,8 @@ try {
             [$api, $code] = buildApiClass(
                 Calendar_Api_EventType_Event_Schoolbox_Group::class,
                 [$user, $export_id],
-                true
+                true,
+                $sentry
             );
 
             $filename = sprintf('group%d', $export_id);
@@ -167,7 +169,8 @@ try {
             [$api, $code] = buildApiClass(
                 Calendar_Api_EventType_Event_Schoolbox_Campus::class,
                 [$user, $export_id],
-                true
+                true,
+                $sentry
             );
 
             $filename = sprintf('campus%d', $export_id);
@@ -184,7 +187,8 @@ try {
             [$api, $code] = buildApiClass(
                 Calendar_Api_EventType_Submission_Schoolbox_Default::class,
                 [$user, $assessmentDataSource, $visibility],
-                true
+                true,
+                $sentry
             );
 
             $filename = 'duework';
@@ -194,7 +198,8 @@ try {
             [$api, $code] = buildApiClass(
                 Calendar_Api_EventType_Timetable_ExternalConstrained_Default::class,
                 [$user],
-                true
+                true,
+                $sentry
             );
 
             $filename = 'timetable';
@@ -206,7 +211,8 @@ try {
             [$api, $code] = buildApiClass(
                 Calendar_Api_EventType_TimetableDays_External_Default::class,
                 [$user],
-                true
+                true,
+                $sentry
             );
 
             $filename = 'timetabledays';
@@ -220,7 +226,8 @@ try {
             [$api, $code] = buildApiClass(
                 Calendar_Api_EventType_ResourceBooking_Booking_Default::class,
                 [$user],
-                (bool)ConfigMapper::getInstance()->get('resource_booking_enabled')
+                (bool)ConfigMapper::getInstance()->get('resource_booking_enabled'),
+                $sentry
             );
 
             $filename = 'resources';
@@ -232,7 +239,8 @@ try {
             [$api, $code] = buildApiClass(
                 Calendar_Api_EventType_ResourceBooking_Booking_ForItem::class,
                 [$user, $resourceId],
-                (bool)ConfigMapper::getInstance()->get('resource_booking_enabled')
+                (bool)ConfigMapper::getInstance()->get('resource_booking_enabled'),
+                $sentry
             );
 
             $filename = sprintf('resource%d', $resourceId);
@@ -244,7 +252,8 @@ try {
             [$api, $code] = buildApiClass(
                 Calendar_Api_EventType_ResourceBooking_Booking_ForCategory::class,
                 [$user, $resourceCategoryId],
-                (bool)ConfigMapper::getInstance()->get('resource_booking_enabled')
+                (bool)ConfigMapper::getInstance()->get('resource_booking_enabled'),
+                $sentry
             );
 
             $filename = sprintf('resourceCategory%d', $resourceCategoryId);
@@ -254,7 +263,8 @@ try {
             [$api, $code] = buildApiClass(
                 Calendar_Api_EventType_Event_Schoolbox_Type::class,
                 [$user, $eventTypeId],
-                true
+                true,
+                $sentry
             );
 
             $filename = sprintf('eventType%d', $eventTypeId);
@@ -269,7 +279,8 @@ try {
             [$api, $code] = buildApiClass(
                 Calendar_Api_EventType_Event_Schoolbox_Type::class,
                 [$user, $externalEvents],
-                true
+                true,
+                $sentry
             );
 
             $filename = 'external';
@@ -281,7 +292,8 @@ try {
             [$api, $code] = buildApiClass(
                 Calendar_Api_EventType_Custom_EOTC_Default::class,
                 [$user],
-                (bool)ConfigMapper::getInstance()->get('eotc_enabled')
+                (bool)ConfigMapper::getInstance()->get('eotc_enabled'),
+                $sentry
             );
 
             break;
@@ -292,7 +304,8 @@ try {
             [$subApi] = buildApiClass(
                 Calendar_Api_EventType_Event_Schoolbox_Default::class,
                 [$user],
-                true
+                true,
+                $sentry
             );
             $api->add($subApi);
 
@@ -302,13 +315,15 @@ try {
                 [$subApi] = buildApiClass(
                     Calendar_Api_EventType_ResourceBooking_Booking_Default::class,
                     [$user],
-                    true
+                    true,
+                    $sentry
                 );
                 $api->add($subApi);
                 [$subApi] = buildApiClass(
                     Calendar_Api_EventType_ResourceBooking_Moderation_Default::class,
                     [$user],
-                    true
+                    true,
+                    $sentry
                 );
                 $api->add($subApi);
             }
@@ -319,7 +334,8 @@ try {
                 [$subApi] = buildApiClass(
                     Calendar_Api_EventType_Custom_EOTC_Default::class,
                     [$user],
-                    true
+                    true,
+                    $sentry
                 );
             }
             break;
