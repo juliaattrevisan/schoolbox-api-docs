@@ -447,7 +447,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         if ($forFeed && $participantCount > 0) {
             $href = $this->buildAssessmentRoute($assessment);
             $bob  = $this->buildGenericBuilder($assessment)
-                         ->addTopic("$topicStub.$topicSuffix")
+                         ->addTopic("$topicStub.$topicSuffix.plan.{$plan->getId()}")
                          ->setSeverity(Logger::NOTICE)
                          ->setTitle(":assessment in :cat has opened for :number")
                          ->setHref($href)
@@ -703,7 +703,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                      ->setHref($href)
                      ->setParam('assessment', new Param($assessment->getTitle(), $href))
                      ->setSeverity(Logger::ERROR)
-                     ->addTopic("$topicStub.closed");
+                     ->addTopic("$topicStub.closed.plan.{$plan->getId()}");
 
         if ($totalUnsubmitted === 0) {
             $bob->setTitle(":assessment in :cat has closed");
