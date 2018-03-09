@@ -60,7 +60,7 @@
          * Set up attendances
          */
         function setupAttendance() {
-            $('#' + config.element.attr('id')).on('click', config.attendanceActivator, function(event) {
+            config.element.on('click', config.attendanceActivator, function(event) {
                 event.preventDefault();
 
                 var button = $(this);
