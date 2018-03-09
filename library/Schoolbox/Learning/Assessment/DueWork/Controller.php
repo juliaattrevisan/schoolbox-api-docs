@@ -251,8 +251,9 @@ class Controller extends Assessment\Controller
             $assessment->assertAcceptSubmission($participant);
         } catch (DomainException $e) {
             $twigData['submissionsBlocked'] = $this->getErrorMapper()->generateException($e->getCode())->getMessage();
-            // also block acknowledgements in this case
-            $twigData['acknowlegementBlocked'] = true;
+
+            // detect the combination of "accept none + self-assess" and allow ACK in this case
+            $twigData['acknowlegementBlocked'] = false === $assessment->isSelfAssessable() && $assessment->isAcceptNone();
         }
 
         $this->getResponse()->content->set(
