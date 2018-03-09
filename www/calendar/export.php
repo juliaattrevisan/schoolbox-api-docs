@@ -10,14 +10,15 @@
  * @link      http://www.alaress.com.au/
  */
 
+/** @var Kernel $kernel */
 $kernel = require_once(dirname(__FILE__) . '/../../library/Bootstrap.php');
 
+use Alaress\Application\Kernel;
 use Alaress\Database\Connector\IConnector;
 use Aura\Di\Exception\ServiceNotFound;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Calendar\Event\Collection\Exporter;
 use Calendar\Event\Collection\CSVExporter;
-use EOTC\ConfigMapper as EOTCConfigMapper;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\UserMapper;
@@ -45,7 +46,16 @@ function getConnector(string $className)
     return $connectorConfig;
 }
 
-
+/**
+ * Builds an API class, and also returns an appropriate response code.
+ *
+ * @todo move this to a factory class; but there already is one, Calendar_Api_Factory
+ *
+ * @param string $apiClass
+ * @param array  $apiConstructorParams
+ * @param bool   $enabled
+ * @return array [$api, $responseCode]
+ */
 function buildApiClass(
     string $apiClass,
     array $apiConstructorParams,
@@ -76,7 +86,7 @@ function buildApiClass(
 try {
     $token = $_GET['token'];
     $export_type = $_GET['export'];
-    $api = new Calendar_Api_Composite();
+    $responseCode = 200;
     $filename = 'calendar';
     $resourceId = $_GET['resource_id'];
     $resourceCategoryId = $_GET['resource_category_id'];
@@ -316,47 +326,49 @@ try {
             throw new SchoolboxException('Invalid export type', 400);
             break;
     }
-
-    if ($_GET['format'] == 'csv') {
-        header('Cache-Control: private');
-        header('Content-Type: text/csv; charset=utf-8');
-        header('Content-Disposition: filename=' . $filename . '.csv');
-
-        $exporter = new CSVExporter(
-            $api,
-            $start,
-            $end,
-            $user,
-            new SitePage(false),
-            $viewer
-        );
-    } else {
-        header('Cache-Control: private');
-        header('Content-Type: text/calendar; charset=utf-8');
-        header('Content-Disposition: filename=' . $filename . '.ics');
-
-        $exporter = new Exporter(
-            $api,
-            $start,
-            $end,
-            $user,
-            new SitePage(false),
-            $viewer
-        );
-    }
-
-    $exporter->renderAll();
 } catch (SchoolboxException|UnexpectedValueException|ServiceNotFound|RuntimeException|DomainException $e) {
-    $code = $e->getCode();
-    switch ($code) {
+    $responseCode = $e->getCode();
+    switch ($responseCode) {
         case 400:
         case 401:
             break;
 
         default:
-            $code = 500;
+            $responseCode = 500;
             break;
     }
-    http_response_code($code);
-    echo $e->getMessage();
+
+    $api = new Calendar_Api_Composite();
 }
+
+// Always output here
+http_response_code($code);
+if ($_GET['format'] === 'csv') {
+    header('Cache-Control: private');
+    header('Content-Type: text/csv; charset=utf-8');
+    header('Content-Disposition: filename=' . $filename . '.csv');
+
+    $exporter = new CSVExporter(
+        $api,
+        $start,
+        $end,
+        $user,
+        new SitePage(false),
+        $viewer
+    );
+} else {
+    header('Cache-Control: private');
+    header('Content-Type: text/calendar; charset=utf-8');
+    header('Content-Disposition: filename=' . $filename . '.ics');
+
+    $exporter = new Exporter(
+        $api,
+        $start,
+        $end,
+        $user,
+        new SitePage(false),
+        $viewer
+    );
+}
+
+$exporter->renderAll();
