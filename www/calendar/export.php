@@ -126,6 +126,12 @@ try {
     $start = strtotime("-{$back} months", $_SERVER['REQUEST_TIME']);
     $end = strtotime("+{$forward} months", $_SERVER['REQUEST_TIME']);
 
+    // Report errors in this thing
+    /** @var Raven_Client|null $sentry */
+    $sentry = $kernel->getDependencyInjector()->has('sentry')
+        ? $kernel->getDependencyInjector()->get('sentry')
+        : null;
+
     switch ($export_type) {
         case 'personal':
             [$api, $responseCode] = buildApiClass(
@@ -338,6 +344,10 @@ try {
             break;
     }
 
+    // Send exception to sentry, and output empty API
+    if ($sentry) {
+        $sentry->captureException($e);
+    }
     $api = new Calendar_Api_Composite();
 }
 
