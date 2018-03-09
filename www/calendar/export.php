@@ -57,7 +57,7 @@ function getConnector(string $className)
  * @param array             $params  Params to pass into its constructor
  * @param bool              $enabled Is this class enabled? 404 if not
  * @param null|Raven_Client $sentry  If something goes wrong, report it here
- * @return array
+ * @return array [Calendar_Api_EventType_Interface $api, int $responseCode]
  * @throws ReflectionException if $class doesn't exist
  */
 function buildApiClass(string $class, array $params, bool $enabled, ?Raven_Client $sentry): array
