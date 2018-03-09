@@ -115,11 +115,9 @@
 
         /* Attendance
          */
-        var allEvents = $('.calendar-list').find('[data-reveal-id]');
+        $('form[data-rsvp-form]').calendarAttendance();
 
-        $.each(allEvents, function(index, element) {
-            $('#' + $(element).attr('data-reveal-id')).calendarAttendance();
-        });
+
 	});
 </script>
 <!-- END custom_head -->
@@ -286,7 +284,7 @@
     </div>
 </div>
 
-<div class="row" data-eventlist="true">
+<div class="row" data-eventlist="true" id="calendar-list">
     <div class="small-12 island">
         <!-- BEGIN date -->
         <div data-calendar-date>
