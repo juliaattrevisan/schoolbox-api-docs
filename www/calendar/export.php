@@ -84,13 +84,13 @@ function buildApiClass(
 }
 
 try {
-    $token = $_GET['token'];
-    $export_type = $_GET['export'];
-    $responseCode = 200;
-    $filename = 'calendar';
-    $resourceId = $_GET['resource_id'];
+    $token              = $_GET['token'];
+    $export_type        = $_GET['export'];
+    $code               = 200;
+    $filename           = 'calendar';
+    $resourceId         = $_GET['resource_id'];
     $resourceCategoryId = $_GET['resource_category_id'];
-    $eventTypeId = $_GET['event_type'];
+    $eventTypeId        = $_GET['event_type'];
     if ($resourceId > 0) {
         $export_type = 'resource';
     }
@@ -134,7 +134,7 @@ try {
 
     switch ($export_type) {
         case 'personal':
-            [$api, $responseCode] = buildApiClass(
+            [$api, $code] = buildApiClass(
                 Calendar_Api_EventType_Event_Schoolbox_Personal::class,
                 [$user],
                 true
@@ -149,7 +149,7 @@ try {
                 throw new SchoolboxException('A group ID must be provided', 400);
             }
 
-            [$api, $responseCode] = buildApiClass(
+            [$api, $code] = buildApiClass(
                 Calendar_Api_EventType_Event_Schoolbox_Group::class,
                 [$user, $export_id],
                 true
@@ -164,7 +164,7 @@ try {
                 throw new SchoolboxException('A campus ID must be provided', 400);
             }
 
-            [$api, $responseCode] = buildApiClass(
+            [$api, $code] = buildApiClass(
                 Calendar_Api_EventType_Event_Schoolbox_Campus::class,
                 [$user, $export_id],
                 true
@@ -181,7 +181,7 @@ try {
             $assessmentDataSource  = $page->getDi()->get('assessmentDataSource');
             $visibility            = new Visibility(Access::getInstance());
 
-            [$api, $responseCode] = buildApiClass(
+            [$api, $code] = buildApiClass(
                 Calendar_Api_EventType_Submission_Schoolbox_Default::class,
                 [$user, $assessmentDataSource, $visibility],
                 true
@@ -191,7 +191,7 @@ try {
             break;
 
         case 'timetable':
-            [$api, $responseCode] = buildApiClass(
+            [$api, $code] = buildApiClass(
                 Calendar_Api_EventType_Timetable_ExternalConstrained_Default::class,
                 [$user],
                 true
@@ -203,7 +203,7 @@ try {
             break;
 
         case 'timetabledays':
-            [$api, $responseCode] = buildApiClass(
+            [$api, $code] = buildApiClass(
                 Calendar_Api_EventType_TimetableDays_External_Default::class,
                 [$user],
                 true
@@ -217,7 +217,7 @@ try {
         case 'resources':
             /* Only include this api if Resource Booking is enabled by Feature Flag
              */
-            [$api, $responseCode] = buildApiClass(
+            [$api, $code] = buildApiClass(
                 Calendar_Api_EventType_ResourceBooking_Booking_Default::class,
                 [$user],
                 (bool)ConfigMapper::getInstance()->get('resource_booking_enabled')
@@ -229,7 +229,7 @@ try {
         case 'resource':
             /* Only include this api if Resource Booking is enabled by Feature Flag
              */
-            [$api, $responseCode] = buildApiClass(
+            [$api, $code] = buildApiClass(
                 Calendar_Api_EventType_ResourceBooking_Booking_ForItem::class,
                 [$user, $resourceId],
                 (bool)ConfigMapper::getInstance()->get('resource_booking_enabled')
@@ -241,7 +241,7 @@ try {
         case 'resource_category':
             /* Only include this api if Resource Booking is enabled by Feature Flag
              */
-            [$api, $responseCode] = buildApiClass(
+            [$api, $code] = buildApiClass(
                 Calendar_Api_EventType_ResourceBooking_Booking_ForCategory::class,
                 [$user, $resourceCategoryId],
                 (bool)ConfigMapper::getInstance()->get('resource_booking_enabled')
@@ -251,7 +251,7 @@ try {
             break;
 
         case 'event_type':
-            [$api, $responseCode] = buildApiClass(
+            [$api, $code] = buildApiClass(
                 Calendar_Api_EventType_Event_Schoolbox_Type::class,
                 [$user, $eventTypeId],
                 true
@@ -266,7 +266,7 @@ try {
             $factory = new ExternalConnectorFactory();
             $externalEvents = $factory->build(new \Schoolbox\Config\Loader(), $databaseExternal, ExternalConnectorFactory::EXTERNAL_EVENTS);
 
-            [$api, $responseCode] = buildApiClass(
+            [$api, $code] = buildApiClass(
                 Calendar_Api_EventType_Event_Schoolbox_Type::class,
                 [$user, $externalEvents],
                 true
@@ -278,7 +278,7 @@ try {
         /* All EOTC Events
          */
         case 'eotc_all':
-            [$api, $responseCode] = buildApiClass(
+            [$api, $code] = buildApiClass(
                 Calendar_Api_EventType_Custom_EOTC_Default::class,
                 [$user],
                 (bool)ConfigMapper::getInstance()->get('eotc_enabled')
@@ -333,14 +333,14 @@ try {
             break;
     }
 } catch (SchoolboxException|UnexpectedValueException|ServiceNotFound|RuntimeException|DomainException $e) {
-    $responseCode = $e->getCode();
-    switch ($responseCode) {
+    $code = $e->getCode();
+    switch ($code) {
         case 400:
         case 401:
             break;
 
         default:
-            $responseCode = 500;
+            $code = 500;
             break;
     }
 
