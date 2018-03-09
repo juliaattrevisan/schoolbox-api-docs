@@ -261,11 +261,9 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      */
     public function getFeed($context, User $user, $limit = self::HARD_LIMIT, $offset = 0)
     {
-        $c = new Collection();
-
         // if parents aren't allowed to see due work, return an empty collection
         if ($user->getRole()->isParent() && !$this->isParentTargetable()) {
-            return $c;
+            return new Collection();
         }
 
         // Forgive my usage of getInstance, or don't;
@@ -284,6 +282,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             ->map([$mutator, 'map'])
             ->filter([$mutator, 'filter']);
 
+        $notifsForPlans = [];
         foreach ($assessments as $assessment) {
             // Go thru each plan and raise in THAT context
             foreach ($assessment->getPlans() as $domainModelPlan) {
@@ -313,11 +312,13 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                     $dataModelPlan->getParticipants()->setOffset($participant->getUser()->getId(), $dataModelParticipant);
                 }
 
-                $c = $c
-                    ->merge(new Collection($this->internalNotifyOpen($assessment, $dataModelPlan, true)
-                                                ->getAll($openDate ? $openDate->getUnixTimeStamp() : null)))
-                    ->merge(new Collection($this->internalNotifyClosed($assessment, $dataModelPlan, true)
-                                                ->getAll($dueDate ? $dueDate->getUnixTimeStamp() : null)));
+                $key = "{$assessment->getId()}.{$domainModelPlan->getId()}";
+                $notifsForPlans["$key.open"] = $this
+                    ->internalNotifyOpen($assessment, $dataModelPlan, true)
+                    ->getAll($openDate ? $openDate->getUnixTimeStamp() : null);
+                $notifsForPlans["$key.closed"] = $this
+                    ->internalNotifyClosed($assessment, $dataModelPlan, true)
+                    ->getAll($dueDate ? $dueDate->getUnixTimeStamp() : null);
             }
         }
 
@@ -364,8 +365,15 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             return false;
         };
 
-        return $c->filter($filter)
-                 ->sortBy('time', 'desc')
+        $c = new Collection();
+        foreach ($notifsForPlans as $notifsForPlan) {
+            foreach ($notifsForPlan as $key => $item) {
+                if ($filter($item, $key)) {
+                    $c->add($item);
+                }
+            }
+        }
+        return $c->sortBy('time', 'desc')
                  ->slice($offset, $limit);
     }
 
