@@ -39,9 +39,9 @@ class Event_Attendance_ServiceController extends Controller
             } catch (Exception $e) {
 
             }
-        } else {
-            return json_encode("No status was given.");
         }
+
+        return json_encode("No valid status was given.");
     }
 
 
