@@ -253,7 +253,7 @@ class Controller extends Assessment\Controller
             $twigData['submissionsBlocked'] = $this->getErrorMapper()->generateException($e->getCode())->getMessage();
 
             // detect the combination of "accept none + self-assess" and allow ACK in this case
-            $twigData['acknowlegementBlocked'] = false === $assessment->isSelfAssessable() && $assessment->isAcceptNone();
+            $twigData['acknowlegementBlocked'] = false === ($assessment->isSelfAssessable() && $assessment->isAcceptNone());
         }
 
         $this->getResponse()->content->set(
