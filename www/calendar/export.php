@@ -352,7 +352,7 @@ try {
             throw new SchoolboxException('Invalid export type', 400);
             break;
     }
-} catch (SchoolboxException|UnexpectedValueException|ServiceNotFound|RuntimeException|DomainException|ReflectionException $e) {
+} catch (Throwable $e) {
     $code = $e->getCode();
     switch ($code) {
         case 400:
