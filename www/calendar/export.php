@@ -15,7 +15,6 @@ $kernel = require_once(dirname(__FILE__) . '/../../library/Bootstrap.php');
 
 use Alaress\Application\Kernel;
 use Alaress\Database\Connector\IConnector;
-use Aura\Di\Exception\ServiceNotFound;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Calendar\Event\Collection\Exporter;
 use Calendar\Event\Collection\CSVExporter;
