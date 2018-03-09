@@ -1,13 +1,8 @@
 <div id="component{COMPONENT_INSTANCE_ID}" class="component-container {COMPONENT_CLASS}" data-component>
-    <script type="text/javascript">
+    <script>
         $(function() {
-            /* Attendance
-            */
-            var allEvents = $('.calendar-list').find('[data-reveal-id]');
-
-            $.each(allEvents, function(index, element) {
-                $('#' + $(element).attr('data-reveal-id')).calendarAttendance();
-            });
+            // Attach rsvp/unattend functionality to rsvp butttons
+            $('form[data-rsvp-form]').calendarAttendance();
         });
     </script>
 
