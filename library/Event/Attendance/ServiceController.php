@@ -36,8 +36,8 @@ class Event_Attendance_ServiceController extends Controller
             try {
                 $eventMapper->removeAttendance($data['event']['id'], $_SESSION['id']);
                 return json_encode("Attendance for event " . $data['event']['id'] . " removed.");
-            } catch (Exception $e) {
-
+            } catch (PDOException $e) {
+                // noop
             }
         }
 
