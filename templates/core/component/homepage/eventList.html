@@ -1,14 +1,10 @@
 <div id='component{COMPONENT_INSTANCE_ID}' class='component-container {COMPONENT_CLASS}' data-component>
     <script type="text/javascript" src="/javascript/components/zeroclipboard/dist/ZeroClipboard.min.js"></script>
     <script type="text/javascript" src="/javascript/shared/jquery.clipboard-selector.js"></script>
-    <script type="text/javascript" src="/javascript/shared/calendar/jquery.calendar.js"></script>
     <script type='text/javascript'>
         $(function() {
-            var allEvents = $('#component{COMPONENT_INSTANCE_ID}').find('[data-reveal-id]');
-
-            $.each(allEvents, function(index, element) {
-                $('#' + $(element).attr('data-reveal-id')).calendarAttendance();
-            });
+            // Attach rsvp/unattend functionality to rsvp butttons
+            $('form[data-rsvp-form]').calendarAttendance();
 
             $('#component{COMPONENT_INSTANCE_ID}').clipboardSelector({
                 userToken: '{USER_TOKEN}',

@@ -6,9 +6,10 @@
 
 <!-- BEGIN no_attendees -->
 <div class="row">
-    <div class="small-12 island">
-        <section class="content">
-            <p>Currently no-one has RSVP.</p>
+    <div class="small-12 column">
+        <section class="empty-state">
+            <i class="icon-info"></i>
+            <p>Nobody has responded to this event.</p>
         </section>
     </div>
 </div>
@@ -56,7 +57,7 @@
                                     {USER_ROLE}
                                 </td>
                                 <td>
-                                    <a href="/calendar/attendance/processRemoveAttendance/{ATTENDANCE_ID}" class="icon-delete" title="Delete"></a>
+                                    <a href="/calendar/attendance/processRemoveAttendance/{EVENT_ID}/{ATTENDING_USER_ID}" class="icon-delete" title="Delete"></a>
                                 </td>
                             </tr>
                             <!-- END pending_attendee -->
@@ -113,7 +114,7 @@
                                 {USER_ROLE}
                             </td>
                             <td>
-                                <a href="/calendar/attendance/processRemoveAttendance/{ATTENDANCE_ID}" class="icon-delete" title="Delete"></a>
+                                <a href="/calendar/attendance/processRemoveAttendance/{EVENT_ID}/{ATTENDING_USER_ID}" class="icon-delete" title="Delete"></a>
                             </td>
                         </tr>
                         <!-- END approved_attendee -->
@@ -160,7 +161,7 @@
                                 {USER_ROLE}
                             </td>
                             <td>
-                                <a href="/calendar/attendance/processRemoveAttendance/{ATTENDANCE_ID}" class="icon-delete" title="Delete"></a>
+                                <a href="/calendar/attendance/processRemoveAttendance/{EVENT_ID}/{ATTENDING_USER_ID}" class="icon-delete" title="Delete"></a>
                             </td>
                         </tr>
                         <!-- END rejected_attendee -->

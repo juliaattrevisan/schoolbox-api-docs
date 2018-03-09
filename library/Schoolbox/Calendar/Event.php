@@ -26,9 +26,17 @@ use Schoolbox\ISoftDeletable;
 class Event implements ISoftDeletable
 {
 
-    const ACCESS_PERSONAL = 1;
-    const ACCESS_GROUP = 2;
-    const ACCESS_CAMPUS = 3;
+    public const ACCESS_PERSONAL = 1;
+    public const ACCESS_GROUP = 2;
+    public const ACCESS_CAMPUS = 3;
+
+    public const ATTENDANCE_STATUS_PENDING = 1;
+    public const ATTENDANCE_STATUS_APPROVED = 2;
+    public const ATTENDANCE_STATUS_REJECTED = 3;
+
+    public const ATTENDANCE_INTENTION_PENDING = 1;
+    public const ATTENDANCE_INTENTION_PRESENT = 2;
+    public const ATTENDANCE_INTENTION_ABSENT = 3;
 
     /**
      * Event id

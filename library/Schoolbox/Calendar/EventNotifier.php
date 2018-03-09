@@ -258,7 +258,7 @@ class EventNotifier extends AbstractModuleNotifier
         $envelope = new Envelope();
 
         switch ($event->getAccess()) {
-            case Calendar::ACCESS_CAMPUS:
+            case Event::ACCESS_CAMPUS:
                 $collection = $event->getRoleCollection();
                 if ($collection instanceof \Traversable || is_array($collection)) {
                     foreach ($collection as $role) {
@@ -270,7 +270,7 @@ class EventNotifier extends AbstractModuleNotifier
                 }
                 break;
 
-            case Calendar::ACCESS_GROUP:
+            case Event::ACCESS_GROUP:
                 foreach ($instances as $instance) {
                     if ($cat = $event->getCategory()) {
                         $envelope->broadcastToCategory($cat, UserAccess::ACCESS_READ, $instance);
@@ -285,7 +285,7 @@ class EventNotifier extends AbstractModuleNotifier
                 }
                 break;
 
-            case Calendar::ACCESS_PERSONAL:
+            case Event::ACCESS_PERSONAL:
                 foreach ($instances as $instance) {
                     $envelope->targetToUser($event->getOwner(), $instance);
                 }

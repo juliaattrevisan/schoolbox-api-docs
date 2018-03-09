@@ -113,9 +113,9 @@
             }
         });
 
-        /* Attendance
-         */
-        $('#calendar-list').calendarAttendance();
+        // Attach rsvp/unattend functionality to rsvp butttons
+        $('form[data-rsvp-form]').calendarAttendance();
+
 	});
 </script>
 <!-- END custom_head -->
