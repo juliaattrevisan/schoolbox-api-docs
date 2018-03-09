@@ -56,6 +56,7 @@ function getConnector(string $className)
  * @param bool              $enabled Is this class enabled? 404 if not
  * @param null|Raven_Client $sentry  If something goes wrong, report it here
  * @return array
+ * @throws ReflectionException if $class doesn't exist
  */
 function buildApiClass(string $class, array $params, bool $enabled, ?Raven_Client $sentry): array {
     if (!$enabled) {
@@ -76,13 +77,16 @@ function buildApiClass(string $class, array $params, bool $enabled, ?Raven_Clien
     if ($configuration->isActive()) {
         // Active: build API class. Response code: 200
         $constructorParams = array_merge([$configuration->getId()], $params);
-        return [call_user_func_array([$class, '__construct'], $constructorParams), 200];
+        $reflectionClass   = new ReflectionClass($class);
+        return [$reflectionClass->newInstanceArgs($constructorParams), 200];
     }
 
     // Inactive: this is fine. Response code: 404
     return [new Calendar_Api_Composite(), 404];
 }
 
+
+// Actually build the export
 try {
     $token              = $_GET['token'];
     $export_type        = $_GET['export'];
@@ -348,7 +352,7 @@ try {
             throw new SchoolboxException('Invalid export type', 400);
             break;
     }
-} catch (SchoolboxException|UnexpectedValueException|ServiceNotFound|RuntimeException|DomainException $e) {
+} catch (SchoolboxException|UnexpectedValueException|ServiceNotFound|RuntimeException|DomainException|ReflectionException $e) {
     $code = $e->getCode();
     switch ($code) {
         case 400:
