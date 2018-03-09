@@ -372,7 +372,7 @@ try {
     }
 
     // Send exception to sentry, and output empty API
-    if ($sentry) {
+    if ($sentry && $code === 500) {
         $sentry->captureException($e);
     }
     $api = new Calendar_Api_Composite();
