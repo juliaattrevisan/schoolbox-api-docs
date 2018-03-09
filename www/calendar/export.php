@@ -38,8 +38,11 @@ function getConnector(string $className)
     try {
         $connectorConfig = Calendar_Api_Config_Mapper::getInstance()->findOneForClass($className);
     } catch (\Schoolbox\Mapper\Exception $e) {
-        throw new UnexpectedValueException("Calendar connector configuration record is missing: $className",
-            $e->getCode(), $e);
+        throw new UnexpectedValueException(
+            "Calendar connector configuration record is missing: $className",
+            $e->getCode(),
+            $e
+        );
     }
 
     return $connectorConfig;
@@ -278,8 +281,11 @@ try {
             /** @var IConnector $databaseExternal */
             $databaseExternal = $kernel->getDependencyInjector()->get('databaseExternal');
             $factory          = new ExternalConnectorFactory();
-            $externalEvents   = $factory->build(new \Schoolbox\Config\Loader(), $databaseExternal,
-                ExternalConnectorFactory::EXTERNAL_EVENTS);
+            $externalEvents   = $factory->build(
+                new \Schoolbox\Config\Loader(),
+                $databaseExternal,
+                ExternalConnectorFactory::EXTERNAL_EVENTS
+            );
 
             [$api, $code] = buildApiClass(
                 Calendar_Api_EventType_Event_Schoolbox_Type::class,
