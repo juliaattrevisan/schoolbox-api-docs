@@ -15,8 +15,6 @@ class Event_Attendance_ServiceController extends Controller
         parent::__construct($page);
 
         $this->getPage()->setAjax(true);
-
-        $this->setCalendarHandler(new Calendar);
     }
 
 
@@ -44,21 +42,4 @@ class Event_Attendance_ServiceController extends Controller
         return json_encode("No valid status was given.");
     }
 
-
-    /**
-     * @param Calendar $calendarHandler
-     */
-    public function setCalendarHandler($calendarHandler)
-    {
-        $this->calendarHandler = $calendarHandler;
-    }
-
-
-    /**
-     * @return Calendar
-     */
-    public function getCalendarHandler()
-    {
-        return $this->calendarHandler;
-    }
 }
