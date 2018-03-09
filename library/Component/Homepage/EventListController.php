@@ -90,6 +90,7 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
             $this->setBlock('event_list', 'event_day', 'event_day_block');
             $this->setBlock('event_day', 'group_events', 'group_events_block');
             $this->setBlock('event_list', 'import_events', 'import_events_block');
+            $this->setBlock('event_list', 'submit_event', 'submit_event_block');
             $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
 
             $this->setVar('empty_state_block', '');
