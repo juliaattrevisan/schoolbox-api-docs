@@ -245,7 +245,7 @@ try {
              */
             $api = buildApiClass(
                 Calendar_Api_EventType_ResourceBooking_Booking_ForItem::class,
-                [$user, $resourceId],
+                [$user, [$resourceId]],
                 (bool)ConfigMapper::getInstance()->get('resource_booking_enabled'),
                 $sentry
             );
