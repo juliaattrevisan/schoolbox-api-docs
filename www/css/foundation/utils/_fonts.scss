@@ -591,10 +591,6 @@
 .icon-reply:before {
     content: '\e65b';
     font-family: $font-family-icon;
-    display: inline-block;
-    transform: rotateY(180deg);
-    padding-left: 10px;
-    padding-right: 0;
 }
 
 .icon-resource-booking:before {
