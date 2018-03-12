@@ -454,18 +454,25 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         // For feed only: build for staff
         if ($forFeed && $participantCount > 0) {
             $title = sprintf(
-                ":assessment in :cat has opened for %d student%s",
+                ":assessment has opened for %d student%s",
                 $participantCount,
                 $participantCount === 1 ? '' : 's'
             );
-            $href = $this->buildAssessmentRoute($assessment);
+            $href = $this->buildAssessmentRoute($assessment) . '#plan-' . $plan->getId();
             $bob  = $this->buildGenericBuilder($assessment)
                          ->addTopic("$topicStub.$topicSuffix")
                          ->setSeverity(Logger::NOTICE)
                          ->setTitle($title)
                          ->setHref($href)
+                         ->unsetParam('cat')
                          ->setParam('assessment', new Param($assessment->getTitle(), $href))
                          ->setSeverity(Logger::ERROR);
+
+            // Dedupe messages for plans
+            if (!$plan->isDynamic()) {
+                $bob->setTitle($title . ' in :plan')
+                    ->setParam('plan', new Param($plan->getName()));
+            }
 
             $envelope->broadcastToCategory(
                 $assessment->getBaseContext()->getFolder(),
@@ -708,28 +715,45 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         }
 
         // build for staff
-        $href = $this->buildAssessmentRoute($assessment);
+        $href = $this->buildAssessmentRoute($assessment) . '#plan-' . $plan->getId();
         $bob  = $this->buildGenericBuilder($assessment)
                      ->setHref($href)
                      ->setParam('assessment', new Param($assessment->getTitle(), $href))
                      ->setSeverity(Logger::ERROR)
                      ->addTopic("$topicStub.closed");
 
-        if ($totalUnsubmitted === 0) {
-            $bob->setTitle(":assessment in :cat has closed");
+        // Build a title depending on plan
+        $title = ':assessment';
+
+        // :cat is irrelevant for feed
+        if ($forFeed) {
+            $bob->unsetParam('cat');
         } else {
-            $bob->setTitle(
-                sprintf(
-                    ":assessment in :cat has closed and %d student%s did not submit work",
-                    $totalUnsubmitted,
-                    $totalUnsubmitted === 1 ? '' : 's'
-                )
+            $title .= ' in :cat';
+        }
+
+        $title .= ' has closed';
+
+        // Mention the plan if it's not the default
+        if (!$plan->isDynamic()) {
+            $title .= ' for plan :plan';
+            $bob->setParam('plan', new Param($plan->getName()));
+        }
+
+        // How many students didn't submit?
+        if ($totalUnsubmitted > 0) {
+            $title .= sprintf(
+                " and %d student%s did not submit work",
+                $totalUnsubmitted,
+                $totalUnsubmitted === 1 ? '' : 's'
             );
         }
+
+        // Broadcast
         $envelope->broadcastToCategory(
             $assessment->getBaseContext()->getFolder(),
             UserAccess::ACCESS_WRITE,
-            $bob->build()
+            $bob->setTitle($title)->build()
         );
 
         return $envelope;
