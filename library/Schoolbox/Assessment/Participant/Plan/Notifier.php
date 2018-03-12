@@ -458,7 +458,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 $participantCount,
                 $participantCount === 1 ? '' : 's'
             );
-            $href = $this->buildAssessmentRoute($assessment) . '#plan-' . $plan->getId();
+            $href = $this->buildAssessmentRoute($assessment, $plan);
             $bob  = $this->buildGenericBuilder($assessment)
                          ->addTopic("$topicStub.$topicSuffix")
                          ->setSeverity(Logger::NOTICE)
@@ -715,7 +715,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         }
 
         // build for staff
-        $href = $this->buildAssessmentRoute($assessment) . '#plan-' . $plan->getId();
+        $href = $this->buildAssessmentRoute($assessment, $plan);
         $bob  = $this->buildGenericBuilder($assessment)
                      ->setHref($href)
                      ->setParam('assessment', new Param($assessment->getTitle(), $href))
@@ -964,11 +964,12 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      * Convenience helper to build a route to the status page.
      *
      * @param IAssessable $assessment
+     * @param Model       $plan       Required for deduping notifications
      * @return string
      */
-    private function buildAssessmentRoute(IAssessable $assessment): string
+    private function buildAssessmentRoute(IAssessable $assessment, Model $plan): string
     {
-        return sprintf('/learning/assessments/%s/status', $assessment->getId());
+        return sprintf('/learning/assessments/%s/status#plan-%d', $assessment->getId(), $plan->getId());
     }
 
     /**
