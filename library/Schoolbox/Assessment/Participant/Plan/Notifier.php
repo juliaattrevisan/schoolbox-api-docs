@@ -453,17 +453,16 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
         // For feed only: build for staff
         if ($forFeed && $participantCount > 0) {
+            $title = sprintf(
+                ":assessment in :cat has opened for %d student%s",
+                $participantCount,
+                $participantCount === 1 ? '' : 's'
+            );
             $href = $this->buildAssessmentRoute($assessment);
             $bob  = $this->buildGenericBuilder($assessment)
                          ->addTopic("$topicStub.$topicSuffix")
                          ->setSeverity(Logger::NOTICE)
-                         ->setTitle(
-                             sprintf(
-                                 ":assessment in :cat has opened for %d student%s",
-                                 $participantCount,
-                                 $participantCount === 1 ? '' : 's'
-                             )
-                         )
+                         ->setTitle($title)
                          ->setHref($href)
                          ->setParam('assessment', new Param($assessment->getTitle(), $href))
                          ->setSeverity(Logger::ERROR);
