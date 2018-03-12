@@ -95,9 +95,9 @@ try {
     $export_type        = $_GET['export'];
     $code               = 200;
     $filename           = 'calendar';
-    $resourceId         = $_GET['resource_id'];
-    $resourceCategoryId = $_GET['resource_category_id'];
-    $eventTypeId        = $_GET['event_type'];
+    $resourceId         = (int)$_GET['resource_id'];
+    $resourceCategoryId = (int)$_GET['resource_category_id'];
+    $eventTypeId        = (int)$_GET['event_type'];
     if ($resourceId > 0) {
         $export_type = 'resource';
     }
