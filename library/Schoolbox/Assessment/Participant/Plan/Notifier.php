@@ -455,16 +455,19 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         if ($forFeed && $participantCount > 0) {
             $href = $this->buildAssessmentRoute($assessment);
             $bob  = $this->buildGenericBuilder($assessment)
-                         ->addTopic("$topicStub.$topicSuffix.plan.{$plan->getId()}")
+                         ->addTopic("$topicStub.$topicSuffix")
                          ->setSeverity(Logger::NOTICE)
-                         ->setTitle(":assessment in :cat has opened for :number")
+                         ->setTitle(
+                             sprintf(
+                                 ":assessment in :cat has opened for %d student%s",
+                                 $participantCount,
+                                 $participantCount === 1 ? '' : 's'
+                             )
+                         )
                          ->setHref($href)
                          ->setParam('assessment', new Param($assessment->getTitle(), $href))
                          ->setSeverity(Logger::ERROR);
-            $bob->setParam(
-                'number',
-                new Param(sprintf('%s student%s', $participantCount, $participantCount === 1 ? '' : 's'))
-            );
+
             $envelope->broadcastToCategory(
                 $assessment->getBaseContext()->getFolder(),
                 UserAccess::ACCESS_WRITE,
@@ -711,15 +714,17 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                      ->setHref($href)
                      ->setParam('assessment', new Param($assessment->getTitle(), $href))
                      ->setSeverity(Logger::ERROR)
-                     ->addTopic("$topicStub.closed.plan.{$plan->getId()}");
+                     ->addTopic("$topicStub.closed");
 
         if ($totalUnsubmitted === 0) {
             $bob->setTitle(":assessment in :cat has closed");
         } else {
-            $bob->setTitle(":assessment in :cat has closed and :number did not submit work");
-            $bob->setParam(
-                'number',
-                new Param(sprintf('%s student%s', $totalUnsubmitted, $totalUnsubmitted === 1 ? '' : 's'))
+            $bob->setTitle(
+                sprintf(
+                    ":assessment in :cat has closed and %d student%s did not submit work",
+                    $totalUnsubmitted,
+                    $totalUnsubmitted === 1 ? '' : 's'
+                )
             );
         }
         $envelope->broadcastToCategory(
