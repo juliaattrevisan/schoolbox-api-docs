@@ -360,19 +360,8 @@ try {
             break;
     }
 } catch (Throwable $e) {
-    $code = $e->getCode();
-    switch ($code) {
-        case 400:
-        case 401:
-            break;
-
-        default:
-            $code = 500;
-            break;
-    }
-
     // Send exception to sentry, and output empty API
-    if ($sentry && $code === 500) {
+    if ($sentry && !in_array($e->getCode(), [400, 401], true)) {
         $sentry->captureException($e);
     }
     $api = new Calendar_Api_Composite();
