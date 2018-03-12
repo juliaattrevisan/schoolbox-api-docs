@@ -81,7 +81,7 @@ function buildApiClass(string $class, array $params, bool $enabled, ?Raven_Clien
         // Active: build API class. Response code: 200
         $constructorParams = array_merge([$configuration->getId()], $params);
         $reflectionClass   = new ReflectionClass($class);
-        $reflectionClass->newInstanceArgs($constructorParams);
+        return $reflectionClass->newInstanceArgs($constructorParams);
     }
 
     // Inactive: this is fine. Response code: 404
