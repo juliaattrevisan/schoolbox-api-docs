@@ -181,9 +181,8 @@ try {
         $lock->release();
     });
 } catch (Exception $e) {
-    // Don't actually know where this exception is coming from- but PhpStorm complains if I don't do a catch all here
-
-    $log->critical("Unhandled exception error: {$e->getMessage()}", [$e]);
+    // this is purely to stop Storm from covering the entire closure in yellow
+    throw $e;
 }
 
 // --------------------------------------------------------------------------------------------------------------------
