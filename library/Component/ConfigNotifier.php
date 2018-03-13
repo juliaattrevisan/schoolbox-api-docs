@@ -263,7 +263,8 @@ class Component_ConfigNotifier extends AbstractModuleNotifier
         if ($namespaceSlug === null) {
             return null;
         }
-        return "*.notify.service.1.$altSourceId.$access.$namespaceSlug.#";
+        $namespaceSuffix = $instance->getDefinition()->getNamespaceSuffix() ?? '#';
+        return "*.notify.service.1.$altSourceId.$access.$namespaceSlug.$namespaceSuffix";
     }
 
 
