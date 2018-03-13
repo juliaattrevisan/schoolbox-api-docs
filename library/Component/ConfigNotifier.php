@@ -168,7 +168,9 @@ class Component_ConfigNotifier extends AbstractModuleNotifier
             $from = $this->determineSourcePath($instance, $access, $altSourceId);
             $to   = $this->determineDestinationPath($instance, $access);
 
-            $this->doQuery($query, $from, $to);
+            if (isset($from, $to)) {
+                $this->doQuery($query, $from, $to);
+            }
         }
 
         // TODO desingleton these
