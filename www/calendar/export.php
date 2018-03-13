@@ -348,6 +348,7 @@ try {
                     true,
                     $sentry
                 );
+                $api->add($subApi);
             }
             break;
 
