@@ -57,7 +57,7 @@
 
     $('#attachment-browser').on('click', '[data-toggle]', function (e) {
 
-      var oldPanel = $(this).find('div.active'),
+      var oldPanel = $('.accordion-navigation .active'),
           newPanel = $(this).closest('[data-source]').find('.content');
 
       // hide the current panel
