@@ -57,7 +57,7 @@
 
     $('#attachment-browser').on('click', '[data-toggle]', function (e) {
 
-      var oldPanel = $('.accordion-navigation .active'),
+      var oldPanel = $('[data-accordion-pane] .active'),
           newPanel = $(this).closest('[data-source]').find('.content');
 
       // hide the current panel
@@ -76,7 +76,7 @@
 <h2>Pick Files</h2>
 <dl id="attachment-browser" class="accordion" data-accordion>
   <!-- BEGIN source -->
-  <dd class="accordion-navigation" data-source="{SRC_SLUG}">
+  <dd class="accordion-navigation" data-source="{SRC_SLUG}" data-accordion-pane>
     <a data-toggle class="icon-{SRC_ICON}" href="#{SRC_SLUG}">{SRC_LABEL}</a>
     <div id="{SRC_SLUG}" class="preload content" data-url="{SRC_URL}" data-method="{SRC_METHOD}"></div>
   </dd>
