@@ -42,6 +42,9 @@ class Component_Definition
     /** @var NS|null $namespace Message namespace this component resides in (may be null) */
     protected $namespace;
 
+    /** @var string|null $namespace Message namespace this component resides in (may be null) */
+    protected $namespaceSuffix;
+
     /** @var string $componentCategoryName The name of this component's category (as opposed to its ID) */
     protected $componentCategoryName;
 
@@ -304,6 +307,24 @@ class Component_Definition
     public function setNamespace(NS $namespace = null)
     {
         $this->namespace = $namespace;
+        return $this;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getNamespaceSuffix(): ?string
+    {
+        return $this->namespaceSuffix;
+    }
+
+    /**
+     * @param null|string $namespaceSuffix
+     * @return static
+     */
+    public function setNamespaceSuffix(?string $namespaceSuffix): self
+    {
+        $this->namespaceSuffix = $namespaceSuffix;
         return $this;
     }
 
