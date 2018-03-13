@@ -288,7 +288,7 @@ try {
             );
 
             $api = buildApiClass(
-                Calendar_Api_EventType_Event_Schoolbox_Type::class,
+                Calendar_Api_EventType_Event_External_Default::class,
                 [$user, $externalEvents],
                 true,
                 $sentry
