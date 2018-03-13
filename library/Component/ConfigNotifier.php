@@ -251,12 +251,55 @@ class Component_ConfigNotifier extends AbstractModuleNotifier
      * @param Component_Instance $instance
      * @param int                $access
      * @param int                $altSourceId
-     * @return string
+     * @return null|string
      */
-    private function determineSourcePath(Component_Instance $instance, int $access, int $altSourceId): string
+    private function determineSourcePath(Component_Instance $instance, int $access, int $altSourceId): ?string
     {
-        $namespaceSlug = $instance->getDefinition()->getNamespace()->getSlug();
-        return "*.notify.service.1.$altSourceId.$access.$namespaceSlug.#";
+        $namespace = $instance->getDefinition()->getNamespace();
+        if (!$namespace) {
+            return null;
+        }
+        $namespaceSlug = $namespace->getSlug();
+        if ($namespaceSlug === null) {
+            return null;
+        }
+
+        // The CMS components filter to a particular type of CMS action;
+        // all others don't discriminate by action type.
+        $suffix = '#';
+        switch ($instance->getDefinition()->getClass()) {
+            // File components
+            case Component_Homepage_AudioController::class:
+            case Component_Homepage_FileListController::class:
+            case Component_Homepage_ImageController::class:
+            case Component_Homepage_ImageGalleryController::class:
+            case Component_Homepage_ScrollerController::class:
+            case Component_Homepage_VideoController::class:
+                // Unfortunately I cannot filter file types by component type
+                $suffix = "file.#";
+                break;
+
+            // Folder components
+            case Component_Homepage_FolderListController::class:
+                $suffix = "folder.#";
+                break;
+
+            // Link components
+            case Component_Homepage_LinkListController::class:
+                $suffix = "link.#";
+                break;
+
+            // Text box components
+            case Component_Homepage_TextBoxController::class:
+                $suffix = "textbox.#";
+                break;
+
+            // All others: leave as #
+            default:
+                break;
+        }
+
+        return "*.notify.service.1.$altSourceId.$access.$namespaceSlug.$suffix";
     }
 
 
