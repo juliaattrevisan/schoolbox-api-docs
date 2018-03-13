@@ -425,8 +425,8 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
 
         /** @var iterable $compareFunctions */
         $isCallable = [];
-        foreach ($compareFunctions as $compareFunction) {
-            $isCallable[] = is_callable($compareFunction);
+        foreach ($compareFunctions as $cf) {
+            $isCallable[] = is_callable($cf);
         }
 
         $callback = function ($a, $b) use ($get_methods, $is_asc, $isCallable, $compareFunctions) {
@@ -755,7 +755,7 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
     {
         $return = new Collection();
         foreach ($this as $key => $item) {
-            $result = call_user_func($callback, $item);
+            $result = call_user_func($callback, $item, $key);
             if ($includeNull || !is_null($result)) {
                 $return->offsetSet($key, $result);
             }
@@ -774,7 +774,7 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
     {
         $return = $this->emptyClone();
         foreach ($this as $key => $item) {
-            if (call_user_func($callback, $item)) {
+            if (call_user_func($callback, $item, $key)) {
                 $return->offsetSet($key, $item);
             }
         }
@@ -842,13 +842,13 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
     {
         $result = new Collection();
 
-        foreach ($this as $item) {
-            $key = call_user_func($callback, $item);
-            if (isset($key)) {
-                if (!isset($result[$key])) {
-                    $result[$key] = $this->emptyClone();
+        foreach ($this as $key => $item) {
+            $newKey = call_user_func($callback, $item, $key);
+            if (isset($newKey)) {
+                if (!isset($result[$newKey])) {
+                    $result[$newKey] = $this->emptyClone();
                 }
-                $result[$key]->add($item);
+                $result[$newKey]->add($item);
             }
         }
 
@@ -881,35 +881,13 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
     public function filterBy($field, $value)
     {
         $getField = $this->getGetMethodName($field);
-        return $this->filterByCallback(
+        return $this->filter(
             function ($item) use ($getField, $value) {
                 return $item->$getField() == $value;
             }
         );
     }
 
-
-    /**
-     * Filters out elements from this collection based on the given callback
-     *
-     * @deprecated use filter() instead
-     * @param callable $callback {
-     *                      param $item
-     *                      return bool
-     *                 }
-     *
-     * @return static
-     */
-    public function filterByCallback($callback)
-    {
-        $result = $this->emptyClone();
-        foreach ($this as $item) {
-            if (call_user_func($callback, $item)) {
-                $result->add($item);
-            }
-        }
-        return $result;
-    }
 
     /**
      * Specify data which should be serialized to JSON. Currently, attempts to
@@ -951,9 +929,9 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
     public function indexByCallback(callable $callback)
     {
         $new = [];
-        foreach($this->stack as $item){
-            $key = call_user_func($callback, $item);
-            $new[$key] = $item;
+        foreach($this->stack as $key => $item){
+            $newKey = call_user_func($callback, $item, $key);
+            $new[$newKey] = $item;
         }
         // Bypass GenericCollection type-check in setStack()
         $this->stack = $new;

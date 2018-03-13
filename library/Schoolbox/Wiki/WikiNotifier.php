@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2014, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -11,13 +11,11 @@ namespace Schoolbox\Wiki;
 
 
 use Alaress\Async\Notification\Instance\Builder;
-use Alaress\Async\Notification\Instance\Instance;
 use Monolog\Logger;
 use Schoolbox\Collection;
 use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Feed\SourceInterface;
 use Schoolbox\Mapper;
-use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
@@ -30,9 +28,10 @@ use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
-class WikiNotifier extends AbstractModuleNotifier implements SourceInterface {
+class WikiNotifier extends AbstractModuleNotifier implements SourceInterface
+{
 
-	const TRIGGER_CREATED = 'created';
+    const TRIGGER_CREATED = 'created';
 
     /** @var RevisionMapper */
     protected $revisionMapper;
@@ -40,15 +39,16 @@ class WikiNotifier extends AbstractModuleNotifier implements SourceInterface {
     /** @var UserMapper */
     protected $userMapper;
 
-	/** @var Folder\Mapper */
-	protected $folderMapper;
+    /** @var Folder\Mapper */
+    protected $folderMapper;
 
-	/**
-	 * @return string
-	 */
-	protected function getSlug() {
-		return NSMapper::NS_WIKI;
-	}
+    /**
+     * @return string
+     */
+    protected function getSlug()
+    {
+        return NSMapper::NS_WIKI;
+    }
 
 
     /**
@@ -59,12 +59,12 @@ class WikiNotifier extends AbstractModuleNotifier implements SourceInterface {
         if (empty($dependencies['revisionMapper'])) {
             $dependencies['revisionMapper'] = RevisionMapper::getInstance();
         }
-	    if (empty($dependencies['userMapper'])) {
-		    $dependencies['userMapper'] = UserMapper::getInstance();
-	    }
-	    if (empty($dependencies['folderMapper'])) {
-		    $dependencies['folderMapper'] = Folder\Mapper::getInstance();
-	    }
+        if (empty($dependencies['userMapper'])) {
+            $dependencies['userMapper'] = UserMapper::getInstance();
+        }
+        if (empty($dependencies['folderMapper'])) {
+            $dependencies['folderMapper'] = Folder\Mapper::getInstance();
+        }
 
         parent::loadDependencies($dependencies);
     }
@@ -92,143 +92,150 @@ class WikiNotifier extends AbstractModuleNotifier implements SourceInterface {
     }
 
 
-	/**
-	 * @param Folder\Mapper $folderMapper
-	 * @return static
-	 */
-	protected function setFolderMapper($folderMapper)
-	{
-		$this->folderMapper = $folderMapper;
-		return $this;
-	}
+    /**
+     * @param Folder\Mapper $folderMapper
+     * @return static
+     */
+    protected function setFolderMapper($folderMapper)
+    {
+        $this->folderMapper = $folderMapper;
+        return $this;
+    }
 
     /**
-	 * @param TriggerBundle $bundle
-	 * @return void
-	 */
-	public function bundleTriggers($bundle) {
-		// we only care about creation
-		if($bundle->getMethod() == Mapper::METHOD_CREATE) {
-			/** @var Wiki $wiki */
-			$wiki = $bundle->getEvent()->getObject();
-			$bundle->attach(self::TRIGGER_CREATED, $wiki->getCreated()->getUnixTimeStamp());
-		}
-	}
+     * @param TriggerBundle $bundle
+     * @return void
+     */
+    public function bundleTriggers($bundle)
+    {
+        // we only care about creation
+        if ($bundle->getMethod() == Mapper::METHOD_CREATE) {
+            /** @var Wiki $wiki */
+            $wiki = $bundle->getEvent()->getObject();
+            $bundle->attach(self::TRIGGER_CREATED, $wiki->getCreated()->getUnixTimeStamp());
+        }
+    }
 
-	/**
-	 * Generate n Instances, from the perspective of casual observation (rather than targeted at a particular user).
-	 *
-	 * @param int $context     - most likely a category ID or ignored
-	 * @param string $roletype - the roletype of the user for whom this feed is being retrieved
-	 * @param int $limit       - how many messages to retrieve
-	 * @param int $offset      - by default, most recent
-	 * @return Collection|Instance[]
-	 */
-	public function getFeed($context, $roletype, $limit = self::HARD_LIMIT, $offset = 0) {
-		$c = new Collection();
+    /**
+     * @inheritdoc
+     */
+    public function getFeed($context, User $user, $limit = self::HARD_LIMIT, $offset = 0)
+    {
+        $c = new Collection();
 
-		// be sure the target method exists
-		if(!$this->mapper instanceof FeedableMapperInterface) {
-			return $c;
-		}
+        // be sure the target method exists
+        if (!$this->mapper instanceof FeedableMapperInterface) {
+            return $c;
+        }
 
-		/** @var Wiki[]|Collection $wikis */
-		$wikis = $this->mapper->findForFeed($context, $limit, $offset);
+        /** @var Wiki[]|Collection $wikis */
+        $wikis = $this->mapper->findForFeed($context, $limit, $offset);
 
-		foreach($wikis as $wiki) {
+        foreach ($wikis as $wiki) {
             // Wiki creator is the author of first (not latest) revision
             try {
-                $first = $this->revisionMapper->findOneByColumn('wikiID', $wiki->getId(), [ 'created' => 'asc' ]);
-                $user = $first->getUser();
-                $c = $c->merge(
-                    new Collection($this->notifyCreated($roletype, $wiki, $user)->getAll($wiki->getCreated()->getUnixTimeStamp()))
+                $first  = $this->revisionMapper->findOneByColumn('wikiID', $wiki->getId(), ['created' => 'asc']);
+                $author = $first->getUser();
+                $c      = $c->merge(
+                    new Collection(
+                        $this->notifyCreated(
+                            $user->getRole()->getType(),
+                            $wiki,
+                            $author
+                        )->getAll($wiki->getCreated()->getUnixTimeStamp())
+                    )
                 );
             } catch (\Schoolbox\Mapper\Exception $e) {
                 //noop 
             }
-		}
+        }
 
-		return $c;
-	}
+        return $c;
+    }
 
-	/**
-	 * Returns the metadata pertaining to this source.
-	 * Useful to RSS
-	 *
-	 * @return mixed
-	 */
-	public function getChannelMetadata() {
-		return null;
-	}
+    /**
+     * Returns the metadata pertaining to this source.
+     * Useful to RSS
+     *
+     * @return mixed
+     */
+    public function getChannelMetadata()
+    {
+        return null;
+    }
 
 
 
-	/* ASYNC NOTIFY METHODS */
+    /* ASYNC NOTIFY METHODS */
 
-	/**
-	 * @param string $roleType
-	 * @param Wiki $wiki
-	 * @param User $author
-	 * @return Envelope
-	 */
-	protected function notifyCreated($roleType, $wiki, $author) {
-		$envelope = new Envelope();
+    /**
+     * @param string $roleType
+     * @param Wiki   $wiki
+     * @param User   $author
+     * @return Envelope
+     */
+    protected function notifyCreated($roleType, $wiki, $author)
+    {
+        $envelope = new Envelope();
 
-		$wikiId       = $wiki->getId();
-		$wikiSlug     = $wiki->getSlug();
+        $wikiId   = $wiki->getId();
+        $wikiSlug = $wiki->getSlug();
 
-		$authorExtId  = $author->getExternalId();
+        $authorExtId = $author->getExternalId();
 
-		$folder       = $this->folderMapper->findById($wiki->getCategory()->getId());
-		$folderId     = $folder->getId();
+        $folder   = $this->folderMapper->findById($wiki->getCategory()->getId());
+        $folderId = $folder->getId();
 
-		$bob = new Builder();
+        $bob = new Builder();
 
-		$bob->setTitle(':author created a new wiki in :catname')
-			->setParams([
-				'author'  => new UserParam($author),
-				'catname' => new CategoryParam($folder)
-			])
-			->setHref("/wiki/$folderId/$wikiSlug")
-			->setIcon("/portrait.php?userId=$authorExtId&size={$this->iconSize}")
-			->setSeverity(Logger::INFO)
-			->setTopics([ "wiki.$wikiId.created" ])
-			->setFilter([ 'roletype' => $roleType ])
-			->setNamespace($this->getSlug());
+        $bob->setTitle(':author created a new wiki in :catname')
+            ->setParams([
+                'author'  => new UserParam($author),
+                'catname' => new CategoryParam($folder),
+            ])
+            ->setHref("/wiki/$folderId/$wikiSlug")
+            ->setIcon("/portrait.php?userId=$authorExtId&size={$this->iconSize}")
+            ->setSeverity(Logger::INFO)
+            ->setTopics(["wiki.$wikiId.created"])
+            ->setFilter(['roletype' => $roleType])
+            ->setNamespace($this->getSlug());
 
-		$envelope->broadcastToCategory($folderId, UserAccess::ACCESS_READ, $bob->build());
+        $envelope->broadcastToCategory($folderId, UserAccess::ACCESS_READ, $bob->build());
 
-		return $envelope;
-	}
+        return $envelope;
+    }
 
-	/**
-	 * @param Wiki $wiki
-	 * @param User $author
-	 * @param array $diff
-	 * @return Envelope
-	 */
-	public function notifyStudentCreated($wiki, $author, $diff = array()) {
-		return $this->notifyCreated(Role::STUDENT, $wiki, $author);
-	}
+    /**
+     * @param Wiki  $wiki
+     * @param User  $author
+     * @param array $diff
+     * @return Envelope
+     */
+    public function notifyStudentCreated($wiki, $author, $diff = [])
+    {
+        return $this->notifyCreated(Role::STUDENT, $wiki, $author);
+    }
 
-	/**
-	 * @param Wiki $wiki
-	 * @param User $author
-	 * @param array $diff
-	 * @return Envelope
-	 */
-	public function notifyStaffCreated($wiki, $author, $diff = array()) {
-		return $this->notifyCreated(Role::STAFF, $wiki, $author);
-	}
+    /**
+     * @param Wiki  $wiki
+     * @param User  $author
+     * @param array $diff
+     * @return Envelope
+     */
+    public function notifyStaffCreated($wiki, $author, $diff = [])
+    {
+        return $this->notifyCreated(Role::STAFF, $wiki, $author);
+    }
 
-	/**
-	 * @param Wiki $wiki
-	 * @param User $author
-	 * @param array $diff
-	 * @return Envelope
-	 */
-	public function notifyParentCreated($wiki, $author, $diff = array()) {
-		return $this->notifyCreated(Role::PARENT, $wiki, $author);
-	}
+    /**
+     * @param Wiki  $wiki
+     * @param User  $author
+     * @param array $diff
+     * @return Envelope
+     */
+    public function notifyParentCreated($wiki, $author, $diff = [])
+    {
+        return $this->notifyCreated(Role::PARENT, $wiki, $author);
+    }
 
 } 

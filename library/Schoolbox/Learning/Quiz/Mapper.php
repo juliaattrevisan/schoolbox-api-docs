@@ -14,7 +14,6 @@ use Schoolbox\Assessment\ActivityCollection;
 use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Collection;
-use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
@@ -35,7 +34,7 @@ use Schoolbox\UserMapper;
  * @method Model createModel($id = null)
  * @method GenericCollection|Model[] findByColumnList($columnList, $options = [])
  */
-class Mapper extends BaseMapper implements FeedableMapperInterface
+class Mapper extends BaseMapper
 {
 
     /**
@@ -395,57 +394,6 @@ class Mapper extends BaseMapper implements FeedableMapperInterface
         $progress['return_count'] = $stmt->fetchColumn(0);
 
         return $progress;
-    }
-
-    /**
-     * @param int $categoryId
-     * @param int $limit
-     * @param int $offset
-     * @param int $time
-     * @return Collection|Model[]
-     */
-    public function findForFeed($categoryId, $limit, $offset = 0, $time = 0)
-    {
-        $time = date('Y-m-d H:i:s', $time ?: time());
-        $limit = (int)$limit;
-        $offset = (int)$offset;
-
-        $stmt = $this->database->prepare("
-			SELECT
-				{$this->getColumnString('a')},
-				{$this->getJoinColumnString('category', 'c')},
-				{$this->getJoinColumnString('work_type', 't')},
-				{$this->getJoinColumnString('user', 'u')}
-			FROM
-				`{$this->getTable()}` `a`
-				LEFT JOIN {$this->getJoinSql('category', 'a', 'c')}
-				LEFT JOIN {$this->getJoinSql('work_type', 'a', 't')}
-				INNER JOIN {$this->getJoinSql('user', 'a', 'u', true)}
-			WHERE
-				`a`.`category_id` = :cat_id
-				AND ( `a`.`start` < :time OR `a`.`finish` < :time )
-				AND `a`.`deleted_at` IS NULL
-			ORDER BY `a`.`start` DESC, `a`.`finish` DESC
-			LIMIT $offset, $limit
-		");
-
-        $stmt->execute(array(
-            'cat_id' => $categoryId,
-            'time'   => $time
-        ));
-
-        $c = $this->createCollection();
-
-        while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            /** @var Model $quiz */
-            $quiz = $this->hydrate($r, 'a');
-            $quiz->setCategory($this->hydrateJoin($r, 'category', 'c'));
-            $quiz->setUser($this->hydrateJoin($r, 'user', 'u'));
-            $quiz->setWorkType($this->hydrateJoin($r, 'work_type', 't'));
-            $c->add($quiz);
-        }
-
-        return $c;
     }
 
 

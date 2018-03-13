@@ -14,17 +14,19 @@ use Alaress\Async\Notification\Parameter\Param;
 use Alaress_Date_Format;
 use Monolog\Logger;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper as DueWorkFeedbackMapper;
+use Schoolbox\Assessment\Participant\Mapper as ParticipantMapper;
 use Schoolbox\Collection;
-use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Feed\SourceInterface;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
-use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
+use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizFeedbackMapper;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
@@ -32,7 +34,6 @@ use Schoolbox\Realtime\Notification\Parameter\CategoryParam;
 use Schoolbox\Realtime\Notification\Parameter\ChildParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundleInterface;
-use Schoolbox\Role;
 use Schoolbox\User;
 
 /**
@@ -75,6 +76,11 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     private $assessmentMapper;
 
     /**
+     * @var AssessmentDataSource
+     */
+    private $assessmentDataSource;
+
+    /**
      * @var DueWorkFeedbackMapper
      */
     private $dueWorkFeedbackMapper;
@@ -98,11 +104,43 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      * Instantiate all your dependencies within yourself.
      *
      * @param mixed $dependencies
+     * @throws \Aura\Di\Exception\ServiceNotFound if somehow my assessment data
+     *                                            source wasn't found
      */
     public function loadDependencies($dependencies = null): void
     {
         if (empty($dependencies['assessmentMapper'])) {
             $dependencies['assessmentMapper'] = AssessmentMapper::getInstance();
+        }
+        if (empty($dependencies['assessmentDataSource'])) {
+            // Remember that thing that under pain of death we're not to use?
+            //
+            //                             ,-.
+            //        ___,---.__          /'|`\          __,---,___
+            //     ,-'    \`    `-.____,-'  |  `-.____,-'    //    `-.
+            //   ,'        |           ~'\     /`~           |        `.
+            //  /      ___//              `. ,'          ,  , \___      \
+            // |    ,-'   `-.__   _         |        ,    __,-'   `-.    |
+            // |   /          /\_  `   .    |    ,      _/\          \   |
+            // \  |           \ \`-.___ \   |   / ___,-'/ /           |  /
+            //  \  \           | `._   `\\  |  //'   _,' |           /  /
+            //   `-.\         /'  _ `---'' , . ``---' _  `\         /,-'
+            //      ``       /     \    ,='/ \`=.    /     \       ''
+            //              |__   /|\_,--.,-.--,--._/|\   __|
+            //              /  `./  \\`\ |  |  | /,//' \,'  \
+            //             /   /     ||--+--|--+-/-|     \   \
+            //            |   |     /'\_\_\ | /_/_/`\     |   |
+            //             \   \__, \_     `~'     _/ .__/   /
+            //              `-._,-'   `-._______,-'   `-._,-'
+            //
+            //          +--------------------------------------+
+            //          |       \Schoolbox\Mapper::getDi       |
+            //          | Under pain of death DO NOT USE THIS! |
+            //          +--------------------------------------+
+            //
+            // ... hold my beer
+            $dependencies['assessmentDataSource'] =
+                $dependencies['assessmentMapper']::getDi()->get('assessmentDataSource');
         }
 
         // Quiz and duework feedback mapper:
@@ -219,40 +257,124 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
 
     /**
-     * Generate n Instances, from the perspective of casual observation (rather than targeted at a particular user).
-     *
-     * @param int    $context  - most likely a category ID or ignored
-     * @param string $roletype - the roletype of the user for whom this feed is being retrieved
-     * @param int    $limit    - how many messages to retrieve
-     * @param int    $offset   - by default, most recent
-     * @throws \OutOfBoundsException     If severity is not set
-     * @throws \InvalidArgumentException If a required property was not set
-     * @return Collection|Instance[]
+     * @inheritdoc
      */
-    public function getFeed($context, $roletype, $limit = self::HARD_LIMIT, $offset = 0)
+    public function getFeed($context, User $user, $limit = self::HARD_LIMIT, $offset = 0)
     {
-        $c = new Collection();
-
         // if parents aren't allowed to see due work, return an empty collection
-        if ($roletype === Role::PARENT && !$this->isParentTargetable()) {
-            return $c;
+        if ($user->getRole()->isParent() && !$this->isParentTargetable()) {
+            return new Collection();
         }
 
-        // be sure the target method exists
-        // TODO implement FMI on participant or assessment
-        if (!$this->getMapper() instanceof FeedableMapperInterface) {
-            return $c;
+        // Forgive my usage of getInstance, or don't;
+        // it's going to happen regardless.
+        $now     = Alaress_Date_Format::now();
+        $access  = Access::getInstance();
+        $mutator = new Participant\AssessmentListMutator($user, new Visibility($access), $now, true);
+
+        /** @var IAssessable[] $assessments */
+        // Write-users see all participants, others see only themselves
+        $contextUser = $user;
+        if ($access->getFolderAccess($user, $context) >= UserAccess::ACCESS_WRITE) {
+            $contextUser = null;
+        }
+        $assessments = $this->assessmentDataSource->findAllByFolderIdForReview($context, $contextUser)
+            ->map([$mutator, 'map'])
+            ->filter([$mutator, 'filter']);
+
+        $notifsForPlans = [];
+        foreach ($assessments as $assessment) {
+            // Go thru each plan and raise in THAT context
+            foreach ($assessment->getPlans() as $domainModelPlan) {
+                $openDate = $this->coalesceDates($domainModelPlan->getOpenDate(), $assessment->getOpenAt());
+                $dueDate  = $this->coalesceDates($domainModelPlan->getDueDate(), $assessment->getDueAt());
+
+                // Finagle the domain-object plan to a model-object plan,
+                // so it can be used in notifiers
+                /** @var Model $dataModelPlan */
+                $dataModelPlan = $this->mapper->createModel($domainModelPlan->getId());
+                $dataModelPlan
+                    ->setName($domainModelPlan->getName())
+                    ->setDescription($domainModelPlan->getDescription())
+                    ->setIsDynamic($domainModelPlan->getIsDynamic())
+                    ->setPublishDate($domainModelPlan->getPublishDate())
+                    ->setOpenDate($domainModelPlan->getOpenDate())
+                    ->setDueDate($domainModelPlan->getDueDate())
+                    ->setCloseDate($domainModelPlan->getDueDate());
+
+                // Finagle participants too
+                foreach ($domainModelPlan->getParticipants() as $participant) {
+                    $dataModelParticipant = ParticipantMapper::getInstance()->createModel($participant->getId());
+                    $dataModelParticipant
+                        ->setUser($participant->getUser())
+                        ->setExcludedAt($participant->getExcludedAt())
+                    ;
+                    $dataModelPlan->getParticipants()->setOffset($participant->getUser()->getId(), $dataModelParticipant);
+                }
+
+                $key = "{$assessment->getId()}.{$domainModelPlan->getId()}";
+                $notifsForPlans["$key.open"] = $this
+                    ->internalNotifyOpen($assessment, $dataModelPlan, true)
+                    ->getAll($openDate ? $openDate->getUnixTimeStamp() : null);
+                $notifsForPlans["$key.closed"] = $this
+                    ->internalNotifyClosed($assessment, $dataModelPlan, true)
+                    ->getAll($dueDate ? $dueDate->getUnixTimeStamp() : null);
+            }
         }
 
-        $boxes = $this->getMapper()->findForFeed($context, $limit, $offset);
 
-        foreach ($boxes as $box) {
-            $c = $c
-                ->merge(new Collection($this->notifyOpen($box, $box->getOwner())->getAll($box->getOpenDate()->getUnixTimeStamp())))
-                ->merge(new Collection($this->notifyClosed($box, $box->getOwner())->getAll($box->getDueDate()->getUnixTimeStamp())));
+        // Determine which notifications are actually relevant to $user.
+        // This includes:
+        // * targeted directly to $user
+        // * targeted to one of $user's children
+        // * targeted to a folder which $user is a part of
+        $childIds = [];
+        foreach ($user->getChildren() as $child) {
+            $childIds[$child->getId()] = true;
         }
 
-        return $c;
+        $ts     = $now->getUnixTimeStamp();
+        $filter = function (Instance $item, $key) use ($user, $access, $childIds, $ts) {
+
+            // For some reason I get notifications for future events?
+            // Filter those out.
+            if ($item->getTime() > $ts) {
+                return false;
+            }
+
+            // notify.user.$userId: am I this user?
+            if (preg_match('/^notify\\.user\\.(?P<userId>\\d+)/', $key, $matches)) {
+                $userId = (int)$matches['userId'];
+                return $userId === $user->getId();
+            }
+
+            // notify.parent.$userId: am I a parent of this user?
+            if (preg_match('/^notify\\.parent\\.(?P<childId>\\d+)/', $key, $matches)) {
+                $childId = (int)$matches['childId'];
+                return $childIds[$childId] ?? false;
+            }
+
+            // notify.service.1.$folderId.$level: do I have $access to $folderId at $level?
+            if (preg_match('/^notify\\.service\\.1\\.(?P<folderId>\\d+).(?P<level>\\d+)/', $key, $matches)) {
+                $folderId = (int)$matches['folderId'];
+                $level    = (int)$matches['level'];
+                return $access->getFolderAccess($user, $folderId) >= $level;
+            }
+
+            // None of the above: filter out
+            return false;
+        };
+
+        $c = new Collection();
+        foreach ($notifsForPlans as $notifsForPlan) {
+            foreach ($notifsForPlan as $key => $item) {
+                if ($filter($item, $key)) {
+                    $c->add($item);
+                }
+            }
+        }
+        return $c->sortBy('time', 'desc')
+                 ->slice($offset, $limit);
     }
 
 
@@ -269,9 +391,31 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      */
     public function notifyOpen(Model $plan): Envelope
     {
-        $assessment = $this->retrieveAssessmentDomainModel($plan);
-        $envelope   = new Envelope();
-        $topicStub  = $this->retrieveAssessmentTopicStub($assessment);
+        return $this->internalNotifyOpen($this->retrieveAssessmentDomainModel($plan), $plan, false);
+    }
+
+
+    /**
+     * Internal method for notifying on open, implemented so that feed can use
+     * it too.
+     *
+     * @param IAssessable $assessment
+     * @param Model       $plan
+     * @param bool        $forFeed Is this for the feed? If so, notify parents and staff
+     * @return Envelope
+     */
+    private function internalNotifyOpen(IAssessable $assessment, Model $plan, bool $forFeed): Envelope
+    {
+        $envelope = new Envelope();
+        if ($assessment instanceof DueWork) {
+            $topicSuffix = "open";
+        } elseif ($assessment instanceof Quiz) {
+            $topicSuffix = "upcoming";
+        }  else {
+            return $envelope;
+        }
+
+        $topicStub = $this->retrieveAssessmentTopicStub($assessment);
         if (!$topicStub) {
             return $envelope;
         }
@@ -279,12 +423,62 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             return $envelope;
         }
 
+        $boxType = $assessment->getTypeName();
+
+        // Build generic builder
+        $bob = $this->buildGenericBuilder($assessment)
+                    ->addTopic("$topicStub.$topicSuffix")
+                    ->setSeverity(Logger::NOTICE);
+
         // Customise and send to every participant in this plan only
+        $participantCount = 0;
         foreach ($this->retrieveParticipantsFromPlan($plan, $assessment) as $participant) {
             if (!$this->isParticipantNotifiable($participant, self::TRIGGER_OPEN)) {
                 continue;
             }
-            $this->internalNotifyOpen($envelope, $participant, $topicStub);
+
+            $participantCount++;
+
+            // build for student
+            $this->internalNotifyStudentOpen($envelope, $participant, $topicStub);
+
+            // For feed only: build for parent
+            if (!($forFeed && $this->isParentTargetable())) {
+                continue;
+            }
+            $bob = $this->targetBuilderToParents($bob, $assessment, $participant)
+                        ->setTitle("$boxType :assessment opened in :cat for :child");
+            $envelope->targetToParent($participant->getUser(), $bob->build());
+        }
+
+        // For feed only: build for staff
+        if ($forFeed && $participantCount > 0) {
+            $title = sprintf(
+                ":assessment has opened for %d student%s",
+                $participantCount,
+                $participantCount === 1 ? '' : 's'
+            );
+            $href = $this->buildAssessmentRoute($assessment, $plan);
+            $bob  = $this->buildGenericBuilder($assessment)
+                         ->addTopic("$topicStub.$topicSuffix")
+                         ->setSeverity(Logger::NOTICE)
+                         ->setTitle($title)
+                         ->setHref($href)
+                         ->unsetParam('cat')
+                         ->setParam('assessment', new Param($assessment->getTitle(), $href))
+                         ->setSeverity(Logger::ERROR);
+
+            // Dedupe messages for plans
+            if (!$plan->isDynamic()) {
+                $bob->setTitle($title . ' in :plan')
+                    ->setParam('plan', new Param($plan->getName()));
+            }
+
+            $envelope->broadcastToCategory(
+                $assessment->getBaseContext()->getFolder(),
+                UserAccess::ACCESS_WRITE,
+                $bob->build()
+            );
         }
 
         return $envelope;
@@ -298,7 +492,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      * @param Participant $participant
      * @param string      $topicStub
      */
-    private function internalNotifyOpen(Envelope $envelope, Participant $participant, string $topicStub): void
+    private function internalNotifyStudentOpen(Envelope $envelope, Participant $participant, string $topicStub): void
     {
         // Get assessment and build
         $assessment = $participant->getAssessable();
@@ -461,9 +655,23 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      */
     public function notifyClosed(Model $plan): Envelope
     {
-        $assessment = $this->retrieveAssessmentDomainModel($plan);
-        $envelope   = new Envelope();
-        $topicStub  = $this->retrieveAssessmentTopicStub($assessment);
+        return $this->internalNotifyClosed($this->retrieveAssessmentDomainModel($plan), $plan, false);
+    }
+
+
+    /**
+     * Internal method for notifying on close, implemented so that feed can use
+     * it too.
+     *
+     * @param IAssessable $assessment
+     * @param Model       $plan
+     * @param bool        $forFeed Is this for the feed? If so, notify parents and students
+     * @return Envelope
+     */
+    private function internalNotifyClosed(IAssessable $assessment, Model $plan, bool $forFeed): Envelope
+    {
+        $envelope  = new Envelope();
+        $topicStub = $this->retrieveAssessmentTopicStub($assessment);
         if (!$topicStub) {
             return $envelope;
         }
@@ -471,34 +679,82 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             return $envelope;
         }
 
-        // Send a single notification for total # students not submitted
-        $href = $this->buildAssessmentRoute($assessment);
+        $bob = $this->buildGenericBuilder($assessment)
+                    ->setSeverity(Logger::ERROR)
+                    ->addTopic("$topicStub.closed");
+
+        // Figure out how many need to submit
+        $totalUnsubmitted = 0;
+        $allowsResponse   = ($assessment instanceof DueWork && !$assessment->isAcceptNone());
+        foreach ($this->retrieveParticipantsFromPlan($plan, $assessment) as $participant) {
+            if (!$this->isParticipantNotifiable($participant, self::TRIGGER_CLOSED)) {
+                continue;
+            }
+
+            // Is this a due work which doesn't accept online?
+            // Don't count $participant as unsubmitted
+            if ($allowsResponse && $participant->isResponseRequired()) {
+                $totalUnsubmitted++;
+            }
+
+            // Feed only
+            if ($forFeed) {
+                // build for student
+                $bob = $this->targetBuilderToStudent($bob, $assessment, $participant)
+                            ->setTitle(":assessment in :cat has closed");
+                $envelope->targetToUser($participant->getUser(), $bob->build());
+
+                // build for parent, only if they're allowed
+                if (!$this->isParentTargetable()) {
+                    continue;
+                }
+                $bob = $this->targetBuilderToParents($bob, $assessment, $participant)
+                            ->setTitle(":assessment in :cat has closed for :child");
+                $envelope->targetToParent($participant->getUser(), $bob->build());
+            }
+        }
+
+        // build for staff
+        $href = $this->buildAssessmentRoute($assessment, $plan);
         $bob  = $this->buildGenericBuilder($assessment)
-                     ->setTitle(":assessment in :cat has closed and :number did not submit work")
                      ->setHref($href)
                      ->setParam('assessment', new Param($assessment->getTitle(), $href))
                      ->setSeverity(Logger::ERROR)
                      ->addTopic("$topicStub.closed");
 
-        // Figure out how many need to submit
-        $totalUnsubmitted = 0;
-        foreach ($this->retrieveParticipantsFromPlan($plan, $assessment) as $participant) {
-            if (!$this->isParticipantNotifiable($participant, self::TRIGGER_CLOSED)) {
-                continue;
-            }
-            $totalUnsubmitted++;
+        // Build a title depending on plan
+        $title = ':assessment';
+
+        // :cat is irrelevant for feed
+        if ($forFeed) {
+            $bob->unsetParam('cat');
+        } else {
+            $title .= ' in :cat';
         }
+
+        $title .= ' has closed';
+
+        // Mention the plan if it's not the default
+        if (!$plan->isDynamic()) {
+            $title .= ' for plan :plan';
+            $bob->setParam('plan', new Param($plan->getName()));
+        }
+
+        // How many students didn't submit?
         if ($totalUnsubmitted > 0) {
-            $bob->setParam(
-                'number',
-                new Param(sprintf('%s student%s', $totalUnsubmitted, $totalUnsubmitted === 1 ? '' : 's'))
-            );
-            $envelope->broadcastToCategory(
-                $assessment->getBaseContext()->getFolder(),
-                UserAccess::ACCESS_WRITE,
-                $bob->build()
+            $title .= sprintf(
+                " and %d student%s did not submit work",
+                $totalUnsubmitted,
+                $totalUnsubmitted === 1 ? '' : 's'
             );
         }
+
+        // Broadcast
+        $envelope->broadcastToCategory(
+            $assessment->getBaseContext()->getFolder(),
+            UserAccess::ACCESS_WRITE,
+            $bob->setTitle($title)->build()
+        );
 
         return $envelope;
     }
@@ -618,7 +874,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 if (!$isExcluded) {
                     // Same as notifyOpen
                     if ($this->isParticipantNotifiable($participant, self::TRIGGER_OPEN)) {
-                        $this->internalNotifyOpen($envelope, $participant, $topicStub);
+                        $this->internalNotifyStudentOpen($envelope, $participant, $topicStub);
                     }
                 }
 
@@ -708,11 +964,12 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      * Convenience helper to build a route to the status page.
      *
      * @param IAssessable $assessment
+     * @param Model       $plan       Required for deduping notifications
      * @return string
      */
-    private function buildAssessmentRoute(IAssessable $assessment): string
+    private function buildAssessmentRoute(IAssessable $assessment, Model $plan): string
     {
-        return sprintf('/learning/assessments/%s/status', $assessment->getId());
+        return sprintf('/learning/assessments/%s/status#plan-%d', $assessment->getId(), $plan->getId());
     }
 
     /**
@@ -734,6 +991,16 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     protected function setAssessmentMapper(AssessmentMapper $assessmentMapper): self
     {
         $this->assessmentMapper = $assessmentMapper;
+        return $this;
+    }
+
+    /**
+     * @param AssessmentDataSource $assessmentDataSource
+     * @return static
+     */
+    protected function setAssessmentDataSource(AssessmentDataSource $assessmentDataSource)
+    {
+        $this->assessmentDataSource = $assessmentDataSource;
         return $this;
     }
 
@@ -786,33 +1053,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      */
     private function retrieveAssessmentDomainModel(Model $plan): IAssessable
     {
-        //                             ,-.
-        //        ___,---.__          /'|`\          __,---,___
-        //     ,-'    \`    `-.____,-'  |  `-.____,-'    //    `-.
-        //   ,'        |           ~'\     /`~           |        `.
-        //  /      ___//              `. ,'          ,  , \___      \
-        // |    ,-'   `-.__   _         |        ,    __,-'   `-.    |
-        // |   /          /\_  `   .    |    ,      _/\          \   |
-        // \  |           \ \`-.___ \   |   / ___,-'/ /           |  /
-        //  \  \           | `._   `\\  |  //'   _,' |           /  /
-        //   `-.\         /'  _ `---'' , . ``---' _  `\         /,-'
-        //      ``       /     \    ,='/ \`=.    /     \       ''
-        //              |__   /|\_,--.,-.--,--._/|\   __|
-        //              /  `./  \\`\ |  |  | /,//' \,'  \
-        //             /   /     ||--+--|--+-/-|     \   \
-        //            |   |     /'\_\_\ | /_/_/`\     |   |
-        //             \   \__, \_     `~'     _/ .__/   /
-        //              `-._,-'   `-._______,-'   `-._,-'
-        //
-        //          +--------------------------------------+
-        //          |       \Schoolbox\Mapper::getDi       |
-        //          | Under pain of death DO NOT USE THIS! |
-        //          +--------------------------------------+
-        //
-        // ... hold my beer
-        /** @var MapperProxy $assessmentDataSource */
-        $assessmentDataSource = $this->mapper::getDi()->get('assessmentDataSource');
-        return $assessmentDataSource->findByIdForReview($plan->getAssessment()->getId());
+        return $this->assessmentDataSource->findByIdForReview($plan->getAssessment()->getId());
     }
 
     /**
@@ -931,12 +1172,12 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         switch ($label) {
             case self::TRIGGER_OPEN:
             case self::TRIGGER_UPDATED:
-                // Open and updated notifs are always sent
+            case self::TRIGGER_CLOSED:
+                // Open, updated and closed notifs are always sent
                 return true;
 
             case self::TRIGGER_UPCOMING:
             case self::TRIGGER_OVERDUE:
-            case self::TRIGGER_CLOSED:
             default:
                 // All other notifs are not sent for due works that don't
                 // accept online, because action isn't necessary for them.
@@ -946,11 +1187,20 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         }
     }
 
+
+    /**
+     * Is this participant notifiable for this label?
+     *
+     * @param Participant $participant
+     * @param string      $label
+     * @return bool
+     */
     private function isParticipantNotifiable(Participant $participant, string $label): bool
     {
         switch ($label) {
             case self::TRIGGER_OPEN:
-                // Open notifs are always sent to non-excluded
+            case self::TRIGGER_CLOSED:
+                // Open and closed notifs are always sent to non-excluded
                 return !$participant->isExcluded();
 
             case self::TRIGGER_UPDATED:
@@ -959,7 +1209,6 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
             case self::TRIGGER_UPCOMING:
             case self::TRIGGER_OVERDUE:
-            case self::TRIGGER_CLOSED:
             default:
                 // All other notifs:
                 // participant is included, and still needs to respond
