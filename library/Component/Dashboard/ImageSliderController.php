@@ -96,13 +96,7 @@ class Component_Dashboard_ImageSliderController extends Component_Dashboard_Cont
         $this->setVar('image_scroller_block', '');
 
         // Load images for the current homepage
-        $allFiles = $this->getFileMapper()->findForFolders(
-            [ $this->getSource()->getId() ], array(
-                'filter'  => array('image'),
-                'sort'    => $this->getConfig('sort'),
-                'sortdir' => $this->getConfig('sortdir'),
-            )
-        );
+        $allFiles = $this->getFolderMapper()->findImages($this->getSource(), (int)$this->getConfigMapper()->get('image_slideshow_max'));
 
         // Have update form to back to this homepage, not the gallery's homepage
         $this->setVar('IMAGESCROLLER_CATEGORY_ID', $this->getSource()->getId());
