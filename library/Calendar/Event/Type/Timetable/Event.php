@@ -54,6 +54,11 @@ class Event extends DayEvent implements EventInterface {
     protected $periodName;
 
     /**
+     * @var bool $hasAttendance If this class has attendance that can be marked
+     */
+    protected $hasAttendance = false;
+
+    /**
      * @return string
      */
     public function getCode()
@@ -132,4 +137,23 @@ class Event extends DayEvent implements EventInterface {
     {
         $this->timetableCode = $timetable;
     }
+
+    /**
+     * @return bool
+     */
+    public function hasAttendance(): bool
+    {
+        return $this->hasAttendance;
+    }
+
+    /**
+     * @param bool $hasAttendance
+     */
+    public function setHasAttendance(bool $hasAttendance): void
+    {
+        $this->hasAttendance = $hasAttendance;
+    }
+
+
+
 }

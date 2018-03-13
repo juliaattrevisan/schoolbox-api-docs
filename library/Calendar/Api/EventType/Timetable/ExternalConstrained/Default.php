@@ -161,6 +161,7 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
                         $event->setType($eventType);
 
                         /* Setup attendance button */
+                        $event->setHasAttendance($period['AttendanceEnabled'] != null);
                         $event->setCode($period['code']);
                         $event->setCampus($period['campus']);
                         $event->setPeriod($period['periodNumber']);
