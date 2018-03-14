@@ -255,6 +255,13 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
 
                                 $this->setVar('PERIOD_DESC', $description);
 
+                                if($class['ClassCancelled']) {
+                                    $this->setVar('CLASS_CANCELLED', 'strike');
+                                }
+                                else {
+                                    $this->setVar('CLASS_CANCELLED','');
+                                }
+
                                 // Link to Attendance Records
                                 
                                 if (strlen($class['code']) && $this->configMapper->get('external_attendance') && $this->getUser()->getRole()->isStaff()) {
