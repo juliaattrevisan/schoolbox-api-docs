@@ -422,8 +422,7 @@ elseif ($authenticator->isEOTCCreator($sessionUser)) {
 	 */
     $groupHandler = new Group();
 
-    /* Set an arbitrary start/end time initially
-     * (9:00-10:00, for some reason)
+    /* Set the default start and end times to the nearest hour and an hour later than that, respectively.
      */
 
     $startDate = Alaress_Date_Format::now();
@@ -437,9 +436,11 @@ elseif ($authenticator->isEOTCCreator($sessionUser)) {
     $endDate = clone $startDate;
     $endDate->addHours(1);
 
-    // TODO how do I set this, what param does it require?
-    $event->getStartDateTime()->setTime(9, 0, 0);
-    $event->getEndDateTime()->setTime(10, 0, 0);
+    $event->getStartDateTime()->setDate($startDate->getYear(),$startDate->getMonth(),$startDate->getDay());
+    $event->getStartDateTime()->setTime($startDate->getHour(),$startDate->getMinute(),$startDate->getSecond());
+
+    $event->getEndDateTime()->setDate($endDate->getYear(),$endDate->getMonth(),$endDate->getDay());
+    $event->getEndDateTime()->setTime($endDate->getHour(),$endDate->getMinute(),$endDate->getSecond());
 
     $page->setVar(
         [
