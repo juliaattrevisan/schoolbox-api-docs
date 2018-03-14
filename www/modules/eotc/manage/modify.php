@@ -442,6 +442,8 @@ elseif ($authenticator->isEOTCCreator($sessionUser)) {
     $event->getEndDateTime()->setDate($endDate->getYear(),$endDate->getMonth(),$endDate->getDay());
     $event->getEndDateTime()->setTime($endDate->getHour(),$endDate->getMinute(),$endDate->getSecond());
 
+    $event->setAllDay(false);
+
     $page->setVar(
         [
             'EVENT_RAMS_FILE'                 => '',
