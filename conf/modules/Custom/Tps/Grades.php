@@ -2,7 +2,7 @@
 namespace Config\Modules\Custom\Tps;
 
 use Alaress\Application\Kernel;
-use Custom\Btac\Grades\Module;
+use Custom\Tps\Grades\Module;
 use Config\Modules\ModuleConfigInterface;
 
 class Grades implements ModuleConfigInterface
