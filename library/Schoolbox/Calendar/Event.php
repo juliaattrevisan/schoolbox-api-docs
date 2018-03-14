@@ -281,7 +281,6 @@ class Event implements ISoftDeletable
      *
      * @param $date
      */
-    // TODO in here
     public function setupDates($date)
     {
         if (preg_match(
