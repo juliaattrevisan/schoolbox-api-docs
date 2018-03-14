@@ -426,6 +426,7 @@ elseif ($authenticator->isEOTCCreator($sessionUser)) {
     /* Set an arbitrary start/end time initially
      * (9:00-10:00, for some reason)
      */
+    // TODO change this to calculate time
     $event->getStartDateTime()->setTime(9, 0, 0);
     $event->getEndDateTime()->setTime(10, 0, 0);
     $page->setVar(
@@ -441,13 +442,9 @@ elseif ($authenticator->isEOTCCreator($sessionUser)) {
             'EVENT_AUTHOR_ID'                 => $sessionUser->getId(),
             'EVENT_TITLE'                     => '',
             'EVENT_TIMEINPUTS'                => 'hide',
-            'EVENT_START_DATE'                => Scrub::text(
-                $event->getAllDay() ? $event->getStartDateTime()->getLocalShort() : $event->getStartDateTime(
-                )->getLocal()
+            'EVENT_START_DATE'                => Scrub::text($event->getStartDateTime()->getLocal()
             ),
-            'EVENT_END_DATE'                  => Scrub::text(
-                $event->getAllDay() ? $event->getEndDateTime()->getLocalShort() : $event->getEndDateTime()->getLocal()
-            ),
+            'EVENT_END_DATE'                  => Scrub::text($event->getEndDateTime()->getLocal()),
             'EVENT_LOCATION'                  => '',
             'EVENT_DETAIL'                    => '',
             'EVENT_REDIRECT'                  => $event->setupRedirect(
