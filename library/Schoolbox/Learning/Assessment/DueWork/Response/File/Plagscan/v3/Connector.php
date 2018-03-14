@@ -127,20 +127,13 @@ class Connector
             throw new \DomainException('File is too large');
         }
 
-        $filepath = $this->makeTempFile($submissionFile, $filename);
-
-        if ($filepath === null) {
-            throw new \RuntimeException('Could not create temp file');
-        }
-
-        /* Temp file created, ready to transmit
-         */
-        $filepointer = fopen($filepath, 'r');
+        $filename = $this->makeFileName($submissionFile, $filename);
 
         $postData = [
             [
                 "name"     => "fileUpload",
-                "contents" => $filepointer,
+                "contents" => $submissionFile->getStorage()->readStream(),
+                "filename" => $filename,
             ],
         ];
 
@@ -151,11 +144,8 @@ class Connector
                 "http_errors" => false,
             ]);
         } catch (TransferException $e) {
-            unlink($filepath);
             throw new \RuntimeException('Error: Plagscan unavailable. Could not transmit file.');
         }
-
-        unlink($filepath);
 
         $response = $client->post("documents?access_token={$this->getAccessTokenGenerator()->generate()}", [
             "multipart" => $postData,
@@ -181,13 +171,13 @@ class Connector
     }
 
     /**
-     * Move $submissionFile data to a temp location for upload
+     * Create a filename that will be sent to plagscan to identify the file
      *
      * @param SubmissionFile $submissionFile
      * @param                $filename
-     * @return null|string
+     * @return string
      */
-    private function makeTempFile(SubmissionFile $submissionFile, $filename)
+    private function makeFileName(SubmissionFile $submissionFile, $filename)
     {
         $documentName = $submissionFile->getStorage()->getFilename();
         $documentExt = $submissionFile->getStorage()->getExtension();
@@ -197,23 +187,7 @@ class Connector
         $name = mb_strcut($name, 0, 255 - ($documentExt ? \strlen($documentExt) + 1 : 0));
         $fullName = $name.'.'.$documentExt;
 
-        /* Shank the file into a temp dir; the file extension must be included
-         */
-        $destination = sys_get_temp_dir() . '/' . $fullName;
-        // copy the file contents to the temp directory
-        if ($submissionFile->getStorage()->exists() && $fp = fopen($destination, 'w')) {
-            $input = $submissionFile->getStorage()->readStream();
-
-            while ($chunk = fgets($input, 1024)) {
-                fwrite($fp, $chunk);
-            }
-
-            fclose($fp);
-
-            return $destination;
-        }
-
-        return null;
+        return $fullName;
     }
 
     /**
