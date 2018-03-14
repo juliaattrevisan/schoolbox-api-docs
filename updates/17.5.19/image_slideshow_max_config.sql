@@ -17,4 +17,5 @@ INSERT INTO `config` (
   (SELECT `id` FROM lu_config_type WHERE `type` = 'Resources'),
   true,
   true
-);
+)
+ON DUPLICATE KEY UPDATE `id` = `id`;
