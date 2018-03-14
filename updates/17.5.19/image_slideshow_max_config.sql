@@ -18,4 +18,4 @@ INSERT INTO `config` (
   true,
   true
 )
-ON DUPLICATE KEY UPDATE `id` = `id`;
+ON DUPLICATE KEY UPDATE `configID` = `configID`;
