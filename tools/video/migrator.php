@@ -120,6 +120,9 @@ try {
         $log->info("Found {$countVideos} videos, {$countAudios} audio, {$countPosters} posters, {$countThumbnails} thumbnails");
         $log->info("");
 
+        // Obtain the destination
+        $storageDir = $configMapper->get("storage_dir");
+
         // ------------------------------------------------------------------------------------------------------------
         // Migrate videos
         // ------------------------------------------------------------------------------------------------------------
@@ -127,7 +130,7 @@ try {
         // Videos need to be migrated first so that the thumbnails/posters have something to be associated with
 
         $log->info("Processing videos...");
-        $results = uploadArrayToStorage($log, $videos, $storageMapper, 'video');
+        $results = uploadArrayToStorage($log, $videos, $storageMapper, $storageDir, 'video');
 
         $success += $results["success"];
         $failed  += $results["failed"];
@@ -139,7 +142,7 @@ try {
         // Videos need to be migrated first so that the thumbnails/posters have something to be associated with
 
         $log->info("Processing audio...");
-        $results = uploadArrayToStorage($log, $audios, $storageMapper, 'audio');
+        $results = uploadArrayToStorage($log, $audios, $storageMapper, $storageDir, 'audio');
 
         $success += $results["success"];
         $failed  += $results["failed"];
@@ -149,7 +152,7 @@ try {
         // ------------------------------------------------------------------------------------------------------------
 
         $log->info("Processing posters...");
-        $results = uploadArrayToStorage($log, $posters, $storageMapper, 'poster');
+        $results = uploadArrayToStorage($log, $posters, $storageMapper, $storageDir, 'poster');
 
         $success += $results["success"];
         $failed  += $results["failed"];
@@ -159,7 +162,7 @@ try {
         // ------------------------------------------------------------------------------------------------------------
 
         $log->info("Processing thumbnails...");
-        $results = uploadArrayToStorage($log, $thumbnails, $storageMapper, 'thumbnail');
+        $results = uploadArrayToStorage($log, $thumbnails, $storageMapper, $storageDir, 'thumbnail');
 
         $success += $results["success"];
         $failed  += $results["failed"];
@@ -181,9 +184,8 @@ try {
         $lock->release();
     });
 } catch (Exception $e) {
-    // Don't actually know where this exception is coming from- but PhpStorm complains if I don't do a catch all here
-
-    $log->critical("Unhandled exception error: {$e->getMessage()}", [$e]);
+    // this is purely to stop Storm from covering the entire closure in yellow
+    throw $e;
 }
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -196,11 +198,12 @@ try {
  * @param LoggerInterface $log
  * @param array           $filenames
  * @param StorageMapper   $storageMapper
+ * @param string          $storageDir
  * @param string          $type
  *
  * @return array
  */
-function uploadArrayToStorage(LoggerInterface $log, array $filenames, StorageMapper $storageMapper, $type)
+function uploadArrayToStorage(LoggerInterface $log, array $filenames, StorageMapper $storageMapper, $storageDir, $type)
 {
     $log->info("");
 
@@ -215,7 +218,7 @@ function uploadArrayToStorage(LoggerInterface $log, array $filenames, StorageMap
         $log->info("    - Migration Type:         " . ucfirst($type));
         $log->info("    - Source File:            {$filename}");
 
-        if (uploadToStorage($log, $filename, $storageMapper, $type)) {
+        if (uploadToStorage($log, $filename, $storageMapper, $storageDir, $type)) {
             $success++;
         } else {
             $log->error("    - Failed:                 {$filename}");
@@ -239,11 +242,12 @@ function uploadArrayToStorage(LoggerInterface $log, array $filenames, StorageMap
  * @param LoggerInterface $log
  * @param string          $filename
  * @param StorageMapper   $storageMapper
+ * @param string          $storageDir
  * @param string          $type
  *
  * @return bool
  */
-function uploadToStorage(LoggerInterface $log, $filename, StorageMapper $storageMapper, $type)
+function uploadToStorage(LoggerInterface $log, $filename, StorageMapper $storageMapper, $storageDir, $type)
 {
     // ----------------------------------------------------------------------------------------------------------------
     // Retrieve existing video storage object
@@ -276,7 +280,7 @@ function uploadToStorage(LoggerInterface $log, $filename, StorageMapper $storage
     // ----------------------------------------------------------------------------------------------------------------
 
     $suffix = $type == 'video' || $type == 'audio' ? 'transcode' : $type;
-    $filenameImage = "/vagrant/data/storage/{$videoStorage->getPath()}-{$suffix}";
+    $filenameImage = "{$storageDir}/{$videoStorage->getPath()}-{$suffix}";
     $log->info("    - Filename:      {$filename}");
     $log->info("    - Uploaded Filename:      {$filenameImage}");
     rename($filename, $filenameImage);
