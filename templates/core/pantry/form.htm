@@ -89,6 +89,9 @@
                             });
                         </script>
                     </div>
+                </fieldset>
+                <fieldset class="content">
+                    <legend>Disabled &amp; Readonly</legend>
                     <div class="small-12 medium-4 columns">
                         <label>Disabled Input
                             <input type="text" placeholder="You cant type here" disabled />
@@ -104,11 +107,21 @@
                     <div class="small-12 medium-4 columns">
                         <label>Disabled Select
                             <select disabled>
-                                <option value="husker">Husker</option>
+                                <option value="husker">Nope</option>
                                 <option value="starbuck">Starbuck</option>
-                                <option value="hotdog">Hot Dog</option>
-                                <option value="apollo">Apollo</option>
                             </select>
+                        </label>
+                    </div>
+                    <div class="small-12 medium-6 columns">
+                        <label>Readonly Input
+                            <input type="text" placeholder="readonly" readonly />
+                        </label>
+                    </div>
+                    <div class="small-12 medium-6 columns">
+                        <label>Readonly Textarea
+                            <textarea readonly>
+                                readonly
+                            </textarea>
                         </label>
                     </div>
                 </fieldset>

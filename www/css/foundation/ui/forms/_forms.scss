@@ -151,19 +151,24 @@ select{
 	}
 }
 
+input:disabled,
+input:read-only,
+textarea:read-only {
+	opacity: .5;
+	label:hover & {
+		@include placeholder-hover-color($base);
+	}
+}
+
 input:disabled:hover,
 textarea:disabled:hover,
 select:disabled:hover,
 input:read-only:hover,
-textarea:read-only:hover {
+textarea:read-only:hover,
+input:read-only:focus,
+textarea:read-only:focus{
 	background-color: $input-bg-color;
-}
-
-input:disabled,
-input:read-only {
-	label:hover & {
-		@include placeholder-hover-color($base);
-	}
+	border-color: $form-border-color;
 }
 
 input[type="checkbox"],
