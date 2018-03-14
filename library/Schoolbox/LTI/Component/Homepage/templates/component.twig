@@ -32,23 +32,27 @@
                 <section>
                     <div class="empty-state">
                         <i class="icon-settings"></i>
-                        <p>
-                            Select a third party embedded learning tool to display in this component for users to
-                            interact with.
-                        </p>
-                        <p>
-                            {% set foundLearningField = false %}
-                            {% for provider in providers %}
-                                {% if provider.url == 'https://bc.vitalsource.com/books/book' %}
-                                    {% set learningfieldProviderId = provider.id %}
-                                    <button data-reveal-id="modal-learningfield">{{ provider.name }}</button>
-                                    {% set foundLearningField = true %}
-                                {% else %}
-                                    <button data-provider="{{ provider.id }}">{{ provider.name }}</button>
-                                {% endif %}
-                            {% endfor %}
-                        </p>
-                    </div>
+                        {% if not readOnly %}
+                            <p>
+                                Select a third party embedded learning tool to display in this component for users to
+                                interact with.
+                            </p>
+                            <p>
+                                {% set foundLearningField = false %}
+                                {% for provider in providers %}
+                                    {% if provider.url == 'https://bc.vitalsource.com/books/book' %}
+                                        {% set learningfieldProviderId = provider.id %}
+                                        <button data-reveal-id="modal-learningfield">{{ provider.name }}</button>
+                                        {% set foundLearningField = true %}
+                                    {% else %}
+                                        <button data-provider="{{ provider.id }}">{{ provider.name }}</button>
+                                    {% endif %}
+                                {% endfor %}
+                            </p>
+                        </div>
+                    {% else %}
+                        <p>There is no content to view at this time.</p>
+                    {% endif %}
                 </section>
             </div>
         </div>
