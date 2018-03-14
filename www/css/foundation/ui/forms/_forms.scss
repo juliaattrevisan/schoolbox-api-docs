@@ -225,6 +225,10 @@ th, td{
 	@include switch-label(0.5rem);
 	vertical-align: middle;
 
+	label {
+		cursor: $cursor-default-value;
+	}
+	
 	span {
 		position: absolute;
 		top: 0.25rem;
@@ -246,7 +250,6 @@ th, td{
 %fancy-check-selector{
 	position: relative;
 	display: block;
-	cursor: pointer;
 }
 %fancy-check-before{
 	position: absolute;
@@ -279,6 +282,7 @@ th, td{
     + #{$label-selector} {
         // this is where the magic happens
 		@extend %fancy-check-selector;
+		cursor: $cursor-default-value;
         min-height: $checkbox-size;
         line-height: $checkbox-size;
         padding: 0 0 0 ($checkbox-size + $checkbox-margin);
