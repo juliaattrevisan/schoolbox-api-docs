@@ -30,7 +30,6 @@ use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
 
-
 if (isset($this)) {
     $page = $this;
 } else {
@@ -426,9 +425,22 @@ elseif ($authenticator->isEOTCCreator($sessionUser)) {
     /* Set an arbitrary start/end time initially
      * (9:00-10:00, for some reason)
      */
-    // TODO change this to calculate time
+
+    $startDate = Alaress_Date_Format::now();
+    $startDateMinutes = $startDate->getMinute();
+    $startDateSeconds = $startDate->getSecond();
+
+    $startDate->addHours(1);
+    $startDate->addMinutes(-$startDateMinutes);
+    $startDate->addSeconds(-$startDateSeconds);
+
+    $endDate = clone $startDate;
+    $endDate->addHours(1);
+
+    // TODO how do I set this, what param does it require?
     $event->getStartDateTime()->setTime(9, 0, 0);
     $event->getEndDateTime()->setTime(10, 0, 0);
+
     $page->setVar(
         [
             'EVENT_RAMS_FILE'                 => '',
