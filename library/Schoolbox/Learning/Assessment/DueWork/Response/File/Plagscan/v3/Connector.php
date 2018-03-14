@@ -189,12 +189,17 @@ class Connector
      */
     private function makeTempFile(SubmissionFile $submissionFile, $filename)
     {
-        $documentName = $submissionFile->getStorage()->getBasename();
+        $documentName = $submissionFile->getStorage()->getFilename();
+        $documentExt = $submissionFile->getStorage()->getExtension();
+
+        // Sanitise the file name to ensure valid characters and length
+        $name = preg_replace('/[^A-Za-z0-9_\-\. ]/', '',$filename.'_'.$documentName);
+        $name = mb_strcut($name, 0, 255 - ($documentExt ? \strlen($documentExt) + 1 : 0));
+        $fullName = $name.'.'.$documentExt;
 
         /* Shank the file into a temp dir; the file extension must be included
          */
-        $destination = sys_get_temp_dir() . '/' . $filename . '_' . $documentName;
-
+        $destination = sys_get_temp_dir() . '/' . $fullName;
         // copy the file contents to the temp directory
         if ($submissionFile->getStorage()->exists() && $fp = fopen($destination, 'w')) {
             $input = $submissionFile->getStorage()->readStream();
