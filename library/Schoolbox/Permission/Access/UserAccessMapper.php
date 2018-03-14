@@ -430,8 +430,7 @@ class UserAccessMapper extends Mapper
                 {$this->getJoinColumnString('user', 'u')}
             FROM
                 `{$this->getTable()}` ua
-                LEFT JOIN {$this->getJoinSql('user', 'ua', 'u')}
-                LEFT JOIN groups g on u.group_id = g.id
+                JOIN {$this->getJoinSql('user', 'ua', 'u')}
             WHERE ua.service = :service
             AND ua.sid = :serviceId
             AND ua.type >= :minAccess
