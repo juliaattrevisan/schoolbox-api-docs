@@ -52,9 +52,17 @@
                                 chart: {
                                     type: 'boxplot'
                                 },
+                                title: {
+                                    text: null
+                                },
                                 series: [{
+                                    name: "{{ workItem.assessment.title }}",
                                     data: [{{ workItem.distribution.continuous.series|json_encode|raw }}]
-                                }]
+                                }],
+                                yAxis: {
+                                    min: 0,
+                                    max: 100
+                                }
                             });
                         })
                     })(jQuery);
