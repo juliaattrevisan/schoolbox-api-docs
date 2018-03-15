@@ -9,8 +9,7 @@
                     <th class="fixed-40">Title</th>
                     <th>Result %</th>
                     <th>Mean %</th>
-                    <th>Standard Deviation %</th>
-                    <th>Date Due</th>
+                    <th>Distribution</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -41,8 +40,27 @@
             </td>
             <td>{{ workItem.pretty_mark | replace({'%': ''}) }}</td>
             <td>{{ workItem.distribution.continuous.mean.mark | number_format(1) }}</td>
-            <td>{{ workItem.distribution.continuous.sd.mark | number_format(1) }}</td>
-            <td>{{ workItem.assessment.dueAt|date('j F') }}</td>
+            <td>
+                {# Graph goes here #}
+                <div id="assessmentGraph-{{ workItem.assessment.id }}-{{ student.id }}"></div>
+
+                {% autoescape 'js' %}
+                <script type="text/javascript">
+                    (function($){
+                        $(function() {
+                            $('#assessmentGraph-{{ workItem.assessment.id }}-{{ student.id }}').highcharts({
+                                chart: {
+                                    type: 'boxplot'
+                                },
+                                series: [{
+                                    data: [{{ workItem.distribution.continuous.marks|json_encode|raw }}]
+                                }]
+                            });
+                        })
+                    })(jQuery);
+                </script>
+                {% endautoescape %}
+            </td>
         </tr>
     {% endif %}
 {% endfor %}
