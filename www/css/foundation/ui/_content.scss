@@ -1275,6 +1275,10 @@ $selector-width: 2.25rem;
             }
         }
     }
+    .reply ~ .reply,
+    .child ~ .child {
+        border-top: 1px solid $base;
+    }
 }
 
 // Tables
