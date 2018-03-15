@@ -234,10 +234,11 @@ class Controller extends Base
             $markbook = new Markbook($assessments, $this->defaultGradeGroup, $this->getUser());
 
             // Data set
-            $subjects[] = [
+            $subjects[$folder->getId()] = [
                 'teachers' => $teachers,
                 'folder'   => $folder,
                 'grade'    => $this->getConfigLoader()->get('show_overall_grade') ? $markbook->getStudentStatistics()[$student->getId()]: '',
+                'perms'    => Access::getInstance()->getFolderAccess($this->getUser(), $folder->getId()),
             ];
         }
 

@@ -260,11 +260,17 @@
                                             {{ upcoming.title }}
                                         {% endif %}
                                     </h3>
-
-                                    <p class="meta">
-                                        <a href="/homepage/{{ upcoming.context.folder.id }}">{{ upcoming.context.folder.title }}</a>
-                                        {{ upcoming.typeName }}
-                                    </p>
+                                    {% if subjects[upcoming.context.folder.id]["perms"] > 0 %}
+                                        <p class="meta">
+                                            <a href="/homepage/{{ upcoming.context.folder.id }}">{{ upcoming.context.folder.title }}</a>
+                                            {{ upcoming.typeName }}
+                                        </p>
+                                    {% else %}
+                                        <p class="meta">
+                                            {{ upcoming.context.folder.title }}
+                                            {{ upcoming.typeName }}
+                                        </p>
+                                    {% endif %}
 
                                     <p class="meta">{{ dueDate.participant(upcoming.participant(student)) }}</p>
                                 </div>
