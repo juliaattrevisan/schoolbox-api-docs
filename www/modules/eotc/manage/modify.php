@@ -30,7 +30,6 @@ use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
 
-
 if (isset($this)) {
     $page = $this;
 } else {
@@ -423,11 +422,28 @@ elseif ($authenticator->isEOTCCreator($sessionUser)) {
 	 */
     $groupHandler = new Group();
 
-    /* Set an arbitrary start/end time initially
-     * (9:00-10:00, for some reason)
+    /* Set the default start and end times to the nearest hour and an hour later than that, respectively.
      */
-    $event->getStartDateTime()->setTime(9, 0, 0);
-    $event->getEndDateTime()->setTime(10, 0, 0);
+
+    $startDate = Alaress_Date_Format::now();
+    $startDateMinutes = $startDate->getMinute();
+    $startDateSeconds = $startDate->getSecond();
+
+    $startDate->addHours(1);
+    $startDate->addMinutes(-$startDateMinutes);
+    $startDate->addSeconds(-$startDateSeconds);
+
+    $endDate = clone $startDate;
+    $endDate->addHours(1);
+
+    $event->getStartDateTime()->setDate($startDate->getYear(),$startDate->getMonth(),$startDate->getDay());
+    $event->getStartDateTime()->setTime($startDate->getHour(),$startDate->getMinute(),$startDate->getSecond());
+
+    $event->getEndDateTime()->setDate($endDate->getYear(),$endDate->getMonth(),$endDate->getDay());
+    $event->getEndDateTime()->setTime($endDate->getHour(),$endDate->getMinute(),$endDate->getSecond());
+
+    $event->setAllDay(false);
+
     $page->setVar(
         [
             'EVENT_RAMS_FILE'                 => '',
@@ -441,13 +457,9 @@ elseif ($authenticator->isEOTCCreator($sessionUser)) {
             'EVENT_AUTHOR_ID'                 => $sessionUser->getId(),
             'EVENT_TITLE'                     => '',
             'EVENT_TIMEINPUTS'                => 'hide',
-            'EVENT_START_DATE'                => Scrub::text(
-                $event->getAllDay() ? $event->getStartDateTime()->getLocalShort() : $event->getStartDateTime(
-                )->getLocal()
+            'EVENT_START_DATE'                => Scrub::text($event->getStartDateTime()->getLocal()
             ),
-            'EVENT_END_DATE'                  => Scrub::text(
-                $event->getAllDay() ? $event->getEndDateTime()->getLocalShort() : $event->getEndDateTime()->getLocal()
-            ),
+            'EVENT_END_DATE'                  => Scrub::text($event->getEndDateTime()->getLocal()),
             'EVENT_LOCATION'                  => '',
             'EVENT_DETAIL'                    => '',
             'EVENT_REDIRECT'                  => $event->setupRedirect(
