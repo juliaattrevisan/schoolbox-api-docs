@@ -263,8 +263,7 @@ class Controller extends Base
             'currentTerm'  => $term,
             'children'     => $children,
             'upcomingWork' => $upcomingWork->limit(self::UPCOMING_WORK_LIMIT),
-            'returnUrl'    => $returnUrl,
-            'calendarStartTime' => Alaress_Date_Format::newNaturalDate("today " . ConfigMapper::getInstance()->get('calendar_start_time'))->getDatabaseTime()
+            'returnUrl'    => $returnUrl
         ];
     }
 }
