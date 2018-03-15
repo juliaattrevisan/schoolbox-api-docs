@@ -58,7 +58,12 @@ class External_Schooledge_Class extends External_Humanedge_Class implements Exte
             }
         }
 
-        return 'IN('. implode(',', $quotedCode).')';
+        if(count($quotedCode)) {
+            return 'IN(' . implode(',', $quotedCode) . ')';
+        }
+        else {
+            return "= ''";
+        }
     }
 
     /**
