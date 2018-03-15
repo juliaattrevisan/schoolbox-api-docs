@@ -34,7 +34,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
 
 
     /**
-     * The default/system timezone for daates
+     * The default/system timezone for dates
      * @var DateTimeZone
      */
     static private $defaultTimezone;
@@ -1118,7 +1118,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     }
 
     /**
-     * Get the date only
+     * Get the time only
      *
      * @return string
      */
