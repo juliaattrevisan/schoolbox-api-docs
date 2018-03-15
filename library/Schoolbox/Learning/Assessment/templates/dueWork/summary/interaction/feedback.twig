@@ -64,8 +64,26 @@ Data:
     {% set tooltip = 'View Profile' %}
 {% endif %}
 
+{% set deleteRoute = routeLookupIfAuthorized(
+'learningDueWorkFeedback.deleteAssessmentFeedback',
+{
+assessmentId: participant.assessable.id,
+assessment: participant.assessable,
+feedbackId: currentFeedback.id,
+feedback: currentFeedback,
+}
+) %}
+
+{% if hasCollapser and deleteRoute and deleteIcon %}
+    {% set actionClass = 'actions-small-2' %}
+{% elseif hasCollapser or (deleteRoute and deleteIcon) %}
+    {% set actionClass = 'actions-small-1' %}
+{% else %}
+    {% set actionClass = '' %}
+{% endif %}
+
 <ul class="information-list reply">
-    <li class="actions-small-2">
+    <li class="{{ actionClass }}">
         <div class="list-item flex-grade">
             <div class="compact card small-12 sibling">
                 {% if url %}
@@ -102,15 +120,7 @@ Data:
                 <span>{{ currentFeedback.humanReadableMark }}</span>
             </div>
         </div>
-        {% set deleteRoute = routeLookupIfAuthorized(
-        'learningDueWorkFeedback.deleteAssessmentFeedback',
-        {
-        assessmentId: participant.assessable.id,
-        assessment: participant.assessable,
-        feedbackId: currentFeedback.id,
-        feedback: currentFeedback,
-        }
-        ) %}
+
         <nav>
             {% if hasCollapser %}
                 <a href="#" class="icon-down-arrow" data-collapser="feedback-{{ responseId }}-{{ currentFeedback.id }}"></a>
