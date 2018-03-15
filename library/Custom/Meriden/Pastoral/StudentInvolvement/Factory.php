@@ -641,7 +641,17 @@ class Factory
             ];
 
             // Show marks as series
-            $distribution['continuous']['series'] = $marks;
+            // Calculation in PHP is kind of annoying, but...
+            sort($marks);
+            $distribution['continuous']['series'] = [
+                'low'  => min($marks),
+                'high' => max($marks),
+            ];
+
+            // Median: midpoint value
+            // If exactly divisible into two, use midpoint of highest min and lowest max
+
+
         }
         return $distribution;
     }
@@ -660,5 +670,39 @@ class Factory
     private function doesDraftFeedbackContribute($reportYear) : bool
     {
         return $reportYear < 2018;
+    }
+
+
+    private function median(array $values)
+    {
+        // Can't median a value which doesn't exist
+        if (empty($values)) {
+            return null;
+        }
+
+        // Only one value? it must be the median
+        $count = \count($values);
+        if ($count === 1) {
+            return array_pop($values);
+        }
+
+        // Median: midpoint value
+        // If exactly divisible into two, use midpoint of highest min and lowest max
+        sort($values);
+        $index = ($count-1) / 2;
+        if (\is_int($index)) {
+            return $values[$index];
+        }
+
+        $lowValue  = $values[(int)floor($index)];
+        $highValue = $values[(int)ceil($index)];
+
+        return ($highValue + $lowValue) / 2;
+
+
+
+        // Percentiles are a surprisingly deep rabbit-hole:
+        // https://en.wikipedia.org/wiki/Percentile#The_nearest-rank_method
+        // https://en.wikipedia.org/wiki/Percentile#The_linear_interpolation_between_closest_ranks_method
     }
 }
