@@ -77,7 +77,7 @@ class Report_Bialik_Parent extends \Report_Parent
         $query = "
             SELECT
                 StudentID,
-                StudentGiven1,
+                StudentPreferred,
                 StudentSurname,
                 StudentYearLevel,
                 House.Description AS StudentHouse,
@@ -172,7 +172,7 @@ class Report_Bialik_Parent extends \Report_Parent
                 AND (
                     (StudentSurname LIKE '%{$name}%')
                     OR
-                    (StudentGiven1 LIKE '%{$name}%')
+                    (StudentPreferred LIKE '%{$name}%')
                 )
             ";
         }

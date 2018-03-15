@@ -278,7 +278,7 @@ class External_Isams_User implements External_UserInterface
             $query .= "WHERE V_Student.Grade = :year_level";
         }
 
-        $query .= " ORDER BY StudentSurname, StudentGiven1, StudentID";
+        $query .= " ORDER BY StudentSurname, StudentPreferred, StudentID";
 
         return $this->getConnector()->executeQuery($query, ['year_level' => $yearlevel])->fetchAll();
     }

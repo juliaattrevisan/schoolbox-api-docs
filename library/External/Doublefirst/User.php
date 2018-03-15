@@ -615,7 +615,7 @@ class External_Doublefirst_User implements External_UserInterface
 
             foreach ($splitNames as $splitName) {
                 $splitName = $this->getDatabase()->quote($splitName);
-                $query .= " {$whereAnd} (StudentSurname LIKE '%{$splitName}%' OR StudentGiven1 LIKE '%{$splitName}%') ";
+                $query .= " {$whereAnd} (StudentSurname LIKE '%{$splitName}%' OR StudentPreferred LIKE '%{$splitName}%') ";
                 $whereAnd = " AND ";
             }
         }
