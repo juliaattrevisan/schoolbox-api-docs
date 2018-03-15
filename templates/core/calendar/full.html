@@ -88,9 +88,9 @@
             },
             fullCalendar: {
                 defaultDate: moment('{SELECTED_DATE}'),
-//                minTime: moment('{CALENDAR_START_TIME}'),
                 height: height,
                 defaultView: anchor || '{CALENDAR_VIEW}',
+                scrollTime: '{CALENDAR_START_TIME}',
                 // Event limit: could be configured from session but leave global for now
                 eventLimit: Boolean('{CALENDAR_COLLAPSE_EVENTS}'),
                 firstDay: Number('{CALENDAR_START_DAY}'),

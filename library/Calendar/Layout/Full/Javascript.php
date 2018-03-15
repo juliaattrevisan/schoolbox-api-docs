@@ -16,6 +16,7 @@
 use EOTC\ConfigMapper as EOTCConfigMapper;
 use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\Collection;
+use Schoolbox\Config\ConfigMapper;
 
 class Calendar_Layout_Full_Javascript extends Calendar_Layout_Full_Abstract
 {
@@ -51,12 +52,7 @@ class Calendar_Layout_Full_Javascript extends Calendar_Layout_Full_Abstract
     protected function setupSelectedDayMonthYear()
     {
         list($selectedDay, $selectedMonth, $selectedYear) = explode("-", $this->getDate());
-
-        // TODO replace all params below with corresponding values from the config option
-        // Use natural language ADF function to take in the string value from config and convert it into the time for todays date
-
         $selectedDate = @mktime(8, 0, 0, $selectedMonth, $selectedDay, $selectedYear);
-
         $this->setSelectedDate($selectedDate);
 
         if ($selectedDate <= 0) {
@@ -100,9 +96,12 @@ class Calendar_Layout_Full_Javascript extends Calendar_Layout_Full_Abstract
             $calendarView = 'month';
         }
 
+        $calendarStartDate = Alaress_Date_Format::newNaturalDate("today " . ConfigMapper::getInstance()->get('calendar_start_time'))->getDatabaseTime();
+
         $this->getPage()->setVar([
             'CALENDAR_USER_ID' => $this->getUser()->getId(),
             'CALENDAR_VIEW' => $calendarView,
+            'CALENDAR_START_TIME' => $calendarStartDate,
             'CALENDAR_COLLAPSE_EVENTS' => Config::get('calendar_collapse_events') ? 1 : '',
             'CALENDAR_START_DAY' => Config::get('calendar_start_day') ? : 0,
             'USER_TOKEN' => $this->getUser()->getKey(),
