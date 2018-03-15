@@ -9,6 +9,7 @@ use Schoolbox\Tour\Renderer as TourRenderer;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Config\ConfigMapper;
 
 class SitePage extends Page
 {
@@ -383,6 +384,7 @@ class SitePage extends Page
             'SYNERGETIC_SSO' => isset($_SESSION["communityLogin"]) ? 'true' : 'false',
             'FEEDBACK_TEXT' => Scrub::text($this->config->get('feedback_text')),
             'FEEDBACK_URL' => Scrub::text($this->config->get('feedback_url')),
+            'CALENDAR_START_TIME' => Alaress_Date_Format::newNaturalDate("today " . ConfigMapper::getInstance()->get('calendar_start_time'))->getDatabaseTime()
         );
 
         $this->setVar($templateVar);
