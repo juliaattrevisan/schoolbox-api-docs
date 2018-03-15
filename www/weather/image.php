@@ -35,3 +35,6 @@ if (is_string($file_path) && !stristr($file_path, '/.gif') ) {
     header('Content-type: image/gif');
     echo $file_contents;
 }
+else {
+    SitePage::redirectToBrokenImageOfSize(50, 50, 404);
+}
