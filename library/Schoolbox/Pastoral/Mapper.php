@@ -375,14 +375,15 @@ class Mapper extends BaseMapper
      * @return Collection|Model[]
      * @throws MapperException
      */
-    public function findRecentDashboard(User $user)
+    public function findRecentDashboard(User $user, $limit = 5)
     {
         return $this->filterRecordsForUser(
             $this->findByColumnList([
                 'sv.dashboard' => 1,
             ], [
-                ['order' => ['created_at' => 'DESC']],
-            ]),
+                'order' => ['created_at' => 'DESC'], 'limit' => 5
+            ]
+            ),
             $user
         );
     }

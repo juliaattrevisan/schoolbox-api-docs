@@ -241,9 +241,8 @@ class DataSource
         // The mapper method is user-sensitive,
         // but filter anyway as it's better to be explicit than implicit.
 
-        return $this->mapper->filterRecordsForUser($this->mapper->findRecentDashboard($currentUser), $currentUser)
-                            ->sortBy('updatedAtDisplay', 'desc')
-                            ->limit($count);
+        return $this->mapper->filterRecordsForUser($this->mapper->findRecentDashboard($currentUser, $count), $currentUser)
+                            ->sortBy('updatedAtDisplay', 'desc');
     }
 
     /**
