@@ -52,7 +52,10 @@ class Calendar_Layout_Full_Javascript extends Calendar_Layout_Full_Abstract
     {
         list($selectedDay, $selectedMonth, $selectedYear) = explode("-", $this->getDate());
 
-        $selectedDate = @mktime(0, 0, 0, $selectedMonth, $selectedDay, $selectedYear);
+        // TODO replace all params below with corresponding values from the config option
+        // Use natural language ADF function to take in the string value from config and convert it into the time for todays date
+
+        $selectedDate = @mktime(8, 0, 0, $selectedMonth, $selectedDay, $selectedYear);
 
         $this->setSelectedDate($selectedDate);
 
