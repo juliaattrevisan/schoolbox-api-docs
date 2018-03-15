@@ -334,11 +334,13 @@ class Report_Parent extends Report_Abstract
         if (is_array($allContacts) && count($allContacts)) {
 
             // Show search options
-            if (!$this->getYearLevel() && !$this->getSearchName() && !$this->getSearchForm() && !$this->getSearchBoardingStatus()) {
+            if (!strlen($this->getYearLevel()) && !$this->getSearchName() && !$this->getSearchForm() && !$this->getSearchBoardingStatus()) {
                 $this->getPage()->parse('show_filter_options_block', 'show_filter_options');
             }
 
-            for ($lastID = -1, $i = 0; $i <= count($allContacts); $i++) {
+            $count = count($allContacts);
+
+            for ($lastID = -1, $i = 0; $i <= $count; $i++) {
                 $currentContact = $allContacts[$i];
 
                 /* New student, or first student
