@@ -625,7 +625,7 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
       // Make the field readonly
       $(t).prop("readonly", true);
 
-      var timestamp = strtotime(t.value);
+      var timestamp = parseTime(t.value);
 
       // If it couldn't parse a date - show a validation error on the form
       if (timestamp === false) {
@@ -712,6 +712,55 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
       // }
     }
   }
+
+
+    /**
+     * JS port of /ajax/strtotime.php.
+     *
+     * @param text
+     * @returns {*}
+     */
+    function parseTime(text) {
+        return strtotime(denaturalize(text));
+    }
+
+
+    /**
+     * Smooth out formats so strtotime digests times more easily
+     *
+     * @param text
+     * @returns {string}
+     */
+    function denaturalize(text) {
+        // normalise any whitespace
+        // remove "^in " and " from now$"
+        // replace all word-numbers with number-numbers
+        // known limitation: 23:00am fails to parse
+        // replace / with - so that strtotime recognises D/M/Y instead of heretical M/D/Y format
+        return text
+            .toLowerCase()
+            .replace(/^in\s+/g, '')
+            .replace(/from\s+now$/g, '')
+            .replace(/at/g, '')
+            .replace(/on/g, '')
+            .replace(/,/g, '')
+            .replace(/zero/g, '0')
+            .replace(/one/g, '1')
+            .replace(/two/g, '2')
+            .replace(/three/g, '3')
+            .replace(/four/g, '4')
+            .replace(/five/g, '5')
+            .replace(/six/g, '6')
+            .replace(/seven/g, '7')
+            .replace(/eight/g, '8')
+            .replace(/nine/g, '9')
+            .replace(/ten/g, '10')
+            .replace(/eleven/g, '11')
+            .replace(/twelve/g, '12')
+            .replace(/\//g, '-')
+            .replace(/\s+/g, ' ')
+        ;
+    }
 
 
     /**
