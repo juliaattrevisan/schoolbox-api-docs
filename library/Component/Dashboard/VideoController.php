@@ -93,7 +93,7 @@ class Component_Dashboard_VideoController extends Component_Dashboard_Controller
         // Set up component name
         $this->setVar(
             array(
-                'COMPONENT_NAME' => strlen(trim($this->getConfig('componentname'))) ? Scrub::text($this->getConfig('componentname')) : 'Video',
+                'COMPONENT_NAME' => strlen($this->getConfig('componentname')) ? Scrub::text($this->getConfig('componentname')) : 'Video',
                 'FILE_CAT_ID'    => $this->source_category_id,
             )
         );

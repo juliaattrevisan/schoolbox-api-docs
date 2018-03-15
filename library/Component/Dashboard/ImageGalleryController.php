@@ -83,7 +83,7 @@ class Component_Dashboard_ImageGalleryController extends Component_Dashboard_Con
          */
         $this->setVar(
             array(
-                'COMPONENT_NAME'           => strlen(trim($this->getConfig('componentname'))) ? Scrub::text($this->getConfig('componentname')) : 'Image Gallery',
+                'COMPONENT_NAME'           => strlen($this->getConfig('componentname')) ? Scrub::text($this->getConfig('componentname')) : 'Image Gallery',
                 'IMAGEGALLERY_CATEGORY_ID' => $this->getSource()->getId()
             )
         );

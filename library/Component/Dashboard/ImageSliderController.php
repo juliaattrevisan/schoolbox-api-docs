@@ -87,7 +87,7 @@ class Component_Dashboard_ImageSliderController extends Component_Dashboard_Cont
         // Set up component name
         $this->setVar(
             'COMPONENT_NAME',
-            strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : 'Image Slider'
+            strlen($this->getConfig('componentname')) ? $this->getConfig('componentname') : 'Image Slider'
         );
 
         /* Prevent multiple galleries from other categories stacking up in the wrong place

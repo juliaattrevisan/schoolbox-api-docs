@@ -74,7 +74,7 @@ class Component_Dashboard_ScrollerController extends Component_Dashboard_Control
         // Set up component name
         $this->setVar(
             'COMPONENT_NAME',
-            strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : 'Image Slideshow'
+            strlen($this->getConfig('componentname')) ? $this->getConfig('componentname') : 'Image Slideshow'
         );
 
         /* Prevent multiple galleries from other categories stacking up in the wrong place

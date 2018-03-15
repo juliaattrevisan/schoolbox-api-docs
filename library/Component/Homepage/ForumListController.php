@@ -103,7 +103,7 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
                 'COMPONENT_CONFIG_SRC_ID' => $this->getSource()->getId(),
                 'COMPONENT_CONFIG_SRC_NAME' => $this->getSource()->getName(),
                 'COMPONENT_HANDLE' => strtolower($templateHandle),
-                'COMPONENT_NAME' => strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : $this->getComponentName(),
+                'COMPONENT_NAME' => strlen($this->getConfig('componentname')) ? $this->getConfig('componentname') : $this->getComponentName(),
             ]);
 
             if (!$this->isSourceRenderable()) {

@@ -485,7 +485,7 @@ abstract class Component_ControllerAbstract
             // Special case for componentname default value when empty
 
             if ($key == 'componentname') {
-                if (!strlen(trim($params['value']))) {
+                if (!strlen($params['value'])) {
                     $componentname = $this->getComponentName();
                 } else {
                     $componentname = Scrub::text($params['value']);
