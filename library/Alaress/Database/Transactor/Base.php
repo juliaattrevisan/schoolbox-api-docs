@@ -12,6 +12,7 @@ use Alaress\Database\Broker\IBroker;
 
 /**
  * Base transactor class, implements the most basic transaction functionality
+ * plus hooks that run when the entire transaction is committed.
  */
 class Base
 {
@@ -21,6 +22,13 @@ class Base
      * @var IBroker
      */
     private $broker;
+
+    /**
+     * A list of callbacks to call when the entire transaction is committed.
+     *
+     * @var callable[][]
+     */
+    private $onPersistHooks = [];
 
     /**
      * Constructor
@@ -39,6 +47,7 @@ class Base
      */
     public function beginTransaction(): bool
     {
+        $this->onPersistHooks[] = [];
         return $this->broker->beginTransaction();
     }
 
@@ -59,7 +68,27 @@ class Base
      */
     public function commit(): bool
     {
-        return $this->broker->commit();
+        if ($this->broker->commit()) {
+            if ($this->inTransaction()) {
+                // Are all transactions complete?
+                // Run hooks FIFO
+                foreach ($this->onPersistHooks as $persistHooks) {
+                    foreach ($persistHooks as $persistHook) {
+                        $persistHook();
+                    }
+                }
+                $this->onPersistHooks = [];
+            } else {
+                // Not yet complete?
+                // Shift this nesting level's hooks onto the next most recent level
+                $committedHooks = array_pop($this->onPersistHooks);
+                $currentHooks   = array_pop($this->onPersistHooks);
+                $this->onPersistHooks[] = array_merge($currentHooks, $committedHooks);
+            }
+            return true;
+        }
+        // Something went wrong
+        return false;
     }
 
     /**
@@ -69,6 +98,19 @@ class Base
      */
     public function rollback(): bool
     {
-        return $this->broker->rollBack();
+        if ($this->broker->rollBack()) {
+            if ($this->inTransaction()) {
+                // Are all transactions complete?
+                // Discard all hooks
+                $this->onPersistHooks = [];
+            } else {
+                // Not yet complete?
+                // Discard current level's hooks
+                array_pop($this->onPersistHooks);
+            }
+            return true;
+        }
+        // Something went wrong
+        return false;
     }
 }
