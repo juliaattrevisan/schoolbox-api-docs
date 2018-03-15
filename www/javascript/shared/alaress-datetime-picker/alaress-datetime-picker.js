@@ -613,10 +613,10 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
     ) {
       // set up params to guide server-side parsing
       var opts = adtp.getOptions($(t));
-      var params = {
-        string: t.value
-      };
-      var xhr = $.get("/ajax/strtotime.php", params);
+      // var params = {
+      //   string: t.value
+      // };
+      // var xhr = $.get("/ajax/strtotime.php", params);
       var $fieldError = $("#" + $(t).attr("id") + "-error"); // A possible validation error for this field
 
       // Hide any validation error while this is processing
@@ -625,96 +625,91 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
       // Make the field readonly
       $(t).prop("readonly", true);
 
-      xhr
-        .done(function(data) {
-          $(t).prop("readonly", false);
+      var timestamp = strtotime(t.value);
 
-          // If it couldn't parse a date - show a validation error on the form
-          if (data.error) {
-            $(t).addClass("error");
+      // If it couldn't parse a date - show a validation error on the form
+      if (timestamp === false) {
 
-            if (!$fieldError.length) {
-              // don't create multiple errors
+        if (!$fieldError.length) {
+          // don't create multiple errors
 
-              var error =
-                '<label id="' +
-                $(t).attr("id") +
-                '-error" class="error" for="' +
-                $(t).attr("id") +
-                '">Please enter a valid date</label>';
+          var error =
+            '<label id="' +
+            $(t).attr("id") +
+            '-error" class="error" for="' +
+            $(t).attr("id") +
+            '">Please enter a valid date</label>';
 
-              if ($(t).closest(".input-group").length) {
-                $(t)
-                  .closest(".input-group")
-                  .after(error);
-              } else {
-                $(t).after(error);
-              }
-            } else {
-              // It might be hidden - show
-              $fieldError.show();
-            }
+          if ($(t).closest(".input-group").length) {
+            $(t)
+              .closest(".input-group")
+              .after(error);
           } else {
-            var newDate = moment(data.time);
-
-            // If field has all day switch data param and is end or start of day - make all day
-            var state =
-              (newDate.format("HHmm") == "0000" ||
-                newDate.format("HHmm") == "2359") &&
-              opts.allDaySwitch;
-
-            // Does the linked element (if any) have time?
-            if (opts.allDayInput) {
-              var linkedElements = getLinkedElements($(t), opts);
-
-              linkedElements.forEach(function(item) {
-                var itemOptions = adtp.getOptions($(item));
-                var itemDate = moment(
-                  item.val(),
-                  adtp.convertFormat(itemOptions.displayFormat)
-                );
-                var itemState =
-                  (itemDate.format("HHmm") == "0000" ||
-                    itemDate.format("HHmm") == "2359") &&
-                  state;
-
-                // Update the state of the linked field
-                setValue($(item), itemOptions, itemState, true);
-
-                // Update the original field's state to make consistent
-                // Note: all fields in the group must be 0000 or 2359 in order for all day to be switched on
-                state = itemState;
-              });
-            }
-
-            // Add the parsed date into the field
-            // assumption: if time is 00:00:00 and the endDay flag is set, push to 23:59:59 instead
-            // this causes a limitation that it is *not possible* to set a field of this nature to midnight
-            setValue($(t), opts, state, true, newDate);
-
-            // Sync dates if applicable
-            adtp.syncDatesOnElement($(t), opts, "");
-
-            // Remove any error class on the field
-            $(t).removeClass("error");
-
-            // Hide any validation error
-            $fieldError.hide();
+            $(t).after(error);
           }
-        })
-        .always(function() {
-          $(t).prop("readonly", false);
-        });
+        } else {
+          // It might be hidden - show
+          $fieldError.show();
+        }
+      } else {
+        var newDate = moment.unix(timestamp);
+
+        // If field has all day switch data param and is end or start of day - make all day
+        var state =
+          (newDate.format("HHmm") == "0000" ||
+            newDate.format("HHmm") == "2359") &&
+          opts.allDaySwitch;
+
+        // Does the linked element (if any) have time?
+        if (opts.allDayInput) {
+          var linkedElements = getLinkedElements($(t), opts);
+
+          linkedElements.forEach(function(item) {
+            var itemOptions = adtp.getOptions($(item));
+            var itemDate = moment(
+              item.val(),
+              adtp.convertFormat(itemOptions.displayFormat)
+            );
+            var itemState =
+              (itemDate.format("HHmm") == "0000" ||
+                itemDate.format("HHmm") == "2359") &&
+              state;
+
+            // Update the state of the linked field
+            setValue($(item), itemOptions, itemState, true);
+
+            // Update the original field's state to make consistent
+            // Note: all fields in the group must be 0000 or 2359 in order for all day to be switched on
+            state = itemState;
+          });
+        }
+
+        // Add the parsed date into the field
+        // assumption: if time is 00:00:00 and the endDay flag is set, push to 23:59:59 instead
+        // this causes a limitation that it is *not possible* to set a field of this nature to midnight
+        setValue($(t), opts, state, true, newDate);
+
+        // Sync dates if applicable
+        adtp.syncDatesOnElement($(t), opts, "");
+
+        // Remove any error class on the field
+        $(t).removeClass("error");
+
+        // Hide any validation error
+        $fieldError.hide();
+      }
+
+      $(t).prop("readonly", false);
 
       // Fire a custom event for change of this
       // This has to happen here (rather than on xhr done above) so that the staller can pick up on this
       $(t).trigger("datepickerChange");
 
-      // this listener needs to be installed last in this case
-      if (staller) {
-        // install this XHR as stalling form submit
-        staller.stallSubmit(xhr);
-      }
+      // // this listener needs to be installed last in this case
+      // if (staller) {
+      //   // install this XHR as stalling form submit
+      //   staller.stallSubmit(xhr);
+      // }
     }
   }
 
