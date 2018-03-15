@@ -82,40 +82,41 @@ feedback: currentFeedback,
     {% set actionClass = '' %}
 {% endif %}
 
+{% set prefix = '' %}
+{% if not currentFeedback.published %}
+    {% set prefix = 'Draft' %}
+{% endif %}
+
+{% if currentFeedback.isSelfGrading %}
+    {% set prefix = prefix ~ ' '~ locale.selfAssessment.proper %}
+{% elseif currentFeedback.isSelfReflectionOnly %}
+    {% set prefix = prefix ~ ' '~ locale.selfReflection.proper %}
+{% else %}
+    {% set prefix = prefix ~ ' Feedback by ' ~  currentFeedback.reviewer.fullname  %}
+{% endif %}
+
+{% set feedbackPublishDate = currentFeedback.published ? currentFeedback.publishedAt.short : currentFeedback.updatedAt.short %}
+
 <ul class="information-list reply">
     <li class="{{ actionClass }}">
         <div class="list-item flex-grade">
-            <div class="card small-12 sibling">
+            {% block card %}
+            <div class="compact card small-12 sibling">
                 {% if url %}
                 <a href="{{ url }}" title="{{ tooltip }}">
                     {% endif %}
                     <img src="/portrait.php?userId={{ currentFeedback.reviewer.externalId }}&amp;size=square64" alt="">
                     <p>
-                        {% if not currentFeedback.published %}
-                            Draft
-                        {% endif %}
-                        {% if currentFeedback.isSelfGrading %}
-                            {{ locale.selfAssessment.proper }}
-                        {% elseif currentFeedback.isSelfReflectionOnly %}
-                            {{ locale.selfReflection.proper }}
-                        {% else %}
-                            Feedback by {{ currentFeedback.reviewer.fullname }}
-                        {% endif %}
-                        {% if currentFeedback.response.id %}
-                        <p class="meta">
-                            {{ currentFeedback.published ? currentFeedback.publishedAt.short : currentFeedback.updatedAt.short }}
-                        </p>
-                        {% endif %}
-                        {% if not currentFeedback.response.id %}
-                        <p class="meta">
-                            {{ currentFeedback.published ? currentFeedback.publishedAt.short : currentFeedback.updatedAt.short }}
-                        </p>
-                        {% endif %}
+                        {{ prefix }}
+                        <span class="pipe meta">
+                            {{ feedbackPublishDate }}
+                        </span>
                     </p>
                     {% if url %}
                 </a>
                 {% endif %}
             </div>
+            {% endblock card %}
             <div class="grade {{ urgency.marks(currentFeedback.normalisedMark) }}-bg">
                 <span>{{ currentFeedback.humanReadableMark }}</span>
             </div>

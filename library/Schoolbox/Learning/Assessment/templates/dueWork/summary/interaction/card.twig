@@ -1,0 +1,19 @@
+{% extends '@learningAssessment/dueWork/summary/interaction/feedback.twig' %}
+
+{% block card %}
+<div class="card small-12 sibling">
+    {% if url %}
+    <a href="{{ url }}" title="{{ tooltip }}">
+        {% endif %}
+        <img src="/portrait.php?userId={{ currentFeedback.reviewer.externalId }}&amp;size=square64" alt="">
+        <p>
+            {{ prefix }}
+            <p class="meta">
+                {{ feedbackPublishDate }}
+            </p>
+        </p>
+        {% if url %}
+    </a>
+    {% endif %}
+</div>
+{% endblock %}
