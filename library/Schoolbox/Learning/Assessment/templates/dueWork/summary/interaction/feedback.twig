@@ -85,7 +85,7 @@ feedback: currentFeedback,
 <ul class="information-list reply">
     <li class="{{ actionClass }}">
         <div class="list-item flex-grade">
-            <div class="compact card small-12 sibling">
+            <div class="card small-12 sibling">
                 {% if url %}
                 <a href="{{ url }}" title="{{ tooltip }}">
                     {% endif %}
@@ -102,14 +102,14 @@ feedback: currentFeedback,
                             Feedback by {{ currentFeedback.reviewer.fullname }}
                         {% endif %}
                         {% if currentFeedback.response.id %}
-                        <span class="pipe meta">
+                        <p class="meta">
                             {{ currentFeedback.published ? currentFeedback.publishedAt.short : currentFeedback.updatedAt.short }}
-                        </span>
+                        </p>
                         {% endif %}
                         {% if not currentFeedback.response.id %}
-                        <span class="pipe meta">
+                        <p class="meta">
                             {{ currentFeedback.published ? currentFeedback.publishedAt.short : currentFeedback.updatedAt.short }}
-                        </span>
+                        </p>
                         {% endif %}
                     </p>
                     {% if url %}
