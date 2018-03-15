@@ -642,16 +642,7 @@ class Factory
 
             // Show marks as series
             // Calculation in PHP is kind of annoying, but...
-            sort($marks);
-            $distribution['continuous']['series'] = [
-                'low'  => min($marks),
-                'high' => max($marks),
-            ];
-
-            // Median: midpoint value
-            // If exactly divisible into two, use midpoint of highest min and lowest max
-
-
+            $distribution['continuous']['series'] = $this->buildSeries($marks);
         }
         return $distribution;
     }
@@ -672,9 +663,19 @@ class Factory
         return $reportYear < 2018;
     }
 
-
-    private function median(array $values)
+    /**
+     * Determines the median value of $values.
+     *
+     * @param array $values
+     * @return float|null
+     */
+    private function median(array $values): ?float
     {
+        // This _could_ be abstracted to a percentile function, but percentiles
+        // are a surprisingly deep rabbit-hole:
+        // https://en.wikipedia.org/wiki/Percentile#The_nearest-rank_method
+        // https://en.wikipedia.org/wiki/Percentile#The_linear_interpolation_between_closest_ranks_method
+
         // Can't median a value which doesn't exist
         if (empty($values)) {
             return null;
@@ -683,7 +684,7 @@ class Factory
         // Only one value? it must be the median
         $count = \count($values);
         if ($count === 1) {
-            return array_pop($values);
+            return (float)array_pop($values);
         }
 
         // Median: midpoint value
@@ -691,18 +692,36 @@ class Factory
         sort($values);
         $index = ($count-1) / 2;
         if (\is_int($index)) {
-            return $values[$index];
+            return (float)$values[$index];
         }
 
         $lowValue  = $values[(int)floor($index)];
         $highValue = $values[(int)ceil($index)];
 
-        return ($highValue + $lowValue) / 2;
+        return (float)(($highValue + $lowValue) / 2);
+    }
 
+    /**
+     * Builds low/high/median/IQR for the list of marks.
+     *
+     * @param array $marks
+     * @return array
+     */
+    private function buildSeries(array $marks): array
+    {
+        sort($marks);
+        $series = [
+            'low'    => min($marks),
+            'high'   => max($marks),
+            'median' => $this->median($marks),
+        ];
 
-
-        // Percentiles are a surprisingly deep rabbit-hole:
-        // https://en.wikipedia.org/wiki/Percentile#The_nearest-rank_method
-        // https://en.wikipedia.org/wiki/Percentile#The_linear_interpolation_between_closest_ranks_method
+        // Calculate q1 (median of lower half), q3 (median of upper half)
+        $sliceSize  = (int)max(\count($marks) / 2, 1);
+        $lowValues  = \array_slice($marks, 0, $sliceSize);
+        $highValues = \array_slice($marks, -$sliceSize);
+        $series['q1'] = $this->median($lowValues);
+        $series['q3'] = $this->median($highValues);
+        return $series;
     }
 }
