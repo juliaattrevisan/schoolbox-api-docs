@@ -605,7 +605,7 @@ class Factory
         if (!empty($distribution['continuous']['marks'])) {
             $marks = array_map(
                 function ($v) {
-                    return $v['mark'];
+                    return (float)$v['mark'];
                 },
                 $distribution['continuous']['marks']
             );
@@ -639,6 +639,9 @@ class Factory
                     ? sprintf('%.1f', $prettySd)
                     : $prettySd,
             ];
+
+            // Show marks as series
+            $distribution['continuous']['series'] = $marks;
         }
         return $distribution;
     }

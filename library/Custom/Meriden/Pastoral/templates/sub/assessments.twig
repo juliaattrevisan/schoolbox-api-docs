@@ -53,7 +53,7 @@
                                     type: 'boxplot'
                                 },
                                 series: [{
-                                    data: [{{ workItem.distribution.continuous.marks|json_encode|raw }}]
+                                    data: [{{ workItem.distribution.continuous.series|json_encode|raw }}]
                                 }]
                             });
                         })
