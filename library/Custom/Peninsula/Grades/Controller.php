@@ -1,6 +1,6 @@
 <?php
 
-namespace Custom\Tps\Grades;
+namespace Custom\Peninsula\Grades;
 
 use Aura\Di\Exception\ServiceNotFound;
 use Schoolbox\Collection;

@@ -4,7 +4,7 @@
  * @copyright Copyright 2016, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-namespace Custom\Tps\Grades;
+namespace Custom\Peninsula\Grades;
 
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;

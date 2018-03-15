@@ -1,8 +1,8 @@
 <?php
-namespace Config\Modules\Custom\Tps;
+namespace Config\Modules\Custom\Peninsula;
 
 use Alaress\Application\Kernel;
-use Custom\Tps\Grades\Module;
+use Custom\Peninsula\Grades\Module;
 use Config\Modules\ModuleConfigInterface;
 
 class Grades implements ModuleConfigInterface
@@ -17,7 +17,7 @@ class Grades implements ModuleConfigInterface
     public function configure($kernel)
     {
         $di = $kernel->getDependencyInjector();
-        if ($di->get('config')->get('site_location') == 'tps') {
+        if ($di->get('config')->get('site_location') == 'peninsula') {
             $module = new Module($di);
             // Override previous definition
             $module->initOverride('/learning/grades');
