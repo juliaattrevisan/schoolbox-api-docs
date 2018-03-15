@@ -120,7 +120,6 @@ feedback: currentFeedback,
                 <span>{{ currentFeedback.humanReadableMark }}</span>
             </div>
         </div>
-
         <nav>
             {% if hasCollapser %}
                 <a href="#" class="icon-down-arrow" data-collapser="feedback-{{ responseId }}-{{ currentFeedback.id }}"></a>
@@ -129,16 +128,6 @@ feedback: currentFeedback,
                 <a class="icon-delete" data-delete="{{ deleteRoute }}"></a>
             {% endif %}
         </nav>
-
-        {% if currentFeedback.comment|length %}
-            <article class="{{ collapsed? 'hide' : '' }}"
-                     {% if hasCollapser %}
-                     data-collapse-state="{{ collapsed? 'collapsed' : 'expanded' }}"
-                     data-collapsable="feedback-{{ responseId }}-{{ currentFeedback.id }}"
-                     {% endif %}>
-                {{ currentFeedback.comment|nl2br }}
-            </article>
-        {% endif %}
 
         {# Rubric goes here #}
         {% if feedbackRubricContexts[currentFeedback.id] %}
@@ -153,6 +142,16 @@ feedback: currentFeedback,
                                     or participant.assessable.isFeedbackVisibleToUser(USER),
                 } only %}
             </div>
+        {% endif %}
+
+        {% if currentFeedback.comment|length %}
+            <article class="{{ collapsed? 'hide' : '' }}"
+                    {% if hasCollapser %}
+                data-collapse-state="{{ collapsed? 'collapsed' : 'expanded' }}"
+                data-collapsable="feedback-{{ responseId }}-{{ currentFeedback.id }}"
+                    {% endif %}>
+                {{ currentFeedback.comment|nl2br }}
+            </article>
         {% endif %}
 
         {% if currentFeedback.allFiles | length %}
