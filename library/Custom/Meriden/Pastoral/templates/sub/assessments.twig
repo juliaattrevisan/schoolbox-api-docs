@@ -49,16 +49,24 @@
                     (function($){
                         $(function() {
                             $('#assessmentGraph-{{ workItem.assessment.id }}-{{ student.id }}').highcharts({
-                                chart: {
-                                    type: 'boxplot'
-                                },
                                 title: {
                                     text: null
                                 },
-                                series: [{
-                                    name: "{{ workItem.assessment.title }}",
-                                    data: [{{ workItem.distribution.continuous.series|json_encode|raw }}]
-                                }],
+                                series: [
+                                    {
+                                        type: 'boxplot',
+                                        name: "{{ workItem.assessment.title }}",
+                                        data: [{{ workItem.distribution.continuous.series|json_encode|raw }}]
+                                    },
+                                    {
+                                        type: 'scatter',
+                                        color: 'rgb(255, 87, 87)',
+                                        marker: {
+                                            radius: 6
+                                        },
+                                        data: [(Number)("{{ workItem.mark }}")]
+                                    }
+                                ],
                                 yAxis: {
                                     min: 0,
                                     max: 100
