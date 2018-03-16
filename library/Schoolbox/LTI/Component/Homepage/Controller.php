@@ -58,8 +58,15 @@ class Controller extends Component_Homepage_ControllerAbstract
             'order' => ['name' => 'asc']
         ]);
 
-        // Render launcher form
+        // Read-only users see nothing at all if no LTI providers exist,
+        // or none is set up for this component.
+        $providerId = $this->getConfig('ltiprovider');
+        $readOnly   = $this->getContentPermission() < UserAccess::ACCESS_WRITE;
+        if ($readOnly && (!$providerId || $providers->count() === 0)) {
+            return false;
+        }
 
+        // Render launcher form
         return $this->renderTwigTemplate(
             $templateHandle,
             '@lti/component.twig',
@@ -69,7 +76,6 @@ class Controller extends Component_Homepage_ControllerAbstract
                 'providers' => $providers,
                 'folderId' => $this->getContext()->getId(),
                 'height' => preg_replace("/[^0-9]/", "", $this->getConfig('pixel')),
-                'readOnly' => ($this->getContentPermission() < UserAccess::ACCESS_WRITE),
                 'user' => $this->getUser()
             ],
             $this->hasWriteAccess() || !$this->getConfig('compactMode')

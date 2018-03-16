@@ -6,9 +6,7 @@
                 <div class="empty-state">
                     <i class="icon-lti"></i>
 
-                    {% if readOnly %}
-                        <p>There is no embedded learning tool to interact with at this time.</p>
-                    {% elseif user.superUser %}
+                    {% if user.superUser %}
                         <p>
                             <a href="/adminv2/lti">Add an LTI provider</a> in the Administration system to allow
                             users to embed third party embedded learning tools in this component.
@@ -32,7 +30,6 @@
                 <section>
                     <div class="empty-state">
                         <i class="icon-settings"></i>
-                        {% if not readOnly %}
                             <p>
                                 Select a third party embedded learning tool to display in this component for users to
                                 interact with.
@@ -50,9 +47,6 @@
                                 {% endfor %}
                             </p>
                         </div>
-                    {% else %}
-                        <p>There is no content to view at this time.</p>
-                    {% endif %}
                 </section>
             </div>
         </div>
