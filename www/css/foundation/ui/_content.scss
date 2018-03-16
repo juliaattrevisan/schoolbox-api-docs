@@ -1281,7 +1281,7 @@ $selector-width: 2.25rem;
     }
     .reply ~ .reply,
     .child ~ .child {
-        border-top: 1px solid $base;
+        border-top: 1px solid $body-bg;
     }
 }
 
