@@ -195,7 +195,7 @@ feedback: currentFeedback,
             </ul>
         {% endif %}
         {# Rubric goes here #}
-        {% if feedbackRubricContexts[currentFeedback.id] %}
+        {% if feedbackRubricContexts[currentFeedback.id].rubric %}
             <div class="rubric-wrap {{ collapsed? 'hide' : '' }}"
                  {% if hasCollapser %}
                  data-collapse-state="{{ collapsed? 'collapsed' : 'expanded' }}"
