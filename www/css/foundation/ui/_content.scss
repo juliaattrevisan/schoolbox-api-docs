@@ -1158,6 +1158,9 @@ $selector-width: 2.25rem;
             margin-left: 0;
         }
     }
+    ~ blockquote {
+        margin-bottom: 0;
+    }
 }
 
 // Show & Hide Task List
@@ -1255,6 +1258,7 @@ $selector-width: 2.25rem;
 
         blockquote {
             margin-left: 1rem;
+            margin-bottom: 0;
         }
 
         .card{
