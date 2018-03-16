@@ -62,6 +62,18 @@
                                 credits: {
                                     enabled: false
                                 },
+                                xAxis: {
+                                    text: null,
+                                    labels: {
+                                        enabled: false
+                                    },
+                                    tickLength: 0
+                                },
+                                yAxis: {
+                                    min: 0,
+                                    max: 100,
+                                    text: null
+                                },
                                 series: [
                                     {
                                         type: 'boxplot',
@@ -116,11 +128,7 @@
                                             }
                                         }
                                     }
-                                ],
-                                yAxis: {
-                                    min: 0,
-                                    max: 100
-                                }
+                                ]
                             });
                         })
                     })(jQuery);
