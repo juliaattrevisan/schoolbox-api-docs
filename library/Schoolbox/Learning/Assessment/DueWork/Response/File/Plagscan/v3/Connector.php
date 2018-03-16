@@ -255,6 +255,13 @@ class Connector
              * - currently being checked
              */
             return false;
+        } elseif ($response->getStatusCode() == 404) {
+
+            /* This document is getting checked; wait for plagscan to do its thing
+             * The current string is "The document is on conversion process.",
+             * but I'm just going to assume it's still waiting.
+             */
+            return false;
         }
 
         /* If you ended up here, the document can't be analysed for various reasons
