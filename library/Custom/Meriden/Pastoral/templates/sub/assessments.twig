@@ -87,7 +87,16 @@
                                     {
                                         type: 'boxplot',
                                         name: null,
-                                        data: [{{ workItem.distribution.continuous.series|json_encode|raw }}]
+                                        data: [{{ workItem.distribution.continuous.series|json_encode|raw }}],
+                                        tooltip: {
+                                            headerFormat: '',
+                                            pointFormat:
+                                                'Maximum: {point.high}<br/>' +
+                                                'Upper quartile: {point.q3}<br/>' +
+                                                'Median: {point.median}<br/>' +
+                                                'Lower quartile: {point.q1}<br/>' +
+                                                'Minimum: {point.low}<br/>'
+                                        }
                                     },
                                     {
                                         type: 'scatter',
