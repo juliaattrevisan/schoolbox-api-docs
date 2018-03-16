@@ -49,6 +49,9 @@
                     (function($){
                         $(function() {
                             $('#assessmentGraph-{{ workItem.assessment.id }}-{{ student.id }}').highcharts({
+                                chart: {
+                                    inverted: true
+                                },
                                 title: {
                                     text: null
                                 },
