@@ -146,13 +146,13 @@ feedback: currentFeedback,
         {% endif %}
 
         {% if currentFeedback.comment|length %}
-            <article class="{{ collapsed? 'hide' : '' }}"
+            <blockquote class="{{ collapsed? 'hide' : '' }}"
                     {% if hasCollapser %}
                 data-collapse-state="{{ collapsed? 'collapsed' : 'expanded' }}"
                 data-collapsable="feedback-{{ responseId }}-{{ currentFeedback.id }}"
                     {% endif %}>
                 {{ currentFeedback.comment|nl2br }}
-            </article>
+            </blockquote>
         {% endif %}
 
         {% if currentFeedback.allFiles | length %}
