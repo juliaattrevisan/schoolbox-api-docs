@@ -1,3 +1,9 @@
+.rubric-wrap {
+    border-top: solid 0.5rem $body-bg;
+}
+.reply .rubric-wrap {
+    border-top-color: $snow;
+}
 table.rb {
     [colspan] {
         border-right-width: 0 !important;
