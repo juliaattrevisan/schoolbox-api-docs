@@ -111,15 +111,6 @@ $align-block-grid-to-grid: true;
 
     @media #{$small-only} {
         padding: 0;
-
-        table {
-            td:first-child, th:first-child {
-                padding-left: $wide-margin;
-            }
-            td:last-child, th:last-child {
-                padding-right: $wide-margin;
-            }
-        }
     }
 
     @media #{$medium-only} {

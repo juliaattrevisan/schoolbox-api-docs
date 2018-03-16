@@ -1117,7 +1117,7 @@ $selector-width: 2.25rem;
 
 .grade{
     font-size: rem-calc(($base-font-size - 4));
-    padding: .5rem 1rem;
+    padding: .285rem 1rem;
     span {
         display: block;
         white-space: nowrap;
@@ -1155,8 +1155,11 @@ $selector-width: 2.25rem;
         .grade {
             flex: 1 1 auto;
             margin-bottom: 1rem;
-            margin-left: 1rem;
+            margin-left: 0;
         }
+    }
+    ~ blockquote {
+        margin-bottom: 0;
     }
 }
 
@@ -1253,6 +1256,11 @@ $selector-width: 2.25rem;
             padding-left: 0.5rem;
         }
 
+        blockquote {
+            margin-left: 1rem;
+            margin-bottom: 0;
+        }
+
         .card{
             margin-left: 1rem;
             img{
@@ -1274,6 +1282,10 @@ $selector-width: 2.25rem;
                 margin-top: 1rem;
             }
         }
+    }
+    .reply ~ .reply,
+    .child ~ .child {
+        border-top: 1px solid $body-bg;
     }
 }
 

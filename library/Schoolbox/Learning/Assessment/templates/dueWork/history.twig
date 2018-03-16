@@ -3,7 +3,7 @@
 <script type="text/javascript">
     $(function() {
 
-        var $history = $('#history');
+        var $history = $('[data-submission-history]');
 
         $history.find('[data-collapser]').collapsable();
 
@@ -56,27 +56,29 @@
 <div class="row">
     <div class="small-12 island">
         <h2 class="subheader">{{ locale.submissionHistory.proper }}</h2>
-
-        <section id='history'>
             {% for currentInteraction in timeline %}
+                <section class="submission-history" data-submission-history>
                 {% if currentInteraction is response %}
                     {% include '@learningAssessment/dueWork/summary/interaction/response.twig' with {
                         currentInteraction: currentInteraction,
                         participant: participant,
                     } %}
                 {% elseif currentInteraction is feedback %}
+
+                    {% set hasCollapser = currentInteraction.allFiles.count or currentInteraction.comment | length > 0 or feedbackRubricContexts[currentInteraction.id].rubric %}
+
+
                     {% include '@learningAssessment/dueWork/summary/interaction/feedback.twig' with {
                         currentFeedback: currentInteraction,
                         participant: participant,
-                        hasCollapser: true,
+                        hasCollapser: hasCollapser,
                         collapsed: true,
                         deleteIcon: true,
                     } %}
                 {% endif %}
+                </section>
             {% endfor %}
-
-            <div class="toast" data-alert></div>
-        </section>
+        <div class="toast" data-alert></div>
     </div>
 </div>
 {% else %}
