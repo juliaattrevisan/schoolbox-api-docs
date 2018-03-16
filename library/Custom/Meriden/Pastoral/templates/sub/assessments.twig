@@ -48,6 +48,7 @@
                 <script type="text/javascript">
                     (function($){
                         $(function() {
+                            var prettyMark = "{{ workItem.pretty_mark | replace({'%': ''}) }}";
                             $('#assessmentGraph-{{ workItem.assessment.id }}-{{ student.id }}').highcharts({
                                 chart: {
                                     inverted: true
@@ -67,7 +68,46 @@
                                         marker: {
                                             radius: 6
                                         },
-                                        data: [(Number)("{{ workItem.mark }}")]
+                                        data: [(Number)("{{ workItem.mark }}")],
+                                        tooltip: {
+                                            headerFormat: '',
+                                            borderColor: '#000000',
+                                            pointFormatter: function () {
+                                                /* Basic template for each outlier
+                                                 */
+                                                var template =
+                                                    '<div style="width:200px!important;overflow:auto;white-space:normal !important;">' +
+                                                    '<div class="grade gradient-{GRADIENTMARK}"><span>{DISPLAYMARK}</span></div>' +
+                                                    // '<p class="comment">{INFO}</p>' +
+                                                    '</div>';
+                                                /* Concatenate everything
+                                                 */
+                                                if (typeof prettyMark !== 'undefined') {
+                                                    var tooltipContent = template;
+
+                                                    if (prettyMark !== null) {
+                                                        tooltipContent = tooltipContent.replace(/{DISPLAYMARK}/, prettyMark);
+                                                        tooltipContent = tooltipContent.replace(/{GRADIENTMARK}/, '10');
+                                                    }
+                                                    else {
+                                                        tooltipContent = tooltipContent.replace(/{DISPLAYMARK}/, '');
+                                                        tooltipContent = tooltipContent.replace(/{GRADIENTMARK}/, '10');
+                                                    }
+                                                    // tooltipContent = tooltipContent.replace(/{INFO}/, infoIndex[this.x].info);
+
+                                                    /* Show tooltip
+                                                     */
+                                                    $('.highcharts-tooltip').show();
+
+                                                    return tooltipContent;
+                                                } else {
+
+                                                    /* Hide tooltip when no data
+                                                     */
+                                                    $('.highcharts-tooltip').hide();
+                                                }
+                                            }
+                                        }
                                     }
                                 ],
                                 yAxis: {
