@@ -3,7 +3,7 @@
 <script type="text/javascript">
     $(function() {
 
-        var $history = $('.submission-history');
+        var $history = $('[data-submission-history]');
 
         $history.find('[data-collapser]').collapsable();
 
@@ -57,7 +57,7 @@
     <div class="small-12 island">
         <h2 class="subheader">{{ locale.submissionHistory.proper }}</h2>
             {% for currentInteraction in timeline %}
-                <section class="submission-history">
+                <section class="submission-history" data-submission-history>
                 {% if currentInteraction is response %}
                     {% include '@learningAssessment/dueWork/summary/interaction/response.twig' with {
                         currentInteraction: currentInteraction,
