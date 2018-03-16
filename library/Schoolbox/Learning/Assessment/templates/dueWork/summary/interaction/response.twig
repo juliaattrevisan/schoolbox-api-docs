@@ -93,6 +93,8 @@
 
                 {% for currentFeedback in currentInteraction.allFeedback %}
 
+                    {% set hasCollapser = currentFeedback.allFiles.count or currentFeedback.comment | length > 0 or feedbackRubricContexts[currentFeedback.id].rubric %}
+
                     {# We pass the responseId as well, so that people can download annotated kami docs
                      #}
                     {# TODO restore only to include, as rubricContext shouldn't be passed in #}
@@ -102,7 +104,7 @@
                         assessmentId: currentInteraction.assessable.id,
                         responseId: currentInteraction.id,
                         participant: participant,
-                        hasCollapser: true,
+                        hasCollapser: hasCollapser,
                         collapsed: true,
                         feedbackRubricContexts: feedbackRubricContexts,
                         deleteIcon: true,
