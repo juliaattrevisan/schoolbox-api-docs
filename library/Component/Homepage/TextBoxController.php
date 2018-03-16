@@ -53,7 +53,7 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
          */
         if (strlen(trim($textBoxHeading))) {
             $this->setComponentName($textBoxHeading);
-        } elseif (strlen(trim($this->getConfig('textBoxComponentName')))) {
+        } elseif (strlen($this->getConfig('textBoxComponentName'))) {
             $this->setComponentName(Scrub::text($this->getConfig('textBoxComponentName')));
         } else {
             $this->getComponentName();
