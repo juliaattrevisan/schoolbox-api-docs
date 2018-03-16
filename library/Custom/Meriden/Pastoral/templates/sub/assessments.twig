@@ -51,7 +51,8 @@
                             var prettyMark = "{{ workItem.pretty_mark | replace({'%': ''}) }}";
                             $('#assessmentGraph-{{ workItem.assessment.id }}-{{ student.id }}').highcharts({
                                 chart: {
-                                    inverted: true
+                                    inverted: true,
+                                    height: 150
                                 },
                                 title: {
                                     text: null
@@ -63,7 +64,9 @@
                                     enabled: false
                                 },
                                 xAxis: {
-                                    text: null,
+                                    title: {
+                                        text: null
+                                    },
                                     labels: {
                                         enabled: false
                                     },
@@ -72,7 +75,13 @@
                                 yAxis: {
                                     min: 0,
                                     max: 100,
-                                    text: null
+                                    tickInterval: 25,
+                                    title: {
+                                        text: null
+                                    },
+                                    labels: {
+                                        step: 2
+                                    }
                                 },
                                 series: [
                                     {
