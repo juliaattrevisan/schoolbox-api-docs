@@ -140,21 +140,6 @@ feedback: currentFeedback,
             </blockquote>
         {% endif %}
 
-        {# Rubric goes here #}
-        {% if feedbackRubricContexts[currentFeedback.id] %}
-            <div class="{{ collapsed? 'hide' : '' }}"
-                 {% if hasCollapser %}
-                 data-collapse-state="{{ collapsed? 'collapsed' : 'expanded' }}"
-                 data-collapsable="feedback-{{ responseId }}-{{ currentFeedback.id }}"
-                 {% endif %}>
-                {% include '@rubric/grid.twig' with {
-                    rubric:         feedbackRubricContexts[currentFeedback.id].rubric,
-                    markVisibility: currentFeedback.isSelfAssessment
-                                    or participant.assessable.isFeedbackVisibleToUser(USER),
-                } only %}
-            </div>
-        {% endif %}
-
         {% if currentFeedback.allFiles | length %}
             <ul class="information-list {{ collapsed? 'hide' : '' }}"
                 data-collapse-state="{{ collapsed? 'collapsed' : 'expanded' }}"
@@ -209,5 +194,20 @@ feedback: currentFeedback,
                 {% endfor %}
             </ul>
         {% endif %}
+        {# Rubric goes here #}
+        {% if feedbackRubricContexts[currentFeedback.id] %}
+            <div class="rubric-wrap {{ collapsed? 'hide' : '' }}"
+                 {% if hasCollapser %}
+                 data-collapse-state="{{ collapsed? 'collapsed' : 'expanded' }}"
+                 data-collapsable="feedback-{{ responseId }}-{{ currentFeedback.id }}"
+                 {% endif %}>
+                {% include '@rubric/grid.twig' with {
+                    rubric:         feedbackRubricContexts[currentFeedback.id].rubric,
+                    markVisibility: currentFeedback.isSelfAssessment
+                                    or participant.assessable.isFeedbackVisibleToUser(USER),
+                } only %}
+            </div>
+        {% endif %}
+
     </li>
 </ul>
