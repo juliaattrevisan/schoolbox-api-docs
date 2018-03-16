@@ -548,6 +548,7 @@ class Module extends BaseModule
     private function buildAuthRuleCanViewStatus()
     {
         return new Rule\All(
+            new Rule\IsLoggedIn(),
             new AssessmentNotDeleted(),
             new Rule\Any(
                 $this->buildAuthRuleHomepageAccess(UserAccess::ACCESS_WRITE),
@@ -603,6 +604,7 @@ class Module extends BaseModule
     private function buildAuthRuleCanViewSummary(): Rule\IAuthorizationRule
     {
         return new Rule\All(
+            new Rule\IsLoggedIn(),
             new AssessmentNotDeleted(),
             new Rule\Any(
                 // Normal participants (whether explicit or dynamic participants)
