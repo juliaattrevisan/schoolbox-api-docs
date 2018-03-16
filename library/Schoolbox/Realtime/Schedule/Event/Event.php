@@ -181,7 +181,7 @@ class Event implements CrudEventInterface, Serializable, JsonSerializable {
                 throw $e;
             }
             // White list of models that are known to have this issue, and which we are confident this implementation will work.
-            $knownIssueClasses = [SubmissionBox::class,];
+            $knownIssueClasses = [SubmissionBox::class, SubmissionBox\ReturnedWork::class];
             if (!\in_array($mapper->getModel(), $knownIssueClasses, true)) {
                 throw $e;
             }
