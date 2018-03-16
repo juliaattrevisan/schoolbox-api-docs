@@ -167,18 +167,19 @@ feedback: currentFeedback,
                         <div class="list-item">
                             <div class="card attachment small-12">
                                 {% set kamiViewRoute = currentFile.kami
-                                ? routeLookupIfAuthorized('learningDueWorkResponse.getKamiView', {
-                                kamiId:       currentFile.kami.id,
-                                assessment:   assessment,
-                                student:      participant.user,
-                                feedback:     currentFeedback,
+                                    ? routeLookupIfAuthorized('learningDueWorkResponse.getKamiView', {
+                                    kamiId:       currentFile.kami.id,
+                                    assessment:   assessment,
+                                    student:      participant.user,
+                                    feedback:     currentFeedback,
                                 })
-                                : null
+                                    : null
                                 %}
                                 {% if currentFile.kami and kamiViewRoute %}
                                     <a href="{{ kamiViewRoute }}" title="{{ currentFile.filename }}">
                                         <img src="/ajax/mime/{{ currentFile.mime }}" alt="View Annotated Document" />
-                                        <p>{{ currentFile.filename }} </p>
+                                        <p>Annotated Feedback</p>
+                                        <p class="meta">{{ currentFile.filename }}</p>
                                     </a>
                                 {% else %}
                                     <a href="/storage/fetch.php?hash={{ currentFile.hash }}" title="{{ currentFile.filename }}" data-plugin="preview">
@@ -190,13 +191,13 @@ feedback: currentFeedback,
                         </div>
                         <nav>
                             {% set kamiExportRoute = currentFile.kami
-                            ? routeLookupIfAuthorized('learningDueWorkResponse.getKamiExport', {
-                            kamiId:       currentFile.kami.id,
-                            assessment:   assessment,
-                            student:      participant.user,
-                            feedback:     currentFeedback,
+                                ? routeLookupIfAuthorized('learningDueWorkResponse.getKamiExport', {
+                                kamiId:       currentFile.kami.id,
+                                assessment:   assessment,
+                                student:      participant.user,
+                                feedback:     currentFeedback,
                             })
-                            : null
+                                : null
                             %}
                             {% if kamiExportRoute %}
                                 <a href="{{ kamiExportRoute }}" data-kami-export class="icon-download" title="Download annotated document"></a>
