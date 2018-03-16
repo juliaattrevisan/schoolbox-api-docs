@@ -521,7 +521,7 @@ class External_Synergetic_User implements External_UserInterface
                 $keySurname = "nameSurname{$count}";
                 $bindings[$keySurname] = "%{$splitName}%";
 
-                $filters .= " AND (StudentSurname LIKE :{$keySurname} OR StudentGiven1 LIKE :{$keyGiven})";
+                $filters .= " AND (StudentSurname LIKE :{$keySurname} OR StudentPreferred LIKE :{$keyGiven})";
 
                 $count++;
             }
@@ -555,7 +555,7 @@ class External_Synergetic_User implements External_UserInterface
 
         $query = "
             SELECT      StudentID,
-                        StudentGiven1,
+                        StudentPreferred,
                         StudentSurname,
                         StudentYearLevel,
                         House.Description AS StudentHouse,

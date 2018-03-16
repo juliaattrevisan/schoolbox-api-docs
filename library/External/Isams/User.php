@@ -222,7 +222,7 @@ class External_Isams_User implements External_UserInterface
         $query = "
             SELECT      
                         V_Student.StudentID           AS StudentID,
-                        V_Student.StudentFirstName    AS StudentGiven1,
+                        V_Student.StudentFirstName    AS StudentPreferred,
                         V_Student.StudentSurname      AS StudentSurname,
                         V_Student.Grade               AS StudentYearLevel,
                         ''                            AS StudentHouse,
@@ -278,7 +278,7 @@ class External_Isams_User implements External_UserInterface
             $query .= "WHERE V_Student.Grade = :year_level";
         }
 
-        $query .= " ORDER BY StudentSurname, StudentGiven1, StudentID";
+        $query .= " ORDER BY StudentSurname, StudentPreferred, StudentID";
 
         return $this->getConnector()->executeQuery($query, ['year_level' => $yearlevel])->fetchAll();
     }

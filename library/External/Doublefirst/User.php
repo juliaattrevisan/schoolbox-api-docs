@@ -482,7 +482,7 @@ class External_Doublefirst_User implements External_UserInterface
         $query =
             "
             SELECT      p.PupilID AS StudentID,
-                        p.ForeName AS StudentGiven1,
+                        p.ForeName AS StudentPreferred,
                         p.Surname AS StudentSurname,
                         p.YearGroup AS StudentYearLevel,
                         p.House AS StudentHouse,
@@ -615,7 +615,7 @@ class External_Doublefirst_User implements External_UserInterface
 
             foreach ($splitNames as $splitName) {
                 $splitName = $this->getDatabase()->quote($splitName);
-                $query .= " {$whereAnd} (StudentSurname LIKE '%{$splitName}%' OR StudentGiven1 LIKE '%{$splitName}%') ";
+                $query .= " {$whereAnd} (StudentSurname LIKE '%{$splitName}%' OR StudentPreferred LIKE '%{$splitName}%') ";
                 $whereAnd = " AND ";
             }
         }

@@ -379,7 +379,7 @@ class Report_Parent extends Report_Abstract
 
                     $this->getPage()->setVar(
                         array(
-                            'STUDENT_FIRSTNAME' => Scrub::text($currentContact['StudentGiven1']),
+                            'STUDENT_FIRSTNAME' => Scrub::text($currentContact['StudentPreferred']),
                             'STUDENT_SURNAME'   => Scrub::text($currentContact['StudentSurname']),
                             'STUDENT_YEAR'      => Scrub::text($currentContact['StudentYearLevel']),
                             'STUDENT_BOARDER'   => Scrub::text($currentContact['StudentBoarder'] == 'B' ? '(Boarder)' : ''),

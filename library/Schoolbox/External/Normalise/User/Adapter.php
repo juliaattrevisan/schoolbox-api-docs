@@ -948,8 +948,8 @@ class Adapter  implements \External_UserInterface {
                 $student = new Student();
                 $student
                     ->setId($currentResult['StudentID'])
-                    ->setGivenName($currentResult['StudentGiven1'])
-                    ->setPreferredName($currentResult['StudentGiven1'])
+                    ->setGivenName($currentResult['StudentPreferred'])
+                    ->setPreferredName($currentResult['StudentPreferred'])
                     ->setLastname($currentResult['StudentSurname'])
                     ->setGuardiansSeparated($currentResult['StudentParentsSeparatedFlag'])
                 ;
