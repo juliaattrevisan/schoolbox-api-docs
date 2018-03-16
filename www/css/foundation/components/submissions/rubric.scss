@@ -86,6 +86,15 @@ table.rb {
             position: relative;
         }
     }
+    // 100 height for selectable checkbox inside cells
+    @media #{$medium-up} {
+        tr {
+            display: flex;
+        }
+        td {
+            flex: 1;
+        }
+    }
     textarea {
         font-size: 0.625rem;
         resize: none;
