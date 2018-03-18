@@ -13,29 +13,6 @@ use Schoolbox\Assessment\Term;
 
 class Controller extends \Schoolbox\Learning\Grades\Controller
 {
-
-    /**
-     * Displays a list of grades/results for the specified user and term for all subjects
-     *
-     * @api   GET /learning/grades/{userId}{/termCode}
-     * @level 165
-     * @param User       $viewee
-     * @param Term\Model $term
-     * @throws ServiceNotFound If unable to find mail handler service
-     * @throws \Schoolbox\Mapper\DefinitionException
-     */
-    public function getGrades(User $viewee, Term\Model $term)
-    {
-        if (!$term) {
-            $term = $this->getTermMapper()->findForToday();
-        }
-        $assessments  = $this->getAssessmentMapperProxy()->findAllByStudent($viewee, false, $term);
-
-        $year = null;
-        $this->getCustomGrades($viewee, $assessments, $year, $term);
-    }
-
-
     /**
      * @api   GET /learning/grades-year/{userId}/year/{year}
      * @level 165
