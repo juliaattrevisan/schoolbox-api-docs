@@ -16,7 +16,6 @@
 use EOTC\ConfigMapper as EOTCConfigMapper;
 use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\Collection;
-use Schoolbox\Config\ConfigMapper;
 
 class Calendar_Layout_Full_Javascript extends Calendar_Layout_Full_Abstract
 {

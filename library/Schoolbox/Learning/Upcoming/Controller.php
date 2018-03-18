@@ -24,8 +24,6 @@ use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as Grade
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-use Schoolbox\Config\ConfigMapper;
-
 
 /**
  * Controller for the upcoming work screen.
