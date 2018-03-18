@@ -52,14 +52,16 @@ class Renderer
                 '[username]',
                 '[firstName]',
                 '[lastName]',
+                '[email]',
             ];
 
             $array_replace = [
-                $user->getId(),
-                $user->getExternalId(),
-                $user->getUsername(),
-                $user->getFirstname(),
-                $user->getLastname(),
+                urlencode($user->getId()),
+                urlencode($user->getExternalId()),
+                urlencode($user->getUsername()),
+                urlencode($user->getFirstname()),
+                urlencode($user->getLastname()),
+                urlencode($user->getEmail())
             ];
 
             $tab->setUrl(str_ireplace($array_find, $array_replace, $tab->getUrl()));
