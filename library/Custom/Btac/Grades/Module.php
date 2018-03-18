@@ -115,14 +115,5 @@ class Module extends \Schoolbox\Learning\Grades\Module
     {
         $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
     }
-
-    /**
-     * @inheritdoc
-     */
-    public function initTemplatePaths(IChainLoader $templateLoader)
-    {
-        // Use this custom module's templates in preference to external module's
-        $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
-        parent::initTemplatePaths($templateLoader);
-    }
+    
 }

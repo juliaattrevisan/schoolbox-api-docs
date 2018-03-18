@@ -35,5 +35,5 @@ class Controller extends \Schoolbox\Learning\Grades\Controller
         );
         $this->getCustomGrades($viewee, $assessments, $year, $term);
     }
-    
+
 }
