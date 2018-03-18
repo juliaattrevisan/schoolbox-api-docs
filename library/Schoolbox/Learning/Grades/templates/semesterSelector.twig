@@ -5,7 +5,6 @@ Usage: include 'sub/semesterSelector.twig
     currentTerm: null|Term               - (optional) the current selected Term
     terms:       Collection|Term[]       - all Terms to render in dropdown
     termRoute:   string                  - Aura route
-    yearRoute:   string                  - Aura route
     routeArgs:   JSON object             - Aura route args to be merged with {Term.code} inside loop
     year:        null|int                - (optional) If viewing an entire year of results
 #}
@@ -51,11 +50,11 @@ Usage: include 'sub/semesterSelector.twig
         {% set foundYear = {} %}
         {% set selected = false %}
         {% for term in terms %}
-            {% if yearRoute is not empty %}
+            {% if year is not empty %}
                 {% if not term.displayFinish.isNull() %}
                     {% if not foundYear['_'~term.displayFinish.year] %}
                         {% set foundYear = foundYear | merge({('_'~term.displayFinish.year):true}) %}
-                        <option data-href="{{ routeLookup(yearRoute, routeArgs | merge({year: term.displayFinish.year}) ) }}" value="{{ term.displayFinish.year }}" {% if year == term.displayFinish.year %}{% set selected = true %}selected{% endif %}>
+                        <option data-href="{{ routeLookup('learningGrades.getCustomGradesYear', routeArgs | merge({year: term.displayFinish.year}) ) }}" value="{{ term.displayFinish.year }}" {% if year == term.displayFinish.year %}{% set selected = true %}selected{% endif %}>
                             {#- dessicate -#}{{ term.displayFinish.year }} Grades Summary{#- dessicate -#}
                         </option>
                     {% endif %}

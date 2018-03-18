@@ -115,5 +115,5 @@ class Module extends \Schoolbox\Learning\Grades\Module
     {
         $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
     }
-    
+
 }
