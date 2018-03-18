@@ -12,6 +12,7 @@ use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\StudentReportCard\Conversation;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
@@ -195,15 +196,75 @@ class Controller extends Base
             }
         }
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learningGrades/summary.twig', [
-            'student'          => $viewee,
-            'term'             => $term,
-            'terms'            => $this->termMapper->findAll()->sortBy('start', 'desc'),
-            'folders'          => $folders,
-            'markbooks'        => $markbooks,
-            'showOverallGrade' => $showOverallGrade,
-            'mailHandle'       => $this->getSession() ->get('mailhandle'),
-        ])->setTab('grade'));
+        $filteredWorkTypes = \Schoolbox\Learning\Assessment\WorkType\Mapper::getInstance()->findByColumn('show_on_grades_page', 1);
+
+        if (count($filteredWorkTypes)) {
+
+            $assessments = $this->getAssessmentMapperProxy()->findAllByStudentBetweenDates($viewee, false, $term->getStart(), $term->getActualFinish());
+
+            // Storage for each folders markbook
+            $markbooks        = [];
+            $markbooksFolders = [];
+
+            // Keep a collection of all folders student has an assessment in for use in the dropdown
+            $assessmentTasks = [];
+
+            $folders = $this->getFolderMapper()->createCollection();
+            /** @var IAssessable $assessment */
+            foreach ($assessments as $assessment) {
+                $folder = $assessment->getContext()->getFolder();
+
+                if ($folder instanceof Folder\Model) {
+                    if (!isset($foldersFound[$folder->getId()])) {
+
+                        if (!isset($markbooksFolders[$folder->getId()])) {
+                            $markbooksFolders[$folder->getId()] = $this->getAssessmentMapperProxy()->createCollection();
+                            $folder->loadTeachers();
+                            $folders->add($folder);
+                        }
+
+                        if ($assessment instanceof DueWork\Model && $assessment->getWorkType()
+                            && 'Assessment Task' === $assessment->getWorkType()->getName()
+                        ) {
+                            if (!isset($assessmentTasks[$folder->getId()])) {
+                                $assessmentTasks[$folder->getId()] = [];
+                            }
+                            $assessmentTasks[$folder->getId()][] = $assessment;
+                        }
+
+                        $markbooksFolders[$folder->getId()]->add($assessment);
+                    }
+                }
+            }
+
+            foreach ($markbooksFolders as $folderId => $assessmentsArray) {
+                $markbooks[$folderId] =
+                    (new Markbook($assessmentsArray, $this->getDefaultGradeGroup(), $this->getUser()))
+                        ->getStudentStatistics()[$viewee->getId()];
+            }
+
+            $this->getResponse()->content->set($this->buildHtmlOutput('@learningGrades/filteredSummary.twig', [
+                'student'         => $viewee,
+                'term'            => $term,
+                'year'            => date('Y'),
+                'terms'           => $this->termMapper->findAll()->sortBy('start', 'desc'),
+                'folders'         => $folders,
+                'assessmentTasks' => $assessmentTasks,
+                'markbooks'       => $markbooks,
+                'mailHandle'      => $this->getSession()->get('mailhandle'),
+                'currentUser'     => $this->getUser(),
+            ]));
+        } else {
+            $this->getResponse()->content->set($this->buildHtmlOutput('@learningGrades/summary.twig', [
+                'student'          => $viewee,
+                'term'             => $term,
+                'terms'            => $this->termMapper->findAll()->sortBy('start', 'desc'),
+                'folders'          => $folders,
+                'markbooks'        => $markbooks,
+                'showOverallGrade' => $showOverallGrade,
+                'mailHandle'       => $this->getSession()->get('mailhandle'),
+            ])->setTab('grade'));
+        }
     }
 
 
