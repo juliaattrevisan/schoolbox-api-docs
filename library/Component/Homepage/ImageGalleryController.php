@@ -69,7 +69,7 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
         $allImages = $allImages->sortByCallback( function (Model $a, Model $b) {return strnatcasecmp($a->getTitle(), $b->getTitle());} );
 
         $this->setVar([
-            'COMPONENT_NAME' => strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : $this->getComponentName(),
+            'COMPONENT_NAME' => strlen($this->getConfig('componentname')) ? $this->getConfig('componentname') : $this->getComponentName(),
             'IMAGEGALLERY_CATEGORY_ID' => $this->getSource()->getId()
         ]);
 

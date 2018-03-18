@@ -88,7 +88,7 @@ class Component_Eportfolio_VideoController extends Component_Eportfolio_Controll
 
         // Set up component name
         $this->setVar(array(
-            'COMPONENT_NAME' => strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : 'Video',
+            'COMPONENT_NAME' => strlen($this->getConfig('componentname')) ? $this->getConfig('componentname') : 'Video',
         ));
 
         $this->setBlock($templateHandle, 'default_video', 'default_video_block');
