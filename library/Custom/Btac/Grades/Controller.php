@@ -3,13 +3,8 @@
 namespace Custom\Btac\Grades;
 
 use Aura\Di\Exception\ServiceNotFound;
-use Schoolbox\Collection;
-use Schoolbox\Learning\Assessment\DueWork;
-use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Markbook\Markbook;
-use Schoolbox\Resource\Folder;
 use Schoolbox\User;
-use Schoolbox\Assessment\Term;
+use \Schoolbox\Learning\Assessment\WorkType;
 
 class Controller extends \Schoolbox\Learning\Grades\Controller
 {
@@ -33,7 +28,10 @@ class Controller extends \Schoolbox\Learning\Grades\Controller
         $term = $this->getTermMapper()->findForDate(
             new \Alaress_Date_Format($dateString, \Alaress_Date_Format::DATABASE_DATE_FORMAT)
         );
-        $this->getCustomGrades($viewee, $assessments, $year, $term);
+
+        $filteredWorkTypes = WorkType\Mapper::getInstance()->findByColumn('show_on_grades_page', 1);
+
+        $this->getCustomGrades($viewee, $assessments, $year, $term, $filteredWorkTypes);
     }
 
 }

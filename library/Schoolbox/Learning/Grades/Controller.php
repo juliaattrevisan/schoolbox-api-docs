@@ -30,6 +30,7 @@ use Schoolbox\Filter\Page as FilterPage;
 use Schoolbox\Filter\Selection as FilterSelection;
 use Schoolbox\Filter\Filters\Assessment as AssessmentFilters;
 use Schoolbox\Learning\Assessment\DueWork;
+use \Schoolbox\Learning\Assessment\WorkType;
 use Alaress\Database\Predicate\InvalidColumnException;
 use LogicException;
 use TypeError;
@@ -158,12 +159,12 @@ class Controller extends Base
      */
     public function getGrades(User $viewee, Term\Model $term)
     {
-        $filteredWorkTypes = \Schoolbox\Learning\Assessment\WorkType\Mapper::getInstance()->findByColumn('show_on_grades_page', 1);
+        $filteredWorkTypes = WorkType\Mapper::getInstance()->findByColumn('show_on_grades_page', 1);
 
         if (\count($filteredWorkTypes)) {
             $assessments = $this->getAssessmentMapperProxy()->findAllByStudentBetweenDates($viewee, false, $term->getStart(), $term->getActualFinish());
 
-            $this->getCustomGrades($viewee, $assessments, null, $term);
+            $this->getCustomGrades($viewee, $assessments, null, $term, $filteredWorkTypes);
             return;
         }
 
@@ -224,8 +225,10 @@ class Controller extends Base
      * @param Term\Model               $term
      * @throws ServiceNotFound If unable to find mail handler service
      */
-    protected function getCustomGrades(User $viewee, Collection $assessments, $year, Term\Model $term)
+    protected function getCustomGrades(User $viewee, Collection $assessments, $year, Term\Model $term, Collection $workTypes)
     {
+        $workTypeNames = $workTypes->getPropertyValues('name');
+
         // Storage for each folders markbook
         $markbooks        = [];
         $markbooksFolders = [];
@@ -249,7 +252,7 @@ class Controller extends Base
                     }
 
                     if ($assessment instanceof DueWork\Model && $assessment->getWorkType()
-                        && 'Assessment Task' === $assessment->getWorkType()->getName()
+                        && \in_array($assessment->getWorkType()->getName(), $workTypeNames, true)
                     ) {
                         if (!isset($assessmentTasks[$folder->getId()])) {
                             $assessmentTasks[$folder->getId()] = [];
