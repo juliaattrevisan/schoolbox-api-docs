@@ -172,4 +172,81 @@ class Freedom implements IQueryHelper
         return [ $sql, $params ];
     }
 
+
+    /**
+     * @param int $studentExternalId
+     * @return array
+     */
+    public function getGetStudentQuery($studentExternalId): array
+    {
+        $sql = "
+            SELECT
+                -- student details
+                S.STUDKEY                       AS StudentID,
+                S.GIVEN_NAME                    AS StudentGiven1,
+                S.LEGAL_SURNAME                 AS StudentSurname,
+                S.BIRTH_DATE                    AS StudentBirthDate,
+                S_HOUSE.DESCRIPTION             AS StudentHouseDescription,
+                S.HOUSE                         AS StudentHouse,
+                ''                              AS HeadOfHouseID,
+                ''                              AS StudentHeadOfHouse,
+                S.STATUS                        AS StudentBoarder,
+                ''                              AS Comment,
+                S.HOME_CLASS                    AS StudentForm,
+                S_CLASS.DESCRIPTION             AS FormDescription,
+                S_HOME_TEACHER.NAME_FOR_REPORT  AS StudentFormStaffName,
+                S.DEAN                          AS StudentTutor,
+                S_HOME_TEACHER.NAME_FOR_REPORT  AS StudentTutorName,
+                S_DEAN.NAME_FOR_REPORT          AS StudentTutorDescription,
+                S.HOME_TEACHER                  AS TeacherFormID,
+                S.DEAN                          AS TeacherTutorID,
+                S.CURRENT_YEAR                  AS StudentYearLevel,
+                S.DEAN                          AS YearLevelCoordID,
+                ''                              AS StudentYearLevelCoordinator,
+                S.LOCKER                        AS StudentLockerBook,
+                S.EMERG_CONTACT                 AS StudentEmergencyName,
+                S.EMERG_PHONE                   AS StudentEmergencyPhone,
+                ''                              AS StudentEmergencyPhoneAlt,
+
+                -- emerghergency contact details
+                EC.GIVENNAME + ' ' + EC.SURNAME AS StudentEmergencyName,
+                EC.HOME_PHONE                   AS StudentEmergencyPhone,
+                EC.MOBILE                       AS StudentEmergencyPhoneAlt,
+
+                -- alerts
+                S.ALERT                         AS StudentMedicalAlert,
+                ''                              AS StudentSpecialNeedsFlag,
+                ''                              AS StudentStudiesCode,
+                S.ALERT                         AS AlertMessage,
+                0                               AS countIndividualEducationPlans
+            FROM STUDENT S
+            LEFT JOIN CODEMAST AS S_HOUSE ON S.HOUSE = S_HOUSE.CODE AND S_HOUSE.TYPE = 'HOUSE'
+            LEFT JOIN CODEMAST AS S_CLASS ON S.HOME_CLASS = S_CLASS.CODE AND S_CLASS.TYPE = 'CLASS'
+            LEFT JOIN TEACHER AS S_HOME_TEACHER ON S.HOME_TEACHER = S_HOME_TEACHER.TEACHER_CODE
+            LEFT JOIN TEACHER AS S_DEAN ON S.DEAN = S_DEAN.TEACHER_CODE
+            LEFT JOIN ALUMREL AS A ON A.CHILD# = S.STUDENT#
+            LEFT JOIN [IDENTITY] EC
+              ON A.PARENT# = EC.MEMBER#
+              AND A.EMERGENCY_PREF = :contactLevel
+              AND A.STUDENT_PREF = :contactLevel
+              AND A.RELATION_STAT = :relationStatus
+              AND givenname <> :fakeRecordName
+              AND (A.PARENT# <> A.FAMILY_HASH)
+              AND i.DECEASED = ' '
+            WHERE S.STUDKEY = :studentId
+            AND S.CURRENT_YEAR BETWEEN ' 5' AND '12'
+            ORDER BY A.CAREGIVER_NO ASC
+        ";
+
+        $params = [
+            'relationStatus' => self::RELATION_CHILD,
+            'contactLevel'   => self::CONTACT_LEVEL_FULL,
+            'fakeRecordName' => self::FAKE_RECORD_NAME,
+            'studentId' => $studentExternalId
+        ];
+
+        return [ $sql, $params ];
+    }
+
+
 }

@@ -17,11 +17,12 @@ interface IQueryHelper
      */
     public function getFindAllParentsQuery(): array;
 
-//    /**
-//     * @return array
-//     */
-//    public function getGetStudentQuery(): array;
-//
+    /**
+     * @param int $studentExternalId
+     * @return array
+     */
+    public function getGetStudentQuery($studentExternalId): array;
+
     /**
      * @param int $studentExternalId
      * @return array
