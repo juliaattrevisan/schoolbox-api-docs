@@ -30,6 +30,18 @@
                                     />
                                     <label for="{{ field_key }}-{{ recordIndex }}"></label>
                                 </div>
+                            {% elseif field.checkbox is not empty %}
+                                {# Radio field, shared between all rows #}
+                                <div class="checklist">
+                                    <input type="checkbox"
+                                           name="checkbox-{{ field_key }}"
+                                           value="{{ recordIndex }}"
+                                           id="{{ field_key }}-{{ recordIndex }}"
+                                        {% if (record[field_key] == 1) %} checked {% endif %}"
+                                    {{ disabledAttr }}
+                                    />
+                                    <label for="{{ field_key }}-{{ recordIndex }}"></label>
+                                </div>
                             {% elseif field.lookup is iterable %}
                                 {# Lookup select box #}
                                 {% if field.lookup | length == 0 %}
