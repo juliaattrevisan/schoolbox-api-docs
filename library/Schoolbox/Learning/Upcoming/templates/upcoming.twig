@@ -260,7 +260,7 @@
                                             {{ upcoming.title }}
                                         {% endif %}
                                     </h3>
-                                    {% if subjects[upcoming.context.folder.id]["perms"] > 0 %}
+                                    {% if subjects[upcoming.context.folder.id].hasPerms %}
                                         <p class="meta">
                                             <a href="/homepage/{{ upcoming.context.folder.id }}">{{ upcoming.context.folder.title }}</a>
                                             {{ upcoming.typeName }}

@@ -19,6 +19,7 @@ use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Markbook\Markbook;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
@@ -238,7 +239,7 @@ class Controller extends Base
                 'teachers' => $teachers,
                 'folder'   => $folder,
                 'grade'    => $this->getConfigLoader()->get('show_overall_grade') ? $markbook->getStudentStatistics()[$student->getId()]: '',
-                'perms'    => Access::getInstance()->getFolderAccess($this->getUser(), $folder->getId()),
+                'hasPerms'    => Access::getInstance()->getFolderAccess($this->getUser(), $folder->getId()) > UserAccess::ACCESS_DENY,
             ];
         }
 
