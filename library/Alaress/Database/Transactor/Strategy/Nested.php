@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace Alaress\Database\Transactor\Strategy;
 
-use Alaress\Database\Broker\IBroker;
+use Alaress\Database\Connector\IConnector;
 
 /**
  * Nested strategy for database transaction handling. This strategy doesn't
@@ -23,18 +23,18 @@ class Nested implements IStrategy
     /**
      * A database connection
      *
-     * @var IBroker
+     * @var IConnector
      */
-    private $broker;
+    private $connector;
 
     /**
      * Constructor
      *
-     * @param IBroker $broker
+     * @param IConnector $connector
      */
-    public function __construct(IBroker $broker)
+    public function __construct(IConnector $connector)
     {
-        $this->broker = $broker;
+        $this->connector = $connector;
     }
 
     /**
@@ -42,7 +42,7 @@ class Nested implements IStrategy
      */
     public function beginTransaction(): bool
     {
-        return $this->broker->beginTransaction();
+        return $this->connector->beginTransaction();
     }
 
     /**
@@ -50,7 +50,7 @@ class Nested implements IStrategy
      */
     public function inTransaction(): bool
     {
-        return $this->broker->inTransaction();
+        return $this->connector->inTransaction();
     }
 
     /**
@@ -58,7 +58,7 @@ class Nested implements IStrategy
      */
     public function commit(): bool
     {
-        return $this->broker->commit();
+        return $this->connector->commit();
     }
 
     /**
@@ -66,6 +66,6 @@ class Nested implements IStrategy
      */
     public function rollback(): bool
     {
-        return $this->broker->rollBack();
+        return $this->connector->rollBack();
     }
 }

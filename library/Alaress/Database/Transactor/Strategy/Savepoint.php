@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace Alaress\Database\Transactor\Strategy;
 
-use Alaress\Database\Broker\IBroker;
+use Alaress\Database\Connector\IConnector;
 use PDO;
 use PDOStatement;
 
@@ -22,9 +22,9 @@ class Savepoint implements IStrategy
     /**
      * A database connection
      *
-     * @var IBroker
+     * @var IConnector
      */
-    private $broker;
+    private $connector;
 
     /**
      * Savepoint stack
@@ -58,11 +58,11 @@ class Savepoint implements IStrategy
     /**
      * Constructor
      *
-     * @param IBroker $broker
+     * @param IConnector $connector
      */
-    public function __construct(IBroker $broker)
+    public function __construct(IConnector $connector)
     {
-        $this->broker = $broker;
+        $this->connector = $connector;
     }
 
     /**
@@ -71,7 +71,7 @@ class Savepoint implements IStrategy
     public function beginTransaction(): bool
     {
         // In a transaction? Don't begin another level
-        if (!$this->inTransaction() && !$this->broker->beginTransaction()) {
+        if (!$this->inTransaction() && !$this->connector->beginTransaction()) {
             return false;
         }
 
@@ -91,7 +91,7 @@ class Savepoint implements IStrategy
      */
     public function inTransaction(): bool
     {
-        return $this->broker->inTransaction();
+        return $this->connector->inTransaction();
     }
 
     /**
@@ -112,7 +112,7 @@ class Savepoint implements IStrategy
 
         // No more levels left: commit the whole thing
         if (empty($this->savepointStack)) {
-            return $this->broker->commit();
+            return $this->connector->commit();
         }
 
         return true;
@@ -136,7 +136,7 @@ class Savepoint implements IStrategy
 
         // No more levels left: rollback the whole thing
         if (empty($this->savepointStack)) {
-            return $this->broker->rollBack();
+            return $this->connector->rollBack();
         }
 
         return true;
@@ -161,7 +161,7 @@ class Savepoint implements IStrategy
     private function createSavepoint(string $name): bool
     {
         if (!$this->createSavepointQuery) {
-            $this->createSavepointQuery = $this->broker->prepare('SAVEPOINT :name');
+            $this->createSavepointQuery = $this->connector->prepareQuery('SAVEPOINT :name');
         }
         $this->createSavepointQuery->bindValue('name', $name, PDO::PARAM_STR);
         return $this->createSavepointQuery->execute();
@@ -176,7 +176,7 @@ class Savepoint implements IStrategy
     private function rollbackToSavepoint($name): bool
     {
         if (!$this->rollbackToSavepointQuery) {
-            $this->rollbackToSavepointQuery = $this->broker->prepare('ROLLBACK TO SAVEPOINT :name');
+            $this->rollbackToSavepointQuery = $this->connector->prepareQuery('ROLLBACK TO SAVEPOINT :name');
         }
         $this->rollbackToSavepointQuery->bindValue('name', $name, \PDO::PARAM_STR);
         return $this->rollbackToSavepointQuery->execute();
@@ -191,7 +191,7 @@ class Savepoint implements IStrategy
     private function releaseSavepoint($name): bool
     {
         if (!$this->releaseSavepointQuery) {
-            $this->releaseSavepointQuery = $this->broker->prepare('RELEASE SAVEPOINT :name');
+            $this->releaseSavepointQuery = $this->connector->prepareQuery('RELEASE SAVEPOINT :name');
         }
         $this->releaseSavepointQuery->bindValue('name', $name, \PDO::PARAM_STR);
         return $this->releaseSavepointQuery->execute();
