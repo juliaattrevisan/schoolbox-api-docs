@@ -8,7 +8,7 @@
     {% set attachments = attachmentsPrivate %}
 {% endif %}
 
-{% if (recordType == 'public' and access > 0 ) or (recordType == 'private' and access > 1)  %}
+{% if (recordType == 'public' and access.public) or (recordType == 'private' and access.private)  %}
 
     {% import '@pastoral/macros/profile.twig' as profile %}
     
