@@ -146,7 +146,7 @@ class Connector implements IConnector
                 [
                     'name'     => 'document',
                     'contents' => $storage->readStream(),
-                    'filename' => $storage->getFilename(),
+                    'filename' => $storage->getBasename(),
                 ],
             ],
         ];
