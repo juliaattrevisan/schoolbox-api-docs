@@ -84,6 +84,7 @@ class Sync extends Base implements ISync
     protected function findAllParentsFreedom()
     {
         $query = "
+            SELECT
             ''                                  AS student_contact_network_login,
             CONVERT(varchar(10), I.MEMBER#)     AS student_contact_id,
             ''                                  AS student_contact_title,
