@@ -15,19 +15,7 @@
     </div>
     {% set viewRoute = routeLookupIfAuthorized('learningAssessment.getStatus', {assessmentId: assessment.id, assessment: assessment}) %}
     {% set modifyRoute = routeLookupIfAuthorized('learningQuiz.getQuizSummary', {assessmentId: assessment.id, assessment: assessment}) %}
-    {% if viewRoute or modifyRoute %}
-        <nav>
-            <a href="#" class="icon-more" data-dropdown="header-options" title="Actions"></a>
-        </nav>
-        <ul data-dropdown-content id="header-options" class="f-dropdown">
-            {% if viewRoute %}
-                <li><a class="icon-progress" href="{{ viewRoute }}">View Status</a></li>
-            {% endif %}
-            {% if modifyRoute %}
-                <li><a href="{{ modifyRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" class="icon-modify">Modify</a></li>
-            {% endif %}
-        </ul>
-    {% endif %}
+    {% include '@learningAssessment/fragments/modifyTot.twig' %}
 </div>
 
 <div class="row">
