@@ -14,7 +14,7 @@
     
     <div class="row">
         <div class="small-12 island">
-            {% if user.role.isStaff %}
+            {% if access.private %}
                 <h2 class="subheader">{{ heading }}</h2>
             {% endif %}
 
@@ -38,6 +38,12 @@
                         {% endfor %}
                     {% endif %}
                 </section>
+            {% else %}
+                {% set routeRecordUpdate = routeLookupIfAuthorized('pastoral.getStudentRecordUpdateForm', {'studentId': record.student.id, 'recordId': record.id}) %}
+                <div class="empty-state">
+                    <i class="icon-pastoral"></i>
+                    <p>There is no content added yet. {% if routeRecordUpdate %} You can add some <a href={{ routeRecordUpdate }}> here. </a> {% endif %}</p>
+                </div>
             {% endif %}
         </div>
     </div>
