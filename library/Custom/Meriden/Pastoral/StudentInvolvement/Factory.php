@@ -9,6 +9,7 @@
 
 namespace Custom\Meriden\Pastoral\StudentInvolvement;
 
+use Alaress\Statistics\Statistics;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
@@ -642,7 +643,7 @@ class Factory
 
             // Show marks as series
             // Calculation in PHP is kind of annoying, but...
-            $distribution['continuous']['series'] = $this->buildSeries($marks);
+            $distribution['continuous']['series'] = Statistics::buildSeries($marks);
         }
         return $distribution;
     }
@@ -661,67 +662,5 @@ class Factory
     private function doesDraftFeedbackContribute($reportYear) : bool
     {
         return $reportYear < 2018;
-    }
-
-    /**
-     * Determines the median value of $values.
-     *
-     * @param array $values
-     * @return float|null
-     */
-    private function median(array $values): ?float
-    {
-        // This _could_ be abstracted to a percentile function, but percentiles
-        // are a surprisingly deep rabbit-hole:
-        // https://en.wikipedia.org/wiki/Percentile#The_nearest-rank_method
-        // https://en.wikipedia.org/wiki/Percentile#The_linear_interpolation_between_closest_ranks_method
-
-        // Can't median a value which doesn't exist
-        if (empty($values)) {
-            return null;
-        }
-
-        // Only one value? it must be the median
-        $count = \count($values);
-        if ($count === 1) {
-            return (float)array_pop($values);
-        }
-
-        // Median: midpoint value
-        // If exactly divisible into two, use midpoint of highest min and lowest max
-        sort($values);
-        $index = ($count-1) / 2;
-        if (\is_int($index)) {
-            return (float)$values[$index];
-        }
-
-        $lowValue  = $values[(int)floor($index)];
-        $highValue = $values[(int)ceil($index)];
-
-        return (float)(($highValue + $lowValue) / 2);
-    }
-
-    /**
-     * Builds low/high/median/IQR for the list of marks.
-     *
-     * @param array $marks
-     * @return array
-     */
-    private function buildSeries(array $marks): array
-    {
-        sort($marks);
-        $series = [
-            'low'    => min($marks),
-            'high'   => max($marks),
-            'median' => $this->median($marks),
-        ];
-
-        // Calculate q1 (median of lower half), q3 (median of upper half)
-        $sliceSize  = (int)max(\count($marks) / 2, 1);
-        $lowValues  = \array_slice($marks, 0, $sliceSize);
-        $highValues = \array_slice($marks, -$sliceSize);
-        $series['q1'] = $this->median($lowValues);
-        $series['q3'] = $this->median($highValues);
-        return $series;
     }
 }
