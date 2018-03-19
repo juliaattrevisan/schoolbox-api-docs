@@ -195,6 +195,11 @@ if(is_array($optionList)) {
                     $this->parse('setting_type_input_block', 'setting_type_select', true);
                     break;
 
+                case 'timepicker':
+                    $this->setVar('setting_type_timepicker_block');
+                    $this->parse('setting_type_timepicker_block', 'setting_type_timepicker');
+                    break;
+
                 case 'bytes':
                     $this->setVar('SETTING_VALUE', Alaress_Byte_Format::bytesToString($option['value']));
                     $this->parse('setting_type_input_block', 'setting_type_input', true);
