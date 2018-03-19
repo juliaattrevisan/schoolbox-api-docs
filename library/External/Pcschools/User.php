@@ -7,6 +7,9 @@
  * @link      http://www.alaress.com.au/
  */
 
+use External\Pcschools\QueryHelper\Freedom;
+use External\Pcschools\QueryHelper\IQueryHelper;
+use External\Pcschools\QueryHelper\NonFreedom;
 use Schoolbox\User;
 
 class External_Pcschools_User implements External_UserInterface
@@ -30,6 +33,9 @@ class External_Pcschools_User implements External_UserInterface
      */
     private $userMapper;
 
+    /** @var IQueryHelper */
+    private $queryHelper;
+
     /**
      * Constructor
      */
@@ -40,6 +46,10 @@ class External_Pcschools_User implements External_UserInterface
 //        $this->getDatabase()->query('SET ANSI_PADDING ON');
 //        $this->getDatabase()->query('SET ANSI_WARNINGS ON');
         $this->userMapper = new \Schoolbox\UserMapper();
+
+        $this->queryHelper = $this->database->query(IQueryHelper::FREEDOM_DETECT)->fetchColumn()
+            ? new Freedom()
+            : new NonFreedom();
     }
 
     /**
@@ -910,38 +920,9 @@ class External_Pcschools_User implements External_UserInterface
      */
     public function getEnrolledStudents($externalUserId)
     {
-        // parent external ID format: $famKey-{some code}
-        $suffix     = '';
-        $familyCode = $externalUserId;
-        $parts = explode('-', $externalUserId);
-        if (count($parts) > 1) {
-            $suffix     = array_pop($parts);
-            $familyCode = implode('-', $parts);
-        }
-        $query = "
-            SELECT S.STUDKEY AS RelatedID
-            FROM STUDENT S
-            INNER JOIN FAMILY AS S_FAMILY ON S.FAMILY_CODE = S_FAMILY.FAMKEY
-            WHERE S_FAMILY.IDENTITY_ID# = {$this->getDatabase()->smartQuote($familyCode)}
-        ";
-        $quotedContactLevel = $this->getDatabase()->smartQuote(self::CONTACT_LEVEL_FULL);
-        switch ($suffix) {
-            case 'F':
-                $query .= " AND S_FAMILY.DAD_LMS = $quotedContactLevel";
-                break;
-            case 'M':
-                $query .= " AND S_FAMILY.MUM_LMS = $quotedContactLevel";
-                break;
-            case 'C':
-                $query .= " AND S_FAMILY.CGIVE_LMS = $quotedContactLevel";
-                break;
-            case 'G':
-                $query .= " AND S_FAMILY.GUARD_LMS = $quotedContactLevel";
-                break;
-            default:
-                break;
-        }
-        return $this->getDatabase()->trimAll($this->getDatabase()->getAll($query));
+        [ $query, $params ] = $this->queryHelper->getGetEnrolledStudentsQuery($externalUserId);
+
+        return $this->getDatabase()->trimAll($this->getDatabase()->getAll($query, $params));
     }
 
     /**

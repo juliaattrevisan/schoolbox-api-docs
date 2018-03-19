@@ -125,4 +125,52 @@ class NonFreedom implements IQueryHelper
         return [ $sql, $params ];
     }
 
+    /**
+     * @param int $externalUserId
+     * @return array
+     */
+    public function getGetEnrolledStudentsQuery($externalUserId): array
+    {
+        // parent external ID format: $famKey-{some code}
+        $suffix     = '';
+        $familyCode = $externalUserId;
+        $parts = explode('-', $externalUserId);
+
+        if (\count($parts) > 1) {
+            $suffix     = array_pop($parts);
+            $familyCode = implode('-', $parts);
+        }
+
+        $query = '
+            SELECT S.STUDKEY AS RelatedID
+            FROM STUDENT S
+            INNER JOIN FAMILY AS S_FAMILY ON S.FAMILY_CODE = S_FAMILY.FAMKEY
+            WHERE S_FAMILY.IDENTITY_ID# = :familyCode
+        ';
+
+        switch ($suffix) {
+            case 'F':
+                $query .= ' AND S_FAMILY.DAD_LMS = :contactLevel';
+                break;
+            case 'M':
+                $query .= ' AND S_FAMILY.MUM_LMS = :contactLevel';
+                break;
+            case 'C':
+                $query .= ' AND S_FAMILY.CGIVE_LMS = :contactLevel';
+                break;
+            case 'G':
+                $query .= ' AND S_FAMILY.GUARD_LMS = :contactLevel';
+                break;
+            default:
+                break;
+        }
+
+        $params = [
+            'familyCode'   => $familyCode,
+            'contactLevel' => self::CONTACT_LEVEL_FULL
+        ];
+
+        return [ $query, $params ];
+    }
+
 }

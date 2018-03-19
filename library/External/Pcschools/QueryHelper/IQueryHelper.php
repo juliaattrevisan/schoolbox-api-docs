@@ -32,9 +32,10 @@ interface IQueryHelper
 //     */
 //    public function getGetParentEmailsQuery(): array;
 //
-//    /**
-//     * @return array
-//     */
-//    public function getGetEnrolledStudentsQuery(): array;
+    /**
+     * @param int $externalUserId
+     * @return array
+     */
+    public function getGetEnrolledStudentsQuery($externalUserId): array;
 
 }

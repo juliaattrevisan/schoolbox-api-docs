@@ -61,4 +61,35 @@ class Freedom implements IQueryHelper
         return [ $sql, $params ];
     }
 
+
+    /**
+     * @param int $externalUserId
+     * @return array
+     */
+    public function getGetEnrolledStudentsQuery($externalUserId): array
+    {
+        $sql = "
+            SELECT S.STUDKEY AS RelatedID
+            FROM dbo.[IDENTITY] AS I
+            INNER JOIN dbo.ALUMREL AS A ON A.PARENT# = I.MEMBER#
+            INNER JOIN dbo.STUDENT AS S ON S.STUDENT# = A.CHILD#
+            WHERE (I.MEMBER# = :externalId)
+            AND (A.RELATION_STAT = :relationStatus)
+            AND (S.CURRENT_YEAR BETWEEN ' 5' AND '12')
+            AND (A.PARENT# <> A.FAMILY_HASH) and (i.DECEASED = ' ')
+            AND (A.STUDENT_PREF = :contactLevel)
+            AND (givenname <> :fakeRecordName);
+        ";
+
+        $params = [
+            'externalId'     => $externalUserId,
+            'relationStatus' => self::RELATION_CHILD,
+            'contactLevel'   => self::CONTACT_LEVEL_FULL,
+            'fakeRecordName' => self::FAKE_RECORD_NAME
+        ];
+
+        return [ $sql, $params ];
+    }
+
+
 }
