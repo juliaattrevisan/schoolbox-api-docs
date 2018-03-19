@@ -62,11 +62,27 @@ class Statistics
      * Builds low/high/median/IQR for the list of values.
      *
      * @param array $values
-     * @return array
+     * @return array low:    min value
+     *               q1:     median of lowest half of values
+     *               median: median value
+     *               q1:     median of highest half of values
+     *               high:   max value
      */
     public static function buildSeries(array $values): array
     {
         $values = static::preProcess($values);
+
+        // Empty case: all null
+        if (empty($values)) {
+            return [
+                'low'    => null,
+                'q1'     => null,
+                'median' => null,
+                'q3'     => null,
+                'high'   => null,
+            ];
+        }
+
         $series = [
             'low'    => min($values),
             'high'   => max($values),

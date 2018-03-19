@@ -23,7 +23,7 @@ class StatisticsTest extends TestCase
      * @param array      $values
      * @param float|null $expected
      */
-    public function testMedian(array $values, ?float $expected)
+    public function testMedian(array $values, ?float $expected): void
     {
         $this->assertEquals($expected, Statistics::median($values));
     }
@@ -64,11 +64,61 @@ class StatisticsTest extends TestCase
     /**
      * Tests calculation of series.
      *
+     * @dataProvider getBuildSeriesMedianData
      * @param array $values
      * @param array $expected
      */
-    public function testBuildSeries(array $values, array $expected)
+    public function testBuildSeries(array $values, array $expected): void
     {
         $this->assertEquals($expected, Statistics::buildSeries($values));
+    }
+
+    /**
+     * @return array
+     */
+    public function getBuildSeriesMedianData(): array
+    {
+        return [
+            'empty' => [
+                [],
+                [
+                    'low'    => null,
+                    'q1'     => null,
+                    'median' => null,
+                    'q3'     => null,
+                    'high'   => null,
+                ],
+            ],
+            'single value' => [
+                [4.1],
+                [
+                    'low'    => 4.1,
+                    'q1'     => 4.1,
+                    'median' => 4.1,
+                    'q3'     => 4.1,
+                    'high'   => 4.1,
+                ],
+            ],
+            'three value' => [
+                [4.1, 5.1, 1.1],
+                [
+                    'low'    => 1.1,
+                    'q1'     => 1.1,
+                    'median' => 4.1,
+                    'q3'     => 5.1,
+                    'high'   => 5.1,
+                ],
+            ],
+            'six values' => [
+                [4.1, 5.1, 1.1, 3.1, 9.1, 2.1],
+                [
+                    'low'    => 1.1,
+                    'q1'     => 2.1,
+                    'median' => 3.6,
+                    'q3'     => 5.1,
+                    'high'   => 9.1,
+                ],
+            ],
+        ];
     }
 }
