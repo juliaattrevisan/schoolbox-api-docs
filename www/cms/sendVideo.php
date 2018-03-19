@@ -118,12 +118,14 @@ if (isset($type) && isset($id)) {
     // ----------------------------------------------------------------------------------------------------------------
 
     /** @var string $mimeType */
-    if ($storage->getMimeType()->isAudio()) {
-        // If audio trancode, assume transcode format is audio/mpeg (mp3)
-        $mimeType = 'audio/mpeg';
-    } elseif ($storage->getMimeType()->isVideo()) {
-        // If video trancode, assume transcode format is video/mp4 (mp4)
-        $mimetype = 'video/mp4';
+    if ($storage->getMimetype() instanceof \Schoolbox\File\Mimetype) {
+        if ($storage->getMimeType()->isAudio()) {
+            // If audio trancode, assume transcode format is audio/mpeg (mp3)
+            $mimeType = 'audio/mpeg';
+        } elseif ($storage->getMimeType()->isVideo()) {
+            // If video trancode, assume transcode format is video/mp4 (mp4)
+            $mimetype = 'video/mp4';
+        }
     } else {
         // If unknown, just flail about and choose the original file mimetype
         $mimetype = 'application/octet-stream';
