@@ -146,7 +146,9 @@ class Savepoint implements IStrategy
         // The DB steadfastly refuses to allow me to use bound params in
         // savepoint queries.
         // Inject instead -_- it will be safe as we directly control the input
-        return $this->connector->execute(sprintf('SAVEPOINT %s', $name));
+        return $this->connector->execute(
+            sprintf('SAVEPOINT %s', $this->connector->quoteIdentifier($name))
+        );
     }
 
     /**
@@ -157,7 +159,9 @@ class Savepoint implements IStrategy
      */
     private function rollbackToSavepoint(string $name): bool
     {
-        return $this->connector->execute(sprintf('ROLLBACK TO SAVEPOINT %s', $name));
+        return $this->connector->execute(
+            sprintf('ROLLBACK TO SAVEPOINT %s', $this->connector->quoteIdentifier($name))
+        );
     }
 
     /**
@@ -168,6 +172,8 @@ class Savepoint implements IStrategy
      */
     private function releaseSavepoint(string $name): bool
     {
-        return $this->connector->execute(sprintf('RELEASE SAVEPOINT %s', $name));
+        return $this->connector->execute(
+            sprintf('RELEASE SAVEPOINT %s', $this->connector->quoteIdentifier($name))
+        );
     }
 }
