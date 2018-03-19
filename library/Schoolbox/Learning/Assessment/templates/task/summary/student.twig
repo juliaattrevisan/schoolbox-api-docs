@@ -25,11 +25,14 @@ Data:
     });
 </script>
 
-<div class="row">
+<div class="row actions-small-1">
     <div class="small-12 columns">
         <h1>{{ assessment.title }}</h1>
         {% include '@learningAssessment/meta.twig' with {assessment: assessment, user: USER, student: student, icon: 'icon-task'} %}
     </div>
+    {% set viewRoute = routeLookupIfAuthorized('learningAssessment.getStatus', {assessmentId: assessment.id, assessment: assessment}) %}
+    {% set modifyRoute = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id, assessment: assessment}) %}
+    {% include '@learningAssessment/fragments/modifyTot.twig' %}
 </div>
 
 <div class="row">
