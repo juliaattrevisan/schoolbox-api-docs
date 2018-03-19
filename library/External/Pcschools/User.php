@@ -105,6 +105,9 @@ class External_Pcschools_User implements External_UserInterface
         // just grab the first from from the non-freedom query result
         $row = $rows[0] ?? null;
         if (!empty($row)) {
+
+            $index = 0;
+
             // freedom takes a bit more processing
             if ($this->queryHelper instanceof Freedom) {
 
@@ -113,18 +116,21 @@ class External_Pcschools_User implements External_UserInterface
 
                 // emergency contacts need to be squashed into a single row
                 foreach ($rows as $i => $ec) {
-                    if ($i === 0) {
+
+                    if (!strlen($ec["{$pfx}Name"])) {
                         // skip the first record because it's already populated
                         // and doesn't get a number in the fieldname
                         continue;
                     }
 
                     // turn the second instance of "StudentEmergencyName" into "StudentEmergency2Name"
-                    $index = $i + 1;
+                    $index++;
+
+                    $num = $index === 1 ? '' : $index;
 
                     // copy the emergency contact details to the expected location
                     foreach ($fields as $field) {
-                        $row["{$pfx}{$index}{$field}"] = $row["{$pfx}{$field}"];
+                        $row["{$pfx}{$num}{$field}"] = $ec["{$pfx}{$field}"];
                     }
                 }
             }
