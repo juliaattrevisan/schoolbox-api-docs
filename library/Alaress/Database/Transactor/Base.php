@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace Alaress\Database\Transactor;
 
-use Alaress\Database\Broker\IBroker;
+use Alaress\Database\Transactor\Strategy\IStrategy;
 
 /**
  * Base transactor class, implements the most basic transaction functionality
@@ -17,11 +17,11 @@ use Alaress\Database\Broker\IBroker;
 class Base
 {
     /**
-     * A database connection
+     * A transactor
      *
-     * @var IBroker
+     * @var IStrategy
      */
-    private $broker;
+    private $transactor;
 
     /**
      * A list of callbacks to call when the entire transaction is committed.
@@ -33,11 +33,11 @@ class Base
     /**
      * Constructor
      *
-     * @param IBroker $broker
+     * @param IStrategy $transactor
      */
-    public function __construct(IBroker $broker)
+    public function __construct(IStrategy $transactor)
     {
-        $this->broker = $broker;
+        $this->transactor = $transactor;
     }
 
     /**
@@ -48,7 +48,7 @@ class Base
     public function beginTransaction(): bool
     {
         $this->onPersistHooks[] = [];
-        return $this->broker->beginTransaction();
+        return $this->transactor->beginTransaction();
     }
 
     /**
@@ -58,7 +58,7 @@ class Base
      */
     public function inTransaction(): bool
     {
-        return $this->broker->inTransaction();
+        return $this->transactor->inTransaction();
     }
 
     /**
@@ -68,7 +68,7 @@ class Base
      */
     public function commit(): bool
     {
-        if ($this->broker->commit()) {
+        if ($this->transactor->commit()) {
             if ($this->inTransaction()) {
                 // Are all transactions complete?
                 // Run hooks FIFO
@@ -98,7 +98,7 @@ class Base
      */
     public function rollback(): bool
     {
-        if ($this->broker->rollBack()) {
+        if ($this->transactor->rollback()) {
             if ($this->inTransaction()) {
                 // Are all transactions complete?
                 // Discard all hooks
