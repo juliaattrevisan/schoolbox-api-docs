@@ -45,12 +45,38 @@ class External_Schooledge_Class extends External_Humanedge_Class implements Exte
     }
 
     /**
+     * Get a query string that contains all the timetable codes
+     * @return null|string
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    protected function getTimetableCodes()
+    {
+        $allCampusCodes = \Schoolbox\CampusMapper::getInstance()->findDistinct('ext_timetable_code');
+        $quotedCode     = [];
+        foreach ($allCampusCodes as $code) {
+            if (strlen($code) > 0) {
+                $quotedCode[$code] = "'" . $this->getDatabase()->quote($code) . "'";
+            }
+        }
+
+        if (count($quotedCode)) {
+            return 'IN(' . implode(',', $quotedCode) . ')';
+        }
+        return null;
+    }
+
+    /**
      * @inheritDoc
      */
     public function getStudents($classCode)
     {
         if (!$classCode) {
             /* Dont bother if you got no code */
+            return false;
+        }
+
+        $timetableCodes = $this->getTimetableCodes();
+        if (null === $timetableCodes) {
             return false;
         }
 
@@ -79,9 +105,10 @@ class External_Schooledge_Class extends External_Humanedge_Class implements Exte
 
             WHERE $classQuery
             AND   t.Enabled = 1
-
+            AND   t.Name    {$timetableCodes}
+            
             UNION
-
+            
             SELECT DISTINCT
                 s.FirstName    AS firstname,
                 s.LastName     AS lastname,
@@ -103,7 +130,8 @@ class External_Schooledge_Class extends External_Humanedge_Class implements Exte
 
             WHERE $classQuery
             AND   t.Enabled = 1
-
+            AND   t.Name    {$timetableCodes}
+            
             ORDER BY synergy_id ASC
         ";
         return $this->getDatabase()->getAll($query);
@@ -116,6 +144,11 @@ class External_Schooledge_Class extends External_Humanedge_Class implements Exte
     {
         if (!$classCode) {
             /* Dont bother if you got no code */
+            return false;
+        }
+
+        $timetableCodes = $this->getTimetableCodes();
+        if (null === $timetableCodes) {
             return false;
         }
 
@@ -147,6 +180,7 @@ class External_Schooledge_Class extends External_Humanedge_Class implements Exte
             WHERE $classQuery
             AND   tcis.TimetableClassStaffID IS NULL
             AND   staff_base.Code IS NOT NULL
+            AND   t.Name    {$timetableCodes}
             AND   t.Enabled = 1
 
             UNION
@@ -169,7 +203,8 @@ class External_Schooledge_Class extends External_Humanedge_Class implements Exte
             WHERE $classQuery
             AND   staff_replacement.Code IS NOT NULL
             AND   t.Enabled = 1
-
+            AND   t.Name    {$timetableCodes}
+            
             ORDER BY code ASC
         ";
 
