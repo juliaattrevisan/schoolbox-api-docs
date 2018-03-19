@@ -160,11 +160,12 @@ class MSSQL
      *
      * @deprecated
      * @param string $sql_q
+     * @param array $params
      * @return array|bool
      */
-    function getAll($sql_q)
+    function getAll($sql_q, $params = null)
     {
-        $query = $this->connector->executeQuery($sql_q);
+        $query = $this->connector->executeQuery($sql_q, $params);
         return $query->fetchAll();
     }
 
