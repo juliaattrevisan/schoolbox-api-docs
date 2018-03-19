@@ -451,9 +451,9 @@ class Calendar extends DeprecatedModel
     {
         $firstCampus = false;
 
-        if ($user->getCampusCollection()->count()) {
-            $campusList = array();
+        $campusList = array();
 
+        if ($user->getCampusCollection()->count()) {
             foreach ($user->getCampusCollection() as $currentCampus) {
                 if (!$firstCampus) {
                     $firstCampus = $currentCampus;
@@ -462,6 +462,16 @@ class Calendar extends DeprecatedModel
                 $campusList[] = $currentCampus->getId();
             }
 
+
+        }
+
+        //Fake in some campusii here from calendar permissions, so user can see events relevant
+        $accessMapper = \Schoolbox\Permission\Access\UserAccessMapper::getInstance();
+
+        $calendarPerms = $accessMapper->findByColumnList(['uid' => $user->getId(), 'service' => \Schoolbox\Permission\Access\UserAccess::SERVICE_CALENDAR])->getPropertyValues('ServiceIdentifier');
+        $campusList = array_merge($campusList, $calendarPerms);
+
+        if(count($campusList) > 0){
             $campusQuery = "event_campus.campus_id IN(" . implode(',', $campusList) . ")";
         } else {
             $campusQuery = '1 = 1';
