@@ -9,6 +9,8 @@ declare(strict_types=1);
 namespace Alaress\Database\Transactor\Strategy;
 
 use Alaress\Database\Broker\IBroker;
+use PDO;
+use PDOStatement;
 
 /**
  * Savepoint strategy for database transaction handling. This strategy
@@ -32,6 +34,28 @@ class Savepoint implements IStrategy
     private $savepointStack = [];
 
     /**
+     * Savepoint number
+     *
+     * @var int
+     */
+    private $savepointNumber = 0;
+
+    /**
+     * @var PDOStatement
+     */
+    private $createSavepointQuery;
+
+    /**
+     * @var PDOStatement
+     */
+    private $rollbackToSavepointQuery;
+
+    /**
+     * @var PDOStatement
+     */
+    private $releaseSavepointQuery;
+
+    /**
      * Constructor
      *
      * @param IBroker $broker
@@ -46,7 +70,20 @@ class Savepoint implements IStrategy
      */
     public function beginTransaction(): bool
     {
-        return $this->broker->beginTransaction();
+        // In a transaction? Don't begin another level
+        if (!$this->inTransaction() && !$this->broker->beginTransaction()) {
+            return false;
+        }
+
+        // create a savepoint
+        $newSavepoint = $this->generateSavepointName();
+        if ($this->createSavepoint($newSavepoint)) {
+            $this->savepointStack[] = $newSavepoint;
+            return true;
+        }
+
+        // Something went wrong
+        return false;
     }
 
     /**
@@ -62,7 +99,23 @@ class Savepoint implements IStrategy
      */
     public function commit(): bool
     {
-        return $this->broker->commit();
+        // Not in a transaction? something's wrong
+        if (!$this->inTransaction()) {
+            return false;
+        }
+
+        // Release the last level in the savepoint stack
+        $lastSavepoint = array_pop($this->savepointStack);
+        if (!$this->releaseSavepoint($lastSavepoint)) {
+            return false;
+        }
+
+        // No more levels left: commit the whole thing
+        if (empty($this->savepointStack)) {
+            return $this->broker->commit();
+        }
+
+        return true;
     }
 
     /**
@@ -70,6 +123,77 @@ class Savepoint implements IStrategy
      */
     public function rollback(): bool
     {
-        return $this->broker->rollBack();
+        // Not in a transaction? something's wrong
+        if (!$this->inTransaction()) {
+            return false;
+        }
+
+        // Rollback and release the last level in the savepoint stack
+        $lastSavepoint = array_pop($this->savepointStack);
+        if (!$this->rollbackToSavepoint($lastSavepoint) && !$this->releaseSavepoint($lastSavepoint)) {
+            return false;
+        }
+
+        // No more levels left: rollback the whole thing
+        if (empty($this->savepointStack)) {
+            return $this->broker->rollBack();
+        }
+
+        return true;
+    }
+
+    /**
+     * Generate an auto-incrementing savepoint name.
+     *
+     * @return string
+     */
+    private function generateSavepointName(): string
+    {
+        return 'savepoint'.$this->savepointNumber++;
+    }
+
+    /**
+     * Creates a savepoint.
+     *
+     * @param string $name
+     * @return bool
+     */
+    private function createSavepoint(string $name): bool
+    {
+        if (!$this->createSavepointQuery) {
+            $this->createSavepointQuery = $this->broker->prepare('SAVEPOINT :name');
+        }
+        $this->createSavepointQuery->bindValue('name', $name, PDO::PARAM_STR);
+        return $this->createSavepointQuery->execute();
+    }
+
+    /**
+     * Rolls back to a savepoint.
+     *
+     * @param string $name
+     * @return bool
+     */
+    private function rollbackToSavepoint($name): bool
+    {
+        if (!$this->rollbackToSavepointQuery) {
+            $this->rollbackToSavepointQuery = $this->broker->prepare('ROLLBACK TO SAVEPOINT :name');
+        }
+        $this->rollbackToSavepointQuery->bindValue('name', $name, \PDO::PARAM_STR);
+        return $this->rollbackToSavepointQuery->execute();
+    }
+
+    /**
+     * Releases a savepoint once it is no longer required.
+     *
+     * @param string $name
+     * @return bool
+     */
+    private function releaseSavepoint($name): bool
+    {
+        if (!$this->releaseSavepointQuery) {
+            $this->releaseSavepointQuery = $this->broker->prepare('RELEASE SAVEPOINT :name');
+        }
+        $this->releaseSavepointQuery->bindValue('name', $name, \PDO::PARAM_STR);
+        return $this->releaseSavepointQuery->execute();
     }
 }
