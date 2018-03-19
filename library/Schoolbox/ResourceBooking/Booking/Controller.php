@@ -629,9 +629,8 @@ class Controller extends Base
         // Get timetabled classes for this room, if there are any.
         $roomCode = $item->getRoomCode();
         if (strlen($roomCode)) {
-            $config = Calendar_Api_Config_Mapper::getInstance()->findOneForClass(Calendar_Api_EventType_Timetable_Room::class);
             $roomSource = new \Calendar_Api_EventType_Timetable_Room(
-                $config->getId(),
+                Calendar_Api_Config_Mapper::CONFIGURATION_NONE,
                 $this->getUser(),
                 $this->externalTimetableHandler,
                 [$item->getRoomCode() => $item->getId()]
