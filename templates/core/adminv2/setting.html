@@ -183,16 +183,18 @@
                                 <script type="text/javascript" src="/javascript/shared/datetime/jquery.minutepicker.js"></script>
                                 <script type="text/javascript" src="/javascript/shared/datetime/attacher.timepicker.js"></script>
                                 <script>
-                                    $('[data-timepicker]').timepicker({
-                                        timeFormat: 'H:i',
-                                        appendTo: function ($input) {
-                                            return $input.closest('.timepick');
-                                        }
-                                    });
+                                    $(document).ready(function() {
+                                        $('[data-timepicker]').timepicker({
+                                            appendTo: function ($input) {
+                                                return $input.closest('.timepick');
+                                            }
+                                        });
+                                    })
+
                                 </script>
 
                                 <div class="timepick">
-                                    <input name="{SETTING_NAME}" data-timepicker="hour" class="timeField" type="text" value="{SETTING_VALUE}" />
+                                    <input type="text" class="ui-timepicker-input" name="{SETTING_NAME}" value="{SETTING_VALUE}" data-time-format="H:i" data-timepicker />
                                 </div>
                             <!-- END setting_type_timepicker -->
 
