@@ -1,4 +1,5 @@
 {# Outputs a Alaress\Date\Interval in a consistent format. #}
+{% import _self as intervalMacro %}
 
 {%- macro intervalPart(value, singular, plural) -%}
     {{ value }} {{ value > 1 ? plural : singular }}
@@ -7,33 +8,33 @@
 {# This is really ugly, but it does work - consider making outputs neater. #}
 {% spaceless %}
     {%- if interval.dayTotal -%}
-        {{ _self.intervalPart(interval.dayTotal, 'day', 'days') }}
+        {{ intervalMacro.intervalPart(interval.dayTotal, 'day', 'days') }}
         {%- if interval.hourRemainder -%}
             {{ interval.minuteRemainder or interval.secondRemainder ? ',' : ' and' }}
-            {{ _self.intervalPart(interval.hourRemainder, 'hour', 'hours') }}
+            {{ intervalMacro.intervalPart(interval.hourRemainder, 'hour', 'hours') }}
         {%- endif -%}
         {%- if interval.minuteRemainder -%}
             {{ interval.secondRemainder ? ',' : ' and' }}
-            {{ _self.intervalPart(interval.minuteRemainder, 'minute', 'minutes') }}
+            {{ intervalMacro.intervalPart(interval.minuteRemainder, 'minute', 'minutes') }}
         {%- endif -%}
         {%- if interval.secondRemainder -%}
-            and {{ _self.intervalPart(interval.secondRemainder, 'second', 'seconds') }}
+            and {{ intervalMacro.intervalPart(interval.secondRemainder, 'second', 'seconds') }}
         {%- endif -%}
     {%- elseif interval.hourRemainder -%}
-        {{ _self.intervalPart(interval.hourRemainder, 'hour', 'hours') }}
+        {{ intervalMacro.intervalPart(interval.hourRemainder, 'hour', 'hours') }}
         {%- if interval.minuteRemainder -%}
             {{ interval.secondRemainder ? ',' : ' and' }}
-            {{ _self.intervalPart(interval.minuteRemainder, 'minute', 'minutes') }}
+            {{ intervalMacro.intervalPart(interval.minuteRemainder, 'minute', 'minutes') }}
         {%- endif -%}
         {%- if interval.secondRemainder -%}
-            and {{ _self.intervalPart(interval.secondRemainder, 'second', 'seconds') }}
+            and {{ intervalMacro.intervalPart(interval.secondRemainder, 'second', 'seconds') }}
         {%- endif -%}
     {%- elseif interval.minuteRemainder -%}
-        {{ _self.intervalPart(interval.minuteRemainder, 'minute', 'minutes') }}
+        {{ intervalMacro.intervalPart(interval.minuteRemainder, 'minute', 'minutes') }}
         {%- if interval.secondRemainder -%}
-            and {{ _self.intervalPart(interval.secondRemainder, 'second', 'seconds') }}
+            and {{ intervalMacro.intervalPart(interval.secondRemainder, 'second', 'seconds') }}
         {%- endif -%}
     {%- elseif interval.secondRemainder -%}
-        {{ _self.intervalPart(interval.secondRemainder, 'second', 'seconds') }}
+        {{ intervalMacro.intervalPart(interval.secondRemainder, 'second', 'seconds') }}
     {%- endif -%}
 {% endspaceless %}
