@@ -204,4 +204,66 @@ class NonFreedom implements IQueryHelper
     }
 
 
+    /**
+     * @param int $studentExternalId
+     * @return array
+     */
+    public function getGetStudentContactListQuery($studentExternalId): array
+    {
+        $sql = '
+            SELECT
+                F.IDENTITY_ID#,
+                -- Father
+                F.DAD_LMS,
+                F.FATHER_TITLE,
+                F.DAD_FIRSTNAME,
+                F.DAD_SURNAME,
+                F.DAD_EMAIL,
+                F.DAD_HOME_PHONE,
+                F.DAD_MOBILE,
+                F.DAD_BUSS_PHONE,
+                F.DAD_STATUS,
+                -- Mother
+                F.MUM_LMS,
+                F.MOTHER_TITLE,
+                F.MUM_FIRSTNAME,
+                F.MUM_SURNAME,
+                F.MUM_EMAIL,
+                F.MUM_HOME_PHONE,
+                F.MUM_MOBILE,
+                F.MUM_BUSS_PHONE,
+                F.MUM_STATUS,
+                -- Guardian
+                F.GUARD_LMS,
+                F.GUARDIAN_TITLE,
+                F.GUARD_FIRSTNAME,
+                F.GUARD_SURNAME,
+                F.GUARD_EMAIL,
+                F.GUARD_HOME_PH,
+                F.GUARD_MOBILE,
+                F.GUARD_BUSS_PH,
+                F.GUARD_STATUS,
+                -- Carer
+                F.CGIVE_LMS,
+                F.CGIVE_TITLE,
+                F.CGIVE_FIRSTNAME,
+                F.CGIVE_SURNAME,
+                F.CGIVE_EMAIL,
+                F.CGIVE_HOME_PH,
+                F.CGIVE_MOBILE,
+                F.CGIVE_BUSS_PH,
+                F.CGIVE_STATUS
+            FROM FAMILY AS F
+            INNER JOIN STUDENT AS S ON F.FAMKEY = S.FAMILY_CODE
+            WHERE S.STUDKEY = :studentId
+        ';
+
+        $params = [
+            'studentId' => $studentExternalId
+        ];
+
+        return [ $sql, $params ];
+    }
+
+
 }

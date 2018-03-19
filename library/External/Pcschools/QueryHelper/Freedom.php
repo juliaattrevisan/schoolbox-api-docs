@@ -122,4 +122,54 @@ class Freedom implements IQueryHelper
     }
 
 
+    /**
+     * @param int $studentExternalId
+     * @return array
+     */
+    public function getGetStudentContactListQuery($studentExternalId): array
+    {
+        $sql = "
+            SELECT
+            CONVERT(varchar(10), I.MEMBER#)     AS StudentContactID,
+            ''                                  AS StudentContactTitle,
+            CONVERT(varchar(20), I.GIVENNAME)   AS StudentContactPreferred,
+            CONVERT(varchar(20), I.SURNAME)     AS StudentContactSurname,
+            I.EMAIL                             AS StudentContactDefaultEmail,
+            I.MOBILE                            AS StudentContactMobilePhone,
+            I.BUS_PHONE                         AS StudentContactOccupPhone,
+            I.HOME_PHONE                     '' AS StudentContactPhoneActual,
+                                             '' AS StudentContactMobilePhone,
+                                             '' AS StudentContactOccupPhone,
+                                             '' AS StudentContactRelation,
+                                             '' AS StudentContactSpouseID,
+                                             '' AS StudentContactSpouseTitle,
+                                             '' AS StudentContactSpousePreferred,
+                                             '' AS StudentContactSpouseSurname,
+                                             '' AS StudentContactSpouseMobilePhone,
+                                             '' AS StudentContactSpouseOccupPhone,
+                                             '' AS StudentContactSpouseDefaultEmail,
+                                             '' AS StudentContactType,
+                                             '' AS StudentContactSpouseRelation
+            FROM dbo.[IDENTITY] AS I
+            INNER JOIN dbo.ALUMREL AS A ON A.PARENT# = I.MEMBER#
+            INNER JOIN dbo.STUDENT AS S ON S.STUDENT# = A.CHILD#
+            WHERE (A.RELATION_STAT = :relationStatus)
+            AND (S.CURRENT_YEAR BETWEEN ' 5' AND '12')
+            AND (A.PARENT# <> A.FAMILY_HASH) and (i.DECEASED = ' ')
+            AND (A.STUDENT_PREF = :contactLevel)
+            AND (givenname <> :fakeRecordName)
+            AND (S.STUDKEY = :studentId)
+            ORDER BY I.MEMBER# ASC;
+        ";
+
+        $params = [
+            'relationStatus' => self::RELATION_CHILD,
+            'contactLevel'   => self::CONTACT_LEVEL_FULL,
+            'fakeRecordName' => self::FAKE_RECORD_NAME,
+            'studentId'      => $studentExternalId
+        ];
+
+        return [ $sql, $params ];
+    }
+
 }

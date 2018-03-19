@@ -22,11 +22,12 @@ interface IQueryHelper
 //     */
 //    public function getGetStudentQuery(): array;
 //
-//    /**
-//     * @return array
-//     */
-//    public function getGetStudentContactListQuery(): array;
-//
+    /**
+     * @param int $studentExternalId
+     * @return array
+     */
+    public function getGetStudentContactListQuery($studentExternalId): array;
+
     /**
      * @param array $studentExternalIds
      * @return array
