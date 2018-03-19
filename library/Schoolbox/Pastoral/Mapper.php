@@ -367,11 +367,12 @@ class Mapper extends BaseMapper
         return $statement->fetchAll(PDO::FETCH_ASSOC);
     }
 
+
     /**
      * Display the most recent records that are tagged for display on dashboard based on their severity
      *
      * @param User $user
-     *
+     * @param int  $limit
      * @return Collection|Model[]
      * @throws MapperException
      */
