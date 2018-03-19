@@ -23,6 +23,7 @@ $this->setBlock('setting', 'setting_type_colour', 'setting_type_colour_block');
 $this->setBlock('setting', 'setting_type_file', 'setting_type_file_block');
 $this->setBlock('setting', 'setting_type_list', 'setting_type_list_block');
 $this->setBlock('setting', 'setting_type_resource', 'setting_type_resource_block');
+$this->setBlock('setting', 'setting_type_timepicker', 'setting_type_timepicker_block');
 $this->setBlock(TEMPLATE_content, 'setting_save', 'setting_save_block');
 
 // include the admin navigation
@@ -88,7 +89,8 @@ if(is_array($optionList)) {
             'setting_type_list_block'        => '',
             'setting_type_resource_block'    => '',
             'setting_type_colour_block'      => '',
-            'setting_type_file_block'      => '',
+            'setting_type_file_block'        => '',
+            'setting_type_timepicker_block'        => '',
             'setting_group_localisation_block' => '',
             'setting_group_skin_config_block' => '',
         );
@@ -196,7 +198,6 @@ if(is_array($optionList)) {
                     break;
 
                 case 'timepicker':
-                    $this->setVar('setting_type_timepicker_block');
                     $this->parse('setting_type_timepicker_block', 'setting_type_timepicker');
                     break;
 

@@ -117,71 +117,84 @@
                         <!-- END setting_group_skin_config -->
 
                         <!-- BEGIN setting -->
-                        <label for="{SETTING_NAME}">
-                            {SETTING_TITLE}
-                            <span data-tooltip class="has-tip tip-top hint" title="{SETTING_DESC}">?</span>
-                        </label>
+                            <label for="{SETTING_NAME}">
+                                {SETTING_TITLE}
+                                <span data-tooltip class="has-tip tip-top hint" title="{SETTING_DESC}">?</span>
+                            </label>
 
-                        <!-- BEGIN setting_type_noneditable -->
-                        <p>{SETTING_VALUE}</p>
-                        <!-- END setting_type_noneditable -->
+                            <!-- BEGIN setting_type_noneditable -->
+                            <p>{SETTING_VALUE}</p>
+                            <!-- END setting_type_noneditable -->
 
-                        <!-- BEGIN setting_type_input -->
-                        <input id="{SETTING_NAME}" class="{OPTION_REQUIRED}" {OPTION_REQUIRED} type="text" name="{SETTING_NAME}" value="{SETTING_VALUE}" />
-                        <!-- END setting_type_input -->
+                            <!-- BEGIN setting_type_input -->
+                            <input id="{SETTING_NAME}" class="{OPTION_REQUIRED}" {OPTION_REQUIRED} type="text" name="{SETTING_NAME}" value="{SETTING_VALUE}" />
+                            <!-- END setting_type_input -->
 
-                        <!-- BEGIN setting_type_password -->
-                        <input id="{SETTING_NAME}" class="{OPTION_REQUIRED}" {OPTION_REQUIRED} type="password" name="{SETTING_NAME}" value="{SETTING_VALUE}" />
-                        <!-- END setting_type_password -->
+                            <!-- BEGIN setting_type_password -->
+                            <input id="{SETTING_NAME}" class="{OPTION_REQUIRED}" {OPTION_REQUIRED} type="password" name="{SETTING_NAME}" value="{SETTING_VALUE}" />
+                            <!-- END setting_type_password -->
 
-                        <!-- BEGIN setting_type_textarea -->
-                        <textarea id="{SETTING_NAME}" class="{OPTION_REQUIRED}" {OPTION_REQUIRED} name="{SETTING_NAME}" rows="5">{SETTING_VALUE}</textarea>
-                        <!-- END setting_type_textarea -->
+                            <!-- BEGIN setting_type_textarea -->
+                            <textarea id="{SETTING_NAME}" class="{OPTION_REQUIRED}" {OPTION_REQUIRED} name="{SETTING_NAME}" rows="5">{SETTING_VALUE}</textarea>
+                            <!-- END setting_type_textarea -->
 
-                        <!-- BEGIN setting_type_html -->
-                        <textarea id="{SETTING_NAME}" class="{OPTION_REQUIRED}" {OPTION_REQUIRED} name="{SETTING_NAME}" data-html-editor>{SETTING_VALUE}</textarea>
-                        <!-- END setting_type_html -->
+                            <!-- BEGIN setting_type_html -->
+                            <textarea id="{SETTING_NAME}" class="{OPTION_REQUIRED}" {OPTION_REQUIRED} name="{SETTING_NAME}" data-html-editor>{SETTING_VALUE}</textarea>
+                            <!-- END setting_type_html -->
 
-                        <!-- BEGIN setting_type_resource -->
-                        <input id="{SETTING_NAME}" class="{OPTION_REQUIRED}" {OPTION_REQUIRED} type="text" name="{SETTING_NAME}" value="{SETTING_VALUE}" />
-                        <a href="#" class="button" data-interaction="homepage_selector" data-input_name="{SETTING_NAME}">Select Source</a>
-                        <!-- END setting_type_resource -->
+                            <!-- BEGIN setting_type_resource -->
+                            <input id="{SETTING_NAME}" class="{OPTION_REQUIRED}" {OPTION_REQUIRED} type="text" name="{SETTING_NAME}" value="{SETTING_VALUE}" />
+                            <a href="#" class="button" data-interaction="homepage_selector" data-input_name="{SETTING_NAME}">Select Source</a>
+                            <!-- END setting_type_resource -->
 
-                        <!-- BEGIN setting_type_boolean -->
-                        <fieldset tabindex="0">
-                            <div class="switch">
-                                <input name="{SETTING_NAME}" value="0" type="hidden">
-                                <input id="{SETTING_NAME}" name="{SETTING_NAME}" {SETTING_CHECKED} value="1" type="checkbox">
-                                <label for="{SETTING_NAME}">
-                                    <span>On</span>
-                                    <span>Off</span>
-                                </label>
-                            </div>
-                        </fieldset>
-                        <!-- END setting_type_boolean -->
+                            <!-- BEGIN setting_type_boolean -->
+                            <fieldset tabindex="0">
+                                <div class="switch">
+                                    <input name="{SETTING_NAME}" value="0" type="hidden">
+                                    <input id="{SETTING_NAME}" name="{SETTING_NAME}" {SETTING_CHECKED} value="1" type="checkbox">
+                                    <label for="{SETTING_NAME}">
+                                        <span>On</span>
+                                        <span>Off</span>
+                                    </label>
+                                </div>
+                            </fieldset>
+                            <!-- END setting_type_boolean -->
 
-                        <!-- BEGIN setting_type_select -->
-                        <select name="{SETTING_NAME}">
-                            <!-- BEGIN setting_select -->
-                            <option value="{SELECT_VALUE}" {SETTING_OPTION_SELECTED}>{SELECT_OPTION}</option>
-                            <!-- END setting_select -->
-                        </select>
-                        <!-- END setting_type_select -->
+                            <!-- BEGIN setting_type_select -->
+                            <select name="{SETTING_NAME}">
+                                <!-- BEGIN setting_select -->
+                                <option value="{SELECT_VALUE}" {SETTING_OPTION_SELECTED}>{SELECT_OPTION}</option>
+                                <!-- END setting_select -->
+                            </select>
+                            <!-- END setting_type_select -->
 
-                        <!-- BEGIN setting_type_colour -->
-                        <input type="text" value="{SETTING_VALUE}" name="{SETTING_NAME}" class="{OPTION_REQUIRED}" {OPTION_REQUIRED} data-colour-picker />
-                        <!-- END setting_type_colour -->
+                            <!-- BEGIN setting_type_colour -->
+                            <input type="text" value="{SETTING_VALUE}" name="{SETTING_NAME}" class="{OPTION_REQUIRED}" {OPTION_REQUIRED} data-colour-picker />
+                            <!-- END setting_type_colour -->
 
-                        <!-- BEGIN setting_type_file -->
-                        <input type="hidden" name="{SETTING_NAME}" value="" />
-                        {ATTACH_ZONE}
-                        <!-- END setting_type_file -->
+                            <!-- BEGIN setting_type_file -->
+                            <input type="hidden" name="{SETTING_NAME}" value="" />
+                            {ATTACH_ZONE}
+                            <!-- END setting_type_file -->
 
-                        <!-- BEGIN setting_type_timepicker -->
-                            <div class="timepick">
-                                <input name="{SETTING_NAME}" data-timepicker="hour" class="timeField" type="text" maxlength="2" value="{SETTING_VALUE}" />
-                            </div>
-                        <!-- END setting_type_timepicker -->
+                            <!-- BEGIN setting_type_timepicker -->
+                                <script type="text/javascript" src="/javascript/components/jquery-timepicker-jt/jquery.timepicker.min.js"></script>
+                                <script type="text/javascript" src="/javascript/shared/datetime/jquery.hourpicker.js"></script>
+                                <script type="text/javascript" src="/javascript/shared/datetime/jquery.minutepicker.js"></script>
+                                <script type="text/javascript" src="/javascript/shared/datetime/attacher.timepicker.js"></script>
+                                <script>
+                                    $('[data-timepicker]').timepicker({
+                                        timeFormat: 'H:i',
+                                        appendTo: function ($input) {
+                                            return $input.closest('.timepick');
+                                        }
+                                    });
+                                </script>
+
+                                <div class="timepick">
+                                    <input name="{SETTING_NAME}" data-timepicker="hour" class="timeField" type="text" value="{SETTING_VALUE}" />
+                                </div>
+                            <!-- END setting_type_timepicker -->
 
                         <!-- END setting -->
                     </div>
