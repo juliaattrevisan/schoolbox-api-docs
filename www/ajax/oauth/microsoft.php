@@ -46,7 +46,7 @@ if (!isset($_GET['code'])) {
 
     // If we don't have an authorization code then get one
     $authUrl = $provider->getAuthorizationUrl();
-    $_SESSION[$sesskey] = $provider->state;
+    $_SESSION[$sesskey] = $provider->getState();
     header('Location: '.$authUrl);
     exit;
 
@@ -76,7 +76,7 @@ if (!isset($_GET['code'])) {
     // Number of seconds until the access token will expire, and need refreshing
 //    var_dump($token->expires); echo "<br/>";
 
-    $_SESSION['azureAccessToken'] = $token->accessToken;
+    $_SESSION['azureAccessToken'] = $token->getToken();
 
     http_response_code(201);
     die('<html><script type="text/javascript">window.close();</script></html>');
