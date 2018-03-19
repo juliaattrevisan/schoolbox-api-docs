@@ -27,11 +27,12 @@ interface IQueryHelper
 //     */
 //    public function getGetStudentContactListQuery(): array;
 //
-//    /**
-//     * @return array
-//     */
-//    public function getGetParentEmailsQuery(): array;
-//
+    /**
+     * @param array $studentExternalIds
+     * @return array
+     */
+    public function getGetParentEmailsQuery($studentExternalIds): array;
+
     /**
      * @param int $externalUserId
      * @return array

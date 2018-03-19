@@ -467,29 +467,25 @@ class External_Pcschools_User implements External_UserInterface
         if (empty($synergyIds)) {
             return [];
         }
-        $query = "
-            SELECT
-                F.IDENTITY_ID#,
-                -- Father
-                F.DAD_LMS,
-                F.DAD_EMAIL,
-                -- Mother
-                F.MUM_LMS,
-                F.MUM_EMAIL,
-                -- Guardian
-                F.GUARD_LMS,
-                F.GUARD_EMAIL,
-                -- Carer
-                F.CGIVE_LMS,
-                F.CGIVE_EMAIL
-            FROM FAMILY AS F
-            INNER JOIN STUDENT AS S ON F.FAMKEY = S.FAMILY_CODE
-        ";
+
+        [ $query, $params ] = $this->queryHelper->getGetParentEmailsQuery($synergyIds);
+
         $whereParts = [];
         foreach ($synergyIds as $id) {
             $whereParts[] = "S.STUDKEY = {$this->getDatabase()->smartQuote($id)}";
         }
-        $query .= ' WHERE '.implode(' OR ', $whereParts);
+        $query .= ' AND ('.implode(' OR ', $whereParts) . ')';
+
+        // sorry for the hack!!
+        if ($this->queryHelper instanceof Freedom) {
+            // freedom returns the data cleanly, just index by ID and return
+            $result = $this->getDatabase()->getAll($query, $params);
+
+            return array_combine(
+                array_column($result, 'IDENTITY_ID#'),
+                array_column($result, 'EMAIL')
+            );
+        }
 
         // Munge data in same way we would in getStudentContactList
         $results = [];

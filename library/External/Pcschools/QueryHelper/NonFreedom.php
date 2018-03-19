@@ -173,4 +173,35 @@ class NonFreedom implements IQueryHelper
         return [ $query, $params ];
     }
 
+
+    /**
+     * @param array $studentExternalIds
+     * @return array
+     */
+    public function getGetParentEmailsQuery($studentExternalIds): array
+    {
+        $query = "
+            SELECT
+                F.IDENTITY_ID#,
+                -- Father
+                F.DAD_LMS,
+                F.DAD_EMAIL,
+                -- Mother
+                F.MUM_LMS,
+                F.MUM_EMAIL,
+                -- Guardian
+                F.GUARD_LMS,
+                F.GUARD_EMAIL,
+                -- Carer
+                F.CGIVE_LMS,
+                F.CGIVE_EMAIL
+            FROM FAMILY AS F
+            INNER JOIN STUDENT AS S ON F.FAMKEY = S.FAMILY_CODE
+            WHERE 1=1
+        ";
+
+        return [ $query, [] ];
+    }
+
+
 }
