@@ -64,9 +64,8 @@ class CalendarApiFactory
 
         // Add the room code API if this resource has got a room code
         if ($roomCode = $resource->getRoomCode()) {
-            $config = $calendarConfigMapper->findOneForClass(Calendar_Api_EventType_Timetable_Room::class);
             $timetableApi = new Calendar_Api_EventType_Timetable_Room(
-                $config->getId(),
+                Calendar_Api_Config_Mapper::CONFIGURATION_NONE,
                 $this->user,
                 $this->timetable,
                 [$roomCode => $resource->getId()]
@@ -113,9 +112,8 @@ class CalendarApiFactory
             $api->add($resourceApi);
         }
         if ($getTimetabledRooms && !empty($roomCodes)) {
-            $config = $calendarConfigMapper->findOneForClass(Calendar_Api_EventType_Timetable_Room::class);
             $timetableApi = new Calendar_Api_EventType_Timetable_Room(
-                $config->getId(),
+                Calendar_Api_Config_Mapper::CONFIGURATION_NONE,
                 $this->user,
                 $this->timetable,
                 $roomCodes
