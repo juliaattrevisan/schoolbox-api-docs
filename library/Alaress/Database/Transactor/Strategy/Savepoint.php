@@ -9,8 +9,6 @@ declare(strict_types=1);
 namespace Alaress\Database\Transactor\Strategy;
 
 use Alaress\Database\Connector\IConnector;
-use PDO;
-use PDOStatement;
 
 /**
  * Savepoint strategy for database transaction handling. This strategy
@@ -39,21 +37,6 @@ class Savepoint implements IStrategy
      * @var int
      */
     private $savepointNumber = 0;
-
-    /**
-     * @var PDOStatement
-     */
-    private $createSavepointQuery;
-
-    /**
-     * @var PDOStatement
-     */
-    private $rollbackToSavepointQuery;
-
-    /**
-     * @var PDOStatement
-     */
-    private $releaseSavepointQuery;
 
     /**
      * Constructor
@@ -160,11 +143,10 @@ class Savepoint implements IStrategy
      */
     private function createSavepoint(string $name): bool
     {
-        if (!$this->createSavepointQuery) {
-            $this->createSavepointQuery = $this->connector->prepareQuery('SAVEPOINT :name');
-        }
-        $this->createSavepointQuery->bindValue('name', $name, PDO::PARAM_STR);
-        return $this->createSavepointQuery->execute();
+        // The DB steadfastly refuses to allow me to use bound params in
+        // savepoint queries.
+        // Inject instead -_- it will be safe as we directly control the input
+        return $this->connector->execute(sprintf('SAVEPOINT %s', $name));
     }
 
     /**
@@ -173,13 +155,9 @@ class Savepoint implements IStrategy
      * @param string $name
      * @return bool
      */
-    private function rollbackToSavepoint($name): bool
+    private function rollbackToSavepoint(string $name): bool
     {
-        if (!$this->rollbackToSavepointQuery) {
-            $this->rollbackToSavepointQuery = $this->connector->prepareQuery('ROLLBACK TO SAVEPOINT :name');
-        }
-        $this->rollbackToSavepointQuery->bindValue('name', $name, \PDO::PARAM_STR);
-        return $this->rollbackToSavepointQuery->execute();
+        return $this->connector->execute(sprintf('ROLLBACK TO SAVEPOINT %s', $name));
     }
 
     /**
@@ -188,12 +166,8 @@ class Savepoint implements IStrategy
      * @param string $name
      * @return bool
      */
-    private function releaseSavepoint($name): bool
+    private function releaseSavepoint(string $name): bool
     {
-        if (!$this->releaseSavepointQuery) {
-            $this->releaseSavepointQuery = $this->connector->prepareQuery('RELEASE SAVEPOINT :name');
-        }
-        $this->releaseSavepointQuery->bindValue('name', $name, \PDO::PARAM_STR);
-        return $this->releaseSavepointQuery->execute();
+        return $this->connector->execute(sprintf('RELEASE SAVEPOINT %s', $name));
     }
 }
