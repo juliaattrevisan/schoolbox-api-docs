@@ -381,7 +381,7 @@ class Mapper extends BaseMapper
             $this->findByColumnList([
                 'sv.dashboard' => 1,
             ], [
-                'order' => ['created_at' => 'DESC'], 'limit' => 5
+                'order' => ['created_at' => 'DESC'], 'limit' => $limit
             ]
             ),
             $user
