@@ -643,7 +643,7 @@ class Factory
 
             // Show marks as series
             // Calculation in PHP is kind of annoying, but...
-            $distribution['continuous']['series'] = Statistics::buildSeries($marks);
+            $distribution['continuous']['series'] = Statistics::buildBoxPlotValues($marks);
         }
         return $distribution;
     }

@@ -62,21 +62,21 @@ class StatisticsTest extends TestCase
     }
 
     /**
-     * Tests calculation of series.
+     * Tests calculation of box plot values.
      *
-     * @dataProvider getBuildSeriesMedianData
+     * @dataProvider getBuildBoxPlotValuesData
      * @param array $values
      * @param array $expected
      */
-    public function testBuildSeries(array $values, array $expected): void
+    public function testBuildBoxPlotValues(array $values, array $expected): void
     {
-        $this->assertEquals($expected, Statistics::buildSeries($values));
+        $this->assertEquals($expected, Statistics::buildBoxPlotValues($values));
     }
 
     /**
      * @return array
      */
-    public function getBuildSeriesMedianData(): array
+    public function getBuildBoxPlotValuesData(): array
     {
         return [
             'empty' => [

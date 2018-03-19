@@ -68,7 +68,7 @@ class Statistics
      *               q1:     median of highest half of values
      *               high:   max value
      */
-    public static function buildSeries(array $values): array
+    public static function buildBoxPlotValues(array $values): array
     {
         $values = static::preProcess($values);
 
