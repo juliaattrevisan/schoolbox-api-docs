@@ -5,7 +5,7 @@ VALUES (
   'calendar_start_time',
   '06:00',
   'Calendar Start Time',
-  'Select the default start time for events created via the Day and Week views',
+  'Select the default start time (in 24hr time) for events created via the Day and Week views',
   15,
   NULL,
   6,
