@@ -9,8 +9,13 @@
 
 namespace Schoolbox\External\Connector\Pcschools\Base;
 
+use Alaress\Database\Connector\IConnector;
+use External\Pcschools\QueryHelper\Freedom;
+use External\Pcschools\QueryHelper\IQueryHelper;
+use External\Pcschools\QueryHelper\NonFreedom;
 use Schoolbox\External\Connector\Base;
 use Schoolbox\External\Connector\ISync;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Sync\Iterator;
 
 class Sync extends Base implements ISync
@@ -23,6 +28,25 @@ class Sync extends Base implements ISync
     const CONTACT_LEVEL_FULL           = 'F';
     const CONTACT_LEVEL_NONE           = 'N';
     const CONTACT_LEVEL_NO_DEMOGRAPHIC = 'D';
+
+    /** @var IQueryHelper */
+    private $queryHelper;
+
+    /**
+     * Constructor
+     *
+     * @param IConfigLoader    $config
+     * @param array|IConnector $databaseExternal External database connector(s)
+     */
+    public function __construct(IConfigLoader $config, $databaseExternal)
+    {
+        parent::__construct($config, $databaseExternal);
+
+        $this->queryHelper = $this->databaseExternal->executeQuery(IQueryHelper::FREEDOM_DETECT)->fetchColumn()
+            ? new Freedom()
+            : new NonFreedom();
+    }
+
 
     /**
      * {@inheritdoc}
@@ -67,159 +91,10 @@ class Sync extends Base implements ISync
      */
     public function findAllParents()
     {
-        $versionDetectQuery = "SELECT COUNT(*) FROM pcschool.dbo.workarea WHERE DBNAME = 'PCSchool' AND STATUS = 'F'";
-
-        $isFreedom = $this->databaseExternal->executeQuery($versionDetectQuery)->fetchColumn();
-
-        if ($isFreedom) {
-            return $this->findAllParentsFreedom();
-        }
-
-        return $this->findAllParentsNonFreedom();
-    }
-
-    /**
-     * @return Iterator\Guardian
-     */
-    protected function findAllParentsFreedom()
-    {
-        $query = "
-            SELECT
-            ''                                  AS student_contact_network_login,
-            CONVERT(varchar(10), I.MEMBER#)     AS student_contact_id,
-            ''                                  AS student_contact_title,
-            CONVERT(varchar(20), I.GIVENNAME)   AS student_contact_given_name,
-            CONVERT(varchar(20), I.GIVENNAME)   AS student_contact_preferred,
-            CONVERT(varchar(20), I.SURNAME)     AS student_contact_surname,
-            I.EMAIL                             AS student_contact_work_email,
-            I.EMAIL_PERSONAL                    AS student_contact_home_email,
-            S.STUDKEY                           AS student_id,
-            S.CURRENT_YEAR                      AS student_year_level,
-            S.CAMPUS                            AS student_campus,
-            S.HOUSE                             AS student_house,
-            S.SEX                               AS student_gender,
-            S.GIVEN_NAME                        AS student_preferred,
-            S.LEGAL_SURNAME                     AS student_surname
-            FROM dbo.[IDENTITY] AS I
-            INNER JOIN dbo.ALUMREL AS A ON A.PARENT# = I.MEMBER#
-            INNER JOIN dbo.STUDENT AS S ON S.STUDENT# = A.CHILD#
-            WHERE (A.RELATION_STAT = 'C')
-            AND (S.CURRENT_YEAR BETWEEN ' 5' AND '12')
-            AND (A.PARENT# <> A.FAMILY_HASH) and (i.DECEASED = ' ')
-            AND (A.STUDENT_PREF = 'I') -- I=LMS FULL ACCESS, A=LMS RESTRCITED, ''=LMS NO ACCESS
-            AND (givenname <> 'Second Email')
-            ORDER BY I.MEMBER# ASC;
-        ";
+        [ $query, $params ] = $this->queryHelper->getFindAllParentsQuery();
 
         return new Iterator\Guardian(
-            $this->databaseExternal->getQueryIterator($query)
-        );
-    }
-
-    /**
-     * @return Iterator\Guardian
-     */
-    protected function findAllParentsNonFreedom()
-    {
-        $childSelect = "
-            S.STUDKEY       AS student_id,
-            S.CURRENT_YEAR  AS student_year_level,
-            S.CAMPUS        AS student_campus,
-            S.HOUSE         AS student_house,
-            S.SEX           AS student_gender,
-            S.GIVEN_NAME    AS student_preferred,
-            S.SURNAME AS student_surname
-        ";
-
-        $query = "
-            SELECT
-                ''                    AS student_contact_network_login,
-                CAST(F.IDENTITY_ID# AS VARCHAR(16)) + '-' + :suffixF
-                                      AS student_contact_id,
-                ''                    AS student_contact_title,
-                F.DAD_FIRSTNAME       AS student_contact_given_name,
-                F.DAD_FIRSTNAME       AS student_contact_preferred,
-                F.DAD_SURNAME         AS student_contact_surname,
-                ''                    AS student_contact_home_email,
-                F.DAD_EMAIL           AS student_contact_default_email,
-                ''                    AS student_contact_work_email,
-                $childSelect
-            FROM FAMILY F
-            INNER JOIN STUDENT S ON F.FAMKEY = S.FAMILY_CODE
-            WHERE (S.DATE_DEPART IS NULL OR DATEDIFF(DAY, S.DATE_DEPART, '1753-01-01') = 0)
-            AND   F.DAD_LMS = :contactLevel
-
-            UNION ALL
-
-            SELECT
-                ''                    AS student_contact_network_login,
-                CAST(F.IDENTITY_ID# AS VARCHAR(16)) + '-' + :suffixM
-                                      AS student_contact_id,
-                ''                    AS student_contact_title,
-                F.MUM_FIRSTNAME       AS student_contact_given_name,
-                F.MUM_FIRSTNAME       AS student_contact_preferred,
-                F.MUM_SURNAME         AS student_contact_surname,
-                ''                    AS student_contact_home_email,
-                F.MUM_EMAIL           AS student_contact_default_email,
-                ''                    AS student_contact_work_email,
-                $childSelect
-            FROM FAMILY F
-            INNER JOIN STUDENT S ON F.FAMKEY = S.FAMILY_CODE
-            WHERE (S.DATE_DEPART IS NULL OR DATEDIFF(DAY, S.DATE_DEPART, '1753-01-01') = 0)
-            AND   F.MUM_LMS = :contactLevel
-
-            UNION ALL
-
-            SELECT
-                ''                    AS student_contact_network_login,
-                CAST(F.IDENTITY_ID# AS VARCHAR(16)) + '-' + :suffixC
-                                      AS student_contact_id,
-                ''                    AS student_contact_title,
-                F.CGIVE_FIRSTNAME     AS student_contact_given_name,
-                F.CGIVE_FIRSTNAME     AS student_contact_preferred,
-                F.CGIVE_SURNAME       AS student_contact_surname,
-                ''                    AS student_contact_home_email,
-                F.CGIVE_EMAIL         AS student_contact_default_email,
-                ''                    AS student_contact_work_email,
-                $childSelect
-            FROM FAMILY F
-            INNER JOIN STUDENT S ON F.FAMKEY = S.FAMILY_CODE
-            WHERE (S.DATE_DEPART IS NULL OR DATEDIFF(DAY, S.DATE_DEPART, '1753-01-01') = 0)
-            AND   F.CGIVE_LMS = :contactLevel
-
-            UNION ALL
-
-            SELECT
-                ''                    AS student_contact_network_login,
-                CAST(F.IDENTITY_ID# AS VARCHAR(16)) + '-' + :suffixG
-                                      AS student_contact_id,
-                ''                    AS student_contact_title,
-                F.GUARD_FIRSTNAME     AS student_contact_given_name,
-                F.GUARD_FIRSTNAME     AS student_contact_preferred,
-                F.GUARD_SURNAME       AS student_contact_surname,
-                ''                    AS student_contact_home_email,
-                F.GUARD_EMAIL         AS student_contact_default_email,
-                ''                    AS student_contact_work_email,
-                $childSelect
-            FROM FAMILY F
-            INNER JOIN STUDENT S ON F.FAMKEY = S.FAMILY_CODE
-            WHERE (S.DATE_DEPART IS NULL OR DATEDIFF(DAY, S.DATE_DEPART, '1753-01-01') = 0)
-            AND   F.GUARD_LMS = :contactLevel
-
-            ORDER BY student_contact_id ASC
-        ";
-
-        return new Iterator\Guardian(
-            $this->databaseExternal->getQueryIterator(
-                $query,
-                [
-                    'suffixF'      => self::CONTACT_TYPE_FATHER,
-                    'suffixM'      => self::CONTACT_TYPE_FATHER,
-                    'suffixC'      => self::CONTACT_TYPE_CAREGIVER,
-                    'suffixG'      => self::CONTACT_TYPE_GUARDIAN,
-                    'contactLevel' => self::CONTACT_LEVEL_FULL,
-                ]
-            )
+            $this->databaseExternal->getQueryIterator($query, $params)
         );
     }
 
