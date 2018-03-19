@@ -9,32 +9,14 @@ declare(strict_types=1);
 namespace Alaress\Statistics;
 
 /**
- * Class Statistics
+ * Class for basic statistics generation.
+ *
+ * Currently includes calculations for:
+ * * median
+ * * series
  */
 class Statistics
 {
-//    /**
-//     * You shouldn't need this
-//     *
-//     * @param array $values
-//     * @return float|null
-//     */
-//    public static function min(array $values): ?float
-//    {
-//        return min($values);
-//    }
-//
-//    /**
-//     * You shouldn't need this
-//     *
-//     * @param array $values
-//     * @return float|null
-//     */
-//    public static function max(array $values): ?float
-//    {
-//        return max($values);
-//    }
-
     /**
      * Determines the median value of $values.
      *
@@ -47,6 +29,8 @@ class Statistics
         // are a surprisingly deep rabbit-hole:
         // https://en.wikipedia.org/wiki/Percentile#The_nearest-rank_method
         // https://en.wikipedia.org/wiki/Percentile#The_linear_interpolation_between_closest_ranks_method
+
+        $values = static::preProcess($values);
 
         // Can't median a value which doesn't exist
         if (empty($values)) {
@@ -82,7 +66,7 @@ class Statistics
      */
     public static function buildSeries(array $values): array
     {
-        sort($values);
+        $values = static::preProcess($values);
         $series = [
             'low'    => min($values),
             'high'   => max($values),
@@ -98,4 +82,19 @@ class Statistics
         return $series;
     }
 
+
+    /**
+     * Pre-process the set of values for use in median and series calculations.
+     * * Remove non-numeric values
+     * * Sort in ascending order
+     *
+     * @param array $values
+     * @return array
+     */
+    private static function preProcess(array $values): array
+    {
+        $values = array_filter($values, 'is_numeric');
+        sort($values);
+        return $values;
+    }
 }
