@@ -127,6 +127,7 @@ class Controller extends Base
         $fixed  = [];
         $nulls  = [];
         $radios = [];
+        $checkboxes = [];
 
         // Get the data into some sort of usable format
 
@@ -140,6 +141,8 @@ class Controller extends Base
                 $nulls[substr($field, 5)] = $value;
             } else if (substr($field, 0, 6) == "radio-") {
                 $radios[substr($field, 6)] = $value;
+            } else if (substr($field, 0, 9) == "checkbox-") {
+                $checkboxes[substr($field, 9)] = $value;
             } else if ($field == "id") {
                 $ids = $value;
             }
@@ -192,6 +195,19 @@ class Controller extends Base
 
             // Process any radio buttons for this list
             foreach ($radios as $field => $index) {
+                $setter = "set" . $this->underscoreToCamelCase($field);
+
+                // Radio buttons can only be on for one row, so set that row to true and all others to false
+
+                if ($id == $ids[$index]) {
+                    $model->$setter(1);
+                } else {
+                    $model->$setter(0);
+                }
+            }
+
+            //Process all the lovely checkboxes
+            foreach ($checkboxes as $field => $index) {
                 $setter = "set" . $this->underscoreToCamelCase($field);
 
                 // Radio buttons can only be on for one row, so set that row to true and all others to false

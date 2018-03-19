@@ -34,7 +34,7 @@ class Model
     /**
      * @return bool
      */
-    public function getShowOnGradesPage(): bool
+    public function getShowOnGradesPage()
     {
         return $this->isShowOnGradesPage();
     }
@@ -42,7 +42,7 @@ class Model
     /**
      * @return bool
      */
-    public function isShowOnGradesPage(): bool
+    public function isShowOnGradesPage()
     {
         return $this->showOnGradesPage;
     }
