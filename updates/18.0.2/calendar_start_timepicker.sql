@@ -1,3 +1,5 @@
+INSERT INTO `lu_config_field` (`field`) VALUES ('timepicker');
+
 INSERT INTO `config` (`name`, `value`, `title`, `description`, `field_id`, `options`, `type_id`, `editable`, `hidden`, `required`)
 VALUES (
   'calendar_start_time',
@@ -11,5 +13,3 @@ VALUES (
   'false',
   'true'
 );
-
-INSERT INTO `lu_config_field` (`field`) VALUES ('timepicker');
