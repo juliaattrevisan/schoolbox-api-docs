@@ -31,14 +31,12 @@
                                     <label for="{{ field_key }}-{{ recordIndex }}"></label>
                                 </div>
                             {% elseif field.checkbox is not empty %}
-                                {# Radio field, shared between all rows #}
                                 <div class="checklist">
-                                    <input type="checkbox"
-                                           name="checkbox-{{ field_key }}"
-                                           value="{{ recordIndex }}"
+                                    <input name="checkbox-{{ field_key }}[{{ recordIndex }}]"
+                                           value="1"
                                            id="{{ field_key }}-{{ recordIndex }}"
-                                        {% if (record[field_key] == 1) %} checked {% endif %}"
-                                    {{ disabledAttr }}
+                                           type="checkbox"
+                                           {% if record[field_key]  %}checked{% endif %}
                                     />
                                     <label for="{{ field_key }}-{{ recordIndex }}"></label>
                                 </div>

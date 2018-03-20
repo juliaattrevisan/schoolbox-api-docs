@@ -207,16 +207,10 @@ class Controller extends Base
             }
 
             //Process all the lovely checkboxes
-            foreach ($checkboxes as $field => $index) {
+            foreach ($checkboxes as $field => $value) {
                 $setter = "set" . $this->underscoreToCamelCase($field);
-
-                // Radio buttons can only be on for one row, so set that row to true and all others to false
-
-                if ($id == $ids[$index]) {
-                    $model->$setter(1);
-                } else {
-                    $model->$setter(0);
-                }
+                $boolean = isset($value[$currentIndex]);
+                $model->$setter($boolean);
             }
 
             if ($sortable_column != "") {
