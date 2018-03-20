@@ -3,9 +3,17 @@
 <script type="text/javascript" src="/javascript/components/schoolbox-masonry.min.js?v={SITE_VERSION}"></script>
 <script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
 <script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
+<script type="text/javascript" src="/javascript/components/jquery-timepicker-jt/jquery.timepicker.min.js"></script>
 
 <script type="text/javascript">
     $(function() {
+        $('[data-timepicker]').timepicker({
+            step: 60,
+            appendTo: function ($input) {
+                return $input.closest('.timepick');
+            }
+        });
+
         $("[data-colour-picker]").spectrum({
             allowEmpty: false,
             showAlpha: true,
@@ -178,19 +186,6 @@
                             <!-- END setting_type_file -->
 
                             <!-- BEGIN setting_type_timepicker -->
-                                <script type="text/javascript" src="/javascript/components/jquery-timepicker-jt/jquery.timepicker.min.js"></script>
-                                <script>
-                                    $(document).ready(function() {
-                                        $('[data-timepicker]').timepicker({
-                                            step: 60,
-                                            appendTo: function ($input) {
-                                                return $input.closest('.timepick');
-                                            }
-                                        });
-                                    })
-
-                                </script>
-
                                 <div class="timepick">
                                     <input type="text" class="ui-timepicker-input" name="{SETTING_NAME}" value="{SETTING_VALUE}" data-time-format="H:i" data-timepicker />
                                 </div>
