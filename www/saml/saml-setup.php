@@ -31,6 +31,7 @@ $settingsInfo = array (
 
     ],
 );
+SAMLDebugLog(json_encode($settingsInfo));
 
 try {
     $url = new \Zend\Uri\Uri(Cfg::get('saml_idp_metadata_url'));
@@ -117,9 +118,9 @@ function useSAMLKerberos() {
 
     $current_browser = $bc->getBrowser();
     SAMLDebugLog(json_encode($current_browser));
-    if ($current_browser->Device_Type == 'Desktop' || $current_browser->Device_Type == 'Tablet') {
-        if (substr($current_browser->Platform,0,3)=='Win' || $current_browser->Platform == 'MacOSX') {
-            switch($current_browser->Browser) {
+    if ($current_browser->device_type == 'Desktop' || $current_browser->device_type == 'Tablet') {
+        if (substr($current_browser->platform,0,3)=='Win' || $current_browser->platform == 'MacOSX') {
+            switch($current_browser->browser) {
                 case 'IE':
                     return true;
 
