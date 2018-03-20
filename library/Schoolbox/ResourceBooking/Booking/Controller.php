@@ -609,10 +609,8 @@ class Controller extends Base
         // the find method should receive:
         // Datetime objects?
         /** @var Model[] $bookings */
-        $calendarConfig = Calendar_Api_Config_Mapper::getInstance()->findOneForClass(Calendar_Api_EventType_ResourceBooking_Booking_ForItem::class);
-
         $source = new Calendar_Api_EventType_ResourceBooking_Booking_ForItem(
-            $calendarConfig->getId(),
+            Calendar_Api_Config_Mapper::CONFIGURATION_NONE,
             $this->getUser(),
             [$item->getId()]
         );
