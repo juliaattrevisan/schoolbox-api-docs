@@ -1,6 +1,5 @@
 <?php
 /**
- *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2017, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -10,18 +9,20 @@ namespace Custom\Mggs\Calendar\Event\Type\Submission\Renderer;
 
 use Calendar;
 use Calendar\Event\Type\EventBase;
+use Calendar\Event\Type\Submission\Renderer\Javascript as SubmissionRendererJavascript;
+use Custom\Mggs\Personalised\Participant\Mapper as ParticipantMapper;
 use Group;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Assessment\Project;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 use SitePage;
+use UnexpectedValueException;
 
-
-class Javascript extends \Calendar\Event\Type\Submission\Renderer\Javascript
+class Javascript extends SubmissionRendererJavascript
 {
-    /** @var \Schoolbox\Learning\Personalised\Participant\Mapper */
+    /** @var ParticipantMapper $pblMapper */
     private $pblMapper;
-
 
     /**
      * @param SitePage  $page
@@ -35,28 +36,29 @@ class Javascript extends \Calendar\Event\Type\Submission\Renderer\Javascript
     {
         parent::__construct($page, $event, $user, $groupHandler, $calHandler, $viewer);
 
-        // regrettably, because of dynamic invocation, we have to settle for singletons in here
-        $this->pblMapper = \Schoolbox\Learning\Personalised\Participant\Mapper::getInstance();
+        // Regrettably, because of dynamic invocation, we have to settle for singletons in here
 
+        $this->pblMapper = ParticipantMapper::getInstance();
     }
-
 
     /**
      * Helper function to determine if person viewing assessment event can edit it, this should probably be on the
      * event itself but its not so this will help
+     *
      * @return bool
      */
     public function isEditable()
     {
         if ($this->getEvent()->getAssessment() instanceof Project) {
-            // cannot move projects in this view
+            // Cannot move projects in this view
+
             return false;
         }
 
-        // can edit if staff, or student is viewing own work
+        // Can edit if staff, or student is viewing own work
+
         return $this->getViewer()->getRole()->isStaff() || $this->getViewer()->getId() === $this->getUser()->getId();
     }
-
 
     /**
      * @return array
@@ -66,18 +68,20 @@ class Javascript extends \Calendar\Event\Type\Submission\Renderer\Javascript
         $event = $this->getEvent();
 
         try {
-            // obtain the reference to "start time" via PBL
+            // Obtain the reference to "start time" via PBL
+
             $dueDate = $this->pblMapper->findOneByColumnList([
                 'assessment_id' => $this->getEvent()->getAssessment()->getId(),
-                'student_id'    => $this->getUser()->getId()
+                'student_id'    => $this->getUser()->getId(),
             ])->getOpenDate();
-        } catch (\Schoolbox\Mapper\Exception $e) {
-            // no override: fall back to the due date of the assessment
+        } catch (MapperException $e) {
+            // No override: fall back to the due date of the assessment
+
             $dueDate = $event->getAssessment()->getDueAt();
         }
 
-        /* Congeal all that stuff
-         */
+        // Congeal all that stuff
+
         $allDay = $event->getAllday();
 
         if ($event->getAllday()) {
@@ -89,11 +93,13 @@ class Javascript extends \Calendar\Event\Type\Submission\Renderer\Javascript
         $context = $event->getAssessment()->getContext();
 
         if ($context instanceof Project) {
-            // resourceId is class-unit-project
+            // ResourceId is class-unit-project
+
             $contextId = $context->getContext()->getId();
             $projectId = $context->getId();
         } else {
-            // resourceId is class-unit-0
+            // ResourceId is class-unit-0
+
             $contextId = $context->getId();
             $projectId = 0;
         }
@@ -105,26 +111,22 @@ class Javascript extends \Calendar\Event\Type\Submission\Renderer\Javascript
             'start' => $start,
             'end'   => '',
 
-            /* Whether you can edit this event or not
-             */
+            // Whether you can edit this event or not
+
             'editable' => $this->isEditable(),
 
-            /* Whether it's an all-day event or not
-             * If allDay is true, then you can't resize it
-             *
-             * Schoolbox usage would be that all events are not
-             * allDay events
-             */
+            // Whether it's an all-day event or not If allDay is true, then you can't resize it
+            // Schoolbox usage would be that all events are not allDay events
+
             'allDay' => $allDay,
 
-            /* Colour of the event
-             */
-            'color'     => $event->getColour(),
-            'className' => $event->getEventClasses(),
+            // Colour of the event
+
+            'color'      => $event->getColour(),
+            'className'  => $event->getEventClasses(),
             'resourceId' => $resourceId,
         ];
     }
-
 
     /**
      * @return array
@@ -133,15 +135,17 @@ class Javascript extends \Calendar\Event\Type\Submission\Renderer\Javascript
     {
         $meta = parent::deriveMeta();
 
-        // pass through the bounds allowed for student's movement
+        // Pass through the bounds allowed for student's movement
+
         $meta['bounds'] = [
             'open' => $this->getEvent()->getAssessment()->getOpenAt()->getDatabaseDate(),
-            'due'  => $this->getEvent()->getAssessment()->getDueAt()->getDatabaseDate()
+            'due'  => $this->getEvent()->getAssessment()->getDueAt()->getDatabaseDate(),
         ];
 
         $status = $this->getStatus();
 
-        // has this student completed this assessment?
+        // Has this student completed this assessment?
+
         $meta['status']       = $status;
         $meta['completed']    = $status === 'reviewed';
         $meta['assessmentId'] = $this->getEvent()->getAssessment()->getId();
@@ -159,14 +163,14 @@ class Javascript extends \Calendar\Event\Type\Submission\Renderer\Javascript
         return $styles;
     }
 
-
     /**
      * @return string
-     * @throws \UnexpectedValueException
+     * @throws UnexpectedValueException
      */
     protected function getStatus()
     {
-        // add a style for bling (if you're not a parent)
+        // Add a style for bling (if you're not a parent)
+
         if ($this->getViewer()->getRole()->isParent()) {
             return null;
         }
@@ -174,7 +178,8 @@ class Javascript extends \Calendar\Event\Type\Submission\Renderer\Javascript
         $part = $this->getEvent()->getAssessment()->getParticipantIfExtant($this->getUser());
 
         if (!$part) {
-            // if there's no participation, there's no bling
+            // If there's no participation, there's no bling
+
             return null;
         }
 
@@ -190,13 +195,15 @@ class Javascript extends \Calendar\Event\Type\Submission\Renderer\Javascript
         $fb = $part->getAuthoritativeFeedback(true);
 
         if (!$fb) {
-            // erm, this shouldn't happen, but ok?
+            // Erm, this shouldn't happen, but ok?
+
             return 'pending';
         }
 
         $mark = $fb->getNormalisedMark();
 
-        // determine which threshold we need to respect
+        // Determine which threshold we need to respect
+
         if ($this->getEvent()->getAssessment()->getContext() instanceof Project) {
             $threshold = 'pbl_project_threshold';
         } else {
@@ -204,11 +211,13 @@ class Javascript extends \Calendar\Event\Type\Submission\Renderer\Javascript
         }
 
         if ($mark === null || $mark >= ConfigMapper::getInstance()->get($threshold)) {
-            // mark as success if null, or above mastery level
+            // Mark as success if null, or above mastery level
+
             return 'reviewed';
         }
 
-        // disappoint
+        // Disappoint
+
         return 'failed';
     }
 }
