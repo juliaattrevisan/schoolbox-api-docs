@@ -247,7 +247,7 @@ break;
 
 case "britannica":
 	$form="loginForm";
-	$action="http://school.eb.com.au/login";
+	$action="https://school.eb.com.au/login";
 	$method="POST";
 	$formArray['username']="shoreschool";
 	$formArray['password']="northsydney";
