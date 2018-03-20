@@ -73,7 +73,7 @@ class Mapper extends BaseMapper
                    {$this->getJoinColumnString('participants.user', 'u')}
             FROM   {$this->getTable()}
             LEFT JOIN  {$this->getJoinSql('participants', '', 'p')}
-            LEFT JOIN  {$this->getJoinSql('participants.user', 'p', 'u')}";
+            LEFT JOIN  {$this->getJoinSql('participants.user', 'p', 'u', true)}";
 
         $args = [];
         if ($pb && $pb->count()) {
