@@ -42,7 +42,7 @@
                 {% set routeRecordUpdate = routeLookupIfAuthorized('pastoral.getStudentRecordUpdateForm', {'studentId': record.student.id, 'recordId': record.id}) %}
                 <div class="empty-state">
                     <i class="icon-pastoral"></i>
-                    <p>There is no content added yet. {% if routeRecordUpdate %} You can add some <a href={{ routeRecordUpdate }}> here. </a> {% endif %}</p>
+                    <p>There is no content yet. {% if routeRecordUpdate %} <a href={{ routeRecordUpdate }}> Edit this pastoral record. </a> {% endif %}</p>
                 </div>
             {% endif %}
         </div>
