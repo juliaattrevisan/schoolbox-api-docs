@@ -83,6 +83,19 @@ class Statistics
             ];
         }
 
+        // Only one value? It must be all of the return values
+        $count = \count($values);
+        if ($count === 1) {
+            $value = (float)array_pop($values);
+            return [
+                'low'    => $value,
+                'q1'     => $value,
+                'median' => $value,
+                'q3'     => $value,
+                'high'   => $value,
+            ];
+        }
+
         $series = [
             'low'    => min($values),
             'high'   => max($values),
@@ -90,7 +103,7 @@ class Statistics
         ];
 
         // Calculate q1 (median of lower half), q3 (median of upper half)
-        $sliceSize  = (int)max(\count($values) / 2, 1);
+        $sliceSize  = (int)max($count / 2, 1);
         $lowValues  = \array_slice($values, 0, $sliceSize);
         $highValues = \array_slice($values, -$sliceSize);
         $series['q1'] = static::median($lowValues);
