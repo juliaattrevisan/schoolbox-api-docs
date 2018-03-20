@@ -353,6 +353,7 @@ class SitePage extends Page
         $dateFormat = $this->config->get('date_local');
         $dateTimeFormat = $this->config->get('date_local').' '.$this->config->get('date_time');
         $dateTimeFormatLong = $this->config->get('date_long');
+        $startTimeADF = new Alaress_Date_Format(ConfigMapper::getInstance()->get('calendar_start_time'), 'H:i');
         $templateVar = array(
             'TEMPLATE_YEAR' => date('Y'),
             'SITE_NAME' => $this->config->get('school_name'),
@@ -385,7 +386,7 @@ class SitePage extends Page
             'SYNERGETIC_SSO' => isset($_SESSION["communityLogin"]) ? 'true' : 'false',
             'FEEDBACK_TEXT' => Scrub::text($this->config->get('feedback_text')),
             'FEEDBACK_URL' => Scrub::text($this->config->get('feedback_url')),
-            'CALENDAR_START_TIME' => new Alaress_Date_Format(ConfigMapper::getInstance()->get('calendar_start_time'), 'H:i')
+            'CALENDAR_START_TIME' => $startTimeADF->getDatabaseTime()
         );
 
 
