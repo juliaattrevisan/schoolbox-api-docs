@@ -78,6 +78,12 @@ class StatisticsTest extends TestCase
                 ['pi', 'π', 'φ', 'e'],
                 null,
             ],
+            'trailing and leading spaces' => [
+                // is_numeric allows leading but not trailing spaces.
+                // I've chosen to allow both for consistency reasons?
+                ['3 ', ' 5', ' 6.4 ', '   7', '   5.3e4 '],
+                6.4,
+            ],
             'key-value pairs' => [
                 [
                     'key'    => 4.1,
@@ -126,6 +132,16 @@ class StatisticsTest extends TestCase
                     'low'    => 4.1,
                     'q1'     => 4.1,
                     'median' => 4.1,
+                    'q3'     => 4.1,
+                    'high'   => 4.1,
+                ],
+            ],
+            'two value' => [
+                [4.1, 3.1],
+                [
+                    'low'    => 3.1,
+                    'q1'     => 3.1,
+                    'median' => 3.6,
                     'q3'     => 4.1,
                     'high'   => 4.1,
                 ],
@@ -276,6 +292,13 @@ class StatisticsTest extends TestCase
                     "91",
                     "93",
                     "85",
+                    // Junk values which must not affect result
+                    "Absent",
+                    '      ',
+                    null,
+                    'null',
+                    'E',
+                    'E+',
                 ],
                 [
                     'low'    => 36,

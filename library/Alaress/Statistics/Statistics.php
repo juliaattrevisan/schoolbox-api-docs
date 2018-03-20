@@ -93,7 +93,7 @@ class Statistics
      */
     private static function preProcess(array $values): array
     {
-        $values = array_filter($values, 'is_numeric');
+        $values = array_filter(array_map('trim', $values), 'is_numeric');
         sort($values);
         return $values;
     }
