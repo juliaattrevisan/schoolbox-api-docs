@@ -7,6 +7,7 @@ if (!$_SESSION['user']->isSuperuser()) {
 $this->setFile(TEMPLATE_content, 'adminv2/setting.html');
 $this->setTitle('Admin - Settings');
 
+$this->setBlock(TEMPLATE_content, 'timepicker_js', 'timepicker_js_block');
 $this->setBlock(TEMPLATE_content, 'setting_tab', 'setting_tab_block');
 $this->setBlock(TEMPLATE_content, 'setting', 'setting_block');
 $this->setBlock('setting', 'setting_type_noneditable', 'setting_type_noneditable_block');
@@ -71,6 +72,7 @@ if (is_array($typeList)) {
 }
 
 $editable = false;
+$hasTimepicker = false;
 
 if(is_array($optionList)) {
     foreach ($optionList as $option) {
@@ -198,6 +200,7 @@ if(is_array($optionList)) {
                     break;
 
                 case 'timepicker':
+                    $hasTimepicker = true;
                     $this->parse('setting_type_timepicker_block', 'setting_type_timepicker');
                     break;
 
@@ -272,4 +275,10 @@ if($editable) {
 }
 else {
     $this->setVar('setting_save_block','');
+}
+
+if ($hasTimepicker) {
+    $this->parse('timepicker_js_block', 'timepicker_js');
+} else {
+    $this->setVar('timepicker_js_block', '');
 }
