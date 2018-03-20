@@ -25,36 +25,7 @@ class Statistics
      */
     public static function median(array $values): ?float
     {
-        // This _could_ be abstracted to a percentile function, but percentiles
-        // are a surprisingly deep rabbit-hole:
-        // https://en.wikipedia.org/wiki/Percentile#The_nearest-rank_method
-        // https://en.wikipedia.org/wiki/Percentile#The_linear_interpolation_between_closest_ranks_method
-
-        $values = static::preProcess($values);
-
-        // Can't median a value which doesn't exist
-        if (empty($values)) {
-            return null;
-        }
-
-        // Only one value? it must be the median
-        $count = \count($values);
-        if ($count === 1) {
-            return (float)array_pop($values);
-        }
-
-        // Median: midpoint value
-        // If exactly divisible into two, use midpoint of highest min and lowest max
-        sort($values);
-        $index = ($count-1) / 2;
-        if (\is_int($index)) {
-            return (float)$values[$index];
-        }
-
-        $lowValue  = $values[(int)floor($index)];
-        $highValue = $values[(int)ceil($index)];
-
-        return (float)(($highValue + $lowValue) / 2);
+        return static::internalMedian(static::preProcess($values));
     }
 
 
@@ -99,15 +70,15 @@ class Statistics
         $series = [
             'low'    => min($values),
             'high'   => max($values),
-            'median' => static::median($values),
+            'median' => static::internalMedian($values),
         ];
 
         // Calculate q1 (median of lower half), q3 (median of upper half)
         $sliceSize  = (int)max($count / 2, 1);
         $lowValues  = \array_slice($values, 0, $sliceSize);
         $highValues = \array_slice($values, -$sliceSize);
-        $series['q1'] = static::median($lowValues);
-        $series['q3'] = static::median($highValues);
+        $series['q1'] = static::internalMedian($lowValues);
+        $series['q3'] = static::internalMedian($highValues);
         return $series;
     }
 
@@ -125,5 +96,47 @@ class Statistics
         $values = array_filter($values, 'is_numeric');
         sort($values);
         return $values;
+    }
+
+
+    /**
+     * Internal median method.
+     *
+     * Not for external consumption, as it assumes that `$values` has already
+     * been passed through `preProcess`.
+     *
+     * @param array $values
+     * @return float|null
+     */
+    private static function internalMedian(array $values): ?float
+    {
+        // This _could_ be abstracted to a percentile function, but percentiles
+        // are a surprisingly deep rabbit-hole:
+        // https://en.wikipedia.org/wiki/Percentile#The_nearest-rank_method
+        // https://en.wikipedia.org/wiki/Percentile#The_linear_interpolation_between_closest_ranks_method
+
+        // Can't median a value which doesn't exist
+        if (empty($values)) {
+            return null;
+        }
+
+        // Only one value? it must be the median
+        $count = \count($values);
+        if ($count === 1) {
+            return (float)array_pop($values);
+        }
+
+        // Median: midpoint value
+        // If exactly divisible into two, use midpoint of highest min and lowest max
+        sort($values);
+        $index = ($count-1) / 2;
+        if (\is_int($index)) {
+            return (float)$values[$index];
+        }
+
+        $lowValue  = $values[(int)floor($index)];
+        $highValue = $values[(int)ceil($index)];
+
+        return (float)(($highValue + $lowValue) / 2);
     }
 }
