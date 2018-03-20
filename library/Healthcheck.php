@@ -560,11 +560,12 @@ class Healthcheck
 
         // Pastoral upload
         if ($this->configMapper->get('external_pastoral_upload')) {
+            $prefix = $mediaDb ? ($mediaDb . '.') : '';
             $this->insertTest(
                 [
-                    $mediaSchema.'.tDocuments',
-                    $mediaSchema.'.DocumentReferences',
-                    $mediaSchema.'.tDocumentReferences',
+                    $prefix.$mediaSchema.'.tDocuments',
+                    $prefix.$mediaSchema.'.DocumentReferences',
+                    $prefix.$mediaSchema.'.tDocumentReferences',
                 ]
             );
         }
