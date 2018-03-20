@@ -699,6 +699,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
             $calendarDiv.fullCalendar({
                 header: false,
                 eventLimit: true,
+                scrollTime: dateDisplayFormats.calendarStartTime,
                 views: {
                     agendaDay: {
                         eventLimit: 4

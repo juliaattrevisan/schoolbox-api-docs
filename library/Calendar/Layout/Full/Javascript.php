@@ -51,9 +51,7 @@ class Calendar_Layout_Full_Javascript extends Calendar_Layout_Full_Abstract
     protected function setupSelectedDayMonthYear()
     {
         list($selectedDay, $selectedMonth, $selectedYear) = explode("-", $this->getDate());
-
         $selectedDate = @mktime(0, 0, 0, $selectedMonth, $selectedDay, $selectedYear);
-
         $this->setSelectedDate($selectedDate);
 
         if ($selectedDate <= 0) {

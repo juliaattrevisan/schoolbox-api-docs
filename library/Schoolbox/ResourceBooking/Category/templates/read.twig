@@ -54,19 +54,18 @@
                 firstHour: 9,
                 allDaySlot: false,
                 defaultDate: calendarDate,
+                scrollTime: dateDisplayFormats.calendarStartTime,
                 views: {
                     timelineMonth: {
                         slotLabelFormat: ['ddd D']
                     },
                     timelineWeek: {
                         slotLabelFormat: ['ddd D/M', 'h'],
-                        scrollTime: '32:00',
                         slotWidth: '50'
 
                     },
                     timelineDay: {
                         titleFormat: dateDisplayFormats.momentJsDateLong,
-                        scrollTime: '08:00',
                         slotWidth: '50'
                     }
                 },

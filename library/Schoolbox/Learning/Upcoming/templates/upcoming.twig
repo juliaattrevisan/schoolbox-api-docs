@@ -90,6 +90,7 @@
                 defaultView: anchor || 'month',
                 // Event limit: could be configured from session but leave global for now
                 eventLimit: false,
+                scrollTime: dateDisplayFormats.calendarStartTime,
                 firstDay: Number('{{ config.calendar_start_day|escape('js') }}'),
 
                 /**

@@ -7,6 +7,7 @@ if (!$_SESSION['user']->isSuperuser()) {
 $this->setFile(TEMPLATE_content, 'adminv2/setting.html');
 $this->setTitle('Admin - Settings');
 
+$this->setBlock(TEMPLATE_content, 'timepicker_js', 'timepicker_js_block');
 $this->setBlock(TEMPLATE_content, 'setting_tab', 'setting_tab_block');
 $this->setBlock(TEMPLATE_content, 'setting', 'setting_block');
 $this->setBlock('setting', 'setting_type_noneditable', 'setting_type_noneditable_block');
@@ -23,6 +24,7 @@ $this->setBlock('setting', 'setting_type_colour', 'setting_type_colour_block');
 $this->setBlock('setting', 'setting_type_file', 'setting_type_file_block');
 $this->setBlock('setting', 'setting_type_list', 'setting_type_list_block');
 $this->setBlock('setting', 'setting_type_resource', 'setting_type_resource_block');
+$this->setBlock('setting', 'setting_type_timepicker', 'setting_type_timepicker_block');
 $this->setBlock(TEMPLATE_content, 'setting_save', 'setting_save_block');
 
 // include the admin navigation
@@ -70,6 +72,7 @@ if (is_array($typeList)) {
 }
 
 $editable = false;
+$hasTimepicker = false;
 
 if(is_array($optionList)) {
     foreach ($optionList as $option) {
@@ -88,7 +91,8 @@ if(is_array($optionList)) {
             'setting_type_list_block'        => '',
             'setting_type_resource_block'    => '',
             'setting_type_colour_block'      => '',
-            'setting_type_file_block'      => '',
+            'setting_type_file_block'        => '',
+            'setting_type_timepicker_block'        => '',
             'setting_group_localisation_block' => '',
             'setting_group_skin_config_block' => '',
         );
@@ -195,6 +199,11 @@ if(is_array($optionList)) {
                     $this->parse('setting_type_input_block', 'setting_type_select', true);
                     break;
 
+                case 'timepicker':
+                    $hasTimepicker = true;
+                    $this->parse('setting_type_timepicker_block', 'setting_type_timepicker');
+                    break;
+
                 case 'bytes':
                     $this->setVar('SETTING_VALUE', Alaress_Byte_Format::bytesToString($option['value']));
                     $this->parse('setting_type_input_block', 'setting_type_input', true);
@@ -266,4 +275,10 @@ if($editable) {
 }
 else {
     $this->setVar('setting_save_block','');
+}
+
+if ($hasTimepicker) {
+    $this->parse('timepicker_js_block', 'timepicker_js');
+} else {
+    $this->setVar('timepicker_js_block', '');
 }
