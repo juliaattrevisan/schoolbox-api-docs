@@ -50,7 +50,7 @@ Usage: include 'sub/semesterSelector.twig
         {% set foundYear = {} %}
         {% set selected = false %}
         {% for term in terms %}
-            {% if year is not empty %}
+            {% if yearRoute %}
                 {% if not term.displayFinish.isNull() %}
                     {% if not foundYear['_'~term.displayFinish.year] %}
                         {% set foundYear = foundYear | merge({('_'~term.displayFinish.year):true}) %}

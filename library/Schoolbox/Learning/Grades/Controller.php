@@ -14,6 +14,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\StudentReportCard\Conversation;
 use Schoolbox\Collection;
 use Schoolbox\Error;
+use Schoolbox\File\Exception;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -271,6 +272,15 @@ class Controller extends Base
                     ->getStudentStatistics()[$viewee->getId()];
         }
 
+        //Do we have access to btacs year summary route?
+        try{
+            $yearRoute = $this->getRouteIfAuthorized('learningGrades.getCustomGradesYear');
+        } catch (RouteNotFound $e) {
+            $yearRoute = null;
+        }
+
+
+
         // Squish this mess out
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningGrades/filteredSummary.twig', [
@@ -283,6 +293,7 @@ class Controller extends Base
             'markbooks'       => $markbooks,
             'mailHandle'      => $this->getSession()->get('mailhandle'),
             'currentUser'     => $this->getUser(),
+            'yearRoute'       => $yearRoute
         ]));
     }
 
