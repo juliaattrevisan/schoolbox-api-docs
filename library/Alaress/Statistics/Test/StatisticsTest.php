@@ -78,6 +78,17 @@ class StatisticsTest extends TestCase
                 ['pi', 'π', 'φ', 'e'],
                 null,
             ],
+            'key-value pairs' => [
+                [
+                    'key'    => 4.1,
+                    'does'   => 5.1,
+                    'not'    => 1.1,
+                    'matter' => 3.1,
+                    'kthx'   => 'non-numeric',
+                    'bye'    => null,
+                ],
+                3.6,
+            ],
         ];
     }
 
