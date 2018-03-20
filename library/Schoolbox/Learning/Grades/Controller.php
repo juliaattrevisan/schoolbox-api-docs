@@ -278,9 +278,7 @@ class Controller extends Base
         } catch (RouteNotFound $e) {
             $yearRoute = null;
         }
-
-
-
+        
         // Squish this mess out
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningGrades/filteredSummary.twig', [
