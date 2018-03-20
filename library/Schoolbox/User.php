@@ -1071,9 +1071,9 @@ class User implements JsonSerializable, ISoftDeletable
      * Load parents into object from external db
      * @return self
      */
-    public function loadParents()
+    private function loadParents()
     {
-        if(!$this->parentsLoaded) {
+        if(!$this->parentsLoaded && $this->getRole()->isStudent()) {
             $DEPRECATED_EXTERNAL_USER = new \External_User();
             $allParents = $DEPRECATED_EXTERNAL_USER->getStudentContactList($this->externalId);
 
@@ -1115,6 +1115,7 @@ class User implements JsonSerializable, ISoftDeletable
      */
     public function getParents()
     {
+        $this->loadParents();
         return $this->parents;
     }
 

@@ -54,7 +54,6 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
             // Check if the current childs timetable is viewable and hide if necessary
             try {
                 $userChild = $userMapper->findById($child['id']);
-                $userChild->loadParents();
             } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
                 continue;
             }

@@ -93,7 +93,7 @@ class Access
         // Parents may edit events of their child, of which they are the author
         if ($accessLevel == Event::ACCESS_PERSONAL) {
             if ($owner->getRole()->isStudent() && $effector->getRole()->isParent()) {
-                $isParentOfOwner = $owner->loadParents()->isChildOf($effector);
+                $isParentOfOwner = $owner->isChildOf($effector);
             } else {
                 $isParentOfOwner = false;
             }

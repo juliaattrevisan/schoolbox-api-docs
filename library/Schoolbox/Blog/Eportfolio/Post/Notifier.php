@@ -157,7 +157,7 @@ class Notifier extends AbstractModuleNotifier
     {
         // Hydrate
         $post->setPage($this->pageMapper->findById($post->getPage()->getPageId()));
-        $post->getPage()->setOwner($this->userMapper->findById($post->getPage()->getOwner()->getId())->loadParents());
+        $post->getPage()->setOwner($this->userMapper->findById($post->getPage()->getOwner()->getId()));
         $audience = $this->userMapper->createCollection();
 
         foreach ($post->getPage()->getOwner()->getParents() as $parent) {
@@ -186,15 +186,6 @@ class Notifier extends AbstractModuleNotifier
         $envelope = new Envelope();
         $page     = $this->pageMapper->findById($post->getPage()->getPageId());
         $owner    = $this->userMapper->findById($page->getOwner()->getId());
-
-        // Are we targeting parents?
-        if (RoleMapper::ROLE_PARENT === $roleType) {
-            // Load parents so we can display just their child's first name
-            $effector->loadParents();
-            if ($effector->getId() !== $owner->getId()) {
-                $owner->loadParents();
-            }
-        }
 
         foreach ($audience as $target) {
             // Just first name if advising parent of child's action

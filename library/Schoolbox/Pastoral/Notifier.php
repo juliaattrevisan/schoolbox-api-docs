@@ -112,7 +112,6 @@ class Notifier extends AbstractModuleNotifier
 
         $student = $this->userMapper->findById($model->getStudent()->getId());
         $student->loadTeachers();
-        $student->loadParents();
         $teachers = $student->getTeacherCollection();
 
         // Create the message

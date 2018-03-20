@@ -142,7 +142,6 @@ class Full
             return $this->getForTeacher();
 
         } elseif ($role->isParent()) {
-            $participant->loadParents();
             if ($participant->isChildOf($user)) {
                 return $this->getForParent();
             }
