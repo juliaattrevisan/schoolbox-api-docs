@@ -38,6 +38,10 @@ class StatisticsTest extends TestCase
                 [],
                 null,
             ],
+            'no non-numeric' => [
+                [null, 'non-numeric'],
+                null,
+            ],
             'single value' => [
                 [4.1],
                 4.1,
@@ -57,6 +61,22 @@ class StatisticsTest extends TestCase
             'ignore non-numeric' => [
                 [4.1, 5.1, 1.1, 3.1, 'non-numeric'],
                 3.6,
+            ],
+            'duplicate values' => [
+                [4.1, 5.1, 1.1, 1.1, 3.1],
+                3.1,
+            ],
+            'exponents' => [
+                [1.3e2, 1.4e3, 3.4e-1, -1.43e1, -3.2e-3, -6.13e-4],
+                0.1696935,
+            ],
+            'numbery strings' => [
+                ['1', '12.25', '+3', '+3.25', '+03.25e1', '-06', '-06.3', '-06.5E-1'],
+                2,
+            ],
+            'hopefully not numbery strings' => [
+                ['pi', 'π', 'φ', 'e'],
+                null,
             ],
         ];
     }
