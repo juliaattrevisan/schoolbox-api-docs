@@ -547,6 +547,17 @@ class Healthcheck
         $tables = array_merge($tables, $this->customUPSTest());
         $this->selectTest($tables);
 
+
+        // Pastoral upload
+        if ($this->configMapper->get('external_pastoral_upload')) {
+            $this->insertTest([
+                'tDocuments',
+                'DocumentReferences',
+                'tDocumentReferences',
+            ]);
+        }
+
+
         // External Document Reports
 
         if ($this->configMapper->get('external_document_report_enabled')) {
