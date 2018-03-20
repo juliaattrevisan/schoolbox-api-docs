@@ -118,7 +118,7 @@ class Notifier extends AbstractModuleNotifier
         $owner = $this->userMapper->findById($page->getOwner()->getId());
 
         // Send it to all their teachers (across all subjects)
-        $audience = $owner->loadTeachers()->getTeacherCollection();
+        $audience = $owner->getTeacherCollection();
 
         return $this->notifyPosted($post, $effector, $audience, RoleMapper::ROLE_STAFF);
     }
