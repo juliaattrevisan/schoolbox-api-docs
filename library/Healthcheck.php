@@ -548,27 +548,31 @@ class Healthcheck
         $this->selectTest($tables);
 
 
+        $externalPing = new \External_Ping();
+        if ($externalPing->getVersion() == "68") {
+            $mediaDb     = null;
+            $mediaSchema = 'media';
+        } else {
+            $mediaDb     = 'SynergyOneMedia';
+            $mediaSchema = 'dbo';
+        }
+
+
         // Pastoral upload
         if ($this->configMapper->get('external_pastoral_upload')) {
-            $this->insertTest([
-                'tDocuments',
-                'DocumentReferences',
-                'tDocumentReferences',
-            ]);
+            $this->insertTest(
+                [
+                    $mediaSchema.'.tDocuments',
+                    $mediaSchema.'.DocumentReferences',
+                    $mediaSchema.'.tDocumentReferences',
+                ]
+            );
         }
 
 
         // External Document Reports
 
         if ($this->configMapper->get('external_document_report_enabled')) {
-            $externalPing = new \External_Ping();
-            if ($externalPing->getVersion() == "68") {
-                $db     = null;
-                $schema = 'media';
-            } else {
-                $db     = 'SynergyOneMedia';
-                $schema = 'dbo';
-            }
             $this->selectTest(
                 [
                     'StudentReportsArchiveLink',
@@ -577,8 +581,8 @@ class Healthcheck
                     'DocumentReferences',
                     'pvDocumentReferences',
                 ],
-                $db,
-                $schema
+                $mediaDb,
+                $mediaSchema
             );
         }
 
