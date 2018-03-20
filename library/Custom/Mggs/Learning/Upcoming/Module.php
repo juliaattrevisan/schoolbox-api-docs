@@ -9,10 +9,9 @@
 namespace Custom\Mggs\Learning\Upcoming;
 
 use Alaress\Authorizer\Rule\IsLoggedIn;
+use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\ContainerInterface;
 use Schoolbox\Application\Exception\NotFound;
-use Twig_Loader_Chain;
-
 
 /**
  * Overload the existing module as-is, and just change our templates directory
@@ -29,18 +28,15 @@ class Module extends \Schoolbox\Learning\Upcoming\Module
         parent::registerRoutes();
 
         $this->register('GET', '/terms/{date}', 'getTermDates', new IsLoggedIn(), function (array $params) {
-
             try {
                 return [
-                    'now' => \Alaress_Date_Format::newUrlDate($params['date'])
+                    'now' => \Alaress_Date_Format::newUrlDate($params['date']),
                 ];
             } catch (\InvalidArgumentException $e) {
                 throw new NotFound();
             }
-
         });
     }
-
 
     /**
      * @inheritdoc
@@ -53,7 +49,7 @@ class Module extends \Schoolbox\Learning\Upcoming\Module
     /**
      * @inheritdoc
      */
-    public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
+    public function initTemplatePaths(IChainLoader $templateLoader)
     {
         // Use this custom module's templates in preference to those defined by the default module
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates', $this->getBasename() . 'Mggs');
