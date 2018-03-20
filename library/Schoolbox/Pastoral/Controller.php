@@ -413,6 +413,11 @@ class Controller extends Base
         $attachmentsPublic  = $record->getAttachments()->filterBy('private', false);
         $attachmentsPrivate = $record->getAttachments()->filterBy('private', true);
 
+        $access = [];
+
+        $access['public'] = $record->getAccessLevel($this->getUser()) > PastoralAccessMapper::ACCESS_DENY ;
+        $access['private'] = $record->getAccessLevel($this->getUser()) > PastoralAccessMapper::ACCESS_PUBLIC ;
+
         // Lets render this thing
 
         $this->getResponse()->content->set([
@@ -426,6 +431,7 @@ class Controller extends Base
                 'moderator'          => $moderator,
                 'user'               => $this->getUser(),
                 'showSeverity'       => $this->getConfigLoader()->get('pastoral_severity'),
+                'access'             => $access,
             ],
             'title' => $record->getHeading(),
         ]);
