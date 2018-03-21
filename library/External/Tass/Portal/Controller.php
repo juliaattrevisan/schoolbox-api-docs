@@ -9,6 +9,7 @@
 namespace External\Tass\Portal;
 
 use Alaress;
+use Aura\Web\Exception\InvalidStatusCode;
 
 class Controller extends Alaress\Web\Controller\Base
 {
@@ -29,6 +30,8 @@ class Controller extends Alaress\Web\Controller\Base
 
     /**
      * Application codes
+     *
+     * Tass's identifier for Schoolbox to use their SSO mechanism, per Tass product.
      *
      * @var array|string[]
      */
@@ -54,22 +57,53 @@ class Controller extends Alaress\Web\Controller\Base
         $this->appCodes   = array_merge($this->appCodes, $appCodes);
     }
 
+
+    /**
+     * Generate an SSO token, and redirect to the specified Tass product
+     *
+     * @param string $productCode The code for the Tass product we wish to redirect to
+     * @param string $appCode     The code by which Schoolbox is known to the specified Tass product
+     * @param string $productPath The Tass portal path where the Tass product is made available
+     * @param string $deepLink    Json-encoded parameters to indicate the Tass product page to deep link to
+     */
+    private function redirectToTassProduct(string $productCode, string $appCode, string $productPath, string $deepLink = '')
+    {
+        // Generate the SSO token request params
+        $config = [
+            'prod_code' => $productCode,
+            'app_code'  => $appCode,
+        ];
+        if($deepLink){
+            $config['deep_link'] = $deepLink;
+        }
+
+        // Send off the SSO token request
+        try{
+            $token = $this->getToken($deepLink);
+        } catch (\UnexpectedValueException $e){
+            $this->captureException($e);
+            $token = '';
+        }
+
+        // If we successfully got a token, redirect the user to the Tass product URL
+        if ($token) {
+            $this->getResponse()->redirect->to("{$this->portalHost}{$productPath}?sso_token={$token}");
+        } else {
+            try{
+                $this->getResponse()->status->setCode(404);
+            } catch (InvalidStatusCode $e){
+                $this->captureException($e);
+                exit($e->getMessage());
+            }
+        }
+    }
+
     /**
      * SSO to parent lounge
      */
     public function parentLounge()
     {
-        $token = $this->getToken([
-            'prod_code' => 'PL',
-            'app_code'  => $this->appCodes['parentLounge'],
-        ]);
-        if ($token) {
-            $this->getResponse()->redirect->to(
-                $this->portalHost."/ParentLounge/PIALogin.cfm?sso_token=$token"
-            );
-        } else {
-            $this->getResponse()->status->setCode(404);
-        }
+        $this->redirectToTassProduct('PL', $this->appCodes['parentLounge'], '/ParentLounge/PIALogin.cfm');
     }
 
     /**
@@ -77,17 +111,7 @@ class Controller extends Alaress\Web\Controller\Base
      */
     public function tassWeb()
     {
-        $token = $this->getToken([
-            'prod_code' => 'TASSWEB',
-            'app_code'  => $this->appCodes['tassWeb'],
-        ]);
-        if ($token) {
-            $this->getResponse()->redirect->to(
-                $this->portalHost."/tassweb/login.cfm?sso_token=$token"
-            );
-        } else {
-            $this->getResponse()->status->setCode(404);
-        }
+        $this->redirectToTassProduct('TASSWEB', $this->appCodes['tassWeb'], '/tassweb/login.cfm');
     }
 
     /**
@@ -95,19 +119,8 @@ class Controller extends Alaress\Web\Controller\Base
      */
     public function teacherKiosk()
     {
-        $token = $this->getToken([
-            'prod_code' => 'TIA',
-            'app_code'  => $this->appCodes['teacherKiosk'],
-            'deep_link' => urlencode($this->getRequest()->query->get['link']),
-        ]);
-
-        if ($token) {
-            $this->getResponse()->redirect->to(
-                $this->portalHost."/kiosk/TIALogin.cfm?sso_token=$token"
-            );
-        } else {
-            $this->getResponse()->status->setCode(404);
-        }
+        $deepLink = urlencode($this->getRequest()->query->get['link']);
+        $this->redirectToTassProduct('TIA', $this->appCodes['teacherKiosk'], '/kiosk/TIALogin.cfm', $deepLink);
     }
 
     /**
@@ -115,17 +128,7 @@ class Controller extends Alaress\Web\Controller\Base
      */
     public function webBook()
     {
-        $token = $this->getToken([
-            'prod_code' => 'WB',
-            'app_code'  => $this->appCodes['webBook'],
-        ]);
-        if ($token) {
-            $this->getResponse()->redirect->to(
-                $this->portalHost."/webbook/WBLogin.cfm?sso_token=$token"
-            );
-        } else {
-            $this->getResponse()->status->setCode(404);
-        }
+        $this->redirectToTassProduct('WB', $this->appCodes['webBook'], '/webbook/WBLogin.cfm');
     }
 
     /**
@@ -133,18 +136,9 @@ class Controller extends Alaress\Web\Controller\Base
      */
     public function studentCafe()
     {
-        $token = $this->getToken([
-            'prod_code' => 'SC',
-            'app_code'  => $this->appCodes['studentCafe'],
-        ]);
-        if ($token) {
-            $this->getResponse()->redirect->to(
-                $this->portalHost."/studentcafe/login.cfm?sso_token=$token"
-            );
-        } else {
-            $this->getResponse()->status->setCode(404);
-        }
+        $this->redirectToTassProduct('SC', $this->appCodes['studentCafe'], '/studentcafe/login.cfm');
     }
+
 
     /**
      * Gets a token out of the SSO token fetcher.
@@ -152,17 +146,19 @@ class Controller extends Alaress\Web\Controller\Base
      * @param array $config
      *
      * @return string
+     *
+     * @throws \UnexpectedValueException
      */
-    protected function getToken($config = [])
+    protected function getToken(array $config = []): string
     {
-        if ($this->getUser()->getRole()->isParent() && \Cfg::get('external_tass_sso_parent_code') == "TASS ID") {
+        if ($this->getUser()->getRole()->isParent() && \Cfg::get('external_tass_sso_parent_code') === "TASS ID") {
             // remove any non-numeric characters so it's the proper TASS id
-            $ssoCode = preg_replace('/[^0-9]/s', '', $this->getUser()->getExternalId());
+            $ssoCode = preg_replace('/\D/', '', $this->getUser()->getExternalId());
         }
-        else if ($this->getUser()->getRole()->isStaff() && \Cfg::get('external_tass_sso_staff_code') == "TASS ID") {
+        else if ($this->getUser()->getRole()->isStaff() && \Cfg::get('external_tass_sso_staff_code') === "TASS ID") {
             $ssoCode = $this->getUser()->getExternalId();
         }
-        else if ($this->getUser()->getRole()->isStudent() && \Cfg::get('external_tass_sso_student_code') == "TASS ID") {
+        else if ($this->getUser()->getRole()->isStudent() && \Cfg::get('external_tass_sso_student_code') === "TASS ID") {
             $ssoCode = $this->getUser()->getExternalId();
         } else {
             $ssoCode = urlencode($this->getUser()->getUsername());
