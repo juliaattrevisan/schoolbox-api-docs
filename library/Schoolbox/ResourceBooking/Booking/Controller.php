@@ -593,10 +593,14 @@ class Controller extends Base
         return $booking;
     }
 
+
     /**
      * Outputs the calendar for this item.
      *
      * @param Item\Model $item
+     * @throws \DomainException
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Exception
      */
     public function bookingCalendar(Item\Model $item)
     {
@@ -605,22 +609,23 @@ class Controller extends Base
         // the find method should receive:
         // Datetime objects?
         /** @var Model[] $bookings */
-        $calendarConfig = Calendar_Api_Config_Mapper::getInstance()->findOneForClass(Calendar_Api_EventType_ResourceBooking_Booking_ForItem::class);
-
         $source = new Calendar_Api_EventType_ResourceBooking_Booking_ForItem(
-            $calendarConfig->getId(),
+            Calendar_Api_Config_Mapper::CONFIGURATION_NONE,
             $this->getUser(),
             [$item->getId()]
         );
         $source
             ->setStatus($this->getRequest()->query['status']);
 
+        /** @var \SitePage $sitepage */
+        $sitepage = $this->getDi()->get('sitePage');
+
         $calendar = new Renderer(
             $source,
             (int)$this->getRequest()->query['start'],
             (int)$this->getRequest()->query['end'],
             $this->getUser(),
-            $this->getDi()->get('sitePage'),
+            $sitepage,
             $this->getUser()
         );
 
@@ -628,15 +633,15 @@ class Controller extends Base
 
         // Get timetabled classes for this room, if there are any.
         $roomCode = $item->getRoomCode();
-        if (strlen($roomCode)) {
-            $config = Calendar_Api_Config_Mapper::getInstance()->findOneForClass(Calendar_Api_EventType_Timetable_Room::class);
+
+        if ('' !== $roomCode) {
             $roomSource = new \Calendar_Api_EventType_Timetable_Room(
-                $config->getId(),
+                Calendar_Api_Config_Mapper::CONFIGURATION_NONE,
                 $this->getUser(),
                 $this->externalTimetableHandler,
                 [$item->getRoomCode() => $item->getId()]
             );
-//            $roomSource->setRoomCodes($item->getRoomCode());
+
             $roomEvents = $roomSource->getEvents(
                 $this->getRequest()->query['start'],
                 $this->getRequest()->query['end']
@@ -644,7 +649,7 @@ class Controller extends Base
 
             foreach ($roomEvents as $event) {
                 $renderer = new Javascript(
-                    $this->getDi()->get('sitePage'),
+                    $sitepage,
                     $event,
                     $this->getUser(),
                     new \Group(),

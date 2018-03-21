@@ -22,6 +22,14 @@ use Schoolbox\Mapper\Exception as MapperException;
 class Calendar_Api_Config_Mapper extends BaseMapper
 {
     /**
+     * Calendar configurations don't always exist for a calendar source
+     *
+     * Some calendar sources operate in a pre-set (hardcoded) manner that is devoid of choice
+     * such as Resource Booking
+     */
+    public const CONFIGURATION_NONE = -1;
+
+    /**
      * Mapping rules
      */
     protected function mapping()

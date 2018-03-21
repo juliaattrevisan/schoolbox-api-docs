@@ -54,9 +54,8 @@ class CalendarApiFactory
         $calendarConfigMapper = Calendar_Api_Config_Mapper::getInstance();
 
         // Add the resource API
-        $config = $calendarConfigMapper->findOneForClass(Calendar_Api_EventType_ResourceBooking_Booking_ForItem::class);
         $resourceApi = new Calendar_Api_EventType_ResourceBooking_Booking_ForItem(
-            $config->getId(),
+            Calendar_Api_Config_Mapper::CONFIGURATION_NONE,
             $this->user,
             [$resource->getId()]
         );
@@ -64,9 +63,8 @@ class CalendarApiFactory
 
         // Add the room code API if this resource has got a room code
         if ($roomCode = $resource->getRoomCode()) {
-            $config = $calendarConfigMapper->findOneForClass(Calendar_Api_EventType_Timetable_Room::class);
             $timetableApi = new Calendar_Api_EventType_Timetable_Room(
-                $config->getId(),
+                Calendar_Api_Config_Mapper::CONFIGURATION_NONE,
                 $this->user,
                 $this->timetable,
                 [$roomCode => $resource->getId()]
@@ -104,18 +102,16 @@ class CalendarApiFactory
         // Get the list of resource IDs and room codes
         $api = new Calendar_Api_Composite();
         if (!empty($resourceIds)) {
-            $config = $calendarConfigMapper->findOneForClass(Calendar_Api_EventType_ResourceBooking_Booking_ForItem::class);
             $resourceApi = new \Calendar_Api_EventType_ResourceBooking_Booking_ForItem(
-                $config->getId(),
+                Calendar_Api_Config_Mapper::CONFIGURATION_NONE,
                 $this->user,
                 $resourceIds
             );
             $api->add($resourceApi);
         }
         if ($getTimetabledRooms && !empty($roomCodes)) {
-            $config = $calendarConfigMapper->findOneForClass(Calendar_Api_EventType_Timetable_Room::class);
             $timetableApi = new Calendar_Api_EventType_Timetable_Room(
-                $config->getId(),
+                Calendar_Api_Config_Mapper::CONFIGURATION_NONE,
                 $this->user,
                 $this->timetable,
                 $roomCodes

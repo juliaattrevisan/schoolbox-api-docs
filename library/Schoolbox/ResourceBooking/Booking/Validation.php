@@ -539,8 +539,7 @@ class Validation
     protected function getTimetableRoomEvents($roomCode, DateTime $startDate, DateTime $endDate)
     {
         // Using  [$roomCode => true] to make Calendar_Api_EventType_Timetable_Room::getEvents happy
-        $config        = Calendar_Api_Config_Mapper::getInstance()->findOneForClass(TimetableRoom::class);
-        $timetableRoom = new TimetableRoom($config->getId(), $this->getUser(), $this->externalTimetableHandler, [$roomCode => true]);
+        $timetableRoom = new TimetableRoom(Calendar_Api_Config_Mapper::CONFIGURATION_NONE, $this->getUser(), $this->externalTimetableHandler, [$roomCode => true]);
 
         return $timetableRoom->getEvents($startDate->getTimestamp() + 1, $endDate->getTimestamp() - 1);
     }

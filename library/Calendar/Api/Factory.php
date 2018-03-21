@@ -140,12 +140,6 @@ class Calendar_Api_Factory
                 return new Calendar_Api_EventType_Event_Vcal_Default($connectorId, $user);
             case Calendar_Api_EventType_ResourceBooking_Booking_Default::class:
                 return new Calendar_Api_EventType_ResourceBooking_Booking_Default($connectorId, $user);
-            case Calendar_Api_EventType_ResourceBooking_Booking_ForCategory::class:
-                return new Calendar_Api_EventType_ResourceBooking_Booking_ForCategory($connectorId, $user);
-            case Calendar_Api_EventType_ResourceBooking_Booking_ForItem::class:
-                return new Calendar_Api_EventType_ResourceBooking_Booking_ForItem($connectorId, $user);
-            case Calendar_Api_EventType_ResourceBooking_Booking_ForUser::class:
-                return new Calendar_Api_EventType_ResourceBooking_Booking_ForUser($connectorId, $user);
             case Calendar_Api_EventType_ResourceBooking_Moderation_Default::class:
                 return new Calendar_Api_EventType_ResourceBooking_Moderation_Default($connectorId, $user);
             case Calendar_Api_EventType_Submission_Schoolbox_Default::class:
@@ -155,6 +149,16 @@ class Calendar_Api_Factory
                     $this->assessmentDataSource,
                     new Visibility(Access::getInstance())
                 );
+
+            /* These don't have connector configs
+             */
+            case Calendar_Api_EventType_ResourceBooking_Booking_ForCategory::class:
+                return new Calendar_Api_EventType_ResourceBooking_Booking_ForCategory(Calendar_Api_Config_Mapper::CONFIGURATION_NONE, $user);
+            case Calendar_Api_EventType_ResourceBooking_Booking_ForItem::class:
+                return new Calendar_Api_EventType_ResourceBooking_Booking_ForItem(Calendar_Api_Config_Mapper::CONFIGURATION_NONE, $user);
+            case Calendar_Api_EventType_ResourceBooking_Booking_ForUser::class:
+                return new Calendar_Api_EventType_ResourceBooking_Booking_ForUser(Calendar_Api_Config_Mapper::CONFIGURATION_NONE, $user);
+
             case Calendar_Api_EventType_Submission_Schoolbox_ForDueWork::class:
                 return new Calendar_Api_EventType_Submission_Schoolbox_ForDueWork(
                     $connectorId,
