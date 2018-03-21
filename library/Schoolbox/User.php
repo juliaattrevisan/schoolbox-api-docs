@@ -1030,7 +1030,7 @@ class User implements JsonSerializable, ISoftDeletable
      */
     private function loadTeachers()
     {
-        if(!$this->parentsLoaded && $this->getRole()->isStudent()) {
+        if(!$this->teachersLoaded && $this->getRole()->isStudent()) {
 
             $teacherCollection = new Collection();
 
