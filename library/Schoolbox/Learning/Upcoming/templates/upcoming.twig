@@ -68,12 +68,6 @@
             }
         }
 
-        var height = null;
-
-        if (isSmallDevice()) {
-            height = 'auto';
-        }
-
         c = new Calendar('calendar', 'calendar-bubble', {
             userId: '{{ student.id|escape('js') }}',
             filter: {
@@ -86,7 +80,6 @@
             },
             fullCalendar: {
                 defaultDate: moment('{{ date|escape('js') }}'),
-                height: height,
                 defaultView: anchor || 'month',
                 // Event limit: could be configured from session but leave global for now
                 eventLimit: false,
@@ -135,16 +128,6 @@
                  */
                 eventDrop: function(event, delta, revertFunc) {
                     revertFunc();
-                },
-
-                /**
-                 * When the window is resized
-                 * @param view
-                 */
-                windowResize: function(view) {
-                    var wHeight = $(window).height();
-                    var calTop = c.dom.offset().top;
-                    c.dom.fullCalendar('option','contentHeight',wHeight - calTop - 60)
                 },
 
                 /**
