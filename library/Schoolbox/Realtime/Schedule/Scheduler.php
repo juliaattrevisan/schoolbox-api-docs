@@ -11,6 +11,7 @@ namespace Schoolbox\Realtime\Schedule;
 
 
 use Alaress\Async\Broker\DuplicateResolutionException;
+use Alaress\Async\Broker\IBrokerException;
 use Alaress\Async\Broker\IConsumer;
 use Alaress\Async\Broker\IResolver;
 use Alaress\Async\Broker\PayloadMissingException;
@@ -115,8 +116,14 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
      */
     public function onException(\Exception $e)
     {
-        if ($e instanceof PayloadMissingException) {
-            $this->log->warning("Could not schedule: {$e->getMessage()}. Dropping message.");
+        if ($e instanceof IBrokerException) {
+
+            $msg = $e->getMessage();
+            if ($e->getPrevious()) {
+                $msg .= " - {$e->getPrevious()->getMessage()}";
+            }
+
+            $this->log->warning("Could not schedule: {$msg}. Dropping message.");
 
             try {
                 // drop the message
