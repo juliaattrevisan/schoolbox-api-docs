@@ -161,10 +161,11 @@ class Controller extends Base
             $unitMapper = Implementation\Unit\Mapper::getInstance();
 
             try {
+                /** @var GenericCollection $ids */
                 $ids = $unitMapper->getJoinMapper('course')->findByColumn('folder_id', $folder->getId())->getPropertyValues('id');
 
                 $where = $unitMapper->getPredicateBuilder()
-                    ->equals('course_implementation_id', $ids)
+                    ->in('course_implementation_id', $ids)
                     ->notLessThan('due_date', $term->getStart()->getDatabase())
                 ;
 
