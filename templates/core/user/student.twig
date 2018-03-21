@@ -16,7 +16,7 @@
 {# contacts: su, staff or parent #}
 {# Should a student see their own contact details? I think so #}
 {% set showContacts = (isStaff or isParentOfStudent) and not hideContacts %}
-{% set showContactsAlert = showContacts and isStaff %}
+{% set showContactsAlert = config.synergetic_community_alerts and showContacts and isStaff %}
 {% set showSubjects = showDetails %}
 {% set showGroups = showDetails %}
 {% set showClasses = showClasses and showDetails %}
