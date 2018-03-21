@@ -94,14 +94,28 @@
                         var component = $("#component{COMPONENT_INSTANCE_ID}");
                         var init = function() {
 
-
                             var mySwiper = new Swiper (component.find('[data-imageslider]'), {
-                                loop: true,
+                                autoplay: {
+                                    delay: {COMPONENT_CONFIG_TIMING_VALUE_MS},
+                                    disableOnInteraction: false,
+                                },
+                                centeredSlides: true,
+                                initialSlide: {COMPONENT_RANDOM_SLIDE},
                                 lazy: {
                                     loadPrevNext: true,
                                     loadPrevNextAmount: 3,
-                                    preloaderClass: 'loader'
-                                }
+                                    preloaderClass: 'loader',
+                                },
+                                loop: true,
+                                pagination: {
+                                    el: '.swiper-pagination',
+                                    clickable: true,
+                                },
+                                navigation: {
+                                    nextEl: '.swiper-button-next',
+                                    prevEl: '.swiper-button-prev',
+                                },
+                                speed: 1000,
                             });
                         };
 
@@ -121,14 +135,19 @@
                             <!-- BEGIN image_scroller -->
                             <div class="swiper-slide">
                                 <!-- BEGIN linked_image -->
-                                <a href="{IMAGE_URL}" >
-                                    <img data-src="/cms/image.php?id={IMAGE_ID}&height=1024&width=1024" alt="{IMAGE_NAME}" class="swiper-lazy" />
+                                <a href="{IMAGE_URL}">
+                                    <div class="{COMPONENT_CONFIG_IMAGE_RATIO}">
+                                        <img data-src="/cms/image.php?id={IMAGE_ID}&height=1024&width=1024" alt="{IMAGE_NAME}" class="swiper-lazy" />
+                                    </div>
                                     <div class="loader"></div>
                                 </a>
                                 <!-- END linked_image -->
                                 <!-- BEGIN unlinked_image -->
-                                <img data-src="/cms/image.php?id={IMAGE_ID}&height=1024&width=1024" alt="{IMAGE_NAME}" class="swiper-lazy" />
-                                <div class="loader"></div>
+                                <div class="{COMPONENT_CONFIG_IMAGE_RATIO}">
+                                    <img data-src="/cms/image.php?id={IMAGE_ID}&height=1024&width=1024" alt="{IMAGE_NAME}" class="swiper-lazy" />
+                                    <div class="loader"></div>
+                                </div>
+                                <!--<div class="loader"></div>-->
                                 <!-- END unlinked_image -->
                                 <!-- BEGIN show_caption -->
                                 <p class="meta">{IMAGE_NAME}</p>
@@ -136,6 +155,9 @@
                             </div>
                             <!-- END image_scroller -->
                         </div>
+                        <div class="swiper-pagination"></div>
+                        <div class="swiper-button-next"></div>
+                        <div class="swiper-button-prev"></div>
                     </div>
                     <ul data-dz-container class="inline-list dz-container no-margin">
                         <!-- THIS TEMPLATE WILL BE DETACHED, DON'T WORRY ABOUT THE BAD DOM -->
