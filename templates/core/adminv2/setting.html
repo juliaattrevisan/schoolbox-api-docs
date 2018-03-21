@@ -48,6 +48,9 @@
 <script type="text/javascript">
     $(function() {
         $('#settings input[data-timepicker]').timepicker({
+            timeFormat: "H:i",
+            // It's meant to stop at 23:00 by default but doesn't, and the show2400 option does nothing.
+            maxTime: "2300",
             step: 60,
             appendTo: function ($input) {
                 return $input.closest('.timepick');
@@ -193,7 +196,7 @@
 
                             <!-- BEGIN setting_type_timepicker -->
                                 <div class="timepick">
-                                    <input type="text" class="ui-timepicker-input" name="{SETTING_NAME}" value="{SETTING_VALUE}" data-time-format="H:i" data-timepicker />
+                                    <input type="text" class="ui-timepicker-input" name="{SETTING_NAME}" value="{SETTING_VALUE}" data-timepicker />
                                 </div>
                             <!-- END setting_type_timepicker -->
 
