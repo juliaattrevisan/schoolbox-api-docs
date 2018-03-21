@@ -159,7 +159,7 @@ class Mapper extends BaseMapper
 
         $model->setOwner($ownerMapper->hydrate($row, 'o'));
         $model->setModifiedBy($modifiedByMapper->hydrate($row, 'mb'));
-        $model->setStudent($studentMapper->hydrate($row, 's')->loadParents()->loadTeachers());
+        $model->setStudent($studentMapper->hydrate($row, 's'));
         $model->setAccess($this->getJoinMapper('access')->findByColumn('pastoral_id', $model->getRootId()));
         $model->setType($typeMapper->hydrate($row, 't'));
         $model->setSubType($subtypeMapper->hydrate($row, 'c'));

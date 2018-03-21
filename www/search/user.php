@@ -309,7 +309,6 @@ function renderStudent(
     // Determine whether current user is student's parent, and if not if they
     // are related in some other way.
 
-    $student->loadParents();
     $isParentOfStudent  = $sessionUser->isParentOf($student);
     $isRelatedToStudent = false;
     $isPrimaryCarer = false;

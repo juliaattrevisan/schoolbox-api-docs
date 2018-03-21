@@ -164,7 +164,6 @@ class Submission implements IStorage, ISoftDeletable
         }
 
         // Parents can view their own children's submissions
-        $this->getOwner()->loadParents();
         if ($this->getOwner()->isChildOf($user)) {
             return true;
         }

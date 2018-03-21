@@ -104,8 +104,6 @@ class CanSeeParticipation extends AbstractParticipationRule
             throw new Unauthorized();
         }
 
-        $student->loadParents();
-
         if ($user->isParentOf($student)) {
             return true;
         }

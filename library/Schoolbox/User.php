@@ -144,6 +144,12 @@ class User implements JsonSerializable, ISoftDeletable
     /** @var Collection */
     protected $parents;
 
+    /**
+     * Determines if parent collection has been loaded
+     * @var bool
+     */
+    private $parentsLoaded = false;
+
     /** @var Collection|UserAccess[] */
     protected $accessList;
 
@@ -198,6 +204,12 @@ class User implements JsonSerializable, ISoftDeletable
 
     /** @var Collection */
     protected $teacherCollection;
+
+    /**
+     * Determines if teacher collection has been loaded
+     * @var bool
+     */
+    private $teachersLoaded = false;
 
     /**
      * @var GenericCollection|User[]
@@ -1014,87 +1026,92 @@ class User implements JsonSerializable, ISoftDeletable
 
     /**
      * Load teachers into object from external db
-     * @return $this
+     * @return self
      */
-    public function loadTeachers()
+    private function loadTeachers()
     {
-        $teacherCollection = new Collection();
+        if(!$this->teachersLoaded && $this->getRole()->isStudent()) {
 
-        // TODO remove handler dependency
-        $externalUser = new \External_User();
-        $externalClass = new \External_Class();
+            $teacherCollection = new Collection();
 
-        // Get all of the students subjects
+            // TODO remove handler dependency
+            $externalUser = new \External_User();
+            $externalClass = new \External_Class();
 
-        $found = [];
-        $subjects = $externalUser->getSubjectList($this);
+            // Get all of the students subjects
 
-        // Iterate and find teachers associated with each subject
+            $found = [];
+            $subjects = $externalUser->getSubjectList($this);
 
-        if (is_array($subjects))
-        {
-            foreach ($subjects as $subject)
-            {
-                $teachers = $externalClass->getTeacherName($subject['code']);
+            // Iterate and find teachers associated with each subject
 
-                foreach ($teachers as $teacher)
-                {
-                    // If we haven't already, add this teacher to their collection
+            if (is_array($subjects)) {
+                foreach ($subjects as $subject) {
+                    $teachers = $externalClass->getTeacherName($subject['code']);
 
-                    if (!isset($found[$teacher]))
-                    {
-                        try {
-                            $teacherCollection->add(
-                                UserMapper::getInstance()->findByExternalId($teacher, Role::STAFF)
-                            );
+                    foreach ($teachers as $teacher) {
+                        // If we haven't already, add this teacher to their collection
 
-                            $found[$teacher] = 1;
-                        } catch (\Schoolbox\Mapper\Exception $e) {
-                            // Schoolbox user not found, lets not try and notify
+                        if (!isset($found[$teacher])) {
+                            try {
+                                $teacherCollection->add(
+                                    UserMapper::getInstance()->findByExternalId($teacher, Role::STAFF)
+                                );
+
+                                $found[$teacher] = 1;
+                            } catch (\Schoolbox\Mapper\Exception $e) {
+                                // Schoolbox user not found, lets not try and notify
+                            }
                         }
                     }
                 }
             }
-        }
 
-        $this->setTeacherCollection($teacherCollection);
+            $this->setTeacherCollection($teacherCollection);
+
+            $this->teachersLoaded = true;
+        }
         return $this;
     }
 
     /**
      * Load parents into object from external db
-     * @return User
+     * @return self
      */
-    public function loadParents()
+    private function loadParents()
     {
-        $DEPRECATED_EXTERNAL_USER = new \External_User();
-        $allParents               = $DEPRECATED_EXTERNAL_USER->getStudentContactList($this->externalId);
+        if(!$this->parentsLoaded && $this->getRole()->isStudent()) {
+            $DEPRECATED_EXTERNAL_USER = new \External_User();
+            $allParents = $DEPRECATED_EXTERNAL_USER->getStudentContactList($this->externalId);
 
-        if (is_array($allParents)) {
-            foreach ($allParents as $currentParent) {
-                /* Add parent
-                 */
-                if (!empty($currentParent['StudentContactID'])) {
-                    try {
-                        $parent = UserMapper::getInstance()->findByExternalId($currentParent['StudentContactID'], Role::PARENT);
-                        $this->parents->add($parent);
-                    } catch (Mapper\Exception $e ) {
-                        //noop
+            if (is_array($allParents)) {
+                foreach ($allParents as $currentParent) {
+                    /* Add parent
+                     */
+                    if (!empty($currentParent['StudentContactID'])) {
+                        try {
+                            $parent = UserMapper::getInstance()->findByExternalId($currentParent['StudentContactID'], Role::PARENT);
+                            $this->parents->add($parent);
+                        } catch (Mapper\Exception $e) {
+                            //noop
+                        }
                     }
-                }
-                /* Add speece
-                 */
-                if (!empty($currentParent['StudentContactSpouseID'])) {
+                    /* Add speece
+                     */
+                    if (!empty($currentParent['StudentContactSpouseID'])) {
 
-                    try {
-                        $spouse = UserMapper::getInstance()->findByExternalId($currentParent['StudentContactSpouseID'], Role::PARENT);
-                        $this->parents->add($spouse);
-                    } catch (Mapper\Exception $e ) {
-                        //noop
+                        try {
+                            $spouse = UserMapper::getInstance()->findByExternalId($currentParent['StudentContactSpouseID'], Role::PARENT);
+                            $this->parents->add($spouse);
+                        } catch (Mapper\Exception $e) {
+                            //noop
+                        }
                     }
                 }
             }
+            $this->parentsLoaded = true;
         }
+
         return $this;
     }
 
@@ -1105,6 +1122,7 @@ class User implements JsonSerializable, ISoftDeletable
      */
     public function getParents()
     {
+        $this->loadParents();
         return $this->parents;
     }
 
@@ -1306,6 +1324,7 @@ class User implements JsonSerializable, ISoftDeletable
      * @return Collection
      */
     public function getTeacherCollection() {
+        $this->loadTeachers();
         return $this->teacherCollection;
     }
 
