@@ -100,16 +100,18 @@ class MSSQL
         );
     }
 
+
     /**
      * Executes a query, returns the statement
      *
      * @deprecated
      * @param string $sql_q
+     * @param array  $params
      * @return bool|IStatement
      */
-    function query($sql_q)
+    function query($sql_q, $params = [])
     {
-        $result = $this->connector->prepareQuery($sql_q);
+        $result = $this->connector->prepareQuery($sql_q, $params);
         $result->execute();
         return $result;
     }
@@ -126,19 +128,22 @@ class MSSQL
         return $this->connector->prepareStoredProcedure($name);
     }
 
+
     /**
      * Gets the first result returned by the query. Returns an associative array of row,
      * false if none exists
      *
      * @deprecated
      * @param string $sql_q
+     * @param null   $params
      * @return array|bool
      */
-    function getRow($sql_q)
+    function getRow($sql_q, $params = null)
     {
-        $query = $this->connector->executeQuery($sql_q);
+        $query = $this->connector->executeQuery($sql_q, $params);
         return $query->fetch();
     }
+
 
     /**
      * Gets the first value of the first result returned by the query. Returns an associative
@@ -146,11 +151,12 @@ class MSSQL
      *
      * @deprecated
      * @param string $sql_q
+     * @param null   $params
      * @return array|bool
      */
-    function getOne($sql_q)
+    function getOne($sql_q, $params = null)
     {
-        $query = $this->connector->executeQuery($sql_q);
+        $query = $this->connector->executeQuery($sql_q, $params);
         return $query->fetchColumn();
     }
 
@@ -169,16 +175,18 @@ class MSSQL
         return $query->fetchAll();
     }
 
+
     /**
      * Gets an iterator over a query.
      *
      * @deprecated
      * @param string $sql_q
+     * @param null   $params
      * @return MssqlResultIterator
      */
-    public function getIterator($sql_q)
+    public function getIterator($sql_q, $params = null)
     {
-        return $this->connector->getQueryIterator($sql_q);
+        return $this->connector->getQueryIterator($sql_q, $params);
     }
 
     /**
