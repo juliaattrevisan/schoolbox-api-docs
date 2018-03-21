@@ -99,7 +99,7 @@ abstract class Broker implements IBroker
                     $payload = unserialize($serial);
 
                 } catch (\Throwable $e) {
-                    $consumer->onException(new PayloadBrokenException($key, $resolve));
+                    $consumer->onException(new PayloadBrokenException($key, $resolve, $e->getCode(), $e));
                     return;
                 }
 
