@@ -30,7 +30,7 @@ class Query extends Base
             foreach ($this->parameters['input'] as $name => $input) {
                 if (isset($input['type'])) {
                     if ($input['type'] == PDO::PARAM_LOB) {
-                        $statement->bindParam($name, $input['value'], PDO::PARAM_LOB, 0, PDO::SQLSRV_ENCODING_BINARY);
+                        $statement->bindParam($name, $input['value'], PDO::PARAM_LOB);
                     } else {
                         $statement->bindValue($name, $input['value'], $input['type']);
                     }
