@@ -1071,7 +1071,7 @@ class User implements JsonSerializable, ISoftDeletable
             }
 
             $this->setTeacherCollection($teacherCollection);
-            $this->parentsLoaded = true;
+            $this->teachersLoaded = true;
         }
 
         return $this;
