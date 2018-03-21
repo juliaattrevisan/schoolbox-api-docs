@@ -11,6 +11,7 @@ namespace Alaress\Async\Broker\StompRedis;
 use Alaress\Async\AMQP\AMQPInterface;
 use Alaress\Async\Broker\IBroker;
 use Alaress\Async\Broker\IConsumer;
+use Alaress\Async\Broker\PayloadBrokenException;
 use Alaress\Async\Broker\PayloadMissingException;
 use Predis\ClientInterface;
 use React\Stomp\AckResolver;
@@ -92,9 +93,15 @@ abstract class Broker implements IBroker
                     return;
                 }
 
-                $gzip    = $this->redis->get($key);
-                $serial  = gzuncompress($gzip);
-                $payload = unserialize($serial);
+                try {
+                    $gzip    = $this->redis->get($key);
+                    $serial  = gzuncompress($gzip);
+                    $payload = unserialize($serial);
+
+                } catch (\Throwable $e) {
+                    $consumer->onException(new PayloadBrokenException($key, $resolve));
+                    return;
+                }
 
                 $consumer->onMessage($payload, $resolve, $context);
             });
