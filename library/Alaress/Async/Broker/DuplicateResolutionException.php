@@ -11,7 +11,7 @@ namespace Alaress\Async\Broker;
 use RuntimeException;
 
 
-class DuplicateResolutionException extends RuntimeException
+class DuplicateResolutionException extends RuntimeException implements IBrokerException
 {
 
 }
