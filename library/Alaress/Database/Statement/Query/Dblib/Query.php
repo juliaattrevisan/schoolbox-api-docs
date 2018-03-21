@@ -9,6 +9,7 @@
 
 namespace Alaress\Database\Statement\Query\Dblib;
 
+use Alaress\Database\Exception;
 use Alaress\Database\Statement\Query\Base;
 use PDOStatement;
 use PDO;
@@ -30,7 +31,7 @@ class Query extends Base
             foreach ($this->parameters['input'] as $name => $input) {
                 if (isset($input['type'])) {
                     if ($input['type'] == PDO::PARAM_LOB) {
-                        $statement->bindParam($name, $input['value'], PDO::PARAM_LOB);
+                        throw new Exception('DBLib does not support parameter type PDO::PARAM_LOB');
                     } else {
                         $statement->bindValue($name, $input['value'], $input['type']);
                     }

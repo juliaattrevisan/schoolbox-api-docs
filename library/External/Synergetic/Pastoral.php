@@ -768,7 +768,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             'classificationCode' => ['value' => $classificationCode],
             'createdById' => ['value' => $externalId],
             'modifiedById' => ['value' => $externalId],
-            'document' => ['value' => bin2hex($storage->read()), 'type' => PDO::PARAM_LOB],
+            'document' => ['value' => bin2hex($storage->read())],
             'createdDate' => ['value' => $date],
             'modifiedDate' => ['value' => $date],
             'sourceDate' => ['value' => $sourceDate],
