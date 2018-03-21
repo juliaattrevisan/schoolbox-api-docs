@@ -235,12 +235,16 @@ class Controller extends Base
             $markbook = new Markbook($assessments, $this->defaultGradeGroup, $this->getUser());
 
             // Data set
-            $subjects[$folder->getId()] = [
-                'teachers' => $teachers,
-                'folder'   => $folder,
-                'grade'    => $this->getConfigLoader()->get('show_overall_grade') ? $markbook->getStudentStatistics()[$student->getId()]: '',
-                'hasPerms'    => Access::getInstance()->getFolderAccess($this->getUser(), $folder->getId()) > UserAccess::ACCESS_DENY,
-            ];
+            $subjects = [];
+
+            if (!isset($subjects[$folder->getId()])) {
+                $subjects[$folder->getId()] = [
+                    'teachers' => $teachers,
+                    'folder'   => $folder,
+                    'grade'    => $this->getConfigLoader()->get('show_overall_grade') ? $markbook->getStudentStatistics()[$student->getId()]: '',
+                    'hasPerms'    => Access::getInstance()->getFolderAccess($this->getUser(), $folder->getId()) > UserAccess::ACCESS_DENY,
+                ];
+            }
         }
 
         $visibility = new Visibility(Access::getInstance());
