@@ -87,14 +87,17 @@ function Calendar(id, bubbleId, opts) {
              */
             contentHeight: function() {
                 var windowHeight = $(window).height();
+                var calendarOffset = $('#calendar .fc-view-container').offset().top; // The amount of space between the top of the window and the start of the calendar
+                var footerHeight = $('#footer').outerHeight();
+                var otherPadding = 32; // <section> margin-bottom and #container padding-bottom
+                var contentHeight = windowHeight - calendarOffset - footerHeight - otherPadding;
 
-                if (windowHeight < 768) {
-                    // Not enough space - set to auto
-                    return 'auto';
+                // Force a min height of 500px
+                if (contentHeight < 500) {
+                    return 500;
                 }
-                else {
-                    return windowHeight - self.dom.offset().top - 60;
-                }
+
+                return contentHeight;
             },
 
             /**
