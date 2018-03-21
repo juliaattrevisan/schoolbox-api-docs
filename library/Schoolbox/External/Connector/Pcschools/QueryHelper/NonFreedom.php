@@ -332,4 +332,14 @@ class NonFreedom implements IQueryHelper
     }
 
 
+    /**
+     * @param array $rows
+     * @return array
+     */
+    public function processGetStudentResult(array $rows): array
+    {
+        return $rows[0] ?? null;
+    }
+
+
 }

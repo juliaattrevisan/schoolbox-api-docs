@@ -24,6 +24,12 @@ interface IQueryHelper
     public function getGetStudentQuery($studentExternalId): array;
 
     /**
+     * @param array $rows
+     * @return array
+     */
+    public function processGetStudentResult(array $rows): array;
+
+    /**
      * @param int $studentExternalId
      * @return array
      */

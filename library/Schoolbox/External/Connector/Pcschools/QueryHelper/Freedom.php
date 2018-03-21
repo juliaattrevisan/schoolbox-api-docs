@@ -249,4 +249,43 @@ class Freedom implements IQueryHelper
     }
 
 
+    /**
+     * @param array $rows
+     * @return array
+     */
+    public function processGetStudentResult(array $rows): array
+    {
+        $row = $rows[0] ?? null;
+
+        if (!\count($row)) {
+            return null;
+        }
+
+        $pfx    = 'StudentEmergency';
+        $fields = [ 'Name', 'Phone', 'PhoneAlt' ];
+        $index  = 0;
+
+        // emergency contacts need to be squashed into a single row
+        foreach ($rows as $i => $ec) {
+
+            if ('' === $ec["{$pfx}Name"]) {
+                // skip the first record because it's already populated
+                // and doesn't get a number in the fieldname
+                continue;
+            }
+
+            // turn the second instance of "StudentEmergencyName" into "StudentEmergency2Name"
+            $index++;
+
+            $num = $index === 1 ? '' : $index;
+
+            // copy the emergency contact details to the expected location
+            foreach ($fields as $field) {
+                $row["{$pfx}{$num}{$field}"] = $ec["{$pfx}{$field}"];
+            }
+        }
+
+        return $row;
+    }
+
 }

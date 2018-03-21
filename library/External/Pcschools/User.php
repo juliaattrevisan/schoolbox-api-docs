@@ -8,6 +8,7 @@
  */
 
 use Schoolbox\External\Connector\Pcschools\QueryHelper;
+use Schoolbox\External\Connector\Pcschools\QueryHelper\Freedom;
 use Schoolbox\External\Connector\Pcschools\QueryHelper\IQueryHelper;
 use Schoolbox\User;
 
@@ -100,38 +101,10 @@ class External_Pcschools_User implements External_UserInterface
 
         $rows = $this->getDatabase()->getAll($sql, $params);
 
-        // just grab the first from from the non-freedom query result
-        $row = $rows[0] ?? null;
+        // squash the result down into a single row
+        $row = $this->queryHelper->processGetStudentResult($rows);
         if (!empty($row)) {
 
-            $index = 0;
-
-            // freedom takes a bit more processing
-            if ($this->queryHelper instanceof Freedom) {
-
-                $pfx    = 'StudentEmergency';
-                $fields = [ 'Name', 'Phone', 'PhoneAlt' ];
-
-                // emergency contacts need to be squashed into a single row
-                foreach ($rows as $i => $ec) {
-
-                    if (!strlen($ec["{$pfx}Name"])) {
-                        // skip the first record because it's already populated
-                        // and doesn't get a number in the fieldname
-                        continue;
-                    }
-
-                    // turn the second instance of "StudentEmergencyName" into "StudentEmergency2Name"
-                    $index++;
-
-                    $num = $index === 1 ? '' : $index;
-
-                    // copy the emergency contact details to the expected location
-                    foreach ($fields as $field) {
-                        $row["{$pfx}{$num}{$field}"] = $ec["{$pfx}{$field}"];
-                    }
-                }
-            }
             $row = $this->getDatabase()->trimRow($row);
             // Get boarder codes and munge student boarder status in
             $boarderCodes = array_map(
