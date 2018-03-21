@@ -128,7 +128,6 @@ class Statistics
 
         // Median: midpoint value
         // If exactly divisible into two, use midpoint of highest min and lowest max
-        sort($values);
         $index = ($count-1) / 2;
         if (\is_int($index)) {
             return (float)$values[$index];
