@@ -56,6 +56,7 @@ class Conversation
             /* Find the parents of this particular student
              */
             $this->student = $student;
+            $this->student->loadParents();
 
             /* FInd the teachers of this particular category
              */

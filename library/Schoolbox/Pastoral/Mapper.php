@@ -226,7 +226,7 @@ class Mapper extends BaseMapper
 
         $model->setOwner($ownerMapper->hydrate($row, 'o'));
         $model->setModifiedBy($modifiedByMapper->hydrate($row, 'mb'));
-        $model->setStudent($studentMapper->hydrate($row, 's'));
+        $model->setStudent($studentMapper->hydrate($row, 's')->loadParents()->loadTeachers());
         $model->setAccess($this->getJoinMapper('access')->findByColumn('pastoral_id', $model->getId()));
 
         if ($this->getConfigLoader()->get('pastoral_severity')) {

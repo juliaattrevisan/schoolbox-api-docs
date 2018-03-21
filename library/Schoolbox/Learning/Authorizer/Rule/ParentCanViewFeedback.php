@@ -29,7 +29,7 @@ class ParentCanViewFeedback extends AbstractCanViewFeedback
         }
 
         $assessment = $this->findAssessable($params);
-        $student    = $this->findStudent($params);
+        $student    = $this->findStudent($params)->loadParents();
 
         // If there's feedback, check it's published
         try {

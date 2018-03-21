@@ -211,7 +211,7 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
                         if($user->getRole()->isStudent()) {
                             if ($viewer->getRole()->isStudent() && $studentPhotoHidden) {
                                 $this->setVar('photo_block', '');
-                            } elseif ($viewer->getRole()->isParent() && !$viewer->isParentOf($user)) {
+                            } elseif ($viewer->getRole()->isParent() && !$viewer->isParentOf($user->loadParents())) {
                                 $this->setVar('photo_block', '');
                             } else {
                                 $this->parse('photo_block', 'photo');
