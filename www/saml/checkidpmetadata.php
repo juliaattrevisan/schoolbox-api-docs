@@ -6,10 +6,23 @@ require "saml-setup.php";
 echo "<pre>";
 echo "IDP metadata:\n\n";
 
-if ($idp) {
-    print_r($idpMetadata_raw);
+if (Cfg::get('saml_idp_metadata_url')) {
+    if ($idpMetadata_raw) {
+        try {
+            $check = OneLogin_Saml2_IdPMetadataParser::parseXML($idpMetadata_raw);
+            print_r($check['idp']);
+        } catch (Exception $e) {
+            echo "Error: unable to read SAML Identity Provider (IDP) metadata from:\n" . Cfg::get('saml_idp_metadata_url') . "\n";
+        }
+    } else {
+        echo "Error: unable to retrieve SAML Identity Provider (IDP) metadata from:\n" . Cfg::get('saml_idp_metadata_url') . "\n";
+    }
 } else {
-    echo "Error: unable to retrieve or read SAML Identity Provider (IDP) metadata from:\n" .Cfg::get('saml_idp_metadata_url');
+    echo "SAML Identity Provider (IDP) metadata URL not configured.\n";
 }
+
+echo "\nOverall IDP configuration (IDP Metadata + Schoolbox configuration):\n";
+
+print_r($settingsInfo['idp']);
 
 echo "</pre>";
