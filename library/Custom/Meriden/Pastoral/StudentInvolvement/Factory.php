@@ -9,6 +9,7 @@
 
 namespace Custom\Meriden\Pastoral\StudentInvolvement;
 
+use Alaress\Statistics\Statistics;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
@@ -605,7 +606,7 @@ class Factory
         if (!empty($distribution['continuous']['marks'])) {
             $marks = array_map(
                 function ($v) {
-                    return $v['mark'];
+                    return (float)$v['mark'];
                 },
                 $distribution['continuous']['marks']
             );
@@ -639,6 +640,10 @@ class Factory
                     ? sprintf('%.1f', $prettySd)
                     : $prettySd,
             ];
+
+            // Show marks as series
+            // Calculation in PHP is kind of annoying, but...
+            $distribution['continuous']['series'] = Statistics::buildBoxPlotValues($marks);
         }
         return $distribution;
     }

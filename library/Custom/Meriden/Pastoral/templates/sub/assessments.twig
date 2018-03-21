@@ -9,8 +9,7 @@
                     <th class="fixed-40">Title</th>
                     <th>Result %</th>
                     <th>Mean %</th>
-                    <th>Standard Deviation %</th>
-                    <th>Date Due</th>
+                    <th class="fixed-30">Distribution</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -41,8 +40,119 @@
             </td>
             <td>{{ workItem.pretty_mark | replace({'%': ''}) }}</td>
             <td>{{ workItem.distribution.continuous.mean.mark | number_format(1) }}</td>
-            <td>{{ workItem.distribution.continuous.sd.mark | number_format(1) }}</td>
-            <td>{{ workItem.assessment.dueAt|date('j F') }}</td>
+            <td>
+                {# Graph goes here #}
+                <div id="assessmentGraph-{{ workItem.assessment.id }}-{{ student.id }}"></div>
+
+                {% autoescape 'js' %}
+                <script type="text/javascript">
+                    (function($){
+                        $(function() {
+                            var prettyMark = "{{ workItem.pretty_mark | replace({'%': ''}) }}";
+                            $('#assessmentGraph-{{ workItem.assessment.id }}-{{ student.id }}').highcharts({
+                                chart: {
+                                    inverted: true,
+                                    height: 100
+                                },
+                                title: {
+                                    text: null
+                                },
+                                legend: {
+                                    enabled: false
+                                },
+                                credits: {
+                                    enabled: false
+                                },
+                                xAxis: {
+                                    title: {
+                                        text: null
+                                    },
+                                    labels: {
+                                        enabled: false
+                                    },
+                                    tickLength: 0
+                                },
+                                yAxis: {
+                                    min: 0,
+                                    max: 100,
+                                    tickInterval: 25,
+                                    title: {
+                                        text: null
+                                    },
+                                    labels: {
+                                        step: 2
+                                    }
+                                },
+                                series: [
+                                    {
+                                        type: 'boxplot',
+                                        name: null,
+                                        data: [{{ workItem.distribution.continuous.series|json_encode|raw }}],
+                                        tooltip: {
+                                            headerFormat: '',
+                                            pointFormat:
+                                                'Maximum: {point.high}<br/>' +
+                                                'Upper quartile: {point.q3}<br/>' +
+                                                'Median: {point.median}<br/>' +
+                                                'Lower quartile: {point.q1}<br/>' +
+                                                'Minimum: {point.low}<br/>'
+                                        }
+                                    },
+                                    {
+                                        type: 'scatter',
+                                        name: null,
+                                        color: 'rgb(255, 87, 87)',
+                                        marker: {
+                                            radius: 6
+                                        },
+                                        data: [(Number)("{{ workItem.mark }}")],
+                                        tooltip: {
+                                            headerFormat: '',
+                                            borderColor: '#000000',
+                                            pointFormatter: function () {
+                                                /* Basic template for each outlier
+                                                 */
+                                                var template =
+                                                    '<div style="width:200px!important;overflow:auto;white-space:normal !important;">' +
+                                                    '<div class="grade gradient-{GRADIENTMARK}"><span>{DISPLAYMARK}</span></div>' +
+                                                    // '<p class="comment">{INFO}</p>' +
+                                                    '</div>';
+                                                /* Concatenate everything
+                                                 */
+                                                if (typeof prettyMark !== 'undefined') {
+                                                    var tooltipContent = template;
+
+                                                    if (prettyMark !== null) {
+                                                        tooltipContent = tooltipContent.replace(/{DISPLAYMARK}/, prettyMark);
+                                                        tooltipContent = tooltipContent.replace(/{GRADIENTMARK}/, '10');
+                                                    }
+                                                    else {
+                                                        tooltipContent = tooltipContent.replace(/{DISPLAYMARK}/, '');
+                                                        tooltipContent = tooltipContent.replace(/{GRADIENTMARK}/, '10');
+                                                    }
+                                                    // tooltipContent = tooltipContent.replace(/{INFO}/, infoIndex[this.x].info);
+
+                                                    /* Show tooltip
+                                                     */
+                                                    $('.highcharts-tooltip').show();
+
+                                                    return tooltipContent;
+                                                } else {
+
+                                                    /* Hide tooltip when no data
+                                                     */
+                                                    $('.highcharts-tooltip').hide();
+                                                }
+                                            }
+                                        }
+                                    }
+                                ]
+                            });
+                        })
+                    })(jQuery);
+                </script>
+                {% endautoescape %}
+            </td>
         </tr>
     {% endif %}
 {% endfor %}
