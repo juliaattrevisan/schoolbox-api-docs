@@ -10,9 +10,8 @@
 namespace Schoolbox\External\Connector\Pcschools\Base;
 
 use Alaress\Database\Connector\IConnector;
-use Schoolbox\External\Connector\Pcschools\QueryHelper\Freedom;
+use Schoolbox\External\Connector\Pcschools\QueryHelper;
 use Schoolbox\External\Connector\Pcschools\QueryHelper\IQueryHelper;
-use Schoolbox\External\Connector\Pcschools\QueryHelper\NonFreedom;
 use Schoolbox\External\Connector\Base;
 use Schoolbox\External\Connector\ISync;
 use Schoolbox\IConfigLoader;
@@ -42,9 +41,8 @@ class Sync extends Base implements ISync
     {
         parent::__construct($config, $databaseExternal);
 
-        $this->queryHelper = $this->databaseExternal->executeQuery(IQueryHelper::FREEDOM_DETECT)->fetchColumn()
-            ? new Freedom()
-            : new NonFreedom();
+        /** @noinspection PhpUnhandledExceptionInspection */
+        $this->queryHelper = (new QueryHelper\Factory($this->databaseExternal))->spawn();
     }
 
 

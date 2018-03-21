@@ -7,9 +7,8 @@
  * @link      http://www.alaress.com.au/
  */
 
-use Schoolbox\External\Connector\Pcschools\QueryHelper\Freedom;
+use Schoolbox\External\Connector\Pcschools\QueryHelper;
 use Schoolbox\External\Connector\Pcschools\QueryHelper\IQueryHelper;
-use Schoolbox\External\Connector\Pcschools\QueryHelper\NonFreedom;
 use Schoolbox\User;
 
 class External_Pcschools_User implements External_UserInterface
@@ -47,9 +46,8 @@ class External_Pcschools_User implements External_UserInterface
 //        $this->getDatabase()->query('SET ANSI_WARNINGS ON');
         $this->userMapper = new \Schoolbox\UserMapper();
 
-        $this->queryHelper = $this->database->query(IQueryHelper::FREEDOM_DETECT)->fetchColumn()
-            ? new Freedom()
-            : new NonFreedom();
+        /** @noinspection PhpUnhandledExceptionInspection */
+        $this->queryHelper = (new QueryHelper\Factory($this->database))->spawn();
     }
 
     /**
