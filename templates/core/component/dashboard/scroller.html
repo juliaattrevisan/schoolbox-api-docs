@@ -1,14 +1,27 @@
 <div id='component{COMPONENT_INSTANCE_ID}' class='component-container {COMPONENT_CLASS}' data-component>
-    <script type="text/javascript" src="/javascript/components/anyslider/dist/jquery.anyslider.min.js"></script>
+    <script src="/javascript/components/swiper/dist/js/swiper.min.js"></script>
+    <link rel="stylesheet" href="/javascript/components/swiper/dist/css/swiper.min.css">
     <script type="text/javascript">
         $(function(){
-            $("#component{COMPONENT_INSTANCE_ID}").find("[data-imageslider]").anyslider({
-                interval: {COMPONENT_CONFIG_TIMING_VALUE_MS},
-                prevLabel: '',
-                nextLabel: '',
-                showBullets: false,
-                showControls: true,
-                startSlide: {COMPONENT_RANDOM_SLIDE}
+            var component = $("#component{COMPONENT_INSTANCE_ID}");
+            var meSwiper = new Swiper (component.find('[data-imageslider]'), {
+                autoplay: {
+                    delay: {COMPONENT_CONFIG_TIMING_VALUE_MS},
+                    disableOnInteraction: false,
+                },
+                centeredSlides: true,
+                initialSlide: {COMPONENT_RANDOM_SLIDE},
+                lazy: {
+                    loadPrevNext: true,
+                    loadPrevNextAmount: 3,
+                    preloaderClass: 'loader',
+                },
+                loop: true,
+                navigation: {
+                    nextEl: '.swiper-button-next',
+                    prevEl: '.swiper-button-prev',
+                },
+                speed: 1000,
             });
         });
     </script>
@@ -20,22 +33,24 @@
             <!-- BEGIN has_header -->
             <h2 class="subheader">{COMPONENT_NAME}</h2>
             <!-- END has_header -->
-            <section class="imageslider-container">
-                <div data-imageslider class="imageslider">
+
+            <div data-imageslider class="swiper-container">
+                <div class="swiper-wrapper">
                     <!-- BEGIN image_scroller -->
-                    <div data-imagescroller-image class="text-center">
+                    <div class="swiper-slide">
                         <div class="{COMPONENT_CONFIG_IMAGE_RATIO}">
-                            <img src="/cms/image.php?id={IMAGE_ID}&height=1024&width=1024"
-                                 alt="{IMAGE_NAME}"/>
-                            <!-- BEGIN show_caption -->
-                            <p class="meta">{IMAGE_NAME}</p>
-                            <!-- END show_caption -->
+                            <img data-src="/cms/image.php?id={IMAGE_ID}&height=1024&width=1024" alt="{IMAGE_NAME}" class="swiper-lazy" />
+                            <div class="loader"></div>
                         </div>
+                        <!-- BEGIN show_caption -->
+                        <p class="meta">{IMAGE_NAME}</p>
+                        <!-- END show_caption -->
                     </div>
                     <!-- END image_scroller -->
                 </div>
-            </section>
+                <div class="swiper-button-next"></div>
+                <div class="swiper-button-prev"></div>
+            </div>
         </div>
     </div>
 </div>
-

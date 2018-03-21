@@ -1,12 +1,31 @@
 <div id='component{COMPONENT_INSTANCE_ID}' class='component-container {COMPONENT_CLASS}' data-component>
-    <!-- Custom javascript -->
-    <script type="text/javascript" src="/javascript/components/anyslider/dist/jquery.anyslider.min.js"></script>
+    <script src="/javascript/components/swiper/dist/js/swiper.min.js"></script>
+    <link rel="stylesheet" href="/javascript/components/swiper/dist/css/swiper.min.css">
     <script type="text/javascript">
         $(function(){
-            $("#component{COMPONENT_INSTANCE_ID}").find("[data-imageslider]").anyslider({
-                interval: {COMPONENT_CONFIG_TIMING_VALUE_MS},
-                prevLabel: '',
-                nextLabel: ''
+            var component = $("#component{COMPONENT_INSTANCE_ID}");
+            var mySwiper = new Swiper (component.find('[data-imageslider]'), {
+                autoplay: {
+                    delay: {COMPONENT_CONFIG_TIMING_VALUE_MS},
+                    disableOnInteraction: false,
+                },
+                centeredSlides: true,
+                initialSlide: {COMPONENT_RANDOM_SLIDE},
+                lazy: {
+                    loadPrevNext: true,
+                    loadPrevNextAmount: 3,
+                    preloaderClass: 'loader',
+                },
+                loop: true,
+                pagination: {
+                    el: '.swiper-pagination',
+                    clickable: true,
+                },
+                navigation: {
+                    nextEl: '.swiper-button-next',
+                    prevEl: '.swiper-button-prev',
+                },
+                speed: 1000,
             });
         });
     </script>
@@ -17,20 +36,27 @@
 
     <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
         <div class="small-12 columns">
-            <section class="imageslider-container">
-                <div data-imageslider class="imageslider">
+            <div data-imageslider class="swiper-container">
+                <div class="swiper-wrapper">
                     <!-- BEGIN image_scroller -->
-                    <!-- BEGIN linked_image -->
-                    <a href="{IMAGE_URL}">
-                        <img src="/cms/image.php?id={IMAGE_ID}&height={IMAGE_DIMENSION}&width={IMAGE_DIMENSION}" alt="{IMAGE_NAME}"/>
-                    </a>
-                    <!-- END linked_image -->
-                    <!-- BEGIN unlinked_image -->
-                    <img src="/cms/image.php?id={IMAGE_ID}&height={IMAGE_DIMENSION}&width={IMAGE_DIMENSION}" alt="{IMAGE_NAME}"/>
-                    <!-- END unlinked_image -->
+                    <div class="swiper-slide">
+                        <!-- BEGIN linked_image -->
+                        <a href="{IMAGE_URL}">
+                            <img data-src="/cms/image.php?id={IMAGE_ID}&height=1024&width=1024" alt="{IMAGE_NAME}" class="swiper-lazy" />
+                        </a>
+                        <div class="loader"></div>
+                        <!-- END linked_image -->
+                        <!-- BEGIN unlinked_image -->
+                        <img data-src="/cms/image.php?id={IMAGE_ID}&height=1024&width=1024" alt="{IMAGE_NAME}" class="swiper-lazy" />
+                        <div class="loader"></div>
+                        <!-- END unlinked_image -->
+                    </div>
                     <!-- END image_scroller -->
                 </div>
-            </section>
+                <div class="swiper-pagination"></div>
+                <div class="swiper-button-next"></div>
+                <div class="swiper-button-prev"></div>
+            </div>
         </div>
     </div>
 </div>
