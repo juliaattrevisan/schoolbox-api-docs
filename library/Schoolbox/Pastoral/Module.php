@@ -232,6 +232,8 @@ class Module extends BaseModule
                     $userMapper = $this->getMapperFactory()->get(UserMapper::class);
 
                     $student = $userMapper->findWithSubjects($params['studentId']);
+                    $student->loadTeachers();
+                    $student->loadParents();
 
                     $injectedValues['student'] = $student;
                 } catch (MapperException $e) {
@@ -249,6 +251,8 @@ class Module extends BaseModule
                     }
 
                     $student = $userMapper->findWithSubjects($params['linkedStudentId']);
+                    $student->loadTeachers();
+                    $student->loadParents();
 
                     $injectedValues['linkedStudent'] = $student;
                 } catch (MapperException $e) {

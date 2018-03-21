@@ -65,6 +65,7 @@ class Visibility {
 			$visibilities[] = IAssessable::MARK_VISIBILITY_PARENT_STUDENT;
 		}
 		else {
+			$student->loadParents();
 			if ($currentUser->isParentOf($student)) {
 				$visibilities[] = IAssessable::MARK_VISIBILITY_PARENT_STUDENT;
 			}

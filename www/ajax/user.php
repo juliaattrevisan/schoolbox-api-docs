@@ -91,6 +91,9 @@ if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64 && (str
 
     if ($filterParents) {
         $student = $userMapper->findById($_GET["studentId"]);
+        if ($student) {
+            $student->loadParents();
+        }
     }
 
     if (is_array($userList)) {

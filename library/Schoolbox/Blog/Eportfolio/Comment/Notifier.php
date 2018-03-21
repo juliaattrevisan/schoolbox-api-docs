@@ -148,7 +148,7 @@ class Notifier extends AbstractModuleNotifier
         $owner = $this->userMapper->findById($post->getPage()->getOwner()->getId());
 
         // Send it to all their teachers (across all subjects)
-        $audience = $owner->getTeacherCollection();
+        $audience = $owner->loadTeachers()->getTeacherCollection();
 
         return $this->notifyCommented($comment, $effector, $audience, RoleMapper::ROLE_STAFF);
     }
@@ -185,7 +185,7 @@ class Notifier extends AbstractModuleNotifier
     public function notifyParentCommented(Model $comment, User $effector): Envelope
     {
         $post  = $this->postMapper->findById($comment->getBlog()->getId());
-        $owner = $this->userMapper->findById($post->getPage()->getOwner()->getId());
+        $owner = $this->userMapper->findById($post->getPage()->getOwner()->getId())->loadParents();
         $post->getPage()->setOwner($owner);
 
         $audience = $this->userMapper->createCollection();
@@ -256,7 +256,7 @@ class Notifier extends AbstractModuleNotifier
     public function notifyParentFollowed(Model $comment, User $effector): Envelope
     {
         $post = $this->postMapper->findById($comment->getBlog()->getId());
-        $post->getPage()->setOwner($this->userMapper->findById($post->getPage()->getOwner()->getId()));
+        $post->getPage()->setOwner($this->userMapper->findById($post->getPage()->getOwner()->getId())->loadParents());
 
         $audience = $this->userMapper->createCollection();
         foreach ($this->getOtherCommentAuthors($comment, RoleMapper::ROLE_PARENT) as $parent) {
@@ -367,8 +367,17 @@ class Notifier extends AbstractModuleNotifier
     ): Envelope {
         $envelope = new Envelope();
         $post     = $this->postMapper->findById($comment->getBlog()->getId());
-        $owner    = $this->userMapper->findById($post->getPage()->getOwner()->getId());
-        
+        $owner    = $this->userMapper->findById($post->getPage()->getOwner()->getId())->loadParents();
+
+        // Are we targeting parents?
+        if (RoleMapper::ROLE_PARENT === $roleType) {
+            // Load parents so we can display just their child's first name
+            $effector->loadParents();
+            if ($effector->getId() !== $owner->getId()) {
+                $owner->loadParents();
+            }
+        }
+
         foreach ($audience as $target) {
             // Just first name if advising parent of child's action
             $effectorParam = RoleMapper::ROLE_PARENT === $roleType && $target->isParentOf($effector)

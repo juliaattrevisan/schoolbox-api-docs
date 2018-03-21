@@ -211,7 +211,7 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
                         //Hide Student Photo
                         if ($viewer->getRole()->isStudent() && $studentPhotoHidden) {
                             $this->setVar('photo_block', '');
-                        } elseif ($viewer->getRole()->isParent() && !$viewer->isParentOf($manager)) {
+                        } elseif ($viewer->getRole()->isParent() && !$viewer->isParentOf($manager->loadParents())) {
                             $this->setVar('photo_block', '');
                         } else {
                             $this->parse('photo_block', 'photo');
