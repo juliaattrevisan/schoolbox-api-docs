@@ -126,16 +126,15 @@ class Statistics
             return (float)array_pop($values);
         }
 
-        // Median: midpoint value
-        // If exactly divisible into two, use midpoint of highest min and lowest max
-        $index = ($count-1) / 2;
-        if (\is_int($index)) {
-            return (float)$values[$index];
+        $midpointIndex = (int)floor($count/2);
+        if ($count % 2 === 1) {
+            // Odd number of values: use midpoint value
+            $median = $values[$midpointIndex];
+        } else {
+            // Even number of values: use average of two midpoint values
+            $median = ($values[$midpointIndex-1] + $values[$midpointIndex])/2;
         }
 
-        $lowValue  = $values[(int)floor($index)];
-        $highValue = $values[(int)ceil($index)];
-
-        return (float)(($highValue + $lowValue) / 2);
+        return (float)$median;
     }
 }
