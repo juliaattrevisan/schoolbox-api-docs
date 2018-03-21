@@ -206,6 +206,12 @@ class User implements JsonSerializable, ISoftDeletable
     protected $teacherCollection;
 
     /**
+     * Determines if teacher collection has been loaded
+     * @var bool
+     */
+    private $teachersLoaded = false;
+
+    /**
      * @var GenericCollection|User[]
      */
     private $children;
@@ -1024,46 +1030,50 @@ class User implements JsonSerializable, ISoftDeletable
      */
     public function loadTeachers()
     {
-        $teacherCollection = new Collection();
+        if(!$this->teachersLoaded) {
+            $teacherCollection = new Collection();
 
-        // TODO remove handler dependency
-        $externalUser = new \External_User();
-        $externalClass = new \External_Class();
+            // TODO remove handler dependency
+            $externalUser = new \External_User();
+            $externalClass = new \External_Class();
 
-        // Get all of the students subjects
+            // Get all of the students subjects
 
-        $found = [];
-        $subjects = $externalUser->getSubjectList($this);
+            $found = [];
+            $subjects = $externalUser->getSubjectList($this);
 
-        // Iterate and find teachers associated with each subject
+            // Iterate and find teachers associated with each subject
 
-        if (is_array($subjects))
-        {
-            foreach ($subjects as $subject)
+            if (is_array($subjects))
             {
-                $teachers = $externalClass->getTeacherName($subject['code']);
-
-                foreach ($teachers as $teacher)
+                foreach ($subjects as $subject)
                 {
-                    // If we haven't already, add this teacher to their collection
+                    $teachers = $externalClass->getTeacherName($subject['code']);
 
-                    if (!isset($found[$teacher]))
+                    foreach ($teachers as $teacher)
                     {
-                        try {
-                            $teacherCollection->add(
-                                UserMapper::getInstance()->findByExternalId($teacher, Role::STAFF)
-                            );
+                        // If we haven't already, add this teacher to their collection
 
-                            $found[$teacher] = 1;
-                        } catch (\Schoolbox\Mapper\Exception $e) {
-                            // Schoolbox user not found, lets not try and notify
+                        if (!isset($found[$teacher]))
+                        {
+                            try {
+                                $teacherCollection->add(
+                                    UserMapper::getInstance()->findByExternalId($teacher, Role::STAFF)
+                                );
+
+                                $found[$teacher] = 1;
+                            } catch (\Schoolbox\Mapper\Exception $e) {
+                                // Schoolbox user not found, lets not try and notify
+                            }
                         }
                     }
                 }
             }
+
+            $this->setTeacherCollection($teacherCollection);
+            $this->teachersLoaded = true;
         }
 
-        $this->setTeacherCollection($teacherCollection);
         return $this;
     }
 
