@@ -74,7 +74,7 @@ class Statistics
         ];
 
         // Calculate q1 (median of lower half), q3 (median of upper half)
-        $sliceSize  = (int)max($count / 2, 1);
+        $sliceSize  = (int)($count / 2);
         $lowValues  = \array_slice($values, 0, $sliceSize);
         $highValues = \array_slice($values, -$sliceSize);
         $series['q1'] = static::internalMedian($lowValues);
