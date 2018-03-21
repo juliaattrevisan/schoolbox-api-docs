@@ -7,12 +7,14 @@
  * @link      http://www.alaress.com.au/
  */
 
+namespace External\Tass\Portal;
+
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule\IsLoggedIn;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 
-class External_Tass_PortalModule extends \Alaress\Module\Module
+class Module extends \Alaress\Module\Module
 {
     protected $basename = 'tassportal';
 
@@ -37,7 +39,7 @@ class External_Tass_PortalModule extends \Alaress\Module\Module
         $injector->set(
             'tassportal:sso',
             $injector->lazyNew(
-                External_Tass_SSO::class,
+                SSO::class,
                 [
                     'configuration' => [
                         'token_key' => $config->get('external_tass_sso_token_key'),
@@ -50,7 +52,7 @@ class External_Tass_PortalModule extends \Alaress\Module\Module
         $injector->set(
             'controller:'.$this->basename,
             $injector->lazyNew(
-                External_Tass_PortalController::class,
+                Controller::class,
                 [
                     'sso'        => $injector->lazyGet('tassportal:sso'),
                     'portalHost' => $config->get('external_staff_portal'),

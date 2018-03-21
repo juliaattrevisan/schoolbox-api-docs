@@ -1,4 +1,9 @@
 <?php
+
+namespace External\Tass\Portal;
+
+use UnexpectedValueException;
+
 /**
  * TASSWeb SSO token retriever
  *
@@ -7,7 +12,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class External_Tass_SSO
+class SSO
 {
 
     /**

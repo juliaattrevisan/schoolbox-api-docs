@@ -6,12 +6,17 @@
  * @copyright Copyright 2015, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-class External_Tass_PortalController extends Alaress\Web\Controller\Base
+namespace External\Tass\Portal;
+
+use Alaress;
+
+class Controller extends Alaress\Web\Controller\Base
 {
+
     /**
      * Connection to SSO server
      *
-     * @var External_Tass_SSO
+     * @var SSO
      */
     protected $sso;
 
@@ -38,11 +43,11 @@ class External_Tass_PortalController extends Alaress\Web\Controller\Base
     /**
      * Constructor
      *
-     * @param External_Tass_SSO $sso
+     * @param SSO               $sso
      * @param string            $portalHost The URL on which TASS services are hosted
      * @param array|string[]    $appCodes
      */
-    public function __construct(External_Tass_SSO $sso, $portalHost, $appCodes)
+    public function __construct(SSO $sso, $portalHost, $appCodes)
     {
         $this->sso        = $sso;
         $this->portalHost = $portalHost;
