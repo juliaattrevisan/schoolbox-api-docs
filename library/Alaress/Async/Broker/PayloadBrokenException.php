@@ -1,0 +1,45 @@
+<?php
+/**
+ *
+ * @author      Matt Day <matt.day@alaress.com.au>
+ * @copyright   Copyright 2017, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ */
+
+namespace Alaress\Async\Broker;
+
+use Alaress\Async\Broker\StompRedis\Resolver;
+use Throwable;
+use UnexpectedValueException;
+
+
+class PayloadBrokenException extends UnexpectedValueException implements IBrokerException
+{
+
+    /** @var Resolver */
+    private $resolver;
+
+    /**
+     * Construct the exception. Note: The message is NOT binary safe.
+     *
+     * @param string    $key
+     * @param Resolver  $resolver
+     * @param int       $code     [optional] The Exception code.
+     * @param Throwable $previous [optional] The previous throwable used for the exception chaining.
+     */
+    public function __construct($key, Resolver $resolver, $code = 0, Throwable $previous = null)
+    {
+        parent::__construct("Payload for `{$key}` exists but is broken", $code, $previous);
+        $this->resolver = $resolver;
+    }
+
+
+    /**
+     * @return Resolver
+     */
+    public function getResolver()
+    {
+        return $this->resolver;
+    }
+
+}
