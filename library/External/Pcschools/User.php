@@ -7,9 +7,9 @@
  * @link      http://www.alaress.com.au/
  */
 
-use External\Pcschools\QueryHelper\Freedom;
-use External\Pcschools\QueryHelper\IQueryHelper;
-use External\Pcschools\QueryHelper\NonFreedom;
+use Schoolbox\External\Connector\Pcschools\QueryHelper\Freedom;
+use Schoolbox\External\Connector\Pcschools\QueryHelper\IQueryHelper;
+use Schoolbox\External\Connector\Pcschools\QueryHelper\NonFreedom;
 use Schoolbox\User;
 
 class External_Pcschools_User implements External_UserInterface

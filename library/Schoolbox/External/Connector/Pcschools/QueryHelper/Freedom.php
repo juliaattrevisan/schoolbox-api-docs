@@ -6,7 +6,7 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace External\Pcschools\QueryHelper;
+namespace Schoolbox\External\Connector\Pcschools\QueryHelper;
 
 class Freedom implements IQueryHelper
 {

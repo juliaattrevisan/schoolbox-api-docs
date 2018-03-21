@@ -10,9 +10,9 @@
 namespace Schoolbox\External\Connector\Pcschools\Base;
 
 use Alaress\Database\Connector\IConnector;
-use External\Pcschools\QueryHelper\Freedom;
-use External\Pcschools\QueryHelper\IQueryHelper;
-use External\Pcschools\QueryHelper\NonFreedom;
+use Schoolbox\External\Connector\Pcschools\QueryHelper\Freedom;
+use Schoolbox\External\Connector\Pcschools\QueryHelper\IQueryHelper;
+use Schoolbox\External\Connector\Pcschools\QueryHelper\NonFreedom;
 use Schoolbox\External\Connector\Base;
 use Schoolbox\External\Connector\ISync;
 use Schoolbox\IConfigLoader;
