@@ -11,7 +11,7 @@ INSERT INTO `config` (
   'synergetic_community_alerts',
   'Show SIS Alerts on Student Profile',
   '1',
-  'Controls if student alerts are displayed on the students profile.  These alerts are only shown to teachers when enabled.',
+  'Controls whether student alerts are displayed on students'' profiles. When enabled, these alerts are only shown to staff.',
   3,
   (SELECT `id` FROM lu_config_type WHERE `type` = 'Policy'),
   true,
