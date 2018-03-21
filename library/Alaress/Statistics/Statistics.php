@@ -68,8 +68,8 @@ class Statistics
         }
 
         $series = [
-            'low'    => (float)min($values),
-            'high'   => (float)max($values),
+            'low'    => (float)$values[0],
+            'high'   => (float)$values[$count - 1],
             'median' => static::internalMedian($values),
         ];
 
