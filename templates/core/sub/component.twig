@@ -1,0 +1,98 @@
+{#
+// TODO move to right place
+Data:
+    componentInstanceId                                            int
+    campusTimetables                                               array
+    campusTimetables[]['campus']                                   string
+    campusTimetables[]['day']                                      string
+    campusTimetables[]['periods']                                  array
+    campusTimetables[]['periods'][]['thCssClass']                  string      eg 'timetable-period-active'
+    campusTimetables[]['periods'][]['tdCssClass']                  string      eg 'timetable-subject-active'
+    campusTimetables[]['periods'][]['name']                        string      eg 'Period 1'
+    campusTimetables[]['periods'][]['start']                       string      eg '8:30am'
+    campusTimetables[]['periods'][]['end']                         string      eg '9:30am'
+    campusTimetables[]['periods'][]['classes']                     array
+    campusTimetables[]['periods'][]['classes'][]['code']           string      eg '(11/12/SCI)'
+    campusTimetables[]['periods'][]['classes'][]['room']           string      eg 'GND1'
+    campusTimetables[]['periods'][]['classes'][]['url']            string      eg '/homepage/code/11%252F12%252FSCI'
+    campusTimetables[]['periods'][]['classes'][]['colour']         string      eg '#ffe0cc'
+    campusTimetables[]['periods'][]['classes'][]['desc']           string      eg 'Year 11 & 12 Science'
+    campusTimetables[]['periods'][]['classes'][]['cssClass']       string      eg 'strike'
+    campusTimetables[]['periods'][]['classes'][]['attendanceLink'] null|string
+    campusTimetables[]['periods'][]['classes'][]['attendanceIcon'] null|string  // TODO convert to logic and compute CSS here in twig
+#}
+<script type="text/javascript" src="/javascript/shared/timetable/jquery.timetable-resize.js"></script>
+<script type="text/javascript" src="/javascript/shared/timetable/jquery.timetable-dashboard.js"></script>
+<script type="text/javascript" src="/javascript/components/jquery.scrollTo/jquery.scrollTo.min.js"></script>
+<script type="text/javascript">
+    $(function() {
+        $.fn.timetableStart();
+
+        // Scroll to current period
+        var timetable = $('#component{{ componentInstanceId }}').find('[data-timetable]');
+        if(timetable.find('.timetable-subject-active').length) {
+            timetable.closest('.scrollable').scrollTo(
+                timetable.find('.timetable-subject-active'),
+                {scrollX: true, scrollY: false, duration: 0, offsetLeft: 0}
+            );
+        }
+    });
+</script>
+
+<div class="small-12 columns">
+    {% for timetable in campusTimetables %}
+        {% set countPeriods = timetable.periods|length %}
+        {% set periodWidth = ((98 - countPeriods * 0.05) / countPeriods)|round(1, 'floor') %}
+    <div data-timetable-container>
+        <h2 class="subheader" data-timetable-header>{% if campusTimetables | length > 1 %}{{ timetable.campus }} - {% endif %}{{ timetable.day }}</h2>
+        <section>
+            <div class="scrollable show-for-medium-up">
+                <table class="timetable" data-timetable>
+                    <thead>
+                    <tr>
+                        {% for period in timetable.periods %}
+                        <th class="{{ period.thCssClass }}" style="width:{{ periodWidth }}%">
+                            {{ period.name }}
+                            <time class="meta">{{ period.start }}&ndash;{{ period.end }}</time>
+                        </th>
+                        {% endfor %}
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        {% for period in timetable.periods %}
+                        <td style="width:{{ periodWidth }}%">
+                            <div class="{{ period.tdCssClass }}">
+                                {% for class in period.classes %}
+                                <div class="timetable-subject" style="background:{{ class.colour }};" data-timetable-subject>
+                                    {% if class.url %}
+                                        <a href="{{ class.url }}" class="{{ class.cssClass }}">{{ class.desc }}</a>
+                                    {% else %}
+                                        <span class="{{ class.cssClass }}">{{ class.desc }}</span>
+                                    {% endif %}
+
+                                    <div>{{ class.code }}<br />
+                                        {{ class.room }}</div>
+
+                                    {% if class.attendanceLink %}
+                                        <br />
+                                        <span class="{{ class.attendanceIcon }}">
+                                            <a href="{{ class.attendanceLink }}" title="Mark Attendance">Attendance</a>
+                                        </span>
+                                    {% endif %}
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        <div class="row timetable-small show-for-small-only" data-smaller></div>
+    </div>
+    {% endfor %}
+</div>
+
+

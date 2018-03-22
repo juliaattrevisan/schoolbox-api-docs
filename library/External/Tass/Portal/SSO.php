@@ -3,6 +3,7 @@
 namespace External\Tass\Portal;
 
 use UnexpectedValueException;
+use GuzzleHttp;
 
 /**
  * TASSWeb SSO token retriever
@@ -21,7 +22,7 @@ class SSO
      *
      * @var bool
      */
-    private $output = false;
+    private $debug = false;
 
     /**
      * The server from which to retrieve a SSO token
@@ -35,15 +36,10 @@ class SSO
      *
      * @var array
      */
-    private $configuration = array(
+    private $configuration = [
         'method' => 'createSSOToken',
-        'cmpy_code' => '01',
-        'prod_code' => 'PL',
-        'app_code' => 'pl',
-        // 'sso_code' => $tassID,
-        // 'token_key' => '',
-        'returntype' => 'URLPARAM'
-    );
+    ];
+
 
     /**
      * Borrowed this default+override configuration idea from the js idiom
@@ -53,57 +49,122 @@ class SSO
      *
      * @param string $server
      */
-    public function __construct($configuration = array(), $server = '')
+    public function __construct(array $configuration, string $server)
     {
-        if (count($configuration)) {
-            foreach ($configuration as $key => $value) {
-                $this->configuration[$key] = $value;
-            }
-        }
-        if ($server) {
-            $this->server = $server;
-        }
+        $this->configuration = array_merge($this->configuration, $configuration);
+        $this->server        = $server;
     }
+
 
     /**
      * Gets a user token.
      *
-     * @param array $userConf Overrides for $this->configuration (if any)
-     *                        Should contain at least ['sso_code' => $tassID]
+     * @param array     $userConf Overrides for $this->configuration (if any)
+     *                            Should contain at least ['sso_code' => $tassID]
      *
+     * @param array     $deepLink
+     * @param bool      $prodMenu
      * @return string If $this->output is true, this will output a string to
-     *                stdout, and then exit.
+     *                            stdout, and then exit.
+     * @throws SsoTokenGenerationException
+     * @throws \RuntimeException
      */
-    public function getUserToken(array $userConf)
+    public function getUserToken(array $userConf, array $deepLink, bool $prodMenu): string
     {
-        $conf = array_merge($this->configuration, $userConf);
-        $cString = $this->array2qstring($conf);
+        $conf   = array_merge($this->configuration, $userConf);
+        $client = new GuzzleHttp\Client();
 
-        $target = $this->server . '?' . $cString;
-        // attempt sso authentication
-        $responseString = @file_get_contents($target);
-
-        $response = $this->qstring2array($responseString);
-
-        if ($this->output) {
-            header('Content-Type: text/plain');
-            die("SEND : $target\nRECV : $responseString\n");
+        // First attempt to get a token using SSO v2
+        try{
+             return $this->getV2Token($client, $conf, $deepLink, $prodMenu);
+        } catch (UnexpectedValueException $v2e){
         }
+
+        // Then attempt to get a token using SSO v1
+        try{
+            return $this->getV1Token($client, $conf);
+        } catch (UnexpectedValueException $v1e){
+        }
+
+        // Merge exceptions if both SSO versions failed
+        throw new SsoTokenGenerationException("SSO v1: {$v1e->getMessage()}, SSO v2: {$v2e->getMessage()}");
+
+    }
+
+
+    /**
+     * @param GuzzleHttp\Client $client
+     * @param array             $conf
+     * @param string[]          $deepLink   To which page in the TASS product should TASS redirect after auth?
+     * @param bool              $prodMenu   Should we display the product menu heading? Ignored if $deepLink is invalid
+     * @return string
+     * @throws SsoTokenGenerationException
+     * @throws \RuntimeException
+     */
+    private function getV2Token(GuzzleHttp\Client $client, array $conf, array $deepLink = [], bool $prodMenu): string
+    {
+
+        $formParams = array_merge($conf, [
+            'prod_menu' => $prodMenu ? 'Y' : 'N',
+            'deep_link' => json_encode($deepLink),
+            ]
+        );
+
+        $response = $client->request('POST', "{$this->server}?returnType=json", ['form_params' => $formParams]);
+        $responseString = $response->getBody()->getContents();
+
+        if ($this->debug) {
+            header('Content-Type: text/plain');
+            die("SSO v2.\nPOST: {$this->server}?returnType=json\nData: {$this->array2qString($formParams)}\nRECV: {$responseString}\n");
+        }
+
+        return $this->parseResponse(json_decode($responseString, true), $conf['sso_code']);
+    }
+
+
+    /**
+     * @param array  $response
+     * @param string $ssoCode
+     * @return string
+     * @throws SsoTokenGenerationException
+     */
+    private function parseResponse(array $response, string $ssoCode): string
+    {
         if (isset($response['sso_token'])) {
             return $response['sso_token'];
         }
 
+        $response_error['1'] = 'Ok';
         $response_error['2'] = "URL parameters missing.";
         $response_error['3'] = "Invalid SSO Application Code or SSO User Mapping";
         $response_error['4'] = "Invalid Portal User";
         $response_error['5'] = "Invalid sfa_num";
-        if (isset($response['response_code']) && array_key_exists($response['response_code'],$response_error)) {
-            throw new UnexpectedValueException('TASS SSO Error: "'.$response_error[$response['response_code']].'" for SSO for user "'.$userConf[sso_code].'"');
+        if (isset($response['response_code']) && array_key_exists($response['response_code'], $response_error)) {
+            throw new SsoTokenGenerationException("TASS SSO Error: {$response_error[$response['response_code']]} for SSO for user {$ssoCode}");
         }
 
         return '';
     }
 
+
+    /**
+     * @param GuzzleHttp\Client $client
+     * @param array             $conf
+     * @return string
+     * @throws SsoTokenGenerationException
+     * @throws \RuntimeException
+     */
+    private function getV1Token(GuzzleHttp\Client $client, array $conf): string
+    {
+        $responseString = $client->get($this->server, ['query' => $conf])->getBody()->getContents();
+        $response       = $this->qString2array($responseString);
+
+        if ($this->debug) {
+            header('Content-Type: text/plain');
+            die("SSO v1.\nSEND: {$this->server}?{$this->array2qString($conf)}\nRECV: {$responseString}\n");
+        }
+        return $this->parseResponse($response, $conf['sso_code']);
+    }
 
 
     /**
@@ -111,7 +172,7 @@ class SSO
      * @param $array
      * @return string
      */
-    public function array2qstring($array)
+    private function array2qString($array): string
     {
         $cPairs = array();
         while ($i = each($array)) {
@@ -122,17 +183,18 @@ class SSO
 
     /**
      * Convert a GET query string to an array
-     * @param $qstring
+     *
+     * @param $qString
      * @return array
      */
-    public function qstring2array($qstring)
+    private function qString2array($qString): array
     {
-        $array = array();
-        $parts = explode('&', $qstring);
+        $array = [];
+        $parts = explode('&', $qString);
 
         foreach ($parts as $part) {
             $bits = explode('=', $part);
-            if (count($bits == 2)) {
+            if (\count($bits) === 2) {
                 $array[$bits[0]] = $bits[1];
             }
         }
