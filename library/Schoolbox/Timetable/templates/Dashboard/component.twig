@@ -1,25 +1,30 @@
 {#
 Data:
-    componentInstanceId                                            int
-    campusTimetables                                               array
-    campusTimetables[]['campus']                                   string
-    campusTimetables[]['day']                                      string
-    campusTimetables[]['periods']                                  array
-    campusTimetables[]['periods'][]['thCssClass']                  string      eg 'timetable-period-active'
-    campusTimetables[]['periods'][]['tdCssClass']                  string      eg 'timetable-subject-active'
-    campusTimetables[]['periods'][]['name']                        string      eg 'Period 1'
-    campusTimetables[]['periods'][]['start']                       string      eg '8:30am'
-    campusTimetables[]['periods'][]['end']                         string      eg '9:30am'
-    campusTimetables[]['periods'][]['classes']                     array
-    campusTimetables[]['periods'][]['classes'][]['code']           string      eg '(11/12/SCI)'
-    campusTimetables[]['periods'][]['classes'][]['room']           string      eg 'GND1'
-    campusTimetables[]['periods'][]['classes'][]['url']            string      eg '/homepage/code/11%252F12%252FSCI'
-    campusTimetables[]['periods'][]['classes'][]['colour']         string      eg '#ffe0cc'
-    campusTimetables[]['periods'][]['classes'][]['desc']           string      eg 'Year 11 & 12 Science'
-    campusTimetables[]['periods'][]['classes'][]['cancelled']      bool        eg 'strike'
-    campusTimetables[]['periods'][]['classes'][]['attendanceLink'] null|string
-    campusTimetables[]['periods'][]['classes'][]['attendanceIcon'] null|string  // TODO convert to logic and compute CSS here in twig
+    componentInstanceId                                                   int
+    $externalType                                                         string      eg ['tass','synergetic', etc]
+    campusTimetables                                                      array
+    campusTimetables[]['campus']                                          string
+    campusTimetables[]['day']                                             string
+    campusTimetables[]['periods']                                         array
+    campusTimetables[]['periods'][]['thCssClass']                         string      eg 'timetable-period-active'
+    campusTimetables[]['periods'][]['tdCssClass']                         string      eg 'timetable-subject-active'
+    campusTimetables[]['periods'][]['name']                               string      eg 'Period 1'
+    campusTimetables[]['periods'][]['start']                              string      eg '8:30am'
+    campusTimetables[]['periods'][]['end']                                string      eg '9:30am'
+    campusTimetables[]['periods'][]['classes']                            array
+    campusTimetables[]['periods'][]['classes'][]['code']                  string      eg '(11/12/SCI)'
+    campusTimetables[]['periods'][]['classes'][]['room']                  string      eg 'GND1'
+    campusTimetables[]['periods'][]['classes'][]['url']                   string      eg '/homepage/code/11%252F12%252FSCI'
+    campusTimetables[]['periods'][]['classes'][]['colour']                string      eg '#ffe0cc'
+    campusTimetables[]['periods'][]['classes'][]['desc']                  string      eg 'Year 11 & 12 Science'
+    campusTimetables[]['periods'][]['classes'][]['cancelled']             bool        eg 'strike'
+    campusTimetables[]['periods'][]['classes'][]['attendance']            array
+    campusTimetables[]['periods'][]['classes'][]['attendance']['enabled'] bool        Need to also check if a 'link' is available
+    campusTimetables[]['periods'][]['classes'][]['attendance']['marked']  bool
+    campusTimetables[]['periods'][]['classes'][]['attendance']['link']    null|string
 #}
+{% import 'sub/attendanceIcon.twig' as attendanceIcon %}
+
 <script type="text/javascript" src="/javascript/shared/timetable/jquery.timetable-resize.js"></script>
 <script type="text/javascript" src="/javascript/shared/timetable/jquery.timetable-dashboard.js"></script>
 <script type="text/javascript" src="/javascript/components/jquery.scrollTo/jquery.scrollTo.min.js"></script>
@@ -74,10 +79,11 @@ Data:
                                     <div>{{ class.code }}<br />
                                         {{ class.room }}</div>
 
-                                    {% if class.attendanceLink %}
+                                    {% set attendance = class.attendance %}
+                                    {% if attendance.enabled and attendance.link %}
                                         <br />
-                                        <span class="{{ class.attendanceIcon }}">
-                                            <a href="{{ class.attendanceLink }}" title="Mark Attendance">Attendance</a>
+                                        <span class="{{ attendanceIcon.icon(externalType, attendance.enabled, attendance.marked) }}">
+                                            <a href="{{ attendance.link }}" title="Mark Attendance">Attendance</a>
                                         </span>
                                     {% endif %}
                                 </div>

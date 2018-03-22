@@ -23,7 +23,11 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
     /** @var array $dayNumber */
     protected $dayNumber = [];
 
-    /** @var array $currentPeriod */
+    /**
+     * The current period for each campus. Null if there is no current period
+     *
+     * @var null[]|mixed[][] $currentPeriod
+     */
     private $currentPeriod = [];
 
     /** @var array $timetable */
@@ -96,7 +100,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                     if ($dayNumber) {
                         $this->dayNumber[$campusId]     = $dayNumber;
                         $this->dayName[$campusId]       = $timetableHandler->getDayName($dayNumber);
-                        $this->currentPeriod[$campusId] = $timetableHandler->getPeriodNumber($campus, 0, $this->getUser());
+                        $this->currentPeriod[$campusId] = $timetableHandler->getPeriodNumber($campus, 0, $this->getUser()) ?: null;
                         $this->timetable[$campusId]     = $timetableHandler->getTimetableForDate(
                             $this->getUser()->getExternalId(), $this->getUser()->getId(), $campus, Alaress_Date_Format::now()
                         );
@@ -211,16 +215,16 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
      */
     private function getAttendanceLink(array $class, Alaress_Date_Format $now, array $period, array $campusList, int $campusId): string
     {
+        if (!$class['AttendanceEnabled']) {
+            return '';
+        }
+
         switch ($this->getConfigMapper()->get('external_type')) {
             case 'synergetic':
-                if (!$class['AttendanceEnabled']) {
-                    return '';
-                }
                 $encodedClass = urlencode(urlencode(urlencode($class['code'])));
                 $classLink    = $class['campus'] ? $class['campus'] . '/' . $encodedClass : '0/' . $encodedClass;
                 return "/modules/attendance/modify/{$classLink}/{$now->getDatabaseDate()}/{$period['periodNumber']}/{$campusList[$campusId]->getExtTimetableCode()}";
             case 'tass':
-
                 /** @noinspection PhpUnusedLocalVariableInspection */
                 [$year, $subject, $class] = explode('-', $class['code']);
                 [$cmpCode, $timetableCode] = explode('-', $campusList[$campusId]->getExtTimetableCode());
@@ -238,28 +242,6 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                 ];
                 $deepLink       = urlencode(implode('&', $deepLinkParams));
                 return "/modules/tassportal/teacherkiosk?deep_link={$deepLink}";
-            default:
-                return '';
-        }
-    }
-
-
-    /**
-     * TODO move this to twig macro, inject three flags [externalType, attendanceEnabled, attendanceMarked]
-     *
-     * @param array $class
-     * @return string
-     */
-    private function getAttendanceIcon(array $class): string
-    {
-        switch ($this->getConfigMapper()->get('external_type')) {
-            case 'synergetic':
-                if (!$class['AttendanceEnabled']) {
-                    return '';
-                }
-                return $class['AttendanceMarked'] ? 'icon-approve' : 'icon-class-list';
-            case 'tass':
-                return $class['AttendanceEnabled'] ? 'icon-class-list' : '';
             default:
                 return '';
         }
@@ -306,18 +288,18 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
      *
      * @param array               $campusList
      * @param int                 $campusId
-     * @param array               $currentPeriod
+     * @param null|array          $currentPeriod  NULL if there is no current period for the campus at this time.
      * @param string[][][]        $period
      * @param Alaress_Date_Format $now
      * @return array
      */
-    private function buildPeriodContext(array $campusList, int $campusId, array $currentPeriod, array $period, Alaress_Date_Format $now): array
+    private function buildPeriodContext(array $campusList, int $campusId, ?array $currentPeriod, array $period, Alaress_Date_Format $now): array
     {
         // Always highlight the current cell, regardless of whether it has something on or not
-        $thCssClass = ($currentPeriod['PeriodNumber'] == $period['periodNumber'] && $currentPeriod['PeriodNumberSeq'] == $period['periodSequence'])
+        $thCssClass = ($currentPeriod && $currentPeriod['PeriodNumber'] == $period['periodNumber'] && $currentPeriod['PeriodNumberSeq'] == $period['periodSequence'])
             ? 'timetable-period-active'
             : '';
-        $tdCssClass = ($currentPeriod['PeriodNumber'] == $period['periodNumber'] && $currentPeriod['PeriodNumberSeq'] == $period['periodSequence'])
+        $tdCssClass = ($currentPeriod && $currentPeriod['PeriodNumber'] == $period['periodNumber'] && $currentPeriod['PeriodNumberSeq'] == $period['periodSequence'])
             ? 'timetable-subject-active'
             : '';
 
@@ -360,10 +342,11 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
         // Optionally link to Attendance Records
         if ('' !== $class['code'] && $this->getConfigMapper()->get('external_attendance') && $this->getUser()->getRole()->isStaff()) {
 
-            $classContext = array_merge($classContext, [
-                'attendanceLink' => $this->getAttendanceLink($class, $now, $period, $campusList, $campusId),
-                'attendanceIcon' => $this->getAttendanceIcon($class),
-            ]);
+            $classContext['attendance'] = [
+                'enabled' => (bool)$class['AttendanceEnabled'],
+                'marked'  => (bool)$class['AttendanceMarked'],
+                'link'    => $this->getAttendanceLink($class, $now, $period, $campusList, $campusId),
+            ];
         }
         return $classContext;
     }
@@ -395,6 +378,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
             '@timetable/Dashboard/component.twig',
             [
                 'componentInstanceId' => $this->getInstance()->getId(),
+                'externalType'        => $this->getConfigMapper()->get('external_type'),
                 'campusTimetables'    => $timetables,
             ],
             false,
