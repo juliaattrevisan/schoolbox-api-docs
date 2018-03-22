@@ -37,6 +37,7 @@ use React\EventLoop\LoopInterface;
 use RuntimeException;
 use Schoolbox\External;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Notif\Formatter\CompressionException;
 
 /**
@@ -177,14 +178,18 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
      */
     public function onMessage($trigger, IResolver $resolver, ?array $context)
     {
-        $this->log->info("Received trigger to schedule: {$trigger->getIdString()}", [ 'char' => '>' ]);
-
         try {
+            $this->log->info("Received trigger to schedule: {$trigger->getIdString()}", [ 'char' => '>' ]);
+
             // attempt to schedule this trigger - there are a fair few things that could go wrong...
             $this->scheduleNotification($trigger, $resolver);
 
             // notice that we don't acknowledge the resolver here before returning
             return;
+
+        } catch (Deleted $e) {
+            // this can be thrown from the hydration of the trigger
+            $this->log->warning('Refusing to schedule notification, target object has been deleted.', [ $e ]);
 
         } catch (InvalidArgumentException $e) {
             $this->log->error($e->getMessage(), [ $e ]);
