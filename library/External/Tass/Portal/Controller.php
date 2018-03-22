@@ -78,10 +78,6 @@ class Controller extends Alaress\Web\Controller\Base
 
         // Send off the SSO token request
         try{
-            //        $config['sso_code'] = $ssoCode;
-            //        $config['sso_code'] = '10253';
-            $config['sso_code'] = 'chapmanj'; // teacher
-
             $token = $this->sso->getUserToken($config, $deepLink, $prodMenu);
         } catch (SsoTokenGenerationException|\RuntimeException $e){
             $this->captureException($e);
@@ -122,22 +118,7 @@ class Controller extends Alaress\Web\Controller\Base
      */
     public function teacherKiosk()
     {
-//        $deepLink = $this->getDeepLink();
-//        $deepLink = ['target' => 'student.profile', 'studcode' => 'GRIK150'];
-        $deepLink = [
-            'target'      => 'teacher.rollcall',
-            'ttid'        => '22',
-            'yeargroups'  => '',
-            'classes'     => '1192',
-            'tchcode'     => 'CHJ',
-            'subjectcode' => '2',
-            'date'        => '22/03/2018',
-            'periodcode'  => '2',
-            'daycode'     => '9',
-        ];
-        // tt_id=22&classes=1192&yeargroupsandclasses=|1192&bfromtimetable=true&currenttchcode=CHJ&mode=Attend&subjectcode=2&ttdate=22/03/2018&periodcode=2&dayCode=9&tchCode=CHJ
-
-        $this->redirectToTassProduct('TIA', $this->appCodes['teacherKiosk'], '/kiosk/TIALogin.cfm', $deepLink, $this->getProdMenu());
+        $this->redirectToTassProduct('TIA', $this->appCodes['teacherKiosk'], '/kiosk/TIALogin.cfm', $this->getDeepLink(), $this->getProdMenu());
     }
 
     /**
