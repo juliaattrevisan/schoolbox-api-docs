@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace Alaress\Database\Transactor\Strategy;
 
-use Alaress\Database\Broker\IBroker;
+use PDO;
 
 /**
  * Savepoint strategy for database transaction handling. This strategy
@@ -20,9 +20,9 @@ class Savepoint implements IStrategy
     /**
      * A database connection broker
      *
-     * @var IBroker
+     * @var PDO
      */
-    private $broker;
+    private $connection;
 
     /**
      * Savepoint stack
@@ -41,11 +41,11 @@ class Savepoint implements IStrategy
     /**
      * Constructor
      *
-     * @param IBroker $broker
+     * @param PDO $connection
      */
-    public function __construct(IBroker $broker)
+    public function __construct(PDO $connection)
     {
-        $this->broker = $broker;
+        $this->connection = $connection;
     }
 
     /**
@@ -54,7 +54,7 @@ class Savepoint implements IStrategy
     public function beginTransaction(): bool
     {
         // In a transaction? Don't begin another level
-        if (!$this->inTransaction() && !$this->broker->beginTransaction()) {
+        if (!$this->inTransaction() && !$this->connection->beginTransaction()) {
             return false;
         }
 
@@ -74,7 +74,7 @@ class Savepoint implements IStrategy
      */
     public function inTransaction(): bool
     {
-        return $this->broker->inTransaction();
+        return $this->connection->inTransaction();
     }
 
     /**
@@ -95,7 +95,7 @@ class Savepoint implements IStrategy
 
         // No more levels left: commit the whole thing
         if (empty($this->savepointStack)) {
-            return $this->broker->commit();
+            return $this->connection->commit();
         }
 
         return true;
@@ -119,7 +119,7 @@ class Savepoint implements IStrategy
 
         // No more levels left: rollback the whole thing
         if (empty($this->savepointStack)) {
-            return $this->broker->rollBack();
+            return $this->connection->rollBack();
         }
 
         return true;
@@ -146,9 +146,10 @@ class Savepoint implements IStrategy
         // The DB steadfastly refuses to allow me to use bound params in
         // savepoint queries.
         // Inject instead -_- it will be safe as we directly control the input
-        return $this->broker
-            ->prepareQuery(sprintf('SAVEPOINT %s', $this->broker->quoteIdentifier($name)))
-            ->execute();
+        $this->connection->exec(
+            sprintf('SAVEPOINT %s', $this->connection->quote($name, PDO::PARAM_STR))
+        );
+        return true;
     }
 
     /**
@@ -159,9 +160,10 @@ class Savepoint implements IStrategy
      */
     private function rollbackToSavepoint(string $name): bool
     {
-        return $this->broker
-            ->prepareQuery(sprintf('ROLLBACK TO SAVEPOINT %s', $this->broker->quoteIdentifier($name)))
-            ->execute();
+        $this->connection->exec(
+            sprintf('ROLLBACK TO SAVEPOINT %s', $this->connection->quote($name, PDO::PARAM_STR))
+        );
+        return true;
     }
 
     /**
@@ -172,8 +174,9 @@ class Savepoint implements IStrategy
      */
     private function releaseSavepoint(string $name): bool
     {
-        return $this->broker
-            ->prepareQuery(sprintf('RELEASE SAVEPOINT %s', $this->broker->quoteIdentifier($name)))
-            ->execute();
+        $this->connection->exec(
+            sprintf('RELEASE SAVEPOINT %s', $this->connection->quote($name, PDO::PARAM_STR))
+        );
+        return true;
     }
 }
