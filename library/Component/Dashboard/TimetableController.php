@@ -5,6 +5,7 @@
  * @link        http://www.alaress.com.au
  */
 
+use Aura\Router\Router;
 use Schoolbox\Campus;
 use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -240,8 +241,14 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                     'periodcode'  => $period['periodNumber'],
                     'daycode'     => $this->dayNumber[$campusId],
                 ];
-                $deepLink       = urlencode(implode('&', $deepLinkParams));
-                return "/modules/tassportal/teacherkiosk?deep_link={$deepLink}";
+                try {
+                    /** @var Router $router */
+                    $router   = $this->getSitePage()->getDi()->get('router');
+                    $deepLink = urlencode(implode('&', $deepLinkParams));
+                    return "{$router->generate('tassportal.teacherKiosk')}?deep_link={$deepLink}";
+                } catch (\Throwable $e) {
+                    return '';
+                }
             default:
                 return '';
         }
@@ -288,7 +295,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
      *
      * @param array               $campusList
      * @param int                 $campusId
-     * @param null|array          $currentPeriod  NULL if there is no current period for the campus at this time.
+     * @param null|array          $currentPeriod NULL if there is no current period for the campus at this time.
      * @param string[][][]        $period
      * @param Alaress_Date_Format $now
      * @return array
