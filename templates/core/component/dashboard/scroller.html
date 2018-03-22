@@ -4,7 +4,7 @@
     <script type="text/javascript">
         $(function(){
             var component = $("#component{COMPONENT_INSTANCE_ID}");
-            var meSwiper = new Swiper (component.find('[data-imageslider]'), {
+            var swiper = new Swiper (component.find('[data-imageslider]'), {
                 autoplay: {
                     delay: {COMPONENT_CONFIG_TIMING_VALUE_MS},
                     disableOnInteraction: false,
@@ -37,11 +37,9 @@
             <div data-imageslider class="swiper-container">
                 <div class="swiper-wrapper">
                     <!-- BEGIN image_scroller -->
-                    <div class="swiper-slide">
-                        <div class="{COMPONENT_CONFIG_IMAGE_RATIO}">
-                            <img data-src="/cms/image.php?id={IMAGE_ID}&height=1024&width=1024" alt="{IMAGE_NAME}" class="swiper-lazy" />
-                            <div class="loader"></div>
-                        </div>
+                    <div class="swiper-slide {COMPONENT_CONFIG_IMAGE_RATIO}">
+                        <img data-src="/cms/image.php?id={IMAGE_ID}&height=1024&width=1024" class="swiper-lazy" />
+                        <div class="loader"></div>
                         <!-- BEGIN show_caption -->
                         <p class="meta">{IMAGE_NAME}</p>
                         <!-- END show_caption -->

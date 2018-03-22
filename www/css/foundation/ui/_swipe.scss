@@ -5,6 +5,12 @@ $swipe-color: $iron;
 $swipe-color-hover: $steel;
 
 .swiper-container {
+    .loader {
+        position: absolute;
+        left:50%;
+        top: 25%;
+        transform: translateY(50%) translateX(-50%);
+    }
 
     .swiper-button-prev,
     .swiper-button-next {
