@@ -22,6 +22,7 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
 
@@ -87,7 +88,9 @@ class Factory
             $path = "/homepage/{$context->getFolder()->getId()}";
 
         } else {
-            $path = "/homepage/{$context->getFolder()->getId()}";
+            if (Access::getInstance()->getFolderAccess($user,$context->getFolder()->getId())) {
+                $path = "/homepage/{$context->getFolder()->getId()}";
+            }
         }
 
         $trail->add([$context->getTitle(), $path]);
