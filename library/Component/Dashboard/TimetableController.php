@@ -13,6 +13,7 @@ use Schoolbox\Permission\Access\UserAccess;
 
 class Component_Dashboard_TimetableController extends Component_Dashboard_ControllerAbstract
 {
+
     /** @var External_Timetable $externalTimetable */
     private $externalTimetable;
 
@@ -38,14 +39,18 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
      */
     private $subjectColourMap;
 
-    /** @var int */
+    /**
+     * Point to next colour from the colour list to assign to a subject
+     *
+     * @var int
+     */
     private $colourIndex;
 
-    
+
     /**
      * @param Component_Instance $instance
-     * @param User $user
-     * @param SitePage $sitepage
+     * @param User               $user
+     * @param SitePage           $sitepage
      * @param External_Timetable $externalTimetable
      */
     public function __construct(Component_Instance $instance, User $user, SitePage $sitepage, External_Timetable $externalTimetable)
@@ -54,6 +59,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
 
         $this->externalTimetable = $externalTimetable;
     }
+
 
     /**
      * Prepares data for the render function. Business logic.
@@ -79,19 +85,19 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
         foreach ($this->getUser()->getCampusCollection() as $campus) {
             if ($campus instanceof Campus) {
 
-                $campusId = $campus->getId();
+                $campusId   = $campus->getId();
                 $campusCode = $campus->getExtTimetableCode();
 
                 if (!isset($checkedCampusList[$campusCode])) {
 
                     $checkedCampusList[$campusCode] = true;
-                    $dayNumber = $timetableHandler->getDayNumber($campus);
+                    $dayNumber                      = $timetableHandler->getDayNumber($campus);
 
                     if ($dayNumber) {
-                        $this->dayNumber[$campusId] = $dayNumber;
-                        $this->dayName[$campusId] = $timetableHandler->getDayName($dayNumber);
+                        $this->dayNumber[$campusId]     = $dayNumber;
+                        $this->dayName[$campusId]       = $timetableHandler->getDayName($dayNumber);
                         $this->currentPeriod[$campusId] = $timetableHandler->getPeriodNumber($campus, 0, $this->getUser());
-                        $this->timetable[$campusId] = $timetableHandler->getTimetableForDate(
+                        $this->timetable[$campusId]     = $timetableHandler->getTimetableForDate(
                             $this->getUser()->getExternalId(), $this->getUser()->getId(), $campus, Alaress_Date_Format::now()
                         );
                     }
@@ -130,7 +136,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
     {
         $classCount = 0;
         foreach ($timetable as $currentPeriod) {
-            $classCount += count($currentPeriod['class']);
+            $classCount += \count($currentPeriod['class']);
         }
         return $classCount;
     }
@@ -152,18 +158,22 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
             $this->subjectColourMap[$subjectCode] = $this->colourList[$this->colourIndex]->getHexColour();
             $this->colourIndex++;
         }
-
-        return Scrub::text($this->subjectColourMap[$subjectCode]); // TODO is this required for twig?
+        return $this->subjectColourMap[$subjectCode];
     }
 
-    // If the class description is blank, fall back to the folder name
-    // TODO move this logic to twig
-    private function getSubjectDescription(string $subjectCode)
+
+    /**
+     * Returns the subject's folder's name, or empty string if not found
+     *
+     * @param string $subjectCode
+     * @return string
+     */
+    private function getSubjectFolderName(string $subjectCode): string
     {
         try {
             return $this->getFolderMapper()->findByCode($subjectCode)->getName();
         } catch (MapperException $e) {
-            return 'Unknown Class';
+            return '';
         }
     }
 
@@ -178,9 +188,9 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
     {
         try {
             $folder = $this->getFolderMapper()->findByCode($subjectCode);
-            if($this->getAccess()->getFolderAccess($this->getUser(), $folder->getId()) >= UserAccess::ACCESS_READ){
+            if ($this->getAccess()->getFolderAccess($this->getUser(), $folder->getId()) >= UserAccess::ACCESS_READ) {
                 // Yes you really do need to double url-encode this
-                return Scrub::text('/homepage/code/' . urlencode(urlencode($subjectCode)));
+                return '/homepage/code/' . urlencode(urlencode($subjectCode));
             }
             return '';
         } catch (MapperException $e) {
@@ -201,13 +211,13 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
      */
     private function getAttendanceLink(array $class, Alaress_Date_Format $now, array $period, array $campusList, int $campusId): string
     {
-        switch($this->getConfigMapper()->get('external_type')){
+        switch ($this->getConfigMapper()->get('external_type')) {
             case 'synergetic':
-                if(!$class['AttendanceEnabled']){
+                if (!$class['AttendanceEnabled']) {
                     return '';
                 }
                 $encodedClass = urlencode(urlencode(urlencode($class['code'])));
-                $classLink = $class['campus'] ? $class['campus'] . '/' . $encodedClass : '0/' . $encodedClass;
+                $classLink    = $class['campus'] ? $class['campus'] . '/' . $encodedClass : '0/' . $encodedClass;
                 return "/modules/attendance/modify/{$classLink}/{$now->getDatabaseDate()}/{$period['periodNumber']}/{$campusList[$campusId]->getExtTimetableCode()}";
             case 'tass':
 
@@ -226,7 +236,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                     'periodcode'  => $period['periodNumber'],
                     'daycode'     => $this->dayNumber[$campusId],
                 ];
-                $deepLink = urlencode(implode('&', $deepLinkParams));
+                $deepLink       = urlencode(implode('&', $deepLinkParams));
                 return "/modules/tassportal/teacherkiosk?deep_link={$deepLink}";
             default:
                 return '';
@@ -235,21 +245,21 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
 
 
     /**
-     * TODO move this to twig
+     * TODO move this to twig macro, inject three flags [externalType, attendanceEnabled, attendanceMarked]
      *
      * @param array $class
      * @return string
      */
     private function getAttendanceIcon(array $class): string
     {
-        switch($this->getConfigMapper()->get('external_type')){
+        switch ($this->getConfigMapper()->get('external_type')) {
             case 'synergetic':
-                if(!$class['AttendanceEnabled']){
+                if (!$class['AttendanceEnabled']) {
                     return '';
                 }
                 return $class['AttendanceMarked'] ? 'icon-approve' : 'icon-class-list';
             case 'tass':
-                return 'icon-class-list';
+                return $class['AttendanceEnabled'] ? 'icon-class-list' : '';
             default:
                 return '';
         }
@@ -312,14 +322,12 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
             : '';
 
         $periodContext = [
-            'name'    => $period['periodName'],
-            'start'   => $period['periodStart'],
-            'end'     => $period['periodEnd'],
+            'name'       => $period['periodName'],
+            'start'      => $period['periodStart'],
+            'end'        => $period['periodEnd'],
             'thCssClass' => $thCssClass,
             'tdCssClass' => $tdCssClass,
         ];
-
-        // Display info only if it exists, otherwise empty cell // TODO move this rule/logic to twig
 
         foreach ($period['class'] as $class) {
             $periodContext['classes'][] = $this->buildClassContext($campusList, $campusId, $period, $now, $class);
@@ -341,16 +349,16 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
     private function buildClassContext(array $campusList, int $campusId, array $period, Alaress_Date_Format $now, array $class): array
     {
         $classContext = [
-            'code'     => "({$class['code']})",
-            'room'     => $class['room'],
-            'url'      => $this->getClassLink($class['code']), // TODO consider moving to twig
-            'colour'   => $this->getSubjectColour($class['code']),
-            'desc'     => $class['description'] ?: $this->getSubjectDescription($class['code']),
-            'cssClass' => $class['ClassCancelled'] ? 'strike' : '', // TODO move this to twig
+            'code'      => "({$class['code']})",
+            'room'      => $class['room'],
+            'url'       => $this->getClassLink($class['code']),
+            'colour'    => $this->getSubjectColour($class['code']),
+            'desc'      => $class['description'] ?: $this->getSubjectFolderName($class['code']),
+            'cancelled' => (bool)$class['ClassCancelled'],
         ];
 
         // Optionally link to Attendance Records
-        if('' !== $class['code'] && $this->getConfigMapper()->get('external_attendance') && $this->getUser()->getRole()->isStaff()){
+        if ('' !== $class['code'] && $this->getConfigMapper()->get('external_attendance') && $this->getUser()->getRole()->isStaff()) {
 
             $classContext = array_merge($classContext, [
                 'attendanceLink' => $this->getAttendanceLink($class, $now, $period, $campusList, $campusId),
@@ -375,7 +383,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
         foreach ($this->timetable as $campusId => $timetable) {
 
             // Don't render if external connector didn't return expected format, or if campus timetable lacks classes
-            if(!\is_array($timetable) || !$this->getClassCountForTimetable($timetable)){
+            if (!\is_array($timetable) || !$this->getClassCountForTimetable($timetable)) {
                 continue;
             }
 
@@ -384,11 +392,10 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
 
         return $this->renderTwigTemplate(
             $templateHandle,
-//            SITE_root . '/library/Timetable/templates/component.twig', // TODO
-            'sub/component.twig', // TODO
+            '@timetable/Dashboard/component.twig',
             [
                 'componentInstanceId' => $this->getInstance()->getId(),
-                'campusTimetables'     => $timetables,
+                'campusTimetables'    => $timetables,
             ],
             false,
             false,

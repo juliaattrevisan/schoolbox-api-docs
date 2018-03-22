@@ -1,5 +1,4 @@
 {#
-// TODO move to right place
 Data:
     componentInstanceId                                            int
     campusTimetables                                               array
@@ -17,7 +16,7 @@ Data:
     campusTimetables[]['periods'][]['classes'][]['url']            string      eg '/homepage/code/11%252F12%252FSCI'
     campusTimetables[]['periods'][]['classes'][]['colour']         string      eg '#ffe0cc'
     campusTimetables[]['periods'][]['classes'][]['desc']           string      eg 'Year 11 & 12 Science'
-    campusTimetables[]['periods'][]['classes'][]['cssClass']       string      eg 'strike'
+    campusTimetables[]['periods'][]['classes'][]['cancelled']      bool        eg 'strike'
     campusTimetables[]['periods'][]['classes'][]['attendanceLink'] null|string
     campusTimetables[]['periods'][]['classes'][]['attendanceIcon'] null|string  // TODO convert to logic and compute CSS here in twig
 #}
@@ -42,7 +41,7 @@ Data:
 <div class="small-12 columns">
     {% for timetable in campusTimetables %}
         {% set countPeriods = timetable.periods|length %}
-        {% set periodWidth = ((98 - countPeriods * 0.05) / countPeriods)|round(1, 'floor') %}
+        {% set periodWidth = ((98 - countPeriods * 0.05) / countPeriods)|round(0, 'floor') %}
     <div data-timetable-container>
         <h2 class="subheader" data-timetable-header>{% if campusTimetables | length > 1 %}{{ timetable.campus }} - {% endif %}{{ timetable.day }}</h2>
         <section>
@@ -64,11 +63,12 @@ Data:
                         <td style="width:{{ periodWidth }}%">
                             <div class="{{ period.tdCssClass }}">
                                 {% for class in period.classes %}
-                                <div class="timetable-subject" style="background:{{ class.colour }};" data-timetable-subject>
+                                <div class="timetable-subject" style="background:{{ class.colour|purify }};" data-timetable-subject>
+                                    {% set cssClass = class.cancelled ? 'strike' : '' %}
                                     {% if class.url %}
-                                        <a href="{{ class.url }}" class="{{ class.cssClass }}">{{ class.desc }}</a>
+                                        <a href="{{ class.url|purify }}" class="{{ cssClass }}">{{ class.desc ?: 'Unknown Class' }}</a>
                                     {% else %}
-                                        <span class="{{ class.cssClass }}">{{ class.desc }}</span>
+                                        <span class="{{ cssClass }}">{{ class.desc }}</span>
                                     {% endif %}
 
                                     <div>{{ class.code }}<br />

@@ -12,18 +12,9 @@ namespace Schoolbox\Timetable;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
-use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
-use Component_Instance;
-use Component_InstanceMapper;
-use External_Timetable;
-use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Permission\Access\RoleAccessMapper;
-use Schoolbox\Resource\Folder;
-use Schoolbox\Resource\Storage;
 use Alaress\Twig\Loader\IChainLoader;
-use Twig_Loader_Filesystem;
 
 class Module extends BaseModule
 {
@@ -63,5 +54,13 @@ class Module extends BaseModule
                 ['externalTimetable' => $this->getExternalTimetable()]
             )
         );
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function initTemplatePaths(IChainLoader $templateLoader)
+    {
+        $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 }
