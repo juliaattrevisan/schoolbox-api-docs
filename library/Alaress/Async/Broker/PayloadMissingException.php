@@ -13,7 +13,7 @@ use OutOfBoundsException;
 use Throwable;
 
 
-class PayloadMissingException extends OutOfBoundsException
+class PayloadMissingException extends OutOfBoundsException implements IBrokerException
 {
 
     /** @var Resolver */
