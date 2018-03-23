@@ -471,14 +471,14 @@ class Controller extends Base
                         'caption'   => 'External SIS Type',
                         'width'     => 4,
                     ],
-                    'showOnGradesPage'       => [
-                        'caption'   => 'Show on Grades Summary Page',
-                        'tooltip'   => 'Assessment with the work types chosen here will appear on the grades summary page. 
-                                                This will change the layout of the grades summary.',
-                        'checkbox'  =>  true,
-                        'width'     => 1,
-                        'mandatory' => true,
-                    ]
+//                    'showOnGradesPage'       => [
+//                        'caption'   => 'Show on Grades Summary Page',
+//                        'tooltip'   => 'Assessment with the work types chosen here will appear on the grades summary page.
+//                                                This will change the layout of the grades summary.',
+//                        'checkbox'  =>  true,
+//                        'width'     => 1,
+//                        'mandatory' => true,
+//                    ]
                 ]
             ],
             'submission-errors'     => [
