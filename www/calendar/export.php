@@ -93,7 +93,6 @@ function buildApiClass(string $class, array $params, bool $enabled, ?Raven_Clien
 try {
     $token              = $_GET['token'];
     $export_type        = $_GET['export'];
-    $code               = 200;
     $filename           = 'calendar';
     $resourceId         = (int)$_GET['resource_id'];
     $resourceCategoryId = (int)$_GET['resource_category_id'];
@@ -365,11 +364,11 @@ try {
     if ($sentry && !in_array($e->getCode(), [400, 401], true)) {
         $sentry->captureException($e);
     }
-    $api = new Calendar_Api_Composite();
+    http_response_code($e->getCode());
+    exit;
 }
 
 // Always output here
-http_response_code($code);
 if ($_GET['format'] === 'csv') {
     header('Cache-Control: private');
     header('Content-Type: text/csv; charset=utf-8');
