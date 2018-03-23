@@ -67,11 +67,6 @@
             }
         }
 
-        var height = null;
-
-        if (isSmallDevice()) {
-            height = 'auto';
-        }
         c = new Calendar('calendar', 'calendar-bubble', {
 			userId: '{CALENDAR_USER_ID}',
 
@@ -88,7 +83,6 @@
             },
             fullCalendar: {
                 defaultDate: moment('{SELECTED_DATE}'),
-                height: height,
                 defaultView: anchor || '{CALENDAR_VIEW}',
                 scrollTime: dateDisplayFormats.calendarStartTime,
                 // Event limit: could be configured from session but leave global for now
@@ -207,16 +201,6 @@
 
                     // Apply whether the submit button is enabled or not
                     toggleFormState(c.getForm('createEvent'));
-                },
-
-                /**
-                 * When the window is resized
-                 * @param view
-                 */
-                windowResize: function(view) {
-                    var wHeight = $(window).height()
-                    var calTop = c.dom.offset().top
-                    c.dom.fullCalendar('option','contentHeight',wHeight - calTop - 60)
                 },
 
                 /**
