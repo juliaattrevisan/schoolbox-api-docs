@@ -31,7 +31,7 @@ class Nested implements IStrategy
      * @param PDO $connection
      * @return self
      */
-    public function setConnection(PDO $connection): self
+    public function setConnection(PDO $connection): IStrategy
     {
         $this->connection = $connection;
         return $this;
