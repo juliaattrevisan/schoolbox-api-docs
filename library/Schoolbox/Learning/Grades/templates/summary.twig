@@ -63,14 +63,15 @@
                 {% for folder in folders %}
                     <li>
                         <a href="{{ routeLookup('learningGrades.getGradesForSubject', {userId: student.id, subjectId: folder.id, termCode: term.code}) }}" class="link-row" title="View {{ locale.grades.properPlural }}">
-                        <div class="medium-10 small-8 card">
-                                <span class="icon-home size-32" title="{{ folder.name }}"></span>
-                                <p>{{ folder.name }}</p>
-                            <p class="meta">
-                                {% for code in folder.codes %}
-                                    {{ code.code }}{% if not loop.last %},{% endif %}
-                                {% endfor %}
-                            </p>
+                        <div class="content medium-10 small-8 columns">
+                            <h3 class="no-margin">
+                                {{ folder.name }}
+                                <span class="meta">
+                                    {% for code in folder.codes %}
+                                        {{ code.code }}{% if not loop.last %},{% endif %}
+                                    {% endfor %}
+                                </span>
+                            </h3>
                         </div>
                         <div class="medium-2 small-4 columns no-pad">
                             <div class="grade content">
@@ -84,15 +85,12 @@
                     {% for teacher in folder.teachers %}
                     <li class="actions-small-1">
                         <div class="list-item">
-                            <div class="small-12 card">
+                            <div class="compact card small-12">
                                 <a href="/search/user/{{ teacher.id }}" title="">
-                                    <img src="/portrait.php?userId={{ teacher.externalId }}&size=square64"
-                                         alt="{{ teacher.fullName }}"/>
-                                    <p>{{ teacher.fullName }}</p>
+                                    <img src="/portrait.php?userId={{ teacher.externalId }}&size=square64" alt="{{ teacher.fullName }}"/>
+                                    <p>{{ teacher.fullName }} <span class="pipe meta">Teacher</span></p>
                                 </a>
-                                <p class="meta">Teacher</p>
                             </div>
-
                         </div>
                         <nav>
                             <a href="{{ mailHandle }}{{ teacher.email }}" class="icon-email" title="Mail"></a>
