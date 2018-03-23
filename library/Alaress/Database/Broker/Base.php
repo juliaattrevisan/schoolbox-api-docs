@@ -293,6 +293,14 @@ abstract class Base implements IBroker
         return $this->connector->getDatabase();
     }
 
+    /**
+     * @return PDO
+     */
+    public function getPdo(): PDO
+    {
+        return $this->pdo;
+    }
+
     // ----------------------------------------------------------------------------------------------------------------
     // Post processor callback stuff
     // ----------------------------------------------------------------------------------------------------------------
