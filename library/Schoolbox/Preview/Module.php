@@ -25,9 +25,6 @@ class Module extends BaseModule
      */
     public function initRoutes(Router $router, $basePath)
     {
-        /* Testing page page
-         */
-        //$this->addGetRoute($router, 'index', $basePath, '');
 
         /* Render html fragment, or redirect
          */
@@ -35,6 +32,15 @@ class Module extends BaseModule
             ->addValues([
                 'format' => '.json'
             ]);
+    }
+
+    /**
+     * {@inheritdoc}
+     * @throws \InvalidArgumentException
+     */
+    public function initRoutePermissions(Authorizer $authorizer)
+    {
+        $this->addRoutePermission($authorizer, '(?:index|preview)', new Rule\IsLoggedIn());
     }
 
     /**
