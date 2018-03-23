@@ -81,7 +81,11 @@ class Base implements Serializable, IConnector
         $this->database = $database;
 
         $this->broker->setConnector($this);
-        return $this->broker->connect($options);
+        if ($this->broker->connect($options)) {
+            $this->transactor->setConnection($this->broker->getPdo());
+            return true;
+        }
+        return false;
     }
 
     /**

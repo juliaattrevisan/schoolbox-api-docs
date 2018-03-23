@@ -8,6 +8,8 @@ declare(strict_types=1);
 
 namespace Alaress\Database\Transactor\Strategy;
 
+use PDO;
+
 /**
  * Interface for database transaction handling strategies.
  */
@@ -40,4 +42,12 @@ interface IStrategy
      * @return bool Did it roll back?
      */
     public function rollback(): bool;
+
+    /**
+     * Sets the PDO connection.
+     *
+     * @param  PDO $connection
+     * @return IStrategy
+     */
+    public function setConnection(PDO $connection): self;
 }

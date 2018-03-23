@@ -39,13 +39,13 @@ class Savepoint implements IStrategy
     private $savepointNumber = 0;
 
     /**
-     * Constructor
-     *
      * @param PDO $connection
+     * @return self
      */
-    public function __construct(PDO $connection)
+    public function setConnection(PDO $connection): self
     {
         $this->connection = $connection;
+        return $this;
     }
 
     /**
