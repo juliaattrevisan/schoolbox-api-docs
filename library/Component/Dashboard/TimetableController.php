@@ -275,10 +275,6 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
 
         $currentPeriod = $this->currentPeriod[$campusId];
 
-        // Setup colour map
-        $this->subjectColourMap = [];
-        $this->colourIndex      = 0;
-
         foreach ($timetable as $period) {
             // Filter out periods like 'Recess' or 'Lunch' to only show those with classes
             if (1 !== (int)$period['periodSequence']) {
@@ -368,7 +364,11 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
     {
         $campusList = $this->getCampusList();
         $now        = new Alaress_Date_Format(time(), 'U');
-        $timetables = [];
+        $timetableContexts = [];
+
+        // Setup colour map - doing so here implies the same subject code across different timetables be same colour
+        $this->subjectColourMap = [];
+        $this->colourIndex      = 0;
 
         foreach ($this->timetable as $campusId => $timetable) {
 
@@ -377,7 +377,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                 continue;
             }
 
-            $timetables[] = $this->buildTimetableContext($campusList, $campusId, $timetable, $now);
+            $timetableContexts[] = $this->buildTimetableContext($campusList, $campusId, $timetable, $now);
         }
 
         return $this->renderTwigTemplate(
@@ -386,7 +386,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
             [
                 'componentInstanceId' => $this->getInstance()->getId(),
                 'externalType'        => $this->getConfigMapper()->get('external_type'),
-                'campusTimetables'    => $timetables,
+                'campusTimetables'    => $timetableContexts,
             ],
             false,
             false,
