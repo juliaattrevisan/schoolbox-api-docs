@@ -27,7 +27,7 @@ class Savepoint implements IStrategy
     /**
      * Savepoint stack
      *
-     * @var string[]
+     * @var int[]
      */
     private $savepointStack = [];
 
@@ -59,7 +59,7 @@ class Savepoint implements IStrategy
         }
 
         // create a savepoint
-        $newSavepoint = $this->generateSavepointName();
+        $newSavepoint = $this->generateSavepointNumber();
         if ($this->createSavepoint($newSavepoint)) {
             $this->savepointStack[] = $newSavepoint;
             return true;
@@ -126,57 +126,51 @@ class Savepoint implements IStrategy
     }
 
     /**
-     * Generate an auto-incrementing savepoint name.
+     * Generate an auto-incrementing savepoint number.
      *
-     * @return string
+     * @return int
      */
-    private function generateSavepointName(): string
+    private function generateSavepointNumber(): int
     {
-        return 'savepoint'.$this->savepointNumber++;
+        return $this->savepointNumber++;
     }
 
     /**
      * Creates a savepoint.
      *
-     * @param string $name
+     * @param int $number
      * @return bool
      */
-    private function createSavepoint(string $name): bool
+    private function createSavepoint(int $number): bool
     {
         // The DB steadfastly refuses to allow me to use bound params in
         // savepoint queries.
         // Inject instead -_- it will be safe as we directly control the input
-        $this->connection->exec(
-            sprintf('SAVEPOINT %s', $this->connection->quote($name, PDO::PARAM_STR))
-        );
+        $this->connection->exec(sprintf('SAVEPOINT point%d', $number));
         return true;
     }
 
     /**
      * Rolls back to a savepoint.
      *
-     * @param string $name
+     * @param int $number
      * @return bool
      */
-    private function rollbackToSavepoint(string $name): bool
+    private function rollbackToSavepoint(int $number): bool
     {
-        $this->connection->exec(
-            sprintf('ROLLBACK TO SAVEPOINT %s', $this->connection->quote($name, PDO::PARAM_STR))
-        );
+        $this->connection->exec(sprintf('ROLLBACK TO SAVEPOINT point%d', $number));
         return true;
     }
 
     /**
      * Releases a savepoint once it is no longer required.
      *
-     * @param string $name
+     * @param int $number
      * @return bool
      */
-    private function releaseSavepoint(string $name): bool
+    private function releaseSavepoint(int $number): bool
     {
-        $this->connection->exec(
-            sprintf('RELEASE SAVEPOINT %s', $this->connection->quote($name, PDO::PARAM_STR))
-        );
+        $this->connection->exec(sprintf('RELEASE SAVEPOINT point%d', $number));
         return true;
     }
 }
