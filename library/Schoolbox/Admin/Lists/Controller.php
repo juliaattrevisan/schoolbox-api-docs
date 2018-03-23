@@ -464,7 +464,7 @@ class Controller extends Base
                 'fields'            => [
                     'name'          => [
                         'caption'   => 'Name',
-                        'width'     => 7,
+                        'width'     => 8,
                         'maxLength' => 40,
                     ],
                     'externalResultType' => [
