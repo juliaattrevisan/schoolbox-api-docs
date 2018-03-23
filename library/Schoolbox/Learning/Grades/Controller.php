@@ -12,7 +12,9 @@ use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\StudentReportCard\Conversation;
+use Schoolbox\Collection;
 use Schoolbox\Error;
+use Schoolbox\File\Exception;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -29,6 +31,7 @@ use Schoolbox\Filter\Page as FilterPage;
 use Schoolbox\Filter\Selection as FilterSelection;
 use Schoolbox\Filter\Filters\Assessment as AssessmentFilters;
 use Schoolbox\Learning\Assessment\DueWork;
+use \Schoolbox\Learning\Assessment\WorkType;
 use Alaress\Database\Predicate\InvalidColumnException;
 use LogicException;
 use TypeError;
@@ -157,6 +160,15 @@ class Controller extends Base
      */
     public function getGrades(User $viewee, Term\Model $term)
     {
+        $filteredWorkTypes = WorkType\Mapper::getInstance()->findByColumn('show_on_grades_page', 1);
+
+        if (\count($filteredWorkTypes)) {
+            $assessments = $this->getAssessmentMapperProxy()->findAllByStudentBetweenDates($viewee, false, $term->getStart(), $term->getActualFinish());
+
+            $this->getCustomGrades($viewee, $assessments, null, $term, $filteredWorkTypes);
+            return;
+        }
+
         // Add folders with response or feedback
         $folders = $this->findFoldersWithStudentInteractions($viewee, $term);
 
@@ -202,8 +214,85 @@ class Controller extends Base
             'folders'          => $folders,
             'markbooks'        => $markbooks,
             'showOverallGrade' => $showOverallGrade,
-            'mailHandle'       => $this->getSession() ->get('mailhandle'),
+            'mailHandle'       => $this->getSession()->get('mailhandle'),
         ])->setTab('grade'));
+    }
+
+    /**
+     *
+     * @param User                     $viewee
+     * @param Collection|IAssessable[] $assessments
+     * @param null|int                 $year         Null if looking at a term, instead of a full-year
+     * @param Term\Model               $term
+     * @throws ServiceNotFound If unable to find mail handler service
+     */
+    protected function getCustomGrades(User $viewee, Collection $assessments, $year, Term\Model $term, Collection $workTypes)
+    {
+        $workTypeNames = $workTypes->getPropertyValues('name');
+
+        // Storage for each folders markbook
+        $markbooks        = [];
+        $markbooksFolders = [];
+
+        // Keep a collection of all folders student has an assessment in for use in the dropdown
+        $assessmentTasks = [];
+
+        $folders = $this->getFolderMapper()->createCollection();
+
+        /** @var IAssessable $assessment */
+        foreach ($assessments as $assessment) {
+            $folder = $assessment->getContext()->getFolder();
+
+            if ($folder instanceof Folder\Model) {
+                if (!isset($foldersFound[$folder->getId()])) {
+
+                    if (!isset($markbooksFolders[$folder->getId()])) {
+                        $markbooksFolders[$folder->getId()] = $this->getAssessmentMapperProxy()->createCollection();
+                        $folder->loadTeachers();
+                        $folders->add($folder);
+                    }
+
+                    if ($assessment instanceof DueWork\Model && $assessment->getWorkType()
+                        && \in_array($assessment->getWorkType()->getName(), $workTypeNames, true)
+                    ) {
+                        if (!isset($assessmentTasks[$folder->getId()])) {
+                            $assessmentTasks[$folder->getId()] = [];
+                        }
+                        $assessmentTasks[$folder->getId()][] = $assessment;
+                    }
+
+                    $markbooksFolders[$folder->getId()]->add($assessment);
+                }
+            }
+        }
+
+        foreach ($markbooksFolders as $folderId => $assessmentsArray) {
+            $markbooks[$folderId] =
+                (new Markbook($assessmentsArray, $this->getDefaultGradeGroup(), $this->getUser()))
+                    ->getStudentStatistics()[$viewee->getId()];
+        }
+
+        //Do we have access to btacs year summary route?
+        try{
+            $yearRoute = $this->getRouteIfAuthorized('learningGrades.getCustomGradesYear');
+        } catch (RouteNotFound $e) {
+            $yearRoute = null;
+        }
+        
+        // Squish this mess out
+
+        $this->getResponse()->content->set($this->buildHtmlOutput('@learningGrades/filteredSummary.twig', [
+            'student'         => $viewee,
+            'term'            => $term,
+            'year'            => $year,
+            'terms'           => $this->getTermMapper()->findAll()->sortBy('start', 'desc'),
+            'folders'         => $folders,
+            'assessmentTasks' => $assessmentTasks,
+            'markbooks'       => $markbooks,
+            'mailHandle'      => $this->getSession()->get('mailhandle'),
+            'currentUser'     => $this->getUser(),
+            'yearRoute'       => $yearRoute
+        ]));
     }
 
 

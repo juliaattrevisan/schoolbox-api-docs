@@ -30,6 +30,16 @@
                                     />
                                     <label for="{{ field_key }}-{{ recordIndex }}"></label>
                                 </div>
+                            {% elseif field.checkbox is not empty %}
+                                <div class="checklist">
+                                    <input name="checkbox-{{ field_key }}[{{ recordIndex }}]"
+                                           value="1"
+                                           id="{{ field_key }}-{{ recordIndex }}"
+                                           type="checkbox"
+                                           {% if record[field_key]  %}checked{% endif %}
+                                    />
+                                    <label for="{{ field_key }}-{{ recordIndex }}"></label>
+                                </div>
                             {% elseif field.lookup is iterable %}
                                 {# Lookup select box #}
                                 {% if field.lookup | length == 0 %}

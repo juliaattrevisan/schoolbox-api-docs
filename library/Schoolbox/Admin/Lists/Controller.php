@@ -127,6 +127,7 @@ class Controller extends Base
         $fixed  = [];
         $nulls  = [];
         $radios = [];
+        $checkboxes = [];
 
         // Get the data into some sort of usable format
 
@@ -140,6 +141,8 @@ class Controller extends Base
                 $nulls[substr($field, 5)] = $value;
             } else if (substr($field, 0, 6) == "radio-") {
                 $radios[substr($field, 6)] = $value;
+            } else if (substr($field, 0, 9) == "checkbox-") {
+                $checkboxes[substr($field, 9)] = $value;
             } else if ($field == "id") {
                 $ids = $value;
             }
@@ -201,6 +204,13 @@ class Controller extends Base
                 } else {
                     $model->$setter(0);
                 }
+            }
+
+            //Process all the lovely checkboxes
+            foreach ($checkboxes as $field => $value) {
+                $setter = "set" . $this->underscoreToCamelCase($field);
+                $boolean = isset($value[$currentIndex]);
+                $model->$setter($boolean);
             }
 
             if ($sortable_column != "") {
@@ -454,13 +464,21 @@ class Controller extends Base
                 'fields'            => [
                     'name'          => [
                         'caption'   => 'Name',
-                        'width'     => 8,
+                        'width'     => 7,
                         'maxLength' => 40,
                     ],
                     'externalResultType' => [
                         'caption'   => 'External SIS Type',
                         'width'     => 4,
                     ],
+                    'showOnGradesPage'       => [
+                        'caption'   => 'Show on Grades Summary Page',
+                        'tooltip'   => 'Assessment with the work types chosen here will appear on the grades summary page. 
+                                                This will change the layout of the grades summary.',
+                        'checkbox'  =>  true,
+                        'width'     => 1,
+                        'mandatory' => true,
+                    ]
                 ]
             ],
             'submission-errors'     => [

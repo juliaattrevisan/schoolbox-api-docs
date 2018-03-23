@@ -27,6 +27,7 @@ class Mapper extends Schoolbox\Mapper
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('name', self::TYPE_STRING);
         $this->uses('external_result_type', self::TYPE_STRING);
+        $this->uses('show_on_grades_page', self::TYPE_BOOLEAN);
     }
 
 

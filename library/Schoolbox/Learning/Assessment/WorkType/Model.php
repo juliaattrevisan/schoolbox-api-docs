@@ -27,6 +27,36 @@ class Model
     private $externalResultType;
 
     /**
+     * @var boolean
+     */
+    private $showOnGradesPage;
+
+    /**
+     * @return bool
+     */
+    public function getShowOnGradesPage()
+    {
+        return $this->isShowOnGradesPage();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isShowOnGradesPage()
+    {
+        return $this->showOnGradesPage;
+    }
+
+
+    /**
+     * @param bool $showOnGradesPage
+     */
+    public function setShowOnGradesPage(bool $showOnGradesPage): void
+    {
+        $this->showOnGradesPage = $showOnGradesPage;
+    }
+
+    /**
      * @param int $id
      * @return static
      */
