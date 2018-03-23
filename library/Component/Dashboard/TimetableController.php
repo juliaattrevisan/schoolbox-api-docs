@@ -298,20 +298,16 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
      */
     private function buildPeriodContext(array $campusList, int $campusId, ?array $currentPeriod, array $period, Alaress_Date_Format $now): array
     {
-        // Always highlight the current cell, regardless of whether it has something on or not
-        $thCssClass = ($currentPeriod && $currentPeriod['PeriodNumber'] == $period['periodNumber'] && $currentPeriod['PeriodNumberSeq'] == $period['periodSequence'])
-            ? 'timetable-period-active'
-            : '';
-        $tdCssClass = ($currentPeriod && $currentPeriod['PeriodNumber'] == $period['periodNumber'] && $currentPeriod['PeriodNumberSeq'] == $period['periodSequence'])
-            ? 'timetable-subject-active'
-            : '';
+        // Always highlight the current cell, regardless of whether it contains any classes
+         $isCurrent = $currentPeriod
+            && $currentPeriod['PeriodNumber'] == $period['periodNumber']
+            && $currentPeriod['PeriodNumberSeq'] == $period['periodSequence'];
 
         $periodContext = [
             'name'       => $period['periodName'],
             'start'      => $period['periodStart'],
             'end'        => $period['periodEnd'],
-            'thCssClass' => $thCssClass,
-            'tdCssClass' => $tdCssClass,
+            'isCurrent'  => $isCurrent,
         ];
 
         foreach ($period['class'] as $class) {

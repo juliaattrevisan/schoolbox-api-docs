@@ -6,11 +6,10 @@ Data:
     campusTimetables[]['campus']                                          string
     campusTimetables[]['day']                                             string
     campusTimetables[]['periods']                                         array
-    campusTimetables[]['periods'][]['thCssClass']                         string      eg 'timetable-period-active'
-    campusTimetables[]['periods'][]['tdCssClass']                         string      eg 'timetable-subject-active'
     campusTimetables[]['periods'][]['name']                               string      eg 'Period 1'
     campusTimetables[]['periods'][]['start']                              string      eg '8:30am'
     campusTimetables[]['periods'][]['end']                                string      eg '9:30am'
+    campusTimetables[]['periods'][]['isCurrent']                          bool        Is this period currently on?
     campusTimetables[]['periods'][]['classes']                            array
     campusTimetables[]['periods'][]['classes'][]['code']                  string      eg '(11/12/SCI)'
     campusTimetables[]['periods'][]['classes'][]['room']                  string      eg 'GND1'
@@ -55,7 +54,7 @@ Data:
                     <thead>
                     <tr>
                         {% for period in timetable.periods %}
-                        <th class="{{ period.thCssClass }}" style="width:{{ periodWidth }}%">
+                        <th{% if period.isCurrent %} class="timetable-period-active"{% endif %} style="width:{{ periodWidth }}%">
                             {{ period.name }}
                             <time class="meta">{{ period.start }}&ndash;{{ period.end }}</time>
                         </th>
@@ -66,7 +65,7 @@ Data:
                     <tr>
                         {% for period in timetable.periods %}
                         <td style="width:{{ periodWidth }}%">
-                            <div class="{{ period.tdCssClass }}">
+                            <div{% if period.isCurrent %} class="timetable-subject-active"{% endif %} >
                                 {% for class in period.classes %}
                                 <div class="timetable-subject" style="background:{{ class.colour|purify }};" data-timetable-subject>
                                     {% set cssClass = class.cancelled ? 'strike' : '' %}
