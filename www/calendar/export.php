@@ -360,10 +360,6 @@ try {
             break;
     }
 } catch (Throwable $e) {
-    // Send exception to sentry, and output empty API
-    if ($sentry && !in_array($e->getCode(), [400, 401], true)) {
-        $sentry->captureException($e);
-    }
     http_response_code($e->getCode());
     exit;
 }
