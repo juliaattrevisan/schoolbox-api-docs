@@ -133,7 +133,7 @@ class GDriveFetcher implements FetcherInterface
             throw new OutOfBoundsException("No url found for download");
         }
 
-        $destination = tempnam(sys_get_temp_dir(), 'gdrive-');
+        $destination = tempnam($this->dir, 'gdrive-');
 
         if (!($fp = fopen($destination, 'w'))) {
             throw new OutOfBoundsException("Could not open target");
