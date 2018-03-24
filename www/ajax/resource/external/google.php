@@ -36,11 +36,12 @@ $files   = array();
 
 foreach ($_POST['docs'] as $doc) {
     $meta = $grive->fetchMetaData($doc['id']);
+    $filename = $grive->deriveFileName($meta);
     $dest = $grive->fetchToFile($doc['id']);
 
     try {
         // this will return an existing record if the file previously existed
-        $storageFile      = $mapper->accept(basename($dest), $dest, $_SESSION['id']);
+        $storageFile      = $mapper->accept($filename, $dest, $_SESSION['id']);
         $meta['hash']     = NodeFactory::STORE . ':' . $storageFile->getHash();
         $meta['filesize'] = $storageFile->getSize();
 
