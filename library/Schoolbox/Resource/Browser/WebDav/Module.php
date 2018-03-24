@@ -15,6 +15,9 @@ use PortfolioWebDAV;
 use Schoolbox\Resource\Browser\AbstractModule;
 use Schoolbox\Resource\Browser\FullAccessController;
 use Schoolbox\Resource\Browser\NodeFactory;
+use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
+
 
 class Module extends AbstractModule
 {
@@ -23,6 +26,7 @@ class Module extends AbstractModule
     /**
      * @param Container $ci
      * @return array
+     * @throws SchoolboxException
      */
     protected function getSetterList(Container $ci)
     {
@@ -34,6 +38,12 @@ class Module extends AbstractModule
                 return PortfolioWebDAV::factory();
             } catch (\UnexpectedValueException $e) {
                 return null;
+            } catch (\DomainException $e) {
+                /**
+                 * @var ErrorMapper $errorMapper
+                 */
+                $errorMapper = $this->getMapperFactory()->get(ErrorMapper::class);
+                throw $errorMapper->generateException(ErrorMapper::ERROR_WEBDAV, $e, $e->getMessage());
             }
         });
 
