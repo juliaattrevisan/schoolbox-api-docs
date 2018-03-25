@@ -12,7 +12,7 @@ namespace Schoolbox\Learning\InlineGrader\Kami;
  * Responsible for checking the status of a processing kami
  * document to determine if it is now 'done' or 'failed'
  */
-class StatusChecker
+class StatusCheck
 {
 
     /** @var Mapper */

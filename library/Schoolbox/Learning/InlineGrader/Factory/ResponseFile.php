@@ -188,7 +188,7 @@ class ResponseFile
         // Was it still being processed by Kami last time we checked?
         if ($kamiModel->isStatusProcessing()) {
             try {
-                $checker   = new Kami\StatusChecker($this->kamiMapper, $this->kamiConnector);
+                $checker   = new Kami\StatusCheck($this->kamiMapper, $this->kamiConnector);
                 $kamiModel = $checker->updateStatus($kamiModel);
             } catch (Kami\Exception\EmptyApiKeyException $e) {
                 // Should be impossible here due to short-circuit at start of method.

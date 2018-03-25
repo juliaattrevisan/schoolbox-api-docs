@@ -347,7 +347,7 @@ class Controller extends Base
     {
         // Was it still being processed by Kami last time we checked?
         if ($kami->isStatusProcessing()) {
-            $statusChecker = new Kami\StatusChecker($this->kamiMapper, $this->kamiConnector);
+            $statusChecker = new Kami\StatusCheck($this->kamiMapper, $this->kamiConnector);
             $kami          = $statusChecker->updateStatus($kami);
         }
 
