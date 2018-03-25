@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\InlineGrader\Kami;
 
 use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\ConnectException;
 use Schoolbox\GenericCollection;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\User;
@@ -75,6 +76,7 @@ interface IConnector
      * @throws Exception\ResponseDecodeException If unable to decode a server response
      * @throws Exception\ApiException If cannot fetch a document for reasons other than simply not existing.
      * @throws Exception\NotFound If document does not exist in Kami
+     * @throws ConnectException
      */
     public function getDocument(string $documentId): Document;
 
