@@ -938,6 +938,8 @@ class Mapper extends BaseMapper
                     $contextId = $context->getAssessmentModel()->getId();
                     if (isset($contextProjects[$contextId])) {
                         $context->setAssessmentModel($contextProjects[$contextId]);
+                        // Ensure project is linked to (potentially deleted) child
+                        $context->getAssessments()[$model->getId()] = $model;
                     }
                 }
             }
