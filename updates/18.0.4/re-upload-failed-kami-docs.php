@@ -152,10 +152,10 @@ $reQueue = new class() extends App
     {
         $jitter = new Jitter(
             new Random\FloatGenerator(),
-            Kami\StatusChecker::DEFAULT_MAX_ATTEMPTS,
-            Kami\StatusChecker::DEFAULT_BASE_JITTER_BACK_OFF
+            Kami\StatusUpdater::DEFAULT_MAX_ATTEMPTS,
+            Kami\StatusUpdater::DEFAULT_BASE_JITTER_BACK_OFF
         );
-        $statusChecker = new Kami\StatusChecker($this->kamiConnector, $this->kamiMapper, $jitter, $this->log);
+        $statusChecker = new Kami\StatusUpdater($this->kamiConnector, $this->kamiMapper, $jitter, $this->log);
         $statusChecker->checkProcessingDocumentsStatus();
     }
 

@@ -51,16 +51,16 @@ $kernel->run(function (
     $opts        = $options['opts'];
     $displayHelp = isset($opts['help']);
     $dryRun      = isset($opts['dry-run']);
-    $maxAttempts = array_key_exists('max-attempts', $opts) ? (int)$opts['max-attempts'] : Kami\StatusChecker::DEFAULT_MAX_ATTEMPTS;
-    $maxSkips    = array_key_exists('max-skips', $opts) ? (int)$opts['max-skips'] : Kami\StatusChecker::DEFAULT_MAX_SKIPS;
-    $baseBackOff = array_key_exists('base-back-off', $opts) ? (int)$opts['base-back-off'] : Kami\StatusChecker::DEFAULT_BASE_JITTER_BACK_OFF;
-    $timeout     = array_key_exists('timeout', $opts) ? (int)$opts['timeout'] : Kami\StatusChecker::DEFAULT_TIMEOUT;
+    $maxAttempts = array_key_exists('max-attempts', $opts) ? (int)$opts['max-attempts'] : Kami\StatusUpdater::DEFAULT_MAX_ATTEMPTS;
+    $maxSkips    = array_key_exists('max-skips', $opts) ? (int)$opts['max-skips'] : Kami\StatusUpdater::DEFAULT_MAX_SKIPS;
+    $baseBackOff = array_key_exists('base-back-off', $opts) ? (int)$opts['base-back-off'] : Kami\StatusUpdater::DEFAULT_BASE_JITTER_BACK_OFF;
+    $timeout     = array_key_exists('timeout', $opts) ? (int)$opts['timeout'] : Kami\StatusUpdater::DEFAULT_TIMEOUT;
 
     if ($displayHelp) {
-        $maxAttempts       = Kami\StatusChecker::DEFAULT_MAX_ATTEMPTS;
-        $maxSkips          = Kami\StatusChecker::DEFAULT_MAX_SKIPS;
-        $baseJitterBackOff = Kami\StatusChecker::DEFAULT_BASE_JITTER_BACK_OFF;
-        $timeout           = Kami\StatusChecker::DEFAULT_TIMEOUT;
+        $maxAttempts       = Kami\StatusUpdater::DEFAULT_MAX_ATTEMPTS;
+        $maxSkips          = Kami\StatusUpdater::DEFAULT_MAX_SKIPS;
+        $baseJitterBackOff = Kami\StatusUpdater::DEFAULT_BASE_JITTER_BACK_OFF;
+        $timeout           = Kami\StatusUpdater::DEFAULT_TIMEOUT;
         echo <<<HELP
 Checks whether documents 'processing' in Kami have finished processing.
  
@@ -108,7 +108,7 @@ HELP;
     }
 
     $jitter = new Jitter(new Random\FloatGenerator(), $maxAttempts, $baseBackOff);
-    $StatusChecker = new Kami\StatusChecker($connector, $kamiMapper, $jitter, $log);
+    $StatusChecker = new Kami\StatusUpdater($connector, $kamiMapper, $jitter, $log);
 
     // Ensure only one instance of checker is running at a time
     $lockFile = "{$config->get('stream_dir')}/.kami_status_check.lock";
