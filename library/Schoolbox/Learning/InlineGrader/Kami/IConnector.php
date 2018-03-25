@@ -70,13 +70,13 @@ interface IConnector
      * Return the specified document from Kami if it exists there. Null otherwise.
      *
      * @param string $documentId
-     * @return null|Document
+     * @return Document
      * @throws Exception\EmptyApiKeyException If API key not configured
      * @throws Exception\ResponseDecodeException If unable to decode a server response
      * @throws Exception\ApiException If cannot fetch a document for reasons other than simply not existing.
      * @throws Exception\NotFound If document does not exist in Kami
      */
-    public function getDocument(string $documentId): ?Document;
+    public function getDocument(string $documentId): Document;
 
 
     /**
