@@ -14,7 +14,7 @@ use Alaress\Database\Transactor\Strategy\IStrategy;
  * Base transactor class, implements the most basic transaction functionality
  * plus hooks that run when the entire transaction is committed.
  */
-class Base
+class Base implements ITransactor
 {
     /**
      * A transactor
@@ -41,9 +41,7 @@ class Base
     }
 
     /**
-     * Begin transaction
-     *
-     * @return bool Did it begin?
+     * @inheritdoc
      */
     public function beginTransaction(): bool
     {
@@ -52,9 +50,7 @@ class Base
     }
 
     /**
-     * Is the broker in a transaction?
-     *
-     * @return bool
+     * @inheritdoc
      */
     public function inTransaction(): bool
     {
@@ -62,9 +58,7 @@ class Base
     }
 
     /**
-     * Commit transaction
-     *
-     * @return bool Did it commit?
+     * @inheritdoc
      */
     public function commit(): bool
     {
@@ -92,9 +86,7 @@ class Base
     }
 
     /**
-     * Rollback current transaction
-     *
-     * @return bool Did it roll back?
+     * @inheritdoc
      */
     public function rollback(): bool
     {
@@ -115,13 +107,9 @@ class Base
     }
 
     /**
-     * Add a callback that is called once (and only if) the outermost nesting
-     * level is committed.
-     *
-     * @param callable $callback
-     * @return self
+     * @inheritdoc
      */
-    public function onPersist(callable $callback): self
+    public function onPersist(callable $callback): ITransactor
     {
         $persistStackSize = \count($this->onPersistHooks);
         if ($persistStackSize > 0) {
