@@ -703,7 +703,7 @@ class Controller extends BaseController
                 } catch (MapperException $e) {
                     // doesn't exist
                     $group = $groupMapper->createModel()
-                        ->setCategory($model->getId())
+                        ->setCategory($model)
                         ->setType(Group::PRIVATE_GROUP)
                         ->setForceFollow(false);
 
