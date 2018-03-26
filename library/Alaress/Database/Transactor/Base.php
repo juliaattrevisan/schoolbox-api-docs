@@ -113,4 +113,25 @@ class Base
         // Something went wrong
         return false;
     }
+
+    /**
+     * Add a callback that is called once (and only if) the outermost nesting
+     * level is committed.
+     *
+     * @param callable $callback
+     * @return self
+     */
+    public function onPersist(callable $callback): self
+    {
+        $persistStackSize = \count($this->onPersistHooks);
+        if ($persistStackSize > 0) {
+            // put in the transaction Q, in the last possible point
+            // Hope that onPersistHooks is in sync with transaction state
+            $this->onPersistHooks[$persistStackSize - 1][] = $callback;
+        } else {
+            // just call immediately
+            $callback();
+        }
+        return $this;
+    }
 }
