@@ -21,6 +21,21 @@ $accessMapper = UserAccessMapper::getInstance();
 /** @var \Schoolbox\User $user */
 $user = $_SESSION["user"];
 
+// Fetch the logged in user's write access groups to exclude from the lists.
+$userWriteGroupIds = [];
+$userGroups = $accessMapper->findAllForUser($user);
+$userWriteGroups = $userGroups->filter(function($element) {
+    /** @var $element UserAccess */
+    if ($element->getAccessLevel() >= UserAccess::ACCESS_WRITE) {
+        return true;
+    }
+    return false;
+});
+foreach ($userWriteGroups as $userGroup) {
+    /** @var $userGroup UserAccess */
+    $userWriteGroupIds[] = $userGroup->getServiceIdentifier();
+}
+
 //Get the perms for user
 $userPerms = $accessMapper->findAllGroupsForUser($user);
 $userPerms->indexBy("serviceIdentifier");
@@ -33,20 +48,21 @@ $natStrSort = function(Group $a, Group $b) {
 /** @var GenericCollection|Group[] $freeGroupList */
 $freeGroupList = $groupMapper->findByColumn("type", Group::FREE_GROUP)->sortByCallback($natStrSort);
 
+$this->setVar('free_list_block', '');
 if ($freeGroupList->count()) {
     foreach ($freeGroupList as $free) {
         $folderId = $free->getCategory()->getId();
-        $output   = [
-            'GROUP_ID'      => $folderId,
-            'GROUP_NAME'    => Scrub::text($free->getCategory()->getName()),
-            'GROUP_CHECKED' => $userPerms[$folderId] ? 'checked=\'checked\'' : '',
-        ];
-        $this->setVar($output);
+        if (!in_array($folderId, $userWriteGroupIds)) {
+            $output   = [
+                'GROUP_ID'      => $folderId,
+                'GROUP_NAME'    => Scrub::text($free->getCategory()->getName()),
+                'GROUP_CHECKED' => $userPerms[$folderId] ? 'checked=\'checked\'' : '',
+            ];
+            $this->setVar($output);
 
-        $this->parse('free_list_block', 'free_list', true);
+            $this->parse('free_list_block', 'free_list', true);
+        }
     }
-} else {
-    $this->setVar('free_list_block', '');
 }
 
 
@@ -54,26 +70,27 @@ if ($freeGroupList->count()) {
 /** @var GenericCollection|Group[] $moderatedGroupList */
 $moderatedGroupList = $groupMapper->findByColumn("type", Group::MODERATED_GROUP)->sortByCallback($natStrSort);
 
+$this->setVar('moderated_list_block', '');
 if ($moderatedGroupList->count()) {
     foreach ($moderatedGroupList as $moderated) {
         $folderId = $moderated->getCategory()->getId();
-        $group    = $moderatedGroupList[$folderId];
-        $output   = [
-            'GROUP_ID'      => $folderId,
-            'GROUP_NAME'    => Scrub::text($moderated->getCategory()->getName()),
-            'GROUP_CHECKED' => $userPerms[$folderId] ? 'checked=\'checked\'' : '',
-        ];
-        $this->setVar($output);
+        if (!in_array($folderId, $userWriteGroupIds)) {
+            $group    = $moderatedGroupList[$folderId];
+            $output   = [
+                'GROUP_ID'      => $folderId,
+                'GROUP_NAME'    => Scrub::text($moderated->getCategory()->getName()),
+                'GROUP_CHECKED' => $userPerms[$folderId] ? 'checked=\'checked\'' : '',
+            ];
+            $this->setVar($output);
 
-        $this->setVar('waiting_block', '');
+            $this->setVar('waiting_block', '');
 
-        if ($userPerms[$folderId] && $userPerms[$folderId]->getAccessLevel() == DENY_ACCESS) {
-            $this->parse('waiting_block', 'waiting');
+            if ($userPerms[$folderId] && $userPerms[$folderId]->getAccessLevel() == DENY_ACCESS) {
+                $this->parse('waiting_block', 'waiting');
+            }
+
+            $this->parse('moderated_list_block', 'moderated_list', true);
         }
-
-        $this->parse('moderated_list_block', 'moderated_list', true);
     }
-} else {
-    $this->setVar('moderated_list_block', '');
 }
 
