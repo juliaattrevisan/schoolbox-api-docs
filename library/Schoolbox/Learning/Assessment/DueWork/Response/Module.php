@@ -269,11 +269,10 @@ class Module extends BaseModule
         }
 
         return [
-            'assessment'  => $assessment,
-            'response'    => $response,
-            'student'     => $participant->getUser(),
-            'studentId'   => $participant->getUser()->getId(),
-            'participant' => $participant,
+            'assessment' => $assessment,
+            'plagscan'  => $plagscanDocument,
+            'response' => $response,
+            'participant' => $participant
         ];
     }
 
