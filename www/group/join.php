@@ -28,9 +28,9 @@ $userGroups = $accessMapper->findAllForUser($user);
 $userWriteGroups = $userGroups->filter(function(UserAccess $element) {
     return $element->getAccessLevel() >= UserAccess::ACCESS_WRITE;
 });
+/** @var $userWriteGroups UserAccess[] */
 foreach ($userWriteGroups as $userGroup) {
-    /** @var $userGroup UserAccess */
-    $userWriteGroupIds[] = $userGroup->getServiceIdentifier();
+   $userWriteGroupIds[] = $userGroup->getServiceIdentifier();
 }
 
 //Get the perms for user
