@@ -33,9 +33,13 @@ foreach ($userWriteGroups as $userGroup) {
    $userWriteGroupIds[] = $userGroup->getServiceIdentifier();
 }
 
-//Get the perms for user
-$userPerms = $accessMapper->findAllGroupsForUser($user);
-$userPerms->indexBy("serviceIdentifier");
+// Get the perms for user - including DENY (semantically PENDING) access
+/** @var GenericCollection|UserAccess[] $userPerms */
+$userPerms = $accessMapper->findByColumnList([
+    'uid'     => $user->getId(),
+    'service' => UserAccess::SERVICE_HOMEPAGE,
+])->indexBy('serviceIdentifier');
+
 
 $natStrSort = function(Group $a, Group $b) {
     return strnatcasecmp($a->getCategory()->getName(), $b->getCategory()->getName());
