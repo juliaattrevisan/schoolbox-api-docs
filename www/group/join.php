@@ -25,12 +25,8 @@ $user = $_SESSION["user"];
 // Fetch the logged in user's write access groups to exclude from the lists.
 $userWriteGroupIds = [];
 $userGroups = $accessMapper->findAllForUser($user);
-$userWriteGroups = $userGroups->filter(function($element) {
-    /** @var $element UserAccess */
-    if ($element->getAccessLevel() >= UserAccess::ACCESS_WRITE) {
-        return true;
-    }
-    return false;
+$userWriteGroups = $userGroups->filter(function(UserAccess $element) {
+    return $element->getAccessLevel() >= UserAccess::ACCESS_WRITE;
 });
 foreach ($userWriteGroups as $userGroup) {
     /** @var $userGroup UserAccess */
