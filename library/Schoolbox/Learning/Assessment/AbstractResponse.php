@@ -162,12 +162,6 @@ abstract class AbstractResponse implements IResponse
      */
     public function isSubmitted()
     {
-        /* If it's a nulldate instance, it's not submitted
-         */
-        if ($this->getSubmittedAt() instanceof \Alaress_Date_NullDate) {
-            return false;
-        }
-
         return $this->getSubmittedAt() !== null;
     }
 

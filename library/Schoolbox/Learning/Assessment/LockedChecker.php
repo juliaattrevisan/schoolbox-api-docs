@@ -77,7 +77,7 @@ class LockedChecker
     {
         $dueDate = $assessment->getDueAt();
 
-        if (!$dueDate || $dueDate instanceof \Alaress_Date_NullDate) {
+        if (!$dueDate) {
             throw new \InvalidArgumentException('Cannot find containing term using a null date');
         }
 

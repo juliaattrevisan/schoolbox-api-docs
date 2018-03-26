@@ -105,7 +105,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
             /** @var \Alaress_Date_Format[] $interactionPoints */
             $interactionPoints = [$attempt->getFinish(), $attempt->getReviewed()];
             foreach ($interactionPoints as $interaction) {
-                if (!is_null($interaction) && !$interaction instanceof \Alaress_Date_NullDate && $interaction->lt($updatedAt)) {
+                if ($interaction && $interaction->lt($updatedAt)) {
                     $updatedAt = $interaction;
                 }
             }

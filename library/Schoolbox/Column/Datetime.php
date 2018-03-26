@@ -71,9 +71,6 @@ class Datetime implements IColumnType
      */
     public function dehydrate($value, $mapper = null)
     {
-        if ($value instanceof \Alaress_Date_NullDate) {
-            return null;
-        }
         if ($value instanceof Alaress_Date_Format) {
             return $value->getUsingFormat($this->output_format);
         }

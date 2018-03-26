@@ -837,12 +837,12 @@ class Mapper extends BaseMapper
 
         $orderSql = '';
 
-        if ($before_date instanceof Alaress_Date_Format && !$before_date instanceof Alaress_Date_NullDate) {
+        if ($before_date instanceof Alaress_Date_Format) {
             $this->bindings[':beforeDate'] = $before_date->endOfDay()->toIso8601String();
             $this->filters[]               = '`pastoral`.`created_at` <= :beforeDate';
         }
 
-        if ($after_date instanceof Alaress_Date_Format && !$after_date instanceof Alaress_Date_NullDate) {
+        if ($after_date instanceof Alaress_Date_Format) {
             $this->bindings[':afterDate'] = $after_date->startOfDay()->toIso8601String();
             $this->filters[]              = '`pastoral`.`created_at` >= :afterDate';
         }

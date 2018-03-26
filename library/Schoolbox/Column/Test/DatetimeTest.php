@@ -90,7 +90,7 @@ class DatetimeTest extends TestCase
         // Only interested in if this successfully hydrated into a non-null value
         $this->assertSame(
             $expected_output,
-            $hydrated instanceof DateWrapper && !$hydrated instanceof \Alaress_Date_NullDate
+            $hydrated instanceof DateWrapper
         );
     }
 

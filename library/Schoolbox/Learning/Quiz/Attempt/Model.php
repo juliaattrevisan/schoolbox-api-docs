@@ -137,7 +137,7 @@ class Model implements ISoftDeletable
      */
     public function isFinished(): bool
     {
-        return !(null === $this->finish || $this->finish instanceof Alaress_Date_NullDate);
+        return null !== $this->finish;
     }
 
 

@@ -73,7 +73,7 @@ class Submission implements IStorage, ISoftDeletable
      */
     public function isDraft()
     {
-        return $this->submittedAt instanceof \Alaress_Date_NullDate;
+        return $this->submittedAt instanceof \Alaress_Date_Format;
     }
 
 

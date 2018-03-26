@@ -59,7 +59,7 @@ abstract class Base extends RendererBase
 
         /* TODO: This is a temporary fix and should be repaired when ADN merges into ADF
          */
-        if ($this->event->getPublishDate() instanceof \Alaress_Date_NullDate) {
+        if ($this->event->getPublishDate()) {
             return false;
         }
 
