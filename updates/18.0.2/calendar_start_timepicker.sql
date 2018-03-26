@@ -1,4 +1,6 @@
-INSERT INTO `lu_config_field` (`field`) VALUES ('timepicker');
+INSERT INTO `lu_config_field` (`field`)
+VALUES ('timepicker')
+ON DUPLICATE KEY UPDATE `id` = `id`;
 
 INSERT INTO `config` (`name`, `value`, `title`, `description`, `field_id`, `options`, `type_id`, `editable`, `hidden`, `required`)
 VALUES (
@@ -12,4 +14,5 @@ VALUES (
   'true',
   'false',
   'true'
-);
+)
+ON DUPLICATE KEY UPDATE `configID` = `configID`;
