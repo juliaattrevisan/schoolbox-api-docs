@@ -1,6 +1,7 @@
 <?php
 
 use Schoolbox\GenericCollection;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Group;
 use Schoolbox\Resource\GroupMapper;
 use Schoolbox\Resource\Folder;
