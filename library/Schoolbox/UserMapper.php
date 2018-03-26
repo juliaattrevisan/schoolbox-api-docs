@@ -98,8 +98,9 @@ class UserMapper extends Mapper
         $this->uses('hide_timetable', self::TYPE_BOOLEAN);
         $this->uses('hide_notifications_tray', self::TYPE_BOOLEAN);
         $this->uses('display_grade_graph', self::TYPE_BOOLEAN);
+        $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
+        $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
-
         $this->joins('house', HouseMapper::class, 'id', null, null, 'schoolHouse', 'schoolHouse');
         $this->joins('residential_house_id', HouseResidentialMapper::class, 'id', null, null, 'residentialHouse', 'residentialHouse');
         $this->joins('group_id', RoleMapper::class, 'id', null, null, 'role', 'role');
