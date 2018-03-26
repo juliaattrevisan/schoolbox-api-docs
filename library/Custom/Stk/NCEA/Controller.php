@@ -8,6 +8,7 @@
  */
 namespace Custom\Stk\NCEA;
 
+use Alaress\Database\Connector\IConnector;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -31,13 +32,18 @@ class Controller extends Base
     }
 
     /**
-     * Provide form
+     * NCEA Report
      *
      * @param User $user
      * @throws \Aura\Di\Exception\ServiceNotFound
      */
     public function getReport(User $user)
     {
+        /** @var IConnector $externalDb */
+        $externalDb = $this->getDi()->get('databaseExternal');
+
+        $acquisition = new Acquisition($externalDb);
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@nceaReport/report.twig', [
             'user' => $user
         ])->setTitle("NCEA Report for {$user->getFullName()}"));
