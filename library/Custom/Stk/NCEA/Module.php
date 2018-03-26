@@ -17,6 +17,7 @@ use InvalidArgumentException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Role;
 use Schoolbox\UserMapper;
 
 
@@ -39,7 +40,11 @@ class Module extends BaseModule
          */
         $getPerms = new Rule\All(
             new Rule\IsLoggedIn(),
-            new Rule\IsSuperuser()
+            new Rule\Any(
+                new Rule\IsUserOrParentOfUser($this->getExternalUser(), $this->getUserMapper(), 'id'),
+                new Rule\HasRole(Role::STAFF),
+                new Rule\IsSuperuser()
+            )
         );
 
         $preloadUser = function ($params) { return $this->preloadUser($params); };
