@@ -4,27 +4,36 @@
         $(function(){
             var component = $("#component{COMPONENT_INSTANCE_ID}");
             var mySwiper = new Swiper (component.find('div[data-imageslider]'), {
-                autoplay: {
-                    delay: {COMPONENT_CONFIG_TIMING_VALUE_MS},
-                    disableOnInteraction: false,
-                },
+                autoplay: false, // This will be overridden on 'lazyImageReady' below
                 centeredSlides: true,
                 initialSlide: {COMPONENT_RANDOM_SLIDE},
                 lazy: {
                     loadPrevNext: true,
                     loadPrevNextAmount: 3,
-                    preloaderClass: 'loader',
+                    preloaderClass: 'loader'
                 },
                 loop: true,
                 pagination: {
                     el: '.swiper-pagination',
-                    clickable: true,
+                    clickable: true
                 },
                 navigation: {
                     nextEl: '.swiper-button-next',
-                    prevEl: '.swiper-button-prev',
+                    prevEl: '.swiper-button-prev'
                 },
                 speed: 1000,
+                on: {
+                    // Don't start autoplay until first image has loaded
+                    lazyImageReady: function() {
+                        if (!mySwiper.params.autoplay.enabled) { // TODO: this should also check the image that was loaded was the active one
+                            mySwiper.params.autoplay = {
+                                delay: {COMPONENT_CONFIG_TIMING_VALUE_MS},
+                                disableOnInteraction: false
+                            };
+                            mySwiper.autoplay.start();
+                        }
+                    }
+                }
             });
         });
     </script>
