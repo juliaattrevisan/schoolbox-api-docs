@@ -96,7 +96,7 @@
         {%- apply spaceless %}
             {% if not latestResponse %}
                 Not attempted
-            {% elseif latestResponse.submittedAt.isNull %}
+            {% elseif not latestResponse.submittedAt %}
                 Attempt in progress
             {% else %}
                 {% if multipleResponses %}

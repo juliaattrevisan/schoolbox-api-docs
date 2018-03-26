@@ -152,10 +152,10 @@ Data:
                                         <p>{{ assessable.title }}</p>
                                         {% if viewRoute %}</a>{% endif %}
 
-                                        {% if assessable.getDueAt.isNull == false %}
+                                        {% if assessable.getDueAt %}
                                         <p class="meta">
                                             {{ dueDate.forAssessment(assessable) }}
-                                            {% if assessable.getDueAt.isNull == false %}
+                                            {% if assessable.getDueAt %}
                                                 <span class="pipe meta"><span class="{{ urgency.marks(completionGradient ?? '') }}">{{ stats.countParticipants - stats.countResponseRequired }}/{{ stats.countParticipants }} students completed
                                             </span>
                                             {% endif %}

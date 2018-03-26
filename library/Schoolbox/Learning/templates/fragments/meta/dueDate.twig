@@ -1,5 +1,5 @@
 {% import '@learning/macro/dueDate.twig' as dueDate %}
-{% if not assessment.dueAt.isNull %}
+{% if assessment.dueAt %}
     {% apply spaceless %}
     {% if student is defined and assessment.participantIfExtant(student) and assessment.participantIfExtant(student).isResubmissionRequired %}
         <li class="icon-alert">Resubmission required</li>
