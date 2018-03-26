@@ -397,10 +397,12 @@ EOL;
             $fields    = $this->getOpt('fields') ?: [];
             $porcelain = in_array('porcelain', $fields);
             $this->log = new Logger(STDOUT, STDERR, $level, $fields, $porcelain);
+
+            // Add Sentry handler into logging system
+            $ravenHandler = new RavenHandler($this->getDependencyInjector()->get('sentry'),Monologger::CRITICAL);
+            $this->log->pushHandler($ravenHandler);
         }
-        // Add Sentry handler into logging system
-        $ravenHandler = new RavenHandler($this->getDependencyInjector()->get('sentry'),Monologger::CRITICAL);
-        $this->log->pushHandler($ravenHandler);
+
 
         return $this->log;
     }
