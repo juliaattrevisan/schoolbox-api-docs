@@ -58,7 +58,6 @@ class Callback
              * which is the only reason we'd be running this Callback
              */
             $interactiveReportUrl = $this->getMapper()->getConnector()->fetchInteractiveReportUrl($currentDocument->getPlagscanId());
-            $reportContents = $this->getMapper()->getConnector()->fetchReport($currentDocument->getPlagscanId());
             $score = $this->getMapper()->getConnector()->fetchScore($currentDocument->getPlagscanId());
 
             /* Update the db with the report contents for this document
@@ -66,7 +65,6 @@ class Callback
             $currentDocument->setPlagscanId($currentDocument->getPlagscanId());
             $currentDocument->setStatus(Plagscan::STATUS_COMPLETE);
             $currentDocument->setScore($score);
-            $currentDocument->setHtml($reportContents);
             $currentDocument->setInteractiveUrl($interactiveReportUrl);
             $currentDocument->setUpdatedAt(\Alaress_Date_Format::now());
             $this->getMapper()->save($currentDocument);
