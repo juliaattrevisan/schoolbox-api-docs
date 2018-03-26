@@ -243,26 +243,23 @@ class Controller extends Base
         foreach ($assessments as $assessment) {
             $folder = $assessment->getContext()->getFolder();
 
-            if ($folder instanceof Folder\Model) {
-                if (!isset($foldersFound[$folder->getId()])) {
-
-                    if (!isset($markbooksFolders[$folder->getId()])) {
-                        $markbooksFolders[$folder->getId()] = $this->getAssessmentMapperProxy()->createCollection();
-                        $folder->loadTeachers();
-                        $folders->add($folder);
-                    }
-
-                    if ($assessment instanceof DueWork\Model && $assessment->getWorkType()
-                        && \in_array($assessment->getWorkType()->getName(), $workTypeNames, true)
-                    ) {
-                        if (!isset($assessmentTasks[$folder->getId()])) {
-                            $assessmentTasks[$folder->getId()] = [];
-                        }
-                        $assessmentTasks[$folder->getId()][] = $assessment;
-                    }
-
-                    $markbooksFolders[$folder->getId()]->add($assessment);
+            if ($folder instanceof Folder\Model && !$folder->isDeleted()) {
+                if (!isset($markbooksFolders[$folder->getId()])) {
+                    $markbooksFolders[$folder->getId()] = $this->getAssessmentMapperProxy()->createCollection();
+                    $folder->loadTeachers();
+                    $folders->add($folder);
                 }
+
+                if ($assessment instanceof DueWork\Model && $assessment->getWorkType()
+                    && \in_array($assessment->getWorkType()->getName(), $workTypeNames, true)
+                ) {
+                    if (!isset($assessmentTasks[$folder->getId()])) {
+                        $assessmentTasks[$folder->getId()] = [];
+                    }
+                    $assessmentTasks[$folder->getId()][] = $assessment;
+                }
+
+                $markbooksFolders[$folder->getId()]->add($assessment);
             }
         }
 
