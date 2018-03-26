@@ -61,8 +61,12 @@ class StartTrigger extends TimetableTrigger
      * @throws OutOfBoundsException if this period is not relevant
      * @return ADF
      */
-    protected function testPeriod(ADF $start, ADF $end, ADF $now)
+    protected function testPeriod(ADF $start, ?ADF $end, ADF $now)
     {
+        if (!$end) {
+            return null;
+        }
+
         // if we're not yet inside this period, return its start time
         if ($now->lte($start)) {
             return $start;

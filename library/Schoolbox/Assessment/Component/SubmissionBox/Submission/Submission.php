@@ -261,7 +261,7 @@ class Submission implements IStorage, ISoftDeletable
      */
     public function setSubmittedAt(\Alaress_Date_Format $submittedAt = null)
     {
-        $this->submittedAt = $submittedAt ?: new \Alaress_Date_NullDate();
+        $this->submittedAt = $submittedAt;
         return $this;
     }
 

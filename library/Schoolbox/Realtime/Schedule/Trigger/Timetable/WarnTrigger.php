@@ -74,7 +74,7 @@ class WarnTrigger extends TimetableTrigger
      * @throws OutOfBoundsException if this period is not relevant
      * @return ADF
      */
-    protected function testPeriod(ADF $start, ADF $end, ADF $now)
+    protected function testPeriod(ADF $start, ?ADF $end, ADF $now)
     {
         // if we're not yet inside this period, return its start time minus the warning window
         $warn = $this->applyWindow(clone $start);

@@ -233,19 +233,19 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
             $startTime =
                 $period['start']
                     ? new Alaress_Date_Format($period['start'], Alaress_Date_Format::DATABASE_TIME_FORMAT)
-                    : new Alaress_Date_NullDate();
+                    : null;
 
             $endTime =
                 $period['finish']
                     ? new Alaress_Date_Format($period['finish'], Alaress_Date_Format::DATABASE_TIME_FORMAT)
-                    : new Alaress_Date_NullDate();
+                    : null;
 
             if (!isset($periodListAdaption[$periodSequence])) {
                 $periodListAdaption[$periodSequence] = [
                     'periodNumber'   => $period['sequence'],
                     'periodName'     => $period['title'],
-                    'periodStart'    => $startTime->getTimeOnly(),
-                    'periodEnd'      => $endTime->getTimeOnly(),
+                    'periodStart'    => $startTime ? $startTime->getTimeOnly() : null,
+                    'periodEnd'      => $endTime ? $endTime->getTimeOnly() : null,
                     'periodSequence' => 1,
                     'day'            => array_fill(1, $dayCount, []),
                 ];
@@ -464,18 +464,18 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
             $startTime =
                 $period['start']
                     ? new Alaress_Date_Format($period['start'], Alaress_Date_Format::DATABASE_TIME_FORMAT)
-                    : new Alaress_Date_NullDate();
+                    : null;
 
             $endTime =
                 $period['finish']
                     ? new Alaress_Date_Format($period['finish'], Alaress_Date_Format::DATABASE_TIME_FORMAT)
-                    : new Alaress_Date_NullDate();
+                    : null;
 
             $periodAdaption = [
                 'periodNumber'   => $period['sequence'],
                 'periodName'     => $period['title'],
-                'periodStart'    => $startTime->getTimeOnly(),
-                'periodEnd'      => $endTime->getTimeOnly(),
+                'periodStart'    => $startTime ? $startTime->getTimeOnly() : null,
+                'periodEnd'      => $endTime ? $endTime->getTimeOnly() : null,
                 'periodSequence' => 1,
                 'class'          => [],
             ];

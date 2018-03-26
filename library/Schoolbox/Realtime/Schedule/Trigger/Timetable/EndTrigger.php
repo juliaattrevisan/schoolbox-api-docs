@@ -61,9 +61,12 @@ class EndTrigger extends TimetableTrigger
      * @throws OutOfBoundsException if this period is not relevant
      * @return ADF
      */
-    protected function testPeriod(ADF $start, ADF $end, ADF $now)
+    protected function testPeriod(ADF $start, ?ADF $end, ADF $now)
     {
         // if we're inside this period, return its end
+        if (!$end) {
+            return null;
+        }
         if ($now->lt($end) && $now->gt($start)) {
             return $end;
         }

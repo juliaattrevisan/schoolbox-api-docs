@@ -205,10 +205,6 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     public function __construct()
     {
         $this->setCategory(new FolderModel());
-        $this->setPublishDate(new \Alaress_Date_NullDate());
-        $this->setOpenDate(new \Alaress_Date_NullDate());
-        $this->setDueDate(new \Alaress_Date_NullDate());
-        $this->setLateDate(new \Alaress_Date_NullDate());
         $this->setAssessmentModel(new Model());
     }
 

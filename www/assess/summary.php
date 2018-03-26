@@ -59,12 +59,12 @@ if (!$authorizer->isPathAuthorizedForUser('learningQuiz.getQuizSummary', $params
 if ($assess['start']) {
     $assessStartDate = new Alaress_Date_Format(strtotime($assess['start']), 'U');
 } else {
-    $assessStartDate = new Alaress_Date_NullDate();
+    $assessStartDate = null;
 }
 if ($assess['finish']) {
     $assessFinishDate = new Alaress_Date_Format(strtotime($assess['finish']), 'U');
 } else {
-    $assessFinishDate = new Alaress_Date_NullDate();
+    $assessFinishDate = null;
 }
 
 $returnUrl = ($_GET[Redirect::RETURN_URL] ?? '')
@@ -82,8 +82,8 @@ $this->setVar(array(
     'ASSESS_KIND'          => 'Quiz',
     'ASSESS_TITLE'         => Scrub::text($assess['title']),
     'ASSESS_DESCRIPTION'   => Scrub::html($assess['description']),
-    'ASSESS_START'         => $assessStartDate->getShort(),
-    'ASSESS_FINISH'        => $assessFinishDate->getShort(),
+    'ASSESS_START'         => $assessStartDate ? $assessStartDate->getShort() : '',
+    'ASSESS_FINISH'        => $assessFinishDate ? $assessFinishDate->getShort() : '',
     'FIRST_SECTION'        => $allSections[0]['section_id'] ?? null,
     'ASSESS_CATEGORY_ID'   => $folder->getId(),
     'ASSESS_CATEGORY_NAME' => Scrub::text($folder->getName()),

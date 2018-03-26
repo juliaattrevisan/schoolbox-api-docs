@@ -135,7 +135,7 @@ class Assess_Import_Xml extends Evaluation_Import_Xml
     {
         $context = $this->getAssessmentContext();
         $inUnitSpec = $context->getBaseContext() instanceof UnitSpec;
-        $nullDate = new Alaress_Date_NullDate();
+        $nullDate = null;
 
         $workType = null;
         if ($parser->getWorkType()) {

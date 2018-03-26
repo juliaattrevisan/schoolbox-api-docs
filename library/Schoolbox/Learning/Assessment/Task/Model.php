@@ -447,7 +447,7 @@ class Model extends AbstractAssessment
      * @param \Alaress_Date_Format $openAt
      * @return static
      */
-    public function setOpenAt(\Alaress_Date_Format $openAt)
+    public function setOpenAt(?\Alaress_Date_Format $openAt)
     {
         //noop
         return $this;
@@ -465,7 +465,7 @@ class Model extends AbstractAssessment
      * @param \Alaress_Date_Format $closeAt
      * @return static
      */
-    public function setCloseAt(\Alaress_Date_Format $closeAt)
+    public function setCloseAt(?\Alaress_Date_Format $closeAt)
     {
         // noop
         return $this;

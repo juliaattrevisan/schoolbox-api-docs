@@ -636,7 +636,7 @@ abstract class EventBase implements EventInterface
         if ($publishDate instanceof Alaress_Date_Format) {
             $this->publishDate = $publishDate;
         } elseif ($publishDate == null) {
-            $this->publishDate = new \Alaress_Date_NullDate();
+            $this->publishDate = null;
         } else {
             $this->publishDate = new Alaress_Date_Format($publishDate, 'Y-m-d H:i:s');
         }
