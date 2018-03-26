@@ -327,7 +327,7 @@ class ReturnedWork implements ISoftDeletable
      */
     public function isPublished()
     {
-        return ($this->getPublishedAt() instanceof \Alaress_Date_Format && !$this->getPublishedAt()->isNull());
+        return ($this->getPublishedAt() instanceof \Alaress_Date_Format);
     }
 
     /**

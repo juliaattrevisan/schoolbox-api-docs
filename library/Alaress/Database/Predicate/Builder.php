@@ -232,7 +232,7 @@ class Builder implements IBuilder
      */
     private function addScalarPredicate($columnName, $columnValue, string $operator): self
     {
-        if (\is_scalar($columnValue) || ($columnValue instanceof Alaress_Date_Format && !$columnValue->isNull())) {
+        if (\is_scalar($columnValue) || $columnValue instanceof Alaress_Date_Format) {
             return $this->addPredicate($columnName, $columnValue, $operator);
         }
         throw new TypeError('Invalid columnValue type. Expected: [string|int|float|ADF]. Actual: ' . gettype($columnValue));
@@ -508,10 +508,10 @@ class Builder implements IBuilder
         $compareFormat = Alaress_Date_Format::DATABASE_FORMAT
     ): ?self {
         $fromString = $toString = null;
-        if (isset($from) && !$from->isNull()) {
+        if (isset($from)) {
             $fromString = $from->getUsingFormat($compareFormat);
         }
-        if (isset($to) && !$to->isNull()) {
+        if (isset($to)) {
             $toString = $to->getUsingFormat($compareFormat);
         }
         try {

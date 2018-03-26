@@ -211,11 +211,11 @@ class EventMapper extends CalendarEventMapper
         $queryParts  = ['WHERE (e.deleted_at IS NULL)'];
         $queryParams = [];
 
-        if ($from instanceof Alaress_Date_Format && !$from->isNull()) {
+        if ($from instanceof Alaress_Date_Format) {
             $queryParts[]        = 'e.start_datetime >= :from';
             $queryParams['from'] = $from->getDatabaseDate();
         }
-        if ($to instanceof Alaress_Date_Format && !$to->isNull()) {
+        if ($to instanceof Alaress_Date_Format) {
             $queryParts[]      = 'e.start_datetime <= :to';
             $queryParams['to'] = $to->getDatabaseDate();
         }

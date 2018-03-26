@@ -73,10 +73,10 @@ class Leave_Request
      */
     public function getOccupancy($datetimeStart, $datetimeFinish)
     {
-        if (null === $this->getStart() || $this->getStart()->isNull()) {
+        if (null === $this->getStart()) {
             return false;
         }
-        if (null === $this->getFinish() || $this->getFinish()->isNull()) {
+        if (null === $this->getFinish()) {
             return false;
         }
         if (

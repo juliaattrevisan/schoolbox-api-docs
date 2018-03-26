@@ -1260,7 +1260,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     private function coalesceDates(?Alaress_Date_Format ...$dates): ?Alaress_Date_Format
     {
         foreach ($dates as $date) {
-            if ($date instanceof Alaress_Date_Format && !$date->isNull()) {
+            if ($date instanceof Alaress_Date_Format) {
                 return clone $date;
             }
         }

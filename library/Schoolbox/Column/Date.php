@@ -52,7 +52,7 @@ class Date extends Datetime
     public function hydrate($value, $mapper = null)
     {
         $hydrated = parent::hydrate($value, $mapper);
-        if (!empty($this->time) && !$hydrated->isNull()) {
+        if (!empty($this->time) && $hydrated) {
             $hydrated->modify($this->time);
         }
         return $hydrated;
