@@ -243,7 +243,7 @@ class Controller extends Base
         foreach ($assessments as $assessment) {
             $folder = $assessment->getContext()->getFolder();
 
-            if ($folder instanceof Folder\Model) {
+            if ($folder instanceof Folder\Model && !$folder->isDeleted()) {
                 if (!isset($foldersFound[$folder->getId()])) {
 
                     if (!isset($markbooksFolders[$folder->getId()])) {
