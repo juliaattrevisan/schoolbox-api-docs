@@ -252,8 +252,7 @@ class DueWorkTest extends TestCase
                     ->setPlagscan((new DueWorkSubmissionFilePlagscan())
                         ->setId($submissionFiles[0]['plagscan']['id'])
                         ->setStatus($submissionFiles[0]['plagscan']['status'])
-                        ->setScore($submissionFiles[0]['plagscan']['score'])
-                        ->setHtml($submissionFiles[0]['plagscan']['html'])))
+                        ->setScore($submissionFiles[0]['plagscan']['score'])))
                 ->add((new DueWorkSubmissionFile())
                     ->setId($submissionFiles[1]['id'])
                     ->setStorage((new Storage())
@@ -284,7 +283,6 @@ class DueWorkTest extends TestCase
         $this->assertEquals($submissionFiles[0]['plagscan']['id'], $submission->getAllFiles()->getOffset(0)->getPlagscan()->getId());
         $this->assertEquals($submissionFiles[0]['plagscan']['status'], $submission->getAllFiles()->getOffset(0)->getPlagscan()->getStatus());
         $this->assertEquals($submissionFiles[0]['plagscan']['score'], $submission->getAllFiles()->getOffset(0)->getPlagscan()->getScore());
-        $this->assertEquals($submissionFiles[0]['plagscan']['html'], $submission->getAllFiles()->getOffset(0)->getPlagscan()->getHtml());
 
         /* Dates
          */
@@ -404,8 +402,7 @@ class DueWorkTest extends TestCase
                     ->setPlagscan((new DueWorkSubmissionFilePlagscan())
                         ->setId($submissionFiles[0]['plagscan']['id'])
                         ->setStatus($submissionFiles[0]['plagscan']['status'])
-                        ->setScore($submissionFiles[0]['plagscan']['score'])
-                        ->setHtml($submissionFiles[0]['plagscan']['html'])))
+                        ->setScore($submissionFiles[0]['plagscan']['score'])))
                 ->add((new DueWorkSubmissionFile())
                     ->setId($submissionFiles[1]['id'])
                     ->setStorage((new Storage())
@@ -537,7 +534,6 @@ class DueWorkTest extends TestCase
                                     ->setId($submissionFiles[0]['plagscan']['id'])
                                     ->setStatus($submissionFiles[0]['plagscan']['status'])
                                     ->setScore($submissionFiles[0]['plagscan']['score'])
-                                    ->setHtml($submissionFiles[0]['plagscan']['html'])
                             )
                     )
                     ->add(
@@ -780,8 +776,7 @@ class DueWorkTest extends TestCase
                     ->setPlagscan((new DueWorkSubmissionFilePlagscan())
                         ->setId($submissionFiles[0]['plagscan']['id'])
                         ->setStatus($submissionFiles[0]['plagscan']['status'])
-                        ->setScore($submissionFiles[0]['plagscan']['score'])
-                        ->setHtml($submissionFiles[0]['plagscan']['html'])))
+                        ->setScore($submissionFiles[0]['plagscan']['score'])))
                 ->add((new DueWorkSubmissionFile())
                     ->setId($submissionFiles[1]['id'])
                     ->setStorage((new Storage())
