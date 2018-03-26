@@ -77,15 +77,6 @@ class ReturnedWork implements ISoftDeletable
 
 
     /**
-     * Is this a confirmation of an existing submission?
-     * If it is, it probably doesn't show in returns and is only for setting a
-     * default mark on a submission.
-     *
-     * @var bool
-     */
-    protected $isConfirmationOfSubmission = false;
-
-    /**
      * @var \Alaress_Date_Format
      */
     protected $publishedAt;
@@ -291,24 +282,6 @@ class ReturnedWork implements ISoftDeletable
         return $this;
     }
 
-
-    /**
-     * @return boolean
-     */
-    public function getIsConfirmationOfSubmission()
-    {
-        return $this->isConfirmationOfSubmission;
-    }
-
-    /**
-     * @param  boolean $isConfirmationOfSubmission
-     * @return $this
-     */
-    public function setIsConfirmationOfSubmission($isConfirmationOfSubmission)
-    {
-        $this->isConfirmationOfSubmission = $isConfirmationOfSubmission;
-        return $this;
-    }
 
     /**
      * Is this a draft?
