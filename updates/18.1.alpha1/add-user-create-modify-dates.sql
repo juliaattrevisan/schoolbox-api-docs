@@ -1,10 +1,10 @@
 ALTER TABLE `user`
     ADD COLUMN `created_at`
-    DATETIME NULL
+    DATETIME NOT NULL
     AFTER `display_grade_graph`,
 
     ADD COLUMN `updated_at`
-    DATETIME NULL
+    DATETIME NOT NULL
     AFTER `created_at`,
 
     CHANGE COLUMN `deleted_at` `deleted_at`
