@@ -31,10 +31,12 @@ class Controller extends Base
         $this->errorMapper = $errorMapper;
     }
 
+
     /**
      * NCEA Report
      *
      * @param User $user
+     * @throws \Alaress\Database\Exception
      * @throws \Aura\Di\Exception\ServiceNotFound
      */
     public function getReport(User $user)
@@ -42,7 +44,7 @@ class Controller extends Base
         /** @var IConnector $externalDb */
         $externalDb = $this->getDi()->get('databaseExternal');
 
-        $acquisition = new Acquisition($externalDb, $user->getExternalId());
+        $acquisition = (new Acquisition($externalDb, $user->getExternalId()))->getRecords();
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@nceaReport/report.twig', [
             'user' => $user

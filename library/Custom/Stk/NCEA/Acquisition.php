@@ -42,10 +42,12 @@ class Acquisition
 
     /**
      * Get all the NCEA data for $externalId
+     *
+     * @throws \Alaress\Database\Exception
      */
     public function getRecords()
     {
-        $statement = $this->database->prepare('
+        $statement = $this->database->prepareQuery('
             SELECT 
                 R.FileYear,
                 R.ID,
@@ -69,5 +71,9 @@ class Acquisition
         $statement->execute([
             'externalId' => $this->externalId
         ]);
+
+        while ($row = $statement->fetch()) {
+            new \Alaress_Probe($row);
+        }
     }
 }
