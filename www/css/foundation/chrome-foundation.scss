@@ -49,7 +49,6 @@
 //////////////////////////////////////////////////////////
 @import "ui/data-tables";
 @import "ui/alert-boxes";
-@import "ui/swipe";
 @import "ui/iframe";
 @import "ui/cards";
 
@@ -74,6 +73,10 @@
 @import "components/course/course";
 @import "components/marksheet";
 @import 'components/assessment/participation';
+
+// Slider
+@import "../../javascript/components/swiper/dist/css/swiper.css";
+@import "ui/swipe";
 
 // Feature Tour
 @import "../../javascript/components/intro.js/introjs.css";
