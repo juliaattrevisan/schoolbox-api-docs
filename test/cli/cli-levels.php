@@ -30,10 +30,6 @@ foreach($fields as $f) {
     }
 }
 
-$l = new \Alaress\Lumberjack\Logger(STDOUT, STDERR, 100, $display, isset($opts['porcelain']));
-
-$l->info("CLI Logger Demo", array('char' => '>'));
-
 $threshold = 0;
 if(isset($opts['v'])) {
     $threshold = 1;
@@ -42,11 +38,13 @@ if(isset($opts['v'])) {
     }
 }
 
+$l = new \Alaress\Lumberjack\Logger(STDOUT, STDERR, $threshold, $display, isset($opts['porcelain']));
+
+$l->info("CLI Logger Demo", array('char' => '>'));
+
 $l->info("Test different levels with -[v|vv|vvv] (currently $threshold/3)");
 $l->info("Test different meta with [--pid|--mem|--truemem|--level]");
 $l->info("Test human vs. machine parseable with --porcelain");
-
-$l->setLevel($limits[$threshold]);
 
 // covered by level 3
 $l->debug("This is DEBUG(100), which should include info that might be useful for bugfinding");
