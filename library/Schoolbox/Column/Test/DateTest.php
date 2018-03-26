@@ -127,7 +127,9 @@ class DateTest extends DatetimeTest
     {
         // Errors are squelched during hydration, as the date and time tests
         // raise a set of warnings due to trailing data.
-        $this->assertEquals($expectedHydratedValue, @$column->hydrate($input)->getDatabase());
+        $actual = @$column->hydrate($input);
+        // Null hydrates to ''
+        $this->assertEquals($expectedHydratedValue, $actual ? $actual->getDatabase() : '');
     }
 
     /**
