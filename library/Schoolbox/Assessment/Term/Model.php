@@ -99,21 +99,21 @@ class Model implements \IComparable, IModel
     public function contains(Alaress_Date_Format $date)
     {
         // TODO make ADF immutable already
-        $start  = clone $this->getStart();
-        $finish = clone $this->getActualFinish();
+        $start  = $this->getStart() ? clone $this->getStart() : null;
+        $finish = $this->getActualFinish() ? clone $this->getActualFinish() : null;
 
         // No bounds on this term?
-        if ($start->isNull() && $finish->isNull()) {
+        if (!$start && !$finish) {
             return true;
         }
 
         // No start? accept any date before finish
-        if ($start->isNull()) {
+        if (!$start) {
             return $date->lte($finish->endOfDay());
         }
 
         // No end: accept any date after start
-        if ($finish->isNull()) {
+        if (!$finish) {
             return $date->gte($start->startOfDay());
         }
 
@@ -320,13 +320,13 @@ class Model implements \IComparable, IModel
 
         // Interpret NULL date as infinitely in future
 
-        if ($this->actualFinish->isNull() && $other->actualFinish->isNull()) {
+        if (!$this->actualFinish && !$other->actualFinish) {
             return 0;
         }
-        if ($other->actualFinish->isNull()) {
+        if (!$other->actualFinish) {
             return -1;
         }
-        if ($this->actualFinish->isNull()) {
+        if (!$this->actualFinish) {
             return 1;
         }
         return $this->actualFinish->compare($other->actualFinish);

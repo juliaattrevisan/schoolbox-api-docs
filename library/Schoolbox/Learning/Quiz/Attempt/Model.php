@@ -84,7 +84,7 @@ class Model implements ISoftDeletable
      */
     public function isDeleted()
     {
-        return !$this->getDeleted()->isNull();
+        return $this->getDeleted() instanceof Alaress_Date_Format;
     }
 
     /* Getters / Setters
@@ -166,7 +166,7 @@ class Model implements ISoftDeletable
      */
     public function isReviewed()
     {
-        return ($this->getReviewed() instanceof \Alaress_Date_Format && !$this->getReviewed()->isNull());
+        return $this->getReviewed() instanceof \Alaress_Date_Format;
     }
 
     /**

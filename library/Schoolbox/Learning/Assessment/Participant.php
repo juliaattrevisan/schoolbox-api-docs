@@ -535,7 +535,7 @@ class Participant
      */
     private function coalesceDates(?Alaress_Date_Format $planDate, Alaress_Date_Format $assessmentDate): Alaress_Date_Format
     {
-        return null === $planDate || $planDate->isNull() ? $assessmentDate : $planDate;
+        return $planDate ?? $assessmentDate;
     }
 
 
@@ -610,7 +610,7 @@ class Participant
     public function isExcluded(): bool
     {
         // Excluded if a non-null date.
-        return $this->excludedAt instanceof Alaress_Date_Format && !$this->excludedAt->isNull();
+        return $this->excludedAt instanceof Alaress_Date_Format;
     }
 
 

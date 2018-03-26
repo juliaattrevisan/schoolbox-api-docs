@@ -70,7 +70,7 @@ class Component extends Filter\BaseComponent
         if ($previousTerm && $abstractOptions[Definition::KEY_PREVIOUS]->getAvailable() && $previousTerm->getId() === $term->getId()) {
             return true;
         }
-        if (!$termFinish->isNull() && $abstractOptions[Definition::KEY_PAST]->getAvailable() && $term->getActualFinish()->isPast()) {
+        if ($termFinish && $abstractOptions[Definition::KEY_PAST]->getAvailable() && $term->getActualFinish()->isPast()) {
             return true;
         }
         if ($abstractOptions[$term->getId()] && $abstractOptions[$term->getId()]->getAvailable()) {
@@ -119,7 +119,7 @@ class Component extends Filter\BaseComponent
             return true;
         }
         if (
-            !$termFinish->isNull() && $abstractOptions->offsetExists(Definition::KEY_PAST) && $term->getActualFinish()->isPast()
+            $abstractOptions->offsetExists(Definition::KEY_PAST) && $term->getActualFinish()->isPast()
             && $abstractOptions[Definition::KEY_PAST]->getDefaults()[$roleType]->getSelected()
         ) {
             return true;

@@ -94,7 +94,7 @@ class ResponseFile extends DAV\File
     public function getLastModified()
     {
         $date = $this->responseFile->getCreatedAt();
-        if ($date instanceof \Alaress_Date_Format && !$date->isNull()) {
+        if ($date instanceof \Alaress_Date_Format) {
             return $date->getUnixTimeStamp();
         }
         return time();

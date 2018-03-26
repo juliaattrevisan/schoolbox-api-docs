@@ -347,13 +347,13 @@ class Full
     protected function getDate($interaction)
     {
         if ($interaction instanceof IResponse) {
-            if (!$interaction->getSubmittedAt()->isNull()) {
+            if ($interaction->getSubmittedAt()) {
                 return $interaction->getSubmittedAt();
             }
         } elseif ($interaction instanceof IFeedback) {
-            if (!$interaction->getPublishedAt()->isNull()) {
+            if ($interaction->getPublishedAt()) {
                 return $interaction->getPublishedAt();
-            } elseif (!$interaction->getUpdatedAt()->isNull()) {
+            } elseif ($interaction->getUpdatedAt()) {
                 return $interaction->getUpdatedAt();
             }
         }

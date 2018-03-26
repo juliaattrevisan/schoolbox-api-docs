@@ -56,8 +56,6 @@ class DueDateSortStrategy
         if (
             $aDate instanceof Alaress_Date_Format
             && $bDate instanceof Alaress_Date_Format
-            && !$aDate->isNull()
-            && !$bDate->isNull()
         ) {
             $dateComp = $aDate->compare($bDate);
             if ($dateComp) {

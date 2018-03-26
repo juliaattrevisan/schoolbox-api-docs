@@ -96,7 +96,7 @@ abstract class TimetableTrigger extends AbstractTrigger
         // find a relevant time
         $relevantTime = $this->getRelevantTime($definition, $now);
 
-        if (!$relevantTime->isNull()) {
+        if ($relevantTime) {
             // if it's not null, return it
             return $relevantTime->getUnixTimeStamp();
         }

@@ -72,7 +72,7 @@ class Model implements ISoftDeletable, ValueLabelInterface
      */
     public function isArchived()
     {
-        return !$this->getArchivedAt()->isNull();
+        return $this->getArchivedAt() instanceof Alaress_Date_Format;
     }
 
     /* Getters/Setters

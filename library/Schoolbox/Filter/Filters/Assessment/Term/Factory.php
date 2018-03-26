@@ -140,7 +140,7 @@ abstract class Factory extends AbstractFactory
             // Get the most recent term that finished in the past
             foreach ($terms as $term) {
                 $termFinish = $term->getActualFinish();
-                if (!$termFinish->isNull() && $termFinish->isPast()) {
+                if ($termFinish && $termFinish->isPast()) {
                     return $term;
                 }
             }

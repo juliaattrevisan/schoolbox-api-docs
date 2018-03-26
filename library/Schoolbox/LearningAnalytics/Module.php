@@ -228,7 +228,7 @@ class Module extends BaseModule
 
             // Ensure Assessment is due in term
             $dueAfterTermStart = $assessment->getDueAt()->gte($term->getStart());
-            $dueBeforeTermEnd  = $term->getActualFinish()->isNull() || $assessment->getDueAt()->lt($term->getActualFinish());
+            $dueBeforeTermEnd  = !$term->getActualFinish() || $assessment->getDueAt()->lt($term->getActualFinish());
             return $dueAfterTermStart && $dueBeforeTermEnd;
         });
 

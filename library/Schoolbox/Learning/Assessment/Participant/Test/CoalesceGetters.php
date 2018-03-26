@@ -138,10 +138,10 @@ class CoalesceGetters extends TestCase
 
                     $data[] = [
                         new Participant(new User(), $planObject),
-                        null === $planDate || $planDate->isNull() ? $assessmentDate : $planDate,
-                        null === $planDate || $planDate->isNull() ? $assessmentDate : $planDate,
-                        null === $planDate || $planDate->isNull() ? $assessmentDate : $planDate,
-                        null === $planDate || $planDate->isNull() ? $assessmentDate : $planDate,
+                        $planDate ?? $assessmentDate,
+                        $planDate ?? $assessmentDate,
+                        $planDate ?? $assessmentDate,
+                        $planDate ?? $assessmentDate,
                     ];
 
                     // Dynamic plan: always use assessment's date

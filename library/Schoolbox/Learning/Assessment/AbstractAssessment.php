@@ -387,7 +387,7 @@ abstract class AbstractAssessment implements IAssessable
      */
     public function isPublished(?User $student, Alaress_Date_Format $now = null): bool
     {
-        if (null === $now || $now->isNull()) {
+        if (null === $now) {
             $now = Alaress_Date_Format::now();
         }
 
@@ -415,7 +415,7 @@ abstract class AbstractAssessment implements IAssessable
             $closeDate = $this->getCloseAt();
         }
 
-        if (null === $now || $now->isNull()) {
+        if (null === $now) {
             $now = Alaress_Date_Format::now();
         }
 
@@ -428,7 +428,7 @@ abstract class AbstractAssessment implements IAssessable
      */
     public function isOverdue(Alaress_Date_Format $now = null)
     {
-        if (null === $now || $now->isNull()) {
+        if (null === $now) {
             $now = Alaress_Date_Format::now();
         }
 
@@ -442,7 +442,7 @@ abstract class AbstractAssessment implements IAssessable
      */
     public function isPastClose(Alaress_Date_Format $now = null)
     {
-        if (null === $now || $now->isNull()) {
+        if (null === $now) {
             $now = Alaress_Date_Format::now();
         }
 
@@ -759,7 +759,7 @@ abstract class AbstractAssessment implements IAssessable
         $previousLabel = '';
 
         foreach ($dates as $label => $adf) {
-            if ($adf->isNull()) {
+            if (!$adf instanceof Alaress_Date_Format) {
                 throw new InvalidArgumentException("Please set a {$label} date");
             }
 
