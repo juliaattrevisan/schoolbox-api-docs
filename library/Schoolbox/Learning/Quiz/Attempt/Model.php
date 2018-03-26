@@ -112,7 +112,7 @@ class Model implements ISoftDeletable
      * @param  Alaress_Date_Format $finish
      * @return $this
      */
-    public function setFinish(Alaress_Date_Format $finish)
+    public function setFinish(?Alaress_Date_Format $finish)
     {
         $this->finish = $finish;
         return $this;
@@ -145,7 +145,7 @@ class Model implements ISoftDeletable
      *
      * @return $this
      */
-    public function setReviewed(Alaress_Date_Format $reviewed)
+    public function setReviewed(?Alaress_Date_Format $reviewed)
     {
         $this->reviewed = $reviewed;
         return $this;
@@ -212,7 +212,7 @@ class Model implements ISoftDeletable
      *
      * @return $this
      */
-    public function setDeleted(Alaress_Date_Format $deleted)
+    public function setDeleted(?Alaress_Date_Format $deleted)
     {
         $this->deleted = $deleted;
         return $this;
