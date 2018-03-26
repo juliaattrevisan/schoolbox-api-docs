@@ -9,7 +9,6 @@
 namespace Schoolbox\Learning\Assessment\DataModel;
 
 use Alaress_Date_Format;
-use Alaress_Date_NullDate;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Assessment\Component\SubmissionBox as DueWork;
@@ -242,13 +241,6 @@ class Model implements ISoftDeletable
      */
     public function __construct()
     {
-        $this->publishDate     = new Alaress_Date_NullDate();
-        $this->openDate        = new Alaress_Date_NullDate();
-        $this->dueDate         = new Alaress_Date_NullDate();
-        $this->closeDate       = new Alaress_Date_NullDate();
-        $this->createdAt       = new Alaress_Date_NullDate();
-        $this->updatedAt       = new Alaress_Date_NullDate();
-        $this->deletedAt       = new Alaress_Date_NullDate();
     }
 
 

@@ -15,7 +15,6 @@ use Schoolbox\Fixtures\Season;
 use Schoolbox\Fixtures\Division;
 use Schoolbox\Fixtures\Team;
 use Alaress_Date_Format;
-use Alaress_Date_NullDate;
 
 class ArchivedSeason extends TestCase
 {
@@ -256,7 +255,7 @@ class ArchivedSeason extends TestCase
     {
         $team = $this->buildTeamInArchivedSeason();
         $team->setName('Team in non-archived season');
-        $team->getDivision()->getSeason()->setArchivedAt(new Alaress_Date_NullDate());
+        $team->getDivision()->getSeason()->setArchivedAt(null);
         return $team;
     }
 
@@ -274,7 +273,7 @@ class ArchivedSeason extends TestCase
             ->setUrl('http://www.google.com')
             ->setCreatedAt($this->buildDate('2001-01-01'))
             ->setUpdatedAt($this->buildDate('2001-01-01'))
-            ->setDeletedAt(new Alaress_Date_NullDate());
+            ->setDeletedAt(null);
         return $model;
     }
 
@@ -286,7 +285,7 @@ class ArchivedSeason extends TestCase
     {
         $division = $this->buildDivisionInArchivedSeason();
         $division->setName('Division linked to non-archived season');
-        $division->getSeason()->setArchivedAt(new Alaress_Date_NullDate());
+        $division->getSeason()->setArchivedAt(null);
         return $division;
     }
 
@@ -305,7 +304,7 @@ class ArchivedSeason extends TestCase
             ->setName('Division linked to archived season')
             ->setCreatedAt($this->buildDate('2001-01-01'))
             ->setUpdatedAt($this->buildDate('2001-01-01'))
-            ->setDeletedAt(new Alaress_Date_NullDate());
+            ->setDeletedAt(null);
         return $division;
     }
 
@@ -317,7 +316,7 @@ class ArchivedSeason extends TestCase
     {
         $season = $this->buildArchivedSeason();
         $season->setName('Non-Archived')
-               ->setArchivedAt(new Alaress_Date_NullDate());
+               ->setArchivedAt(null);
         return $season;
     }
 
@@ -336,7 +335,7 @@ class ArchivedSeason extends TestCase
             ->setArchivedAt($this->buildDate('2020-01-01'))
             ->setCreatedAt($this->buildDate('2001-01-01'))
             ->setUpdatedAt($this->buildDate('2001-01-01'))
-            ->setDeletedAt(new Alaress_Date_NullDate());
+            ->setDeletedAt(null);
         return $model;
     }
 

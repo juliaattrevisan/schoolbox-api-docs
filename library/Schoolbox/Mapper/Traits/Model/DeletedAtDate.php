@@ -36,7 +36,7 @@ trait DeletedAtDate
      * @param  Alaress_Date_Format|null $deletedAt
      * @return $this
      */
-    public function setDeletedAt(Alaress_Date_Format $deletedAt = null)
+    public function setDeletedAt(?Alaress_Date_Format $deletedAt = null)
     {
         $this->deletedAt = $deletedAt;
         return $this;

@@ -11,7 +11,6 @@
 namespace Schoolbox\Learning\Assessment;
 
 use Alaress_Date_Format;
-use Alaress_Date_NullDate;
 use InvalidArgumentException;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
@@ -188,19 +187,19 @@ abstract class AbstractAssessment implements IAssessable
      */
     public function __clone()
     {
-        $this->setPublishAt($this->getPublishAt() instanceof Alaress_Date_Format ? clone $this->getPublishAt() : new Alaress_Date_NullDate());
-        $this->setOpenAt($this->getOpenAt() instanceof Alaress_Date_Format ? clone $this->getOpenAt() : new Alaress_Date_NullDate());
-        $this->setDueAt($this->getDueAt() instanceof Alaress_Date_Format ? clone $this->getDueAt() : new Alaress_Date_NullDate());
-        $this->setCloseAt($this->getCloseAt() instanceof Alaress_Date_Format ? clone $this->getCloseAt() : new Alaress_Date_NullDate());
+        $this->setPublishAt($this->getPublishAt() instanceof Alaress_Date_Format ? clone $this->getPublishAt() : null);
+        $this->setOpenAt($this->getOpenAt() instanceof Alaress_Date_Format ? clone $this->getOpenAt() : null);
+        $this->setDueAt($this->getDueAt() instanceof Alaress_Date_Format ? clone $this->getDueAt() : null);
+        $this->setCloseAt($this->getCloseAt() instanceof Alaress_Date_Format ? clone $this->getCloseAt() : null);
 
         $this->plans = $this->getPlans()->emptyClone();
 
         /* TODO: Dump away all the attached files?
          */
 
-        $this->setCreatedAt($this->getCreatedAt() instanceof Alaress_Date_Format ? clone $this->getCreatedAt() : new Alaress_Date_NullDate());
-        $this->setUpdatedAt($this->getUpdatedAt() instanceof Alaress_Date_Format ? clone $this->getUpdatedAt() : new Alaress_Date_NullDate());
-        $this->setDeletedAt($this->getDeletedAt() instanceof Alaress_Date_Format ? clone $this->getDeletedAt() : new Alaress_Date_NullDate());
+        $this->setCreatedAt($this->getCreatedAt() instanceof Alaress_Date_Format ? clone $this->getCreatedAt() : null);
+        $this->setUpdatedAt($this->getUpdatedAt() instanceof Alaress_Date_Format ? clone $this->getUpdatedAt() : null);
+        $this->setDeletedAt($this->getDeletedAt() instanceof Alaress_Date_Format ? clone $this->getDeletedAt() : null);
     }
 
 

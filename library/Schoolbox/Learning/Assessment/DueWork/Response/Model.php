@@ -9,7 +9,6 @@
 namespace Schoolbox\Learning\Assessment\DueWork\Response;
 
 use Alaress_Date_Format;
-use Alaress_Date_NullDate;
 use Schoolbox\Collection;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
 use Schoolbox\Learning\Assessment\DueWork\Feedback;
@@ -151,7 +150,7 @@ class Model extends AbstractResponse
      */
     public function setSubmittedAt(Alaress_Date_Format $submittedAt = null)
     {
-        $this->submittedAt = $submittedAt ?: new Alaress_Date_NullDate();
+        $this->submittedAt = $submittedAt;
         return $this;
     }
 }

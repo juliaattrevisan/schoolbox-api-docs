@@ -26,7 +26,6 @@ use Schoolbox\Learning\InlineGrader\Kami\Exception;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\IStorage;
 use Alaress_Date_Format;
-use Alaress_Date_NullDate;
 use Schoolbox\User;
 use stdClass;
 
@@ -633,7 +632,7 @@ class Connector implements IConnector
                 throw new Exception\ApiException("Property session_expiry is not able to be parsed as a date");
             }
         } else {
-            $sessionExpiry = new Alaress_Date_NullDate();
+            $sessionExpiry = null;
         }
         return new Session($sessionKey, $obj->viewer_url, $sessionExpiry);
     }

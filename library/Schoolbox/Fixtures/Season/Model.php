@@ -154,7 +154,7 @@ class Model implements ISoftDeletable, ValueLabelInterface
      * @param Alaress_Date_Format $archivedAt
      * @return static
      */
-    public function setArchivedAt(Alaress_Date_Format $archivedAt)
+    public function setArchivedAt(?Alaress_Date_Format $archivedAt)
     {
         $this->archivedAt = $archivedAt;
         return $this;

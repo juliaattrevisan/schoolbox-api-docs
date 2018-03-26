@@ -10,7 +10,6 @@ namespace Schoolbox\Pastoral;
 
 use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use Alaress_Date_Format;
-use Alaress_Date_NullDate;
 use House;
 use PDOStatement;
 use Schoolbox\Campus;

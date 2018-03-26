@@ -21,7 +21,6 @@ use PHPUnit\Framework\TestCase;
 use Alaress\Database\Quoter\Mysql;
 use Traversable;
 use Alaress_Date_Format;
-use Alaress_Date_NullDate;
 
 /**
  * Test that the Predicate Builder's public methods throw the exceptions they claim to.
@@ -698,13 +697,11 @@ class TestExpectedExceptions extends TestCase
         $data = [];
         foreach ($this->getValidColumnNames() as $validColumn) {
             $data[] = [$validColumn, null];
-            $data[] = [$validColumn, new Alaress_Date_NullDate()];
             $data[] = [$validColumn, []];
             $data[] = [$validColumn, [10, 20]];
         }
         foreach ($this->getSqlFuncWithValidColumnNames() as $validSqlFunc) {
             $data[] = [$validSqlFunc, null];
-            $data[] = [$validSqlFunc, new Alaress_Date_NullDate()];
             $data[] = [$validSqlFunc, []];
             $data[] = [$validSqlFunc, [10, 20]];
         }

@@ -9,7 +9,6 @@
 namespace Schoolbox\User\Password\Reset;
 
 use Alaress_Date_Format;
-use Alaress_Date_NullDate;
 use Schoolbox\User;
 
 /**
@@ -61,9 +60,8 @@ class Model
      */
     public function __construct()
     {
-        $this->user      = new User();
-        $this->expiry    = Alaress_Date_Format::now()->addDays(1);
-        $this->resetTime = new Alaress_Date_NullDate();
+        $this->user   = new User();
+        $this->expiry = Alaress_Date_Format::now()->addDays(1);
     }
 
     /**

@@ -12,7 +12,6 @@ namespace Schoolbox\Learning\Assessment\Participant\Test;
 
 use PHPUnit\Framework\TestCase;
 use Alaress_Date_Format;
-use Alaress_Date_NullDate;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Plan as PlanObject;
@@ -191,13 +190,12 @@ class CoalesceGetters extends TestCase
 
 
     /**
-     * @return null[]|Alaress_Date_NullDate[]|Alaress_Date_Format[]
+     * @return null[]|Alaress_Date_Format[]|Alaress_Date_Format[]
      */
     private function getDates(): array
     {
         return [
             null,
-            new Alaress_Date_NullDate(),
             $this->buildDate('2016-01-01 00:00:00'),
             $this->buildDate('2016-01-01 12:00:00'),
             $this->buildDate('2016-01-01 23:59:59'),

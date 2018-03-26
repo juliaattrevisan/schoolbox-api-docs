@@ -17,7 +17,6 @@ use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\User;
 use Alaress_Date_Format;
 use Schoolbox\Learning\Quiz\Attempt\Answer\Model as QuizAnswer;
-use Alaress_Date_NullDate;
 
 class Model implements ISoftDeletable
 {
