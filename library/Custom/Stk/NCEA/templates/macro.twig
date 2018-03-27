@@ -7,6 +7,9 @@
     {% endif %}
 {% endmacro %}
 
+{# Render a comma-separated list of values for a given Achievement letter
+ # Used to populate the stacked barchart's array of values
+ #}
 {% macro renderCreditsforAchievement(data, achievement) %}
     {% for level, value in data.graph[achievement] %}
         {{ value }}{% if not loop.last %}, {% endif %}
