@@ -31,6 +31,17 @@ interface IMapper
 
 
     /**
+     * Returns whether this entity is soft-deletable.
+     *
+     * This is not necessarily equal to whether the table has a soft-delete column. The entity may take
+     * its soft-deletion status from a different table, eg `submission_box` from `assessment`
+     *
+     * @return bool
+     */
+    public function isSoftDeletable(): bool;
+
+
+    /**
      * @param null|int $idValue
      * @return mixed
      * @todo return an IModel interface
