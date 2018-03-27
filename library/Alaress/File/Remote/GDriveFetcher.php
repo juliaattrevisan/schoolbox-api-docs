@@ -104,38 +104,28 @@ class GDriveFetcher implements FetcherInterface
 
         if (isset($metadata['labels']['restricted']) && $metadata['labels']['restricted'] == true) {
             // if this file has been flagged by Drive as "restricted", disallow any download
-            $url = null;
-            $ext = '';
+            return null;
 
         } elseif ($this->getConfigLoader()->get('googledrive_export_pdf') == '1' && isset($metadata['exportLinks']['application/pdf'])) {
             // if there is a PDF-export option for this file (and the config is set to do pdf export), always give that preference
             $url = $metadata['exportLinks']['application/pdf'];
-            $ext = '.pdf';
-
         } else {
-
             if ($metadata['mimeType'] == "application/vnd.google-apps.presentation") {
                 // Get PPTX format slides
                 $url = $metadata['exportLinks']['application/vnd.openxmlformats-officedocument.presentationml.presentation'];
-                $ext = '.pptx';
             } else if ($metadata['mimeType'] == "application/vnd.google-apps.document") {
                 // Get DOCX format spreadsheet
                 $url = $metadata['exportLinks']['application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
-                $ext = '.docx';
             } else if ($metadata['mimeType'] == "application/vnd.google-apps.spreadsheet") {
                 // Get XLSX format spreadsheet
                 $url = $metadata['exportLinks']['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'];
-                $ext = '.xlsx';
             } else if (!empty($metadata['downloadUrl'])) {
                 // Fall back to the download URL
                 $url = $metadata['downloadUrl'];
-                $ext = $this->deriveFileExtension($metadata);
             } else {
                 // Last ditched PDF attempt if the download URL not set
                 $url = $metadata['exportLinks']['application/pdf'];
-                $ext = '.pdf';
             }
-
         }
 
         if (!$url) {
@@ -143,7 +133,7 @@ class GDriveFetcher implements FetcherInterface
             throw new OutOfBoundsException("No url found for download");
         }
 
-        $destination = $this->getFirstFreeName($this->parseTitle($metadata['title'], $ext));
+        $destination = tempnam($this->dir, 'gdrive-');
 
         if (!($fp = fopen($destination, 'w'))) {
             throw new OutOfBoundsException("Could not open target");
@@ -163,20 +153,34 @@ class GDriveFetcher implements FetcherInterface
 
 
     /**
-     * Derive the file extension from the metadata
+     * Derive the file name from the metadata
      *
      * @param array $metadata
      * @return string
      */
-    protected function deriveFileExtension(array $metadata)
+    public function deriveFileName(array $metadata)
     {
-        if ($metadata['fullFileExtension']) {
-            // attempt to use the file extension proper
-            return '.' . $metadata['fullFileExtension'];
-        }
+            if ($this->getConfigLoader()->get('googledrive_export_pdf') == '1' && isset($metadata['exportLinks']['application/pdf'])) {
+                // if there is a PDF-export option for this file (and the config is set to do pdf export), always give that preference
+                $ext = '.pdf';
+            } else {
+                if ($metadata['mimeType'] == "application/vnd.google-apps.presentation") {
+                    $ext = '.pptx';
+                } else if ($metadata['mimeType'] == "application/vnd.google-apps.document") {
+                    // Get DOCX format spreadsheet
+                    $ext = '.docx';
+                } else if ($metadata['mimeType'] == "application/vnd.google-apps.spreadsheet") {
+                    // Get XLSX format spreadsheet
+                    $ext = '.xlsx';
+                } else if ($metadata['fullFileExtension']) {
+                    // attempt to use the file extension proper
+                    $ext = '.' . $metadata['fullFileExtension'];
+                } else {
+                    $ext = '.pdf';
+                }
+            }
 
-        // nothing else we can really go on
-        return '';
+            return $metadata['title'].$ext;
     }
 
 
@@ -218,29 +222,4 @@ class GDriveFetcher implements FetcherInterface
         curl_setopt_array($ch, $opts);
         return $ch;
     }
-
-    /**
-     * @param $filename
-     * @return string
-     */
-    protected function getFirstFreeName($filename)
-    {
-        if (($dot = strrpos($filename, '.')) === false) {
-            $title = $filename;
-            $ext   = '';
-        } else {
-            $title = substr($filename, 0, $dot);
-            $ext   = substr($filename, $dot);
-        }
-
-        $i = 0;
-
-        // iterate filenames until we find a name that hasn't been taken yet
-        do {
-            $destination = "{$this->dir}/$title" . ($i > 0 ? "-{$i}" : '') . $ext;
-        } while (file_exists($destination) && ++$i);
-
-        return $destination;
-    }
-
 } 
