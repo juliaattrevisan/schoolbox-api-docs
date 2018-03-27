@@ -72,9 +72,9 @@ class Acquisition
                 R.CommPortalCurrentFlag
             FROM dbo.uvStudentsNCEAResultsTracking R
             WHERE R.ID = :externalId
-            AND CommPortalCurrentFlag = \'NCEA\'
+            AND CommPortalCurrentFlag = 1
             AND FileYear = :year
-            ORDER BY R.FileYear, R.SubjectSort, R.AssessAreaNCEAStandardNumber
+            ORDER BY R.SubjectName, R.SubjectSort, R.AssessAreaNCEAStandardNumber
         ');
 
         $statement->execute([
