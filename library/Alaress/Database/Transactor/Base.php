@@ -63,7 +63,7 @@ class Base implements ITransactor
     public function commit(): bool
     {
         if ($this->strategy->commit()) {
-            if ($this->inTransaction()) {
+            if (!$this->inTransaction()) {
                 // Are all transactions complete?
                 // Run hooks FIFO
                 foreach ($this->onPersistHooks as $persistHooks) {
@@ -91,7 +91,7 @@ class Base implements ITransactor
     public function rollback(): bool
     {
         if ($this->strategy->rollback()) {
-            if ($this->inTransaction()) {
+            if (!$this->inTransaction()) {
                 // Are all transactions complete?
                 // Discard all hooks
                 $this->onPersistHooks = [];
