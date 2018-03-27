@@ -81,10 +81,10 @@
 
 <div class="row">
     <div class="small-12 island">
-        <h1>Summary of Progress towards NCEA for {{ currentYear }}</h1>
+        <h1>Summary of Progress towards NCEA for {{ data.meta.year }}</h1>
         <h2>
-            Student Name: {{ user.lastname }}, {{ user.firstname }}<br />
-            Tutor Group: {{ studentTutor }}
+            Student Name: {{ data.meta.fullname }}<br />
+            Tutor Group: {{ data.meta.tutorGroup }}
         </h2>
 
         <section class="content">
