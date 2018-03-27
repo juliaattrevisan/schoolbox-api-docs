@@ -171,6 +171,15 @@ interface IConnector extends IQuoter
     // ----------------------------------------------------------------------------------------------------------------
 
     /**
+     * Wraps `$callback` in a transaction.
+     *
+     * @param callable $callback
+     * @return IConnector
+     * @throws \Throwable
+     */
+    public function transact(callable $callback);
+
+    /**
      * Initiates a transaction
      *
      * @return bool Returns TRUE on success or FALSE on failure

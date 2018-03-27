@@ -356,6 +356,19 @@ class Database implements IDatabase, Serializable, IQuoter
     }
 
     /**
+     * Wraps `$callback` in a transaction.
+     *
+     * @param callable $callback
+     * @return $this
+     * @throws \Throwable
+     */
+    public function transact(callable $callback)
+    {
+        $this->transactor->transact($callback);
+        return $this;
+    }
+
+    /**
      * Wrapper for PDO::beginTransaction
      * Initiates a transaction
      *

@@ -398,6 +398,15 @@ class Base implements Serializable, IConnector
     /**
      * @inheritdoc
      */
+    public function transact(callable $callback)
+    {
+        $this->transactor->transact($callback);
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function beginTransaction()
     {
         return $this->transactor->beginTransaction();
