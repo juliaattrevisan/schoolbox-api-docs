@@ -103,8 +103,12 @@ class Aggregation
                 }
 
                 /* Store this record (it represents a line item in the tables) only if it's for the current year
+                 * Augment it with a Levels array, because this makes it nicer in twig town
                  */
-                $aggregatedData[$subjectKey]['data'][] = $current;
+                $augmented = array_merge($current, $this->makeLevelArray());
+                $augmented[$levelKey] = $current['creditsGained'];
+
+                $aggregatedData[$subjectKey]['data'][] = $augmented;
 
                 /* Augment and aggregate totals for each subject
                  */
