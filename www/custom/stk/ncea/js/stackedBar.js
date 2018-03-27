@@ -47,7 +47,11 @@
 
                 /* Bar segments
                  */
-                series: []
+                series: [],
+
+                /* Type of stacking
+                 */
+                stacking: 'percent'
             };
 
             var derived = {
@@ -83,7 +87,7 @@
                 },
                 plotOptions: {
                     series: {
-                        stacking: 'percent',
+                        stacking: config.stacking,
                         dataLabels: {
                             enabled: true,
                             align: 'center',
