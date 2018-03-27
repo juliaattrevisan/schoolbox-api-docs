@@ -1,5 +1,6 @@
 <div id="component{COMPONENT_INSTANCE_ID}" class="component-container {COMPONENT_CLASS}" data-component>
     <script src="/javascript/components/swiper/dist/js/swiper.min.js"></script>
+    <script src="/javascript/jquery.alaressSlider.js"></script>
 
     {CONFIGURATION}
 
@@ -85,38 +86,20 @@
                 <!-- END source_folder_deleted -->
 
                 <!-- BEGIN source_folder_exists -->
-                <script type="text/javascript">
+                <script>
                     // Expanded? init on load
                     // Collapsed? init on expand
-                    $(function(){
-                        var component = $("#component{COMPONENT_INSTANCE_ID}");
+                    $(function() {
                         var init = function() {
-
-                            var mySwiper = new Swiper (component.find('div[data-imageslider]'), {
-                                autoplay: {
-                                    delay: {COMPONENT_CONFIG_TIMING_VALUE_MS},
-                                    disableOnInteraction: false,
-                                },
-                                centeredSlides: true,
+                            $('#component{COMPONENT_INSTANCE_ID}-imageslider').alaressSlider({
                                 initialSlide: {COMPONENT_RANDOM_SLIDE},
-                                lazy: {
-                                    loadPrevNext: true,
-                                    loadPrevNextAmount: 3,
-                                    preloaderClass: 'loader',
-                                },
-                                loop: true,
-                                pagination: {
-                                    el: '.swiper-pagination',
-                                    clickable: true,
-                                },
-                                navigation: {
-                                    nextEl: '.swiper-button-next',
-                                    prevEl: '.swiper-button-prev',
-                                },
-                                speed: 1000,
+                                alaress: {
+                                    autoplayDelay: {COMPONENT_CONFIG_TIMING_VALUE_MS}
+                                }
                             });
                         };
 
+                        var component = $("#component{COMPONENT_INSTANCE_ID}");
                         var collapser = component.find('[data-collapsable="true"]');
                         if (collapser.data('collapseState') === 'uncollapsed') {
                             init();
@@ -128,7 +111,7 @@
 
                 <div class="dropzone-wrap no-margin">
                     <form class="dropzone overlay" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/fileForm.php?ajax=1" method="post" data-accepts="image"></form>
-                    <div data-imageslider class="swiper-container">
+                    <div class="swiper-container" id="component{COMPONENT_INSTANCE_ID}-imageslider">
                         <div class="swiper-wrapper">
                             <!-- BEGIN image_scroller -->
                             <div class="swiper-slide">

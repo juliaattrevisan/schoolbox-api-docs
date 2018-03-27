@@ -1163,32 +1163,13 @@
     <div class="small-12 island">
         <h2 class="subheader" id="image-slider">Image Slider (Swiper)</h2>
         <script src="/javascript/components/swiper/dist/js/swiper.min.js"></script>
-        <script type="text/javascript">
-            $(function(){
-                var swiper = new Swiper('div[data-imageslider]', {
-                    autoplay: {
-                        delay: 2000
-                    },
-                    centeredSlides: true,
-                    lazy: {
-                        loadPrevNext: true,
-                        loadPrevNextAmount: 3,
-                        preloaderClass: 'loader',
-                    },
-                    loop: true,
-                    pagination: {
-                        el: '.swiper-pagination',
-                        clickable: true,
-                    },
-                    navigation: {
-                        nextEl: '.swiper-button-next',
-                        prevEl: '.swiper-button-prev',
-                    },
-                    speed: 1000,
-                });
+        <script src="/javascript/jquery.alaressSlider.js"></script>
+        <script>
+            $(function() {
+                $('#pantry-imageslider').alaressSlider();
             });
         </script>
-        <div data-imageslider class="swiper-container">
+        <div class="swiper-container" id="pantry-imageslider">
             <div class="swiper-wrapper">
                 <div class="swiper-slide">
                     <img data-src="https://placeimg.com/1440/280/animals" alt="Animals" class="swiper-lazy" />

@@ -1,26 +1,13 @@
 <div id='component{COMPONENT_INSTANCE_ID}' class='component-container {COMPONENT_CLASS}' data-component>
     <script src="/javascript/components/swiper/dist/js/swiper.min.js"></script>
-    <script type="text/javascript">
-        $(function(){
-            var component = $("#component{COMPONENT_INSTANCE_ID}");
-            var swiper = new Swiper (component.find('div[data-imageslider]'), {
-                autoplay: {
-                    delay: {COMPONENT_CONFIG_TIMING_VALUE_MS},
-                    disableOnInteraction: false,
-                },
-                centeredSlides: true,
+    <script src="/javascript/jquery.alaressSlider.js"></script>
+    <script>
+        $(function() {
+            $('#component{COMPONENT_INSTANCE_ID}-imageslider').alaressSlider({
                 initialSlide: {COMPONENT_RANDOM_SLIDE},
-                lazy: {
-                    loadPrevNext: true,
-                    loadPrevNextAmount: 3,
-                    preloaderClass: 'loader',
-                },
-                loop: true,
-                navigation: {
-                    nextEl: '.swiper-button-next',
-                    prevEl: '.swiper-button-prev',
-                },
-                speed: 1000,
+                alaress: {
+                    autoplayDelay: {COMPONENT_CONFIG_TIMING_VALUE_MS}
+                }
             });
         });
     </script>
@@ -33,7 +20,7 @@
             <h2 class="subheader">{COMPONENT_NAME}</h2>
             <!-- END has_header -->
 
-            <div data-imageslider class="swiper-container">
+            <div class="swiper-container" id="component{COMPONENT_INSTANCE_ID}-imageslider">
                 <div class="swiper-wrapper">
                     <!-- BEGIN image_scroller -->
                     <div class="swiper-slide {COMPONENT_CONFIG_IMAGE_RATIO}">
