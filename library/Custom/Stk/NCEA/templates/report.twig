@@ -57,28 +57,25 @@
                 {
                     name: 'Achieved',
                     data: [
-                        1,2,3
-                        {#{% for currentLevel, allLevelValues in dataset.data.graph.result %}#}
-                        {#{{ allLevelValues.A }}{% if not loop.last %}, {% endif %}#}
-                        {#{% endfor %}#}
+                        {% for level, value in data.graph.A %}
+                        {{ value }}{% if not loop.last %}, {% endif %}
+                        {% endfor %}
                     ]
                 },
                 {
                     name: 'Merit',
                     data: [
-                        4,5,6
-                        {#{% for currentLevel, allLevelValues in dataset.data.graph.result %}#}
-                        {#{{ allLevelValues.M }}{% if not loop.last %}, {% endif %}#}
-                        {#{% endfor %}#}
+                        {% for level, value in data.graph.M %}
+                        {{ value }}{% if not loop.last %}, {% endif %}
+                        {% endfor %}
                     ]
                 },
                 {
                     name: 'Excellence',
                     data: [
-                        7,8,9
-                        {#{% for currentLevel, allLevelValues in dataset.data.graph.result %}#}
-                        {#{{ allLevelValues.E }}{% if not loop.last %}, {% endif %}#}
-                        {#{% endfor %}#}
+                        {% for level, value in data.graph.E %}
+                        {{ value }}{% if not loop.last %}, {% endif %}
+                        {% endfor %}
                     ]
                 }
             ]
