@@ -20,15 +20,23 @@ You must have your HTML in the correct layout in order for this plugin to work.
         </div>
         ...
     </div>
-    <div class="swiper-pagination"></div>
-    <div class="swiper-button-prev"></div>
-    <div class="swiper-button-next"></div>
+    <div class="swiper-pagination" id="image-slider-pagination"></div>
+    <div class="swiper-button-prev" id="image-slider-button-prev"></div>
+    <div class="swiper-button-next" id="image-slider-button-next"></div>
 </div>
 ```
 
 Then just initilise with JS like so:
 ```js
-$('#image-slider').alaressSlider();
+$('#image-slider').alaressSlider({
+    pagination: {
+        el: '#image-slider-pagination'
+    },
+    navigation: {
+        nextEl: '#image-slider-button-next',
+        prevEl: '#image-slider-button-prev'
+    }
+});
 ````
 
 ## Parameters
@@ -99,47 +107,17 @@ These are the Swiper parameters we set by default with this wrapper.
         </tr>
         <tr>
             <td>pagination</td>
-            <td>true</td>
+            <td></td>
             <td></td>
         </tr>
         <tr>
             <td>{</td>
             <td></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>&nbsp;&nbsp;&nbsp;&nbsp;el</td>
-            <td>.swiper-pagination</td>
             <td></td>
         </tr>
         <tr>
             <td>&nbsp;&nbsp;&nbsp;&nbsp;clickable</td>
             <td>true</td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>}</td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>navigation</td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>{</td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>&nbsp;&nbsp;&nbsp;&nbsp;nextEl</td>
-            <td>.swiper-button-next</td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>&nbsp;&nbsp;&nbsp;&nbsp;prevEl</td>
-            <td>.swiper-button-prev</td>
             <td></td>
         </tr>
         <tr>
