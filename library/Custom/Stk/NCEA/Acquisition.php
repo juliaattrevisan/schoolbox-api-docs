@@ -112,7 +112,7 @@ class Acquisition
                 'creditsGained' => $row['CreditsGained'],
                 'subjectSort' => $row['SubjectSort'],
                 'subjectName' => $row['SubjectName'],
-                'year' => $row['FileYear']
+                'year' => (string)$row['FileYear']
             ];
         }
 

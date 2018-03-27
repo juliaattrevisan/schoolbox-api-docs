@@ -20,42 +20,71 @@ class Aggregation
         /* Aggregation totals
          */
         $credits = [
-            'gainedThisYear' => 0,
-            'broughtForward' => 0,
-            'total' => 0,
+            'gainedThisYear' => [
+                'L1' => 0,
+                'L2' => 0,
+                'L3' => 0
+            ],
+            'broughtForward' => [
+                'L1' => 0,
+                'L2' => 0,
+                'L3' => 0
+            ],
+            'total' => [
+                'L1' => 0,
+                'L2' => 0,
+                'L3' => 0
+            ],
         ];
 
         /* Group by subject name
          */
         $aggregatedData = [];
 
-        foreach ($data['records'] as $current) {
-            $key = $current['subjectName'];
+        /** @var array $allRecords */
+        $allRecords = $data['records'];
 
-            /* Set up a new subject's information if it hasn't been encountered before
-             */
-            if (!isset($aggregationData[$key])) {
-                $aggregatedData[$key] = [
-                    'availableCredits' => 0,
-                    'gainedCredits' => 0,
-                    'data' => []
-                ];
+        foreach ($allRecords as $current) {
+            $subjectKey = $current['subjectName'];
+            $levelKey = "L{$current['nceaLevel']}";
+
+            if ($current['year'] === date('Y')) {
+
+                /* Set up a new subject's information if it hasn't been encountered before
+                 */
+                if (!isset($aggregationData[$subjectKey])) {
+                    $aggregatedData[$subjectKey] = [
+                        'availableCredits' => 0,
+                        'gainedCredits' => [
+                            'L1' => 0,
+                            'L2' => 0,
+                            'L3' => 0
+                        ],
+                        'data' => []
+                    ];
+                }
+
+                /* Store this record (it represents a line item in the tables) only if it's for the current year
+                 */
+                $aggregatedData[$subjectKey]['data'][] = $current;
+
+                /* Augment and aggregate totals for each subject
+                 */
+                $aggregatedData[$subjectKey]['availableCredits'] += $current['nceaCredits'];
+                $aggregatedData[$subjectKey]['gainedCredits'][$levelKey] += $current['creditsGained'];
+
+                /* Also aggregate this summary total for the current year
+                 */
+                $credits['gainedThisYear'][$levelKey] += $current['creditsGained'];
             }
+            else {
 
-            /* Store this record (it represents a line item in the tables)
-             */
-            $aggregatedData[$key]['data'][] = $current;
-
-            /* Augment and aggregate totals for each subject
-             */
-            $aggregatedData[$key]['availableCredits'] += $current['nceaCredits'];
-            $aggregatedData[$key]['gainedCredits'] += $current['creditsGained'];
-
-            /* Also aggregate this summary total
-             */
-            $credits['gainedThisYear'] += $current['creditsGained'];
+                /* Accumulate a total of credits that were obtained in a previous year
+                 */
+                $credits['broughtForward'][$levelKey] += $current['creditsGained'];
+            }
         }
 
-        new \Alaress_Probe($data, $aggregatedData);
+        new \Alaress_Probe($data, $aggregatedData, $credits);
     }
 }
