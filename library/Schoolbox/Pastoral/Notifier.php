@@ -183,6 +183,9 @@ class Notifier extends AbstractModuleNotifier
                 } elseif ($user instanceof User) {
                     // Sending to an individual user
 
+                    // user is not hydrated
+                    $user = $this->userMapper->findById($user->getId());
+
                     $role = $user->getRole();
 
                     // Only send to parents if parent access is enabled
