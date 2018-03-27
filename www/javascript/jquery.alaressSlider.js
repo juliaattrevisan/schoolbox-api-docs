@@ -14,13 +14,13 @@
     var defaults = {
         autoplay: false, // This will be overridden on 'lazyImageReady' below
         centeredSlides: true,
-        initialSlide: 0,
+        loop: true,
+        speed: 1000,
         lazy: {
             loadPrevNext: true,
             loadPrevNextAmount: 3,
             preloaderClass: 'loader'
         },
-        loop: true,
         pagination: {
             el: '.swiper-pagination',
             clickable: true
@@ -29,7 +29,6 @@
             nextEl: '.swiper-button-next',
             prevEl: '.swiper-button-prev'
         },
-        speed: 1000,
         alaress: {
             autoplayDelay: 5000
         }
