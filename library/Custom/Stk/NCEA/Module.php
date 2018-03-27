@@ -72,7 +72,7 @@ class Module extends BaseModule
         /* Can't get reports from the future
          */
         if ((int)$params['year'] > date('Y')) {
-            throw new NotFound('User Not Found');
+            throw new NotFound('Invalid year');
         }
 
         return [
