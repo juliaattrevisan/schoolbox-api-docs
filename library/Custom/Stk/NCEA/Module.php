@@ -49,7 +49,7 @@ class Module extends BaseModule
 
         $preloadUser = function ($params) { return $this->preloadUser($params); };
 
-        $this->register('GET', '/report/{id}', 'getReport', $getPerms, $preloadUser);
+        $this->register('GET', '/report/{id}/{year}', 'getReport', $getPerms, $preloadUser);
     }
 
     /**
@@ -69,8 +69,15 @@ class Module extends BaseModule
             throw new NotFound('User Not Found');
         }
 
+        /* Can't get reports from the future
+         */
+        if ((int)$params['year'] > date('Y')) {
+            throw new NotFound('User Not Found');
+        }
+
         return [
             'user' => $user,
+            'year' => (int)$params['year'],
         ];
     }
 

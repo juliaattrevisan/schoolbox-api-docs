@@ -33,25 +33,24 @@ class Controller extends Base
 
 
     /**
-     * NCEA Report
+     * NCEA Report for $year
      *
      * @param User $user
+     * @param int  $year
      * @throws \Alaress\Database\Exception
      * @throws \Aura\Di\Exception\ServiceNotFound
      */
-    public function getReport(User $user)
+    public function getReport(User $user, int $year)
     {
         /** @var IConnector $externalDb */
         $externalDb = $this->getDi()->get('databaseExternal');
-
-        $year = 2017;
 
         $rawData = (new Acquisition($externalDb, $user->getExternalId()))->getRecords($year);
 
         $aggregatedData = (new Aggregation())->aggregate($rawData, $year);
 
         new \Alaress_Probe($aggregatedData);
-        
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@nceaReport/report.twig', [
             'user' => $user,
             'data' => $aggregatedData,
