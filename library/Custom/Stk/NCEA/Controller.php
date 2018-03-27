@@ -44,7 +44,7 @@ class Controller extends Base
         /** @var IConnector $externalDb */
         $externalDb = $this->getDi()->get('databaseExternal');
 
-        $data = (new Acquisition($externalDb, $user->getExternalId()))->getRecords(2018);
+        $data = (new Acquisition($externalDb, $user->getExternalId()))->getRecords();
 
         (new Aggregation())->aggregate($data);
 

@@ -48,11 +48,10 @@ class Acquisition
      *
      * Filter it for relevant values (see WHERE clause)
      *
-     * @param int $year Get records only for $year
      * @return array
      * @throws \Alaress\Database\Exception
      */
-    public function getRecords(int $year): array
+    public function getRecords(): array
     {
         $statement = $this->database->prepareQuery('
             SELECT 
@@ -73,13 +72,11 @@ class Acquisition
             FROM dbo.uvStudentsNCEAResultsTracking R
             WHERE R.ID = :externalId
             AND CommPortalCurrentFlag = 1
-            AND FileYear = :year
-            ORDER BY R.SubjectSort, R.AssessAreaNCEAStandardNumber
+            ORDER BY R.FileYear, R.SubjectSort, R.AssessAreaNCEAStandardNumber
         ');
 
         $statement->execute([
             'externalId' => $this->externalId,
-            'year' => $year,
         ]);
 
         /* Passed to Aggregation for summarising
@@ -103,7 +100,7 @@ class Acquisition
                     'firstname' => $row['StudentPreferred'],
                     'fullname' => $row['StudentName'],
                     'tutorGroup' => $row['StudentTutor'],
-                    'year' => $row['FileYear'],
+                    'year' => date('Y'),
                 ];
             }
 
@@ -116,6 +113,7 @@ class Acquisition
                 'creditsGained' => $row['CreditsGained'],
                 'subjectSort' => $row['SubjectSort'],
                 'subjectName' => $row['SubjectName'],
+                'year' => $row['FileYear']
             ];
         }
 
