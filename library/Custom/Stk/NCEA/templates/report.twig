@@ -10,24 +10,24 @@
 {% endmacro %}
 
 <style type="text/css" media="screen">
-    span.disclaimer {
+    #nceaReport span.disclaimer {
         font-weight: bold;
         text-decoration: underline;
     }
 
-    th, td {
+    #nceaReport th, td {
         border: 1px solid #000 !important;
     }
 
-    .center {
+    #nceaReport .center {
         text-align: center;
     }
 
-    td span {
+    #nceaReport td span {
         font-weight: bold;
     }
 
-    td.total {
+    #nceaReport td.total {
         background-color: #ededed;
         font-weight: bold;
     }
@@ -80,7 +80,7 @@
 <div data-graph="result-{{ dataset.suffix }}"></div>
 
 <div class="row">
-    <div class="small-12 island">
+    <div class="small-12 island" id="nceaReport">
         <h1>Summary of Progress towards NCEA for {{ data.meta.year }}</h1>
         <h2>
             Student Name: {{ data.meta.fullname }}<br />
