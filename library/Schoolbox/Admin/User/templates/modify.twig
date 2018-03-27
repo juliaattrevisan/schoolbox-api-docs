@@ -612,14 +612,20 @@
                 'alt_email':        { emailTrimmed: true },
                 'firstname':        { required: true },
                 'lastname':         { required: true },
-                'campus[]':         { required: true }
+                'campus[]':         {
+                    required: function(elem)
+                    {
+                        console.log("Validating checkboxes");
+                        var valid = $("input[name='campus[]']:checked").length > 0;
+                        console.log("Valid? " + valid);
+                        return valid;
+                    }
+                }
             },
             messages: {
-                'firstname':        { require_from_group: "Please enter either a first name or surname" },
-                'lastname':         { require_from_group: "Please enter either a first name or surname" },
                 'alt_email':        "Please enter a valid email address",
-                'campus[]':         { required: 'Users must be involved in at least one campus' }
-            }
+            },
+            errorPlacement: $.alaressValidate.defaultErrorPlacement
         });
 
         {# Confirm change of superuser status #}
