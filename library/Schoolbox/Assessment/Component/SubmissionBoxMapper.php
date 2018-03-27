@@ -98,7 +98,6 @@ class SubmissionBoxMapper extends Schoolbox\Mapper
 
         // SoftDelete/Restore weak entities
         $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteRubricLevels']);
-        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteAssessment']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteSubmissions'));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteReturns'));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteShowcase'));
@@ -128,22 +127,6 @@ class SubmissionBoxMapper extends Schoolbox\Mapper
     public function softDeleteRubricLevels(SubmissionBox $dueWork)
     {
         Rubric\LevelMapper::getInstance()->deleteByColumn('box_id', $dueWork->getId());
-        return true;
-    }
-
-
-    /**
-     * Soft delete the box's assessment model
-     *
-     * @param SubmissionBox $dueWork
-     * @return bool
-     * @throws Schoolbox\Mapper\DefinitionException
-     */
-    protected function softDeleteAssessment(SubmissionBox $dueWork): bool
-    {
-        /** @var AssessmentMapper $assessmentMapper */
-        $assessmentMapper = $this->getJoinMapper('assessmentModel');
-        $assessmentMapper->softDelete($dueWork->getAssessmentModel());
         return true;
     }
 
@@ -587,6 +570,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper
      * @param object|Collection|SubmissionBox $object
      * @return bool
      * @throws \UnexpectedValueException If a callback fails and we need to halt
+     * @throws Schoolbox\Mapper\DefinitionException
      */
     public function softDelete($object): bool
     {
@@ -604,6 +588,11 @@ class SubmissionBoxMapper extends Schoolbox\Mapper
                 return false;
             }
         }
+
+        // This is neither a PRE or POST action - it is the action.
+        /** @var AssessmentMapper $assessmentMapper */
+        $assessmentMapper = $this->getJoinMapper('assessmentModel');
+        $assessmentMapper->softDelete($object->getAssessmentModel());
 
         // Trigger the post-trigger
         foreach ($collection as $model) {
