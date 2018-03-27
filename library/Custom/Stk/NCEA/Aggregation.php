@@ -41,9 +41,9 @@ class Aggregation
      */
     private function makeAchievementArray(): array
     {
-        $letters = array_fill_keys($this->achievements, 0);
+        $levels = $this->makeLevelArray();
 
-        return $this->makeLevelArray($letters);
+        return array_fill_keys($this->achievements, $levels);
     }
 
     /**
@@ -107,7 +107,7 @@ class Aggregation
                  * All others are ignored
                  */
                 if (\in_array($current['grade'], $this->achievements, true)) {
-                    $graph[$levelKey][$current['grade']]++;
+                    $graph[$current['grade']][$levelKey]++;
                 }
             }
             elseif ($current['year'] < $year) {
