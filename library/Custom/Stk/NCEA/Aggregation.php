@@ -13,6 +13,21 @@ class Aggregation
 {
 
     /**
+     * @var array
+     */
+    private $indexes = ['L1', 'L2', 'L3'];
+
+    /**
+     * Make an associative array using level indexes
+     *
+     * @return array
+     */
+    private function makeLevelArray(): array
+    {
+        return array_fill_keys($this->indexes, 0);
+    }
+
+    /**
      * @param array $data
      */
     public function aggregate(array $data)
@@ -20,21 +35,9 @@ class Aggregation
         /* Aggregation totals
          */
         $credits = [
-            'gainedThisYear' => [
-                'L1' => 0,
-                'L2' => 0,
-                'L3' => 0
-            ],
-            'broughtForward' => [
-                'L1' => 0,
-                'L2' => 0,
-                'L3' => 0
-            ],
-            'total' => [
-                'L1' => 0,
-                'L2' => 0,
-                'L3' => 0
-            ],
+            'gainedThisYear' => $this->makeLevelArray(),
+            'broughtForward' => $this->makeLevelArray(),
+            'total' => $this->makeLevelArray(),
         ];
 
         /* Group by subject name
@@ -55,11 +58,7 @@ class Aggregation
                 if (!isset($aggregationData[$subjectKey])) {
                     $aggregatedData[$subjectKey] = [
                         'availableCredits' => 0,
-                        'gainedCredits' => [
-                            'L1' => 0,
-                            'L2' => 0,
-                            'L3' => 0
-                        ],
+                        'gainedCredits' => $this->makeLevelArray(),
                         'data' => []
                     ];
                 }
@@ -87,7 +86,7 @@ class Aggregation
 
         /* Grand Total
          */
-        foreach (['L1', 'L2', 'L3'] as $levelKey) {
+        foreach ($this->indexes as $levelKey) {
             $credits['total'][$levelKey] = $credits['gainedThisYear'][$levelKey] + $credits['broughtForward'][$levelKey];
         }
 
