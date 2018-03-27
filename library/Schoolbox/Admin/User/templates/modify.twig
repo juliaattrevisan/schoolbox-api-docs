@@ -1,3 +1,4 @@
+<script type="text/javascript" src="/javascript/components/jquery-validation/dist/additional-methods.js"></script>
 {# Shared navigation menu #}
 
 <div class="row">
@@ -74,10 +75,10 @@
                         </select>
 
                         <label for="firstname">First Name</label>
-                        <input id="firstname" type="text" name="firstname" value="{{ user.firstName }}"/>
+                        <input id="firstname" type="text" class="given_name" name="firstname" value="{{ user.firstName }}"/>
 
                         <label for="lastname">Surname</label>
-                        <input id="lastname" type="text" name="lastname" value="{{ user.lastName }}"/>
+                        <input id="lastname" type="text" class="given_name" name="lastname" value="{{ user.lastName }}"/>
 
                         <label for="database">{{ externalDatabase }} ID</label>
                         <input id="database" type="text" name="database_id" value="{{ user.externalId }}"/>
@@ -611,18 +612,11 @@
 
         {# Validate user details#}
 
-        $.validator.addMethod('require_name', function(value, element) {
-            if ($.trim($("#firstname").val()).length > 0 || $.trim($("#lastname").val()).length > 0) {
-                return true;
-            }
-            return false;
-        });
-
         $('form[data-validatable-as="userDetails"]').alaressValidate({
             rules: {
                 'alt_email':        { emailTrimmed: true },
-                'firstname':        { require_name: true },
-                'lastname':         { require_name: true },
+                'firstname':        { require_from_group: [1,".given_name"] },
+                'lastname':         { require_from_group: [1,".given_name"] },
                 'campus[]':         { required: true }
             },
             messages: {
