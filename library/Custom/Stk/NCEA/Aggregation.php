@@ -18,15 +18,33 @@ class Aggregation
     private $indexes = ['L1', 'L2', 'L3'];
 
     /**
+     * @var array
+     */
+    private $achievements = ['A', 'M', 'E'];
+
+    /**
      * Make an associative array using level indexes
+     *
+     * @param int $default
+     * @return array
+     */
+    private function makeLevelArray($default = 0): array
+    {
+        return array_fill_keys($this->indexes, $default);
+    }
+
+    /**
+     * Make an associative array using level indexes and prefill it with
+     * the initials of achievements
      *
      * @return array
      */
-    private function makeLevelArray(): array
+    private function makeAchievementArray(): array
     {
-        return array_fill_keys($this->indexes, 0);
-    }
+        $letters = array_fill_keys($this->achievements, 0);
 
+        return $this->makeLevelArray($letters);
+    }
 
     /**
      * Make an aggregation for the given $year
@@ -44,6 +62,10 @@ class Aggregation
             'broughtForward' => $this->makeLevelArray(),
             'total' => $this->makeLevelArray(),
         ];
+
+        /* Data for Graph
+         */
+        $graph = $this->makeAchievementArray();
 
         /* Group by subject name
          */
@@ -97,6 +119,7 @@ class Aggregation
 
         return [
             'meta' => $data['meta'],
+            'graph' => $graph,
             'records' => $aggregatedData,
             'credits' => $credits,
         ];
