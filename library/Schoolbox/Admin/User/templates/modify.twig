@@ -611,16 +611,25 @@
 
         {# Validate user details#}
 
+        $.validator.addMethod('require_name', function(value, element) {
+            if ($.trim($("#firstname").val()).length > 0 || $.trim($("#lastname").val()).length > 0) {
+                return true;
+            }
+            return false;
+        });
+
         $('form[data-validatable-as="userDetails"]').alaressValidate({
             rules: {
                 'alt_email':        { emailTrimmed: true },
-                'firstname':        { required: true },
-                'lastname':         { required: true },
+                'firstname':        { require_name: true },
+                'lastname':         { require_name: true },
                 'campus[]':         { required: true }
             },
             messages: {
                 'alt_email':        "Please enter a valid email address",
-                'campus[]':           "Please select at least one campus"
+                'firstname':        "Please enter either a first name or surname",
+                'lastname':         "Please enter either a first name or surname",
+                'campus[]':         "Please select at least one campus"
             }
         });
 
