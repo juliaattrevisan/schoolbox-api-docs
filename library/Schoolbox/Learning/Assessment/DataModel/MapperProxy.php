@@ -901,18 +901,27 @@ class MapperProxy
         return null;
     }
 
+
     /**
      * Deletes an assessable
      *
      * @param IAssessable $assessable
      * @throws UnexpectedValueException If assessment does not have a context
      * @throws LogicException If cyclic graph detected during translation
+     * @throws MapperException
      */
     public function delete(IAssessable $assessable)
     {
         // Delete assessment
         $dataModel = $this->translateToDataModel($assessable);
-        $this->baseMapper->delete($dataModel);
+        if ($dataModel->getSubObject() instanceof SubmissionBox) {
+            // The assessment model is a component of the submission box.
+            // The composite object is responsible for deleting its components
+            // TODO - roll out this methodology to other assessment types
+            SubmissionBoxMapper::getInstance()->delete($dataModel->getSubObject());
+        } else {
+            $this->baseMapper->delete($dataModel);
+        }
         $assessable->setDeletedAt($dataModel->getDeletedAt());
         // I don't think I need to delete sub-objects.
         // The assessable itself is all that should need deletion
