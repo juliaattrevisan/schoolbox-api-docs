@@ -249,7 +249,11 @@ class SubmissionBoxMapper extends Schoolbox\Mapper
                 $submission_box = $this->hydrate($row, 'sb');
                 $submission_box->setMarkType($marktype_mapper->hydrate($row, 'mt'));
                 $submission_box->setCategory($this->hydrateJoin($row, 'category', 'cat'));
-                $submission_box->setAssessmentModel($this->getJoinMapper('assessmentModel')->findById($row['sb.assessment_id'])); // I despise the necessity of this
+                try {
+                    $submission_box->setAssessmentModel($this->getJoinMapper('assessmentModel')->findById($row['sb.assessment_id'])); // I despise the necessity of this
+                } catch (Schoolbox\Mapper\Exception\Deleted $e) {
+                    $submission_box->setAssessmentModel($e->getDeletedObject()); // I also am not thrilled :)
+                }
             }
             // Hydrate curriculum nodes
 
