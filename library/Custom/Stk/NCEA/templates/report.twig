@@ -9,7 +9,7 @@
     {% endif %}
 {% endmacro %}
 
-<style type="text/css" media="screen">
+<style type="text/css" media="screen, print">
     #nceaReport span.disclaimer {
         font-weight: bold;
         text-decoration: underline;
@@ -30,6 +30,13 @@
     #nceaReport td.total {
         background-color: #ededed;
         font-weight: bold;
+    }
+</style>
+
+<style type="text/css" media="print">
+    h1 {
+        margin: 0 !important;
+        padding: 0 !important;
     }
 </style>
 <script type="text/javascript" src="/javascript/components/highcharts-release/highcharts.js"></script>
