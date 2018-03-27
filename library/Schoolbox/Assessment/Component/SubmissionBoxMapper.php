@@ -91,7 +91,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper
         ));
 
 
-        $this->registerCallback(self::CALLBACK_POSTSAVE, array($this, 'postSave'));
+        $this->registerCallback(self::CALLBACK_POSTSAVE, array($this, 'syncToExternalMarkbook'));
         $this->registerCallback(self::CALLBACK_POSTDELETE, array($this, 'deleteFromMarkbook'));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'deleteFromMarkbook'));
 
@@ -254,12 +254,12 @@ class SubmissionBoxMapper extends Schoolbox\Mapper
 
 
     /**
-     * Post-save method for submission boxes - saves new submission box files
+     * Post-save method for submission boxes - syncs details to SIS markbook
      *
      * @param SubmissionBox $object
      * @return bool
      */
-    public function postSave(SubmissionBox $object)
+    public function syncToExternalMarkbook(SubmissionBox $object): bool
     {
         // Don't attempt to sync assessment specs to external markbook (they cannot have interactions)
         if ($this->isAssessmentSpecification($object)) {
