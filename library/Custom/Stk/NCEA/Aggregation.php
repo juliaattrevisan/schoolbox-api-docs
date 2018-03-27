@@ -25,10 +25,13 @@ class Aggregation
     /**
      * Make an associative array using level indexes
      *
+     * Start at null so highcharts knows to ignore a level when there's no data in it (all null values)
+     * Otherwise it renders a stacked barchart of length 0 which looks ugly
+     *
      * @param int $default
      * @return array
      */
-    private function makeLevelArray($default = 0): array
+    private function makeLevelArray($default = null): array
     {
         return array_fill_keys($this->indexes, $default);
     }
