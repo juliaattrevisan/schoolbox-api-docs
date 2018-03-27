@@ -17,11 +17,11 @@ use Alaress\Database\Transactor\Strategy\IStrategy;
 class Base implements ITransactor
 {
     /**
-     * A transactor
+     * A transaction strategy
      *
      * @var IStrategy
      */
-    private $transactor;
+    private $strategy;
 
     /**
      * A list of callbacks to call when the entire transaction is committed.
@@ -33,11 +33,11 @@ class Base implements ITransactor
     /**
      * Constructor
      *
-     * @param IStrategy $transactor
+     * @param IStrategy $strategy
      */
-    public function __construct(IStrategy $transactor)
+    public function __construct(IStrategy $strategy)
     {
-        $this->transactor = $transactor;
+        $this->strategy = $strategy;
     }
 
     /**
@@ -46,7 +46,7 @@ class Base implements ITransactor
     public function beginTransaction(): bool
     {
         $this->onPersistHooks[] = [];
-        return $this->transactor->beginTransaction();
+        return $this->strategy->beginTransaction();
     }
 
     /**
@@ -54,7 +54,7 @@ class Base implements ITransactor
      */
     public function inTransaction(): bool
     {
-        return $this->transactor->inTransaction();
+        return $this->strategy->inTransaction();
     }
 
     /**
@@ -62,7 +62,7 @@ class Base implements ITransactor
      */
     public function commit(): bool
     {
-        if ($this->transactor->commit()) {
+        if ($this->strategy->commit()) {
             if ($this->inTransaction()) {
                 // Are all transactions complete?
                 // Run hooks FIFO
@@ -90,7 +90,7 @@ class Base implements ITransactor
      */
     public function rollback(): bool
     {
-        if ($this->transactor->rollback()) {
+        if ($this->strategy->rollback()) {
             if ($this->inTransaction()) {
                 // Are all transactions complete?
                 // Discard all hooks
@@ -121,5 +121,13 @@ class Base implements ITransactor
             $callback();
         }
         return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getStrategy(): IStrategy
+    {
+        return $this->strategy;
     }
 }

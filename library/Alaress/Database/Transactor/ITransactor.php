@@ -8,6 +8,8 @@ declare(strict_types=1);
 
 namespace Alaress\Database\Transactor;
 
+use Alaress\Database\Transactor\Strategy\IStrategy;
+
 /**
  * Interface ITransactor
  *
@@ -52,4 +54,11 @@ interface ITransactor
      * @return ITransactor
      */
     public function onPersist(callable $callback): ITransactor;
+
+    /**
+     * Gets the transaction strategy.
+     *
+     * @return IStrategy
+     */
+    public function getStrategy(): IStrategy;
 }
