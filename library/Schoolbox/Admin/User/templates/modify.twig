@@ -615,14 +615,11 @@
         $('form[data-validatable-as="userDetails"]').alaressValidate({
             rules: {
                 'alt_email':        { emailTrimmed: true },
-                'firstname':        { require_from_group: [1,".given_name"] },
-                'lastname':         { require_from_group: [1,".given_name"] },
+                'firstname':        { required: true },
                 'campus[]':         { required: true }
             },
             messages: {
                 'alt_email':        "Please enter a valid email address",
-                'firstname':        "Please enter either a first name or surname",
-                'lastname':         "Please enter either a first name or surname",
                 'campus[]':         "Please select at least one campus"
             }
         });
