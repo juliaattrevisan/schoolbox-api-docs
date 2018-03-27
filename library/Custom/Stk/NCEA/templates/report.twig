@@ -1,3 +1,14 @@
+{% import _self as macro %}
+
+{# Only render $total if it wasn't zero
+ # Otherwise render it as an empty string
+ #}
+{% macro renderLevelTotal(total) %}
+    {% if total != 0 %}
+        {{ total }}
+    {% endif %}
+{% endmacro %}
+
 <style type="text/css" media="screen">
     span.disclaimer {
         font-weight: bold;
@@ -114,17 +125,17 @@
                         <td class="center">{{ item.grade }}</td>
                         <td class="center">
                             {% if item.nceaLevel == 1 %}
-                                {{ item.creditsGained }}
+                                {{ macro.renderLevelTotal(item.creditsGained) }}
                             {% endif %}
                         </td>
                         <td class="center">
                             {% if item.nceaLevel == 2 %}
-                                {{ item.creditsGained }}
+                                {{ macro.renderLevelTotal(item.creditsGained) }}
                             {% endif %}
                         </td>
                         <td class="center">
                             {% if item.nceaLevel == 3 %}
-                                {{ item.creditsGained }}
+                                {{ macro.renderLevelTotal(item.creditsGained) }}
                             {% endif %}
                         </td>
                     </tr>
@@ -134,9 +145,9 @@
                         <td colspan="3"><span>Available Credits:</span></td>
                         <td class="center"><span>{{ subjectData.availableCredits }}</span></td>
                         <td colspan="2"><span>Gained Credits:</span></td>
-                        <td class="center"><span>{{ subjectData.gainedCredits.L1 }}</span></td>
-                        <td class="center"><span>{{ subjectData.gainedCredits.L2 }}</span></td>
-                        <td class="center"><span>{{ subjectData.gainedCredits.L3 }}</span></td>
+                        <td class="center"><span>{{ macro.renderLevelTotal(subjectData.gainedCredits.L1) }}</span></td>
+                        <td class="center"><span>{{ macro.renderLevelTotal(subjectData.gainedCredits.L2) }}</span></td>
+                        <td class="center"><span>{{ macro.renderLevelTotal(subjectData.gainedCredits.L3) }}</span></td>
                     </tr>
                 {% endfor %}
                 <tr>
