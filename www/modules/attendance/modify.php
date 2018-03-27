@@ -292,7 +292,13 @@ if ($class) {
                 foreach ($flags as $key => $value) {
                     if(isset($currentStudent[$key]) && $currentStudent[$key]){
                         $this->setVar('ICON', $flags[$key]['icon']);
-                        $this->setVar('DESCRIPTION', $currentStudent[$flags[$key]['descriptionField']]);
+
+                        if(!empty($currentStudent[$flags[$key]['descriptionField']])) {
+                            $this->setVar('DESCRIPTION', $currentStudent[$flags[$key]['descriptionField']]);
+                        } else {
+                            $this->setVar('DESCRIPTION', $key);
+                        }
+
                         $this->parse('flags_block', 'flags', true);
                     }
                 }

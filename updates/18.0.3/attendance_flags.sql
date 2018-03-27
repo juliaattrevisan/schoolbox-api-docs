@@ -1,4 +1,6 @@
-INSERT INTO config VALUES(NULL, 'show_attendance_flags', 0, 'Attendance Flags', 'If seleceted, the following flags from Synergetic will show on the attendance page: MedicalAlertFlag,
+INSERT INTO config VALUES(NULL, 'show_attendance_flags', 0, 'Attendance Flags',
+'If selected, the following flags from Synergetic will show for each studfenton the attendance page:
+MedicalAlertFlag,
 SpecialNeedsFlag,
 CommentWarningFlag,
 ParentsSeparatedFlag,
