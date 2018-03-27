@@ -176,8 +176,11 @@ class Notifier extends AbstractModuleNotifier
                     foreach ($pastoralGroup->getMembers() as $member) {
                         // Only staff should be in pastoral groups
 
-                        if ($member->getUser()->getRole()->isStaff()) {
-                            $this->targetToUser($member->getUser(), $message, $pastoralAccess, $envelope);
+                        // user is not hydrated
+                        $user = $this->userMapper->findById($member->getUser()->getId());
+
+                        if ($user->getRole()->isStaff()) {
+                            $this->targetToUser($user, $message, $pastoralAccess, $envelope);
                         }
                     }
                 } elseif ($user instanceof User) {
