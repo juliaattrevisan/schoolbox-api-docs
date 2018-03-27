@@ -43,9 +43,16 @@ class Acquisition
     /**
      * Get all the NCEA data for $externalId
      *
+     * Their view contains multiple years of data; it isn't just the current year's data,
+     * it's a person's entire history
+     *
+     * Filter it for relevant values (see WHERE clause)
+     *
+     * @param int $year Get records only for $year
+     * @return array
      * @throws \Alaress\Database\Exception
      */
-    public function getRecords()
+    public function getRecords(int $year): array
     {
         $statement = $this->database->prepareQuery('
             SELECT 
@@ -66,11 +73,13 @@ class Acquisition
             FROM dbo.uvStudentsNCEAResultsTracking R
             WHERE R.ID = :externalId
             AND CommPortalCurrentFlag = \'NCEA\'
+            AND FileYear = :year
             ORDER BY R.FileYear, R.SubjectSort, R.AssessAreaNCEAStandardNumber
         ');
 
         $statement->execute([
-            'externalId' => $this->externalId
+            'externalId' => $this->externalId,
+            'year' => $year,
         ]);
 
         /* Passed to Aggregation for summarising

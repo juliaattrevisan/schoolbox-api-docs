@@ -44,7 +44,7 @@ class Controller extends Base
         /** @var IConnector $externalDb */
         $externalDb = $this->getDi()->get('databaseExternal');
 
-        $acquisition = (new Acquisition($externalDb, $user->getExternalId()))->getRecords();
+        $acquisition = (new Acquisition($externalDb, $user->getExternalId()))->getRecords((string)date('Y'));
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@nceaReport/report.twig', [
             'user' => $user
