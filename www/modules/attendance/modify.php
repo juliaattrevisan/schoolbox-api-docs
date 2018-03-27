@@ -261,31 +261,38 @@ if ($class) {
                 $flags = [
                     'MedicalAlertFlag'=> [
                         'icon' => 'alert',
-                        'descriptionField' => 'MedicalAlert'
+                        'descriptionField' => 'MedicalAlert',
+                        'defaultDescription' => 'Medical Alert'
                     ],
                     'SpecialNeedsFlag'=> [
                         'icon' => 'info',
-                        'descriptionField' => 'SpecialNeedsDescription'
+                        'descriptionField' => 'SpecialNeedsDescription',
+                        'defaultDescription' => 'Special Needs'
                     ],
                     'CommentWarningFlag'=> [
                         'icon' => 'comment',
-                        'descriptionField' => 'CommentDescription'
+                        'descriptionField' => 'CommentDescription',
+                        'defaultDescription' => 'Comment'
                     ],
                     'ParentsSeparatedFlag'=> [
                         'icon' => 'staff',
-                        'descriptionField' => 'ParentsSeparatedDescription'
+                        'descriptionField' => 'ParentsSeparatedDescription',
+                        'defaultDescription' => 'Parents Separated'
                     ],
                     'CourtOrderFlag'=> [
                         'icon' => 'forms',
-                        'descriptionField' => 'CourtOrderDescription'
+                        'descriptionField' => 'CourtOrderDescription',
+                        'defaultDescription' => 'Court Order'
                     ],
                     'IndividualPlanFlag'=> [
                         'icon' => 'staff-students',
-                        'descriptionField' => 'IndividualPlanDescription'
+                        'descriptionField' => 'IndividualPlanDescription',
+                        'defaultDescription' => 'Individual Plan'
                     ],
                     'AnaphylaxisFlag'=> [
                         'icon' => 'danger',
-                        'descriptionField' => 'AnaphlaxisDescription'
+                        'descriptionField' => 'AnaphylaxisDescription',
+                        'defaultDescription' => 'Anaphylaxis'
                     ]
                 ];
 
@@ -296,7 +303,7 @@ if ($class) {
                         if(!empty($currentStudent[$flags[$key]['descriptionField']])) {
                             $this->setVar('DESCRIPTION', $currentStudent[$flags[$key]['descriptionField']]);
                         } else {
-                            $this->setVar('DESCRIPTION', $key);
+                            $this->setVar('DESCRIPTION', $flags[$key]['defaultDescription']);
                         }
 
                         $this->parse('flags_block', 'flags', true);

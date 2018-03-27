@@ -1,5 +1,5 @@
 INSERT INTO config VALUES(NULL, 'show_attendance_flags', 0, 'Attendance Flags',
-'If selected, the following flags from Synergetic will show for each studfenton the attendance page:
+'If selected, the following flags from Synergetic will show for each student on the attendance page:
 MedicalAlertFlag,
 SpecialNeedsFlag,
 CommentWarningFlag,
