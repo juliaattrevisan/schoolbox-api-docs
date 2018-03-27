@@ -33,6 +33,7 @@ class Aggregation
      **
      * @param array $data
      * @param int   $year
+     * @return array
      */
     public function aggregate(array $data, int $year)
     {
