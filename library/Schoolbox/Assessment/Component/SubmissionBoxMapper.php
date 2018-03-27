@@ -98,6 +98,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper
 
         // SoftDelete/Restore weak entities
         $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteRubricLevels']);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteAssessment']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteSubmissions'));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteReturns'));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteShowcase'));
@@ -128,6 +129,21 @@ class SubmissionBoxMapper extends Schoolbox\Mapper
     {
         Rubric\LevelMapper::getInstance()->deleteByColumn('box_id', $dueWork->getId());
         return true;
+    }
+
+
+    /**
+     * Soft delete the box's assessment model
+     *
+     * @param SubmissionBox $dueWork
+     * @return bool
+     * @throws Schoolbox\Mapper\DefinitionException
+     */
+    protected function softDeleteAssessment(SubmissionBox $dueWork): bool
+    {
+        /** @var AssessmentMapper $assessmentMapper */
+        $assessmentMapper = $this->getJoinMapper('assessmentModel');
+        return $assessmentMapper->softDelete($dueWork->getAssessmentModel());
     }
 
 
