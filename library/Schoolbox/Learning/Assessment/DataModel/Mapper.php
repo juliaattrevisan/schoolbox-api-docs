@@ -163,7 +163,7 @@ class Mapper extends BaseMapper
 
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteQuiz'));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteTask'));
-        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteDueWork'));
+        $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteDueWork']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteProject'));
     }
 
