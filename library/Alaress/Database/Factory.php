@@ -15,6 +15,7 @@ use Alaress\Database\Broker\Db2\Broker as Db2Broker;
 use Alaress\Database\Broker\Mysql\Broker as MysqlBroker;
 use Alaress\Database\Broker\Sqlsrv;
 use Alaress\Database\Connector\Base as Connector;
+use Alaress\Database\Transactor\Base as Transactor;
 use Alaress\Database\Transactor\Strategy;
 use function in_array;
 use InvalidArgumentException;
@@ -34,7 +35,7 @@ class Factory
     public function createMysql()
     {
         $broker = new MysqlBroker();
-        return new Connector($broker, new Strategy\Savepoint());
+        return new Connector($broker, new Transactor(new Strategy\Savepoint()));
     }
 
 
@@ -70,7 +71,7 @@ class Factory
     public function createDblib()
     {
         $broker = new DblibBroker();
-        return new Connector($broker, new Strategy\Nested());
+        return new Connector($broker, new Transactor(new Strategy\Nested()));
     }
 
     /**
@@ -81,7 +82,7 @@ class Factory
     public function createSqlsrv()
     {
         $broker = new SqlsrvBroker();
-        return new Connector($broker, new Strategy\Nested());
+        return new Connector($broker, new Transactor(new Strategy\Nested()));
     }
 
     /**
@@ -92,6 +93,6 @@ class Factory
     public function createDb2()
     {
         $broker = new Db2Broker();
-        return new Connector($broker, new Strategy\Savepoint());
+        return new Connector($broker, new Transactor(new Strategy\Savepoint()));
     }
 }

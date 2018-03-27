@@ -15,7 +15,7 @@ use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Statement\FunctionCall\IFunctionCall;
 use Alaress\Database\Statement\Query\IQuery;
 use Alaress\Database\Statement\StoredProcedure\IStoredProcedure;
-use Alaress\Database\Transactor\Strategy\IStrategy as ITransactorStrategy;
+use Alaress\Database\Transactor\ITransactor;
 use Serializable;
 
 class Base implements Serializable, IConnector
@@ -23,7 +23,7 @@ class Base implements Serializable, IConnector
     /** @var IBroker */
     protected $broker;
 
-    /** @var ITransactorStrategy */
+    /** @var ITransactor */
     protected $transactor;
 
     /** @param array */
@@ -53,10 +53,10 @@ class Base implements Serializable, IConnector
     /**
      * Connector constructor
      *
-     * @param IBroker             $broker     Type specific broker
-     * @param ITransactorStrategy $transactor Transactor appropriate for this broker
+     * @param IBroker     $broker     Type specific broker
+     * @param ITransactor $transactor Transactor appropriate for this broker
      */
-    public function __construct(IBroker $broker, ITransactorStrategy $transactor)
+    public function __construct(IBroker $broker, ITransactor $transactor)
     {
         $this->broker     = $broker;
         $this->transactor = $transactor;
@@ -82,7 +82,7 @@ class Base implements Serializable, IConnector
 
         $this->broker->setConnector($this);
         if ($this->broker->connect($options)) {
-            $this->transactor->setConnection($this->broker->getPdo());
+            $this->transactor->getStrategy()->setConnection($this->broker->getPdo());
             return true;
         }
         return false;
