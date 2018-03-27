@@ -152,21 +152,21 @@
                 {% endfor %}
                 <tr>
                     <td colspan="6"><span>Credits Gained This Year</span></td>
-                    <td class="total center"></td>
-                    <td class="total center"></td>
-                    <td class="total center">58</td>
+                    <td class="total center">{{ macro.renderLevelTotal(data.credits.gainedThisYear.L1) }}</td>
+                    <td class="total center">{{ macro.renderLevelTotal(data.credits.gainedThisYear.L2) }}</td>
+                    <td class="total center">{{ macro.renderLevelTotal(data.credits.gainedThisYear.L3) }}</td>
                 </tr>
                 <tr>
                     <td colspan="6"><span>Credits Brought Forward From Previous Years</span></td>
-                    <td class="total center">178</td>
-                    <td class="total center">94</td>
-                    <td class="total center"></td>
+                    <td class="total center">{{ macro.renderLevelTotal(data.credits.broughtForward.L1) }}</td>
+                    <td class="total center">{{ macro.renderLevelTotal(data.credits.broughtForward.L2) }}</td>
+                    <td class="total center">{{ macro.renderLevelTotal(data.credits.broughtForward.L3) }}</td>
                 </tr>
                 <tr>
                     <td colspan="6"><span>Current Grand Total of Credits</span></td>
-                    <td class="total center">178</td>
-                    <td class="total center">94</td>
-                    <td class="total center">58</td>
+                    <td class="total center">{{ macro.renderLevelTotal(data.credits.total.L1) }}</td>
+                    <td class="total center">{{ macro.renderLevelTotal(data.credits.total.L2) }}</td>
+                    <td class="total center">{{ macro.renderLevelTotal(data.credits.total.L3) }}</td>
                 </tr>
             </tbody>
         </table>
