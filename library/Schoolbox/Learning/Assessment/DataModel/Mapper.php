@@ -163,7 +163,6 @@ class Mapper extends BaseMapper
 
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteQuiz'));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteTask'));
-        $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteDueWork']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteProject'));
     }
 
@@ -297,21 +296,6 @@ class Mapper extends BaseMapper
             $taskMapper = $this->getJoinMapper('task');
             $task = $taskMapper->findByColumn('assessment_id',$assessment->getId(), ['deleted' => true]);
             $taskMapper->delete($task);
-        }
-    }
-
-
-    /**
-     * When deleting an Assessment that is a DueWork, we need to delete all sub-objects of the DueWork
-     * @param Model $assessment
-     * @throws BaseMapper\DefinitionException If join name is not on this mapper
-     */
-    public function softDeleteDueWork(Model $assessment)
-    {
-        if($assessment->getDueWork() instanceof SubmissionBox){
-            $dueWorkMapper = $this->getJoinMapper('duework');
-            $dueWork = $dueWorkMapper->findByColumn('assessment_id',$assessment->getId(), ['deleted' => true]);
-            $dueWorkMapper->delete($dueWork);
         }
     }
 
