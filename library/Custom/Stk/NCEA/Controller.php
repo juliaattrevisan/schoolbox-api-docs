@@ -49,8 +49,6 @@ class Controller extends Base
 
         $aggregatedData = (new Aggregation())->aggregate($rawData, $year);
 
-        new \Alaress_Probe($aggregatedData);
-
         $this->getResponse()->content->set($this->buildHtmlOutput('@nceaReport/report.twig', [
             'user' => $user,
             'data' => $aggregatedData,
