@@ -38,7 +38,7 @@
     "flatpickr": "2.4.8",
     "jquery.scrollTo": "2.1.2",
     "intro.js": "alaress/intro.js#master",
-    "swiper": "^4.2.0"
+    "swiper": "4.2.0"
   },
   "ignore": [
     "**/.*",
