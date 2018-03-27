@@ -43,7 +43,11 @@ class Icon extends BaseTransformation
             NSMapper::NS_SSTREAM            => 'chat',
             NSMapper::NS_EOTC               => 'clock',
             NSMapper::NS_RESOURCE_BOOKING   => 'clock',
-            NSMapper::NS_REPORT_CARD        => 'chat'
+            NSMapper::NS_REPORT_CARD        => 'chat',
+            NSMapper::NS_EPORTFOLIO_BLOG    => 'comment',
+            NSMapper::NS_PASTORAL           => 'comment',
+            NSMapper::NS_PASTORAL_COMMENT   => 'chat',
+            NSMapper::NS_SPORTS_FIXTURES    => 'bolt',
         );
 
         if (!in_array($size, $validSizes)) {
