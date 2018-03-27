@@ -11,6 +11,7 @@
 use Alaress\Cache;
 use Alaress\Database\Quoter\IQuoter;
 use Alaress\Database\Quoter\Mysql\Quoter as MysqlQuoter;
+use Alaress\Database\Transactor\Base as Transactor;
 use Alaress\Database\Transactor\Strategy\Savepoint as TransactionStrategy;
 use Alaress\DebugBar\Instance as DebugBar;
 use Alaress\IDatabase;
@@ -66,9 +67,9 @@ class Database implements IDatabase, Serializable, IQuoter
     private $connection;
 
     /**
-     * The transaction strategy. (In this case, always nested)
+     * The transaction handler
      *
-     * @var TransactionStrategy
+     * @var Transactor
      */
     private $transactor;
 
@@ -155,8 +156,8 @@ class Database implements IDatabase, Serializable, IQuoter
         }
 
         // Create transactor, which depends on connection
-        $this->transactor = new TransactionStrategy();
-        $this->transactor->setConnection($this->connection);
+        $this->transactor = new Transactor(new TransactionStrategy());
+        $this->transactor->getStrategy()->setConnection($this->connection);
 
         return true;
     }
