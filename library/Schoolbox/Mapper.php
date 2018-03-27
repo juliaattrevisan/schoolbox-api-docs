@@ -3682,9 +3682,10 @@ abstract class Mapper implements IMapper, Serializable
 
         // create a new event, and send it to the scheduler
         try {
-            $this->getEventPropagator()->propagate($this->sessionData['user'], $verb, $object, $this, $diff);
-        }
-        catch( \ErrorException $e) {
+            $this->database->onPersist(function() use ($verb, $object, $diff) {
+                $this->getEventPropagator()->propagate($this->sessionData['user'], $verb, $object, $this, $diff);
+            });
+        } catch( \ErrorException $e) {
             //Unable to connect to notification system
             return false;
         }
