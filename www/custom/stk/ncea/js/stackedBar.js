@@ -51,7 +51,11 @@
 
                 /* Type of stacking
                  */
-                stacking: 'percent'
+                stacking: 'percent',
+
+                /* Stack Labels
+                 */
+                stackLabels: false
             };
 
             var derived = {
@@ -74,12 +78,16 @@
                 },
                 xAxis: {
                     categories: config.categories
+
                 },
                 yAxis: {
                     min: 0,
                     reversedStacks: false,
                     title: {
                         text: config.yAxisTitle
+                    },
+                    stackLabels: {
+                        enabled: config.stackLabels
                     }
                 },
                 legend: {
