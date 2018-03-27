@@ -53,7 +53,7 @@ class Aggregation
      * @param int   $year
      * @return array
      */
-    public function aggregate(array $data, int $year)
+    public function aggregate(array $data, int $year): array
     {
         /* Aggregation totals
          */
@@ -77,7 +77,19 @@ class Aggregation
         foreach ($allRecords as $current) {
             $subjectKey = $current['subjectName'];
             $levelKey = "L{$current['nceaLevel']}";
+            $gradeKey = $current['grade'];
 
+            /* Data for Graph: only care about the achievements listed in $this->achievements
+             * All others are ignored
+             *
+             * Accumulate from all records obtained in Acquisition (it's not year-specific)
+             */
+            if (\in_array($gradeKey, $this->achievements, false)) {
+                $graph[$gradeKey][$levelKey] += $current['creditsGained'];
+            }
+
+            /* Data for Tables
+             */
             if ($current['year'] === $year) {
 
                 /* Set up a new subject's information if it hasn't been encountered before
@@ -102,13 +114,6 @@ class Aggregation
                 /* Also aggregate this summary total for the current year
                  */
                 $credits['gainedThisYear'][$levelKey] += $current['creditsGained'];
-
-                /* Data for Graph: only care about the achievements listed in $this->achievements
-                 * All others are ignored
-                 */
-                if (\in_array($current['grade'], $this->achievements, true)) {
-                    $graph[$current['grade']][$levelKey]++;
-                }
             }
             elseif ($current['year'] < $year) {
 
