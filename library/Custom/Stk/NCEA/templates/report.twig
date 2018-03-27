@@ -53,7 +53,7 @@
 
             {# Show data, if there is any to display; otherwise "empty state" message #}
             {% if data.records|length %}
-                {% include '@nceaReport/data.twig' with {
+                {% include '@nceaReport/graph-summary-data.twig' with {
                     user: user,
                     data: data
                 } %}
