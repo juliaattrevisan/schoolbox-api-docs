@@ -65,6 +65,7 @@ class Acquisition
                 R.CommPortalCurrentFlag
             FROM dbo.uvStudentsNCEAResultsTracking R
             WHERE R.ID = :externalId
+            AND CommPortalCurrentFlag = \'NCEA\'
             ORDER BY R.FileYear, R.SubjectSort, R.AssessAreaNCEAStandardNumber
         ');
 
