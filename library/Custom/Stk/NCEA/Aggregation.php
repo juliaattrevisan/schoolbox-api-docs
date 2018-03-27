@@ -94,6 +94,10 @@ class Aggregation
             $credits['total'][$levelKey] = $credits['gainedThisYear'][$levelKey] + $credits['broughtForward'][$levelKey];
         }
 
-        new \Alaress_Probe($data, $aggregatedData, $credits);
+        return [
+            'meta' => $data['meta'],
+            'records' => $aggregatedData,
+            'credits' => $credits,
+        ];
     }
 }

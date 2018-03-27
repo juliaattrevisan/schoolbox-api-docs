@@ -44,12 +44,17 @@ class Controller extends Base
         /** @var IConnector $externalDb */
         $externalDb = $this->getDi()->get('databaseExternal');
 
-        $data = (new Acquisition($externalDb, $user->getExternalId()))->getRecords(2017);
+        $year = 2017;
 
-        (new Aggregation())->aggregate($data, 2017);
+        $rawData = (new Acquisition($externalDb, $user->getExternalId()))->getRecords($year);
 
+        $aggregatedData = (new Aggregation())->aggregate($rawData, $year);
+
+        new \Alaress_Probe($aggregatedData);
+        
         $this->getResponse()->content->set($this->buildHtmlOutput('@nceaReport/report.twig', [
-            'user' => $user
-        ])->setTitle("NCEA Report for {$user->getFullName()}"));
+            'user' => $user,
+            'data' => $aggregatedData,
+        ])->setTitle("NCEA Report for {$aggregatedData['meta']['fullname']}"));
     }
 }
