@@ -109,7 +109,7 @@ class SSO
      * @throws SsoTokenGenerationException
      * @throws \RuntimeException
      */
-    private function getV2Token(GuzzleHttp\Client $client, array $conf, array $deepLink = [], bool $prodMenu): string
+    private function getV2Token(GuzzleHttp\Client $client, array $conf, array $deepLink, bool $prodMenu): string
     {
         $formParams = array_merge($conf, [
             'prod_menu' => $prodMenu ? 'Y' : 'N',

@@ -665,7 +665,7 @@ abstract class Component_ControllerAbstract
             }
         }
 
-        if($renderInIsland){
+        if ($renderInIsland) {
             // If we are rending raw we want to dump the TWIG content into the header rather than COMPONENT_CONTENT block
             if ($contentRaw) {
                 if ($this->getInstance()->getModule() === 'dashboard') {

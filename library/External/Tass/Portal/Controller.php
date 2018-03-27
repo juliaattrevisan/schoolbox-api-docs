@@ -77,9 +77,9 @@ class Controller extends Alaress\Web\Controller\Base
         ];
 
         // Send off the SSO token request
-        try{
+        try {
             $token = $this->sso->getUserToken($config, $deepLink, $prodMenu);
-        } catch (SsoTokenGenerationException|\RuntimeException $e){
+        } catch (SsoTokenGenerationException|\RuntimeException $e) {
             $this->captureException($e);
             $token = '';
         }
@@ -88,9 +88,9 @@ class Controller extends Alaress\Web\Controller\Base
         if ($token) {
             $this->getResponse()->redirect->to("{$this->portalHost}{$productPath}?sso_token={$token}");
         } else {
-            try{
+            try {
                 $this->getResponse()->status->setCode(404);
-            } catch (InvalidStatusCode $e){
+            } catch (InvalidStatusCode $e) {
                 $this->captureException($e);
                 exit($e->getMessage());
             }
@@ -188,7 +188,7 @@ class Controller extends Alaress\Web\Controller\Base
     private function getProdMenu(): bool
     {
         $prodMenu = $this->getRequest()->query->get('prod_menu', true);
-        if(\in_array($prodMenu, [false, 0, '0', 'n', 'N'], true)){
+        if (\in_array($prodMenu, [false, 0, '0', 'n', 'N'], true)) {
             return false;
         }
         return true;
