@@ -85,6 +85,12 @@ class Aggregation
             }
         }
 
+        /* Grand Total
+         */
+        foreach (['L1', 'L2', 'L3'] as $levelKey) {
+            $credits['total'][$levelKey] = $credits['gainedThisYear'][$levelKey] + $credits['broughtForward'][$levelKey];
+        }
+
         new \Alaress_Probe($data, $aggregatedData, $credits);
     }
 }
