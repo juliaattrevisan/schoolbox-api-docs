@@ -28,10 +28,12 @@ class Module extends BaseModule
      */
     protected $basename = 'nceaReport';
 
+
     /**
      * Hook method for setting up routes via self::register()
      *
      * @return void
+     * @throws \Schoolbox\Application\Exception\NotFound
      * @throws \InvalidArgumentException
      */
     protected function registerRoutes()
