@@ -143,7 +143,8 @@ class SubmissionBoxMapper extends Schoolbox\Mapper
     {
         /** @var AssessmentMapper $assessmentMapper */
         $assessmentMapper = $this->getJoinMapper('assessmentModel');
-        return $assessmentMapper->softDelete($dueWork->getAssessmentModel());
+        $assessmentMapper->softDelete($dueWork->getAssessmentModel());
+        return true;
     }
 
 
