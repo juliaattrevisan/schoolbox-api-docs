@@ -369,6 +369,21 @@ class Database implements IDatabase, Serializable, IQuoter
     }
 
     /**
+     * If not in a transaction, call `$callback` immediately.
+     *
+     * Otherwise, queue `$callback` to be called only if the outermost nesting
+     * level is committed.
+     *
+     * @param callable $callback
+     * @return $this
+     */
+    public function onPersist(callable $callback)
+    {
+        $this->transactor->onPersist($callback);
+        return $this;
+    }
+
+    /**
      * Wrapper for PDO::beginTransaction
      * Initiates a transaction
      *
