@@ -9,6 +9,12 @@
     {% endif %}
 {% endmacro %}
 
+{% macro renderCreditsforAchievement(data, achievement) %}
+    {% for level, value in data.graph[achievement] %}
+        {{ value }}{% if not loop.last %}, {% endif %}
+    {% endfor %}
+{% endmacro %}
+
 <style type="text/css" media="screen, print">
     #nceaReport span.disclaimer {
         font-weight: bold;
@@ -57,25 +63,19 @@
                 {
                     name: 'Achieved',
                     data: [
-                        {% for level, value in data.graph.A %}
-                        {{ value }}{% if not loop.last %}, {% endif %}
-                        {% endfor %}
+                        {{ macro.renderCreditsforAchievement(data, 'A') }}
                     ]
                 },
                 {
                     name: 'Merit',
                     data: [
-                        {% for level, value in data.graph.M %}
-                        {{ value }}{% if not loop.last %}, {% endif %}
-                        {% endfor %}
+                        {{ macro.renderCreditsforAchievement(data, 'M') }}
                     ]
                 },
                 {
                     name: 'Excellence',
                     data: [
-                        {% for level, value in data.graph.E %}
-                        {{ value }}{% if not loop.last %}, {% endif %}
-                        {% endfor %}
+                        {{ macro.renderCreditsforAchievement(data, 'E') }}
                     ]
                 }
             ]
