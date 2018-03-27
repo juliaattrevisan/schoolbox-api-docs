@@ -78,7 +78,7 @@ class Aggregation
         $allRecords = $data['records'];
 
         foreach ($allRecords as $current) {
-            $subjectKey = $current['subjectName'];
+            $subjectKey = $current['subjectSort'];
             $levelKey = "L{$current['nceaLevel']}";
             $gradeKey = $current['grade'];
 
