@@ -97,7 +97,11 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
 
         if ($interval <= 0) {
             $this->log->info('Immediately dispatching trigger');
+            $previousTriggerExisted = $this->unschedule($trigger);
+            $this->log->debug($previousTriggerExisted ? 'Cleared previous trigger' : 'No previous trigger was set', [ 'char' => '-' ]);
+
             $this->dispatchTrigger($trigger);
+
             return;
         }
 
