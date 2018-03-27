@@ -71,7 +71,6 @@ class Acquisition
                 R.CommPortalCurrentFlag
             FROM dbo.uvStudentsNCEAResultsTracking R
             WHERE R.ID = :externalId
-            AND CommPortalCurrentFlag = 1
             ORDER BY R.FileYear, R.SubjectSort, R.AssessAreaNCEAStandardNumber
         ');
 
