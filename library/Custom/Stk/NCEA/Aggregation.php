@@ -27,10 +27,14 @@ class Aggregation
         return array_fill_keys($this->indexes, 0);
     }
 
+
     /**
+     * Make an aggregation for the given $year
+     **
      * @param array $data
+     * @param int   $year
      */
-    public function aggregate(array $data)
+    public function aggregate(array $data, int $year)
     {
         /* Aggregation totals
          */
@@ -51,7 +55,7 @@ class Aggregation
             $subjectKey = $current['subjectName'];
             $levelKey = "L{$current['nceaLevel']}";
 
-            if ($current['year'] === date('Y')) {
+            if ($current['year'] === $year) {
 
                 /* Set up a new subject's information if it hasn't been encountered before
                  */
@@ -76,7 +80,7 @@ class Aggregation
                  */
                 $credits['gainedThisYear'][$levelKey] += $current['creditsGained'];
             }
-            else {
+            elseif ($current['year'] < $year) {
 
                 /* Accumulate a total of credits that were obtained in a previous year
                  */
