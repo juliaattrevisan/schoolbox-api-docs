@@ -74,7 +74,7 @@ class Acquisition
             WHERE R.ID = :externalId
             AND CommPortalCurrentFlag = 1
             AND FileYear = :year
-            ORDER BY R.SubjectName, R.SubjectSort, R.AssessAreaNCEAStandardNumber
+            ORDER BY R.SubjectSort, R.AssessAreaNCEAStandardNumber
         ');
 
         $statement->execute([
