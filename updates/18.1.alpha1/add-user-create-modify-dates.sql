@@ -13,3 +13,5 @@ ALTER TABLE `user`
     DATETIME NULL
     DEFAULT NULL
     AFTER `updated_at`;
+
+UPDATE `user` SET created_at=FROM_UNIXTIME(0), updated_at=FROM_UNIXTIME(0);
