@@ -544,14 +544,56 @@ class SubmissionBoxMapper extends Schoolbox\Mapper
         return true;
     }
 
+
     /**
-     * Override delete as we now only delete the assessment not the submission_box
-     * @param object|Collection $object
-     * @return bool
+     * Special case for submission_box which reflects the soft-deleted status of it's assessment
+     *
+     * @inheritdoc
      */
-    public function delete($object)
+    public function isSoftDeletable(): bool
     {
-        //noop
+        // Even though this table lacks a soft-delete column, it takes is soft-delete status from the assessment table
+        return $this->getJoinMapper('assessmentModel')->isSoftDeletable();
+    }
+
+
+    /**
+     * Special case for SubmissionBox which takes its deletion status from the assessment table.
+     *
+     * This table lacks a soft-delete column, but is soft-deletable by virtue of it being composed
+     * of a soft-deletable assessment
+     *
+     * @param object|Collection|SubmissionBox $object
+     * @return bool
+     * @throws \UnexpectedValueException If a callback fails and we need to halt
+     */
+    public function softDelete($object): bool
+    {
+        $collection = $this->getModelAsCollection($object);
+        $notDeleted = $collection->filter(function (SubmissionBox $model) {
+            return !$model->getAssessmentModel()->isDeleted();
+        });
+        if (!\count($notDeleted)) {
+            return false;
+        }
+
+        // Trigger the pre-trigger
+        foreach ($collection as $model) {
+            if (!$this->triggerCallbacks(self::CALLBACK_PRESOFTDELETE, $model)) {
+                return false;
+            }
+        }
+
+        // Trigger the post-trigger
+        foreach ($collection as $model) {
+            $this->triggerCallbacks(self::CALLBACK_POSTSOFTDELETE, $model);
+        }
+
+        // Send the notification action
+        foreach ($collection as $model) {
+            $this->raiseNotification($model, self::METHOD_DELETE);
+        }
+
         return true;
     }
 
