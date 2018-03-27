@@ -356,11 +356,7 @@ class Database implements IDatabase, Serializable, IQuoter
     }
 
     /**
-     * Wraps `$callback` in a transaction.
-     *
-     * @param callable $callback
-     * @return $this
-     * @throws \Throwable
+     * @inheritdoc
      */
     public function transact(callable $callback)
     {
@@ -369,13 +365,7 @@ class Database implements IDatabase, Serializable, IQuoter
     }
 
     /**
-     * If not in a transaction, call `$callback` immediately.
-     *
-     * Otherwise, queue `$callback` to be called only if the outermost nesting
-     * level is committed.
-     *
-     * @param callable $callback
-     * @return $this
+     * @inheritdoc
      */
     public function onPersist(callable $callback)
     {

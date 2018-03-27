@@ -189,6 +189,21 @@ class MockDatabase implements IDatabase, IQuoter
         return $columnName;
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function transact(callable $callback)
+    {
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function onPersist(callable $callback)
+    {
+        return $this;
+    }
 
     /**
      * @return bool
