@@ -1,0 +1,38 @@
+@media all {
+  #nceaReport {
+    span.disclaimer {
+      font-weight: bold;
+      text-decoration: underline;
+    }
+
+    th, td {
+      border: 1px solid #000 !important;
+    }
+
+    td {
+      span {
+        font-weight: bold;
+      }
+
+      &.total {
+        background-color: #ededed;
+        font-weight: bold;
+      }
+    }
+
+    .center {
+      text-align: center;
+    }
+
+    p.center {
+      margin: 0 auto;
+    }
+  }
+}
+
+@media print {
+  h1 {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+}
