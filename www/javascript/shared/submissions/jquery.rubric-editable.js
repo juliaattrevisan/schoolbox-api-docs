@@ -170,17 +170,8 @@
         $rb.off('focus keyup paste', 'textarea');
         $rb.on('focus keyup paste', 'textarea', function () {
 
-            // get mah siblangs
-            var $areas = $(this).closest('tr').find('textarea');
-
-            var h = 0;
-
-            $areas.each(function() {
-                this.style.height = 'auto';
-                h = Math.max(h, this.scrollHeight - parseInt($(this).css('paddingTop')) - parseInt($(this).css('paddingBottom')));
-            });
-
-            $areas.height(h);
+            // get mah row, and resize its inputs
+            rubricEditable.resizeDescriptorTextInputs($(this.closest('[data-group]')));
         });
 
         $rb.off('click', 'td.' + opt.hideVerticalClass);
@@ -218,7 +209,9 @@
 
         // effect these listeners
         $rb.find('input[data-level]').trigger('change');
-        $rb.find('textarea').trigger('keyup');
+        $rb.find('[data-group]').each(function() {
+            rubricEditable.resizeDescriptorTextInputs($(this));
+        });
 
         $rb.sequencer({
             swap: function (axis, first, second) {
@@ -516,6 +509,25 @@
         });
 
         this.options.afterApplyResultSet.call(this);
+    };
+
+    /**
+     * Resize all descriptor text inputs within the row.
+     *
+     * @param row
+     */
+    RubricEditable.prototype.resizeDescriptorTextInputs = function (row) {
+        // get mah inputs
+        var $areas = row.find('[data-descriptor-text]');
+
+        var h = 0;
+
+        $areas.each(function() {
+            this.style.height = 'auto';
+            h = Math.max(h, this.scrollHeight - parseInt($(this).css('paddingTop')) - parseInt($(this).css('paddingBottom')));
+        });
+
+        $areas.height(h);
     };
 
 
