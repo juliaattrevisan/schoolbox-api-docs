@@ -73,8 +73,43 @@ class Acquisition
             'externalId' => $this->externalId
         ]);
 
+        /* Passed to Aggregation for summarising
+         */
+        $data = [
+
+            /* Headings that are repeated for every row
+             * But we only need them once
+             */
+            'meta' => [],
+
+            /* Individual data records that we need to Aggregate later
+             */
+            'records' => [],
+        ];
+
         while ($row = $statement->fetch()) {
-            new \Alaress_Probe($row);
+            if (empty($data['meta'])) {
+                $data['meta'] = [
+                    'externalId' => $row['ID'],
+                    'firstname' => $row['StudentPreferred'],
+                    'fullname' => $row['StudentName'],
+                    'tutorGroup' => $row['StudentTutor'],
+                    'year' => $row['FileYear'],
+                ];
+            }
+
+            $data['records'][] = [
+                'grade' => $row['Grade'],
+                'nceaStandardNumber' => $row['AssessAreaNCEAStandardNumber'],
+                'nceaLevel' => $row['AssessAreaNCEALevel'],
+                'nceaCredits' => $row['AssessAreaNCEACredits'],
+                'assessmentOption' => $row['AssessmentOption'],
+                'creditsGained' => $row['CreditsGained'],
+                'subjectSort' => $row['SubjectSort'],
+                'subjectName' => $row['SubjectName'],
+            ];
         }
+
+        return $data;
     }
 }
