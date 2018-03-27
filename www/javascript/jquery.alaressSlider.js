@@ -1,23 +1,39 @@
 /**
  *
- * @author      Matt Day <matt.day@alaress.com.au>
+ * @author      Doug MacKenzie <doug.mackenzie@alaress.com.au>
  * @copyright   Copyright 2018, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
-
-/**
- *
- * @author      Matt Day <matt.day@alaress.com.au>
- * @copyright   Copyright 2018, Alaress Pty Ltd
- * @link        http://www.alaress.com.au/
- */
-;(function ($, window, document, undefined) {
+;(function ($, window, document, Swiper, undefined) {
+    "use strict";
 
     // the name of the plugin, as internally referenced by $().data()
     var pluginName = 'alaressSlider';
 
     // default construction arguments
-    var defaults = {};
+    var defaults = {
+        autoplay: false, // This will be overridden on 'lazyImageReady' below
+        centeredSlides: true,
+        initialSlide: 1,
+        lazy: {
+            loadPrevNext: true,
+            loadPrevNextAmount: 3,
+            preloaderClass: 'loader'
+        },
+        loop: true,
+        pagination: {
+            el: '.swiper-pagination',
+            clickable: true
+        },
+        navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev'
+        },
+        speed: 1000,
+        alaress: {
+            autoplayDelay: 5000
+        }
+    };
 
 
     /**
@@ -30,25 +46,20 @@
 
         this.element = element;
         this.options = $.extend(true, {}, defaults, options);
+
+        var mySwiper = new Swiper(element, alaressSlider.options);
+
+        // Don't start autoplay until first image has loaded
+        mySwiper.on('lazyImageReady', function() {
+            if (!mySwiper.params.autoplay.enabled) { // TODO: this should also check the image that was loaded was the active one
+                mySwiper.params.autoplay = {
+                    delay: alaressSlider.options.alaress.autoplayDelay,
+                    disableOnInteraction: false
+                };
+                mySwiper.autoplay.start();
+            }
+        });
     }
-
-    /**
-     * Example privileged method: accessible via:
-     * - $().data('plugin_alaressSlider').examplePrivilegedMethod(val, val);
-     * - $().alaressSlider('examplePrivileged', val, val);
-     */
-    alaressSlider.prototype.examplePrivilegedMethod = function (arg, another) {
-        // `this` refers to the alaressSlider instance
-        examplePrivateMethod(this.element);
-    };
-
-    /**
-     * Private method restricted to plugin scope. Inaccessible from outside plugin.
-     */
-    function examplePrivateMethod(noTouchies) {
-        window.console.log(noTouchies);
-    }
-
 
     /**
      * Register plugin into jQuery
@@ -107,4 +118,4 @@
         this.options = $.extend(true, {}, merge, opts);
     }
 
-})(jQuery, window, document);
+})(jQuery, window, document, Swiper);
