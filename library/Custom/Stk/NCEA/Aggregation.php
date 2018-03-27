@@ -84,7 +84,7 @@ class Aggregation
              *
              * Accumulate from all records obtained in Acquisition (it's not year-specific)
              */
-            if (\in_array($gradeKey, $this->achievements, false)) {
+            if (\in_array($gradeKey, $this->achievements, true)) {
                 $graph[$gradeKey][$levelKey] += $current['creditsGained'];
             }
 
