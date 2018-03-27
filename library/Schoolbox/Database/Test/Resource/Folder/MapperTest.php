@@ -93,7 +93,7 @@ class MapperTest extends TestCase
         $this->connectSchoolbox();
         $this->schoolbox->beginTransaction();
         $this->schoolbox->executeQuery("UPDATE `folder` SET deleted_at = '1970-01-01 00:00:00'");
-        $this->schoolbox->executeQuery('TRUNCATE `folder_code`');
+        $this->schoolbox->executeQuery('DELETE FROM `folder_code`');
 
         self::iterate($this->schoolbox, 0, self::$tree);
     }
