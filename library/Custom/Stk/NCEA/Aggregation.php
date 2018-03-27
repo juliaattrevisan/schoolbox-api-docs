@@ -59,7 +59,7 @@ class Aggregation
 
                 /* Set up a new subject's information if it hasn't been encountered before
                  */
-                if (!isset($aggregationData[$subjectKey])) {
+                if (!isset($aggregatedData[$subjectKey])) {
                     $aggregatedData[$subjectKey] = [
                         'availableCredits' => 0,
                         'gainedCredits' => $this->makeLevelArray(),
