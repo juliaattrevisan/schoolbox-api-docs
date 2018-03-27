@@ -241,12 +241,14 @@ class Notifier extends AbstractModuleNotifier
      */
     public function bundleTriggers($bundle)
     {
+        $now = time() + 5;
+
         switch ($bundle->getMethod()) {
             case BaseMapper::METHOD_CREATE:
-                $bundle->attach(self::TRIGGER_CREATED, self::IMMEDIATELY);
+                $bundle->attach(self::TRIGGER_CREATED, $now);
                 break;
             case BaseMapper::METHOD_UPDATE:
-                $bundle->attach(self::TRIGGER_UPDATED, self::IMMEDIATELY);
+                $bundle->attach(self::TRIGGER_UPDATED, $now);
                 break;
         }
     }
