@@ -1,0 +1,112 @@
+{% import '@nceaReport/macro.twig' as macro %}
+
+<script type="text/javascript" src="/javascript/components/highcharts-release/highcharts.js"></script>
+<script type="text/javascript" src="/custom/stk/ncea/js/stackedBar.js"></script>
+
+<script type="text/javascript">
+    $(function() {
+        $('#graph').ncea_stackedBar({
+            title: 'Running Total of Credits to Date',
+
+            colors: ['#4394FF', '#FFB37C', '#409F40'],
+
+            categories: [
+                'Level 1', 'Level 2', 'Level 3'
+            ],
+
+            series: [
+                {
+                    name: 'Achieved',
+                    data: [
+                        {{ macro.renderCreditsforAchievement(data, 'A') }}
+                    ]
+                },
+                {
+                    name: 'Merit',
+                    data: [
+                        {{ macro.renderCreditsforAchievement(data, 'M') }}
+                    ]
+                },
+                {
+                    name: 'Excellence',
+                    data: [
+                        {{ macro.renderCreditsforAchievement(data, 'E') }}
+                    ]
+                }
+            ],
+
+            stacking: 'normal',
+            stackLabels: true
+        });
+    });
+</script>
+
+<div id="graph"></div>
+
+<p class="content center">
+    {{ user.firstname }} is enrolled in the standards below.
+    Only <u>final</u> results are shown, practice and interim results are excluded.
+</p>
+
+<table>
+    <thead>
+    <tr>
+        <th rowspan="2" width="42%">Course</th>
+        <th rowspan="2" class="center" width="8%">Standard Number</th>
+        <th rowspan="2" class="center" width="8%">Level</th>
+        <th rowspan="2" class="center" width="8%">Credit Value</th>
+        <th rowspan="2" class="center" width="8%">Internal or External</th>
+        <th rowspan="2" class="center" width="8%">Grade</th>
+        <th colspan="3" class="center" width="18%">Total Credits Gained</th>
+    </tr>
+    <tr>
+        <th class="center">L1</th>
+        <th class="center">L2</th>
+        <th class="center">L3</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for subjectName, subjectData in data.records %}
+        {% for item in subjectData.data %}
+            <tr>
+                <td>{{ subjectName }}</td>
+                <td class="center">{{ item.nceaStandardNumber }}</td>
+                <td class="center">{{ item.nceaLevel }}</td>
+                <td class="center">{{ item.nceaCredits }}</td>
+                <td class="center">{{ item.assessmentOption }}</td>
+                <td class="center">{{ item.grade }}</td>
+                <td class="center">{{ macro.renderLevelTotal(item.L1) }}</td>
+                <td class="center">{{ macro.renderLevelTotal(item.L2) }}</td>
+                <td class="center">{{ macro.renderLevelTotal(item.L3) }}</td>
+            </tr>
+        {% endfor %}
+
+        <tr>
+            <td colspan="3" class="text-right"><span>Available Credits:</span></td>
+            <td class="center"><span>{{ subjectData.availableCredits }}</span></td>
+            <td colspan="2"><span>Gained Credits:</span></td>
+            <td class="center"><span>{{ macro.renderLevelTotal(subjectData.gainedCredits.L1) }}</span></td>
+            <td class="center"><span>{{ macro.renderLevelTotal(subjectData.gainedCredits.L2) }}</span></td>
+            <td class="center"><span>{{ macro.renderLevelTotal(subjectData.gainedCredits.L3) }}</span></td>
+        </tr>
+    {% endfor %}
+    <tr>
+        <td colspan="6"><span>Credits Gained This Year</span></td>
+        <td class="total center">{{ macro.renderLevelTotal(data.credits.gainedThisYear.L1) }}</td>
+        <td class="total center">{{ macro.renderLevelTotal(data.credits.gainedThisYear.L2) }}</td>
+        <td class="total center">{{ macro.renderLevelTotal(data.credits.gainedThisYear.L3) }}</td>
+    </tr>
+    <tr>
+        <td colspan="6"><span>Credits Brought Forward From Previous Years</span></td>
+        <td class="total center">{{ macro.renderLevelTotal(data.credits.broughtForward.L1) }}</td>
+        <td class="total center">{{ macro.renderLevelTotal(data.credits.broughtForward.L2) }}</td>
+        <td class="total center">{{ macro.renderLevelTotal(data.credits.broughtForward.L3) }}</td>
+    </tr>
+    <tr>
+        <td colspan="6"><span>Current Grand Total of Credits</span></td>
+        <td class="total center">{{ macro.renderLevelTotal(data.credits.total.L1) }}</td>
+        <td class="total center">{{ macro.renderLevelTotal(data.credits.total.L2) }}</td>
+        <td class="total center">{{ macro.renderLevelTotal(data.credits.total.L3) }}</td>
+    </tr>
+    </tbody>
+</table>

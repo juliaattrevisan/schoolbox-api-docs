@@ -46,19 +46,12 @@ class Controller extends Base
         $externalDb = $this->getDi()->get('databaseExternal');
 
         $rawData = (new Acquisition($externalDb, $user->getExternalId()))->getRecords($year);
-$rawData = [];
-        if (\count($rawData['records'])) {
-            $aggregatedData = (new Aggregation())->aggregate($rawData, $year);
 
-            $this->getResponse()->content->set($this->buildHtmlOutput('@nceaReport/report.twig', [
-                'user' => $user,
-                'data' => $aggregatedData,
-            ])->setTitle("NCEA Report for {$aggregatedData['meta']['fullname']}"));
-        }
-        else {
-            $this->getResponse()->content->set($this->buildHtmlOutput('@nceaReport/no-report.twig', [
-                'user' => $user,
-            ])->setTitle("NCEA Report for {$user->getFullName()}"));
-        }
+        $aggregatedData = (new Aggregation())->aggregate($rawData, $year);
+
+        $this->getResponse()->content->set($this->buildHtmlOutput('@nceaReport/report.twig', [
+            'user' => $user,
+            'data' => $aggregatedData,
+        ])->setTitle("NCEA Report for {$user->getFullName()}"));
     }
 }

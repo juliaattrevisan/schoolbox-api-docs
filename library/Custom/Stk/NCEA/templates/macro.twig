@@ -1,0 +1,14 @@
+{# Only render $total if it wasn't zero
+ # Otherwise render it as an empty string
+ #}
+{% macro renderLevelTotal(total) %}
+    {% if total != 0 %}
+        {{ total }}
+    {% endif %}
+{% endmacro %}
+
+{% macro renderCreditsforAchievement(data, achievement) %}
+    {% for level, value in data.graph[achievement] %}
+        {{ value }}{% if not loop.last %}, {% endif %}
+    {% endfor %}
+{% endmacro %}
