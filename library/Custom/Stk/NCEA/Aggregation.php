@@ -102,6 +102,13 @@ class Aggregation
                 /* Also aggregate this summary total for the current year
                  */
                 $credits['gainedThisYear'][$levelKey] += $current['creditsGained'];
+
+                /* Data for Graph: only care about the achievements listed in $this->achievements
+                 * All others are ignored
+                 */
+                if (\in_array($current['grade'], $this->achievements, true)) {
+                    $graph[$levelKey][$current['grade']]++;
+                }
             }
             elseif ($current['year'] < $year) {
 
