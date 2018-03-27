@@ -225,6 +225,9 @@ class TestStatement extends TestCase
     public function testFunctionCall()
     {
         // create and drop test function here, instead of in updates
+        // First, I must exit the transaction though.
+        $this->schoolbox->rollBack();
+
         $this->schoolbox->executeQuery("
             CREATE FUNCTION IF NOT EXISTS testFunction (`input` VARCHAR(255))
                 RETURNS VARCHAR(500)
@@ -243,5 +246,8 @@ class TestStatement extends TestCase
         $this->assertSame($function->fetchColumn(), 'testFunctionDidThis:Got Milk?');
 
         $this->schoolbox->executeQuery("DROP FUNCTION IF EXISTS testFunction;");
+
+        // I must reopen a transaction, so rollBack() can roll something back
+        $this->schoolbox->beginTransaction();
     }
 }
