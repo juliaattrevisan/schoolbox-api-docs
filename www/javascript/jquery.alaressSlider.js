@@ -14,7 +14,7 @@
     var defaults = {
         autoplay: false, // This will be overridden on 'lazyImageReady' below
         centeredSlides: true,
-        initialSlide: 1,
+        initialSlide: 0,
         lazy: {
             loadPrevNext: true,
             loadPrevNextAmount: 3,
