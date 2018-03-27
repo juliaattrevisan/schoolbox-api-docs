@@ -45,6 +45,7 @@ $this->setBlock(TEMPLATE_content, 'student', 'student_block');
 $this->setBlock('student', 'student_absent', 'student_absent_block');
 $this->setBlock('student', 'absence_options', 'absence_options_block');
 $this->setBlock('student', 'reason_options', 'reason_options_block');
+$this->setBlock('student', 'flags', 'flags_block');
 
 // Ensure correct parameter count
 
@@ -254,10 +255,66 @@ if ($class) {
                 array('Code' => 'REASON_OPTIONS_VALUE', 'AbsenceTypeCode' => 'REASON_OPTIONS_TYPE', 'Description' => 'REASON_OPTIONS_DESCRIPTION')
             );
 
+            if ($configLoader->get('show_attendance_flags')) {
+                //Let's render out some flags
+                //Only the flags defined in the keys will be rendered
+                $flags = [
+                    'MedicalAlertFlag'=> [
+                        'icon' => 'alert',
+                        'descriptionField' => 'MedicalAlert',
+                        'defaultDescription' => 'Medical Alert'
+                    ],
+                    'SpecialNeedsFlag'=> [
+                        'icon' => 'info',
+                        'descriptionField' => 'SpecialNeedsDescription',
+                        'defaultDescription' => 'Special Needs'
+                    ],
+                    'CommentWarningFlag'=> [
+                        'icon' => 'comment',
+                        'descriptionField' => 'CommentDescription',
+                        'defaultDescription' => 'Comment'
+                    ],
+                    'ParentsSeparatedFlag'=> [
+                        'icon' => 'staff',
+                        'descriptionField' => 'ParentsSeparatedDescription',
+                        'defaultDescription' => 'Parents Separated'
+                    ],
+                    'CourtOrderFlag'=> [
+                        'icon' => 'forms',
+                        'descriptionField' => 'CourtOrderDescription',
+                        'defaultDescription' => 'Court Order'
+                    ],
+                    'IndividualPlanFlag'=> [
+                        'icon' => 'staff-students',
+                        'descriptionField' => 'IndividualPlanDescription',
+                        'defaultDescription' => 'Individual Plan'
+                    ],
+                    'AnaphylaxisFlag'=> [
+                        'icon' => 'danger',
+                        'descriptionField' => 'AnaphylaxisDescription',
+                        'defaultDescription' => 'Anaphylaxis'
+                    ]
+                ];
+
+                foreach ($flags as $key => $value) {
+                    if(isset($currentStudent[$key]) && $currentStudent[$key]){
+                        $this->setVar('ICON', $flags[$key]['icon']);
+
+                        if(!empty($currentStudent[$flags[$key]['descriptionField']])) {
+                            $this->setVar('DESCRIPTION', $currentStudent[$flags[$key]['descriptionField']]);
+                        } else {
+                            $this->setVar('DESCRIPTION', $flags[$key]['defaultDescription']);
+                        }
+
+                        $this->parse('flags_block', 'flags', true);
+                    }
+                }
+            }
+
             $this->parse('student_block', 'student', true);
 
             // Clear children after parsing out the parent
-
+            $this->setVar('flags_block', '');
             $this->setVar('absence_options_block', '');
             $this->setVar('reason_options_block', '');
         }
