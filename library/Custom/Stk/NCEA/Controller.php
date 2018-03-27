@@ -49,6 +49,26 @@ class Controller extends Base
 
         $aggregatedData = (new Aggregation())->aggregate($rawData, $year);
 
+        /* Equivalent representation from either the custom view, or getStudent()
+         *
+         * User data only exists when there are records; user's data is duped per record
+         *
+         * If there are no records, we have to get it from somewhere else (specifically Tutor Group)
+         */
+        if (!\count($aggregatedData['records'])) {
+            $externalUser = $this->getDi()->get('externalUser')->getStudent($user->getExternalId());
+
+            $aggregatedData['meta'] = [
+                'externalId' => $user->getExternalId(),
+                'firstname' => $user->getFirstname(),
+                'fullname' => $user->getFullName(),
+                'tutorGroup' => $externalUser['StudentTutor'],
+                'year' => $year,
+            ];
+        }
+
+        /* Pass to twig to render nicely
+         */
         $this->getResponse()->content->set($this->buildHtmlOutput('@nceaReport/report.twig', [
             'user' => $user,
             'data' => $aggregatedData,
