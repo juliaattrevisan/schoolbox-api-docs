@@ -17,6 +17,18 @@ use Alaress\Database\Transactor\Strategy\IStrategy;
  */
 interface ITransactor
 {
+    /**
+     * Wraps $callable in a transaction.
+     *
+     * If $callable throws an exception, rollback and rethrow exception
+     * If $callable() === false, rollback
+     * Otherwise, commit
+     *
+     * @param callable $callback
+     * @return ITransactor
+     * @throws \Throwable Anything that $callback throws
+     */
+    public function transact(callable $callback): ITransactor;
 
     /**
      * Begin transaction

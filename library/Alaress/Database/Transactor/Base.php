@@ -43,6 +43,29 @@ class Base implements ITransactor
     /**
      * @inheritdoc
      */
+    public function transact(callable $callback): ITransactor
+    {
+        $this->beginTransaction();
+        try {
+            $result = $callback();
+        } catch (\Throwable $e) {
+            // Rollback if an exception happened, and rethrow
+            $this->rollback();
+            throw $e;
+        }
+
+        // Otherwise, if false (not null) was returned, rollback
+        if ($result === false) {
+            $this->rollback();
+        } else {
+            $this->commit();
+        }
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function beginTransaction(): bool
     {
         $this->onPersistHooks[] = [];
