@@ -66,10 +66,10 @@
     </tr>
     </thead>
     <tbody>
-    {% for subjectName, subjectData in data.records %}
+    {% for subjectSort, subjectData in data.records %}
         {% for item in subjectData.data %}
             <tr>
-                <td>{{ subjectName }}</td>
+                <td>{{ item.subjectName }}</td>
                 <td class="center">{{ item.nceaStandardNumber }}</td>
                 <td class="center">{{ item.nceaLevel }}</td>
                 <td class="center">{{ item.nceaCredits }}</td>
