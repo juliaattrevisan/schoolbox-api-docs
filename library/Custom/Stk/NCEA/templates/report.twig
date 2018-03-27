@@ -134,21 +134,9 @@
                             <td class="center">{{ item.nceaCredits }}</td>
                             <td class="center">{{ item.assessmentOption }}</td>
                             <td class="center">{{ item.grade }}</td>
-                            <td class="center">
-                                {% if item.nceaLevel == 1 %}
-                                    {{ macro.renderLevelTotal(item.creditsGained) }}
-                                {% endif %}
-                            </td>
-                            <td class="center">
-                                {% if item.nceaLevel == 2 %}
-                                    {{ macro.renderLevelTotal(item.creditsGained) }}
-                                {% endif %}
-                            </td>
-                            <td class="center">
-                                {% if item.nceaLevel == 3 %}
-                                    {{ macro.renderLevelTotal(item.creditsGained) }}
-                                {% endif %}
-                            </td>
+                            <td class="center">{{ macro.renderLevelTotal(item.L1) }}</td>
+                            <td class="center">{{ macro.renderLevelTotal(item.L2) }}</td>
+                            <td class="center">{{ macro.renderLevelTotal(item.L3) }}</td>
                         </tr>
                     {% endfor %}
 
