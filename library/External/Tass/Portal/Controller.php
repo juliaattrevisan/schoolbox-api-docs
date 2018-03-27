@@ -171,8 +171,10 @@ class Controller extends Alaress\Web\Controller\Base
         $deepLinkArray = [];
 
         foreach (explode('&', $deepLink) as $arg) {
-            [$key, $val] = explode('=', $arg, 2);
-            $deepLinkArray[(string)$key] = (string)$val;
+            if (strpos($arg, '=')) {
+                [$key, $val] = explode('=', $arg, 2);
+                $deepLinkArray[(string)$key] = (string)$val;
+            }
         }
         return $deepLinkArray;
     }
