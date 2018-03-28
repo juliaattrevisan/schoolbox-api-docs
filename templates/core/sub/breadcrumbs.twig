@@ -46,7 +46,7 @@
                 {% if crumb[1] %}
                     <a href="{{ crumb[1] }}">{{ crumb[0] }} {% if not loop.last %}&rsaquo; {% endif %}</a>
                 {% else %}
-                    {{ crumb[0] }} {% if not loop.last %}&rsaquo; {% endif %}
+                    <a>{{ crumb[0] }} {% if not loop.last %}&rsaquo; {% endif %}</a>
                 {% endif %}
             </li>
         {% endfor %}
