@@ -142,6 +142,8 @@ if (is_numeric($_REQUEST['cid'])) {
             // and doing so can break components that rely on context
 //            $controller->execute();
 
+            /** @var Component_Config[] $configInstances */
+            $configInstances = $componentConfigInstanceMapper->createCollection();
             /** @var Component_ConfigDefinition $confD */
             foreach ($configDefinitionCollection as $confD) {
                 $key = $confD->getKey();
@@ -168,10 +170,16 @@ if (is_numeric($_REQUEST['cid'])) {
                     }
                     $confI->setValue($value);
 
-                    $componentConfigInstanceMapper->save($confI);
-
+                    $configInstances[] = $confI;
                 }
             }
+
+            if (count($configInstances)) {
+                $componentConfigInstanceMapper->getDatabase()->transact(function () use ($componentConfigInstanceMapper, $configInstances) {
+                    $componentConfigInstanceMapper->save($configInstances);
+                });
+            }
+
             if (SitePage::detectAjax()) {
                 // Just refetch the instance
                 $instance   = $componentInstanceMapper->findByInstanceId($instance->getId());
