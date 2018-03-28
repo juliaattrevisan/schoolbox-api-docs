@@ -90,7 +90,7 @@
                                     {%  if access.user.isDeleted %}
                                         {{ parent.fullName }}<br>
                                     {% else %}
-                                        <a href="{{ profile.link(access.user) }}">{{ parent.fullName }}</a><br>
+                                        <a href="{{ profile.link(parent) }}">{{ parent.fullName }}</a><br>
                                     {% endif %}
                                 {% endfor %}
                             {% else %}
@@ -180,7 +180,7 @@
                                         {% if access.user.isDeleted() %}
                                             {{ parent.fullName }}<br>
                                         {% else %}
-                                            <a href="{{ profile.link(access.user) }}">{{ parent.fullName }}</a><br>
+                                            <a href="{{ profile.link(parent) }}">{{ parent.fullName }}</a><br>
                                         {% endif %}
                                 {% endfor %}
                             {% else %}
@@ -272,7 +272,7 @@
                                     {% if access.user.isDeleted() %}
                                         {{ parent.fullName }}<br>
                                     {% else %}
-                                        <a href="{{ profile.link(access.user) }}">{{ parent.fullName }}</a><br>
+                                        <a href="{{ profile.link(parent) }}">{{ parent.fullName }}</a><br>
                                     {% endif %}
                                 {% endfor %}
                             {% else %}
