@@ -27,6 +27,10 @@
                 parentSearch = 'div, fieldset';
             }
 
+            // This used to use the :first-of-type pseudoclass selector (see https://api.jquery.com/first-of-type-selector/)
+            // However for some reason it would not select anything if the closest parent had
+            // multiple input types e.g. an input[type=text] alongside an input[type=checkbox].
+            // get(0) does the same thing using jquery instead of css selectors, and doesn't break.
             error.insertBefore(element.closest(parentSearch).find('input[type=checkbox], input[type=radio]').get(0));
 
         } else if (element.closest('.input-group').length) {
