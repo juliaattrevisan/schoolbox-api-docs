@@ -35,7 +35,7 @@ class Icon extends BaseTransformation
             NSMapper::NS_PASTORAL_LOG           => 'bolt',
             NSMapper::NS_DUEWORK                => 'work',
             NSMapper::NS_ONLINE_ASSESS          => 'work',
-            NSMapper::NS_HOMEPAGE_BLOG          => 'chat',
+            NSMapper::NS_HOMEPAGE_BLOG          => 'comment',
             NSMapper::NS_EPORTFOLIO_BLOG        => 'comment',
             NSMapper::NS_FORUM                  => 'chat',
             NSMapper::NS_NEWS                   => 'pin',
