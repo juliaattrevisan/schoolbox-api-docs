@@ -163,6 +163,7 @@ class External_Tass_User implements External_UserInterface
             '' AS AlertMessage,
             boarder AS StudentBoarder,
             '' AS Comment,
+            '' AS StudentIBFlag,
             0 AS countIndividualEducationPlans
         FROM student AS s
         LEFT JOIN house AS h ON s.house=h.hse_code AND s.cmpy_code=h.cmpy_code
