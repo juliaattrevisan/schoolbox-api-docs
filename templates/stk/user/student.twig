@@ -34,9 +34,12 @@
         <a href="{{ routeLookup('customStkOleReport.reportList', {studentId: user.id}) }}" class="icon-document">Reports</a>
     </li>
 
-    {% if not externalUser.StudentIBFlag %}
+    {# Obey access rules for non-ib students #}
+    {% set nceaRoute = routeLookupIfAuthorized('nceaReport.getReport', {id: user.id, year: 'now'|date('Y')}) %}
+
+    {% if nceaRoute and not externalUser.StudentIBFlag %}
     <li>
-        <a href="{{ routeLookup('nceaReport.getReport', {id: user.id, year: 'now'|date('Y') }) }}" class="icon-progress">NCEA Report</a>
+        <a href="{{ nceaRoute }}" class="icon-progress">NCEA Report</a>
     </li>
     {% endif %}
 {% endblock buttons_miscellaneous %}
