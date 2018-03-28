@@ -25,10 +25,10 @@ interface ITransactor
      * Otherwise, commit
      *
      * @param callable $callback
-     * @return ITransactor
+     * @return bool
      * @throws \Throwable Anything that $callback throws
      */
-    public function transact(callable $callback): ITransactor;
+    public function transact(callable $callback): bool;
 
     /**
      * Begin transaction

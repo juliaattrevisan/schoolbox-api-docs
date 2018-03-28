@@ -194,7 +194,7 @@ class MockDatabase implements IDatabase, IQuoter
      */
     public function transact(callable $callback)
     {
-        return $this;
+        return true;
     }
 
     /**

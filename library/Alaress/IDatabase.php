@@ -49,7 +49,7 @@ interface IDatabase
      * Wraps `$callback` in a transaction.
      *
      * @param callable $callback
-     * @return $this
+     * @return bool
      * @throws \Throwable
      */
     public function transact(callable $callback);

@@ -360,8 +360,7 @@ class Database implements IDatabase, Serializable, IQuoter
      */
     public function transact(callable $callback)
     {
-        $this->transactor->transact($callback);
-        return $this;
+        return $this->transactor->transact($callback);
     }
 
     /**

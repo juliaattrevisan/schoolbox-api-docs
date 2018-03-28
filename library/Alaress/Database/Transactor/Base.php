@@ -43,7 +43,7 @@ class Base implements ITransactor
     /**
      * @inheritdoc
      */
-    public function transact(callable $callback): ITransactor
+    public function transact(callable $callback): bool
     {
         $this->beginTransaction();
         try {
@@ -57,10 +57,10 @@ class Base implements ITransactor
         // Otherwise, if false (not null) was returned, rollback
         if ($result === false) {
             $this->rollback();
-        } else {
-            $this->commit();
+            return false;
         }
-        return $this;
+        $this->commit();
+        return true;
     }
 
     /**
