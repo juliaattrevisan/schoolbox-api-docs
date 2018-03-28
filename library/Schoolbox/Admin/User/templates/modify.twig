@@ -58,7 +58,9 @@
     <form method="POST" action="{{ routeLookup('adminUser.postDetails', {userId: user.id}) }}" data-validatable-as="userDetails" data-modify-user-form>
     <div class="small-12 island">
         <section class="content">
-            <div class="row">
+            <fieldset>
+
+                <div class="row">
                     <input type="hidden" name="type" value="modify"/>
                     <input type="hidden" name="userID" value="{{ user.id }}"/>
 
@@ -95,21 +97,22 @@
 
                         <label for="position_title">Position Title</label>
                         <input id="position_title" type="text" name="position_title" value="{{ user.positionTitle }}"/>
+                        
+                        <fieldset class="checklist">
+                            <label>Campus Involvement</label>
+                            {% for campus in campuses %}
+                                {# Work out if the user is in this campus- really need to write a collection.contains() method #}
 
-                        <label>Campus Involvement</label>
-
-                        {% for campus in campuses %}
-                            {# Work out if the user is in this campus- really need to write a collection.contains() method #}
-
-                            {% set campusChecked = false %}
-                            {% for userCampus in user.campusCollection %}
-                                {% if userCampus.id == campus.id %}
-                                    {% set campusChecked = true %}
-                                {% endif %}
+                                {% set campusChecked = false %}
+                                {% for userCampus in user.campusCollection %}
+                                    {% if userCampus.id == campus.id %}
+                                        {% set campusChecked = true %}
+                                    {% endif %}
+                                {% endfor %}
+                                <input id="campus-{{ campus.id }}" type="checkbox" name="campus[]" value="{{ campus.id }}" {% if campusChecked %}checked{% endif %}>
+                                <label for="campus-{{ campus.id }}" class="checkbox-label">{{ campus.name }}</label>
                             {% endfor %}
-                            <input id="campus-{{ campus.id }}" type="checkbox" name="campus[]" value="{{ campus.id }}" {% if campusChecked %}checked{% endif %}>
-                            <label for="campus-{{ campus.id }}" class="checkbox-label">{{ campus.name }}</label>
-                        {% endfor %}
+                        </fieldset>
                     </div>
 
                     <div class="small-12 medium-6 island">
@@ -174,8 +177,8 @@
                         {% endif %}
                     </div>
 
-
-            </div>
+                </div>
+            </fieldset>
         </section>
     </div>
     <div class="small-12 columns">
@@ -611,14 +614,11 @@
             rules: {
                 'alt_email':        { emailTrimmed: true },
                 'firstname':        { required: true },
-                'lastname':         { required: true },
                 'campus[]':         { required: true }
             },
             messages: {
-                'firstname':        { require_from_group: "Please enter either a first name or surname" },
-                'lastname':         { require_from_group: "Please enter either a first name or surname" },
                 'alt_email':        "Please enter a valid email address",
-                'campus[]':         { required: 'Users must be involved in at least one campus' }
+                'campus[]':         "Please select at least one campus"
             }
         });
 
