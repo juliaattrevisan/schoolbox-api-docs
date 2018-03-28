@@ -82,6 +82,8 @@ class Module extends BaseModule
 
         /* Can't get reports from the future, or too far in the past
          * Arbitrary limit of 2000
+         *
+         * TODO: Eventually this will be limited to the current year only after testing
          */
         $oldestYear = 2000;
 
