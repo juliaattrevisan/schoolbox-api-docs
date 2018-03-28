@@ -68,7 +68,7 @@ interface IConnector
 
 
     /**
-     * Return the specified document from Kami if it exists there. Null otherwise.
+     * Return the specified document from Kami. Throws exception if not found.
      *
      * @param string $documentId
      * @return Document
