@@ -85,7 +85,6 @@ class Factory
             }
 
             $trail->add([$context->getFolder()->getTitle(), $path]);
-            $path = "/homepage/{$context->getFolder()->getId()}";
 
         } else {
             if (Access::getInstance()->getFolderAccess($user,$context->getFolder()->getId())) {
