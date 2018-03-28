@@ -106,7 +106,6 @@ HELP;
 
 
     /**
-     * @var IConnector        $db
      * @var IConfigLoader     $config
      * @var MapperFactory     $mapperFactory
      * @var Kami\Mapper       $kamiMapper
