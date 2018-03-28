@@ -89,7 +89,7 @@ class Acquisition
         $data = [
 
             /* Headings that are repeated for every row
-             * But we only need them once
+             * But we only need them once (but get selected year's data, not just the first)
              */
             'meta' => [],
 
@@ -99,7 +99,7 @@ class Acquisition
         ];
 
         while ($row = $statement->fetch()) {
-            if (empty($data['meta'])) {
+            if (empty($data['meta']) && ((int)$row['FileYear'] === $year)) {
                 $data['meta'] = [
                     'externalId' => $row['ID'],
                     'firstname' => $row['StudentPreferred'],
