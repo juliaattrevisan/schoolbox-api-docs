@@ -78,6 +78,7 @@ class External_Pcschools_User implements External_UserInterface
      * StudentSpecialNeedsFlag,
      * StudentStudiesCode,
      * AlertMessage,
+     * StudentIBFlag
      *
      * @importance high - used on student profile page
      *
@@ -99,6 +100,7 @@ class External_Pcschools_User implements External_UserInterface
                 '' AS StudentHeadOfHouse,
                 S.STATUS AS StudentBoarder,
                 '' AS Comment,
+                '' AS StudentIBFlag,
                 S.HOME_CLASS AS StudentForm,
                 S_CLASS.DESCRIPTION AS FormDescription,
                 S_HOME_TEACHER.NAME_FOR_REPORT AS StudentFormStaffName,
