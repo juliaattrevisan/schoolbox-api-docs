@@ -97,6 +97,9 @@ $breadcrumb-noclick-bg-opacity: $button-disabled-opacity;
 			opacity: $breadcrumb-noclick-bg-opacity;
 			cursor: text;
 		}
+		&.active a {
+			opacity: 1;
+		}
 
 	}
 }
