@@ -72,6 +72,7 @@ class External_Maze_Loreto_User extends External_Maze_User {
 				'' AS AlertMessage,
 				'' AS StudentBoarder,
 				'' AS Comment,
+				'' AS StudentIBFlag,
 				ST.ROLL_GROUP,
 				0 AS countIndividualEducationPlans
 			FROM ST
