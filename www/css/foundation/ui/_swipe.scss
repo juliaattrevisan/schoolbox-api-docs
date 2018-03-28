@@ -19,8 +19,9 @@ $swipe-color-hover: $steel;
         font-size: rem-calc($base-font-size * 1.5);
         width: 2rem;
         height: 4rem;
-        margin-top: -2.5rem;
+        margin-top: 0;
         transition: all .15s linear;
+        transform: translateY(-2rem);
         &:hover {
             color: $swipe-color-hover;
         }
