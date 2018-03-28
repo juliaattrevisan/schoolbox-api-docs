@@ -22,6 +22,7 @@ use Alaress\Random;
 
 $fields = [
     'help',
+    'perform',
     'dry-run',
     'max-attempts:',
     'max-skips:',
@@ -51,10 +52,22 @@ $kernel->run(function (
     $opts        = $options['opts'];
     $displayHelp = isset($opts['help']);
     $dryRun      = isset($opts['dry-run']);
+    $perform     = isset($opts['perform']);
     $maxAttempts = array_key_exists('max-attempts', $opts) ? (int)$opts['max-attempts'] : Kami\StatusUpdater::DEFAULT_MAX_ATTEMPTS;
     $maxSkips    = array_key_exists('max-skips', $opts) ? (int)$opts['max-skips'] : Kami\StatusUpdater::DEFAULT_MAX_SKIPS;
     $baseBackOff = array_key_exists('base-back-off', $opts) ? (int)$opts['base-back-off'] : Kami\StatusUpdater::DEFAULT_BASE_JITTER_BACK_OFF;
     $timeout     = array_key_exists('timeout', $opts) ? (int)$opts['timeout'] : Kami\StatusUpdater::DEFAULT_TIMEOUT;
+
+    $colourRed   = "\033[0;31m";
+    $colourWhite = "\033[0m";
+    if (!$dryRun && !$perform) {
+        echo "{$colourRed}Invalid syntax. You must specify the mode using '--dry-run' or '--perform'{$colourWhite}\n\n";
+        $displayHelp = true;
+    }
+    if ($dryRun && $perform) {
+        echo "{$colourRed}Invalid syntax. You must specify only one mode using '--dry-run' or '--perform'{$colourWhite}\n\n";
+        $displayHelp = true;
+    }
 
     if ($displayHelp) {
         $maxAttempts       = Kami\StatusUpdater::DEFAULT_MAX_ATTEMPTS;
@@ -64,9 +77,10 @@ $kernel->run(function (
         echo <<<HELP
 Checks whether documents 'processing' in Kami have finished processing.
  
-Usage: check-status.php [-v[v[v]]] [--dry-run] [--max-attempts={$maxAttempts}] [--max-skips={$maxSkips}] [--base-back-off={$baseJitterBackOff}] [--timeout={$timeout}]
-    -v:                  Optional verbosity level, -vvv: most verbose. Defaults to most verbose.
+Usage: check-status.php --dry-run|--perform [-v[v[v]]] [--max-attempts={$maxAttempts}] [--max-skips={$maxSkips}] [--base-back-off={$baseJitterBackOff}] [--timeout={$timeout}]
     --dry-run:           If set, do not update the status in Schoolbox
+    --perform:           If set, do update the status in Schoolbox
+    -v:                  Optional verbosity level, -vvv: most verbose. Defaults to most verbose.
     --max-attempts:      The maximum number of attempts to check a document before skipping that document.
                          Defaults to {$maxAttempts}.
     --max-skips:         The maximum number of times in a row that a document may be skipped before the script aborts.
