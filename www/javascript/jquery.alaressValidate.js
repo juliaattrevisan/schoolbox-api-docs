@@ -27,7 +27,7 @@
                 parentSearch = 'div, fieldset';
             }
 
-            error.insertBefore(element.closest(parentSearch).find('input[type=checkbox]:first-of-type, input[type=radio]:first-of-type'));
+            error.insertBefore(element.closest(parentSearch).find('input[type=checkbox], input[type=radio]').get(0));
 
         } else if (element.closest('.input-group').length) {
             error.insertAfter(element.closest('.input-group'));
