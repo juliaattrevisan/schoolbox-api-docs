@@ -15,7 +15,7 @@ The co-authored and mutually-agreed-upon charter of practise of the Development 
 * Developer Channel (developers only, standup bot)
 * Developer Support Channel (interface to company)
 * Knowledge base (no tool yet) 
-* New Relic (reports issues, stack traces)
+* Sentry (reports issues, stack traces)
 * Gmail &rarr; minimise email usage, team alerts,memos
 
 ### Responsibilities
