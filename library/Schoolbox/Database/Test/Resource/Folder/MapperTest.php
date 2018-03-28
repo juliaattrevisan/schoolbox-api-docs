@@ -23,6 +23,8 @@ use PHPUnit\Framework\TestCase;
  */
 class MapperTest extends TestCase
 {
+    use Alaress\Database\Test\TestConnectorTrait;
+
     /**
      * @var Alaress\IDatabase
      */
@@ -93,7 +95,8 @@ class MapperTest extends TestCase
      */
     public function setUp()
     {
-        $this->database = Mapper::getInstance()->getDatabase();
+        $this->connectSchoolbox();
+        $this->database = \Database::getInstance();
         $this->database->beginTransaction();
         $this->database->query("UPDATE `folder` SET deleted_at = '1970-01-01 00:00:00'");
         $this->database->query('DELETE FROM `folder_code`');
@@ -126,7 +129,7 @@ class MapperTest extends TestCase
 
             try {
                 $db->query('INSERT INTO `folder` (`id`, `name`, `parent`) VALUES (:id, :nm, :pa)', $params);
-            } catch (Alaress\Database\Exception $e) {
+            } catch (\PDOException $e) {
                 $db->query('UPDATE `folder` SET `name` = :nm, `parent` = :pa, deleted_at = NULL WHERE id = :id', $params);
             }
 
