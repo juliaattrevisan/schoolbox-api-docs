@@ -30,6 +30,7 @@ $breadcrumb-color: $content-ui-foreground;
 $breadcrumb-bg-color: $content-ui-background;
 $breadcrumb-hover-bg-color: $content-ui-hover;
 $breadcrumb-active-bg-color: $content-ui-selected;
+$breadcrumb-noclick-bg-opacity: $button-disabled-opacity;
 
 @import "../../../../javascript/components/foundation/scss/foundation/components/breadcrumbs";
 
@@ -90,6 +91,19 @@ $breadcrumb-active-bg-color: $content-ui-selected;
 		&.active a:before{
 			margin-left: 0px;
 		}
+
+		// Special styling for non-linked breadcrumbs
+		a:not([href]) {
+			opacity: $breadcrumb-noclick-bg-opacity;
+			cursor: text;
+			&:hover {
+				background-color: $breadcrumb-bg-color;
+			}
+		}
+		&.active a:not([href]):hover {
+			background-color: $breadcrumb-active-bg-color;
+		}
+
 	}
 }
 
