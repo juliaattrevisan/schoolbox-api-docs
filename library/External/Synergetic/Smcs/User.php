@@ -65,7 +65,8 @@ class External_Synergetic_Smcs_User extends External_Synergetic_User
                         uvStudents.StudentStudiesCode,
                         AlertMessage,
                         uvStudents.StudentBoarder,
-                        uvStudents.StudentsComment as Comment,                        
+                        uvStudents.StudentsComment as Comment,  
+                        '' AS StudentIBFlag,                      
                         $learningPlanQuery
             FROM        dbo.uvStudents uvStudents
             LEFT JOIN   CommunityAlerts ON 
