@@ -89,44 +89,44 @@ class Aggregation
              */
             if (\in_array($gradeKey, $this->achievements, true)) {
                 $graph[$gradeKey][$levelKey] += $current['creditsGained'];
+            }
 
-                /* Data for Tables
+            /* Data for Tables
+             */
+            if ($current['year'] === $year) {
+
+                /* Set up a new subject's information if it hasn't been encountered before
                  */
-                if ($current['year'] === $year) {
-
-                    /* Set up a new subject's information if it hasn't been encountered before
-                     */
-                    if (!isset($aggregatedData[$subjectKey])) {
-                        $aggregatedData[$subjectKey] = [
-                            'availableCredits' => 0,
-                            'gainedCredits' => $this->makeLevelArray(),
-                            'data' => []
-                        ];
-                    }
-
-                    /* Store this record (it represents a line item in the tables) only if it's for the current year
-                     * Augment it with a Levels array, because this makes it nicer in twig town
-                     */
-                    $augmented = array_merge($current, $this->makeLevelArray());
-                    $augmented[$levelKey] = $current['creditsGained'];
-
-                    $aggregatedData[$subjectKey]['data'][] = $augmented;
-
-                    /* Augment and aggregate totals for each subject
-                     */
-                    $aggregatedData[$subjectKey]['availableCredits'] += $current['nceaCredits'];
-                    $aggregatedData[$subjectKey]['gainedCredits'][$levelKey] += $current['creditsGained'];
-
-                    /* Also aggregate this summary total for the current year
-                     */
-                    $credits['gainedThisYear'][$levelKey] += $current['creditsGained'];
+                if (!isset($aggregatedData[$subjectKey])) {
+                    $aggregatedData[$subjectKey] = [
+                        'availableCredits' => 0,
+                        'gainedCredits' => $this->makeLevelArray(),
+                        'data' => []
+                    ];
                 }
-                elseif ($current['year'] < $year) {
 
-                    /* Accumulate a total of credits that were obtained in a previous year
-                     */
-                    $credits['broughtForward'][$levelKey] += $current['creditsGained'];
-                }
+                /* Store this record (it represents a line item in the tables) only if it's for the current year
+                 * Augment it with a Levels array, because this makes it nicer in twig town
+                 */
+                $augmented = array_merge($current, $this->makeLevelArray());
+                $augmented[$levelKey] = $current['creditsGained'];
+
+                $aggregatedData[$subjectKey]['data'][] = $augmented;
+
+                /* Augment and aggregate totals for each subject
+                 */
+                $aggregatedData[$subjectKey]['availableCredits'] += $current['nceaCredits'];
+                $aggregatedData[$subjectKey]['gainedCredits'][$levelKey] += $current['creditsGained'];
+
+                /* Also aggregate this summary total for the current year
+                 */
+                $credits['gainedThisYear'][$levelKey] += $current['creditsGained'];
+            }
+            elseif ($current['year'] < $year) {
+
+                /* Accumulate a total of credits that were obtained in a previous year
+                 */
+                $credits['broughtForward'][$levelKey] += $current['creditsGained'];
             }
         }
 
