@@ -25,6 +25,7 @@ interface External_UserInterface {
      * StudentHeadOfHouse,
      * StudentBoarder,
      * Comment,
+     * IBFlag,
      * StudentForm,
      * FormDescription,
      * StudentFormStaffName,
