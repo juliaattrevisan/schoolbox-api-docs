@@ -97,22 +97,21 @@
 
                         <label for="position_title">Position Title</label>
                         <input id="position_title" type="text" name="position_title" value="{{ user.positionTitle }}"/>
-
-                        <label>Campus Involvement</label>
-
+                        
                         <fieldset class="checklist">
-                        {% for campus in campuses %}
-                            {# Work out if the user is in this campus- really need to write a collection.contains() method #}
+                            <label>Campus Involvement</label>
+                            {% for campus in campuses %}
+                                {# Work out if the user is in this campus- really need to write a collection.contains() method #}
 
-                            {% set campusChecked = false %}
-                            {% for userCampus in user.campusCollection %}
-                                {% if userCampus.id == campus.id %}
-                                    {% set campusChecked = true %}
-                                {% endif %}
+                                {% set campusChecked = false %}
+                                {% for userCampus in user.campusCollection %}
+                                    {% if userCampus.id == campus.id %}
+                                        {% set campusChecked = true %}
+                                    {% endif %}
+                                {% endfor %}
+                                <input id="campus-{{ campus.id }}" type="checkbox" name="campus[]" value="{{ campus.id }}" {% if campusChecked %}checked{% endif %}>
+                                <label for="campus-{{ campus.id }}" class="checkbox-label">{{ campus.name }}</label>
                             {% endfor %}
-                            <input id="campus-{{ campus.id }}" type="checkbox" name="campus[]" value="{{ campus.id }}" {% if campusChecked %}checked{% endif %}>
-                            <label for="campus-{{ campus.id }}" class="checkbox-label">{{ campus.name }}</label>
-                        {% endfor %}
                         </fieldset>
                     </div>
 
