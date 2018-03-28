@@ -76,10 +76,10 @@ $breadcrumb-noclick-bg-opacity: $button-disabled-opacity;
 			&:after{
 				border-left: rem-calc($base-font-size * .4) solid $breadcrumb-bg-color;
 			}
-			&:hover{
+			&[href]:hover{
 				background-color: $breadcrumb-hover-bg-color;
 			}
-			&:hover:after{
+			&[href]:hover:after{
 				border-left-color: $breadcrumb-hover-bg-color !important;
 			}
 		}
@@ -96,12 +96,6 @@ $breadcrumb-noclick-bg-opacity: $button-disabled-opacity;
 		a:not([href]) {
 			opacity: $breadcrumb-noclick-bg-opacity;
 			cursor: text;
-			&:hover {
-				background-color: $breadcrumb-bg-color;
-			}
-		}
-		&.active a:not([href]):hover {
-			background-color: $breadcrumb-active-bg-color;
 		}
 
 	}
