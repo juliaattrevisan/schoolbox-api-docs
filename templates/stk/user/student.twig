@@ -33,4 +33,10 @@
     <li>
         <a href="{{ routeLookup('customStkOleReport.reportList', {studentId: user.id}) }}" class="icon-document">Reports</a>
     </li>
+
+    {% if externalUser.StudentIBFlag %}
+    <li>
+        <a href="{{ routeLookup('nceaReport.getReport', {id: user.id, year: 'now'|date('Y') }) }}" class="icon-progress">NCEA Report</a>
+    </li>
+    {% endif %}
 {% endblock buttons_miscellaneous %}
