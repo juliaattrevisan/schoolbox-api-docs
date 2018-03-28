@@ -46,13 +46,16 @@ class Module extends BaseModule
      */
     public function registerRoutes()
     {
-        $permissions = new Rule\Any(
-            new Rule\IsSuperuser(),
-            new Rule\HasRole(Role::STAFF),
-            new Rule\IsUser('userId'),
-            new Rule\All(
-                new Rule\IsTrue(!$this->getConfig()->get('restrict_parent_grades')),
-                new Rule\IsParentOfUser($this->getExternalUser(), $this->getUserMapper(), 'userId')
+        $permissions = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\HasRole(Role::STAFF),
+                new Rule\IsUser('userId'),
+                new Rule\All(
+                    new Rule\IsTrue(!$this->getConfig()->get('restrict_parent_grades')),
+                    new Rule\IsParentOfUser($this->getExternalUser(), $this->getUserMapper(), 'userId')
+                )
             )
         );
 
