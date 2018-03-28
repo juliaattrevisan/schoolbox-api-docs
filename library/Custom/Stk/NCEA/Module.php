@@ -80,9 +80,15 @@ class Module extends BaseModule
             throw new NotFound('NCEA Reports not available to IB Students');
         }
 
-        /* Can't get reports from the future
+        /* Can't get reports from the future, or too far in the past
+         * Arbitrary limit of 2000
          */
-        if ((int)$params['year'] > date('Y')) {
+        $oldestYear = 2000;
+
+        $inFuture = (int)$params['year'] > date('Y');
+        $inPast = (int)$params['year'] < $oldestYear;
+
+        if ($inPast || $inFuture) {
             throw new NotFound('Invalid year');
         }
 
