@@ -36,11 +36,12 @@ class Controller extends Base
      * NCEA Report for $year
      *
      * @param User $user
+     * @param array $externalUser
      * @param int  $year
      * @throws \Alaress\Database\Exception
      * @throws \Aura\Di\Exception\ServiceNotFound
      */
-    public function getReport(User $user, int $year)
+    public function getReport(User $user, array $externalUser, int $year)
     {
         /** @var IConnector $externalDb */
         $externalDb = $this->getDi()->get('databaseExternal');
@@ -56,8 +57,6 @@ class Controller extends Base
          * If there are no records, we have to get it from somewhere else (specifically Tutor Group)
          */
         if (!\count($aggregatedData['records'])) {
-            $externalUser = $this->getDi()->get('externalUser')->getStudent($user->getExternalId());
-
             $aggregatedData['meta'] = [
                 'externalId' => $user->getExternalId(),
                 'firstname' => $user->getFirstname(),

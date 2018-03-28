@@ -88,6 +88,7 @@ class Module extends BaseModule
 
         return [
             'user' => $user,
+            'externalUser' => $externalUser,
             'year' => (int)$params['year'],
         ];
     }
