@@ -340,6 +340,7 @@ class External_Maze_User implements External_UserInterface
 				'' AS AlertMessage,
 				'' AS StudentBoarder,
 				'' AS Comment,
+				'' AS StudentIBFlag,
 				ST.ROLL_GROUP,
 				0 AS countIndividualEducationPlans
 			FROM ST
