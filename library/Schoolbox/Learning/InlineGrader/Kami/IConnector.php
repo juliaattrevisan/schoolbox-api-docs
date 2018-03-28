@@ -85,11 +85,12 @@ interface IConnector
      * Delete an uploaded document. This will remove the file from Kami's cloud storage.
      *
      * @param string $documentId
-     * @return bool Whether a mutation occurred. (will return false if doc not found)
+     * @return bool Whether a mutation occurred. (will throw exception if not found)
      * @throws Exception\EmptyApiKeyException If API key not configured
      * @throws Exception\ResponseDecodeException If unable to decode a server response
      * @throws Exception\ApiException If cannot fetch a document for reasons other than simply not existing.
      * @throws Exception\NotFound If document does not exist in Kami
+     * @throws ConnectException
      */
     public function deleteDocument(string $documentId): bool;
 
