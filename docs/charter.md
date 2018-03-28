@@ -13,7 +13,6 @@ The co-authored and mutually-agreed-upon charter of practise of the Development 
 * Build CI
 * HipChat
 * Developer Channel (developers only, standup bot)
-* Developer Support Channel (interface to company)
 * Knowledge base (no tool yet) 
 * Sentry (reports issues, stack traces)
 * Gmail &rarr; minimise email usage, team alerts,memos
