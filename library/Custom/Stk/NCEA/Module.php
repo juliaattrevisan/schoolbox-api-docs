@@ -72,6 +72,14 @@ class Module extends BaseModule
             throw new NotFound('User Not Found');
         }
 
+        /* IB Students not allowed
+         */
+        $externalUser = $this->getExternalUser()->getStudent($user->getExternalId());
+
+        if ($externalUser['StudentIBFlag']) {
+            throw new NotFound('NCEA Reports not available to IB Students');
+        }
+
         /* Can't get reports from the future
          */
         if ((int)$params['year'] > date('Y')) {
