@@ -71,7 +71,7 @@ class StatusUpdater
      * @return int
      * @throws \Throwable
      */
-    public function checkProcessingDocumentsStatus(bool $dryRun = false, int $maxSkips = self::DEFAULT_MAX_SKIPS): int
+    public function checkProcessingDocumentsStatus(bool $dryRun, int $maxSkips): int
     {
         $this->resetCounts();
         $processingDocumentIds = $this->findProcessingDocumentsIds();
