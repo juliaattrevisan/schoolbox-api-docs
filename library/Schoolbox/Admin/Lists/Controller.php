@@ -492,7 +492,7 @@ class Controller extends Base
                 'fields'            => [
                     'name'          => [
                         'caption'   => 'Name',
-                        'width'     => 7,
+                        'width'     => 6,
                         'maxLength' => 40,
                         'mandatory' => true,
                     ],
@@ -505,7 +505,7 @@ class Controller extends Base
                         'tooltip'   => 'Assessment with the work types chosen here will appear on the grades summary page.
                                                 This will change the layout of the grades summary.',
                         'checkbox'  =>  true,
-                        'width'     => 1,
+                        'width'     => 2,
                         'mandatory' => true,
                     ]
                 ]

@@ -174,7 +174,11 @@
                                     <div class="small-12 medium-{% if field.width is not empty %}{{ field.width }}{% else %}2{% endif %} columns">
                                         {{ field.caption }}
                                         {% if field.tooltip %}
-                                            <span class="hint has-tip tip-top" data-tooltip title="{{ field.tooltip }}">?</span>
+                                            {% if field.tooltipPosition %}
+                                                <span class="hint has-tip tip-{{ field.tooltipPosition }}" data-tooltip title="{{ field.tooltip }}">?</span>
+                                            {% else %}
+                                                <span class="hint has-tip tip-top" data-tooltip title="{{ field.tooltip }}">?</span>
+                                            {% endif %}
                                         {% endif %}
                                     </div>
                                 {% endif %}
