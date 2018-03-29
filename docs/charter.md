@@ -120,21 +120,6 @@ Coalesce data from Discovery into a usable state, such as personas, empathy maps
 * Fix critical issues
 * Add items into sprint and backlog if necessary
 
-### Ceremonies
-
-* Showcase **Last day of sprint 3:00pm** 
-* Retrospective **First day of the next sprint 10:30am** 
-* Sprint planning **First day of the sprint 11:00am**
-* Standup **11:50am daily** 
-    * Be transparent about status (green, yellow, red)
-    * This is not the place for in-depth discussion or simply "this is what I'm working on" (we have the chat-bot for
-      that); if you're blocked by something, make it known and flag the appropriate people for followup immediately
-      after the standup.
-* Backlog grooming **2:00pm Tuesday, Thursday**
-    * Distribution of foundational work (including tech spikes, elaboration, AC refinement) is an outcome of this ceremony
-* Custom work review **Monday 4:00pm**
-
-
 ### Team Cohesion
 
 #### Accountability to your team
