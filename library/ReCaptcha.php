@@ -89,17 +89,14 @@ class ReCaptcha {
             $errorpart = '&amp;error=' . $error;
         }
 
-        return '
-        <script type="text/javascript" src="' . $this->api_server . '/challenge?k=' . $this->public_key . $errorpart . '"></script>
-        <noscript>
-            <iframe src="' . $this->api_server . '/noscript?k=' . $this->public_key . $errorpart . '" height="300" width="500" frameborder="0"></iframe><br/>
-            <textarea name="recaptcha_challenge_field" rows="3" cols="40"></textarea>
-            <input type="hidden" name="recaptcha_response_field" value="manual_challenge"/>
-        </noscript>';
+        return '    
+            <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+            <div class="g-recaptcha" data-sitekey="'.$this->public_key.'"></div>
+  ';
 
     }
 
-    public function check_answer ($remote_ip, $challenge, $response, $extra_params = array()) {
+    public function check_answer ($remote_ip, $response, $extra_params = array()) {
 
         if ( is_null($this->private_key) || empty( $this->private_key ) ) {
             exit( 'To use reCAPTCHA you must get an API key from <a href="' . $this->api_create . '">' . $this->api_create . '</a>' );
@@ -110,34 +107,15 @@ class ReCaptcha {
         }
 
         // discard spam submissions
-        if ( is_null($challenge) || strlen($challenge) == 0 || is_null($response) || strlen($response) == 0 ) {
+        if ( is_null($response) || strlen($response) == 0 ) {
             $this->is_valid = false;
             $this->error_message = 'incorrect-captcha-sol';
             return false;
         }
 
-        $response = $this->post($this->verify_server, '/recaptcha/api/verify', array(
-           'privatekey' => $this->private_key,
-           'remoteip' => $remote_ip,
-           'challenge' => $challenge,
-           'response' => $response
-        ) + $extra_params);
+        $response = file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=".$this->private_key."&response=".$response);
 
-        $answers = explode("\n", $response[1]);
-
-        if ( trim($answers[0]) == 'true' ) {
-
-            $this->is_valid = true;
-
-        }
-        else {
-
-            $this->is_valid = false;
-            $this->error_message = $answers [1];
-
-        }
-
-        return ( $this->is_valid ? $this->is_valid : false );
+        return ( json_decode($response)->success );
 
     }
 
