@@ -5,11 +5,8 @@ $swipe-color: $iron;
 $swipe-color-hover: $steel;
 
 .swiper-container {
-    .loader {
-        position: absolute;
-        left:50%;
-        top: 25%;
-        transform: translateY(50%) translateX(-50%);
+    .swiper-wrapper {
+        min-height: 4rem;
     }
 
     .swiper-button-prev,
@@ -52,8 +49,8 @@ $swipe-color-hover: $steel;
             background: $swipe-color;
             opacity: 1;
             margin: 1rem .5rem;
-            height: 10px;
-            width: 10px;
+            height: .625rem;
+            width: .625rem;
         }
         .swiper-pagination-bullet-active,
         .swiper-pagination-bullet-active:hover{
