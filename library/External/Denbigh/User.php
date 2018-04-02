@@ -103,20 +103,20 @@ class External_Denbigh_User implements External_UserInterface
         /** @noinspection SqlDialectInspection */
         $parentQuery = $this->externalDatabase->executeQuery(
             "
-                SELECT      pe.denbighID, 
-                            pe.surname, 
-                            pe.given_names, 
-                            pe.preferred_name, 
-                            pe.title, 
-                            pe.gender, 
+                SELECT      pe.denbighID,
+                            pe.surname,
+                            pe.given_names,
+                            pe.preferred_name,
+                            pe.title,
+                            pe.gender,
                             pe.dateOfBirth,
-                            pa.relationship, 
+                            pa.relationship,
                             a.telephoneHome
                 FROM        People
                 LEFT JOIN   Parents ON Parents.peopleDenbighID = People.denbighID
                 LEFT JOIN   Parents pa ON pa.familyDenbighID = Parents.familyDenbighID
                 LEFT JOIN   People pe ON pe.denbighID = pa.peopleDenbighID
-                LEFT JOIN   Addresses a ON a.familyDenbighID = pa.familyDenbighID AND 
+                LEFT JOIN   Addresses a ON a.familyDenbighID = pa.familyDenbighID AND
                             a.addressType = 'Residential Address'
                 WHERE       People.denbighID = :externalId
                 ORDER BY    a.telephoneHome IS NOT NULL DESC,
@@ -180,27 +180,27 @@ class External_Denbigh_User implements External_UserInterface
         /** @noinspection SqlDialectInspection */
         $studentQuery = $this->externalDatabase->executeQuery(
             "
-                SELECT      pe.denbighID, 
-                            pe.surname, 
-                            pe.given_names, 
-                            pe.preferred_name, 
-                            pe.title, 
-                            pe.gender, 
+                SELECT      pe.denbighID,
+                            pe.surname,
+                            pe.given_names,
+                            pe.preferred_name,
+                            pe.title,
+                            pe.gender,
                             UNIX_TIMESTAMP(pe.dateOfBirth),
                             stu.tutorGroup, stu.house, stu.academicYear,
-                            pe_sta.denbighID AS tutor_denbighID, 
-                            pe_sta.surname AS tutor_surname, 
-                            pe_sta.preferred_name AS tutor_preferred_name, 
+                            pe_sta.denbighID AS tutor_denbighID,
+                            pe_sta.surname AS tutor_surname,
+                            pe_sta.preferred_name AS tutor_preferred_name,
                             pe_sta.title AS tutor_title,
-                            pe_pa.denbighID AS parent_denbighID, 
-                            pe_pa.surname AS parent_surname, 
-                            pe_pa.preferred_name AS parent_preferred_name, 
+                            pe_pa.denbighID AS parent_denbighID,
+                            pe_pa.surname AS parent_surname,
+                            pe_pa.preferred_name AS parent_preferred_name,
                             pe_pa.title AS parent_title,
-                            fa.EmergencyContact1, 
-                            fa.EmergencyRelationship1, 
-                            fa.EmergencyPhone1, 
+                            fa.EmergencyContact1,
+                            fa.EmergencyRelationship1,
+                            fa.EmergencyPhone1,
                             fa.EmergencyEmail1,
-                            stu.boardingStatus, 
+                            stu.boardingStatus,
                             0 AS countIndividualEducationPlans
                 FROM        People pe
                 LEFT JOIN   Students stu ON stu.peopleDenbighID = pe.denbighID
@@ -209,7 +209,7 @@ class External_Denbigh_User implements External_UserInterface
                 LEFT JOIN   Parents pa ON pa.familyDenbighID = stu.familyDenbighID
                 LEFT JOIN   People pe_pa ON pe_pa.denbighID = pa.peopleDenbighID
                 LEFT JOIN   Family fa ON stu.familyDenbighID = fa.familyDenbighID
-                WHERE       pe.denbighID = :externalId 
+                WHERE       pe.denbighID = :externalId
                 LIMIT       1
             ",
             ['externalId' => $externalId]
@@ -283,12 +283,12 @@ class External_Denbigh_User implements External_UserInterface
         /** @noinspection SqlDialectInspection */
         $staff = $this->externalDatabase->executeQuery(
             "
-                SELECT    p.denbighID, 
-                          p.surname, 
-                          p.given_names, 
-                          p.preferred_name, 
-                          p.title, 
-                          p.gender, 
+                SELECT    p.denbighID,
+                          p.surname,
+                          p.given_names,
+                          p.preferred_name,
+                          p.title,
+                          p.gender,
                           p.dateOfBirth,
                           s.staffCode,
                           '' AS StaffHouseDescription
@@ -330,17 +330,17 @@ class External_Denbigh_User implements External_UserInterface
         /** @noinspection SqlDialectInspection */
         $contactIterator = $this->externalDatabase->getQueryIterator(
             "
-                SELECT        pe_p.denbighID, 
-                              pe_p.surname, 
-                              pe_p.given_names, 
-                              pe_p.preferred_name, 
-                              pe_p.title, 
+                SELECT        pe_p.denbighID,
+                              pe_p.surname,
+                              pe_p.given_names,
+                              pe_p.preferred_name,
+                              pe_p.title,
                               pe_p.email,
                               pa_p.familyDenbighID,
                               a.telephoneHome
                 FROM          People pe_s
                 LEFT JOIN     Students s ON s.peopleDenbighID = pe_s.denbighID
-                LEFT JOIN     Parents pa_p ON pa_p.familyDenbighID = s.familyDenbighID AND 
+                LEFT JOIN     Parents pa_p ON pa_p.familyDenbighID = s.familyDenbighID AND
                               pa_p.type != 'Non Resident'
                 LEFT JOIN     People pe_p ON pe_p.denbighID = pa_p.peopleDenbighID
                 LEFT JOIN     Addresses a ON a.familyDenbighID = s.familyDenbighID
@@ -417,14 +417,14 @@ class External_Denbigh_User implements External_UserInterface
             /** @noinspection SqlDialectInspection */
             return $this->externalDatabase->executeQuery(
                 "
-                    SELECT      cl.classCode AS code, 
+                    SELECT      cl.classCode AS code,
                                 co.subjectName AS name
                     FROM        People p
                     RIGHT JOIN  Staff s ON s.peopleDenbighID = p.denbighID
                     RIGHT JOIN  Classes cl ON cl.staffCode = s.staffCode
                     RIGHT JOIN  Courses co ON co.courseCode = cl.courseCode
                     WHERE       p.denbighID = :externalId
-                    ORDER BY    cl.classCode ASC, 
+                    ORDER BY    cl.classCode ASC,
                                 co.subjectName ASC
 			    ",
                 ['externalId' => $externalId]
@@ -433,7 +433,7 @@ class External_Denbigh_User implements External_UserInterface
             /** @noinspection SqlDialectInspection */
             return $this->externalDatabase->executeQuery(
                 "
-                        SELECT      cl.classCode AS code, 
+                        SELECT      cl.classCode AS code,
                                     co.subjectName AS name
                         FROM        People p
                         RIGHT JOIN  Enrolments e ON e.studentID = p.denbighID
@@ -441,7 +441,7 @@ class External_Denbigh_User implements External_UserInterface
                         RIGHT JOIN  Courses co ON co.courseCode = cl.courseCode
                         WHERE       p.denbighID = :externalId
                         GROUP BY    code
-                        ORDER BY    cl.classCode ASC, 
+                        ORDER BY    cl.classCode ASC,
                                     co.subjectName ASC
                     ",
                 ['externalId' => $externalId]
@@ -464,8 +464,8 @@ class External_Denbigh_User implements External_UserInterface
             "
                 SELECT    s.peopleDenbighID AS RelatedID
                 FROM      People pe
-                LEFT JOIN Parents pa ON pa.peopleDenbighID = pe.denbighID
-                LEFT JOIN Students s ON s.familyDenbighID = pa.familyDenbighID
+                JOIN Parents pa ON pa.peopleDenbighID = pe.denbighID
+                JOIN Students s ON s.familyDenbighID = pa.familyDenbighID
                 WHERE     pe.denbighID = :externalId
             ",
             ['externalId' => $externalId]
@@ -498,14 +498,14 @@ class External_Denbigh_User implements External_UserInterface
         /** @noinspection SqlDialectInspection */
         return $this->externalDatabase->executeQuery(
             "
-                SELECT  username, 
-                        academicYear, 
-                        firstname, 
-                        surname, 
-                        denbighID, 
-                        email, 
-                        house, 
-                        cateringHouse, 
+                SELECT  username,
+                        academicYear,
+                        firstname,
+                        surname,
+                        denbighID,
+                        email,
+                        house,
+                        cateringHouse,
                         boardingStatus
                 FROM    Schoolbox_Students
             "
@@ -521,20 +521,20 @@ class External_Denbigh_User implements External_UserInterface
         /** @noinspection SqlDialectInspection */
         return $this->externalDatabase->executeQuery(
             "
-                SELECT    peo.title, 
-                          preferred_name, 
-                          peo.surname, 
-                          adr.telephoneHome, 
-                          peo.denbighID, 
+                SELECT    peo.title,
+                          preferred_name,
+                          peo.surname,
+                          adr.telephoneHome,
+                          peo.denbighID,
                           par.familyDenbighID,
-                          peo.email, 
+                          peo.email,
                           par.loginID
                 FROM      Addresses adr
                 LEFT JOIN Parents par ON par.familyDenbighID = adr.familyDenbighID
                 LEFT JOIN People peo ON peo.denbighID = par.peopleDenbighID
                 WHERE     peo.id IS NOT NULL
                 GROUP BY  peo.denbighID
-                ORDER BY  familyDenbighID ASC, 
+                ORDER BY  familyDenbighID ASC,
                           denbighID ASC
             "
         )->fetchAll();
@@ -549,11 +549,11 @@ class External_Denbigh_User implements External_UserInterface
         /** @noinspection SqlDialectInspection */
         return $this->externalDatabase->executeQuery(
             "
-                SELECT    People.denbighID, 
-                          surname, 
-                          preferred_name, 
-                          title, 
-                          staffCode, 
+                SELECT    People.denbighID,
+                          surname,
+                          preferred_name,
+                          title,
+                          staffCode,
                           email
                 FROM      Staff
                 LEFT JOIN People ON Staff.peopleDenbighID = People.denbighID
