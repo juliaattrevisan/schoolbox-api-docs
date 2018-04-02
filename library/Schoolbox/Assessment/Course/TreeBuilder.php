@@ -52,4 +52,14 @@ class TreeBuilder extends Resources\TreeBuilder
         // Otherwise prevent drilling into children of courses
         return $this->folderLocator->findById($nodeId)->getFolderType() !== 'course';
     }
+
+
+    /**
+     * @inheritdoc
+     */
+    protected function getDataType(IFolder $folder, string $type): string
+    {
+        // Not selectable if a course or unit.
+        return \in_array($folder->getFolderType(), ['course', 'unit'], true) ? 'noaccess' : $type;
+    }
 }

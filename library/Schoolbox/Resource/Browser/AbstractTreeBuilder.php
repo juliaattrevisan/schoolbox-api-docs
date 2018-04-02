@@ -250,13 +250,26 @@ abstract class AbstractTreeBuilder
             $coverImage,
             [
                 'data-permission' => $permission,
-                'data-type' => $type
+                'data-type' => $this->getDataType($folder, $type)
             ],
             [
                 'href' => $href
             ],
             $parentList
         );
+    }
+
+
+    /**
+     * Returns a value to insert as a data attribute on the node
+     *
+     * @param IFolder $folder
+     * @param string  $type
+     * @return string
+     */
+    protected function getDataType(IFolder $folder, string $type): string
+    {
+        return $type;
     }
 
 
