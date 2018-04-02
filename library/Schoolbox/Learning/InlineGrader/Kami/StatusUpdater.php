@@ -16,7 +16,7 @@ use Schoolbox\Learning\InlineGrader\Kami\Exception\IKamiException;
 
 /**
  * A tool for checking the status of all 'processing' kami documents
- * to determine if they are now 'done' or 'failed'
+ * to determine if they have progressed to 'done' or 'failed'
  */
 class StatusUpdater
 {
@@ -173,7 +173,6 @@ class StatusUpdater
      * @param Model $kamiModel
      * @return Document
      * @throws \Throwable
-     *
      */
     private function getDocument(Model $kamiModel): Document
     {

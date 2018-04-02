@@ -164,7 +164,7 @@ class ReQueueErrors
         // If this save fails, we will have a SB kami model that points to a KamiDoc that no longer exists.
         // There are two ways to resolve this:
         // 1. Case by case. Simply set the kamiDocId to NULL, and status to QUEUED
-        // 2. Re-execution of this script with no 'error_message' filter (entity will still be in 'error' state)
+        // 2. Re-execution of this script (entity will still be in 'error' state)
         if (!$dryRun) {
             $this->mapper->save($kamiModel);
         }
@@ -195,7 +195,7 @@ class ReQueueErrors
                 $this->log->debug('Document successfully deleted in Kami');
                 return true;
             } catch (Exception\NotFound $e) {
-                // Document was already deleted (ensures script is idempotent)
+                // Document was already deleted (ensures tool is idempotent)
                 $this->log->warning('Document already deleted in Kami');
                 return true;
             } catch (Exception\IKamiException|ConnectException $e) {
