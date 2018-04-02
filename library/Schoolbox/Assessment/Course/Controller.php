@@ -1005,7 +1005,7 @@ class Controller extends Base\Base
         $treeBuilder = new TreeBuilder(
             FolderMapper::getInstance(),
             $_SESSION['user'],
-            'Courses'
+            $folderId
         );
 
         $facultyRootFolder = $this->getCourseSpecificationMapper()->getFacultyRootFolder();
@@ -1564,7 +1564,7 @@ class Controller extends Base\Base
         $treeBuilder = new TreeBuilder(
             FolderMapper::getInstance(),
             $_SESSION['user'],
-            'Courses'
+            $folderId
         );
 
 

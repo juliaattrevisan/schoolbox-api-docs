@@ -9,12 +9,31 @@
 
 namespace Schoolbox\Assessment\Course;
 
+use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\IFolder;
 use Schoolbox\Resource\Browser\Resources;
+use Schoolbox\User;
 
 
 class TreeBuilder extends Resources\TreeBuilder
 {
+
+    /** @var int */
+    private $currentParentId;
+
+
+    /**
+     * @param Folder\ILocator $locator
+     * @param User            $user
+     * @param int             $currentParentId
+     * @param string          $rootLabel
+     */
+    public function __construct(Folder\ILocator $locator, User $user, int $currentParentId, string $rootLabel = 'Courses')
+    {
+        parent::__construct($locator, $user, $rootLabel);
+        $this->currentParentId = $currentParentId;
+    }
+
 
     /**
      * Class specific filter for which folders appear in the tree
@@ -26,11 +45,11 @@ class TreeBuilder extends Resources\TreeBuilder
     protected function filterFolder(IFolder $folder, array $parentList = []): bool
     {
         // Must include (because on branch from root to target node)?
-        if(\in_array($folder->getId(), $parentList, false)){
+        if (\in_array($folder->getId(), $parentList, false)) {
             return true;
         }
         // Don't build tree below courses
-        if($folder->getParent()->getFolderType() === 'course'){
+        if ($folder->getParent()->getFolderType() === 'course') {
             return false;
         }
         return true;
@@ -45,7 +64,7 @@ class TreeBuilder extends Resources\TreeBuilder
     protected function getNodeHasChildren($nodeId, array $parentList = []): bool
     {
         // Is node on path between root and target node?
-        if(\in_array($nodeId, $parentList, false)){
+        if (\in_array($nodeId, $parentList, false)) {
             return parent::getNodeHasChildren($nodeId, $parentList);
         }
 
@@ -59,7 +78,10 @@ class TreeBuilder extends Resources\TreeBuilder
      */
     protected function getDataType(IFolder $folder, string $type): string
     {
-        // Not selectable if a course or unit.
-        return \in_array($folder->getFolderType(), ['course', 'unit'], true) ? 'noaccess' : $type;
+        // Not selectable if a course or unit (but do permit current invalid parent to be retained)
+        if ($folder->getId() !== $this->currentParentId && \in_array($folder->getFolderType(), ['course', 'unit'], true)) {
+            return 'noaccess';
+        }
+        return $type;
     }
 }
