@@ -591,5 +591,8 @@ abstract class AbstractTreeBuilder
      * @param IFolder $folder
      * @return bool
      */
-    protected abstract function filterFolder(IFolder $folder);
+    protected function filterFolder(IFolder $folder): bool
+    {
+        return true;
+    }
 }

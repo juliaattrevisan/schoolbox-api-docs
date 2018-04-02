@@ -22,7 +22,7 @@ class TreeBuilder extends Resources\TreeBuilder
      * @param IFolder $folder
      * @return bool
      */
-    protected function filterFolder(IFolder $folder)
+    protected function filterFolder(IFolder $folder): bool
     {
 
         if ($folder->getFolderType() == 'course' || $folder->getFolderType() == 'unit') {
