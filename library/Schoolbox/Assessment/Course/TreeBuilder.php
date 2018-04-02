@@ -10,10 +10,10 @@
 namespace Schoolbox\Assessment\Course;
 
 use Schoolbox\Resource\Folder\IFolder;
-use Schoolbox\Resource\Browser\Resources\TreeBuilder;
+use Schoolbox\Resource\Browser\Resources;
 
 
-class CourseTreeBuilder extends TreeBuilder
+class TreeBuilder extends Resources\TreeBuilder
 {
 
     /**
