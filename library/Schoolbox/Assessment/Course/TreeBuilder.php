@@ -20,15 +20,36 @@ class TreeBuilder extends Resources\TreeBuilder
      * Class specific filter for which folders appear in the tree
      *
      * @param IFolder $folder
+     * @param array   $parentList
      * @return bool
      */
-    protected function filterFolder(IFolder $folder): bool
+    protected function filterFolder(IFolder $folder, array $parentList = []): bool
     {
-
-        if ($folder->getFolderType() == 'course' || $folder->getFolderType() == 'unit') {
+        // Must include (because on branch from root to target node)?
+        if(\in_array($folder->getId(), $parentList, false)){
+            return true;
+        }
+        // Don't build tree below courses
+        if($folder->getParent()->getFolderType() === 'course'){
             return false;
         }
-
         return true;
+    }
+
+
+    /**
+     * @param int   $nodeId
+     * @param array $parentList
+     * @return bool
+     */
+    protected function getNodeHasChildren($nodeId, array $parentList = []): bool
+    {
+        // Is node on path between root and target node?
+        if(\in_array($nodeId, $parentList, false)){
+            return parent::getNodeHasChildren($nodeId, $parentList);
+        }
+
+        // Otherwise prevent drilling into children of courses
+        return $this->folderLocator->findById($nodeId)->getFolderType() !== 'course';
     }
 }
