@@ -140,6 +140,11 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
     {
         $envelope = new Envelope();
 
+        //Don't send a notification for an item that the user cannot see
+        if ($returnedWork->getPublishedAt() < \Alaress_Date_Format::now()) {
+            return $envelope;
+        }
+
         /** @var User $student */
         $student = $this->userMapper->findById($returnedWork->getOwner()->getId());
         /** @var User $teacher */
