@@ -30,7 +30,9 @@ $breadcrumb-color: $content-ui-foreground;
 $breadcrumb-bg-color: $content-ui-background;
 $breadcrumb-hover-bg-color: $content-ui-hover;
 $breadcrumb-active-bg-color: $content-ui-selected;
-$breadcrumb-noclick-bg-opacity: $button-disabled-opacity;
+
+$breadcrumb-noclick-color: scale-color($breadcrumb-color, $lightness: 40%);
+$breadcrumb-noclick-bg-color: scale-color($breadcrumb-bg-color, $lightness: 40%);
 
 @import "../../../../javascript/components/foundation/scss/foundation/components/breadcrumbs";
 
@@ -83,25 +85,39 @@ $breadcrumb-noclick-bg-opacity: $button-disabled-opacity;
 				border-left-color: $breadcrumb-hover-bg-color !important;
 			}
 		}
-		&.active a,
-		&.active a:after{
-			background-color: $breadcrumb-active-bg-color;
-			border-left: 0px solid $breadcrumb-active-bg-color;
-		}
+
 		&.active a:before{
 			margin-left: 0px;
 		}
 
 		// Special styling for non-linked breadcrumbs
 		a:not([href]) {
-			opacity: $breadcrumb-noclick-bg-opacity;
+			background-color: $breadcrumb-noclick-bg-color;
+			color: $breadcrumb-noclick-color;
 			cursor: text;
-		}
-		&.active a {
-			opacity: 1;
-		}
 
+			&:before{
+				margin-left: 1px;
+				border-left: rem-calc($base-font-size * .4) solid $breadcrumb-noclick-bg-color;
+			}
+			&:after{
+				border-left: rem-calc($base-font-size * .4) solid $breadcrumb-noclick-bg-color;
+			}
+		}
+		&.active a:not([href]) {
+			background-color: $breadcrumb-active-bg-color;
+			color: $breadcrumb-color;
+			&:before{
+				border-left: rem-calc($base-font-size * .4) solid $breadcrumb-active-bg-color;
+			}
+		}
+		&.active a,
+		&.active a:after{
+			background-color: $breadcrumb-active-bg-color;
+			border-left: 0px solid $breadcrumb-active-bg-color;
+		}
 	}
+
 }
 
 #content > .breadcrumb {
