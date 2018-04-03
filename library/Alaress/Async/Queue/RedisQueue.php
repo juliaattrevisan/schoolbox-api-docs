@@ -66,10 +66,9 @@ abstract class RedisQueue implements QueueInterface
      */
     public function remove(Instance $instance): bool
     {
-        if ($this->contains($instance)) {
-            return $this->redis->del([$this->getRedisMsgKey($instance)]) > 0;
-        }
-        return false;
+        $id = $this->getRedisMsgKey($instance);
+        return $this->redis->del([$id]) > 0
+            && $this->redis->srem($this->getRedisSetKey(), $id) > 0;
     }
 
 
@@ -82,11 +81,22 @@ abstract class RedisQueue implements QueueInterface
      */
     public function removeAllLike(Instance $instance): int
     {
-        $keys = [];
-        foreach (new Keyspace($this->redis, $this->getRedisMsgBaseKey($instance)) as $key) {
-            $keys[] = $key;
+        $ids = [];
+        foreach (new Keyspace($this->redis, $this->getRedisMsgBaseKey($instance)) as $id) {
+            $ids[] = $id;
         }
-        return $this->redis->del($keys);
+
+        // Delete from both the key-value store, and the set
+        $count = 0;
+        if (!empty($ids)) {
+            $this->redis->del($ids);
+            foreach ($ids as $id) {
+                if ($this->redis->srem($this->getRedisSetKey(), $id) > 0) {
+                    $count++;
+                }
+            }
+        }
+        return $count;
     }
 
 
