@@ -88,6 +88,25 @@ class ArticleNotifier extends AbstractModuleNotifier
 
 
     /**
+     * Retracts a deleted article.
+     *
+     * @param Article $article
+     * @return Envelope
+     */
+    public function notifyDeleted(Article $article): Envelope
+    {
+        $envelope = new Envelope();
+        $bob      = new Builder();
+        $bob->setTitle(":user posted :title under :topic")
+            ->setHref('/news/item/' . $article->getId());
+
+        // TODO implement retract, make it call \Alaress\Async\Queue\RedisQueue::remove or removeAllLike
+        $envelope->retract($bob->build());
+        return $envelope;
+    }
+
+
+    /**
      * Notify a group type that news has been posted
      *
      * @param string $roleType
