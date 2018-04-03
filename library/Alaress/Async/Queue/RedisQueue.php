@@ -16,6 +16,7 @@ use Alaress\Async\Notification\Parameter\Param;
 use ErrorException;
 use InvalidArgumentException;
 use Predis\ClientInterface;
+use Predis\Collection\Iterator\Keyspace;
 
 abstract class RedisQueue implements QueueInterface
 {
@@ -54,6 +55,38 @@ abstract class RedisQueue implements QueueInterface
         }
 
         return $exists && $listed;
+    }
+
+
+    /**
+     * Surgically remove this message from the queue, if it's there.
+     *
+     * @param Instance $instance
+     * @return bool
+     */
+    public function remove(Instance $instance): bool
+    {
+        if ($this->contains($instance)) {
+            return $this->redis->del([$this->getRedisMsgKey($instance)]) > 0;
+        }
+        return false;
+    }
+
+
+    /**
+     * Surgically remove this message and any with the same base hash from the
+     * queue.
+     *
+     * @param Instance $instance
+     * @return int The number of msgs removed
+     */
+    public function removeAllLike(Instance $instance): int
+    {
+        $keys = [];
+        foreach (new Keyspace($this->redis, $this->getRedisMsgBaseKey($instance)) as $key) {
+            $keys[] = $key;
+        }
+        return $this->redis->del($keys);
     }
 
 
@@ -159,6 +192,23 @@ abstract class RedisQueue implements QueueInterface
             $this->getNamespace(),
             $instance->getBaseHash(),
             $instance->getParamHash()
+        );
+    }
+
+
+    /**
+     * The base key in Redis for the given Instance, in the form 'msg:INSTANCE:m:baseHash:*'
+     *
+     * @param Instance $instance
+     * @return string
+     */
+    private function getRedisMsgBaseKey(Instance $instance)
+    {
+        return sprintf(
+            $this->getMessageKeyPattern(),
+            $this->getNamespace(),
+            $instance->getBaseHash(),
+            '*'
         );
     }
 
