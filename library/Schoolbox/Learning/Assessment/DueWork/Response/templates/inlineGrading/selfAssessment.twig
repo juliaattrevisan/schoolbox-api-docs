@@ -51,6 +51,19 @@
         {% set text = 'rubric and'  %}
     {% endif %}
 
+
+    <ul class="train-line">
+        <li>
+            <a><span class="icon-due-work"></span>Submission</a>
+        </li>
+        <li class="current-stop">
+            <a>
+                <span class="icon-blog"></span>
+                {{ assessment.selfGradable ? locale.selfAssessment.proper : locale.selfReflection.proper }}
+            </a>
+        </li>
+    </ul>
+
 <div class="row">
     <div class="small-12 columns">
         <div class="alert-box">{% spaceless %}

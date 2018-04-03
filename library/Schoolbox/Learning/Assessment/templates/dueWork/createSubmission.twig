@@ -238,6 +238,20 @@ Data:
             {% include '@learning/fragments/meta/workType.twig' %}
         </ul>
 
+        {% if requiresReflection %}
+        <ul class="train-line">
+            <li class="current-stop">
+                <a><span class="icon-due-work"></span>Submission</a>
+            </li>
+            <li>
+                <a>
+                    <span class="icon-blog"></span>
+                    {{ assessment.selfGradable ? locale.selfAssessment.proper : locale.selfReflection.proper }}
+                </a>
+            </li>
+        </ul>
+        {% endif %}
+
         {% set description = participant ? participant.description : assessment.description %}
         {% if description | length %}
         <section class="content">
