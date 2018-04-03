@@ -98,7 +98,7 @@ $breadcrumb-noclick-bg-color: scale-color($breadcrumb-bg-color, $lightness: 40%)
 
 			&:before{
 				margin-left: 1px;
-				border-left: rem-calc($base-font-size * .4) solid $breadcrumb-noclick-bg-color;
+				border-left: rem-calc($base-font-size * .4) solid white;
 			}
 			&:after{
 				border-left: rem-calc($base-font-size * .4) solid $breadcrumb-noclick-bg-color;
