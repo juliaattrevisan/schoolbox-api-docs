@@ -17,6 +17,7 @@ use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\DataModel;
 use Schoolbox\Mapper;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
@@ -140,13 +141,24 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
     {
         $envelope = new Envelope();
 
+        /** @var User $student */
+        $student = $this->userMapper->findById($returnedWork->getOwner()->getId());
+
+        /** @var \Schoolbox\Learning\Assessment\DataModel\MapperProxy $assessmentDataSource */
+        $assessmentDataSource = Mapper::getDi()->get("assessmentDataSource");
+        $assessment = $assessmentDataSource->findById($returnedWork->getSubmissionBox()->getAssessmentId());
+        //var_dump($assessment);
+        $participant = $assessment->getParticipantIfExtant($student);
+
+        //var_dump(\Alaress_Date_Format::now());
+        //var_dump($participant->getPublishDate());
+        //var_dump(\Alaress_Date_Format::now()->lt($returnedWork->getSubmissionBox()->getAssessmentModel()->getPublishDate()));
+
         //Don't send a notification for an item that the user cannot see
-        if ($returnedWork->getPublishedAt() < \Alaress_Date_Format::now()) {
+        if (\Alaress_Date_Format::now()->lt($participant->getPublishDate())) {
             return $envelope;
         }
 
-        /** @var User $student */
-        $student = $this->userMapper->findById($returnedWork->getOwner()->getId());
         /** @var User $teacher */
         $teacher = $this->userMapper->findById($user->getId());
         /** @var SubmissionBox $box */
