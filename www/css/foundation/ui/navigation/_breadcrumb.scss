@@ -31,7 +31,6 @@ $breadcrumb-bg-color: $content-ui-background;
 $breadcrumb-hover-bg-color: $content-ui-hover;
 $breadcrumb-active-bg-color: $content-ui-selected;
 
-$breadcrumb-noclick-color: scale-color($breadcrumb-color, $lightness: 40%);
 $breadcrumb-noclick-bg-color: scale-color($breadcrumb-bg-color, $lightness: 40%);
 
 @import "../../../../javascript/components/foundation/scss/foundation/components/breadcrumbs";
@@ -93,7 +92,7 @@ $breadcrumb-noclick-bg-color: scale-color($breadcrumb-bg-color, $lightness: 40%)
 		// Special styling for non-linked breadcrumbs
 		a:not([href]) {
 			background-color: $breadcrumb-noclick-bg-color;
-			color: $breadcrumb-noclick-color;
+			color: scale-color($breadcrumb-noclick-bg-color, $lightness: -30%);
 			cursor: text;
 
 			&:before{
