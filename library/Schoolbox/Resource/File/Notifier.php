@@ -38,6 +38,10 @@ class Notifier extends ResourceNotifier
      */
     public function notifyCreated($roletype, $file, $effector, $diff = null)
     {
+        if($file->isHidden()) {
+            return new Envelope();
+        }
+
         try {
             $category = $this->folderMapper->findById($file->getFolder()->getId());
         } catch (Deleted $e) {
@@ -64,6 +68,10 @@ class Notifier extends ResourceNotifier
      */
     public function notifyDeleted($roletype, $file, $effector, $diff = null)
     {
+        if($file->isHidden()) {
+            return new Envelope();
+        }
+
         try {
             $category = $this->folderMapper->findById($file->getFolder()->getId());
         } catch (Deleted $e) {
