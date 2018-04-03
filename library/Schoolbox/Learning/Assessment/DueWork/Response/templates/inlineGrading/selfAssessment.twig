@@ -27,9 +27,9 @@
 {# Different button text in self-assessment #}
 {% block dynamicFeedback %}
     {% include '@learningDueWorkResponse/inlineGrading/fragments/dynamicFeedback.twig' with {
-        publishText: 'Submit self-assessment',
-        publishingText: 'Submitting self-assessment...',
-        publishedText: 'Submitted self-assessment'
+        publishText: 'Submit ' ~ locale.selfAssessment,
+        publishingText: 'Submitting ' ~ locale.selfAssessment ~ '...',
+        publishedText: 'Submitted ' ~ locale.selfAssessment
     } only %}
 {% endblock %}
 
