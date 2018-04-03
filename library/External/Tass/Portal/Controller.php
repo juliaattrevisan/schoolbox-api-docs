@@ -66,6 +66,7 @@ class Controller extends Alaress\Web\Controller\Base
      * @param string    $productPath The Tass portal path where the Tass product is made available
      * @param array     $deepLink    Parameters to indicate the Tass product page to deep link to
      * @param bool      $prodMenu    Should Tass render the product menu? Null for default behaviour
+     * @throws InvalidStatusCode If unable to generate a token and unable to set appropriate error code
      */
     private function redirectToTassProduct(string $productCode, string $appCode, string $productPath, array $deepLink, bool $prodMenu)
     {
@@ -92,13 +93,14 @@ class Controller extends Alaress\Web\Controller\Base
                 $this->getResponse()->status->setCode(404);
             } catch (InvalidStatusCode $e) {
                 $this->captureException($e);
-                exit($e->getMessage());
+                throw $e;
             }
         }
     }
 
     /**
      * SSO to parent lounge
+     * @throws InvalidStatusCode
      */
     public function parentLounge()
     {
@@ -107,6 +109,7 @@ class Controller extends Alaress\Web\Controller\Base
 
     /**
      * SSO to TASSWeb
+     * @throws InvalidStatusCode
      */
     public function tassWeb()
     {
@@ -115,6 +118,7 @@ class Controller extends Alaress\Web\Controller\Base
 
     /**
      * SSO to teacher kiosk
+     * @throws InvalidStatusCode
      */
     public function teacherKiosk()
     {
@@ -123,6 +127,7 @@ class Controller extends Alaress\Web\Controller\Base
 
     /**
      * SSO to web book
+     * @throws InvalidStatusCode
      */
     public function webBook()
     {
@@ -131,6 +136,7 @@ class Controller extends Alaress\Web\Controller\Base
 
     /**
      * SSO to student cafe
+     * @throws InvalidStatusCode
      */
     public function studentCafe()
     {
