@@ -46,9 +46,14 @@ All workshops should include stakeholders and relevant SMEs.
             <td>Name</td>
             <td>Problem Statement Refinement</td>
         </tr>
+        <tr>
+            <td>Name</td>
+            <td>Problem Statement Refinement</td>
+        </tr>
     </tbody>
 </table>
-#### 
+
+
 Pre-reading: “What’s Your Problem?” by Matt Lavoie (Part 1, Part 2)
 
 Involves: Strike Team
