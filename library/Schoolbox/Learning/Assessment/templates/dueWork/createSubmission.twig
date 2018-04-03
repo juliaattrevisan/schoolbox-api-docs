@@ -299,7 +299,7 @@ Data:
                     </section>
 
                     {%- if requiresReflection -%}
-                        <input type="submit" value="Reflect on my work" data-action-self-reflect />
+                        <input type="submit" value="Next" data-action-self-reflect />
                     {%- else -%}
                         <input type="submit"
                                value="{% if isSubmitOnBehalfOf %}Submit on behalf of {{ student.formatName }}{% else %}Submit for assessment{% endif %}"
