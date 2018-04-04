@@ -267,7 +267,8 @@ class Component_ConfigNotifier extends AbstractModuleNotifier
         if ($namespaceSuffix === null) {
             return null;
         }
-        return "*.notify.service.1.$altSourceId.$access.$namespaceSlug.$namespaceSuffix";
+        $service = UserAccess::SERVICE_HOMEPAGE;
+        return "*.notify.service.$service.$altSourceId.$access.$namespaceSlug.$namespaceSuffix";
     }
 
 
@@ -281,6 +282,7 @@ class Component_ConfigNotifier extends AbstractModuleNotifier
     private function determineDestinationPath(Component_Instance $instance, int $access): string
     {
         $hostFolderId = $instance->getIdentifier();
-        return "*.notify.service.1.$hostFolderId.$access.#";
+        $service      = UserAccess::SERVICE_HOMEPAGE;
+        return "*.notify.service.$service.$hostFolderId.$access.#";
     }
 }
