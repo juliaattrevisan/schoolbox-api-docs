@@ -87,7 +87,8 @@ class Sync extends Base implements ISync
                 sc.Relationship = 'Houseparents' OR
                 sc.Relationship LIKE '%Guardian%' OR
                 sc.Relationship LIKE 'Foster%' OR
-                sc.Relationship = 'Carer'
+                sc.Relationship = 'Carer' OR
+                sc.[Copy-of-reports] = 'Y'
             )
             AND   s.DateLeft IS NULL
             ORDER BY c.Code ASC

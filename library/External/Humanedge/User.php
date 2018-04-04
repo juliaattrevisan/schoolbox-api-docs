@@ -45,7 +45,8 @@ class External_Humanedge_User implements External_UserInterface
         sc.Relationship = 'Houseparents' OR
         sc.Relationship LIKE '%Guardian%' OR
         sc.Relationship LIKE 'Foster%' OR
-        sc.Relationship = 'Carer'
+        sc.Relationship = 'Carer' OR
+        sc.[Copy-of-reports] = 'Y'
     )";
 
     /**
