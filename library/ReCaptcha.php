@@ -113,9 +113,10 @@ class ReCaptcha {
             return false;
         }
 
-        $response = file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=".$this->private_key."&response=".$response);
+        $client = new \GuzzleHttp\Client();
+        $response = $client->request('POST', "https://www.google.com/recaptcha/api/siteverify?secret=".$this->private_key."&response=".$response);
 
-        return json_decode($response)->success;
+        return json_decode($response->getBody())->success;
 
     }
 
