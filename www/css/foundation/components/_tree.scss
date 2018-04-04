@@ -16,6 +16,11 @@ $tree-homepage-icon-color: darkorange;
 $tree-course-icon-color: #008600;
 $tree-favorite-icon-color: darkorange;
 
+/* Can't touch this... node */
+li[data-type=noaccess] > a.jstree-anchor{
+    cursor: not-allowed;
+}
+
 
 %browser-icon-colors {
     .icon-folder:before {
