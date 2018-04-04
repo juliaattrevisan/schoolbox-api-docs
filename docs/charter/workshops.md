@@ -27,7 +27,8 @@ Pre-reading: “What’s Your Problem?” by Matt Lavoie ([Part 1](https://drive
     Preparation:    None
     Deliverables:   What kind of research is needed?
                     Put the content together
-                    
+       
+             
 ## Definition Workshops
 
 ### Persona Refinement
@@ -103,6 +104,3 @@ Pre-reading: “What’s Your Problem?” by Matt Lavoie ([Part 1](https://drive
     Preparation:    Tasks written and curated
     Prepared by:    Strike Team
     Deliverables:   Tasks made ready for sprint
-
-    
-

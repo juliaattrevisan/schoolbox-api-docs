@@ -1,5 +1,4 @@
-# Schoolbox (SA) Issue Types
-
+# Issue Type Definitions
 
 ## Epic
 Equates to a feature or problem. Internal projects such as refactors have to conform to the same constraints as features: they have to have a problem, goal, and articulable value. 
