@@ -23,7 +23,7 @@ $recaptcha = new ReCaptcha(Config::get('recaptcha_public_api_key'), Config::get(
 
 if (!isset($_SESSION['id']) && !$recaptcha->check_answer($_SERVER['REMOTE_ADDR'], $_POST['g-recaptcha-response'])) {
     $page = new SitePage(false);
-    error(105, "The Human Checker (reCAPTCHA) words you entered did not match.");
+    error(105, "The Human Checker (reCAPTCHA) failed.");
 }
 
 if(isset($_SESSION['user'])) {
