@@ -1,0 +1,1 @@
+UPDATE `config` SET `value`="sbcbc" WHERE `name`="site_location" AND `value`="stbernards";
