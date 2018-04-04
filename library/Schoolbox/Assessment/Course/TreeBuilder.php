@@ -57,19 +57,15 @@ class TreeBuilder extends Resources\TreeBuilder
 
 
     /**
-     * @param int   $nodeId
-     * @param array $parentList
-     * @return bool
+     * @inheritdoc
      */
     protected function getNodeHasChildren($nodeId, array $parentList = []): bool
     {
-        // Is node on path between root and target node?
-        if (\in_array($nodeId, $parentList, false)) {
-            return parent::getNodeHasChildren($nodeId, $parentList);
+        if (!\in_array($nodeId, $parentList, false) && 'course' === $this->folderLocator->findById($nodeId)->getFolderType()) {
+            // If node is a course and not an ancestor, we are not interested in its children
+            return false;
         }
-
-        // Otherwise prevent drilling into children of courses
-        return $this->folderLocator->findById($nodeId)->getFolderType() !== 'course';
+        return parent::getNodeHasChildren($nodeId, $parentList);
     }
 
 
