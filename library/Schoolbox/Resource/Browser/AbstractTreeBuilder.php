@@ -166,7 +166,7 @@ abstract class AbstractTreeBuilder
             $output[] = $this->generateNodeArray(
                 $folder->getId(),
                 $folder->getParent()->getId(),
-                'root',
+                NodeInterface::TYPE_ROOT,
                 $this->getRootNodeLabel(),
                 null,
                 null,
@@ -233,7 +233,7 @@ abstract class AbstractTreeBuilder
         if (empty($permission)) {
             // ensure that the direct tree to the selected node is available by generating ghost nodes
             if (in_array($folder->getId(), $parentList)) {
-                $type = 'noaccess';
+                $type = NodeInterface::TYPE_NO_ACCESS;
                 $href = '#';
                 $name = '(' . $folder->getName() . ')';
             } else {
@@ -356,7 +356,7 @@ abstract class AbstractTreeBuilder
         return $this->generateNodeArray(
             $file->getId(),
             $folderId,
-            'file',
+            NodeInterface::TYPE_FILE,
             $name ?: $file->getTitle(),
             null,
             null,
@@ -399,7 +399,7 @@ abstract class AbstractTreeBuilder
             'coverImage' => $coverImage,
         );
 
-        if ($type == 'file' || $type == 'link') {
+        if ($type === NodeInterface::TYPE_FILE || $type === NodeInterface::TYPE_LINK) {
             $array['id'] = "{$this->namespace}-$type-$nodeId";
         } else {
             $array['children'] = $this->getNodeHasChildren($nodeId, $parentList);

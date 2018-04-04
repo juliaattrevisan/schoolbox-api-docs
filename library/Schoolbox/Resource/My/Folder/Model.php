@@ -11,6 +11,7 @@ namespace Schoolbox\Resource\My\Folder;
 
 
 use Schoolbox\Resource\AbstractFolder;
+use Schoolbox\Resource\Browser\NodeInterface;
 use Schoolbox\User;
 
 /**
@@ -54,7 +55,7 @@ class Model extends AbstractFolder
      */
     public function getFolderType()
     {
-        return 'folder';
+        return NodeInterface::TYPE_FOLDER;
     }
 
 }

@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Assessment\Course;
 
+use Schoolbox\Resource\Browser\NodeInterface;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\IFolder;
 use Schoolbox\Resource\Browser\Resources;
@@ -49,7 +50,7 @@ class TreeBuilder extends Resources\TreeBuilder
             return true;
         }
         // Don't build tree below courses
-        if ($folder->getParent()->getFolderType() === 'course') {
+        if ($folder->getParent()->getFolderType() === NodeInterface::TYPE_COURSE) {
             return false;
         }
         return true;
@@ -61,7 +62,7 @@ class TreeBuilder extends Resources\TreeBuilder
      */
     protected function getNodeHasChildren($nodeId, array $parentList = []): bool
     {
-        if (!\in_array($nodeId, $parentList, false) && 'course' === $this->folderLocator->findById($nodeId)->getFolderType()) {
+        if (!\in_array($nodeId, $parentList, false) && NodeInterface::TYPE_COURSE === $this->folderLocator->findById($nodeId)->getFolderType()) {
             // If node is a course and not an ancestor, we are not interested in its children
             return false;
         }
@@ -75,8 +76,10 @@ class TreeBuilder extends Resources\TreeBuilder
     protected function getDataType(IFolder $folder, string $type): string
     {
         // Not selectable if a course or unit (but do permit current invalid parent to be retained)
-        if ($folder->getId() !== $this->currentParentId && \in_array($folder->getFolderType(), ['course', 'unit'], true)) {
-            return 'noaccess';
+        if ($folder->getId() !== $this->currentParentId &&
+            \in_array($folder->getFolderType(), [NodeInterface::TYPE_COURSE, NodeInterface::TYPE_UNIT], true)
+        ) {
+            return NodeInterface::TYPE_NO_ACCESS;
         }
         return $type;
     }
