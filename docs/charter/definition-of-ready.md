@@ -9,7 +9,7 @@ This is considered a set of ideals, acknowledging that it isn't always practical
 ## Story, Task
 * Detail include assumptions, constraints, business rules, technical, performance, security
 * External dependencies ideally resolved, but at minimum identified
-* Story Points
+* Story Points, or the 'expresslane' label added by PO or SM.
 * Story isn’t larger than can be realistically be completed in 5 working days
     * If it is, decomposition is required
 
