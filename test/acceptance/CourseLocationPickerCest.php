@@ -20,7 +20,7 @@ class CourseLocationPickerCest
      * Go to the course modify page before every test
      *
      * @param AcceptanceTester $i
-     * @throws \Codeception\Exception\TestRuntimeException
+     * @throws Exception
      */
     public function _before(AcceptanceTester $i): void
     {
@@ -30,7 +30,7 @@ class CourseLocationPickerCest
         $i->loginAsAdmin();
         $i->amOnPage(CourseModify::getUrl(6));
         $i->click(CourseModify::SELECTOR_LOCATION);
-        $i->wait(0.5); // Need to wait for modal fade-in to finish
+        $i->waitForElement(CourseModify::SELECTOR_USE_FOLDER); // Need to wait for modal fade-in to finish
     }
 
 
@@ -74,10 +74,12 @@ class CourseLocationPickerCest
      * * can persist a homepage as a course location
      *
      * @param AcceptanceTester $i
+     * @throws Exception
      */
     public function locationSelection(AcceptanceTester $i): void
     {
         // open the 'French' homepage node
+        $i->waitForElement('#519_anchor');
         $i->click('#519_anchor');
 
         // 'French' homepage should be selected
