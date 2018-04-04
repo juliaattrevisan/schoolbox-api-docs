@@ -199,7 +199,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
      * @param string             $roletype
      * @return Envelope
      */
-    protected function notify($kind, $id, $action, $param, $effector, $category, $roletype)
+    protected function notify($kind, $id, $action, $param, $effector, $category, $roletype, $accessLevel)
     {
         $envelope = new Envelope();
 
@@ -229,7 +229,8 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
             ->addTopic("cms.$kind.$id.$action")
             ->addFilter('roletype', $roletype);
 
-        $envelope->broadcastToCategory($category, UserAccess::ACCESS_READ, $bob->build());
+
+        $envelope->broadcastToCategory($category, $accessLevel, $bob->build());
 
         return $envelope;
     }
@@ -364,7 +365,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
         if (count($diff) || is_null($diff)) {
             $instances = $this->notify(
                 $resourceKind, $resourceId, self::TRIGGER_UPDATED,
-                new Param($resourceName, $resourceHref), $effector, $category, $roleType
+                new Param($resourceName, $resourceHref), $effector, $category, $roleType, UserAccess::ACCESS_READ
             )->getAll();
 
             foreach ($instances as $inst) {

@@ -12,6 +12,7 @@ use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\Parameter\Param;
 use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception\Deleted;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\LogMapper;
 use Schoolbox\Resource\ResourceNotifier;
@@ -38,8 +39,12 @@ class Notifier extends ResourceNotifier
      */
     public function notifyCreated($roletype, $file, $effector, $diff = null)
     {
+        $accessLevel = null;
+
         if($file->isHidden()) {
-            return new Envelope();
+            $accessLevel = UserAccess::ACCESS_WRITE;
+        } else {
+            $accessLevel = UserAccess::ACCESS_READ;
         }
 
         try {
@@ -55,7 +60,8 @@ class Notifier extends ResourceNotifier
             new Param($file->getTitle(), '/send.php?id='.$file->getId()), // the :resource param
             $effector,
             $category,
-            $roletype
+            $roletype,
+            $accessLevel
         );
     }
 
@@ -68,8 +74,12 @@ class Notifier extends ResourceNotifier
      */
     public function notifyDeleted($roletype, $file, $effector, $diff = null)
     {
+        $accessLevel = null;
+
         if($file->isHidden()) {
-            return new Envelope();
+            $accessLevel = UserAccess::ACCESS_WRITE;
+        } else {
+            $accessLevel = UserAccess::ACCESS_READ;
         }
 
         try {
@@ -86,7 +96,8 @@ class Notifier extends ResourceNotifier
             new Param($file->getTitle()), // the :resource param
             $effector,
             $category,
-            $roletype
+            $roletype,
+            $accessLevel
         );
     }
 

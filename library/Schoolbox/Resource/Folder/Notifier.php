@@ -13,6 +13,7 @@ namespace Schoolbox\Resource\Folder;
 use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\Parameter\Param;
 use Schoolbox\Collection;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
@@ -85,7 +86,7 @@ class Notifier extends ResourceNotifier {
         return $this->notify(
             LogMapper::KIND_FOLDER, $category->getId(), self::TRIGGER_CREATED,
             new Param($category->getName(), "/homepage/".$category->getId()),
-            $creator, $category->getParent(), $roleType
+            $creator, $category->getParent(), $roleType, UserAccess::ACCESS_READ
         );
     }
 
@@ -102,7 +103,7 @@ class Notifier extends ResourceNotifier {
         return $this->notify(
             LogMapper::KIND_FOLDER, $category->getId(), self::TRIGGER_DELETED,
             new Param($category->getName()),
-            $effector, $category->getParent(), $roleType
+            $effector, $category->getParent(), $roleType, UserAccess::ACCESS_READ
         );
     }
 
