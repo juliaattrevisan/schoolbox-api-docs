@@ -33,8 +33,8 @@ $accessLevels = [
 $stmt = $db->prepareQuery("
     INSERT INTO msg_redirect
     SELECT
-        CONCAT_WS('.', '*.notify.service.', :service, cci.value, :access, cd.msg_namespace_slug, cd.msg_namespace_slug_suffix) AS `from`,
-        CONCAT_WS('.', '*.notify.service.', :service, ci.identifier, :access, '#') AS `to`
+        CONCAT_WS('.', '*.notify.service', :service, cci.value, :access, cd.msg_namespace_slug, cd.msg_namespace_slug_suffix) AS `from`,
+        CONCAT_WS('.', '*.notify.service', :service, ci.identifier, :access, '#') AS `to`
 
     FROM component_config_instance cci
         INNER JOIN component_config_definition ccd ON cci.component_config_definition_id = ccd.id
