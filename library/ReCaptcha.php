@@ -115,7 +115,7 @@ class ReCaptcha {
 
         $response = file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=".$this->private_key."&response=".$response);
 
-        return ( json_decode($response)->success );
+        return json_decode($response)->success;
 
     }
 
