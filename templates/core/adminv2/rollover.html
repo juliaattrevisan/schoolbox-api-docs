@@ -10,7 +10,9 @@
 
         /* left tree navigation */
         $('[data-tree]')
-                .resourceTree({
+                .resourceTree(
+                    {JS_NODE_TYPE_ICON_MAP},
+                    {
                     data: {
                         cache: {TREEDATA}
                     }

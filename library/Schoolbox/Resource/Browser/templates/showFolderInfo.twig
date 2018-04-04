@@ -1,3 +1,5 @@
+{% import '@resourceBrowser/macro/nodeIcon.twig' as nodeIcon %}
+
 {% if access > 0 or user.isSuperuser %}
 
     {% set colouring -%}
@@ -24,7 +26,7 @@
         {% if folder.hasCoverImage %}
             <img class="icon" src="/storage/image.php?hash={{ folder.coverImage.hash }}&size=square128" alt="{{ folder.name }}" {{ colouring }} />
         {% else %}
-            <div class="icon-{{ icon }} size-64" alt="{{ folder.name }}"></div>
+            <div class="{{ nodeIcon.icon(nodeType) }} size-64" alt="{{ folder.name }}"></div>
         {% endif %}
         {% if folder.hasHomepage %}
             </a>

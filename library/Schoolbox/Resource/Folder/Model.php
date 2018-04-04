@@ -328,7 +328,7 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
      *
      * {@inheritdoc}
      */
-    public function getFolderType()
+    public function getNodeType(): string
     {
         if($this->hasCourseSpecification()){
             return NodeInterface::TYPE_COURSE;

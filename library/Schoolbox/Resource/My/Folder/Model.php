@@ -49,11 +49,9 @@ class Model extends AbstractFolder
 
 
     /**
-     * A folder type. This will probably map to a class name.
-     *
-     * @return string
+     * @inheritdoc
      */
-    public function getFolderType()
+    public function getNodeType(): string
     {
         return NodeInterface::TYPE_FOLDER;
     }

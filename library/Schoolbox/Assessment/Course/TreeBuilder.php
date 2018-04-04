@@ -50,7 +50,7 @@ class TreeBuilder extends Resources\TreeBuilder
             return true;
         }
         // Don't build tree below courses
-        if ($folder->getParent()->getFolderType() === NodeInterface::TYPE_COURSE) {
+        if ($folder->getParent()->getNodeType() === NodeInterface::TYPE_COURSE) {
             return false;
         }
         return true;
@@ -62,7 +62,7 @@ class TreeBuilder extends Resources\TreeBuilder
      */
     protected function getNodeHasChildren($nodeId, array $parentList = []): bool
     {
-        if (!\in_array($nodeId, $parentList, false) && NodeInterface::TYPE_COURSE === $this->folderLocator->findById($nodeId)->getFolderType()) {
+        if (!\in_array($nodeId, $parentList, false) && NodeInterface::TYPE_COURSE === $this->folderLocator->findById($nodeId)->getNodeType()) {
             // If node is a course and not an ancestor, we are not interested in its children
             return false;
         }
@@ -77,7 +77,7 @@ class TreeBuilder extends Resources\TreeBuilder
     {
         // Not selectable if a course or unit (but do permit current invalid parent to be retained)
         if ($folder->getId() !== $this->currentParentId &&
-            \in_array($folder->getFolderType(), [NodeInterface::TYPE_COURSE, NodeInterface::TYPE_UNIT], true)
+            \in_array($folder->getNodeType(), [NodeInterface::TYPE_COURSE, NodeInterface::TYPE_UNIT], true)
         ) {
             return NodeInterface::TYPE_NO_ACCESS;
         }

@@ -224,7 +224,7 @@ abstract class AbstractTreeBuilder
         $permission = $this->getFolderPermission($folder->getId());
 
         // this seems so trivial, but it's so these can be overridden
-        $type = $this->getFolderIcon($folder);
+        $type = $this->getNodeType($folder);
         $name = $this->getFolderName($folder);
         $href = $this->getFolderHref($folder);
         $colour = $this->getFolderColour($folder);
@@ -446,9 +446,9 @@ abstract class AbstractTreeBuilder
      * @param IFolder $folder
      * @return string
      */
-    public function getFolderIcon(IFolder $folder)
+    public function getNodeType(IFolder $folder): string
     {
-        return 'folder';
+        return NodeInterface::TYPE_FOLDER;
     }
 
 
