@@ -1,12 +1,6 @@
 # Definition of Done
 
 ## Story, Task or Bug
-* Documentation
-    * README for module is created/updated
-* Code is written to standards
-    * Unit tests
-    * Selenium tests
-* Developer confirms code is ready for review
 * Peer Review
     * Code Standard 
     * Static analysis
@@ -15,6 +9,20 @@
 * Quality Assurance
     * Ensure that system working to an acceptable level
     * Check the acceptance criteria are still met
+
+## Story or Task
+* Code is written to standards
+    * Unit tests
+    * Selenium tests
+
+## Task
+* Documentation
+    * README created or updated for any jQuery plugins
+    * Pantry updated with any design language changes
+    
+## Story
+* Documentation
+    * README for module is created/updated
 
 ## Sprint
 * Committed stories done
