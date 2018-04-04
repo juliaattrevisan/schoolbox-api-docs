@@ -14,8 +14,8 @@ use Schoolbox\External\Connector\Schooledge\Base\Sync as BaseSync;
 class Sync extends BaseSync
 {
     /**
-     * The filter for a student's contacts - this filters out anyone who's not
-     * a primary guardian or parent.
+     * CCB's student contact filter also allows through any user who has the
+     * custom flag "Copy-of-reports".
      *
      * @var string
      */

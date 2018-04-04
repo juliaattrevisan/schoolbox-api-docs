@@ -13,8 +13,8 @@ declare(strict_types=1);
 class External_Schooledge_Ccb_User extends External_Schooledge_User
 {
     /**
-     * The filter for a student's contacts - this filters out anyone who's not
-     * a primary guardian or parent.
+     * CCB's student contact filter also allows through any user who has the
+     * custom flag "Copy-of-reports".
      *
      * @var string
      */
