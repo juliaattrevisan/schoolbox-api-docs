@@ -35,6 +35,18 @@ class CourseLocationPickerCest
 
 
     /**
+     * Clean up after every test
+     *
+     * @param AcceptanceTester $i
+     */
+    public function _after(AcceptanceTester $i): void
+    {
+        // Set the location of the 'Java Programming' course to 'Class 1: Introduction' unit
+        $i->updateInDatabase('folder', ['parent' => 508], ['id' => 545]);
+    }
+
+
+    /**
      * Test that user can select current (invalid) location
      *
      * @param AcceptanceTester $i
