@@ -168,12 +168,18 @@ class Controller extends BaseController
 
         // Check all permissions before making any changes to system
         $errors = [];
+
         foreach ($assessmentImpls as $assessmentImpl) {
-            $folderId = $assessmentImpl->getContext()->getFolder()->getId();
-            if (!$folderWritePerms[$folderId]) {
-                $errors[$folderId] = true;
+            // But only if the implementation was ticked by the user
+
+            if (array_key_exists($assessmentImpl->getBaseContext()->getId(), $importedImplementations)) {
+                $folderId = $assessmentImpl->getContext()->getFolder()->getId();
+                if (!$folderWritePerms[$folderId]) {
+                    $errors[$folderId] = true;
+                }
             }
         }
+
         if (\count($errors)) {
             $folderIds = '[' . implode(',', array_keys($errors)) . ']';
             $this->sendError(
