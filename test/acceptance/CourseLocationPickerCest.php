@@ -11,7 +11,7 @@ use Page\CourseModify;
  * Steps:
  * 1. Provision legacy.tar.gz data
  * 2. vagrant ssh
- * 3. Execute /vagrant/vendor/bin/codecept run --steps acceptance CourseLocationPickerCest
+ * 3. Execute cd /vagrant && ./vendor/bin/codecept run --steps acceptance CourseLocationPickerCest
  */
 class CourseLocationPickerCest
 {
