@@ -37,8 +37,8 @@ class Aggregation
     }
 
     /**
-     * Make an associative array using level indexes and prefill it with
-     * the initials of achievements
+     * Make an associative array using achievement indexes and prefill it with
+     * the level indexes
      *
      * @return array
      */
