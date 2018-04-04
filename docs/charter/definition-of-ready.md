@@ -1,9 +1,10 @@
 # Definition of Ready
 
-This is considered a set of ideals, acknowledging that it isn't always practical or possible; that isn't an excuse to be lazy though!
-
 ## Bug
-* Steps to Reproduce
+* Steps to Reproduce field populated:
+    * Local/Vagrant steps to reproduce if attainable.
+    * Steps to reproduce on a dev or live school server added if relevant or in lieu of local steps.
+    * If neither of the above are possible, a brief message explaining so included.
 * Acceptance Criteria
 
 ## Story, Task
