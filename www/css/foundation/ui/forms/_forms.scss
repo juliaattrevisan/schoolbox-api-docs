@@ -709,6 +709,16 @@ form .information-list .sp-replacer {
 	margin-bottom: 1rem;
 }
 
+/* Allow rubrics to display levels exceeding the container element SA-2730
+ * This is, apparently, some obnoxious webkit/failfox bug
+ *
+ * https://stackoverflow.com/questions/17408815/fieldset-resizes-wrong-appears-to-have-unremovable-min-width-min-content
+ * https://bugzilla.mozilla.org/show_bug.cgi?id=504622#c5
+ */
+fieldset {
+	min-width: 0;
+}
+
 @import 'dropzone';
 @import 'datetime';
 @import 'tinymce';
