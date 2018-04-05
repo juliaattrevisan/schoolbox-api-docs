@@ -11,7 +11,7 @@ You must have your HTML in the correct layout in order for this plugin to work.
 <div class="swiper-container" id="image-slider">
     <div class="swiper-wrapper">
         <div class="swiper-slide">
-            <img data-src="/path/to/img/1" alt=""> <!-- data-src is used instead of src for lazy loading -->
+            <img data-src="/path/to/img/1" alt="" class="swiper-lazy"> <!-- data-src is used instead of src for lazy loading -->
             <div class="loader"></div>
         </div>
         <div class="swiper-slide">
