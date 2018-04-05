@@ -152,6 +152,11 @@ class Aggregation
             }
         }
 
+        /* Ensure seenLevels is sorted... because highcharts
+         * (Otherwise the graph labels could be misordered)
+         */
+        ksort($seenLevels);
+
         return [
             'meta' => $data['meta'],
             'levels' => $seenLevels,
