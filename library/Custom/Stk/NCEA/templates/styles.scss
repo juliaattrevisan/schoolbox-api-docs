@@ -1,5 +1,9 @@
 @media all {
   #nceaReport {
+    #graph {
+      height: 350px;
+    }
+
     span.disclaimer {
       font-weight: bold;
       text-decoration: underline;
@@ -7,6 +11,7 @@
 
     th, td {
       border: 1px solid #000 !important;
+      padding: 0.25rem !important;
     }
 
     td {
