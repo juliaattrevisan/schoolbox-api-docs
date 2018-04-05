@@ -143,26 +143,28 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
 
         /** @var User $student */
         $student = $this->userMapper->findById($returnedWork->getOwner()->getId());
+        /** @var User $teacher */
+        $teacher = $this->userMapper->findById($user->getId());
+        /** @var SubmissionBox $box */
+        $box = $this->boxMapper->findById($returnedWork->getSubmissionBox()->getId());
 
         /** @var \Schoolbox\Learning\Assessment\DataModel\MapperProxy $assessmentDataSource */
         $assessmentDataSource = Mapper::getDi()->get("assessmentDataSource");
-        $assessment = $assessmentDataSource->findById($returnedWork->getSubmissionBox()->getAssessmentId());
-        //var_dump($assessment);
-        $participant = $assessment->getParticipantIfExtant($student);
 
-        //var_dump(\Alaress_Date_Format::now());
-        //var_dump($participant->getPublishDate());
-        //var_dump(\Alaress_Date_Format::now()->lt($returnedWork->getSubmissionBox()->getAssessmentModel()->getPublishDate()));
+        /** @var \Schoolbox\Learning\Assessment\Participant\DataSource $participantDataSource */
+        $participantDataSource = Mapper::getDi()->get("participantDataSource");
+
+        $assessment = $assessmentDataSource->findById($box->getAssessmentId());
+
+        $participantDataSource->loadParticipationIntoAssessment($assessment, $student);
+
+        $participant = $assessment->getParticipantIfExtant($student);
 
         //Don't send a notification for an item that the user cannot see
         if (\Alaress_Date_Format::now()->lt($participant->getPublishDate())) {
             return $envelope;
         }
 
-        /** @var User $teacher */
-        $teacher = $this->userMapper->findById($user->getId());
-        /** @var SubmissionBox $box */
-        $box = $this->boxMapper->findById($returnedWork->getSubmissionBox()->getId());
         /** @var Folder $cat */
         $cat = $this->catMapper->findById($box->getCategory()->getId());
 
