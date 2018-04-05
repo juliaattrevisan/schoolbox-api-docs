@@ -6,9 +6,7 @@
 
 {# Display header #}
 
-{% if user %}
-
-    {% set method = 'Update' %}
+{% if method=='Update' %}
 
     {# Display modify user header with drop-down #}
 
@@ -169,7 +167,7 @@
                         <input id="superuser" type="checkbox" name="superuser" data-role="superuser" value="1" {% if user.isSuperuser %}checked{% endif %} />
                         <label for="superuser" class="checkbox-label">Superuser</label>
 
-                        {% if user %}
+                        {% if method=='Update' %}
                             {# Only modify user screen has the enabled checkbox #}
                             <input id="account_enabled" type="checkbox" name="account_enabled" data-role="enabled" value="1"
                                    {% if user.enabled %}checked{% endif %} />
@@ -187,7 +185,7 @@
 </form>
 </div>
 
-{% if user %}
+{% if method=='Update' %}
 
     {# Synergetic file year and semester #}
 
@@ -636,7 +634,7 @@
 
         {# This is script that only relates to the modify user screen #}
 
-        {% if user %}
+        {% if method=='Update' %}
 
             {# Confirm change of enabled flag#}
 
