@@ -85,7 +85,6 @@ class Aggregation
             $subjectKey = $current['subjectSort'];
             $levelKey = "L{$current['nceaLevel']}";
             $gradeKey = $current['grade'];
-            $seenLevels[$levelKey] = $levelKey;
 
             /* Data for Graph: only care about the achievements listed in $this->achievements
              * All others are ignored
@@ -94,6 +93,7 @@ class Aggregation
              */
             if (\in_array($gradeKey, $this->achievements, true)) {
                 $graph[$gradeKey][$levelKey] += $current['creditsGained'];
+                $seenLevels[$levelKey] = $levelKey;
             }
 
             /* Data for Tables
