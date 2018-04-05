@@ -21,24 +21,14 @@ class Acquisition
     private $database;
 
     /**
-     * The ExternalId of the student
-     *
-     * @var int
-     */
-    private $externalId;
-
-    /**
      * Controller constructor.
      *
      * @param IConnector $database
-     * @param int        $externalId
      */
-    public function __construct(IConnector $database, int $externalId)
+    public function __construct(IConnector $database)
     {
         $this->database = $database;
-        $this->externalId = $externalId;
     }
-
 
     /**
      * Get all the NCEA data for $externalId
@@ -51,11 +41,12 @@ class Acquisition
      *
      * Added because test data exists only for a previous year
      *
-     * @param int $year
+     * @param int $externalId The ExternalId of the student
+     * @param int $year The year for which to generate a report
      * @return array
      * @throws \Alaress\Database\Exception
      */
-    public function getRecords(int $year): array
+    public function getRecords(int $externalId, int $year): array
     {
         $statement = $this->database->prepareQuery('
             SELECT 
@@ -71,8 +62,7 @@ class Acquisition
                 R.AssessmentOption,
                 R.CreditsGained,
                 R.SubjectSort,
-                R.SubjectName,
-                R.CommPortalCurrentFlag
+                R.SubjectName
             FROM dbo.uvStudentsNCEAResultsTracking R
             WHERE R.ID = :externalId
             AND R.FileYear <= :year
@@ -80,7 +70,7 @@ class Acquisition
         ');
 
         $statement->execute([
-            'externalId' => $this->externalId,
+            'externalId' => $externalId,
             'year' => $year,
         ]);
 

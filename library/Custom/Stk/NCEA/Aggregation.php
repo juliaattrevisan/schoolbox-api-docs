@@ -74,6 +74,10 @@ class Aggregation
          */
         $aggregatedData = [];
 
+        /* Levels that were seen in the data
+         */
+        $seenLevels = [];
+
         /** @var array $allRecords */
         $allRecords = $data['records'];
 
@@ -89,6 +93,7 @@ class Aggregation
              */
             if (\in_array($gradeKey, $this->achievements, true)) {
                 $graph[$gradeKey][$levelKey] += $current['creditsGained'];
+                $seenLevels[$levelKey] = $levelKey;
             }
 
             /* Data for Tables
@@ -136,8 +141,25 @@ class Aggregation
             $credits['total'][$levelKey] = $credits['gainedThisYear'][$levelKey] + $credits['broughtForward'][$levelKey];
         }
 
+        /* Remove levels that weren't seen in the data set
+         * ...because highcharts
+         */
+        $unseen = array_diff($this->indexes, $seenLevels);
+
+        foreach ($this->achievements as $currentAchievement) {
+            foreach ($unseen as $currentUnseen) {
+                unset($graph[$currentAchievement][$currentUnseen]);
+            }
+        }
+
+        /* Ensure seenLevels is sorted... because highcharts
+         * (Otherwise the graph labels could be misordered)
+         */
+        ksort($seenLevels);
+
         return [
             'meta' => $data['meta'],
+            'levels' => $seenLevels,
             'graph' => $graph,
             'records' => $aggregatedData,
             'credits' => $credits,

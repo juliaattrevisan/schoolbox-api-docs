@@ -12,6 +12,16 @@
  #}
 {% macro renderCreditsforAchievement(data, achievement) %}
     {% for level, value in data.graph[achievement] %}
-        {{ value }}{% if not loop.last %}, {% endif %}
+        {% if value %}{{ value }}{% else %}null{% endif %}{% if not loop.last %}, {% endif %}
+    {% endfor %}
+{% endmacro %}
+
+{# Render "categories" (the y-axis) on the barchart
+ # but only for the levels that we know exist, otherwise it renders stupidly and reserves a space
+ # for a nonexistent bar
+ #}
+{% macro renderDataLevels(levels) %}
+    {% for level in levels %}
+        "{{ level|replace({'L': 'Level '}) }}"{% if not loop.last %}, {% endif %}
     {% endfor %}
 {% endmacro %}
