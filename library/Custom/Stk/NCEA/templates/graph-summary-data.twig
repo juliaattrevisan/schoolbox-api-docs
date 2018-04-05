@@ -11,7 +11,7 @@
             colors: ['#4394FF', '#FFB37C', '#409F40'],
 
             categories: [
-                'Level 1', 'Level 2', 'Level 3'
+                {{ macro.renderDataLevels(data.levels) }}
             ],
 
             series: [

@@ -74,6 +74,10 @@ class Aggregation
          */
         $aggregatedData = [];
 
+        /* Levels that were seen in the data
+         */
+        $seenLevels = [];
+
         /** @var array $allRecords */
         $allRecords = $data['records'];
 
@@ -81,6 +85,7 @@ class Aggregation
             $subjectKey = $current['subjectSort'];
             $levelKey = "L{$current['nceaLevel']}";
             $gradeKey = $current['grade'];
+            $seenLevels[$levelKey] = $levelKey;
 
             /* Data for Graph: only care about the achievements listed in $this->achievements
              * All others are ignored
@@ -136,8 +141,20 @@ class Aggregation
             $credits['total'][$levelKey] = $credits['gainedThisYear'][$levelKey] + $credits['broughtForward'][$levelKey];
         }
 
+        /* Remove levels that weren't seen in the data set
+         * ...because highcharts
+         */
+        $unseen = array_diff($this->indexes, $seenLevels);
+
+        foreach ($this->achievements as $currentAchievement) {
+            foreach ($unseen as $currentUnseen) {
+                unset($graph[$currentAchievement][$currentUnseen]);
+            }
+        }
+
         return [
             'meta' => $data['meta'],
+            'levels' => $seenLevels,
             'graph' => $graph,
             'records' => $aggregatedData,
             'credits' => $credits,
