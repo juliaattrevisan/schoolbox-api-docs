@@ -4,7 +4,7 @@ Used for all image slideshows on Schoolbox.
 
 This is a wrapper around the image slider plugin we use - [Swiper](http://idangero.us/swiper/), with lazy loading and other preferred settings set by default.
 
-## Initilising
+## Initialising
 
 You must have your HTML in the correct layout in order for this plugin to work.
 ```html
@@ -26,7 +26,7 @@ You must have your HTML in the correct layout in order for this plugin to work.
 </div>
 ```
 
-Then just initilise with JS like so:
+Then just initialise with JS like so:
 ```js
 $('#image-slider').alaressSlider({
     pagination: {
