@@ -66,7 +66,7 @@ This is to follow the standard packaging process linux distributions use for web
   * [Curriculum](./library/Schoolbox/Curriculum/README.md)
   * [EOTC](./www/modules/eotc/README.md)
   * [NESA](./docs/nesa.md)
-  * [Notifications](./docs/notifications.md)
+  * [Notifications](./docs/notifications/README.md)
   * [ResourceBooking](./library/Schoolbox/ResourceBooking/README.md)
 * Custom Modules
   * [Loyola: Survey](./library/Custom/Loyola/Survey/README.md)
