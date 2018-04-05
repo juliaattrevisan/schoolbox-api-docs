@@ -1166,7 +1166,12 @@
         <script src="/javascript/jquery.alaressSlider.js"></script>
         <script>
             $(function() {
-                $('#pantry-imageslider').alaressSlider();
+                $('#pantry-imageslider').alaressSlider({
+                    navigation: {
+                        nextEl: '#image-slider-button-next',
+                        prevEl: '#image-slider-button-prev'
+                    }
+                });
             });
         </script>
         <div class="swiper-container" id="pantry-imageslider">
@@ -1181,8 +1186,8 @@
                 </div>
             </div>
             <div class="swiper-pagination"></div>
-            <div class="swiper-button-next"></div>
-            <div class="swiper-button-prev"></div>
+            <div class="swiper-button-next" id="image-slider-button-next"></div>
+            <div class="swiper-button-prev" id="image-slider-button-prev"></div>
         </div>
     </div>
 </div>
