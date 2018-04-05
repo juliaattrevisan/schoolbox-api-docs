@@ -100,6 +100,10 @@ class External_Denbigh_User implements External_UserInterface
      */
     public function getParent($externalId)
     {
+        if (empty($externalId)) {
+            return [];
+        }
+
         /** @noinspection SqlDialectInspection */
         $parentQuery = $this->externalDatabase->executeQuery(
             "
@@ -177,6 +181,10 @@ class External_Denbigh_User implements External_UserInterface
      */
     public function getStudent($externalId)
     {
+        if (empty($externalId)) {
+            return [];
+        }
+
         /** @noinspection SqlDialectInspection */
         $studentQuery = $this->externalDatabase->executeQuery(
             "
@@ -282,6 +290,10 @@ class External_Denbigh_User implements External_UserInterface
      */
     public function getStaff($externalId)
     {
+        if (empty($externalId)) {
+            return [];
+        }
+
         /** @noinspection SqlDialectInspection */
         $staff = $this->externalDatabase->executeQuery(
             "
@@ -329,6 +341,10 @@ class External_Denbigh_User implements External_UserInterface
      */
     public function getStudentContactList($externalId)
     {
+        if (empty($externalId)) {
+            return [];
+        }
+
         /** @noinspection SqlDialectInspection */
         $contactIterator = $this->externalDatabase->getQueryIterator(
             "
@@ -461,6 +477,10 @@ class External_Denbigh_User implements External_UserInterface
      */
     public function getEnrolledStudents($externalId)
     {
+        if (empty($externalId)) {
+            return [];
+        }
+
         /** @noinspection SqlDialectInspection */
         return $this->externalDatabase->executeQuery(
             "
