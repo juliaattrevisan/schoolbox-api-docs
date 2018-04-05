@@ -160,7 +160,7 @@ class SSO
     private function getV1Token(GuzzleHttp\Client $client, array $conf): string
     {
         $responseString = $client->get($this->server, ['query' => $conf])->getBody()->getContents();
-        $response       = $this->qString2array($responseString);
+        parse_str($responseString, $response);
 
         if ($this->debug) {
             header('Content-Type: text/plain');
@@ -168,26 +168,5 @@ class SSO
             die("SSO v1.\nSEND: {$this->server}?{$data}\nRECV: {$responseString}\n");
         }
         return $this->parseResponse($response, $conf['sso_code']);
-    }
-
-
-    /**
-     * Convert a GET query string to an array
-     *
-     * @param $qString
-     * @return array
-     */
-    private function qString2array($qString): array
-    {
-        $array = [];
-        $parts = explode('&', $qString);
-
-        foreach ($parts as $part) {
-            $bits = explode('=', $part);
-            if (\count($bits) === 2) {
-                $array[$bits[0]] = $bits[1];
-            }
-        }
-        return $array;
     }
 }
