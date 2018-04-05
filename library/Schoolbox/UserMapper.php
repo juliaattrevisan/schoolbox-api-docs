@@ -403,26 +403,18 @@ class UserMapper extends Mapper
     /**
      * Fetches the user, and all of the user's subjects.
      *
-     * @throws Schoolbox\Mapper\Exception if user wasn't found
      * @param  int $id
      * @return \Schoolbox\User
+     *
+     * @throws Schoolbox\Mapper\Exception if user wasn't found
+     * @throws Schoolbox\Mapper\Exception\Deleted if user wasn't found
      */
     public function findWithSubjects($id)
     {
-        $statement = $this->database->prepare(
-            "SELECT {$this->getColumnString('u')} FROM {$this->table} AS u WHERE u.id=?"
-        );
-        $statement->execute(array($id));
-
-        if ($row = $statement->fetch()) {
-            $user = $this->hydrate($row, 'u');
-            //
-            // Set subject collection here.
-            $subject_mapper = new External\SubjectMapper();
-            $user->setSubjectCollection($subject_mapper->findAllForStudent($user));
-            return $user;
-        }
-        throw new Schoolbox\Mapper\Exception();
+        $user = $this->findById($id);
+        $subject_mapper = new External\SubjectMapper();
+        $user->setSubjectCollection($subject_mapper->findAllForStudent($user));
+        return $user;
     }
 
     /**
