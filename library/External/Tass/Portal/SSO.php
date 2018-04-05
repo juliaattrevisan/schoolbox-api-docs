@@ -121,7 +121,8 @@ class SSO
 
         if ($this->debug) {
             header('Content-Type: text/plain');
-            die("SSO v2.\nPOST: {$this->server}?returnType=json\nData: {$this->array2qString($formParams)}\nRECV: {$responseString}\n");
+            $queryString = http_build_query($formParams);
+            die("SSO v2.\nPOST: {$this->server}?returnType=json\nData: {$queryString}\nRECV: {$responseString}\n");
         }
 
         return $this->parseResponse(json_decode($responseString, true), $conf['sso_code']);
@@ -163,25 +164,10 @@ class SSO
 
         if ($this->debug) {
             header('Content-Type: text/plain');
-            die("SSO v1.\nSEND: {$this->server}?{$this->array2qString($conf)}\nRECV: {$responseString}\n");
+            $data = http_build_query($conf);
+            die("SSO v1.\nSEND: {$this->server}?{$data}\nRECV: {$responseString}\n");
         }
         return $this->parseResponse($response, $conf['sso_code']);
-    }
-
-
-    /**
-     * Convert an array to a GET query string
-     *
-     * @param array $array
-     * @return string
-     */
-    private function array2qString($array): string
-    {
-        $cPairs = [];
-        foreach ($array as $key => $val) {
-            $cPairs[] = "{$key}={$val}";
-        }
-        return implode('&', $cPairs);
     }
 
 
