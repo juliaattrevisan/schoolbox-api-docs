@@ -17,10 +17,9 @@
 {% endmacro %}
 
 {# Render "categories" (the y-axis) on the barchart
- # but only for the levels that we know exist, otherwise it renders stupidly
- #}
+ # but only for the levels that we know exist, otherwise it renders stupidly#}
 {% macro renderDataLevels(levels) %}
     {% for level in levels %}
-        {{ level|replace({'L', 'Level '}) }}{% if not loop.last %}, {% endif %}
+        "{{ level|replace({'L': 'Level '}) }}"{% if not loop.last %}, {% endif %}
     {% endfor %}
 {% endmacro %}
