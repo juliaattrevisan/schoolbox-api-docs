@@ -58,7 +58,7 @@ These are the Swiper parameters we set by default with this wrapper.
         <tr>
             <td>autoplay</td>
             <td>false</td>
-            <td>This is set to false by default, which is then overridden when the first image of the slider has finished loading. This way the slider does not start sliding through a bunch of loaders.</td>
+            <td>This is set to false by default, which is then overridden when the first image of the slider has finished loading. This way the user does not get slided through a bunch of loading graphics.</td>
         </tr>
         <tr>
             <td>centeredSlides</td>
