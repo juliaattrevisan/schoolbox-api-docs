@@ -163,6 +163,7 @@ class Controller extends Base
             'template' => '@adminUser/modify.twig',
             'data' => [
                 'pageCurrent' => 'user',
+                'method'       => 'Update',
                 'campuses' => $this->campusMapper->findAll(),
                 'roles' => $this->roleMapper->findAll(),
                 'externalDatabase' => ucfirst($this->getConfigLoader()->get('external_type')),
@@ -200,6 +201,7 @@ class Controller extends Base
             'template' => '@adminUser/modify.twig',
             'data' => [
                 'pageCurrent' => 'user',
+                'method'    => 'Create',
                 'user' => $user,
                 'campuses' => $this->campusMapper->findAll(),
                 'roles' => $this->roleMapper->findAll(),
