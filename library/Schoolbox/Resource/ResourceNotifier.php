@@ -299,6 +299,14 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
     {
         $envelope = new Envelope();
 
+        $accessLevel = null;
+
+        if ($resource->isHidden()) {
+            $accessLevel = UserAccess::ACCESS_WRITE;
+        } else {
+            $accessLevel = UserAccess::ACCESS_READ;
+        }
+
         $effectorExtId = $effector->getExternalId();
         $resourceId    = $resource->getId();
 
@@ -342,7 +350,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
                     'category' => $catParam
                 ));
 
-            $envelope->broadcastToCategory($category, UserAccess::ACCESS_READ, $bob->build());
+            $envelope->broadcastToCategory($category, $accessLevel, $bob->build());
 
             unset($diff[$nameField]);
         }
@@ -356,7 +364,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
                     'category' => $catParam
                 ));
 
-            $envelope->broadcastToCategory($category, UserAccess::ACCESS_READ, $bob->build());
+            $envelope->broadcastToCategory($category, $accessLevel, $bob->build());
 
             unset($diff[$categoryField]);
         }
@@ -365,11 +373,11 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
         if (count($diff) || is_null($diff)) {
             $instances = $this->notify(
                 $resourceKind, $resourceId, self::TRIGGER_UPDATED,
-                new Param($resourceName, $resourceHref), $effector, $category, $roleType, UserAccess::ACCESS_READ
+                new Param($resourceName, $resourceHref), $effector, $category, $roleType, $accessLevel
             )->getAll();
 
             foreach ($instances as $inst) {
-                $envelope->broadcastToCategory($category, UserAccess::ACCESS_READ, $inst);
+                $envelope->broadcastToCategory($category, $accessLevel, $inst);
             }
         }
 
