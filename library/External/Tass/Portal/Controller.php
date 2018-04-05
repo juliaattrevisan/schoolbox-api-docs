@@ -173,16 +173,8 @@ class Controller extends Alaress\Web\Controller\Base
      */
     private function getDeepLink(): array
     {
-        $deepLink      = $this->getRequest()->query->get('deep_link', '');
-        $deepLinkArray = [];
-
-        foreach (explode('&', $deepLink) as $arg) {
-            if (strpos($arg, '=')) {
-                [$key, $val] = explode('=', $arg, 2);
-                $deepLinkArray[(string)$key] = (string)$val;
-            }
-        }
-        return $deepLinkArray;
+        parse_str($this->getRequest()->query->get('deep_link', ''), $deepLink);
+        return $deepLink;
     }
 
 
