@@ -201,7 +201,8 @@ class External_Denbigh_User implements External_UserInterface
                             fa.EmergencyPhone1,
                             fa.EmergencyEmail1,
                             stu.boardingStatus,
-                            0 AS countIndividualEducationPlans
+                            0 AS countIndividualEducationPlans,
+                            '' AS StudentIBFlag
                 FROM        People pe
                 LEFT JOIN   Students stu ON stu.peopleDenbighID = pe.denbighID
                 LEFT JOIN   Staff sta ON sta.tutorGroup = stu.tutorGroup
@@ -243,6 +244,7 @@ class External_Denbigh_User implements External_UserInterface
             'AlertMessage'             => '',
             'StudentBoarder'           => '',
             'Comment'                  => '',
+            'StudentIBFlag'            => '',
             'StudentStudiesCode'       => '',
         ];
 
