@@ -28,10 +28,12 @@ class Module extends BaseModule
      */
     protected $basename = 'nceaReport';
 
+
     /**
      * Hook method for setting up routes via self::register()
      *
      * @return void
+     * @throws \Schoolbox\Application\Exception\NotFound
      * @throws \InvalidArgumentException
      */
     protected function registerRoutes()
@@ -49,7 +51,7 @@ class Module extends BaseModule
 
         $preloadUser = function ($params) { return $this->preloadUser($params); };
 
-        $this->register('GET', '/report/{id}', 'getReport', $getPerms, $preloadUser);
+        $this->register('GET', '/report/{id}/{year}', 'getReport', $getPerms, $preloadUser);
     }
 
     /**
@@ -60,7 +62,7 @@ class Module extends BaseModule
      * @throws InvalidArgumentException
      * @throws NotFound
      */
-    private function preloadUser(array $params)
+    private function preloadUser(array $params): array
     {
         try {
             $user = $this->getUserMapper()->findById($params['id']);
@@ -69,8 +71,15 @@ class Module extends BaseModule
             throw new NotFound('User Not Found');
         }
 
+        /* Can't get reports from the future
+         */
+        if ((int)$params['year'] > date('Y')) {
+            throw new NotFound('Invalid year');
+        }
+
         return [
             'user' => $user,
+            'year' => (int)$params['year'],
         ];
     }
 

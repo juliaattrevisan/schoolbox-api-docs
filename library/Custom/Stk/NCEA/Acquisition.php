@@ -44,11 +44,14 @@ class Acquisition
      * Get all the NCEA data for $externalId
      *
      * Their view contains multiple years of data; it isn't just the current year's data,
-     * it's a person's entire history
+     * it's a person's entire history.
      *
-     * Filter it for relevant values (see WHERE clause)
+     * Typically $year is the current year as per date('Y') however you can make a historical report
+     * by specifying a $year in the past (any records in a more recent year will be ignored)
      *
-     * @param int $year Get records only for $year
+     * Added because test data exists only for a previous year
+     *
+     * @param int $year
      * @return array
      * @throws \Alaress\Database\Exception
      */
@@ -72,9 +75,8 @@ class Acquisition
                 R.CommPortalCurrentFlag
             FROM dbo.uvStudentsNCEAResultsTracking R
             WHERE R.ID = :externalId
-            AND CommPortalCurrentFlag = 1
-            AND FileYear = :year
-            ORDER BY R.SubjectName, R.SubjectSort, R.AssessAreaNCEAStandardNumber
+            AND R.FileYear <= :year
+            ORDER BY R.FileYear, R.SubjectSort, R.AssessAreaNCEAStandardNumber
         ');
 
         $statement->execute([
@@ -103,7 +105,7 @@ class Acquisition
                     'firstname' => $row['StudentPreferred'],
                     'fullname' => $row['StudentName'],
                     'tutorGroup' => $row['StudentTutor'],
-                    'year' => $row['FileYear'],
+                    'year' => $year,
                 ];
             }
 
@@ -116,6 +118,7 @@ class Acquisition
                 'creditsGained' => $row['CreditsGained'],
                 'subjectSort' => $row['SubjectSort'],
                 'subjectName' => $row['SubjectName'],
+                'year' => (int)$row['FileYear']
             ];
         }
 
