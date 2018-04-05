@@ -62,8 +62,7 @@ class Acquisition
                 R.AssessmentOption,
                 R.CreditsGained,
                 R.SubjectSort,
-                R.SubjectName,
-                R.CommPortalCurrentFlag
+                R.SubjectName
             FROM dbo.uvStudentsNCEAResultsTracking R
             WHERE R.ID = :externalId
             AND R.FileYear <= :year
