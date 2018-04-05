@@ -173,6 +173,7 @@ class External_Schoolpro_User implements External_UserInterface
                 'StudentSpecialNeedsFlag' => '',
                 'AlertMessage'            => '',
                 'Comment'                 => '',
+                'StudentIBFlag'           => '',
             );
 
             return $student;

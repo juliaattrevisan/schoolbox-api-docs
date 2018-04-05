@@ -123,6 +123,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
               s.form_staff_name AS StudentTutor, p.full_name AS StudentEmergencyName,
               p.mobile AS StudentEmergencyPhone,
               '' AS Comment,
+              '' AS StudentIBFlag,
               '' AS StudentStudiesCode,
               0 AS countIndividualEducationPlans
             FROM db2inst1.schoolbox_students s

@@ -111,6 +111,7 @@ class External_Schoolbox_User implements External_UserInterface
                           '' AS AlertMessage,
                           '' AS StudentBoarder,
                           '' AS Comment,
+                          '' AS StudentIBFlag,
                           0 AS countIndividualEducationPlans
                 FROM      `user`
                 LEFT JOIN user_profile ON user.id = user_profile.user_id

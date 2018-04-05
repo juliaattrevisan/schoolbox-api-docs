@@ -72,14 +72,31 @@ class Module extends BaseModule
             throw new NotFound('User Not Found');
         }
 
-        /* Can't get reports from the future
+        /* IB Students not allowed
          */
-        if ((int)$params['year'] > date('Y')) {
+        $externalUser = $this->getExternalUser()->getStudent($user->getExternalId());
+
+        if ($externalUser['StudentIBFlag']) {
+            throw new NotFound('NCEA Reports not available to IB Students');
+        }
+
+        /* Can't get reports from the future, or too far in the past
+         * Arbitrary limit of 2000
+         *
+         * TODO: Eventually this will be limited to the current year only after testing
+         */
+        $oldestYear = 2000;
+
+        $inFuture = (int)$params['year'] > date('Y');
+        $inPast = (int)$params['year'] < $oldestYear;
+
+        if ($inPast || $inFuture) {
             throw new NotFound('Invalid year');
         }
 
         return [
             'user' => $user,
+            'externalUser' => $externalUser,
             'year' => (int)$params['year'],
         ];
     }

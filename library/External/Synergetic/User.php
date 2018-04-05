@@ -370,7 +370,8 @@ class External_Synergetic_User implements External_UserInterface
                         vStudents.StudentStudiesCode,
                         AlertMessage,
                         vStudents.StudentBoarder,
-                        vStudents.StudentsComment as Comment,                        
+                        vStudents.StudentsComment as Comment,   
+                        vStudents.StudentIBFlag,
                         $learningPlanQuery
             FROM        dbo.vStudents vStudents
             LEFT JOIN   CommunityAlerts ON 
