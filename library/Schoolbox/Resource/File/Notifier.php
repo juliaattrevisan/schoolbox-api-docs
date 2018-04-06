@@ -8,9 +8,7 @@
 
 namespace Schoolbox\Resource\File;
 
-use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\Parameter\Param;
-use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder;
@@ -39,14 +37,6 @@ class Notifier extends ResourceNotifier
      */
     public function notifyCreated($roletype, $file, $effector, $diff = null)
     {
-        $accessLevel = null;
-
-        if($file->isHidden()) {
-            $accessLevel = UserAccess::ACCESS_WRITE;
-        } else {
-            $accessLevel = UserAccess::ACCESS_READ;
-        }
-
         try {
             $category = $this->folderMapper->findById($file->getFolder()->getId());
         } catch (Deleted $e) {
@@ -61,7 +51,7 @@ class Notifier extends ResourceNotifier
             $effector,
             $category,
             $roletype,
-            $accessLevel
+            $this->getAccessLevel($file)
         );
     }
 
@@ -74,14 +64,6 @@ class Notifier extends ResourceNotifier
      */
     public function notifyDeleted($roletype, $file, $effector, $diff = null)
     {
-        $accessLevel = null;
-
-        if($file->isHidden()) {
-            $accessLevel = UserAccess::ACCESS_WRITE;
-        } else {
-            $accessLevel = UserAccess::ACCESS_READ;
-        }
-
         try {
             $category = $this->folderMapper->findById($file->getFolder()->getId());
         } catch (Deleted $e) {
@@ -97,7 +79,7 @@ class Notifier extends ResourceNotifier
             $effector,
             $category,
             $roletype,
-            $accessLevel
+            $this->getAccessLevel($file)
         );
     }
 
@@ -147,4 +129,18 @@ class Notifier extends ResourceNotifier
     {
         return 'folder';
     }
+
+    /**
+     * @return int
+     * @param Model $file
+     */
+    protected function getAccessLevel($file):?int
+    {
+        if ($file->isHidden()) {
+            return UserAccess::ACCESS_WRITE;
+        } else {
+            return UserAccess::ACCESS_READ;
+        }
+    }
+
 }

@@ -164,4 +164,13 @@ class Notifier extends ResourceNotifier
         return 'category';
     }
 
+    /**
+     * @return int
+     * @param Model $resource
+     */
+    protected function getAccessLevel($resource):?int
+    {
+        return UserAccess::ACCESS_READ;
+    }
+
 }

@@ -299,13 +299,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
     {
         $envelope = new Envelope();
 
-        $accessLevel = null;
-
-        if ($resource->isHidden()) {
-            $accessLevel = UserAccess::ACCESS_WRITE;
-        } else {
-            $accessLevel = UserAccess::ACCESS_READ;
-        }
+        $accessLevel = $this->getAccessLevel($resource);
 
         $effectorExtId = $effector->getExternalId();
         $resourceId    = $resource->getId();
@@ -540,4 +534,9 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
         return $this->notifyDeleted(Role::PARENT, $resource, $effector);
     }
 
+    /**
+     * @return int
+     * @param Folder|File|Link|Textbox $resource
+     */
+    abstract protected function getAccessLevel($resource);
 }

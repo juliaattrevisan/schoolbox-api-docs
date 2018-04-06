@@ -40,18 +40,10 @@ class LinkNotifier extends ResourceNotifier
     {
         $category = $this->folderMapper->findById($link->getFolder()->getId());
 
-        $accessLevel = null;
-
-        if ($link->isHidden()) {
-            $accessLevel = UserAccess::ACCESS_WRITE;
-        } else {
-            $accessLevel = UserAccess::ACCESS_READ;
-        }
-
         return $this->notify(
             LogMapper::KIND_LINK, $link->getId(), self::TRIGGER_CREATED,    // "link.{id}.created"
             new Param($link->getDescription(), $link->getHref()),           // the :resource param
-            $effector, $category, $roletype, $accessLevel
+            $effector, $category, $roletype, $this->getAccessLevel($link)
         );
     }
 
@@ -70,19 +62,11 @@ class LinkNotifier extends ResourceNotifier
             return new Envelope();
         }
 
-        $accessLevel = null;
-
-        if ($link->isHidden()) {
-            $accessLevel = UserAccess::ACCESS_WRITE;
-        } else {
-            $accessLevel = UserAccess::ACCESS_READ;
-        }
-
         // abstract this so far it doesn't even make sense any more
         return $this->notify(
             LogMapper::KIND_LINK, $link->getId(), self::TRIGGER_DELETED,    // "link.{id}.deleted"
             new Param($link->getDescription()),                             // the :resource param
-            $effector, $category, $roletype, $accessLevel
+            $effector, $category, $roletype, $this->getAccessLevel($link)
         );
     }
 
@@ -133,4 +117,16 @@ class LinkNotifier extends ResourceNotifier
         return 'folder';
     }
 
+    /**
+     * @return int
+     * @param Link $link
+     */
+    protected function getAccessLevel($link):?int
+    {
+        if ($link->isHidden()) {
+            return UserAccess::ACCESS_WRITE;
+        } else {
+            return UserAccess::ACCESS_READ;
+        }
+    }
 }
