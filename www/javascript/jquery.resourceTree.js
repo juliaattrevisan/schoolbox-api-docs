@@ -58,6 +58,7 @@
 
     /**
      * @param element The jQuery element to tie this resource tree to.
+     * @param nodeTypeIconMap Maps nodeTypes to CSS class
      * @param options
      *   data:
      *     cache:         A set of preloaded nodes (see jstree.data)
@@ -66,7 +67,7 @@
      *   jstree: Any and all jstree parameters
      * @constructor
      */
-    var ResourceTree = function(element, options) {
+    var ResourceTree = function(element, nodeTypeIconMap, options) {
         var self     = this;
         var defaults = {
             data: {
@@ -166,34 +167,34 @@
                 },
                 types: {
                     root: {
-                        icon: 'icon-folder'
+                        icon: nodeTypeIconMap.root
                     },
                     'default': {
-                        icon: 'icon-unknown'
+                        icon: nodeTypeIconMap.default
                     },
                     file: {
-                        icon: 'icon-document'
+                        icon: nodeTypeIconMap.file
                     },
                     link: {
-                        icon: 'icon-link'
+                        icon: nodeTypeIconMap.link
                     },
                     folder: {
-                        icon: 'icon-folder'
+                        icon: nodeTypeIconMap.folder
                     },
                     home: {
-                        icon: 'icon-home'
+                        icon: nodeTypeIconMap.home
                     },
                     homepage: {
-                        icon: 'icon-home'
+                        icon: nodeTypeIconMap.homepage
                     },
                     course: {
-                        icon: 'icon-course-builder'
+                        icon: nodeTypeIconMap.course
                     },
                     unit: {
-                        icon: 'icon-unit'
+                        icon: nodeTypeIconMap.unit
                     },
                     noaccess: {
-                        icon: 'icon-locked'
+                        icon: nodeTypeIconMap.noaccess
                     }
                 },
                 sort: function(a, b) {
@@ -209,10 +210,10 @@
         element.jstree(self.options.jstree);
     }
 
-    $.fn.resourceTree = function(options) {
+    $.fn.resourceTree = function(nodeTypeIconMap, options) {
         this.each(function() {
             var element = $(this);
-            element.data('resourceTree', new ResourceTree(element, options));
+            element.data('resourceTree', new ResourceTree(element, nodeTypeIconMap, options));
         })
         return this;
     };

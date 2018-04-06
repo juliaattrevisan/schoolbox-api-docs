@@ -31,11 +31,11 @@ interface IFolder {
 
 
     /**
-     * A folder type. This will probably map to a CSS class name.
+     * A folder node type. This will probably map to a CSS class name.
      *
      * @return string
      */
-    public function getFolderType();
+    public function getNodeType(): string;
 
 
     /**

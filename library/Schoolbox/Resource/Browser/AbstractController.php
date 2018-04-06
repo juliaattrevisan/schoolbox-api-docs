@@ -174,7 +174,7 @@ abstract class AbstractController extends BaseController
         return [
             'tree'      => $tree,
             'folder'    => $folder,
-            'icon'      => $this->treeBuilder->getFolderIcon($folder),
+            'nodeType'  => $this->treeBuilder->getNodeType($folder),
             'access'    => $access,
             'user'      => $this->getUser(),
             'conf'      => $this->conf,

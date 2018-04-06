@@ -35,7 +35,7 @@ use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
-use Schoolbox\Assessment\Course\CourseTreeBuilder;
+use Schoolbox\Assessment\Course\TreeBuilder;
 use Schoolbox\Resource\Folder\Ancestry;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
@@ -1002,10 +1002,10 @@ class Controller extends Base\Base
             $folderId = $this->getCourseSpecificationMapper()->getFacultyRootFolder()->getId();
         }
 
-        $treeBuilder = new CourseTreeBuilder(
+        $treeBuilder = new TreeBuilder(
             FolderMapper::getInstance(),
             $_SESSION['user'],
-            'Courses'
+            $folderId
         );
 
         $facultyRootFolder = $this->getCourseSpecificationMapper()->getFacultyRootFolder();
@@ -1561,10 +1561,10 @@ class Controller extends Base\Base
             $mime = "*/*";
         }
 
-        $treeBuilder = new CourseTreeBuilder(
+        $treeBuilder = new TreeBuilder(
             FolderMapper::getInstance(),
             $_SESSION['user'],
-            'Courses'
+            $folderId
         );
 
 

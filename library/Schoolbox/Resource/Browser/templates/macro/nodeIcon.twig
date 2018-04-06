@@ -1,0 +1,38 @@
+{#
+    Single point of responsibility for mapping a node type to CSS classes
+    @see NodeInterface::TYPE_* constants for set of valid types
+#}
+{%- macro icon(nodeType) -%}
+    {%- spaceless -%}
+        {% if 'course' == nodeType %}
+            icon-course-builder
+        {% elseif 'unit' == nodeType %}
+            icon-unit
+        {% elseif 'home' == nodeType or 'homepage' == nodeType %}
+            icon-home
+        {% elseif 'noaccess' == nodeType %}
+            icon-locked
+        {% elseif 'file' == nodeType %}
+            icon-document
+        {% elseif 'link' == nodeType %}
+            icon-link
+        {% elseif 'default' == nodeType %}
+            icon-unknown
+        {% else %}
+        {# 'root', 'folder' #}
+            icon-folder
+        {% endif %}
+    {%- endspaceless -%}
+{%- endmacro -%}
+
+
+ {# Renders a JS object suitable for injecting into plugins that require this mapping #}
+{%- macro jsIconMap() -%}
+    {% import _self as self %}
+    {
+        {% for type in ['course', 'unit', 'home', 'homepage', 'noaccess', 'file', 'link', 'default', 'root', 'folder'] %}
+            {% if not loop.first %},{% endif %}
+            '{{ type }}': '{{ self.icon(type) }}'
+        {% endfor %}
+    }
+{% endmacro %}

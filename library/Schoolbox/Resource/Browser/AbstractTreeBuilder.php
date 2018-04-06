@@ -152,11 +152,11 @@ abstract class AbstractTreeBuilder
      * Builds a list of child nodes for $folderId
      *
      * @param int|string $folderId
-     * @param array $mustInclude
-     * @param string $mime
+     * @param array      $parentList
+     * @param string     $mime
      * @return array
      */
-    public function buildChildNodes($folderId, $mustInclude = [], $mime = "*/*")
+    public function buildChildNodes($folderId, $parentList = [], $mime = "*/*")
     {
         $output = [];
 
@@ -166,7 +166,7 @@ abstract class AbstractTreeBuilder
             $output[] = $this->generateNodeArray(
                 $folder->getId(),
                 $folder->getParent()->getId(),
-                'root',
+                NodeInterface::TYPE_ROOT,
                 $this->getRootNodeLabel(),
                 null,
                 null,
@@ -180,9 +180,9 @@ abstract class AbstractTreeBuilder
             // Child nodes
             foreach ($this->getNodeFolders($folderId) as $folder) {
 
-                if($this->filterFolder($folder)) {
+                if($this->filterFolder($folder, $parentList)) {
                     try {
-                        $output[] = $this->buildFolderNode($folder, $mustInclude);
+                        $output[] = $this->buildFolderNode($folder, $parentList);
                     } catch (Resource\Exception $e) {
                         continue;
                     }
@@ -213,18 +213,18 @@ abstract class AbstractTreeBuilder
 
     /**
      * @param IFolder $folder
-     * @param array $mustInclude
+     * @param array   $parentList
      * @throws Resource\Exception
      * @return array
      */
-    protected function buildFolderNode(IFolder $folder, $mustInclude = [])
+    protected function buildFolderNode(IFolder $folder, $parentList = [])
     {
         // Get the permission this user has on this folder.
         // No permission: don't show it at all!
         $permission = $this->getFolderPermission($folder->getId());
 
         // this seems so trivial, but it's so these can be overridden
-        $type = $this->getFolderIcon($folder);
+        $type = $this->getNodeType($folder);
         $name = $this->getFolderName($folder);
         $href = $this->getFolderHref($folder);
         $colour = $this->getFolderColour($folder);
@@ -232,8 +232,8 @@ abstract class AbstractTreeBuilder
 
         if (empty($permission)) {
             // ensure that the direct tree to the selected node is available by generating ghost nodes
-            if (in_array($folder->getId(), $mustInclude)) {
-                $type = 'noaccess';
+            if (in_array($folder->getId(), $parentList)) {
+                $type = NodeInterface::TYPE_NO_ACCESS;
                 $href = '#';
                 $name = '(' . $folder->getName() . ')';
             } else {
@@ -248,14 +248,39 @@ abstract class AbstractTreeBuilder
             $name,
             $colour,
             $coverImage,
-            [
-                'data-permission' => $permission,
-                'data-type' => $type
-            ],
+            $this->buildLiAttributes($permission, $this->getDataType($folder, $type)),
             [
                 'href' => $href
-            ]
+            ],
+            $parentList
         );
+    }
+
+
+    /**
+     * @param string    $permission
+     * @param string    $dataType
+     * @return array
+     */
+    protected function buildLiAttributes($permission, $dataType)
+    {
+        return [
+            'data-permission' => $permission,
+            'data-type' => $dataType,
+        ];
+    }
+
+
+    /**
+     * Returns a value to insert as a data attribute on the node
+     *
+     * @param IFolder $folder
+     * @param string  $type
+     * @return string
+     */
+    protected function getDataType(IFolder $folder, string $type): string
+    {
+        return $type;
     }
 
 
@@ -293,10 +318,19 @@ abstract class AbstractTreeBuilder
      * @param IStorage $coverImage
      * @param array $liAttributes
      * @param array $aAttributes
+     * @param array    $parentList
      * @return array
      */
-    protected function generateFolderArray(IFolder $folder, $type, $name = null, Color $colour = null, IStorage $coverImage = null, array $liAttributes = null, array $aAttributes = null)
-    {
+    protected function generateFolderArray(
+        IFolder $folder,
+        $type,
+        $name = null,
+        Color $colour = null,
+        IStorage $coverImage = null,
+        array $liAttributes = null,
+        array $aAttributes = null,
+        array $parentList = []
+    ) {
         return $this->generateNodeArray(
             $folder->getId(),
             $folder->getParent()->getId(),
@@ -305,7 +339,8 @@ abstract class AbstractTreeBuilder
             $colour,
             $coverImage,
             $liAttributes,
-            $aAttributes
+            $aAttributes,
+            $parentList
         );
     }
 
@@ -332,7 +367,7 @@ abstract class AbstractTreeBuilder
         return $this->generateNodeArray(
             $file->getId(),
             $folderId,
-            'file',
+            NodeInterface::TYPE_FILE,
             $name ?: $file->getTitle(),
             null,
             null,
@@ -351,10 +386,20 @@ abstract class AbstractTreeBuilder
      * @param \Schoolbox\Resource\Storage\IStorage $coverImage
      * @param array $liAttributes
      * @param array $aAttributes
+     * @param array                                $parentList
      * @return array
      */
-    protected function generateNodeArray($nodeId, $parentId, $type, $name, Color $colour = null, IStorage $coverImage = null, array $liAttributes = null, array $aAttributes = null)
-    {
+    protected function generateNodeArray(
+        $nodeId,
+        $parentId,
+        $type,
+        $name,
+        Color $colour = null,
+        IStorage $coverImage = null,
+        array $liAttributes = null,
+        array $aAttributes = null,
+        array $parentList = []
+    ) {
         $array = array(
             'id' => $nodeId,
             'parent' => $parentId ?: '0',
@@ -365,10 +410,10 @@ abstract class AbstractTreeBuilder
             'coverImage' => $coverImage,
         );
 
-        if ($type == 'file' || $type == 'link') {
+        if ($type === NodeInterface::TYPE_FILE || $type === NodeInterface::TYPE_LINK) {
             $array['id'] = "{$this->namespace}-$type-$nodeId";
         } else {
-            $array['children'] = $this->getNodeHasChildren($nodeId);
+            $array['children'] = $this->getNodeHasChildren($nodeId, $parentList);
         }
 
         if ($liAttributes) {
@@ -388,10 +433,13 @@ abstract class AbstractTreeBuilder
 
 
     /**
-     * @param int $nodeId
+     * Returns whether to indicate this node has children
+     *
+     * @param int   $nodeId
+     * @param array $parentList
      * @return bool
      */
-    protected function getNodeHasChildren($nodeId)
+    protected function getNodeHasChildren($nodeId, array $parentList = []): bool
     {
         $count = $this->getNodeFolders($nodeId)->count();
 
@@ -409,9 +457,9 @@ abstract class AbstractTreeBuilder
      * @param IFolder $folder
      * @return string
      */
-    public function getFolderIcon(IFolder $folder)
+    public function getNodeType(IFolder $folder): string
     {
-        return 'folder';
+        return NodeInterface::TYPE_FOLDER;
     }
 
 
@@ -585,11 +633,16 @@ abstract class AbstractTreeBuilder
      */
     protected abstract function getFolderCoverImage(IFolder $folder);
 
+
     /**
-     * Class specific filter for which folders appear in the tree
+     * Returns whether the specified folder should be included in the tree
      *
      * @param IFolder $folder
+     * @param array   $parentList
      * @return bool
      */
-    protected abstract function filterFolder(IFolder $folder);
+    protected function filterFolder(IFolder $folder, array $parentList = []): bool
+    {
+        return true;
+    }
 }

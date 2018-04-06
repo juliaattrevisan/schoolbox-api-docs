@@ -1,3 +1,5 @@
+{% import '@resourceBrowser/macro/nodeIcon.twig' as nodeIcon %}
+
 {# TODO PUT THIS IN THE HEAD SOMEHOW #}
 <link rel="stylesheet" href="/javascript/components/jstree/dist/themes/default/style.css" />
 <script type="text/javascript" src="/javascript/components/jstree/dist/jstree.js"></script>
@@ -34,7 +36,7 @@
             fileInfoUri      = '/file/:id/info',
             linkInfoUri      = '/link/:id/info';
 
-        tree.resourceTree({
+        tree.resourceTree({{ nodeIcon.jsIconMap() }}, {
             data: {
                 {# raw HTML reluctantly sanctioned - this should be passed to template as raw, then json_encode|raw #}
                 cache: {{ treedata | raw }},

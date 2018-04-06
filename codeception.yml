@@ -15,6 +15,7 @@ suites:
                             args: ["--headless", "--disable-gpu", "--window-size=1920x1080"]
                             binary: "/usr/bin/google-chrome"
                 - \Helper\Acceptance
+                - Asserts
                 - Db:
                     dsn: "mysql:host=localhost;dbname=schoolbox"
                     user: "root"

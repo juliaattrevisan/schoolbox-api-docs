@@ -101,7 +101,7 @@ class Node extends AbstractNode
             'type'       => 'category',
             'categoryId' => $folder->getId(),
             'name'       => $folder->getTitle(),
-            'folderType' => $folder->getFolderType(),
+            'folderType' => $folder->getNodeType(),
         );
     }
 

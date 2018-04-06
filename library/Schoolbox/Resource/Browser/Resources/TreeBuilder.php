@@ -43,9 +43,9 @@ class TreeBuilder extends AbstractTreeBuilder
      * @param IFolder|Folder\Model $folder
      * @return string
      */
-    public function getFolderIcon(IFolder $folder)
+    public function getNodeType(IFolder $folder): string
     {
-        return $folder->getFolderType();
+        return $folder->getNodeType();
     }
 
 
@@ -217,15 +217,5 @@ class TreeBuilder extends AbstractTreeBuilder
         } else {
             return [];
         }
-    }
-
-    /**
-    * Class specific filter for which folders appear in the tree
-    *
-    * @param IFolder $folder
-    * @return bool
-    */
-    protected function filterFolder(IFolder $folder) {
-        return true;
     }
 }

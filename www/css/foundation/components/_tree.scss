@@ -56,6 +56,15 @@ div.jstree-default, ul.jstree-default {
                 background: $tree-node-selected-background;
             }
         }
+
+        /* Can't touch this... node */
+        &[data-type=noaccess] {
+            .jstree-wholerow,
+            .jstree-anchor,
+            .jstree-ocl {
+                cursor: not-allowed;
+            }
+        }
     }
 
     li:hover {

@@ -22,6 +22,7 @@ use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecificati
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Resource\AbstractFolder;
+use Schoolbox\Resource\Browser\NodeInterface;
 use Schoolbox\Resource\Folder\Code\Model as FolderCode;
 use Schoolbox\Resource\HomepageConfig;
 use Schoolbox\Resource\HomepageTemplate;
@@ -327,15 +328,15 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
      *
      * {@inheritdoc}
      */
-    public function getFolderType()
+    public function getNodeType(): string
     {
         if($this->hasCourseSpecification()){
-            return 'course';
+            return NodeInterface::TYPE_COURSE;
         }
         if($this->hasUnitSpecification()){
-            return 'unit';
+            return NodeInterface::TYPE_UNIT;
         }
-        return $this->hasHomepage() ? 'home' : 'folder';
+        return $this->hasHomepage() ? NodeInterface::TYPE_HOME : NodeInterface::TYPE_FOLDER;
     }
 
     /**

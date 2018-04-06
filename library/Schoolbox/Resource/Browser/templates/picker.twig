@@ -1,3 +1,5 @@
+{% import '@resourceBrowser/macro/nodeIcon.twig' as nodeIcon %}
+
 {# Load in required JS/CSS as we are not inside the chrome #}
 <script type="text/javascript" src="/javascript/components/schoolbox.min.js?v={{ site_version }}"></script>
 <link rel="stylesheet" type="text/css" href="/css/{{ site_location }}/chrome-foundation.css?v={{ site_version }}" />
@@ -39,7 +41,7 @@
                 fileInfoUri      = '/file/:id/info',
                 linkInfoUri      = '/link/:id/info';
 
-        tree.resourceTree({
+        tree.resourceTree({{ nodeIcon.jsIconMap() }}, {
             data: {
                 {# raw HTML reluctantly sanctioned - this should be passed to template as raw, then json_encode|raw #}
                 cache: {{ treedata | raw }},

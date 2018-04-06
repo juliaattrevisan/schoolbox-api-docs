@@ -202,7 +202,7 @@ abstract class AbstractNode implements NodeInterface
             'type'       => 'category',
             'categoryId' => $folder->getId(),
             'name'       => $folder->getName(),
-            'folderType' => $folder->getFolderType(),
+            'folderType' => $folder->getNodeType(),
         );
     }
 

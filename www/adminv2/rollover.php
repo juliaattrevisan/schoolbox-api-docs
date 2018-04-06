@@ -35,4 +35,7 @@ $treeBuilder = new \Schoolbox\Resource\Browser\Resources\TreeBuilder(
     $_SESSION['user'],
     $this->getLocalisedTerm('resource', true, true)
 );
+/** @var Alaress\Web\Output\Html $twigRenderer */
+$twigRenderer = $this->getDi()->get('webOutput:nochrome');
+$this->setVar('JS_NODE_TYPE_ICON_MAP', $twigRenderer->setTemplate('resources/jsNodeIconMap.twig')->getAsString());
 $this->setVar('TREEDATA', json_encode($treeBuilder->buildPartialTree($openCategory)));
