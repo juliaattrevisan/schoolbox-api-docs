@@ -57,9 +57,21 @@
                     </div>
                 </div>
 
-                {# Show data, if there is any to display; otherwise "empty state" message #}
+                {# Show Graph if credits were obtained in any year
+                 # Otherwise hide it
+                 #}
+                {% if data.numRecords %}
+                    {% include '@nceaReport/graph.twig' with {
+                        user: user,
+                        data: data
+                    } %}
+                {% endif %}
+
+                {# Show Table if there is data for the current year
+                 # Otherwise hide it and display the error message instead
+                 #}
                 {% if data.records|length %}
-                    {% include '@nceaReport/graph-summary-data.twig' with {
+                    {% include '@nceaReport/summary.twig' with {
                         user: user,
                         data: data
                     } %}
