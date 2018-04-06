@@ -20,10 +20,10 @@ You must have your HTML in the correct layout in order for this plugin to work.
         </div>
         ...
     </div>
-    <div class="swiper-pagination" id="image-slider-pagination"></div>
     <div class="swiper-button-prev" id="image-slider-button-prev"></div>
     <div class="swiper-button-next" id="image-slider-button-next"></div>
 </div>
+<div class="swiper-pagination" id="image-slider-pagination"></div>
 ```
 
 Then just initialise with JS like so:
@@ -38,6 +38,16 @@ $('#image-slider').alaressSlider({
     }
 });
 ````
+
+## Styles
+Styles can be found in `www/css/foundation/ui/_slider.scss`.
+
+## Pagination tweaks
+By default, this slider plugin places the pagination dots as an overlay on the bottom of the image (just like the next/prev arrows are also overlays). 
+However, this is not the schoolbox way of doing things: we prefer to have the pagination UNDERNEATH the entire slider, not overlaying the image.
+
+In order to achieve this while maintaining the correct positioning of the next/prev arrows, the pagination has been moved to just below and outside of the `swiper-container` div.
+The `.image-slider-pagination` css styles have also been moved outside of the `.swiper-container` in SASS to match the new HTML structure.
 
 ## Parameters
 You can send any of the options Swiper takes, see the [Swiper docs](http://idangero.us/swiper/api/#parameters) for the list of Swiper parameters.
