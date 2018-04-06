@@ -281,7 +281,7 @@ OR ml.name        LIKE :keyword
                         $actionString .= 'file <a href="/send.php?id=' . $log['f_id'] . '">' . Scrub::text($log['f_description']) . '</a> ' . $locationPrefix . ' <a href=/homepage/'. $log['f_cid'] .'>'.$log['f_catname'].'</a>';
                         break;
                     case 'link':
-                        $actionString .= 'link <a href="/redir.php?id=' . $log['l_cid'] . '">' . Scrub::text($log['l_description']) . '</a> ' . $locationPrefix . ' <a href=/homepage/'. $log['l_cid'] .'>'.$log['l_catname'].'</a>';
+                        $actionString .= 'link <a href="/redir.php?id=' . $log['l_id'] . '">' . Scrub::text($log['l_description']) . '</a> ' . $locationPrefix . ' <a href=/homepage/'. $log['l_cid'] .'>'.$log['l_catname'].'</a>';
                         break;
                     case 'myfile':
                         $actionString .= 'myFile <a href="/my-files/' . $log['mf_id'] . '">' . Scrub::text($log['mf_description']) . '</a>';
