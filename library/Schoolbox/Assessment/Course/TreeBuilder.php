@@ -83,4 +83,20 @@ class TreeBuilder extends Resources\TreeBuilder
         }
         return $type;
     }
+
+
+    /**
+     * @inheritdoc
+     */
+    protected function buildLiAttributes($permission, $dataType)
+    {
+        $liAttributes = parent::buildLiAttributes($permission, $dataType);
+        if ($dataType === NodeInterface::TYPE_NO_ACCESS) {
+            $liAttributes += [
+                'title' => 'Courses cannot be placed into other courses'
+            ];
+        }
+        return $liAttributes;
+    }
 }
+
