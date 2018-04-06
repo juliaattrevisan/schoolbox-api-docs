@@ -1,0 +1,16 @@
+{# Renders a CSS class name appropriate for the externalType and attendance status #}
+{% macro icon(externalType, isEnabled, isMarked) -%}
+{% spaceless %}
+    {% if isEnabled %}
+        {% if 'tass' == externalType %}
+            icon-class-list
+        {% elseif 'synergetic' == externalType %}
+            {% if isMarked %}
+                icon-approve
+            {% else %}
+                icon-class-list
+            {% endif %}
+        {% endif %}
+    {% endif %}
+{% endspaceless %}
+{%- endmacro %}

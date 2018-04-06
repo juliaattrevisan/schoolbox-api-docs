@@ -607,6 +607,7 @@ abstract class Component_ControllerAbstract
      * @param bool $renderConfig Set to false if you don't want the PHPLib controlled configuration to show.
      *                               (Dashboard components show the collapse controls if this is true.)
      * @param bool $contentRaw This is a flag that lets you dump the twig raw rather than using standard header block
+     * @param bool   $renderInIsland Set to false if you need to render directly into ocean
      * @return bool Was the template renderable?
      * @throws Exception
      */
@@ -616,7 +617,8 @@ abstract class Component_ControllerAbstract
         $twigData = [],
         $renderHeader = true,
         $renderConfig = true,
-        $contentRaw = false
+        $contentRaw = false,
+        $renderInIsland = true
     ) {
         if (!$this->loadTemplate($templateHandle, 'twig', 'component/')) {
             return false;
@@ -631,12 +633,17 @@ abstract class Component_ControllerAbstract
         // Residual blockage
 
         $this->setBlock($templateHandle, 'header', 'header_block');
-        $this->setBlock($templateHandle, 'dashboard_header', 'dashboard_header_block');
+        $this->setBlock($templateHandle, 'component_island', 'component_island_block');
+        $this->setBlock($templateHandle, 'component_ocean', 'component_ocean_block');
+        $this->setBlock('component_island', 'dashboard_header', 'dashboard_header_block');
+
+        $this->setVar('component_island_block', '');
+        $this->setVar('component_ocean_block', '');
         $this->setVar('header_block', '');
         $this->setVar('dashboard_header_block', '');
 
         if ($renderHeader) {
-            if ($this->getInstance()->getModule() == 'dashboard') {
+            if ($this->getInstance()->getModule() === 'dashboard') {
                 $this->parse('dashboard_header_block', 'dashboard_header');
             } else {
                 $this->parse('header_block', 'header');
@@ -658,17 +665,23 @@ abstract class Component_ControllerAbstract
             }
         }
 
-        // If we are rending raw we want to dump the TWIG content into the header rather than COMPONENT_CONTENT block
-
-        if ($contentRaw) {
-            if ($this->getInstance()->getModule() == 'dashboard') {
-                $this->setVar('dashboard_header_block', $content);
+        if ($renderInIsland) {
+            // If we are rending raw we want to dump the TWIG content into the header rather than COMPONENT_CONTENT block
+            if ($contentRaw) {
+                if ($this->getInstance()->getModule() === 'dashboard') {
+                    $this->setVar('dashboard_header_block', $content);
+                } else {
+                    $this->setVar('header_block', $content);
+                }
+                $this->setVar('COMPONENT_CONTENT', '');
             } else {
-                $this->setVar('header_block', $content);
+                $this->setVar('COMPONENT_CONTENT', $content);
             }
-            $this->setVar('COMPONENT_CONTENT', '');
+            $this->parse('component_island_block', 'component_island');
         } else {
+            // We don't want any island at all for full control (eg dashboard timetable)
             $this->setVar('COMPONENT_CONTENT', $content);
+            $this->parse('component_ocean_block', 'component_ocean');
         }
 
         return true;

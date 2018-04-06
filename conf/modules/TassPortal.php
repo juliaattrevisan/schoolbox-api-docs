@@ -10,6 +10,7 @@
 namespace Config\Modules;
 
 use Alaress\Application\Kernel;
+use External\Tass\Portal;
 
 class TassPortal implements ModuleConfigInterface
 {
@@ -23,7 +24,7 @@ class TassPortal implements ModuleConfigInterface
     public function configure($kernel)
     {
         if ($kernel->getDependencyInjector()->get('config')->get('external_type') == 'tass') {
-            $module = new \External_Tass_PortalModule($kernel->getDependencyInjector());
+            $module = new Portal\Module($kernel->getDependencyInjector());
             $module->init('/modules/tassportal');
         }
     }

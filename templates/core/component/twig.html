@@ -4,6 +4,7 @@
     <!-- END header -->
 
     <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+        <!-- BEGIN component_island -->
         <div class="small-12 island">
             <!-- BEGIN dashboard_header -->
             <h2 class="subheader">{COMPONENT_NAME}</h2>
@@ -12,5 +13,9 @@
                 {COMPONENT_CONTENT}
             </section>
         </div>
+        <!-- END component_island -->
+        <!-- BEGIN component_ocean -->
+        {COMPONENT_CONTENT}
+        <!-- END component_ocean -->
     </div>
 </div>

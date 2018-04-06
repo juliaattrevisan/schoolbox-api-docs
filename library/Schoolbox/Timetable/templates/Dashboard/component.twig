@@ -1,0 +1,103 @@
+{#
+Data:
+    componentInstanceId                                                   int
+    $externalType                                                         string      eg ['tass','synergetic', etc]
+    campusTimetables                                                      array
+    campusTimetables[]['campus']                                          string
+    campusTimetables[]['day']                                             string
+    campusTimetables[]['periods']                                         array
+    campusTimetables[]['periods'][]['name']                               string      eg 'Period 1'
+    campusTimetables[]['periods'][]['start']                              string      eg '8:30am'
+    campusTimetables[]['periods'][]['end']                                string      eg '9:30am'
+    campusTimetables[]['periods'][]['isCurrent']                          bool        Is this period currently on?
+    campusTimetables[]['periods'][]['classes']                            array
+    campusTimetables[]['periods'][]['classes'][]['code']                  string      eg '(11/12/SCI)'
+    campusTimetables[]['periods'][]['classes'][]['room']                  string      eg 'GND1'
+    campusTimetables[]['periods'][]['classes'][]['url']                   string      eg '/homepage/code/11%252F12%252FSCI'
+    campusTimetables[]['periods'][]['classes'][]['colour']                string      eg '#ffe0cc'
+    campusTimetables[]['periods'][]['classes'][]['desc']                  string      eg 'Year 11 & 12 Science'
+    campusTimetables[]['periods'][]['classes'][]['cancelled']             bool        eg 'strike'
+    campusTimetables[]['periods'][]['classes'][]['attendance']            array
+    campusTimetables[]['periods'][]['classes'][]['attendance']['enabled'] bool        Need to also check if a 'link' is available
+    campusTimetables[]['periods'][]['classes'][]['attendance']['marked']  bool
+    campusTimetables[]['periods'][]['classes'][]['attendance']['link']    null|string
+#}
+{% import 'sub/attendanceIcon.twig' as attendanceIcon %}
+
+<script type="text/javascript" src="/javascript/shared/timetable/jquery.timetable-resize.js"></script>
+<script type="text/javascript" src="/javascript/shared/timetable/jquery.timetable-dashboard.js"></script>
+<script type="text/javascript" src="/javascript/components/jquery.scrollTo/jquery.scrollTo.min.js"></script>
+<script type="text/javascript">
+    $(function() {
+        $.fn.timetableStart();
+
+        // Scroll to current period
+        var timetable = $('#component{{ componentInstanceId }}').find('[data-timetable]');
+        if(timetable.find('.timetable-subject-active').length) {
+            timetable.closest('.scrollable').scrollTo(
+                timetable.find('.timetable-subject-active'),
+                {scrollX: true, scrollY: false, duration: 0, offsetLeft: 0}
+            );
+        }
+    });
+</script>
+
+<div class="small-12 columns">
+    {% for timetable in campusTimetables %}
+        {% set countPeriods = timetable.periods|length %}
+        {% set periodWidth = ((98 - countPeriods * 0.05) / countPeriods)|round(0, 'floor') %}
+    <div data-timetable-container>
+        <h2 class="subheader" data-timetable-header>{% if campusTimetables | length > 1 %}{{ timetable.campus }} - {% endif %}{{ timetable.day }}</h2>
+        <section>
+            <div class="scrollable show-for-medium-up">
+                <table class="timetable" data-timetable>
+                    <thead>
+                    <tr>
+                        {% for period in timetable.periods %}
+                        <th{% if period.isCurrent %} class="timetable-period-active"{% endif %} style="width:{{ periodWidth }}%">
+                            {{ period.name }}
+                            <time class="meta">{{ period.start }}&ndash;{{ period.end }}</time>
+                        </th>
+                        {% endfor %}
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        {% for period in timetable.periods %}
+                        <td style="width:{{ periodWidth }}%">
+                            <div{% if period.isCurrent %} class="timetable-subject-active"{% endif %} >
+                                {% for class in period.classes %}
+                                <div class="timetable-subject" style="background:{{ class.colour|purify }};" data-timetable-subject>
+                                    {% set cssClass = class.cancelled ? 'strike' : '' %}
+                                    {% if class.url %}
+                                        <a href="{{ class.url|purify }}" class="{{ cssClass }}">{{ class.desc ?: 'Unknown Class' }}</a>
+                                    {% else %}
+                                        <span class="{{ cssClass }}">{{ class.desc }}</span>
+                                    {% endif %}
+
+                                    <div>{{ class.code }}<br />
+                                        {{ class.room }}</div>
+
+                                    {% set attendance = class.attendance %}
+                                    {% if attendance.enabled and attendance.link %}
+                                        <br />
+                                        <span class="{{ attendanceIcon.icon(externalType, attendance.enabled, attendance.marked) }}">
+                                            <a href="{{ attendance.link }}" title="Mark Attendance">Attendance</a>
+                                        </span>
+                                    {% endif %}
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        <div class="row timetable-small show-for-small-only" data-smaller></div>
+    </div>
+    {% endfor %}
+</div>
+
+

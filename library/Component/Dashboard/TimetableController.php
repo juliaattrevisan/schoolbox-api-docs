@@ -5,15 +5,16 @@
  * @link        http://www.alaress.com.au
  */
 
+use Aura\Router\Router;
 use Schoolbox\Campus;
 use Schoolbox\Collection;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 use Schoolbox\Permission\Access\UserAccess;
 
 class Component_Dashboard_TimetableController extends Component_Dashboard_ControllerAbstract
 {
+
     /** @var External_Timetable $externalTimetable */
     private $externalTimetable;
 
@@ -23,22 +24,38 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
     /** @var array $dayNumber */
     protected $dayNumber = [];
 
-    /** @var array $currentPeriod */
+    /**
+     * The current period for each campus. Null if there is no current period
+     *
+     * @var null[]|mixed[][] $currentPeriod
+     */
     private $currentPeriod = [];
 
     /** @var array $timetable */
     protected $timetable = [];
 
-    /** @var Collection $colourList */
+    /** @var Timetable_Colour[]|Collection $colourList */
     protected $colourList;
 
-    /** @var ConfigMapper $configMapper */
-    protected $configMapper;
-    
+    /**
+     * Indexed by subject.code
+     *
+     * @var string[]
+     */
+    private $subjectColourMap;
+
+    /**
+     * Point to next colour from the colour list to assign to a subject
+     *
+     * @var int
+     */
+    private $colourIndex;
+
+
     /**
      * @param Component_Instance $instance
-     * @param User $user
-     * @param SitePage $sitepage
+     * @param User               $user
+     * @param SitePage           $sitepage
      * @param External_Timetable $externalTimetable
      */
     public function __construct(Component_Instance $instance, User $user, SitePage $sitepage, External_Timetable $externalTimetable)
@@ -46,8 +63,8 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
         parent::__construct($instance, $user, $sitepage);
 
         $this->externalTimetable = $externalTimetable;
-        $this->configMapper = ConfigMapper::getInstance();
     }
+
 
     /**
      * Prepares data for the render function. Business logic.
@@ -60,7 +77,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
             return false;
         }
 
-        if (!($_SESSION['timetable'] && $this->configMapper->get('external_enable'))) {
+        if (!($_SESSION['timetable'] && $this->getConfigMapper()->get('external_enable'))) {
             return false;
         }
 
@@ -73,19 +90,19 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
         foreach ($this->getUser()->getCampusCollection() as $campus) {
             if ($campus instanceof Campus) {
 
-                $campusId = $campus->getId();
+                $campusId   = $campus->getId();
                 $campusCode = $campus->getExtTimetableCode();
 
                 if (!isset($checkedCampusList[$campusCode])) {
 
                     $checkedCampusList[$campusCode] = true;
-                    $dayNumber = $timetableHandler->getDayNumber($campus);
+                    $dayNumber                      = $timetableHandler->getDayNumber($campus);
 
                     if ($dayNumber) {
-                        $this->dayNumber[$campusId] = $dayNumber;
-                        $this->dayName[$campusId] = $timetableHandler->getDayName($dayNumber);
-                        $this->currentPeriod[$campusId] = $timetableHandler->getPeriodNumber($campus, 0, $this->getUser());
-                        $this->timetable[$campusId] = $timetableHandler->getTimetableForDate(
+                        $this->dayNumber[$campusId]     = $dayNumber;
+                        $this->dayName[$campusId]       = $timetableHandler->getDayName($dayNumber);
+                        $this->currentPeriod[$campusId] = $timetableHandler->getPeriodNumber($campus, 0, $this->getUser()) ?: null;
+                        $this->timetable[$campusId]     = $timetableHandler->getTimetableForDate(
                             $this->getUser()->getExternalId(), $this->getUser()->getId(), $campus, Alaress_Date_Format::now()
                         );
                     }
@@ -98,248 +115,279 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
         return true;
     }
 
+
     /**
-     * @param String $templateHandle
-     * @return bool
+     * Returns the campuses associated with current user
+     *
+     * @return Campus[]
      */
-    public function renderTemplate($templateHandle)
+    private function getCampusList(): array
     {
-        $periodCount = 0;
-        $timetableCount = 0;
-
-        if (!$this->loadTemplate($templateHandle, 'timetable')) {
-            return false;
-        }
-
-        $this->setBlock($templateHandle, "campus_timetable", "campus_timetable_block");
-        $this->setBlock("campus_timetable", "timetable_campus_name", "timetable_campus_name_block");
-        $this->setBlock("campus_timetable", "timetable_period", "timetable_period_block");
-        $this->setBlock("campus_timetable", "timetable_header", "timetable_header_block");
-        $this->setBlock('timetable_period', 'period_class_link', 'period_class_link_block');
-        $this->setBlock('timetable_period', 'period_class', 'period_class_block');
-        $this->setBlock('period_class_link', 'period_class_link_attendance_synergetic', "period_class_link_attendance_synergetic_block");
-        $this->setBlock('period_class_link', 'period_class_link_attendance_tass', "period_class_link_attendance_tass_block");
-        $this->setBlock('period_class', 'period_class_attendance_synergetic', "period_class_attendance_synergetic_block");
-        $this->setBlock('period_class', 'period_class_attendance_tass', "period_class_attendance_tass_block");
-
-
-        foreach ($this->timetable as $timetable) {
-            if (is_array($timetable) && !empty($timetable)) {
-                $timetableCount++;
-            }
-        }
-
-        if ($timetableCount === 0) {
-            return false;
-        }
-        
         $campusList = [];
-        
         foreach ($this->getUser()->getCampusCollection() as $campus) {
             $campusList[$campus->getId()] = $campus;
         }
+        return $campusList;
+    }
 
-        $this->setVar("campus_timetable_block", '');
-        $now = new Alaress_Date_Format(time(), 'U');
 
-        foreach ($this->timetable as $campusId => $timetable) {
-            $classCount = 0;
+    /**
+     * Returns the number of classes in the timetable
+     *
+     * @param array $timetable
+     * @return int
+     */
+    private function getClassCountForTimetable(array $timetable): int
+    {
+        $classCount = 0;
+        foreach ($timetable as $currentPeriod) {
+            $classCount += \count($currentPeriod['class']);
+        }
+        return $classCount;
+    }
 
-            // Find out if the current campus timetable has any classes associated with the timetable definition. If not, skip its rendering altogether
 
-            if (is_array($timetable) && count($timetable)) {
-                foreach ($timetable as $currentPeriod) {
-                    $classCount += count($currentPeriod['class']);
-                }
+    /**
+     * Gets a background colour for a subject
+     *
+     * @param string $subjectCode
+     * @return string
+     */
+    private function getSubjectColour(string $subjectCode): string
+    {
+        if ($subjectCode && !array_key_exists($subjectCode, $this->subjectColourMap)) {
+            if (!$this->colourList->offsetExists($this->colourIndex)) {
+                $this->colourIndex = 0; // Loop back to start of colour list
             }
 
-            if (is_array($timetable) && !empty($timetable) && $classCount) {
-                
-                if ($timetableCount > 1) {
-                    $this->setVar("CAMPUS_NAME", $campusList[$campusId]->getName());
-                    $this->parse('timetable_campus_name_block', 'timetable_campus_name');
-                } else {
-                    $this->setVar('timetable_campus_name_block', '');
-                }
-                
-                $this->setVar("DAYNAME", $this->dayName[$campusId]);
-                $currentPeriod = $this->currentPeriod[$campusId];
-                
-                // Setup colour map
-                
-                $subjectColourMap = [];
-                $colourIndex = 0;
+            $this->subjectColourMap[$subjectCode] = $this->colourList[$this->colourIndex]->getHexColour();
+            $this->colourIndex++;
+        }
+        return $this->subjectColourMap[$subjectCode];
+    }
 
-                // For each period set result
-                
-                $this->setVar('timetable_header_block', '');
-                $this->setVar('timetable_period_block', '');
 
-                foreach ($timetable as $period) {
+    /**
+     * Returns the subject's folder's name, or empty string if not found
+     *
+     * @param string $subjectCode
+     * @return string
+     */
+    private function getSubjectFolderName(string $subjectCode): string
+    {
+        try {
+            return $this->getFolderMapper()->findByCode($subjectCode)->getName();
+        } catch (MapperException $e) {
+            return '';
+        }
+    }
 
-                    if ($period['periodSequence'] == 1) {
-                        
-                        $this->setVar('period_class_block', '');
-                        $this->setVar('period_class_link_block', '');
-                        $this->setVar('period_class_attendance_synergetic_block', '');
-                        $this->setVar('period_class_link_attendance_synergetic_block', '');
-                        $this->setVar('period_class_attendance_tass_block', '');
-                        $this->setVar('period_class_link_attendance_tass_block', '');
-                        $this->setVar("PERIOD_NAME", $period['periodName']);
-                        $this->setVar("PERIOD_START", $period['periodStart']);
-                        $this->setVar("PERIOD_END", $period['periodEnd']);
 
-                        $periodCount++;
-
-                        // Always highlight the current cell, regardless of whether it has something on or not
-                        
-                        if ($currentPeriod['PeriodNumber'] == $period['periodNumber'] && $currentPeriod['PeriodNumberSeq'] == $period['periodSequence']) {
-                            $this->setVar([
-                                'PERIOD_CLASS' => 'timetable-subject-active',
-                                'PERIOD_TH_CLASS' => 'timetable-period-active'
-                            ]);
-                        } else {
-                            $this->setVar([
-                                'PERIOD_CLASS' => '',
-                                'PERIOD_TH_CLASS' => ''
-                            ]);
-                        }
-
-                        // Display info only if it exists, otherwise empty cell
-                        
-                        if (count($period['class']) > 0) {
-                            
-                            foreach ($period['class'] as $class) {
-                                $this->setVar('PERIOD_CODE', '(' . $class['code'] . ')');
-                                $this->setVar('PERIOD_ROOM', $class['room']);
-                                
-                                // Yes you really do need to double url-encode this
-                                
-                                $this->setVar('PERIOD_URL', Scrub::text('/homepage/code/' . urlencode(urlencode($class['code']))));
-
-                                // Handle colour array
-                                
-                                if ($class['code'] && !array_key_exists($class['code'], $subjectColourMap)) {
-                                    if (!($this->colourList->offsetExists($colourIndex))) {
-                                        $colourIndex = 0;
-                                    }
-                                    
-                                    $subjectColourMap[$class['code']] = $this->colourList->offsetGet($colourIndex)->getHexColour();
-                                    $colourIndex++;
-                                }
-
-                                $this->setVar('PERIOD_COLOUR', Scrub::text($subjectColourMap[$class['code']]));
-
-                                // Set the class' description
-                                $description = $class['description'];
-                                try {
-                                    $folder = $this->getFolderMapper()->findByCode($class['code']);
-                                    $hasLink = $this->getAccess()->getFolderAccess($this->getUser(), $folder->getId()) >= UserAccess::ACCESS_READ;
-
-                                    // If the class description is blank, fall back to the folder name
-
-                                    if (empty($description)) {
-                                        $description = $folder->getName();
-                                    }
-                                    
-                                } catch (MapperException $e) {
-
-                                    $hasLink = false;
-                                }
-
-                                // If both the class description and folder name as blank, fall back to "Unknown Class"
-
-                                if (empty($description)) {
-                                    $description = "Unknown Class";
-                                }
-
-                                $this->setVar('PERIOD_DESC', $description);
-
-                                if($class['ClassCancelled']) {
-                                    $this->setVar('CLASS_CANCELLED', 'strike');
-                                }
-                                else {
-                                    $this->setVar('CLASS_CANCELLED','');
-                                }
-
-                                // Link to Attendance Records
-                                
-                                if (strlen($class['code']) && $this->configMapper->get('external_attendance') && $this->getUser()->getRole()->isStaff()) {
-
-                                    if ($this->configMapper->get('external_type') == 'synergetic' && $class['AttendanceEnabled']) {
-
-                                        $encodedClass = urlencode(urlencode(urlencode($class['code'])));
-                                        $classLink = $class['campus'] ? $class['campus'] . '/' . $encodedClass : '0/' . $encodedClass;
-
-                                        $this->setVar([
-                                            'ATTENDANCE_CLASS_CODE' => $classLink,
-                                            'ATTENDANCE_ATTENDANCE_DATE' => $now->getDatabaseDate(),
-                                            'ATTENDANCE_ATTENDANCE_PERIOD' => $period['periodNumber'],
-                                            'ATTENDANCE_TIMETABLE_CODE' => $campusList[$campusId]->getExtTimetableCode(),
-                                            'ATTENDANCE_ICON' => $class['AttendanceMarked'] ? 'icon-approve' : 'icon-class-list',
-                                        ]);
-
-                                        if ($hasLink) {
-                                            $this->parse('period_class_link_attendance_synergetic_block', 'period_class_link_attendance_synergetic');
-                                        } else {
-                                            $this->parse('period_class_attendance_synergetic_block', 'period_class_attendance_synergetic');
-                                        }
-                                        
-                                    } elseif ($this->configMapper->get('external_type') == 'tass') {
-
-                                        /** @noinspection PhpUnusedLocalVariableInspection */
-                                        list($year, $subject, $class) = explode('-', $class['code']);
-
-                                        /** @noinspection PhpUnusedLocalVariableInspection */
-                                        list($cmpCode, $timetableCode) = explode('-', $campusList[$campusId]->getExtTimetableCode());
-                                        
-                                        $this->setVar([
-                                            'ATTENDANCE_CLASS_CODE' => $class,
-                                            'ATTENDANCE_SUBJECT_CODE' => $subject,
-                                            'ATTENDANCE_ATTENDANCE_DATE' => $now->getUsingFormat('d/m/Y'),
-                                            'ATTENDANCE_ATTENDANCE_DAY' => $this->dayNumber[$campusId],
-                                            'ATTENDANCE_ATTENDANCE_PERIOD' => $period['periodNumber'],
-                                            'ATTENDANCE_TIMETABLE_CODE' => $timetableCode,
-                                            'ATTENDANCE_ICON' => 'icon-class-list',
-                                        ]);
-
-                                        if ($hasLink) {
-                                            $this->parse('period_class_link_attendance_tass_block', 'period_class_link_attendance_tass');
-                                        } else {
-                                            $this->parse('period_class_attendance_tass_block', 'period_class_attendance_tass');
-                                        }
-                                    }
-                                }
-
-                                if ($hasLink) {
-                                    $this->parse('period_class_link_block', 'period_class_link', true);
-                                } else {
-                                    $this->parse('period_class_block', 'period_class', true);
-                                }
-
-                                /* Clear children after parsing out the parent
-                                 */
-                                $this->setVar([
-                                    'period_class_link_attendance_block' => '',
-                                    'period_class_attendance_block' => ''
-                                ]);
-                            }
-                        }
-
-                        // Output period block
-                        
-                        $this->parse("timetable_header_block", "timetable_header", true);
-                        $this->parse("timetable_period_block", "timetable_period", true);
-                    }
-                }
-
-                // Timetable field width
-                
-                $this->setVar("TIMETABLE_FIELD_WIDTH", floor(((98 - ($periodCount * 0.05)) / $periodCount)));
-                $this->parse("campus_timetable_block", 'campus_timetable', true);
+    /**
+     * Returns a link from a class to a homepage if user permitted to follow it
+     *
+     * @param string $subjectCode
+     * @return string
+     */
+    private function getClassLink(string $subjectCode): string
+    {
+        try {
+            $folder = $this->getFolderMapper()->findByCode($subjectCode);
+            if ($this->getAccess()->getFolderAccess($this->getUser(), $folder->getId()) >= UserAccess::ACCESS_READ) {
+                // Yes you really do need to double url-encode this
+                return '/homepage/code/' . urlencode(urlencode($subjectCode));
             }
+            return '';
+        } catch (MapperException $e) {
+            return '';
+        }
+    }
+
+
+    /**
+     * Returns a link the user can follow to mark attendance in their SIS
+     *
+     * @param array               $class
+     * @param Alaress_Date_Format $now
+     * @param array               $period
+     * @param array               $campusList
+     * @param int                 $campusId
+     * @return string
+     */
+    private function getAttendanceLink(array $class, Alaress_Date_Format $now, array $period, array $campusList, int $campusId): string
+    {
+        if (!$class['AttendanceEnabled']) {
+            return '';
         }
 
-        return true;
+        switch ($this->getConfigMapper()->get('external_type')) {
+            case 'synergetic':
+                $encodedClass = urlencode(urlencode(urlencode($class['code'])));
+                $classLink    = $class['campus'] ? $class['campus'] . '/' . $encodedClass : '0/' . $encodedClass;
+                return "/modules/attendance/modify/{$classLink}/{$now->getDatabaseDate()}/{$period['periodNumber']}/{$campusList[$campusId]->getExtTimetableCode()}";
+            case 'tass':
+                /** @noinspection PhpUnusedLocalVariableInspection */
+                [$year, $subject, $class] = explode('-', $class['code']);
+                [$cmpCode, $timetableCode] = explode('-', $campusList[$campusId]->getExtTimetableCode());
+
+                $deepLinkParams = [
+                    'target'      => 'teacher.rollcall',
+                    'ttid'        => $timetableCode,
+                    'yeargroups'  => '',
+                    'classes'     => $class,
+                    'tchcode'     => $this->getUser()->getExternalId(),
+                    'subjectcode' => $subject,
+                    'date'        => $now->getUsingFormat('d/m/Y'),
+                    'periodcode'  => $period['periodNumber'],
+                    'daycode'     => $this->dayNumber[$campusId],
+                ];
+                try {
+                    /** @var Router $router */
+                    $router   = $this->getSitePage()->getDi()->get('router');
+                    $deepLink = urlencode(implode('&', $deepLinkParams));
+                    return "{$router->generate('tassportal.teacherKiosk')}?deep_link={$deepLink}";
+                } catch (\Throwable $e) {
+                    return '';
+                }
+            default:
+                return '';
+        }
+    }
+
+
+    /**
+     * Builds twig context data for a single timetable
+     *
+     * @param Campus[]            $campusList
+     * @param int                 $campusId
+     * @param array               $timetable
+     * @param Alaress_Date_Format $now
+     * @return array
+     */
+    private function buildTimetableContext(array $campusList, int $campusId, array $timetable, Alaress_Date_Format $now): array
+    {
+        // Start building twig data
+        $timetableContext = [
+            'campus'  => $campusList[$campusId]->getName(),
+            'day'     => $this->dayName[$campusId],
+            'periods' => [],
+        ];
+
+        $currentPeriod = $this->currentPeriod[$campusId];
+
+        foreach ($timetable as $period) {
+            // Filter out periods like 'Recess' or 'Lunch' to only show those with classes
+            if (1 !== (int)$period['periodSequence']) {
+                continue;
+            }
+            $timetableContext['periods'][] = $this->buildPeriodContext($campusList, $campusId, $currentPeriod, $period, $now);
+        }
+        return $timetableContext;
+    }
+
+
+    /**
+     * Build twig data for a single period in a timetable
+     *
+     * @param array               $campusList
+     * @param int                 $campusId
+     * @param null|array          $currentPeriod NULL if there is no current period for the campus at this time.
+     * @param string[][][]        $period
+     * @param Alaress_Date_Format $now
+     * @return array
+     */
+    private function buildPeriodContext(array $campusList, int $campusId, ?array $currentPeriod, array $period, Alaress_Date_Format $now): array
+    {
+        // Always highlight the current cell, regardless of whether it contains any classes
+         $isCurrent = $currentPeriod
+            && $currentPeriod['PeriodNumber'] == $period['periodNumber']
+            && $currentPeriod['PeriodNumberSeq'] == $period['periodSequence'];
+
+        $periodContext = [
+            'name'       => $period['periodName'],
+            'start'      => $period['periodStart'],
+            'end'        => $period['periodEnd'],
+            'isCurrent'  => $isCurrent,
+        ];
+
+        foreach ($period['class'] as $class) {
+            $periodContext['classes'][] = $this->buildClassContext($campusList, $campusId, $period, $now, $class);
+        }
+        return $periodContext;
+    }
+
+
+    /**
+     * Builds data for a single class suitable for sending off to twig
+     *
+     * @param array               $campusList
+     * @param int                 $campusId
+     * @param array               $period
+     * @param Alaress_Date_Format $now
+     * @param array               $class
+     * @return array
+     */
+    private function buildClassContext(array $campusList, int $campusId, array $period, Alaress_Date_Format $now, array $class): array
+    {
+        $classContext = [
+            'code'      => "({$class['code']})",
+            'room'      => $class['room'],
+            'url'       => $this->getClassLink($class['code']),
+            'colour'    => $this->getSubjectColour($class['code']),
+            'desc'      => $class['description'] ?: $this->getSubjectFolderName($class['code']),
+            'cancelled' => (bool)$class['ClassCancelled'],
+        ];
+
+        // Optionally link to Attendance Records
+        if ('' !== $class['code'] && $this->getConfigMapper()->get('external_attendance') && $this->getUser()->getRole()->isStaff()) {
+
+            $classContext['attendance'] = [
+                'enabled' => (bool)$class['AttendanceEnabled'],
+                'marked'  => (bool)$class['AttendanceMarked'],
+                'link'    => $this->getAttendanceLink($class, $now, $period, $campusList, $campusId),
+            ];
+        }
+        return $classContext;
+    }
+
+
+    /**
+     * @param string $templateHandle
+     * @return bool
+     * @throws Exception
+     */
+    public function renderTemplate($templateHandle)
+    {
+        $campusList = $this->getCampusList();
+        $now        = new Alaress_Date_Format(time(), 'U');
+        $timetableContexts = [];
+
+        // Setup colour map - doing so here implies the same subject code across different timetables be same colour
+        $this->subjectColourMap = [];
+        $this->colourIndex      = 0;
+
+        foreach ($this->timetable as $campusId => $timetable) {
+
+            // Don't render if external connector didn't return expected format, or if campus timetable lacks classes
+            if (!\is_array($timetable) || !$this->getClassCountForTimetable($timetable)) {
+                continue;
+            }
+
+            $timetableContexts[] = $this->buildTimetableContext($campusList, $campusId, $timetable, $now);
+        }
+
+        return $this->renderTwigTemplate(
+            $templateHandle,
+            '@timetable/Dashboard/component.twig',
+            [
+                'componentInstanceId' => $this->getInstance()->getId(),
+                'externalType'        => $this->getConfigMapper()->get('external_type'),
+                'campusTimetables'    => $timetableContexts,
+            ],
+            false,
+            false,
+            false,
+            false
+        );
     }
 }
