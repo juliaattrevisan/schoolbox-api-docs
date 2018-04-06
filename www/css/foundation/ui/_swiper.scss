@@ -4,6 +4,23 @@
 $swipe-color: $iron;
 $swipe-color-hover: $steel;
 
+
+.swiper-pagination{
+    bottom: 0 !important;
+    position: relative;
+    .swiper-pagination-bullet {
+        background: $swipe-color;
+        opacity: 1;
+        margin: 1rem .5rem;
+        height: .625rem;
+        width: .625rem;
+    }
+    .swiper-pagination-bullet-active,
+    .swiper-pagination-bullet-active:hover{
+        background: $swipe-color-hover;
+    }
+}
+
 .swiper-container {
     .swiper-wrapper {
         min-height: 4rem;
@@ -42,21 +59,6 @@ $swipe-color-hover: $steel;
         right: 0;
     }
 
-    .swiper-pagination{
-        bottom: 0 !important;
-        position: relative;
-        .swiper-pagination-bullet {
-            background: $swipe-color;
-            opacity: 1;
-            margin: 1rem .5rem;
-            height: .625rem;
-            width: .625rem;
-        }
-        .swiper-pagination-bullet-active,
-        .swiper-pagination-bullet-active:hover{
-            background: $swipe-color-hover;
-        }
-    }
     // image title
     .meta{
         background: rgba($black, .7);
