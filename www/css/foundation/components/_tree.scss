@@ -16,11 +16,6 @@ $tree-homepage-icon-color: darkorange;
 $tree-course-icon-color: #008600;
 $tree-favorite-icon-color: darkorange;
 
-/* Can't touch this... node */
-li[data-type=noaccess] > a.jstree-anchor{
-    cursor: not-allowed;
-}
-
 
 %browser-icon-colors {
     .icon-folder:before {
@@ -59,6 +54,15 @@ div.jstree-default, ul.jstree-default {
             &.jstree-wholerow-clicked {
                 color: $tree-node-selected-color;
                 background: $tree-node-selected-background;
+            }
+        }
+
+        /* Can't touch this... node */
+        &[data-type=noaccess] {
+            .jstree-wholerow,
+            .jstree-anchor,
+            .jstree-ocl {
+                cursor: not-allowed;
             }
         }
     }
