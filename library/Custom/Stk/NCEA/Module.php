@@ -29,6 +29,17 @@ class Module extends BaseModule
      */
     protected $basename = 'nceaReport';
 
+    /**
+     * Minimum year level for NCEA report availability
+     * @var int
+     */
+    private $minYearInclusive = 11;
+
+    /**
+     * Maximum year level for NCEA report availability
+     * @var int
+     */
+    private $maxYearInclusive = 13;
 
     /**
      * Hook method for setting up routes via self::register()
@@ -66,6 +77,7 @@ class Module extends BaseModule
     private function preloadUser(array $params): array
     {
         try {
+            /** @var \Schoolbox\User $user */
             $user = $this->getUserMapper()->findById($params['id']);
         }
         catch (MapperException $e) {
@@ -78,6 +90,12 @@ class Module extends BaseModule
 
         if ($externalUser['StudentIBFlag']) {
             throw new NotFound('NCEA Reports not available to IB Students');
+        }
+
+        /* Year level boundaries
+         */
+        if (($user->getYear() < $this->minYearInclusive) || ($user->getYear() > $this->maxYearInclusive)) {
+            throw new NotFound('Unavailable for this student\'s year level');
         }
 
         /* Can't get reports from the future, or too far in the past
