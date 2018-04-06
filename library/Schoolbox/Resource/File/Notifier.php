@@ -19,6 +19,7 @@ use Schoolbox\User;
 
 class Notifier extends ResourceNotifier
 {
+
     /**
      * @inheritdoc
      */
@@ -30,9 +31,9 @@ class Notifier extends ResourceNotifier
 
     /**
      * @param string $roletype
-     * @param Model $file
-     * @param User $effector
-     * @param array $diff
+     * @param Model  $file
+     * @param User   $effector
+     * @param array  $diff
      * @return Envelope
      */
     public function notifyCreated($roletype, $file, $effector, $diff = null)
@@ -47,7 +48,7 @@ class Notifier extends ResourceNotifier
             LogMapper::KIND_FILE,
             $file->getId(),
             self::TRIGGER_CREATED, // "file.{id}.created"
-            new Param($file->getTitle(), '/send.php?id='.$file->getId()), // the :resource param
+            new Param($file->getTitle(), '/send.php?id=' . $file->getId()), // the :resource param
             $effector,
             $category,
             $roletype,
@@ -55,11 +56,12 @@ class Notifier extends ResourceNotifier
         );
     }
 
+
     /**
      * @param string $roletype
-     * @param Model $file
-     * @param User $effector
-     * @param array $diff
+     * @param Model  $file
+     * @param User   $effector
+     * @param array  $diff
      * @return Envelope
      */
     public function notifyDeleted($roletype, $file, $effector, $diff = null)
@@ -130,11 +132,12 @@ class Notifier extends ResourceNotifier
         return 'folder';
     }
 
+
     /**
      * @return int
      * @param Model $file
      */
-    protected function getAccessLevel($file):?int
+    protected function getAccessLevel($file): ?int
     {
         if ($file->isHidden()) {
             return UserAccess::ACCESS_WRITE;

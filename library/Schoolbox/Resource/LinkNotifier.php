@@ -47,6 +47,7 @@ class LinkNotifier extends ResourceNotifier
         );
     }
 
+
     /**
      * @param string $roletype
      * @param Link   $link
@@ -117,11 +118,12 @@ class LinkNotifier extends ResourceNotifier
         return 'folder';
     }
 
+
     /**
      * @return int
      * @param Link $link
      */
-    protected function getAccessLevel($link):?int
+    protected function getAccessLevel($link): ?int
     {
         if ($link->isHidden()) {
             return UserAccess::ACCESS_WRITE;
