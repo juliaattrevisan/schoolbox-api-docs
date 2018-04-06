@@ -18,27 +18,22 @@
 
     {CONFIGURATION}
 
-    <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
-        <div class="small-12 island">
-            <!-- BEGIN has_header -->
-            <h2 class="subheader">{COMPONENT_NAME}</h2>
-            <!-- END has_header -->
-
-            <div class="swiper-container" id="component{COMPONENT_INSTANCE_ID}-imageslider">
-                <div class="swiper-wrapper">
-                    <!-- BEGIN image_scroller -->
-                    <div class="swiper-slide {COMPONENT_CONFIG_IMAGE_RATIO}">
-                        <img data-src="/cms/image.php?id={IMAGE_ID}&height=1024&width=1024" class="swiper-lazy" />
-                        <div class="loader"></div>
-                        <!-- BEGIN show_caption -->
-                        <p class="meta">{IMAGE_NAME}</p>
-                        <!-- END show_caption -->
-                    </div>
-                    <!-- END image_scroller -->
+    <div class="swiper-container" id="component{COMPONENT_INSTANCE_ID}-imageslider">
+        <div class="swiper-wrapper">
+            <!-- BEGIN image_scroller -->
+            <div class="swiper-slide">
+                <div class="{COMPONENT_CONFIG_IMAGE_RATIO}">
+                    <img data-src="/cms/image.php?id={IMAGE_ID}&height=1024&width=1024" class="swiper-lazy" />
+                    <div class="loader"></div>
                 </div>
-                <div class="swiper-button-next" id="component{COMPONENT_INSTANCE_ID}-imageslider-button-next"></div>
-                <div class="swiper-button-prev" id="component{COMPONENT_INSTANCE_ID}-imageslider-button-prev"></div>
+                <!-- BEGIN show_caption -->
+                <p class="meta">{IMAGE_NAME}</p>
+                <!-- END show_caption -->
             </div>
+            <!-- END image_scroller -->
         </div>
+        <div class="swiper-button-next" id="component{COMPONENT_INSTANCE_ID}-imageslider-button-next"></div>
+        <div class="swiper-button-prev" id="component{COMPONENT_INSTANCE_ID}-imageslider-button-prev"></div>
     </div>
+
 </div>
