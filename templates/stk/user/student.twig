@@ -35,7 +35,7 @@
     </li>
 
     {# Obey access rules for non-ib students #}
-    {% set nceaRoute = routeLookupIfAuthorized('nceaReport.getReport', {id: user.id, year: 'now'|date('Y')}) %}
+    {% set nceaRoute = routeLookupIfAuthorized('nceaReport.getReport', {id: user.id, year: 'now'|date('Y'), user: user}) %}
 
     {% if nceaRoute and not externalUser.StudentIBFlag %}
     <li>

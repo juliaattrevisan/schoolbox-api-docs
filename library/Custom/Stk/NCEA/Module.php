@@ -30,16 +30,11 @@ class Module extends BaseModule
     protected $basename = 'nceaReport';
 
     /**
-     * Minimum year level for NCEA report availability
-     * @var int
+     * Report is available for these year levels
+     *
+     * @var array
      */
-    private $minYearInclusive = 11;
-
-    /**
-     * Maximum year level for NCEA report availability
-     * @var int
-     */
-    private $maxYearInclusive = 13;
+    private $availableForYears = [11, 12, 13];
 
     /**
      * Hook method for setting up routes via self::register()
@@ -54,10 +49,20 @@ class Module extends BaseModule
          */
         $getPerms = new Rule\All(
             new Rule\IsLoggedIn(),
-            new Rule\Any(
-                new Rule\IsUserOrParentOfUser($this->getExternalUser(), $this->getUserMapper(), 'id'),
-                new Rule\HasRole(Role::STAFF),
-                new Rule\IsSuperuser()
+
+            /* This student must be in Year 11-13 inclusive
+             */
+            new Rule\All(
+                new Rule\Any(
+                    new Rule\IsYearLevel($this->availableForYears)
+                ),
+                /* The Students themselves, their parents, any staff/superuser can get button and report
+                 */
+                new Rule\Any(
+                    new Rule\IsUserOrParentOfUser($this->getExternalUser(), $this->getUserMapper(), 'id'),
+                    new Rule\HasRole(Role::STAFF),
+                    new Rule\IsSuperuser()
+                )
             )
         );
 
@@ -94,7 +99,7 @@ class Module extends BaseModule
 
         /* Year level boundaries
          */
-        if (($user->getYear() < $this->minYearInclusive) || ($user->getYear() > $this->maxYearInclusive)) {
+        if (!\in_array($user->getYear(), $this->availableForYears, false)) {
             throw new NotFound('Unavailable for this student\'s year level');
         }
 
