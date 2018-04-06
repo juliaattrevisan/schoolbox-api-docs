@@ -93,6 +93,7 @@
 
                     },
                     yAxis: {
+                        allowDecimals: false,
                         min: 0,
                         reversedStacks: false,
                         title: {
