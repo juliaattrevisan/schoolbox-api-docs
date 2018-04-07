@@ -114,7 +114,12 @@ class ReCaptcha {
         }
 
         $httpClient = new \GuzzleHttp\Client(['curl' => \Proxy\Server::getInstance()->buildCurlOptions()]);
-        $response = $httpClient->request('POST', "https://www.google.com/recaptcha/api/siteverify?secret=".$this->private_key."&response=".$response);
+        $response = $httpClient->request('POST', "https://www.google.com/recaptcha/api/siteverify", [
+            'form_params' => [
+                'secret' => $this->private_key,
+                'response' => $response
+            ]
+        ]);
 
         return json_decode($response->getBody())->success;
 
