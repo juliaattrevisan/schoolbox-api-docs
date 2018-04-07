@@ -164,14 +164,13 @@ class Component_ConfigNotifier extends AbstractModuleNotifier
             return;
         }
 
-        $hostFolderId  = $instance->getIdentifier();
-        $namespaceSlug = $instance->getDefinition()->getNamespace()->getSlug();
-
         foreach ([ UserAccess::ACCESS_READ, UserAccess::ACCESS_WRITE, UserAccess::ACCESS_FULL ] as $access) {
-            $from = "*.notify.service.1.$altSourceId.$access.$namespaceSlug.#";
-            $to   = "*.notify.service.1.$hostFolderId.$access.#";
+            $from = $this->determineSourcePath($instance, $access, $altSourceId);
+            $to   = $this->determineDestinationPath($instance, $access);
 
-            $this->doQuery($query, $from, $to);
+            if (isset($from, $to)) {
+                $this->doQuery($query, $from, $to);
+            }
         }
 
         // TODO desingleton these
@@ -245,4 +244,45 @@ class Component_ConfigNotifier extends AbstractModuleNotifier
         return in_array($model->getConfigDefinitionId(), $this->definitionCache, false);
     }
 
+
+    /**
+     * Determines what the source path should be for the message redirect.
+     *
+     * @param Component_Instance $instance
+     * @param int                $access
+     * @param int                $altSourceId
+     * @return null|string
+     */
+    private function determineSourcePath(Component_Instance $instance, int $access, int $altSourceId): ?string
+    {
+        $namespace = $instance->getDefinition()->getNamespace();
+        if (!$namespace) {
+            return null;
+        }
+        $namespaceSlug = $namespace->getSlug();
+        if ($namespaceSlug === null) {
+            return null;
+        }
+        $namespaceSuffix = $instance->getDefinition()->getNamespaceSuffix();
+        if ($namespaceSuffix === null) {
+            return null;
+        }
+        $service = UserAccess::SERVICE_HOMEPAGE;
+        return "*.notify.service.$service.$altSourceId.$access.$namespaceSlug.$namespaceSuffix";
+    }
+
+
+    /**
+     * Determines what the destination path should be for the message redirect.
+     *
+     * @param Component_Instance $instance
+     * @param int                $access
+     * @return string
+     */
+    private function determineDestinationPath(Component_Instance $instance, int $access): string
+    {
+        $hostFolderId = $instance->getIdentifier();
+        $service      = UserAccess::SERVICE_HOMEPAGE;
+        return "*.notify.service.$service.$hostFolderId.$access.#";
+    }
 }

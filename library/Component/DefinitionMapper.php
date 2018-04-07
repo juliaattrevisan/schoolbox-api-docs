@@ -37,6 +37,7 @@ class Component_DefinitionMapper extends Schoolbox\Mapper
         $this->uses('multiple', self::TYPE_STRING);
         $this->uses('component_category', self::TYPE_STRING);
         $this->joins('msg_namespace_slug', NSMapper::class, 'slug', null, null, 'namespace', 'namespace');
+        $this->uses('msg_namespace_slug_suffix', self::TYPE_STRING, null, 'namespaceSuffix');
     }
 
     /**
