@@ -123,7 +123,7 @@ class LinkNotifier extends ResourceNotifier
      * @return int
      * @param Link $link
      */
-    protected function getAccessLevel($link): ?int
+    protected function getAccessLevel($link): int
     {
         if ($link->isHidden()) {
             return UserAccess::ACCESS_WRITE;

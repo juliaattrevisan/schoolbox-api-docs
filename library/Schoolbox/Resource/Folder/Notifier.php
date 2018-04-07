@@ -167,7 +167,7 @@ class Notifier extends ResourceNotifier
      * @return int
      * @param Model $resource
      */
-    protected function getAccessLevel($resource): ?int
+    protected function getAccessLevel($resource): int
     {
         return UserAccess::ACCESS_READ;
     }

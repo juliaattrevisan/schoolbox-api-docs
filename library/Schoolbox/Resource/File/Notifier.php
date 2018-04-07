@@ -137,7 +137,7 @@ class Notifier extends ResourceNotifier
      * @return int
      * @param Model $file
      */
-    protected function getAccessLevel($file): ?int
+    protected function getAccessLevel($file): int
     {
         if ($file->isHidden()) {
             return UserAccess::ACCESS_WRITE;

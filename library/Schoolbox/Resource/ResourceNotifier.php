@@ -539,5 +539,5 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
      * @return int
      * @param Folder|File|Link|Textbox $resource
      */
-    abstract protected function getAccessLevel($resource);
+    abstract protected function getAccessLevel($resource): int;
 }
