@@ -12,6 +12,7 @@ namespace Schoolbox\Resource;
 
 use Alaress\Async\Notification\Parameter\Param;
 use Schoolbox\Mapper\Exception\Deleted;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\User;
 
@@ -42,9 +43,10 @@ class LinkNotifier extends ResourceNotifier
         return $this->notify(
             LogMapper::KIND_LINK, $link->getId(), self::TRIGGER_CREATED,    // "link.{id}.created"
             new Param($link->getDescription(), $link->getHref()),           // the :resource param
-            $effector, $category, $roletype
+            $effector, $category, $roletype, $this->getAccessLevel($link)
         );
     }
+
 
     /**
      * @param string $roletype
@@ -65,7 +67,7 @@ class LinkNotifier extends ResourceNotifier
         return $this->notify(
             LogMapper::KIND_LINK, $link->getId(), self::TRIGGER_DELETED,    // "link.{id}.deleted"
             new Param($link->getDescription()),                             // the :resource param
-            $effector, $category, $roletype
+            $effector, $category, $roletype, $this->getAccessLevel($link)
         );
     }
 
@@ -116,4 +118,17 @@ class LinkNotifier extends ResourceNotifier
         return 'folder';
     }
 
+
+    /**
+     * @return int
+     * @param Link $link
+     */
+    protected function getAccessLevel($link): int
+    {
+        if ($link->isHidden()) {
+            return UserAccess::ACCESS_WRITE;
+        } else {
+            return UserAccess::ACCESS_READ;
+        }
+    }
 }

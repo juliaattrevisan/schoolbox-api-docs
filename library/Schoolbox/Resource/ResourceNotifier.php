@@ -115,7 +115,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
         $callbacks = parent::retrieveCallbacks($label);
         $method    = 'notifySystem' . ucfirst($label);
         if (method_exists($this, $method)) {
-            $callbacks[] = array($this, $method);
+            $callbacks[] = [$this, $method];
         }
 
         return $callbacks;
@@ -125,9 +125,9 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
     /**
      * Notify the system that a CMS event occurred (will be sent to cmsLog table)
      *
-     * @param string                     $action
-     * @param Folder|File|Link|Textbox   $resource
-     * @param User                       $effector
+     * @param string                   $action
+     * @param Folder|File|Link|Textbox $resource
+     * @param User                     $effector
      * @throws ScheduleException
      * @return void
      */
@@ -135,12 +135,12 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
     {
         $notif = Notifactory::create(Notif::TOPIC_CMS);
 
-        $notif->notice("CRUD", array(
+        $notif->notice("CRUD", [
             'object'   => $this->getResourceKind(),
             'objectId' => $resource->getId(),
             'action'   => $action,
-            'user'     => $effector->getId()
-        ));
+            'user'     => $effector->getId(),
+        ]);
     }
 
 
@@ -164,8 +164,8 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 
             try {
                 $resource = $log->getObject();
-                $user = $log->getUser();
-                $time = $log->getTimestamp()->getUnixTimeStamp();
+                $user     = $log->getUser();
+                $time     = $log->getTimestamp()->getUnixTimeStamp();
 
                 switch ($log->getAction()) {
                     case LogMapper::ACTION_CREATE:
@@ -178,7 +178,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
                         $c = $c->merge(new Collection($this->notifyDeleted($roletype, $resource, $user)->getAll($time)));
                         break;
                 }
-            } catch(Mapper\Exception|\Error $e) {
+            } catch (Mapper\Exception|\Error $e) {
                 // mute failures where things were logged about resources that no longer exist
             }
 
@@ -190,16 +190,16 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
     /**
      * The generic-est of all messengers. Resources follow a pretty rigid pattern.
      *
-     * @param string             $kind
-     * @param int                $id
-     * @param string             $action
-     * @param ParameterInterface $param
-     * @param User               $effector
+     * @param string                $kind
+     * @param int                   $id
+     * @param string                $action
+     * @param ParameterInterface    $param
+     * @param User                  $effector
      * @param Folder|ISoftDeletable $category
-     * @param string             $roletype
+     * @param string                $roletype
      * @return Envelope
      */
-    protected function notify($kind, $id, $action, $param, $effector, $category, $roletype)
+    protected function notify($kind, $id, $action, $param, $effector, $category, $roletype, $accessLevel)
     {
         $envelope = new Envelope();
 
@@ -219,17 +219,18 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
         $bob->setIcon("/portrait.php?userId=$effectorExtId&size={$this->iconSize}")
             ->setHref("/homepage/$categoryId#$kind-$id")
             ->setTitle(":effector $action the $kind :resource in :category")
-            ->setParams(array(
+            ->setParams([
                 'effector' => new UserParam($effector, ParameterInterface::STACKING_REPLACE),
                 'resource' => $param,
-                'category' => new CategoryParam($category)
-            ))
+                'category' => new CategoryParam($category),
+            ])
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::INFO)
             ->addTopic("cms.$kind.$id.$action")
             ->addFilter('roletype', $roletype);
 
-        $envelope->broadcastToCategory($category, UserAccess::ACCESS_READ, $bob->build());
+
+        $envelope->broadcastToCategory($category, $accessLevel, $bob->build());
 
         return $envelope;
     }
@@ -278,7 +279,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 
     /**
      * @param Folder|File|Link|Textbox $resource
-     * @param User                       $effector
+     * @param User                     $effector
      * @return void
      */
     public function notifySystemDeleted($resource, $effector)
@@ -297,6 +298,8 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
     public function notifyUpdated($roleType, $resource, $effector, $diff = null)
     {
         $envelope = new Envelope();
+
+        $accessLevel = $this->getAccessLevel($resource);
 
         $effectorExtId = $effector->getExternalId();
         $resourceId    = $resource->getId();
@@ -326,7 +329,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::INFO)
             ->addFilter('roletype', $roleType)
-            ->setTopics(array("cms.$resourceKind.$resourceId.updated"));
+            ->setTopics(["cms.$resourceKind.$resourceId.updated"]);
 
         $userParam = new UserParam($effector, ParameterInterface::STACKING_REPLACE);
         $catParam  = new CategoryParam($category);
@@ -334,14 +337,14 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
         // if renamed...
         if (isset($diff[$nameField])) {
             $bob->setTitle(":user renamed the $resourceKind :oldname to :newname in :category")
-                ->setParams(array(
+                ->setParams([
                     'user'     => $userParam,
                     'oldname'  => new Param($diff[$nameField][1]),
                     'newname'  => new Param($resourceName, $resourceHref),
-                    'category' => $catParam
-                ));
+                    'category' => $catParam,
+                ]);
 
-            $envelope->broadcastToCategory($category, UserAccess::ACCESS_READ, $bob->build());
+            $envelope->broadcastToCategory($category, $accessLevel, $bob->build());
 
             unset($diff[$nameField]);
         }
@@ -349,13 +352,13 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
         // if moved elsewhere...
         if (isset($diff[$categoryField])) {
             $bob->setTitle(":user moved the $resourceKind :name into :category")
-                ->setParams(array(
+                ->setParams([
                     'user'     => $userParam,
                     'name'     => new Param($resourceName, $resourceHref),
-                    'category' => $catParam
-                ));
+                    'category' => $catParam,
+                ]);
 
-            $envelope->broadcastToCategory($category, UserAccess::ACCESS_READ, $bob->build());
+            $envelope->broadcastToCategory($category, $accessLevel, $bob->build());
 
             unset($diff[$categoryField]);
         }
@@ -364,11 +367,11 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
         if (count($diff) || is_null($diff)) {
             $instances = $this->notify(
                 $resourceKind, $resourceId, self::TRIGGER_UPDATED,
-                new Param($resourceName, $resourceHref), $effector, $category, $roleType
+                new Param($resourceName, $resourceHref), $effector, $category, $roleType, $accessLevel
             )->getAll();
 
             foreach ($instances as $inst) {
-                $envelope->broadcastToCategory($category, UserAccess::ACCESS_READ, $inst);
+                $envelope->broadcastToCategory($category, $accessLevel, $inst);
             }
         }
 
@@ -531,4 +534,10 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
         return $this->notifyDeleted(Role::PARENT, $resource, $effector);
     }
 
+
+    /**
+     * @return int
+     * @param Folder|File|Link|Textbox $resource
+     */
+    abstract protected function getAccessLevel($resource): int;
 }
