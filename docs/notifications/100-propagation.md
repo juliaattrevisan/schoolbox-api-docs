@@ -17,7 +17,9 @@ are usually created by mapper actions.
 
 Source: https://drive.google.com/open?id=1TG40pNKxsKMMK-Ij4GQtBz6Rqh9vlTrI
 
+
 ## Technical Description and Developer Guide
+
 
 ### `Schoolbox\Mapper::save/delete/updateAll`
 
@@ -49,13 +51,15 @@ Example:
 
 This can be worked around by deferring and then manually raising notifications.
 
+
 ### `Schoolbox\Mapper::raiseNotification`
 
-This method marshals the current session user, action type (create, update,
-delete), model, mapper and changed state (for update actions only) into the
-mapper's event propagator's `propagate` method.
+This method sends the current session user, action type (create, update,
+delete), model, mapper and difference between previous and current state
+(for update actions only) into the mapper's event propagator's `propagate`
+method.
 
-#### Developer notes
+#### Developer Notes
 
 This method can be overridden; in practise, it's overridden because this mapper:
 * doesn't fire notifications at all
@@ -70,3 +74,49 @@ is because mapper-based notifications require an effector to have been set.
 
 This means that notifications won't trigger if a mapper save action occurs in a
 CLI script or daemon.
+
+
+### `\Schoolbox\Realtime\Schedule\Trigger\IPropagator::propagate/propagateEvent`
+
+`propagate` simply marshals the session user, action type, model, mapper and
+diff into a `\Schoolbox\Realtime\Schedule\Event\CrudEventInterface` object for
+passing into `propagateEvent`.
+
+`propagateEvent` is responsible for the publishing of all triggers into the
+scheduling sub-system's message queue. In order to do this, it must first
+generate a set of triggers from the event it receives, using
+`\Schoolbox\Realtime\Schedule\Event\Splitter::generateTriggers`.
+
+
+### `\Schoolbox\Realtime\Schedule\Event\Splitter::generateTriggers`
+
+This method determines which notifier module (if any) generates the triggers
+for the given event. If it finds a notifier module, it:
+* builds a `\Schoolbox\Realtime\Schedule\Trigger\TriggerFactory` instance out
+  of the module and event
+* calls the trigger factory's `buildTriggers` method
+* this in turn calls the notifier module's `bundleTriggers` method to generate
+  the set of triggers
+
+#### Developer Notes
+
+In order to generate a trigger for an event, there must be a
+`\Schoolbox\Realtime\Schedule\Module\ModuleNotifierInterface` implementation
+that is able to be associated with the event.
+
+In practise, this is a sub-class of
+`\Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier` within the same
+namespace as the mapper and model class, named either `${namespace}\Notifier`
+or `${namespace}\${modelName}Notifier`.
+
+
+### `\Schoolbox\Realtime\Schedule\Module\ModuleNotifierInterface::bundleTriggers`
+
+
+### `\Alaress\Async\Broker\IBroker::publish`
+
+
+## Supporting Objects and Methods
+
+#### `\Schoolbox\Mapper::diff`
+#### `\Schoolbox\Realtime\Schedule\Event\CrudEventInterface`
