@@ -7,6 +7,7 @@
  * @version     SVN: $Id$
  */
 
+use Alaress\Web\Template\DebugTwig;
 use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -37,5 +38,5 @@ $treeBuilder = new \Schoolbox\Resource\Browser\Resources\TreeBuilder(
 );
 /** @var Alaress\Web\Output\Html $twigRenderer */
 $twigRenderer = $this->getDi()->get('webOutput:nochrome');
-$this->setVar('JS_NODE_TYPE_ICON_MAP', $twigRenderer->setTemplate('resources/jsNodeIconMap.twig')->getAsString());
+$this->setVar('JS_NODE_TYPE_ICON_MAP', $twigRenderer->setData([DebugTwig::DEBUG_WRAP => false])->setTemplate('@resourceBrowser/jsNodeIconMap.twig')->getAsString());
 $this->setVar('TREEDATA', json_encode($treeBuilder->buildPartialTree($openCategory)));
