@@ -112,11 +112,58 @@ or `${namespace}\${modelName}Notifier`.
 
 ### `\Schoolbox\Realtime\Schedule\Module\ModuleNotifierInterface::bundleTriggers`
 
+Implementations of this method are directly responsible for which triggers are
+sent to the scheduling sub-system, and for the time that they are set to
+trigger.
+
+The `\Schoolbox\Realtime\Schedule\Trigger\TriggerBundleInterface` object which
+this method receives contains the
+`\Schoolbox\Realtime\Schedule\Event\CrudEventInterface` object passed into
+`\Schoolbox\Realtime\Schedule\Trigger\IPropagator::propagate/propagateEvent`,
+and therefore has access to the:
+* session user (a.k.a. effector)
+* action type
+* model
+* mapper
+* diff
+
+All of these attributes can be used to determine exactly which
+`notify${roleType}${trigger}` methods of the notifier get called by the
+scheduling sub-system, and when. (Calling these methods is a responsibility of
+the scheduling sub-system, and will be documented in its documentation.)
+
+#### Developer Notes
+
+There are two types of actions that can be called on the bundle:
+* `attach`: schedules the given trigger type to be called by the scheduler,
+  at the given time
+  * The time is given as a Unix timestamp, or
+    `\Schoolbox\Realtime\Schedule\Module\ModuleNotifierInterface::IMMEDIATELY`
+    to schedule it to fire immediately
+* `detach`: retracts a previously scheduled trigger type from the scheduler, so
+  that it doesn't fire at all
+  * Generally, this is used for delete actions; it's usually not appropriate to
+    fire notifications for models that have been deleted
+
+#### Known Limitations
+
+`detach` only informs the scheduler that the trigger is to be retracted from
+the scheduler; it doesn't pass the message any further.
+
+This can cause issues if the scheduler has already processed an event, and the
+router has sent the resultant message to be sent by a non-instant delivery
+system (such as the digest, or web-app notifications); the delivery system
+doesn't know that the object has been deleted, and will therefore send
+notifications that reference deleted objects.
+
+A solution to this limitation is being considered.
+
 
 ### `\Alaress\Async\Broker\IBroker::publish`
 
+This method pushes the event and its scheduled triggers into the scheduling
+sub-system.
 
-## Supporting Objects and Methods
-
-#### `\Schoolbox\Mapper::diff`
-#### `\Schoolbox\Realtime\Schedule\Event\CrudEventInterface`
+At this point, the propagation sub-system's responsibilities are concluded; it
+is the scheduling sub-system's responsibility to then queue each trigger and
+its events, and call them when their time is reached.
