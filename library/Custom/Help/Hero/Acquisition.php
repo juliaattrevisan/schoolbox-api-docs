@@ -38,10 +38,6 @@ class Acquisition
     public function __construct(UserMapper $userMapper) {
         $this->courseSpecId = self::HERO_COURSE_SPEC_ID;
         $this->userMapper = $userMapper;
-
-        /* Can't proceed without this
-         */
-        $this->involvement = $this->findInvolvement();
     }
 
 
@@ -53,7 +49,7 @@ class Acquisition
      * @throws \TypeError
      * @throws \UnderflowException
      */
-    private function findInvolvement(): array
+    public function findInvolvement(): array
     {
         /* A list of assessment spec ids that are mandatory for the Hero award
          * There are some optional Due Works that don't contribute toward the achievement

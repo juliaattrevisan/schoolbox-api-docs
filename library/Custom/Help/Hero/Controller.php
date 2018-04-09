@@ -52,11 +52,14 @@ class Controller extends Base
         $this->userMapper = $userMapper;
     }
 
+
     /**
      * Hero Report
      *
      * All the people who have achieved Hero status
      *
+     * @throws \UnderflowException
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \Schoolbox\Application\Exception\Exception
      */
@@ -73,7 +76,9 @@ class Controller extends Base
             throw $this->errorMapper->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
         }
 
-        $acquisition = new Acquisition($this->userMapper);
+        $data = (new Acquisition($this->userMapper))->findInvolvement();
+
+        $aggregation = (new Aggregation())->aggregate($data);
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@helpHero/hero.twig', [
             'course' => $courseSpecification,
