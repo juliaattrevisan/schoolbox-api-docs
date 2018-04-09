@@ -332,7 +332,7 @@ class Acquisition
         /* A hashtable of tuples for a user, their highest-marked Feedback for each of the mandatory assessments
          */
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $hierarchy[$row['userId']][] = $row;
+            $hierarchy[$row['userId']][$row['attemptId']] = $row;
         }
 
         return $hierarchy;
