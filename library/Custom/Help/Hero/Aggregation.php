@@ -41,21 +41,39 @@ class Aggregation
                     ];
                 }
 
+                /* Figure out if this assessment spec stack already exists
+                 *
+                 * Reassignation shouldn't happen for Due Works; Acquisition gets unique Due Works with the highest
+                 * mark already, so I didn't need to throw data away here
+                 *
+                 * However, with quizzes, for some reason subqueries didn't work so I have to find the one with the
+                 * highest mark manually
+                 */
                 $key = $currentAssessmentData['specId'];
 
-                $aggregatedData[$userId]['assessments'][$key] = [
-                    'assessmentId' => $currentAssessmentData['assessmentId'],
-                    'assessmentTitle' => $currentAssessmentData['assessmentTitle'],
-                    'mark' => $currentAssessmentData['highestMark'],
-                ];
+                $assessmentSpecNotStackedYet = !array_key_exists($key, $aggregatedData[$userId]['assessments']);
+                $existingSpecHasLowerMark = ((float)$aggregatedData[$userId]['assessments'][$key]['mark'] < (float)$currentAssessmentData['mark']);
+
+                /* Stack it if it doesn't exist
+                 * Update the existing stack record if it already exists but mark was lower than current record
+                 */
+                if ($assessmentSpecNotStackedYet || $existingSpecHasLowerMark) {
+                    $aggregatedData[$userId]['assessments'][$key] = [
+                        'assessmentId' => $currentAssessmentData['assessmentId'],
+                        'assessmentTitle' => $currentAssessmentData['assessmentTitle'],
+                        'mark' => $currentAssessmentData['mark'],
+                    ];
+                }
 
                 /* Add to the count of assessments that received 100%
                  */
-                if ((float)$currentAssessmentData['highestMark'] === (float)100) {
+                if ((float)$currentAssessmentData['mark'] === (float)100) {
                     $aggregatedData[$userId]['fullmarks']++;
                 }
             }
         }
+
+        new \Alaress_Probe($aggregatedData);
 
         /* Identify those who qualified
          */
@@ -65,7 +83,7 @@ class Aggregation
             }
         }
 
-        new \Alaress_Probe($aggregatedData);
+
         return $aggregatedData;
     }
 }
