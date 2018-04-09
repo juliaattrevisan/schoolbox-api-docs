@@ -139,7 +139,7 @@ abstract class AbstractTreeBuilder
         // Open $categoryId's node and its parents
 
         foreach ($partialTree as &$leaf) {
-            $leaf['state']['opened'] = in_array($leaf['id'], $parentList) || $leaf['id'] === IFolder::ROOT_ID;
+            $leaf['state']['opened'] = in_array($leaf['id'], $parentList) || (int)$leaf['id'] === IFolder::ROOT_ID;
             $leaf['state']['selected'] = ($leaf['id'] == $categoryId);
         }
         unset($leaf);
