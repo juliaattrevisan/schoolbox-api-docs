@@ -107,11 +107,14 @@ class Notifier extends AbstractModuleNotifier
         // Create the message
 
         $timestamp = md5(date("YmdHis"));
+        $href = "/pastoral/student/{$pastoral->getStudent()->getId()}/record/{$pastoral->getId()}?ts={$timestamp}";
+
 
         $builder = new Builder();
-        $builder->setTitle("A pastoral comment has been {$method}")
+        $builder->setTitle("A :pastoralcare comment has been {$method}")
+                ->setParam('pastoralcare', new Param($this->l10n->translate('pastoralCare'), $href))
                 ->setIcon("/portrait.php?size=square32&userId={$owner->getExternalId()}")
-                ->setHref("/pastoral/student/{$pastoral->getStudent()->getId()}/record/{$pastoral->getId()}?ts={$timestamp}")
+                ->setHref($href)
                 ->setNamespace($this->getSlug())
                 ->setSeverity(Logger::ERROR)
                 ->addTopic("pastoral_comment.{$model->getId()}.{$method}");
