@@ -73,8 +73,6 @@ class Aggregation
             }
         }
 
-        new \Alaress_Probe($aggregatedData);
-
         /* Identify those who qualified
          */
         foreach ($aggregatedData as $userId => &$userData) {
@@ -82,7 +80,6 @@ class Aggregation
                 $userData['qualified'] = true;
             }
         }
-
 
         return $aggregatedData;
     }

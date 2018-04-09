@@ -80,7 +80,7 @@ class Acquisition
      */
     public function numRequired(): int
     {
-        return \count($this->mandatoryDueWorks);
+        return \count($this->mandatoryDueWorks) + \count($this->mandatoryQuizzes);
     }
 
     /**
