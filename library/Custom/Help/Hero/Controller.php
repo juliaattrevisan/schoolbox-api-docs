@@ -81,6 +81,8 @@ class Controller extends Base
             throw $this->errorMapper->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
         }
 
+        $start = microtime(true);
+
         /* Acquisition
          */
         $acquisition = new Acquisition($this->userMapper);
@@ -95,9 +97,12 @@ class Controller extends Base
          */
         $heroes = (new Heroes(Folder\Mapper::getInstance(), UserAccessMapper::getInstance()))->findHeroes();
 
+        $end = microtime(true);
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@helpHero/hero.twig', [
             'course' => $courseSpecification,
             'heroes' => $heroes,
+            'duration' => number_format($end - $start, 2),
             'aggregatedData' => $aggregatedData
         ]));
     }
