@@ -15,6 +15,10 @@ use Schoolbox\Learning\Course\DataModel\Specification;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
 
+use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Resource\Folder;
+
+
 ini_set('max_execution_time', 300);
 
 class Controller extends Base
@@ -58,6 +62,7 @@ class Controller extends Base
      *
      * All the people who have achieved Hero status
      *
+     * @throws \DomainException
      * @throws \UnderflowException
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Aura\Di\Exception\ServiceNotFound
@@ -88,8 +93,11 @@ class Controller extends Base
 
         /* Presentation
          */
+        $heroes = (new Heroes(Folder\Mapper::getInstance(), UserAccessMapper::getInstance()))->findHeroes();
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@helpHero/hero.twig', [
             'course' => $courseSpecification,
+            'heroes' => $heroes,
             'aggregatedData' => $aggregatedData
         ]));
     }
