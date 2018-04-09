@@ -2,6 +2,9 @@
 
 Tickets that meet the definitions below may have its status moved from 'Unconfirmed' to 'Ready' in Jira. Bugs that are ready may be brought into Sprint at any time as part of BAU. Stories and Tasks must either go through Sprint Planning, or be agreed upon as a team before going into Sprint. The one exception to this is if the task or story has an 'expresslane' label, in which case the ticket can be treated as BAU.
 
+## Epic
+* Problem statement is generated and documented.
+
 ## Bug
 * Steps to Reproduce field populated:
     * Local/Vagrant steps to reproduce if attainable.
