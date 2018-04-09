@@ -219,24 +219,22 @@ class Acquisition
             ORDER BY u.id, u.lastname, asi.specification_assessment_id, ar.attempt_id
         ";
 
-        new \Alaress_Probe($query, implode(',', $this->mandatoryQuizzes));
-        die();
-//        /* Use a totally random mapper
-//         */
-//        $statement = $this->userMapper->getDatabase()->prepare($query);
-//
-//        $statement->execute(array_merge([
-//            'homepageService' => UserAccess::SERVICE_HOMEPAGE,
-//        ], $pb->getParams()));
-//
-//        $hierarchy = [];
-//
-//        /* A hashtable of tuples for a user, their highest-marked Feedback for each of the mandatory assessments
-//         */
-//        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-//            $hierarchy[$row['userId']][] = $row;
-//        }
-//
-//        return $hierarchy;
+        /* Use a totally random mapper
+         */
+        $statement = $this->userMapper->getDatabase()->prepare($query);
+
+        $statement->execute(array_merge([
+            'homepageService' => UserAccess::SERVICE_HOMEPAGE,
+        ], $pb->getParams()));
+
+        $hierarchy = [];
+
+        /* A hashtable of tuples for a user, their highest-marked Feedback for each of the mandatory assessments
+         */
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $hierarchy[$row['userId']][] = $row;
+        }
+
+        return $hierarchy;
     }
 }
