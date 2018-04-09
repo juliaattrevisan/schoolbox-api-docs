@@ -163,7 +163,7 @@ class Acquisition
                 asi.specification_assessment_id AS specId,
                 a.id AS assessmentId, 
                 a.title AS assessmentTitle,
-                MAX(sr.norm_mark) AS highestMark
+                MAX(sr.norm_mark) AS mark
             FROM user u
             INNER JOIN userAccess ua ON ua.uid = u.`id`
             INNER JOIN course_implementation ci ON ua.sid = ci.`folder_id` AND ua.service = :homepageService
@@ -233,7 +233,7 @@ class Acquisition
                 a.id AS assessmentId, 
                 a.title AS assessmentTitle,
                 ar.attempt_id AS attemptId,
-                SUM(ar.mark) AS attemptTotal
+                SUM(ar.mark) AS mark
             FROM `user` u
             INNER JOIN userAccess ua ON ua.uid = u.`id`
             INNER JOIN course_implementation ci ON ua.sid = ci.`folder_id` AND ua.service = :homepageService
