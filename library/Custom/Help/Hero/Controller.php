@@ -80,7 +80,7 @@ class Controller extends Base
          */
         $acquisition = new Acquisition($this->userMapper);
         $numRequired = $acquisition->numRequired();
-        $rawData = $acquisition->findInvolvement();
+        $rawData = $acquisition->findDueWork();
 
         /* Aggregation
          */

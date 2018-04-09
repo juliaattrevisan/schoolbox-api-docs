@@ -68,7 +68,7 @@ class Acquisition
      * @throws \TypeError
      * @throws \UnderflowException
      */
-    public function findInvolvement(): array
+    public function findDueWork(): array
     {
         /* Dynamically assemble WHERE clause
          */
