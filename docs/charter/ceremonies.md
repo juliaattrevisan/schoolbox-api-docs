@@ -26,7 +26,7 @@ Ceremonies are the regular meetings we have as a product team. Along with the fo
 > * How will the work needed to deliver the Increment be achieved?
 
 ## Daily Standup / Scrum
-* **When:** 11:50am everyday of the Sprint
+* **When:** 2pm every day of the Sprint
 * **Timebox:** 15 minutes
 
 > The Development Team plans work for the next 24 hours. This optimizes team collaboration and performance by inspecting the work since the last Daily Scrum and forecasting upcoming Sprint work.
@@ -42,7 +42,7 @@ Ceremonies are the regular meetings we have as a product team. Along with the fo
       after the standup.
 
 ## Workshops
-* **When:** Tuesdays at 11:00am, Thursdays at 1:30pm
+* **When:** Tuesdays and Thursdays at 11:00am
 * **Timebox:** Varies per session, 2 hours at most
 
 Workshops are flexible in that they can take the form of a different type of session, depending on what is required most at the time.
