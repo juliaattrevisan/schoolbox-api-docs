@@ -95,15 +95,18 @@ class TreeBuilder extends Resources\TreeBuilder
     /**
      * @inheritdoc
      */
-    protected function buildLiAttributes($permission, $dataType)
+    protected function buildLiAttributes(IFolder $folder, string $permission, string $dataType): array
     {
-        $liAttributes = parent::buildLiAttributes($permission, $dataType);
-        if ($dataType === NodeInterface::TYPE_NO_ACCESS) {
-            $liAttributes += [
-                'title' => 'Courses cannot be placed into other courses'
-            ];
+        // Suppress leak of parent node title
+        $title = '';
+
+        if ($this->currentParentId === (int)$folder->getId()) {
+            $title = 'Current course location';
+        } elseif (NodeInterface::TYPE_NO_ACCESS === $dataType) {
+            $title = 'Courses cannot be placed into other courses';
         }
-        return $liAttributes;
+
+        return parent::buildLiAttributes($folder, $permission, $dataType) + ['title' => $title];
     }
 }
 

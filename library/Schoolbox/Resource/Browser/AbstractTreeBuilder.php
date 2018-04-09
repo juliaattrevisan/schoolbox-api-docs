@@ -248,7 +248,7 @@ abstract class AbstractTreeBuilder
             $name,
             $colour,
             $coverImage,
-            $this->buildLiAttributes($permission, $this->getDataType($folder, $type)),
+            $this->buildLiAttributes($folder, $permission, $this->getDataType($folder, $type)),
             [
                 'href' => $href
             ],
@@ -258,11 +258,12 @@ abstract class AbstractTreeBuilder
 
 
     /**
-     * @param string    $permission
-     * @param string    $dataType
+     * @param IFolder $folder
+     * @param string  $permission
+     * @param string  $dataType
      * @return array
      */
-    protected function buildLiAttributes($permission, $dataType)
+    protected function buildLiAttributes(IFolder $folder, string $permission, string $dataType): array
     {
         return [
             'data-permission' => $permission,
