@@ -3,3 +3,28 @@
         <h1>Hero Report</h1>
     </div>
 </div>
+
+<div class="row">
+    <div class="small-12 columns">
+        <table>
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Qualification</th>
+                    <th>Put On The Wall</th>
+                </tr>
+            </thead>
+            {% for id, userData in aggregatedData %}
+            <tr>
+                <td><a href="/search/user/{{ id }}">{{ userData.firstname }} {{ userData.lastname }}</a></td>
+                <td>
+                    {% if userData.qualified %}
+                    Qualified
+                    {% endif %}
+                </td>
+                <td></td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
