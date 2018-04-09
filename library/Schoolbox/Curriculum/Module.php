@@ -31,6 +31,9 @@ class Module extends BaseModule
     {
         $importModule = new Import\Module($injector);
         $importModule->init($basePath.'/import');
+
+        $rubiconModule = new Rubicon\Module($injector);
+        $rubiconModule->init($basePath.'/rubicon');
     }
 
     /**
