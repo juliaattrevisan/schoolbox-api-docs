@@ -50,13 +50,16 @@ class Acquisition
         16911, // Unit 7, Project 1 Test your knowledge of advanced component usage
         15913, // Unit 7, Project 2 Test your knowledge of creating pages
         15772, // Unit 8, Project 1 Complete this continuous reporting quiz
-        43618, // Unit 9 Review your knowledge of v17
-        46375, // Unit 9 Review your knowledge of v17.5
 
         /* These exist in the course/modify/23 url but not in Alaress Teacher Course
          */
         // 15578, // Unit 2, Project 2 Verify your understanding of news
         // 15767, // Unit 3, Project 1 Assess your knowledge of the timetable
+
+        /* I don't think these are mandatory for the achievement
+         */
+        // 43618, // Unit 9 Review your knowledge of v17
+        // 46375, // Unit 9 Review your knowledge of v17.5
     ];
 
     /**
