@@ -84,7 +84,7 @@ abstract class AbstractTreeBuilder
         }
 
         // Build the root node
-        $partialTree = $this->buildChildNodes($baseFolder);
+        $partialTree = $this->buildChildNodes($baseFolder, $parentList);
 
         if ($baseFolder == '#') {
             // Build the parent nodes
