@@ -1565,8 +1565,8 @@ class Controller extends Base\Base
         $folder = $this->folderMapper->findById($folderId);
 
         $treeBuilder = new TreeBuilder(
-            FolderMapper::getInstance(),
-            $_SESSION['user'],
+            $this->folderMapper,
+            $this->getUser(),
             $folder->getId()
         );
 
