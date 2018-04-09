@@ -18,6 +18,12 @@
                 </tr>
             </thead>
             {% for id, userData in aggregatedData %}
+
+            {# TODO: I think this should ultimately be showing Qualified people who aren't on the wall
+             # ie. those who haven't received their achievement
+             #
+             # if userData.qualified and not heroes[id]
+             #}
             {% if userData.qualified or heroes[id]%}
             <tr>
                 <td><a href="/search/user/{{ id }}">{{ userData.firstname }} {{ userData.lastname }}</a></td>
