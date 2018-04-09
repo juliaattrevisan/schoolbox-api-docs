@@ -16,6 +16,7 @@ class Aggregation
      * Aggregate data to work out who qualified for Hero status
      *
      * @param array $data
+     * @return array
      */
     public function aggregate(array $data)
     {
@@ -23,25 +24,38 @@ class Aggregation
 
         /* Build a hierarchy of data
          */
-        foreach ($data as $id => $currentData) {
-            if (!array_key_exists($id, $aggregatedData)) {
-                $aggregatedData[$id] = [
-                    'firstname' => $currentData['firstname'],
-                    'lastname' => $currentData['lastname'],
-                    'assessments' => []
+        /**
+         * @var int $id
+         * @var array $assessmentData
+         */
+        foreach ($data as $id => $assessmentData) {
+            foreach ($assessmentData as $currentAssessmentData) {
+                if (!array_key_exists($id, $aggregatedData)) {
+                    $aggregatedData[$id] = [
+                        'firstname' => $currentAssessmentData['firstname'],
+                        'lastname' => $currentAssessmentData['lastname'],
+                        'fullmarks' => 0,
+                        'assessments' => []
+                    ];
+                }
+
+                $key = $currentAssessmentData['assessmentId'];
+
+                $aggregatedData[$id]['assessments'][$key] = [
+                    'specId' => $currentAssessmentData['specId'],
+                    'assessmentId' => $currentAssessmentData['assessmentId'],
+                    'assessmentTitle' => $currentAssessmentData['assessmentTitle'],
+                    'mark' => $currentAssessmentData['highestMark'],
                 ];
+
+                /* Add to the count of assessments that received 100%
+                 */
+                if ((float)$currentAssessmentData['highestMark'] === (float)100) {
+                    $aggregatedData[$id]['fullmarks']++;
+                }
             }
-
-            $key = $currentData['assessmentId'];
-
-            $aggregatedData[$id]['assessments'][$key] = [
-                'specId' => $currentData['specId'],
-                'assessmentId' => $currentData['assessmentId'],
-                'assessmentTitle' => $currentData['assessmentTitle'],
-                'mark' => $currentData['highestMark'],
-            ];
-
-            new \Alaress_Probe($aggregatedData);
         }
+
+        return $aggregatedData;
     }
 }
