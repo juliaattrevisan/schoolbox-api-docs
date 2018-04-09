@@ -37,6 +37,7 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Assessment\Course\TreeBuilder;
 use Schoolbox\Resource\Folder\Ancestry;
+use Schoolbox\Resource\Folder\IFolder;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Folder\Controller as FolderController;
@@ -1570,10 +1571,19 @@ class Controller extends Base\Base
             $folder->getId()
         );
 
+        // Don't show children if this is an invalid location
+        $showChildren = true;
+        $i            = 0;
+        while ($folder && IFolder::ROOT_ID !== (int)$folder->getId() && $showChildren && $i++ < 1000) {
+            if (\in_array($folder->getFolderType(), ['course', 'unit'], true)) {
+                $showChildren = false;
+            }
+            $folder = $this->folderMapper->findById($folder->getParent()->getId());
+        }
 
         $this->getResponse()->content->set([
             'format' => 'json',
-            'data'   => $treeBuilder->buildChildNodes($folderId, [], $mime)
+            'data'   => $showChildren ? $treeBuilder->buildChildNodes($folderId, [], $mime) : [],
         ]);
     }
 }

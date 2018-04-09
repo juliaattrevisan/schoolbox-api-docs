@@ -49,9 +49,18 @@ class TreeBuilder extends Resources\TreeBuilder
         if (\in_array($folder->getId(), $parentList, false)) {
             return true;
         }
+
         // Don't build tree below courses or units
-        $folderType = $folder->getParent()->getNodeType();
-        return !($folderType === NodeInterface::TYPE_COURSE || $folderType === NodeInterface::TYPE_UNIT);
+        $parent = $folder->getParent();
+        $i      = 0;
+        while ($parent && (int)$parent->getId() !== IFolder::ROOT_ID && $parent->getId() !== IFolder::ROOT_PARENT_ID && $i++ < 1000) {
+            $folderType = $parent->getNodeType();
+            if ($folderType === NodeInterface::TYPE_COURSE || $folderType === NodeInterface::TYPE_UNIT) {
+                return false;
+            }
+            $parent = $parent->getParent();
+        }
+        return true;
     }
 
 
