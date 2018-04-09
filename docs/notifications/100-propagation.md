@@ -167,3 +167,5 @@ sub-system.
 At this point, the propagation sub-system's responsibilities are concluded; it
 is the scheduling sub-system's responsibility to then queue each trigger and
 its events, and call them when their time is reached.
+
+[Scheduling sub-system documentation >](200-scheduling.md)
