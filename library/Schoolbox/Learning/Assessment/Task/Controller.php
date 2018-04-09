@@ -127,6 +127,8 @@ class Controller extends Assessment\Controller
 
             if ($previewFragment['type'] == 'redirect' && !$assessment->getDescription()) {
 
+                $this->saveTaskResponse(TaskCompletion::STATUS_SELF_ASSESSED_COMPLETE, $assessment, $student);
+
                 /* Just forward if we only have a URL
                  */
                 $this->getResponse()->redirect->temporaryRedirect($assessment->getUrl());
@@ -224,42 +226,8 @@ class Controller extends Assessment\Controller
     {
         // Did user mark (regardless of who they are) the task as incomplete ?
         $completionStatus = $this->getRequest()->post->getInt('status');
-        $isMarkedComplete = $completionStatus != TaskCompletion::STATUS_INCOMPLETE;
 
-        $response = (new TaskResponse())
-            ->setAssessable($assessment)
-            ->setSubmittedOnBehalfOf($student)
-            ->setSubmittedBy($this->getUser())
-            // TODO figure out whether to set create time as now, or set it as a created timestamp in mapper
-            ->setCreatedAt(\Alaress_Date_Format::now())
-            ->setMarkedComplete($isMarkedComplete);
-
-        if (TaskCompletion::STATUS_TEACHER_ASSESSED_COMPLETE == $completionStatus) {
-            $feedback = (new Feedback\Model())
-                ->setResponse($response);
-            $response->getAllFeedback()->add($feedback);
-        }
-
-        try{
-            $participant = $assessment->getParticipantIfExtant($student);
-            if ($participant) {
-                $this->assertSaveability($participant, $response);
-            }
-        } catch (\UnexpectedValueException $e){
-
-            // Cast reason to standardised/localised representation
-            $errorException = $this->getErrorMapper()->generateException(Error\Mapper::ERROR_INVALID_TASK_COMPLETION, null, $e->getMessage());
-
-            $result['success']   = false;
-            $result['message']   = $errorException->getMessage();
-            $result['id']        = null;
-            $this->getResponse()->status->setCode(400);
-            $this->getResponse()->content->set($this->buildJsonOutput($result));
-            return;
-        }
-
-        // And save (no need to save a feedback - it will be built automatically from this response on DB retrieval)
-        $this->taskResponseDataSource->save($response);
+        $response = $this->saveTaskResponse($completionStatus, $assessment, $student);
 
         // And redirect somewhere
         if ($this->getRequest()->isXhr()) {
@@ -357,5 +325,53 @@ class Controller extends Assessment\Controller
         return $data;
     }
 
+    /**
+     *
+     * @param int $completionStatus status to mark
+     * @param IAssessable $assessment
+     * @param User $student
+     * @return TaskResponse $taskResponse Updated task response
+     * @throws \Aura\Web\Exception\InvalidStatusCode if value is invalid
+     */
+    private function saveTaskResponse(int $completionStatus, IAssessable $assessment, User $student)
+    {
+        $isMarkedComplete = $completionStatus != TaskCompletion::STATUS_INCOMPLETE;
+
+        $taskResponse = (new TaskResponse())
+            ->setAssessable($assessment)
+            ->setSubmittedOnBehalfOf($student)
+            ->setSubmittedBy($this->getUser())
+            // TODO figure out whether to set create time as now, or set it as a created timestamp in mapper
+            ->setCreatedAt(\Alaress_Date_Format::now())
+            ->setMarkedComplete($isMarkedComplete);
+
+        if (TaskCompletion::STATUS_TEACHER_ASSESSED_COMPLETE == $completionStatus) {
+            $feedback = (new Feedback\Model())
+                ->setResponse($taskResponse);
+            $taskResponse->getAllFeedback()->add($feedback);
+        }
+
+        try{
+            $participant = $assessment->getParticipantIfExtant($student);
+            if ($participant) {
+                $this->assertSaveability($participant, $taskResponse);
+            }
+        } catch (\UnexpectedValueException $e){
+
+            // Cast reason to standardised/localised representation
+            $errorException = $this->getErrorMapper()->generateException(Error\Mapper::ERROR_INVALID_TASK_COMPLETION, null, $e->getMessage());
+
+            $result['success']   = false;
+            $result['message']   = $errorException->getMessage();
+            $result['id']        = null;
+            $this->getResponse()->status->setCode(400);
+            $this->getResponse()->content->set($this->buildJsonOutput($result));
+            return;
+        }
+
+        // And save (no need to save a feedback - it will be built automatically from this response on DB retrieval)
+        $this->taskResponseDataSource->save($taskResponse);
+        return $taskResponse;
+    }
 
 }
