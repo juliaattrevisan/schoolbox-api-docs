@@ -9,6 +9,7 @@
 namespace Custom\Stk\NCEA;
 
 use Alaress\Authorizer\Rule;
+use Alaress\Database\Connector\IConnector;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\Container;
@@ -71,6 +72,7 @@ class Module extends BaseModule
         $this->register('GET', '/report/{id}/{year}', 'getReport', $getPerms, $preloadUser);
     }
 
+
     /**
      * Preload a User instance
      *
@@ -78,6 +80,8 @@ class Module extends BaseModule
      * @return array
      * @throws InvalidArgumentException
      * @throws NotFound
+     * @throws \Alaress\Database\Exception
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     private function preloadUser(array $params): array
     {
@@ -95,6 +99,15 @@ class Module extends BaseModule
 
         if ($externalUser['StudentIBFlag']) {
             throw new NotFound('NCEA Reports not available to IB Students');
+        }
+
+        /** @var IConnector $externalDb */
+        $externalDb = $this->getInjector()->get('databaseExternal');
+
+        $availability = (new Availability($externalDb))->hasAccess($user->getYear());
+
+        if (!$availability) {
+            throw new NotFound('Unavailable for this student\'s year level due to OLE flag');
         }
 
         /* Year level boundaries
