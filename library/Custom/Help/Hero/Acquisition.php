@@ -50,6 +50,15 @@ class Acquisition
         $this->userMapper = $userMapper;
     }
 
+    /**
+     * Number of assessments that are required to get Hero status
+     *
+     * @return int
+     */
+    public function numRequired(): int
+    {
+        return \count($this->mandatoryDueWorks);
+    }
 
     /**
      * Find all the assessments and any Feedbacks that exist for them

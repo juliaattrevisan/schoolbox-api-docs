@@ -76,12 +76,21 @@ class Controller extends Base
             throw $this->errorMapper->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
         }
 
-        $data = (new Acquisition($this->userMapper))->findInvolvement();
+        /* Acquisition
+         */
+        $acquisition = new Acquisition($this->userMapper);
+        $numRequired = $acquisition->numRequired();
+        $rawData = $acquisition->findInvolvement();
 
-        $aggregation = (new Aggregation())->aggregate($data);
+        /* Aggregation
+         */
+        $aggregatedData = (new Aggregation())->aggregate($rawData, $numRequired);
 
+        /* Presentation
+         */
         $this->getResponse()->content->set($this->buildHtmlOutput('@helpHero/hero.twig', [
             'course' => $courseSpecification,
+            'aggregatedData' => $aggregatedData
         ]));
     }
 }

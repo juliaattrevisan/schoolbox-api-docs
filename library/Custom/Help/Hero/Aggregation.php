@@ -15,10 +15,11 @@ class Aggregation
     /**
      * Aggregate data to work out who qualified for Hero status
      *
-     * @param array $data
+     * @param array $data Data from Acquisition
+     * @param int   $numRequired Number of assessments that must be 100% to get Hero status
      * @return array
      */
-    public function aggregate(array $data)
+    public function aggregate(array $data, int $numRequired)
     {
         $aggregatedData = [];
 
@@ -35,6 +36,7 @@ class Aggregation
                         'firstname' => $currentAssessmentData['firstname'],
                         'lastname' => $currentAssessmentData['lastname'],
                         'fullmarks' => 0,
+                        'qualified' => false,
                         'assessments' => []
                     ];
                 }
@@ -53,6 +55,14 @@ class Aggregation
                 if ((float)$currentAssessmentData['highestMark'] === (float)100) {
                     $aggregatedData[$id]['fullmarks']++;
                 }
+            }
+        }
+
+        /* Identify those who qualified
+         */
+        foreach ($aggregatedData as $id => &$userData) {
+            if ($userData['fullmarks'] === $numRequired) {
+                $userData['qualified'] = true;
             }
         }
 
