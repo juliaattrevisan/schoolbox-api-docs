@@ -22,7 +22,11 @@
                     Qualified
                     {% endif %}
                 </td>
-                <td></td>
+                <td>
+                    {% if heroes[id] %}
+                    Already on wall
+                    {% endif %}
+                </td>
             </tr>
             {% endfor %}
         </table>

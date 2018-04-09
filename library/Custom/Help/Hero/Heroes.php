@@ -9,10 +9,10 @@
 
 namespace Custom\Help\Hero;
 
-use Schoolbox\Collection;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder;
+use Schoolbox\User;
 
 class Heroes
 {
@@ -45,10 +45,10 @@ class Heroes
      * Find a list of Heroes already on the Wall
      * /homepage/2209
      *
-     * @return Collection
+     * @return array
      * @throws \DomainException
      */
-    public function findHeroes(): Collection
+    public function findHeroes(): array
     {
         try {
             $folder = $this->folderMapper->findById($this->heroFolderId);
@@ -58,6 +58,12 @@ class Heroes
             throw new \DomainException('Could not obtain Hero Wall folder id');
         }
 
-        return $users;
+        /* Convert it into something nicer to use
+         */
+        $heroesCallback = function (User $user) {
+            return $user->getId();
+        };
+
+        return $users->indexByCallback($heroesCallback)->getAll();
     }
 }
