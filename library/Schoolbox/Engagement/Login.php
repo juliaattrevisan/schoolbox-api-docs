@@ -51,7 +51,7 @@ class Login
             FROM login_log
             JOIN `user` ON login_log.username = `user`.username
             JOIN groups ON user.group_id = groups.id
-            WHERE login=1 AND date >= :start AND date <= :end
+            WHERE login=1 AND date >= :start AND date <= :end AND `user`.deleted_at IS NULL
             GROUP BY group_id';
 
         $statement = $this->database->prepareQuery($query);
@@ -76,7 +76,7 @@ class Login
             (
                 SELECT COUNT(DISTINCT(`user`.username)) FROM `user`
                 INNER JOIN login_log ON `user`.username = login_log.username
-                WHERE group_id = groups.id AND login=1 AND `date` >= :start AND `date` <= :end
+                WHERE group_id = groups.id AND login=1 AND `date` >= :start AND `date` <= :end AND `user`.deleted_at IS NULL
             ) AS total
           FROM groups';
 
