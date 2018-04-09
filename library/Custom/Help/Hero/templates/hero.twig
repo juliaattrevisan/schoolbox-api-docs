@@ -15,6 +15,7 @@
                 </tr>
             </thead>
             {% for id, userData in aggregatedData %}
+            {% if userData.qualified or heroes[id]%}
             <tr>
                 <td><a href="/search/user/{{ id }}">{{ userData.firstname }} {{ userData.lastname }}</a></td>
                 <td>
@@ -28,6 +29,7 @@
                     {% endif %}
                 </td>
             </tr>
+            {% endif %}
             {% endfor %}
         </table>
     </div>
