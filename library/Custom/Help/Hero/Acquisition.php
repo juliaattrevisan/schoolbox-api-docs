@@ -23,6 +23,16 @@ class Acquisition
     public const HERO_COURSE_SPEC_ID = 23;
 
     /**
+     * A list of assessment spec ids that are mandatory for the Hero award
+     * There are some optional Due Works that don't contribute toward the achievement
+     */
+    private $mandatoryDueWorks = [
+        15574, // Unit 4, Project 3 Advanced Course Skills
+        15607, // Unit 5, Project 2 Master Courses And Classes
+        15635, // Unit 7, Project 3 Managing Groups And Pages
+    ];
+
+    /**
      * @var UserMapper
      */
     private $userMapper;
@@ -51,15 +61,6 @@ class Acquisition
      */
     public function findInvolvement(): array
     {
-        /* A list of assessment spec ids that are mandatory for the Hero award
-         * There are some optional Due Works that don't contribute toward the achievement
-         */
-        $mandatoryDueWorks = [
-            15574, // Unit 4, Project 3 Advanced Course Skills
-            15607, // Unit 5, Project 2 Master Courses And Classes
-            15635, // Unit 7, Project 3 Managing Groups And Pages
-        ];
-
         /* Dynamically assemble WHERE clause
          */
         $pb = new Builder($this->userMapper->getDatabase(), 'upd');
@@ -71,7 +72,7 @@ class Acquisition
         $pb->isNull('a.deleted_at');
         $pb->notEquals('a.created_at', '0000-00-00 00:00:00');
         $pb->isNull('u.deleted_at');
-        $pb->in('asi.specification_assessment_id', $mandatoryDueWorks);
+        $pb->in('asi.specification_assessment_id', $this->mandatoryDueWorks);
         $pb->notNull('sr.published_at');
 
         $where = implode("\nAND ", $pb->getWhere());
