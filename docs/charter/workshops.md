@@ -14,7 +14,7 @@ Pre-reading: “What’s Your Problem?” by Matt Lavoie ([Part 1](https://drive
     Prepared by:    Product Owner
     Deliverables:   Problem statement
 
-### Agile UX Board
+### Questions and Assumptions Session
     Involves:       Whole team
     Preparation:    Epics written
     Prepared by:    Strike Team
