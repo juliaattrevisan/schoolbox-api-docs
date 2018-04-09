@@ -29,8 +29,8 @@ class User_Logger_AssumeUser extends DeprecatedModel {
 	 * @param \Schoolbox\User $user
 	 */
 	public function __construct(\Schoolbox\User $currentUser, \Schoolbox\User $user) {
-		$this->setCurrentUser($currentUser);
-		$this->setUser($user);
+        $this->currentUser = $currentUser;
+        $this->user        = $user;
 
 		parent::__construct();
 	}
@@ -40,49 +40,14 @@ class User_Logger_AssumeUser extends DeprecatedModel {
 	 */
 	public function notify() {
 		$date = new Alaress_Date_Format(time(), 'U');
-		$user = $this->getUser();
 
 		$log = array(
-			'user' => $this->getCurrentUser()->getUsername(),
-			'assumed' => $user->getUsername(),
+			'user' => $this->currentUser->getUsername(),
+			'assumed' => $this->user->getUsername(),
 			'created_at' => $date->getDatabase(),
 			'ip' => $_SERVER['REMOTE_ADDR'],
 		);
 
 		parent::create($log);
-	}
-
-	/**
-	 * Set session
-	 *
-	 * @param \Schoolbox\User $currentUser
-	 */
-	private function setCurrentUser($currentUser) {
-		$this->currentUser = $currentUser;
-	}
-
-	/**
-	 * Get session
-	 *
-	 * @return \Schoolbox\User
-	 */
-	private function getCurrentUser() {
-		return $this->currentUser;
-	}
-
-	/**
-	 * Set user
-	 *
-	 * @param \Schoolbox\User $user
-	 */
-	private function setUser($user) {
-		$this->user = $user;
-	}
-
-	/**
-	 * @return \Schoolbox\User
-	 */
-	private function getUser() {
-		return $this->user;
 	}
 }
