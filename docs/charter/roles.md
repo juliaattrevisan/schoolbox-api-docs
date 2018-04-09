@@ -69,21 +69,3 @@ Proactively work to facilitate team's ability to successfully deliver the sprint
 * Move issues from Unconfirmed to Confirmed
 * Fix critical issues
 * Add items into sprint and backlog if necessary
-
-## UX
-
-### Problem Elicitation 
-
-Engage with stakeholders to uncover the underlying problems that are trying to be addressed. 
-
-### Discovery
-
-Gather data by performing research tasks, such as analytics, workshops, interviews, focus groups, surveys, user tests (eg. True Intent, Remote Unmoderated, Local Moderated, etc.)
-
-### Definition 
-
-Coalesce data from Discovery into a usable state, such as personas, empathy maps, user journeys, affinity maps, etc. The **most important** activity in this phase is generation of a User Story Backbone that can be used as a starting point for story decomposition.
-
-### Foundational work 
-
-“Just Enough, Just in Time.” This work needs to be started several sprints in advance, as orchestrated by SM. While this does include cross-cutting concerns and external influences, from specifically a UX Design standpoint this represents \[ sketches &rarr; flows &rarr; mockups &rarr; live prototypes ] so that—by the time the story lands in the sprint—the fundamental UX considerations have been mostly dealt with.
