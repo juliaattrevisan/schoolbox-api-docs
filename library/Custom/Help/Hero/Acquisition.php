@@ -222,7 +222,7 @@ class Acquisition
         /* Find all the Quizzes and their 100% Attempts
          * This is a list of all the people who qualify for Hero status
          *
-         * Unfortunately need to do a subquery, because the attempts' totals are derived and not cached anywhere
+         * Unfortunately need to do postprocessing, because the attempts' totals are derived and not cached anywhere
          */
         $query = "
             SELECT 
