@@ -18,6 +18,10 @@ $swipe-color-hover: $steel;
     margin: auto;
   }
 
+  .swiper-slide img {
+    width: 100%;
+  }
+
   .swiper-button-prev,
   .swiper-button-next {
     background-image: none;
