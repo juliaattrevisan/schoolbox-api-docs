@@ -11,7 +11,7 @@
                 <tr>
                     <th>User</th>
                     <th>Qualification</th>
-                    <th>Put On The Wall</th>
+                    <th>Action</th>
                 </tr>
             </thead>
             {% for id, userData in aggregatedData %}
@@ -22,9 +22,9 @@
                     Qualified
                     {% endif %}
                 </td>
-                <td>
+                <td class="actions-small-1">
                     {% if heroes[id] %}
-                    Already on wall
+                        <a class="icon-favourite" title="{{ userData.firstname }} {{ userData.lastname }} is on the Hero Wall"></a>
                     {% endif %}
                 </td>
             </tr>
@@ -32,3 +32,5 @@
         </table>
     </div>
 </div>
+
+<div id="heroise-toast" class="toast"></div>
