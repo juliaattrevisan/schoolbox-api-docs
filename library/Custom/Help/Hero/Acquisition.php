@@ -84,17 +84,15 @@ class Acquisition
     }
 
     /**
-     * Find all the assessments and any Feedbacks that exist for them
-     * If there are Feedbacks, find the one with the maximum normalised mark
-     * @return array
+     * Dynamically assemble WHERE clause
+     *
+     * Shared between Due Work and Quizzes pieces
+     *
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \TypeError
-     * @throws \UnderflowException
      */
-    public function findDueWork(): array
+    private function makeDefaultBuilder()
     {
-        /* Dynamically assemble WHERE clause
-         */
         $pb = new Builder($this->userMapper->getDatabase(), 'upd');
         $pb->equals('cs.id', $this->courseSpecId);
         $pb->isNull('cs.deleted_at');
@@ -104,6 +102,21 @@ class Acquisition
         $pb->isNull('a.deleted_at');
         $pb->notEquals('a.created_at', '0000-00-00 00:00:00');
         $pb->isNull('u.deleted_at');
+
+        return $pb;
+    }
+
+    /**
+     * Find all the assessments and any Feedbacks that exist for them
+     * If there are Feedbacks, find the one with the maximum normalised mark
+     * @return array
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \TypeError
+     * @throws \UnderflowException
+     */
+    public function findDueWork(): array
+    {
+        $pb = $this->makeDefaultBuilder();
         $pb->in('asi.specification_assessment_id', $this->mandatoryDueWorks);
         $pb->notNull('sr.published_at');
 
@@ -167,17 +180,7 @@ class Acquisition
      */
     public function findQuiz(): array
     {
-        /* Dynamically assemble WHERE clause
-         */
-        $pb = new Builder($this->userMapper->getDatabase(), 'upd');
-        $pb->equals('cs.id', $this->courseSpecId);
-        $pb->isNull('cs.deleted_at');
-        $pb->isNull('ci.deleted_at');
-        $pb->isNull('cui.deleted_at');
-        $pb->isNull('p.deleted_at');
-        $pb->isNull('a.deleted_at');
-        $pb->notEquals('a.created_at', '0000-00-00 00:00:00');
-        $pb->isNull('u.deleted_at');
+        $pb = $this->makeDefaultBuilder();
         $pb->in('asi.specification_assessment_id', $this->mandatoryQuizzes);
         $pb->isNull('ass.deleted_at');
         $pb->notNull('aa.reviewed_at');
