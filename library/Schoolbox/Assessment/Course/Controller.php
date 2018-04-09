@@ -1561,10 +1561,13 @@ class Controller extends Base\Base
             $mime = "*/*";
         }
 
+        // hydrate so children can detect parent folder type
+        $folder = $this->folderMapper->findById($folderId);
+
         $treeBuilder = new TreeBuilder(
             FolderMapper::getInstance(),
             $_SESSION['user'],
-            $folderId
+            $folder->getId()
         );
 
 
