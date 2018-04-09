@@ -292,7 +292,7 @@ class Acquisition
     /**
      * Figure out the maximum marks available in each attempt
      *
-     * Due to randomised questions ths maximum mark might vary
+     * Due to randomised questions this maximum mark might vary
      *
      * @return array
      * @throws \Alaress\Database\Predicate\InvalidColumnException
