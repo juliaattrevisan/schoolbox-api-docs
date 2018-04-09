@@ -284,8 +284,7 @@ class Acquisition
 
             $hierarchy[$row['userId']][] = $row;
         }
-new \Alaress_Probe($hierarchy[467]);
-        die();
+
         return $hierarchy;
     }
 
