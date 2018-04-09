@@ -4,10 +4,15 @@
 * Peer Review
     * Code Standard 
     * Static analysis
-    * Unit test run
+    * No unit tests are failing (related or otherwise)
     * Code runs and is functional in accordance to acceptance criteria
 * Quality Assurance
-    * Ensure that system working to an acceptable level
+    * Ensure that system working to an acceptable level by asking the question "What would happen if I&hellip;", eg.
+        * "&hellip;turned off my vagrant's internet connection?"
+        * "&hellip;changed to a different SIS connector?"
+        * "&hellip;provisioned a different dataset?"
+        * "&hellip;soft-deleted every \[insert entity type here] in the system?"
+        * "&hellip;turned off RabbitMQ or Redis?"
     * Check the acceptance criteria are still met
 
 ## Story or Task
@@ -26,14 +31,14 @@
 
 ## Sprint
 * Committed stories done
-* Showcase
+* Sprint Review
 * Retrospective
 
 ## Minor Release
 * Release notes are written
 * Regression Testing
-* Based on release notes
-* Utilise and chaos test all function affected by release notes
+    * Based on release notes
+    * Utilise and chaos test all functionality affected by release notes
 * Build is packaged and passes all checks
 
 ## Beta Release
