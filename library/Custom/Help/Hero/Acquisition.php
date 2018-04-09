@@ -42,7 +42,6 @@ class Acquisition
     private $mandatoryQuizzes = [
         16058, // Unit 1, Project 2 Prove yourself as a Schoolbox Teacher Newbie
         15912, // Unit 2, Project 1 Review your knowledge of the calendar
-        15578, // Unit 2, Project 2 Verify your understanding of news
         15579, // Unit 2, Project 2 Verify your understanding of viewing and posting news
         15767, // Unit 3, Project 1 Assess your knowledge of the timetable
         15766, // Unit 3, Project 1 Assess your knowledge of the timetable and marking attendance
@@ -53,6 +52,10 @@ class Acquisition
         15772, // Unit 8, Project 1 Complete this continuous reporting quiz
         43618, // Unit 9 Review your knowledge of v17
         46375, // Unit 9 Review your knowledge of v17.5
+
+        /* These exist in the course/modify/23 url but not in Alaress Teacher Course
+         */
+        // 15578, // Unit 2, Project 2 Verify your understanding of news
     ];
 
     /**
@@ -277,7 +280,8 @@ class Acquisition
 
             $hierarchy[$row['userId']][] = $row;
         }
-
+new \Alaress_Probe($hierarchy[467]);
+        die();
         return $hierarchy;
     }
 
