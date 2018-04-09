@@ -268,6 +268,13 @@ class Acquisition
         /* A hashtable of tuples for a user, their highest-marked Feedback for each of the mandatory assessments
          */
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+
+            /* Figure out the normalised mark for each attempt
+             */
+            $normalisedMark = 100.00000 * (float)$row['mark'] / (float)$availableMarks[$row['userId']][$row['attemptId']]['availableMarks'];
+
+            $row['mark'] = $normalisedMark;
+
             $hierarchy[$row['userId']][] = $row;
         }
 
@@ -307,7 +314,7 @@ class Acquisition
                 a.id AS assessmentId, 
                 a.title AS assessmentTitle,
                 ar.attempt_id AS attemptId,
-                SUM(aq.marks) AS mark
+                SUM(aq.marks) AS availableMarks
             FROM `user` u
             {$this->commonJoin}
             INNER JOIN assess ass ON a.`id` = ass.`assessment_id`
