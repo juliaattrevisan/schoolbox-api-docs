@@ -11,7 +11,6 @@ namespace Custom\Help\Hero;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Error;
-use Schoolbox\Learning\Assessment\DataModel;
 use Schoolbox\Learning\Course\DataModel\Specification;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
@@ -68,11 +67,13 @@ class Controller extends Base
          * For now, we hardcode this manually; is reasonable to assume it exists
          */
         try {
-            $courseSpecification = $this->courseSpecificationMapper->findById(23);
+            $courseSpecification = $this->courseSpecificationMapper->findById(Acquisition::HERO_COURSE_SPEC_ID);
         }
         catch (MapperException $e) {
             throw $this->errorMapper->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
         }
+
+        $acquisition = new Acquisition($this->userMapper);
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@helpHero/hero.twig', [
             'course' => $courseSpecification,
