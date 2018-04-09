@@ -219,6 +219,8 @@ class Acquisition
      */
     private function findQuiz(): array
     {
+        $availableMarks = $this->findQuizMaxMarks();
+
         $pb = $this->makeDefaultBuilder();
         $pb->in('asi.specification_assessment_id', $this->mandatoryQuizzes);
         $pb->isNull('ass.deleted_at');
@@ -283,7 +285,7 @@ class Acquisition
      * @throws \TypeError
      * @throws \UnderflowException
      */
-    public function findQuizMaxMarks(): array
+    private function findQuizMaxMarks(): array
     {
         $pb = $this->makeDefaultBuilder();
         $pb->in('asi.specification_assessment_id', $this->mandatoryQuizzes);
