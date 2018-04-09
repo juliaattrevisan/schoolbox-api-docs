@@ -49,7 +49,7 @@ Workshops are flexible in that they can take the form of a different type of ses
 
 Some sessions will require the whole product team, and some will require just the strike team assigned to a particular problem.
 
-See workshops.md for a list of the different types of workshops.
+See [workshops.md](workshops.md) for a list of the different types of workshops.
 
 ## Showcase / Sprint Review
 * **When:** Last day of Sprint 2:00pm
