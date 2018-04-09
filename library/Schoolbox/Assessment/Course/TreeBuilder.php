@@ -69,7 +69,14 @@ class TreeBuilder extends Resources\TreeBuilder
      */
     protected function getNodeHasChildren($nodeId, array $parentList = []): bool
     {
-        if (!\in_array($nodeId, $parentList, false) && NodeInterface::TYPE_COURSE === $this->folderLocator->findById($nodeId)->getNodeType()) {
+        // Are we checking the current course location node?
+        if ((int)$nodeId === $this->currentParentId) {
+            // We are only interested in children of current location if current location is valid
+            return $this->isValidCourseLocation($nodeId);
+        }
+
+        $isAncestor = \in_array($nodeId, $parentList, false);
+        if (!$isAncestor && NodeInterface::TYPE_COURSE === $this->folderLocator->findById($nodeId)->getNodeType()) {
             // If node is a course and not an ancestor, we are not interested in its children
             return false;
         }
@@ -107,6 +114,27 @@ class TreeBuilder extends Resources\TreeBuilder
         }
 
         return parent::buildLiAttributes($folder, $permission, $dataType) + ['title' => $title];
+    }
+
+
+    /**
+     * Returns whether a node is a valid course location
+     *
+     * @param int $nodeId
+     * @return bool
+     */
+    private function isValidCourseLocation(int $nodeId): bool
+    {
+        $folder  = $this->folderLocator->findById($nodeId);
+        $isValid = true;
+        $i       = 0;
+        while ($folder && $folder->getId() && $i++ < 1000) {
+            if (\in_array($folder->getNodeType(), [NodeInterface::TYPE_COURSE, NodeInterface::TYPE_UNIT], true)) {
+                $isValid = false;
+            }
+            $folder = $this->folderLocator->findById($folder->getParent()->getId());
+        }
+        return $isValid;
     }
 }
 
