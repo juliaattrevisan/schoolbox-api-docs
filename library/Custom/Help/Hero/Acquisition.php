@@ -84,6 +84,36 @@ class Acquisition
     }
 
     /**
+     * Combine the hierarchies of Due Work and Quiz into one big stack
+     *
+     * @return array
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \TypeError
+     * @throws \UnderflowException
+     */
+    public function findInvolvement(): array
+    {
+        $stack1 = $this->findDueWork();
+        $stack2 = $this->findQuiz();
+
+        /* Combine stack2 into stack1
+         *
+         * I guess there's no particular order required but if it really gets on your nerves
+         * you could additionally sort on specId
+         */
+        foreach ($stack2 as $id => $data) {
+            if (array_key_exists($id, $stack1)) {
+                $stack1[$id] = array_merge($stack1[$id], $data);
+            }
+            else {
+                $stack1[$id] = $data;
+            }
+        }
+
+        return $stack1;
+    }
+
+    /**
      * Dynamically assemble WHERE clause
      *
      * Shared between Due Work and Quizzes pieces
@@ -114,7 +144,7 @@ class Acquisition
      * @throws \TypeError
      * @throws \UnderflowException
      */
-    public function findDueWork(): array
+    private function findDueWork(): array
     {
         $pb = $this->makeDefaultBuilder();
         $pb->in('asi.specification_assessment_id', $this->mandatoryDueWorks);
@@ -178,7 +208,7 @@ class Acquisition
      * @throws \TypeError
      * @throws \UnderflowException
      */
-    public function findQuiz(): array
+    private function findQuiz(): array
     {
         $pb = $this->makeDefaultBuilder();
         $pb->in('asi.specification_assessment_id', $this->mandatoryQuizzes);
