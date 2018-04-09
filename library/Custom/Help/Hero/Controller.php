@@ -81,7 +81,9 @@ class Controller extends Base
         $acquisition = new Acquisition($this->userMapper);
         $numRequired = $acquisition->numRequired();
         $rawData = $acquisition->findDueWork();
+        $rawData = $acquisition->findQuiz();
 
+        die();
         /* Aggregation
          */
         $aggregatedData = (new Aggregation())->aggregate($rawData, $numRequired);
