@@ -25,8 +25,9 @@ Pre-reading: “What’s Your Problem?” by Matt Lavoie ([Part 1](https://drive
 ### Research Planning
     Involves:       Strike Team
     Preparation:    None
-    Deliverables:   What kind of research is needed?
-                    Put the content together
+    Deliverables:   Activities in Jira
+                        What kind of research is needed?
+                        Put the content together
        
              
 ## Definition Workshops
