@@ -43,7 +43,7 @@ class Acquisition
         16058, // Unit 1, Project 2 Prove yourself as a Schoolbox Teacher Newbie
         15912, // Unit 2, Project 1 Review your knowledge of the calendar
         15579, // Unit 2, Project 2 Verify your understanding of viewing and posting news
-        15767, // Unit 3, Project 1 Assess your knowledge of the timetable
+
         15766, // Unit 3, Project 1 Assess your knowledge of the timetable and marking attendance
         15509, // Unit 3, Project 2 Verify your knowledge of page types and components
         15768, // Unit 6, Project 1 Prove your knowledge about submitting and marking
@@ -56,6 +56,7 @@ class Acquisition
         /* These exist in the course/modify/23 url but not in Alaress Teacher Course
          */
         // 15578, // Unit 2, Project 2 Verify your understanding of news
+        // 15767, // Unit 3, Project 1 Assess your knowledge of the timetable
     ];
 
     /**
