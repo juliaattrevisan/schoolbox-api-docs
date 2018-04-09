@@ -56,6 +56,23 @@ class Acquisition
     ];
 
     /**
+     * Mega-join common to both Due Work and Quizzes
+     *
+     * @var string
+     */
+    private $commonJoin = '
+        INNER JOIN userAccess ua ON ua.uid = u.`id`
+        INNER JOIN course_implementation ci ON ua.sid = ci.`folder_id` AND ua.service = :homepageService
+        INNER JOIN course_specification cs ON ci.`course_specification_id` = cs.`id`
+        INNER JOIN course_unit_implementation cui ON cui.`course_implementation_id` = ci.`id`
+        INNER JOIN assessment_course_unit_implementation acui ON acui.course_unit_implementation_id = cui.`id`
+        INNER JOIN project p ON acui.`assessment_id` = p.`assessment_id`
+        INNER JOIN project_assessment pa ON pa.`project_id` = p.`id`
+        INNER JOIN assessment a ON pa.`assessment_id` = a.`id`
+        INNER JOIN assessment_specification_implementation asi ON a.`id` = asi.`implementation_assessment_id`
+    ';
+
+    /**
      * @var UserMapper
      */
     private $userMapper;
@@ -165,15 +182,7 @@ class Acquisition
                 a.title AS assessmentTitle,
                 MAX(sr.norm_mark) AS mark
             FROM user u
-            INNER JOIN userAccess ua ON ua.uid = u.`id`
-            INNER JOIN course_implementation ci ON ua.sid = ci.`folder_id` AND ua.service = :homepageService
-            INNER JOIN course_specification cs ON ci.`course_specification_id` = cs.`id`
-            INNER JOIN course_unit_implementation cui ON cui.`course_implementation_id` = ci.`id`
-            INNER JOIN assessment_course_unit_implementation acui ON acui.course_unit_implementation_id = cui.`id`
-            INNER JOIN project p ON acui.`assessment_id` = p.`assessment_id`
-            INNER JOIN project_assessment pa ON pa.`project_id` = p.`id`
-            INNER JOIN assessment a ON pa.`assessment_id` = a.`id`
-            INNER JOIN assessment_specification_implementation asi ON a.`id` = asi.`implementation_assessment_id`
+            {$this->commonJoin}
             INNER JOIN submission_box sb ON sb.`assessment_id` = a.`id`
             INNER JOIN submission_return sr ON sb.`id` = sr.`box_id` AND sr.`owner` = ua.`uid`
             WHERE {$where}
@@ -235,15 +244,7 @@ class Acquisition
                 ar.attempt_id AS attemptId,
                 SUM(ar.mark) AS mark
             FROM `user` u
-            INNER JOIN userAccess ua ON ua.uid = u.`id`
-            INNER JOIN course_implementation ci ON ua.sid = ci.`folder_id` AND ua.service = :homepageService
-            INNER JOIN course_specification cs ON ci.`course_specification_id` = cs.`id`
-            INNER JOIN course_unit_implementation cui ON cui.`course_implementation_id` = ci.`id`
-            INNER JOIN assessment_course_unit_implementation acui ON acui.course_unit_implementation_id = cui.`id`
-            INNER JOIN project p ON acui.`assessment_id` = p.`assessment_id`
-            INNER JOIN project_assessment pa ON pa.`project_id` = p.`id`
-            INNER JOIN assessment a ON pa.`assessment_id` = a.`id`
-            INNER JOIN assessment_specification_implementation asi ON a.`id` = asi.`implementation_assessment_id`
+            {$this->commonJoin}
             INNER JOIN assess ass ON a.`id` = ass.`assessment_id`
             INNER JOIN assess_attempt aa ON ass.`assess_id` = aa.`assess_id` AND aa.`user_id` = u.`id`
             INNER JOIN assess_response ar ON aa.`attempt_id` = ar.`attempt_id`
@@ -306,15 +307,7 @@ class Acquisition
                 ar.attempt_id AS attemptId,
                 SUM(aq.marks) AS mark
             FROM `user` u
-            INNER JOIN userAccess ua ON ua.uid = u.`id`
-            INNER JOIN course_implementation ci ON ua.sid = ci.`folder_id` AND ua.service = :homepageService
-            INNER JOIN course_specification cs ON ci.`course_specification_id` = cs.`id`
-            INNER JOIN course_unit_implementation cui ON cui.`course_implementation_id` = ci.`id`
-            INNER JOIN assessment_course_unit_implementation acui ON acui.course_unit_implementation_id = cui.`id`
-            INNER JOIN project p ON acui.`assessment_id` = p.`assessment_id`
-            INNER JOIN project_assessment pa ON pa.`project_id` = p.`id`
-            INNER JOIN assessment a ON pa.`assessment_id` = a.`id`
-            INNER JOIN assessment_specification_implementation asi ON a.`id` = asi.`implementation_assessment_id`
+            {$this->commonJoin}
             INNER JOIN assess ass ON a.`id` = ass.`assessment_id`
             INNER JOIN assess_attempt aa ON ass.`assess_id` = aa.`assess_id` AND aa.`user_id` = u.`id`
             INNER JOIN assess_response ar ON aa.`attempt_id` = ar.`attempt_id`
