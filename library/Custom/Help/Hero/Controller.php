@@ -82,6 +82,7 @@ class Controller extends Base
         $numRequired = $acquisition->numRequired();
         $rawData = $acquisition->findInvolvement();
 
+        $temp = $acquisition->findQuizMaxMarks();
         /* Aggregation
          */
         $aggregatedData = (new Aggregation())->aggregate($rawData, $numRequired);

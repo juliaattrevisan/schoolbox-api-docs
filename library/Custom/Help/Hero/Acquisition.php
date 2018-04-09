@@ -270,4 +270,76 @@ class Acquisition
 
         return $hierarchy;
     }
+
+
+    /**
+     * Figure out the maximum marks available in each attempt
+     *
+     * Due to randomised questions ths maximum mark might vary
+     *
+     * @return array
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \TypeError
+     * @throws \UnderflowException
+     */
+    public function findQuizMaxMarks(): array
+    {
+        $pb = $this->makeDefaultBuilder();
+        $pb->in('asi.specification_assessment_id', $this->mandatoryQuizzes);
+        $pb->isNull('ass.deleted_at');
+        $pb->notNull('aa.reviewed_at');
+        $pb->isNull('aa.deleted_at');
+        $pb->isNull('aq.deleted_at');
+
+        $where = implode("\nAND ", $pb->getWhere());
+
+        /* Find all the Quizzes and the Questions contained in each Attempt
+         */
+        $query = "
+            SELECT 
+                u.id AS userId,
+                u.firstname, 
+                u.lastname,
+                asi.specification_assessment_id AS specId,
+                a.id AS assessmentId, 
+                a.title AS assessmentTitle,
+                ar.attempt_id AS attemptId,
+                SUM(aq.marks) AS mark
+            FROM `user` u
+            INNER JOIN userAccess ua ON ua.uid = u.`id`
+            INNER JOIN course_implementation ci ON ua.sid = ci.`folder_id` AND ua.service = :homepageService
+            INNER JOIN course_specification cs ON ci.`course_specification_id` = cs.`id`
+            INNER JOIN course_unit_implementation cui ON cui.`course_implementation_id` = ci.`id`
+            INNER JOIN assessment_course_unit_implementation acui ON acui.course_unit_implementation_id = cui.`id`
+            INNER JOIN project p ON acui.`assessment_id` = p.`assessment_id`
+            INNER JOIN project_assessment pa ON pa.`project_id` = p.`id`
+            INNER JOIN assessment a ON pa.`assessment_id` = a.`id`
+            INNER JOIN assessment_specification_implementation asi ON a.`id` = asi.`implementation_assessment_id`
+            INNER JOIN assess ass ON a.`id` = ass.`assessment_id`
+            INNER JOIN assess_attempt aa ON ass.`assess_id` = aa.`assess_id` AND aa.`user_id` = u.`id`
+            INNER JOIN assess_response ar ON aa.`attempt_id` = ar.`attempt_id`
+            INNER JOIN assess_question aq ON ar.`question_id` = aq.`question_id` 
+            WHERE {$where}
+            GROUP BY ar.attempt_id
+            ORDER BY u.id, u.lastname, asi.specification_assessment_id, ar.attempt_id
+        ";
+
+        /* Use a totally random mapper
+         */
+        $statement = $this->userMapper->getDatabase()->prepare($query);
+
+        $statement->execute(array_merge([
+            'homepageService' => UserAccess::SERVICE_HOMEPAGE,
+        ], $pb->getParams()));
+
+        $hierarchy = [];
+
+        /* A hashtable of tuples for a user, their highest-marked Feedback for each of the mandatory assessments
+         */
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $hierarchy[$row['userId']][] = $row;
+        }
+
+        return $hierarchy;
+    }
 }
