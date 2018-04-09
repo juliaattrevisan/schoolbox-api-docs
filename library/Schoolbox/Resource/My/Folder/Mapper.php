@@ -37,7 +37,7 @@ class Mapper extends AbstractFolderMapper implements ILocator
             return $this->createModel()
                         ->setId(0)
                         ->setName('Top Level')
-                        ->setParent($this->createModel()->setId('#'));
+                        ->setParent($this->createModel()->setId(IFolder::ROOT_PARENT_ID));
         }
 
         return parent::findById($id);
@@ -86,13 +86,13 @@ class Mapper extends AbstractFolderMapper implements ILocator
     public function isDescendant(Model $possibleDescendant, Model $possibleAncestor)
     {
         // Pseudo-root parent is never a descendant
-        if ('#' === $possibleDescendant->getId()) {
+        if (IFolder::ROOT_PARENT_ID === $possibleDescendant->getId()) {
             return false;
         }
 
         // Pseudo-root is only a descendant of its imaginary parent
-        if (0 === (int)$possibleDescendant->getId()) {
-            return '#' === $possibleAncestor->getId();
+        if (IFolder::ROOT_ID === (int)$possibleDescendant->getId()) {
+            return IFolder::ROOT_PARENT_ID === $possibleAncestor->getId();
         }
 
         // Nodes do not descend from themselves
@@ -101,7 +101,7 @@ class Mapper extends AbstractFolderMapper implements ILocator
         }
 
         // All folders are descendant from pseudo-root (and its parent)
-        if (0 === (int)$possibleAncestor->getId() || '#' === $possibleAncestor->getId()) {
+        if (IFolder::ROOT_ID === (int)$possibleAncestor->getId() || IFolder::ROOT_PARENT_ID === $possibleAncestor->getId()) {
             return true;
         }
 
@@ -111,7 +111,7 @@ class Mapper extends AbstractFolderMapper implements ILocator
         // Climb inheritance tree
         $parent                      = $this->findById($possibleDescendant->getParent()->getId());
         $ancestry[$parent->getId()] = true;
-        while (0 !== $parent->getId()) {
+        while (IFolder::ROOT_ID !== $parent->getId()) {
             if ((int)$parent->getId() === (int)$possibleAncestor->getId()) {
                 return true;
             }
