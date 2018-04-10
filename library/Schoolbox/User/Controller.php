@@ -12,6 +12,8 @@ use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Role;
 use \Schoolbox\User;
+use User\Logger;
+use External_User;
 
 
 class Controller extends Base
@@ -22,19 +24,24 @@ class Controller extends Base
     protected $userAccessMapper;
 
     /**
-     * @var \External_User
+     * @var External_User
      */
     private $externalHandler;
+
+    /** @var Logger\Mapper */
+    private $assumeUserLogMapper;
 
 
     /**
      * @param UserAccessMapper $userAccessMapper
-     * @param \External_User   $externalHandler
+     * @param External_User   $externalHandler
+     * @param Logger\Mapper    $assumeUserLogMapper
      */
-    public function __construct(UserAccessMapper $userAccessMapper, \External_User $externalHandler)
+    public function __construct(UserAccessMapper $userAccessMapper, External_User $externalHandler,  Logger\Mapper $assumeUserLogMapper)
     {
-        $this->userAccessMapper = $userAccessMapper;
-        $this->externalHandler = $externalHandler;
+        $this->userAccessMapper    = $userAccessMapper;
+        $this->externalHandler     = $externalHandler;
+        $this->assumeUserLogMapper = $assumeUserLogMapper;
     }
 
 
@@ -42,6 +49,9 @@ class Controller extends Base
      * Function to transfer to another user (impersonate), stores your previous session for later return
      *
      * @param User $user
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
      */
     public function impersonate(User $user) {
         $previous = $_SESSION;
@@ -50,8 +60,15 @@ class Controller extends Base
         if ($session->create($user->getUsername())) {
             $_SESSION['previous'] = $previous;
 
-            $logger = new \User_Logger_AssumeUser($previous['user'], $user);
-            $logger->notify();
+            /** @var User $previousUser */
+            $previousUser = $previous['user'];
+
+            $logItem = $this->assumeUserLogMapper->createModel()
+                ->setUser($previousUser->getUsername())
+                ->setAssumed($user->getUsername())
+                ->setIp($_SERVER['REMOTE_ADDR']);
+
+            $this->assumeUserLogMapper->save($logItem);
         }
         else {
             $_SESSION = $previous; //Recover old session
@@ -84,7 +101,7 @@ class Controller extends Base
         $studentIds = [];
 
         // Get list of members in the folder
-        $members = $this->getUserAccessMapper()->findUsersInCategory($folder);
+        $members = $this->userAccessMapper->findUsersInCategory($folder);
 
         // Loop through members, storing emails for parents, and ids for students (for use later)
         foreach ($members as $member) {
@@ -96,7 +113,7 @@ class Controller extends Base
         }
 
         // Use the student ids to grab an array of parent emails and add it to $parentEmails
-        $parentEmails = array_merge($parentEmails, $this->getExternalHandler()->getParentEmails($studentIds) ?: []);
+        $parentEmails = array_merge($parentEmails, $this->externalHandler->getParentEmails($studentIds) ?: []);
 
         // Reset the array with no keys (getParentEmails() returns student ids as array keys)
         $parentEmails = array_values($parentEmails);
@@ -110,45 +127,4 @@ class Controller extends Base
         // Return a json encoded array :)
         $this->getResponse()->content->set($this->buildJsonOutput($parentEmails));
     }
-
-
-    /**
-     * @return UserAccessMapper
-     */
-    protected function getUserAccessMapper(): UserAccessMapper
-    {
-        return $this->userAccessMapper;
-    }
-
-
-    /**
-     * @param UserAccessMapper $userAccessMapper
-     * @return static
-     */
-    protected function setUserAccessMapper($userAccessMapper)
-    {
-        $this->userAccessMapper = $userAccessMapper;
-        return $this;
-    }
-
-
-    /**
-     * @return \External_User
-     */
-    public function getExternalHandler(): \External_User
-    {
-        return $this->externalHandler;
-    }
-
-
-    /**
-     * @param \External_User $externalHandler
-     * @return static
-     */
-    public function setExternalHandler($externalHandler)
-    {
-        $this->externalHandler = $externalHandler;
-        return $this;
-    }
-
 }
