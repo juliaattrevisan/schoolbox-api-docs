@@ -39,6 +39,14 @@
                             <div class="list-item">
                                 <div class="card small-12">
                                     <span data-template="title"></span>
+                                    <div class="meta">
+                                        <span data-template="assessments-loading">
+                                            Loading...
+                                        </span>
+                                        <span data-template="assessments" class="hide">
+                                            <span data-template="assessments-count"></span> assessments
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
                         </li>
@@ -169,6 +177,10 @@
                     row.find('[data-template="title"]').text(item.title);
                     baseTemplate.append(row);
                 });
+                unit.find('[data-template="assessments-loading"]').addClass('hide');
+                unit.find('[data-template="assessments"]')
+                    .removeClass('hide')
+                    .find('[data-template="assessments-count"]').text(response.data.length);
                 unit.append(baseTemplate);
             };
         });
