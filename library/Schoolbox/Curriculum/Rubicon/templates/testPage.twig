@@ -33,9 +33,24 @@
                                 <button class="submit" data-action="loadUnits">Load Units</button>
                             </div>
                         </li>
-                        <li id="unit-template" class="hide child" data-unit>
-                            <h3 data-template="title"></h3>
+                    </ul>
+                    <ul id="units-template" class="hide information-list reply">
+                        <li id="unit-template" class="hide" data-unit>
+                            <div class="list-item">
+                                <div class="card small-12">
+                                    <span data-template="title"></span>
+                                </div>
+                            </div>
                             <button class="submit" data-action="loadAssessments">Load Assessments</button>
+                        </li>
+                    </ul>
+                    <ul id="assessments-template" class="hide information-list reply">
+                        <li id="assessment-template" class="hide" data-assessment>
+                            <div class="list-item">
+                                <div class="card small-12">
+                                    <span data-template="title"></span>
+                                </div>
+                            </div>
                         </li>
                     </ul>
                 </section>
@@ -61,11 +76,12 @@
                 .done(function(response) {
                     toast.toastTimeout({text: 'Loaded', css: 'success'});
 
-                    var template = $('#curriculum-template');
+                    var template = $('#curriculum-template')
+                        .clone()
+                        .removeClass('hide')
+                        .removeAttr('id');
                     response.data.forEach(function(item) {
                         var row = template.clone()
-                            .removeClass('hide')
-                            .removeAttr('id')
                             .data('curriculum', item.id);
                         row.find('[data-template="title"]').text(item.title);
                         row.find('[data-template="grade"]').text(item.grade);
@@ -78,11 +94,10 @@
                     toast.toastTimeout({text: 'Failed!', css: 'alert'});
                 });
 
-            // On click of a curriculum: load its units and assessments
+            // On click of a curriculum's load units button
             list.on('click', '[data-action="loadUnits"]', function() {
                 var button     = $(this),
                     curriculum = button.closest('[data-curriculum]'),
-                    nextPoint  = curriculum,
                     request    = $.ajax(
                         api + 'unit/',
                         {data: {curriculummap_id: curriculum.data('curriculum')}}
@@ -95,16 +110,63 @@
                     .done(function(response) {
                         toast.toastTimeout({text: 'Loaded', css: 'success'});
 
-                        var template = $('#unit-template');
+                        var template     = $('#unit-template')
+                            .clone()
+                            .removeClass('hide')
+                            .removeAttr('id');
+                        var baseTemplate = $('#units-template')
+                            .clone()
+                            .removeClass('hide')
+                            .removeAttr('id')
+                            .empty();
                         response.data.forEach(function(item) {
-                            var row = template.clone()
-                                .removeClass('hide')
-                                .removeAttr('id')
+                            var row = template
+                                .clone()
                                 .data('unit', item.id);
                             row.find('[data-template="title"]').text(item.title);
-                            nextPoint.after(row);
-                            nextPoint = row;
+                            baseTemplate.append(row);
                         });
+                        curriculum.append(baseTemplate);
+                    })
+                    .fail(function() {
+                        toast.toastTimeout({text: 'Failed!', css: 'alert'});
+                        button.prop('disabled', false);
+                    });
+            });
+
+            // On click of a unit's load assessments button
+            list.on('click', '[data-action="loadAssessments"]', function() {
+                var button  = $(this),
+                    unit    = button.closest('[data-unit]'),
+                    request = $.ajax(
+                        api + 'assessment/',
+                        {data: {unit_id: unit.data('unit')}}
+                    );
+
+                toast.toastActivate({text: 'Loading assessments...'});
+                button.prop('disabled', true);
+
+                request
+                    .done(function(response) {
+                        toast.toastTimeout({text: 'Loaded', css: 'success'});
+
+                        var template     = $('#assessment-template')
+                            .clone()
+                            .removeClass('hide')
+                            .removeAttr('id');
+                        var baseTemplate = $('#assessments-template')
+                            .clone()
+                            .removeClass('hide')
+                            .removeAttr('id')
+                            .empty();
+                        response.data.forEach(function(item) {
+                            var row = template
+                                .clone()
+                                .data('unit', item.id);
+                            row.find('[data-template="title"]').text(item.title);
+                            baseTemplate.append(row);
+                        });
+                        unit.append(baseTemplate);
                     })
                     .fail(function() {
                         toast.toastTimeout({text: 'Failed!', css: 'alert'});
