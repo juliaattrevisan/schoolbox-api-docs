@@ -939,7 +939,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         $campusTimetableList = array();
         $result              = array();
         foreach ($this->database->getAll($query) ?: array() as $row) {
-            $timetableDay  = $row['TimetableDay'];
+            $timetableDay  = $row['DayNumber'];
             $timetableCode = $row['TimetableGroup'];
 
             // Load the campus for this code if I haven't tried already
