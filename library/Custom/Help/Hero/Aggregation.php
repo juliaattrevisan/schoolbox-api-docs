@@ -69,8 +69,6 @@ class Aggregation
                  */
                 if ($assessmentSpecNotStackedYet || $existingSpecHasLowerMark) {
                     $aggregatedData[$userId]['assessments'][$key] = [
-                        'assessmentId' => $currentAssessmentData['assessmentId'],
-                        'assessmentTitle' => $currentAssessmentData['assessmentTitle'],
                         'mark' => $currentAssessmentData['mark'],
                     ];
                 }

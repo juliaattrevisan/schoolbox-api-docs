@@ -138,8 +138,6 @@ class Acquisition
                 f.id AS folderId,
                 f.name AS folderName,
                 asi.specification_assessment_id AS specId,
-                a.id AS assessmentId, 
-                a.title AS assessmentTitle,
                 MAX(sr.norm_mark) AS mark
             FROM user u
             {$this->commonJoin}
@@ -203,8 +201,6 @@ class Acquisition
                 f.id AS folderId,
                 f.name AS folderName,
                 asi.specification_assessment_id AS specId,
-                a.id AS assessmentId, 
-                a.title AS assessmentTitle,
                 ar.attempt_id AS attemptId,
                 SUM(ar.mark) AS mark
             FROM `user` u
@@ -275,8 +271,6 @@ class Acquisition
                 f.id AS folderId,
                 f.name AS folderName,
                 asi.specification_assessment_id AS specId,
-                a.id AS assessmentId, 
-                a.title AS assessmentTitle,
                 ar.attempt_id AS attemptId,
                 SUM(aq.marks) AS availableMarks
             FROM `user` u
