@@ -7,8 +7,12 @@
     </div>
 </div>
 
+{# Process this in two parts:
+ # First get the people who have qualified, but aren't on the wall
+ #}
 <div class="row">
     <div class="small-12 columns">
+        <h2 class="subheader">Hero Candidates</h2>
         <table>
             <thead>
                 <tr>
@@ -17,27 +21,58 @@
                     <th>Status</th>
                 </tr>
             </thead>
+            <tbody>
             {% for id, userData in aggregatedData %}
-
-            {# Show Qualified people who aren't on the wall
-             # ie. those who haven't received their achievement
-             #}
-            {% if userData.qualified or userData.heroised %}
-            <tr>
-                <td><a href="/search/user/{{ id }}">{{ userData.fullname }}</a></td>
-                <td>
-                    {% if userData.qualified %}
-                    Qualified
-                    {% endif %}
-                </td>
-                <td class="actions-small-1">
-                    {% if userData.heroised %}
-                        <a class="icon-favourite" title="{{ userData.fullname }} is on the Hero Wall"></a>
-                    {% endif %}
-                </td>
-            </tr>
+            {% if userData.qualified and not userData.heroised %}
+                <tr>
+                    <td><a href="/search/user/{{ id }}">{{ userData.fullname }}</a></td>
+                    <td>
+                        {% if userData.qualified %}
+                            Qualified
+                        {% endif %}
+                    </td>
+                    <td class="actions-small-1">
+                    </td>
+                </tr>
             {% endif %}
             {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{# Then get the people who have qualified and are on the wall
+ #}
+<div class="row">
+    <div class="small-12 columns">
+        <h2 class="subheader">Heroes</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Qualification</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for id, userData in aggregatedData %}
+            {% if userData.heroised %}
+                <tr>
+                    <td><a href="/search/user/{{ id }}">{{ userData.fullname }}</a></td>
+                    <td>
+                        {% if userData.qualified %}
+                            Qualified
+                        {% endif %}
+                    </td>
+                    <td class="actions-small-1">
+                        {% if userData.heroised %}
+                            <a class="icon-favourite" title="{{ userData.fullname }} is on the Hero Wall"></a>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endif %}
+            {% endfor %}
+            </tbody>
         </table>
     </div>
 </div>
