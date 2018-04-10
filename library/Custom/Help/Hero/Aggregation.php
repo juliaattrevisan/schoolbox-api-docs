@@ -89,9 +89,17 @@ class Aggregation
 
         /* Identify those who qualified
          */
+        $validConditionalQuiz = new ValidConditionalQuiz();
+
         foreach ($aggregatedData as $userId => &$userData) {
-            if ($userData['fullmarks'] === $numRequired) {
-                $userData['qualified'] = true;
+            if ($userData['fullmarks'] >= $numRequired) {
+                if ($userId == 23094) {
+                    new \Alaress_Probe($userData);
+                }
+
+                if ($validConditionalQuiz->isSatisifiedBy($userData, $conditionalQuizzes)) {
+                    $userData['qualified'] = true;
+                }
             }
         }
 
