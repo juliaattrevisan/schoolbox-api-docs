@@ -50,6 +50,11 @@ class AccessTokenGenerator
     private $accessTokenTime;
 
     /**
+     * Maximum time that we allow plagscan to connect for before dropping
+     */
+    const CONNECTION_TIMEOUT = 360;
+
+    /**
      * Api url where stuff is sent
      *
      * @var string
@@ -86,7 +91,7 @@ class AccessTokenGenerator
 
         $client = new Client([
             "base_uri"    => $this->getApiUrl(),
-            "timeout"     => 2.0,
+            "timeout"     => self::CONNECTION_TIMEOUT,
             "http_errors" => false,
         ]);
 
