@@ -186,7 +186,7 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
             $statement->bindValue('limit', $limit, \PDO::PARAM_INT);
         }
         $statement->execute();
-        $files =  $this->hydrateSelect($statement);
+        $files = $this->hydrateSelect($statement);
 
         // sort the array by title using natural sort
         if ($sortColumn === 'name') {
