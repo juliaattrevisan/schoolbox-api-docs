@@ -10,6 +10,8 @@ namespace External\Tass\Portal;
 
 use Alaress;
 use Aura\Web\Exception\InvalidStatusCode;
+use Schoolbox\User;
+use Schoolbox\Error;
 
 class Controller extends Alaress\Web\Controller\Base
 {
@@ -43,33 +45,44 @@ class Controller extends Alaress\Web\Controller\Base
         'studentCafe'      => '',
     ];
 
+    /** @var Error\Mapper */
+    private $errorMapper;
+
     /**
      * Constructor
      *
-     * @param SSO               $sso
-     * @param string            $portalHost The URL on which TASS services are hosted
-     * @param array|string[]    $appCodes
+     * @param SSO            $sso
+     * @param string         $portalHost The URL on which TASS services are hosted
+     * @param array|string[] $appCodes
+     * @param Error\Mapper   $errorMapper
      */
-    public function __construct(SSO $sso, $portalHost, $appCodes)
+    public function __construct(SSO $sso, $portalHost, $appCodes, Error\Mapper $errorMapper)
     {
-        $this->sso        = $sso;
-        $this->portalHost = $portalHost;
-        $this->appCodes   = array_merge($this->appCodes, $appCodes);
+        $this->sso         = $sso;
+        $this->portalHost  = $portalHost;
+        $this->appCodes    = array_merge($this->appCodes, $appCodes);
+        $this->errorMapper = $errorMapper;
     }
 
 
     /**
      * Generate an SSO token, and redirect to the specified Tass product
      *
-     * @param string    $productCode The code for the Tass product we wish to redirect to
-     * @param string    $appCode     The code by which Schoolbox is known to the specified Tass product
-     * @param string    $productPath The Tass portal path where the Tass product is made available
-     * @param array     $deepLink    Parameters to indicate the Tass product page to deep link to
-     * @param bool      $prodMenu    Should Tass render the product menu? Null for default behaviour
+     * @param string $productCode The code for the Tass product we wish to redirect to
+     * @param string $appCode     The code by which Schoolbox is known to the specified Tass product
+     * @param string $productPath The Tass portal path where the Tass product is made available
+     * @param array  $deepLink    Parameters to indicate the Tass product page to deep link to
+     * @param bool   $prodMenu    Should Tass render the product menu? Null for default behaviour
      * @throws InvalidStatusCode If unable to generate a token and unable to set appropriate error code
+     * @throws \Schoolbox\Application\Exception\Exception
      */
     private function redirectToTassProduct(string $productCode, string $appCode, string $productPath, array $deepLink, bool $prodMenu)
     {
+        // We don't permit SSO of impersonated users into external systems
+        if ($this->isCurrentUserImpersonated()) {
+            throw $this->errorMapper->generateException(Error\Mapper::ERROR_NO_SSO_IMPERSONATION);
+        }
+
         // Generate the SSO token request params
         $config = [
             'prod_code' => $productCode,
@@ -191,6 +204,34 @@ class Controller extends Alaress\Web\Controller\Base
         if (\in_array($prodMenu, [false, 0, '0', 'n', 'N'], true)) {
             return false;
         }
+        return true;
+    }
+
+
+    /**
+     * Returns whether the current session user is being impersonated (but not merely linked)
+     *
+     * @return bool
+     */
+    private function isCurrentUserImpersonated(): bool
+    {
+        $previous = $this->getSession()->get('previous');
+        if (!$previous) {
+            return false;
+        }
+        // We need to distinguish between switching to a linked vs non-linked user
+        /** @var User $previousUser */
+        $previousUser = $previous['user'];
+        $currentUser  = $this->getUser();
+
+        foreach ($previousUser->getLinkedUser() as $linkedUser) {
+            if ((int)$linkedUser->getId() === (int)$currentUser->getId()) {
+                // User has merely switched to a linked account, this does not constitute 'impersonation'
+                return false;
+            }
+        }
+
+        // A previous user exists, and current user is not linked to from them. Current user is being impersonated.
         return true;
     }
 }
