@@ -62,7 +62,14 @@ class ReCaptcha
     {
         return '    
             <script src="' . $this->api_script . '" async defer></script>
-            <div class="g-recaptcha" data-sitekey="' . $this->public_key . '"></div>';
+            <script>
+                function recaptchaCallback() {
+                    $("#recaptcha-valid").val(1);
+                }
+            </script>
+            <div class="g-recaptcha" data-sitekey="' . $this->public_key . '" data-callback="recaptchaCallback"></div>
+            <input type="hidden" name="recaptcha" id="recaptcha-valid" />
+        ';
     }
 
     /**
