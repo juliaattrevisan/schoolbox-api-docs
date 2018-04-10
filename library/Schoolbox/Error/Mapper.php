@@ -182,6 +182,7 @@ class Mapper extends BaseMapper implements IExceptionGenerator
     public const ERROR_CAMPUS_CODE = 209;
     public const ERROR_ATTENDANCE_LIST = 210;
     public const ERROR_ATTENDANCE_SAVE = 211;
+    public const ERROR_NO_SSO_IMPERSONATION = 212;
 
     const ERROR_CODE_TOO_LONG = 208;
 
