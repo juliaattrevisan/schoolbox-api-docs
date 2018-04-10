@@ -68,15 +68,28 @@
 
 {% autoescape 'js' %}
 <script type="text/javascript">
-    {#var token = "{{ token }}";#}
+
+    // API token for Rubicon
+    var token = "{{ token }}";
+
+    // Live API doesn't work locally, thus I proxy thru Schoolbox
     // var api   = "https://api.rubicon.com/api/";
-    var api = "/curriculum/rubicon/proxy/";
+    var api   = "/curriculum/rubicon/proxy/";
+
+    // Headers and data type that Rubicon requires
+    var ajaxOptions = {
+        dataType: 'json',
+        headers: {
+            Authorization: "Bearer " + token
+        }
+    };
+
     (function($){
+        // On load: load the list of curricula via AJAX
         $(function() {
-            // On load: load the list of curricula via AJAX
             var toast = $('#toast'),
                 list  = $('#curriculum-list'),
-                request = $.ajax(api + 'curriculummap/');
+                request = $.ajax(api + 'curriculummap/', ajaxOptions);
 
             toast.toastActivate({text: 'Loading curricula...'});
             request
@@ -107,7 +120,7 @@
                     curriculum = button.closest('[data-curriculum]'),
                     request    = $.ajax(
                         api + 'unit/',
-                        {data: {curriculummap_id: curriculum.data('curriculum')}}
+                        $.extend({}, ajaxOptions, {data: {curriculummap_id: curriculum.data('curriculum')}})
                     );
 
                 toast.toastActivate({text: 'Loading units and assessments...'});
@@ -134,7 +147,7 @@
                                 .data('unit', item.id);
                             var assessmentRequest = $.ajax(
                                 api + 'assessment/',
-                                {data: {unit_id: item.id}}
+                                $.extend({}, ajaxOptions, {data: {unit_id: item.id}})
                             );
                             assessmentRequest.then(function(response) {
                                 loadAssessments(response, row)
