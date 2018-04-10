@@ -74,6 +74,16 @@ class ValidQualification
         15767 => 15766
     ];
 
+    /**
+     * $mark is equivalent to 100.00%
+     *
+     * @param $mark
+     * @return bool
+     */
+    private function isFullmarks($mark): bool
+    {
+        return (float)$mark === (float)100;
+    }
 
     /**
      * Determine if $userData fulfilled the Hero Award requirements
@@ -91,7 +101,7 @@ class ValidQualification
         $mandatoryDueWorksSatisfied = 0;
 
         foreach (self::MANDATORY_DUE_WORKS as $specId) {
-            if ((float)$assessments[$specId]['mark'] === (float)100) {
+            if ($this->isFullmarks($assessments[$specId]['mark'])) {
                 $mandatoryDueWorksSatisfied++;
             }
         }
@@ -101,7 +111,7 @@ class ValidQualification
         $mandatoryQuizSatisfied = 0;
 
         foreach (self::MANDATORY_QUIZZES as $specId) {
-            if ((float)$assessments[$specId]['mark'] === (float)100) {
+            if ($this->isFullmarks($assessments[$specId]['mark'])) {
                 $mandatoryQuizSatisfied++;
             }
         }
@@ -111,7 +121,7 @@ class ValidQualification
         $conditionalQuizSatisfied = 0;
 
         foreach (self::CONDITIONAL_QUIZ_PAIRS as $opt1 => $opt2) {
-            if (((float)$assessments[$opt1]['mark'] === (float)100) || ((float)$assessments[$opt2]['mark'] === (float)100)) {
+            if ($this->isFullmarks($assessments[$opt1]['mark']) || $this->isFullmarks($assessments[$opt2]['mark'])) {
                 $conditionalQuizSatisfied++;
             }
         }

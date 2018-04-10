@@ -48,7 +48,6 @@ class Aggregation
                         'fullname' => "{$currentAssessmentData['firstname']} {$currentAssessmentData['lastname']}",
                         'qualified' => false,
                         'heroised' => \array_key_exists($userId, $heroes),
-                        'fullmarks' => 0,
                         'assessments' => []
                     ];
                 }
@@ -75,12 +74,6 @@ class Aggregation
                         'assessmentTitle' => $currentAssessmentData['assessmentTitle'],
                         'mark' => $currentAssessmentData['mark'],
                     ];
-                }
-
-                /* Add to the count of assessments that received 100%
-                 */
-                if ((float)$currentAssessmentData['mark'] === (float)100) {
-                    $aggregatedData[$userId]['fullmarks']++;
                 }
             }
         }
