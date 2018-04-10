@@ -19,12 +19,10 @@
             </thead>
             {% for id, userData in aggregatedData %}
 
-            {# TODO: I think this should ultimately be showing Qualified people who aren't on the wall
+            {# Show Qualified people who aren't on the wall
              # ie. those who haven't received their achievement
-             #
-             # if userData.qualified and not heroes[id]
              #}
-            {% if userData.qualified or heroes[id]%}
+            {% if userData.qualified or userData.heroised %}
             <tr>
                 <td><a href="/search/user/{{ id }}">{{ userData.firstname }} {{ userData.lastname }}</a></td>
                 <td>
@@ -33,7 +31,7 @@
                     {% endif %}
                 </td>
                 <td class="actions-small-1">
-                    {% if heroes[id] %}
+                    {% if userData.heroised %}
                         <a class="icon-favourite" title="{{ userData.firstname }} {{ userData.lastname }} is on the Hero Wall"></a>
                     {% endif %}
                 </td>

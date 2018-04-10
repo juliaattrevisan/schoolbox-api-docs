@@ -9,18 +9,26 @@
 
 namespace Custom\Help\Hero;
 
+use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Resource\Folder;
+
 class Aggregation
 {
 
     /**
      * Aggregate data to work out who qualified for Hero status
      *
-     * @param array $data Data from Acquisition
+     * @param array $data        Data from Acquisition
      * @param int   $numRequired Number of assessments that must be 100% to get Hero status
      * @return array
+     * @throws \DomainException
      */
     public function aggregate(array $data, int $numRequired)
     {
+        /* Figure out who the current heroes are
+         */
+        $heroes = (new Heroes(Folder\Mapper::getInstance(), UserAccessMapper::getInstance()))->findHeroes();
+
         $aggregatedData = [];
 
         /* Build a hierarchy of data
@@ -37,6 +45,7 @@ class Aggregation
                         'lastname' => $currentAssessmentData['lastname'],
                         'fullmarks' => 0,
                         'qualified' => false,
+                        'heroised' => false,
                         'assessments' => []
                     ];
                 }
@@ -69,6 +78,12 @@ class Aggregation
                  */
                 if ((float)$currentAssessmentData['mark'] === (float)100) {
                     $aggregatedData[$userId]['fullmarks']++;
+                }
+
+                /* If they're already on the wall, remember this fact
+                 */
+                if (\array_key_exists($userId, $heroes)) {
+                    $aggregatedData[$userId]['heroised'] = true;
                 }
             }
         }
