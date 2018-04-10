@@ -52,11 +52,8 @@ class ValidQualification
      * @var array
      */
     public const CONDITIONAL_QUIZZES = [
-        // Conditional Quizzes
         15578, // Unit 2, Project 2 Verify your understanding of news
         15579, // Unit 2, Project 2 Verify your understanding of viewing and posting news
-
-        // Conditional Quizzes
         15767, // Unit 3, Project 1 Assess your knowledge of the timetable
         15766, // Unit 3, Project 1 Assess your knowledge of the timetable and marking attendance
     ];
