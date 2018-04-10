@@ -80,21 +80,18 @@ class Controller extends Base
             throw $this->errorMapper->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
         }
 
+        /* Acquisition + Aggregation
+         */
         $start = microtime(true);
 
-        /* Acquisition
-         */
-        $acquisition = new Acquisition($this->userMapper);
-        $rawData = $acquisition->findInvolvement();
+        $aggregatedData = (new Aggregation())->aggregate(
+            (new Acquisition($this->userMapper))->findInvolvement()
+        );
 
-        /* Aggregation
-         */
-        $aggregatedData = (new Aggregation())->aggregate($rawData);
+        $end = microtime(true);
 
         /* Presentation
          */
-        $end = microtime(true);
-
         $this->getResponse()->content->set($this->buildHtmlOutput('@helpHero/hero.twig', [
             'course' => $courseSpecification,
             'duration' => number_format($end - $start, 2),
