@@ -28,6 +28,10 @@ use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Schoolbox\L10n\Mapper as L10nMapper;
+use Schoolbox\L10n\RosettaStoneFactory;
+use Schoolbox\L10n\RosettaStone;
+use Alaress\Async\Notification\Parameter\Param;
 
 class Notifier extends AbstractModuleNotifier
 {
@@ -52,6 +56,9 @@ class Notifier extends AbstractModuleNotifier
     /** @var UserMapper $userMapper */
     protected $userMapper;
 
+    /** @var RosettaStone $l10n */
+    protected $l10n;
+
     /**
      * @param array $dependencies
      */
@@ -75,6 +82,11 @@ class Notifier extends AbstractModuleNotifier
 
         if (empty($dependencies["userMapper"])) {
             $dependencies["userMapper"] = UserMapper::getInstance();
+        }
+
+        if (empty($dependencies["l10n"])) {
+            $stoneFactory = new RosettaStoneFactory();
+            $dependencies["l10n"] = $stoneFactory->build(L10nMapper::getInstance());
         }
 
         parent::loadDependencies($dependencies);
@@ -107,11 +119,14 @@ class Notifier extends AbstractModuleNotifier
         // Create the message
 
         $timestamp = md5(date("YmdHis"));
+        $href = "/pastoral/student/{$pastoral->getStudent()->getId()}/record/{$pastoral->getId()}?ts={$timestamp}";
+
 
         $builder = new Builder();
-        $builder->setTitle("A pastoral comment has been {$method}")
+        $builder->setTitle("A :pastoralcare comment has been {$method}")
+                ->setParam('pastoralcare', new Param($this->l10n->translate('pastoralCare'), $href))
                 ->setIcon("/portrait.php?size=square32&userId={$owner->getExternalId()}")
-                ->setHref("/pastoral/student/{$pastoral->getStudent()->getId()}/record/{$pastoral->getId()}?ts={$timestamp}")
+                ->setHref($href)
                 ->setNamespace($this->getSlug())
                 ->setSeverity(Logger::ERROR)
                 ->addTopic("pastoral_comment.{$model->getId()}.{$method}");
@@ -323,6 +338,25 @@ class Notifier extends AbstractModuleNotifier
     public function setUserMapper(UserMapper $userMapper)
     {
         $this->userMapper = $userMapper;
+
+        return $this;
+    }
+
+    /**
+     * @return RosettaStone
+     */
+    public function getL10n(): RosettaStone
+    {
+        return $this->l10n;
+    }
+
+    /**
+     * @param RosettaStone $l10n
+     * @return self|$this
+     */
+    public function setL10n(RosettaStone $l10n)
+    {
+        $this->l10n = $l10n;
 
         return $this;
     }
