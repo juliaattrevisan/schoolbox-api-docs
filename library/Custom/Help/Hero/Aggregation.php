@@ -31,10 +31,10 @@ class Aggregation
          */
         $heroes = (new Heroes(Folder\Mapper::getInstance(), UserAccessMapper::getInstance()))->findHeroes();
 
-        $aggregatedData = [];
-
         /* Build a hierarchy of data
          */
+        $aggregatedData = [];
+
         /** @var array $assessmentData */
         foreach ($data as $userId => $assessmentData) {
             foreach ($assessmentData as $currentAssessmentData) {
