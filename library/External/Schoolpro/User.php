@@ -31,6 +31,10 @@ class External_Schoolpro_User implements External_UserInterface
      */
     public function getParent($externalId)
     {
+        if (empty($externalId)) {
+            return [];
+        }
+
         $vars = [
             'sbGetParent',
             [
@@ -114,6 +118,10 @@ class External_Schoolpro_User implements External_UserInterface
      */
     public function getStudent($synId)
     {
+        if (empty($synId)) {
+            return [];
+        }
+
         $medicalNoteStr = '';
 
         $vars = [
@@ -202,6 +210,10 @@ class External_Schoolpro_User implements External_UserInterface
      */
     public function getStudentContactList($externalUserId)
     {
+        if (empty($externalUserId)) {
+            return [];
+        }
+
         $vars = [
             'sbGetStudentContact',
             [
@@ -359,6 +371,10 @@ class External_Schoolpro_User implements External_UserInterface
      */
     public function getEnrolledStudents($synergyID)
     {
+        if (empty($synergyID)) {
+            return [];
+        }
+
         $vars = [
             'sbGetEnrolledStudents',
             [
