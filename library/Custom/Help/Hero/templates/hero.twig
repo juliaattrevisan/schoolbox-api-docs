@@ -24,7 +24,7 @@
              #}
             {% if userData.qualified or userData.heroised %}
             <tr>
-                <td><a href="/search/user/{{ id }}">{{ userData.firstname }} {{ userData.lastname }}</a></td>
+                <td><a href="/search/user/{{ id }}">{{ userData.fullname }}</a></td>
                 <td>
                     {% if userData.qualified %}
                     Qualified
@@ -32,7 +32,7 @@
                 </td>
                 <td class="actions-small-1">
                     {% if userData.heroised %}
-                        <a class="icon-favourite" title="{{ userData.firstname }} {{ userData.lastname }} is on the Hero Wall"></a>
+                        <a class="icon-favourite" title="{{ userData.fullname }} is on the Hero Wall"></a>
                     {% endif %}
                 </td>
             </tr>

@@ -43,6 +43,7 @@ class Aggregation
                     $aggregatedData[$userId] = [
                         'firstname' => $currentAssessmentData['firstname'],
                         'lastname' => $currentAssessmentData['lastname'],
+                        'fullname' => "{$currentAssessmentData['firstname']} {$currentAssessmentData['lastname']}",
                         'fullmarks' => 0,
                         'qualified' => false,
                         'heroised' => false,
