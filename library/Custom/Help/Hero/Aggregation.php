@@ -44,9 +44,9 @@ class Aggregation
                         'firstname' => $currentAssessmentData['firstname'],
                         'lastname' => $currentAssessmentData['lastname'],
                         'fullname' => "{$currentAssessmentData['firstname']} {$currentAssessmentData['lastname']}",
-                        'fullmarks' => 0,
                         'qualified' => false,
-                        'heroised' => false,
+                        'heroised' => \array_key_exists($userId, $heroes),
+                        'fullmarks' => 0,
                         'assessments' => []
                     ];
                 }
@@ -79,12 +79,6 @@ class Aggregation
                  */
                 if ((float)$currentAssessmentData['mark'] === (float)100) {
                     $aggregatedData[$userId]['fullmarks']++;
-                }
-
-                /* If they're already on the wall, remember this fact
-                 */
-                if (\array_key_exists($userId, $heroes)) {
-                    $aggregatedData[$userId]['heroised'] = true;
                 }
             }
         }
