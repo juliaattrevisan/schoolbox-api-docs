@@ -2,6 +2,9 @@
 /**
  * Acquisition
  *
+ * Get all the data we'll be operating on for Hero qualification
+ * We can combine some data here; this class focuses on obtaining the correct data in a convenient structure
+ *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2018, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -88,9 +91,6 @@ class Acquisition
      * Acquisition constructor.
      *
      * @param UserMapper            $userMapper
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \TypeError
-     * @throws \UnderflowException
      */
     public function __construct(UserMapper $userMapper) {
         $this->userMapper = $userMapper;
@@ -144,7 +144,7 @@ class Acquisition
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \TypeError
      */
-    private function makeDefaultBuilder()
+    private function makeDefaultBuilder(): Builder
     {
         $pb = new Builder($this->userMapper->getDatabase(), 'upd');
         $pb->equals('cs.id', self::HERO_COURSE_SPEC_ID);

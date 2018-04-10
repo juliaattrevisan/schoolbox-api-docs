@@ -2,6 +2,9 @@
 /**
  * help.schoolbox.com.au
  *
+ * Hero Report
+ * Get a list of potential Heroes, and also a list of existing Heroes
+ *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2018, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -14,8 +17,6 @@ use Schoolbox\Error;
 use Schoolbox\Learning\Course\DataModel\Specification;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
-
-
 
 ini_set('max_execution_time', 300);
 

@@ -2,6 +2,8 @@
 /**
  * Heroes
  *
+ * Find a list of existing Heroes
+ *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2018, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -28,6 +30,11 @@ class Heroes
      * @var int
      */
     private $heroFolderId = 2209;
+
+    /**
+     * @var Folder\Mapper
+     */
+    private $folderMapper;
 
     /**
      * Heroes constructor.
