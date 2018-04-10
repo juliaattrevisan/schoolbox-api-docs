@@ -171,10 +171,10 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
 
         // sorting by name will be handled later to support natural sorting
         if ($sortColumn !== 'name') {
-            $baseQuery    .= " ORDER BY " . $sortFields[$sortColumn] . " " . $sortDirection;
+            $baseQuery .= " ORDER BY " . $sortFields[$sortColumn] . " " . $sortDirection;
         }
 
-        if ($limit > 0) {
+            if ($limit > 0) {
             $baseQuery .= " LIMIT 0, :limit";
         }
 
