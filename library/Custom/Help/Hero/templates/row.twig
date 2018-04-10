@@ -1,0 +1,16 @@
+<tr>
+    <td><a href="/search/user/{{ id }}">{{ userData.fullname }}</a></td>
+    <td>
+        {% if userData.qualified %}
+            Qualified
+        {% endif %}
+    </td>
+    <td>
+        <a href="{{ routeLookup('learningGrades.getGrades', {userId: id }) }}" title="Grades">Grades</a>
+    </td>
+    <td class="actions-small-1">
+        {% if userData.heroised %}
+            <a class="icon-favourite" title="{{ userData.fullname }} is on the Hero Wall"></a>
+        {% endif %}
+    </td>
+</tr>
