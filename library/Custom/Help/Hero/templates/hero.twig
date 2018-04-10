@@ -22,23 +22,17 @@
         <div class="scrollable">
             <table>
                 <thead>
-                    <tr>
-                        <th style="width:30%">User</th>
-                        <th style="width:36%">Course</th>
-                        <th style="width:12%" class="center">Qualification</th>
-                        <th style="width:12%" class="center">Grades</th>
-                        <th style="width:10%" class="center">Status</th>
-                    </tr>
+                    {% include '@helpHero/headings.twig' %}
                 </thead>
                 <tbody>
-                {% for id, userData in aggregatedData %}
-                {% if userData.qualified and not userData.heroised %}
-                    {% include '@helpHero/row.twig' with {
-                        id: id,
-                        userData: userData
-                    } %}
-                {% endif %}
-                {% endfor %}
+                    {% for id, userData in aggregatedData %}
+                    {% if userData.qualified and not userData.heroised %}
+                        {% include '@helpHero/row.twig' with {
+                            id: id,
+                            userData: userData
+                        } %}
+                    {% endif %}
+                    {% endfor %}
                 </tbody>
             </table>
         </div>
@@ -53,23 +47,17 @@
         <div class="scrollable">
             <table>
                 <thead>
-                    <tr>
-                        <th style="width:30%">User</th>
-                        <th style="width:36%">Course</th>
-                        <th style="width:12%" class="center">Qualification</th>
-                        <th style="width:12%" class="center">Grades</th>
-                        <th style="width:10%" class="center">Status</th>
-                    </tr>
+                    {% include '@helpHero/headings.twig' %}
                 </thead>
                 <tbody>
-                {% for id, userData in aggregatedData %}
-                {% if userData.heroised %}
-                    {% include '@helpHero/row.twig' with {
-                        id: id,
-                        userData: userData
-                    } %}
-                {% endif %}
-                {% endfor %}
+                    {% for id, userData in aggregatedData %}
+                    {% if userData.heroised %}
+                        {% include '@helpHero/row.twig' with {
+                            id: id,
+                            userData: userData
+                        } %}
+                    {% endif %}
+                    {% endfor %}
                 </tbody>
             </table>
         </div>
