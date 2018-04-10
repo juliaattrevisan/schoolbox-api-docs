@@ -35,10 +35,7 @@ class Aggregation
 
         /* Build a hierarchy of data
          */
-        /**
-         * @var int $id
-         * @var array $assessmentData
-         */
+        /** @var array $assessmentData */
         foreach ($data as $userId => $assessmentData) {
             foreach ($assessmentData as $currentAssessmentData) {
                 if (!array_key_exists($userId, $aggregatedData)) {
