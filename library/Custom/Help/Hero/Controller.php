@@ -86,12 +86,10 @@ class Controller extends Base
          */
         $acquisition = new Acquisition($this->userMapper);
         $rawData = $acquisition->findInvolvement();
-        $numRequired = $acquisition->numRequired();
-        $conditionalQuizzes = $acquisition->getConditionalQuizzes();
 
         /* Aggregation
          */
-        $aggregatedData = (new Aggregation())->aggregate($rawData, $numRequired, $conditionalQuizzes);
+        $aggregatedData = (new Aggregation())->aggregate($rawData);
 
         /* Presentation
          */

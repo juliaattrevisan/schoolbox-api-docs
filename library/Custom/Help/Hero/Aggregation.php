@@ -21,13 +21,11 @@ class Aggregation
     /**
      * Aggregate data to work out who qualified for Hero status
      *
-     * @param array $data               Data from Acquisition
-     * @param int   $numRequired        Number of assessments that must be 100% to get Hero status
-     * @param array $conditionalQuizzes A list of conditional quiz tuples
+     * @param array $data Data from Acquisition
      * @return array
      * @throws \DomainException
      */
-    public function aggregate(array $data, int $numRequired, array $conditionalQuizzes): array
+    public function aggregate(array $data): array
     {
         /* Figure out who the current heroes are
          */
@@ -89,17 +87,11 @@ class Aggregation
 
         /* Identify those who qualified
          */
-        $validConditionalQuiz = new ValidConditionalQuiz();
+        $qualification = new ValidQualification();
 
         foreach ($aggregatedData as $userId => &$userData) {
-            if ($userData['fullmarks'] >= $numRequired) {
-                if ($userId == 23094) {
-                    new \Alaress_Probe($userData);
-                }
-
-                if ($validConditionalQuiz->isSatisifiedBy($userData, $conditionalQuizzes)) {
-                    $userData['qualified'] = true;
-                }
+            if ($qualification->isSatisfiedBy($userData)) {
+                $userData['qualified'] = true;
             }
         }
 

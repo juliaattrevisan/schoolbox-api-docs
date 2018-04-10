@@ -26,59 +26,6 @@ class Acquisition
     public const HERO_COURSE_SPEC_ID = 23;
 
     /**
-     * Due Work
-     *
-     * A list of assessment spec ids that are mandatory for the Hero award
-     * There are some optional Due Works that don't contribute toward the achievement
-     */
-    private $mandatoryDueWorks = [
-        15574, // Unit 4, Project 3 Advanced Course Skills
-        15607, // Unit 5, Project 2 Master Courses And Classes
-        15635, // Unit 7, Project 3 Managing Groups And Pages
-    ];
-
-    /**
-     * Quizzes
-     *
-     * A list of assessment spec ids that are mandatory for the Hero award
-     */
-    private $mandatoryQuizzes = [
-        16058, // Unit 1, Project 2 Prove yourself as a Schoolbox Teacher Newbie
-        15912, // Unit 2, Project 1 Review your knowledge of the calendar
-
-        // Conditional Quizzes
-        15578, // Unit 2, Project 2 Verify your understanding of news
-        15579, // Unit 2, Project 2 Verify your understanding of viewing and posting news
-
-        // Conditional Quizzes
-        15767, // Unit 3, Project 1 Assess your knowledge of the timetable
-        15766, // Unit 3, Project 1 Assess your knowledge of the timetable and marking attendance
-
-        15509, // Unit 3, Project 2 Verify your knowledge of page types and components
-        15768, // Unit 6, Project 1 Prove your knowledge about submitting and marking
-        16911, // Unit 7, Project 1 Test your knowledge of advanced component usage
-        15913, // Unit 7, Project 2 Test your knowledge of creating pages
-        15772, // Unit 8, Project 1 Complete this continuous reporting quiz
-
-        /* I don't think these are mandatory for the achievement
-         */
-        // 43618, // Unit 9 Review your knowledge of v17
-        // 46375, // Unit 9 Review your knowledge of v17.5
-    ];
-
-    /**
-     * Quizzes
-     *
-     * A list of assessment spec ids that are conditional, along with their counterpart
-     *
-     * @var array
-     */
-    private $conditionalQuizzes = [
-        15578 => 15579,
-        15767 => 15766
-    ];
-
-    /**
      * Mega-join common to both Due Work and Quizzes
      *
      * @var string
@@ -107,16 +54,6 @@ class Acquisition
      */
     public function __construct(UserMapper $userMapper) {
         $this->userMapper = $userMapper;
-    }
-
-    /**
-     * Number of assessments that are required to get Hero status
-     *
-     * @return int
-     */
-    public function numRequired(): int
-    {
-        return \count($this->mandatoryDueWorks) + \count($this->mandatoryQuizzes) - \count($this->conditionalQuizzes);
     }
 
     /**
@@ -183,7 +120,7 @@ class Acquisition
     private function findDueWork(): array
     {
         $pb = $this->makeDefaultBuilder();
-        $pb->in('asi.specification_assessment_id', $this->mandatoryDueWorks);
+        $pb->in('asi.specification_assessment_id', ValidQualification::MANDATORY_DUE_WORKS);
         $pb->notNull('sr.published_at');
 
         $where = implode("\nAND ", $pb->getWhere());
@@ -241,7 +178,7 @@ class Acquisition
         $availableMarks = $this->findQuizMaxMarks();
 
         $pb = $this->makeDefaultBuilder();
-        $pb->in('asi.specification_assessment_id', $this->mandatoryQuizzes);
+        $pb->in('asi.specification_assessment_id', array_merge(ValidQualification::MANDATORY_QUIZZES, ValidQualification::CONDITIONAL_QUIZZES));
         $pb->isNull('ass.deleted_at');
         $pb->notNull('aa.reviewed_at');
         $pb->isNull('aa.deleted_at');
@@ -314,7 +251,7 @@ class Acquisition
     private function findQuizMaxMarks(): array
     {
         $pb = $this->makeDefaultBuilder();
-        $pb->in('asi.specification_assessment_id', $this->mandatoryQuizzes);
+        $pb->in('asi.specification_assessment_id', array_merge(ValidQualification::MANDATORY_QUIZZES, ValidQualification::CONDITIONAL_QUIZZES));
         $pb->isNull('ass.deleted_at');
         $pb->notNull('aa.reviewed_at');
         $pb->isNull('aa.deleted_at');
@@ -362,16 +299,5 @@ class Acquisition
         }
 
         return $hierarchy;
-    }
-
-    /* Getters/Setters
-     */
-
-    /**
-     * @return array
-     */
-    public function getConditionalQuizzes(): array
-    {
-        return $this->conditionalQuizzes;
     }
 }
