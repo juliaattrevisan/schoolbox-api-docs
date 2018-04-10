@@ -41,7 +41,6 @@
                                     <span data-template="title"></span>
                                 </div>
                             </div>
-                            <button class="submit" data-action="loadAssessments">Load Assessments</button>
                         </li>
                     </ul>
                     <ul id="assessments-template" class="hide information-list reply">
@@ -103,12 +102,11 @@
                         {data: {curriculummap_id: curriculum.data('curriculum')}}
                     );
 
-                toast.toastActivate({text: 'Loading units...'});
+                toast.toastActivate({text: 'Loading units and assessments...'});
                 button.prop('disabled', true);
 
                 request
                     .done(function(response) {
-                        toast.toastTimeout({text: 'Loaded', css: 'success'});
 
                         var template     = $('#unit-template')
                             .clone()
@@ -119,13 +117,32 @@
                             .removeClass('hide')
                             .removeAttr('id')
                             .empty();
+
+                        // May as well load all assessments as well
+                        var requests = [];
                         response.data.forEach(function(item) {
                             var row = template
                                 .clone()
                                 .data('unit', item.id);
+                            var assessmentRequest = $.ajax(
+                                api + 'assessment/',
+                                {data: {unit_id: item.id}}
+                            );
+                            assessmentRequest.then(function(response) {
+                                loadAssessments(response, row)
+                            });
+                            requests.push(assessmentRequest);
+
                             row.find('[data-template="title"]').text(item.title);
                             baseTemplate.append(row);
+
                         });
+
+                        $.when.apply(this, requests)
+                            .done(function() {
+                                toast.toastTimeout({text: 'Loaded', css: 'success'});
+                            });
+
                         curriculum.append(baseTemplate);
                     })
                     .fail(function() {
@@ -135,44 +152,25 @@
             });
 
             // On click of a unit's load assessments button
-            list.on('click', '[data-action="loadAssessments"]', function() {
-                var button  = $(this),
-                    unit    = button.closest('[data-unit]'),
-                    request = $.ajax(
-                        api + 'assessment/',
-                        {data: {unit_id: unit.data('unit')}}
-                    );
-
-                toast.toastActivate({text: 'Loading assessments...'});
-                button.prop('disabled', true);
-
-                request
-                    .done(function(response) {
-                        toast.toastTimeout({text: 'Loaded', css: 'success'});
-
-                        var template     = $('#assessment-template')
-                            .clone()
-                            .removeClass('hide')
-                            .removeAttr('id');
-                        var baseTemplate = $('#assessments-template')
-                            .clone()
-                            .removeClass('hide')
-                            .removeAttr('id')
-                            .empty();
-                        response.data.forEach(function(item) {
-                            var row = template
-                                .clone()
-                                .data('unit', item.id);
-                            row.find('[data-template="title"]').text(item.title);
-                            baseTemplate.append(row);
-                        });
-                        unit.append(baseTemplate);
-                    })
-                    .fail(function() {
-                        toast.toastTimeout({text: 'Failed!', css: 'alert'});
-                        button.prop('disabled', false);
-                    });
-            });
+            var loadAssessments = function(response, unit) {
+                var template     = $('#assessment-template')
+                    .clone()
+                    .removeClass('hide')
+                    .removeAttr('id');
+                var baseTemplate = $('#assessments-template')
+                    .clone()
+                    .removeClass('hide')
+                    .removeAttr('id')
+                    .empty();
+                response.data.forEach(function(item) {
+                    var row = template
+                        .clone()
+                        .data('unit', item.id);
+                    row.find('[data-template="title"]').text(item.title);
+                    baseTemplate.append(row);
+                });
+                unit.append(baseTemplate);
+            };
         });
     })(jQuery);
 </script>
