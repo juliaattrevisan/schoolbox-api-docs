@@ -13,9 +13,29 @@
     </div>
 </div>
 
+
 <div class="row">
-    <div class="small-12 island">
-        <pre id="test"></pre>
+    <div class="small-12 columns">
+        <div class="row">
+            <div class="small-12 island">
+                <section>
+                    <ul id="curriculum-list" class="information-list threaded">
+                        <li id="curriculum-template" class="hide">
+                            <div class="list-item">
+                                <div class="card small-12">
+                                    <h3 data-template="title"></h3>
+                                    <p class="meta">
+                                        <span data-template="grade"></span>
+                                        <span data-template="subject"></span>
+                                    </p>
+                                </div>
+                                <article data-template="description"></article>
+                            </div>
+                        </li>
+                    </ul>
+                </section>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -32,9 +52,19 @@
 
             var request = $.ajax(api + 'curriculummap/');
             request
-                .done(function(data) {
+                .done(function(response) {
                     toast.toastTimeout({text: 'Loaded', css: 'success'});
-                    $('#test').text(JSON.stringify(data, null, 2));
+
+                    var template = $('#curriculum-template'),
+                        list     = $('#curriculum-list');
+                    response.data.forEach(function(item) {
+                        var row = template.clone().removeClass('hide');
+                        row.find('[data-template="title"]').text(item.title);
+                        row.find('[data-template="grade"]').text(item.grade);
+                        row.find('[data-template="subject"]').text(item.subject);
+                        row.find('[data-template="description"]').html(item.description);
+                        list.append(row);
+                    });
                 })
                 .fail(function() {
                     toast.toastTimeout({text: 'Failed!', css: 'alert'});
