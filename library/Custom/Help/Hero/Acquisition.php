@@ -40,6 +40,7 @@ class Acquisition
         INNER JOIN project_assessment pa ON pa.`project_id` = p.`id`
         INNER JOIN assessment a ON pa.`assessment_id` = a.`id`
         INNER JOIN assessment_specification_implementation asi ON a.`id` = asi.`implementation_assessment_id`
+        INNER JOIN folder f ON ci.`folder_id` = f.`id`
     ';
 
     /**
@@ -105,6 +106,7 @@ class Acquisition
         $pb->isNull('a.deleted_at');
         $pb->notEquals('a.created_at', '0000-00-00 00:00:00');
         $pb->isNull('u.deleted_at');
+        $pb->isNull('f.deleted_at');
 
         return $pb;
     }
@@ -133,6 +135,8 @@ class Acquisition
                 u.id AS userId,
                 u.firstname, 
                 u.lastname,
+                f.id AS folderId,
+                f.name AS folderName,
                 asi.specification_assessment_id AS specId,
                 a.id AS assessmentId, 
                 a.title AS assessmentTitle,
@@ -196,6 +200,8 @@ class Acquisition
                 u.id AS userId,
                 u.firstname, 
                 u.lastname,
+                f.id AS folderId,
+                f.name AS folderName,
                 asi.specification_assessment_id AS specId,
                 a.id AS assessmentId, 
                 a.title AS assessmentTitle,
@@ -266,6 +272,8 @@ class Acquisition
                 u.id AS userId,
                 u.firstname, 
                 u.lastname,
+                f.id AS folderId,
+                f.name AS folderName,
                 asi.specification_assessment_id AS specId,
                 a.id AS assessmentId, 
                 a.title AS assessmentTitle,

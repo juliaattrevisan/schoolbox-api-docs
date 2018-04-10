@@ -43,6 +43,8 @@ class Aggregation
                         'firstname' => $currentAssessmentData['firstname'],
                         'lastname' => $currentAssessmentData['lastname'],
                         'fullname' => "{$currentAssessmentData['firstname']} {$currentAssessmentData['lastname']}",
+                        'folderId' => $currentAssessmentData['folderId'],
+                        'folderName' => $currentAssessmentData['folderName'],
                         'qualified' => false,
                         'heroised' => \array_key_exists($userId, $heroes),
                         'assessments' => []
