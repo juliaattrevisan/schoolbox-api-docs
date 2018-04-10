@@ -93,7 +93,6 @@ class Acquisition
      * @throws \UnderflowException
      */
     public function __construct(UserMapper $userMapper) {
-        $this->courseSpecId = self::HERO_COURSE_SPEC_ID;
         $this->userMapper = $userMapper;
     }
 
@@ -148,7 +147,7 @@ class Acquisition
     private function makeDefaultBuilder()
     {
         $pb = new Builder($this->userMapper->getDatabase(), 'upd');
-        $pb->equals('cs.id', $this->courseSpecId);
+        $pb->equals('cs.id', self::HERO_COURSE_SPEC_ID);
         $pb->isNull('cs.deleted_at');
         $pb->isNull('ci.deleted_at');
         $pb->isNull('cui.deleted_at');
