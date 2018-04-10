@@ -30,7 +30,9 @@ class Module extends BaseModule
      */
     protected function registerRoutes(): void
     {
-        $this->register('GET', '/test', 'getTestPage', new Rule\IsSuperuser(), null);
+        $permission = new Rule\IsLoggedIn();
+        $this->register('GET', '/test', 'getTestPage', $permission, null);
+        $this->register('GET', '/proxy/{endpoint}', 'getProxy', $permission, null);
     }
 
     /**

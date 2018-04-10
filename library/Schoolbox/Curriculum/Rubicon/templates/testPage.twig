@@ -1,1 +1,47 @@
-Test page
+{% import 'sub/breadcrumbs.twig' as bread %}
+
+{{ bread.crumbs(
+    ['Curriculum', routeLookup('curriculum.browse')],
+    ['Rubicon Test', '#']
+) }}
+
+<div class="row">
+    <div class="list-item">
+        <div class="small-12 columns">
+            <h1>Rubicon Test</h1>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <pre id="test"></pre>
+    </div>
+</div>
+
+{% autoescape 'js' %}
+<script type="text/javascript">
+    var token = "{{ token }}";
+    // var api   = "https://api.rubicon.com/api/";
+    var api   = "/curriculum/rubicon/proxy/";
+    (function($){
+        $(function() {
+            // On load: load the list of curricula via AJAX
+            var toast = $('#toast');
+            toast.toastActivate({text: 'Loading curricula...'});
+
+            var request = $.ajax(api + 'curriculummap/');
+            request
+                .done(function(data) {
+                    toast.toastTimeout({text: 'Loaded', css: 'success'});
+                    $('#test').text(JSON.stringify(data, null, 2));
+                })
+                .fail(function() {
+                    toast.toastTimeout({text: 'Failed!', css: 'alert'});
+                });
+        })
+    })(jQuery);
+</script>
+{% endautoescape %}
+
+<div class="toast" id="toast"></div>
