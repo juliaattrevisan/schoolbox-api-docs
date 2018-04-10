@@ -242,12 +242,16 @@ try {
         case 'resource':
             /* Only include this api if Resource Booking is enabled by Feature Flag
              */
-            $api = buildApiClass(
-                Calendar_Api_EventType_ResourceBooking_Booking_ForItem::class,
-                [$user, [$resourceId]],
-                (bool)ConfigMapper::getInstance()->get('resource_booking_enabled'),
-                $sentry
-            );
+            if (ConfigMapper::getInstance()->get('resource_booking_enabled')) {
+                $api = new Calendar_Api_EventType_ResourceBooking_Booking_ForItem(
+                    getConnector(Calendar_Api_EventType_ResourceBooking_Booking_ForItem::class)->getId(),
+                    $user,
+                    [$resourceId]
+                );
+            }
+            else {
+                $api = new Calendar_Api_Composite();
+            }
 
             $filename = sprintf('resource%d', $resourceId);
             break;
@@ -255,12 +259,16 @@ try {
         case 'resource_category':
             /* Only include this api if Resource Booking is enabled by Feature Flag
              */
-            $api = buildApiClass(
-                Calendar_Api_EventType_ResourceBooking_Booking_ForCategory::class,
-                [$user, $resourceCategoryId],
-                (bool)ConfigMapper::getInstance()->get('resource_booking_enabled'),
-                $sentry
-            );
+            if (ConfigMapper::getInstance()->get('resource_booking_enabled')) {
+                $api = new Calendar_Api_EventType_ResourceBooking_Booking_ForCategory(
+                    getConnector(Calendar_Api_EventType_ResourceBooking_Booking_ForCategory::class)->getId(),
+                    $user,
+                    $resourceCategoryId
+                );
+            }
+            else {
+                $api = new Calendar_Api_Composite();
+            }
 
             $filename = sprintf('resourceCategory%d', $resourceCategoryId);
             break;
