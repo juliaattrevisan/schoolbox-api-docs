@@ -174,7 +174,7 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
             $baseQuery .= " ORDER BY " . $sortFields[$sortColumn] . " " . $sortDirection;
         }
 
-            if ($limit > 0) {
+        if ($limit > 0) {
             $baseQuery .= " LIMIT 0, :limit";
         }
 
