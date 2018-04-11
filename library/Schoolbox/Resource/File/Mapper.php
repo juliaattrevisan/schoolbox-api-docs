@@ -168,7 +168,11 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
         );
         $sortColumn    = isset($sortFields[$sortColumn]) ? $sortColumn : 'name';
         $sortDirection = strtoupper($sortDirection) == 'DESC' ? 'DESC' : 'ASC';
-        $baseQuery    .= " ORDER BY " . $sortFields[$sortColumn] . " " . $sortDirection;
+
+        // sorting by name will be handled later to support natural sorting
+        if ($sortColumn !== 'name') {
+            $baseQuery .= " ORDER BY " . $sortFields[$sortColumn] . " " . $sortDirection;
+        }
 
         if ($limit > 0) {
             $baseQuery .= " LIMIT 0, :limit";
@@ -182,7 +186,23 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
             $statement->bindValue('limit', $limit, \PDO::PARAM_INT);
         }
         $statement->execute();
-        return $this->hydrateSelect($statement);
+        $files = $this->hydrateSelect($statement);
+
+        // sort the array by title using natural sort
+        if ($sortColumn === 'name') {
+            if ($sortDirection === 'DESC') {
+                $callback = function ($a, $b) {
+                    return strnatcasecmp($b->getTitle(), $a->getTitle());
+                };
+            } else {
+                $callback = function ($a, $b) {
+                    return strnatcasecmp($a->getTitle(), $b->getTitle());
+                };
+            }
+            $files = $files->sortByCallback($callback, true);
+        }
+
+        return $files;
     }
 
 
