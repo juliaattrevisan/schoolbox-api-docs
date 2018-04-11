@@ -154,6 +154,7 @@ class RubricMapper
             GROUP BY rc.id
         ", $args);
 
+        // TODO what is this magic number
         $groupId = 21;
 
         // De-duplicate into caches, prioritising parent if duplicate between
@@ -547,6 +548,7 @@ class RubricMapper
         $levelNames = array_slice($square[0], 2);
 
         $workingGroupName = '';
+        $workingCritName = '';
 
         $criteria = [];
 
@@ -557,12 +559,16 @@ class RubricMapper
             if ($row[0]) {
                 $workingGroupName = $row[0];
             }
-
             // copy the groupname into the row
             $row[0] = $workingGroupName;
 
+            if ($row[1]) {
+                $workingCritName = $row[1];
+            }
+            // copy the criteria name into the row
+            $row[1] = $workingCritName;
+
             // extract the criterion uniquely (can be blank)
-            $workingCritName                               = $row[1];
             $criteria[$workingGroupName][$workingCritName] = [
                 'id'   => null,
                 'name' => $workingCritName,
