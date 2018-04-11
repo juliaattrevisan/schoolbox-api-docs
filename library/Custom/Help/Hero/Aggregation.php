@@ -14,6 +14,8 @@ namespace Custom\Help\Hero;
 
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder;
+use Schoolbox\User;
+
 
 class Aggregation
 {
@@ -31,12 +33,21 @@ class Aggregation
          */
         $heroes = (new Heroes(Folder\Mapper::getInstance(), UserAccessMapper::getInstance()))->findHeroes();
 
+        /* A list of heroes who have been doing the Teacher Course
+         * Some heroes have done an older version, or different assessments
+         * We don't want to exclude those from the report, so remember the guys we saw
+         * and include the difference at the end
+         */
+        $seen = [];
+
         /* Build a hierarchy of data
          */
         $aggregatedData = [];
 
         /** @var array $assessmentData */
         foreach ($data as $userId => $assessmentData) {
+            $seen[] = $userId;
+
             foreach ($assessmentData as $currentAssessmentData) {
                 if (!array_key_exists($userId, $aggregatedData)) {
                     $aggregatedData[$userId] = [
@@ -83,6 +94,29 @@ class Aggregation
             if ($qualification->isSatisfiedBy($userData)) {
                 $userData['qualified'] = true;
             }
+        }
+
+        /* All the older heroes who do not meet the current qualification criteria
+         * but met some older version of it, at some point in the past, and are already heroes
+         */
+        $existingHeroes = array_keys($heroes);
+        $olderHeroes = array_diff($existingHeroes, $seen);
+
+        foreach ($olderHeroes as $userId) {
+
+            /** @var User $hero */
+            $hero = $heroes[$userId];
+
+            $aggregatedData[$userId] = [
+                'firstname' => $hero->getFirstname(),
+                'lastname' => $hero->getLastname(),
+                'fullname' => $hero->getFullName(),
+                'folderId' => $heroes['folderId'],
+                'folderName' => $heroes['folderName'],
+                'qualified' => false,
+                'heroised' => true,
+                'assessments' => []
+            ];
         }
 
         return $aggregatedData;
