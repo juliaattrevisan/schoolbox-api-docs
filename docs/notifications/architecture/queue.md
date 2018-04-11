@@ -12,6 +12,45 @@ Schoolbox provides the `\Alaress\Async\Broker\IBroker` interface for defining
 how a message queue must work.
 
 
+## Glossary
+
+<dl>
+  <dt>Message Broker</dt>
+  <dd>
+    The high-level interface through which Messages are Published and Subscribed
+    to.
+  </dd>
+  
+  <dt>Queue</dt>
+  <dd>
+    The low-level implementation of a message queue that the Message Broker 
+    uses.
+  </dd>
+  
+  <dt>Data Store</dt>
+  <dd>
+    The low-level storage mechanism for Messages that have been Published to
+    the Message Broker.
+  </dd>
+  
+  <dt>Message</dt>
+  <dd>
+    A payload that is Published to the Message Broker. Any Subscriber will see
+    the payload, and be able to act upon it.
+  </dd>
+  
+  <dt>Publish</dt>
+  <dd>
+    The act of a process pushing a Message to the Message Broker.
+  </dd>
+  
+  <dt>Subscribe</dt>
+  <dd>
+    The act of a process receiving a Message to the Message Broker.
+  </dd>
+</dl>
+
+
 ## Implementation
 
 Schoolbox's message queues are implemented in two parts; the message queue
