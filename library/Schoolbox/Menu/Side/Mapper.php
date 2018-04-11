@@ -115,6 +115,10 @@ class Mapper extends BaseMapper
                 array_push($filteredGroups, $group);
             }
         }
+        usort($filteredGroups, function ($a, $b) {
+            return strnatcasecmp($a['name'], $b['name']);
+        });
+
         return $filteredGroups;
     }
 }
