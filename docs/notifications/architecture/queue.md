@@ -58,6 +58,9 @@ TODO figure out what `$context` does, and exactly what's stored in the queue
 `\Alaress\Async\Broker\IBroker::registerConsumer` registers a subscription to
 the message queue.
 
+Multiple subscribers may subscribe to a single message queue; the queue knows
+about each of its subscribers, and can push messages in a round-robin fashion.
+
 
 #### Acknowledgement and rejection
 
