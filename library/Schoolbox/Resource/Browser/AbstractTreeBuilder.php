@@ -263,8 +263,11 @@ abstract class AbstractTreeBuilder
      * @param string  $dataType
      * @return array
      */
-    protected function buildLiAttributes(IFolder $folder, string $permission, string $dataType): array
-    {
+    protected function buildLiAttributes(
+        /** @noinspection PhpUnusedParameterInspection */ IFolder $folder,
+        string $permission,
+        string $dataType
+    ): array {
         return [
             'data-permission' => $permission,
             'data-type' => $dataType,
