@@ -1,3 +1,13 @@
+<script type="text/javascript">
+    $(function () {
+        $('table[data-sortable]').DataTable({
+            info: false,
+            paging: false,
+            searching: false
+        });
+    });
+</script>
+
 <style type="text/css">
     td.center, th.center {
         text-align: center;
@@ -20,7 +30,7 @@
     <div class="small-12 columns">
         <h2 class="subheader">Hero Candidates</h2>
         <div class="scrollable">
-            <table>
+            <table data-sortable>
                 <thead>
                     {% include '@helpHero/headings.twig' %}
                 </thead>
@@ -45,7 +55,7 @@
     <div class="small-12 columns">
         <h2 class="subheader">Heroes</h2>
         <div class="scrollable">
-            <table>
+            <table data-sortable>
                 <thead>
                     {% include '@helpHero/headings.twig' %}
                 </thead>
