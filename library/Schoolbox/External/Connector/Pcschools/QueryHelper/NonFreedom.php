@@ -147,28 +147,30 @@ class NonFreedom implements IQueryHelper
             INNER JOIN FAMILY AS S_FAMILY ON S.FAMILY_CODE = S_FAMILY.FAMKEY
             WHERE S_FAMILY.IDENTITY_ID# = :familyCode
         ';
+        $params = [
+            'familyCode' => $familyCode,
+        ];
 
         switch ($suffix) {
             case 'F':
                 $query .= ' AND S_FAMILY.DAD_LMS = :contactLevel';
+                $params['contactLevel'] = self::CONTACT_LEVEL_FULL;
                 break;
             case 'M':
                 $query .= ' AND S_FAMILY.MUM_LMS = :contactLevel';
+                $params['contactLevel'] = self::CONTACT_LEVEL_FULL;
                 break;
             case 'C':
                 $query .= ' AND S_FAMILY.CGIVE_LMS = :contactLevel';
+                $params['contactLevel'] = self::CONTACT_LEVEL_FULL;
                 break;
             case 'G':
                 $query .= ' AND S_FAMILY.GUARD_LMS = :contactLevel';
+                $params['contactLevel'] = self::CONTACT_LEVEL_FULL;
                 break;
             default:
                 break;
         }
-
-        $params = [
-            'familyCode'   => $familyCode,
-            'contactLevel' => self::CONTACT_LEVEL_FULL
-        ];
 
         return [ $query, $params ];
     }
