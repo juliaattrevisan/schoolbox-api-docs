@@ -63,7 +63,7 @@ class Sync extends Base implements ISync
                     THEN S.KNOWN_AS_NAME
                     ELSE S.GIVEN_NAME
                 END             AS student_preferred,
-                S.SURNAME AS student_surname,
+                S.SURNAME       AS student_surname,
                 S.SEX           AS student_gender,
                 ''              AS student_home_email,
                 S.EMAIL         AS student_default_email,

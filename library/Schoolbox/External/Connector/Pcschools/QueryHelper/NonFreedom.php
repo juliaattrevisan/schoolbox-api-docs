@@ -32,7 +32,7 @@ class NonFreedom implements IQueryHelper
             S.HOUSE         AS student_house,
             S.SEX           AS student_gender,
             S.GIVEN_NAME    AS student_preferred,
-            S.LEGAL_SURNAME AS student_surname
+            S.SURNAME       AS student_surname
         ";
 
         $sql = "

@@ -40,7 +40,7 @@ class Freedom implements IQueryHelper
             S.HOUSE                             AS student_house,
             S.SEX                               AS student_gender,
             S.GIVEN_NAME                        AS student_preferred,
-            S.LEGAL_SURNAME                     AS student_surname
+            S.SURNAME                           AS student_surname
             FROM dbo.[IDENTITY] AS I
             INNER JOIN dbo.ALUMREL AS A ON A.PARENT# = I.MEMBER#
             INNER JOIN dbo.STUDENT AS S ON S.STUDENT# = A.CHILD#
