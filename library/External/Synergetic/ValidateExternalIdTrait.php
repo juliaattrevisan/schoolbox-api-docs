@@ -23,6 +23,7 @@ trait External_Synergetic_ValidateExternalIdTrait
     {
         // Empty? Reject
         // Any non-digit characters? Reject
-        return !empty($externalUserId) && !preg_match('/\\D/', $externalUserId);
+        // Out of mysql int range? Reject
+        return !empty($externalUserId) && !preg_match('/\\D/', $externalUserId) && ($externalUserId <= 2147483647);
     }
 }
