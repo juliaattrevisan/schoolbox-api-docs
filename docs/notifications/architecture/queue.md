@@ -1,15 +1,15 @@
-# Message Queue
+# Message Broker
 
-The notification system uses message queues to store messages that must be
+The notification system uses message brokers to store messages that must be
 passed from one process to another.
 
-These queues function as publish-subscribe queues:
+The message broker functions as a publish-subscribe queue would:
 * Clients may publish messages to them
-* Subscribers may listen for new messages published to a queue, and act on them
-  accordingly
+* Subscribers may listen for new messages published to a them, and act on the
+  message content accordingly
 
 Schoolbox provides the `\Alaress\Async\Broker\IBroker` interface for defining
-how a message queue must work.
+how a message broker must work.
 
 
 ## Glossary
@@ -53,11 +53,11 @@ how a message queue must work.
 
 ## Implementation
 
-Schoolbox's message queues are implemented in two parts; the message queue
+Schoolbox's message brokers are implemented in two parts; the message queue
 itself, and a data store for the queue.
 
 `\Alaress\Async\Broker\StompRedis\Broker` is the abstract implementation of the
-two-part message queue; concrete queues may extend this abstract class.
+two-part message broker; concrete brokers may extend this abstract class.
 
 
 ### Queue
@@ -67,16 +67,17 @@ protocol. Schoolbox uses [RabbitMQ](https://www.rabbitmq.com/) as its AMQP
 implementation; in theory, it could be switched for a different implementation
 without having to modify the interfacing code.
 
-The queue itself stores no data other than keys; the actual message content is
+The queue itself stores no data other than keys; the actual message payload is
 stored in the data store.
 
 
 ### Data Store
 
-Schoolbox message queues use [Redis](https://redis.io/) as a data store.
+Schoolbox message brokers use [Redis](https://redis.io/) as a data store.
 
 Each item in the queue contains a key value; this key must be a valid key
-within the queue's Redis store.
+within the data store, otherwise the queue item is considered to be invalid
+and will be removed from the queue.
 
 
 ## Usage
@@ -85,7 +86,7 @@ within the queue's Redis store.
 ### Publishing
 
 `\Alaress\Async\Broker\IBroker::publish` publishes a message to the message
-queue.
+broker.
 
 The message itself will be `serialize`d before storing it in the data store.
 
@@ -95,10 +96,11 @@ TODO figure out what `$context` does, and exactly what's stored in the queue
 ### Subscription
 
 `\Alaress\Async\Broker\IBroker::registerConsumer` registers a subscription to
-the message queue.
+the message broker.
 
-Multiple subscribers may subscribe to a single message queue; the queue knows
-about each of its subscribers, and can push messages in a round-robin fashion.
+Multiple subscribers may subscribe to a single message broker; the underlying
+queue knows about each of its subscribers, and can push messages in a 
+round-robin fashion.
 
 
 #### Acknowledgement and rejection
@@ -107,14 +109,12 @@ The message handler (as passed to `registerConsumer` above) must implement
 `\Alaress\Async\Broker\IConsumer`; this interface prescribes `onMessage` and
 `onException` methods.
 
-`onMessage` receives a message from the queue; it's up to the consumer to
+`onMessage` receives a message from the broker; it's up to the consumer to
 figure out what to do with it, and then either acknowledge or reject it using
 the `\Alaress\Async\Broker\IResolver` this message receives.
 
-
-The message queue holds messages in escrow when consumed by a consumer:
-* Acknowledging the message will cause the queue to remove the message from
-  the queue
+The underlying queue holds messages in escrow when consumed by a consumer:
+* Acknowledging the message will cause the queue to remove the message
 * Rejecting the message will cause the queue to re-queue the message
 * If the handler process terminates unexpectedly, the queue will be notified;
   this will cause the queue to re-queue any messages that were held by the
