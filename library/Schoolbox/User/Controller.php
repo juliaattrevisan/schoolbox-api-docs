@@ -15,7 +15,6 @@ use \Schoolbox\User;
 use User\Logger;
 use External_User;
 
-
 class Controller extends Base
 {
     /**
@@ -37,7 +36,7 @@ class Controller extends Base
      * @param External_User   $externalHandler
      * @param Logger\Mapper    $assumeUserLogMapper
      */
-    public function __construct(UserAccessMapper $userAccessMapper, External_User $externalHandler,  Logger\Mapper $assumeUserLogMapper)
+    public function __construct(UserAccessMapper $userAccessMapper, External_User $externalHandler, Logger\Mapper $assumeUserLogMapper)
     {
         $this->userAccessMapper    = $userAccessMapper;
         $this->externalHandler     = $externalHandler;
