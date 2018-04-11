@@ -285,6 +285,7 @@ class NonFreedom implements IQueryHelper
                 ''                                                            AS StudentHeadOfHouse,
                 S.STATUS                                                      AS StudentBoarder,
                 ''                                                            AS Comment,
+                ''                                                            AS StudentIBFlag,
                 S.HOME_CLASS                                                  AS StudentForm,
                 S_CLASS.DESCRIPTION                                           AS FormDescription,
                 S_HOME_TEACHER.NAME_FOR_REPORT                                AS StudentFormStaffName,
