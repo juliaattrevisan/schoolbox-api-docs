@@ -1572,15 +1572,7 @@ class Controller extends Base\Base
         );
 
         // Don't show children if this is an invalid location
-        $showChildren = true;
-        $i            = 0;
-        while ($folder && IFolder::ROOT_ID !== (int)$folder->getId() && $i++ < 1000) {
-            if (\in_array($folder->getFolderType(), ['course', 'unit'], true)) {
-                $showChildren = false;
-                break;
-            }
-            $folder = $this->folderMapper->findById($folder->getParent()->getId());
-        }
+        $showChildren = $treeBuilder->isValidCourseLocation($folderId);
 
         $this->getResponse()->content->set([
             'format' => 'json',

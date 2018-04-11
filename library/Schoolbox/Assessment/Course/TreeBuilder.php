@@ -123,18 +123,17 @@ class TreeBuilder extends Resources\TreeBuilder
      * @param int $nodeId
      * @return bool
      */
-    private function isValidCourseLocation(int $nodeId): bool
+    public function isValidCourseLocation(int $nodeId): bool
     {
         $folder  = $this->folderLocator->findById($nodeId);
-        $isValid = true;
         $i       = 0;
         while ($folder && $folder->getId() && $i++ < 1000) {
             if (\in_array($folder->getNodeType(), [NodeInterface::TYPE_COURSE, NodeInterface::TYPE_UNIT], true)) {
-                $isValid = false;
+                return false;
             }
             $folder = $this->folderLocator->findById($folder->getParent()->getId());
         }
-        return $isValid;
+        return true;
     }
 }
 
