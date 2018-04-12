@@ -256,10 +256,10 @@ class Freedom implements IQueryHelper
      */
     public function processGetStudentResult(array $rows): array
     {
-        $row = $rows[0] ?? null;
+        $row = $rows[0] ?? [];
 
         if (!\count($row)) {
-            return null;
+            return [];
         }
 
         $pfx    = 'StudentEmergency';
