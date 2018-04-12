@@ -65,9 +65,11 @@ class ReCaptcha
             <script>
                 function recaptchaCallback() {
                     $("#recaptcha-valid").val(1);
+                    $("#recaptcha-valid-error").hide();
                 }
                 function recaptchaExpiredCallback() {
                     $("#recaptcha-valid").val(0);
+                    $("#recaptcha-valid-error").show();
                 }
             </script>
             <div class="g-recaptcha" data-sitekey="' . $this->public_key . '" data-callback="recaptchaCallback" data-expired-callback="recaptchaExpiredCallback"></div>
