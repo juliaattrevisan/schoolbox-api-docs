@@ -7,6 +7,9 @@
  * @link      http://www.alaress.com.au/
  */
 
+use Schoolbox\External\Connector\Pcschools\QueryHelper;
+use Schoolbox\External\Connector\Pcschools\QueryHelper\Freedom;
+use Schoolbox\External\Connector\Pcschools\QueryHelper\IQueryHelper;
 use Schoolbox\User;
 
 class External_Pcschools_User implements External_UserInterface
@@ -30,6 +33,9 @@ class External_Pcschools_User implements External_UserInterface
      */
     private $userMapper;
 
+    /** @var IQueryHelper */
+    private $queryHelper;
+
     /**
      * Constructor
      */
@@ -40,6 +46,9 @@ class External_Pcschools_User implements External_UserInterface
 //        $this->getDatabase()->query('SET ANSI_PADDING ON');
 //        $this->getDatabase()->query('SET ANSI_WARNINGS ON');
         $this->userMapper = new \Schoolbox\UserMapper();
+
+        /** @noinspection PhpUnhandledExceptionInspection */
+        $this->queryHelper = (new QueryHelper\Factory($this->database))->spawn();
     }
 
     /**
@@ -88,54 +97,14 @@ class External_Pcschools_User implements External_UserInterface
      */
     public function getStudent($externalUserId)
     {
-        $row = $this->getDatabase()->getRow("
-            SELECT
-                S.STUDKEY AS StudentID,
-                S.GIVEN_NAME AS StudentGiven1,
-                S.LEGAL_SURNAME AS StudentSurname,
-                S.BIRTH_DATE AS StudentBirthDate,
-                S_HOUSE.DESCRIPTION AS StudentHouseDescription,
-                S.HOUSE AS StudentHouse,
-                '' AS HeadOfHouseID,
-                '' AS StudentHeadOfHouse,
-                S.STATUS AS StudentBoarder,
-                '' AS Comment,
-                '' AS StudentIBFlag,
-                S.HOME_CLASS AS StudentForm,
-                S_CLASS.DESCRIPTION AS FormDescription,
-                S_HOME_TEACHER.NAME_FOR_REPORT AS StudentFormStaffName,
-                S.DEAN AS StudentTutor,
-                S_HOME_TEACHER.NAME_FOR_REPORT AS StudentTutorName,
-                S_DEAN.NAME_FOR_REPORT AS StudentTutorDescription,
-                S.HOME_TEACHER AS TeacherFormID,
-                S.DEAN AS TeacherTutorID,
-                S.CURRENT_YEAR AS StudentYearLevel,
-                S.DEAN AS YearLevelCoordID,
-                '' AS StudentYearLevelCoordinator,
-                S.LOCKER AS StudentLockerBook,
-                S.EMERG_CONTACT AS StudentEmergencyName,
-                S.EMERG_PHONE AS StudentEmergencyPhone,
-                '' AS StudentEmergencyPhoneAlt,
-                S_FAMILY.DAD_FIRSTNAME + ' ' + S_FAMILY.DAD_SURNAME AS StudentEmergency2Name,
-                S_FAMILY.DAD_EMERG AS StudentEmergency2Phone,
-                S_FAMILY.DAD_EMERG_PH AS StudentEmergency2PhoneAlt,
-                S_FAMILY.MUM_FIRSTNAME + ' ' + S_FAMILY.MUM_SURNAME AS StudentEmergency3Name,
-                S_FAMILY.MUM_EMERG AS StudentEmergency3Phone,
-                S_FAMILY.MUM_EMERG_PH AS StudentEmergency3PhoneAlt,
-                S.ALERT AS StudentMedicalAlert,
-                '' AS StudentSpecialNeedsFlag,
-                '' AS StudentStudiesCode,
-                S.ALERT AS AlertMessage,
-                0 AS countIndividualEducationPlans
-            FROM STUDENT S
-            LEFT JOIN CODEMAST AS S_HOUSE ON S.HOUSE = S_HOUSE.CODE AND S_HOUSE.TYPE = 'HOUSE'
-            LEFT JOIN CODEMAST AS S_CLASS ON S.HOME_CLASS = S_CLASS.CODE AND S_CLASS.TYPE = 'CLASS'
-            LEFT JOIN TEACHER AS S_HOME_TEACHER ON S.HOME_TEACHER = S_HOME_TEACHER.TEACHER_CODE
-            LEFT JOIN TEACHER AS S_DEAN ON S.DEAN = S_DEAN.TEACHER_CODE
-            LEFT JOIN FAMILY AS S_FAMILY ON S.FAMILY_CODE = S_FAMILY.FAMKEY
-            WHERE S.STUDKEY = {$this->getDatabase()->smartQuote($externalUserId)}
-        ");
+        [ $sql, $params ] = $this->queryHelper->getGetStudentQuery($externalUserId);
+
+        $rows = $this->getDatabase()->getAll($sql, $params);
+
+        // squash the result down into a single row
+        $row = $this->queryHelper->processGetStudentResult($rows);
         if (!empty($row)) {
+
             $row = $this->getDatabase()->trimRow($row);
             // Get boarder codes and munge student boarder status in
             $boarderCodes = array_map(
@@ -185,56 +154,19 @@ class External_Pcschools_User implements External_UserInterface
      */
     public function getStudentContactList($externalUserId)
     {
+        [ $sql, $params ] = $this->queryHelper->getGetStudentContactListQuery($externalUserId);
+
         // Split contacts into separate father/mother/guardian/carer records
         // (at this stage, all with the same contact ID)
-        $rowset = $this->getDatabase()->getAll("
-            SELECT
-                F.IDENTITY_ID#,
-                -- Father
-                F.DAD_LMS,
-                F.FATHER_TITLE,
-                F.DAD_FIRSTNAME,
-                F.DAD_SURNAME,
-                F.DAD_EMAIL,
-                F.DAD_HOME_PHONE,
-                F.DAD_MOBILE,
-                F.DAD_BUSS_PHONE,
-                F.DAD_STATUS,
-                -- Mother
-                F.MUM_LMS,
-                F.MOTHER_TITLE,
-                F.MUM_FIRSTNAME,
-                F.MUM_SURNAME,
-                F.MUM_EMAIL,
-                F.MUM_HOME_PHONE,
-                F.MUM_MOBILE,
-                F.MUM_BUSS_PHONE,
-                F.MUM_STATUS,
-                -- Guardian
-                F.GUARD_LMS,
-                F.GUARDIAN_TITLE,
-                F.GUARD_FIRSTNAME,
-                F.GUARD_SURNAME,
-                F.GUARD_EMAIL,
-                F.GUARD_HOME_PH,
-                F.GUARD_MOBILE,
-                F.GUARD_BUSS_PH,
-                F.GUARD_STATUS,
-                -- Carer
-                F.CGIVE_LMS,
-                F.CGIVE_TITLE,
-                F.CGIVE_FIRSTNAME,
-                F.CGIVE_SURNAME,
-                F.CGIVE_EMAIL,
-                F.CGIVE_HOME_PH,
-                F.CGIVE_MOBILE,
-                F.CGIVE_BUSS_PH,
-                F.CGIVE_STATUS
-            FROM FAMILY AS F
-            INNER JOIN STUDENT AS S ON F.FAMKEY = S.FAMILY_CODE
-            WHERE S.STUDKEY = {$this->getDatabase()->smartQuote($externalUserId)}
-        ");
+        $rowset = $this->getDatabase()->getAll($sql, $params);
 
+        // another hack sorry!
+        if ($this->queryHelper instanceof Freedom) {
+            // data is clean, just send it back
+            return $rowset;
+        }
+
+        // non-freedom requires hackery to make this all come together properly
         $base   = [
             'StudentContactID'                 => '',
             'StudentContactTitle'              => '',
@@ -457,29 +389,25 @@ class External_Pcschools_User implements External_UserInterface
         if (empty($synergyIds)) {
             return [];
         }
-        $query = "
-            SELECT
-                F.IDENTITY_ID#,
-                -- Father
-                F.DAD_LMS,
-                F.DAD_EMAIL,
-                -- Mother
-                F.MUM_LMS,
-                F.MUM_EMAIL,
-                -- Guardian
-                F.GUARD_LMS,
-                F.GUARD_EMAIL,
-                -- Carer
-                F.CGIVE_LMS,
-                F.CGIVE_EMAIL
-            FROM FAMILY AS F
-            INNER JOIN STUDENT AS S ON F.FAMKEY = S.FAMILY_CODE
-        ";
+
+        [ $query, $params ] = $this->queryHelper->getGetParentEmailsQuery($synergyIds);
+
         $whereParts = [];
         foreach ($synergyIds as $id) {
             $whereParts[] = "S.STUDKEY = {$this->getDatabase()->smartQuote($id)}";
         }
-        $query .= ' WHERE '.implode(' OR ', $whereParts);
+        $query .= ' AND ('.implode(' OR ', $whereParts) . ')';
+
+        // sorry for the hack!!
+        if ($this->queryHelper instanceof Freedom) {
+            // freedom returns the data cleanly, just index by ID and return
+            $result = $this->getDatabase()->getAll($query, $params);
+
+            return array_combine(
+                array_column($result, 'IDENTITY_ID#'),
+                array_column($result, 'EMAIL')
+            );
+        }
 
         // Munge data in same way we would in getStudentContactList
         $results = [];
@@ -904,44 +832,15 @@ class External_Pcschools_User implements External_UserInterface
      *
      * @importance high - used to determine a parent's children, and related permissions.
      *
-     * @param $externalUserId
+     * @param string $externalUserId
      *
      * @return array
      */
     public function getEnrolledStudents($externalUserId)
     {
-        // parent external ID format: $famKey-{some code}
-        $suffix     = '';
-        $familyCode = $externalUserId;
-        $parts = explode('-', $externalUserId);
-        if (count($parts) > 1) {
-            $suffix     = array_pop($parts);
-            $familyCode = implode('-', $parts);
-        }
-        $query = "
-            SELECT S.STUDKEY AS RelatedID
-            FROM STUDENT S
-            INNER JOIN FAMILY AS S_FAMILY ON S.FAMILY_CODE = S_FAMILY.FAMKEY
-            WHERE S_FAMILY.IDENTITY_ID# = {$this->getDatabase()->smartQuote($familyCode)}
-        ";
-        $quotedContactLevel = $this->getDatabase()->smartQuote(self::CONTACT_LEVEL_FULL);
-        switch ($suffix) {
-            case 'F':
-                $query .= " AND S_FAMILY.DAD_LMS = $quotedContactLevel";
-                break;
-            case 'M':
-                $query .= " AND S_FAMILY.MUM_LMS = $quotedContactLevel";
-                break;
-            case 'C':
-                $query .= " AND S_FAMILY.CGIVE_LMS = $quotedContactLevel";
-                break;
-            case 'G':
-                $query .= " AND S_FAMILY.GUARD_LMS = $quotedContactLevel";
-                break;
-            default:
-                break;
-        }
-        return $this->getDatabase()->trimAll($this->getDatabase()->getAll($query));
+        [ $query, $params ] = $this->queryHelper->getGetEnrolledStudentsQuery($externalUserId);
+
+        return $this->getDatabase()->trimAll($this->getDatabase()->getAll($query, $params));
     }
 
     /**
