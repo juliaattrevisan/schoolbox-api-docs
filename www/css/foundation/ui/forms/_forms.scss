@@ -29,7 +29,7 @@ $input-hover-color: $black;
 $input-border-style: solid;
 $input-border-width: .0625rem;
 $input-border-radius: $global-radius;
-$input-disabled-bg: rgba($input-focus-bg-color, 0.05);
+$input-disabled-bg: $vapor;
 $input-disabled-cursor: $cursor-default-value;
 $input-box-shadow: none;
 
@@ -153,22 +153,18 @@ select{
 
 input:disabled,
 input:read-only,
-textarea:read-only {
-	opacity: .5;
+textarea:disabled,
+textarea:read-only,
+select:disabled {
+	background-color: $vapor;
+	color: $aluminum;
+	opacity: 1;
 	label:hover & {
 		@include placeholder-hover-color($base);
 	}
-}
-
-input:disabled:hover,
-textarea:disabled:hover,
-select:disabled:hover,
-input:read-only:hover,
-textarea:read-only:hover,
-input:read-only:focus,
-textarea:read-only:focus{
-	background-color: $input-bg-color;
-	border-color: $form-border-color;
+	&:hover {
+		border-color: $form-border-color;
+	}
 }
 
 input[type="checkbox"],
