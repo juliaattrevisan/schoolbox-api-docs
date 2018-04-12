@@ -110,17 +110,9 @@ class Module extends BaseModule
             throw new NotFound('Unavailable for this student\'s year level due to OLE flag');
         }
 
-        /* Can't get reports from the future, or too far in the past
-         * Arbitrary limit of 2000
-         *
-         * TODO: Eventually this will be limited to the current year only after testing
+        /* Only works for the current year
          */
-        $oldestYear = 2000;
-
-        $inFuture = (int)$params['year'] > date('Y');
-        $inPast = (int)$params['year'] < $oldestYear;
-
-        if ($inPast || $inFuture) {
+        if ((int)$params['year'] !== (int)date('Y')) {
             throw new NotFound('Invalid year');
         }
 
