@@ -110,12 +110,6 @@ class Module extends BaseModule
             throw new NotFound('Unavailable for this student\'s year level due to OLE flag');
         }
 
-        /* Year level boundaries
-         */
-        if (!\in_array($user->getYear(), $this->availableForYears, false)) {
-            throw new NotFound('Unavailable for this student\'s year level');
-        }
-
         /* Can't get reports from the future, or too far in the past
          * Arbitrary limit of 2000
          *
