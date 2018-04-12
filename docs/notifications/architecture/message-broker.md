@@ -17,8 +17,8 @@ how a message broker must work.
 <dl>
   <dt>Message Broker</dt>
   <dd>
-    The high-level interface through which Messages are Published and Subscribed
-    to.
+    The high-level interface through which Messages are Published and
+    Subscribed to.
   </dd>
   
   <dt>Queue</dt>
