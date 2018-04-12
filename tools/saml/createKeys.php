@@ -42,7 +42,7 @@ $kernel->run(function (Di\Container $di, $loop, $log, $opts) {
     // Save your private key, CSR and self-signed cert for later use
     openssl_csr_export($csr, $csrout);
     openssl_x509_export($x509, $certout);
-    openssl_pkey_export($privkey, $pkeyout, "mypassword");
+    openssl_pkey_export($privkey, $pkeyout, sha1(strtolower(trim($conf->get('site_school_code')))));
 
     $conf->set('saml_private_cert',$pkeyout);
     $conf->set('saml_public_cert',$certout);

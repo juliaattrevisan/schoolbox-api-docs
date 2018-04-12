@@ -51,6 +51,13 @@ try {
     //noop, metadata url invalid
 }
 
+/**
+ * Exports the private key for use as it is stored passphrase encoded
+ */
+$privateKey = false;
+$privateKeyResource = openssl_pkey_get_private(Cfg::get('saml_private_cert'), sha1(strtolower(trim(Cfg::get('site_school_code')))));
+openssl_pkey_export($privateKeyResource, $privateKey);
+
 $settingsInfo['sp'] = [
         'entityId' => $spBaseUrl,
         'assertionConsumerService' => [
@@ -64,7 +71,7 @@ $settingsInfo['sp'] = [
         ],
         'NameIDFormat' => OneLogin_Saml2_Constants::NAMEID_UNSPECIFIED,
         'x509cert' => Cfg::get('saml_public_cert'),
-        'privateKey' => Cfg::get('saml_private_cert'),
+        'privateKey' => $privateKey ? $privateKey : Cfg::get('saml_public_cert'),
     ];
 
 /**
