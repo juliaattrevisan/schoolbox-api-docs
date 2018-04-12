@@ -126,7 +126,7 @@ class NonFreedom implements IQueryHelper
     }
 
     /**
-     * @param int $externalUserId
+     * @param string $externalUserId
      * @return array
      */
     public function getGetEnrolledStudentsQuery($externalUserId): array
@@ -207,7 +207,7 @@ class NonFreedom implements IQueryHelper
 
 
     /**
-     * @param int $studentExternalId
+     * @param string $studentExternalId
      * @return array
      */
     public function getGetStudentContactListQuery($studentExternalId): array
@@ -269,7 +269,7 @@ class NonFreedom implements IQueryHelper
 
 
     /**
-     * @param int $studentExternalId
+     * @param string $studentExternalId
      * @return array
      */
     public function getGetStudentQuery($studentExternalId): array

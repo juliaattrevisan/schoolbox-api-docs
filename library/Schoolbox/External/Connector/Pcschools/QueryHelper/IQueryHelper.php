@@ -18,7 +18,7 @@ interface IQueryHelper
     public function getFindAllParentsQuery(): array;
 
     /**
-     * @param int $studentExternalId
+     * @param string $studentExternalId
      * @return array
      */
     public function getGetStudentQuery($studentExternalId): array;
@@ -30,7 +30,7 @@ interface IQueryHelper
     public function processGetStudentResult(array $rows): array;
 
     /**
-     * @param int $studentExternalId
+     * @param string $studentExternalId
      * @return array
      */
     public function getGetStudentContactListQuery($studentExternalId): array;
@@ -42,7 +42,7 @@ interface IQueryHelper
     public function getGetParentEmailsQuery($studentExternalIds): array;
 
     /**
-     * @param int $externalUserId
+     * @param string $externalUserId
      * @return array
      */
     public function getGetEnrolledStudentsQuery($externalUserId): array;

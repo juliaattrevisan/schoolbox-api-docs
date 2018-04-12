@@ -832,7 +832,7 @@ class External_Pcschools_User implements External_UserInterface
      *
      * @importance high - used to determine a parent's children, and related permissions.
      *
-     * @param $externalUserId
+     * @param string $externalUserId
      *
      * @return array
      */
