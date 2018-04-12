@@ -26,7 +26,7 @@ abstract class AbstractFolder implements IFolder
     /**
      * Identifier
      *
-     * @var int
+     * @var int|string
      */
     protected $id;
 
@@ -81,7 +81,7 @@ abstract class AbstractFolder implements IFolder
     /**
      * Get id
      *
-     * @return int
+     * @return int|string
      */
     public function getId()
     {

@@ -1085,7 +1085,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             return $this->createModel()
                         ->setId(0)
                         ->setName('Top Level')
-                        ->setParent($this->createModel()->setId('#'));
+                        ->setParent($this->createModel()->setId(IFolder::ROOT_PARENT_ID));
         }
 
         /** @var Model $folder */
@@ -1284,7 +1284,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                 break;
             }
             $parent_id = $parent->getId();
-            if (!$parent_id || $parent_id == '#' || (!empty($stop_id) && $stop_id == $parent_id)) {
+            if (!$parent_id || $parent_id === IFolder::ROOT_PARENT_ID || (!empty($stop_id) && $stop_id == $parent_id)) {
                 break;
             }
 
@@ -1417,7 +1417,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             return $this->createModel()
                 ->setId(0)
                 ->setName('Top Level')
-                ->setParent($this->createModel()->setId('#'));
+                ->setParent($this->createModel()->setId(IFolder::ROOT_PARENT_ID));
         }
 
         $query = "

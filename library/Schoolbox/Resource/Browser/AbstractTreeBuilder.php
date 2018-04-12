@@ -67,7 +67,7 @@ abstract class AbstractTreeBuilder
      * @param string $baseFolder
      * @return array
      */
-    public function buildPartialTree($categoryId, $baseFolder='#')
+    public function buildPartialTree($categoryId, $baseFolder = IFolder::ROOT_PARENT_ID)
     {
         // build a list of parentage
         $parentList[] = $parentId = $categoryId;
@@ -84,9 +84,9 @@ abstract class AbstractTreeBuilder
         }
 
         // Build the root node
-        $partialTree = $this->buildChildNodes($baseFolder);
+        $partialTree = $this->buildChildNodes($baseFolder, $parentList);
 
-        if ($baseFolder == '#') {
+        if ($baseFolder === IFolder::ROOT_PARENT_ID) {
             // Build the parent nodes
             foreach ($parentList as $parentCategoryId) {
                 $partialTree = array_merge(
@@ -102,7 +102,7 @@ abstract class AbstractTreeBuilder
                 $nodes = $this->buildChildNodes($parentCategoryId, $parentList);
                 foreach ($nodes as $node) {
                     if ($node['id'] == $baseFolder) {
-                        $node['parent'] = '#';
+                        $node['parent'] = IFolder::ROOT_PARENT_ID;
                         $partialTree[] = $node;
                         $found = true;
                         break;
@@ -139,7 +139,7 @@ abstract class AbstractTreeBuilder
         // Open $categoryId's node and its parents
 
         foreach ($partialTree as &$leaf) {
-            $leaf['state']['opened'] = in_array($leaf['id'], $parentList) || $leaf['id'] == 0;
+            $leaf['state']['opened'] = in_array($leaf['id'], $parentList) || (int)$leaf['id'] === IFolder::ROOT_ID;
             $leaf['state']['selected'] = ($leaf['id'] == $categoryId);
         }
         unset($leaf);
@@ -161,7 +161,7 @@ abstract class AbstractTreeBuilder
         $output = [];
 
         // Did I ask for the root node? get it
-        if ($folderId === '#') {
+        if ($folderId === IFolder::ROOT_PARENT_ID) {
             $folder = $this->folderLocator->findById(0);
             $output[] = $this->generateNodeArray(
                 $folder->getId(),
@@ -248,7 +248,7 @@ abstract class AbstractTreeBuilder
             $name,
             $colour,
             $coverImage,
-            $this->buildLiAttributes($permission, $this->getDataType($folder, $type)),
+            $this->buildLiAttributes($folder, $permission, $this->getDataType($folder, $type)),
             [
                 'href' => $href
             ],
@@ -258,12 +258,16 @@ abstract class AbstractTreeBuilder
 
 
     /**
-     * @param string    $permission
-     * @param string    $dataType
+     * @param IFolder $folder
+     * @param string  $permission
+     * @param string  $dataType
      * @return array
      */
-    protected function buildLiAttributes($permission, $dataType)
-    {
+    protected function buildLiAttributes(
+        /** @noinspection PhpUnusedParameterInspection */ IFolder $folder,
+        string $permission,
+        string $dataType
+    ): array {
         return [
             'data-permission' => $permission,
             'data-type' => $dataType,

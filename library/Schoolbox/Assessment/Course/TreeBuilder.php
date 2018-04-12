@@ -49,9 +49,16 @@ class TreeBuilder extends Resources\TreeBuilder
         if (\in_array($folder->getId(), $parentList, false)) {
             return true;
         }
-        // Don't build tree below courses
-        if ($folder->getParent()->getNodeType() === NodeInterface::TYPE_COURSE) {
-            return false;
+
+        // Don't build tree below courses or units
+        $parent = $folder->getParent();
+        $i      = 0;
+        while ($parent && (int)$parent->getId() !== IFolder::ROOT_ID && $parent->getId() !== IFolder::ROOT_PARENT_ID && $i++ < 1000) {
+            $folderType = $parent->getNodeType();
+            if ($folderType === NodeInterface::TYPE_COURSE || $folderType === NodeInterface::TYPE_UNIT) {
+                return false;
+            }
+            $parent = $parent->getParent();
         }
         return true;
     }
@@ -62,7 +69,14 @@ class TreeBuilder extends Resources\TreeBuilder
      */
     protected function getNodeHasChildren($nodeId, array $parentList = []): bool
     {
-        if (!\in_array($nodeId, $parentList, false) && NodeInterface::TYPE_COURSE === $this->folderLocator->findById($nodeId)->getNodeType()) {
+        // Are we checking the current course location node?
+        if ((int)$nodeId === $this->currentParentId) {
+            // We are only interested in children of current location if current location is valid
+            return $this->isValidCourseLocation($nodeId);
+        }
+
+        $isAncestor = \in_array($nodeId, $parentList, false);
+        if (!$isAncestor && NodeInterface::TYPE_COURSE === $this->folderLocator->findById($nodeId)->getNodeType()) {
             // If node is a course and not an ancestor, we are not interested in its children
             return false;
         }
@@ -88,15 +102,38 @@ class TreeBuilder extends Resources\TreeBuilder
     /**
      * @inheritdoc
      */
-    protected function buildLiAttributes($permission, $dataType)
+    protected function buildLiAttributes(IFolder $folder, string $permission, string $dataType): array
     {
-        $liAttributes = parent::buildLiAttributes($permission, $dataType);
-        if ($dataType === NodeInterface::TYPE_NO_ACCESS) {
-            $liAttributes += [
-                'title' => 'Courses cannot be placed into other courses'
-            ];
+        // Suppress leak of parent node title
+        $title = '';
+
+        if ($this->currentParentId === (int)$folder->getId()) {
+            $title = 'Current course location';
+        } elseif (NodeInterface::TYPE_NO_ACCESS === $dataType) {
+            $title = 'Courses cannot be placed into other courses';
         }
-        return $liAttributes;
+
+        return parent::buildLiAttributes($folder, $permission, $dataType) + ['title' => $title];
+    }
+
+
+    /**
+     * Returns whether a node is a valid course location
+     *
+     * @param int $nodeId
+     * @return bool
+     */
+    public function isValidCourseLocation(int $nodeId): bool
+    {
+        $folder  = $this->folderLocator->findById($nodeId);
+        $i       = 0;
+        while ($folder && $folder->getId() && $i++ < 1000) {
+            if (\in_array($folder->getNodeType(), [NodeInterface::TYPE_COURSE, NodeInterface::TYPE_UNIT], true)) {
+                return false;
+            }
+            $folder = $this->folderLocator->findById($folder->getParent()->getId());
+        }
+        return true;
     }
 }
 

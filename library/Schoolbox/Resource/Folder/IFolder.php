@@ -12,8 +12,17 @@ namespace Schoolbox\Resource\Folder;
 
 interface IFolder {
 
+    // Any child of a node with this ID will be considered a root node
+    // @see https://www.jstree.com/docs/json/
+    // TODO consider changing this to -1 and perform -1 => '#' mapping for JS-tree implementation only
+    public const ROOT_PARENT_ID = '#';
+    public const ROOT_ID = 0;
+
     /**
-     * @return int
+     * For now, we need to support string too account for '#'
+     *
+     * @see self::ROOT_PARENT_ID
+     * @return int|string
      */
     public function getId();
 
