@@ -8,6 +8,7 @@
  */
 namespace Custom\Stk\NCEA;
 
+use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Authorizer\Rule;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Module\Module as BaseModule;
@@ -20,6 +21,7 @@ use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Role;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 
@@ -54,7 +56,25 @@ class Module extends BaseModule
             /* This student must be in Year 11-13 inclusive
              */
             new Rule\All(
-                new Rule\Any(
+                new Rule\All(
+                    new Rule\Callback(function ($params, User $user) {
+                        try {
+                            /** @var \Schoolbox\User $user */
+                            $student = $this->getUserMapper()->findById($params['id']);
+                        }
+                        catch (MapperException $e) {
+                            throw new Unauthorized('User Not Found');
+                        }
+
+                        /** @var IConnector $externalDb */
+                        $externalDb = $this->getInjector()->get('databaseExternal');
+
+                        $availability = (new Availability($externalDb))->hasAccess((int)$student->getYear());
+
+                        if (!$availability) {
+                            throw new Unauthorized('Unavailable for this student\'s year level due to OLE flag');
+                        }
+                    }),
                     new Rule\IsYearLevel($this->availableForYears)
                 ),
                 /* The Students themselves, their parents, any staff/superuser can get button and report
@@ -71,7 +91,6 @@ class Module extends BaseModule
 
         $this->register('GET', '/report/{id}/{year}', 'getReport', $getPerms, $preloadUser);
     }
-
 
     /**
      * Preload a User instance
@@ -99,15 +118,6 @@ class Module extends BaseModule
 
         if ($externalUser['StudentIBFlag']) {
             throw new NotFound('NCEA Reports not available to IB Students');
-        }
-
-        /** @var IConnector $externalDb */
-        $externalDb = $this->getInjector()->get('databaseExternal');
-
-        $availability = (new Availability($externalDb))->hasAccess($user->getYear());
-
-        if (!$availability) {
-            throw new NotFound('Unavailable for this student\'s year level due to OLE flag');
         }
 
         /* Only works for the current year
