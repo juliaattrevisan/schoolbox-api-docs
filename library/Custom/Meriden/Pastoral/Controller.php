@@ -124,18 +124,8 @@ class Controller extends Base
      */
     protected function buildReportData($year, User $student, $subjectCode = null)
     {
-        // Reports are only for students who started year 7 in 2015 or later for now.
-        $thisYear  = date('Y');
-        $startYear = $thisYear + 7 - $student->getYear();
-        if ($startYear < 2015) {
-            throw new \RangeException("Reports are only for students who started year 7 in 2015 or later for now");
-        }
-        // Reports also aren't shown for year 10+.
-        // What year would the student be in now?
-        $reportYearLevel = $student->getYear() - ($thisYear - $year);
-        if ($reportYearLevel >= 10) {
-            throw new \RangeException("Reports are only for years 7, 8 and 9 for now");
-        }
+        $this->assertValidYearForReport($year, $student);
+
         $tutorGroup     = null;
         $tutorGroupList = $this->getStudentInvolvementFactory()->buildTutorGroupList($student);
         $subject        = null;
@@ -195,5 +185,29 @@ class Controller extends Base
     {
         $this->studentInvolvementFactory = $studentInvolvementFactory;
         return $this;
+    }
+
+    /**
+     * Asserts that this year is valid for the eReport.
+     *
+     * * Reports are only for students who started year 7 in 2015+ for now
+     * * Reports are only for years the student is/was in year 7, 8 or 9
+     *
+     * @param int  $year
+     * @param User $student
+     * @throws \RangeException if it's not valid
+     */
+    private function assertValidYearForReport($year, User $student): void
+    {
+        $thisYear  = date('Y');
+        $startYear = $thisYear + 7 - $student->getYear();
+        if ($startYear < 2015) {
+            throw new \RangeException("Reports are only for students who started year 7 in 2015 or later for now");
+        }
+
+        $reportYearLevel = $student->getYear() - ($thisYear - $year);
+        if ($reportYearLevel >= 10) {
+            throw new \RangeException("Reports are only for years 7, 8 and 9 for now");
+        }
     }
 }
