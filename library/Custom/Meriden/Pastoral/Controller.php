@@ -45,6 +45,19 @@ class Controller extends Base
             $this->getStudentInvolvementFactory()->buildTutorGroupList($student)
         );
 
+        // Only redirect to valid years
+        $reportYears = array_filter(
+            $reportYears,
+            function ($year) use ($student) {
+                try {
+                    $this->assertValidYearForReport($year, $student);
+                    return true;
+                } catch (\RangeException $e) {
+                    return false;
+                }
+            }
+        );
+
         if (empty($reportYears)) {
             // 404
             $this->getResponse()->status->setCode(404);
