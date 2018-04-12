@@ -16,26 +16,6 @@ use Schoolbox\Sync\Iterator;
 class Sync extends Base implements ISync
 {
     /**
-     * The filter for a student's contacts - this filters out anyone who's not
-     * a primary guardian or parent.
-     *
-     * @var string
-     */
-    protected $studentContactFilter = "(
-        sc.ResidentialGuardian = 'Y' OR
-        sc.Relationship = 'Father' OR
-        sc.Relationship = 'Mother' OR
-        sc.Relationship = 'Stepfather' OR
-        sc.Relationship = 'Stepmother' OR
-        sc.Relationship = 'Step Father' OR
-        sc.Relationship = 'Step Mother' OR
-        sc.Relationship = 'Houseparents' OR
-        sc.Relationship LIKE '%Guardian%' OR
-        sc.Relationship LIKE 'Foster%' OR
-        sc.Relationship = 'Carer'
-    )";
-
-    /**
      * {@inheritdoc}
      */
     public function findAllStudents()
@@ -96,7 +76,19 @@ class Sync extends Base implements ISync
             FROM Contact c
             INNER JOIN StudentContact sc ON c.ID = sc.ContactID
             INNER JOIN Student         s ON sc.StudentID = s.ID
-            WHERE {$this->studentContactFilter}
+            WHERE (
+                sc.ResidentialGuardian = 'Y' OR
+                sc.Relationship = 'Father' OR
+                sc.Relationship = 'Mother' OR
+                sc.Relationship = 'Stepfather' OR
+                sc.Relationship = 'Stepmother' OR
+                sc.Relationship = 'Step Father' OR
+                sc.Relationship = 'Step Mother' OR
+                sc.Relationship = 'Houseparents' OR
+                sc.Relationship LIKE '%Guardian%' OR
+                sc.Relationship LIKE 'Foster%' OR
+                sc.Relationship = 'Carer'
+            )
             AND   s.DateLeft IS NULL
             ORDER BY c.Code ASC
         ";
