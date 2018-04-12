@@ -7,10 +7,10 @@
     {% set actionCrumb  = match.id ? action : '' %}
 
     {{ bread.crumbs(
-        [ 'Fixtures',                   routeLookup('sportsfixtures.getLanding') ],
-        [ 'Sports',                     routeLookup('sportsfixturesSport.getList') ],
-        [ sport.name,                   routeLookup('sportsfixturesSport.getEntity', { entityId: sport.id }) ],
-        [ division.name,                routeLookup('sportsfixturesDivision.getLobby', { entityId: division.id }) ],
+        [ 'Fixtures',                   routeLookupIfAuthorized('sportsfixtures.getLanding') ],
+        [ 'Sports',                     routeLookupIfAuthorized('sportsfixturesSport.getList') ],
+        [ sport.name,                   routeLookupIfAuthorized('sportsfixturesSport.getEntity', { entityId: sport.id }) ],
+        [ division.name,                routeLookupIfAuthorized('sportsfixturesDivision.getLobby', { entityId: division.id }) ],
         [ matchHeading.generate(match), headingCrumb ],
         [ actionCrumb ]
     ) }}
