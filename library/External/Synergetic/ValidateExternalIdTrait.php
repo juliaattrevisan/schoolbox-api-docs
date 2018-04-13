@@ -10,6 +10,8 @@
  */
 trait External_Synergetic_ValidateExternalIdTrait
 {
+    private static $mysqlIntMax = 2147483647;
+
     /**
      * Validates that a Synergetic user ID is an integer.
      *
@@ -23,6 +25,7 @@ trait External_Synergetic_ValidateExternalIdTrait
     {
         // Empty? Reject
         // Any non-digit characters? Reject
-        return !empty($externalUserId) && !preg_match('/\\D/', $externalUserId);
+        // Out of mysql int range? Reject
+        return !empty($externalUserId) && !preg_match('/\\D/', $externalUserId) && ($externalUserId <= self::$mysqlIntMax);
     }
 }
