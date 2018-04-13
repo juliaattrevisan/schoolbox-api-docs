@@ -128,6 +128,8 @@ class Controller extends Base
         $nulls  = [];
         $radios = [];
         $checkboxes = [];
+        // for mandatory text fields
+        $mandatoryValues = [];
 
         // Get the data into some sort of usable format
 
@@ -135,6 +137,9 @@ class Controller extends Base
 
             if (substr($field, 0, 6) == "value-") {
                 $values[substr($field, 6)] = $value;
+            } else if (substr($field, 0, 10) == "mandatory-") {
+                $values[substr($field, 10)] = $value;
+                $mandatoryValues[substr($field, 10)] = $value;
             } else if (substr($field, 0, 6) == "fixed-") {
                 $fixed[substr($field, 6)] = $value;
             } else if (substr($field, 0, 5) == "null-") {
@@ -176,6 +181,11 @@ class Controller extends Base
 
             // set literal values
             foreach ($values as $field => $value) {
+                if (array_key_exists($field, $mandatoryValues) && empty($value[$currentIndex])) {
+                    // do not save this field, if required and empty
+                    continue 2;
+                }
+
                 // Update values
                 $setter = "set" . $this->underscoreToCamelCase($field);
 
@@ -308,12 +318,13 @@ class Controller extends Base
                         'caption'   => 'Name',                                  // Friendly caption that is displayed
                         'width'     => 7,                                       // Width of the column on anything bigger than 'small'
                         'maxLength' => 50,
+                        'mandatory' => true,                                    // Set this true to avoid empty value for a text field.
                     ],
                     'type' => [
                         'caption'   => 'Role Type',
                         'lookup'    => $luRoleType,                             // If defined the column will appear as a select box
                         'width'     => 3,
-                        'mandatory' => true,
+                        'mandatory' => true,                                    // Set this true to remove an empty option from a drop down field.
                     ],
                     'canChangePassword' => [
                         'caption'   => 'Allow Password Change',
@@ -334,6 +345,7 @@ class Controller extends Base
                         'caption'   => 'Name',
                         'width'     => 12,
                         'maxLength' => 50,
+                        'mandatory' => true,
                     ]
                 ]
             ],
@@ -345,6 +357,7 @@ class Controller extends Base
                         'caption'   => 'Name',
                         'width'     => 12,
                         'maxLength' => 255,
+                        'mandatory' => true,
                     ]
                 ]
             ],
@@ -356,6 +369,7 @@ class Controller extends Base
                     'uri'           => [
                         'caption'   => 'Base URI',
                         'width'     => 3,
+                        'mandatory' => true,
                     ],
                     'path'           => [
                         'caption'   => 'Path',
@@ -419,6 +433,7 @@ class Controller extends Base
                         'caption'   => 'Name',
                         'width'     => 6,
                         'maxLength' => 255,
+                        'mandatory' => true,
                     ],
                     'extTimetableCode' => [
                         'caption'   => 'External Timetable Code',
@@ -438,6 +453,7 @@ class Controller extends Base
                         'caption'   => 'Event Type',
                         'width'     => 10,
                         'maxLength' => 100,
+                        'mandatory' => true,
                     ],
                     'color'         => [
                         'caption'   => 'Event Colour',
@@ -455,6 +471,7 @@ class Controller extends Base
                         'caption'   => 'Name',
                         'width'     => 12,
                         'maxLength' => 150,
+                        'mandatory' => true,
                     ],
                 ]
             ],
@@ -466,6 +483,7 @@ class Controller extends Base
                         'caption'   => 'Name',
                         'width'     => 8,
                         'maxLength' => 40,
+                        'mandatory' => true,
                     ],
                     'externalResultType' => [
                         'caption'   => 'External SIS Type',
@@ -494,6 +512,7 @@ class Controller extends Base
                         'caption'   => 'Display Name',
                         'width'     => 8,
                         'maxLength' => 16,
+                        'mandatory' => true,
                     ],
                     'normaliseAs'   => [
                         'caption'   => 'Normalised Mark',
@@ -558,6 +577,7 @@ class Controller extends Base
                         'caption'   => 'Name',
                         'width'     => 6,
                         'maxLength' => 100,
+                        'mandatory' => true,
                     ],
                     'documentClassification' => [
                         'getter'    => 'getDocumentClassification',
@@ -591,8 +611,10 @@ class Controller extends Base
                     ],
                     'name'          => [
                         'caption'   => 'Name',
+                        'mandatory' => true,
                         'width'     => 8,
                         'maxLength' => 100,
+                        'mandatory' => true,
                     ],
                     'externalCode' => [
                         'caption'   => 'SIS Code',
@@ -610,6 +632,7 @@ class Controller extends Base
                         'caption'   => 'Name',
                         'width'     => 10,
                         'maxLength' => 100,
+                        'mandatory' => true,
                     ],
                     'externalCode' => [
                         'caption'   => 'SIS Code',
@@ -632,6 +655,7 @@ class Controller extends Base
                         'caption' => 'Name',
                         'width' => 8,
                         'maxLength' => 100,
+                        'mandatory' => true,
                     ],
                     'dashboard' => [
                         'caption' => 'Show On Pastoral Dashboard',

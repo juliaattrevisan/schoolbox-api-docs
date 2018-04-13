@@ -46,8 +46,11 @@ class Topic
     public function setName($name)
     {
         $this->name = $name;
-        $url = new \Url($name);
-        $this->setSlug($url->getSlug());
+        // This should not happen. Just to make sure that this will not break admin news page.
+        if (!empty($name)) {
+            $url = new \Url($name);
+            $this->setSlug($url->getSlug());
+        }
     }
 
     /**
