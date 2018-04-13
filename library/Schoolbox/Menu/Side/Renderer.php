@@ -69,6 +69,9 @@ class Renderer
                 }
                 $subjects[$subject['classType']][] = $subject;
             }
+            uksort($subjects, function ($a, $b) {
+                return strnatcmp($a, $b);
+            });
         }
 
         // Get the menu sections in their correct order
