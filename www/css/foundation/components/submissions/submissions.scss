@@ -55,7 +55,6 @@ table.rubric {
         }
 
         input[type=radio]:not(.plain):disabled + label{
-            cursor: default;
             opacity: 1;
         }
     }
