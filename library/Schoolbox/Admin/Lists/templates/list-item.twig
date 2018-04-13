@@ -59,6 +59,9 @@
                             {% elseif field.colour is not empty %}
                                 {# Color picker #}
                                 <input name="value-{{field_key}}[{{ recordIndex }}]" type="text" placeholder="{{ field.caption }}" value="{{ record[field_key] }}" data-colour-picker {{ disabledAttr }} />
+                            {% elseif field.mandatory %}
+                                {# All other fields are just text boxes #}
+                                <input name="mandatory-{{field_key}}[{{ recordIndex }}]" type="text" placeholder="{{ field.caption }}" value="{{ record[field_key] }}" maxlength="{{field.maxLength}}" {{ disabledAttr }} />
                             {% else %}
                                 {# All other fields are just text boxes #}
                                 <input name="value-{{field_key}}[{{ recordIndex }}]" type="text" placeholder="{{ field.caption }}" value="{{ record[field_key] }}" maxlength="{{field.maxLength}}" {{ disabledAttr }} />
