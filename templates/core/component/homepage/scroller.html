@@ -93,9 +93,6 @@
                         var init = function() {
                             $('#component{COMPONENT_INSTANCE_ID}-imageslider').alaressSlider({
                                 initialSlide: {COMPONENT_RANDOM_SLIDE},
-                                pagination: {
-                                    el: '#component{COMPONENT_INSTANCE_ID}-imageslider-pagination'
-                                },
                                 navigation: {
                                     nextEl: '#component{COMPONENT_INSTANCE_ID}-imageslider-button-next',
                                     prevEl: '#component{COMPONENT_INSTANCE_ID}-imageslider-button-prev'
@@ -145,7 +142,6 @@
                         <div class="swiper-button-next" id="component{COMPONENT_INSTANCE_ID}-imageslider-button-next"></div>
                         <div class="swiper-button-prev" id="component{COMPONENT_INSTANCE_ID}-imageslider-button-prev"></div>
                     </div>
-                    <div class="swiper-pagination" id="component{COMPONENT_INSTANCE_ID}-imageslider-pagination"></div>
                     <ul data-dz-container class="inline-list dz-container no-margin">
                         <!-- THIS TEMPLATE WILL BE DETACHED, DON'T WORRY ABOUT THE BAD DOM -->
                         <ul class="hide" data-dz-template>
