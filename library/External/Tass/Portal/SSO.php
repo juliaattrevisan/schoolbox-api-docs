@@ -125,7 +125,21 @@ class SSO
             die("SSO v2.\nPOST: {$this->server}?returnType=json\nData: {$queryString}\nRECV: {$responseString}\n");
         }
 
-        return $this->parseResponse(json_decode($responseString, true), $conf['sso_code']);
+        // The response should be in this format
+        $responseData = json_decode($responseString, true);
+
+        if (!\is_array($responseData)) {
+            // For some unknown reason, 'SAAGS Dev' is returning a plain string, while other instances are returning a json encoded array
+            parse_str($responseString, $responseData);
+        }
+
+        // Still not expected format?
+        if (!\is_array($responseData)) {
+            // Just throw it back
+            throw new SsoTokenGenerationException("Unable to process response: '{$responseString}'");
+        }
+
+        return $this->parseResponse($responseData, $conf['sso_code']);
     }
 
 
