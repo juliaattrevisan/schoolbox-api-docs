@@ -1,134 +1,134 @@
 @charset "UTF-8";
 
 // Utils
-@import "utils/skin";
-@import "utils/colors";
-@import "utils/font-faces";
-@import "utils/variables";
-@import "utils/mixins";
-@import "utils/functions";
-@import "utils/pointer-events";
+@import 'utils/skin';
+@import 'utils/colors';
+@import 'utils/font-faces';
+@import 'utils/variables';
+@import 'utils/mixins';
+@import 'utils/functions';
+@import 'utils/pointer-events';
 
 // Settings
-@import "settings";
-@import "utils/fonts";
+@import 'settings';
+@import 'utils/fonts';
 
 // Base
-@import "base/reset";
-@import "base/typography";
+@import 'base/reset';
+@import 'base/typography';
 
 // General
-@import "ui/content";
+@import 'ui/content';
 
 // Must import before forms, as forms reimports buttons.scss
-@import "components/buttons";
+@import 'components/buttons';
 
-@import "ui/forms/forms";
-@import "components/tree";
-@import "components/masonry";
-@import "components/ups";
-@import "ui/preview";
-@import "components/debugbar/debugbar";
+@import 'ui/forms/forms';
+@import 'components/tree';
+@import 'components/masonry';
+@import 'components/ups';
+@import 'ui/preview';
+@import 'components/debugbar/debugbar';
 
 // Refined UI Elements
-@import "ui/button/button";
-@import "ui/button/list-actions";       // requires _button.scss
-@import "ui/button/header-actions";     // requires _list-actions.scss
-@import "ui/button/dropdown";
-@import "ui/button/tabs";
-@import "ui/navigation/navigation";
-@import "ui/navigation/notification";   // requires _button.scss
-@import "ui/navigation/breadcrumb";
-@import "ui/navigation/pagination";
-@import "ui/navigation/sub-nav";
+@import 'ui/button/button';
+@import 'ui/button/list-actions';       // requires _button.scss
+@import 'ui/button/header-actions';     // requires _list-actions.scss
+@import 'ui/button/dropdown';
+@import 'ui/button/tabs';
+@import 'ui/navigation/navigation';
+@import 'ui/navigation/notification';   // requires _button.scss
+@import 'ui/navigation/breadcrumb';
+@import 'ui/navigation/pagination';
+@import 'ui/navigation/sub-nav';
 
 //////////////////////////////////////////////////////////
 // Common UI Elements
 //
 // Specialist elements, plugins and widgets
 //////////////////////////////////////////////////////////
-@import "ui/data-tables";
-@import "ui/alert-boxes";
-@import "ui/iframe";
-@import "ui/cards";
+@import 'ui/data-tables';
+@import 'ui/alert-boxes';
+@import 'ui/iframe';
+@import 'ui/cards';
 
 // Layout
-@import "layout/footer";
-@import "layout/grid";
-@import "layout/header";
-@import "layout/sidebar";
-@import "layout/container";
-@import "layout/login";
-@import "layout/flex";
+@import 'layout/footer';
+@import 'layout/grid';
+@import 'layout/header';
+@import 'layout/sidebar';
+@import 'layout/container';
+@import 'layout/login';
+@import 'layout/flex';
 
 // Schoolbox Areas
-@import "components/evaluation/evaluation";
-@import "components/submissions/inline-grading";
-@import "components/submissions/submissions";
-@import "components/submissions/rubric";
-@import "components/wiki/wiki";
-@import "components/timetable/timetable";
-@import "components/calendar/calendar";
-@import "components/curriculum/curriculum";
-@import "components/course/course";
-@import "components/marksheet";
+@import 'components/evaluation/evaluation';
+@import 'components/submissions/inline-grading';
+@import 'components/submissions/submissions';
+@import 'components/submissions/rubric';
+@import 'components/wiki/wiki';
+@import 'components/timetable/timetable';
+@import 'components/calendar/calendar';
+@import 'components/curriculum/curriculum';
+@import 'components/course/course';
+@import 'components/marksheet';
 @import 'components/assessment/participation';
 
 // Slider
-@import "../../javascript/components/swiper/dist/css/swiper.css";
-@import "ui/slider";
+@import '../../javascript/components/swiper/dist/css/swiper.css';
+@import 'ui/slider';
 
 // Feature Tour
-@import "../../javascript/components/intro.js/introjs.css";
-@import "components/feature-tour/feature-tour";
+@import '../../javascript/components/intro.js/introjs.css';
+@import 'components/feature-tour/feature-tour';
 
 // Select Source shard
-@import "components/sourceSelect";
+@import 'components/sourceSelect';
 
 // Dashboard/Homepage/Eportfolio component styles
-@import "components/components";
+@import 'components/components';
 
 // UPS
-@import "components/ups/ups";
+@import 'components/ups/ups';
 
 // EOTC
-@import "components/eotc/eotc";
+@import 'components/eotc/eotc';
 
 // CK Editor
-@import "components/editor/editor";
-@import "components/editor/custom-styles";
-@import "components/editor/mejs";
+@import 'components/editor/editor';
+@import 'components/editor/custom-styles';
+@import 'components/editor/mejs';
 
 // Boarder Leave
-@import "components/boarder-leave/boarder-leave";
+@import 'components/boarder-leave/boarder-leave';
 
 // Sports Fixtures
-@import "components/sportsfixtures/sportsfixtures";
+@import 'components/sportsfixtures/sportsfixtures';
 
 // Flatpickr
-@import "../../javascript/components/flatpickr/dist/flatpickr.css";
-@import "components/alaress-datetime-picker/alaress-datetime-picker";
+@import '../../javascript/components/flatpickr/dist/flatpickr.css';
+@import 'components/alaress-datetime-picker/alaress-datetime-picker';
 
 // Needs to be included outside of container in order to work
-@import "../../javascript/components/foundation/scss/foundation/components/reveal";
-@import "../../javascript/components/foundation/scss/foundation/components/tooltips";
-@import "../../javascript/components/foundation/scss/foundation/components/flex-video";
+@import '../../javascript/components/foundation/scss/foundation/components/reveal';
+@import '../../javascript/components/foundation/scss/foundation/components/tooltips';
+@import '../../javascript/components/foundation/scss/foundation/components/flex-video';
 @import '../../javascript/components/foundation/scss/foundation/components/dropdown-buttons';
-@import "ui/selectize.customisation";
+@import 'ui/selectize.customisation';
 
 //Magnific Popup
-@import "../../javascript/components/magnific-popup/src/css/main";
-@import "components/magnific/settings";
+@import '../../javascript/components/magnific-popup/src/css/main';
+@import 'components/magnific/settings';
 
 // combobox relies on selectize styles
-@import "ui/combobox";
+@import 'ui/combobox';
 
 // jqmath
-@import "../../javascript/math/jqmath-0.4.0.css";
+@import '../../javascript/math/jqmath-0.4.0.css';
 
 // jQuery UI
-@import "../../javascript/components/jquery-ui/themes/base/draggable.css";
-@import "../../javascript/components/jquery-ui/themes/base/sortable.css";
+@import '../../javascript/components/jquery-ui/themes/base/draggable.css';
+@import '../../javascript/components/jquery-ui/themes/base/sortable.css';
 
 // client custom CSS overrides
-@import "utils/custom";
+@import 'utils/custom';

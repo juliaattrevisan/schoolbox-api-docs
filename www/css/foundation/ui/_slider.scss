@@ -1,6 +1,6 @@
-/*
- * Image Slider (Swiper)
- */
+//
+// Image Slider (Swiper)
+//
 $swipe-color: $iron;
 $swipe-color-hover: $steel;
 
@@ -24,10 +24,10 @@ $swipe-color-hover: $steel;
       width: 100%;
     }
 
-    /* Constrain size of slider for slideshow components to minimise image size effects on page */
+    // Constrain size of slider for slideshow components to minimise image size effects on page
     .square {
       position: relative;
-      padding: 100% 0 0 0;
+      padding: 100% 0 0;
       overflow: hidden;
 
       img {
@@ -44,7 +44,7 @@ $swipe-color-hover: $steel;
 
     .portrait {
       position: relative;
-      padding: 150% 0 0 0;
+      padding: 150% 0 0;
       overflow: hidden;
 
       img {
@@ -61,7 +61,7 @@ $swipe-color-hover: $steel;
 
     .landscape {
       position: relative;
-      padding: 56.25% 0 0 0;
+      padding: 56.25% 0 0;
       overflow: hidden;
 
       img {
@@ -78,7 +78,7 @@ $swipe-color-hover: $steel;
 
     .panorama {
       position: relative;
-      padding: 25% 0 0 0;
+      padding: 25% 0 0;
       overflow: hidden;
 
       img {
@@ -95,7 +95,7 @@ $swipe-color-hover: $steel;
 
     .banner {
       position: relative;
-      padding: 12.8% 0 0 0;
+      padding: 12.8% 0 0;
       overflow: hidden;
 
       img {
@@ -121,25 +121,28 @@ $swipe-color-hover: $steel;
     margin-top: 0;
     transition: all .15s linear;
     transform: translateY(-2rem);
+
     &:hover {
       color: $swipe-color-hover;
     }
+
     &:focus {
       outline: none;
     }
-    &:before {
+
+    &::before {
       font-family: 'schoolbox';
       position: absolute;
       top: .875rem;
     }
   }
 
-  .swiper-button-prev:before {
+  .swiper-button-prev::before {
     @extend .icon-previous;
     left: 0;
   }
 
-  .swiper-button-next:before {
+  .swiper-button-next::before {
     @extend .icon-next;
     right: 0;
   }
@@ -150,7 +153,7 @@ $swipe-color-hover: $steel;
     color: $white;
     position: absolute;
     bottom: 0;
-    font-size: 0.8125rem;
+    font-size: .8125rem;
     padding: 1rem;
     margin: 0;
     width: 100%;
@@ -169,6 +172,7 @@ $swipe-color-hover: $steel;
 .swiper-pagination {
   bottom: 0 !important;
   position: relative;
+
   .swiper-pagination-bullet {
     background: $swipe-color;
     opacity: 1;
@@ -176,6 +180,7 @@ $swipe-color-hover: $steel;
     height: .625rem;
     width: .625rem;
   }
+
   .swiper-pagination-bullet-active,
   .swiper-pagination-bullet-active:hover {
     background: $swipe-color-hover;
