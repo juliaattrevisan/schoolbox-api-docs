@@ -1,10 +1,10 @@
 #!/bin/bash
 # Ensure running an appropriate era vagrant box
-if [ `cat /home/vagrant/.vagrant.buildtimestamp` -gt 1505952659 ];
+if [ `cat /home/vagrant/.vagrant.buildtimestamp` -gt 1523234419 ];
 then
-    echo "[SB][`date +%Y-%m-%d\ %X`] Vagrant box meets minimum requirements: 1505952660 Current: "`cat /home/vagrant/.vagrant.buildtimestamp`;
+    echo "[SB][`date +%Y-%m-%d\ %X`] Vagrant box meets minimum requirements: 1523234420 Current: "`cat /home/vagrant/.vagrant.buildtimestamp`;
 else
-    echo "Error: Your vagrant box is out of date. Please ensure you are using the latest version (> 1505952660). Current: "`cat /home/vagrant/.vagrant.buildtimestamp` >2;
+    echo "Error: Your vagrant box is out of date. Please ensure you are using the latest version (>= 1523234420). Current: "`cat /home/vagrant/.vagrant.buildtimestamp` >2;
     echo "To fix this:";
     echo "  vagrant destroy;";
     echo "  vagrant box remove ubuntu-1404-php55;";
@@ -137,6 +137,15 @@ fi
 
 S3file="$data_filename";
 S3file_short="$data_filename_short";
+getS3file;
+if [ ! -f $cachedir/$S3file_short ];
+then
+    echo "Error: file missing $S3file";
+    exit 1;
+fi
+
+S3file="tls-vagrant.dev.schoolbox.cloud.tar.gz";
+S3file_short="tls-vagrant.dev.schoolbox.cloud.tar.gz";
 getS3file;
 if [ ! -f $cachedir/$S3file_short ];
 then
@@ -291,26 +300,19 @@ echo "[SB][`date +%Y-%m-%d\ %X`] Removing existing apache vhosts";
 rm -f /etc/apache2/sites-enabled/*;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Enabling Schoolbox apache vhost";
-sed 's/usr\/share\/schoolbox/vagrant/g' /vagrant/tools/apache-vhost-schoolbox > /etc/apache2/sites-available/schoolbox.conf;
-sed -i 's/php_flag\ display_startup_errors\ off/php_flag\ display_startup_errors\ on/g' /etc/apache2/sites-available/schoolbox.conf;
-sed -i 's/php_flag\ display_errors\ off/php_flag\ display_errors\ on/g' /etc/apache2/sites-available/schoolbox.conf;
-sed -i 's/php_flag\ html_errors\ off/php_flag\ html_errors\ on/g' /etc/apache2/sites-available/schoolbox.conf;
-sed -i 's/var\/log\/apache2/vagrant/g' /etc/apache2/sites-available/schoolbox.conf;
-a2ensite schoolbox.conf
-echo 'Listen 8000' > /etc/apache2/sites-available/schoolbox-dav.conf;
-sed 's/usr\/share\/schoolbox/vagrant/g' /vagrant/tools/apache-vhost-schoolbox-webdav >> /etc/apache2/sites-available/schoolbox-dav.conf;
-sed -i 's/php_flag\ display_startup_errors\ off/php_flag\ display_startup_errors\ on/g' /etc/apache2/sites-available/schoolbox-dav.conf;
-sed -i 's/php_flag\ display_errors\ off/php_flag\ display_errors\ on/g' /etc/apache2/sites-available/schoolbox-dav.conf;
-sed -i 's/php_flag\ html_errors\ off/php_flag\ html_errors\ on/g' /etc/apache2/sites-available/schoolbox-dav.conf;
-sed -i 's/var\/log\/apache2/vagrant/g' /etc/apache2/sites-available/schoolbox-dav.conf;
-sed -i 's/*:80/*:8000/g' /etc/apache2/sites-available/schoolbox-dav.conf;
-a2ensite schoolbox-dav.conf
+cp /vagrant/tools/apache-vhost-schoolbox-webdav-only.conf /etc/apache2/sites-available/;
+a2ensite apache-vhost-schoolbox-webdav-only
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Enabling Schoolbox nginx vhost";
 cp -f /vagrant/tools/nginx-vhost-schoolbox-websocket.conf /etc/nginx/conf.d/;
-sed -i 's/var\/log\/nginx/vagrant/g' /etc/nginx/conf.d/nginx-vhost-schoolbox-websocket.conf;
+cp -f /vagrant/tools/nginx-vhost-schoolbox-websocket-ssl.conf /etc/nginx/conf.d/;
 sed -i 's/var\/lib\/schoolbox/vagrant/g' /etc/php/7.1/fpm/pool.d/schoolbox*;
 sed -i 's/www-data/vagrant/g' /etc/php/7.1/fpm/pool.d/schoolbox*;
+cd $cachedir;
+rm -fR vagrant.dev.schoolbox.cloud;
+tar xzf tls-vagrant.dev.schoolbox.cloud.tar.gz;
+cp -f vagrant.dev.schoolbox.cloud/fullchain.pem /etc/nginx/certs/schoolbox-fullchain.crt;
+cp -f vagrant.dev.schoolbox.cloud/privkey.pem /etc/nginx/certs/schoolbox-private.key;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Set up video cronjobs"
 cp -f /vagrant/tools/cron/schoolboxdev $cachedir/schoolboxdemo-latest-cron
@@ -605,5 +607,8 @@ fi
 for eth in `ip addr | grep inet | grep -v inet6 | grep global | grep -v eth0 | awk {'print $2'} | cut -d/ -f1`;
 do
     echo "[SB][`date +%Y-%m-%d\ %X`] Website URL => http://$eth/";
-    echo "[SB][`date +%Y-%m-%d\ %X`] WebDav URL => http://$eth:8000/";
+    echo "[SB][`date +%Y-%m-%d\ %X`] WebDav URL => http://$eth:8881/";
 done
+
+echo "[SB][`date +%Y-%m-%d\ %X`] Website URL => https://vagrant.dev.schoolbox.cloud";
+echo "[SB][`date +%Y-%m-%d\ %X`] WebDav URL => https://vagrant.dev.schoolbox.cloud:8882/";
