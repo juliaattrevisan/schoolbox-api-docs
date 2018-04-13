@@ -158,10 +158,26 @@ class Aggregation
         ksort($seenLevels);
 
         return [
+
+            /* Misc details
+             */
             'meta' => $data['meta'],
+
+            /* Data for plotting the graph
+             */
             'levels' => $seenLevels,
             'graph' => $graph,
+
+            /* The number of records that exist for this person from all time
+             */
+            'numRecords' => \count($allRecords),
+
+            /* Records aggregated for the current year
+             */
             'records' => $aggregatedData,
+
+            /* Summary table for all time
+             */
             'credits' => $credits,
         ];
     }

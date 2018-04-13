@@ -68,55 +68,72 @@
          * Graph it
          */
         function graph() {
-            $(config.element).highcharts({
-                chart: {
-                    type: 'bar'
-                },
-                colors: config.colors,
-                title: {
-                    text: config.title
-                },
-                xAxis: {
-                    categories: config.categories
 
-                },
-                yAxis: {
-                    min: 0,
-                    reversedStacks: false,
-                    title: {
-                        text: config.yAxisTitle
+            /* Hide graph if no data is present
+             */
+            var hasData = false;
+
+            for (var i = 0; (i < config.series.length) && !hasData; i++) {
+                if (config.series[i].data.length) {
+                    hasData = true;
+                }
+            }
+
+            if (hasData) {
+                $(config.element).highcharts({
+                    chart: {
+                        type: 'bar'
                     },
-                    stackLabels: {
-                        enabled: config.stackLabels
-                    }
-                },
-                legend: {
-                    reversed: false
-                },
-                plotOptions: {
-                    series: {
-                        stacking: config.stacking,
-                        dataLabels: {
-                            enabled: true,
-                            align: 'center',
-                            inside: true,
-                            formatter: function() {
-                                var str = '';
+                    colors: config.colors,
+                    title: {
+                        text: config.title
+                    },
+                    xAxis: {
+                        categories: config.categories
 
-                                if (this.y > 0) {
-                                    str = this.y;
+                    },
+                    yAxis: {
+                        allowDecimals: false,
+                        min: 0,
+                        reversedStacks: false,
+                        title: {
+                            text: config.yAxisTitle
+                        },
+                        stackLabels: {
+                            enabled: config.stackLabels
+                        }
+                    },
+                    legend: {
+                        reversed: false
+                    },
+                    plotOptions: {
+                        series: {
+                            stacking: config.stacking,
+                            dataLabels: {
+                                enabled: true,
+                                align: 'center',
+                                inside: true,
+                                formatter: function () {
+                                    var str = '';
+
+                                    if (this.y > 0) {
+                                        str = this.y;
+                                    }
+
+                                    return str;
                                 }
-                                
-                                return str;
                             }
                         }
+                    },
+                    series: config.series,
+                    credits: {
+                        enabled: false
                     }
-                },
-                series: config.series,
-                credits: {
-                    enabled: false
-                }
-            });
+                });
+            }
+            else {
+                $(config.element).hide();
+            }
         }
     }
 }(jQuery));

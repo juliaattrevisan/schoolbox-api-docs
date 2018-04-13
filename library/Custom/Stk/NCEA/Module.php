@@ -8,7 +8,9 @@
  */
 namespace Custom\Stk\NCEA;
 
+use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Authorizer\Rule;
+use Alaress\Database\Connector\IConnector;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\Container;
@@ -19,6 +21,7 @@ use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Role;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 
@@ -29,6 +32,12 @@ class Module extends BaseModule
      */
     protected $basename = 'nceaReport';
 
+    /**
+     * Report is available for these year levels
+     *
+     * @var array
+     */
+    private $availableForYears = [11, 12, 13];
 
     /**
      * Hook method for setting up routes via self::register()
@@ -43,10 +52,38 @@ class Module extends BaseModule
          */
         $getPerms = new Rule\All(
             new Rule\IsLoggedIn(),
-            new Rule\Any(
-                new Rule\IsUserOrParentOfUser($this->getExternalUser(), $this->getUserMapper(), 'id'),
-                new Rule\HasRole(Role::STAFF),
-                new Rule\IsSuperuser()
+
+            /* This student must be in Year 11-13 inclusive
+             */
+            new Rule\All(
+                new Rule\All(
+                    new Rule\Callback(function ($params, User $user) {
+                        try {
+                            /** @var \Schoolbox\User $user */
+                            $student = $this->getUserMapper()->findById($params['id']);
+                        }
+                        catch (MapperException $e) {
+                            throw new Unauthorized('User Not Found');
+                        }
+
+                        /** @var IConnector $externalDb */
+                        $externalDb = $this->getInjector()->get('databaseExternal');
+
+                        $availability = (new Availability($externalDb))->hasAccess((int)$student->getYear());
+
+                        if (!$availability) {
+                            throw new Unauthorized('Unavailable for this student\'s year level due to OLE flag');
+                        }
+                    }),
+                    new Rule\IsYearLevel($this->availableForYears)
+                ),
+                /* The Students themselves, their parents, any staff/superuser can get button and report
+                 */
+                new Rule\Any(
+                    new Rule\IsUserOrParentOfUser($this->getExternalUser(), $this->getUserMapper(), 'id'),
+                    new Rule\HasRole(Role::STAFF),
+                    new Rule\IsSuperuser()
+                )
             )
         );
 
@@ -62,10 +99,13 @@ class Module extends BaseModule
      * @return array
      * @throws InvalidArgumentException
      * @throws NotFound
+     * @throws \Alaress\Database\Exception
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     private function preloadUser(array $params): array
     {
         try {
+            /** @var \Schoolbox\User $user */
             $user = $this->getUserMapper()->findById($params['id']);
         }
         catch (MapperException $e) {
@@ -80,17 +120,9 @@ class Module extends BaseModule
             throw new NotFound('NCEA Reports not available to IB Students');
         }
 
-        /* Can't get reports from the future, or too far in the past
-         * Arbitrary limit of 2000
-         *
-         * TODO: Eventually this will be limited to the current year only after testing
+        /* Only works for the current year
          */
-        $oldestYear = 2000;
-
-        $inFuture = (int)$params['year'] > date('Y');
-        $inPast = (int)$params['year'] < $oldestYear;
-
-        if ($inPast || $inFuture) {
+        if ((int)$params['year'] !== (int)date('Y')) {
             throw new NotFound('Invalid year');
         }
 
