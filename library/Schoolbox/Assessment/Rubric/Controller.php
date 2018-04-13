@@ -10,6 +10,7 @@
 namespace Schoolbox\Assessment\Rubric;
 
 use Alaress\Web\Controller\Base as BaseController;
+use Alaress\Web\Template\DebugTwig;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Criterion;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
@@ -83,6 +84,7 @@ class Controller extends BaseController
         $formField = $post->get('formField', 'rb');
 
         $context = [
+            DebugTwig::DEBUG_WRAP => false,
             'formField' => $formField,
             'rubric' => [
                 'id' => $post->get('rubricId'),

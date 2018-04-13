@@ -249,7 +249,7 @@ class Base implements OutputInterface
     }
 
     /**
-     * @param  string $data
+     * @param  string|array $data
      * @return $this
      */
     public function setData($data)
