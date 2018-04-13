@@ -1161,26 +1161,33 @@
 
 <div class="row">
     <div class="small-12 island">
-        <h2 class="subheader" id="image-slider">Image Slider</h2>
-        <!-- Custom javascript -->
-        <script type="text/javascript" src="/javascript/components/anyslider/dist/jquery.anyslider.min.js"></script>
-        <script type="text/javascript">
-            $(function(){
-                $('[data-imageslider]').anyslider({
-                    interval: 4000,
-                    prevLabel: '',
-                    nextLabel: ''
+        <h2 class="subheader" id="image-slider">Image Slider (Swiper)</h2>
+        <script src="/javascript/components/swiper/dist/js/swiper.min.js"></script>
+        <script src="/javascript/jquery.alaressSlider.js"></script>
+        <script>
+            $(function() {
+                $('#pantry-imageslider').alaressSlider({
+                    navigation: {
+                        nextEl: '#image-slider-button-next',
+                        prevEl: '#image-slider-button-prev'
+                    }
                 });
             });
         </script>
-        <div class="imageslider-container">
-            <div data-imageslider class="imageslider">
-                <a href="/pantry"><img src="https://placeimg.com/1440/280/animals" alt="Animals"></a>
-                <a href="/pantry"><img src="https://placeimg.com/1440/280/animals" alt="Animals"></a>
-                <a href="/pantry"><img src="https://placeimg.com/1440/280/animals" alt="Animals"></a>
-                <a href="/pantry"><img src="https://placeimg.com/1440/280/animals" alt="Animals"></a>
-                <a href="/pantry"><img src="https://placeimg.com/1440/280/animals" alt="Animals"></a>
+        <div class="swiper-container" id="pantry-imageslider">
+            <div class="swiper-wrapper">
+                <div class="swiper-slide">
+                    <img data-src="https://placeimg.com/1440/280/animals" alt="Animals" class="swiper-lazy" />
+                    <div class="loader"></div>
+                </div>
+                <div class="swiper-slide">
+                    <img data-src="https://placeimg.com/1440/280/nature" alt="Nature" class="swiper-lazy" />
+                    <div class="loader"></div>
+                </div>
             </div>
+            <div class="swiper-pagination"></div>
+            <div class="swiper-button-next" id="image-slider-button-next"></div>
+            <div class="swiper-button-prev" id="image-slider-button-prev"></div>
         </div>
     </div>
 </div>

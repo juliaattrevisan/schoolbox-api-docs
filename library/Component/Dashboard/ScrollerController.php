@@ -86,9 +86,9 @@ class Component_Dashboard_ScrollerController extends Component_Dashboard_Control
         $allFiles = $this->getFolderMapper()->findImages($this->getSource(), (int)$this->getConfigMapper()->get('image_slideshow_max'));
 
         if ($this->getConfig('randomStartingSlide')) {
-            $this->setVar('COMPONENT_RANDOM_SLIDE', rand(1, count($allFiles)));
+            $this->setVar('COMPONENT_RANDOM_SLIDE', rand(0, count($allFiles) - 1));
         } else {
-            $this->setVar('COMPONENT_RANDOM_SLIDE', 1);
+            $this->setVar('COMPONENT_RANDOM_SLIDE', 0);
         }
 
         // Have update form to back to this homepage, not the gallery's homepage

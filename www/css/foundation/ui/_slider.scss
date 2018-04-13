@@ -1,0 +1,188 @@
+//
+// Image Slider (Swiper)
+//
+$swipe-color: $iron;
+$swipe-color-hover: $steel;
+
+.swiper-container {
+  .swiper-wrapper {
+    min-height: 10rem;
+  }
+
+  .loader {
+    position: absolute;
+    top: 5rem;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: auto;
+  }
+
+  .swiper-slide {
+    // For dashboard slider, image fills space and maintains aspect ratio
+    img {
+      width: 100%;
+    }
+
+    // Constrain size of slider for slideshow components to minimise image size effects on page
+    .square {
+      position: relative;
+      padding: 100% 0 0;
+      overflow: hidden;
+
+      img {
+        position: absolute;
+        max-width: 100%;
+        width: auto;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        margin: auto;
+      }
+    }
+
+    .portrait {
+      position: relative;
+      padding: 150% 0 0;
+      overflow: hidden;
+
+      img {
+        position: absolute;
+        max-width: 100%;
+        width: auto;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        margin: auto;
+      }
+    }
+
+    .landscape {
+      position: relative;
+      padding: 56.25% 0 0;
+      overflow: hidden;
+
+      img {
+        position: absolute;
+        max-width: 100%;
+        width: auto;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        margin: auto;
+      }
+    }
+
+    .panorama {
+      position: relative;
+      padding: 25% 0 0;
+      overflow: hidden;
+
+      img {
+        position: absolute;
+        max-width: 100%;
+        width: auto;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        margin: auto;
+      }
+    }
+
+    .banner {
+      position: relative;
+      padding: 12.8% 0 0;
+      overflow: hidden;
+
+      img {
+        position: absolute;
+        max-width: 100%;
+        width: auto;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        margin: auto;
+      }
+    }
+  }
+
+  .swiper-button-prev,
+  .swiper-button-next {
+    background-image: none;
+    color: $iron;
+    font-size: rem-calc($base-font-size * 1.5);
+    width: 2rem;
+    height: 4rem;
+    margin-top: 0;
+    transition: all .15s linear;
+    transform: translateY(-2rem);
+
+    &:hover {
+      color: $swipe-color-hover;
+    }
+
+    &:focus {
+      outline: none;
+    }
+
+    &::before {
+      font-family: 'schoolbox';
+      position: absolute;
+      top: .875rem;
+    }
+  }
+
+  .swiper-button-prev::before {
+    @extend .icon-previous;
+    left: 0;
+  }
+
+  .swiper-button-next::before {
+    @extend .icon-next;
+    right: 0;
+  }
+
+  // image title
+  .meta {
+    background: rgba($black, .7);
+    color: $white;
+    position: absolute;
+    bottom: 0;
+    font-size: .8125rem;
+    padding: 1rem;
+    margin: 0;
+    width: 100%;
+    font-style: normal;
+
+    // hide if empty - because padding
+    &:empty {
+      display: none;
+    }
+  }
+
+}
+
+// Pagination (dot navigation)
+// Must live outside of .swiper-container in order for the prev/next arrows to be vertically centered properly
+.swiper-pagination {
+  bottom: 0 !important;
+  position: relative;
+
+  .swiper-pagination-bullet {
+    background: $swipe-color;
+    opacity: 1;
+    margin: 1rem .5rem;
+    height: .625rem;
+    width: .625rem;
+  }
+
+  .swiper-pagination-bullet-active,
+  .swiper-pagination-bullet-active:hover {
+    background: $swipe-color-hover;
+  }
+}

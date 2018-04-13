@@ -1,5 +1,6 @@
 <div id="component{COMPONENT_INSTANCE_ID}" class="component-container {COMPONENT_CLASS}" data-component>
-    <script type="text/javascript" src="/javascript/components/anyslider/dist/jquery.anyslider.min.js"></script>
+    <script src="/javascript/components/swiper/dist/js/swiper.min.js"></script>
+    <script src="/javascript/jquery.alaressSlider.js"></script>
 
     {CONFIGURATION}
 
@@ -85,22 +86,24 @@
                 <!-- END source_folder_deleted -->
 
                 <!-- BEGIN source_folder_exists -->
-                <script type="text/javascript">
+                <script>
                     // Expanded? init on load
                     // Collapsed? init on expand
-                    $(function(){
-                        var component = $("#component{COMPONENT_INSTANCE_ID}");
+                    $(function() {
                         var init = function() {
-                            component.find("[data-imageslider]").anyslider({
-                                interval: {COMPONENT_CONFIG_TIMING_VALUE_MS},
-                                prevLabel: '',
-                                nextLabel: '',
-                                showBullets: false,
-                                showControls: true,
-                                startSlide: {COMPONENT_RANDOM_SLIDE}
+                            $('#component{COMPONENT_INSTANCE_ID}-imageslider').alaressSlider({
+                                initialSlide: {COMPONENT_RANDOM_SLIDE},
+                                navigation: {
+                                    nextEl: '#component{COMPONENT_INSTANCE_ID}-imageslider-button-next',
+                                    prevEl: '#component{COMPONENT_INSTANCE_ID}-imageslider-button-prev'
+                                },
+                                alaress: {
+                                    autoplayDelay: {COMPONENT_CONFIG_TIMING_VALUE_MS}
+                                }
                             });
                         };
 
+                        var component = $("#component{COMPONENT_INSTANCE_ID}");
                         var collapser = component.find('[data-collapsable="true"]');
                         if (collapser.data('collapseState') === 'uncollapsed') {
                             init();
@@ -112,26 +115,32 @@
 
                 <div class="dropzone-wrap no-margin">
                     <form class="dropzone overlay" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/fileForm.php?ajax=1" method="post" data-accepts="image"></form>
-                    <div data-imageslider class="imageslider">
-                        <!-- BEGIN image_scroller -->
-                        <div data-imageslider-image class="text-center">
-                            <!-- BEGIN linked_image -->
-                            <a href="{IMAGE_URL}" >
+                    <div class="swiper-container" id="component{COMPONENT_INSTANCE_ID}-imageslider">
+                        <div class="swiper-wrapper">
+                            <!-- BEGIN image_scroller -->
+                            <div class="swiper-slide">
+                                <!-- BEGIN linked_image -->
+                                <a href="{IMAGE_URL}">
+                                    <div class="{COMPONENT_CONFIG_IMAGE_RATIO}">
+                                        <img data-src="/cms/image.php?id={IMAGE_ID}&height=1024&width=1024" class="swiper-lazy" />
+                                    </div>
+                                </a>
+                                <div class="loader"></div>
+                                <!-- END linked_image -->
+                                <!-- BEGIN unlinked_image -->
                                 <div class="{COMPONENT_CONFIG_IMAGE_RATIO}">
-                                    <img src="/cms/image.php?id={IMAGE_ID}&height=1024&width=1024" alt="{IMAGE_NAME}" />
+                                    <img data-src="/cms/image.php?id={IMAGE_ID}&height=1024&width=1024" class="swiper-lazy" />
+                                    <div class="loader"></div>
                                 </div>
-                            </a>
-                            <!-- END linked_image -->
-                            <!-- BEGIN unlinked_image -->
-                            <div class="{COMPONENT_CONFIG_IMAGE_RATIO}">
-                                <img src="/cms/image.php?id={IMAGE_ID}&height=1024&width=1024" alt="{IMAGE_NAME}" />
+                                <!-- END unlinked_image -->
+                                <!-- BEGIN show_caption -->
+                                <p class="meta">{IMAGE_NAME}</p>
+                                <!-- END show_caption -->
                             </div>
-                            <!-- END unlinked_image -->
-                            <!-- BEGIN show_caption -->
-                            <p class="meta">{IMAGE_NAME}</p>
-                            <!-- END show_caption -->
+                            <!-- END image_scroller -->
                         </div>
-                        <!-- END image_scroller -->
+                        <div class="swiper-button-next" id="component{COMPONENT_INSTANCE_ID}-imageslider-button-next"></div>
+                        <div class="swiper-button-prev" id="component{COMPONENT_INSTANCE_ID}-imageslider-button-prev"></div>
                     </div>
                     <ul data-dz-container class="inline-list dz-container no-margin">
                         <!-- THIS TEMPLATE WILL BE DETACHED, DON'T WORRY ABOUT THE BAD DOM -->

@@ -91,9 +91,9 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
                 $this->setVar('image_scroller_block', '');
 
                 if ($this->getConfig('randomStartingSlide')) {
-                    $this->setVar('COMPONENT_RANDOM_SLIDE', rand(1, count($allFiles)));
+                    $this->setVar('COMPONENT_RANDOM_SLIDE', rand(0, count($allFiles) - 1));
                 } else {
-                    $this->setVar('COMPONENT_RANDOM_SLIDE', 1);
+                    $this->setVar('COMPONENT_RANDOM_SLIDE', 0);
                 }
 
                 // Controls such as Post Images

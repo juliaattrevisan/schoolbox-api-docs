@@ -262,7 +262,7 @@ abstract class Component_ControllerAbstract
 
     /**
      * @param string|array $var
-     * @param string $value
+     * @param string|int $value
      */
     public function setVar($var, $value = '')
     {
