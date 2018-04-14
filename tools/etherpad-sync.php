@@ -35,9 +35,12 @@ foreach($allPads as $currentPad) {
 	if ($getTextResult->getMessage() == 'ok') {
 		$data = $getTextResult->getData();
 		$currentPad->setBody($data['html']);
-        $padMapper->save($currentPad);
-        $logger->info(sprintf("Successfully saved pad %d: %s", $currentPad->getId(), $getTextResult->getMessage()));
-
+		try {
+            $padMapper->save($currentPad);
+            $logger->info(sprintf("Successfully saved pad %d: %s", $currentPad->getId(), $getTextResult->getMessage()));
+        } catch (Exception $e) {
+		    $logger->error(sprintf("Error while saving pad %d: %s", $currentPad->getId(), $e->getMessage()));
+        }
 
     } else {
 	    $logger->warning(sprintf("Failed to get pad %d with key %s: %s", $currentPad->getId(), $currentPad->getPadId(), $getTextResult->getMessage()));
