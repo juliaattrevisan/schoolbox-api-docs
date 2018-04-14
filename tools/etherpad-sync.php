@@ -10,9 +10,8 @@
 
 require_once __DIR__ . '/../conf/core/require.php';
 spl_autoload_call('Schoolbox\\Application\\Daemon');
-$kernel = new \Schoolbox\Application\Daemon\Kernel('Etherpad Sync', array('level'=>200) );
+$kernel = new \Schoolbox\Application\Daemon\Kernel('Etherpad Sync', array('level' => 200));
 $logger = $kernel->logger();
-
 
 
 /* Load the pad from our db to get its groupId
@@ -29,25 +28,25 @@ $logger->info(sprintf("Commencing etherpad sync, processing %d pads", count($all
 
 //var_dump($allPads);
 
-foreach($allPads as $currentPad) {
-	$getTextResult = $client->getHTML($currentPad->getPadId());
+foreach ($allPads as $currentPad) {
+    $getTextResult = $client->getHTML($currentPad->getPadId());
 
-	if ($getTextResult->getMessage() == 'ok') {
-		$data = $getTextResult->getData();
-		$currentPad->setBody($data['html']);
-		try {
+    if ($getTextResult->getMessage() == 'ok') {
+        $data = $getTextResult->getData();
+        $currentPad->setBody($data['html']);
+        try {
             $padMapper->save($currentPad);
             $logger->info(sprintf("Successfully saved pad %d: %s", $currentPad->getId(), $getTextResult->getMessage()));
         } catch (Exception $e) {
-		    $logger->error(sprintf("Error while saving pad %d: %s", $currentPad->getId(), $e->getMessage()));
+            $logger->error(sprintf("Error while saving pad %d: %s", $currentPad->getId(), $e->getMessage()));
         }
 
     } else {
-	    $logger->warning(sprintf("Failed to get pad %d with key %s: %s", $currentPad->getId(), $currentPad->getPadId(), $getTextResult->getMessage()));
+        $logger->warning(sprintf("Failed to get pad %d with key %s: %s", $currentPad->getId(), $currentPad->getPadId(), $getTextResult->getMessage()));
     }
 
-	/* Save it!
-	 */
+    /* Save it!
+     */
 }
 $logger->info("Etherpad sync complete");
 
