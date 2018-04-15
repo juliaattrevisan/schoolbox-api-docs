@@ -23,6 +23,7 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\ResourceBooking\Item\Mapper as ItemMapper;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\ResourceBooking\Booking\Status\Mapper as StatusMapper;
+use Schoolbox\Application\Exception\NotFound;
 
 class Module extends BaseModule
 {
@@ -60,9 +61,11 @@ class Module extends BaseModule
             $matcher,
             '(?:edit|update|approve|reject|setPending|cancel)',
             function ($params) {
-                return array(
-                    'item' => $this->getMapper()->findById($params['id']),
-                );
+                try {
+                    return ['item' => $this->getMapper()->findById($params['id'])];
+                } catch (\Schoolbox\Mapper\Exception $e) {
+                    throw new NotFound();
+                }
             }
         );
         // Add the resource item to params, if item ID is in the route.
@@ -70,9 +73,11 @@ class Module extends BaseModule
             $matcher,
             '(?:book|createBooking|bookingCalendar)',
             function ($params) {
-                return array(
-                    'item' => $this->getItemMapper()->findById($params['id']),
-                );
+                try {
+                    return ['item' => $this->getItemMapper()->findById($params['id'])];
+                } catch (\Schoolbox\Mapper\Exception $e) {
+                    throw new NotFound();
+                }
             }
         );
     }
