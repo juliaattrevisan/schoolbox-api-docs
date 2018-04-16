@@ -56,8 +56,14 @@
                             <div class="list-item">
                                 <div class="card small-12">
                                     <span data-template="title"></span>
-                                    <ul data-template="standards">
-                                        <li data-template="standard" class="hide"></li>
+                                    <ul data-template="standards" class="information-list reply">
+                                        <li data-template="standard" class="hide">
+                                            <div class="list-item">
+                                                <div class="card small-12">
+                                                    <span data-template="description"></span>
+                                                </div>
+                                            </div>
+                                        </li>
                                     </ul>
                                 </div>
                             </div>
@@ -201,7 +207,13 @@
                     // Add its standards too
                     if (item.standards) {
                         item.standards.forEach(function(standard) {
-                            standards.append(standardTemplate.clone().html(standard));
+                            var standardHtml = standardTemplate.clone();
+                            standardHtml
+                                .find('[data-template="description"]')
+                                .html(standard);
+                            // Remove noise
+                            standardHtml.find('img').remove();
+                            standards.append(standardHtml);
                         });
                     }
                     baseTemplate.append(row);
