@@ -68,13 +68,17 @@ class Controller extends Base
         $client = $this->buildClient();
 
         // Get all units, and their assessments/attachments in one shot
-        $units = json_decode(
-            $client->get(
+        $requests = [
+            'curriculum' => $client->getAsync('curriculummap/'.$curriculumId),
+            'units'      => $client->getAsync(
                 'unit/',
                 ['query' => ['curriculummap_id' => $curriculumId]]
-            )->getBody()->getContents(),
-            true
-        )['data'];
+            ),
+        ];
+
+        $result     = $this->unwrapRequests($requests);
+        $curriculum = array_pop($result['curriculum']);
+        $units      = $result['units'];
 
         // For each unit: get its assessments and attachments
         $requests = [];
@@ -88,14 +92,9 @@ class Controller extends Base
                 ['query' => ['unit_id' => $unit['id']]]
             );
         }
-        $result = array_map(
-            function (ResponseInterface $response) {
-                return json_decode($response->getBody()->getContents(), true)['data'];
-            },
-            Promise\unwrap($requests)
-        );
 
         // Put results into units
+        $result = $this->unwrapRequests($requests);
         foreach ($units as $i => $unit) {
             $unitId = $unit['id'];
             $unit['assessments'] = $result['assessments:'.$unitId] ?? [];
@@ -114,7 +113,8 @@ class Controller extends Base
             }
         );
 
-        $this->getResponse()->content->set($this->buildJsonOutput($units));
+        $curriculum['units'] = $units;
+        $this->getResponse()->content->set($this->buildJsonOutput($curriculum));
     }
 
     /**
@@ -131,5 +131,22 @@ class Controller extends Base
                 'Accept'        => 'application/json',
             ],
         ]);
+    }
+
+    /**
+     * Awaits all `$requests` to finish, and returns their results.
+     *
+     * @param array|ResponseInterface[] $requests
+     * @return array
+     * @throws \Throwable
+     */
+    private function unwrapRequests(array $requests): array
+    {
+        return array_map(
+            function (ResponseInterface $response) {
+                return json_decode($response->getBody()->getContents(), true)['data'];
+            },
+            Promise\unwrap($requests)
+        );
     }
 }
