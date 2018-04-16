@@ -49,6 +49,9 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
     /** @var Term\Mapper */
     protected $termMapper;
 
+    /** @var \Schoolbox\Learning\Assessment\DataModel\MapperProxy $assessmentDataSource */
+    protected $assessmentDataSource;
+
     /**
      * Instantiate all your dependencies within yourself.
      *
@@ -61,6 +64,7 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
         $this->catMapper = FolderMapper::getInstance();
         $this->boxMapper = SubmissionBoxMapper::getInstance();
         $this->termMapper = Term\Mapper::getInstance();
+        $this->assessmentDataSource = Mapper::getDi()->get("assessmentDataSource");
         parent::loadDependencies($dependencies);
     }
 
@@ -148,10 +152,7 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
         /** @var SubmissionBox $box */
         $box = $this->boxMapper->findById($returnedWork->getSubmissionBox()->getId());
 
-        /** @var \Schoolbox\Learning\Assessment\DataModel\MapperProxy $assessmentDataSource */
-        $assessmentDataSource = Mapper::getDi()->get("assessmentDataSource");
-
-        $assessment = $assessmentDataSource->findByIdForReview($box->getAssessmentId(), $student);
+        $assessment = $this->assessmentDataSource->findByIdForReview($box->getAssessmentId(), $student);
 
         $participant = $assessment->getParticipantIfExtant($student);
 

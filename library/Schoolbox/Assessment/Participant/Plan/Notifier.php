@@ -110,7 +110,8 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     public function loadDependencies($dependencies = null): void
     {
         if (empty($dependencies['assessmentMapper'])) {
-            $dependencies['assessmentMapper'] = AssessmentMapper::getInstance();
+            $dependencies['asses
+            smentMapper'] = AssessmentMapper::getInstance();
         }
         if (empty($dependencies['assessmentDataSource'])) {
             // Remember that thing that under pain of death we're not to use?
