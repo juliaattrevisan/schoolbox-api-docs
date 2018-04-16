@@ -104,6 +104,16 @@ class Controller extends Base
             $units[$i] = $unit;
         }
 
+        // Try ordering responses by time frame.
+        // I can only assume it's natcase-sortable, as there's no apparent
+        // structure.
+        usort(
+            $units,
+            function ($a, $b) {
+                return strnatcasecmp($a['time_frame'], $b['time_frame']);
+            }
+        );
+
         $this->getResponse()->content->set($this->buildJsonOutput($units));
     }
 
