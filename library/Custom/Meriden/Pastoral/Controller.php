@@ -11,6 +11,7 @@ namespace Custom\Meriden\Pastoral;
 
 use Alaress\Web\Controller\Base;
 use Custom\Meriden\Pastoral\StudentInvolvement\Factory;
+use Custom\Meriden\Pastoral\StudentInvolvement\TutorGroup;
 use Schoolbox\User;
 
 class Controller extends Base
@@ -38,25 +39,7 @@ class Controller extends Base
     public function currentReport(User $student)
     {
         $currentYear = date('Y');
-        $reportYears = array_map(
-            function ($v) {
-                return $v->getYear();
-            },
-            $this->getStudentInvolvementFactory()->buildTutorGroupList($student)
-        );
-
-        // Only redirect to valid years
-        $reportYears = array_filter(
-            $reportYears,
-            function ($year) use ($student) {
-                try {
-                    $this->assertValidYearForReport($year, $student);
-                    return true;
-                } catch (\RangeException $e) {
-                    return false;
-                }
-            }
-        );
+        $reportYears = $this->retrieveValidYearsForReport($student);
 
         if (empty($reportYears)) {
             // 404
@@ -140,7 +123,7 @@ class Controller extends Base
         $this->assertValidYearForReport($year, $student);
 
         $tutorGroup     = null;
-        $tutorGroupList = $this->getStudentInvolvementFactory()->buildTutorGroupList($student);
+        $tutorGroupList = $this->retrieveTutorGroupList($student);
         $subject        = null;
         $subjectList    = $this->getStudentInvolvementFactory()->buildSubjectList($year, $student);
         if (!isset($subjectCode)) {
@@ -198,6 +181,43 @@ class Controller extends Base
     {
         $this->studentInvolvementFactory = $studentInvolvementFactory;
         return $this;
+    }
+
+    /**
+     * Builds a list of tutor groups for this student, excluding invalid years.
+     *
+     * @param User $student
+     * @return array|TutorGroup[]
+     */
+    private function retrieveTutorGroupList(User $student): array
+    {
+        return array_filter(
+            $this->getStudentInvolvementFactory()->buildTutorGroupList($student),
+            function (TutorGroup $tutorGroup) use ($student) {
+                try {
+                    $this->assertValidYearForReport($tutorGroup->getYear(), $student);
+                    return true;
+                } catch (\RangeException $e) {
+                    return false;
+                }
+            }
+        );
+    }
+
+    /**
+     * Retrieves a list of valid years for this student's report.
+     *
+     * @param User $student
+     * @return array
+     */
+    private function retrieveValidYearsForReport(User $student): array
+    {
+        return array_map(
+            function (TutorGroup $tutorGroup) {
+                return $tutorGroup->getYear();
+            },
+            $this->retrieveTutorGroupList($student)
+        );
     }
 
     /**
