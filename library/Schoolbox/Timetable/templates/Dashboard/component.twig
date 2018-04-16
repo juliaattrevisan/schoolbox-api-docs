@@ -18,9 +18,8 @@ Data:
     campusTimetables[]['periods'][]['classes'][]['desc']                  string      eg 'Year 11 & 12 Science'
     campusTimetables[]['periods'][]['classes'][]['cancelled']             bool        eg 'strike'
     campusTimetables[]['periods'][]['classes'][]['attendance']            array
-    campusTimetables[]['periods'][]['classes'][]['attendance']['enabled'] bool        Need to also check if a 'link' is available
+    campusTimetables[]['periods'][]['classes'][]['attendance']['link']    null|string Will be null if attendance not available
     campusTimetables[]['periods'][]['classes'][]['attendance']['marked']  bool
-    campusTimetables[]['periods'][]['classes'][]['attendance']['link']    null|string
 #}
 {% import 'sub/attendanceIcon.twig' as attendanceIcon %}
 
@@ -78,11 +77,10 @@ Data:
                                     <div>{{ class.code }}<br />
                                         {{ class.room }}</div>
 
-                                    {% set attendance = class.attendance %}
-                                    {% if attendance.enabled and attendance.link %}
+                                    {% if class.attendance.link %}
                                         <br />
-                                        <span class="{{ attendanceIcon.icon(externalType, attendance.enabled, attendance.marked) }}">
-                                            <a href="{{ attendance.link }}" title="Mark Attendance">Attendance</a>
+                                        <span class="{{ attendanceIcon.icon(externalType, class.attendance.marked) }}">
+                                            <a href="{{ class.attendance.link }}" title="Mark Attendance">Attendance</a>
                                         </span>
                                     {% endif %}
                                 </div>

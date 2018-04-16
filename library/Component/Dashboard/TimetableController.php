@@ -216,12 +216,11 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
      */
     private function getAttendanceLink(array $class, Alaress_Date_Format $now, array $period, array $campusList, int $campusId): string
     {
-        if (!$class['AttendanceEnabled']) {
-            return '';
-        }
-
         switch ($this->getConfigMapper()->get('external_type')) {
             case 'synergetic':
+                if (!$class['AttendanceEnabled']) {
+                    return '';
+                }
                 $encodedClass = urlencode(urlencode(urlencode($class['code'])));
                 $classLink    = $class['campus'] ? $class['campus'] . '/' . $encodedClass : '0/' . $encodedClass;
                 return "/modules/attendance/modify/{$classLink}/{$now->getDatabaseDate()}/{$period['periodNumber']}/{$campusList[$campusId]->getExtTimetableCode()}";
@@ -342,9 +341,8 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
         if ('' !== $class['code'] && $this->getConfigMapper()->get('external_attendance') && $this->getUser()->getRole()->isStaff()) {
 
             $classContext['attendance'] = [
-                'enabled' => (bool)$class['AttendanceEnabled'],
-                'marked'  => (bool)$class['AttendanceMarked'],
                 'link'    => $this->getAttendanceLink($class, $now, $period, $campusList, $campusId),
+                'marked'  => (bool)$class['AttendanceMarked'],
             ];
         }
         return $classContext;
