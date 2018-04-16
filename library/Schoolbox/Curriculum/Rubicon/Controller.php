@@ -74,23 +74,37 @@ class Controller extends Base
                 ['query' => ['curriculummap_id' => $curriculumId]]
             )->getBody()->getContents(),
             true
-        );
+        )['data'];
 
-        // For each unit: get its assessments
+        // For each unit: get its assessments and attachments
         $requests = [];
-        foreach ($units['data'] as $unit) {
-            $requests['unit:'.$unit['id']] = $client->getAsync(
+        foreach ($units as $unit) {
+            $requests['assessments:'.$unit['id']] = $client->getAsync(
                 'assessment/',
                 ['query' => ['unit_id' => $unit['id']]]
             );
+            $requests['attachments:'.$unit['id']] = $client->getAsync(
+                'attachment/',
+                ['query' => ['unit_id' => $unit['id']]]
+            );
         }
-        $results = array_map(
+        $result = array_map(
             function (ResponseInterface $response) {
                 return json_decode($response->getBody()->getContents(), true)['data'];
             },
             Promise\unwrap($requests)
         );
-        $this->getResponse()->content->set($this->buildJsonOutput($results));
+
+        // Put results into units
+        foreach ($units as $i => $unit) {
+            $unitId = $unit['id'];
+            $unit['assessments'] = $result['assessments:'.$unitId] ?? [];
+            // Attachments is badly bugged, but can be worked around
+            $unit['attachments'] = isset($result['attachments:'.$unitId][0]) ? $result['attachments:'.$unitId] : [];
+            $units[$i] = $unit;
+        }
+
+        $this->getResponse()->content->set($this->buildJsonOutput($units));
     }
 
     /**
