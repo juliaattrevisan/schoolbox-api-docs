@@ -47,9 +47,17 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
          * Update it, encode it, save it again
          */
         if (($configuration->getConnectorClass() == 'External') && ($configuration->getEventType() == 'Timetable')) {
-            $configuration->setConnectorClass('ExternalConstrained');
 
-            $newRecord->setConfig($configuration);
+            /* Some outdated records may still be of type Calendar_Api_Config_Connector_External
+             * This needs to be updated as well
+             */
+            $updatedConfiguration = new Calendar_Api_Config_Connector_ExternalConstrained();
+            $updatedConfiguration->setConnectorClass('ExternalConstrained');
+            $updatedConfiguration->setLabel($configuration->getLabel());
+            $updatedConfiguration->setEventType($configuration->getEventType());
+            $updatedConfiguration->setLuEventType($configuration->getLuEventType());
+
+            $newRecord->updateConfig($updatedConfiguration);
 
             $statement = $db->prepare('
                 UPDATE calendar_connector
@@ -59,7 +67,7 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
 
             $statement->execute([
                 'id' => $row['id'],
-                'config' => $newRecord->encodeConfig(),
+                'config' => $newRecord->getConfig(),
             ]);
         }
     }
