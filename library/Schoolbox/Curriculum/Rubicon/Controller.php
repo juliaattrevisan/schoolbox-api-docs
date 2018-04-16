@@ -65,36 +65,25 @@ class Controller extends Base
      */
     public function getCurriculum(int $curriculumId): void
     {
-        $client = $this->buildClient();
-
         // Get all units, and their assessments/attachments in one shot
         $requests = [
-            'curriculum' => $client->getAsync('curriculummap/'.$curriculumId),
-            'units'      => $client->getAsync(
-                'unit/',
-                ['query' => ['curriculummap_id' => $curriculumId]]
-            ),
+            'curriculum' => ['curriculummap/'.$curriculumId, []],
+            'units'      => ['unit/',                        ['query' => ['curriculummap_id' => $curriculumId]]]
         ];
 
-        $result     = $this->unwrapRequests($requests);
+        $result     = $this->makeRequests($requests);
         $curriculum = array_pop($result['curriculum']);
         $units      = $result['units'];
 
         // For each unit: get its assessments and attachments
         $requests = [];
         foreach ($units as $unit) {
-            $requests['assessments:'.$unit['id']] = $client->getAsync(
-                'assessment/',
-                ['query' => ['unit_id' => $unit['id']]]
-            );
-            $requests['attachments:'.$unit['id']] = $client->getAsync(
-                'attachment/',
-                ['query' => ['unit_id' => $unit['id']]]
-            );
+            $requests['assessments:'.$unit['id']] = ['assessment/', ['query' => ['unit_id' => $unit['id']]]];
+            $requests['attachments:'.$unit['id']] = ['attachment/', ['query' => ['unit_id' => $unit['id']]]];
         }
 
         // Put results into units
-        $result = $this->unwrapRequests($requests);
+        $result = $this->makeRequests($requests);
         foreach ($units as $i => $unit) {
             $unitId = $unit['id'];
             $unit['assessments'] = $result['assessments:'.$unitId] ?? [];
@@ -134,19 +123,57 @@ class Controller extends Base
     }
 
     /**
-     * Awaits all `$requests` to finish, and returns their results.
+     * Makes all `$requests`, awaits their completion, and returns the results.
      *
-     * @param array|ResponseInterface[] $requests
+     * @param array $requests
+     * @param int   $currentPage
      * @return array
      * @throws \Throwable
      */
-    private function unwrapRequests(array $requests): array
+    private function makeRequests(array $requests, $currentPage = 1): array
     {
-        return array_map(
-            function (ResponseInterface $response) {
-                return json_decode($response->getBody()->getContents(), true)['data'];
-            },
-            Promise\unwrap($requests)
-        );
+        // Safeguard: no more than 10 pages
+        if ($currentPage > 10) {
+            return [];
+        }
+
+        // Asynchronously make the requests
+        $asyncRequests = [];
+        $client        = $this->buildClient();
+        foreach ($requests as $requestName => $request) {
+            $asyncRequests[$requestName] = \call_user_func_array([$client, 'getAsync'], $request);
+        }
+
+        // Await request completion
+        $responses        = Promise\unwrap($asyncRequests);
+        $result           = [];
+        $nextPageRequests = [];
+        foreach ($responses as $requestName => $response) {
+            if (!$response instanceof ResponseInterface) {
+                continue;
+            }
+
+            // Build the response, organising to get the next page if required.
+            $decoded = json_decode($response->getBody()->getContents(), true);
+            if ($currentPage < $decoded['page']['last_page']) {
+                // Make a new request for the next page
+                [$uri, $params] = $request;
+                $params['query']['page'] = $currentPage + 1;
+                $nextPageRequests[$requestName] = [$uri, $params];
+            }
+
+            // Assign the data; we're done
+            $result[$requestName] = $decoded['data'];
+        }
+
+        // Recursively run any next page requests;
+        // merge their responses into the current data set
+        if (!empty($nextPageRequests)) {
+            foreach ($this->makeRequests($nextPageRequests, $currentPage + 1) as $requestName => $response) {
+                $result[$requestName] = array_merge($result[$requestName] ?? [], $response);
+            }
+        }
+
+        return $result;
     }
 }
