@@ -549,15 +549,15 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             }
 
             // Title varies for due work and quiz
+            $when = $participant->getDueDate()->getRelativeTime(Alaress_Date_Format::now()->addMinutes(-5), true);
             if ($assessment instanceof DueWork) {
-                $when         = $participant->getDueDate()->getRelativeTime(Alaress_Date_Format::now()->addMinutes(-5), true);
-                $studentTitle = ":assessment is due $when from now in :cat";
-                $parentTitle  = ":child has not yet submitted work for :assessment, which is due $when from now in :cat";
+                $studentTitle = "You have $when left to submit :assessment in :cat";
+                $parentTitle  = ":child has $when left to submit :assessment in :cat";
 
             } elseif ($assessment instanceof Quiz) {
-                $when         = self::QUIZ_UPCOMING_WINDOW . " hour" . (self::QUIZ_UPCOMING_WINDOW === 1 ? '' : 's');
-                $studentTitle = ":assessment is due in $when in :cat";
-                $parentTitle  = ":child has not yet attempted :assessment in :cat";
+                $studentTitle = "You have $when left to attempt :assessment in :cat";
+                $parentTitle  = ":child has $when left to attempt :assessment in :cat";
+
             } else {
                 continue;
             }
