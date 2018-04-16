@@ -272,9 +272,7 @@
     $.validator.addMethod('notInList', function(value, element, list) {
 
         list = JSON.parse(list);
-
-        console.log(list);
-
+        
         if(list.indexOf(value) > -1) {
             return false;
         } else {
