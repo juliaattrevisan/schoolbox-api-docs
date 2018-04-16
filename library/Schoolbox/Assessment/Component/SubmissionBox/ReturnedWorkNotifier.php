@@ -151,12 +151,7 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
         /** @var \Schoolbox\Learning\Assessment\DataModel\MapperProxy $assessmentDataSource */
         $assessmentDataSource = Mapper::getDi()->get("assessmentDataSource");
 
-        /** @var \Schoolbox\Learning\Assessment\Participant\DataSource $participantDataSource */
-        $participantDataSource = Mapper::getDi()->get("participantDataSource");
-
-        $assessment = $assessmentDataSource->findById($box->getAssessmentId());
-
-        $participantDataSource->loadParticipationIntoAssessment($assessment, $student);
+        $assessment = $assessmentDataSource->findByIdForReview($box->getAssessmentId(), $student);
 
         $participant = $assessment->getParticipantIfExtant($student);
 
