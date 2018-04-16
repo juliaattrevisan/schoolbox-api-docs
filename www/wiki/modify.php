@@ -89,6 +89,15 @@ elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1]) && is_numeric($this-
     $slug  = strlen($this->arg[3]) ? $this->arg[3] : '';
     $title = ucwords(str_replace('-', ' ', $slug));
 
+
+    $wikis = $wikiHandler->getByCategory($folder->getId());
+
+    $slugs = [];
+
+    foreach ($wikis as $wiki) {
+        $slugs[] = $wiki['slug'];
+    }
+
     $this->setVar(
         array(
             'ACTION'      => 'Add',
@@ -100,6 +109,7 @@ elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1]) && is_numeric($this-
             'REVISION'    => '',
             'INSTANCE_ID' => $this->arg[2],
             'SLUG'        => '',
+            'SLUG_LIST'   => json_encode($slugs),
         )
     );
 

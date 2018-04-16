@@ -254,7 +254,7 @@
             return true;
         }
         return false;
-    }, 'This field cannot be blank')
+    }, 'This field cannot be blank');
 
     $.validator.addMethod("alphanumeric", function(value, element) {
         return this.optional(element) || /^[a-z0-9]+$/i.test(value);
@@ -267,7 +267,20 @@
             return true;
         }
         return jQuery.validator.methods.email.call(this, $.trim(value), element);
-    }, 'Please enter a valid email address')
+    }, 'Please enter a valid email address');
+
+    $.validator.addMethod('notInList', function(value, element, list) {
+
+        list = JSON.parse(list);
+
+        console.log(list);
+
+        if(list.indexOf(value) > -1) {
+            return false;
+        } else {
+            return true;
+        }
+    }, 'This heading is already in use - please choose another.');
 
 
 }(jQuery));

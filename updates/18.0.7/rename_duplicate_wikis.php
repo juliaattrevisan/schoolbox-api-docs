@@ -75,7 +75,7 @@ $kernel->run(
 
                 // Update wikis that have the same slug as the previous row (skips first item)
                 if($row2['slug'] == $lastSlug && $row2['categoryID'] == $lastCategoryID) {
-                    
+
                     $updateQuery->execute(['wikiID' => $row2['wikiID'], 'incrementer' => $incrementer]);
                 } else {
                     // Reset Incrementer

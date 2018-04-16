@@ -7,7 +7,20 @@
             file_browser_category_id : {CATEGORY_ID}
         });
 
-        $('#wikiForm').alaressValidate();
+        alert('banana');
+
+        $('#wikiForm').alaressValidate({
+            rules: {
+                heading: {
+					notInList: {SLUG_LIST}
+                }
+            },
+            messages: {
+                heading: 'This wiki name is already in use - please choose another.'
+            }
+        });
+
+
     });
 </script>
 <!-- END custom_head -->
