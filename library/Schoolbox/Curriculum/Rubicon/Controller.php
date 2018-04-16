@@ -10,6 +10,8 @@ namespace Schoolbox\Curriculum\Rubicon;
 
 use Alaress\Web\Controller\Base;
 use GuzzleHttp\Client;
+use GuzzleHttp\Promise;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * Rubicon Atlas controller.
@@ -40,16 +42,8 @@ class Controller extends Base
      *
      * @param string $endpoint
      */
-    public function getProxy(string $endpoint)
+    public function getProxy(string $endpoint): void
     {
-        $client = new Client([
-            'base_uri' => 'https://api.rubicon.com/api/',
-            'headers'  => [
-                'Authorization' => 'Bearer ' . $this->getConfigLoader()->get('rubicon_api_token'),
-                'Accept'        => 'application/json',
-            ],
-        ]);
-
         // pass thru GET params
         $params = [
             'query' => $this->getRequest()->query->getArrayCopy(),
@@ -58,8 +52,60 @@ class Controller extends Base
 
         $this->getResponse()->content->set(
             $this->buildJsonOutput(
-                json_decode($client->get($endpoint, $params)->getBody()->getContents())
+                json_decode($this->buildClient()->get($endpoint, $params)->getBody()->getContents())
             )
         );
+    }
+
+    /**
+     * Test for getting a curriculum and contents in a single request.
+     *
+     * @param int $curriculumId
+     * @throws \Throwable
+     */
+    public function getCurriculum(int $curriculumId): void
+    {
+        $client = $this->buildClient();
+
+        // Get all units, and their assessments/attachments in one shot
+        $units = json_decode(
+            $client->get(
+                'unit/',
+                ['query' => ['curriculummap_id' => $curriculumId]]
+            )->getBody()->getContents(),
+            true
+        );
+
+        // For each unit: get its assessments
+        $requests = [];
+        foreach ($units['data'] as $unit) {
+            $requests['unit:'.$unit['id']] = $client->getAsync(
+                'assessment/',
+                ['query' => ['unit_id' => $unit['id']]]
+            );
+        }
+        $results = array_map(
+            function (ResponseInterface $response) {
+                return json_decode($response->getBody()->getContents(), true)['data'];
+            },
+            Promise\unwrap($requests)
+        );
+        $this->getResponse()->content->set($this->buildJsonOutput($results));
+    }
+
+    /**
+     * Helper for building a Rubicon API client
+     *
+     * @return Client
+     */
+    private function buildClient(): Client
+    {
+        return new Client([
+            'base_uri' => 'https://api.rubicon.com/api/',
+            'headers'  => [
+                'Authorization' => 'Bearer ' . $this->getConfigLoader()->get('rubicon_api_token'),
+                'Accept'        => 'application/json',
+            ],
+        ]);
     }
 }
