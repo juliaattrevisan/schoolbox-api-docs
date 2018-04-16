@@ -86,8 +86,7 @@ if($enabled) {
             $timecron = \Cron\CronExpression::factory($schedule)
                 ->setPart(\Cron\CronExpression::DAY, '*')
                 ->setPart(\Cron\CronExpression::MONTH, '*')
-                ->setPart(\Cron\CronExpression::WEEKDAY, '*')
-                ->setPart(\Cron\CronExpression::YEAR, '*');
+                ->setPart(\Cron\CronExpression::WEEKDAY, '*');
         } catch(InvalidArgumentException $e) {
             // no schedule for group
         }
