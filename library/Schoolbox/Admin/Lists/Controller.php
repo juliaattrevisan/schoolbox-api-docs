@@ -614,7 +614,6 @@ class Controller extends Base
                         'mandatory' => true,
                         'width'     => 8,
                         'maxLength' => 100,
-                        'mandatory' => true,
                     ],
                     'externalCode' => [
                         'caption'   => 'SIS Code',
