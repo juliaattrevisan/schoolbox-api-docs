@@ -67,8 +67,11 @@ class Controller extends Base
     {
         // Get all units, and their assessments/attachments in one shot
         $requests = [
-            'curriculum' => ['curriculummap/'.$curriculumId, []],
-            'units'      => ['unit/',                        ['query' => ['curriculummap_id' => $curriculumId]]]
+            'curriculum' => ['curriculummap/'.$curriculumId],
+            'units'      => [
+                'unit/',
+                ['query' => ['curriculummap_id' => $curriculumId, 'perPage' => 5]]
+            ]
         ];
 
         $result     = $this->makeRequests($requests);
