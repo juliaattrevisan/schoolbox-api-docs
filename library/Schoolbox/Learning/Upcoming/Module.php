@@ -18,6 +18,7 @@ use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
+use Schoolbox\Application\Exception\NotFound;
 
 /**
  * Sub-module for a student's upcoming due work.
@@ -68,10 +69,14 @@ class Module extends BaseModule
                 }
 
                 // Pass the date and student to the controller action
-                return [
-                    'student' => $this->getUserMapper()->findById($params['studentId']),
-                    'date'    => $date,
-                ];
+                try {
+                    return [
+                        'student' => $this->getUserMapper()->findById($params['studentId']),
+                        'date'    => $date,
+                    ];
+                } catch (\Exception $e) {
+                    throw new NotFound();
+                }
             }
         );
     }
