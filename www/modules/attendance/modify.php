@@ -61,6 +61,10 @@ $externalClass = new External_Synergetic_Class();
 $externalTimetable = new External_Timetable();
 $externalUserHandler = new External_User();
 
+if (!$configLoader->get('external_attendance')) {
+    error(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+}
+
 if ($this->arg[0]) {
     $class = $externalClass->getClass($this->arg[0] . '/' . urldecode(urldecode(urldecode($this->arg[1]))), $_SESSION['user']);
 } else {
