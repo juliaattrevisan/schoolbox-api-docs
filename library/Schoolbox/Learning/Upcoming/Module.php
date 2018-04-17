@@ -74,7 +74,7 @@ class Module extends BaseModule
                         'student' => $this->getUserMapper()->findById($params['studentId']),
                         'date'    => $date,
                     ];
-                } catch (\Exception $e) {
+                } catch (MapperException $e) {
                     throw new NotFound();
                 }
             }
