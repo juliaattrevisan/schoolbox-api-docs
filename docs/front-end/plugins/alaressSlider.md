@@ -183,3 +183,8 @@ However, this is not the schoolbox way of doing things: we prefer to have the pa
 
 In order to achieve this while maintaining the correct positioning of the next/prev arrows, the pagination has been moved to just below and outside of the `swiper-container` div.
 The `.image-slider-pagination` css styles have also been moved outside of the `.swiper-container` in SASS to match the new HTML structure.
+
+## Known bugs & behaviors
+- If there is only a single image in a slideshow component, that image will loop. It actually duplicates the image so there are three (current, next and previous), causing this behavior. There may be an option that can be set to prevent this, but nothing I tried worked and we decided it wasn't essential to fix it since users are unlikely to create a slideshow with a single image and it's only a minor annoyance anyway.
+- If you drag a slideshow component into a different column on a homepage, the sliding will stop, but can be "jump-started" by manually sliding.
+- If you have a lot of images on the Image Slider on the Dashboard, you can get a boatload of navigation dots - we might consider hiding them if there's more than 10 or so images at which point navigation dots are pretty useless.
