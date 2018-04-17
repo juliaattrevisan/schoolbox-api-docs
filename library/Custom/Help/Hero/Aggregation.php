@@ -96,6 +96,11 @@ class Aggregation
             }
         }
 
+        /* Safety measure to ensure that $userData isn't accidentally changed
+         * https://stackoverflow.com/questions/3307409/php-pass-by-reference-in-foreach
+         */
+        unset($userData);
+
         /* All the older heroes who do not meet the current qualification criteria
          * but met some older version of it, at some point in the past, and are already heroes
          */
