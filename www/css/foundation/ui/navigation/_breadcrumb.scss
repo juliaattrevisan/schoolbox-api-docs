@@ -85,10 +85,6 @@ $breadcrumb-noclick-bg-color: scale-color($breadcrumb-bg-color, $lightness: 40%)
       }
     }
 
-    &.active a:before {
-      margin-left: 0px;
-    }
-
     // Special styling for non-linked breadcrumbs
     a:not([href]) {
       background-color: $breadcrumb-noclick-bg-color;
@@ -116,6 +112,10 @@ $breadcrumb-noclick-bg-color: scale-color($breadcrumb-bg-color, $lightness: 40%)
     }
 
     &.active a {
+      &:before {
+        margin-left: 0px;
+      }
+
       &[href]:hover:before, &[href]:hover:after {
         border-left-color: $breadcrumb-hover-bg-color;
       }
