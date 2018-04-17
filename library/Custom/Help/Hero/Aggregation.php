@@ -21,6 +21,27 @@ class Aggregation
 {
 
     /**
+     * @var Folder\Mapper
+     */
+    private $folderMapper;
+
+    /**
+     * @var UserAccessMapper
+     */
+    private $userAccessMapper;
+
+    /**
+     * Aggregation constructor.
+     * @param Folder\Mapper    $folderMapper
+     * @param UserAccessMapper $userAccessMapper
+     */
+    public function __construct(Folder\Mapper $folderMapper, UserAccessMapper $userAccessMapper)
+    {
+        $this->folderMapper = $folderMapper;
+        $this->userAccessMapper = $userAccessMapper;
+    }
+
+    /**
      * Aggregate data to work out who qualified for Hero status
      *
      * @param array $data Data from Acquisition
@@ -31,7 +52,7 @@ class Aggregation
     {
         /* Figure out who the current heroes are
          */
-        $heroes = (new Heroes(Folder\Mapper::getInstance(), UserAccessMapper::getInstance()))->findHeroes();
+        $heroes = (new Heroes($this->folderMapper, $this->userAccessMapper))->findHeroes();
 
         /* A list of heroes who have been doing the Teacher Course
          * Some heroes have done an older version, or different assessments

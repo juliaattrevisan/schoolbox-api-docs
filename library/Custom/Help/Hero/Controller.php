@@ -16,7 +16,8 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\Error;
 use Schoolbox\Learning\Course\DataModel\Specification;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\UserMapper;
+use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Resource\Folder;
 
 ini_set('max_execution_time', 300);
 
@@ -34,19 +35,34 @@ class Controller extends Base
     private $courseSpecificationMapper;
 
     /**
+     * @var Folder\Mapper
+     */
+    private $folderMapper;
+
+    /**
+     * @var UserAccessMapper
+     */
+    private $userAccessMapper;
+
+    /**
      * Controller constructor.
      *
-     * @param Error\Mapper                   $errorMapper
-     * @param Specification\Mapper           $courseSpecificationMapper
+     * @param Error\Mapper         $errorMapper
+     * @param Specification\Mapper $courseSpecificationMapper
+     * @param Folder\Mapper        $folderMapper
+     * @param UserAccessMapper     $userAccessMapper
      */
     public function __construct(
         Error\Mapper $errorMapper,
-        Specification\Mapper $courseSpecificationMapper
+        Specification\Mapper $courseSpecificationMapper,
+        Folder\Mapper $folderMapper,
+        UserAccessMapper $userAccessMapper
     ) {
         $this->errorMapper = $errorMapper;
         $this->courseSpecificationMapper = $courseSpecificationMapper;
+        $this->folderMapper = $folderMapper;
+        $this->userAccessMapper = $userAccessMapper;
     }
-
 
     /**
      * Hero Report
@@ -76,7 +92,7 @@ class Controller extends Base
          */
         $start = microtime(true);
 
-        $aggregatedData = (new Aggregation())->aggregate(
+        $aggregatedData = (new Aggregation($this->folderMapper, $this->userAccessMapper))->aggregate(
             (new Acquisition($this->errorMapper->getDatabase()))->findInvolvement()
         );
 

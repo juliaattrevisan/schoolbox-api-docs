@@ -14,6 +14,8 @@ use InvalidArgumentException;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Mapper;
+use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Resource\Folder;
 use \Alaress\Twig\Loader\IChainLoader;
 
 
@@ -69,7 +71,9 @@ class Module extends BaseModule
         /** @var Container $injector */
         $injector->params[Controller::class] = [
             'courseSpecificationMapper' => $this->getMapperFactory()->getLazy(CourseSpecificationMapper::class),
-            'errorMapper' => $this->getMapperFactory()->getLazy(ErrorMapper::class)
+            'errorMapper' => $this->getMapperFactory()->getLazy(ErrorMapper::class),
+            'folderMapper' => $this->getMapperFactory()->getLazy(Folder\Mapper::class),
+            'userAccessrMapper' => $this->getMapperFactory()->getLazy(UserAccessMapper::class)
         ];
     }
 
