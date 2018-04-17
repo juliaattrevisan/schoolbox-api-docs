@@ -2,5 +2,7 @@
 
 {% block buttons %}
     {{ parent() }}
-    <li><a class="icon-progress" href="/modules/remote/aHR0cDovLzUyLjY1LjI2LjQ2L2FwcGEvcmVwb3J0cw==/window">Reports</a></li>
+    {% if isStaff %}
+        <li><a class="icon-progress" href="/modules/remote/aHR0cDovLzUyLjY1LjI2LjQ2L2FwcGEvcmVwb3J0cw==/window">Reports</a></li>
+    {% endif %}
 {% endblock buttons %}
