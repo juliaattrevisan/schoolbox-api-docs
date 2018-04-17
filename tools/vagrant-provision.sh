@@ -304,6 +304,9 @@ cp /vagrant/tools/apache-vhost-schoolbox-webdav-only.conf /etc/apache2/sites-ava
 a2ensite apache-vhost-schoolbox-webdav-only
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Enabling Schoolbox nginx vhost";
+sed -i 's/php_flag\[display_startup_errors\]\ \=\ off/php_flag\[display_startup_errors\]\ \=\ on/g' /etc/php/7.1/fpm/pool.d/schoolbox*.conf;
+sed -i 's/php_flag\[display_errors\]\ \=\ off/php_flag\[display_errors\]\ \=\ on/g' /etc/php/7.1/fpm/pool.d/schoolbox*.conf;
+sed -i 's/php_flag\[html_errors\]\ \=\ off/php_flag\[html_errors\]\ \=\ on/g' /etc/php/7.1/fpm/pool.d/schoolbox*.conf;
 cp -f /vagrant/tools/nginx-vhost-schoolbox-websocket.conf /etc/nginx/conf.d/;
 cp -f /vagrant/tools/nginx-vhost-schoolbox-websocket-ssl.conf /etc/nginx/conf.d/;
 sed -i 's/var\/lib\/schoolbox/vagrant/g' /etc/php/7.1/fpm/pool.d/schoolbox*;
