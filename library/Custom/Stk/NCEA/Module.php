@@ -58,6 +58,9 @@ class Module extends BaseModule
              */
             new Rule\All(
                 new Rule\All(
+
+                    /* Permission to NCEA Report and its button, controlled by STK
+                     */
                     new Rule\Callback(function ($params, User $user) {
                         try {
                             /** @var \Schoolbox\User $user */
@@ -74,6 +77,23 @@ class Module extends BaseModule
 
                         if (!$availability) {
                             throw new Unauthorized('Unavailable for this student\'s year level due to OLE flag');
+                        }
+                    }),
+
+                    /* Explicit IB Check: IB students not allowed
+                     */
+                    new Rule\Callback(function ($params, User $user) {
+                        try {
+                            /** @var \Schoolbox\User $user */
+                            $student = $this->getUserMapper()->findById($params['userId']);
+                            $externalUser = $this->getExternalUser()->getStudent($student->getExternalId());
+
+                            if ($externalUser['StudentIBFlag']) {
+                                throw new Unauthorized('NCEA Reports not available to IB Students');
+                            }
+                        }
+                        catch (MapperException $e) {
+                            throw new Unauthorized('User Not Found');
                         }
                     }),
                     new Rule\IsYearLevel($this->availableForYears)
@@ -113,14 +133,6 @@ class Module extends BaseModule
             throw new NotFound('User Not Found');
         }
 
-        /* IB Students not allowed
-         */
-        $externalUser = $this->getExternalUser()->getStudent($user->getExternalId());
-
-        if ($externalUser['StudentIBFlag']) {
-            throw new NotFound('NCEA Reports not available to IB Students');
-        }
-
         /* Only works for the current year
          */
         if ((int)$params['year'] !== (int)date('Y')) {
@@ -129,7 +141,7 @@ class Module extends BaseModule
 
         return [
             'user' => $user,
-            'externalUser' => $externalUser,
+            'externalUser' => $this->getExternalUser()->getStudent($user->getExternalId()),
             'year' => (int)$params['year'],
         ];
     }
