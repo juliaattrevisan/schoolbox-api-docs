@@ -83,6 +83,13 @@ div.dataTables_scrollFoot table {
 table.dataTable thead {
     th {
         position: relative;
+
+        /* Don't need to reserve space when sorting is disabled
+         * Noticable on center-aligned table headings
+         */
+        &.sorting_disabled {
+            padding-right: 0.5rem;
+        }
     }
 
     th.sorting:hover, th.sorting_asc:hover, th.sorting_desc:hover {
