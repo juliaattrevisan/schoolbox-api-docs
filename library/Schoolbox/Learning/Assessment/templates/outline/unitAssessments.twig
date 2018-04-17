@@ -83,17 +83,21 @@
                         {##
                          # Metadata
                          #
-                         # Teacher: sees completion stats
-                         # Others: see due date
+                         # Teacher: sees completion stats and due date for base assessment
+                         # Others: see due date as per participation
                          #}
                         {% if canWrite %}
                             <p class="meta">
                                 <span class="{{ urgency.marks(completionGradient) }}">{{ completionCount }}/{{ studentCount }} students completed</span>
                             </p>
+                            <p class="meta spaced">
+                                <span class="unit-task-due-date">{{ dueDate.assessment(assessment) }}</span>
+                            </p>
+                        {% else %}
+                            <p class="meta spaced">
+                                <span class="unit-task-due-date">{{ dueDate.dueDate(assessment, USER) }}</span>
+                            </p>
                         {% endif %}
-                        <p class="meta spaced">
-                            <span class="unit-task-due-date">{{ dueDate.dueDate(assessment, USER) }}</span>
-                        </p>
                     </div>
                 </div>
 
