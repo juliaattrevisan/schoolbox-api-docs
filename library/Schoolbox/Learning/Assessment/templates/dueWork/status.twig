@@ -361,19 +361,16 @@
                                 'drafts': draftFeedbackIds
                             }).done(function (response) {
 
-                                var feedbackErrors = false,
-                                    rubricErrors   = false;
+                                var feedbackErrors = false;
 
                                 for (var feedbackId in response) {
                                     if (response.hasOwnProperty(feedbackId)) {
                                         var result           = response[feedbackId],
                                             isPublishSuccess = result['publishSuccess'],
-                                            isRubricSuccess  = result['rubricSuccess'],
                                             $actionBar       = $actionBars[feedbackId],
                                             $publishButton   = $actionBar.find('[data-draft=publish]');
 
                                         feedbackErrors = feedbackErrors || !isPublishSuccess;
-                                        rubricErrors   = rubricErrors || !isRubricSuccess;
 
                                         $publishButton.html('Publish');
                                         $publishButton.removeAttr('disabled');
@@ -387,8 +384,6 @@
                                 {# Update the toast depending on error/success #}
                                 if (feedbackErrors) {
                                     $toast.toastTimeout({text: 'Unable to publish all drafts', css: 'alert'});
-                                } else if (rubricErrors) {
-                                    $toast.toastTimeout({text: 'Publish all drafts, but failed to publish rubric marks', css: 'alert'});
                                 } else {
                                     $toast.toastTimeout({text: 'Published all drafts', css: 'success'});
                                 }
