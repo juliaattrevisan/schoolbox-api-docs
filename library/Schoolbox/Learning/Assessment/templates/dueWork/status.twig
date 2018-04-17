@@ -135,6 +135,11 @@
             </div>
             {% if fbUrl %}
         </form>
+        <script>
+            $('form').submit(function(e) {
+                e. preventDefault();
+            });
+        </script>
         {% endif %}
     </div>
 {% endblock %}
