@@ -368,12 +368,10 @@
                                     if (response.hasOwnProperty(feedbackId)) {
                                         var result           = response[feedbackId],
                                             isPublishSuccess = result['publishSuccess'],
-                                            isRubricSuccess  = result['rubricSuccess'],
                                             $actionBar       = $actionBars[feedbackId],
                                             $publishButton   = $actionBar.find('[data-draft=publish]');
 
                                         feedbackErrors = feedbackErrors || !isPublishSuccess;
-                                        rubricErrors   = rubricErrors || !isRubricSuccess;
 
                                         $publishButton.html('Publish');
                                         $publishButton.removeAttr('disabled');
