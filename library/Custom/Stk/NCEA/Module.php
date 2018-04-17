@@ -54,17 +54,13 @@ class Module extends BaseModule
         $getPerms = new Rule\All(
             new Rule\IsLoggedIn(),
 
-            /* This student must be in Year 11-13 inclusive
-             */
             new Rule\All(
                 new Rule\All(
-
-                    /* Permission to NCEA Report and its button, controlled by STK
-                     */
                     new Rule\Callback(function ($params, User $user) {
                         try {
                             /** @var \Schoolbox\User $user */
                             $student = $this->getUserMapper()->findById($params['userId']);
+                            $externalUser = $this->getExternalUser()->getStudent($student->getExternalId());
                         }
                         catch (MapperException $e) {
                             throw new Unauthorized('User Not Found');
@@ -73,29 +69,23 @@ class Module extends BaseModule
                         /** @var IConnector $externalDb */
                         $externalDb = $this->getInjector()->get('databaseExternal');
 
+                        /* Permission to NCEA Report and its button, controlled by STK
+                         */
                         $availability = (new Availability($externalDb))->hasAccess((int)$student->getYear());
 
                         if (!$availability) {
                             throw new Unauthorized('Unavailable for this student\'s year level due to OLE flag');
                         }
+
+                        /* Explicit IB Check: IB students not allowed
+                         */
+                        if ($externalUser['StudentIBFlag']) {
+                            throw new Unauthorized('NCEA Reports not available to IB Students');
+                        }
                     }),
 
-                    /* Explicit IB Check: IB students not allowed
+                    /* This student must be in Year 11-13 inclusive
                      */
-                    new Rule\Callback(function ($params, User $user) {
-                        try {
-                            /** @var \Schoolbox\User $user */
-                            $student = $this->getUserMapper()->findById($params['userId']);
-                            $externalUser = $this->getExternalUser()->getStudent($student->getExternalId());
-
-                            if ($externalUser['StudentIBFlag']) {
-                                throw new Unauthorized('NCEA Reports not available to IB Students');
-                            }
-                        }
-                        catch (MapperException $e) {
-                            throw new Unauthorized('User Not Found');
-                        }
-                    }),
                     new Rule\IsYearLevel($this->availableForYears)
                 ),
                 /* The Students themselves, their parents, any staff/superuser can get button and report
