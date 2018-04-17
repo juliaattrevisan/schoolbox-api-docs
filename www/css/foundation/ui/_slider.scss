@@ -137,12 +137,12 @@ $swipe-color-hover: $steel;
     }
   }
 
-  .swiper-button-prev::before {
+  .swiper-button-prev:before {
     @extend .icon-previous;
     left: 0;
   }
 
-  .swiper-button-next::before {
+  .swiper-button-next:before {
     @extend .icon-next;
     right: 0;
   }
