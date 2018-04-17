@@ -732,9 +732,26 @@ class UserMapper extends Mapper
      */
     public function verifyHasCampus(User $user)
     {
-        if ($user->getCampusCollection()->count() < 1 ) {
+        // if no campus has been selected in the interface
+        if ($user->getCampusCollection()->count() < 1) {
             throw new UnexpectedValueException('User must have at least one campus');
         }
+
+        // verify that at least one valid campus id exists in the selected campuses.
+        $campusList = CampusMapper::getInstance()->findAll();
+        $foundOne = false;
+        foreach ($campusList as $realCampus) {
+            foreach ($user->getCampusCollection() as $selectedCampus) {
+                if ($realCampus->getId() == $selectedCampus->getId()) {
+                    $foundOne = true;
+                    break 2;
+                }
+            }
+        }
+        if (!$foundOne) {
+            throw new UnexpectedValueException('User must have at least one valid campus');
+        }
+
         return true;
     }
 
