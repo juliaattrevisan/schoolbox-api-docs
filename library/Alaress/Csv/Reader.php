@@ -26,6 +26,15 @@ class Reader implements \Iterator {
      */
     protected $column_list = array();
 
+
+    /**
+     * The column list expected for this reader.
+     * If not set, it'll simply be ignored. If set, case insensitive search of the csv column names
+     * will be performed against this array.
+     * @var array
+     */
+    protected $expected_column_list = array();
+
     /**
      * Is the column list loaded from the first row of the CSV file?
      *
@@ -183,7 +192,26 @@ class Reader implements \Iterator {
      * @return $this
      */
     public function setColumnList($column_list) {
-        $this->column_list = $column_list;
+        if (empty($this->getExpectedColumnList())) {
+            $this->column_list = $column_list;
+            return $this;
+        }
+
+        // Check importing column name against expected column names.
+        // This is not to exclude existence of the importing field,
+        // but to search the same name with different case
+        foreach ($column_list as $importedColumn) {
+            foreach ($this->getExpectedColumnList() as $expectedColumn) {
+                if ($importedColumn === $expectedColumn) {
+                    break;
+                }
+                if (strcasecmp($importedColumn, $expectedColumn) === 0) {
+                    $importedColumn = $expectedColumn;
+                    break;
+                }
+            }
+            $this->column_list[] = $importedColumn;
+        }
         return $this;
     }
 
@@ -192,6 +220,22 @@ class Reader implements \Iterator {
      */
     public function getColumnList() {
         return $this->column_list;
+    }
+
+    /**
+     * @param  array $expected_column_list
+     * @return $this
+     */
+    public function setExpectedColumnList($expected_column_list) {
+        $this->expected_column_list = $expected_column_list;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getExpectedColumnList() {
+        return $this->expected_column_list;
     }
 
     /**
