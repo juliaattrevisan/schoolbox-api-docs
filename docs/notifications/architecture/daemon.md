@@ -106,6 +106,8 @@ acting upon the content of that Response.
 * TODO this is actually responsibility of `\Alaress\Redis\Async\EventListener`,
   which the schedule daemon's scheduler _happens to_ implement
 
+TODO is scheduler an optional piece of daemon? slice out into separate doc
+
 
 #### Event Loop
 
