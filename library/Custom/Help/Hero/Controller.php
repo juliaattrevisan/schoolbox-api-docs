@@ -34,25 +34,17 @@ class Controller extends Base
     private $courseSpecificationMapper;
 
     /**
-     * @var UserMapper
-     */
-    private $userMapper;
-
-    /**
      * Controller constructor.
      *
      * @param Error\Mapper                   $errorMapper
      * @param Specification\Mapper           $courseSpecificationMapper
-     * @param UserMapper                     $userMapper
      */
     public function __construct(
         Error\Mapper $errorMapper,
-        Specification\Mapper $courseSpecificationMapper,
-        UserMapper $userMapper
+        Specification\Mapper $courseSpecificationMapper
     ) {
         $this->errorMapper = $errorMapper;
         $this->courseSpecificationMapper = $courseSpecificationMapper;
-        $this->userMapper = $userMapper;
     }
 
 
@@ -85,7 +77,7 @@ class Controller extends Base
         $start = microtime(true);
 
         $aggregatedData = (new Aggregation())->aggregate(
-            (new Acquisition($this->userMapper))->findInvolvement()
+            (new Acquisition($this->errorMapper->getDatabase()))->findInvolvement()
         );
 
         $end = microtime(true);

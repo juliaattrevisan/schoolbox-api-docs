@@ -13,8 +13,9 @@
 namespace Custom\Help\Hero;
 
 use Alaress\Database\Predicate\Builder;
+use Alaress\Database\Quoter\IQuoter;
+use Alaress\IDatabase;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\UserMapper;
 
 class Acquisition
 {
@@ -44,17 +45,20 @@ class Acquisition
     ';
 
     /**
-     * @var UserMapper
+     * Builder expects an IQuoter
+     * prepare() available on IDatabase
+     *
+     * @var IQuoter|IDatabase
      */
-    private $userMapper;
+    private $db;
 
     /**
      * Acquisition constructor.
      *
-     * @param UserMapper            $userMapper
+     * @param IQuoter|IDatabase $db
      */
-    public function __construct(UserMapper $userMapper) {
-        $this->userMapper = $userMapper;
+    public function __construct(IDatabase $db) {
+        $this->db = $db;
     }
 
     /**
@@ -97,7 +101,7 @@ class Acquisition
      */
     private function makeDefaultBuilder(): Builder
     {
-        $pb = new Builder($this->userMapper->getDatabase(), 'upd');
+        $pb = new Builder($this->db, 'upd');
         $pb->equals('cs.id', self::HERO_COURSE_SPEC_ID);
         $pb->isNull('cs.deleted_at');
         $pb->isNull('ci.deleted_at');
@@ -150,7 +154,7 @@ class Acquisition
 
         /* Use a totally random mapper
          */
-        $statement = $this->userMapper->getDatabase()->prepare($query);
+        $statement = $this->db->prepare($query);
 
         $statement->execute(array_merge([
             'homepageService' => UserAccess::SERVICE_HOMEPAGE,
@@ -215,7 +219,7 @@ class Acquisition
 
         /* Use a totally random mapper
          */
-        $statement = $this->userMapper->getDatabase()->prepare($query);
+        $statement = $this->db->prepare($query);
 
         $statement->execute(array_merge([
             'homepageService' => UserAccess::SERVICE_HOMEPAGE,
@@ -286,7 +290,7 @@ class Acquisition
 
         /* Use a totally random mapper
          */
-        $statement = $this->userMapper->getDatabase()->prepare($query);
+        $statement = $this->db->prepare($query);
 
         $statement->execute(array_merge([
             'homepageService' => UserAccess::SERVICE_HOMEPAGE,
