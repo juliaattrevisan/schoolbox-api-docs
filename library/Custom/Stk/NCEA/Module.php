@@ -61,7 +61,7 @@ class Module extends BaseModule
                     new Rule\Callback(function ($params, User $user) {
                         try {
                             /** @var \Schoolbox\User $user */
-                            $student = $this->getUserMapper()->findById($params['id']);
+                            $student = $this->getUserMapper()->findById($params['userId']);
                         }
                         catch (MapperException $e) {
                             throw new Unauthorized('User Not Found');
@@ -81,7 +81,7 @@ class Module extends BaseModule
                 /* The Students themselves, their parents, any staff/superuser can get button and report
                  */
                 new Rule\Any(
-                    new Rule\IsUserOrParentOfUser($this->getExternalUser(), $this->getUserMapper(), 'id'),
+                    new Rule\IsUserOrParentOfUser($this->getExternalUser(), $this->getUserMapper(), 'userId'),
                     new Rule\HasRole(Role::STAFF),
                     new Rule\IsSuperuser()
                 )
@@ -90,7 +90,7 @@ class Module extends BaseModule
 
         $preloadUser = function ($params) { return $this->preloadUser($params); };
 
-        $this->register('GET', '/report/{id}/{year}', 'getReport', $getPerms, $preloadUser);
+        $this->register('GET', '/report/{userId}/{year}', 'getReport', $getPerms, $preloadUser);
     }
 
     /**
@@ -107,7 +107,7 @@ class Module extends BaseModule
     {
         try {
             /** @var \Schoolbox\User $user */
-            $user = $this->getUserMapper()->findById($params['id']);
+            $user = $this->getUserMapper()->findById($params['userId']);
         }
         catch (MapperException $e) {
             throw new NotFound('User Not Found');
