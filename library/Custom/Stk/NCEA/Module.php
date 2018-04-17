@@ -18,6 +18,7 @@ use Aura\Di\ContainerInterface;
 use External_User;
 use InvalidArgumentException;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Role;
@@ -163,8 +164,7 @@ class Module extends BaseModule
     {
         /** @var Container $injector */
         $injector->params[Controller::class] = [
-            'userMapper' => $this->getMapperFactory()->getLazy(UserMapper::class),
-            'externalUser' => $injector->lazyNew(External_User::class)
+            'errorMapper' => $this->getMapperFactory()->getLazy(ErrorMapper::class)
         ];
     }
 
