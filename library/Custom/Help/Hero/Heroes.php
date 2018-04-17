@@ -18,18 +18,19 @@ use Schoolbox\User;
 
 class Heroes
 {
+    /**
+     * Homepage id for the Hero Wall
+     * /homepage/2209
+     *
+     * @var int
+     */
+    private const HERO_FOLDER_ID = 2209;
+
 
     /**
      * @var UserAccessMapper
      */
     private $userAccessMapper;
-
-    /**
-     * Homepage id for the Hero Wall
-     *
-     * @var int
-     */
-    private $heroFolderId = 2209;
 
     /**
      * @var Folder\Mapper
@@ -50,7 +51,6 @@ class Heroes
 
     /**
      * Find a list of Heroes already on the Wall
-     * /homepage/2209
      *
      * @return array
      * @throws \DomainException
@@ -58,7 +58,7 @@ class Heroes
     public function findHeroes(): array
     {
         try {
-            $folder = $this->folderMapper->findById($this->heroFolderId);
+            $folder = $this->folderMapper->findById(self::HERO_FOLDER_ID);
             $users = $this->userAccessMapper->findUsersInCategory($folder);
         }
         catch (Mapper\Exception $e) {
