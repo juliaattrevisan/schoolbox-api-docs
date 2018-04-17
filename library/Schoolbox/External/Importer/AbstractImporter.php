@@ -54,6 +54,7 @@ abstract class AbstractImporter
      */
     public function __construct(Reader $reader, LoggerInterface $log, $performUpdate = false)
     {
+        $reader->setExpectedColumnList(array_keys($this::getFormat()));
         $this->reader        = $reader;
         $this->log           = $log;
         $this->performUpdate = $performUpdate;
