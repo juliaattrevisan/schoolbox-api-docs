@@ -108,12 +108,12 @@ $breadcrumb-noclick-bg-color: scale-color($breadcrumb-bg-color, $lightness: 40%)
     &.active a,
     &.active a:after {
       background-color: $breadcrumb-active-bg-color;
-      border-left: 0px solid $breadcrumb-active-bg-color;
+      border-left: 0 solid $breadcrumb-active-bg-color;
     }
 
     &.active a {
       &:before {
-        margin-left: 0px;
+        margin-left: 0;
       }
 
       &[href]:hover:before, &[href]:hover:after {
