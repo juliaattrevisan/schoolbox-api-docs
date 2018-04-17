@@ -1,0 +1,69 @@
+<script type="text/javascript">
+    $(function () {
+        $('table[data-sortable]').DataTable({
+            info: false,
+            paging: false,
+            searching: false
+        });
+    });
+</script>
+
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Hero Report</h1>
+        <ul class="meta">
+            <li class="icon-timetable">Took approx. {{ duration }} seconds</li>
+        </ul>
+    </div>
+</div>
+
+{# Process this in two parts:
+ # First get the people who have qualified, but aren't on the wall
+ #}
+<div class="row">
+    <div class="small-12 columns">
+        <h2 class="subheader">Hero Candidates</h2>
+        <div class="scrollable">
+            <table data-sortable>
+                <thead>
+                    {% include '@helpHero/headings.twig' %}
+                </thead>
+                <tbody>
+                    {% for id, userData in aggregatedData %}
+                    {% if userData.qualified and not userData.heroised %}
+                        {% include '@helpHero/row.twig' with {
+                            id: id,
+                            userData: userData
+                        } %}
+                    {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{# Then get the people who have qualified and are on the wall
+ #}
+<div class="row">
+    <div class="small-12 columns">
+        <h2 class="subheader">Heroes</h2>
+        <div class="scrollable">
+            <table data-sortable>
+                <thead>
+                    {% include '@helpHero/headings.twig' %}
+                </thead>
+                <tbody>
+                    {% for id, userData in aggregatedData %}
+                    {% if userData.heroised %}
+                        {% include '@helpHero/row.twig' with {
+                            id: id,
+                            userData: userData
+                        } %}
+                    {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
