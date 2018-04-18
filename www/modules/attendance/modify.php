@@ -38,15 +38,14 @@ function parseDateTimeString($input)
 
 /** @var SitePage $this */
 
-// Ensure correct parameter count
-if (count($this->arg) < 3) {
-    $this->pageNotFound();
-}
-
 // Ensure online attendance is enabled.
 $configLoader = new Config();
 if (!$configLoader->get('external_attendance')) {
     $this->pageNotFound();
+}
+// Ensure correct parameter count
+if (count($this->arg) < 3) {
+    error(ErrorMapper::ERROR_CLASS_CODE_NOT_FOUND);
 }
 
 $this->setTitle('Student Attendance');
