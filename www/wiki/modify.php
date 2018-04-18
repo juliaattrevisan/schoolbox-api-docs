@@ -89,13 +89,13 @@ elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1]) && is_numeric($this-
     $slug  = strlen($this->arg[3]) ? $this->arg[3] : '';
     $title = ucwords(str_replace('-', ' ', $slug));
 
-    //Collate the slugfs of other wikis on this page - used for validation
+    //Collate the slugs of other wikis on this page - used for validation
     $wikis = $wikiHandler->getByCategory($folder->getId());
 
     $slugs = [];
 
     foreach ($wikis as $wiki) {
-        $slugs[] = $wiki['slug'];
+        $slugs[$wiki['slug']] = $wiki['slug'];
     }
 
     $this->setVar(
