@@ -303,6 +303,20 @@ class Controller extends BaseController
                    ->indexBy('id')
                    ->getAll();
 
+        //Filtering out disabled modules
+        //What about resource_booking and leave (which is boarder_leave_enabled in settings)?
+        $checkEnabled = Array('eotc');
+
+        $configMapper = ConfigMapper::getInstance();
+
+        foreach($ns as $i=>$k){
+            if(in_array($k->getSlug(), $checkEnabled)){
+                if(0 == $configMapper->get($k->getSlug().'_enabled')){
+                    unset($ns[$i]);
+                }
+            }
+        }
+
         $sources = SourceMapper::getInstance()
                                ->findAll()
                                ->indexBy('id')
