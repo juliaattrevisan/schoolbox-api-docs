@@ -114,9 +114,6 @@ $breadcrumb-noclick-bg-color: scale-color($breadcrumb-bg-color, $lightness: 40%)
 
       &:not([href]) {
         color: $breadcrumb-color;
-        &:before {
-          border-left: rem-calc($base-font-size * .4) solid $breadcrumb-active-bg-color;
-        }
       }
     }
 
