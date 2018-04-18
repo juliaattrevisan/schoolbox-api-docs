@@ -96,7 +96,8 @@
         {% include '@learningAssessment/dueWork/comment.twig' with {
             tabIndex: 2,
             readonly: readonly,
-            selfReflection: true
+            selfReflection: true,
+            feedback: latestFeedback
         } only %}
     </div>
 {% endblock %}
