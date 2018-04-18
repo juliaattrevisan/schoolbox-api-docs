@@ -1267,7 +1267,7 @@ class SitePage extends Page
         if ($this->config->get('saml_enabled') == '1'
             && (strlen($this->config->get('saml_sso_url')) || strlen($this->config->get('saml_idp_metadata_url')))
             && $_GET['samlAuth'] !== '0'
-            && !$this->samlBlacklist()) {
+            && (!$this->samlBlacklist() || $_GET['samlAuth'] === '1' )) {
             $redirectUrl = '/saml/index.php';
             if (isset($_GET['page'])) {
                 $redirectUrl .= '?page=' . urlencode($_GET['page']);
