@@ -94,8 +94,10 @@ elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1]) && is_numeric($this-
 
     $slugs = [];
 
-    foreach ($wikis as $wiki) {
-        $slugs[$wiki['slug']] = $wiki['slug'];
+    if (!empty($wikis)) {
+        foreach ($wikis as $wiki) {
+            $slugs[$wiki['slug']] = $wiki['slug'];
+        }
     }
 
     $this->setVar(

@@ -271,8 +271,10 @@
 
     $.validator.addMethod('notInList', function(value, element, list) {
 
-        list = JSON.parse(list);
-        
+        if (!Array.isArray(list)) {
+            list = JSON.parse(list);
+        }
+
         return list.indexOf(value) < 0;
 
     }, 'This heading is already in use - please choose another.');
