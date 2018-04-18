@@ -18,7 +18,7 @@ use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
-use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Error\Mapper as ErrorMapper;
 
 /**
  * Sub-module for a student's upcoming due work.
@@ -75,7 +75,7 @@ class Module extends BaseModule
                         'date'    => $date,
                     ];
                 } catch (MapperException $e) {
-                    throw new NotFound();
+                    throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_USER_NOT_FOUND);
                 }
             }
         );
@@ -138,5 +138,13 @@ class Module extends BaseModule
     protected function getConfigMapper()
     {
         return $this->getMapperFactory()->get(ConfigMapper::class);
+    }
+
+    /**
+     * @return ErrorMapper
+     */
+    protected function getErrorMapper()
+    {
+        return $this->getMapperFactory()->get(ErrorMapper::class);
     }
 }
