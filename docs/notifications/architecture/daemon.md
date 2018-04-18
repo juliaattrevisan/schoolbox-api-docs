@@ -65,7 +65,7 @@ task.
 
 Schoolbox Daemons are implemented as a collection of parts:
 * Message Broker Subscription
-* Scheduler
+* Scheduler (optional)
 * Dispatcher
 * Redis Queue subscription?
   * TODO figure this part out
@@ -79,7 +79,7 @@ The Message Broker is an implementation of `\Alaress\Async\Broker\IBroker`.
 
 Schoolbox Daemons contain a Subscription to a Message Broker; when that
 Subscription receives a Message, the Daemon uses that Message as a signal to
-Schedule a Task.
+Dispatch a Task.
 
 Once the Task has finished, the Daemon either:
 * acknowledges the Message if the Task completed successfully
@@ -95,27 +95,17 @@ another Message Broker. It seems to do this via a Redis queue subscription?
 
 ### Scheduler
 
-The Scheduler is an implementation of `\Alaress\Scheduler\AbstractScheduler`.
+The Scheduler is an optional component of a Daemon. (Further documentation on
+the Scheduler may be found in the [Scheduler documentation](scheduler.md).)
 
-It receives Messages from the Message Broker, and depending on the payload:
-* sends the Task associated with the Message to the Dispatcher immediately
-* defers Dispatch until the payload's trigger time is reached
+If it exists, is responsible for determining _when_ a Task is dispatched;
+depending on the payload of the Message received from the Message Broker, it
+will either:
+* send the Task associated with the Message to the Dispatcher immediately
+* defer Dispatch until the payload's trigger time is reached
 
-Once a Task has returned a Response, the Scheduler is also responsible for
-acting upon the content of that Response.
-* TODO this is actually responsibility of `\Alaress\Redis\Async\EventListener`,
-  which the schedule daemon's scheduler _happens to_ implement
-
-TODO is scheduler an optional piece of daemon? slice out into separate doc
-
-
-#### Event Loop
-
-The Event Loop is the low-level mechanism that the Scheduler uses to defer
-sending of a Task to the Dispatcher. It is an implementation of
-`\React\EventLoop\LoopInterface`.
-
-TODO figure out how React loop fits into this
+If the Daemon doesn't contain a Scheduler, it will simply send the task to the
+Dispatcher immediately.
 
 
 ### Dispatcher
