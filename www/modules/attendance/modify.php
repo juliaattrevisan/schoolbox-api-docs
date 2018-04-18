@@ -36,6 +36,18 @@ function parseDateTimeString($input)
     error(ErrorMapper::ERROR_DATE_FORMAT);
 }
 
+/** @var SitePage $this */
+
+// Ensure online attendance is enabled.
+$configLoader = new Config();
+if (!$configLoader->get('external_attendance')) {
+    $this->pageNotFound();
+}
+// Ensure correct parameter count
+if (count($this->arg) < 3) {
+    error(ErrorMapper::ERROR_CLASS_CODE_NOT_FOUND);
+}
+
 $this->setTitle('Student Attendance');
 $this->setFile(TEMPLATE_content, 'modules/attendance/modify.html');
 $this->setBlock(TEMPLATE_content, 'student', 'student_block');
@@ -47,23 +59,11 @@ $this->setBlock('student', 'absence_options', 'absence_options_block');
 $this->setBlock('student', 'reason_options', 'reason_options_block');
 $this->setBlock('student', 'flags', 'flags_block');
 
-// Ensure correct parameter count
-
-if (count($this->arg) < 3) {
-    error(ErrorMapper::ERROR_CLASS_CODE_NOT_FOUND);
-}
-
 // Setup handlers
-
-$configLoader = new Config();
 $groupHandler = new Group();
 $externalClass = new External_Synergetic_Class();
 $externalTimetable = new External_Timetable();
 $externalUserHandler = new External_User();
-
-if (!$configLoader->get('external_attendance')) {
-    error(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
-}
 
 if ($this->arg[0]) {
     $class = $externalClass->getClass($this->arg[0] . '/' . urldecode(urldecode(urldecode($this->arg[1]))), $_SESSION['user']);
