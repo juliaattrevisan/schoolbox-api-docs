@@ -353,7 +353,7 @@
 
         /* The form is never submitted synchronously */
         function disableFormSubmit() {
-            $('[data-feedback-form]').submit(function(e) {
+            $(config.assessmentList).find('form[data-feedback-form]').submit(function(e) {
                 e. preventDefault();
             });
         }
