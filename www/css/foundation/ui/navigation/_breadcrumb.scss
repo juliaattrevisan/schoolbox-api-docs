@@ -43,17 +43,18 @@ $breadcrumb-noclick-bg-color: scale-color($breadcrumb-bg-color, $lightness: 40%)
   list-style: none;
   overflow: hidden;
   li {
-    a {
-      color: $breadcrumb-color;
+    a { // Note these styles will default to a disabled crumb, then add the link styles based on a[href]
+      color: scale-color($breadcrumb-noclick-bg-color, $lightness: -30%);
       line-height: rem-calc($base-font-size);
       padding: rem-calc(($base-font-size / 2));
       padding-left: rem-calc($base-font-size);
-      background-color: $breadcrumb-bg-color;
+      background-color: $breadcrumb-noclick-bg-color;
       position: relative;
       display: block;
       float: left;
       margin-right: 0;
       white-space: nowrap;
+      cursor: text;
 
       &:before,
       &:after {
@@ -70,55 +71,61 @@ $breadcrumb-noclick-bg-color: scale-color($breadcrumb-bg-color, $lightness: 40%)
         left: 100%;
         z-index: 2;
       }
+
       &:before {
         margin-left: 1px;
         border-left: rem-calc($base-font-size * .4) solid $breadcrumb-active-bg-color;
       }
-      &:after {
-        border-left: rem-calc($base-font-size * .4) solid $breadcrumb-bg-color;
-      }
-      &[href]:hover {
-        background-color: $breadcrumb-hover-bg-color;
-      }
-      &[href]:hover:after {
-        border-left-color: $breadcrumb-hover-bg-color !important;
-      }
-    }
-
-    // Special styling for non-linked breadcrumbs
-    a:not([href]) {
-      background-color: $breadcrumb-noclick-bg-color;
-      color: scale-color($breadcrumb-noclick-bg-color, $lightness: -30%);
-      cursor: text;
 
       &:after {
         border-left: rem-calc($base-font-size * .4) solid $breadcrumb-noclick-bg-color;
       }
-    }
-    &.active a:not([href]) {
-      color: $breadcrumb-color;
-      &:before {
-        border-left: rem-calc($base-font-size * .4) solid $breadcrumb-active-bg-color;
+
+      // Styles when it actually contains a link
+      &[href] {
+        color: $breadcrumb-color;
+        background-color: $breadcrumb-bg-color;
+        cursor: pointer;
+
+        &:after {
+          border-left: rem-calc($base-font-size * .4) solid $breadcrumb-bg-color;
+        }
+
+        &:hover {
+          background-color: $breadcrumb-hover-bg-color;
+
+          &:after {
+            border-left-color: $breadcrumb-hover-bg-color !important;
+          }
+        }
       }
     }
-    &.active a,
-    &.active a:after {
-      background-color: $breadcrumb-active-bg-color;
-      border-left: 0 solid $breadcrumb-active-bg-color;
-    }
 
+    // Active styles
     &.active a {
       &:before {
         margin-left: 0;
       }
 
-      &[href]:hover:before, &[href]:hover:after {
+      &[href]:hover:before,
+      &[href]:hover:after {
         border-left-color: $breadcrumb-hover-bg-color;
+      }
+
+      &:not([href]) {
+        color: $breadcrumb-color;
+        &:before {
+          border-left: rem-calc($base-font-size * .4) solid $breadcrumb-active-bg-color;
+        }
       }
     }
 
+    &.active a,
+    &.active a:after {
+      background-color: $breadcrumb-active-bg-color;
+      border-left: 0 solid $breadcrumb-active-bg-color;
+    }
   }
-
 }
 
 #content > .breadcrumb {
