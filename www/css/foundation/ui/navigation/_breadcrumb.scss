@@ -90,13 +90,12 @@ $breadcrumb-noclick-bg-color: scale-color($breadcrumb-bg-color, $lightness: 40%)
       background-color: $breadcrumb-noclick-bg-color;
       color: scale-color($breadcrumb-noclick-bg-color, $lightness: -30%);
       cursor: text;
-      
+
       &:after {
         border-left: rem-calc($base-font-size * .4) solid $breadcrumb-noclick-bg-color;
       }
     }
     &.active a:not([href]) {
-      background-color: $breadcrumb-active-bg-color;
       color: $breadcrumb-color;
       &:before {
         border-left: rem-calc($base-font-size * .4) solid $breadcrumb-active-bg-color;
