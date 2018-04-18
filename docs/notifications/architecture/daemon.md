@@ -53,6 +53,18 @@ task.
     The output of a Task, once it has completed execution.
   </dd>
 
+  <dt>Response Handler</dt>
+  <dd>
+    The object which listens for Responses, and then performs an action based
+    on the Response.
+  </dd>
+
+  <dt>Signal Queue</dt>
+  <dd>
+    A queue which Daemons subscribe to, for the purpose of receiving control
+    signals.
+  </dd>
+
   <dt>Inter-Process Communication (IPC) Protocol</dt>
   <dd>
     The protocol through which processes (in the daemon's case, the Dispatcher
@@ -67,8 +79,7 @@ Schoolbox Daemons are implemented as a collection of parts:
 * Message Broker Subscription
 * Scheduler (optional)
 * Dispatcher
-* Redis Queue subscription?
-  * TODO figure this part out
+* Response Handler
 
 
 ### Message Broker Subscription
@@ -88,9 +99,8 @@ Once the Task has finished, the Daemon either:
   * this allows the Message to be handled again by the same Daemon, thus
     allowing the Daemon to try again in the case of transient failures
 
-A Daemon may also (depending on its intended functionality) Publish Messages to
-another Message Broker. It seems to do this via a Redis queue subscription?
-(TODO figure that part out)
+Then, the Response is sent to the Response Handler to act upon; the action
+that the Response Handler takes is implementation-specific.
 
 
 ### Scheduler
@@ -116,6 +126,30 @@ Dispatcher immediately.
 
 ### Task
 
-## Usage
+### Response Handler
 
-TODO discuss how the various parts of daemons work
+The Response Handler is an implementation of
+`\Alaress\WorkerCrew\TaskResponseHandlerInterface`.
+
+Once a Task has returned a Response, the Response Handler is responsible for
+acting upon the content of that Response; it is handled in the implementation's
+`handleResponse` method.
+
+
+### Signal Queue
+
+The Signal Queue is implemented as a Redis publish/subscribe queue; its handler
+must implement `\Alaress\Redis\Async\EventListener`, and handle the signal in
+its `handle` method.
+
+It exists primarily so that processes can broadcast a
+[control signal](https://en.wikipedia.org/wiki/Signal_(IPC)#POSIX_signals)
+to all instances of the same daemon (either global, or restricted to a single
+Schoolbox instance), without having to know the exact identity of every daemon.
+
+In practise, the Signal Queue's handler is often the same object as the
+Response Handler; this is because both handlers must often act upon the same
+set of objects.
+
+
+## Usage
