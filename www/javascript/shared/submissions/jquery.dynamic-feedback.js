@@ -51,6 +51,7 @@
         setupPreValues();
         setupListeners();
         setupPublishAction();
+        disableFormSubmit();
 
         /**
          * Init
@@ -348,6 +349,13 @@
                 this.find('[data-action-bar]').slideDown();
                 this.find('[data-action-bar] [data-draft=publish]').removeClass('hide');
             }
+        }
+
+        /* The form is never submitted synchronously */
+        function disableFormSubmit() {
+            $(config.assessmentList).find('form[data-feedback-form]').submit(function(e) {
+                e. preventDefault();
+            });
         }
     }
 }(jQuery));
