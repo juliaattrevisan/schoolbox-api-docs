@@ -109,7 +109,7 @@ elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1]) && is_numeric($this-
             'REVISION'    => '',
             'INSTANCE_ID' => $this->arg[2],
             'SLUG'        => '',
-            'SLUG_LIST'   => json_encode($slugs),
+            'SLUG_LIST'   => json_encode(array_keys($slugs)),
         )
     );
 
