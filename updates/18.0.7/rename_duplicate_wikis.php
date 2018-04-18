@@ -50,20 +50,20 @@ $kernel->run(
             SELECT *
             FROM wiki
             WHERE categoryID = :category
+            ORDER BY slug ASC
         ");
 
 
         // Append the slugs with '-'.$increment
         $updateQuery = $db->prepareQuery("
             UPDATE wiki 
-            SET slug = CONCAT(slug, CONCAT('-',:incrementer))
+            SET slug = CONCAT(slug, '-', :incrementer)
             WHERE wikiID = :wikiID
         ");
 
         $selectQuery->execute();
 
         $lastSlug = null;
-        $lastCategoryID = null;
         $incrementer = 1;
 
         foreach ($selectQuery->fetchAll() as $row) {
@@ -74,16 +74,18 @@ $kernel->run(
             foreach($selectQuery2->fetchAll() as $row2) {
 
                 // Update wikis that have the same slug as the previous row (skips first item)
-                if($row2['slug'] == $lastSlug && $row2['categoryID'] == $lastCategoryID) {
+                if($row2['slug'] == $lastSlug) {
 
                     $updateQuery->execute(['wikiID' => $row2['wikiID'], 'incrementer' => $incrementer]);
+                    $incrementer++;
                 } else {
+
                     // Reset Incrementer
                     $incrementer = 1;
-                }
 
-                $lastSlug = $row2['slug'];
-                $lastCategoryID = $row2['categoryID'];
+                    //Update the title to check against
+                    $lastSlug = $row2['slug'];
+                }
             }
         }
     }
