@@ -95,7 +95,7 @@ $breadcrumb-noclick-bg-color: scale-color($breadcrumb-bg-color, $lightness: 40%)
           background-color: $breadcrumb-hover-bg-color;
 
           &:after {
-            border-left-color: $breadcrumb-hover-bg-color !important;
+            border-left-color: $breadcrumb-hover-bg-color;
           }
         }
       }
