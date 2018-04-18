@@ -273,11 +273,8 @@
 
         list = JSON.parse(list);
         
-        if(list.indexOf(value) > -1) {
-            return false;
-        } else {
-            return true;
-        }
+        return list.indexOf(value) < 0;
+        
     }, 'This heading is already in use - please choose another.');
 
 
