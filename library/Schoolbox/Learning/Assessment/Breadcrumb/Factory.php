@@ -81,11 +81,10 @@ class Factory
                 $path = "/homepage/{$context->getFolder()->getId()}";
 
             } else {
-                $path = '#';
+                $path = '';
             }
 
             $trail->add([$context->getFolder()->getTitle(), $path]);
-            $path = "/homepage/{$context->getFolder()->getId()}";
 
         } else {
             if (Access::getInstance()->getFolderAccess($user,$context->getFolder()->getId())) {
