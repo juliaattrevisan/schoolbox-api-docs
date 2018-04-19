@@ -15,6 +15,14 @@ use GuzzleHttp;
  */
 class SSO
 {
+    // How should we attempt to generate an SSO token?
+    // Corresponds to DB config setting
+    public const SSO_STRATEGY_V1_ONLY    = 'Version 1 only';
+    public const SSO_STRATEGY_V2_ONLY    = 'Version 2 only';
+    public const SSO_STRATEGY_V2_THEN_V1 = 'Version 2 with fallback to Version 1';
+
+    // If not configured in db, what should the default strategy be?
+    public const SSO_STRATEGY_DEFAULT    = self::SSO_STRATEGY_V2_THEN_V1;
 
     // Recognised TASS SSO token request response codes and what they mean
     private const RESPONSE_CODES = [
