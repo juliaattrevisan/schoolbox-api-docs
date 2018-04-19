@@ -92,6 +92,11 @@ Schoolbox Daemons contain a Subscription to a Message Broker; when that
 Subscription receives a Message, the Daemon uses that Message as a signal to
 Dispatch a Task.
 
+> As discussed in the Message Broker documentation, the Subscription is an
+  instance of `\Alaress\Async\Broker\IConsumer`; its `onMessage` method will be
+  called when it receives a message, and that is the point where the Task will
+  be Dispatched.
+
 Once the Task has finished, the Daemon either:
 * acknowledges the Message if the Task completed successfully
   * this removes the Message from the Broker
@@ -120,11 +125,80 @@ Dispatcher immediately.
 
 ### Dispatcher
 
-### Worker Pool
+The Dispatcher is an implementation of
+`\Alaress\WorkerCrew\DispatcherInterface`.
 
-### Worker
+> TODO figure out if dispatcher should be its own document
 
-### Task
+> TODO figure out how a Task's output gets back to the Daemon
+
+At a high level, it is responsible for Tasks being performed. The
+implementation that Daemons use uses Workers to perform Tasks, so that:
+* the Daemon is not blocked whilst running the Task
+* the Daemon is not brought down by a Task run which results in an
+  unrecoverable error
+
+The `enqueue` method enqueues a Task to be Dispatched; this method takes:
+* an identifier
+* a command
+* data
+
+> TODO document what is actually enqueued
+
+The `dispatch` method dispatches the most recently added Task
+
+
+#### Worker Pool
+
+The Worker Pool is a strategy for the assignment of Tasks to Workers. It is an
+implementation of `\Alaress\WorkerCrew\PoolInterface`.
+
+It ensures that only a certain number or Worker processes exist, and that
+Workers remain alive and contactable after they have finished a Task so that
+they may be reused (thus avoiding unnecessary overhead involved with spawning a
+new Worker process).
+
+It is responsible for:
+* answering a request for a Worker to perform a Task, either with:
+  * a [process identifier](https://en.wikipedia.org/wiki/Process_identifier),
+    corresponding to the process identifier of the Worker assigned the Task
+  * a rejection of the request if the maximum number of Workers is reached,
+    and none of them are idle
+* monitoring the health of its Workers
+  * keeping them alive and contactable after they have finished a Task
+  * releasing a Worker (by sending a `SIGTERM` or `SIGKILL` signal) if it has
+    been busy too long
+  * releasing a Worker process if it has been idle for too long
+
+
+#### Worker
+
+A Worker is an abstraction of a child process of the Daemon. It is an
+instance of `\Alaress\WorkerCrew\Worker\Worker`.
+
+The Worker itself is internal to the Worker Pool and Dispatcher; anything
+outside of these classes need not know about this abstraction.
+
+
+#### Task
+
+A Task is run within a Worker.
+
+> TODO figure out how a call to `enqueue` actually becomes a Task callback
+
+
+#### IPC Protocol
+
+The protocol used to transmit information to and from the Task encapsulated by
+the Worker.
+
+It is an implementation of `\Alaress\WorkerCrew\IPC\ProtocolInterface`; it is
+responsible for:
+* constituting data sent to the Worker's input pipe, so that the its Task may
+  act upon it
+* re-constituting data sent by the Worker's output pipe, so that the Dispatcher
+  may receive its output, eventually sending to the Response
+
 
 ### Response Handler
 
