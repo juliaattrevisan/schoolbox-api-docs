@@ -4,7 +4,7 @@
     {% block buttons_miscellaneous %}
         <!-- Start on School Grades page initially -->
         {% if USER.role.staff %}
-            <li><a href="/modules/tassportal/teacherkiosk?link=index.cfm%3Fdo%3Dkiosk.students.main.student.details%26stud_code%3D{{ user.getExternalId() }}" class="icon-progress">TASS Profile</a></li>
+            <li><a href="{{ routeLookup('tassportal.studentProfile', {studentId: user.id}) }}" class="icon-progress">TASS Profile</a></li>
         {% endif %}
     {% endblock buttons_miscellaneous %}
 {% endif %}
