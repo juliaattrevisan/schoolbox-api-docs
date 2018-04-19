@@ -183,6 +183,9 @@ class Mapper extends BaseMapper implements IExceptionGenerator
     public const ERROR_ATTENDANCE_LIST = 210;
     public const ERROR_ATTENDANCE_SAVE = 211;
     public const ERROR_NO_SSO_IMPERSONATION = 212;
+
+    public const ERROR_WIKI_NAME_IN_USE = 213;
+
     public const ERROR_SUBMISSION_WINDOW_EXCEEDED = 214;
 
     /**

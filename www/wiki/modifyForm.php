@@ -9,6 +9,7 @@ $groupHandler = new Group(HOMEPAGE_SERVICE);
 $wikiMapper     = \Schoolbox\Wiki\WikiMapper::getInstance();
 $revisionMapper = \Schoolbox\Wiki\RevisionMapper::getInstance();
 $folderMapper   = Schoolbox\Resource\Folder\Mapper::getInstance();
+$errorMapper    = Schoolbox\Error\Mapper::getInstance();
 
 $now = new Alaress_Date_Format(time(), 'U');
 
@@ -20,6 +21,17 @@ if (isset($_POST['heading']) && is_numeric($_POST['categoryID'])) {
         error(2);
         exit;
     }
+
+    //Does a wiki with this name already exist on this homepage?
+    $wikis = $wikiHandler->getByCategory($_POST['categoryID']);
+
+    foreach ( $wikis as $wiki) {
+        if ($wiki['slug'] == $_POST['slug']) {
+            //You have been naughty and bypassed javascript validation
+            $errorMapper->generateException($errorMapper::ERROR_WIKI_NAME_IN_USE);
+        }
+    }
+
 
     // generate the revision object regardless of whether or not the wiki exists
     $revision = $revisionMapper->createModel()
