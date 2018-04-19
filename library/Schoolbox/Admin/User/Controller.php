@@ -32,6 +32,7 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\User\Log\Mapper as UserLogMapper;
 use Schoolbox\CMS\Log\Mapper as CMSLogMapper;
 use Scrub;
+use UnexpectedValueException;
 
 /**
  * Controller for managing school users through the admin section.
@@ -462,8 +463,11 @@ class Controller extends Base
         }
 
         // Save the user
-
-        $this->userMapper->save($user);
+        try {
+            $this->userMapper->save($user);
+        } catch (UnexpectedValueException $e) {
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_PROCESSING, null, $e->getMessage());
+        }
 
         // Redirect back to modify page
 
