@@ -124,7 +124,7 @@ class Module extends BaseModule
     {
         $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class, [
             'userAccessMapper'    => $this->getMapperFactory()->getLazy(UserAccessMapper::class),
-            'externalHandler'     => $injector->lazyNew(External_User::class),
+            'externalHandler'     => $injector->lazyGet('externalUser'),
             'assumeUserLogMapper' => $this->getMapperFactory()->getLazy(Logger\Mapper::class),
         ]));
     }
