@@ -1021,13 +1021,20 @@ class Controller extends Base
     private function persistAttachments(PastoralModel $record, RequestValues $post, bool $isPrivate)
     {
         $attachzone = $isPrivate ? self::ATTACHZONE_PRIVATE : self::ATTACHZONE_PUBLIC;
+
+        // preparation
+        $oldAttachments = $record->getAttachments()->filterBy('private', $isPrivate);
+        $newAttachments = $this->pastoralAttachmentMapper->createCollection();
+        $diffMethod = function (PastoralAttachmentModel $a, PastoralAttachmentModel $b) {
+            return $a->getStorage()->getHash() === $b->getStorage()->getHash();
+        };
+
+        // If there are any new attachments, compare and replace
         if (is_array($post[$attachzone . '_attachments'])) {
             $collectorFactory  = new CollectorFactory();
             $attachmentObjects = $collectorFactory->build($post[$attachzone . '_attachments'])->getAll();
 
             /** @var Storage $storageObject */
-            $newAttachments = $this->pastoralAttachmentMapper->createCollection();
-            $oldAttachments = $record->getAttachments()->filterBy('private', $isPrivate);
             foreach ($attachmentObjects as $storageObject) {
                 // Only add attachments which don't already exist
                 $attachment = $this->pastoralAttachmentMapper->createModel();
@@ -1038,13 +1045,10 @@ class Controller extends Base
             }
 
             // Save new attachments that aren't in old
-            // Delete old attachments that aren't in new
-            $diffMethod = function (PastoralAttachmentModel $a, PastoralAttachmentModel $b) {
-                return $a->getStorage()->getHash() === $b->getStorage()->getHash();
-            };
             $this->pastoralAttachmentMapper->save($newAttachments->diff($oldAttachments, $diffMethod));
-            $this->pastoralAttachmentMapper->delete($oldAttachments->diff($newAttachments, $diffMethod));
         }
+        // Delete old attachments that aren't in new
+        $this->pastoralAttachmentMapper->delete($oldAttachments->diff($newAttachments, $diffMethod));
     }
 }
 
