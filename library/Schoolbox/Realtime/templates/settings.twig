@@ -109,7 +109,7 @@
             </div>
 
             {% for namespace in config %}
-                {% if ns[namespace.id].slug != false %}
+                {% if ns[namespace.id] %}
                 <h3 class="subheader">Receive {{ locale.translateSentence(namespace.label) }} messages when&hellip;</h3>
                 <section>
                         <ul class='permission-list' data-roles data-digest-settings>
