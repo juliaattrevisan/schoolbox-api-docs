@@ -20,7 +20,7 @@ class SSO
     private const RESPONSE_CODES = [
         1 => 'Ok',
         2 => 'URL parameters missing.',
-        3 => 'Invalid SSO Application Code or SSO User Mapping',
+        3 => 'Invalid SSO Token Key, or SSO Application Code, or SSO User Mapping, or IP is not white-listed',
         4 => 'Invalid Portal User',
         5 => 'Invalid sfa_num',
     ];
