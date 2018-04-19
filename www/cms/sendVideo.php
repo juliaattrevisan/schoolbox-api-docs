@@ -124,11 +124,11 @@ if (isset($type) && isset($id)) {
             $mimeType = 'audio/mpeg';
         } elseif ($storage->getMimeType()->isVideo()) {
             // If video trancode, assume transcode format is video/mp4 (mp4)
-            $mimetype = 'video/mp4';
+            $mimeType = 'video/mp4';
         }
     } else {
         // If unknown, just flail about and choose the original file mimetype
-        $mimetype = 'application/octet-stream';
+        $mimeType = 'application/octet-stream';
     }
 
 
