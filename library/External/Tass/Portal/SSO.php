@@ -75,9 +75,9 @@ class SSO
     public static function getSsoStrategies(): array
     {
         return [
-            self::SSO_STRATEGY_V1_ONLY,
-            self::SSO_STRATEGY_V2_ONLY,
             self::SSO_STRATEGY_V2_THEN_V1,
+            self::SSO_STRATEGY_V2_ONLY,
+            self::SSO_STRATEGY_V1_ONLY,
         ];
     }
 
