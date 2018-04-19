@@ -15,15 +15,17 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
-use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use \Schoolbox\UserMapper;
 use \Schoolbox\User;
 use \Alaress\Authorizer\Failure\Unauthorized;
+use User\Logger;
+use External_User;
 
 class Module extends BaseModule
 {
@@ -118,9 +120,13 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initControllers(ContainerInterface $injector)
+    public function initControllers(ContainerInterface $injector): void
     {
-        $injector->set('controller:'.$this->basename, $injector->lazyNew(Controller::class));
+        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class, [
+            'userAccessMapper'    => $this->getMapperFactory()->getLazy(UserAccessMapper::class),
+            'externalHandler'     => $injector->lazyGet('externalUser'),
+            'assumeUserLogMapper' => $this->getMapperFactory()->getLazy(Logger\Mapper::class),
+        ]));
     }
 
     /* Getters / Setters
