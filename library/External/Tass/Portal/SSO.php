@@ -59,6 +59,21 @@ class SSO
 
 
     /**
+     * Returns the set of available SSO strategies
+     *
+     * @return string[]
+     */
+    public static function getSsoStrategies(): array
+    {
+        return [
+            self::SSO_STRATEGY_V1_ONLY,
+            self::SSO_STRATEGY_V2_ONLY,
+            self::SSO_STRATEGY_V2_THEN_V1,
+        ];
+    }
+
+
+    /**
      * Borrowed this default+override configuration idea from the js idiom
      *
      * @param array  $configuration Overrides for $this->configuration (if any)
