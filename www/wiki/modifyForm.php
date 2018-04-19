@@ -25,10 +25,10 @@ if (isset($_POST['heading']) && is_numeric($_POST['categoryID'])) {
     //Does a wiki with this name already exist on this homepage?
     $wikis = $wikiHandler->getByCategory($_POST['categoryID']);
 
-    foreach ( $wikis as $wiki) {
-        if ($wiki['slug'] == $_POST['slug']) {
+    foreach ($wikis as $wiki) {
+        if ($wiki['slug'] == $heading) {
             //You have been naughty and bypassed javascript validation
-            $errorMapper->generateException($errorMapper::ERROR_WIKI_NAME_IN_USE);
+            error($errorMapper::ERROR_WIKI_NAME_IN_USE);
         }
     }
 
