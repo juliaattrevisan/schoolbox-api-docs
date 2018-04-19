@@ -28,7 +28,7 @@ $sql  = "
       'external_tass_sso_token_generation_strategy',
       :value,
       'Tass SSO token generation strategy',
-      'Set whether your school should attempt to connect to TASS products using SSO v1 or v2',
+      'Set whether your school should attempt to connect to TASS products using SSO v1 or v2. If you know you do not have v2 deep-links, you should use v1 SSO tokens',
       (SELECT id FROM lu_config_field WHERE field = 'select'),
       :options,
       (SELECT id FROM lu_config_type WHERE type = 'Site'),
