@@ -1,8 +1,8 @@
 {##
  # To show, or not to show? That is the question.
  # Parameters:
- # * userRoleType: role type of the user veiwing ('student', 'parent', 'staff')
  # * visibility: visibility of the mark (0,1,2)
+ # * mark: the string that will be printed, given the access level is right
  #}
 {% macro show(visibility, mark) %}
     {% spaceless %}
@@ -24,7 +24,7 @@
         {% if access <= visibility %}
             {{ mark }}
         {% else %}
-            —
+            N/A
         {% endif %}
     {% endspaceless %}
 {% endmacro %}
