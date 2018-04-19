@@ -17,6 +17,7 @@ use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\DataModel;
 use Schoolbox\Mapper;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
@@ -48,6 +49,9 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
     /** @var Term\Mapper */
     protected $termMapper;
 
+    /** @var \Schoolbox\Learning\Assessment\DataModel\MapperProxy $assessmentDataSource */
+    protected $assessmentDataSource;
+
     /**
      * Instantiate all your dependencies within yourself.
      *
@@ -60,6 +64,7 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
         $this->catMapper = FolderMapper::getInstance();
         $this->boxMapper = SubmissionBoxMapper::getInstance();
         $this->termMapper = Term\Mapper::getInstance();
+        $this->assessmentDataSource = Mapper::getDi()->get("assessmentDataSource");
         parent::loadDependencies($dependencies);
     }
 
@@ -146,6 +151,16 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
         $teacher = $this->userMapper->findById($user->getId());
         /** @var SubmissionBox $box */
         $box = $this->boxMapper->findById($returnedWork->getSubmissionBox()->getId());
+
+        $assessment = $this->assessmentDataSource->findByIdForReview($box->getAssessmentId(), $student);
+
+        $participant = $assessment->getParticipantIfExtant($student);
+
+        //Don't send a notification for an item that the user cannot see
+        if (\Alaress_Date_Format::now()->lt($participant->getPublishDate())) {
+            return $envelope;
+        }
+
         /** @var Folder $cat */
         $cat = $this->catMapper->findById($box->getCategory()->getId());
 
