@@ -738,21 +738,13 @@ class UserMapper extends Mapper
         }
 
         // verify that at least one valid campus id exists in the selected campuses.
-        $campusList = CampusMapper::getInstance()->findAll();
-        $foundOne = false;
-        foreach ($campusList as $realCampus) {
-            foreach ($user->getCampusCollection() as $selectedCampus) {
-                if ($realCampus->getId() == $selectedCampus->getId()) {
-                    $foundOne = true;
-                    break 2;
-                }
+        $campusList = CampusMapper::getInstance()->findAll()->indexBy('id')->keys();
+        foreach ($user->getCampusCollection() as $selectedCampus) {
+            if (in_array($selectedCampus->getId(), $campusList)) {
+                return true;
             }
         }
-        if (!$foundOne) {
-            throw new UnexpectedValueException('User must have at least one valid campus');
-        }
-
-        return true;
+        throw new UnexpectedValueException('User must have at least one valid campus');
     }
 
     /**
