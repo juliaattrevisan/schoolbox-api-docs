@@ -1,7 +1,5 @@
 <?php
 /**
- * Description of the file and what its purpose is
- *
  * @author      James Leckie <james.leckie@alaress.com.au>
  * @copyright   2013 Alaress Pty Ltd
  * @link        http://www.alaress.com.au
@@ -11,13 +9,18 @@ namespace Schoolbox\Video;
 
 use Component\Eportfolio\FileListMapper;
 use Schoolbox;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper;
 use Schoolbox\Collection;
+use Schoolbox\File\Mimetype;
+use Schoolbox\File\MimetypeMapper;
 use Schoolbox\Mapper;
-use Schoolbox\Resource;
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Resource\File\Mapper as FileMapper;
+use Schoolbox\Resource\My\File\Mapper as MyFileMapper;
+use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 
 class ResourceVideoMapper extends Mapper
 {
-
     /**
      * @return void
      */
@@ -25,65 +28,29 @@ class ResourceVideoMapper extends Mapper
     {
         $this->hasTable('video_queue');
         $this->hasModel(ResourceVideo::class);
+        $this->uses('video_queue_id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER, 'id');
+        $this->uses('status', self::TYPE_STRING);
+        $this->uses('duration', self::TYPE_INTEGER);
+        $this->joins('hash', FileMapper::class, 'hash', null, null, 'file', 'file');
+        $this->joins('hash', StorageMapper::class, 'hash', null, null, 'storage', 'storage');
 
-        $this->hasMap(
-            array(
-                'column'     => 'video_queue_id',
-                'property'   => 'id',
-                'type'       => self::TYPE_INTEGER,
-                'identifier' => true,
-            )
-        );
+        $this->hasJoin('myfile', [
+            'mapper'    => MyFileMapper::class,
+            'this_key'  => 'hash',
+            'other_key' => 'hash',
+        ]);
 
-        $this->hasMap(
-            array(
-                'column'   => 'status',
-                'property' => 'status',
-                'type'     => self::TYPE_STRING,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'duration',
-                'property' => 'duration',
-                'type'     => self::TYPE_INTEGER,
-            )
-        );
-        $this->hasJoin(
-            'file', array(
-                'mapper'    => '\\Schoolbox\\Resource\\File\\Mapper',
-                'this_key'  => 'hash',
-                'other_key' => 'hash',
-            )
-        );
-        $this->hasJoin(
-            'myfile', array(
-                'mapper'    => '\\Schoolbox\\Resource\\My\\File\\Mapper',
-                'this_key'  => 'hash',
-                'other_key' => 'hash',
-            )
-        );
-        $this->hasJoin(
-            'storage', array(
-                'mapper'    => Schoolbox\Resource\Storage\Mapper::class,
-                'this_key'  => 'hash',
-                'other_key' => 'hash',
-            )
-        );
-        $this->hasJoin(
-            'student_submission', array(
-                'mapper'    => Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper::class,
-                'this_key'  => 'hash',
-                'other_key' => 'hash',
-            )
-        );
-        $this->hasJoin(
-            'eportfolio_filelist', array(
-                'mapper'    => '\\Component\\Eportfolio\\FileListMapper',
-                'this_key'  => 'id',
-                'other_key' => 'file_id',
-            )
-        );
+        $this->hasJoin('student_submission', [
+            'mapper'    => SubmissionMapper::class,
+            'this_key'  => 'hash',
+            'other_key' => 'hash',
+        ]);
+
+        $this->hasJoin('eportfolio_filelist', [
+            'mapper'    => FileListMapper::class,
+            'this_key'  => 'id',
+            'other_key' => 'file_id',
+        ]);
     }
 
     /**
@@ -94,11 +61,12 @@ class ResourceVideoMapper extends Mapper
      * @param  bool  $limit
      *
      * @return Collection|ResourceVideo[]
+     * @throws MapperException
      */
     public function findByCategory($category, $options, $limit = false)
     {
         $videoList  = $this->createCollection();
-        $fileMapper = Resource\File\Mapper::getInstance();
+        $fileMapper = FileMapper::getInstance();
 
         $query = "
             SELECT    {$this->getJoinMapper('file')->getColumnString('f')}, 
@@ -159,6 +127,7 @@ class ResourceVideoMapper extends Mapper
             if ($row['u.id']) {
                 $video->getFile()->setOwner($fileMapper->getJoinMapper('owner')->hydrate($row, 'u'));
             } else {
+                /** @noinspection PhpUndefinedMethodInspection */
                 $video->getFile()->setOwner($fileMapper->getJoinMapper('owner')->getUnknownUser());
             }
             $videoList->add($video);
@@ -175,11 +144,12 @@ class ResourceVideoMapper extends Mapper
      * @param bool $limit
      *
      * @return Collection
+     * @throws MapperException
      */
     public function findByEportfolioPage($pageId, $options, $limit = false)
     {
         $videoList      = new Collection();
-        $myFileMapper   = Resource\My\File\Mapper::getInstance();
+        $myFileMapper   = MyFileMapper::getInstance();
         $fileListMapper = FileListMapper::getInstance();
 
         $query = "
@@ -232,6 +202,7 @@ class ResourceVideoMapper extends Mapper
             if ($row['o.id']) {
                 $video->getFile()->setOwner($myFileMapper->getJoinMapper('owner')->hydrate($row, 'o'));
             } else {
+                /** @noinspection PhpUndefinedMethodInspection */
                 $video->getFile()->setOwner($myFileMapper->getJoinMapper('owner')->getUnknownUser());
             }
 
@@ -246,11 +217,11 @@ class ResourceVideoMapper extends Mapper
      * @param $id
      *
      * @return ResourceVideo
-     * @throws Mapper\Exception
+     * @throws MapperException
      */
     public function findByFileId($id)
     {
-        $fileMapper = Resource\File\Mapper::getInstance();
+        $fileMapper = FileMapper::getInstance();
 
         $statement = $this->database->prepare(
             "
@@ -269,7 +240,7 @@ class ResourceVideoMapper extends Mapper
             $video->setFile($fileMapper->hydrate($row, 'f'));
         }
         if (!($video instanceof ResourceVideo)) {
-            throw new Mapper\Exception('Instance of object not found');
+            throw new MapperException('Instance of object not found');
         }
         return $video;
 
@@ -281,13 +252,13 @@ class ResourceVideoMapper extends Mapper
      * @param $id
      *
      * @return ResourceVideo
-     * @throws Mapper\Exception
+     * @throws MapperException
      *
      * @deprecated
      */
     public function findByMyFileId($id)
     {
-        $fileMapper = Resource\My\File\Mapper::getInstance();
+        $fileMapper = MyFileMapper::getInstance();
 
         $statement = $this->database->prepare(
             "
@@ -311,7 +282,7 @@ class ResourceVideoMapper extends Mapper
         }
 
         if (!($video instanceof ResourceVideo)) {
-            throw new Mapper\Exception('Instance of object not found');
+            throw new MapperException('Instance of object not found');
         }
 
         return $video;
@@ -321,7 +292,7 @@ class ResourceVideoMapper extends Mapper
      * Like findByStorageId() except it accepts a brownhole hash instead of a
      * brownhole storage ID.
      *
-     * @throws Mapper\Exception if no video with this hash was found
+     * @throws MapperException if no video with this hash was found
      *
      * @param  string $hash
      *
@@ -331,28 +302,43 @@ class ResourceVideoMapper extends Mapper
     {
         $storageMapper = $this->getJoinMapper('storage');
 
-        $statement     = $this->database->prepare(
-            "
-            SELECT {$storageMapper->getColumnString('s')}, {$this->getColumnString('vq')}
-            FROM `{$this->getTable()}` vq
-            JOIN {$this->getJoinSQL('storage', 'vq', 's')}
-            WHERE s.hash = ? AND vq.status != 'failed'
-        "
-        );
+        $sql = "
+            SELECT      {$storageMapper->getColumnString('s')}, 
+                        {$this->getColumnString('vq')},
+                        {$storageMapper->getJoinColumnString('allowedFileExtension', 'mime')}
+            FROM        `{$this->getTable()}` vq
+            JOIN        {$this->getJoinSQL('storage', 'vq', 's')}
+            LEFT JOIN   {$storageMapper->getJoinSql('allowedFileExtension', 's', 'mime', true)}
+            WHERE       s.hash = ? AND 
+                        vq.status != 'failed'
+        ";
 
-        $statement->execute(array($hash));
+        $statement = $this->database->prepare($sql);
+        $statement->execute([$hash]);
+
+        /** @var MimetypeMapper $mimeMapper */
+        $mimeMapper = $storageMapper->getJoinMapper('allowedFileExtension');
 
         $video = null;
+
         if (($row = $statement->fetch())) {
             $video = $this->hydrate($row, 'vq');
-            $video->setStorage($storageMapper->hydrate($row, 's'));
+
+            $storageObject = $storageMapper->hydrate($row, 's');
+
+            /** @var Mimetype $mime */
+            $mime = $mimeMapper->hydrate($row, 'mime');
+
+            if ($mime instanceof MimeType) {
+                $storageObject->setMimetype($mime);
+            }
+
+            $video->setStorage($storageObject);
         }
 
         if (!($video instanceof ResourceVideo)) {
-            throw new Mapper\Exception('Instance of object not found');
+            throw new MapperException('Instance of object not found');
         }
         return $video;
     }
-
-
 }
