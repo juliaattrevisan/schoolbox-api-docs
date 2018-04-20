@@ -91,6 +91,7 @@ class SSO
 
         // Then attempt to get a token using SSO v1
         try {
+            $conf['sso_code'] = urlencode($conf['sso_code']);
             return $this->getV1Token($client, $conf);
         } catch (UnexpectedValueException $v1e) {
         }
