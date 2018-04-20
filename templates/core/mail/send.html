@@ -70,7 +70,7 @@ $(function() {
         var eBody = $.trim($("#mailForm iframe").contents().find("body").text());
         var hasTo = $("#to").val() || $("#cc").val() || $("#bcc").val();
         // If recipients or subject is not set, let this fail by validator without showing the confirm dialog.
-        if ((hasTo && $('#subject').val()) && eBody.length < 1) {
+        if (hasTo && $('#subject').val() && eBody.length < 1) {
             $(this).confirmDialog({
                 header: 'Please Confirm',
                 text: 'Message body is empty. Are you sure to send this message?',
