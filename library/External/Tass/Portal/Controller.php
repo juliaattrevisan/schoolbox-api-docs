@@ -174,7 +174,7 @@ class Controller extends Alaress\Web\Controller\Base
         if ($this->getUser()->getRole()->isStudent() && \Cfg::get('external_tass_sso_student_code') === "TASS ID") {
             return $this->getUser()->getExternalId();
         }
-        return urlencode($this->getUser()->getUsername());
+        return $this->getUser()->getUsername();
     }
 
 
