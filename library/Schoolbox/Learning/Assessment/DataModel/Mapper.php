@@ -350,12 +350,6 @@ class Mapper extends BaseMapper
     ): array {
         $pb = $this->getPredicateBuilder();
         $pb->isNull('a.deleted_at');
-        $pb->any($pb->emptyClone()
-                    ->notNull('tc.student_id')
-                    ->notNull('ds.owner')
-                    ->notNull('dr.owner')
-                    ->notNull('qa.user_id'));
-
         // Filter task/dueWork/quiz by term dates
         $dueDateCol = $usePlanDates ? new Coalesce(['pp.due_date', 'a.due_date']) : 'a.due_date';
         $pb->betweenDates($dueDateCol, $from, $to);
@@ -364,27 +358,50 @@ class Mapper extends BaseMapper
         if ($usePlanDates) {
             $planJoin = "
                 LEFT JOIN {$this->getJoinSql('plans', 'a', 'pp')}
-                LEFT JOIN {$this->getJoinSql('plans.participants', 'pp', 'p')} AND p.user_id = :userId
+                JOIN {$this->getJoinSql('plans.participants', 'pp', 'p')} AND p.user_id = :userId
             ";
         }
         $pb->putParam('userId', $student->getId()); // For join
 
         $where = implode(' AND ', $pb->getWhere());
         $query = "
-            SELECT DISTINCT
-                a.id
-            FROM {$this->getDatabase()->quoteIdentifier($this->getTable())} a
-            LEFT JOIN {$this->getJoinSql('task', 'a', 't', true)}
-            LEFT JOIN {$this->getJoinSql('task.completion', 't', 'tc')} AND tc.student_id = :userId
-            LEFT JOIN {$this->getJoinSql('duework', 'a', 'd', true)}
-            LEFT JOIN {$this->getJoinSql('duework.submission', 'd', 'ds')} AND ds.owner = :userId
-            LEFT JOIN {$this->getJoinSql('duework.return', 'd', 'dr')} AND dr.owner = :userId
-            LEFT JOIN {$this->getJoinSql('quiz', 'a', 'q', true)}
-            LEFT JOIN {$this->getJoinSql('quiz.attempt', 'q', 'qa')} AND qa.user_id = :userId
-            {$planJoin}
+            SELECT DISTINCT a.id
+            FROM  {$this->getDatabase()->quoteIdentifier($this->getTable())} a
+            JOIN  {$this->getJoinSql('task', 'a', 't', true)}
+            JOIN  {$this->getJoinSql('task.completion', 't', 'tc')} AND tc.student_id = :userId
+                  {$planJoin}
             WHERE {$where}
-            ORDER BY a.id ASC
+            
+            UNION
+
+            SELECT DISTINCT a.id
+            FROM  {$this->getDatabase()->quoteIdentifier($this->getTable())} a
+            JOIN  {$this->getJoinSql('duework', 'a', 'd', true)}
+            JOIN  {$this->getJoinSql('duework.submission', 'd', 'ds')} AND ds.owner = :userId
+                  {$planJoin}
+            WHERE {$where}
+
+            UNION
+
+            SELECT DISTINCT a.id
+            FROM  {$this->getDatabase()->quoteIdentifier($this->getTable())} a
+            JOIN  {$this->getJoinSql('duework', 'a', 'd', true)}
+            JOIN  {$this->getJoinSql('duework.return', 'd', 'dr')} AND dr.owner = :userId
+                  {$planJoin}
+            WHERE {$where}
+
+            UNION
+
+            SELECT DISTINCT a.id
+            FROM  {$this->getDatabase()->quoteIdentifier($this->getTable())} a
+            JOIN  {$this->getJoinSql('quiz', 'a', 'q', true)}
+            JOIN  {$this->getJoinSql('quiz.attempt', 'q', 'qa')} AND qa.user_id = :userId
+                  {$planJoin}
+            WHERE {$where}
+            
+            ORDER BY id ASC
         ";
+
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute($pb->getParams());
         return array_column($statement->fetchAll(\PDO::FETCH_ASSOC), 'id');
