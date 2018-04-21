@@ -433,7 +433,7 @@ class Queue extends ResourceVideo
 
             $this->log("Media Source Location:  Flysystem");
             $this->log("Downloading file to local disk");
-            $mediaFilename = $this->getTempFilename("{$storage->getHash()}-source", "{$storage->getExtension()}");
+            $mediaFilename = $this->getTempFilename("{$storage->getHash()}-source", $storage->getExtension());
             $mediaFileOut  = fopen($mediaFilename, "w");
             $this->getStorage()->pipe($mediaFileOut);
             fclose($mediaFileOut);
@@ -495,16 +495,27 @@ class Queue extends ResourceVideo
         $width  = 0;
         $height = 0;
 
-        $videoScale = "";
-        $thumbScale = "";
+        $videoScale = '';
+        $thumbScale = '';
+
 
         if (preg_match("/width=(\\d+)/", $infoMessage, $matches)) {
-            list(, $width) = $matches;
+            $width = (int)$matches[1];
         }
 
         if (preg_match("/height=(\\d+)/", $infoMessage, $matches)) {
-            list(, $height) = $matches;
+            $height = (int)$matches[1];
         }
+
+        if (preg_match("/rotate=(\\d+)/", $infoMessage, $matches)) {
+            $rotation = (int)$matches[1];
+            if($rotation === 90 || $rotation === 270) {
+                $temp = $height;
+                $height = $width;
+                $width = $temp;
+            }
+        }
+
 
         if ($width && $height) {
             list($containedWidth, $containedHeight) = $this->contain([$width, $height], [1280, 720]);
