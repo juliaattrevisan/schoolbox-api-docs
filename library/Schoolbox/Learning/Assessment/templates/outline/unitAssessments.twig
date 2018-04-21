@@ -103,16 +103,15 @@
 
                 {% if isActionRoutes or isParticipant %}
                     <nav>
-                        {% if isParticipant %}
-                            {# TODO known bug SA-5984. Participant progress icon renders incorrectly if part of multiple actions. #}
+                        {% if isActionRoutes %}
+                            <a href="#" class="icon-more" data-dropdown="options-task{{ assessment.id }}" aria-expanded="false" title="Actions"></a>
+                        {% elseif isParticipant %}
                             {% include '@learningAssessment/fragments/progressTick.twig' with {
                                 assessment: assessment,
                                 student: USER
                             } only %}
                         {% endif %}
-                        {% if isActionRoutes %}
-                            <a href="#" class="icon-more" data-dropdown="options-task{{ assessment.id }}" aria-expanded="false" title="Actions"></a>
-                        {% endif %}
+
                     </nav>
                 {% endif %}
 
