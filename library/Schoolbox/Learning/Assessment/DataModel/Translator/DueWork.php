@@ -19,6 +19,7 @@ use Schoolbox\Learning\MarkScheme\None;
 use Schoolbox\Learning\MarkScheme\Percentage;
 use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
 use Schoolbox\Resource\Storage\Model as StorageModel;
+use Schoolbox\Collection;
 
 /**
  * Sub-translator for due work specific fields.
@@ -124,14 +125,20 @@ class DueWork implements IAssessmentTypeTranslator
 
         // Translate files
         // TODO consider whether the DueWorkFile model is required - should Storage be used directly?
-        foreach ($domainObject->getAttachedFiles() as $file) {
-            $dataModel->addAttachment(
-                (new StorageModel())
-                    ->setHash($file->getHash())
-                    ->setFilename($file->getFilename())
-                    ->setExtension($file->getExtension())
-            );
+        if (count($domainObject->getAttachedFiles())) {
+            foreach ($domainObject->getAttachedFiles() as $file) {
+                $dataModel->addAttachment(
+                    (new StorageModel())
+                        ->setHash($file->getHash())
+                        ->setFilename($file->getFilename())
+                        ->setExtension($file->getExtension())
+                );
+            }
         }
+        else {
+            $dataModel->setAttachments(new Collection());
+        }
+
         // TODO figure out mark visibility - it's likely obsolete as feedback is manually published
         // TODO figure out rubric result set
         // TODO figure out mark per rubric group
