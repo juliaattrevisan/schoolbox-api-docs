@@ -59,7 +59,7 @@ class Model extends AbstractResponse
      * @param \Alaress_Date_Format $submittedAt
      * @return $this
      */
-    public function setSubmittedAt(\Alaress_Date_Format $submittedAt)
+    public function setSubmittedAt(?\Alaress_Date_Format $submittedAt)
     {
         $this->submittedAt = $submittedAt;
         return $this;
