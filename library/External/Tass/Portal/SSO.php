@@ -134,7 +134,6 @@ class SSO
         // Is school configured to attempt SSO v1 ?
         if(\in_array($this->ssoStrategy, [self::SSO_STRATEGY_V1_ONLY, self::SSO_STRATEGY_V2_THEN_V1], true)) {
             try {
-                $conf['sso_code'] = urlencode($conf['sso_code']);
                 return $this->getV1Token($client, $conf, $deepLinkV1);
             } catch (UnexpectedValueException $e) {
                 $errors[] = "SSO v1: {$e->getMessage()}";
@@ -167,8 +166,8 @@ class SSO
 
         if ($this->debug) {
             header('Content-Type: text/plain');
-            $queryString = http_build_query($formParams);
-            die("SSO v2.\nPOST: {$this->server}?returnType=json\nData: {$queryString}\nRECV: {$responseString}\n");
+            $data = print_r($formParams, true);
+            die("SSO v2.\nPOST: {$this->server}?returnType=json\nData: {$data}\nRECV: {$responseString}\n");
         }
 
         // The response should be in this format
@@ -223,13 +222,13 @@ class SSO
         if (null !== $deepLinkV1) {
             $conf['deep_link'] = 'index.cfm?' . http_build_query($deepLinkV1);
         }
-        $responseString = $client->get($this->server, ['query' => $conf])->getBody()->getContents();
+        $query = http_build_query($conf);
+        $responseString = $client->get("{$this->server}?{$query}")->getBody()->getContents();
         parse_str($responseString, $response);
 
         if ($this->debug) {
             header('Content-Type: text/plain');
-            $data = http_build_query($conf);
-            die("SSO v1.\nSEND: {$this->server}?{$data}\nRECV: {$responseString}\n");
+            die("SSO v1.\nSEND: {$this->server}?{$query}\nRECV: {$responseString}\n");
         }
         return $this->parseResponse($response, $conf['sso_code']);
     }
