@@ -100,7 +100,8 @@ class ArticleNotifier extends AbstractModuleNotifier
         $bob       = new Builder(false);
         $articleId = $article->getId();
         $bob->setTitle(":user posted :title under :topic")
-            ->setHref('/news/item/' . $articleId);
+            ->setHref('/news/item/' . $articleId)
+            ->addTopic("news.$articleId.posted");
 
         // Empty params for completeness?
         $bob->setParams([
