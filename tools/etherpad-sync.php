@@ -7,12 +7,13 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+use Alaress\Database\Connector\IConnector;
+
 
 require_once __DIR__ . '/../conf/core/require.php';
 spl_autoload_call('Schoolbox\\Application\\Daemon');
-$kernel = new \Schoolbox\Application\Daemon\Kernel('Etherpad Sync', array('level'=>200) );
+$kernel = new \Schoolbox\Application\Daemon\Kernel('Etherpad Sync', array('level' => 200));
 $logger = $kernel->logger();
-
 
 
 /* Load the pad from our db to get its groupId
@@ -27,24 +28,37 @@ $allPads = $padMapper->findAll();
 $client = new \EtherpadLite\Client(Cfg::get('etherpad_api_token'));
 $logger->info(sprintf("Commencing etherpad sync, processing %d pads", count($allPads)));
 
-//var_dump($allPads);
+/** @var IConnector $db */
+$db = $kernel->get('databaseInternal');
+$maxPacket = $db->executeQuery("SHOW VARIABLES WHERE Variable_name = 'max_allowed_packet'")->fetchAll()[0]['Value'];
 
-foreach($allPads as $currentPad) {
-	$getTextResult = $client->getHTML($currentPad->getPadId());
 
-	if ($getTextResult->getMessage() == 'ok') {
-		$data = $getTextResult->getData();
-		$currentPad->setBody($data['html']);
-        $padMapper->save($currentPad);
-        $logger->info(sprintf("Successfully saved pad %d: %s", $currentPad->getId(), $getTextResult->getMessage()));
+foreach ($allPads as $currentPad) {
+    $getTextResult = $client->getHTML($currentPad->getPadId());
 
+    if ($getTextResult->getMessage() == 'ok') {
+        $data = $getTextResult->getData();
+        $currentPad->setBody($data['html']);
+        $bodyHtmlLength = strlen($data['html']);
+
+        if($bodyHtmlLength > $maxPacket){
+            $logger->error(sprintf('Pad (%d) body HTML size (%d) exceeds max packet (%d), skipping...', $currentPad->getId(), $bodyHtmlLength, $maxPacket));
+            continue;
+        }
+
+        try {
+            $padMapper->save($currentPad);
+            $logger->info(sprintf("Successfully saved pad %d: %s", $currentPad->getId(), $getTextResult->getMessage()));
+        } catch (Exception $e) {
+            $logger->error(sprintf("Error while saving pad %d: %s", $currentPad->getId(), $e->getMessage()));
+        }
 
     } else {
-	    $logger->warning(sprintf("Failed to get pad %d with key %s: %s", $currentPad->getId(), $currentPad->getPadId(), $getTextResult->getMessage()));
+        $logger->warning(sprintf("Failed to get pad %d with key %s: %s", $currentPad->getId(), $currentPad->getPadId(), $getTextResult->getMessage()));
     }
 
-	/* Save it!
-	 */
+    /* Save it!
+     */
 }
 $logger->info("Etherpad sync complete");
 
