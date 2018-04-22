@@ -29,6 +29,10 @@ use Schoolbox\User;
 
 abstract class AbstractModuleNotifier implements ModuleNotifierInterface
 {
+    /**
+     * Generic deleted trigger, available to all notifiers
+     */
+    const TRIGGER_DELETED = 'deleted';
 
     /** @var callable[] */
     protected $closures = array();
@@ -220,6 +224,14 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface
 
         $callbacks = array();
 
+        // notifyDeleted: always associated if it exists,
+        // regardless of source collection
+        $deletedNotifier = 'notifyDeleted';
+        if (isset($availableMethods[$deletedNotifier])) {
+            $callbacks[] = [$this, $deletedNotifier];
+        }
+
+        // All other notifiers: notify{$roleType}{$key}
         foreach ($sourceCollection as $source) {
             $method = sprintf("notify%s%s",
                 ucfirst(strtolower($source->getRoleType())),
