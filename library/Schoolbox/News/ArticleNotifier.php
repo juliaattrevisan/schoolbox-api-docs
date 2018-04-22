@@ -102,6 +102,13 @@ class ArticleNotifier extends AbstractModuleNotifier
         $bob->setTitle(":user posted :title under :topic")
             ->setHref('/news/item/' . $articleId);
 
+        // Empty params for completeness?
+        $bob->setParams([
+            'user'  => new Param(''),
+            'title' => new Param(''),
+            'topic' => new Param(''),
+        ]);
+
         $envelope->retract($bob->build());
         return $envelope;
     }
