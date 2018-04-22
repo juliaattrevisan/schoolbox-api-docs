@@ -96,10 +96,11 @@ class ArticleNotifier extends AbstractModuleNotifier
      */
     public function notifyDeleted(Article $article): Envelope
     {
-        $envelope = new Envelope();
-        $bob      = new Builder();
+        $envelope  = new Envelope();
+        $bob       = new Builder();
+        $articleId = $article->getId();
         $bob->setTitle(":user posted :title under :topic")
-            ->setHref('/news/item/' . $article->getId());
+            ->setHref('/news/item/' . $articleId);
 
         $envelope->retract($bob->build());
         return $envelope;
