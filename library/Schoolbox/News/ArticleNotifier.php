@@ -83,6 +83,7 @@ class ArticleNotifier extends AbstractModuleNotifier
 
             case Mapper::METHOD_DELETE:
                 $bundle->detach(self::TRIGGER_POSTED);
+                $bundle->attach(self::TRIGGER_DELETED, self::IMMEDIATELY);
         }
     }
 
