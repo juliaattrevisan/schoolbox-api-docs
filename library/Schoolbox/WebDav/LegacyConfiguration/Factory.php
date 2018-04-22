@@ -586,7 +586,7 @@ class Factory
             }
         } elseif (in_array($siteLocation, array('core', 'demo'))) {
             $settings = array(
-                'baseUri'  => 'http://127.0.0.1:8000/',
+                'baseUri'  => 'http://127.0.0.1:8881/',
                 'userName' => $session['username'],
                 'password' => $session['password'],
             );

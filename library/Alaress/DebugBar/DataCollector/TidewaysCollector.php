@@ -38,7 +38,7 @@ class TidewaysCollector extends DataCollector implements Renderable {
             $run_id = $xhprof_runs->save_run($xhprof_data, $profiler_namespace);
 
             return array(
-                'profile_url' => sprintf('/xhprof/index.php?run=%s&source=%s', $run_id, $profiler_namespace)
+                'profile_url' => sprintf('/xhprof_html/index.php?run=%s&source=%s', $run_id, $profiler_namespace)
             );
         }
         return array();
