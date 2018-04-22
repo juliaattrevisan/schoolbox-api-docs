@@ -36,10 +36,9 @@
         {% endif %}
         {% set deleteRoute = routeLookupIfAuthorized('learningAssessment.postDeleteAssessment', {assessmentId: assessment.id, assessment: assessment}) %}
         {% set isActionRoutes = statusRoute or modifyRoute or deleteRoute %}
-        {% set actionCount = (isActionRoutes ? 1 : 0) + (isParticipant ? 1 : 0) %}
 
         <li class="interact" data-unit-assessment="{{ assessment.id }}">
-            <div{% if actionCount %} class="actions-small-{{ actionCount }}"{% endif %}>
+            <div{% if isActionRoutes or isParticipant %} class="actions-small-1"{% endif %}>
                 {% if canWrite %}
                     <div class="grip compact"></div>
                 {% endif %}
@@ -103,16 +102,15 @@
 
                 {% if isActionRoutes or isParticipant %}
                     <nav>
-                        {% if isParticipant %}
-                            {# TODO known bug SA-5984. Participant progress icon renders incorrectly if part of multiple actions. #}
+                        {% if isActionRoutes %}
+                            <a href="#" class="icon-more" data-dropdown="options-task{{ assessment.id }}" aria-expanded="false" title="Actions"></a>
+                        {% elseif isParticipant %}
                             {% include '@learningAssessment/fragments/progressTick.twig' with {
                                 assessment: assessment,
                                 student: USER
                             } only %}
                         {% endif %}
-                        {% if isActionRoutes %}
-                            <a href="#" class="icon-more" data-dropdown="options-task{{ assessment.id }}" aria-expanded="false" title="Actions"></a>
-                        {% endif %}
+
                     </nav>
                 {% endif %}
 
