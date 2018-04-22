@@ -100,7 +100,6 @@ class ArticleNotifier extends AbstractModuleNotifier
         $bob->setTitle(":user posted :title under :topic")
             ->setHref('/news/item/' . $article->getId());
 
-        // TODO implement retract, make it call \Alaress\Async\Queue\RedisQueue::remove or removeAllLike
         $envelope->retract($bob->build());
         return $envelope;
     }
