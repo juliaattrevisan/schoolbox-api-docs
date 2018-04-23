@@ -93,4 +93,27 @@ class Mobile implements QueueInterface
         // noop: this "list" doesn't contain things
     }
 
+
+    /**
+     * It's too late to rescind a message once pushed to mobile.
+     *
+     * @param Instance $instance
+     * @return bool
+     */
+    public function remove(Instance $instance): bool
+    {
+        throw new \BadMethodCallException('Mobile messages may not be rescinded');
+    }
+
+
+    /**
+     * It's too late to rescind a message once pushed to mobile.
+     *
+     * @param Instance $instance
+     * @return bool
+     */
+    public function removeAllLike(Instance $instance): int
+    {
+        throw new \BadMethodCallException('Mobile messages may not be rescinded');
+    }
 }
