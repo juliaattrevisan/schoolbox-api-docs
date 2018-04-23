@@ -33,6 +33,28 @@ class Instance implements JsonSerializable
     const MAX_FIELD_SIZE = 512;
 
     /**
+     * A type of action for this instance, as used by `$this->get/setAction`.
+     *
+     * This instance's notification is sent.
+     */
+    public const ACTION_SEND = 'send';
+
+    /**
+     * A type of action for this instance, as used by `$this->get/setAction`.
+     *
+     * This instance's notification is retracted.
+     */
+    public const ACTION_RETRACT_SINGLE = 'retract-single';
+
+    /**
+     * A type of action for this instance, as used by `$this->get/setAction`.
+     *
+     * This instance's notification is retracted, as are all with the same base
+     * hash (`$this->getBaseHash`).
+     */
+    public const ACTION_RETRACT_ALL = 'retract-all';
+
+    /**
      * The :tokenised string that forms the base template of the message
      *
      * @var string
@@ -118,6 +140,21 @@ class Instance implements JsonSerializable
      * @var bool
      */
     protected $retraction = false;
+
+    /**
+     * What kind of notification is this?
+     *
+     * * self::ACTION_SEND:           Send this message.
+     * * self::ACTION_RETRACT_SINGLE: Retract this message. Must match sent
+     *                                message exactly.
+     * * self::ACTION_RETRACT_ALL:    Retract this message, and any like it,
+     *                                from everyone.
+     *                                Base hash (message and href) must match
+     *                                sent message.
+     *
+     * @var string
+     */
+    protected $action = self::ACTION_SEND;
 
 
     /**
@@ -239,7 +276,7 @@ class Instance implements JsonSerializable
         $href          = $array['href'];
         $time          = $array['time'];
         $meta          = $array['meta'];
-        $retraction    = $array['retraction'] ?? false;
+        $action        = $array['action'] ?? self::ACTION_SEND;
         $severity      = isset($array['level']) ? $array['level'] : 0;
         $context       = isset($array['context']) ? $array['context'] : [];
 
@@ -259,7 +296,7 @@ class Instance implements JsonSerializable
         }
 
         $instance = new self($messageString, $namespace, $icon, $href, $params, $severity, $topics, $time, $meta, $context);
-        $instance->setRetraction($retraction);
+        $instance->setAction($action);
         return $instance;
     }
 
@@ -295,19 +332,19 @@ class Instance implements JsonSerializable
     public function jsonSerialize()
     {
         return array(
-            'title'      => [
+            'title'     => [
                 'text'   => $this->messageString,
                 'params' => $this->params
             ],
-            'namespace'  => $this->namespace,
-            'time'       => $this->time,
-            'icon'       => $this->icon,
-            'href'       => $this->href,
-            'meta'       => $this->meta,
-            'level'      => $this->severity,
-            'topics'     => $this->topics,
-            'context'    => $this->context,
-            'retraction' => $this->retraction,
+            'namespace' => $this->namespace,
+            'time'      => $this->time,
+            'icon'      => $this->icon,
+            'href'      => $this->href,
+            'meta'      => $this->meta,
+            'level'     => $this->severity,
+            'topics'    => $this->topics,
+            'context'   => $this->context,
+            'action'    => $this->action,
         );
     }
 
@@ -414,21 +451,59 @@ class Instance implements JsonSerializable
 
 
     /**
-     * @return bool
+     * @return string
      */
-    public function isRetraction(): bool
+    public function getAction(): string
     {
-        return $this->retraction;
+        return $this->action;
     }
 
 
     /**
-     * @param bool $retraction
+     * @param string $action
      * @return static
+     * @throws InvalidArgumentException if `$action` isn't one of the
+     *                                  `self::ACTION_*` constants
      */
-    public function setRetraction(bool $retraction): self
+    public function setAction(string $action): self
     {
-        $this->retraction = $retraction;
+        if (!\in_array($action, [self::ACTION_SEND, self::ACTION_RETRACT_SINGLE, self::ACTION_RETRACT_ALL], true)) {
+            throw new InvalidArgumentException('$action must be a ACTION_* constant of this class');
+        }
+        $this->action = $action;
         return $this;
+    }
+
+
+    /**
+     * Is this a send notification?
+     *
+     * @return bool
+     */
+    public function isActionSend(): bool
+    {
+        return $this->action === self::ACTION_SEND;
+    }
+
+
+    /**
+     * Is this a retract single message notification?
+     *
+     * @return bool
+     */
+    public function isActionRetractSingle(): bool
+    {
+        return $this->action === self::ACTION_RETRACT_SINGLE;
+    }
+
+
+    /**
+     * Is this a retract all instances of message notification?
+     *
+     * @return bool
+     */
+    public function isActionRetractAll(): bool
+    {
+        return $this->action === self::ACTION_RETRACT_ALL;
     }
 }

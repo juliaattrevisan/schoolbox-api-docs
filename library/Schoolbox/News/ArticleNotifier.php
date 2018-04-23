@@ -110,7 +110,8 @@ class ArticleNotifier extends AbstractModuleNotifier
             'topic' => new Param(''),
         ]);
 
-        $envelope->broadcastToEveryone($bob->buildRetraction());
+        // Only broadcast to superusers as there's no system channel
+        $envelope->broadcastToSuperusers($bob->buildRetractAll());
         return $envelope;
     }
 

@@ -328,12 +328,23 @@ class Builder implements BuilderInterface
 
 
     /**
-     * Builds a message retraction instance from the construction given.
+     * Builds a retract single message instance from the construction given.
      *
      * @return Instance
      */
-    public function buildRetraction()
+    public function buildRetractSingle()
     {
-        return $this->build()->setRetraction(true);
+        return $this->build()->setAction(Instance::ACTION_RETRACT_SINGLE);
+    }
+
+
+    /**
+     * Builds a retract all message instance from the construction given.
+     *
+     * @return Instance
+     */
+    public function buildRetractAll()
+    {
+        return $this->build()->setAction(Instance::ACTION_RETRACT_ALL);
     }
 }
