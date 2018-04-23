@@ -346,7 +346,7 @@ class Controller extends Assessment\Controller
             ->setSubmittedBy($this->getUser())
             ->setMarkedComplete($isMarkedComplete);
 
-        if (TaskCompletion::STATUS_TEACHER_ASSESSED_COMPLETE == $completionStatus) {
+        if (TaskCompletion::STATUS_TEACHER_ASSESSED_COMPLETE === $completionStatus) {
             $feedback = (new Feedback\Model())
                 ->setResponse($taskResponse);
             $taskResponse->getAllFeedback()->add($feedback);
