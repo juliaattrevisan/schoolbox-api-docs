@@ -1269,7 +1269,11 @@ class SitePage extends Page
         // is SAML enabled?
         // don't show the login page, redirect to the SAML login page.
         // (unless ?samlLogin=0 is set)
-        if ($this->config->get('saml_enabled') == '1' && (strlen($this->config->get('saml_sso_url')) || strlen($this->config->get('saml_idp_metadata_url'))) && $_GET['samlAuth'] !== '0') {
+        // (or the users IP exists in the blacklist
+        if ($this->config->get('saml_enabled') == '1'
+            && (strlen($this->config->get('saml_sso_url')) || strlen($this->config->get('saml_idp_metadata_url')))
+            && $_GET['samlAuth'] !== '0'
+            && (!$this->samlBlacklist() || $_GET['samlAuth'] === '1' )) {
             $redirectUrl = '/saml/index.php';
             if (isset($_GET['page'])) {
                 $redirectUrl .= '?page=' . urlencode($_GET['page']);
@@ -1279,6 +1283,21 @@ class SitePage extends Page
             $this->outputPage(true);
         }
         exit;
+    }
+
+    /**
+     * Check if the users IP exists in the SAML blacklist.
+     * @return bool
+     */
+    private function samlBlacklist()
+    {
+        $ipBlacklist = $this->config->get('saml_ip_blacklist');
+        foreach (explode(',', $ipBlacklist) as $ip) {
+            if ($ip == Session::getIP()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
