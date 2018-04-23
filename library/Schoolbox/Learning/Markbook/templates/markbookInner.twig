@@ -114,8 +114,8 @@
 
                     {% for assessment in markbook.assessments %}
                         {% set participant = assessment.getParticipantIfExtant(student) %}
-                        <td class="column-{{ assessment.id }}{% if not participant %} excluded{% endif %}" data-assessment="{{ assessment.id }}">
-                            {% if participant %}
+                        <td class="column-{{ assessment.id }}{% if not participant or participant.isExcluded %} excluded{% endif %}" data-assessment="{{ assessment.id }}">
+                            {% if participant and not participant.isExcluded %}
                                 {% if assessment is task %}
                                    {# An icon that shows if the student has attempted the task or not #}
                                     {% if studentCount < functionDegradeLimit %}
