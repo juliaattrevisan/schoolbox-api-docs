@@ -1,0 +1,31 @@
+{##
+ # To show, or not to show? That is the question.
+ # Parameters:
+ # * visibility: visibility of the mark (0,1,2)
+ # * mark: the string that will be printed, given the access level is right
+ # * replacement: what to show if the access does not have access
+ #}
+{% macro show(visibility, mark, replacement) %}
+    {% spaceless %}
+        {% if USER.role.type == 'parent' %}
+            {% set access = 2  %}
+        {% elseif USER.role.type == 'student' %}
+            {% set access = 1  %}
+        {% elseif USER.role.type == 'staff' %}
+            {% set access = 0  %}
+        {% else  %}
+            {% set access = 2  %}
+        {% endif %}
+
+        {# This seems whack, but the grades visibility is:
+            Staff Only: 0
+            Staff and Students: 1
+            Staff, Students and Parents: 2
+            #}
+        {% if access <= visibility %}
+            {{ mark }}
+        {% else %}
+            {{ replacement }}
+        {% endif %}
+    {% endspaceless %}
+{% endmacro %}

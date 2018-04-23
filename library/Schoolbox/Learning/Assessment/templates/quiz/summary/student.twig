@@ -1,6 +1,8 @@
 
 {% import 'sub/breadcrumbs.twig' as bread %}
 {% import '@learningAssessment/fragments/macro/duration.twig' as duration %}
+{% import '@learningAssessment/fragments/macro/markVisible.twig' as markVisible %}
+
 {{ bread.crumbsArray(breadcrumbs) }}
 
 <div class="row actions-small-1">
@@ -120,9 +122,10 @@
                             {% if finished %}
                                 {% set totalMark       = attempt.totalMark %}
                                 {% set totalMarkGraded = attempt.totalMarkGraded %}
-                                {{ attempt.mark }}/{{ totalMark }}
+                                {{ markVisible.show(quiz.markVisibility, attempt.mark / totalMark, 'N/A' ) }}
                                 {% if totalMarkGraded < totalMark %}
-                                    ({{ (totalMarkGraded/totalMark*100) | round }}% graded)
+                                    {% set percentGraded =  (totalMarkGraded/totalMark*100) | round %}
+                                    {{ markVisible.show(quiz.markVisibility, percentGraded~'% graded', '' ) }}
                                 {% endif %}
                             {% else %}
                                 —
