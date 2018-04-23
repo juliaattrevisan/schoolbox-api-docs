@@ -33,6 +33,11 @@ task.
     The interface through which a Scheduler assigns Tasks to Workers.
   </dd>
 
+  <dt>Event Loop</dt>
+  <dd>
+    A component used for asynchronously listening for events.
+  </dd>
+
   <dt>Worker Pool</dt>
   <dd>
     A collection of pre-created Workers waiting to be assigned a Task.
@@ -145,7 +150,25 @@ The `enqueue` method enqueues a Task to be Dispatched; this method takes:
 
 > TODO document what is actually enqueued
 
-The `dispatch` method dispatches the most recently added Task
+The `dispatch` method dispatches the most recently added Task.
+
+
+#### Event Loop
+
+The Event Loop is an implementation of `\React\EventLoop\LoopInterface`.
+Think of it as the asynchronous equivalent of a classic event loop:
+
+```php
+$eventQueue = new EventQueueSubscription();
+while (true) {
+    foreach ($eventQueue->getEvents() as $event) {
+        handleEvent($event);
+    }
+}
+```
+
+It is used by the Dispatcher to defer execution of a Task until its time to
+execute is reached.
 
 
 #### Worker Pool
