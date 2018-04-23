@@ -335,7 +335,7 @@ class Controller extends Assessment\Controller
      */
     private function saveTaskResponse(int $completionStatus, IAssessable $assessment, User $student): Response\Model
     {
-        $isMarkedComplete = $completionStatus != TaskCompletion::STATUS_INCOMPLETE;
+        $isMarkedComplete = $completionStatus !== TaskCompletion::STATUS_INCOMPLETE;
 
         $taskResponse = (new TaskResponse())
             ->setAssessable($assessment)
