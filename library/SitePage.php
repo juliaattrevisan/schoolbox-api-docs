@@ -361,6 +361,7 @@ class SitePage extends Page
             'SITE_GREETING' => TextFormatter::greeting(), // TODO: This should be an object
             'SITE_LOGINNAME' => $this->user->formatName(),
             'SITE_USERNAME' => $this->user->getUsername(),
+            'SITE_USER_EMAIL' => $this->user->getEmail(),
             'SITE_LOCATION' => $this->site,
             'SITE_ANALYTICS' => $this->config->get('site_analytics'),
             'USER_ID' => $this->user->getId(),
