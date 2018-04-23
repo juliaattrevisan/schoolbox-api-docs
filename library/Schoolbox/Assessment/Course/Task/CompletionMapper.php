@@ -18,6 +18,9 @@ use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Assessment\Participant;
 
+/**
+ * @method Completion createModel($idValue = null)
+ */
 class CompletionMapper extends Mapper {
 
     /**
