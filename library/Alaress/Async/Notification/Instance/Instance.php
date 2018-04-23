@@ -112,6 +112,13 @@ class Instance implements JsonSerializable
      */
     protected $context;
 
+    /**
+     * Is this a retraction of a previously sent message?
+     *
+     * @var bool
+     */
+    protected $retraction = false;
+
 
     /**
      * @param string               $text
@@ -401,4 +408,23 @@ class Instance implements JsonSerializable
         return sha1(json_encode($list));
     }
 
+
+    /**
+     * @return bool
+     */
+    public function isRetraction(): bool
+    {
+        return $this->retraction;
+    }
+
+
+    /**
+     * @param bool $retraction
+     * @return static
+     */
+    public function setRetraction(bool $retraction): self
+    {
+        $this->retraction = $retraction;
+        return $this;
+    }
 }
