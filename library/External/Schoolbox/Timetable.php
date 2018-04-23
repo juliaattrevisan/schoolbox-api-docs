@@ -327,7 +327,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
      */
     public function getDayTimetable($externalUserId, $userId, Campus $campus, $dayNumber)
     {
-        if (empty($externalUserId)) {
+        if (empty($externalUserId) || empty($dayNumber)) {
             return [];
         }
 
