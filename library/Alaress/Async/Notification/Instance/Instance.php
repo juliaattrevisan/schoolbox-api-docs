@@ -239,6 +239,7 @@ class Instance implements JsonSerializable
         $href          = $array['href'];
         $time          = $array['time'];
         $meta          = $array['meta'];
+        $retraction    = $array['retraction'] ?? false;
         $severity      = isset($array['level']) ? $array['level'] : 0;
         $context       = isset($array['context']) ? $array['context'] : [];
 
@@ -257,7 +258,9 @@ class Instance implements JsonSerializable
             }
         }
 
-        return new self($messageString, $namespace, $icon, $href, $params, $severity, $topics, $time, $meta, $context);
+        $instance = new self($messageString, $namespace, $icon, $href, $params, $severity, $topics, $time, $meta, $context);
+        $instance->setRetraction($retraction);
+        return $instance;
     }
 
 
@@ -292,18 +295,19 @@ class Instance implements JsonSerializable
     public function jsonSerialize()
     {
         return array(
-            'title'     => array(
+            'title'      => [
                 'text'   => $this->messageString,
                 'params' => $this->params
-            ),
-            'namespace' => $this->namespace,
-            'time'      => $this->time,
-            'icon'      => $this->icon,
-            'href'      => $this->href,
-            'meta'      => $this->meta,
-            'level'     => $this->severity,
-            'topics'    => $this->topics,
-            'context'   => $this->context,
+            ],
+            'namespace'  => $this->namespace,
+            'time'       => $this->time,
+            'icon'       => $this->icon,
+            'href'       => $this->href,
+            'meta'       => $this->meta,
+            'level'      => $this->severity,
+            'topics'     => $this->topics,
+            'context'    => $this->context,
+            'retraction' => $this->retraction,
         );
     }
 
