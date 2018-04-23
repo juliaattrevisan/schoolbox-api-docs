@@ -303,6 +303,27 @@ class Controller extends BaseController
                    ->indexBy('id')
                    ->getAll();
 
+        //Filtering out disabled modules
+        //   Modules            => Related Notifications
+        $checkEnabled = Array(
+            'eotc'              => ['eotc'],
+            'resource_booking'  => ['resource_booking'],
+            'pastoral'          => ['pastoral', 'pastoral_log', 'pastoral_comment'],
+            'fixtures'          => ['sports_fixtures', 'sports_fixtures_import']
+        );
+
+        $configMapper = ConfigMapper::getInstance();
+
+        foreach ($ns as $i=>$k) {
+            foreach ($checkEnabled as $notifType=>$notifs) {
+                if(in_array($k->getSlug(), $notifs)){
+                    if(0 == $configMapper->get($notifType.'_enabled')){
+                        unset($ns[$i]);
+                    }
+                }
+            }
+        }
+
         $sources = SourceMapper::getInstance()
                                ->findAll()
                                ->indexBy('id')

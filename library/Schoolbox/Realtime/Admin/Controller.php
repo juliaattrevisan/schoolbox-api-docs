@@ -307,17 +307,24 @@ class Controller extends BaseController
                    ->findAll()
                    ->indexBy('id')
                    ->getAll();
-
+        
         //Filtering out disabled modules
-        //What about resource_booking and leave (which is boarder_leave_enabled in settings)?
-        $checkEnabled = Array('eotc');
+        //   Modules            => Related Notifications
+        $checkEnabled = Array(
+            'eotc'              => ['eotc'],
+            'resource_booking'  => ['resource_booking'],
+            'pastoral'          => ['pastoral', 'pastoral_log', 'pastoral_comment'],
+            'fixtures'          => ['sports_fixtures', 'sports_fixtures_import']
+        );
 
         $configMapper = ConfigMapper::getInstance();
 
-        foreach($ns as $i=>$k){
-            if(in_array($k->getSlug(), $checkEnabled)){
-                if(0 == $configMapper->get($k->getSlug().'_enabled')){
-                    unset($ns[$i]);
+        foreach ($ns as $i=>$k) {
+            foreach ($checkEnabled as $notifType=>$notifs) {
+                if(in_array($k->getSlug(), $notifs)){
+                    if(0 == $configMapper->get($notifType.'_enabled')){
+                        unset($ns[$i]);
+                    }
                 }
             }
         }
