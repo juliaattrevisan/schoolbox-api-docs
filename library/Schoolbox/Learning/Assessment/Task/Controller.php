@@ -325,13 +325,16 @@ class Controller extends Assessment\Controller
         return $data;
     }
 
+
     /**
      *
-     * @param int $completionStatus status to mark
+     * @param int         $completionStatus status to mark
      * @param IAssessable $assessment
-     * @param User $student
+     * @param User        $student
      * @return TaskResponse $taskResponse Updated task response
      * @throws \Aura\Web\Exception\InvalidStatusCode if value is invalid
+     * @throws \InvalidArgumentException If we attempt to give a task feedback a null response
+     * @throws \PDOException If unable to save task response to DB
      */
     private function saveTaskResponse(int $completionStatus, IAssessable $assessment, User $student): Response\Model
     {
