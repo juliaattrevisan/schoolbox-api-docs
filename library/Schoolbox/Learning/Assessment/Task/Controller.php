@@ -112,7 +112,9 @@ class Controller extends Assessment\Controller
      * @param User        $student
      * @throws ServiceNotFound
      * @throws \DomainException
-     * @throws \InvalidArgumentException
+     * @throws \Aura\Web\Exception\InvalidStatusCode if value is invalid
+     * @throws \InvalidArgumentException If we attempt to give a task feedback a null response
+     * @throws \PDOException If unable to save task response to DB
      */
     public function getSummary(IAssessable $assessment, User $student): void
     {
@@ -219,8 +221,9 @@ class Controller extends Assessment\Controller
      * @param User              $student
      * @return void
      * @throws \Aura\Router\Exception\RouteNotFound
-     * @throws \Aura\Web\Exception\InvalidStatusCode
-     * @throws \PDOException
+     * @throws \Aura\Web\Exception\InvalidStatusCode if value is invalid
+     * @throws \InvalidArgumentException If we attempt to give a task feedback a null response
+     * @throws \PDOException If unable to save task response to DB
      */
     public function postCreateResponse(IAssessable $assessment, User $student): void
     {
