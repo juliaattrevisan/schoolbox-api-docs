@@ -309,9 +309,7 @@ abstract class AbstractAssessment implements IAssessable
         $userId = $user->getId();
         foreach ($this->plans as $plan) {
             if ($plan->getParticipants()->offsetExists($userId)) {
-                if(!$plan->getParticipants()[$userId]->isExcluded()) {
-                    return $plan->getParticipants()[$userId];
-                }
+                return $plan->getParticipants()[$userId];
             }
         }
 
