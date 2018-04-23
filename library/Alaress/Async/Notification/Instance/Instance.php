@@ -135,13 +135,6 @@ class Instance implements JsonSerializable
     protected $context;
 
     /**
-     * Is this a retraction of a previously sent message?
-     *
-     * @var bool
-     */
-    protected $retraction = false;
-
-    /**
      * What kind of notification is this?
      *
      * * self::ACTION_SEND:           Send this message.
