@@ -59,4 +59,20 @@ interface QueueInterface
      */
     public function fetchIntoBundle(NotificationBundle $bundle, $dropCache = false);
 
+    /**
+     * Surgically remove this message from the queue, if it's there.
+     *
+     * @param Instance $instance
+     * @return bool
+     */
+    public function remove(Instance $instance): bool;
+
+    /**
+     * Surgically remove this message and any with the same base hash from the
+     * queue.
+     *
+     * @param Instance $instance
+     * @return int The number of msgs removed
+     */
+    public function removeAllLike(Instance $instance): int;
 }
