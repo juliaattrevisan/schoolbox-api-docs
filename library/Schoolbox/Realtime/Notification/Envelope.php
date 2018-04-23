@@ -127,16 +127,6 @@ class Envelope extends InstanceBundle {
 	}
 
     /**
-     * Retracts a message from ALL users who would've received it.
-     *
-     * @param Instance $instance
-     */
-    public function retract($instance)
-    {
-        $this->bind("retract", $instance, true);
-    }
-
-    /**
      * Broadcast a message to everyone (at least, all staff/students/parents).
      *
      * @param Instance $instance
