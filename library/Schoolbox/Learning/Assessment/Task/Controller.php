@@ -129,7 +129,9 @@ class Controller extends Assessment\Controller
 
             if ($previewFragment['type'] == 'redirect' && !$assessment->getDescription()) {
 
-                $this->saveTaskResponse(TaskCompletion::STATUS_SELF_ASSESSED_COMPLETE, $assessment, $student);
+                if ((int)$student->getId() === (int)$this->getUser()->getId()) {
+                    $this->saveTaskResponse(TaskCompletion::STATUS_SELF_ASSESSED_COMPLETE, $assessment, $student);
+                }
 
                 /* Just forward if we only have a URL
                  */
