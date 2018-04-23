@@ -341,8 +341,6 @@ class Controller extends Assessment\Controller
             ->setAssessable($assessment)
             ->setSubmittedOnBehalfOf($student)
             ->setSubmittedBy($this->getUser())
-            // TODO figure out whether to set create time as now, or set it as a created timestamp in mapper
-            ->setCreatedAt(\Alaress_Date_Format::now())
             ->setMarkedComplete($isMarkedComplete);
 
         if (TaskCompletion::STATUS_TEACHER_ASSESSED_COMPLETE == $completionStatus) {
