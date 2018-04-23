@@ -110,7 +110,7 @@ class ArticleNotifier extends AbstractModuleNotifier
             'topic' => new Param(''),
         ]);
 
-        $envelope->retract($bob->build());
+        $envelope->broadcastToEveryone($bob->buildRetraction());
         return $envelope;
     }
 

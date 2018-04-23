@@ -326,4 +326,14 @@ class Builder implements BuilderInterface
 		);
 	}
 
+
+    /**
+     * Builds a message retraction instance from the construction given.
+     *
+     * @return Instance
+     */
+    public function buildRetraction()
+    {
+        return $this->build()->setRetraction(true);
+    }
 }
