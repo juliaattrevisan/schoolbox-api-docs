@@ -136,6 +136,11 @@ class Handler implements IConsumer, EventListener
         // typically there's only 1, but the possibility of more
         foreach ($topics as $topic) {
             try {
+                // Is this a retract message: if so do something else
+                // The router probably don't need to know the topic,
+                // but the msg must be delivered somehow.
+                // Nobody is actually subscribed to it though.
+
                 $userIds = $this->resolver->getSubscribedUserIds($topic);
 
                 $userCount = count($userIds);
