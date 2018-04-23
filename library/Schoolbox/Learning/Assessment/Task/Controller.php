@@ -333,7 +333,7 @@ class Controller extends Assessment\Controller
      * @return TaskResponse $taskResponse Updated task response
      * @throws \Aura\Web\Exception\InvalidStatusCode if value is invalid
      */
-    private function saveTaskResponse(int $completionStatus, IAssessable $assessment, User $student)
+    private function saveTaskResponse(int $completionStatus, IAssessable $assessment, User $student): Response\Model
     {
         $isMarkedComplete = $completionStatus != TaskCompletion::STATUS_INCOMPLETE;
 
