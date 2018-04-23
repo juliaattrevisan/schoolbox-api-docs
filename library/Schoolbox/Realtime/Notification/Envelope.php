@@ -135,4 +135,16 @@ class Envelope extends InstanceBundle {
     {
         $this->bind("retract", $instance, true);
     }
+
+    /**
+     * Broadcast a message to everyone (at least, all staff/students/parents).
+     *
+     * @param Instance $instance
+     */
+    public function broadcastToEveryone($instance)
+    {
+        $this->broadcastToRoleType(Role::STAFF, $instance);
+        $this->broadcastToRoleType(Role::STUDENT, $instance);
+        $this->broadcastToRoleType(Role::PARENT, $instance);
+    }
 }
