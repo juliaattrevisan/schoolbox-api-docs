@@ -210,6 +210,8 @@ class External_Denbigh_User implements External_UserInterface
                             fa.EmergencyEmail1,
                             stu.boardingStatus,
                             0 AS countIndividualEducationPlans,
+                            '' AS StudentEnrolmentDate,
+                            '' AS StudentLeavingDate,
                             '' AS StudentIBFlag
                 FROM        People pe
                 LEFT JOIN   Students stu ON stu.peopleDenbighID = pe.denbighID
