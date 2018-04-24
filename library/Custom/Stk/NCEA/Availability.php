@@ -27,6 +27,7 @@ class Availability
         $this->externalDb = $externalDb;
     }
 
+
     /**
      * Whether the report is available at all
      *
@@ -52,5 +53,38 @@ class Availability
         $row = $statement->fetch();
 
         return \is_array($row);
+    }
+
+
+    /**
+     * A special database-controlled text field that displays in the report
+     * This used to be hardcoded
+     *
+     * @param int $yearLevel
+     * @return string
+     * @throws \Alaress\Database\Exception
+     */
+    public function findReportComment(int $yearLevel): string
+    {
+        $query = '
+            SELECT * 
+            FROM uluShowNCEAReport
+            WHERE YearLevel = :yearLevel
+            AND ShowOnOLE = 1
+        ';
+
+        $statement = $this->externalDb->prepareQuery($query);
+
+        $statement->execute([
+            'yearLevel' => $yearLevel
+        ]);
+
+        $row = $statement->fetch();
+
+        if (\is_array($row)) {
+            return $row['ResultComment'];
+        }
+
+        return '';
     }
 }

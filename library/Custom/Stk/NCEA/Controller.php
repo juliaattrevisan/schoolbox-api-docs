@@ -66,6 +66,10 @@ class Controller extends Base
             ];
         }
 
+        /* Figure out the dynamic comment
+         */
+        $aggregatedData['dynamicComment'] = (new Availability($externalDb))->findReportComment($year);
+
         /* Pass to twig to render nicely
          */
         $this->getResponse()->content->set($this->buildHtmlOutput('@nceaReport/report.twig', [
