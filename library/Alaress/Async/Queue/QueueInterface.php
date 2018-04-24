@@ -64,6 +64,7 @@ interface QueueInterface
      *
      * @param Instance $instance
      * @return bool
+     * @throws \BadMethodCallException if queue doesn't support removal
      */
     public function remove(Instance $instance): bool;
 
@@ -73,6 +74,7 @@ interface QueueInterface
      *
      * @param Instance $instance
      * @return int The number of msgs removed
+     * @throws \BadMethodCallException if queue doesn't support removal
      */
     public function removeAllLike(Instance $instance): int;
 }

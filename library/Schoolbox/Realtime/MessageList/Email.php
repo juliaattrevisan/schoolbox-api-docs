@@ -117,6 +117,7 @@ class Email implements QueueInterface
      *
      * @param Instance $instance
      * @return bool
+     * @throws \BadMethodCallException
      */
     public function remove(Instance $instance): bool
     {
@@ -129,6 +130,7 @@ class Email implements QueueInterface
      *
      * @param Instance $instance
      * @return bool
+     * @throws \BadMethodCallException
      */
     public function removeAllLike(Instance $instance): int
     {
