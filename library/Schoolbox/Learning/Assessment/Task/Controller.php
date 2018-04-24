@@ -102,19 +102,19 @@ class Controller extends Assessment\Controller
     }
 
 
-
     /**
      * Display appropriate landing page based on role
      *
      * @api   GET /learning/assessments/:assessmentId/:userId
      * @level 165
      * @param IAssessable|Task $assessment
-     * @param User        $student
+     * @param User             $student
      * @throws ServiceNotFound
      * @throws \DomainException
      * @throws \Aura\Web\Exception\InvalidStatusCode if value is invalid
      * @throws \InvalidArgumentException If we attempt to give a task feedback a null response
      * @throws \PDOException If unable to save task response to DB
+     * @throws \UnexpectedValueException If lack of hydration
      */
     public function getSummary(IAssessable $assessment, User $student): void
     {
@@ -185,12 +185,22 @@ class Controller extends Assessment\Controller
             $returnUrl = '/homepage/'.$assessment->getBaseContext()->getFolder()->getId();
         }
 
+        // How should the jewelry transition?
+        $classFolder          = $assessment->getBaseContext()->getFolder();
+        $isViewerAnInstructor = $this->getAccess()->isInstructor($this->getUser(), $classFolder);
+        $tickTransitions      = [
+            'incomplete'      => $isViewerAnInstructor ? 'teacherAssessed' : 'selfAssessed',
+            'selfAssessed'    => $isViewerAnInstructor ? 'teacherAssessed' : 'incomplete',
+            'teacherAssessed' => 'incomplete',
+        ];
+
         $twigData = [
             'breadcrumbs'  => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([ $assessment->getTitle(), '' ]),
             'assessment'   => $assessment,
             'student'      => $student,
             'preview'      => $previewFragment,
             'returnUrl'    => $returnUrl,
+            'transitions'  => $tickTransitions,
         ];
 
         $this->getResponse()->content->set(
