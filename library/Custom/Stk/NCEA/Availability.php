@@ -30,7 +30,7 @@ class Availability
 
     /**
      * @param int $yearLevel
-     * @return array|null
+     * @return array
      * @throws \Alaress\Database\Exception
      */
     private function findMeta(int $yearLevel): array
