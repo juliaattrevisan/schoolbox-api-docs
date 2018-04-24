@@ -66,7 +66,7 @@ class Availability
      */
     public function hasAccess(int $yearLevel): bool
     {
-        return \count($this->findMeta($yearLevel));
+        return (bool)\count($this->findMeta($yearLevel));
     }
 
     /**
