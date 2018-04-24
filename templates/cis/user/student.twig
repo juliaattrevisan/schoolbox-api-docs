@@ -1,5 +1,11 @@
 {% extends '@core/user/student.twig' %}
 
+{% block details_studentDates %}
+    {% if isStaff %}
+    <dt class="small-12 medium-3">Enrolment Date:</dt>
+    <dd class="small-12 medium-9"> {{ externalUser.StudentEnrolmentDate|date(dateFormats.shortDateOnlyFormat) }}</dd>
+    {% endif %}
+{% endblock %}
 
 {% block contacts %}
     <h2 class="subheader">Contact Information</h2>
