@@ -80,7 +80,6 @@ $(function() {
             }
         },
         submitHandler: function(mailForm) {
-
             if (!CKEDITOR.instances['body'].getData().length) {
                 $(this).confirmDialog({
                     text: 'Message body is empty. Are you sure you want to send this message?',
@@ -91,18 +90,18 @@ $(function() {
             } else {
                 submitForm(mailForm);
             }
+
+            /**
+             * Submit the form, disabling the submit button while it's working
+             * @param form
+             */
+            function submitForm(form) {
+                var $submitButton = $('#mailSubmit');
+                $submitButton.prop('disabled', true).val($submitButton.attr('data-working'));
+                form.submit();
+            }
         }
     });
-
-    /**
-     * Submit the form, disabling the submit button while it's working
-     * @param form
-     */
-    function submitForm(form) {
-        var $submitButton = $('#mailSubmit');
-        $submitButton.prop('disabled', true).val($submitButton.attr('data-working'));
-        form.submit();
-    }
 });
 </script>
 <!-- END custom_head -->
