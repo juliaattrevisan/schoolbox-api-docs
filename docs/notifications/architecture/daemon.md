@@ -211,13 +211,25 @@ It is responsible for:
     corresponding to the process identifier of the Worker assigned the Task
   * a rejection of the request if the maximum number of Workers is reached,
     and none of them are idle
+* listening for when a Worker's Task sends a message
 * monitoring the health of its Workers
   * keeping them alive and contactable after they have finished a Task
   * releasing a Worker (by sending a `SIGTERM` or `SIGKILL` signal) if it has
     been busy too long
   * releasing a Worker process if it has been idle for too long
 
-The pool's `accept` method is used to trigger a Task.
+The pool's `accept` method is used to trigger a Task. Any messages the Task
+sends are captured by the Pool's `dataReceived` method; this is able to then
+trigger the Response Handler's `handleResponse` with the response received from
+the Task.
+
+
+#### Stream Listener
+
+The Stream Listener is an implementation of
+`\Alaress\Async\Listener\Stream\StreamListener`.
+
+The Worker Pool uses this to listen on messages received from its Workers.
 
 
 #### Worker
@@ -234,6 +246,13 @@ outside of these classes need not know about this abstraction.
 A Task is run within a Worker.
 
 > TODO figure out how a call to `enqueue` actually becomes a Task callback
+
+The Task is able to receive data from its input pipe, and send data through its
+various output pipes (output, log, error) to its encapsulating Worker process.
+
+`\Alaress\WorkerCrew\Worker\IO\Listener\DataIOListener::dataReceived` receives
+messages through this pipe; once it receives a message the the Task has
+completed, the Response Handler's `handleResponse` method gets called.
 
 
 #### IPC Protocol
