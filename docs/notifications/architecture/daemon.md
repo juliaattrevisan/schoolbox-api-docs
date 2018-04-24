@@ -101,6 +101,9 @@ Dispatch a Task.
   instance of `\Alaress\Async\Broker\IConsumer`; its `onMessage` method will be
   called when it receives a message, and that is the point where the Task will
   be Dispatched.
+>
+> `onMessage` will call the Dispatcher's `enqueue` method, either directly or
+  via a Scheduler.
 
 Once the Task has finished, the Daemon either:
 * acknowledges the Message if the Task completed successfully
@@ -143,14 +146,35 @@ implementation that Daemons use uses Workers to perform Tasks, so that:
 * the Daemon is not brought down by a Task run which results in an
   unrecoverable error
 
-The `enqueue` method enqueues a Task to be Dispatched; this method takes:
-* an identifier
-* a command
-* data
+The `enqueue` method enqueues a Task to be Dispatched. This method's parameters
+are arbitrary in their specifics, but will always be:
+* an identifier: an object on which a command will run
+* a command: a string, which maps to a command to process
+* data: an array of values the command will require
 
-> TODO document what is actually enqueued
+> Note that `enqueue`'s parameters match the parameters for:
+>  * the Response Handler's `handleResponse` method
+>  * the Worker Pool's `accept` method
+>  * the Worker's `setTask` method
+>  * the Task's constructor
 
 The `dispatch` method dispatches the most recently added Task.
+The Event Loop triggers this method on a regular basis.
+
+Depending on the Tasks that the Worker Pool is able to perform (see
+`\Alaress\WorkerCrew\Pooling\DispatchStrategyInterface::getSupportedActions`),
+`dispatch` will either run the Task immediately or send it to the Worker Pool.
+
+
+#### Dispatch Strategy
+
+The Dispatch Strategy is an implementation of
+`\Alaress\WorkerCrew\Pooling\DispatchStrategyInterface`.
+
+It is responsible for managing various aspects of how the Dispatcher runs; at
+this stage, we're most interested in its `getSupportedActions` method, as it
+determines whether the Dispatcher runs a Task immediately, or sends it to the
+Worker Pool.
 
 
 #### Event Loop
@@ -192,6 +216,8 @@ It is responsible for:
   * releasing a Worker (by sending a `SIGTERM` or `SIGKILL` signal) if it has
     been busy too long
   * releasing a Worker process if it has been idle for too long
+
+The pool's `accept` method is used to trigger a Task.
 
 
 #### Worker
