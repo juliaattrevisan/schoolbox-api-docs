@@ -398,6 +398,8 @@ class External_Doublefirst_User implements External_UserInterface
                 UrgentNotes                                         AS AlertMessage,
                 ''                                                  AS StudentBoarder,
                 ''                                                  AS Comment,
+                ''                                                  AS StudentEnrolmentDate,
+                ''                                                  AS StudentLeavingDate,
                 ''                                                  AS StudentIBFlag,
                 pca.CustodyAlert                                    AS CustodyAlert,
                 pca.CustodyNotes                                    AS CustodyNotes,
