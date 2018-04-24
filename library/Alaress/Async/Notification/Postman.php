@@ -71,12 +71,12 @@ class Postman
             }
 
             if ($instance->isActionRetractSingle()) {
-                $this->log->info("Retracted a message from '$routeKey'", ['char' => '<']);
+                $this->log->info("Retracting a message from '$routeKey'", ['char' => '<']);
             } elseif ($instance->isActionRetractAll()) {
-                $this->log->info("Retracted all messages from '$routeKey'", ['char' => '<']);
+                $this->log->info("Retracting all messages from '$routeKey'", ['char' => '<']);
             } else {
                 // assume send
-                $this->log->info("Broadcast a message to '$routeKey'", ['char' => '<']);
+                $this->log->info("Broadcasting a message to '$routeKey'", ['char' => '<']);
             }
 			++$i;
 		}
