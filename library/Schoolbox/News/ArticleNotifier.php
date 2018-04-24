@@ -111,7 +111,7 @@ class ArticleNotifier extends AbstractModuleNotifier
         ]);
 
         // Only broadcast to superusers as there's no system channel
-        $envelope->broadcastToSuperusers($bob->buildRetractAll());
+        $envelope->retractAllLike($bob->build());
         return $envelope;
     }
 

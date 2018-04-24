@@ -137,4 +137,26 @@ class Envelope extends InstanceBundle {
         $this->broadcastToRoleType(Role::STUDENT, $instance);
         $this->broadcastToRoleType(Role::PARENT, $instance);
     }
+
+    /**
+     * Retracts this message.
+     *
+     * @param Instance $instance
+     */
+    public function retract(Instance $instance)
+    {
+        $instance->setAction(Instance::ACTION_RETRACT_SINGLE);
+        $this->broadcastToSuperusers($instance);
+    }
+
+    /**
+     * Retracts this message, and all like it.
+     *
+     * @param Instance $instance
+     */
+    public function retractAllLike(Instance $instance)
+    {
+        $instance->setAction(Instance::ACTION_RETRACT_ALL);
+        $this->broadcastToSuperusers($instance);
+    }
 }

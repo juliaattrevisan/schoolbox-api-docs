@@ -325,26 +325,4 @@ class Builder implements BuilderInterface
 			$this->time, $this->meta, $this->context
 		);
 	}
-
-
-    /**
-     * Builds a retract single message instance from the construction given.
-     *
-     * @return Instance
-     */
-    public function buildRetractSingle()
-    {
-        return $this->build()->setAction(Instance::ACTION_RETRACT_SINGLE);
-    }
-
-
-    /**
-     * Builds a retract all message instance from the construction given.
-     *
-     * @return Instance
-     */
-    public function buildRetractAll()
-    {
-        return $this->build()->setAction(Instance::ACTION_RETRACT_ALL);
-    }
 }
