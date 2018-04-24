@@ -8,6 +8,7 @@
 
 namespace Schoolbox\Realtime\MessageList;
 
+use Alaress\Async\Queue\Composite;
 use Alaress\Async\Queue\QueueInterface;
 use Alaress\Redis;
 use Predis\ClientInterface;
@@ -68,9 +69,14 @@ class ListFactory implements IListFactory, Serializable
     /**
      * @inheritdoc
      */
-    public function revoke(): QueueInterface
+    public function revoker(): QueueInterface
     {
-        //
+        // Revoker queues don't need user IDs
+        return new Composite(
+            new Digest($this->redis, $this->instanceId, 0),
+            new Listed($this->redis, $this->instanceId, 0),
+            new Unread($this->redis, $this->instanceId, 0)
+        );
     }
 
 

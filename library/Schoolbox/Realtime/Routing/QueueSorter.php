@@ -77,13 +77,13 @@ class QueueSorter implements FilterInterface
             // Handle retractions here
             if ($instance->isActionRetractSingle()) {
                 $this->log->info(sprintf('RETRACT %s:%s', $instance->getBaseHash(), $instance->getParamHash()));
-                $this->listFactory->revoker()->revoke($instance);
+                $this->listFactory->revoker()->remove($instance);
                 return true;
             }
 
             if ($instance->isActionRetractAll()) {
                 $this->log->info(sprintf('RETRACT-ALL %s:*', $instance->getBaseHash()));
-                $this->listFactory->revoker()->revokeAllLike($instance);
+                $this->listFactory->revoker()->removeAllLike($instance);
                 return true;
             }
 

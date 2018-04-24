@@ -9,7 +9,6 @@
 namespace Schoolbox\Realtime\MessageList;
 
 use Alaress\Async\Queue\QueueInterface;
-use Alaress\Async\Queue\Revoker\RevokerInterface;
 
 
 interface IListFactory
@@ -37,10 +36,10 @@ interface IListFactory
 
 
     /**
-     * Get a revoker for messages.
+     * Get an un-queue (revoker) for messages.
      *
-     * @return RevokerInterface
+     * @return QueueInterface
      */
-    public function revoker(): RevokerInterface;
+    public function revoker(): QueueInterface;
 
 }
