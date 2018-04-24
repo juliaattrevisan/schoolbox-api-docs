@@ -576,7 +576,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper
     {
         $collection = $this->getModelAsCollection($object);
         $notDeleted = $collection->filter(function (SubmissionBox $model) {
-            return !$model->getAssessmentModel()->isDeleted();
+            return !$model->isDeleted();
         });
         if (!\count($notDeleted)) {
             return false;
