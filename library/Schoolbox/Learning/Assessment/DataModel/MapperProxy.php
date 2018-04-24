@@ -1144,10 +1144,6 @@ class MapperProxy
     /**
      * Loads participants into a collection of assessables.
      *
-     * Note: This method returns *DOES NOT* return the same assessment collection you pass
-     * into it - it will return you the flattened collection. Eg if you pass in a collection that contains
-     * a single project, which contains two tasks, this method will return you a collection of 3 assessments.
-     *
      * @param Collection $collection
      * @param User       $user            If specified, only load this user's interactions
      * @return Collection|IAssessable[]
