@@ -371,6 +371,8 @@ class External_Synergetic_User implements External_UserInterface
                         AlertMessage,
                         vStudents.StudentBoarder,
                         vStudents.StudentsComment as Comment,   
+                        '' AS StudentEnrolmentDate,
+                        '' AS StudentLeavingDate,
                         vStudents.StudentIBFlag,
                         $learningPlanQuery
             FROM        dbo.vStudents vStudents
