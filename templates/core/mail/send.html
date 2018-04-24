@@ -78,6 +78,18 @@ $(function() {
             to: {
                 mailHasRecipient: true
             }
+        },
+        submitHandler: function(mailForm) {
+            if (!CKEDITOR.instances['body'].getData().length) {
+                $(this).confirmDialog({
+                    text: 'Message body is empty. Are you sure you want to send this message?',
+                    confirmEvent: function() {
+                        mailForm.submit();
+                    }
+                });
+            } else {
+                mailForm.submit();
+            }
         }
     });
 });
@@ -143,7 +155,7 @@ $(function() {
                     </div>
                 </fieldset>
             </section>
-            <input type="submit" name="submit" value="Send" />
+            <input type="submit" value="Send" />
         </form>
     </div>
 </div>
