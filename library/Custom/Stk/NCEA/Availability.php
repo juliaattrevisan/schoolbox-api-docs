@@ -29,42 +29,11 @@ class Availability
 
 
     /**
-     * Whether the report is available at all
-     *
      * @param int $yearLevel
-     * @return bool
+     * @return array|null
      * @throws \Alaress\Database\Exception
      */
-    public function hasAccess(int $yearLevel): bool
-    {
-        $query = '
-            SELECT * 
-            FROM uluShowNCEAReport
-            WHERE YearLevel = :yearLevel
-            AND ShowOnOLE = 1
-        ';
-
-        $statement = $this->externalDb->prepareQuery($query);
-
-        $statement->execute([
-            'yearLevel' => $yearLevel
-        ]);
-
-        $row = $statement->fetch();
-
-        return \is_array($row);
-    }
-
-
-    /**
-     * A special database-controlled text field that displays in the report
-     * This used to be hardcoded
-     *
-     * @param int $yearLevel
-     * @return string
-     * @throws \Alaress\Database\Exception
-     */
-    public function findReportComment(int $yearLevel): string
+    private function findMeta(int $yearLevel): array
     {
         $query = '
             SELECT * 
@@ -82,6 +51,37 @@ class Availability
         $row = $statement->fetch();
 
         if (\is_array($row)) {
+            return $row;
+        }
+
+        return [];
+    }
+
+    /**
+     * Whether the report is available at all
+     *
+     * @param int $yearLevel
+     * @return bool
+     * @throws \Alaress\Database\Exception
+     */
+    public function hasAccess(int $yearLevel): bool
+    {
+        return \count($this->findMeta($yearLevel));
+    }
+
+    /**
+     * A special database-controlled text field that displays in the report
+     * This used to be hardcoded
+     *
+     * @param int $yearLevel
+     * @return string
+     * @throws \Alaress\Database\Exception
+     */
+    public function findReportComment(int $yearLevel): string
+    {
+        $row = $this->findMeta($yearLevel);
+
+        if (\count($row)) {
             return $row['ResultComment'];
         }
 
