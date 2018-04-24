@@ -28,6 +28,7 @@ use \Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\Assessment\Task\Response\Model as TaskResponse;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Assessment\Term;
+use Schoolbox\Learning\Assessment\Task\Exception\ConcurrentModificationException;
 
 
 class Controller extends Assessment\Controller
@@ -133,9 +134,11 @@ class Controller extends Assessment\Controller
                 if ((int)$student->getId() === (int)$this->getUser()->getId()) {
                     try {
                         $this->saveTaskResponse(TaskCompletion::STATUS_SELF_ASSESSED_COMPLETE, $assessment, $student);
+                    } catch (ConcurrentModificationException $e) {
+                        // noop. This is expected to happen from time to time. No need to log.
                     } catch (\UnexpectedValueException $e) {
-                        // noop. This may or may not be an issue.
-                        // For now, assume it's trivial like multiple tabs open at once, so no need to log
+                        // Something else when wrong. Probably a bug. Need to know about this.
+                        $this->captureException($e);
                     }
                 }
 
@@ -273,7 +276,13 @@ class Controller extends Assessment\Controller
                     )
                 );
             }
-        } catch (\UnexpectedValueException $e) {
+        } catch (ConcurrentModificationException|\UnexpectedValueException $e) {
+
+            // We don't need to log concurrent exceptions, we expect them to happen from time to time.
+            if (!$e instanceof ConcurrentModificationException) {
+                $this->captureException($e);
+            }
+
             $this->getResponse()->status->setCode(400);
 
             if ($this->getRequest()->isXhr()) {
@@ -299,7 +308,8 @@ class Controller extends Assessment\Controller
      * 6. Learners users may not create a new response if an instructor has marked them as complete
      *
      * @param TaskResponse $response
-     * @throws \UnexpectedValueException if task response is not saveable
+     * @throws ConcurrentModificationException If participant already has the task completion status - and don't want to log.
+     * @throws \UnexpectedValueException if task response is not saveable - and we want to log.
      * @todo This should all be wrapped up in an auth rule
      */
     protected function assertSaveability(TaskResponse $response)
@@ -331,7 +341,7 @@ class Controller extends Assessment\Controller
         if (empty($response->getId())) {
             $mostRecentResponse = $participant ? $participant->findMostRecentResponse() : null;
             if ($mostRecentResponse instanceof TaskResponse && $mostRecentResponse->getCompletionStatus() === $response->getCompletionStatus()) {
-                throw new \UnexpectedValueException("{$submittedFor->getFullName()} already has status ({$mostRecentResponse->getCompletionStatus()}) for this task");
+                throw new ConcurrentModificationException("{$submittedFor->getFullName()} already has status ({$mostRecentResponse->getCompletionStatus()}) for this task");
             }
         }
 
@@ -374,6 +384,7 @@ class Controller extends Assessment\Controller
      * @return TaskResponse $taskResponse Created task response
      * @throws \InvalidArgumentException If we attempt to give a task feedback a null response
      * @throws \PDOException If unable to save task response to DB
+     * @throws ConcurrentModificationException If participant already has the task completion status.
      * @throws \UnexpectedValueException If proposed Task Response is invalid for some reasons
      */
     private function saveTaskResponse(int $completionStatus, IAssessable $assessment, User $student): Response\Model
