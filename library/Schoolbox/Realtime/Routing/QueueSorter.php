@@ -77,18 +77,20 @@ class QueueSorter implements FilterInterface
             // Handle retractions here
             if ($instance->isActionRetractSingle()) {
                 $this->log->info(sprintf('RETRACT %s:%s -> user %d', $instance->getBaseHash(), $instance->getParamHash(), $userId));
-                $this->listFactory->digest($userId)->remove($instance);
-                $this->listFactory->listed($userId)->remove($instance);
-                $this->listFactory->unread($userId)->remove($instance);
+//                $this->listFactory->digest($userId)->remove($instance);
+//                $this->listFactory->listed($userId)->remove($instance);
+//                $this->listFactory->unread($userId)->remove($instance);
+                $this->listFactory->revoker()->revoke($instance);
                 return true;
             }
 
             if ($instance->isActionRetractAll()) {
                 $this->log->info(sprintf('RETRACT-ALL %s:*', $instance->getBaseHash()));
-                // TODO remove need to use list factory to fetch here
-                $this->listFactory->digest($userId)->removeAllLike($instance);
-                $this->listFactory->listed($userId)->removeAllLike($instance);
-                $this->listFactory->unread($userId)->removeAllLike($instance);
+//                // TODO remove need to use list factory to fetch here
+//                $this->listFactory->digest($userId)->removeAllLike($instance);
+//                $this->listFactory->listed($userId)->removeAllLike($instance);
+//                $this->listFactory->unread($userId)->removeAllLike($instance);
+                $this->listFactory->revoker()->revokeAllLike($instance);
                 return true;
             }
 
