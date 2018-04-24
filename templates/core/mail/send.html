@@ -65,30 +65,6 @@ $(function() {
         });
     });
 
-    // had to move the sendButton out of the mailForm to make this work.
-    $('#sendButton').click(function() {
-        var eBody = $.trim($("#mailForm iframe").contents().find("body").text());
-        var hasTo = $("#to").val() || $("#cc").val() || $("#bcc").val();
-        // If recipients or subject is not set, let this fail by validator without showing the confirm dialog.
-        if (hasTo && $('#subject').val() && eBody.length < 1) {
-            $(this).confirmDialog({
-                header: 'Please Confirm',
-                text: 'Message body is empty. Are you sure to send this message?',
-                confirmEvent: function() {
-                    $('#sendButton').prop('disabled', true);
-                    $('#sendButton').val($('#sendButton').attr('data-working'));
-                    $('#mailForm').submit();
-                },
-                cancelEvent: function() {
-                }
-            });
-        } else {
-            $(this).prop('disabled', true);
-            $(this).val($(this).attr('data-working'));
-            $('#mailForm').submit();
-        }
-    });
-
     $.validator.addMethod('mailHasRecipient', function(value, element) {
         if ($("#to").val() || $("#cc").val() || $("#bcc").val()) {
             return true;
@@ -103,9 +79,27 @@ $(function() {
                 mailHasRecipient: true
             }
         },
-        invalidHandler: function(event, validator) {
-            $('#sendButton').prop('disabled', false);
-            $('#sendButton').val('Send');
+        submitHandler: function(mailForm) {
+            if (!CKEDITOR.instances['body'].getData().length) {
+                $(this).confirmDialog({
+                    text: 'Message body is empty. Are you sure you want to send this message?',
+                    confirmEvent: function() {
+                        submitForm(mailForm);
+                    }
+                });
+            } else {
+                submitForm(mailForm);
+            }
+
+            /**
+             * Submit the form, disabling the submit button while it's working
+             * @param form
+             */
+            function submitForm(form) {
+                var $submitButton = $('#mailSubmit');
+                $submitButton.prop('disabled', true).val($submitButton.attr('data-working'));
+                form.submit();
+            }
         }
     });
 });
@@ -159,7 +153,7 @@ $(function() {
                     <div class="small-12 columns">
                         <label>
                             Subject
-                            <input type="text" name="subject" id="subject" value="{SUBJECT}" required />
+                            <input type="text" name="subject" value="{SUBJECT}" required />
                         </label>
                         <label>
                             <textarea name="message" id="body">{BODY}</textarea>
@@ -171,8 +165,8 @@ $(function() {
                     </div>
                 </fieldset>
             </section>
+            <input type="submit" id="mailSubmit" value="Send" data-working="Sending..." />
         </form>
-        <input type="submit" id="sendButton" name="submit" value="Send" data-working="Sending..."/>
     </div>
 </div>
 
