@@ -34,4 +34,12 @@ interface IListFactory
      */
     public function digest($userId);
 
+
+    /**
+     * Get a "queue" whose sole function is the revocation of messages.
+     *
+     * @return QueueInterface
+     */
+    public function revoke(): QueueInterface;
+
 }

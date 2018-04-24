@@ -66,6 +66,15 @@ class ListFactory implements IListFactory, Serializable
 
 
     /**
+     * @inheritdoc
+     */
+    public function revoke(): QueueInterface
+    {
+        //
+    }
+
+
+    /**
      * String representation of object, or null
      *
      * @return string
