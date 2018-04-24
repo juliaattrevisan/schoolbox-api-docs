@@ -480,6 +480,17 @@ class Instance implements JsonSerializable
 
 
     /**
+     * Is this a retract message (either single or all) notification?
+     *
+     * @return bool
+     */
+    public function isActionRetract(): bool
+    {
+        return $this->isActionRetractSingle() || $this->isActionRetractAll();
+    }
+
+
+    /**
      * Is this a retract single message notification?
      *
      * @return bool
