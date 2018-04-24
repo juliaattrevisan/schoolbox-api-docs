@@ -42,7 +42,7 @@ class Sync extends BaseSync
      *
      * @var string
      */
-    protected $adhocJoin = "LEFT JOIN AdhocData ad ON ad.AdhocID = 53 AND c.ID = AdhocData.SourceID";
+    protected $adhocJoin = "LEFT JOIN AdhocData ad ON ad.AdhocID = 53 AND c.ID = ad.SourceID";
 
     /**
      * {@inheritdoc}

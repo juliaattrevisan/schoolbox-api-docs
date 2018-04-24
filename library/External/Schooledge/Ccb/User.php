@@ -40,7 +40,7 @@ class External_Schooledge_Ccb_User extends External_Schooledge_User
      *
      * @var string
      */
-    protected $adhocJoin = "LEFT JOIN AdhocData ad ON ad.AdhocID = 53 AND c.ID = AdhocData.SourceID";
+    protected $adhocJoin = "LEFT JOIN AdhocData ad ON ad.AdhocID = 53 AND c.ID = ad.SourceID";
 
     /**
      * @inheritDoc
