@@ -176,6 +176,8 @@ class External_Isams_User implements External_UserInterface
                         ''                      AS StudentStudiesCode,
                         ''                      AS StudentBoarder,
                         ''                      AS StudentIBFlag,
+                        EnrolmentDate           AS StudentEnrolmentDate,
+                        LeavingDate             AS StudentLeavingDate,
                         0 AS countIndividualEducationPlans
             FROM        V_Student
             WHERE       StudentID = :external_user_id
