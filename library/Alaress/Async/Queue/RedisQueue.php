@@ -59,12 +59,12 @@ abstract class RedisQueue implements QueueInterface
 
 
     /**
-     * Surgically remove this message from the queue, if it's there.
+     * Surgically retract this message from the queue, if it's there.
      *
      * @param Instance $instance
      * @return bool
      */
-    public function remove(Instance $instance): bool
+    public function retract(Instance $instance): bool
     {
         $id = $this->getRedisMsgKey($instance);
         return $this->redis->del([$id]) > 0
@@ -73,13 +73,13 @@ abstract class RedisQueue implements QueueInterface
 
 
     /**
-     * Surgically remove this message and any with the same base hash from the
+     * Surgically retract this message and any with the same base hash from the
      * queue.
      *
      * @param Instance $instance
      * @return int The number of msgs removed
      */
-    public function removeAllLike(Instance $instance): int
+    public function retractAllLike(Instance $instance): int
     {
         $ids = [];
         foreach (new Keyspace($this->redis, $this->getRedisMsgBaseKey($instance)) as $id) {

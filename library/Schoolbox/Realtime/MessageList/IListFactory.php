@@ -36,10 +36,10 @@ interface IListFactory
 
 
     /**
-     * Get an un-queue (revoker) for messages.
+     * Get an un-queue (retractor) for messages.
      *
      * @return QueueInterface
      */
-    public function revoker(): QueueInterface;
+    public function retractor(): QueueInterface;
 
 }

@@ -113,27 +113,27 @@ class Email implements QueueInterface
 
 
     /**
-     * It's too late to rescind a message once pushed to email.
+     * It's too late to retract a message once pushed to email.
      *
      * @param Instance $instance
      * @return bool
      * @throws \BadMethodCallException
      */
-    public function remove(Instance $instance): bool
+    public function retract(Instance $instance): bool
     {
-        throw new \BadMethodCallException('Email messages may not be rescinded');
+        throw new \BadMethodCallException('Email messages may not be retracted');
     }
 
 
     /**
-     * It's too late to rescind a message once pushed to email.
+     * It's too late to retract a message once pushed to email.
      *
      * @param Instance $instance
      * @return bool
      * @throws \BadMethodCallException
      */
-    public function removeAllLike(Instance $instance): int
+    public function retractAllLike(Instance $instance): int
     {
-        throw new \BadMethodCallException('Email messages may not be rescinded');
+        throw new \BadMethodCallException('Email messages may not be retracted');
     }
 }

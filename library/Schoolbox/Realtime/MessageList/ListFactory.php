@@ -69,7 +69,7 @@ class ListFactory implements IListFactory, Serializable
     /**
      * @inheritdoc
      */
-    public function revoker(): QueueInterface
+    public function retractor(): QueueInterface
     {
         // Revoker queues don't need user IDs
         return new Composite(
