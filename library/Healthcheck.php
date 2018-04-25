@@ -559,6 +559,10 @@ class Healthcheck
         $tables = array_merge($tables, $this->customUPSTest());
         $this->selectTest($tables);
 
+        // Attendance Update Tests
+        $this->updateTest(['wkAttendances']);
+        $this->insertTest(['wkAttendances']);
+
 
         $externalPing = new \External_Ping();
         if ($externalPing->getVersion() == "68") {
