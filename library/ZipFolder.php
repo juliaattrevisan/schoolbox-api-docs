@@ -96,11 +96,16 @@ class ZipFolder
 
         foreach ($fileList as $file) {
             if ($file->getStorage()->exists()) {
-                $this->size = $this->size + $file->getSize();
-                $fileName = $this->getTargetPath($currentDir, $file->getBasename());
-                $fp = fopen($fileName, 'wb');
-                stream_copy_to_stream($file->getStorage()->readStream(), $fp);
-                fclose($fp);
+                $nextSize = $this->size + $file->getSize();
+                if ($this->maxSize > $nextSize) {
+                    $this->size = $this->size + $file->getSize();
+                    $fileName = $this->getTargetPath($currentDir, $file->getBasename());
+                    $fp = fopen($fileName, 'wb');
+                    stream_copy_to_stream($file->getStorage()->readStream(), $fp);
+                    fclose($fp);
+                } else {
+                   error(Schoolbox\Error\Mapper::ERROR_FILE_SIZE, 'The maximum download size is '.($this->maxSize/1024).' megabytes.'  );
+                }
             }
         }
 
