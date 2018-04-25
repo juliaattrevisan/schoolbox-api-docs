@@ -563,6 +563,10 @@ class Healthcheck
         $this->updateTest(['wkAttendances']);
         $this->insertTest(['wkAttendances']);
 
+        //Markbook Tests
+        $this->updateTest(['StaffAssessmentMarkBook','StudentAssessmentMarkBook']);
+        $this->insertTest(['StaffAssessmentMarkBook','StudentAssessmentMarkBook']);
+
 
         $externalPing = new \External_Ping();
         if ($externalPing->getVersion() == "68") {
