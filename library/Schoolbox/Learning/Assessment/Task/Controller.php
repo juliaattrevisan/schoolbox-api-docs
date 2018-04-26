@@ -30,6 +30,7 @@ use Schoolbox\Learning\Assessment\Task\Response\Model as TaskResponse;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Learning\Assessment\Task\Exception\ConcurrentModificationException;
+use Schoolbox\Learning\Assessment\Task\Exception\InvalidTaskResponseException;
 
 
 class Controller extends Assessment\Controller
@@ -137,7 +138,7 @@ class Controller extends Assessment\Controller
                         $this->saveTaskResponse(TaskCompletion::STATUS_SELF_ASSESSED_COMPLETE, $assessment, $student);
                     } catch (ConcurrentModificationException $e) {
                         // noop. This is expected to happen from time to time. No need to log.
-                    } catch (\UnexpectedValueException $e) {
+                    } catch (InvalidTaskResponseException $e) {
                         // Something else when wrong. Probably a bug. Need to know about this.
                         $this->captureException($e);
                     }
@@ -248,6 +249,7 @@ class Controller extends Assessment\Controller
      * @throws \InvalidArgumentException If we attempt to give a task feedback a null response
      * @throws \PDOException If unable to save task response to DB
      * @throws \Schoolbox\Application\Exception\Exception If synchronous request and something went wrong
+     * @throws InsufficientHydration If unable to perform some logic because an object lacks hydration
      */
     public function postCreateResponse(IAssessable $assessment, User $student): void
     {
@@ -277,7 +279,7 @@ class Controller extends Assessment\Controller
                     )
                 );
             }
-        } catch (ConcurrentModificationException|\UnexpectedValueException $e) {
+        } catch (ConcurrentModificationException|InvalidTaskResponseException $e) {
 
             // We don't need to log concurrent exceptions, we expect them to happen from time to time.
             if (!$e instanceof ConcurrentModificationException) {
@@ -310,7 +312,7 @@ class Controller extends Assessment\Controller
      *
      * @param TaskResponse $response
      * @throws ConcurrentModificationException If participant already has the task completion status - and don't want to log.
-     * @throws \UnexpectedValueException if task response is not saveable - and we want to log.
+     * @throws InvalidTaskResponseException If task response is not saveable - and we want to log.
      * @throws InsufficientHydration If task object has not been sufficiently hydrated
      * @todo This should all be wrapped up in an auth rule
      */
@@ -322,7 +324,7 @@ class Controller extends Assessment\Controller
 
         // 1. Cannot interact if explicitly excluded
         if($participant && $participant->isExcluded()){
-            throw new \UnexpectedValueException("Cannot create a response for an excluded participation.");
+            throw new InvalidTaskResponseException("Cannot create a response for an excluded participation.");
         }
 
         // Is the current session user an instructor
@@ -331,12 +333,12 @@ class Controller extends Assessment\Controller
 
         // 2. Is session user creating for another user, and is not an instructor ?
         if(!$isInstructor && (int)$submittedFor->getId() !== $this->getUser()->getId()){
-            throw new \UnexpectedValueException("Only instructors can mark other users");
+            throw new InvalidTaskResponseException("Only instructors can mark other users");
         }
 
         // 3. Not yet a participant? And not an instructor or not marking themself?
         if(!$participant && (!$isInstructor || (int)$submittedFor->getId() !== (int)$this->getUser()->getId())){
-            throw new \UnexpectedValueException("Only an non-excluded instructor marking themself is permitted to preview a task");
+            throw new InvalidTaskResponseException("Only an non-excluded instructor marking themself is permitted to preview a task");
         }
 
         // 4. Does the most recent response for the student already have the proposed status?
@@ -352,12 +354,12 @@ class Controller extends Assessment\Controller
 
             // 5. Is the task not self-assessable ?
             if (!$response->getAssessable()->isSelfAssessable()) {
-                throw new \UnexpectedValueException("Learners may not self-assess a task if the task is not self-assessable");
+                throw new InvalidTaskResponseException("Learners may not self-assess a task if the task is not self-assessable");
             }
 
             // 6. Is the task already marked by the teacher as complete ?
             if ($mostRecentResponse && !$mostRecentResponse->isSelfAssessed() && $mostRecentResponse->getMarkedComplete()) {
-                throw new \UnexpectedValueException("Learners may not change a task completion status if the instructor has marked it complete.");
+                throw new InvalidTaskResponseException("Learners may not change a task completion status if the instructor has marked it complete.");
             }
         }
     }
@@ -387,7 +389,7 @@ class Controller extends Assessment\Controller
      * @throws \InvalidArgumentException If we attempt to give a task feedback a null response
      * @throws \PDOException If unable to save task response to DB
      * @throws ConcurrentModificationException If participant already has the task completion status.
-     * @throws \UnexpectedValueException If proposed Task Response is invalid for some reasons
+     * @throws InvalidTaskResponseException If proposed Task Response is invalid for some reasons
      * @throws InsufficientHydration If task object is insufficiently hydrated
      */
     private function saveTaskResponse(int $completionStatus, IAssessable $assessment, User $student): Response\Model
