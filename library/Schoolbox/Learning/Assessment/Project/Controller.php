@@ -97,8 +97,6 @@ class Controller extends Assessment\Controller
         // Calculate summary totals for display purposes
         $participants = $assessment->getAllParticipants();
 
-        $assessment->getAssessables()->sortBy('sequence', 'asc');
-
         $assessmentStats = new GenericCollection(Assessment\Statistics::class);
         $assessmentStats[$assessment->getId()] = new Assessment\Statistics($assessment);
         foreach($assessment->getAssessables() as $subAssessable){
@@ -138,9 +136,6 @@ class Controller extends Assessment\Controller
      */
     public function getSummary(IAssessable $assessment, User $student): void
     {
-
-        $assessment->getAssessables()->sortBy('sequence', 'asc');
-
         $subActivities = $assessment->getAssessables();
 
         // filter out any sub-activities that have not yet been published
