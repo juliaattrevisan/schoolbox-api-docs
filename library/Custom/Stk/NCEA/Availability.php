@@ -27,14 +27,13 @@ class Availability
         $this->externalDb = $externalDb;
     }
 
+
     /**
-     * Whether the report is available at all
-     *
      * @param int $yearLevel
-     * @return bool
+     * @return array
      * @throws \Alaress\Database\Exception
      */
-    public function hasAccess(int $yearLevel): bool
+    private function findMeta(int $yearLevel): array
     {
         $query = '
             SELECT * 
@@ -51,6 +50,41 @@ class Availability
 
         $row = $statement->fetch();
 
-        return \is_array($row);
+        if (\is_array($row)) {
+            return $row;
+        }
+
+        return [];
+    }
+
+    /**
+     * Whether the report is available at all
+     *
+     * @param int $yearLevel
+     * @return bool
+     * @throws \Alaress\Database\Exception
+     */
+    public function hasAccess(int $yearLevel): bool
+    {
+        return (bool)\count($this->findMeta($yearLevel));
+    }
+
+    /**
+     * A special database-controlled text field that displays in the report
+     * This used to be hardcoded
+     *
+     * @param int $yearLevel
+     * @return string
+     * @throws \Alaress\Database\Exception
+     */
+    public function findReportComment(int $yearLevel): string
+    {
+        $row = $this->findMeta($yearLevel);
+
+        if (\count($row)) {
+            return $row['ResultComment'];
+        }
+
+        return '';
     }
 }
