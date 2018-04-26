@@ -158,12 +158,23 @@ class Controller extends Assessment\Controller
         // hack the project object for good measure
         $assessment->setAssessables($subActivities);
 
+        // How should the jewelry transition?
+        $classFolder          = $assessment->getBaseContext()->getFolder();
+        $isViewerAnInstructor = $this->getAccess()->isInstructor($this->getUser(), $classFolder);
+        $tickTransitions      = [
+            'incomplete'      => $isViewerAnInstructor ? 'teacherAssessed' : 'selfAssessed',
+            'selfAssessed'    => $isViewerAnInstructor ? 'teacherAssessed' : 'incomplete',
+            'teacherAssessed' => 'incomplete',
+        ];
+
+
         // Ideally make this an instance var instead of instantiating all the time
         // Except you can't, $this->getRouter() returns null in __construct()?
         $twigData = [
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle(), '' ]),
             'student'     => $student,
             'assessment'  => $assessment,
+            'transitions'  => $tickTransitions,
         ];
 
         $this->getResponse()->content->set(
