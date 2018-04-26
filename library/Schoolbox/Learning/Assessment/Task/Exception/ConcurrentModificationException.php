@@ -15,7 +15,7 @@ namespace Schoolbox\Learning\Assessment\Task\Exception;
  *
  * No need to log this to sentry.
  */
-class ConcurrentModificationException extends \Exception
+class ConcurrentModificationException extends \LogicException
 {
 
 }
