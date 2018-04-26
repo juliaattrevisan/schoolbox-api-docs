@@ -13,8 +13,12 @@ if (($permission = $groupHandler->getPermission(0)) < WRITE_ACCESS) {
 }
 
 if ($_POST['heading']) {
-    $publishedDate = Alaress_Date_Format::newLocal($_POST['item_datetime_published']);
-    $expiryDate = Alaress_Date_Format::newLocal($_POST['item_datetime_expires']);
+    try {
+        $publishedDate = Alaress_Date_Format::newLocal($_POST['item_datetime_published']);
+        $expiryDate = Alaress_Date_Format::newLocal($_POST['item_datetime_expires']);
+    } catch (InvalidArgumentException $e) {
+        error(ErrorMapper::ERROR_PROCESSING, $e->getMessage());
+    }
 
     // Error out if there's campi that this user can't post to in $_POST[campus]
     $campusList = array();

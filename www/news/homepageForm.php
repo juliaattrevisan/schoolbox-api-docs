@@ -40,8 +40,12 @@ if ($permission == WRITE_ACCESS
 // setup various data
 $cat = new \Schoolbox\Resource\Folder\Model();
 $cat->setId($_POST['code']);
-$publishedDate = Alaress_Date_Format::newLocal($_POST['datetime_published']);
-$expiryDate = Alaress_Date_Format::newLocal($_POST['datetime_expires']);
+try {
+    $publishedDate = Alaress_Date_Format::newLocal($_POST['datetime_published']);
+    $expiryDate = Alaress_Date_Format::newLocal($_POST['datetime_expires']);
+} catch (InvalidArgumentException $e) {
+    error(ErrorMapper::ERROR_PROCESSING, $e->getMessage());
+}
 
 $news
 	->setHeading($_POST['heading'])
