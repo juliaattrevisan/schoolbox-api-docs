@@ -572,12 +572,13 @@ class Healthcheck
         // Attendance Update Tests
         $this->updateTest(['wkAttendances']);
 
-        //Markbook Tests
-        $this->updateTest(['StaffAssessmentMarkBook','StudentAssessmentMarkBook']);
-        $this->insertTest(['StaffAssessmentMarkBook','StudentAssessmentMarkBook']);
-        $this->deleteTest(['StaffAssessmentMarkBook','StudentAssessmentMarkBook']);
-
-
+        // Markbook Tests
+        if ($this->configMapper->get('external_markbook')) {
+            $markbookTables = ['StaffAssessmentMarkBook', 'StudentAssessmentMarkBook'];
+            $this->updateTest($markbookTables);
+            $this->insertTest($markbookTables);
+            $this->deleteTest($markbookTables);
+        }
 
         $externalPing = new \External_Ping();
         if ($externalPing->getVersion() == "68") {
