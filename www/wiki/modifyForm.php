@@ -13,26 +13,31 @@ $errorMapper    = Schoolbox\Error\Mapper::getInstance();
 
 $now = new Alaress_Date_Format(time(), 'U');
 
+$potentialSlug = '';
+$heading = trim($_POST['heading']);
+$url  = new Url($heading);
+
+if (is_ascii($_POST['heading'])) {
+    $potentialSlug = $url->getSlug();
+}
+
+//Does a wiki with this name already exist on this homepage?
+$wikis = $wikiHandler->getByCategory($_POST['categoryID']);
+
+foreach ($wikis as $wiki) {
+    if ($wiki['slug'] == $potentialSlug) {
+        //You have been naughty and bypassed javascript validation
+        error($errorMapper::ERROR_WIKI_NAME_IN_USE);
+    }
+}
+
 // posting a revision - wiki may or may not exist
 if (isset($_POST['heading']) && is_numeric($_POST['categoryID'])) {
-    $heading = trim($_POST['heading']);
 
     if (strlen($heading) === 0) {
         error(2);
         exit;
     }
-
-    //Does a wiki with this name already exist on this homepage?
-    $wikis = $wikiHandler->getByCategory($_POST['categoryID']);
-
-    foreach ($wikis as $wiki) {
-        if ($wiki['slug'] == $heading) {
-            //You have been naughty and bypassed javascript validation
-            error($errorMapper::ERROR_WIKI_NAME_IN_USE);
-        }
-    }
-
-
     // generate the revision object regardless of whether or not the wiki exists
     $revision = $revisionMapper->createModel()
         ->setHeading($heading)
@@ -60,7 +65,6 @@ if (isset($_POST['heading']) && is_numeric($_POST['categoryID'])) {
         }
     } else {
         // request to create new wiki
-        $url  = new Url($heading);
         $wiki = $wikiMapper->createModel()
             ->setCategory($folderMapper->createModel()->setId($_POST['categoryID']))
             ->setLatestRevision(null)
@@ -70,6 +74,7 @@ if (isset($_POST['heading']) && is_numeric($_POST['categoryID'])) {
 
         /* If the heading contains unicode it can't be used as a slug, so we
         use the wiki ID instead */
+        $url  = new Url($heading);
         if (is_ascii($_POST['heading'])) {
             $wiki->setSlug($url->getSlug());
         } else {
