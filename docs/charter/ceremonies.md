@@ -1,6 +1,6 @@
 # Ceremonies
 
-Ceremonies are the regular meetings we have as a product team. Along with the four formal events prescribed by Scrum, we also have workshops that usually take the form of one of the defined UX sessions.
+Ceremonies are the regular meetings we have. Along with the four formal events prescribed by Scrum, we also have workshops that usually take the form of one of the defined UX sessions.
 
 > Block quotes taken from the [Scrum Guide](http://www.scrumguides.org/scrum-guide.html#events).
 
@@ -8,14 +8,14 @@ Ceremonies are the regular meetings we have as a product team. Along with the fo
 * **When:** First day of the next Sprint at 10:30am
 * **Timebox:** 1 hour
 
-> The Sprint Retrospective is an opportunity for the Scrum Team to inspect itself and create a plan for improvements to be enacted during the next Sprint.
-
 > The purpose of the Sprint Retrospective is to:
 > * Inspect how the last Sprint went with regards to people, relationships, process, and tools;
 > * Identify and order the major items that went well and potential improvements; and,
 > * Create a plan for implementing improvements to the way the Scrum Team does its work.
 
-> By the end of the Sprint Retrospective, the Scrum Team should have identified improvements that it will implement in the next Sprint.
+Prior to the Sprint Retrospective - any Product Team members may contact the Scrum Master to request items to be discussed in the Retrospective. The Scrum Master will prepare a general overview of how the last Sprint went, as well as collate all the items to be discussed in the meeting.
+
+All discussions that identify areas where the team should improve should involve a quick brainstorm by the team for potential solutions, and a plan should be agreed on for the team to follow up on during the next Sprint.
 
 ## Sprint Planning
 * **When:** First day of the Sprint at 11:30am
@@ -24,6 +24,8 @@ Ceremonies are the regular meetings we have as a product team. Along with the fo
 > Sprint Planning answers the following:
 > * What can be delivered in the Increment resulting from the upcoming Sprint?
 > * How will the work needed to deliver the Increment be achieved?
+
+Prior to the Sprint Planning meeting - the Product Owner and Scrum Master will work together to prepare a rough Sprint worth of work. In this meeting we go through this work to get everyone up to speed on the work, assigning out specific tickets to team members, and agreeing as a team on the unit of work that we plan to complete for the Sprint.
 
 ## Daily Standup / Scrum
 * **When:** 2pm every day of the Sprint (excluding the first and last days of the sprint)
