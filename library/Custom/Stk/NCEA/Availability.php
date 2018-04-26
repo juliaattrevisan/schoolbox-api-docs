@@ -50,6 +50,10 @@ class Availability
 
         $row = $statement->fetch();
 
+        /* Discard any other unconsumed data to avoid leaving the connection hanging
+         */
+        $statement->close();
+
         if (\is_array($row)) {
             return $row;
         }
