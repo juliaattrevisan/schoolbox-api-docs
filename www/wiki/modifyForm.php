@@ -63,6 +63,19 @@ if (isset($_POST['heading']) && is_numeric($_POST['categoryID'])) {
             error(2);
             exit;
         }
+
+        //The slug now updates with the heading
+        /* If the heading contains unicode it can't be used as a slug, so we
+        use the wiki ID instead */
+        if (is_ascii($_POST['heading'])) {
+            $wiki->setSlug($url->getSlug());
+        } else {
+            /* Need to save new wiki before we can get the auto-incremented
+             * ID to use in the slug.
+             */
+            $wikiMapper->save($wiki);
+            $wiki->setSlug($wiki->getId());
+        }
     } else {
         // request to create new wiki
         $wiki = $wikiMapper->createModel()
@@ -74,7 +87,6 @@ if (isset($_POST['heading']) && is_numeric($_POST['categoryID'])) {
 
         /* If the heading contains unicode it can't be used as a slug, so we
         use the wiki ID instead */
-        $url  = new Url($heading);
         if (is_ascii($_POST['heading'])) {
             $wiki->setSlug($url->getSlug());
         } else {
