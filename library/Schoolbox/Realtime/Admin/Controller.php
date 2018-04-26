@@ -320,9 +320,9 @@ class Controller extends BaseController
 
         $configMapper = ConfigMapper::getInstance();
 
-        foreach ($ns as $i=>$k) {
+        foreach ($ns as $i=>$namespace) {
             foreach ($checkEnabled as $notifType=>$notifs) {
-                if(in_array($k->getSlug(), $notifs)){
+                if(in_array($namespace->getSlug(), $notifs)){
                     if(0 == $configMapper->get($notifType.'_enabled')){
                         unset($ns[$i]);
                     }
