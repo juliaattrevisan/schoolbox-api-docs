@@ -125,7 +125,7 @@
                                 {{ markVisible.show(assessment, attempt.mark ~ '/' ~ totalMark, 'N/A' ) }}
                                 {% if totalMarkGraded < totalMark %}
                                     {% set percentGraded =  (totalMarkGraded/totalMark*100) | round %}
-                                    {{ markVisible.show(assessment, percentGraded~'% graded', '' ) }}
+                                    {{ markVisible.show(assessment, '(' ~ percentGraded~'% graded' ~ ')', '' ) }}
                                 {% endif %}
                             {% else %}
                                 —
