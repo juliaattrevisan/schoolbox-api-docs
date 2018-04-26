@@ -798,7 +798,8 @@ class Mapper extends BaseMapper
             $this->getSelectString(),
             $this->getFromString(),
             new Builder($this->getDatabase(), $this->getTable()),
-            ['v_pa.project_id' => $projectIds]
+            ['v_pa.project_id' => $projectIds],
+            ['order' => ['sequence' => 'asc']]
         );
         $statement->execute();
 
