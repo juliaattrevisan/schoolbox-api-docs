@@ -18,6 +18,7 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Task\Response\MapperProxy as TaskResponseDataSource;
 use Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Mapper\Exception\InsufficientHydration;
 use Schoolbox\Preview\Factory as PreviewFactory;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Learning\Assessment\Transactor;
@@ -310,6 +311,7 @@ class Controller extends Assessment\Controller
      * @param TaskResponse $response
      * @throws ConcurrentModificationException If participant already has the task completion status - and don't want to log.
      * @throws \UnexpectedValueException if task response is not saveable - and we want to log.
+     * @throws InsufficientHydration If task object has not been sufficiently hydrated
      * @todo This should all be wrapped up in an auth rule
      */
     protected function assertSaveability(TaskResponse $response)
@@ -386,6 +388,7 @@ class Controller extends Assessment\Controller
      * @throws \PDOException If unable to save task response to DB
      * @throws ConcurrentModificationException If participant already has the task completion status.
      * @throws \UnexpectedValueException If proposed Task Response is invalid for some reasons
+     * @throws InsufficientHydration If task object is insufficiently hydrated
      */
     private function saveTaskResponse(int $completionStatus, IAssessable $assessment, User $student): Response\Model
     {
