@@ -20,17 +20,12 @@
             return false;
         });
 
-        $.validator.addMethod("urlOrOnclick", function(value, element) {
-            var regExOnclick = new RegExp("^onclick:\\w+\\(\\)$");
-            return $.validator.methods.isURL.call(this, value, element) || regExOnclick.test(value);
-        }, "Please enter a URL beginning with http://, https://, ftp://, or a relative URL (beginning with '/', '#', or '?')");
-
         $('[data-submit]').click(function () {
             form.alaressValidate({
                 ignore: ':disabled',
                 rules: {
                     'text': {required: true},
-                    'url': {required: true, urlOrOnclick: true}
+                    'url': {required: true, isURL: true}
                 },
                 messages: {
                     'text': {required: 'You must enter a name before you can proceed.'},
