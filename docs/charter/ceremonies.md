@@ -29,25 +29,28 @@ Ceremonies are the regular meetings we have as a product team. Along with the fo
 * **When:** 2pm every day of the Sprint (excluding the first and last days of the sprint)
 * **Timebox:** 15 minutes
 
-> The Development Team plans work for the next 24 hours. This optimizes team collaboration and performance by inspecting the work since the last Daily Scrum and forecasting upcoming Sprint work.
+> The Development Team plans work for the next 24 hours. The Development Team uses the Daily Scrum to inspect progress toward the Sprint Goal and to inspect how progress is trending toward completing the work in the Sprint Backlog.
 
-> The Development Team uses the Daily Scrum to inspect progress toward the Sprint Goal and to inspect how progress is trending toward completing the work in the Sprint Backlog.
+We meet in the Glass Conference Room, the last person to arrive starts and we move clockwise from there answering the following questions:
+* What have I been working on since the last Standup?
+* What am I planning on working on until the next Standup?
+* Do I see any impediments that will delay or block me from achieving what I need to achieve?
 
-> Every day, the Development Team should understand how it intends to work together as a self-organizing team to accomplish the Sprint Goal and create the anticipated Increment by the end of the Sprint.
+You may give a traffic light status (green, yellow, red) to give an indication of how you believe your work is going in regards to Sprint completion.
 
-    * PO or SM to issue standing orders
-    * Be transparent about status (green, yellow, red)
-    * This is not the place for in-depth discussion or simply "this is what I'm working on" (we have the chat-bot for
-      that); if you're blocked by something, make it known and flag the appropriate people for followup immediately
-      after the standup.
+When impediments are identified by team members - the team should collaborate to work out how to remove any blockers.
+
+The Standup should be short and sweet, generally only high level details should be mentioned. Often in-depth discussion with relevant parties will happen soon after the Standup.
+
+Often the Product Owner or Scrum Master will utilise the Daily Standup to ask the team to focus their efforts in a specific area where possible (eg. QA'ing a point release).
 
 ## Workshops
 * **When:** Tuesdays and Thursdays at 11:00am
 * **Timebox:** Varies per session, 2 hours at most
 
-Workshops are flexible in that they can take the form of a different type of session, depending on what is required most at the time.
+Workshops will take the some form of a UX session, depending on what is required most at the time.
 
-Some sessions will require the whole product team, and some will require just the strike team assigned to a particular problem.
+Some sessions will require the whole Product Team, and some will require just the Strike Team assigned to a particular problem space.
 
 See [workshops.md](workshops.md) for a list of the different types of workshops.
 
