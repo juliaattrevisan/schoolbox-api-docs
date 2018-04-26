@@ -290,6 +290,16 @@ class Healthcheck
     }
 
     /**
+     * Test whether a list of tables have DELETE permission.
+     *
+     * @param array $objects
+     */
+    private function deleteTest($objects): void
+    {
+        $this->permissionTest($objects, 'DELETE');
+    }
+
+    /**
      * Test object execution against each database object in the supplied array.
      *
      * This now uses HAS_PERMS_BY_NAME instead of actually running the proc;
@@ -561,11 +571,12 @@ class Healthcheck
 
         // Attendance Update Tests
         $this->updateTest(['wkAttendances']);
-        $this->insertTest(['wkAttendances']);
 
         //Markbook Tests
         $this->updateTest(['StaffAssessmentMarkBook','StudentAssessmentMarkBook']);
         $this->insertTest(['StaffAssessmentMarkBook','StudentAssessmentMarkBook']);
+        $this->deleteTest(['StaffAssessmentMarkBook','StudentAssessmentMarkBook']);
+
 
 
         $externalPing = new \External_Ping();
