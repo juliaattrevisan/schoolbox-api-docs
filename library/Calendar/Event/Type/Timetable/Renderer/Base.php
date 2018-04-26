@@ -30,10 +30,11 @@ abstract class Base extends RendererBase
     public function showAttendanceLink() {
 
         $config = new Config();
+
         if (
             $this->getEvent() instanceof Event
             && $config->get('external_type') == 'synergetic'
-            && $config->get('external_attendance')
+            && $config->get('external_attendance') == "1"
             && $this->getEvent()->hasAttendance()
             && $this->getViewer()->getRole()->isStaff()
             && $this->getEvent()->getCode() != ''
@@ -43,8 +44,9 @@ abstract class Base extends RendererBase
             $now->endOfDay();
 
             $from = new \Alaress_Date_Format();
+            $from->startOfDay();
             $from->addDays($config->get('external_attendance_days') * -1);
-
+            
             if($this->getEvent()->getStartTime()->gte($from) && $this->getEvent()->getStartTime()->lte($now)) {
                 return true;
             }
