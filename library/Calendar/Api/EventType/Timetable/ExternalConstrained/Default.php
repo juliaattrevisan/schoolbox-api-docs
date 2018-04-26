@@ -5,6 +5,7 @@ use Schoolbox\Resource\Folder\Model as Folder;
 use Calendar\Event\Collection;
 use Calendar\Event\Type\Timetable\Event;
 use Schoolbox\User;
+use Schoolbox\Config;
 
 /**
  * Event type that represents events from the external timetable handler.
@@ -21,14 +22,18 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
      */
     private $externalTimetable;
 
+    /** @var Config\Loader */
+    private $configLoader;
+
 
     /**
      * @inheritdoc
      */
-    public function __construct(int $connectorId, User $user)
+    public function __construct(int $connectorId, User $user, Config\Loader $configLoader)
     {
         parent::__construct($connectorId, $user);
         $this->externalTimetable = new External_Timetable();
+        $this->configLoader = $configLoader;
     }
 
     /**
@@ -41,6 +46,7 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
      */
     public function getEvents($startTimestamp, $endTimestamp)
     {
+        $secondsPerDay = 86400;
         // we're going to use this as a window for not building *too* much expensive timetable at once
         $midnight = mktime(0, 0, 0);
 
@@ -73,7 +79,11 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
         } catch (\Schoolbox\Mapper\Exception $e) {
             $eventType = 1;
         }
-        $expensiveWindow = $days * 86400;
+        $expensiveWindow = $days * $secondsPerDay;
+
+        // This is a config var that determines how many days in the past you can mark attendance for.
+        // Later, we need to fetch these days expensively, because otherwise they come without attendance data.
+        $attendanceDays = $this->configLoader->get('external_attendance_days') * $secondsPerDay;
 
         // Scan through each day from $startTimestamp to $endTimestamp, figuring
         // out that day's timetable day number for each of the user's campuses.
@@ -87,8 +97,11 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
 
                 $date = new Alaress_Date_Format($currentTimestamp, Alaress_Date_Format::TIMESTAMP);
 
-                if ($ttl >= 0 && $ttl < $expensiveWindow) {
-                    // if the current day is in the future AND within 2 days of midnight, get the expensive timetable
+                if ($ttl >= (-$attendanceDays) && $ttl < $expensiveWindow) {
+                    // if the current day is
+                    // - no more than $attendanceDays in the past, and
+                    // - within 2 days of midnight,
+                    // get the expensive timetable
                     $dayTimetable = $this->buildTimetableExpensively($this->getUser(), $campus, $date);
 
                 } else {
@@ -339,4 +352,5 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
         // No events in this strat, just return empty.
         return new Collection();
     }
+
 }
