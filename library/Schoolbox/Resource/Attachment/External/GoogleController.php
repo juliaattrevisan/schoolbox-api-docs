@@ -51,7 +51,9 @@ class GoogleController extends AbstractController implements ExternalInterface {
     {
         parent::__construct($multi, $mimeFilter);
         $this->addScope('drive.readonly')
-             ->addFeature('NAV_HIDDEN');
+             ->addFeature('NAV_HIDDEN')
+             ->addFeature('SUPPORT_TEAM_DRIVES')
+             ->addView('setEnableTeamDrives');
 
         $this->setViewsFromMimeFilter($mimeFilter);
 
