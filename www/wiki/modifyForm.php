@@ -13,7 +13,9 @@ $errorMapper    = Schoolbox\Error\Mapper::getInstance();
 
 $now = new Alaress_Date_Format(time(), 'U');
 
+//Does a wiki with this name already exist on this homepage?
 $potentialSlug = '';
+
 $heading = trim($_POST['heading']);
 $url  = new Url($heading);
 
@@ -21,7 +23,6 @@ if (is_ascii($_POST['heading'])) {
     $potentialSlug = $url->getSlug();
 }
 
-//Does a wiki with this name already exist on this homepage?
 $wikis = $wikiHandler->getByCategory($_POST['categoryID']);
 
 foreach ($wikis as $wiki) {
@@ -51,8 +52,7 @@ if (isset($_POST['heading']) && is_numeric($_POST['categoryID'])) {
             /** @var Schoolbox\Wiki\Wiki $wiki */
             $wiki = $wikiMapper->findOneByColumnList(
                 array(
-                    'categoryID' => $_POST['categoryID'],
-                    'slug'       => $_POST['slug']
+                    'wikiID'    => $_POST['wikiID']
                 )
             );
             // ok we got a wiki, but if it's not the one you were looking for, freak out
