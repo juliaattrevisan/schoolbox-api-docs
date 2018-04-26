@@ -125,18 +125,14 @@ class DueWork implements IAssessmentTypeTranslator
 
         // Translate files
         // TODO consider whether the DueWorkFile model is required - should Storage be used directly?
-        if (count($domainObject->getAttachedFiles())) {
-            foreach ($domainObject->getAttachedFiles() as $file) {
-                $dataModel->addAttachment(
-                    (new StorageModel())
-                        ->setHash($file->getHash())
-                        ->setFilename($file->getFilename())
-                        ->setExtension($file->getExtension())
-                );
-            }
-        }
-        else {
-            $dataModel->setAttachments(new Collection());
+        $dataModel->setAttachments($dataModel->getAttachments()->emptyClone());
+        foreach ($domainObject->getAttachedFiles() as $file) {
+            $dataModel->addAttachment(
+                (new StorageModel())
+                    ->setHash($file->getHash())
+                    ->setFilename($file->getFilename())
+                    ->setExtension($file->getExtension())
+            );
         }
 
         // TODO figure out mark visibility - it's likely obsolete as feedback is manually published
@@ -188,6 +184,7 @@ class DueWork implements IAssessmentTypeTranslator
         }
 
         // Convert attachments
+        $domainObject->setAttachedFiles($domainObject->getAttachedFiles()->emptyClone());
         foreach ($dataModel->getAttachments() as $attachment) {
             $domainObject->getAttachedFiles()->add(
                 (new DueWorkFile())
