@@ -303,6 +303,7 @@ class Controller extends BaseController
         $roles = $rolec->indexBy('id')
                        ->getAll();
 
+        /** @var NS[] $ns */
         $ns = $this->getNsMapper()
                    ->findAll()
                    ->indexBy('id')
