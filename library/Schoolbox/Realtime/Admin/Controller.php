@@ -311,10 +311,10 @@ class Controller extends BaseController
         //Filtering out disabled modules
         //   Modules            => Related Notifications
         $checkEnabled = Array(
-            'eotc'              => ['eotc'],
-            'resource_booking'  => ['resource_booking'],
-            'pastoral'          => ['pastoral', 'pastoral_log', 'pastoral_comment'],
-            'fixtures'          => ['sports_fixtures', 'sports_fixtures_import']
+            'eotc'              => [NSMapper::NS_EOTC],
+            'resource_booking'  => [NSMapper::NS_RESOURCE_BOOKING],
+            'pastoral'          => [NSMapper::NS_PASTORAL, NSMapper::NS_PASTORAL_LOG, NSMapper::NS_PASTORAL_COMMENT],
+            'fixtures'          => [NSMapper::NS_SPORTS_FIXTURES, NSMapper::NS_SPORTS_FIXTURES_IMPORT]
         );
 
         $configMapper = ConfigMapper::getInstance();
