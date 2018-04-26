@@ -118,10 +118,10 @@ class Completion implements ISoftDeletable
     }
 
     /**
-     * @param \Alaress_Date_Format $completionDate
+     * @param null|\Alaress_Date_Format $completionDate
      * @return static
      */
-    public function setCompletionDate(\Alaress_Date_Format $completionDate)
+    public function setCompletionDate(?\Alaress_Date_Format $completionDate)
     {
         $this->completionDate = $completionDate;
         return $this;

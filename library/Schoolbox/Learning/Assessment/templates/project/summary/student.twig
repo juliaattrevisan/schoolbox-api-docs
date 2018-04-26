@@ -27,12 +27,11 @@
 
         // Save form for task completion
         $('form[data-progress-tick-form]').progressTickForm({
-            disabledSelector: 'form:not([data-progress-tick-form="selfAssessed"])',
             label: $('[data-save-progress-state]'),
             transitions: {
-                incomplete:      'selfAssessed',
-                selfAssessed:    'incomplete',
-                teacherAssessed: 'incomplete'
+                incomplete:      '{{ transitions['incomplete'] }}',
+                selfAssessed:    '{{ transitions['selfAssessed'] }}',
+                teacherAssessed: '{{ transitions['teacherAssessed'] }}'
             },
             onChange: function(newTaskStatus) {
                 // Update the light and the row's status

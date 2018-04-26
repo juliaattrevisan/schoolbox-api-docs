@@ -5,6 +5,7 @@ Data:
     student     User
     preview     array
     returnUrl   string
+    transitions string[]           The next state for each state. Indexed by current state.
 #}
 
 {% import 'sub/breadcrumbs.twig' as bread %}
@@ -17,9 +18,9 @@ Data:
         // Save form for task completion
         $('form[data-progress-tick-form]').progressTickForm({
             transitions: {
-                incomplete:      'teacherAssessed',
-                selfAssessed:    'incomplete',
-                teacherAssessed: 'incomplete'
+                incomplete:      '{{ transitions['incomplete'] }}',
+                selfAssessed:    '{{ transitions['selfAssessed'] }}',
+                teacherAssessed: '{{ transitions['teacherAssessed'] }}'
             }
         });
     });

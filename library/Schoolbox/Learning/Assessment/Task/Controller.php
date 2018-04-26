@@ -18,6 +18,7 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Task\Response\MapperProxy as TaskResponseDataSource;
 use Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Mapper\Exception\InsufficientHydration;
 use Schoolbox\Preview\Factory as PreviewFactory;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Learning\Assessment\Transactor;
@@ -28,6 +29,8 @@ use \Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\Assessment\Task\Response\Model as TaskResponse;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Assessment\Term;
+use Schoolbox\Learning\Assessment\Task\Exception\ConcurrentModificationException;
+use Schoolbox\Learning\Assessment\Task\Exception\InvalidTaskResponseException;
 
 
 class Controller extends Assessment\Controller
@@ -102,17 +105,19 @@ class Controller extends Assessment\Controller
     }
 
 
-
     /**
      * Display appropriate landing page based on role
      *
      * @api   GET /learning/assessments/:assessmentId/:userId
      * @level 165
      * @param IAssessable|Task $assessment
-     * @param User        $student
+     * @param User             $student
      * @throws ServiceNotFound
      * @throws \DomainException
-     * @throws \InvalidArgumentException
+     * @throws \Aura\Web\Exception\InvalidStatusCode if value is invalid
+     * @throws \InvalidArgumentException If we attempt to give a task feedback a null response
+     * @throws \PDOException If unable to save task response to DB
+     * @throws \UnexpectedValueException If lack of hydration
      */
     public function getSummary(IAssessable $assessment, User $student): void
     {
@@ -127,7 +132,17 @@ class Controller extends Assessment\Controller
 
             if ($previewFragment['type'] == 'redirect' && !$assessment->getDescription()) {
 
-                $this->saveTaskResponse(TaskCompletion::STATUS_SELF_ASSESSED_COMPLETE, $assessment, $student);
+                // Don't save a response if instructor is looking at student's summary page
+                if ((int)$student->getId() === (int)$this->getUser()->getId()) {
+                    try {
+                        $this->saveTaskResponse(TaskCompletion::STATUS_SELF_ASSESSED_COMPLETE, $assessment, $student);
+                    } catch (ConcurrentModificationException $e) {
+                        // noop. This is expected to happen from time to time. No need to log.
+                    } catch (InvalidTaskResponseException $e) {
+                        // Something else when wrong. Probably a bug. Need to know about this.
+                        $this->captureException($e);
+                    }
+                }
 
                 /* Just forward if we only have a URL
                  */
@@ -175,12 +190,22 @@ class Controller extends Assessment\Controller
             $returnUrl = '/homepage/'.$assessment->getBaseContext()->getFolder()->getId();
         }
 
+        // How should the jewelry transition?
+        $classFolder          = $assessment->getBaseContext()->getFolder();
+        $isViewerAnInstructor = $this->getAccess()->isInstructor($this->getUser(), $classFolder);
+        $tickTransitions      = [
+            'incomplete'      => $isViewerAnInstructor ? 'teacherAssessed' : 'selfAssessed',
+            'selfAssessed'    => $isViewerAnInstructor ? 'teacherAssessed' : 'incomplete',
+            'teacherAssessed' => 'incomplete',
+        ];
+
         $twigData = [
             'breadcrumbs'  => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([ $assessment->getTitle(), '' ]),
             'assessment'   => $assessment,
             'student'      => $student,
             'preview'      => $previewFragment,
             'returnUrl'    => $returnUrl,
+            'transitions'  => $tickTransitions,
         ];
 
         $this->getResponse()->content->set(
@@ -217,96 +242,124 @@ class Controller extends Assessment\Controller
      *
      * @param IAssessable|Model $assessment
      * @param User              $student
+     * @var int                 $_POST ['status'] One of the TaskCompletion::STATUS_* constants
      * @return void
      * @throws \Aura\Router\Exception\RouteNotFound
-     * @throws \Aura\Web\Exception\InvalidStatusCode
-     * @throws \PDOException
+     * @throws \Aura\Web\Exception\InvalidStatusCode if value is invalid
+     * @throws \InvalidArgumentException If we attempt to give a task feedback a null response
+     * @throws \PDOException If unable to save task response to DB
+     * @throws \Schoolbox\Application\Exception\Exception If synchronous request and something went wrong
+     * @throws InsufficientHydration If unable to perform some logic because an object lacks hydration
      */
     public function postCreateResponse(IAssessable $assessment, User $student): void
     {
         // Did user mark (regardless of who they are) the task as incomplete ?
         $completionStatus = $this->getRequest()->post->getInt('status');
 
-        $response = $this->saveTaskResponse($completionStatus, $assessment, $student);
-
-        // And redirect somewhere
-        if ($this->getRequest()->isXhr()) {
-            $result['success'] = true;
-            $result['message'] = 'OK';
-            $result['id']      = $response->getId();
-            $result['status']  = $completionStatus;
+        try {
+            $response = $this->saveTaskResponse($completionStatus, $assessment, $student);
             $this->getResponse()->status->setCode(200);
-            $this->getResponse()->content->set($this->buildJsonOutput($result));
 
-        } else {
-            // redirect after saving to Due Work Summary For Particular Student
-            $this->getResponse()->redirect->to(
-                $this->getRouter()->generate(
-                    'learningAssessment.getSummary',
-                    [
-                        'assessmentId' => $assessment->getId(),
-                        'studentId'    => $student->getId(),
-                    ]
-                )
-            );
+            if ($this->getRequest()->isXhr()) {
+                $this->getResponse()->content->set($this->buildJsonOutput([
+                    'success' => true,
+                    'message' => 'OK',
+                    'id'      => $response->getId(),
+                    'status'  => $completionStatus,
+                ]));
+            } else {
+                // redirect after saving to Task Summary for particular Student
+                $this->getResponse()->redirect->to(
+                    $this->getRouter()->generate(
+                        'learningAssessment.getSummary',
+                        [
+                            'assessmentId' => $assessment->getId(),
+                            'studentId'    => $student->getId(),
+                        ]
+                    )
+                );
+            }
+        } catch (ConcurrentModificationException|InvalidTaskResponseException $e) {
+
+            // We don't need to log concurrent exceptions, we expect them to happen from time to time.
+            if (!$e instanceof ConcurrentModificationException) {
+                $this->captureException($e);
+            }
+
+            $this->getResponse()->status->setCode(400);
+
+            if ($this->getRequest()->isXhr()) {
+                $this->getResponse()->content->set($this->buildJsonOutput([
+                    'success' => false,
+                    'message' => $e->getMessage(),
+                    'id'      => null,
+                ]));
+            } else {
+                throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_INVALID_TASK_COMPLETION, $e, $e->getMessage());
+            }
         }
     }
 
     /**
-     * Can current user save the proposed TaskResponse for the specified Participant ?
+     * Throws an exception if the proposed task response is not valid ?
      *
-     * * Instructors cannot mark a student if they lack WRITE+ perm to class
-     * * Responses cannot be created for users not participating in the task.
-     * * Cannot create a new response with the same status as the most recent response for the student.
-     * * Participants may not create a response if the task is not self-assessable
-     * * Participants may not create a new response if the teacher has marked them as complete
+     * 1. Cannot interact if user has been excluded
+     * 2. Only instructors can mark other users
+     * 3. Responses cannot be created for users not participating in the task, unless it is an instructor marking themself
+     * 4. Cannot create a new response with the same status as the most recent response for the student.
+     * 5. Learners may not create a response if the task is not self-assessable
+     * 6. Learners users may not create a new response if an instructor has marked them as complete
      *
-     * @param Participant  $participant
      * @param TaskResponse $response
-     * @throws \UnexpectedValueException if task response is not saveable
+     * @throws ConcurrentModificationException If participant already has the task completion status - and don't want to log.
+     * @throws InvalidTaskResponseException If task response is not saveable - and we want to log.
+     * @throws InsufficientHydration If task object has not been sufficiently hydrated
+     * @todo This should all be wrapped up in an auth rule
      */
-    protected function assertSaveability(Participant $participant, TaskResponse $response)
+    protected function assertSaveability(TaskResponse $response)
     {
         $submittedBy  = $response->getSubmittedBy();
         $submittedFor = $response->getSubmittedOnBehalfOf();
+        $participant  = $response->getAssessable()->getParticipantIfExtant($submittedFor);
 
-        // Is teacher marking a student ?
-        if($participant->getUser()->getId() != $this->getUser()->getId()){
-
-            // Does teacher lack WRITE+ permission to class folder?
-            $classFolder = $participant->getAssessable()->getBaseContext()->getFolder();
-            if(!$this->getAccess()->isInstructor($this->getUser(), $classFolder)){
-                throw new \UnexpectedValueException("Teachers may only mark tasks on classes where they have write permissions.");
-            }
+        // 1. Cannot interact if explicitly excluded
+        if($participant && $participant->isExcluded()){
+            throw new InvalidTaskResponseException("Cannot create a response for an excluded participation.");
         }
 
-        // Is student not a participant of Task ?
-        if (!$response->getAssessable()->isParticipant($submittedFor)) {
-            throw new \UnexpectedValueException("{$submittedFor->getFullName()} is not a participant in this task");
+        // Is the current session user an instructor
+        $classFolder  = $response->getAssessable()->getBaseContext()->getFolder();
+        $isInstructor = $this->getAccess()->isInstructor($this->getUser(), $classFolder);
+
+        // 2. Is session user creating for another user, and is not an instructor ?
+        if(!$isInstructor && (int)$submittedFor->getId() !== $this->getUser()->getId()){
+            throw new InvalidTaskResponseException("Only instructors can mark other users");
         }
 
-        // Does the most recent response for the student already have the proposed status?
+        // 3. Not yet a participant? And not an instructor or not marking themself?
+        if(!$participant && (!$isInstructor || (int)$submittedFor->getId() !== (int)$this->getUser()->getId())){
+            throw new InvalidTaskResponseException("Only an non-excluded instructor marking themself is permitted to preview a task");
+        }
+
+        // 4. Does the most recent response for the student already have the proposed status?
         if (empty($response->getId())) {
-            $mostRecentResponse = $participant->findMostRecentResponse();
-            if ($mostRecentResponse instanceof TaskResponse
-                && $mostRecentResponse->getCompletionStatus() == $response->getCompletionStatus()
-                && $mostRecentResponse->hasFeedback() === $response->hasFeedback()
-            ) {
-                throw new \UnexpectedValueException("{$submittedFor->getFullName()} already has status ({$mostRecentResponse->getCompletionStatus()}) for this task");
+            $mostRecentResponse = $participant ? $participant->findMostRecentResponse() : null;
+            if ($mostRecentResponse instanceof TaskResponse && $mostRecentResponse->getCompletionStatus() === $response->getCompletionStatus()) {
+                throw new ConcurrentModificationException("{$submittedFor->getFullName()} already has status ({$mostRecentResponse->getCompletionStatus()}) for this task");
             }
         }
 
-        // Is the student self-assessing ?
-        if ($submittedBy->getId() == $submittedFor->getId()) {
+        // Is the learner self-assessing ?
+        if (!$isInstructor && (int)$submittedBy->getId() === (int)$submittedFor->getId()) {
 
-            // Is the task not self-assessable ?
+            // 5. Is the task not self-assessable ?
             if (!$response->getAssessable()->isSelfAssessable()) {
-                throw new \UnexpectedValueException("Students may not self-assess a task if the task is not self-assessable");
+                throw new InvalidTaskResponseException("Learners may not self-assess a task if the task is not self-assessable");
             }
 
-            // Is the task already marked by the teacher as complete ?
+            // 6. Is the task already marked by the teacher as complete ?
             if ($mostRecentResponse && !$mostRecentResponse->isSelfAssessed() && $mostRecentResponse->getMarkedComplete()) {
-                throw new \UnexpectedValueException("Students may not change a task completion status if the teacher has marked it complete.");
+                throw new InvalidTaskResponseException("Learners may not change a task completion status if the instructor has marked it complete.");
             }
         }
     }
@@ -325,49 +378,37 @@ class Controller extends Assessment\Controller
         return $data;
     }
 
+
     /**
+     * Generates, saves, then returns a domain-layer Task Response object
      *
-     * @param int $completionStatus status to mark
+     * @param int         $completionStatus status to mark
      * @param IAssessable $assessment
-     * @param User $student
-     * @return TaskResponse $taskResponse Updated task response
-     * @throws \Aura\Web\Exception\InvalidStatusCode if value is invalid
+     * @param User        $student
+     * @return TaskResponse $taskResponse Created task response
+     * @throws \InvalidArgumentException If we attempt to give a task feedback a null response
+     * @throws \PDOException If unable to save task response to DB
+     * @throws ConcurrentModificationException If participant already has the task completion status.
+     * @throws InvalidTaskResponseException If proposed Task Response is invalid for some reasons
+     * @throws InsufficientHydration If task object is insufficiently hydrated
      */
-    private function saveTaskResponse(int $completionStatus, IAssessable $assessment, User $student)
+    private function saveTaskResponse(int $completionStatus, IAssessable $assessment, User $student): Response\Model
     {
-        $isMarkedComplete = $completionStatus != TaskCompletion::STATUS_INCOMPLETE;
+        $isMarkedComplete = $completionStatus !== TaskCompletion::STATUS_INCOMPLETE;
 
         $taskResponse = (new TaskResponse())
             ->setAssessable($assessment)
             ->setSubmittedOnBehalfOf($student)
             ->setSubmittedBy($this->getUser())
-            // TODO figure out whether to set create time as now, or set it as a created timestamp in mapper
-            ->setCreatedAt(\Alaress_Date_Format::now())
             ->setMarkedComplete($isMarkedComplete);
 
-        if (TaskCompletion::STATUS_TEACHER_ASSESSED_COMPLETE == $completionStatus) {
+        if (TaskCompletion::STATUS_TEACHER_ASSESSED_COMPLETE === $completionStatus) {
             $feedback = (new Feedback\Model())
                 ->setResponse($taskResponse);
             $taskResponse->getAllFeedback()->add($feedback);
         }
 
-        try{
-            $participant = $assessment->getParticipantIfExtant($student);
-            if ($participant) {
-                $this->assertSaveability($participant, $taskResponse);
-            }
-        } catch (\UnexpectedValueException $e){
-
-            // Cast reason to standardised/localised representation
-            $errorException = $this->getErrorMapper()->generateException(Error\Mapper::ERROR_INVALID_TASK_COMPLETION, null, $e->getMessage());
-
-            $result['success']   = false;
-            $result['message']   = $errorException->getMessage();
-            $result['id']        = null;
-            $this->getResponse()->status->setCode(400);
-            $this->getResponse()->content->set($this->buildJsonOutput($result));
-            return;
-        }
+        $this->assertSaveability($taskResponse);
 
         // And save (no need to save a feedback - it will be built automatically from this response on DB retrieval)
         $this->taskResponseDataSource->save($taskResponse);
