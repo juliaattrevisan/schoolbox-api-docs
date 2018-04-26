@@ -51,8 +51,30 @@ Some sessions will require the whole product team, and some will require just th
 
 See [workshops.md](workshops.md) for a list of the different types of workshops.
 
-## Showcase / Sprint Review
-* **When:** Last day of Sprint 2:00pm
+## Showcase
+* **When:** Last day of Sprint at 2:00pm
 * **Timebox:** 2 hours
 
 > A Sprint Review is held at the end of the Sprint to inspect the Increment and adapt the Product Backlog if needed. During the Sprint Review, the Scrum Team and stakeholders collaborate about what was done in the Sprint. Based on that and any changes to the Product Backlog during the Sprint, attendees collaborate on the next things that could be done to optimize value. This is an informal meeting, not a status meeting, and the presentation of the Increment is intended to elicit feedback and foster collaboration.
+
+Showcases are our chance to the whole company up to speed with where we're at with our development, and allow us to collaborate and get feedback on what we've got and where we're going.
+
+Showcases will generally take the following form:
+* The Product Owner will opening the meeting with a quick summary what our focus was for the Sprint, what we got "done" and what we didn't get "done".
+* The Product Team will showcase their work. Generally the people that did the work will be asked to present their work, but sometimes the Scrum Master will present other people's work.
+* Feedback and questions will be asked by the audience at the end of each unit of work shown.
+* The Product Owner and Product Team will briefly talk about the plan for the next Sprint, giving the audience a chance to give feedback and ask questions around that.
+
+Work that may be presented:
+* Research insights
+* Sketches and wireframes
+* Prototypes
+* Production ready interfaces
+* Changes to existing interfaces and functionality
+
+What the Showcase shouldn't include:
+* Bug fixes where there is no change to intended functionality - best left for the release notes.
+* Minor changes or additions to user interfaces and functionality - it is too hard for the audience to get context with these, best left to release notes and Jira.
+* Changes that have no functional impact.
+
+As there will be non-technical people at the Showcase - we should always try to stay away from delving into technical details. These discussions should be parked and happen after the Showcase.
