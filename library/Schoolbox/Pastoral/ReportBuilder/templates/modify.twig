@@ -26,18 +26,19 @@
 
         {# Toggle all checkboxes when the 'Select All' box is changed #}
 
-        $("#formReport").selectAll({
+        var $reportForm = $("#formReport");
+
+        $reportForm.selectAll({
             selector: $('#type-all'),
             checkboxes: $('[data-check-type], [data-check-subtype]')
         });
 
-        $("#formReport").selectAll({
+        $reportForm.selectAll({
             selector: $('#year-all'),
             checkboxes: $('[data-check-year]')
         });
 
-        // TODO fix this one up?
-        $("#formReport").selectAll({
+        $reportForm.selectAll({
             selector: $('#house-all'),
             checkboxes: $('[data-check-house]')
         });
@@ -90,7 +91,7 @@
 
         {# Generate the report after a little sanity checking#}
 
-        $('#formReport').alaressValidate({
+        $reportForm.alaressValidate({
             rules: {
                 'name': 'required',
                 'types[]': 'required',
@@ -345,19 +346,35 @@
 
             <script>
                 $(function() {
+                    // Hide subtypes by default to reduce vertical scrolling
+                    $(".pastoral-subtypes").hide();
+
                     // If a pastoral type checkbox is checked...
                     $("input[name='types[]']").change(function(e) {
                         var checkbox = e.target;
                         var $subCheckboxes = $(checkbox).siblings(".pastoral-subtypes").find("input[name='subtypes[]']");
                         if ($(checkbox).is(':checked')) {
-                            // ...check all its subtypes
+                            // ...show the subtypes for this type
+                            $(checkbox).siblings(".pastoral-subtypes").show();
+
+                            // ...and check them by default
                             $subCheckboxes.each(function(index, subCheckbox) {
                                 $(subCheckbox).prop('checked', true);
                             })
                         } else {
                             $subCheckboxes.each(function(index, subCheckbox) {
                                 $(subCheckbox).prop('checked', false);
+                                $(checkbox).siblings(".pastoral-subtypes").hide();
                             })
+                        }
+                    });
+
+                    // Show/hide subtypes on select/deselect all
+                    $("#type-all").change(function(e) {
+                        if ($(e.target).is(':checked')) {
+                            $(".pastoral-subtypes").show();
+                        } else {
+                            $(".pastoral-subtypes").hide();
                         }
                     });
                 });
