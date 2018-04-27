@@ -28,12 +28,7 @@
 
         $("#formReport").selectAll({
             selector: $('#type-all'),
-            checkboxes: $('[data-check-type]')
-        });
-
-        $("#formReport").selectAll({
-            selector: $('#subtype-all'),
-            checkboxes: $('[data-check-subtype]')
+            checkboxes: $('[data-check-type], [data-check-subtype]')
         });
 
         $("#formReport").selectAll({
