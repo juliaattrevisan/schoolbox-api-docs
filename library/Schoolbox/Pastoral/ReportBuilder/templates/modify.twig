@@ -415,6 +415,15 @@
                                     </div>
                                 </div>
                             </li>
+                        {% elseif order == 'house' %}
+                            <li data-order="house">
+                                <div>
+                                    <div class="grip"></div>
+                                    <div class="card small-12">
+                                        <p>House</p>
+                                    </div>
+                                </div>
+                            </li>
                         {% elseif order == 'points' %}
                             <li data-order="points">
                                 <div>
@@ -424,8 +433,8 @@
                                     </div>
                                 </div>
                             </li>
-                        {% elseif order == 'subtype' %}
-                            <li data-order="subtype">
+                        {% elseif order == 'type' %}
+                            <li data-order="type">
                                 <div>
                                     <div class="grip"></div>
                                     <div class="card small-12 wrap-down">
@@ -435,6 +444,24 @@
                                                 (
                                                 {%- for type in types -%}
                                                     {{ type.name }}{% if not loop.last %}, {% endif %}
+                                                {%- endfor -%}
+                                                )
+                                            </span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </li>
+                        {% elseif order == 'subtype' %}
+                            <li data-order="subtype">
+                                <div>
+                                    <div class="grip"></div>
+                                    <div class="card small-12 wrap-down">
+                                        <p>
+                                            Record Subtype
+                                            <span class="meta">
+                                                (
+                                                {%- for subtype in subTypes -%}
+                                                    {{ subtype.name }}{% if not loop.last %}, {% endif %}
                                                 {%- endfor -%}
                                                 )
                                             </span>

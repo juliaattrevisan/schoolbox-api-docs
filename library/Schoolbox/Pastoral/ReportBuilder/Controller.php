@@ -211,10 +211,12 @@ class Controller extends Base
         $orders = [
             'student',
             'date',
+            'type',
             'subtype',
             'author',
             'points',
             'year',
+            'house'
         ];
 
         // Only show severity if it is enabled by policy
@@ -242,8 +244,6 @@ class Controller extends Base
         } catch (MapperException $e) {
             $report->setDashboard(false);
         }
-
-        $subtypes = $this->pastoralSubTypeMapper->findAll()->sortBy('name', 'asc');
 
         // And render this thing out
         $this->getResponse()->content->set(
