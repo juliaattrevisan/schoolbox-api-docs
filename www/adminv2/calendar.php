@@ -226,7 +226,7 @@ foreach ($typeList as $type) {
         ]);
 
         $eventMapper = new \Schoolbox\Calendar\EventMapper();
-        $allEvents = $eventMapper->findEventsBetween($from->getDatabaseDate(), $to->getDatabaseDate());
+        $allEvents = $eventMapper->findEventsBetween($from->getDatabaseDate(), $to->getDatabaseDate(), true);
 
         /** @var \Schoolbox\Calendar\Event $currentEvent */
         foreach ($allEvents as $currentEvent) {
