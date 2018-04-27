@@ -346,6 +346,22 @@
                 </div>
             </div>
 
+            <script>
+                $(function() {
+                    // If a pastoral type checkbox is checked...
+                    $("input[name='types[]']").change(function(e) {
+                        var checkbox = e.target;
+                        if ($(checkbox).is(':checked')) {
+                            // ...check all its subtypes
+                            var $subCheckboxes = $(checkbox).siblings(".checklist").find("input[name='subtypes[]']");
+                            $subCheckboxes.each(function(index, subCheckbox) {
+                                $(subCheckbox).prop('checked', true);
+                            })
+                        }
+                    });
+                });
+            </script>
+
             <h2 class="subheader">Sort Order</h2>
             <p class="meta">Select the order in which you would like your report sorted</p>
             <section>
