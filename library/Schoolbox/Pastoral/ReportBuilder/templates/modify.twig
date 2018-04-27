@@ -15,65 +15,37 @@
 <script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
 <script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
 <script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
-<script type="text/javascript" src="/javascript/shared/select-all/attacher.select-all.js"></script>
+<script type="text/javascript" src="/javascript/shared/select-all/jquery.select-all.js"></script>
 
 <!--suppress JSValidateTypes -->
 <script type="text/javascript">
 
     $(function () {
 
-        var dataCheckType = $('[data-check-type]');
-        var dataCheckAllType = $('[data-check-all-type]');
-
-        var dataCheckYear = $('[data-check-year]');
-        var dataCheckAllYear = $('[data-check-all-year]');
-
         $('#sort-order').sortable({handle: '.grip', axis: 'y'});
 
         {# Toggle all checkboxes when the 'Select All' box is changed #}
 
-        dataCheckAllType.change(function (e) {
-            dataCheckType.prop('checked', $(e.target)[0].checked);
+        $("#formReport").selectAll({
+            selector: $('#type-all'),
+            checkboxes: $('[data-check-type]')
         });
 
-        dataCheckAllYear.change(function (e) {
-            dataCheckYear.prop('checked', $(e.target)[0].checked);
+        $("#formReport").selectAll({
+            selector: $('#subtype-all'),
+            checkboxes: $('[data-check-subtype]')
         });
 
-        {# Whenever a type checkbox is changed disable the 'Select All' box #}
-
-        {# Dynamically decide when all checkboxes are selected while you're ticking boxes #}
-
-        dataCheckType.change(function () {
-            if ($('[data-check-type]:checked').length === dataCheckType.length) {
-                dataCheckAllType.prop('checked', true);
-            }
-            else {
-                dataCheckAllType.removeAttr('checked');
-            }
+        $("#formReport").selectAll({
+            selector: $('#year-all'),
+            checkboxes: $('[data-check-year]')
         });
 
-        {# Dynamically decide when all checkboxes are selected while you're ticking boxes #}
-
-        dataCheckYear.change(function () {
-            if ($('[data-check-year]:checked').length === dataCheckYear.length) {
-                dataCheckAllYear.prop('checked', true);
-            }
-            else {
-                dataCheckAllYear.removeAttr('checked');
-            }
+        // TODO fix this one up?
+        $("#formReport").selectAll({
+            selector: $('#house-all'),
+            checkboxes: $('[data-check-house]')
         });
-
-        {# If we are changing report criteria this will tick the 'Select All' box if every type was selected;
-         # this occurs upon page load
-         #}
-        if ($('[data-check-type]:checked').length === dataCheckType.length) {
-            dataCheckAllType.prop('checked', true);
-        }
-
-        if ($('[data-check-year]:checked').length === dataCheckYear.length) {
-            dataCheckAllYear.prop('checked', true);
-        }
 
         {# Setup selectize boxes #}
 
