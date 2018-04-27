@@ -113,7 +113,7 @@
                         </td>
                         <td>
                             {% if attempt.reviewed and not attempt.reviewed.null %}
-                                {{ markVisible.showIfVisible(assessment, attempt.reviewed.short, 'N/A' ) }}
+                                {{ markVisible.showIfVisible(assessment, attempt.reviewed.short, '—' ) }}
                             {% else %}
                                 —
                             {% endif %}
@@ -122,7 +122,7 @@
                             {% if finished %}
                                 {% set totalMark       = attempt.totalMark %}
                                 {% set totalMarkGraded = attempt.totalMarkGraded %}
-                                {{ markVisible.showIfVisible(assessment, attempt.mark ~ '/' ~ totalMark, 'N/A' ) }}
+                                {{ markVisible.showIfVisible(assessment, attempt.mark ~ '/' ~ totalMark, '—' ) }}
                                 {% if totalMarkGraded < totalMark %}
                                     {% set percentGraded =  (totalMarkGraded/totalMark*100) | round %}
                                     {{ markVisible.showIfVisible(assessment, '(' ~ percentGraded~'% graded' ~ ')', '' ) }}
