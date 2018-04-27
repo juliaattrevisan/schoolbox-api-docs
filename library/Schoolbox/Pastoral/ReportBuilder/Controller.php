@@ -243,8 +243,9 @@ class Controller extends Base
             $report->setDashboard(false);
         }
 
-        // And render this thing out
+        $subtypes = $this->pastoralSubTypeMapper->findAll()->sortBy('name', 'asc');
 
+        // And render this thing out
         $this->getResponse()->content->set(
             [
                 'template' => '@pastoralReportBuilder/modify.twig',

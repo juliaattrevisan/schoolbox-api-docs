@@ -276,11 +276,16 @@
                         {% endfor %}
                     </div>
                 </div>
+            </section>
+
+            <h2 class="subheader">Record Subtypes</h2>
+            <p class="meta">Select the record subtypes you want to appear in the report</p>
+            <section>
                 <div class="small-12 medium-6 columns content">
                     <div class="checklist">
                         <input id="subtype-all" type="checkbox" data-check-all-subtype>
                         <label for="subtype-all">Select All</label>
-                        {% for subtype in subtypes %}
+                        {% for subtype in subTypes %}
                             <input id="subtype-{{ subtype.id }}"
                                    name="subtypes[]"
                                    value="{{ subtype.id }}"
