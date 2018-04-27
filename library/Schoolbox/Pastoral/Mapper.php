@@ -838,13 +838,15 @@ class Mapper extends BaseMapper
      * @param Alaress_Date_Format   $before_date
      * @param Alaress_Date_Format   $after_date
      * @param null|PastoralSeverity $severity
-     * @param Collection            $types
+     * @param Collection            $types,
+     * @param Collection            $subtypes,
      * @param Collection            $authors
      * @param Collection            $students
      * @param Collection            $tags
      * @param Collection            $order
      * @param bool                  $involved
      * @param Collection            $years
+     * @param Collection            $houses
      *
      * @return Collection|Model[]
      */
@@ -854,12 +856,14 @@ class Mapper extends BaseMapper
         Alaress_Date_Format $after_date,
         ?PastoralSeverity $severity,
         Collection $types,
+        Collection $subtypes,
         Collection $authors,
         Collection $students,
         Collection $tags,
         Collection $order,
         $involved,
-        Collection $years
+        Collection $years,
+        Collection $houses
     ) {
         $this->bindings = [];
         $this->filters  = [];
@@ -883,12 +887,15 @@ class Mapper extends BaseMapper
 
         $this->addFilter($students, '`student_id`');
         $this->addFilter($years, '`s`.`year`');
+        $this->addFilter($houses, '`s`.`house`');
         $this->addFilter($types, '`type_id`');
+        $this->addFilter($subtypes, '`subtype_id`');
         $this->addFilter($authors, '`owner_id`');
 
         $orderParts = [];
         foreach ($order as $orderCurrent) {
             switch ($orderCurrent) {
+                // TODO also need to order by house apparently?
                 case 'student':
                     $orderParts[] = "`s`.lastname, `s`.firstname";
                     break;
@@ -899,7 +906,7 @@ class Mapper extends BaseMapper
                     $orderParts[] = "`pastoral`.created_at desc";
                     break;
                 case 'subtype':
-                    $orderParts[] = "`c`.name";
+                    $orderParts[] = "`c`.name, `t`.name"; // TODO why aren't we ordering by type as well as subtype?
                     break;
                 case 'points':
                     $orderParts[] = "`pastoral`.points";

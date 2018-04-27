@@ -19,6 +19,7 @@ use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
 use Schoolbox\Pastoral\Severity\Model as PastoralSeverity;
 use Schoolbox\Pastoral\Tag\Mapper as PastoralTagMapper;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
+use Schoolbox\Pastoral\SubType\Mapper as PastoralSubTypeMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -47,11 +48,13 @@ class Mapper extends BaseMapper
         // Filter criteria CSV strings
 
         $this->uses('types', self::TYPE_STRING, null, 'typesCsv');
+        $this->uses('sub_types', self::TYPE_STRING, null, 'subTypesCsv');
         $this->uses('authors', self::TYPE_STRING, null, 'authorsCsv');
         $this->uses('students', self::TYPE_STRING, null, 'studentsCsv');
         $this->uses('tags', self::TYPE_STRING, null, 'tagsCsv');
         $this->uses('order', self::TYPE_STRING, null, 'orderCsv');
         $this->uses('years', self::TYPE_STRING, null, 'yearsCsv');
+        $this->uses('houses', self::TYPE_STRING, null, 'housesCsv');
 
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
@@ -170,11 +173,14 @@ class Mapper extends BaseMapper
 
             $model->setOrder(new Collection(explode(',', $row['order'])));
             $model->setYears(new Collection(explode(',', $row['years'])));
+
             $model->setTypes($this->getCollection(PastoralTypeMapper::getInstance(), $row['types']));
+            $model->setSubTypes($this->getCollection(PastoralSubTypeMapper::getInstance(), $row['sub_types']));
             $model->setAuthors($this->getCollection(UserMapper::getInstance(), $row['authors']));
             $model->setStudents($this->getCollection(UserMapper::getInstance(), $row['students']));
             $model->setTags($this->getCollection(PastoralTagMapper::getInstance(), $row['tags']));
             $model->setGroups($this->getCollection(PastoralGroupMapper::getInstance(), $row['groups']));
+            $model->setHouses($this->getCollection(\HouseMapper::getInstance(), $row['houses']));
 
             $collection->add($model);
         }
