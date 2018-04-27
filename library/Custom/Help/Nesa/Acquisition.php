@@ -71,6 +71,7 @@ class Acquisition
      */
     private $involvement;
 
+
     /**
      * Acquisition constructor.
      *
@@ -82,6 +83,8 @@ class Acquisition
      * @param Rubric\RubricMapper   $rubricMapper
      * @param DataModel\MapperProxy $assessmentMapperProxy
      * @param UserMapper            $userMapper
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \UnderflowException
      */
     public function __construct(
         array $states,
@@ -115,6 +118,8 @@ class Acquisition
      * - Only get folders that have our selected people in them
      *
      * @return array
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \UnderflowException
      */
     private function findHierarchy() :array
     {
@@ -190,13 +195,16 @@ class Acquisition
         return $hierarchy;
     }
 
+
     /**
      * Find all the people in the states you selected
      * This way we can cheaply assemble the list of everyone who has received rubrics
      * and those who haven't
      *
      * @return array
-    */
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \UnderflowException
+     */
     private function findRoster() :array
     {
         $pb = new Builder($this->userMapper->getDatabase(), 'upd');
@@ -239,6 +247,7 @@ class Acquisition
         return $roster;
     }
 
+
     /**
      * Find all the assessment ids that spawned from $courseSpecId
      * Use a custom query, otherwise it's just too slow
@@ -247,6 +256,8 @@ class Acquisition
      * and (user_id, pdNumber) tuples
      *
      * @return array
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \UnderflowException
      */
     private function findInvolvement() :array
     {
@@ -268,6 +279,11 @@ class Acquisition
      * Populate a particular subset of Participants
      *
      * @return array
+     * @throws Mapper\DefinitionException
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
+     * @throws \LogicException
+     * @throws \UnexpectedValueException
      */
     public function generate() :array
     {
