@@ -362,6 +362,7 @@ class SitePage extends Page
             'SITE_LOGINNAME' => $this->user->formatName(),
             'SITE_USERNAME' => $this->user->getUsername(),
             'SITE_USER_EMAIL' => $this->user->getEmail(),
+            'SITE_USER_FULLNAME' => json_encode($this->user->formatName()),
             'SITE_LOCATION' => $this->site,
             'SITE_ANALYTICS' => $this->config->get('site_analytics'),
             'USER_ID' => $this->user->getId(),
