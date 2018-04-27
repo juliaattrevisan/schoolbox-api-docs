@@ -134,7 +134,7 @@ class Acquisition
         $pb->equals('sb.use_rubric', 1);
         $pb->isNull('rd.deleted_at');
         $pb->isNull('rc.deleted_at');
-        $pb->notNull('rm.published_at');
+        $pb->notNull('sr.published_at');
 
         /* Show only unaccredited users
          */
@@ -154,7 +154,8 @@ class Acquisition
             SELECT u.id AS user_id, upd.number, a.id AS assessment_id, ci.folder_id
             FROM user_professionaldevelopment upd
             INNER JOIN `user` u ON upd.user_id = u.`id`
-            INNER JOIN rubric_mark rm ON u.`id` = rm.student_id
+            INNER JOIN submission_return sr ON u.`id` = sr.`owner`
+            INNER JOIN rubric_mark rm ON sr.`id` = rm.`return_id`
             INNER JOIN rubric_descriptor rd ON rm.`descriptor_id` = rd.`id`
             INNER JOIN rubric_criterion rc ON rd.`criterion_id`  = rc.`id`
             INNER JOIN userAccess ua ON ua.uid = u.`id` AND rc.parent_id = ua.`sid` AND parent_type = 'category'
