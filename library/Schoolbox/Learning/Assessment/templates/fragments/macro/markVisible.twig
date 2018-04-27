@@ -2,15 +2,15 @@
  # To show, or not to show? That is the question.
  # Parameters:
  # * assessment: the assesment whos visibility we are querying
- # * mark: the string that will be printed, given the access level is right
- # * replacement: what to show if the access does not have access
+ # * string: the string that will be printed, given the access level is right
+ # * default: what to show if the user does not have access
  #}
-{% macro show(assessment, mark, replacement) %}
+{% macro showIfVisible(assessment, string, default) %}
     {% spaceless %}
         {% if assessment.isFeedbackVisibleToUser(USER) %}
-            {{ mark }}
+            {{ string }}
         {% else %}
-            {{ replacement }}
+            {{ default }}
         {% endif %}
     {% endspaceless %}
 {% endmacro %}
