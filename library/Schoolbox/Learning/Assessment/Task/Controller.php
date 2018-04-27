@@ -318,7 +318,6 @@ class Controller extends Assessment\Controller
      */
     protected function assertSaveability(TaskResponse $response)
     {
-        $submittedBy  = $response->getSubmittedBy();
         $submittedFor = $response->getSubmittedOnBehalfOf();
         $participant  = $response->getAssessable()->getParticipantIfExtant($submittedFor);
 
@@ -350,7 +349,7 @@ class Controller extends Assessment\Controller
         }
 
         // Is the learner self-assessing ?
-        if (!$isInstructor && (int)$submittedBy->getId() === (int)$submittedFor->getId()) {
+        if (!$isInstructor && $response->isSelfAssessed()) {
 
             // 5. Is the task not self-assessable ?
             if (!$response->getAssessable()->isSelfAssessable()) {
