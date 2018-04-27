@@ -273,33 +273,27 @@
                             <label for="type-{{ type.id }}">
                                 {{ type.name }}
                             </label>
+                            <div class="subtype checklist">
+                                {% for subtype in subTypes %}
+
+                                    {% if subtype.pastoralType.id == type.id %}
+                                        <input id="subtype-{{ subtype.id }}"
+                                               name="subtypes[]"
+                                               value="{{ subtype.id }}"
+                                               type="checkbox"
+                                               {% for subtypeSelected in report.subtypes if subtypeSelected.id == subtype.id %}checked{% endfor %}
+                                               data-check-subtype
+                                        >
+                                        <label for="subtype-{{ subtype.id }}">
+                                            {{ subtype.name }}
+                                        </label>
+                                    {% endif %}
+
+                                {% endfor %}
+                            </div>
                         {% endfor %}
                     </div>
                 </div>
-            </section>
-
-            <h2 class="subheader">Record Subtypes</h2>
-            <p class="meta">Select the record subtypes you want to appear in the report</p>
-            <section>
-                <div class="small-12 medium-6 columns content">
-                    <div class="checklist">
-                        <input id="subtype-all" type="checkbox" data-check-all-subtype>
-                        <label for="subtype-all">Select All</label>
-                        {% for subtype in subTypes %}
-                            <input id="subtype-{{ subtype.id }}"
-                                   name="subtypes[]"
-                                   value="{{ subtype.id }}"
-                                   type="checkbox"
-                                   {% for subtypeSelected in report.subtypes if subtypeSelected.id == subtype.id %}checked{% endfor %}
-                                   data-check-subtype
-                            >
-                            <label for="subtype-{{ subtype.id }}">
-                                {{ subtype.name }}
-                            </label>
-                        {% endfor %}
-                    </div>
-                </div>
-
             </section>
 
             {# Pastoral moderators get an additional option to only show records in which they are involved #}
