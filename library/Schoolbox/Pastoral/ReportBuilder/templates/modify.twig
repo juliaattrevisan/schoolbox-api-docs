@@ -230,33 +230,35 @@
                         <input id="type-all" type="checkbox" data-check-all-type>
                         <label for="type-all">Select All</label>
                         {% for type in types %}
-                            <input id="type-{{ type.id }}"
-                                   name="types[]"
-                                   value="{{ type.id }}"
-                                   type="checkbox"
-                                   {% for typeSelected in report.types if typeSelected.id == type.id %}checked{% endfor %}
-                                   data-check-type
-                            >
-                            <label for="type-{{ type.id }}">
-                                {{ type.name }}
-                            </label>
-                            <div class="checklist">
-                                {% for subtype in subTypes %}
+                            <div class="pastoral-types">
+                                <input id="type-{{ type.id }}"
+                                       name="types[]"
+                                       value="{{ type.id }}"
+                                       type="checkbox"
+                                       {% for typeSelected in report.types if typeSelected.id == type.id %}checked{% endfor %}
+                                       data-check-type
+                                >
+                                <label for="type-{{ type.id }}">
+                                    {{ type.name }}
+                                </label>
+                                <div class="checklist pastoral-subtypes">
+                                    {% for subtype in subTypes %}
 
-                                    {% if subtype.pastoralType.id == type.id %}
-                                        <input id="subtype-{{ subtype.id }}"
-                                               name="subtypes[]"
-                                               value="{{ subtype.id }}"
-                                               type="checkbox"
-                                               {% for subtypeSelected in report.subtypes if subtypeSelected.id == subtype.id %}checked{% endfor %}
-                                               data-check-subtype
-                                        >
-                                        <label for="subtype-{{ subtype.id }}">
-                                            {{ subtype.name }}
-                                        </label>
-                                    {% endif %}
+                                        {% if subtype.pastoralType.id == type.id %}
+                                            <input id="subtype-{{ subtype.id }}"
+                                                   name="subtypes[]"
+                                                   value="{{ subtype.id }}"
+                                                   type="checkbox"
+                                                   {% for subtypeSelected in report.subtypes if subtypeSelected.id == subtype.id %}checked{% endfor %}
+                                                   data-check-subtype
+                                            >
+                                            <label for="subtype-{{ subtype.id }}">
+                                                {{ subtype.name }}
+                                            </label>
+                                        {% endif %}
 
-                                {% endfor %}
+                                    {% endfor %}
+                                </div>
                             </div>
                         {% endfor %}
                     </div>
@@ -346,11 +348,15 @@
                     // If a pastoral type checkbox is checked...
                     $("input[name='types[]']").change(function(e) {
                         var checkbox = e.target;
+                        var $subCheckboxes = $(checkbox).siblings(".pastoral-subtypes").find("input[name='subtypes[]']");
                         if ($(checkbox).is(':checked')) {
                             // ...check all its subtypes
-                            var $subCheckboxes = $(checkbox).siblings(".checklist").find("input[name='subtypes[]']");
                             $subCheckboxes.each(function(index, subCheckbox) {
                                 $(subCheckbox).prop('checked', true);
+                            })
+                        } else {
+                            $subCheckboxes.each(function(index, subCheckbox) {
+                                $(subCheckbox).prop('checked', false);
                             })
                         }
                     });
