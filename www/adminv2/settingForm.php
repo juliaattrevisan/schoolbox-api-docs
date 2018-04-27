@@ -47,12 +47,14 @@ if ($_SESSION['user']->isSuperuser()) {
             $factory = new \Schoolbox\Resource\Attachment\Collector\CollectorFactory();
             try {
                 $newValue = '';
-                foreach ($_POST[$currentRow] as $file) {
-                    $image = $factory->build(array($file))->getFirst();
-                    if ($newValue != '') {
-                        $newValue .= ',';
+                if (is_array($_POST[$currentRow])) {
+                    foreach ($_POST[$currentRow] as $file) {
+                        $image = $factory->build(array($file))->getFirst();
+                        if ($newValue != '') {
+                            $newValue .= ',';
+                        }
+                        $newValue .= $image->getHash();
                     }
-                    $newValue .= $image->getHash();
                 }
             } catch (\Schoolbox\Resource\Exception $e) {
                 // File is empty or not found. Delete the record completely
