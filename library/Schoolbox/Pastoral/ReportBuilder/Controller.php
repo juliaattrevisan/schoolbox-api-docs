@@ -25,9 +25,9 @@ use Schoolbox\Pastoral\Tag\Mapper as PastoralTagMapper;
 use Schoolbox\Pastoral\Tag\Model as PastoralTag;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
 use Schoolbox\Pastoral\SubType\Mapper as PastoralSubTypeMapper;
+use HouseMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\UserMapper;
-use HouseMapper;
 
 class Controller extends Base
 {
@@ -110,6 +110,7 @@ class Controller extends Base
         $this->pastoralSubTypeMapper     = $pastoralSubTypeMapper;
         $this->pastoralSeverityMapper    = $pastoralSeverityMapper;
         $this->userMapper                = $userMapper;
+        $this->houseMapper               = $houseMapper;
         $this->pastoralGroupMapper       = $pastoralGroupMapper;
         $this->pastoralGroupMemberMapper = $pastoralGroupMemberMapper;
         $this->pastoralReportMapper          = $pastoralReportMapper;
