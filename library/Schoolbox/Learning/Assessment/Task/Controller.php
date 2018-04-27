@@ -18,7 +18,7 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Task\Response\MapperProxy as TaskResponseDataSource;
 use Schoolbox\Learning\Assessment\Redirect;
-use Schoolbox\Mapper\Exception\InsufficientHydration;
+use Schoolbox\Mapper\Exception\InsufficientHydrationException;
 use Schoolbox\Preview\Factory as PreviewFactory;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Learning\Assessment\Transactor;
@@ -249,7 +249,7 @@ class Controller extends Assessment\Controller
      * @throws \InvalidArgumentException If we attempt to give a task feedback a null response
      * @throws \PDOException If unable to save task response to DB
      * @throws \Schoolbox\Application\Exception\Exception If synchronous request and something went wrong
-     * @throws InsufficientHydration If unable to perform some logic because an object lacks hydration
+     * @throws InsufficientHydrationException If unable to perform some logic because an object lacks hydration
      */
     public function postCreateResponse(IAssessable $assessment, User $student): void
     {
@@ -313,7 +313,7 @@ class Controller extends Assessment\Controller
      * @param TaskResponse $response
      * @throws ConcurrentModificationException If participant already has the task completion status - and don't want to log.
      * @throws InvalidTaskResponseException If task response is not saveable - and we want to log.
-     * @throws InsufficientHydration If task object has not been sufficiently hydrated
+     * @throws InsufficientHydrationException If task object has not been sufficiently hydrated
      * @todo This should all be wrapped up in an auth rule
      */
     protected function assertSaveability(TaskResponse $response)
@@ -390,7 +390,7 @@ class Controller extends Assessment\Controller
      * @throws \PDOException If unable to save task response to DB
      * @throws ConcurrentModificationException If participant already has the task completion status.
      * @throws InvalidTaskResponseException If proposed Task Response is invalid for some reasons
-     * @throws InsufficientHydration If task object is insufficiently hydrated
+     * @throws InsufficientHydrationException If task object is insufficiently hydrated
      */
     private function saveTaskResponse(int $completionStatus, IAssessable $assessment, User $student): Response\Model
     {

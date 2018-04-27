@@ -19,7 +19,7 @@ namespace Schoolbox\Learning\Assessment\Task;
 
 use InvalidArgumentException;
 use Schoolbox\Learning\Assessment\Participant;
-use Schoolbox\Mapper\Exception\InsufficientHydration;
+use Schoolbox\Mapper\Exception\InsufficientHydrationException;
 use \Schoolbox\User;
 use \Schoolbox\Learning\Assessment\AbstractAssessment;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
@@ -294,12 +294,12 @@ class Model extends AbstractAssessment
      * Convenience intuitive method (but not a mapper standard get/set)
      *
      * @return bool
-     * @throws InsufficientHydration If property is not set
+     * @throws InsufficientHydrationException If property is not set
      */
     public function isSelfAssessable(): bool
     {
         if(null === $this->isSelfAssessable){
-            throw new InsufficientHydration('Property not set');
+            throw new InsufficientHydrationException('Property not set');
         }
         return $this->isSelfAssessable;
     }

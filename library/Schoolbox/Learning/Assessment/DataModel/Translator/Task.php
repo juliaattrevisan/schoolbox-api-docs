@@ -13,7 +13,7 @@ use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Task\Model as TaskObject;
-use Schoolbox\Mapper\Exception\InsufficientHydration;
+use Schoolbox\Mapper\Exception\InsufficientHydrationException;
 
 
 /**
@@ -78,7 +78,7 @@ class Task implements IAssessmentTypeTranslator
      *
      * @param IAssessable|TaskObject         $domainObject
      * @param IAssessableDataModel|TaskModel $dataModel
-     * @throws InsufficientHydration If domain object is insufficiently hydrated for translation
+     * @throws InsufficientHydrationException If domain object is insufficiently hydrated for translation
      */
     public function translateToDataModel(IAssessable $domainObject, IAssessableDataModel $dataModel): void
     {
