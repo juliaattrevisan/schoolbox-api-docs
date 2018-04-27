@@ -66,6 +66,6 @@ Proactively work to facilitate team's ability to successfully deliver the sprint
 
 ## Business as Usual (BAU) Triage Nurse 
 
-* Move issues from Unconfirmed to Confirmed
+* Filling in incomplete tickets and moving from Unconfirmed to Confirmed
 * Fix critical issues
-* Add items into sprint and backlog if necessary
+* Add items into Sprint and backlog if necessary
