@@ -17,7 +17,7 @@ namespace Schoolbox\Mapper\Exception;
  *
  * This represents a logic bug and should be logged to sentry.
  */
-class InsufficientHydration extends \UnexpectedValueException
+class InsufficientHydration extends \LogicException
 {
 
 }
