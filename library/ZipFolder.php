@@ -104,7 +104,7 @@ class ZipFolder
                     stream_copy_to_stream($file->getStorage()->readStream(), $fp);
                     fclose($fp);
                 } else {
-                   error(Schoolbox\Error\Mapper::ERROR_FILE_SIZE, 'The maximum download size is '.($this->maxSize/1024).' megabytes.'  );
+                   error(Schoolbox\Error\Mapper::ERROR_FILE_SIZE, 'The maximum download size is '.\Alaress_Byte_Format::bytesToString($this->maxSize/1024).' megabytes.'  );
                 }
             }
         }
