@@ -1,32 +1,26 @@
 # Dispatcher
 
-The notification system Daemons use the Dispatcher as the interface through
-which their Scheduler assigns Tasks to Workers, and receives a Response from
-them once they have completed execution.
+The notification system uses the Dispatcher to assign Tasks to be executed.
+Depending on the requested Task, it may be executed:
+* synchronously in the same process
+* asynchronously in a child process
+
+It is also responsible for returning a Response to an assigned Response
+Handler.
+
 
 ## Glossary
 
 <dl>
-  <dt>Daemon</dt>
-  <dd>
-    A long-running process which listens to events, and acts upon those events.
-  </dd>
-
-  <dt>Message Broker</dt>
-  <dd>
-    The high-level interface through which Messages are Published and
-    Subscribed to.
-  </dd>
-
-  <dt>Scheduler</dt>
-  <dd>
-    The interface through which a Daemon can Dispatch a Task to be executed,
-    and which handles what happens when a Task returns a Response.
-  </dd>
-
   <dt>Dispatcher</dt>
   <dd>
-    The interface through which a Scheduler assigns Tasks to Workers.
+    A generic framework for assigning Tasks to be executed.
+  </dd>
+
+  <dt>Dispatch Strategy</dt>
+  <dd>
+    A strategy for determining whether a Task should be executed synchronously
+    or asynchronously.
   </dd>
 
   <dt>Event Loop</dt>
@@ -60,12 +54,6 @@ them once they have completed execution.
     on the Response.
   </dd>
 
-  <dt>Signal Queue</dt>
-  <dd>
-    A queue which Daemons subscribe to, for the purpose of receiving control
-    signals.
-  </dd>
-
   <dt>Inter-Process Communication (IPC) Protocol</dt>
   <dd>
     The protocol through which processes (in the daemon's case, the Dispatcher
@@ -81,11 +69,10 @@ The Dispatcher is an implementation of
 
 > TODO figure out how a Task's output gets back to the Daemon
 
-At a high level, it is responsible for Tasks being performed. The
-implementation that Daemons use uses Workers to perform Tasks, so that:
-* the Daemon is not blocked whilst running the Task
-* the Daemon is not brought down by a Task run which results in an
-  unrecoverable error
+At a high level, it is responsible for Tasks being performed, whilst ensuring
+that the process using the Dispatcher:
+* is not blocked whilst running the Task
+* is not brought down by a Task run which results in an unrecoverable error
 
 The `enqueue` method enqueues a Task to be Dispatched. This method's parameters
 are arbitrary in their specifics, but will always be:
@@ -135,6 +122,8 @@ while (true) {
 It is used by the Dispatcher to defer execution of a Task until its time to
 execute is reached.
 
+> TODO is the above correct? Doesn't the Scheduler control when a Task runs?
+
 
 ### Worker Pool
 
@@ -175,7 +164,7 @@ The Worker Pool uses this to listen on messages received from its Workers.
 
 ### Worker
 
-A Worker is an abstraction of a child process of the Daemon. It is an
+A Worker is an abstraction of a child process of the current process. It is an
 instance of `\Alaress\WorkerCrew\Worker\Worker`.
 
 The Worker itself is internal to the Worker Pool and Dispatcher; anything
