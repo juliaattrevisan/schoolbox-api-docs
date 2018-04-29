@@ -25,7 +25,8 @@ Handler.
 
   <dt>Event Loop</dt>
   <dd>
-    A component used for asynchronously listening for events.
+    A low-level mechanism that the Dispatcher uses to repeatedly check for
+    queued Tasks.
   </dd>
 
   <dt>Worker Pool</dt>
@@ -108,7 +109,8 @@ Worker Pool.
 ### Event Loop
 
 The Event Loop is an implementation of `\React\EventLoop\LoopInterface`.
-Think of it as the asynchronous equivalent of a classic event loop:
+This interface provides the asynchronous equivalent of the classic periodic
+timer loop:
 
 ```php
 $eventQueue = new EventQueueSubscription();
@@ -116,13 +118,12 @@ while (true) {
     foreach ($eventQueue->getEvents() as $event) {
         handleEvent($event);
     }
+    sleep();
 }
 ```
 
-It is used by the Dispatcher to defer execution of a Task until its time to
-execute is reached.
-
-> TODO is the above correct? Doesn't the Scheduler control when a Task runs?
+The Dispatcher uses the Event Loop to repeatedly check for new Tasks to assign
+to the Worker Pool.
 
 
 ### Worker Pool
@@ -196,3 +197,5 @@ responsible for:
   act upon it
 * re-constituting data sent by the Worker's output pipe, so that the Dispatcher
   may receive its output, eventually sending to the Response
+
+## Usage
