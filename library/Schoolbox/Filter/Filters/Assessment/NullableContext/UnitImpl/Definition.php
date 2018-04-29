@@ -27,7 +27,7 @@ class Definition extends NullableContext\Definition
 {
 
     // The name to expose in the UI
-    const NAME = 'Unit Implementation';
+    protected const NAME = 'Unit Implementation';
 
 
     /**

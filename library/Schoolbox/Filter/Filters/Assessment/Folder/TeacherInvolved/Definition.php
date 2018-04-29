@@ -23,7 +23,7 @@ class Definition extends FolderFilter\Definition
 {
 
     // The name to expose in the UI
-    const NAME = 'Teacher Folders';
+    protected const NAME = 'Teacher Folders';
 
 
     /**

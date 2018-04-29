@@ -21,7 +21,7 @@ class Definition extends Filter\AbstractDefinition
 {
 
     // The name to expose in the UI
-    const NAME = 'Weighting';
+    protected const NAME = 'Weighting';
 
     const KEY_WEIGHTED = 'weighted';
     const KEY_UNWEIGHTED = 'unweighted';

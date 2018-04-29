@@ -22,7 +22,7 @@ class Definition extends FolderFilter\Definition
 {
 
     // The name to expose in the UI
-    const NAME = 'Student Folders';
+    protected const NAME = 'Student Folders';
 
     const KEY_RESPONSE = 'response';
     const KEY_FEEDBACK = 'feedback';

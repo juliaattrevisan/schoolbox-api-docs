@@ -26,7 +26,7 @@ class Definition extends Filter\AbstractDefinition
 {
 
     // The name to expose in the UI
-    const NAME = 'Activity Type';
+    protected const NAME = 'Activity Type';
 
     const KEY_PROJECT = AssessmentType::TYPE_PROJECT;
     const KEY_QUIZ = AssessmentType::TYPE_QUIZ;
