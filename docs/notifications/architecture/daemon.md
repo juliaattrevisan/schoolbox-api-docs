@@ -30,27 +30,12 @@ task.
 
   <dt>Dispatcher</dt>
   <dd>
-    The interface through which a Scheduler assigns Tasks to Workers.
-  </dd>
-
-  <dt>Event Loop</dt>
-  <dd>
-    A component used for asynchronously listening for events.
-  </dd>
-
-  <dt>Worker Pool</dt>
-  <dd>
-    A collection of pre-created Workers waiting to be assigned a Task.
-  </dd>
-
-  <dt>Worker</dt>
-  <dd>
-    A child process of the Daemon, summoned only to perform Tasks.
+    The interface through which a Scheduler assigns Tasks to be completed.
   </dd>
 
   <dt>Task</dt>
   <dd>
-    The job that a Worker has been assigned.
+    The job that the Dispatcher has been assigned to complete.
   </dd>
 
   <dt>Response</dt>
@@ -68,12 +53,6 @@ task.
   <dd>
     A queue which Daemons subscribe to, for the purpose of receiving control
     signals.
-  </dd>
-
-  <dt>Inter-Process Communication (IPC) Protocol</dt>
-  <dd>
-    The protocol through which processes (in the daemon's case, the Dispatcher
-    and the Tasks it creates) communicate with one another.
   </dd>
 </dl>
 
@@ -138,7 +117,7 @@ Further information on the Scheduler may be found in the
 The Dispatcher is an implementation of
 `\Alaress\WorkerCrew\DispatcherInterface`.
 
-The implementation that Daemons use uses Workers to perform Tasks, so that:
+The Dispatcher implementation that Daemons use ensures that:
 * the Daemon is not blocked whilst running the Task
 * the Daemon is not brought down by a Task run which results in an
   unrecoverable error
