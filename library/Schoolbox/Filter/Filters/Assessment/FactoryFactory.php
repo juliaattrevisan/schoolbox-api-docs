@@ -33,7 +33,7 @@ use Schoolbox\Filter\Filters\Assessment\WorkType as WorkTypeFilter;
 class FactoryFactory extends Filter\AbstractFactoryFactory
 {
 
-    const ENTITY = Assessment\Mapper::class;
+    protected const ENTITY = Assessment\Mapper::class;
 
 
     /**
@@ -46,7 +46,7 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
      * @throws \InvalidArgumentException if no filter definition class not found, or filter factory not registered
      * @throws \ReflectionException If the specified class does not exist
      */
-    public function buildFilterFactoryForFilter($filterDefinitionClass)
+    public function buildFilterFactoryForFilter($filterDefinitionClass): IFactory
     {
         if (!class_exists($filterDefinitionClass)) {
             throw new \InvalidArgumentException('No filter definition found for class: ' . $filterDefinitionClass);
@@ -115,8 +115,9 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
      * @param null[]|Collection[] $filters
      * @param User                $viewee
      * @return null[]|Collection[]
+     * @throws \InvalidArgumentException    If unable to find specified Mapper class
      */
-    public function checkTeacherFolders(array $filters, User $viewee)
+    public function checkTeacherFolders(array $filters, User $viewee): array
     {
         /** @var Folder\Mapper $folderMapper */
         $folderMapper = $this->getMapperFactory()->get(Folder\Mapper::class);
