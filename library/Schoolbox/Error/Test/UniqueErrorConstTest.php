@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use Schoolbox\Error;
 
-class UniqueErrorConst extends TestCase
+class UniqueErrorConstTest extends TestCase
 {
 
     /**
