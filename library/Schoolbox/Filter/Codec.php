@@ -55,6 +55,8 @@ class Codec
      * @param string  $page
      * @param int[][] $request Indexed by filter.id, then selection.key
      * @return Collection|GenericCollection[]|Selection\Model[][] Indexed by filter.id then selection.key
+     * @throws \UnexpectedValueException             If wrong item type inserted in a generic collection
+     * @throws \Schoolbox\Mapper\Exception           If unable to create a mapper's model
      */
     public function convertRequestToSelections(User $user, $page, array $request)
     {
@@ -62,7 +64,7 @@ class Codec
         $selections = new GenericCollection(GenericCollection::class);
 
         // Has any data been passed in? (will be empty if no filters enabled on this page)
-        if (count($request)) {
+        if (\count($request)) {
             foreach ($request as $filterId => $filterSelectionArray) {
 
                 // Create the collection before checking if empty.
@@ -71,14 +73,14 @@ class Codec
                 $selections[$filterId] = $filterSelections;
 
                 // Not an array, this happens for empty sets, eg '?2='
-                if (!is_array($filterSelectionArray)) {
+                if (!\is_array($filterSelectionArray)) {
                     continue;
                 }
 
                 $filter = $this->filterMapper->createModel($filterId);
                 $page   = (string)$page;
 
-                /** @var bool[] $filterSelectionArray */
+                /** @var string[]|bool[] $filterSelectionArray */
                 foreach ($filterSelectionArray as $key => $isSelected) {
                     $selection = $this->selectionMapper->createModel();
                     $selection
