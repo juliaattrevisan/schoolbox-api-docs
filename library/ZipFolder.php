@@ -110,8 +110,8 @@ class ZipFolder
         }
 
 
-        //dont recurse deeper than max depth or max size
-        if ($this->maxDepth > $depth && $this->maxSize > $this->size) {
+        //dont recurse deeper than max depth
+        if ($this->maxDepth > $depth) {
             //get subfolders and recurse through them
             $folderList = $this->getFolders($parentFolder->getId());
             foreach ($folderList as $folder) {
