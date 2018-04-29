@@ -19,6 +19,7 @@ class UniqueErrorConstTest extends TestCase
      * Ensure that all errorId constant values are unique
      *
      * @throws \PHPUnit\Framework\Exception
+     * @throws \ReflectionException
      */
     public function testErrorIdUniqueness(): void
     {
