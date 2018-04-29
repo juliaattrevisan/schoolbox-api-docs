@@ -40,12 +40,13 @@ class KeyConverter extends AbstractKeyConverter
     /**
      * @inheritdoc
      */
-    public function getItem($key)
+    public function getItem(string $key, \Schoolbox\User $user, string $page): ?int
     {
-        $this->assertValidKey($key);
         if(Definition::KEY_NONE === $key){
             return null;
         }
+        $this->assertValidKey($key, $user, $page);
+
         return (int)$key;
     }
 
@@ -64,7 +65,7 @@ class KeyConverter extends AbstractKeyConverter
     /**
      * @inheritdoc
      */
-    protected function assertValidKey($key)
+    protected function assertValidKey(string $key, \Schoolbox\User $user, string $page): void
     {
         if ($key !== Definition::KEY_NONE && !$this->workTypeIds->offsetExists($key)) {
             throw new \InvalidArgumentException("No WorkType found for key: $key");

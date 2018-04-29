@@ -42,16 +42,15 @@ class KeyConverter extends NullableContext\KeyConverter
     /**
      * Given a concrete key (such as returned from a user's filter panel selections), return the corresponding item
      *
-     * @param string $key
+     * @inheritdoc
      * @return null|int
-     * @throws \InvalidArgumentException
      */
-    public function getItem($key)
+    public function getItem(string $key, \Schoolbox\User $user, string $page): ?int
     {
         if (Definition::KEY_NONE === $key) {
             return null;
         }
-        $this->assertValidKey($key);
+        $this->assertValidKey($key, $user, $page);
         return $this->unitSpecIds[$key];
     }
 
@@ -70,7 +69,7 @@ class KeyConverter extends NullableContext\KeyConverter
     /**
      * @inheritdoc
      */
-    protected function assertValidKey($key)
+    protected function assertValidKey(string $key, \Schoolbox\User $user, string $page): void
     {
         if (Definition::KEY_NONE === $key) {
             return;

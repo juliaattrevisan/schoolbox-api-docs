@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Filter;
 
+use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\GenericCollection;
 
@@ -30,17 +31,19 @@ abstract class AbstractKeyConverter implements IKeyConverter
     /**
      * Fetch the item represented by the key
      *
-     * @param string $key
+     * @param string          $key
+     * @param \Schoolbox\User $user
+     * @param string          $page
      * @return mixed
-     * @throws \InvalidArgumentException If key is invalid
+     * @throws \InvalidArgumentException If requested item is invalid
      */
-    abstract protected function getItem($key);
+    abstract protected function getItem(string $key, \Schoolbox\User $user, string $page);
 
 
     /**
      * @inheritdoc
      */
-    public function getSelectedItems(GenericCollection $availableSelections)
+    public function getSelectedItems(GenericCollection $availableSelections, \Schoolbox\User $user, string $page): ?Collection
     {
         $allItems       = $this->getAllPossibleItems();
         $availableItems = $allItems->emptyClone();
@@ -55,7 +58,7 @@ abstract class AbstractKeyConverter implements IKeyConverter
         // Build the available and selected item collections
         foreach ($availableSelections as $selection) {
             $key  = $selection->getKey();
-            $item = $this->getItem($key);
+            $item = $this->getItem($key, $user, $page);
             $availableItems->offsetSet($key, $item);
             if ($selection->getSelected()) {
                 $selectedItems->offsetSet($key, $item);
@@ -84,10 +87,12 @@ abstract class AbstractKeyConverter implements IKeyConverter
 
 
     /**
-     * @param string $key A concrete key
-     * @throws \InvalidArgumentException If key is invalid
+     * @param string          $key  A concrete key
+     * @param \Schoolbox\User $user The current session user
+     * @param string          $page
+     * @throws \InvalidArgumentException If $key is invalid for $user and $page
      */
-    abstract protected function assertValidKey($key);
+    abstract protected function assertValidKey(string $key, \Schoolbox\User $user, string $page): void;
 
     /* Getters
      */

@@ -55,7 +55,7 @@ abstract class KeyConverter extends Filter\AbstractKeyConverter
      * @inheritdoc
      * @todo This is almost identical to parent. Need to abstract out common bits. See inline comments for different logic.
      */
-    public function getSelectedItems(GenericCollection $availableSelections)
+    public function getSelectedItems(GenericCollection $availableSelections, \Schoolbox\User $user, string $page): ?Collection
     {
         /** @var Collection|int[] $allItems */
         $allItems       = $this->getAllPossibleItems();
@@ -71,7 +71,7 @@ abstract class KeyConverter extends Filter\AbstractKeyConverter
         // Build the available and selected item collections
         foreach ($availableSelections as $selection) {
             $key  = $selection->getKey();
-            $item = $this->getItem($key);
+            $item = $this->getItem($key, $user, $page);
             $availableItems->offsetSet($key, $item);
             if ($selection->getSelected()) {
                 $selectedItems->offsetSet($key, $item);

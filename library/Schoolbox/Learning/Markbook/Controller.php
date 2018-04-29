@@ -276,7 +276,7 @@ class Controller extends Base
             $selectionMapper->updateSelections($this->getUser(), $page, $selectionsPerFilter);
         }
 
-        $filters = $this->filterFactoryFactory->convertSelectionsToFilters($selectionsPerFilter, $page);
+        $filters = $this->filterFactoryFactory->convertSelectionsToFilters($selectionsPerFilter, $this->getUser(), $page);
 
         $filters = $this->filterFactoryFactory->checkTeacherFolders($filters, $viewee);
 

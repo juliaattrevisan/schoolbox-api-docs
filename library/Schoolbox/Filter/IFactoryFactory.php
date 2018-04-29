@@ -56,14 +56,16 @@ interface IFactoryFactory
      */
     public function buildEnabledKeyConverters($page);
 
+
     /**
      * Converts filter Selection models into an array of filters that can be injected into an IdFinder
      *
      * @param Collection|GenericCollection[]|Selection\Model[][] $selectionsPerFilter Indexed by filter.id then selection.key
+     * @param User                                               $user
      * @param string                                             $page
      * @return null[]|Collection[]  Indexed by filter.class
      */
-    public function convertSelectionsToFilters(Collection $selectionsPerFilter, $page);
+    public function convertSelectionsToFilters(Collection $selectionsPerFilter, User $user, string $page): array;
 
     /**
      * Build the current state of filters for a page, regardless of whether the state

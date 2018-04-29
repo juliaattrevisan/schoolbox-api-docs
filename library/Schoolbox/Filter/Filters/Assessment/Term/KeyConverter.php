@@ -46,9 +46,9 @@ abstract class KeyConverter extends AbstractKeyConverter
      * @inheritdoc
      * @return int
      */
-    protected function getItem($key)
+    protected function getItem(string $key, \Schoolbox\User $user, string $page): int
     {
-        $this->assertValidKey($key);
+        $this->assertValidKey($key, $user, $page);
         return (int)$key;
     }
 
@@ -67,7 +67,7 @@ abstract class KeyConverter extends AbstractKeyConverter
     /**
      * @inheritdoc
      */
-    protected function assertValidKey($key)
+    protected function assertValidKey(string $key, \Schoolbox\User $user, string $page): void
     {
         if (!is_numeric($key)) {
             throw new \InvalidArgumentException("Term keys must be numeric, representing term.id:  $key");

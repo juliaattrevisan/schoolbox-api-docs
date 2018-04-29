@@ -10,9 +10,7 @@ namespace Schoolbox\Filter\Filters\Assessment\Folder\TeacherInvolved;
 use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\GenericCollection;
-use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Resource\Folder;
 use Schoolbox\User;
 use Schoolbox\Filter\Filters\Assessment\Folder as FolderFilter;
 
@@ -42,6 +40,7 @@ class Factory extends FolderFilter\Factory
      * The 'Teacher Folder' component has the following custom functionality:
      * * It inserts any folders which the current session user is involved with,
      * * It inserts any folders specified in GET args if user has READ+ perm to them
+     * * Inserts any folders where GET-injected UnitImportSpecs reside
      *
      * @param Filter\IDefinition                                        $definition
      * @param User                                                      $user
@@ -94,7 +93,7 @@ class Factory extends FolderFilter\Factory
             $extraFolders = $this->getFolderMapper()->findByColumn($this->getFolderMapper()->getIdentifierColumn(), $folderIds);
 
             foreach ($extraFolders as $extraFolder) {
-                // Ensure user has READ perm to the requested folder
+                // Ensure user has READ perm to the requested folder (this will also be enforced via key-converter)
                 if ($this->getAccess()->getFolderAccess($user, $extraFolder->getId()) >= UserAccess::ACCESS_READ) {
                     $folders[$extraFolder->getId()] = $extraFolder;
                 }
@@ -124,8 +123,6 @@ class Factory extends FolderFilter\Factory
             ->indexByCallback(function ($folderId) {
                 return $folderId;
             });
-//        TODO resolve merge conflict remnant. Should we perm check client-supplied folder ids?
-//        return new KeyConverter($filter, $folderIds, $this->getAccess());
-        return new KeyConverter($filter, $folderIds);
+        return new KeyConverter($filter, $folderIds, $this->getAccess());
     }
 }

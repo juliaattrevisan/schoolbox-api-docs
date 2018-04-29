@@ -95,12 +95,12 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
      * @throws \Schoolbox\Mapper\Exception           If an alias is incorrect
      * @throws \UnexpectedValueException             If wrong item type inserted in a generic collection
      */
-    public function convertSelectionsToFilters(Collection $selectionsPerFilter, $page): array
+    public function convertSelectionsToFilters(Collection $selectionsPerFilter, User $user, string $page): array
     {
         $keyConverters        = $this->buildEnabledKeyConverters($page);
         $selectionTransformer = new Transformer($keyConverters, $selectionsPerFilter);
 
-        return $selectionTransformer->getByClass();
+        return $selectionTransformer->getByClass($user, $page);
     }
 
 

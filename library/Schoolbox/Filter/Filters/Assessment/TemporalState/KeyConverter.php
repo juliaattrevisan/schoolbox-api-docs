@@ -40,10 +40,11 @@ class KeyConverter extends AbstractKeyConverter
     /**
      * @inheritdoc
      * @return string
+     * @throws \InvalidArgumentException
      */
-    protected function getItem($key)
+    protected function getItem(string $key, \Schoolbox\User $user, string $page): string
     {
-        $this->assertValidKey($key);
+        $this->assertValidKey($key, $user, $page);
         return $key;
     }
 
@@ -60,7 +61,7 @@ class KeyConverter extends AbstractKeyConverter
     /**
      * @inheritdoc
      */
-    protected function assertValidKey($key)
+    protected function assertValidKey(string $key, \Schoolbox\User $user, string $page): void
     {
         if (!in_array($key, $this->temporalStates->getAll(), true)) {
             throw new \InvalidArgumentException('TemporalState Key is invalid: ' . $key);
