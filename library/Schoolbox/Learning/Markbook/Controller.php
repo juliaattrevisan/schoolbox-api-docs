@@ -13,7 +13,6 @@ use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group as GradeGroup;
 use Schoolbox\Assessment\Term;
@@ -21,6 +20,7 @@ use DueWork_ErrorMapper;
 use Schoolbox\Filter;
 use Schoolbox\User;
 use Schoolbox\GenericCollection;
+use Alaress\Database\Predicate\InvalidColumnException;
 
 class Controller extends Base
 {
@@ -168,6 +168,9 @@ class Controller extends Base
      * @throws \DomainException                      If of the filters on this page does not have its slug set
      * @throws \Schoolbox\Mapper\DefinitionException If join $name isn't on this mapper
      * @throws \Schoolbox\Mapper\Exception           If an alias is incorrect
+     * @throws InvalidColumnException                If an invalid column is passed to PB
+     * @throws \UnderflowException                   If empty IN arg passed to PB
+     * @throws \UnexpectedValueException             If wrong item type inserted in a generic collection
      */
     public function getMarkbook(User $viewee = null): void
     {
