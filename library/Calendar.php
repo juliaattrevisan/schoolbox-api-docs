@@ -6,7 +6,10 @@ use Schoolbox\Calendar\Event as EventModel;
 
 class Calendar extends DeprecatedModel
 {
-    private var $groupHandler;
+    /**
+     * @var Group
+     */
+    private $groupHandler;
 
     function __construct()
     {
