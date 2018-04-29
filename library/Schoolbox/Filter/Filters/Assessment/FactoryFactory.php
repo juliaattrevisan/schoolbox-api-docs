@@ -22,9 +22,6 @@ use Schoolbox\Learning\Assessment\DataModel\Project;
 use Schoolbox\Filter\Filters;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\User;
-use Schoolbox\Filter\Filters\Assessment\Folder as FolderFilter;
-use Schoolbox\Filter\Filters\Assessment\Term as TermFilter;
-use Schoolbox\Filter\Filters\Assessment\WorkType as WorkTypeFilter;
 
 
 /**
@@ -56,27 +53,27 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
         switch ($filterDefinitionClass) {
             case AssessmentType\Definition::class:
                 return $this->buildFactory(AssessmentType\Factory::class);
-            case FolderFilter\TeacherInvolved\Definition::class:
-                return $this->buildFactory(FolderFilter\TeacherInvolved\Factory::class, [
+            case Filters\Assessment\Folder\TeacherInvolved\Definition::class:
+                return $this->buildFactory(Filters\Assessment\Folder\TeacherInvolved\Factory::class, [
                     'folderMapper' => $this->getMapperFactory()->get(Folder\Mapper::class),
                     'access'       => $this->getMapperFactory()->get(Access::class),
                 ]);
-            case FolderFilter\StudentInteractions\Definition::class:
-                return $this->buildFactory(FolderFilter\StudentInteractions\Factory::class, [
+            case Filters\Assessment\Folder\StudentInteractions\Definition::class:
+                return $this->buildFactory(Filters\Assessment\Folder\StudentInteractions\Factory::class, [
                     'folderMapper' => $this->getMapperFactory()->get(Folder\Mapper::class),
                 ]);
-            case TermFilter\Due\Definition::class:
-                return $this->buildFactory(TermFilter\Due\Factory::class, [
+            case Filters\Assessment\Term\Due\Definition::class:
+                return $this->buildFactory(Filters\Assessment\Term\Due\Factory::class, [
                     'termMapper' => $this->getMapperFactory()->get(Term\Mapper::class),
                 ]);
-            case TermFilter\Close\Definition::class:
-                return $this->buildFactory(TermFilter\Close\Factory::class, [
+            case Filters\Assessment\Term\Close\Definition::class:
+                return $this->buildFactory(Filters\Assessment\Term\Close\Factory::class, [
                     'termMapper' => $this->getMapperFactory()->get(Term\Mapper::class),
                 ]);
             case TemporalState\Definition::class:
                 return $this->buildFactory(TemporalState\Factory::class);
-            case WorkTypeFilter\Definition::class:
-                return $this->buildFactory(WorkTypeFilter\Factory::class, [
+            case Filters\Assessment\WorkType\Definition::class:
+                return $this->buildFactory(Filters\Assessment\WorkType\Factory::class, [
                     'workTypeMapper' => $this->getMapperFactory()->get(WorkType\Mapper::class),
                 ]);
             case WeightingType\Definition::class:
@@ -123,14 +120,14 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
         $folderMapper = $this->getMapperFactory()->get(Folder\Mapper::class);
 
         // No teacher-folder filter ? (Either not defined or set to NULL)
-        if (!isset($filters[FolderFilter\TeacherInvolved\Definition::class])) {
+        if (!isset($filters[Filters\Assessment\Folder\TeacherInvolved\Definition::class])) {
 
             // Insert all involved folders for the specified viewee
-            $filters[FolderFilter\TeacherInvolved\Definition::class] = new Collection();
-            $involvedFolders                                         = $folderMapper->findForUser($viewee, true, UserAccess::ACCESS_WRITE);
+            $filters[Filters\Assessment\Folder\TeacherInvolved\Definition::class] = new Collection();
+            $involvedFolders                                                      = $folderMapper->findForUser($viewee, true, UserAccess::ACCESS_WRITE);
             foreach ($involvedFolders as $involvedFolder) {
-                $folderId                                                           = $involvedFolder->getId();
-                $filters[FolderFilter\TeacherInvolved\Definition::class][$folderId] = $folderId;
+                $folderId                                                                        = $involvedFolder->getId();
+                $filters[Filters\Assessment\Folder\TeacherInvolved\Definition::class][$folderId] = $folderId;
             }
         }
 
