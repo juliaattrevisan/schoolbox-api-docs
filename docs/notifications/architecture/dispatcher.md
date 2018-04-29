@@ -74,8 +74,6 @@ Handler.
 The Dispatcher is an implementation of
 `\Alaress\WorkerCrew\DispatcherInterface`.
 
-> TODO figure out how a Task's output gets back to the Daemon
-
 At a high level, it is responsible for Tasks being performed, whilst ensuring
 that the process using the Dispatcher:
 * is not blocked whilst running the Task
@@ -93,8 +91,9 @@ are arbitrary in their specifics, but will always be:
 >  * the Worker's `setTask` method
 >  * the Task's constructor
 
-The `dispatch` method dispatches the most recently added Task.
-The Event Loop triggers this method on a regular basis.
+The `dispatch` method dispatches any Tasks waiting to be run; depending on the
+Dispatch Strategy, it will either run the Task itself or send it to the Worker
+Pool.
 
 Depending on the Tasks that the Worker Pool is able to perform (see
 `\Alaress\WorkerCrew\Pooling\DispatchStrategyInterface::getSupportedActions`),
@@ -128,8 +127,8 @@ while (true) {
 }
 ```
 
-The Dispatcher uses the Event Loop to repeatedly check for new Tasks to assign
-to the Worker Pool.
+The Dispatcher uses the Event Loop to repeatedly run the Dispatcher's
+`dispatch` method.
 
 
 ### Worker Pool
@@ -182,8 +181,6 @@ outside of these classes need not know about this abstraction.
 ### Task
 
 A Task is run within a Worker.
-
-> TODO figure out how a call to `enqueue` actually becomes a Task callback
 
 The Task is able to receive data from its input pipe, and send data through its
 various output pipes (output, log, error) to its encapsulating Worker process.
