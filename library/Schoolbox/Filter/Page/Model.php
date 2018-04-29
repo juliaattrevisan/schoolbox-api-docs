@@ -23,6 +23,7 @@ class Model
     const PAGE_PENDING_ASSESSMENTS = 'pending';
     const PAGE_GRADES = 'grades';
     const PAGE_MARK_BOOK = 'markbook';
+    const PAGE_COURSE_MARK_BOOK = 'courseMarkbook';
     const PAGE_LEARNING_ANALYTICS = 'analytics';
     const PAGE_DUE_WORK_CALENDAR = 'dueWorkCal';
 
