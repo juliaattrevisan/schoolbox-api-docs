@@ -34,6 +34,12 @@ Handler.
     A collection of pre-created Workers waiting to be assigned a Task.
   </dd>
 
+  <dt>Stream Listener</dt>
+  <dd>
+    A low-level mechanism through which the Worker Pool listens to the output
+    of its Workers.
+  </dd>
+
   <dt>Worker</dt>
   <dd>
     A child process of the Daemon, summoned only to perform Tasks.
@@ -142,7 +148,8 @@ It is responsible for:
     corresponding to the process identifier of the Worker assigned the Task
   * a rejection of the request if the maximum number of Workers is reached,
     and none of them are idle
-* listening for when a Worker's Task sends a message
+* listening for when a Worker's Task sends a message, through its Stream
+  Listener
 * monitoring the health of its Workers
   * keeping them alive and contactable after they have finished a Task
   * releasing a Worker (by sending a `SIGTERM` or `SIGKILL` signal) if it has
@@ -196,6 +203,7 @@ responsible for:
 * constituting data sent to the Worker's input pipe, so that the its Task may
   act upon it
 * re-constituting data sent by the Worker's output pipe, so that the Dispatcher
-  may receive its output, eventually sending to the Response
+  may receive its output, eventually sending to the Response Handler
+
 
 ## Usage
