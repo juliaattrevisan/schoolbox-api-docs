@@ -3,6 +3,6 @@
 {% block buttons %}
     {{ parent() }}
     {% if isStaff %}
-        <li><a class="icon-progress" href="https://schoolbox.scr.vic.edu.au/modules/remote/aHR0cHM6Ly9kYXNoYm9hcmQuc2NyLnZpYy5lZHUuYXUvbG9naW4vc2Nob29sYm94bG9naW4=">Dashboard</a></li>
+        <li><a class="icon-progress" href="https://dashboard.scr.vic.edu.au/login/stafflogin/{{ user.Id }}">Dashboard</a></li>
     {% endif %}
 {% endblock buttons %}
