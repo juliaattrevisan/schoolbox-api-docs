@@ -312,7 +312,7 @@ class Controller extends Base
      * @throws LogicException If cyclic graph detected
      * @throws UnexpectedValueException If unable to merge student collections
      */
-    public function getGradesForSubject(User $viewee, Term\Model $term, Folder\Model $subject)
+    public function getGradesForSubject(User $viewee, Term\Model $term, Folder\Model $subject): void
     {
         $page        = FilterPage\Model::PAGE_GRADES;
         $route       = $this->getRouter()->generate('learningGrades.postReport', [
@@ -383,7 +383,7 @@ class Controller extends Base
      * @todo convert to a GET route
      *
      */
-    public function postReport(User $viewee, Term\Model $term, Folder\Model $subject)
+    public function postReport(User $viewee, Term\Model $term, Folder\Model $subject): void
     {
         $request         = $this->request->post['filter_selection'] ?: [];
         $page            = FilterPage\Model::PAGE_GRADES;

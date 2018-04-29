@@ -95,7 +95,7 @@ class Controller extends Base
      * @level 165
      * @throws RouteNotFound
      */
-    public function getPendingAssessments()
+    public function getPendingAssessments(): void
     {
         // Is current user not SuperUser or Staff ?
         if (!($this->getUser()->isSuperuser() || $this->getUser()->getRole()->isStaff())) {
@@ -128,7 +128,7 @@ class Controller extends Base
      * @throws \DomainException     If filter factoryFactory has not defined the entity it is filtering
      * @throws NotFound             If $viewee is not staff
      */
-    public function getPendingAssessmentsForUser(User $viewee, AssessmentFilters\FactoryFactory $filterFactoryFactory)
+    public function getPendingAssessmentsForUser(User $viewee, AssessmentFilters\FactoryFactory $filterFactoryFactory): void
     {
         if(!$viewee->getRole()->isStaff()){
             throw new NotFound('Only staff have pending assessments. Found: ' . $viewee->getRole()->getType());
@@ -169,7 +169,7 @@ class Controller extends Base
      * @throws \Exception
      * @throws \InvalidArgumentException
      */
-    public function postPendingAssessmentsForUser(User $viewee, AssessmentFilters\FactoryFactory $filterFactoryFactory)
+    public function postPendingAssessmentsForUser(User $viewee, AssessmentFilters\FactoryFactory $filterFactoryFactory): void
     {
         try {
             $postFilterSelections = $this->request->post['filter_selection'] ?: [];

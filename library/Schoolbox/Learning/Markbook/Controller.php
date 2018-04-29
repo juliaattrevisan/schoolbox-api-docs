@@ -169,7 +169,7 @@ class Controller extends Base
      * @throws \Schoolbox\Mapper\DefinitionException If join $name isn't on this mapper
      * @throws \Schoolbox\Mapper\Exception           If an alias is incorrect
      */
-    public function getMarkbook(User $viewee = null)
+    public function getMarkbook(User $viewee = null): void
     {
         // If viewee not specified, then display current user's markbook.
         if (null === $viewee) {
@@ -202,7 +202,7 @@ class Controller extends Base
      * @param User $viewee
      * @todo convert this to a GET on the same route name as getMarkbook, but distinguish as being AJAX
      */
-    public function postMarkbook(User $viewee)
+    public function postMarkbook(User $viewee): void
     {
         try {
             $request = $this->request->post['filter_selection'] ?: [];
