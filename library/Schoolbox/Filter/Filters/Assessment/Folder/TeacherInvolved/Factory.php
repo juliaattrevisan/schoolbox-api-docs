@@ -10,7 +10,9 @@ namespace Schoolbox\Filter\Filters\Assessment\Folder\TeacherInvolved;
 use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\GenericCollection;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\Folder;
 use Schoolbox\User;
 use Schoolbox\Filter\Filters\Assessment\Folder as FolderFilter;
 
@@ -37,6 +39,10 @@ class Factory extends FolderFilter\Factory
 
 
     /**
+     * The 'Teacher Folder' component has the following custom functionality:
+     * * It inserts any folders which the current session user is involved with,
+     * * It inserts any folders specified in GET args if user has READ+ perm to them
+     *
      * @param Filter\IDefinition                                        $definition
      * @param User                                                      $user
      * @param Filter\Page\Model                                         $pageFilter
@@ -82,14 +88,16 @@ class Factory extends FolderFilter\Factory
         $folders = $this->getFolderMapper()->findForUser($viewee, $getClasses, $groupAccessLevel, false)->indexBy('id');
 
         // Did caller specify they wish to insert some custom folders in the list?
-        // (Note that perm check was already performed by key-converter)
         $folderOverrides = $overrides[$pageFilter->getFilter()->getId()];
         if ($folderOverrides && $folderOverrides->count()) {
             $folderIds    = $folderOverrides->getPropertyValues('key');
             $extraFolders = $this->getFolderMapper()->findByColumn($this->getFolderMapper()->getIdentifierColumn(), $folderIds);
 
             foreach ($extraFolders as $extraFolder) {
-                $folders[$extraFolder->getId()] = $extraFolder;
+                // Ensure user has READ perm to the requested folder
+                if ($this->getAccess()->getFolderAccess($user, $extraFolder->getId()) >= UserAccess::ACCESS_READ) {
+                    $folders[$extraFolder->getId()] = $extraFolder;
+                }
             }
         }
 
