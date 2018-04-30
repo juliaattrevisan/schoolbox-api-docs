@@ -34,7 +34,7 @@ abstract class Base extends RendererBase
         if (
             $this->getEvent() instanceof Event
             && $config->get('external_type') == 'synergetic'
-            && $config->get('external_attendance') == "1"
+            && $config->get('external_attendance')
             && $this->getEvent()->hasAttendance()
             && $this->getViewer()->getRole()->isStaff()
             && $this->getEvent()->getCode() != ''
