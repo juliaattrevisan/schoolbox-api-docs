@@ -47,7 +47,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      * @const Character encoding for fields within this database.
      *        Required when converting field values from Schoolbox to Synergetic.
      */
-    const CHARACTER_ENCODING = 'ASCII';
+    const CHARACTER_ENCODING = 'UTF-8';
 
     /**
      * Constructor
