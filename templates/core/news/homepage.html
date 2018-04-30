@@ -11,10 +11,15 @@
             rules: {
                 'heading': {
                     requiredNotBlank: true
-                }
+                },
+                'datetime_published': {
+                    datepickerDate: true
+                },
+                'datetime_expires': {
+                    datepickerDate: true
+                },
             }
         });
-
         $('[data-delete]').click(function(event) {
             event.preventDefault();
 
