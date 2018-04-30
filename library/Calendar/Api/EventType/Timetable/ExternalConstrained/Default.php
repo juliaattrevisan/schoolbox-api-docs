@@ -89,14 +89,14 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
         /** @var Event[] $addedEvents */
         $addedEvents = array();
         while ($currentTimestamp < $endTimestamp) {
-            $ttl = $currentTimestamp - $startOfDay;
+            $elapsedTime= $currentTimestamp - $startOfDay;
 
             foreach ($this->getUser()->getCampusCollection() as $campus) {
                 $campusId  = $campus->getId();
 
                 $date = new Alaress_Date_Format($currentTimestamp, Alaress_Date_Format::TIMESTAMP);
 
-                if ($ttl >= (-$attendanceWindow) && $ttl < $expensiveWindow) {
+                if ($elapsedTime >= (-$attendanceWindow) && $elapsedTime < $expensiveWindow) {
                     // if the day we're looking at is
                     // - no more than $attendanceWindow in the past, and
                     // - no more than $expensiveWindow in the future,
