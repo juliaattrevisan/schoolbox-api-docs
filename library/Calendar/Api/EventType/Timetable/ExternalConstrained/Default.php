@@ -5,6 +5,7 @@ use Schoolbox\Resource\Folder\Model as Folder;
 use Calendar\Event\Collection;
 use Calendar\Event\Type\Timetable\Event;
 use Schoolbox\User;
+use Schoolbox\IConfigLoader;
 
 /**
  * Event type that represents events from the external timetable handler.
@@ -21,14 +22,18 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
      */
     private $externalTimetable;
 
+    /** @var Config\Loader */
+    private $configLoader;
+
 
     /**
      * @inheritdoc
      */
-    public function __construct(int $connectorId, User $user)
+    public function __construct(int $connectorId, User $user, IConfigLoader $configLoader)
     {
         parent::__construct($connectorId, $user);
         $this->externalTimetable = new External_Timetable();
+        $this->configLoader = $configLoader;
     }
 
     /**
@@ -42,7 +47,7 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
     public function getEvents($startTimestamp, $endTimestamp)
     {
         // we're going to use this as a window for not building *too* much expensive timetable at once
-        $midnight = mktime(0, 0, 0);
+        $startOfDay = Alaress_Date_Format::now()->startOfDay()->getUnixTimeStamp();
 
         // If the user is not allowed to view timetables return an empty collection
         if ($this->getUser()->getHideTimetable()) {
@@ -73,22 +78,29 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
         } catch (\Schoolbox\Mapper\Exception $e) {
             $eventType = 1;
         }
-        $expensiveWindow = $days * 86400;
+        $expensiveWindow = strtotime("{$days} day", 0); // convert days to seconds
+
+        // This is a config var that determines how many days in the past you can mark attendance for.
+        // Later, we need to fetch these days expensively, because otherwise they come without attendance data.
+        $attendanceWindow = strtotime("{$this->configLoader->get('external_attendance_days')} day", 0); // convert days to seconds
 
         // Scan through each day from $startTimestamp to $endTimestamp, figuring
         // out that day's timetable day number for each of the user's campuses.
         /** @var Event[] $addedEvents */
         $addedEvents = array();
         while ($currentTimestamp < $endTimestamp) {
-            $ttl = $currentTimestamp - $midnight;
+            $elapsedTime = $currentTimestamp - $startOfDay;
 
             foreach ($this->getUser()->getCampusCollection() as $campus) {
                 $campusId  = $campus->getId();
 
                 $date = new Alaress_Date_Format($currentTimestamp, Alaress_Date_Format::TIMESTAMP);
 
-                if ($ttl >= 0 && $ttl < $expensiveWindow) {
-                    // if the current day is in the future AND within 2 days of midnight, get the expensive timetable
+                if ($elapsedTime >= (-$attendanceWindow) && $elapsedTime < $expensiveWindow) {
+                    // if the day we're looking at is
+                    // - no more than $attendanceWindow in the past, and
+                    // - no more than $expensiveWindow in the future,
+                    // get the expensive timetable
                     $dayTimetable = $this->buildTimetableExpensively($this->getUser(), $campus, $date);
 
                 } else {
@@ -339,4 +351,5 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
         // No events in this strat, just return empty.
         return new Collection();
     }
+
 }

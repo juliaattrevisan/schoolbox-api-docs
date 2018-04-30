@@ -19,9 +19,9 @@ use Calendar\Api\ModuleChecker;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\External\Connector\Factory as ExternalConnectorFactory;
-use Schoolbox\Config;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\IConfigLoader;
 
 class Calendar_Api_Factory
 {
@@ -43,6 +43,9 @@ class Calendar_Api_Factory
     /** @var null|IConnector */
     private $databaseExternal;
 
+    /** @var IConfigLoader */
+    private $configLoader;
+
 
     /**
      * Constructor
@@ -50,14 +53,17 @@ class Calendar_Api_Factory
      * @param Assessment\MapperProxy $assessmentDataSource
      * @param ModuleChecker          $moduleChecker
      * @param null|IConnector        $databaseExternal
+     * @param IConfigLoader          $config
      */
     public function __construct(
         Assessment\MapperProxy $assessmentDataSource,
         ModuleChecker $moduleChecker,
-        IConnector $databaseExternal = null
+        IConnector $databaseExternal = null,
+        IConfigLoader $config
     ) {
         $this->assessmentDataSource = $assessmentDataSource;
         $this->databaseExternal     = $databaseExternal;
+        $this->configLoader = $config;
 
         $allConfigRecords = Calendar_Api_Config_Mapper::getInstance()->getAllConfigRecords();
 
@@ -124,7 +130,7 @@ class Calendar_Api_Factory
             case Calendar_Api_EventType_Event_External_Default::class:
                 // Same as default constructor, but add the assessment data source
                 $factory        = new ExternalConnectorFactory();
-                $externalEvents = $factory->build(new Config\Loader(), $this->databaseExternal, ExternalConnectorFactory::EXTERNAL_EVENTS);
+                $externalEvents = $factory->build($this->configLoader, $this->databaseExternal, ExternalConnectorFactory::EXTERNAL_EVENTS);
                 return new Calendar_Api_EventType_Event_External_Default($connectorId, $user, $externalEvents);
             case Calendar_Api_EventType_Event_Schoolbox_Campus::class:
                 return new Calendar_Api_EventType_Event_Schoolbox_Campus($connectorId, $user);
@@ -168,7 +174,7 @@ class Calendar_Api_Factory
                     new Timetable_ColourManager(Timetable_ColourMapper::getInstance()->findAll())
                 );
             case Calendar_Api_EventType_Timetable_ExternalConstrained_Default::class:
-                return new Calendar_Api_EventType_Timetable_ExternalConstrained_Default($connectorId, $user);
+                return new Calendar_Api_EventType_Timetable_ExternalConstrained_Default($connectorId, $user, $this->configLoader);
             case Calendar_Api_EventType_Timetable_Room::class:
                 return new Calendar_Api_EventType_Timetable_Room($connectorId, $user, new External_Timetable());
             case Calendar_Api_EventType_TimetableDays_External_Default::class:
