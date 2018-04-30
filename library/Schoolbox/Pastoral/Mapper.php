@@ -905,8 +905,11 @@ class Mapper extends BaseMapper
                 case 'date':
                     $orderParts[] = "`pastoral`.created_at desc";
                     break;
+                case 'type':
+                    $orderParts[] = "`c`.name";
+                    break;
                 case 'subtype':
-                    $orderParts[] = "`c`.name, `t`.name"; // TODO why aren't we ordering by type as well as subtype?
+                    $orderParts[] = "`c`.name";
                     break;
                 case 'points':
                     $orderParts[] = "`pastoral`.points";
