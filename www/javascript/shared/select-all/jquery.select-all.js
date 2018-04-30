@@ -46,10 +46,7 @@
          */
         function start() {
 
-            // Tick select all box if all checkboxes are already ticked
-            if (config.checkboxes.filter(':checked').length === config.checkboxes.length) {
-                config.selector.prop('checked', true);
-            }
+            autoSelectAll(config);
 
             // On check of select all, change all the tickboxes
             config.selector.change(function (event) {
@@ -63,17 +60,20 @@
                 config.change();
             });
 
-
-            // On change of any checkbox, if all the checkboxes are already ticked, tick Select All box automatically
             config.checkboxes.change(function () {
-                if (config.checkboxes.filter(':checked').length === config.checkboxes.length) {
-                    config.selector.prop('checked', true);
-                }
-                else {
-                    config.selector.prop('checked', false);
-                }
+                autoSelectAll(config);
             });
 
+        }
+
+        // Automatically tick select all box if all checkboxes are already ticked
+        function autoSelectAll(config) {
+            if (config.checkboxes.filter(':checked').length === config.checkboxes.length) {
+                config.selector.prop('checked', true);
+            }
+            else {
+                config.selector.prop('checked', false);
+            }
         }
     }
 }(jQuery));
