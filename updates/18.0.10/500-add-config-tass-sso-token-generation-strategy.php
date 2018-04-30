@@ -31,7 +31,7 @@ $sql  = "
       'Set whether your school should attempt to connect to TASS products using SSO v1 or v2. If you know you do not have v2 deep-links, you should use v1 SSO tokens',
       (SELECT id FROM lu_config_field WHERE field = 'selectKey'),
       :options,
-      (SELECT id FROM lu_config_type WHERE type = 'Site'),
+      (SELECT id FROM lu_config_type WHERE type = 'External DB'),
       'true',
       'true',
       'true'
