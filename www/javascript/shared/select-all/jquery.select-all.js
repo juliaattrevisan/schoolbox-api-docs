@@ -70,7 +70,7 @@
                     config.selector.prop('checked', true);
                 }
                 else {
-                    config.selector.removeAttr('checked');
+                    config.selector.prop('checked', false);
                 }
             });
 
