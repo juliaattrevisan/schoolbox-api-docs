@@ -35,9 +35,9 @@
     </li>
 
     {# Obey access rules for non-ib students #}
-    {% set nceaRoute = routeLookupIfAuthorized('nceaReport.getReport', {id: user.id, year: 'now'|date('Y'), user: user}) %}
+    {% set nceaRoute = routeLookupIfAuthorized('nceaReport.getReport', {userId: user.id, year: 'now'|date('Y'), user: user}) %}
 
-    {% if nceaRoute and not externalUser.StudentIBFlag %}
+    {% if nceaRoute %}
     <li>
         <a href="{{ nceaRoute }}" class="icon-progress">NCEA Progress</a>
     </li>

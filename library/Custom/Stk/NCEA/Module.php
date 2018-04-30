@@ -18,6 +18,7 @@ use Aura\Di\ContainerInterface;
 use External_User;
 use InvalidArgumentException;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Role;
@@ -53,14 +54,13 @@ class Module extends BaseModule
         $getPerms = new Rule\All(
             new Rule\IsLoggedIn(),
 
-            /* This student must be in Year 11-13 inclusive
-             */
             new Rule\All(
                 new Rule\All(
                     new Rule\Callback(function ($params, User $user) {
                         try {
                             /** @var \Schoolbox\User $user */
-                            $student = $this->getUserMapper()->findById($params['id']);
+                            $student = $this->getUserMapper()->findById($params['userId']);
+                            $externalUser = $this->getExternalUser()->getStudent($student->getExternalId());
                         }
                         catch (MapperException $e) {
                             throw new Unauthorized('User Not Found');
@@ -69,18 +69,29 @@ class Module extends BaseModule
                         /** @var IConnector $externalDb */
                         $externalDb = $this->getInjector()->get('databaseExternal');
 
+                        /* Permission to NCEA Report and its button, controlled by STK
+                         */
                         $availability = (new Availability($externalDb))->hasAccess((int)$student->getYear());
 
                         if (!$availability) {
                             throw new Unauthorized('Unavailable for this student\'s year level due to OLE flag');
                         }
+
+                        /* Explicit IB Check: IB students not allowed
+                         */
+                        if ($externalUser['StudentIBFlag']) {
+                            throw new Unauthorized('NCEA Reports not available to IB Students');
+                        }
                     }),
+
+                    /* This student must be in Year 11-13 inclusive
+                     */
                     new Rule\IsYearLevel($this->availableForYears)
                 ),
                 /* The Students themselves, their parents, any staff/superuser can get button and report
                  */
                 new Rule\Any(
-                    new Rule\IsUserOrParentOfUser($this->getExternalUser(), $this->getUserMapper(), 'id'),
+                    new Rule\IsUserOrParentOfUser($this->getExternalUser(), $this->getUserMapper(), 'userId'),
                     new Rule\HasRole(Role::STAFF),
                     new Rule\IsSuperuser()
                 )
@@ -89,7 +100,7 @@ class Module extends BaseModule
 
         $preloadUser = function ($params) { return $this->preloadUser($params); };
 
-        $this->register('GET', '/report/{id}/{year}', 'getReport', $getPerms, $preloadUser);
+        $this->register('GET', '/report/{userId}/{year}', 'getReport', $getPerms, $preloadUser);
     }
 
     /**
@@ -106,18 +117,10 @@ class Module extends BaseModule
     {
         try {
             /** @var \Schoolbox\User $user */
-            $user = $this->getUserMapper()->findById($params['id']);
+            $user = $this->getUserMapper()->findById($params['userId']);
         }
         catch (MapperException $e) {
             throw new NotFound('User Not Found');
-        }
-
-        /* IB Students not allowed
-         */
-        $externalUser = $this->getExternalUser()->getStudent($user->getExternalId());
-
-        if ($externalUser['StudentIBFlag']) {
-            throw new NotFound('NCEA Reports not available to IB Students');
         }
 
         /* Only works for the current year
@@ -128,7 +131,7 @@ class Module extends BaseModule
 
         return [
             'user' => $user,
-            'externalUser' => $externalUser,
+            'externalUser' => $this->getExternalUser()->getStudent($user->getExternalId()),
             'year' => (int)$params['year'],
         ];
     }
@@ -163,8 +166,7 @@ class Module extends BaseModule
     {
         /** @var Container $injector */
         $injector->params[Controller::class] = [
-            'userMapper' => $this->getMapperFactory()->getLazy(UserMapper::class),
-            'externalUser' => $injector->lazyNew(External_User::class)
+            'errorMapper' => $this->getMapperFactory()->getLazy(ErrorMapper::class)
         ];
     }
 

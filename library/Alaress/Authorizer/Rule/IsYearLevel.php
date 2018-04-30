@@ -29,7 +29,6 @@ class IsYearLevel extends All
         $this->years = $years;
 
         parent::__construct(
-            new IsLoggedIn(),
             new Callback(array($this, 'authorizeMethod'))
         );
     }
