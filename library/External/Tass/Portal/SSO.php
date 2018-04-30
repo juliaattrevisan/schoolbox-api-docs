@@ -123,7 +123,7 @@ class SSO
         $errors = [];
 
         // Is school configured to attempt SSO v2 ?
-        if(\in_array($this->ssoStrategy, [self::SSO_STRATEGY_V2_ONLY, self::SSO_STRATEGY_V2_THEN_V1], true)){
+        if (\in_array($this->ssoStrategy, [self::SSO_STRATEGY_V2_ONLY, self::SSO_STRATEGY_V2_THEN_V1], true)) {
             try {
                 return $this->getV2Token($client, $conf, $deepLinkV2, $prodMenu);
             } catch (UnexpectedValueException $e) {
@@ -132,7 +132,7 @@ class SSO
         }
 
         // Is school configured to attempt SSO v1 ?
-        if(\in_array($this->ssoStrategy, [self::SSO_STRATEGY_V1_ONLY, self::SSO_STRATEGY_V2_THEN_V1], true)) {
+        if (\in_array($this->ssoStrategy, [self::SSO_STRATEGY_V1_ONLY, self::SSO_STRATEGY_V2_THEN_V1], true)) {
             try {
                 return $this->getV1Token($client, $conf, $deepLinkV1);
             } catch (UnexpectedValueException $e) {
