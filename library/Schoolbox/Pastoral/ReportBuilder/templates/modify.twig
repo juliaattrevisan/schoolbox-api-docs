@@ -242,7 +242,7 @@
                                 <label for="type-{{ type.id }}">
                                     {{ type.name }}
                                 </label>
-                                <div class="checklist pastoral-subtypes">
+                                <div class="checklist" data-pastoral-subtype>
                                     {% for subtype in subTypes %}
 
                                         {% if subtype.pastoralType.id == type.id %}
@@ -346,19 +346,19 @@
 
             <script>
                 $(function() {
-                    var $parentTypeSelector = "input[name='types[]']";
-                    var $subTypeSelector = "input[name='subtypes[]']";
+                    var $parentTypeSelector = "input[data-check-type]";
+                    var $subTypeSelector = "input[data-check-subtype]";
 
                     $($parentTypeSelector).each(function(index, value) {
                         var checkbox = value;
-                        var $subCheckboxes = $(checkbox).siblings(".pastoral-subtypes").find($subTypeSelector);
+                        var $subCheckboxes = $(checkbox).siblings("[data-pastoral-subtype]").find($subTypeSelector);
                         if ($(checkbox).is(':checked')) {
                             // ...show the subtypes for this type
-                            $(checkbox).siblings(".pastoral-subtypes").show();
+                            $(checkbox).siblings("[data-pastoral-subtype]").show();
                         } else {
                             // Hide subtypes by default to reduce vertical scrolling
                             $subCheckboxes.each(function(index, subCheckbox) {
-                                $(checkbox).siblings(".pastoral-subtypes").hide();
+                                $(checkbox).siblings("[data-pastoral-subtype]").hide();
                             })
                         }
                     });
@@ -366,10 +366,10 @@
                     // If a pastoral type checkbox is checked...
                     $($parentTypeSelector).change(function(e) {
                         var checkbox = e.target;
-                        var $subCheckboxes = $(checkbox).siblings(".pastoral-subtypes").find($subTypeSelector);
+                        var $subCheckboxes = $(checkbox).siblings("[data-pastoral-subtype]").find($subTypeSelector);
                         if ($(checkbox).is(':checked')) {
                             // ...show the subtypes for this type
-                            $(checkbox).siblings(".pastoral-subtypes").show();
+                            $(checkbox).siblings("[data-pastoral-subtype]").show();
 
                             // ...and check them by default
                             $subCheckboxes.each(function(index, subCheckbox) {
@@ -378,7 +378,7 @@
                         } else {
                             $subCheckboxes.each(function(index, subCheckbox) {
                                 $(subCheckbox).prop('checked', false);
-                                $(checkbox).siblings(".pastoral-subtypes").hide();
+                                $(checkbox).siblings("[data-pastoral-subtype]").hide();
                             })
                         }
                     });
@@ -386,9 +386,9 @@
                     // Show/hide subtypes on select/deselect all
                     $("#type-all").change(function(e) {
                         if ($(e.target).is(':checked')) {
-                            $(".pastoral-subtypes").show();
+                            $("[data-pastoral-subtype]").show();
                         } else {
-                            $(".pastoral-subtypes").hide();
+                            $("[data-pastoral-subtype]").hide();
                         }
                     });
                 });
