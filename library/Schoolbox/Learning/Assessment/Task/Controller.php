@@ -117,7 +117,7 @@ class Controller extends Assessment\Controller
      * @throws \Aura\Web\Exception\InvalidStatusCode if value is invalid
      * @throws \InvalidArgumentException If we attempt to give a task feedback a null response
      * @throws \PDOException If unable to save task response to DB
-     * @throws \UnexpectedValueException If lack of hydration
+     * @throws InsufficientHydrationException If lack of hydration
      */
     public function getSummary(IAssessable $assessment, User $student): void
     {
@@ -133,7 +133,7 @@ class Controller extends Assessment\Controller
             if ($previewFragment['type'] == 'redirect' && !$assessment->getDescription()) {
 
                 // Don't save a response if instructor is looking at student's summary page
-                if ((int)$student->getId() === (int)$this->getUser()->getId()) {
+                if ($assessment->isSelfAssessable() && (int)$student->getId() === (int)$this->getUser()->getId()) {
                     try {
                         $this->saveTaskResponse(TaskCompletion::STATUS_SELF_ASSESSED_COMPLETE, $assessment, $student);
                     } catch (ConcurrentModificationException $e) {
