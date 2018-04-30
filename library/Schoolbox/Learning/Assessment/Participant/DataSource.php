@@ -133,11 +133,11 @@ class DataSource
      */
     public function loadParticipationIntoAssessment(IAssessable $assessment, User $user = null): IAssessable
     {
-        $collection = $this->loadParticipationIntoAssessmentCollection(
+        $this->loadParticipationIntoAssessmentCollection(
             new GenericCollection(IAssessable::class, [$assessment]),
             $user
         );
-        return $collection->first();
+        return $assessment;
     }
 
 
@@ -168,7 +168,7 @@ class DataSource
                 $this->aggregator->aggregate($assessable);
             }
         }
-        return $assessableWithDescendants;
+        return $assessments;
     }
 
 
