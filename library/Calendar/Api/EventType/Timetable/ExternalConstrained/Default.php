@@ -5,7 +5,7 @@ use Schoolbox\Resource\Folder\Model as Folder;
 use Calendar\Event\Collection;
 use Calendar\Event\Type\Timetable\Event;
 use Schoolbox\User;
-use Schoolbox\Config;
+use Schoolbox\IConfigLoader;
 
 /**
  * Event type that represents events from the external timetable handler.
@@ -29,7 +29,7 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
     /**
      * @inheritdoc
      */
-    public function __construct(int $connectorId, User $user, Config\Loader $configLoader)
+    public function __construct(int $connectorId, User $user, IConfigLoader $configLoader)
     {
         parent::__construct($connectorId, $user);
         $this->externalTimetable = new External_Timetable();

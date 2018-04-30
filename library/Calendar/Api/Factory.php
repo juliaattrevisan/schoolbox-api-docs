@@ -19,7 +19,6 @@ use Calendar\Api\ModuleChecker;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\External\Connector\Factory as ExternalConnectorFactory;
-use Schoolbox\Config;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\IConfigLoader;
@@ -44,7 +43,7 @@ class Calendar_Api_Factory
     /** @var null|IConnector */
     private $databaseExternal;
 
-    /** @var Config\Loader */
+    /** @var IConfigLoader */
     private $configLoader;
 
 
