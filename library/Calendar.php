@@ -6,6 +6,11 @@ use Schoolbox\Calendar\Event as EventModel;
 
 class Calendar extends DeprecatedModel
 {
+    /**
+     * @var Group
+     */
+    private $groupHandler;
+
     function __construct()
     {
 
@@ -219,12 +224,16 @@ class Calendar extends DeprecatedModel
                 }
 
                 $this->groupHandler->setService(HOMEPAGE_SERVICE);
-                $permissions = array(0);
+                $permissions = array();
                 foreach ($categoryList as $category) {
                     $permissions[] = $this->groupHandler->getPermission($category);
                 }
                 $this->groupHandler->setService(CALENDAR_SERVICE);
-                return max($permissions);
+
+                if (empty($permissions)) {
+                    $permissions[] = 0;
+                }
+                return min($permissions);
 
             case EventModel::ACCESS_CAMPUS:
 
