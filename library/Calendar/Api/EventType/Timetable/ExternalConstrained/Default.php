@@ -89,7 +89,7 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
         /** @var Event[] $addedEvents */
         $addedEvents = array();
         while ($currentTimestamp < $endTimestamp) {
-            $elapsedTime= $currentTimestamp - $startOfDay;
+            $elapsedTime = $currentTimestamp - $startOfDay;
 
             foreach ($this->getUser()->getCampusCollection() as $campus) {
                 $campusId  = $campus->getId();
