@@ -29,26 +29,6 @@ class External_Humanedge_User implements External_UserInterface
     private $database;
 
     /**
-     * The filter for a student's contacts - this filters out anyone who's not
-     * a primary guardian or parent.
-     *
-     * @var string
-     */
-    protected $studentContactFilter = "(
-        sc.ResidentialGuardian = 'Y' OR
-        sc.Relationship = 'Father' OR
-        sc.Relationship = 'Mother' OR
-        sc.Relationship = 'Stepfather' OR
-        sc.Relationship = 'Stepmother' OR
-        sc.Relationship = 'Step Father' OR
-        sc.Relationship = 'Step Mother' OR
-        sc.Relationship = 'Houseparents' OR
-        sc.Relationship LIKE '%Guardian%' OR
-        sc.Relationship LIKE 'Foster%' OR
-        sc.Relationship = 'Carer'
-    )";
-
-    /**
      * This identifies the CONVERT/CAST format for ISO8601 date
      * yyyy-mm-ddThh:mi:ss.mmm
      */
@@ -163,6 +143,7 @@ class External_Humanedge_User implements External_UserInterface
             -- LEFT JOIN ContactFamily cf ON c.ID = cf.ContactID
             -- LEFT JOIN Family f ON cf.FamilyID = f.ID
             LEFT JOIN vw_Contact_Addresses ca ON c.ID = ca.ContactID
+            {$this->buildStudentContactAdhocJoins()}
             WHERE s.Code = {$this->getDatabase()->smartQuote($externalUserId)}
             AND
             (
@@ -171,7 +152,7 @@ class External_Humanedge_User implements External_UserInterface
               (sc.FeeFactor<>0 AND sc.EmergencyContact = 'Y' AND sc.Relationship <> 'Grandmother')
             )
             AND ca.MailAddrID = ca.ID
-            AND {$this->studentContactFilter}
+            AND ({$this->buildStudentContactFilter()})
         ";
         return $this->getDatabase()->getAll($query);
     }
@@ -211,8 +192,9 @@ class External_Humanedge_User implements External_UserInterface
             FROM Contact c
             INNER JOIN StudentContact sc ON c.ID = sc.ContactID
             INNER JOIN Student s ON sc.StudentID = s.ID
+            {$this->buildStudentContactAdhocJoins()}
             WHERE s.Code IN ($idString)
-            AND {$this->studentContactFilter}
+            AND ({$this->buildStudentContactFilter()})
         ";
 
         $result = [];
@@ -507,8 +489,9 @@ class External_Humanedge_User implements External_UserInterface
             FROM Student s
             LEFT JOIN StudentContact sc ON s.ID = sc.StudentID
             LEFT JOIN Contact c ON sc.ContactID = c.ID
+            {$this->buildStudentContactAdhocJoins()}
             WHERE c.Code = {$this->getDatabase()->smartQuote($externalUserId)}
-            AND {$this->studentContactFilter}
+            AND ({$this->buildStudentContactFilter()})
         ";
         return $this->getDatabase()->getAll($query);
     }
@@ -589,5 +572,41 @@ class External_Humanedge_User implements External_UserInterface
     protected function getDatabase()
     {
         return $this->database;
+    }
+
+    /**
+     * Builds a filter for a student's contacts.
+     *
+     * This filters out anyone who's not a primary guardian or parent.
+     *
+     * @return string
+     */
+    protected function buildStudentContactFilter()
+    {
+        return "
+            sc.ResidentialGuardian = 'Y' OR
+            sc.Relationship = 'Father' OR
+            sc.Relationship = 'Mother' OR
+            sc.Relationship = 'Stepfather' OR
+            sc.Relationship = 'Stepmother' OR
+            sc.Relationship = 'Step Father' OR
+            sc.Relationship = 'Step Mother' OR
+            sc.Relationship = 'Houseparents' OR
+            sc.Relationship LIKE '%Guardian%' OR
+            sc.Relationship LIKE 'Foster%' OR
+            sc.Relationship = 'Carer'
+        ";
+    }
+
+    /**
+     * Builds a set of joins onto the AdHoc table, if required.
+     *
+     * This default implementation requires no joins onto this table.
+     *
+     * @return string
+     */
+    protected function buildStudentContactAdhocJoins()
+    {
+        return '';
     }
 }
