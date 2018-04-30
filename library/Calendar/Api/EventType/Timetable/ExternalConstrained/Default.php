@@ -47,7 +47,7 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
     public function getEvents($startTimestamp, $endTimestamp)
     {
         // we're going to use this as a window for not building *too* much expensive timetable at once
-        $midnight = mktime(0, 0, 0);
+        $startOfDay = Alaress_Date_Format::now()->startOfDay();
 
         // If the user is not allowed to view timetables return an empty collection
         if ($this->getUser()->getHideTimetable()) {
@@ -89,7 +89,7 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
         /** @var Event[] $addedEvents */
         $addedEvents = array();
         while ($currentTimestamp < $endTimestamp) {
-            $ttl = $currentTimestamp - $midnight;
+            $ttl = $currentTimestamp - $startOfDay;
 
             foreach ($this->getUser()->getCampusCollection() as $campus) {
                 $campusId  = $campus->getId();
@@ -97,9 +97,9 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
                 $date = new Alaress_Date_Format($currentTimestamp, Alaress_Date_Format::TIMESTAMP);
 
                 if ($ttl >= (-$attendanceDays) && $ttl < $expensiveWindow) {
-                    // if the current day is
+                    // if the day we're looking at is
                     // - no more than $attendanceDays in the past, and
-                    // - within 2 days of midnight,
+                    // - no more than $expensiveWindow in the future,
                     // get the expensive timetable
                     $dayTimetable = $this->buildTimetableExpensively($this->getUser(), $campus, $date);
 
