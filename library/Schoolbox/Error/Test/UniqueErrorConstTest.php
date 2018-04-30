@@ -18,21 +18,65 @@ class UniqueErrorConstTest extends TestCase
     /**
      * Ensure that all errorId constant values are unique
      *
-     * @throws \PHPUnit\Framework\Exception
-     * @throws \ReflectionException
+     * @dataProvider providerErrorConstants
+     * @param array  $errorConstants
+     * @param string $errorName
+     * @param int    $errorValue
+     * @throws \PHPUnit\Framework\AssertionFailedError
      */
-    public function testErrorIdUniqueness(): void
+    public function testErrorIdUniqueness(array $errorConstants, string $errorName, int $errorValue): void
     {
-        $reflection = new ReflectionClass(Error\Mapper::class);
-        $constants  = $reflection->getConstants();
-
-        $uniqueIds = [];
-        foreach ($constants as $name => $idValue) {
-            if ($this->isErrorIdConst($name)) {
-                $this->assertArrayNotHasKey($idValue, $uniqueIds);
-                $uniqueIds[$idValue] = true;
+        $collisions = [];
+        foreach ($errorConstants as $name => $value) {
+            if ($errorValue === $value) {
+                $collisions[] = $name;
             }
         }
+
+        if (\count($collisions) >= 2) {
+            $message = "Non-unique constant found. const {$errorName} = {$errorValue}";
+            $this->fail($message);
+        } else {
+            $this->addToAssertionCount(1);
+        }
+    }
+
+
+    /**
+     * @return array
+     * @throws \ReflectionException
+     */
+    public function providerErrorConstants(): array
+    {
+        $data           = [];
+        $errorConstants = $this->getErrorConstants();
+
+        foreach ($errorConstants as $name => $idValue) {
+            $data[] = [$errorConstants, $name, $idValue];
+        }
+        return $data;
+    }
+
+
+    /**
+     * Returns an array of ErrorConstant name => value
+     *
+     * @return int[]
+     * @throws \ReflectionException
+     */
+    private function getErrorConstants(): array
+    {
+        $errorConstants = [];
+        $reflection     = new ReflectionClass(Error\Mapper::class);
+
+        foreach ($reflection->getConstants() as $name => $idValue) {
+            // Ignore irrelevant constants
+            if ($this->isErrorIdConst($name)) {
+                $errorConstants[$name] = $idValue;
+            }
+        }
+
+        return $errorConstants;
     }
 
 
