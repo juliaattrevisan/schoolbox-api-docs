@@ -46,7 +46,6 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
      */
     public function getEvents($startTimestamp, $endTimestamp)
     {
-        $secondsPerDay = 86400;
         // we're going to use this as a window for not building *too* much expensive timetable at once
         $midnight = mktime(0, 0, 0);
 
@@ -79,11 +78,11 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
         } catch (\Schoolbox\Mapper\Exception $e) {
             $eventType = 1;
         }
-        $expensiveWindow = $days * $secondsPerDay;
+        $expensiveWindow = strtotime("{$days} day", 0); // convert days to seconds
 
         // This is a config var that determines how many days in the past you can mark attendance for.
         // Later, we need to fetch these days expensively, because otherwise they come without attendance data.
-        $attendanceDays = $this->configLoader->get('external_attendance_days') * $secondsPerDay;
+        $attendanceDays = strtotime("{$this->configLoader->get('external_attendance_days')} day", 0); // convert days to seconds
 
         // Scan through each day from $startTimestamp to $endTimestamp, figuring
         // out that day's timetable day number for each of the user's campuses.
