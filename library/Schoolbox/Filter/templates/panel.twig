@@ -188,6 +188,7 @@ Usage:
                         return;
                     }
 
+                    updateHistoryState(data);
                     processServerSuccess(response.content);
                 })
                 .fail(function(response){
@@ -214,6 +215,52 @@ Usage:
             }
             $reportContent.trigger('filterContentLoaded');
             $toast.toastTimeout({text: 'Success!', css: 'success'});
+        }
+
+        /**
+         * Converts the filter selections to a URL and updates the browser history so that the URL
+         * reflects the current view. This ensures the user can copy/paste the URL, and page refresh works
+         * as expected.
+         *
+         * @param {string} encodedSelections
+         */
+        function updateHistoryState(encodedSelections) {
+            var decodedData = decodeURIComponent(encodedSelections),
+                flatArray   = decodedData.split('&'),
+                nestedObj   = {},
+                regEx       = /^filter_selection\[(\d+)]\[(\w+)]=([01])$/; // eg 'filter_selection[1][task]=1'
+
+            // Convert flat string array to nested object
+            for (var i in flatArray) {
+                var result = regEx.exec(flatArray[i]);
+                var filterId = result[1];
+                var optionKey = result[2];
+                var optionVal = result[3];
+
+                if (!nestedObj.hasOwnProperty(filterId)) {
+                    nestedObj[filterId] = {};
+                }
+                // We only need to know about checked values
+                if ("1" === optionVal) {
+                    nestedObj[filterId][optionKey] = optionVal;
+                }
+            }
+
+            // Convert to query args
+            var queryArgs = [];
+            for (filterId in nestedObj) {
+                var selections = nestedObj[filterId];
+                if (0 === Object.keys(selections).length) {
+                    queryArgs.push(filterId + '='); // empty filter selection syntax
+                } else {
+                    for (optionKey in selections) {
+                        queryArgs.push(filterId + '[' + optionKey + ']=1'); // filter option selected syntax
+                    }
+                }
+            }
+
+            var url = window.location.origin + window.location.pathname + '?' + queryArgs.join('&');
+            history.replaceState({}, '', url);
         }
 
         /**
