@@ -14,6 +14,7 @@ use Alaress\Authorizer\Rule\IsLoggedIn;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
+use Schoolbox\IConfigLoader;
 use Schoolbox\UserMapper;
 
 class Module extends \Alaress\Module\Module
@@ -51,6 +52,7 @@ class Module extends \Alaress\Module\Module
      */
     public function initControllers(ContainerInterface $injector)
     {
+        /** @var IConfigLoader $config */
         $config = $injector->get('config');
         $injector->set(
             'tassportal:sso',

@@ -18,9 +18,9 @@ class SSO
 {
     // How should we attempt to generate an SSO token?
     // Corresponds to DB config setting
-    public const SSO_STRATEGY_V1_ONLY    = 'Version 1 only';
-    public const SSO_STRATEGY_V2_ONLY    = 'Version 2 only';
-    public const SSO_STRATEGY_V2_THEN_V1 = 'Version 2 with fallback to Version 1';
+    public const SSO_STRATEGY_V1_ONLY    = 1;
+    public const SSO_STRATEGY_V2_ONLY    = 2;
+    public const SSO_STRATEGY_V2_THEN_V1 = 3;
 
     // If not configured in db, what should the default strategy be?
     public const SSO_STRATEGY_DEFAULT    = self::SSO_STRATEGY_V2_THEN_V1;
@@ -61,7 +61,7 @@ class SSO
     /**
      * Which SSO token generation strategy should we use?
      *
-     * @var string
+     * @var int
      * @see self::SSO_STRATEGY_* constants
      */
     private $ssoStrategy;
@@ -70,7 +70,7 @@ class SSO
     /**
      * Returns the set of available SSO strategies
      *
-     * @return string[]
+     * @return int[]
      */
     public static function getSsoStrategies(): array
     {
@@ -89,10 +89,10 @@ class SSO
      *                              Should contain at least 'token_key'.
      *
      * @param string $server
-     * @param string    $ssoStrategy
+     * @param int    $ssoStrategy
      * @throws InvalidArgumentException If an unrecognised SSO strategy is specified
      */
-    public function __construct(array $configuration, string $server, string $ssoStrategy)
+    public function __construct(array $configuration, string $server, int $ssoStrategy)
     {
         $this->configuration = array_merge($this->configuration, $configuration);
         $this->server        = $server;
