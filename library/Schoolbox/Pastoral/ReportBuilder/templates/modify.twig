@@ -346,13 +346,27 @@
 
             <script>
                 $(function() {
-                    // Hide subtypes by default to reduce vertical scrolling
-                    $(".pastoral-subtypes").hide();
+                    var $parentTypeSelector = "input[name='types[]']";
+                    var $subTypeSelector = "input[name='subtypes[]']";
+
+                    $($parentTypeSelector).each(function(index, value) {
+                        var checkbox = value;
+                        var $subCheckboxes = $(checkbox).siblings(".pastoral-subtypes").find($subTypeSelector);
+                        if ($(checkbox).is(':checked')) {
+                            // ...show the subtypes for this type
+                            $(checkbox).siblings(".pastoral-subtypes").show();
+                        } else {
+                            // Hide subtypes by default to reduce vertical scrolling
+                            $subCheckboxes.each(function(index, subCheckbox) {
+                                $(checkbox).siblings(".pastoral-subtypes").hide();
+                            })
+                        }
+                    });
 
                     // If a pastoral type checkbox is checked...
-                    $("input[name='types[]']").change(function(e) {
+                    $($parentTypeSelector).change(function(e) {
                         var checkbox = e.target;
-                        var $subCheckboxes = $(checkbox).siblings(".pastoral-subtypes").find("input[name='subtypes[]']");
+                        var $subCheckboxes = $(checkbox).siblings(".pastoral-subtypes").find($subTypeSelector);
                         if ($(checkbox).is(':checked')) {
                             // ...show the subtypes for this type
                             $(checkbox).siblings(".pastoral-subtypes").show();
