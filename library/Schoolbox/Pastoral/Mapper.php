@@ -895,7 +895,6 @@ class Mapper extends BaseMapper
         $orderParts = [];
         foreach ($order as $orderCurrent) {
             switch ($orderCurrent) {
-                // TODO also need to order by house apparently?
                 case 'student':
                     $orderParts[] = "`s`.lastname, `s`.firstname";
                     break;
@@ -919,6 +918,9 @@ class Mapper extends BaseMapper
                     break;
                 case 'author':
                     $orderParts[] = "`o`.lastname, `o`.firstname";
+                    break;
+                case 'house':
+                    $orderParts[] = "`s`.`house`";
                     break;
             }
         }
