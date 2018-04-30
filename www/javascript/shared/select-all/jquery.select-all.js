@@ -64,7 +64,7 @@
             });
 
 
-            //On change of the
+            // On change of any checkbox, if all the checkboxes are already ticked, tick Select All box automatically
             config.checkboxes.change(function () {
                 if (config.checkboxes.filter(':checked').length === config.checkboxes.length) {
                     config.selector.prop('checked', true);
