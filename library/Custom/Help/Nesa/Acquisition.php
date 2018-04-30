@@ -71,6 +71,7 @@ class Acquisition
      */
     private $involvement;
 
+
     /**
      * Acquisition constructor.
      *
@@ -82,6 +83,8 @@ class Acquisition
      * @param Rubric\RubricMapper   $rubricMapper
      * @param DataModel\MapperProxy $assessmentMapperProxy
      * @param UserMapper            $userMapper
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \UnderflowException
      */
     public function __construct(
         array $states,
@@ -115,6 +118,8 @@ class Acquisition
      * - Only get folders that have our selected people in them
      *
      * @return array
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \UnderflowException
      */
     private function findHierarchy() :array
     {
@@ -134,7 +139,7 @@ class Acquisition
         $pb->equals('sb.use_rubric', 1);
         $pb->isNull('rd.deleted_at');
         $pb->isNull('rc.deleted_at');
-        $pb->notNull('rm.published_at');
+        $pb->notNull('sr.published_at');
 
         /* Show only unaccredited users
          */
@@ -154,7 +159,8 @@ class Acquisition
             SELECT u.id AS user_id, upd.number, a.id AS assessment_id, ci.folder_id
             FROM user_professionaldevelopment upd
             INNER JOIN `user` u ON upd.user_id = u.`id`
-            INNER JOIN rubric_mark rm ON u.`id` = rm.student_id
+            INNER JOIN submission_return sr ON u.`id` = sr.`owner`
+            INNER JOIN rubric_mark rm ON sr.`id` = rm.`return_id`
             INNER JOIN rubric_descriptor rd ON rm.`descriptor_id` = rd.`id`
             INNER JOIN rubric_criterion rc ON rd.`criterion_id`  = rc.`id`
             INNER JOIN userAccess ua ON ua.uid = u.`id` AND rc.parent_id = ua.`sid` AND parent_type = 'category'
@@ -189,13 +195,16 @@ class Acquisition
         return $hierarchy;
     }
 
+
     /**
      * Find all the people in the states you selected
      * This way we can cheaply assemble the list of everyone who has received rubrics
      * and those who haven't
      *
      * @return array
-    */
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \UnderflowException
+     */
     private function findRoster() :array
     {
         $pb = new Builder($this->userMapper->getDatabase(), 'upd');
@@ -238,6 +247,7 @@ class Acquisition
         return $roster;
     }
 
+
     /**
      * Find all the assessment ids that spawned from $courseSpecId
      * Use a custom query, otherwise it's just too slow
@@ -246,6 +256,8 @@ class Acquisition
      * and (user_id, pdNumber) tuples
      *
      * @return array
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \UnderflowException
      */
     private function findInvolvement() :array
     {
@@ -267,6 +279,11 @@ class Acquisition
      * Populate a particular subset of Participants
      *
      * @return array
+     * @throws Mapper\DefinitionException
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
+     * @throws \LogicException
+     * @throws \UnexpectedValueException
      */
     public function generate() :array
     {
