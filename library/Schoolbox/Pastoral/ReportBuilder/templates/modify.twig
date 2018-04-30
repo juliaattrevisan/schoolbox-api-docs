@@ -347,7 +347,7 @@
             <script>
                 $(function() {
                     var $parentTypeSelector = "#formReport input[data-check-type]";
-                    var $subTypeSelector = "#formReport input[data-check-subtype]";
+                    var $subTypeSelector = "input[data-check-subtype]";
                     var $siblingSelector = "[data-pastoral-subtype]";
 
                     $($parentTypeSelector).each(function(index, value) {
@@ -368,6 +368,7 @@
                     $($parentTypeSelector).change(function(e) {
                         var checkbox = e.target;
                         var $subCheckboxes = $(checkbox).siblings($siblingSelector).find($subTypeSelector);
+
                         if ($(checkbox).is(':checked')) {
                             // ...show the subtypes for this type
                             $(checkbox).siblings($siblingSelector).show();
