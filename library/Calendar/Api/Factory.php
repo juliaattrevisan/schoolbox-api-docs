@@ -22,6 +22,7 @@ use Schoolbox\External\Connector\Factory as ExternalConnectorFactory;
 use Schoolbox\Config;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\IConfigLoader;
 
 class Calendar_Api_Factory
 {
@@ -53,15 +54,17 @@ class Calendar_Api_Factory
      * @param Assessment\MapperProxy $assessmentDataSource
      * @param ModuleChecker          $moduleChecker
      * @param null|IConnector        $databaseExternal
+     * @param IConfigLoader          $config
      */
     public function __construct(
         Assessment\MapperProxy $assessmentDataSource,
         ModuleChecker $moduleChecker,
-        IConnector $databaseExternal = null
+        IConnector $databaseExternal = null,
+        IConfigLoader $config
     ) {
         $this->assessmentDataSource = $assessmentDataSource;
         $this->databaseExternal     = $databaseExternal;
-        $this->configLoader = new Config\Loader();
+        $this->configLoader = $config;
 
         $allConfigRecords = Calendar_Api_Config_Mapper::getInstance()->getAllConfigRecords();
 
