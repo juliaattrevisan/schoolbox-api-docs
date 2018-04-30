@@ -47,7 +47,7 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
     public function getEvents($startTimestamp, $endTimestamp)
     {
         // we're going to use this as a window for not building *too* much expensive timetable at once
-        $startOfDay = Alaress_Date_Format::now()->startOfDay();
+        $startOfDay = Alaress_Date_Format::now()->startOfDay()->getUnixTimeStamp();
 
         // If the user is not allowed to view timetables return an empty collection
         if ($this->getUser()->getHideTimetable()) {
