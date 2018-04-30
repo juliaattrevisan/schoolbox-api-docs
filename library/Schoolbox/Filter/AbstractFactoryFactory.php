@@ -430,7 +430,7 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
      * @return \Schoolbox\Mapper|Page\Option\Mapper
      * @throws \InvalidArgumentException If mapper class not found
      */
-    private function getOptionMapper()
+    protected function getOptionMapper()
     {
         return $this->mapperFactory->get(Page\Option\Mapper::class);
     }
@@ -440,7 +440,7 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
      * @return \Schoolbox\Mapper|Page\Option\Defaults\Mapper
      * @throws \InvalidArgumentException If mapper class not found
      */
-    private function getDefaultsMapper()
+    protected function getDefaultsMapper()
     {
         return $this->mapperFactory->get(Page\Option\Defaults\Mapper::class);
     }
@@ -450,7 +450,7 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
      * @return \Schoolbox\Mapper|Selection\Mapper
      * @throws \InvalidArgumentException If mapper class not found
      */
-    private function getSelectionMapper()
+    protected function getSelectionMapper()
     {
         return $this->mapperFactory->get(Selection\Mapper::class);
     }

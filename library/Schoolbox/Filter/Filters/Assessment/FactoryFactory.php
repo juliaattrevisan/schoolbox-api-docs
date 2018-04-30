@@ -22,6 +22,7 @@ use Schoolbox\Learning\Assessment\DataModel\Project;
 use Schoolbox\Filter\Filters;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\User;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImplementation;
 
 
 /**
@@ -54,10 +55,15 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
             case AssessmentType\Definition::class:
                 return $this->buildFactory(AssessmentType\Factory::class);
             case Filters\Assessment\Folder\TeacherInvolved\Definition::class:
-                return $this->buildFactory(Filters\Assessment\Folder\TeacherInvolved\Factory::class, [
-                    'folderMapper' => $this->getMapperFactory()->get(Folder\Mapper::class),
-                    'access'       => $this->getMapperFactory()->get(Access::class),
-                ]);
+                return new Filters\Assessment\Folder\TeacherInvolved\Factory(
+                    $this->getOptionMapper(),
+                    $this->getDefaultsMapper(),
+                    $this->getSelectionMapper(),
+                    $this->getFolderMapper(),
+                    $this->getAccess(),
+                    $this->getFilterMapper(),
+                    $this->getUnitImplMapper()
+                );
             case Filters\Assessment\Folder\StudentInteractions\Definition::class:
                 return $this->buildFactory(Filters\Assessment\Folder\StudentInteractions\Factory::class, [
                     'folderMapper' => $this->getMapperFactory()->get(Folder\Mapper::class),
@@ -132,5 +138,45 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
         }
 
         return $filters;
+    }
+
+
+    /**
+     * @return Folder\Mapper|\Schoolbox\Mapper
+     * @throws \InvalidArgumentException
+     */
+    protected function getFolderMapper(): Folder\Mapper
+    {
+        return $this->getMapperFactory()->get(Folder\Mapper::class);
+    }
+
+
+    /**
+     * @return Access|\Schoolbox\Mapper
+     * @throws \InvalidArgumentException
+     */
+    protected function getAccess(): Access
+    {
+        return $this->getMapperFactory()->get(Access::class);
+    }
+
+
+    /**
+     * @return Filter\Mapper|\Schoolbox\Mapper
+     * @throws \InvalidArgumentException
+     */
+    protected function getFilterMapper(): Filter\Mapper
+    {
+        return $this->getMapperFactory()->get(Filter\Mapper::class);
+    }
+
+
+    /**
+     * @return UnitImplementation\Mapper|\Schoolbox\Mapper
+     * @throws \InvalidArgumentException
+     */
+    protected function getUnitImplMapper(): UnitImplementation\Mapper
+    {
+        return $this->getMapperFactory()->get(UnitImplementation\Mapper::class);
     }
 }

@@ -9,6 +9,7 @@ namespace Schoolbox\Learning\Course\DataModel\Specification\Unit;
 
 use PDOStatement;
 use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Course\DataModel\AbstractUnitMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecificationModel;
@@ -24,6 +25,7 @@ use Schoolbox\Resource\HomepageConfig;
  * @method Model createModel($idValue = null)
  * @method Model findById($identifierValue)
  * @method Model findOneByColumn($columnName, $columnValue, $order = [], $options = [])
+ * @method GenericCollection|Model[] findByColumn($columnName, $columnValue, $options = [])
  * @method Model hydrate(array $row, $alias = '', $callback = null)
  */
 class Mapper extends AbstractUnitMapper
