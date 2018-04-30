@@ -15,22 +15,27 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
     /**
      * Determine whether this should display an icon or something
      * via the image transform
-     * 
+     *
+     * @param $iconSize
      * @return string
      */
-    public function determineIcon(): string
+    public function determineIcon($iconSize = 'square64'): string
     {
-        $defaultIcon = 'application-octet-stream.svg';
-
         /* Load the current icon as set by Admin > Allowed Files because sysadmins can choose their own icons
          * If the filetype is indeterminate, return a default icon rather than nothing
          */
         try {
-            return MimetypeMapper::getInstance()->getByFilename($this->getExternalTitle())->getIconFile();
+            $iconFile = MimetypeMapper::getInstance()->getByFilename($this->getExternalTitle())->getIconFile();
+            return '/images/mime/' . $iconFile;
+        } catch (FileException $e) {
+            // noop;
         }
-        catch (FileException $e) {
-            return $defaultIcon;
+
+        if ($this->hasThumbnail()) {
+            return "/socialstream/image.php?size={$iconSize}&id=" . $this->getPostId();
         }
+        // default icon
+        return '/images/mime/application-octet-stream.svg';
     }
 
     /**
