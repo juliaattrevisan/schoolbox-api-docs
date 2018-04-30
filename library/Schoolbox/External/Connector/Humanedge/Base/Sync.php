@@ -96,7 +96,8 @@ class Sync extends Base implements ISync
             FROM Contact c
             INNER JOIN StudentContact sc ON c.ID = sc.ContactID
             INNER JOIN Student         s ON sc.StudentID = s.ID
-            WHERE {$this->studentContactFilter}
+            {$this->buildStudentContactAdhocJoins()}
+            WHERE ({$this->buildStudentContactFilter()})
             AND   s.DateLeft IS NULL
             ORDER BY c.Code ASC
         ";
@@ -144,5 +145,41 @@ class Sync extends Base implements ISync
         return new Iterator\Staff(
             $this->databaseExternal->getQueryIterator($query)
         );
+    }
+
+    /**
+     * Builds a filter for a student's contacts.
+     *
+     * This filters out anyone who's not a primary guardian or parent.
+     *
+     * @return string
+     */
+    protected function buildStudentContactFilter()
+    {
+        return "
+            sc.ResidentialGuardian = 'Y' OR
+            sc.Relationship = 'Father' OR
+            sc.Relationship = 'Mother' OR
+            sc.Relationship = 'Stepfather' OR
+            sc.Relationship = 'Stepmother' OR
+            sc.Relationship = 'Step Father' OR
+            sc.Relationship = 'Step Mother' OR
+            sc.Relationship = 'Houseparents' OR
+            sc.Relationship LIKE '%Guardian%' OR
+            sc.Relationship LIKE 'Foster%' OR
+            sc.Relationship = 'Carer'
+        ";
+    }
+
+    /**
+     * Builds a set of joins onto the AdHoc table, if required.
+     *
+     * This default implementation requires no joins onto this table.
+     *
+     * @return string
+     */
+    protected function buildStudentContactAdhocJoins()
+    {
+        return '';
     }
 }
