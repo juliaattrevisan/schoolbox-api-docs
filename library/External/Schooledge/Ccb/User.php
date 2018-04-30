@@ -137,4 +137,31 @@ class External_Schooledge_Ccb_User extends External_Schooledge_User
         ";
         return $this->getDatabase()->getAll($query);
     }
+
+    /**
+     * Builds a filter for a student's contacts.
+     *
+     * This filters out anyone who's not a primary guardian or parent, but
+     * allows users who have a
+     *
+     * @return string
+     */
+    protected function buildStudentContactFilter()
+    {
+        return parent::buildStudentContactFilter() . "
+            OR ad.FieldValue = 'Y'
+        ";
+    }
+
+    /**
+     * Builds a set of joins onto the AdHoc table.
+     *
+     * This implementation joins onto ad-hoc field 53 ("Copy of reports").
+     *
+     * @return string
+     */
+    protected function buildStudentContactAdhocJoins()
+    {
+        return 'LEFT JOIN AdhocData ad ON ad.AdhocID = 53 AND c.ID = ad.SourceID';
+    }
 }
