@@ -9,7 +9,7 @@ declare(strict_types=1);
 use External\Tass\Portal\SSO;
 use Schoolbox\Application\Daemon;
 
-$opts = require __DIR__ . '../../../schoolbox/conf/core/require-cli.php';
+$opts = require __DIR__ . '/../../conf/core/require-cli.php';
 spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
 $kernel = new Daemon\Kernel('Insert SSO token generation strategy config', [
