@@ -82,7 +82,7 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
 
         // This is a config var that determines how many days in the past you can mark attendance for.
         // Later, we need to fetch these days expensively, because otherwise they come without attendance data.
-        $attendanceDays = strtotime("{$this->configLoader->get('external_attendance_days')} day", 0); // convert days to seconds
+        $attendanceWindow = strtotime("{$this->configLoader->get('external_attendance_days')} day", 0); // convert days to seconds
 
         // Scan through each day from $startTimestamp to $endTimestamp, figuring
         // out that day's timetable day number for each of the user's campuses.
@@ -96,9 +96,9 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
 
                 $date = new Alaress_Date_Format($currentTimestamp, Alaress_Date_Format::TIMESTAMP);
 
-                if ($ttl >= (-$attendanceDays) && $ttl < $expensiveWindow) {
+                if ($ttl >= (-$attendanceWindow) && $ttl < $expensiveWindow) {
                     // if the day we're looking at is
-                    // - no more than $attendanceDays in the past, and
+                    // - no more than $attendanceWindow in the past, and
                     // - no more than $expensiveWindow in the future,
                     // get the expensive timetable
                     $dayTimetable = $this->buildTimetableExpensively($this->getUser(), $campus, $date);
