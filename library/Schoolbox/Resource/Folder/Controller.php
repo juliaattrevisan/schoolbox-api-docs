@@ -669,21 +669,26 @@ class Controller extends BaseController
         $folders = $folderMapper->findAllChildren($model->getId(), true);
         foreach ($folders as $folder) {
 
+            $deleteFolderMemberships = [];
+
             if ($model->getInherit()) {
-
-                // If inheriting permissions we need to remove any user access permissions...
-                $userAccessMapper->deleteByColumnList([
-                    "sid"     => $folder->getId(),
-                    "service" => UserAccess::SERVICE_HOMEPAGE,
-                ]);
-
-                // ...and role permissions
-                $roleAccessMapper->deleteByColumn("cid", $folder->getId());
+                $deleteFolderMemberships[] = $folder->getId();
             }
 
             $folder->setInherit($model->getInherit());
             $folderMapper->save($folder);
             $this->recurseInheritance($folder);
+        }
+
+        if (!empty($deleteFolderMemberships)) {
+            // If inheriting permissions we need to remove any user access permissions...
+            $userAccessMapper->deleteByColumnList([
+                "sid"     => $deleteFolderMemberships,
+                "service" => UserAccess::SERVICE_HOMEPAGE,
+            ]);
+
+            // ...and role permissions
+            $roleAccessMapper->deleteByColumn("cid", $deleteFolderMemberships);
         }
     }
 
