@@ -9,13 +9,12 @@
 namespace Schoolbox\Realtime\Routing;
 
 use Alaress\Async\Notification\Instance\Instance;
+use Alaress\Async\Queue\QueueInterface;
 use Alaress\WorkerCrew\Transaction\ITransaction;
 use Alaress\WorkerCrew\TXRX;
 use BadMethodCallException;
 use InvalidArgumentException;
 use PDOException;
-use Predis\ClientInterface;
-use Predis\Collection\Iterator\Keyspace;
 use Schoolbox\UserMapper;
 
 class RouteTXRX implements TXRX
@@ -27,12 +26,8 @@ class RouteTXRX implements TXRX
     /** @var QueueSorter */
     private $sorter;
 
-    /** @var ClientInterface */
-    private $redis;
-
-    /** @var string */
-    private $instanceId;
-
+    /** @var QueueInterface */
+    private $queue;
 
     /**
      * Constructor
@@ -40,21 +35,18 @@ class RouteTXRX implements TXRX
      * @see buildForDaemon
      * @see buildForWorker
      *
-     * @param UserMapper|null      $mapper
-     * @param QueueSorter|null     $sorter
-     * @param ClientInterface|null $redis
-     * @param string|null          $instanceId
+     * @param UserMapper|null     $mapper
+     * @param QueueSorter|null    $sorter
+     * @param QueueInterface|null $queue
      */
     private function __construct(
         UserMapper $mapper = null,
         QueueSorter $sorter = null,
-        ClientInterface $redis = null,
-        string $instanceId = null
+        QueueInterface $queue = null
     ) {
-        $this->mapper     = $mapper;
-        $this->sorter     = $sorter;
-        $this->redis      = $redis;
-        $this->instanceId = $instanceId;
+        $this->mapper = $mapper;
+        $this->sorter = $sorter;
+        $this->queue  = $queue;
     }
 
 
@@ -62,13 +54,12 @@ class RouteTXRX implements TXRX
      * "Constructor" for the transactor variant of this object, as used in
      * daemons.
      *
-     * @param ClientInterface $redis
-     * @param string          $instanceId
+     * @param QueueInterface $queue
      * @return self
      */
-    public static function buildTransactor(ClientInterface $redis, string $instanceId): self
+    public static function buildTransactor(QueueInterface $queue): self
     {
-        return new static(null, null, $redis, $instanceId);
+        return new static(null, null, $queue);
     }
 
 
@@ -99,25 +90,19 @@ class RouteTXRX implements TXRX
      */
     public function send($instance, ITransaction $tx, $userIds)
     {
-        if (null === $this->redis) {
+        if (null === $this->queue) {
             throw new BadMethodCallException('Attempting to send using the receiver variant of RouteTXRX');
         }
 
         // Is a retract single: retract it
         if ($instance->isActionRetractSingle()) {
-            $this->redis->del([$this->buildMessageKey($instance)]);
+            $this->queue->retract($instance);
             return;
         }
 
         // Is a retract all: find all like it, then retract them
         if ($instance->isActionRetractAll()) {
-            $msgKeys = [];
-            foreach (new Keyspace($this->redis, $this->buildMessageBaseKey($instance)) as $msgKey) {
-                $msgKeys[] = $msgKey;
-            }
-            if (!empty($msgKeys)) {
-                $this->redis->del($msgKeys);
-            }
+            $this->queue->retractAllLike($instance);
             return;
         }
 
@@ -162,43 +147,5 @@ class RouteTXRX implements TXRX
         }
 
         return $count;
-    }
-
-
-    /**
-     * Builds a message key for this instance, so that it may be retracted.
-     *
-     * TODO undupe this from RedisQueue
-     *
-     * @param Instance $instance
-     * @return string
-     */
-    private function buildMessageKey(Instance $instance): string
-    {
-        return sprintf(
-            'msg:%s:m:%s:%s',
-            $this->instanceId,
-            $instance->getBaseHash(),
-            $instance->getParamHash()
-        );
-    }
-
-
-    /**
-     * Builds a base message key for this instance, so that all messages like
-     * it may be retracted.
-     *
-     * TODO undupe this from RedisQueue
-     *
-     * @param Instance $instance
-     * @return string
-     */
-    private function buildMessageBaseKey(Instance $instance): string
-    {
-        return sprintf(
-            'msg:%s:m:%s:*',
-            $this->instanceId,
-            $instance->getBaseHash()
-        );
     }
 }

@@ -19,6 +19,7 @@ use Predis\ClientInterface;
 use Psr\Log\LoggerInterface as Logger;
 use React\EventLoop\LoopInterface;
 use React\Stomp\Client;
+use Schoolbox\Realtime\MessageList\Retractor;
 use Schoolbox\Realtime\Routing;
 use Schoolbox\Realtime\Routing\DispatchResponder;
 use Schoolbox\Realtime\Routing\DispatchStrategy;
@@ -61,7 +62,7 @@ $kernel->run(function(Di\Container $di, LoopInterface $loop, Logger $log, array 
 
             // ensure endpoints exist
             foreach ($instances as $instance) {
-                $txrx = RouteTXRX::buildTransactor($redis, $instance);
+                $txrx = RouteTXRX::buildTransactor(new Retractor($redis, $instance));
 
                 // this holds and traverses all our subscription data
                 $router = new Router(new SubscriptionDictionary('.'));
