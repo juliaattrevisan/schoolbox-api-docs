@@ -68,15 +68,16 @@ class Controller extends Alaress\Web\Controller\Base
     /**
      * Generate an SSO token, and redirect to the specified Tass product
      *
-     * @param string $productCode The code for the Tass product we wish to redirect to
-     * @param string $appCode     The code by which Schoolbox is known to the specified Tass product
-     * @param string $productPath The Tass portal path where the Tass product is made available
-     * @param array  $deepLink    Parameters to indicate the Tass product page to deep link to
-     * @param bool   $prodMenu    Should Tass render the product menu? Null for default behaviour
+     * @param string     $productCode The code for the Tass product we wish to redirect to
+     * @param string     $appCode     The code by which Schoolbox is known to the specified Tass product
+     * @param string     $productPath The Tass portal path where the Tass product is made available
+     * @param array      $deepLinkV2  Injected when generating a SSO v2 token
+     * @param bool       $prodMenu    Should Tass render the product menu? Null for default behaviour
+     * @param null|array $deepLinkV1  Injected when generating a SSO v1 token
      * @throws InvalidStatusCode If unable to generate a token and unable to set appropriate error code
-     * @throws \Schoolbox\Application\Exception\Exception
+     * @throws \Schoolbox\Application\Exception\Exception If attempting to SSO as an impersonated user
      */
-    private function redirectToTassProduct(string $productCode, string $appCode, string $productPath, array $deepLink, bool $prodMenu)
+    private function redirectToTassProduct(string $productCode, string $appCode, string $productPath, array $deepLinkV2, bool $prodMenu, array $deepLinkV1 = null)
     {
         // We don't permit SSO of impersonated users into external systems
         if ($this->isCurrentUserImpersonated()) {
@@ -92,7 +93,7 @@ class Controller extends Alaress\Web\Controller\Base
 
         // Send off the SSO token request
         try {
-            $token = $this->sso->getUserToken($config, $deepLink, $prodMenu);
+            $token = $this->sso->getUserToken($config, $deepLinkV2, $prodMenu, $deepLinkV1);
         } catch (SsoTokenGenerationException|\RuntimeException $e) {
             $this->captureException($e);
             $token = '';
@@ -114,46 +115,73 @@ class Controller extends Alaress\Web\Controller\Base
     /**
      * SSO to parent lounge
      * @throws InvalidStatusCode
+     * @throws \Schoolbox\Application\Exception\Exception If attempting to SSO as an impersonated user
      */
     public function parentLounge()
     {
-        $this->redirectToTassProduct('PL', $this->appCodes['parentLounge'], '/ParentLounge/PIALogin.cfm', $this->getDeepLink(), $this->getProdMenu());
+        $this->redirectToTassProduct('PL', $this->appCodes['parentLounge'], '/ParentLounge/PIALogin.cfm', $this->getDeepLinkV2(), $this->getProdMenu());
     }
 
     /**
      * SSO to TASSWeb
      * @throws InvalidStatusCode
+     * @throws \Schoolbox\Application\Exception\Exception If attempting to SSO as an impersonated user
      */
     public function tassWeb()
     {
-        $this->redirectToTassProduct('TASSWEB', $this->appCodes['tassWeb'], '/tassweb/login.cfm', $this->getDeepLink(), $this->getProdMenu());
+        $this->redirectToTassProduct('TASSWEB', $this->appCodes['tassWeb'], '/tassweb/login.cfm', $this->getDeepLinkV2(), $this->getProdMenu());
     }
+
 
     /**
      * SSO to teacher kiosk
+     *
      * @throws InvalidStatusCode
+     * @throws \Schoolbox\Application\Exception\Exception If attempting to SSO as an impersonated user
      */
     public function teacherKiosk()
     {
-        $this->redirectToTassProduct('TIA', $this->appCodes['teacherKiosk'], '/kiosk/TIALogin.cfm', $this->getDeepLink(), $this->getProdMenu());
+        $this->redirectToTassProduct('TIA', $this->appCodes['teacherKiosk'], '/kiosk/TIALogin.cfm', $this->getDeepLinkV2(), $this->getProdMenu());
     }
+
+
+    /**
+     * Redirect to the student profile page in TASS's teacher kiosk
+     *
+     * @param User $student
+     * @throws InvalidStatusCode
+     * @throws \Schoolbox\Application\Exception\Exception If attempting to SSO as an impersonated user
+     */
+    public function studentProfile(User $student): void
+    {
+        $deepLinkV2 = ['studcode' => $student->getExternalId()];
+
+        $deepLinkV1 = [
+            'do'        => 'kiosk.students.main.student.details',
+            'stud_code' => $student->getExternalId(),
+        ];
+        $this->redirectToTassProduct('TIA', $this->appCodes['teacherKiosk'], '/kiosk/TIALogin.cfm', $deepLinkV2, true, $deepLinkV1);
+    }
+
 
     /**
      * SSO to web book
      * @throws InvalidStatusCode
+     * @throws \Schoolbox\Application\Exception\Exception If attempting to SSO as an impersonated user
      */
     public function webBook()
     {
-        $this->redirectToTassProduct('WB', $this->appCodes['webBook'], '/webbook/WBLogin.cfm', $this->getDeepLink(), $this->getProdMenu());
+        $this->redirectToTassProduct('WB', $this->appCodes['webBook'], '/webbook/WBLogin.cfm', $this->getDeepLinkV2(), $this->getProdMenu());
     }
 
     /**
      * SSO to student cafe
      * @throws InvalidStatusCode
+     * @throws \Schoolbox\Application\Exception\Exception If attempting to SSO as an impersonated user
      */
     public function studentCafe()
     {
-        $this->redirectToTassProduct('SC', $this->appCodes['studentCafe'], '/studentcafe/login.cfm', $this->getDeepLink(), $this->getProdMenu());
+        $this->redirectToTassProduct('SC', $this->appCodes['studentCafe'], '/studentcafe/login.cfm', $this->getDeepLinkV2(), $this->getProdMenu());
     }
 
 
@@ -184,7 +212,7 @@ class Controller extends Alaress\Web\Controller\Base
      *
      * @return string[]
      */
-    private function getDeepLink(): array
+    private function getDeepLinkV2(): array
     {
         parse_str($this->getRequest()->query->get('deep_link', ''), $deepLink);
         return $deepLink;

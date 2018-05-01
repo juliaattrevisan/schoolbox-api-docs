@@ -11,8 +11,11 @@ namespace External\Tass\Portal;
 
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule\IsLoggedIn;
+use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
+use Schoolbox\IConfigLoader;
+use Schoolbox\UserMapper;
 
 class Module extends \Alaress\Module\Module
 {
@@ -26,8 +29,22 @@ class Module extends \Alaress\Module\Module
         $this->addRoute($router, 'parentLounge', $basePath, '/parentlounge');
         $this->addRoute($router, 'tassWeb', $basePath, '/tassweb');
         $this->addRoute($router, 'teacherKiosk', $basePath, '/teacherkiosk');
+        $this->addRoute($router, 'studentProfile', $basePath, '/studentProfile/{studentId}');
         $this->addRoute($router, 'webBook', $basePath, '/webbook');
         $this->addRoute($router, 'studentCafe', $basePath, '/studentcafe');
+    }
+
+    /**
+     * @param PathMatcher $matcher
+     */
+    public function initRoutePreloads(PathMatcher $matcher): void
+    {
+        $this
+            ->addRoutePreload($matcher, 'studentProfile', function ($params) {
+                return [
+                    'student' => UserMapper::getInstance()->findById($params['studentId']),
+                ];
+            });
     }
 
     /**
@@ -35,6 +52,7 @@ class Module extends \Alaress\Module\Module
      */
     public function initControllers(ContainerInterface $injector)
     {
+        /** @var IConfigLoader $config */
         $config = $injector->get('config');
         $injector->set(
             'tassportal:sso',
@@ -45,7 +63,8 @@ class Module extends \Alaress\Module\Module
                         'token_key' => $config->get('external_tass_sso_token_key'),
                         'cmpy_code' => $config->get('external_tass_company_code'),
                     ],
-                    'server' => $config->get('external_tass_sso_server'),
+                    'server'        => $config->get('external_tass_sso_server'),
+                    'ssoStrategy'   => $config->get('external_tass_sso_token_generation_strategy') ?: SSO::SSO_STRATEGY_DEFAULT,
                 ]
             )
         );

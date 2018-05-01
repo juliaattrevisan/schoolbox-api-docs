@@ -4,6 +4,7 @@ namespace External\Tass\Portal;
 
 use UnexpectedValueException;
 use GuzzleHttp;
+use InvalidArgumentException;
 
 /**
  * TASSWeb SSO token retriever
@@ -15,12 +16,20 @@ use GuzzleHttp;
  */
 class SSO
 {
+    // How should we attempt to generate an SSO token?
+    // Corresponds to DB config setting
+    public const SSO_STRATEGY_V1_ONLY    = 1;
+    public const SSO_STRATEGY_V2_ONLY    = 2;
+    public const SSO_STRATEGY_V2_THEN_V1 = 3;
+
+    // If not configured in db, what should the default strategy be?
+    public const SSO_STRATEGY_DEFAULT    = self::SSO_STRATEGY_V2_THEN_V1;
 
     // Recognised TASS SSO token request response codes and what they mean
     private const RESPONSE_CODES = [
         1 => 'Ok',
         2 => 'URL parameters missing.',
-        3 => 'Invalid SSO Application Code or SSO User Mapping',
+        3 => 'Invalid SSO Token Key, or SSO Application Code, or SSO User Mapping, or IP is not white-listed',
         4 => 'Invalid Portal User',
         5 => 'Invalid sfa_num',
     ];
@@ -49,6 +58,29 @@ class SSO
         'method' => 'createSSOToken',
     ];
 
+    /**
+     * Which SSO token generation strategy should we use?
+     *
+     * @var int
+     * @see self::SSO_STRATEGY_* constants
+     */
+    private $ssoStrategy;
+
+
+    /**
+     * Returns the set of available SSO strategies
+     *
+     * @return int[]
+     */
+    public static function getSsoStrategies(): array
+    {
+        return [
+            self::SSO_STRATEGY_V2_THEN_V1,
+            self::SSO_STRATEGY_V2_ONLY,
+            self::SSO_STRATEGY_V1_ONLY,
+        ];
+    }
+
 
     /**
      * Borrowed this default+override configuration idea from the js idiom
@@ -57,47 +89,59 @@ class SSO
      *                              Should contain at least 'token_key'.
      *
      * @param string $server
+     * @param int    $ssoStrategy
+     * @throws InvalidArgumentException If an unrecognised SSO strategy is specified
      */
-    public function __construct(array $configuration, string $server)
+    public function __construct(array $configuration, string $server, int $ssoStrategy)
     {
         $this->configuration = array_merge($this->configuration, $configuration);
         $this->server        = $server;
+        if (!\in_array($ssoStrategy, self::getSsoStrategies(), true)) {
+            throw new InvalidArgumentException("Invalid SSO token generation strategy: '{$ssoStrategy}'");
+        }
+        $this->ssoStrategy = $ssoStrategy;
     }
 
 
     /**
      * Gets a user token.
      *
-     * @param array $userConf     Overrides for $this->configuration (if any)
-     *                            Should contain at least ['sso_code' => $tassID]
-     *
-     * @param array $deepLink
-     * @param bool  $prodMenu
+     * @param array      $userConf   Overrides for $this->configuration (if any)
+     *                               Should contain at least ['sso_code' => $tassID]
+     * @param array      $deepLinkV2 Injected when requesting a SSOv2 token
+     * @param bool       $prodMenu
+     * @param array|null $deepLinkV1 Injected when requesting a SSOv1 token
      * @return string If $this->output is true, this will output a string to
      *                            stdout, and then exit.
      * @throws SsoTokenGenerationException
      * @throws \RuntimeException
      */
-    public function getUserToken(array $userConf, array $deepLink, bool $prodMenu): string
+    public function getUserToken(array $userConf, array $deepLinkV2, bool $prodMenu, array $deepLinkV1 = null): string
     {
         $conf   = array_merge($this->configuration, $userConf);
         $client = new GuzzleHttp\Client();
+        $errors = [];
 
-        // First attempt to get a token using SSO v2
-        try {
-            return $this->getV2Token($client, $conf, $deepLink, $prodMenu);
-        } catch (UnexpectedValueException $v2e) {
+        // Is school configured to attempt SSO v2 ?
+        if (\in_array($this->ssoStrategy, [self::SSO_STRATEGY_V2_ONLY, self::SSO_STRATEGY_V2_THEN_V1], true)) {
+            try {
+                return $this->getV2Token($client, $conf, $deepLinkV2, $prodMenu);
+            } catch (UnexpectedValueException $e) {
+                $errors[] = "SSO v2: {$e->getMessage()}";
+            }
         }
 
-        // Then attempt to get a token using SSO v1
-        try {
-            $conf['sso_code'] = urlencode($conf['sso_code']);
-            return $this->getV1Token($client, $conf);
-        } catch (UnexpectedValueException $v1e) {
+        // Is school configured to attempt SSO v1 ?
+        if (\in_array($this->ssoStrategy, [self::SSO_STRATEGY_V1_ONLY, self::SSO_STRATEGY_V2_THEN_V1], true)) {
+            try {
+                return $this->getV1Token($client, $conf, $deepLinkV1);
+            } catch (UnexpectedValueException $e) {
+                $errors[] = "SSO v1: {$e->getMessage()}";
+            }
         }
 
-        // Merge exceptions if both SSO versions failed
-        throw new SsoTokenGenerationException("SSO v1: {$v1e->getMessage()}, SSO v2: {$v2e->getMessage()}");
+        // Merge exception messages
+        throw new SsoTokenGenerationException('Unable to generate SSO token. ' . implode(', ', $errors));
     }
 
 
@@ -122,8 +166,8 @@ class SSO
 
         if ($this->debug) {
             header('Content-Type: text/plain');
-            $queryString = http_build_query($formParams);
-            die("SSO v2.\nPOST: {$this->server}?returnType=json\nData: {$queryString}\nRECV: {$responseString}\n");
+            $data = print_r($formParams, true);
+            die("SSO v2.\nPOST: {$this->server}?returnType=json\nData: {$data}\nRECV: {$responseString}\n");
         }
 
         // The response should be in this format
@@ -168,19 +212,23 @@ class SSO
     /**
      * @param GuzzleHttp\Client $client
      * @param array             $conf
+     * @param array|null        $deepLinkV1
      * @return string
      * @throws SsoTokenGenerationException
      * @throws \RuntimeException
      */
-    private function getV1Token(GuzzleHttp\Client $client, array $conf): string
+    private function getV1Token(GuzzleHttp\Client $client, array $conf, array $deepLinkV1 = null): string
     {
-        $responseString = $client->get($this->server, ['query' => $conf])->getBody()->getContents();
+        if (null !== $deepLinkV1) {
+            $conf['deep_link'] = 'index.cfm?' . http_build_query($deepLinkV1);
+        }
+        $query = http_build_query($conf);
+        $responseString = $client->get("{$this->server}?{$query}")->getBody()->getContents();
         parse_str($responseString, $response);
 
         if ($this->debug) {
             header('Content-Type: text/plain');
-            $data = http_build_query($conf);
-            die("SSO v1.\nSEND: {$this->server}?{$data}\nRECV: {$responseString}\n");
+            die("SSO v1.\nSEND: {$this->server}?{$query}\nRECV: {$responseString}\n");
         }
         return $this->parseResponse($response, $conf['sso_code']);
     }
