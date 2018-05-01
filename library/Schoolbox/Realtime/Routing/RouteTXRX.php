@@ -14,6 +14,7 @@ use Alaress\WorkerCrew\TXRX;
 use BadMethodCallException;
 use InvalidArgumentException;
 use PDOException;
+use Predis\ClientInterface;
 use Schoolbox\UserMapper;
 
 class RouteTXRX implements TXRX
@@ -25,19 +26,52 @@ class RouteTXRX implements TXRX
     /** @var QueueSorter */
     private $sorter;
 
+    /** @var ClientInterface */
+    private $redis;
+
 
     /**
-     * TODO pass in a Redis client, only for daemon-side TXRX
+     * @see buildForDaemon
+     * @see buildForWorker
+     * @param UserMapper|null      $mapper
+     * @param QueueSorter|null     $sorter
+     * @param ClientInterface|null $redis
+     */
+    private function __construct(
+        UserMapper $mapper = null,
+        QueueSorter $sorter = null,
+        ClientInterface $redis = null
+    ) {
+        $this->mapper = $mapper;
+        $this->sorter = $sorter;
+        $this->redis  = $redis;
+    }
+
+
+    /**
+     * "Constructor" for the transactor variant of this object, as used in
+     * daemons.
      *
-     * You need to install these dependencies on the worker-side; they not used daemon-side
+     * @param ClientInterface $redis
+     * @return self
+     */
+    public static function buildTransactor(ClientInterface $redis): self
+    {
+        return new static(null, null, $redis);
+    }
+
+
+    /**
+     * "Constructor" for the receiver variant of this object, as used in
+     * workers.
      *
      * @param UserMapper  $mapper
      * @param QueueSorter $sorter
+     * @return self
      */
-    public function __construct(UserMapper $mapper = null, QueueSorter $sorter = null)
+    public static function buildReceiver(UserMapper $mapper, QueueSorter $sorter): self
     {
-        $this->mapper = $mapper;
-        $this->sorter = $sorter;
+        return new static($mapper, $sorter, null);
     }
 
 
@@ -56,6 +90,14 @@ class RouteTXRX implements TXRX
      */
     public function send($instance, ITransaction $tx, $userIds)
     {
+        if ($instance->isActionRetractSingle()) {
+            // TODO handle retracts right here
+        }
+        if ($instance->isActionRetractAll()) {
+            // TODO handle retracts
+        }
+
+        // Is a send action: proceed as before
         if (!is_array($userIds)) {
             throw new InvalidArgumentException('Payload must be an array of user IDs');
         }

@@ -47,11 +47,10 @@ $kernel->run(function(Di\Container $di, LoopInterface $loop, Logger $log, array 
             // the list of instances this particular daemon will listen for
             $instances = [ INSTANCE_ID ];
 
-            // daemon-version: no dependencies required
-            $txrx = new RouteTXRX();
-
             /** @var ClientInterface $redis */
             $redis = $di->get('redis');
+
+            $txrx = RouteTXRX::buildTransactor($redis);
 
             /** @var AMQPInterface $amqp */
             $amqp = $di->get('amqp');
