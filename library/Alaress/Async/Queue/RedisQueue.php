@@ -66,9 +66,10 @@ abstract class RedisQueue implements QueueInterface
      */
     public function retract(Instance $instance): bool
     {
-        $id = $this->getRedisMsgKey($instance);
-        return $this->redis->del([$id]) > 0
-            && $this->redis->srem($this->getRedisSetKey(), $id) > 0;
+        // When retracting messages, only the message body need be removed.
+        // The pointer in the set need not be removed, as `fetch()` knows how
+        // to handle set items with missing message bodies.
+        return $this->redis->del([$this->getRedisMsgKey($instance)]) > 0;
     }
 
 
@@ -86,17 +87,10 @@ abstract class RedisQueue implements QueueInterface
             $ids[] = $id;
         }
 
-        // Delete from both the key-value store, and the set
-        $count = 0;
         if (!empty($ids)) {
             $this->redis->del($ids);
-            foreach ($ids as $id) {
-                if ($this->redis->srem($this->getRedisSetKey(), $id) > 0) {
-                    $count++;
-                }
-            }
         }
-        return $count;
+        return \count($ids);
     }
 
 
