@@ -16,8 +16,11 @@ class External_Schooledge_Ccb_User extends External_Schooledge_User
      * Builds a filter for a student's contacts.
      *
      * This filters out anyone who's not a primary guardian or parent, but
-     * allows users who have a
+     * allows users who have an ad-hoc field value set to "Y".
      *
+     * (The join onto that field is built in `buildStudentContactAdhocJoins`.)
+     *
+     * @see buildStudentContactAdhocJoins
      * @return string
      */
     protected function buildStudentContactFilter()
