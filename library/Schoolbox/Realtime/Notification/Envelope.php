@@ -146,7 +146,8 @@ class Envelope extends InstanceBundle {
     public function retract(Instance $instance)
     {
         $instance->setAction(Instance::ACTION_RETRACT_SINGLE);
-        $this->broadcastToSuperusers($instance);
+        // Binding name is arbitrary, this won't ever get sent to anyone
+        $this->bind(Instance::ACTION_RETRACT_SINGLE, $instance);
     }
 
     /**
@@ -157,6 +158,7 @@ class Envelope extends InstanceBundle {
     public function retractAllLike(Instance $instance)
     {
         $instance->setAction(Instance::ACTION_RETRACT_ALL);
-        $this->broadcastToSuperusers($instance);
+        // Binding name is arbitrary, this won't ever get sent to anyone
+        $this->bind(Instance::ACTION_RETRACT_ALL, $instance);
     }
 }
