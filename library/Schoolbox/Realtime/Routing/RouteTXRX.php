@@ -106,19 +106,24 @@ class RouteTXRX implements TXRX
             return;
         }
 
-        // Is a send action: proceed as before
-        if (!is_array($userIds)) {
-            throw new InvalidArgumentException('Payload must be an array of user IDs');
+        // Is a send action: let worker handle it
+        if ($instance->isActionSend()) {
+            if (!\is_array($userIds)) {
+                throw new InvalidArgumentException('Payload must be an array of user IDs');
+            }
+
+            $key = $instance->getBaseHash().$instance->getParamHash();
+
+            // rather than dump everyone in together, allow the transaction to batch the users
+            // the implication of this is that if the user count exceeds the limit placed on the transaction,
+            // users will be batched through multiple transactions
+            foreach ($userIds as $userId) {
+                $tx->put("$key-$userId", [ $instance, (int)$userId ]);
+            }
+            return;
         }
 
-        $key = $instance->getBaseHash().$instance->getParamHash();
-
-        // rather than dump everyone in together, allow the transaction to batch the users
-        // the implication of this is that if the user count exceeds the limit placed on the transaction,
-        // users will be batched through multiple transactions
-        foreach ($userIds as $userId) {
-            $tx->put("$key-$userId", [ $instance, (int)$userId ]);
-        }
+        throw new InvalidArgumentException(sprintf('Instance has unknown action type "%s"', $instance->getAction()));
     }
 
 
