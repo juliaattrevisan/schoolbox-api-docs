@@ -29,22 +29,31 @@ class RouteTXRX implements TXRX
     /** @var ClientInterface */
     private $redis;
 
+    /** @var string */
+    private $instanceId;
+
 
     /**
+     * Constructor
+     *
      * @see buildForDaemon
      * @see buildForWorker
+     *
      * @param UserMapper|null      $mapper
      * @param QueueSorter|null     $sorter
      * @param ClientInterface|null $redis
+     * @param string|null          $instanceId
      */
     private function __construct(
         UserMapper $mapper = null,
         QueueSorter $sorter = null,
-        ClientInterface $redis = null
+        ClientInterface $redis = null,
+        string $instanceId = null
     ) {
-        $this->mapper = $mapper;
-        $this->sorter = $sorter;
-        $this->redis  = $redis;
+        $this->mapper     = $mapper;
+        $this->sorter     = $sorter;
+        $this->redis      = $redis;
+        $this->instanceId = $instanceId;
     }
 
 
@@ -53,11 +62,12 @@ class RouteTXRX implements TXRX
      * daemons.
      *
      * @param ClientInterface $redis
+     * @param string          $instanceId
      * @return self
      */
-    public static function buildTransactor(ClientInterface $redis): self
+    public static function buildTransactor(ClientInterface $redis, string $instanceId): self
     {
-        return new static(null, null, $redis);
+        return new static(null, null, $redis, $instanceId);
     }
 
 

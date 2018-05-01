@@ -50,8 +50,6 @@ $kernel->run(function(Di\Container $di, LoopInterface $loop, Logger $log, array 
             /** @var ClientInterface $redis */
             $redis = $di->get('redis');
 
-            $txrx = RouteTXRX::buildTransactor($redis);
-
             /** @var AMQPInterface $amqp */
             $amqp = $di->get('amqp');
 
@@ -63,6 +61,8 @@ $kernel->run(function(Di\Container $di, LoopInterface $loop, Logger $log, array 
 
             // ensure endpoints exist
             foreach ($instances as $instance) {
+                $txrx = RouteTXRX::buildTransactor($redis, $instance);
+
                 // this holds and traverses all our subscription data
                 $router = new Router(new SubscriptionDictionary('.'));
                 $routeBroker = new Routing\Broker($instance, $amqp, $redis, $client);
