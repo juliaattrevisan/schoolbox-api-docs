@@ -34,12 +34,9 @@ interface IListFactory
      */
     public function digest($userId);
 
-
     /**
-     * Get an un-queue (retractor) for messages.
-     *
+     * @param int $userId
      * @return QueueInterface
      */
-    public function retractor(): QueueInterface;
-
+    public function instant($userId);
 }

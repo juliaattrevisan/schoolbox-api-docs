@@ -67,16 +67,12 @@ class ListFactory implements IListFactory, Serializable
 
 
     /**
-     * @inheritdoc
+     * @param int $userId
+     * @return QueueInterface
      */
-    public function retractor(): QueueInterface
+    public function instant($userId)
     {
-        // Revoker queues don't need user IDs
-        return new Composite(
-            new Digest($this->redis, $this->instanceId, 0),
-            new Listed($this->redis, $this->instanceId, 0),
-            new Unread($this->redis, $this->instanceId, 0)
-        );
+        return new Composite($this->listed($userId), $this->unread($userId));
     }
 
 
