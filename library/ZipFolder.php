@@ -96,17 +96,22 @@ class ZipFolder
 
         foreach ($fileList as $file) {
             if ($file->getStorage()->exists()) {
-                $this->size = $this->size + $file->getSize();
-                $fileName = $this->getTargetPath($currentDir, $file->getBasename());
-                $fp = fopen($fileName, 'wb');
-                stream_copy_to_stream($file->getStorage()->readStream(), $fp);
-                fclose($fp);
+                $nextSize = $this->size + $file->getSize();
+                if ($this->maxSize > $nextSize) {
+                    $this->size = $this->size + $file->getSize();
+                    $fileName = $this->getTargetPath($currentDir, $file->getBasename());
+                    $fp = fopen($fileName, 'wb');
+                    stream_copy_to_stream($file->getStorage()->readStream(), $fp);
+                    fclose($fp);
+                } else {
+                   error(Schoolbox\Error\Mapper::ERROR_FILE_SIZE, 'The maximum download size is '.\Alaress_Byte_Format::bytesToString($this->maxSize).'.');
+                }
             }
         }
 
 
-        //dont recurse deeper than max depth or max size
-        if ($this->maxDepth > $depth && $this->maxSize > $this->size) {
+        //dont recurse deeper than max depth
+        if ($this->maxDepth > $depth) {
             //get subfolders and recurse through them
             $folderList = $this->getFolders($parentFolder->getId());
             foreach ($folderList as $folder) {
