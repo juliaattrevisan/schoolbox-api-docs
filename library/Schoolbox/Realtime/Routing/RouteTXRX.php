@@ -87,9 +87,6 @@ class RouteTXRX implements TXRX
 
 
     /**
-     * TODO make $userIDs able to be a string command (retract, retractAllLike)
-     * TODO handle retracts right here, instead of in receiver
-     *
      * EXECUTED DAEMON-SIDE
      * Send the work from the daemon to the worker
      *
