@@ -69,6 +69,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
             resetCycles($('#byTimetable-' + twigVars.id).find('[data-adtp-tt-submit]').attr('data-timetable-value'));
             revealTimetable();
             revealByCampus();
+            buildCycles();
 
         });
 
