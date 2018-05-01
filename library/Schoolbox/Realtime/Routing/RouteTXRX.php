@@ -15,6 +15,7 @@ use BadMethodCallException;
 use InvalidArgumentException;
 use PDOException;
 use Predis\ClientInterface;
+use Predis\Collection\Iterator\Keyspace;
 use Schoolbox\UserMapper;
 
 class RouteTXRX implements TXRX
@@ -105,14 +106,22 @@ class RouteTXRX implements TXRX
             throw new BadMethodCallException('Attempting to send using the receiver variant of RouteTXRX');
         }
 
+        // Is a retract single: retract it
         if ($instance->isActionRetractSingle()) {
-            // TODO handle retracts right here
-//            $id = $this->getRedisMsgKey($instance);
-//            $this->redis->del([$id]);
-//            return;
+            $this->redis->del([$this->buildMessageKey($instance)]);
+            return;
         }
+
+        // Is a retract all: find all like it, then retract them
         if ($instance->isActionRetractAll()) {
-            // TODO handle retracts right here
+            $msgKeys = [];
+            foreach (new Keyspace($this->redis, $this->buildMessageBaseKey($instance)) as $msgKey) {
+                $msgKeys[] = $msgKey;
+            }
+            if (!empty($msgKeys)) {
+                $this->redis->del($msgKeys);
+            }
+            return;
         }
 
         // Is a send action: proceed as before
@@ -158,4 +167,41 @@ class RouteTXRX implements TXRX
         return $count;
     }
 
+
+    /**
+     * Builds a message key for this instance, so that it may be retracted.
+     *
+     * TODO undupe this from RedisQueue
+     *
+     * @param Instance $instance
+     * @return string
+     */
+    private function buildMessageKey(Instance $instance): string
+    {
+        return sprintf(
+            'msg:%s:m:%s:%s',
+            $this->instanceId,
+            $instance->getBaseHash(),
+            $instance->getParamHash()
+        );
+    }
+
+
+    /**
+     * Builds a base message key for this instance, so that all messages like
+     * it may be retracted.
+     *
+     * TODO undupe this from RedisQueue
+     *
+     * @param Instance $instance
+     * @return string
+     */
+    private function buildMessageBaseKey(Instance $instance): string
+    {
+        return sprintf(
+            'msg:%s:m:%s:*',
+            $this->instanceId,
+            $instance->getBaseHash()
+        );
+    }
 }
