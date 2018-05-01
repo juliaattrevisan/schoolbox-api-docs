@@ -27,6 +27,8 @@ class RouteTXRX implements TXRX
 
 
     /**
+     * TODO pass in a Redis client, only for daemon-side TXRX
+     *
      * You need to install these dependencies on the worker-side; they not used daemon-side
      *
      * @param UserMapper  $mapper
@@ -40,6 +42,9 @@ class RouteTXRX implements TXRX
 
 
     /**
+     * TODO make $userIDs able to be a string command (retract, retractAllLike)
+     * TODO handle retracts right here, instead of in receiver
+     *
      * EXECUTED DAEMON-SIDE
      * Send the work from the daemon to the worker
      *

@@ -133,6 +133,8 @@ class Handler implements IConsumer, EventListener
         // if topics are explicitly given, use those rather than what you find in the instance
         $topics = $topics ?: $instance->getTopics();
 
+        // TODO check if retraction; if so, send action to TXRX
+
         // typically there's only 1, but the possibility of more
         foreach ($topics as $topic) {
             try {
