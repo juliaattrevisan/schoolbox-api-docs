@@ -33,7 +33,7 @@ $sql  = "
       :options,
       (SELECT id FROM lu_config_type WHERE type = 'External DB'),
       'true',
-      'true',
+      'false',
       'true'
     );
 ";
