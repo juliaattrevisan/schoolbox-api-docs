@@ -74,19 +74,6 @@ class QueueSorter implements FilterInterface
         $userId = $user->getId();
 
 		try {
-            // Handle retractions here
-            if ($instance->isActionRetractSingle()) {
-                $this->log->info(sprintf('RETRACT %s:%s', $instance->getBaseHash(), $instance->getParamHash()));
-                $this->listFactory->retractor()->retract($instance);
-                return true;
-            }
-
-            if ($instance->isActionRetractAll()) {
-                $this->log->info(sprintf('RETRACT-ALL %s:*', $instance->getBaseHash()));
-                $this->listFactory->retractor()->retractAllLike($instance);
-                return true;
-            }
-
 			$this->validate($instance, $user);
 
 			// just take the first topic
