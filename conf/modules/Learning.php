@@ -20,6 +20,7 @@ use Schoolbox\Learning\Quiz\Module as QuizModule;
 use Schoolbox\Learning\Upcoming\Module as UpcomingModule;
 use Schoolbox\Learning\Assessment\Exporter\Module as AssessmentExporterModule;
 use Schoolbox\Learning\MarkScheme;
+use Schoolbox\Assessment\Course;
 
 class Learning extends ModuleLoader
 {
@@ -29,7 +30,7 @@ class Learning extends ModuleLoader
      * @param Kernel $kernel
      * @return void
      */
-    public function configure($kernel)
+    public function configure($kernel): void
     {
         $namespace  = 'learning';
 
@@ -43,6 +44,7 @@ class Learning extends ModuleLoader
         $this->loadModule($kernel, DueworkResponseModule::class,        "/{$namespace}");
         $this->loadModule($kernel, QuizModule::class,                   "/{$namespace}");
         $this->loadModule($kernel, MarkbookModule::class,               "/{$namespace}/markbook");
+        $this->loadModule($kernel, Course\Markbook\Module::class,       "/{$namespace}/courseMarkbook");
         $this->loadModule($kernel, UpcomingModule::class,               "/{$namespace}/due");
         $this->loadModule($kernel, AssessmentExporterModule::class,     "/{$namespace}/export");
         $this->loadModule($kernel, MarkScheme\Module::class,            "/{$namespace}/markscheme");
