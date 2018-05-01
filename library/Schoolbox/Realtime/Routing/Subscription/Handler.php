@@ -133,28 +133,38 @@ class Handler implements IConsumer, EventListener
         // if topics are explicitly given, use those rather than what you find in the instance
         $topics = $topics ?: $instance->getTopics();
 
-        // TODO check if retraction; if so, send action to TXRX
-
         // typically there's only 1, but the possibility of more
         foreach ($topics as $topic) {
             try {
-                $userIds = $this->resolver->getSubscribedUserIds($topic);
+                if ($instance->isActionRetractSingle()) {
+                    // Retract actions route to nobody in particular
+                    $msgType = 'targeted retraction';
+                    $suffix  = 'nobody in particular';
+                    $userIds = [];
 
-                $userCount = count($userIds);
+                } elseif ($instance->isActionRetractAll()) {
+                    // Retract actions route to nobody in particular
+                    $msgType = 'full retraction';
+                    $suffix  = 'nobody in particular';
+                    $userIds = [];
 
-                if ($userCount === 0) {
-                    $this->log->info("Nobody is subscribed to '$topic', dropping message");
-                    return;
-                }
-
-                if ($userCount > 16) {
-                    $suffix = "$userCount users";
                 } else {
-                    $suffix = json_encode($userIds);
+                    $msgType   = 'send';
+                    $userIds   = $this->resolver->getSubscribedUserIds($topic);
+                    $userCount = \count($userIds);
+                    if ($userCount === 0) {
+                        $this->log->info("Nobody is subscribed to '$topic', dropping message");
+                        return;
+                    }
+
+                    if ($userCount > 16) {
+                        $suffix = "$userCount users";
+                    } else {
+                        $suffix = json_encode($userIds);
+                    }
                 }
 
-                $this->log->info("Routing message via '$topic' to $suffix");
-
+                $this->log->info("Routing message $msgType via '$topic' to $suffix");
                 $this->txrx->send($instance, $this->transaction, $userIds);
 
             } catch (OverflowException $e) {
