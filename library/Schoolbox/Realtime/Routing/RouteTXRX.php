@@ -86,15 +86,23 @@ class RouteTXRX implements TXRX
      * @param ITransaction $tx
      * @param array        $userIds
      * @throws InvalidArgumentException
+     * @throws BadMethodCallException if using the receiver variant
      * @return void
      */
     public function send($instance, ITransaction $tx, $userIds)
     {
+        if (null === $this->redis) {
+            throw new BadMethodCallException('Attempting to send using the receiver variant of RouteTXRX');
+        }
+
         if ($instance->isActionRetractSingle()) {
             // TODO handle retracts right here
+//            $id = $this->getRedisMsgKey($instance);
+//            $this->redis->del([$id]);
+//            return;
         }
         if ($instance->isActionRetractAll()) {
-            // TODO handle retracts
+            // TODO handle retracts right here
         }
 
         // Is a send action: proceed as before
@@ -126,7 +134,7 @@ class RouteTXRX implements TXRX
     public function receive(array $args)
     {
         if (null === $this->mapper || null === $this->sorter) {
-            throw new BadMethodCallException('Not configured');
+            throw new BadMethodCallException('Attempting to receive using the transactor variant of RouteTXRX');
         }
 
         $count = 0;
