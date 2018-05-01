@@ -179,10 +179,12 @@ class External_Maze_Timetable implements External_TimetableInterface
 		$tempDate = $temp->getDatabaseDate();
 	}
 
+
+
         $query = "
 			SELECT TOP 1 QCOL
 			FROM TCTQ
-			INNER JOIN TH ON TCTQ.QKEY = TH.THKEY
+			INNER JOIN TH ON TCTQ.QKEY = TH.THKEY AND TH.THKEY = '{$this->getHelper()->getCurrentTHKEY()}'
 			WHERE TCTQKEY = CAST('{$tempDate}' AS DATE)
 		";
 
