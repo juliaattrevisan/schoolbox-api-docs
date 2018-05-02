@@ -346,32 +346,32 @@
 
             <script>
                 $(function() {
-                    var $parentTypeSelector = "#formReport input[data-check-type]";
-                    var $subTypeSelector = "input[data-check-subtype]";
-                    var $siblingSelector = "[data-pastoral-subtype]";
+                    var parentTypeSelector = "#formReport input[data-check-type]";
+                    var subTypeSelector = "input[data-check-subtype]";
+                    var siblingSelector = "[data-pastoral-subtype]";
 
-                    $($parentTypeSelector).each(function(index, value) {
+                    $(parentTypeSelector).each(function(index, value) {
                         var checkbox = value;
-                        var $subCheckboxes = $(checkbox).siblings($siblingSelector).find($subTypeSelector);
+                        var $subCheckboxes = $(checkbox).siblings(siblingSelector).find(subTypeSelector);
                         if ($(checkbox).is(':checked')) {
                             // ...show the subtypes for this type
-                            $(checkbox).siblings($siblingSelector).show();
+                            $(checkbox).siblings(siblingSelector).show();
                         } else {
                             // Hide subtypes by default to reduce vertical scrolling
                             $subCheckboxes.each(function() {
-                                $(checkbox).siblings($siblingSelector).hide();
+                                $(checkbox).siblings(siblingSelector).hide();
                             })
                         }
                     });
 
                     // If a pastoral type checkbox is checked...
-                    $($parentTypeSelector).change(function(e) {
+                    $(parentTypeSelector).change(function(e) {
                         var checkbox = e.target;
-                        var $subCheckboxes = $(checkbox).siblings($siblingSelector).find($subTypeSelector);
+                        var $subCheckboxes = $(checkbox).siblings(siblingSelector).find(subTypeSelector);
 
                         if ($(checkbox).is(':checked')) {
                             // ...show the subtypes for this type
-                            $(checkbox).siblings($siblingSelector).show();
+                            $(checkbox).siblings(siblingSelector).show();
 
                             // ...and check them by default
                             $subCheckboxes.each(function(index, subCheckbox) {
@@ -380,7 +380,7 @@
                         } else {
                             $subCheckboxes.each(function(index, subCheckbox) {
                                 $(subCheckbox).prop('checked', false);
-                                $(checkbox).siblings($siblingSelector).hide();
+                                $(checkbox).siblings(siblingSelector).hide();
                             })
                         }
                     });
@@ -388,9 +388,9 @@
                     // Show/hide subtypes on select/deselect all
                     $("#type-all").change(function(e) {
                         if ($(e.target).is(':checked')) {
-                            $($siblingSelector).show();
+                            $(siblingSelector).show();
                         } else {
-                            $($siblingSelector).hide();
+                            $(siblingSelector).hide();
                         }
                     });
                 });
