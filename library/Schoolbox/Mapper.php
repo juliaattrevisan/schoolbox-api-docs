@@ -283,6 +283,16 @@ abstract class Mapper implements IMapper, Serializable
 
 
     /**
+     * @inheritdoc
+     */
+    public function isSoftDeletable(): bool
+    {
+        // Default behaviour is whether this mapper has a soft-delete column registered
+        return (bool)$this->soft_delete_column;
+    }
+
+
+    /**
      * @deprecated under pain of death DO NOT USE THIS; refactor the Mapper instead
      * @return Di\ContainerInterface
      */
@@ -1354,7 +1364,7 @@ abstract class Mapper implements IMapper, Serializable
      */
     public function delete($object)
     {
-        if (isset($this->soft_delete_column)) {
+        if ($this->isSoftDeletable()) {
             return $this->softDelete($object);
         } else {
             return $this->hardDelete($object);

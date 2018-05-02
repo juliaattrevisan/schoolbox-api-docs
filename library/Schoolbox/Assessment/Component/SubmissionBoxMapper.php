@@ -91,7 +91,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper
         ));
 
 
-        $this->registerCallback(self::CALLBACK_POSTSAVE, array($this, 'postSave'));
+        $this->registerCallback(self::CALLBACK_POSTSAVE, array($this, 'syncToExternalMarkbook'));
         $this->registerCallback(self::CALLBACK_POSTDELETE, array($this, 'deleteFromMarkbook'));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'deleteFromMarkbook'));
 
@@ -232,7 +232,11 @@ class SubmissionBoxMapper extends Schoolbox\Mapper
                 $submission_box = $this->hydrate($row, 'sb');
                 $submission_box->setMarkType($marktype_mapper->hydrate($row, 'mt'));
                 $submission_box->setCategory($this->hydrateJoin($row, 'category', 'cat'));
-                $submission_box->setAssessmentModel($this->getJoinMapper('assessmentModel')->findById($row['sb.assessment_id'])); // I despise the necessity of this
+                try {
+                    $submission_box->setAssessmentModel($this->getJoinMapper('assessmentModel')->findById($row['sb.assessment_id'])); // I despise the necessity of this
+                } catch (Schoolbox\Mapper\Exception\Deleted $e) {
+                    $submission_box->setAssessmentModel($e->getDeletedObject()); // I also am not thrilled :)
+                }
             }
             // Hydrate curriculum nodes
 
@@ -254,12 +258,12 @@ class SubmissionBoxMapper extends Schoolbox\Mapper
 
 
     /**
-     * Post-save method for submission boxes - saves new submission box files
+     * Post-save method for submission boxes - syncs details to SIS markbook
      *
      * @param SubmissionBox $object
      * @return bool
      */
-    public function postSave(SubmissionBox $object)
+    public function syncToExternalMarkbook(SubmissionBox $object): bool
     {
         // Don't attempt to sync assessment specs to external markbook (they cannot have interactions)
         if ($this->isAssessmentSpecification($object)) {
@@ -544,14 +548,62 @@ class SubmissionBoxMapper extends Schoolbox\Mapper
         return true;
     }
 
+
     /**
-     * Override delete as we now only delete the assessment not the submission_box
-     * @param object|Collection $object
-     * @return bool
+     * Special case for submission_box which reflects the soft-deleted status of it's assessment
+     *
+     * @inheritdoc
      */
-    public function delete($object)
+    public function isSoftDeletable(): bool
     {
-        //noop
+        // Even though this table lacks a soft-delete column, it takes is soft-delete status from the assessment table
+        return $this->getJoinMapper('assessmentModel')->isSoftDeletable();
+    }
+
+
+    /**
+     * Special case for SubmissionBox which takes its deletion status from the assessment table.
+     *
+     * This table lacks a soft-delete column, but is soft-deletable by virtue of it being composed
+     * of a soft-deletable assessment
+     *
+     * @param object|Collection|SubmissionBox $object
+     * @return bool
+     * @throws \UnexpectedValueException If a callback fails and we need to halt
+     * @throws Schoolbox\Mapper\DefinitionException
+     */
+    public function softDelete($object): bool
+    {
+        $collection = $this->getModelAsCollection($object);
+        $notDeleted = $collection->filter(function (SubmissionBox $model) {
+            return !$model->isDeleted();
+        });
+        if (!\count($notDeleted)) {
+            return false;
+        }
+
+        // Trigger the pre-trigger
+        foreach ($collection as $model) {
+            if (!$this->triggerCallbacks(self::CALLBACK_PRESOFTDELETE, $model)) {
+                return false;
+            }
+        }
+
+        // This is neither a PRE or POST action - it is the action.
+        /** @var AssessmentMapper $assessmentMapper */
+        $assessmentMapper = $this->getJoinMapper('assessmentModel');
+        $assessmentMapper->softDelete($object->getAssessmentModel());
+
+        // Trigger the post-trigger
+        foreach ($collection as $model) {
+            $this->triggerCallbacks(self::CALLBACK_POSTSOFTDELETE, $model);
+        }
+
+        // Send the notification action
+        foreach ($collection as $model) {
+            $this->raiseNotification($model, self::METHOD_DELETE);
+        }
+
         return true;
     }
 

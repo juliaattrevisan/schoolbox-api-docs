@@ -30,7 +30,7 @@ use Schoolbox\User;
 use Schoolbox\Collection;
 use Schoolbox\Permission\Access\Access;
 
-class SubmissionBox implements IAssessableDataModel
+class SubmissionBox implements IAssessableDataModel, ISoftDeletable
 {
     use HasCurriculumNodes;
     use AssessmentModelTrait;
@@ -866,5 +866,17 @@ class SubmissionBox implements IAssessableDataModel
     {
         $this->selfReviewability = $selfReviewability;
         return $this;
+    }
+
+
+    /**
+     * Is this object deleted?
+     *
+     * @return bool
+     */
+    public function isDeleted(): bool
+    {
+        // Submission box takes this value from the assessment it is *composed* of
+        return $this->assessmentModel->isDeleted();
     }
 }

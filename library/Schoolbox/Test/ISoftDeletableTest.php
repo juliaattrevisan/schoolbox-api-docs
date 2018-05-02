@@ -42,13 +42,12 @@ class ISoftDeletableTest extends TestCase
     public function testMapperAndModelConsistency(IMapper $mapper, ReflectionClass $reflection, string $className): void
     {
         $model              = $mapper->createModel();
-        $reflectionProperty = $reflection->getProperty('soft_delete_column');
-        $reflectionProperty->setAccessible(true);
-        $isSoftDeletable       = $model instanceof ISoftDeletable;
-        $hasSoftDeleteColumn   = (bool)$reflectionProperty->getValue($mapper);
-        $message               = "$className is" . ($isSoftDeletable ? '' : ' not ') . ' soft-deletable but has' .
-            ($hasSoftDeleteColumn ? '' : ' no ') . 'soft-delete column registered.';
-        $this->assertEquals($isSoftDeletable, $hasSoftDeleteColumn, $message);
+        $reflectionMethod = $reflection->getMethod('isSoftDeletable');
+        $isModelSoftDeletable       = $model instanceof ISoftDeletable;
+        $isMapperSoftDeleteColumn   = (bool)$reflectionMethod->invoke($mapper);
+        $message               = "'{$className}' model is" . ($isModelSoftDeletable ? '' : ' not') . ' soft-deletable but mapper is ' .
+            ($isMapperSoftDeleteColumn ? '' : 'not ') . 'soft-deletable';
+        $this->assertEquals($isModelSoftDeletable, $isMapperSoftDeleteColumn, $message);
     }
 
 
