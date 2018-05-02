@@ -8,6 +8,7 @@ Depending on the requested Task, it may be executed:
 It is also responsible for returning a Response to an assigned Response
 Handler.
 
+> TODO: sequence/class/object diagrams?
 
 ## Glossary
 

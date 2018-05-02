@@ -11,6 +11,8 @@ The message broker functions as a publish-subscribe queue would:
 Schoolbox provides the `\Alaress\Async\Broker\IBroker` interface for defining
 how a message broker must work.
 
+> TODO: class/object diagrams?
+
 
 ## Glossary
 

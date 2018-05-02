@@ -6,6 +6,9 @@ until a point in time has been reached.
 As an example: the digest sub-system uses a Scheduler to defer the sending of
 the digest message until the configured time to send digests has been reached.
 
+> TODO: complete documentation
+
+> TODO: sequence/class/object diagrams?
 
 ## Glossary
 

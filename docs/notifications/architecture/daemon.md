@@ -7,6 +7,13 @@ Generally, a daemon listens by subscribing to a message broker; when it
 receives an event from the broker, it will summon a worker process to perform a
 task.
 
+> TODO: AMQP, STOMP
+
+> TODO: TXRX
+
+> TODO: real-world example of how a daemon works
+
+> TODO: sequence/class/object diagrams?
 
 ## Glossary
 
