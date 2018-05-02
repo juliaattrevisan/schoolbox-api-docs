@@ -663,7 +663,9 @@ class Controller extends BaseController
      */
     protected function recurseInheritance(Model $model)
     {
-        $deleteFolderMemberships = $this->getFolderMapper()->recurseInheritance($model);
+        /* Find all the unique folder ids that need their memberships purged
+         */
+        $deleteFolderMemberships = array_values($this->getFolderMapper()->recurseInheritance($model));
 
         if (!empty($deleteFolderMemberships)) {
             // If inheriting permissions we need to remove any user access permissions...
