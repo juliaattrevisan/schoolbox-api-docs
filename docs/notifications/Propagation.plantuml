@@ -1,0 +1,15 @@
+@startuml
+Controller -> Mapper: save/delete/updateAll()
+Mapper -> Mapper: raiseNotification()
+Mapper -> IPropagator: propagateEvent(effector: User, action: string, model: IModel, mapper: IMapper, diff: array)
+IPropagator -> Event: event = new(subject: User, verb: string, object: Imodel, mapper: IMapper, diff: array)
+IPropagator -> IPropagator: propagateEvent(event: CrudEventInterface)
+IPropagator -> Splitter: triggers = generateTriggers(event: CrudEventInterface)
+Splitter -> Splitter: getModule(event: CrudEventInterface): ModuleNotifierInterface
+Splitter -> Event: getObject()
+Splitter -> Event: getMapper()
+Splitter -> Mapper: getModuleNotifer(): string
+Splitter -> Splitter: newInstance(className: string)
+Splitter -> TriggerFactoryFactory: spawn(eventModule, event)
+TriggerFactoryFactory -> TriggerFactory: factory = new(notifier, event, compression)
+@enduml
