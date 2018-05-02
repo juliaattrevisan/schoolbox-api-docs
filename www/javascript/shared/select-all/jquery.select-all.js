@@ -40,8 +40,7 @@
         }
 
         function autoSelectAll(config) {
-            console.log("Number selected: " + $(":checked").length);
-            console.log("Number total: " + config.checkboxes.length);
+            // TODO this filter seems to be tallying up ALL checked checkboxes on the page, not just the ones in config.checkboxes...how
             if (config.checkboxes.filter(":checked").length === config.checkboxes.length) {
                 config.selector.prop("checked", true);
             } else {
