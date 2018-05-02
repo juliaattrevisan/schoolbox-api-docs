@@ -8,7 +8,7 @@
 
         function init(options, element) {
             var defaults = {
-                change: function () {},
+                change: function () {}, // TODO wha?
                 autoSelectAll: function () {
                     // TODO this filter seems to be tallying up ALL checked checkboxes on the page, not just the ones in config.checkboxes...how
                     if (config.checkboxes.filter(":checked").length === config.checkboxes.length) {
@@ -39,6 +39,7 @@
                     config.checkboxes.prop('checked', false);
                 }
 
+                // TODO what is this?
                 config.change();
             });
 
