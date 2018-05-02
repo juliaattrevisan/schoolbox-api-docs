@@ -113,22 +113,10 @@ Worker Pool.
 
 ### Event Loop
 
-The Event Loop is an implementation of `\React\EventLoop\LoopInterface`.
-This interface provides the asynchronous equivalent of the classic periodic
-timer loop:
+The Dispatcher uses the Event Loop's Periodic Timer Loop to repeatedly run the
+Dispatcher's `dispatch` method.
 
-```php
-$eventQueue = new EventQueueSubscription();
-while (true) {
-    foreach ($eventQueue->getEvents() as $event) {
-        handleEvent($event);
-    }
-    sleep();
-}
-```
-
-The Dispatcher uses the Event Loop to repeatedly run the Dispatcher's
-`dispatch` method.
+More information can be found in the [Event Loop documentation](event-loop.md).
 
 
 ### Worker Pool

@@ -29,19 +29,7 @@ The Scheduler is an implementation of `\Alaress\Scheduler\AbstractScheduler`.
 
 ### Event Loop
 
-The Event Loop is an implementation of `\React\EventLoop\LoopInterface`.
-This interface provides the asynchronous equivalent of deferred execution:
+The Scheduler uses the Event Loop's Deferred Execution to defer processing of
+Messages until their time to process has been reached.
 
-```php
-$event = new Event();
-while (true) {
-    if ($event->getWhen() < time()) {
-        handleEvent($event);
-        break;
-    }
-    sleep();
-}
-```
-
-The Scheduler uses the Event Loop to defer execution until the Message is ready
-to be processed.
+More information can be found in the [Event Loop documentation](event-loop.md).
