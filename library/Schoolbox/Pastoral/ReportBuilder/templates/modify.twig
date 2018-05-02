@@ -29,8 +29,30 @@
         var $reportForm = $("#formReport");
 
         $reportForm.selectAll({
-            selector: $('#type-all'),
-            checkboxes: $('[data-check-type], [data-check-subtype]')
+            selector: $("#type-all"),
+            checkboxes: $("[data-check-type], [data-check-subtype]"),
+            autoSelectAll: function() {
+                var $allCheckboxes = $("[data-check-type], [data-check-subtype]");
+
+                // TODO in here, prop checked and :checked is returning true
+//                $("[data-check-subtype]").each(function(index, value) {
+//                    console.log("checked? " + $(value).is(":checked"));
+//                })
+                // TODO length of filter:checked is right, too
+                //console.log($("[data-check-subtype]").filter(":checked").length);
+
+                // TODO At the point that this is getting run, it hasn't yet registered that the most recently ticked set of subcheckboxes have been checked!
+                // I fixed this by selecting all the subcheckboxes upfront, but this doesn't respect the saved settings on the page,
+                // and it also doesn't solve the problem that the checkboxes are not getting a checked property when you deselect, then reselect.
+                // WHY??
+                console.log($allCheckboxes.filter(":checked").length);
+
+                if ($allCheckboxes.length === $allCheckboxes.filter(":checked").length) {
+                    $("#type-all").prop("checked", true);
+                } else {
+                    $("#type-all").prop("checked", false);
+                }
+            }
         });
 
         $reportForm.selectAll({
@@ -353,14 +375,18 @@
                     $(parentTypeSelector).each(function(index, value) {
                         var checkbox = value;
                         var $subCheckboxes = $(checkbox).siblings(siblingSelector).find(subTypeSelector);
+
+                        // check them  by default (causes all kinds of problems if we don't)
+                        $subCheckboxes.each(function(index, subCheckbox) {
+                            $(subCheckbox).prop('checked', true);
+                        });
+
                         if ($(checkbox).is(':checked')) {
                             // ...show the subtypes for this type
                             $(checkbox).siblings(siblingSelector).show();
                         } else {
                             // Hide subtypes by default to reduce vertical scrolling
-                            $subCheckboxes.each(function() {
-                                $(checkbox).siblings(siblingSelector).hide();
-                            })
+                            $(checkbox).siblings(siblingSelector).hide();
                         }
                     });
 
@@ -375,6 +401,7 @@
 
                             // ...and check them by default
                             $subCheckboxes.each(function(index, subCheckbox) {
+                                console.log("adding prop checked to subcheckbox")
                                 $(subCheckbox).prop('checked', true);
                             })
                         } else {

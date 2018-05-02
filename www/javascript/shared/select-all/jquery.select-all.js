@@ -8,7 +8,15 @@
 
         function init(options, element) {
             var defaults = {
-                change: function () {}
+                change: function () {},
+                autoSelectAll: function () {
+                    // TODO this filter seems to be tallying up ALL checked checkboxes on the page, not just the ones in config.checkboxes...how
+                    if (config.checkboxes.filter(":checked").length === config.checkboxes.length) {
+                        config.selector.prop("checked", true);
+                    } else {
+                        config.selector.prop("checked", false);
+                    }
+                }
             };
 
             var derived = {
@@ -22,7 +30,7 @@
         }
 
         function start() {
-            autoSelectAll(config);
+            config.autoSelectAll();
 
             config.selector.change(function () {
                 if ($(this).is(':checked')) {
@@ -35,17 +43,8 @@
             });
 
             config.checkboxes.change(function () {
-                autoSelectAll(config);
+                config.autoSelectAll();
             });
-        }
-
-        function autoSelectAll(config) {
-            // TODO this filter seems to be tallying up ALL checked checkboxes on the page, not just the ones in config.checkboxes...how
-            if (config.checkboxes.filter(":checked").length === config.checkboxes.length) {
-                config.selector.prop("checked", true);
-            } else {
-                config.selector.prop("checked", false);
-            }
         }
     };
 }(jQuery));
