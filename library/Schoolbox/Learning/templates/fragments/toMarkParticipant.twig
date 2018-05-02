@@ -17,7 +17,7 @@
 {% set isDueWork  = isDueWork or assessment is dueWork %}
 
 <li data-participant="{{ participant.user.id }}">
-    {% set response = participant.findMostRecentResponse %}
+    {% set response = participant.findMostRecentSubmittedResponse %}
     {% if isTask %}
         <div class="compact card small-6">
             <img src="/portrait.php?userId={{ participant.user.externalId }}&amp;size=square64" alt="View Submission">
