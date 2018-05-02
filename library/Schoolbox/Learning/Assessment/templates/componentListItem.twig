@@ -1,14 +1,20 @@
 {% import '@learning/macro/dueDate.twig' as dueDate %}
 
-{# What action-tot routes are available to this user ? #}
-{% set statusRoute = routeLookupIfAuthorized('learningAssessment.getStatus', {assessmentId: assessable.id, assessment: assessable}) %}
-{% if assessable is quiz %}
-    {% set modifyRoute = routeLookupIfAuthorized('learningQuiz.getQuizSummary', {assessmentId: assessable.id, assessment: assessable}) %}
+{# What action-tot routes are available to this user? #}
+{% if readOnly %}
+    {# If readonly mode: show no tot #}
+    {% set isActionRoutes = false %}
 {% else %}
-    {% set modifyRoute = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessable.id, assessment: assessable}) %}
+    {# If write mode: show tot only if there's at least one action #}
+    {% set statusRoute = routeLookupIfAuthorized('learningAssessment.getStatus', {assessmentId: assessable.id, assessment: assessable}) %}
+    {% if assessable is quiz %}
+        {% set modifyRoute = routeLookupIfAuthorized('learningQuiz.getQuizSummary', {assessmentId: assessable.id, assessment: assessable}) %}
+    {% else %}
+        {% set modifyRoute = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessable.id, assessment: assessable}) %}
+    {% endif %}
+    {% set deleteRoute = routeLookupIfAuthorized('learningAssessment.postDeleteAssessment', {assessmentId: assessable.id, assessment: assessable}) %}
+    {% set isActionRoutes = statusRoute or modifyRoute or deleteRoute %}
 {% endif %}
-{% set deleteRoute = routeLookupIfAuthorized('learningAssessment.postDeleteAssessment', {assessmentId: assessable.id, assessment: assessable}) %}
-{% set isActionRoutes = statusRoute or modifyRoute or deleteRoute %}
 
 <li
     id="component-assessment-{{ assessable.id }}"
