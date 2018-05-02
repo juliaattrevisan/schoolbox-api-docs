@@ -903,7 +903,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
         // Retrieve pastoral subtype, if there is no type as well we need to blank this out
 
-        if (empty($pastoralTypeCode)) {
+        if (empty($pastoralTypeCode) || empty($pastoral->getSubType())) {
             $pastoralSubTypeCode = '';
         } else {
             $pastoralSubTypeCode =
