@@ -38,7 +38,7 @@ class External_Offline_Markbook implements External_MarkbookInterface
      */
     public function createAssessment(Activity $assessment)
     {
-        return [];
+        return false;
     }
 
     /**
@@ -46,7 +46,7 @@ class External_Offline_Markbook implements External_MarkbookInterface
      */
     public function updateAssessment(Activity $assessment)
     {
-        return [];
+        return false;
     }
 
     /**
