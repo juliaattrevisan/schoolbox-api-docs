@@ -3,7 +3,7 @@
 {% set isParticipant = assessable.isParticipant(USER) %}
 
 {% block actionsClass -%}
-    {%- set actionCount = (isActionRoutes ? 1 : 0) + (isParticipant ? 1 : 0) -%}
+    {%- set actionCount = isActionRoutes or isParticipant ? 1 : 0 -%}
     {%- if actionCount %}actions-small-{{ actionCount }}{% endif -%}
 {%- endblock %}
 
