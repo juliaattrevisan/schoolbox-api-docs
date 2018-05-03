@@ -94,8 +94,6 @@ thousands of users this caused significant performance issues, as RabbitMQ is
 designed to be most performant and efficient with a small number of
 high-throughput queues.
 
-> TODO figure out what the actual queues used are
-
 The current implementation of notifications maintains just two queues: one for
 the [scheduling](../200-scheduling.md) sub-system, and one for
 [routing](../300-routing.md).
@@ -107,8 +105,6 @@ Redis implements [publish/subscribe messaging](https://redis.io/topics/pubsub);
 the reason that notifications don't use Redis alone as the message broker is
 that it doesn't support message escrow/acknowledgement/rejection, which are
 essential for ensuring that a message is processed once and only once.
-
-> TODO determine the veracity of the above statement
 
 Redis publish/subscribe queues are used in other parts of notifications; for
 example, daemons use them for storing messages received by tasks.
@@ -124,7 +120,10 @@ broker.
 
 The message itself will be `serialize`d before storing it in the data store.
 
-TODO figure out what `$context` does, and exactly what's stored in the queue
+`publish` accepts an optional `context` parameter; if this is passed, it is
+received as part of a subscriber's `onMessage` method call. (What a subscriber
+actually does with the `context` if present is up to each individual
+subscriber.)
 
 
 ### Subscription
