@@ -260,23 +260,27 @@ class SubmissionBoxMapper extends Schoolbox\Mapper
     /**
      * Post-save method for submission boxes - syncs details to SIS markbook
      *
+     * Always returns TRUE - we don't want to prevent other callbacks executing if this fails.
+     *
      * @param SubmissionBox $object
      * @return bool
      */
     public function syncToExternalMarkbook(SubmissionBox $object): bool
     {
         // Don't attempt to sync assessment specs to external markbook (they cannot have interactions)
-        if ($this->isAssessmentSpecification($object)) {
-            return false;
+        if (!$this->isAssessmentSpecification($object)) {
+            // This saves the assessment to the remote system
+            $externalMarkbook = new External_Markbook();
+            $activity         = (new ActivityFactory())->buildFromSubmissionBox($object, 'upcoming');
+
+            if (!$externalMarkbook->hasAssessment($activity)) {
+                $externalMarkbook->createAssessment($activity);
+            } else {
+                $externalMarkbook->updateAssessment($activity);
+            }
         }
 
-        // This saves the assessment to the remote system
-        $externalMarkbook = new External_Markbook();
-        $activity         = (new ActivityFactory())->buildFromSubmissionBox($object, 'upcoming');
-        if (!$externalMarkbook->hasAssessment($activity)) {
-            return $externalMarkbook->createAssessment($activity);
-        }
-        return $externalMarkbook->updateAssessment($activity);
+        return true;
     }
 
     /**

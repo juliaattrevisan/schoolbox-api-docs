@@ -297,7 +297,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
                         FileSemester = :fileSemester
         ";
 
-        $this->getConnector()->executeQuery($sql, [
+        return $this->getConnector()->executeQuery($sql, [
             'headingAbbreviation2' => $this->getMarkbookIdentifier($assessment),
             'fileYear' => $this->fileYear,
             'fileSemester' => $this->fileSemester
