@@ -196,6 +196,13 @@ class Standard extends BaseProcessor
      */
     public function stream()
     {
+        // Add cache header for logging when a cached transform is used
+        if (!$this->isCached()) {
+            header('X-Cache-Status: MISS');
+        } else {
+            header('X-Cache-Status: HIT');
+        }
+
         if (!$this->isCached() && $this->getCache()->getKey()) {
             $this->save();
         }
