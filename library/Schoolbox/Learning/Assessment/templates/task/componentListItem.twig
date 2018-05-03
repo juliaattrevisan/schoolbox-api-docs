@@ -8,7 +8,7 @@
 {%- endblock %}
 
 {% block extraNavItems %}
-    {% if isParticipant %}
+    {% if isParticipant and not isActionRoutes %}
         {% include '@learningAssessment/fragments/progressTick.twig' with {
             assessment: assessable,
             student: USER
