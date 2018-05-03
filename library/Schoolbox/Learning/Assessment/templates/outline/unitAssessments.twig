@@ -27,15 +27,21 @@
             {% set completionGradient = (completionCount / studentCount) * 100 %}
         {% endif %}
 
-        {# What routes are available to this user ? #}
-        {% set statusRoute = routeLookupIfAuthorized('learningAssessment.getStatus', {assessmentId: assessment.id, assessment: assessment}) %}
-        {% if assessment is quiz %}
-            {% set modifyRoute = routeLookupIfAuthorized('learningQuiz.getQuizSummary', {assessmentId: assessment.id, assessment: assessment}) %}
+        {# What action-tot routes are available to this user? #}
+        {% if readOnly %}
+            {# If readonly mode: show no tot #}
+            {% set isActionRoutes = false %}
         {% else %}
-            {% set modifyRoute = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id, assessment: assessment}) %}
+            {# If write mode: show tot only if there's at least one action #}
+            {% set statusRoute = routeLookupIfAuthorized('learningAssessment.getStatus', {assessmentId: assessment.id, assessment: assessment}) %}
+            {% if assessment is quiz %}
+                {% set modifyRoute = routeLookupIfAuthorized('learningQuiz.getQuizSummary', {assessmentId: assessment.id, assessment: assessment}) %}
+            {% else %}
+                {% set modifyRoute = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id, assessment: assessment}) %}
+            {% endif %}
+            {% set deleteRoute = routeLookupIfAuthorized('learningAssessment.postDeleteAssessment', {assessmentId: assessment.id, assessment: assessment}) %}
+            {% set isActionRoutes = statusRoute or modifyRoute or deleteRoute %}
         {% endif %}
-        {% set deleteRoute = routeLookupIfAuthorized('learningAssessment.postDeleteAssessment', {assessmentId: assessment.id, assessment: assessment}) %}
-        {% set isActionRoutes = statusRoute or modifyRoute or deleteRoute %}
 
         <li class="interact" data-unit-assessment="{{ assessment.id }}">
             <div{% if isActionRoutes or isParticipant %} class="actions-small-1"{% endif %}>
