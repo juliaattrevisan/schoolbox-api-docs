@@ -312,6 +312,8 @@ cp -f /vagrant/tools/nginx-vhost-schoolbox-websocket.conf /etc/nginx/conf.d/;
 cp -f /vagrant/tools/nginx-vhost-schoolbox-websocket-ssl.conf /etc/nginx/conf.d/;
 sed -i 's/var\/lib\/schoolbox/vagrant/g' /etc/php/7.1/fpm/pool.d/schoolbox*;
 sed -i 's/www-data/vagrant/g' /etc/php/7.1/fpm/pool.d/schoolbox*;
+# disable nginx open file cache since not a production server
+sed -i '/open_file_cache/d' /etc/nginx/nginx.conf;
 cd $cachedir;
 rm -fR vagrant.dev.schoolbox.cloud;
 tar xzf tls-vagrant.dev.schoolbox.cloud.tar.gz;
