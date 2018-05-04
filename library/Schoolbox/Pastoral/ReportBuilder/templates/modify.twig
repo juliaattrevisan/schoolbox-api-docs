@@ -453,18 +453,6 @@
                     $(subtypeLists).hide();
                     $(subCheckboxes).prop("checked", false);
                 }
-
-            },
-            autoSelectAllNested: function(selectAllButton, subCheckboxes) {
-                // Check/uncheck select all button based on how many boxes are checked
-
-                $(subCheckboxes).change(function() {
-                    if ($(subCheckboxes).length === $(subCheckboxes).filter(":checked").length) {
-                        $(selectAllButton).prop("checked", true);
-                    } else {
-                        $(selectAllButton).prop("checked", false);
-                    }
-                })
             }
         });
 

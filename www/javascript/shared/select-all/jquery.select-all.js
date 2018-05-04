@@ -10,7 +10,6 @@
             var defaults = {
                 change: function () {},
                 selectAllNested: function () {},
-                autoSelectAllNested: function () {}
             };
 
             var derived = {
@@ -38,7 +37,23 @@
         // Check or uncheck the Select All box automatically,
         // based on whether all checkboxes have been manually checked.
         function autoSelectAll() {
-            if (config.checkboxes.length === config.checkboxes.filter(":checked").length) {
+            config.checkboxes.change(function () {
+                if (config.checkboxes.length === config.checkboxes.filter(":checked").length) {
+                    config.selector.prop("checked", true);
+                } else {
+                    config.selector.prop("checked", false);
+                }
+            });
+
+            if (config.subCheckboxes) {
+                config.subCheckboxes.change(function() {
+                    autoSelectAllNested();
+                });
+            }
+        }
+
+        function autoSelectAllNested() {
+            if (config.subCheckboxes.length === config.subCheckboxes.filter(":checked").length) {
                 config.selector.prop("checked", true);
             } else {
                 config.selector.prop("checked", false);
@@ -52,13 +67,6 @@
                 selectAll();
 
                 config.change();
-            });
-
-            config.checkboxes.change(function () {
-                autoSelectAll();
-            });
-            config.subCheckboxes.change(function () {
-                config.autoSelectAllNested(config.selector, config.subCheckboxes);
             });
         }
     };
