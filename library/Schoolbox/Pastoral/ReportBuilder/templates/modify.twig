@@ -441,28 +441,25 @@
         $reportForm.selectAll({
             selector: $("#type-all"),
             checkboxes: $("[data-check-type]"),
-            customSelectAll: function(selectAllButton) {
+            subCheckboxes: $("[data-check-subtype]"),
+            customSelectAll: function(selectAllButton, subCheckboxes) {
                 // Show/hide subtypes on select/deselect all
 
                 var subtypeLists = "[data-pastoral-subtype]";
-                var subtypeCheckboxes = "[data-check-subtype]";
-
                 if ($(selectAllButton).is(':checked')) {
                     $(subtypeLists).show();
-                    $(subtypeCheckboxes).prop("checked", true);
+                    $(subCheckboxes).prop("checked", true);
                 } else {
                     $(subtypeLists).hide();
-                    $(subtypeCheckboxes).prop("checked", false);
+                    $(subCheckboxes).prop("checked", false);
                 }
 
             },
-            customAutoSelectAll: function(selectAllButton) {
+            customAutoSelectAll: function(selectAllButton, subCheckboxes) {
                 // Check/uncheck select all button based on how many boxes are checked
 
-                var subtypes = "[data-check-subtype]";
-
-                $(subtypes).change(function() {
-                    if ($(subtypes).length === $(subtypes).filter(":checked").length) {
+                $(subCheckboxes).change(function() {
+                    if ($(subCheckboxes).length === $(subCheckboxes).filter(":checked").length) {
                         $(selectAllButton).prop("checked", true);
                     } else {
                         $(selectAllButton).prop("checked", false);
