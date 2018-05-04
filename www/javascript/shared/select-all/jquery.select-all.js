@@ -9,14 +9,7 @@
         function init(options, element) {
             var defaults = {
                 change: function () {}, // TODO wha?
-                autoSelectAll: function () {
-                    // TODO this filter seems to be tallying up ALL checked checkboxes on the page, not just the ones in config.checkboxes...how
-                    if (config.checkboxes.filter(":checked").length === config.checkboxes.length) {
-                        config.selector.prop("checked", true);
-                    } else {
-                        config.selector.prop("checked", false);
-                    }
-                }
+                autoSelectAll: function () {}
             };
 
             var derived = {
@@ -32,16 +25,16 @@
         function start() {
             config.autoSelectAll();
 
-            // config.selector.change(function () {
-            //     if ($(this).is(':checked')) {
-            //         config.checkboxes.prop('checked', true);
-            //     } else {
-            //         config.checkboxes.prop('checked', false);
-            //     }
-            //
-            //     // TODO what is this?
-            //     config.change();
-            // });
+            config.selector.change(function () {
+                if ($(this).is(':checked')) {
+                    config.checkboxes.prop('checked', true);
+                } else {
+                    config.checkboxes.prop('checked', false);
+                }
+
+                // TODO what is this?
+                config.change();
+            });
 
             config.checkboxes.change(function () {
                 config.autoSelectAll();

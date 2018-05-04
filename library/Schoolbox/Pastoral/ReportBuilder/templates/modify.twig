@@ -273,17 +273,6 @@
                         }
                     });
 
-                    // Show/hide subtypes on select/deselect all
-                    // TODO plugin is meant to handle the parent types here, but is not doing so; what did I break?
-                    $("#type-all").change(function(e) {
-                        if ($(e.target).is(':checked')) {
-                            $(parentTypeSelector).prop("checked", true);
-                            $(siblingSelector).prop("checked", true).show();
-                        } else {
-                            $(parentTypeSelector).prop("checked", false);
-                            $(siblingSelector).prop("checked", false).hide();
-                        }
-                    });
                 });
             </script>
 
@@ -576,6 +565,22 @@
                 form.submit();
             }
         });
+    });
+
+
+    // Show/hide subtypes on select/deselect all
+    // TODO plugin is meant to handle the parent types here, but is not doing so; what did I break?
+    var parentTypeSelector = "#formReport input[data-check-type]";
+    var siblingSelector = "[data-pastoral-subtype]";
+
+    $("#type-all").change(function(e) {
+        if ($(e.target).is(':checked')) {
+//            $(parentTypeSelector).prop("checked", true);
+            $(siblingSelector).prop("checked", true).show();
+        } else {
+//            $(parentTypeSelector).prop("checked", false);
+            $(siblingSelector).prop("checked", false).hide();
+        }
     });
 
 </script>
