@@ -17,147 +17,6 @@
 <script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
 <script type="text/javascript" src="/javascript/shared/select-all/jquery.select-all.js"></script>
 
-<!--suppress JSValidateTypes -->
-<script type="text/javascript">
-
-    $(function () {
-
-        $('#sort-order').sortable({handle: '.grip', axis: 'y'});
-
-        {# Toggle all checkboxes when the 'Select All' box is changed #}
-
-        var $reportForm = $("#formReport");
-
-        $reportForm.selectAll({
-            selector: $("#type-all"),
-            checkboxes: $("[data-check-type], [data-check-subtype]"),
-            autoSelectAll: function() {
-                var allCheckboxes = "[data-check-type], [data-check-subtype]";
-
-                // TODO the dom update of the checked status of subtypes is occurring AFTER the check for number of checked boxes
-                console.log("Number of checkboxes in total: " + $(allCheckboxes).length);
-                console.log("Number of checked checkboxes: " + $(allCheckboxes).filter(":checked").length);
-                if ($(allCheckboxes).filter(":checked").length > 0) {
-                    console.log("All checkboxes checked: ");
-                    console.log($(allCheckboxes).filter(":checked"))
-                }
-                if ($("[data-check-subtype]:checked").length > 0) {
-                    console.log("Subtypes checked:");
-                    console.log($("[data-check-subtype]:checked"));
-                }
-
-                if ($(allCheckboxes).length === $(allCheckboxes).filter(":checked").length) {
-                    $("#type-all").prop("checked", true);
-                } else {
-                    $("#type-all").prop("checked", false);
-                }
-            }
-        });
-
-        $reportForm.selectAll({
-            selector: $('#year-all'),
-            checkboxes: $('[data-check-year]')
-        });
-
-        $reportForm.selectAll({
-            selector: $('#house-all'),
-            checkboxes: $('[data-check-house]')
-        });
-
-        {# Setup selectize boxes #}
-
-        $('#filterStudents').selectizeSelector({
-            multiple: true,
-            ajax: {
-                url: '/ajax/user.php',
-                type: 'GET',
-                data: {roleTypeID: 'student'},
-                dataType: 'json'
-            },
-            value: [
-                {% for student in studentsSelected %}
-                {'id': '{{ student.id }}', 'name': '{{ student.name | escape('js') }}'},
-                {% endfor %}
-            ]
-        });
-
-        $('#filterTags').selectizeSelector({
-            multiple: true,
-            ajax: {
-                url: '/ajax/tags/pastoral',
-                type: 'GET',
-                dataType: 'json'
-            },
-            value: [
-                {% for tag in tagsSelected %}
-                {'id': '{{ tag.id }}', 'name': '{{ tag.name | escape('js') }}'},
-                {% endfor %}
-            ]
-        });
-
-        $('#filterAuthors').selectizeSelector({
-            multiple: true,
-            ajax: {
-                url: '/ajax/user.php',
-                type: 'GET',
-                data: {roleTypeID: 'staff'},
-                dataType: 'json'
-            },
-            value: [
-                {% for author in authorsSelected %}
-                {'id': '{{ author.id }}', 'name': '{{ author.name | escape('js') }}'},
-                {% endfor %}
-            ]
-        });
-
-        {# Generate the report after a little sanity checking#}
-
-        $reportForm.alaressValidate({
-            rules: {
-                'name': 'required',
-                'types[]': 'required',
-                'years[]': 'required',
-                'after': {
-                    datepickerDate: {
-                        depends: function (element) {
-                            return $(element).val().length > 0;
-                        }
-                    }
-                },
-                'before': {
-                    datepickerDate: {
-                        depends: function (element) {
-                            return $(element).val().length > 0;
-                        }
-                    }
-                }
-            },
-            messages: {
-                'types[]': 'You must select at least one record type to show in the report',
-                'years[]': 'You must select at least one year level to show in the report'
-            },
-            submitHandler: function (form) {
-                {# Prior to submitting the form we need to set the hidden `order` #}
-                var order = $.makeArray(
-                    $('#sort-order').children('li')
-                        .map(function () {
-                            return $(this).data('order');
-                        })
-                );
-
-                {# Just in case something has gone wrong and there was no order- we set the default #}
-                if (order.length === 0) {
-                    order = ['student', 'date', 'subtype', 'author', 'points', 'year', 'severity'];
-                }
-
-                $('#order').val(order.join(','));
-                form.submit();
-            }
-        });
-    });
-
-</script>
-
 <div class="row">
     <div class="small-12 column">
         <h1>{{ locale.pastoralCare.proper }} Reports</h1>
@@ -577,3 +436,145 @@
         </form>
     </div>
 </div>
+
+
+<!--suppress JSValidateTypes -->
+<script type="text/javascript">
+
+    $(function () {
+
+        $('#sort-order').sortable({handle: '.grip', axis: 'y'});
+
+        {# Toggle all checkboxes when the 'Select All' box is changed #}
+
+        var $reportForm = $("#formReport");
+
+        $reportForm.selectAll({
+            selector: $("#type-all"),
+            checkboxes: $("[data-check-type], [data-check-subtype]"),
+            autoSelectAll: function() {
+                var allCheckboxes = "[data-check-type], [data-check-subtype]";
+
+                // TODO the dom update of the checked status of subtypes is occurring AFTER the check for number of checked boxes
+                console.log("Number of checkboxes in total: " + $(allCheckboxes).length);
+                console.log("Number of checked checkboxes: " + $(allCheckboxes).filter(":checked").length);
+                if ($(allCheckboxes).filter(":checked").length > 0) {
+                    console.log("All checkboxes checked: ");
+                    console.log($(allCheckboxes).filter(":checked"))
+                }
+                if ($("[data-check-subtype]:checked").length > 0) {
+                    console.log("Subtypes checked:");
+                    console.log($("[data-check-subtype]:checked"));
+                }
+
+                if ($(allCheckboxes).length === $(allCheckboxes).filter(":checked").length) {
+                    $("#type-all").prop("checked", true);
+                } else {
+                    $("#type-all").prop("checked", false);
+                }
+            }
+        });
+
+        $reportForm.selectAll({
+            selector: $('#year-all'),
+            checkboxes: $('[data-check-year]')
+        });
+
+        $reportForm.selectAll({
+            selector: $('#house-all'),
+            checkboxes: $('[data-check-house]')
+        });
+
+        {# Setup selectize boxes #}
+
+        $('#filterStudents').selectizeSelector({
+            multiple: true,
+            ajax: {
+                url: '/ajax/user.php',
+                type: 'GET',
+                data: {roleTypeID: 'student'},
+                dataType: 'json'
+            },
+            value: [
+                {% for student in studentsSelected %}
+                {'id': '{{ student.id }}', 'name': '{{ student.name | escape('js') }}'},
+                {% endfor %}
+            ]
+        });
+
+        $('#filterTags').selectizeSelector({
+            multiple: true,
+            ajax: {
+                url: '/ajax/tags/pastoral',
+                type: 'GET',
+                dataType: 'json'
+            },
+            value: [
+                {% for tag in tagsSelected %}
+                {'id': '{{ tag.id }}', 'name': '{{ tag.name | escape('js') }}'},
+                {% endfor %}
+            ]
+        });
+
+        $('#filterAuthors').selectizeSelector({
+            multiple: true,
+            ajax: {
+                url: '/ajax/user.php',
+                type: 'GET',
+                data: {roleTypeID: 'staff'},
+                dataType: 'json'
+            },
+            value: [
+                {% for author in authorsSelected %}
+                {'id': '{{ author.id }}', 'name': '{{ author.name | escape('js') }}'},
+                {% endfor %}
+            ]
+        });
+
+        {# Generate the report after a little sanity checking#}
+
+        $reportForm.alaressValidate({
+            rules: {
+                'name': 'required',
+                'types[]': 'required',
+                'years[]': 'required',
+                'after': {
+                    datepickerDate: {
+                        depends: function (element) {
+                            return $(element).val().length > 0;
+                        }
+                    }
+                },
+                'before': {
+                    datepickerDate: {
+                        depends: function (element) {
+                            return $(element).val().length > 0;
+                        }
+                    }
+                }
+            },
+            messages: {
+                'types[]': 'You must select at least one record type to show in the report',
+                'years[]': 'You must select at least one year level to show in the report'
+            },
+            submitHandler: function (form) {
+                {# Prior to submitting the form we need to set the hidden `order` #}
+                var order = $.makeArray(
+                    $('#sort-order').children('li')
+                        .map(function () {
+                            return $(this).data('order');
+                        })
+                );
+
+                {# Just in case something has gone wrong and there was no order- we set the default #}
+                if (order.length === 0) {
+                    order = ['student', 'date', 'subtype', 'author', 'points', 'year', 'severity'];
+                }
+
+                $('#order').val(order.join(','));
+                form.submit();
+            }
+        });
+    });
+
+</script>
