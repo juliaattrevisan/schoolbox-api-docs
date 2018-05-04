@@ -442,26 +442,26 @@
         $reportForm.selectAll({
             selector: $("#type-all"),
             checkboxes: $("[data-check-type]"),
-            customSelectAll: function(target) {
+            customSelectAll: function(selectAllButton) {
                 // Show/hide subtypes on select/deselect all
                 var subtypes = "[data-check-subtype]";
 
-                if ($(target).is(':checked')) {
+                if ($(selectAllButton).is(':checked')) {
                     $(subtypes).prop("checked", true).show();
                 } else {
                     $(subtypes).prop("checked", false).hide();
                 }
 
             },
-            customAutoSelectAll: function(target) {
+            customAutoSelectAll: function(selectAllButton) {
                 console.log("doing a thing");
                 var subtypes = "[data-check-subtype]";
 
                 $(subtypes).change(function() {
                     if ($(subtypes).length === $(subtypes).filter(":checked").length) {
-                        $(target).prop("checked", true);
+                        $(selectAllButton).prop("checked", true);
                     } else {
-                        $(target).prop("checked", false);
+                        $(selectAllButton).prop("checked", false);
                     }
                 })
             }
