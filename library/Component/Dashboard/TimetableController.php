@@ -341,7 +341,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
         $classContext = [
             'code'      => "({$class['code']})",
             'room'      => $class['room'],
-            'url'       => $this->getClassLink($class['code']),
+            'url'       => empty($class['code']) ? '' : $this->getClassLink($class['code']),
             'colour'    => $this->getSubjectColour((string)$class['code']),
             'desc'      => $classDescription,
             'cancelled' => (bool)$class['ClassCancelled'],
