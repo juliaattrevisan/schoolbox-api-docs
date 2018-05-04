@@ -150,12 +150,14 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
     /**
      * Gets a background colour for a subject
      *
+     * Treats empty $subjectCode '' as a valid index. Hence all subjects which lack a code will have the same colour.
+     *
      * @param string $subjectCode
      * @return string
      */
     private function getSubjectColour(string $subjectCode): string
     {
-        if ($subjectCode && !array_key_exists($subjectCode, $this->subjectColourMap)) {
+        if (!array_key_exists($subjectCode, $this->subjectColourMap)) {
             if (!$this->colourList->offsetExists($this->colourIndex)) {
                 $this->colourIndex = 0; // Loop back to start of colour list
             }
@@ -332,7 +334,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
             'code'      => "({$class['code']})",
             'room'      => $class['room'],
             'url'       => $this->getClassLink($class['code']),
-            'colour'    => $this->getSubjectColour($class['code']),
+            'colour'    => $this->getSubjectColour((string)$class['code']),
             'desc'      => $class['description'] ?: $this->getSubjectFolderName($class['code']),
             'cancelled' => (bool)$class['ClassCancelled'],
         ];
