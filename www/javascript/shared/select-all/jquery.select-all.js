@@ -32,16 +32,16 @@
         function start() {
             config.autoSelectAll();
 
-            config.selector.change(function () {
-                if ($(this).is(':checked')) {
-                    config.checkboxes.prop('checked', true);
-                } else {
-                    config.checkboxes.prop('checked', false);
-                }
-
-                // TODO what is this?
-                config.change();
-            });
+            // config.selector.change(function () {
+            //     if ($(this).is(':checked')) {
+            //         config.checkboxes.prop('checked', true);
+            //     } else {
+            //         config.checkboxes.prop('checked', false);
+            //     }
+            //
+            //     // TODO what is this?
+            //     config.change();
+            // });
 
             config.checkboxes.change(function () {
                 config.autoSelectAll();
