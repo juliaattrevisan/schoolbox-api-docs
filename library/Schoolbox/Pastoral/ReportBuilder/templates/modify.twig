@@ -442,7 +442,7 @@
             selector: $("#type-all"),
             checkboxes: $("[data-check-type]"),
             subCheckboxes: $("[data-check-subtype]"),
-            customSelectAll: function(selectAllButton, subCheckboxes) {
+            selectAllNested: function(selectAllButton, subCheckboxes) {
                 // Show/hide subtypes on select/deselect all
 
                 var subtypeLists = "[data-pastoral-subtype]";
@@ -455,7 +455,7 @@
                 }
 
             },
-            customAutoSelectAll: function(selectAllButton, subCheckboxes) {
+            autoSelectAllNested: function(selectAllButton, subCheckboxes) {
                 // Check/uncheck select all button based on how many boxes are checked
 
                 $(subCheckboxes).change(function() {

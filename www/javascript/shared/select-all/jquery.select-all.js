@@ -9,8 +9,8 @@
         function init(options, element) {
             var defaults = {
                 change: function () {},
-                customSelectAll: function () {},
-                customAutoSelectAll: function () {}
+                selectAllNested: function () {},
+                autoSelectAllNested: function () {}
             };
 
             var derived = {
@@ -32,7 +32,7 @@
                 config.checkboxes.prop('checked', false);
             }
 
-            config.customSelectAll(config.selector, config.subCheckboxes);
+            config.selectAllNested(config.selector, config.subCheckboxes);
         }
 
         // Check or uncheck the Select All box automatically,
@@ -58,7 +58,7 @@
                 autoSelectAll();
             });
             config.subCheckboxes.change(function () {
-                config.customAutoSelectAll(config.selector, config.subCheckboxes);
+                config.autoSelectAllNested(config.selector, config.subCheckboxes);
             });
         }
     };
