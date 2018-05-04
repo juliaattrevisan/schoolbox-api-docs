@@ -442,17 +442,16 @@
         $reportForm.selectAll({
             selector: $("#type-all"),
             checkboxes: $("[data-check-type]"),
-            customSelectAll: function() {
+            customSelectAll: function(target) {
                 // Show/hide subtypes on select/deselect all
                 var siblingSelector = "[data-pastoral-subtype]";
 
-                $("#type-all").change(function(e) {
-                    if ($(e.target).is(':checked')) {
-                        $(siblingSelector).prop("checked", true).show();
-                    } else {
-                        $(siblingSelector).prop("checked", false).hide();
-                    }
-                });
+                if ($(target).is(':checked')) {
+                    $(siblingSelector).prop("checked", true).show();
+                } else {
+                    $(siblingSelector).prop("checked", false).hide();
+                }
+
             },
             customAutoSelectAll: function() {
                 console.log("doing a thing");

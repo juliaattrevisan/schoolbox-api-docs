@@ -50,7 +50,7 @@
 
             config.selector.change(function () {
                 selectAll(this);
-                // config.customSelectAll();
+                config.customSelectAll(this);
 
                 config.change();
             });
