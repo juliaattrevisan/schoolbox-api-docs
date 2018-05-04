@@ -24,12 +24,14 @@
         }
 
         // Select or deselect all checkboxes via the Select All checkbox.
-        function selectAll(selector) {
-            if ($(selector).is(':checked')) {
+        function selectAll() {
+            if (config.selector.is(':checked')) {
                 config.checkboxes.prop('checked', true);
             } else {
                 config.checkboxes.prop('checked', false);
             }
+
+            config.customSelectAll(config.selector);
         }
 
         // Check or uncheck the Select All box automatically,
@@ -42,18 +44,16 @@
                     config.selector.prop("checked", false);
                 }
             });
+
+            config.customAutoSelectAll(config.selector);
         }
 
         function start() {
-            selectAll(config.selector);
-            config.customSelectAll(config.selector);
-
+            selectAll();
             autoSelectAll();
-            config.customAutoSelectAll(config.selector);
 
             config.selector.change(function () {
-                selectAll(this);
-                config.customSelectAll(this);
+                selectAll();
 
                 config.change();
             });
