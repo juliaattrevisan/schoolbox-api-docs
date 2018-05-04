@@ -444,12 +444,12 @@
             checkboxes: $("[data-check-type]"),
             customSelectAll: function(target) {
                 // Show/hide subtypes on select/deselect all
-                var siblingSelector = "[data-pastoral-subtype]";
+                var subtypes = "[data-check-subtype]";
 
                 if ($(target).is(':checked')) {
-                    $(siblingSelector).prop("checked", true).show();
+                    $(subtypes).prop("checked", true).show();
                 } else {
-                    $(siblingSelector).prop("checked", false).hide();
+                    $(subtypes).prop("checked", false).hide();
                 }
 
             },
