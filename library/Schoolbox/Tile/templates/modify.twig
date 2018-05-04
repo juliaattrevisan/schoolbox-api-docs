@@ -63,7 +63,7 @@
     {% else %}
         <li><a href="/homepage/{{ folder.getId() }}#component{{ component.getId() }}">{{ folder.getName() }}</a></li>
     {% endif %}
-    <li><a href="{{ routeLookup('tile.layout', {componentId: component.id}) }}">Tiles</a></li>
+    <li><a href="{{ routeLookup('tile.layout', {layoutId: item.id}) }}">Tiles</a></li>
     <li class="active"><a href="#">Modify Tile</a></li>
 </ul>
 
