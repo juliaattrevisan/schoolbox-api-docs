@@ -46,7 +46,10 @@
 
         function start() {
             selectAll(config.selector);
-            // config.customSelectAll();
+            config.customSelectAll(config.selector);
+
+            autoSelectAll();
+            config.customAutoSelectAll(config.selector);
 
             config.selector.change(function () {
                 selectAll(this);
@@ -55,8 +58,6 @@
                 config.change();
             });
 
-            autoSelectAll();
-            // config.customAutoSelectAll();
         }
 
     };

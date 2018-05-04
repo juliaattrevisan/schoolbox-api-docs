@@ -453,15 +453,17 @@
                 }
 
             },
-            customAutoSelectAll: function() {
+            customAutoSelectAll: function(target) {
                 console.log("doing a thing");
-                var allCheckboxes = "[data-check-type], [data-check-subtype]";
+                var subtypes = "[data-check-subtype]";
 
-                if ($(allCheckboxes).length === $(allCheckboxes).filter(":checked").length) {
-                    $("#type-all").prop("checked", true);
-                } else {
-                    $("#type-all").prop("checked", false);
-                }
+                $(subtypes).change(function() {
+                    if ($(subtypes).length === $(subtypes).filter(":checked").length) {
+                        $(target).prop("checked", true);
+                    } else {
+                        $(target).prop("checked", false);
+                    }
+                })
             }
         });
 
