@@ -63,16 +63,19 @@ class Module extends BaseModule
                     $params['id'],
                     array('joins' => array('backgroundImage',),)
                 );
-                $component = $this->getComponentInstanceMapper()->findComponentByConfigValue(
-                    'layoutId',
-                    $item->getTileLayout()->getId()
-                )->first();
-                if (!($component instanceof Component_Instance)) {
-                    throw new \RuntimeException('Component does not exist');
-                }
+
+                $layout = $this->getTileLayoutMapper()->findById($item->getTileLayout()->getId());
+//                $component = $this->getComponentInstanceMapper()->findComponentByConfigValue(
+//                    'layoutId',
+//                    $item->getTileLayout()->getId()
+//                )->first();
+//                if (!($component instanceof Component_Instance)) {
+//                    throw new \RuntimeException('Component does not exist');
+//                }
                 return array(
                     'item'      => $item,
-                    'component' => $component,
+                    'layout'    => $layout,
+//                    'component' => $component,
                 );
             }
         );
@@ -82,28 +85,32 @@ class Module extends BaseModule
             $matcher,
             '(?:add|create|layout|layoutForm)',
             function ($params) {
-                $component = $this->getComponentInstanceMapper()->findByInstanceId($params['componentId']);
+                return [
+                    'layout' => $this->getTileLayoutMapper()->findById($params['layoutId']),
+                ];
 
-                // Component must actually exist.
-                // This should cause an error that is recorded, but doesn't
-                // prevent a login check.
-                if (!($component instanceof Component_Instance)) {
-                    throw new \RuntimeException('Component does not exist');
-                }
-
-                // Also, this component needs to be a tile grid.
-                if (!is_a(
-                    $component->getDefinition()->getClass(),
-                    TileControllerInterface::class,
-                    true
-                )) {
-                    throw new \RuntimeException('Component exists, but is not a tile layout');
-                }
-
-                // augment params with component
-                return array(
-                    'component' => $component,
-                );
+//                $component = $this->getComponentInstanceMapper()->findByInstanceId($params['componentId']);
+//
+//                // Component must actually exist.
+//                // This should cause an error that is recorded, but doesn't
+//                // prevent a login check.
+//                if (!($component instanceof Component_Instance)) {
+//                    throw new \RuntimeException('Component does not exist');
+//                }
+//
+//                // Also, this component needs to be a tile grid.
+//                if (!is_a(
+//                    $component->getDefinition()->getClass(),
+//                    TileControllerInterface::class,
+//                    true
+//                )) {
+//                    throw new \RuntimeException('Component exists, but is not a tile layout');
+//                }
+//
+//                // augment params with component
+//                return array(
+//                    'component' => $component,
+//                );
             }
         );
 
@@ -113,18 +120,40 @@ class Module extends BaseModule
             $matcher,
             "(?:add|create|layout|layoutForm|edit|update|update:post|delete|delete:post)",
             function ($params) {
-                // augment params with homepage from category
-                if ($params['component']->getModule() == 'homepage') {
+                if ($params['layout'] instanceof Layout\Model) {
+                    $component = $this->getComponentInstanceMapper()->findComponentByConfigValue(
+                        'layoutId',
+                        $params['layout']->getId()
+                    )->first();
 
-                    // Support tile alt source to potentially soft-deleted homepage
-                    $folderId   = $params['component']->getIdentifier();
-                    $columnName = $this->getFolderMapper()->getIdentifier()['column'];
+                    if ($component) {
+                        $folderId   = $component->getIdentifier();
+                        $columnName = $this->getFolderMapper()->getIdentifier()['column'];
 
-                    return array(
-                        'homepage' => $this->getFolderMapper()->findByColumn($columnName, $folderId, ['deleted' => true])->first(),
-                    );
+                        return [
+                            'component' => $component,
+                            'homepage'  => $this->getFolderMapper()->findByColumn(
+                                $columnName,
+                                $folderId,
+                                ['deleted' => true]
+                            )->first(),
+                        ];
+                    }
                 }
-                return array();
+                return [];
+
+//                // augment params with homepage from category
+//                if ($params['component']->getModule() == 'homepage') {
+//
+//                    // Support tile alt source to potentially soft-deleted homepage
+//                    $folderId   = $params['component']->getIdentifier();
+//                    $columnName = $this->getFolderMapper()->getIdentifier()['column'];
+//
+//                    return array(
+//                        'homepage' => $this->getFolderMapper()->findByColumn($columnName, $folderId, ['deleted' => true])->first(),
+//                    );
+//                }
+//                return array();
             }
         );
     }
@@ -239,4 +268,13 @@ class Module extends BaseModule
         return $this->getMapperFactory()->get(Mapper::class);
     }
 
+    /**
+     * Required for fetching the tile layout mapper.
+     *
+     * @return Layout\Mapper
+     */
+    public function getTileLayoutMapper()
+    {
+        return $this->getMapperFactory()->get(Layout\Mapper::class);
+    }
 }
