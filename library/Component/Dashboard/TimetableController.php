@@ -330,12 +330,20 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
      */
     private function buildClassContext(array $campusList, int $campusId, array $period, Alaress_Date_Format $now, array $class): array
     {
+        if ($class['description']) {
+            $classDescription = $class['description'];
+        } elseif (!empty($class['code'])) {
+            $classDescription = $this->getSubjectFolderName($class['code']);
+        } else {
+            $classDescription = '';
+        }
+
         $classContext = [
             'code'      => "({$class['code']})",
             'room'      => $class['room'],
             'url'       => $this->getClassLink($class['code']),
             'colour'    => $this->getSubjectColour((string)$class['code']),
-            'desc'      => $class['description'] ?: $this->getSubjectFolderName($class['code']),
+            'desc'      => $classDescription,
             'cancelled' => (bool)$class['ClassCancelled'],
         ];
 
