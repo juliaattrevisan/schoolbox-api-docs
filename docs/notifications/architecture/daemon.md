@@ -68,6 +68,8 @@ task.
 
 Schoolbox Daemons are implemented as a collection of parts:
 * Message Broker Subscription
+  * > TODO note that a daemon can listen to any external event, not just a
+      message queue. For example: the socket daemon is a HTTP server.
 * Scheduler (optional)
 * Dispatcher
 * Response Handler
