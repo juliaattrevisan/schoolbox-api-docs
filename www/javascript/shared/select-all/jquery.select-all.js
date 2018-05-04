@@ -37,39 +37,20 @@
         // Check or uncheck the Select All box automatically,
         // based on whether all checkboxes have been manually checked.
         function autoSelectAll() {
-            // TODO this is not working properly for initially deselected (persisted) subcheckboxes
-            
-            // Upfront...
-            if (config.checkboxes.length === config.checkboxes.filter(":checked").length) {
-                config.selector.prop("checked", true);
-            } else {
-                config.selector.prop("checked", false);
-            }
+            // TODO refactor these conditionals maybe
             if (config.subCheckboxes) {
-                autoSelectAllNested();
-            }
-
-            // ... and also on change
-            config.checkboxes.change(function () {
+                if ( (config.checkboxes.length === config.checkboxes.filter(":checked").length) &&
+                    (config.subCheckboxes.length === config.subCheckboxes.filter(":checked").length)) {
+                    config.selector.prop("checked", true);
+                } else {
+                    config.selector.prop("checked", false);
+                }
+            } else {
                 if (config.checkboxes.length === config.checkboxes.filter(":checked").length) {
                     config.selector.prop("checked", true);
                 } else {
                     config.selector.prop("checked", false);
                 }
-            });
-
-            if (config.subCheckboxes) {
-                config.subCheckboxes.change(function() {
-                    autoSelectAllNested();
-                });
-            }
-        }
-
-        function autoSelectAllNested() {
-            if (config.subCheckboxes.length === config.subCheckboxes.filter(":checked").length) {
-                config.selector.prop("checked", true);
-            } else {
-                config.selector.prop("checked", false);
             }
         }
 
@@ -81,6 +62,16 @@
 
                 config.change();
             });
+
+            config.checkboxes.change(function() {
+                autoSelectAll();
+            });
+
+            if (config.subCheckboxes) {
+                config.subCheckboxes.change(function() {
+                    autoSelectAll();
+                });
+            }
         }
     };
 }(jQuery));
