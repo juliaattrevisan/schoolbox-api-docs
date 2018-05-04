@@ -49,7 +49,6 @@
         }
 
         function start() {
-            selectAll();
             autoSelectAll();
 
             config.selector.change(function () {
