@@ -37,21 +37,25 @@
         // Check or uncheck the Select All box automatically,
         // based on whether all checkboxes have been manually checked.
         function autoSelectAll() {
-            // TODO refactor these conditionals maybe
-            if (config.subCheckboxes) {
-                if ( (config.checkboxes.length === config.checkboxes.filter(":checked").length) &&
-                    (config.subCheckboxes.length === config.subCheckboxes.filter(":checked").length)) {
-                    config.selector.prop("checked", true);
+
+            // If all parent checkboxes are checked...
+            if (config.checkboxes.length === config.checkboxes.filter(":checked").length) {
+
+                // If we have nested checkboxes, make sure they're all checked as well
+                if (config.subCheckboxes) {
+                    if (config.subCheckboxes.length === config.subCheckboxes.filter(":checked").length) {
+                        config.selector.prop("checked", true);
+                    } else {
+                        config.selector.prop("checked", false);
+                    }
                 } else {
-                    config.selector.prop("checked", false);
+                    config.selector.prop("checked", true);
                 }
+
             } else {
-                if (config.checkboxes.length === config.checkboxes.filter(":checked").length) {
-                    config.selector.prop("checked", true);
-                } else {
-                    config.selector.prop("checked", false);
-                }
+                config.selector.prop("checked", false);
             }
+
         }
 
         function start() {
