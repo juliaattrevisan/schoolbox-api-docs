@@ -441,8 +441,21 @@
 
         $reportForm.selectAll({
             selector: $("#type-all"),
-            checkboxes: $("[data-check-type], [data-check-subtype]"),
+            checkboxes: $("[data-check-type]"),
             customSelectAll: function() {
+                // Show/hide subtypes on select/deselect all
+                var siblingSelector = "[data-pastoral-subtype]";
+
+                $("#type-all").change(function(e) {
+                    if ($(e.target).is(':checked')) {
+                        $(siblingSelector).prop("checked", true).show();
+                    } else {
+                        $(siblingSelector).prop("checked", false).hide();
+                    }
+                });
+            },
+            customAutoSelectAll: function() {
+                console.log("doing a thing");
                 var allCheckboxes = "[data-check-type], [data-check-subtype]";
 
                 if ($(allCheckboxes).length === $(allCheckboxes).filter(":checked").length) {
@@ -553,18 +566,6 @@
                 form.submit();
             }
         });
-    });
-
-
-    // Show/hide subtypes on select/deselect all
-    var siblingSelector = "[data-pastoral-subtype]";
-
-    $("#type-all").change(function(e) {
-        if ($(e.target).is(':checked')) {
-            $(siblingSelector).prop("checked", true).show();
-        } else {
-            $(siblingSelector).prop("checked", false).hide();
-        }
     });
 
 </script>

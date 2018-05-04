@@ -9,7 +9,8 @@
         function init(options, element) {
             var defaults = {
                 change: function () {},
-                customSelectAll: function () {}
+                customSelectAll: function () {},
+                customAutoSelectAll: function () {}
             };
 
             var derived = {
@@ -22,19 +23,41 @@
             return merged;
         }
 
-        function start() {
-            config.customSelectAll();
+        // Select or deselect all checkboxes via the Select All checkbox.
+        function selectAll(selector) {
+            if ($(selector).is(':checked')) {
+                config.checkboxes.prop('checked', true);
+            } else {
+                config.checkboxes.prop('checked', false);
+            }
+        }
 
-            config.selector.change(function () {
-                if ($(this).is(':checked')) {
-                    config.checkboxes.prop('checked', true);
+        // Check or uncheck the Select All box automatically,
+        // based on whether all checkboxes have been manually checked.
+        function autoSelectAll() {
+            config.checkboxes.change(function() {
+                if (config.checkboxes.length === config.checkboxes.filter(":checked").length) {
+                    config.selector.prop("checked", true);
                 } else {
-                    config.checkboxes.prop('checked', false);
+                    config.selector.prop("checked", false);
                 }
-
-                config.change();
-                config.customSelectAll();
             });
         }
+
+        function start() {
+            selectAll(config.selector);
+            // config.customSelectAll();
+
+            config.selector.change(function () {
+                selectAll(this);
+                // config.customSelectAll();
+
+                config.change();
+            });
+
+            autoSelectAll();
+            // config.customAutoSelectAll();
+        }
+
     };
 }(jQuery));
