@@ -229,10 +229,22 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                 [$year, $subject, $class] = explode('-', $class['code']);
                 [$cmpCode, $timetableCode] = explode('-', $campusList[$campusId]->getExtTimetableCode());
 
+                /* Example given by BTAC = [
+                        "target":      "teacher.rollcall",
+                        "ttid":        "23",
+                        "yeargroups":  "10",
+                        "classes":     "1",
+                        "tchcode":     "VPE",
+                        "subjectcode": "1111",
+                        "date":        "01/05/2018",
+                        "periodcode":  "3",
+                        "daycode":     "7"
+                    ]
+                 */
                 $deepLinkParams = [
                     'target'      => 'teacher.rollcall',
                     'ttid'        => $timetableCode,
-                    'yeargroups'  => '',
+                    'yeargroups'  => '',                           // Note this is different to the example given, but links appear to be working.
                     'classes'     => $class,
                     'tchcode'     => $this->getUser()->getExternalId(),
                     'subjectcode' => $subject,
@@ -243,7 +255,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                 try {
                     /** @var Router $router */
                     $router   = $this->getSitePage()->getDi()->get('router');
-                    $deepLink = urlencode(implode('&', $deepLinkParams));
+                    $deepLink = urlencode(http_build_query($deepLinkParams));
                     return "{$router->generate('tassportal.teacherKiosk')}?deep_link={$deepLink}";
                 } catch (\Throwable $e) {
                     return '';
