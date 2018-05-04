@@ -29,6 +29,10 @@ the digest message until the configured time to send digests has been reached.
 
 The Scheduler is an implementation of `\Alaress\Scheduler\AbstractScheduler`.
 
+Note that `AbstractScheduler` implements
+`Alaress\WorkerCrew\TaskResponseHandlerInterface`; this means that all
+Schedulers may also be set up as the Response Handler for a Daemon.
+
 
 ### Event Loop
 
