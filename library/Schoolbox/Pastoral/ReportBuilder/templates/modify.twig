@@ -34,21 +34,16 @@
             autoSelectAll: function() {
                 var allCheckboxes = "[data-check-type], [data-check-subtype]";
 
-                // TODO in here, prop checked and :checked is returning true
-//                $("[data-check-subtype]").each(function(index, value) {
-//                    console.log("checked? " + $(value).is(":checked"));
-//                })
-                // TODO length of filter:checked is right, too
-                //console.log($("[data-check-subtype]").filter(":checked").length);
-
-                // TODO At the point that this is getting run, it hasn't yet registered that the most recently ticked set of subcheckboxes have been checked!
-                // I fixed this by selecting all the subcheckboxes upfront, but this doesn't respect the saved settings on the page,
-                // and it also doesn't solve the problem that the checkboxes are not getting a checked property when you deselect, then reselect.
-                // WHY??
+                // TODO the dom update of the checked status of subtypes is occurring AFTER the check for number of checked boxes
                 console.log("Number of checkboxes in total: " + $(allCheckboxes).length);
                 console.log("Number of checked checkboxes: " + $(allCheckboxes).filter(":checked").length);
                 if ($(allCheckboxes).filter(":checked").length > 0) {
+                    console.log("All checkboxes checked: ");
                     console.log($(allCheckboxes).filter(":checked"))
+                }
+                if ($("[data-check-subtype]:checked").length > 0) {
+                    console.log("Subtypes checked:");
+                    console.log($("[data-check-subtype]:checked"));
                 }
 
                 if ($(allCheckboxes).length === $(allCheckboxes).filter(":checked").length) {
