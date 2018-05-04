@@ -442,20 +442,8 @@
         $reportForm.selectAll({
             selector: $("#type-all"),
             checkboxes: $("[data-check-type], [data-check-subtype]"),
-            autoSelectAll: function() {
+            customSelectAll: function() {
                 var allCheckboxes = "[data-check-type], [data-check-subtype]";
-
-                // TODO the dom update of the checked status of subtypes is occurring AFTER the check for number of checked boxes
-                console.log("Number of checkboxes in total: " + $(allCheckboxes).length);
-                console.log("Number of checked checkboxes: " + $(allCheckboxes).filter(":checked").length);
-                if ($(allCheckboxes).filter(":checked").length > 0) {
-                    console.log("All checkboxes checked: ");
-                    console.log($(allCheckboxes).filter(":checked"))
-                }
-                if ($("[data-check-subtype]:checked").length > 0) {
-                    console.log("Subtypes checked:");
-                    console.log($("[data-check-subtype]:checked"));
-                }
 
                 if ($(allCheckboxes).length === $(allCheckboxes).filter(":checked").length) {
                     $("#type-all").prop("checked", true);
@@ -569,16 +557,12 @@
 
 
     // Show/hide subtypes on select/deselect all
-    // TODO plugin is meant to handle the parent types here, but is not doing so; what did I break?
-    var parentTypeSelector = "#formReport input[data-check-type]";
     var siblingSelector = "[data-pastoral-subtype]";
 
     $("#type-all").change(function(e) {
         if ($(e.target).is(':checked')) {
-//            $(parentTypeSelector).prop("checked", true);
             $(siblingSelector).prop("checked", true).show();
         } else {
-//            $(parentTypeSelector).prop("checked", false);
             $(siblingSelector).prop("checked", false).hide();
         }
     });

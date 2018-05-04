@@ -8,8 +8,8 @@
 
         function init(options, element) {
             var defaults = {
-                change: function () {}, // TODO wha?
-                autoSelectAll: function () {}
+                change: function () {},
+                customSelectAll: function () {}
             };
 
             var derived = {
@@ -23,7 +23,7 @@
         }
 
         function start() {
-            config.autoSelectAll();
+            config.customSelectAll();
 
             config.selector.change(function () {
                 if ($(this).is(':checked')) {
@@ -32,12 +32,8 @@
                     config.checkboxes.prop('checked', false);
                 }
 
-                // TODO what is this?
                 config.change();
-            });
-
-            config.checkboxes.change(function () {
-                config.autoSelectAll();
+                config.customSelectAll();
             });
         }
     };
