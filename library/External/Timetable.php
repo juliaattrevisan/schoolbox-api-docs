@@ -202,28 +202,7 @@ class External_Timetable implements External_TimetableInterface
     }
 
     /**
-     * Returns a user's timetable for a particular date
-     *
-     * The structure of this data is as follows
-     * Array[]['periodName']
-     * Array[]['periodStart']
-     * Array[]['periodEnd']
-     * Array[]['periodNumber']
-     * Array[]['periodSequence']
-     * Array[]['class'][]['description']
-     * Array[]['class'][]['code']
-     * Array[]['class'][]['room']
-     * Array[]['class'][]['campus']
-     * Array[]['class'][]['staffID']
-     *
-     * Note that you can have multiple classes per period.
-     *
-     *
-     * @param Integer $externalUserId
-     * @param Integer $userId
-     * @param int|\Schoolbox\Campus $campus
-     * @param Alaress_Date_Format $date
-     * @return Array
+     * @inheritdoc
      */
     function getTimetableForDate($externalUserId, $userId, \Schoolbox\Campus $campus, Alaress_Date_Format $date)
     {
