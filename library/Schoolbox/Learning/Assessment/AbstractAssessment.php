@@ -342,8 +342,9 @@ abstract class AbstractAssessment implements IAssessable
             $openDate = $participant->getOpenDate();
             $closeDate = $participant->getCloseDate();
         } else {
-            $openDate =  $this->openAt;
-            $closeDate = $this->closeAt;
+            // Intentionally uses getters to enable Task null date coalescence
+            $openDate =  $this->getOpenAt();
+            $closeDate = $this->getCloseAt();
         }
 
         if (null === $now || $now->isNull()) {
