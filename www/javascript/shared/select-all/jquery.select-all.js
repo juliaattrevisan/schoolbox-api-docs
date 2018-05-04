@@ -37,6 +37,19 @@
         // Check or uncheck the Select All box automatically,
         // based on whether all checkboxes have been manually checked.
         function autoSelectAll() {
+            // TODO this is not working properly for initially deselected (persisted) subcheckboxes
+            
+            // Upfront...
+            if (config.checkboxes.length === config.checkboxes.filter(":checked").length) {
+                config.selector.prop("checked", true);
+            } else {
+                config.selector.prop("checked", false);
+            }
+            if (config.subCheckboxes) {
+                autoSelectAllNested();
+            }
+
+            // ... and also on change
             config.checkboxes.change(function () {
                 if (config.checkboxes.length === config.checkboxes.filter(":checked").length) {
                     config.selector.prop("checked", true);
