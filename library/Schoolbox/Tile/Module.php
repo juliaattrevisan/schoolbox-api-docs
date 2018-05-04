@@ -39,13 +39,13 @@ class Module extends BaseModule
      */
     public function initRoutes(Router $router, $basePath)
     {
-        $this->addGetRoute($router, 'layout', $basePath, '/layout/{componentId}');
-        $this->addPostRoute($router, 'layoutForm', $basePath , '/layout/{componentId}');
+        $this->addGetRoute($router, 'layout', $basePath, '/layout/{layoutId}');
+        $this->addPostRoute($router, 'layoutForm', $basePath , '/layout/{layoutId}');
         // Attach standard REST routes
         $this->attachResourceRoutes($router, $basePath);
         // but have separate add tile paths
-        $this->addGetRoute($router, 'add', $basePath, '/add/{componentId}');
-        $this->addPostRoute($router, 'create', $basePath, '/add/{componentId}');
+        $this->addGetRoute($router, 'add', $basePath, '/add/{layoutId}');
+        $this->addPostRoute($router, 'create', $basePath, '/add/{layoutId}');
     }
 
     /**
@@ -77,7 +77,7 @@ class Module extends BaseModule
             }
         );
 
-        // Routes that take a component ID: look up component from it
+        // Routes that take a layout ID: look up layout from it
         $this->addRoutePreload(
             $matcher,
             '(?:add|create|layout|layoutForm)',
