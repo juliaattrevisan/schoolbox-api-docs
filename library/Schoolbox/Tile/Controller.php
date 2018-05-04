@@ -49,9 +49,10 @@ class Controller extends Base
     /**
      * Displays a form for editing a tile layout.
      *
+     * @param Layout\Model       $layout
      * @param Component_Instance $component
      */
-    public function layout(Component_Instance $component)
+    public function layout(Layout\Model $layout, Component_Instance $component)
     {
         // Load layout
         $this->getResponse()->content->set(
@@ -59,7 +60,7 @@ class Controller extends Base
                 'title'    => 'Tile Component Layout',
                 'template' => '@tile/layout.twig',
                 'data'     => array(
-                    'item'      => $this->getLayoutFromComponent($component),
+                    'item'      => $layout,
                     'component' => $component,
                     'folder'    => $this->getFolderForComponent($component),
                 ),
@@ -70,12 +71,14 @@ class Controller extends Base
     /**
      * Save form for tile layout.
      *
+     * @param Layout\Model       $layout
      * @param Component_Instance $component
+     * @throws MapperException
+     * @throws \Aura\Web\Exception\InvalidStatusCode
      */
-    public function layoutForm(Component_Instance $component)
+    public function layoutForm(Layout\Model $layout, Component_Instance $component)
     {
         $code   = 200;
-        $layout = $this->getLayoutFromComponent($component);
         $layout
             ->setGridWidth(intval($this->getRequest()->post['grid_width']))
             ->setGridPadding(intval($this->getRequest()->post['grid_padding']))
@@ -142,9 +145,11 @@ class Controller extends Base
     /**
      * Displays a form for adding a tile
      *
+     * @param Layout\Model       $layout
      * @param Component_Instance $component
+     * @throws MapperException
      */
-    public function add(Component_Instance $component)
+    public function add(Layout\Model $layout, Component_Instance $component)
     {
         /** @var Model $model */
         $model = $this->getMapper()->createModel();
@@ -154,7 +159,7 @@ class Controller extends Base
                 'template' => '@tile/modify.twig',
                 'data'     => array(
                     'item'       => $model,
-                    'layout'     => $this->getLayoutFromComponent($component),
+                    'layout'     => $layout,
                     'component'  => $component,
                     'attachzone' => $this->getAttachZoneData($model),
                     'folder'     => $this->getFolderForComponent($component),
@@ -166,10 +171,12 @@ class Controller extends Base
     /**
      * Create form for a new tile.
      *
+     * @param Layout\Model       $layout
      * @param Component_Instance $component
-     * @throws \RuntimeException if tile is added to non-existent layout
+     * @throws MapperException
+     * @throws \Aura\Router\Exception\RouteNotFound
      */
-    public function create(Component_Instance $component)
+    public function create(Layout\Model $layout, Component_Instance $component)
     {
         /** @var Model $item */
         $item = $this->getMapper()->createModel();
@@ -179,7 +186,6 @@ class Controller extends Base
         );
 
         // updateItemWithFormValues() doesn't set the layout item - set it here.
-        $layout = $this->getLayoutFromComponent($component);
         if (!($layout->getId())) {
             throw new \RuntimeException('Layout must be created before adding a tile');
         }
