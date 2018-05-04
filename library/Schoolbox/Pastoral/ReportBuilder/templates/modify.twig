@@ -237,11 +237,6 @@
                         if ($(checkbox).is(':checked')) {
                             // ...show the subtypes for this type
                             $(checkbox).siblings(siblingSelector).show();
-
-                            // ...and check them by default
-                            $subCheckboxes.each(function(index, subCheckbox) {
-                                $(subCheckbox).prop('checked', true);
-                            })
                         } else {
                             // Hide subtypes by default to reduce vertical scrolling
                             $(checkbox).siblings(siblingSelector).hide();
@@ -278,9 +273,11 @@
                     // Show/hide subtypes on select/deselect all
                     $("#type-all").change(function(e) {
                         if ($(e.target).is(':checked')) {
-                            $(siblingSelector).show();
+                            $(parentTypeSelector).prop("checked", true);
+                            $(siblingSelector).prop("checked", true).show();
                         } else {
-                            $(siblingSelector).hide();
+                            $(parentTypeSelector).prop("checked", false);
+                            $(siblingSelector).prop("checked", false).hide();
                         }
                     });
                 });
