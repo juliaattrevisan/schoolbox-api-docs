@@ -74,8 +74,9 @@ Data:
                                         <span class="{{ cssClass }}">{{ class.desc }}</span>
                                     {% endif %}
 
-                                    <div>{% if class.code %}({{ class.code }}){% endif %}<br />
-                                        {{ class.room }}</div>
+                                    {% if class.code %}<div>({{ class.code }})</div>{% endif %}
+
+                                    {% if class.room %}<div>{{ class.room }}</div>{% endif %}
 
                                     {% if class.attendance.link %}
                                         <br />
