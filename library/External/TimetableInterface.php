@@ -98,26 +98,32 @@ interface External_TimetableInterface
      * Depending on the role for $userId (staff or student) this summons the respective
      * method to spawn associated timetable
      *
-     * Has the structure for each period
+     * Returns the following structure:
      *
-     * periodName
-     * periodStart
-     * periodEnd
-     * periodNumber
-     * periodSequence
-     * description
-     * code
-     * room
-     * staffID
-     * staffTitle
-     * staffFirstname
-     * staffSurname
+     * @internal string      array[]['periodName']
+     * @internal string      array[]['periodStart']
+     * @internal string      array[]['periodEnd']
+     * @internal null|int    array[]['periodNumber']
+     * @internal null|int    array[]['periodSequence']
+     * @internal string      array[]['class'][]['description']
+     * @internal null|string array[]['class'][]['code']
+     * @internal string      array[]['class'][]['room']
+     * @internal string      array[]['class'][]['campus']
+     * @internal null|string array[]['class'][]['staffID']
+     * @internal null|string array[]['class'][]['staffTitle']
+     * @internal null|string array[]['class'][]['staffFirstname']
+     * @internal null|string array[]['class'][]['staffSurname']
+     * @internal string      array[]['class'][]['SubstituteFlag']
+     * @internal null|int    array[]['class'][]['SubstitutedFlag']
+     * @internal null|int    array[]['class'][]['AttendanceMarked']
+     * @internal null|bool   array[]['class'][]['AttendanceEnabled']
+     * @internal null|int    array[]['class'][]['ClassCancelled']
      *
-     * @param $externalUserId
-     * @param $userId
+     * @param string $externalUserId
+     * @param int $userId
      * @param Schoolbox\Campus $campus
      * @param Alaress_Date_Format $date
-     * @return mixed
+     * @return array
      */
     public function getTimetableForDate($externalUserId, $userId, \Schoolbox\Campus $campus, Alaress_Date_Format $date);
 

@@ -11,7 +11,7 @@ Data:
     campusTimetables[]['periods'][]['end']                                string      eg '9:30am'
     campusTimetables[]['periods'][]['isCurrent']                          bool        Is this period currently on?
     campusTimetables[]['periods'][]['classes']                            array
-    campusTimetables[]['periods'][]['classes'][]['code']                  string      eg '(11/12/SCI)'
+    campusTimetables[]['periods'][]['classes'][]['code']                  null|string eg '11/12/SCI'
     campusTimetables[]['periods'][]['classes'][]['room']                  string      eg 'GND1'
     campusTimetables[]['periods'][]['classes'][]['url']                   string      eg '/homepage/code/11%252F12%252FSCI'
     campusTimetables[]['periods'][]['classes'][]['colour']                string      eg '#ffe0cc'
@@ -74,8 +74,9 @@ Data:
                                         <span class="{{ cssClass }}">{{ class.desc }}</span>
                                     {% endif %}
 
-                                    <div>{{ class.code }}<br />
-                                        {{ class.room }}</div>
+                                    {% if class.code %}<div>({{ class.code }})</div>{% endif %}
+
+                                    {% if class.room %}<div>{{ class.room }}</div>{% endif %}
 
                                     {% if class.attendance.link %}
                                         <br />
