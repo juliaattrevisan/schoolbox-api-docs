@@ -91,6 +91,21 @@ class Queue extends ResourceVideo
 
         $this->storageMapper = StorageMapper::getInstance();
 
+    }
+
+    /**
+     * Determines if file is audio or video and does corresponding processing
+     *
+     * @param LoggerInterface|null $logger Optional logger for debugging purposes
+     *
+     * @return bool
+     *
+     * @throws MapperException
+     * @throws \League\Flysystem\FileExistsException
+     * @throws \League\Flysystem\FileNotFoundException
+     */
+    public function process(LoggerInterface $logger = null)
+    {
         // Grab transcoding configuration
 
         $this->audioBitrate = $this->getConfig()->get("audio_bitrate");
@@ -107,21 +122,7 @@ class Queue extends ResourceVideo
         } else {
             $this->processTimeout = self::DEFAULT_TIMEOUT;
         }
-    }
 
-    /**
-     * Determines if file is audio or video and does corresponding processing
-     *
-     * @param LoggerInterface|null $logger Optional logger for debugging purposes
-     *
-     * @return bool
-     *
-     * @throws MapperException
-     * @throws \League\Flysystem\FileExistsException
-     * @throws \League\Flysystem\FileNotFoundException
-     */
-    public function process(LoggerInterface $logger = null)
-    {
         $this->log = $logger;
 
         $result = false;
@@ -519,10 +520,10 @@ class Queue extends ResourceVideo
 
         if ($width && $height) {
             list($containedWidth, $containedHeight) = $this->contain([$width, $height], [1280, 720]);
-            $videoScale = sprintf("-vf scale=%d:%d", intval($containedWidth / 2) * 2, intval($containedHeight / 2) * 2);
+            $videoScale = sprintf("-vf scale=%d:%d", $containedWidth, $containedHeight);
 
             list($thumbWidth, $thumbHeight) = $this->cover([$width, $height], [64, 64]);
-            $thumbScale = sprintf("scale=%d:%d,", intval($thumbWidth / 2) * 2, intval($thumbHeight / 2) * 2);
+            $thumbScale = sprintf("scale=%d:%d,", $thumbWidth, $thumbHeight);
         }
 
         return [
@@ -556,7 +557,7 @@ class Queue extends ResourceVideo
             $height = $maxHeight;
         }
 
-        return [$width, $height];
+        return [(int)(ceil($width /2)*2), (int)(ceil($height / 2) * 2)];
     }
 
     /**
@@ -575,7 +576,7 @@ class Queue extends ResourceVideo
         list($coverWidth, $coverHeight) = $coverDimensions;
         $newRatio = max($coverWidth / $width, $coverHeight / $height);
 
-        return [$width * $newRatio, $height * $newRatio];
+        return [(int)(ceil(($width * $newRatio) / 2) * 2), (int)(ceil(($height * $newRatio) / 2) * 2)];
     }
 
     // ----------------------------------------------------------------------------------------------------------------
