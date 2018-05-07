@@ -81,17 +81,15 @@
                                     floor: yMin,
                                     max: yMax,
                                     ceiling: yMax,
-                                    tickInterval: 5,
+                                    tickPositioner: function () {
+                                        var yMean = (yMin + yMax) / 2;
+                                        return [yMin, (yMin + yMean) / 2, yMean, (yMax + yMean) / 2, yMax];
+                                    },
                                     title: {
                                         text: null
                                     },
                                     labels: {
-                                        formatter: function () {
-                                            if (this.isFirst || this.isLast) {
-                                                return this.axis.defaultLabelFormatter.call(this);
-                                            }
-                                            return null;
-                                        }
+                                        step: 2
                                     }
                                 },
                                 series: [
