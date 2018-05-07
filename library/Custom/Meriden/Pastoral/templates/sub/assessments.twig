@@ -51,6 +51,7 @@
                             // Set y-minimum to the series low, down to the nearest 5
                             var prettyMark = "{{ workItem.pretty_mark | replace({'%': ''}) }}",
                                 seriesData = {{ workItem.distribution.continuous.series|json_encode|raw }},
+                                yMax       = 100,
                                 yMin       = seriesData.low - (seriesData.low % 5);
                             $('#assessmentGraph-{{ workItem.assessment.id }}-{{ student.id }}').highcharts({
                                 chart: {
@@ -77,13 +78,17 @@
                                 },
                                 yAxis: {
                                     min: yMin,
-                                    max: 100,
-                                    tickInterval: 25,
+                                    max: yMax,
                                     title: {
                                         text: null
                                     },
                                     labels: {
-                                        step: 2
+                                        formatter: function () {
+                                            if (this.isFirst || this.isLast) {
+                                                return this.axis.defaultLabelFormatter.call(this);
+                                            }
+                                            return null;
+                                        }
                                     }
                                 },
                                 series: [
