@@ -48,7 +48,10 @@
                 <script type="text/javascript">
                     (function($){
                         $(function() {
-                            var prettyMark = "{{ workItem.pretty_mark | replace({'%': ''}) }}";
+                            // Set y-minimum to the series low, down to the nearest 5
+                            var prettyMark = "{{ workItem.pretty_mark | replace({'%': ''}) }}",
+                                seriesData = {{ workItem.distribution.continuous.series|json_encode|raw }},
+                                yMin       = seriesData.low - (seriesData.low % 5);
                             $('#assessmentGraph-{{ workItem.assessment.id }}-{{ student.id }}').highcharts({
                                 chart: {
                                     inverted: true,
@@ -73,7 +76,7 @@
                                     tickLength: 0
                                 },
                                 yAxis: {
-                                    min: 0,
+                                    min: yMin,
                                     max: 100,
                                     tickInterval: 25,
                                     title: {
@@ -87,7 +90,7 @@
                                     {
                                         type: 'boxplot',
                                         name: null,
-                                        data: [{{ workItem.distribution.continuous.series|json_encode|raw }}],
+                                        data: [seriesData],
                                         tooltip: {
                                             headerFormat: '',
                                             pointFormat:
