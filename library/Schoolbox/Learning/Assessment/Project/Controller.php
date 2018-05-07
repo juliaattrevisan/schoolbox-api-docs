@@ -146,6 +146,11 @@ class Controller extends Assessment\Controller
             ->map([$mutator, 'map'])
             ->filter([$mutator, 'filter'])
             ->filter(function(IAssessable $subAssessable) use ($student) {
+                // Don't show assessment if user is excluded
+                $participant = $subAssessable->getParticipantIfExtant($student);
+                if ($participant && $participant->isExcluded()) {
+                    return false;
+                }
                 // If a parent, only show sub-assessments if the current viewee is participating
                 return !(!$subAssessable->isParticipant($student) && $this->getUser()->getRole()->isParent());
             });
