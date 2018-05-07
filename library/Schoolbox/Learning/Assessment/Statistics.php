@@ -64,7 +64,13 @@ class Statistics
     public function getCountParticipants(): int
     {
         if (null === $this->cacheCountParticipants) {
-            $this->cacheCountParticipants = $this->assessment->getAllParticipants()->count();
+            $count = 0;
+            foreach ($this->assessment->getAllParticipants() as $participation) {
+                if (!$participation->isExcluded()) {
+                    $count++;
+                }
+            }
+            $this->cacheCountParticipants = $count;
         }
         return $this->cacheCountParticipants;
     }
@@ -82,7 +88,7 @@ class Statistics
         if (null === $this->cacheCountResponseRequired) {
             $this->cacheCountResponseRequired = 0;
             foreach ($this->assessment->getAllParticipants() as $participant) {
-                if ($participant->isResponseRequired()) {
+                if (!$participant->isExcluded() && $participant->isResponseRequired()) {
                     $this->cacheCountResponseRequired++;
                 }
             }
@@ -103,7 +109,7 @@ class Statistics
         if (null === $this->cacheCountFeedbackRequired) {
             $this->cacheCountFeedbackRequired = 0;
             foreach ($this->assessment->getAllParticipants() as $participant) {
-                if ($participant->isFeedbackRequired()) {
+                if (!$participant->isExcluded() && $participant->isFeedbackRequired()) {
                     $this->cacheCountFeedbackRequired++;
                 }
             }
@@ -124,7 +130,7 @@ class Statistics
         if (null === $this->cacheCountReviewComplete) {
             $this->cacheCountReviewComplete = 0;
             foreach ($this->assessment->getAllParticipants() as $participant) {
-                if ($participant->isReviewComplete()) {
+                if (!$participant->isExcluded() && $participant->isReviewComplete()) {
                     $this->cacheCountReviewComplete++;
                 }
             }
@@ -145,7 +151,7 @@ class Statistics
         if (null === $this->cacheCountHasSubmittedResponse) {
             $this->cacheCountHasSubmittedResponse = 0;
             foreach ($this->assessment->getAllParticipants() as $participant) {
-                if ($participant->hasSubmittedResponse()) {
+                if (!$participant->isExcluded() && $participant->hasSubmittedResponse()) {
                     $this->cacheCountHasSubmittedResponse++;
                 }
             }
@@ -164,7 +170,7 @@ class Statistics
         if (null === $this->cacheCountHasPublishedFeedback) {
             $this->cacheCountHasPublishedFeedback = 0;
             foreach ($this->assessment->getAllParticipants() as $participant) {
-                if ($participant->hasPublishedFeedback()) {
+                if (!$participant->isExcluded() && $participant->hasPublishedFeedback()) {
                     $this->cacheCountHasPublishedFeedback++;
                 }
             }
@@ -187,7 +193,7 @@ class Statistics
         if (null === $this->cacheCountHasMark) {
             $this->cacheCountHasMark = 0;
             foreach ($this->assessment->getAllParticipants() as $participant) {
-                if ($participant->hasMark()) {
+                if (!$participant->isExcluded() && $participant->hasMark()) {
                     $this->cacheCountHasMark++;
                 }
             }
