@@ -21,6 +21,11 @@ table.rb {
                 }
             }
             + label {
+                // Prevent iPad breakage
+                * {
+                    pointer-events: none;
+                }
+
                 &:hover {
                     color: calc-text-color($content-ui-hover);
                     cursor: pointer;
