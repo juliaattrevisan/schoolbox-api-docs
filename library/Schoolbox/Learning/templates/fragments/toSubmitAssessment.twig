@@ -68,7 +68,7 @@
             <p data-count-to-chase title="{{ stats.countResponseRequired }} of {{ stats.countParticipants }} students have not {{ noResultsTitleSuffix }}" data-title-suffix="{{ noResultsTitleSuffix }}"><span data-user-count>{{ stats.countResponseRequired }}</span> {{ state }}</p>
         </div>
         <ul class="information-list hide" data-participant-list data-collapsable="to-chase-{{ assessment.id }}" data-collapse-state="collapsed">
-            {% for participant in assessment.allParticipants %}
+            {% for participant in assessment.allParticipants if not participant.excluded %}
                 {% if participant.responseRequired %}
                     {% include '@learning/fragments/toSubmitParticipant.twig' with {
                         participant: participant,

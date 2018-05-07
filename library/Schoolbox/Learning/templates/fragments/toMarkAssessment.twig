@@ -64,7 +64,7 @@
             <p data-count-to-mark title="{{ stats.countFeedbackRequired }} of {{ stats.countParticipants }} students require marking"><span data-user-count>{{ stats.countFeedbackRequired }}</span> unmarked</p>
         </div>
         <ul class="information-list hide" data-participant-list data-collapsable="to-mark-{{ assessment.id }}" data-collapse-state="collapsed">
-            {% for participant in assessment.allParticipants %}
+            {% for participant in assessment.allParticipants if not participant.excluded %}
                 {% if participant.isFeedbackRequired %}
                     {% include '@learning/fragments/toMarkParticipant.twig' with {
                         participant: participant,
