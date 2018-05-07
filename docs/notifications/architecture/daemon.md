@@ -23,6 +23,12 @@ task.
     A long-running process which listens to events, and acts upon those events.
   </dd>
 
+  <dt>Event Listener</dt>
+  <dd>
+    The mechanism through which the Daemon listens for external events, and
+    then prompts the Daemon to act.
+  </dd>
+
   <dt>Message Broker</dt>
   <dd>
     The high-level interface through which Messages are Published and
@@ -67,15 +73,25 @@ task.
 ## Implementation
 
 Schoolbox Daemons are implemented as a collection of parts:
-* Message Broker Subscription
-  * > TODO note that a daemon can listen to any external event, not just a
-      message queue. For example: the socket daemon is a HTTP server.
+* Event Listener
 * Scheduler (optional)
 * Dispatcher
 * Response Handler
 
 
-### Message Broker Subscription
+### Event Listener
+
+The Event Listener need not be an implementation of any particular class or
+interface, but it must at least be something that knows about events that
+happen outside of the Daemon.
+
+Daemons currently use one of the following as their Event Listener (but are not
+restricted to using either):
+* Message Broker Subscription
+* HTTP Server
+
+
+#### Message Broker Subscription
 
 The Message Broker is an implementation of `\Alaress\Async\Broker\IBroker`.
 (Further documentation on Message Brokers may be found in the
@@ -102,6 +118,19 @@ Once the Task has finished, the Daemon either:
 
 Then, the Response is sent to the Response Handler to act upon; the action
 that the Response Handler takes is implementation-specific.
+
+
+#### HTTP Server
+
+The HTTP Server within a Schoolbox Daemon functions as any other HTTP server
+would: it listens to HTTP requests on a particular port, and responds to them.
+
+When a HTTP request is received, the Daemon uses the request as a signal to
+Dispatch a Task (just as it does when the Daemon contains a Message Broker
+Subscription).
+
+Once the Task has finished, the Response Handler is responsible for returning a
+HTTP response to the requesting client.
 
 
 ### Scheduler
