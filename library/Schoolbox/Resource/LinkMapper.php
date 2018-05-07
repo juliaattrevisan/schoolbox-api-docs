@@ -248,11 +248,11 @@ class LinkMapper extends Mapper implements ILocator, Searchable
         // sort the array by description using natural sort
         if ($sort === 'description') {
             if ($sortDir === 'DESC') {
-                $callback = function ($a, $b) {
+                $callback = function (Link $a, Link $b) {
                     return strnatcasecmp($b->getDescription(), $a->getDescription());
                 };
             } else {
-                $callback = function ($a, $b) {
+                $callback = function (Link $a, Link $b) {
                     return strnatcasecmp($a->getDescription(), $b->getDescription());
                 };
             }
