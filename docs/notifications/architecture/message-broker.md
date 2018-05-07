@@ -41,6 +41,12 @@ how a message broker must work.
     Broker uses as its AMQP and STOMP implementation.
   </dd>
 
+  <dt>Event Loop</dt>
+  <dd>
+    A low-level mechanism that the STOMP protocol implementation uses to
+    asynchronously subscribe to published Messages.
+  </dd>
+
   <dt>Queue</dt>
   <dd>
     The low-level implementation of a message queue that the Message Broker
@@ -95,20 +101,34 @@ stored in the data store.
 Schoolbox Message Queues use [AMQP](https://www.amqp.org/) as the protocol for
 publishing messages.
 
+Schoolbox uses an implementation of `\Alaress\Async\AMQP\AMQPInterface` for its
+Message Queue Publishers.
+
 
 #### STOMP
 
 Schoolbox Message Queues use [STOMP](https://stomp.github.io/) as the protocol
 for registering a Subscriber.
 
+Schoolbox uses an instance of `\React\Stomp\Client` for its Message Queue
+Subscriptions.
+
 
 #### Why two separate protocols?
 
 > TODO verify veracity of below statements
 
-AMQP is best suited for publishing, because... TODO
+AMQP is best suited for publishing, because it has the ability to send to a
+particular exchange.
 
-STOMP is best suited for subscription, because... TODO
+> In practise: all the Message Brokers seem to send to the default exchange?
+
+STOMP is best suited for subscription, because of its asynchronicity: the STOMP
+client library Schoolbox uses makes use of the Event Loop so that subscriptions
+do not block.
+
+RabbitMQ is able to understand both protocols, and can translate a message
+published via AMQP into STOMP when a Subscriber receives it.
 
 
 ### Data Store
