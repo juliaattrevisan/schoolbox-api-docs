@@ -9,8 +9,6 @@ task.
 
 > TODO: AMQP, STOMP
 
-> TODO: real-world example of how a daemon works
-
 > TODO: sequence/class/object diagrams?
 
 ## Glossary
