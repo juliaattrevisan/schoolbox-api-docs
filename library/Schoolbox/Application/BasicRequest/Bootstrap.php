@@ -520,13 +520,6 @@ class Bootstrap extends AbstractBootstrap {
                     }
                 }
 
-                // Report to New Relic
-                if (extension_loaded('newrelic')) {
-                    if ($e instanceof \Exception || $e instanceof \Throwable) {
-                        newrelic_notice_error(null, $e);
-                    }
-                }
-
                 if(isset($_SERVER['HTTP_HOST'])) {
                     $url = 'http'.(getenv("SERVER_PORT") == 443 ? 's://' : '://') . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
                 }

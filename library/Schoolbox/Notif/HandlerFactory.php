@@ -88,11 +88,7 @@ class HandlerFactory
         };
         $this->handlerGenerators[self::SYS_EXCEPTION_MAIL] = function ()
         {
-            if (extension_loaded('newrelic')) {
-                return new NullHandler(Logger::CRITICAL);
-            } else {
-                return $this->createMailHandler('Uncaught Exception in Schoolbox', Logger::CRITICAL);
-            }
+            return new NullHandler(Logger::CRITICAL);
         };
         $this->handlerGenerators[self::SYS_NULL_DEBUG] = function ()
         {
