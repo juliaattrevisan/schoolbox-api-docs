@@ -13,8 +13,6 @@ how a message broker must work.
 
 > TODO: class/object diagrams?
 
-> TODO: AMQP/STOMP
-
 
 ## Glossary
 
@@ -23,6 +21,24 @@ how a message broker must work.
   <dd>
     The high-level interface through which Messages are Published and
     Subscribed to.
+  </dd>
+
+  <dt>AMQP</dt>
+  <dd>
+    Advanced Message Queueing Protocol: the protocol that the Message Broker
+    uses for publishing messages.
+  </dd>
+
+  <dt>STOMP</dt>
+  <dd>
+    Simple/Streaming Text Oriented Messaging Protocol: the protocol that the
+    Message Broker uses for registering a Subscriber.
+  </dd>
+
+  <dt>RabbitMQ</dt>
+  <dd>
+    The low-level implementation of message broking that the Schoolbox Message
+    Broker uses as its AMQP and STOMP implementation.
   </dd>
 
   <dt>Queue</dt>
@@ -66,13 +82,33 @@ two-part message broker; concrete brokers may extend this abstract class.
 
 ### Queue
 
-The queue itself is an implementation of the [AMQP](https://www.amqp.org/)
-protocol. Schoolbox uses [RabbitMQ](https://www.rabbitmq.com/) as its AMQP
+Schoolbox uses [RabbitMQ](https://www.rabbitmq.com/) as its AMQP and STOMP
 implementation; in theory, it could be switched for a different implementation
 without having to modify the interfacing code.
 
 The queue itself stores no data other than keys; the actual message payload is
 stored in the data store.
+
+
+#### AMQP
+
+Schoolbox Message Queues use [AMQP](https://www.amqp.org/) as the protocol for
+publishing messages.
+
+
+#### STOMP
+
+Schoolbox Message Queues use [STOMP](https://stomp.github.io/) as the protocol
+for registering a Subscriber.
+
+
+#### Why two separate protocols?
+
+> TODO verify veracity of below statements
+
+AMQP is best suited for publishing, because... TODO
+
+STOMP is best suited for subscription, because... TODO
 
 
 ### Data Store
@@ -86,7 +122,7 @@ and will be removed from the queue.
 
 ### Why a two-part implementation?
 
-#### Why not just AMQP?
+#### Why not just RabbitMQ?
 
 An earlier implementation of the notification system used RabbitMQ as both the
 queue and the data store.
