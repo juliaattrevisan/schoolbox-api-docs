@@ -13,6 +13,8 @@ how a message broker must work.
 
 > TODO: class/object diagrams?
 
+> TODO: AMQP/STOMP
+
 
 ## Glossary
 
