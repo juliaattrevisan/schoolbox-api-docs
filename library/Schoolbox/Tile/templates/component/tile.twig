@@ -1,10 +1,19 @@
+
+{% set routeParams = {
+    layoutId:  component.layout.id,
+    layout:    component.layout,
+    component: component.instance,
+    homepage:  component.context,
+} %}
+
 {% if component.layout.tileList is empty %}
 
     <div class="empty-state">
         <i class="icon-tiles"></i>
 
-        {% if writeAccess %}
-            <p><a href="/tile/add/{{ tile_component_instance_id }}">Add a tile</a> to create buttons or banners that link to other pages.</p>
+        {% set addTileUrl = routeLookupIfAuthorized("tile.add", routeParams) %}
+        {% if writeAccess and addTileUrl %}
+            <p><a href="{{ addTileUrl }}">Add a tile</a> to create buttons or banners that link to other pages.</p>
         {% else %}
             <p>There are no tiles available at this time.</p>
         {% endif %}
@@ -22,12 +31,6 @@
     %}
 
     {% if writeAccess %}
-        {% set routeParams = {
-            layoutId:  component.layout.id,
-            layout:    component.layout,
-            component: component.instance,
-            homepage:  component.context,
-        } %}
         {% set addTileUrl = routeLookupIfAuthorized("tile.add", routeParams) %}
         {% set modifyUrl = routeLookupIfAuthorized("tile.layout", routeParams) %}
         {% if addTileUrl or modifyUrl %}
