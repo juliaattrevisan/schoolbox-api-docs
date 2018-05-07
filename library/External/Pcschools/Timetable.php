@@ -225,7 +225,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
             $teacherExternalId = $user->getExternalId();
         }
 
-        $statement = $this->getDatabase()->prepareProcedure('spSelTimetable');
+        $statement = $this->getDatabase()->prepareProcedure('spSelTimeTableSchoolBox');
         $statement->bindInputs([
             'DATE'        => date('Ymd'),
             'TIMEPERIOD'  => $timePeriod,
@@ -342,7 +342,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
             $teacherExternalId = $user->getExternalId();
         }
 
-        $statement = $this->getDatabase()->prepareProcedure('spSelTimetable');
+        $statement = $this->getDatabase()->prepareProcedure('spSelTimeTableSchoolBox');
         $statement->bindInputs([
             'DATE'        => $date->getUsingFormat('Ymd'),
             'TIMEPERIOD'  => $timePeriod,
@@ -491,7 +491,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
             $teacherExternalId = $user->getExternalId();
         }
 
-        $statement = $this->getDatabase()->prepareProcedure('spSelTimetable');
+        $statement = $this->getDatabase()->prepareProcedure('spSelTimeTableSchoolBox');
         $statement->bindInputs([
             'DATE'        => date('Ymd'),
             'TIMEPERIOD'  => $timePeriod,
