@@ -607,4 +607,19 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     {
         return true;
     }
+
+    /**
+     * Returns a string of all codes on the folder, comma delineated
+     */
+    public function getCodeList()
+    {
+        $codes = [];
+        $codeModels = $this->getCodes();
+
+        foreach ($codeModels as $codeModel) {
+            $codes[] = $codeModel->getCode();
+        }
+
+        return implode(', ', $codes);
+    }
 }
