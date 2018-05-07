@@ -247,16 +247,7 @@ class LinkMapper extends Mapper implements ILocator, Searchable
 
         // sort the array by description using natural sort
         if ($sort === 'description') {
-            if ($sortDir === 'DESC') {
-                $callback = function (Link $a, Link $b) {
-                    return strnatcasecmp($b->getDescription(), $a->getDescription());
-                };
-            } else {
-                $callback = function (Link $a, Link $b) {
-                    return strnatcasecmp($a->getDescription(), $b->getDescription());
-                };
-            }
-            $collection = $collection->sortByCallback($callback, true);
+            $collection = $collection->sortByCallback($this->getNaturalSortCallback($sortDir), true);
         }
 
         return $collection;
@@ -318,6 +309,27 @@ class LinkMapper extends Mapper implements ILocator, Searchable
     public function findByFolderId($nodeId)
     {
         // Sort by title
-        return $this->findByColumn('category', $nodeId, ['order' => ['description' => 'asc',],]);
+        $collection = $this->findByColumn('category', $nodeId);
+        return $collection->sortByCallback($this->getNaturalSortCallback(), true);
+    }
+
+    /**
+     * Gets callback for link natural sorting
+     * @param string $direction
+     * @return \Closure
+     */
+    private function getNaturalSortCallback(string $direction = 'ASC')
+    {
+        if ($direction === 'ASC') {
+            $callback = function (Link $a, Link $b) {
+                return strnatcmp($a->getDescription(), $b->getDescription());
+            };
+        } else {
+            $callback = function (Link $a, Link $b) {
+                return strnatcmp($b->getDescription(), $a->getDescription());
+            };
+        }
+
+        return $callback;
     }
 }
