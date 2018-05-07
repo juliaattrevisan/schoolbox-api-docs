@@ -22,7 +22,12 @@
     %}
 
     {% if writeAccess %}
-        {% set routeParams = {layoutId: component.layout.id, layout: component.layout, component: component} %}
+        {% set routeParams = {
+            layoutId:  component.layout.id,
+            layout:    component.layout,
+            component: component.instance,
+            homepage:  component.context,
+        } %}
         {% set addTileUrl = routeLookupIfAuthorized("tile.add", routeParams) %}
         {% set modifyUrl = routeLookupIfAuthorized("tile.layout", routeParams) %}
         {% if addTileUrl or modifyUrl %}
