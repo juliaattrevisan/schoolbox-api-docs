@@ -100,9 +100,8 @@
                                         tooltip: {
                                             headerFormat: '',
                                             pointFormat:
-                                                'Maximum: {point.high}<br/>' +
-                                                'Median: {point.median}<br/>' +
-                                                'Minimum: {point.low}<br/>'
+                                                'Mean: {{ workItem.distribution.continuous.mean.mark | number_format(1) }}' +
+                                                '<br/>Median: {point.median}<br/>'
                                         }
                                     },
                                     {
