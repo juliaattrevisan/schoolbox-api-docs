@@ -62,7 +62,7 @@ $kernel->run(function(Di\Container $di, LoopInterface $loop, Logger $log, array 
 
             // ensure endpoints exist
             foreach ($instances as $instance) {
-                $txrx = RouteTXRX::buildTransactor(new Retractor($redis, $instance));
+                $txrx = RouteTXRX::buildTransmitter(new Retractor($redis, $instance));
 
                 // this holds and traverses all our subscription data
                 $router = new Router(new SubscriptionDictionary('.'));

@@ -32,8 +32,8 @@ class RouteTXRX implements TXRX
     /**
      * Constructor
      *
-     * @see buildForDaemon
-     * @see buildForWorker
+     * @see `$this->buildTransmitter`
+     * @see `$this->buildReceiver`
      *
      * @param UserMapper|null     $mapper
      * @param QueueSorter|null    $sorter
@@ -51,13 +51,13 @@ class RouteTXRX implements TXRX
 
 
     /**
-     * "Constructor" for the transactor variant of this object, as used in
+     * "Constructor" for the transmitter variant of this object, as used in
      * daemons.
      *
      * @param QueueInterface $queue
      * @return self
      */
-    public static function buildTransactor(QueueInterface $queue): self
+    public static function buildTransmitter(QueueInterface $queue): self
     {
         return new static(null, null, $queue);
     }
