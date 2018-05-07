@@ -22,7 +22,6 @@ table.rb {
             }
             + label {
                 &:hover {
-                    background: $content-ui-hover;
                     color: calc-text-color($content-ui-hover);
                     cursor: pointer;
                 }
