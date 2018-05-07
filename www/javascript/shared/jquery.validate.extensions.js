@@ -275,7 +275,7 @@
             list = JSON.parse(list);
         }
 
-        return list.indexOf(value) < 0;
+        return list.indexOf($.trim(value)) < 0;
 
     }, 'This heading is already in use - please choose another.');
 
