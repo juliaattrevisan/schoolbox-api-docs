@@ -102,7 +102,7 @@ class Mapper extends BaseMapper
      *
      * @return Collection|User[]
      */
-    public function findRecentStudents($count = 5, $offset = 0)
+    public function findRecentStudents(int $count = 5, int $offset = 0): Collection
     {
         /** @var UserMapper $userMapper */
         $userMapper = $this->getJoinMapper('student');
