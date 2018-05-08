@@ -182,11 +182,6 @@ select {
 	font-family: $font-family-icon, $font-family-sans-serif;
 }
 
-//  this is to prevent iPad trigger events on label
-label > * {
-	pointer-events:none;
-}
-
 // remove margins on forms inside tables
 th, td{
 	input[type],
