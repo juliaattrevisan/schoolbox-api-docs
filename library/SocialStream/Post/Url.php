@@ -15,22 +15,27 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
     /**
      * Determine whether this should display an icon or something
      * via the image transform
-     * 
+     *
+     * @param $iconSize
      * @return string
      */
-    public function determineIcon(): string
+    public function determineIcon($iconSize = 'square64'): string
     {
-        $defaultIcon = 'application-octet-stream.svg';
-
         /* Load the current icon as set by Admin > Allowed Files because sysadmins can choose their own icons
          * If the filetype is indeterminate, return a default icon rather than nothing
          */
         try {
-            return MimetypeMapper::getInstance()->getByFilename($this->getExternalTitle())->getIconFile();
+            $iconFile = MimetypeMapper::getInstance()->getByFilename($this->getExternalTitle())->getIconFile();
+            return '/images/mime/' . $iconFile;
+        } catch (FileException $e) {
+            // noop;
         }
-        catch (FileException $e) {
-            return $defaultIcon;
+
+        if ($this->hasThumbnail()) {
+            return "/socialstream/image.php?size={$iconSize}&id=" . $this->getPostId();
         }
+        // default icon
+        return '/images/mime/application-octet-stream.svg';
     }
 
     /**
@@ -64,6 +69,7 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
                 'SOCIALSTREAM_POST_URL'            => Scrub::text($this->getUrl()),
                 'SOCIALSTREAM_POST_EXTERNAL_TITLE' => Scrub::text($this->getExternalTitle()),
                 'SOCIALSTREAM_POST_EXTERNAL_BODY'  => Scrub::text($this->getExternalBody()),
+                'SOCIALSTREAM_POST_ICON' => $icon,
             ));
 
             /* Parse metadata
@@ -71,23 +77,7 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
             if ('' !== $this->getExternalTitle() || '' !== $this->getExternalBody()) {
                 $page->parse('socialstream_post_has_metadata_block', 'socialstream_post_has_metadata');
             }
-
-            /* Parse icon
-              */
-            if ($icon) {
-                $page->setVar(array(
-                    'SOCIALSTREAM_POST_ICON' => $icon,
-                ));
-                $page->parse('socialstream_post_has_icon_block', 'socialstream_post_has_icon');
-            }
-            /* Parse thumbnail if one was successfully found
-             */
-            elseif ($this->hasThumbnail()) {
-                $page->parse('socialstream_post_has_thumbnail_block', 'socialstream_post_has_thumbnail');
-            } else {
-                // URL with no thumbnail
-                $page->parse('socialstream_post_has_link_block', 'socialstream_post_has_link');
-            }
+            $page->parse('socialstream_post_has_icon_block', 'socialstream_post_has_icon');
 
             return true;
         }
@@ -96,6 +86,7 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
                 'SOCIALSTREAM_COMMENT_URL'            => Scrub::text($this->getUrl()),
                 'SOCIALSTREAM_COMMENT_EXTERNAL_TITLE' => Scrub::text($this->getExternalTitle()),
                 'SOCIALSTREAM_COMMENT_EXTERNAL_BODY'  => Scrub::text($this->getExternalBody()),
+                'SOCIALSTREAM_COMMENT_ICON' => $icon,
             ));
 
             /* Parse metadata
@@ -103,23 +94,7 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
             if ('' !== $this->getExternalTitle() || '' !== $this->getExternalBody()) {
                 $page->parse('socialstream_comment_has_metadata_block', 'socialstream_comment_has_metadata');
             }
-
-            /* Parse icon
-             */
-            if ($icon) {
-                $page->setVar(array(
-                    'SOCIALSTREAM_COMMENT_ICON' => $icon,
-                ));
-                $page->parse('socialstream_comment_has_icon_block', 'socialstream_comment_has_icon');
-            }
-            /* Parse thumbnail if one was successfully found
-             */
-            elseif ($this->hasThumbnail()) {
-                $page->parse('socialstream_comment_has_thumbnail_block', 'socialstream_comment_has_thumbnail');
-            } else {
-                // URL with no thumbnail
-                $page->parse('socialstream_comment_has_link_block', 'socialstream_comment_has_link');
-            }
+            $page->parse('socialstream_comment_has_icon_block', 'socialstream_comment_has_icon');
 
             return true;
         }
@@ -128,6 +103,7 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
                 'SOCIALSTREAM_REPLY_URL'            => Scrub::text($this->getUrl()),
                 'SOCIALSTREAM_REPLY_EXTERNAL_TITLE' => Scrub::text($this->getExternalTitle()),
                 'SOCIALSTREAM_REPLY_EXTERNAL_BODY'  => Scrub::text($this->getExternalBody()),
+                'SOCIALSTREAM_REPLY_ICON' => $icon,
             ));
 
             /* Parse metadata
@@ -135,23 +111,7 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
             if ('' !== $this->getExternalTitle() || '' !== $this->getExternalBody()) {
                 $page->parse('socialstream_reply_has_metadata_block', 'socialstream_reply_has_metadata');
             }
-
-            /* Parse icon
-             */
-            if ($icon) {
-                $page->setVar(array(
-                    'SOCIALSTREAM_REPLY_ICON' => $icon,
-                ));
-                $page->parse('socialstream_reply_has_icon_block', 'socialstream_reply_has_icon');
-            }
-            /* Parse thumbnail if one was successfully found
-             */
-            elseif ($this->hasThumbnail()) {
-                $page->parse('socialstream_reply_has_thumbnail_block', 'socialstream_reply_has_thumbnail');
-            } else {
-                // URL with no thumbnail
-                $page->parse('socialstream_reply_has_link_block', 'socialstream_reply_has_link');
-            }
+            $page->parse('socialstream_reply_has_icon_block', 'socialstream_reply_has_icon');
 
             return true;
         }
