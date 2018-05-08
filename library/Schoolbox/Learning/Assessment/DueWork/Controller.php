@@ -13,6 +13,7 @@ use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Exception\RouteNotFound;
 use DomainException;
 use DueWork_ErrorMapper;
+use Raven_Client;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 use Schoolbox\GenericCollection;
@@ -658,6 +659,7 @@ class Controller extends Assessment\Controller
      * @param IAssessable|Model $assessment
      * @param User              $student
      * @return void
+     * @throws \Schoolbox\Application\Exception\Exception
      * @throws MapperException If unable to create new Response object
      * @throws MapperException\Deleted If specified Response is deleted
      * @throws RouteNotFound If unable to generate a specified Route
@@ -665,6 +667,7 @@ class Controller extends Assessment\Controller
      * @throws \LogicException If files are not saved prior to insertion into kami upload queue
      * @throws \PDOException If unable to save the Response
      * @throws \UnexpectedValueException
+     * @throws ServiceNotFound
      */
     public function postCreateResponse(IAssessable $assessment, User $student): void
     {
@@ -676,6 +679,24 @@ class Controller extends Assessment\Controller
          */
         $isFinal = !$rq->post['saveDraft'];
         $body    = $rq->post['body'];
+
+        /* Determine whether a finalised submission could be initialised
+         * Check that you don't exceed the specified rate limit
+         */
+        if ($isFinal) {
+            try {
+                (new ValidFinalisedSubmission())->isSatisfiedBy($assessment, $student, $this->getConfigLoader()->get('submission_window'));
+            } catch (\DomainException $e) {
+
+                // Report errors in this thing
+                /** @var Raven_Client|null $sentry */
+                if ($this->getDi()->has('sentry')) {
+                    $this->getDi()->get('sentry')->captureException($e);
+                }
+
+                throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_SUBMISSION_WINDOW_EXCEEDED);
+            }
+        }
 
         if ($rq->post['responseId']) {
             // Load an existing response to update
