@@ -352,7 +352,7 @@ class External_Humanedge_User implements External_UserInterface
                 ppp.PhoneType,
                 ppp.Number
             FROM Staff t
-            LEFT JOIN Person.PersonPhone ppp ON ppp.PersonID = t.PersonID AND Archived = 0 
+            LEFT JOIN Person.PersonPhone ppp ON ppp.PersonID = t.PersonID AND ppp.Archived = 0
             LEFT JOIN Campus c ON t.CampusID = c.ID
             WHERE t.Deceased = 'N' 
             AND t.Active = 'Y'
