@@ -116,19 +116,16 @@ class Mapper extends BaseMapper
         $students = $userMapper->createCollection();
 
         $statement = $this->getDatabase()->prepare("
-            
-            SELECT DISTINCT   MAX(`created_at`) as `created_at`,
-                              {$this->getJoinColumnString('student', 's')},
-                              {$this->getJoinMapper('student')->getJoinColumnString('role', 'r')}
-            FROM              {$this->database->quoteIdentifier($this->table)}
-            LEFT JOIN         {$this->getJoinSql('student', '', 's')}
-            LEFT JOIN         {$this->getJoinMapper('student')->getJoinSql('role', 's', 'r')}
-            WHERE             `s`.`id` IS NOT NULL AND
-                              `pastoral_audit`.`user_id` = :userId
-            GROUP BY          `s`.`id`
-            ORDER BY          MAX(`created_at`) DESC
-            LIMIT             {$count}
-            OFFSET            {$offset}
+            SELECT      {$this->getJoinColumnString('student', 's')},
+                        {$userMapper->getJoinColumnString('role', 'r')}
+            FROM        {$this->database->quoteIdentifier($this->table)}
+            INNER JOIN  {$this->getJoinSql('student', '', 's')}
+            LEFT  JOIN  {$userMapper->getJoinSql('role', 's', 'r')}
+            WHERE       {$this->table}.`user_id` = :userId
+            GROUP BY    `s`.`id`
+            ORDER BY    MAX({$this->table}.created_at) DESC
+            LIMIT       {$count}
+            OFFSET      {$offset}
         ");
 
         $statement->execute([
