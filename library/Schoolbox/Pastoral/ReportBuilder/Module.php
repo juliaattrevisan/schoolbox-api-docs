@@ -11,6 +11,7 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
+use HouseMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -66,6 +67,7 @@ class Module extends BaseModule
     {
         $mappers = [
             'userMapper'             => UserMapper::getInstance(),
+            'houseMapper'            => HouseMapper::getInstance(),
             'pastoralDataSource'     => $injector->get('pastoralDataSource'),
             'pastoralReportMapper'   => PastoralReportMapper::getInstance(),
             'pastoralSeverityMapper' => PastoralSeverityMapper::getInstance(),
