@@ -190,7 +190,7 @@ class Model implements ISoftDeletable
      * @param null|string $subTypesCsv
      * @return $this
      */
-    public function setSubTypesCsv(?string $subTypesCsv)
+    public function setSubTypesCsv(?string $subTypesCsv) : self
     {
         $this->subTypesCsv = $subTypesCsv;
         return $this;
@@ -199,7 +199,7 @@ class Model implements ISoftDeletable
     /**
      * @return null|string
      */
-    public function getSubTypesCsv()
+    public function getSubTypesCsv() : ?string
     {
         return $this->subTypesCsv;
     }
@@ -208,7 +208,7 @@ class Model implements ISoftDeletable
      * @param null|string $housesCsv
      * @return $this
      */
-    public function setHousesCsv(?string $housesCsv)
+    public function setHousesCsv(?string $housesCsv) : self
     {
         $this->housesCsv = $housesCsv;
         return $this;
@@ -217,7 +217,7 @@ class Model implements ISoftDeletable
     /**
      * @return null|string
      */
-    public function getHousesCsv()
+    public function getHousesCsv() : ?string
     {
         return $this->housesCsv;
     }
@@ -447,7 +447,7 @@ class Model implements ISoftDeletable
      *
      * @return self
      */
-    public function setSubTypes(Collection $subTypes)
+    public function setSubTypes(Collection $subTypes) : self
     {
         $this->subTypes = $subTypes;
 
@@ -457,7 +457,7 @@ class Model implements ISoftDeletable
     /**
      * @return null|Collection|PastoralSubType\Model[]
      */
-    public function getSubTypes()
+    public function getSubTypes() : ?Collection
     {
         return $this->subTypes;
     }
@@ -466,7 +466,7 @@ class Model implements ISoftDeletable
      * @param Collection|House[] $houses
      * @return $this
      */
-    public function setHouses(Collection $houses)
+    public function setHouses(Collection $houses) : self
     {
         $this->houses = $houses;
         return $this;
@@ -475,7 +475,7 @@ class Model implements ISoftDeletable
     /**
      * @return null|Collection|House[]
      */
-    public function getHouses()
+    public function getHouses() : ?Collection
     {
         return $this->houses;
     }
