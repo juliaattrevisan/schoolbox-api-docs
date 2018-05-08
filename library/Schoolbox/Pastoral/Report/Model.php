@@ -21,6 +21,7 @@ use Schoolbox\Pastoral\Severity\Model as PastoralSeverity;
 use Schoolbox\Pastoral\Tag as PastoralTag;
 use Schoolbox\Pastoral\Type as PastoralType;
 use Schoolbox\User;
+use House;
 
 class Model implements ISoftDeletable
 {
