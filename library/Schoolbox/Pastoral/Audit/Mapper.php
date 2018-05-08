@@ -114,8 +114,6 @@ class Mapper extends BaseMapper
         /** @var RoleMapper $roleMapper */
         $roleMapper = $userMapper->getJoinMapper('role');
 
-        $students = $userMapper->createCollection();
-
         $statement = $this->getDatabase()->prepare("
             SELECT      {$this->getJoinColumnString('student', 's')},
                         {$userMapper->getJoinColumnString('role', 'r')}
@@ -133,17 +131,12 @@ class Mapper extends BaseMapper
             'userId' =>  $viewer->getId(),
         ]);
 
+        $students = $userMapper->createCollection();
+
         foreach ($statement as $row) {
             // Hydrate the student and their role for display purposes
-
-            $model   = $this->hydrate($row);
-            $student = $userMapper->hydrate($row, 's');
-            $role    = $roleMapper->hydrate($row, 'r');
-
-            $model->setStudent($student);
-            $student->setRole($role);
-
-            $students->add($student);
+            $student = $userMapper->hydrate($row, 's')->setRole($roleMapper->hydrate($row, 'r'));
+            $students[$student->getId()] = $student;
         }
 
         return $students;
