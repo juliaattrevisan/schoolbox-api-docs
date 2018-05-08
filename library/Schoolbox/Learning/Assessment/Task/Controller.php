@@ -130,7 +130,8 @@ class Controller extends Assessment\Controller
         if ($assessment->getUrl()) {
             $previewFragment = (new PreviewFactory($this->getRouter()))->urlFragment($assessment->getUrl(), $this->getUser());
 
-            if ($previewFragment['type'] == 'redirect' && !$assessment->getDescription()) {
+            if (($previewFragment['type'] == 'redirect' || $previewFragment['type'] == 'iframe')
+                && !$assessment->getDescription()) {
 
                 // Don't save a response if instructor is looking at student's summary page
                 if ($assessment->isSelfAssessable() && (int)$student->getId() === (int)$this->getUser()->getId()) {
@@ -144,7 +145,7 @@ class Controller extends Assessment\Controller
                     }
                 }
 
-                /* Just forward if we only have a URL
+                /* Just forward if we only have a URL, regardless of iframe safe or not.
                  */
                 $this->getResponse()->redirect->temporaryRedirect($assessment->getUrl());
                 return;
