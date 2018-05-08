@@ -504,17 +504,27 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
     *
     * @param $startDate
     * @param $endDate
+    * @param $excludeResourceBookings
     * @return Collection
     */
-    public function findEventsBetween($startDate, $endDate)
+    public function findEventsBetween($startDate, $endDate, bool $excludeResourceBookings = false)
     {
         $query = $this->getSelectString();
         $query .= $this->getFromString();
+
+        if ($excludeResourceBookings) {
+            $query .= ' LEFT JOIN resource_booking ON event.id = resource_booking.event_id ';
+        }
+
         $query .= '
             WHERE DATE(start_datetime) >= :startDate
             AND DATE(end_datetime) <= :endDate
             AND event.deleted_at IS NULL
         ';
+
+        if ($excludeResourceBookings) {
+            $query .= ' AND resource_booking.id IS NULL ';
+        }
 
         $statement = $this->database->prepare($query);
         $statement->bindParam(":startDate", $startDate);
