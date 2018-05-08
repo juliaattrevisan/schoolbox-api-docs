@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\InlineGrader\Kami;
 
 use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\ConnectException;
 use Schoolbox\GenericCollection;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\User;
@@ -67,27 +68,29 @@ interface IConnector
 
 
     /**
-     * Return the specified document from Kami if it exists there. Null otherwise.
+     * Return the specified document from Kami. Throws exception if not found.
      *
      * @param string $documentId
-     * @return null|Document
+     * @return Document
      * @throws Exception\EmptyApiKeyException If API key not configured
      * @throws Exception\ResponseDecodeException If unable to decode a server response
      * @throws Exception\ApiException If cannot fetch a document for reasons other than simply not existing.
      * @throws Exception\NotFound If document does not exist in Kami
+     * @throws ConnectException
      */
-    public function getDocument(string $documentId): ?Document;
+    public function getDocument(string $documentId): Document;
 
 
     /**
      * Delete an uploaded document. This will remove the file from Kami's cloud storage.
      *
      * @param string $documentId
-     * @return bool Whether a mutation occurred. (will return false if doc not found)
+     * @return bool Whether a mutation occurred. (will throw exception if not found)
      * @throws Exception\EmptyApiKeyException If API key not configured
      * @throws Exception\ResponseDecodeException If unable to decode a server response
      * @throws Exception\ApiException If cannot fetch a document for reasons other than simply not existing.
      * @throws Exception\NotFound If document does not exist in Kami
+     * @throws ConnectException
      */
     public function deleteDocument(string $documentId): bool;
 
