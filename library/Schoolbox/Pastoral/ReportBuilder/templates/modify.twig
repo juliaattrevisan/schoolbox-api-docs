@@ -546,12 +546,7 @@
                             return $(this).data('order');
                         })
                 );
-
-                {# Just in case something has gone wrong and there was no order- we set the default #}
-                if (order.length === 0) {
-                    order = ['student', 'date', 'subtype', 'author', 'points', 'year', 'severity'];
-                }
-
+                
                 $('#order').val(order.join(','));
                 form.submit();
             }
