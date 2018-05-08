@@ -93,6 +93,7 @@ class Mapper extends BaseMapper
         return $collection;
     }
 
+
     /**
      * Return list of recently viewed students. This is used to display recently viewed students on the pastoral
      * dashboard
@@ -101,6 +102,8 @@ class Mapper extends BaseMapper
      * @param int $offset Offset from start of results
      *
      * @return Collection|User[]
+     * @throws BaseMapper\DefinitionException
+     * @throws BaseMapper\Exception
      */
     public function findRecentStudents(int $count = 5, int $offset = 0): Collection
     {
