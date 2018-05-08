@@ -187,17 +187,17 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param string $subTypesCsv
+     * @param null|string $subTypesCsv
      * @return $this
      */
-    public function setSubTypesCsv($subTypesCsv)
+    public function setSubTypesCsv(?string $subTypesCsv)
     {
         $this->subTypesCsv = $subTypesCsv;
         return $this;
     }
 
     /**
-     * @return string
+     * @return null|string
      */
     public function getSubTypesCsv()
     {
@@ -205,17 +205,17 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param string $housesCsv
+     * @param null|string $housesCsv
      * @return $this
      */
-    public function setHousesCsv($housesCsv)
+    public function setHousesCsv(?string $housesCsv)
     {
         $this->housesCsv = $housesCsv;
         return $this;
     }
 
     /**
-     * @return string
+     * @return null|string
      */
     public function getHousesCsv()
     {
@@ -455,7 +455,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return Collection|PastoralSubType\Model[]
+     * @return null|Collection|PastoralSubType\Model[]
      */
     public function getSubTypes()
     {
@@ -463,21 +463,21 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return Collection|House[]
+     * @param Collection|House[] $houses
+     * @return $this
+     */
+    public function setHouses(Collection $houses)
+    {
+        $this->houses = $houses;
+        return $this;
+    }
+
+    /**
+     * @return null|Collection|House[]
      */
     public function getHouses()
     {
         return $this->houses;
-    }
-
-    /**
-     * @param Collection|House[] $houses
-     * @return $this
-     */
-    public function setHouses($houses)
-    {
-        $this->houses = $houses;
-        return $this;
     }
 
     /**
