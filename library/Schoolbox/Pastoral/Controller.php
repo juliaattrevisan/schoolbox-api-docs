@@ -186,16 +186,20 @@ class Controller extends Base
         $this->pastoralReportMapper      = $pastoralReportMapper;
     }
 
+
     /**
      * Display pastoral dashboard page
+     *
+     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws MapperException
      */
-    public function getIndex()
+    public function getIndex(): void
     {
         $this->getResponse()->content->set([
             'template' => '@pastoral/index.twig',
             'data'     => [
                 'user'             => $this->getUser(),
-                'recentStudents'   => $this->pastoralAuditMapper->findRecentStudents(),
+                'recentStudents'   => $this->pastoralAuditMapper->findRecentlyViewedStudentsForUser($this->getUser()),
                 'recentDashboard'  => $this->pastoralDataSource->findRecentDashboard($this->getUser()),
                 'reportsDashboard' => $this->pastoralReportMapper->findForUserDashboard($this->getUser()),
                 'groups'           => $this->pastoralGroupMemberMapper->findByColumn(

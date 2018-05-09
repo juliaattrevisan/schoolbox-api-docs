@@ -93,16 +93,20 @@ class Mapper extends BaseMapper
         return $collection;
     }
 
+
     /**
      * Return list of recently viewed students. This is used to display recently viewed students on the pastoral
      * dashboard
      *
-     * @param int $count  Number of records to return
-     * @param int $offset Offset from start of results
+     * @param User $viewer
+     * @param int  $count  Number of records to return
+     * @param int  $offset Offset from start of results
      *
      * @return Collection|User[]
+     * @throws BaseMapper\DefinitionException
+     * @throws BaseMapper\Exception
      */
-    public function findRecentStudents($count = 5, $offset = 0)
+    public function findRecentlyViewedStudentsForUser(User $viewer, int $count = 5, int $offset = 0): Collection
     {
         /** @var UserMapper $userMapper */
         $userMapper = $this->getJoinMapper('student');
@@ -110,39 +114,29 @@ class Mapper extends BaseMapper
         /** @var RoleMapper $roleMapper */
         $roleMapper = $userMapper->getJoinMapper('role');
 
-        $students = $userMapper->createCollection();
-
         $statement = $this->getDatabase()->prepare("
-            
-            SELECT DISTINCT   MAX(`created_at`) as `created_at`,
-                              {$this->getJoinColumnString('student', 's')},
-                              {$this->getJoinMapper('student')->getJoinColumnString('role', 'r')}
-            FROM              {$this->database->quoteIdentifier($this->table)}
-            LEFT JOIN         {$this->getJoinSql('student', '', 's')}
-            LEFT JOIN         {$this->getJoinMapper('student')->getJoinSql('role', 's', 'r')}
-            WHERE             `s`.`id` IS NOT NULL AND
-                              `pastoral_audit`.`user_id` = :userId
-            GROUP BY          `s`.`id`
-            ORDER BY          MAX(`created_at`) DESC
-            LIMIT             {$count}
-            OFFSET            {$offset}
+            SELECT      {$this->getJoinColumnString('student', 's')},
+                        {$userMapper->getJoinColumnString('role', 'r')}
+            FROM        {$this->database->quoteIdentifier($this->table)}
+            INNER JOIN  {$this->getJoinSql('student', '', 's')}
+            LEFT  JOIN  {$userMapper->getJoinSql('role', 's', 'r')}
+            WHERE       {$this->table}.`user_id` = :userId
+            GROUP BY    `s`.`id`
+            ORDER BY    MAX({$this->table}.created_at) DESC
+            LIMIT       {$count}
+            OFFSET      {$offset}
         ");
 
         $statement->execute([
-            'userId' => $this->getSessionUser()->getId(),
+            'userId' =>  $viewer->getId(),
         ]);
+
+        $students = $userMapper->createCollection();
 
         foreach ($statement as $row) {
             // Hydrate the student and their role for display purposes
-
-            $model   = $this->hydrate($row);
-            $student = $userMapper->hydrate($row, 's');
-            $role    = $roleMapper->hydrate($row, 'r');
-
-            $model->setStudent($student);
-            $student->setRole($role);
-
-            $students->add($student);
+            $student = $userMapper->hydrate($row, 's')->setRole($roleMapper->hydrate($row, 'r'));
+            $students[$student->getId()] = $student;
         }
 
         return $students;
