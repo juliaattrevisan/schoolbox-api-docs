@@ -47,7 +47,7 @@ class QueueTest extends TestCase
 
         foreach ($resolutions as $res) {
             $result = $this->invokeMethod($queue, 'cover', [$res, $thumbnailResolution]);
-            $this->assertContains((int)64, $result, "{$result[0]}x{$result[1]}");
+            $this->assertContains(64, $result, "{$result[0]}x{$result[1]}");
         }
 
     }
