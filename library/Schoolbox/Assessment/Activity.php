@@ -20,6 +20,13 @@ use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 
 class Activity
 {
+    // Valid enum values for $this->event
+    public const EVENT_NEW       = 'new';
+    public const EVENT_OVERDUE   = 'overdue';
+    public const EVENT_CLOSED    = 'closed';
+    public const EVENT_UPCOMING  = 'upcoming';
+    public const EVENT_SUBMITTED = 'submitted';
+    public const EVENT_RETURNED  = 'returned';
 
     /**
      * @var string
@@ -175,7 +182,7 @@ class Activity
      *
      * @return $this
      */
-    public function setEvent($event)
+    public function setEvent(string $event): self
     {
         $this->event = $event;
         return $this;
@@ -200,19 +207,19 @@ class Activity
     public function getEventIcon()
     {
         switch ($this->getEvent()) {
-            case 'new' :
+            case self::EVENT_NEW :
                 return 'icon-due-work';
 
-            case 'overdue' :
+            case self::EVENT_OVERDUE :
                 return 'icon-countdown';
 
-            case 'closed' :
+            case self::EVENT_CLOSED :
                 return 'icon-timetable';
 
-            case 'submitted' :
+            case self::EVENT_SUBMITTED :
                 return 'icon-upload';
 
-            case 'returned':
+            case self::EVENT_RETURNED:
                 return 'icon-download';
 
             default:

@@ -207,7 +207,7 @@ class Mapper extends BaseMapper
             return false;
         }
         $externalMarkbook = new \External_Markbook();
-        $activity         = (new ActivityFactory())->buildFromOnlineAssessment($object, 'upcoming');
+        $activity         = (new ActivityFactory())->buildFromOnlineAssessment($object, Schoolbox\Assessment\Activity::EVENT_UPCOMING);
         if (!$externalMarkbook->hasAssessment($activity)) {
             return $externalMarkbook->createAssessment($activity);
         }
@@ -239,7 +239,7 @@ class Mapper extends BaseMapper
         $externalMarkbook = new \External_Markbook();
         $activityFactory = new ActivityFactory();
         $externalMarkbook->deleteAssessment(
-            $activityFactory->buildFromOnlineAssessment($object, 'upcoming')
+            $activityFactory->buildFromOnlineAssessment($object, Schoolbox\Assessment\Activity::EVENT_UPCOMING)
         );
         return true;
     }
@@ -294,7 +294,7 @@ class Mapper extends BaseMapper
             $box = $this->hydrate($row, 'a');
             $box->setUser($user_mapper->hydrate($row, 'u'))
                 ->setCategory($cat_mapper->hydrate($row, 'c'));
-            $collection->add($factory->buildFromOnlineAssessment($box, 'closed'));
+            $collection->add($factory->buildFromOnlineAssessment($box, Schoolbox\Assessment\Activity::EVENT_CLOSED));
         }
         $cat_mapper->getJoinMapper('codes')->applyCodesToCategories(
             $collection,

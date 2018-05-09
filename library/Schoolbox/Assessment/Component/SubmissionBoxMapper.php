@@ -271,7 +271,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper
         if (!$this->isAssessmentSpecification($object)) {
             // This saves the assessment to the remote system
             $externalMarkbook = new External_Markbook();
-            $activity         = (new ActivityFactory())->buildFromSubmissionBox($object, 'upcoming');
+            $activity         = (new ActivityFactory())->buildFromSubmissionBox($object, Schoolbox\Assessment\Activity::EVENT_UPCOMING);
 
             if (!$externalMarkbook->hasAssessment($activity)) {
                 $externalMarkbook->createAssessment($activity);
@@ -308,7 +308,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper
         $externalMarkbook = new \External_Markbook();
         $activityFactory  = new \Schoolbox\Assessment\ActivityFactory();
         $externalMarkbook->deleteAssessment(
-            $activityFactory->buildFromSubmissionBox($object, 'upcoming')
+            $activityFactory->buildFromSubmissionBox($object, Schoolbox\Assessment\Activity::EVENT_UPCOMING)
         );
     }
 
@@ -388,7 +388,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper
             $box = $this->hydrate($row, 'sb');
             $box->setOwner($user_mapper->hydrate($row, 'u'));
             $box->setCategory($cat_mapper->hydrate($row, 'c'));
-            $collection->add($factory->buildFromSubmissionBox($box, 'overdue'));
+            $collection->add($factory->buildFromSubmissionBox($box, Schoolbox\Assessment\Activity::EVENT_OVERDUE));
         }
         /** @var Folder\Code\Mapper $code_mapper */
         $code_mapper = $cat_mapper->getJoinMapper('codes');

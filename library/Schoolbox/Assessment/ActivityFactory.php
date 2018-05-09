@@ -18,20 +18,19 @@ class ActivityFactory {
 
 	/**
 	 * @param SubmissionBox $box
-	 * @param string        $event The event type: "new", "overdue", "closed" or
-	 *                             "upcoming"
-	 *
+	 * @param string        $event The event type
+     * @see Activity::EVENT_* constants
 	 * @return null|Activity
 	 */
-	public function buildFromSubmissionBox(SubmissionBox $box, $event) {
+    public function buildFromSubmissionBox(SubmissionBox $box, string $event) {
 		$date = null;
-		if ($event === 'new') {
+        if ($event === Activity::EVENT_NEW) {
 			$date = $box->getOpenDate();
 		}
-		elseif ($event === 'overdue' || $event === 'upcoming') {
+        elseif ($event === Activity::EVENT_OVERDUE || $event === Activity::EVENT_UPCOMING) {
 			$date = $box->getDueDate();
 		}
-		elseif ($event === 'closed') {
+        elseif ($event === Activity::EVENT_CLOSED) {
 			$date = $box->getLateDate();
 		}
 		if (!isset($date)) {
@@ -52,12 +51,12 @@ class ActivityFactory {
 	 * @param string        $event The event type: "new", "closed" or "upcoming"
 	 * @return null|Activity
 	 */
-	public function buildFromOnlineAssessment(Quiz $assess, $event) {
+	public function buildFromOnlineAssessment(Quiz $assess, string $event) {
 		$date = null;
-		if ($event === 'new') {
+		if ($event === Activity::EVENT_NEW) {
 			$date = $assess->getStart();
 		}
-		elseif ($event === 'closed' || $event === 'upcoming') {
+        elseif ($event === Activity::EVENT_CLOSED || $event === Activity::EVENT_UPCOMING) {
 			$date = $assess->getFinish();
 		}
 		if (!isset($date)) {
@@ -80,7 +79,7 @@ class ActivityFactory {
 	public function buildFromStudentSubmission(Submission\Submission $submission) {
 		$activity = new Activity();
 		$activity
-			->setEvent('submitted')
+			->setEvent(Activity::EVENT_SUBMITTED)
 			->setSubmissionBox($submission->getSubmissionBox())
 			->setOwner($submission->getOwner())
 			->setCategory($submission->getSubmissionBox()->getCategory())
@@ -96,7 +95,7 @@ class ActivityFactory {
 	public function buildFromReturnedWork(ReturnedWork $return) {
 		$activity = new Activity();
 		$activity
-			->setEvent('returned')
+			->setEvent(Activity::EVENT_RETURNED)
 			->setSubmissionBox($return->getSubmissionBox())
 			->setOwner($return->getOwner())
 			->setCategory($return->getSubmissionBox()->getCategory())
