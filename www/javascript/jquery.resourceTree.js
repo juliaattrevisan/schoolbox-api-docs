@@ -151,10 +151,17 @@
                         $.each(nodes, function(i, node) {
                             // Check both the file and its parent
                             var permission       = node.li_attr['data-permission'];
-                            var parentPermission = jstree.get_node(node.parent).li_attr['data-permission'];
-                            if (!(permission == 'write' || permission == 'full')
-                                || !(parentPermission == 'write' || parentPermission == 'full')
-                            ) {
+                            var parent           = jstree.get_node(node.parent);
+
+                            if (parent['id'] != '#') {
+                                var parentPermission = parent.li_attr['data-permission'];
+                                if (!(permission == 'write' || permission == 'full')
+                                    || !(parentPermission == 'write' || parentPermission == 'full')
+                                ) {
+                                    isDraggable = false;
+                                    return false;
+                                }
+                            } else {
                                 isDraggable = false;
                                 return false;
                             }
