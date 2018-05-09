@@ -10,6 +10,7 @@
 namespace Schoolbox\Assessment\Component;
 
 use PDO;
+use PDOStatement;
 use Schoolbox;
 use Schoolbox\Assessment\ActivityFactory;
 use Schoolbox\Assessment\ActivityCollection;
@@ -101,6 +102,43 @@ class SubmissionBoxMapper extends Schoolbox\Mapper
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteShowcase'));
 
         $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'restoreToExternalMarkbook']);
+    }
+
+
+    /**
+     * @inheritdoc
+     * @throws Schoolbox\Mapper\DefinitionException
+     */
+    public function getSelectString(): string
+    {
+        return "
+            SELECT     {$this->getColumnString()},
+                       {$this->getJoinColumnString('assessmentModel', 'am')}
+            FROM       {$this->getTable()}
+            INNER JOIN {$this->getJoinSql('assessmentModel', '', 'am', true)}
+        ";
+    }
+
+
+    /**
+     * @param PDOStatement $statement
+     * @return GenericCollection
+     * @throws Schoolbox\Mapper\DefinitionException
+     * @throws Schoolbox\Mapper\Exception
+     */
+    public function hydrateSelect(PDOStatement $statement): GenericCollection
+    {
+        /** @var AssessmentMapper $assessmentMapper */
+        $assessmentMapper = $this->getJoinMapper('assessmentModel');
+        $collection       = $this->createCollection();
+
+        /** @noinspection PhpAssignmentInConditionInspection */
+        while ($row = $statement->fetch()) {
+            $box                       = $this->hydrate($row)->setAssessmentModel($assessmentMapper->hydrate($row, 'am'));
+            $collection[$box->getId()] = $box;
+        }
+
+        return $collection;
     }
 
 
