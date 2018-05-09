@@ -95,12 +95,12 @@ class SubmissionBoxMapper extends Schoolbox\Mapper
         $this->registerCallback(self::CALLBACK_POSTDELETE, array($this, 'deleteFromMarkbook'));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'deleteFromMarkbook'));
 
-
-        // SoftDelete/Restore weak entities
         $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteRubricLevels']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteSubmissions'));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteReturns'));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteShowcase'));
+
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'restoreToExternalMarkbook']);
     }
 
 
@@ -282,6 +282,20 @@ class SubmissionBoxMapper extends Schoolbox\Mapper
 
         return true;
     }
+
+
+    /**
+     * Re-inserts assessment in markbook
+     *
+     * @param SubmissionBox $box
+     * @return bool
+     */
+    public function restoreToExternalMarkbook(SubmissionBox $box): bool
+    {
+        $this->syncToExternalMarkbook($box);
+        return true;
+    }
+
 
     /**
      * @param SubmissionBox $box
