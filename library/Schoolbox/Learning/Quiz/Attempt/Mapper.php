@@ -73,6 +73,8 @@ class Mapper extends BaseMapper
 
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'canParticipate']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'insertParticipation']);
+
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'restoreToExternalMarkbook']);
     }
 
 
@@ -203,6 +205,20 @@ class Mapper extends BaseMapper
 
         return true;
     }
+
+
+    /**
+     * Post-restore callback to re-insert in SIS markbook
+     *
+     * @param Model $attempt
+     * @return bool
+     */
+    public function restoreToExternalMarkbook(Model $attempt): bool
+    {
+        $this->updateExternalMarkbook($attempt);
+        return true;
+    }
+
 
     /**
      * Gets a string of placeholders for an array - usually used for creating a
