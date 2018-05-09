@@ -54,7 +54,6 @@ class Controller extends Base
     }
 
     public function searchUsers($userID) {
-
         $user = $this->userMapper->findByExternalId($userID);
         $userJSON = [
             'name' => $user->getFullName(),
