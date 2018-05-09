@@ -808,12 +808,15 @@ class Mapper extends BaseMapper
         return $modelList;
     }
 
+
     /**
      * Augments the list from hydrateSelect() with Curriculum Nodes
      *
      * @param Collection|Model[] $modelList
      * @return Collection|Model[]
      * @throws BaseMapper\DefinitionException If join name is not on this mapper
+     * @throws InvalidColumnException
+     * @throws UnderflowException
      */
     protected function augmentListWithCurriculumNodes($modelList)
     {
@@ -822,7 +825,9 @@ class Mapper extends BaseMapper
         }
 
         // Fetch all curriculum nodes + supplementary fields
-        $predicate = $this->getPredicateBuilder()->in('id', $modelList->getColumnValues('id'));
+        $predicate = $this->getPredicateBuilder()
+                          ->in('id', $modelList->getColumnValues('id'))
+                          ->notNull('cn.id');
         $where     = implode(' AND ', $predicate->getWhere());
         $query     = "
             SELECT
