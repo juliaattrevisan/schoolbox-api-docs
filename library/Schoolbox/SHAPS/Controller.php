@@ -40,6 +40,11 @@ class Controller extends Base
 
     public function getProvisionmentStatusList() {
         $staff = $this->userMapper->findByColumn('g.group_type', 'staff');
+
+        /* TODO get users from this API call eventually
+        /api/course-participation/{schoolCode}/users
+        */
+
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@shaps/index.twig', [
