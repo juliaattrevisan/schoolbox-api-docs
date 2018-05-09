@@ -8,9 +8,9 @@
 namespace Config\Modules;
 
 use Alaress\Application\Kernel;
-use Schoolbox\Example\Module;
+use Schoolbox\SHAPS\Module;
 
-class Example implements ModuleConfigInterface
+class SHAPS implements ModuleConfigInterface
 {
     /**
      * Run configuration for the given module
@@ -20,7 +20,7 @@ class Example implements ModuleConfigInterface
      */
     public function configure($kernel)
     {
-        $namespace = 'example';
+        $namespace = 'shaps';
 
         $module = new Module($kernel->getDependencyInjector());
         $module->init("/$namespace");

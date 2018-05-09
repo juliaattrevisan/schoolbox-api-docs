@@ -6,7 +6,7 @@
  * @copyright   Copyright 2017, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
-namespace Schoolbox\Example;
+namespace Schoolbox\SHAPS;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -46,7 +46,7 @@ class Controller extends Base
      */
     public function getExample(User $user)
     {
-        $this->getResponse()->content->set($this->buildHtmlOutput('@example/index.twig', [
+        $this->getResponse()->content->set($this->buildHtmlOutput('@shaps/index.twig', [
             'user' => $user
         ])->setTitle('Example'));
     }
@@ -63,7 +63,7 @@ class Controller extends Base
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_USER_NOT_FOUND);
         }
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@example/submit.twig', [
+        $this->getResponse()->content->set($this->buildHtmlOutput('@shaps/submit.twig', [
             'user' => $user,
             'var1' => $this->getRequest()->post['var1']
         ])->setTitle('Example Form Output'));
