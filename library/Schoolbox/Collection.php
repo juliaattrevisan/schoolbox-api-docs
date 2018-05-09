@@ -375,7 +375,7 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
      * Gets values for the given model property in the collection.
      *
      * @param string $property
-     * @return mixed[]
+     * @return mixed[]|array
      */
     public function getPropertyValues($property)
     {
