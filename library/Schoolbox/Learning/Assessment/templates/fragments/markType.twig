@@ -107,9 +107,15 @@
         <label for="gradingScheme">{{ locale.grading.proper }} Scheme</label>
         <div class="input-group">
             <select name="gradingScheme" id="gradingScheme">
-                {% for scheme in allGradeSchemes %}
-                    <option value="{{ scheme.id }}"{% if scheme.id == assessment.gradeGroup.id %} selected{% endif %}>{{ scheme.name }}</option>
-                {% endfor %}
+                {% if assessment.gradeGroup.id is not null  %}
+                    {% for scheme in allGradeSchemes %}
+                        <option value="{{ scheme.id }}"{% if scheme.id == assessment.gradeGroup.id %} selected{% endif %}>{{ scheme.name }}</option>
+                    {% endfor %}
+                {% else %}
+                    {% for scheme in allGradeSchemes %}
+                        <option value="{{ scheme.id }}"{% if scheme.id == defaultGradeGroup %} selected{% endif %}>{{ scheme.name }}</option>
+                    {% endfor %}
+                {% endif %}
             </select>
             <button type="button" class="button" data-reveal-id="gradeScale">Show {{ locale.grades.proper }} Scale</button>
         </div>
