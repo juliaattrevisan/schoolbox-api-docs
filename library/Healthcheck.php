@@ -556,19 +556,20 @@ class Healthcheck
         // Pastoral Care Tables (Only If Module Enabled)
 
         if ($this->configMapper->get('pastoral_enabled')) {
-            $tables = array_merge($tables, [
+            $pastoralTables = [
                 'luPastoralCareCategory',
                 'luPastoralCareType',
                 'PastoralCareComments',
                 'PastoralCareContacts',
                 'PastoralCareActions',
                 'tPastoralCare'
-            ]);
+            ];
+            $this->selectTest($pastoralTables);
+            $this->insertTest($pastoralTables);
         }
 
         $tables = array_merge($tables, $this->customUPSTest());
         $this->selectTest($tables);
-        $this->insertTest($tables);
 
         // Attendance Update Tests
         $this->updateTest(['wkAttendances']);
