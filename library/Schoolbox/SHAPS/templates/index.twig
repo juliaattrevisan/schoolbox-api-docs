@@ -27,14 +27,18 @@
                     <th>Provisioning Status</th>
                     <th>User</th>
                 </tr>
-                <tr>
-                    <td>
-                        <i class="icon-course-outline"></i>
-                    </td>
-                    <td>
-                        Zane Smith
-                    </td>
-                </tr>
+                
+                {% for user in users %}
+                    <tr>
+                        <td>
+                            <i class="icon-course-outline"></i>
+                        </td>
+                        <td>
+                            {{ user.fullname }}
+                        </td>
+                    </tr>
+                {% endfor %}
+
             </table>
         </section>
 

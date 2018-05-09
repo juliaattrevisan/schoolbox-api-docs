@@ -38,6 +38,15 @@ class Controller extends Base
         $this->setUserMapper($userMapper);
     }
 
+    public function getProvisionmentStatusList() {
+        $staff = $this->userMapper->findByColumn('g.group_type', 'staff');
+        $this->getResponse()->content->set(
+            $this->buildHtmlOutput(
+                '@shaps/index.twig', [
+                'users' => $staff
+            ])->setTitle('Example')
+        );
+    }
     /**
      * Provide form
      *
