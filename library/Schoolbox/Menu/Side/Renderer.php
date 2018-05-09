@@ -75,15 +75,15 @@ class Renderer
         }
 
         //Sort the subjects within each subjectGroup
-        foreach ($subjectGroups as $key => $value ) {
+        foreach ($subjectGroups as $subjectGroup => $subjects ) {
 
             //Each value is an array, so sort each array
-            usort($value, function ($a, $b) {
+            usort($subjects, function ($a, $b) {
                 return strnatcmp($a['name'].$a['code'], $b['name'].$b['code']);
             });
             
-            //Need to assign back, as $value is localised variable
-            $subjectGroups[$key] = $value;
+            //Need to assign back, as $subjects is localised variable
+            $subjectGroups[$subjectGroup] = $subjects;
         }
 
         // Get the menu sections in their correct order
