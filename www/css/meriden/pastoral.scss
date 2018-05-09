@@ -62,6 +62,11 @@ body.login input[type=checkbox]:not(.plain):checked+label:after{ background-colo
     .e-report a {
         text-decoration: none;
     }
+
+    // Fix print width of graphs
+    .e-report div.highcharts-container {
+        zoom: .75;
+    }
 }
 
 /** Style the crest **/
