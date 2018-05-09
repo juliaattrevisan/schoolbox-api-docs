@@ -244,9 +244,6 @@ class Controller extends Base
                 ]);
             }
             $this->getResponse()->content->set($this->buildJsonOutput($data));
-        } catch (\Exception $e) {
-            $this->returnJsonError($e);
-            // TODO - can remove this block when we abandon PHP 5 support
         } catch (\Throwable $e) {
             $this->returnJsonError($e);
         }
