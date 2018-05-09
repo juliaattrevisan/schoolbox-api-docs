@@ -9,7 +9,7 @@
             <script type="text/javascript">
                 $(function() {
 
-                    $('#users').selectizeSelector({
+                    var $selectize = $('#users').selectizeSelector({
                         ajax: {
                             url:      '/ajax/user.php',
                             type:     'GET',
@@ -17,6 +17,21 @@
                             dataType: 'json'
                         },
                         multiple: true
+                    });
+
+                    $selectize = $selectize[0].selectize;
+                    $selectize.on("item_add", function(value, $item) {
+                        var $itemText = $item.text();
+                        var userID = $itemText.match(/\((\d*)\)/)[1];
+
+                        $.get("/shaps/provisioning/"+userID, function(data) {
+                            console.log(data);
+                        }, "json")
+                            .fail(function(xhr, status, error) {
+                                console.log(xhr);
+                                console.log(status + ": " + error);
+                            })
+
                     });
                 });
             </script>

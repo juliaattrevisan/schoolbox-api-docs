@@ -50,6 +50,7 @@ class Module extends BaseModule
         $preloadUser = function ($params) { return $this->preloadUser($params); };
 
         $this->register('GET', '/provisioning', 'getProvisionmentStatusList', $getPerms);
+        $this->register('GET', '/provisioning/{id}', 'searchUsers', $getPerms);
         $this->register('POST', '/user', 'postExample', $postPerms, null);
     }
 

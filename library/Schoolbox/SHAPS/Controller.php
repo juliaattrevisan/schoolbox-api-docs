@@ -52,6 +52,23 @@ class Controller extends Base
             ])->setTitle('Example')
         );
     }
+
+    public function searchUsers($userID) {
+
+        $user = $this->userMapper->findByExternalId($userID);
+        $userJSON = [
+            'name' => $user->getFullName(),
+            'id' => $user->getId(),
+            'externalID' => $user->getExternalId(),
+        ];
+        header('Content-Type: text/json');
+        echo json_encode($userJSON);
+
+        /* Prevent rendering of template */
+        exit();
+    }
+
+
     /**
      * Provide form
      *
