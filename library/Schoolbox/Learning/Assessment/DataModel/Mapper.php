@@ -826,7 +826,7 @@ class Mapper extends BaseMapper
 
         // Fetch all curriculum nodes + supplementary fields
         $predicate = $this->getPredicateBuilder()
-                          ->in('id', $modelList->getColumnValues('id'))
+                          ->in('id', $modelList->getPropertyValues('id'))
                           ->notNull('cn.id');
         $where     = implode(' AND ', $predicate->getWhere());
         $query     = "
