@@ -180,7 +180,8 @@
                     // Update the icon
                     $participant.find('[data-status]')
                         .removeClass(config.statusIncomplete + ' ' + config.statusPending)
-                        .addClass(config.statusReviewed);
+                        .addClass(config.statusReviewed)
+                        .attr('title', 'Reviewed');
 
                     // Update the text
                     $participant.find('[data-status-label]').html('Reviewed');
