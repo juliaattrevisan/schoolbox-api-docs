@@ -185,7 +185,6 @@ class Factory extends FolderFilter\Factory
      * @param GenericCollection|Folder\Model[]                               $folders
      * @param GenericCollection|Filter\Selection\Model[]                     $folderOverrides
      * @throws \Schoolbox\Mapper\Exception     If unable to create a Selection model
-     * @throws \UnexpectedValueException       If we add the wrong type to a GenericCollection
      */
     private function insertUnitImportSpecFolders(
         Filter\IDefinition $definition,
@@ -199,10 +198,14 @@ class Factory extends FolderFilter\Factory
         /** @var Filter\Model $unitSpecFilter */
         $unitSpecFilter    = $this->filterMapper->findByClass($definitionClass)->first();
         $unitSpecOverrides = $overrides[$unitSpecFilter->getId()];
-        $unitSpecIds       = $unitSpecOverrides->getPropertyValues('key');
+
+        if (!$unitSpecOverrides) {
+            // If no UnitSpecs requested via query args, then no folders require insertion and we are done.
+            return;
+        }
 
         // Find any unit impls imported from these specs
-        $unitImpls = $this->unitImplMapper->findAllByUnitSpecificationId($unitSpecIds);
+        $unitImpls = $this->unitImplMapper->findAllByUnitSpecificationId($unitSpecOverrides->getPropertyValues('key'));
 
         foreach ($unitImpls as $unitImpl) {
             $folderId = $unitImpl->getFolder()->getId();
