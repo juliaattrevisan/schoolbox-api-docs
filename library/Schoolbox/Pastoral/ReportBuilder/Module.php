@@ -75,6 +75,10 @@ class Module extends BaseModule
             'pastoralSubTypeMapper'  => $this->getMapperFactory()->getLazy(\Schoolbox\Pastoral\SubType\Mapper::class),
             'pastoralAccessMapper'   => PastoralAccessMapper::getInstance(),
             'pastoralTagMapper'      => PastoralTagMapper::getInstance(),
+            'errorMapper'                   => $this->getMapperFactory()->getLazy(ErrorMapper::class),
+            'pastoralGroupMapper'           => $this->getMapperFactory()->getLazy(\Schoolbox\Pastoral\Group\Mapper::class),
+            'pastoralGroupMemberMapper'     => $this->getMapperFactory()->getLazy(\Schoolbox\Pastoral\Group\Member\Mapper::class),
+            'pastoralReportDashboardMapper' => $this->getMapperFactory()->getLazy(\Schoolbox\Pastoral\Report\Dashboard\Mapper::class),
         ];
 
         $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class, $mappers));
