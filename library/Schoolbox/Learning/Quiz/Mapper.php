@@ -195,23 +195,24 @@ class Mapper extends BaseMapper
     /**
      * Post-save callback.
      *
-     * Saves a record in external markbook system
+     * Saves a record in external markbook system. Always returns TRUE as we never want to short-circuit subsequent callbacks
      *
      * @param  Model $object
      * @return bool
      */
-    public function updateExternalMarkbook(Model $object)
+    public function updateExternalMarkbook(Model $object): bool
     {
         // Don't attempt to sync assessment specs to external markbook (they cannot have interactions)
-        if ($this->isAssessmentSpecification($object)) {
-            return false;
+        if (!$this->isAssessmentSpecification($object)) {
+            $externalMarkbook = new \External_Markbook();
+            $activity         = (new ActivityFactory())->buildFromOnlineAssessment($object, Schoolbox\Assessment\Activity::EVENT_UPCOMING);
+            if (!$externalMarkbook->hasAssessment($activity)) {
+                $externalMarkbook->createAssessment($activity);
+            }
+            $externalMarkbook->updateAssessment($activity);
         }
-        $externalMarkbook = new \External_Markbook();
-        $activity         = (new ActivityFactory())->buildFromOnlineAssessment($object, Schoolbox\Assessment\Activity::EVENT_UPCOMING);
-        if (!$externalMarkbook->hasAssessment($activity)) {
-            return $externalMarkbook->createAssessment($activity);
-        }
-        return $externalMarkbook->updateAssessment($activity);
+
+        return true;
     }
 
 
