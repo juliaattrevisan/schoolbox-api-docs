@@ -67,11 +67,12 @@ class Module extends BaseModule
     {
         $mappers = [
             'userMapper'             => UserMapper::getInstance(),
-            'houseMapper'            => HouseMapper::getInstance(),
+            'houseMapper'            => $this->getMapperFactory()->getLazy(HouseMapper::class),
             'pastoralDataSource'     => $injector->get('pastoralDataSource'),
             'pastoralReportMapper'   => PastoralReportMapper::getInstance(),
             'pastoralSeverityMapper' => PastoralSeverityMapper::getInstance(),
             'pastoralTypeMapper'     => PastoralTypeMapper::getInstance(),
+            'pastoralSubTypeMapper'  => $this->getMapperFactory()->getLazy(\Schoolbox\Pastoral\SubType\Mapper::class),
             'pastoralAccessMapper'   => PastoralAccessMapper::getInstance(),
             'pastoralTagMapper'      => PastoralTagMapper::getInstance(),
         ];
