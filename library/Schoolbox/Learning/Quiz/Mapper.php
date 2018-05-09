@@ -89,9 +89,10 @@ class Mapper extends BaseMapper
         $this->registerCallback(self::CALLBACK_POSTDELETE, array($this, 'deleteFromMarkbook'));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'deleteFromMarkbook'));
 
-        // SoftDelete/Restore weak entities
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteSections'));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteAttempts'));
+
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'restoreToExternalMarkbook']);
     }
 
     /**
@@ -197,21 +198,34 @@ class Mapper extends BaseMapper
      *
      * Saves a record in external markbook system. Always returns TRUE as we never want to short-circuit subsequent callbacks
      *
-     * @param  Model $object
+     * @param  Model $quiz
      * @return bool
      */
-    public function updateExternalMarkbook(Model $object): bool
+    public function updateExternalMarkbook(Model $quiz): bool
     {
         // Don't attempt to sync assessment specs to external markbook (they cannot have interactions)
-        if (!$this->isAssessmentSpecification($object)) {
+        if (!$this->isAssessmentSpecification($quiz)) {
             $externalMarkbook = new \External_Markbook();
-            $activity         = (new ActivityFactory())->buildFromOnlineAssessment($object, Schoolbox\Assessment\Activity::EVENT_UPCOMING);
+            $activity         = (new ActivityFactory())->buildFromOnlineAssessment($quiz, Schoolbox\Assessment\Activity::EVENT_UPCOMING);
             if (!$externalMarkbook->hasAssessment($activity)) {
                 $externalMarkbook->createAssessment($activity);
             }
             $externalMarkbook->updateAssessment($activity);
         }
 
+        return true;
+    }
+
+
+    /**
+     * Post-restore callback to re-insert in SIS markbook
+     *
+     * @param Model $quiz
+     * @return bool
+     */
+    public function restoreToExternalMarkbook(Model $quiz): bool
+    {
+        $this->updateExternalMarkbook($quiz);
         return true;
     }
 
