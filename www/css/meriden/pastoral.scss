@@ -182,6 +182,7 @@ body.login input[type=checkbox]:not(.plain):checked+label:after{ background-colo
     }
 
     #assessments{
+        page-break-inside: avoid;
         table tr th {
             &.title {
                 width: 40%;
