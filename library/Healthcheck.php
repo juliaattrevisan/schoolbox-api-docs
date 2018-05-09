@@ -568,6 +568,7 @@ class Healthcheck
 
         $tables = array_merge($tables, $this->customUPSTest());
         $this->selectTest($tables);
+        $this->insertTest($tables);
 
         // Attendance Update Tests
         $this->updateTest(['wkAttendances']);
