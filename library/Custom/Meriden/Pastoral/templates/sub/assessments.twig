@@ -50,7 +50,18 @@
                             var prettyMark = "{{ workItem.pretty_mark | replace({'%': ''}) }}",
                                 seriesData = {{ workItem.distribution.continuous.series|json_encode|raw }},
                                 yMax       = 100,
-                                yMin       = seriesData.low - (seriesData.low % 5);
+                                yMin       = seriesData.low,
+                                step       = 5,
+                                yMod       = yMin % step;
+
+                            // Step back to at least one step before low, but not less than 0
+                            if (yMod === 0) {
+                                yMin = yMin - step;
+                            } else {
+                                yMin = yMin - yMod;
+                            }
+                            yMin = Math.max(0, yMin);
+
                             $('#assessmentGraph-{{ workItem.assessment.id }}-{{ student.id }}').highcharts({
                                 chart: {
                                     inverted: true,
