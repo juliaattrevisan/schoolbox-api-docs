@@ -272,6 +272,22 @@
                         }
                     });
 
+                    // When a subtype checkbox is changed, find out if any subtypes in that group are still checked
+                    // and if not, uncheck the parent and hide the subtypes
+                    $(parentTypeSelector).each(function(index, parentCheckbox) {
+                        var $subtypes = $(parentCheckbox).siblings(siblingSelector).find(subTypeSelector);
+
+                        $subtypes.change(function() {
+                            if ($subtypes.filter(":checked").length < 1) {
+                                $(parentCheckbox).prop("checked", false);
+                                $subtypes.parent(siblingSelector).hide();
+                            } else {
+                                $(parentCheckbox).prop("checked", true);
+                                $subtypes.parent(siblingSelector).show();
+                            }
+                        });
+                    })
+
                 });
             </script>
 
