@@ -33,11 +33,6 @@ class StudentCarousel
     private $assessment;
 
     /**
-     * @var Submission
-     */
-    private $response;
-
-    /**
      * StudentCarousel constructor.
      *
      * @param Router $router
