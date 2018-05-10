@@ -67,12 +67,10 @@
 
     {% set pStatusText %}
         {%- spaceless %}
-            {% if not latestResponse %}
-                {% if participant.reviewComplete %}
-                    {{ labelReviewed }}
-                {% else %}
-                    Not submitted
-                {% endif %}
+            {% if participant.reviewComplete %}
+                {{ labelReviewed }}
+            {% elseif not latestResponse %}
+                Not submitted
             {% else %}
                 {% if multipleResponses %}
                     Resubmitted
@@ -486,6 +484,7 @@
                         $actionBar.removeAttr('data-mass-submit');
                         $statusIcon.addClass('pending');
                         $statusLabel.html('Submitted ' + (submittedLate ? 'late' : 'on time'));
+                        $statusIcon.attr('title', 'Marking required');
                         $('#filters').find('[data-status="pending"]').prop('checked', true);
                     }
 
