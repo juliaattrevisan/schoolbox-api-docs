@@ -10,9 +10,8 @@
 namespace Schoolbox\Learning\InlineGrader;
 
 use Aura\Router\Router;
-use \Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
-use \Schoolbox\Learning\Assessment\DueWork\Response\Model as Submission;
-use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use Schoolbox\Learning\Assessment\DueWork\Response\Model as Submission;
 use Schoolbox\User;
 
 class StudentCarousel
@@ -37,9 +36,9 @@ class StudentCarousel
      *
      * @param Router $router
      * @param User $student
-     * @param IAssessable $assessment
+     * @param DueWork $assessment
      */
-    public function __construct(Router $router, User $student, IAssessable $assessment)
+    public function __construct(Router $router, User $student, DueWork $assessment)
     {
         $this->router     = $router;
         $this->student    = $student;
