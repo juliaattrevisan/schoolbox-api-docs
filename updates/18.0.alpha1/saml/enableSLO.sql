@@ -16,7 +16,7 @@ INSERT INTO config (
   required
 ) VALUES (
   'saml_slo_enabled',
-  '1',
+  '0',
   'Enable Single Logout',
   'If enabled, logout performed in Schoolbox will be sent to the IdP to log the user out of all other services registered with the IdP.',
   (SELECT id FROM lu_config_field WHERE field = 'boolean'),
