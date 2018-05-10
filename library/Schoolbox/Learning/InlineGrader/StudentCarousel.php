@@ -73,34 +73,43 @@ class StudentCarousel
         $allPeople = [];
 
         foreach ($this->getAssessment()->getAllParticipants() as $currentParticipant) {
-            $latestSubmission = $currentParticipant->findMostRecentResponse();
 
-            /** @var Submission $latestSubmission */
-            if ($latestSubmission) {
-                if ($latestSubmission->isSubmitted()) {
-                    if ($latestSubmission->isSubmittedOnTime()) {
-                        $css = 'submitted';
-                        $label = 'Submitted on time';
+            // CSS/label rules
+            if ($currentParticipant->findMostRecentInstructorGivenPublishedFeedback()) {
+                // Has feedback been given? Always say "Reviewed"
+                $css = 'submitted';
+                $label = 'Reviewed';
+
+            } else {
+                $latestSubmission = $currentParticipant->findMostRecentResponse();
+
+                /** @var Submission $latestSubmission */
+                if ($latestSubmission) {
+                    if ($latestSubmission->isSubmitted()) {
+                        if ($latestSubmission->isSubmittedOnTime()) {
+                            $css = 'submitted';
+                            $label = 'Submitted on time';
+                        }
+                        else {
+                            $css   = 'submitted-late';
+                            $label = 'Submitted late';
+                        }
                     }
                     else {
-                        $css   = 'submitted-late';
-                        $label = 'Submitted late';
+
+                        /* Draft Submission exists
+                         */
+                        $css = 'unsubmitted';
+                        $label = 'Not submitted';
                     }
                 }
                 else {
 
-                    /* Draft Submission exists
+                    /* No submission exists
                      */
                     $css = 'unsubmitted';
                     $label = 'Not submitted';
                 }
-            }
-            else {
-
-                /* No submission exists
-                 */
-                $css = 'unsubmitted';
-                $label = 'Not submitted';
             }
 
             /* Viewing the most recent response for the next student
