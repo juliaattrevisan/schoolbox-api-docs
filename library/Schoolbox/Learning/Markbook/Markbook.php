@@ -149,7 +149,16 @@ class Markbook
                 $participants[$student->getId()] = $student;
             }
         }
-        // Sort by name?
+        $participants->sortByCallback(
+            function (User $a, User $b) {
+                $cmp = strcasecmp($a->getLastname(), $b->getLastname());
+                if ($cmp === 0) {
+                    $cmp = strcasecmp($a->getFirstname(), $b->getFirstname());
+                }
+                return $cmp;
+            },
+            true
+        );
         return $participants;
     }
 
