@@ -141,6 +141,7 @@ class Controller extends Base
             // bad request
             $this->sendGenericStatus(400);
         }
+
     }
 
     /**

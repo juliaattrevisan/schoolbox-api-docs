@@ -9,10 +9,14 @@
 namespace Schoolbox\SHAPS;
 
 use Alaress\Web\Controller\Base;
+use Alaress_Date_Format;
+use Codeception\Lib\Connector\Guzzle;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use GuzzleHttp\Client as GuzzleClient;
+
 
 class Controller extends Base
 {
@@ -45,9 +49,28 @@ class Controller extends Base
         // TODO this will be all the staff on Help
         $provisionedStaff = $this->userMapper->findByColumn('g.group_type', 'staff')->slice($allStaff->count()/2);
 
-        /* TODO get provisioned users from this API call eventually
-        /api/course-participation/{schoolCode}/users
-        */
+
+
+
+        // TODO make this config stuff 'right' later
+        $config = new \Schoolbox\Config\Loader();
+        $schoolCode = $config->get('site_school_code');
+
+        $client = new GuzzleClient();
+
+        $ip = "http://192.168.36.10";
+        $timestamp = Alaress_Date_Format::now();
+        $token = sha1('ecc');
+
+        $response = $client->request(
+            "get",
+            "${ip}/api/course-participation/${schoolCode}/users",
+            ['query' =>
+                ['ts' => $timestamp, 'token' => $token]
+            ]
+        );
+
+        $body = $response->getBody()->getContents();
 
         $provisionedUserIDs = [];
         foreach($allStaff as $user) {
