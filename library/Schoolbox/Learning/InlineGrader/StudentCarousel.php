@@ -41,9 +41,9 @@ class StudentCarousel
      */
     public function __construct(Router $router, User $student, IAssessable $assessment)
     {
-        $this->setRouter($router);
-        $this->setStudent($student);
-        $this->setAssessment($assessment);
+        $this->router     = $router;
+        $this->student    = $student;
+        $this->assessment = $assessment;
     }
 
     /**
@@ -67,7 +67,7 @@ class StudentCarousel
     {
         $allPeople = [];
 
-        foreach ($this->getAssessment()->getAllParticipants() as $currentParticipant) {
+        foreach ($this->assessment->getAllParticipants() as $currentParticipant) {
 
             // CSS/label rules
             if ($currentParticipant->findMostRecentInstructorGivenPublishedFeedback()) {
@@ -109,10 +109,10 @@ class StudentCarousel
 
             /* Viewing the most recent response for the next student
              */
-            $urlValue = $this->getRouter()->generate('learningDueWorkResponse.getParticularResponse', [
-                'assessmentId' => $this->getAssessment()->getId(),
+            $urlValue = $this->router->generate('learningDueWorkResponse.getParticularResponse', [
+                'assessmentId' => $this->assessment->getId(),
                 'studentId'    => $currentParticipant->getUser()->getId(),
-                'assessment'   => $this->getAssessment()
+                'assessment'   => $this->assessment
             ]);
 
             $person = [
@@ -143,67 +143,10 @@ class StudentCarousel
      */
     private function getCurrentPerson()
     {
-        return $this->getRouter()->generate('learningDueWorkResponse.getParticularResponse', [
-            'assessmentId' => $this->getAssessment()->getId(),
-            'studentId'    => $this->getStudent()->getId(),
-            'assessment'   => $this->getAssessment()
+        return $this->router->generate('learningDueWorkResponse.getParticularResponse', [
+            'assessmentId' => $this->assessment->getId(),
+            'studentId'    => $this->student->getId(),
+            'assessment'   => $this->assessment
         ]);
-    }
-
-    /* Getters/Setters
-     */
-
-    /**
-     * @return Router
-     */
-    private function getRouter()
-    {
-        return $this->router;
-    }
-
-    /**
-     * @param Router $router
-     * @return $this
-     */
-    private function setRouter($router)
-    {
-        $this->router = $router;
-        return $this;
-    }
-
-    /**
-     * @return User
-     */
-    private function getStudent()
-    {
-        return $this->student;
-    }
-
-    /**
-     * @param User $student
-     * @return $this
-     */
-    private function setStudent($student)
-    {
-        $this->student = $student;
-        return $this;
-    }
-
-    /**
-     * @return IAssessable
-     */
-    private function getAssessment()
-    {
-        return $this->assessment;
-    }
-
-    /**
-     * @param IAssessable $assessment
-     * @return $this
-     */
-    private function setAssessment($assessment)
-    {
-        $this->assessment = $assessment;
-        return $this;
     }
 }
