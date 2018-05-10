@@ -130,7 +130,7 @@
                                 {% if hasSubTypes %}
                                     <label for="type-{{ type.id }}" title="Has sub-types - select to see them">
                                         {{ type.name }}
-                                        <i class="icon-dropdown size-8"></i>
+                                        <i class="icon-click-view size-8"></i>
                                     </label>
                                 {% else %}
                                     <label for="type-{{ type.id }}">
@@ -273,19 +273,24 @@
                             // ...and check them by default
                             $subCheckboxes.each(function(index, subCheckbox) {
                                 $(subCheckbox).prop('checked', true);
-                            })
+                            });
+
+                            $(checkbox).siblings("label").find("i").removeClass("icon-click-view").addClass("icon-dropdown");
                         } else {
                             // ...hide the subtypes for this type
                             $subCheckboxes.each(function(index, subCheckbox) {
                                 $(subCheckbox).prop('checked', false);
                                 $(checkbox).siblings(childGroupSelector).hide();
-                            })
+                            });
 
                             // ...and uncheck them (causes all sorts of problems with select all otherwise)
                             $subCheckboxes.each(function(index, subCheckbox) {
                                 $(subCheckbox).prop('checked', false);
-                            })
+                            });
+
+                            $(checkbox).siblings("label").find("i").removeClass("icon-dropdown").addClass("icon-click-view");
                         }
+
                     });
 
                     // When a subtype checkbox is changed, find out if any subtypes in that group are still checked
@@ -297,9 +302,11 @@
                             if ($subtypes.filter(":checked").length < 1) {
                                 $(parentCheckbox).prop("checked", false);
                                 $subtypes.parent(childGroupSelector).hide();
+                                $(parentCheckbox).siblings("label").find("i").removeClass("icon-dropdown").addClass("icon-click-view");
                             } else {
                                 $(parentCheckbox).prop("checked", true);
                                 $subtypes.parent(childGroupSelector).show();
+                                $(parentCheckbox).siblings("label").find("i").removeClass("icon-click-view").addClass("icon-dropdown");
                             }
                         });
                     })
@@ -477,13 +484,16 @@
             selectAllNested: function(selectAllButton, subCheckboxes) {
                 // Show/hide subtypes on select/deselect all
 
+                var parentCheckboxes = "[data-check-type]"
                 var subtypeLists = "[data-pastoral-subtype]";
                 if ($(selectAllButton).is(':checked')) {
                     $(subtypeLists).show();
                     $(subCheckboxes).prop("checked", true);
+                    $(parentCheckboxes).siblings("label").find("i").removeClass("icon-click-view").addClass("icon-dropdown");
                 } else {
                     $(subtypeLists).hide();
                     $(subCheckboxes).prop("checked", false);
+                    $(parentCheckboxes).siblings("label").find("i").removeClass("icon-dropdown").addClass("icon-click-view");
                 }
             }
         });
