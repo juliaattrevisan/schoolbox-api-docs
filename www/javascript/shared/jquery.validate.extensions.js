@@ -271,11 +271,39 @@
 
     $.validator.addMethod('notInList', function(value, element, list) {
 
+        value = $.trim(value);
+
         if (!Array.isArray(list)) {
             list = JSON.parse(list);
         }
 
         return list.indexOf($.trim(value)) < 0;
+
+    }, 'This heading is already in use - please choose another.');
+
+
+
+    $.validator.addMethod('notInSlugList', function(value, element, list) {
+
+        value = $.trim(value);
+
+        if (!Array.isArray(list)) {
+            list = JSON.parse(list);
+        }
+
+        //This simulates the preg replace in /schoolbox/library/Url.php::getSlug()
+        var pattern = /(\s|-|\/)+/g;
+        var replace = '-';
+
+        var newValue = value.replace(pattern, replace);
+
+        pattern = /[^a-zA-Z\d\s\-\+\/]*/;
+        replace = '';
+
+        newValue = newValue.replace(pattern, replace);
+        //--
+
+        return list.indexOf($.trim(newValue)) < 0;
 
     }, 'This heading is already in use - please choose another.');
 
