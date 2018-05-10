@@ -68,9 +68,9 @@
                             {{ weightedMean | default('–') }}
                     </th>
                     {% for assessment in markbook.assessments %}
-                        {% set assessmentMean = markbook.assessmentStatistics[assessment.id].mean %}
-                        <th class="{{ urgency.marks(assessmentMean) }}-bg" data-assessment="{{ assessment.id }}">
-                                {{ assessmentMean | default('–') }}
+                        {% set stats = markbook.assessmentStatistics[assessment.id] %}
+                        <th class="{{ urgency.marks(stats.meanNormalized) }}-bg" data-assessment="{{ assessment.id }}">
+                                {{ stats.mean | default('–') }}
                         </th>
                     {% endfor %}
                 </tr>
