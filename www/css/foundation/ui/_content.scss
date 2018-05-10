@@ -716,9 +716,9 @@ $rotate-span-width: 11rem;
 }
 .submitted-late {
     @include label(
-            $bg: tint($warning-color, 74%)
+            $bg: tint($alert-color, 74%)
     );
-    color: $warning-color;
+    color: $alert-color;
 }
 .unsubmitted {
     @include label(
