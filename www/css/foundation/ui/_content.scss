@@ -701,6 +701,13 @@ $rotate-span-width: 11rem;
         }
     }
 }
+
+.reviewed {
+    @include label(
+            $bg: tint($success-color, 74%)
+    );
+    color: $success-color;
+}
 .submitted {
     @include label(
             $bg: tint($success-color, 74%)

@@ -71,7 +71,7 @@ class StudentCarousel
             // CSS/label rules
             if ($currentParticipant->findMostRecentInstructorGivenPublishedFeedback()) {
                 // Has feedback been given? Always say "Reviewed"
-                $css = 'submitted';
+                $css   = 'reviewed';
                 $label = 'Reviewed';
 
             } else {
@@ -80,19 +80,17 @@ class StudentCarousel
                 /** @var Submission $latestSubmission */
                 if ($latestSubmission) {
                     if ($latestSubmission->isSubmittedOnTime()) {
-                        $css = 'submitted';
+                        $css   = 'submitted';
                         $label = 'Submitted on time';
 
                     } else {
                         $css   = 'submitted-late';
                         $label = 'Submitted late';
                     }
-                }
-                else {
-
+                } else {
                     /* No submission exists
                      */
-                    $css = 'unsubmitted';
+                    $css   = 'unsubmitted';
                     $label = 'Not submitted';
                 }
             }
