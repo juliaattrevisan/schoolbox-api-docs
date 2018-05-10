@@ -26,7 +26,7 @@ if (is_ascii($_POST['heading'])) {
 $wikis = $wikiHandler->getByCategory($_POST['categoryID']);
 
 foreach ($wikis as $wiki) {
-    if ($wiki['slug'] == $potentialSlug) {
+    if ($wiki['slug'] == $potentialSlug && $wiki['wikiID'] != $_POST['wikiID']) {
         //You have been naughty and bypassed javascript validation
         error($errorMapper::ERROR_WIKI_NAME_IN_USE);
     }
