@@ -156,7 +156,8 @@ class Markbook
                     $cmp = strcasecmp($a->getFirstname(), $b->getFirstname());
                 }
                 return $cmp;
-            }
+            },
+            true
         );
         return $participants;
     }
