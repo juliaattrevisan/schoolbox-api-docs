@@ -50,11 +50,13 @@ class DueWork_Rubric_Handler
      * @param int[]      $folderIds
      * @param Term\Model $term
      * @return array
-     * @var string       $data [sb.id][rc.id]['grouping'] criterion.grouping
-     * @var string       $data [sb.id][rc.id]['name'] criterion.name
-     * @var string       $data [sb.id][rc.id]['max_mark'] max mark
-     * @var array        $data [sb.id][rc.id]['marks']
-     * @var float        $data [sb.id][rc.id]['marks'][student.id]
+     * @internal  string       $data [sb.id][rc.id]['grouping'] criterion.grouping
+     * @internal  string       $data [sb.id][rc.id]['name'] criterion.name
+     * @internal  string       $data [sb.id][rc.id]['max_mark'] max mark
+     * @internal  array        $data [sb.id][rc.id]['marks']
+     * @internal  float        $data [sb.id][rc.id]['marks'][student.id]
+     * @throws UnderflowException
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
      */
     public function getStudentMarksByCriteriaInFolder(array $folderIds, Term\Model $term)
     {
