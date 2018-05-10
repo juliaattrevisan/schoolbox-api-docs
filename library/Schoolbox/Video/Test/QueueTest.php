@@ -88,26 +88,27 @@ class QueueTest extends TestCase
             [1280, 720],
             [1280, 720],
             [1280, 720],
-            [1280, 960],
-            [1280, 960],
-            [1280, 960],
-            [1280, 960],
-            [1280, 962],
+            [800, 600],
+            [960, 720],
+            [960, 720],
+            [960, 720],
+            [960, 720],
             [1280, 720],
-            [1280, 800],
-            [1280, 912],
-            [1384, 720],
-            [1280, 2276],
-            [1280, 2276],
-            [1280, 2276],
-            [1280, 1800],
-            [1280, 2276],
+            [1152, 720],
+            [1014, 720],
+            [1280, 668],
+            [406, 720],
+            [406, 720],
+            [406, 720],
+            [512, 720],
+            [406, 720],
         ];
 
         $queue = new Queue();
         for ($i = 0; isset($resolutions[$i]); $i++) {
-            $result = $this->invokeMethod($queue, 'cover', [$resolutions[$i], $videoResolution]);
-            $this->assertEquals($outputResolutions[$i], $result, "{$result[0]}x{$result[1]}");
+            var_dump($i);
+            $result = $this->invokeMethod($queue, 'contain', [$resolutions[$i], $videoResolution]);
+            $this->assertEquals($outputResolutions[$i], $result, "{$result[0]}x{$result[1]} does not equal {$outputResolutions[$i][0]}x{$outputResolutions[$i][1]}");
         }
     }
 
