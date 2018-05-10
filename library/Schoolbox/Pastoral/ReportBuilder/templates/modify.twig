@@ -248,39 +248,37 @@
 
                     // Initial setup: if any parent types are already checked (from saved data), show their subtypes
                     // otherwise hide the subtypes to save space
-                    $(parentCheckboxSelector).each(function(index, value) {
-                        var checkbox = value;
-
-                        if ($(checkbox).is(':checked')) {
+                    $(parentCheckboxSelector).each(function(index, parentCheckbox) {
+                        if ($(parentCheckbox).is(':checked')) {
                             // ...show the subtypes for this type
-                            $(checkbox).siblings(childGroupSelector).show();
+                            $(parentCheckbox).siblings(childGroupSelector).show();
                         } else {
                             // Hide subtypes by default to reduce vertical scrolling
-                            $(checkbox).siblings(childGroupSelector).hide();
+                            $(parentCheckbox).siblings(childGroupSelector).hide();
                         }
                     });
 
                     // When a parent type checkbox is changed, show or hide its subtypes
                     // and check them by default when shown
                     $(parentCheckboxSelector).change(function(e) {
-                        var checkbox = e.target;
-                        var $subCheckboxes = $(checkbox).siblings(childGroupSelector).find(childCheckboxSelector);
+                        var parentCheckbox = e.target;
+                        var $subCheckboxes = $(parentCheckbox).siblings(childGroupSelector).find(childCheckboxSelector);
 
-                        if ($(checkbox).is(':checked')) {
+                        if ($(parentCheckbox).is(':checked')) {
                             // ...show the subtypes for this type
-                            $(checkbox).siblings(childGroupSelector).show();
+                            $(parentCheckbox).siblings(childGroupSelector).show();
 
                             // ...and check them by default
                             $subCheckboxes.each(function(index, subCheckbox) {
                                 $(subCheckbox).prop('checked', true);
                             });
 
-                            $(checkbox).siblings("label").find("i").removeClass("icon-click-view").addClass("icon-dropdown");
+                            $(parentCheckbox).siblings("label").find("i").removeClass("icon-click-view").addClass("icon-dropdown");
                         } else {
                             // ...hide the subtypes for this type
                             $subCheckboxes.each(function(index, subCheckbox) {
                                 $(subCheckbox).prop('checked', false);
-                                $(checkbox).siblings(childGroupSelector).hide();
+                                $(parentCheckbox).siblings(childGroupSelector).hide();
                             });
 
                             // ...and uncheck them (causes all sorts of problems with select all otherwise)
@@ -288,7 +286,7 @@
                                 $(subCheckbox).prop('checked', false);
                             });
 
-                            $(checkbox).siblings("label").find("i").removeClass("icon-dropdown").addClass("icon-click-view");
+                            $(parentCheckbox).siblings("label").find("i").removeClass("icon-dropdown").addClass("icon-click-view");
                         }
 
                     });
@@ -481,18 +479,18 @@
             selector: $("#type-all"),
             checkboxes: $("[data-check-type]"),
             subCheckboxes: $("[data-check-subtype]"),
-            selectAllNested: function(selectAllButton, subCheckboxes) {
+            selectAllNested: function(selectAllButton, childCheckboxes) {
                 // Show/hide subtypes on select/deselect all
-
                 var parentCheckboxes = "[data-check-type]"
-                var subtypeLists = "[data-pastoral-subtype]";
+                var childCheckboxGroups = "[data-pastoral-subtype]";
+
                 if ($(selectAllButton).is(':checked')) {
-                    $(subtypeLists).show();
-                    $(subCheckboxes).prop("checked", true);
+                    $(childCheckboxGroups).show();
+                    $(childCheckboxes).prop("checked", true);
                     $(parentCheckboxes).siblings("label").find("i").removeClass("icon-click-view").addClass("icon-dropdown");
                 } else {
-                    $(subtypeLists).hide();
-                    $(subCheckboxes).prop("checked", false);
+                    $(childCheckboxGroups).hide();
+                    $(childCheckboxes).prop("checked", false);
                     $(parentCheckboxes).siblings("label").find("i").removeClass("icon-dropdown").addClass("icon-click-view");
                 }
             }
