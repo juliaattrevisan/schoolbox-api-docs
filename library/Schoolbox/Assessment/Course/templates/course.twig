@@ -109,6 +109,10 @@ Usage:
                 $selector.addClass('icon-folder').text($selection.data('label'));
                 $input.val($selection.data('selection'));
 
+                //Hacky way to remove error message - could not find alternative
+                $input.click();
+                $input.blur();
+
                 modal.foundation('reveal', 'close');
             });
             $(document).on('opened.fndtn.reveal', '[data-reveal]', function () {
@@ -252,7 +256,7 @@ Usage:
                                href="#" >
                                 {{ courseSpec.id ? courseSpec.folder.parent.name : '(Click to select)' }}
                             </a>
-                            <input type="hidden" name="parent" id="parent" value="{{ courseSpec.folder.parent.id }}" />
+                            <input class="hide" name="parent" id="parent" value="{{ courseSpec.folder.parent.id }}" />
                         </label>
                     </div>
 
