@@ -226,33 +226,33 @@
 
             <script>
                 $(function() {
-                    var parentTypeSelector = "#formReport input[data-check-type]";
-                    var subTypeSelector = "input[data-check-subtype]";
-                    var siblingSelector = "[data-pastoral-subtype]";
+                    var parentCheckboxSelector = "#formReport input[data-check-type]";
+                    var childCheckboxSelector = "input[data-check-subtype]";
+                    var childGroupSelector = "[data-pastoral-subtype]";
 
                     // Initial setup: if any parent types are already checked (from saved data), show their subtypes
                     // otherwise hide the subtypes to save space
-                    $(parentTypeSelector).each(function(index, value) {
+                    $(parentCheckboxSelector).each(function(index, value) {
                         var checkbox = value;
 
                         if ($(checkbox).is(':checked')) {
                             // ...show the subtypes for this type
-                            $(checkbox).siblings(siblingSelector).show();
+                            $(checkbox).siblings(childGroupSelector).show();
                         } else {
                             // Hide subtypes by default to reduce vertical scrolling
-                            $(checkbox).siblings(siblingSelector).hide();
+                            $(checkbox).siblings(childGroupSelector).hide();
                         }
                     });
 
                     // When a parent type checkbox is changed, show or hide its subtypes
                     // and check them by default when shown
-                    $(parentTypeSelector).change(function(e) {
+                    $(parentCheckboxSelector).change(function(e) {
                         var checkbox = e.target;
-                        var $subCheckboxes = $(checkbox).siblings(siblingSelector).find(subTypeSelector);
+                        var $subCheckboxes = $(checkbox).siblings(childGroupSelector).find(childCheckboxSelector);
 
                         if ($(checkbox).is(':checked')) {
                             // ...show the subtypes for this type
-                            $(checkbox).siblings(siblingSelector).show();
+                            $(checkbox).siblings(childGroupSelector).show();
 
                             // ...and check them by default
                             $subCheckboxes.each(function(index, subCheckbox) {
@@ -262,7 +262,7 @@
                             // ...hide the subtypes for this type
                             $subCheckboxes.each(function(index, subCheckbox) {
                                 $(subCheckbox).prop('checked', false);
-                                $(checkbox).siblings(siblingSelector).hide();
+                                $(checkbox).siblings(childGroupSelector).hide();
                             })
 
                             // ...and uncheck them (causes all sorts of problems with select all otherwise)
@@ -274,16 +274,16 @@
 
                     // When a subtype checkbox is changed, find out if any subtypes in that group are still checked
                     // and if not, uncheck the parent and hide the subtypes
-                    $(parentTypeSelector).each(function(index, parentCheckbox) {
-                        var $subtypes = $(parentCheckbox).siblings(siblingSelector).find(subTypeSelector);
+                    $(parentCheckboxSelector).each(function(index, parentCheckbox) {
+                        var $subtypes = $(parentCheckbox).siblings(childGroupSelector).find(childCheckboxSelector);
 
                         $subtypes.change(function() {
                             if ($subtypes.filter(":checked").length < 1) {
                                 $(parentCheckbox).prop("checked", false);
-                                $subtypes.parent(siblingSelector).hide();
+                                $subtypes.parent(childGroupSelector).hide();
                             } else {
                                 $(parentCheckbox).prop("checked", true);
-                                $subtypes.parent(siblingSelector).show();
+                                $subtypes.parent(childGroupSelector).show();
                             }
                         });
                     })
