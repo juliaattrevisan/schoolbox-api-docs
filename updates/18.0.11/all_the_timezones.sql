@@ -1,0 +1,1 @@
+UPDATE config set field_id = "10", options = "a:1:{s:6:'mapper';s:31:'Schoolbox\\Admin\\Timezone\\Mapper';}" where name = "date_timezone";
