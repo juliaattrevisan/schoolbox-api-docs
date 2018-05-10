@@ -15,7 +15,7 @@
             var derived = {
                 selector: element.find("[data-" + options.key + "='true']"),
                 checkboxes: element.find("input[name='" + options.checkboxName + "']"),
-                subCheckboxes: element.find("input[name='" + options.checkboxName + "']")
+                childCheckboxes: element.find("input[name='" + options.checkboxName + "']")
             };
 
             var merged = $.extend(defaults, derived, options);
@@ -31,7 +31,7 @@
                 config.checkboxes.prop('checked', false);
             }
 
-            config.selectAllNested(config.selector, config.subCheckboxes);
+            config.selectAllNested(config.selector, config.childCheckboxes);
         }
 
         // Check or uncheck the Select All box automatically,
@@ -42,8 +42,8 @@
             if (config.checkboxes.length === config.checkboxes.filter(":checked").length) {
 
                 // If we have nested checkboxes, make sure they're all checked as well
-                if (config.subCheckboxes) {
-                    if (config.subCheckboxes.length === config.subCheckboxes.filter(":checked").length) {
+                if (config.childCheckboxes) {
+                    if (config.childCheckboxes.length === config.childCheckboxes.filter(":checked").length) {
                         config.selector.prop("checked", true);
                     } else {
                         config.selector.prop("checked", false);
@@ -71,8 +71,8 @@
                 autoSelectAll();
             });
 
-            if (config.subCheckboxes) {
-                config.subCheckboxes.change(function() {
+            if (config.childCheckboxes) {
+                config.childCheckboxes.change(function() {
                     autoSelectAll();
                 });
             }

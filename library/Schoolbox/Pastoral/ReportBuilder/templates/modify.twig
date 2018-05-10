@@ -478,7 +478,7 @@
         $reportForm.selectAll({
             selector: $("#type-all"),
             checkboxes: $("[data-check-type]"),
-            subCheckboxes: $("[data-check-subtype]"),
+            childCheckboxes: $("[data-check-subtype]"),
             selectAllNested: function(selectAllButton, childCheckboxes) {
                 // Show/hide subtypes on select/deselect all
                 var parentCheckboxes = "[data-check-type]"
