@@ -62,13 +62,17 @@ class Controller extends Base
         $timestamp = Alaress_Date_Format::now();
         $token = sha1('ecc');
 
+        $headers = ['Cookie' => 'PHPSESSID=voq0oha05p599grrvvco36a29r'];
+
         $response = $client->request(
             "get",
-            "${ip}/api/course-participation/${schoolCode}/users",
-            ['query' =>
-                ['ts' => $timestamp, 'token' => $token]
-            ]
-        );
+            "${ip}/api/course-participation/ecc/users", [
+            'query' => [
+                'ts' => $timestamp,
+                'token' => $token
+            ],
+            'headers' => $headers
+        ]);
 
         $body = $response->getBody()->getContents();
 
