@@ -59,19 +59,31 @@ class Renderer
 
         // Mangle subjects into usable format
 
-        $subjects = [];
+        $subjectGroups = [];
 
         // TODO eradicate this session dependency
         if (is_array($_SESSION["subjects"])) {
             foreach ($_SESSION["subjects"] as $subject) {
-                if (!isset($subjects[$subject['classType']])) {
-                    $subjects[$subject["classType"]] = [];
+                if (!isset($subjectGroups[$subject['classType']])) {
+                    $subjectGroups[$subject["classType"]] = [];
                 }
-                $subjects[$subject['classType']][] = $subject;
+                $subjectGroups[$subject['classType']][] = $subject;
             }
-            uksort($subjects, function ($a, $b) {
+            uksort($subjectGroups, function ($a, $b) {
                 return strnatcmp($a, $b);
             });
+        }
+
+        //Sort the subjects within each subjectGroup
+        foreach ($subjectGroups as $subjectGroup => $subjects ) {
+
+            //Each value is an array, so sort each array
+            usort($subjects, function ($a, $b) {
+                return strnatcmp($a['name'].$a['code'], $b['name'].$b['code']);
+            });
+            
+            //Need to assign back, as $subjects is localised variable
+            $subjectGroups[$subjectGroup] = $subjects;
         }
 
         // Get the menu sections in their correct order
@@ -128,7 +140,7 @@ class Renderer
         return $twig->render('@menuSide/renderer.twig', array(
             'isStaff' => $user->getRole()->isStaff(),
             'nodes' => $nodes,
-            'subjects' => $subjects,
+            'subjects' => $subjectGroups,
             'sections' => $sections,
             'pageCurrent' => $pageCurrent,
             'groups' => $this->getMenuSideMapper()->findGroupsForUser($user),
