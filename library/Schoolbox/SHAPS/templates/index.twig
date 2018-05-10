@@ -37,16 +37,40 @@
             </script>
 
             <aside>Showing status for all staff</aside>
+
             <table>
                 <tr>
+                    <th>
+                        Select users
+                    </th>
                     <th>Provisioning Status</th>
                     <th>User</th>
                 </tr>
 
-                {% for user in users %}
+                <tr>
+                    <td>
+                        <div class="checklist">
+                            <input id="checkbox1" type="checkbox"><label for="checkbox1">Select all unprovisioned</label>
+                        </div>
+                    </td>
+                    <td></td>
+                    <td></td>
+                </tr>
+
+                {% for user in allUsers %}
                     <tr>
                         <td>
-                            <i class="icon-course-outline"></i>
+                            {% if user.id not in provisionedUserIDs %}
+                                <div class="checklist">
+                                    <input id="checkbox1" type="checkbox">
+                                    <label for="checkbox1"></label>
+                                </div>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if user.id in provisionedUserIDs %}
+                                <i class="icon-course-outline"></i>
+                            {% endif %}
                         </td>
                         <td>
                             {{ user.fullname }}

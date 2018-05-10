@@ -39,16 +39,28 @@ class Controller extends Base
     }
 
     public function getProvisionmentStatusList() {
-        $staff = $this->userMapper->findByColumn('g.group_type', 'staff');
+        // All the staff in our Schoolbox instance
+        $allStaff = $this->userMapper->findByColumn('g.group_type', 'staff')->sortBy("lastname", "asc");
+
+        // TODO this will be all the staff on Help
+        $provisionedStaff = $this->userMapper->findByColumn('g.group_type', 'staff')->slice($allStaff->count()/2);
 
         /* TODO get users from this API call eventually
         /api/course-participation/{schoolCode}/users
         */
 
+        $provisionedUserIDs = [];
+        foreach($allStaff as $user) {
+            if ($provisionedStaff->contains($user)) {
+                $provisionedUserIDs[] = $user->getID();
+            }
+        }
+
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@shaps/index.twig', [
-                'users' => $staff
+                'allUsers' => $allStaff,
+                'provisionedUserIDs' => $provisionedUserIDs
             ])->setTitle('Example')
         );
     }
