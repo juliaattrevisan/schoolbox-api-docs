@@ -75,7 +75,7 @@ class StudentCarousel
                 $label = 'Reviewed';
 
             } else {
-                $latestSubmission = $currentParticipant->findMostRecentResponse();
+                $latestSubmission = $currentParticipant->findMostRecentSubmittedResponse();
 
                 /** @var Submission $latestSubmission */
                 if ($latestSubmission) {
