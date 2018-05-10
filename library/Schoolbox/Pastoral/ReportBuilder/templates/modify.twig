@@ -119,9 +119,25 @@
                                        {% for typeSelected in report.types if typeSelected.id == type.id %}checked{% endfor %}
                                        data-check-type
                                 >
-                                <label for="type-{{ type.id }}">
-                                    {{ type.name }}
-                                </label>
+
+                                {% set hasSubTypes = false %}
+                                {% for subtype in subTypes %}
+                                    {% if subtype.pastoralType.id == type.id %}
+                                        {% set hasSubTypes = true %}
+                                    {% endif %}
+                                {% endfor %}
+
+                                {% if hasSubTypes %}
+                                    <label for="type-{{ type.id }}" title="Record type also has sub-types - check this box to see them">
+                                        {{ type.name }}
+                                        <i class="icon-add size-8"></i>
+                                    </label>
+                                {% else %}
+                                    <label for="type-{{ type.id }}">
+                                        {{ type.name }}
+                                    </label>
+                                {% endif %}
+
                                 <div class="checklist" data-pastoral-subtype>
                                     {% for subtype in subTypes %}
 
