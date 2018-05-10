@@ -700,44 +700,44 @@ $rotate-span-width: 11rem;
             }
         }
     }
-}
 
-.reviewed {
-    @include label(
-            $bg: tint($success-color, 74%)
-    );
-    color: $success-color;
-}
-.submitted {
-    @include label(
-            $bg: tint($warning-color, 74%)
-    );
-    color: $warning-color;
-}
-.submitted-late {
-    @include label(
-            $bg: tint($alert-color, 74%)
-    );
-    color: $alert-color;
-}
-.unsubmitted {
-    @include label(
-            $bg: $gainsboro
-    );
-    color: darken($gainsboro, 50%);
-}
-.warning.label {
-    @include label(
-            $bg: tint($warning-color, 74%)
-    );
-    color: $warning-color;
-}
-
-.neutral.label {
-    @include label(
-            $bg: $neutral-color
-    );
-    color: darken($neutral-color, 50%);
+    // Label colors
+    &.reviewed {
+        @include label(
+                $bg: tint($success-color, 74%)
+        );
+        color: $success-color;
+    }
+    &.submitted {
+        @include label(
+                $bg: tint($warning-color, 74%)
+        );
+        color: $warning-color;
+    }
+    &.submitted-late {
+        @include label(
+                $bg: tint($alert-color, 74%)
+        );
+        color: $alert-color;
+    }
+    &.unsubmitted {
+        @include label(
+                $bg: $gainsboro
+        );
+        color: darken($gainsboro, 50%);
+    }
+    &.warning {
+        @include label(
+                $bg: tint($warning-color, 74%)
+        );
+        color: $warning-color;
+    }
+    &.neutral {
+        @include label(
+                $bg: $neutral-color
+        );
+        color: darken($neutral-color, 50%);
+    }
 }
 
 // Hints
