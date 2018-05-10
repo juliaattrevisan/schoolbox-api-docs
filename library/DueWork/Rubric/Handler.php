@@ -126,7 +126,8 @@ class DueWork_Rubric_Handler
         // 2. Get max mark per criterion and dueWork
         $pb = new Alaress\Database\Predicate\Builder($this->db, '');
         $pb->in('rc.parent_id', $folderIds)
-           ->equals('rc.parent_type', Criterion::PARENT_TYPE_CATEGORY);
+           ->equals('rc.parent_type', Criterion::PARENT_TYPE_CATEGORY)
+           ->greaterThan('rd.value', 0.0);
         $whereClause = implode(' AND ', $pb->getWhere());
         $stmt        = Database::getInstance()->prepare("
             SELECT rl.box_id AS 'sb.id', rc.id AS 'rc.id', rc.grouping, rc.name, MAX(rd.value) AS 'max_mark'
@@ -160,11 +161,16 @@ class DueWork_Rubric_Handler
         foreach ($studentMarks as $row) {
             $mark = $row['mark'];
             if (null === $mark) {
+                // If student does not have a numeric mark, cannot calculate normalised mark
                 continue;
             }
             $boxId       = $row['sb.id'];
             $criterionId = $row['rc.id'];
-            $maxMark     = $results[$boxId][$criterionId]['maxMark'];
+            $maxMark     = $results[$boxId][$criterionId]['maxMark'] ?? null;
+            if (null === $maxMark) {
+                // This criterion has a max mark of 0.0 and therefore was not fetched into results array. Cannot calculate a normalised mark
+                continue;
+            }
 
             $results[$boxId][$criterionId]['marks'][$row['owner']] = 100.0 * $mark / $maxMark;
         }
