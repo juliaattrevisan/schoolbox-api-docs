@@ -45,7 +45,7 @@ class Controller extends Base
         // TODO this will be all the staff on Help
         $provisionedStaff = $this->userMapper->findByColumn('g.group_type', 'staff')->slice($allStaff->count()/2);
 
-        /* TODO get users from this API call eventually
+        /* TODO get provisioned users from this API call eventually
         /api/course-participation/{schoolCode}/users
         */
 
