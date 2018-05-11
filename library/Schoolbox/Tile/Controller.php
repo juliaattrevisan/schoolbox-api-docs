@@ -69,6 +69,17 @@ class Controller extends Base
     }
 
     /**
+     * Displays a form for creating a tile layout for a component.
+     *
+     * @param Layout\Model|null  $layout
+     * @param Component_Instance $component
+     */
+    public function layoutForComponent(?Layout\Model $layout, Component_Instance $component)
+    {
+        // TODO implement
+    }
+
+    /**
      * Save form for tile layout.
      *
      * @param Layout\Model       $layout
@@ -138,8 +149,17 @@ class Controller extends Base
             }
             $this->getResponse()->redirect->afterPost($href);
         }
+    }
 
-
+    /**
+     * Save form for tile layout, when a component is provided.
+     *
+     * @param null|Layout\Model  $layout
+     * @param Component_Instance $component
+     */
+    public function layoutForComponentForm(?Layout\Model $layout, Component_Instance $component)
+    {
+        // TODO implement
     }
 
     /**
