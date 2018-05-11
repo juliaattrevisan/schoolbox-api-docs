@@ -43,7 +43,7 @@ class Controller extends Base
         $this->setUserMapper($userMapper);
     }
 
-    public function getProvisionmentStatusList() {
+    public function getAll() {
         // All the staff in our Schoolbox instance
         $allStaff = $this->userMapper->findByColumn('g.group_type', 'staff')->sortBy("lastname", "asc");
 
@@ -64,7 +64,7 @@ class Controller extends Base
         $token = sha1(sprintf(':%s-%s-%s:', $now, $schoolCode, $privateKey));
 
         $timestamp = $now->getUnixTimeStamp();
-        
+
         $response = $client->request(
             "get",
             "${ip}/api/course-participation/${schoolCode}/users", [
@@ -88,6 +88,30 @@ class Controller extends Base
                 'allUsers' => $allStaff,
                 'provisionedUserIDs' => $provisionedUserIDs
             ])->setTitle('Schoolbox Help Staff Provisioning')
+        );
+    }
+
+    public function getProvisioned() {
+        $this->getResponse()->content->set(
+            $this->buildHtmlOutput(
+                '@shaps/provisioned.twig', [
+            ])->setTitle('Provisioned Staff - Schoolbox Help Staff Provisioning')
+        );
+    }
+
+    public function getUnprovisioned() {
+        $this->getResponse()->content->set(
+            $this->buildHtmlOutput(
+                '@shaps/unprovisioned.twig', [
+            ])->setTitle('Unprovisioned Staff - Schoolbox Help Staff Provisioning')
+        );
+    }
+
+    public function getSearch() {
+        $this->getResponse()->content->set(
+            $this->buildHtmlOutput(
+                '@shaps/search.twig', [
+            ])->setTitle('Search - Schoolbox Help Staff Provisioning')
         );
     }
 

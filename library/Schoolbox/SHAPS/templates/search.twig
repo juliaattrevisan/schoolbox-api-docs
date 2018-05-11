@@ -1,35 +1,50 @@
+<div class="row">
+    <div class="small-12 island">
 
-<section id="staffSearch" class="content">
-    <input id="users" name="userId" value="" placeholder="Search Staff" data-selectizeuser="" required="" tabindex="-1" style="display: none;" class="selectized" type="text">
-    <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
-    <script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
-    <script type="text/javascript">
-        $(function() {
+        <h1>Schoolbox Help Staff Provisioning</h1>
 
-            var $selectize = $('#users').selectizeSelector({
-                ajax: {
-                    url:      '/ajax/user.php',
-                    type:     'GET',
-                    data:     {showCampus: true},
-                    dataType: 'json'
-                },
-                multiple: true
-            });
+        <ul class="sub-nav">
+            <li><a href="/shaps/provisioning/">All</a></li>
+            <li><a href="/shaps/provisioning/provisioned">Provisioned</a></li>
+            <li><a href="/shaps/provisioning/unprovisioned">Not Provisioned</a></li>
+            <li class="active"><a href="/shaps/provisioning/search">Search</a></li>
+        </ul>
 
-            $selectize = $selectize[0].selectize;
-            $selectize.on("item_add", function(value, $item) {
-                var $itemText = $item.text();
-                var userID = $itemText.match(/\((\d*)\)/)[1];
 
-                $.get("/shaps/provisioning/"+userID, function(data) {
-                    console.log(data);
-                }, "json")
-                    .fail(function(xhr, status, error) {
-                        console.log(xhr);
-                        console.log(status + ": " + error);
-                    })
+        <section id="staffSearch" class="content">
+            <input id="users" name="userId" value="" placeholder="Search Staff" data-selectizeuser="" required="" tabindex="-1" style="display: none;" class="selectized" type="text">
+            <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+            <script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
+            <script type="text/javascript">
+                $(function() {
 
-            });
-        });
-    </script>
-</section>
+                    var $selectize = $('#users').selectizeSelector({
+                        ajax: {
+                            url:      '/ajax/user.php',
+                            type:     'GET',
+                            data:     {showCampus: true},
+                            dataType: 'json'
+                        },
+                        multiple: true
+                    });
+
+                    $selectize = $selectize[0].selectize;
+                    $selectize.on("item_add", function(value, $item) {
+                        var $itemText = $item.text();
+                        var userID = $itemText.match(/\((\d*)\)/)[1];
+
+                        $.get("/shaps/provisioning/"+userID, function(data) {
+                            console.log(data);
+                        }, "json")
+                            .fail(function(xhr, status, error) {
+                                console.log(xhr);
+                                console.log(status + ": " + error);
+                            })
+
+                    });
+                });
+            </script>
+        </section>
+
+    </div>
+</div>
