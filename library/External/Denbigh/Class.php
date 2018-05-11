@@ -49,9 +49,9 @@ class External_Denbigh_Class implements External_ClassInterface
                             s.academicYear, 
                             s.house
                 FROM        Classes c
-                LEFT JOIN   Enrolments e ON e.classCode = c.classCode
-                LEFT JOIN   Students s ON s.peopleDenbighID = e.studentID
-                LEFT JOIN   People p ON p.denbighID = s.peopleDenbighID
+                JOIN        Enrolments e ON e.classCode = c.classCode
+                JOIN        Students s ON s.peopleDenbighID = e.studentID
+                JOIN        People p ON p.denbighID = s.peopleDenbighID
                 WHERE       c.classCode IN ({$predicate["placeholders"]})
                 GROUP BY    denbighID
                 ORDER BY    p.surname ASC
@@ -99,8 +99,8 @@ class External_Denbigh_Class implements External_ClassInterface
             "
                 SELECT DISTINCT p.denbighID
                 FROM            Classes c
-                LEFT JOIN       Staff s ON s.staffCode = c.staffCode
-                LEFT JOIN       People p ON p.denbighID = s.peopleDenbighID
+                JOIN            Staff s ON s.staffCode = c.staffCode
+                JOIN            People p ON p.denbighID = s.peopleDenbighID
                 WHERE           c.ClassCode IN ({$predicate["placeholders"]})
 		    ",
             $predicate["bindings"]
