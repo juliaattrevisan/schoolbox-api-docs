@@ -2,71 +2,16 @@
     <div class="small-12 island">
         <h1>Schoolbox Help Staff Provisioning</h1>
 
-        <section id="staffSearch" class="content">
-            <input id="users" name="userId" value="" placeholder="Search Staff" data-selectizeuser="" required="" tabindex="-1" style="display: none;" class="selectized" type="text">
-            <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
-            <script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
-            <script type="text/javascript">
-                $(function() {
-
-                    var $selectize = $('#users').selectizeSelector({
-                        ajax: {
-                            url:      '/ajax/user.php',
-                            type:     'GET',
-                            data:     {showCampus: true},
-                            dataType: 'json'
-                        },
-                        multiple: true
-                    });
-
-                    $selectize = $selectize[0].selectize;
-                    $selectize.on("item_add", function(value, $item) {
-                        var $itemText = $item.text();
-                        var userID = $itemText.match(/\((\d*)\)/)[1];
-
-                        $.get("/shaps/provisioning/"+userID, function(data) {
-                            console.log(data);
-                        }, "json")
-                            .fail(function(xhr, status, error) {
-                                console.log(xhr);
-                                console.log(status + ": " + error);
-                            })
-
-                    });
-                });
-            </script>
-
-            <aside>Showing status for all staff</aside>
-
+        <section id="statusTable">
             <table>
                 <tr>
-                    <th>
-                        Select users
-                    </th>
-                    <th>Provisioning Status</th>
+                    <th>Status</th>
                     <th>User</th>
-                </tr>
-
-                <tr>
-                    <td>
-                        <div class="checklist">
-                            <input id="checkbox1" type="checkbox"><label for="checkbox1">Select all unprovisioned</label>
-                        </div>
-                    </td>
-                    <td></td>
-                    <td></td>
+                    <th>Provision?</th>
                 </tr>
 
                 {% for user in allUsers %}
                     <tr>
-                        <td>
-                            {% if user.externalID not in provisionedUserIDs %}
-                                <div class="checklist">
-                                    <input id="checkbox1" type="checkbox">
-                                    <label for="checkbox1"></label>
-                                </div>
-                            {% endif %}
-                        </td>
                         <td>
                             {% if user.externalID in provisionedUserIDs %}
                                 <i class="icon-course-outline"></i>
@@ -74,6 +19,19 @@
                         </td>
                         <td>
                             {{ user.fullname }}
+                        </td>
+                        <td>
+                            {% if user.externalID not in provisionedUserIDs %}
+                                <div class="checklist">
+                                    <input id="provision-{{ user.externalID }}" type="checkbox">
+                                    <label for="provision-{{ user.externalID }}"></label>
+                                </div>
+                            {% else %}
+                                <div class="checklist">
+                                    <input id="provision-{{ user.externalID }}" type="checkbox" disabled>
+                                    <label for="provision-{{ user.externalID }}" title="Already provisioned"></label>
+                                </div>
+                            {% endif %}
                         </td>
                     </tr>
                 {% endfor %}
