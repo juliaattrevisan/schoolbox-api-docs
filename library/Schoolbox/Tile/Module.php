@@ -98,7 +98,7 @@ class Module extends BaseModule
                 // Load component first
                 $component = null;
                 if ($params['componentId']) {
-                    $component = $this->getComponentInstanceMapper()->findById($params['componentId']);
+                    $component = $this->getComponentInstanceMapper()->findByInstanceId($params['componentId']);
 
                 } elseif ($params['layout'] instanceof Layout\Model) {
                     $layoutId  = $params['layout']->getId();
