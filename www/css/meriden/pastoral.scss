@@ -62,6 +62,11 @@ body.login input[type=checkbox]:not(.plain):checked+label:after{ background-colo
     .e-report a {
         text-decoration: none;
     }
+
+    // Fix print width of graphs
+    .e-report div.highcharts-container {
+        zoom: .75;
+    }
 }
 
 /** Style the crest **/
@@ -182,14 +187,17 @@ body.login input[type=checkbox]:not(.plain):checked+label:after{ background-colo
     }
 
     #assessments{
-        table tr th{
-            width: 15%;
-        }
-        .fixed-40{
-            width: 40%;
-        }
-        .fixed-30{
-            width: 30%;
+        page-break-inside: avoid;
+        table tr th {
+            &.title {
+                width: 40%;
+            }
+            &.result {
+                width: 15%;
+            }
+            &.distribution {
+                width: 45%;
+            }
         }
     }
 
