@@ -47,12 +47,6 @@ class Controller extends Base
         // All the staff in our Schoolbox instance
         $allStaff = $this->userMapper->findByColumn('g.group_type', 'staff')->sortBy("lastname", "asc");
 
-        // TODO this will be all the staff on Help
-        $provisionedStaff = $this->userMapper->findByColumn('g.group_type', 'staff')->slice($allStaff->count()/2);
-
-
-
-
         // TODO make this config stuff 'right' later
         $config = new \Schoolbox\Config\Loader();
         $schoolCode = $config->get('site_school_code');
@@ -86,13 +80,12 @@ class Controller extends Base
             'headers' => $headers
         ]);
 
-        $body = $response->getBody()->getContents();
+        $provisionedUsers = json_decode($response->getBody()->getContents(), true);
 
         $provisionedUserIDs = [];
-        foreach($allStaff as $user) {
-            if ($provisionedStaff->contains($user)) {
-                $provisionedUserIDs[] = $user->getID();
-            }
+
+        foreach($provisionedUsers as $key => $value) {
+            $provisionedUserIDs[] = $key;
         }
 
         $this->getResponse()->content->set(
@@ -100,7 +93,7 @@ class Controller extends Base
                 '@shaps/index.twig', [
                 'allUsers' => $allStaff,
                 'provisionedUserIDs' => $provisionedUserIDs
-            ])->setTitle('Example')
+            ])->setTitle('Schoolbox Help Staff Provisioning')
         );
     }
 

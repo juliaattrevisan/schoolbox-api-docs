@@ -60,7 +60,7 @@
                 {% for user in allUsers %}
                     <tr>
                         <td>
-                            {% if user.id not in provisionedUserIDs %}
+                            {% if user.externalID not in provisionedUserIDs %}
                                 <div class="checklist">
                                     <input id="checkbox1" type="checkbox">
                                     <label for="checkbox1"></label>
@@ -68,7 +68,7 @@
                             {% endif %}
                         </td>
                         <td>
-                            {% if user.id in provisionedUserIDs %}
+                            {% if user.externalID in provisionedUserIDs %}
                                 <i class="icon-course-outline"></i>
                             {% endif %}
                         </td>
