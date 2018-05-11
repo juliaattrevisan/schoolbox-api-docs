@@ -41,6 +41,11 @@ class Module extends BaseModule
     {
         $this->addGetRoute($router, 'layout', $basePath, '/layout/{layoutId}');
         $this->addPostRoute($router, 'layoutForm', $basePath , '/layout/{layoutId}');
+
+        // New routes: creating a new layout, given a component
+        $this->addGetRoute($router, 'layoutComponent', $basePath, '/layout/component/{componentId}');
+        $this->addPostRoute($router, 'layoutComponentForm', $basePath , '/layout/component/{componentId}');
+
         // Attach standard REST routes
         $this->attachResourceRoutes($router, $basePath);
         // but have separate add tile paths
@@ -120,10 +125,16 @@ class Module extends BaseModule
             $matcher,
             "(?:add|create|layout|layoutForm|edit|update|update:post|delete|delete:post)",
             function ($params) {
-                if ($params['layout'] instanceof Layout\Model) {
+                if ($params['componentId']) {
+                    $componentId = $params['componentId'];
+                } elseif ($params['layout'] instanceof Layout\Model) {
+                    $componentId = $params['layout']->getId();
+                }
+
+                if (isset($componentId)) {
                     $component = $this->getComponentInstanceMapper()->findComponentByConfigValue(
                         'layoutId',
-                        $params['layout']->getId()
+                        $componentId
                     )->first();
 
                     if ($component) {
