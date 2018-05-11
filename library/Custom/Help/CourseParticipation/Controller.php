@@ -443,9 +443,6 @@ class Controller extends Base
     {
         $requestTimestamp = Alaress_Date_Format::newFromTimestamp($query->get('ts', 0));
 
-        // TODO temporarily hard coding the timestamp to now for testing purposes
-//        $requestTimestamp = new Alaress_Date_Format();
-
         $authDigest = $query->get('token', '');
 
         $responseCode = $this->getResponseCode($schoolCode, $requestTimestamp, $authDigest);
