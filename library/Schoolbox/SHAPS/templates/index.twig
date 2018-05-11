@@ -9,49 +9,54 @@
             <li><a href="#">Search</a></li>
         </ul>
 
-        <section class="content" id="statusTable">
-            <table>
-                <tr>
-                    <th>Status</th>
-                    <th>User</th>
-                    <th>Provision?</th>
-                </tr>
-
-                {% for user in allUsers %}
-                    {% if user.externalID not in provisionedUserIDs %}
-                        <tr class="highlight-warning">
-                    {% else %}
-                        <tr>
-                    {% endif %}
-                        <td>
-                            {% if user.externalID in provisionedUserIDs %}
-                                <i class="icon-course-outline"></i>
-                            {% else %}
-                                <i class="icon-close"></i>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {{ user.fullname }}
-                        </td>
-                        <td>
-                            {% if user.externalID not in provisionedUserIDs %}
-                                <div class="checklist">
-                                    <input id="provision-{{ user.externalID }}" type="checkbox">
-                                    <label for="provision-{{ user.externalID }}"></label>
-                                </div>
-                            {% else %}
-                                <div class="checklist">
-                                    <input id="provision-{{ user.externalID }}" type="checkbox" disabled>
-                                    <label for="provision-{{ user.externalID }}" title="Already provisioned"></label>
-                                </div>
-                            {% endif %}
-                        </td>
+        <form>
+            <section class="content" id="statusTable">
+                <table>
+                    <tr>
+                        <th>Status</th>
+                        <th>User</th>
+                        <th>Provision?</th>
                     </tr>
-                {% endfor %}
 
-            </table>
-        </section>
+                    {% for user in allUsers %}
+                        {% if user.externalID not in provisionedUserIDs %}
+                            <tr class="highlight-warning">
+                        {% else %}
+                            <tr>
+                        {% endif %}
+                            <td>
+                                {% if user.externalID in provisionedUserIDs %}
+                                    <i class="icon-course-outline"></i>
+                                {% else %}
+                                    <i class="icon-close"></i>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {{ user.fullname }}
+                            </td>
+                            <td>
+                                {% if user.externalID not in provisionedUserIDs %}
+                                    <div class="checklist">
+                                        <input id="provision-{{ user.externalID }}" type="checkbox">
+                                        <label for="provision-{{ user.externalID }}"></label>
+                                    </div>
+                                {% else %}
+                                    <div class="checklist">
+                                        <input id="provision-{{ user.externalID }}" type="checkbox" disabled>
+                                        <label for="provision-{{ user.externalID }}" title="Already provisioned"></label>
+                                    </div>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
 
+                </table>
+            </section>
+
+            <input type="submit" value="Save changes">
+        </form>
     </div>
+
+
 </div>
 
