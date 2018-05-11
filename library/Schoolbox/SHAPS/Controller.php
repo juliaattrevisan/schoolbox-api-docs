@@ -93,9 +93,11 @@ class Controller extends Base
     }
 
     public function getProvisioned() {
+        $provisionedUsers = $this->getUsersFromHelp();
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@shaps/provisioned.twig', [
+                    'provisionedUsers' => $provisionedUsers
             ])->setTitle('Provisioned Staff - Schoolbox Help Staff Provisioning')
         );
     }
