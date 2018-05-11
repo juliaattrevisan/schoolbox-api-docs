@@ -46,23 +46,16 @@
 
                             $(data).each(function(index, user) {
                                 var statusMarkup = '';
+                                var checkboxMarkup = '';
+                                var trMarkup = '';
+
                                 if (user.provisioned) {
                                     statusMarkup = '<i class="icon-course-outline" title="Provisioned"></i>\n';
-                                } else {
-                                    statusMarkup = '<i class="icon-close" title="Not Provisioned"></i>\n';
-                                }
-
-                                var checkboxMarkup = '';
-                                if (user.provisioned) {
                                     checkboxMarkup = '<div class="checklist"><input id="provision-' + user.externalID + '" type="checkbox" disabled><label for="provision-' + user.externalID + '" title="Already provisioned"></label></div>';
-                                } else {
-                                    checkboxMarkup = '<div class="checklist"><input id="provision-' + user.externalID + '" type="checkbox"><label for="provision-' + user.externalID + '"></label></div>';
-                                }
-
-                                var trMarkup = '';
-                                if (user.provisioned) {
                                     trMarkup = '<tr>';
                                 } else {
+                                    statusMarkup = '<i class="icon-close" title="Not Provisioned"></i>\n';
+                                    checkboxMarkup = '<div class="checklist"><input id="provision-' + user.externalID + '" type="checkbox"><label for="provision-' + user.externalID + '"></label></div>';
                                     trMarkup = '<tr class="highlight-warning">';
                                 }
 
