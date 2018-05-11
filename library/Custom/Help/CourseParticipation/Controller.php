@@ -345,6 +345,10 @@ class Controller extends Base
         $rq = $this->getRequest();
         $rs = $this->getResponse();
 
+        $timestamp = $rq->query->get('timestamp');
+        $token = $rq->query->get('token');
+        $headers = $rq->headers;
+
         if ($this->isInvalidAuth($rq->query, $schoolCode)) {
             return;
         }
@@ -437,7 +441,10 @@ class Controller extends Base
      */
     private function isInvalidAuth(Values $query, $schoolCode)
     {
-        $requestTimestamp = new Alaress_Date_Format($query->get('ts', 0), Alaress_Date_Format::TIMESTAMP);
+//        $requestTimestamp = new Alaress_Date_Format($query->get('ts', 0), Alaress_Date_Format::TIMESTAMP);
+
+        // TODO temporarily hard coding the timestamp to now for testing purposes
+        $requestTimestamp = new Alaress_Date_Format();
 
         $authDigest = $query->get('token', '');
 
@@ -471,8 +478,9 @@ class Controller extends Base
     {
         $deltaTimestamp = abs(Alaress_Date_Format::now()->diffInSeconds($requestTimestamp));
 
+        // TODO hardcoding to larger value for debugging
         // permit a window of +/- 10 seconds to guard against replay
-        if ($deltaTimestamp > 10) {
+        if ($deltaTimestamp > 500) {
             return 400;
         }
 

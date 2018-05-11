@@ -120,7 +120,8 @@ class Admin implements ModuleConfigInterface
         $featureTours = new \Schoolbox\Admin\FeatureTours\Module($di);
         $featureTours->init('/adminv2/feature-tours');
 
-        $module = new \Custom\Help\CourseParticipation\Module($kernel->getDependencyInjector());
+        // Schoolbox Help API
+        $module = new \Custom\Help\CourseParticipation\Module($di);
         $module->init('/api/course-participation');
     }
 } 

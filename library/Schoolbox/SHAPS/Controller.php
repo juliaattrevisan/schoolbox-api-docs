@@ -16,6 +16,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use GuzzleHttp\Client as GuzzleClient;
+use Schoolbox\Permission\SiteAccess;
 
 
 class Controller extends Base
@@ -59,14 +60,23 @@ class Controller extends Base
         $client = new GuzzleClient();
 
         $ip = "http://192.168.36.10";
-        $timestamp = Alaress_Date_Format::now();
-        $token = sha1('ecc');
 
-        $headers = ['Cookie' => 'PHPSESSID=voq0oha05p599grrvvco36a29r'];
+        // Query params
+        $schoolCode = 'ecc';
+
+        $timestamp = new Alaress_Date_Format();
+        $timestamp = $timestamp->getUnixTimeStamp();
+
+        $tokenMapper = new SiteAccess\Mapper();
+        $privateKey = $tokenMapper->findById($schoolCode)->getAccessToken();
+        $token = sha1(sprintf(':%s-%s-%s:', $timestamp, $schoolCode, $privateKey));
+
+        // Other request options
+        $headers = ['Cookie' => 'PHPSESSID=qhmi1oedvd68rfcf0bhtdpno65'];
 
         $response = $client->request(
             "get",
-            "${ip}/api/course-participation/ecc/users", [
+            "${ip}/api/course-participation/${schoolCode}/users", [
             'query' => [
                 'ts' => $timestamp,
                 'token' => $token
