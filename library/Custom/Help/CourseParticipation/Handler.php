@@ -129,7 +129,12 @@ class Handler
      */
     public function getUsersBySchool($schoolCode, $fuzzy = false)
     {
-        $roleId = $this->getRoleMapper()->findOneByColumn('name', self::PARTICIPANT_ROLE_NAME)->getId();
+        $column = "name";
+        // TODO hard coding because of different role types in vagrant
+//        $value = self::PARTICIPANT_ROLE_NAME;
+        $value = "Teachers";
+        $roleMapper = $this->getRoleMapper();
+        $roleId = $roleMapper->findOneByColumn($column, $value)->getId();
 
         // show the list of users for this school
         // filter to the list of users whose external IDs are prefixed with the given school code
