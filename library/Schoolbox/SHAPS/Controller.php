@@ -79,8 +79,8 @@ class Controller extends Base
         $allStaff = $this->userMapper->findByColumn('g.group_type', 'staff')->sortBy("lastname", "asc");
         $provisionedUsers = $this->getUsersFromHelp();
         $provisionedUserIDs = [];
-        foreach($provisionedUsers as $key => $value) {
-            $provisionedUserIDs[] = $key;
+        foreach($provisionedUsers as $externalID => $username) {
+            $provisionedUserIDs[] = $externalID;
         }
 
         $this->getResponse()->content->set(
