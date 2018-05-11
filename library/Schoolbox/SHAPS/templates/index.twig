@@ -26,9 +26,9 @@
                         {% endif %}
                             <td>
                                 {% if user.externalID in provisionedUserIDs %}
-                                    <i class="icon-course-outline"></i>
+                                    <i class="icon-course-outline" title="Provisioned"></i>
                                 {% else %}
-                                    <i class="icon-close"></i>
+                                    <i class="icon-close" title="Not Provisioned"></i>
                                 {% endif %}
                             </td>
                             <td>
