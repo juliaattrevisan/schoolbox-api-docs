@@ -10,6 +10,7 @@
 namespace Schoolbox\Assessment\Component;
 
 use PDO;
+use PDOStatement;
 use Schoolbox;
 use Schoolbox\Assessment\ActivityFactory;
 use Schoolbox\Assessment\ActivityCollection;
@@ -95,12 +96,49 @@ class SubmissionBoxMapper extends Schoolbox\Mapper
         $this->registerCallback(self::CALLBACK_POSTDELETE, array($this, 'deleteFromMarkbook'));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'deleteFromMarkbook'));
 
-
-        // SoftDelete/Restore weak entities
         $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteRubricLevels']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteSubmissions'));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteReturns'));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteShowcase'));
+
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'restoreToExternalMarkbook']);
+    }
+
+
+    /**
+     * @inheritdoc
+     * @throws Schoolbox\Mapper\DefinitionException
+     */
+    public function getSelectString(): string
+    {
+        return "
+            SELECT     {$this->getColumnString()},
+                       {$this->getJoinColumnString('assessmentModel', 'am')}
+            FROM       {$this->getTable()}
+            INNER JOIN {$this->getJoinSql('assessmentModel', '', 'am', true)}
+        ";
+    }
+
+
+    /**
+     * @param PDOStatement $statement
+     * @return GenericCollection
+     * @throws Schoolbox\Mapper\DefinitionException
+     * @throws Schoolbox\Mapper\Exception
+     */
+    public function hydrateSelect(PDOStatement $statement): GenericCollection
+    {
+        /** @var AssessmentMapper $assessmentMapper */
+        $assessmentMapper = $this->getJoinMapper('assessmentModel');
+        $collection       = $this->createCollection();
+
+        /** @noinspection PhpAssignmentInConditionInspection */
+        while ($row = $statement->fetch()) {
+            $box                       = $this->hydrate($row)->setAssessmentModel($assessmentMapper->hydrate($row, 'am'));
+            $collection[$box->getId()] = $box;
+        }
+
+        return $collection;
     }
 
 
@@ -271,7 +309,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper
         if (!$this->isAssessmentSpecification($object)) {
             // This saves the assessment to the remote system
             $externalMarkbook = new External_Markbook();
-            $activity         = (new ActivityFactory())->buildFromSubmissionBox($object, 'upcoming');
+            $activity         = (new ActivityFactory())->buildFromSubmissionBox($object, Schoolbox\Assessment\Activity::EVENT_UPCOMING);
 
             if (!$externalMarkbook->hasAssessment($activity)) {
                 $externalMarkbook->createAssessment($activity);
@@ -282,6 +320,20 @@ class SubmissionBoxMapper extends Schoolbox\Mapper
 
         return true;
     }
+
+
+    /**
+     * Re-inserts assessment in markbook
+     *
+     * @param SubmissionBox $box
+     * @return bool
+     */
+    public function restoreToExternalMarkbook(SubmissionBox $box): bool
+    {
+        $this->syncToExternalMarkbook($box);
+        return true;
+    }
+
 
     /**
      * @param SubmissionBox $box
@@ -308,7 +360,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper
         $externalMarkbook = new \External_Markbook();
         $activityFactory  = new \Schoolbox\Assessment\ActivityFactory();
         $externalMarkbook->deleteAssessment(
-            $activityFactory->buildFromSubmissionBox($object, 'upcoming')
+            $activityFactory->buildFromSubmissionBox($object, Schoolbox\Assessment\Activity::EVENT_UPCOMING)
         );
     }
 
@@ -388,7 +440,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper
             $box = $this->hydrate($row, 'sb');
             $box->setOwner($user_mapper->hydrate($row, 'u'));
             $box->setCategory($cat_mapper->hydrate($row, 'c'));
-            $collection->add($factory->buildFromSubmissionBox($box, 'overdue'));
+            $collection->add($factory->buildFromSubmissionBox($box, Schoolbox\Assessment\Activity::EVENT_OVERDUE));
         }
         /** @var Folder\Code\Mapper $code_mapper */
         $code_mapper = $cat_mapper->getJoinMapper('codes');

@@ -89,9 +89,10 @@ class Mapper extends BaseMapper
         $this->registerCallback(self::CALLBACK_POSTDELETE, array($this, 'deleteFromMarkbook'));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'deleteFromMarkbook'));
 
-        // SoftDelete/Restore weak entities
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteSections'));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteAttempts'));
+
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'restoreToExternalMarkbook']);
     }
 
     /**
@@ -195,23 +196,37 @@ class Mapper extends BaseMapper
     /**
      * Post-save callback.
      *
-     * Saves a record in external markbook system
+     * Saves a record in external markbook system. Always returns TRUE as we never want to short-circuit subsequent callbacks
      *
-     * @param  Model $object
+     * @param  Model $quiz
      * @return bool
      */
-    public function updateExternalMarkbook(Model $object)
+    public function updateExternalMarkbook(Model $quiz): bool
     {
         // Don't attempt to sync assessment specs to external markbook (they cannot have interactions)
-        if ($this->isAssessmentSpecification($object)) {
-            return false;
+        if (!$this->isAssessmentSpecification($quiz)) {
+            $externalMarkbook = new \External_Markbook();
+            $activity         = (new ActivityFactory())->buildFromOnlineAssessment($quiz, Schoolbox\Assessment\Activity::EVENT_UPCOMING);
+            if (!$externalMarkbook->hasAssessment($activity)) {
+                $externalMarkbook->createAssessment($activity);
+            }
+            $externalMarkbook->updateAssessment($activity);
         }
-        $externalMarkbook = new \External_Markbook();
-        $activity         = (new ActivityFactory())->buildFromOnlineAssessment($object, 'upcoming');
-        if (!$externalMarkbook->hasAssessment($activity)) {
-            return $externalMarkbook->createAssessment($activity);
-        }
-        return $externalMarkbook->updateAssessment($activity);
+
+        return true;
+    }
+
+
+    /**
+     * Post-restore callback to re-insert in SIS markbook
+     *
+     * @param Model $quiz
+     * @return bool
+     */
+    public function restoreToExternalMarkbook(Model $quiz): bool
+    {
+        $this->updateExternalMarkbook($quiz);
+        return true;
     }
 
 
@@ -239,7 +254,7 @@ class Mapper extends BaseMapper
         $externalMarkbook = new \External_Markbook();
         $activityFactory = new ActivityFactory();
         $externalMarkbook->deleteAssessment(
-            $activityFactory->buildFromOnlineAssessment($object, 'upcoming')
+            $activityFactory->buildFromOnlineAssessment($object, Schoolbox\Assessment\Activity::EVENT_UPCOMING)
         );
         return true;
     }
@@ -294,7 +309,7 @@ class Mapper extends BaseMapper
             $box = $this->hydrate($row, 'a');
             $box->setUser($user_mapper->hydrate($row, 'u'))
                 ->setCategory($cat_mapper->hydrate($row, 'c'));
-            $collection->add($factory->buildFromOnlineAssessment($box, 'closed'));
+            $collection->add($factory->buildFromOnlineAssessment($box, Schoolbox\Assessment\Activity::EVENT_CLOSED));
         }
         $cat_mapper->getJoinMapper('codes')->applyCodesToCategories(
             $collection,

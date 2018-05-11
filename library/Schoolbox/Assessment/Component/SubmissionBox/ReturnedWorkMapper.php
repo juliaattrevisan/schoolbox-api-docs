@@ -77,10 +77,11 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
 
         // SoftDelete/Restore weak entities
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteReturnedWorkFiles'));
-        $this->registerCallback(self::CALLBACK_POSTSAVE, array($this, 'syncToMarkbook'));
+        $this->registerCallback(self::CALLBACK_POSTSAVE, array($this, 'syncToExternalMarkbook'));
         $this->registerCallback(self::CALLBACK_POSTSAVE, array($this, 'persistFiles'));
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'canParticipate']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'insertParticipation']);
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'restoreToExternalMarkbook']);
     }
 
 
@@ -257,15 +258,29 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
      * * Saves the data to the remote data connector
      *
      * @param ReturnedWork $object
-     * @param ReturnedWork $previous
+     * @param null|ReturnedWork $previous
      */
-    public function syncToMarkbook(ReturnedWork $object, $previous = null)
+    public function syncToExternalMarkbook(ReturnedWork $object, $previous = null)
     {
         if ($object->isPublished()) {
             $externalMarkbook = new \External_Markbook();
             $externalMarkbook->setMark($object);
         }
     }
+
+
+    /**
+     * Re-inserts mark in markbook
+     *
+     * @param ReturnedWork $returnedWork
+     * @return bool
+     */
+    public function restoreToExternalMarkbook(ReturnedWork $returnedWork): bool
+    {
+        $this->syncToExternalMarkbook($returnedWork);
+        return true;
+    }
+
 
     /**
      * Post-save callback.
