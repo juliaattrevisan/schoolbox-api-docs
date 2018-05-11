@@ -26,6 +26,8 @@
                         <td>
                             {% if user.externalID in provisionedUserIDs %}
                                 <i class="icon-course-outline"></i>
+                            {% else %}
+                                <i class="icon-close"></i>
                             {% endif %}
                         </td>
                         <td>
