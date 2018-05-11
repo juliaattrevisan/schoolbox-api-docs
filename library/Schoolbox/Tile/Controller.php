@@ -163,6 +163,10 @@ class Controller extends Base
                     'component'  => $component,
                     'attachzone' => $this->getAttachZoneData($model),
                     'folder'     => $this->getFolderForComponent($component),
+                    'formAction' => $this->getRouter()->generate(
+                        'tile.create',
+                        ['layoutId' => $layout->getId()]
+                    ),
                 ),
             )
         );
@@ -187,6 +191,10 @@ class Controller extends Base
                     'component'  => $component,
                     'attachzone' => $this->getAttachZoneData($model),
                     'folder'     => $this->getFolderForComponent($component),
+                    'formAction' => $this->getRouter()->generate(
+                        'tile.createForComponent',
+                        ['componentId' => $component->getId()]
+                    ),
                 ),
             )
         );
@@ -270,6 +278,10 @@ class Controller extends Base
                     'component'  => $component,
                     'attachzone' => $this->getAttachZoneData($item),
                     'folder'     => $this->getFolderForComponent($component),
+                    'formAction' => $this->getRouter()->generate(
+                        'tile.update:post',
+                        ['id' => $item->getId()]
+                    ),
                 ),
             )
         );
