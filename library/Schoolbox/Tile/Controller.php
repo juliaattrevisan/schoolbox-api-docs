@@ -169,6 +169,30 @@ class Controller extends Base
     }
 
     /**
+     * Displays a form for adding a tile to a component
+     *
+     * @param Component_Instance $component
+     * @throws MapperException
+     */
+    public function addToComponent(Component_Instance $component)
+    {
+        /** @var Model $model */
+        $model = $this->getMapper()->createModel();
+        $this->getResponse()->content->set(
+            array(
+                'title'    => 'Add Tile',
+                'template' => '@tile/modify.twig',
+                'data'     => array(
+                    'item'       => $model,
+                    'component'  => $component,
+                    'attachzone' => $this->getAttachZoneData($model),
+                    'folder'     => $this->getFolderForComponent($component),
+                ),
+            )
+        );
+    }
+
+    /**
      * Create form for a new tile.
      *
      * @param Layout\Model       $layout
@@ -189,6 +213,35 @@ class Controller extends Base
         if (!($layout->getId())) {
             throw new \RuntimeException('Layout must be created before adding a tile');
         }
+        $item->setTileLayout($layout);
+
+        $this->getMapper()->save($item);
+        $this->getResponse()->redirect->afterPost(
+            $this->getRouter()->generate(
+                'tile.layout',
+                array('layoutId' => $layout->getId())
+            )
+        );
+    }
+
+    /**
+     * Create form for a new tile.
+     *
+     * @param Component_Instance $component
+     * @throws MapperException
+     * @throws \Aura\Router\Exception\RouteNotFound
+     */
+    public function createForComponent(Component_Instance $component)
+    {
+        /** @var Model $item */
+        $item = $this->getMapper()->createModel();
+        $this->updateItemWithFormValues(
+            $item,
+            $this->getRequest()->post
+        );
+
+        // Find and build layout from the component
+        $layout = $this->getLayoutFromComponent($component);
         $item->setTileLayout($layout);
 
         $this->getMapper()->save($item);

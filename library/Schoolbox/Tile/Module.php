@@ -51,7 +51,7 @@ class Module extends BaseModule
 
         // also have separate paths for adding a tile to a component (will create a new layout)
         $this->addGetRoute($router, 'addToComponent', $basePath, '/add/component/{componentId}');
-        $this->addPostRoute($router, 'createForComponentForm', $basePath , '/add/component/{componentId}');
+        $this->addPostRoute($router, 'createForComponent', $basePath , '/add/component/{componentId}');
     }
 
     /**
