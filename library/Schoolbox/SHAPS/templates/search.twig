@@ -73,7 +73,9 @@
                             })
                     });
 
-                    $selectize.on("item_remove", function() {
+                    $selectize.on("item_remove", function(index, value) {
+                        // TODO extract the id from the value innerText
+                        // and use it to find the table row for that user and delete it from the DOM
                         var selectizeEmpty = ($selectize.items.length < 1);
                         if (selectizeEmpty) {
                             $(".empty-state").show();
