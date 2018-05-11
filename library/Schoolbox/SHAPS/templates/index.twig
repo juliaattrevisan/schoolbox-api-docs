@@ -11,7 +11,11 @@
                 </tr>
 
                 {% for user in allUsers %}
-                    <tr>
+                    {% if user.externalID not in provisionedUserIDs %}
+                        <tr class="highlight-warning">
+                    {% else %}
+                        <tr>
+                    {% endif %}
                         <td>
                             {% if user.externalID in provisionedUserIDs %}
                                 <i class="icon-course-outline"></i>
