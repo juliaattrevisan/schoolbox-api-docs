@@ -60,18 +60,32 @@ class Module extends BaseModule
         $preloadPlagscanWithAss = function (array $params) { return $this->preloadPlagscanWithAssessment($params); };
         $preloadKami            = function (array $params) { return $this->preloadKami($params); };
 
-        $hasWriteAccess = $this->buildRuleHasWriteAccess();
-        $hasKamiAccess = $this->buildRuleCanAccessKami();
-        $hasInlineAccess = new Rule\Any(
-            $this->buildRuleHasWriteAccess(),
-            new CanSelfAssess()
+        $hasWriteAccess = new Rule\All(
+                new Rule\IsLoggedIn(),
+                $this->buildRuleHasWriteAccess()
         );
 
-        $hasPlagscanAccess = new Rule\Any(
-            $hasWriteAccess,
-            new Rule\All(
-                new Rule\IsUser('studentId'),
-                new Rule\IsConfigOn('plagscan_allow_students_report_access', $this->getConfigLoader())
+        $hasKamiAccess = new Rule\All(
+            new Rule\IsLoggedIn(),
+            $this->buildRuleCanAccessKami()
+        );
+
+        $hasInlineAccess = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\Any(
+                $this->buildRuleHasWriteAccess(),
+                new CanSelfAssess()
+            )
+        );
+
+        $hasPlagscanAccess = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\Any(
+                $this->buildRuleHasWriteAccess(),
+                new Rule\All(
+                    new Rule\IsUser('studentId'),
+                    new Rule\IsConfigOn('plagscan_allow_students_report_access', $this->getConfigLoader())
+                )
             )
         );
 
