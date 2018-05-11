@@ -17,7 +17,7 @@ use Schoolbox\User;
 use Schoolbox\UserMapper;
 use GuzzleHttp\Client as GuzzleClient;
 use Schoolbox\Permission\SiteAccess;
-
+use Schoolbox\Collection;
 
 class Controller extends Base
 {
@@ -108,9 +108,19 @@ class Controller extends Base
     }
 
     public function getUnprovisioned() {
+        $allStaff = $this->userMapper->findByColumn('g.group_type', 'staff')->sortBy("lastname", "asc");
+        $usersFromHelp = $this->getUsersFromHelp();
+        $provisionedUsers = [];
+        foreach($usersFromHelp as $externalID => $username) {
+            $userObj = $this->userMapper->findByExternalId($externalID);
+            $provisionedUsers[] = $userObj;
+        }
+        $unprovisionedStaff = $allStaff->diff(new Collection($provisionedUsers));
+
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@shaps/unprovisioned.twig', [
+                    'unprovisionedUsers' => $unprovisionedStaff
             ])->setTitle('Unprovisioned Staff - Schoolbox Help Staff Provisioning')
         );
     }

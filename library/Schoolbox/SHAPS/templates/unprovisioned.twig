@@ -10,5 +10,38 @@
             <li><a href="/shaps/provisioning/search">Search</a></li>
         </ul>
 
+        <form>
+            <section class="content" id="statusTable">
+                <table>
+                    <tr>
+                        <th>Status</th>
+                        <th>User</th>
+                        <th>Provision?</th>
+                    </tr>
+
+                    {% for user in unprovisionedUsers %}
+                        <tr>
+                            <td>
+                                <i class="icon-close"></i>
+                            </td>
+                            <td>
+                                {{ user.fullname }}
+                            </td>
+                            <td>
+                                <div class="checklist">
+                                    <input id="provision-{{ user.externalID }}" type="checkbox">
+                                    <label for="provision-{{ user.externalID }}"></label>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+
+                </table>
+            </section>
+
+            <input type="submit" value="Save changes">
+        </form>
+
+
     </div>
 </div>
