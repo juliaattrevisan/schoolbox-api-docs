@@ -735,6 +735,12 @@ fieldset {
 	min-width: 0;
 }
 
+// TODO only putting this here temporarily until I can get my own sass file working
+tr.highlight-warning, tr:nth-of-type(even).highlight-warning {
+	background: scale-color($warning-color, $lightness: 75%);
+}
+
+
 @import 'dropzone';
 @import 'datetime';
 @import 'tinymce';
