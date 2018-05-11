@@ -126,31 +126,32 @@ class Module extends BaseModule
             $matcher,
             '.*',
             function ($params) {
+                // Load component first
+                $component = null;
                 if ($params['componentId']) {
-                    $componentId = $params['componentId'];
-                } elseif ($params['layout'] instanceof Layout\Model) {
-                    $componentId = $params['layout']->getId();
-                }
+                    $component = $this->getComponentInstanceMapper()->findById($params['componentId']);
 
-                if (isset($componentId)) {
+                } elseif ($params['layout'] instanceof Layout\Model) {
+                    $layoutId  = $params['layout']->getId();
                     $component = $this->getComponentInstanceMapper()->findComponentByConfigValue(
                         'layoutId',
-                        $componentId
+                        $layoutId
                     )->first();
+                }
 
-                    if ($component) {
-                        $folderId   = $component->getIdentifier();
-                        $columnName = $this->getFolderMapper()->getIdentifier()['column'];
+                // Load homepage from component
+                if ($component instanceof Component_Instance) {
+                    $folderId   = $component->getIdentifier();
+                    $columnName = $this->getFolderMapper()->getIdentifier()['column'];
 
-                        return [
-                            'component' => $component,
-                            'homepage'  => $this->getFolderMapper()->findByColumn(
-                                $columnName,
-                                $folderId,
-                                ['deleted' => true]
-                            )->first(),
-                        ];
-                    }
+                    return [
+                        'component' => $component,
+                        'homepage'  => $this->getFolderMapper()->findByColumn(
+                            $columnName,
+                            $folderId,
+                            ['deleted' => true]
+                        )->first(),
+                    ];
                 }
                 return [];
 
