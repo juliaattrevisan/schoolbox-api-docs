@@ -64,12 +64,14 @@ class Controller extends Base
         // Query params
         $schoolCode = 'ecc';
 
-        $timestamp = new Alaress_Date_Format();
-        $timestamp = $timestamp->getUnixTimeStamp();
+        $now = new Alaress_Date_Format();
 
         $tokenMapper = new SiteAccess\Mapper();
         $privateKey = $tokenMapper->findById($schoolCode)->getAccessToken();
-        $token = sha1(sprintf(':%s-%s-%s:', $timestamp, $schoolCode, $privateKey));
+
+        $token = sha1(sprintf(':%s-%s-%s:', $now, $schoolCode, $privateKey));
+
+        $timestamp = $now->getUnixTimeStamp();
 
         // Other request options
         $headers = ['Cookie' => 'PHPSESSID=qhmi1oedvd68rfcf0bhtdpno65'];

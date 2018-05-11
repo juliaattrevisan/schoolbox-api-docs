@@ -441,10 +441,10 @@ class Controller extends Base
      */
     private function isInvalidAuth(Values $query, $schoolCode)
     {
-//        $requestTimestamp = new Alaress_Date_Format($query->get('ts', 0), Alaress_Date_Format::TIMESTAMP);
+        $requestTimestamp = Alaress_Date_Format::newFromTimestamp($query->get('ts', 0));
 
         // TODO temporarily hard coding the timestamp to now for testing purposes
-        $requestTimestamp = new Alaress_Date_Format();
+//        $requestTimestamp = new Alaress_Date_Format();
 
         $authDigest = $query->get('token', '');
 
