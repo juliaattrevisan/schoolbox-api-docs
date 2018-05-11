@@ -69,6 +69,18 @@ abstract class Controller extends ListController implements IAssessmentControlle
         $this->termMapper      = $termMapper;
     }
 
+    /**
+     * Redirect the standard assessment URL to a user specific version
+     * @api GET /learning/assessment/{assessmentId}
+     * @level 165
+     *
+     */
+    public function getAssessment(IAssessable $assessment) {
+
+        $url = $this->getRouter()->generate('learningAssessment.getSummary', [ 'assessmentId' => $assessment->getId(), 'studentId' => $this->getUser()->getId() ]);
+        $this->redirect($url);
+
+    }
 
     /**
      * Get the form for creating a new assessment in a particular context
