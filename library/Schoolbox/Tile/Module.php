@@ -140,20 +140,16 @@ class Module extends BaseModule
                 }
 
                 // Load homepage from component
+                $extraParams = [];
                 if ($component instanceof Component_Instance) {
-                    $folderId   = $component->getIdentifier();
-                    $columnName = $this->getFolderMapper()->getIdentifier()['column'];
-
-                    return [
-                        'component' => $component,
-                        'homepage'  => $this->getFolderMapper()->findByColumn(
-                            $columnName,
-                            $folderId,
-                            ['deleted' => true]
-                        )->first(),
-                    ];
+                    $extraParams['component'] = $component;
+                    if ($component->getModule() === 'homepage') {
+                        $extraParams['homepage'] = $this->getFolderMapper()->findByIdWithFallback(
+                            $component->getIdentifier()
+                        );
+                    }
                 }
-                return [];
+                return $extraParams;
 
 //                // augment params with homepage from category
 //                if ($params['component']->getModule() == 'homepage') {
