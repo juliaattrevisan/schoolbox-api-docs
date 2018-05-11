@@ -74,14 +74,19 @@ class Controller extends Base
         return json_decode($response->getBody()->getContents(), true);
     }
 
-    public function getAll() {
-        // All the staff in our Schoolbox instance
-        $allStaff = $this->userMapper->findByColumn('g.group_type', 'staff')->sortBy("lastname", "asc");
+    private function getProvisionedUserIDs() {
         $provisionedUsers = $this->getUsersFromHelp();
         $provisionedUserIDs = [];
         foreach($provisionedUsers as $externalID => $username) {
             $provisionedUserIDs[] = $externalID;
         }
+        return $provisionedUserIDs;
+    }
+
+    public function getAll() {
+        // All the staff in our Schoolbox instance
+        $allStaff = $this->userMapper->findByColumn('g.group_type', 'staff')->sortBy("lastname", "asc");
+        $provisionedUserIDs = $this->getProvisionedUserIDs();
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
@@ -135,8 +140,11 @@ class Controller extends Base
 
     public function searchUsers($userID) {
         $user = $this->userMapper->findByExternalId($userID);
+        $provisionedUserIDs = $this->getProvisionedUserIDs();
+        $status = in_array($user->getExternalId(), $provisionedUserIDs);
         $userJSON = [
             'name' => $user->getFullName(),
+            'provisioned' => $status,
             'id' => $user->getId(),
             'externalID' => $user->getExternalId(),
         ];

@@ -34,7 +34,8 @@
                         var userID = $itemText.match(/\((\d*)\)/)[1];
 
                         $.get("/shaps/provisioning/"+userID, function(data) {
-                            console.log(data);
+                            var tableSelector = "#statusTable table";
+
                             if ($.isEmptyObject(data)) {
                                 $(".empty-state").show();
                                 $("#statusForm").addClass("hide");
@@ -42,6 +43,30 @@
                                 $(".empty-state").hide();
                                 $("#statusForm").removeClass("hide");
                             }
+
+                            $(data).each(function(index, user) {
+                                var statusMarkup = '';
+                                if (user.provisioned) {
+                                    statusMarkup = '<i class="icon-course-outline" title="Provisioned"></i>\n';
+                                } else {
+                                    statusMarkup = '<i class="icon-close" title="Not Provisioned"></i>\n';
+                                }
+
+                                var checkboxMarkup = '';
+                                if (user.provisioned) {
+                                    checkboxMarkup = '<div class="checklist"><input id="provision-' + user.externalID + '" type="checkbox" disabled><label for="provision-' + user.externalID + '" title="Already provisioned"></label></div>';
+                                } else {
+                                    checkboxMarkup = '<div class="checklist"><input id="provision-' + user.externalID + '" type="checkbox"><label for="provision-' + user.externalID + '"></label></div>';
+                                }
+
+                                var markup = "<tr><td>" + statusMarkup + "</td>"
+                                    + "<td>" + user.name + "</td>"
+                                    + "<td>" + checkboxMarkup + "</td></tr>";
+
+                                $(tableSelector).append(markup);
+                            });
+
+
                         }, "json")
                             .fail(function(xhr, status, error) {
                                 console.log(xhr);
@@ -99,7 +124,6 @@
                             </td>
                             </tr>
                         {% endfor %}
-
                     </table>
                 </section>
 
