@@ -195,7 +195,7 @@ class Controller extends Base
         $this->getResponse()->redirect->afterPost(
             $this->getRouter()->generate(
                 'tile.layout',
-                array('componentId' => $component->getId())
+                array('layoutId' => $layout->getId())
             )
         );
     }
