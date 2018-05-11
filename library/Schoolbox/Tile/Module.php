@@ -123,7 +123,7 @@ class Module extends BaseModule
         // (if this component belongs to the homepage!)
         $this->addRoutePreload(
             $matcher,
-            "(?:add|create|layout|layoutForm|edit|update|update:post|delete|delete:post)",
+            '.*',
             function ($params) {
                 if ($params['componentId']) {
                     $componentId = $params['componentId'];
