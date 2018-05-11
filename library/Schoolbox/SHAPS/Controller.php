@@ -66,6 +66,7 @@ class Controller extends Base
         $timestamp = $now->getUnixTimeStamp();
 
         // Other request options
+        // TODO testing only - this cookie is needed because of the oddities of vagrant making requests to vagrant
         $headers = ['Cookie' => 'PHPSESSID=qhmi1oedvd68rfcf0bhtdpno65'];
 
         $response = $client->request(
