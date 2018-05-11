@@ -55,12 +55,12 @@ class Assess_Attempt extends Evaluation_Attempt {
 				INNER JOIN (
 					SELECT *
 					FROM assess_attempt
+					WHERE assess_attempt.assess_id = '{$assessId}'
 					ORDER BY user_id, `start` DESC
 				) q ON assess_attempt.`attempt_id` = q.attempt_id
 				GROUP BY assess_attempt.user_id
-			) AS latestAttempt ON assess_attempt.assess_id = latestAttempt.assess_id
-			SET assess_attempt.reviewed_at = NOW()
-			WHERE assess_attempt.assess_id = '{$assessId}'
+			) AS latestAttempt ON assess_attempt.attempt_id = latestAttempt.attempt_id
+			SET assess_attempt.reviewed_at = NOW();
 		";
 
 		$this->db->query($query);
