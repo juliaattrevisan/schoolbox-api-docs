@@ -43,10 +43,7 @@ class Controller extends Base
         $this->setUserMapper($userMapper);
     }
 
-    public function getAll() {
-        // All the staff in our Schoolbox instance
-        $allStaff = $this->userMapper->findByColumn('g.group_type', 'staff')->sortBy("lastname", "asc");
-
+    private function getUsersFromHelp() {
         $client = new GuzzleClient();
 
         $ip = "http://192.168.36.10";
@@ -74,10 +71,14 @@ class Controller extends Base
             ]
         ]);
 
-        $provisionedUsers = json_decode($response->getBody()->getContents(), true);
+        return json_decode($response->getBody()->getContents(), true);
+    }
 
+    public function getAll() {
+        // All the staff in our Schoolbox instance
+        $allStaff = $this->userMapper->findByColumn('g.group_type', 'staff')->sortBy("lastname", "asc");
+        $provisionedUsers = $this->getUsersFromHelp();
         $provisionedUserIDs = [];
-
         foreach($provisionedUsers as $key => $value) {
             $provisionedUserIDs[] = $key;
         }
