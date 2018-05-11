@@ -475,9 +475,8 @@ class Controller extends Base
     {
         $deltaTimestamp = abs(Alaress_Date_Format::now()->diffInSeconds($requestTimestamp));
 
-        // TODO hardcoding to larger value for debugging
         // permit a window of +/- 10 seconds to guard against replay
-        if ($deltaTimestamp > 500) {
+        if ($deltaTimestamp > 10) {
             return 400;
         }
 
