@@ -93,7 +93,12 @@ class Controller extends Base
     }
 
     public function getProvisioned() {
-        $provisionedUsers = $this->getUsersFromHelp();
+        $usersFromHelp = $this->getUsersFromHelp();
+        $provisionedUsers = [];
+        foreach($usersFromHelp as $externalID => $username) {
+            $userObj = $this->userMapper->findByExternalId($externalID);
+            $provisionedUsers[] = $userObj;
+        }
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@shaps/provisioned.twig', [
