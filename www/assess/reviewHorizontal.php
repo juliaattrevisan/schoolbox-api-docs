@@ -123,9 +123,9 @@ else if ($this->arg[1] == 'finalise') {
 	$attemptHandler->finaliseAllLatestAttempts($assess['assess_id']);
 
 	//Save all the marks
-    $attemptMapper = QuizAttemptMapper::getInstance();
-    $allAttempts = $attemptMapper->findByColumn("assess_id", $assess['assess_id']);
-    $attemptMapper->save($allAttempts);
+//    $attemptMapper = QuizAttemptMapper::getInstance();
+//    $allAttempts = $attemptMapper->findByColumn("assess_id", $assess['assess_id']);
+//    $attemptMapper->save($allAttempts);
 
 	$this->localRedir("/learning/assessments/{$assess['assessment_id']}/status");
 }
