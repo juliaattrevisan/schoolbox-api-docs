@@ -47,16 +47,14 @@ class Controller extends Base
         // All the staff in our Schoolbox instance
         $allStaff = $this->userMapper->findByColumn('g.group_type', 'staff')->sortBy("lastname", "asc");
 
-        // TODO make this config stuff 'right' later
-        $config = new \Schoolbox\Config\Loader();
-        $schoolCode = $config->get('site_school_code');
-
         $client = new GuzzleClient();
 
         $ip = "http://192.168.36.10";
 
         // Query params
-        $schoolCode = 'ecc';
+        // TODO make this config stuff 'right' later
+        $config = new \Schoolbox\Config\Loader();
+        $schoolCode = $config->get('site_school_code');
 
         $now = new Alaress_Date_Format();
 
