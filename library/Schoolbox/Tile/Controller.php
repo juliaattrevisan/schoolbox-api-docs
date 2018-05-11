@@ -275,6 +275,7 @@ class Controller extends Base
                 'template' => '@tile/modify.twig',
                 'data'     => array(
                     'item'       => $item,
+                    'layout'     => $item->getTileLayout(),
                     'component'  => $component,
                     'attachzone' => $this->getAttachZoneData($item),
                     'folder'     => $this->getFolderForComponent($component),
