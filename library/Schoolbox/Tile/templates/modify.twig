@@ -61,9 +61,9 @@
         <li><a href="/adminv2/home">Admin</a></li>
         <li><a href="/adminv2/homepage#{{ component.identifier }}">Homepages</a></li>
     {% else %}
-        <li><a href="/homepage/{{ folder.getId() }}#component{{ component.getId() }}">{{ folder.getName() }}</a></li>
+        <li><a href="/homepage/{{ folder.id }}#component{{ component.id }}">{{ folder.title }}</a></li>
     {% endif %}
-    <li><a href="{{ routeLookup('tile.layout', {layoutId: item.id}) }}">Tiles</a></li>
+    <li><a href="{{ routeLookup('tile.layout', {layoutId: layout.id}) }}">Tiles</a></li>
     <li class="active"><a href="#">Modify Tile</a></li>
 </ul>
 
@@ -77,7 +77,7 @@
 
 <div class="row">
     <div class="small-12 island">
-        <form id="tile-modify-form" name='form' action="{% if item.id %}{{ routeLookup('tile.update:post', {id: item.id}) }}{% else %}{{ routeLookup('tile.create', {componentId: component.id}) }}{% endif %}" method="post" enctype="multipart/form-data">
+        <form id="tile-modify-form" name='form' action="{% if item.id %}{{ routeLookup('tile.update:post', {id: item.id}) }}{% else %}{{ routeLookup('tile.create', {layoutId: layout.id}) }}{% endif %}" method="post" enctype="multipart/form-data">
             <input type="hidden" name="id" value="{{ item.id|e('html_attr') }}"/>
 
             <h2 class="subheader">Title</h2>
