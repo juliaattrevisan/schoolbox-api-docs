@@ -59,7 +59,14 @@
                                     checkboxMarkup = '<div class="checklist"><input id="provision-' + user.externalID + '" type="checkbox"><label for="provision-' + user.externalID + '"></label></div>';
                                 }
 
-                                var markup = "<tr><td>" + statusMarkup + "</td>"
+                                var trMarkup = '';
+                                if (user.provisioned) {
+                                    trMarkup = '<tr>';
+                                } else {
+                                    trMarkup = '<tr class="highlight-warning">';
+                                }
+
+                                var markup = trMarkup + "<td>" + statusMarkup + "</td>"
                                     + "<td>" + user.name + "</td>"
                                     + "<td>" + checkboxMarkup + "</td></tr>";
 
