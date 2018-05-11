@@ -140,22 +140,23 @@ class Handler
         // filter to the list of users whose external IDs are prefixed with the given school code
         $predicate = $this->getUserMapper()->getPredicateBuilder()->equals('group_id', $roleId);
 
-        if ($fuzzy) {
-            // if we're doing a fuzzy lookup, search by `year`
-            /** @var string[][] $map */
-            $map = json_decode(file_get_contents(__DIR__ . '/code-map.json'), true);
-
-            if (empty($map[$schoolCode])) {
-                // we don't have this code mapped, therefore nobody matches
-                return [];
-            }
-
-            $predicate->in('year', $map[$schoolCode]);
-
-        } else {
-            // "normal" behaviour is to look up by external IDs
-            $predicate->like('synergy_id', "{$schoolCode}.%");
-        }
+        // TODO nobody in vagrant is gonna have our arbitrary school code...so comment this out...
+//        if ($fuzzy) {
+//            // if we're doing a fuzzy lookup, search by `year`
+//            /** @var string[][] $map */
+//            $map = json_decode(file_get_contents(__DIR__ . '/code-map.json'), true);
+//
+//            if (empty($map[$schoolCode])) {
+//                // we don't have this code mapped, therefore nobody matches
+//                return [];
+//            }
+//
+//            $predicate->in('year', $map[$schoolCode]);
+//
+//        } else {
+//            // "normal" behaviour is to look up by external IDs
+//            $predicate->like('synergy_id', "{$schoolCode}.%");
+//        }
 
         // we only need the external ID itself, so bypass object hydration
         $rows = $this->getUserMapper()->findColumnsByPredicates([ 'username', 'synergy_id' ], $predicate);
