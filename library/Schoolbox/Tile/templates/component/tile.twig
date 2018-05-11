@@ -1,9 +1,10 @@
 
 {% set routeParams = {
-    layoutId:  component.layout.id,
-    layout:    component.layout,
-    component: component.instance,
-    homepage:  component.context,
+    layoutId:    component.layout.id,
+    layout:      component.layout,
+    component:   component.instance,
+    componentId: component.instance.id,
+    homepage:    component.context,
 } %}
 
 {% if component.layout.tileList is empty %}
@@ -11,7 +12,7 @@
     <div class="empty-state">
         <i class="icon-tiles"></i>
 
-        {% set addTileUrl = routeLookupIfAuthorized("tile.add", routeParams) %}
+        {% set addTileUrl = routeLookupIfAuthorized("tile.addToComponent", routeParams) %}
         {% if writeAccess and addTileUrl %}
             <p><a href="{{ addTileUrl }}">Add a tile</a> to create buttons or banners that link to other pages.</p>
         {% else %}
