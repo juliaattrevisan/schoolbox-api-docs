@@ -29,12 +29,19 @@ $owner = UserMapper::getInstance()->findById($ownerId);
 
 $event = new Event();
 
+if (is_numeric($_POST['type'])) {
+    $type = EventTypeMapper::getInstance()->createModel()->setId($_POST['type']);
+}
+else {
+    $type = EventTypeMapper::getInstance()->findAll()->first();
+}
+
 $event->setOwner($owner)
 	->setAuthor($user)
 	->setAccess(Event::ACCESS_PERSONAL)
 	->setCampusCollection(new Collection())
 	->setRoleCollection(new Collection())
-	->setType(EventTypeMapper::getInstance()->createModel()->setId($_POST['type']))
+	->setType($type)
 	->setTitle($_POST['title'])
 	->setLocation($_POST['location'])
 	->setAttendance($_POST['attendance'])
