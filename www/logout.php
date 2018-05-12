@@ -3,7 +3,7 @@
 
 require_once('../library/Bootstrap.php');
 
-if (Cfg::get('saml_enabled') && Cfg::get('saml_slo_enabled')) {
+if (Cfg::get('saml_enabled') && Cfg::get('saml_slo_enabled') && isset($_SESSION['samlNameId'])) {
     // Initiate SLO
     header('Location: /saml/logout.php');
     exit;
