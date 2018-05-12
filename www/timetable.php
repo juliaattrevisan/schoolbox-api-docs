@@ -142,7 +142,7 @@ foreach ($userList as $user) {
 
                 /* Continue as normal
                  */
-                $days = count($timetable[1]['day']);
+                $days = count($timetable[array_keys($timetable)[0]]['day']);
 
                 $periodCount = 1;
                 //for each period
