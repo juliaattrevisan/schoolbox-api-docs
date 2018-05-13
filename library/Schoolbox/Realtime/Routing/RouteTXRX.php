@@ -140,7 +140,7 @@ class RouteTXRX implements TXRX
     public function receive(array $args)
     {
         if (null === $this->mapper || null === $this->sorter) {
-            throw new BadMethodCallException('Attempting to receive using the transactor variant of RouteTXRX');
+            throw new BadMethodCallException('Attempting to receive using the transmitter variant of RouteTXRX');
         }
 
         $count = 0;
