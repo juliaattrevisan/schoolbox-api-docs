@@ -92,28 +92,4 @@ class Mobile implements QueueInterface
     {
         // noop: this "list" doesn't contain things
     }
-
-
-    /**
-     * It's too late to retract a message once pushed to mobile.
-     *
-     * @param Instance $instance
-     * @return bool
-     */
-    public function retract(Instance $instance): bool
-    {
-        throw new \BadMethodCallException('Mobile messages may not be retracted');
-    }
-
-
-    /**
-     * It's too late to retract a message once pushed to mobile.
-     *
-     * @param Instance $instance
-     * @return bool
-     */
-    public function retractAllLike(Instance $instance): int
-    {
-        throw new \BadMethodCallException('Mobile messages may not be retracted');
-    }
 }

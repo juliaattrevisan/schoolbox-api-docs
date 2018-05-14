@@ -110,30 +110,4 @@ class Email implements QueueInterface
             $bundle->appendInstance($this->messageInstance);
         }
     }
-
-
-    /**
-     * It's too late to retract a message once pushed to email.
-     *
-     * @param Instance $instance
-     * @return bool
-     * @throws \BadMethodCallException
-     */
-    public function retract(Instance $instance): bool
-    {
-        throw new \BadMethodCallException('Email messages may not be retracted');
-    }
-
-
-    /**
-     * It's too late to retract a message once pushed to email.
-     *
-     * @param Instance $instance
-     * @return bool
-     * @throws \BadMethodCallException
-     */
-    public function retractAllLike(Instance $instance): int
-    {
-        throw new \BadMethodCallException('Email messages may not be retracted');
-    }
 }
