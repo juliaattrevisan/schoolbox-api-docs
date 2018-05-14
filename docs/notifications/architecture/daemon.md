@@ -32,8 +32,9 @@ task.
 
   <dt>Scheduler</dt>
   <dd>
-    The interface through which a Daemon can Dispatch a Task to be executed,
-    and which handles what happens when a Task returns a Response.
+    The interface through which a Daemon can hold a Task in a waiting area to
+    await execution, and which handles what happens when a Task returns a
+    Response.
   </dd>
 
   <dt>Dispatcher</dt>
@@ -167,6 +168,11 @@ The Response Handler is an implementation of
 Once a Task has returned a Response, the Response Handler is responsible for
 acting upon the content of that Response; it is handled in the implementation's
 `handleResponse` method.
+
+> In all current Daemon implementations, the Response Handler is the same
+  object as the Event Listener. This means that the object has the dual
+  responsibility of listening to incoming messages, and acting upon the content
+  of any Tasks that were executed as a result.
 
 
 ### Signal Queue
