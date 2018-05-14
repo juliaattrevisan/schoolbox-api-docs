@@ -58,10 +58,9 @@ task.
     on the Response.
   </dd>
 
-  <dt>Signal Queue</dt>
+  <dt>Signal Listener</dt>
   <dd>
-    A queue which Daemons subscribe to, for the purpose of receiving control
-    signals.
+    A mechanism through which Daemons listen for control signals.
   </dd>
 </dl>
 
@@ -175,18 +174,18 @@ acting upon the content of that Response; it is handled in the implementation's
   of any Tasks that were executed as a result.
 
 
-### Signal Queue
+### Signal Listener
 
-The Signal Queue is implemented as a Redis publish/subscribe queue; its handler
-must implement `\Alaress\Redis\Async\EventListener`, and handle the signal in
-its `handle` method.
+The Signal Listener is implemented as a Redis publish/subscribe queue; its
+handler must implement `\Alaress\Redis\Async\EventListener`, and handle the
+signal in its `handle` method.
 
 It exists primarily so that processes can broadcast a
 [control signal](https://en.wikipedia.org/wiki/Signal_(IPC)#POSIX_signals)
 to all instances of the same daemon (either global, or restricted to a single
 Schoolbox instance), without having to know the exact identity of every daemon.
 
-In practise, the Signal Queue's handler is often the same object as the
+In practise, the Signal Listener's handler is often the same object as the
 Response Handler; this is because both handlers must often act upon the same
 set of objects.
 
