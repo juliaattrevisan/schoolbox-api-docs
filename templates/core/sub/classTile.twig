@@ -15,7 +15,7 @@
     <div class="card-content actions-small-1">
         <div class="list-item">
             <h3><a href="/homepage/{{ class.id }}" title="{{ class.title }}">{{ class.name }}</a></h3>
-            <p class="meta">({{ class.codeList }})<br>{{ classType }}</p>
+            <p class="meta">({{ class.codeString }})<br>{{ classType }}</p>
         </div>
         {% if USER.getRole.isStaff == true %}
             <nav>

@@ -176,7 +176,7 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     {
         $codeSet = array();
 
-        if (count($this->codes)) {
+        if (\count($this->codes)) {
             foreach ($this->codes as $code) {
                 if (!$code->isDeleted()) {
                     $codeSet[] = $code->getCode();
@@ -608,18 +608,4 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
         return true;
     }
 
-    /**
-     * Returns a string of all codes on the folder, comma delineated
-     */
-    public function getCodeList()
-    {
-        $codes = [];
-        $codeModels = $this->getCodes();
-
-        foreach ($codeModels as $codeModel) {
-            $codes[] = $codeModel->getCode();
-        }
-
-        return implode(', ', $codes);
-    }
 }
