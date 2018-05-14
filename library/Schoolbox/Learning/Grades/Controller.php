@@ -502,7 +502,7 @@ class Controller extends Base
             $hasStats = $statistics[$assessment->getId()]['count'] > 0 && $assessment->getMarkScheme()
                                                                                      ->isQuantitative();
 
-            if($feedback && null !== ($feedback->getNormalisedMark() && $hasStats)) {
+            if($feedback && (null !== $feedback->getNormalisedMark()) && $hasStats) {
                 $graphAssessments[] = $assessment->getTitle();
 
 
