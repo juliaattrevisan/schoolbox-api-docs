@@ -1,0 +1,10 @@
+{% extends '@core/user/student.twig' %}
+
+{% if showButtons %}
+    {% block buttons_miscellaneous %}
+        <!-- Start on School Grades page initially -->
+        {% if USER.role.staff %}
+            <li><a href="{{ routeLookup('tassportal.studentProfile', {studentId: user.id}) }}" class="icon-progress">TASS Profile</a></li>
+        {% endif %}
+    {% endblock buttons_miscellaneous %}
+{% endif %}
