@@ -9,18 +9,36 @@ $groupHandler = new Group(HOMEPAGE_SERVICE);
 $wikiMapper     = \Schoolbox\Wiki\WikiMapper::getInstance();
 $revisionMapper = \Schoolbox\Wiki\RevisionMapper::getInstance();
 $folderMapper   = Schoolbox\Resource\Folder\Mapper::getInstance();
+$errorMapper    = Schoolbox\Error\Mapper::getInstance();
 
 $now = new Alaress_Date_Format(time(), 'U');
 
+//Does a wiki with this name already exist on this homepage?
+$potentialSlug = '';
+
+$heading = trim($_POST['heading']);
+$url  = new Url($heading);
+
+if (is_ascii($_POST['heading'])) {
+    $potentialSlug = $url->getSlug();
+}
+
+$wikis = $wikiHandler->getByCategory($_POST['categoryID']);
+
+foreach ($wikis as $wiki) {
+    if ($wiki['slug'] == $potentialSlug && $wiki['wikiID'] != $_POST['wikiID']) {
+        //You have been naughty and bypassed javascript validation
+        error($errorMapper::ERROR_WIKI_NAME_IN_USE);
+    }
+}
+
 // posting a revision - wiki may or may not exist
 if (isset($_POST['heading']) && is_numeric($_POST['categoryID'])) {
-    $heading = trim($_POST['heading']);
 
     if (strlen($heading) === 0) {
         error(2);
         exit;
     }
-
     // generate the revision object regardless of whether or not the wiki exists
     $revision = $revisionMapper->createModel()
         ->setHeading($heading)
@@ -34,8 +52,7 @@ if (isset($_POST['heading']) && is_numeric($_POST['categoryID'])) {
             /** @var Schoolbox\Wiki\Wiki $wiki */
             $wiki = $wikiMapper->findOneByColumnList(
                 array(
-                    'categoryID' => $_POST['categoryID'],
-                    'slug'       => $_POST['slug']
+                    'wikiID'    => $_POST['wikiID']
                 )
             );
             // ok we got a wiki, but if it's not the one you were looking for, freak out
@@ -46,9 +63,21 @@ if (isset($_POST['heading']) && is_numeric($_POST['categoryID'])) {
             error(2);
             exit;
         }
+
+        //The slug now updates with the heading
+        /* If the heading contains unicode it can't be used as a slug, so we
+        use the wiki ID instead */
+        if (is_ascii($_POST['heading'])) {
+            $wiki->setSlug($url->getSlug());
+        } else {
+            /* Need to save new wiki before we can get the auto-incremented
+             * ID to use in the slug.
+             */
+            $wikiMapper->save($wiki);
+            $wiki->setSlug($wiki->getId());
+        }
     } else {
         // request to create new wiki
-        $url  = new Url($heading);
         $wiki = $wikiMapper->createModel()
             ->setCategory($folderMapper->createModel()->setId($_POST['categoryID']))
             ->setLatestRevision(null)

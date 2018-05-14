@@ -33,6 +33,12 @@ if (is_numeric($this->arg[0])) {
         error(19);
     }
 
+    //Collate the slugs of wikis on this page - used for validation
+    $slugs = gimmeDaWikiSlugs($wikiHandler, $folder);
+
+    //Unset current wiki in validation list
+    unset($slugs[$wiki['wikiID']]);
+
     $output = array(
         'ACTION'      => 'Modify',
         'WIKI_ID'     => $wiki['wikiID'],
@@ -42,6 +48,7 @@ if (is_numeric($this->arg[0])) {
         'HEADING'     => Scrub::text($wiki['heading']),
         'BODY'        => Scrub::text($wiki['body']),
         'REVISION'    => $wiki['latestRevision'],
+        'SLUG_LIST'   => json_encode(array_values($slugs))
     );
 
     $this->setVar($output);
@@ -89,6 +96,9 @@ elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1]) && is_numeric($this-
     $slug  = strlen($this->arg[3]) ? $this->arg[3] : '';
     $title = ucwords(str_replace('-', ' ', $slug));
 
+    //Collate the slugs of wikis on this page - used for validation
+    $slugs = gimmeDaWikiSlugs($wikiHandler, $folder);
+
     $this->setVar(
         array(
             'ACTION'      => 'Add',
@@ -100,6 +110,7 @@ elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1]) && is_numeric($this-
             'REVISION'    => '',
             'INSTANCE_ID' => $this->arg[2],
             'SLUG'        => '',
+            'SLUG_LIST'   => json_encode(array_values($slugs))
         )
     );
 
@@ -120,4 +131,23 @@ elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1]) && is_numeric($this-
     ]);
 } else {
     error(2);
+}
+
+/**
+ * @param Wiki $wikiHandler
+ * @param Schoolbox\Resource\Folder\Model $folder
+ */
+function gimmeDaWikiSlugs($wikiHandler, $folder) {
+    //Collate the slugs of wikis on this page - used for validation
+    $wikis = $wikiHandler->getByCategory($folder->getId());
+
+    $slugs = [];
+
+    if (!empty($wikis)) {
+        foreach ($wikis as $wiki) {
+            $slugs[$wiki['wikiID']] = $wiki['slug'];
+        }
+    }
+
+    return $slugs;
 }

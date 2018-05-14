@@ -7,7 +7,15 @@
             file_browser_category_id : {CATEGORY_ID}
         });
 
-        $('#wikiForm').alaressValidate();
+        $('#wikiForm').alaressValidate({
+            rules: {
+                heading: {
+                    notInSlugList: {SLUG_LIST}
+                }
+            }
+        });
+
+
     });
 </script>
 <!-- END custom_head -->

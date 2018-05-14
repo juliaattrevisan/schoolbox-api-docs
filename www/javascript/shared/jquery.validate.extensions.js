@@ -254,7 +254,7 @@
             return true;
         }
         return false;
-    }, 'This field cannot be blank')
+    }, 'This field cannot be blank');
 
     $.validator.addMethod("alphanumeric", function(value, element) {
         return this.optional(element) || /^[a-z0-9]+$/i.test(value);
@@ -267,7 +267,45 @@
             return true;
         }
         return jQuery.validator.methods.email.call(this, $.trim(value), element);
-    }, 'Please enter a valid email address')
+    }, 'Please enter a valid email address');
+
+    $.validator.addMethod('notInList', function(value, element, list) {
+
+        value = $.trim(value);
+
+        if (!Array.isArray(list)) {
+            list = JSON.parse(list);
+        }
+
+        return list.indexOf($.trim(value)) < 0;
+
+    }, 'This heading is already in use - please choose another.');
+
+
+
+    $.validator.addMethod('notInSlugList', function(value, element, list) {
+
+        value = $.trim(value).toLowerCase();
+
+        if (!Array.isArray(list)) {
+            list = JSON.parse(list);
+        }
+
+        //This simulates the preg replace in /schoolbox/library/Url.php::getSlug()
+        var pattern = /[^a-zA-Z\d\s\-\+\/]*/g;
+        var replace = '';
+
+        var newValue = value.replace(pattern, replace);
+
+        pattern = /(\s|-|\/)+/g;
+        replace = '-';
+
+        newValue = newValue.replace(pattern, replace);
+        //--
+        
+        return list.indexOf($.trim(newValue)) < 0;
+
+    }, 'This heading is already in use - please choose another.');
 
 
 }(jQuery));
