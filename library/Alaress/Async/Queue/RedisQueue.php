@@ -59,42 +59,6 @@ abstract class RedisQueue implements QueueInterface
 
 
     /**
-     * Surgically retract this message from the queue, if it's there.
-     *
-     * @param Instance $instance
-     * @return bool
-     */
-    public function retract(Instance $instance): bool
-    {
-        // When retracting messages, only the message body need be removed.
-        // The pointer in the set need not be removed, as `fetch()` knows how
-        // to handle set items with missing message bodies.
-        return $this->redis->del([$this->getRedisMsgKey($instance)]) > 0;
-    }
-
-
-    /**
-     * Surgically retract this message and any with the same base hash from the
-     * queue.
-     *
-     * @param Instance $instance
-     * @return int The number of msgs removed
-     */
-    public function retractAllLike(Instance $instance): int
-    {
-        $ids = [];
-        foreach (new Keyspace($this->redis, $this->getRedisMsgBaseKey($instance)) as $id) {
-            $ids[] = $id;
-        }
-
-        if (!empty($ids)) {
-            $this->redis->del($ids);
-        }
-        return \count($ids);
-    }
-
-
-    /**
      * Request to drain the queue of its contents.
      *
      * @return void

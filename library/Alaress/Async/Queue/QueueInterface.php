@@ -58,23 +58,4 @@ interface QueueInterface
      * @return void
      */
     public function fetchIntoBundle(NotificationBundle $bundle, $dropCache = false);
-
-    /**
-     * Surgically retract this message from the queue, if it's there.
-     *
-     * @param Instance $instance
-     * @return bool
-     * @throws \BadMethodCallException if queue doesn't support removal
-     */
-    public function retract(Instance $instance): bool;
-
-    /**
-     * Surgically retract this message and any with the same base hash from the
-     * queue.
-     *
-     * @param Instance $instance
-     * @return int The number of msgs removed
-     * @throws \BadMethodCallException if queue doesn't support removal
-     */
-    public function retractAllLike(Instance $instance): int;
 }

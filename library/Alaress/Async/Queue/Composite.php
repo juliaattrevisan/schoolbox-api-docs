@@ -86,46 +86,4 @@ class Composite implements QueueInterface
             $queue->fetchIntoBundle($bundle, $dropCache);
         }
     }
-
-    /**
-     * Assume item was retracted if any queue retracted it.
-     *
-     * @param Instance $instance
-     * @return bool
-     */
-    public function retract(Instance $instance): bool
-    {
-        $removed = false;
-        foreach ($this->queues as $queue) {
-            // Not all queues support remove; ignore if it doesn't.
-            try {
-                if ($queue->retract($instance)) {
-                    $removed = true;
-                }
-            } catch (\BadMethodCallException $e) {
-                continue;
-            }
-        }
-        return $removed;
-    }
-
-    /**
-     * Assume item with the most retractions is the total count of retractions.
-     *
-     * @param Instance $instance
-     * @return int
-     */
-    public function retractAllLike(Instance $instance): int
-    {
-        $removedCounts = [];
-        foreach ($this->queues as $queue) {
-            // Not all queues support remove; ignore if it doesn't.
-            try {
-                $removedCounts[] = $queue->retractAllLike($instance);
-            } catch (\BadMethodCallException $e) {
-                continue;
-            }
-        }
-        return !empty($removedCounts) ? max($removedCounts) : 0;
-    }
 }
