@@ -446,6 +446,10 @@ input[type=checkbox].plain {
     }
 }
 
+.checklist .checklist {
+	margin-left: 2rem;
+}
+
 .toggle-set {
 	@include flex;
 	justify-content: space-between;

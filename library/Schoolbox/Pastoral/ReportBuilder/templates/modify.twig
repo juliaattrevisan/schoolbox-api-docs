@@ -15,159 +15,7 @@
 <script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
 <script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
 <script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
-<script type="text/javascript" src="/javascript/shared/select-all/attacher.select-all.js"></script>
-
-<!--suppress JSValidateTypes -->
-<script type="text/javascript">
-
-    $(function () {
-
-        var dataCheckType = $('[data-check-type]');
-        var dataCheckAllType = $('[data-check-all-type]');
-
-        var dataCheckYear = $('[data-check-year]');
-        var dataCheckAllYear = $('[data-check-all-year]');
-
-        $('#sort-order').sortable({handle: '.grip', axis: 'y'});
-
-        {# Toggle all checkboxes when the 'Select All' box is changed #}
-
-        dataCheckAllType.change(function (e) {
-            dataCheckType.prop('checked', $(e.target)[0].checked);
-        });
-
-        dataCheckAllYear.change(function (e) {
-            dataCheckYear.prop('checked', $(e.target)[0].checked);
-        });
-
-        {# Whenever a type checkbox is changed disable the 'Select All' box #}
-
-        {# Dynamically decide when all checkboxes are selected while you're ticking boxes #}
-
-        dataCheckType.change(function () {
-            if ($('[data-check-type]:checked').length === dataCheckType.length) {
-                dataCheckAllType.prop('checked', true);
-            }
-            else {
-                dataCheckAllType.removeAttr('checked');
-            }
-        });
-
-        {# Dynamically decide when all checkboxes are selected while you're ticking boxes #}
-
-        dataCheckYear.change(function () {
-            if ($('[data-check-year]:checked').length === dataCheckYear.length) {
-                dataCheckAllYear.prop('checked', true);
-            }
-            else {
-                dataCheckAllYear.removeAttr('checked');
-            }
-        });
-
-        {# If we are changing report criteria this will tick the 'Select All' box if every type was selected;
-         # this occurs upon page load
-         #}
-        if ($('[data-check-type]:checked').length === dataCheckType.length) {
-            dataCheckAllType.prop('checked', true);
-        }
-
-        if ($('[data-check-year]:checked').length === dataCheckYear.length) {
-            dataCheckAllYear.prop('checked', true);
-        }
-
-        {# Setup selectize boxes #}
-
-        $('#filterStudents').selectizeSelector({
-            multiple: true,
-            ajax: {
-                url: '/ajax/user.php',
-                type: 'GET',
-                data: {roleTypeID: 'student'},
-                dataType: 'json'
-            },
-            value: [
-                {% for student in studentsSelected %}
-                {'id': '{{ student.id }}', 'name': '{{ student.name | escape('js') }}'},
-                {% endfor %}
-            ]
-        });
-
-        $('#filterTags').selectizeSelector({
-            multiple: true,
-            ajax: {
-                url: '/ajax/tags/pastoral',
-                type: 'GET',
-                dataType: 'json'
-            },
-            value: [
-                {% for tag in tagsSelected %}
-                {'id': '{{ tag.id }}', 'name': '{{ tag.name | escape('js') }}'},
-                {% endfor %}
-            ]
-        });
-
-        $('#filterAuthors').selectizeSelector({
-            multiple: true,
-            ajax: {
-                url: '/ajax/user.php',
-                type: 'GET',
-                data: {roleTypeID: 'staff'},
-                dataType: 'json'
-            },
-            value: [
-                {% for author in authorsSelected %}
-                {'id': '{{ author.id }}', 'name': '{{ author.name | escape('js') }}'},
-                {% endfor %}
-            ]
-        });
-
-        {# Generate the report after a little sanity checking#}
-
-        $('#formReport').alaressValidate({
-            rules: {
-                'name': 'required',
-                'types[]': 'required',
-                'years[]': 'required',
-                'after': {
-                    datepickerDate: {
-                        depends: function (element) {
-                            return $(element).val().length > 0;
-                        }
-                    }
-                },
-                'before': {
-                    datepickerDate: {
-                        depends: function (element) {
-                            return $(element).val().length > 0;
-                        }
-                    }
-                }
-            },
-            messages: {
-                'types[]': 'You must select at least one record type to show in the report',
-                'years[]': 'You must select at least one year level to show in the report'
-            },
-            submitHandler: function (form) {
-                {# Prior to submitting the form we need to set the hidden `order` #}
-                var order = $.makeArray(
-                    $('#sort-order').children('li')
-                        .map(function () {
-                            return $(this).data('order');
-                        })
-                );
-
-                {# Just in case something has gone wrong and there was no order- we set the default #}
-                if (order.length === 0) {
-                    order = ['student', 'date', 'subtype', 'author', 'points', 'year', 'severity'];
-                }
-
-                $('#order').val(order.join(','));
-                form.submit();
-            }
-        });
-    });
-
-</script>
+<script type="text/javascript" src="/javascript/shared/select-all/jquery.select-all.js"></script>
 
 <div class="row">
     <div class="small-12 column">
@@ -263,16 +111,52 @@
                         <input id="type-all" type="checkbox" data-check-all-type>
                         <label for="type-all">Select All</label>
                         {% for type in types %}
-                            <input id="type-{{ type.id }}"
-                                   name="types[]"
-                                   value="{{ type.id }}"
-                                   type="checkbox"
-                                   {% for typeSelected in report.types if typeSelected.id == type.id %}checked{% endfor %}
-                                   data-check-type
-                            >
-                            <label for="type-{{ type.id }}">
-                                {{ type.name }}
-                            </label>
+                            <div class="pastoral-types">
+                                <input id="type-{{ type.id }}"
+                                       name="types[]"
+                                       value="{{ type.id }}"
+                                       type="checkbox"
+                                       {% for typeSelected in report.types if typeSelected.id == type.id %}checked{% endfor %}
+                                       data-check-type
+                                >
+
+                                {% set hasSubTypes = false %}
+                                {% for subtype in subTypes %}
+                                    {% if subtype.pastoralType.id == type.id %}
+                                        {% set hasSubTypes = true %}
+                                    {% endif %}
+                                {% endfor %}
+
+                                {% if hasSubTypes %}
+                                    <label for="type-{{ type.id }}" title="Has sub-types - select to see them">
+                                        {{ type.name }}
+                                        <i class="icon-click-view size-8"></i>
+                                    </label>
+                                {% else %}
+                                    <label for="type-{{ type.id }}">
+                                        {{ type.name }}
+                                    </label>
+                                {% endif %}
+
+                                <div class="checklist" data-pastoral-subtype>
+                                    {% for subtype in subTypes %}
+
+                                        {% if subtype.pastoralType.id == type.id %}
+                                            <input id="subtype-{{ subtype.id }}"
+                                                   name="subtypes[]"
+                                                   value="{{ subtype.id }}"
+                                                   type="checkbox"
+                                                   {% for subtypeSelected in report.subtypes if subtypeSelected.id == subtype.id %}checked{% endfor %}
+                                                   data-check-subtype
+                                            >
+                                            <label for="subtype-{{ subtype.id }}">
+                                                {{ subtype.name }}
+                                            </label>
+                                        {% endif %}
+
+                                    {% endfor %}
+                                </div>
+                            </div>
                         {% endfor %}
                     </div>
                 </div>
@@ -306,27 +190,127 @@
                 <input type="hidden" id="involved-checkbox" value="1">
             {% endif %}
 
-            <h2 class="subheader">Year Levels</h2>
-            <p class="meta">Select the year levels you want included in the report</p>
+            <div class="row">
+                <div class="small-12 medium-6 columns">
+                    <h2 class="subheader">Year Levels</h2>
+                    <p class="meta">Select the year levels you want included in the report</p>
 
-            <section>
-                <div class="small-12 columns content">
-                    <div class="checklist">
-                        <input id="year-all" type="checkbox" data-check-all-year>
-                        <label for="year-all">Select All</label>
-                        {% for year in years %}
-                            <input id="year-{{ year }}"
-                                   name="years[]"
-                                   value="{{ year }}"
-                                   type="checkbox"
-                                   {% for yearSelected in report.years if yearSelected == year %}checked{% endfor %}
-                                   data-check-year
-                            >
-                            <label for="year-{{ year }}">{{ year }}</label>
-                        {% endfor %}
-                    </div>
+                    <section>
+                        <div class="small-12 columns content">
+                            <div class="checklist">
+                                <input id="year-all" type="checkbox" data-check-all-year>
+                                <label for="year-all">Select All</label>
+                                {% for year in years %}
+                                    <input id="year-{{ year }}"
+                                           name="years[]"
+                                           value="{{ year }}"
+                                           type="checkbox"
+                                           {% for yearSelected in report.years if yearSelected == year %}checked{% endfor %}
+                                           data-check-year
+                                    >
+                                    <label for="year-{{ year }}">{{ year }}</label>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </section>
                 </div>
-            </section>
+
+                <div class="small-12 medium-6 columns">
+                    <h2 class="subheader">Houses</h2>
+                    <p class="meta">Select the houses you want included in the report</p>
+
+                    <section>
+                        <div class="small-12 columns content">
+                            <div class="checklist">
+                                <input id="house-all" type="checkbox" data-check-all-house>
+                                <label for="house-all">Select All</label>
+                                {% for house in houses %}
+                                    <input id="house-{{ house.id }}"
+                                           name="houses[]"
+                                           value="{{ house.id }}"
+                                           type="checkbox"
+                                           {% for houseSelected in report.houses if houseSelected == house %}checked{% endfor %}
+                                           data-check-house
+                                    >
+                                    <label for="house-{{ house.id }}">{{ house.house }}</label>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+            <script>
+                $(function() {
+                    var parentCheckboxSelector = "#formReport input[data-check-type]";
+                    var childCheckboxSelector = "input[data-check-subtype]";
+                    var childGroupSelector = "[data-pastoral-subtype]";
+
+                    // Initial setup: if any parent types are already checked (from saved data), show their subtypes
+                    // otherwise hide the subtypes to save space
+                    $(parentCheckboxSelector).each(function(index, parentCheckbox) {
+                        if ($(parentCheckbox).is(':checked')) {
+                            // ...show the subtypes for this type
+                            $(parentCheckbox).siblings(childGroupSelector).show();
+                        } else {
+                            // Hide subtypes by default to reduce vertical scrolling
+                            $(parentCheckbox).siblings(childGroupSelector).hide();
+                        }
+                    });
+
+                    // When a parent type checkbox is changed, show or hide its subtypes
+                    // and check them by default when shown
+                    $(parentCheckboxSelector).change(function(e) {
+                        var parentCheckbox = e.target;
+                        var $subCheckboxes = $(parentCheckbox).siblings(childGroupSelector).find(childCheckboxSelector);
+
+                        if ($(parentCheckbox).is(':checked')) {
+                            // ...show the subtypes for this type
+                            $(parentCheckbox).siblings(childGroupSelector).show();
+
+                            // ...and check them by default
+                            $subCheckboxes.each(function(index, subCheckbox) {
+                                $(subCheckbox).prop('checked', true);
+                            });
+
+                            $(parentCheckbox).siblings("label").find("i").removeClass("icon-click-view").addClass("icon-dropdown");
+                        } else {
+                            // ...hide the subtypes for this type
+                            $subCheckboxes.each(function(index, subCheckbox) {
+                                $(subCheckbox).prop('checked', false);
+                                $(parentCheckbox).siblings(childGroupSelector).hide();
+                            });
+
+                            // ...and uncheck them (causes all sorts of problems with select all otherwise)
+                            $subCheckboxes.each(function(index, subCheckbox) {
+                                $(subCheckbox).prop('checked', false);
+                            });
+
+                            $(parentCheckbox).siblings("label").find("i").removeClass("icon-dropdown").addClass("icon-click-view");
+                        }
+
+                    });
+
+                    // When a subtype checkbox is changed, find out if any subtypes in that group are still checked
+                    // and if not, uncheck the parent and hide the subtypes
+                    $(parentCheckboxSelector).each(function(index, parentCheckbox) {
+                        var $subtypes = $(parentCheckbox).siblings(childGroupSelector).find(childCheckboxSelector);
+
+                        $subtypes.change(function() {
+                            if ($subtypes.filter(":checked").length < 1) {
+                                $(parentCheckbox).prop("checked", false);
+                                $subtypes.parent(childGroupSelector).hide();
+                                $(parentCheckbox).siblings("label").find("i").removeClass("icon-dropdown").addClass("icon-click-view");
+                            } else {
+                                $(parentCheckbox).prop("checked", true);
+                                $subtypes.parent(childGroupSelector).show();
+                                $(parentCheckbox).siblings("label").find("i").removeClass("icon-click-view").addClass("icon-dropdown");
+                            }
+                        });
+                    })
+
+                });
+            </script>
 
             <h2 class="subheader">Sort Order</h2>
             <p class="meta">Select the order in which you would like your report sorted</p>
@@ -363,6 +347,15 @@
                                     </div>
                                 </div>
                             </li>
+                        {% elseif order == 'house' %}
+                            <li data-order="house">
+                                <div>
+                                    <div class="grip"></div>
+                                    <div class="card small-12">
+                                        <p>House</p>
+                                    </div>
+                                </div>
+                            </li>
                         {% elseif order == 'points' %}
                             <li data-order="points">
                                 <div>
@@ -372,8 +365,8 @@
                                     </div>
                                 </div>
                             </li>
-                        {% elseif order == 'subtype' %}
-                            <li data-order="subtype">
+                        {% elseif order == 'type' %}
+                            <li data-order="type">
                                 <div>
                                     <div class="grip"></div>
                                     <div class="card small-12 wrap-down">
@@ -383,6 +376,24 @@
                                                 (
                                                 {%- for type in types -%}
                                                     {{ type.name }}{% if not loop.last %}, {% endif %}
+                                                {%- endfor -%}
+                                                )
+                                            </span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </li>
+                        {% elseif order == 'subtype' %}
+                            <li data-order="subtype">
+                                <div>
+                                    <div class="grip"></div>
+                                    <div class="card small-12 wrap-down">
+                                        <p>
+                                            Record Subtype
+                                            <span class="meta">
+                                                (
+                                                {%- for subtype in subTypes -%}
+                                                    {{ subtype.name }}{% if not loop.last %}, {% endif %}
                                                 {%- endfor -%}
                                                 )
                                             </span>
@@ -451,3 +462,135 @@
         </form>
     </div>
 </div>
+
+
+<!--suppress JSValidateTypes -->
+<script type="text/javascript">
+
+    $(function () {
+
+        $('#sort-order').sortable({handle: '.grip', axis: 'y'});
+
+        {# Toggle all checkboxes when the 'Select All' box is changed #}
+
+        var $reportForm = $("#formReport");
+
+        $reportForm.selectAll({
+            selector: $("#type-all"),
+            checkboxes: $("[data-check-type]"),
+            childCheckboxes: $("[data-check-subtype]"),
+            selectAllNested: function(selectAllButton, childCheckboxes) {
+                // Show/hide subtypes on select/deselect all
+                var parentCheckboxes = "[data-check-type]"
+                var childCheckboxGroups = "[data-pastoral-subtype]";
+
+                if ($(selectAllButton).is(':checked')) {
+                    $(childCheckboxGroups).show();
+                    $(childCheckboxes).prop("checked", true);
+                    $(parentCheckboxes).siblings("label").find("i").removeClass("icon-click-view").addClass("icon-dropdown");
+                } else {
+                    $(childCheckboxGroups).hide();
+                    $(childCheckboxes).prop("checked", false);
+                    $(parentCheckboxes).siblings("label").find("i").removeClass("icon-dropdown").addClass("icon-click-view");
+                }
+            }
+        });
+
+        $reportForm.selectAll({
+            selector: $('#year-all'),
+            checkboxes: $('[data-check-year]')
+        });
+
+        $reportForm.selectAll({
+            selector: $('#house-all'),
+            checkboxes: $('[data-check-house]')
+        });
+
+        {# Setup selectize boxes #}
+
+        $('#filterStudents').selectizeSelector({
+            multiple: true,
+            ajax: {
+                url: '/ajax/user.php',
+                type: 'GET',
+                data: {roleTypeID: 'student'},
+                dataType: 'json'
+            },
+            value: [
+                {% for student in studentsSelected %}
+                {'id': '{{ student.id }}', 'name': '{{ student.name | escape('js') }}'},
+                {% endfor %}
+            ]
+        });
+
+        $('#filterTags').selectizeSelector({
+            multiple: true,
+            ajax: {
+                url: '/ajax/tags/pastoral',
+                type: 'GET',
+                dataType: 'json'
+            },
+            value: [
+                {% for tag in tagsSelected %}
+                {'id': '{{ tag.id }}', 'name': '{{ tag.name | escape('js') }}'},
+                {% endfor %}
+            ]
+        });
+
+        $('#filterAuthors').selectizeSelector({
+            multiple: true,
+            ajax: {
+                url: '/ajax/user.php',
+                type: 'GET',
+                data: {roleTypeID: 'staff'},
+                dataType: 'json'
+            },
+            value: [
+                {% for author in authorsSelected %}
+                {'id': '{{ author.id }}', 'name': '{{ author.name | escape('js') }}'},
+                {% endfor %}
+            ]
+        });
+
+        {# Generate the report after a little sanity checking#}
+
+        $reportForm.alaressValidate({
+            rules: {
+                'name': 'required',
+                'types[]': 'required',
+                'years[]': 'required',
+                'after': {
+                    datepickerDate: {
+                        depends: function (element) {
+                            return $(element).val().length > 0;
+                        }
+                    }
+                },
+                'before': {
+                    datepickerDate: {
+                        depends: function (element) {
+                            return $(element).val().length > 0;
+                        }
+                    }
+                }
+            },
+            messages: {
+                'types[]': 'You must select at least one record type to show in the report',
+                'years[]': 'You must select at least one year level to show in the report'
+            },
+            submitHandler: function (form) {
+                {# Prior to submitting the form we need to set the hidden `order` #}
+                var order = $.makeArray(
+                    $('#sort-order').children('li')
+                        .map(function () {
+                            return $(this).data('order');
+                        })
+                );
+                
+                $('#order').val(order.join(','));
+                form.submit();
+            }
+        });
+    });
+
+</script>

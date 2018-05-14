@@ -21,6 +21,7 @@ use Schoolbox\Pastoral\Severity\Model as PastoralSeverity;
 use Schoolbox\Pastoral\Tag as PastoralTag;
 use Schoolbox\Pastoral\Type as PastoralType;
 use Schoolbox\User;
+use House;
 
 class Model implements ISoftDeletable
 {
@@ -74,6 +75,12 @@ class Model implements ISoftDeletable
      */
     private $typesCsv;
 
+    /** @var string $subTypesCsv */
+    private $subTypesCsv;
+
+    /** @var string $housesCsv */
+    private $housesCsv;
+
     /** @var string $authorsCsv */
     private $authorsCsv;
 
@@ -103,8 +110,14 @@ class Model implements ISoftDeletable
     /** @var Collection|User[] $authors */
     private $authors;
 
-    /** @var Collection|PastoralSubType\Model[] $types */
+    /** @var Collection|PastoralType\Model[] $types */
     private $types;
+
+    /** @var Collection|PastoralSubType\Model[] $types */
+    private $subTypes;
+
+    /** @var Collection|House[] $types */
+    private $houses;
 
     /**
      * Will be null if severity is turned off in admin config
@@ -126,6 +139,8 @@ class Model implements ISoftDeletable
         $this->order    = new Collection();
         $this->tags     = new GenericCollection(PastoralTag\Model::class);
         $this->types    = new GenericCollection(PastoralType\Model::class);
+        $this->subTypes = new GenericCollection(PastoralSubType\Model::class);
+        $this->houses   = new GenericCollection(House::class);
 
         // This is a collection of groups that have access to this report
         $this->groups = new GenericCollection(PastoralGroup\Model::class);
@@ -169,6 +184,42 @@ class Model implements ISoftDeletable
     public function getTypesCsv()
     {
         return $this->typesCsv;
+    }
+
+    /**
+     * @param null|string $subTypesCsv
+     * @return $this
+     */
+    public function setSubTypesCsv(?string $subTypesCsv) : self
+    {
+        $this->subTypesCsv = $subTypesCsv;
+        return $this;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getSubTypesCsv() : ?string
+    {
+        return $this->subTypesCsv;
+    }
+
+    /**
+     * @param null|string $housesCsv
+     * @return $this
+     */
+    public function setHousesCsv(?string $housesCsv) : self
+    {
+        $this->housesCsv = $housesCsv;
+        return $this;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getHousesCsv() : ?string
+    {
+        return $this->housesCsv;
     }
 
     /**
@@ -372,7 +423,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param Collection|PastoralSubType\Model[] $types
+     * @param Collection|PastoralType\Model[] $types
      *
      * @return self
      */
@@ -384,11 +435,49 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return Collection|PastoralSubType\Model[]
+     * @return Collection|PastoralType\Model[]
      */
     public function getTypes()
     {
         return $this->types;
+    }
+
+    /**
+     * @param Collection|PastoralSubType\Model[] $subTypes
+     *
+     * @return self
+     */
+    public function setSubTypes(Collection $subTypes) : self
+    {
+        $this->subTypes = $subTypes;
+
+        return $this;
+    }
+
+    /**
+     * @return null|Collection|PastoralSubType\Model[]
+     */
+    public function getSubTypes() : ?Collection
+    {
+        return $this->subTypes;
+    }
+
+    /**
+     * @param Collection|House[] $houses
+     * @return $this
+     */
+    public function setHouses(Collection $houses) : self
+    {
+        $this->houses = $houses;
+        return $this;
+    }
+
+    /**
+     * @return null|Collection|House[]
+     */
+    public function getHouses() : ?Collection
+    {
+        return $this->houses;
     }
 
     /**

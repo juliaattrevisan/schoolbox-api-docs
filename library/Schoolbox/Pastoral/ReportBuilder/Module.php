@@ -11,16 +11,20 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
+use HouseMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Pastoral\Authorizer\Rule\IsReportOwner;
-use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Report\Mapper as PastoralReportMapper;
 use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
 use Schoolbox\Pastoral\Tag\Mapper as PastoralTagMapper;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
+use Schoolbox\Pastoral\SubType\Mapper as PastoralSubTypeMapper;
+use Schoolbox\Pastoral\Group\Mapper as PastoralGroupMapper;
+use Schoolbox\Pastoral\Group\Member\Mapper as PastoralGroupMemberMapper;
+use Schoolbox\Pastoral\Report\Dashboard\Mapper as PastoralReportDashboardMapper;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
 use Alaress\Twig\Loader\IChainLoader;
@@ -65,13 +69,19 @@ class Module extends BaseModule
     public function initControllers(ContainerInterface $injector)
     {
         $mappers = [
-            'userMapper'             => UserMapper::getInstance(),
-            'pastoralDataSource'     => $injector->get('pastoralDataSource'),
-            'pastoralReportMapper'   => PastoralReportMapper::getInstance(),
-            'pastoralSeverityMapper' => PastoralSeverityMapper::getInstance(),
-            'pastoralTypeMapper'     => PastoralTypeMapper::getInstance(),
-            'pastoralAccessMapper'   => PastoralAccessMapper::getInstance(),
-            'pastoralTagMapper'      => PastoralTagMapper::getInstance(),
+            'userMapper'                    => $this->getMapperFactory()->getLazy(UserMapper::class),
+            'houseMapper'                   => $this->getMapperFactory()->getLazy(HouseMapper::class),
+            'pastoralDataSource'            => $injector->get('pastoralDataSource'),
+            'pastoralReportMapper'          => $this->getMapperFactory()->getLazy(PastoralReportMapper::class),
+            'pastoralSeverityMapper'        => $this->getMapperFactory()->getLazy(PastoralSeverityMapper::class),
+            'pastoralTypeMapper'            => $this->getMapperFactory()->getLazy(PastoralTypeMapper::class),
+            'pastoralSubTypeMapper'         => $this->getMapperFactory()->getLazy(PastoralSubTypeMapper::class),
+            'pastoralAccessMapper'          => $this->getMapperFactory()->getLazy(PastoralAccessMapper::class),
+            'pastoralTagMapper'             => $this->getMapperFactory()->getLazy(PastoralTagMapper::class),
+            'errorMapper'                   => $this->getMapperFactory()->getLazy(ErrorMapper::class),
+            'pastoralGroupMapper'           => $this->getMapperFactory()->getLazy(PastoralGroupMapper::class),
+            'pastoralGroupMemberMapper'     => $this->getMapperFactory()->getLazy(PastoralGroupMemberMapper::class),
+            'pastoralReportDashboardMapper' => $this->getMapperFactory()->getLazy(PastoralReportDashboardMapper::class),
         ];
 
         $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class, $mappers));

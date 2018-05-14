@@ -1,60 +1,81 @@
-(function($) {
+(function ($) {
+    $.fn.selectAll = function (options) {
+        options = options || {};
 
-	/**
-	 * Constructor
-	 *
-	 * @param options
-	 */
-	$.fn.selectAll = function(options) {
-		options = options || {};
+        var config = init(options, this);
 
-		/* Store the config in this instance so private methods
-		 * can access it
-		 */
-		var config = init(options, this);
+        start();
 
-		start();
+        function init(options, element) {
+            var defaults = {
+                change: function () {},
+                selectAllNested: function () {},
+            };
 
-		/**
-		 * Initialise parameters
-		 *
-		 * @param options
-		 * @param element
-		 * @returns {*}
-		 */
-		function init(options, element) {
+            var derived = {
+                selector: element.find("[data-" + options.key + "='true']"),
+                checkboxes: element.find("input[name='" + options.checkboxName + "']"),
+                childCheckboxes: element.find("input[name='" + options.checkboxName + "']")
+            };
 
-			/* key is the checkbox to control all checkboxes
-			 * checkboxName is the name of all checkboxes to be manipulated
-			 */
-			var defaults = {
-				change: function() {
-				}
-			}
+            var merged = $.extend(defaults, derived, options);
 
-			var derived = {
-				selector: element.find('[data-' + options.key + '="true"]'),
-				checkboxes: element.find('input[name="' + options.checkboxName + '"]')
-			}
-			var merged = $.extend(defaults, derived, options);
+            return merged;
+        }
 
-			return merged;
-		}
+        // Select or deselect all checkboxes via the Select All checkbox.
+        function selectAll() {
+            if (config.selector.is(':checked')) {
+                config.checkboxes.prop('checked', true);
+            } else {
+                config.checkboxes.prop('checked', false);
+            }
 
-		/**
-		 * Start select-all
-		 */
-		function start() {
-			$(config.selector).change(function(event) {
-				if ($(this).is(':checked')) {
-					$(config.checkboxes).prop('checked', true);
-				}
-				else {
-					$(config.checkboxes).prop('checked', false);
-				}
+            config.selectAllNested(config.selector, config.childCheckboxes);
+        }
 
-				config.change();
-			});
-		}
-	}
+        // Check or uncheck the Select All box automatically,
+        // based on whether all checkboxes have been manually checked.
+        function autoSelectAll() {
+
+            // If all parent checkboxes are checked...
+            if (config.checkboxes.length === config.checkboxes.filter(":checked").length) {
+
+                // If we have nested checkboxes, make sure they're all checked as well
+                if (config.childCheckboxes) {
+                    if (config.childCheckboxes.length === config.childCheckboxes.filter(":checked").length) {
+                        config.selector.prop("checked", true);
+                    } else {
+                        config.selector.prop("checked", false);
+                    }
+                } else {
+                    config.selector.prop("checked", true);
+                }
+
+            } else {
+                config.selector.prop("checked", false);
+            }
+
+        }
+
+        function start() {
+            autoSelectAll();
+
+            config.selector.change(function () {
+                selectAll();
+
+                config.change();
+            });
+
+            config.checkboxes.change(function() {
+                autoSelectAll();
+            });
+
+            if (config.childCheckboxes) {
+                config.childCheckboxes.change(function() {
+                    autoSelectAll();
+                });
+            }
+        }
+    };
 }(jQuery));

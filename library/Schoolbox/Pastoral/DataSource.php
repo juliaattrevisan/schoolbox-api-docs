@@ -136,12 +136,14 @@ class DataSource
      * @param Alaress_Date_Format   $after_date
      * @param null|PastoralSeverity $severity
      * @param Collection            $types
+     * @param Collection            $subtypes
      * @param Collection            $authors
      * @param Collection            $students
      * @param Collection            $tags
      * @param Collection            $order
      * @param                       $involved
      * @param Collection            $years
+     * @param Collection            $houses
      *
      * @return Collection
      */
@@ -151,12 +153,14 @@ class DataSource
         Alaress_Date_Format $after_date,
         ?PastoralSeverity $severity,
         Collection $types,
+        Collection $subtypes,
         Collection $authors,
         Collection $students,
         Collection $tags,
         Collection $order,
         $involved,
-        Collection $years
+        Collection $years,
+        Collection $houses
     ): Collection
     {
         // The mapper method is user-sensitive,
@@ -168,12 +172,14 @@ class DataSource
                 $after_date,
                 $severity,
                 $types,
+                $subtypes,
                 $authors,
                 $students,
                 $tags,
                 $order,
                 $involved,
-                $years
+                $years,
+                $houses
             ),
             $currentUser
         );
