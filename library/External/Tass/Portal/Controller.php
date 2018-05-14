@@ -154,7 +154,10 @@ class Controller extends Alaress\Web\Controller\Base
      */
     public function studentProfile(User $student): void
     {
-        $deepLinkV2 = ['studcode' => $student->getExternalId()];
+        $deepLinkV2 = [
+            'target'   => 'student.profile',
+            'studcode' => $student->getExternalId(),
+        ];
 
         $deepLinkV1 = [
             'do'        => 'kiosk.students.main.student.details',
