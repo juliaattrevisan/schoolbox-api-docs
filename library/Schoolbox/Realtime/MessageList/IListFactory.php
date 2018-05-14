@@ -39,4 +39,22 @@ interface IListFactory
      * @return QueueInterface
      */
     public function instant($userId);
+
+    /**
+     * Create a "queue" that when a notification is pushed onto it:
+     * * retracts any matches for the notification from any other queues
+     *   (Match = has same message string, href and params)
+     *
+     * @return QueueInterface
+     */
+    public function retract(): QueueInterface;
+
+    /**
+     * Create a "queue" that when a notification is pushed onto it:
+     * * retracts any notifications like it from any other queues
+     *   (Like = has same message string and href)
+     *
+     * @return QueueInterface
+     */
+    public function retractLike(): QueueInterface;
 }

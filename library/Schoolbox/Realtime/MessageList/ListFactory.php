@@ -77,6 +77,24 @@ class ListFactory implements IListFactory, Serializable
 
 
     /**
+     * @inheritdoc
+     */
+    public function retract(): QueueInterface
+    {
+        return new Retractor($this->redis, $this->instanceId);
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function retractLike(): QueueInterface
+    {
+        return new Retractor($this->redis, $this->instanceId);
+    }
+
+
+    /**
      * String representation of object, or null
      *
      * @return string
