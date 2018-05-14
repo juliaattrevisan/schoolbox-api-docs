@@ -197,7 +197,7 @@ class Factory extends FolderFilter\Factory
         $unitSpecFilter    = $this->filterMapper->findByClass($definitionClass)->first();
         $unitSpecOverrides = $overrides[$unitSpecFilter->getId()];
 
-        if (!$unitSpecOverrides) {
+        if (!$unitSpecOverrides || \count($unitSpecOverrides) === 0) {
             // If no UnitSpecs requested via query args, then no folders require insertion and we are done.
             return;
         }
