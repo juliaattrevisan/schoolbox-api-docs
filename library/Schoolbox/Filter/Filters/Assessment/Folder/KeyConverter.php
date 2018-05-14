@@ -78,7 +78,7 @@ abstract class KeyConverter extends AbstractKeyConverter
         if (!$this->folderIds->offsetExists($key)) {
             throw new \InvalidArgumentException("No Folder ID found for key: $key");
         }
-        if($this->access->getFolderAccess($user, $key) < UserAccess::ACCESS_READ){
+        if ($this->access->getFolderAccess($user, (int)$key) < UserAccess::ACCESS_READ) {
             throw new \InvalidArgumentException("Session user lacks read perm to folder: $key");
         }
     }

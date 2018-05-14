@@ -368,6 +368,7 @@ class Controller extends Base
         );
     }
 
+
     /**
      * @param User         $viewee
      * @param Term\Model   $term
@@ -380,8 +381,8 @@ class Controller extends Base
      * @throws DefinitionException If specified mapper join is not defined
      * @throws LogicException If cyclic graph detected during assessment translation
      * @throws UnexpectedValueException If unable to merge student collections
+     * @throws \Schoolbox\Mapper\Exception
      * @todo convert to a GET route
-     *
      */
     public function postReport(User $viewee, Term\Model $term, Folder\Model $subject): void
     {
@@ -394,7 +395,7 @@ class Controller extends Base
         // TODO don't save selections for non user-configurable page filters
         $this->selectionMapper->updateSelections($this->getUser(), $page, $userSelections);
 
-        $filters = $this->filterFactoryFactory->convertSelectionsToFilters($userSelections, $page);
+        $filters = $this->filterFactoryFactory->convertSelectionsToFilters($userSelections, $this->getUser(), $page);
 
         /* Merge filters to ensure that assessments:
          * * Belong to this folder

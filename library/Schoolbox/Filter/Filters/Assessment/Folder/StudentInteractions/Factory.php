@@ -102,8 +102,6 @@ class Factory extends FolderFilter\Factory
             ->indexByCallback(function ($folderId) {
                 return $folderId;
             });
-//        TODO resolve merge conflict remnant. Should we perm check client-supplied folder ids?
-//        return new KeyConverter($filter, $folderIds, $this->getAccess());
-        return new KeyConverter($filter, $folderIds);
+        return new KeyConverter($filter, $folderIds, $this->getAccess());
     }
 }

@@ -17,7 +17,6 @@ use Schoolbox\Filter\Filters\Assessment\Folder as FolderFilter;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImplementation;
 use Schoolbox\Resource\Folder;
 
-
 /**
  * A factory for building Teacher 'Folder' filter objects
  */
@@ -48,7 +47,6 @@ class Factory extends FolderFilter\Factory
         Access $access,
         Filter\Mapper $filterMapper,
         UnitImplementation\Mapper $unitImplMapper
-
     ) {
         parent::__construct($optionMapper, $defaultMapper, $selectionMapper, $folderMapper, $access);
         $this->filterMapper   = $filterMapper;
@@ -139,7 +137,7 @@ class Factory extends FolderFilter\Factory
 
         // Course Markbook enables insertion of unit-import-specs and their host folders
         if (Filter\Page\Model::PAGE_COURSE_MARK_BOOK === $pageFilter->getPage()) {
-            if(null === $folderOverrides){
+            if (null === $folderOverrides) {
                 $folderOverrides = new GenericCollection(Filter\Selection\Model::class);
             }
             $this->insertUnitImportSpecFolders($definition, $user, $pageFilter, $overrides, $folders, $folderOverrides);

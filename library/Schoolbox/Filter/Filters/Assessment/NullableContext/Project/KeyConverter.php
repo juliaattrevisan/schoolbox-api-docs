@@ -41,7 +41,7 @@ class KeyConverter extends NullableContext\KeyConverter
      * Given a concrete key (such as returned from a user's filter panel selections), return the corresponding item
      *
      * @inheritdoc
-     * @return int
+     * @return null|int
      */
     public function getItem(string $key, \Schoolbox\User $user, string $page): ?int
     {

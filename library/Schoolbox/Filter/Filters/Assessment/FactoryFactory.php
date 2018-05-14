@@ -24,7 +24,6 @@ use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\User;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImplementation;
 
-
 /**
  * The Assessment FilterFactoryFactory is responsible for creating assessment-filter factories.
  */
@@ -142,41 +141,45 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
 
 
     /**
-     * @return Folder\Mapper|\Schoolbox\Mapper
+     * @return Folder\Mapper
      * @throws \InvalidArgumentException
      */
     protected function getFolderMapper(): Folder\Mapper
     {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getMapperFactory()->get(Folder\Mapper::class);
     }
 
 
     /**
-     * @return Access|\Schoolbox\Mapper
+     * @return Access
      * @throws \InvalidArgumentException
      */
     protected function getAccess(): Access
     {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getMapperFactory()->get(Access::class);
     }
 
 
     /**
-     * @return Filter\Mapper|\Schoolbox\Mapper
+     * @return Filter\Mapper
      * @throws \InvalidArgumentException
      */
     protected function getFilterMapper(): Filter\Mapper
     {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getMapperFactory()->get(Filter\Mapper::class);
     }
 
 
     /**
-     * @return UnitImplementation\Mapper|\Schoolbox\Mapper
+     * @return UnitImplementation\Mapper
      * @throws \InvalidArgumentException
      */
     protected function getUnitImplMapper(): UnitImplementation\Mapper
     {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getMapperFactory()->get(UnitImplementation\Mapper::class);
     }
 }

@@ -23,9 +23,9 @@ interface IFactoryFactory
      * Return a constant that represents the entity that is being filtered,
      * eg 1 => 'assessments'
      *
-     * @return int
+     * @return string
      */
-    public static function getEntity();
+    public static function getEntity(): string;
 
 
     /**

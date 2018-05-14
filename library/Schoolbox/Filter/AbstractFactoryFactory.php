@@ -129,7 +129,7 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
             $class = $filter->getClass();
 
             // Can this filter never appear on this page?
-            if(!\in_array($page, $class::getPages(), true)){
+            if (!\in_array($page, $class::getPages(), true)) {
                 continue;
             }
             $filterId = $filter->getId();
@@ -254,7 +254,7 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
         $filterIds = array_diff($visibleFilterIds, $overrideSelections->keys());
 
         // If ignoring all saved user-selections (because everything is overridden)
-        if(0 === \count($filterIds)){
+        if (0 === \count($filterIds)) {
             return new Collection();
         }
 
