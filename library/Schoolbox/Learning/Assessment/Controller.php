@@ -75,11 +75,10 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * @level 165
      *
      */
-    public function getAssessment(IAssessable $assessment) {
-
+    public function getAssessment(IAssessable $assessment)
+    {
         $url = $this->getRouter()->generate('learningAssessment.getSummary', [ 'assessmentId' => $assessment->getId(), 'studentId' => $this->getUser()->getId() ]);
         $this->redirect($url);
-
     }
 
     /**
