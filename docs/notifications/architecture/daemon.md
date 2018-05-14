@@ -83,7 +83,7 @@ happen outside of the Daemon.
 Daemons currently use one of the following as their Event Listener (but are not
 restricted to using either):
 * Message Broker Subscription
-* HTTP Server
+* HTTP Web Socket Server
 
 
 #### Message Broker Subscription
@@ -115,17 +115,28 @@ Then, the Response is sent to the Response Handler to act upon; the action
 that the Response Handler takes is implementation-specific.
 
 
-#### HTTP Server
+#### HTTP Web Socket Server
 
-The HTTP Server within a Schoolbox Daemon functions as any other HTTP server
-would: it listens to HTTP requests on a particular port, and responds to them.
+The HTTP Web Socket Server within a Schoolbox Daemon functions as any other
+web socket server would:
+* it listens to connection requests on a particular port
+* once a client has connected, it may either:
+  * receive further requests from the client, if an event occurs which the
+    client should know about
+  * send responses to the client, if the client performs an action which the
+    daemon should know about
 
-When a HTTP request is received, the Daemon uses the request as a signal to
+When the HTTP request is received, the Daemon uses the request as a signal to
 Dispatch a Task (just as it does when the Daemon contains a Message Broker
 Subscription).
 
-Once the Task has finished, the Response Handler is responsible for returning a
-HTTP response to the requesting client.
+Once the Task has finished, the Response Handler is responsible for performing
+an action; again, the action that the Response Handler takes is
+implementation-specific.
+
+The Web Sockets Server may also listen to other sources of events (for example,
+a Message Broker Subscription), and from those events generate and send a
+response to the client.
 
 
 ### Scheduler
