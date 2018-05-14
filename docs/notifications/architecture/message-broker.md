@@ -117,12 +117,12 @@ Consumers.
 
 #### Why two separate protocols?
 
-> TODO verify veracity of below statements
-
 AMQP is best suited for publishing, because it has the ability to send to a
 particular exchange.
 
-> In practise: all the Message Brokers seem to send to the default exchange?
+> Currently, all Message Brokers within Schoolbox send to the default exchange.
+  This is subject to change as Message Brokers may start to live on different
+  servers to other Schoolbox services.
 
 STOMP is best suited for consumers, because of its asynchronicity: the STOMP
 client library Schoolbox uses makes use of the Event Loop so that consumers do
@@ -152,6 +152,10 @@ This resulted in `count(users) * 4` queues for each user; for schools with
 thousands of users this caused significant performance issues, as RabbitMQ is
 designed to be most performant and efficient with a small number of
 high-throughput queues.
+
+In addition, due to performance issues with persisting and reloading RabbitMQ
+instances with large numbers of queues, the decision was made to no longer
+treat RabbitMQ as the single source of truth for queue data.
 
 The current implementation of notifications maintains just two queues: one for
 the [scheduling](../200-scheduling.md) sub-system, and one for
@@ -196,7 +200,7 @@ The consumer must be an instance of `\Alaress\Async\Broker\IConsumer`; its
 `onMessage` method will be called when it receives a message.
 
 Multiple consumers may consume from a single message broker; the underlying
-queue knows about each of its consumers, and can push messages in a round-robin
+queue knows about each of its consumers, and will push messages in round-robin
 fashion.
 
 
