@@ -17,12 +17,28 @@ use Predis\ClientInterface;
  */
 class Retractor extends AbstractList
 {
+    public const MODE_RETRACT_SINGLE = 1;
+    public const MODE_RETRACT_LIKE = 2;
+
     /**
+     * @var int
+     */
+    private $mode;
+
+    /**
+     * Constructor
+     *
      * @param ClientInterface $redis
      * @param string          $instanceId
+     * @param int             $mode
      */
-    public function __construct(ClientInterface $redis, $instanceId)
+    public function __construct(ClientInterface $redis, $instanceId, int $mode)
     {
+        if (!\in_array($mode, [self::MODE_RETRACT_SINGLE, self::MODE_RETRACT_LIKE], true)) {
+            throw new \InvalidArgumentException('$mode must be one of the MODE_RETRACT_* class constants');
+        }
+        $this->mode = $mode;
+
         parent::__construct($redis, $instanceId, 0);
     }
 

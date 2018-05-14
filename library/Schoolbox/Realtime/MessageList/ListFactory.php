@@ -81,7 +81,7 @@ class ListFactory implements IListFactory, Serializable
      */
     public function retract(): QueueInterface
     {
-        return new Retractor($this->redis, $this->instanceId);
+        return new Retractor($this->redis, $this->instanceId, Retractor::MODE_RETRACT_SINGLE);
     }
 
 
@@ -90,7 +90,7 @@ class ListFactory implements IListFactory, Serializable
      */
     public function retractLike(): QueueInterface
     {
-        return new Retractor($this->redis, $this->instanceId);
+        return new Retractor($this->redis, $this->instanceId, Retractor::MODE_RETRACT_LIKE);
     }
 
 
