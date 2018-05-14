@@ -6,7 +6,7 @@ namespace Schoolbox\Admin\Timezone;
  * Class Model
  * @package Schoolbox\Admin
  */
-class Model
+class Timezone
 {
     /** @var string $timezone */
     protected $timezone;

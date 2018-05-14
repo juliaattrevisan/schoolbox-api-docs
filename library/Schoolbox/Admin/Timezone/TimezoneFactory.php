@@ -7,18 +7,16 @@ use DateTimeZone;
 /**
  * Class Mapper
  *
- * a:1:{s:6:"mapper";s:31:"Schoolbox\Admin\Timezone\Mapper";}
- *
  * @package Schoolbox\Admin
  */
-class Mapper
+class TimezoneFactory
 {
     /**
-     * @return Mapper
+     * @return TimezoneFactory
      */
     public static function getInstance()
     {
-        return new Mapper();
+        return new TimezoneFactory();
     }
 
     /**
@@ -46,7 +44,7 @@ class Mapper
 
             foreach($zones as $timezone)
             {
-                $options [] = new Model($timezone);
+                $options [] = new Timezone($timezone);
             }
         }
 
