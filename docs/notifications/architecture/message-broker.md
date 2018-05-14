@@ -3,10 +3,11 @@
 The notification system uses message brokers to store messages that must be
 passed from one process to another.
 
-The message broker functions as a publish-subscribe queue would:
+The message broker functions as a publish-consume queue would:
 * Clients may publish messages to them
-* Subscribers may listen for new messages published to a them, and act on the
+* Consumers may listen for new messages published to a them, and act on the
   message content accordingly
+* Once a Consumer has acted upon a message, it is removed from the queue
 
 Schoolbox provides the `\Alaress\Async\Broker\IBroker` interface for defining
 how a message broker must work.
@@ -19,8 +20,8 @@ how a message broker must work.
 <dl>
   <dt>Message Broker</dt>
   <dd>
-    The high-level interface through which Messages are Published and
-    Subscribed to.
+    The high-level interface through which Messages are Published to and
+    Consumed from.
   </dd>
 
   <dt>AMQP</dt>
@@ -32,7 +33,7 @@ how a message broker must work.
   <dt>STOMP</dt>
   <dd>
     Simple/Streaming Text Oriented Messaging Protocol: the protocol that the
-    Message Broker uses for registering a Subscriber.
+    Message Broker uses for registering a Consumer.
   </dd>
 
   <dt>RabbitMQ</dt>
@@ -44,7 +45,7 @@ how a message broker must work.
   <dt>Event Loop</dt>
   <dd>
     A low-level mechanism that the STOMP protocol implementation uses to
-    asynchronously subscribe to published Messages.
+    asynchronously listen for published Messages.
   </dd>
 
   <dt>Queue</dt>
@@ -61,7 +62,7 @@ how a message broker must work.
 
   <dt>Message</dt>
   <dd>
-    A payload that is Published to the Message Broker. Any Subscriber will see
+    A payload that is Published to the Message Broker. Any Consumer will see
     the payload, and be able to act upon it.
   </dd>
 
@@ -70,9 +71,9 @@ how a message broker must work.
     The act of a process pushing a Message to the Message Broker.
   </dd>
 
-  <dt>Subscribe</dt>
+  <dt>Consumption</dt>
   <dd>
-    The act of a process receiving a Message to the Message Broker.
+    The act of a process receiving a Message from the Message Broker.
   </dd>
 </dl>
 
@@ -108,10 +109,10 @@ Message Queue Publishers.
 #### STOMP
 
 Schoolbox Message Queues use [STOMP](https://stomp.github.io/) as the protocol
-for registering a Subscriber.
+for registering a Consumer.
 
 Schoolbox uses an instance of `\React\Stomp\Client` for its Message Queue
-Subscriptions.
+Consumers.
 
 
 #### Why two separate protocols?
@@ -123,12 +124,12 @@ particular exchange.
 
 > In practise: all the Message Brokers seem to send to the default exchange?
 
-STOMP is best suited for subscription, because of its asynchronicity: the STOMP
-client library Schoolbox uses makes use of the Event Loop so that subscriptions
-do not block.
+STOMP is best suited for consumers, because of its asynchronicity: the STOMP
+client library Schoolbox uses makes use of the Event Loop so that consumers do
+not block.
 
 RabbitMQ is able to understand both protocols, and can translate a message
-published via AMQP into STOMP when a Subscriber receives it.
+published via AMQP into STOMP when a Consumer receives it.
 
 
 ### Data Store
@@ -161,8 +162,10 @@ the [scheduling](../200-scheduling.md) sub-system, and one for
 
 Redis implements [publish/subscribe messaging](https://redis.io/topics/pubsub);
 the reason that notifications don't use Redis alone as the message broker is
-that it doesn't support message escrow/acknowledgement/rejection, which are
-essential for ensuring that a message is processed once and only once.
+that it doesn't support the extra functionality that a publish/consume queue
+requires. In particular, Redis publish/subscribe queues have no support for
+message escrow/acknowledgement/rejection, which are essential for ensuring that
+a message is processed once and only once.
 
 Redis publish/subscribe queues are used in other parts of notifications; for
 example, daemons use them for storing messages received by tasks.
@@ -179,22 +182,22 @@ broker.
 The message itself will be `serialize`d before storing it in the data store.
 
 `publish` accepts an optional `context` parameter; if this is passed, it is
-received as part of a subscriber's `onMessage` method call. (What a subscriber
+received as part of a consumer's `onMessage` method call. (What a consumer
 actually does with the `context` if present is up to each individual
-subscriber.)
+consumer.)
 
 
-### Subscription
+### Consumption
 
-`\Alaress\Async\Broker\IBroker::registerConsumer` registers a subscription to
-the message broker.
+`\Alaress\Async\Broker\IBroker::registerConsumer` registers a consumer of the
+message broker.
 
-The subscriber must be an instance of `\Alaress\Async\Broker\IConsumer`; its
+The consumer must be an instance of `\Alaress\Async\Broker\IConsumer`; its
 `onMessage` method will be called when it receives a message.
 
-Multiple subscribers may subscribe to a single message broker; the underlying
-queue knows about each of its subscribers, and can push messages in a
-round-robin fashion.
+Multiple consumers may consume from a single message broker; the underlying
+queue knows about each of its consumers, and can push messages in a round-robin
+fashion.
 
 
 #### Acknowledgement and rejection
