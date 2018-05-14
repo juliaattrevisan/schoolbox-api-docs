@@ -53,7 +53,7 @@ class LetterGrade extends AbstractMarkScheme
         $lowestGradeLevel = null;
         foreach ($this->getGradeGroup()->getGradeLevels() as $gradeLevel) {
             $lowestGradeLevel = $gradeLevel;
-            if (round($normalisedMark,5) >= round($gradeLevel->getLowerBound(),5)) {
+            if (round($normalisedMark, 5) >= round($gradeLevel->getLowerBound(), 5)) {
                 return $gradeLevel->getCaption();
             }
         }
