@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Realtime\MessageList;
 
+use Alaress\Async\Notification\Instance\Instance;
 use BadMethodCallException;
 use Predis\ClientInterface;
 
@@ -23,6 +24,18 @@ class Retractor extends AbstractList
     public function __construct(ClientInterface $redis, $instanceId)
     {
         parent::__construct($redis, $instanceId, 0);
+    }
+
+
+    /**
+     * "Pushing" a message onto this queue only retracts it from other queues.
+     *
+     * @param Instance $instance
+     * @return void
+     */
+    public function push(Instance $instance)
+    {
+        $this->redis->del([$this->getRedisMsgKey($instance)]);
     }
 
 

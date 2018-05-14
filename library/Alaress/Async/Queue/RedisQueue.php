@@ -189,7 +189,7 @@ abstract class RedisQueue implements QueueInterface
      * @param Instance $instance
      * @return string
      */
-    private function getRedisMsgKey(Instance $instance)
+    protected function getRedisMsgKey(Instance $instance)
     {
         return sprintf(
             $this->getMessageKeyPattern(),
@@ -206,7 +206,7 @@ abstract class RedisQueue implements QueueInterface
      * @param Instance $instance
      * @return string
      */
-    private function getRedisMsgBaseKey(Instance $instance)
+    protected function getRedisMsgBaseKey(Instance $instance)
     {
         return sprintf(
             $this->getMessageKeyPattern(),
