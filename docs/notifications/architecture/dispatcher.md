@@ -20,8 +20,7 @@ Handler.
 
   <dt>Dispatch Strategy</dt>
   <dd>
-    A strategy for determining whether a Task should be executed synchronously
-    or asynchronously.
+    A strategy for determining various aspects of the Dispatcher's execution.
   </dd>
 
   <dt>Event Loop</dt>
@@ -32,7 +31,8 @@ Handler.
 
   <dt>Worker Pool</dt>
   <dd>
-    A collection of pre-created Workers waiting to be assigned a Task.
+    A strategy for the creation of Workers, and for the assignment of existing
+    Workers to Tasks.
   </dd>
 
   <dt>Stream Listener</dt>
@@ -53,7 +53,8 @@ Handler.
 
   <dt>Response</dt>
   <dd>
-    The output of a Task, once it has completed execution.
+    The output of a Task, once it has completed execution (successfully or
+    otherwise).
   </dd>
 
   <dt>Response Handler</dt>
@@ -110,6 +111,10 @@ It is responsible for managing various aspects of how the Dispatcher runs; at
 this stage, we're most interested in its `getSupportedActions` method, as it
 determines whether the Dispatcher runs a Task immediately, or sends it to the
 Worker Pool.
+
+It also determines:
+* the number of Workers that may exist simultaneously in the Worker Pool
+* how long a Worker may be busy or idle before its process is released
 
 
 ### Event Loop
