@@ -15,6 +15,7 @@ use Alaress\WorkerCrew\TXRX;
 use BadMethodCallException;
 use InvalidArgumentException;
 use PDOException;
+use Schoolbox\Realtime\MessageList\ListFactory;
 use Schoolbox\UserMapper;
 
 class RouteTXRX implements TXRX
@@ -29,24 +30,27 @@ class RouteTXRX implements TXRX
     /** @var QueueInterface */
     private $queue;
 
+    /** @var ListFactory */
+    private $listFactory;
+
     /**
      * Constructor
      *
      * @see `$this->buildTransmitter`
      * @see `$this->buildReceiver`
      *
-     * @param UserMapper|null     $mapper
-     * @param QueueSorter|null    $sorter
-     * @param QueueInterface|null $queue
+     * @param UserMapper|null  $mapper
+     * @param QueueSorter|null $sorter
+     * @param ListFactory|null $listFactory
      */
     private function __construct(
         UserMapper $mapper = null,
         QueueSorter $sorter = null,
-        QueueInterface $queue = null
+        ListFactory $listFactory = null
     ) {
-        $this->mapper = $mapper;
-        $this->sorter = $sorter;
-        $this->queue  = $queue;
+        $this->mapper      = $mapper;
+        $this->sorter      = $sorter;
+        $this->listFactory = $listFactory;
     }
 
 
@@ -54,12 +58,12 @@ class RouteTXRX implements TXRX
      * "Constructor" for the transmitter variant of this object, as used in
      * daemons.
      *
-     * @param QueueInterface $queue
+     * @param ListFactory $listFactory
      * @return self
      */
-    public static function buildTransmitter(QueueInterface $queue): self
+    public static function buildTransmitter(ListFactory $listFactory): self
     {
-        return new static(null, null, $queue);
+        return new static(null, null, $listFactory);
     }
 
 
@@ -90,19 +94,19 @@ class RouteTXRX implements TXRX
      */
     public function send($instance, ITransaction $tx, $userIds)
     {
-        if (null === $this->queue) {
+        if (null === $this->listFactory) {
             throw new BadMethodCallException('Attempting to send using the receiver variant of RouteTXRX');
         }
 
         // Is a retract single: retract it
         if ($instance->isActionRetractSingle()) {
-            $this->queue->retract($instance);
+            $this->listFactory->retract()->push($instance);
             return;
         }
 
         // Is a retract all: find all like it, then retract them
         if ($instance->isActionRetractAll()) {
-            $this->queue->retractAllLike($instance);
+            $this->listFactory->retractLike()->push($instance);
             return;
         }
 
