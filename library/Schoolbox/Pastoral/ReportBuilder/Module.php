@@ -17,14 +17,8 @@ use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Authorizer\Rule\IsReportOwner;
 use Schoolbox\Pastoral\Report\Mapper as PastoralReportMapper;
-use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
 use Schoolbox\Pastoral\Tag\Mapper as PastoralTagMapper;
-use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
-use Schoolbox\Pastoral\SubType\Mapper as PastoralSubTypeMapper;
-use Schoolbox\Pastoral\Group\Mapper as PastoralGroupMapper;
-use Schoolbox\Pastoral\Report\Dashboard\Mapper as PastoralReportDashboardMapper;
 use Schoolbox\Role;
-use Schoolbox\UserMapper;
 use Alaress\Twig\Loader\IChainLoader;
 
 // These mappers are injected into controllers where required
@@ -67,17 +61,17 @@ class Module extends BaseModule
     public function initControllers(ContainerInterface $injector)
     {
         $mappers = [
-            'userMapper'                    => $this->getMapperFactory()->getLazy(UserMapper::class),
+            'userMapper'                    => $this->getMapperFactory()->getLazy(\Schoolbox\UserMapper::class),
             'houseMapper'                   => $this->getMapperFactory()->getLazy(HouseMapper::class),
             'pastoralDataSource'            => $injector->get('pastoralDataSource'),
-            'pastoralReportMapper'          => $this->getMapperFactory()->getLazy(PastoralReportMapper::class),
-            'pastoralSeverityMapper'        => $this->getMapperFactory()->getLazy(PastoralSeverityMapper::class),
-            'pastoralTypeMapper'            => $this->getMapperFactory()->getLazy(PastoralTypeMapper::class),
-            'pastoralSubTypeMapper'         => $this->getMapperFactory()->getLazy(PastoralSubTypeMapper::class),
-            'pastoralTagMapper'             => $this->getMapperFactory()->getLazy(PastoralTagMapper::class),
-            'errorMapper'                   => $this->getMapperFactory()->getLazy(ErrorMapper::class),
-            'pastoralGroupMapper'           => $this->getMapperFactory()->getLazy(PastoralGroupMapper::class),
-            'pastoralReportDashboardMapper' => $this->getMapperFactory()->getLazy(PastoralReportDashboardMapper::class),
+            'pastoralReportMapper'          => $this->getMapperFactory()->getLazy(\Schoolbox\Pastoral\Report\Mapper::class),
+            'pastoralSeverityMapper'        => $this->getMapperFactory()->getLazy(\Schoolbox\Pastoral\Severity\Mapper::class),
+            'pastoralTypeMapper'            => $this->getMapperFactory()->getLazy(\Schoolbox\Pastoral\Type\Mapper::class),
+            'pastoralSubTypeMapper'         => $this->getMapperFactory()->getLazy(\Schoolbox\Pastoral\SubType\Mapper::class),
+            'pastoralTagMapper'             => $this->getMapperFactory()->getLazy(\Schoolbox\Pastoral\Tag\Mapper::class),
+            'errorMapper'                   => $this->getMapperFactory()->getLazy(\Schoolbox\Error\Mapper::class),
+            'pastoralGroupMapper'           => $this->getMapperFactory()->getLazy(\Schoolbox\Pastoral\Group\Mapper::class),
+            'pastoralReportDashboardMapper' => $this->getMapperFactory()->getLazy(\Schoolbox\Pastoral\Report\Dashboard\Mapper::class),
         ];
 
         $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class, $mappers));
