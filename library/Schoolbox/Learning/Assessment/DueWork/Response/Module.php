@@ -61,8 +61,8 @@ class Module extends BaseModule
         $preloadKami            = function (array $params) { return $this->preloadKami($params); };
 
         $hasWriteAccess = new Rule\All(
-                new Rule\IsLoggedIn(),
-                $this->buildRuleHasWriteAccess()
+            new Rule\IsLoggedIn(),
+            $this->buildRuleHasWriteAccess()
         );
 
         $hasKamiAccess = new Rule\All(
