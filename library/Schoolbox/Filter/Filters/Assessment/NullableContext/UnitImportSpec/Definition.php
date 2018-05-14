@@ -39,7 +39,7 @@ class Definition extends NullableContext\Definition
 {
 
     // The name to expose in the UI
-    const NAME = "Unit Import's Specification";
+    protected const NAME = "Unit Import's Specification";
 
     /* Show units imported to the following folder types:
      * eg,

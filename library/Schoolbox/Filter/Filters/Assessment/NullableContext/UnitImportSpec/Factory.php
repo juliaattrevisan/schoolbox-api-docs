@@ -93,6 +93,7 @@ class Factory extends NullableContext\Factory
         if (null === $viewee) {
             throw new \InvalidArgumentException('Viewee cannot be null for UnitImportSpec filter');
         }
+        $unitSpecOverrides = $overrides[$definition->getFilter()->getId()];
 
         // Should this role type see classes for this page?
         $options     = $pageFilter->getOptions();
@@ -173,12 +174,22 @@ class Factory extends NullableContext\Factory
                 $unitSpecsImportedToGroups->setOffset($unitSpec->getId(), $unitSpec);
             }
         }
+
+
+        // Course Markbook enables insertion of unit-import-specs and their host folders
+        if ($unitSpecOverrides && Filter\Page\Model::PAGE_COURSE_MARK_BOOK === $pageFilter->getPage()) {
+            $unitSpecs = $this->unitSpecMapper->findByColumn($this->unitSpecMapper->getIdentifierColumn(), $unitSpecOverrides->keys());
+            foreach ($unitSpecs as $unitSpec) {
+                $unitSpecsImportedToFolders->setOffset($unitSpec->getId(), $unitSpec);
+            }
+        }
+
         return new Component(
             $definition,
             $user,
             $pageFilter,
             $selections,
-            $overrides[$pageFilter->getFilter()->getId()],
+            $unitSpecOverrides,
             $this->getSelectionMapper(),
             $unitSpecsImportedToFolders,
             $unitSpecsImportedToClasses,

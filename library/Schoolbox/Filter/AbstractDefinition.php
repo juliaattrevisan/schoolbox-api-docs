@@ -16,7 +16,8 @@ abstract class AbstractDefinition implements IDefinition
 {
 
     // The name to expose in the UI
-    const NAME = '';
+    // @todo It should be a view-layer responsibility (eg twig macro) to map from filter definition to a human-readable name
+    protected const NAME = '';
 
     /** @var Model */
     private $filter;
@@ -102,6 +103,7 @@ abstract class AbstractDefinition implements IDefinition
      *
      * @param Page\Model $pageFilter
      * @return GenericCollection|Page\Option\Model[]
+     * @throws \Schoolbox\Mapper\Exception            If unable to generate a mapper's model
      */
     protected function insertAbstractOptions(Page\Model $pageFilter)
     {
@@ -200,6 +202,7 @@ abstract class AbstractDefinition implements IDefinition
 
     /**
      * @inheritdoc
+     * @throws \Schoolbox\Mapper\Exception            If unable to generate a mapper's model
      */
     public function normalisePageOptions(Page\Model $pageFilter, $roleTypeFilter = null)
     {
@@ -216,8 +219,9 @@ abstract class AbstractDefinition implements IDefinition
     /**
      * @param Page\Model  $pageFilter
      * @param null|string $roleTypeFilter
+     * @throws \Schoolbox\Mapper\Exception            If unable to generate a mapper's model
      */
-    private function insertRoleDefaults(Page\Model $pageFilter, $roleTypeFilter = null)
+    private function insertRoleDefaults(Page\Model $pageFilter, $roleTypeFilter = null): void
     {
         // Get the role types that can access this page
         $roleTypes = Page\Model::getRoleTypesForPage($pageFilter->getPage());

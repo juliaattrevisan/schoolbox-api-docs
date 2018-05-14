@@ -9,7 +9,6 @@ namespace Schoolbox\Filter;
 
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
-use Schoolbox\User;
 
 /**
  * Knows how to map between an option.key and the item
@@ -37,9 +36,11 @@ interface IKeyConverter
      * that it can skip this filter entirely.
      *
      * @param GenericCollection|Selection\Model[] $availableSelections Indexed by setting.key
+     * @param \Schoolbox\User                     $user
+     * @param string                              $page
      * @return null|Collection|int[]|string[] (intentionally not GenericCollection as it only contains scalars)
      */
-    public function getSelectedItems(GenericCollection $availableSelections);
+    public function getSelectedItems(GenericCollection $availableSelections, \Schoolbox\User $user, string $page): ?Collection;
 
 
     /**

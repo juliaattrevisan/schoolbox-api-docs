@@ -28,7 +28,7 @@ class Definition extends AssessmentTermFilter\Definition
 {
 
     // The name to expose in the UI
-    const NAME = 'Term Closed';
+    protected const NAME = 'Term Closed';
 
 
     /**

@@ -62,10 +62,12 @@ class Transformer
     /**
      * Get a set of entities represented by a filter component's selections
      *
-     * @param string $filterClass
+     * @param string          $filterClass
+     * @param \Schoolbox\User $user
+     * @param string          $page
      * @return null|Collection|mixed[]
      */
-    protected function getSelectedItems($filterClass)
+    protected function getSelectedItems(string $filterClass, \Schoolbox\User $user, string $page)
     {
         // Was the requested filter not injected into this transformer?
         if (!$this->filtersByClass->offsetExists($filterClass)) {
@@ -74,16 +76,18 @@ class Transformer
         $filterId     = $this->filtersByClass[$filterClass]->getId();
         $keyConverter = $this->keyConverters[$filterId];
 
-        return $keyConverter->getSelectedItems($this->selectionsPerFilter[$filterId]);
+        return $keyConverter->getSelectedItems($this->selectionsPerFilter[$filterId], $user, $page);
     }
 
 
     /**
      * Build an array of filters, ready for injection into an IdFinder
      *
+     * @param \Schoolbox\User $user
+     * @param string          $page
      * @return null[]|Collection[] Indexed by filter.class
      */
-    public function getByClass()
+    public function getByClass(\Schoolbox\User $user, string $page): array
     {
         $filters = [];
 
@@ -95,7 +99,7 @@ class Transformer
         foreach ($this->keyConverters as $keyConverter) {
             $filter          = $keyConverter->getFilter();
             $class           = $filter->getClass();
-            $filters[$class] = $this->getSelectedItems($class);
+            $filters[$class] = $this->getSelectedItems($class, $user, $page);
         }
 
         return $filters;

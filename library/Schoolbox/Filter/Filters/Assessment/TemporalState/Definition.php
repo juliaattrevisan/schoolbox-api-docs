@@ -25,7 +25,7 @@ class Definition extends Filter\AbstractDefinition
 {
 
     // The name to expose in the UI
-    const NAME = 'Activity State';
+    protected const NAME = 'Activity State';
 
     const KEY_UNPUBLISHED = 'unpublished';
     const KEY_UPCOMING = 'upcoming';

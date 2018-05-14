@@ -13,7 +13,6 @@ use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group as GradeGroup;
 use Schoolbox\Assessment\Term;
@@ -21,6 +20,7 @@ use DueWork_ErrorMapper;
 use Schoolbox\Filter;
 use Schoolbox\User;
 use Schoolbox\GenericCollection;
+use Alaress\Database\Predicate\InvalidColumnException;
 
 class Controller extends Base
 {
@@ -168,8 +168,11 @@ class Controller extends Base
      * @throws \DomainException                      If of the filters on this page does not have its slug set
      * @throws \Schoolbox\Mapper\DefinitionException If join $name isn't on this mapper
      * @throws \Schoolbox\Mapper\Exception           If an alias is incorrect
+     * @throws InvalidColumnException                If an invalid column is passed to PB
+     * @throws \UnderflowException                   If empty IN arg passed to PB
+     * @throws \UnexpectedValueException             If wrong item type inserted in a generic collection
      */
-    public function getMarkbook(User $viewee = null)
+    public function getMarkbook(User $viewee = null): void
     {
         // If viewee not specified, then display current user's markbook.
         if (null === $viewee) {
@@ -202,7 +205,7 @@ class Controller extends Base
      * @param User $viewee
      * @todo convert this to a GET on the same route name as getMarkbook, but distinguish as being AJAX
      */
-    public function postMarkbook(User $viewee)
+    public function postMarkbook(User $viewee): void
     {
         try {
             $request = $this->request->post['filter_selection'] ?: [];
@@ -241,9 +244,6 @@ class Controller extends Base
                 ]);
             }
             $this->getResponse()->content->set($this->buildJsonOutput($data));
-        } catch (\Exception $e) {
-            $this->returnJsonError($e);
-            // TODO - can remove this block when we abandon PHP 5 support
         } catch (\Throwable $e) {
             $this->returnJsonError($e);
         }
@@ -273,7 +273,7 @@ class Controller extends Base
             $selectionMapper->updateSelections($this->getUser(), $page, $selectionsPerFilter);
         }
 
-        $filters = $this->filterFactoryFactory->convertSelectionsToFilters($selectionsPerFilter, $page);
+        $filters = $this->filterFactoryFactory->convertSelectionsToFilters($selectionsPerFilter, $this->getUser(), $page);
 
         $filters = $this->filterFactoryFactory->checkTeacherFolders($filters, $viewee);
 

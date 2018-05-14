@@ -40,13 +40,15 @@ class KeyConverter extends NullableContext\KeyConverter
     /**
      * Given a concrete key (such as returned from a user's filter panel selections), return the corresponding item
      *
-     * @param string $key
-     * @return int
-     * @throws \InvalidArgumentException
+     * @inheritdoc
+     * @return null|int
      */
-    public function getItem($key)
+    public function getItem(string $key, \Schoolbox\User $user, string $page): ?int
     {
-        $this->assertValidKey($key);
+        if (Definition::KEY_NONE === $key) {
+            return null;
+        }
+        $this->assertValidKey($key, $user, $page);
         return $this->projectIds[$key];
     }
 
@@ -65,7 +67,7 @@ class KeyConverter extends NullableContext\KeyConverter
     /**
      * @inheritdoc
      */
-    protected function assertValidKey($key)
+    protected function assertValidKey(string $key, \Schoolbox\User $user, string $page): void
     {
         if (Definition::KEY_NONE !== $key && !$this->projectIds->offsetExists($key)) {
             throw new \InvalidArgumentException("No Project ID found for key: $key");

@@ -22,7 +22,7 @@ class Definition extends Filter\AbstractDefinition
 {
 
     // The name to expose in the UI
-    const NAME = 'Work Type';
+    protected const NAME = 'Work Type';
 
     // If assessment does not have a WorkType at all
     const KEY_NONE = 'none';

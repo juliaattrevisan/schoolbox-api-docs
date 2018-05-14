@@ -17,13 +17,11 @@ class KeyConverter extends AbstractKeyConverter
 {
 
     /**
-     * @param string $key
-     * @return mixed
-     * @throws \InvalidArgumentException
+     * @inheritdoc
      */
-    protected function getItem($key)
+    protected function getItem(string $key, \Schoolbox\User $user, string $page)
     {
-        $this->assertValidKey($key);
+        $this->assertValidKey($key, $user, $page);
         return $key;
     }
 
@@ -38,10 +36,10 @@ class KeyConverter extends AbstractKeyConverter
 
 
     /**
-     * @param string $key A concrete key
+     * @inheritdoc
      * @throws \InvalidArgumentException If key is not numeric
      */
-    protected function assertValidKey($key)
+    protected function assertValidKey(string $key, \Schoolbox\User $user, string $page): void
     {
         if (!is_numeric($key)) {
             throw new \InvalidArgumentException('YearDue Key is invalid: ' . $key);
