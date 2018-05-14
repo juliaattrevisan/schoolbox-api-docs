@@ -11,6 +11,7 @@ namespace Schoolbox\Realtime\MessageList;
 use Alaress\Async\Notification\Instance\Instance;
 use BadMethodCallException;
 use Predis\ClientInterface;
+use Predis\Collection\Iterator\Keyspace;
 
 /**
  * A user-independent list interface, usable only for retracting messages.
@@ -51,7 +52,50 @@ class Retractor extends AbstractList
      */
     public function push(Instance $instance)
     {
-        $this->redis->del([$this->getRedisMsgKey($instance)]);
+        if ($this->mode === self::MODE_RETRACT_SINGLE) {
+            $this->retractSingle($instance);
+        } elseif ($this->mode === self::MODE_RETRACT_LIKE) {
+            $this->retractLike($instance);
+        }
+        // should always be at least one of the above:
+        // constructor guarantees mode must be one of the above modes
+    }
+
+
+    /**
+     * Surgically retract this message from the queue, if it's there.
+     *
+     * @param Instance $instance
+     * @return bool
+     */
+    private function retractSingle(Instance $instance): bool
+    {
+        // When retracting messages, only the message body need be removed.
+        // The pointer in the set need not be removed, as `fetch()` knows how
+        // to handle set items with missing message bodies.
+        return $this->redis->del([$this->getRedisMsgKey($instance)]) > 0;
+    }
+
+
+    /**
+     * Surgically retract this message and any with the same base hash from the
+     * queue.
+     *
+     * @param Instance $instance
+     * @return int The number of msgs removed
+     */
+    private function retractLike(Instance $instance): int
+    {
+        $ids = [];
+        foreach (new Keyspace($this->redis, $this->getRedisMsgBaseKey($instance)) as $id) {
+            $ids[] = $id;
+        }
+
+        if (!empty($ids)) {
+            // Again, only the message body need be removed
+            $this->redis->del($ids);
+        }
+        return \count($ids);
     }
 
 
