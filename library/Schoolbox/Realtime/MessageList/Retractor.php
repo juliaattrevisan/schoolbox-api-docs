@@ -40,24 +40,24 @@ class Retractor extends AbstractList
 
 
     /**
-     * The retractor queue is user-independent, therefore it has no access to
-     * any user's set queue.
+     * Retract queues are user-independent, therefore it has no access to any
+     * user's set queue.
      *
      * @throws BadMethodCallException
      */
     protected function getSetKeyPattern()
     {
-        throw new BadMethodCallException('Retractor queue has no access to set');
+        throw new BadMethodCallException('Retract queues has no access to set');
     }
 
 
     /**
-     * As the retractor queue has no access to any set queue, the suffix is not used.
+     * Retract queues have no access to any set queue, the suffix is not used.
      *
      * @throws BadMethodCallException
      */
     protected function getSuffix()
     {
-        throw new BadMethodCallException('Retractor does not support suffix');
+        throw new BadMethodCallException('Retract queues do not support suffix');
     }
 }
