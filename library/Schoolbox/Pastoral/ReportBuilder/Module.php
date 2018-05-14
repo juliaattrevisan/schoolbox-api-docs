@@ -15,7 +15,6 @@ use HouseMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Pastoral\Authorizer\Rule\IsReportOwner;
 use Schoolbox\Pastoral\Report\Mapper as PastoralReportMapper;
 use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
@@ -23,7 +22,6 @@ use Schoolbox\Pastoral\Tag\Mapper as PastoralTagMapper;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
 use Schoolbox\Pastoral\SubType\Mapper as PastoralSubTypeMapper;
 use Schoolbox\Pastoral\Group\Mapper as PastoralGroupMapper;
-use Schoolbox\Pastoral\Group\Member\Mapper as PastoralGroupMemberMapper;
 use Schoolbox\Pastoral\Report\Dashboard\Mapper as PastoralReportDashboardMapper;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
@@ -76,11 +74,9 @@ class Module extends BaseModule
             'pastoralSeverityMapper'        => $this->getMapperFactory()->getLazy(PastoralSeverityMapper::class),
             'pastoralTypeMapper'            => $this->getMapperFactory()->getLazy(PastoralTypeMapper::class),
             'pastoralSubTypeMapper'         => $this->getMapperFactory()->getLazy(PastoralSubTypeMapper::class),
-            'pastoralAccessMapper'          => $this->getMapperFactory()->getLazy(PastoralAccessMapper::class),
             'pastoralTagMapper'             => $this->getMapperFactory()->getLazy(PastoralTagMapper::class),
             'errorMapper'                   => $this->getMapperFactory()->getLazy(ErrorMapper::class),
             'pastoralGroupMapper'           => $this->getMapperFactory()->getLazy(PastoralGroupMapper::class),
-            'pastoralGroupMemberMapper'     => $this->getMapperFactory()->getLazy(PastoralGroupMemberMapper::class),
             'pastoralReportDashboardMapper' => $this->getMapperFactory()->getLazy(PastoralReportDashboardMapper::class),
         ];
 

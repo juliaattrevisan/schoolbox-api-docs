@@ -40,9 +40,6 @@ class Controller extends Base
     /** @var PastoralTagMapper $pastoralTagMapper */
     private $pastoralTagMapper;
 
-    /** @var PastoralAccessMapper $pastoralAccessMapper */
-    private $pastoralAccessMapper;
-
     /** @var PastoralTypeMapper $pastoralTypeMapper */
     private $pastoralTypeMapper;
 
@@ -61,9 +58,6 @@ class Controller extends Base
     /** @var PastoralGroupMapper $pastoralGroupMapper */
     private $pastoralGroupMapper;
 
-    /** @var PastoralGroupMemberMapper $pastoralGroupMemberMapper */
-    private $pastoralGroupMemberMapper;
-
     /** @var UserMapper $userMapper */
     private $userMapper;
 
@@ -75,7 +69,6 @@ class Controller extends Base
      *
      * @param ErrorMapper                   $errorMapper
      * @param PastoralDataSource            $pastoralDataSource
-     * @param PastoralAccessMapper          $pastoralAccessMapper
      * @param PastoralTagMapper             $pastoralTagMapper
      * @param PastoralTypeMapper            $pastoralTypeMapper
      * @param PastoralSubTypeMapper         $pastoralSubTypeMapper
@@ -83,14 +76,12 @@ class Controller extends Base
      * @param UserMapper                    $userMapper
      * @param HouseMapper                   $houseMapper
      * @param PastoralGroupMapper           $pastoralGroupMapper
-     * @param PastoralGroupMemberMapper     $pastoralGroupMemberMapper
      * @param PastoralReportMapper          $pastoralReportMapper
      * @param PastoralReportDashboardMapper $pastoralReportDashboardMapper
      */
     public function __construct(
         ErrorMapper $errorMapper,
         PastoralDataSource $pastoralDataSource,
-        PastoralAccessMapper $pastoralAccessMapper,
         PastoralTagMapper $pastoralTagMapper,
         PastoralTypeMapper $pastoralTypeMapper,
         PastoralSubTypeMapper $pastoralSubTypeMapper,
@@ -98,13 +89,11 @@ class Controller extends Base
         UserMapper $userMapper,
         HouseMapper $houseMapper,
         PastoralGroupMapper $pastoralGroupMapper,
-        PastoralGroupMemberMapper $pastoralGroupMemberMapper,
         PastoralReportMapper $pastoralReportMapper,
         PastoralReportDashboardMapper $pastoralReportDashboardMapper
     ) {
         $this->errorMapper               = $errorMapper;
         $this->pastoralDataSource        = $pastoralDataSource;
-        $this->pastoralAccessMapper      = $pastoralAccessMapper;
         $this->pastoralTagMapper         = $pastoralTagMapper;
         $this->pastoralTypeMapper        = $pastoralTypeMapper;
         $this->pastoralSubTypeMapper     = $pastoralSubTypeMapper;
@@ -112,7 +101,6 @@ class Controller extends Base
         $this->userMapper                = $userMapper;
         $this->houseMapper               = $houseMapper;
         $this->pastoralGroupMapper       = $pastoralGroupMapper;
-        $this->pastoralGroupMemberMapper = $pastoralGroupMemberMapper;
         $this->pastoralReportMapper          = $pastoralReportMapper;
         $this->pastoralReportDashboardMapper = $pastoralReportDashboardMapper;
     }
