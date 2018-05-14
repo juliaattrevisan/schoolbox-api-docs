@@ -214,7 +214,12 @@ class External_Isams_Timetable implements External_TimetableInterface
      */
     public function getPeriodNumber(\Schoolbox\Campus $campus, $now = 0, $user = null)
     {
-        $time = date("U");
+        if($now) {
+            $time = date("H:i", $now);
+        }
+        else {
+            $time = date("H:i");
+        }
 
         $queryPeriod = "
            SELECT     StartTime as TimeFrom,
