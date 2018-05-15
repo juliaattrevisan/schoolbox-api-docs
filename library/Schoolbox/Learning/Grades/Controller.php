@@ -497,12 +497,16 @@ class Controller extends Base
 
         foreach($markbook->getAssessments() as $assessment) {
 
-            $graphAssessments[] = $assessment->getTitle();
-
             $participant = $assessment->getParticipantIfExtant($viewee);
             $feedback    = $participant ? $participant->findAuthoritativeVisibleFeedback($this->getUser()) : null;
 
-            if($feedback && null !== ($feedback->getNormalisedMark())) {
+            $hasStats = $statistics[$assessment->getId()]['count'] > 0 && $assessment->getMarkScheme()
+                                                                                     ->isQuantitative();
+
+            if($feedback && (null !== $feedback->getNormalisedMark()) && $hasStats) {
+                $graphAssessments[] = $assessment->getTitle();
+
+
                 $graphScatter[] = (float)$feedback->getNormalisedMark();
 
                 if(!empty($feedback->getHumanReadableMark()) || !empty($feedback->getComment())) {
@@ -515,16 +519,7 @@ class Controller extends Base
                 else {
                     $graphInfo[] = [];
                 }
-            }
-            else {
-                $graphScatter[] = '';
-                $graphInfo[]    = [];
-            }
 
-            $hasStats = $statistics[$assessment->getId()]['count'] > 0 && $assessment->getMarkScheme()
-                                                                                     ->isQuantitative();
-
-            if($hasStats) {
                 $graphData[] = [
                     // Minimum
                     [
@@ -559,9 +554,7 @@ class Controller extends Base
                         'value' => $statistics[$assessment->getId()]['maxNormalized'],
                     ],
                 ];
-            }
-            else {
-                $graphData[] = [];
+
             }
         }
 
