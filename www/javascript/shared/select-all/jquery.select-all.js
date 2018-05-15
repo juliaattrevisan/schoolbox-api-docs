@@ -30,8 +30,6 @@
             } else {
                 config.checkboxes.prop('checked', false);
             }
-
-            config.selectAllNested(config.selector, config.childCheckboxes);
         }
 
         // Check or uncheck the Select All box automatically,
@@ -63,6 +61,7 @@
 
             config.selector.change(function () {
                 selectAll();
+                config.selectAllNested(config.selector, config.childCheckboxes);
 
                 config.change();
             });
