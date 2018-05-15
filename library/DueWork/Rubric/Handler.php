@@ -50,11 +50,13 @@ class DueWork_Rubric_Handler
      * @param int[]      $folderIds
      * @param Term\Model $term
      * @return array
-     * @var string       $data [sb.id][rc.id]['grouping'] criterion.grouping
-     * @var string       $data [sb.id][rc.id]['name'] criterion.name
-     * @var string       $data [sb.id][rc.id]['max_mark'] max mark
-     * @var array        $data [sb.id][rc.id]['marks']
-     * @var float        $data [sb.id][rc.id]['marks'][student.id]
+     * @internal  string       $data [sb.id][rc.id]['grouping'] criterion.grouping
+     * @internal  string       $data [sb.id][rc.id]['name'] criterion.name
+     * @internal  string       $data [sb.id][rc.id]['max_mark'] max mark
+     * @internal  array        $data [sb.id][rc.id]['marks']
+     * @internal  float        $data [sb.id][rc.id]['marks'][student.id]
+     * @throws UnderflowException
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
      */
     public function getStudentMarksByCriteriaInFolder(array $folderIds, Term\Model $term)
     {
@@ -124,7 +126,8 @@ class DueWork_Rubric_Handler
         // 2. Get max mark per criterion and dueWork
         $pb = new Alaress\Database\Predicate\Builder($this->db, '');
         $pb->in('rc.parent_id', $folderIds)
-           ->equals('rc.parent_type', Criterion::PARENT_TYPE_CATEGORY);
+           ->equals('rc.parent_type', Criterion::PARENT_TYPE_CATEGORY)
+           ->greaterThan('rd.value', 0.0);
         $whereClause = implode(' AND ', $pb->getWhere());
         $stmt        = Database::getInstance()->prepare("
             SELECT rl.box_id AS 'sb.id', rc.id AS 'rc.id', rc.grouping, rc.name, MAX(rd.value) AS 'max_mark'
@@ -158,11 +161,16 @@ class DueWork_Rubric_Handler
         foreach ($studentMarks as $row) {
             $mark = $row['mark'];
             if (null === $mark) {
+                // If student does not have a numeric mark, cannot calculate normalised mark
                 continue;
             }
             $boxId       = $row['sb.id'];
             $criterionId = $row['rc.id'];
-            $maxMark     = $results[$boxId][$criterionId]['maxMark'];
+            $maxMark     = $results[$boxId][$criterionId]['maxMark'] ?? null;
+            if (null === $maxMark) {
+                // This criterion has a max mark of 0.0 and therefore was not fetched into results array. Cannot calculate a normalised mark
+                continue;
+            }
 
             $results[$boxId][$criterionId]['marks'][$row['owner']] = 100.0 * $mark / $maxMark;
         }
