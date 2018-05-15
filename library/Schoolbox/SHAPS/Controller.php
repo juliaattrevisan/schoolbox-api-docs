@@ -107,7 +107,7 @@ class Controller extends Base
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@shaps/provisioned.twig', [
-                    'provisionedUsers' => $provisionedUsers
+                    'allUsers' => $provisionedUsers
             ])->setTitle('Provisioned Staff - Schoolbox Help Staff Provisioning')
         );
     }
@@ -125,7 +125,7 @@ class Controller extends Base
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@shaps/unprovisioned.twig', [
-                    'unprovisionedUsers' => $unprovisionedStaff
+                    'allUsers' => $unprovisionedStaff
             ])->setTitle('Unprovisioned Staff - Schoolbox Help Staff Provisioning')
         );
     }
