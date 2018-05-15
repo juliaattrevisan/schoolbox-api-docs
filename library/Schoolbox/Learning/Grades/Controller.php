@@ -495,36 +495,33 @@ class Controller extends Base
 
         $statistics = $markbook->getAssessmentStatistics();
 
-        foreach($markbook->getAssessments() as $assessment) {
-            if($assessment->isFeedbackVisibleToUser($viewee)  && $assessment->getMarkScheme()->isQuantitative()) {
+        foreach ($markbook->getAssessments() as $assessment) {
+            if ($assessment->isFeedbackVisibleToUser($viewee) && $assessment->getMarkScheme()->isQuantitative()) {
                 $graphAssessments[] = $assessment->getTitle();
 
                 $participant = $assessment->getParticipantIfExtant($viewee);
 
                 if ($participant && null !== $participant->getNormalisedMark(true)) {
                     $graphScatter[] = (float)$participant->getNormalisedMark(true);
-                }
-                else {
+                } else {
                     $graphScatter[] = [];
                 }
 
-                $feedback    = $participant ? $participant->findAuthoritativeVisibleFeedback($this->getUser()) : null;
+                $feedback = $participant ? $participant->findAuthoritativeVisibleFeedback($this->getUser()) : null;
                 if ($feedback && (!empty($feedback->getHumanReadableMark()) || !empty($feedback->getComment()))) {
                     $graphInfo[] = [
                         'displayMark'  => $feedback->getHumanReadableMark(),
                         'gradientMark' => (int)($feedback->getNormalisedMark() / 10),
-                        'info'         => null === $feedback->getComment() ? '' : $feedback->getComment(),
+                        'info'         => $feedback->getComment() ?? '',
                     ];
-                }
-                else if ($participant->getHumanReadableMark(true)) {
-                    //Handle project mark, not available through feedback
+                } elseif ($participant->getHumanReadableMark(true)) {
+                    // Handle project mark, not available through feedback
                     $graphInfo[] = [
                         'displayMark'  => $participant->getHumanReadableMark(true),
                         'gradientMark' => (int)($participant->getNormalisedMark(true) / 10),
                         'info'         => '',
                     ];
-                }
-                else {
+                } else {
                     $graphInfo[] = [];
                 }
 
@@ -565,8 +562,7 @@ class Controller extends Base
                             'value' => $statistics[$assessment->getId()]['maxNormalized'],
                         ],
                     ];
-                }
-                else {
+                } else {
                     $graphData[] = [];
                 }
 
