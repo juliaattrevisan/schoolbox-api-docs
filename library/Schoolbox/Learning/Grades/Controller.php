@@ -501,32 +501,37 @@ class Controller extends Base
 
                 $participant = $assessment->getParticipantIfExtant($viewee);
 
-                if ($participant && null !== $participant->getNormalisedMark(true)) {
-                    $graphScatter[] = (float)$participant->getNormalisedMark(true);
-                } else {
-                    $graphScatter[] = [];
+                // Set scatter plot value
+                $graphScatterValue = [];
+                if ($participant) {
+                    $normalisedMark = $participant->getNormalisedMark(true);
+                    if (null !== $normalisedMark) {
+                        $graphScatterValue = (float)$normalisedMark;
+                    }
                 }
+                $graphScatter[] = $graphScatterValue;
 
+                // Set graph info value
+                $graphInfoValue = [];
                 $feedback = $participant ? $participant->findAuthoritativeVisibleFeedback($this->getUser()) : null;
                 if ($feedback && (!empty($feedback->getHumanReadableMark()) || !empty($feedback->getComment()))) {
-                    $graphInfo[] = [
+                    $graphInfoValue = [
                         'displayMark'  => $feedback->getHumanReadableMark(),
                         'gradientMark' => (int)($feedback->getNormalisedMark() / 10),
                         'info'         => $feedback->getComment() ?? '',
                     ];
                 } elseif ($participant->getHumanReadableMark(true)) {
                     // Handle project mark, not available through feedback
-                    $graphInfo[] = [
+                    $graphInfoValue = [
                         'displayMark'  => $participant->getHumanReadableMark(true),
                         'gradientMark' => (int)($participant->getNormalisedMark(true) / 10),
                         'info'         => '',
                     ];
-                } else {
-                    $graphInfo[] = [];
                 }
+                $graphInfo[] = $graphInfoValue;
 
+                // Set box plot values
                 $hasStats = $statistics[$assessment->getId()]['count'] > 0;
-
                 if ($hasStats) {
                     $graphData[] = [
                         // Minimum
