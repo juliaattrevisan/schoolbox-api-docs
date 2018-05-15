@@ -10,6 +10,7 @@
             var defaults = {
                 change: function () {},
                 selectAllNested: function () {},
+                childCheckboxGroups: {}
             };
 
             var derived = {
@@ -29,6 +30,19 @@
                 config.checkboxes.prop('checked', true);
             } else {
                 config.checkboxes.prop('checked', false);
+            }
+
+            // If we have nested checkboxes, affect them as well
+            if (config.childCheckboxes) {
+                if (config.selector.is(':checked')) {
+                    config.childCheckboxGroups.show();
+                    config.childCheckboxes.prop("checked", true);
+                    config.checkboxes.siblings("label").find("i").removeClass("icon-click-view").addClass("icon-dropdown");
+                } else {
+                    config.childCheckboxGroups.hide();
+                    config.childCheckboxes.prop("checked", false);
+                    config.checkboxes.siblings("label").find("i").removeClass("icon-dropdown").addClass("icon-click-view");
+                }
             }
         }
 
@@ -61,7 +75,7 @@
 
             config.selector.change(function () {
                 selectAll();
-                config.selectAllNested(config.selector, config.childCheckboxes);
+                config.selectAllNested();
 
                 config.change();
             });

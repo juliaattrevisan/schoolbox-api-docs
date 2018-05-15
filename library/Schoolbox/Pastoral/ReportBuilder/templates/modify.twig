@@ -479,21 +479,7 @@
             selector: $("#type-all"),
             checkboxes: $("[data-check-type]"),
             childCheckboxes: $("[data-check-subtype]"),
-            selectAllNested: function(selectAllButton, childCheckboxes) {
-                // Show/hide subtypes on select/deselect all
-                var parentCheckboxes = "[data-check-type]"
-                var childCheckboxGroups = "[data-pastoral-subtype]";
-
-                if ($(selectAllButton).is(':checked')) {
-                    $(childCheckboxGroups).show();
-                    $(childCheckboxes).prop("checked", true);
-                    $(parentCheckboxes).siblings("label").find("i").removeClass("icon-click-view").addClass("icon-dropdown");
-                } else {
-                    $(childCheckboxGroups).hide();
-                    $(childCheckboxes).prop("checked", false);
-                    $(parentCheckboxes).siblings("label").find("i").removeClass("icon-dropdown").addClass("icon-click-view");
-                }
-            }
+            childCheckboxGroups: $("[data-pastoral-subtype]")
         });
 
         $reportForm.selectAll({
