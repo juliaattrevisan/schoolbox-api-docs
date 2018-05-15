@@ -3,12 +3,18 @@
 
         <h1>Schoolbox Help Staff Provisioning</h1>
 
-        {# TODO current page highlighting #}
+        {%
+            set pages = {
+                '/' : 'All',
+                '/provisioned' : 'Provisioned',
+                '/unprovisioned' : 'Not Provisioned',
+                '/search' : 'Search'
+            }
+        %}
         <ul class="sub-nav">
-            <li><a href="/shaps/provisioning/">All</a></li>
-            <li><a href="/shaps/provisioning/provisioned">Provisioned</a></li>
-            <li><a href="/shaps/provisioning/unprovisioned">Not Provisioned</a></li>
-            <li class="active"><a href="/shaps/provisioning/search">Search</a></li>
+            {% for pageUrl, pageTitle in pages %}
+                <li {% if currentPageUrl == pageUrl %}class="active"{% endif %}><a href="/shaps/provisioning{{ pageUrl }}">{{ pageTitle }}</a></li>
+            {% endfor %}
         </ul>
 
         {% block page_specific_content %}
