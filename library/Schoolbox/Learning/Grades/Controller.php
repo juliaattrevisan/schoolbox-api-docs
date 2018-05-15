@@ -513,20 +513,27 @@ class Controller extends Base
 
                 // Set graph info value
                 $graphInfoValue = [];
-                $feedback = $participant ? $participant->findAuthoritativeVisibleFeedback($this->getUser()) : null;
-                if ($feedback && (!empty($feedback->getHumanReadableMark()) || !empty($feedback->getComment()))) {
-                    $graphInfoValue = [
-                        'displayMark'  => $feedback->getHumanReadableMark(),
-                        'gradientMark' => (int)($feedback->getNormalisedMark() / 10),
-                        'info'         => $feedback->getComment() ?? '',
-                    ];
-                } elseif ($participant->getHumanReadableMark(true)) {
-                    // Handle project mark, not available through feedback
-                    $graphInfoValue = [
-                        'displayMark'  => $participant->getHumanReadableMark(true),
-                        'gradientMark' => (int)($participant->getNormalisedMark(true) / 10),
-                        'info'         => '',
-                    ];
+                $feedback       = $participant ? $participant->findAuthoritativeVisibleFeedback($this->getUser()) : null;
+                if ($feedback) {
+                    $humanReadableMark = $feedback->getHumanReadableMark();
+                    $comment           = $feedback->getComment();
+                    if (!empty($humanReadableMark) || !empty($comment)) {
+                        $graphInfoValue = [
+                            'displayMark'  => $humanReadableMark,
+                            'gradientMark' => (int)($feedback->getNormalisedMark() / 10),
+                            'info'         => $comment ?? '',
+                        ];
+                    }
+                } else {
+                    $humanReadableMark = $participant->getHumanReadableMark(true);
+                    if ($humanReadableMark) {
+                        // Handle project mark, not available through feedback
+                        $graphInfoValue = [
+                            'displayMark'  => $humanReadableMark,
+                            'gradientMark' => (int)($participant->getNormalisedMark(true) / 10),
+                            'info'         => '',
+                        ];
+                    }
                 }
                 $graphInfo[] = $graphInfoValue;
 
