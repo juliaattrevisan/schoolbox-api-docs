@@ -21,7 +21,12 @@
                         <tr>
                             <th>Status</th>
                             <th>User</th>
-                            <th>Provision?</th>
+                            <th>
+                                <div class="checklist">
+                                    <input id="select-all" type="checkbox">
+                                    <label for="select-all" title="Select All">Provision?</label>
+                                </div>
+                            </th>
                         </tr>
 
                         {% for user in allUsers %}

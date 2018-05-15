@@ -104,10 +104,13 @@ class Controller extends Base
             $userObj = $this->userMapper->findByExternalId($externalID);
             $provisionedUsers[] = $userObj;
         }
+        $provisionedUserIDs = $this->getProvisionedUserIDs();
+
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@shaps/provisioned.twig', [
-                    'allUsers' => $provisionedUsers
+                    'allUsers' => $provisionedUsers,
+                    'provisionedUserIDs' => $provisionedUserIDs
             ])->setTitle('Provisioned Staff - Schoolbox Help Staff Provisioning')
         );
     }
