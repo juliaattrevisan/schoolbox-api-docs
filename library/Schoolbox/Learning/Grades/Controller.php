@@ -501,7 +501,7 @@ class Controller extends Base
 
                 $participant = $assessment->getParticipantIfExtant($viewee);
 
-                if (null !== $participant->getNormalisedMark(false)) {
+                if ($participant && null !== $participant->getNormalisedMark(false)) {
                     $graphScatter[] = (float)$participant->getNormalisedMark(false);
                 }
                 else {
