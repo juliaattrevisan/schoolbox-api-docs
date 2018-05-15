@@ -153,7 +153,6 @@ class Assess_Import_Xml extends Evaluation_Import_Xml
             ->setCreator($_SESSION['user'])
             ->setCompletionMessage($parser->getCompletionMessage())
             ->setDuration($parser->getDuration())
-            ->setContext($context)
             ->setTitle($parser->getTitle())
             ->setWorkType($workType)
             ->setDescription($parser->getDescription())
@@ -165,6 +164,13 @@ class Assess_Import_Xml extends Evaluation_Import_Xml
             ->setDefaultOpenSpan($parser->getDefaultOpenSpan())
             ->setMaxAttempts($parser->getMaxAttempts())
             ->setMarkVisibility($parser->getMarkVisibility());
+
+        if ($context instanceof Project) {
+            // Attach context
+            // @see Schoolbox\Learning\Assessment\Factory produceNew()
+            $context->getAssessables()->add($quizAssessable);
+        }
+        $quizAssessable->setContext($context);
 
         $this->assessmentMapperProxy->save($quizAssessable);
 
