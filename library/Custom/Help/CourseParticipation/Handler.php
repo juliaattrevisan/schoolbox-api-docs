@@ -26,6 +26,7 @@ use UnexpectedValueException;
 class Handler
 {
     const PARTICIPANT_ROLE_NAME = 'School Staff';
+
     const PARTICIPANT_CAMPUS    = 1;
     const REQUIRED_USER_FIELDS  = [
         'id', 'email', 'title', 'firstname', 'lastname'
@@ -130,9 +131,7 @@ class Handler
     public function getUsersBySchool($schoolCode, $fuzzy = false)
     {
         $column = "name";
-        // TODO hard coding because of different role types in vagrant
-//        $value = self::PARTICIPANT_ROLE_NAME;
-        $value = "Teachers";
+        $value = self::PARTICIPANT_ROLE_NAME;
         $roleMapper = $this->getRoleMapper();
         $roleId = $roleMapper->findOneByColumn($column, $value)->getId();
 
@@ -140,23 +139,22 @@ class Handler
         // filter to the list of users whose external IDs are prefixed with the given school code
         $predicate = $this->getUserMapper()->getPredicateBuilder()->equals('group_id', $roleId);
 
-        // TODO nobody in vagrant is gonna have our arbitrary school code...so comment this out...
-//        if ($fuzzy) {
-//            // if we're doing a fuzzy lookup, search by `year`
-//            /** @var string[][] $map */
-//            $map = json_decode(file_get_contents(__DIR__ . '/code-map.json'), true);
-//
-//            if (empty($map[$schoolCode])) {
-//                // we don't have this code mapped, therefore nobody matches
-//                return [];
-//            }
-//
-//            $predicate->in('year', $map[$schoolCode]);
-//
-//        } else {
-//            // "normal" behaviour is to look up by external IDs
-//            $predicate->like('synergy_id', "{$schoolCode}.%");
-//        }
+        if ($fuzzy) {
+            // if we're doing a fuzzy lookup, search by `year`
+            /** @var string[][] $map */
+            $map = json_decode(file_get_contents(__DIR__ . '/code-map.json'), true);
+
+            if (empty($map[$schoolCode])) {
+                // we don't have this code mapped, therefore nobody matches
+                return [];
+            }
+
+            $predicate->in('year', $map[$schoolCode]);
+
+        } else {
+            // "normal" behaviour is to look up by external IDs
+            $predicate->like('synergy_id', "{$schoolCode}.%");
+        }
 
         // we only need the external ID itself, so bypass object hydration
         $rows = $this->getUserMapper()->findColumnsByPredicates([ 'username', 'synergy_id' ], $predicate);
