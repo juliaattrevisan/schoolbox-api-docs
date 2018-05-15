@@ -495,65 +495,88 @@ class Controller extends Base
 
         $statistics = $markbook->getAssessmentStatistics();
 
-        foreach($markbook->getAssessments() as $assessment) {
-
-            $participant = $assessment->getParticipantIfExtant($viewee);
-            $feedback    = $participant ? $participant->findAuthoritativeVisibleFeedback($this->getUser()) : null;
-
-            $hasStats = $statistics[$assessment->getId()]['count'] > 0 && $assessment->getMarkScheme()
-                                                                                     ->isQuantitative();
-
-            if($feedback && (null !== $feedback->getNormalisedMark()) && $hasStats) {
+        foreach ($markbook->getAssessments() as $assessment) {
+            if ($assessment->isFeedbackVisibleToUser($viewee) && $assessment->getMarkScheme()->isQuantitative()) {
                 $graphAssessments[] = $assessment->getTitle();
 
+                $participant = $assessment->getParticipantIfExtant($viewee);
 
-                $graphScatter[] = (float)$feedback->getNormalisedMark();
+                // Set scatter plot value
+                $graphScatterValue = [];
+                if ($participant) {
+                    $normalisedMark = $participant->getNormalisedMark(true);
+                    if (null !== $normalisedMark) {
+                        $graphScatterValue = (float)$normalisedMark;
+                    }
+                }
+                $graphScatter[] = $graphScatterValue;
 
-                if(!empty($feedback->getHumanReadableMark()) || !empty($feedback->getComment())) {
-                    $graphInfo[] = [
-                        'displayMark'  => $feedback->getHumanReadableMark(),
-                        'gradientMark' => (int)($feedback->getNormalisedMark() / 10),
-                        'info'         => null === $feedback->getComment() ? '' : $feedback->getComment(),
+                // Set graph info value
+                $graphInfoValue = [];
+                $feedback       = $participant ? $participant->findAuthoritativeVisibleFeedback($this->getUser()) : null;
+                if ($feedback) {
+                    $humanReadableMark = $feedback->getHumanReadableMark();
+                    $comment           = $feedback->getComment();
+                    if (!empty($humanReadableMark) || !empty($comment)) {
+                        $graphInfoValue = [
+                            'displayMark'  => $humanReadableMark,
+                            'gradientMark' => (int)($feedback->getNormalisedMark() / 10),
+                            'info'         => $comment ?? '',
+                        ];
+                    }
+                } else {
+                    $humanReadableMark = $participant->getHumanReadableMark(true);
+                    if ($humanReadableMark) {
+                        // Handle project mark, not available through feedback
+                        $graphInfoValue = [
+                            'displayMark'  => $humanReadableMark,
+                            'gradientMark' => (int)($participant->getNormalisedMark(true) / 10),
+                            'info'         => '',
+                        ];
+                    }
+                }
+                $graphInfo[] = $graphInfoValue;
+
+                // Set box plot values
+                $hasStats = $statistics[$assessment->getId()]['count'] > 0;
+                if ($hasStats) {
+                    $graphData[] = [
+                        // Minimum
+                        [
+                            'info'  => null,
+                            'uid'   => null,
+                            'value' => $statistics[$assessment->getId()]['minNormalized'],
+                        ],
+                        // 1st Quartile
+                        [
+                            'info'  => null,
+                            'uid'   => null,
+                            // TODO: Find the real way to calculate the 1st/3rd quartiles
+                            'value' => $statistics[$assessment->getId()]['meanNormalized'] - $statistics[$assessment->getId()]['sdNormalized'],
+                        ],
+                        // Median
+                        [
+                            'info'  => null,
+                            'uid'   => null,
+                            'value' => $statistics[$assessment->getId()]['meanNormalized'],
+                        ],
+                        // 3rd Quartile
+                        [
+                            'info'  => null,
+                            'uid'   => null,
+                            // TODO: Find the real way to calculate the 1st/3rd quartiles
+                            'value' => $statistics[$assessment->getId()]['meanNormalized'] + $statistics[$assessment->getId()]['sdNormalized'],
+                        ],
+                        // Maximum
+                        [
+                            'info'  => null,
+                            'uid'   => null,
+                            'value' => $statistics[$assessment->getId()]['maxNormalized'],
+                        ],
                     ];
+                } else {
+                    $graphData[] = [];
                 }
-                else {
-                    $graphInfo[] = [];
-                }
-
-                $graphData[] = [
-                    // Minimum
-                    [
-                        'info'  => null,
-                        'uid'   => null,
-                        'value' => $statistics[$assessment->getId()]['minNormalized'],
-                    ],
-                    // 1st Quartile
-                    [
-                        'info'  => null,
-                        'uid'   => null,
-                        // TODO: Find the real way to calculate the 1st/3rd quartiles
-                        'value' => $statistics[$assessment->getId()]['meanNormalized'] - $statistics[$assessment->getId()]['sdNormalized'],
-                    ],
-                    // Median
-                    [
-                        'info'  => null,
-                        'uid'   => null,
-                        'value' => $statistics[$assessment->getId()]['meanNormalized'],
-                    ],
-                    // 3rd Quartile
-                    [
-                        'info'  => null,
-                        'uid'   => null,
-                        // TODO: Find the real way to calculate the 1st/3rd quartiles
-                        'value' => $statistics[$assessment->getId()]['meanNormalized'] + $statistics[$assessment->getId()]['sdNormalized'],
-                    ],
-                    // Maximum
-                    [
-                        'info'  => null,
-                        'uid'   => null,
-                        'value' => $statistics[$assessment->getId()]['maxNormalized'],
-                    ],
-                ];
 
             }
         }
