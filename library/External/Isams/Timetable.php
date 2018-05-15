@@ -232,7 +232,7 @@ class External_Isams_Timetable implements External_TimetableInterface
 
         $period = $this->getConnector()->executeQuery($queryPeriod, [
             'time_val'  => $time,
-            'day_id'    => $this->getDayId($campus, $time)
+            'day_id'    => $this->getDayId($campus, $now)
         ])->fetch();
 
         if ($period) {
