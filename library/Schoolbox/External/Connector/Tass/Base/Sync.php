@@ -64,7 +64,7 @@ class Sync extends Base implements ISync
                 FROM student AS s
                 LEFT JOIN studboard AS sb ON s.stud_code = sb.stud_code AND s.cmpy_code = sb.cmpy_code
                 WHERE s.cmpy_code = :companyCode
-                AND   (s.dol IS NULL OR s.dol > getdate())
+                AND   (s.dol IS NULL OR s.dol >= getdate())
             ",
             ['companyCode' => $this->companyCode]
         );
@@ -151,9 +151,9 @@ class Sync extends Base implements ISync
                 AND   (pd.deceased_flg != 'Y' OR pd.deceased_flg IS NULL)
                 AND   ((CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') IS NULL)
                 OR    (CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') > 0))
-    
+
                 UNION ALL
-    
+
                 SELECT DISTINCT
                     CASE
                         WHEN
@@ -198,7 +198,7 @@ class Sync extends Base implements ISync
                 AND   (pd.deceased_flg != 'Y' OR pd.deceased_flg IS NULL)
                 AND   ((CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') IS NULL)
                 OR    (CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') > 0))
-    
+
                 ORDER BY student_contact_id ASC
             ",
             [
@@ -259,7 +259,7 @@ class Sync extends Base implements ISync
                 LEFT JOIN teacher AS te ON t.emp_code = te.emp_code AND t.cust_code = te.cmpy_code
                 LEFT JOIN tchdept AS td ON te.tch_code = td.tch_code
                 LEFT JOIN tchcampus AS tc ON te.tch_code = tc.tch_code AND t.cust_code = tc.cmpy_code
-                LEFT JOIN portalusers AS p ON prodcode='TIA' AND t.cust_code = p.cmpy_code AND (t.emp_code = p.portal_code OR te.tch_code = p.portal_code) 
+                LEFT JOIN portalusers AS p ON prodcode='TIA' AND t.cust_code = p.cmpy_code AND (t.emp_code = p.portal_code OR te.tch_code = p.portal_code)
                 WHERE t.cust_code = :companyCode
             ",
             ['companyCode' => $this->companyCode]
