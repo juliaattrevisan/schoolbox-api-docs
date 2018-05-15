@@ -501,8 +501,8 @@ class Controller extends Base
 
                 $participant = $assessment->getParticipantIfExtant($viewee);
 
-                if ($participant && null !== $participant->getNormalisedMark(false)) {
-                    $graphScatter[] = (float)$participant->getNormalisedMark(false);
+                if ($participant && null !== $participant->getNormalisedMark(true)) {
+                    $graphScatter[] = (float)$participant->getNormalisedMark(true);
                 }
                 else {
                     $graphScatter[] = [];
@@ -516,11 +516,11 @@ class Controller extends Base
                         'info'         => null === $feedback->getComment() ? '' : $feedback->getComment(),
                     ];
                 }
-                else if ($humanMark = $participant->getHumanReadableMark(false)) {
+                else if ($humanMark = $participant->getHumanReadableMark(true)) {
                     //Handle project mark, not available through feedback
                     $graphInfo[] = [
-                        'displayMark'  => $participant->getHumanReadableMark(false),
-                        'gradientMark' => (int)($participant->getNormalisedMark(false) / 10),
+                        'displayMark'  => $participant->getHumanReadableMark(true),
+                        'gradientMark' => (int)($participant->getNormalisedMark(true) / 10),
                         'info'         => '',
                     ];
                 }
