@@ -262,8 +262,8 @@
 <script type="text/javascript">
     $(function() {
         $('table').selectAll({
-            key: 'selectall',
-            checkboxName: 'cleanupEventId[]'
+            selector: $('#check-all'),
+            checkboxes: $('[name="cleanupEventId[]"]')
         });
 
         /* Special modifiers
