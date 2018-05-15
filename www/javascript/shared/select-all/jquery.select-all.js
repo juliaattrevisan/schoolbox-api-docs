@@ -13,10 +13,13 @@
                 childCheckboxGroups: {}
             };
 
+            // This is necessary because we only want to select things
+            // inside the element we're initialising the plugin on.
             var derived = {
-                selector: element.find("[data-" + options.key + "='true']"),
-                checkboxes: element.find("input[name='" + options.checkboxName + "']"),
-                childCheckboxes: element.find("input[name='" + options.checkboxName + "']")
+                selector: element.find(options.selector),
+                checkboxes: element.find(options.checkboxes),
+                childCheckboxes: element.find(options.childCheckboxes),
+                childCheckboxGroups: element.find(options.childCheckboxGroups)
             };
 
             var merged = $.extend(defaults, derived, options);
