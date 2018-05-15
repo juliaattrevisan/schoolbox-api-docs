@@ -516,7 +516,7 @@ class Controller extends Base
                         'info'         => null === $feedback->getComment() ? '' : $feedback->getComment(),
                     ];
                 }
-                else if ($humanMark = $participant->getHumanReadableMark(true)) {
+                else if ($participant->getHumanReadableMark(true)) {
                     //Handle project mark, not available through feedback
                     $graphInfo[] = [
                         'displayMark'  => $participant->getHumanReadableMark(true),
