@@ -208,7 +208,7 @@ else {
 	/* Load all the questions for this section.
 	 * Note: only show the randomly-selected ones
 	 */
-	$allAttempts = $attemptHandler->getAllAttemptsForQuestion($question['question_id']);
+	$allAttempts = $attemptHandler->getAllAttemptsForQuestion($assess['assess_id'], $question['question_id']);
 
     $this->setVar('attempt_block', '');
 
