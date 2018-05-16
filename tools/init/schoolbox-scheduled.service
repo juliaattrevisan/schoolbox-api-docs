@@ -1,0 +1,18 @@
+[Unit]
+Description=Schoolbox Scheduling Server
+After=mysql.service redis-server.service rabbitmq-server.service
+Requires=mysql.service redis-server.service rabbitmq-server.service
+
+[Service]
+Environment=SBVERBOSITY='--porcelain -vvv --pid'
+ExecStartPre=/usr/share/schoolbox/tools/notif/syscheck.php -vvv
+ExecStartPre=/usr/share/schoolbox/tools/mq/schedule-safe-restart.php -vvv --perform
+ExecStart=/usr/share/schoolbox/tools/mq/scheduled.php $SBVERBOSITY
+ExecReload=/bin/kill -HUP $MAINPID
+KillMode=process
+Restart=on-failure
+LimitNOFILE=10240:10240
+Nice=5
+
+[Install]
+WantedBy=multi-user.target
