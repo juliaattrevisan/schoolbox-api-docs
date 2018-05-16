@@ -24,7 +24,7 @@ class Assess_Attempt extends Evaluation_Attempt {
     public function getAllAttemptsForQuestion($assessId, $questionId)
     {
         // Retrieve all attempts
-        $attempts = $this->retrieveLatestReviewableAttempts($assessId);
+        $attempts = $this->retrieveLatestReviewableAttemptIds($assessId);
         if (empty($attempts)) {
             return [];
         }
@@ -53,7 +53,7 @@ class Assess_Attempt extends Evaluation_Attempt {
     public function finaliseAllLatestAttempts($assessId)
     {
         // Retrieve all attempts
-        $attempts = $this->retrieveLatestReviewableAttempts($assessId);
+        $attempts = $this->retrieveLatestReviewableAttemptIds($assessId);
         if (empty($attempts)) {
             return;
         }
@@ -70,7 +70,8 @@ class Assess_Attempt extends Evaluation_Attempt {
     }
 
     /**
-     * Retrieves the latest attempts for each user that are still reviewable.
+     * Retrieves the IDs for each participant's most recent reviewable attempt.
+     *
      * Reviewable attempts:
      * * aren't deleted
      * * aren't yet reviewed
@@ -78,7 +79,7 @@ class Assess_Attempt extends Evaluation_Attempt {
      * @param int $assessId
      * @return array
      */
-    private function retrieveLatestReviewableAttempts($assessId)
+    private function retrieveLatestReviewableAttemptIds($assessId)
     {
         $query = "
             SELECT user_id, attempt_id
