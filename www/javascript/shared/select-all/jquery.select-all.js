@@ -27,7 +27,7 @@
             return merged;
         }
 
-        // Select or deselect all checkboxes via the Select All checkbox.
+        /** Select or deselect all checkboxes via the Select All checkbox. */
         function selectAll() {
             if (config.selector.is(':checked')) {
                 config.checkboxes.prop('checked', true);
@@ -49,8 +49,8 @@
             }
         }
 
-        // Check or uncheck the Select All box automatically,
-        // based on whether all checkboxes have been manually checked.
+        /** Check or uncheck the Select All box automatically,
+        based on whether all checkboxes have been manually checked. */
         function autoSelectAll() {
 
             // If all parent checkboxes are checked...
@@ -73,6 +73,8 @@
 
         }
 
+        /** Determine and apply the correct icon (down or side arrow) on page load of a saved pastoral report
+         * based on the persisted checked state of checkboxes */
         function setupDropdownIcons() {
             if (config.childCheckboxes) {
                 config.checkboxes.each(function(index, checkbox) {
