@@ -99,12 +99,12 @@
                 config.change();
             });
 
-            config.checkboxes.change(function() {
+            config.checkboxes.change(function () {
                 autoSelectAllCheckboxes();
             });
 
             if (config.childCheckboxes) {
-                config.childCheckboxes.change(function() {
+                config.childCheckboxes.change(function () {
                     autoSelectAllCheckboxes();
                 });
             }
