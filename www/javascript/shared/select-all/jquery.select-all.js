@@ -9,7 +9,6 @@
         function init(options, element) {
             var defaults = {
                 change: function () {},
-                selectAllNested: function () {},
                 selector: '',
                 checkboxes: '',
                 childCheckboxes: '',
@@ -96,7 +95,6 @@
 
             config.selector.change(function () {
                 selectAll();
-                config.selectAllNested();
 
                 config.change();
             });
