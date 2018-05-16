@@ -10,7 +10,10 @@
             var defaults = {
                 change: function () {},
                 selectAllNested: function () {},
-                childCheckboxGroups: {}
+                selector: '',
+                checkboxes: '',
+                childCheckboxes: '',
+                childCheckboxGroups: ''
             };
 
             // This is necessary because we only want to select things
@@ -22,7 +25,7 @@
                 childCheckboxGroups: element.find(options.childCheckboxGroups)
             };
 
-            var merged = $.extend(defaults, derived, options);
+            var merged = $.extend(defaults, options, derived);
 
             return merged;
         }

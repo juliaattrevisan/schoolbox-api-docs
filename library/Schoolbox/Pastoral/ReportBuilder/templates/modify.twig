@@ -476,10 +476,10 @@
         var $reportForm = $("#formReport");
 
         $reportForm.selectAll({
-            selector: $("#type-all"),
-            checkboxes: $("[data-check-type]"),
-            childCheckboxes: $("[data-check-subtype]"),
-            childCheckboxGroups: $("[data-pastoral-subtype]")
+            selector: "#type-all",
+            checkboxes: "[data-check-type]",
+            childCheckboxes: "[data-check-subtype]",
+            childCheckboxGroups: "[data-pastoral-subtype]"
         });
 
         $reportForm.selectAll({
