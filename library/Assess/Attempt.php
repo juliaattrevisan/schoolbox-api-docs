@@ -35,6 +35,8 @@ class Assess_Attempt extends Evaluation_Attempt {
             SELECT *
             FROM assess_question aq
             INNER JOIN assess_response ar ON aq.question_id = ar.question_id
+            INNER JOIN assess_attempt  aa ON ar.attempt_id  = aa.attempt_id
+            LEFT  JOIN user            u  ON aa.user_id     = u.id
             WHERE aq.question_id = '{$this->db->quote($questionId)}'
             AND   ar.attempt_id IN ({$attemptIds})
         ";
