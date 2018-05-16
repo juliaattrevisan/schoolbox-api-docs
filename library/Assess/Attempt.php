@@ -56,6 +56,7 @@ class Assess_Attempt extends Evaluation_Attempt {
 					SELECT *
 					FROM assess_attempt
 					WHERE assess_attempt.assess_id = '{$assessId}'
+					AND assess_attempt.deleted_at IS NULL
 					ORDER BY user_id, `start` DESC
 				) q ON assess_attempt.`attempt_id` = q.attempt_id
 				GROUP BY assess_attempt.user_id
