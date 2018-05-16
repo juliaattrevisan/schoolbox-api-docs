@@ -67,4 +67,32 @@ class Assess_Attempt extends Evaluation_Attempt {
 		$this->db->query($query);
 	}
 
+    /**
+     * Retrieves the latest attempts for each user that are still reviewable.
+     * Reviewable attempts:
+     * * aren't deleted
+     * * aren't yet reviewed
+     *
+     * @param int $assessId
+     * @return array
+     */
+    private function getLatestReviewableAttempts($assessId)
+    {
+        $query = "
+            SELECT *
+            FROM assess_attempt
+            WHERE assess_id = '{$this->db->quote($assessId)}'
+            AND   deleted_at IS NULL
+            AND   reviewed_at IS NULL
+            ORDER BY user_id, `start` DESC
+        ";
+        $results = [];
+        foreach ($this->db->getAll($query) as $row) {
+            $userId = $row['user_id'];
+            if (!isset($results[$userId])) {
+                $results[$userId] = $row;
+            }
+        }
+        return $results;
+    }
 }
