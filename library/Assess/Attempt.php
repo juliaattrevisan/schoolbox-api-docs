@@ -28,9 +28,9 @@ class Assess_Attempt extends Evaluation_Attempt {
         if (empty($attempts)) {
             return [];
         }
-        $attemptIds = implode(',', array_map([$this->db, 'quote'], array_column($attempts, 'attempt_id')));
+        $attemptIds = implode(',', array_map([$this->db, 'quote'], $attempts));
 
-        // Cross-reference them against questions
+        // Get everything for that question
         $query = "
             SELECT *
             FROM assess_question aq
@@ -55,7 +55,7 @@ class Assess_Attempt extends Evaluation_Attempt {
         if (empty($attempts)) {
             return;
         }
-        $attemptIds = implode(',', array_map([$this->db, 'quote'], array_column($attempts, 'attempt_id')));
+        $attemptIds = implode(',', array_map([$this->db, 'quote'], $attempts));
         $now        = Alaress_Date_Format::now();
 
         // Review them right now
@@ -79,7 +79,7 @@ class Assess_Attempt extends Evaluation_Attempt {
     private function retrieveLatestReviewableAttempts($assessId)
     {
         $query = "
-            SELECT *
+            SELECT user_id, attempt_id
             FROM assess_attempt
             WHERE assess_id = '{$this->db->quote($assessId)}'
             AND   deleted_at IS NULL
@@ -90,7 +90,7 @@ class Assess_Attempt extends Evaluation_Attempt {
         foreach ($this->db->getAll($query) as $row) {
             $userId = $row['user_id'];
             if (!isset($results[$userId])) {
-                $results[$userId] = $row;
+                $results[$userId] = $row['attempt_id'];
             }
         }
         return $results;
