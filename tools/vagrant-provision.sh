@@ -526,25 +526,30 @@ echo "[SB][`date +%Y-%m-%d\ %X`] Loading all demo data complete";
 echo "[SB][`date +%Y-%m-%d\ %X`] Run Notifications binding cache rebuild (in background)";
 /vagrant/tools/notif/route/refresh-binding-cache.php --instance=vagrantx &
 
-echo "[SB][`date +%Y-%m-%d\ %X`] Install schoolbox-scheduled";
-cp -f /vagrant/tools/init/upstart-scheduled.conf /etc/init/schoolbox-scheduled.conf;
-cp -f /vagrant/tools/init/upstart-scheduled.override /etc/init/schoolbox-scheduled.override;
-
-echo "[SB][`date +%Y-%m-%d\ %X`] Install schoolbox-socketd";
-cp -f /vagrant/tools/init/upstart-socketd.conf /etc/init/schoolbox-socketd.conf;
-cp -f /vagrant/tools/init/upstart-socketd.override /etc/init/schoolbox-socketd.override;
-
-echo "[SB][`date +%Y-%m-%d\ %X`] Install schoolbox-digestd";
-cp -f /vagrant/tools/init/upstart-digestd.conf /etc/init/schoolbox-digestd.conf;
-cp -f /vagrant/tools/init/upstart-digestd.override /etc/init/schoolbox-digestd.override;
-
-echo "[SB][`date +%Y-%m-%d\ %X`] Install schoolbox-routed";
-cp -f /vagrant/tools/init/upstart-routed.conf /etc/init/schoolbox-routed.conf;
-cp -f /vagrant/tools/init/upstart-routed.override /etc/init/schoolbox-routed.override;
-
-#echo "[SB][`date +%Y-%m-%d\ %X`] Install schoolbox-belld";
-#cp -f /vagrant/tools/init/upstart-belld.conf /etc/init/schoolbox-belld.conf;
-#cp -f /vagrant/tools/init/upstart-belld.override /etc/init/schoolbox-belld.override;
+if [[ "$(readlink /proc/1/exe)" == */systemd ]];
+then
+    echo "[SB][`date +%Y-%m-%d\ %X`] Installing daemon systemd configurations";
+    cp -f /vagrant/tools/init/schoolbox-*.service /lib/systemd/system/;
+    sed -i 's/usr\/share\/schoolbox/vagrant/g' /lib/systemd/system/schoolbox-*.service;
+    systemctl daemon-reload;
+    systemctl enable schoolbox-scheduled.service;
+    systemctl enable schoolbox-routed.service;
+    systemctl enable schoolbox-socketd.service;
+    systemctl enable schoolbox-digestd.service;
+    #systemctl enable schoolbox-belld.service;
+else
+    echo "[SB][`date +%Y-%m-%d\ %X`] Installing daemon upstart configurations";
+    cp -f /vagrant/tools/init/upstart-scheduled.conf /etc/init/schoolbox-scheduled.conf;
+    cp -f /vagrant/tools/init/upstart-scheduled.override /etc/init/schoolbox-scheduled.override;
+    cp -f /vagrant/tools/init/upstart-socketd.conf /etc/init/schoolbox-socketd.conf;
+    cp -f /vagrant/tools/init/upstart-socketd.override /etc/init/schoolbox-socketd.override;
+    cp -f /vagrant/tools/init/upstart-digestd.conf /etc/init/schoolbox-digestd.conf;
+    cp -f /vagrant/tools/init/upstart-digestd.override /etc/init/schoolbox-digestd.override;
+    cp -f /vagrant/tools/init/upstart-routed.conf /etc/init/schoolbox-routed.conf;
+    cp -f /vagrant/tools/init/upstart-routed.override /etc/init/schoolbox-routed.override;
+    #cp -f /vagrant/tools/init/upstart-belld.conf /etc/init/schoolbox-belld.conf;
+    #cp -f /vagrant/tools/init/upstart-belld.override /etc/init/schoolbox-belld.override;
+fi
 
 eplver=`dpkg -l schoolbox-epl | tail -n1 | awk {'print $3'}`;
 echo "[SB][`date +%Y-%m-%d\ %X`] schoolbox-epl installed: $eplver";
