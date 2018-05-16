@@ -158,6 +158,64 @@
                         </fieldset>
                     </div>
 
+                    <div id="ordinaryCheckboxes" class="small-12 medium-6 columns">
+                        <fieldset class="checklist">
+                            <legend>Select All - ordinary checkboxes</legend>
+
+                            <input id="selectAllOrdinary" type="checkbox">
+                            <label for="selectAllOrdinary">Select All</label>
+
+                            <input id="ordinaryCheckbox1" type="checkbox" data-ordinary-checkbox>
+                            <label for="ordinaryCheckbox1">
+                                A Checkbox
+                            </label>
+
+                            <input id="ordinaryCheckbox2" type="checkbox" data-ordinary-checkbox>
+                            <label for="ordinaryCheckbox2">
+                                Another Checkbox
+                            </label>
+                        </fieldset>
+                        <script type="text/javascript" src="/javascript/shared/select-all/jquery.select-all.js"></script>
+                        <script>
+                            $("#ordinaryCheckboxes").selectAll({
+                                selector: "#selectAllOrdinary",
+                                checkboxes: "[data-ordinary-checkbox]"
+                            });
+                        </script>
+                    </div>
+
+                    <div id="nestedCheckboxes" class="small-12 medium-6 columns">
+                        <fieldset class="checklist">
+                            <legend>Select All - nested checkboxes</legend>
+
+                            <input id="selectAllNested" type="checkbox">
+                            <label for="selectAllNested">Select All</label>
+
+                            <input id="parentCheckbox1" type="checkbox" data-parent-checkbox>
+                            <label for="parentCheckbox1" title="Select to reveal children">
+                                Parent Checkbox
+                                <i class="icon-click-view size-8"></i>
+                            </label>
+
+                            <div class="checklist" data-child-group>
+                                <input id="childCheckbox1" type="checkbox" data-child-checkbox>
+                                <label for="childCheckbox1">A Child Checkbox</label>
+
+                                <input id="childCheckbox2" type="checkbox" data-child-checkbox>
+                                <label for="childCheckbox2">Another Child Checkbox</label>
+                            </div>
+                        </fieldset>
+                        <script type="text/javascript" src="/javascript/shared/select-all/jquery.select-all.js"></script>
+                        <script>
+                            $("#nestedCheckboxes").selectAll({
+                                selector: "#selectAllNested",
+                                checkboxes: "[data-parent-checkbox]",
+                                childCheckboxes: "[data-child-checkbox]",
+                                childCheckboxGroups: "[data-child-group]"
+                            });
+                        </script>
+                    </div>
+
                     <div class="small-12 medium-6 columns">
                         <label for="exampleCheckboxSwitch">If you <em>reeeeeally</em> need a switch on your form...</label>
                         <div class="switch">
