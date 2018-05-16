@@ -291,6 +291,8 @@
                         statusIncomplete: '{{ statusIncomplete }}',
                         statusPending: '{{ statusPending }}',
                         statusReviewed: '{{ statusReviewed }}',
+                        reviewedText: '{{ labelReviewed }}',
+
                         onPreDraftCallback: function(){
                             $massPublishButton.attr('disabled', 'disabled');
                         },
@@ -482,9 +484,9 @@
                         });
                         $participant.attr('data-status', 'pending');
                         $actionBar.removeAttr('data-mass-submit');
-                        $statusIcon.addClass('pending');
+                        $statusIcon.addClass('{{ statusPending }}');
                         $statusLabel.html('Submitted ' + (submittedLate ? 'late' : 'on time'));
-                        $statusIcon.attr('title', 'Marking required');
+                        $statusIcon.attr('title', '{{ labelPending }}');
                         $('#filters').find('[data-status="pending"]').prop('checked', true);
                     }
 

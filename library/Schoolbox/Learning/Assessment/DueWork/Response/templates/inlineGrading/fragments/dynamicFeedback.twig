@@ -5,6 +5,7 @@
  # string publishText
  #}
 <script src='/javascript/shared/submissions/jquery.dynamic-feedback.js'></script>
+{% autoescape 'js' %}
 <script>
     $(function() {
         {# nextUrl is defined in javascript in the parent #}
@@ -24,3 +25,4 @@
         });
     });
 </script>
+{% endautoescape %}

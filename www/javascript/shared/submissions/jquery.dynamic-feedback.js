@@ -91,6 +91,8 @@
                 publishingText: 'Publishing...',
                 publishedText: 'Feedback published',
 
+                reviewedText: 'Reviewed',
+
                 // Callbacks to execute upon initiation and successful completion of Draft and Publish actions
                 onPreDraftCallback: $.noop,
                 onDraftCallback: $.noop,
@@ -181,10 +183,10 @@
                     $participant.find('[data-status]')
                         .removeClass(config.statusIncomplete + ' ' + config.statusPending)
                         .addClass(config.statusReviewed)
-                        .attr('title', 'Reviewed');
+                        .attr('title', config.reviewedText);
 
                     // Update the text
-                    $participant.find('[data-status-label]').html('Reviewed');
+                    $participant.find('[data-status-label]').html(config.reviewedText);
 
                     // Ensure the 'display reviewed' filter is ON
                     $(config.filters).find('[data-status="reviewed"]').prop('checked', true);
