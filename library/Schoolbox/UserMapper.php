@@ -235,7 +235,7 @@ class UserMapper extends Mapper
      */
     public function findByEmail($email)
     {
-        $query  = $this->getSelectString() . ' WHERE (user.alt_email = :altEmail AND user.local_email IS FALSE)';
+        $query = 'user.alt_email = :altEmail AND user.local_email IS FALSE';
         $params = ['altEmail' => $email];
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $emailParts = explode('@', $email, 2);
@@ -244,11 +244,12 @@ class UserMapper extends Mapper
                 list($username, $domain) = $emailParts;
                 $thisDomain = $this->getConfigLoader()->get('mail_address');
                 if ($domain == $thisDomain) {
-                    $query .= ' OR (user.username = :username AND user.local_email IS TRUE)';
+                    $query = '((' . $query . ') OR (user.username = :username AND user.local_email IS TRUE))';
                     $params['username'] = $username;
                 }
             }
         }
+        $query = $this->getSelectString() . ' WHERE ' . $query . ' AND user.deleted_at IS NULL';
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute($params);
         return $this->hydrateSelect($statement);
