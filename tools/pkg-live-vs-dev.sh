@@ -33,8 +33,8 @@ else
 	if [ "$1" == 'schoolboxdev' ];
 	then
 		cronjob='schoolbox';
-		sed -i 's/schoolbox/schoolboxdev/g' $fullpath/init/*.conf;
-		sed -i 's/Schoolbox/Schoolbox\ Dev/g' $fullpath/init/*.conf;
+		sed -i 's/schoolbox/schoolboxdev/g' $fullpath/init/*.{conf,service};
+		sed -i 's/Schoolbox/Schoolbox\ Dev/g' $fullpath/init/*.{conf,service};
 	else
 		helpmsg;
 	fi
