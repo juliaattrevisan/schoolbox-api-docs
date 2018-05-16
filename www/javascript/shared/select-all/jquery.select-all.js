@@ -73,7 +73,20 @@
 
         }
 
+        function setupDropdownIcons() {
+            if (config.childCheckboxes) {
+                config.checkboxes.each(function(index, checkbox) {
+                    if ($(checkbox).is(":checked")) {
+                        $(checkbox).siblings("label").find("i").removeClass("icon-click-view").addClass("icon-dropdown");
+                    } else {
+                        $(checkbox).siblings("label").find("i").removeClass("icon-dropdown").addClass("icon-click-view");
+                    }
+                });
+            }
+        }
+
         function start() {
+            setupDropdownIcons();
             autoSelectAll();
 
             config.selector.change(function () {
