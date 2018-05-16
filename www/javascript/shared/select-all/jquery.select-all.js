@@ -30,7 +30,7 @@
         }
 
         /** Select or deselect all checkboxes via the Select All checkbox. */
-        function selectAll() {
+        function selectAllCheckboxes() {
             if (config.selector.is(':checked')) {
                 config.checkboxes.prop('checked', true);
             } else {
@@ -53,7 +53,7 @@
 
         /** Check or uncheck the Select All box automatically,
         based on whether all checkboxes have been manually checked. */
-        function autoSelectAll() {
+        function autoSelectAllCheckboxes() {
 
             // If all parent checkboxes are checked...
             if (config.checkboxes.length === config.checkboxes.filter(":checked").length) {
@@ -91,21 +91,21 @@
 
         function start() {
             setupDropdownIcons();
-            autoSelectAll();
+            autoSelectAllCheckboxes();
 
             config.selector.change(function () {
-                selectAll();
+                selectAllCheckboxes();
 
                 config.change();
             });
 
             config.checkboxes.change(function() {
-                autoSelectAll();
+                autoSelectAllCheckboxes();
             });
 
             if (config.childCheckboxes) {
                 config.childCheckboxes.change(function() {
-                    autoSelectAll();
+                    autoSelectAllCheckboxes();
                 });
             }
         }
