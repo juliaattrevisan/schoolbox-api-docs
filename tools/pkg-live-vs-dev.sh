@@ -40,6 +40,7 @@ else
 	fi
 fi
 
+# upstart
 mv -f $fullpath/init/upstart-scheduled.conf $fullpath/init/$1-scheduled.conf;
 mv -f $fullpath/init/upstart-socketd.conf $fullpath/init/$1-socketd.conf;
 mv -f $fullpath/init/upstart-digestd.conf $fullpath/init/$1-digestd.conf;
@@ -50,6 +51,16 @@ mv -f $fullpath/init/upstart-belld.conf $fullpath/$1-belld.conf;
 mv -f $fullpath/init/$1-upstart-socketd.override $fullpath/init/$1-socketd.override;
 rm -vf `readlink -f $fullpath/init/$cronjob-upstart-socketd.override`;
 rm -f $fullpath/init/upstart*.override;
+
+# systemd
+if [ "$1" == 'schoolboxdev' ];
+then
+	mv -f $fullpath/init/schoolbox-scheduled.service $fullpath/init/$1-scheduled.service;
+	mv -f $fullpath/init/schoolbox-routed.service $fullpath/init/$1-routed.service;
+	mv -f $fullpath/init/schoolbox-socketd.service $fullpath/init/$1-socketd.service;
+	mv -f $fullpath/init/schoolbox-digestd.service $fullpath/init/$1-digestd.service;
+	mv -f $fullpath/init/schoolbox-belld.service $fullpath/init/$1-belld.service;
+fi
 
 rm -vf `readlink -f $fullpath/cron/$cronjob`;
 rm -vf `readlink -f $fullpath/logrotate/$cronjob`;

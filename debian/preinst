@@ -16,13 +16,24 @@ case "$1" in
         fi
         # Ensure the alaress user exists
         useradd -m alaress 2> /dev/null || true;
-        # Stop all daemons for consistency
-        service schoolbox-scheduled stop 2>&1 >> /var/log/schoolbox/upgrade.log || true;
-        service schoolbox-socketd stop 2>&1 >> /var/log/schoolbox/upgrade.log || true;
-        service schoolbox-digestd stop 2>&1 >> /var/log/schoolbox/upgrade.log || true;
-        service schoolbox-routed stop 2>&1 >> /var/log/schoolbox/upgrade.log || true;
-        if [ -f /etc/init/schoolbox-belld.conf ]; then
-            service schoolbox-belld stop 2>&1 >> /var/log/schoolbox/upgrade.log || true;
+        # Stop all daemons for consistency (upstart|systemd)
+        if [ "$(readlink /proc/1/exe)" = "/lib/systemd/systemd" ]; then
+            systemctl stop schoolbox-scheduled.service | tee -a /var/log/schoolbox/upgrade.log;
+            systemctl stop schoolbox-routed.service | tee -a /var/log/schoolbox/upgrade.log;
+            systemctl stop schoolbox-socketd.service | tee -a /var/log/schoolbox/upgrade.log;
+            systemctl stop schoolbox-digestd.service | tee -a /var/log/schoolbox/upgrade.log;
+            # Restart schoolbox-belld only if already enabled
+            if [ "$(systemctl is-enabled schoolbox-belld.service 2>/dev/null)" = "enabled" ]; then
+                systemctl stop schoolbox-belld.service | tee -a /var/log/schoolbox/upgrade.log;
+            fi
+        else
+            service schoolbox-scheduled stop 2>&1 >> /var/log/schoolbox/upgrade.log || true;
+            service schoolbox-socketd stop 2>&1 >> /var/log/schoolbox/upgrade.log || true;
+            service schoolbox-digestd stop 2>&1 >> /var/log/schoolbox/upgrade.log || true;
+            service schoolbox-routed stop 2>&1 >> /var/log/schoolbox/upgrade.log || true;
+            if [ -f /etc/init/schoolbox-belld.conf ]; then
+                service schoolbox-belld stop 2>&1 >> /var/log/schoolbox/upgrade.log || true;
+            fi
         fi
     ;;
 
