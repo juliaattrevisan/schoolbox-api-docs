@@ -5,6 +5,8 @@ _Note: this plugin should be used for all future select-all needs. However, some
 
 ## Basic usage
 
+### Initialising
+
 #### Markup
 
 ```
@@ -25,14 +27,10 @@ _Note: this plugin should be used for all future select-all needs. However, some
 ```
 
 #### jQuery
-The plugin is initialised on the form element that contains the checkboxes.
-
-It has two mandatory options, both jQuery selector strings:
-- `selector`, which is the Select All checkbox (it's called _selector_ because it selects other checkboxes, NOT because it's a jQuery selector!)
-- `checkboxes`, which is a data attribute that will be present on all checkboxes you want selected.
+The plugin is initialised on a container element of your choice. Only checkboxes inside this container will be affected by the select-all functionality.
 
 ```
-$("#form").selectAll({    
+$("#container").selectAll({    
     selector: "#selectAll",
     checkboxes: "[data-checkbox]"
 });
@@ -68,12 +66,8 @@ Parent checkboxes get an icon indicating that they have children. This is a usef
 
 #### jQuery
 
-In addition to the mandatory options described in Basic Usage, child checkbox usage accepts two options:
-- `childCheckboxes` - this is a data attribute that will be present on all child checkboxes you want selected
-- `childCheckboxGroups` - this is a data attribute that will be present on all child checkbox container divs
-
 ```
-$("#form").selectAll({    
+$("#container").selectAll({    
     selector: "#selectAll",
     checkboxes: "[data-checkbox]",
     childCheckboxes: "[data-child-checkbox]",
@@ -168,3 +162,43 @@ $("#form").selectAll({
 ```
 
 Trying to use `change` to modify the provided selection behavior may have...unexpected results. You have been warned!
+
+## Parameters
+<table>
+    <tr>
+        <th>Parameter</th>
+        <th>Type</th>
+        <th>Optional?</th>
+        <th>Notes</th>
+    </tr>
+    <tr>
+        <td>selector</td>
+        <td>string</td>
+        <td>No</td>
+        <td>Selector for the checkbox which will be used to toggle select-all of other checkboxes. Parameter is called 'selector' because it selects other checkboxes, NOT because it's a jQuery selector!
+    </tr>
+    <tr>
+        <td>checkboxes</td>
+        <td>string</td>
+        <td>No</td>
+        <td>Data attribute that will be present on all the checkboxes you want selected</td>
+    </tr>
+    <tr>
+        <td>childCheckboxes</td>
+        <td>string</td>
+        <td>Yes</td>
+        <td>Data attribute that will be present on all child checkboxes you want selected</td>
+    </tr>
+    <tr>
+        <td>childCheckboxGroups</td>
+        <td>string</td>
+        <td>Yes</td>
+        <td>Data attribute that will be present on all child checkbox container divs</td>
+    </tr>
+    <tr>
+        <td>change</td>
+        <td>function</td>
+        <td>Yes</td>
+        <td>Custom function that will be run when the checkbox specified by 'selector' is checked or unchecked.</td>
+    </tr>
+</table>
