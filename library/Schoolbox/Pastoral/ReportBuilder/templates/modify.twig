@@ -240,78 +240,6 @@
                 </div>
             </div>
 
-            <script>
-                $(function() {
-                    var parentCheckboxSelector = "#formReport input[data-check-type]";
-                    var childCheckboxSelector = "input[data-check-subtype]";
-                    var childGroupSelector = "[data-pastoral-subtype]";
-
-                    // Initial setup: if any parent types are already checked (from saved data), show their subtypes
-                    // otherwise hide the subtypes to save space
-                    $(parentCheckboxSelector).each(function(index, parentCheckbox) {
-                        if ($(parentCheckbox).is(':checked')) {
-                            // ...show the subtypes for this type
-                            $(parentCheckbox).siblings(childGroupSelector).show();
-                        } else {
-                            // Hide subtypes by default to reduce vertical scrolling
-                            $(parentCheckbox).siblings(childGroupSelector).hide();
-                        }
-                    });
-
-                    // When a parent type checkbox is changed, show or hide its subtypes
-                    // and check them by default when shown
-                    $(parentCheckboxSelector).change(function(e) {
-                        var parentCheckbox = e.target;
-                        var $subCheckboxes = $(parentCheckbox).siblings(childGroupSelector).find(childCheckboxSelector);
-
-                        if ($(parentCheckbox).is(':checked')) {
-                            // ...show the subtypes for this type
-                            $(parentCheckbox).siblings(childGroupSelector).show();
-
-                            // ...and check them by default
-                            $subCheckboxes.each(function(index, subCheckbox) {
-                                $(subCheckbox).prop('checked', true);
-                            });
-
-                            $(parentCheckbox).siblings("label").find("i").removeClass("icon-click-view").addClass("icon-dropdown");
-                        } else {
-                            // ...hide the subtypes for this type
-                            $subCheckboxes.each(function(index, subCheckbox) {
-                                $(subCheckbox).prop('checked', false);
-                                $(parentCheckbox).siblings(childGroupSelector).hide();
-                            });
-
-                            // ...and uncheck them (causes all sorts of problems with select all otherwise)
-                            $subCheckboxes.each(function(index, subCheckbox) {
-                                $(subCheckbox).prop('checked', false);
-                            });
-
-                            $(parentCheckbox).siblings("label").find("i").removeClass("icon-dropdown").addClass("icon-click-view");
-                        }
-
-                    });
-
-                    // When a subtype checkbox is changed, find out if any subtypes in that group are still checked
-                    // and if not, uncheck the parent and hide the subtypes
-                    $(parentCheckboxSelector).each(function(index, parentCheckbox) {
-                        var $subtypes = $(parentCheckbox).siblings(childGroupSelector).find(childCheckboxSelector);
-
-                        $subtypes.change(function() {
-                            if ($subtypes.filter(":checked").length < 1) {
-                                $(parentCheckbox).prop("checked", false);
-                                $subtypes.parent(childGroupSelector).hide();
-                                $(parentCheckbox).siblings("label").find("i").removeClass("icon-dropdown").addClass("icon-click-view");
-                            } else {
-                                $(parentCheckbox).prop("checked", true);
-                                $subtypes.parent(childGroupSelector).show();
-                                $(parentCheckbox).siblings("label").find("i").removeClass("icon-click-view").addClass("icon-dropdown");
-                            }
-                        });
-                    })
-
-                });
-            </script>
-
             <h2 class="subheader">Sort Order</h2>
             <p class="meta">Select the order in which you would like your report sorted</p>
             <section>
@@ -468,6 +396,74 @@
 <script type="text/javascript">
 
     $(function () {
+
+        var parentCheckboxSelector = "#formReport input[data-check-type]";
+        var childCheckboxSelector = "input[data-check-subtype]";
+        var childGroupSelector = "[data-pastoral-subtype]";
+
+        // Initial setup: if any parent types are already checked (from saved data), show their subtypes
+        // otherwise hide the subtypes to save space
+        $(parentCheckboxSelector).each(function(index, parentCheckbox) {
+            if ($(parentCheckbox).is(':checked')) {
+                // ...show the subtypes for this type
+                $(parentCheckbox).siblings(childGroupSelector).show();
+            } else {
+                // Hide subtypes by default to reduce vertical scrolling
+                $(parentCheckbox).siblings(childGroupSelector).hide();
+            }
+        });
+
+        // When a parent type checkbox is changed, show or hide its subtypes
+        // and check them by default when shown
+        $(parentCheckboxSelector).change(function(e) {
+            var parentCheckbox = e.target;
+            var $subCheckboxes = $(parentCheckbox).siblings(childGroupSelector).find(childCheckboxSelector);
+
+            if ($(parentCheckbox).is(':checked')) {
+                // ...show the subtypes for this type
+                $(parentCheckbox).siblings(childGroupSelector).show();
+
+                // ...and check them by default
+                $subCheckboxes.each(function(index, subCheckbox) {
+                    $(subCheckbox).prop('checked', true);
+                });
+
+                $(parentCheckbox).siblings("label").find("i").removeClass("icon-click-view").addClass("icon-dropdown");
+            } else {
+                // ...hide the subtypes for this type
+                $subCheckboxes.each(function(index, subCheckbox) {
+                    $(subCheckbox).prop('checked', false);
+                    $(parentCheckbox).siblings(childGroupSelector).hide();
+                });
+
+                // ...and uncheck them (causes all sorts of problems with select all otherwise)
+                $subCheckboxes.each(function(index, subCheckbox) {
+                    $(subCheckbox).prop('checked', false);
+                });
+
+                $(parentCheckbox).siblings("label").find("i").removeClass("icon-dropdown").addClass("icon-click-view");
+            }
+
+        });
+
+        // When a subtype checkbox is changed, find out if any subtypes in that group are still checked
+        // and if not, uncheck the parent and hide the subtypes
+        $(parentCheckboxSelector).each(function(index, parentCheckbox) {
+            var $subtypes = $(parentCheckbox).siblings(childGroupSelector).find(childCheckboxSelector);
+
+            $subtypes.change(function() {
+                if ($subtypes.filter(":checked").length < 1) {
+                    $(parentCheckbox).prop("checked", false);
+                    $subtypes.parent(childGroupSelector).hide();
+                    $(parentCheckbox).siblings("label").find("i").removeClass("icon-dropdown").addClass("icon-click-view");
+                } else {
+                    $(parentCheckbox).prop("checked", true);
+                    $subtypes.parent(childGroupSelector).show();
+                    $(parentCheckbox).siblings("label").find("i").removeClass("icon-click-view").addClass("icon-dropdown");
+                }
+            });
+        })
+
 
         $('#sort-order').sortable({handle: '.grip', axis: 'y'});
 
