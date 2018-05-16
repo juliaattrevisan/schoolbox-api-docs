@@ -905,7 +905,7 @@ class Mapper extends BaseMapper
                     $orderParts[] = "`pastoral`.created_at desc";
                     break;
                 case 'type':
-                    $orderParts[] = "`c`.name";
+                    $orderParts[] = "`t`.name";
                     break;
                 case 'subtype':
                     $orderParts[] = "`c`.name";
