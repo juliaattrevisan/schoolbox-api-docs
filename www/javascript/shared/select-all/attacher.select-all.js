@@ -1,6 +1,8 @@
 /**
  * Select all/none checkboxes within a fieldset.
  *
+ * TODO actually attach jquery.select-all plugin here, instead of reinventing the wheel!
+ *
  * Options:
  * * select-all: the element that contains the fields to select. Defaults to the closest fieldset.
  * * select-all-for-group: if set, ignores the container setting and acts as select all for any
