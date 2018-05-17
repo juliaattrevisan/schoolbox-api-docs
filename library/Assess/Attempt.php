@@ -60,10 +60,12 @@ class Assess_Attempt extends Evaluation_Attempt {
         $now = Alaress_Date_Format::now();
 
         // Review them right now
+        // (Don't update review date of anything already reviewed)
         $query = "
             UPDATE assess_attempt
             SET reviewed_at = '{$this->db->quote($now->getUsingFormat(Alaress_Date_Format::DATABASE_FORMAT))}'
             WHERE attempt_id IN ({$this->buildReviewableAttemptsForQuery($attempts)})
+            AND   reviewed_at IS NULL
         ";
         $this->db->query($query);
     }
