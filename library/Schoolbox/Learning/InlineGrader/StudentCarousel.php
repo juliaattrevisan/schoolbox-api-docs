@@ -69,6 +69,7 @@ class StudentCarousel
         foreach ($this->assessment->getAllParticipants() as $currentParticipant) {
 
             // CSS/label rules
+            // TODO move CSS/label generation to participant class, and dedupe usages
             if ($currentParticipant->findMostRecentInstructorGivenPublishedFeedback()) {
                 // Has feedback been given? Always say "Reviewed"
                 $css   = 'reviewed';
