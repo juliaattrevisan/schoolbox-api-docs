@@ -269,7 +269,7 @@ class Controller extends Base
         );
 
         // Find and build layout from the component
-        $layout = $this->getLayoutFromComponent($component);
+        $layout = $this->findLayoutForComponent($component);
         $item->setTileLayout($layout);
 
         $this->getMapper()->save($item);
@@ -428,7 +428,7 @@ class Controller extends Base
      * @param  Component_Instance $component
      * @return Layout\Model
      */
-    protected function getLayoutFromComponent(Component_Instance $component)
+    protected function findLayoutForComponent(Component_Instance $component)
     {
         $config   = $component->getConfigArray();
         $layoutId = $config['layoutId']['value'];
