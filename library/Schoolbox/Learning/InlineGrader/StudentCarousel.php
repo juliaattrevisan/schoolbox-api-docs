@@ -91,7 +91,7 @@ class StudentCarousel
                     /* No submission exists
                      */
                     $css   = 'unsubmitted';
-                    $label = 'Not submitted';
+                    $label = $this->assessment->isAcceptNone() ? 'Not reviewed' : 'Not submitted';
                 }
             }
 
