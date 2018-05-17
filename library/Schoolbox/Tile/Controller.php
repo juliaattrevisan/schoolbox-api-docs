@@ -436,33 +436,7 @@ class Controller extends Base
         try {
             return $mapper->findById($layoutId);
         } catch (MapperException $e) {
-            /** @var Layout\Model $model */
-            $model = $mapper->createModel();
-            $mapper->save($model);
-
-            // Update the component's configuration.
-            // (Should this be done in postSave?)
-            $configMapper = $this->getComponentConfigMapper();
-            foreach ($component->getConfig() as $configDefinition) {
-                if ($configDefinition->getKey() == 'layoutId') {
-                    /** @var Component_Config $confI */
-                    $config = $configMapper->findByColumnList(
-                        array(
-                            'component_config_definition_id' => $configDefinition->getId(),
-                            'component_instance_id'          => $component->getId()
-                        )
-                    )->first();
-                    if (!($config instanceof Component_Config)) {
-                        $config = new Component_Config();
-                        $config->setConfigDefinitionId($configDefinition->getId());
-                        $config->setInstanceId($component->getId());
-                    }
-                    $config->setValue($model->getId());
-                    $configMapper->save($config);
-                    break;
-                }
-            }
-            return $model;
+            return $this->buildLayoutForComponent($component);
         }
     }
 
@@ -575,5 +549,45 @@ class Controller extends Base
             return $this->getFolderMapper()->findByColumn($columnName, $folderId, ['deleted' => true])->first();
         }
         return null;
+    }
+
+    /**
+     * Build a layout object for the given component.
+     *
+     * @param Component_Instance $component
+     * @return Layout\Model
+     * @throws MapperException
+     */
+    private function buildLayoutForComponent(Component_Instance $component): Layout\Model
+    {
+        $mapper = $this->layoutMapper;
+
+        /** @var Layout\Model $model */
+        $model = $mapper->createModel();
+        $mapper->save($model);
+
+        // Update the component's configuration.
+        // (Should this be done in postSave?)
+        $configMapper = $this->getComponentConfigMapper();
+        foreach ($component->getConfig() as $configDefinition) {
+            if ($configDefinition->getKey() == 'layoutId') {
+                /** @var Component_Config $confI */
+                $config = $configMapper->findByColumnList(
+                    [
+                        'component_config_definition_id' => $configDefinition->getId(),
+                        'component_instance_id'          => $component->getId()
+                    ]
+                )->first();
+                if (!($config instanceof Component_Config)) {
+                    $config = new Component_Config();
+                    $config->setConfigDefinitionId($configDefinition->getId());
+                    $config->setInstanceId($component->getId());
+                }
+                $config->setValue($model->getId());
+                $configMapper->save($config);
+                break;
+            }
+        }
+        return $model;
     }
 }
