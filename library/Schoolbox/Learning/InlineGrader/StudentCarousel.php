@@ -70,8 +70,8 @@ class StudentCarousel
 
             // CSS/label rules
             // TODO move CSS/label generation to participant class, and dedupe usages
-            if ($currentParticipant->findMostRecentInstructorGivenPublishedFeedback()) {
-                // Has feedback been given? Always say "Reviewed"
+            if ($currentParticipant->isReviewComplete()) {
+                // Is review complete? Always say "Reviewed"
                 $css   = 'reviewed';
                 $label = 'Reviewed';
 
@@ -80,13 +80,14 @@ class StudentCarousel
 
                 /** @var Submission $latestSubmission */
                 if ($latestSubmission) {
+                    $multipleResponses = \count($currentParticipant->getAllResponses()) > 1;
                     if ($latestSubmission->isSubmittedOnTime()) {
                         $css   = 'submitted';
-                        $label = 'Submitted on time';
+                        $label = $multipleResponses ? 'Resubmitted on time' : 'Submitted on time';
 
                     } else {
                         $css   = 'submitted-late';
-                        $label = 'Submitted late';
+                        $label = $multipleResponses ? 'Resubmitted late' : 'Submitted late';
                     }
                 } else {
                     /* No submission exists
