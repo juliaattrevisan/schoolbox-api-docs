@@ -294,7 +294,7 @@ class Controller extends Assessment\Controller
      * @return string
      */
     private function sanitizeForFilename($string) {
-        return preg_replace("/[^A-Za-z0-9. ]/", '_', $string);
+        return preg_replace("/[^A-Za-z0-9\-. ]/", '_', $string);
     }
 
     /**
