@@ -200,6 +200,21 @@ class Controller extends Base
      */
     public function addToComponent(Component_Instance $component)
     {
+        // Does a layout exist for this component?
+        // Yes: redirect to add($layout)
+        // No:  render this page
+        try {
+            $layout = $this->findLayoutForComponent($component);
+            $this->response->redirect->found(
+                $this->getRouter()->generate(
+                    'tile.add',
+                    ['layoutId' => $layout->getId()]
+                )
+            );
+        } catch (MapperException $e) {
+            // continue
+        }
+
         /** @var Model $model */
         $model = $this->getMapper()->createModel();
         $this->getResponse()->content->set(
@@ -269,7 +284,11 @@ class Controller extends Base
         );
 
         // Find and build layout from the component
-        $layout = $this->findLayoutForComponent($component);
+        try {
+            $layout = $this->findLayoutForComponent($component);
+        } catch (MapperException $e) {
+            $layout = $this->buildLayoutForComponent($component);
+        }
         $item->setTileLayout($layout);
 
         $this->getMapper()->save($item);
@@ -427,17 +446,14 @@ class Controller extends Base
      *
      * @param  Component_Instance $component
      * @return Layout\Model
+     * @throws MapperException if no component exists
      */
     protected function findLayoutForComponent(Component_Instance $component)
     {
         $config   = $component->getConfigArray();
         $layoutId = $config['layoutId']['value'];
         $mapper   = $this->getLayoutMapper();
-        try {
-            return $mapper->findById($layoutId);
-        } catch (MapperException $e) {
-            return $this->buildLayoutForComponent($component);
-        }
+        return $mapper->findById($layoutId);
     }
 
     /**
