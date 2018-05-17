@@ -85,7 +85,6 @@ class Assess_Attempt extends Evaluation_Attempt {
             FROM assess_attempt
             WHERE assess_id = '{$this->db->quote($assessId)}'
             AND   deleted_at IS NULL
-            AND   reviewed_at IS NULL
             ORDER BY user_id, `start` DESC
         ";
         $results = [];
