@@ -55,7 +55,6 @@ class Module extends BaseModule
 
         // also have separate paths for layouts for component
         $this->addGetRoute($router, 'layoutForComponent', $basePath , '/layout/component/{componentId}');
-        $this->addPostRoute($router, 'layoutForComponentForm', $basePath , '/layout/component/{componentId}');
     }
 
     /**

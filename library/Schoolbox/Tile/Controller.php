@@ -69,14 +69,26 @@ class Controller extends Base
     }
 
     /**
-     * Displays a form for creating a tile layout for a component.
+     * Action for rendering a layout for a component.
      *
-     * @param Layout\Model|null  $layout
+     * (This is implemented as a redirect to the layout form, creating the
+     *  layout if it doesn't exist.)
+     *
      * @param Component_Instance $component
      */
-    public function layoutForComponent(?Layout\Model $layout, Component_Instance $component)
+    public function layoutForComponent(Component_Instance $component)
     {
-        // TODO implement
+        try {
+            $layout = $this->findLayoutForComponent($component);
+        } catch (MapperException $e) {
+            $layout = $this->buildLayoutForComponent($component);
+        }
+        $this->response->redirect->found(
+            $this->getRouter()->generate(
+                'tile.layout',
+                ['layoutId' => $layout->getId()]
+            )
+        );
     }
 
     /**
@@ -149,17 +161,6 @@ class Controller extends Base
             }
             $this->getResponse()->redirect->afterPost($href);
         }
-    }
-
-    /**
-     * Save form for tile layout, when a component is provided.
-     *
-     * @param null|Layout\Model  $layout
-     * @param Component_Instance $component
-     */
-    public function layoutForComponentForm(?Layout\Model $layout, Component_Instance $component)
-    {
-        // TODO implement
     }
 
     /**
