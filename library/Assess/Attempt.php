@@ -38,6 +38,7 @@ class Assess_Attempt extends Evaluation_Attempt {
             LEFT  JOIN user            u  ON aa.user_id     = u.id
             WHERE aq.question_id = '{$this->db->quote($questionId)}'
             AND   ar.attempt_id IN ({$this->buildReviewableAttemptsForQuery($attempts)})
+            ORDER BY u.lastname ASC, u.firstname ASC, u.id ASC
         ";
 
         return $this->db->getAll($query);
