@@ -19,6 +19,10 @@ set -e
 
 case "$1" in
     configure)
+        useradd -r mailcatcher || true;
+        systemctl daemon-reload;
+        systemctl enable mailcatcher;
+        systemctl restart mailcatcher;
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)

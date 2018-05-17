@@ -10,7 +10,10 @@
 filepath=`readlink -f $0`;
 fullpath=${filepath%/*};
 
-ver='0.5.12';
+ver='0.6.5';
+
+# Install deps
+apt-get install -y ruby2.5-dev libsqlite3-dev devscripts
 
 # Create directories for completing the build
 builddir="/tmp/build-dir-`date -I`";
@@ -31,8 +34,7 @@ fi
 
 # Add in upstart init script and logrotate
 cd $tardir;
-cp -fR $fullpath/mailcatcher.conf .;
-cp -fR $fullpath/mailcatcher.logrotate mailcatcher;
+cp -fR $fullpath/mailcatcher.service .;
 cd $builddir;
 
 # Retar everything for the build process
