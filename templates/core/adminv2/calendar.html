@@ -217,7 +217,7 @@
                                     <!-- BEGIN cleanup_event -->
                                     <tr>
                                         <td>
-                                            <input id="check-{CLEANUP_EVENT_ID}" type="checkbox" name="cleanupEventId[]" data-modifier='{CLEANUP_EVENT_MODIFIER}' value="{CLEANUP_EVENT_ID}" />
+                                            <input id="check-{CLEANUP_EVENT_ID}" type="checkbox" name="cleanupEventId[]" data-modifier='{CLEANUP_EVENT_MODIFIER}' value="{CLEANUP_EVENT_ID}" data-cleanup-event-id />
                                             <label for="check-{CLEANUP_EVENT_ID}" class="checkbox-label"></label>
                                         </td>
                                         <td><a href='/calendar/modify.php?eventID={CLEANUP_EVENT_ID}'>{CLEANUP_EVENT_TITLE}</a></td>
@@ -262,8 +262,8 @@
 <script type="text/javascript">
     $(function() {
         $('table').selectAll({
-            key: 'selectall',
-            checkboxName: 'cleanupEventId[]'
+            selector: '#check-all',
+            checkboxes: '[data-cleanup-event-id]'
         });
 
         /* Special modifiers

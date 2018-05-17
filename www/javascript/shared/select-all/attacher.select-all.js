@@ -1,8 +1,7 @@
 /**
- * Automatically apply a plugin to a predefined data attribute.
- * This saves you from having to instantiate plugins manually.
- *
  * Select all/none checkboxes within a fieldset.
+ *
+ * TODO actually attach jquery.select-all plugin here, instead of reinventing the wheel!
  *
  * Options:
  * * select-all: the element that contains the fields to select. Defaults to the closest fieldset.

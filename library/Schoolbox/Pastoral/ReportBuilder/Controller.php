@@ -24,6 +24,8 @@ use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
 use Schoolbox\Pastoral\Tag\Mapper as PastoralTagMapper;
 use Schoolbox\Pastoral\Tag\Model as PastoralTag;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
+use Schoolbox\Pastoral\SubType\Mapper as PastoralSubTypeMapper;
+use HouseMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\UserMapper;
 
@@ -38,11 +40,11 @@ class Controller extends Base
     /** @var PastoralTagMapper $pastoralTagMapper */
     private $pastoralTagMapper;
 
-    /** @var PastoralAccessMapper $pastoralAccessMapper */
-    private $pastoralAccessMapper;
-
     /** @var PastoralTypeMapper $pastoralTypeMapper */
     private $pastoralTypeMapper;
+
+    /** @var PastoralSubTypeMapper $pastoralSubTypeMapper */
+    private $pastoralSubTypeMapper;
 
     /** @var PastoralSeverityMapper $pastoralSeverityMapper */
     private $pastoralSeverityMapper;
@@ -56,49 +58,49 @@ class Controller extends Base
     /** @var PastoralGroupMapper $pastoralGroupMapper */
     private $pastoralGroupMapper;
 
-    /** @var PastoralGroupMemberMapper $pastoralGroupMemberMapper */
-    private $pastoralGroupMemberMapper;
-
     /** @var UserMapper $userMapper */
     private $userMapper;
+
+    /** @var HouseMapper $houseMapper */
+    private $houseMapper;
 
     /**
      * Constructor
      *
      * @param ErrorMapper                   $errorMapper
      * @param PastoralDataSource            $pastoralDataSource
-     * @param PastoralAccessMapper          $pastoralAccessMapper
      * @param PastoralTagMapper             $pastoralTagMapper
      * @param PastoralTypeMapper            $pastoralTypeMapper
+     * @param PastoralSubTypeMapper         $pastoralSubTypeMapper
      * @param PastoralSeverityMapper        $pastoralSeverityMapper
      * @param UserMapper                    $userMapper
+     * @param HouseMapper                   $houseMapper
      * @param PastoralGroupMapper           $pastoralGroupMapper
-     * @param PastoralGroupMemberMapper     $pastoralGroupMemberMapper
      * @param PastoralReportMapper          $pastoralReportMapper
      * @param PastoralReportDashboardMapper $pastoralReportDashboardMapper
      */
     public function __construct(
         ErrorMapper $errorMapper,
         PastoralDataSource $pastoralDataSource,
-        PastoralAccessMapper $pastoralAccessMapper,
         PastoralTagMapper $pastoralTagMapper,
         PastoralTypeMapper $pastoralTypeMapper,
+        PastoralSubTypeMapper $pastoralSubTypeMapper,
         PastoralSeverityMapper $pastoralSeverityMapper,
         UserMapper $userMapper,
+        HouseMapper $houseMapper,
         PastoralGroupMapper $pastoralGroupMapper,
-        PastoralGroupMemberMapper $pastoralGroupMemberMapper,
         PastoralReportMapper $pastoralReportMapper,
         PastoralReportDashboardMapper $pastoralReportDashboardMapper
     ) {
         $this->errorMapper               = $errorMapper;
         $this->pastoralDataSource        = $pastoralDataSource;
-        $this->pastoralAccessMapper      = $pastoralAccessMapper;
         $this->pastoralTagMapper         = $pastoralTagMapper;
         $this->pastoralTypeMapper        = $pastoralTypeMapper;
+        $this->pastoralSubTypeMapper     = $pastoralSubTypeMapper;
         $this->pastoralSeverityMapper    = $pastoralSeverityMapper;
         $this->userMapper                = $userMapper;
+        $this->houseMapper               = $houseMapper;
         $this->pastoralGroupMapper       = $pastoralGroupMapper;
-        $this->pastoralGroupMemberMapper = $pastoralGroupMemberMapper;
         $this->pastoralReportMapper          = $pastoralReportMapper;
         $this->pastoralReportDashboardMapper = $pastoralReportDashboardMapper;
     }
@@ -197,10 +199,12 @@ class Controller extends Base
         $orders = [
             'student',
             'date',
+            'type',
             'subtype',
             'author',
             'points',
             'year',
+            'house'
         ];
 
         // Only show severity if it is enabled by policy
@@ -230,7 +234,6 @@ class Controller extends Base
         }
 
         // And render this thing out
-
         $this->getResponse()->content->set(
             [
                 'template' => '@pastoralReportBuilder/modify.twig',
@@ -240,7 +243,9 @@ class Controller extends Base
                             UserAccess::SERVICE_PASTORAL
                         )->count() > 0,
                     'years'            => $this->userMapper->getYearLevels(),
+                    'houses'           => $this->houseMapper->findAll()->sortBy('house', 'asc'),
                     'types'            => $this->pastoralTypeMapper->findAll()->sortBy('name', 'asc'),
+                    'subTypes'         => $this->pastoralSubTypeMapper->findAll()->sortBy('name', 'asc'),
                     'severities'       => $severities,
                     'tags'             => $this->pastoralTagMapper->findAll(),
                     'groups'           => $this->pastoralGroupMapper->findAll(['order' => ['name' => 'asc']]),
@@ -335,12 +340,14 @@ class Controller extends Base
             $report->getAfterDate(),
             $report->getSeverity(),
             $report->getTypes(),
+            $report->getSubTypes(),
             $report->getAuthors(),
             $report->getStudents(),
             $report->getTags(),
             $report->getOrder(),
             $report->getInvolved(),
-            $report->getYears()
+            $report->getYears(),
+            $report->getHouses()
         );
     }
 
@@ -405,6 +412,12 @@ class Controller extends Base
             $pastoralReport->setTypesCsv('');
         }
 
+        if (is_array($post['subtypes'])) {
+            $pastoralReport->setSubTypesCsv(implode(',', $post['subtypes']));
+        } else {
+            $pastoralReport->setSubTypesCsv('');
+        }
+
         if (is_array($post['authors'])) {
             $pastoralReport->setAuthorsCsv(implode(',', $post['authors']));
         } else {
@@ -427,6 +440,12 @@ class Controller extends Base
             $pastoralReport->setYearsCsv(implode(',', $post['years']));
         } else {
             $pastoralReport->setTypesCsv('');
+        }
+
+        if (is_array($post['houses'])) {
+            $pastoralReport->setHousesCsv(implode(',', $post['houses']));
+        } else {
+            $pastoralReport->setHousesCsv('');
         }
 
         // Save groups the report is shared with

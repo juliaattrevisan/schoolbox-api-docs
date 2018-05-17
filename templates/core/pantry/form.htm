@@ -158,6 +158,136 @@
                         </fieldset>
                     </div>
 
+                    <script type="text/javascript" src="/javascript/shared/select-all/jquery.select-all.js"></script>
+
+                    <div id="ordinaryCheckboxes" class="small-12 medium-6 columns">
+                        <fieldset class="checklist">
+                            <legend>Select All - ordinary checkboxes</legend>
+
+                            <input id="selectAllOrdinary" type="checkbox">
+                            <label for="selectAllOrdinary">Select All</label>
+
+                            <input id="ordinaryCheckbox1" type="checkbox" data-ordinary-checkbox>
+                            <label for="ordinaryCheckbox1">
+                                A Checkbox
+                            </label>
+
+                            <input id="ordinaryCheckbox2" type="checkbox" data-ordinary-checkbox>
+                            <label for="ordinaryCheckbox2">
+                                Another Checkbox
+                            </label>
+                        </fieldset>
+                        <script>
+                            $("#ordinaryCheckboxes").selectAll({
+                                selector: "#selectAllOrdinary",
+                                checkboxes: "[data-ordinary-checkbox]"
+                            });
+                        </script>
+                    </div>
+
+                    <div id="nestedCheckboxes" class="small-12 medium-6 columns">
+                        <fieldset class="checklist">
+                            <legend>Select All - nested checkboxes</legend>
+
+                            <input id="selectAllNested" type="checkbox">
+                            <label for="selectAllNested">Select All</label>
+
+                            <input id="parentCheckbox1" type="checkbox" data-parent-checkbox>
+                            <label for="parentCheckbox1" title="Select to reveal children">
+                                Parent Checkbox
+                                <i class="icon-click-view size-8"></i>
+                            </label>
+
+                            <div class="checklist" data-child-group>
+                                <input id="childCheckbox1" type="checkbox" data-child-checkbox>
+                                <label for="childCheckbox1">A Child Checkbox</label>
+
+                                <input id="childCheckbox2" type="checkbox" data-child-checkbox>
+                                <label for="childCheckbox2">Another Child Checkbox</label>
+                            </div>
+                        </fieldset>
+                        <script>
+                            $(function() {
+                                var parentCheckboxSelector = "[data-parent-checkbox]";
+                                var childCheckboxSelector = "[data-child-checkbox]";
+                                var childGroupSelector = "[data-child-group]";
+
+                                // Initial setup: if any parent types are already checked (from saved data), show their subtypes
+                                // otherwise hide the subtypes to save space
+                                $(parentCheckboxSelector).each(function(index, parentCheckbox) {
+                                    if ($(parentCheckbox).is(':checked')) {
+                                        // ...show the subtypes for this type
+                                        $(parentCheckbox).siblings(childGroupSelector).show();
+                                    } else {
+                                        // Hide subtypes by default to reduce vertical scrolling
+                                        $(parentCheckbox).siblings(childGroupSelector).hide();
+                                    }
+                                });
+
+                                // When a parent type checkbox is changed, show or hide its subtypes
+                                // and check them by default when shown
+                                $(parentCheckboxSelector).change(function(e) {
+                                    var parentCheckbox = e.target;
+                                    var $subCheckboxes = $(parentCheckbox).siblings(childGroupSelector).find(childCheckboxSelector);
+
+                                    if ($(parentCheckbox).is(':checked')) {
+                                        // ...show the subtypes for this type
+                                        $(parentCheckbox).siblings(childGroupSelector).show();
+
+                                        // ...and check them by default
+                                        $subCheckboxes.each(function(index, subCheckbox) {
+                                            $(subCheckbox).prop('checked', true);
+                                        });
+
+                                        $(parentCheckbox).siblings("label").find("i").removeClass("icon-click-view").addClass("icon-dropdown");
+                                    } else {
+                                        // ...hide the subtypes for this type
+                                        $subCheckboxes.each(function(index, subCheckbox) {
+                                            $(subCheckbox).prop('checked', false);
+                                            $(parentCheckbox).siblings(childGroupSelector).hide();
+                                        });
+
+                                        // ...and uncheck them (causes all sorts of problems with select all otherwise)
+                                        $subCheckboxes.each(function(index, subCheckbox) {
+                                            $(subCheckbox).prop('checked', false);
+                                        });
+
+                                        $(parentCheckbox).siblings("label").find("i").removeClass("icon-dropdown").addClass("icon-click-view");
+                                    }
+
+                                });
+
+                                // When a subtype checkbox is changed, find out if any subtypes in that group are still checked
+                                // and if not, uncheck the parent and hide the subtypes
+                                $(parentCheckboxSelector).each(function(index, parentCheckbox) {
+                                    var $subtypes = $(parentCheckbox).siblings(childGroupSelector).find(childCheckboxSelector);
+
+                                    $subtypes.change(function() {
+                                        if ($subtypes.filter(":checked").length < 1) {
+                                            $(parentCheckbox).prop("checked", false);
+                                            $subtypes.parent(childGroupSelector).hide();
+                                            $(parentCheckbox).siblings("label").find("i").removeClass("icon-dropdown").addClass("icon-click-view");
+                                        } else {
+                                            $(parentCheckbox).prop("checked", true);
+                                            $subtypes.parent(childGroupSelector).show();
+                                            $(parentCheckbox).siblings("label").find("i").removeClass("icon-click-view").addClass("icon-dropdown");
+                                        }
+                                    });
+                                })
+
+                                $("#nestedCheckboxes").selectAll({
+                                    selector: "#selectAllNested",
+                                    checkboxes: "[data-parent-checkbox]",
+                                    childCheckboxes: "[data-child-checkbox]",
+                                    childCheckboxGroups: "[data-child-group]"
+                                });
+                            });
+                        </script>
+                    </div>
+
+                </fieldset>
+                <fieldset>
+                    <legend>Switches</legend>
                     <div class="small-12 medium-6 columns">
                         <label for="exampleCheckboxSwitch">If you <em>reeeeeally</em> need a switch on your form...</label>
                         <div class="switch">

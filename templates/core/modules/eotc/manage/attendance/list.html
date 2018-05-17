@@ -2,8 +2,8 @@
 <script type="text/javascript">
     $(function() {
         $('[data-attendees]').selectAll({
-            key: 'selectall',
-            checkboxName: 'selected[]'
+            selector: '#selectall',
+            checkboxes: '[data-student-attendee]'
         });
     });
 </script>
@@ -123,7 +123,7 @@
                     <!-- BEGIN student_attendee -->
                     <tr>
                         <td>
-                            <input id='student{STUDENT_ATTENDEE_ID}' name="selected[]" type="checkbox" value="{STUDENT_ATTENDEE_ID}" />
+                            <input id='student{STUDENT_ATTENDEE_ID}' data-student-attendee name="selected[]" type="checkbox" value="{STUDENT_ATTENDEE_ID}" />
                             <label for="student{STUDENT_ATTENDEE_ID}" class="checkbox-label"></label>
                         </td>
                         <td>{STUDENT_ATTENDEE_ID}</td>
