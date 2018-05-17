@@ -530,7 +530,7 @@ if [[ "$(readlink /proc/1/exe)" == */systemd ]];
 then
     echo "[SB][`date +%Y-%m-%d\ %X`] Installing daemon systemd configurations";
     cp -f /vagrant/tools/init/schoolbox-*.service /lib/systemd/system/;
-    sed -i 's/usr\/share\/schoolbox/vagrant/g' /lib/systemd/system/schoolbox-*.service;
+    sed -i 's/usr\/share\/schoolbox/vagrant/g' /lib/systemd/system/schoolbox-*d.service;
     systemctl daemon-reload;
     systemctl enable schoolbox-scheduled.service;
     systemctl enable schoolbox-routed.service;
