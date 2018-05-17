@@ -10,9 +10,8 @@
 namespace Schoolbox\Learning\InlineGrader;
 
 use Aura\Router\Router;
-use \Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
-use \Schoolbox\Learning\Assessment\DueWork\Response\Model as Submission;
-use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use Schoolbox\Learning\Assessment\DueWork\Response\Model as Submission;
 use Schoolbox\User;
 
 class StudentCarousel
@@ -33,22 +32,17 @@ class StudentCarousel
     private $assessment;
 
     /**
-     * @var Submission
-     */
-    private $response;
-
-    /**
      * StudentCarousel constructor.
      *
      * @param Router $router
      * @param User $student
-     * @param IAssessable $assessment
+     * @param DueWork $assessment
      */
-    public function __construct(Router $router, User $student, IAssessable $assessment)
+    public function __construct(Router $router, User $student, DueWork $assessment)
     {
-        $this->setRouter($router);
-        $this->setStudent($student);
-        $this->setAssessment($assessment);
+        $this->router     = $router;
+        $this->student    = $student;
+        $this->assessment = $assessment;
     }
 
     /**
@@ -72,43 +66,43 @@ class StudentCarousel
     {
         $allPeople = [];
 
-        foreach ($this->getAssessment()->getAllParticipants() as $currentParticipant) {
-            $latestSubmission = $currentParticipant->findMostRecentResponse();
+        foreach ($this->assessment->getAllParticipants() as $currentParticipant) {
 
-            /** @var Submission $latestSubmission */
-            if ($latestSubmission) {
-                if ($latestSubmission->isSubmitted()) {
+            // CSS/label rules
+            // TODO move CSS/label generation to participant class, and dedupe usages
+            if ($currentParticipant->isReviewComplete()) {
+                // Is review complete? Always say "Reviewed"
+                $css   = 'reviewed';
+                $label = 'Reviewed';
+
+            } else {
+                $latestSubmission = $currentParticipant->findMostRecentSubmittedResponse();
+
+                /** @var Submission $latestSubmission */
+                if ($latestSubmission) {
+                    $multipleResponses = \count($currentParticipant->getAllResponses()) > 1;
                     if ($latestSubmission->isSubmittedOnTime()) {
-                        $css = 'submitted';
-                        $label = 'Submitted on time';
-                    }
-                    else {
+                        $css   = 'submitted';
+                        $label = $multipleResponses ? 'Resubmitted on time' : 'Submitted on time';
+
+                    } else {
                         $css   = 'submitted-late';
-                        $label = 'Submitted late';
+                        $label = $multipleResponses ? 'Resubmitted late' : 'Submitted late';
                     }
-                }
-                else {
-
-                    /* Draft Submission exists
+                } else {
+                    /* No submission exists
                      */
-                    $css = 'unsubmitted';
-                    $label = 'Not submitted';
+                    $css   = 'unsubmitted';
+                    $label = $this->assessment->isAcceptNone() ? 'Not reviewed' : 'Not submitted';
                 }
-            }
-            else {
-
-                /* No submission exists
-                 */
-                $css = 'unsubmitted';
-                $label = 'Not submitted';
             }
 
             /* Viewing the most recent response for the next student
              */
-            $urlValue = $this->getRouter()->generate('learningDueWorkResponse.getParticularResponse', [
-                'assessmentId' => $this->getAssessment()->getId(),
+            $urlValue = $this->router->generate('learningDueWorkResponse.getParticularResponse', [
+                'assessmentId' => $this->assessment->getId(),
                 'studentId'    => $currentParticipant->getUser()->getId(),
-                'assessment'   => $this->getAssessment()
+                'assessment'   => $this->assessment
             ]);
 
             $person = [
@@ -139,67 +133,10 @@ class StudentCarousel
      */
     private function getCurrentPerson()
     {
-        return $this->getRouter()->generate('learningDueWorkResponse.getParticularResponse', [
-            'assessmentId' => $this->getAssessment()->getId(),
-            'studentId'    => $this->getStudent()->getId(),
-            'assessment'   => $this->getAssessment()
+        return $this->router->generate('learningDueWorkResponse.getParticularResponse', [
+            'assessmentId' => $this->assessment->getId(),
+            'studentId'    => $this->student->getId(),
+            'assessment'   => $this->assessment
         ]);
-    }
-
-    /* Getters/Setters
-     */
-
-    /**
-     * @return Router
-     */
-    private function getRouter()
-    {
-        return $this->router;
-    }
-
-    /**
-     * @param Router $router
-     * @return $this
-     */
-    private function setRouter($router)
-    {
-        $this->router = $router;
-        return $this;
-    }
-
-    /**
-     * @return User
-     */
-    private function getStudent()
-    {
-        return $this->student;
-    }
-
-    /**
-     * @param User $student
-     * @return $this
-     */
-    private function setStudent($student)
-    {
-        $this->student = $student;
-        return $this;
-    }
-
-    /**
-     * @return IAssessable
-     */
-    private function getAssessment()
-    {
-        return $this->assessment;
-    }
-
-    /**
-     * @param IAssessable $assessment
-     * @return $this
-     */
-    private function setAssessment($assessment)
-    {
-        $this->assessment = $assessment;
-        return $this;
     }
 }

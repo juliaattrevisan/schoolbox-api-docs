@@ -66,11 +66,19 @@
     {% set pTooltip     = participant.responseRequired ? labelIncomplete  : (participant.feedbackRequired ? labelPending  : labelReviewed ) %}
 
     {% set pStatusText %}
+        {##
+          # TODO move CSS/label generation to participant class, and dedupe usages
+          # (see \Schoolbox\Learning\InlineGrader\StudentCarousel::getAllPeople)
+          #}
         {%- spaceless %}
             {% if participant.reviewComplete %}
                 {{ labelReviewed }}
             {% elseif not latestResponse %}
-                Not submitted
+                {% if assessment.acceptNone %}
+                    Not reviewed
+                {% else %}
+                    Not submitted
+                {% endif %}
             {% else %}
                 {% if multipleResponses %}
                     Resubmitted
