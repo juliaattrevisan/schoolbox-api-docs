@@ -37,7 +37,7 @@ class Assess_Attempt extends Evaluation_Attempt {
             INNER JOIN assess_attempt  aa ON ar.attempt_id  = aa.attempt_id
             LEFT  JOIN user            u  ON aa.user_id     = u.id
             WHERE aq.question_id = '{$this->db->quote($questionId)}'
-            AND   ar.attempt_id IN ({$this->buildAttemptIdsQueryPart($attempts)})
+            AND   ar.attempt_id IN ({$this->buildReviewableAttemptsForQuery($attempts)})
         ";
 
         return $this->db->getAll($query);
@@ -62,7 +62,7 @@ class Assess_Attempt extends Evaluation_Attempt {
         $query = "
             UPDATE assess_attempt
             SET reviewed_at = '{$this->db->quote($now->getUsingFormat(Alaress_Date_Format::DATABASE_FORMAT))}'
-            WHERE attempt_id IN ({$this->buildAttemptIdsQueryPart($attempts)})
+            WHERE attempt_id IN ({$this->buildReviewableAttemptsForQuery($attempts)})
         ";
         $this->db->query($query);
     }
@@ -103,7 +103,7 @@ class Assess_Attempt extends Evaluation_Attempt {
      * @param int[] $attemptIds
      * @return string
      */
-    private function buildAttemptIdsQueryPart(array $attemptIds)
+    private function buildReviewableAttemptsForQuery(array $attemptIds)
     {
         return implode(',', array_map([$this->db, 'quote'], $attemptIds));
     }
