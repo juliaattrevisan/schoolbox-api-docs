@@ -13,58 +13,98 @@ class Assess_Attempt extends Evaluation_Attempt {
     public $_table = 'assess_attempt';
     public $_index = 'attempt_id';
 
-	/**
-	 * Get all the attempts for a particular question
-	 * This is used for horizontal marking
-	 *
-	 * @param $questionId
-	 * @return array|bool
-	 */
-	public function getAllAttemptsForQuestion($questionId) {
-		$query = "
-			SELECT *
-			FROM assess_question
-			LEFT JOIN assess_response ON assess_question.question_id = assess_response.question_id
-			INNER JOIN (
-				SELECT assess_attempt.attempt_id, user_id
-				FROM  assess_attempt
-				WHERE deleted_at IS NULL
-				ORDER BY user_id, `start` DESC
-			) el_boomerang ON assess_response.attempt_id = el_boomerang.attempt_id
-			LEFT JOIN `user` ON el_boomerang.user_id = `user`.id
-			WHERE assess_question.question_id = '{$questionId}'
-			GROUP BY el_boomerang.user_id
-			ORDER BY `user`.lastname
-		";
+    /**
+     * Get all the attempts for a particular question
+     * This is used for horizontal marking
+     *
+     * @param $assessId
+     * @param $questionId
+     * @return array|bool
+     */
+    public function getAllAttemptsForQuestion($assessId, $questionId)
+    {
+        // Retrieve all attempts
+        $attempts = $this->retrieveLatestReviewableAttemptIds($assessId);
+        if (empty($attempts)) {
+            return [];
+        }
 
-		return $this->db->getAll($query);
-	}
+        // Get everything for that question
+        $query = "
+            SELECT *
+            FROM assess_question aq
+            INNER JOIN assess_response ar ON aq.question_id = ar.question_id
+            INNER JOIN assess_attempt  aa ON ar.attempt_id  = aa.attempt_id
+            LEFT  JOIN user            u  ON aa.user_id     = u.id
+            WHERE aq.question_id = '{$this->db->quote($questionId)}'
+            AND   ar.attempt_id IN ({$this->buildReviewableAttemptsForQuery($attempts)})
+        ";
 
-	/**
-	 * Update the reviewed_at for all the latest attempts for a particular assess :D
-	 * How do you like them apples
-	 *
-	 * @param $assessId
-	 */
-	public function finaliseAllLatestAttempts($assessId) {
-		$query = "
-			UPDATE assess_attempt
-			INNER JOIN (
-				SELECT assess_attempt.*
-				FROM assess_attempt
-				INNER JOIN (
-					SELECT *
-					FROM assess_attempt
-					WHERE assess_attempt.assess_id = '{$assessId}'
-					AND assess_attempt.deleted_at IS NULL
-					ORDER BY user_id, `start` DESC
-				) q ON assess_attempt.`attempt_id` = q.attempt_id
-				GROUP BY assess_attempt.user_id
-			) AS latestAttempt ON assess_attempt.attempt_id = latestAttempt.attempt_id
-			SET assess_attempt.reviewed_at = NOW();
-		";
+        return $this->db->getAll($query);
+    }
 
-		$this->db->query($query);
-	}
+    /**
+     * Update the reviewed_at for all the latest attempts for a particular assess :D
+     * How do you like them apples
+     *
+     * @param $assessId
+     */
+    public function finaliseAllLatestAttempts($assessId)
+    {
+        // Retrieve all attempts
+        $attempts = $this->retrieveLatestReviewableAttemptIds($assessId);
+        if (empty($attempts)) {
+            return;
+        }
+        $now = Alaress_Date_Format::now();
 
+        // Review them right now
+        $query = "
+            UPDATE assess_attempt
+            SET reviewed_at = '{$this->db->quote($now->getUsingFormat(Alaress_Date_Format::DATABASE_FORMAT))}'
+            WHERE attempt_id IN ({$this->buildReviewableAttemptsForQuery($attempts)})
+        ";
+        $this->db->query($query);
+    }
+
+    /**
+     * Retrieves the IDs for each participant's most recent reviewable attempt.
+     *
+     * Reviewable attempts:
+     * * aren't deleted
+     * * aren't yet reviewed
+     *
+     * @param int $assessId
+     * @return array
+     */
+    private function retrieveLatestReviewableAttemptIds($assessId)
+    {
+        $query = "
+            SELECT user_id, attempt_id
+            FROM assess_attempt
+            WHERE assess_id = '{$this->db->quote($assessId)}'
+            AND   deleted_at IS NULL
+            AND   reviewed_at IS NULL
+            ORDER BY user_id, `start` DESC
+        ";
+        $results = [];
+        foreach ($this->db->getAll($query) as $row) {
+            $userId = $row['user_id'];
+            if (!isset($results[$userId])) {
+                $results[$userId] = $row['attempt_id'];
+            }
+        }
+        return $results;
+    }
+
+    /**
+     * Builds the contents of a `IN()` statement for the list of attempt IDs.
+     *
+     * @param int[] $attemptIds
+     * @return string
+     */
+    private function buildReviewableAttemptsForQuery(array $attemptIds)
+    {
+        return implode(',', array_map([$this->db, 'quote'], $attemptIds));
+    }
 }
