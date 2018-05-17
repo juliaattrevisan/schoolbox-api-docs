@@ -38,6 +38,7 @@ class Assess_Attempt extends Evaluation_Attempt {
             LEFT  JOIN user            u  ON aa.user_id     = u.id
             WHERE aq.question_id = '{$this->db->quote($questionId)}'
             AND   ar.attempt_id IN ({$this->buildReviewableAttemptsForQuery($attempts)})
+            ORDER BY u.lastname ASC, u.firstname ASC, u.id ASC
         ";
 
         return $this->db->getAll($query);
@@ -59,10 +60,12 @@ class Assess_Attempt extends Evaluation_Attempt {
         $now = Alaress_Date_Format::now();
 
         // Review them right now
+        // (Don't update review date of anything already reviewed)
         $query = "
             UPDATE assess_attempt
             SET reviewed_at = '{$this->db->quote($now->getUsingFormat(Alaress_Date_Format::DATABASE_FORMAT))}'
             WHERE attempt_id IN ({$this->buildReviewableAttemptsForQuery($attempts)})
+            AND   reviewed_at IS NULL
         ";
         $this->db->query($query);
     }
@@ -84,7 +87,6 @@ class Assess_Attempt extends Evaluation_Attempt {
             FROM assess_attempt
             WHERE assess_id = '{$this->db->quote($assessId)}'
             AND   deleted_at IS NULL
-            AND   reviewed_at IS NULL
             ORDER BY user_id, `start` DESC
         ";
         $results = [];
