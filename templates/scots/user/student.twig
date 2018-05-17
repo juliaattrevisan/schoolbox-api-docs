@@ -2,7 +2,7 @@
 
 {% block buttons %}
     {{ parent() }}
-    {% if isParentOfStudent %}
+    {% if isParentOfStudent or isStaff %}
         <li><a class="icon-result" href="https://dashboard.tsc.nsw.edu.au/login/index/{{user.id}}">Results</a></li>
     {% endif %}
 {% endblock buttons %}
