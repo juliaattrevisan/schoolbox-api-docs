@@ -203,7 +203,7 @@ try {
         case 'timetable':
             $api = buildApiClass(
                 Calendar_Api_EventType_Timetable_ExternalConstrained_Default::class,
-                [$user],
+                [$user, $kernel->getDependencyInjector()->get('config')],
                 true,
                 $sentry
             );
