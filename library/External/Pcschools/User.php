@@ -788,13 +788,13 @@ class External_Pcschools_User implements External_UserInterface
                 return [];
             }
 
-            // Ordering of result sets from spSelTimetable:
+            // Ordering of result sets from spSelTimeTableSchoolBox:
             // Day periods
             // Day classes
             // Home classes
             // Week days
             // Terms
-            $statement = $this->getDatabase()->prepareProcedure('spSelTimetable');
+            $statement = $this->getDatabase()->prepareProcedure('spSelTimeTableSchoolBox');
             $statement->bindInputs([
                 'DATE' => date('Ymd'),
                 'TIMEPERIOD' => $timePeriod,
