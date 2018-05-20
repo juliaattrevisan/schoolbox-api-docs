@@ -257,6 +257,8 @@ class Full
                      * * If feedback is floating, we do *not* add any response files to it. Floating feedbacks now
                      *   only exist if no response exists, hence no response file could have been annotated at the
                      *   time of feedback creation.
+                     *   --> This doesn't apply for the case where a teacher annotated on a KamiDoc and then
+                     *       published a feedback comment on the quick mark screen. (SA-6760)
                      */
                     foreach ($currentResponse->getAllFiles() as $currentFile) {
                         if ($currentFile->getKami()) {
@@ -287,6 +289,14 @@ class Full
                 if (!\in_array($currentFeedback->getId(), $processedFeedback, true)
                     && $feedbackFilter($currentFeedback)
                 ) {
+                    // Adding Kami documents for visibility.
+                    // TODO: This needs to be reconsidered once the core solution for SA-6464 is provided.
+                    foreach ($currentResponse->getAllFiles() as $currentFile) {
+                        // If the status is other than "done", nobody has viewed it online.
+                        if ($currentFile->getKami() && $currentFile->getKami()->isStatusDone()) {
+                            $currentFeedback->getAllFiles()->add($currentFile);
+                        }
+                    }
                     $this->getRecombined()->add($currentFeedback);
 
                     $processedFeedback[] = $currentFeedback->getId();
