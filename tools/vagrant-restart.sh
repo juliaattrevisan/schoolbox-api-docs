@@ -2,12 +2,13 @@
 # wait for /vagrant to mount correctly
 for i in {1..60};
 do
-    if [ -f /vagrant/Vagrantfile ];
+    if [ -f /vagrant/tools/notif/syscheck.php ];
     then
         break;
     fi
     sleep 1;
 done
+sleep 0.5;
 service schoolbox-socketd restart;
 service schoolbox-routed restart;
 service schoolbox-digestd restart;
