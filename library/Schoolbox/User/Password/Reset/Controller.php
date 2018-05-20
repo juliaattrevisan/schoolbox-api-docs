@@ -148,7 +148,7 @@ class Controller extends Base
         $confirm = $this->getRequest()->post->get('confirm_password', '');
 
         // Verify that passwords match format and each other
-        if ($password === $confirm && mb_strlen($password, 'UTF-8') >= 8) {
+        if ($reset->getUser() && $password === $confirm && mb_strlen($password, 'UTF-8') >= 8) {
             // Reset password
             // Refetch user too cause other things may break
             $user = $this->userMapper->findById($reset->getUser()->getId());
@@ -202,7 +202,12 @@ class Controller extends Base
      */
     protected function validateResetRequest(Model $reset)
     {
-        if (!$reset->getToken()) {
+        if ($reset->getUser() === null) {
+            // User does not exist
+            $this->getResponse()->redirect->to(
+                $this->getRouter()->generate('userPasswordReset.displayCreateRequestForm')
+            );
+        } elseif (!$reset->getToken()) {
             // Token wasn't found - go elsewhere
             $this->getResponse()->redirect->to(
                 $this->getRouter()->generate('userPasswordReset.displayCreateRequestForm')
