@@ -3,6 +3,10 @@ This plugin implements select-all functionality for checkboxes.
 
 _Note: this plugin should be used for all future select-all needs. However, some places in the system currently use attacher.select-all.js instead. The "attacher" doesn't actually attach any plugins, it just implements the select-all feature itself from scratch. Please don't use it in future._
 
+Include the plugin with the following:
+```
+<script type="text/javascript" src="/javascript/shared/select-all/jquery.select-all.js"></script>
+```
 ## Basic usage
 
 ### Initialising
