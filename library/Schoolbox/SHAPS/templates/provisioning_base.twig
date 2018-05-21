@@ -20,7 +20,7 @@
         {% block page_specific_content %}
         {% endblock %}
 
-        <div id="statusForm">
+        <div id="statusForm" {% if allUsers | length == 0 %}class="hide"{% endif %}>
             <form>
                 <section class="content" id="statusTable">
                     <table>
@@ -71,6 +71,11 @@
 
                 <input type="submit" value="Save changes">
             </form>
+        </div>
+
+        <div class="empty-state{% if allUsers | length > 0 %} hide{% endif %}">
+            <i class="icon-staff-students"></i>
+            <p>No matching users found.</p>
         </div>
 
     </div>
