@@ -113,8 +113,10 @@
                 name: 'gradingScheme',
                 options: allGradeSchemes,
                 preselected: assessment.gradeGroup.id ?: defaultGradeGroup,
-                value: 'id',
-                label: 'name'
+                pairs: {
+                    value: 'id',
+                    label: 'name'
+                }
             }
             %}
             <button type="button" class="button" data-reveal-id="gradeScale">Show {{ locale.grades.proper }} Scale</button>

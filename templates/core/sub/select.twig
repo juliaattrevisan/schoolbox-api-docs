@@ -8,8 +8,9 @@
  # name: the name of the select element
  # preselected: the value that should be initially selected (preselected)
  # options: a collection of objects or an array
- # value: the object method that returns the value e.g. "id", or the array key containing the equivalent
- # label: the object method that returns the name e.g. "name", or the array key containing the equivalent
+ # pairs: a key/value set containing "value" and "label" settings
+ #     value: the object method that returns the value e.g. "id", or the array key containing the equivalent
+ #     label: the object method that returns the name e.g. "name", or the array key containing the equivalent
  # selectData: a set of key-value pairs corresponding to data vars or element attributes
  # showPrompt: a boolean to determine whether to show the "Please Select" option
  #}
@@ -24,7 +25,7 @@
 
 {% for index, option in options %}
 
-    {% if (value == null or label == null)  %}
+    {% if (pairs == null)  %}
 
         {# If (value, label) was not specified, assume backwards-compatible defaults
          #}
@@ -32,13 +33,13 @@
             {{ option }}
         </option>
 
-    {% elseif attribute(option, value) is defined %}
+    {% elseif attribute(option, pairs.value) is defined %}
 
         {# Object method exists; assume a set of objects
          # access their contents using the attribute() method
          #}
-        <option value="{{ attribute(option, value) }}" {% if attribute(option, value) == preselected %}selected="selected"{% endif %}>
-            {{ attribute(option, label) }}
+        <option value="{{ attribute(option, pairs.value) }}" {% if attribute(option, pairs.value) == preselected %}selected="selected"{% endif %}>
+            {{ attribute(option, pairs.label) }}
         </option>
 
     {% else %}
@@ -46,8 +47,8 @@
         {# The (value, label) tuple was specified; access arrays accordingly
          # using the chosen settings
          #}
-        <option value="{{ option[value] }}" {% if option[value] == preselected %}selected="selected"{% endif %}>
-            {{ option[label] }}
+        <option value="{{ option[pairs.value] }}" {% if option[pairs.value] == preselected %}selected="selected"{% endif %}>
+            {{ option[pairs.label] }}
         </option>
     {% endif %}
 {% endfor %}
