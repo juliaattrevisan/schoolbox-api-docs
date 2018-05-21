@@ -48,7 +48,7 @@
         function autoSelectAllCheckboxes() {
 
             // If all parent checkboxes are checked...
-            if ($(config.parent).find(config.checkboxes).length === $(config.parent).find(config.checkboxes).filter(":checked").length) {
+            if (($(config.parent).find(config.checkboxes).length === $(config.parent).find(config.checkboxes).filter(":checked").length) && $(config.parent).find(config.checkboxes).length) {
 
                 // If we have nested checkboxes, make sure they're all checked as well
                 if ($(config.parent).find(config.childCheckboxes)) {
