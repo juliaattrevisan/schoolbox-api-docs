@@ -22,20 +22,32 @@
     <option disabled selected="selected" value="">Please Select</option>
     {% endif %}
 
-{% for option in options %}
+{% for index, option in options %}
 
-    {# Determine whether option was an array or an object
-     # Currently using iterable to determine the difference
-     #}
-    {% if option is iterable %}
-        {# arrays #}
-        <option value="{{ option[value] }}" {% if option[value] == preselected %}selected="selected"{% endif %}>
-            {{ option[label] }}
+    {% if (value == null or label == null)  %}
+
+        {# If (value, label) was not specified, assume backwards-compatible defaults
+         #}
+        <option value="{{ index }}" {% if index == preselected %}selected="selected"{% endif %}>
+            {{ option }}
         </option>
-    {% else %}
-        {# objects #}
+
+    {% elseif attribute(option, value) is defined %}
+
+        {# Object method exists; assume a set of objects
+         # access their contents using the attribute() method
+         #}
         <option value="{{ attribute(option, value) }}" {% if attribute(option, value) == preselected %}selected="selected"{% endif %}>
             {{ attribute(option, label) }}
+        </option>
+
+    {% else %}
+
+        {# The (value, label) tuple was specified; access arrays accordingly
+         # using the chosen settings
+         #}
+        <option value="{{ option[value] }}" {% if option[value] == preselected %}selected="selected"{% endif %}>
+            {{ option[label] }}
         </option>
     {% endif %}
 {% endfor %}
