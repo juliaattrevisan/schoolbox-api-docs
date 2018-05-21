@@ -54,7 +54,7 @@
                             <td>
                                 {% if user.externalID not in provisionedUserIDs %}
                                     <div class="checklist">
-                                        <input id="provision-{{ user.externalID }}" type="checkbox">
+                                        <input id="provision-{{ user.externalID }}" type="checkbox" data-checkbox>
                                         <label for="provision-{{ user.externalID }}"></label>
                                     </div>
                                 {% else %}
@@ -75,3 +75,11 @@
 
     </div>
 </div>
+
+<script type="text/javascript" src="/javascript/shared/select-all/jquery.select-all.js"></script>
+<script>
+    $("#statusForm").selectAll({
+        selector: "#select-all",
+        checkboxes: "[data-checkbox]"
+    });
+</script>

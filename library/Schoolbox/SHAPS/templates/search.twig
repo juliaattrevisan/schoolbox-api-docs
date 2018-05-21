@@ -51,11 +51,11 @@
 
                                 if (user.provisioned) {
                                     statusMarkup = '<i class="icon-course-outline" title="Provisioned"></i>';
-                                    checkboxMarkup = '<div class="checklist"><input id="provision-' + user.externalID + '" type="checkbox" disabled><label for="provision-' + user.externalID + '" title="Already provisioned"></label></div>';
+                                    checkboxMarkup = '<div class="checklist"><input id="provision-' + user.externalID + '" type="checkbox" data-checkbox disabled><label for="provision-' + user.externalID + '" title="Already provisioned"></label></div>';
                                     trMarkup = '<tr id="' + user.externalID + '">';
                                 } else {
                                     statusMarkup = '<p>Not Provisioned</p>';
-                                    checkboxMarkup = '<div class="checklist"><input id="provision-' + user.externalID + '" type="checkbox"><label for="provision-' + user.externalID + '"></label></div>';
+                                    checkboxMarkup = '<div class="checklist"><input id="provision-' + user.externalID + '" type="checkbox" data-checkbox><label for="provision-' + user.externalID + '"></label></div>';
                                     trMarkup = '<tr class="highlight-warning" id="' + user.externalID + '">';
                                 }
 
