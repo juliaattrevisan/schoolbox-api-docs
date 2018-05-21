@@ -119,9 +119,5 @@ class Admin implements ModuleConfigInterface
         //Feature Tours
         $featureTours = new \Schoolbox\Admin\FeatureTours\Module($di);
         $featureTours->init('/adminv2/feature-tours');
-
-        // Schoolbox Help API
-        $module = new \Custom\Help\CourseParticipation\Module($di);
-        $module->init('/api/course-participation');
     }
 } 
