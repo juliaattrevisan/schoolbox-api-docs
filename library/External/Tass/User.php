@@ -398,7 +398,7 @@ class External_Tass_User implements External_UserInterface
                 LEFT JOIN student as s
                     ON p.par_code = s.par_code
                     AND p.cmpy_code = s.cmpy_code
-                    AND (s.dol IS NULL OR s.dol > getdate())
+                    AND (s.dol IS NULL OR s.dol >= getdate())
                 WHERE sf.par_code = {$this->getDatabase()->smartQuote($parentCode)}
                 AND   sf.sfa_num  = {$this->getDatabase()->smartQuote($parentNum)}
             ";
@@ -443,7 +443,7 @@ class External_Tass_User implements External_UserInterface
                     ON  p.par_code = s.par_code
                     AND p.cmpy_code = s.cmpy_code
                 WHERE s.par_code = {$this->getDatabase()->smartQuote($id)}
-                AND (s.dol IS NULL OR s.dol > getdate())
+                AND (s.dol IS NULL OR s.dol >= getdate())
             ";
             if ($commrules) {
                 $query = $query . "
@@ -574,7 +574,7 @@ class External_Tass_User implements External_UserInterface
                 s.*
             FROM student AS s
             LEFT JOIN studboard AS sb ON s.stud_code = sb.stud_code AND s.cmpy_code = sb.cmpy_code
-            WHERE (s.dol IS NULL OR s.dol > getdate())
+            WHERE (s.dol IS NULL OR s.dol >= getdate())
         ";
 
         $result = $this->getDatabase()->trimAll($this->getDatabase()->getAll($query));
