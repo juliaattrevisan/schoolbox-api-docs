@@ -46,7 +46,7 @@ class Controller extends Base
     private function getUsersFromHelp() {
         $client = new GuzzleClient();
 
-        $ip = "http://172.22.15.101";
+        $url = "https://help.schoolbox.com.au";
 
         // Query params
         // TODO make this config stuff 'right' later
@@ -64,7 +64,7 @@ class Controller extends Base
 
         $response = $client->request(
             "get",
-            "${ip}/api/course-participation/${schoolCode}/users", [
+            "${url}/api/course-participation/${schoolCode}/users", [
             'query' => [
                 'ts' => $timestamp,
                 'token' => $token
