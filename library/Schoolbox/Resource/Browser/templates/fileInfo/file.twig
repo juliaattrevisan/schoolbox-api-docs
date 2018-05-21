@@ -15,12 +15,12 @@
     <dd class="small-12 medium-8">{{ file.size | bytes }}</dd>
 
     <dt class="small-12 medium-4">Created</dt>
-    <dd class="small-12 medium-8">{{ file.createdAt.dateOnly }}</dd>
+    <dd class="small-12 medium-8">{{ file.createdAt.short }}</dd>
 
     {% if namespace == 'resourceBrowser' %}
         {% if file.createdAt.unixTimestamp != file.modifiedAt.unixTimestamp %}
             <dt class="small-12 medium-4">Last modified</dt>
-            <dd class="small-12 medium-8">{{ file.modifiedAt.dateOnly }}</dd>
+            <dd class="small-12 medium-8">{{ file.modifiedAt.short }}</dd>
         {% endif %}
     {% endif %}
 
