@@ -125,6 +125,8 @@ abstract class Controller extends ListController implements IAssessmentControlle
         $data['custom_assessment_participation'] = $this->getConfigLoader()->get('custom_assessment_participation');
         $data['selfAssessmentEnabled'] = $this->getConfigLoader()->get('self_assessment_enabled');
 
+        $data['defaultGradeGroup'] = $this->getConfigLoader()->get('default_grade_group');
+
         // either output the fragment to the mage, or use the synchronous form
         if ($this->getRequest()->isXhr()) {
             $content = $this->buildUnthemedHtmlOutput("@learningAssessment/$type/create.twig", $data);
