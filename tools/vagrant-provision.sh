@@ -602,11 +602,6 @@ service schoolbox-epl restart > /dev/null 2>&1;
 service apache2 restart > /dev/null 2>&1;
 service php7.1-fpm restart > /dev/null 2>&1;
 service nginx restart > /dev/null 2>&1;
-service schoolbox-scheduled restart > /dev/null 2>/dev/null &
-service schoolbox-socketd restart > /dev/null 2>/dev/null &
-service schoolbox-digestd restart > /dev/null 2>/dev/null &
-service schoolbox-routed restart > /dev/null 2>/dev/null &
-#service schoolbox-belld restart > /dev/null 2>/dev/null &
 
 # call custom provisioning
 if [ -f /vagrant/post-provision.sh ];
