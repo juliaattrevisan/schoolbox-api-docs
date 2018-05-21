@@ -11,13 +11,16 @@
  # value: the object method that returns the value e.g. "id", or the array key containing the equivalent
  # label: the object method that returns the name e.g. "name", or the array key containing the equivalent
  # selectData: a set of key-value pairs corresponding to data vars or element attributes
+ # showPrompt: a boolean to determine whether to show the "Please Select" option
  #}
 <select {{ disabled }} name="{{ name }}"
     {% for dataVar, dataValue in selectData %}
         {{ dataVar }}="{{ dataValue }}"
     {% endfor %}
 >
+    {% if showPrompt %}
     <option disabled selected="selected" value="">Please Select</option>
+    {% endif %}
 
 {% for option in options %}
 
