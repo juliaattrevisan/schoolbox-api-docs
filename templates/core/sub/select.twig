@@ -14,11 +14,17 @@
     <option disabled selected="selected" value="">Please Select</option>
 
 {% for option in options %}
+
+    {# Determine whether option was an array or an object
+     # Currently using iterable to determine the difference
+     #}
     {% if option is iterable %}
+        {# arrays #}
         <option value="{{ option[value] }}" {% if option[value] == preselected %}selected="selected"{% endif %}>
             {{ option[label] }}
         </option>
     {% else %}
+        {# objects #}
         <option value="{{ attribute(option, value) }}" {% if attribute(option, value) == preselected %}selected="selected"{% endif %}>
             {{ attribute(option, label) }}
         </option>
