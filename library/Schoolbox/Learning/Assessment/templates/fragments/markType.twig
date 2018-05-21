@@ -87,7 +87,8 @@
     <div class="small-12 columns">
         {% include 'sub/select.twig' with {
             selectData: {
-                id: 'gradingScheme'
+                id: 'gradingScheme',
+                name: 'gradingScheme'
             },
             options: allGradeSchemes,
             preselected: assessment.gradeGroup.id ?: defaultGradeGroup,
