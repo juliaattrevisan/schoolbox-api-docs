@@ -372,20 +372,18 @@
 
                 {# Only superusers can recurse permission changes, and its only relevant on modification #}
                 {% if user.isSuperuser and action == 'Modify' %}
-
                 <fieldset class="content">
                     <div class="small-12 large-10 columns">
                         <input type="checkbox" id="recursive" name="recursive" value="1" />
                         <label for="recursive" class="checkbox-label">Apply these permissions to all subfolders</label>
                     </div>
-                </fieldset>
 
-                <div class="list-item small-12 island">
-                    <div data-alert="" class="alert-box alert hide">
-                        Applying inherited permissions to all subfolders will remove class codes from all subfolders!
+                    <div class="small-12 columns">
+                        <div data-alert="" class="alert-box alert hide">
+                            This will remove all role permissions, group memberships, and class codes from all subfolders.
+                        </div>
                     </div>
-                </div>
-
+                </fieldset>
                 {% endif %}
 
                 <fieldset id="curriculum-codes" class="content">

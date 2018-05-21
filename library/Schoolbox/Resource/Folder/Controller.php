@@ -659,16 +659,23 @@ class Controller extends BaseController
      * Recursively apply inheritance. Why? Not sure. Cut-Paste from /cms/categoryForm.php
      *
      * @param Model $model
+     * @throws \Exception
      */
     protected function recurseInheritance(Model $model)
     {
-        $folderMapper = $this->getFolderMapper();
+        /* Find all the unique folder ids that need their memberships purged
+         */
+        $deleteFolderMemberships = array_values($this->getFolderMapper()->recurseInheritance($model));
 
-        $folders = $folderMapper->findAllChildren($model->getId(), true);
-        foreach ($folders as $folder) {
-            $folder->setInherit($model->getInherit());
-            $folderMapper->save($folder);
-            $this->recurseInheritance($folder);
+        if (!empty($deleteFolderMemberships)) {
+            // If inheriting permissions we need to remove any user access permissions...
+            $this->getUserAccessMapper()->deleteByColumnList([
+                "sid"     => $deleteFolderMemberships,
+                "service" => UserAccess::SERVICE_HOMEPAGE,
+            ]);
+
+            // ...and role permissions
+            $this->getRoleAccessMapper()->deleteByColumn("cid", $deleteFolderMemberships);
         }
     }
 

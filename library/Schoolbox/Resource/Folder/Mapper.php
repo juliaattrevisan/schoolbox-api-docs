@@ -1907,22 +1907,37 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         return $folders;
     }
 
+
     /**
      * Apply inherited permissions checkbox DOWN the tree
      *
      * @param Model $model
+     * @return array
      * @throws \Exception
      */
-    public function recurseInheritance(Model $model)
+    public function recurseInheritance(Model $model): array
     {
         $folders = $this->findAllChildren($model->getId(), true);
-        foreach ($folders as $folder)
 
+        $deleteFolderMemberships = [];
+
+        foreach ($folders as $folder)
         {
+            /* Remember the folders that were inheriting as we traversed the tree
+             */
+            if ($model->getInherit()) {
+                $deleteFolderMemberships[$folder->getId()] = $folder->getId();
+            }
+
             $folder->setInherit($model->getInherit());
             $this->save($folder);
-            $this->recurseInheritance($folder);
+
+            /* Collate all the inheriting folders that are deeper in the recursion
+             */
+            $deleteFolderMemberships += $this->recurseInheritance($folder);
         }
+
+        return $deleteFolderMemberships;
     }
 
     /**
