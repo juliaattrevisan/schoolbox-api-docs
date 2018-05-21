@@ -3,7 +3,7 @@
  # options: a collection of objects or an array
  # value: the object method that returns the value e.g. "id", or the array key containing the equivalent
  # label: the object method that returns the name e.g. "name", or the array key containing the equivalent
- # selectData: a set of key-value pairs corresponding to data vars
+ # selectData: a set of key-value pairs corresponding to data vars or element attributes
  #}
 <select {{ disabled }} name="{{ name }}"
     {% for dataVar, dataValue in selectData %}
