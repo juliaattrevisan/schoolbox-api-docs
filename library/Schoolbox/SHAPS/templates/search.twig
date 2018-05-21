@@ -22,13 +22,17 @@
                         multiple: true
                     });
 
+                    function getUserIdFromRegex(userID) {
+                        return userID.match(/\((\d*)\)/)[1];
+                    }
+
+                    var tableSelector = "#statusTable table";
+
                     $selectize = $selectize[0].selectize;
                     $selectize.on("item_add", function(value, $item) {
-                        var $itemText = $item.text();
-                        var userID = $itemText.match(/\((\d*)\)/)[1];
+                        var userID = getUserIdFromRegex($item.text())
 
                         $.get("/shaps/provisioning/"+userID, function(data) {
-                            var tableSelector = "#statusTable table";
 
                             if ($.isEmptyObject(data)) {
                                 // Not sure under what circumstances this could possibly happen with a selectize,
@@ -48,7 +52,7 @@
                                 if (user.provisioned) {
                                     statusMarkup = '<i class="icon-course-outline" title="Provisioned"></i>\n';
                                     checkboxMarkup = '<div class="checklist"><input id="provision-' + user.externalID + '" type="checkbox" disabled><label for="provision-' + user.externalID + '" title="Already provisioned"></label></div>';
-                                    trMarkup = '<tr>';
+                                    trMarkup = '<tr id="' + user.externalID + '">';
                                 } else {
                                     statusMarkup = '<i class="icon-close" title="Not Provisioned"></i>\n';
                                     checkboxMarkup = '<div class="checklist"><input id="provision-' + user.externalID + '" type="checkbox"><label for="provision-' + user.externalID + '"></label></div>';
@@ -70,11 +74,11 @@
                     });
 
                     $selectize.on("item_remove", function(index, $item) {
-                        // TODO extract the id from the value innerText
-                        // and use it to find the table row for that user and delete it from the DOM
-                        // You can get it using:
-                        // var $itemText = $item.text();
-                        // var userID = $itemText.match(/\((\d*)\)/)[1];
+//                        var userID = getUserIdFromRegex($item.text())
+//                        var userRow = tableSelector + " tr#" + userID;
+//                        $(userRow).remove();
+
+                        // Show empty state if the selectize is no longer searching for anyone
                         var selectizeEmpty = ($selectize.items.length < 1);
                         if (selectizeEmpty) {
                             $(".empty-state").show();
