@@ -31,6 +31,8 @@
                             var tableSelector = "#statusTable table";
 
                             if ($.isEmptyObject(data)) {
+                                // Not sure under what circumstances this could possibly happen with a selectize,
+                                // but accommodating it anyway
                                 $(".empty-state").show();
                                 $("#statusForm").addClass("hide");
                             } else {

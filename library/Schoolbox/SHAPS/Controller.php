@@ -46,7 +46,7 @@ class Controller extends Base
     private function getUsersFromHelp() {
         $client = new GuzzleClient();
 
-        $ip = "http://192.168.36.10";
+        $ip = "http://172.22.15.101";
 
         // Query params
         // TODO make this config stuff 'right' later
