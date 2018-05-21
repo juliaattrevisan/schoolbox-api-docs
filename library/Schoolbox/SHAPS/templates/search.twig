@@ -56,7 +56,7 @@
                                 } else {
                                     statusMarkup = '<i class="icon-close" title="Not Provisioned"></i>\n';
                                     checkboxMarkup = '<div class="checklist"><input id="provision-' + user.externalID + '" type="checkbox"><label for="provision-' + user.externalID + '"></label></div>';
-                                    trMarkup = '<tr class="highlight-warning">';
+                                    trMarkup = '<tr class="highlight-warning" id="' + user.externalID + '">';
                                 }
 
                                 var markup = trMarkup + "<td>" + statusMarkup + "</td>"
@@ -74,9 +74,10 @@
                     });
 
                     $selectize.on("item_remove", function(index, $item) {
-//                        var userID = getUserIdFromRegex($item.text())
-//                        var userRow = tableSelector + " tr#" + userID;
-//                        $(userRow).remove();
+                        // Remove users from search results when they are removed from the selectize
+                        var userID = getUserIdFromRegex($item.text())
+                        var userRow = tableSelector + " tr#" + userID;
+                        $(userRow).remove();
 
                         // Show empty state if the selectize is no longer searching for anyone
                         var selectizeEmpty = ($selectize.items.length < 1);
