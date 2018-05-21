@@ -1,3 +1,10 @@
+{#
+ # preselected: the value that should be preselected
+ # options: a collection of objects or an array
+ # value: the object method that returns the value e.g. "id", or the array key containing the equivalent
+ # label: the object method that returns the name e.g. "name", or the array key containing the equivalent
+ # selectData: a set of key-value pairs corresponding to data vars
+ #}
 <select {{ disabled }} name="{{ name }}"
     {% for dataVar, dataValue in selectData %}
         {{ dataVar }}="{{ dataValue }}"
@@ -5,9 +12,16 @@
 >
     <option disabled selected="selected" value="">Please Select</option>
 
-    {% for value, label in options %}
-    <option value="{{ value }}" {% if value == preselected %}selected="selected"{% endif %}>
-        {{ label }}
-    </option>
-    {% endfor %}
+{% for option in options %}
+    {% if option is iterable %}
+        <option value="{{ option[value] }}" {% if option[value] == preselected %}selected="selected"{% endif %}>
+            {{ option[label] }}
+        </option>
+    {% else %}
+        <option value="{{ attribute(option, value) }}" {% if attribute(option, value) == preselected %}selected="selected"{% endif %}>
+            {{ attribute(option, label) }}
+        </option>
+    {% endif %}
+{% endfor %}
 </select>
+

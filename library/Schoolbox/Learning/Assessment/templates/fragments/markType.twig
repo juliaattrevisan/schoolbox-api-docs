@@ -84,6 +84,18 @@
 </script>
 
 <div class="row">
+    <div class="small-12 columns">
+        {% include 'sub/select.twig' with {
+            options: allGradeSchemes,
+            preselected: assessment.gradeGroup.id ?: defaultGradeGroup,
+            value: 'id',
+            label: 'name'
+        }
+        %}
+    </div>
+</div>
+
+<div class="row">
     <div class="small-12 medium-6 columns">
         <label>
             Mark Type
@@ -108,14 +120,14 @@
         <div class="input-group">
             <select name="gradingScheme" id="gradingScheme">
                 {% if assessment.gradeGroup.id is not null  %}
-                    {% for scheme in allGradeSchemes %}
-                        <option value="{{ scheme.id }}"{% if scheme.id == assessment.gradeGroup.id %} selected{% endif %}>{{ scheme.name }}</option>
-                    {% endfor %}
+                    {% set preselected = assessment.gradeGroup.id %}
                 {% else %}
-                    {% for scheme in allGradeSchemes %}
-                        <option value="{{ scheme.id }}"{% if scheme.id == defaultGradeGroup %} selected{% endif %}>{{ scheme.name }}</option>
-                    {% endfor %}
+                    {% set preselected = defaultGradeGroup %}
                 {% endif %}
+
+                {% for scheme in allGradeSchemes %}
+                    <option value="{{ scheme.id }}"{% if scheme.id == preselected %} selected{% endif %}>{{ scheme.name }}</option>
+                {% endfor %}
             </select>
             <button type="button" class="button" data-reveal-id="gradeScale">Show {{ locale.grades.proper }} Scale</button>
         </div>
