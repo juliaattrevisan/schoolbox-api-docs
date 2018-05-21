@@ -108,9 +108,9 @@
         <div class="input-group">
             {% include 'sub/select.twig' with {
                 selectData: {
-                    id: 'gradingScheme',
-                    name: 'gradingScheme'
+                    id: 'gradingScheme'
                 },
+                name: 'gradingScheme',
                 options: allGradeSchemes,
                 preselected: assessment.gradeGroup.id ?: defaultGradeGroup,
                 value: 'id',
