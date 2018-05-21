@@ -118,7 +118,7 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
             'USER_EXTERNAL_ID' => $this->getExternalUserId(),
             'USER_FULLNAME' => $this->getUserName(),
             'USER_CAMPUS' => Scrub::text(' '.$this->getUserCampusName()),
-            'USER_YEAR' => $this->getUserYear() != '' ? Scrub::text('Year '.$this->getUserYear()) : '',
+            'USER_YEAR_LEVEL' => $this->getUserYear() != '' ? Scrub::text('Year '.$this->getUserYear()) : '',
             'USER_HOUSE' => $house != '' ? Scrub::text(', '.$this->getUserHouse()) : '' ,
         ));
     }
