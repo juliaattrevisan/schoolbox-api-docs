@@ -50,11 +50,11 @@
                                 var trMarkup = '';
 
                                 if (user.provisioned) {
-                                    statusMarkup = '<i class="icon-course-outline" title="Provisioned"></i>\n';
+                                    statusMarkup = '<i class="icon-course-outline" title="Provisioned"></i>';
                                     checkboxMarkup = '<div class="checklist"><input id="provision-' + user.externalID + '" type="checkbox" disabled><label for="provision-' + user.externalID + '" title="Already provisioned"></label></div>';
                                     trMarkup = '<tr id="' + user.externalID + '">';
                                 } else {
-                                    statusMarkup = '<i class="icon-close" title="Not Provisioned"></i>\n';
+                                    statusMarkup = '<p>Not Provisioned</p>';
                                     checkboxMarkup = '<div class="checklist"><input id="provision-' + user.externalID + '" type="checkbox"><label for="provision-' + user.externalID + '"></label></div>';
                                     trMarkup = '<tr class="highlight-warning" id="' + user.externalID + '">';
                                 }
