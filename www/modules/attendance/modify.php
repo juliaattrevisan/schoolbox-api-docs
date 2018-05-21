@@ -45,7 +45,7 @@ if (!$configLoader->get('external_attendance')) {
 }
 // Ensure correct parameter count
 if (count($this->arg) < 3) {
-    error(ErrorMapper::ERROR_CLASS_CODE_NOT_FOUND);
+    $this->error(ErrorMapper::ERROR_CLASS_CODE_DATE_PERIOD);
 }
 
 $this->setTitle('Student Attendance');
@@ -76,17 +76,20 @@ if (!$class) {
 }
 
 if (!strlen($this->arg[2])) {
-    error(ErrorMapper::ERROR_PERIOD_NUMBER_INVALID);
+    $this->error(ErrorMapper::ERROR_DATE_FORMAT);
 }
 
 if (!preg_match('/^\d+$/', $this->arg[3]) || $this->arg[3] < 0 || $this->arg[3] > 100) {
-    error(ErrorMapper::ERROR_ATTENDANCE_PAST);
+    $this->error(ErrorMapper::ERROR_PERIOD_NUMBER_INVALID);
 }
 
 // Selected date for which to deal with attendances check that you are allowed to edit something in a particular date range (You cannot edit anything
 // older than the previous week)
 
 $attendanceDate = new Alaress_Date_Format($this->arg[2], 'Y-m-d');
+if (!$attendanceDate->isValid()) {
+    $this->error(ErrorMapper::ERROR_DATE_FORMAT);
+}
 $attendanceDate->startOfDay();
 
 $now = Alaress_Date_Format::now();
@@ -96,11 +99,11 @@ $days = $configLoader->get('external_attendance_days');
 
 // If not today and not within days range
 if ($attendanceDate->diffInDays($now) != 0 && $attendanceDate->diffInDays($now) > $days) {
-    error(ErrorMapper::ERROR_ATTENDANCE_FUTURE);
+    $this->error(ErrorMapper::ERROR_ATTENDANCE_PAST);
 }
 
 if ($attendanceDate->gt($now)) {
-    error(ErrorMapper::ERROR_NOT_ENROLLED);
+    $this->error(ErrorMapper::ERROR_ATTENDANCE_FUTURE);
 }
 
 // Only teachers can mark attendance (we allow all staff, but synergetic may restrict this later aswell)
