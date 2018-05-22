@@ -61,7 +61,7 @@ class Module extends BaseModule
             new Rule\Any(
                 new Rule\All(
                     new Rule\IsTrue($this->getConfig()->get('academic_reports_available_to_students')),
-                    new Rule\IsUserOrParentOfUser($this->getExternalUser(), $this->getUserMapper(), 'studentId')
+                    new Rule\IsUser('studentId')
                 ),
                 new Rule\IsParentOfUser($this->getExternalUser(), $this->getUserMapper(), 'studentId')
             )
