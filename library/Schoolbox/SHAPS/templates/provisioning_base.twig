@@ -27,12 +27,14 @@
                         <tr>
                             <th>Status</th>
                             <th>User</th>
+                            {% if currentPageUrl != "/provisioned" %}
                             <th>
                                 <div class="checklist">
                                     <input id="select-all" type="checkbox">
                                     <label for="select-all" title="Select All">Provision?</label>
                                 </div>
                             </th>
+                            {% endif %}
                         </tr>
 
                         {% for user in allUsers %}
@@ -51,19 +53,22 @@
                             <td>
                                 {{ user.fullname }}
                             </td>
-                            <td>
-                                {% if user.externalID not in provisionedUserIDs %}
-                                    <div class="checklist">
-                                        <input id="provision-{{ user.externalID }}" type="checkbox" data-checkbox>
-                                        <label for="provision-{{ user.externalID }}"></label>
-                                    </div>
-                                {% else %}
-                                    <div class="checklist">
-                                        <input id="provision-{{ user.externalID }}" type="checkbox" disabled>
-                                        <label for="provision-{{ user.externalID }}" title="Already provisioned"></label>
-                                    </div>
-                                {% endif %}
-                            </td>
+
+                            {% if currentPageUrl != "/provisioned" %}
+                                <td>
+                                    {% if user.externalID not in provisionedUserIDs %}
+                                        <div class="checklist">
+                                            <input id="provision-{{ user.externalID }}" type="checkbox" data-checkbox>
+                                            <label for="provision-{{ user.externalID }}"></label>
+                                        </div>
+                                    {% else %}
+                                        <div class="checklist">
+                                            <input id="provision-{{ user.externalID }}" type="checkbox" disabled>
+                                            <label for="provision-{{ user.externalID }}" title="Already provisioned"></label>
+                                        </div>
+                                    {% endif %}
+                                </td>
+                            {% endif %}
                             </tr>
                         {% endfor %}
                     </table>
