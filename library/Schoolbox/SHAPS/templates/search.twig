@@ -23,7 +23,9 @@
                     });
 
                     function getUserIdFromRegex(userID) {
-                        return userID.match(/\((\d*)\)/)[1];
+                        // Match the last bit of text in brackets (as there is a small chance the user's role, for example, could contain brackets)
+                        // Can't match on end of string because there's a weird unicode character at the end.
+                        return userID.match(/\((.*)\)(?!\((.*)\))/)[1];
                     }
 
                     var tableSelector = "#statusTable table";
