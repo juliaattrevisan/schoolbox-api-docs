@@ -158,21 +158,8 @@ Data:
 
         submitButtons.click(function (e) {
             var form = $(this).closest('form'),
-                dialog = confirmDialog,
-                submit = form.find(':submit');
-
-            if (!allowSubmit()) {
-                // prevent submission without SOMETHING to submit
-                e.preventDefault();
-                emptyDialog.foundation('reveal', 'open');
-            }
-            else if (dialog.length) {
-                // wait! display confirm modal
-                e.preventDefault();
-
-                dialog.find('[data-accept]').click(function (event) {
-                    event.preventDefault();
-
+                submit = form.find(':submit'),
+                submitForm = function () {
                     submit.prop('disabled', true);
 
                     /* Disable draft autosaving while actually submitting
@@ -180,25 +167,41 @@ Data:
                     suspendAutosave();
 
                     form.submit();
-                });
+                };
 
-                dialog.find('[data-reject]').click(function (event) {
+            if (!allowSubmit()) {
+                // prevent submission without SOMETHING to submit
+                e.preventDefault();
+                emptyDialog.foundation('reveal', 'open');
+            }
+            else if (confirmDialog.length) {
+                // wait! display confirm modal
+                e.preventDefault();
+
+                var acceptButton   = confirmDialog.find('[data-accept]'),
+                    rejectButton   = confirmDialog.find('[data-reject]'),
+                    buttons        = $().add(acceptButton).add(rejectButton),
+                    enableButtons  = function () { buttons.removeClass('disabled'); },
+                    disableButtons = function () { buttons.addClass('disabled'); };
+
+                acceptButton.click(function (event) {
+                    disableButtons();
                     event.preventDefault();
-
-                    dialog.foundation('reveal', 'close');
+                    confirmDialog.foundation('reveal', 'close');
+                    submitForm();
                 });
 
+                rejectButton.click(function (event) {
+                    event.preventDefault();
+                    confirmDialog.foundation('reveal', 'close');
+                });
+
+                enableButtons();
                 confirmDialog.foundation('reveal').foundation('reveal', 'open');
             }
             else {
                 // checks pass: go for broke
-                submit.prop('disabled', true);
-
-                /* Disable draft autosaving while actually submitting
-                 */
-                suspendAutosave();
-
-                form.submit();
+                submitForm();
             }
         });
 
