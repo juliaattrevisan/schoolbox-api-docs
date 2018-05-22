@@ -16,7 +16,7 @@ Bugs that are 'ready' may be brought into Sprint at any time as part of BAU. Sto
     * If neither of the above are possible, a brief message explaining so included.
 * Acceptance Criteria
 * Priority is moved from Low if applicable
-* Ticket is reviewed by another team membe.
+* Ticket is reviewed by another team member.
 
 ## Story, Task
 * Acceptance Criteria

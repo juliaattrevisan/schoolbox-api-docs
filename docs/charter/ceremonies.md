@@ -65,7 +65,7 @@ See [workshops.md](workshops.md) for a list of the different types of workshops.
 Showcases are our chance to the whole company up to speed with where we're at with our development, and allow us to collaborate and get feedback on what we've got and where we're going.
 
 Showcases will generally take the following form:
-* The Product Owner will opening the meeting with a quick summary what our focus was for the Sprint, what we got "done" and what we didn't get "done".
+* The Product Owner will open the meeting with a quick summary what our focus was for the Sprint, what we got "done" and what we didn't get "done".
 * The Product Team will showcase their work. Generally the people that did the work will be asked to present their work, but sometimes the Scrum Master will present other people's work.
 * Feedback and questions will be asked by the audience at the end of each unit of work shown.
 * The Product Owner and Product Team will briefly talk about the plan for the next Sprint, giving the audience a chance to give feedback and ask questions around that.
