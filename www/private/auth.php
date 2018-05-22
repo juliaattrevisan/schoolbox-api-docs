@@ -1,0 +1,18 @@
+<?php
+require_once __DIR__ . '/../../conf/core/require.php';
+spl_autoload_call('Schoolbox\\Application\\BasicRequest');
+$kernel = new \Schoolbox\Application\BasicRequest\Kernel();
+
+if (!isset($_SESSION['user'])) {
+    http_response_code(401);
+    exit;
+}
+
+/** @var \Schoolbox\User $user */
+$user = $_SESSION['user'];
+
+if ($user->isSuperuser()) {
+    http_response_code(200);
+} else {
+    http_response_code(403);
+}
