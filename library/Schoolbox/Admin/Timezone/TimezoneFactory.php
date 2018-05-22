@@ -5,8 +5,7 @@ namespace Schoolbox\Admin\Timezone;
 use DateTimeZone;
 
 /**
- * Class Mapper
- *
+ * Class TimezoneFactory
  * @package Schoolbox\Admin
  */
 class TimezoneFactory
