@@ -524,7 +524,7 @@ class Controller extends Base
                             'info'         => $comment ?? '',
                         ];
                     }
-                } else {
+                } else if ($participant) {
                     $humanReadableMark = $participant->getHumanReadableMark(true);
                     if ($humanReadableMark) {
                         // Handle project mark, not available through feedback
