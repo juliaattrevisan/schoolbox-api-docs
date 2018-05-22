@@ -52,10 +52,19 @@ class Module extends BaseModule
             return $injectedValues;
         };
 
+        /* Also check the config option academic_reports_available_to_students to see if students can access
+         * anything; parents-of-student and all staff can always access these docs
+         */
         $permission = new Rule\Any(
             new Rule\IsSuperuser(),
             new Rule\HasRole(Role::STAFF),
-            new Rule\IsUserOrParentOfUser($this->getExternalUser(), $this->getUserMapper(), 'studentId')
+            new Rule\Any(
+                new Rule\All(
+                    new Rule\IsTrue($this->getConfig()->get('academic_reports_available_to_students')),
+                    new Rule\IsUserOrParentOfUser($this->getExternalUser(), $this->getUserMapper(), 'studentId')
+                ),
+                new Rule\IsParentOfUser($this->getExternalUser(), $this->getUserMapper(), 'studentId')
+            )
         );
 
         $this->register(
