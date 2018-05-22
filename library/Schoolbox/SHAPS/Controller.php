@@ -46,7 +46,7 @@ class Controller extends Base
     private function getUsersFromHelp() {
         $client = new GuzzleClient();
 
-        $url = "https://help.schoolbox.com.au";
+        $url = "https://help.dev.schoolbox.cloud";
 
         // Query params
         // TODO make this config stuff 'right' later
