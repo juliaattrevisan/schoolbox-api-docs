@@ -501,40 +501,41 @@ class Controller extends Base
 
                 $participant = $assessment->getParticipantIfExtant($viewee);
 
-                // Set scatter plot value
                 $graphScatterValue = [];
+                $graphInfoValue = [];
                 if ($participant) {
+                    // Set graph marker for student
                     $normalisedMark = $participant->getNormalisedMark(true);
                     if (null !== $normalisedMark) {
                         $graphScatterValue = (float)$normalisedMark;
                     }
+
+                    // Set graph info value for modal
+                    $feedback       = $participant->findAuthoritativeVisibleFeedback($this->getUser());
+                    if ($feedback) {
+                        $humanReadableMark = $feedback->getHumanReadableMark();
+                        $comment           = $feedback->getComment();
+                        if (!empty($humanReadableMark) || !empty($comment)) {
+                            $graphInfoValue = [
+                                'displayMark'  => $humanReadableMark,
+                                'gradientMark' => (int)($feedback->getNormalisedMark() / 10),
+                                'info'         => $comment ?? '',
+                            ];
+                        }
+                    } else {
+                        //Projects don't have feedback so just get from participant record
+                        $humanReadableMark = $participant->getHumanReadableMark(true);
+                        if ($humanReadableMark) {
+                            // Handle project mark, not available through feedback
+                            $graphInfoValue = [
+                                'displayMark'  => $humanReadableMark,
+                                'gradientMark' => (int)($participant->getNormalisedMark(true) / 10),
+                                'info'         => '',
+                            ];
+                        }
+                    }
                 }
                 $graphScatter[] = $graphScatterValue;
-
-                // Set graph info value
-                $graphInfoValue = [];
-                $feedback       = $participant ? $participant->findAuthoritativeVisibleFeedback($this->getUser()) : null;
-                if ($feedback) {
-                    $humanReadableMark = $feedback->getHumanReadableMark();
-                    $comment           = $feedback->getComment();
-                    if (!empty($humanReadableMark) || !empty($comment)) {
-                        $graphInfoValue = [
-                            'displayMark'  => $humanReadableMark,
-                            'gradientMark' => (int)($feedback->getNormalisedMark() / 10),
-                            'info'         => $comment ?? '',
-                        ];
-                    }
-                } else if ($participant) {
-                    $humanReadableMark = $participant->getHumanReadableMark(true);
-                    if ($humanReadableMark) {
-                        // Handle project mark, not available through feedback
-                        $graphInfoValue = [
-                            'displayMark'  => $humanReadableMark,
-                            'gradientMark' => (int)($participant->getNormalisedMark(true) / 10),
-                            'info'         => '',
-                        ];
-                    }
-                }
                 $graphInfo[] = $graphInfoValue;
 
                 // Set box plot values
