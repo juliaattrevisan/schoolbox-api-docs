@@ -148,27 +148,46 @@ Data:
             }
         });
 
+        // Empty submission dialog
         var emptyDialog = $('#empty-dialog');
         emptyDialog.on('click', '[data-interaction="close"]', function (e) {
             e.preventDefault();
             emptyDialog.foundation('reveal', 'close');
         });
 
-        var confirmDialog = $('#confirm-dialog');
+        // Confirm dialog (if it exists)
+        var confirmDialog  = $('#confirm-dialog'),
+            acceptButton   = confirmDialog.find('[data-accept]'),
+            rejectButton   = confirmDialog.find('[data-reject]'),
+            buttons        = $().add(acceptButton).add(rejectButton),
+            enableButtons  = function () { buttons.removeClass('disabled'); },
+            disableButtons = function () { buttons.addClass('disabled'); },
+            submitButton   = form.find(':submit'),
+            submitForm     = function () {
+                submitButton.prop('disabled', true);
 
+                /* Disable draft autosaving while actually submitting
+                 */
+                suspendAutosave();
+
+                form.submit();
+            };
+
+        // Confirm dialog accept/reject
+        acceptButton.click(function (event) {
+            disableButtons();
+            event.preventDefault();
+            confirmDialog.foundation('reveal', 'close');
+            submitForm();
+        });
+
+        rejectButton.click(function (event) {
+            event.preventDefault();
+            confirmDialog.foundation('reveal', 'close');
+        });
+
+        // Submit form
         submitButtons.click(function (e) {
-            var form = $(this).closest('form'),
-                submit = form.find(':submit'),
-                submitForm = function () {
-                    submit.prop('disabled', true);
-
-                    /* Disable draft autosaving while actually submitting
-                     */
-                    suspendAutosave();
-
-                    form.submit();
-                };
-
             if (!allowSubmit()) {
                 // prevent submission without SOMETHING to submit
                 e.preventDefault();
@@ -177,25 +196,6 @@ Data:
             else if (confirmDialog.length) {
                 // wait! display confirm modal
                 e.preventDefault();
-
-                var acceptButton   = confirmDialog.find('[data-accept]'),
-                    rejectButton   = confirmDialog.find('[data-reject]'),
-                    buttons        = $().add(acceptButton).add(rejectButton),
-                    enableButtons  = function () { buttons.removeClass('disabled'); },
-                    disableButtons = function () { buttons.addClass('disabled'); };
-
-                acceptButton.click(function (event) {
-                    disableButtons();
-                    event.preventDefault();
-                    confirmDialog.foundation('reveal', 'close');
-                    submitForm();
-                });
-
-                rejectButton.click(function (event) {
-                    event.preventDefault();
-                    confirmDialog.foundation('reveal', 'close');
-                });
-
                 enableButtons();
                 confirmDialog.foundation('reveal').foundation('reveal', 'open');
             }
