@@ -98,7 +98,7 @@ $now->endOfDay();
 $days = $configLoader->get('external_attendance_days');
 
 // If not today and not within days range
-if ($attendanceDate->diffInDays($now) != 0 && $attendanceDate->diffInDays($now) > $days) {
+if ($attendanceDate->diffInDays($now) != 0 && $attendanceDate->diffInDays($now, false) > $days) {
     $this->error(ErrorMapper::ERROR_ATTENDANCE_PAST);
 }
 
