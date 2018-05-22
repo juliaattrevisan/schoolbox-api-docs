@@ -21,6 +21,11 @@
             return merged;
         }
 
+        /* TODO we are reselecting the element every single time in order to keep up to date with any DOM changes
+        * (for example due to an ajax call adding/removing elements), however this is pretty horrible
+        * and we should consider other solutions such as adding a listener and reinitialising on DOM change.
+        */
+
         /** Select or deselect all checkboxes via the Select All checkbox. */
         function selectAllCheckboxes() {
             if ( $(config.parent).find(config.selector).is(':checked') ) {
