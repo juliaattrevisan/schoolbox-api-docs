@@ -24,7 +24,7 @@ class TimezoneFactory
      */
     public function findAll()
     {
-        $regions = array(
+        $regions = [
             'Africa' => DateTimeZone::AFRICA,
             'America' => DateTimeZone::AMERICA,
             'Antarctica' => DateTimeZone::ANTARCTICA,
@@ -34,7 +34,7 @@ class TimezoneFactory
             'Europe' => DateTimeZone::EUROPE,
             'Indian' => DateTimeZone::INDIAN,
             'Pacific' => DateTimeZone::PACIFIC
-        );
+        ];
 
         $options = [];
 
@@ -44,7 +44,7 @@ class TimezoneFactory
 
             foreach($zones as $timezone)
             {
-                $options [] = new Timezone($timezone);
+                $options[] = new Timezone($timezone);
             }
         }
 
