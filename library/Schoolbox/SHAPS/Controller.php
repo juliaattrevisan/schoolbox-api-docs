@@ -55,8 +55,7 @@ class Controller extends Base
 
         $now = new Alaress_Date_Format();
 
-        $tokenMapper = new SiteAccess\Mapper();
-        $privateKey = $tokenMapper->findById($schoolCode)->getAccessToken();
+        $privateKey = $config->get('schoolbox_help_access_token');
 
         $token = sha1(sprintf(':%s-%s-%s:', $now, $schoolCode, $privateKey));
 
