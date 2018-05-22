@@ -51,7 +51,7 @@ class Controller extends Base
         // Query params
         // TODO make this config stuff 'right' later
         $config = new \Schoolbox\Config\Loader();
-        $schoolCode = $config->get('site_school_code');
+        $schoolCode = strtolower($config->get('site_school_code'));
 
         $now = new Alaress_Date_Format();
 
