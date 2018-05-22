@@ -501,7 +501,7 @@ class Controller extends Base
 
                 $participant = $assessment->getParticipantIfExtant($viewee);
 
-                $graphScatterValue = [];
+                $graphScatterValue = null;
                 $graphInfoValue = [];
                 if ($participant) {
                     // Set graph marker for student
