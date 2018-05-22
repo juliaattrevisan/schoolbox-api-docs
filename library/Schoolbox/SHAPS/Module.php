@@ -55,6 +55,10 @@ class Module extends BaseModule
 
         $this->register('GET', '/provisioning/{userId}', 'searchUsers', $getPerms);
         $this->register('GET', '/provisioning/provisionedUsers', 'getProvisionedUsersJSON', $getPerms);
+
+
+        // Separated so as not to cause merge conflicts
+        $this->register('POST', '/provision', 'postProvision', $postPerms);
     }
 
     /**

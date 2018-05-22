@@ -273,4 +273,68 @@ class Controller extends Base
         }
     }
 
+
+    /**
+     * Post users to SHAPS
+     *
+     * @api POST /shaps/provision/
+     * @level 181
+     */
+    public function postProvision(): void
+    {
+        $userIds     = $this->request->post->get('userId');
+        $userPayload = [];
+        if (is_iterable($userIds)) {
+            foreach ($this->userMapper->findByColumn('id', $userIds) as $user) {
+                /** @var User $user */
+                if (!$user->getRole()->isStaff()) {
+                    continue;
+                }
+                $userPayload[] = [
+                    'id'        => $user->getId(),
+                    'email'     => $user->getEmail(),
+                    'title'     => $user->getTitle(),
+                    'firstname' => $user->getFirstname(),
+                    'lastname'  => $user->getLastname(),
+                ];
+            }
+        }
+
+        if (!empty($userPayload)) {
+            // Send each user to Help
+
+            $client = new GuzzleClient();
+
+            $url = "https://help.dev.schoolbox.cloud";
+
+            // Query params
+            // TODO make this config stuff 'right' later
+            $config = new \Schoolbox\Config\Loader();
+            $schoolCode = $config->get('site_school_code');
+
+            $now = new Alaress_Date_Format();
+
+            $privateKey = $config->get('schoolbox_help_access_token');
+
+            $token = sha1(sprintf(':%s-%s-%s:', $now, $schoolCode, $privateKey));
+
+            $timestamp = $now->getUnixTimeStamp();
+
+            $response = $client->request(
+                "post",
+                "${url}/api/course-participation/${schoolCode}/users", [
+                'query' => [
+                    'ts'    => $timestamp,
+                    'token' => $token,
+                    'user'  => $userPayload,
+                ]
+            ]);
+
+            // Do something with this?
+//            return json_decode($response->getBody()->getContents(), true);
+        }
+
+        // Once done: send back to list
+        $this->response->redirect->afterPost($this->router->generate('shaps.getAll'));
+    }
 }

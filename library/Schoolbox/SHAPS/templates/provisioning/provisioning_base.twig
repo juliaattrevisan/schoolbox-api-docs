@@ -22,7 +22,7 @@
         {% endblock %}
 
         <div id="statusForm" {% if allUsers | length == 0 %}class="hide"{% endif %}>
-            <form>
+            <form action="{{ routeLookup('shaps.postProvision') }}" method="post">
                 <section id="statusTable">
                     <table>
                         <tr>
@@ -55,12 +55,12 @@
                                 <td>
                                     {% if provisionedUsers[user.id] %}
                                         <div class="checklist">
-                                            <input id="provision-{{ user.id }}" type="checkbox" disabled>
+                                            <input id="provision-{{ user.id }}" name="userId[]" value="{{ user.id }}" type="checkbox" disabled>
                                             <label for="provision-{{ user.id }}" title="Already provisioned"></label>
                                         </div>
                                     {% else %}
                                         <div class="checklist">
-                                            <input id="provision-{{ user.id }}" type="checkbox" data-checkbox>
+                                            <input id="provision-{{ user.id }}" name="userId[]" value="{{ user.id }}" type="checkbox" data-checkbox>
                                             <label for="provision-{{ user.id }}"></label>
                                         </div>
                                     {% endif %}
