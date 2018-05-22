@@ -2,11 +2,30 @@
 
 Explaining all those weird terms we throw around everyday.
 
-## People
-Term | Definition
---- | --- 
-Dough | Douglas.
-MD | Matt Day. Also Doctor, Doctore, Doctorinox, Mr Matt.
+## The Dev Team
+Full Name | Most commonly known as | Nicknames | GitHub username
+--- | --- | --- | ---
+Steve Chan | Steve | | stevechan
+Matt Day | The Doctor / Matt / MD | Doctoray, Doctorinox, Mr Matt | emdienn
+Doug MacKenzie | Doug | Dough | dougmackenzie
+Sophia Marinou | Sophia | | sophiamarinou
+Andy Ryan | Andy | Airian-tech | andrewryantech
+Amri Sannang | Amri | | armatronic
+Matthew Schembri | Schem |  | xkem
+Tomoko Tanaka | Tomoko | Tomo | tallzeebaa
+
+### Other people
+Full Name | Most commonly known as | Nicknames | GitHub username
+--- | --- | --- | ---
+Stuart Mahon | Stuart | Stu | stuart-mahon
+James Leckie | James | Leck-tech | jleckie
+Sam Bailey | Sam | | thatsamguy
+Damian Sloane | Damo | | dddaaammmooo
+Josh Cauchi | Josh | Cauchi | joshcauchi
+Natalie Bakhtadze | Nat | | nataliebakhtadze
+
+
+
 
 ## Feature and Software Names
 Term | Definition
