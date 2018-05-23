@@ -180,9 +180,11 @@ class Controller extends Base
      */
     public function searchUsers($userID)
     {
+        // Selectize gives us the user's external ID
         $user = $this->userMapper->findByExternalId($userID);
+
         $provisionedUserIDs = $this->getProvisionedUserIDs();
-        $status = in_array($user->getExternalId(), $provisionedUserIDs);
+        $status = in_array($user->getId(), $provisionedUserIDs);
         $userJSON = [
             'name' => $user->getFullName(),
             'provisioned' => $status,
