@@ -1,4 +1,22 @@
-# Tick Processes    
+# Business as Usual (BAU)
+
+## BAU duties
+
+Possible jobs to undertake when performing BAU.
+
+### Bring Unconfirmeds to Ready
+
+ Go through tickets in Jira in the 'Unconfirmed' state, bringing them to Ready by confirming they exist, setting priority based on the rubric below, and curating them to meet our Definition of Ready.
+
+### Clean and curate old tickets
+
+Go through older tickets in Jira, confirming that they still exist, bringing them to Ready, closing duplicates.
+    
+### Sentry Duty
+
+### Coding fixes for Ready bugs
+
+Write fixes for Bugs in the Ready state, ideally ones that you have not curated yourself.    
 
 ## Priority Rubric
 
