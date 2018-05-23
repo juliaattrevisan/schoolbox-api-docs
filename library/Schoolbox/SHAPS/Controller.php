@@ -50,7 +50,7 @@ class Controller extends Base
     }
 
     /**
-     * Get a list of users provisioned on Help for a particular school.
+     * Get a list of users provisioned on Help for a particular school, in JSON format.
      *
      * @return mixed
      */
@@ -81,6 +81,21 @@ class Controller extends Base
         ]);
 
         return json_decode($response->getBody()->getContents(), true);
+    }
+
+    /**
+     * Helper method to get a list of user objects from the raw JSON Help API response.
+     *
+     * @return array
+     */
+    private function getProvisionedUsers() {
+        $usersFromHelp = $this->getUsersFromHelp();
+        $provisionedUsers = [];
+        foreach($usersFromHelp as $id => $username) {
+            $userObj = $this->userMapper->findById($id);
+            $provisionedUsers[] = $userObj;
+        }
+        return $provisionedUsers;
     }
 
     /**
@@ -121,19 +136,11 @@ class Controller extends Base
      */
     public function getProvisioned()
     {
-        $usersFromHelp = $this->getUsersFromHelp();
-        $provisionedUsers = [];
-        foreach($usersFromHelp as $externalID => $username) {
-            $userObj = $this->userMapper->findByExternalId($externalID);
-            $provisionedUsers[] = $userObj;
-        }
-        $provisionedUserIDs = $this->getProvisionedUserIDs();
-
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@shaps/provisioned.twig', [
-                    'allUsers' => $provisionedUsers,
-                    'provisionedUserIDs' => $provisionedUserIDs
+                    'allUsers' => $this->getProvisionedUsers(),
+                    'provisionedUserIDs' => $this->getProvisionedUserIDs()
             ])->setTitle('Provisioned Staff - Schoolbox Help Staff Provisioning')
         );
     }
@@ -145,14 +152,7 @@ class Controller extends Base
      */
     public function getUnprovisioned()
     {
-        $allStaff = $this->userMapper->findByColumn('g.group_type', 'staff')->sortBy("lastname", "asc");
-        $usersFromHelp = $this->getUsersFromHelp();
-        $provisionedUsers = [];
-        foreach($usersFromHelp as $externalID => $username) {
-            $userObj = $this->userMapper->findByExternalId($externalID);
-            $provisionedUsers[] = $userObj;
-        }
-        $unprovisionedStaff = $allStaff->diff(new Collection($provisionedUsers));
+        $unprovisionedStaff = $allStaff->diff(new Collection($this->getProvisionedUsers()));
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
