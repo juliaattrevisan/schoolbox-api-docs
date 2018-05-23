@@ -29,6 +29,9 @@ class Course implements ModuleConfigInterface
 
         $importModule = new Assessment\Course\Import\Module($kernel->getDependencyInjector());
         $importModule->init('/course/import');
+
+        $atlasModule = new Assessment\Course\Import\Atlas\Module($kernel->getDependencyInjector());
+        $atlasModule->init('/course/import/atlas');
     }
 
 } 
