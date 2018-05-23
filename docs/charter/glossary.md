@@ -118,4 +118,5 @@ STT | (n.) Steps To Test.
 STR | (n.) Steps to Reproduce (for a bug)
 Strike Team | A team of 2-3 developers assigned to work on a new feature.
 Tagging |
+Wireframe | 
 Zane | The teacher most completely tested with in the 'legacy' dataset - Zane Smith
