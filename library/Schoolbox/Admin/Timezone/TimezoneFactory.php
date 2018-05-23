@@ -3,6 +3,7 @@
 namespace Schoolbox\Admin\Timezone;
 
 use DateTimeZone;
+use Schoolbox\Column\Date;
 
 /**
  * Class TimezoneFactory
@@ -36,6 +37,8 @@ class TimezoneFactory
         ];
 
         $options = [];
+        $gmt = new DateTimeZone("Europe/London");
+        $gmtTimezone = new \DateTime("now", $gmt);
 
         foreach ($regions as $name => $mask)
         {
@@ -43,9 +46,20 @@ class TimezoneFactory
 
             foreach($zones as $timezone)
             {
-                $options[] = new Timezone($timezone);
+                $dateTimeZone = new DateTimeZone($timezone);
+                $offset = $dateTimeZone->getOffset($gmtTimezone);
+
+                $options[] = new Timezone($timezone, $offset);
             }
         }
+
+        usort($options,function ($a, $b){
+            $a = $a->getName();
+            $b = $b->getName();
+
+
+            return strcmp($a, $b);
+        });
 
         return $options;
     }
