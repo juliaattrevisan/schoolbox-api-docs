@@ -214,11 +214,7 @@ class External_Isams_Timetable implements External_TimetableInterface
      */
     public function getPeriodNumber(\Schoolbox\Campus $campus, $now = 0, $user = null)
     {
-        if ($now) {
-            $time = date("H:i", $now);
-        } else {
-            $time = date("H:i");
-        }
+        $time = date("U");
 
         $queryPeriod = "
            SELECT     StartTime as TimeFrom,
@@ -232,7 +228,7 @@ class External_Isams_Timetable implements External_TimetableInterface
 
         $period = $this->getConnector()->executeQuery($queryPeriod, [
             'time_val'  => $time,
-            'day_id'    => $this->getDayId($campus, $now)
+            'day_id'    => $this->getDayId($campus, $time)
         ])->fetch();
 
         if ($period) {
