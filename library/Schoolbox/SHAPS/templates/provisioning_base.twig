@@ -38,13 +38,13 @@
                         </tr>
 
                         {% for user in allUsers %}
-                            {% if user.externalID not in provisionedUserIDs %}
+                            {% if user.id not in provisionedUserIDs %}
                                 <tr class="highlight-warning">
                             {% else %}
                                 <tr>
                             {% endif %}
                             <td>
-                                {% if user.externalID in provisionedUserIDs %}
+                                {% if user.id in provisionedUserIDs %}
                                     <i class="icon-course-outline" title="Provisioned"></i>
                                 {% else %}
                                     <p>Not Provisioned</p>
@@ -56,15 +56,15 @@
 
                             {% block provisioned_column %}
                                 <td>
-                                    {% if user.externalID not in provisionedUserIDs %}
+                                    {% if user.id not in provisionedUserIDs %}
                                         <div class="checklist">
-                                            <input id="provision-{{ user.externalID }}" type="checkbox" data-checkbox>
-                                            <label for="provision-{{ user.externalID }}"></label>
+                                            <input id="provision-{{ user.id }}" type="checkbox" data-checkbox>
+                                            <label for="provision-{{ user.id }}"></label>
                                         </div>
                                     {% else %}
                                         <div class="checklist">
-                                            <input id="provision-{{ user.externalID }}" type="checkbox" disabled>
-                                            <label for="provision-{{ user.externalID }}" title="Already provisioned"></label>
+                                            <input id="provision-{{ user.id }}" type="checkbox" disabled>
+                                            <label for="provision-{{ user.id }}" title="Already provisioned"></label>
                                         </div>
                                     {% endif %}
                                 </td>
