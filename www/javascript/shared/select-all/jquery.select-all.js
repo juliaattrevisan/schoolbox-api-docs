@@ -33,8 +33,8 @@
             // inside the element we're initialising the plugin on.
             var derived = {
                 selector: $(element.selector).find(options.selector),
-                checkboxes: $(element.selector).find(options.checkboxes),
-                childCheckboxes: $(element.selector).find(options.childCheckboxes),
+                checkboxes: $(element.selector).find(options.checkboxes).not(":disabled"),
+                childCheckboxes: $(element.selector).find(options.childCheckboxes).not(":disabled"),
                 childCheckboxGroups: $(element.selector).find(options.childCheckboxGroups),
                 observerParent: options.observerParent ? (element.selector + " " + options.observerParent) : element.selector
             };
