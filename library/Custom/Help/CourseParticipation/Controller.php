@@ -345,10 +345,6 @@ class Controller extends Base
         $rq = $this->getRequest();
         $rs = $this->getResponse();
 
-        $timestamp = $rq->query->get('timestamp');
-        $token = $rq->query->get('token');
-        $headers = $rq->headers;
-
         if ($this->isInvalidAuth($rq->query, $schoolCode)) {
             return;
         }
