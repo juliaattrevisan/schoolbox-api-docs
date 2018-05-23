@@ -34,16 +34,12 @@ class Module extends BaseModule
      */
     protected function registerRoutes()
     {
-        /* Anyone can see the form
-         */
+        /* Only superusers are allowed to access SHAPS in any capacity */
         $getPerms = new Rule\All(
-            new Rule\IsLoggedIn()
+            new Rule\IsSuperuser()
         );
 
-        /* Only superusers can receive data from the form
-         */
         $postPerms = new Rule\All(
-            new Rule\IsLoggedIn(),
             new Rule\IsSuperuser()
         );
         
