@@ -130,10 +130,7 @@ class Handler
      */
     public function getUsersBySchool($schoolCode, $fuzzy = false)
     {
-        $column = "name";
-        $value = self::PARTICIPANT_ROLE_NAME;
-        $roleMapper = $this->getRoleMapper();
-        $roleId = $roleMapper->findOneByColumn($column, $value)->getId();
+        $roleId = $this->getRoleMapper()->findOneByColumn("name", self::PARTICIPANT_ROLE_NAME)->getId();
 
         // show the list of users for this school
         // filter to the list of users whose external IDs are prefixed with the given school code
