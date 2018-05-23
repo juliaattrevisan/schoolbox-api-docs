@@ -1,0 +1,13 @@
+tr.highlight-warning, tr:nth-of-type(even).highlight-warning {
+  background: scale-color($warning-color, $lightness: 75%);
+}
+
+#statusTable {
+  .checklist label {
+    margin: 0;
+  }
+
+  th label {
+    font-weight: bold;
+  }
+}
