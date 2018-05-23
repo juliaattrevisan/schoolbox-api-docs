@@ -46,9 +46,7 @@ class Module extends BaseModule
             new Rule\IsLoggedIn(),
             new Rule\IsSuperuser()
         );
-
-        $preloadUser = function ($params) { return $this->preloadUser($params); };
-
+        
         $this->register('GET', '/provisioning', 'getAll', $getPerms);
         $this->register('GET', '/provisioning/provisioned', 'getProvisioned', $getPerms);
         $this->register('GET', '/provisioning/unprovisioned', 'getUnprovisioned', $getPerms);
