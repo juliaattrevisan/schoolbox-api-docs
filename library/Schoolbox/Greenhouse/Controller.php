@@ -3,9 +3,7 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
-
 namespace Schoolbox\Greenhouse;
 
 use Alaress\Web\Controller\Base;
@@ -14,9 +12,25 @@ class Controller extends Base
 {
 
     /**
+     * @var \Schoolbox\Error\Mapper
+     */
+    private $errorMapper;
+
+    /**
+     * Controller constructor.
+     *
+     * @param \Schoolbox\Error\Mapper $errorMapper
+     */
+    public function __construct(\Schoolbox\Error\Mapper $errorMapper)
+    {
+        $this->errorMapper = $errorMapper;
+    }
+
+    /**
      * Load $templateName
      *
      * @param $templateName
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     public function getGreenhouse($templateName)
     {

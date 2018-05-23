@@ -3,19 +3,16 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
- 
 namespace Schoolbox\Greenhouse;
 
-use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
-use Aura\Di\ContainerInterface;
-use Aura\Router\Router;
-use Twig_Error_Loader;
 use Alaress\Twig\Loader\IChainLoader;
-use \Schoolbox\Permission\Access\UserAccess;
+use Aura\Di\Container;
+use Aura\Di\ContainerInterface;
+use InvalidArgumentException;
+use Twig_Error_Loader;
 
 class Module extends BaseModule
 {
@@ -23,48 +20,37 @@ class Module extends BaseModule
     protected $basename = 'greenhouse';
 
     /**
-     * Initializes any routes for this module, with a given base path.
+     * Hook method for setting up routes via self::register()
      *
-     * The base path for each route needs to match up to the name of the
-     * controller in $this->initControllers(), so if its base path is
-     * "user", there must be a controller in the DI container called
-     * "controller:user"
-     *
-     * @param Router $router
-     * @param string $basePath The base route for this module
+     * @return void
+     * @throws \InvalidArgumentException
      */
-    public function initRoutes(Router $router, $basePath)
+    protected function registerRoutes()
     {
-        $routes = [
-            'GET' => [
-                '/{templateName}' => 'getGreenhouse',
-            ],
-            'POST' => [
-            ]
-        ];
-
-        foreach ($routes['GET'] as $path => $alias) {
-            $this->addGetRoute($router, $alias, $basePath, $path);
-        }
-
-        foreach ($routes['POST'] as $path => $alias) {
-            $this->addPostRoute($router, $alias, $basePath, $path);
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function initRoutePermissions(Authorizer $authorizer) {
         $isAdministrator = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\IsSuperuser()
         );
 
-        /* Apply route permissions here as you add them to initRoutes()
-         * Note that if the perms change you need to log out/log in to refresh
-         */
-        $this->addRoutePermission($authorizer, 'getGreenhouse', $isAdministrator);
+        $this->register('GET', '/{templateName}', 'getGreenhouse', $isAdministrator, null);
+    }
+
+    /**
+     * Override with any steps required for a controller and its routes
+     *
+     * You should use this method to initialize any mappers or other objects
+     * which the controller needs, but are too heavy to initialize at module
+     * init time.
+     *
+     * @param Container|ContainerInterface $injector The dependency injection container.
+     * @throws InvalidArgumentException
+     */
+    protected function preInitControllerDependencies(ContainerInterface $injector)
+    {
+        /** @var Container $injector */
+        $injector->params[Controller::class] = [
+            'errorMapper' => $this->getMapperFactory()->getLazy(\Schoolbox\Error\Mapper::class)
+        ];
     }
 
     /**
@@ -83,9 +69,6 @@ class Module extends BaseModule
      */
     public function initControllers(ContainerInterface $injector)
     {
-        $injector->set(
-            'controller:'.$this->basename,
-            $injector->lazyNew(Controller::class)
-        );
+        $injector->set('controller:'.$this->basename, $injector->lazyNew(Controller::class));
     }
 }
