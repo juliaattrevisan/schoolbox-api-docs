@@ -1,5 +1,5 @@
 {% embed "@shaps/provisioning_base.twig" %}
-    {% set currentPageUrl = "/provisioned" %}
+    {% block pageProvisioned %}<li class="active">{% endblock %}
 
     {# No provision column on this page - hide them #}
     {% block provisioned_column_heading %}
