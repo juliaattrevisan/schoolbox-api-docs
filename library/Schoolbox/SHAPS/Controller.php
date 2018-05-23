@@ -155,10 +155,7 @@ class Controller extends Base
             'externalID' => $user->getExternalId(),
         ];
         header('Content-Type: text/json');
-        echo json_encode($userJSON);
-
-        /* Prevent rendering of template */
-        exit();
+        $this->getResponse()->content->set($this->buildJsonOutput($userJSON));
     }
 
 
