@@ -79,11 +79,7 @@ class Controller extends Base
 
     private function getProvisionedUserIDs() {
         $provisionedUsers = $this->getUsersFromHelp();
-        $provisionedUserIDs = [];
-        foreach($provisionedUsers as $externalID => $username) {
-            $provisionedUserIDs[] = $externalID;
-        }
-        return $provisionedUserIDs;
+        return array_keys($provisionedUsers);
     }
 
     public function getAll() {
