@@ -35,8 +35,14 @@ Usage: include 'sub/semesterSelector.twig
     <select id="context-selector-semester" title="Select a Term">
         <option disabled {% if currentTerm is empty %}selected{% endif %} label="Select a term">Select a term</option>
         {% for term in terms %}
-            <option data-href="{{ routeLookup(route, routeArgs|merge({termCode: term.code}) ) }}" value="{{ term.code }}" {% if currentTerm.code == term.code %}selected{% endif %}>
-                {#- dessicate -#}{{ term.title }} ({{ term.start.dateOnly }} - {{ term.displayFinish.dateOnly }}){#- dessicate -#}
+            <option data-href="{{ routeLookup(route, routeArgs|merge({termCode: term.code}) ) }}" value="{{ term.code }}" {% if currentTerm.code == term.code %}selected{% endif %}
+                    {% if termsWithResults| length == 0 or term not in termsWithResults %} disabled {% endif %}>
+                {#- dessicate -#}
+                    {{ term.title }} ({{ term.start.dateOnly }} - {{ term.displayFinish.dateOnly }})
+                    {% if termsWithResults| length == 0 or term not in termsWithResults %}
+                        (No results)
+                    {% endif %}
+                {#- dessicate -#}
             </option>
         {% endfor %}
     </select>

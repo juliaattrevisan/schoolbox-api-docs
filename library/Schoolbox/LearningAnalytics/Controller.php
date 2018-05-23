@@ -334,7 +334,8 @@ class Controller extends Base
         $codeMapper->applyCodesToCategories($courseImplementationFolders);
 
         /** @var Term[]|GenericCollection $navigableTerms */
-        $navigableTerms = $this->getNavigableTerms($courseSpecification, $classFolder);
+        $navigableTerms = TermMapper::getInstance()->findAll();
+        $termsWithResults = $this->getNavigableTerms($courseSpecification, $classFolder);
 
         $data = [
             'courseSpec'          => $courseSpecification,
@@ -367,6 +368,7 @@ class Controller extends Base
             'effort'              => [
                 'allEffort' => $analysis->getEffort(),
             ],
+            'termsWithResults'    => $termsWithResults,
         ];
 
         $this->getResponse()->content->set([
