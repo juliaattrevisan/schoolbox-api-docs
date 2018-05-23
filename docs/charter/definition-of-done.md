@@ -43,7 +43,6 @@
 
 ## Beta Release
 * Release notes are written
-* Testing ????
 * Build is packaged and passes all checks
 * Non Functional Requirements (installation, system, etc) have been documented.
 * Important Change Management tips have been documented and reviewed.

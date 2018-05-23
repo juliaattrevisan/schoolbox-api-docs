@@ -86,6 +86,7 @@ Badges |
 BAU | Business as Usual
 BGB | Big Green Button - refers to the "Merge" button on github
 Bling | (n.) Shortened form of "dollar symbol" $. e.g. "bling test" == $test
+Chaos Test | 
 Cherry Pick | 
 Copypasta | A copy/paste that duplicates code unnecessarily. (See: [DRY programming](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself))
 Copy pas | A copypasta missing something critical
@@ -95,6 +96,7 @@ Design Language | See https://en.wikipedia.org/wiki/Design_language
 Double Diamond | 
 Dr. Hodes | The user David Rhodes in the 'legacy' dataset.
 Embargo |
+Express Lane | A Kanban-style process/lane in Jira that is used for tasks and stories.
 Feature Freeze |
 Jypad | The iPad named after Jy because it was frequently found in, or around, his desk.
 Legacy Data | The dataset used for most development work in Vagrant, specified by `data_filename: "legacy.tar.gz"` in vagrant.yaml
