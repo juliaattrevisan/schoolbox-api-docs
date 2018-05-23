@@ -32,6 +32,11 @@ class Controller extends Base
     private $errorMapper;
 
     /**
+     * @var \Schoolbox\Config\Loader
+     */
+    private $config;
+
+    /**
      * Controller constructor.
      *
      * @param ErrorMapper $errorMapper
@@ -41,6 +46,7 @@ class Controller extends Base
     {
         $this->setErrorMapper($errorMapper);
         $this->setUserMapper($userMapper);
+        $this->config = new \Schoolbox\Config\Loader();
     }
 
     private function getUsersFromHelp() {
@@ -49,13 +55,11 @@ class Controller extends Base
         $url = "https://help.dev.schoolbox.cloud";
 
         // Query params
-        // TODO make this config stuff 'right' later
-        $config = new \Schoolbox\Config\Loader();
-        $schoolCode = strtolower($config->get('site_school_code'));
+        $schoolCode = strtolower($this->config->get('site_school_code'));
 
         $now = new Alaress_Date_Format();
 
-        $privateKey = $config->get('schoolbox_help_access_token');
+        $privateKey = $this->config->get('schoolbox_help_access_token');
 
         $token = sha1(sprintf(':%s-%s-%s:', $now, $schoolCode, $privateKey));
 
