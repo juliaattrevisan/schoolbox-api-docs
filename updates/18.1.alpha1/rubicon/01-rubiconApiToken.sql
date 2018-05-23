@@ -17,7 +17,7 @@ INSERT INTO `config` (
     2, -- textarea
     '',
     10, -- 3rd party services
-    'false',
     'true',
-    'true'
+    'false',
+    'false'
 );
