@@ -166,14 +166,19 @@ Data:
             submitButton   = form.find('[data-action-save]'),
             submittingText = 'Submitting... please wait',
             submitForm     = function () {
+                // Disable the submit button and add 'working' text
                 submitButton
                     .prop('disabled', true)
                     .val(submittingText);
 
-                /* Disable draft autosaving while actually submitting
-                 */
+                // Disable the form's inputs
+                form.find('input, select, textarea').prop('disabled', true);
+                CKEDITOR.instances['editor-body'].setReadOnly(true);
+
+                // Disable draft autosaving
                 suspendAutosave();
 
+                // Submit the form
                 form.submit();
             };
 
