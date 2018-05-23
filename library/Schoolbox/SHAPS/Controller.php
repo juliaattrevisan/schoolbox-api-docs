@@ -49,7 +49,8 @@ class Controller extends Base
         $this->config = new \Schoolbox\Config\Loader();
     }
 
-    private function getUsersFromHelp() {
+    private function getUsersFromHelp()
+    {
         $client = new GuzzleClient();
 
         $url = $this->config->get('schoolbox_help_url');
@@ -77,12 +78,14 @@ class Controller extends Base
         return json_decode($response->getBody()->getContents(), true);
     }
 
-    private function getProvisionedUserIDs() {
+    private function getProvisionedUserIDs()
+    {
         $provisionedUsers = $this->getUsersFromHelp();
         return array_keys($provisionedUsers);
     }
 
-    public function getAll() {
+    public function getAll()
+    {
         // All the staff in our Schoolbox instance
         $allStaff = $this->userMapper->findByColumn('g.group_type', 'staff')->sortBy("lastname", "asc");
         $provisionedUserIDs = $this->getProvisionedUserIDs();
@@ -96,7 +99,8 @@ class Controller extends Base
         );
     }
 
-    public function getProvisioned() {
+    public function getProvisioned()
+    {
         $usersFromHelp = $this->getUsersFromHelp();
         $provisionedUsers = [];
         foreach($usersFromHelp as $externalID => $username) {
@@ -114,7 +118,8 @@ class Controller extends Base
         );
     }
 
-    public function getUnprovisioned() {
+    public function getUnprovisioned()
+    {
         $allStaff = $this->userMapper->findByColumn('g.group_type', 'staff')->sortBy("lastname", "asc");
         $usersFromHelp = $this->getUsersFromHelp();
         $provisionedUsers = [];
@@ -132,7 +137,8 @@ class Controller extends Base
         );
     }
 
-    public function getSearch() {
+    public function getSearch()
+    {
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@shaps/search.twig', [
@@ -140,7 +146,8 @@ class Controller extends Base
         );
     }
 
-    public function searchUsers($userID) {
+    public function searchUsers($userID)
+    {
         $user = $this->userMapper->findByExternalId($userID);
         $provisionedUserIDs = $this->getProvisionedUserIDs();
         $status = in_array($user->getExternalId(), $provisionedUserIDs);
