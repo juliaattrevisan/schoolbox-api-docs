@@ -13,7 +13,7 @@
         setup();
 
         // Reinitialise on DOM change
-        var targetNode = document.querySelectorAll(config.parent + " tbody")[0];
+        var targetNode = document.querySelectorAll(config.observerParent)[0];
         var observerOptions = {childList: true, attributes: true};
         var observer = new MutationObserver(setup);
         observer.observe(targetNode, observerOptions);
@@ -25,6 +25,7 @@
                 checkboxes: '',
                 childCheckboxes: '',
                 childCheckboxGroups: '',
+                observerParent: '',
                 parent: element.selector
             };
 
@@ -34,7 +35,8 @@
                 selector: $(element.selector).find(options.selector),
                 checkboxes: $(element.selector).find(options.checkboxes),
                 childCheckboxes: $(element.selector).find(options.childCheckboxes),
-                childCheckboxGroups: $(element.selector).find(options.childCheckboxGroups)
+                childCheckboxGroups: $(element.selector).find(options.childCheckboxGroups),
+                observerParent: options.observerParent ? (element.selector + " " + options.observerParent) : element.selector
             };
 
             var merged = $.extend(defaults, options, derived);
