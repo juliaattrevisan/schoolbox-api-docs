@@ -91,6 +91,7 @@ Copypasta | A copy/paste that duplicates code unnecessarily. (See: [DRY programm
 Copy pas | A copypasta missing something critical
 Curation | The process of confirming, writing AC/STR, and generally cleaning up Jira tickets.
 Datums | (n. pl.) Somewhat informal rendition of "data".
+Design Language | See https://en.wikipedia.org/wiki/Design_language
 Double Diamond | 
 Dr. Hodes | The user David Rhodes in the 'legacy' dataset.
 Embargo |
