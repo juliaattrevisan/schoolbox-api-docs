@@ -156,34 +156,42 @@ Data:
         });
 
         // Confirm dialog (if it exists)
-        var confirmDialog  = $('#confirm-dialog'),
-            acceptButton   = confirmDialog.find('[data-accept]'),
-            rejectButton   = confirmDialog.find('[data-reject]'),
-            buttons        = $().add(acceptButton).add(rejectButton),
-            enableButtons  = function () { buttons.removeClass('disabled'); },
-            disableButtons = function () { buttons.addClass('disabled'); },
-            submitButton   = form.find(':submit'),
+        var $confirmDialog  = $('#confirm-dialog'),
+            $acceptButton   = $confirmDialog.find('[data-accept]'),
+            $rejectButton   = $confirmDialog.find('[data-reject]'),
+            $buttons        = $().add($acceptButton).add($rejectButton),
+            enableButtons  = function () { $buttons.removeClass('disabled'); },
+            disableButtons = function () { $buttons.addClass('disabled'); },
+            $submitButton   = form.find(':submit'),
+            submittingText = 'Submitting... please wait',
             submitForm     = function () {
-                submitButton.prop('disabled', true);
+                // Disable the submit button and add 'working' text
+                $submitButton
+                    .prop('disabled', true)
+                    .val(submittingText);
 
-                /* Disable draft autosaving while actually submitting
-                 */
+                // Disable the form's inputs
+                form.find('input, select, textarea').prop('disabled', true);
+                CKEDITOR.instances['editor-body'].setReadOnly(true);
+
+                // Disable draft autosaving
                 suspendAutosave();
 
+                // Submit the form
                 form.submit();
             };
 
         // Confirm dialog accept/reject
-        acceptButton.click(function (event) {
+        $acceptButton.click(function (event) {
             disableButtons();
+            $acceptButton.text(submittingText);
             event.preventDefault();
-            confirmDialog.foundation('reveal', 'close');
             submitForm();
         });
 
-        rejectButton.click(function (event) {
+        $rejectButton.click(function (event) {
             event.preventDefault();
-            confirmDialog.foundation('reveal', 'close');
+            $confirmDialog.foundation('reveal', 'close');
         });
 
         // Submit form
@@ -193,11 +201,11 @@ Data:
                 e.preventDefault();
                 emptyDialog.foundation('reveal', 'open');
             }
-            else if (confirmDialog.length) {
+            else if ($confirmDialog.length) {
                 // wait! display confirm modal
                 e.preventDefault();
                 enableButtons();
-                confirmDialog.foundation('reveal').foundation('reveal', 'open');
+                $confirmDialog.foundation('reveal').foundation('reveal', 'open');
             }
             else {
                 // checks pass: go for broke
