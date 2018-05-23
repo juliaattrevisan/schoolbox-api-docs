@@ -15,7 +15,6 @@ Data:
 <script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
 
 <script type="text/javascript">
-    "use strict";
     $(function () {
 
         var form          = $('#editor-form'),
@@ -157,17 +156,17 @@ Data:
         });
 
         // Confirm dialog (if it exists)
-        var confirmDialog  = $('#confirm-dialog'),
-            acceptButton   = confirmDialog.find('[data-accept]'),
-            rejectButton   = confirmDialog.find('[data-reject]'),
-            buttons        = $().add(acceptButton).add(rejectButton),
-            enableButtons  = function () { buttons.removeClass('disabled'); },
-            disableButtons = function () { buttons.addClass('disabled'); },
-            submitButton   = form.find('[data-action-save]'),
+        var $confirmDialog  = $('#confirm-dialog'),
+            $acceptButton   = $confirmDialog.find('[data-accept]'),
+            $rejectButton   = $confirmDialog.find('[data-reject]'),
+            $buttons        = $().add($acceptButton).add($rejectButton),
+            enableButtons  = function () { $buttons.removeClass('disabled'); },
+            disableButtons = function () { $buttons.addClass('disabled'); },
+            $submitButton   = form.find(':submit'),
             submittingText = 'Submitting... please wait',
             submitForm     = function () {
                 // Disable the submit button and add 'working' text
-                submitButton
+                $submitButton
                     .prop('disabled', true)
                     .val(submittingText);
 
@@ -183,16 +182,16 @@ Data:
             };
 
         // Confirm dialog accept/reject
-        acceptButton.click(function (event) {
+        $acceptButton.click(function (event) {
             disableButtons();
-            acceptButton.text(submittingText);
+            $acceptButton.text(submittingText);
             event.preventDefault();
             submitForm();
         });
 
-        rejectButton.click(function (event) {
+        $rejectButton.click(function (event) {
             event.preventDefault();
-            confirmDialog.foundation('reveal', 'close');
+            $confirmDialog.foundation('reveal', 'close');
         });
 
         // Submit form
@@ -202,11 +201,11 @@ Data:
                 e.preventDefault();
                 emptyDialog.foundation('reveal', 'open');
             }
-            else if (confirmDialog.length) {
+            else if ($confirmDialog.length) {
                 // wait! display confirm modal
                 e.preventDefault();
                 enableButtons();
-                confirmDialog.foundation('reveal').foundation('reveal', 'open');
+                $confirmDialog.foundation('reveal').foundation('reveal', 'open');
             }
             else {
                 // checks pass: go for broke
