@@ -15,6 +15,7 @@ Data:
 <script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
 
 <script type="text/javascript">
+    "use strict";
     $(function () {
 
         var form          = $('#editor-form'),
@@ -162,9 +163,12 @@ Data:
             buttons        = $().add(acceptButton).add(rejectButton),
             enableButtons  = function () { buttons.removeClass('disabled'); },
             disableButtons = function () { buttons.addClass('disabled'); },
-            submitButton   = form.find(':submit'),
+            submitButton   = form.find('[data-action-save]'),
+            submittingText = 'Submitting... please wait',
             submitForm     = function () {
-                submitButton.prop('disabled', true);
+                submitButton
+                    .prop('disabled', true)
+                    .val(submittingText);
 
                 /* Disable draft autosaving while actually submitting
                  */
@@ -176,8 +180,8 @@ Data:
         // Confirm dialog accept/reject
         acceptButton.click(function (event) {
             disableButtons();
+            acceptButton.text(submittingText);
             event.preventDefault();
-            confirmDialog.foundation('reveal', 'close');
             submitForm();
         });
 
