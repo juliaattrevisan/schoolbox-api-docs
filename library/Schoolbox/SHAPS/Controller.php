@@ -86,15 +86,11 @@ class Controller extends Base
     /**
      * Helper method to get a list of user objects from the raw JSON Help API response.
      *
-     * @return array
+     * @return Collection
      */
     private function getProvisionedUsers() {
-        $usersFromHelp = $this->getUsersFromHelp();
-        $provisionedUsers = [];
-        foreach($usersFromHelp as $id => $username) {
-            $userObj = $this->userMapper->findById($id);
-            $provisionedUsers[] = $userObj;
-        }
+        $provisionedUserIDs = $this->getProvisionedUserIDs();
+        $provisionedUsers = $this->userMapper->findByColumn('id', $provisionedUserIDs);
         return $provisionedUsers;
     }
 
@@ -152,7 +148,8 @@ class Controller extends Base
      */
     public function getUnprovisioned()
     {
-        $unprovisionedStaff = $allStaff->diff(new Collection($this->getProvisionedUsers()));
+        $allStaff = $this->userMapper->findByColumn('g.group_type', 'staff')->sortBy("lastname", "asc");
+        $unprovisionedStaff = $allStaff->diff($this->getProvisionedUsers());
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
