@@ -27,5 +27,5 @@ Bugs that are 'ready' may be brought into Sprint at any time as part of BAU. Sto
     * If it is, decomposition is required.
 
 ## Custom Work
-* Budget, cost centre (FP Job)
+* Budget, cost centre (Function Point Job)
 * Contact information for customer

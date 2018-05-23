@@ -1,6 +1,6 @@
 # Responsibilities
 
-* Align and understand with company vision and mission
+* Align with and understand company vision and mission
 * Maintain our definition of done
 * Commit to deliver what (and by when) we agree
 * Attend all ceremonies, on time and with any necessary preparations.
@@ -18,7 +18,7 @@
 ## Show respect at all times and appreciate others input and work
 * Treat others as you wish to be treated
 * Don’t talk over other people
-* Respect the shared workspace, noise, cleanyness, your actions impact others
+* Respect the shared workspace, noise, cleanliness, your actions impact others
 * Consider everyone is an individual with their own personal background and perspective
 
 ## Ensure that you are approachable and open
@@ -38,7 +38,7 @@
 ## Rules for communication
 * Communicate in method appropriate for the urgency (use online chat, email, github over personal interruption)
 * Ensure you respond to pending communication in a timely fashion 
-* Do not stay in DND for long periods of time
+* Do not stay in Do Not Disturb for long periods of time
 * Maintain your status in HipChat
 * Attend standup and actively engage
 
