@@ -52,7 +52,7 @@ class Controller extends Base
     private function getUsersFromHelp() {
         $client = new GuzzleClient();
 
-        $url = "https://help.dev.schoolbox.cloud";
+        $url = $this->config->get('schoolbox_help_url');
 
         // Query params
         $schoolCode = strtolower($this->config->get('site_school_code'));
