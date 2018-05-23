@@ -15,7 +15,7 @@
 
 * A different developer reviews the PRs, static reviewing the code, and functional testing the area. In most cases there will be changes required, in which case the reviewer leaves comments on GitHub, and pushes the ticket back to 'In Progress' in Jira.
 
-    If the reviewer finds issues with the PR (most cases) - that person will leave comments on the PR, and push the ticket back to 'In Progress' in Jira, for the original developer to fix up and put back into 'Awaiting Review'.
+   If the reviewer finds issues with the PR (most cases) - that person will leave comments on the PR, and push the ticket back to 'In Progress' in Jira, for the original developer to fix up and put back into 'Awaiting Review'.
     
     If/once the reviewer is happy with the PRs - the reviewer will merge the PRs into the code base, pushing the ticket into 'Awaiting QA' and setting the fix version (next point release for master and develop fixes, or the next major release for develop only fixes).
 
@@ -30,3 +30,15 @@
 * Minimum of 2 (ideally 3 different people) have seen the Ready state of a ticket before it starts being coded.
 * Every code change should have 3 different people approve it over the course of coding, reviewing and QA'ing.
 * In the case that the QA person finds a small problem, they are welcome to review the fix, and continue QA'ing.
+
+## Story & Task
+* Story or Task is created by anyone, it goes straight to 'Ready' in Jira.
+
+* The ticket is not worked on until either:
+    
+    1. The ticket is labelled `expresslane` by the SM or PO
+    2. The ticket goes through at least a Sprint Planning meeting, ideally a Refinement meeting prior to that.
+    
+* The coding process follows the same as above, except there is just one PR for develop (unless custom work or otherwise stated).
+
+## Epic
