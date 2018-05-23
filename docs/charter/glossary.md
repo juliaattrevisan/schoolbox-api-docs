@@ -34,7 +34,7 @@ Activity | (n.) In the context of the Schoolbox software - an assessment (Due Wo
 Attach Zone | (n.) An area where you can drag and drop files to upload them
 Aura (or mistakenly Aurora) |
 Breadcrumbs |
-CKE, CKEditor | (n.) An inline wysiwyg editor.
+CK, CKE, CKEditor | (n.) An inline wysiwyg editor.
 Connector | (n.) Software that connects to a SIS from which it draws data.
 Date Picker | (n.) A modal that allows you to specify dates from a calendar-esque view.
 Empty State | (n.) The grey block that displays when a component does not contain any content.
@@ -46,8 +46,8 @@ Fixtures | (n.)
 Foundation | The CSS framework we use - https://foundation.zurb.com/
 Full Calendar | (n.) 
 Grunt | (n.)
-Inline Grader | (n.) The place where you can mark assessments and annotate them inline
-Jellytot | (n.) The dropdown menu accessed by an icon that looks like 3 vertical dots. “Jellytot” comes from the Jelly Baby sweets, which someone thought resembled the icon.
+Inline Grader | (n.) A page in the LMS of Schoolbox that simultaneously shows a student's submission as well as the means to grade it
+Jellytot | (n.) Internal nomenclature for what the world calls a 'kebab' menu. The dropdown menu accessed by an icon that looks like 3 vertical dots. “Jellytot” comes from the Jelly Baby sweets, which someone thought resembled the icon.
 Jewellery | (n.) The colored blobs indicating an assessment's review/submission status
 Jube | (n.) See **Jewellery**.
 Kami | (n.) A third party service that allows annotations on documents via the user interface.
