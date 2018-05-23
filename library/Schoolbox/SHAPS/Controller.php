@@ -49,6 +49,11 @@ class Controller extends Base
         $this->config = new \Schoolbox\Config\Loader();
     }
 
+    /**
+     * Get a list of users provisioned on Help for a particular school.
+     *
+     * @return mixed
+     */
     private function getUsersFromHelp()
     {
         $client = new GuzzleClient();
@@ -78,12 +83,22 @@ class Controller extends Base
         return json_decode($response->getBody()->getContents(), true);
     }
 
+    /**
+     * Helper method to get a list of IDs of users provisioned on Help.
+     *
+     * @return array
+     */
     private function getProvisionedUserIDs()
     {
         $provisionedUsers = $this->getUsersFromHelp();
         return array_keys($provisionedUsers);
     }
 
+    /**
+     * Renders a list of all staff in your Schoolbox instance, and whether or not they are provisioned on Help.
+     *
+     * @api GET /shaps/provisioning
+     */
     public function getAll()
     {
         // All the staff in our Schoolbox instance
@@ -99,6 +114,11 @@ class Controller extends Base
         );
     }
 
+    /**
+     * Renders a list of staff in your Schoolbox instance that are also provisioned on Help.
+     *
+     * @api GET /shaps/provisioning/provisioned
+     */
     public function getProvisioned()
     {
         $usersFromHelp = $this->getUsersFromHelp();
@@ -118,6 +138,11 @@ class Controller extends Base
         );
     }
 
+    /**
+     * Renders a list of staff in your Schoolbox instance that are NOT provisioned on Help.
+     *
+     * @api GET /shaps/provisioning/unprovisioned
+     */
     public function getUnprovisioned()
     {
         $allStaff = $this->userMapper->findByColumn('g.group_type', 'staff')->sortBy("lastname", "asc");
@@ -137,6 +162,11 @@ class Controller extends Base
         );
     }
 
+    /**
+     * Renders a selectize for searching users in your Schoolbox instance to see if they are provisioned.
+     *
+     * @api GET /shaps/provisioning/search
+     */
     public function getSearch()
     {
         $this->getResponse()->content->set(
@@ -146,6 +176,11 @@ class Controller extends Base
         );
     }
 
+    /**
+     * Provides details about a user in response to an ajax request for that user's external ID.
+     *
+     * @api GET /shaps/provisioning/{userID}
+     */
     public function searchUsers($userID)
     {
         $user = $this->userMapper->findByExternalId($userID);
