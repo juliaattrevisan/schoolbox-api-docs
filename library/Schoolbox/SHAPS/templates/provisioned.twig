@@ -1,3 +1,10 @@
 {% embed "@shaps/provisioning_base.twig" %}
     {% set currentPageUrl = "/provisioned" %}
+
+    {# No provision column on this page - hide them #}
+    {% block provisioned_column_heading %}
+    {% endblock %}
+    {% block provisioned_column %}
+    {% endblock %}
+
 {% endembed %}
