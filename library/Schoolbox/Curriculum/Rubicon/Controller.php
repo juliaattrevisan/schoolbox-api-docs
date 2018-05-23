@@ -31,7 +31,7 @@ class Controller extends Base
                 '@curriculumRubicon/testPage.twig',
                 [
                     // Test token
-                    'token' => $this->getConfigLoader()->get('rubicon_api_token'),
+                    'token' => $this->getConfigLoader()->get('rubicon_atlas_api_token'),
                 ]
             )
         );
@@ -119,7 +119,7 @@ class Controller extends Base
         return new Client([
             'base_uri' => 'https://api.rubicon.com/api/',
             'headers'  => [
-                'Authorization' => 'Bearer ' . $this->getConfigLoader()->get('rubicon_api_token'),
+                'Authorization' => 'Bearer ' . $this->getConfigLoader()->get('rubicon_atlas_api_token'),
                 'Accept'        => 'application/json',
             ],
         ]);
