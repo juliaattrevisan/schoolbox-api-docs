@@ -154,35 +154,37 @@ class Module extends BaseModule
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 
+
     /**
      * Initializes controller classes into the dependency injector.
      *
      * @param ContainerInterface $injector The dependency injection container.
+     * @throws \InvalidArgumentException
      */
-    public function initControllers(ContainerInterface $injector)
+    public function initControllers(ContainerInterface $injector): void
     {
         $injector->set(
             'controller:'.$this->basename,
-            $injector->lazyNew(Controller::class, [], [
-                'setAssessmentMapperProxy'      => $injector->lazyGet('assessmentDataSource'),
-                'setCourseSpecificationMapper'  => $this->getMapperFactory()->getLazy(CourseSpecificationMapper::class),
-                'setCourseImplementationMapper' => $this->getMapperFactory()->getLazy(CourseImplementationMapper::class),
-                'setUnitSpecificationMapper'    => $this->getMapperFactory()->getLazy(UnitSpecificationMapper::class),
-                'setUnitImplementationMapper'   => $this->getMapperFactory()->getLazy(UnitImplementationMapper::class),
-                'setSubmissionBoxMapper'        => $this->getMapperFactory()->getLazy(SubmissionBoxMapper::class),
-                'setFolderMapper'               => $this->getMapperFactory()->getLazy(FolderMapper::class),
-                'setComponentDefinitionMapper'  => $this->getMapperFactory()->getLazy(Component_DefinitionMapper::class),
-                'setComponentInstanceMapper'    => $this->getMapperFactory()->getLazy(Component_InstanceMapper::class),
-                'setTaskMapper'                 => $this->getMapperFactory()->getLazy(TaskMapper::class),
-                'setHomepageConfigMapper'       => $this->getMapperFactory()->getLazy(HomepageConfigMapper::class),
-                'setHomepageTemplateMapper'     => $this->getMapperFactory()->getLazy(HomepageTemplateMapper::class),
-                'setAccess'                     => $this->getMapperFactory()->getLazy(Access::class),
-                'setCourseConfigMapper'         => $this->getMapperFactory()->getLazy(CourseConfigMapper::class),
-                'setUserAccessMapper'           => $this->getMapperFactory()->getLazy(UserAccessMapper::class),
-                'setUserMapper'                 => $this->getMapperFactory()->getLazy(UserMapper::class),
-                'setErrorMapper'                => $this->getMapperFactory()->getLazy(ErrorMapper::class),
-                'setAssessmentMapper'           => $this->getMapperFactory()->getLazy(AssessmentMapper::class),
-                'setCurriculumNodeMapper'       => $this->getMapperFactory()->getLazy(CurriculumNodeMapper::class),
+            $injector->lazyNew(Controller::class, [
+                'assessmentMapperProxy'      => $injector->lazyGet('assessmentDataSource'),
+                'courseSpecificationMapper'  => $this->getMapperFactory()->getLazy(CourseSpecificationMapper::class),
+                'courseImplementationMapper' => $this->getMapperFactory()->getLazy(CourseImplementationMapper::class),
+                'unitSpecificationMapper'    => $this->getMapperFactory()->getLazy(UnitSpecificationMapper::class),
+                'unitImplementationMapper'   => $this->getMapperFactory()->getLazy(UnitImplementationMapper::class),
+                'submissionBoxMapper'        => $this->getMapperFactory()->getLazy(SubmissionBoxMapper::class),
+                'folderMapper'               => $this->getMapperFactory()->getLazy(FolderMapper::class),
+                'componentDefinitionMapper'  => $this->getMapperFactory()->getLazy(Component_DefinitionMapper::class),
+                'componentInstanceMapper'    => $this->getMapperFactory()->getLazy(Component_InstanceMapper::class),
+                'taskMapper'                 => $this->getMapperFactory()->getLazy(TaskMapper::class),
+                'homepageConfigMapper'       => $this->getMapperFactory()->getLazy(HomepageConfigMapper::class),
+                'homepageTemplateMapper'     => $this->getMapperFactory()->getLazy(HomepageTemplateMapper::class),
+                'access'                     => $this->getMapperFactory()->getLazy(Access::class),
+                'courseConfigMapper'         => $this->getMapperFactory()->getLazy(CourseConfigMapper::class),
+                'userAccessMapper'           => $this->getMapperFactory()->getLazy(UserAccessMapper::class),
+                'userMapper'                 => $this->getMapperFactory()->getLazy(UserMapper::class),
+                'errorMapper'                => $this->getMapperFactory()->getLazy(ErrorMapper::class),
+                'assessmentMapper'           => $this->getMapperFactory()->getLazy(AssessmentMapper::class),
+                'curriculumNodeMapper'       => $this->getMapperFactory()->getLazy(CurriculumNodeMapper::class),
             ])
         );
     }
