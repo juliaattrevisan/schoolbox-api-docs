@@ -14,11 +14,9 @@ use Component_Instance;
 use Component_InstanceMapper;
 use RangeException;
 use Schoolbox\Application\Exception\NotFound;
-use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Course\Config\Mapper as CourseConfigMapper;
 use Schoolbox\Assessment\Course\Config\Model as CourseConfigModel;
 use Schoolbox\Collection;
-use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
@@ -27,7 +25,6 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecific
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
-use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\Deleted as MapperExceptionDeleted;
@@ -42,7 +39,6 @@ use Schoolbox\Resource\Folder\Controller as FolderController;
 use Schoolbox\Resource\HomepageConfigMapper;
 use Schoolbox\Resource\HomepageTemplate;
 use Schoolbox\Resource\HomepageTemplateMapper;
-use Schoolbox\UserMapper;
 use Schoolbox\Resource\Folder\IFolder as FolderInterface;
 use \Schoolbox\Learning\Assessment\Component\Homepage\Builder\Controller as CourseBuilderController;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
@@ -52,12 +48,6 @@ class Controller extends Base\Base
 {
     /** @var FolderMapper */
     private $folderMapper;
-
-    /** @var SubmissionBoxMapper */
-    private $submissionBoxMapper;
-
-    /** @var TaskMapper */
-    private $taskMapper;
 
     /**  @var CourseSpecificationMapper */
     private $courseSpecificationMapper;
@@ -70,9 +60,6 @@ class Controller extends Base\Base
 
     /** @var UnitImplementationMapper */
     private $unitImplementationMapper;
-
-    /** @var CourseImplementationMapper */
-    private $courseImplementationMapper;
 
     /** @var Component_DefinitionMapper */
     private $componentDefinitionMapper;
@@ -89,14 +76,8 @@ class Controller extends Base\Base
     /** @var CourseConfigMapper */
     private $courseConfigMapper;
 
-    /** @var ErrorMapper */
-    private $errorMapper;
-
     /** @var UserAccessMapper */
     private $userAccessMapper;
-
-    /** @var UserMapper */
-    private $userMapper;
 
     /** @var Access */
     private $access;
@@ -111,62 +92,47 @@ class Controller extends Base\Base
     /**
      * @param AssessmentMapperProxy      $assessmentMapperProxy
      * @param CourseSpecificationMapper  $courseSpecificationMapper
-     * @param CourseImplementationMapper $courseImplementationMapper
      * @param UnitSpecificationMapper    $unitSpecificationMapper
      * @param UnitImplementationMapper   $unitImplementationMapper
-     * @param SubmissionBoxMapper        $submissionBoxMapper
      * @param FolderMapper               $folderMapper
      * @param Component_DefinitionMapper $componentDefinitionMapper
      * @param Component_InstanceMapper   $componentInstanceMapper
-     * @param TaskMapper                 $taskMapper
      * @param HomepageConfigMapper       $homepageConfigMapper
      * @param HomepageTemplateMapper     $homepageTemplateMapper
      * @param Access                     $access
      * @param CourseConfigMapper         $courseConfigMapper
      * @param UserAccessMapper           $userAccessMapper
-     * @param UserMapper                 $userMapper
-     * @param ErrorMapper                $errorMapper
      * @param AssessmentMapper           $assessmentMapper
      * @param CurriculumNodeMapper       $curriculumNodeMapper
      */
     public function __construct(
         AssessmentMapperProxy $assessmentMapperProxy,
         CourseSpecificationMapper $courseSpecificationMapper,
-        CourseImplementationMapper $courseImplementationMapper,
         UnitSpecificationMapper $unitSpecificationMapper,
         UnitImplementationMapper $unitImplementationMapper,
-        SubmissionBoxMapper $submissionBoxMapper,
         FolderMapper $folderMapper,
         Component_DefinitionMapper $componentDefinitionMapper,
         Component_InstanceMapper $componentInstanceMapper,
-        TaskMapper $taskMapper,
         HomepageConfigMapper $homepageConfigMapper,
         HomepageTemplateMapper $homepageTemplateMapper,
         Access $access,
         CourseConfigMapper $courseConfigMapper,
         UserAccessMapper $userAccessMapper,
-        UserMapper $userMapper,
-        ErrorMapper $errorMapper,
         AssessmentMapper $assessmentMapper,
         CurriculumNodeMapper $curriculumNodeMapper
     ) {
         $this->assessmentMapperProxy      = $assessmentMapperProxy;
         $this->courseSpecificationMapper  = $courseSpecificationMapper;
-        $this->courseImplementationMapper = $courseImplementationMapper;
         $this->unitSpecificationMapper    = $unitSpecificationMapper;
         $this->unitImplementationMapper   = $unitImplementationMapper;
-        $this->submissionBoxMapper        = $submissionBoxMapper;
         $this->folderMapper               = $folderMapper;
         $this->componentDefinitionMapper  = $componentDefinitionMapper;
         $this->componentInstanceMapper    = $componentInstanceMapper;
-        $this->taskMapper                 = $taskMapper;
         $this->homepageConfigMapper       = $homepageConfigMapper;
         $this->homepageTemplateMapper     = $homepageTemplateMapper;
         $this->access                     = $access;
         $this->courseConfigMapper         = $courseConfigMapper;
         $this->userAccessMapper           = $userAccessMapper;
-        $this->userMapper                 = $userMapper;
-        $this->errorMapper                = $errorMapper;
         $this->assessmentMapper           = $assessmentMapper;
         $this->curriculumNodeMapper       = $curriculumNodeMapper;
     }
