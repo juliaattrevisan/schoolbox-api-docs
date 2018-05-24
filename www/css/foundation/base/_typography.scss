@@ -166,10 +166,13 @@ a{
 	    font-style: normal;
 	    font-weight: bold;
 	}
-	&.pipe:before{
-		content: '|';
-		margin: 0 0.35rem;
-		font-style: normal;
+	&.pipe {
+		margin: 0;
+		&:before{
+			content: '|';
+			margin: 0 .35rem;
+			font-style: normal;
+		}
 	}
 }
 

@@ -62,24 +62,20 @@
             <ul class="information-list">
                 {% for folder in folders %}
                     <li>
-                        <a href="{{ routeLookup('learningGrades.getGradesForSubject', {userId: student.id, subjectId: folder.id, termCode: term.code}) }}" class="link-row" title="View {{ locale.grades.properPlural }}">
-                        <div class="content medium-10 small-8 columns">
-                            <h3 class="no-margin">
-                                {{ folder.name }}
-                                <span class="meta">
-                                    {% for code in folder.codes %}
-                                        {{ code.code }}{% if not loop.last %},{% endif %}
-                                    {% endfor %}
-                                </span>
-                            </h3>
-                        </div>
-                        <div class="medium-2 small-4 columns no-pad">
-                            <div class="grade content">
-                                <span class="{{ urgency.marks(markbooks[folder.id].studentStatistics[student.id].meanNormalised) }}">
-                                    {{ markbooks[folder.id].studentStatistics[student.id].weightedMean }}
-                                </span>
+                        <a href="{{ routeLookup('learningGrades.getGradesForSubject', {userId: student.id, subjectId: folder.id, termCode: term.code}) }}" class="flex-grade link-row" title="View {{ locale.grades.properPlural }}">
+                            <div class="small-12 content sibling">
+                                <h3 class="no-margin">
+                                    {{ folder.name }}
+                                    <span class="meta">
+                                        {% for code in folder.codes %}
+                                            {{ code.code }}{% if not loop.last %},{% endif %}
+                                        {% endfor %}
+                                    </span>
+                                </h3>
                             </div>
-                        </div>
+                            <div class="grade {{ urgency.marks(markbooks[folder.id].studentStatistics[student.id].meanNormalised) }}-bg no-margin">
+                                <span>{{ markbooks[folder.id].studentStatistics[student.id].weightedMean }}</span>
+                            </div>
                         </a>
                     </li>
                     {% for teacher in folder.teachers %}

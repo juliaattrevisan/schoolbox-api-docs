@@ -368,7 +368,7 @@
                                 {% block contacts_alert %}
                                     {# Only staff may view contact alerts #}
                                     {% if showContactsAlert %}
-                                        <div class="alert-box alert icon-alert no-margin">
+                                        <div class="alert-box alert icon-alert">
                                             {{ message }}
                                         </div>
                                     {% endif %}
@@ -519,24 +519,7 @@
                                                 {% endif %}
                                             </li>
                                             {% endif %}
-
                                         {% endif %}
-
-                                        <li>
-                                            <div>
-                                                <div class="content small-12">
-                                                    {% if contact.StudentContactAddress1 or contact.StudentContactAddress2 or contact.StudentContactAddress3 %}
-                                                        <p>{{ contact.StudentContactAddress1 }}</p>
-                                                        <p>{{ contact.StudentContactAddress2 }}</p>
-                                                        <p>{{ contact.StudentContactAddress3 }}</p>
-                                                        <p>{{ contact.StudentContactSuburb }}, {{ contact.StudentContactState }} {{ contact.StudentContactPostCode }}</p>
-                                                    {% endif %}
-                                                    {% if contact.StudentContactPhoneActual %}
-                                                        <a class="href="tel:{{ contact.StudentContactPhoneActual }}" title="Call {{ contact.StudentContactPhoneActual }}"></a>
-                                                    {% endif %}
-                                                </div>
-                                            </div>
-                                        </li>
                                     {% endfor %}
                                 </ul>
                             </section>
@@ -700,30 +683,30 @@
                                         </div>
                                     </li>
                                     {% if group.owner %}
-                                        <li class="actions-small-1">
-                                            <div class="list-item">
-                                                <div class="compact card small-12">
-                                                    <a href="/search/user/{{ group.owner.id }}">
-                                                        <img src="/portrait.php?userId={{ group.owner.externalId }}&amp;size=square64" />
-                                                        <p>
-                                                            {{ group.owner.formatName }}
-                                                            <span class="pipe meta">
-                                                                {% if group.owner.positionTitle is empty %}
-                                                                    {{ group.owner.role.name }}
-                                                                {% else %}
-                                                                    {{ group.owner.positionTitle }}
-                                                                {% endif %}
-                                                            </span>
-                                                        </p>
-                                                    </a>
-                                                </div>
+                                    <li class="actions-small-1">
+                                        <div class="list-item">
+                                            <div class="compact card small-12">
+                                                <a href="/search/user/{{ group.owner.id }}">
+                                                    <img src="/portrait.php?userId={{ group.owner.externalId }}&amp;size=square64" />
+                                                    <p>
+                                                        {{ group.owner.formatName }}
+                                                        <span class="pipe meta">
+                                                            {% if group.owner.positionTitle is empty %}
+                                                                {{ group.owner.role.name }}
+                                                            {% else %}
+                                                                {{ group.owner.positionTitle }}
+                                                            {% endif %}
+                                                        </span>
+                                                    </p>
+                                                </a>
                                             </div>
-                                            <nav>
-                                                {% if not group.owner.email is empty %}
-                                                    <a class="icon-email" href="{{ session.mailhandle }}{{ group.owner.email }}" title="Email {{ group.owner.email }}"></a>
-                                                {% endif %}
-                                            </nav>
-                                        </li>
+                                        </div>
+                                        <nav>
+                                            {% if not group.owner.email is empty %}
+                                                <a class="icon-email" href="{{ session.mailhandle }}{{ group.owner.email }}" title="Email {{ group.owner.email }}"></a>
+                                            {% endif %}
+                                        </nav>
+                                    </li>
                                     {% endif %}
                                 {% endfor %}
                             </ul>
