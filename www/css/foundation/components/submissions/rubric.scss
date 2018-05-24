@@ -103,7 +103,6 @@ table.rb {
         height: 100px; /* yes, I used pixels. wanna fight about it? */
         min-width: 5rem;
         &:focus {
-            color: calc-text-color($container-bg);
             background-color: $container-bg;
         }
     }
@@ -112,8 +111,7 @@ table.rb {
         background-color: transparent;
         &:focus {
             border-color: $input-focus-border-color !important;
-            color: calc-text-color($container-bg);
-            background-color: $container-bg;
+            background-color: transparent;
         }
     }
     tr {
