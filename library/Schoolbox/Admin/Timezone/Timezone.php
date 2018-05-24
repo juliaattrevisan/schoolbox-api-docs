@@ -27,7 +27,9 @@ class Timezone
     public function __construct($timezone, $offset) {
         $this->timezone = $timezone;
         $this->offset = $offset;
-        $this->name = "(+".gmdate("H:i", $offset).") ".$timezone;
+
+        $offsetInHours = gmdate("H:i", $offset);
+        $this->name = "(+".$offsetInHours.") ".$timezone;
     }
 
     /**
