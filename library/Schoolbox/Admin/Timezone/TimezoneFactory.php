@@ -53,13 +53,7 @@ class TimezoneFactory
             $options->add(new Timezone($timezone, $offset));
         }
 
-        usort($options,function ($a, $b){
-            $a = $a->getName();
-            $b = $b->getName();
-
-
-            return strcmp($a, $b);
-        });
+        $options->sortBy('name', 'asc');
 
         return $options;
     }
