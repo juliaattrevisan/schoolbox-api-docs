@@ -29,7 +29,7 @@ class Timezone
         $this->offset = $offset;
 
         $offsetInHours = gmdate("H:i", $offset);
-        $this->name = "(+".$offsetInHours.") ".$timezone;
+        $this->name = "(GMT+".$offsetInHours.") ".$timezone;
     }
 
     /**

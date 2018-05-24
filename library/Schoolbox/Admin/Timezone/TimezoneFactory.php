@@ -35,7 +35,7 @@ class TimezoneFactory
             DateTimeZone::INDIAN |
             DateTimeZone::PACIFIC
         );
-        
+
         $options = [];
         $gmt = new DateTimeZone("Europe/London");
         $gmtTimezone = new \DateTime("now", $gmt);
