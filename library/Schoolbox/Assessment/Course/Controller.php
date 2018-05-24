@@ -774,7 +774,7 @@ class Controller extends Base\Base
      * @var int      $_GET['folder']             Folder.id for URL generation
      * @var int      $_GET['component']          ComponentInstance.id for URL generation
      */
-    public function courseList()
+    public function courseList(): void
     {
         $query = $this->getRequest()->query;
         $data = $this->getCourseData();
