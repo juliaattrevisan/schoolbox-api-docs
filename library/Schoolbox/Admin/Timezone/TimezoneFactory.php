@@ -24,33 +24,28 @@ class TimezoneFactory
      */
     public function findAll()
     {
-        $regions = [
-            'Africa' => DateTimeZone::AFRICA,
-            'America' => DateTimeZone::AMERICA,
-            'Antarctica' => DateTimeZone::ANTARCTICA,
-            'Asia' => DateTimeZone::ASIA,
-            'Atlantic' => DateTimeZone::ATLANTIC,
-            'Australia' => DateTimeZone::AUSTRALIA,
-            'Europe' => DateTimeZone::EUROPE,
-            'Indian' => DateTimeZone::INDIAN,
-            'Pacific' => DateTimeZone::PACIFIC
-        ];
-
+        $zones = DateTimeZone::listIdentifiers(
+            DateTimeZone::AFRICA |
+            DateTimeZone::AMERICA |
+            DateTimeZone::ANTARCTICA |
+            DateTimeZone::ASIA |
+            DateTimeZone::ATLANTIC |
+            DateTimeZone::AUSTRALIA |
+            DateTimeZone::EUROPE |
+            DateTimeZone::INDIAN |
+            DateTimeZone::PACIFIC
+        );
+        
         $options = [];
         $gmt = new DateTimeZone("Europe/London");
         $gmtTimezone = new \DateTime("now", $gmt);
 
-        foreach ($regions as $name => $mask)
+        foreach($zones as $timezone)
         {
-            $zones = DateTimeZone::listIdentifiers($mask);
+            $dateTimeZone = new DateTimeZone($timezone);
+            $offset = $dateTimeZone->getOffset($gmtTimezone);
 
-            foreach($zones as $timezone)
-            {
-                $dateTimeZone = new DateTimeZone($timezone);
-                $offset = $dateTimeZone->getOffset($gmtTimezone);
-
-                $options[] = new Timezone($timezone, $offset);
-            }
+            $options[] = new Timezone($timezone, $offset);
         }
 
         usort($options,function ($a, $b){
