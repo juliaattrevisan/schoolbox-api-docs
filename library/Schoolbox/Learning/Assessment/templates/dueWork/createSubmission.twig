@@ -170,8 +170,8 @@ Data:
                     .prop('disabled', true)
                     .val(submittingText);
 
-                // Disable the form's inputs
-                form.find('input, select, textarea').prop('disabled', true);
+                // Make the form's inputs readonly (NOT disabled)
+                form.find('input, select, textarea').prop('readonly', true);
                 CKEDITOR.instances['editor-body'].setReadOnly(true);
 
                 // Disable draft autosaving
