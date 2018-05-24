@@ -3,7 +3,7 @@
 namespace Schoolbox\Admin\Timezone;
 
 /**
- * Class Timesone
+ * Class Timezone
  * @package Schoolbox\Admin
  */
 class Timezone
