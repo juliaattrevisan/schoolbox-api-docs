@@ -17,7 +17,11 @@ class TimezoneFactory
      */
     public static function getInstance()
     {
-        return new TimezoneFactory();
+        static $inst = null;
+        if ($inst === null) {
+            $inst = new self;
+        }
+        return $inst;
     }
 
     /**
