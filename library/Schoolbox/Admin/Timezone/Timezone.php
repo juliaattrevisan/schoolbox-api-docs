@@ -14,6 +14,9 @@ class Timezone
     /** @var int $offset */
     protected $offset;
 
+    /** @var string $name */
+    protected $name;
+
 
     /**
      * Timezone constructor.
@@ -24,10 +27,11 @@ class Timezone
     public function __construct($timezone, $offset) {
         $this->timezone = $timezone;
         $this->offset = $offset;
+        $this->name = "(+".gmdate("H:i", $offset).") ".$timezone;
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getId()
     {
@@ -35,11 +39,11 @@ class Timezone
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getName()
     {
-        return "(+".gmdate("H:i", $this->offset).") ".$this->timezone;
+        return $this->name;
     }
 }
 
