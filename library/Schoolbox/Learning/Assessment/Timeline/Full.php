@@ -291,10 +291,12 @@ class Full
                 ) {
                     // Adding Kami documents for visibility.
                     // TODO: This needs to be reconsidered once the core solution for SA-6464 is provided.
-                    foreach ($currentResponse->getAllFiles() as $currentFile) {
-                        // If the status is other than "done", nobody has viewed it online.
-                        if ($currentFile->getKami() && $currentFile->getKami()->isStatusDone()) {
-                            $currentFeedback->getAllFiles()->add($currentFile);
+                    if ($currentResponse instanceof DueWork\Response\Model) {
+                        foreach ($currentResponse->getAllFiles() as $currentFile) {
+                            // If the status is other than "done", nobody has viewed it online.
+                            if ($currentFile->getKami() && $currentFile->getKami()->isStatusDone()) {
+                                $currentFeedback->getAllFiles()->add($currentFile);
+                            }
                         }
                     }
                     $this->getRecombined()->add($currentFeedback);
