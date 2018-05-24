@@ -21,8 +21,8 @@ class Timezone
     /**
      * Timezone constructor.
      *
-     * @param $timezone
-     * @param $offset
+     * @param string $timezone
+     * @param int $offset
      */
     public function __construct($timezone, $offset) {
         $this->timezone = $timezone;
