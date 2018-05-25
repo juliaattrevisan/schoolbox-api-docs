@@ -314,6 +314,8 @@ class Controller extends Base
             // CSRF defeating:
             // set HTTP_ORIGIN and HTTP_HOST to this school's URL
             $host     = $schoolCode . '.' . $this->getConfigLoader()->get('site_domain');
+            // This endpoint calls `\Custom\Help\CourseParticipation\Controller::postUserRegistrations`
+            // on host `config.schoolbox_help_url`.
             $response = $client->post(
                 "${url}/api/course-participation/${schoolCode}/users",
                 [
