@@ -309,12 +309,15 @@ class Controller extends Base
 
             $schoolCode = $this->getConfigLoader()->get('site_school_code');
 
-            $query = $this->generateQuery(Alaress_Date_Format::now(), ['user' => $userPayload]);
+            $query = $this->generateQuery(Alaress_Date_Format::now());
 
-            $response = $client->request(
-                "post",
-                "${url}/api/course-participation/${schoolCode}/users", [
-                'query' => $query
+            $response = $client->post(
+                "${url}/api/course-participation/${schoolCode}/users",
+                [
+                    'query'       => $query,
+                    'form_params' => ['user' => $userPayload],
+                ]
+            );
 
             // Do something with this?
 //            return json_decode($response->getBody()->getContents(), true);
