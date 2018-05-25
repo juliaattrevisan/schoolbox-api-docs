@@ -311,11 +311,18 @@ class Controller extends Base
 
             $query = $this->generateQuery(Alaress_Date_Format::now());
 
+            // CSRF defeating:
+            // set HTTP_ORIGIN and HTTP_HOST to this school's URL
+            $host     = $schoolCode . '.' . $this->getConfigLoader()->get('site_domain');
             $response = $client->post(
                 "${url}/api/course-participation/${schoolCode}/users",
                 [
                     'query'       => $query,
                     'form_params' => ['user' => $userPayload],
+                    'headers'     => [
+                        'Host'   => $host,
+                        'Origin' => $host,
+                    ],
                 ]
             );
 
