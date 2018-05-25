@@ -51,29 +51,7 @@ class Module extends BaseModule
         $this->register('GET', '/provisioning/{userID}', 'searchUsers', $getPerms);
         $this->register('POST', '/user', 'postExample', $postPerms, null);
     }
-
-    /**
-     * Preload a User instance
-     *
-     * @param array $params
-     * @return array
-     * @throws InvalidArgumentException
-     * @throws NotFound
-     */
-    private function preloadUser(array $params)
-    {
-        try {
-            $user = $this->getUserMapper()->findById($params['id']);
-        }
-        catch (MapperException $e) {
-            throw new NotFound();
-        }
-
-        return [
-            'user' => $user,
-        ];
-    }
-
+    
     /**
      * @inheritdoc
      */
