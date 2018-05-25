@@ -1,0 +1,31 @@
+{#
+Usage:
+    filterPanel: FilterPanel - a filter panel that can filter and AJAX in the report
+    courseSpec:  CourseSpec
+#}
+
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbs(['Courses', routeLookupIfAuthorized('course.courseList') ], ['Course Markbook']) }}
+
+<div class="row">
+    <div class="small-12 columns"><h1>Course Markbook - {{ courseSpec.title }}</h1></div>
+</div>
+
+{% set reportContentId = 'report_content' %}
+
+{% include filterPanel.template with {
+    contentId: reportContentId,
+    panel:     filterPanel,
+    quickload: true,
+} only %}
+
+
+<div id="{{ reportContentId }}" data-loaded="0">
+    <div class="small-12 island" data-placeholder>
+        <section class="content">
+            <img src="/images/foundation/preloader.gif" alt="preloader.gif" style="text-align:center; margin:auto; display:block;">
+        </section>
+    </div>
+</div>
+
+
