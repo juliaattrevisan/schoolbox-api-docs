@@ -312,6 +312,7 @@ class Handler
      */
     public function computeAccessToken(Alaress_Date_Format $timestamp, $schoolCode, $privateKey)
     {
+        // TODO factor this out so that into a general location so that it can be reused by the client
         return sha1(sprintf(':%s-%s-%s:', $timestamp, $schoolCode, $privateKey));
     }
 
