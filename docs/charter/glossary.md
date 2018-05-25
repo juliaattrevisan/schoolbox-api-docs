@@ -5,13 +5,14 @@ Explaining all those weird terms we throw around everyday.
 ## The Dev Team
 Full Name | Most commonly known as | Nicknames | GitHub username
 --- | --- | --- | ---
+Dorothea Baker | Dorothea | | d-baker
 Steve Chan | Steve | | stevechan
 Matt Day | The Doctor / Matt / MD | Doctoray, Doctorinox, Mr Matt | emdienn
 Doug MacKenzie | Doug | Dough | dougmackenzie
 Sophia Marinou | Sophia | | sophiamarinou
 Andy Ryan | Andy | Airian-tech | andrewryantech
 Amri Sannang | Amri | | armatronic
-Matthew Schembri | Schem |  | xkem
+Matthew Schembri | Schem / Schembri |  | xkem
 Tomoko Tanaka | Tomoko | Tomo | tallzeebaa
 
 ### Other people
