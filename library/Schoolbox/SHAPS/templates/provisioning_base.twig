@@ -75,7 +75,9 @@
                     </table>
                 </section>
 
-                <input type="submit" value="Save changes">
+                {% block submit_button %}
+                    <input type="submit" value="Save changes">
+                {% endblock %}
             </form>
         </div>
 
