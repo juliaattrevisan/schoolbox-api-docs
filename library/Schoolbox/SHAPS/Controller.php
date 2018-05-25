@@ -305,30 +305,16 @@ class Controller extends Base
 
             $client = new GuzzleClient();
 
-            $url = "https://help.dev.schoolbox.cloud";
+            $url = $this->getConfigLoader()->get('schoolbox_help_url');
 
-            // Query params
-            // TODO make this config stuff 'right' later
-            $config = new \Schoolbox\Config\Loader();
-            $schoolCode = $config->get('site_school_code');
+            $schoolCode = $this->getConfigLoader()->get('site_school_code');
 
-            $now = new Alaress_Date_Format();
-
-            $privateKey = $config->get('schoolbox_help_access_token');
-
-            $token = sha1(sprintf(':%s-%s-%s:', $now, $schoolCode, $privateKey));
-
-            $timestamp = $now->getUnixTimeStamp();
+            $query = $this->generateQuery(Alaress_Date_Format::now(), ['user' => $userPayload]);
 
             $response = $client->request(
                 "post",
                 "${url}/api/course-participation/${schoolCode}/users", [
-                'query' => [
-                    'ts'    => $timestamp,
-                    'token' => $token,
-                    'user'  => $userPayload,
-                ]
-            ]);
+                'query' => $query
 
             // Do something with this?
 //            return json_decode($response->getBody()->getContents(), true);
@@ -336,5 +322,46 @@ class Controller extends Base
 
         // Once done: send back to list
         $this->response->redirect->afterPost($this->router->generate('shaps.getAll'));
+    }
+
+
+    /**
+     * Generate query params for this school to connect to the Help API.
+     *
+     * @todo consider moving this to a helper class
+     *
+     * @param Alaress_Date_Format $time
+     * @param array               $extraParams
+     * @return array
+     */
+    private function generateQuery(Alaress_Date_Format $time, array $extraParams = []): array
+    {
+        $schoolCode = $this->getConfigLoader()->get('site_school_code');
+        $privateKey = $this->getConfigLoader()->get('schoolbox_help_access_token');
+
+        $query = [
+            'ts'    => $time->getUnixTimeStamp(),
+            'token' => $this->generateToken($time, $schoolCode, $privateKey),
+        ];
+        if (\is_array($extraParams)) {
+            $query = array_merge($query, $extraParams);
+        }
+        return $query;
+    }
+
+
+    /**
+     * Generates a token for authenticating this school with the Help API.
+     *
+     * @todo once \Custom\Help\CourseParticipation\Handler::computeAccessToken is moved, replace this with new method
+     *
+     * @param Alaress_Date_Format $time
+     * @param string              $schoolCode
+     * @param string              $privateKey
+     * @return string
+     */
+    private function generateToken(Alaress_Date_Format $time, string $schoolCode, string $privateKey): string
+    {
+        return sha1(sprintf(':%s-%s-%s:', $time, $schoolCode, $privateKey));
     }
 }
