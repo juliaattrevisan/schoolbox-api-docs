@@ -1,0 +1,100 @@
+{% embed "@shaps/provisioning_base.twig" %}
+    {% block pageSearch %}<li class="active">{% endblock %}
+
+    {% block page_specific_content %}
+
+        <section id="staffSearch" class="content">
+            <input id="users" name="userId" value="" placeholder="Search Staff" data-selectizeuser="" required="" tabindex="-1" style="display: none;" class="selectized" type="text">
+            <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+            <script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
+            <script type="text/javascript">
+                $(function() {
+
+                    $("#statusForm").addClass("hide");
+
+                    var $selectize = $('#users').selectizeSelector({
+                        ajax: {
+                            url:      '/ajax/user.php',
+                            type:     'GET',
+                            data:     {roleTypeID: 'staff', showCampus: true},
+                            dataType: 'json'
+                        },
+                        multiple: true
+                    });
+
+                    function getUserIdFromRegex(userID) {
+                        // Match the last bit of text in brackets (as there is a small chance the user's role, for example, could contain brackets)
+                        // Can't match on end of string because there's a weird unicode character at the end.
+                        return userID.match(/\((.*)\)(?!\((.*)\))/)[1];
+                    }
+
+                    var tableSelector = "#statusTable table";
+
+                    $selectize = $selectize[0].selectize;
+                    $selectize.on("item_add", function(value, $item) {
+                        var userID = getUserIdFromRegex($item.text())
+
+                        $.get("/shaps/provisioning/"+userID, function(data) {
+
+                            if ($.isEmptyObject(data)) {
+                                // Not sure under what circumstances this could possibly happen with a selectize,
+                                // but accommodating it anyway
+                                $(".empty-state").show();
+                                $("#statusForm").addClass("hide");
+                            } else {
+                                $(".empty-state").hide();
+                                $("#statusForm").removeClass("hide");
+                            }
+
+                            $(data).each(function(index, user) {
+                                var statusMarkup = '';
+                                var checkboxMarkup = '';
+                                var trMarkup = '';
+
+                                // Selectize uses external ID
+                                // So we have to use users' external IDs for the table row ID here, so that we can easily remove them from the DOM based on selectize events
+                                if (user.provisioned) {
+                                    statusMarkup = '<i class="icon-course-outline" title="Provisioned"></i>';
+                                    checkboxMarkup = '<div class="checklist"><input id="provision-' + user.id + '" type="checkbox" data-checkbox disabled><label for="provision-' + user.id + '" title="Already provisioned"></label></div>';
+                                    trMarkup = '<tr id="' + user.externalID + '">';
+                                } else {
+                                    statusMarkup = 'Not Provisioned';
+                                    checkboxMarkup = '<div class="checklist"><input id="provision-' + user.id + '" type="checkbox" data-checkbox><label for="provision-' + user.id + '"></label></div>';
+                                    trMarkup = '<tr class="highlight-warning" id="' + user.externalID + '">';
+                                }
+
+                                var markup = trMarkup + "<td>" + statusMarkup + "</td>"
+                                    + "<td>" + user.name + "</td>"
+                                    + "<td>" + checkboxMarkup + "</td></tr>";
+
+                                $(tableSelector).append(markup);
+                            });
+
+                        }, "json")
+                            .fail(function(xhr, status, error) {
+                                console.log(xhr);
+                                console.log(status + ": " + error);
+                            })
+                    });
+
+                    $selectize.on("item_remove", function(index, $item) {
+                        // Remove users from search results when they are removed from the selectize
+                        var userID = getUserIdFromRegex($item.text())
+                        var userRow = tableSelector + " tr#" + userID;
+                        $(userRow).remove();
+
+                        // Show empty state if the selectize is no longer searching for anyone
+                        var selectizeEmpty = ($selectize.items.length < 1);
+                        if (selectizeEmpty) {
+                            $(".empty-state").show();
+                            $("#statusForm").addClass("hide");
+                        }
+                    });
+
+                });
+            </script>
+        </section>
+
+    {% endblock %}
+    {% block emptyStateText %}Users you search for will appear here.{% endblock %}
+{% endembed %}

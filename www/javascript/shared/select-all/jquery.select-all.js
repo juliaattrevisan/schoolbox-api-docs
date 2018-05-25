@@ -2,9 +2,21 @@
     $.fn.selectAll = function (options) {
         options = options || {};
 
-        var config = init(options, this);
+        var config = {};
 
-        start();
+        function setup() {
+            config = init(options, $this);
+            start();
+        }
+
+        var $this = this;
+        setup();
+
+        // Reinitialise on DOM change
+        var targetNode = document.querySelectorAll(config.observerParent)[0];
+        var observerOptions = {childList: true, attributes: true};
+        var observer = new MutationObserver(setup);
+        observer.observe(targetNode, observerOptions);
 
         function init(options, element) {
             var defaults = {
@@ -12,16 +24,19 @@
                 selector: '',
                 checkboxes: '',
                 childCheckboxes: '',
-                childCheckboxGroups: ''
+                childCheckboxGroups: '',
+                observerParent: '',
+                parent: element.selector
             };
 
             // This is necessary because we only want to select things
             // inside the element we're initialising the plugin on.
             var derived = {
-                selector: element.find(options.selector),
-                checkboxes: element.find(options.checkboxes),
-                childCheckboxes: element.find(options.childCheckboxes),
-                childCheckboxGroups: element.find(options.childCheckboxGroups)
+                selector: $(element.selector).find(options.selector),
+                checkboxes: $(element.selector).find(options.checkboxes).not(":disabled"),
+                childCheckboxes: $(element.selector).find(options.childCheckboxes).not(":disabled"),
+                childCheckboxGroups: $(element.selector).find(options.childCheckboxGroups),
+                observerParent: options.observerParent ? (element.selector + " " + options.observerParent) : element.selector
             };
 
             var merged = $.extend(defaults, options, derived);
@@ -31,15 +46,15 @@
 
         /** Select or deselect all checkboxes via the Select All checkbox. */
         function selectAllCheckboxes() {
-            if (config.selector.is(':checked')) {
+            if ( config.selector.is(':checked') ) {
                 config.checkboxes.prop('checked', true);
             } else {
                 config.checkboxes.prop('checked', false);
             }
 
             // If we have nested checkboxes, affect them as well
-            if (config.childCheckboxes) {
-                if (config.selector.is(':checked')) {
+            if ( config.childCheckboxes ) {
+                if ( config.selector.is(':checked') ) {
                     config.childCheckboxGroups.show();
                     config.childCheckboxes.prop("checked", true);
                     config.checkboxes.siblings("label").find("i").removeClass("icon-click-view").addClass("icon-dropdown");
@@ -56,7 +71,7 @@
         function autoSelectAllCheckboxes() {
 
             // If all parent checkboxes are checked...
-            if (config.checkboxes.length === config.checkboxes.filter(":checked").length) {
+            if ((config.checkboxes.length === config.checkboxes.filter(":checked").length) && config.checkboxes.length) {
 
                 // If we have nested checkboxes, make sure they're all checked as well
                 if (config.childCheckboxes) {

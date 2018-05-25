@@ -3,6 +3,10 @@ This plugin implements select-all functionality for checkboxes.
 
 _Note: this plugin should be used for all future select-all needs. However, some places in the system currently use attacher.select-all.js instead. The "attacher" doesn't actually attach any plugins, it just implements the select-all feature itself from scratch. Please don't use it in future._
 
+Include the plugin with the following:
+```
+<script type="text/javascript" src="/javascript/shared/select-all/jquery.select-all.js"></script>
+```
 ## Basic usage
 
 ### Initialising
@@ -148,7 +152,16 @@ $(parentCheckboxSelector).each(function(index, parentCheckbox) {
     });
 })
 ```
- 
+
+### Mutation observer support
+If you are using AJAX to dynamically add or remove checkboxes from the DOM, any checkboxes added after page load will not be selected, unless the `observerParent` option is supplied.
+
+This option is a selector for the direct parent of whatever element is being added or removed from the DOM.
+
+For example, if you are adding or removing a `<div class='checkbox-container'>`, which contains your checkbox, you would pass the selector `div.checkbox-container`.
+
+Providing this selector allows the plugin to listen for changes to direct children of the `observerParent`, and update its copy of the DOM accordingly.
+
 ### Custom onChange function
 You can supply your own function which is run when the checkbox specified by `selector` is checked or unchecked. 
 ```
@@ -194,6 +207,12 @@ Trying to use `change` to modify the provided selection behavior may have...unex
         <td>string</td>
         <td>Yes</td>
         <td>Data attribute that will be present on all child checkbox container divs</td>
+    </tr>
+    <tr>
+        <td>observerParent</td>
+        <td>string</td>
+        <td>Yes</td>
+        <td>Selector for the direct parent of elements in the DOM that will be added or removed via AJAX</td>
     </tr>
     <tr>
         <td>change</td>

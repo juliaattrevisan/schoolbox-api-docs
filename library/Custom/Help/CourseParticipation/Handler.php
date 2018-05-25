@@ -26,6 +26,7 @@ use UnexpectedValueException;
 class Handler
 {
     const PARTICIPANT_ROLE_NAME = 'School Staff';
+
     const PARTICIPANT_CAMPUS    = 1;
     const REQUIRED_USER_FIELDS  = [
         'id', 'email', 'title', 'firstname', 'lastname'
@@ -129,7 +130,7 @@ class Handler
      */
     public function getUsersBySchool($schoolCode, $fuzzy = false)
     {
-        $roleId = $this->getRoleMapper()->findOneByColumn('name', self::PARTICIPANT_ROLE_NAME)->getId();
+        $roleId = $this->getRoleMapper()->findOneByColumn("name", self::PARTICIPANT_ROLE_NAME)->getId();
 
         // show the list of users for this school
         // filter to the list of users whose external IDs are prefixed with the given school code
@@ -311,6 +312,7 @@ class Handler
      */
     public function computeAccessToken(Alaress_Date_Format $timestamp, $schoolCode, $privateKey)
     {
+        // TODO factor this out so that into a general location so that it can be reused by the client
         return sha1(sprintf(':%s-%s-%s:', $timestamp, $schoolCode, $privateKey));
     }
 

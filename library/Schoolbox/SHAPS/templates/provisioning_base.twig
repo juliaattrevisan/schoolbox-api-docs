@@ -1,0 +1,99 @@
+<div class="row">
+    <div class="small-12 island">
+
+        <h1>Schoolbox Help Staff Provisioning</h1>
+
+        <ul class="sub-nav">
+            {% block pageAll %}<li>{% endblock %}
+                <a href="{{ routeLookup('shaps.getAll') }}">All</a>
+            </li>
+            {% block pageProvisioned %}<li>{% endblock %}
+                <a href="{{ routeLookup('shaps.getProvisioned') }}">Provisioned</a>
+            </li>
+            {% block pageUnprovisioned %}<li>{% endblock %}
+                <a href="{{ routeLookup('shaps.getUnprovisioned') }}">Not Provisioned</a>
+            </li>
+            {% block pageSearch %}<li>{% endblock %}
+                <a href="{{ routeLookup('shaps.getSearch') }}">Search</a>
+            </li>
+        </ul>
+
+        {% block page_specific_content %}
+        {% endblock %}
+
+        <div id="statusForm" {% if allUsers | length == 0 %}class="hide"{% endif %}>
+            <form>
+                <section id="statusTable">
+                    <table>
+                        <tr>
+                            <th>Status</th>
+                            <th>User</th>
+                            {% block provisioned_column_heading %}
+                            <th>
+                                <div class="checklist">
+                                    <input id="select-all" type="checkbox">
+                                    <label for="select-all" title="Select All">Provision?</label>
+                                </div>
+                            </th>
+                            {% endblock %}
+                        </tr>
+
+                        {% for user in allUsers %}
+                            {% if user.id not in provisionedUserIDs %}
+                                <tr class="highlight-warning">
+                            {% else %}
+                                <tr>
+                            {% endif %}
+                            <td>
+                                {% if user.id in provisionedUserIDs %}
+                                    <i class="icon-course-outline" title="Provisioned"></i>
+                                {% else %}
+                                    Not Provisioned
+                                {% endif %}
+                            </td>
+                            <td>
+                                {{ user.fullname }}
+                            </td>
+
+                            {% block provisioned_column %}
+                                <td>
+                                    {% if user.id not in provisionedUserIDs %}
+                                        <div class="checklist">
+                                            <input id="provision-{{ user.id }}" type="checkbox" data-checkbox>
+                                            <label for="provision-{{ user.id }}"></label>
+                                        </div>
+                                    {% else %}
+                                        <div class="checklist">
+                                            <input id="provision-{{ user.id }}" type="checkbox" disabled>
+                                            <label for="provision-{{ user.id }}" title="Already provisioned"></label>
+                                        </div>
+                                    {% endif %}
+                                </td>
+                            {% endblock %}
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </section>
+
+                {% block submit_button %}
+                    <input type="submit" value="Save changes">
+                {% endblock %}
+            </form>
+        </div>
+
+        <div class="empty-state{% if allUsers | length > 0 %} hide{% endif %}">
+            <i class="icon-staff-students"></i>
+            <p>{% block emptyStateText %}No matching users found.{% endblock %}</p>
+        </div>
+
+    </div>
+</div>
+
+<script type="text/javascript" src="/javascript/shared/select-all/jquery.select-all.js"></script>
+<script>
+    $("#statusForm").selectAll({
+        selector: "#select-all",
+        checkboxes: "[data-checkbox]",
+        observerParent: "tbody"
+    });
+</script>
