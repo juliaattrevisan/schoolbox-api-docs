@@ -97,6 +97,7 @@ Dr. Hodes | The user David Rhodes in the 'legacy' dataset.
 Embargo | Prevention of merging PRs in preparation for a release going out.
 Express Lane | A Kanban-style process/lane in Jira that is used for tasks and stories.
 Feature Freeze |
+Hat | The role in the team currently being taken on by a member of the team. See [hats.md](hats.md)/
 Jypad | The iPad named after Jy because it was frequently found in, or around, his desk.
 Legacy Data | The dataset used for most development work in Vagrant, specified by `data_filename: "legacy.tar.gz"` in vagrant.yaml
 Park | Defer a discussion to be resumed later

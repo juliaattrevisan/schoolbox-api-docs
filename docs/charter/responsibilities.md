@@ -5,7 +5,7 @@
 * Commit to deliver what (and by when) we agree
 * Attend all ceremonies, on time and with any necessary preparations.
 * Ensure sprint runs smoothly by grooming backlog ensuring appropriate preparations have been conducted before work development commences
-* Interacting with customers to assist with diagnosis and delivery
+* Interacting with customers and other teams in the company to assist with diagnosis and delivery
 * Conduct discovery and definition with a PM or PO
 
 # Team Cohesion

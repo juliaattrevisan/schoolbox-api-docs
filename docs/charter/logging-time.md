@@ -20,7 +20,7 @@ Any coding, reviewing, or QA'ing a custom work ticket | Dev | The job that is li
 Any work on an Activity | Spike | Development on the next major release
 Coding, reviewing, or QA'ing a Story or Task in the Sprint Forecast Lane | Dev | Development on the next major release
 Coding, reviewing, or QA'ing a Story or Task in the Express Lane | BAU | Development on the next major release
-Backlog grooming | Spike | Development on the current release
+Backlog grooming | Dev | Development on the current release
 Coding, reviewing or QA'ing master bugs | BAU | Development on the current release
 Coding, reviewing or QA'ing develop bugs | BAU | Development on the next major release
 Preparing any meetings | Management | Development on the next major release
