@@ -54,3 +54,16 @@
 * Under Development: Exactly what it sounds like.
 * MVP Delivered: Minimum Viable Product has been delivered. Resolution should be MVP.
 * Closed: Resolution should be Done.
+
+# Development processes
+## Review
+- Statically review code for logical correctness, efficiency, adherence to best practices and conventions, readability, etc.
+- Consult with the author of the code, if necessary, to gain understanding of the changes made.
+- Functionally test all parts of the system that have been changed, and ensure they meet the Acceptance Criteria defined on the ticket.
+- Move the ticket back to "In Progress" if any problems are found, and leave comments on the PR outlining what needs to be changed.
+
+## QA
+- Check the `files` tab on the PR to see what parts of the system were changed.
+- Functionally test these parts of the system to ensure:
+    1. That they fulfill the Acceptance Criteria defined on the ticket
+    2. That all features available in these parts of the system otherwise behave the same as before.
