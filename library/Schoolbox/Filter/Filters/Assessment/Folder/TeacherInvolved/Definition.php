@@ -29,7 +29,7 @@ class Definition extends FolderFilter\Definition
     /**
      * @inheritdoc
      */
-    public static function getPages()
+    public static function getPages(): array
     {
         return [
             Page\Model::PAGE_PENDING_ASSESSMENTS,

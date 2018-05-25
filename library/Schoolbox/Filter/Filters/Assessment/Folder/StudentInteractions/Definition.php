@@ -31,7 +31,7 @@ class Definition extends FolderFilter\Definition
     /**
      * @inheritdoc
      */
-    public static function getPages()
+    public static function getPages(): array
     {
         return [
 //            Option\Model::PAGE_GRADES,

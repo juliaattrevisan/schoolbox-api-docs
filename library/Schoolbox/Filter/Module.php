@@ -36,7 +36,7 @@ class Module extends AlaressModule
      * @throws ServiceNotFound
      * @throws \ReflectionException If the filter definition class cannot be found in code base
      */
-    protected function registerRoutes()
+    protected function registerRoutes(): void
     {
         $isSuper = new IsSuperuser();
 
@@ -44,6 +44,7 @@ class Module extends AlaressModule
             switch ($params['page']) {
                 case Page\Model::PAGE_PENDING_ASSESSMENTS:
                 case Page\Model::PAGE_MARK_BOOK:
+                case Page\Model::PAGE_COURSE_MARK_BOOK:
                 case Page\Model::PAGE_GRADES:
                     return ['factoryFactory' => new Filters\Assessment\FactoryFactory($this->getMapperFactory())];
                 // Other entity types can have their factory factories registered here

@@ -23,6 +23,8 @@
                         {% set pageName = 'Grades' %}
                     {% elseif PAGE_MARK_BOOK == page %}
                         {% set pageName = 'Markbook' %}
+                    {% elseif PAGE_COURSE_MARK_BOOK == page %}
+                        {% set pageName = 'Course Markbook' %}
                     {% elseif PAGE_PENDING_ASSESSMENTS == page %}
                         {% set pageName = 'Pending ' ~ locale.assessment.proper %}
                     {% else %}

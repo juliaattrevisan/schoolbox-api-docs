@@ -55,7 +55,7 @@ class Controller extends BaseController
      * @level 17.0
      * @throws ServiceNotFound
      */
-    public function getIndex()
+    public function getIndex(): void
     {
         $filtersPerPage = $this->findAvailableFiltersPerPage();
 
@@ -66,8 +66,9 @@ class Controller extends BaseController
             'PAGE_PENDING_ASSESSMENTS' => Page\Model::PAGE_PENDING_ASSESSMENTS,
             'PAGE_GRADES'              => Page\Model::PAGE_GRADES,
             'PAGE_MARK_BOOK'           => Page\Model::PAGE_MARK_BOOK,
+            'PAGE_COURSE_MARK_BOOK'    => Page\Model::PAGE_COURSE_MARK_BOOK,
             'ENTITY_ASSESSMENTS'       => Assessment\Mapper::class,
-            'pageCurrent' => basename($this->getRequest()->query->get('page')),
+            'pageCurrent'              => basename($this->getRequest()->query->get('page')),
         ])->setTitle('Filterable pages'));
     }
 
@@ -85,7 +86,7 @@ class Controller extends BaseController
      * @throws \Schoolbox\Mapper\DefinitionException If join $name isn't on this mapper
      * @throws \Schoolbox\Mapper\Exception If an alias is incorrect
      */
-    public function getPageSettings(IFactoryFactory $factoryFactory, $page)
+    public function getPageSettings(IFactoryFactory $factoryFactory, string $page): void
     {
         $enabledOnly = false;
         $definitions = $factoryFactory->buildCurrentState($page, $enabledOnly);
@@ -105,6 +106,7 @@ class Controller extends BaseController
             'PAGE_PENDING_ASSESSMENTS' => Page\Model::PAGE_PENDING_ASSESSMENTS,
             'PAGE_GRADES'              => Page\Model::PAGE_GRADES,
             'PAGE_MARK_BOOK'           => Page\Model::PAGE_MARK_BOOK,
+            'PAGE_COURSE_MARK_BOOK'    => Page\Model::PAGE_COURSE_MARK_BOOK,
             'ENTITY_ASSESSMENTS'       => Assessment\Mapper::class,
         ])->setTitle(ucfirst($page) . ' filters'));
     }
@@ -207,12 +209,12 @@ class Controller extends BaseController
     /**
      * @return GenericCollection[]|Model[][] $visibleFilters Indexed by page, then filterDefinition.name
      */
-    private function findAvailableFiltersPerPage()
+    private function findAvailableFiltersPerPage(): array
     {
         /** @var GenericCollection|Model[] $visibleFilters */
         $visibleFilters = $this->filterMapper->findAll()->filter(function (Model $instance) {
             $definitionClass = $instance->getClass();
-            return count($definitionClass::getPages()) > 0;
+            return \count($definitionClass::getPages()) > 0;
         });
 
         // Group filters by which pages they appear on
