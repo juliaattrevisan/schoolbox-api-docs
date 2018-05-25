@@ -42,3 +42,15 @@
 * The coding process follows the same as above, except there is just one PR for develop (unless custom work or otherwise stated).
 
 ## Epic
+* Represents a problem space
+* Has stories which provide the solution to the problem
+* Has activities which represent research that needs to be undertaken before stories can be generated
+
+### Workflow:
+* New: The issue is new - devise activities (confirm the problem statement).
+* In Discovery: Discovery activities, such as research, user interview, usability tests, are underway.
+* In Definition: Definition activities, such as affinity mapping & empathy mapping, are underway.
+* In Brainstorm: Brainstorming is underway. Includes activities such as mock-ups, prototyping, etc.
+* Under Development: Exactly what it sounds like.
+* MVP Delivered: Minimum Viable Product has been delivered. Resolution should be MVP.
+* Closed: Resolution should be Done.
