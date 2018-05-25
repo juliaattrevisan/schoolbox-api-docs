@@ -92,9 +92,9 @@ Copy pas | A copypasta missing something critical
 Curation | The process of confirming, writing AC/STR, and generally cleaning up Jira tickets.
 Datums | (n. pl.) Somewhat informal rendition of "data".
 Design Language | See https://en.wikipedia.org/wiki/Design_language
-Double Diamond | 
+Double Diamond | The agile UX process of research, insights, ideation and development.
 Dr. Hodes | The user David Rhodes in the 'legacy' dataset.
-Embargo |
+Embargo | Prevention of merging PRs in preparation for a release going out.
 Express Lane | A Kanban-style process/lane in Jira that is used for tasks and stories.
 Feature Freeze |
 Jypad | The iPad named after Jy because it was frequently found in, or around, his desk.
@@ -106,13 +106,13 @@ Po-Po | (n.) See **Product Owner**.
 Product Owner (PO) | (n.) 
 Rebase | A [Git rebase](https://git-scm.com/book/en/v2/Git-Branching-Rebasing)
 Red Worm |
-Refinement | 
-Retro | 
+Refinement | A meeting in which we go through tickets in the backlog and discuss in order to come to a shared understanding of what is required, so that the tickets can be made ready for working on.
+Retro | Sprint Retrospective - see [ceremonies.md](ceremonies.md)
 Scrum Master (SM) | 
 Self Help Initiative | (v.) Merging your own branch.
-Spike | 
+Spike | Any activity conducted for discovery and preparation purposes prior to commencing development, such as research and wireframing.
 Sprint | 
-Standup | 
+Standup | Short daily meeting conducted while standing - see [ceremonies.md](ceremonies.md)
 Storm | PHPStorm - the IDE used across the team.
 Story | 
 STT | (n.) Steps To Test.
