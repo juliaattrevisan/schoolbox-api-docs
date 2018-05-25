@@ -37,6 +37,7 @@ We meet in the Glass Conference Room, the last person to arrive starts and we mo
 * What have I been working on since the last Standup?
 * What am I planning on working on until the next Standup?
 * Do I see any impediments that will delay or block me from achieving what I need to achieve?
+* How likely am I to complete my sprint commitment on time?
 
 You may give a traffic light status (green, yellow, red) to give an indication of how you believe your work is going in regards to Sprint completion.
 
@@ -47,7 +48,7 @@ The Standup should be short and sweet, generally only high level details should 
 Often the Product Owner or Scrum Master will utilise the Daily Standup to ask the team to focus their efforts in a specific area where possible (eg. QA'ing a point release).
 
 ## Workshops
-* **When:** Tuesdays and Thursdays at 11:00am
+* **When:** Tuesdays and Thursdays at 11:00am, as required
 * **Timebox:** Varies per session, 2 hours at most
 
 Workshops will take the some form of a UX session, depending on what is required most at the time.
@@ -55,6 +56,15 @@ Workshops will take the some form of a UX session, depending on what is required
 Some sessions will require the whole Product Team, and some will require just the Strike Team assigned to a particular problem space.
 
 See [workshops.md](workshops.md) for a list of the different types of workshops.
+
+## Refinement
+* **When:** Tuesdays and Thursdays at 11:00am, as required
+* **Timebox:** Varies per session, 2 hours at most
+
+> Product Backlog refinement is the act of adding detail, estimates, and order to items in the Product Backlog.
+
+During a refinement session, the Product Team endeavours to reach a shared understanding of the business requirements and technical implications of the tickets being examined.
+
 
 ## Showcase
 * **When:** Last day of Sprint at 2:00pm
