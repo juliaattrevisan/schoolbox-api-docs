@@ -46,7 +46,7 @@ $f-dropdown-icon-align: 0.25rem;
 		}
 	}
 	[class*="icon-"]:before {
-		padding: 0 (0.5rem + $f-dropdown-icon-align) 0 $f-dropdown-icon-align;
+		padding-right: .8125rem;
 	}
 }
 
