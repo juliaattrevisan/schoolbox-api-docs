@@ -185,7 +185,6 @@ class Controller extends Base
             'id' => $user->getId(),
             'externalID' => $user->getExternalId(),
         ];
-        header('Content-Type: text/json');
         $this->getResponse()->content->set($this->buildJsonOutput($userJSON));
     }
 
