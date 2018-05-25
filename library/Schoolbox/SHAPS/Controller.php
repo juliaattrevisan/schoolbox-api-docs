@@ -189,38 +189,6 @@ class Controller extends Base
         $this->getResponse()->content->set($this->buildJsonOutput($userJSON));
     }
 
-
-    /**
-     * Provide form
-     *
-     * @param User $user
-     * @throws \Aura\Di\Exception\ServiceNotFound
-     */
-    public function getExample(User $user)
-    {
-        $this->getResponse()->content->set($this->buildHtmlOutput('@shaps/index.twig', [
-            'user' => $user
-        ])->setTitle('Example'));
-    }
-
-    /**
-     * Process the form vars
-     */
-    public function postExample()
-    {
-        try {
-            $user = $this->getUserMapper()->findById($this->getRequest()->post['id']);
-        }
-        catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_USER_NOT_FOUND);
-        }
-
-        $this->getResponse()->content->set($this->buildHtmlOutput('@shaps/submit.twig', [
-            'user' => $user,
-            'var1' => $this->getRequest()->post['var1']
-        ])->setTitle('Example Form Output'));
-    }
-
     /**
      * @return UserMapper
      */

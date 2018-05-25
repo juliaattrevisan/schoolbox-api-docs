@@ -49,9 +49,8 @@ class Module extends BaseModule
         $this->register('GET', '/provisioning/search', 'getSearch', $getPerms);
 
         $this->register('GET', '/provisioning/{userID}', 'searchUsers', $getPerms);
-        $this->register('POST', '/user', 'postExample', $postPerms, null);
     }
-    
+
     /**
      * @inheritdoc
      */
