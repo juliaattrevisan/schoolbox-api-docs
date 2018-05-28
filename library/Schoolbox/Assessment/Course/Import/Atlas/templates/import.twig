@@ -30,17 +30,17 @@
                         <div class="small-12 medium-6 column">
                             <label>School
                                 <select id="curriculum-school">
-                                    <option>(all schools)</option>
+                                    <option value="">(all schools)</option>
                                 </select>
                             </label>
                             <label>Grade
                                 <select id="curriculum-grade">
-                                    <option>(all grades)</option>
+                                    <option value="">(all grades)</option>
                                 </select>
                             </label>
                             <label>Subject
                                 <select id="curriculum-subject">
-                                    <option>(all subjects)</option>
+                                    <option value="">(all subjects)</option>
                                 </select>
                             </label>
                         </div>
@@ -52,7 +52,7 @@
                                         <h3>Loading...</h3>
                                     </div>
                                 </li>
-                                <li id="curriculum-plan-template" class="hide">
+                                <li id="curriculum-plan-template" class="hide" data-template="curriculum-plan">
                                     <div>
                                         <div class="selector">
                                             <input data-template="curriculum-plan-input" id="curriculum-plan" type="radio">
@@ -166,7 +166,13 @@
                 response.forEach(function(item) {
                     var planItem = $curriculumPlanTpl.clone()
                         .removeAttr('id')
-                        .removeClass('hide');
+                        .removeClass('hide')
+                        .data({
+                            id:      item.id,
+                            school:  item.school,
+                            grade:   item.grade,
+                            subject: item.subject
+                        });
                     planItem.find('[data-template="curriculum-plan-input"]').attr('id', 'curriculum-plan-' + String(item.id));
                     planItem.find('[data-template="curriculum-plan-label"]').attr('for', 'curriculum-plan-' + String(item.id));
                     planItem.find('[data-template="curriculum-plan-title"]').text(item.title);
@@ -182,6 +188,38 @@
             .fail(function() {
                 $toast.toastTimeout({text: 'Failed!', css: 'alert'});
             });
+
+        // On select of school/grade/subject:
+        // filter out ones that don't match
+        $().add($schoolSelect).add($gradeSelect).add($subjectSelect).on('change', function() {
+            var selections = {};
+            if ($schoolSelect.val()) {
+                selections.school = $schoolSelect.val();
+            }
+            if ($gradeSelect.val()) {
+                selections.grade = $gradeSelect.val();
+            }
+            if ($subjectSelect.val()) {
+                selections.subject = $subjectSelect.val();
+            }
+
+            $curriculumPlanList.find('[data-template="curriculum-plan"]').each(function(i, item) {
+                var $item   = $(item),
+                    display = true;
+                ['school', 'grade', 'subject'].forEach(function(key) {
+                    if (key in selections && $item.data(key) !== selections[key]) {
+                        display = false;
+                    }
+                });
+                if (display) {
+                    $item.slideDown('fast');
+                } else {
+                    $item.slideUp('fast');
+                    // Unselect it if it was selected
+                    $item.find(':radio').prop('checked', false);
+                }
+            });
+        });
     });
 </script>
 {% endautoescape %}
