@@ -33,7 +33,8 @@ class Module extends BaseModule
         $permission = new Rule\IsLoggedIn();
         $this->register('GET', '/test', 'getTestPage', $permission, null);
         $this->register('GET', '/proxy/{endpoint}', 'getProxy', $permission, null);
-        $this->register('GET', '/curriculum/{curriculumId}', 'getCurriculum', $permission, null);
+        $this->register('GET', '/curriculum/list', 'getCurriculumList', $permission, null);
+        $this->register('GET', '/curriculum/{curriculumId:\d+}', 'getCurriculum', $permission, null);
     }
 
     /**

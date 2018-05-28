@@ -58,6 +58,18 @@ class Controller extends Base
     }
 
     /**
+     * Action for getting a list of all curricula.
+     */
+    public function getCurriculumList(): void
+    {
+        $requests = [
+            'curriculumList' => ['curriculummap/'],
+        ];
+        $result = $this->makeRequests($requests);
+        $this->getResponse()->content->set($this->buildJsonOutput($result['curriculumList']));
+    }
+
+    /**
      * Test for getting a curriculum and contents in a single request.
      *
      * @param int $curriculumId
