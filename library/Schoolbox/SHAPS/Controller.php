@@ -128,7 +128,7 @@ class Controller extends Base
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
-                '@shaps/index.twig', [
+                '@shaps/provisioning/index.twig', [
                 'allUsers' => $allStaff,
                 'provisionedUserIds' => $provisionedUserIds
             ])->setTitle('Schoolbox Help Staff Provisioning')
@@ -144,7 +144,7 @@ class Controller extends Base
     {
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
-                '@shaps/provisioned.twig', [
+                '@shaps/provisioning/provisioned.twig', [
                     'allUsers' => $this->getProvisionedUsers(),
                     'provisionedUserIds' => $this->getProvisionedUserIds()
             ])->setTitle('Provisioned Staff - Schoolbox Help Staff Provisioning')
@@ -163,7 +163,7 @@ class Controller extends Base
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
-                '@shaps/unprovisioned.twig', [
+                '@shaps/provisioning/unprovisioned.twig', [
                     'allUsers' => $unprovisionedStaff
             ])->setTitle('Unprovisioned Staff - Schoolbox Help Staff Provisioning')
         );
@@ -178,7 +178,7 @@ class Controller extends Base
     {
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
-                '@shaps/search.twig', [
+                '@shaps/provisioning/search.twig', [
             ])->setTitle('Search - Schoolbox Help Staff Provisioning')
         );
     }
