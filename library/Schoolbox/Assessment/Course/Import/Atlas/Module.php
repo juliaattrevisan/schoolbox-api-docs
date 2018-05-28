@@ -28,6 +28,8 @@ class Module extends \Alaress\Module\Module
         $staffOnly = $this->getAuthRule('isStaffOrSuper');
         $this->register('GET', '', 'getImport', $staffOnly);
         $this->register('POST', '', 'postImport', $staffOnly);
+        $this->register('GET', '/curriculum/list', 'getCurriculumList', $staffOnly, null);
+        $this->register('GET', '/curriculum/{curriculumId:\d+}', 'getCurriculum', $staffOnly, null);
     }
 
 

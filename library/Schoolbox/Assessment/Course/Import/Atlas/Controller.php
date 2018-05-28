@@ -34,6 +34,29 @@ class Controller extends BaseController
 
 
     /**
+     * Action for getting a list of all curricula.
+     *
+     * @throws \Throwable
+     */
+    public function getCurriculumList(): void
+    {
+        $this->getResponse()->content->set($this->buildJsonOutput($this->apiBridge->getCurriculumList()));
+    }
+
+
+    /**
+     * Action for getting a curriculum and contents in a single request.
+     *
+     * @param int $curriculumId
+     * @throws \Throwable
+     */
+    public function getCurriculum(int $curriculumId): void
+    {
+        $this->getResponse()->content->set($this->buildJsonOutput($this->apiBridge->getCurriculum($curriculumId)));
+    }
+
+
+    /**
      * POST action for `getImport` mage form.
      */
     public function postImport(): void
