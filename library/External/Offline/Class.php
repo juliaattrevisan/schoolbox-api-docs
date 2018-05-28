@@ -12,11 +12,13 @@ class External_Offline_Class implements External_ClassInterface
     public function getStudents($classCode)
     {
         // Noop
+        return [];
     }
 
     public function getTeacherName($classCode)
     {
         // Noop
+        return [];
     }
 
 }

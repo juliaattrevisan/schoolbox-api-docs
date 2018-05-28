@@ -49,7 +49,7 @@ class External_Humanedge_Class implements External_ClassInterface
     {
         if (!$classCode) {
             /* Dont bother if you got no code */
-            return false;
+            return [];
         }
 
         $db    = $this->loadAPlusDatabase();
@@ -106,7 +106,7 @@ class External_Humanedge_Class implements External_ClassInterface
     {
         if (!$classCode) {
             /* Dont bother if you got no code */
-            return false;
+            return [];
         }
 
         $roomJoin = ($this->requireClassTeachersHaveRooms ? 'INNER JOIN tblRoom r on r.ID = b.RoomID' : '');
