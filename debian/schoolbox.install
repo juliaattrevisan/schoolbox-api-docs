@@ -2,7 +2,6 @@
 www/conf/* /etc/schoolbox/examples
 tools/cron/* /etc/cron.d
 tools/logrotate/* /etc/logrotate.d
-tools/init/* /etc/init
 dav /usr/share/schoolbox
 library /usr/share/schoolbox
 sql /usr/share/schoolbox

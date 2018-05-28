@@ -526,25 +526,30 @@ echo "[SB][`date +%Y-%m-%d\ %X`] Loading all demo data complete";
 echo "[SB][`date +%Y-%m-%d\ %X`] Run Notifications binding cache rebuild (in background)";
 /vagrant/tools/notif/route/refresh-binding-cache.php --instance=vagrantx &
 
-echo "[SB][`date +%Y-%m-%d\ %X`] Install schoolbox-scheduled";
-cp -f /vagrant/tools/init/upstart-scheduled.conf /etc/init/schoolbox-scheduled.conf;
-cp -f /vagrant/tools/init/upstart-scheduled.override /etc/init/schoolbox-scheduled.override;
-
-echo "[SB][`date +%Y-%m-%d\ %X`] Install schoolbox-socketd";
-cp -f /vagrant/tools/init/upstart-socketd.conf /etc/init/schoolbox-socketd.conf;
-cp -f /vagrant/tools/init/upstart-socketd.override /etc/init/schoolbox-socketd.override;
-
-echo "[SB][`date +%Y-%m-%d\ %X`] Install schoolbox-digestd";
-cp -f /vagrant/tools/init/upstart-digestd.conf /etc/init/schoolbox-digestd.conf;
-cp -f /vagrant/tools/init/upstart-digestd.override /etc/init/schoolbox-digestd.override;
-
-echo "[SB][`date +%Y-%m-%d\ %X`] Install schoolbox-routed";
-cp -f /vagrant/tools/init/upstart-routed.conf /etc/init/schoolbox-routed.conf;
-cp -f /vagrant/tools/init/upstart-routed.override /etc/init/schoolbox-routed.override;
-
-#echo "[SB][`date +%Y-%m-%d\ %X`] Install schoolbox-belld";
-#cp -f /vagrant/tools/init/upstart-belld.conf /etc/init/schoolbox-belld.conf;
-#cp -f /vagrant/tools/init/upstart-belld.override /etc/init/schoolbox-belld.override;
+if [[ "$(readlink /proc/1/exe)" == */systemd ]];
+then
+    echo "[SB][`date +%Y-%m-%d\ %X`] Installing daemon systemd configurations";
+    cp -f /vagrant/tools/init/schoolbox-*.service /lib/systemd/system/;
+    sed -i 's/usr\/share\/schoolbox/vagrant/g' /lib/systemd/system/schoolbox-*d.service;
+    systemctl daemon-reload;
+    systemctl enable schoolbox-scheduled.service;
+    systemctl enable schoolbox-routed.service;
+    systemctl enable schoolbox-socketd.service;
+    systemctl enable schoolbox-digestd.service;
+    #systemctl enable schoolbox-belld.service;
+else
+    echo "[SB][`date +%Y-%m-%d\ %X`] Installing daemon upstart configurations";
+    cp -f /vagrant/tools/init/upstart-scheduled.conf /etc/init/schoolbox-scheduled.conf;
+    cp -f /vagrant/tools/init/upstart-scheduled.override /etc/init/schoolbox-scheduled.override;
+    cp -f /vagrant/tools/init/upstart-socketd.conf /etc/init/schoolbox-socketd.conf;
+    cp -f /vagrant/tools/init/upstart-socketd.override /etc/init/schoolbox-socketd.override;
+    cp -f /vagrant/tools/init/upstart-digestd.conf /etc/init/schoolbox-digestd.conf;
+    cp -f /vagrant/tools/init/upstart-digestd.override /etc/init/schoolbox-digestd.override;
+    cp -f /vagrant/tools/init/upstart-routed.conf /etc/init/schoolbox-routed.conf;
+    cp -f /vagrant/tools/init/upstart-routed.override /etc/init/schoolbox-routed.override;
+    #cp -f /vagrant/tools/init/upstart-belld.conf /etc/init/schoolbox-belld.conf;
+    #cp -f /vagrant/tools/init/upstart-belld.override /etc/init/schoolbox-belld.override;
+fi
 
 eplver=`dpkg -l schoolbox-epl | tail -n1 | awk {'print $3'}`;
 echo "[SB][`date +%Y-%m-%d\ %X`] schoolbox-epl installed: $eplver";
@@ -597,11 +602,6 @@ service schoolbox-epl restart > /dev/null 2>&1;
 service apache2 restart > /dev/null 2>&1;
 service php7.1-fpm restart > /dev/null 2>&1;
 service nginx restart > /dev/null 2>&1;
-service schoolbox-scheduled restart > /dev/null 2>/dev/null &
-service schoolbox-socketd restart > /dev/null 2>/dev/null &
-service schoolbox-digestd restart > /dev/null 2>/dev/null &
-service schoolbox-routed restart > /dev/null 2>/dev/null &
-#service schoolbox-belld restart > /dev/null 2>/dev/null &
 
 # call custom provisioning
 if [ -f /vagrant/post-provision.sh ];
@@ -609,12 +609,3 @@ then
     echo "[SB][`date +%Y-%m-%d\ %X`] Running custom post provisioning";
     /vagrant/post-provision.sh 2>&1;
 fi
-
-for eth in `ip addr | grep inet | grep -v inet6 | grep global | grep -v eth0 | awk {'print $2'} | cut -d/ -f1`;
-do
-    echo "[SB][`date +%Y-%m-%d\ %X`] Website URL => http://$eth/";
-    echo "[SB][`date +%Y-%m-%d\ %X`] WebDav URL => http://$eth:8881/";
-done
-
-echo "[SB][`date +%Y-%m-%d\ %X`] Website URL => https://vagrant.dev.schoolbox.cloud";
-echo "[SB][`date +%Y-%m-%d\ %X`] WebDav URL => https://vagrant.dev.schoolbox.cloud:8882/";

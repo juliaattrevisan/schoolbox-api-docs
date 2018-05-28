@@ -89,5 +89,5 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     s.path = "#{provision_script}"
     s.args = "#{data_source} \"#{data_filename}\" #{external_db} #{external_db_host} #{external_db_db} #{enable_xdebug}"
   end
-
+  config.vm.provision "shell", run: "always", path: "tools/vagrant-restart.sh"
 end
