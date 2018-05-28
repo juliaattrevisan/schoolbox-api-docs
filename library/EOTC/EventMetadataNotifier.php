@@ -205,6 +205,7 @@ class EventMetadataNotifier extends AbstractModuleNotifier
         // retrieve the event that this metadata object is connected to
         $eventCollection = EventMetadataMapper::getInstance()->findEventsForMetadata($eventMetadata);
 
+
         // no event? no messages
         if (!$eventCollection->count()) {
             // Don't translate log messages
@@ -216,7 +217,7 @@ class EventMetadataNotifier extends AbstractModuleNotifier
         $relEvent      = EventMapper::getInstance()->findById($eventCollection->first()->getId());
         $relEventId    = $relEvent->getId();
         $relEventStart = $relEvent->getStartDateTime();
-        $currentStatus = $eventMetadata->getStatus();
+        $currentStatus = $relEvent->getMetadata()->getStatus();
 
         // Don't notify if event is in a final state.
         // (Required because some notifs may be awaiting, and not rescinded)
