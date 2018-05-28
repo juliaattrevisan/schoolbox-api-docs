@@ -11,6 +11,18 @@ use Alaress\Web\Controller\Base as BaseController;
 class Controller extends BaseController
 {
     /**
+     * @var ApiBridge
+     */
+    private $apiBridge;
+
+
+    public function __construct(ApiBridge $apiBridge)
+    {
+        $this->apiBridge = $apiBridge;
+    }
+
+
+    /**
      * Render form for the import page.
      */
     public function getImport(): void
@@ -19,6 +31,7 @@ class Controller extends BaseController
             $this->buildHtmlOutput('@courseImportAtlas/import.twig', [], 'Atlas Import', 'course')
         );
     }
+
 
     /**
      * POST action for `getImport` mage form.
@@ -37,6 +50,7 @@ class Controller extends BaseController
         }
     }
 
+
     /**
      * POST part 1: I have chosen a plan, now show the parts
      */
@@ -46,6 +60,7 @@ class Controller extends BaseController
             $this->buildJsonOutput(['okay' => 'okay'])
         );
     }
+
 
     /**
      * POST part 2: I have chosen parts of a plan, now import them

@@ -8,6 +8,7 @@ namespace Schoolbox\Assessment\Course\Import\Atlas;
 
 use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\ContainerInterface;
+use GuzzleHttp\Client;
 use Schoolbox\Learning\Course;
 use Twig\Error\LoaderError;
 
@@ -49,7 +50,28 @@ class Module extends \Alaress\Module\Module
     {
         $injector->set(
             'controller:' . $this->basename,
-            $injector->lazyNew(Controller::class, [])
+            $injector->lazyNew(
+                Controller::class,
+                [
+                    'apiBridge' => $injector->lazyNew(
+                        ApiBridge::class,
+                        [
+                            'httpClient' => $injector->lazyNew(
+                                Client::class,
+                                [
+                                    'config' => [
+                                        'base_uri' => 'https://api.rubicon.com/api/',
+                                        'headers'  => [
+                                            'Authorization' => 'Bearer ' . $this->getConfig()->get('rubicon_atlas_api_token'),
+                                            'Accept'        => 'application/json',
+                                        ],
+                                    ]
+                                ]
+                            )
+                        ]
+                    )
+                ]
+            )
         );
     }
 }
