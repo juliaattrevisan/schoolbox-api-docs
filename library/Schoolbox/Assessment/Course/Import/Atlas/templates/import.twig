@@ -173,7 +173,9 @@
                             grade:   item.grade,
                             subject: item.subject
                         });
-                    planItem.find('[data-template="curriculum-plan-input"]').attr('id', 'curriculum-plan-' + String(item.id));
+                    planItem.find('[data-template="curriculum-plan-input"]')
+                        .attr('id', 'curriculum-plan-' + String(item.id))
+                        .attr('value', item.id);
                     planItem.find('[data-template="curriculum-plan-label"]').attr('for', 'curriculum-plan-' + String(item.id));
                     planItem.find('[data-template="curriculum-plan-title"]').text(item.title);
                     planItem.find('[data-template="curriculum-plan-school"]').text(item.school);
