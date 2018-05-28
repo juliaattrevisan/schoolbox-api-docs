@@ -32,11 +32,12 @@
 
                         $("#statusForm").addClass("hide");
 
+                        // TODO limit user search to users on help
+
                         var $selectize = $('#users').selectizeSelector({
                             ajax: {
-                                url:      '/ajax/user.php',
+                                url:      '/shaps/provisioning/provisionedUsers',
                                 type:     'GET',
-                                data:     {roleTypeID: 'staff', showCampus: true},
                                 dataType: 'json'
                             },
                             multiple: true

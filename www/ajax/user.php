@@ -1,4 +1,4 @@
-<?php
+ <?php
 
 /**
  * @author    Someone <support@alaress.com.au>

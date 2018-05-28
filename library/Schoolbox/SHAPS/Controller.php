@@ -116,6 +116,7 @@ class Controller extends Base
     /**
      * Helper method to get a list of user objects from the raw JSON Help API response.
      *
+     * @api GET /shaps/provisioning/provisionedUsers
      * @return Collection
      */
     private function getProvisionedUsers() : Collection
@@ -123,6 +124,10 @@ class Controller extends Base
         $provisionedUserIds = $this->getProvisionedUserIds();
         $provisionedUsers = $this->userMapper->findByColumn('id', $provisionedUserIds);
         return $provisionedUsers;
+    }
+
+    public function getProvisionedUsersJSON() {
+        return json_encode($this->getProvisionedUsers());
     }
 
     /**
@@ -296,14 +301,16 @@ class Controller extends Base
 
         // TODO this won't work until Sam adds vagrant to Help dev
 
-        $provisionedUsers = $this->getProvisionedUsers();
+//        $provisionedUsers = $this->getProvisionedUsers();
+//
+//        $enrolments = $this->getCoursesFromHelp();
+//
+//        $this->getResponse()->content->set($this->buildHtmlOutput('@shaps/courses/index.twig', [
+//            'courses' => $enrolments,
+//            'users'   => $provisionedUsers
+//        ]));
 
-        $enrolments = $this->getCoursesFromHelp();
-
-        $this->getResponse()->content->set($this->buildHtmlOutput('@shaps/courses/index.twig', [
-            'courses' => $enrolments,
-            'users'   => $provisionedUsers
-        ]));
+        $this->getResponse()->content->set($this->buildHtmlOutput('@shaps/courses/index.twig', []));
     }
 
     /**
