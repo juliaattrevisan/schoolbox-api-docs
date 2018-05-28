@@ -27,9 +27,11 @@
                 <fieldset data-mage="part-1" class="content">
                     <legend>Select a Curriculum Plan</legend>
                     <div class="small-12 column" data-mage-collapsefinal>
-                        <p>
-                            Curriculum plan search and select go here
-                        </p>
+                        <label>Curriculum Plan
+                            <select id="curriculum-plan">
+                                <option data-loading disabled>Loading...</option>
+                            </select>
+                        </label>
                         <div class="row" data-mage-submitrow>
                             <div class="small-12 medium-8 column">
                                 <p class="alert alert-box icon-alert" data-mage-error></p>
@@ -64,6 +66,7 @@
 </div>
 
 <script type="text/javascript" src="/javascript/shared/jquery.mage.js"></script>
+{% autoescape 'js' %}
 <script type="text/javascript">
     $(function () {
         // the mage plugin is applied to the submit buttons: setup a basic mage on all the buttons
@@ -76,5 +79,28 @@
                 }
             }
         });
+
+        // Step 1: load curricula from Atlas
+        var $toast                = $('#toast'),
+            $curriculumPlanSelect = $('#curriculum-plan');
+
+        $toast.toastActivate({text: 'Loading curricula...'});
+
+        // Live API doesn't work locally, thus I proxy thru Schoolbox
+        $.ajax("{{ routeLookup('curriculumRubicon.getCurriculumList') }}", {dataType: 'json'})
+            .done(function(response) {
+                $toast.toastTimeout({text: 'Loaded', css: 'success'});
+                response.forEach(function(item) {
+                    $curriculumPlanSelect.append(
+                        $('<option />')
+                            .text(item.title)
+                            .attr('value', item.id)
+                    )
+                })
+            })
+            .fail(function() {
+                $toast.toastTimeout({text: 'Failed!', css: 'alert'});
+            });
     });
 </script>
+{% endautoescape %}
