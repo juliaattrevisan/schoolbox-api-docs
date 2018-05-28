@@ -294,13 +294,15 @@ class Controller extends Base
 //            ]
 //        ];
 
-        $registeredUsers = $this->getUsersFromHelp();
+        // TODO this won't work until Sam adds vagrant to Help dev
+
+        $provisionedUsers = $this->getProvisionedUsers();
 
         $enrolments = $this->getCoursesFromHelp();
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@shaps/courses/index.twig', [
             'courses' => $enrolments,
-            'users'   => $registeredUsers
+            'users'   => $provisionedUsers
         ]));
     }
 
