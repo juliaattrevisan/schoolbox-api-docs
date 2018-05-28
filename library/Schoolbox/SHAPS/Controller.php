@@ -204,4 +204,19 @@ class Controller extends Base
         ];
         $this->getResponse()->content->set($this->buildJsonOutput($userJSON));
     }
+
+    /**
+     * Renders a list of all courses available for your school on Help, and the users enrolled in each.
+     */
+    public function getUsersInCourses() {
+
+    }
+
+    /**
+     * Takes a user ID and renders a list of all courses that user is enrolled in on Help.
+     */
+    public function getCoursesForUser($userID) {
+
+    }
+
 }
