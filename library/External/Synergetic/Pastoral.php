@@ -484,6 +484,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                     // notification every time someone creates a pastoral record
 
                     $pastoral->setExternalId($this->connector->lastInsertId());
+                    $this->getPastoralMapper()->setNotifier( new SilentNotif());
                     $this->getPastoralMapper()->save($pastoral);
                 }
 
