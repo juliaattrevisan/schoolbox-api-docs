@@ -18,6 +18,8 @@ type = "Diagnostic"
 method = "Performance: Authentic Task"
 content = "<p>added some words for the description</p>"
 standards = {array} [0]
+
+
 attachments = {array} [1]
 0 = {array} [7]
 id = 1312
@@ -31,7 +33,7 @@ ItemID = 49959
 
 <p>Pick and choose which units and content you wish to import.</p>
 
-<ul class="information-list card-selectable" id="assessment-list">
+<ul class="information-list card-selectable" id="unit-list">
     {% for unit in curriculum.units %}
         <li>
             <div>
@@ -47,5 +49,34 @@ ItemID = 49959
                 </div>
             </div>
         </li>
+        {% if unit.assessments|length %}
+            <li class="child">
+                <div class="small-12 card">
+                    <h3>Assessments</h3>
+                </div>
+                <ul class="information-list">
+                    {% for assessment in unit.assessments %}
+                        <li>
+                            <div>
+                                <div class="selector">
+                                    <input id="assessment-{{ assessment.id }}" name="assessment[{{ assessment.id }}]" value="1" type="checkbox">
+                                    <label for="assessment-{{ assessment.id }}" class="checkbox-label"></label>
+                                </div>
+                                <div class="small-12 card">
+                                    <a href="#">
+                                        <h3>{{ assessment.title }}</h3>
+                                        {% if assessment.type %}<p class="meta">Type: {{ assessment.type }}</p>{% endif %}
+                                        {% if assessment.method %}<p class="meta">Method: {{ assessment.method }}</p>{% endif %}
+                                    </a>
+                                    {% if assessment.content %}
+                                        <article>{{ assessment.content | purify }}</article>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </li>
+        {% endif %}
     {% endfor %}
 </ul>
