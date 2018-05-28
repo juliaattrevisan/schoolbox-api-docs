@@ -267,14 +267,12 @@ class Controller extends Base
      * @param string $userID
      */
     public function getCoursesForUser($userID) {
-        $userMapper = new UserMapper();
-
         // Some sample users
-        $zsmith = $userMapper->findById(151);
-        $jbenson = $userMapper->findById(247);
+        $zsmith = $this->userMapper->findById(151);
+        $jbenson = $this->userMapper->findById(247);
 
-        $mharris = $userMapper->findById(248);
-        $mkelley = $userMapper->findById(249);
+        $mharris = $this->userMapper->findById(248);
+        $mkelley = $this->userMapper->findById(249);
 
         $coursesForUser = [
             [
@@ -322,9 +320,8 @@ class Controller extends Base
         // If the user we searched for has sample data in the array above, render it out
         foreach($coursesForUser as $user) {
             if ($user['externalID'] == $userID) {
-                echo json_encode($user);
-                /* Prevent rendering of template */
-                exit();
+                $userCourses = $user['courses'];
+                $this->getResponse()->content->set($this->buildJsonOutput($userCourses));
             }
         }
     }

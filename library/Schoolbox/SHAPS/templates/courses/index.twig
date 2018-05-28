@@ -24,46 +24,52 @@
                 <label>Find enrolments for user
                     <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Search for a user to see their enrolments">?</span>
                 </label>
-                <input id='user' name="userId" type='text' value='' placeholder="Search users" value="Ms Jenifer Shadbolt" data-selectizeuser required />
+                <input id="users" name="userId" value="" placeholder="Search Staff" data-selectizeuser="" required="" tabindex="-1" style="display: none;" class="selectized" type="text">
                 <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
                 <script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
                 <script type="text/javascript">
                     $(function() {
-                        var $selectize = $('#user').selectizeSelector({
+
+                        $("#statusForm").addClass("hide");
+
+                        var $selectize = $('#users').selectizeSelector({
                             ajax: {
                                 url:      '/ajax/user.php',
                                 type:     'GET',
-                                data:     {showCampus: true},
+                                data:     {roleTypeID: 'staff', showCampus: true},
                                 dataType: 'json'
-                            }
+                            },
+                            multiple: true
                         });
+
+                        function getUserIdFromRegex(userID) {
+                            // Match the last bit of text in brackets (as there is a small chance the user's role, for example, could contain brackets)
+                            // Can't match on end of string because there's a weird unicode character at the end.
+                            return userID.match(/\((.*)\)(?!\((.*)\))/)[1];
+                        }
 
                         $selectize = $selectize[0].selectize;
                         $selectize.on("item_add", function(value, $item) {
-                            var $itemText = $item.text();
-                            var userID = $itemText.match(/\((\d*)\)/)[1];
+                            var userID = getUserIdFromRegex($item.text());
 
-                            $.get("/greenhouse/url/courses/"+userID, function(data) {
+                            console.log(userID);
 
+                            $.get("/shaps/courses/"+userID, function(courses) {
                                 var $coursesListEl = $("#coursesForUser #list");
                                 // Clear this node in case it contains someone elses courses from a previous request
                                 $coursesListEl.empty();
 
-                                // Set up initial state of buttons etc
-                                $("#emptyState").removeClass("hide");
-                                $("#selectAll input[type='checkbox']").prop("checked", false);
-
-                                $(data.courses).each(function(index, course) {
-                                    var markup = "<li><div><div class='selector'>" +
-                                        "<input id='chk-" + course.id + "' type='checkbox'/><label for='chk-" + course.id + "' class='checkbox-label'></label>" +
-                                        "</div><div class='icon-course'></div><div class='small-12 card'><h3>" + course.name + "</h3></div></div></li>";
-                                    $coursesListEl.append(markup);
-                                });
-
-                                if (data.courses.length) {
+                                if (courses.length) {
                                     $("#multiUnenrol").removeClass("hide");
                                     $("#selectAll").removeClass("hide");
                                     $("#emptyState").addClass("hide");
+
+                                    $(courses).each(function(index, course) {
+                                        var markup = "<li><div><div class='selector'>" +
+                                            "<input id='chk-" + course.id + "' type='checkbox'/><label for='chk-" + course.id + "' class='checkbox-label'></label>" +
+                                            "</div><div class='icon-course'></div><div class='small-12 card'><h3>" + course.name + "</h3></div></div></li>";
+                                        $coursesListEl.append(markup);
+                                    });
                                 }
 
                                 var $checkboxes = $("#coursesForUser input[type='checkbox']");
