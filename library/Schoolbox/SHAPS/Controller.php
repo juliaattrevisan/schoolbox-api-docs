@@ -214,6 +214,8 @@ class Controller extends Base
 
     /**
      * Takes a user ID and renders a list of all courses that user is enrolled in on Help.
+     *
+     * @param string $userID
      */
     public function getCoursesForUser($userID) {
 
