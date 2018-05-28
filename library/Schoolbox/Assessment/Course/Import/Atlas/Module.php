@@ -6,10 +6,10 @@
 
 namespace Schoolbox\Assessment\Course\Import\Atlas;
 
-use Alaress\Redis\Cache as RedisCache;
 use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\ContainerInterface;
 use GuzzleHttp\Client;
+use Schoolbox\Assessment\Course\Import\Atlas\Api\Bridge as ApiBridge;
 use Schoolbox\Learning\Course;
 use Twig\Error\LoaderError;
 
