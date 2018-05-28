@@ -141,7 +141,7 @@
         $toast.toastActivate({text: 'Loading curricula...'});
 
         // Live API doesn't work locally, thus I proxy thru Schoolbox
-        $.ajax("{{ routeLookup('curriculumRubicon.getCurriculumList') }}", {dataType: 'json'})
+        $.ajax("{{ routeLookup('courseImportAtlas.getCurriculumList') }}", {dataType: 'json'})
             .done(function(response) {
                 $toast.toastTimeout({text: 'Loaded', css: 'success'});
 
