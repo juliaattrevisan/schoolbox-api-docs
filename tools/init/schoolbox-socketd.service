@@ -11,6 +11,7 @@ ExecStart=/usr/share/schoolbox/tools/socket/socketd.php -p${SBPORT} $SBVERBOSITY
 ExecReload=/bin/kill -HUP $MAINPID
 KillMode=process
 Restart=on-failure
+RestartSec=2s
 LimitNOFILE=10240:10240
 Nice=5
 
