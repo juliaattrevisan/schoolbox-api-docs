@@ -86,10 +86,7 @@
                 <fieldset data-mage="part-2" class="content" disabled="disabled">
                     <legend>Select Units and Content</legend>
                     <div class="small-12 column hide" data-mage-collapsed>
-                        <div data-mage-collapsefinal>
-                            <p>
-                                Pick and choose which units and content you wish to import.
-                            </p>
+                        <div data-mage-collapsefinal id="curriculum-plan-units">
                         </div>
                         <div class="row" data-mage-submitrow>
                             <div class="small-12 medium-8 column">
@@ -118,6 +115,9 @@
                     $('fieldset[data-mage]').find('[data-mage-collapsefinal]').slideDown();
                     revert();
                 }
+            },
+            onXhrDone: function (data) {
+                $('#curriculum-plan-units').html(data);
             }
         });
 
