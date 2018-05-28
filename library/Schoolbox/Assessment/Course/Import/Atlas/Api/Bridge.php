@@ -84,15 +84,11 @@ class Bridge
         // Get all units, and their assessments/attachments in one shot
         $requests = [
             'curriculum' => ['curriculummap/'.$curriculumId],
-            'units'      => [
-                'unit/',
-                ['query' => ['curriculummap_id' => $curriculumId]]
-            ]
         ];
 
         $result     = $this->redisCache->get('curriculumUnits.'.$curriculumId, [$requests]);
         $curriculum = array_pop($result['curriculum']);
-        $units      = $result['units'];
+        $units      = $curriculum['units'];
 
         // For each unit: get its assessments and attachments
         $requests = [];
