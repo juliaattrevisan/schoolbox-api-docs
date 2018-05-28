@@ -201,9 +201,17 @@ class Bridge
      */
     private function parseStandard(string $standard): array
     {
+        // ACARA strategy: find a link to Scootle, use it
+        if (preg_match('[>(.*?)</a>]i', $standard, $matches)) {
+            [, $code] = $matches;
+            $standard = strip_tags($standard);
+        } else {
+            $code = '';
+        }
+
         return [
             'title' => $standard,
-            'code'  => '',
+            'code'  => $code,
         ];
     }
 }
