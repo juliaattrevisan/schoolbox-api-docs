@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Schoolbox\Curriculum\Rubicon;
 
 use Alaress\Web\Controller\Base;
+use GuzzleHttp\Client;
 
 /**
  * Rubicon Atlas controller.
@@ -52,5 +53,21 @@ class Controller extends Base
                 json_decode($this->buildClient()->get($endpoint, $params)->getBody()->getContents())
             )
         );
+    }
+
+    /**
+     * Helper for building a Rubicon API client
+     *
+     * @return Client
+     */
+    private function buildClient(): Client
+    {
+        return new Client([
+            'base_uri' => 'https://api.rubicon.com/api/',
+            'headers'  => [
+                'Authorization' => 'Bearer ' . $this->getConfigLoader()->get('rubicon_atlas_api_token'),
+                'Accept'        => 'application/json',
+            ],
+        ]);
     }
 }
