@@ -26,31 +26,55 @@
             <section>
                 <fieldset data-mage="part-1" class="content">
                     <legend>Select a Curriculum Plan</legend>
-                    <div class="small-12 medium-6 column" data-mage-collapsefinal>
-                        <label>School
-                            <select id="curriculum-school">
-                                <option data-loading disabled>Loading...</option>
-                            </select>
-                        </label>
-                        <label>Grade
-                            <select id="curriculum-grade">
-                                <option data-loading disabled>Loading...</option>
-                            </select>
-                        </label>
-                        <label>Subject
-                            <select id="curriculum-subject">
-                                <option data-loading disabled>Loading...</option>
-                            </select>
-                        </label>
+                    <div data-mage-collapsefinal>
+                        <div class="small-12 medium-6 column">
+                            <label>School
+                                <select id="curriculum-school">
+                                    <option>(all schools)</option>
+                                </select>
+                            </label>
+                            <label>Grade
+                                <select id="curriculum-grade">
+                                    <option>(all grades)</option>
+                                </select>
+                            </label>
+                            <label>Subject
+                                <select id="curriculum-subject">
+                                    <option>(all subjects)</option>
+                                </select>
+                            </label>
+                        </div>
+                        <div class="small-12 medium-6 column">
+                            <label>Curriculum Plans</label>
+                            <ul class="information-list card-selectable" id="curriculum-plan-list">
+                                <li data-loading>
+                                    <div class="small-12 card">
+                                        <h3>Loading...</h3>
+                                    </div>
+                                </li>
+                                <li id="curriculum-plan-template" class="hide">
+                                    <div>
+                                        <div class="selector">
+                                            <input data-template="curriculum-plan-input" id="curriculum-plan" type="radio">
+                                            <label data-template="curriculum-plan-label" for="curriculum-plan" class="radio-label"></label>
+                                        </div>
+                                        <div class="small-12 card">
+                                            {# Clicking this shows curriculum information? #}
+                                            <a href="#">
+                                                <h3 data-template="curriculum-plan-title"></h3>
+                                                <p class="meta">
+                                                    <span data-template="curriculum-plan-school"></span>;
+                                                    <span data-template="curriculum-plan-grade"></span>,
+                                                    <span data-template="curriculum-plan-subject"></span>
+                                                </p>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
-                    <div class="small-12 medium-6 column" data-mage-collapsefinal>
-                        <label>Curriculum
-                            <select id="curriculum-plan">
-                                <option data-loading disabled>Loading...</option>
-                            </select>
-                        </label>
-                    </div>
-                    <div class="row" data-mage-submitrow>
+                    <div data-mage-submitrow>
                         <div class="small-12 medium-8 column">
                             <p class="alert alert-box icon-alert" data-mage-error></p>
                         </div>
@@ -102,7 +126,8 @@
             $schoolSelect         = $('#curriculum-school'),
             $gradeSelect          = $('#curriculum-grade'),
             $subjectSelect        = $('#curriculum-subject'),
-            $curriculumPlanSelect = $('#curriculum-plan'),
+            $curriculumPlanList   = $('#curriculum-plan-list'),
+            $curriculumPlanTpl    = $('#curriculum-plan-template'),
             schools               = {},
             grades                = {},
             subjects              = {},
@@ -132,14 +157,27 @@
                 populateSelector($gradeSelect, grades);
                 populateSelector($subjectSelect, subjects);
 
-                // Load list of plans into a radio list
+                // Sort plans
+                response = response.sort(function (a, b) {
+                    return collator.compare(a.title, b.title);
+                });
+
+                // Load plans into a list
                 response.forEach(function(item) {
-                    $curriculumPlanSelect.append(
-                        $('<option />')
-                            .text(item.title)
-                            .attr('value', item.id)
-                    )
-                })
+                    var planItem = $curriculumPlanTpl.clone()
+                        .removeAttr('id')
+                        .removeClass('hide');
+                    planItem.find('[data-template="curriculum-plan-input"]').attr('id', 'curriculum-plan-' + String(item.id));
+                    planItem.find('[data-template="curriculum-plan-label"]').attr('for', 'curriculum-plan-' + String(item.id));
+                    planItem.find('[data-template="curriculum-plan-title"]').text(item.title);
+                    planItem.find('[data-template="curriculum-plan-school"]').text(item.school);
+                    planItem.find('[data-template="curriculum-plan-grade"]').text(item.grade);
+                    planItem.find('[data-template="curriculum-plan-subject"]').text(item.subject);
+                    $curriculumPlanList.append(planItem);
+                });
+
+                // Remove loading
+                $curriculumPlanList.find('[data-loading]').addClass('hide');
             })
             .fail(function() {
                 $toast.toastTimeout({text: 'Failed!', css: 'alert'});
