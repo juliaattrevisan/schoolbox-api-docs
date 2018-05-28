@@ -8,8 +8,10 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Course\Import\Atlas;
 
-use GuzzleHttp\Client;
+use Alaress\Redis\Cache as RedisCache;
+use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Promise;
+use Predis\ClientInterface as RedisClient;
 use Psr\Http\Message\ResponseInterface;
 
 
@@ -18,21 +20,36 @@ use Psr\Http\Message\ResponseInterface;
  */
 class ApiBridge
 {
+    private const CACHE_EXPIRY = 300;
+
+
     /**
-     * @var Client
+     * @var HttpClient
      */
     private $httpClient;
 
 
     /**
+     * @var RedisCache
+     */
+    private $redisCache;
+
+
+    /**
      * Constructor
      *
-     * @param Client $httpClient a HTTP client, pre-configured to connect to
-     *                           Atlas' API.
+     * @param HttpClient  $httpClient
+     * @param RedisClient $redisClient
      */
-    public function __construct(Client $httpClient)
+    public function __construct(HttpClient $httpClient, RedisClient $redisClient)
     {
         $this->httpClient = $httpClient;
+        $this->redisCache = new RedisCache(
+            function ($requests) { return $this->makeRequests($requests); },
+            $redisClient,
+            'atlasApi',
+            self::CACHE_EXPIRY
+        );
     }
 
 
@@ -48,7 +65,7 @@ class ApiBridge
         $requests = [
             'curriculumList' => ['curriculummap/'],
         ];
-        $result = $this->makeRequests($requests);
+        $result = $this->redisCache->get('curriculumList', [$requests]);
         return $result['curriculumList'];
     }
 
@@ -71,7 +88,7 @@ class ApiBridge
             ]
         ];
 
-        $result     = $this->makeRequests($requests);
+        $result     = $this->redisCache->get('curriculumUnits.'.$curriculumId, [$requests]);
         $curriculum = array_pop($result['curriculum']);
         $units      = $result['units'];
 
@@ -83,7 +100,7 @@ class ApiBridge
         }
 
         // Put results into units
-        $result = $this->makeRequests($requests);
+        $result = $this->redisCache->get('curriculumUnitData.'.$curriculumId, [$requests]);
         foreach ($units as $i => $unit) {
             $unitId = $unit['id'];
             $unit['assessments'] = $result['assessments:'.$unitId] ?? [];

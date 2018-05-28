@@ -6,6 +6,7 @@
 
 namespace Schoolbox\Assessment\Course\Import\Atlas;
 
+use Alaress\Redis\Cache as RedisCache;
 use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\ContainerInterface;
 use GuzzleHttp\Client;
@@ -69,7 +70,8 @@ class Module extends \Alaress\Module\Module
                                         ],
                                     ]
                                 ]
-                            )
+                            ),
+                            'redisClient' => $injector->lazyGet('redis'),
                         ]
                     )
                 ]
