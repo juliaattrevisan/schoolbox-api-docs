@@ -8,14 +8,13 @@ do
     fi
     sleep 1;
 done
-sleep 0.5;
 if [ -f "/vagrant/tools/notif/syscheck.php" ];
 then
     echo "[SB][`date +%Y-%m-%d\ %X`] Restarting daemons in background";
-    service schoolbox-socketd restart &
-    service schoolbox-routed restart &
-    service schoolbox-digestd restart &
-    service schoolbox-scheduled restart &
+    sleep 5 && service schoolbox-socketd restart &
+    sleep 5 && service schoolbox-routed restart &
+    sleep 5 && service schoolbox-digestd restart &
+    sleep 5 && service schoolbox-scheduled restart &
 else
     echo "Unable to locate: /vagrant/tools/notif/syscheck.php";
 fi
