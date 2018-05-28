@@ -26,19 +26,36 @@
             <section>
                 <fieldset data-mage="part-1" class="content">
                     <legend>Select a Curriculum Plan</legend>
-                    <div class="small-12 column" data-mage-collapsefinal>
-                        <label>Curriculum Plan
+                    <div class="small-12 medium-6 column" data-mage-collapsefinal>
+                        <label>School
+                            <select id="curriculum-school">
+                                <option data-loading disabled>Loading...</option>
+                            </select>
+                        </label>
+                        <label>Grade
+                            <select id="curriculum-grade">
+                                <option data-loading disabled>Loading...</option>
+                            </select>
+                        </label>
+                        <label>Subject
+                            <select id="curriculum-subject">
+                                <option data-loading disabled>Loading...</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div class="small-12 medium-6 column" data-mage-collapsefinal>
+                        <label>Curriculum
                             <select id="curriculum-plan">
                                 <option data-loading disabled>Loading...</option>
                             </select>
                         </label>
-                        <div class="row" data-mage-submitrow>
-                            <div class="small-12 medium-8 column">
-                                <p class="alert alert-box icon-alert" data-mage-error></p>
-                            </div>
-                            <div class="small-12 medium-4 column">
-                                <input type="submit" name="part-1" value="Use this plan" data-mage-next="part-2" data-mage-working="Wait 2 secs..." />
-                            </div>
+                    </div>
+                    <div class="row" data-mage-submitrow>
+                        <div class="small-12 medium-8 column">
+                            <p class="alert alert-box icon-alert" data-mage-error></p>
+                        </div>
+                        <div class="small-12 medium-4 column">
+                            <input type="submit" name="part-1" value="Use this plan" data-mage-next="part-2" data-mage-working="Wait 2 secs..." />
                         </div>
                     </div>
                 </fieldset>
@@ -82,7 +99,19 @@
 
         // Step 1: load curricula from Atlas
         var $toast                = $('#toast'),
-            $curriculumPlanSelect = $('#curriculum-plan');
+            $schoolSelect         = $('#curriculum-school'),
+            $gradeSelect          = $('#curriculum-grade'),
+            $subjectSelect        = $('#curriculum-subject'),
+            $curriculumPlanSelect = $('#curriculum-plan'),
+            schools               = {},
+            grades                = {},
+            subjects              = {},
+            collator              = new Intl.Collator(undefined, {numeric: true}),
+            populateSelector      = function($selector, object) {
+                Object.keys(object).sort(collator.compare).forEach(function(item) {
+                    $selector.append($('<option />').text(item).attr('value', item));
+                });
+            };
 
         $toast.toastActivate({text: 'Loading curricula...'});
 
@@ -90,6 +119,20 @@
         $.ajax("{{ routeLookup('curriculumRubicon.getCurriculumList') }}", {dataType: 'json'})
             .done(function(response) {
                 $toast.toastTimeout({text: 'Loaded', css: 'success'});
+
+                // Load list of schools, grades, subjects
+                response.forEach(function(item) {
+                    schools[item.school]   = true;
+                    grades[item.grade]     = true;
+                    subjects[item.subject] = true;
+                });
+
+                // Populate them
+                populateSelector($schoolSelect, schools);
+                populateSelector($gradeSelect, grades);
+                populateSelector($subjectSelect, subjects);
+
+                // Load list of plans into a radio list
                 response.forEach(function(item) {
                     $curriculumPlanSelect.append(
                         $('<option />')
