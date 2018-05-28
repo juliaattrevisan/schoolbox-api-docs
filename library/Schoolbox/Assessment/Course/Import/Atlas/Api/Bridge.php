@@ -17,6 +17,8 @@ use Psr\Http\Message\ResponseInterface;
 
 /**
  * Bridge between high-level Atlas API calls and their low-level implementation.
+ *
+ * Based against version 0.5.0 of the Atlas API.
  */
 class Bridge
 {
