@@ -18,12 +18,11 @@
     <tr>{{ fn.spacer(config.fqdn, 8, 0) }}</tr>
     <tr>
         {% if msg.icon %}
-        <td width="72" height="48" valign="top">
+        <td width="48" height="48" valign="top">
             <table>
                 <tr>
-                    {{ fn.spacer(config.fqdn, 0, 8) }}
-                    <td><img src="{{ msg.icon }}" width="48" height="48" /></td>
-                    {{ fn.spacer(config.fqdn, 0, 8) }}
+                    <td><img src="{{ msg.icon }}" width="32" height="32" /></td>
+                    {{ fn.spacer(config.fqdn, 0, 16) }}
                 </tr>
             </table>
         </td>

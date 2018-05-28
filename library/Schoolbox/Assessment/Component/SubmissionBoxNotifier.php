@@ -618,7 +618,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
 
         $bob->setTitle(":boxname is due $when from now in :catname")
             ->setParam('catname', new CategoryParam($folder))
-            ->setIcon("/images/icon.php?size={$this->iconSize}&icon=work")
+            ->setIcon("/images/icon.php?size={$this->iconSize}&icon=".NSMapper::NS_DUEWORK)
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::WARNING)
             ->addTopic("duework.$boxId.upcoming")
@@ -835,7 +835,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
 
         $bob->setTitle('Submissions have closed for :boxname in :catname')
             ->setParam('catname', new CategoryParam($folder))
-            ->setIcon("/images/icon.php?size={$this->iconSize}&icon=cross")
+            ->setIcon("/images/icon.php?size={$this->iconSize}&icon=".NSMapper::NS_DUEWORK)
             ->setSeverity(Logger::NOTICE)
             ->setNamespace($this->getSlug())
             ->addTopic("duework.$boxId.closed");
@@ -884,7 +884,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         $boxName = $submissionBox->getName();
 
         $bob->setParam('catname', new CategoryParam($folder))
-            ->setIcon("/images/icon.php?size={$this->iconSize}&icon=work")
+            ->setIcon("/images/icon.php?size={$this->iconSize}&icon=".NSMapper::NS_DUEWORK)
             ->setSeverity(Logger::ERROR)
             ->setNamespace($this->getSlug())
             ->addTopic("duework.$boxId.overdue");
@@ -995,7 +995,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
 
         $href = $this->buildStatusRoute($submissionBox);
         $bob->setTitle(':boxname has closed and :number did not submit work')
-            ->setIcon("/images/icon.php?size={$this->iconSize}&icon=work")
+            ->setIcon("/images/icon.php?size={$this->iconSize}&icon=".NSMapper::NS_DUEWORK)
             ->setHref($href)
             ->setNamespace($this->getSlug())
             ->setParams(array(

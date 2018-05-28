@@ -254,7 +254,7 @@ class EventMetadataNotifier extends AbstractModuleNotifier
             ->setSeverity(Logger::WARNING)
             ->setNamespace($this->getSlug())
             ->addTopic("eotc.$relEventId.".self::TRIGGER_UPCOMING)
-            ->setIcon("/images/icon.php?icon=alert&size=32")
+            ->setIcon("/images/icon.php?size=32&icon=".Realtime\Message\NSMapper::NS_EOTC)
             ->setAllowSelfSend(true);
 
         $msg = $bob->build();

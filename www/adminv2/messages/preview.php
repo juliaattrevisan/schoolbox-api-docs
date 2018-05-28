@@ -54,7 +54,7 @@ switch ($this->arg[0]) {
             ->setBody('You will conduct a chemistry lab experiment to test acid based compounds and their reactions to a range of other elements.')
             ->setByline('Due 24th April, 2014')
             ->setHref('#')
-            ->setIcon('/images/icon.php?size=32&icon=work')
+            ->setIcon('/images/icon.php?size=32&icon='.NSMapper::NS_DUEWORK)
             ->build()
         );
         break;
@@ -77,7 +77,7 @@ switch ($this->arg[0]) {
             ->setBody('You will conduct a chemistry lab experiment to test acid based compounds and their reactions to a range of other elements.')
             ->setByline('Due 24th April, 2014')
             ->setHref('#')
-            ->setIcon('/images/icon.php?size=32&icon=work')
+            ->setIcon('/images/icon.php?size=32&icon='.NSMapper::NS_DUEWORK)
             ->build()
         );
 
@@ -93,7 +93,7 @@ switch ($this->arg[0]) {
             ->setTimestamp(strtotime('-3 days'))
             ->setBody('')
             ->setByline("Due $due")
-            ->setIcon('/images/icon.php?size=32&icon=work')
+            ->setIcon('/images/icon.php?size=32&icon='.NSMapper::NS_DUEWORK)
             ->build()
         );
 
@@ -142,7 +142,7 @@ switch ($this->arg[0]) {
                 $image = "/storage/image.php?size=square64&hash=$hash";
                 $thumb = "/storage/image.php?size=square200&hash=$hash";
             } catch (\Schoolbox\Mapper\Exception $e) {
-                $image = '/images/icon.php?size=64&icon=news';
+                $image = '/images/icon.php?size=32&icon='.NSMapper::NS_NEWS;
                 $thumb = '/images/emails/spacer.gif';
             }
 

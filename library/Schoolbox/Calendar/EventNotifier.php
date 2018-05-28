@@ -138,7 +138,7 @@ class EventNotifier extends AbstractModuleNotifier
 
         $bob = new Builder();
         $bob->setNamespace(NSMapper::NS_CALENDAR)
-            ->setIcon("/images/icon.php?size={$this->iconSize}&icon=clock")
+            ->setIcon("/images/icon.php?size={$this->iconSize}&icon=".NSMapper::NS_CALENDAR)
             // we need to stack based on series if that's possible
             ->setHref("/calendar/full/$href#day")
             ->setBody($event->getDetail())

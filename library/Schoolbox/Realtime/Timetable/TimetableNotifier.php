@@ -22,6 +22,7 @@ use Schoolbox\Campus;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Realtime\Alert\IPublisher;
 use Schoolbox\Realtime\Alert\RedisPublisher;
+use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Schedule\Trigger\Timetable\TimetableTrigger;
 use Schoolbox\Realtime\WorkNotifier;
 
@@ -266,7 +267,7 @@ class TimetableNotifier extends WorkNotifier {
                     ->setTitle($body)
                     ->setTopics([ "notify.campus.$campusId" ])
                     ->putMeta('title', $title ?: 'Timetable')
-                    ->setIcon($icon ?: '/images/icon.php?icon=clock&size=64'); // {$this->iconSize}
+                    ->setIcon($icon ?: '/images/icon.php?size=32&icon='.NSMapper::NS_TIMETABLE); // {$this->iconSize}
 
         $instance = $bob->build();
 

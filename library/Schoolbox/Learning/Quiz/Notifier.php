@@ -281,7 +281,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
         $quizName = $quiz->getTitle();
 
-        $icon = "/images/icon.php?size={$this->iconSize}&icon=cross";
+        $icon = "/images/icon.php?size={$this->iconSize}&icon=".NSMapper::NS_ONLINE_ASSESS;
         $href = "/intro/assess/$quizId";
 
         $bob = new Builder();
@@ -334,7 +334,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         $quizId = $quiz->getId();
         $quizName = $quiz->getTitle();
 
-        $icon = "/images/icon.php?size={$this->iconSize}&icon=work";
+        $icon = "/images/icon.php?size={$this->iconSize}&icon=".NSMapper::NS_ONLINE_ASSESS;
         $href = sprintf('/learning/assessments/%s/status', $quiz->getAssessmentModel()->getId());
 
         $bob = new Builder();
@@ -393,7 +393,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
         $quizName = $quiz->getTitle();
 
-        $icon = "/images/icon.php?size={$this->iconSize}&icon=work";
+        $icon = "/images/icon.php?size={$this->iconSize}&icon=".NSMapper::NS_ONLINE_ASSESS;
         $href = "/assess/intro/$quizId";
 
         $bob = new Builder();
@@ -434,7 +434,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
         $quizName = $quiz->getTitle();
 
-        $icon = "/images/icon.php?size={$this->iconSize}&icon=work";
+        $icon = "/images/icon.php?size={$this->iconSize}&icon=".NSMapper::NS_ONLINE_ASSESS;
 
         $bob = new Builder();
         $bob->addTopic("assess.$quizId.overdue")
@@ -473,7 +473,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
         $quizName = $quiz->getTitle();
 
-        $icon = "/images/icon.php?size={$this->iconSize}&icon=work";
+        $icon = "/images/icon.php?size={$this->iconSize}&icon=".NSMapper::NS_ONLINE_ASSESS;
         $href = "/assess/intro/$quizId";
 
         $when = self::UPCOMING_WINDOW . " hour" . (self::UPCOMING_WINDOW == 1 ? '' : 's');
@@ -516,7 +516,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
         $quizName = $quiz->getTitle();
 
-        $icon = "/images/icon.php?size={$this->iconSize}&icon=work";
+        $icon = "/images/icon.php?size={$this->iconSize}&icon=".NSMapper::NS_ONLINE_ASSESS;
 
         // don't provide a link for parents to click on if it's just going to give the a 403
         $quizParam = new Param($quizName);
@@ -575,7 +575,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
         $cat = $quiz->getCategory();
 
-        $icon = "/images/icon.php?size={$this->iconSize}&icon=work";
+        $icon = "/images/icon.php?size={$this->iconSize}&icon=".NSMapper::NS_ONLINE_ASSESS;
         $href = "/assess/intro/$quizId";
 
 
@@ -701,7 +701,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         $quizName = $quiz->getTitle();
         $quizType = $quiz->getWorkType() ? $quiz->getWorkType()->getName() : "";
 
-        $icon = "/images/icon.php?size={$this->iconSize}&icon=work";
+        $icon = "/images/icon.php?size={$this->iconSize}&icon=".NSMapper::NS_ONLINE_ASSESS;
 
         // notify all student's parents
         $students = $this->userAccessMapper->findStudentsInCategory($quiz->getCategory());

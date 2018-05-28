@@ -2,16 +2,16 @@
 
 <tr class="{{ loop.index is even ? 'dark' : '' }}">{{ fn.spacer(config.fqdn, 12, 0, 4) }}</tr>
 <tr class="{{ loop.index is even ? 'dark' : '' }}">
-    <td width="64" height="56" valign="top">
+    <td width="72" height="64" valign="top">
         <table>
             <tr>
-                {{ fn.spacer(config.fqdn, 0, 8) }}
                 <td>
                     {% block image %}
                     {# leave an empty space of appropriate size #}
-                    {{ fn.spacer(config.fqdn, 56, 56) }}
+                    {{ fn.spacer(config.fqdn, 64, 64) }}
                     {% endblock %}
                 </td>
+                {{ fn.spacer(config.fqdn, 0, 16) }}
             </tr>
         </table>
     </td>

@@ -36,7 +36,7 @@ class Notifier extends AbstractModuleNotifier
 
         $builder = new Builder();
         $builder->setTitle("A fixture import has " . $import->getStatus())
-            ->setIcon("/images/icon.php?icon=bolt&size=72")
+            ->setIcon("/images/icon.php?size=32&icon=".NSMapper::NS_SPORTS_FIXTURES_IMPORT)
             ->setHref("/fixtures/import-progress?id=". $import->getId())
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::ERROR)

@@ -15,10 +15,10 @@ require_once __DIR__ . '/../../conf/core/require.php';
 spl_autoload_call('Schoolbox\\Application\\BasicRequest');
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
 
-$path = '/images/core/icons/activity-icons-72x72px.png';
+$path = '/images/core/icons/activity-icons-64x64px.png';
 
 $icon = isset($_GET['icon']) ? $_GET['icon'] : '';
-$size = isset($_GET['size']) ? $_GET['size'] : 64;
+$size = isset($_GET['size']) ? $_GET['size'] : 32;
 
 // handle "square32" as well as just `32`
 $size = str_replace('square', '', $size);

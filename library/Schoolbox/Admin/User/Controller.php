@@ -23,6 +23,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Alert\RedisPublisher;
+use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\User\Title\Mapper as UserTitleMapper;
@@ -640,7 +641,7 @@ class Controller extends Base
             ->setSeverity(Logger::INFO)
             ->setNamespace('ALERT')
             ->setHref('#')
-            ->setIcon('/images/icon.php?icon=bolt&size=64')
+            ->setIcon('/images/icon.php?size=32&icon='.NSMapper::NS_MESSAGE)
             ->addTopic("notify.user.$userId")
             ->putMeta('ttl', 30)
             ->putMeta('title', 'Message from ' . $this->getUser()->getFullName());

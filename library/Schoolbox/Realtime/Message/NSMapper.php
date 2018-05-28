@@ -18,7 +18,8 @@ class NSMapper extends Mapper {
 	const NS_PASTORAL_COMMENT 		= 'pastoral_comment';
 	const NS_PASTORAL_LOG     		= 'pastoral_log';
 	const NS_DUEWORK          		= 'duework';
-	const NS_ONLINE_ASSESS    		= 'assess';
+    const NS_OLDDUEWORK          		= 'work';
+    const NS_ONLINE_ASSESS    		= 'assess';
     const NS_HOMEPAGE_BLOG          = 'homepage_blog';
     const NS_EPORTFOLIO_BLOG        = 'eportfolio_blog';
 	const NS_FORUM            		= 'forum';
@@ -34,9 +35,13 @@ class NSMapper extends Mapper {
 	const NS_REPORT_CARD      		= 'report_card';
     const NS_SPORTS_FIXTURES  		= 'sports_fixtures';
     const NS_SPORTS_FIXTURES_IMPORT = 'sports_fixtures_import';
+    const NS_MESSAGE                = 'message';
+    const NS_TIMETABLE              = 'timetable';
+    const NS_UPS                    = 'ups';
 
 
-	protected function mapping() {
+
+    protected function mapping() {
 		$this->hasTable('msg_namespace');
 		$this->hasModel(NS::class);
 
