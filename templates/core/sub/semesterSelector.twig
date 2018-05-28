@@ -1,10 +1,11 @@
 {#
 Generic Term (aka Semester) selector.
 Usage: include 'sub/semesterSelector.twig
-    currentTerm: Term                    - (optional) the current selected Term
-    terms:       Collection|Term[]       - all Terms to render in dropdown
-    route:       string                  - Aura route
-    routeArgs:   JSON object             - Aura route args to be merged with {Term.code} inside loop
+    currentTerm:        Term                    - (optional) the current selected Term
+    terms:              Collection|Term[]       - all Terms to render in dropdown
+    termsWithResults:   Collection|Term[]       - Terms that have results. Used to disable terms in dropdown.
+    route:              string                  - Aura route
+    routeArgs:          JSON object             - Aura route args to be merged with {Term.code} inside loop
 #}
 
 <script type="text/javascript">
