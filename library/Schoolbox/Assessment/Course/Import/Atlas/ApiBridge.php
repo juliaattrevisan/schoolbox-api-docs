@@ -84,7 +84,7 @@ class ApiBridge
             'curriculum' => ['curriculummap/'.$curriculumId],
             'units'      => [
                 'unit/',
-                ['query' => ['curriculummap_id' => $curriculumId, 'perPage' => 5]]
+                ['query' => ['curriculummap_id' => $curriculumId]]
             ]
         ];
 
