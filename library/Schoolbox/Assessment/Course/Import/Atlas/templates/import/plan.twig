@@ -68,6 +68,17 @@ ItemID = 49959
                                         {% if assessment.type %}<p class="meta">Type: {{ assessment.type }}</p>{% endif %}
                                         {% if assessment.method %}<p class="meta">Method: {{ assessment.method }}</p>{% endif %}
                                     </a>
+                                    {% if assessment.standards|length %}
+                                        <article>
+                                            <h4>Standards</h4>
+                                            <dl>
+                                                {% for standard in assessment.standards %}
+                                                    {% if standard.code %}<dt>({{ standard.code }})</dt>{% endif %}
+                                                    <dd>{{ standard.title }}</dd>
+                                                {% endfor %}
+                                            </dl>
+                                        </article>
+                                    {% endif %}
                                     {% if assessment.content %}
                                         <article>{{ assessment.content | purify }}</article>
                                     {% endif %}

@@ -47,7 +47,9 @@ class Bridge
     {
         $this->httpClient = $httpClient;
         $this->redisCache = new RedisCache(
-            function ($requests) { return $this->makeRequests($requests); },
+            function ($requests) {
+                return $this->makeRequests($requests);
+            },
             $redisClient,
             'atlasApi',
             self::CACHE_EXPIRY
@@ -67,7 +69,7 @@ class Bridge
         $requests = [
             'curriculumList' => ['curriculummap/'],
         ];
-        $result = $this->redisCache->get('curriculumList', [$requests]);
+        $result   = $this->redisCache->get('curriculumList', [$requests]);
         return $result['curriculumList'];
     }
 
@@ -83,27 +85,38 @@ class Bridge
     {
         // Get all units, and their assessments/attachments in one shot
         $requests = [
-            'curriculum' => ['curriculummap/'.$curriculumId],
+            'curriculum' => ['curriculummap/' . $curriculumId],
         ];
 
-        $result     = $this->redisCache->get('curriculumUnits.'.$curriculumId, [$requests]);
+        $result     = $this->redisCache->get('curriculumUnits.' . $curriculumId, [$requests]);
         $curriculum = array_pop($result['curriculum']);
         $units      = $curriculum['units'];
 
         // For each unit: get its assessments and attachments
         $requests = [];
         foreach ($units as $unit) {
-            $requests['assessments:'.$unit['id']] = ['assessment/', ['query' => ['unit_id' => $unit['id']]]];
-            $requests['attachments:'.$unit['id']] = ['attachment/', ['query' => ['unit_id' => $unit['id']]]];
+            $requests['assessments:' . $unit['id']] = ['assessment/', ['query' => ['unit_id' => $unit['id']]]];
+            $requests['attachments:' . $unit['id']] = ['attachment/', ['query' => ['unit_id' => $unit['id']]]];
         }
 
         // Put results into units
-        $result = $this->redisCache->get('curriculumUnitData.'.$curriculumId, [$requests]);
+        $result = $this->redisCache->get('curriculumUnitData.' . $curriculumId, [$requests]);
         foreach ($units as $i => $unit) {
-            $unitId = $unit['id'];
-            $unit['assessments'] = $result['assessments:'.$unitId] ?? [];
+            $unitId              = $unit['id'];
+            $unit['assessments'] = $result['assessments:' . $unitId] ?? [];
             // Attachments is badly bugged, but can be worked around
-            $unit['attachments'] = isset($result['attachments:'.$unitId][0]) ? $result['attachments:'.$unitId] : [];
+            $unit['attachments'] = isset($result['attachments:' . $unitId][0]) ? $result['attachments:' . $unitId] : [];
+
+            // Parse assessment standards into something legible
+            foreach ($unit['assessments'] as $j => $assessment) {
+                if ($assessment['standards']) {
+                    $unit['assessments'][$j]['standards'] = array_map(
+                        function ($value) { return $this->parseStandard($value); },
+                        $assessment['standards']
+                    );
+                }
+            }
+
             $units[$i] = $unit;
         }
 
@@ -157,7 +170,7 @@ class Bridge
             if ($currentPage < $decoded['page']['last_page']) {
                 // Make a new request for the next page
                 [$uri, $params] = $request;
-                $params['query']['page'] = $currentPage + 1;
+                $params['query']['page']        = $currentPage + 1;
                 $nextPageRequests[$requestName] = [$uri, $params];
             }
 
@@ -174,5 +187,23 @@ class Bridge
         }
 
         return $result;
+    }
+
+
+    /**
+     * Parses a string standard into something renderable.
+     *
+     * This is required because Atlas stores curriculum codes as part of a
+     * string value.
+     *
+     * @param string $standard
+     * @return array
+     */
+    private function parseStandard(string $standard): array
+    {
+        return [
+            'title' => $standard,
+            'code'  => '',
+        ];
     }
 }
