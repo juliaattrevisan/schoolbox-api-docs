@@ -4,7 +4,6 @@ namespace Schoolbox\Admin\Timezone;
 
 use DateTimeZone;
 use Schoolbox\Collection;
-use Schoolbox\Column\Date;
 
 /**
  * Class TimezoneFactory
