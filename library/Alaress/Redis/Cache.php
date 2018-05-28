@@ -74,7 +74,7 @@ class Cache extends BaseCache
         // Is it in redis already?
         $redisKey = $this->buildRedisKey($key);
         if ($this->redis->exists($redisKey)) {
-            $result = json_decode($this->redis->get($redisKey));
+            $result = json_decode($this->redis->get($redisKey), true);
         } else {
             $result = parent::get($key, $fetchArgs, $invalidateCache);
             if ($this->expiry > 0) {
