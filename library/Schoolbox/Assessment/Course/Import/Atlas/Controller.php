@@ -79,6 +79,22 @@ class Controller extends BaseController
      */
     private function postImportPart1(): void
     {
+        // Which plan did I choose?
+        // I'll likely have to render in Twig then output it
+        $curriculumPlanId = $this->request->post->getInt('curriculum-plan');
+        if (!isset($curriculumPlanId)) {
+            $this->response->status->setCode(400);
+            $this->response->content->set(
+                $this->buildUnthemedHtmlOutput('sub/mage-error.twig',
+                    [
+                        'error' => [
+                            'problem' => 'You must select a curriculum plan.'
+                        ]
+                    ]
+                )
+            );
+            return;
+        }
         $this->response->content->set(
             $this->buildJsonOutput(['okay' => 'okay'])
         );
