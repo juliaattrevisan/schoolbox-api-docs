@@ -6,7 +6,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Assessment\Course\Import\Atlas;
+namespace Schoolbox\Assessment\Course\Import\Atlas\Api;
 
 use Alaress\Redis\Cache as RedisCache;
 use GuzzleHttp\Client as HttpClient;
@@ -18,7 +18,7 @@ use Psr\Http\Message\ResponseInterface;
 /**
  * Bridge between high-level Atlas API calls and their low-level implementation.
  */
-class ApiBridge
+class Bridge
 {
     private const CACHE_EXPIRY = 300;
 

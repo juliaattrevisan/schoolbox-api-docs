@@ -7,6 +7,7 @@
 namespace Schoolbox\Assessment\Course\Import\Atlas;
 
 use Alaress\Web\Controller\Base as BaseController;
+use Schoolbox\Assessment\Course\Import\Atlas\Api\Bridge as ApiBridge;
 
 class Controller extends BaseController
 {
