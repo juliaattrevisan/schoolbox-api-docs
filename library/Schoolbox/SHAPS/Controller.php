@@ -209,7 +209,56 @@ class Controller extends Base
      * Renders a list of all courses available for your school on Help, and the users enrolled in each.
      */
     public function getUsersInCourses() {
+        // Some sample users
+        $zsmith = $this->userMapper->findById(151);
+        $jbenson = $this->userMapper->findById(247);
 
+        $mharris = $this->userMapper->findById(248);
+        $mkelley = $this->userMapper->findById(249);
+
+        $twigData = [
+            "courses" => [
+                [
+                    "name" => "Random Course",
+                    "id" => 1,
+                    "enrolments" => [
+                        [
+                            "id" => $mkelley->getId(),
+                            "externalID" => $mkelley->getExternalID(),
+                            "name" => $mkelley->getFullName()
+                        ],
+                        [
+                            "id" => $mharris,
+                            "externalID" => $mharris->getExternalID(),
+                            "name" => $mharris->getFullname()
+                        ],
+                        [
+                            "id" => $zsmith->getId(),
+                            "externalID" => $zsmith->getExternalID(),
+                            "name" => $zsmith->getFullName()
+                        ]
+                    ]
+                ],
+                [
+                    "name" => "Schoolbox Teacher Course",
+                    "id" => 2,
+                    "enrolments" => [
+                        [
+                            "id" => $zsmith->getId(),
+                            "externalID" => $zsmith->getExternalID(),
+                            "name" => $zsmith->getFullName()
+                        ],
+                        [
+                            "id" => $jbenson,
+                            "externalID" => $jbenson->getExternalID(),
+                            "name" => $jbenson->getFullname()
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $this->getResponse()->content->set($this->buildHtmlOutput('@shaps/courses/index.twig', $twigData));
     }
 
     /**
@@ -218,7 +267,66 @@ class Controller extends Base
      * @param string $userID
      */
     public function getCoursesForUser($userID) {
+        $userMapper = new UserMapper();
 
+        // Some sample users
+        $zsmith = $userMapper->findById(151);
+        $jbenson = $userMapper->findById(247);
+
+        $mharris = $userMapper->findById(248);
+        $mkelley = $userMapper->findById(249);
+
+        $coursesForUser = [
+            [
+                "externalID" => $zsmith->getExternalID(),
+                "courses" => [
+                    [
+                        "name" => "Random Course",
+                        "id" => 1
+                    ],
+                    [
+                        "name" => "Schoolbox Teacher Course",
+                        "id" => 2
+                    ]
+                ]
+            ],
+            [
+                "externalID" => $mharris->getExternalID(),
+                "courses" => [
+                    [
+                        "name" => "Random Course",
+                        "id" => 1
+                    ]
+                ]
+            ],
+            [
+                "externalID" => $mkelley->getExternalID(),
+                "courses" => [
+                    [
+                        "name" => "Random Course",
+                        "id" => 1
+                    ]
+                ]
+            ],
+            [
+                "externalID" => $jbenson->getExternalID(),
+                "courses" => [
+                    [
+                        "name" => "Schoolbox Teacher Course",
+                        "id" => 2
+                    ]
+                ]
+            ],
+        ];
+
+        // If the user we searched for has sample data in the array above, render it out
+        foreach($coursesForUser as $user) {
+            if ($user['externalID'] == $userID) {
+                echo json_encode($user);
+                /* Prevent rendering of template */
+                exit();
+            }
+        }
     }
 
 }

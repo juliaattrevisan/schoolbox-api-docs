@@ -1,0 +1,315 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/shared/jquery.pantry.js"></script>
+
+<script type="text/javascript">
+    $(function() {
+        /* Collapse content on components
+         */
+        $('[data-component]').find('[data-collapser=true]').collapsable();
+    });
+</script>
+<!-- END custom_head -->
+
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Schoolbox Help Courses</h1>
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="small-12 island">
+        <fieldset class="content">
+            <div class="column small-12">
+                <label>Find enrolments for user
+                    <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Search for a user to see their enrolments">?</span>
+                </label>
+                <input id='user' name="userId" type='text' value='' placeholder="Search users" value="Ms Jenifer Shadbolt" data-selectizeuser required />
+                <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+                <script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
+                <script type="text/javascript">
+                    $(function() {
+                        var $selectize = $('#user').selectizeSelector({
+                            ajax: {
+                                url:      '/ajax/user.php',
+                                type:     'GET',
+                                data:     {showCampus: true},
+                                dataType: 'json'
+                            }
+                        });
+
+                        $selectize = $selectize[0].selectize;
+                        $selectize.on("item_add", function(value, $item) {
+                            var $itemText = $item.text();
+                            var userID = $itemText.match(/\((\d*)\)/)[1];
+
+                            $.get("/greenhouse/url/courses/"+userID, function(data) {
+
+                                var $coursesListEl = $("#coursesForUser #list");
+                                // Clear this node in case it contains someone elses courses from a previous request
+                                $coursesListEl.empty();
+
+                                // Set up initial state of buttons etc
+                                $("#emptyState").removeClass("hide");
+                                $("#selectAll input[type='checkbox']").prop("checked", false);
+
+                                $(data.courses).each(function(index, course) {
+                                    var markup = "<li><div><div class='selector'>" +
+                                        "<input id='chk-" + course.id + "' type='checkbox'/><label for='chk-" + course.id + "' class='checkbox-label'></label>" +
+                                        "</div><div class='icon-course'></div><div class='small-12 card'><h3>" + course.name + "</h3></div></div></li>";
+                                    $coursesListEl.append(markup);
+                                });
+
+                                if (data.courses.length) {
+                                    $("#multiUnenrol").removeClass("hide");
+                                    $("#selectAll").removeClass("hide");
+                                    $("#emptyState").addClass("hide");
+                                }
+
+                                var $checkboxes = $("#coursesForUser input[type='checkbox']");
+
+                                // If user clicks select all box, select or deselect all the courses
+                                $("#selectAll").change(function(e) {
+                                    if ($(e.target).is(":checked")) {
+                                        $checkboxes.prop("checked", true);
+                                    } else {
+                                        $checkboxes.prop("checked", false);
+                                        $("#multiUnenrol button").prop("disabled", true);
+                                    }
+                                })
+
+                                // If user has checked any of the course checkboxes, allow them to click the unenrol button
+                                if ($checkboxes.filter(":checked").length > 0) {
+                                    $("#multiUnenrol button").removeAttr("disabled");
+                                }
+                                $checkboxes.change(function() {
+                                    if ($checkboxes.filter(":checked").length > 0) {
+                                        $("#multiUnenrol button").removeAttr("disabled");
+                                    } else {
+                                        $("#multiUnenrol button").prop("disabled", true);
+                                    }
+                                })
+
+                                // If user clicks the unenrol button, send the IDs of the courses to unenrol from
+                                // and get a toast back
+
+                                $("#multiUnenrol").click(function() {
+                                    event.preventDefault();
+                                    var $toast = $('[data-toast]');
+                                    $toast.toastActivate({text: 'Unenrolling user from selected courses...'});
+                                    window.setTimeout( function () {
+                                        $toast.toastTimeout({text: 'Successfully unenrolled!', duration: 2000, css: 'success'});
+
+                                        $("#multiUnenrol").prop("disabled", true);
+
+                                        // If all the courses are gone...
+                                        if ($("#list input[type='checkbox']:checked").length === $("#list input[type='checkbox']").length) {
+                                            $("#selectAll").addClass("hide");
+                                            $("#multiUnenrol").addClass("hide");
+                                            $("#emptyState").removeClass("hide");
+                                        }
+                                        $("#list input[type='checkbox']:checked").closest("li").remove();
+
+                                    }, 1000);
+                                })
+
+                            }, "json")
+                                .fail(function(xhr, status, error) {
+                                    console.log(xhr);
+                                    console.log(status + ": " + error);
+                                })
+
+                        });
+
+                    });
+                </script>
+            </div>
+            <section id="coursesForUser">
+                <ul id="selectAll" class="information-list card-selectable hide">
+                    <li>
+                        <div>
+                            <div class="selector">
+                                <input id="chk-all" type="checkbox">
+                                <label for="chk-all" class="checkbox-label"></label>
+                            </div>
+                            <div class="small-12 card">
+                                <h3>Select All</h3>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+
+                <ul id="list" class="information-list card-selectable">
+                </ul>
+
+                <div class="content hide" id="multiUnenrol">
+                    <button disabled style="width:100%">Unenrol User From Selected Courses</button>
+                </div>
+
+                <div id='toaster' class="toast" data-toast></div>
+                <div class="empty-state hide" id="emptyState" style="margin-bottom: 0">
+                    <i class="icon-news"></i>
+                    <p>This user is not currently enrolled in any courses.</p>
+                    <p><a href="#" title="">Enrol them in a course</a> using the Available Courses list below.</p>
+                </div>
+            </section>
+
+        </fieldset>
+
+    </div>
+</div>
+<div class="row">
+    <div class="small-12 island">
+        <h3 class="subheader">Available courses</h3>
+
+        <section>
+            <ul class="information-list expandable-card">
+                {% for course in courses %}
+                    <li>
+                        <div class="actions-small-1">
+                            <div class="expander icon-down-arrow" data-collapser="collap-{{loop.index}}"></div>
+                            <div class="small-12 card compact list-item">
+                                <div class="icon-course"></div>
+                                <h3>{{ course.name }}</h3>
+                            </div>
+                        </div>
+                        <div class="small-12 column hide" data-collapse-state="collapsed" data-collapsable="collap-{{loop.index}}">
+
+                            <div class="row">
+                                <div class="small-12 island">
+                                    <dl class="tabs" data-tab>
+                                        <dd class="active"><a href="#members">Current Enrolments</a></dd>
+                                        <dd><a href="#addMembers">Enrol users</a></dd>
+                                    </dl>
+
+                                    <section>
+                                        <div class="tabs-content content no-margin">
+                                            <div class="content active" id="members">
+                                                <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
+
+                                                <ul class="information-list card-selectable">
+
+                                                    <li data-relation="member">
+                                                        <div class="actions-small-4">
+                                                            <div class="selector">
+                                                                <input data-toggle-all name="delete-all-{{ loop.index }}" id="delete-all-{{ loop.index }}" type="checkbox">
+                                                                <label for="delete-all-{{ loop.index }}" class="checkbox-label"></label>
+                                                            </div>
+                                                            <div class="list-item">
+                                                                <div class="card small-12">
+                                                                    <p>Select All</p>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+
+                                                    {% for user in course.enrolments %}
+                                                        <li data-relation="member">
+                                                            <div class="actions-small-4">
+                                                                <div class="selector">
+                                                                    <input id="delete-{{ user.memberID }}" name="delete[]" type="checkbox">
+                                                                    <label for="delete-{{ user.memberID }}" class="checkbox-label"></label>
+                                                                </div>
+                                                                <div class="list-item">
+                                                                    <div class="card small-12">
+                                                                        <a href="/search/user/{{ user.memberID }}">
+                                                                            <img src="/portrait.php?userId={{ user.externalID }}&size=square64" />
+                                                                            {{ user.name }}
+                                                                        </a>
+                                                                    </div>
+                                                                </div>
+                                                                <nav>
+                                                                    <!-- TODO change this form action -->
+                                                                    <form action="/group/modifyForm.php" method="post" class="no-margin">
+                                                                        <input id="accessLevel-{{ user.memberID }}-0" type="radio" name="accessLevel[{{ user.memberID }}]" value="0" />
+                                                                        <label for="accessLevel-{{ user.memberID }}-0" class="input-toggle" title="Remove user from this course">
+                                                                            <i class="icon-close alert"></i>
+                                                                        </label>
+                                                                    </form>
+                                                                </nav>
+                                                            </div>
+                                                        </li>
+                                                    {% endfor %}
+                                                </ul>
+
+                                                <hr>
+                                                <button disabled data-delete-members class="expand">Remove Selected Users From Course</button>
+                                            </div>
+
+                                            <div class="content" id="addMembers">
+                                                <dl class="tabs" data-tab>
+                                                    <dd class="active"><a href="#userName">From Name</a></dd>
+                                                    <dd><a href="#userGroups">From Group</a></dd>
+                                                    <dd><a href="#userRoles">From Role</a></dd>
+                                                    <dd><a href="#userList">From List</a></dd>
+                                                </dl>
+                                                <section>
+                                                    <div class="tabs-content no-margin">
+                                                        <div class="content active" id="userName">
+                                                            <!-- TODO change this form action -->
+                                                            <form action="/group/modifyForm.php" method="post" class="no-margin">
+                                                                <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
+                                                                <label for="addUser">
+                                                                    Enrol users
+                                                                    <span data-tooltip class="has-tip tip-top hint" title="You may add users individually by typing their name and selecting from the list.">?</span>
+                                                                </label>
+                                                                <select id="addUser" name="userID[]" multiple placeholder="Search Users"></select>
+                                                                <input type="submit" value="Add Users" />
+                                                            </form>
+                                                        </div>
+
+                                                        <div class="content" id="userGroups">
+                                                            <form action="/group/addUserByGroup.php?type=individual&destinationID={CATEGORY_ID}" method="post" class="no-margin">
+                                                                <input type="hidden" name="individualGroupID" id="individualGroupID" />
+                                                                <label for="addUsersByIndividualGroup">
+                                                                    Group
+                                                                    <span data-tooltip class="has-tip tip-top hint" title="Add all users that belong to another group.">?</span>
+                                                                </label>
+                                                                <input id="addUsersByIndividualGroup" type="text" size="30" placeholder="Search User Groups" />
+                                                                <input type="submit" value="Add Users" />
+                                                            </form>
+                                                        </div>
+
+                                                        <div class="content" id="userRoles">
+                                                            <form action="/group/addUserByGroup.php?type=system&destinationID={CATEGORY_ID}" method="post" class="no-margin">
+                                                                <input type="hidden" name="systemGroupID" id="systemGroupID" />
+                                                                <label for="addUsersBySystemGroup">
+                                                                    Role
+                                                                    <span data-tooltip class="has-tip tip-top hint" title="Add all users of a particular role in the system.">?</span>
+                                                                </label>
+                                                                <input id="addUsersBySystemGroup" type="text" size="30" placeholder="Search User Roles" />
+                                                                <input type="submit" value="Add Users" />
+                                                            </form>
+                                                        </div>
+
+                                                        <div class="content" id="userList">
+                                                            <form action="/group/modifyForm.php" method="post" class="no-margin">
+                                                                <label for="addUsersByList">
+                                                                    User List
+                                                                    <span data-tooltip class="has-tip tip-top hint" title="Add a list of users (either external user IDs or Schoolbox usernames).">?</span>
+                                                                </label>
+                                                                <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
+                                                                <textarea name="bulkAdd" id="addUsersByList" cols="30" rows="20"></textarea>
+                                                                <input type="submit" value="Add Users" />
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </section>
+                                            </div>
+
+                                        </div>
+                                    </section>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+            <script type="text/javascript">
+                $(function () {
+                    $('[data-collapser]').collapsable();
+                });
+            </script>
+        </section>
+    </div>
+</div>
