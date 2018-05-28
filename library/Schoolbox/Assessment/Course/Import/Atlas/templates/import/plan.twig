@@ -33,7 +33,7 @@ ItemID = 49959
 
 <p>Pick and choose which units and content you wish to import.</p>
 
-<ul class="information-list card-selectable" id="unit-list">
+<ul class="information-list card-selectable threaded" id="unit-list">
     {% for unit in curriculum.units %}
         <li>
             <div>
@@ -54,7 +54,7 @@ ItemID = 49959
                 <div class="small-12 card">
                     <h3>Assessments</h3>
                 </div>
-                <ul class="information-list">
+                <ul class="information-list card-selectable">
                     {% for assessment in unit.assessments %}
                         <li>
                             <div>
@@ -71,6 +71,31 @@ ItemID = 49959
                                     {% if assessment.content %}
                                         <article>{{ assessment.content | purify }}</article>
                                     {% endif %}
+                                </div>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </li>
+        {% endif %}
+
+        {% if unit.attachments|length %}
+            <li class="child">
+                <div class="small-12 card">
+                    <h3>Attachments</h3>
+                </div>
+                <ul class="information-list card-selectable">
+                    {% for attachment in unit.attachments %}
+                        <li>
+                            <div>
+                                <div class="selector">
+                                    <input id="attachment-{{ attachment.id }}" name="attachment[{{ attachment.id }}]" value="1" type="checkbox">
+                                    <label for="attachment-{{ attachment.id }}" class="checkbox-label"></label>
+                                </div>
+                                <div class="small-12 card">
+                                    <a href="#">
+                                        <h3>{{ attachment.title }}</h3>
+                                    </a>
                                 </div>
                             </div>
                         </li>
