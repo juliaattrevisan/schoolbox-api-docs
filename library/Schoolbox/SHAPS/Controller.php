@@ -78,6 +78,42 @@ class Controller extends Base
     }
 
     /**
+     * Get a list of courses available on Help for a particular school, in JSON format.
+     *
+     * @return mixed
+     */
+    private function getCoursesFromHelp()
+    {
+        $client = new GuzzleClient();
+
+        $url = $this->getConfigLoader()->get('schoolbox_help_url');
+
+        // Query params
+        $schoolCode = strtolower($this->getConfigLoader()->get('site_school_code'));
+
+        $now = new Alaress_Date_Format();
+
+        $privateKey = $this->getConfigLoader()->get('schoolbox_help_access_token');
+
+        // TODO once \Custom\Help\CourseParticipation\Handler::computeAccessToken is moved, replace this with new method
+        $token = sha1(sprintf(':%s-%s-%s:', $now, $schoolCode, $privateKey));
+
+        $timestamp = $now->getUnixTimeStamp();
+
+        $response = $client->request(
+            "get",
+            "${url}/api/course-participation/${schoolCode}/courses", [
+            'query' => [
+                'ts' => $timestamp,
+                'token' => $token
+            ]
+        ]);
+
+        return json_decode($response->getBody()->getContents(), true);
+    }
+
+
+    /**
      * Helper method to get a list of user objects from the raw JSON Help API response.
      *
      * @return Collection
@@ -210,55 +246,62 @@ class Controller extends Base
      */
     public function getUsersInCourses() {
         // Some sample users
-        $zsmith = $this->userMapper->findById(151);
-        $jbenson = $this->userMapper->findById(247);
+//        $zsmith = $this->userMapper->findById(151);
+//        $jbenson = $this->userMapper->findById(247);
+//
+//        $mharris = $this->userMapper->findById(248);
+//        $mkelley = $this->userMapper->findById(249);
+//
+//        $twigData = [
+//            "courses" => [
+//                [
+//                    "name" => "Random Course",
+//                    "id" => 1,
+//                    "enrolments" => [
+//                        [
+//                            "id" => $mkelley->getId(),
+//                            "externalID" => $mkelley->getExternalID(),
+//                            "name" => $mkelley->getFullName()
+//                        ],
+//                        [
+//                            "id" => $mharris,
+//                            "externalID" => $mharris->getExternalID(),
+//                            "name" => $mharris->getFullname()
+//                        ],
+//                        [
+//                            "id" => $zsmith->getId(),
+//                            "externalID" => $zsmith->getExternalID(),
+//                            "name" => $zsmith->getFullName()
+//                        ]
+//                    ]
+//                ],
+//                [
+//                    "name" => "Schoolbox Teacher Course",
+//                    "id" => 2,
+//                    "enrolments" => [
+//                        [
+//                            "id" => $zsmith->getId(),
+//                            "externalID" => $zsmith->getExternalID(),
+//                            "name" => $zsmith->getFullName()
+//                        ],
+//                        [
+//                            "id" => $jbenson,
+//                            "externalID" => $jbenson->getExternalID(),
+//                            "name" => $jbenson->getFullname()
+//                        ]
+//                    ]
+//                ]
+//            ]
+//        ];
 
-        $mharris = $this->userMapper->findById(248);
-        $mkelley = $this->userMapper->findById(249);
+        $registeredUsers = $this->getUsersFromHelp();
 
-        $twigData = [
-            "courses" => [
-                [
-                    "name" => "Random Course",
-                    "id" => 1,
-                    "enrolments" => [
-                        [
-                            "id" => $mkelley->getId(),
-                            "externalID" => $mkelley->getExternalID(),
-                            "name" => $mkelley->getFullName()
-                        ],
-                        [
-                            "id" => $mharris,
-                            "externalID" => $mharris->getExternalID(),
-                            "name" => $mharris->getFullname()
-                        ],
-                        [
-                            "id" => $zsmith->getId(),
-                            "externalID" => $zsmith->getExternalID(),
-                            "name" => $zsmith->getFullName()
-                        ]
-                    ]
-                ],
-                [
-                    "name" => "Schoolbox Teacher Course",
-                    "id" => 2,
-                    "enrolments" => [
-                        [
-                            "id" => $zsmith->getId(),
-                            "externalID" => $zsmith->getExternalID(),
-                            "name" => $zsmith->getFullName()
-                        ],
-                        [
-                            "id" => $jbenson,
-                            "externalID" => $jbenson->getExternalID(),
-                            "name" => $jbenson->getFullname()
-                        ]
-                    ]
-                ]
-            ]
-        ];
+        $enrolments = $this->getCoursesFromHelp();
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@shaps/courses/index.twig', $twigData));
+        $this->getResponse()->content->set($this->buildHtmlOutput('@shaps/courses/index.twig', [
+            'courses' => $enrolments,
+            'users'   => $registeredUsers
+        ]));
     }
 
     /**
