@@ -165,12 +165,14 @@ function renderStudent(
             }
         }
 
-        $subject['teachers'] = $userMapper->findByColumnList([
-            'synergy_id' => $classHandler->getTeacherName(
-                $subject['folder']->getCodeString() ?: $subject['code']
-            ),
-            'group_id' => $teacherRoles,
-        ]);
+        $teacherCodes = $classHandler->getTeacherName($subject['folder']->getCodeString() ?: $subject['code']);
+
+        if(is_array($teacherCodes) && count($teacherCodes) > 0) {
+            $subject['teachers'] = $userMapper->findByColumnList([
+                    'synergy_id' => $teacherCodes,
+                    'group_id' => $teacherRoles,
+            ]);
+        }
 
         $subjects[$group][] = $subject;
     }
