@@ -80,9 +80,10 @@ class Controller extends BaseController
     private function postImportPart1(): void
     {
         // Which plan did I choose?
-        // I'll likely have to render in Twig then output it
-        $curriculumPlanId = $this->request->post->getInt('curriculum-plan');
-        if (!isset($curriculumPlanId)) {
+        $curriculumPlanId = $this->request->post->getInt('curriculum-plan', 0);
+
+        // None: render an error
+        if ($curriculumPlanId === 0) {
             $this->response->status->setCode(400);
             $this->response->content->set(
                 $this->buildUnthemedHtmlOutput('sub/mage-error.twig',
@@ -95,8 +96,16 @@ class Controller extends BaseController
             );
             return;
         }
+
+        $curriculumPlan = $this->apiBridge->getCurriculum($curriculumPlanId);
+
         $this->response->content->set(
-            $this->buildJsonOutput(['okay' => 'okay'])
+            $this->buildUnthemedHtmlOutput(
+                '@courseImportAtlas/import/plan.twig',
+                [
+                    'curriculum' => $curriculumPlan,
+                ]
+            )
         );
     }
 
