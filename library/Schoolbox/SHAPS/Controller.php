@@ -134,7 +134,7 @@ class Controller extends Base
             $this->buildHtmlOutput(
                 '@shaps/index.twig', [
                 'allUsers' => $allStaff,
-                'provisionedUserIDs' => $provisionedUserIds
+                'provisionedUserIds' => $provisionedUserIds
             ])->setTitle('Schoolbox Help Staff Provisioning')
         );
     }
@@ -150,7 +150,7 @@ class Controller extends Base
             $this->buildHtmlOutput(
                 '@shaps/provisioned.twig', [
                     'allUsers' => $this->getProvisionedUsers(),
-                    'provisionedUserIDs' => $this->getProvisionedUserIds()
+                    'provisionedUserIds' => $this->getProvisionedUserIds()
             ])->setTitle('Provisioned Staff - Schoolbox Help Staff Provisioning')
         );
     }
