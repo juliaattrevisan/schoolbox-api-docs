@@ -10,13 +10,9 @@ namespace Schoolbox\SHAPS;
 
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
-use Codeception\Lib\Connector\Guzzle;
 use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\User;
 use Schoolbox\UserMapper;
 use GuzzleHttp\Client as GuzzleClient;
-use Schoolbox\Permission\SiteAccess;
 use Schoolbox\Collection;
 
 class Controller extends Base
