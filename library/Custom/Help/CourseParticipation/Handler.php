@@ -102,7 +102,7 @@ class Handler
      * @throws Mapper\Exception\Deleted
      * @return array
      */
-    public function getFolderAccessBySchool(string $schoolCode)
+    public function getFolderAccessBySchool(string $schoolCode) : array
     {
         // ok, if you're here, you can see the thing.
         $courses = $this->getCoursesBySchool($schoolCode);
@@ -129,7 +129,7 @@ class Handler
      * @return array
      * @throws Mapper\DefinitionException
      */
-    public function getUsersBySchool(string $schoolCode, bool $fuzzy = false)
+    public function getUsersBySchool(string $schoolCode, bool $fuzzy = false) : array
     {
         $roleId = $this->getRoleMapper()->findOneByColumn("name", self::PARTICIPANT_ROLE_NAME)->getId();
 
@@ -177,7 +177,7 @@ class Handler
      * @throws Mapper\DefinitionException
      * @throws \PDOException
      */
-    public function postUserRegistrations(string $schoolCode, bool $byUsername, iterable $post)
+    public function postUserRegistrations(string $schoolCode, bool $byUsername, iterable $post) : array
     {
         $participantRole     = $this->getRoleMapper()->findOneByColumn('name', self::PARTICIPANT_ROLE_NAME);
         $participantCampuses = $this->getCampusMapper()->findByColumn('id', self::PARTICIPANT_CAMPUS);
@@ -295,7 +295,7 @@ class Handler
      * @throws Mapper\Exception
      * @return string
      */
-    public function computeAuthDigest(string $schoolCode, int $timestamp)
+    public function computeAuthDigest(string $schoolCode, int $timestamp) : string
     {
         $privateKey = $this->tokenMapper->findById($schoolCode)->getAccessToken();
 
@@ -311,7 +311,7 @@ class Handler
      * @param string              $privateKey
      * @return string
      */
-    public function computeAccessToken(int $timestamp, string $schoolCode, string $privateKey)
+    public function computeAccessToken(int $timestamp, string $schoolCode, string $privateKey) : string
     {
         return (new HelpToken($schoolCode, $privateKey))->generate($timestamp);
     }
@@ -319,9 +319,9 @@ class Handler
 
     /**
      * @param string|int $externalId
-     * @return bool|string
+     * @return string
      */
-    private function getPortraitPath($externalId)
+    private function getPortraitPath($externalId) : string
     {
         return "{$this->portraitDir}/{$externalId}.jpg";
     }
@@ -333,7 +333,7 @@ class Handler
      * @throws Mapper\Exception\Deleted
      * @return Collection|IFolder[]
      */
-    private function getCoursesBySchool(string $schoolCode)
+    private function getCoursesBySchool(string $schoolCode) : Collection
     {
         // ok, if you're here, you can see the thing.
         $folder = $this->folderMapper->findById(
@@ -350,7 +350,7 @@ class Handler
      * @param array $userData
      * @return bool
      */
-    private function userPayloadIsValid(array $userData)
+    private function userPayloadIsValid(array $userData) : bool
     {
         // check all the necessary data is present
         foreach (self::REQUIRED_USER_FIELDS as $required) {
@@ -367,7 +367,7 @@ class Handler
      * @return UserMapper|Mapper
      * @throws Mapper\DefinitionException
      */
-    private function getUserMapper()
+    private function getUserMapper() : UserMapper
     {
         return $this->userAccessMapper->getJoinMapper('user');
     }
@@ -377,7 +377,7 @@ class Handler
      * @return RoleMapper|Mapper
      * @throws Mapper\DefinitionException
      */
-    private function getRoleMapper()
+    private function getRoleMapper() : RoleMapper
     {
         return $this->getUserMapper()->getJoinMapper('role');
     }
@@ -387,7 +387,7 @@ class Handler
      * @return CampusMapper|Mapper
      * @throws Mapper\DefinitionException
      */
-    private function getCampusMapper()
+    private function getCampusMapper() : CampusMapper
     {
         return $this->getUserMapper()->getJoinMapper('userCampus');
     }
