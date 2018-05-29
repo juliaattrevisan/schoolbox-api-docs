@@ -36,10 +36,12 @@ class Module extends BaseModule
     {
         /* Only superusers are allowed to access SHAPS in any capacity */
         $getPerms = new Rule\All(
+            new Rule\IsLoggedIn(),
             new Rule\IsSuperuser()
         );
 
         $postPerms = new Rule\All(
+            new Rule\IsLoggedIn(),
             new Rule\IsSuperuser()
         );
         
