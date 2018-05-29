@@ -11,19 +11,20 @@ namespace Schoolbox\SHAPS;
 
 class HelpToken
 {
-    /*
-     * @var $schoolCode
+    /**
+     * @var string
      */
     private $schoolCode;
 
 
-    /*
-     * @var $privateKey
+    /**
+     * @var string
      */
     private $privateKey;
 
-    /*
-     * @param string $userMapper
+    /**
+     * HelpToken constructor.
+     * @param string $schoolCode
      * @param string $privateKey
      */
     public function __construct(string $schoolCode, string $privateKey) {
@@ -31,8 +32,11 @@ class HelpToken
         $this->privateKey = $privateKey;
     }
 
-    /*
+    /**
      * Generate a token from a timestamp
+     *
+     * @param $timestamp
+     * @return string
      */
     public function generate($timestamp) {
         return sha1(sprintf(':%s-%s-%s:', $timestamp, $this->schoolCode, $this->privateKey));
