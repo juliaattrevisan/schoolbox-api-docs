@@ -269,9 +269,7 @@ class Controller extends Base
                         // Is this Assessment due in this Term?
                         if ($t->getStart()->lte($a->getDueAt()) && ($t->getActualFinish()->isNull() || $t->getActualFinish()->gt($a->getDueAt()))) {
                             $navigableTerms->setOffset($t->getId(), $t);
-
-                            // Remove from available terms to avoid repeated traversals
-                            $allTerms->offsetUnset($t->getId());
+                            
                             break;
                         }
                     }
@@ -334,7 +332,8 @@ class Controller extends Base
         $codeMapper->applyCodesToCategories($courseImplementationFolders);
 
         /** @var Term[]|GenericCollection $navigableTerms */
-        $navigableTerms = $this->getNavigableTerms($courseSpecification, $classFolder);
+        $navigableTerms = TermMapper::getInstance()->findAll();
+        $termsWithResults = $this->getNavigableTerms($courseSpecification, $classFolder);
 
         $data = [
             'courseSpec'          => $courseSpecification,
@@ -367,6 +366,7 @@ class Controller extends Base
             'effort'              => [
                 'allEffort' => $analysis->getEffort(),
             ],
+            'termsWithResults'    => $termsWithResults,
         ];
 
         $this->getResponse()->content->set([
