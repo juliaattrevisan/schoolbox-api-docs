@@ -39,10 +39,10 @@
                             if ($.isEmptyObject(data)) {
                                 // Not sure under what circumstances this could possibly happen with a selectize,
                                 // but accommodating it anyway
-                                $(".empty-state").show();
+                                $("[data-empty-state]").show();
                                 $("#statusForm").addClass("hide");
                             } else {
-                                $(".empty-state").hide();
+                                $("[data-empty-state]").hide();
                                 $("#statusForm").removeClass("hide");
                             }
 
@@ -86,7 +86,7 @@
                         // Show empty state if the selectize is no longer searching for anyone
                         var selectizeEmpty = ($selectize.items.length < 1);
                         if (selectizeEmpty) {
-                            $(".empty-state").show();
+                            $("[data-empty-state]").show();
                             $("#statusForm").addClass("hide");
                         }
                     });
