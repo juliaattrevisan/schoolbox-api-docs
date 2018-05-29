@@ -276,8 +276,9 @@ abstract class Synchronise_Synergetic_Wenona_Strategy_Abstract extends Synchroni
 			FROM user
 			LEFT JOIN groups ON user.group_id = groups.id
 			LEFT JOIN userCampus ON user.id = userCampus.uid
-			WHERE (user.synergy_id = '{$newUser['synergy_id']}'
-			AND groups.id = '{$newUser['group_id']}' ) OR user.username = '{$newUser['username']}'
+			WHERE ((user.synergy_id = '{$newUser['synergy_id']}' AND groups.id = '{$newUser['group_id']}' ) 
+			OR user.username = '{$newUser['username']}') 
+			AND user.deleted_at is null
 			ORDER BY userCampus.defaultCampus DESC
 		";
 

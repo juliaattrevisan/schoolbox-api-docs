@@ -251,6 +251,7 @@ abstract class Synchronise_Synergetic_Moriah_Strategy_Abstract extends Synchroni
 			LEFT JOIN userCampus ON user.id = userCampus.uid
 			WHERE user.synergy_id = '{$newUser['synergy_id']}'
 			AND groups.id = '{$newUser['group_id']}'
+			AND user.deleted_at is null
 			ORDER BY userCampus.defaultCampus DESC
 		";
 
