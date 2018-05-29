@@ -9,38 +9,37 @@
 namespace Schoolbox\SHAPS;
 
 
-class HelpToken
+class AuthDigest
 {
     /**
      * @var string
      */
     private $schoolCode;
 
-
     /**
      * @var string
      */
-    private $privateKey;
+    private $accessToken;
 
     /**
-     * HelpToken constructor.
+     * AuthDigest constructor.
      * @param string $schoolCode
-     * @param string $privateKey
+     * @param string $accessToken
      */
-    public function __construct(string $schoolCode, string $privateKey)
+    public function __construct(string $schoolCode, string $accessToken)
     {
         $this->schoolCode = $schoolCode;
-        $this->privateKey = $privateKey;
+        $this->accessToken = $accessToken;
     }
 
     /**
-     * Generate a token from a timestamp
+     * Generate a digest from a timestamp, schoolcode and access token
      *
      * @param int $timestamp
      * @return string
      */
     public function generate(int $timestamp) : string
     {
-        return sha1(sprintf(':%s-%s-%s:', $timestamp, $this->schoolCode, $this->privateKey));
+        return sha1(sprintf(':%s-%s-%s:', $timestamp, $this->schoolCode, $this->accessToken));
     }
 }

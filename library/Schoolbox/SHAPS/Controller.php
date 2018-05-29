@@ -45,13 +45,13 @@ class Controller extends Base
 
         $now = new Alaress_Date_Format();
 
-        $privateKey = $this->getConfigLoader()->get('schoolbox_help_access_token');
+        $accessToken = $this->getConfigLoader()->get('schoolbox_help_access_token');
 
-        $token = (new HelpToken($schoolCode, $privateKey))->generate($now);
+        $digest = (new AuthDigest($schoolCode, $accessToken))->generate($now->getUnixTimeStamp());
 
         $timestamp = $now->getUnixTimeStamp();
 
-        return ['url' => $url, 'timestamp' => $timestamp, 'token' => $token, 'schoolCode' => $schoolCode];
+        return ['url' => $url, 'timestamp' => $timestamp, 'digest' => $digest, 'schoolCode' => $schoolCode];
     }
 
     /**
@@ -69,7 +69,7 @@ class Controller extends Base
             "{$auth['url']}/api/course-participation/{$auth['schoolCode']}/users", [
             'query' => [
                 'ts' => $auth['timestamp'],
-                'token' => $auth['token']
+                'digest' => $auth['digest']
             ]
         ]);
 

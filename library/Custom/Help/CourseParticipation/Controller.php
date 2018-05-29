@@ -118,23 +118,23 @@ class Controller extends Base
 
 
     /**
-     * @api   GET /api/course-participation/{schoolCode:\w+}/token
+     * @api   GET /api/course-participation/{schoolCode:\w+}/digest
      * @level 170
      *
      * @param string $schoolCode
      * @throws Mapper\Exception
      * @throws Mapper\Exception\Deleted
      */
-    public function refreshToken($schoolCode)
+    public function refreshDigest($schoolCode)
     {
         $now = Alaress_Date_Format::now();
 
         try {
-            $token = $this->handler->computeAuthDigest($schoolCode, $now->getUnixTimeStamp());
+            $digest = $this->handler->computeAuthDigest($schoolCode, $now->getUnixTimeStamp());
 
             $this->getResponse()->content->set($this->buildJsonOutput([
                 'ts'    => $now->getUnixTimeStamp(),
-                'token' => $token
+                'digest' => $digest
             ]));
 
         } catch (\Schoolbox\Mapper\Exception|Mapper\DefinitionException $e) {
@@ -167,7 +167,7 @@ class Controller extends Base
             $c->post($uri, [
                 'query' => [
                     'ts'    => $now->getUnixTimeStamp(),
-                    'token' => $this->handler->computeAuthDigest($school, $now->getUnixTimeStamp())
+                    'digest' => $this->handler->computeAuthDigest($school, $now->getUnixTimeStamp())
                 ],
                 'form_params' => $post
             ]);
@@ -439,7 +439,7 @@ class Controller extends Base
     {
         $requestTimestamp = Alaress_Date_Format::newFromTimestamp($query->get('ts', 0));
 
-        $authDigest = $query->get('token', '');
+        $authDigest = $query->get('digest', '');
 
         $responseCode = $this->getResponseCode($schoolCode, $requestTimestamp, $authDigest);
 

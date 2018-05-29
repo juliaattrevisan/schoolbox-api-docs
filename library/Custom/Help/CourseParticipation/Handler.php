@@ -18,7 +18,7 @@ use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\IFolder;
 use Schoolbox\RoleMapper;
-use Schoolbox\SHAPS\HelpToken;
+use Schoolbox\SHAPS\AuthDigest;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use UnexpectedValueException;
@@ -297,9 +297,9 @@ class Handler
      */
     public function computeAuthDigest(string $schoolCode, int $timestamp) : string
     {
-        $privateKey = $this->tokenMapper->findById($schoolCode)->getAccessToken();
+        $accessToken = $this->tokenMapper->findById($schoolCode)->getAccessToken();
 
-        return $this->computeAccessToken($timestamp, $schoolCode, $privateKey);
+        return (new AuthDigest($schoolCode, $accessToken))->generate($timestamp);
     }
 
 
@@ -308,12 +308,12 @@ class Handler
      *
      * @param int                 $timestamp
      * @param string              $schoolCode
-     * @param string              $privateKey
+     * @param string              $accessToken
      * @return string
      */
-    public function computeAccessToken(int $timestamp, string $schoolCode, string $privateKey) : string
+    public function computeAccessToken(int $timestamp, string $schoolCode, string $accessToken) : string
     {
-        return (new HelpToken($schoolCode, $privateKey))->generate($timestamp);
+        return (new AuthDigest($schoolCode, $accessToken))->generate($timestamp);
     }
 
 
