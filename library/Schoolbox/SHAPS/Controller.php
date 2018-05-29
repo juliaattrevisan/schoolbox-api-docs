@@ -10,7 +10,6 @@ namespace Schoolbox\SHAPS;
 
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
-use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\UserMapper;
 use GuzzleHttp\Client as GuzzleClient;
 use Schoolbox\Collection;
@@ -23,19 +22,12 @@ class Controller extends Base
     private $userMapper;
 
     /**
-     * @var ErrorMapper
-     */
-    private $errorMapper;
-
-    /**
      * Controller constructor.
      *
-     * @param ErrorMapper $errorMapper
      * @param UserMapper  $userMapper
      */
-    public function __construct(ErrorMapper $errorMapper, UserMapper $userMapper)
+    public function __construct(UserMapper $userMapper)
     {
-        $this->$errorMapper = $errorMapper;
         $this->$userMapper = $userMapper;
     }
 
