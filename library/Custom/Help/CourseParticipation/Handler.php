@@ -18,6 +18,7 @@ use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\IFolder;
 use Schoolbox\RoleMapper;
+use Schoolbox\SHAPS\HelpToken;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use UnexpectedValueException;
@@ -312,8 +313,7 @@ class Handler
      */
     public function computeAccessToken(Alaress_Date_Format $timestamp, $schoolCode, $privateKey)
     {
-        // TODO factor this out so that into a general location so that it can be reused by the client
-        return sha1(sprintf(':%s-%s-%s:', $timestamp, $schoolCode, $privateKey));
+        return (new HelpToken($schoolCode, $privateKey))->generate($now);
     }
 
 

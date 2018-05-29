@@ -46,8 +46,7 @@ class Controller extends Base
 
         $privateKey = $this->getConfigLoader()->get('schoolbox_help_access_token');
 
-        // TODO once \Custom\Help\CourseParticipation\Handler::computeAccessToken is moved, replace this with new method
-        $token = sha1(sprintf(':%s-%s-%s:', $now, $schoolCode, $privateKey));
+        $token = (new HelpToken($schoolCode, $privateKey))->generate($now);
 
         $timestamp = $now->getUnixTimeStamp();
 
