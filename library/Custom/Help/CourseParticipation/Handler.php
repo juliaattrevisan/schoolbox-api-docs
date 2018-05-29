@@ -288,22 +288,8 @@ class Handler
     }
 
     /**
-     * Compute an access token (digest auth) for the given school code and timestamp.
+     * Compute a digest auth for the given school code and timestamp.
      *
-     * @param string               $schoolCode
-     * @param int                  $timestamp
-     * @throws Mapper\Exception
-     * @return string
-     */
-    public function computeAuthDigest(string $schoolCode, int $timestamp) : string
-    {
-        $accessToken = $this->tokenMapper->findById($schoolCode)->getAccessToken();
-
-        return (new AuthDigest($schoolCode, $accessToken))->generate($timestamp);
-    }
-
-
-    /**
      * Mash ingredients thoroughly in a small bowl, seasoning with a little salt to taste.
      *
      * @param int                 $timestamp
@@ -311,7 +297,7 @@ class Handler
      * @param string              $accessToken
      * @return string
      */
-    public function computeAccessToken(int $timestamp, string $schoolCode, string $accessToken) : string
+    public function computeAuthDigest(int $timestamp, string $schoolCode, string $accessToken) : string
     {
         return (new AuthDigest($schoolCode, $accessToken))->generate($timestamp);
     }

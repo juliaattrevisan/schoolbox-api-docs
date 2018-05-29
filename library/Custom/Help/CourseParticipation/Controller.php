@@ -110,7 +110,7 @@ class Controller extends Base
 
         foreach ($codes as $code) {
             $school = $code->getSiteSchoolCode();
-            $data['hashes'][$school] = $this->handler->computeAccessToken($now, $school, $code->getAccessToken());
+            $data['hashes'][$school] = $this->handler->computeAuthDigest($now->getUnixTimeStamp(), $school, $code->getAccessToken());
         }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@helpCourseParticipation/apitest.twig', $data));
@@ -130,7 +130,8 @@ class Controller extends Base
         $now = Alaress_Date_Format::now();
 
         try {
-            $digest = $this->handler->computeAuthDigest($schoolCode, $now->getUnixTimeStamp());
+            $accessToken = $this->tokenMapper->findById($schoolCode)->getAccessToken();
+            $digest = $this->handler->computeAuthDigest($schoolCode, $now->getUnixTimeStamp(), $accessToken);
 
             $this->getResponse()->content->set($this->buildJsonOutput([
                 'ts'    => $now->getUnixTimeStamp(),
@@ -152,12 +153,13 @@ class Controller extends Base
     {
         $post = $this->getRequest()->post->getArrayCopy();
 
-        $school = $post['schoolCode'];
+        $schoolCode = $post['schoolCode'];
+        $accessToken = $this->tokenMapper->findById($schoolCode)->getAccessToken();
 
         $now = Alaress_Date_Format::now();
 
         $route = 'helpCourseParticipation.postUserRegistrations';
-        $uri = $post['host'] . $this->getRouteIfAuthorized($route, [ 'schoolCode' => $school ]);
+        $uri = $post['host'] . $this->getRouteIfAuthorized($route, [ 'schoolCode' => $schoolCode ]);
 
         $c = new Client();
 
@@ -167,7 +169,7 @@ class Controller extends Base
             $c->post($uri, [
                 'query' => [
                     'ts'    => $now->getUnixTimeStamp(),
-                    'digest' => $this->handler->computeAuthDigest($school, $now->getUnixTimeStamp())
+                    'digest' => $this->handler->computeAuthDigest($schoolCode, $now->getUnixTimeStamp(), $accessToken)
                 ],
                 'form_params' => $post
             ]);
@@ -483,7 +485,7 @@ class Controller extends Base
         }
 
         try {
-            $expectedToken = $this->handler->computeAccessToken(
+            $expectedToken = $this->handler->computeAuthDigest(
                 $requestTimestamp,
                 $schoolCode,
                 $privateKey
