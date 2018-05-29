@@ -37,7 +37,7 @@ class Controller extends Base
      * @return array
      */
     private function getAuthDetails() {
-        $url = $this->getConfigLoader()->get('schoolbox_help_url');
+        $url = rtrim($this->getConfigLoader()->get('schoolbox_help_url'), '/');
 
         // Query params
         $schoolCode = strtolower($this->getConfigLoader()->get('site_school_code'));
