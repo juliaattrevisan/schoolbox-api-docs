@@ -32,6 +32,11 @@ use Schoolbox\UserMapper;
 class Controller extends Base
 {
     /**
+     * Client requests are considered unauthorised if they are older than this many seconds.
+     */
+    private const REQUEST_TIMESTAMP_EXPIRY = 10;
+
+    /**
      * @var UserAccessMapper
      */
     private $userAccessMapper;
@@ -473,8 +478,9 @@ class Controller extends Base
     {
         $deltaTimestamp = abs(Alaress_Date_Format::now()->diffInSeconds($requestTimestamp));
 
-        // permit a window of +/- 10 seconds to guard against replay
-        if ($deltaTimestamp > 10) {
+        // Client requests are considered unauthorised if they are older than self::REQUEST_TIMESTAMP_EXPIRY.
+        // This is to guard against replay attacks.
+        if ($deltaTimestamp > self::REQUEST_TIMESTAMP_EXPIRY) {
             return 400;
         }
 
