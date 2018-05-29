@@ -39,13 +39,13 @@
                         </tr>
 
                         {% for user in allUsers %}
-                            {% if user.id not in provisionedUserIDs %}
+                            {% if user.id not in provisionedUserIds %}
                                 <tr class="highlight-warning">
                             {% else %}
                                 <tr>
                             {% endif %}
                             <td>
-                                {% if user.id in provisionedUserIDs %}
+                                {% if user.id in provisionedUserIds %}
                                     <i class="icon-course-outline" title="Provisioned"></i>
                                 {% else %}
                                     Not Provisioned
@@ -57,7 +57,7 @@
 
                             {% block provisioned_column %}
                                 <td>
-                                    {% if user.id not in provisionedUserIDs %}
+                                    {% if user.id not in provisionedUserIds %}
                                         <div class="checklist">
                                             <input id="provision-{{ user.id }}" type="checkbox" data-checkbox>
                                             <label for="provision-{{ user.id }}"></label>
@@ -81,7 +81,7 @@
             </form>
         </div>
 
-        <div class="empty-state{% if allUsers | length > 0 %} hide{% endif %}">
+        <div class="empty-state{% if allUsers | length > 0 %} hide{% endif %}" data-empty-state>
             <i class="icon-staff-students"></i>
             <p>{% block emptyStateText %}No matching users found.{% endblock %}</p>
         </div>

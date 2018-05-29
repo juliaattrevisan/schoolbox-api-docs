@@ -3,7 +3,7 @@ VALUES (
   'schoolbox_help_url',
   'https://help.schoolbox.com.au',
   'Schoolbox Help URL',
-  'URL for help, used in API requests. Must NOT have a trailing slash.',
+  'URL for help, used in API requests.',
   '1',
   '',
   '10',

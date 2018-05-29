@@ -32,6 +32,11 @@ use Schoolbox\UserMapper;
 class Controller extends Base
 {
     /**
+     * Client requests are considered unauthorised if they are older than this many seconds.
+     */
+    private const REQUEST_TIMESTAMP_EXPIRY = 10;
+
+    /**
      * @var UserAccessMapper
      */
     private $userAccessMapper;
@@ -110,7 +115,7 @@ class Controller extends Base
 
         foreach ($codes as $code) {
             $school = $code->getSiteSchoolCode();
-            $data['hashes'][$school] = $this->handler->computeAccessToken($now, $school, $code->getAccessToken());
+            $data['hashes'][$school] = $this->handler->computeAuthDigest($now->getUnixTimeStamp(), $school, $code->getAccessToken());
         }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@helpCourseParticipation/apitest.twig', $data));
@@ -118,23 +123,24 @@ class Controller extends Base
 
 
     /**
-     * @api   GET /api/course-participation/{schoolCode:\w+}/token
+     * @api   GET /api/course-participation/{schoolCode:\w+}/digest
      * @level 170
      *
      * @param string $schoolCode
      * @throws Mapper\Exception
      * @throws Mapper\Exception\Deleted
      */
-    public function refreshToken($schoolCode)
+    public function refreshDigest($schoolCode)
     {
         $now = Alaress_Date_Format::now();
 
         try {
-            $token = $this->handler->computeAuthDigest($schoolCode, $now);
+            $accessToken = $this->tokenMapper->findById($schoolCode)->getAccessToken();
+            $digest = $this->handler->computeAuthDigest($schoolCode, $now->getUnixTimeStamp(), $accessToken);
 
             $this->getResponse()->content->set($this->buildJsonOutput([
                 'ts'    => $now->getUnixTimeStamp(),
-                'token' => $token
+                'digest' => $digest
             ]));
 
         } catch (\Schoolbox\Mapper\Exception|Mapper\DefinitionException $e) {
@@ -152,12 +158,13 @@ class Controller extends Base
     {
         $post = $this->getRequest()->post->getArrayCopy();
 
-        $school = $post['schoolCode'];
+        $schoolCode = $post['schoolCode'];
+        $accessToken = $this->tokenMapper->findById($schoolCode)->getAccessToken();
 
         $now = Alaress_Date_Format::now();
 
         $route = 'helpCourseParticipation.postUserRegistrations';
-        $uri = $post['host'] . $this->getRouteIfAuthorized($route, [ 'schoolCode' => $school ]);
+        $uri = $post['host'] . $this->getRouteIfAuthorized($route, [ 'schoolCode' => $schoolCode ]);
 
         $c = new Client();
 
@@ -167,7 +174,7 @@ class Controller extends Base
             $c->post($uri, [
                 'query' => [
                     'ts'    => $now->getUnixTimeStamp(),
-                    'token' => $this->handler->computeAuthDigest($school, $now)
+                    'digest' => $this->handler->computeAuthDigest($schoolCode, $now->getUnixTimeStamp(), $accessToken)
                 ],
                 'form_params' => $post
             ]);
@@ -197,7 +204,7 @@ class Controller extends Base
      * @throws Mapper\Exception
      * @throws Mapper\Exception\Deleted
      */
-    public function getApiTestEnrolmentTable($schoolCode)
+    public function getApiTestEnrolmentTable(string $schoolCode)
     {
         $rq = $this->getRequest();
         $rs = $this->getResponse();
@@ -224,7 +231,7 @@ class Controller extends Base
      * @throws Mapper\Exception\Deleted
      * @throws Mapper\DefinitionException
      */
-    public function getFolderAccessBySchool($schoolCode)
+    public function getFolderAccessBySchool(string $schoolCode)
     {
         $rq = $this->getRequest();
         $rs = $this->getResponse();
@@ -257,7 +264,7 @@ class Controller extends Base
      * @throws Mapper\Exception\Deleted
      * @throws \Aura\Web\Exception\InvalidStatusCode
      */
-    public function postFolderAccessBySchool($schoolCode)
+    public function postFolderAccessBySchool(string $schoolCode)
     {
         $rq = $this->getRequest();
         $rs = $this->getResponse();
@@ -340,7 +347,7 @@ class Controller extends Base
      * @param string $schoolCode
      * @throws Mapper\DefinitionException
      */
-    public function getUsersBySchool($schoolCode)
+    public function getUsersBySchool(string $schoolCode)
     {
         $rq = $this->getRequest();
         $rs = $this->getResponse();
@@ -367,7 +374,7 @@ class Controller extends Base
      * @throws Mapper\DefinitionException
      * @throws PDOException
      */
-    public function postUserRegistrations($schoolCode)
+    public function postUserRegistrations(string $schoolCode)
     {
         $rq = $this->getRequest();
         $rs = $this->getResponse();
@@ -417,7 +424,7 @@ class Controller extends Base
      * @throws Mapper\Exception\Deleted
      * @return Collection|IFolder[]
      */
-    private function getCoursesBySchool($schoolCode)
+    private function getCoursesBySchool(string $schoolCode) : Collection
     {
         // ok, if you're here, you can see the thing.
         $folder = $this->folderMapper->findById(
@@ -435,11 +442,11 @@ class Controller extends Base
      * @param string $schoolCode
      * @return bool
      */
-    private function isInvalidAuth(Values $query, $schoolCode)
+    private function isInvalidAuth(Values $query, string $schoolCode) : bool
     {
         $requestTimestamp = Alaress_Date_Format::newFromTimestamp($query->get('ts', 0));
 
-        $authDigest = $query->get('token', '');
+        $authDigest = $query->get('digest', '');
 
         $responseCode = $this->getResponseCode($schoolCode, $requestTimestamp, $authDigest);
 
@@ -467,12 +474,13 @@ class Controller extends Base
      * @param string              $authDigest
      * @return int
      */
-    private function getResponseCode($schoolCode, Alaress_Date_Format $requestTimestamp, $authDigest)
+    private function getResponseCode(string $schoolCode, Alaress_Date_Format $requestTimestamp, string $authDigest) : int
     {
         $deltaTimestamp = abs(Alaress_Date_Format::now()->diffInSeconds($requestTimestamp));
 
-        // permit a window of +/- 10 seconds to guard against replay
-        if ($deltaTimestamp > 10) {
+        // Client requests are considered unauthorised if they are older than self::REQUEST_TIMESTAMP_EXPIRY.
+        // This is to guard against replay attacks.
+        if ($deltaTimestamp > self::REQUEST_TIMESTAMP_EXPIRY) {
             return 400;
         }
 
@@ -483,8 +491,8 @@ class Controller extends Base
         }
 
         try {
-            $expectedToken = $this->handler->computeAccessToken(
-                $requestTimestamp,
+            $expectedToken = $this->handler->computeAuthDigest(
+                $requestTimestamp->getUnixTimeStamp(),
                 $schoolCode,
                 $privateKey
             );
@@ -520,7 +528,7 @@ class Controller extends Base
      * @return UserMapper|Mapper
      * @throws Mapper\DefinitionException
      */
-    private function getUserMapper()
+    private function getUserMapper() : UserMapper
     {
         return $this->userAccessMapper->getJoinMapper('user');
     }
@@ -530,7 +538,7 @@ class Controller extends Base
      * @return RoleMapper|Mapper
      * @throws Mapper\DefinitionException
      */
-    private function getRoleMapper()
+    private function getRoleMapper() : RoleMapper
     {
         return $this->getUserMapper()->getJoinMapper('role');
     }
@@ -540,7 +548,7 @@ class Controller extends Base
      * @return CampusMapper|Mapper
      * @throws Mapper\DefinitionException
      */
-    private function getCampusMapper()
+    private function getCampusMapper() : CampusMapper
     {
         return $this->getUserMapper()->getJoinMapper('userCampus');
     }

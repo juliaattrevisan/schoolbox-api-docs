@@ -13,9 +13,7 @@ use Alaress\Module\Module as BaseModule;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
-use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Mapper;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
 use Alaress\Twig\Loader\IChainLoader;
 
@@ -36,10 +34,12 @@ class Module extends BaseModule
     {
         /* Only superusers are allowed to access SHAPS in any capacity */
         $getPerms = new Rule\All(
+            new Rule\IsLoggedIn(),
             new Rule\IsSuperuser()
         );
 
         $postPerms = new Rule\All(
+            new Rule\IsLoggedIn(),
             new Rule\IsSuperuser()
         );
         
@@ -48,7 +48,7 @@ class Module extends BaseModule
         $this->register('GET', '/provisioning/unprovisioned', 'getUnprovisioned', $getPerms);
         $this->register('GET', '/provisioning/search', 'getSearch', $getPerms);
 
-        $this->register('GET', '/provisioning/{userID}', 'searchUsers', $getPerms);
+        $this->register('GET', '/provisioning/{userId}', 'searchUsers', $getPerms);
     }
 
     /**

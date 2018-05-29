@@ -10,13 +10,8 @@ namespace Schoolbox\SHAPS;
 
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
-use Codeception\Lib\Connector\Guzzle;
-use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\User;
 use Schoolbox\UserMapper;
 use GuzzleHttp\Client as GuzzleClient;
-use Schoolbox\Permission\SiteAccess;
 use Schoolbox\Collection;
 
 class Controller extends Base
@@ -27,20 +22,36 @@ class Controller extends Base
     private $userMapper;
 
     /**
-     * @var ErrorMapper
-     */
-    private $errorMapper;
-
-    /**
      * Controller constructor.
      *
-     * @param ErrorMapper $errorMapper
-     * @param UserMapper  $userMapper
+     * @param UserMapper $userMapper
      */
-    public function __construct(ErrorMapper $errorMapper, UserMapper $userMapper)
+    public function __construct(UserMapper $userMapper)
     {
-        $this->setErrorMapper($errorMapper);
-        $this->setUserMapper($userMapper);
+        $this->userMapper = $userMapper;
+    }
+
+    /*
+     * Helper method to get details required for any Help API request.
+     *
+     * @return array
+     */
+    private function getAuthDetails() : array
+    {
+        $url = rtrim($this->getConfigLoader()->get('schoolbox_help_url'), '/');
+
+        // Query params
+        $schoolCode = strtolower($this->getConfigLoader()->get('site_school_code'));
+
+        $now = new Alaress_Date_Format();
+
+        $accessToken = $this->getConfigLoader()->get('schoolbox_help_access_token');
+
+        $digest = (new AuthDigest($schoolCode, $accessToken))->generate($now->getUnixTimeStamp());
+
+        $timestamp = $now->getUnixTimeStamp();
+
+        return ['url' => $url, 'timestamp' => $timestamp, 'digest' => $digest, 'schoolCode' => $schoolCode];
     }
 
     /**
@@ -50,30 +61,23 @@ class Controller extends Base
      */
     private function getUsersFromHelp()
     {
+        // TODO clean this up a bit - code duplication whenever we want to make a different API call...
         $client = new GuzzleClient();
+        $auth = $this->getAuthDetails();
 
-        $url = $this->getConfigLoader()->get('schoolbox_help_url');
-
-        // Query params
-        $schoolCode = strtolower($this->getConfigLoader()->get('site_school_code'));
-
-        $now = new Alaress_Date_Format();
-
-        $privateKey = $this->getConfigLoader()->get('schoolbox_help_access_token');
-
-        // TODO once \Custom\Help\CourseParticipation\Handler::computeAccessToken is moved, replace this with new method
-        $token = sha1(sprintf(':%s-%s-%s:', $now, $schoolCode, $privateKey));
-
-        $timestamp = $now->getUnixTimeStamp();
+        $route = $this->getRouter()->generate('helpCourseParticipation.getUsersBySchool', [
+            'schoolCode' => $auth['schoolCode']
+        ]);
 
         $response = $client->request(
             "get",
-            "${url}/api/course-participation/${schoolCode}/users", [
-            'query' => [
-                'ts' => $timestamp,
-                'token' => $token
+            "{$auth['url']}{$route}", [
+                'query' => [
+                    'ts' => $auth['timestamp'],
+                    'digest' => $auth['digest']
+                ]
             ]
-        ]);
+        );
 
         return json_decode($response->getBody()->getContents(), true);
     }
@@ -83,9 +87,10 @@ class Controller extends Base
      *
      * @return Collection
      */
-    private function getProvisionedUsers() {
-        $provisionedUserIDs = $this->getProvisionedUserIDs();
-        $provisionedUsers = $this->userMapper->findByColumn('id', $provisionedUserIDs);
+    private function getProvisionedUsers() : Collection
+    {
+        $provisionedUserIds = $this->getProvisionedUserIds();
+        $provisionedUsers = $this->userMapper->findByColumn('id', $provisionedUserIds);
         return $provisionedUsers;
     }
 
@@ -94,10 +99,26 @@ class Controller extends Base
      *
      * @return array
      */
-    private function getProvisionedUserIDs()
+    private function getProvisionedUserIds() : array
     {
         $provisionedUsers = $this->getUsersFromHelp();
         return array_keys($provisionedUsers);
+    }
+
+    /*
+     * Helper method to get all staff in your Schoolbox instance.
+     *
+     * @return Collection
+     */
+    private function getAllStaff() : Collection
+    {
+        // All the staff in our Schoolbox instance
+        return $this->userMapper->findByColumn('g.group_type', \Schoolbox\Role::STAFF, [
+            'order' => [
+                'lastname' => 'asc',
+                'firstname' => 'asc'
+            ]
+        ]);
     }
 
     /**
@@ -107,15 +128,14 @@ class Controller extends Base
      */
     public function getAll()
     {
-        // All the staff in our Schoolbox instance
-        $allStaff = $this->userMapper->findByColumn('g.group_type', 'staff')->sortBy("lastname", "asc");
-        $provisionedUserIDs = $this->getProvisionedUserIDs();
+        $allStaff = $this->getAllStaff();
+        $provisionedUserIds = $this->getProvisionedUserIds();
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@shaps/index.twig', [
                 'allUsers' => $allStaff,
-                'provisionedUserIDs' => $provisionedUserIDs
+                'provisionedUserIds' => $provisionedUserIds
             ])->setTitle('Schoolbox Help Staff Provisioning')
         );
     }
@@ -131,7 +151,7 @@ class Controller extends Base
             $this->buildHtmlOutput(
                 '@shaps/provisioned.twig', [
                     'allUsers' => $this->getProvisionedUsers(),
-                    'provisionedUserIDs' => $this->getProvisionedUserIDs()
+                    'provisionedUserIds' => $this->getProvisionedUserIds()
             ])->setTitle('Provisioned Staff - Schoolbox Help Staff Provisioning')
         );
     }
@@ -143,7 +163,7 @@ class Controller extends Base
      */
     public function getUnprovisioned()
     {
-        $allStaff = $this->userMapper->findByColumn('g.group_type', 'staff')->sortBy("lastname", "asc");
+        $allStaff = $this->getAllStaff();
         $unprovisionedStaff = $allStaff->diff($this->getProvisionedUsers());
 
         $this->getResponse()->content->set(
@@ -171,15 +191,16 @@ class Controller extends Base
     /**
      * Provides details about a user in response to an ajax request for that user's external ID.
      *
-     * @api GET /shaps/provisioning/{userID}
+     * @api GET /shaps/provisioning/{userId}
+     * @param string $userId
      */
-    public function searchUsers($userID)
+    public function searchUsers(string $userId)
     {
         // Selectize gives us the user's external ID
-        $user = $this->userMapper->findByExternalId($userID);
+        $user = $this->userMapper->findByExternalId($userId);
 
-        $provisionedUserIDs = $this->getProvisionedUserIDs();
-        $status = in_array($user->getId(), $provisionedUserIDs);
+        $provisionedUserIds = $this->getProvisionedUserIds();
+        $status = in_array($user->getId(), $provisionedUserIds);
         $userJSON = [
             'name' => $user->getFullName(),
             'provisioned' => $status,
@@ -187,41 +208,5 @@ class Controller extends Base
             'externalID' => $user->getExternalId(),
         ];
         $this->getResponse()->content->set($this->buildJsonOutput($userJSON));
-    }
-
-    /**
-     * @return UserMapper
-     */
-    private function getUserMapper(): UserMapper
-    {
-        return $this->userMapper;
-    }
-
-    /**
-     * @param UserMapper $userMapper
-     * @return $this
-     */
-    private function setUserMapper(UserMapper $userMapper)
-    {
-        $this->userMapper = $userMapper;
-        return $this;
-    }
-
-    /**
-     * @return ErrorMapper
-     */
-    private function getErrorMapper(): ErrorMapper
-    {
-        return $this->errorMapper;
-    }
-
-    /**
-     * @param ErrorMapper $errorMapper
-     * @return $this
-     */
-    private function setErrorMapper(ErrorMapper $errorMapper)
-    {
-        $this->errorMapper = $errorMapper;
-        return $this;
     }
 }

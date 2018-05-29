@@ -7,12 +7,12 @@
             <ul class="information-list">
                 {% for code in codes %}
                     {% set school = code.siteSchoolCode %}
-                    {% set token  = hashes[school] %}
+                    {% set digest  = hashes[school] %}
                     <li>
-                        <a class="link-row content" href="{{ routeLookup('helpCourseParticipation.getFolderAccessBySchool', { schoolCode: school }) }}?ts={{ ts }}&token={{ token }}">{{ school }} participations</a>
+                        <a class="link-row content" href="{{ routeLookup('helpCourseParticipation.getFolderAccessBySchool', { schoolCode: school }) }}?ts={{ ts }}&digest={{ digest }}">{{ school }} participations</a>
                     </li>
                     <li>
-                        <a class="link-row content" href="{{ routeLookup('helpCourseParticipation.getUsersBySchool', { schoolCode: school }) }}?ts={{ ts }}&token={{ token }}">{{ school }} user list</a>
+                        <a class="link-row content" href="{{ routeLookup('helpCourseParticipation.getUsersBySchool', { schoolCode: school }) }}?ts={{ ts }}&digest={{ digest }}">{{ school }} user list</a>
                     </li>
                 {% endfor %}
             </ul>
@@ -89,7 +89,7 @@
 </div>
 <script>
     $(function () {
-        var tokenGetRoute      = "{{ routeLookup('helpCourseParticipation.refreshToken') }}";
+        var digestGetRoute      = "{{ routeLookup('helpCourseParticipation.refreshDigest') }}";
         var enrolmentGetRoute  = "{{ routeLookup('helpCourseParticipation.getApiTestEnrolmentTable') }}";
         var enrolmentPostRoute = "{{ routeLookup('helpCourseParticipation.postFolderAccessBySchool') }}";
 
@@ -107,7 +107,7 @@
 
             var data = $(this).serialize();
 
-            fetch(getServer() + tokenGetRoute, schoolCode).done(function (auth) {
+            fetch(getServer() + digestGetRoute, schoolCode).done(function (auth) {
                 $.ajax($form.attr('action') + '?' + $.param(auth), {
                     method: $form.attr('method'),
                     data: data
@@ -131,9 +131,9 @@
 
             $host.attr('disabled', true);
 
-            $ul.html('<p>Getting a fresh token for ' + schoolCode + ' from ' + host + '&hellip;</p>');
+            $ul.html('<p>Getting a fresh digest for ' + schoolCode + ' from ' + host + '&hellip;</p>');
 
-            fetch(server + tokenGetRoute, schoolCode).done(function (auth) {
+            fetch(server + digestGetRoute, schoolCode).done(function (auth) {
                 $ul.html('<p>Getting enrolment data for ' + schoolCode + ' from ' + host + '&hellip;</p>');
 
                 fetch(server + enrolmentGetRoute, schoolCode, auth).done(function (tableHtml) {
@@ -150,7 +150,7 @@
                 });
 
             }).fail(function (xhr, status, reason) {
-                $ul.html('<p>Token fetch failed: '+reason+'. <button data-load-users value="' + schoolCode + '">Try again</button></p>');
+                $ul.html('<p>Digest fetch failed: '+reason+'. <button data-load-users value="' + schoolCode + '">Try again</button></p>');
                 $host.attr('disabled', false);
             });
         }

@@ -8,7 +8,6 @@
 
 namespace Custom\Help\CourseParticipation;
 
-use Alaress_Date_Format;
 use InvalidArgumentException;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
@@ -18,6 +17,7 @@ use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\IFolder;
 use Schoolbox\RoleMapper;
+use Schoolbox\SHAPS\AuthDigest;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use UnexpectedValueException;
@@ -77,7 +77,7 @@ class Handler
         SiteAccess\Mapper $tokenMapper,
         Folder\Mapper $folderMapper,
         User\Password\MailService $mailService,
-        $portraitDir
+        string $portraitDir
     ) {
         $this->userAccessMapper = $userAccessMapper;
         $this->tokenMapper = $tokenMapper;
@@ -101,7 +101,7 @@ class Handler
      * @throws Mapper\Exception\Deleted
      * @return array
      */
-    public function getFolderAccessBySchool($schoolCode)
+    public function getFolderAccessBySchool(string $schoolCode) : array
     {
         // ok, if you're here, you can see the thing.
         $courses = $this->getCoursesBySchool($schoolCode);
@@ -128,7 +128,7 @@ class Handler
      * @return array
      * @throws Mapper\DefinitionException
      */
-    public function getUsersBySchool($schoolCode, $fuzzy = false)
+    public function getUsersBySchool(string $schoolCode, bool $fuzzy = false) : array
     {
         $roleId = $this->getRoleMapper()->findOneByColumn("name", self::PARTICIPANT_ROLE_NAME)->getId();
 
@@ -176,7 +176,7 @@ class Handler
      * @throws Mapper\DefinitionException
      * @throws \PDOException
      */
-    public function postUserRegistrations($schoolCode, $byUsername, iterable $post)
+    public function postUserRegistrations(string $schoolCode, bool $byUsername, iterable $post) : array
     {
         $participantRole     = $this->getRoleMapper()->findOneByColumn('name', self::PARTICIPANT_ROLE_NAME);
         $participantCampuses = $this->getCampusMapper()->findByColumn('id', self::PARTICIPANT_CAMPUS);
@@ -287,41 +287,26 @@ class Handler
     }
 
     /**
-     * Compute an access token (digest auth) for the given school code and timestamp.
+     * Compute a digest auth for the given school code and timestamp.
      *
-     * @param string               $schoolCode
-     * @param Alaress_Date_Format $now
-     * @throws Mapper\Exception
-     * @return string
-     */
-    public function computeAuthDigest($schoolCode, Alaress_Date_Format $now)
-    {
-        $privateKey = $this->tokenMapper->findById($schoolCode)->getAccessToken();
-
-        return $this->computeAccessToken($now, $schoolCode, $privateKey);
-    }
-
-
-    /**
      * Mash ingredients thoroughly in a small bowl, seasoning with a little salt to taste.
      *
-     * @param Alaress_Date_Format $timestamp
+     * @param int                 $timestamp
      * @param string              $schoolCode
-     * @param string              $privateKey
+     * @param string              $accessToken
      * @return string
      */
-    public function computeAccessToken(Alaress_Date_Format $timestamp, $schoolCode, $privateKey)
+    public function computeAuthDigest(int $timestamp, string $schoolCode, string $accessToken) : string
     {
-        // TODO factor this out so that into a general location so that it can be reused by the client
-        return sha1(sprintf(':%s-%s-%s:', $timestamp, $schoolCode, $privateKey));
+        return (new AuthDigest($schoolCode, $accessToken))->generate($timestamp);
     }
 
 
     /**
      * @param string|int $externalId
-     * @return bool|string
+     * @return string
      */
-    private function getPortraitPath($externalId)
+    private function getPortraitPath($externalId) : string
     {
         return "{$this->portraitDir}/{$externalId}.jpg";
     }
@@ -333,7 +318,7 @@ class Handler
      * @throws Mapper\Exception\Deleted
      * @return Collection|IFolder[]
      */
-    private function getCoursesBySchool($schoolCode)
+    private function getCoursesBySchool(string $schoolCode) : Collection
     {
         // ok, if you're here, you can see the thing.
         $folder = $this->folderMapper->findById(
@@ -350,7 +335,7 @@ class Handler
      * @param array $userData
      * @return bool
      */
-    private function userPayloadIsValid(array $userData)
+    private function userPayloadIsValid(array $userData) : bool
     {
         // check all the necessary data is present
         foreach (self::REQUIRED_USER_FIELDS as $required) {
@@ -367,7 +352,7 @@ class Handler
      * @return UserMapper|Mapper
      * @throws Mapper\DefinitionException
      */
-    private function getUserMapper()
+    private function getUserMapper() : UserMapper
     {
         return $this->userAccessMapper->getJoinMapper('user');
     }
@@ -377,7 +362,7 @@ class Handler
      * @return RoleMapper|Mapper
      * @throws Mapper\DefinitionException
      */
-    private function getRoleMapper()
+    private function getRoleMapper() : RoleMapper
     {
         return $this->getUserMapper()->getJoinMapper('role');
     }
@@ -387,7 +372,7 @@ class Handler
      * @return CampusMapper|Mapper
      * @throws Mapper\DefinitionException
      */
-    private function getCampusMapper()
+    private function getCampusMapper() : CampusMapper
     {
         return $this->getUserMapper()->getJoinMapper('userCampus');
     }

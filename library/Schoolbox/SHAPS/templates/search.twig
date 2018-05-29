@@ -22,27 +22,29 @@
                         multiple: true
                     });
 
-                    function getUserIdFromRegex(userID) {
+                    function getUserIdFromRegex(userId) {
                         // Match the last bit of text in brackets (as there is a small chance the user's role, for example, could contain brackets)
                         // Can't match on end of string because there's a weird unicode character at the end.
-                        return userID.match(/\((.*)\)(?!\((.*)\))/)[1];
+                        return userId.match(/\((.*)\)(?!\((.*)\))/)[1];
                     }
 
                     var tableSelector = "#statusTable table";
 
                     $selectize = $selectize[0].selectize;
                     $selectize.on("item_add", function(value, $item) {
-                        var userID = getUserIdFromRegex($item.text())
+                        var userId = getUserIdFromRegex($item.text())
 
-                        $.get("/shaps/provisioning/"+userID, function(data) {
+                        var url = '{{ routeLookup("shaps.searchUsers") }}'.replace('{userId}', userId);
+
+                        $.get(url, function(data) {
 
                             if ($.isEmptyObject(data)) {
                                 // Not sure under what circumstances this could possibly happen with a selectize,
                                 // but accommodating it anyway
-                                $(".empty-state").show();
+                                $("[data-empty-state]").show();
                                 $("#statusForm").addClass("hide");
                             } else {
-                                $(".empty-state").hide();
+                                $("[data-empty-state]").hide();
                                 $("#statusForm").removeClass("hide");
                             }
 
@@ -79,14 +81,14 @@
 
                     $selectize.on("item_remove", function(index, $item) {
                         // Remove users from search results when they are removed from the selectize
-                        var userID = getUserIdFromRegex($item.text())
-                        var userRow = tableSelector + " tr#" + userID;
+                        var userId = getUserIdFromRegex($item.text())
+                        var userRow = tableSelector + " tr#" + userId;
                         $(userRow).remove();
 
                         // Show empty state if the selectize is no longer searching for anyone
                         var selectizeEmpty = ($selectize.items.length < 1);
                         if (selectizeEmpty) {
-                            $(".empty-state").show();
+                            $("[data-empty-state]").show();
                             $("#statusForm").addClass("hide");
                         }
                     });
