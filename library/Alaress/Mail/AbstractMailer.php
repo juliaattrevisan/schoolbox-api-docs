@@ -218,6 +218,16 @@ abstract class AbstractMailer implements IMailer
 
 
     /**
+     * Encodes email in base64 rather than quoted printable
+     */
+    public function encodeBase64()
+    {
+        $encoder = new \Swift_Mime_ContentEncoder_Base64ContentEncoder();
+        $this->email->setEncoder($encoder);
+
+    }
+
+    /**
      * Attempts to send the email constructed by this class. Returns mailing success or failure.
      *
      * @param string $to

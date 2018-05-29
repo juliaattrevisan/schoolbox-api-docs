@@ -225,6 +225,7 @@ class MailService
         $email = $this->mailFactory->build($template, $subject);
 
         $email->setFrom($fromAddress, $fromName);
+        $email->encodeBase64();
 
         try {
             if (filter_var($user->getEmail(), FILTER_VALIDATE_EMAIL)) {

@@ -11,6 +11,7 @@ namespace Alaress\Mail;
 
 
 use Schoolbox\IConfigLoader;
+use Psr\Log\LoggerInterface;
 use Swift_Transport;
 
 interface IMailer {
@@ -56,8 +57,12 @@ interface IMailer {
 
 	public function addFile($file, $mime = 'text/plain', $filename = '', $isFile = true);
 
-	public function addImage($file, $type='appplication/octet');
+	public function addImage($file, $type='application/octet');
 
 	public function send($to = '');
+
+	public function setLogger(LoggerInterface $logger);
+
+	public function encodeBase64();
 
 }
