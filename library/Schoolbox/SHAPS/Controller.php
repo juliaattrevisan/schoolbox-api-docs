@@ -28,7 +28,7 @@ class Controller extends Base
      */
     public function __construct(UserMapper $userMapper)
     {
-        $this->$userMapper = $userMapper;
+        $this->userMapper = $userMapper;
     }
 
     /*
