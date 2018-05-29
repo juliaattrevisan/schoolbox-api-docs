@@ -39,15 +39,12 @@ class Controller extends Base
         $this->$userMapper = $userMapper;
     }
 
-    /**
-     * Get a list of users provisioned on Help for a particular school, in JSON format.
+    /*
+     * Helper method to get details required for any Help API request.
      *
-     * @return mixed
+     * @return array
      */
-    private function getUsersFromHelp()
-    {
-        $client = new GuzzleClient();
-
+    private function getAuthDetails() {
         $url = $this->getConfigLoader()->get('schoolbox_help_url');
 
         // Query params
@@ -62,12 +59,25 @@ class Controller extends Base
 
         $timestamp = $now->getUnixTimeStamp();
 
+        return ['url' => $url, 'timestamp' => $timestamp, 'token' => $token];
+    }
+
+    /**
+     * Get a list of users provisioned on Help for a particular school, in JSON format.
+     *
+     * @return mixed
+     */
+    private function getUsersFromHelp()
+    {
+        $client = new GuzzleClient();
+        $auth = $this->getAuthDetails();
+
         $response = $client->request(
             "get",
-            "{$url}/api/course-participation/{$schoolCode}/users", [
+            "{$auth['url']}/api/course-participation/{$auth['schoolCode']}/users", [
             'query' => [
-                'ts' => $timestamp,
-                'token' => $token
+                'ts' => $auth['timestamp'],
+                'token' => $auth['token']
             ]
         ]);
 
