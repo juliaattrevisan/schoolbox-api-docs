@@ -8,7 +8,6 @@
 
 namespace Custom\Help\CourseParticipation;
 
-use Alaress_Date_Format;
 use InvalidArgumentException;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
