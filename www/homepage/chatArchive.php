@@ -191,9 +191,9 @@ if (is_array($items)) {
 
             // get the datestamp for the post
             if (isset($previous)) {
-                $df = new Alaress_Date_Format($previous['time'], 'Y-m-d');
+                $df = new Alaress_Date_Format($previous['time'], Alaress_Date_Format::DATABASE_FORMAT);
             } else {
-                $df = new Alaress_Date_Format($chat['time'], 'Y-m-d');
+                $df = new Alaress_Date_Format($chat['time'], Alaress_Date_Format::DATABASE_FORMAT);
             }
 
             $postDay = $df->getLongDateOnly();
@@ -230,7 +230,7 @@ if (is_array($items)) {
                 $this->parse("chat_block", "chat", true);
 
                 if ($total == $i) {
-                    $lastDate = new Alaress_Date_Format($chat['time'], 'Y-m-d');
+                    $lastDate = new Alaress_Date_Format($chat['time'], Alaress_Date_Format::DATABASE_FORMAT);
                     $this->setVar('CHAT_DATE', $lastDate->getLongDateOnly());
                     $this->parse('chat_date_block', 'chat_date', true);
 
