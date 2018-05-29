@@ -30,14 +30,14 @@ Term | Definition
 --- | --- 
 Activity | (n.) In the context of the Schoolbox software - an assessment (Due Work, Task or Quiz). In the context of work the Product Team does - a type of ticket in Jira (see [issue-types.md](issue-types.md)).
 Attach Zone | (n.) An area where you can drag and drop files to upload them
-Aura (or mistakenly Aurora) | A collection of PHP libraries, some of which we use more recently in our codebase, like the router - http://auraphp.com/
-Breadcrumbs | See https://en.wikipedia.org/wiki/Breadcrumb_(navigation)
+Aura (or mistakenly Aurora) | (n.) A collection of PHP libraries, some of which we use more recently in our codebase, like the router - http://auraphp.com/
+Breadcrumbs | (n.) See https://en.wikipedia.org/wiki/Breadcrumb_(navigation)
 CK, CKE, CKEditor | (n.) An inline wysiwyg editor.
 Connector | (n.) Software that connects to a SIS from which it draws data.
 Date Picker | (n.) A modal that allows you to specify dates from a calendar-esque view.
 Empty State | (n.) The grey block that displays when a component does not contain any content.
 EOTC | (n.) "Education Outside the Classroom". A module in Schoolbox. Search for eotc/README.md.
-eVi | MGGS' instance name.
+eVi | (n.) MGGS' instance name.
 Feature Tour | (n.) A walk-through of a screen or feature via a series of dialogs
 Filters | (n.) Often refers to the Filters panel that exists in a few places in Schoolbox. Eg. the Pending Assessments page
 Fixtures, Sports Fixtures | (n.) A feature in Schoolbox used for managing teams & games.
@@ -59,11 +59,14 @@ Pasta Care | (n.) See **Pastoral Care**.
 Pastoral, Pastoral Care | (n.) The Pastoral Care module.
 Plagscan | (n.) A plagiarism checker. Third party service.
 Quick Mark page | (n.) Also known as the Status Page
+Resource Browser | (n.) An in-Schoolbox file and folder browser for SBFS
 Rubicon Atlas | A curriculum mapping software we are soon to integrate with - https://www.rubicon.com/
 Selectize | (n.) A jQuery plugin we use for our autocomplete/tag selector inputs  - https://selectize.github.io/selectize.js/
 Sentry | (n.) An error reporting service that costs us money for everything it encounters.
+SBFS | (n.) Schoolbox File System - the virtual file system that Schoolbox uses for storing folders, as well as their homepages, files and subfolders. 
 SIS | (n.) Student Information System - an external database we integrate with
 SOBO | (v.) 'Submit on behalf of'. An action a teacher or admin can do in Schoolbox to submit due work on behalf of a student.
+Storage | (n.) The method through which all files uploaded to Schoolbox are stored on a file system. Sometimes colloquially referred to as _Brownhole_.
 Swamp | (n.) A set of classes that transform data in the LMS  
 Synergetic | (n.) The most popular SIS used by our schools
 TASS | (n.) Another SIS
@@ -73,52 +76,54 @@ Tot | (n.) A three-dot menu; (v.) to place something into a three-dot menu. See 
 Uglify | (n.) A javascript minifier. 
 UPS | (n.) User Provisioning System - a cron job that automatically creates/updates user accounts etc. based on data from the SIS
 Vaporwave | (n.) A set of related user interface elements that toggle on and off. 
-WebDAV | (n.)
+WebDAV | (n.) A HTTP extension for the creation and update of documents. Schoolbox can act as both a client (the Drives tab) and a server (upload of files into SBFS and due work submissions).
 
 ## Processes
 Term | Definition
 --- | --- 
 AC | Acceptance Criteria (for a Jira ticket)
-Backlog | 
-Backlog Grooming | 
+Backlog | The list of issues awaiting grooming
+Backlog Grooming | The process of making issues in the Backlog available for addition to the current sprint
 Badges | A list of all the silly things that have happened in our workplace - https://wiki.alaress.com.au/index.php/Badges
-BAU | Business as Usual
+BAU | Business as Usual (see [bau.md](bau.md))
 BGB | Big Green Button - refers to the "Merge" button on github
 Bling | (n.) Shortened form of "dollar symbol" $. e.g. "bling test" == $test
-Chaos Test | 
+Chaos Test | (n.) The process of testing a system's resilience by deliberately introducing breakages to its data, environment or dependencies.
 Cherry Pick | A git process/command - https://git-scm.com/docs/git-cherry-pick
 Copypasta | A copy/paste that duplicates code unnecessarily. (See: [DRY programming](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself))
 Copy pas | A copypasta missing something critical
 Curation | The process of confirming, writing AC/STR, and generally cleaning up Jira tickets.
 Datums | (n. pl.) Somewhat informal rendition of "data".
 Design Language | See https://en.wikipedia.org/wiki/Design_language
+Dev Data | a synonym of Legacy Data
 Double Diamond | The agile UX process of research, insights, ideation and development.
 Dr. Hodes | The user David Rhodes in the 'legacy' dataset.
 Embargo | Prevention of merging PRs in preparation for a release going out.
 Express Lane | A Kanban-style process/lane in Jira that is used for tasks and stories.
-Feature Freeze |
+Feature Freeze | (n.) A prevention on the addition of new epics to an upcoming major release.
 Hat | The role in the team currently being taken on by a member of the team. See [hats.md](hats.md)/
 Jypad | The iPad named after Jy because it was frequently found in, or around, his desk.
+Large Data | A very large dataset used when testing for scaling and capacity, specified by `data_filename: "large.tar.gz"` in vagrant.yaml
 Legacy Data | The dataset used for most development work in Vagrant, specified by `data_filename: "legacy.tar.gz"` in vagrant.yaml
 Park | Defer a discussion to be resumed later
 Parrotting | (v.) To supervise someone executing Self Help Initiative.
-Pinning a server | 
+Pinning a server | (v.) To ensure that a particular server does not get automatically updated to a new minor release. Usually done to a client's dev server, when they're testing a bug fix or custom work.
 Po-Po | (n.) See **Product Owner**.
-Product Owner (PO) | (n.) 
+Product Owner (PO) | (n.) Representative of the product team to other teams and external stakeholders. See [hats.md](hats.md)
 Rebase | A [Git rebase](https://git-scm.com/book/en/v2/Git-Branching-Rebasing)
-Red Worm |
+Red Worm | (n.) A colloquial term for a syntax error, so named for the worm-like appearance of the underline beneath a syntax error in PHPStorm.
 Refinement | A meeting in which we go through tickets in the backlog and discuss in order to come to a shared understanding of what is required, so that the tickets can be made ready for working on.
 Retro | Sprint Retrospective - see [ceremonies.md](ceremonies.md)
-Scrum Master (SM) | 
+Sales Data | The dataset used in client demos, specified by `data_filename: "sales.tar.gz"` in vagrant.yaml
+Scrum Master (SM) | (n.) Administrator of the product team. See [hats.md](hats.md)
 Self Help Initiative | (v.) Merging your own branch.
 Spike | Any activity conducted for discovery and preparation purposes prior to commencing development, such as research and wireframing.
-Sprint | 
+Sprint | (n.) A time window within which the Product Team commits to or forecasts delivery of a defined set of issues.
 Standup | Short daily meeting conducted while standing - see [ceremonies.md](ceremonies.md)
 Storm | PHPStorm - the IDE used across the team.
-Story | 
 STT | (n.) Steps To Test.
 STR | (n.) Steps to Reproduce (for a bug)
 Strike Team | A team of 2-3 developers assigned to work on a new feature.
-Tagging |
-Wireframe | 
+Tagging | (v.) The process of attaching a tag to an issue in Jira, usually with the purpose of bringing it to another team member's attention.
+Wireframe | (n.) A mockup of a user interface, usually created in a [workshop](workshops.md).
 Zane | The teacher most completely tested with in the 'legacy' dataset - Zane Smith
