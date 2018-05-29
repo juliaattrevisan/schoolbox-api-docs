@@ -236,7 +236,8 @@ abstract class Synchronise_Synergetic_StPauls_Strategy_Abstract extends Synchron
 						FROM user
 						LEFT JOIN groups ON user.group_id = groups.id
 						LEFT JOIN userCampus ON user.id = userCampus.uid
-						WHERE user.synergy_id = '{$newUser['synergy_id']}'";
+						WHERE user.synergy_id = '{$newUser['synergy_id']}'
+						AND user.deleted_at is null";
 
         //Only lock user to group if parent account
         if ($newUser['group_id'] == self::PARENT_GROUP_ID)
