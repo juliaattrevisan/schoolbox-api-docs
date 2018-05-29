@@ -296,7 +296,7 @@ class Feed {
 					FROM subject_news sn
 					JOIN user u ON owner = u.id
 					LEFT JOIN folder c ON c.id = sn.code
-					WHERE sn.code $where AND sn.datetime_published < now() AND deleted = 0
+					WHERE sn.code $where AND sn.datetime_published < NOW() AND deleted = 0
 					ORDER BY datetime_posted DESC LIMIT 0, $limit";
 
         $this->db->query($query);
