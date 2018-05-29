@@ -24,7 +24,7 @@ class Controller extends Base
     /**
      * Controller constructor.
      *
-     * @param UserMapper  $userMapper
+     * @param UserMapper $userMapper
      */
     public function __construct(UserMapper $userMapper)
     {
