@@ -109,7 +109,8 @@ class Controller extends Base
         // All the staff in our Schoolbox instance
         return $this->userMapper->findByColumn('g.group_type', \Schoolbox\Role::STAFF, [
             'order' => [
-                'lastname' => 'asc'
+                'lastname' => 'asc',
+                'firstname' => 'asc'
             ]
         ]);
     }
