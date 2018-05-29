@@ -180,12 +180,13 @@ class Controller extends Base
     /**
      * Provides details about a user in response to an ajax request for that user's external ID.
      *
-     * @api GET /shaps/provisioning/{userID}
+     * @api GET /shaps/provisioning/{userId}
+     * @param string $userId
      */
-    public function searchUsers($userID)
+    public function searchUsers($userId)
     {
         // Selectize gives us the user's external ID
-        $user = $this->userMapper->findByExternalId($userID);
+        $user = $this->userMapper->findByExternalId($userId);
 
         $provisionedUserIDs = $this->getProvisionedUserIDs();
         $status = in_array($user->getId(), $provisionedUserIDs);
