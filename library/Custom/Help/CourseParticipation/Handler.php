@@ -291,27 +291,27 @@ class Handler
      * Compute an access token (digest auth) for the given school code and timestamp.
      *
      * @param string               $schoolCode
-     * @param Alaress_Date_Format $now
+     * @param string               $timestamp
      * @throws Mapper\Exception
      * @return string
      */
-    public function computeAuthDigest($schoolCode, Alaress_Date_Format $now)
+    public function computeAuthDigest($schoolCode, $timestamp)
     {
         $privateKey = $this->tokenMapper->findById($schoolCode)->getAccessToken();
 
-        return $this->computeAccessToken($now, $schoolCode, $privateKey);
+        return $this->computeAccessToken($timestamp, $schoolCode, $privateKey);
     }
 
 
     /**
      * Mash ingredients thoroughly in a small bowl, seasoning with a little salt to taste.
      *
-     * @param Alaress_Date_Format $timestamp
+     * @param string $timestamp
      * @param string              $schoolCode
      * @param string              $privateKey
      * @return string
      */
-    public function computeAccessToken(Alaress_Date_Format $timestamp, $schoolCode, $privateKey)
+    public function computeAccessToken($timestamp, $schoolCode, $privateKey)
     {
         return (new HelpToken($schoolCode, $privateKey))->generate($timestamp);
     }

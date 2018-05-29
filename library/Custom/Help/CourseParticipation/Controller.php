@@ -130,7 +130,7 @@ class Controller extends Base
         $now = Alaress_Date_Format::now();
 
         try {
-            $token = $this->handler->computeAuthDigest($schoolCode, $now);
+            $token = $this->handler->computeAuthDigest($schoolCode, $now->getUnixTimeStamp());
 
             $this->getResponse()->content->set($this->buildJsonOutput([
                 'ts'    => $now->getUnixTimeStamp(),
@@ -167,7 +167,7 @@ class Controller extends Base
             $c->post($uri, [
                 'query' => [
                     'ts'    => $now->getUnixTimeStamp(),
-                    'token' => $this->handler->computeAuthDigest($school, $now)
+                    'token' => $this->handler->computeAuthDigest($school, $now->getUnixTimeStamp())
                 ],
                 'form_params' => $post
             ]);

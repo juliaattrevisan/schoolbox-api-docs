@@ -281,7 +281,7 @@ $kernel->run(new class extends App {
     private function generateAuth()
     {
         $now   = Alaress_Date_Format::now();
-        $token = $this->handler->computeAuthDigest($this->schoolCode, $now);
+        $token = $this->handler->computeAuthDigest($this->schoolCode, $now->getUnixTimeStamp());
 
         return [
             'ts'    => $now->getUnixTimeStamp(),
