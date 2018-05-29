@@ -5,7 +5,7 @@
 
 * Someone from the Product Team reviews the ticket, confirming the bug exists in Schoolbox, fills in any missing details to get the ticket to our Definition of Ready.
 
-    It's important that this person applies a critical mindset during this process (to an extent), not taking everything the reporter has written as gospel.
+  * It's important that this person applies a critical mindset during this process (to an extent), not taking everything the reporter has written as gospel.
 
 * Bug is inserted into the Backlog, with a priority set, for someone to pick up.
 
@@ -15,15 +15,15 @@
 
 * A different developer reviews the PRs, static reviewing the code, and functional testing the area. In most cases there will be changes required, in which case the reviewer leaves comments on GitHub, and pushes the ticket back to 'In Progress' in Jira.
 
-   If the reviewer finds issues with the PR (most cases) - that person will leave comments on the PR, and push the ticket back to 'In Progress' in Jira, for the original developer to fix up and put back into 'Awaiting Review'.
+  * If the reviewer finds issues with the PR (most cases) - that person will leave comments on the PR, and push the ticket back to 'In Progress' in Jira, for the original developer to fix up and put back into 'Awaiting Review'.
     
-    If/once the reviewer is happy with the PRs - the reviewer will merge the PRs into the code base, pushing the ticket into 'Awaiting QA' and setting the fix version (next point release for master and develop fixes, or the next major release for develop only fixes).
+  * If/once the reviewer is happy with the PRs - the reviewer will merge the PRs into the code base, pushing the ticket into 'Awaiting QA' and setting the fix version (next point release for master and develop fixes, or the next major release for develop only fixes).
 
 * Another member of the Product Team picks up the ticket for QA, focusing on functional testing the area that has been changed.
     
-    If that person finds any issues that have been caused by the fixes for this ticket - they will 'QA Fail' the ticket, sending it back to Ready and back through the coding and review process.
+  * If that person finds any issues that have been caused by the fixes for this ticket - they will 'QA Fail' the ticket, sending it back to Ready and back through the coding and review process.
     
-    If the person is happy with everything, they will 'QA Pass' the ticket and it will go into Ready, ready to deployed with the release.
+  * If the person is happy with everything, they will 'QA Pass' the ticket and it will go into Ready, ready to deployed with the release.
 
 ### Important Notes and Caveats
 * For the most part you should not be merging any code you have written that no one else has seen and approved.
