@@ -67,11 +67,12 @@ class Controller extends Base
         $response = $client->request(
             "get",
             "{$auth['url']}/api/course-participation/{$auth['schoolCode']}/users", [
-            'query' => [
-                'ts' => $auth['timestamp'],
-                'digest' => $auth['digest']
+                'query' => [
+                    'ts' => $auth['timestamp'],
+                    'digest' => $auth['digest']
+                ]
             ]
-        ]);
+        );
 
         return json_decode($response->getBody()->getContents(), true);
     }
