@@ -3,6 +3,9 @@ tr.highlight-warning, tr:nth-of-type(even).highlight-warning {
 }
 
 #statusTable {
+  table {
+    margin-bottom: 0;
+  }
   .checklist label {
     margin: 0;
   }
