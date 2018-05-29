@@ -61,6 +61,7 @@ class Controller extends Base
      */
     private function getUsersFromHelp()
     {
+        // TODO clean this up a bit - code duplication whenever we want to make a different API call...
         $client = new GuzzleClient();
         $auth = $this->getAuthDetails();
 
