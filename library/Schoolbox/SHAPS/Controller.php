@@ -104,7 +104,11 @@ class Controller extends Base
     public function getAll()
     {
         // All the staff in our Schoolbox instance
-        $allStaff = $this->userMapper->findByColumn('g.group_type', \Schoolbox\Role::STAFF)->sortBy("lastname", "asc");
+        $allStaff = $this->userMapper->findByColumn('g.group_type', \Schoolbox\Role::STAFF, [
+            'order' => [
+                'lastname' => 'asc'
+            ]
+        ]);
         $provisionedUserIDs = $this->getProvisionedUserIDs();
 
         $this->getResponse()->content->set(
