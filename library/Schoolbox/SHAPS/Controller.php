@@ -61,23 +61,17 @@ class Controller extends Base
      */
     private function getUsersFromHelp()
     {
-        // TODO clean this up a bit - code duplication whenever we want to make a different API call...
         $client = new GuzzleClient();
         $auth = $this->getAuthDetails();
 
-        $route = $this->getRouter()->generate('helpCourseParticipation.getUsersBySchool', [
-            'schoolCode' => $auth['schoolCode']
-        ]);
-
         $response = $client->request(
             "get",
-            "{$auth['url']}{$route}", [
-                'query' => [
-                    'ts' => $auth['timestamp'],
-                    'digest' => $auth['digest']
-                ]
+            "{$auth['url']}/api/course-participation/{$auth['schoolCode']}/users", [
+            'query' => [
+                'ts' => $auth['timestamp'],
+                'digest' => $auth['digest']
             ]
-        );
+        ]);
 
         return json_decode($response->getBody()->getContents(), true);
     }
