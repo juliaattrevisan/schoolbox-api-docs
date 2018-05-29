@@ -313,7 +313,7 @@ class Handler
      */
     public function computeAccessToken(Alaress_Date_Format $timestamp, $schoolCode, $privateKey)
     {
-        return (new HelpToken($schoolCode, $privateKey))->generate($now);
+        return (new HelpToken($schoolCode, $privateKey))->generate($timestamp);
     }
 
 
