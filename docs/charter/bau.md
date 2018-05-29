@@ -6,13 +6,16 @@ Possible jobs to undertake when performing BAU.
 
 ### Bring Unconfirmeds to Ready
 
- Go through tickets in Jira in the 'Unconfirmed' state, bringing them to Ready by confirming they exist, setting priority based on the rubric below, and curating them to meet our Definition of Ready.
+Go through tickets in Jira in the 'Unconfirmed' state, bringing them to Ready by confirming they exist, setting priority based on the rubric below, and curating them to meet our
+[Definition of Ready](definition-of-ready.md).
 
 ### Clean and curate old tickets
 
 Go through older tickets in Jira, confirming that they still exist, bringing them to Ready, closing duplicates.
     
 ### Sentry Duty
+
+Go through the backlog of unresolved issues in [Sentry](https://sentry.io/), determining severity and automatically creating Jira issues from any that are deemed to require a fix.
 
 ### Coding fixes for Ready bugs
 
