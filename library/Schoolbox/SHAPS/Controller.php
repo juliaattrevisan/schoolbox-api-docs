@@ -36,7 +36,8 @@ class Controller extends Base
      *
      * @return array
      */
-    private function getAuthDetails() {
+    private function getAuthDetails() : array
+    {
         $url = rtrim($this->getConfigLoader()->get('schoolbox_help_url'), '/');
 
         // Query params
@@ -58,7 +59,7 @@ class Controller extends Base
      *
      * @return mixed
      */
-    private function getUsersFromHelp()
+    private function getUsersFromHelp() : mixed
     {
         $client = new GuzzleClient();
         $auth = $this->getAuthDetails();
@@ -80,7 +81,8 @@ class Controller extends Base
      *
      * @return Collection
      */
-    private function getProvisionedUsers() {
+    private function getProvisionedUsers() : Collection
+    {
         $provisionedUserIDs = $this->getProvisionedUserIDs();
         $provisionedUsers = $this->userMapper->findByColumn('id', $provisionedUserIDs);
         return $provisionedUsers;
@@ -91,7 +93,7 @@ class Controller extends Base
      *
      * @return array
      */
-    private function getProvisionedUserIDs()
+    private function getProvisionedUserIDs() : array
     {
         $provisionedUsers = $this->getUsersFromHelp();
         return array_keys($provisionedUsers);
@@ -102,7 +104,8 @@ class Controller extends Base
      *
      * @return Collection
      */
-    private function getAllStaff() {
+    private function getAllStaff() : Collection
+    {
         // All the staff in our Schoolbox instance
         return $this->userMapper->findByColumn('g.group_type', \Schoolbox\Role::STAFF, [
             'order' => [
@@ -184,7 +187,7 @@ class Controller extends Base
      * @api GET /shaps/provisioning/{userId}
      * @param string $userId
      */
-    public function searchUsers($userId)
+    public function searchUsers(string $userId)
     {
         // Selectize gives us the user's external ID
         $user = $this->userMapper->findByExternalId($userId);
