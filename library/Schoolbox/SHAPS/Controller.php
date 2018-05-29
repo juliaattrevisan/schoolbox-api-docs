@@ -59,7 +59,7 @@ class Controller extends Base
      *
      * @return mixed
      */
-    private function getUsersFromHelp() : mixed
+    private function getUsersFromHelp()
     {
         $client = new GuzzleClient();
         $auth = $this->getAuthDetails();
