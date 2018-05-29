@@ -78,7 +78,7 @@ class Handler
         SiteAccess\Mapper $tokenMapper,
         Folder\Mapper $folderMapper,
         User\Password\MailService $mailService,
-        $portraitDir
+        string $portraitDir
     ) {
         $this->userAccessMapper = $userAccessMapper;
         $this->tokenMapper = $tokenMapper;
@@ -102,7 +102,7 @@ class Handler
      * @throws Mapper\Exception\Deleted
      * @return array
      */
-    public function getFolderAccessBySchool($schoolCode)
+    public function getFolderAccessBySchool(string $schoolCode)
     {
         // ok, if you're here, you can see the thing.
         $courses = $this->getCoursesBySchool($schoolCode);
@@ -129,7 +129,7 @@ class Handler
      * @return array
      * @throws Mapper\DefinitionException
      */
-    public function getUsersBySchool($schoolCode, $fuzzy = false)
+    public function getUsersBySchool(string $schoolCode, bool $fuzzy = false)
     {
         $roleId = $this->getRoleMapper()->findOneByColumn("name", self::PARTICIPANT_ROLE_NAME)->getId();
 
@@ -177,7 +177,7 @@ class Handler
      * @throws Mapper\DefinitionException
      * @throws \PDOException
      */
-    public function postUserRegistrations($schoolCode, $byUsername, iterable $post)
+    public function postUserRegistrations(string $schoolCode, bool $byUsername, iterable $post)
     {
         $participantRole     = $this->getRoleMapper()->findOneByColumn('name', self::PARTICIPANT_ROLE_NAME);
         $participantCampuses = $this->getCampusMapper()->findByColumn('id', self::PARTICIPANT_CAMPUS);
@@ -333,7 +333,7 @@ class Handler
      * @throws Mapper\Exception\Deleted
      * @return Collection|IFolder[]
      */
-    private function getCoursesBySchool($schoolCode)
+    private function getCoursesBySchool(string $schoolCode)
     {
         // ok, if you're here, you can see the thing.
         $folder = $this->folderMapper->findById(
