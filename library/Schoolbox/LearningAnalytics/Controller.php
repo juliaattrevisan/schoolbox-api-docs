@@ -269,7 +269,10 @@ class Controller extends Base
                         // Is this Assessment due in this Term?
                         if ($t->getStart()->lte($a->getDueAt()) && ($t->getActualFinish()->isNull() || $t->getActualFinish()->gt($a->getDueAt()))) {
                             $navigableTerms->setOffset($t->getId(), $t);
-                            
+
+                            // Remove from available terms to avoid repeated traversals
+                            $allTerms->offsetUnset($t->getId());
+
                             break;
                         }
                     }
