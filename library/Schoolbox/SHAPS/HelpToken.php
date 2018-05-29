@@ -27,7 +27,8 @@ class HelpToken
      * @param string $schoolCode
      * @param string $privateKey
      */
-    public function __construct(string $schoolCode, string $privateKey) {
+    public function __construct(string $schoolCode, string $privateKey)
+    {
         $this->schoolCode = $schoolCode;
         $this->privateKey = $privateKey;
     }
@@ -38,7 +39,8 @@ class HelpToken
      * @param int $timestamp
      * @return string
      */
-    public function generate(int $timestamp) {
+    public function generate(int $timestamp) : string
+    {
         return sha1(sprintf(':%s-%s-%s:', $timestamp, $this->schoolCode, $this->privateKey));
     }
 }
