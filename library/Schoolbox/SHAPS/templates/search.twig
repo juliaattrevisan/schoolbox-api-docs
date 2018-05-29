@@ -22,19 +22,19 @@
                         multiple: true
                     });
 
-                    function getUserIdFromRegex(userID) {
+                    function getUserIdFromRegex(userId) {
                         // Match the last bit of text in brackets (as there is a small chance the user's role, for example, could contain brackets)
                         // Can't match on end of string because there's a weird unicode character at the end.
-                        return userID.match(/\((.*)\)(?!\((.*)\))/)[1];
+                        return userId.match(/\((.*)\)(?!\((.*)\))/)[1];
                     }
 
                     var tableSelector = "#statusTable table";
 
                     $selectize = $selectize[0].selectize;
                     $selectize.on("item_add", function(value, $item) {
-                        var userID = getUserIdFromRegex($item.text())
+                        var userId = getUserIdFromRegex($item.text())
 
-                        var url = '{{ routeLookup("shaps.searchUsers") }}'.replace('{userID}', userID);
+                        var url = '{{ routeLookup("shaps.searchUsers") }}'.replace('{userId}', userId);
 
                         $.get(url, function(data) {
 
@@ -81,8 +81,8 @@
 
                     $selectize.on("item_remove", function(index, $item) {
                         // Remove users from search results when they are removed from the selectize
-                        var userID = getUserIdFromRegex($item.text())
-                        var userRow = tableSelector + " tr#" + userID;
+                        var userId = getUserIdFromRegex($item.text())
+                        var userRow = tableSelector + " tr#" + userId;
                         $(userRow).remove();
 
                         // Show empty state if the selectize is no longer searching for anyone

@@ -48,7 +48,7 @@ class Module extends BaseModule
         $this->register('GET', '/provisioning/unprovisioned', 'getUnprovisioned', $getPerms);
         $this->register('GET', '/provisioning/search', 'getSearch', $getPerms);
 
-        $this->register('GET', '/provisioning/{userID}', 'searchUsers', $getPerms);
+        $this->register('GET', '/provisioning/{userId}', 'searchUsers', $getPerms);
     }
 
     /**
