@@ -494,63 +494,69 @@ class Mapper extends BaseMapper
     {
         // Support stuff for query
         $folderList = Builder::canTraverse($folderId) ? $folderId : [$folderId];
-        if (\count($folderList) === 0) {
+        if (0 === \count($folderList) && 0 === \count($uniqueIds)) {
             // Exit early if empty
             return $this->createCollection();
         }
-        $params       = Builder::getArrayParameters($folderList, 'folder');
-        $placeholders = Builder::getArrayPlaceholders($folderList, 'folder');
 
-        $idQuery = "
-            SELECT a.id
-            FROM `folder` f
-            INNER JOIN `assessment_folder` AS `v_f`
-                ON `f`.`id` = `v_f`.`folder_id`
-            INNER JOIN `assessment` AS `a`
-                ON `a`.`id` = `v_f`.`assessment_id`
-            WHERE f.id IN {$placeholders}
+        // Don't attempt to fetch from folders if no folder ids supplied
+        $idList = [];
+        if (\count($folderList)) {
+            $params       = Builder::getArrayParameters($folderList, 'folder');
+            $placeholders = Builder::getArrayPlaceholders($folderList, 'folder');
 
-            UNION
+            $idQuery = "
+                SELECT a.id
+                FROM `folder` f
+                INNER JOIN `assessment_folder` AS `v_f`
+                    ON `f`.`id` = `v_f`.`folder_id`
+                INNER JOIN `assessment` AS `a`
+                    ON `a`.`id` = `v_f`.`assessment_id`
+                WHERE f.id IN {$placeholders}
 
-            SELECT af.id
-            FROM `folder` uicf
-            INNER JOIN `course_implementation` AS `uic`
-                ON `uicf`.`id` = `uic`.`folder_id` AND `uic`.`deleted_at` IS NULL
-            INNER JOIN `course_unit_implementation` AS `ui`
-                ON `uic`.`id` = `ui`.`course_implementation_id` AND `ui`.`deleted_at` IS NULL
-            INNER JOIN `assessment_course_unit_implementation` AS `v_ui`
-                ON `ui`.`id` = `v_ui`.`course_unit_implementation_id`
-            INNER JOIN `assessment` AS `af`
-                ON `af`.`id` = `v_ui`.`assessment_id`
-            WHERE uicf.id IN {$placeholders}
-            
-            UNION
-            
-            SELECT `p_a`.`assessment_id`
-            FROM project_assessment `p_a` 
-            INNER JOIN `project` AS `p` 
-                ON `p`.`id` = `p_a`.`project_id`
-            INNER JOIN assessment_course_unit_implementation AS `v_ui` 
-                ON `v_ui`.`assessment_id` = `p`.assessment_id
-            INNER JOIN `course_unit_implementation` AS `ui` 
-                ON `ui`.`id` = `v_ui`.`course_unit_implementation_id`
-            INNER JOIN course_implementation AS `uic`
-                ON `uic`.`id` = `ui`.course_implementation_id
-            WHERE `uic`.`folder_id` IN {$placeholders}
-            
-            UNION
-            
-            SELECT `p_a`.`assessment_id`
-            FROM project_assessment `p_a` 
-            INNER JOIN `project` AS `p` 
-                ON `p`.`id` = `p_a`.`project_id`
-            INNER JOIN assessment_folder AS `v_f`
-                ON `v_f`.`assessment_id` = `p`.`assessment_id`
-            WHERE `v_f`.`folder_id` IN {$placeholders}
-        ";
-        $idStatement = $this->getDatabase()->prepare($idQuery);
-        $idStatement->execute($params);
-        $idList = array_column($idStatement->fetchAll(), 'id');
+                UNION
+
+                SELECT af.id
+                FROM `folder` uicf
+                INNER JOIN `course_implementation` AS `uic`
+                    ON `uicf`.`id` = `uic`.`folder_id` AND `uic`.`deleted_at` IS NULL
+                INNER JOIN `course_unit_implementation` AS `ui`
+                    ON `uic`.`id` = `ui`.`course_implementation_id` AND `ui`.`deleted_at` IS NULL
+                INNER JOIN `assessment_course_unit_implementation` AS `v_ui`
+                    ON `ui`.`id` = `v_ui`.`course_unit_implementation_id`
+                INNER JOIN `assessment` AS `af`
+                    ON `af`.`id` = `v_ui`.`assessment_id`
+                WHERE uicf.id IN {$placeholders}
+
+                UNION
+
+                SELECT `p_a`.`assessment_id`
+                FROM project_assessment `p_a`
+                INNER JOIN `project` AS `p`
+                    ON `p`.`id` = `p_a`.`project_id`
+                INNER JOIN assessment_course_unit_implementation AS `v_ui`
+                    ON `v_ui`.`assessment_id` = `p`.assessment_id
+                INNER JOIN `course_unit_implementation` AS `ui`
+                    ON `ui`.`id` = `v_ui`.`course_unit_implementation_id`
+                INNER JOIN course_implementation AS `uic`
+                    ON `uic`.`id` = `ui`.course_implementation_id
+                WHERE `uic`.`folder_id` IN {$placeholders}
+
+                UNION
+
+                SELECT `p_a`.`assessment_id`
+                FROM project_assessment `p_a`
+                INNER JOIN `project` AS `p`
+                    ON `p`.`id` = `p_a`.`project_id`
+                INNER JOIN assessment_folder AS `v_f`
+                    ON `v_f`.`assessment_id` = `p`.`assessment_id`
+                WHERE `v_f`.`folder_id` IN {$placeholders}
+            ";
+
+            $idStatement = $this->getDatabase()->prepare($idQuery);
+            $idStatement->execute($params);
+            $idList = array_column($idStatement->fetchAll(), 'id');
+        }
 
         // Send IDs to findByColumnList
         $ids = array_merge($idList, $uniqueIds);
