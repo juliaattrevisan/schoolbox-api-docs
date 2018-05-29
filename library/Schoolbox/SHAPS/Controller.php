@@ -51,7 +51,7 @@ class Controller extends Base
 
         $timestamp = $now->getUnixTimeStamp();
 
-        return ['url' => $url, 'timestamp' => $timestamp, 'token' => $token];
+        return ['url' => $url, 'timestamp' => $timestamp, 'token' => $token, 'schoolCode' => $schoolCode];
     }
 
     /**
