@@ -486,7 +486,7 @@ class Controller extends Base
 
         try {
             $expectedToken = $this->handler->computeAuthDigest(
-                $requestTimestamp,
+                $requestTimestamp->getUnixTimeStamp(),
                 $schoolCode,
                 $privateKey
             );
