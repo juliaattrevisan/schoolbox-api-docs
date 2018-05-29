@@ -96,6 +96,20 @@ class Controller extends Base
         return array_keys($provisionedUsers);
     }
 
+    /*
+     * Helper method to get all staff in your Schoolbox instance.
+     *
+     * @return Collection
+     */
+    private function getAllStaff() {
+        // All the staff in our Schoolbox instance
+        return $this->userMapper->findByColumn('g.group_type', \Schoolbox\Role::STAFF, [
+            'order' => [
+                'lastname' => 'asc'
+            ]
+        ]);
+    }
+
     /**
      * Renders a list of all staff in your Schoolbox instance, and whether or not they are provisioned on Help.
      *
@@ -103,12 +117,7 @@ class Controller extends Base
      */
     public function getAll()
     {
-        // All the staff in our Schoolbox instance
-        $allStaff = $this->userMapper->findByColumn('g.group_type', \Schoolbox\Role::STAFF, [
-            'order' => [
-                'lastname' => 'asc'
-            ]
-        ]);
+        $allStaff = $this->getAllStaff();
         $provisionedUserIDs = $this->getProvisionedUserIDs();
 
         $this->getResponse()->content->set(
@@ -143,7 +152,7 @@ class Controller extends Base
      */
     public function getUnprovisioned()
     {
-        $allStaff = $this->userMapper->findByColumn('g.group_type', 'staff')->sortBy("lastname", "asc");
+        $allStaff = $this->getAllStaff();
         $unprovisionedStaff = $allStaff->diff($this->getProvisionedUsers());
 
         $this->getResponse()->content->set(
