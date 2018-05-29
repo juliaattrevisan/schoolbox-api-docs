@@ -83,8 +83,8 @@ class Controller extends Base
      */
     private function getProvisionedUsers() : Collection
     {
-        $provisionedUserIDs = $this->getProvisionedUserIDs();
-        $provisionedUsers = $this->userMapper->findByColumn('id', $provisionedUserIDs);
+        $provisionedUserIds = $this->getProvisionedUserIds();
+        $provisionedUsers = $this->userMapper->findByColumn('id', $provisionedUserIds);
         return $provisionedUsers;
     }
 
@@ -93,7 +93,7 @@ class Controller extends Base
      *
      * @return array
      */
-    private function getProvisionedUserIDs() : array
+    private function getProvisionedUserIds() : array
     {
         $provisionedUsers = $this->getUsersFromHelp();
         return array_keys($provisionedUsers);
@@ -123,13 +123,13 @@ class Controller extends Base
     public function getAll()
     {
         $allStaff = $this->getAllStaff();
-        $provisionedUserIDs = $this->getProvisionedUserIDs();
+        $provisionedUserIds = $this->getProvisionedUserIds();
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@shaps/index.twig', [
                 'allUsers' => $allStaff,
-                'provisionedUserIDs' => $provisionedUserIDs
+                'provisionedUserIDs' => $provisionedUserIds
             ])->setTitle('Schoolbox Help Staff Provisioning')
         );
     }
@@ -145,7 +145,7 @@ class Controller extends Base
             $this->buildHtmlOutput(
                 '@shaps/provisioned.twig', [
                     'allUsers' => $this->getProvisionedUsers(),
-                    'provisionedUserIDs' => $this->getProvisionedUserIDs()
+                    'provisionedUserIDs' => $this->getProvisionedUserIds()
             ])->setTitle('Provisioned Staff - Schoolbox Help Staff Provisioning')
         );
     }
@@ -193,8 +193,8 @@ class Controller extends Base
         // Selectize gives us the user's external ID
         $user = $this->userMapper->findByExternalId($userId);
 
-        $provisionedUserIDs = $this->getProvisionedUserIDs();
-        $status = in_array($user->getId(), $provisionedUserIDs);
+        $provisionedUserIds = $this->getProvisionedUserIds();
+        $status = in_array($user->getId(), $provisionedUserIds);
         $userJSON = [
             'name' => $user->getFullName(),
             'provisioned' => $status,
