@@ -39,8 +39,8 @@ class Controller extends Base
      */
     public function __construct(ErrorMapper $errorMapper, UserMapper $userMapper)
     {
-        $this->setErrorMapper($errorMapper);
-        $this->setUserMapper($userMapper);
+        $this->$errorMapper = $errorMapper;
+        $this->$userMapper = $userMapper;
     }
 
     /**
@@ -187,41 +187,5 @@ class Controller extends Base
             'externalID' => $user->getExternalId(),
         ];
         $this->getResponse()->content->set($this->buildJsonOutput($userJSON));
-    }
-
-    /**
-     * @return UserMapper
-     */
-    private function getUserMapper(): UserMapper
-    {
-        return $this->userMapper;
-    }
-
-    /**
-     * @param UserMapper $userMapper
-     * @return $this
-     */
-    private function setUserMapper(UserMapper $userMapper)
-    {
-        $this->userMapper = $userMapper;
-        return $this;
-    }
-
-    /**
-     * @return ErrorMapper
-     */
-    private function getErrorMapper(): ErrorMapper
-    {
-        return $this->errorMapper;
-    }
-
-    /**
-     * @param ErrorMapper $errorMapper
-     * @return $this
-     */
-    private function setErrorMapper(ErrorMapper $errorMapper)
-    {
-        $this->errorMapper = $errorMapper;
-        return $this;
     }
 }
