@@ -45,7 +45,7 @@ class External_Doublefirst_Class implements External_ClassInterface
     {
         if (!$subCode) {
             /* Dont bother if you got no code */
-            return false;
+            return [];
         }
 
         $year = date("Y");
@@ -109,7 +109,7 @@ class External_Doublefirst_Class implements External_ClassInterface
     {
         if (!$subCode) {
             /* Dont bother if you got no code */
-            return false;
+            return [];
         }
 
         $year = date("Y");

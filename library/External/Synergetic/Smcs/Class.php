@@ -15,7 +15,7 @@ class External_Synergetic_Smcs_Class extends External_Synergetic_Class
     {
         if (!$subCode) {
             /* Dont bother if you got no code */
-            return false;
+            return [];
         }
 
         $classQuery = $this->getClassCodeQuery($subCode);
