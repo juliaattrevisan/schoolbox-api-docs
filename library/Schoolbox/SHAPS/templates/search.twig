@@ -34,7 +34,9 @@
                     $selectize.on("item_add", function(value, $item) {
                         var userID = getUserIdFromRegex($item.text())
 
-                        $.get("/shaps/provisioning/"+userID, function(data) {
+                        var url = '{{ routeLookup("shaps.searchUsers") }}'.replace('{userID}', userID);
+
+                        $.get(url, function(data) {
 
                             if ($.isEmptyObject(data)) {
                                 // Not sure under what circumstances this could possibly happen with a selectize,
