@@ -35,10 +35,10 @@ class HelpToken
     /**
      * Generate a token from a timestamp
      *
-     * @param $timestamp
+     * @param int $timestamp
      * @return string
      */
-    public function generate($timestamp) {
+    public function generate(int $timestamp) {
         return sha1(sprintf(':%s-%s-%s:', $timestamp, $this->schoolCode, $this->privateKey));
     }
 }

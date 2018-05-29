@@ -291,11 +291,11 @@ class Handler
      * Compute an access token (digest auth) for the given school code and timestamp.
      *
      * @param string               $schoolCode
-     * @param string               $timestamp
+     * @param int                  $timestamp
      * @throws Mapper\Exception
      * @return string
      */
-    public function computeAuthDigest($schoolCode, $timestamp)
+    public function computeAuthDigest(string $schoolCode, int $timestamp)
     {
         $privateKey = $this->tokenMapper->findById($schoolCode)->getAccessToken();
 
@@ -306,12 +306,12 @@ class Handler
     /**
      * Mash ingredients thoroughly in a small bowl, seasoning with a little salt to taste.
      *
-     * @param string $timestamp
+     * @param int                 $timestamp
      * @param string              $schoolCode
      * @param string              $privateKey
      * @return string
      */
-    public function computeAccessToken($timestamp, $schoolCode, $privateKey)
+    public function computeAccessToken(int $timestamp, string $schoolCode, string $privateKey)
     {
         return (new HelpToken($schoolCode, $privateKey))->generate($timestamp);
     }
