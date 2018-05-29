@@ -64,7 +64,7 @@ class Controller extends Base
 
         $response = $client->request(
             "get",
-            "${url}/api/course-participation/${schoolCode}/users", [
+            "{$url}/api/course-participation/{$schoolCode}/users", [
             'query' => [
                 'ts' => $timestamp,
                 'token' => $token
