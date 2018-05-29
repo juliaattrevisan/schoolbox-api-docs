@@ -2119,7 +2119,8 @@ abstract class Mapper implements IMapper, Serializable
 
             $this->monitor->stopExecuteSelectTimer($this, $predicate);
 
-            return $c;
+            // Ensure collection objects are distinct while containing references to unique model instances
+            return $c instanceof Collection ? $c->shallowClone() : $c;
 
         } catch (UnderflowException $e) {
             return $this->hydrateList([]);
