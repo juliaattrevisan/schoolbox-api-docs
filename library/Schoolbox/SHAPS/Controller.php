@@ -64,14 +64,19 @@ class Controller extends Base
         $client = new GuzzleClient();
         $auth = $this->getAuthDetails();
 
+        $route = $this->getRouter()->generate('helpCourseParticipation.getUsersBySchool', [
+            'schoolCode' => $auth['schoolCode']
+        ]);
+
         $response = $client->request(
             "get",
-            "{$auth['url']}/api/course-participation/{$auth['schoolCode']}/users", [
-            'query' => [
-                'ts' => $auth['timestamp'],
-                'digest' => $auth['digest']
+            "{$auth['url']}{$route}", [
+                'query' => [
+                    'ts' => $auth['timestamp'],
+                    'digest' => $auth['digest']
+                ]
             ]
-        ]);
+        );
 
         return json_decode($response->getBody()->getContents(), true);
     }
