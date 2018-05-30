@@ -191,9 +191,10 @@ class Controller extends BaseController
         // * a lookup list has an item removed
         foreach ($pagesToSave as $pageFilter) {
             $optionsBuilder = $this->optionsMapper->getPredicateBuilder();
-            $optionsBuilder
-                ->equals('filter_page_id', $pageFilter->getId())
-                ->notIn('key', $pageFilter->getOptions()->getColumnValues('key'));
+            $optionsBuilder->equals('filter_page_id', $pageFilter->getId());
+            if ($pageFilter->getOptions()->count()) {
+                $optionsBuilder->notIn('key', $pageFilter->getOptions()->getColumnValues('key'));
+            }
             $this->optionsMapper->deleteByPredicates($optionsBuilder);
         }
 
