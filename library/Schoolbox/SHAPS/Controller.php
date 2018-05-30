@@ -237,57 +237,6 @@ class Controller extends Base
      * Renders a list of all courses available for your school on Help, and the users enrolled in each.
      */
     public function getUsersInCourses() {
-        // Some sample users
-//        $zsmith = $this->userMapper->findById(151);
-//        $jbenson = $this->userMapper->findById(247);
-//
-//        $mharris = $this->userMapper->findById(248);
-//        $mkelley = $this->userMapper->findById(249);
-//
-//        $twigData = [
-//            "courses" => [
-//                [
-//                    "name" => "Random Course",
-//                    "id" => 1,
-//                    "enrolments" => [
-//                        [
-//                            "id" => $mkelley->getId(),
-//                            "externalID" => $mkelley->getExternalID(),
-//                            "name" => $mkelley->getFullName()
-//                        ],
-//                        [
-//                            "id" => $mharris,
-//                            "externalID" => $mharris->getExternalID(),
-//                            "name" => $mharris->getFullname()
-//                        ],
-//                        [
-//                            "id" => $zsmith->getId(),
-//                            "externalID" => $zsmith->getExternalID(),
-//                            "name" => $zsmith->getFullName()
-//                        ]
-//                    ]
-//                ],
-//                [
-//                    "name" => "Schoolbox Teacher Course",
-//                    "id" => 2,
-//                    "enrolments" => [
-//                        [
-//                            "id" => $zsmith->getId(),
-//                            "externalID" => $zsmith->getExternalID(),
-//                            "name" => $zsmith->getFullName()
-//                        ],
-//                        [
-//                            "id" => $jbenson,
-//                            "externalID" => $jbenson->getExternalID(),
-//                            "name" => $jbenson->getFullname()
-//                        ]
-//                    ]
-//                ]
-//            ]
-//        ];
-
-        // TODO this won't work until Sam adds vagrant to Help dev
-
         $provisionedUsers = $this->getProvisionedUsers();
 
         $enrolments = $this->getCoursesFromHelp();
