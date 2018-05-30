@@ -305,25 +305,23 @@ class Controller extends Base
 
             $client = new GuzzleClient();
 
-            $url = $this->getConfigLoader()->get('schoolbox_help_url');
-
-            $schoolCode = $this->getConfigLoader()->get('site_school_code');
-
-            $query = $this->generateQuery(Alaress_Date_Format::now());
+            $auth = $this->getAuthDetails();
 
             // CSRF defeating:
             // set HTTP_ORIGIN and HTTP_HOST to this school's URL
-            $host     = $schoolCode . '.' . $this->getConfigLoader()->get('site_domain');
             // This endpoint calls `\Custom\Help\CourseParticipation\Controller::postUserRegistrations`
             // on host `config.schoolbox_help_url`.
             $response = $client->post(
-                "${url}/api/course-participation/${schoolCode}/users",
+                "{$auth['url']}/api/course-participation/{$auth['schoolCode']}/users",
                 [
-                    'query'       => $query,
+                    'query' => [
+                        'ts'     => $auth['timestamp'],
+                        'digest' => $auth['digest']
+                    ],
                     'form_params' => ['user' => $userPayload],
                     'headers'     => [
-                        'Host'   => $host,
-                        'Origin' => $host,
+                        'Host'   => $auth['host'],
+                        'Origin' => $auth['host'],
                     ],
                 ]
             );
@@ -334,46 +332,5 @@ class Controller extends Base
 
         // Once done: send back to list
         $this->response->redirect->afterPost($this->router->generate('shaps.getAll'));
-    }
-
-
-    /**
-     * Generate query params for this school to connect to the Help API.
-     *
-     * @todo consider moving this to a helper class
-     *
-     * @param Alaress_Date_Format $time
-     * @param array               $extraParams
-     * @return array
-     */
-    private function generateQuery(Alaress_Date_Format $time, array $extraParams = []): array
-    {
-        $schoolCode = $this->getConfigLoader()->get('site_school_code');
-        $privateKey = $this->getConfigLoader()->get('schoolbox_help_access_token');
-
-        $query = [
-            'ts'    => $time->getUnixTimeStamp(),
-            'token' => $this->generateToken($time, $schoolCode, $privateKey),
-        ];
-        if (\is_array($extraParams)) {
-            $query = array_merge($query, $extraParams);
-        }
-        return $query;
-    }
-
-
-    /**
-     * Generates a token for authenticating this school with the Help API.
-     *
-     * @todo once \Custom\Help\CourseParticipation\Handler::computeAccessToken is moved, replace this with new method
-     *
-     * @param Alaress_Date_Format $time
-     * @param string              $schoolCode
-     * @param string              $privateKey
-     * @return string
-     */
-    private function generateToken(Alaress_Date_Format $time, string $schoolCode, string $privateKey): string
-    {
-        return sha1(sprintf(':%s-%s-%s:', $time, $schoolCode, $privateKey));
     }
 }
