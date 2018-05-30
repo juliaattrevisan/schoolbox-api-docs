@@ -228,7 +228,7 @@ Usage:
                 {% else %}
                     <li><a class="icon-folder" href="/resources/{{ courseSpec.folder.id }}">View Resources</a></li>
                 {% endif %}
-                <li><a href="{{ routeLookup('courseMarkbook.getCourseMarkbook', {courseSpecId: courseSpec.id}) }}" class="icon-curriculum">Course Markbook</a></li>
+                <li><a href="{{ routeLookup('courseMarkbook.getCourseRedirect', {courseSpecId: courseSpec.id}) }}" class="icon-curriculum">Course Markbook</a></li>
             </ul>
         {% endif %}
     </div>

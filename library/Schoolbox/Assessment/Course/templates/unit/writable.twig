@@ -35,6 +35,7 @@ Usage:
             <li><a href="/resources/{{ unitSpec.folder.id }}" class="icon-folder">Browse Resources</a></li>
         {% endif %}
         <li><a href="{{ routeLookup('course.deleteUnitSpecification', {id: unitSpec.id}) }}" class="icon-delete" data-action="delete-unit">Delete Unit</a></li>
+        <li><a href="{{ routeLookup('courseMarkbook.getUnitRedirect', {unitSpecId: unitSpec.id}) }}" class="icon-curriculum">Course Markbook</a></li>
     </ul>
     <div class="small-12 column {% if not _expanded %}hide{% endif %}" data-collapsable="unit-{{ unitSpec.id }}" {% if not _expanded %}data-collapse-state="collapsed"{% endif %}>
         <div class="empty-state{% if unitSpec.assessables|length %} hide{% endif %}" data-empty-state>
