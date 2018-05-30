@@ -177,7 +177,7 @@
                             <div class="expander icon-down-arrow" data-collapser="collap-{{loop.index}}"></div>
                             <div class="small-12 card compact list-item">
                                 <div class="icon-course"></div>
-                                <h3>{{ course.name }}</h3>
+                                <h3>{{ course.folderName }}</h3>
                             </div>
                         </div>
                         <div class="small-12 column hide" data-collapse-state="collapsed" data-collapsable="collap-{{loop.index}}">
@@ -210,7 +210,7 @@
                                                         </div>
                                                     </li>
 
-                                                    {% for user in course.enrolments %}
+                                                    {% for user in course.participants %}
                                                         <li data-relation="member">
                                                             <div class="actions-small-4">
                                                                 <div class="selector">
