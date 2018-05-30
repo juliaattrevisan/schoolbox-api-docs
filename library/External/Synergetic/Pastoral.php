@@ -9,6 +9,7 @@ use Html2Text\Html2Text;
 use Schoolbox\External\Exception as ExternalException;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Notif\SilentNotif;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Pastoral\Access\Model as PastoralAccess;
 use Schoolbox\Pastoral\Attachment\Mapper as PastoralAttachmentMapper;
@@ -480,11 +481,14 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                 // If this is a new record we need to store the ID of the newly created Synergetic record
 
                 if (empty($pastoral->getExternalId())) {
+                    $pastoral->setExternalId($this->connector->lastInsertId());
+
                     // Stop pastoral notifier firing on this update, otherwise they receive both a create/update
                     // notification every time someone creates a pastoral record
-
-                    $pastoral->setExternalId($this->connector->lastInsertId());
+                    $pastoralNotif = $this->getPastoralMapper()->getNotifier();
+                    $this->getPastoralMapper()->setNotifier(new SilentNotif());
                     $this->getPastoralMapper()->save($pastoral);
+                    $this->getPastoralMapper()->setNotifier($pastoralNotif);
                 }
 
                 // Export the permissions/audience of the pastoral record to Synergetic
