@@ -36,14 +36,18 @@ class Module extends \Alaress\Module\Module
     protected function registerRoutes(): void
     {
         $canSeeUnitMarkbook   = $this->buildAuthRuleCanSeeUnitMarkbook();
-        $preloadUnitSpec      = $this->buildPreloadUnitSpec();
+        $preloadUnitSpec      = $this->buildPreloadUnitAndCourseSpec();
 
         $canSeeCourseMarkbook = $this->buildAuthRuleCanSeeCourseMarkbook();
         $preloadCourseSpec    = $this->buildPreloadCourseSpec();
 
-        $this->register('GET', '/unit/{unitSpecId:\d+}', 'getUnitMarkbook', $canSeeUnitMarkbook, $preloadUnitSpec);
-        $this->register('GET', '/{courseSpecId:\d+}', 'getCourseMarkbook', $canSeeCourseMarkbook, $preloadCourseSpec);
-        $this->register('POST', '/{courseSpecId:\d+}', 'postCourseMarkbook', $canSeeCourseMarkbook, $preloadCourseSpec);
+        // Convenience redirects to the Course Markbook page
+        $this->register('GET', '/redirect/unit/{unitSpecId:\d+}', 'getUnitRedirect', $canSeeUnitMarkbook, $preloadUnitSpec);
+        $this->register('GET', '/redirect/{courseSpecId:\d+}', 'getCourseRedirect', $canSeeCourseMarkbook, $preloadCourseSpec);
+
+        // Course Markbook page and filtered report
+        $this->register('GET', '/{courseSpecId:\d+}', 'getMarkbook', $canSeeCourseMarkbook, $preloadCourseSpec);
+        $this->register('POST', '/{courseSpecId:\d+}', 'postMarkbook', $canSeeCourseMarkbook, $preloadCourseSpec);
     }
 
     /**
@@ -175,19 +179,23 @@ class Module extends \Alaress\Module\Module
     }
 
 
-
     /**
      * Returns a function that preloads a CourseSpec model
      *
      * @return callable
      */
-    private function buildPreloadUnitSpec(): callable
+    private function buildPreloadUnitAndCourseSpec(): callable
     {
         return function (array $params): array {
             if (array_key_exists('unitSpecId', $params)) {
                 try {
                     /** @noinspection ExceptionsAnnotatingAndHandlingInspection */
-                    return ['unitSpec' => $this->getUnitSpecMapper()->findById($params['unitSpecId'])];
+                    $unitSpec = $this->getUnitSpecMapper()->findById($params['unitSpecId']);
+                    /** @noinspection ExceptionsAnnotatingAndHandlingInspection */
+                    return [
+                        'courseSpec' => $this->getCourseSpecMapper()->findById($unitSpec->getCourse()->getId()),
+                        'unitSpec'   => $unitSpec,
+                    ];
                 } catch (Mapper\Exception $e) {
                     /** @noinspection ExceptionsAnnotatingAndHandlingInspection */
                     throw new NotFound("No Unit found for id: {$params['unitSpecId']}");

@@ -44,61 +44,72 @@ class Controller extends WebController\Base
 
 
     /**
-     * Redirects to the course markbook page with the specified unit pre-selected in filter panel
+     * Redirects to the course markbook, ensuring all units in the course are visible, with the specified unit pre-selected
      *
-     * @param UnitSpec\Model $unitSpec
      * @level 18.0
+     * @param CourseSpec\Model $courseSpec With all units hydrated
+     * @param UnitSpec\Model   $unitSpec
      * @throws \Aura\Router\Exception\RouteNotFound
      * @throws \InvalidArgumentException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    public function getUnitMarkbook(UnitSpec\Model $unitSpec): void
+    public function getUnitRedirect(CourseSpec\Model $courseSpec, UnitSpec\Model $unitSpec): void
     {
-        $filter = $this->filterMapper->findByClass(Filter\Filters\Assessment\NullableContext\UnitImportSpec\Definition::class)[0];
-
-        $selections                                       = new GenericCollection(GenericCollection::class);
-        $selections[$filter->getId()]                     = $this->filterSelectionMapper->createCollection();
-        $selections[$filter->getId()][$unitSpec->getId()] = $this->createSelectionModel($filter, (string)$unitSpec->getId());
-
-        $getArgString = $this->filterFactoryFactory->buildCodec()->convertSelectionsToQueryString($selections);
-        $route        = $this->getRouter()->generate('courseMarkbook.getCourseMarkbook', ['courseSpecId' => $unitSpec->getCourse()->getId()]);
-
-        $this->getResponse()->redirect->to("{$route}?{$getArgString}");
+        $this->redirectToMarkbook($courseSpec, $unitSpec);
     }
 
 
+    /**
+     * Redirects to the course markbook, ensuring all units in the course are visible
+     *
+     * @level 18.0
+     * @param CourseSpec\Model $courseSpec
+     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \InvalidArgumentException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     */
+    public function getCourseRedirect(CourseSpec\Model $courseSpec): void
+    {
+        $this->redirectToMarkbook($courseSpec);
+    }
 
 
     /**
-     * Displays the Course Markbook page
+     * Helper to redirect to the course markbook
      *
-     * @param CourseSpec\Model $courseSpec
-     * @level 18.0
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @param CourseSpec\Model    $courseSpec
+     * @param UnitSpec\Model|null $unitSpec
      * @throws \Aura\Router\Exception\RouteNotFound
-     * @throws \DomainException
      * @throws \InvalidArgumentException
-     * @throws \ReflectionException
-     * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \Schoolbox\Mapper\Exception
-     * @throws \UnderflowException
      * @throws \UnexpectedValueException
      */
-    public function getCourseMarkbook(CourseSpec\Model $courseSpec): void
+    private function redirectToMarkbook(CourseSpec\Model $courseSpec, UnitSpec\Model $unitSpec = null): void
     {
-        $queryArgs = $this->getRequest()->query->getArrayCopy();
-        unset($queryArgs['page']);
-        $this->markbookOuter($courseSpec, $queryArgs);
+        $filter = $this->filterMapper->findByClass(Filter\Filters\Assessment\NullableContext\UnitImportSpec\Definition::class)[0];
+
+        $selections                   = new GenericCollection(GenericCollection::class);
+        $selections[$filter->getId()] = $this->filterSelectionMapper->createCollection();
+        foreach ($courseSpec->getUnits() as $courseUnitSpec) {
+            $courseUnitSpecId                                = $courseUnitSpec->getId();
+            $selected                                        = $unitSpec && (int)$unitSpec->getId() === (int)$courseUnitSpec->getId();
+            $selections[$filter->getId()][$courseUnitSpecId] = $this->createSelectionModel($filter, (string)$courseUnitSpecId, $selected);
+        }
+
+        $getArgString = $this->filterFactoryFactory->buildCodec()->convertSelectionsToQueryString($selections);
+        $route        = $this->getRouter()->generate('courseMarkbook.getMarkbook', ['courseSpecId' => $courseSpec->getId()]);
+
+        $this->getResponse()->redirect->to("{$route}?{$getArgString}");
     }
 
 
     /**
      * Renders the outer part of the course markbook page with a filter panel
      *
+     * @level 18.0
      * @param CourseSpec\Model $courseSpec
-     * @param array            $queryArgs
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \Aura\Router\Exception\RouteNotFound
@@ -110,13 +121,13 @@ class Controller extends WebController\Base
      * @throws \UnderflowException
      * @throws \UnexpectedValueException
      */
-    private function markbookOuter(CourseSpec\Model $courseSpec, array $queryArgs): void
+    public function getMarkbook(CourseSpec\Model $courseSpec): void
     {
-        $page  = Filter\Page\Model::PAGE_COURSE_MARK_BOOK;
-        $route = $this->getRouter()->generate('courseMarkbook.postCourseMarkbook', ['userId' => $this->getUser()->getId()]);
+        $queryArgs = $this->getRequest()->query->getArrayCopy();
+        unset($queryArgs['page']);
 
-
-
+        $page        = Filter\Page\Model::PAGE_COURSE_MARK_BOOK;
+        $route       = $this->getRouter()->generate('courseMarkbook.postMarkbook', ['userId' => $this->getUser()->getId()]);
         $filterPanel = $this->filterFactoryFactory->buildPanel($this->getUser(), $page, $route, $this->getUser(), $queryArgs);
 
         $this->getResponse()->content->set(
@@ -136,7 +147,7 @@ class Controller extends WebController\Base
      * @level 18.0
      * @todo  Condense this and the GET route into a single route and distinguish via SYNC vs AJAX
      */
-    public function postCourseMarkbook(CourseSpec\Model $courseSpec): void
+    public function postMarkbook(CourseSpec\Model $courseSpec): void
     {
         // TODO implement method
         echo 'function: ' . __FUNCTION__ . "<br>\n";
@@ -149,12 +160,13 @@ class Controller extends WebController\Base
     /**
      * Helper method to create a Filter Selection model
      *
-     * @param Filter\Model            $filter
-     * @param string                  $key
+     * @param Filter\Model $filter
+     * @param string       $key
+     * @param bool         $selected
      * @return Filter\Selection\Model
      * @throws \Schoolbox\Mapper\Exception
      */
-    private function createSelectionModel(Filter\Model $filter, string $key): Filter\Selection\Model
+    private function createSelectionModel(Filter\Model $filter, string $key, bool $selected): Filter\Selection\Model
     {
         return $this->filterSelectionMapper
             ->createModel()
@@ -162,6 +174,6 @@ class Controller extends WebController\Base
             ->setUser($this->getUser())
             ->setPage(Filter\Page\Model::PAGE_COURSE_MARK_BOOK)
             ->setKey($key)
-            ->setSelected(true);
+            ->setSelected($selected);
     }
 }
