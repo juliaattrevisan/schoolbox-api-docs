@@ -116,8 +116,8 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
             $this->setVar('markbook_link_block');
         }
 
-        // Show course markbook link to staff on unit or course pages
-        if ($isStaffOrSuper && ($isUnitPage || $isCoursePage)) {
+        // Show course markbook link to staff on unit or course pages (if feature enabled)
+        if ($isStaffOrSuper && ($isUnitPage || $isCoursePage) && $this->getConfigMapper()->get('course_markbook_enable')) {
             $this->setVar('COURSE_MARKBOOK_LINK', $this->buildCourseMarkbookLink($isUnitPage, $isCoursePage));
             $this->parse('course_markbook_link_block', 'course_markbook_link');
             $hasClassActions = true;
