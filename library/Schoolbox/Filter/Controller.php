@@ -117,10 +117,14 @@ class Controller extends BaseController
      *
      * @param IFactoryFactory $factoryFactory The factory responsible for the entity filtered by this page
      * @param string          $page
+     * @throws \UnexpectedValueException
+     * @throws \PDOException
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \InvalidArgumentException If a filter definition class not found, or filter factory not registered
      * @throws \ReflectionException If a definition class does not exist
      * @throws \Schoolbox\Mapper\DefinitionException If join $name isn't on this mapper
      * @throws \Schoolbox\Mapper\Exception If an alias is incorrect
+     * @throws \UnderflowException
      */
     public function postSavePageSettings(IFactoryFactory $factoryFactory, $page)
     {
@@ -130,8 +134,6 @@ class Controller extends BaseController
         $pagesToSave    = $this->pageMapper->createCollection();
         $optionsToSave  = $this->optionsMapper->createCollection();
         $defaultsToSave = $this->defaultsMapper->createCollection();
-
-
 
         /** @var GenericCollection|Page\Model[] $pageFilters */
         $pageFilters = $this->pageMapper->createCollection();
