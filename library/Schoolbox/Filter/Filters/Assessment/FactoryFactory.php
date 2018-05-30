@@ -59,6 +59,14 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
                     $this->getDefaultsMapper(),
                     $this->getSelectionMapper(),
                     $this->getFolderMapper(),
+                    $this->getAccess()
+                );
+            case Filters\Assessment\Folder\CourseImports\Definition::class:
+                return new Filters\Assessment\Folder\CourseImports\Factory(
+                    $this->getOptionMapper(),
+                    $this->getDefaultsMapper(),
+                    $this->getSelectionMapper(),
+                    $this->getFolderMapper(),
                     $this->getAccess(),
                     $this->getFilterMapper(),
                     $this->getUnitImplMapper()
