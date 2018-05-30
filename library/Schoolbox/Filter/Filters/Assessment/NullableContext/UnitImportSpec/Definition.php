@@ -81,6 +81,16 @@ class Definition extends NullableContext\Definition
         ];
     }
 
+    /**
+     * @inheritdoc
+     */
+    public static function isMandatory($page)
+    {
+        // This filter must always be present on this page
+        return $page === Page\Model::PAGE_COURSE_MARK_BOOK;
+    }
+
+
 
     /**
      * @inheritdoc
