@@ -372,6 +372,7 @@ class Controller extends Base\Base
     public function modifyCourse(CourseSpecification $courseSpec)
     {
         // Is course deleted ?
+        // TODO move this to module's route auth rule
         if($courseSpec->isDeleted()){
             throw new NotFound();
         }
