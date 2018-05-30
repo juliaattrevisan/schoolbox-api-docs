@@ -245,8 +245,6 @@ class Controller extends Base
             'courses' => $enrolments,
             'users'   => $provisionedUsers
         ]));
-
-        $this->getResponse()->content->set($this->buildHtmlOutput('@shaps/courses/index.twig', []));
     }
 
     /**
