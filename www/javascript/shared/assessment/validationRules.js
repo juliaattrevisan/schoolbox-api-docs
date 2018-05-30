@@ -46,7 +46,8 @@ var beforeSubmit = function() {
         dueDate = $('input[name="dueDate"]'),
         dueTime = $('input[name="dueTime"]'),
         closeDate = $('input[name="closeDate"]'),
-        closeTime = $('input[name="closeTime"]');
+        closeTime = $('input[name="closeTime"]'),
+        maxMark = $('input[name="maxMark"]');
 
     var openVisible = openDate.is(':visible'),
         closeVisible = closeDate.is(':visible');
@@ -135,5 +136,16 @@ var beforeSubmit = function() {
             });
         }
 
+    }
+
+    $.validator.addMethod("positiveNumeric", function (value, element) {
+        return this.optional(element) || (parseFloat(value) > 0 && /^\d+(\.\d+)?$/.test(value));
+    }, "Amount must be greater than zero");
+
+    if (maxMark.is(':visible')) {
+        maxMark.rules('add', {
+            required: true,
+            positiveNumeric: true
+        })
     }
 };
