@@ -237,13 +237,27 @@ class Controller extends Base
      * Renders a list of all courses available for your school on Help, and the users enrolled in each.
      */
     public function getUsersInCourses() {
-        $provisionedUsers = $this->getProvisionedUsers();
-
         $enrolments = $this->getCoursesFromHelp();
 
+        for($i = 0; $i < count($enrolments); $i++) {
+            $participantsOnLocal = [];
+            $participantsOnHelp = $enrolments[$i]['participants'];
+
+            foreach($participantsOnHelp as $participantId) {
+                try {
+                    $participantsOnLocal[] = $this->userMapper->findById($participantId);
+                } catch (\Schoolbox\Mapper\Exception $e) {
+                    // That user doesn't exist locally
+                    // Do nothing
+                }
+            }
+
+            // TODO we were planning to also show users not present locally, but not sure how we can
+            $enrolments[$i]['participants'] = $participantsOnLocal;
+        }
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@shaps/courses/index.twig', [
-            'courses' => $enrolments,
-            'users'   => $provisionedUsers
+            'courses' => $enrolments
         ]));
     }
 
