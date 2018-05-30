@@ -30,7 +30,7 @@ class Learning extends ModuleLoader
      * @param Kernel $kernel
      * @return void
      */
-    public function configure($kernel): void
+    public function configure($kernel)
     {
         $namespace  = 'learning';
 
