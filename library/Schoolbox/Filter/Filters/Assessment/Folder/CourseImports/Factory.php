@@ -117,7 +117,7 @@ class Factory extends FolderFilter\Factory
             $this->insertUnitImportSpecFolders($definition, $user, $pageFilter, $overrides, $folders, $folderOverrides);
         }
 
-        return new FolderFilter\Component(
+        return new Component(
             $definition,
             $user,
             $pageFilter,
