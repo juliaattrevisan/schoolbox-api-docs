@@ -19,6 +19,7 @@ use React\EventLoop\LoopInterface;
 use Schoolbox\Application\Daemon\App;
 use Schoolbox\Learning\InlineGrader\Kami;
 use Alaress\Random;
+use Schoolbox\MapperFactory;
 
 $opts = require __DIR__ . '/../../conf/core/require-cli.php';
 spl_autoload_call('\\Schoolbox\\Application\\Daemon');
@@ -40,13 +41,19 @@ $reQueue = new class() extends App
      * @param LoggerInterface $log
      * @param array           $opts
      * @return void
-     * @throws Di\Exception\ServiceNotFound
+     * @throws \InvalidArgumentException
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     public function run(Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts): void
     {
-        /** @var Kami\Connector $kamiConnector */
+        /**
+         * @var MapperFactory  $mapperFactory
+         * @var Kami\Connector $kamiConnector
+         * @var Kami\Mapper    $kamiMapper
+         */
+        $mapperFactory = $di->get('mapperFactory');
         $kamiConnector = $di->get('kamiConnector');
-        $kamiMapper    = Kami\Mapper::getInstance();
+        $kamiMapper    = $mapperFactory->get(Kami\Mapper::class);
         $jitter        = new Jitter(new Random\FloatGenerator());
 
         try {
