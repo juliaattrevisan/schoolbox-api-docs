@@ -85,27 +85,14 @@ class Controller extends Base
     private function getCoursesFromHelp()
     {
         $client = new GuzzleClient();
-
-        $url = $this->getConfigLoader()->get('schoolbox_help_url');
-
-        // Query params
-        $schoolCode = strtolower($this->getConfigLoader()->get('site_school_code'));
-
-        $now = new Alaress_Date_Format();
-
-        $privateKey = $this->getConfigLoader()->get('schoolbox_help_access_token');
-
-        // TODO once \Custom\Help\CourseParticipation\Handler::computeAccessToken is moved, replace this with new method
-        $token = sha1(sprintf(':%s-%s-%s:', $now, $schoolCode, $privateKey));
-
-        $timestamp = $now->getUnixTimeStamp();
+        $auth = $this->getAuthDetails();
 
         $response = $client->request(
             "get",
-            "${url}/api/course-participation/${schoolCode}/courses", [
+            "{$auth['url']}/api/course-participation/{$auth['schoolCode']}/courses", [
             'query' => [
-                'ts' => $timestamp,
-                'token' => $token
+                'ts' => $auth['timestamp'],
+                'digest' => $auth['digest']
             ]
         ]);
 
