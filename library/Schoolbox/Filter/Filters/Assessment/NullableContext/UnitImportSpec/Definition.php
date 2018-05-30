@@ -72,7 +72,7 @@ class Definition extends NullableContext\Definition
     /**
      * @inheritdoc
      */
-    public static function getPages(): array
+    public static function getPages()
     {
         return [
             Page\Model::PAGE_MARK_BOOK,

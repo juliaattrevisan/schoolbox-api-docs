@@ -30,7 +30,7 @@ class Definition extends AssessmentTermFilter\Definition
     /**
      * @inheritdoc
      */
-    public static function getPages(): array
+    public static function getPages()
     {
         return [
             Page\Model::PAGE_PENDING_ASSESSMENTS,

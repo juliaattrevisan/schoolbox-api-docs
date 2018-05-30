@@ -29,7 +29,7 @@ class Definition extends FolderFilter\Definition
     /**
      * @inheritdoc
      */
-    public static function getPages(): array
+    public static function getPages()
     {
         return [
             Page\Model::PAGE_COURSE_MARK_BOOK,

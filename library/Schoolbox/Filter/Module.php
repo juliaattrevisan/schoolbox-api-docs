@@ -36,7 +36,7 @@ class Module extends AlaressModule
      * @throws ServiceNotFound
      * @throws \ReflectionException If the filter definition class cannot be found in code base
      */
-    protected function registerRoutes(): void
+    protected function registerRoutes()
     {
         $isSuper = new IsSuperuser();
 

@@ -72,7 +72,7 @@ class Definition extends NullableContext\Definition
     /**
      * @inheritdoc
      */
-    public static function getPages(): array
+    public static function getPages()
     {
         // For now, not available on any pages - purely used for internal query building
         return [

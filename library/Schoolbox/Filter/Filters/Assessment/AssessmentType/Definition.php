@@ -57,7 +57,7 @@ class Definition extends Filter\AbstractDefinition
     /**
      * @inheritdoc
      */
-    public static function getPages(): array
+    public static function getPages()
     {
         return [
             Filter\Page\Model::PAGE_PENDING_ASSESSMENTS,

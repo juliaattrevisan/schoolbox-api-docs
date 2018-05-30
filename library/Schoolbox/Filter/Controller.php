@@ -55,7 +55,7 @@ class Controller extends BaseController
      * @level 17.0
      * @throws ServiceNotFound
      */
-    public function getIndex(): void
+    public function getIndex()
     {
         $filtersPerPage = $this->findAvailableFiltersPerPage();
 
@@ -86,7 +86,7 @@ class Controller extends BaseController
      * @throws \Schoolbox\Mapper\DefinitionException If join $name isn't on this mapper
      * @throws \Schoolbox\Mapper\Exception If an alias is incorrect
      */
-    public function getPageSettings(IFactoryFactory $factoryFactory, string $page): void
+    public function getPageSettings(IFactoryFactory $factoryFactory, $page)
     {
         $enabledOnly = false;
         $definitions = $factoryFactory->buildCurrentState($page, $enabledOnly);
@@ -209,12 +209,12 @@ class Controller extends BaseController
     /**
      * @return GenericCollection[]|Model[][] $visibleFilters Indexed by page, then filterDefinition.name
      */
-    private function findAvailableFiltersPerPage(): array
+    private function findAvailableFiltersPerPage()
     {
         /** @var GenericCollection|Model[] $visibleFilters */
         $visibleFilters = $this->filterMapper->findAll()->filter(function (Model $instance) {
             $definitionClass = $instance->getClass();
-            return \count($definitionClass::getPages()) > 0;
+            return count($definitionClass::getPages()) > 0;
         });
 
         // Group filters by which pages they appear on
