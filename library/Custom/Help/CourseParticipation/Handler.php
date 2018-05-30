@@ -97,11 +97,12 @@ class Handler
 
     /**
      * @param string $schoolCode
+     * @param bool $fuzzy
      * @throws Mapper\Exception
      * @throws Mapper\Exception\Deleted
      * @return array
      */
-    public function getFolderAccessBySchool(string $schoolCode) : array
+    public function getFolderAccessBySchool(string $schoolCode, bool $fuzzy=false) : array
     {
         // ok, if you're here, you can see the thing.
         $courses = $this->getCoursesBySchool($schoolCode);
@@ -109,7 +110,28 @@ class Handler
         $payload = [];
 
         foreach ($courses as $course) {
-            $participants = $this->userAccessMapper->findUsersInCategory($course)->getPropertyValues('externalId');
+            $participantIds = $this->userAccessMapper->findUsersInCategory($course)->getPropertyValues('externalId');
+
+            for ($i = 0; $i < count($participantIds); $i++) {
+                if ($fuzzy) {
+                    // if we're doing a fuzzy lookup, search by `year`
+                    /** @var string[][] $map */
+                    $map = json_decode(file_get_contents(__DIR__ . '/code-map.json'), true);
+
+                    if (empty($map[$schoolCode])) {
+                        // we don't have this code mapped, therefore nobody matches
+                    }
+
+                    // TODO how do we handle this weird case
+                } else {
+                    // "normal" behaviour is to look up by external IDs
+                    $matches = "";
+                    preg_match("{$schoolCode}\.(\d*)", $matches, $participantIds[$i]);
+                    if (! empty($matches)) {
+                        $participantIds[$i] = $matches[1];
+                    }
+                }
+            }
 
             $payload[] = [
                 'folderName'   => $course->getName(),
