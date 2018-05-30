@@ -14,6 +14,7 @@ use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use Alaress\Authorizer\Failure\InvalidPath;
+use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
@@ -68,7 +69,7 @@ class Module extends \Alaress\Module\Module
     private function buildAuthRuleCanSeeCourseMarkbook(): Rule\IAuthorizationRule
     {
         return new Rule\All(
-            new Rule\Callback(function (array $params, User $user) {
+            new Rule\Callback(function () {
                 if (!$this->getConfig()->get('course_markbook_enable')) {
                     /** @noinspection ExceptionsAnnotatingAndHandlingInspection */
                     throw new InvalidPath('Course markbook module is disabled');
