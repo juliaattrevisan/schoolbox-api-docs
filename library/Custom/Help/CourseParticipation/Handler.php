@@ -109,7 +109,7 @@ class Handler
         $payload = [];
 
         foreach ($courses as $course) {
-            $participants = $this->userAccessMapper->findUsersInCategory($course)->getPropertyValues('id');
+            $participants = $this->userAccessMapper->findUsersInCategory($course)->getPropertyValues('externalId');
 
             $payload[] = [
                 'folderName'   => $course->getName(),
