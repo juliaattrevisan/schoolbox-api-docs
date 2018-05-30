@@ -485,22 +485,22 @@ class Controller extends Base
         }
 
         try {
-            $privateKey = $this->tokenMapper->findById($schoolCode)->getAccessToken();
+            $accessToken = $this->tokenMapper->findById($schoolCode)->getAccessToken();
         } catch (Mapper\Exception $e) {
             return 404;
         }
 
         try {
-            $expectedToken = $this->handler->computeAuthDigest(
+            $expectedDigest = $this->handler->computeAuthDigest(
                 $requestTimestamp->getUnixTimeStamp(),
                 $schoolCode,
-                $privateKey
+                $accessToken
             );
         } catch (Mapper\DefinitionException $e) {
             return 500;
         }
 
-        if ($expectedToken !== $authDigest) {
+        if ($expectedDigest !== $authDigest) {
             return 403;
         }
 
