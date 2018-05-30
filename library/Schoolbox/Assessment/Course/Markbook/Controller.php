@@ -10,7 +10,6 @@ namespace Schoolbox\Assessment\Course\Markbook;
 
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Alaress\Web\Controller as WebController;
 use Schoolbox\Filter;
 
@@ -48,54 +47,37 @@ class Controller extends WebController\Base
      *
      * @level 18.0
      * @param CourseSpec\Model $courseSpec With all units hydrated
-     * @param UnitSpec\Model   $unitSpec
+     * @param int              $unitSpecId 0 => ignore
+     * @param int              $folderId   0 => ignore
      * @throws \Aura\Router\Exception\RouteNotFound
      * @throws \InvalidArgumentException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    public function getUnitRedirect(CourseSpec\Model $courseSpec, UnitSpec\Model $unitSpec): void
+    public function getRedirect(CourseSpec\Model $courseSpec, int $unitSpecId, int $folderId): void
     {
-        $this->redirectToMarkbook($courseSpec, $unitSpec);
-    }
+        /** @var Filter\Model[] $filters */
+        $filters      = $this->filterMapper->findByClass([
+            Filter\Filters\Assessment\NullableContext\UnitImportSpec\Definition::class,
+            Filter\Filters\Assessment\Folder\CourseImports\Definition::class,
+        ])->indexBy('class');
+        $unitFilter   = $filters[Filter\Filters\Assessment\NullableContext\UnitImportSpec\Definition::class];
+        $folderFilter = $filters[Filter\Filters\Assessment\Folder\CourseImports\Definition::class];
 
+        $selections   = new GenericCollection(GenericCollection::class);
 
-    /**
-     * Redirects to the course markbook, ensuring all units in the course are visible
-     *
-     * @level 18.0
-     * @param CourseSpec\Model $courseSpec
-     * @throws \Aura\Router\Exception\RouteNotFound
-     * @throws \InvalidArgumentException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \UnexpectedValueException
-     */
-    public function getCourseRedirect(CourseSpec\Model $courseSpec): void
-    {
-        $this->redirectToMarkbook($courseSpec);
-    }
-
-
-    /**
-     * Helper to redirect to the course markbook
-     *
-     * @param CourseSpec\Model    $courseSpec
-     * @param UnitSpec\Model|null $unitSpec
-     * @throws \Aura\Router\Exception\RouteNotFound
-     * @throws \InvalidArgumentException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \UnexpectedValueException
-     */
-    private function redirectToMarkbook(CourseSpec\Model $courseSpec, UnitSpec\Model $unitSpec = null): void
-    {
-        $filter = $this->filterMapper->findByClass(Filter\Filters\Assessment\NullableContext\UnitImportSpec\Definition::class)[0];
-
-        $selections                   = new GenericCollection(GenericCollection::class);
-        $selections[$filter->getId()] = $this->filterSelectionMapper->createCollection();
+        // Unit Filter options
+        $selections[$unitFilter->getId()] = $this->filterSelectionMapper->createCollection();
         foreach ($courseSpec->getUnits() as $courseUnitSpec) {
             $courseUnitSpecId                                = $courseUnitSpec->getId();
-            $selected                                        = $unitSpec && (int)$unitSpec->getId() === (int)$courseUnitSpec->getId();
-            $selections[$filter->getId()][$courseUnitSpecId] = $this->createSelectionModel($filter, (string)$courseUnitSpecId, $selected);
+            $selected                                        = $unitSpecId && $unitSpecId === (int)$courseUnitSpec->getId();
+            $selections[$unitFilter->getId()][$courseUnitSpecId] = $this->createSelectionModel($unitFilter, (string)$courseUnitSpecId, $selected);
+        }
+
+        // Folder Filter options
+        if($folderId){
+            $selections[$folderFilter->getId()] = $this->filterSelectionMapper->createCollection();
+            $selections[$folderFilter->getId()][$folderId] = $this->createSelectionModel($folderFilter, (string)$folderId, true);
         }
 
         $getArgString = $this->filterFactoryFactory->buildCodec()->convertSelectionsToQueryString($selections);

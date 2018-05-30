@@ -192,9 +192,9 @@ class Factory extends FolderFilter\Factory
                                                        ->setFilter($definition->getFilter())
                                                        ->setUser($user)
                                                        ->setPage($pageFilter->getPage())
-                                                       ->setKey((string)$folderId);
+                                                       ->setKey((string)$folderId)
+                                                       ->setSelected(false);
                 }
-                $folderOverrides[$folderId]->setSelected(true);
             }
         }
     }
