@@ -5,6 +5,8 @@
             filtersPerPage           Filter\Model[][] Indexed by page, then filter.class.name
             PAGE_GRADES              string
             PAGE_MARK_BOOK           string
+            PAGE_COURSE_MARK_BOOK    string
+            showCourseMarkbook       bool
             PAGE_PENDING_ASSESSMENTS string
             ENTITY_ASSESSMENTS       string
             pageCurrent              string
@@ -18,7 +20,7 @@
         <h2 class="subheader">Filterable Pages</h2>
         <section>
             <ul class="information-list">
-                {% for page, pageFilters in filtersPerPage %}
+                {% for page, pageFilters in filtersPerPage if showCourseMarkbook or page != PAGE_COURSE_MARK_BOOK %}
                     {% if PAGE_GRADES == page %}
                         {% set pageName = 'Grades' %}
                     {% elseif PAGE_MARK_BOOK == page %}
