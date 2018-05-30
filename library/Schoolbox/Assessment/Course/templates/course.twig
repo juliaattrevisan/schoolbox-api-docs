@@ -228,7 +228,8 @@ Usage:
                 {% else %}
                     <li><a class="icon-folder" href="/resources/{{ courseSpec.folder.id }}">View Resources</a></li>
                 {% endif %}
-                <li><a href="{{ routeLookup('courseMarkbook.getRedirect', {courseSpecId: courseSpec.id, unitSpecId: 0, folderId: 0}) }}" class="icon-curriculum">Course Markbook</a></li>
+                {% set courseMarkbookRoute = routeLookupIfAuthorized('courseMarkbook.getRedirect', {courseSpec: courseSpec, courseSpecId: courseSpec.id, unitSpecId: 0, folderId: 0}) %}
+                {% if courseMarkbookRoute %}<li><a href="{{ courseMarkbookRoute }}" class="icon-curriculum">Course Markbook</a></li>{% endif %}
             </ul>
         {% endif %}
     </div>
