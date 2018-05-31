@@ -29,21 +29,20 @@ case "$1" in
             a2enmod ssl > /dev/null || true
             a2enmod headers > /dev/null || true
         fi
+        chown -R alaress:alaress /usr/share/schoolbox 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
+        /usr/share/schoolbox/tools/create-data-dirs.sh /var/lib/schoolbox 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
         # Fix ownership and permissions of existing configuration.
         if [ -f /etc/schoolbox/conf.php ]; then
             chown root:www-data /etc/schoolbox/conf.php;
             chmod 0644 /etc/schoolbox/conf.php;
+            /usr/share/schoolbox/tools/update-sql.sh 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
+            /usr/share/schoolbox/tools/clean-cache-dir.sh 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
+            /usr/share/schoolbox/tools/set-data-dir-perms.sh /var/lib/schoolbox/cache 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
+            /usr/bin/php /usr/share/schoolbox/tools/skin/builder.php --force 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
         fi
-        chown -R alaress:alaress /usr/share/schoolbox 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
-        /usr/share/schoolbox/tools/create-data-dirs.sh /var/lib/schoolbox 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
-        /usr/share/schoolbox/tools/update-sql.sh 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
-        /usr/share/schoolbox/tools/clean-cache-dir.sh 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
-        /usr/share/schoolbox/tools/set-data-dir-perms.sh /var/lib/schoolbox/cache 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
-        # Build Skin
-        /usr/bin/php /usr/share/schoolbox/tools/skin/builder.php --force 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
         # Manage services (upstart|systemd)
         if [ "$(readlink /proc/1/exe)" = "/lib/systemd/systemd" ]; then
-            cp -f /usr/share/schoolbox/init/schoolbox-*.service /lib/systemd/system;
+            cp -f /usr/share/schoolbox/tools/init/schoolbox-*.service /lib/systemd/system;
             systemctl daemon-reload;
             # Enable services
             # schoolbox-belld is not enabled by default
