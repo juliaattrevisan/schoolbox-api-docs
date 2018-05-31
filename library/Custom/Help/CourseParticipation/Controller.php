@@ -174,7 +174,7 @@ class Controller extends Base
             $c->post($uri, [
                 'query' => [
                     'ts'    => $now->getUnixTimeStamp(),
-                    'digest' => $this->handler->computeAuthDigest($schoolCode, $now->getUnixTimeStamp(), $accessToken)
+                    'digest' => $this->handler->computeAuthDigest($now->getUnixTimeStamp(), $schoolCode, $accessToken)
                 ],
                 'form_params' => $post
             ]);
