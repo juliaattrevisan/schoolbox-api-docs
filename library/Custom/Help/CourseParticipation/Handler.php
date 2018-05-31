@@ -126,7 +126,7 @@ class Handler
                 } else {
                     // "normal" behaviour is to look up by external IDs
                     $matches = "";
-                    preg_match("{$schoolCode}\.(\d*)", $matches, $participantIds[$i]);
+                    preg_match("/" . preg_quote($schoolCode) . "\.(\d*)/", $participantIds[$i], $matches);
                     if (! empty($matches)) {
                         $participantIds[$i] = $matches[1];
                     }
