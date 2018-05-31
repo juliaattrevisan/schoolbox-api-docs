@@ -46,10 +46,12 @@ class Module extends BaseModule
         $this->register('GET', '/provisioning', 'getAll', $getPerms);
         $this->register('GET', '/provisioning/provisioned', 'getProvisioned', $getPerms);
         $this->register('GET', '/provisioning/unprovisioned', 'getUnprovisioned', $getPerms);
-        $this->register('GET', '/provisioning/search', 'getSearch', $getPerms);
+        $this->register('GET', '/provisioning/search', 'getUserProvisioningSearch', $getPerms);
 
         $this->register('GET', '/courses', 'getUsersInCourses', $getPerms);
-        $this->register('GET', '/courses/{userId}', 'getCoursesForUser', $getPerms);
+        $this->register('GET', '/courses/search', 'getUserEnrolmentSearch', $getPerms);
+        $this->register('GET', '/courses/{userId}', 'searchCoursesForUser', $getPerms);
+
 
         $this->register('GET', '/provisioning/{userId}', 'searchUsers', $getPerms);
         $this->register('GET', '/provisioning/provisionedUsers', 'getProvisionedUsersJSON', $getPerms);

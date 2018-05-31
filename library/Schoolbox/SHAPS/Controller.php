@@ -202,7 +202,7 @@ class Controller extends Base
      *
      * @api GET /shaps/provisioning/search
      */
-    public function getSearch()
+    public function getUserProvisioningSearch()
     {
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
@@ -264,11 +264,19 @@ class Controller extends Base
     }
 
     /**
+     * Renders a search form for finding users to view their enrolments.
+     */
+    public function getUserEnrolmentSearch() {
+        $this->getResponse()->content->set($this->buildHtmlOutput('@shaps/courses/search.twig', [
+        ]));
+    }
+
+    /**
      * Takes a user ID and renders a list of all courses that user is enrolled in on Help.
      *
      * @param string $userID
      */
-    public function getCoursesForUser($userID) {
+    public function searchCoursesForUser($userID) {
         // Some sample users
         $zsmith = $this->userMapper->findById(151);
         $jbenson = $this->userMapper->findById(247);
