@@ -129,6 +129,9 @@ class Handler
                     preg_match("/" . preg_quote($schoolCode) . "\.(\d*)/", $participantIds[$i], $matches);
                     if (! empty($matches)) {
                         $participantIds[$i] = $matches[1];
+                    } else {
+                        // This user didn't have a school code, so don't include them
+                        $participantIds[$i] = null;
                     }
                 }
             }
@@ -136,7 +139,7 @@ class Handler
             $payload[] = [
                 'folderName'   => $course->getName(),
                 'folderId'     => $course->getId(),
-                'participants' => array_filter($participants)
+                'participants' => array_filter($participantIds)
             ];
         }
 
