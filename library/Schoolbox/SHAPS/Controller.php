@@ -243,12 +243,14 @@ class Controller extends Base
             $participantsOnLocal = [];
             $participantsOnHelp = $enrolments[$i]['participants'];
 
-            foreach($participantsOnHelp as $participantId) {
-                try {
-                    $participantsOnLocal[] = $this->userMapper->findById($participantId);
-                } catch (\Schoolbox\Mapper\Exception $e) {
-                    // That user doesn't exist locally
-                    // Do nothing
+            if ($participantsOnHelp !== null) {
+                foreach($participantsOnHelp as $participantId) {
+                    try {
+                        $participantsOnLocal[] = $this->userMapper->findById($participantId);
+                    } catch (\Schoolbox\Mapper\Exception $e) {
+                        // That user doesn't exist locally
+                        // Do nothing
+                    }
                 }
             }
 
