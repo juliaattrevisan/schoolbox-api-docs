@@ -74,31 +74,44 @@
 
                                                     {% for user in course.participants %}
                                                         {% if user.id is null %}
-                                                        {% else %}
-                                                        <li data-relation="member">
-                                                            <div class="actions-small-4">
-                                                                <div class="selector">
-                                                                    <input id="delete-{{ user.id}}" name="delete[]" type="checkbox">
-                                                                    <label for="delete-{{ user.id }}" class="checkbox-label"></label>
-                                                                </div>
-                                                                <div class="list-item">
-                                                                    <div class="card small-12">
-                                                                        <a href="/search/user/{{ user.id }}">
-                                                                            {{ user.firstname }} {{ user.lastname }}
-                                                                        </a>
+                                                            <li data-relation="member">
+                                                                <div class="actions-small-4">
+                                                                    <div class="selector">
+                                                                        <input id="delete-{{ user.id}}" name="delete[]" type="checkbox" disabled>
+                                                                        <label for="delete-{{ user.id }}" class="checkbox-label"></label>
+                                                                    </div>
+                                                                    <div class="list-item">
+                                                                        <div class="card small-12">
+                                                                            {{ user.firstname }} {{ user.lastname }}*
+                                                                        </div>
                                                                     </div>
                                                                 </div>
-                                                                <nav>
-                                                                    <!-- TODO change this form action -->
-                                                                    <form action="/group/modifyForm.php" method="post" class="no-margin">
-                                                                        <input id="accessLevel-{{ user.id }}-0" type="radio" name="accessLevel[{{ user.id }}]" value="0" />
-                                                                        <label for="accessLevel-{{ user.id }}-0" class="input-toggle" title="Remove user from this course">
-                                                                            <i class="icon-close alert"></i>
-                                                                        </label>
-                                                                    </form>
-                                                                </nav>
-                                                            </div>
-                                                        </li>
+                                                            </li>
+                                                        {% else %}
+                                                            <li data-relation="member">
+                                                                <div class="actions-small-4">
+                                                                    <div class="selector">
+                                                                        <input id="delete-{{ user.id}}" name="delete[]" type="checkbox">
+                                                                        <label for="delete-{{ user.id }}" class="checkbox-label"></label>
+                                                                    </div>
+                                                                    <div class="list-item">
+                                                                        <div class="card small-12">
+                                                                            <a href="/search/user/{{ user.id }}">
+                                                                                {{ user.firstname }} {{ user.lastname }}
+                                                                            </a>
+                                                                        </div>
+                                                                    </div>
+                                                                    <nav>
+                                                                        <!-- TODO change this form action -->
+                                                                        <form action="/group/modifyForm.php" method="post" class="no-margin">
+                                                                            <input id="accessLevel-{{ user.id }}-0" type="radio" name="accessLevel[{{ user.id }}]" value="0" />
+                                                                            <label for="accessLevel-{{ user.id }}-0" class="input-toggle" title="Remove user from this course">
+                                                                                <i class="icon-close alert"></i>
+                                                                            </label>
+                                                                        </form>
+                                                                    </nav>
+                                                                </div>
+                                                            </li>
                                                         {% endif %}
                                                     {% endfor %}
                                                 </ul>
