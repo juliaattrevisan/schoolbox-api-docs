@@ -39,7 +39,7 @@
                             <div class="expander icon-down-arrow" data-collapser="collap-{{loop.index}}"></div>
                             <div class="small-12 card compact list-item">
                                 <div class="icon-course"></div>
-                                <h3>{{ course.folderName }}</h3>
+                                <a href="{{ serverUrl }}/homepage/{{ course.folderId }}"><h3>{{ course.folderName }}</h3></a>
                             </div>
                         </div>
                         <div class="small-12 column hide" data-collapse-state="collapsed" data-collapsable="collap-{{loop.index}}">

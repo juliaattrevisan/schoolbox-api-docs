@@ -254,7 +254,8 @@ class Controller extends Base
         }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@shaps/courses/index.twig', [
-            'courses' => $enrolments
+            'courses' => $enrolments,
+            'serverUrl' => $url = rtrim($this->getConfigLoader()->get('schoolbox_help_url'), '/')
         ])->setTitle('Schoolbox Help Courses'));
     }
 
