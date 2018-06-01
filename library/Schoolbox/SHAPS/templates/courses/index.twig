@@ -6,6 +6,7 @@
         $('[data-component]').find('[data-collapser=true]').collapsable();
     });
 </script>
+<script type="text/javascript" src="/javascript/shared/select-all/jquery.select-all.js"></script>
 <!-- END custom_head -->
 
 <div class="row">
@@ -91,7 +92,7 @@
                                                             <li data-relation="member">
                                                                 <div class="actions-small-4">
                                                                     <div class="selector">
-                                                                        <input id="check-{{ user.id }}" name="check[]" type="checkbox">
+                                                                        <input id="check-{{ user.id }}" name="check[]" type="checkbox" data-checkbox>
                                                                         <label for="check-{{ user.id }}" class="checkbox-label"></label>
                                                                     </div>
                                                                     <div class="list-item">
@@ -164,6 +165,13 @@
                             </div>
                         </div>
                     </li>
+                    <script>
+                        $("ul").selectAll({
+                            selector: "#check-all-{{ course.folderId }}",
+                            checkboxes: "[data-checkbox]"
+                        });
+                    </script>
+
                 {% endfor %}
             </ul>
 
