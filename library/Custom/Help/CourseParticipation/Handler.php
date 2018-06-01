@@ -138,8 +138,8 @@ class Handler
                     if (! empty($matches)) {
                         $users[$i]["id"] = $matches[1];
                     } else {
-                        // This user didn't have a school code, so don't include them
-                        $users[$i] = null;
+                        // This user didn't have a school code, so give them a null ID
+                        $users[$i]["id"] = null;
                     }
                 }
             }
@@ -147,7 +147,7 @@ class Handler
             $payload[] = [
                 'folderName'   => $course->getName(),
                 'folderId'     => $course->getId(),
-                'participants' => array_filter($users)
+                'participants' => $users
             ];
         }
 

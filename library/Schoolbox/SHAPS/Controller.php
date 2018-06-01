@@ -239,26 +239,6 @@ class Controller extends Base
     public function getUsersInCourses() {
         $enrolments = $this->getCoursesFromHelp();
 
-        for($i = 0; $i < count($enrolments); $i++) {
-            $participantsOnLocal = [];
-            $participantsOnHelp = $enrolments[$i]['participants'];
-
-            if ($participantsOnHelp !== null) {
-                foreach($participantsOnHelp as $participantId) {
-                    try {
-                        $participantsOnLocal[] = $this->userMapper->findById($participantId);
-                    } catch (\Schoolbox\Mapper\Exception $e) {
-                        // TODO why is Storm saying this exception isn't thrown in the try block?
-                        // That user doesn't exist locally
-                        // Do nothing
-                    }
-                }
-            }
-
-            // TODO we were planning to also show users not present locally, but not sure how we can
-            $enrolments[$i]['participants'] = $participantsOnLocal;
-        }
-
         $this->getResponse()->content->set($this->buildHtmlOutput('@shaps/courses/index.twig', [
             'courses' => $enrolments
         ]));
