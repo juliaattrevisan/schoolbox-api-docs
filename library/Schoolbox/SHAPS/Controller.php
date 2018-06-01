@@ -248,6 +248,7 @@ class Controller extends Base
                     try {
                         $participantsOnLocal[] = $this->userMapper->findById($participantId);
                     } catch (\Schoolbox\Mapper\Exception $e) {
+                        // TODO why is Storm saying this exception isn't thrown in the try block?
                         // That user doesn't exist locally
                         // Do nothing
                     }
