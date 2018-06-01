@@ -108,10 +108,18 @@ class Handler
         $payload = [];
 
         foreach ($courses as $course) {
-            // TODO we need return not just the ID but also the firstname and lastname so we can show prospects
-            $participantIds = $this->userAccessMapper->findUsersInCategory($course)->getPropertyValues('externalId');
+            $participants = $this->userAccessMapper->findUsersInCategory($course);
+            $users = [];
 
-            for ($i = 0; $i < count($participantIds); $i++) {
+            foreach($participants as $user) {
+                $users[] = [
+                    "id" => $user->getExternalId(),
+                    "firstname" => $user->getFirstname(),
+                    "lastname" => $user->getLastname()
+                ];
+            }
+
+            for ($i = 0; $i < count($users); $i++) {
                 if ($fuzzy) {
                     // if we're doing a fuzzy lookup, search by `year`
                     /** @var string[][] $map */
@@ -125,12 +133,13 @@ class Handler
                 } else {
                     // "normal" behaviour is to look up by external IDs
                     $matches = "";
-                    preg_match("/" . preg_quote($schoolCode) . "\.(\d*)/", $participantIds[$i], $matches);
+                    $currentUserId = $users[$i]["id"];
+                    preg_match("/" . preg_quote($schoolCode) . "\.(\d*)/", $currentUserId, $matches);
                     if (! empty($matches)) {
-                        $participantIds[$i] = $matches[1];
+                        $users[$i]["id"] = $matches[1];
                     } else {
                         // This user didn't have a school code, so don't include them
-                        $participantIds[$i] = null;
+                        $users[$i] = null;
                     }
                 }
             }
@@ -138,7 +147,7 @@ class Handler
             $payload[] = [
                 'folderName'   => $course->getName(),
                 'folderId'     => $course->getId(),
-                'participants' => array_filter($participantIds)
+                'participants' => array_filter($users)
             ];
         }
 
