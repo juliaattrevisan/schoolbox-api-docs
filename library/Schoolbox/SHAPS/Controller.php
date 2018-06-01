@@ -255,7 +255,7 @@ class Controller extends Base
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@shaps/courses/index.twig', [
             'courses' => $enrolments
-        ]));
+        ])->setTitle('Schoolbox Help Courses'));
     }
 
     /**
@@ -263,7 +263,7 @@ class Controller extends Base
      */
     public function getUserEnrolmentSearch() {
         $this->getResponse()->content->set($this->buildHtmlOutput('@shaps/courses/search.twig', [
-        ]));
+        ])->setTitle('Schoolbox Help Courses - User Search'));
     }
 
     /**
