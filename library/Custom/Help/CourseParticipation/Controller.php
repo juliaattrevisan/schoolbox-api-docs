@@ -34,7 +34,7 @@ class Controller extends Base
     /**
      * Client requests are considered unauthorised if they are older than this many seconds.
      */
-    private const REQUEST_TIMESTAMP_EXPIRY = 5200;
+    private const REQUEST_TIMESTAMP_EXPIRY = 10;
 
     /**
      * @var UserAccessMapper
