@@ -108,6 +108,7 @@ class Handler
         $payload = [];
 
         foreach ($courses as $course) {
+            // TODO we need return not just the ID but also the firstname and lastname so we can show prospects
             $participantIds = $this->userAccessMapper->findUsersInCategory($course)->getPropertyValues('externalId');
 
             for ($i = 0; $i < count($participantIds); $i++) {
