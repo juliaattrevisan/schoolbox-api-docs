@@ -346,9 +346,9 @@ class Handler
     private function getCoursesBySchool(string $schoolCode) : Collection
     {
         // ok, if you're here, you can see the thing.
-        $folder = $this->folderMapper->findById(
-            $this->codeMapper->findOneByColumn('code', $schoolCode)->getFolder()->getId()
-        );
+        // TODO if there are no courses for the school, this throws an exception. That's bad!
+        $code = $this->codeMapper->findOneByColumn('code', $schoolCode)->getFolder()->getId();
+        $folder = $this->folderMapper->findById($code);
 
         // obtain all direct descendants of this folder
         // the scope of implementation is immediate children only, rather than attempting to gather all descendants
