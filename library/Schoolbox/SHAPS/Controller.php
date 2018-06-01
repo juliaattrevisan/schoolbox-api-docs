@@ -125,7 +125,12 @@ class Controller extends Base
     private function getProvisionedUserIds() : array
     {
         $provisionedUsers = $this->getUsersFromHelp();
-        return array_keys($provisionedUsers);
+        $matchingUsers = array_filter($provisionedUsers,
+            function($id) {
+                return in_array($id, $this->getAllStaff()->getPropertyValues('id'));
+            }
+        , ARRAY_FILTER_USE_KEY);
+        return array_keys($matchingUsers);
     }
 
     /*
@@ -238,6 +243,15 @@ class Controller extends Base
      */
     public function getUsersInCourses() {
         $enrolments = $this->getCoursesFromHelp();
+
+        for($i = 0; $i < count($enrolments); $i++) {
+            for($n = 0; $n < count($enrolments[$i]['participants']); $n++) {
+                if (! in_array($enrolments[$i]['participants'][$n]['id'], $this->getProvisionedUserIds())) {
+                    // A convoluted way of saying this user couldn't be matched with anyone on our instance.
+                    $enrolments[$i]['participants'][$n]['id'] = null;
+                }
+            }
+        }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@shaps/courses/index.twig', [
             'courses' => $enrolments
