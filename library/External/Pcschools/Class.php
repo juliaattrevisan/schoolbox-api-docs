@@ -64,7 +64,7 @@ class External_Pcschools_Class implements External_ClassInterface
                 INNER JOIN SUBJECT s  ON tf.SUBJECT = s.NO
                 INNER JOIN STUDENT st ON su.STUDKEY = st.STUDKEY
                 WHERE 
-                    st.CURRENT_YEAR <> ".self::LEFT_YEAR." AND
+                    st.CURRENT_YEAR <> '".self::LEFT_YEAR."' AND
                     {$codeQuery};";
 
         return $this->getDatabase()->trimAll($this->getDatabase()->getAll($query));
