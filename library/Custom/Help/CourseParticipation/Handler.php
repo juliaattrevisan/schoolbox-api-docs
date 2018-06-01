@@ -98,8 +98,6 @@ class Handler
     /**
      * @param string $schoolCode
      * @param bool $fuzzy
-     * @throws Mapper\Exception
-     * @throws Mapper\Exception\Deleted
      * @return array
      */
     public function getFolderAccessBySchool(string $schoolCode, bool $fuzzy=false) : array
@@ -339,20 +337,22 @@ class Handler
 
     /**
      * @param string $schoolCode
-     * @throws Mapper\Exception
-     * @throws Mapper\Exception\Deleted
      * @return Collection|IFolder[]
      */
     private function getCoursesBySchool(string $schoolCode) : Collection
     {
         // ok, if you're here, you can see the thing.
-        // TODO if there are no courses for the school, this throws an exception. That's bad!
-        $code = $this->codeMapper->findOneByColumn('code', $schoolCode)->getFolder()->getId();
-        $folder = $this->folderMapper->findById($code);
+        try {
+            $code = $this->codeMapper->findOneByColumn('code', $schoolCode)->getFolder()->getId();
+            $folder = $this->folderMapper->findById($code);
+            // obtain all direct descendants of this folder
+            // the scope of implementation is immediate children only, rather than attempting to gather all descendants
+            return $this->folderMapper->findByParentId($folder->getId());
+        } catch (Mapper\Exception $e) {
+            // No courses? Do nothing, we're going to return an empty collection outside this block
+        }
 
-        // obtain all direct descendants of this folder
-        // the scope of implementation is immediate children only, rather than attempting to gather all descendants
-        return $this->folderMapper->findByParentId($folder->getId());
+        return new Collection();
     }
 
 
