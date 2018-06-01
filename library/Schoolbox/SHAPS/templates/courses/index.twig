@@ -1,6 +1,4 @@
 <!-- BEGIN custom_head -->
-<script type="text/javascript" src="/javascript/shared/jquery.pantry.js"></script>
-
 <script type="text/javascript">
     $(function() {
         /* Collapse content on components
@@ -39,7 +37,9 @@
                             <div class="expander icon-down-arrow" data-collapser="collap-{{loop.index}}"></div>
                             <div class="small-12 card compact list-item">
                                 <div class="icon-course"></div>
-                                <a href="{{ serverUrl }}/homepage/{{ course.folderId }}"><h3>{{ course.folderName }}</h3></a>
+                                <a href="{{ serverUrl }}/homepage/{{ course.folderId }}">
+                                    <h3>{{ course.folderName }}</h3>
+                                </a>
                             </div>
                         </div>
                         <div class="small-12 column hide" data-collapse-state="collapsed" data-collapsable="collap-{{loop.index}}">
@@ -47,22 +47,22 @@
                             <div class="row">
                                 <div class="small-12 island">
                                     <dl class="tabs" data-tab>
-                                        <dd class="active"><a href="#members">Current Enrolments</a></dd>
-                                        <dd><a href="#addMembers">Enrol users</a></dd>
+                                        <dd class="active"><a href="#enrolments-{{ course.folderId }}">Current Enrolments</a></dd>
+                                        <dd><a href="#enrol-{{ course.folderId}}">Enrol users</a></dd>
                                     </dl>
 
                                     <section>
                                         <div class="tabs-content content no-margin">
-                                            <div class="content active" id="members">
-                                                <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
+                                            <div class="content active" id="enrolments-{{ course.folderId }}">
+                                                <input type="hidden" name="folderId" value="{{ course.folderId }}" />
 
                                                 <ul class="information-list card-selectable">
 
                                                     <li data-relation="member">
                                                         <div class="actions-small-4">
                                                             <div class="selector">
-                                                                <input data-toggle-all name="delete-all-{{ loop.index }}" id="delete-all-{{ loop.index }}" type="checkbox">
-                                                                <label for="delete-all-{{ loop.index }}" class="checkbox-label"></label>
+                                                                <input data-toggle-all name="check-all-{{ course.folderId }}" id="check-all-{{ course.folderId }}" type="checkbox">
+                                                                <label for="check-all-{{ course.folderId}}" class="checkbox-label"></label>
                                                             </div>
                                                             <div class="list-item">
                                                                 <div class="card small-12">
@@ -77,8 +77,8 @@
                                                             <li data-relation="member">
                                                                 <div class="actions-small-4">
                                                                     <div class="selector">
-                                                                        <input id="delete-{{ user.id}}" name="delete[]" type="checkbox" disabled>
-                                                                        <label for="delete-{{ user.id }}" class="checkbox-label"></label>
+                                                                        <input id="check-{{ user.id }}" name="check[]" type="checkbox" disabled>
+                                                                        <label for="check-{{ user.id }}" class="checkbox-label"></label>
                                                                     </div>
                                                                     <div class="list-item">
                                                                         <div class="card small-12">
@@ -91,8 +91,8 @@
                                                             <li data-relation="member">
                                                                 <div class="actions-small-4">
                                                                     <div class="selector">
-                                                                        <input id="delete-{{ user.id}}" name="delete[]" type="checkbox">
-                                                                        <label for="delete-{{ user.id }}" class="checkbox-label"></label>
+                                                                        <input id="check-{{ user.id }}" name="check[]" type="checkbox">
+                                                                        <label for="check-{{ user.id }}" class="checkbox-label"></label>
                                                                     </div>
                                                                     <div class="list-item">
                                                                         <div class="card small-12">
@@ -104,8 +104,8 @@
                                                                     <nav>
                                                                         <!-- TODO change this form action -->
                                                                         <form action="/group/modifyForm.php" method="post" class="no-margin">
-                                                                            <input id="accessLevel-{{ user.id }}-0" type="radio" name="accessLevel[{{ user.id }}]" value="0" />
-                                                                            <label for="accessLevel-{{ user.id }}-0" class="input-toggle" title="Remove user from this course">
+                                                                            <input id="unenrol-{{ user.id }}" type="button" />
+                                                                            <label for="unenrol-{{ user.id }}" title="Remove user from this course">
                                                                                 <i class="icon-close alert"></i>
                                                                             </label>
                                                                         </form>
@@ -120,61 +120,38 @@
                                                 <button disabled data-delete-members class="expand">Remove Selected Users From Course</button>
                                             </div>
 
-                                            <div class="content" id="addMembers">
+                                            <div class="content" id="enrol-{{ course.folderId}}" data-enrol>
                                                 <dl class="tabs" data-tab>
-                                                    <dd class="active"><a href="#userName">From Name</a></dd>
-                                                    <dd><a href="#userGroups">From Group</a></dd>
-                                                    <dd><a href="#userRoles">From Role</a></dd>
-                                                    <dd><a href="#userList">From List</a></dd>
+                                                    <dd><a href="#userRoles-{{ course.folderId }}">From Role</a></dd>
+                                                    <dd><a href="#userList-{{ course.folderId }}">From List</a></dd>
                                                 </dl>
                                                 <section>
                                                     <div class="tabs-content no-margin">
-                                                        <div class="content active" id="userName">
+
+                                                        <div class="content" id="userRoles-{{ course.folderId }}">
                                                             <!-- TODO change this form action -->
-                                                            <form action="/group/modifyForm.php" method="post" class="no-margin">
-                                                                <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
-                                                                <label for="addUser">
-                                                                    Enrol users
-                                                                    <span data-tooltip class="has-tip tip-top hint" title="You may add users individually by typing their name and selecting from the list.">?</span>
-                                                                </label>
-                                                                <select id="addUser" name="userID[]" multiple placeholder="Search Users"></select>
-                                                                <input type="submit" value="Add Users" />
-                                                            </form>
-                                                        </div>
-
-                                                        <div class="content" id="userGroups">
-                                                            <form action="/group/addUserByGroup.php?type=individual&destinationID={CATEGORY_ID}" method="post" class="no-margin">
-                                                                <input type="hidden" name="individualGroupID" id="individualGroupID" />
-                                                                <label for="addUsersByIndividualGroup">
-                                                                    Group
-                                                                    <span data-tooltip class="has-tip tip-top hint" title="Add all users that belong to another group.">?</span>
-                                                                </label>
-                                                                <input id="addUsersByIndividualGroup" type="text" size="30" placeholder="Search User Groups" />
-                                                                <input type="submit" value="Add Users" />
-                                                            </form>
-                                                        </div>
-
-                                                        <div class="content" id="userRoles">
-                                                            <form action="/group/addUserByGroup.php?type=system&destinationID={CATEGORY_ID}" method="post" class="no-margin">
+                                                            <form action="" method="post" class="no-margin">
                                                                 <input type="hidden" name="systemGroupID" id="systemGroupID" />
                                                                 <label for="addUsersBySystemGroup">
                                                                     Role
                                                                     <span data-tooltip class="has-tip tip-top hint" title="Add all users of a particular role in the system.">?</span>
                                                                 </label>
-                                                                <input id="addUsersBySystemGroup" type="text" size="30" placeholder="Search User Roles" />
-                                                                <input type="submit" value="Add Users" />
+                                                                <input type="hidden" name="folderId" value="{{ course.folderId }}" />
+                                                                <input id="enrolUsersBySystemGroup" type="text" size="30" placeholder="Search User Roles" />
+                                                                <input type="submit" value="Enrol Users" />
                                                             </form>
                                                         </div>
 
-                                                        <div class="content" id="userList">
-                                                            <form action="/group/modifyForm.php" method="post" class="no-margin">
+                                                        <div class="content" id="userList-{{ course.folderId }}">
+                                                            <!-- TODO change this form action -->
+                                                            <form action="" method="post" class="no-margin">
                                                                 <label for="addUsersByList">
                                                                     User List
                                                                     <span data-tooltip class="has-tip tip-top hint" title="Add a list of users (either external user IDs or Schoolbox usernames).">?</span>
                                                                 </label>
-                                                                <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
-                                                                <textarea name="bulkAdd" id="addUsersByList" cols="30" rows="20"></textarea>
-                                                                <input type="submit" value="Add Users" />
+                                                                <input type="hidden" name="folderId" value="{{ course.folderId }}" />
+                                                                <textarea name="bulkAdd" id="enrolUsersByList" cols="30" rows="20"></textarea>
+                                                                <input type="submit" value="Enrol Users" />
                                                             </form>
                                                         </div>
                                                     </div>
