@@ -173,11 +173,17 @@
                     </li>
                 {% endfor %}
             </ul>
+
             <script type="text/javascript">
                 $(function () {
                     $('[data-collapser]').collapsable();
                 });
             </script>
         </section>
+
+        <div class="empty-state{% if courses | length > 0 %} hide{% endif %}" data-empty-state>
+            <i class="icon-course"></i>
+            <p>{% block emptyStateText %}No courses found for your school.{% endblock %}</p>
+        </div>
     </div>
 </div>
