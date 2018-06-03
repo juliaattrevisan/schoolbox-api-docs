@@ -46,10 +46,12 @@ class ShowcaseMapper extends Schoolbox\Mapper
      */
     protected function getSelectString()
     {
+        $submissionBoxMapper = $this->getJoinMapper('submissionBox');
         return "
             SELECT
                 {$this->getColumnString()},
-                {$this->getJoinMapper('submissionBox')->getColumnString('sb')}
+                {$this->getJoinMapper('submissionBox')->getColumnString('sb')},
+                {$submissionBoxMapper->getJoinMapper('assessmentModel')->getColumnString('am')}
         ";
     }
 
@@ -60,9 +62,11 @@ class ShowcaseMapper extends Schoolbox\Mapper
      */
     protected function getFromString()
     {
+        $submissionBoxMapper = $this->getJoinMapper('submissionBox');
         return "
             FROM {$this->getTable()}
             JOIN {$this->getJoinSql('submissionBox', '', 'sb')}
+            JOIN {$submissionBoxMapper->getJoinSql('assessmentModel', 'sb', 'am')}
         ";
     }
 
