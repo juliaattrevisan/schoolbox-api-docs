@@ -11,14 +11,15 @@ namespace Schoolbox\Assessment\Course\Import\Atlas\Api;
 use Alaress_Date_Format;
 
 /**
- * Class CurriculumFactory
+ * Factory for building a curriculum object from a response from the Atlas API.
  */
 class CurriculumFactory
 {
     /**
      * Build a curriculum from a response.
      *
-     * @param array $response
+     * @param array $response A single curriculum from the Atlas API.
+     *                        (@see https://api.rubicon.com/docs/#!/Curriculum/get_curriculummap_id)
      * @return Curriculum
      */
     public function build(array $response): Curriculum
