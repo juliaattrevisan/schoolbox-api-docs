@@ -99,12 +99,7 @@ class ShowcaseMapper extends Schoolbox\Mapper
 
         foreach ($showcaseItems as $showcaseItem) {
             $assessmentId = $showcaseItem->getSubmissionBox()->getAssessmentModel()->getId();
-            // if assessment is deleted, exclude the showcase
-            if ($assessmentModels->offsetExists($assessmentId)) {
-                $showcaseItem->getSubmissionBox()->setAssessmentModel($assessmentModels[$assessmentId]);
-            } else {
-                $showcaseItems->offsetUnset($showcaseItem->getId());
-            }
+            $showcaseItem->getSubmissionBox()->setAssessmentModel($assessmentModels[$assessmentId]);
         }
 
         return $showcaseItems;
