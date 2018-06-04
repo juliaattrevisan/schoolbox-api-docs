@@ -138,8 +138,9 @@ class Instance implements JsonSerializable
      * What kind of notification is this?
      *
      * * self::ACTION_SEND:           Send this message.
-     * * self::ACTION_RETRACT_SINGLE: Retract this message. Must match sent
-     *                                message exactly.
+     * * self::ACTION_RETRACT_SINGLE: Retract this message.
+     *                                Base hash, params, context and meta must
+     *                                match sent message.
      * * self::ACTION_RETRACT_ALL:    Retract this message, and any like it,
      *                                from everyone.
      *                                Base hash (message and href) must match
