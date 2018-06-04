@@ -173,6 +173,9 @@ function renderStudent(
                     'group_id' => $teacherRoles,
             ]);
         }
+        else {
+            $subject['teachers'] = [];
+        }
 
         $subjects[$group][] = $subject;
     }
