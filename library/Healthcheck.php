@@ -489,7 +489,7 @@ class Healthcheck
         $this->selectTest($tables);
 
         $procedures = [
-            'spSelTimeTableSchoolBox',
+            'spSelTimeTable',
         ];
 
         $this->executeTest($procedures);
