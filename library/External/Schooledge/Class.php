@@ -72,12 +72,12 @@ class External_Schooledge_Class extends External_Humanedge_Class implements Exte
     {
         if (!$classCode) {
             /* Dont bother if you got no code */
-            return false;
+            return [];
         }
 
         $timetableCodes = $this->getTimetableCodes();
         if (null === $timetableCodes) {
-            return false;
+            return [];
         }
 
         $classQuery = $this->getClassCodeQuery($classCode);
@@ -144,12 +144,12 @@ class External_Schooledge_Class extends External_Humanedge_Class implements Exte
     {
         if (!$classCode) {
             /* Dont bother if you got no code */
-            return false;
+            return [];
         }
 
         $timetableCodes = $this->getTimetableCodes();
         if (null === $timetableCodes) {
-            return false;
+            return [];
         }
 
         $classQuery = $this->getClassCodeQuery($classCode);

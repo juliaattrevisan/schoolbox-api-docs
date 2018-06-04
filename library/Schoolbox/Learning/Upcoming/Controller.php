@@ -217,12 +217,15 @@ class Controller extends Base
             $teachers = [];
             if (count($folder->getCodes()) > 0) {
                 // Actual teachers only
-                $teachers = $this->userMapper->findByColumn(
-                    'synergy_id',
-                    $this->externalClass->getTeacherName($folder->getCodeString())
-                )->filter(function (User $teacher) {
-                    return $teacher->getRole()->isStaff();
-                });
+                $teacherCodes = $this->externalClass->getTeacherName($folder->getCodeString());
+                if(is_array($teacherCodes) && count($teacherCodes) > 1) {
+                    $teachers = $this->userMapper->findByColumn('synergy_id', $teacherCodes)
+                        ->filter(
+                            function (User $teacher) {
+                                return $teacher->getRole()->isStaff();
+                            }
+                        );
+                }
             }
 
             // Student's grades

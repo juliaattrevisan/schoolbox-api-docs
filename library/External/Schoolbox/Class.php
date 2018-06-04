@@ -78,7 +78,7 @@ class External_Schoolbox_Class implements External_ClassInterface
         $codes = array_filter(explode(',', $classCodes));
 
         if (empty($codes)) {
-            return null;
+            return [];
         }
 
         $predicate = PredicateBuilder::getArrayBindings($codes, 'classCode');

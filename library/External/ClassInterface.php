@@ -23,7 +23,7 @@ interface External_ClassInterface {
      * ClassCampus
      *
      * @param $classCode
-     * @return array|null
+     * @return array
      */
     public function getStudents($classCode);
 
