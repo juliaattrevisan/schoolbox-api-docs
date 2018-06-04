@@ -116,7 +116,7 @@ class Factory
                 if ($dueWork->getMaxMark() > 0) {
                     return new TotalMarkFractional($dueWork->getMaxMark());
                 }
-                throw new \DomainException("Invalid MaxMark value for Total Mark MarkType: " . $dueWork->getMaxMark());
+                throw new \UnexpectedValueException("Invalid MaxMark value for Total Mark MarkType: " . $dueWork->getMaxMark());
             case MarkType::TYPE_LETTER:
                 return new LetterGrade($dueWork->getGradeGroup());
             default:
