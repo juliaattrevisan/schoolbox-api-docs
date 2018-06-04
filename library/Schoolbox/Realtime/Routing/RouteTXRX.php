@@ -27,9 +27,6 @@ class RouteTXRX implements TXRX
     /** @var QueueSorter */
     private $sorter;
 
-    /** @var QueueInterface */
-    private $queue;
-
     /** @var ListFactory */
     private $listFactory;
 
@@ -137,9 +134,8 @@ class RouteTXRX implements TXRX
      *
      * @param array $args
      * @return int
-     * @throws BadMethodCallException
-     * @throws InvalidArgumentException
-     * @throws PDOException
+     * @throws BadMethodCallException if using the transmitter variant
+     * @throws \Schoolbox\Mapper\Exception if user doesn't exist or was deleted
      */
     public function receive(array $args)
     {
