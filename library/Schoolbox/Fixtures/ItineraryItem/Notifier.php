@@ -66,15 +66,15 @@ class Notifier extends AbstractModuleNotifier
     {
         $method = $bundle->getEvent()->getAction();
 
-        /** @var Match $match */
-        $match = $bundle->getEvent()->getObject();
+        /** @var Model $itineraryItem */
+        $itineraryItem = $bundle->getEvent()->getObject();
 
-        // Notify 24 hours before the match start time
-        $notifyTime = clone $match->getStartAt();
+        // Notify 24 hours before the itinerary item's start time
+        $notifyTime = clone $itineraryItem->getStartAt();
         $notifyTime->addHours(-24);
         $now = \Alaress_Date_Format::now();
 
-        if($now->between($notifyTime, $match->getStartAt())) {
+        if($now->between($notifyTime, $itineraryItem->getStartAt())) {
             switch ($method) {
                 case Mapper::METHOD_CREATE:
                 case Mapper::METHOD_UPDATE:
