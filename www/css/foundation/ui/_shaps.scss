@@ -14,3 +14,7 @@ tr.highlight-warning, tr:nth-of-type(even).highlight-warning {
     font-weight: bold;
   }
 }
+
+[data-relation='member'] .prospect {
+  font-style: italic;
+}

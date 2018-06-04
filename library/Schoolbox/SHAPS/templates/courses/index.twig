@@ -77,6 +77,8 @@
                                                     #}
                                                     {% for user in course.participants %}
                                                         {% if user.id is null %}
+                                                            {# Users without IDs have been created on Help via non-standard workflow (e.g. prospects)
+                                                            So cannot be identified locally - don't link to them #}
                                                             <li data-relation="member">
                                                                 <div class="actions-small-4">
                                                                     {#
@@ -86,8 +88,8 @@
                                                                     </div>
                                                                     #}
                                                                     <div class="list-item">
-                                                                        <div class="card small-12">
-                                                                            {{ user.firstname }} {{ user.lastname }}*
+                                                                        <div class="card small-12 prospect" title="This user only exists on Help">
+                                                                            {{ user.firstname }} {{ user.lastname }}
                                                                         </div>
                                                                     </div>
                                                                 </div>
