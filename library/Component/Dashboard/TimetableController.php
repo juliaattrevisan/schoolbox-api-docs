@@ -246,7 +246,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                 $deepLinkParams = [
                     'target'      => 'teacher.rollcall',
                     'ttid'        => $timetableCode,
-                    'yeargroups'  => '',                           // Note this is different to the example given, but links appear to be working.
+                    'yeargroups'  => $year,
                     'classes'     => $class,
                     'tchcode'     => $this->getUser()->getExternalId(),
                     'subjectcode' => $subject,
