@@ -256,7 +256,7 @@ class Controller extends Base
         $this->getResponse()->content->set($this->buildHtmlOutput('@shaps/courses/index.twig', [
             'courses' => $enrolments,
             'serverUrl' => $url = rtrim($this->getConfigLoader()->get('schoolbox_help_url'), '/')
-        ])->setTitle('Schoolbox Help Courses'));
+        ])->setTitle('Schoolbox Help Course Enrolments'));
     }
 
     /**
@@ -264,7 +264,7 @@ class Controller extends Base
      */
     public function getUserEnrolmentSearch() {
         $this->getResponse()->content->set($this->buildHtmlOutput('@shaps/courses/search.twig', [
-        ])->setTitle('Schoolbox Help Courses - User Search'));
+        ])->setTitle('Schoolbox Help Course Enrolments - User Search'));
     }
 
     /**
