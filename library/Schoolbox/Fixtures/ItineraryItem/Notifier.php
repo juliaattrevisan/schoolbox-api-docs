@@ -71,14 +71,17 @@ class Notifier extends AbstractModuleNotifier
 
         // Notify 24 hours before the match start time
         $notifyTime = clone $match->getStartAt();
-        $notifyTime = $notifyTime->addHours(-24)->getUnixTimeStamp();
+        $notifyTime->addHours(-24);
+        $now = \Alaress_Date_Format::now();
 
-        switch ($method) {
-            case Mapper::METHOD_CREATE:
-            case Mapper::METHOD_UPDATE:
-            case Mapper::METHOD_DELETE:
-                $bundle->attach(self::TRIGGER_UPDATED, $notifyTime);
-                break;
+        if($now->between($notifyTime, $match->getStartAt())) {
+            switch ($method) {
+                case Mapper::METHOD_CREATE:
+                case Mapper::METHOD_UPDATE:
+                case Mapper::METHOD_DELETE:
+                    $bundle->attach(self::TRIGGER_UPDATED, self::IMMEDIATELY);
+                    break;
+            }
         }
     }
 
