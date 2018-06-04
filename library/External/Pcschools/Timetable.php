@@ -16,6 +16,14 @@ use Schoolbox\UserMapper;
 
 class External_Pcschools_Timetable implements External_TimetableInterface
 {
+
+    /**
+     * Name of stored proc to retrieve a timetable
+     *
+     * @var string
+     */
+    protected $timetableStoredProc = 'spSelTimeTable';
+
     /**
      * @var MSSQL
      */
@@ -225,7 +233,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
             $teacherExternalId = $user->getExternalId();
         }
 
-        $statement = $this->getDatabase()->prepareProcedure('spSelTimeTableSchoolBox');
+        $statement = $this->getDatabase()->prepareProcedure($this->timetableStoredProc);
         $statement->bindInputs([
             'DATE'        => date('Ymd'),
             'TIMEPERIOD'  => $timePeriod,
@@ -342,7 +350,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
             $teacherExternalId = $user->getExternalId();
         }
 
-        $statement = $this->getDatabase()->prepareProcedure('spSelTimeTableSchoolBox');
+        $statement = $this->getDatabase()->prepareProcedure($this->timetableStoredProc);
         $statement->bindInputs([
             'DATE'        => $date->getUsingFormat('Ymd'),
             'TIMEPERIOD'  => $timePeriod,
@@ -491,7 +499,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
             $teacherExternalId = $user->getExternalId();
         }
 
-        $statement = $this->getDatabase()->prepareProcedure('spSelTimeTableSchoolBox');
+        $statement = $this->getDatabase()->prepareProcedure($this->timetableStoredProc);
         $statement->bindInputs([
             'DATE'        => date('Ymd'),
             'TIMEPERIOD'  => $timePeriod,

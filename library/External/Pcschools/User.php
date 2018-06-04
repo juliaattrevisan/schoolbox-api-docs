@@ -24,6 +24,13 @@ class External_Pcschools_User implements External_UserInterface
     const CONTACT_LEVEL_NO_DEMOGRAPHIC = 'D';
 
     /**
+     * Name of stored proc to retrieve a timetable
+     *
+     * @var string
+     */
+    protected $timetableStoredProc = 'spSelTimeTable';
+
+    /**
      * @var MSSQL
      */
     private $database;
@@ -794,7 +801,7 @@ class External_Pcschools_User implements External_UserInterface
             // Home classes
             // Week days
             // Terms
-            $statement = $this->getDatabase()->prepareProcedure('spSelTimeTableSchoolBox');
+            $statement = $this->getDatabase()->prepareProcedure($this->timetableStoredProc);
             $statement->bindInputs([
                 'DATE' => date('Ymd'),
                 'TIMEPERIOD' => $timePeriod,
