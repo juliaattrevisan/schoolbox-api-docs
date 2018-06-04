@@ -59,9 +59,10 @@
                                                 <input type="hidden" name="folderId" value="{{ course.folderId }}" />
 
                                                 <ul class="information-list card-selectable">
-
+                                                    {#
                                                     <li data-relation="member">
                                                         <div class="actions-small-4">
+
                                                             <div class="selector">
                                                                 <input data-toggle-all name="check-all-{{ course.folderId }}" id="check-all-{{ course.folderId }}" type="checkbox">
                                                                 <label for="check-all-{{ course.folderId}}" class="checkbox-label"></label>
@@ -73,15 +74,17 @@
                                                             </div>
                                                         </div>
                                                     </li>
-
+                                                    #}
                                                     {% for user in course.participants %}
                                                         {% if user.id is null %}
                                                             <li data-relation="member">
                                                                 <div class="actions-small-4">
+                                                                    {#
                                                                     <div class="selector">
                                                                         <input id="check-{{ user.id }}" name="check[]" type="checkbox" disabled>
                                                                         <label for="check-{{ user.id }}" class="checkbox-label"></label>
                                                                     </div>
+                                                                    #}
                                                                     <div class="list-item">
                                                                         <div class="card small-12">
                                                                             {{ user.firstname }} {{ user.lastname }}*
@@ -92,10 +95,12 @@
                                                         {% else %}
                                                             <li data-relation="member">
                                                                 <div class="actions-small-4">
+                                                                    {#
                                                                     <div class="selector">
                                                                         <input id="check-{{ user.id }}" name="check[]" type="checkbox" data-checkbox>
                                                                         <label for="check-{{ user.id }}" class="checkbox-label"></label>
                                                                     </div>
+                                                                    #}
                                                                     <div class="list-item">
                                                                         <div class="card small-12">
                                                                             <a href="/search/user/{{ user.id }}">
