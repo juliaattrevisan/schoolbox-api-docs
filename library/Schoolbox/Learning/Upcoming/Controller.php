@@ -234,9 +234,6 @@ class Controller extends Base
             // Markbook
             $markbook = new Markbook($assessments, $this->defaultGradeGroup, $this->getUser());
 
-            // Data set
-            $subjects = [];
-
             if (!isset($subjects[$folder->getId()])) {
                 $subjects[$folder->getId()] = [
                     'teachers' => $teachers,
