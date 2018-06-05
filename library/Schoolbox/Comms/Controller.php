@@ -48,11 +48,11 @@ class Controller extends Base
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \Schoolbox\Mapper\DefinitionException
      */
-    public function getComms()
+    public function getConfig()
     {
         $allCommsOfficers = UserAccessMapper::getInstance()->findUsersForService(UserAccess::SERVICE_COMMS_OFFICER);
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@comms/index.twig', [
+        $this->getResponse()->content->set($this->buildHtmlOutput('@comms/config/index.twig', [
             'allCommsOfficers' => $allCommsOfficers,
         ])->setTitle('Comms Configuration'));
     }
@@ -60,7 +60,7 @@ class Controller extends Base
     /**
      * Process the form vars
      */
-    public function postComms()
+    public function postConfig()
     {
         try {
             $user = $this->userMapper->findById($this->getRequest()->post['id']);
