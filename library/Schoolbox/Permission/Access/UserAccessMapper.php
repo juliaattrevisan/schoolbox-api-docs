@@ -9,19 +9,21 @@
 
 namespace Schoolbox\Permission\Access;
 
+use Alaress\Database\Predicate\Builder;
 use Aura\Di\Exception\ServiceNotFound;
 use PDO;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper;
 use Schoolbox\Realtime\Routing\Cache\WritableCache;
+use Schoolbox\Resource\Folder\Code\Mapper as CodeMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-use Schoolbox\Resource\Folder\Code\Mapper as CodeMapper;
+
 
 /**
  * Class UserAccessMapper
@@ -428,26 +430,24 @@ class UserAccessMapper extends Mapper
      * @return User[]|Collection
      * @throws Mapper\DefinitionException
      * @throws Mapper\Exception
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
      */
     public function findUsersForService($service, $serviceId = null, $accessType = UserAccess::ACCESS_READ)
     {
+        $userMapper = $this->getJoinMapper('user');
+        $roleMapper = $userMapper->getJoinMapper('role');
 
-        $args = [
-            'service'   => $service,
-            'minAccess' => $accessType,
-        ];
+        $pb = new Builder($userMapper->getDatabase(), 'u');
+        $pb->equals('ua.service', $service);
+        $pb->greaterThanOrEqualTo('ua.type', $accessType);
 
         /* Find $service folks in $serviceId, if specified
          */
-        $specificServiceId = '';
-
         if ($serviceId !== null) {
-            $specificServiceId = ' AND ua.sid = :serviceId ';
-            $args['serviceId'] = $serviceId;
+            $pb->equals('ua.sid', $serviceId);
         }
 
-        $userMapper = $this->getJoinMapper('user');
-        $roleMapper = $userMapper->getJoinMapper('role');
+        $where = implode("\nAND ", $pb->getWhere());
 
         $query = "
             SELECT
@@ -457,14 +457,12 @@ class UserAccessMapper extends Mapper
                 `{$this->getTable()}` ua
             INNER JOIN {$this->getJoinSql('user', 'ua', 'u')}
             LEFT JOIN {$userMapper->getJoinSql('role', 'u', 'r')}
-            WHERE ua.service = :service
-            {$specificServiceId}
-            AND ua.type >= :minAccess
+            WHERE {$where}
             ORDER BY u.id DESC
         ";
 
         $stmt = $this->getDatabase()->prepare($query);
-        $stmt->execute($args);
+        $stmt->execute($pb->getParams());
 
         $userCollection = $this->getJoinMapper('user')->createCollection();
         foreach ($stmt as $row) {
