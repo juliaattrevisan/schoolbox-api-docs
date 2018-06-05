@@ -62,6 +62,8 @@ class Controller extends Base
     {
         $commsOfficers = $this->userAccessMapper->findUsersForService(UserAccess::SERVICE_COMMS_OFFICER);
 
+        /* TODO: Get current policy settings from db
+         */
         $policies = (new Collection())
             ->add(new GlobalModeration());
 
@@ -76,8 +78,24 @@ class Controller extends Base
      */
     public function postConfig()
     {
+        $policies = (new Collection())
+            ->add(new GlobalModeration());
+
+        foreach ($this->getRequest()->post as $identifier => $value) {
+            $existingPolicy = $policies->getBy('identifier', $identifier);
+
+            /* TODO: Persist values to db
+             */
+            if ((int)$value) {
+                $existingPolicy->activate();
+            }
+            else {
+                $existingPolicy->deactivate();
+            }
+        }
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsConfig/submit.twig', [
-            'policyGlobalModeration' => $this->getRequest()->post['policy-global-moderation']
+            'policies' => $policies
         ])->setTitle('Update Comms settings'));
     }
 }

@@ -1,15 +1,27 @@
-{# Add your own javascript, validation etc. #}
-{# Use pantry for styling #}
+
 <div class="row">
     <div class="small-12 island">
         <h2 class="subheader">POST contents</h2>
-        <section class="content">
-            <p>policy-global-moderation: {{ policyGlobalModeration ?: 0 }}</p>
+        <section>
+            <ul class="information-list">
+                {% for policy in policies %}
+                <li class="content">
+                    {{ policy.label }} ({{ policy.identifier }})
+                    {% if policy.isActive %}
+                        is now active.
+                    {% else %}
+                        is now inactive.
+                    {% endif %}
+                </li>
+                {% endfor %}
+            </ul>
 
             {% set formRoute = routeLookupIfAuthorized('commsConfig.getConfig', {id: user.id}) %}
 
             {% if formRoute %}
-                <a href="{{ formRoute }}" class="button icon-previous">Back to {{ formRoute }}</a>
+                <div class="content">
+                    <a href="{{ formRoute }}" class="button icon-previous">Back to {{ formRoute }}</a>
+                </div>
             {% else %}
                 Not authorised to POST
             {% endif %}

@@ -49,7 +49,32 @@ class Base
      * @var array
      */
     protected $options = [];
-    
+
+    /**
+     * Activate this policy
+     *
+     * @return $this
+     */
+    public function activate()
+    {
+        $this->isActive = true;
+        return $this;
+    }
+
+    /**
+     * Deactivate this policy
+     *
+     * @return $this
+     */
+    public function deactivate()
+    {
+        $this->isActive = false;
+        return $this;
+    }
+
+    /* Getters/Setters
+     */
+
     /**
      * @return string
      */
