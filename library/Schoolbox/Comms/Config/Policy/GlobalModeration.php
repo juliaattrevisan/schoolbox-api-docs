@@ -29,6 +29,13 @@ class GlobalModeration extends Base
     protected $identifier = 'policy-global-moderation';
 
     /**
+     * Config twig file
+     *
+     * @var string
+     */
+    protected $template = 'checkbox';
+
+    /**
      * This configuration is on (active)
      *
      * @var bool

@@ -29,6 +29,12 @@ class Base
      */
     protected $identifier = '';
 
+    /**
+     * Config twig file
+     *
+     * @var string
+     */
+    protected $template = 'checkbox';
 
     /**
      * This configuration is on (active)
@@ -77,5 +83,14 @@ class Base
     public function getOptions(): array
     {
         return $this->options;
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getTemplate(): string
+    {
+        return $this->template;
     }
 }
