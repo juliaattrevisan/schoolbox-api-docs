@@ -15,6 +15,8 @@ use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
 use Schoolbox\Mapper;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Role;
 use Schoolbox\UserMapper;
 
 
@@ -34,21 +36,25 @@ class Module extends BaseModule
      */
     protected function registerRoutes()
     {
-        /* Anyone can see the form
+        /* Any staff can see the form
          */
         $getPerms = new Rule\All(
-            new Rule\IsLoggedIn()
+            new Rule\IsLoggedIn(),
+            new Rule\HasRole(Role::STAFF)
         );
 
-        /* Only superusers can receive data from the form
+        /* Only superusers or comms officers can receive data from the form
          */
         $postPerms = new Rule\All(
             new Rule\IsLoggedIn(),
-            new Rule\IsSuperuser()
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\HasServicePermission(UserAccess::SERVICE_COMMS_OFFICER, UserAccess::ACCESS_FULL)
+            )
         );
 
         $this->register('GET', '/config', 'getConfig', $getPerms, null);
-        $this->register('POST', '/user', 'postComms', $postPerms, null);
+        $this->register('POST', '/config', 'postConfig', $postPerms, null);
     }
 
     /**
