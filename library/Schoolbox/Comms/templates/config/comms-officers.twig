@@ -22,7 +22,7 @@
         <div class="empty-state">
             <i class="icon-staff-students"></i>
             <p>There are no Comms Officers.</p>
-            {% if user.isSuperuser %}
+            {% if USER.isSuperuser %}
             <p><a href="/adminv2/home/user" title="Add Comms Officers">Assign Comms Officer service permissions</a> to a user.</p>
             {% endif %}
         </div>
