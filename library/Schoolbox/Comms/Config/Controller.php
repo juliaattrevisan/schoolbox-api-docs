@@ -6,7 +6,7 @@
  * @copyright   Copyright 2017, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
-namespace Schoolbox\Comms;
+namespace Schoolbox\Comms\Config;
 
 
 use Alaress\Web\Controller\Base;
@@ -65,7 +65,7 @@ class Controller extends Base
         $policies = (new Collection())
             ->add(new GlobalModeration());
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@comms/config/index.twig', [
+        $this->getResponse()->content->set($this->buildHtmlOutput('@commsConfig/index.twig', [
             'commsOfficers' => $commsOfficers,
             'policies' => $policies
         ])->setTitle('Comms Configuration'));

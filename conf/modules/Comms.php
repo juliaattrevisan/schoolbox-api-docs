@@ -8,9 +8,10 @@
 namespace Config\Modules;
 
 use Alaress\Application\Kernel;
-use Schoolbox\Comms\Module;
+use Config\ModuleLoader;
+use Schoolbox\Comms\Config;
 
-class Comms implements ModuleConfigInterface
+class Comms extends ModuleLoader
 {
     /**
      * Run configuration for the given module
@@ -22,7 +23,6 @@ class Comms implements ModuleConfigInterface
     {
         $namespace = 'comms';
 
-        $module = new Module($kernel->getDependencyInjector());
-        $module->init("/$namespace");
+        $this->loadModule($kernel, Config\Module::class, "/{$namespace}/config");
     }
 }

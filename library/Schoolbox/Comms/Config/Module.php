@@ -6,7 +6,7 @@
  * @copyright   Copyright 2017, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
-namespace Schoolbox\Comms;
+namespace Schoolbox\Comms\Config;
 
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
@@ -25,7 +25,7 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    protected $basename = 'comms';
+    protected $basename = 'commsConfig';
 
 
     /**
@@ -56,8 +56,8 @@ class Module extends BaseModule
             )
         );
 
-        $this->register('GET', '/config', 'getConfig', $getPerms, null);
-        $this->register('POST', '/config', 'postConfig', $postPerms, null);
+        $this->register('GET', '', 'getConfig', $getPerms, null);
+        $this->register('POST', '', 'postConfig', $postPerms, null);
     }
 
 

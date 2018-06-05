@@ -1,6 +1,6 @@
 {# Add a list of current Comms Officers
  #}
-{% include '@comms/config/comms-officers.twig' with {
+{% include '@commsConfig/comms-officers.twig' with {
     commsOfficers: commsOfficers
 } %}
 
@@ -13,9 +13,9 @@
     <div class="small-12 island">
         <h2 class="subheader">Comms Policy Settings</h2>
             {% if USER.isSuperuser %}
-                {% include '@comms/config/policy-container-write.twig' with { policies: policies } %}
+                {% include '@commsConfig/policy-container-write.twig' with { policies: policies } %}
             {% else %}
-                {% include '@comms/config/policy-container-read.twig' with { policies: policies } %}
+                {% include '@commsConfig/policy-container-read.twig' with { policies: policies } %}
             {% endif %}
         </section>
     </div>
