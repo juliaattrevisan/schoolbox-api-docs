@@ -1,9 +1,7 @@
-<label for="{{ policy.identifier }}">{{ policy.name }}</label>
-<p>{{ policy.options.config }}.</p>
-<div class="switch">
-    <input id="{{ policy.identifier }}" name="{{ policy.identifier }}" type="checkbox" {% if policy.isActive %}checked{% endif %} value="1">
-    <label for="{{ policy.identifier }}">
-        <span>On</span>
-        <span>Off</span>
-    </label>
-</div>
+{% include 'sub/switch.twig' with {
+    name: policy.name,
+    identifier: policy.identifier,
+    subtext: policy.options.config,
+    isChecked: policy.isActive,
+    checkedValue: 1
+} %}
