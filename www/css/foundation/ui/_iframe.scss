@@ -9,13 +9,6 @@ iframe:not(.phpdebugbar-widgets-iframe) {
   }
 }
 
-// iframes in articles and editor have default height
-article iframe,
-.cke_editable iframe
-{
-  height: rem-calc(($base-font-size) * 25);
-}
-
 .scroll-wrapper {
   /* Hack to allow iframes to scroll on IOS, wrap around iframes you need to be able to scroll on mobile */
   -webkit-overflow-scrolling: touch;
