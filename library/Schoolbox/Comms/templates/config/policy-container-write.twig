@@ -1,0 +1,10 @@
+<form method="post">
+    <section>
+    {% for policy in policies %}
+        <fieldset>
+            {% include '@comms/config/' ~ policy.template ~ '.twig' %}
+        </fieldset>
+    {% endfor %}
+    </section>
+</form>
+

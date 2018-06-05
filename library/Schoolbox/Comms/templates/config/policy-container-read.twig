@@ -1,0 +1,13 @@
+<section>
+    <ul class="information-list">
+        {% for policy in policies %}
+            <li class="content">
+                {% if policy.isActive %}
+                    {{ policy.options.active|purify }}
+                {% else %}
+                    {{ policy.options.inactive|purify }}
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+</section>
