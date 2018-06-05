@@ -60,13 +60,13 @@ class Controller extends Base
      */
     public function getConfig()
     {
-        $allCommsOfficers = $this->userAccessMapper->findUsersForService(UserAccess::SERVICE_COMMS_OFFICER);
+        $commsOfficers = $this->userAccessMapper->findUsersForService(UserAccess::SERVICE_COMMS_OFFICER);
 
         $policies = (new Collection())
             ->add(new GlobalModeration());
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@comms/config/index.twig', [
-            'allCommsOfficers' => $allCommsOfficers,
+            'commsOfficers' => $commsOfficers,
             'policies' => $policies
         ])->setTitle('Comms Configuration'));
     }
