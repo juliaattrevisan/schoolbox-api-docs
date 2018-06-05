@@ -30,7 +30,7 @@ class GlobalModeration extends Base
      *
      * @var string
      */
-    protected $template = 'checkbox';
+    protected $template = 'switch';
 
     /**
      * This configuration is on (active)
