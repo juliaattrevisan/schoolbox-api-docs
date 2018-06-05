@@ -8,11 +8,15 @@
  */
 namespace Schoolbox\Comms;
 
+
 use Alaress\Web\Controller\Base;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\UserMapper;
+
 
 class Controller extends Base
 {
@@ -38,15 +42,21 @@ class Controller extends Base
         $this->userMapper = $userMapper;
     }
 
+
     /**
      * Provide form
      *
      * @param User $user
      * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Schoolbox\Mapper\DefinitionException
      */
     public function getComms(User $user)
     {
+
+        $allCommsOfficers = UserAccessMapper::getInstance()->findUsersForService(UserAccess::SERVICE_COMMS_OFFICER);
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@comms/index.twig', [
+            'allCommsOfficers' => $allCommsOfficers,
             'user' => $user
         ])->setTitle('Comms'));
     }

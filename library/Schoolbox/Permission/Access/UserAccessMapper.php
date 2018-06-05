@@ -413,8 +413,12 @@ class UserAccessMapper extends Mapper
         return $extUserCollection;
 	}
 
+
     /**
      * Gets users that belong to a given user access type.
+     *
+     * If you don't specify a $serviceId it won't check for that particular $serviceId and give you everybody
+     * who is involved with $service.
      *
      * @param int $service    The service to check - one of the UserAccess::SERVICE_* constants
      * @param int $serviceId  The identifier of the service to check
@@ -422,27 +426,40 @@ class UserAccessMapper extends Mapper
      *                        Defaults to UserAccess::ACCESS_READ
      *
      * @return User[]|Collection
+     * @throws Mapper\DefinitionException
      */
-    public function findUsersForService($service, $serviceId, $accessType = UserAccess::ACCESS_READ)
+    public function findUsersForService($service, $serviceId = null, $accessType = UserAccess::ACCESS_READ)
     {
-        $stmt = $this->getDatabase()->prepare("
+
+        $args = [
+            'service'   => $service,
+            'minAccess' => $accessType,
+        ];
+
+        /* Find $service folks in $serviceId, if specified
+         */
+        $specificServiceId = '';
+
+        if ($serviceId !== null) {
+            $specificServiceId = ' AND ua.sid = :serviceId ';
+            $args['serviceId'] = $serviceId;
+        }
+
+        $query = "
             SELECT
                 {$this->getJoinColumnString('user', 'u')}
             FROM
                 `{$this->getTable()}` ua
                 JOIN {$this->getJoinSql('user', 'ua', 'u')}
             WHERE ua.service = :service
-            AND ua.sid = :serviceId
+            {$specificServiceId}
             AND ua.type >= :minAccess
             ORDER BY u.id DESC
-        ");
-        $stmt->execute(
-            array(
-                'service'   => $service,
-                'serviceId' => $serviceId,
-                'minAccess' => $accessType,
-            )
-        );
+        ";
+
+        $stmt = $this->getDatabase()->prepare($query);
+        $stmt->execute($args);
+
         $userCollection = $this->getJoinMapper('user')->createCollection();
         foreach ($stmt as $row) {
             $userCollection->add(
