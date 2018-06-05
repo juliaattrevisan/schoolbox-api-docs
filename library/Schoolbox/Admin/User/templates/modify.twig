@@ -284,28 +284,21 @@
                             <div class="small-4 columns">Access</div>
                         </div>
                     </li>
-                    {% for permission in userPermissions if permission.service != constant('HOMEPAGE_SERVICE') %}
+                    {% for permission in userPermissions %}
 
+                        {% if serviceMapping[permission.service].visible %}
                         <li class="actions-small-1" data-permission>
                             <div class="list-item">
                                 <div class="small-4 card">
-                                    {% if permission.service == constant('CALENDAR_SERVICE') %}Calendar{% endif %}
-                                    {% if permission.service == constant('NEWS_SERVICE') %}News{% endif %}
-                                    {% if permission.service == constant('CMS_SERVICE') %}CMS{% endif %}
-                                    {% if permission.service == constant('HOUSEMASTER_SERVICE') %}Housemaster{% endif %}
-                                    {% if permission.service == constant('RESOURCE_BOOKING_SERVICE') %}Resource Booking{% endif %}
-                                    {% if permission.service == constant('CURRICULUM_SERVICE') %}Curriculum{% endif %}
-                                    {% if permission.service == constant('PASTORAL_SERVICE') %}Pastoral Moderator{% endif %}
-                                    {% if permission.service == constant('SPORTS_ADMINISTRATOR_SERVICE') %}Sports Administrator{% endif %}
-                                    {% if permission.service == constant('COMMS_OFFICER_SERVICE') %}Comms Officer{% endif %}
+                                    {{ serviceMapping[permission.service].name }}
                                 </div>
                                 <div class="small-4 card">
-                                    {% if permission.service == constant('CALENDAR_SERVICE') or permission.service == constant('NEWS_SERVICE') or permission.service == constant('COMMS_OFFICER_SERVICE') %}
+                                    {% if serviceMapping[permission.service].identifier == 'campus' %}
                                         Campus:
                                         {% for campus in campuses if campus.id == permission.serviceIdentifier %}
                                             {{ campus.name }}
                                         {% endfor %}
-                                    {% elseif permission.service == constant('HOUSEMASTER_SERVICE') %}
+                                    {% elseif serviceMapping[permission.service].identifier == 'residentialHouse' %}
                                         House:
                                         {% for residentialHouse in residentialHouses if residentialHouse.id == permission.serviceIdentifier %}
                                             {{ residentialHouse.house }}
@@ -332,6 +325,7 @@
                                 <a href="#" data-delete-permission="{{ permission.serviceIdentifier }}" data-service="{{ permission.service}}" class="icon-delete" title="Remove"></a>
                             </nav>
                         </li>
+                        {% endif %}
                     {% endfor %}
 
                     <li class="actions-small-1">
@@ -340,15 +334,12 @@
                             <div class="small-4 card">
                                 <select data-role="serviceSelector" name="service" id="serviceSelect" form="serviceCloneForm" required>
                                     <option value="" data-identifier="none">Select Service</option>
-                                    <option value="2" data-identifier="campus">Calendar</option>
-                                    <option value="3" data-identifier="campus">News</option>
-                                    <option value="5" data-identifier="none">CMS</option>
-                                    <option value="6" data-identifier="residentialHouse">Housemaster</option>
-                                    <option value="7" data-identifier="none">Resource Booking</option>
-                                    <option value="8" data-identifier="none">Curriculum</option>
-                                    <option value="9" data-identifier="none">Pastoral Moderator</option>
-                                    <option value="10" data-identifier="none">Sports Administrator</option>
-                                    <option value="11" data-identifier="campus">Comms Officer</option>
+
+                                    {% for serviceIdentifier, serviceData in serviceMapping %}
+                                        {% if serviceData.visible %}
+                                            <option value="{{ serviceIdentifier }}" data-identifier="{{ serviceData.identifier }}">{{ serviceData.name }}</option>
+                                        {% endif %}
+                                    {% endfor %}
                                 </select>
                             </div>
                             <div class="small-4 card">

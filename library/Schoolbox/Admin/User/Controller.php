@@ -160,11 +160,65 @@ class Controller extends Base
         $groupPermissions = $userPermissions->filterBy('service', UserAccess::SERVICE_HOMEPAGE)
                                             ->indexBy('serviceIdentifier');
 
+        $serviceMapping = [
+            UserAccess::SERVICE_HOMEPAGE => [
+                'name' => '',
+                'identifier' => '',
+                'visible' => false,
+            ],
+            UserAccess::SERVICE_CALENDAR => [
+                'name' => 'Calendar',
+                'identifier' => 'campus',
+                'visible' => true,
+            ],
+            UserAccess::SERVICE_NEWS => [
+                'name' => 'News',
+                'identifier' => 'campus',
+                'visible' => true,
+            ],
+            UserAccess::SERVICE_CMS => [
+                'name' => 'CMS',
+                'identifier' => 'none',
+                'visible' => true,
+            ],
+            UserAccess::SERVICE_HOUSEMASTER => [
+                'name' => 'Housemaster',
+                'identifier' => 'residentialHouse',
+                'visible' => true,
+            ],
+            UserAccess::SERVICE_RESOURCE_BOOKING => [
+                'name' => 'Resource Booking',
+                'identifier' => 'none',
+                'visible' => true,
+            ],
+            UserAccess::SERVICE_CURRICULUM => [
+                'name' => 'Curriculum',
+                'identifier' => 'none',
+                'visible' => true,
+            ],
+            UserAccess::SERVICE_PASTORAL => [
+                'name' => 'Pastoral Moderator',
+                'identifier' => 'none',
+                'visible' => true,
+            ],
+            UserAccess::SERVICE_SPORTS_ADMINISTRATOR => [
+                'name' => 'Sports Administrator',
+                'identifier' => 'none',
+                'visible' => true,
+            ],
+            UserAccess::SERVICE_COMMS_OFFICER => [
+                'name' => 'Comms Officer',
+                'identifier' => 'campus',
+                'visible' => true,
+            ],
+        ];
+
         $this->getResponse()->content->set([
             'template' => '@adminUser/modify.twig',
             'data' => [
+                'serviceMapping' => $serviceMapping,
                 'pageCurrent' => 'user',
-                'method'       => 'Update',
+                'method' => 'Update',
                 'campuses' => $this->campusMapper->findAll(),
                 'roles' => $this->roleMapper->findAll(),
                 'externalDatabase' => ucfirst($this->getConfigLoader()->get('external_type')),
