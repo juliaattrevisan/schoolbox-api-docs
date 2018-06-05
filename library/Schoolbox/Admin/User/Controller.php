@@ -363,11 +363,23 @@ class Controller extends Base
             }
         }
 
+        /* Find the no-middle-dropdown services
+         */
+        $noMiddleDropdown = [];
+
+        foreach ($serviceMapping as $service => $data) {
+            if ($data['identifier'] === 'none') {
+                $noMiddleDropdown[] = $service;
+            }
+        }
+
         $this->getResponse()->content->set([
             'template' => '@adminUser/modify.twig',
             'data' => [
                 'serviceMapping' => $serviceMapping,
                 'moderateOnly' => json_encode($moderateOnly),
+                'noMiddleDropdown' => json_encode($noMiddleDropdown),
+
                 'pageCurrent' => 'user',
                 'method' => 'Update',
                 'campuses' => $this->campusMapper->findAll(),

@@ -565,17 +565,10 @@
                 middleDropdown.show();
             }
 
-            var selectedServiceId = $(e.target).val();
-
-            var resourceBooking = '{{ constant('RESOURCE_BOOKING_SERVICE') }}';
-            var fixtures = '{{ constant('SPORTS_ADMINISTRATOR_SERVICE') }}';
-            var cms = '{{ constant('CMS_SERVICE') }}';
-            var curriculum = '{{ constant('CURRICULUM_SERVICE') }}';
-            var pastoralCare = '{{ constant('PASTORAL_SERVICE') }}';
-            var comms = '{{ constant('COMMS_OFFICER_SERVICE') }}';
+            var selectedServiceId = parseInt($(e.target).val());
 
             var moderateOnlyServices = {{ moderateOnly }};
-            var noMiddleDropdownServices = [cms, resourceBooking, curriculum, pastoralCare, fixtures]
+            var noMiddleDropdownServices = {{ noMiddleDropdown }};
 
             var moderateAccess = 3;
             var readAccess = 1;
@@ -590,11 +583,11 @@
             {# Hide Read and Write permission options in dropdown for certain services #}
             if (moderateOnlyServices.indexOf(selectedServiceId) !== -1) {
                 $("#read").hide();
-                $("#write").hide()
+                $("#write").hide();
                 permissionsDropdown.val(moderateAccess);
             } else {
                 $("#read").show();
-                $("#write").show()
+                $("#write").show();
                 permissionsDropdown.val(readAccess);
             }
         });
