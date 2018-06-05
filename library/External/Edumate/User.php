@@ -24,7 +24,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
         $stmt = $this->getConnection()->prepareQuery("
             SELECT carer_number AS ID, full_name, COMBINED_EMAIL_ADDRESS AS Email, mobile AS MobilePhone, spouse_carer_number AS SpouseID, spouse_full_name,
               spouse_mobile AS SpouseMobilePhone
-            FROM db2inst1.schoolbox_parents
+            FROM db2inst1.SCHOOLBOX_PARENTS
             WHERE carer_number = :id
         ");
 
@@ -128,9 +128,9 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
               '' AS StudentIBFlag,
               '' AS StudentStudiesCode,
               0 AS countIndividualEducationPlans
-            FROM db2inst1.schoolbox_students s
-            LEFT JOIN db2inst1.schoolbox_parent_student ps ON s.student_number = ps.student_number
-            LEFT JOIN db2inst1.schoolbox_parents p ON ps.carer_number = p.carer_number
+            FROM db2inst1.SCHOOLBOX_STUDENTS s
+            LEFT JOIN db2inst1.SCHOOLBOX_PARENT_STUDENT ps ON s.student_number = ps.student_number
+            LEFT JOIN db2inst1.SCHOOLBOX_PARENTS p ON ps.carer_number = p.carer_number
             WHERE s.student_number = :id
         ");
 
@@ -216,8 +216,8 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
         $stmt = $this->getConnection()->prepareQuery("
             SELECT p.carer_number AS StudentContactID, full_name, COMBINED_EMAIL_ADDRESS AS StudentContactDefaultEmail,
               mobile AS StudentContactMobilePhone, p.spouse_carer_number AS StudentContactSpouseID, spouse_full_name, spouse_mobile AS StudentContactSpouseMobilePhone, COMBINED_EMAIL_ADDRESS AS StudentContactSpouseDefaultEmail
-            FROM db2inst1.schoolbox_parents p
-            INNER JOIN db2inst1.schoolbox_parent_student ps ON p.carer_number = ps.carer_number
+            FROM db2inst1.SCHOOLBOX_PARENTS p
+            INNER JOIN db2inst1.SCHOOLBOX_PARENT_STUDENT ps ON p.carer_number = ps.carer_number
             WHERE ps.student_number = :id
         ");
 
@@ -252,7 +252,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
     {
         $stmt = $this->getConnection()->prepareQuery("
             SELECT report_period
-            FROM db2inst1.schoolbox_report_periods
+            FROM db2inst1.SCHOOLBOX_REPORT_PERIODS
             WHERE start_date < CURRENT_TIMESTAMP
             AND end_date > CURRENT_TIMESTAMP
         ");
@@ -290,8 +290,8 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
         if ($user->getRole()->isStaff()) {
             $sql = "
                 SELECT c.class_code AS code, class AS name, class_type AS classType
-                FROM db2inst1.schoolbox_teacherclass tc
-                LEFT JOIN db2inst1.schoolbox_classes c ON tc.class_code = c.class_code
+                FROM db2inst1.SCHOOLBOX_TEACHERCLASS tc
+                LEFT JOIN db2inst1.SCHOOLBOX_CLASSES c ON tc.class_code = c.class_code
                 WHERE tc.staff_number = :id
                 ORDER BY class_type, name
             ";
@@ -299,8 +299,8 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
             if ($user->getRole()->isStudent()) {
                 $sql = "
                 SELECT c.class_code AS code, class AS name, class_type AS classType
-                FROM db2inst1.schoolbox_studentclass sc
-                LEFT JOIN db2inst1.schoolbox_classes c ON sc.class_code = c.class_code
+                FROM db2inst1.SCHOOLBOX_STUDENTCLASS sc
+                LEFT JOIN db2inst1.SCHOOLBOX_CLASSES c ON sc.class_code = c.class_code
                 WHERE sc.student_number = :id
                 ORDER BY class_type, name
             ";
@@ -336,7 +336,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
         // prepare
         $stmt = $this->getConnection()->prepareQuery("
             SELECT student_number
-            FROM db2inst1.schoolbox_parent_student
+            FROM db2inst1.SCHOOLBOX_PARENT_STUDENT
             WHERE carer_number = :id
         ");
 
@@ -389,7 +389,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
             YEAR_LEVEL     AS "StudentYearLevel",
             HOUSE          AS "StudentHouse",
             NULL           AS "StudentCampus"
-            FROM db2inst1.schoolbox_students
+            FROM db2inst1.SCHOOLBOX_STUDENTS
         ');
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -414,10 +414,10 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
 			p.SPOUSE_EMAIL        AS "StudentContactSpouseDefaultEmail",
 			s.YEAR_LEVEL          AS "StudentYearLevel",
 			s.STUDENT_NUMBER      AS "StudentID"
-            FROM db2inst1.schoolbox_parents AS p
-            INNER JOIN db2inst1.schoolbox_parent_student
+            FROM db2inst1.SCHOOLBOX_PARENTS AS p
+            INNER JOIN db2inst1.SCHOOLBOX_PARENT_STUDENT
             	AS ps ON p.CARER_NUMBER = ps.CARER_NUMBER
-            INNER JOIN db2inst1.schoolbox_students
+            INNER JOIN db2inst1.SCHOOLBOX_STUDENTS
             	AS s ON ps.STUDENT_NUMBER = s.STUDENT_NUMBER
             ORDER BY INTEGER(p.CARER_NUMBER) ASC, INTEGER(s.STUDENT_NUMBER) ASC
         ');
@@ -444,7 +444,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
                 CAMPUS        AS "StaffCampus",
                 NULL          AS "StaffCategoryType",
                 NULL          AS "StaffCategory"
-             FROM db2inst1.schoolbox_staff
+             FROM db2inst1.SCHOOLBOX_STAFF
              WHERE USERNAME IS NOT NULL
         ');
         $stmt->execute();

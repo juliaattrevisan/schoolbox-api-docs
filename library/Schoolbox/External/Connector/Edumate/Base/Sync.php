@@ -36,7 +36,7 @@ class Sync extends Base implements ISync
             NULL           AS "student_boarder",
             NULL           AS "student_boarding_house",
             NULL           AS "student_campus"
-            FROM db2inst1.schoolbox_students
+            FROM db2inst1.SCHOOLBOX_STUDENTS
         ';
 
         return new Iterator\Student(
@@ -67,10 +67,10 @@ class Sync extends Base implements ISync
                 NULL                     AS "student_gender",
                 s.FIRSTNAME              AS "student_preferred",
                 s.SURNAME                AS "student_surname"
-            FROM db2inst1.schoolbox_parents AS p
-            INNER JOIN db2inst1.schoolbox_parent_student
+            FROM db2inst1.SCHOOLBOX_PARENTS AS p
+            INNER JOIN db2inst1.SCHOOLBOX_PARENT_STUDENT
                 AS ps ON p.CARER_NUMBER = ps.CARER_NUMBER
-            INNER JOIN db2inst1.schoolbox_students
+            INNER JOIN db2inst1.SCHOOLBOX_STUDENTS
                 AS s ON ps.STUDENT_NUMBER = s.STUDENT_NUMBER
             WHERE p.CARER_NUMBER IS NOT NULL
 
@@ -93,10 +93,10 @@ class Sync extends Base implements ISync
                 NULL                     AS "student_gender",
                 s.FIRSTNAME              AS "student_preferred",
                 s.SURNAME                AS "student_surname"
-            FROM db2inst1.schoolbox_parents AS p
-            INNER JOIN db2inst1.schoolbox_parent_student
+            FROM db2inst1.SCHOOLBOX_PARENTS AS p
+            INNER JOIN db2inst1.SCHOOLBOX_PARENT_STUDENT
                 AS ps ON p.CARER_NUMBER = ps.CARER_NUMBER
-            INNER JOIN db2inst1.schoolbox_students
+            INNER JOIN db2inst1.SCHOOLBOX_STUDENTS
                 AS s ON ps.STUDENT_NUMBER = s.STUDENT_NUMBER
             WHERE p.SPOUSE_CARER_NUMBER IS NOT NULL
         ';
@@ -132,7 +132,7 @@ class Sync extends Base implements ISync
                 NULL          AS "staff_year_level",
                 NULL          AS "staff_year_level_description"                
                 
-            FROM db2inst1.schoolbox_staff
+            FROM db2inst1.SCHOOLBOX_STAFF
             WHERE USERNAME IS NOT NULL
         ';
 
