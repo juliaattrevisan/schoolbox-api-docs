@@ -6,12 +6,50 @@
 
 {% set isSuperuser = USER.isSuperuser %}
 
+{% set policies = [
+    {
+        'label': 'Global Moderation',
+        'template': 'policy-global-moderation',
+        'isActive': true,
+        'options': {
+            'active': '<strong>Global moderation is on</strong>. Every article requires moderator approval.',
+            'inactive': '<strong>Global moderation is off</strong>. You can freely post articles.'
+        }
+    },
+    {
+        'label': 'Likes',
+        'template': 'policy-likes',
+        'isActive': false,
+        'options': {
+            'active': '<strong>Likes is on</strong>. Every article can receive Likes.',
+            'inactive': '<strong>Likes is off</strong>. Articles cannot receive audience feedback like this.'
+        }
+    }
+] %}
+
 {# Show a list of configuration options that can be changed by super
  # Otherwise just show the conclusion to everyone else
  #}
-{% if isSuperuser %}
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Comms Policy Settings</h2>
+        <section>
+            <ul class="information-list">
+                {% for policy in policies %}
+                    <li class="content">
+                        {% if isSuperuser %}
 
-{% else %}
-
-{% endif %}
+                        {% else %}
+                            {% if policy.isActive %}
+                                {{ policy.options.active|purify }}
+                            {% else %}
+                                {{ policy.options.inactive|purify }}
+                            {% endif %}
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        </section>
+    </div>
+</div>
 
