@@ -40,7 +40,10 @@ class Module extends BaseModule
          */
         $getPerms = new Rule\All(
             new Rule\IsLoggedIn(),
-            new Rule\HasRole(Role::STAFF)
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\HasRole(Role::STAFF)
+            )
         );
 
         /* Only superusers or comms officers can receive data from the form
@@ -57,21 +60,6 @@ class Module extends BaseModule
         $this->register('POST', '/config', 'postConfig', $postPerms, null);
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function initControllers(ContainerInterface $injector)
-    {
-        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function initTemplatePaths(IChainLoader $templateLoader)
-    {
-        $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
-    }
 
     /**
      * Override with any steps required for a controller and its routes
@@ -91,5 +79,21 @@ class Module extends BaseModule
             'userMapper' => $this->getMapperFactory()->getLazy(UserMapper::class),
             'userAccessMapper' => $this->getMapperFactory()->getLazy(UserAccessMapper::class)
         ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function initControllers(ContainerInterface $injector)
+    {
+        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function initTemplatePaths(IChainLoader $templateLoader)
+    {
+        $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 }
