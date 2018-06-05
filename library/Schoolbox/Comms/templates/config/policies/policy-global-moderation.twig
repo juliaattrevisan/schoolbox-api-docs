@@ -1,8 +1,8 @@
-<label for="policy-global-moderation">Global Moderation</label>
-<p>Enable to require moderation on every article before they are made publicly available.</p>
+<label for="{{ policy.template }}">{{ policy.label }}</label>
+<p>{{ policy.options.config }}.</p>
 <div class="switch">
-    <input id="policy-global-moderation" type="checkbox" {% if policy.isActive %}checked{% endif %}>
-    <label for="policy-global-moderation">
+    <input id="{{ policy.template }}" type="checkbox" {% if policy.isActive %}checked{% endif %}>
+    <label for="{{ policy.template }}">
         <span>On</span>
         <span>Off</span>
     </label>
