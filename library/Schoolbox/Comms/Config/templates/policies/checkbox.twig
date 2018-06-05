@@ -1,8 +1,8 @@
-<label for="{{ policy.template }}">{{ policy.label }}</label>
+<label for="{{ policy.identifier }}">{{ policy.label }}</label>
 <p>{{ policy.options.config }}.</p>
 <div class="switch">
-    <input id="{{ policy.template }}" type="checkbox" {% if policy.isActive %}checked{% endif %}>
-    <label for="{{ policy.template }}">
+    <input id="{{ policy.identifier }}" name="{{ policy.identifier }}" type="checkbox" {% if policy.isActive %}checked{% endif %} value="1">
+    <label for="{{ policy.identifier }}">
         <span>On</span>
         <span>Off</span>
     </label>

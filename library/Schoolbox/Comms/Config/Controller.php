@@ -77,7 +77,7 @@ class Controller extends Base
     public function postConfig()
     {
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsConfig/submit.twig', [
-            'policy-global-moderation' => $this->getRequest()->post['policy-global-moderation']
+            'policyGlobalModeration' => $this->getRequest()->post['policy-global-moderation']
         ])->setTitle('Update Comms settings'));
     }
 }

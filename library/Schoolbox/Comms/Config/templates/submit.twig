@@ -1,11 +1,10 @@
 {# Add your own javascript, validation etc. #}
 {# Use pantry for styling #}
-
 <div class="row">
     <div class="small-12 island">
         <h2 class="subheader">POST contents</h2>
         <section class="content">
-            <p>policy-global-moderation: {{ policy-global-moderation }}</p>
+            <p>policy-global-moderation: {{ policyGlobalModeration ?: 0 }}</p>
 
             {% set formRoute = routeLookupIfAuthorized('commsConfig.getConfig', {id: user.id}) %}
 
