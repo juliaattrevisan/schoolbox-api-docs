@@ -10,6 +10,8 @@ namespace Schoolbox\Comms;
 
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Collection;
+use Schoolbox\Comms\Config\Policy\GlobalModeration;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccess;
@@ -60,8 +62,12 @@ class Controller extends Base
     {
         $allCommsOfficers = $this->userAccessMapper->findUsersForService(UserAccess::SERVICE_COMMS_OFFICER);
 
+        $policies = (new Collection())
+            ->add(new GlobalModeration());
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@comms/config/index.twig', [
             'allCommsOfficers' => $allCommsOfficers,
+            'policies' => $policies
         ])->setTitle('Comms Configuration'));
     }
 

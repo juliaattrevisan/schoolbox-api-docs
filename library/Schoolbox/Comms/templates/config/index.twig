@@ -6,24 +6,6 @@
 
 {% set isSuperuser = USER.isSuperuser %}
 
-{% set policies = [
-    {
-        'label': 'Global Moderation',
-        'template': 'policy-global-moderation',
-        'isActive': false,
-        'options': {
-            'active': {
-                'state': 'Global moderation is on',
-                'description': 'Every article requires moderator approval.'
-            },
-            'inactive': {
-                'state': 'Global moderation is off',
-                'description': 'You can freely post articles.'
-            }
-        }
-    }
-] %}
-
 {# Show a list of configuration options that can be changed by super
  # Otherwise just show the conclusion to everyone else
  #}
@@ -31,9 +13,9 @@
     <div class="small-12 island">
         <h2 class="subheader">Comms Policy Settings</h2>
             {% if USER.isSuperuser %}
-                {% include '@comms/config/policy-container-write.twig' %}
+                {% include '@comms/config/policy-container-write.twig' with { policies: policies } %}
             {% else %}
-                {% include '@comms/config/policy-container-read.twig' %}
+                {% include '@comms/config/policy-container-read.twig' with { policies: policies } %}
             {% endif %}
         </section>
     </div>
