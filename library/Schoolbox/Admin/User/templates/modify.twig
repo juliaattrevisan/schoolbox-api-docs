@@ -574,7 +574,7 @@
             var pastoralCare = '{{ constant('PASTORAL_SERVICE') }}';
             var comms = '{{ constant('COMMS_OFFICER_SERVICE') }}';
 
-            var moderateOnlyServices = [resourceBooking, fixtures, comms];
+            var moderateOnlyServices = {{ moderateOnly }};
             var noMiddleDropdownServices = [cms, resourceBooking, curriculum, pastoralCare, fixtures]
 
             var moderateAccess = 3;

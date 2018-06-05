@@ -353,10 +353,21 @@ class Controller extends Base
             ],
         ];
 
+        /* Find the moderate-only services
+         */
+        $moderateOnly = [];
+
+        foreach ($serviceMapping as $service => $data) {
+            if ($data['levels']['moderate']['available'] && !$data['levels']['write']['available'] && !$data['levels']['read']['available']) {
+                $moderateOnly[] = $service;
+            }
+        }
+
         $this->getResponse()->content->set([
             'template' => '@adminUser/modify.twig',
             'data' => [
                 'serviceMapping' => $serviceMapping,
+                'moderateOnly' => json_encode($moderateOnly),
                 'pageCurrent' => 'user',
                 'method' => 'Update',
                 'campuses' => $this->campusMapper->findAll(),
