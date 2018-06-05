@@ -165,51 +165,191 @@ class Controller extends Base
                 'name' => '',
                 'identifier' => '',
                 'visible' => false,
+                'levels' => [
+                    'read' => [
+                        'level' => UserAccess::ACCESS_READ,
+                        'available' => true,
+                    ],
+                    'write' => [
+                        'level' => UserAccess::ACCESS_WRITE,
+                        'available' => true,
+                    ],
+                    'moderate' => [
+                        'level' => UserAccess::ACCESS_FULL,
+                        'available' => true,
+                    ],
+                ]
             ],
             UserAccess::SERVICE_CALENDAR => [
                 'name' => 'Calendar',
                 'identifier' => 'campus',
                 'visible' => true,
+                'levels' => [
+                    'read' => [
+                        'level' => UserAccess::ACCESS_READ,
+                        'available' => true,
+                    ],
+                    'write' => [
+                        'level' => UserAccess::ACCESS_WRITE,
+                        'available' => true,
+                    ],
+                    'moderate' => [
+                        'level' => UserAccess::ACCESS_FULL,
+                        'available' => true,
+                    ],
+                ]
             ],
             UserAccess::SERVICE_NEWS => [
                 'name' => 'News',
                 'identifier' => 'campus',
                 'visible' => true,
+                'levels' => [
+                    'read' => [
+                        'level' => UserAccess::ACCESS_READ,
+                        'available' => true,
+                    ],
+                    'write' => [
+                        'level' => UserAccess::ACCESS_WRITE,
+                        'available' => true,
+                    ],
+                    'moderate' => [
+                        'level' => UserAccess::ACCESS_FULL,
+                        'available' => true,
+                    ],
+                ]
             ],
             UserAccess::SERVICE_CMS => [
                 'name' => 'CMS',
                 'identifier' => 'none',
                 'visible' => true,
+                'levels' => [
+                    'read' => [
+                        'level' => UserAccess::ACCESS_READ,
+                        'available' => true,
+                    ],
+                    'write' => [
+                        'level' => UserAccess::ACCESS_WRITE,
+                        'available' => true,
+                    ],
+                    'moderate' => [
+                        'level' => UserAccess::ACCESS_FULL,
+                        'available' => true,
+                    ],
+                ]
             ],
             UserAccess::SERVICE_HOUSEMASTER => [
                 'name' => 'Housemaster',
                 'identifier' => 'residentialHouse',
                 'visible' => true,
+                'levels' => [
+                    'read' => [
+                        'level' => UserAccess::ACCESS_READ,
+                        'available' => true,
+                    ],
+                    'write' => [
+                        'level' => UserAccess::ACCESS_WRITE,
+                        'available' => true,
+                    ],
+                    'moderate' => [
+                        'level' => UserAccess::ACCESS_FULL,
+                        'available' => true,
+                    ],
+                ]
             ],
             UserAccess::SERVICE_RESOURCE_BOOKING => [
                 'name' => 'Resource Booking',
                 'identifier' => 'none',
                 'visible' => true,
+                'levels' => [
+                    'read' => [
+                        'level' => UserAccess::ACCESS_READ,
+                        'available' => false,
+                    ],
+                    'write' => [
+                        'level' => UserAccess::ACCESS_WRITE,
+                        'available' => false,
+                    ],
+                    'moderate' => [
+                        'level' => UserAccess::ACCESS_FULL,
+                        'available' => true,
+                    ],
+                ]
             ],
             UserAccess::SERVICE_CURRICULUM => [
                 'name' => 'Curriculum',
                 'identifier' => 'none',
                 'visible' => true,
+                'levels' => [
+                    'read' => [
+                        'level' => UserAccess::ACCESS_READ,
+                        'available' => true,
+                    ],
+                    'write' => [
+                        'level' => UserAccess::ACCESS_WRITE,
+                        'available' => true,
+                    ],
+                    'moderate' => [
+                        'level' => UserAccess::ACCESS_FULL,
+                        'available' => true,
+                    ],
+                ]
             ],
             UserAccess::SERVICE_PASTORAL => [
                 'name' => 'Pastoral Moderator',
                 'identifier' => 'none',
                 'visible' => true,
+                'levels' => [
+                    'read' => [
+                        'level' => UserAccess::ACCESS_READ,
+                        'available' => true,
+                    ],
+                    'write' => [
+                        'level' => UserAccess::ACCESS_WRITE,
+                        'available' => true,
+                    ],
+                    'moderate' => [
+                        'level' => UserAccess::ACCESS_FULL,
+                        'available' => true,
+                    ],
+                ]
             ],
             UserAccess::SERVICE_SPORTS_ADMINISTRATOR => [
                 'name' => 'Sports Administrator',
                 'identifier' => 'none',
                 'visible' => true,
+                'levels' => [
+                    'read' => [
+                        'level' => UserAccess::ACCESS_READ,
+                        'available' => false,
+                    ],
+                    'write' => [
+                        'level' => UserAccess::ACCESS_WRITE,
+                        'available' => false,
+                    ],
+                    'moderate' => [
+                        'level' => UserAccess::ACCESS_FULL,
+                        'available' => true,
+                    ],
+                ]
             ],
             UserAccess::SERVICE_COMMS_OFFICER => [
                 'name' => 'Comms Officer',
                 'identifier' => 'campus',
                 'visible' => true,
+                'levels' => [
+                    'read' => [
+                        'level' => UserAccess::ACCESS_READ,
+                        'available' => false,
+                    ],
+                    'write' => [
+                        'level' => UserAccess::ACCESS_WRITE,
+                        'available' => false,
+                    ],
+                    'moderate' => [
+                        'level' => UserAccess::ACCESS_FULL,
+                        'available' => true,
+                    ],
+                ]
             ],
         ];
 
