@@ -297,9 +297,10 @@
                                     {% if permission.service == constant('CURRICULUM_SERVICE') %}Curriculum{% endif %}
                                     {% if permission.service == constant('PASTORAL_SERVICE') %}Pastoral Moderator{% endif %}
                                     {% if permission.service == constant('SPORTS_ADMINISTRATOR_SERVICE') %}Sports Administrator{% endif %}
+                                    {% if permission.service == constant('COMMS_OFFICER_SERVICE') %}Comms Officer{% endif %}
                                 </div>
                                 <div class="small-4 card">
-                                    {% if permission.service == constant('CALENDAR_SERVICE') or permission.service == constant('NEWS_SERVICE') %}
+                                    {% if permission.service == constant('CALENDAR_SERVICE') or permission.service == constant('NEWS_SERVICE') or permission.service == constant('COMMS_OFFICER_SERVICE') %}
                                         Campus:
                                         {% for campus in campuses if campus.id == permission.serviceIdentifier %}
                                             {{ campus.name }}
@@ -347,6 +348,7 @@
                                     <option value="8" data-identifier="none">Curriculum</option>
                                     <option value="9" data-identifier="none">Pastoral Moderator</option>
                                     <option value="10" data-identifier="none">Sports Administrator</option>
+                                    <option value="11" data-identifier="campus">Comms Officer</option>
                                 </select>
                             </div>
                             <div class="small-4 card">
@@ -580,8 +582,9 @@
             var cms = '{{ constant('CMS_SERVICE') }}';
             var curriculum = '{{ constant('CURRICULUM_SERVICE') }}';
             var pastoralCare = '{{ constant('PASTORAL_SERVICE') }}';
+            var comms = '{{ constant('COMMS_OFFICER_SERVICE') }}';
 
-            var moderateOnlyServices = [resourceBooking, fixtures];
+            var moderateOnlyServices = [resourceBooking, fixtures, comms];
             var noMiddleDropdownServices = [cms, resourceBooking, curriculum, pastoralCare, fixtures]
 
             var moderateAccess = 3;
