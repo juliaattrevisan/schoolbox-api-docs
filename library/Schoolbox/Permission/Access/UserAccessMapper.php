@@ -72,6 +72,7 @@ class UserAccessMapper extends Mapper
         $this->uses('service', self::TYPE_INTEGER);
         $this->uses('sid', self::TYPE_INTEGER, null, 'serviceIdentifier');
         $this->uses('type', self::TYPE_INTEGER, null, 'accessLevel');
+        $this->joinsReverseSingle('id', RoleMapper::class, 'role', 'role');
 
         $this->registerCallback(self::CALLBACK_POSTSAVE,   [ $this, 'calculateUserSubscription' ]);
         $this->registerCallback(self::CALLBACK_POSTDELETE, [ $this, 'calculateUserSubscription' ]);
@@ -447,10 +448,12 @@ class UserAccessMapper extends Mapper
 
         $query = "
             SELECT
-                {$this->getJoinColumnString('user', 'u')}
+                {$this->getJoinColumnString('user', 'u')},
+                {$this->getJoinColumnString('role', 'r')}
             FROM
                 `{$this->getTable()}` ua
-                JOIN {$this->getJoinSql('user', 'ua', 'u')}
+            INNER JOIN {$this->getJoinSql('user', 'ua', 'u')}
+            LEFT JOIN {$this->getJoinMapper('user')->getJoinSql('role', 'u', 'r')}
             WHERE ua.service = :service
             {$specificServiceId}
             AND ua.type >= :minAccess
@@ -462,9 +465,11 @@ class UserAccessMapper extends Mapper
 
         $userCollection = $this->getJoinMapper('user')->createCollection();
         foreach ($stmt as $row) {
-            $userCollection->add(
-                $this->hydrateJoin($row, 'user', 'u')
-            );
+            $role = $this->getJoinMapper('role')->hydrate($row, 'r');
+            $user = $this->hydrateJoin($row, 'user', 'u');
+            $user->setRole($role);
+
+            $userCollection->add($user);
         }
         return $userCollection;
     }
