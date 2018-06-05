@@ -79,6 +79,13 @@ class UserAccess
     const SERVICE_SPORTS_ADMINISTRATOR = 10;
 
     /**
+     * Value for $this->service:
+     * $this->user has $this->accessLevel permission for the Comms
+     * system.
+     */
+    public const SERVICE_COMMS_OFFICER = 11;
+
+    /**
      * Value for $this->accessLevel:
      * $this->user is denied access to resource in $this->service.
      */
