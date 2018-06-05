@@ -73,8 +73,11 @@ class Controller extends Base
         ])->setTitle('Comms Configuration'));
     }
 
+
     /**
      * Process the form vars
+     *
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     public function postConfig()
     {
