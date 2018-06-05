@@ -97,6 +97,218 @@ class Controller extends Base
     protected $cmsLogMapper;
 
     /**
+     * A mapping of services and what can appear in the Permissions section
+     *
+     * @var array
+     */
+    protected $serviceMapping = [
+        UserAccess::SERVICE_HOMEPAGE => [
+
+            /* The text that appears in the dropdow list
+             */
+            'name' => '',
+
+            /* The service identifier options to use: campus dropdown, house dropdown, nothing (none)
+             */
+            'identifier' => '',
+
+            /* Whether this service appears in the Permissions section as something you can choose
+             * SERVICE_HOMEPAGE is never available, it seems
+             */
+            'visible' => false,
+
+            /* Access levels that you can choose; some services are Moderate-Only, but this way you can specify
+             * the available access levels more granularly e.g. write-only, if you ever needed that
+             */
+            'levels' => [
+                'read' => [
+                    'level' => UserAccess::ACCESS_READ,
+                    'available' => true,
+                ],
+                'write' => [
+                    'level' => UserAccess::ACCESS_WRITE,
+                    'available' => true,
+                ],
+                'moderate' => [
+                    'level' => UserAccess::ACCESS_FULL,
+                    'available' => true,
+                ],
+            ]
+        ],
+        UserAccess::SERVICE_CALENDAR => [
+            'name' => 'Calendar',
+            'identifier' => 'campus',
+            'visible' => true,
+            'levels' => [
+                'read' => [
+                    'level' => UserAccess::ACCESS_READ,
+                    'available' => true,
+                ],
+                'write' => [
+                    'level' => UserAccess::ACCESS_WRITE,
+                    'available' => true,
+                ],
+                'moderate' => [
+                    'level' => UserAccess::ACCESS_FULL,
+                    'available' => true,
+                ],
+            ]
+        ],
+        UserAccess::SERVICE_NEWS => [
+            'name' => 'News',
+            'identifier' => 'campus',
+            'visible' => true,
+            'levels' => [
+                'read' => [
+                    'level' => UserAccess::ACCESS_READ,
+                    'available' => true,
+                ],
+                'write' => [
+                    'level' => UserAccess::ACCESS_WRITE,
+                    'available' => true,
+                ],
+                'moderate' => [
+                    'level' => UserAccess::ACCESS_FULL,
+                    'available' => true,
+                ],
+            ]
+        ],
+        UserAccess::SERVICE_CMS => [
+            'name' => 'CMS',
+            'identifier' => 'none',
+            'visible' => true,
+            'levels' => [
+                'read' => [
+                    'level' => UserAccess::ACCESS_READ,
+                    'available' => true,
+                ],
+                'write' => [
+                    'level' => UserAccess::ACCESS_WRITE,
+                    'available' => true,
+                ],
+                'moderate' => [
+                    'level' => UserAccess::ACCESS_FULL,
+                    'available' => true,
+                ],
+            ]
+        ],
+        UserAccess::SERVICE_HOUSEMASTER => [
+            'name' => 'Housemaster',
+            'identifier' => 'residentialHouse',
+            'visible' => true,
+            'levels' => [
+                'read' => [
+                    'level' => UserAccess::ACCESS_READ,
+                    'available' => true,
+                ],
+                'write' => [
+                    'level' => UserAccess::ACCESS_WRITE,
+                    'available' => true,
+                ],
+                'moderate' => [
+                    'level' => UserAccess::ACCESS_FULL,
+                    'available' => true,
+                ],
+            ]
+        ],
+        UserAccess::SERVICE_RESOURCE_BOOKING => [
+            'name' => 'Resource Booking',
+            'identifier' => 'none',
+            'visible' => true,
+            'levels' => [
+                'read' => [
+                    'level' => UserAccess::ACCESS_READ,
+                    'available' => false,
+                ],
+                'write' => [
+                    'level' => UserAccess::ACCESS_WRITE,
+                    'available' => false,
+                ],
+                'moderate' => [
+                    'level' => UserAccess::ACCESS_FULL,
+                    'available' => true,
+                ],
+            ]
+        ],
+        UserAccess::SERVICE_CURRICULUM => [
+            'name' => 'Curriculum',
+            'identifier' => 'none',
+            'visible' => true,
+            'levels' => [
+                'read' => [
+                    'level' => UserAccess::ACCESS_READ,
+                    'available' => true,
+                ],
+                'write' => [
+                    'level' => UserAccess::ACCESS_WRITE,
+                    'available' => true,
+                ],
+                'moderate' => [
+                    'level' => UserAccess::ACCESS_FULL,
+                    'available' => true,
+                ],
+            ]
+        ],
+        UserAccess::SERVICE_PASTORAL => [
+            'name' => 'Pastoral Moderator',
+            'identifier' => 'none',
+            'visible' => true,
+            'levels' => [
+                'read' => [
+                    'level' => UserAccess::ACCESS_READ,
+                    'available' => true,
+                ],
+                'write' => [
+                    'level' => UserAccess::ACCESS_WRITE,
+                    'available' => true,
+                ],
+                'moderate' => [
+                    'level' => UserAccess::ACCESS_FULL,
+                    'available' => true,
+                ],
+            ]
+        ],
+        UserAccess::SERVICE_SPORTS_ADMINISTRATOR => [
+            'name' => 'Sports Administrator',
+            'identifier' => 'none',
+            'visible' => true,
+            'levels' => [
+                'read' => [
+                    'level' => UserAccess::ACCESS_READ,
+                    'available' => false,
+                ],
+                'write' => [
+                    'level' => UserAccess::ACCESS_WRITE,
+                    'available' => false,
+                ],
+                'moderate' => [
+                    'level' => UserAccess::ACCESS_FULL,
+                    'available' => true,
+                ],
+            ]
+        ],
+        UserAccess::SERVICE_COMMS_OFFICER => [
+            'name' => 'Comms Officer',
+            'identifier' => 'campus',
+            'visible' => true,
+            'levels' => [
+                'read' => [
+                    'level' => UserAccess::ACCESS_READ,
+                    'available' => false,
+                ],
+                'write' => [
+                    'level' => UserAccess::ACCESS_WRITE,
+                    'available' => false,
+                ],
+                'moderate' => [
+                    'level' => UserAccess::ACCESS_FULL,
+                    'available' => true,
+                ],
+            ]
+        ],
+    ];
+
+    /**
      * Controller constructor.
      * @param CMSLogMapper $cmsLogMapper
      * @param UserLogMapper $userLogMapper
@@ -160,218 +372,11 @@ class Controller extends Base
         $groupPermissions = $userPermissions->filterBy('service', UserAccess::SERVICE_HOMEPAGE)
                                             ->indexBy('serviceIdentifier');
 
-        $serviceMapping = [
-            UserAccess::SERVICE_HOMEPAGE => [
-
-                /* The text that appears in the dropdow list
-                 */
-                'name' => '',
-
-                /* The service identifier options to use: campus dropdown, house dropdown, nothing (none)
-                 */
-                'identifier' => '',
-
-                /* Whether this service appears in the Permissions section as something you can choose
-                 * SERVICE_HOMEPAGE is never available, it seems
-                 */
-                'visible' => false,
-
-                /* Access levels that you can choose; some services are Moderate-Only, but this way you can specify
-                 * the available access levels more granularly e.g. write-only, if you ever needed that
-                 */
-                'levels' => [
-                    'read' => [
-                        'level' => UserAccess::ACCESS_READ,
-                        'available' => true,
-                    ],
-                    'write' => [
-                        'level' => UserAccess::ACCESS_WRITE,
-                        'available' => true,
-                    ],
-                    'moderate' => [
-                        'level' => UserAccess::ACCESS_FULL,
-                        'available' => true,
-                    ],
-                ]
-            ],
-            UserAccess::SERVICE_CALENDAR => [
-                'name' => 'Calendar',
-                'identifier' => 'campus',
-                'visible' => true,
-                'levels' => [
-                    'read' => [
-                        'level' => UserAccess::ACCESS_READ,
-                        'available' => true,
-                    ],
-                    'write' => [
-                        'level' => UserAccess::ACCESS_WRITE,
-                        'available' => true,
-                    ],
-                    'moderate' => [
-                        'level' => UserAccess::ACCESS_FULL,
-                        'available' => true,
-                    ],
-                ]
-            ],
-            UserAccess::SERVICE_NEWS => [
-                'name' => 'News',
-                'identifier' => 'campus',
-                'visible' => true,
-                'levels' => [
-                    'read' => [
-                        'level' => UserAccess::ACCESS_READ,
-                        'available' => true,
-                    ],
-                    'write' => [
-                        'level' => UserAccess::ACCESS_WRITE,
-                        'available' => true,
-                    ],
-                    'moderate' => [
-                        'level' => UserAccess::ACCESS_FULL,
-                        'available' => true,
-                    ],
-                ]
-            ],
-            UserAccess::SERVICE_CMS => [
-                'name' => 'CMS',
-                'identifier' => 'none',
-                'visible' => true,
-                'levels' => [
-                    'read' => [
-                        'level' => UserAccess::ACCESS_READ,
-                        'available' => true,
-                    ],
-                    'write' => [
-                        'level' => UserAccess::ACCESS_WRITE,
-                        'available' => true,
-                    ],
-                    'moderate' => [
-                        'level' => UserAccess::ACCESS_FULL,
-                        'available' => true,
-                    ],
-                ]
-            ],
-            UserAccess::SERVICE_HOUSEMASTER => [
-                'name' => 'Housemaster',
-                'identifier' => 'residentialHouse',
-                'visible' => true,
-                'levels' => [
-                    'read' => [
-                        'level' => UserAccess::ACCESS_READ,
-                        'available' => true,
-                    ],
-                    'write' => [
-                        'level' => UserAccess::ACCESS_WRITE,
-                        'available' => true,
-                    ],
-                    'moderate' => [
-                        'level' => UserAccess::ACCESS_FULL,
-                        'available' => true,
-                    ],
-                ]
-            ],
-            UserAccess::SERVICE_RESOURCE_BOOKING => [
-                'name' => 'Resource Booking',
-                'identifier' => 'none',
-                'visible' => true,
-                'levels' => [
-                    'read' => [
-                        'level' => UserAccess::ACCESS_READ,
-                        'available' => false,
-                    ],
-                    'write' => [
-                        'level' => UserAccess::ACCESS_WRITE,
-                        'available' => false,
-                    ],
-                    'moderate' => [
-                        'level' => UserAccess::ACCESS_FULL,
-                        'available' => true,
-                    ],
-                ]
-            ],
-            UserAccess::SERVICE_CURRICULUM => [
-                'name' => 'Curriculum',
-                'identifier' => 'none',
-                'visible' => true,
-                'levels' => [
-                    'read' => [
-                        'level' => UserAccess::ACCESS_READ,
-                        'available' => true,
-                    ],
-                    'write' => [
-                        'level' => UserAccess::ACCESS_WRITE,
-                        'available' => true,
-                    ],
-                    'moderate' => [
-                        'level' => UserAccess::ACCESS_FULL,
-                        'available' => true,
-                    ],
-                ]
-            ],
-            UserAccess::SERVICE_PASTORAL => [
-                'name' => 'Pastoral Moderator',
-                'identifier' => 'none',
-                'visible' => true,
-                'levels' => [
-                    'read' => [
-                        'level' => UserAccess::ACCESS_READ,
-                        'available' => true,
-                    ],
-                    'write' => [
-                        'level' => UserAccess::ACCESS_WRITE,
-                        'available' => true,
-                    ],
-                    'moderate' => [
-                        'level' => UserAccess::ACCESS_FULL,
-                        'available' => true,
-                    ],
-                ]
-            ],
-            UserAccess::SERVICE_SPORTS_ADMINISTRATOR => [
-                'name' => 'Sports Administrator',
-                'identifier' => 'none',
-                'visible' => true,
-                'levels' => [
-                    'read' => [
-                        'level' => UserAccess::ACCESS_READ,
-                        'available' => false,
-                    ],
-                    'write' => [
-                        'level' => UserAccess::ACCESS_WRITE,
-                        'available' => false,
-                    ],
-                    'moderate' => [
-                        'level' => UserAccess::ACCESS_FULL,
-                        'available' => true,
-                    ],
-                ]
-            ],
-            UserAccess::SERVICE_COMMS_OFFICER => [
-                'name' => 'Comms Officer',
-                'identifier' => 'campus',
-                'visible' => true,
-                'levels' => [
-                    'read' => [
-                        'level' => UserAccess::ACCESS_READ,
-                        'available' => false,
-                    ],
-                    'write' => [
-                        'level' => UserAccess::ACCESS_WRITE,
-                        'available' => false,
-                    ],
-                    'moderate' => [
-                        'level' => UserAccess::ACCESS_FULL,
-                        'available' => true,
-                    ],
-                ]
-            ],
-        ];
-
         /* Find the moderate-only services
          */
         $moderateOnly = [];
 
-        foreach ($serviceMapping as $service => $data) {
+        foreach ($this->serviceMapping as $service => $data) {
             if ($data['levels']['moderate']['available'] && !$data['levels']['write']['available'] && !$data['levels']['read']['available']) {
                 $moderateOnly[] = $service;
             }
@@ -381,7 +386,7 @@ class Controller extends Base
          */
         $noMiddleDropdown = [];
 
-        foreach ($serviceMapping as $service => $data) {
+        foreach ($this->serviceMapping as $service => $data) {
             if ($data['identifier'] === 'none') {
                 $noMiddleDropdown[] = $service;
             }
@@ -390,7 +395,7 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@adminUser/modify.twig',
             'data' => [
-                'serviceMapping' => $serviceMapping,
+                'serviceMapping' => $this->serviceMapping,
                 'moderateOnly' => json_encode($moderateOnly),
                 'noMiddleDropdown' => json_encode($noMiddleDropdown),
 
