@@ -21,10 +21,14 @@ class Base
 
     /**
      * Twig template to represent controls in writable config screen
+     * Also, the input name
+     *
+     * (you can't and shouldn't easily mix things up inadvertently)
      *
      * @var string
      */
-    protected $template = '';
+    protected $identifier = '';
+
 
     /**
      * This configuration is on (active)
@@ -52,9 +56,9 @@ class Base
     /**
      * @return string
      */
-    public function getTemplate(): string
+    public function getIdentifier(): string
     {
-        return $this->template;
+        return $this->identifier;
     }
 
 

@@ -20,10 +20,13 @@ class GlobalModeration extends Base
 
     /**
      * Twig template to represent controls in writable config screen
+     * Also, the input name
+     *
+     * (you can't and shouldn't easily mix things up inadvertently)
      *
      * @var string
      */
-    protected $template = 'policy-global-moderation';
+    protected $identifier = 'policy-global-moderation';
 
     /**
      * This configuration is on (active)
