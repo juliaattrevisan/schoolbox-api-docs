@@ -352,7 +352,7 @@ class ImportFactory
                 if(!$assessmentSpec->isDeleted()){
                     $assessmentSpecs->getOffset($unitSpecId)->setOffset($assessmentSpec->getId(), $assessmentSpec);
                 }
-            } else {
+            } else if ($assessmentImpl instanceof IAssessable){
                 $assessmentImpls->getOffset($unitSpecId)->setOffset($assessmentImpl->getId(), $assessmentImpl);
             }
         }
@@ -426,10 +426,12 @@ class ImportFactory
             // Only add deleted specs if they are linked to from a current Impl
             if(is_null($deletedAt) || array_key_exists($assessmentId, $specToImplMap)){
                 $assessmentSpec = $this->buildAssessmentSpecFromRow($row);
-                /** @var Project $projectSpec */
-                $projectSpec = $projectSpecs->getOffset($projectAssessmentId);
-                $projectSpec->getAssessables()->setOffset($assessmentSpec->getId(), $assessmentSpec);
-                $assessmentSpec->setContext($projectSpec);
+                if ($assessmentSpec instanceof IAssessable) {
+                    /** @var Project $projectSpec */
+                    $projectSpec = $projectSpecs->getOffset($projectAssessmentId);
+                    $projectSpec->getAssessables()->setOffset($assessmentSpec->getId(), $assessmentSpec);
+                    $assessmentSpec->setContext($projectSpec);
+                }
             }
         }
 
@@ -498,6 +500,9 @@ class ImportFactory
             // Add AssessmentImpl to ProjectImpl
             $projectAssessmentId = $row['p.assessment_id'];
             $assessmentImpl = $this->buildAssessmentImplFromRow($row);
+            if (!$assessmentImpl instanceof IAssessable) {
+                continue;
+            }
             /** @var Project $projectImpl */
             $projectImpl = $projectImpls->getOffset($projectAssessmentId);
             $projectImpl->getAssessables()->setOffset($assessmentImpl->getId(), $assessmentImpl);
