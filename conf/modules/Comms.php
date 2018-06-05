@@ -10,6 +10,7 @@ namespace Config\Modules;
 use Alaress\Application\Kernel;
 use Config\ModuleLoader;
 use Schoolbox\Comms\Config;
+use Schoolbox\Comms\News;
 
 class Comms extends ModuleLoader
 {
@@ -24,5 +25,6 @@ class Comms extends ModuleLoader
         $namespace = 'comms';
 
         $this->loadModule($kernel, Config\Module::class, "/{$namespace}/config");
+        $this->loadModule($kernel, News\Module::class, "/{$namespace}/news");
     }
 }
