@@ -2,7 +2,7 @@
     <section>
     {% for policy in policies %}
         <fieldset>
-            {% include '@comms/config/' ~ policy.template ~ '.twig' %}
+            {% include '@comms/config/policies/' ~ policy.template ~ '.twig' with { policy: policy } %}
         </fieldset>
     {% endfor %}
     </section>
