@@ -7,7 +7,7 @@
                 {% for officer in allCommsOfficers %}
                 <li>
                     <div class="card small-12">
-                        <a href="#" title="View Profile">
+                        <a href="/search/user/{{ officer.id }}" title="View Profile">
                             <img src="/portrait.php?userId={{ officer.externalId }}&size=square64" alt="View Profile" />
                             <p>{{ officer.fullname }}</p>
                         </a>
