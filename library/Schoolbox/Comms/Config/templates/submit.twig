@@ -5,9 +5,9 @@
     <div class="small-12 island">
         <h2 class="subheader">POST contents</h2>
         <section class="content">
-            <p>var1: {{ var1 }}</p>
+            <p>policy-global-moderation: {{ policy-global-moderation }}</p>
 
-            {% set formRoute = routeLookupIfAuthorized('comms.getComms', {id: user.id}) %}
+            {% set formRoute = routeLookupIfAuthorized('commsConfig.getConfig', {id: user.id}) %}
 
             {% if formRoute %}
                 <a href="{{ formRoute }}" class="button icon-previous">Back to {{ formRoute }}</a>

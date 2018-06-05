@@ -76,16 +76,8 @@ class Controller extends Base
      */
     public function postConfig()
     {
-        try {
-            $user = $this->userMapper->findById($this->getRequest()->post['id']);
-        }
-        catch (MapperException $e) {
-            throw $this->errorMapper->generateException(ErrorMapper::ERROR_USER_NOT_FOUND);
-        }
-
-        $this->getResponse()->content->set($this->buildHtmlOutput('@comms/submit.twig', [
-            'user' => $user,
-            'var1' => $this->getRequest()->post['var1']
-        ])->setTitle('Comms Form Output'));
+        $this->getResponse()->content->set($this->buildHtmlOutput('@commsConfig/submit.twig', [
+            'policy-global-moderation' => $this->getRequest()->post['policy-global-moderation']
+        ])->setTitle('Update Comms settings'));
     }
 }

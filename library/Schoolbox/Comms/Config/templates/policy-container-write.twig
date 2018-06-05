@@ -1,4 +1,6 @@
-<form method="post">
+{% set formRoute = routeLookupIfAuthorized('commsConfig.postConfig') %}
+
+<form action="{{ formRoute }}" method="post">
     <section>
     {% for policy in policies %}
         <fieldset>
@@ -6,5 +8,7 @@
         </fieldset>
     {% endfor %}
     </section>
+
+    <input type="submit" value="Update Comms settings"/>
 </form>
 
