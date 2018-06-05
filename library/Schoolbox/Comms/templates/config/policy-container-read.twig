@@ -3,9 +3,9 @@
         {% for policy in policies %}
             <li class="content">
                 {% if policy.isActive %}
-                    {{ policy.options.active|purify }}
+                    <strong>{{ policy.options.active.state }}</strong>. {{ policy.options.active.description }}
                 {% else %}
-                    {{ policy.options.inactive|purify }}
+                    <strong>{{ policy.options.inactive.state }}</strong>. {{ policy.options.inactive.description }}
                 {% endif %}
             </li>
         {% endfor %}

@@ -10,10 +10,16 @@
     {
         'label': 'Global Moderation',
         'template': 'policy-global-moderation',
-        'isActive': true,
+        'isActive': false,
         'options': {
-            'active': '<strong>Global moderation is on</strong>. Every article requires moderator approval.',
-            'inactive': '<strong>Global moderation is off</strong>. You can freely post articles.'
+            'active': {
+                'state': 'Global moderation is on',
+                'description': 'Every article requires moderator approval.'
+            },
+            'inactive': {
+                'state': 'Global moderation is off',
+                'description': 'You can freely post articles.'
+            }
         }
     },
     {
@@ -33,7 +39,7 @@
 <div class="row">
     <div class="small-12 island">
         <h2 class="subheader">Comms Policy Settings</h2>
-            {% if USER.isSuperuser %}
+            {% if USER.isSuperuser and false%}
                 {% include '@comms/config/policy-container-write.twig' %}
             {% else %}
                 {% include '@comms/config/policy-container-read.twig' %}
