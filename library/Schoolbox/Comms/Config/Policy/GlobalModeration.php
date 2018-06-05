@@ -19,10 +19,7 @@ class GlobalModeration extends Base
     protected $label = 'Global Moderation';
 
     /**
-     * Twig template to represent controls in writable config screen
-     * Also, the input name
-     *
-     * (you can't and shouldn't easily mix things up inadvertently)
+     * The input element's name attribute
      *
      * @var string
      */
