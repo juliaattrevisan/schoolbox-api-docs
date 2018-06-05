@@ -392,6 +392,7 @@ class Healthcheck
             'SCHOOLBOX_PARENT_STUDENT',
             'SCHOOLBOX_STAFF',
             'SCHOOLBOX_TIMETABLE',
+            'SCHOOLBOX_TIMETABLE_DAYS',
             'SCHOOLBOX_TIMETABLE_DEFINITION'
         ];
 
