@@ -1,6 +1,21 @@
 <div class="row">
     <div class="small-12 island">
+
+        {% if USER.isSuperuser %}
+        <div class="actions-small-1 row">
+            <div class="list-item">
+                <div class="small-12 columns">
+                    <h2 class="subheader">Comms Officers</h2>
+                </div>
+            </div>
+            <nav>
+                <a href="/adminv2/user" class="icon-add" title="Manage Comms Officers"></a>
+            </nav>
+        </div>
+        {% else %}
         <h2 class="subheader">Comms Officers</h2>
+        {% endif %}
+
         {% if commsOfficers|length %}
         <section>
             <ul class="grid medium-block-grid-2 large-block-grid-4">
