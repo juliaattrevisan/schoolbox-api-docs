@@ -30,27 +30,35 @@ class Controller extends Base
     private $errorMapper;
 
     /**
+     * @var UserAccessMapper
+     */
+    private $userAccessMapper;
+
+    /**
      * Controller constructor.
      *
-     * @param ErrorMapper $errorMapper
-     * @param UserMapper  $userMapper
+     * @param ErrorMapper      $errorMapper
+     * @param UserMapper       $userMapper
+     * @param UserAccessMapper $userAccessMapper
      */
-    public function __construct(ErrorMapper $errorMapper, UserMapper $userMapper)
+    public function __construct(ErrorMapper $errorMapper, UserMapper $userMapper, UserAccessMapper $userAccessMapper)
     {
         $this->errorMapper = $errorMapper;
         $this->userMapper = $userMapper;
+        $this->userAccessMapper = $userAccessMapper;
     }
-
 
     /**
      * Provide form
      *
+     * @throws MapperException
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \Schoolbox\Mapper\DefinitionException
      */
     public function getConfig()
     {
-        $allCommsOfficers = UserAccessMapper::getInstance()->findUsersForService(UserAccess::SERVICE_COMMS_OFFICER);
+        $allCommsOfficers = $this->userAccessMapper->findUsersForService(UserAccess::SERVICE_COMMS_OFFICER);
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@comms/config/index.twig', [
             'allCommsOfficers' => $allCommsOfficers,
