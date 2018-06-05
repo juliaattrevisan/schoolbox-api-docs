@@ -90,9 +90,9 @@ class External_Edumate_Class extends External_Edumate_Connection implements Exte
 
         // prepare
         $stmt = $this->getConnection()->prepareQuery("
-            SELECT staff_number AS StaffID
+            SELECT STAFF_NUMBER AS StaffID
                 FROM DB2INST1.SCHOOLBOX_TEACHERCLASS
-                WHERE class_code IN (".implode(',',$codes).")
+                WHERE CLASS_CODE IN (".implode(',',$codes).")
         ");
 
         // retrieve
