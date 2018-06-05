@@ -45,7 +45,7 @@ class GlobalModeration extends Base
      * @var array
      */
     protected $options = [
-        'config' => 'Enable to require moderation on every article before they are made publicly available',
+        'subtext' => 'Enable to require moderation on every article before they are made publicly available',
         'active' => [
             'state' => 'Global moderation is on',
             'description' => 'Every article requires moderator approval'
