@@ -8,7 +8,7 @@
  */
 namespace Schoolbox\Comms\Config\Policy;
 
-class GlobalModeration
+class GlobalModeration extends Base
 {
 
     /**
@@ -16,28 +16,28 @@ class GlobalModeration
      *
      * @var string
      */
-    private $label = 'Global Moderation';
+    protected $label = 'Global Moderation';
 
     /**
      * Twig template to represent controls in writable config screen
      *
      * @var string
      */
-    private $template = 'policy-global-moderation';
+    protected $template = 'policy-global-moderation';
 
     /**
      * This configuration is on (active)
      *
      * @var bool
      */
-    private $isActive = false;
+    protected $isActive = false;
 
     /**
      * Strings to describe states
      *
      * @var array
      */
-    private $options = [
+    protected $options = [
         'active' => [
             'state' => 'Global moderation is on',
             'description' => 'Every article requires moderator approval'
@@ -47,40 +47,5 @@ class GlobalModeration
             'description' => 'You can freely post articles'
         ]
     ];
-
-    /**
-     * @return string
-     */
-    public function getLabel(): string
-    {
-        return $this->label;
-    }
-
-
-    /**
-     * @return string
-     */
-    public function getTemplate(): string
-    {
-        return $this->template;
-    }
-
-
-    /**
-     * @return bool
-     */
-    public function isActive(): bool
-    {
-        return $this->isActive;
-    }
-
-
-    /**
-     * @return array
-     */
-    public function getOptions(): array
-    {
-        return $this->options;
-    }
 }
 
