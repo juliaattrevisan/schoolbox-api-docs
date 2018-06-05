@@ -138,14 +138,11 @@ var beforeSubmit = function() {
 
     }
 
-    $.validator.addMethod("positiveNumeric", function (value, element) {
-        return this.optional(element) || (parseFloat(value) > 0 && /^\d+(\.\d+)?$/.test(value));
-    }, "Amount must be greater than zero");
-
     if (maxMark.is(':visible')) {
         maxMark.rules('add', {
             required: true,
-            positiveNumeric: true
+            number: true,
+            greaterThanZero: true
         })
     }
 };

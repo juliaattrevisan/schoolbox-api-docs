@@ -260,6 +260,10 @@
         return this.optional(element) || /^[a-z0-9]+$/i.test(value);
     }, "This field must only contain letters or numbers.");
 
+    $.validator.addMethod("greaterThanZero", function (value, element) {
+        return this.optional(element) || (parseFloat(value) > 0);
+    }, "Amount must be greater than zero");
+
     /* Validate email while ignoring whitespace-only values */
     $.validator.addMethod('emailTrimmed', function(value, element) {
         // If field contains just whitespace...pass
