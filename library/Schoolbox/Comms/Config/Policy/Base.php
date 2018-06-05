@@ -17,7 +17,7 @@ class Base
      *
      * @var string
      */
-    protected $label = '';
+    protected $name = '';
 
     /**
      * The input element's name attribute
@@ -76,9 +76,9 @@ class Base
     /**
      * @return string
      */
-    public function getLabel(): string
+    public function getname(): string
     {
-        return $this->label;
+        return $this->name;
     }
 
 

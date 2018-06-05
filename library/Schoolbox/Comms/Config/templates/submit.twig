@@ -6,7 +6,7 @@
             <ul class="information-list">
                 {% for policy in policies %}
                 <li class="content">
-                    {{ policy.label }} ({{ policy.identifier }})
+                    {{ policy.name }} ({{ policy.identifier }})
                     {% if policy.isActive %}
                         is now active.
                     {% else %}

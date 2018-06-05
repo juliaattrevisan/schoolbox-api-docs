@@ -1,4 +1,4 @@
-<label for="{{ policy.identifier }}">{{ policy.label }}</label>
+<label for="{{ policy.identifier }}">{{ policy.name }}</label>
 <p>{{ policy.options.config }}.</p>
 <div class="switch">
     <input id="{{ policy.identifier }}" name="{{ policy.identifier }}" type="checkbox" {% if policy.isActive %}checked{% endif %} value="1">

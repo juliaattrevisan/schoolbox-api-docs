@@ -16,7 +16,7 @@ class GlobalModeration extends Base
      *
      * @var string
      */
-    protected $label = 'Global Moderation';
+    protected $name = 'Global Moderation';
 
     /**
      * The input element's name attribute
