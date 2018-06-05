@@ -398,6 +398,11 @@ class Controller extends Base
                 'serviceMapping' => $this->serviceMapping,
                 'moderateOnly' => json_encode($moderateOnly),
                 'noMiddleDropdown' => json_encode($noMiddleDropdown),
+                'accessLevel' => [
+                    'read' => UserAccess::ACCESS_READ,
+                    'write' => UserAccess::ACCESS_WRITE,
+                    'moderate' => UserAccess::ACCESS_FULL
+                ],
 
                 'pageCurrent' => 'user',
                 'method' => 'Update',
