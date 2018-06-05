@@ -72,7 +72,6 @@ class UserAccessMapper extends Mapper
         $this->uses('service', self::TYPE_INTEGER);
         $this->uses('sid', self::TYPE_INTEGER, null, 'serviceIdentifier');
         $this->uses('type', self::TYPE_INTEGER, null, 'accessLevel');
-        $this->joinsReverseSingle('id', RoleMapper::class, 'role', 'role');
 
         $this->registerCallback(self::CALLBACK_POSTSAVE,   [ $this, 'calculateUserSubscription' ]);
         $this->registerCallback(self::CALLBACK_POSTDELETE, [ $this, 'calculateUserSubscription' ]);
@@ -428,6 +427,7 @@ class UserAccessMapper extends Mapper
      *
      * @return User[]|Collection
      * @throws Mapper\DefinitionException
+     * @throws Mapper\Exception
      */
     public function findUsersForService($service, $serviceId = null, $accessType = UserAccess::ACCESS_READ)
     {
@@ -446,14 +446,17 @@ class UserAccessMapper extends Mapper
             $args['serviceId'] = $serviceId;
         }
 
+        $userMapper = $this->getJoinMapper('user');
+        $roleMapper = $userMapper->getJoinMapper('role');
+
         $query = "
             SELECT
                 {$this->getJoinColumnString('user', 'u')},
-                {$this->getJoinColumnString('role', 'r')}
+                {$roleMapper->getColumnString( 'r')}
             FROM
                 `{$this->getTable()}` ua
             INNER JOIN {$this->getJoinSql('user', 'ua', 'u')}
-            LEFT JOIN {$this->getJoinMapper('user')->getJoinSql('role', 'u', 'r')}
+            LEFT JOIN {$userMapper->getJoinSql('role', 'u', 'r')}
             WHERE ua.service = :service
             {$specificServiceId}
             AND ua.type >= :minAccess
@@ -465,7 +468,7 @@ class UserAccessMapper extends Mapper
 
         $userCollection = $this->getJoinMapper('user')->createCollection();
         foreach ($stmt as $row) {
-            $role = $this->getJoinMapper('role')->hydrate($row, 'r');
+            $role = $roleMapper->hydrate($row, 'r');
             $user = $this->hydrateJoin($row, 'user', 'u');
             $user->setRole($role);
 
