@@ -14,9 +14,7 @@ use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
-use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Mapper;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
 
 
@@ -49,34 +47,8 @@ class Module extends BaseModule
             new Rule\IsSuperuser()
         );
 
-        $preloadUser = function ($params) { return $this->preloadUser($params); };
-
-        $this->register('GET', '/user/{id}', 'getComms', $getPerms, $preloadUser);
+        $this->register('GET', '/user', 'getComms', $getPerms, null);
         $this->register('POST', '/user', 'postComms', $postPerms, null);
-    }
-
-
-    /**
-     * Preload a User instance
-     *
-     * @param array $params
-     * @return array
-     * @throws \Schoolbox\Application\Exception\NotFound
-     * @throws InvalidArgumentException
-     * @throws NotFound
-     */
-    private function preloadUser(array $params)
-    {
-        try {
-            $user = $this->getUserMapper()->findById($params['id']);
-        }
-        catch (MapperException $e) {
-            throw new NotFound();
-        }
-
-        return [
-            'user' => $user,
-        ];
     }
 
     /**
