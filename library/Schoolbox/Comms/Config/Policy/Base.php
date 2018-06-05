@@ -76,7 +76,7 @@ class Base
     /**
      * @return string
      */
-    public function getname(): string
+    public function getName(): string
     {
         return $this->name;
     }
