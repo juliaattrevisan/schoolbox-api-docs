@@ -83,7 +83,36 @@ class ArticleNotifier extends AbstractModuleNotifier
 
             case Mapper::METHOD_DELETE:
                 $bundle->detach(self::TRIGGER_POSTED);
+                $bundle->attach(self::TRIGGER_DELETED, self::IMMEDIATELY);
         }
+    }
+
+
+    /**
+     * Retracts a deleted article.
+     *
+     * @param Article $article
+     * @return Envelope
+     */
+    public function notifyDeleted(Article $article): Envelope
+    {
+        $envelope  = new Envelope();
+        $bob       = new Builder(false);
+        $articleId = $article->getId();
+        $bob->setTitle(":user posted :title under :topic")
+            ->setHref('/news/item/' . $articleId)
+            ->addTopic("news.$articleId.posted");
+
+        // Empty params for completeness?
+        $bob->setParams([
+            'user'  => new Param(''),
+            'title' => new Param(''),
+            'topic' => new Param(''),
+        ]);
+
+        // Only broadcast to superusers as there's no system channel
+        $envelope->retractAllLike($bob->build());
+        return $envelope;
     }
 
 

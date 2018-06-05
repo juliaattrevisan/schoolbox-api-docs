@@ -9,11 +9,13 @@
 namespace Schoolbox\Realtime\Routing;
 
 use Alaress\Async\Notification\Instance\Instance;
+use Alaress\Async\Queue\QueueInterface;
 use Alaress\WorkerCrew\Transaction\ITransaction;
 use Alaress\WorkerCrew\TXRX;
 use BadMethodCallException;
 use InvalidArgumentException;
 use PDOException;
+use Schoolbox\Realtime\MessageList\ListFactory;
 use Schoolbox\UserMapper;
 
 class RouteTXRX implements TXRX
@@ -25,17 +27,54 @@ class RouteTXRX implements TXRX
     /** @var QueueSorter */
     private $sorter;
 
+    /** @var ListFactory */
+    private $listFactory;
 
     /**
-     * You need to install these dependencies on the worker-side; they not used daemon-side
+     * Constructor
+     *
+     * @see `$this->buildTransmitter`
+     * @see `$this->buildReceiver`
+     *
+     * @param UserMapper|null  $mapper
+     * @param QueueSorter|null $sorter
+     * @param ListFactory|null $listFactory
+     */
+    private function __construct(
+        UserMapper $mapper = null,
+        QueueSorter $sorter = null,
+        ListFactory $listFactory = null
+    ) {
+        $this->mapper      = $mapper;
+        $this->sorter      = $sorter;
+        $this->listFactory = $listFactory;
+    }
+
+
+    /**
+     * "Constructor" for the transmitter variant of this object, as used in
+     * daemons.
+     *
+     * @param ListFactory $listFactory
+     * @return self
+     */
+    public static function buildTransmitter(ListFactory $listFactory): self
+    {
+        return new static(null, null, $listFactory);
+    }
+
+
+    /**
+     * "Constructor" for the receiver variant of this object, as used in
+     * workers.
      *
      * @param UserMapper  $mapper
      * @param QueueSorter $sorter
+     * @return self
      */
-    public function __construct(UserMapper $mapper = null, QueueSorter $sorter = null)
+    public static function buildReceiver(UserMapper $mapper, QueueSorter $sorter): self
     {
-        $this->mapper = $mapper;
-        $this->sorter = $sorter;
+        return new static($mapper, $sorter, null);
     }
 
 
@@ -47,22 +86,45 @@ class RouteTXRX implements TXRX
      * @param ITransaction $tx
      * @param array        $userIds
      * @throws InvalidArgumentException
+     * @throws BadMethodCallException if using the receiver variant
      * @return void
      */
     public function send($instance, ITransaction $tx, $userIds)
     {
-        if (!is_array($userIds)) {
-            throw new InvalidArgumentException('Payload must be an array of user IDs');
+        if (null === $this->listFactory) {
+            throw new BadMethodCallException('Attempting to send using the receiver variant of RouteTXRX');
         }
 
-        $key = $instance->getBaseHash().$instance->getParamHash();
-
-        // rather than dump everyone in together, allow the transaction to batch the users
-        // the implication of this is that if the user count exceeds the limit placed on the transaction,
-        // users will be batched through multiple transactions
-        foreach ($userIds as $userId) {
-            $tx->put("$key-$userId", [ $instance, (int)$userId ]);
+        // Is a retract single: retract it
+        if ($instance->isActionRetractSingle()) {
+            $this->listFactory->retract()->push($instance);
+            return;
         }
+
+        // Is a retract all: find all like it, then retract them
+        if ($instance->isActionRetractAll()) {
+            $this->listFactory->retractLike()->push($instance);
+            return;
+        }
+
+        // Is a send action: let worker handle it
+        if ($instance->isActionSend()) {
+            if (!\is_array($userIds)) {
+                throw new InvalidArgumentException('Payload must be an array of user IDs');
+            }
+
+            $key = $instance->getBaseHash().$instance->getParamHash();
+
+            // rather than dump everyone in together, allow the transaction to batch the users
+            // the implication of this is that if the user count exceeds the limit placed on the transaction,
+            // users will be batched through multiple transactions
+            foreach ($userIds as $userId) {
+                $tx->put("$key-$userId", [ $instance, (int)$userId ]);
+            }
+            return;
+        }
+
+        throw new InvalidArgumentException(sprintf('Instance has unknown action type "%s"', $instance->getAction()));
     }
 
 
@@ -72,14 +134,13 @@ class RouteTXRX implements TXRX
      *
      * @param array $args
      * @return int
-     * @throws BadMethodCallException
-     * @throws InvalidArgumentException
-     * @throws PDOException
+     * @throws BadMethodCallException if using the transmitter variant
+     * @throws \Schoolbox\Mapper\Exception if user doesn't exist or was deleted
      */
     public function receive(array $args)
     {
         if (null === $this->mapper || null === $this->sorter) {
-            throw new BadMethodCallException('Not configured');
+            throw new BadMethodCallException('Attempting to receive using the transmitter variant of RouteTXRX');
         }
 
         $count = 0;
@@ -92,5 +153,4 @@ class RouteTXRX implements TXRX
 
         return $count;
     }
-
 }

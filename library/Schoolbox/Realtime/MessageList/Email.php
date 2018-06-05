@@ -110,5 +110,4 @@ class Email implements QueueInterface
             $bundle->appendInstance($this->messageInstance);
         }
     }
-
 }

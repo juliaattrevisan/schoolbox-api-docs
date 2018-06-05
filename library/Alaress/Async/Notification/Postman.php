@@ -70,7 +70,14 @@ class Postman
                 $this->log->notice('Broken message, was unable to json_decode', ['char' => '?']);
             }
 
-			$this->log->info("Broadcast a message to '$routeKey'", ['char' => '<']);
+            if ($instance->isActionRetractSingle()) {
+                $this->log->info("Retracting a message from '$routeKey'", ['char' => '<']);
+            } elseif ($instance->isActionRetractAll()) {
+                $this->log->info("Retracting all messages from '$routeKey'", ['char' => '<']);
+            } else {
+                // assume send
+                $this->log->info("Broadcasting a message to '$routeKey'", ['char' => '<']);
+            }
 			++$i;
 		}
 

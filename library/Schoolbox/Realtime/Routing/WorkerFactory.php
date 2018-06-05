@@ -110,7 +110,7 @@ class WorkerFactory
         $writer = new PipeWriter($strat, $this->log, fopen('php://fd/3', 'wb'));
 
         // worker-side: dependencies used
-        $txrx = new RouteTXRX($this->userMapper, $sorter);
+        $txrx = RouteTXRX::buildReceiver($this->userMapper, $sorter);
 
         return new Routing\Worker($txrx, $loop, $this->log, $writer, $strat);
     }

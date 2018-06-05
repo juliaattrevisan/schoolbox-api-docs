@@ -368,7 +368,7 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
 
         // method not implemented or nothing to send, this is fine
         if (null === $bundle) {
-            $this->log->debug('No messages to broadcast');
+            $this->log->debug('No messages to broadcast: bundle is null');
             return;
         }
         // worker died midflight and nothing valid was returned
@@ -386,7 +386,7 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
 
         // if there are no messages, just ignore this callback and move on
         if ($bundle->isEmpty()) {
-            $this->log->debug('No messages to broadcast');
+            $this->log->debug('No messages to broadcast: bundle is empty');
             return;
         }
 
@@ -395,7 +395,7 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
         ]);
 
         if ($count === 0) {
-            $this->log->debug('No messages to broadcast');
+            $this->log->debug('No messages broadcast');
             return;
         }
 

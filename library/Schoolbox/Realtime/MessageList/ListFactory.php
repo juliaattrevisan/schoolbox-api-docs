@@ -8,6 +8,7 @@
 
 namespace Schoolbox\Realtime\MessageList;
 
+use Alaress\Async\Queue\Composite;
 use Alaress\Async\Queue\QueueInterface;
 use Alaress\Redis;
 use Predis\ClientInterface;
@@ -62,6 +63,34 @@ class ListFactory implements IListFactory, Serializable
     public function digest($userId)
     {
         return new Digest($this->redis, $this->instanceId, $userId);
+    }
+
+
+    /**
+     * @param int $userId
+     * @return QueueInterface
+     */
+    public function instant($userId)
+    {
+        return new Composite($this->listed($userId), $this->unread($userId));
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function retract(): QueueInterface
+    {
+        return new Retractor($this->redis, $this->instanceId, Retractor::MODE_RETRACT_SINGLE);
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function retractLike(): QueueInterface
+    {
+        return new Retractor($this->redis, $this->instanceId, Retractor::MODE_RETRACT_LIKE);
     }
 
 

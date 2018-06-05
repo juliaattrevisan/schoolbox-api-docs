@@ -325,5 +325,4 @@ class Builder implements BuilderInterface
 			$this->time, $this->meta, $this->context
 		);
 	}
-
 }

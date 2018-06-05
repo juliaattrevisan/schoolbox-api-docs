@@ -19,6 +19,7 @@ use Predis\ClientInterface;
 use Psr\Log\LoggerInterface as Logger;
 use React\EventLoop\LoopInterface;
 use React\Stomp\Client;
+use Schoolbox\Realtime\MessageList\ListFactory;
 use Schoolbox\Realtime\Routing;
 use Schoolbox\Realtime\Routing\DispatchResponder;
 use Schoolbox\Realtime\Routing\DispatchStrategy;
@@ -47,9 +48,6 @@ $kernel->run(function(Di\Container $di, LoopInterface $loop, Logger $log, array 
             // the list of instances this particular daemon will listen for
             $instances = [ INSTANCE_ID ];
 
-            // daemon-version: no dependencies required
-            $txrx = new RouteTXRX();
-
             /** @var ClientInterface $redis */
             $redis = $di->get('redis');
 
@@ -64,6 +62,8 @@ $kernel->run(function(Di\Container $di, LoopInterface $loop, Logger $log, array 
 
             // ensure endpoints exist
             foreach ($instances as $instance) {
+                $txrx = RouteTXRX::buildTransmitter(new ListFactory($instance, $redis));
+
                 // this holds and traverses all our subscription data
                 $router = new Router(new SubscriptionDictionary('.'));
                 $routeBroker = new Routing\Broker($instance, $amqp, $redis, $client);

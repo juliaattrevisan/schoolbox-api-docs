@@ -16,6 +16,7 @@ use Alaress\Async\Notification\Parameter\Param;
 use ErrorException;
 use InvalidArgumentException;
 use Predis\ClientInterface;
+use Predis\Collection\Iterator\Keyspace;
 
 abstract class RedisQueue implements QueueInterface
 {
@@ -152,13 +153,30 @@ abstract class RedisQueue implements QueueInterface
      * @param Instance $instance
      * @return string
      */
-    private function getRedisMsgKey(Instance $instance)
+    protected function getRedisMsgKey(Instance $instance)
     {
         return sprintf(
             $this->getMessageKeyPattern(),
             $this->getNamespace(),
             $instance->getBaseHash(),
             $instance->getParamHash()
+        );
+    }
+
+
+    /**
+     * The base key in Redis for the given Instance, in the form 'msg:INSTANCE:m:baseHash:*'
+     *
+     * @param Instance $instance
+     * @return string
+     */
+    protected function getRedisMsgBaseKey(Instance $instance)
+    {
+        return sprintf(
+            $this->getMessageKeyPattern(),
+            $this->getNamespace(),
+            $instance->getBaseHash(),
+            '*'
         );
     }
 

@@ -93,8 +93,7 @@ class QueueSorter implements FilterInterface
                         break;
 
                     case RoutePermission::INSTANT:
-                        $this->listFactory->listed($userId)->push($instance);
-                        $this->listFactory->unread($userId)->push($instance);
+                        $this->listFactory->instant($userId)->push($instance);
                         break;
 
                     case RoutePermission::PUSH:

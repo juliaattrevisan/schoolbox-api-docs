@@ -58,5 +58,4 @@ interface QueueInterface
      * @return void
      */
     public function fetchIntoBundle(NotificationBundle $bundle, $dropCache = false);
-
 }

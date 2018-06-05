@@ -92,5 +92,4 @@ class Mobile implements QueueInterface
     {
         // noop: this "list" doesn't contain things
     }
-
 }
