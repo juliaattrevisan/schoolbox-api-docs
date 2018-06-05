@@ -40,11 +40,11 @@ class GlobalModeration
     private $options = [
         'active' => [
             'state' => 'Global moderation is on',
-            'description' => 'Every article requires moderator approval.'
+            'description' => 'Every article requires moderator approval'
         ],
         'inactive' => [
             'state' => 'Global moderation is off',
-            'description' => 'You can freely post articles.'
+            'description' => 'You can freely post articles'
         ]
     ];
 
