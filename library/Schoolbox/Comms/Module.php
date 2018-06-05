@@ -14,7 +14,6 @@ use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
-use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Role;
@@ -92,14 +91,5 @@ class Module extends BaseModule
             'userMapper' => $this->getMapperFactory()->getLazy(UserMapper::class),
             'userAccessMapper' => $this->getMapperFactory()->getLazy(UserAccessMapper::class)
         ];
-    }
-
-    /**
-     * @return Mapper|UserMapper
-     * @throws \InvalidArgumentException If cannot find mapper class
-     */
-    protected function getUserMapper()
-    {
-        return $this->getMapperFactory()->get(UserMapper::class);
     }
 }
