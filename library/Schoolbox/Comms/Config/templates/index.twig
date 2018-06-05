@@ -1,10 +1,14 @@
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Comms Settings</h1>
+    </div>
+</div>
+
 {# Add a list of current Comms Officers
  #}
 {% include '@commsConfig/comms-officers.twig' with {
     commsOfficers: commsOfficers
 } %}
-
-{% set isSuperuser = USER.isSuperuser %}
 
 {# Show a list of configuration options that can be changed by super
  # Otherwise just show the conclusion to everyone else
