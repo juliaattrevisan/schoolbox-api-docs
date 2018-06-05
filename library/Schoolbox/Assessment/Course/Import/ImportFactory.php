@@ -692,7 +692,7 @@ class ImportFactory
             $assessmentSpec = new Project();
 
         } else {
-            throw new \DomainException("Unknown assessment type: {$row['sa.id']}");
+            return null;
         }
 
         $assessmentSpec->setId($row['sa.id']);
@@ -740,7 +740,7 @@ class ImportFactory
             $assessmentImpl = new Project();
 
         } else {
-            throw new \DomainException("Unknown assessment type: {$row['ia.id']}");
+            return null;
         }
 
         $assessmentImpl->setId($row['ia.id']);
