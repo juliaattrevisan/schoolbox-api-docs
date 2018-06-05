@@ -46,7 +46,8 @@ var beforeSubmit = function() {
         dueDate = $('input[name="dueDate"]'),
         dueTime = $('input[name="dueTime"]'),
         closeDate = $('input[name="closeDate"]'),
-        closeTime = $('input[name="closeTime"]');
+        closeTime = $('input[name="closeTime"]'),
+        maxMark = $('input[name="maxMark"]');
 
     var openVisible = openDate.is(':visible'),
         closeVisible = closeDate.is(':visible');
@@ -135,5 +136,13 @@ var beforeSubmit = function() {
             });
         }
 
+    }
+
+    if (maxMark.is(':visible')) {
+        maxMark.rules('add', {
+            required: true,
+            number: true,
+            greaterThanZero: true
+        })
     }
 };

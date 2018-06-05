@@ -113,7 +113,10 @@ class Factory
             case MarkType::TYPE_NONE:
                 return new None();
             case MarkType::TYPE_TOTAL:
-                return new TotalMarkFractional($dueWork->getMaxMark());
+                if ($dueWork->getMaxMark() > 0) {
+                    return new TotalMarkFractional($dueWork->getMaxMark());
+                }
+                throw new \UnexpectedValueException("Invalid MaxMark value for Total Mark MarkType: " . $dueWork->getMaxMark());
             case MarkType::TYPE_LETTER:
                 return new LetterGrade($dueWork->getGradeGroup());
             default:
