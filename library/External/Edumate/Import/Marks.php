@@ -26,7 +26,7 @@ class External_Edumate_Import_Marks extends External_Edumate_Connection {
 
 		$query = "
 			SELECT *
-			FROM db2inst1.schoolbox_task_marks
+			FROM DB2INST1.schoolbox_task_marks
 		";
 
 		$statement = $this->getDatabase()->prepare($query);
