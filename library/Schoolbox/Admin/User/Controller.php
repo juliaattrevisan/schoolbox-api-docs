@@ -162,9 +162,23 @@ class Controller extends Base
 
         $serviceMapping = [
             UserAccess::SERVICE_HOMEPAGE => [
+
+                /* The text that appears in the dropdow list
+                 */
                 'name' => '',
+
+                /* The service identifier options to use: campus dropdown, house dropdown, nothing (none)
+                 */
                 'identifier' => '',
+
+                /* Whether this service appears in the Permissions section as something you can choose
+                 * SERVICE_HOMEPAGE is never available, it seems
+                 */
                 'visible' => false,
+
+                /* Access levels that you can choose; some services are Moderate-Only, but this way you can specify
+                 * the available access levels more granularly e.g. write-only, if you ever needed that
+                 */
                 'levels' => [
                     'read' => [
                         'level' => UserAccess::ACCESS_READ,
