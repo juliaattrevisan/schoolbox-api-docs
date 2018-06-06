@@ -1,3 +1,19 @@
+<script type="text/javascript">
+    $(function() {
+        $('#forgottenPassword').alaressValidate({
+            rules: {
+                'email': {
+                    required: true,
+                    minlength: 1
+                }
+            },
+            messages: {
+                'email': "Please enter an email address or username"
+            }
+        });
+    });
+
+</script>
 <div class="row">
     <div class="small-12 island">
         <h1>{{ config.forgotten_password_title }}</h1>
