@@ -14,15 +14,10 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
-use Schoolbox\UserMapper;
 
 
 class Controller extends Base
 {
-    /**
-     * @var UserMapper
-     */
-    private $userMapper;
 
     /**
      * @var ErrorMapper
@@ -38,13 +33,11 @@ class Controller extends Base
      * Controller constructor.
      *
      * @param ErrorMapper      $errorMapper
-     * @param UserMapper       $userMapper
      * @param UserAccessMapper $userAccessMapper
      */
-    public function __construct(ErrorMapper $errorMapper, UserMapper $userMapper, UserAccessMapper $userAccessMapper)
+    public function __construct(ErrorMapper $errorMapper, UserAccessMapper $userAccessMapper)
     {
         $this->errorMapper = $errorMapper;
-        $this->userMapper = $userMapper;
         $this->userAccessMapper = $userAccessMapper;
     }
 

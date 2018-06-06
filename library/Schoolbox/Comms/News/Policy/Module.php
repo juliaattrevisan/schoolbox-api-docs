@@ -17,7 +17,6 @@ use InvalidArgumentException;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Role;
-use Schoolbox\UserMapper;
 
 
 class Module extends BaseModule
@@ -76,7 +75,6 @@ class Module extends BaseModule
         /** @var Container $injector */
         $injector->params[Controller::class] = [
             'errorMapper' => $this->getMapperFactory()->getLazy(\Schoolbox\Error\Mapper::class),
-            'userMapper' => $this->getMapperFactory()->getLazy(UserMapper::class),
             'userAccessMapper' => $this->getMapperFactory()->getLazy(UserAccessMapper::class)
         ];
     }
