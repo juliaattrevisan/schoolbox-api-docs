@@ -60,7 +60,7 @@ class Controller extends Base
      */
     public function getConfig()
     {
-        $commsOfficers = $this->userAccessMapper->findUsersForService(UserAccess::SERVICE_COMMS_OFFICER);
+        $commsOfficers = $this->userAccessMapper->findUsersForService(UserAccess::SERVICE_COMMS_OFFICER)->getUnique('id');
 
         /* TODO: Get current policy settings from db
          */
