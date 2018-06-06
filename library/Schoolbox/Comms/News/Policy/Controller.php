@@ -30,15 +30,22 @@ class Controller extends Base
     private $userAccessMapper;
 
     /**
+     * @var Mapper
+     */
+    private $policyMapper;
+
+    /**
      * Controller constructor.
      *
      * @param ErrorMapper      $errorMapper
      * @param UserAccessMapper $userAccessMapper
+     * @param Mapper           $policyMapper
      */
-    public function __construct(ErrorMapper $errorMapper, UserAccessMapper $userAccessMapper)
+    public function __construct(ErrorMapper $errorMapper, UserAccessMapper $userAccessMapper, Mapper $policyMapper)
     {
         $this->errorMapper = $errorMapper;
         $this->userAccessMapper = $userAccessMapper;
+        $this->policyMapper = $policyMapper;
     }
 
 
@@ -54,7 +61,7 @@ class Controller extends Base
     public function getPolicies()
     {
         $commsOfficers = $this->userAccessMapper->findUsersForService(UserAccess::SERVICE_COMMS_OFFICER)->getUnique('id');
-        $policies = Mapper::getInstance()->findAll();
+        $policies = $this->policyMapper->findAll();
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsPolicy/index.twig', [
             'commsOfficers' => $commsOfficers,
@@ -73,7 +80,7 @@ class Controller extends Base
      */
     public function postPolicies()
     {
-        $policies = Mapper::getInstance()->findAll();
+        $policies = $this->policyMapper->findAll();
 
         foreach ($policies as $policy) {
             if (isset($this->getRequest()->post['policy'][$policy->getIdentifier()])) {
@@ -83,7 +90,7 @@ class Controller extends Base
                 $policy->setValue('');
             }
 
-            Mapper::getInstance()->save($policy);
+            $this->policyMapper->save($policy);
         }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsPolicy/submit.twig', [
