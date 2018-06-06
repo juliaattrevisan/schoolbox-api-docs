@@ -7,7 +7,7 @@
                 {% for policy in policies %}
                 <li class="content">
                     {{ policy.identifier }}
-                    {% if policy.isActive %}
+                    {% if policy.value %}
                         is now active.
                     {% else %}
                         is now inactive.

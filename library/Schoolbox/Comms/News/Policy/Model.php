@@ -13,20 +13,18 @@ class Model
 {
 
     /**
-     * The input element's name attribute
+     * A unique identifier (not the primary key) that identifies this input element
      *
      * @var string
      */
-
     protected $identifier = 'global-moderation';
 
-
     /**
-     * This configuration is on (active)
+     * The value that was set for this policy
      *
-     * @var bool
+     * @var string
      */
-    protected $isActive = false;
+    protected $value = '';
 
     /* Getters/Setters
      */
@@ -42,30 +40,31 @@ class Model
 
     /**
      * @param string $identifier
+     * @return $this
      */
-    public function setIdentifier(string $identifier): void
+    public function setIdentifier(string $identifier)
     {
         $this->identifier = $identifier;
+        return $this;
     }
 
 
     /**
-     * @return bool
+     * @return string
      */
-    public function isActive(): bool
+    public function getValue(): string
     {
-        return $this->isActive;
+        return $this->value;
     }
 
 
     /**
-     * @param bool $isActive
+     * @param string $value
+     * @return $this
      */
-    public function setIsActive(bool $isActive): void
+    public function setValue(string $value)
     {
-        $this->isActive = $isActive;
+        $this->value = $value;
+        return $this;
     }
-
-
-
 }

@@ -93,7 +93,7 @@ class Controller extends Base
 
                 /* TODO: Persist values to db
                  */
-                $existingPolicy->setIsActive($value);
+                $existingPolicy->setValue($value);
             }
         }
 
