@@ -108,6 +108,14 @@ class Notifier extends AbstractModuleNotifier
 
         $pastoral = $this->mapper->findById($model->getId());
 
+        // If this is an update, and the create time = update time, do nothing
+        // instead of raising an update.
+        // (This happens because there's an update which happens directly after
+        //  a create, if pastoral sync is on; a create has already been issued.)
+        if ($method === self::TRIGGER_UPDATED && $model->getCreatedAt()->eq($model->getUpdatedAt())) {
+            return $envelope;
+        }
+
         // Get the kids teachers
 
         $student = $this->userMapper->findById($model->getStudent()->getId());
