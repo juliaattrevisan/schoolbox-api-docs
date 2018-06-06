@@ -667,6 +667,7 @@ class ImportFactory
      *
      * @param string $row
      * @return IAssessable|null
+     * @throws \DomainException if the assessment has no determinable type
      */
     protected function buildAssessmentSpecFromRow($row)
     {
@@ -718,6 +719,7 @@ class ImportFactory
      *
      * @param $row
      * @return IAssessable|null
+     * @throws \DomainException if the assessment has no determinable type
      */
     protected function buildAssessmentImplFromRow($row)
     {
