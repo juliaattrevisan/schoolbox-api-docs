@@ -9,7 +9,7 @@
 
 namespace Schoolbox\Comms\News\Policy;
 
-class Base
+class Model
 {
 
     /**

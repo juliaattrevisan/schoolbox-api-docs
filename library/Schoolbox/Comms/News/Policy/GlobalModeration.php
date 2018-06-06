@@ -8,7 +8,7 @@
  */
 namespace Schoolbox\Comms\News\Policy;
 
-class GlobalModeration extends Base
+class GlobalModeration extends Model
 {
 
     /**
