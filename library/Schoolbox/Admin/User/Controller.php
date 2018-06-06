@@ -297,7 +297,7 @@ class Controller extends Base
         ],
         UserAccess::SERVICE_COMMS_OFFICER => [
             'name' => 'Comms Officer',
-            'identifier' => self::IDENTIFIER_CAMPUS,
+            'identifier' => self::IDENTIFIER_NONE,
             'visible' => true,
             'levels' => [
                 'read' => [
