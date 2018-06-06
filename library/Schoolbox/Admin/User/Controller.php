@@ -97,6 +97,14 @@ class Controller extends Base
     protected $cmsLogMapper;
 
     /**
+     * These identifier consts determine which dropdown to use when choosing the Service Identifier
+     * There are currently three options: campus, residentialHouse, none
+     */
+    private const IDENTIFIER_CAMPUS = 'campus';
+    private const IDENTIFIER_RESIDENTIAL_HOUSE = 'residentialHouse';
+    private const IDENTIFIER_NONE = 'none';
+
+    /**
      * A mapping of services and what can appear in the Permissions section
      *
      * @var array
@@ -137,7 +145,7 @@ class Controller extends Base
         ],
         UserAccess::SERVICE_CALENDAR => [
             'name' => 'Calendar',
-            'identifier' => 'campus',
+            'identifier' => self::IDENTIFIER_CAMPUS,
             'visible' => true,
             'levels' => [
                 'read' => [
@@ -156,7 +164,7 @@ class Controller extends Base
         ],
         UserAccess::SERVICE_NEWS => [
             'name' => 'News',
-            'identifier' => 'campus',
+            'identifier' => self::IDENTIFIER_CAMPUS,
             'visible' => true,
             'levels' => [
                 'read' => [
@@ -175,7 +183,7 @@ class Controller extends Base
         ],
         UserAccess::SERVICE_CMS => [
             'name' => 'CMS',
-            'identifier' => 'none',
+            'identifier' => self::IDENTIFIER_NONE,
             'visible' => true,
             'levels' => [
                 'read' => [
@@ -194,7 +202,7 @@ class Controller extends Base
         ],
         UserAccess::SERVICE_HOUSEMASTER => [
             'name' => 'Housemaster',
-            'identifier' => 'residentialHouse',
+            'identifier' => self::IDENTIFIER_RESIDENTIAL_HOUSE,
             'visible' => true,
             'levels' => [
                 'read' => [
@@ -213,7 +221,7 @@ class Controller extends Base
         ],
         UserAccess::SERVICE_RESOURCE_BOOKING => [
             'name' => 'Resource Booking',
-            'identifier' => 'none',
+            'identifier' => self::IDENTIFIER_NONE,
             'visible' => true,
             'levels' => [
                 'read' => [
@@ -232,7 +240,7 @@ class Controller extends Base
         ],
         UserAccess::SERVICE_CURRICULUM => [
             'name' => 'Curriculum',
-            'identifier' => 'none',
+            'identifier' => self::IDENTIFIER_NONE,
             'visible' => true,
             'levels' => [
                 'read' => [
@@ -251,7 +259,7 @@ class Controller extends Base
         ],
         UserAccess::SERVICE_PASTORAL => [
             'name' => 'Pastoral Moderator',
-            'identifier' => 'none',
+            'identifier' => self::IDENTIFIER_NONE,
             'visible' => true,
             'levels' => [
                 'read' => [
@@ -270,7 +278,7 @@ class Controller extends Base
         ],
         UserAccess::SERVICE_SPORTS_ADMINISTRATOR => [
             'name' => 'Sports Administrator',
-            'identifier' => 'none',
+            'identifier' => self::IDENTIFIER_NONE,
             'visible' => true,
             'levels' => [
                 'read' => [
@@ -289,7 +297,7 @@ class Controller extends Base
         ],
         UserAccess::SERVICE_COMMS_OFFICER => [
             'name' => 'Comms Officer',
-            'identifier' => 'campus',
+            'identifier' => self::IDENTIFIER_CAMPUS,
             'visible' => true,
             'levels' => [
                 'read' => [
