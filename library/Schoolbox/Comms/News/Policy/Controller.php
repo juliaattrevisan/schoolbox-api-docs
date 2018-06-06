@@ -10,7 +10,6 @@ namespace Schoolbox\Comms\News\Policy;
 
 
 use Alaress\Web\Controller\Base;
-use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccess;
@@ -62,11 +61,7 @@ class Controller extends Base
     public function getPolicies()
     {
         $commsOfficers = $this->userAccessMapper->findUsersForService(UserAccess::SERVICE_COMMS_OFFICER)->getUnique('id');
-
-        /* TODO: Get current policy settings from db
-         */
-        $policies = (new Collection())
-            ->add((new Model())->setIdentifier('global_moderation')->setValue(456));
+        $policies = Mapper::getInstance()->findAll();
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsPolicy/index.twig', [
             'commsOfficers' => $commsOfficers,
@@ -78,25 +73,24 @@ class Controller extends Base
     /**
      * Process the form vars
      *
+     * @throws MapperException
      * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
      */
     public function postPolicies()
     {
-        /* TODO: Load existing settings from db
-         */
-        $policies = (new Collection())
-            ->add((new Model())->setIdentifier('global_moderation')->setValue(0));
+        $policies = Mapper::getInstance()->findAll();
 
-        /* Won't be an array if you turned everything off
-         */
-        if (\is_array($this->getRequest()->post['policy'])) {
-            foreach ($this->getRequest()->post['policy'] as $identifier => $value) {
-                $existingPolicy = $policies->getBy('identifier', $identifier);
-
-                /* TODO: Persist values to db
-                 */
-                $existingPolicy->setValue($value);
+        foreach ($policies as $policy) {
+            if (isset($this->getRequest()->post['policy'][$policy->getIdentifier()])) {
+                $policy->setValue($this->getRequest()->post['policy'][$policy->getIdentifier()]);
             }
+            else {
+                $policy->setValue('');
+            }
+
+            Mapper::getInstance()->save($policy);
         }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsPolicy/submit.twig', [
