@@ -50,6 +50,7 @@ class Controller extends Base
         $this->userAccessMapper = $userAccessMapper;
     }
 
+
     /**
      * Provide form
      *
@@ -57,6 +58,7 @@ class Controller extends Base
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \UnexpectedValueException
      */
     public function getConfig()
     {
