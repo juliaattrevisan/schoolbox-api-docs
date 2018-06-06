@@ -9,15 +9,18 @@
 
 namespace Schoolbox\Comms\News\Policy;
 
+use Schoolbox\Mapper\Traits\Model\Id;
+
 class Model
 {
+    use Id;
 
     /**
      * A unique identifier (not the primary key) that identifies this input element
      *
      * @var string
      */
-    protected $identifier = 'global-moderation';
+    protected $identifier = 'global_moderation';
 
     /**
      * The value that was set for this policy
