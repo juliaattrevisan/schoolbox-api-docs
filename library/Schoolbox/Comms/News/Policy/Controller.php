@@ -66,7 +66,7 @@ class Controller extends Base
         /* TODO: Get current policy settings from db
          */
         $policies = (new Collection())
-            ->add(new GlobalModeration());
+            ->add(new Model());
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsPolicy/index.twig', [
             'commsOfficers' => $commsOfficers,
@@ -83,18 +83,17 @@ class Controller extends Base
     public function postPolicies()
     {
         $policies = (new Collection())
-            ->add(new GlobalModeration());
+            ->add(new Model());
 
-        foreach ($this->getRequest()->post as $identifier => $value) {
-            $existingPolicy = $policies->getBy('identifier', $identifier);
+        /* Won't be an array if you turned everything off
+         */
+        if (\is_array($this->getRequest()->post['policy'])) {
+            foreach ($this->getRequest()->post['policy'] as $identifier => $value) {
+                $existingPolicy = $policies->getBy('identifier', $identifier);
 
-            /* TODO: Persist values to db
-             */
-            if ((int)$value) {
-                $existingPolicy->activate();
-            }
-            else {
-                $existingPolicy->deactivate();
+                /* TODO: Persist values to db
+                 */
+                $existingPolicy->setIsActive($value);
             }
         }
 

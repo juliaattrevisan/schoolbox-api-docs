@@ -1,11 +1,11 @@
-<label for="{{ identifier }}">{{ name }}</label>
+<label for="{{ identifier }}">{{ label }}</label>
 
 {% if subtext|length %}
 <p>{{ subtext }}.</p>
 {% endif %}
 
 <div class="switch">
-    <input id="{{ identifier }}" name="{{ identifier }}" type="checkbox" {% if isChecked %}checked{% endif %} value="{{ checkedValue }}">
+    <input id="{{ identifier }}" name="{{ name }}" type="checkbox" {% if isChecked %}checked{% endif %} value="{{ checkedValue }}">
     <label for="{{ identifier }}">
         <span>On</span>
         <span>Off</span>

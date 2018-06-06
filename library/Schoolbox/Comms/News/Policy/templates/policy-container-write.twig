@@ -4,7 +4,8 @@
     <section>
     {% for policy in policies %}
         <fieldset>
-            {% include '@commsNewsPolicy/policies/' ~ policy.template ~ '.twig' with { policy: policy } %}
+            {% set template = policy.identifier|replace({'_': '-'}) %}
+            {% include '@commsNewsPolicy/policies/' ~ template ~ '.twig' with { policy: policy } %}
         </fieldset>
     {% endfor %}
     </section>

@@ -13,26 +13,13 @@ class Model
 {
 
     /**
-     * Policy name
-     *
-     * @var string
-     */
-    protected $name = '';
-
-    /**
      * The input element's name attribute
      *
      * @var string
      */
 
-    protected $identifier = '';
+    protected $identifier = 'global-moderation';
 
-    /**
-     * Config twig file
-     *
-     * @var string
-     */
-    protected $template = 'checkbox';
 
     /**
      * This configuration is on (active)
@@ -41,46 +28,8 @@ class Model
      */
     protected $isActive = false;
 
-    /**
-     * Strings to describe states
-     *
-     * @var array
-     */
-    protected $options = [];
-
-    /**
-     * Activate this policy
-     *
-     * @return $this
-     */
-    public function activate()
-    {
-        $this->isActive = true;
-        return $this;
-    }
-
-    /**
-     * Deactivate this policy
-     *
-     * @return $this
-     */
-    public function deactivate()
-    {
-        $this->isActive = false;
-        return $this;
-    }
-
     /* Getters/Setters
      */
-
-    /**
-     * @return string
-     */
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
 
     /**
      * @return string
@@ -88,6 +37,15 @@ class Model
     public function getIdentifier(): string
     {
         return $this->identifier;
+    }
+
+
+    /**
+     * @param string $identifier
+     */
+    public function setIdentifier(string $identifier): void
+    {
+        $this->identifier = $identifier;
     }
 
 
@@ -101,19 +59,13 @@ class Model
 
 
     /**
-     * @return array
+     * @param bool $isActive
      */
-    public function getOptions(): array
+    public function setIsActive(bool $isActive): void
     {
-        return $this->options;
+        $this->isActive = $isActive;
     }
 
 
-    /**
-     * @return string
-     */
-    public function getTemplate(): string
-    {
-        return $this->template;
-    }
+
 }
