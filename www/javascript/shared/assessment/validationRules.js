@@ -26,7 +26,7 @@ var validateOptions = {
         dueTime: {
             required: true,
             timepickerTime: true
-        },
+        }
     },
     messages: {
         weight: 'The ' + scriptValidationRules.attr('data-locale-grading-proper') + ' weight should zero or greater'
@@ -138,11 +138,27 @@ var beforeSubmit = function() {
 
     }
 
+    // Max mark validation: only when the field is visible
     if (maxMark.is(':visible')) {
+
+        // The message is a little different when rubrics are in use,
+        // because the solution is a little different.
+        var messageCallback = function() {
+            if ($('input[name="useRubric"]').is(':checked')) {
+                return 'If using Total Mark with rubrics, at least one descriptor must have a points value greater than zero.'
+            }
+            return 'This field must be a number greater than zero.';
+        };
+
         maxMark.rules('add', {
             required: true,
             number: true,
-            greaterThanZero: true
+            greaterThanZero: true,
+            messages: {
+                required: messageCallback,
+                number: messageCallback,
+                greaterThanZero: messageCallback
+            }
         })
     }
 };

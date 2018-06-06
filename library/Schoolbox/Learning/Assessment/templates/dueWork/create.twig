@@ -199,6 +199,8 @@
                 calculateGridTotal();
             } else {
                 enableMaxMark();
+                // Need to validate the max mark
+                $maxMarkInput.valid();
             }
         }
 
@@ -263,8 +265,8 @@
 
         max = parseFloat(max.toFixed(2));
 
-        $('#maxMark').val(max);
-        $('#maxMark').valid();
+        // Set and validate the max mark
+        $('#maxMark').val(max).valid();
     }
 
 </script>
