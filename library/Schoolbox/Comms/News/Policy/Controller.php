@@ -71,10 +71,10 @@ class Controller extends Base
 
 
     /**
-     * Process the form vars
+     * Save policy settings
      *
      * @throws MapperException
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Aura\Router\Exception\RouteNotFound
      * @throws \PDOException
      * @throws \UnexpectedValueException
      */
@@ -93,8 +93,6 @@ class Controller extends Base
             $this->policyMapper->save($policy);
         }
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsPolicy/submit.twig', [
-            'policies' => $policies
-        ])->setTitle('Update Comms Policies'));
+        $this->getResponse()->redirect->afterPost($this->getRouter()->generate('commsNewsPolicy.getPolicies'));
     }
 }
