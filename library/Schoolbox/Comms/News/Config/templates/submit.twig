@@ -16,7 +16,7 @@
                 {% endfor %}
             </ul>
 
-            {% set formRoute = routeLookupIfAuthorized('commsConfig.getConfig', {id: user.id}) %}
+            {% set formRoute = routeLookupIfAuthorized('commsNewsConfig.getConfig', {id: user.id}) %}
 
             {% if formRoute %}
                 <div class="content">

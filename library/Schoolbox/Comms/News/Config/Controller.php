@@ -6,12 +6,12 @@
  * @copyright   Copyright 2017, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
-namespace Schoolbox\Comms\Config;
+namespace Schoolbox\Comms\News\Config;
 
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Collection;
-use Schoolbox\Comms\Config\Policy\GlobalModeration;
+use Schoolbox\Comms\News\Config\Policy\GlobalModeration;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccess;
@@ -69,7 +69,7 @@ class Controller extends Base
         $policies = (new Collection())
             ->add(new GlobalModeration());
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@commsConfig/index.twig', [
+        $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsConfig/index.twig', [
             'commsOfficers' => $commsOfficers,
             'policies' => $policies
         ])->setTitle('Comms Configuration'));
@@ -99,7 +99,7 @@ class Controller extends Base
             }
         }
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@commsConfig/submit.twig', [
+        $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsConfig/submit.twig', [
             'policies' => $policies
         ])->setTitle('Update Comms settings'));
     }

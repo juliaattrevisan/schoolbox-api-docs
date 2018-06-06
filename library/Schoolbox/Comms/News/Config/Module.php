@@ -6,7 +6,7 @@
  * @copyright   Copyright 2017, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
-namespace Schoolbox\Comms\Config;
+namespace Schoolbox\Comms\News\Config;
 
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
@@ -25,7 +25,7 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    protected $basename = 'commsConfig';
+    protected $basename = 'commsNewsConfig';
 
 
     /**

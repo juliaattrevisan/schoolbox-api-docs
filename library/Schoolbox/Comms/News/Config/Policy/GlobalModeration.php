@@ -6,7 +6,7 @@
  * @copyright   Copyright 2018, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
-namespace Schoolbox\Comms\Config\Policy;
+namespace Schoolbox\Comms\News\Config\Policy;
 
 class GlobalModeration extends Base
 {
