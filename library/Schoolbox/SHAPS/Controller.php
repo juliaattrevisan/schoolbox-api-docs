@@ -9,6 +9,9 @@
 namespace Schoolbox\SHAPS;
 
 use Alaress\Web\Controller\Base;
+use Alaress_Date_Format;
+use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\TransferException;
 use Schoolbox\IConfigLoader;
 use Schoolbox\UserMapper;
 use Schoolbox\Collection;
@@ -300,6 +303,9 @@ class Controller extends Base
             }
         }
 
+        $code    = 400;
+        $message = 'Bad Request';
+        $data    = [];
         if (!empty($userPayload)) {
             // Send each user to Help
 
@@ -308,29 +314,52 @@ class Controller extends Base
             $auth = $this->getAuthDetails();
 
             // CSRF defeating:
-            // set HTTP_ORIGIN and HTTP_HOST to this school's URL
+            // set HTTP_ORIGIN and HTTP_HOST to the Help host
             // This endpoint calls `\Custom\Help\CourseParticipation\Controller::postUserRegistrations`
             // on host `config.schoolbox_help_url`.
-            $response = $client->post(
-                "{$auth['url']}/api/course-participation/{$auth['schoolCode']}/users",
-                [
-                    'query' => [
-                        'ts'     => $auth['timestamp'],
-                        'digest' => $auth['digest']
-                    ],
-                    'form_params' => ['user' => $userPayload],
-                    'headers'     => [
-                        'Host'   => $auth['host'],
-                        'Origin' => $auth['host'],
-                    ],
-                ]
-            );
+            try {
+                $client->post(
+                    "{$auth['url']}/api/course-participation/{$auth['schoolCode']}/users",
+                    [
+                        'query' => [
+                            'ts'     => $auth['timestamp'],
+                            'digest' => $auth['digest']
+                        ],
+                        'form_params' => ['user' => $userPayload],
+                        'headers'     => [
+                            'Host'   => $auth['host'],
+                            'Origin' => $auth['host'],
+                        ],
+                    ]
+                );
+                $code    = 200;
+                $message = 'OK';
 
-            // Do something with this?
-//            return json_decode($response->getBody()->getContents(), true);
+            } catch (ClientException $e) {
+                // 400: empty payload (should never get this) or some users failed
+                $code    = 400;
+                $message = 'Bad Request';
+                if ($e->getResponse()) {
+                    $data = json_decode($e->getResponse()->getBody()->getContents());
+                }
+
+            } catch (TransferException $e) {
+                // any other exception
+                $code    = 500;
+                $message = 'Internal Server Error';
+            }
         }
 
-        // Once done: send back to list
-        $this->response->redirect->afterPost($this->router->generate('shaps.getAll'));
+        // Build response
+        $this->response->status->set($code);
+        $this->response->content->set(
+            $this->buildJsonOutput([
+                'data'   => $data,
+                'status' => [
+                    'code'    => $code,
+                    'message' => $message,
+                ],
+            ])
+        );
     }
 }
