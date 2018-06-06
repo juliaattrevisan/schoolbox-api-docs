@@ -645,11 +645,11 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
         foreach ($this as $item) {
             $value = $item->$getterMethod();
 
-            if (is_object($value)) {
+            if (\is_object($value)) {
                 throw new \UnexpectedValueException('Cannot compare objects');
             }
 
-            if (!in_array($value, $found)) {
+            if (!\in_array($value, $found, false)) {
                 $results->add($item);
                 $found[] = $value;
             }
