@@ -1,17 +1,17 @@
-{% set policy = {
+{% set specification = {
     'title': 'Global Moderation',
     'subtext': 'Enable to require moderation on every article before they are made publicly available',
     'active': '<strong>Global moderation is on</strong>. Every article requires moderator approval',
     'inactive': '<strong>Global moderation is off</strong>. You can freely post articles',
-    'identifier': 'global-moderation',
-    'value': false
+    'identifier': policy.identifier,
+    'value': policy.value
 } %}
 
 {% include 'sub/switch.twig' with {
-    label: policy.title,
-    name: 'policy[' ~ policy.identifier ~ ']',
-    identifier: policy.identifier,
-    subtext: policy.subtext,
-    isChecked: policy.value,
+    label: specification.title,
+    name: 'policy[' ~ specification.identifier ~ ']',
+    identifier: specification.identifier,
+    subtext: specification.subtext,
+    isChecked: specification.value,
     checkedValue: 1
 } %}

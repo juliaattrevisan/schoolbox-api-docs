@@ -66,7 +66,7 @@ class Controller extends Base
         /* TODO: Get current policy settings from db
          */
         $policies = (new Collection())
-            ->add(new Model());
+            ->add((new Model())->setIdentifier('global-moderation')->setValue(0));
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsPolicy/index.twig', [
             'commsOfficers' => $commsOfficers,
@@ -82,8 +82,10 @@ class Controller extends Base
      */
     public function postPolicies()
     {
+        /* TODO: Load existing settings from db
+         */
         $policies = (new Collection())
-            ->add(new Model());
+            ->add((new Model())->setIdentifier('global-moderation')->setValue(0));
 
         /* Won't be an array if you turned everything off
          */
