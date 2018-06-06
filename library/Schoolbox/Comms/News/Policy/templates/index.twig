@@ -14,11 +14,10 @@
 <div class="row">
     <div class="small-12 island">
         <h2 class="subheader">Comms Policy Settings</h2>
-            {% if USER.isSuperuser %}
-                {% include '@commsNewsPolicy/policy-container-write.twig' with { policies: policies } %}
-            {% else %}
-                {% include '@commsNewsPolicy/policy-container-read.twig' with { policies: policies } %}
-            {% endif %}
+        {% include '@commsNewsPolicy/policy-container.twig' with {
+            policies: policies,
+            configurable: USER.isSuperuser
+        } %}
         </section>
     </div>
 </div>
