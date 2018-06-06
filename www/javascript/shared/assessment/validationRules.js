@@ -26,7 +26,7 @@ var validateOptions = {
         dueTime: {
             required: true,
             timepickerTime: true
-        },
+        }
     },
     messages: {
         weight: 'The ' + scriptValidationRules.attr('data-locale-grading-proper') + ' weight should zero or greater'
@@ -145,7 +145,7 @@ var beforeSubmit = function() {
         // because the solution is a little different.
         var messageCallback = function() {
             if ($('input[name="useRubric"]').is(':checked')) {
-                return 'At least one descriptor must have a points value greater than zero.'
+                return 'If using Total Mark with rubrics, at least one descriptor must have a points value greater than zero.'
             }
             return 'This field must be a number greater than zero.';
         };
