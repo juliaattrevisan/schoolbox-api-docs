@@ -6,7 +6,7 @@
  * @copyright   Copyright 2017, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
-namespace Schoolbox\Comms\News\Config;
+namespace Schoolbox\Comms\News\Policy;
 
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
@@ -25,7 +25,7 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    protected $basename = 'commsNewsConfig';
+    protected $basename = 'commsNewsPolicy';
 
 
     /**
@@ -56,8 +56,8 @@ class Module extends BaseModule
             )
         );
 
-        $this->register('GET', '', 'getConfig', $getPerms, null);
-        $this->register('POST', '', 'postConfig', $postPerms, null);
+        $this->register('GET', '', 'getPolicies', $getPerms, null);
+        $this->register('POST', '', 'postPolicies', $postPerms, null);
     }
 
 

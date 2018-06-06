@@ -6,12 +6,11 @@
  * @copyright   Copyright 2017, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
-namespace Schoolbox\Comms\News\Config;
+namespace Schoolbox\Comms\News\Policy;
 
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Collection;
-use Schoolbox\Comms\News\Config\Policy\GlobalModeration;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccess;
@@ -60,7 +59,7 @@ class Controller extends Base
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \UnexpectedValueException
      */
-    public function getConfig()
+    public function getPolicies()
     {
         $commsOfficers = $this->userAccessMapper->findUsersForService(UserAccess::SERVICE_COMMS_OFFICER)->getUnique('id');
 
@@ -69,10 +68,10 @@ class Controller extends Base
         $policies = (new Collection())
             ->add(new GlobalModeration());
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsConfig/index.twig', [
+        $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsPolicy/index.twig', [
             'commsOfficers' => $commsOfficers,
             'policies' => $policies
-        ])->setTitle('Comms Configuration'));
+        ])->setTitle('Comms Policies'));
     }
 
 
@@ -81,7 +80,7 @@ class Controller extends Base
      *
      * @throws \Aura\Di\Exception\ServiceNotFound
      */
-    public function postConfig()
+    public function postPolicies()
     {
         $policies = (new Collection())
             ->add(new GlobalModeration());
@@ -99,8 +98,8 @@ class Controller extends Base
             }
         }
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsConfig/submit.twig', [
+        $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsPolicy/submit.twig', [
             'policies' => $policies
-        ])->setTitle('Update Comms settings'));
+        ])->setTitle('Update Comms Policies'));
     }
 }

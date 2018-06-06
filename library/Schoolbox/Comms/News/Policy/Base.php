@@ -7,7 +7,7 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Comms\News\Config\Policy;
+namespace Schoolbox\Comms\News\Policy;
 
 class Base
 {

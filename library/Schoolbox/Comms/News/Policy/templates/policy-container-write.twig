@@ -1,10 +1,10 @@
-{% set formRoute = routeLookupIfAuthorized('commsNewsConfig.postConfig') %}
+{% set formRoute = routeLookupIfAuthorized('commsNewsPolicy.postPolicies') %}
 
 <form action="{{ formRoute }}" method="post">
     <section>
     {% for policy in policies %}
         <fieldset>
-            {% include '@commsNewsConfig/policies/' ~ policy.template ~ '.twig' with { policy: policy } %}
+            {% include '@commsNewsPolicy/policies/' ~ policy.template ~ '.twig' with { policy: policy } %}
         </fieldset>
     {% endfor %}
     </section>
