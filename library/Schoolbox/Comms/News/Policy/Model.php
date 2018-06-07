@@ -27,7 +27,7 @@ class Model
      *
      * @var string
      */
-    private $value = '';
+    private $value;
 
     /* Getters/Setters
      */
