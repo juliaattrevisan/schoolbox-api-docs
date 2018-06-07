@@ -45,7 +45,7 @@ class Model
      * @param string $identifier
      * @return $this
      */
-    public function setIdentifier(string $identifier)
+    public function setIdentifier(string $identifier): self
     {
         $this->identifier = $identifier;
         return $this;
@@ -65,7 +65,7 @@ class Model
      * @param string $value
      * @return $this
      */
-    public function setValue(string $value)
+    public function setValue(string $value): self
     {
         $this->value = $value;
         return $this;
