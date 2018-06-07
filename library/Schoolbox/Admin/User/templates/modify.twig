@@ -219,21 +219,6 @@
                         </div>
                     </li>
 
-                    {% set options = [
-                        {
-                            value: accessLevel.read,
-                            label: 'Read'
-                        },
-                        {
-                            value: accessLevel.write,
-                            label: 'Write'
-                        },
-                        {
-                            value: accessLevel.moderate,
-                            label: 'Group Admin'
-                        },
-                    ] %}
-
                     {# Show all groups the user is a member of #}
                     {% for folder in userGroups %}
                         <li class="actions-small-1" data-group>
@@ -245,20 +230,11 @@
                                     <form action="{{ routeLookup('adminUser.postUpdateGroup', {userId: user.id, folderId: folder.id}) }}" method="post">
                                         {% set perm = userGroupPermissions[folder.id].accessLevel %}
 
-                                        {% include 'sub/select.twig' with {
-                                            selectData: {
-                                                'data-folder': folder.id,
-                                                'data-autosubmit-group': '',
-                                                'title': 'Access'
-                                            },
-                                            name: 'type',
-                                            options: options,
-                                            preselected: perm,
-                                            pairs: {
-                                                value: 'value',
-                                                label: 'label'
-                                            }
-                                        } %}
+                                        <select name="type" data-autosubmit-group data-folder="{{ folder.id }}" title="Access">
+                                            <option value="{{ accessLevel.read }}" {% if perm == accessLevel.read %}selected{% endif %}>Read</option>
+                                            <option value="{{ accessLevel.write }}" {% if perm == accessLevel.write %}selected{% endif %}>Write</option>
+                                            <option value="{{ accessLevel.moderate }}" {% if perm == accessLevel.moderate %}selected{% endif %}>Group Admin</option>
+                                        </select>
                                     </form>
                                 </div>
                             </div>
@@ -279,19 +255,11 @@
                                 </select>
                             </div>
                             <div class="card small-5 end">
-                                {% include 'sub/select.twig' with {
-                                    selectData: {
-                                        'form': 'groupAdd',
-                                        'required': '',
-                                        'title': 'Access'
-                                    },
-                                    name: 'type',
-                                    options: options,
-                                    pairs: {
-                                        value: 'value',
-                                        label: 'label'
-                                    }
-                                } %}
+                                <select required name="type" form="groupAdd" title="Access">
+                                    <option value="{{ accessLevel.read }}">Read</option>
+                                    <option value="{{ accessLevel.write }}">Write</option>
+                                    <option value="{{ accessLevel.moderate }}">Group Admin</option>
+                                </select>
                             </div>
                             <div class="card small-12">
                                 <p><input type="submit" value="Add"/></p>
