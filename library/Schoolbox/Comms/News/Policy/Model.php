@@ -20,14 +20,14 @@ class Model
      *
      * @var string
      */
-    protected $identifier = 'global_moderation';
+    private $identifier;
 
     /**
      * The value that was set for this policy
      *
      * @var string
      */
-    protected $value = '';
+    private $value = '';
 
     /* Getters/Setters
      */
