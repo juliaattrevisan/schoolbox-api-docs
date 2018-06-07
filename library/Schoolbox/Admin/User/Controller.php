@@ -291,7 +291,7 @@ class Controller extends Base
         $moderateOnly = [];
 
         foreach (self::SERVICE_MAPPING as $service => $data) {
-            if ($data['levels']['moderate']['available'] && !$data['levels']['write']['available'] && !$data['levels']['read']['available']) {
+            if ($data['availability']['moderate'] && !$data['availability']['write'] && !$data['availability']['read']) {
                 $moderateOnly[] = $service;
             }
         }
