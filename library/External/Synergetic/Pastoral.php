@@ -555,7 +555,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                     $this->connector->executeQuery($query, [
                         'externalId' => $pastoral->getExternalId(),
                         'order' => $order++,
-                        'email' => $user->getEmail(),
+                        'email' => $user->getEmail() ? $user->getEmail() : '',
                         'userId' => $user->getExternalId(),
                     ]);
 
