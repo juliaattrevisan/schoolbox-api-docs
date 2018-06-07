@@ -21,8 +21,8 @@
         {% block page_specific_content %}
         {% endblock %}
 
-        <div id="statusForm" {% if allUsers | length == 0 %}class="hide"{% endif %}>
-            <form action="{{ routeLookup('shaps.postProvision') }}" method="post">
+        <div {% if allUsers | length == 0 %}class="hide"{% endif %}>
+            <form id="statusForm" action="{{ routeLookup('shaps.postProvision') }}" method="post">
                 <section id="statusTable">
                     <table>
                         <tr>
@@ -39,14 +39,18 @@
                         </tr>
 
                         {% for user in allUsers %}
-                            {% if provisionedUsers[user.id] %}
-                                <tr>
-                                <td><i class="icon-course-outline" title="Provisioned"></i></td>
-                            {% else %}
+                            {% if user.id not in provisionedUserIds %}
                                 <tr class="highlight-warning">
-                                <td>Not Provisioned</td>
+                            {% else %}
+                                <tr>
                             {% endif %}
-
+                            <td>
+                                {% if user.id in provisionedUserIds %}
+                                    <span data-provision-status class="icon-course-outline" title="Provisioned"></span>
+                                {% else %}
+                                    <span data-provision-status>Not Provisioned</span>
+                                {% endif %}
+                            </td>
                             <td>
                                 {{ user.fullname }}
                             </td>
@@ -87,9 +91,43 @@
 
 <script type="text/javascript" src="/javascript/shared/select-all/jquery.select-all.js"></script>
 <script>
-    $("#statusForm").selectAll({
+    var form = $("#statusForm"),
+        markAsProvisioned = function ($tableRow) {
+            var $checkbox = $tableRow.find(':checkbox');
+            if ($checkbox.is(':checked')) {
+                $checkbox.prop('checked', false).prop('disabled', true);
+                $tableRow.removeClass('highlight-warning');
+                $tableRow.find('[data-provision-status]').text('').addClass('icon-course-outline');
+            }
+        };
+
+    form.selectAll({
         selector: "#select-all",
         checkboxes: "[data-checkbox]",
         observerParent: "tbody"
+    });
+
+    form.on('submit', function(event) {
+        event.preventDefault();
+
+        var $toast     = $('#toast'),
+            ajaxParams = {
+                method: form.attr('method'),
+                data:   form.serializeArray()
+            };
+
+        $toast.toastActivate({text: 'Provisioning users...'});
+        $.ajax(form.attr('action'), ajaxParams)
+            .done(function() {
+                // Reload page, or change DOM now
+                $toast.toastTimeout({text: 'Provisioned!'});
+                form.find('#statusTable tr').each(function() {
+                    markAsProvisioned($(this));
+                })
+            })
+            .fail(function() {
+                // Maybe the response has more information on what failed?
+                $toast.toastTimeout({text: 'Provision failed!', css: 'alert'});
+            })
     });
 </script>
