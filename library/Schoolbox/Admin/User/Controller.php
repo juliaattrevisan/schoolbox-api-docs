@@ -373,7 +373,7 @@ class Controller extends Base
         $noMiddleDropdown = [];
 
         foreach (self::SERVICE_MAPPING as $service => $data) {
-            if ($data['identifier'] === 'none') {
+            if ($data['identifier'] === self::IDENTIFIER_NONE) {
                 $noMiddleDropdown[] = $service;
             }
         }
