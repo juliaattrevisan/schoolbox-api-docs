@@ -135,163 +135,82 @@ class Controller extends Base
             /* Access levels that you can choose; some services are Moderate-Only, but this way you can specify
              * the available access levels more granularly e.g. write-only, if you ever needed that
              */
-            'levels' => [
-                'read' => [
-                    'level' => UserAccess::ACCESS_READ,
-                    'available' => true,
-                ],
-                'write' => [
-                    'level' => UserAccess::ACCESS_WRITE,
-                    'available' => true,
-                ],
-                'moderate' => [
-                    'level' => UserAccess::ACCESS_FULL,
-                    'available' => true,
-                ],
+            'availability' => [
+                'read' => true,
+                'write' => true,
+                'moderate' => true
             ]
         ],
         UserAccess::SERVICE_NEWS => [
             'name' => 'News',
             'identifier' => self::IDENTIFIER_CAMPUS,
-            'levels' => [
-                'read' => [
-                    'level' => UserAccess::ACCESS_READ,
-                    'available' => true,
-                ],
-                'write' => [
-                    'level' => UserAccess::ACCESS_WRITE,
-                    'available' => true,
-                ],
-                'moderate' => [
-                    'level' => UserAccess::ACCESS_FULL,
-                    'available' => true,
-                ],
+            'availability' => [
+                'read' => true,
+                'write' => true,
+                'moderate' => true
             ]
         ],
         UserAccess::SERVICE_CMS => [
             'name' => 'CMS',
             'identifier' => self::IDENTIFIER_NONE,
-            'levels' => [
-                'read' => [
-                    'level' => UserAccess::ACCESS_READ,
-                    'available' => true,
-                ],
-                'write' => [
-                    'level' => UserAccess::ACCESS_WRITE,
-                    'available' => true,
-                ],
-                'moderate' => [
-                    'level' => UserAccess::ACCESS_FULL,
-                    'available' => true,
-                ],
+            'availability' => [
+                'read' => true,
+                'write' => true,
+                'moderate' => true
             ]
         ],
         UserAccess::SERVICE_HOUSEMASTER => [
             'name' => 'Housemaster',
             'identifier' => self::IDENTIFIER_RESIDENTIAL_HOUSE,
-            'levels' => [
-                'read' => [
-                    'level' => UserAccess::ACCESS_READ,
-                    'available' => true,
-                ],
-                'write' => [
-                    'level' => UserAccess::ACCESS_WRITE,
-                    'available' => true,
-                ],
-                'moderate' => [
-                    'level' => UserAccess::ACCESS_FULL,
-                    'available' => true,
-                ],
+            'availability' => [
+                'read' => true,
+                'write' => true,
+                'moderate' => true
             ]
         ],
         UserAccess::SERVICE_RESOURCE_BOOKING => [
             'name' => 'Resource Booking',
             'identifier' => self::IDENTIFIER_NONE,
-            'levels' => [
-                'read' => [
-                    'level' => UserAccess::ACCESS_READ,
-                    'available' => false,
-                ],
-                'write' => [
-                    'level' => UserAccess::ACCESS_WRITE,
-                    'available' => false,
-                ],
-                'moderate' => [
-                    'level' => UserAccess::ACCESS_FULL,
-                    'available' => true,
-                ],
+            'availability' => [
+                'read' => false,
+                'write' => false,
+                'moderate' => true
             ]
         ],
         UserAccess::SERVICE_CURRICULUM => [
             'name' => 'Curriculum',
             'identifier' => self::IDENTIFIER_NONE,
-            'levels' => [
-                'read' => [
-                    'level' => UserAccess::ACCESS_READ,
-                    'available' => true,
-                ],
-                'write' => [
-                    'level' => UserAccess::ACCESS_WRITE,
-                    'available' => true,
-                ],
-                'moderate' => [
-                    'level' => UserAccess::ACCESS_FULL,
-                    'available' => true,
-                ],
+            'availability' => [
+                'read' => true,
+                'write' => true,
+                'moderate' => true
             ]
         ],
         UserAccess::SERVICE_PASTORAL => [
             'name' => 'Pastoral Moderator',
             'identifier' => self::IDENTIFIER_NONE,
-            'levels' => [
-                'read' => [
-                    'level' => UserAccess::ACCESS_READ,
-                    'available' => true,
-                ],
-                'write' => [
-                    'level' => UserAccess::ACCESS_WRITE,
-                    'available' => true,
-                ],
-                'moderate' => [
-                    'level' => UserAccess::ACCESS_FULL,
-                    'available' => true,
-                ],
+            'availability' => [
+                'read' => true,
+                'write' => true,
+                'moderate' => true
             ]
         ],
         UserAccess::SERVICE_SPORTS_ADMINISTRATOR => [
             'name' => 'Sports Administrator',
             'identifier' => self::IDENTIFIER_NONE,
-            'levels' => [
-                'read' => [
-                    'level' => UserAccess::ACCESS_READ,
-                    'available' => false,
-                ],
-                'write' => [
-                    'level' => UserAccess::ACCESS_WRITE,
-                    'available' => false,
-                ],
-                'moderate' => [
-                    'level' => UserAccess::ACCESS_FULL,
-                    'available' => true,
-                ],
+            'availability' => [
+                'read' => false,
+                'write' => false,
+                'moderate' => true
             ]
         ],
         UserAccess::SERVICE_COMMS_OFFICER => [
             'name' => 'Comms Officer',
             'identifier' => self::IDENTIFIER_NONE,
-            'levels' => [
-                'read' => [
-                    'level' => UserAccess::ACCESS_READ,
-                    'available' => false,
-                ],
-                'write' => [
-                    'level' => UserAccess::ACCESS_WRITE,
-                    'available' => false,
-                ],
-                'moderate' => [
-                    'level' => UserAccess::ACCESS_FULL,
-                    'available' => true,
-                ],
+            'availability' => [
+                'read' => false,
+                'write' => false,
+                'moderate' => true
             ]
         ],
     ];

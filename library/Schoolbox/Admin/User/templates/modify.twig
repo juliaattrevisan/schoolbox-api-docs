@@ -312,10 +312,11 @@
                                         <input type="hidden" name="sid" value="{{ permission.serviceIdentifier }}"/>
                                         <input type="hidden" name="service" value="{{ permission.service }}"/>
                                         <input type="hidden" name="updateServices" value="1"/>
+
                                         <select name="type" data-autosubmit-service data-service="{{ permission.service }}" data-sid="{{ permission.serviceIdentifier }}">
-                                            {% for key, data in serviceMapping[permission.service].levels %}
-                                                {% if data.available %}
-                                                    <option value="{{ data.level }}" {% if permission.accessLevel == data.level %}selected{% endif %}>{{ key|capitalize }}</option>
+                                            {% for level, available in serviceMapping[permission.service].availability %}
+                                                {% if available %}
+                                                    <option value="{{ accessLevel[level] }}" {% if permission.accessLevel == accessLevel[level] %}selected{% endif %}>{{ level|capitalize }}</option>
                                                 {% endif %}
                                             {% endfor %}
                                         </select>
