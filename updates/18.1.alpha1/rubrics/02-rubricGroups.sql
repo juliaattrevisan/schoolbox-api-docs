@@ -11,6 +11,5 @@ CREATE TABLE `rubric_group` (
     `deleted_at` datetime DEFAULT NULL,
     PRIMARY KEY (`id`),
     KEY `deleted` (`deleted_at`),
-    KEY `parent_id` (`parent_id`,`parent_type`),
-    UNIQUE KEY (`name`, `parent_id`,`parent_type`)
+    KEY `parent_id` (`parent_id`,`parent_type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
