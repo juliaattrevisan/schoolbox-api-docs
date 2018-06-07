@@ -56,6 +56,7 @@ class ImportFactory
      *
      * @param UnitImplementation[]|GenericCollection $unitImpls Each UnitImpl links to a UnitSpec to get Assessments for
      * @return DataTransferObject
+     * @throws InvalidDataStateException If broken data encountered
      */
     public function buildForNewImport(GenericCollection $unitImpls)
     {
@@ -129,6 +130,7 @@ class ImportFactory
                 $unitSpecCache[$unitSpecId]->setFolder($folder);
             }
 
+            // It's quite valid for this to return NULL. This will occur if there are no assessments in the unit-spec.
             $assessmentSpec = $this->buildAssessmentSpecFromRow($row);
 
             if ($assessmentSpec instanceof IAssessable) {
@@ -144,7 +146,6 @@ class ImportFactory
     }
 
 
-
     /**
      * Called during a modification of prior import
      *
@@ -153,6 +154,7 @@ class ImportFactory
      *
      * @param UnitImplementation[]|GenericCollection $unitImpls
      * @return DataTransferObject
+     * @throws InvalidDataStateException If broken course data detected
      */
     public function buildForImportModify(GenericCollection $unitImpls)
     {
@@ -338,10 +340,10 @@ class ImportFactory
                 $unitSpecCache[$unitSpecId]->setFolder($folder);
             }
 
-            // Create AssessmentSpec (if one exists)
+            // Create AssessmentSpec (if one exists). This may be valid null. This will occur, eg, if assessment was created in class.
             $assessmentSpec = $this->buildAssessmentSpecFromRow($row);
 
-            // Create corresponding AssessmentImpl (if one exists)
+            // Create corresponding AssessmentImpl (if one exists). This may be valid null, eg if assessment has not been imported.
             $assessmentImpl = $this->buildAssessmentImplFromRow($row);
 
             if($assessmentSpec instanceof IAssessable && $assessmentImpl instanceof IAssessable){
@@ -354,6 +356,9 @@ class ImportFactory
                 }
             } else if ($assessmentImpl instanceof IAssessable){
                 $assessmentImpls->getOffset($unitSpecId)->setOffset($assessmentImpl->getId(), $assessmentImpl);
+            } else {
+                // If unable to build a pair, spec-only, or impl-only, something has gone wrong!
+                throw new InvalidDataStateException("Unable to build any assessments. spec.id: {$row['sa.id']}, impl.id: {$row['ia.id']}");
             }
         }
 
@@ -365,14 +370,16 @@ class ImportFactory
         return $dto;
     }
 
+
     /**
      * Load all Assessments inside Project Specs
      *
      * Normally we are un-interested in deleted specs. The exception is when we are adding as part of a pair.
      *
-     * @param GenericCollection|GenericCollection[] $assessmentSpecs   - Sets of AssessmentSpecs, indexed by UnitSpec.id
-     * @param int[] $assessmentImplToSpecMap
+     * @param GenericCollection|GenericCollection[] $assessmentSpecs - Sets of AssessmentSpecs, indexed by UnitSpec.id
+     * @param int[]                                 $assessmentImplToSpecMap
      * @return GenericCollection
+     * @throws InvalidDataStateException If broken course data encountered
      */
     protected function loadProjectSpecAssessables(GenericCollection $assessmentSpecs, array $assessmentImplToSpecMap)
     {
@@ -425,25 +432,29 @@ class ImportFactory
 
             // Only add deleted specs if they are linked to from a current Impl
             if(is_null($deletedAt) || array_key_exists($assessmentId, $specToImplMap)){
+                // This call should never return NULL - see above SQL query
                 $assessmentSpec = $this->buildAssessmentSpecFromRow($row);
-                if ($assessmentSpec instanceof IAssessable) {
-                    /** @var Project $projectSpec */
-                    $projectSpec = $projectSpecs->getOffset($projectAssessmentId);
-                    $projectSpec->getAssessables()->setOffset($assessmentSpec->getId(), $assessmentSpec);
-                    $assessmentSpec->setContext($projectSpec);
+                if (!$assessmentSpec instanceof IAssessable) {
+                    throw new InvalidDataStateException("Unable to build spec assessment. id: {$row['sa.id']}");
                 }
+                /** @var Project $projectSpec */
+                $projectSpec = $projectSpecs->getOffset($projectAssessmentId);
+                $projectSpec->getAssessables()->setOffset($assessmentSpec->getId(), $assessmentSpec);
+                $assessmentSpec->setContext($projectSpec);
             }
         }
 
         return $assessmentSpecs;
     }
 
+
     /**
      * Load all Assessments inside Project Impls, and links the AssessmentImpls to AssessmentSpecs
      *
-     * @param GenericCollection $assessmentImpls   - Sets of AssessmentImpls, indexed by UnitSpec.id
-     * @param int[] $assessmentImplToSpecMap
+     * @param GenericCollection $assessmentImpls - Sets of AssessmentImpls, indexed by UnitSpec.id
+     * @param int[]             $assessmentImplToSpecMap
      * @return GenericCollection
+     * @throws InvalidDataStateException If broken course data encountered
      */
     protected function loadProjectImplAssessables(GenericCollection $assessmentImpls, array $assessmentImplToSpecMap)
     {
@@ -499,9 +510,10 @@ class ImportFactory
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             // Add AssessmentImpl to ProjectImpl
             $projectAssessmentId = $row['p.assessment_id'];
+            // This call should never return NULL - see SQL query above
             $assessmentImpl = $this->buildAssessmentImplFromRow($row);
             if (!$assessmentImpl instanceof IAssessable) {
-                continue;
+                throw new InvalidDataStateException("Unable to build project implementation sub-assessment. id: {$row['ia.id']}");
             }
             /** @var Project $projectImpl */
             $projectImpl = $projectImpls->getOffset($projectAssessmentId);
@@ -663,11 +675,15 @@ class ImportFactory
     }
 
     /**
-     * Builds an assessment spec from this row.
+     * Attempt to builds an assessment spec from this row.
+     *
+     * If the caller to this method expected to receive an instance, and doesn't, it probably means
+     * the system has broken data. In this case the caller should throw and exception which
+     * halts the import, can be caught by controller, logged to sentry, and used to inform the end-user.
      *
      * @param string $row
      * @return IAssessable|null
-     * @throws \DomainException if the assessment has no determinable type
+     * @throws InvalidDataStateException if the assessment has no determinable type
      */
     protected function buildAssessmentSpecFromRow($row)
     {
@@ -698,7 +714,7 @@ class ImportFactory
             $assessmentSpec = new Project();
 
         } else {
-            throw new \DomainException("Unknown assessment type: {$row['sa.id']}");
+            throw new InvalidDataStateException("Broken data detected. Unknown assessment type. id: {$row['sa.id']}");
         }
 
         $assessmentSpec->setId($row['sa.id']);
@@ -715,11 +731,15 @@ class ImportFactory
     }
 
     /**
-     * Builds an assessment implementation from this row.
+     * Attempts to builds an assessment implementation from this row.
+     *
+     * If the caller to this method expected to receive an instance, and doesn't, it probably means
+     * the system has broken data. In this case the caller should throw and exception which
+     * halts the import, can be caught by controller, logged to sentry, and used to inform the end-user.
      *
      * @param $row
      * @return IAssessable|null
-     * @throws \DomainException if the assessment has no determinable type
+     * @throws InvalidDataStateException if the assessment has no determinable type
      */
     protected function buildAssessmentImplFromRow($row)
     {
@@ -747,7 +767,7 @@ class ImportFactory
             $assessmentImpl = new Project();
 
         } else {
-            throw new \DomainException("Unknown assessment type: {$row['ia.id']}");
+            throw new InvalidDataStateException("Broken data detected. Unknown assessment type. id: {$row['ia.id']}");
         }
 
         $assessmentImpl->setId($row['ia.id']);
