@@ -349,14 +349,14 @@ class Controller extends Base
 
         $allPermissions   = $this->userAccessMapper->findAllForUser($user);
 
+        $groupPermissions = $allPermissions->filterBy('service', UserAccess::SERVICE_HOMEPAGE)
+                                            ->indexBy('serviceIdentifier');
+
         /* Don't need the HOMEPAGE service; it's never used
          */
         $userPermissions  = $allPermissions->filter(function (UserAccess $access) {
             return UserAccess::SERVICE_HOMEPAGE !== $access->getService();
         });
-
-        $groupPermissions = $userPermissions->filterBy('service', UserAccess::SERVICE_HOMEPAGE)
-                                            ->indexBy('serviceIdentifier');
 
         /* Find the moderate-only services
          */
