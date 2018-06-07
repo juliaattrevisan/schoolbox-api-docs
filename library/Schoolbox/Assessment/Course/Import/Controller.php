@@ -377,13 +377,21 @@ class Controller extends Base\Base
             }
         }
 
-        // If not modifying any already imported Units, we can treat this modification merely as a fresh import.
-        if ('import' === $action || !$countImportedUnits) {
-            $dto = $this->importFactory->buildForNewImport($unitImpls);
-        } elseif ('modify' === $action) {
-            $dto = $this->importFactory->buildForImportModify($unitImpls);
-        } else {
-            throw new \DomainException('Unable to determine if this is a new import or modification of prior import.');
+        try {
+            // If not modifying any already imported Units, we can treat this modification merely as a fresh import.
+            if ('import' === $action || !$countImportedUnits) {
+                $dto = $this->importFactory->buildForNewImport($unitImpls);
+            } elseif ('modify' === $action) {
+                $dto = $this->importFactory->buildForImportModify($unitImpls);
+            } else {
+                throw new \DomainException('Unable to determine if this is a new import or modification of prior import.');
+            }
+        } catch (InvalidDataStateException $e) {
+            // Let sentry know that we have broken data on this school which needs to be fixed
+            $this->captureException($e);
+            // Halt the import, but let the user know why in a useful way.
+            $this->sendError($e->getMessage() . ' - This issue has been logged');
+            return;
         }
 
         // respond with stage 4: coursework list
