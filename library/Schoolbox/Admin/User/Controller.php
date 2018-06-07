@@ -105,6 +105,15 @@ class Controller extends Base
     private const IDENTIFIER_NONE = 'none';
 
     /**
+     * Access Levels
+     */
+    private const ACCESS_LEVELS = [
+        'read' => UserAccess::ACCESS_READ,
+        'write' => UserAccess::ACCESS_WRITE,
+        'moderate' => UserAccess::ACCESS_FULL
+    ];
+
+    /**
      * A mapping of services and what can appear in the Permissions section
      *
      * @var array
@@ -389,11 +398,7 @@ class Controller extends Base
                     'campus' => self::IDENTIFIER_CAMPUS,
                     'residentialHouse' => self::IDENTIFIER_RESIDENTIAL_HOUSE
                 ],
-                'accessLevel' => [
-                    'read' => UserAccess::ACCESS_READ,
-                    'write' => UserAccess::ACCESS_WRITE,
-                    'moderate' => UserAccess::ACCESS_FULL
-                ],
+                'accessLevel' => self::ACCESS_LEVELS,
 
                 'pageCurrent' => 'user',
                 'method' => 'Update',
