@@ -129,6 +129,7 @@ class ImportFactory
                 $unitSpecCache[$unitSpecId]->setFolder($folder);
             }
 
+            // It's quite valid for this to return NULL. This will occur if there are no assessments in the unit-spec.
             $assessmentSpec = $this->buildAssessmentSpecFromRow($row);
 
             if ($assessmentSpec instanceof IAssessable) {
@@ -338,10 +339,10 @@ class ImportFactory
                 $unitSpecCache[$unitSpecId]->setFolder($folder);
             }
 
-            // Create AssessmentSpec (if one exists)
+            // Create AssessmentSpec (if one exists). This may be valid null. This will occur, eg, if assessment was created in class.
             $assessmentSpec = $this->buildAssessmentSpecFromRow($row);
 
-            // Create corresponding AssessmentImpl (if one exists)
+            // Create corresponding AssessmentImpl (if one exists). This may be valid null, eg if assessment has not been imported.
             $assessmentImpl = $this->buildAssessmentImplFromRow($row);
 
             if($assessmentSpec instanceof IAssessable && $assessmentImpl instanceof IAssessable){
@@ -425,6 +426,7 @@ class ImportFactory
 
             // Only add deleted specs if they are linked to from a current Impl
             if(is_null($deletedAt) || array_key_exists($assessmentId, $specToImplMap)){
+                // This call should never return NULL - see above SQL query
                 $assessmentSpec = $this->buildAssessmentSpecFromRow($row);
                 if ($assessmentSpec instanceof IAssessable) {
                     /** @var Project $projectSpec */
@@ -499,6 +501,7 @@ class ImportFactory
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             // Add AssessmentImpl to ProjectImpl
             $projectAssessmentId = $row['p.assessment_id'];
+            // This call should never return NULL - see SQL query above
             $assessmentImpl = $this->buildAssessmentImplFromRow($row);
             if (!$assessmentImpl instanceof IAssessable) {
                 continue;
