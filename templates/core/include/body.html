@@ -30,71 +30,16 @@
 
 </head>
 <body class="{NOTIFICATION_CLASS}">
-<div class="off-canvas-wrap docs-wrap" data-offcanvas>
-    <div class="inner-wrap {HIDE_NOTIFICATIONS_TRAY}">
+<div class="off-canvas-wrap docs-wrap" data-offcanvas data-transition="overlap">
+    <div class="inner-wrap {HIDE_SIDENAV} {HIDE_NOTIFICATIONS_TRAY}">
 
-        {INSTANTMESSAGE_BLOCK}
-
-        <aside class="left-off-canvas-menu hide-for-print" data-side-nav>
+        <aside id="left-menu" class="left-off-canvas-menu hide-for-print" data-side-nav>
+            <a href="#" id="drawer" title="Show or hide navigation"></a>
             <div class="logo-wrapper">
                 <a href="/" class="logo">
                     <img src="/images/logo.php?logo=skin_logo_large&size=normal" srcset="/images/logo.php?logo=skin_logo_large&size=normal 1x,/images/logo.php?logo=skin_logo_large&size=hidpi 2x" alt="{SITE_NAME}"/>
                 </a>
             </div>
-
-            <!-- BEGIN banner_logged_in -->
-            <div class="row">
-                <ul class="account-menu accordion" id="account-menu" data-accordion>
-                    <li class="accordion-navigation">
-                        <a href="#accountContent" class="profile-drop" id="profile-accordion">
-                            <img height="72" width="72" alt="View Profile" src="/portrait.php?userId={EXTERNAL_ID}&size=square80"/>
-                            <span>{SITE_LOGINNAME}</span>
-                        </a>
-                        <div id="accountContent" class="content">
-                            <ul id="profile-options">
-                                <li><a class="icon-staff-students" href="/search/user/{USER_ID}">Profile</a></li>
-                                <li><a class="icon-settings" href="/settings/messages">Settings</a></li>
-                                <!-- BEGIN admin_only_menu -->
-                                <li><a class="icon-locked" href="/adminv2/home">Administration</a></li>
-                                <!-- END admin_only_menu -->
-                                <li><a class="icon-logout" href="/logout.php">Logout</a></li>
-                            </ul>
-                            <ul id="avatar2">
-                                <!-- BEGIN can_switch -->
-                                <li>
-                                    <ul id="switch-user">
-                                        <li class="separator">Switch User</li>
-                                        <!-- BEGIN switch_user -->
-                                        <li class="switch-user">
-                                            <div class="card small-12">
-                                                <a class="no-pad" href="/user/switch/{MENU_SWITCH_USERID}" title="Switch to {MENU_SWITCH_USER_FULLNAME}">
-                                                    <img src="/portrait.php?userId={MENU_SWITCH_EXTERNAL_ID}&amp;size=square64" />
-                                                    <p>{MENU_SWITCH_USER_FULLNAME}</p>
-                                                    <p class="meta">{MENU_SWITCH_USER_ROLE}</p>
-                                                </a>
-                                            </div>
-                                        </li>
-                                        <!-- END switch_user -->
-                                    </ul>
-                                </li>
-                                <!-- END can_switch -->
-                                <!-- BEGIN recover_user -->
-                                <li class="switch-user">
-                                    <div class="card small-12">
-                                        <a class="no-pad" href="/user/recoverSession" title="Return to {MENU_SWITCH_USER_FULLNAME}">
-                                            <img src="/portrait.php?userId={MENU_SWITCH_EXTERNAL_ID}&amp;size=square64" />
-                                            <p>{MENU_SWITCH_USER_FULLNAME}</p>
-                                            <p class="meta">{MENU_SWITCH_USER_ROLE}</p>
-                                        </a>
-                                    </div>
-                                </li>
-                                <!-- END recover_user -->
-                            </ul>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-            <!-- END banner_logged_in -->
             <nav class="row">
                 <ul class="off-canvas-list second-nav">
                     {MENU_TOP}
@@ -103,17 +48,16 @@
             {MENU_SIDE}
         </aside>
 
-        <!-- START CONTAINER -->
-        <section class="main-section">
+        <!-- CONTAINER -->
+        <section class="main">
             <div id="header">
                 {MAIN_BANNER_REGION}
             </div>
 
-            <!-- The Schoolbox Hybrid Bar -->
             <div class="hybrid-bar hide-for-print" id="hybrid-bar">
                 <nav class="tab-bar">
                     <section class="left-small">
-                        <a class="left-off-canvas-toggle menu-icon hide-for-large-up" id="left-off-canvas-toggle" href="#"><span></span></a>
+                        <a class="left-off-canvas-toggle menu-icon" id="left-off-canvas-toggle" href="left-menu"><span></span></a>
                     </section>
 
                     <section class="tab-bar-section">
@@ -127,13 +71,56 @@
                             <input id="search-field" type="text" name="keyword" placeholder="Search"/>
                             <label data-jsubmit for="search-field" class="icon-search no-text"></label>
                         </form>
+
+                        <!-- BEGIN banner_logged_in -->
+                        <a href="#" id="profile-drop">
+                            <img height="72" width="72" alt="View Profile" src="/portrait.php?userId={EXTERNAL_ID}&size=square80"/>
+                        </a>
+                        <div id="account-content" class="account-drop">
+                            <ul id="profile-options">
+                                <li><a class="icon-staff-students" href="/search/user/{USER_ID}">Profile</a></li>
+                                <li><a class="icon-settings" href="/settings/messages">Settings</a></li>
+                                <!-- BEGIN admin_only_menu -->
+                                <li><a class="icon-locked" href="/adminv2/home">Administration</a></li>
+                                <!-- END admin_only_menu -->
+                                <li><a class="icon-logout" href="/logout.php">Logout</a></li>
+                            </ul>
+                            <!-- BEGIN can_switch -->
+                            <ul id="switch-user">
+                                <li class="separator">Switch User</li>
+                                <!-- BEGIN switch_user -->
+                                <li class="user">
+                                    <div class="card small-12">
+                                        <a class="no-pad" href="/user/switch/{MENU_SWITCH_USERID}" title="Switch to {MENU_SWITCH_USER_FULLNAME}">
+                                            <img src="/portrait.php?userId={MENU_SWITCH_EXTERNAL_ID}&amp;size=square64" />
+                                            <p>{MENU_SWITCH_USER_FULLNAME}</p>
+                                            <p class="meta">{MENU_SWITCH_USER_ROLE}</p>
+                                        </a>
+                                    </div>
+                                </li>
+                                <!-- END switch_user -->
+                                <!-- BEGIN recover_user -->
+                                <li class="user">
+                                    <div class="card small-12">
+                                        <a class="no-pad" href="/user/recoverSession" title="Return to {MENU_SWITCH_USER_FULLNAME}">
+                                            <img src="/portrait.php?userId={MENU_SWITCH_EXTERNAL_ID}&amp;size=square64" />
+                                            <p>{MENU_SWITCH_USER_FULLNAME}</p>
+                                            <p class="meta">{MENU_SWITCH_USER_ROLE}</p>
+                                        </a>
+                                    </div>
+                                </li>
+                                <!-- END recover_user -->
+                            </ul>
+                            <!-- END can_switch -->
+                        </div>
+                        <!-- END banner_logged_in -->
                     </section>
                     <!-- BEGIN instantmessage_toggle -->
                     <section class="right-small" id="notification-toggle">
-                        <a class="right-off-canvas-toggle icon-notifications hidden-for-xlarge-up" data-unread="{WEBSOCKET_UNREAD_COUNT}">
+                        <a href="msgs" class="right-off-canvas-toggle icon-notifications hidden-for-xlarge-up" data-unread="{WEBSOCKET_UNREAD_COUNT}">
                             <span data-unread-count>{WEBSOCKET_UNREAD_LABEL}</span>
                         </a>
-                        <a class="icon-notifications show-for-xlarge-up" data-unread="{WEBSOCKET_UNREAD_COUNT}">
+                        <a href="msgs" class="icon-notifications show-for-xlarge-up" data-unread="{WEBSOCKET_UNREAD_COUNT}">
                             <span data-unread-count>{WEBSOCKET_UNREAD_LABEL}</span>
                         </a>
                     </section>
@@ -151,6 +138,9 @@
             {DEBUGBAR}
         </section>
         <!-- END CONTAINER -->
+
+        {INSTANTMESSAGE_BLOCK}
+
         <a href="#" class="exit-off-canvas"></a>
     </div>
 </div>

@@ -66,16 +66,15 @@ class Controller extends Base
     {
         $this->validateAccess();
         $sessionSegment = $this->getSessionSegment();
-        $this->getResponse()->content->set([
-            'title' => 'Reset Password',
-            'template' => '@userPasswordReset/createRequestForm.twig',
-            'data' => [
+        $this->getResponse()->content->set($this->buildUnthemedHtmlOutput(
+            '@userPasswordReset/createRequestForm.twig',
+            [
                 'email' => $sessionSegment->getFlash('email', ''),
                 'isEmailValid' => $sessionSegment->getFlash('isEmailValid', true),
                 'isEmailSubmitted' => $sessionSegment->getFlash('isEmailSubmitted', false),
                 'isResetExpired' => $sessionSegment->getFlash('isResetExpired', false),
-            ],
-        ]);
+            ])
+        );
     }
 
     /**
@@ -88,15 +87,14 @@ class Controller extends Base
         $this->validateAccess();
         $this->validateResetRequest($reset);
         $sessionSegment = $this->getSessionSegment();
-        $this->getResponse()->content->set([
-            'title' => 'Reset Password',
-            'template' => '@userPasswordReset/resetForm.twig',
-            'data' => [
+        $this->getResponse()->content->set($this->buildUnthemedHtmlOutput(
+            '@userPasswordReset/resetForm.twig',
+            [
                 'reset' => $reset,
                 'isPasswordSubmitted' => $sessionSegment->getFlash('isPasswordSubmitted', false),
                 'isPasswordValid' => $sessionSegment->getFlash('isPasswordValid', true),
-            ],
-        ]);
+            ])
+        );
     }
 
     /**

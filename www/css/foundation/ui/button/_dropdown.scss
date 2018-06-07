@@ -18,7 +18,7 @@ $f-dropdown-icon-align: 0.25rem;
 
 // Dropdown
 .f-dropdown{
-	@include box-shadow(10px, 10px, 0, rgba(0,0,0,0.1));
+	@include box-shadow(-2px, 2px, 4px, rgba(0,0,0,0.15));
 	li{
 		display: block;
 		width: 100%;

@@ -71,7 +71,7 @@
                 });
 
                 /* Replace all editor video/audio placeholders
-                 */
+                */
                 $.fn.schoolboxResource_ProxyReplacment();
 
                 $('.right-small, .right-off-canvas-menu').hover(function(){
@@ -81,11 +81,11 @@
                         $('.right-off-canvas-menu').removeClass('overlap');
                     });
 
-                $('.right-small a, .right-off-canvas-menu label').click(function() {
-                    $('.inner-wrap').toggleClass('docking');
+                $('.right-small a, .right-off-canvas-menu label').on('click', function() {
+                    $('.inner-wrap').toggleClass('right-open');
                     $(this).toggleClass('raquo');
 
-                    if ($('.inner-wrap').hasClass('docking')){
+                    if ($('.inner-wrap').hasClass('right-open')){
                         $.post('/ajax/notificationsTray', {state: 'show'}, function(responseText) {
                         });
                     }
@@ -93,6 +93,35 @@
                         $.post('/ajax/notificationsTray', {state: 'hide'}, function(responseText) {
                         });
                     }
+                });
+
+                $('#drawer').on('click', function(){
+                    $('[data-offcanvas]').removeClass('move-right');
+                    $('.inner-wrap').toggleClass('left-open');
+                    $(this).toggleClass('open');
+
+                    /* Sidenav toggle
+                     */
+                    if ($('.inner-wrap').hasClass('left-open')){
+                        $.post('/ajax/sidenav', {state: 'show'});
+                    }
+                    else {
+                        $.post('/ajax/sidenav', {state: 'hide'});
+                    }
+                });
+
+                /* Open / Close account menu
+                 * + click outside div to close
+                 */
+                var accountMenu = $('#account-content');
+
+                $('#profile-drop').on('click', function(e){
+                    e.stopPropagation();
+                    accountMenu.toggleClass('open');
+                });
+
+                $('[data-offcanvas]').on('click', function(){
+                    accountMenu.removeClass('open');
                 });
 
                 /* Ensure modals always appear in a visible location
@@ -228,148 +257,16 @@
 
 </head>
 <body class="{{ ws.enabled ? '' : 'disableNotifications' }}">
-<div class="off-canvas-wrap docs-wrap" data-offcanvas>
-    <div class="inner-wrap {{ user.current.getHideNotificationsTray ? '' : 'docking' }}">
+<div class="off-canvas-wrap docs-wrap" data-offcanvas data-transition="overlap">
+    <div class="inner-wrap {{ user.current.getHideSidenav ? '' : 'left-open' }} {{ user.current.getHideNotificationsTray ? '' : 'right-open' }}">
 
-        {% block instant %}
-            {% if user.current.id %}
-            <aside class="right-off-canvas-menu island no-pad hide-for-print" id="msgs" data-unread="{{ ws.unread }}">
-                <ul class="off-canvas-list" id="message-list">
-                    <li>
-                        <label title="Click to hide or show Notifications">Notifications</label>
-                    </li>
-                    <li>
-                        <a id="msg-mar" class="mark-all-read button icon-approve" href="#">Mark all read</a>
-                    </li>
-                    <li>
-                        <section>
-                            <ul id="msg-content" class="action-list">
-                                <li data-msgitem class="actions-small-1">
-                                    <div class="list-item">
-                                        <div class="compact card wrap-down small-12">
-                                            <a data-msgitem-href class="no-pad">
-                                                <img data-msgitem-thumb />
-                                                <p data-msgitem-title></p>
-                                                <p class="meta spaced" data-msgitem-time></p>
-                                            </a>
-                                        </div>
-                                    </div>
-                                    <nav>
-                                        <a data-msgitem-ack class="icon-approve no-pad" title="Mark as read"></a>
-                                    </nav>
-                                </li>
-                            </ul>
-                        </section>
-                    </li>
-                    <li>
-                        <a href="/messages" class="button" data-msgfooter-action>
-                            <span class="connecting"></span>&nbsp;Connecting&hellip;
-                        </a>
-                    </li>
-                </ul>
-            </aside>
-            <div id="alert-dialog" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
-                <h2 data-modal-title></h2>
-                <ul id="alert-content" class="information-list no-pad">
-                    <li data-msgitem>
-                        <div class="card wrap-down small-12">
-                            <a data-msgitem-href>
-                                <img data-msgitem-thumb />
-                                <p data-msgitem-title></p>
-                            </a>
-                        </div>
-                    </li>
-                </ul>
-                <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-            </div>
-
-            {% autoescape 'js' %}
-            <script type="text/javascript">
-                $(function () {
-                    // launch the notifier
-                    $('#msgs').notifier({
-                        host:     '{{ ws.host }}',
-                        port:     Number('{{ ws.port }}'),
-                        path:     '{{ ws.path }}',
-                        secure:   Boolean('{{ ws.secure }}'),
-                        unread:   Number('{{ ws.unread }}'),
-                        maxstack: Number('{{ ws.stackLimit }}')
-                    });
-
-                    $('#alert-dialog').on('click', 'a.action', function (e) {
-                        e.preventDefault();
-                    })
-                });
-            </script>
-            {% endautoescape %}
-            {% endif %}
-        {% endblock %}
-
-
-        <aside class="left-off-canvas-menu hide-for-print" data-side-nav>
+        <aside id="left-menu" class="left-off-canvas-menu hide-for-print" data-side-nav>
+            <a href="#" id="drawer" title="Show or hide navigation"></a>
             <div class="logo-wrapper">
                 <a href="/" class="logo">
                     <img src="/images/logo.php?logo=skin_logo_large&size=normal" srcset="/images/logo.php?logo=skin_logo_large&size=normal 1x,/images/logo.php?logo=skin_logo_large&size=hidpi 2x" alt="{{ config.school_name }}"/>
                 </a>
             </div>
-
-            {% block accountMenu %}
-                {% if user.current.id %}
-                    <div class="row">
-                        <ul class="account-menu accordion" id="account-menu" data-accordion>
-                            <li class="accordion-navigation">
-                                <a href="#accountContent" class="profile-drop" id="profile-accordion">
-                                    <img height="72" width="72" alt="View Profile" src="/portrait.php?userId={{ user.current.externalId }}&size=square80"/>
-                                    <span>{{ user.current.formatName }}</span>
-                                </a>
-                                <div id="accountContent" class="content">
-                                    <ul id="profile-options">
-                                        <li><a class="icon-staff-students" href="/search/user/{{ user.current.id }}">Profile</a></li>
-                                        <li><a class="icon-settings" href="/settings/messages">Settings</a></li>
-                                        {% if user.current.superuser %}
-                                            <li><a class="icon-locked" href="/adminv2/home">Administration</a></li>
-                                        {% endif %}
-                                        <li><a class="icon-logout" href="/logout.php">Logout</a></li>
-                                    </ul>
-                                    <ul id="avatar2">
-
-                                        {% if user.current.linkedUser is not empty %}
-                                            <li>
-                                                <ul id="switch-user">
-                                                    <li class="separator">Switch User</li>
-                                                    {% for linkedUser in user.current.linkedUser %}
-                                                        <li class="switch-user">
-                                                            <div class="card small-12">
-                                                                <a class="no-pad" href="/user/switch/{{ linkedUser.id }}" title="Switch to {{ linkedUser.formatName }}">
-                                                                    <img src="/portrait.php?userId={{ linkedUser.externalId }}&amp;size=square64" />
-                                                                    <p>{{ linkedUser.formatName }}</p>
-                                                                    <p class="meta">{{ linkedUser.role.name }}</p>
-                                                                </a>
-                                                            </div>
-                                                        </li>
-                                                    {% endfor %}
-                                                </ul>
-                                            </li>
-                                        {% endif %}
-
-                                        {% if user.previous %}
-                                            <li class="switch-user">
-                                                <div class="card small-12">
-                                                    <a class="no-pad" href="/user/recoverSession" title="Return to {{ user.previous.formatName }}">
-                                                        <img src="/portrait.php?userId={{ user.previous.externalId }}&amp;size=square64" />
-                                                        <p>{{ user.previous.formatName }}</p>
-                                                        <p class="meta">{{ user.previous.role.name }}</p>
-                                                    </a>
-                                                </div>
-                                            </li>
-                                        {% endif %}
-                                    </ul>
-                                </div>
-                            </li>
-                        </ul>
-                    </div>
-                {% endif %}
-            {% endblock accountMenu %}
 
             {% block menuTopOffCanvas %}
                 {% if user.current.id %}
@@ -388,18 +285,17 @@
             {% endblock menuSideOffCanvas %}
         </aside>
 
-        <!-- START CONTAINER -->
-        <section class="main-section">
+        <!-- CONTAINER -->
+        <section class="main">
             <div id="header">
                 {# Never used AFAICT #}
                 {#{MAIN_BANNER_REGION}#}
             </div>
 
-            <!-- The Schoolbox Hybrid Bar -->
             <div class="hybrid-bar hide-for-print" id="hybrid-bar">
                 <nav class="tab-bar">
                     <section class="left-small">
-                        <a class="left-off-canvas-toggle menu-icon hide-for-large-up" id="left-off-canvas-toggle" href="#"><span></span></a>
+                        <a class="left-off-canvas-toggle menu-icon" id="left-off-canvas-toggle" href="left-menu"><span></span></a>
                     </section>
 
                     <section class="tab-bar-section">
@@ -423,15 +319,61 @@
                                 </form>
                             {% endif %}
                         {% endblock search %}
+
+                        {% block accountMenu %}
+                            {% if user.current.id %}
+                                <a href="#" id="profile-drop">
+                                    <img height="72" width="72" alt="View Profile" src="/portrait.php?userId={{ user.current.externalId }}&size=square80"/>
+                                </a>
+                                <div id="account-content" class="account-drop">
+                                    <ul id="profile-options">
+                                        <li><a class="icon-staff-students" href="/search/user/{{ user.current.id }}">Profile</a></li>
+                                        <li><a class="icon-settings" href="/settings/messages">Settings</a></li>
+                                        {% if user.current.superuser %}
+                                            <li><a class="icon-locked" href="/adminv2/home">Administration</a></li>
+                                        {% endif %}
+                                        <li><a class="icon-logout" href="/logout.php">Logout</a></li>
+                                    </ul>
+                                    <ul id="switch-user">
+                                        {% if user.current.linkedUser is not empty %}
+                                            <li class="separator">Switch User</li>
+                                            {% for linkedUser in user.current.linkedUser %}
+                                                <li class="user">
+                                                    <div class="card small-12">
+                                                        <a class="no-pad" href="/user/switch/{{ linkedUser.id }}" title="Switch to {{ linkedUser.formatName }}">
+                                                            <img src="/portrait.php?userId={{ linkedUser.externalId }}&amp;size=square64" />
+                                                            <p>{{ linkedUser.formatName }}</p>
+                                                            <p class="meta">{{ linkedUser.role.name }}</p>
+                                                        </a>
+                                                    </div>
+                                                </li>
+                                            {% endfor %}
+                                        {% endif %}
+
+                                        {% if user.previous %}
+                                            <li class="user">
+                                                <div class="card small-12">
+                                                    <a class="no-pad" href="/user/recoverSession" title="Return to {{ user.previous.formatName }}">
+                                                        <img src="/portrait.php?userId={{ user.previous.externalId }}&amp;size=square64" />
+                                                        <p>{{ user.previous.formatName }}</p>
+                                                        <p class="meta">{{ user.previous.role.name }}</p>
+                                                    </a>
+                                                </div>
+                                            </li>
+                                        {% endif %}
+                                    </ul>
+                                </div>
+                            {% endif %}
+                        {% endblock accountMenu %}
                     </section>
 
                     {% block messaging %}
                         {% if ws.enabled and user.current.id %}
                             <section class="right-small" id="notification-toggle">
-                                <a class="right-off-canvas-toggle icon-notifications hidden-for-xlarge-up" data-unread="{{ ws.unread }}">
+                                <a href="#msgs" class="right-off-canvas-toggle icon-notifications hidden-for-xlarge-up" data-unread="{{ ws.unread }}">
                                     <span data-unread-count>{{ ws.unread ?? ''}}</span>
                                 </a>
-                                <a class="icon-notifications show-for-xlarge-up" data-unread="{{ ws.unread }}">
+                                <a href="#msgs" class="icon-notifications show-for-xlarge-up" data-unread="{{ ws.unread }}">
                                     <span data-unread-count>{{ ws.unread ?? '' }}</span>
                                 </a>
                             </section>
@@ -455,7 +397,7 @@
                         <li><a href="http://www.schoolbox.com.au" title="Schoolbox, Virtual Learning Environment, Learning Management System, LMS">Schoolbox</a>
                             {{ config.site_version }} by <a href="http://www.alaress.com.au">Alaress</a></li>
                         {% if config.feedback_url and config.feedback_text %}
-                        <li><a href="{{ config.feedback_url }}">{{ config.feedback_text }}</a></li>
+                            <li><a href="{{ config.feedback_url }}">{{ config.feedback_text }}</a></li>
                         {% endif %}
                     </ul>
                 </div>
@@ -482,6 +424,80 @@
             {{ debugBar.body | raw }}
         </section>
         <!-- END CONTAINER -->
+
+        {% block instant %}
+            {% if user.current.id %}
+                <aside class="right-off-canvas-menu island no-pad hide-for-print" id="msgs" data-unread="{{ ws.unread }}">
+                    <ul class="off-canvas-list" id="message-list">
+                        <li>
+                            <label title="Show or hide notifications">Notifications</label>
+                        </li>
+                        <li>
+                            <a id="msg-mar" class="mark-all-read button icon-approve" href="#">Mark all read</a>
+                        </li>
+                        <li>
+                            <section>
+                                <ul id="msg-content" class="action-list">
+                                    <li data-msgitem class="actions-small-1">
+                                        <div class="list-item">
+                                            <div class="compact card wrap-down small-12">
+                                                <a data-msgitem-href class="no-pad">
+                                                    <img data-msgitem-thumb />
+                                                    <p data-msgitem-title></p>
+                                                    <p class="meta spaced" data-msgitem-time></p>
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <nav>
+                                            <a data-msgitem-ack class="icon-approve no-pad" title="Mark as read"></a>
+                                        </nav>
+                                    </li>
+                                </ul>
+                            </section>
+                        </li>
+                        <li>
+                            <a href="/messages" class="button" data-msgfooter-action>
+                                <span class="connecting"></span>&nbsp;Connecting&hellip;
+                            </a>
+                        </li>
+                    </ul>
+                </aside>
+                <div id="alert-dialog" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
+                    <h2 data-modal-title></h2>
+                    <ul id="alert-content" class="information-list no-pad">
+                        <li data-msgitem>
+                            <div class="card wrap-down small-12">
+                                <a data-msgitem-href>
+                                    <img data-msgitem-thumb />
+                                    <p data-msgitem-title></p>
+                                </a>
+                            </div>
+                        </li>
+                    </ul>
+                    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+                </div>
+
+                {% autoescape 'js' %}
+                <script type="text/javascript">
+                    $(function () {
+                        // launch the notifier
+                        $('#msgs').notifier({
+                            host:     '{{ ws.host }}',
+                            port:     Number('{{ ws.port }}'),
+                            path:     '{{ ws.path }}',
+                            secure:   Boolean('{{ ws.secure }}'),
+                            unread:   Number('{{ ws.unread }}'),
+                            maxstack: Number('{{ ws.stackLimit }}')
+                        });
+
+                        $('#alert-dialog').on('click', 'a.action', function (e) {
+                            e.preventDefault();
+                        })
+                    });
+                </script>
+                {% endautoescape %}
+            {% endif %}
+        {% endblock %}
         <a href="#" class="exit-off-canvas"></a>
     </div>
 </div>

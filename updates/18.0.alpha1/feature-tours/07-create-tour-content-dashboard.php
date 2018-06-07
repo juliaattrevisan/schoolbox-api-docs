@@ -39,50 +39,6 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
             'css_class'    => 'introjs-intromodal',
         ],
 
-        // Account details
-        [
-            'uuid'         => '204e36bb-f5b9-11e7-9503-08002751fd3c',
-            'tooltip_uuid' => '2c5fbc48-ff4a-11e7-bd23-08002751fd3c',
-            'type'         => 'tooltip',
-            'selector'     => '#profile-accordion',
-            'content'      => "
-                <p>At the top of the side menu you will see your profile picture and name. Clicking the arrow will give you some further options.</p>
-            ",
-        ],
-
-        // Profile accordion menu
-        [
-            'uuid'         => 'b3b2f865-f697-11e7-965e-08002751fd3c',
-            'tooltip_uuid' => '321b5fd4-ff4a-11e7-bd23-08002751fd3c',
-            'type'         => 'tooltip',
-            'selector'     => '#profile-options',
-            'content'      => "<p>
-                    <b>Profile</b> will allow you to view your profile.
-                    <br />
-                    <b>Settings</b> will allow you to customise your notifications.
-                    <br />
-                    <b>Logout</b> will log you out of the system.
-                </p>",
-            'events'       => [
-                [
-                    'uuid'            => '4225f5bf-ff01-11e7-9951-08002751fd3c',
-                    'selector'        => '#account-menu',
-                    'event'           => 'accordion.open',
-                    'insertion_point' => 'open',
-                    'order'           => 0,
-                ],
-            ],
-        ],
-
-        // Switch user
-        [
-            'uuid'         => '292d8471-f5b9-11e7-9503-08002751fd3c',
-            'tooltip_uuid' => '36c20038-ff4a-11e7-bd23-08002751fd3c',
-            'type'         => 'tooltip',
-            'selector'     => '#switch-user',
-            'content'      => "<p>The switch user section will list your other profiles within the system. It allows you to move easily between multiple accounts.</p>",
-        ],
-
         // Customisable Links
         [
             'uuid'         => '3470d234-f5b9-11e7-9503-08002751fd3c',
@@ -119,6 +75,15 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
             'content'      => "This section can be customised by you. By clicking on the pencil icon, you can add your own individual links that are important for you.",
         ],
 
+        // Hide side menu
+        [
+            'uuid'         => '#',
+            'tooltip_uuid' => '#',
+            'type'         => 'tooltip',
+            'selector'     => '#drawer',
+            'content'      => "You can show or hide the side menu by clicking this icon.",
+        ],
+
         // Top Nav
         [
             'uuid'         => '4a73e905-f5b9-11e7-9503-08002751fd3c',
@@ -135,6 +100,50 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
             'type'         => 'tooltip',
             'selector'     => '#search',
             'content'      => "In the top right hand corner you will see a search icon. Hovering over this reveals a search bar. You can search for users, page content, files, folders, links, news and events.",
+        ],
+
+        // Account details
+        [
+            'uuid'         => '204e36bb-f5b9-11e7-9503-08002751fd3c',
+            'tooltip_uuid' => '2c5fbc48-ff4a-11e7-bd23-08002751fd3c',
+            'type'         => 'tooltip',
+            'selector'     => '#profile-drop',
+            'content'      => "
+                <p>Next to the search, you will see your profile picture. Clicking the profile image will give you some further options.</p>
+            ",
+        ],
+
+        // Profile dropdown
+        [
+            'uuid'         => 'b3b2f865-f697-11e7-965e-08002751fd3c',
+            'tooltip_uuid' => '321b5fd4-ff4a-11e7-bd23-08002751fd3c',
+            'type'         => 'tooltip',
+            'selector'     => '#profile-options',
+            'content'      => "<p>
+                    <b>Profile</b> will allow you to view your profile.
+                    <br />
+                    <b>Settings</b> will allow you to customise your notifications.
+                    <br />
+                    <b>Logout</b> will log you out of the system.
+                </p>",
+            'events'       => [
+                [
+                    'uuid'            => '4225f5bf-ff01-11e7-9951-08002751fd3c',
+                    'selector'        => '#account-menu',
+                    'event'           => 'accordion.open',
+                    'insertion_point' => 'open',
+                    'order'           => 0,
+                ],
+            ],
+        ],
+
+        // Switch user
+        [
+            'uuid'         => '292d8471-f5b9-11e7-9503-08002751fd3c',
+            'tooltip_uuid' => '36c20038-ff4a-11e7-bd23-08002751fd3c',
+            'type'         => 'tooltip',
+            'selector'     => '#switch-user',
+            'content'      => "<p>The switch user section will list your other profiles within the system. It allows you to move easily between multiple accounts.</p>",
         ],
 
         // Notifications
