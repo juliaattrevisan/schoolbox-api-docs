@@ -120,12 +120,20 @@ if (!isset($this->arg[1])) {
  * How do you like them apples
  */
 else if ($this->arg[1] == 'finalise') {
-	$attemptHandler->finaliseAllLatestAttempts($assess['assess_id']);
 
-	//Save all the marks
-//    $attemptMapper = QuizAttemptMapper::getInstance();
-//    $allAttempts = $attemptMapper->findByColumn("assess_id", $assess['assess_id']);
-//    $attemptMapper->save($allAttempts);
+    // Retrieve all attempts
+    $attemptMapper = QuizAttemptMapper::getInstance();
+    $attempts = $attemptHandler->retrieveLatestReviewableAttemptIds($assess['assess_id'], true);
+    // Review them right now
+    // (Don't update review date of anything already reviewed)
+    foreach ($attempts as $attemptId) {
+        try {
+            $attempt = $attemptMapper->findById($attemptId);
+            $attemptMapper->finalizeReview($attempt, $_SESSION['user']);
+        } catch (Exception $e) {
+            // noop;
+        }
+    }
 
 	$this->localRedir("/learning/assessments/{$assess['assessment_id']}/status");
 }

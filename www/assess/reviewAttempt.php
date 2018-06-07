@@ -4,6 +4,7 @@
  */
 
 use Schoolbox\Learning\Quiz\ActionValidator;
+use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\UserMapper;
@@ -59,12 +60,15 @@ $data = [
     'action'  => 'reload',
     'updated' => [],
 ];
+$attemptMapper = QuizAttemptMapper::getInstance();
 foreach ($allAttempts as $currentAttempt) {
-
-    $data['updated'][$currentAttempt['attempt_id']] = $attemptHandler->update(array(
-		'attempt_id' => $currentAttempt['attempt_id'],
-		'reviewed_at' => 'NOW()'
-	));
+    try {
+        $attempt = $attemptMapper->findById($currentAttempt['attempt_id']);
+        $result = $attemptMapper->finalizeReview($attempt, $_SESSION['user']);
+        $data['updated'][$currentAttempt['attempt_id']] = ($result !== false);
+    } catch (Exception $e) {
+        // noop;
+    }
 }
 header('Content-Type: application/json');
 die(json_encode($data));
