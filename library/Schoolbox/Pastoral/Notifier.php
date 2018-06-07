@@ -281,7 +281,11 @@ class Notifier extends AbstractModuleNotifier
      */
     public function notifyUpdated(Model $model, User $effector, $diff = [])
     {
-        return $this->buildMessage($model, self::TRIGGER_UPDATED);
+        // Prevents update notification being sent on create due to external pastoral mapper adding the external ID
+
+        if (!$model->getCreatedAt() instanceof Alaress_Date_NullDate && $model->getCreatedAt() !== null) {
+            return $this->buildMessage($model, self::TRIGGER_UPDATED);
+        }
     }
 
     /**
