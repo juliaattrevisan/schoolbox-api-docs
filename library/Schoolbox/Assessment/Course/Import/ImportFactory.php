@@ -663,7 +663,11 @@ class ImportFactory
     }
 
     /**
-     * Builds an assessment spec from this row.
+     * Attempt to builds an assessment spec from this row.
+     *
+     * If the caller to this method expected to receive an instance, and doesn't, it probably means
+     * the system has broken data. In this case the caller should throw and exception which
+     * halts the import, can be caught by controller, logged to sentry, and used to inform the end-user.
      *
      * @param string $row
      * @return IAssessable|null
@@ -715,7 +719,11 @@ class ImportFactory
     }
 
     /**
-     * Builds an assessment implementation from this row.
+     * Attempts to builds an assessment implementation from this row.
+     *
+     * If the caller to this method expected to receive an instance, and doesn't, it probably means
+     * the system has broken data. In this case the caller should throw and exception which
+     * halts the import, can be caught by controller, logged to sentry, and used to inform the end-user.
      *
      * @param $row
      * @return IAssessable|null
