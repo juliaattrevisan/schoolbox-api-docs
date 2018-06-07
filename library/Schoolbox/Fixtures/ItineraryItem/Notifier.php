@@ -90,10 +90,15 @@ class Notifier extends AbstractModuleNotifier
      *
      * @param Model $itinerary
      * @param User  $effector
+     * @param array $diff
      * @return Envelope
      */
-    public function notifyStudentUpdated(Model $itinerary, User $effector)
+    public function notifyStudentUpdated(Model $itinerary, User $effector, array $diff = null)
     {
+        // No diff in important fields? don't notify
+        if (empty($diff['description']) && empty($diff['startAt'])) {
+            return new Envelope();
+        }
         // Generic notification to team's participants that itinerary has updated
         $match = $this->notifierHelper->hydrateMatch($itinerary->getMatch());
         return $this->notifierHelper->postToTeams(
@@ -109,10 +114,15 @@ class Notifier extends AbstractModuleNotifier
      *
      * @param Model $itinerary
      * @param User  $effector
+     * @param array $diff
      * @return Envelope
      */
-    public function notifyParentUpdated(Model $itinerary, User $effector)
+    public function notifyParentUpdated(Model $itinerary, User $effector, array $diff = null)
     {
+        // No diff in important fields? don't notify
+        if (empty($diff['description']) && empty($diff['startAt'])) {
+            return new Envelope();
+        }
         // Generic notification to team's participants that itinerary has updated
         $match = $this->notifierHelper->hydrateMatch($itinerary->getMatch());
         return $this->notifierHelper->postToParentsOfTeams(
