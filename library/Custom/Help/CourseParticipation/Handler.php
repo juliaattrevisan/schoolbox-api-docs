@@ -25,7 +25,7 @@ use UnexpectedValueException;
 
 class Handler
 {
-    const PARTICIPANT_ROLE_NAME = 'School Staff';
+    const PARTICIPANT_ROLE_NAMES = ['School Staff', 'Hero Teacher', 'Prospect'];
 
     const PARTICIPANT_CAMPUS    = 1;
     const REQUIRED_USER_FIELDS  = [
@@ -170,11 +170,12 @@ class Handler
      */
     public function getUsersBySchool(string $schoolCode, bool $fuzzy = false) : array
     {
-        $roleId = $this->getRoleMapper()->findOneByColumn("name", self::PARTICIPANT_ROLE_NAME)->getId();
+        // TODO we need just the ids here - not the whole model
+        $roleIds = $this->getRoleMapper()->findByColumn("name", self::PARTICIPANT_ROLE_NAMES);
 
         // show the list of users for this school
         // filter to the list of users whose external IDs are prefixed with the given school code
-        $predicate = $this->getUserMapper()->getPredicateBuilder()->equals('group_id', $roleId);
+        $predicate = $this->getUserMapper()->getPredicateBuilder()->equals('group_id', $roleIds);
 
         // TODO remove the fuzzy search case, because it can't match Help users to their local Schoolbox instance
 
