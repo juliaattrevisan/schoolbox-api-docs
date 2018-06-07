@@ -109,7 +109,7 @@ class Controller extends Base
      *
      * @var array
      */
-    protected $serviceMapping = [
+    private const SERVICE_MAPPING = [
         UserAccess::SERVICE_HOMEPAGE => [
 
             /* The text that appears in the dropdow list
@@ -384,7 +384,7 @@ class Controller extends Base
          */
         $moderateOnly = [];
 
-        foreach ($this->serviceMapping as $service => $data) {
+        foreach (self::SERVICE_MAPPING as $service => $data) {
             if ($data['levels']['moderate']['available'] && !$data['levels']['write']['available'] && !$data['levels']['read']['available']) {
                 $moderateOnly[] = $service;
             }
@@ -394,7 +394,7 @@ class Controller extends Base
          */
         $noMiddleDropdown = [];
 
-        foreach ($this->serviceMapping as $service => $data) {
+        foreach (self::SERVICE_MAPPING as $service => $data) {
             if ($data['identifier'] === 'none') {
                 $noMiddleDropdown[] = $service;
             }
@@ -403,7 +403,7 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@adminUser/modify.twig',
             'data' => [
-                'serviceMapping' => $this->serviceMapping,
+                'serviceMapping' => self::SERVICE_MAPPING,
                 'moderateOnly' => json_encode($moderateOnly),
                 'noMiddleDropdown' => json_encode($noMiddleDropdown),
                 'accessLevel' => [
