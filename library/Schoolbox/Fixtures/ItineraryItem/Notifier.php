@@ -95,8 +95,7 @@ class Notifier extends AbstractModuleNotifier
      */
     public function notifyStudentUpdated(Model $itinerary, User $effector, array $diff = null)
     {
-        // No diff in important fields? don't notify
-        if (empty($diff['description']) && empty($diff['startAt'])) {
+        if (!$this->isMeaningfullyDifferent($diff)) {
             return new Envelope();
         }
         // Generic notification to team's participants that itinerary has updated
@@ -119,8 +118,7 @@ class Notifier extends AbstractModuleNotifier
      */
     public function notifyParentUpdated(Model $itinerary, User $effector, array $diff = null)
     {
-        // No diff in important fields? don't notify
-        if (empty($diff['description']) && empty($diff['startAt'])) {
+        if (!$this->isMeaningfullyDifferent($diff)) {
             return new Envelope();
         }
         // Generic notification to team's participants that itinerary has updated
@@ -131,6 +129,18 @@ class Notifier extends AbstractModuleNotifier
                  ->setTitle(':child\'s upcoming :sport match :match itinerary has been changed'),
             $match
         );
+    }
+
+    /**
+     * Is the current state of an itinerary item meaningfully different to its
+     * previous state?
+     *
+     * @param array|null $diff The difference between the two states
+     * @return bool
+     */
+    private function isMeaningfullyDifferent(array $diff = null): bool
+    {
+        return !empty($diff['description']) || !empty($diff['startAt']);
     }
 
     /**
