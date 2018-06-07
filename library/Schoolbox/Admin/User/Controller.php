@@ -406,6 +406,11 @@ class Controller extends Base
                 'serviceMapping' => self::SERVICE_MAPPING,
                 'moderateOnly' => json_encode($moderateOnly),
                 'noMiddleDropdown' => json_encode($noMiddleDropdown),
+                'identifiers' => [
+                    'none' => self::IDENTIFIER_NONE,
+                    'campus' => self::IDENTIFIER_CAMPUS,
+                    'residentialHouse' => self::IDENTIFIER_RESIDENTIAL_HOUSE
+                ],
                 'accessLevel' => [
                     'read' => UserAccess::ACCESS_READ,
                     'write' => UserAccess::ACCESS_WRITE,

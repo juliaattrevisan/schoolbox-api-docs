@@ -317,6 +317,7 @@
                             <div class="small-4 columns">Access</div>
                         </div>
                     </li>
+
                     {% for permission in userPermissions %}
 
                         {% if serviceMapping[permission.service].visible %}
@@ -326,12 +327,12 @@
                                     {{ serviceMapping[permission.service].name }}
                                 </div>
                                 <div class="small-4 card">
-                                    {% if serviceMapping[permission.service].identifier == 'campus' %}
+                                    {% if serviceMapping[permission.service].identifier == identifiers.campus %}
                                         Campus:
                                         {% for campus in campuses if campus.id == permission.serviceIdentifier %}
                                             {{ campus.name }}
                                         {% endfor %}
-                                    {% elseif serviceMapping[permission.service].identifier == 'residentialHouse' %}
+                                    {% elseif serviceMapping[permission.service].identifier ==  identifiers.residentialHouse %}
                                         House:
                                         {% for residentialHouse in residentialHouses if residentialHouse.id == permission.serviceIdentifier %}
                                             {{ residentialHouse.house }}
@@ -365,7 +366,7 @@
                               data-action="addService" class="list-item">
                             <div class="small-4 card">
                                 <select data-role="serviceSelector" name="service" id="serviceSelect" form="serviceCloneForm" required>
-                                    <option value="" data-identifier="none">Select Service</option>
+                                    <option value="" data-identifier="{{ identifiers.none }}">Select Service</option>
 
                                     {% for serviceIdentifier, serviceData in serviceMapping %}
                                         {% if serviceData.visible %}
@@ -375,19 +376,19 @@
                                 </select>
                             </div>
                             <div class="small-4 card">
-                                <select data-service-type="campus" name="sid" id="campusSelect" class="hide" disabled required>
+                                <select data-service-type="{{ identifiers.campus }}" name="sid" id="campusSelect" class="hide" disabled required>
                                     <option value="">Select Campus</option>
                                     {% for campus in campuses %}
                                         <option value="{{ campus.id }}">{{ campus.name }}</option>
                                     {% endfor %}
                                 </select>
-                                <select data-service-type="residentialHouse" name="sid" id="residentialHouseSelect" class="hide" disabled required>
+                                <select data-service-type="{{ identifiers.residentialHouse }}" name="sid" id="residentialHouseSelect" class="hide" disabled required>
                                     <option value="">Select Residential House</option>
                                     {% for residentialHouse in residentialHouses %}
                                         <option value="{{ residentialHouse.id }}">{{ residentialHouse.house }}</option>
                                     {% endfor %}
                                 </select>
-                                <select data-service-type="none" name="sid" id="defaultSelect">
+                                <select data-service-type="{{ identifiers.none }}" name="sid" id="defaultSelect">
                                     <option value="" disabled>--</option>
                                 </select>
                             </div>
