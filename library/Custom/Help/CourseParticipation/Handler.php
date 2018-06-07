@@ -170,12 +170,11 @@ class Handler
      */
     public function getUsersBySchool(string $schoolCode, bool $fuzzy = false) : array
     {
-        // TODO we need just the ids here - not the whole model
-        $roleIds = $this->getRoleMapper()->findByColumn("name", self::PARTICIPANT_ROLE_NAMES);
+        $roleIds = $this->getRoleMapper()->findIdsByColumn("name", self::PARTICIPANT_ROLE_NAMES);
 
         // show the list of users for this school
         // filter to the list of users whose external IDs are prefixed with the given school code
-        $predicate = $this->getUserMapper()->getPredicateBuilder()->equals('group_id', $roleIds);
+        $predicate = $this->getUserMapper()->getPredicateBuilder()->in('group_id', $roleIds);
 
         // TODO remove the fuzzy search case, because it can't match Help users to their local Schoolbox instance
 
@@ -199,7 +198,7 @@ class Handler
                 return [];
             }
 
-            $predicate->in('year', $map[$schoolCode]);
+            $predicate ->in('year', $map[$schoolCode]);
 
         } else {
             // "normal" behaviour is to look up by external IDs
