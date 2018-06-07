@@ -288,7 +288,7 @@
 
                     {% for permission in userPermissions %}
 
-                        {% if serviceMapping[permission.service].visible %}
+                        {% if serviceMapping[permission.service] is defined %}
                         <li class="actions-small-1" data-permission>
                             <div class="list-item">
                                 <div class="small-4 card">
@@ -337,9 +337,7 @@
                                     <option value="" data-identifier="{{ identifiers.none }}">Select Service</option>
 
                                     {% for serviceIdentifier, serviceData in serviceMapping %}
-                                        {% if serviceData.visible %}
-                                            <option value="{{ serviceIdentifier }}" data-identifier="{{ serviceData.identifier }}">{{ serviceData.name }}</option>
-                                        {% endif %}
+                                        <option value="{{ serviceIdentifier }}" data-identifier="{{ serviceData.identifier }}">{{ serviceData.name }}</option>
                                     {% endfor %}
                                 </select>
                             </div>

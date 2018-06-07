@@ -110,20 +110,18 @@ class Controller extends Base
      * @var array
      */
     private const SERVICE_MAPPING = [
-        UserAccess::SERVICE_HOMEPAGE => [
 
-            /* The text that appears in the dropdow list
+        /* For some historical reason, SERVICE_HOMEPAGE is no longer shown.
+         */
+        UserAccess::SERVICE_CALENDAR => [
+
+            /* The text that appears in the dropdown list
              */
-            'name' => '',
+            'name' => 'Calendar',
 
             /* The service identifier options to use: campus dropdown, house dropdown, nothing (none)
              */
-            'identifier' => '',
-
-            /* Whether this service appears in the Permissions section as something you can choose
-             * SERVICE_HOMEPAGE is never available, it seems
-             */
-            'visible' => false,
+            'identifier' => self::IDENTIFIER_CAMPUS,
 
             /* Access levels that you can choose; some services are Moderate-Only, but this way you can specify
              * the available access levels more granularly e.g. write-only, if you ever needed that
@@ -143,29 +141,9 @@ class Controller extends Base
                 ],
             ]
         ],
-        UserAccess::SERVICE_CALENDAR => [
-            'name' => 'Calendar',
-            'identifier' => self::IDENTIFIER_CAMPUS,
-            'visible' => true,
-            'levels' => [
-                'read' => [
-                    'level' => UserAccess::ACCESS_READ,
-                    'available' => true,
-                ],
-                'write' => [
-                    'level' => UserAccess::ACCESS_WRITE,
-                    'available' => true,
-                ],
-                'moderate' => [
-                    'level' => UserAccess::ACCESS_FULL,
-                    'available' => true,
-                ],
-            ]
-        ],
         UserAccess::SERVICE_NEWS => [
             'name' => 'News',
             'identifier' => self::IDENTIFIER_CAMPUS,
-            'visible' => true,
             'levels' => [
                 'read' => [
                     'level' => UserAccess::ACCESS_READ,
@@ -184,7 +162,6 @@ class Controller extends Base
         UserAccess::SERVICE_CMS => [
             'name' => 'CMS',
             'identifier' => self::IDENTIFIER_NONE,
-            'visible' => true,
             'levels' => [
                 'read' => [
                     'level' => UserAccess::ACCESS_READ,
@@ -203,7 +180,6 @@ class Controller extends Base
         UserAccess::SERVICE_HOUSEMASTER => [
             'name' => 'Housemaster',
             'identifier' => self::IDENTIFIER_RESIDENTIAL_HOUSE,
-            'visible' => true,
             'levels' => [
                 'read' => [
                     'level' => UserAccess::ACCESS_READ,
@@ -222,7 +198,6 @@ class Controller extends Base
         UserAccess::SERVICE_RESOURCE_BOOKING => [
             'name' => 'Resource Booking',
             'identifier' => self::IDENTIFIER_NONE,
-            'visible' => true,
             'levels' => [
                 'read' => [
                     'level' => UserAccess::ACCESS_READ,
@@ -241,7 +216,6 @@ class Controller extends Base
         UserAccess::SERVICE_CURRICULUM => [
             'name' => 'Curriculum',
             'identifier' => self::IDENTIFIER_NONE,
-            'visible' => true,
             'levels' => [
                 'read' => [
                     'level' => UserAccess::ACCESS_READ,
@@ -260,7 +234,6 @@ class Controller extends Base
         UserAccess::SERVICE_PASTORAL => [
             'name' => 'Pastoral Moderator',
             'identifier' => self::IDENTIFIER_NONE,
-            'visible' => true,
             'levels' => [
                 'read' => [
                     'level' => UserAccess::ACCESS_READ,
@@ -279,7 +252,6 @@ class Controller extends Base
         UserAccess::SERVICE_SPORTS_ADMINISTRATOR => [
             'name' => 'Sports Administrator',
             'identifier' => self::IDENTIFIER_NONE,
-            'visible' => true,
             'levels' => [
                 'read' => [
                     'level' => UserAccess::ACCESS_READ,
@@ -298,7 +270,6 @@ class Controller extends Base
         UserAccess::SERVICE_COMMS_OFFICER => [
             'name' => 'Comms Officer',
             'identifier' => self::IDENTIFIER_NONE,
-            'visible' => true,
             'levels' => [
                 'read' => [
                     'level' => UserAccess::ACCESS_READ,
@@ -376,7 +347,14 @@ class Controller extends Base
             $fileYear = '';
         }
 
-        $userPermissions = $this->userAccessMapper->findAllForUser($user);
+        $allPermissions   = $this->userAccessMapper->findAllForUser($user);
+
+        /* Don't need the HOMEPAGE service; it's never used
+         */
+        $userPermissions  = $allPermissions->filter(function (UserAccess $access) {
+            return UserAccess::SERVICE_HOMEPAGE !== $access->getService();
+        });
+
         $groupPermissions = $userPermissions->filterBy('service', UserAccess::SERVICE_HOMEPAGE)
                                             ->indexBy('serviceIdentifier');
 
