@@ -10,7 +10,7 @@
             <script type="text/javascript">
                 $(function() {
 
-                    $("#statusForm").addClass("hide");
+                    var $statusFormContainer = $("#statusFormContainer").addClass("hide");
 
                     var $selectize = $('#users').selectizeSelector({
                         ajax: {
@@ -42,10 +42,10 @@
                                 // Not sure under what circumstances this could possibly happen with a selectize,
                                 // but accommodating it anyway
                                 $("[data-empty-state]").show();
-                                $("#statusForm").addClass("hide");
+                                $statusFormContainer.addClass("hide");
                             } else {
                                 $("[data-empty-state]").hide();
-                                $("#statusForm").removeClass("hide");
+                                $statusFormContainer.removeClass("hide");
                             }
 
                             $(data).each(function(index, user) {
@@ -90,7 +90,7 @@
                         var selectizeEmpty = ($selectize.items.length < 1);
                         if (selectizeEmpty) {
                             $("[data-empty-state]").show();
-                            $("#statusForm").addClass("hide");
+                            $statusFormContainer.addClass("hide");
                         }
                     });
 

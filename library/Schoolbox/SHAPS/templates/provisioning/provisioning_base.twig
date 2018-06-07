@@ -21,7 +21,7 @@
         {% block page_specific_content %}
         {% endblock %}
 
-        <div {% if allUsers | length == 0 %}class="hide"{% endif %}>
+        <div id="statusFormContainer" {% if allUsers | length == 0 %}class="hide"{% endif %}>
             <form id="statusForm" action="{{ routeLookup('shaps.postProvision') }}" method="post">
                 <section id="statusTable">
                     <table>
