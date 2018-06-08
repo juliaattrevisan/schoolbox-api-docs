@@ -549,8 +549,9 @@
         var serviceIdentifierDropdown = $("#serviceIdentifierSelect");
         var accessLevelDropdown = $("#accessLevelSelect");
 
-        {# These services only have Moderate as an access level option #}
-        var moderateOnlyServices = {{ moderateOnly }};
+        /* Put that array struct into something js can comprehend
+         */
+        var serviceMapping = $.parseJSON('{{ serviceMapping|json_encode|purify }}');
 
         {# These services don't have Service Identifier options; they are universally applied
          # The Service Identifier dropdown should be hidden when these services are selected
@@ -583,14 +584,26 @@
             }
 
             {# Hide Read and Write permission options in dropdown for certain services #}
-            if (moderateOnlyServices.indexOf(selectedServiceId) > -1) {
-                $("#read").hide();
-                $("#write").hide();
-                accessLevelDropdown.val({{ accessLevel.moderate }});
-            } else {
-                $("#read").show();
-                $("#write").show();
-                accessLevelDropdown.val({{ accessLevel.read }});
+            var preselected = false;
+
+            for (var availability in serviceMapping[selectedServiceId].availability)
+            {
+                var option = $('#' + availability);
+
+                if (serviceMapping[selectedServiceId].availability[availability]) {
+                    option.show();
+
+                    {# Select first available option
+                     # Tried to find a shorter way to do this with option:visible:first but it didn't work; idk why
+                     #}
+                    if (!preselected) {
+                        $('#' + availability).attr('selected', 'selected');
+                        preselected = true;
+                    }
+                }
+                else {
+                    option.hide();
+                }
             }
         });
 

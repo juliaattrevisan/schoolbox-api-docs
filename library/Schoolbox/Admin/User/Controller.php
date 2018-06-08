@@ -286,16 +286,6 @@ class Controller extends Base
             return UserAccess::SERVICE_HOMEPAGE !== $access->getService();
         });
 
-        /* Find the moderate-only services
-         */
-        $moderateOnly = [];
-
-        foreach (self::SERVICE_MAPPING as $service => $data) {
-            if ($data['availability']['moderate'] && !$data['availability']['write'] && !$data['availability']['read']) {
-                $moderateOnly[] = $service;
-            }
-        }
-
         /* Find the Service Identifier Exclusions (no-middle-dropdown services)
          */
         $serviceIdentifierExclusions = [];
@@ -310,7 +300,6 @@ class Controller extends Base
             'template' => '@adminUser/modify.twig',
             'data' => [
                 'serviceMapping' => self::SERVICE_MAPPING,
-                'moderateOnly' => json_encode($moderateOnly),
                 'serviceIdentifierExclusions' => json_encode($serviceIdentifierExclusions),
                 'identifiers' => [
                     'none' => self::IDENTIFIER_NONE,
