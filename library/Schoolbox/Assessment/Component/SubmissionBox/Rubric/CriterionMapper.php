@@ -26,6 +26,8 @@ class CriterionMapper extends Schoolbox\Mapper {
         $this->hasModel(Criterion::class);
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+
+        // These fields now belong to rubric_group
         $this->uses('grouping', self::TYPE_STRING);
         $this->uses('name', self::TYPE_STRING);
         $this->uses('parent_type', self::TYPE_STRING);
@@ -34,6 +36,8 @@ class CriterionMapper extends Schoolbox\Mapper {
         // as far as I can tell, it's never not "category"
         $this->uses('parent_id', self::TYPE_INTEGER);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+
+        $this->joins('rubric_group_id', GroupMapper::class, 'id', null, null, 'group', 'group');
 
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyUniqueness']);
         $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteDescriptors']);

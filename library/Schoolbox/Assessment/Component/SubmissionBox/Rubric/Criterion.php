@@ -42,6 +42,11 @@ class Criterion implements ISoftDeletable
      */
     private $parent_type = self::PARENT_TYPE_CATEGORY;
 
+    /**
+     * @var Group
+     */
+    private $group;
+
 
     /**
      * @param  string $grouping
@@ -113,5 +118,23 @@ class Criterion implements ISoftDeletable
     public function getParentType()
     {
         return $this->parent_type;
+    }
+
+    /**
+     * @return Group
+     */
+    public function getGroup(): Group
+    {
+        return $this->group;
+    }
+
+    /**
+     * @param Group $group
+     * @return static
+     */
+    public function setGroup(Group $group)
+    {
+        $this->group = $group;
+        return $this;
     }
 }
