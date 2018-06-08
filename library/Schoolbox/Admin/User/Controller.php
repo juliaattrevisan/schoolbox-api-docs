@@ -296,13 +296,13 @@ class Controller extends Base
             }
         }
 
-        /* Find the no-middle-dropdown services
+        /* Find the Service Identifier Exclusions (no-middle-dropdown services)
          */
-        $noMiddleDropdown = [];
+        $serviceIdentifierExclusions = [];
 
         foreach (self::SERVICE_MAPPING as $service => $data) {
             if ($data['identifier'] === self::IDENTIFIER_NONE) {
-                $noMiddleDropdown[] = $service;
+                $serviceIdentifierExclusions[] = $service;
             }
         }
 
@@ -311,7 +311,7 @@ class Controller extends Base
             'data' => [
                 'serviceMapping' => self::SERVICE_MAPPING,
                 'moderateOnly' => json_encode($moderateOnly),
-                'noMiddleDropdown' => json_encode($noMiddleDropdown),
+                'serviceIdentifierExclusions' => json_encode($serviceIdentifierExclusions),
                 'identifiers' => [
                     'none' => self::IDENTIFIER_NONE,
                     'campus' => self::IDENTIFIER_CAMPUS,

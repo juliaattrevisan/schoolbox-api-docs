@@ -553,9 +553,9 @@
         var moderateOnlyServices = {{ moderateOnly }};
 
         {# These services don't have Service Identifier options; they are universally applied
-         # The Service Identifier dropdowns hould be hidden when these services are selected
+         # The Service Identifier dropdown should be hidden when these services are selected
          #}
-        var serviceIdentifierExclusions = {{ noMiddleDropdown }}
+        var serviceIdentifierExclusions = {{ serviceIdentifierExclusions }};
 
         servicesDropdown.on('change', function(e) {
             // Hide the last middle and last dropdowns when no service is selected
