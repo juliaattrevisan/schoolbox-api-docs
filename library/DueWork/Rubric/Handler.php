@@ -93,7 +93,8 @@ class DueWork_Rubric_Handler
             SELECT sr.owner, sb.id AS 'sb.id', rc.id AS 'rc.id', rd.value AS 'mark'
             FROM rubric_mark rm
             JOIN rubric_descriptor rd ON rd.id = rm.descriptor_id AND rd.deleted_at IS NULL
-            JOIN rubric_criterion rc  ON rc.id = rd.criterion_id AND rc.deleted_at IS NULL
+            JOIN rubric_criterion  rc ON rc.id = rd.criterion_id AND rc.deleted_at IS NULL
+            JOIN rubric_group      rg ON rg.id = rc.rubric_group_id AND rg.deleted_at IS NULL
             JOIN submission_return sr ON sr.id = rm.return_id
             JOIN submission_box sb    ON sb.id = sr.box_id
             JOIN assessment a         ON  a.id = sb.assessment_id
@@ -107,7 +108,8 @@ class DueWork_Rubric_Handler
                     sr.box_id AS 'sb_id'
                 FROM rubric_mark rm
                 JOIN rubric_descriptor rd ON rd.id = rm.descriptor_id AND rd.deleted_at IS NULL
-                JOIN rubric_criterion rc  ON rc.id = rd.criterion_id AND rc.deleted_at IS NULL
+                JOIN rubric_criterion  rc ON rc.id = rd.criterion_id AND rc.deleted_at IS NULL
+                JOIN rubric_group      rg ON rg.id = rc.rubric_group_id AND rg.deleted_at IS NULL
                 JOIN submission_return sr ON sr.id = rm.return_id
                 JOIN submission_box sb    ON sb.id = sr.box_id
                 JOIN assessment a         ON  a.id = sb.assessment_id
@@ -125,15 +127,16 @@ class DueWork_Rubric_Handler
 
         // 2. Get max mark per criterion and dueWork
         $pb = new Alaress\Database\Predicate\Builder($this->db, '');
-        $pb->in('rc.parent_id', $folderIds)
-           ->equals('rc.parent_type', Criterion::PARENT_TYPE_CATEGORY)
+        $pb->in('rg.parent_id', $folderIds)
+           ->equals('rg.parent_type', Criterion::PARENT_TYPE_CATEGORY)
            ->greaterThan('rd.value', 0.0);
         $whereClause = implode(' AND ', $pb->getWhere());
         $stmt        = Database::getInstance()->prepare("
-            SELECT rl.box_id AS 'sb.id', rc.id AS 'rc.id', rc.grouping, rc.name, MAX(rd.value) AS 'max_mark'
+            SELECT rl.box_id AS 'sb.id', rc.id AS 'rc.id', rg.name AS grouping, rc.name, MAX(rd.value) AS 'max_mark'
             FROM rubric_descriptor rd
             JOIN rubric_criterion rc ON rc.id = rd.criterion_id AND rc.deleted_at IS NULL
-            JOIN rubric_level rl ON rl.id = rd.level_id AND rl.deleted_at IS NULL
+            JOIN rubric_group     rg ON rg.id = rc.rubric_group_id AND rg.deleted_at IS NULL
+            JOIN rubric_level     rl ON rl.id = rd.level_id AND rl.deleted_at IS NULL
             WHERE {$whereClause}
             GROUP BY rl.box_id, rc.id
             ORDER BY rl.box_id, rc.id
@@ -208,17 +211,19 @@ class DueWork_Rubric_Handler
         }
 
         $pb = new Alaress\Database\Predicate\Builder($this->db, '');
-        $pb->in('parent_id', $parentIds)
-           ->equals('parent_type', $parentType);
+        $pb->in('rg.parent_id', $parentIds)
+           ->equals('rg.parent_type', $parentType);
 
         $whereClause = implode(' AND ', $pb->getWhere());
 
         $stmt = $this->db->prepare("
-            SELECT `grouping`, `id`, `name`
-            FROM `rubric_criterion`
+            SELECT rg.name AS grouping, rc.id, rc.name
+            FROM rubric_criterion rc
+            JOIN rubric_group     rg ON rg.id = rc.rubric_group_id AND rg.deleted_at IS NULL
             WHERE {$whereClause}
-            AND deleted_at IS NULL
-            ORDER BY `grouping` ASC, `name` ASC
+            AND rc.deleted_at IS NULL
+            AND rg.deleted_at IS NULL
+            ORDER BY rg.name ASC, rc.name ASC
         ");
         $stmt->execute($pb->getParams());
 
