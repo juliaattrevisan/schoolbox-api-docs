@@ -553,11 +553,6 @@
          */
         var serviceMapping = $.parseJSON('{{ serviceMapping|json_encode|purify }}');
 
-        {# These services don't have Service Identifier options; they are universally applied
-         # The Service Identifier dropdown should be hidden when these services are selected
-         #}
-        var serviceIdentifierExclusions = {{ serviceIdentifierExclusions }};
-
         $("#serviceSelect").on('change', function() {
 
             {# Enable submit button #}
@@ -577,7 +572,7 @@
             {# Hide the Service Identifier dropdown when it's not required
              # Service Identifiers are only made visible when a non-disabled Service is selected
              #}
-            if (serviceIdentifierExclusions.indexOf(selectedServiceId) > -1) {
+            if (serviceMapping[selectedServiceId].identifier == '{{ identifiers.none }}') {
                 serviceIdentifierDropdown.hide();
             } else {
                 serviceIdentifierDropdown.show();

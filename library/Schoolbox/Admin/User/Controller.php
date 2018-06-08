@@ -286,21 +286,10 @@ class Controller extends Base
             return UserAccess::SERVICE_HOMEPAGE !== $access->getService();
         });
 
-        /* Find the Service Identifier Exclusions (no-middle-dropdown services)
-         */
-        $serviceIdentifierExclusions = [];
-
-        foreach (self::SERVICE_MAPPING as $service => $data) {
-            if ($data['identifier'] === self::IDENTIFIER_NONE) {
-                $serviceIdentifierExclusions[] = $service;
-            }
-        }
-
         $this->getResponse()->content->set([
             'template' => '@adminUser/modify.twig',
             'data' => [
                 'serviceMapping' => self::SERVICE_MAPPING,
-                'serviceIdentifierExclusions' => json_encode($serviceIdentifierExclusions),
                 'identifiers' => [
                     'none' => self::IDENTIFIER_NONE,
                     'campus' => self::IDENTIFIER_CAMPUS,
