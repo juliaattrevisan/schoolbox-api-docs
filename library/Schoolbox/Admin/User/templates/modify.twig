@@ -248,7 +248,7 @@
                         <form action="{{ routeLookup('adminUser.postInsertGroup', {userId: user.id }) }}" method="post" id="groupAdd" data-validatable-as="addGroup" class="list-item">
                             <div class="card small-7">
                                 <select required name="sid" id="groupSelect" form="groupAdd" class="required" title="Group">
-                                    <option value="">Select a Group</option>
+                                    <option value="" disabled selected>Select a Group</option>
                                     {% for folder in allGroups %}
                                         <option value="{{ folder.id }}">{{ folder.name }}</option>
                                     {% endfor %}
@@ -335,7 +335,7 @@
                               data-action="addService" class="list-item">
                             <div class="small-4 card">
                                 <select data-role="serviceSelector" name="service" id="serviceSelect" form="serviceCloneForm" required>
-                                    <option value="" data-identifier="{{ identifiers.none }}">Select Service</option>
+                                    <option value="" data-identifier="{{ identifiers.none }}" disabled selected>Select Service</option>
 
                                     {% for serviceIdentifier, serviceData in serviceMapping %}
                                         <option value="{{ serviceIdentifier }}" data-identifier="{{ serviceData.identifier }}">{{ serviceData.name }}</option>
@@ -344,13 +344,13 @@
                             </div>
                             <div class="small-4 card">
                                 <select data-service-type="{{ identifiers.campus }}" name="sid" id="campusSelect" class="hide" disabled required>
-                                    <option value="">Select Campus</option>
+                                    <option value="" disabled selected>Select Campus</option>
                                     {% for campus in campuses %}
                                         <option value="{{ campus.id }}">{{ campus.name }}</option>
                                     {% endfor %}
                                 </select>
                                 <select data-service-type="{{ identifiers.residentialHouse }}" name="sid" id="residentialHouseSelect" class="hide" disabled required>
-                                    <option value="">Select Residential House</option>
+                                    <option value="" disabled selected>Select Residential House</option>
                                     {% for residentialHouse in residentialHouses %}
                                         <option value="{{ residentialHouse.id }}">{{ residentialHouse.house }}</option>
                                     {% endfor %}
