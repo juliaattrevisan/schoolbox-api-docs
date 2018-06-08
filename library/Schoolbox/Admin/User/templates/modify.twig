@@ -741,7 +741,6 @@
 
                 $.post(form.attr('action'), form.serializeArray(), function() {
                     label.toastTimeout({text: 'Group Access Level updated.', css: 'success'});
-                    reloadComponent();
                 })
                 .fail(function(){
                     label.toastTimeout({text: 'Could not update Group Access Level.', css: 'alert'});
@@ -758,7 +757,6 @@
 
                 $.post(form.attr('action'), form.serializeArray(), function() {
                     label.toastTimeout({text: 'Service Access Level updated.', css: 'success'});
-                    reloadComponent();
                 })
                 .fail(function(){
                     label.toastTimeout({text: 'Could not update Service Access Level.', css: 'alert'});
