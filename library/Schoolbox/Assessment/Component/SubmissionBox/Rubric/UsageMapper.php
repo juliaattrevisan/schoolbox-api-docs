@@ -89,10 +89,10 @@ class UsageMapper extends Schoolbox\Mapper {
                     $criterion_usage->setCriterion(
                         $criterion_mapper->findOneByColumnList(
                             array(
-                                'grouping'    => $from_criterion->getGrouping(),
-                                'name'        => $from_criterion->getName(),
-                                'parent_id'   => $to_box->getCategory()->getId(),
-                                'parent_type' => Criterion::PARENT_TYPE_CATEGORY,
+                                'g.name'        => $from_criterion->getGrouping(),
+                                'name'          => $from_criterion->getName(),
+                                'g.parent_id'   => $to_box->getCategory()->getId(),
+                                'g.parent_type' => Criterion::PARENT_TYPE_CATEGORY,
                             )
                         )
                     );

@@ -68,10 +68,11 @@ $affectedSubmissionBoxes = SubmissionBoxMapper::getInstance()->createCollection(
 //work out the diff and delete unnecessary criteria
 $found = array_keys($data);
 
+// TODO write this into criteria mapper, it's reused frequently. Search for "parent_type"
 $criterionCollection = $criterionMapper->findByColumnList(
     [
-        'parent_id'   => $folderId,
-        'parent_type' => Criterion::PARENT_TYPE_CATEGORY,
+        'g.parent_id'   => $folderId,
+        'g.parent_type' => Criterion::PARENT_TYPE_CATEGORY,
     ]
 );
 

@@ -107,15 +107,15 @@ class CriterionMapper extends Schoolbox\Mapper {
         /** @var Criterion[] $from_rubric_list */
         $from_rubric_list = $this->findByColumnList(
             array(
-                'parent_id'   => $from_id,
-                'parent_type' => Criterion::PARENT_TYPE_CATEGORY,
+                'g.parent_id'   => $from_id,
+                'g.parent_type' => Criterion::PARENT_TYPE_CATEGORY,
             )
         );
         /** @var Criterion[] $existing_rubric_list */
         $existing_rubric_list = $this->findByColumnList(
             array(
-                'parent_id'   => $to_id,
-                'parent_type' => Criterion::PARENT_TYPE_CATEGORY,
+                'g.parent_id'   => $to_id,
+                'g.parent_type' => Criterion::PARENT_TYPE_CATEGORY,
             )
         );
         $new_rubric_list = new Schoolbox\Collection();
@@ -161,10 +161,10 @@ class CriterionMapper extends Schoolbox\Mapper {
         try {
             // attempt lookup
             $existingObject = $this->findOneByColumnList([
-                'grouping'    => $object->getGrouping(),
-                'name'        => $object->getName(),
-                'parent_id'   => $object->getParentId(),
-                'parent_type' => $object->getParentType(),
+                'g.name'        => $object->getGrouping(),
+                'name'          => $object->getName(),
+                'g.parent_id'   => $object->getParentId(),
+                'g.parent_type' => $object->getParentType(),
             ]);
 
             // found something! sweet. assign that ID.

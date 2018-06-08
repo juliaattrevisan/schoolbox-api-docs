@@ -1109,8 +1109,8 @@ class Controller extends Base\Base
         /** @var GenericCollection | Criterion[] $allCriteria */
         $allCriteria = $criteriaMapper->findByColumnList(
             [
-                'parent_id'   => $sourceIds,
-                'parent_type' => Criterion::PARENT_TYPE_CATEGORY,
+                'g.parent_id'   => $sourceIds,
+                'g.parent_type' => Criterion::PARENT_TYPE_CATEGORY,
             ]
         );
 

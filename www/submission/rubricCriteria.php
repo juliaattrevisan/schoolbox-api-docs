@@ -72,10 +72,10 @@ $this->setVar('PAGE_TITLE', $title);
 // get rubric details
 $criterionCollection = CriterionMapper::getInstance()->findByColumnList(
     [
-        'parent_id'   => $folderId,
-        'parent_type' => Criterion::PARENT_TYPE_CATEGORY,
+        'g.parent_id'   => $folderId,
+        'g.parent_type' => Criterion::PARENT_TYPE_CATEGORY,
     ],
-    ['order' => ['grouping' => 'ASC', 'name' => 'ASC']]
+    ['order' => ['g.name' => 'ASC', 'name' => 'ASC']]
 );
 
 

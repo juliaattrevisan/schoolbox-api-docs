@@ -75,8 +75,8 @@ class DueWork_Rubric_Handler
          * @see http://www.sqlservice.se/sql-server-performance-death-by-correlated-subqueries/
          */
         $pb = new Alaress\Database\Predicate\Builder($this->db, '');
-        $pb->in('rc.parent_id', $folderIds)
-           ->equals('rc.parent_type', Criterion::PARENT_TYPE_CATEGORY)
+        $pb->in('rg.parent_id', $folderIds)
+           ->equals('rg.parent_type', Criterion::PARENT_TYPE_CATEGORY)
            ->greaterThanOrEqualTo('a.due_date', $term->getStart()->getDatabase())
            ->equals('sr.review_route', ReturnedWork::REVIEW_ROUTE_INSTRUCTOR);
 

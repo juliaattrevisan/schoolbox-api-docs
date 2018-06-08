@@ -149,8 +149,8 @@ class RubricMapper
             LEFT JOIN rubric_usage ru ON rc.id = ru.criterion_id
             LEFT JOIN submission_box b ON ru.submission_box_id = b.id
             LEFT JOIN assessment a ON b.assessment_id = a.id AND a.deleted_at IS NOT NULL
-            WHERE rc.parent_type = 'category'
-            AND rc.parent_id IN (:$in)
+            WHERE rg.parent_type = 'category'
+            AND rg.parent_id IN (:$in)
             AND rc.deleted_at IS NULL
             AND rg.deleted_at IS NULL
             GROUP BY rc.id
@@ -386,8 +386,8 @@ class RubricMapper
                 LEFT JOIN rubric_usage u ON u.criterion_id = c.id
                 LEFT JOIN submission_box b ON u.submission_box_id = b.id                  -- This will join to deleted boxes
                 LEFT JOIN assessment a ON b.assessment_id = a.id AND a.deleted_at IS NULL -- But won't join to deleted assessments
-                WHERE c.parent_type = :parent_type
-                AND c.parent_id IN (:$in)
+                WHERE g.parent_type = :parent_type
+                AND g.parent_id IN (:$in)
                 AND c.deleted_at IS NULL
                 AND g.deleted_at IS NULL
             ) t
@@ -596,10 +596,10 @@ class RubricMapper
                 try {
                     // if the crit exists, just use that
                     $model = CriterionMapper::getInstance()->findOneByColumnList([
-                        'grouping'    => $group,
+                        'g.name'        => $group,
                         'name'        => $name,
-                        'parent_type' => 'category',
-                        'parent_id'   => $folderLookup,
+                        'g.parent_type' => Group::PARENT_TYPE_CATEGORY,
+                        'g.parent_id'   => $folderLookup,
                     ]);
 
                 } catch (\Schoolbox\Mapper\Exception $e) {
@@ -1113,8 +1113,8 @@ class RubricMapper
         /** @var Descriptor $firstSrcDescriptor */
         $firstSrcDescriptor = $srcDescriptors->first();
         $existingCriteria   = $criterionMapper->findByColumnList([
-            'parent_id'   => $dstBox->getCategory()->getId(),
-            'parent_type' => $firstSrcDescriptor->getCriterion()->getParentType(),
+            'g.parent_id'   => $dstBox->getCategory()->getId(),
+            'g.parent_type' => $firstSrcDescriptor->getCriterion()->getParentType(),
         ], ['cache' => false]);
         // Convert to 2-D arrays, indexed by 'group' then 'name', so we can later find duplicates.
         /** @var Criterion[][] $existingGroupMap */
