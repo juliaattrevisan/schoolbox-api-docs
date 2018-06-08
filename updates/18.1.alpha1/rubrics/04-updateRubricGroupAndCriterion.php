@@ -27,17 +27,18 @@ $kernel->run(
      * @param Di\Container  $di
      * @param LoopInterface $loop
      * @param Logger        $log
-     * @param               $opts
      *
      * @throws Di\Exception\ServiceNotFound
      */
-    function (Di\Container $di, LoopInterface $loop, Logger $log, $opts) {
+    function (Di\Container $di, LoopInterface $loop, Logger $log) {
         /** @var IConnector $db */
         $db = $di->get('databaseInternal');
 
         $db->beginTransaction();
 
         // Query for finding criteria
+        // The grouping is deleted when its most recent criterion is deleted.
+        // (If it has non-deleted criteria, it will be restored next update.)
         $selectCriteriaQuery = $db->prepareQuery("
             SELECT DISTINCT
                 `grouping`, `parent_id`, `parent_type`, MAX(`deleted_at`) AS `deleted_at`
@@ -55,7 +56,7 @@ $kernel->run(
         ");
 
         // Associate rubric criteria with their group
-        $updateRubricCriteriaQuery = $db->prepareQuery("
+        $associateRubricCriteriaQuery = $db->prepareQuery("
             UPDATE `rubric_criterion`
             SET `rubric_group_id` = :rubricGroupId
             WHERE grouping = :grouping AND parent_id = :parentId AND parent_type = :parentType
@@ -90,7 +91,7 @@ $kernel->run(
 
 
             // Associate existing rubric_criterion rows with new rubric_group
-            $updateRubricCriteriaQuery->execute([
+            $associateRubricCriteriaQuery->execute([
                 'grouping'      => $row['grouping'],
                 'parentId'      => $row['parent_id'],
                 'parentType'    => $row['parent_type'],
@@ -99,7 +100,7 @@ $kernel->run(
             $log->debug(
                 sprintf(
                     '%d rubric_criterion rows associated with rubric_group #%d',
-                    $updateRubricCriteriaQuery->rowCount(),
+                    $associateRubricCriteriaQuery->rowCount(),
                     $rubricGroupId
                 )
             );
