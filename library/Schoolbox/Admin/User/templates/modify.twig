@@ -584,6 +584,7 @@
             for (var availability in serviceMapping[selectedServiceId].availability)
             {
                 var option = $('#' + availability);
+                option.removeAttr('selected');
 
                 if (serviceMapping[selectedServiceId].availability[availability]) {
                     option.show();
@@ -592,7 +593,7 @@
                      # Tried to find a shorter way to do this with option:visible:first but it didn't work; idk why
                      #}
                     if (!preselected) {
-                        $('#' + availability).attr('selected', 'selected');
+                        option.attr('selected', 'selected');
                         preselected = true;
                     }
                 }
