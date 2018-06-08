@@ -549,8 +549,7 @@
         var serviceIdentifierDropdown = $("#serviceIdentifierSelect");
         var accessLevelDropdown = $("#accessLevelSelect");
 
-        /* Put that array struct into something js can comprehend
-         */
+        {# Put that array struct into something js can comprehend #}
         var serviceMapping = $.parseJSON('{{ serviceMapping|json_encode|purify }}');
 
         $("#serviceSelect").on('change', function() {
@@ -583,8 +582,7 @@
 
             for (var availability in serviceMapping[selectedServiceId].availability)
             {
-                var option = $('#' + availability);
-                option.removeAttr('selected');
+                var option = $('#' + availability).removeAttr('selected');
 
                 if (serviceMapping[selectedServiceId].availability[availability]) {
                     option.show();
