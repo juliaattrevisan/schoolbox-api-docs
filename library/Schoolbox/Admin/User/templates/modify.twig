@@ -550,6 +550,7 @@
         var serviceIdentifierDropdown = $("#serviceIdentifierSelect");
         var permissionsDropdown = $("#permissionSelect");
 
+        {# These services only have Moderate as an access level option #}
         var moderateOnlyServices = {{ moderateOnly }};
 
         {# These services don't have Service Identifier options; they are universally applied
