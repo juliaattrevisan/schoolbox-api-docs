@@ -143,14 +143,16 @@ class RubricMapper
         $in = implode(', :', array_keys($args));
 
         $stmt = $this->database->query("
-            SELECT rc.id, rc.grouping, rc.name, COUNT(ru.submission_box_id) usage_count, rc.parent_id
+            SELECT rc.id, rg.name AS grouping, rc.name, COUNT(ru.submission_box_id) usage_count, rc.parent_id
             FROM rubric_criterion rc
+            JOIN      rubric_group rg ON rg.id = rc.rubric_group_id
             LEFT JOIN rubric_usage ru ON rc.id = ru.criterion_id
             LEFT JOIN submission_box b ON ru.submission_box_id = b.id
             LEFT JOIN assessment a ON b.assessment_id = a.id AND a.deleted_at IS NOT NULL
             WHERE rc.parent_type = 'category'
             AND rc.parent_id IN (:$in)
             AND rc.deleted_at IS NULL
+            AND rg.deleted_at IS NULL
             GROUP BY rc.id
         ", $args);
 
@@ -374,18 +376,20 @@ class RubricMapper
             FROM (
                 SELECT
                     c.id AS crit_id,
-                    c.grouping,
+                    g.name AS grouping,
                     c.name,
                     a.id AS a_id,                                        -- Will be NULL if not in use by a box, or box is soft-deleted
                     IF(b.id = :boxId, 1, 0) AS selected,                 -- Is this criterion in use by this box? (ignores whether box is deleted)
                     IF(b.id = :boxId, u.sequence, NULL) AS sequence      -- Only get sequence for this box (ignores whether box is deleted)
                 FROM rubric_criterion c
+                JOIN      rubric_group g ON g.id = c.rubric_group_id
                 LEFT JOIN rubric_usage u ON u.criterion_id = c.id
                 LEFT JOIN submission_box b ON u.submission_box_id = b.id                  -- This will join to deleted boxes
                 LEFT JOIN assessment a ON b.assessment_id = a.id AND a.deleted_at IS NULL -- But won't join to deleted assessments
                 WHERE c.parent_type = :parent_type
                 AND c.parent_id IN (:$in)
                 AND c.deleted_at IS NULL
+                AND g.deleted_at IS NULL
             ) t
             GROUP BY crit_id
             ORDER BY selected DESC, MAX(`sequence`) ASC, `grouping` ASC, `name` ASC;
