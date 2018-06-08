@@ -558,6 +558,13 @@
         var serviceIdentifierExclusions = {{ serviceIdentifierExclusions }};
 
         $("#serviceSelect").on('change', function() {
+
+            {# Validator does not have a functioniong reset-all-errors mechanism
+             # https://stackoverflow.com/questions/2086287/how-to-clear-jquery-validation-error-messages
+             #}
+            $('label.error').hide();
+            $('.error').removeClass('error');
+
             var selectedServiceId = parseInt($(this).val());
 
             {# These are always available once a non-disabled Service is selected #}
