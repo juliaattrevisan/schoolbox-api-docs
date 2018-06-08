@@ -25,11 +25,6 @@ class Group implements ISoftDeletable
     /**
      * @var string
      */
-    private $grouping;
-
-    /**
-     * @var string
-     */
     private $name;
 
     /**
@@ -41,24 +36,6 @@ class Group implements ISoftDeletable
      * @var string
      */
     private $parentType = self::PARENT_TYPE_CATEGORY;
-
-    /**
-     * @return string
-     */
-    public function getGrouping(): string
-    {
-        return $this->grouping;
-    }
-
-    /**
-     * @param string $grouping
-     * @return static
-     */
-    public function setGrouping(string $grouping)
-    {
-        $this->grouping = $grouping;
-        return $this;
-    }
 
     /**
      * @return string

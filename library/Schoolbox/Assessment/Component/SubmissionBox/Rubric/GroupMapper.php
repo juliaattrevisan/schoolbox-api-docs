@@ -29,7 +29,6 @@ class GroupMapper extends Schoolbox\Mapper
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
 
-        $this->uses('grouping', self::TYPE_STRING);
         $this->uses('name', self::TYPE_STRING);
         $this->uses('parent_type', self::TYPE_STRING);
 
