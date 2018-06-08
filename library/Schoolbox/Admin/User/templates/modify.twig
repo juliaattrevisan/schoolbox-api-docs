@@ -248,7 +248,7 @@
                         <form action="{{ routeLookup('adminUser.postInsertGroup', {userId: user.id }) }}" method="post" id="groupAdd" data-validatable-as="addGroup" class="list-item">
                             <div class="card small-7">
                                 <select required name="sid" id="groupSelect" form="groupAdd" class="required" title="Group">
-                                    <option value="" disabled selected>Select a Group</option>
+                                    <option value="" disabled selected>Select Group</option>
                                     {% for folder in allGroups %}
                                         <option value="{{ folder.id }}">{{ folder.name }}</option>
                                     {% endfor %}
