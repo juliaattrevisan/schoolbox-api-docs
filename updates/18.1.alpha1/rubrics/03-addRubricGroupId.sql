@@ -1,6 +1,6 @@
 /**
  * Add a relation to rubric groups in criteria.
- * This will be populated in the next update.
+ * This will be populated in the next update script.
  */
 ALTER TABLE `rubric_criterion`
     ADD COLUMN `rubric_group_id` int(11) NULL DEFAULT NULL AFTER `id`,
