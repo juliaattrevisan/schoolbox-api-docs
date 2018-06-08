@@ -34,14 +34,17 @@ $kernel->run(
         /** @var IConnector $db */
         $db = $di->get('databaseInternal');
 
-        $db->beginTransaction();
-
         // Query for finding criteria
-        // The grouping is deleted when its most recent criterion is deleted.
-        // (If it has non-deleted criteria, it will be restored next update.)
+        // If and only if the criteria grouping has only deleted criteria:
+        // the grouping is deleted at the time its most recently deleted
+        // criterion was deleted.
+        // It is not deleted if it has any non-deleted criteria.
         $selectCriteriaQuery = $db->prepareQuery("
             SELECT DISTINCT
-                `grouping`, `parent_id`, `parent_type`, MAX(`deleted_at`) AS `deleted_at`
+                `grouping`,
+                `parent_id`,
+                `parent_type`,
+                IF (MAX(`deleted_at` IS NULL) = 0, MAX(`deleted_at`), NULL) AS `deleted_at`
             FROM `rubric_criterion`
             WHERE `rubric_group_id` IS NULL
             GROUP BY `grouping`, `parent_id`, `parent_type`
@@ -63,7 +66,8 @@ $kernel->run(
         ");
 
 
-        // Go
+        // Run update
+        $db->beginTransaction();
         $selectCriteriaQuery->execute();
         $criteriaCount = $selectCriteriaQuery->rowCount();
         $log->info(sprintf('Migrating %d distinct rubric_criterion rows...', $criteriaCount));
@@ -102,52 +106,6 @@ $kernel->run(
                     '%d rubric_criterion rows associated with rubric_group #%d',
                     $associateRubricCriteriaQuery->rowCount(),
                     $rubricGroupId
-                )
-            );
-        }
-
-
-        // Which criteria are NOT soft-deleted?
-        // We need to make sure they aren't deleted in the rubric group.
-
-        // Find undeleted criteria
-        $selectUndeletedCriteriaQuery = $db->prepareQuery("
-            SELECT DISTINCT
-                `rubric_group_id`, `grouping`, `parent_id`, `parent_type`
-            FROM `rubric_criterion`
-            WHERE `deleted_at` IS NOT NULL
-            ORDER BY `parent_type`, `parent_id`, `grouping`
-        ");
-
-        // Ensure their group is undeleted
-        $updateRubricGroupQuery = $db->prepareQuery("
-            UPDATE `rubric_group`
-            SET `deleted_at` = NULL
-            WHERE id = :rubricGroupId
-        ");
-
-        // Go
-        $selectUndeletedCriteriaQuery->execute();
-        $undeletedCriteriaCount = $selectCriteriaQuery->rowCount();
-        $log->info(sprintf('Ensuring %d distinct rubric_criterion rows are not deleted...', $undeletedCriteriaCount));
-        foreach ($selectUndeletedCriteriaQuery->getIterator() as $i => $row) {
-            $log->info(
-                sprintf(
-                    'Ensuring rubric_criterion %d/%d (%s #%d: %s) is not deleted...',
-                    $i+1,
-                    $undeletedCriteriaCount,
-                    $row['parent_type'],
-                    $row['parent_id'],
-                    $row['grouping']
-                )
-            );
-            $updateRubricGroupQuery->execute([
-                'rubricGroupId' => $row['rubric_group_id'],
-            ]);
-            $log->debug(
-                sprintf(
-                    '%d rubric_group rows undeleted',
-                    $updateRubricGroupQuery->rowCount()
                 )
             );
         }
