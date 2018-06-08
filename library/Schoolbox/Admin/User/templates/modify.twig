@@ -546,7 +546,6 @@
 <script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
 <script type="text/javascript">
     $(function () {
-        var servicesDropdown = $("#serviceSelect");
         var serviceIdentifierDropdown = $("#serviceIdentifierSelect");
         var accessLevelDropdown = $("#accessLevelSelect");
 
@@ -558,7 +557,7 @@
          #}
         var serviceIdentifierExclusions = {{ serviceIdentifierExclusions }};
 
-        servicesDropdown.on('change', function() {
+        $("#serviceSelect").on('change', function() {
             var selectedServiceId = parseInt($(this).val());
 
             {# These are always available once a non-disabled Service is selected #}
