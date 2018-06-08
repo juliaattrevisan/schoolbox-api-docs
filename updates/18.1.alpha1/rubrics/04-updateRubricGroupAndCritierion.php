@@ -42,6 +42,7 @@ $kernel->run(
             SELECT DISTINCT
                 `grouping`, `parent_id`, `parent_type`, MAX(`deleted_at`) AS `deleted_at`
             FROM `rubric_criterion`
+            WHERE `rubric_group_id` IS NULL
             GROUP BY `grouping`, `parent_id`, `parent_type`
             ORDER BY `parent_type`, `parent_id`, `grouping`
         ");
@@ -113,7 +114,7 @@ $kernel->run(
             SELECT DISTINCT
                 `rubric_group_id`, `grouping`, `parent_id`, `parent_type`
             FROM `rubric_criterion`
-            WHERE `deleted_at` IS NULL
+            WHERE `deleted_at` IS NOT NULL
             ORDER BY `parent_type`, `parent_id`, `grouping`
         ");
 
@@ -142,8 +143,14 @@ $kernel->run(
             $updateRubricGroupQuery->execute([
                 'rubricGroupId' => $row['rubric_group_id'],
             ]);
+            $log->debug(
+                sprintf(
+                    '%d rubric_group rows undeleted',
+                    $updateRubricGroupQuery->rowCount()
+                )
+            );
         }
 
-        $db->rollBack();
+        $db->commit();
     }
 );
