@@ -564,14 +564,14 @@
             permissionsDropdown.show();
 
             // Hide the middle dropdown for services where it's empty
-            if (serviceIdentifierExclusions.indexOf(selectedServiceId) !== -1) {
+            if (serviceIdentifierExclusions.indexOf(selectedServiceId) > -1) {
                 serviceIdentifierDropdown.hide();
             } else if (servicesDropdown.val() !== "")  {
                 serviceIdentifierDropdown.show();
             }
 
             {# Hide Read and Write permission options in dropdown for certain services #}
-            if (moderateOnlyServices.indexOf(selectedServiceId) !== -1) {
+            if (moderateOnlyServices.indexOf(selectedServiceId) > -1) {
                 $("#read").hide();
                 $("#write").hide();
                 permissionsDropdown.val({{ accessLevel.moderate }});
