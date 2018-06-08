@@ -549,6 +549,8 @@
         var servicesDropdown = $("#serviceSelect");
         var middleDropdown = $("#defaultSelect");
         var permissionsDropdown = $("#permissionSelect");
+        var moderateOnlyServices = {{ moderateOnly }};
+        var noMiddleDropdownServices = {{ noMiddleDropdown }};
 
         // Hide the last middle and last dropdowns initially, when no service is selected yet
         if (servicesDropdown.val() === "") {
@@ -568,8 +570,6 @@
 
             var selectedServiceId = parseInt($(e.target).val());
 
-            var moderateOnlyServices = {{ moderateOnly }};
-            var noMiddleDropdownServices = {{ noMiddleDropdown }};
 
             // Hide the middle dropdown for services where it's empty
             if (noMiddleDropdownServices.indexOf(selectedServiceId) !== -1) {
