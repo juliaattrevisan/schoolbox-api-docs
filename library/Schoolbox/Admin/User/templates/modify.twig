@@ -367,7 +367,7 @@
                                 </select>
                             </div>
                             <div class="small-12 card">
-                                <p><input type="submit" value="Add" name="serviceSubmit"></p>
+                                <p><input type="submit" value="Add" name="serviceSubmit" disabled></p>
                             </div>
                         </form>
                     </li>
@@ -558,6 +558,9 @@
         var serviceIdentifierExclusions = {{ serviceIdentifierExclusions }};
 
         $("#serviceSelect").on('change', function() {
+
+            {# Enable submit button #}
+            $('form[data-validatable-as="addService"]').find(':submit').prop('disabled', false);
 
             {# Validator does not have a functioniong reset-all-errors mechanism
              # https://stackoverflow.com/questions/2086287/how-to-clear-jquery-validation-error-messages
