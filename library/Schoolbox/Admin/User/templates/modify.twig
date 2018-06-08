@@ -262,7 +262,7 @@
                                 </select>
                             </div>
                             <div class="card small-12">
-                                <p><input type="submit" value="Add"/></p>
+                                <p><input type="submit" value="Add" disabled/></p>
                             </div>
                         </form>
                     </li>
@@ -592,6 +592,11 @@
                 $("#write").show();
                 accessLevelDropdown.val({{ accessLevel.read }});
             }
+        });
+
+        {# Enable submit button once something valid was chosen #}
+        $('#groupSelect').on('change', function() {
+            $('form[data-validatable-as="addGroup"]').find(':submit').prop('disabled', false);
         });
 
         {# Validate user details#}
