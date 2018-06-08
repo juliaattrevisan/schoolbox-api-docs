@@ -559,16 +559,9 @@
         var serviceIdentifierExclusions = {{ serviceIdentifierExclusions }};
 
         servicesDropdown.on('change', function() {
-            // Hide the last middle and last dropdowns when no service is selected
-            if (servicesDropdown.val() === "") {
-                permissionsDropdown.hide();
-                serviceIdentifierDropdown.hide();
-            } else {
-                permissionsDropdown.show();
-                serviceIdentifierDropdown.show();
-            }
-
             var selectedServiceId = parseInt($(this).val());
+
+            permissionsDropdown.show();
 
             // Hide the middle dropdown for services where it's empty
             if (serviceIdentifierExclusions.indexOf(selectedServiceId) !== -1) {
