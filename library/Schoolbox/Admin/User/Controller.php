@@ -99,10 +99,17 @@ class Controller extends Base
     /**
      * These identifier consts determine which dropdown to use when choosing the Service Identifier
      * There are currently three options: campus, residentialHouse, none
+     * Also represent those as an iterable
      */
+    private const IDENTIFIER_NONE = 'none';
     private const IDENTIFIER_CAMPUS = 'campus';
     private const IDENTIFIER_RESIDENTIAL_HOUSE = 'residentialHouse';
-    private const IDENTIFIER_NONE = 'none';
+
+    private const IDENTIFIERS = [
+        'none' => self::IDENTIFIER_NONE,
+        'campus' => self::IDENTIFIER_CAMPUS,
+        'residentialHouse' => self::IDENTIFIER_RESIDENTIAL_HOUSE
+    ];
 
     /**
      * Access Levels
@@ -290,11 +297,7 @@ class Controller extends Base
             'template' => '@adminUser/modify.twig',
             'data' => [
                 'serviceMapping' => self::SERVICE_MAPPING,
-                'identifiers' => [
-                    'none' => self::IDENTIFIER_NONE,
-                    'campus' => self::IDENTIFIER_CAMPUS,
-                    'residentialHouse' => self::IDENTIFIER_RESIDENTIAL_HOUSE
-                ],
+                'identifiers' => self::IDENTIFIERS,
                 'accessLevel' => self::ACCESS_LEVELS,
 
                 'pageCurrent' => 'user',
