@@ -355,12 +355,12 @@
                                         <option value="{{ residentialHouse.id }}">{{ residentialHouse.house }}</option>
                                     {% endfor %}
                                 </select>
-                                <select data-service-type="{{ identifiers.none }}" name="sid" id="defaultSelect">
+                                <select data-service-type="{{ identifiers.none }}" name="sid" id="defaultSelect" style="display:none">
                                     <option value="" disabled>--</option>
                                 </select>
                             </div>
                             <div class="small-4 card end">
-                                <select name="type" id="permissionSelect" form="serviceCloneForm" required>
+                                <select name="type" id="permissionSelect" form="serviceCloneForm" required style="display:none">
                                     <option id="read" value="{{ accessLevel.read }}">Read</option>
                                     <option id="write" value="{{ accessLevel.write }}">Write</option>
                                     <option id="moderate" value="{{ accessLevel.moderate }}">Moderate</option>
@@ -551,12 +551,6 @@
         var permissionsDropdown = $("#permissionSelect");
         var moderateOnlyServices = {{ moderateOnly }};
         var noMiddleDropdownServices = {{ noMiddleDropdown }};
-
-        // Hide the last middle and last dropdowns initially, when no service is selected yet
-        if (servicesDropdown.val() === "") {
-            permissionsDropdown.hide();
-            middleDropdown.hide();
-        }
 
         servicesDropdown.on('change', function(e) {
             // Hide the last middle and last dropdowns when no service is selected
