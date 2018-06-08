@@ -20,8 +20,8 @@ class Mapper extends \Schoolbox\Mapper
         $this->hasTable('comms_news_policy');
         $this->hasModel(Model::class);
 
-        $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER, 'id');
-        $this->uses('identifier', self::TYPE_STRING, null, 'identifier');
-        $this->uses('value', self::TYPE_STRING, null, 'value');
+        $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+        $this->uses('identifier', self::TYPE_STRING);
+        $this->uses('value', self::TYPE_STRING);
     }
 }
