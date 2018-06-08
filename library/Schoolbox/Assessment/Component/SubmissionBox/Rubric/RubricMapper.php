@@ -969,6 +969,7 @@ class RubricMapper
             ->isNull('rd.deleted_at')
             ->isNull('rl.deleted_at')
             ->isNull('rc.deleted_at')
+            ->isNull('rg.deleted_at')
             ->isNull('a.deleted_at');
 
         $where = implode(' AND ', $pb->getWhere());
@@ -986,12 +987,13 @@ class RubricMapper
         // see http://stackoverflow.com/questions/7745609/sql-select-only-rows-with-max-value-on-a-column
 
         $stmt = $this->database->prepare("
-            SELECT rc.grouping, rc.name, a.id, a.title, rd.description
+            SELECT rg.name AS grouping, rc.name, a.id, a.title, rd.description
             FROM assessment         a
             JOIN submission_box    sb ON  a.id = sb.assessment_id
             JOIN rubric_level      rl ON sb.id = rl.box_id
             JOIN rubric_descriptor rd ON rl.id = rd.level_id
             JOIN rubric_criterion  rc ON rc.id = rd.criterion_id
+            JOIN rubric_group      rg ON rg.id = rc.rubric_group_id
             JOIN rubric_mark       rm ON rd.id = rm.descriptor_id
             JOIN submission_return sr ON sr.id = rm.return_id
             JOIN (
@@ -999,6 +1001,7 @@ class RubricMapper
                 FROM rubric_mark       rm
                 JOIN rubric_descriptor rd ON rd.id = rm.descriptor_id
                 JOIN rubric_criterion  rc ON rc.id = rd.criterion_id
+                JOIN rubric_group      rg ON rg.id = rc.rubric_group_id
                 JOIN rubric_level      rl ON rl.id = rd.level_id
                 JOIN submission_box    sb ON sb.id = rl.box_id
                 JOIN assessment         a ON  a.id = sb.assessment_id
@@ -1007,7 +1010,7 @@ class RubricMapper
                 GROUP BY sb.assessment_id, rd.criterion_id
             ) t ON `a`.`id` = `t`.`a.id` AND `rc`.`id` = `t`.`rc.id` AND `sr`.`published_at` = `t`.`sr.max_published_at`
             WHERE {$where}
-            ORDER BY rc.grouping ASC, rc.name ASC, a.due_date DESC;
+            ORDER BY rg.name ASC, rc.name ASC, a.due_date DESC;
         ");
 
         $stmt->execute($pb->getParams());
