@@ -360,7 +360,7 @@
                                 </select>
                             </div>
                             <div class="small-4 card end">
-                                <select name="type" id="permissionSelect" form="serviceCloneForm" required style="display:none">
+                                <select name="type" id="accessLevelSelect" form="serviceCloneForm" required style="display:none">
                                     <option id="read" value="{{ accessLevel.read }}">Read</option>
                                     <option id="write" value="{{ accessLevel.write }}">Write</option>
                                     <option id="moderate" value="{{ accessLevel.moderate }}">Moderate</option>
@@ -548,7 +548,7 @@
     $(function () {
         var servicesDropdown = $("#serviceSelect");
         var serviceIdentifierDropdown = $("#serviceIdentifierSelect");
-        var permissionsDropdown = $("#permissionSelect");
+        var accessLevelDropdown = $("#accessLevelSelect");
 
         {# These services only have Moderate as an access level option #}
         var moderateOnlyServices = {{ moderateOnly }};
@@ -561,7 +561,8 @@
         servicesDropdown.on('change', function() {
             var selectedServiceId = parseInt($(this).val());
 
-            permissionsDropdown.show();
+            {# These are always available once a non-disabled Service is selected #}
+            accessLevelDropdown.show();
 
             {# Hide the Service Identifier dropdown when it's not required
              # Service Identifiers are only made visible when a non-disabled Service is selected
@@ -576,11 +577,11 @@
             if (moderateOnlyServices.indexOf(selectedServiceId) > -1) {
                 $("#read").hide();
                 $("#write").hide();
-                permissionsDropdown.val({{ accessLevel.moderate }});
+                accessLevelDropdown.val({{ accessLevel.moderate }});
             } else {
                 $("#read").show();
                 $("#write").show();
-                permissionsDropdown.val({{ accessLevel.read }});
+                accessLevelDropdown.val({{ accessLevel.read }});
             }
         });
 
