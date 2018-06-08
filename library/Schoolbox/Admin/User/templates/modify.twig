@@ -563,10 +563,12 @@
 
             permissionsDropdown.show();
 
-            // Hide the middle dropdown for services where it's empty
+            {# Hide the Service Identifier dropdown when it's not required
+             # Service Identifiers are only made visible when a non-disabled Service is selected
+             #}
             if (serviceIdentifierExclusions.indexOf(selectedServiceId) > -1) {
                 serviceIdentifierDropdown.hide();
-            } else if (servicesDropdown.val() !== "")  {
+            } else {
                 serviceIdentifierDropdown.show();
             }
 
