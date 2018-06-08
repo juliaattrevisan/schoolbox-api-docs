@@ -551,7 +551,11 @@
         var permissionsDropdown = $("#permissionSelect");
 
         var moderateOnlyServices = {{ moderateOnly }};
-        var noMiddleDropdownServices = {{ noMiddleDropdown }};
+
+        {# These services don't have Service Identifier options; they are universally applied
+         # The Service Identifier dropdowns hould be hidden when these services are selected
+         #}
+        var serviceIdentifierExclusions = {{ noMiddleDropdown }}
 
         servicesDropdown.on('change', function(e) {
             // Hide the last middle and last dropdowns when no service is selected
@@ -566,7 +570,7 @@
             var selectedServiceId = parseInt($(e.target).val());
 
             // Hide the middle dropdown for services where it's empty
-            if (noMiddleDropdownServices.indexOf(selectedServiceId) !== -1) {
+            if (serviceIdentifierExclusions.indexOf(selectedServiceId) !== -1) {
                 serviceIdentifierDropdown.hide();
             } else if (servicesDropdown.val() !== "")  {
                 serviceIdentifierDropdown.show();
