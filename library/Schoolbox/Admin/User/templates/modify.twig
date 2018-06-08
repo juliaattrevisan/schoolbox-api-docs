@@ -738,17 +738,37 @@
                 });
 
             {# AJAX submission of groups #}
-
-            $(':input[data-autosubmit-group]').change(function () {
+            $(':input[data-autosubmit-group]').on('change', function(event) {
+                event.preventDefault();
+                var label = $('#saveLabel');
                 var form = $(this).parents('form:first');
-                $.post(form.attr('action'), form.serializeArray());
+
+                label.toastActivate({text: 'Updating Group Access Level...'});
+
+                $.post(form.attr('action'), form.serializeArray(), function() {
+                    label.toastTimeout({text: 'Group Access Level updated.', css: 'success'});
+                    reloadComponent();
+                })
+                .fail(function(){
+                    label.toastTimeout({text: 'Could not update Group Access Level.', css: 'alert'});
+                });
             });
 
             {# AJAX submission of services #}
-
-            $(':input[data-autosubmit-service]').change(function () {
+            $(':input[data-autosubmit-service]').on('change', function(event) {
+                event.preventDefault();
+                var label = $('#saveLabel');
                 var form = $(this).parents('form:first');
-                $.post(form.attr('action'), form.serializeArray());
+
+                label.toastActivate({text: 'Updating Service Access Level...'});
+
+                $.post(form.attr('action'), form.serializeArray(), function() {
+                    label.toastTimeout({text: 'Service Access Level updated.', css: 'success'});
+                    reloadComponent();
+                })
+                .fail(function(){
+                    label.toastTimeout({text: 'Could not update Service Access Level.', css: 'alert'});
+                });
             });
 
             {# Hide campus selector if user selected a service that doesn't use them #}
@@ -771,3 +791,5 @@
     });
 </script>
 <!-- END custom_head -->
+
+<div id="saveLabel" class="toast"></div>
