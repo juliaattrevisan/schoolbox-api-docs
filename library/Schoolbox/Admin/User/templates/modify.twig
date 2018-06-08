@@ -547,8 +547,9 @@
 <script type="text/javascript">
     $(function () {
         var servicesDropdown = $("#serviceSelect");
-        var middleDropdown = $("#serviceIdentifierSelect");
+        var serviceIdentifierDropdown = $("#serviceIdentifierSelect");
         var permissionsDropdown = $("#permissionSelect");
+
         var moderateOnlyServices = {{ moderateOnly }};
         var noMiddleDropdownServices = {{ noMiddleDropdown }};
 
@@ -556,19 +557,19 @@
             // Hide the last middle and last dropdowns when no service is selected
             if (servicesDropdown.val() === "") {
                 permissionsDropdown.hide();
-                middleDropdown.hide();
+                serviceIdentifierDropdown.hide();
             } else {
                 permissionsDropdown.show();
-                middleDropdown.show();
+                serviceIdentifierDropdown.show();
             }
 
             var selectedServiceId = parseInt($(e.target).val());
 
             // Hide the middle dropdown for services where it's empty
             if (noMiddleDropdownServices.indexOf(selectedServiceId) !== -1) {
-                middleDropdown.hide();
+                serviceIdentifierDropdown.hide();
             } else if (servicesDropdown.val() !== "")  {
-                middleDropdown.show();
+                serviceIdentifierDropdown.show();
             }
 
             {# Hide Read and Write permission options in dropdown for certain services #}
