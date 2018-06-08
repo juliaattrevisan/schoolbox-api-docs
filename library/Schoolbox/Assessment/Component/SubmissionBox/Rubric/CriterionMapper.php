@@ -8,6 +8,7 @@
  */
 
 namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
+use PDOStatement;
 use Schoolbox;
 
 /**
@@ -41,6 +42,41 @@ class CriterionMapper extends Schoolbox\Mapper {
 
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyUniqueness']);
         $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteDescriptors']);
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    protected function getSelectString(): string
+    {
+        return "
+            SELECT
+                {$this->getColumnString()},
+                {$this->getJoinColumnString('group', 'g')}
+            FROM {$this->getTable()}
+            LEFT JOIN {$this->getJoinSql('group', '', 'g')}
+        ";
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    protected function hydrateSelect(PDOStatement $statement): Schoolbox\GenericCollection
+    {
+        /** @var GroupMapper $groupMapper */
+        $groupMapper = $this->getJoinMapper('group');
+        $collection = $this->createCollection();
+        foreach ($statement as $row) {
+            /** @var Criterion $crit */
+            $crit = $this->hydrate($row);
+            if ($row['g.id']) {
+                $crit->setGroup($groupMapper->hydrate($row, 'g'));
+            }
+            $collection->setOffset($crit->getId(), $crit);
+        }
+        return $collection;
     }
 
 
