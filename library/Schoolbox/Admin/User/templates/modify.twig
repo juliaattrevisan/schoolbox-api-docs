@@ -355,7 +355,7 @@
                                         <option value="{{ residentialHouse.id }}">{{ residentialHouse.house }}</option>
                                     {% endfor %}
                                 </select>
-                                <select data-service-type="{{ identifiers.none }}" name="sid" id="defaultSelect" style="display:none">
+                                <select data-service-type="{{ identifiers.none }}" name="sid" id="serviceIdentifierSelect" style="display:none">
                                     <option value="" disabled>--</option>
                                 </select>
                             </div>
@@ -547,7 +547,7 @@
 <script type="text/javascript">
     $(function () {
         var servicesDropdown = $("#serviceSelect");
-        var middleDropdown = $("#defaultSelect");
+        var middleDropdown = $("#serviceIdentifierSelect");
         var permissionsDropdown = $("#permissionSelect");
         var moderateOnlyServices = {{ moderateOnly }};
         var noMiddleDropdownServices = {{ noMiddleDropdown }};
