@@ -226,6 +226,9 @@ class External_Pcschools_Timetable implements External_TimetableInterface
         $teacherExternalId = '';
 
         $timePeriod = $campus->getExtTimetableCode();
+        if('' == $timePeriod) {
+            return [];
+        }
 
         if ($user->getRole()->isStudent()) {
             $studentExternalId = $user->getExternalId();
@@ -343,6 +346,9 @@ class External_Pcschools_Timetable implements External_TimetableInterface
         $studentExternalId = '';
         $teacherExternalId = '';
         $timePeriod        = $campus->getExtTimetableCode();
+        if('' == $timePeriod) {
+            return [];
+        }
 
         if ($user->getRole()->isStudent()) {
             $studentExternalId = $user->getExternalId();
@@ -493,6 +499,9 @@ class External_Pcschools_Timetable implements External_TimetableInterface
         $studentExternalId = '';
         $teacherExternalId = '';
         $timePeriod        = $campus->getExtTimetableCode();
+        if('' == $timePeriod) {
+            return [];
+        }
         if ($user->getRole()->isStudent()) {
             $studentExternalId = $user->getExternalId();
         } elseif ($user->getRole()->isStaff()) {
