@@ -30,7 +30,7 @@ class SSO
         1 => 'Ok',
         2 => 'URL parameters missing.',
         3 => 'Invalid SSO Token Key, or SSO Application Code, or SSO User Mapping, or IP is not white-listed',
-        4 => 'Invalid Portal User',
+        4 => 'User not recognised',
         5 => 'Invalid sfa_num',
     ];
 
@@ -202,7 +202,7 @@ class SSO
 
         if (isset($response['response_code']) && array_key_exists($response['response_code'], self::RESPONSE_CODES)) {
             $errorMessage = self::RESPONSE_CODES[$response['response_code']];
-            throw new SsoTokenGenerationException("TASS SSO Error: {$errorMessage} for SSO for user {$ssoCode}");
+            throw new SsoTokenGenerationException("{$errorMessage} for SSO with ID: {$ssoCode}");
         }
 
         return '';
