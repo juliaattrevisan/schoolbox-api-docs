@@ -27,8 +27,9 @@ use Schoolbox\User;
  */
 class Notifier extends AbstractModuleNotifier
 {
-    const TRIGGER_CREATED = 'created';
-    const TRIGGER_UPDATED = 'updated';
+    public const TRIGGER_CREATED = 'created';
+    public const TRIGGER_UPDATED = 'updated';
+    public const TRIGGER_DELETED = 'deleted';
 
     /**
      * @var NotifierHelper
@@ -76,17 +77,41 @@ class Notifier extends AbstractModuleNotifier
 
         if($now->between($notifyTime, $itineraryItem->getStartAt())) {
             switch ($method) {
+                // Create will always notify
                 case Mapper::METHOD_CREATE:
+                    $bundle->attach(self::TRIGGER_CREATED, self::IMMEDIATELY);
+                    break;
+
+                // Update only notifies if it's meaningfully different
                 case Mapper::METHOD_UPDATE:
-                case Mapper::METHOD_DELETE:
                     $bundle->attach(self::TRIGGER_UPDATED, self::IMMEDIATELY);
+                    break;
+
+                // Delete will always notify
+                case Mapper::METHOD_DELETE:
+                    $bundle->attach(self::TRIGGER_DELETED, self::IMMEDIATELY);
                     break;
             }
         }
     }
 
     /**
+     * Setup upcoming notification when itinerary is created
+     *
+     * @param Model $itinerary
+     * @param User  $effector
+     * @return Envelope
+     */
+    public function notifyStudentCreated(Model $itinerary, User $effector)
+    {
+        return $this->internalNotifyStudent($itinerary, $effector);
+    }
+
+    /**
      * Setup upcoming notification when itinerary changes
+     *
+     * This doesn't notify if the itinerary isn't meaningfully different to its
+     * previous state.
      *
      * @param Model $itinerary
      * @param User  $effector
@@ -98,18 +123,38 @@ class Notifier extends AbstractModuleNotifier
         if (!$this->isMeaningfullyDifferent($diff)) {
             return new Envelope();
         }
-        // Generic notification to team's participants that itinerary has updated
-        $match = $this->notifierHelper->hydrateMatch($itinerary->getMatch());
-        return $this->notifierHelper->postToTeams(
-            new Envelope(),
-            $this->notifierHelper->buildBuilder($match, $effector, $this->getSlug(), self::TRIGGER_CREATED)
-                ->setTitle('Your upcoming :sport match :match itinerary has been changed'),
-            $match
-        );
+        return $this->internalNotifyStudent($itinerary, $effector);
+    }
+
+    /**
+     * Setup upcoming notification when itinerary is deleted
+     *
+     * @param Model $itinerary
+     * @param User  $effector
+     * @return Envelope
+     */
+    public function notifyStudentDeleted(Model $itinerary, User $effector)
+    {
+        return $this->internalNotifyStudent($itinerary, $effector);
+    }
+
+    /**
+     * Setup upcoming notification when itinerary is created
+     *
+     * @param Model $itinerary
+     * @param User  $effector
+     * @return Envelope
+     */
+    public function notifyParentCreated(Model $itinerary, User $effector)
+    {
+        return $this->internalNotifyParent($itinerary, $effector);
     }
 
     /**
      * Setup upcoming notification when itinerary changes
+     *
+     * This doesn't notify if the itinerary isn't meaningfully different to its
+     * previous state.
      *
      * @param Model $itinerary
      * @param User  $effector
@@ -121,12 +166,51 @@ class Notifier extends AbstractModuleNotifier
         if (!$this->isMeaningfullyDifferent($diff)) {
             return new Envelope();
         }
+        return $this->internalNotifyParent($itinerary, $effector);
+    }
+
+    /**
+     * Setup upcoming notification when itinerary is deleted
+     *
+     * @param Model $itinerary
+     * @param User  $effector
+     * @return Envelope
+     */
+    public function notifyParentDeleted(Model $itinerary, User $effector)
+    {
+        return $this->internalNotifyParent($itinerary, $effector);
+    }
+
+    /**
+     * @param Model $itinerary
+     * @param User  $effector
+     * @return Envelope
+     */
+    private function internalNotifyStudent(Model $itinerary, User $effector): Envelope
+    {
+        // Generic notification to team's participants that itinerary has updated
+        $match = $this->notifierHelper->hydrateMatch($itinerary->getMatch());
+        return $this->notifierHelper->postToTeams(
+            new Envelope(),
+            $this->notifierHelper->buildBuilder($match, $effector, $this->getSlug(), self::TRIGGER_CREATED)
+                                 ->setTitle('Your upcoming :sport match :match itinerary has been changed'),
+            $match
+        );
+    }
+
+    /**
+     * @param Model $itinerary
+     * @param User  $effector
+     * @return Envelope
+     */
+    private function internalNotifyParent(Model $itinerary, User $effector): Envelope
+    {
         // Generic notification to team's participants that itinerary has updated
         $match = $this->notifierHelper->hydrateMatch($itinerary->getMatch());
         return $this->notifierHelper->postToParentsOfTeams(
             new Envelope(),
             $this->notifierHelper->buildBuilder($match, $effector, $this->getSlug(), self::TRIGGER_CREATED)
-                 ->setTitle(':child\'s upcoming :sport match :match itinerary has been changed'),
+                                 ->setTitle(':child\'s upcoming :sport match :match itinerary has been changed'),
             $match
         );
     }
