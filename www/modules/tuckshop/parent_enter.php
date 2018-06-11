@@ -23,3 +23,7 @@ $hash = md5('L@goon1917'.$tassID);
 
 $destination = "https://msawebportal.cathedral.qld.edu.au/?id=$tassID&key=$hash";
 header("Location: $destination");
+
+// Don't continue processing if a redirect has been initiated. Since no template has been set,
+// that will ultimately throw exceptions in SitePage's template renderer.
+exit();
