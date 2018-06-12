@@ -15,7 +15,7 @@
 </script>
 <div class="row">
     <div class="small-12 island">
-        <h2 class="subheader">Create {{ locale.news }}</h2>
+        <h2 class="subheader">{{ action|capitalize }} {{ locale.news }}</h2>
 
         {% set formAction = routeLookupIfAuthorized('commsNews.postCreate') %}
         {% if formAction %}
@@ -39,7 +39,7 @@
                 </fieldset>
             </section>
 
-            <input type="submit" value="Create {{ locale.news }}"/>
+            <input type="submit" value="{{ action|capitalize }} {{ locale.news }}"/>
         </form>
         {% else %}
             Not authorised to POST
