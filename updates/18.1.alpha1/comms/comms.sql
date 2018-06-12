@@ -9,8 +9,9 @@ CREATE TABLE `comms_news_policy` (
 );
 
 -- News Policy: Global Moderation
+-- When enabled, every news article requires moderation before it can reach the masses
 INSERT INTO `comms_news_policy` (identifier, value)
-VALUES ('global_moderation', 0);
+VALUES ('global_moderation', 1);
 
 -- News Article
 CREATE TABLE `comms_news_article` (
