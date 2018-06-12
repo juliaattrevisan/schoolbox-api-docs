@@ -79,9 +79,9 @@ class Model
     private $moderatedAt;
 
     /**
-     * @return string
+     * @return null|string
      */
-    public function getTitle(): string
+    public function getTitle(): ?string
     {
         return $this->title;
     }
@@ -99,9 +99,9 @@ class Model
 
 
     /**
-     * @return string
+     * @return null|string
      */
-    public function getBody(): string
+    public function getBody(): ?string
     {
         return $this->body;
     }
@@ -119,9 +119,9 @@ class Model
 
 
     /**
-     * @return string
+     * @return null|string
      */
-    public function getBlurb(): string
+    public function getBlurb(): ?string
     {
         return $this->blurb;
     }
@@ -139,9 +139,9 @@ class Model
 
 
     /**
-     * @return User
+     * @return null|User
      */
-    public function getAuthor(): User
+    public function getAuthor(): ?User
     {
         return $this->author;
     }
@@ -159,9 +159,9 @@ class Model
 
 
     /**
-     * @return \Alaress_Date_Format
+     * @return \Alaress_Date_Format|null
      */
-    public function getPublishAt(): \Alaress_Date_Format
+    public function getPublishAt(): ?\Alaress_Date_Format
     {
         return $this->publishAt;
     }
@@ -179,9 +179,9 @@ class Model
 
 
     /**
-     * @return \Alaress_Date_Format
+     * @return \Alaress_Date_Format|null
      */
-    public function getExpiresAt(): \Alaress_Date_Format
+    public function getExpiresAt(): ?\Alaress_Date_Format
     {
         return $this->expiresAt;
     }
@@ -219,9 +219,9 @@ class Model
 
 
     /**
-     * @return \Alaress_Date_Format
+     * @return \Alaress_Date_Format|null
      */
-    public function getModeratedAt(): \Alaress_Date_Format
+    public function getModeratedAt(): ?\Alaress_Date_Format
     {
         return $this->moderatedAt;
     }
