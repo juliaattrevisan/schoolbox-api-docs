@@ -97,6 +97,125 @@ class Controller extends Base
     protected $cmsLogMapper;
 
     /**
+     * These identifier consts determine which dropdown to use when choosing the Service Identifier
+     * There are currently three options: campus, residentialHouse, none
+     */
+    private const IDENTIFIER_CAMPUS = 'campus';
+    private const IDENTIFIER_RESIDENTIAL_HOUSE = 'residentialHouse';
+    private const IDENTIFIER_NONE = 'none';
+
+    /**
+     * Access Levels
+     */
+    private const ACCESS_LEVELS = [
+        'read' => UserAccess::ACCESS_READ,
+        'write' => UserAccess::ACCESS_WRITE,
+        'moderate' => UserAccess::ACCESS_FULL
+    ];
+
+    /**
+     * A mapping of services and what can appear in the Permissions section
+     *
+     * @var array
+     */
+    private const SERVICE_MAPPING = [
+
+        /* For some historical reason, SERVICE_HOMEPAGE is no longer shown.
+         */
+        UserAccess::SERVICE_CALENDAR => [
+
+            /* The text that appears in the dropdown list
+             */
+            'name' => 'Calendar',
+
+            /* The service identifier options to use: campus dropdown, house dropdown, nothing (none)
+             */
+            'identifier' => self::IDENTIFIER_CAMPUS,
+
+            /* Access levels that you can choose; some services are Moderate-Only, but this way you can specify
+             * the available access levels more granularly e.g. write-only, if you ever needed that
+             */
+            'availability' => [
+                'read' => true,
+                'write' => true,
+                'moderate' => true
+            ]
+        ],
+        UserAccess::SERVICE_NEWS => [
+            'name' => 'News',
+            'identifier' => self::IDENTIFIER_CAMPUS,
+            'availability' => [
+                'read' => true,
+                'write' => true,
+                'moderate' => true
+            ]
+        ],
+        UserAccess::SERVICE_CMS => [
+            'name' => 'CMS',
+            'identifier' => self::IDENTIFIER_NONE,
+            'availability' => [
+                'read' => true,
+                'write' => true,
+                'moderate' => true
+            ]
+        ],
+        UserAccess::SERVICE_HOUSEMASTER => [
+            'name' => 'Housemaster',
+            'identifier' => self::IDENTIFIER_RESIDENTIAL_HOUSE,
+            'availability' => [
+                'read' => true,
+                'write' => true,
+                'moderate' => true
+            ]
+        ],
+        UserAccess::SERVICE_RESOURCE_BOOKING => [
+            'name' => 'Resource Booking',
+            'identifier' => self::IDENTIFIER_NONE,
+            'availability' => [
+                'read' => false,
+                'write' => false,
+                'moderate' => true
+            ]
+        ],
+        UserAccess::SERVICE_CURRICULUM => [
+            'name' => 'Curriculum',
+            'identifier' => self::IDENTIFIER_NONE,
+            'availability' => [
+                'read' => true,
+                'write' => true,
+                'moderate' => true
+            ]
+        ],
+        UserAccess::SERVICE_PASTORAL => [
+            'name' => 'Pastoral Moderator',
+            'identifier' => self::IDENTIFIER_NONE,
+            'availability' => [
+                'read' => true,
+                'write' => true,
+                'moderate' => true
+            ]
+        ],
+        UserAccess::SERVICE_SPORTS_ADMINISTRATOR => [
+            'name' => 'Sports Administrator',
+            'identifier' => self::IDENTIFIER_NONE,
+            'availability' => [
+                'read' => false,
+                'write' => false,
+                'moderate' => true
+            ]
+        ],
+        UserAccess::SERVICE_COMMS_OFFICER => [
+            'name' => 'Comms Officer',
+            'identifier' => self::IDENTIFIER_NONE,
+            'availability' => [
+                'read' => false,
+                'write' => false,
+                'moderate' => true
+            ]
+        ],
+    ];
+
+    /**
      * Controller constructor.
      * @param CMSLogMapper $cmsLogMapper
      * @param UserLogMapper $userLogMapper
@@ -156,15 +275,52 @@ class Controller extends Base
             $fileYear = '';
         }
 
-        $userPermissions = $this->userAccessMapper->findAllForUser($user);
-        $groupPermissions = $userPermissions->filterBy('service', UserAccess::SERVICE_HOMEPAGE)
+        $allPermissions   = $this->userAccessMapper->findAllForUser($user);
+
+        $groupPermissions = $allPermissions->filterBy('service', UserAccess::SERVICE_HOMEPAGE)
                                             ->indexBy('serviceIdentifier');
+
+        /* Don't need the HOMEPAGE service; it's never used
+         */
+        $userPermissions  = $allPermissions->filter(function (UserAccess $access) {
+            return UserAccess::SERVICE_HOMEPAGE !== $access->getService();
+        });
+
+        /* Find the moderate-only services
+         */
+        $moderateOnly = [];
+
+        foreach (self::SERVICE_MAPPING as $service => $data) {
+            if ($data['availability']['moderate'] && !$data['availability']['write'] && !$data['availability']['read']) {
+                $moderateOnly[] = $service;
+            }
+        }
+
+        /* Find the Service Identifier Exclusions (no-middle-dropdown services)
+         */
+        $serviceIdentifierExclusions = [];
+
+        foreach (self::SERVICE_MAPPING as $service => $data) {
+            if ($data['identifier'] === self::IDENTIFIER_NONE) {
+                $serviceIdentifierExclusions[] = $service;
+            }
+        }
 
         $this->getResponse()->content->set([
             'template' => '@adminUser/modify.twig',
             'data' => [
+                'serviceMapping' => self::SERVICE_MAPPING,
+                'moderateOnly' => json_encode($moderateOnly),
+                'serviceIdentifierExclusions' => json_encode($serviceIdentifierExclusions),
+                'identifiers' => [
+                    'none' => self::IDENTIFIER_NONE,
+                    'campus' => self::IDENTIFIER_CAMPUS,
+                    'residentialHouse' => self::IDENTIFIER_RESIDENTIAL_HOUSE
+                ],
+                'accessLevel' => self::ACCESS_LEVELS,
+
                 'pageCurrent' => 'user',
-                'method'       => 'Update',
+                'method' => 'Update',
                 'campuses' => $this->campusMapper->findAll(),
                 'roles' => $this->roleMapper->findAll(),
                 'externalDatabase' => ucfirst($this->getConfigLoader()->get('external_type')),

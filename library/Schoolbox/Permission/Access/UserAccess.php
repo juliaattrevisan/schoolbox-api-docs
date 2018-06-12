@@ -19,21 +19,21 @@ class UserAccess
      * Value for $this->service:
      * $this->user has $this->accessLevel permission for homepage $this->itemId.
      */
-    const SERVICE_HOMEPAGE = 1;
+    public const SERVICE_HOMEPAGE = 1;
 
     /**
      * Value for $this->service:
      * $this->user has $this->accessLevel permission for the calendar for campus
      * $this->itemId.
      */
-    const SERVICE_CALENDAR = 2;
+    public const SERVICE_CALENDAR = 2;
 
     /**
      * Value for $this->service:
      * $this->user has $this->accessLevel permission for the calendar for campus
      * $this->itemId.
      */
-    const SERVICE_NEWS = 3;
+    public const SERVICE_NEWS = 3;
 
     /**
      * Value for $this->service:
@@ -41,66 +41,73 @@ class UserAccess
      *
      * @todo confirm if this is the case
      */
-    const SERVICE_CMS = 5;
+    public const SERVICE_CMS = 5;
 
     /**
      * Value for $this->service:
      * $this->user has $this->accessLevel permission for the leave management
      * system.
      */
-    const SERVICE_HOUSEMASTER = 6;
+    public const SERVICE_HOUSEMASTER = 6;
 
     /**
      * Value for $this->service:
      * $this->user has $this->accessLevel permission for the resource booking
      * system.
      */
-    const SERVICE_RESOURCE_BOOKING = 7;
+    public const SERVICE_RESOURCE_BOOKING = 7;
 
     /**
      * Value for $this->service:
      * $this->user has $this->accessLevel permission for the curriculum
      * system.
      */
-    const SERVICE_CURRICULUM = 8;
+    public const SERVICE_CURRICULUM = 8;
 
     /**
      * Value for $this->service:
      * $this->user has $this->accessLevel permission for the pastoral care
      * system.
      */
-    const SERVICE_PASTORAL = 9;
+    public const SERVICE_PASTORAL = 9;
 
     /**
      * Value for $this->service:
      * $this->user has $this->accessLevel permission for the Sports Fixtures
      * system.
      */
-    const SERVICE_SPORTS_ADMINISTRATOR = 10;
+    public const SERVICE_SPORTS_ADMINISTRATOR = 10;
+
+    /**
+     * Value for $this->service:
+     * $this->user has $this->accessLevel permission for the Comms
+     * system.
+     */
+    public const SERVICE_COMMS_OFFICER = 11;
 
     /**
      * Value for $this->accessLevel:
      * $this->user is denied access to resource in $this->service.
      */
-    const ACCESS_DENY = 0;
+    public const ACCESS_DENY = 0;
 
     /**
      * Value for $this->accessLevel:
      * $this->user has read access to resource in $this->service.
      */
-    const ACCESS_READ = 1;
+    public const ACCESS_READ = 1;
 
     /**
      * Value for $this->accessLevel:
      * $this->user has write access to resource in $this->service.
      */
-    const ACCESS_WRITE = 2;
+    public const ACCESS_WRITE = 2;
 
     /**
      * Value for $this->accessLevel:
      * $this->user has moderate access to resource in $this->service.
      */
-    const ACCESS_FULL = 3;
+    public const ACCESS_FULL = 3;
 
 
     /** @var User */

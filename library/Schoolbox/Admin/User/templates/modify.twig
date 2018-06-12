@@ -195,10 +195,10 @@
                 <h3 class="subheader">Synergetic Info</h3>
                 <section class="profile content">
                     <dl>
-                        <dt class="small-12 medium-3">Year:</dt>
-                        <dd class="small-12 medium-9">{{ fileYear }}</dd>
-                        <dt class="small-12 medium-3">Semester:</dt>
-                        <dd class="small-12 medium-9">{{ fileSemester }}</dd>
+                        <dt class="small-12 medium-3 no-pad">Year:</dt>
+                        <dd class="small-12 medium-9 no-pad">{{ fileYear }}</dd>
+                        <dt class="small-12 medium-3 no-pad">Semester:</dt>
+                        <dd class="small-12 medium-9 no-pad">{{ fileSemester }}</dd>
                     </dl>
                 </section>
             </div>
@@ -229,10 +229,11 @@
                                 <div class="card small-5">
                                     <form action="{{ routeLookup('adminUser.postUpdateGroup', {userId: user.id, folderId: folder.id}) }}" method="post">
                                         {% set perm = userGroupPermissions[folder.id].accessLevel %}
+
                                         <select name="type" data-autosubmit-group data-folder="{{ folder.id }}" title="Access">
-                                            <option value="1" {% if perm == 1 %}selected{% endif %}>Read</option>
-                                            <option value="2" {% if perm == 2 %}selected{% endif %}>Write</option>
-                                            <option value="3" {% if perm == 3 %}selected{% endif %}>Group Admin</option>
+                                            <option value="{{ accessLevel.read }}" {% if perm == accessLevel.read %}selected{% endif %}>Read</option>
+                                            <option value="{{ accessLevel.write }}" {% if perm == accessLevel.write %}selected{% endif %}>Write</option>
+                                            <option value="{{ accessLevel.moderate }}" {% if perm == accessLevel.moderate %}selected{% endif %}>Group Admin</option>
                                         </select>
                                     </form>
                                 </div>
@@ -247,21 +248,21 @@
                         <form action="{{ routeLookup('adminUser.postInsertGroup', {userId: user.id }) }}" method="post" id="groupAdd" data-validatable-as="addGroup" class="list-item">
                             <div class="card small-7">
                                 <select required name="sid" id="groupSelect" form="groupAdd" class="required" title="Group">
-                                    <option value="">Select a Group</option>
+                                    <option value="" disabled selected>Select Group</option>
                                     {% for folder in allGroups %}
                                         <option value="{{ folder.id }}">{{ folder.name }}</option>
                                     {% endfor %}
                                 </select>
                             </div>
-                            <div class="card small-5 end">
+                            <div class="card small-5">
                                 <select required name="type" form="groupAdd" title="Access">
-                                    <option value="1">Read</option>
-                                    <option value="2">Write</option>
-                                    <option value="3">Group Admin</option>
+                                    <option value="{{ accessLevel.read }}">Read</option>
+                                    <option value="{{ accessLevel.write }}">Write</option>
+                                    <option value="{{ accessLevel.moderate }}">Group Admin</option>
                                 </select>
                             </div>
                             <div class="card small-12">
-                                <p><input type="submit" value="Add"/></p>
+                                <p><input type="submit" value="Add" disabled/></p>
                             </div>
                         </form>
                     </li>
@@ -284,27 +285,22 @@
                             <div class="small-4 columns">Access</div>
                         </div>
                     </li>
-                    {% for permission in userPermissions if permission.service != constant('HOMEPAGE_SERVICE') %}
 
+                    {% for permission in userPermissions %}
+
+                        {% if serviceMapping[permission.service] is defined %}
                         <li class="actions-small-1" data-permission>
                             <div class="list-item">
                                 <div class="small-4 card">
-                                    {% if permission.service == constant('CALENDAR_SERVICE') %}Calendar{% endif %}
-                                    {% if permission.service == constant('NEWS_SERVICE') %}News{% endif %}
-                                    {% if permission.service == constant('CMS_SERVICE') %}CMS{% endif %}
-                                    {% if permission.service == constant('HOUSEMASTER_SERVICE') %}Housemaster{% endif %}
-                                    {% if permission.service == constant('RESOURCE_BOOKING_SERVICE') %}Resource Booking{% endif %}
-                                    {% if permission.service == constant('CURRICULUM_SERVICE') %}Curriculum{% endif %}
-                                    {% if permission.service == constant('PASTORAL_SERVICE') %}Pastoral Moderator{% endif %}
-                                    {% if permission.service == constant('SPORTS_ADMINISTRATOR_SERVICE') %}Sports Administrator{% endif %}
+                                    {{ serviceMapping[permission.service].name }}
                                 </div>
                                 <div class="small-4 card">
-                                    {% if permission.service == constant('CALENDAR_SERVICE') or permission.service == constant('NEWS_SERVICE') %}
+                                    {% if serviceMapping[permission.service].identifier == identifiers.campus %}
                                         Campus:
                                         {% for campus in campuses if campus.id == permission.serviceIdentifier %}
                                             {{ campus.name }}
                                         {% endfor %}
-                                    {% elseif permission.service == constant('HOUSEMASTER_SERVICE') %}
+                                    {% elseif serviceMapping[permission.service].identifier ==  identifiers.residentialHouse %}
                                         House:
                                         {% for residentialHouse in residentialHouses if residentialHouse.id == permission.serviceIdentifier %}
                                             {{ residentialHouse.house }}
@@ -316,13 +312,13 @@
                                         <input type="hidden" name="sid" value="{{ permission.serviceIdentifier }}"/>
                                         <input type="hidden" name="service" value="{{ permission.service }}"/>
                                         <input type="hidden" name="updateServices" value="1"/>
+
                                         <select name="type" data-autosubmit-service data-service="{{ permission.service }}" data-sid="{{ permission.serviceIdentifier }}">
-                                            {% if permission.service != constant('RESOURCE_BOOKING_SERVICE')
-                                            and permission.service != constant('SPORTS_ADMINISTRATOR_SERVICE') %}
-                                                <option value="1" {% if permission.accessLevel == 1 %}selected{% endif %}>Read</option>
-                                                <option value="2" {% if permission.accessLevel == 2 %}selected{% endif %}>Write</option>
-                                            {% endif %}
-                                            <option value="3" {% if permission.accessLevel == 3 %}selected{% endif %}>Moderate</option>
+                                            {% for level, available in serviceMapping[permission.service].availability %}
+                                                {% if available %}
+                                                    <option value="{{ accessLevel[level] }}" {% if permission.accessLevel == accessLevel[level] %}selected{% endif %}>{{ level|capitalize }}</option>
+                                                {% endif %}
+                                            {% endfor %}
                                         </select>
                                     </form>
                                 </div>
@@ -331,6 +327,7 @@
                                 <a href="#" data-delete-permission="{{ permission.serviceIdentifier }}" data-service="{{ permission.service}}" class="icon-delete" title="Remove"></a>
                             </nav>
                         </li>
+                        {% endif %}
                     {% endfor %}
 
                     <li class="actions-small-1">
@@ -338,43 +335,39 @@
                               data-action="addService" class="list-item">
                             <div class="small-4 card">
                                 <select data-role="serviceSelector" name="service" id="serviceSelect" form="serviceCloneForm" required>
-                                    <option value="" data-identifier="none">Select Service</option>
-                                    <option value="2" data-identifier="campus">Calendar</option>
-                                    <option value="3" data-identifier="campus">News</option>
-                                    <option value="5" data-identifier="none">CMS</option>
-                                    <option value="6" data-identifier="residentialHouse">Housemaster</option>
-                                    <option value="7" data-identifier="none">Resource Booking</option>
-                                    <option value="8" data-identifier="none">Curriculum</option>
-                                    <option value="9" data-identifier="none">Pastoral Moderator</option>
-                                    <option value="10" data-identifier="none">Sports Administrator</option>
+                                    <option value="" data-identifier="{{ identifiers.none }}" disabled selected>Select Service</option>
+
+                                    {% for serviceIdentifier, serviceData in serviceMapping %}
+                                        <option value="{{ serviceIdentifier }}" data-identifier="{{ serviceData.identifier }}">{{ serviceData.name }}</option>
+                                    {% endfor %}
                                 </select>
                             </div>
                             <div class="small-4 card">
-                                <select data-service-type="campus" name="sid" id="campusSelect" class="hide" disabled required>
-                                    <option value="">Select Campus</option>
+                                <select data-service-type="{{ identifiers.campus }}" name="sid" id="campusSelect" class="hide" disabled required>
+                                    <option value="" disabled selected>Select Campus</option>
                                     {% for campus in campuses %}
                                         <option value="{{ campus.id }}">{{ campus.name }}</option>
                                     {% endfor %}
                                 </select>
-                                <select data-service-type="residentialHouse" name="sid" id="residentialHouseSelect" class="hide" disabled required>
-                                    <option value="">Select Residential House</option>
+                                <select data-service-type="{{ identifiers.residentialHouse }}" name="sid" id="residentialHouseSelect" class="hide" disabled required>
+                                    <option value="" disabled selected>Select Residential House</option>
                                     {% for residentialHouse in residentialHouses %}
                                         <option value="{{ residentialHouse.id }}">{{ residentialHouse.house }}</option>
                                     {% endfor %}
                                 </select>
-                                <select data-service-type="none" name="sid" id="defaultSelect">
+                                <select data-service-type="{{ identifiers.none }}" name="sid" id="serviceIdentifierSelect" style="display:none">
                                     <option value="" disabled>--</option>
                                 </select>
                             </div>
-                            <div class="small-4 card end">
-                                <select name="type" id="permissionSelect" form="serviceCloneForm" required>
-                                    <option id="read" value="1">Read</option>
-                                    <option id="write" value="2">Write</option>
-                                    <option id="moderate" value="3">Moderate</option>
+                            <div class="small-4 card">
+                                <select name="type" id="accessLevelSelect" form="serviceCloneForm" required style="display:none">
+                                    <option id="read" value="{{ accessLevel.read }}">Read</option>
+                                    <option id="write" value="{{ accessLevel.write }}">Write</option>
+                                    <option id="moderate" value="{{ accessLevel.moderate }}">Moderate</option>
                                 </select>
                             </div>
                             <div class="small-12 card">
-                                <input type="submit" class="submit-btn-plain" value="Add" name="serviceSubmit">
+                                <p><input type="submit" value="Add" name="serviceSubmit" disabled></p>
                             </div>
                         </form>
                     </li>
@@ -415,7 +408,7 @@
                                 <select data-selectizeuser="addUser" name="linkUser[]" multiple placeholder="Search Users" form="linkedUserAdd"></select>
                             </div>
                             <div class="small-12 card">
-                                <input type="submit" value="Add" disabled/>
+                                <p><input type="submit" value="Add" disabled /></p>
                             </div>
                         </form>
                     </li>
@@ -436,7 +429,7 @@
                     <div class="actions-small-1">
                         <div class="list-item">
                             <div class="small-12 columns">
-                                <h4>Logins</h4>
+                                <h4 class="subheader">Logins</h4>
                             </div>
                         </div>
                         <nav>
@@ -479,7 +472,7 @@
                     <div class="actions-small-1">
                         <div class="list-item">
                             <div class="small-12 columns">
-                                <h4>Activity</h4>
+                                <h4 class="subheader">Activity</h4>
                             </div>
                         </div>
                         <nav>
@@ -545,65 +538,65 @@
             </form>
         </div>
     </div>
-
 {% endif %}
 
-<!-- BEGIN custom_head -->
+<div id="saveLabel" class="toast"></div>
+
 <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
 <script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
 <script type="text/javascript">
     $(function () {
-        var servicesDropdown = $("#serviceSelect");
-        var middleDropdown = $("#defaultSelect");
-        var permissionsDropdown = $("#permissionSelect");
+        var serviceIdentifierDropdown = $("#serviceIdentifierSelect");
+        var accessLevelDropdown = $("#accessLevelSelect");
 
-        // Hide the last middle and last dropdowns initially, when no service is selected yet
-        if (servicesDropdown.val() === "") {
-            permissionsDropdown.hide();
-            middleDropdown.hide();
-        }
+        {# These services only have Moderate as an access level option #}
+        var moderateOnlyServices = {{ moderateOnly }};
 
-        servicesDropdown.change(function(e) {
-            // Hide the last middle and last dropdowns when no service is selected
-            if (servicesDropdown.val() === "") {
-                permissionsDropdown.hide();
-                middleDropdown.hide();
+        {# These services don't have Service Identifier options; they are universally applied
+         # The Service Identifier dropdown should be hidden when these services are selected
+         #}
+        var serviceIdentifierExclusions = {{ serviceIdentifierExclusions }};
+
+        $("#serviceSelect").on('change', function() {
+
+            {# Enable submit button #}
+            $('form[data-validatable-as="addService"]').find(':submit').prop('disabled', false);
+
+            {# Validator does not have a functioniong reset-all-errors mechanism
+             # https://stackoverflow.com/questions/2086287/how-to-clear-jquery-validation-error-messages
+             #}
+            $('label.error').hide();
+            $('.error').removeClass('error');
+
+            var selectedServiceId = parseInt($(this).val());
+
+            {# These are always available once a non-disabled Service is selected #}
+            accessLevelDropdown.show();
+
+            {# Hide the Service Identifier dropdown when it's not required
+             # Service Identifiers are only made visible when a non-disabled Service is selected
+             #}
+            if (serviceIdentifierExclusions.indexOf(selectedServiceId) > -1) {
+                serviceIdentifierDropdown.hide();
             } else {
-                permissionsDropdown.show();
-                middleDropdown.show();
-            }
-
-            var selectedServiceId = $(e.target).val();
-
-            var resourceBooking = '{{ constant('RESOURCE_BOOKING_SERVICE') }}';
-            var fixtures = '{{ constant('SPORTS_ADMINISTRATOR_SERVICE') }}';
-            var cms = '{{ constant('CMS_SERVICE') }}';
-            var curriculum = '{{ constant('CURRICULUM_SERVICE') }}';
-            var pastoralCare = '{{ constant('PASTORAL_SERVICE') }}';
-
-            var moderateOnlyServices = [resourceBooking, fixtures];
-            var noMiddleDropdownServices = [cms, resourceBooking, curriculum, pastoralCare, fixtures]
-
-            var moderateAccess = 3;
-            var readAccess = 1;
-
-            // Hide the middle dropdown for services where it's empty
-            if (noMiddleDropdownServices.indexOf(selectedServiceId) !== -1) {
-                middleDropdown.hide();
-            } else if (servicesDropdown.val() !== "")  {
-                middleDropdown.show();
+                serviceIdentifierDropdown.show();
             }
 
             {# Hide Read and Write permission options in dropdown for certain services #}
-            if (moderateOnlyServices.indexOf(selectedServiceId) !== -1) {
+            if (moderateOnlyServices.indexOf(selectedServiceId) > -1) {
                 $("#read").hide();
-                $("#write").hide()
-                permissionsDropdown.val(moderateAccess);
+                $("#write").hide();
+                accessLevelDropdown.val({{ accessLevel.moderate }});
             } else {
                 $("#read").show();
-                $("#write").show()
-                permissionsDropdown.val(readAccess);
+                $("#write").show();
+                accessLevelDropdown.val({{ accessLevel.read }});
             }
+        });
+
+        {# Enable submit button once something valid was chosen #}
+        $('#groupSelect').on('change', function() {
+            $('form[data-validatable-as="addGroup"]').find(':submit').prop('disabled', false);
         });
 
         {# Validate user details#}
@@ -754,17 +747,35 @@
                 });
 
             {# AJAX submission of groups #}
-
-            $(':input[data-autosubmit-group]').change(function () {
+            $(':input[data-autosubmit-group]').on('change', function(event) {
+                event.preventDefault();
+                var label = $('#saveLabel');
                 var form = $(this).parents('form:first');
-                $.post(form.attr('action'), form.serializeArray());
+
+                label.toastActivate({text: 'Updating Group Access Level...'});
+
+                $.post(form.attr('action'), form.serializeArray(), function() {
+                    label.toastTimeout({text: 'Group Access Level updated.', css: 'success'});
+                })
+                .fail(function(){
+                    label.toastTimeout({text: 'Could not update Group Access Level.', css: 'alert'});
+                });
             });
 
             {# AJAX submission of services #}
-
-            $(':input[data-autosubmit-service]').change(function () {
+            $(':input[data-autosubmit-service]').on('change', function(event) {
+                event.preventDefault();
+                var label = $('#saveLabel');
                 var form = $(this).parents('form:first');
-                $.post(form.attr('action'), form.serializeArray());
+
+                label.toastActivate({text: 'Updating Service Access Level...'});
+
+                $.post(form.attr('action'), form.serializeArray(), function() {
+                    label.toastTimeout({text: 'Service Access Level updated.', css: 'success'});
+                })
+                .fail(function(){
+                    label.toastTimeout({text: 'Could not update Service Access Level.', css: 'alert'});
+                });
             });
 
             {# Hide campus selector if user selected a service that doesn't use them #}
@@ -786,4 +797,4 @@
         {% endif %}
     });
 </script>
-<!-- END custom_head -->
+

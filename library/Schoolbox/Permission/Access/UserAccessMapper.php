@@ -9,19 +9,21 @@
 
 namespace Schoolbox\Permission\Access;
 
+use Alaress\Database\Predicate\Builder;
 use Aura\Di\Exception\ServiceNotFound;
 use PDO;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper;
 use Schoolbox\Realtime\Routing\Cache\WritableCache;
+use Schoolbox\Resource\Folder\Code\Mapper as CodeMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-use Schoolbox\Resource\Folder\Code\Mapper as CodeMapper;
+
 
 /**
  * Class UserAccessMapper
@@ -413,8 +415,12 @@ class UserAccessMapper extends Mapper
         return $extUserCollection;
 	}
 
+
     /**
      * Gets users that belong to a given user access type.
+     *
+     * If you don't specify a $serviceId it won't check for that particular $serviceId and give you everybody
+     * who is involved with $service.
      *
      * @param int $service    The service to check - one of the UserAccess::SERVICE_* constants
      * @param int $serviceId  The identifier of the service to check
@@ -422,32 +428,49 @@ class UserAccessMapper extends Mapper
      *                        Defaults to UserAccess::ACCESS_READ
      *
      * @return User[]|Collection
+     * @throws Mapper\DefinitionException
+     * @throws Mapper\Exception
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
      */
-    public function findUsersForService($service, $serviceId, $accessType = UserAccess::ACCESS_READ)
+    public function findUsersForService($service, $serviceId = null, $accessType = UserAccess::ACCESS_READ)
     {
-        $stmt = $this->getDatabase()->prepare("
+        $userMapper = $this->getJoinMapper('user');
+        $roleMapper = $userMapper->getJoinMapper('role');
+
+        $pb = new Builder($userMapper->getDatabase(), 'u');
+        $pb->equals('ua.service', $service);
+        $pb->greaterThanOrEqualTo('ua.type', $accessType);
+
+        /* Find $service folks in $serviceId, if specified
+         */
+        if ($serviceId !== null) {
+            $pb->equals('ua.sid', $serviceId);
+        }
+
+        $where = implode("\nAND ", $pb->getWhere());
+
+        $query = "
             SELECT
-                {$this->getJoinColumnString('user', 'u')}
+                {$this->getJoinColumnString('user', 'u')},
+                {$roleMapper->getColumnString( 'r')}
             FROM
                 `{$this->getTable()}` ua
-                JOIN {$this->getJoinSql('user', 'ua', 'u')}
-            WHERE ua.service = :service
-            AND ua.sid = :serviceId
-            AND ua.type >= :minAccess
-            ORDER BY u.id DESC
-        ");
-        $stmt->execute(
-            array(
-                'service'   => $service,
-                'serviceId' => $serviceId,
-                'minAccess' => $accessType,
-            )
-        );
+            INNER JOIN {$this->getJoinSql('user', 'ua', 'u')}
+            LEFT JOIN {$userMapper->getJoinSql('role', 'u', 'r')}
+            WHERE {$where}
+            ORDER BY u.lastname
+        ";
+
+        $stmt = $this->getDatabase()->prepare($query);
+        $stmt->execute($pb->getParams());
+
         $userCollection = $this->getJoinMapper('user')->createCollection();
         foreach ($stmt as $row) {
-            $userCollection->add(
-                $this->hydrateJoin($row, 'user', 'u')
-            );
+            $role = $roleMapper->hydrate($row, 'r');
+            $user = $this->hydrateJoin($row, 'user', 'u');
+            $user->setRole($role);
+
+            $userCollection->add($user);
         }
         return $userCollection;
     }
