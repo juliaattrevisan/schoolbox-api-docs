@@ -71,6 +71,12 @@ class Controller extends Base
             ->setBody($this->getRequest()->post['body'])
             ->setBlurb($this->getRequest()->post['blurb']);
 
-        $mapper->save($model);
+        if ((new ValidArticle())->isSatisfiedBy($model)) {
+            $mapper->save($model);
+        }
+
+        /* TODO: Custom error message
+         */
+        throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
     }
 }
