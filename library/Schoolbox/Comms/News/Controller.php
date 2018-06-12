@@ -12,8 +12,10 @@ namespace Schoolbox\Comms\News;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\UserMapper;
+use Schoolbox\Comms\News\Policy;
 
 
 class Controller extends Base
@@ -39,30 +41,48 @@ class Controller extends Base
     private $newsMapper;
 
     /**
+     * @var Policy\Mapper
+     */
+    private $policyMapper;
+
+    /**
      * Controller constructor.
      *
      * @param ErrorMapper      $errorMapper
      * @param UserMapper       $userMapper
      * @param UserAccessMapper $userAccessMapper
      * @param Mapper           $newsMapper
+     * @param Policy\Mapper    $policyMapper
      */
-    public function __construct(ErrorMapper $errorMapper, UserMapper $userMapper, UserAccessMapper $userAccessMapper, Mapper $newsMapper)
+    public function __construct(ErrorMapper $errorMapper, UserMapper $userMapper, UserAccessMapper $userAccessMapper, Mapper $newsMapper, Policy\Mapper $policyMapper)
     {
         $this->errorMapper = $errorMapper;
         $this->userMapper = $userMapper;
         $this->userAccessMapper = $userAccessMapper;
         $this->newsMapper = $newsMapper;
+        $this->policyMapper = $policyMapper;
     }
+
 
     /**
      * Provide form to create a news article
      *
+     * @throws MapperException
+     * @throws MapperException\Deleted
      * @throws \Aura\Di\Exception\ServiceNotFound
      */
     public function getCreate()
     {
+        try {
+            $moderationRequired = $this->policyMapper->findOneByColumn('identifier', 'global_moderation')->getValue();
+        }
+        catch (Exception $e) {
+            $moderationRequired = false;
+        }
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/create.twig', [
             'action' => 'Create',
+            'moderationRequired' => $moderationRequired,
             'user' => $this->getUser()
         ])->setTitle("Create {$this->getDi()->get('sitePage')->getLocalisedTerm('news', false, true)}"));
     }
@@ -90,12 +110,22 @@ class Controller extends Base
      * Provide form to update a news article
      *
      * @param Model $news
+     * @throws MapperException
+     * @throws MapperException\Deleted
      * @throws \Aura\Di\Exception\ServiceNotFound
      */
     public function getUpdate(Model $news)
     {
+        try {
+            $moderationRequired = $this->policyMapper->findOneByColumn('identifier', 'global_moderation')->getValue();
+        }
+        catch (Exception $e) {
+            $moderationRequired = false;
+        }
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/create.twig', [
             'action' => 'Update',
+            'moderationRequired' => $moderationRequired,
             'user' => $this->getUser(),
             'news' => $news
         ])->setTitle("Update {$news->getTitle()}"));

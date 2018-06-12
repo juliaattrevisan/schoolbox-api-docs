@@ -127,7 +127,8 @@ class Module extends BaseModule
             'errorMapper' => $this->getMapperFactory()->getLazy(\Schoolbox\Error\Mapper::class),
             'userMapper' => $this->getMapperFactory()->getLazy(UserMapper::class),
             'userAccessMapper' => $this->getMapperFactory()->getLazy(UserAccessMapper::class),
-            'newsMapper' => $this->getMapperFactory()->getLazy(Mapper::class)
+            'newsMapper' => $this->getMapperFactory()->getLazy(Mapper::class),
+            'policyMapper' => $this->getMapperFactory()->getLazy(Policy\Mapper::class),
         ];
     }
 

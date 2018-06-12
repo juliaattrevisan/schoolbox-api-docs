@@ -34,6 +34,21 @@
             </li>
             {% endif %}
         </ul>
+    </div>
+</div>
+
+{% if moderationRequired %}
+<div class="row">
+    <div class="small-12 columns">
+        <div class="alert-box">
+            Moderation is required for this news article. You can review <a href="{{ routeLookup('commsNewsPolicy.getPolicies') }}" title="view policy settings">current policy settings</a>.
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="row">
+    <div class="small-12 island">
 
         {% set formAction = routeLookupIfAuthorized('commsNews.postCreate') %}
         {% if formAction %}
