@@ -62,8 +62,9 @@ class Controller extends Base
     public function getCreate()
     {
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/create.twig', [
+            'action' => 'Create',
             'user' => $this->getUser()
-        ])->setTitle('Comms News'));
+        ])->setTitle("Create {$this->getDi()->get('sitePage')->getLocalisedTerm('news', false, true)}"));
     }
 
 
@@ -94,6 +95,7 @@ class Controller extends Base
     public function getUpdate(Model $news)
     {
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/create.twig', [
+            'action' => 'Update',
             'user' => $this->getUser(),
             'news' => $news
         ])->setTitle("Update {$news->getTitle()}"));
