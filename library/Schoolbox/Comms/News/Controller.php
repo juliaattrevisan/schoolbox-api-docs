@@ -129,7 +129,7 @@ class Controller extends Base
      * Persist model to db
      *
      * @param Model $news
-     * @param       $data
+     * @param array|\Aura\Web\Request\Values $data
      * @return bool
      * @throws MapperException
      * @throws \PDOException
