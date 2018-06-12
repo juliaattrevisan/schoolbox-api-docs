@@ -114,15 +114,7 @@ class Controller extends Base
      */
     public function postUpdate(Model $news)
     {
-        $news
-            ->setTitle($this->getRequest()->post['title'])
-            ->setBody($this->getRequest()->post['body'])
-            ->setBlurb($this->getRequest()->post['blurb'])
-            ->setAuthor($this->getUser());
-
-        if ((new ValidArticle())->isSatisfiedBy($news)) {
-            $this->newsMapper->save($news);
-
+        if ($this->persist($news, $this->getRequest()->post)) {
             $this->getResponse()->redirect->afterPost($this->getRouter()->generate('commsNews.getUpdate', ['newsId' => $news->getId()]));
             return;
         }
@@ -130,5 +122,32 @@ class Controller extends Base
         /* TODO: Custom error message
          */
         throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
+    }
+
+
+    /**
+     * Persist model to db
+     *
+     * @param Model $news
+     * @param       $data
+     * @return bool
+     * @throws MapperException
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
+     */
+    private function persist(Model $news, $data)
+    {
+        $news
+            ->setTitle($data['title'])
+            ->setBody($data['body'])
+            ->setBlurb($data['blurb'])
+            ->setAuthor($this->getUser());
+
+        if ((new ValidArticle())->isSatisfiedBy($news)) {
+            $this->newsMapper->save($news);
+            return true;
+        }
+
+        return false;
     }
 }
