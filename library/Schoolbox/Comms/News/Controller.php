@@ -10,11 +10,8 @@ namespace Schoolbox\Comms\News;
 
 
 use Alaress\Web\Controller\Base;
-use Schoolbox\Collection;
-use Schoolbox\Comms\Config\Policy\GlobalModeration;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\UserMapper;
 
@@ -55,7 +52,7 @@ class Controller extends Base
      *
      * @throws \Aura\Di\Exception\ServiceNotFound
      */
-    public function getNews()
+    public function getCreate()
     {
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/index.twig', [
             'user' => $this->getUser()
@@ -65,7 +62,7 @@ class Controller extends Base
     /**
      * Process the form vars
      */
-    public function postNews()
+    public function postCreate()
     {
         try {
             $user = $this->userMapper->findById($this->getRequest()->post['id']);

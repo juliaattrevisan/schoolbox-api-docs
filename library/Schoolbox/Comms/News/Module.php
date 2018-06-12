@@ -56,8 +56,8 @@ class Module extends BaseModule
             )
         );
 
-        $this->register('GET', '', 'getNews', $getPerms, null);
-        $this->register('POST', '', 'postNews', $postPerms, null);
+        $this->register('GET', '/create', 'getCreate', $getPerms, null);
+        $this->register('POST', 'create', 'postCreate', $postPerms, null);
     }
 
 

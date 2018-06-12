@@ -7,7 +7,7 @@
         <section class="content">
             <p>var1: {{ var1 }}</p>
 
-            {% set formRoute = routeLookupIfAuthorized('commsNews.getNews', {id: user.id}) %}
+            {% set formRoute = routeLookupIfAuthorized('commsNews.getCreate', {id: user.id}) %}
 
             {% if formRoute %}
                 <a href="{{ formRoute }}" class="button icon-previous">Back to {{ formRoute }}</a>
