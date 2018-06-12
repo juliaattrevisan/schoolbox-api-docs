@@ -99,10 +99,17 @@ class Controller extends Base
     /**
      * These identifier consts determine which dropdown to use when choosing the Service Identifier
      * There are currently three options: campus, residentialHouse, none
+     * Also represent those as an iterable
      */
+    private const IDENTIFIER_NONE = 'none';
     private const IDENTIFIER_CAMPUS = 'campus';
     private const IDENTIFIER_RESIDENTIAL_HOUSE = 'residentialHouse';
-    private const IDENTIFIER_NONE = 'none';
+
+    private const IDENTIFIERS = [
+        'none' => self::IDENTIFIER_NONE,
+        'campus' => self::IDENTIFIER_CAMPUS,
+        'residentialHouse' => self::IDENTIFIER_RESIDENTIAL_HOUSE
+    ];
 
     /**
      * Access Levels
@@ -286,37 +293,11 @@ class Controller extends Base
             return UserAccess::SERVICE_HOMEPAGE !== $access->getService();
         });
 
-        /* Find the moderate-only services
-         */
-        $moderateOnly = [];
-
-        foreach (self::SERVICE_MAPPING as $service => $data) {
-            if ($data['availability']['moderate'] && !$data['availability']['write'] && !$data['availability']['read']) {
-                $moderateOnly[] = $service;
-            }
-        }
-
-        /* Find the Service Identifier Exclusions (no-middle-dropdown services)
-         */
-        $serviceIdentifierExclusions = [];
-
-        foreach (self::SERVICE_MAPPING as $service => $data) {
-            if ($data['identifier'] === self::IDENTIFIER_NONE) {
-                $serviceIdentifierExclusions[] = $service;
-            }
-        }
-
         $this->getResponse()->content->set([
             'template' => '@adminUser/modify.twig',
             'data' => [
                 'serviceMapping' => self::SERVICE_MAPPING,
-                'moderateOnly' => json_encode($moderateOnly),
-                'serviceIdentifierExclusions' => json_encode($serviceIdentifierExclusions),
-                'identifiers' => [
-                    'none' => self::IDENTIFIER_NONE,
-                    'campus' => self::IDENTIFIER_CAMPUS,
-                    'residentialHouse' => self::IDENTIFIER_RESIDENTIAL_HOUSE
-                ],
+                'identifiers' => self::IDENTIFIERS,
                 'accessLevel' => self::ACCESS_LEVELS,
 
                 'pageCurrent' => 'user',
