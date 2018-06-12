@@ -87,8 +87,7 @@ class Controller extends Base
 
         /* Feature image
          */
-        $zone = new Zone('featureImage');
-        $zone
+        $zone = (new Zone('featureImage'))
             ->setMulti(false)
             ->setAttachPrompt('Attach a feature image')
             ->setAttachmentsLabel('')
@@ -152,8 +151,7 @@ class Controller extends Base
 
         /* Feature image
          */
-        $zone = new Zone('featureImage');
-        $zone
+        $zone = (new Zone('featureImage'))
             ->setMulti(false)
             ->setAttachPrompt('Attach a feature image')
             ->setAttachmentsLabel('')
