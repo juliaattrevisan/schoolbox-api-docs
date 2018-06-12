@@ -1,0 +1,105 @@
+<?php
+/**
+ * Model
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2018, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ */
+
+namespace Schoolbox\Comms\News;
+
+use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
+use Schoolbox\Mapper\Traits\Model\Id;
+use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
+
+
+class Model
+{
+    use Id;
+    use CreatedAtDate;
+    use UpdatedAtDate;
+    use DeletedAtDate;
+
+    /**
+     * Title of the article
+     *
+     * @var string
+     */
+    private $title;
+
+    /**
+     * Main body of the article
+     *
+     * @var string
+     */
+    private $body;
+
+    /**
+     * A short version of the $body that appears in places like email digest etc.
+     *
+     * @var string
+     */
+    private $blurb;
+
+
+    /**
+     * @return string
+     */
+    public function getTitle(): string
+    {
+        return $this->title;
+    }
+
+
+    /**
+     * @param string $title
+     * @return $this
+     */
+    public function setTitle(string $title): self
+    {
+        $this->title = $title;
+        return $this;
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getBody(): string
+    {
+        return $this->body;
+    }
+
+
+    /**
+     * @param string $body
+     * @return $this
+     */
+    public function setBody(string $body): self
+    {
+        $this->body = $body;
+        return $this;
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getBlurb(): string
+    {
+        return $this->blurb;
+    }
+
+
+    /**
+     * @param string $blurb
+     * @return $this
+     */
+    public function setBlurb(string $blurb): self
+    {
+        $this->blurb = $blurb;
+        return $this;
+    }
+}

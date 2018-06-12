@@ -64,16 +64,13 @@ class Controller extends Base
      */
     public function postCreate()
     {
-        try {
-            $user = $this->userMapper->findById($this->getRequest()->post['id']);
-        }
-        catch (MapperException $e) {
-            throw $this->errorMapper->generateException(ErrorMapper::ERROR_USER_NOT_FOUND);
-        }
+        $mapper = \Schoolbox\Comms\News\Mapper::getInstance();
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/submit.twig', [
-            'user' => $user,
-            'var1' => $this->getRequest()->post['var1']
-        ])->setTitle('Comms Form Output'));
+        $model = ($mapper->createModel())
+            ->setTitle($this->getRequest()->post['title'])
+            ->setBody($this->getRequest()->post['body'])
+            ->setBlurb($this->getRequest()->post['blurb']);
+
+        $mapper->save($model);
     }
 }

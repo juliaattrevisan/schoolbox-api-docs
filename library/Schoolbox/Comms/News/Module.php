@@ -57,7 +57,7 @@ class Module extends BaseModule
         );
 
         $this->register('GET', '/create', 'getCreate', $getPerms, null);
-        $this->register('POST', 'create', 'postCreate', $postPerms, null);
+        $this->register('POST', '/create', 'postCreate', $postPerms, null);
     }
 
 
