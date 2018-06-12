@@ -34,17 +34,24 @@ class Controller extends Base
     private $userAccessMapper;
 
     /**
+     * @var Mapper
+     */
+    private $newsMapper;
+
+    /**
      * Controller constructor.
      *
      * @param ErrorMapper      $errorMapper
      * @param UserMapper       $userMapper
      * @param UserAccessMapper $userAccessMapper
+     * @param Mapper           $newsMapper
      */
-    public function __construct(ErrorMapper $errorMapper, UserMapper $userMapper, UserAccessMapper $userAccessMapper)
+    public function __construct(ErrorMapper $errorMapper, UserMapper $userMapper, UserAccessMapper $userAccessMapper, Mapper $newsMapper)
     {
         $this->errorMapper = $errorMapper;
         $this->userMapper = $userMapper;
         $this->userAccessMapper = $userAccessMapper;
+        $this->newsMapper = $newsMapper;
     }
 
     /**
@@ -59,20 +66,23 @@ class Controller extends Base
         ])->setTitle('Comms News'));
     }
 
+
     /**
      * Process the form vars
+     * @throws MapperException
+     * @throws \PDOException
+     * @throws \Schoolbox\Application\Exception\Exception
+     * @throws \UnexpectedValueException
      */
     public function postCreate()
     {
-        $mapper = \Schoolbox\Comms\News\Mapper::getInstance();
-
-        $model = ($mapper->createModel())
+        $model = $this->newsMapper->createModel()
             ->setTitle($this->getRequest()->post['title'])
             ->setBody($this->getRequest()->post['body'])
             ->setBlurb($this->getRequest()->post['blurb']);
 
         if ((new ValidArticle())->isSatisfiedBy($model)) {
-            $mapper->save($model);
+            $this->newsMapper->save($model);
         }
 
         /* TODO: Custom error message
