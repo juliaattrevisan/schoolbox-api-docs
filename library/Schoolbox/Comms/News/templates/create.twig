@@ -15,7 +15,25 @@
 </script>
 <div class="row">
     <div class="small-12 island">
-        <h2 class="subheader">{{ action|capitalize }} {{ locale.news }}</h2>
+        <h1>{{ action|capitalize }} {{ locale.news.proper }}</h1>
+
+        <ul class="meta">
+            {% if news.publishAt %}
+            <li class="icon-calendar">Publishes to audience on {{ news.publishAt.local }}</li>
+            {% endif %}
+
+            {% if news.expiresAt %}
+            <li class="icon-calendar">Automatically archives on {{ news.expiresAt.local }}</li>
+            {% endif %}
+
+            {% if news.moderatedBy.id %}
+            <li class="icon-staff">Last moderated by {{ news.moderatedBy.fullname }}
+                {% if not news.moderatedAt.isNull %}
+                    on {{ news.moderatedAt.local }}
+                {% endif %}
+            </li>
+            {% endif %}
+        </ul>
 
         {% set formAction = routeLookupIfAuthorized('commsNews.postCreate') %}
         {% if formAction %}
