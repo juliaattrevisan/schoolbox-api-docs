@@ -196,7 +196,7 @@ class Controller extends Base
      * @throws \UnexpectedValueException
      * @throws \Schoolbox\Resource\Exception
      */
-    private function persist(Model $news, $data)
+    private function persist(Model $news, $data): bool
     {
         $news
             ->setTitle($data['title'])
