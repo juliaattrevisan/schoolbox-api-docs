@@ -1,15 +1,10 @@
-{# Add your own javascript, validation etc. #}
-{# Use pantry for styling #}
-
 <div class="row">
     <div class="small-12 island">
-        <h2 class="subheader">{{ user.fullname }}</h2>
+        <h2 class="subheader">Create {{ locale.news }}</h2>
         <section class="content">
             {% set formAction = routeLookupIfAuthorized('commsNews.postCreate') %}
             {% if formAction %}
                 <form action="{{ formAction }}" method="post">
-                    <input type="hidden" name="id" value="{{ user.id }}" />
-
                     <label>var1</label>
                     <input type="text" name="var1" />
 
