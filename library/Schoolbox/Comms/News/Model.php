@@ -13,6 +13,7 @@ use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
+use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\User;
 
 class Model
@@ -49,6 +50,11 @@ class Model
      * @var User
      */
     private $author;
+
+    /**
+     * @var IStorage
+     */
+    private $featureImage;
 
     /**
      * The article becomes available to the audience at this time
@@ -236,4 +242,26 @@ class Model
         $this->moderatedAt = $moderatedAt;
         return $this;
     }
+
+
+    /**
+     * @return IStorage
+     */
+    public function getFeatureImage(): ?IStorage
+    {
+        return $this->featureImage;
+    }
+
+
+    /**
+     * @param IStorage $featureImage
+     * @return $this
+     */
+    public function setFeatureImage(IStorage $featureImage): self
+    {
+        $this->featureImage = $featureImage;
+        return $this;
+    }
+
+
 }

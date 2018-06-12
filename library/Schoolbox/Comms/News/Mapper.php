@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Comms\News;
 
+use Schoolbox\Resource\Storage;
 use Schoolbox\UserMapper;
 
 class Mapper extends \Schoolbox\Mapper
@@ -26,6 +27,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('title', self::TYPE_STRING);
         $this->uses('body', self::TYPE_STRING);
         $this->uses('blurb', self::TYPE_STRING);
+        $this->joins('feature_image_hash', Storage\Mapper::class, 'hash', null, null, 'featureImage', 'featureImage');
         $this->joins('author_id', UserMapper::class, 'id', null, null, 'author', 'author');
         $this->joins('moderated_by', UserMapper::class, 'id', null, null, 'moderatedBy', 'moderatedBy');
         $this->uses('moderated_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);

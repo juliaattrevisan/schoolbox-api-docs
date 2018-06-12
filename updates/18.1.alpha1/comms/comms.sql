@@ -15,18 +15,19 @@ VALUES ('global_moderation', 1);
 
 -- News Article
 CREATE TABLE `comms_news_article` (
-  `id`            int(11)      PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  `title`         VARCHAR(255) NOT NULL,
-  `body`          text,
-  `blurb`         text,
-  `author_id`     int(11)      UNSIGNED,
-  `moderated_by`  int(11)      UNSIGNED,
-  `moderated_at`  DATETIME,
-  `publish_at`    DATETIME     NOT NULL,
-  `expires_at`    DATETIME     NOT NULL,
-  `created_at`    DATETIME     NOT NULL,
-  `updated_at`    DATETIME     NOT NULL,
-  `deleted_at`    DATETIME
+  `id`                 int(11)       PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  `title`              VARCHAR(255)  NOT NULL,
+  `body`               text,
+  `blurb`              text,
+  `author_id`          int(11)       UNSIGNED,
+  `feature_image_hash` VARCHAR(255),
+  `moderated_by`       int(11)       UNSIGNED,
+  `moderated_at`       DATETIME,
+  `publish_at`         DATETIME      NOT NULL,
+  `expires_at`         DATETIME      NOT NULL,
+  `created_at`         DATETIME      NOT NULL,
+  `updated_at`         DATETIME      NOT NULL,
+  `deleted_at`         DATETIME
 );
 
 ALTER TABLE `comms_news_article`

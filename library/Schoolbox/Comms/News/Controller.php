@@ -14,6 +14,7 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\UserMapper;
 use Schoolbox\Comms\News\Policy;
@@ -110,6 +111,7 @@ class Controller extends Base
      * @throws \Schoolbox\Application\Exception\Exception
      * @throws \UnexpectedValueException
      * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \Schoolbox\Resource\Exception
      */
     public function postCreate()
     {
@@ -168,6 +170,7 @@ class Controller extends Base
      * @throws \PDOException
      * @throws \Schoolbox\Application\Exception\Exception
      * @throws \UnexpectedValueException
+     * @throws \Schoolbox\Resource\Exception
      */
     public function postUpdate(Model $news)
     {
@@ -185,12 +188,13 @@ class Controller extends Base
     /**
      * Persist model to db during news article authorship
      *
-     * @param Model $news
+     * @param Model                          $news
      * @param array|\Aura\Web\Request\Values $data
      * @return bool
      * @throws MapperException
      * @throws \PDOException
      * @throws \UnexpectedValueException
+     * @throws \Schoolbox\Resource\Exception
      */
     private function persist(Model $news, $data)
     {
@@ -199,6 +203,7 @@ class Controller extends Base
             ->setBody($data['body'])
             ->setBlurb($data['blurb'])
             ->setAuthor($this->getUser())
+            ->setFeatureImage((new CollectorFactory())->build($data['attachment'] ?: [])->getFirst())
             ->setModeratedBy(null)
             ->setModeratedAt(new \Alaress_Date_NullDate())
             ->setPublishAt(\Alaress_Date_Format::newLocal($data['publishAt']))
