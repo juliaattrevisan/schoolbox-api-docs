@@ -23,27 +23,10 @@ class Criterion implements ISoftDeletable
     const PARENT_TYPE_CURRICULUM = 'curriculum';
 
     /**
-     * @deprecated use `$this->group->getName()` instead
-     * @var string
-     */
-    private $grouping;
-
-    /**
      * @var string
      */
     private $name;
 
-    /**
-     * @deprecated use `$this->group->getParentId()` instead
-     * @var int
-     */
-    private $parent_id;
-
-    /**
-     * @deprecated use `$this->group->getParentType()` instead
-     * @var string
-     */
-    private $parent_type = self::PARENT_TYPE_CATEGORY;
 
     /**
      * @var Group
