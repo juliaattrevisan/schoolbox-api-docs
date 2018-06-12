@@ -78,22 +78,10 @@ class Controller extends Base
      */
     public function postCreate()
     {
-        $model = $this->newsMapper->createModel()
-            ->setTitle($this->getRequest()->post['title'])
-            ->setBody($this->getRequest()->post['body'])
-            ->setBlurb($this->getRequest()->post['blurb'])
-            ->setAuthor($this->getUser());
+        /** @var Model $news */
+        $news = $this->newsMapper->createModel();
 
-        if ((new ValidArticle())->isSatisfiedBy($model)) {
-            $this->newsMapper->save($model);
-
-            $this->getResponse()->redirect->afterPost($this->getRouter()->generate('commsNews.getCreate'));
-            return;
-        }
-
-        /* TODO: Custom error message
-         */
-        throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
+        $this->postUpdate($news);
     }
 
 
@@ -116,19 +104,24 @@ class Controller extends Base
      * Update a news article
      *
      * @param Model $news
+     * @throws MapperException
+     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \PDOException
+     * @throws \Schoolbox\Application\Exception\Exception
+     * @throws \UnexpectedValueException
      */
     public function postUpdate(Model $news)
     {
-        $model = $this->newsMapper->createModel()
+        $news
             ->setTitle($this->getRequest()->post['title'])
             ->setBody($this->getRequest()->post['body'])
             ->setBlurb($this->getRequest()->post['blurb'])
             ->setAuthor($this->getUser());
 
-        if ((new ValidArticle())->isSatisfiedBy($model)) {
-            $this->newsMapper->save($model);
+        if ((new ValidArticle())->isSatisfiedBy($news)) {
+            $this->newsMapper->save($news);
 
-            $this->getResponse()->redirect->afterPost($this->getRouter()->generate('commsNews.getCreate'));
+            $this->getResponse()->redirect->afterPost($this->getRouter()->generate('commsNews.getUpdate', ['newsId' => $news->getId()]));
             return;
         }
 
