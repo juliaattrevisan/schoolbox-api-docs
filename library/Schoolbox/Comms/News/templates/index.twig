@@ -1,10 +1,25 @@
+<script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
+<script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
+
+<script>
+    $(function () {
+        $.fn.alaressEditor({
+            targetElements: $('#createForm textarea[name=body]')
+        });
+
+        $.fn.alaressEditor({
+            targetElements: $('#createForm textarea[name=blurb]'),
+            removePlugins: 'autoembed,uploadimage,schoolboxresource,schoolboxiframe,link'
+        });
+    });
+</script>
 <div class="row">
     <div class="small-12 island">
         <h2 class="subheader">Create {{ locale.news }}</h2>
 
         {% set formAction = routeLookupIfAuthorized('commsNews.postCreate') %}
         {% if formAction %}
-        <form action="{{ formAction }}" method="post">
+        <form id="createForm" action="{{ formAction }}" method="post">
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
