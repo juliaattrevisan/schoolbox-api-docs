@@ -29,7 +29,6 @@ class Notifier extends AbstractModuleNotifier
 {
     public const TRIGGER_CREATED = 'created';
     public const TRIGGER_UPDATED = 'updated';
-    public const TRIGGER_DELETED = 'deleted';
 
     /**
      * @var NotifierHelper
@@ -89,7 +88,8 @@ class Notifier extends AbstractModuleNotifier
 
                 // Delete will always notify
                 case Mapper::METHOD_DELETE:
-                    $bundle->attach(self::TRIGGER_DELETED, self::IMMEDIATELY);
+                    // Use created trigger, because deleted doesn't actually exist
+                    $bundle->attach(self::TRIGGER_CREATED, self::IMMEDIATELY);
                     break;
             }
         }
