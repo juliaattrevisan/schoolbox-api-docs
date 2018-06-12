@@ -11,6 +11,7 @@ namespace Schoolbox\Comms\News\Test;
 
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Comms\News\Model;
+use Schoolbox\Comms\News\ValidArticle;
 use Schoolbox\Comms\News\ValidBroadcast;
 
 
@@ -69,6 +70,36 @@ class ValidationTest extends TestCase
                 (new Model())->setTitle('cat'),
                 0,
                 true
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider provider_validArticle
+     * @param Model $news
+     * @param int   $expected
+     */
+    public function testValidArticle(Model $news, $expected)
+    {
+        $validation = new ValidArticle();
+
+        $this->assertEquals($expected, $validation->isSatisfiedBy($news));
+    }
+
+    /**
+     * Data provider for testValidArticle
+     *
+     * @return array
+     */
+    public function provider_validArticle() :array {
+        return [
+            'Heading is set' => [
+                (new Model())->setTitle('cat'),
+                true
+            ],
+            'Heading is missing' => [
+                new Model(),
+                false
             ],
         ];
     }
