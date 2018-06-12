@@ -13,7 +13,7 @@ use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
-
+use Schoolbox\User;
 
 class Model
 {
@@ -43,6 +43,12 @@ class Model
      */
     private $blurb;
 
+    /**
+     * The person who authored this article
+     *
+     * @var User
+     */
+    private $author;
 
     /**
      * @return string
@@ -100,6 +106,26 @@ class Model
     public function setBlurb(string $blurb): self
     {
         $this->blurb = $blurb;
+        return $this;
+    }
+
+
+    /**
+     * @return User
+     */
+    public function getAuthor(): User
+    {
+        return $this->author;
+    }
+
+
+    /**
+     * @param User $author
+     * @return $this
+     */
+    public function setAuthor(User $author): self
+    {
+        $this->author = $author;
         return $this;
     }
 }

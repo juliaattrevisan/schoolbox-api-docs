@@ -9,6 +9,8 @@
 
 namespace Schoolbox\Comms\News;
 
+use Schoolbox\UserMapper;
+
 class Mapper extends \Schoolbox\Mapper
 {
 
@@ -24,6 +26,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('title', self::TYPE_STRING);
         $this->uses('body', self::TYPE_STRING);
         $this->uses('blurb', self::TYPE_STRING);
+        $this->joins('author_id', UserMapper::class, 'id', null, null, 'author', 'author');
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);

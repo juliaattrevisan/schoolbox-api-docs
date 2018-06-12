@@ -80,7 +80,8 @@ class Controller extends Base
         $model = $this->newsMapper->createModel()
             ->setTitle($this->getRequest()->post['title'])
             ->setBody($this->getRequest()->post['body'])
-            ->setBlurb($this->getRequest()->post['blurb']);
+            ->setBlurb($this->getRequest()->post['blurb'])
+            ->setAuthor($this->getUser());
 
         if ((new ValidArticle())->isSatisfiedBy($model)) {
             $this->newsMapper->save($model);

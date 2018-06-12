@@ -18,8 +18,13 @@ CREATE TABLE `comms_news_article` (
   `title`      VARCHAR(255) NOT NULL,
   `body`       text,
   `blurb`      text,
-  `created_at` DATETIME NOT NULL,
-  `updated_at` DATETIME NOT NULL,
+  `author_id`  int(11)      UNSIGNED,
+  `created_at` DATETIME     NOT NULL,
+  `updated_at` DATETIME     NOT NULL,
   `deleted_at` DATETIME
 );
 
+ALTER TABLE `comms_news_article`
+ADD CONSTRAINT `fk_comms_news_article_1`
+FOREIGN KEY (`author_id`) REFERENCES `user` (`id`)
+ON DELETE NO ACTION ON UPDATE NO ACTION;
