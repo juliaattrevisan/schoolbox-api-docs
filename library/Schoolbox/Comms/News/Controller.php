@@ -54,7 +54,7 @@ class Controller extends Base
      */
     public function getCreate()
     {
-        $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/index.twig', [
+        $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/create.twig', [
             'user' => $this->getUser()
         ])->setTitle('Comms News'));
     }
