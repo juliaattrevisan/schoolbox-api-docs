@@ -73,6 +73,7 @@ class Controller extends Base
      * @throws \PDOException
      * @throws \Schoolbox\Application\Exception\Exception
      * @throws \UnexpectedValueException
+     * @throws \Aura\Router\Exception\RouteNotFound
      */
     public function postCreate()
     {
@@ -83,6 +84,9 @@ class Controller extends Base
 
         if ((new ValidArticle())->isSatisfiedBy($model)) {
             $this->newsMapper->save($model);
+
+            $this->getResponse()->redirect->afterPost($this->getRouter()->generate('commsNews.getCreate'));
+            return;
         }
 
         /* TODO: Custom error message
