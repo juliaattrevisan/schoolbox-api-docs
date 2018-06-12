@@ -19,6 +19,8 @@ CREATE TABLE `comms_news_article` (
   `body`       text,
   `blurb`      text,
   `author_id`  int(11)      UNSIGNED,
+  `publish_at` DATETIME     NOT NULL,
+  `expires_at` DATETIME     NOT NULL,
   `created_at` DATETIME     NOT NULL,
   `updated_at` DATETIME     NOT NULL,
   `deleted_at` DATETIME

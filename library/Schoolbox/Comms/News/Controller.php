@@ -141,7 +141,9 @@ class Controller extends Base
             ->setTitle($data['title'])
             ->setBody($data['body'])
             ->setBlurb($data['blurb'])
-            ->setAuthor($this->getUser());
+            ->setAuthor($this->getUser())
+            ->setPublishAt(\Alaress_Date_Format::newLocal($data['publishAt']))
+            ->setExpiresAt(\Alaress_Date_Format::newLocal($data['expiresAt']));
 
         if ((new ValidArticle())->isSatisfiedBy($news)) {
             $this->newsMapper->save($news);

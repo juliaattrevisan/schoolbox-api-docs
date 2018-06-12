@@ -51,6 +51,20 @@ class Model
     private $author;
 
     /**
+     * The article becomes available to the audience at this time
+     *
+     * @var \Alaress_Date_Format
+     */
+    private $publishAt;
+
+    /**
+     * The article becomes archived at this time
+     *
+     * @var \Alaress_Date_Format
+     */
+    private $expiresAt;
+
+    /**
      * @return string
      */
     public function getTitle(): string
@@ -128,4 +142,46 @@ class Model
         $this->author = $author;
         return $this;
     }
+
+
+    /**
+     * @return \Alaress_Date_Format
+     */
+    public function getPublishAt(): \Alaress_Date_Format
+    {
+        return $this->publishAt;
+    }
+
+
+    /**
+     * @param \Alaress_Date_Format $publishAt
+     * @return $this
+     */
+    public function setPublishAt(\Alaress_Date_Format $publishAt): self
+    {
+        $this->publishAt = $publishAt;
+        return $this;
+    }
+
+
+    /**
+     * @return \Alaress_Date_Format
+     */
+    public function getExpiresAt(): \Alaress_Date_Format
+    {
+        return $this->expiresAt;
+    }
+
+
+    /**
+     * @param \Alaress_Date_Format $expiresAt
+     * @return $this;
+     */
+    public function setExpiresAt(\Alaress_Date_Format $expiresAt): self
+    {
+        $this->expiresAt = $expiresAt;
+        return $this;
+    }
+
+
 }
