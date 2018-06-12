@@ -16,7 +16,6 @@ use Schoolbox\Fixtures\Team\Player\Mapper as TeamPlayerMapper;
 use Schoolbox\Fixtures\Division\Mapper as DivisionMapper;
 use Schoolbox\Fixtures\Sport\Mapper as SportMapper;
 use Schoolbox\Fixtures\Match\Mapper as MatchMapper;
-use Schoolbox\Fixtures\Match\Model as Match;
 use Schoolbox\Fixtures\Match\Notifier\Helper as NotifierHelper;
 use Schoolbox\User;
 
@@ -127,18 +126,6 @@ class Notifier extends AbstractModuleNotifier
     }
 
     /**
-     * Setup upcoming notification when itinerary is deleted
-     *
-     * @param Model $itinerary
-     * @param User  $effector
-     * @return Envelope
-     */
-    public function notifyStudentDeleted(Model $itinerary, User $effector)
-    {
-        return $this->internalNotifyStudent($itinerary, $effector);
-    }
-
-    /**
      * Setup upcoming notification when itinerary is created
      *
      * @param Model $itinerary
@@ -166,18 +153,6 @@ class Notifier extends AbstractModuleNotifier
         if (!$this->isMeaningfullyDifferent($diff)) {
             return new Envelope();
         }
-        return $this->internalNotifyParent($itinerary, $effector);
-    }
-
-    /**
-     * Setup upcoming notification when itinerary is deleted
-     *
-     * @param Model $itinerary
-     * @param User  $effector
-     * @return Envelope
-     */
-    public function notifyParentDeleted(Model $itinerary, User $effector)
-    {
         return $this->internalNotifyParent($itinerary, $effector);
     }
 
