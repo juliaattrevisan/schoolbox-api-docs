@@ -90,10 +90,6 @@ class Exporter
                 $assessmentCode = $workType ? trim($workType->getName()) : '';
             }
 
-            // Load participation
-            $singleCollection  = new GenericCollection(get_class($assessment), [$assessment]);
-            $assessment = $this->assessmentDataSource->loadParticipantsIntoAssessmentCollection($singleCollection)->first();
-
             foreach ($assessment->getAllParticipants() as $participant) {
                 $mark = $participant->getHumanReadableMark(true);
                 if (!$mark) {
@@ -155,6 +151,19 @@ class Exporter
             return $assessment->getBaseContext()->getFolder()->getCodes()->count() > 0;
         });
 
+        // Load participation
+        $classAssessments = $this->assessmentDataSource->loadParticipantsIntoAssessmentCollection($classAssessments);
+
+        // Filter out assessments without results
+        $filteredAssessments = $classAssessments->filter(function (IAssessable $assessment) {
+            foreach ($assessment->getAllParticipants() as $participant) {
+                // Only real marks (not feedback with just a comment)
+                if ($participant->getHumanReadableMark(true)) {
+                    return true;
+                }
+            }
+            return false;
+        });
 
         // Order assessments by folder code
         $sortFunction = function (IAssessable $left, IAssessable $right) {
@@ -167,6 +176,6 @@ class Exporter
             return strcmp($leftFolderCode->getCode(), $rightFolderCode->getCode());
         };
 
-        return $classAssessments->sortByCallback($sortFunction, true);
+        return $filteredAssessments->sortByCallback($sortFunction, true);
     }
 }
