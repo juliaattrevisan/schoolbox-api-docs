@@ -55,7 +55,7 @@ class Controller extends Base
     }
 
     /**
-     * Provide form
+     * Provide form to create a news article
      *
      * @throws \Aura\Di\Exception\ServiceNotFound
      */
@@ -68,7 +68,8 @@ class Controller extends Base
 
 
     /**
-     * Process the form vars
+     * Create a news article
+     *
      * @throws MapperException
      * @throws \PDOException
      * @throws \Schoolbox\Application\Exception\Exception
@@ -76,6 +77,47 @@ class Controller extends Base
      * @throws \Aura\Router\Exception\RouteNotFound
      */
     public function postCreate()
+    {
+        $model = $this->newsMapper->createModel()
+            ->setTitle($this->getRequest()->post['title'])
+            ->setBody($this->getRequest()->post['body'])
+            ->setBlurb($this->getRequest()->post['blurb'])
+            ->setAuthor($this->getUser());
+
+        if ((new ValidArticle())->isSatisfiedBy($model)) {
+            $this->newsMapper->save($model);
+
+            $this->getResponse()->redirect->afterPost($this->getRouter()->generate('commsNews.getCreate'));
+            return;
+        }
+
+        /* TODO: Custom error message
+         */
+        throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
+    }
+
+
+    /**
+     * Provide form to update a news article
+     *
+     * @param Model $news
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     */
+    public function getUpdate(Model $news)
+    {
+        $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/create.twig', [
+            'user' => $this->getUser(),
+            'news' => $news
+        ])->setTitle("Update {$news->getTitle()}"));
+    }
+
+
+    /**
+     * Update a news article
+     *
+     * @param Model $news
+     */
+    public function postUpdate(Model $news)
     {
         $model = $this->newsMapper->createModel()
             ->setTitle($this->getRequest()->post['title'])

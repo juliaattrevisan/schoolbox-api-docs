@@ -24,17 +24,17 @@
                 <fieldset class="content">
                     <div class="small-12 columns">
                         <label>Title</label>
-                        <input name="title" type="text" maxlength="255" />
+                        <input name="title" type="text" maxlength="255" value="{{ news.title }}" />
                     </div>
 
                     <div class="small-12 columns">
                         <label>Body</label>
-                        <textarea name="body"></textarea>
+                        <textarea name="body">{{ news.body }}</textarea>
                     </div>
 
                     <div class="small-12 columns">
                         <label>Blurb</label>
-                        <textarea name="blurb"></textarea>
+                        <textarea name="blurb">{{ news.blurb }}</textarea>
                     </div>
                 </fieldset>
             </section>

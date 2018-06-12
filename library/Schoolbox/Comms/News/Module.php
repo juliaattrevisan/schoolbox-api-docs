@@ -14,6 +14,9 @@ use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
+use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Role;
@@ -56,10 +59,56 @@ class Module extends BaseModule
             )
         );
 
+        $preloadNews = function ($params) { return $this->preloadNews($params); };
+
         $this->register('GET', '/create', 'getCreate', $getPerms, null);
+        $this->register('GET', '/create/{newsId}', 'getUpdate', $getPerms, $preloadNews);
         $this->register('POST', '/create', 'postCreate', $postPerms, null);
+        $this->register('POST', '/create/{newsId}', 'postUpdate', $getPerms, $preloadNews);
     }
 
+
+    /**
+     * Preload the news article
+     *
+     * @param array $params
+     * @return array
+     * @throws \Schoolbox\Application\Exception\NotFound
+     * @throws InvalidArgumentException
+     * @throws NotFound
+     */
+    private function preloadNews(array $params) :array
+    {
+        try {
+            $news = $this->getNewsMapper()->findById($params['newsId']);
+        }
+        catch (MapperException $e) {
+            throw new NotFound(ErrorMapper::ERROR_USER_NOT_FOUND);
+        }
+
+        return [
+            'news' => $news,
+        ];
+    }
+
+    /**
+     * @return Mapper|UserMapper
+     * @throws \InvalidArgumentException If cannot find mapper class
+     */
+    protected function getNewsMapper()
+    {
+        return $this->getMapperFactory()->get(Mapper::class);
+    }
+
+
+    /**
+     * @return Mapper|ErrorMapper
+     * @throws \InvalidArgumentException If cannot find mapper class
+     */
+    protected function getErrorMapper()
+    {
+        return $this->getMapperFactory()->get(ErrorMapper::class);
+    }
 
     /**
      * Override with any steps required for a controller and its routes
