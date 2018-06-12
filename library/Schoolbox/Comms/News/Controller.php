@@ -94,10 +94,18 @@ class Controller extends Base
             ->setAttachmentsLabel('')
             ->setMimeFilter('image/*');
 
+        /* Default news settings
+         */
+        $news = $this->newsMapper->createModel()
+            ->setPublishAt(\Alaress_Date_Format::now())
+            ->setExpiresAt(\Alaress_Date_Format::now())
+        ;
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/create.twig', [
             'action' => 'Create',
             'moderationRequired' => $moderationRequired,
             'user' => $this->getUser(),
+            'news' => $news,
             'featureImageZone' => $zone->getTwigContext(),
         ])->setTitle("Create {$this->getDi()->get('sitePage')->getLocalisedTerm('news', false, true)}"));
     }
