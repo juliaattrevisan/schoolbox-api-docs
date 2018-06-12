@@ -159,6 +159,10 @@ class Controller extends Base
             ->setAttachmentsLabel('')
             ->setMimeFilter('image/*');
 
+        if ($news->getFeatureImage()) {
+            $zone->attachFiles([$news->getFeatureImage()->getHash()]);
+        }
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/create.twig', [
             'action' => 'Update',
             'moderationRequired' => $moderationRequired,
