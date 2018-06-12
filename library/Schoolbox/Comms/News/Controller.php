@@ -126,7 +126,7 @@ class Controller extends Base
 
 
     /**
-     * Persist model to db
+     * Persist model to db during news article authorship
      *
      * @param Model $news
      * @param array|\Aura\Web\Request\Values $data
@@ -142,6 +142,8 @@ class Controller extends Base
             ->setBody($data['body'])
             ->setBlurb($data['blurb'])
             ->setAuthor($this->getUser())
+            ->setModeratedBy(null)
+            ->setModeratedAt(new \Alaress_Date_NullDate())
             ->setPublishAt(\Alaress_Date_Format::newLocal($data['publishAt']))
             ->setExpiresAt(\Alaress_Date_Format::newLocal($data['expiresAt']));
 

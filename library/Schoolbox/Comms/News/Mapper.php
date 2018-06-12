@@ -27,6 +27,8 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('body', self::TYPE_STRING);
         $this->uses('blurb', self::TYPE_STRING);
         $this->joins('author_id', UserMapper::class, 'id', null, null, 'author', 'author');
+        $this->joins('moderated_by', UserMapper::class, 'id', null, null, 'moderatedBy', 'moderatedBy');
+        $this->uses('moderated_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('publish_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('expires_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);

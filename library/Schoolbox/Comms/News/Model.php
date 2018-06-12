@@ -65,6 +65,20 @@ class Model
     private $expiresAt;
 
     /**
+     * The person who allowed this article to be published
+     *
+     * @var User|null
+     */
+    private $moderatedBy;
+
+    /**
+     * The datetime when this article was allowed to be published
+     *
+     * @var \Alaress_Date_Format
+     */
+    private $moderatedAt;
+
+    /**
      * @return string
      */
     public function getTitle(): string
@@ -184,4 +198,42 @@ class Model
     }
 
 
+    /**
+     * @return null|User
+     */
+    public function getModeratedBy(): ?User
+    {
+        return $this->moderatedBy;
+    }
+
+
+    /**
+     * @param null|User $moderatedBy
+     * @return Model
+     */
+    public function setModeratedBy(?User $moderatedBy): self
+    {
+        $this->moderatedBy = $moderatedBy;
+        return $this;
+    }
+
+
+    /**
+     * @return \Alaress_Date_Format
+     */
+    public function getModeratedAt(): \Alaress_Date_Format
+    {
+        return $this->moderatedAt;
+    }
+
+
+    /**
+     * @param \Alaress_Date_Format $moderatedAt
+     * @return $this
+     */
+    public function setModeratedAt(\Alaress_Date_Format $moderatedAt): self
+    {
+        $this->moderatedAt = $moderatedAt;
+        return $this;
+    }
 }
