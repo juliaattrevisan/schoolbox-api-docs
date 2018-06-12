@@ -23,6 +23,7 @@ class Criterion implements ISoftDeletable
     const PARENT_TYPE_CURRICULUM = 'curriculum';
 
     /**
+     * @deprecated use `$this->group->getName()` instead
      * @var string
      */
     private $grouping;
@@ -33,11 +34,13 @@ class Criterion implements ISoftDeletable
     private $name;
 
     /**
+     * @deprecated use `$this->group->getParentId()` instead
      * @var int
      */
     private $parent_id;
 
     /**
+     * @deprecated use `$this->group->getParentType()` instead
      * @var string
      */
     private $parent_type = self::PARENT_TYPE_CATEGORY;
@@ -49,12 +52,15 @@ class Criterion implements ISoftDeletable
 
 
     /**
+     * @deprecated use `$this->getGroup()->setName()` instead
      * @param  string $grouping
      * @return $this
      */
     public function setGrouping($grouping)
     {
-        $this->grouping = $grouping;
+        trigger_error('This method is deprecated; use "getGroup->setName" instead', E_USER_DEPRECATED);
+//        $this->grouping = $grouping;
+        $this->group->setName($grouping);
         return $this;
     }
 
@@ -63,7 +69,9 @@ class Criterion implements ISoftDeletable
      */
     public function getGrouping()
     {
-        return $this->grouping;
+        trigger_error('This method is deprecated; use "getGroup->getName" instead', E_USER_DEPRECATED);
+//        return $this->grouping;
+        return $this->group->getName();
     }
 
     /**
@@ -90,7 +98,9 @@ class Criterion implements ISoftDeletable
      */
     public function setParentId($parent_id)
     {
-        $this->parent_id = $parent_id;
+        trigger_error('This method is deprecated; use "getGroup->setParentId" instead', E_USER_DEPRECATED);
+//        $this->parent_id = $parent_id;
+        $this->group->setParentId($parent_id);
         return $this;
     }
 
@@ -99,7 +109,9 @@ class Criterion implements ISoftDeletable
      */
     public function getParentId()
     {
-        return $this->parent_id;
+        trigger_error('This method is deprecated; use "getGroup->getParentId" instead', E_USER_DEPRECATED);
+//        return $this->parent_id;
+        return $this->group->getParentId();
     }
 
     /**
@@ -108,7 +120,9 @@ class Criterion implements ISoftDeletable
      */
     public function setParentType($parent_type)
     {
-        $this->parent_type = $parent_type;
+        trigger_error('This method is deprecated; use "getGroup->setParentType" instead', E_USER_DEPRECATED);
+//        $this->parent_type = $parent_type;
+        $this->group->setParentType($parent_type);
         return $this;
     }
 
@@ -117,7 +131,9 @@ class Criterion implements ISoftDeletable
      */
     public function getParentType()
     {
-        return $this->parent_type;
+        trigger_error('This method is deprecated; use "getGroup->getParentType" instead', E_USER_DEPRECATED);
+//        return $this->parent_type;
+        return $this->group->getParentType();
     }
 
     /**
