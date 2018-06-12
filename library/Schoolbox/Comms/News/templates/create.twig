@@ -72,6 +72,19 @@
                 </fieldset>
 
                 <fieldset class="content">
+
+                    <div class="small-12 columns">
+                        <label>
+                            Feature Image
+                            <span data-tooltip class="hint has-tip tip-top" title="Attach a feature image to represent your news article">?</span>
+                        </label>
+
+                        {% include 'sub/attachzone.twig' with { attachzone: featureImageZone } %}
+                    </div>
+                </fieldset>
+
+
+                <fieldset class="content">
                     <legend>Availability</legend>
                     <div class="small-12 large-6 columns">
                         <label for="publishAt">

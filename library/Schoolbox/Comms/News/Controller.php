@@ -14,6 +14,7 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\UserMapper;
 use Schoolbox\Comms\News\Policy;
 
@@ -70,9 +71,12 @@ class Controller extends Base
      * @throws MapperException
      * @throws MapperException\Deleted
      * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \UnexpectedValueException
      */
     public function getCreate()
     {
+        /* Moderation policy
+         */
         try {
             $moderationRequired = $this->policyMapper->findOneByColumn('identifier', 'global_moderation')->getValue();
         }
@@ -80,10 +84,20 @@ class Controller extends Base
             $moderationRequired = false;
         }
 
+        /* Feature image
+         */
+        $zone = new Zone('featureImage');
+        $zone
+            ->setMulti(false)
+            ->setAttachPrompt('Attach a feature image')
+            ->setAttachmentsLabel('')
+            ->setMimeFilter('image/*');
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/create.twig', [
             'action' => 'Create',
             'moderationRequired' => $moderationRequired,
-            'user' => $this->getUser()
+            'user' => $this->getUser(),
+            'featureImageZone' => $zone->getTwigContext(),
         ])->setTitle("Create {$this->getDi()->get('sitePage')->getLocalisedTerm('news', false, true)}"));
     }
 
@@ -113,9 +127,12 @@ class Controller extends Base
      * @throws MapperException
      * @throws MapperException\Deleted
      * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \UnexpectedValueException
      */
     public function getUpdate(Model $news)
     {
+        /* Moderation policy
+         */
         try {
             $moderationRequired = $this->policyMapper->findOneByColumn('identifier', 'global_moderation')->getValue();
         }
@@ -123,11 +140,21 @@ class Controller extends Base
             $moderationRequired = false;
         }
 
+        /* Feature image
+         */
+        $zone = new Zone('featureImage');
+        $zone
+            ->setMulti(false)
+            ->setAttachPrompt('Attach a feature image')
+            ->setAttachmentsLabel('')
+            ->setMimeFilter('image/*');
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/create.twig', [
             'action' => 'Update',
             'moderationRequired' => $moderationRequired,
             'user' => $this->getUser(),
-            'news' => $news
+            'news' => $news,
+            'featureImageZone' => $zone->getTwigContext(),
         ])->setTitle("Update {$news->getTitle()}"));
     }
 
