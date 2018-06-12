@@ -16,6 +16,7 @@ use Schoolbox\Fixtures\Team\Player\Mapper as TeamPlayerMapper;
 use Schoolbox\Fixtures\Division\Mapper as DivisionMapper;
 use Schoolbox\Fixtures\Sport\Mapper as SportMapper;
 use Schoolbox\Fixtures\Match\Mapper as MatchMapper;
+use Schoolbox\Fixtures\Match\Model as MatchModel;
 use Schoolbox\Fixtures\Match\Notifier\Helper as NotifierHelper;
 use Schoolbox\User;
 
@@ -157,6 +158,11 @@ class Notifier extends AbstractModuleNotifier
     }
 
     /**
+     * Notify student when itinerary changes.
+     *
+     * This doesn't notify if the notify action was triggered by the creation
+     * of a match; there's already a match notification for that.
+     *
      * @param Model $itinerary
      * @param User  $effector
      * @return Envelope
@@ -164,9 +170,14 @@ class Notifier extends AbstractModuleNotifier
     private function internalNotifyStudent(Model $itinerary, User $effector): Envelope
     {
         // Generic notification to team's participants that itinerary has updated
-        $match = $this->notifierHelper->hydrateMatch($itinerary->getMatch());
+        $match    = $this->notifierHelper->hydrateMatch($itinerary->getMatch());
+        $envelope = new Envelope();
+        if ($this->isNotifyTriggeredByMatchCreate($itinerary, $match)) {
+            return $envelope;
+        }
+
         return $this->notifierHelper->postToTeams(
-            new Envelope(),
+            $envelope,
             $this->notifierHelper->buildBuilder($match, $effector, $this->getSlug(), self::TRIGGER_CREATED)
                                  ->setTitle('Your upcoming :sport match :match itinerary has been changed'),
             $match
@@ -174,6 +185,11 @@ class Notifier extends AbstractModuleNotifier
     }
 
     /**
+     * Notify parents of students when itinerary changes.
+     *
+     * This doesn't notify if the notify action was triggered by the creation
+     * of a match; there's already a match notification for that.
+     *
      * @param Model $itinerary
      * @param User  $effector
      * @return Envelope
@@ -182,6 +198,11 @@ class Notifier extends AbstractModuleNotifier
     {
         // Generic notification to team's participants that itinerary has updated
         $match = $this->notifierHelper->hydrateMatch($itinerary->getMatch());
+        $envelope = new Envelope();
+        if ($this->isNotifyTriggeredByMatchCreate($itinerary, $match)) {
+            return $envelope;
+        }
+
         return $this->notifierHelper->postToParentsOfTeams(
             new Envelope(),
             $this->notifierHelper->buildBuilder($match, $effector, $this->getSlug(), self::TRIGGER_CREATED)
@@ -200,6 +221,19 @@ class Notifier extends AbstractModuleNotifier
     private function isMeaningfullyDifferent(array $diff = null): bool
     {
         return !empty($diff['description']) || !empty($diff['startAt']);
+    }
+
+    /**
+     * Is this notify action happening due to the initial create of the
+     * itinerary item?
+     *
+     * @param Model      $itinerary
+     * @param MatchModel $match
+     * @return bool
+     */
+    private function isNotifyTriggeredByMatchCreate(Model $itinerary, MatchModel $match): bool
+    {
+        return $itinerary->getUpdatedAt()->eq($match->getCreatedAt());
     }
 
     /**
