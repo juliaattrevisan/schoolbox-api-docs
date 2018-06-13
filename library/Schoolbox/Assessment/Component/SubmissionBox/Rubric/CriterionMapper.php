@@ -150,7 +150,7 @@ class CriterionMapper extends Schoolbox\Mapper {
             // attempt lookup
             $existingObject = $this->findOneForParentByKey(
                 $object->getGroup()->getParentId(),
-                $object->getParentType(),
+                $object->getGroup()->getParentType(),
                 $object->getName(),
                 $object->getGroup()->getName()
             );

@@ -1109,7 +1109,7 @@ class RubricMapper
         $firstSrcDescriptor = $srcDescriptors->first();
         $existingCriteria   = $criterionMapper->findForParent(
             $dstBox->getCategory()->getId(),
-            $firstSrcDescriptor->getCriterion()->getParentType(),
+            $firstSrcDescriptor->getCriterion()->getGroup()->getParentType(),
             false
         );
         // Convert to 2-D arrays, indexed by 'group' then 'name', so we can later find duplicates.
