@@ -1,7 +1,19 @@
-<label for="{{ identifier }}">{{ label }}</label>
+{# Write representation #}
+{% macro writable(specification) %}
+    <label for="{{ specification.identifier }}">{{ specification.label }}</label>
 
-{% if subtext|length %}
-    <p>{{ subtext }}.</p>
-{% endif %}
+    {% if specification.subtext|length %}
+        <p>{{ specification.subtext }}</p>
+    {% endif %}
 
-<input type="text" id="{{ identifier }}" name="{{ name }}" value="{{ value }}" />
+    <input type="text" id="{{ specification.identifier }}" name="{{ specification.name }}" value="{{ specification.value }}" />
+{% endmacro %}
+
+{# Read-only representation #}
+{% macro readable(specification) %}
+    {% if specification.value|length %}
+        {{ specification.active|purify }}: {{ specification.value }}
+    {% else %}
+        {{ specification.inactive|purify }}
+    {% endif %}
+{% endmacro %}

@@ -60,13 +60,8 @@
                                 {% import '@commsNewsPolicy/switch.twig' as policyMacro %}
                                 {{ policyMacro.writable(specification) }}
                             {% elseif specification.type == 'input' %}
-                                {% include '@commsNewsPolicy/input.twig' with {
-                                    label: specification.title,
-                                    name: specification.name,
-                                    identifier: specification.identifier,
-                                    subtext: specification.subtext,
-                                    value: specification.value
-                                } %}
+                                {% import '@commsNewsPolicy/input.twig' as policyMacro %}
+                                {{ policyMacro.writable(specification) }}
                             {% endif %}
                         </fieldset>
                     {% endfor %}
@@ -87,11 +82,8 @@
                                 {% import '@commsNewsPolicy/switch.twig' as policyMacro %}
                                 {{ policyMacro.readable(specification) }}
                             {% elseif specification.type == 'input' %}
-                                {% if specification.value|length %}
-                                    {{ specification.active|purify }}: {{ specification.value }}
-                                {% else %}
-                                    {{ specification.inactive|purify }}
-                                {% endif %}
+                                {% import '@commsNewsPolicy/input.twig' as policyMacro %}
+                                {{ policyMacro.readable(specification) }}
                             {% endif %}
                         </li>
                     {% endfor %}
