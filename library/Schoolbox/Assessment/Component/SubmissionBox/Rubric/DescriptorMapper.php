@@ -221,7 +221,7 @@ class DescriptorMapper extends Schoolbox\Mapper {
                 $toCriterion = $criterionMapper->createModel();
                 $toCriterion
                     ->setParentId($toBox->getCategory()->getId())
-                    ->setParentType(Criterion::PARENT_TYPE_CATEGORY)
+                    ->setParentType(Group::PARENT_TYPE_CATEGORY)
                     ->setName($fromItem->getCriterion()->getName())
                     ->setGrouping($fromItem->getCriterion()->getGrouping())
                 ;

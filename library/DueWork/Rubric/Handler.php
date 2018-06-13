@@ -9,7 +9,7 @@
  */
 
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Criterion;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Group;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\Term;
 
@@ -76,7 +76,7 @@ class DueWork_Rubric_Handler
          */
         $pb = new Alaress\Database\Predicate\Builder($this->db, '');
         $pb->in('rg.parent_id', $folderIds)
-           ->equals('rg.parent_type', Criterion::PARENT_TYPE_CATEGORY)
+           ->equals('rg.parent_type', Group::PARENT_TYPE_CATEGORY)
            ->greaterThanOrEqualTo('a.due_date', $term->getStart()->getDatabase())
            ->equals('sr.review_route', ReturnedWork::REVIEW_ROUTE_INSTRUCTOR);
 
@@ -128,7 +128,7 @@ class DueWork_Rubric_Handler
         // 2. Get max mark per criterion and dueWork
         $pb = new Alaress\Database\Predicate\Builder($this->db, '');
         $pb->in('rg.parent_id', $folderIds)
-           ->equals('rg.parent_type', Criterion::PARENT_TYPE_CATEGORY)
+           ->equals('rg.parent_type', Group::PARENT_TYPE_CATEGORY)
            ->greaterThan('rd.value', 0.0);
         $whereClause = implode(' AND ', $pb->getWhere());
         $stmt        = Database::getInstance()->prepare("
@@ -204,7 +204,7 @@ class DueWork_Rubric_Handler
      * @var string   $criteria [rc.id]['grouping']
      * @var string   $criteria [rc.id]['name']
      */
-    public function getAvailableCriteria(array $parentIds, $parentType = Criterion::PARENT_TYPE_CATEGORY)
+    public function getAvailableCriteria(array $parentIds, $parentType = Group::PARENT_TYPE_CATEGORY)
     {
         if (!count($parentIds)) {
             return [];
