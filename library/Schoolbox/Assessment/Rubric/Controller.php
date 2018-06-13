@@ -107,11 +107,7 @@ class Controller extends BaseController
                 return;
             }
 
-            $columnList = [
-                'g.parent_type' => Criterion::PARENT_TYPE_CATEGORY,
-                'g.parent_id'   => $folderId,
-            ];
-            $criteria = CriterionMapper::getInstance()->findByColumnList($columnList);
+            $criteria      = CriterionMapper::getInstance()->findForFolder($folderId);
             $proposedGroup = $this->mapper->normaliseForComparison($group);
             $proposedName  = $this->mapper->normaliseForComparison($name);
             foreach ($criteria as $criterion){
@@ -135,11 +131,7 @@ class Controller extends BaseController
         elseif ($post->get('type') == 'group') {
 
             // Ensure the proposed Group name is not already in use.
-            $columnList = [
-                'g.parent_type' => Criterion::PARENT_TYPE_CATEGORY,
-                'g.parent_id'   => $folderId,
-            ];
-            $criteria = CriterionMapper::getInstance()->findByColumnList($columnList);
+            $criteria = CriterionMapper::getInstance()->findForFolder($folderId);
             $proposed = $this->mapper->normaliseForComparison($post->get('name'));
             foreach ($criteria as $criterion){
                 $grouping = $this->mapper->normaliseForComparison($criterion->getGrouping());

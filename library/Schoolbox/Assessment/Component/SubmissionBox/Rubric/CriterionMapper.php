@@ -103,19 +103,9 @@ class CriterionMapper extends Schoolbox\Mapper {
      */
     public function copyFromCategory($from_id, $to_id) {
         /** @var Criterion[] $from_rubric_list */
-        $from_rubric_list = $this->findByColumnList(
-            array(
-                'g.parent_id'   => $from_id,
-                'g.parent_type' => Criterion::PARENT_TYPE_CATEGORY,
-            )
-        );
+        $from_rubric_list = $this->findForFolder($from_id);
         /** @var Criterion[] $existing_rubric_list */
-        $existing_rubric_list = $this->findByColumnList(
-            array(
-                'g.parent_id'   => $to_id,
-                'g.parent_type' => Criterion::PARENT_TYPE_CATEGORY,
-            )
-        );
+        $existing_rubric_list = $this->findForFolder($to_id);
         $new_rubric_list = new Schoolbox\Collection();
         foreach ($from_rubric_list as $rubric) {
             // search existing for a rubric that matches this one.
@@ -171,6 +161,44 @@ class CriterionMapper extends Schoolbox\Mapper {
             // noop, new object. leave it as-is
         }
         return true;
+    }
+
+
+    /**
+     * Find all criteria for a parent type.
+     *
+     * @param int|int[] $parentId   The parent ID (or list thereof) to find for
+     * @param string    $parentType One of the `Group::PARENT_TYPE_*` constants
+     * @param bool      $cache      If false, bypass result cache
+     * @return Schoolbox\GenericCollection|Criterion[]
+     * @throws Schoolbox\Mapper\Exception
+     */
+    public function findForParent($parentId, string $parentType, bool $cache = true): Schoolbox\GenericCollection
+    {
+        return $this->findByColumnList(
+            [
+                'g.parent_id'   => $parentId,
+                'g.parent_type' => $parentType,
+            ],
+            [
+                'order' => ['g.name' => 'ASC', 'name' => 'ASC'],
+                'cache' => $cache,
+            ]
+        );
+    }
+
+
+    /**
+     * Find all criteria for a folder.
+     *
+     * @param int|int[] $folderId The folder ID (or list thereof) to find for
+     * @param bool      $cache    If false, bypass result cache
+     * @return Schoolbox\GenericCollection|Criterion[]
+     * @throws Schoolbox\Mapper\Exception
+     */
+    public function findForFolder($folderId, bool $cache = true): Schoolbox\GenericCollection
+    {
+        return $this->findForParent($folderId, Group::PARENT_TYPE_CATEGORY, $cache);
     }
 
 

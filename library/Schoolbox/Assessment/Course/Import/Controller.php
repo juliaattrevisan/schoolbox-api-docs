@@ -1107,12 +1107,7 @@ class Controller extends Base\Base
         $criteriaMapper = CriterionMapper::getInstance();
 
         /** @var GenericCollection | Criterion[] $allCriteria */
-        $allCriteria = $criteriaMapper->findByColumnList(
-            [
-                'g.parent_id'   => $sourceIds,
-                'g.parent_type' => Criterion::PARENT_TYPE_CATEGORY,
-            ]
-        );
+        $allCriteria = $criteriaMapper->findForFolder($sourceIds);
 
         $allCriteria = $allCriteria->deepClone();
 

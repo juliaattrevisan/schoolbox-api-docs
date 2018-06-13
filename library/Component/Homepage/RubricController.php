@@ -36,13 +36,7 @@ class Component_Homepage_RubricController extends Component_Homepage_ControllerA
         }
 
         // get rubric details
-        $this->criteria = CriterionMapper::getInstance()->findByColumnList(
-            array(
-                'g.parent_id'   => $this->getContext()->getId(),
-                'g.parent_type' => Criterion::PARENT_TYPE_CATEGORY,
-            ),
-            array('order' => array('g.name' => 'ASC', 'name' => 'ASC'))
-        );
+        $this->criteria = CriterionMapper::getInstance()->findForFolder($this->getContext()->getId());
         return true;
     }
 

@@ -70,13 +70,7 @@ $this->setTitle($title);
 $this->setVar('PAGE_TITLE', $title);
 
 // get rubric details
-$criterionCollection = CriterionMapper::getInstance()->findByColumnList(
-    [
-        'g.parent_id'   => $folderId,
-        'g.parent_type' => Criterion::PARENT_TYPE_CATEGORY,
-    ],
-    ['order' => ['g.name' => 'ASC', 'name' => 'ASC']]
-);
+$criterionCollection = CriterionMapper::getInstance()->findForFolder($folderId);
 
 
 // for now, we're not supporting inheritance
