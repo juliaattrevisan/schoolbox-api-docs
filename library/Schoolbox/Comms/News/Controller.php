@@ -11,8 +11,7 @@ namespace Schoolbox\Comms\News;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Mapper\Exception;
+use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
@@ -69,7 +68,7 @@ class Controller extends Base
     /**
      * Provide form to create a news article
      *
-     * @throws MapperException
+     * @throws Mapper\Exception
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \UnexpectedValueException
      */
@@ -105,7 +104,7 @@ class Controller extends Base
     /**
      * Create a news article
      *
-     * @throws MapperException
+     * @throws Mapper\Exception
      * @throws \PDOException
      * @throws \Schoolbox\Application\Exception\Exception
      * @throws \UnexpectedValueException
@@ -158,7 +157,7 @@ class Controller extends Base
      * Update a news article
      *
      * @param Model $news
-     * @throws MapperException
+     * @throws \Schoolbox\Mapper\Exception
      * @throws \Aura\Router\Exception\RouteNotFound
      * @throws \PDOException
      * @throws \Schoolbox\Application\Exception\Exception
@@ -167,23 +166,38 @@ class Controller extends Base
      */
     public function postUpdate(Model $news)
     {
-        if ($this->persist($news, $this->getRequest()->post)) {
-            $url = $this->getRouter()->generate('commsNews.getUpdate', ['newsId' => $news->getId()]);
+        try {
+            if ($this->persist($news, $this->getRequest()->post)) {
+                $url = $this->getRouter()->generate('commsNews.getUpdate', [ 'newsId' => $news->getId() ]);
 
-            /* Save a draft of the news article
-             * This can occur from either the Create or Update context
-             * Update the form action accordingly
-             */
+                /* Save a draft of the news article
+                 * This can occur from either the Create or Update context
+                 * Update the form action accordingly
+                 */
+                if ($this->getRequest()->isXhr()) {
+                    $this->getResponse()->content->set($this->buildJsonOutput([
+                        'success' => true,
+                        'formAction' => $url
+                    ]));
+                } else {
+                    $this->getResponse()->redirect->afterPost($url);
+                }
+
+                return;
+            }
+        }
+        catch (Mapper\Exception $e) {
             if ($this->getRequest()->isXhr()) {
+                $this->getResponse()->status->set(400);
                 $this->getResponse()->content->set($this->buildJsonOutput([
-                    'formAction' => $url
+                    'success' => false,
+                    'message' => $e->getMessage()
                 ]));
-            }
-            else {
-                $this->getResponse()->redirect->afterPost($url);
+
+                return;
             }
 
-            return;
+            throw $e;
         }
 
         /* TODO: Custom error message
@@ -198,7 +212,7 @@ class Controller extends Base
      * @param Model                          $news
      * @param array|\Aura\Web\Request\Values $data
      * @return bool
-     * @throws MapperException
+     * @throws Mapper\Exception
      * @throws \PDOException
      * @throws \UnexpectedValueException
      * @throws \Schoolbox\Resource\Exception
