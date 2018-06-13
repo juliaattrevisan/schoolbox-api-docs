@@ -76,6 +76,27 @@ class Controller extends Base
     {
         $policies = $this->policyMapper->findAll()->indexBy('identifier');
 
+        /* Spawn an empty news with default settings
+         */
+        /** @var Model $news */
+        $news = $this->newsMapper->createModel()
+            ->setPublishAt(\Alaress_Date_Format::now())
+            ->setExpiresAt(\Alaress_Date_Format::now());
+
+        /* Policies: Date Offsets
+         */
+        $publishOffset = strtotime($policies->getOffset('publish_date_offset')->getValue());
+
+        if ('' !== $publishOffset) {
+            $news->getPublishAt()->modify($publishOffset)->endOfDay();
+        }
+
+        $expiryOffset = strtotime($policies->getOffset('expiry_date_offset')->getValue());
+
+        if ('' !== $expiryOffset) {
+            $news->getExpiresAt()->modify($expiryOffset)->endOfDay();
+        }
+
         /* Feature image
          */
         $zone = (new Zone('featureImage'))
@@ -84,12 +105,6 @@ class Controller extends Base
             ->setAttachmentsLabel('')
             ->setMimeFilter('image/*');
 
-        /* Default news settings
-         */
-        $news = $this->newsMapper->createModel()
-            ->setPublishAt(\Alaress_Date_Format::now()->modify($policies->getOffset('publish_date_offset')->getValue())->endOfDay())
-            ->setExpiresAt(\Alaress_Date_Format::now()->modify($policies->getOffset('expiry_date_offset')->getValue())->endOfDay())
-        ;
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/create.twig', [
             'policies' => $policies,
