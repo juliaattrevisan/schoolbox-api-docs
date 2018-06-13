@@ -175,7 +175,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
                         $c = $c->merge(new Collection($this->notifyUpdated($roletype, $resource, $user)->getAll($time)));
                         break;
                     case LogMapper::ACTION_DELETE:
-                        $c = $c->merge(new Collection($this->notifyDeleted($roletype, $resource, $user)->getAll($time)));
+                        $c = $c->merge(new Collection($this->notifyDeletedInternal($roletype, $resource, $user)->getAll($time)));
                         break;
                 }
             } catch (Mapper\Exception|\Error $e) {
@@ -428,7 +428,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
      * @param array                    $diff
      * @return Envelope
      */
-    public abstract function notifyDeleted($roletype, $resource, $author, $diff = null);
+    public abstract function notifyDeletedInternal($roletype, $resource, $author, $diff = null);
 
 
     /* ASYNC METHODS */
@@ -463,7 +463,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
      */
     public function notifyStudentDeleted($resource, $effector)
     {
-        return $this->notifyDeleted(Role::STUDENT, $resource, $effector);
+        return $this->notifyDeletedInternal(Role::STUDENT, $resource, $effector);
     }
 
 
@@ -497,7 +497,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
      */
     public function notifyStaffDeleted($resource, $effector)
     {
-        return $this->notifyDeleted(Role::STAFF, $resource, $effector);
+        return $this->notifyDeletedInternal(Role::STAFF, $resource, $effector);
     }
 
 
@@ -531,7 +531,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
      */
     public function notifyParentDeleted($resource, $effector)
     {
-        return $this->notifyDeleted(Role::PARENT, $resource, $effector);
+        return $this->notifyDeletedInternal(Role::PARENT, $resource, $effector);
     }
 
 

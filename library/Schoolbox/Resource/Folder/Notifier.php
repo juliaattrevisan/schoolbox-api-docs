@@ -106,7 +106,7 @@ class Notifier extends ResourceNotifier
      * @param array  $diff
      * @return Envelope
      */
-    public function notifyDeleted($roleType, $category, $effector, $diff = null)
+    public function notifyDeletedInternal($roleType, $category, $effector, $diff = null)
     {
         return $this->notify(
             LogMapper::KIND_FOLDER, $category->getId(), self::TRIGGER_DELETED,
