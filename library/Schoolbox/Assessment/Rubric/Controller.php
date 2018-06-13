@@ -112,7 +112,7 @@ class Controller extends BaseController
             $proposedGroup = $this->mapper->normaliseForComparison($group);
             $proposedName  = $this->mapper->normaliseForComparison($name);
             foreach ($criteria as $criterion){
-                $normGroup = $this->mapper->normaliseForComparison($criterion->getGrouping());
+                $normGroup = $this->mapper->normaliseForComparison($criterion->getGroup()->getName());
                 $normName = $this->mapper->normaliseForComparison($criterion->getName());
                 if($normGroup == $proposedGroup && $normName == $proposedName){
                     $this->sendJSONError("Indicator already exists in this Group");
@@ -135,7 +135,7 @@ class Controller extends BaseController
             $criteria = CriterionMapper::getInstance()->findForFolder($folderId);
             $proposed = $this->mapper->normaliseForComparison($post->get('name'));
             foreach ($criteria as $criterion){
-                $grouping = $this->mapper->normaliseForComparison($criterion->getGrouping());
+                $grouping = $this->mapper->normaliseForComparison($criterion->getGroup()->getName());
                 if($proposed == $grouping){
                     $this->sendJSONError("Group name already exists in this context");
                     return;

@@ -1116,7 +1116,7 @@ class RubricMapper
         /** @var Criterion[][] $existingGroupMap */
         $existingGroupMap = [];
         foreach ($existingCriteria as $existingCriterion) {
-            $group                           = $this->normaliseForComparison($existingCriterion->getGrouping());
+            $group                           = $this->normaliseForComparison($existingCriterion->getGroup()->getName());
             $name                            = $this->normaliseForComparison($existingCriterion->getName());
             $existingGroupMap[$group][$name] = $existingCriterion;
         }
@@ -1136,7 +1136,7 @@ class RubricMapper
                 // Does this Criterion already exist on destination folder ?
 
                 $duplicate = false;
-                $group     = $this->normaliseForComparison($srcCriterion->getGrouping());
+                $group     = $this->normaliseForComparison($srcCriterion->getGroup()->getName());
                 $name      = null;
                 if (array_key_exists($group, $existingGroupMap)) {
                     $name = $this->normaliseForComparison($srcCriterion->getName());

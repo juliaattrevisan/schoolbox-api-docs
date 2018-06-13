@@ -211,7 +211,7 @@ class DescriptorMapper extends Schoolbox\Mapper {
                 $toCriterion = $criterionMapper->findOneForFolderByKey(
                     $toBox->getCategory()->getId(),
                     $fromItem->getCriterion()->getName(),
-                    $fromItem->getCriterion()->getGrouping()
+                    $fromItem->getCriterion()->getGroup()->getName()
                 );
             } catch (Schoolbox\Mapper\Exception $e) {
                 // Try creating a new one?
@@ -223,7 +223,7 @@ class DescriptorMapper extends Schoolbox\Mapper {
                     ->setParentId($toBox->getCategory()->getId())
                     ->setParentType(Group::PARENT_TYPE_CATEGORY)
                     ->setName($fromItem->getCriterion()->getName())
-                    ->setGrouping($fromItem->getCriterion()->getGrouping())
+                    ->setGrouping($fromItem->getCriterion()->getGroup()->getName())
                 ;
                 $criterionMapper->save($toCriterion);
             }

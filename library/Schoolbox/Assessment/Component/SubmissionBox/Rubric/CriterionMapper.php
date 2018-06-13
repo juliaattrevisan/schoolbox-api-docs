@@ -113,7 +113,7 @@ class CriterionMapper extends Schoolbox\Mapper {
             $rubric_exists = false;
             foreach ($existing_rubric_list as $existing_rubric) {
                 if (
-                    $existing_rubric->getGrouping() === $rubric->getGrouping()
+                    $existing_rubric->getGroup()->getName() === $rubric->getGroup()->getName()
                     && $existing_rubric->getName() === $rubric->getName()
                 ) {
                     $rubric_exists = true;
@@ -144,7 +144,7 @@ class CriterionMapper extends Schoolbox\Mapper {
     {
         // remove any newlines and consecutive/leading/trailing spaces from input
         $object->setName(preg_replace('`\s+`', ' ', trim($object->getName())));
-        $object->setGrouping(preg_replace('`\s+`', ' ', trim($object->getGrouping())));
+        $object->setGrouping(preg_replace('`\s+`', ' ', trim($object->getGroup()->getName())));
 
         try {
             // attempt lookup
@@ -152,7 +152,7 @@ class CriterionMapper extends Schoolbox\Mapper {
                 $object->getParentId(),
                 $object->getParentType(),
                 $object->getName(),
-                $object->getGrouping()
+                $object->getGroup()->getName()
             );
 
             // found something! sweet. assign that ID.

@@ -84,7 +84,7 @@ if (count($criterionCollection)) {
     /* Create group structure */
     $criteriaList = [];
     foreach ($criterionCollection as $crit) {
-        $criteriaList[$crit->getGrouping()][] = $crit;
+        $criteriaList[$crit->getGroup()->getName()][] = $crit;
     }
 
     foreach ($criteriaList as $grouping => $crits) {

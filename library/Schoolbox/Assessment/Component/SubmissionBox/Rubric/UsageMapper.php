@@ -74,7 +74,7 @@ class UsageMapper extends Schoolbox\Mapper {
             $is_used = false;
             foreach ($to_criterion_list as $to_criterion) {
                 if (
-                    $from_criterion->getGrouping() === $to_criterion->getGrouping()
+                    $from_criterion->getGroup()->getName() === $to_criterion->getGroup()->getName()
                     && $from_criterion->getName() === $to_criterion->getName()
                 ) {
                     $is_used = true;
@@ -90,7 +90,7 @@ class UsageMapper extends Schoolbox\Mapper {
                         $criterion_mapper->findOneForFolderByKey(
                             $to_box->getCategory()->getId(),
                             $from_criterion->getName(),
-                            $from_criterion->getGrouping()
+                            $from_criterion->getGroup()->getName()
                         )
                     );
                     $new_criterion_list->add($criterion_usage);
