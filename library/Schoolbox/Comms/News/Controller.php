@@ -83,18 +83,20 @@ class Controller extends Base
             ->setPublishAt(\Alaress_Date_Format::now())
             ->setExpiresAt(\Alaress_Date_Format::now());
 
-        /* Policies: Date Offsets
+        /* Policies: Publish Date Offset
          */
-        $publishOffset = strtotime($policies->getOffset('publish_date_offset')->getValue());
+        $policy = $policies->getOffset('publish_date_offset');
 
-        if ('' !== $publishOffset) {
-            $news->getPublishAt()->modify($publishOffset)->endOfDay();
+        if ((new ValidDateOffset())->isSatisfiedBy($policy)) {
+            $news->getPublishAt()->modify($policy->getValue())->endOfDay();
         }
 
-        $expiryOffset = strtotime($policies->getOffset('expiry_date_offset')->getValue());
+        /* Policies: Expiry Date Offset
+         */
+        $policy = $policies->getOffset('expiry_date_offset');
 
-        if ('' !== $expiryOffset) {
-            $news->getExpiresAt()->modify($expiryOffset)->endOfDay();
+        if ((new ValidDateOffset())->isSatisfiedBy($policy)) {
+            $news->getExpiresAt()->modify($policy->getValue())->endOfDay();
         }
 
         /* Feature image
@@ -104,7 +106,6 @@ class Controller extends Base
             ->setAttachPrompt('Attach a feature image')
             ->setAttachmentsLabel('')
             ->setMimeFilter('image/*');
-
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/create.twig', [
             'policies' => $policies,
