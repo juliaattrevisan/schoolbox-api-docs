@@ -56,13 +56,8 @@
                 <section>
                     {% for specification in specifications %}
                         <fieldset>
-                            {% if specification.type == 'switch' %}
-                                {% import '@commsNewsPolicy/switch.twig' as policyMacro %}
-                                {{ policyMacro.writable(specification) }}
-                            {% elseif specification.type == 'input' %}
-                                {% import '@commsNewsPolicy/input.twig' as policyMacro %}
-                                {{ policyMacro.writable(specification) }}
-                            {% endif %}
+                            {% import '@commsNewsPolicy/' ~ specification.type ~ '.twig' as policyMacro %}
+                            {{ policyMacro.writable(specification) }}
                         </fieldset>
                     {% endfor %}
                 </section>
@@ -74,17 +69,8 @@
                 <ul class="information-list">
                     {% for specification in specifications %}
                         <li class="content">
-
-                            {# Read-only representation
-                             # Ideally this should be bundled together with each data type
-                             #}
-                            {% if specification.type == 'switch' %}
-                                {% import '@commsNewsPolicy/switch.twig' as policyMacro %}
-                                {{ policyMacro.readable(specification) }}
-                            {% elseif specification.type == 'input' %}
-                                {% import '@commsNewsPolicy/input.twig' as policyMacro %}
-                                {{ policyMacro.readable(specification) }}
-                            {% endif %}
+                            {% import '@commsNewsPolicy/' ~ specification.type ~ '.twig' as policyMacro %}
+                            {{ policyMacro.readable(specification) }}
                         </li>
                     {% endfor %}
                 </ul>
