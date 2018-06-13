@@ -6,6 +6,7 @@
  # name: The input name (comes out in POST)
  # identifier: A unique identifier for this policy (stored in db)
  # value: The value that was set for this policy (stored in db)
+ # type: The type of input it is
  #}
 {% set specifications = {
     'global_moderation': {
@@ -15,7 +16,18 @@
         'inactive': '<strong>Global moderation is off</strong>. You can freely post articles',
         'name': 'policy[global_moderation]',
         'identifier': 'global_moderation',
-        'value': 0
+        'value': 0,
+        'type': 'switch'
+    },
+    'publish_date_offset': {
+        'title': 'Publish Date Offset',
+        'subtext': 'News Articles will have their default publish date set to the current datetime plus this value',
+        'active': '<strong>News Articles are set to publish using an offset</strong>',
+        'inactive': '<strong>News Articles are set to publish immediately</strong>',
+        'name': 'policy[publish_date_offset]',
+        'identifier': 'publish_date_offset',
+        'value': '',
+        'type': 'input'
     }
 } %}
 
@@ -44,29 +56,51 @@
                 <section>
                     {% for specification in specifications %}
                         <fieldset>
-                            {% include 'sub/switch.twig' with {
-                                label: specification.title,
-                                name: specification.name,
-                                identifier: specification.identifier,
-                                subtext: specification.subtext,
-                                isChecked: specification.value,
-                                checkedValue: 1
-                            } %}
+                            {% if specification.type == 'switch' %}
+                                {% include 'sub/switch.twig' with {
+                                    label: specification.title,
+                                    name: specification.name,
+                                    identifier: specification.identifier,
+                                    subtext: specification.subtext,
+                                    isChecked: specification.value,
+                                    checkedValue: 1
+                                } %}
+                            {% elseif specification.type == 'input' %}
+                                {% include '@commsNewsPolicy/input.twig' with {
+                                    label: specification.title,
+                                    name: specification.name,
+                                    identifier: specification.identifier,
+                                    subtext: specification.subtext,
+                                    value: specification.value
+                                } %}
+                            {% endif %}
                         </fieldset>
                     {% endfor %}
                 </section>
 
-                <input type="submit" value="Update Comms settings"/>
+                <input type="submit" value="Update Comms settings" />
             </form>
         {% else %}
             <section>
                 <ul class="information-list">
                     {% for specification in specifications %}
                         <li class="content">
-                            {% if specification.value %}
-                                {{ specification.active|purify }}
-                            {% else %}
-                                {{ specification.inactive|purify }}
+
+                            {# Read-only representation
+                             # Ideally this should be bundled together with each data type
+                             #}
+                            {% if specification.type == 'switch' %}
+                                {% if specification.value %}
+                                    {{ specification.active|purify }}
+                                {% else %}
+                                    {{ specification.inactive|purify }}
+                                {% endif %}
+                            {% elseif specification.type == 'input' %}
+                                {% if specification.value|length %}
+                                    {{ specification.active|purify }}: {{ specification.value }}
+                                {% else %}
+                                    {{ specification.inactive|purify }}
+                                {% endif %}
                             {% endif %}
                         </li>
                     {% endfor %}

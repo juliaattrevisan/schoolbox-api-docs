@@ -13,6 +13,12 @@ CREATE TABLE `comms_news_policy` (
 INSERT INTO `comms_news_policy` (identifier, value)
 VALUES ('global_moderation', 1);
 
+-- News Policy: Publish Date Offset
+-- When enabled, every article's publish date is offset by this amount
+-- When empty, publish date is set to the current datetime for immediate effect
+INSERT INTO `comms_news_policy` (identifier, value)
+VALUES ('publish_date_offset', '');
+
 -- News Article
 CREATE TABLE `comms_news_article` (
   `id`                 int(11)       PRIMARY KEY NOT NULL AUTO_INCREMENT,

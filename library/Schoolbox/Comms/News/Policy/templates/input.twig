@@ -1,0 +1,7 @@
+<label for="{{ identifier }}">{{ label }}</label>
+
+{% if subtext|length %}
+    <p>{{ subtext }}.</p>
+{% endif %}
+
+<input type="text" id="{{ identifier }}" name="{{ name }}" value="{{ value }}" />
