@@ -1,8 +1,11 @@
 <script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
 <script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
+<script type="text/javascript" src="/javascript/shared/comms/draft.js"></script>
 
 <script>
     $(function () {
+
+        {# CKEditors #}
         $.fn.alaressEditor({
             targetElements: $('#createForm textarea[name=body]')
         });
@@ -11,6 +14,68 @@
             targetElements: $('#createForm textarea[name=blurb]'),
             removePlugins: 'autoembed,uploadimage,schoolboxresource,schoolboxiframe,link'
         });
+
+        {# Drafting mechanism #}
+        $('#createForm').draft({
+            textareas: {
+                'blurb': null,
+                'body': null
+            }
+        });
+
+        {#var submitButtons = $("[data-action-save], [data-action-self-reflect]");#}
+
+        {#// The autosave submit method#}
+
+        {#var autosaveAjaxSubmit = function () {#}
+
+            {#/* Disable actual submit button#}
+             {#*/#}
+            {#submitButtons.prop('disabled', true);#}
+
+            {#// Submit form via AJAX#}
+            {#var formContents = form.serializeArray();#}
+            {#formContents.push({name: 'saveDraft', value: '1'});#}
+            {#formContents.push({name: 'body', value: CKEDITOR.instances['editor-body'].getData()});#}
+
+            {#formSaveLabel.toastActivate({#}
+                {#text: 'Autosaving'#}
+            {#});#}
+
+            {#$.ajax({#}
+                {#type: "POST",#}
+                {#url: '{{ routeLookup('learningAssessment.postCreateResponse', { assessmentId: assessment.id, studentId: student.id}) }}',#}
+                {#data: formContents,#}
+                {#complete: function () {#}
+                    {#// Re-init the autosave#}
+                    {#initAutosave();#}
+
+                    {#/* Re-enable submit#}
+                     {#*/#}
+                    {#submitButtons.prop('disabled', false);#}
+                {#},#}
+                {#success: function (responseText) {#}
+
+                    {#/* Recycle the id ><#}
+                     {#*/#}
+                    {#form.find('input[name=responseId]').val(responseText.id);#}
+                    {#formSaveLabel.toastTimeout({#}
+                        {#text: 'Draft Saved',#}
+                        {#css: 'success'#}
+                    {#});#}
+                {#},#}
+                {#error: function (response) {#}
+                    {#var temp = $.parseJSON(response.responseText);#}
+
+                    {#formSaveLabel.toastTimeout({#}
+                        {#text: 'Error: ' + temp.message,#}
+                        {#css: 'alert'#}
+                    {#});#}
+                {#},#}
+                {#dataType: 'json'#}
+            {#});#}
+        {#};#}
+
     });
 </script>
 <div class="row">

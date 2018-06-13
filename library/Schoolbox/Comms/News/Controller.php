@@ -168,7 +168,21 @@ class Controller extends Base
     public function postUpdate(Model $news)
     {
         if ($this->persist($news, $this->getRequest()->post)) {
-            $this->getResponse()->redirect->afterPost($this->getRouter()->generate('commsNews.getUpdate', ['newsId' => $news->getId()]));
+            $url = $this->getRouter()->generate('commsNews.getUpdate', ['newsId' => $news->getId()]);
+
+            /* Save a draft of the news article
+             * This can occur from either the Create or Update context
+             * Update the form action accordingly
+             */
+            if ($this->getRequest()->isXhr()) {
+                $this->getResponse()->content->set($this->buildJsonOutput([
+                    'formAction' => $url
+                ]));
+            }
+            else {
+                $this->getResponse()->redirect->afterPost($url);
+            }
+
             return;
         }
 
