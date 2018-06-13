@@ -11,8 +11,11 @@ namespace Schoolbox\Comms\News\Test;
 
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Comms\News\Model;
+use Schoolbox\Comms\News\Policy;
 use Schoolbox\Comms\News\ValidArticle;
 use Schoolbox\Comms\News\ValidBroadcast;
+use Schoolbox\Comms\News\ValidDateOffset;
+
 
 
 class ValidationTest extends TestCase
@@ -99,6 +102,73 @@ class ValidationTest extends TestCase
             ],
             'Heading is missing' => [
                 new Model(),
+                false
+            ],
+        ];
+    }
+
+
+    /**
+     * @dataProvider provider_validDateOffset
+     * @param Policy\Model $policy
+     * @param int   $expected
+     */
+    public function testValidDateOffset(Policy\Model $policy, $expected)
+    {
+        $validation = new ValidDateOffset();
+
+        $this->assertEquals($expected, $validation->isSatisfiedBy($policy));
+    }
+
+    /**
+     * Data provider for testValidDateOffset
+     *
+     * @return array
+     */
+    public function provider_validDateOffset() :array {
+        return [
+            'Valid (+1 day)' => [
+                (new Policy\Model())->setValue('+1 day'),
+                true
+            ],
+            'Valid (+1 week)' => [
+                (new Policy\Model())->setValue('+1 week'),
+                true
+            ],
+            'Valid (+1 month)' => [
+                (new Policy\Model())->setValue('+1 month'),
+                true
+            ],
+            'Valid (tomorrow)' => [
+                (new Policy\Model())->setValue('tomorrow'),
+                true
+            ],
+            'Invalid (empty string)' => [
+                (new Policy\Model())->setValue(''),
+                false
+            ],
+            'Invalid (whitespace)' => [
+                (new Policy\Model())->setValue('   '),
+                false
+            ],
+            'Invalid 1' => [
+                (new Policy\Model())->setValue('no particular time'),
+                false
+            ],
+            'Invalid 2' => [
+                (new Policy\Model())->setValue('later'),
+                false
+            ],
+            'Invalid 3' => [
+                (new Policy\Model())->setValue('a few days later'),
+                false
+            ],
+            'Invalid (trash 1)' => [
+                (new Policy\Model())->setValue('ALKJFLj297245u2o34jklhlsdf'),
+                false
+            ],
+            'Invalid (trash 2)' => [
+                (new Policy\Model())->setValue('@#(O$%&U@(*$U(@JKO$HJO@#H$(*@#YU( 9284 2894 y9284 y928y97&$(!@&$'),
                 false
             ],
         ];

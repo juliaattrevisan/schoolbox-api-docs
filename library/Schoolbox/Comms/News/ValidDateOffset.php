@@ -21,6 +21,6 @@ class ValidDateOffset
      */
     public function isSatisfiedBy(Policy\Model $policy)
     {
-        return (bool)strtotime($policy->getValue());
+        return (bool)strtotime(trim($policy->getValue()));
     }
 }
