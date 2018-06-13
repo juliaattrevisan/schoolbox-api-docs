@@ -73,7 +73,10 @@
             autosaveInterval = setInterval(function() {
                 if (isDifferent()) {
 
-                    // Disable inputs
+                    /* Disable inputs
+                     */
+                    config.element.find('input[type=submit]').prop('disabled', true);
+                    
                     // clear interval
                     save();
                     // fire toast

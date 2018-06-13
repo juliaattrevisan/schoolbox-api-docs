@@ -27,14 +27,6 @@
 
         {#var autosaveAjaxSubmit = function () {#}
 
-            {#/* Disable actual submit button#}
-             {#*/#}
-            {#submitButtons.prop('disabled', true);#}
-
-            {#// Submit form via AJAX#}
-            {#var formContents = form.serializeArray();#}
-            {#formContents.push({name: 'saveDraft', value: '1'});#}
-            {#formContents.push({name: 'body', value: CKEDITOR.instances['editor-body'].getData()});#}
 
             {#formSaveLabel.toastActivate({#}
                 {#text: 'Autosaving'#}
