@@ -12,6 +12,7 @@ namespace Schoolbox\Comms\News;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper;
+use Schoolbox\News\Topic;
 use Schoolbox\News\TopicMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
@@ -249,6 +250,10 @@ class Controller extends Base
             ->setModeratedAt(new \Alaress_Date_NullDate())
             ->setPublishAt(\Alaress_Date_Format::newLocal($data['publishAt']))
             ->setExpiresAt(\Alaress_Date_Format::newLocal($data['expiresAt']));
+
+        /* TODO: Assign tags from a selectize
+         * TopicMapper::getInstance()->findByColumn('id', $data['tags']);
+         */
 
         if (\is_array($data['attachment'])) {
             $news->setFeatureImage((new CollectorFactory())->build($data['attachment'] ?: [])->getFirst());
