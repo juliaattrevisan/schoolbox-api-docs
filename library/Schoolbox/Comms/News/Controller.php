@@ -70,20 +70,12 @@ class Controller extends Base
      * Provide form to create a news article
      *
      * @throws MapperException
-     * @throws MapperException\Deleted
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \UnexpectedValueException
      */
     public function getCreate()
     {
-        /* Moderation policy
-         */
-        try {
-            $moderationRequired = $this->policyMapper->findOneByColumn('identifier', 'global_moderation')->getValue();
-        }
-        catch (Exception $e) {
-            $moderationRequired = false;
-        }
+        $policies = $this->policyMapper->findAll()->indexBy('identifier');
 
         /* Feature image
          */
@@ -96,13 +88,13 @@ class Controller extends Base
         /* Default news settings
          */
         $news = $this->newsMapper->createModel()
-            ->setPublishAt(\Alaress_Date_Format::now())
-            ->setExpiresAt(\Alaress_Date_Format::now())
+            ->setPublishAt(\Alaress_Date_Format::now()->modify($policies->getOffset('publish_date_offset')->getValue())->endOfDay())
+            ->setExpiresAt(\Alaress_Date_Format::now()->modify($policies->getOffset('expiry_date_offset')->getValue())->endOfDay())
         ;
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/create.twig', [
+            'policies' => $policies,
             'action' => 'Create',
-            'moderationRequired' => $moderationRequired,
             'user' => $this->getUser(),
             'news' => $news,
             'featureImageZone' => $zone->getTwigContext(),
@@ -133,21 +125,12 @@ class Controller extends Base
      * Provide form to update a news article
      *
      * @param Model $news
-     * @throws MapperException
-     * @throws MapperException\Deleted
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \UnexpectedValueException
      */
     public function getUpdate(Model $news)
     {
-        /* Moderation policy
-         */
-        try {
-            $moderationRequired = $this->policyMapper->findOneByColumn('identifier', 'global_moderation')->getValue();
-        }
-        catch (Exception $e) {
-            $moderationRequired = false;
-        }
+        $policies = $this->policyMapper->findAll()->indexBy('identifier');
 
         /* Feature image
          */
@@ -162,8 +145,8 @@ class Controller extends Base
         }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/create.twig', [
+            'policies' => $policies,
             'action' => 'Update',
-            'moderationRequired' => $moderationRequired,
             'user' => $this->getUser(),
             'news' => $news,
             'featureImageZone' => $zone->getTwigContext(),
