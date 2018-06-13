@@ -176,6 +176,10 @@
                      */
                     config.element.attr('action', responseText.formAction);
 
+                    /* hehe
+                     */
+                    window.history.pushState({}, null, responseText.formAction);
+
                     config.toaster.toastTimeout({
                         text: 'Draft Saved',
                         css: 'success'
