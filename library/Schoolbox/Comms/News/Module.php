@@ -83,7 +83,7 @@ class Module extends BaseModule
             $news = $this->getNewsMapper()->findById($params['newsId']);
         }
         catch (MapperException $e) {
-            throw new NotFound(ErrorMapper::ERROR_USER_NOT_FOUND);
+            throw new NotFound(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
         }
 
         return [
