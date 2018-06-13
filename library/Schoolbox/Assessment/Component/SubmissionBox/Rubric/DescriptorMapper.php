@@ -206,9 +206,7 @@ class DescriptorMapper extends Schoolbox\Mapper {
 
             /** @var Criterion $toCriterion */
             /** @var CriterionMapper $criterionMapper */
-            /** @var GroupMapper $groupMapper */
             $criterionMapper = $this->getJoinMapper('criterion');
-            $groupMapper     = $this->getJoinMapper('criterion.group');
             try {
                 $toCriterion = $criterionMapper->findOneForFolderByKey(
                     $toBox->getCategory()->getId(),
@@ -220,17 +218,11 @@ class DescriptorMapper extends Schoolbox\Mapper {
                 if (!$createCriterion) {
                     continue;
                 }
-                $toCriterion = $criterionMapper->createModel();
-                $toCriterion
-                    ->setName($fromItem->getCriterion()->getName())
-                    ->setGroup(
-                        $groupMapper->findOrCreateOneForFolderByName(
-                            $toBox->getCategory()->getId(),
-                            $fromItem->getCriterion()->getGroup()->getName()
-                        )
-                    )
-                ;
-                $criterionMapper->save($toCriterion);
+                $toCriterion = $criterionMapper->findOrCreateOneForFolderByKey(
+                    $toBox->getCategory()->getId(),
+                    $fromItem->getCriterion()->getName(),
+                    $fromItem->getCriterion()->getGroup()->getName()
+                );
             }
 
             // The criterion's level:
