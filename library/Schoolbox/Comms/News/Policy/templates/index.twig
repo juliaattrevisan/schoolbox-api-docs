@@ -13,5 +13,5 @@
  #}
 {% include '@commsNewsPolicy/policies.twig' with {
     policies: policies,
-    configurable: USER.isSuperuser
+    configurable: USER.isSuperuser or commsOfficers[USER.id]
 } %}

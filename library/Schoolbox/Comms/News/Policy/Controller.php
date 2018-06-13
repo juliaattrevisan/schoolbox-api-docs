@@ -60,7 +60,7 @@ class Controller extends Base
      */
     public function getPolicies()
     {
-        $commsOfficers = $this->userAccessMapper->findUsersForService(UserAccess::SERVICE_COMMS_OFFICER)->getUnique('id');
+        $commsOfficers = $this->userAccessMapper->findUsersForService(UserAccess::SERVICE_COMMS_OFFICER)->getUnique('id')->indexBy('id');
         $policies = $this->policyMapper->findAll();
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsPolicy/index.twig', [
