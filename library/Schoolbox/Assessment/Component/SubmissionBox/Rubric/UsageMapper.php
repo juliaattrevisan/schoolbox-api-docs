@@ -87,13 +87,10 @@ class UsageMapper extends Schoolbox\Mapper {
                 // Find the criterion to link this one to.
                 try {
                     $criterion_usage->setCriterion(
-                        $criterion_mapper->findOneByColumnList(
-                            array(
-                                'g.name'        => $from_criterion->getGrouping(),
-                                'name'          => $from_criterion->getName(),
-                                'g.parent_id'   => $to_box->getCategory()->getId(),
-                                'g.parent_type' => Criterion::PARENT_TYPE_CATEGORY,
-                            )
+                        $criterion_mapper->findOneForFolderByKey(
+                            $to_box->getCategory()->getId(),
+                            $from_criterion->getName(),
+                            $from_criterion->getGrouping()
                         )
                     );
                     $new_criterion_list->add($criterion_usage);

@@ -203,29 +203,29 @@ class DescriptorMapper extends Schoolbox\Mapper {
             // The to box descriptor's criterion:
             // has the same name, type and grouping as the to box, but instead
             // belongs to the to box's category and level.
-            $params = array(
-                'g.parent_id'   => $toBox->getCategory()->getId(),
-                'g.parent_type' => Criterion::PARENT_TYPE_CATEGORY,
-                'name'          => $fromItem->getCriterion()->getName(),
-                'g.name'        => $fromItem->getCriterion()->getGrouping(),
-            );
 
             /** @var Criterion $toCriterion */
+            /** @var CriterionMapper $criterionMapper */
+            $criterionMapper = $this->getJoinMapper('criterion');
             try {
-                $toCriterion = $this->getJoinMapper('criterion')->findOneByColumnList($params);
+                $toCriterion = $criterionMapper->findOneForFolderByKey(
+                    $toBox->getCategory()->getId(),
+                    $fromItem->getCriterion()->getName(),
+                    $fromItem->getCriterion()->getGrouping()
+                );
             } catch (Schoolbox\Mapper\Exception $e) {
                 // Try creating a new one?
                 if (!$createCriterion) {
                     continue;
                 }
-                $toCriterion = $this->getJoinMapper('criterion')->createModel();
+                $toCriterion = $criterionMapper->createModel();
                 $toCriterion
                     ->setParentId($toBox->getCategory()->getId())
                     ->setParentType(Criterion::PARENT_TYPE_CATEGORY)
                     ->setName($fromItem->getCriterion()->getName())
                     ->setGrouping($fromItem->getCriterion()->getGrouping())
                 ;
-                $this->getJoinMapper('criterion')->save($toCriterion);
+                $criterionMapper->save($toCriterion);
             }
 
             // The criterion's level:

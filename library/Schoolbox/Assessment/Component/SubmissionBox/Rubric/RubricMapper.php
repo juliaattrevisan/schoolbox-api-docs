@@ -595,12 +595,7 @@ class RubricMapper
 
                 try {
                     // if the crit exists, just use that
-                    $model = CriterionMapper::getInstance()->findOneByColumnList([
-                        'g.name'        => $group,
-                        'name'        => $name,
-                        'g.parent_type' => Group::PARENT_TYPE_CATEGORY,
-                        'g.parent_id'   => $folderLookup,
-                    ]);
+                    $model = CriterionMapper::getInstance()->findOneForFolderByKey($folderLookup, $name, $group);
 
                 } catch (\Schoolbox\Mapper\Exception $e) {
 
