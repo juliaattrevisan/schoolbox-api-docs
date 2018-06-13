@@ -19,6 +19,12 @@ VALUES ('global_moderation', 1);
 INSERT INTO `comms_news_policy` (identifier, value)
 VALUES ('publish_date_offset', '');
 
+-- News Policy: Expiry Date Offset
+-- When enabled, every article's expiry date is offset by this amount
+-- When empty, expiry date is set to the current datetime plus 1 week
+INSERT INTO `comms_news_policy` (identifier, value)
+VALUES ('expiry_date_offset', '+1 week');
+
 -- News Article
 CREATE TABLE `comms_news_article` (
   `id`                 int(11)       PRIMARY KEY NOT NULL AUTO_INCREMENT,

@@ -22,11 +22,21 @@
     'publish_date_offset': {
         'title': 'Publish Date Offset',
         'subtext': 'News Articles will have their default publish date set to the current datetime plus this value.',
-        'active': '<strong>News Articles are set to publish using an offset</strong>.',
+        'active': '<strong>News Articles are set to publish using an offset</strong>',
         'inactive': '<strong>News Articles are set to publish immediately</strong>.',
         'name': 'policy[publish_date_offset]',
         'identifier': 'publish_date_offset',
         'value': '',
+        'type': 'input'
+    },
+    'expiry_date_offset': {
+        'title': 'Expiry Date Offset',
+        'subtext': 'News Articles will have their default expiry date set to the current datetime plus this value.',
+        'active': '<strong>News Articles are set to expire using an offset</strong>',
+        'inactive': '<strong>News Articles are set to expire one week from time of authorship</strong>.',
+        'name': 'policy[expiry_date_offset]',
+        'identifier': 'expiry_date_offset',
+        'value': '+1 week',
         'type': 'input'
     }
 } %}
