@@ -1,7 +1,12 @@
 (function() {
 
     /**
-     * Plugin
+     * The Draft plugin detects differences in the elements listed in config.inputs
+     * and config.textareas and asynchronously saves when needed
+     *
+     * This also quietly updates the url and form action so if you refresh the page
+     * without hitting the submit button, you won't reload what the screen originally
+     * did which might actually be a Create screen.
      *
      * @param options
      */
