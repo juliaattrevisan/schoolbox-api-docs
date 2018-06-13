@@ -41,6 +41,51 @@ class GroupMapper extends Schoolbox\Mapper
 
 
     /**
+     * Find a group with the given name for the given parent.
+     * If none is found, create one and return it.
+     *
+     * @param int    $parentId
+     * @param string $parentType
+     * @param string $name
+     * @return Group
+     * @throws Schoolbox\Mapper\Exception if for some reason it can't be created
+     */
+    public function findOrCreateOneForParentByName(int $parentId, string $parentType, string $name): Group
+    {
+        try {
+            return $this->findOneByColumnList([
+                'parent_id'   => $parentId,
+                'parent_type' => $parentType,
+                'name'        => $name,
+            ]);
+        } catch (Schoolbox\Mapper\Exception $e) {
+            // Create one
+            $item = $this->createModel()
+                         ->setParentId($parentId)
+                         ->setParentType($parentType)
+                         ->setName($name);
+            $this->save($item);
+            return $item;
+        }
+    }
+
+
+    /**
+     * Find a group with the given name for the given folder.
+     * If none is found, create one and return it.
+     *
+     * @param int    $folderId
+     * @param string $name
+     * @return Group
+     * @throws Schoolbox\Mapper\Exception if for some reason it can't be created
+     */
+    public function findOrCreateOneForFolderByName(int $folderId, string $name): Group
+    {
+        return $this->findOrCreateOneForParentByName($folderId, Group::PARENT_TYPE_CATEGORY, $name);
+    }
+
+
+    /**
      * No notifications.
      *
      * @param object $object
