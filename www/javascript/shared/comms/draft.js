@@ -76,24 +76,16 @@
         }
 
         /**
-         * Initiate an autosave
+         * Initiate an autosave - activate toast and save it
          */
         function initAutosave() {
             autosaveInterval = setInterval(function() {
                 if (isDifferent()) {
-
-                    /* Activate toaster
-                     */
                     config.toaster.toastActivate({
                         text: 'Autosaving'
                     });
 
-                    /* Save it
-                     */
                     save();
-                }
-                else {
-                    console.log('no change');
                 }
             }, config.interval * 1000);
         }
