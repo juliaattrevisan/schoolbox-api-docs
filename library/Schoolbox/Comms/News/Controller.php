@@ -210,11 +210,14 @@ class Controller extends Base
             ->setBody($data['body'])
             ->setBlurb($data['blurb'])
             ->setAuthor($this->getUser())
-            ->setFeatureImage((new CollectorFactory())->build($data['attachment'] ?: [])->getFirst())
             ->setModeratedBy(null)
             ->setModeratedAt(new \Alaress_Date_NullDate())
             ->setPublishAt(\Alaress_Date_Format::newLocal($data['publishAt']))
             ->setExpiresAt(\Alaress_Date_Format::newLocal($data['expiresAt']));
+
+        if (\is_array($data['attachment'])) {
+            $news->setFeatureImage((new CollectorFactory())->build($data['attachment'] ?: [])->getFirst());
+        }
 
         if ((new ValidArticle())->isSatisfiedBy($news)) {
             $this->newsMapper->save($news);
