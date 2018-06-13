@@ -206,17 +206,17 @@ class CriterionMapper extends Schoolbox\Mapper {
      * Find a single criterion for a parent type, given its unique identifier
      * (parentId+parentType+name+groupName).
      *
-     * @param int|int[] $parentId   The parent ID (or list thereof) to find for
-     * @param string    $parentType One of the `Group::PARENT_TYPE_*` constants
-     * @param string    $name       The name of the criterion
-     * @param string    $groupName  The name of the criterion's group
-     * @param bool      $cache      If false, bypass result cache
+     * @param int    $parentId   The parent ID (or list thereof) to find for
+     * @param string $parentType One of the `Group::PARENT_TYPE_*` constants
+     * @param string $name       The name of the criterion
+     * @param string $groupName  The name of the criterion's group
+     * @param bool   $cache      If false, bypass result cache
      * @return Criterion
      * @throws Schoolbox\Mapper\Exception
      * @throws Schoolbox\Mapper\Exception\Deleted
      */
     public function findOneForParentByKey(
-        $parentId,
+        int $parentId,
         string $parentType,
         string $name,
         string $groupName,
@@ -240,17 +240,79 @@ class CriterionMapper extends Schoolbox\Mapper {
      * Find a single criterion for a folder, given its unique identifier
      * (folder+name+groupName).
      *
-     * @param int|int[] $folderId  The folder ID (or list thereof) to find for
-     * @param string    $name      The name of the criterion
-     * @param string    $groupName The name of the criterion's group
-     * @param bool      $cache     If false, bypass result cache
+     * @param int    $folderId  The folder ID (or list thereof) to find for
+     * @param string $name      The name of the criterion
+     * @param string $groupName The name of the criterion's group
+     * @param bool   $cache     If false, bypass result cache
      * @return Criterion
      * @throws Schoolbox\Mapper\Exception
      * @throws Schoolbox\Mapper\Exception\Deleted
      */
-    public function findOneForFolderByKey($folderId, string $name, string $groupName, bool $cache = true): Criterion
+    public function findOneForFolderByKey(int $folderId, string $name, string $groupName, bool $cache = true): Criterion
     {
         return $this->findOneForParentByKey($folderId, Group::PARENT_TYPE_CATEGORY, $name, $groupName, $cache);
+    }
+
+
+    /**
+     * Find a single criterion for a parent type, given its unique identifier
+     * (parentId+parentType+name+groupName).
+     *
+     * If none exists: create it
+     *
+     * @param int    $parentId
+     * @param string $parentType
+     * @param string $name
+     * @param string $groupName
+     * @param bool   $cache
+     * @return Criterion
+     * @throws Schoolbox\Mapper\Exception
+     */
+    public function findOrCreateOneForParentByKey(
+        int $parentId,
+        string $parentType,
+        string $name,
+        string $groupName,
+        bool $cache = true
+    ): Criterion
+    {
+        try {
+            return $this->findOneForParentByKey($parentId, $parentType, $name, $groupName, $cache);
+        } catch (Schoolbox\Mapper\Exception $e) {
+            // Build it
+            /** @var GroupMapper $groupMapper */
+            $groupMapper = $this->getJoinMapper('group');
+            $group       = $groupMapper->findOrCreateOneForParentByName($parentId, $parentType, $name);
+            $criterion   = $this->createModel()
+                                ->setGroup($group)
+                                ->setName($name);
+            $this->save($criterion);
+            return $criterion;
+        }
+    }
+
+
+    /**
+     * Find a single criterion for a folder, given its unique identifier
+     * (folder+name+groupName).
+     *
+     * If none exists: create it
+     *
+     * @param int    $folderId
+     * @param string $name
+     * @param string $groupName
+     * @param bool   $cache
+     * @return Criterion
+     * @throws Schoolbox\Mapper\Exception
+     */
+    public function findOrCreateOneForFolderByKey(
+        int $folderId,
+        string $name,
+        string $groupName,
+        bool $cache = true
+    ): Criterion
+    {
+        return $this->findOrCreateOneForParentByKey($folderId, Group::PARENT_TYPE_CATEGORY, $name, $groupName, $cache);
     }
 
 
