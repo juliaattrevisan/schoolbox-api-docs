@@ -30,9 +30,9 @@ class Mapper extends \Schoolbox\Mapper
         $this->joins('feature_image_hash', Storage\Mapper::class, 'hash', null, null, 'featureImage', 'featureImage');
         $this->joins('author_id', UserMapper::class);
         $this->joins('moderated_by', UserMapper::class);
-        $this->uses('moderated_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
-        $this->uses('publish_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
-        $this->uses('expires_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
+        $this->uses('moderated_at', self::TYPE_DATETIME);
+        $this->uses('publish_at', self::TYPE_DATETIME);
+        $this->uses('expires_at', self::TYPE_DATETIME);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
