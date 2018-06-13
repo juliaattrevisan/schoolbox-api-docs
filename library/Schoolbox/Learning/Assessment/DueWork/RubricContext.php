@@ -92,10 +92,11 @@ class RubricContext
      *
      * @param DueWork  $dueWork
      * @param User     $student
+     * @param null/User $currentUser
      *
      * @return array
      */
-    public function generateMarkable(DueWork $dueWork, User $student)
+    public function generateMarkable(DueWork $dueWork, User $student, $currentUser = null)
     {
         if (!$dueWork->getUseRubric()) {
             return ['rubric' => null];
@@ -103,9 +104,14 @@ class RubricContext
 
         $context = $this->generateDefaultContext($dueWork);
 
+        $publishedOnly = true;
+        if ($currentUser instanceof User) {
+            $publishedOnly = !Access::getInstance()->isInstructor($currentUser, $dueWork->getContext()->getFolder());
+        }
+
         /* Spawn rubric grid
          */
-        (new GridGenerator($this->rubricMapper, $dueWork->getRubric(), $student))->applyInstructorGivenMark(false);
+        (new GridGenerator($this->rubricMapper, $dueWork->getRubric(), $student))->applyInstructorGivenMark($publishedOnly);
         $context['rubric'] = $dueWork->getRubric()->toContext();
 
         return $context;

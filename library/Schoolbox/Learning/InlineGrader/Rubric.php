@@ -88,7 +88,7 @@ class Rubric
             ];
         } else {
             return [
-                'rubricContext' => $this->rubricContext->generateMarkable($this->assessment, $this->participant->getUser())
+                'rubricContext' => $this->rubricContext->generateMarkable($this->assessment, $this->participant->getUser(), $this->currentUser)
             ];
         }
     }
