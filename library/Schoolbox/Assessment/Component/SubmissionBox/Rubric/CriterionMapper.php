@@ -203,6 +203,30 @@ class CriterionMapper extends Schoolbox\Mapper {
 
 
     /**
+     * @param int|int[] $folderId  The folder ID (or list thereof) to find for
+     * @param string    $name      The name of the criterion
+     * @param string    $groupName The name of the criterion's group
+     * @param bool      $cache     If false, bypass result cache
+     * @return Criterion
+     * @throws Schoolbox\Mapper\Exception
+     * @throws Schoolbox\Mapper\Exception\Deleted
+     */
+    public function findOneForFolderByKey($folderId, string $name, string $groupName, bool $cache = true): Criterion
+    {
+        return $this->findOneByColumnList(
+            [
+                'g.name'        => $groupName,
+                'name'          => $name,
+                'g.parent_type' => Group::PARENT_TYPE_CATEGORY,
+                'g.parent_id'   => $folderId,
+            ],
+            [],
+            ['cache' => $cache,]
+        );
+    }
+
+
+    /**
      * No notifications.
      *
      * @param object $object
