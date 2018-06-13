@@ -154,7 +154,7 @@
              */
             $.ajax({
                 type: 'POST',
-                url: config.element.action,
+                url: config.element.attr('action'),
                 data: formContents,
 
                 complete: function () {
