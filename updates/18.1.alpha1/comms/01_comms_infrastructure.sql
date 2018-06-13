@@ -51,3 +51,9 @@ ALTER TABLE `comms_news_article`
 ADD CONSTRAINT `fk_comms_news_article_2`
 FOREIGN KEY (`moderated_by`) REFERENCES `user` (`id`)
 ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+-- News Article Tag relations
+CREATE TABLE `comms_news_article_tag` (
+  `article_id` int(11) NOT NULL,
+  `tag_id`     int(11) NOT NULL
+);

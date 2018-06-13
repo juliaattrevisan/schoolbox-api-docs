@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Comms\News;
 
+use Schoolbox\Collection;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
@@ -83,6 +84,11 @@ class Model
      * @var \Alaress_Date_Format
      */
     private $moderatedAt;
+
+    /**
+     * @var Collection
+     */
+    private $tags;
 
     /**
      * @return null|string
@@ -264,4 +270,22 @@ class Model
     }
 
 
+    /**
+     * @return Collection
+     */
+    public function getTags(): Collection
+    {
+        return $this->tags;
+    }
+
+
+    /**
+     * @param Collection $tags
+     * @return $this
+     */
+    public function setTags(Collection $tags): self
+    {
+        $this->tags = $tags;
+        return $this;
+    }
 }
