@@ -57,7 +57,7 @@
                     {% for specification in specifications %}
                         <fieldset>
                             {% if specification.type == 'switch' %}
-                                {% include 'sub/switch.twig' with {
+                                {% include '@commsNewsPolicy/switch.twig' with {
                                     label: specification.title,
                                     name: specification.name,
                                     identifier: specification.identifier,
