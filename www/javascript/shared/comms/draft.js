@@ -77,21 +77,15 @@
             autosaveInterval = setInterval(function() {
                 if (isDifferent()) {
 
-                    /* Disable inputs
-                     */
-                    config.element.find('input[type=submit]').prop('disabled', true);
-
                     /* Activate toaster
                      */
                     config.toaster.toastActivate({
                         text: 'Autosaving'
                     });
 
-                    // clear interval
-
+                    /* Save it
+                     */
                     save();
-
-                    // restore interval
                 }
                 else {
                     console.log('no change');
@@ -155,7 +149,48 @@
                 formContents.push({name: key, value: CKEDITOR.instances[key].getData()});
             }
 
-            console.log(formContents);
+            /* Disable inputs
+             */
+            config.element.find('input[type=submit]').prop('disabled', true);
+
+            /* Transact
+             */
+            $.ajax({
+                type: 'POST',
+                url: config.element.action,
+                data: formContents,
+
+                complete: function () {
+
+                    /* Re-init the autosave interval
+                     */
+                    initAutosave();
+
+                    /* Re-enable submit
+                     */
+                    config.element.find('input[type=submit]').prop('disabled', false);
+                },
+                success: function (responseText) {
+
+                    /* Recycle the id ><
+                     */
+                    config.element.attr('action', responseText.formAction);
+
+                    config.toaster.toastTimeout({
+                        text: 'Draft Saved',
+                        css: 'success'
+                    });
+                },
+                error: function (response) {
+                    var temp = $.parseJSON(response.responseText);
+
+                    config.toaster.toastTimeout({
+                        text: 'Error: ' + temp.message,
+                        css: 'alert'
+                    });
+                },
+                dataType: 'json'
+            });
         }
     }
 }(jQuery));

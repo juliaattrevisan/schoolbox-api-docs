@@ -20,50 +20,6 @@
             inputs: ['title', 'publishAt', 'expiresAt'],
             textareas: ['body', 'blurb']
         });
-
-        {#var submitButtons = $("[data-action-save], [data-action-self-reflect]");#}
-
-        {#// The autosave submit method#}
-
-        {#var autosaveAjaxSubmit = function () {#}
-
-
-
-
-            {#$.ajax({#}
-                {#type: "POST",#}
-                {#url: '{{ routeLookup('learningAssessment.postCreateResponse', { assessmentId: assessment.id, studentId: student.id}) }}',#}
-                {#data: formContents,#}
-                {#complete: function () {#}
-                    {#// Re-init the autosave#}
-                    {#initAutosave();#}
-
-                    {#/* Re-enable submit#}
-                     {#*/#}
-                    {#submitButtons.prop('disabled', false);#}
-                {#},#}
-                {#success: function (responseText) {#}
-
-                    {#/* Recycle the id ><#}
-                     {#*/#}
-                    {#form.find('input[name=responseId]').val(responseText.id);#}
-                    {#formSaveLabel.toastTimeout({#}
-                        {#text: 'Draft Saved',#}
-                        {#css: 'success'#}
-                    {#});#}
-                {#},#}
-                {#error: function (response) {#}
-                    {#var temp = $.parseJSON(response.responseText);#}
-
-                    {#formSaveLabel.toastTimeout({#}
-                        {#text: 'Error: ' + temp.message,#}
-                        {#css: 'alert'#}
-                    {#});#}
-                {#},#}
-                {#dataType: 'json'#}
-            {#});#}
-        {#};#}
-
     });
 </script>
 <div class="row">
