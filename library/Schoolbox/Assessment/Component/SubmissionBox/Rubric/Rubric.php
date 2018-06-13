@@ -137,7 +137,7 @@ class Rubric extends Core\Rubric
         if (!$this->cCache->contains($criterion)) {
             try {
                 $model    = CriterionMapper::getInstance()->findById($criterion->getId());
-                $parentId = $model->getParentId();
+                $parentId = $model->getGroup()->getParentId();
 
             } catch (Mapper\Exception $e) {
                 $model    = CriterionMapper::getInstance()->createModel();
