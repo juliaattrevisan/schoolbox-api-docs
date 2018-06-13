@@ -17,7 +17,7 @@
         var autosaveInterval;
 
         /* A registry of current values that change over time while content is created
-         * Used to determine when to initiate autosave
+         * Used to determine when to initiate actual save transaction
          */
         var registry = {};
 
