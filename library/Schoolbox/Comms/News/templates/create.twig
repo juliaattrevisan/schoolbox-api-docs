@@ -103,14 +103,14 @@
                     <div class="small-12 large-6 columns">
                         <label for="publishAt">
                             Publish Date
-                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Select a date for when this news item will become available">?</span>
+                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="This article becomes available to its audience once this date and time is reached.">?</span>
                             <input type="text" class="required" name="publishAt" id="publishAt" data-datepicker data-datepicker-time data-datesync-enddate="#expiresAt" maxlength="50" value="{{ news.publishAt.local }}"/>
                         </label>
                     </div>
                     <div class="large-6 columns">
                         <label for="expiresAt">
                             Expiry Date
-                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Select a date for when this item will expire; news will automatically be archived one this date is reached.">?</span>
+                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="News articles are automatically archived once this expiry date is reached.">?</span>
                         </label>
                         <input type="text" class="required" name="expiresAt" id="expiresAt" data-datepicker data-datepicker-time data-datesync-startdate="#publishAt" maxlength="50" value="{{ news.expiresAt.local }}"/>
                     </div>
