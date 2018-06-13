@@ -604,7 +604,7 @@ class RubricMapper
                                             ->createModel()
                                             ->setName($name)
                                             ->setGrouping($group)
-                                            ->setParentType('category')
+                                            ->setParentType(Group::PARENT_TYPE_CATEGORY)
                                             ->setParentId($folderId);
 
                     CriterionMapper::getInstance()->save($model);
