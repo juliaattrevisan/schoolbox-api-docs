@@ -57,14 +57,8 @@
                     {% for specification in specifications %}
                         <fieldset>
                             {% if specification.type == 'switch' %}
-                                {% include '@commsNewsPolicy/switch.twig' with {
-                                    label: specification.title,
-                                    name: specification.name,
-                                    identifier: specification.identifier,
-                                    subtext: specification.subtext,
-                                    isChecked: specification.value,
-                                    checkedValue: 1
-                                } %}
+                                {% import '@commsNewsPolicy/switch.twig' as policyMacro %}
+                                {{ policyMacro.writable(specification) }}
                             {% elseif specification.type == 'input' %}
                                 {% include '@commsNewsPolicy/input.twig' with {
                                     label: specification.title,
@@ -90,11 +84,8 @@
                              # Ideally this should be bundled together with each data type
                              #}
                             {% if specification.type == 'switch' %}
-                                {% if specification.value %}
-                                    {{ specification.active|purify }}
-                                {% else %}
-                                    {{ specification.inactive|purify }}
-                                {% endif %}
+                                {% import '@commsNewsPolicy/switch.twig' as policyMacro %}
+                                {{ policyMacro.readable(specification) }}
                             {% elseif specification.type == 'input' %}
                                 {% if specification.value|length %}
                                     {{ specification.active|purify }}: {{ specification.value }}

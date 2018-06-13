@@ -1,13 +1,25 @@
-<label for="{{ identifier }}">{{ label }}</label>
+{# Write representation #}
+{% macro writable(specification) %}
+<label for="{{ specification.identifier }}">{{ specification.label }}</label>
 
-{% if subtext|length %}
-<p>{{ subtext }}.</p>
+{% if specification.subtext|length %}
+<p>{{ specification.subtext }}.</p>
 {% endif %}
 
 <div class="switch">
-    <input id="{{ identifier }}" name="{{ name }}" type="checkbox" {% if isChecked %}checked{% endif %} value="{{ checkedValue }}">
-    <label for="{{ identifier }}">
+    <input id="{{ specification.identifier }}" name="{{ specification.name }}" type="checkbox" {% if specification.value %}checked{% endif %} value="{{ specification.checkedValue }}">
+    <label for="{{ specification.identifier }}">
         <span>On</span>
         <span>Off</span>
     </label>
 </div>
+{% endmacro %}
+
+{# Read-only representation #}
+{% macro readable(specification) %}
+    {% if specification.value %}
+        {{ specification.active|purify }}
+    {% else %}
+        {{ specification.inactive|purify }}
+    {% endif %}
+{% endmacro %}
