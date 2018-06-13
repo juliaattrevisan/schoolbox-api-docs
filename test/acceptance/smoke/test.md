@@ -120,7 +120,7 @@ as cglenn:
 as zsmith:
 * go to http://192.168.36.10/homepage/code/FREA1
 * add a files component
-* upload a file (through the file upload form), with:
+* upload a file (through the file upload form, accessible via "select a file"), with:
   * title
   * file
   * content
@@ -132,6 +132,13 @@ as zsmith:
 * upload a file (via drag/drop onto the component)
 * verify that:
   * file is what I uploaded
+* set one of the files you uploaded as private
+
+as drhodes:
+* go to http://192.168.36.10/homepage/code/FREA1
+* verify that:
+  * public files are visible
+  * private files are not visible
 
 
 ### LMS
@@ -238,9 +245,6 @@ as zsmith
 as drhodes
 * attempt that quiz
 * complete my attempt
-* review that attempt
-* verify that:
-  * the answers were as I entered them
 
 as zsmith:
 * review drhodes' attempt
@@ -263,6 +267,9 @@ as drhodes:
 * go to the summary for the quiz, and verify:
   * I see the feedback
   * I can't attempt; late date is past
+* review my attempt
+* verify that:
+  * the answers were as I entered them
 
 as zsmith:
 * modify the quiz again
@@ -282,8 +289,8 @@ as zsmith
   * title
   * work type
   * description
-  * publish and open date: past
-  * due and late date: future
+  * publish date: past
+  * due date: future
   * attached file
   * self-assessed: on
 * save
