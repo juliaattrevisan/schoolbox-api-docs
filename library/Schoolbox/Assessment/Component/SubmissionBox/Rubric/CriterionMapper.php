@@ -148,12 +148,12 @@ class CriterionMapper extends Schoolbox\Mapper {
 
         try {
             // attempt lookup
-            $existingObject = $this->findOneByColumnList([
-                'g.name'        => $object->getGrouping(),
-                'name'          => $object->getName(),
-                'g.parent_id'   => $object->getParentId(),
-                'g.parent_type' => $object->getParentType(),
-            ]);
+            $existingObject = $this->findOneForParentByKey(
+                $object->getParentId(),
+                $object->getParentType(),
+                $object->getName(),
+                $object->getGrouping()
+            );
 
             // found something! sweet. assign that ID.
             $object->setId($existingObject->getId());
@@ -203,6 +203,43 @@ class CriterionMapper extends Schoolbox\Mapper {
 
 
     /**
+     * Find a single criterion for a parent type, given its unique identifier
+     * (parentId+parentType+name+groupName).
+     *
+     * @param int|int[] $parentId   The parent ID (or list thereof) to find for
+     * @param string    $parentType One of the `Group::PARENT_TYPE_*` constants
+     * @param string    $name       The name of the criterion
+     * @param string    $groupName  The name of the criterion's group
+     * @param bool      $cache      If false, bypass result cache
+     * @return Criterion
+     * @throws Schoolbox\Mapper\Exception
+     * @throws Schoolbox\Mapper\Exception\Deleted
+     */
+    public function findOneForParentByKey(
+        $parentId,
+        string $parentType,
+        string $name,
+        string $groupName,
+        bool $cache = true
+    ): Criterion
+    {
+        return $this->findOneByColumnList(
+            [
+                'g.name'        => $groupName,
+                'name'          => $name,
+                'g.parent_type' => $parentType,
+                'g.parent_id'   => $parentId,
+            ],
+            [],
+            ['cache' => $cache,]
+        );
+    }
+
+
+    /**
+     * Find a single criterion for a folder, given its unique identifier
+     * (folder+name+groupName).
+     *
      * @param int|int[] $folderId  The folder ID (or list thereof) to find for
      * @param string    $name      The name of the criterion
      * @param string    $groupName The name of the criterion's group
@@ -213,16 +250,7 @@ class CriterionMapper extends Schoolbox\Mapper {
      */
     public function findOneForFolderByKey($folderId, string $name, string $groupName, bool $cache = true): Criterion
     {
-        return $this->findOneByColumnList(
-            [
-                'g.name'        => $groupName,
-                'name'          => $name,
-                'g.parent_type' => Group::PARENT_TYPE_CATEGORY,
-                'g.parent_id'   => $folderId,
-            ],
-            [],
-            ['cache' => $cache,]
-        );
+        return $this->findOneForParentByKey($folderId, Group::PARENT_TYPE_CATEGORY, $name, $groupName, $cache);
     }
 
 
