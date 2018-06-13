@@ -167,6 +167,10 @@ class Controller extends Base
     public function postUpdate(Model $news)
     {
         try {
+
+            /* TODO: Check that the current session user is allowed to modify this $news
+             */
+
             if ($this->persist($news, $this->getRequest()->post)) {
                 $url = $this->getRouter()->generate('commsNews.getUpdate', [ 'newsId' => $news->getId() ]);
 
