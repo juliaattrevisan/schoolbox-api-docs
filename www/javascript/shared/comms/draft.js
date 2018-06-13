@@ -35,6 +35,10 @@
             var defaults = {
                 element: element,
 
+                /* Toaster
+                 */
+                toaster: $('#saveDraft'),
+
                 /* Save every 5 seconds by default
                  */
                 interval: 5,
@@ -76,10 +80,17 @@
                     /* Disable inputs
                      */
                     config.element.find('input[type=submit]').prop('disabled', true);
-                    
+
+                    /* Activate toaster
+                     */
+                    config.toaster.toastActivate({
+                        text: 'Autosaving'
+                    });
+
                     // clear interval
+
                     save();
-                    // fire toast
+
                     // restore interval
                 }
                 else {
