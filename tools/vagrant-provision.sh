@@ -1,14 +1,14 @@
 #!/bin/bash
 # Ensure running an appropriate era vagrant box
-if [ `cat /home/vagrant/.vagrant.buildtimestamp` -gt 1523234419 ];
+if [ `cat /home/vagrant/.vagrant.buildtimestamp` -gt 1528782104 ];
 then
-    echo "[SB][`date +%Y-%m-%d\ %X`] Vagrant box meets minimum requirements: 1523234420 Current: "`cat /home/vagrant/.vagrant.buildtimestamp`;
+    echo "[SB][`date +%Y-%m-%d\ %X`] Vagrant box meets minimum requirements: 1528782105 Current: "`cat /home/vagrant/.vagrant.buildtimestamp`;
 else
-    echo "Error: Your vagrant box is out of date. Please ensure you are using the latest version (>= 1523234420). Current: "`cat /home/vagrant/.vagrant.buildtimestamp` >2;
+    echo "Error: Your vagrant box is out of date. Please ensure you are using the latest version (>= 1528782105). Current: "`cat /home/vagrant/.vagrant.buildtimestamp` >2;
     echo "To fix this:";
     echo "  vagrant destroy;";
-    echo "  vagrant box remove ubuntu-1404-php55;";
     echo "  vagrant box remove ubuntu-1404-php71;";
+    echo "  vagrant box remove ubuntu-1804-php71;";
     if [ -f /vagrant/vagrant.yaml ] && [ `grep vagrant_box /vagrant/vagrant.yaml | grep -v '#' | wc -l` -gt 0 ];
     then
         echo "then:";
