@@ -6,6 +6,7 @@
  # name: The input name (comes out in POST)
  # identifier: A unique identifier for this policy (stored in db)
  # value: The value that was set for this policy (stored in db)
+ # checkedValue: The value of the checkbox when activated (stored in db, switch.twig only)
  # type: The type of input it is
  #}
 {% set specifications = {
@@ -17,6 +18,7 @@
         'name': 'policy[global_moderation]',
         'identifier': 'global_moderation',
         'value': 0,
+        'checkedValue': 1,
         'type': 'switch'
     },
     'publish_date_offset': {
