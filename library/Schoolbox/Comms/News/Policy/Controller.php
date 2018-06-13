@@ -63,8 +63,13 @@ class Controller extends Base
         $commsOfficers = $this->userAccessMapper->findUsersForService(UserAccess::SERVICE_COMMS_OFFICER)->getUnique('id')->indexBy('id');
         $policies = $this->policyMapper->findAll();
 
+        /* Superusers and Comms Officers can change policy settings
+         */
+        $isConfigurable = $this->getUser()->isSuperuser() || $commsOfficers->getOffset($this->getUser()->getId());
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsPolicy/index.twig', [
             'commsOfficers' => $commsOfficers,
+            'isConfigurable' => $isConfigurable,
             'policies' => $policies
         ])->setTitle('Comms Policies'));
     }
