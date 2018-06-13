@@ -49,6 +49,11 @@ class Controller extends Base
     private $policyMapper;
 
     /**
+     * @var TopicMapper
+     */
+    private $topicMapper;
+
+    /**
      * Controller constructor.
      *
      * @param ErrorMapper      $errorMapper
@@ -56,14 +61,21 @@ class Controller extends Base
      * @param UserAccessMapper $userAccessMapper
      * @param Mapper           $newsMapper
      * @param Policy\Mapper    $policyMapper
+     * @param TopicMapper      $topicMapper
      */
-    public function __construct(ErrorMapper $errorMapper, UserMapper $userMapper, UserAccessMapper $userAccessMapper, Mapper $newsMapper, Policy\Mapper $policyMapper)
+    public function __construct(
+        ErrorMapper $errorMapper,
+        UserMapper $userMapper, UserAccessMapper $userAccessMapper,
+        Mapper $newsMapper, Policy\Mapper $policyMapper,
+        TopicMapper $topicMapper
+    )
     {
         $this->errorMapper = $errorMapper;
         $this->userMapper = $userMapper;
         $this->userAccessMapper = $userAccessMapper;
         $this->newsMapper = $newsMapper;
         $this->policyMapper = $policyMapper;
+        $this->topicMapper = $topicMapper;
     }
 
 

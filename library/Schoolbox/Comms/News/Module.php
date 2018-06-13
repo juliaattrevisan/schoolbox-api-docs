@@ -17,6 +17,7 @@ use InvalidArgumentException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\News\TopicMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Role;
@@ -129,6 +130,7 @@ class Module extends BaseModule
             'userAccessMapper' => $this->getMapperFactory()->getLazy(UserAccessMapper::class),
             'newsMapper' => $this->getMapperFactory()->getLazy(Mapper::class),
             'policyMapper' => $this->getMapperFactory()->getLazy(Policy\Mapper::class),
+            'topicMapper' => $this->getMapperFactory()->getLazy(TopicMapper::class),
         ];
     }
 
