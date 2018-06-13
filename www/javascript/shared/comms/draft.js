@@ -11,9 +11,14 @@
         var config = init(options, $(this));
         var autosaveInterval;
 
+        /* A registry of current values that change over time while content is created
+         * Used to determine when to initiate autosave
+         */
+        var registry = {};
+
         /* Set initial state
          */
-        isDifferent();
+        initRegistry();
 
         /* Watch the content for changes
          */
@@ -34,35 +39,31 @@
                  */
                 interval: 5,
 
+                /* Inputs to check
+                 */
+                inputs: [],
+
                 /* Textareas to check
                  */
-                textareas: null
+                textareas: []
             };
 
             return $.extend(defaults, options);
         }
 
         /**
-         * Find out if any textareas changed
-         *
-         * @returns {boolean}
+         * Remember what the initial values were at the start
          */
-        function isDifferent() {
-            var contentChanged = false;
+        function initRegistry() {
+            var i;
 
-            Object.keys(config.textareas).forEach(function(key) {
-                var current = CKEDITOR.instances[key].getData();
+            for (i = 0; i < config.inputs.length; i++) {
+                registry[config.inputs[i]] = $('input[name="'+config.inputs[i]+'"]').val();
+            }
 
-                /* Update registry of known values
-                 */
-                if (config.textareas[key] !== current) {
-                    contentChanged = true;
-
-                    config.textareas[key] = current;
-                }
-            });
-
-            return contentChanged;
+            for (i = 0; i < config.textareas.length; i++) {
+                registry[config.textareas[i]] = CKEDITOR.instances[config.textareas[i]].getData();
+            }
         }
 
         /**
@@ -85,14 +86,60 @@
         }
 
         /**
+         * Find out if any textareas changed
+         * Update registry of known values
+         *
+         * @returns {boolean}
+         */
+        function isDifferent() {
+            var contentChanged = false;
+            var key;
+            var current;
+
+            /* Check inputs
+             */
+            for (i = 0; i < config.inputs.length; i++) {
+                key = config.inputs[i];
+
+                current = config.element.find('input[name="'+key+'"]').val();
+
+                if (registry[key] !== current) {
+                    contentChanged = true;
+
+                    registry[key] = current;
+                }
+            }
+
+            /* Check textareas
+             */
+            for (var i = 0; i < config.textareas.length; i++) {
+                key = config.textareas[i];
+
+                current = CKEDITOR.instances[key].getData();
+
+                if (registry[key] !== current) {
+                    contentChanged = true;
+
+                    registry[key] = current;
+                }
+            }
+
+            return contentChanged;
+        }
+
+        /**
          * Actually save the data
          */
         function save() {
             var formContents = $(config.element).serializeArray();
 
-            Object.keys(config.textareas).forEach(function(key) {
+            /* Special treatment because ck reasons
+             */
+            for (var i = 0; i < config.textareas.length; i++) {
+                var key = config.textareas[i];
+
                 formContents.push({name: key, value: CKEDITOR.instances[key].getData()});
-            });
+            }
 
             console.log(formContents);
         }

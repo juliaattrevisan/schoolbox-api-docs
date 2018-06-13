@@ -17,10 +17,8 @@
 
         {# Drafting mechanism #}
         $('#createForm').draft({
-            textareas: {
-                'blurb': null,
-                'body': null
-            }
+            inputs: ['title', 'publishAt', 'expiresAt'],
+            textareas: ['body', 'blurb']
         });
 
         {#var submitButtons = $("[data-action-save], [data-action-self-reflect]");#}
