@@ -13,6 +13,7 @@ use Alaress\Web\Controller\Base as BaseController;
 use Alaress\Web\Template\DebugTwig;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Criterion;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Group;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Resource\Attachment\Zone;
@@ -291,7 +292,7 @@ class Controller extends BaseController
     {
         $model = CriterionMapper::getInstance()
             ->createModel()
-            ->setParentType('category')
+            ->setParentType(Group::PARENT_TYPE_CATEGORY)
             ->setParentId($folderId)
             ->setGrouping($grouping)
             ->setName($name);

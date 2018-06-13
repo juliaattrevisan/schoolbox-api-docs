@@ -145,7 +145,7 @@ class Rubric extends Core\Rubric
             }
 
             $model->setName($criterion->getName())
-                  ->setParentType('category')
+                  ->setParentType(Group::PARENT_TYPE_CATEGORY)
                   ->setParentId($parentId);
 
             $this->cCache->attach($criterion, $model);
