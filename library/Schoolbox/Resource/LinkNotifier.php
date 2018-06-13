@@ -55,7 +55,7 @@ class LinkNotifier extends ResourceNotifier
      * @param array  $diff
      * @return Envelope
      */
-    public function notifyDeleted($roletype, $link, $effector, $diff = null)
+    public function notifyDeletedInternal($roletype, $link, $effector, $diff = null)
     {
         try {
             $category = $this->folderMapper->findById($link->getFolder()->getId());
