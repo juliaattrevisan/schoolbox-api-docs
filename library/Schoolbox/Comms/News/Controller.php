@@ -258,14 +258,11 @@ class Controller extends Base
             ->setBody($data['body'])
             ->setBlurb($data['blurb'])
             ->setAuthor($this->getUser())
+            ->setTags($this->topicMapper->findByColumn('newsTopicID', $data['tags']))
             ->setModeratedBy(null)
             ->setModeratedAt(new \Alaress_Date_NullDate())
             ->setPublishAt(\Alaress_Date_Format::newLocal($data['publishAt']))
             ->setExpiresAt(\Alaress_Date_Format::newLocal($data['expiresAt']));
-
-        /* TODO: Assign tags from a selectize
-         * TopicMapper::getInstance()->findByColumn('id', $data['tags']);
-         */
 
         if (\is_array($data['attachment'])) {
             $news->setFeatureImage((new CollectorFactory())->build($data['attachment'] ?: [])->getFirst());
