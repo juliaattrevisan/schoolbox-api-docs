@@ -30,6 +30,9 @@
                 type:     'GET',
                 dataType: 'json'
             },
+            selectize: {
+                placeholder: 'Assign Tags'
+            },
             value: {{ news.tags|json_encode|raw }},
             multiple: true
         });
@@ -111,7 +114,7 @@
                     <div class="small-12 columns">
                         <label>Tags</label>
                         <p class="meta">You can assign multiple tags to to this article to adjust its exposure across topics.</p>
-                        <select data-tags name="tags[]" multiple placeholder="Assign Tags"></select>
+                        <select data-tags name="tags[]" multiple></select>
                     </div>
                 </fieldset>
 
