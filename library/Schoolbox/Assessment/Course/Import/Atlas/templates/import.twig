@@ -122,14 +122,34 @@
                 // Apply collapser
                 units.find('[data-collapser]').collapsable();
 
-                // Update selected counts
+                // Update selected counts when an assess/attach is selected/unselected
                 units.find('[data-checkbox-group]').on('change', function () {
                     var $this    = $(this),
                         group    = $this.data('checkboxGroup'),
-                        selected = units.find('[data-checkbox-group="'+group+'"]:checked'),
+                        selected = units.find('[data-checkbox-group="'+group+'"]:checked:not(:disabled)'),
                         counter  = units.find('[data-checkbox-group-count="'+group+'"]');
                     counter.attr('data-show-count', selected.length);
                 });
+
+                // Unit:
+                // * check:   enable assess/attach
+                // * uncheck: disable assess/attach
+                // * change:  update counts
+                units.find('[data-unit]').on('change', function () {
+                    var $this        = $(this),
+                        unit         = $this.data('unit'),
+                        isChecked    = $this.prop('checked'),
+                        $assessments = units.find('[data-checkbox-group="unit-'+unit+'-assessments"]'),
+                        $attachments = units.find('[data-checkbox-group="unit-'+unit+'-attachments"]');
+                    $assessments.prop('disabled', !isChecked);
+                    $attachments.prop('disabled', !isChecked);
+                });
+
+                // Assess/attach:
+                // * change: update counts
+
+                // Update counts when a unit is selected/unselected
+                // Uncheck all when a unit is unselected
             }
         });
 
