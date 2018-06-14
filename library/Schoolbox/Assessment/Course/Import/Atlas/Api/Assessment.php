@@ -7,11 +7,12 @@
 declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Course\Import\Atlas\Api;
+use JsonSerializable;
 
 /**
  * Object representation of an assessment from Atlas Rubicon.
  */
-class Assessment
+class Assessment implements JsonSerializable
 {
     /**
      * @var int
@@ -149,5 +150,20 @@ class Assessment
     {
         $this->standards = $standards;
         return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function jsonSerialize()
+    {
+        return [
+            'id'        => $this->id,
+            'title'     => $this->title,
+            'type'      => $this->type,
+            'method'    => $this->method,
+            'content'   => $this->content,
+            'standards' => $this->standards,
+        ];
     }
 }

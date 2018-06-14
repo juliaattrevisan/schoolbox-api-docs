@@ -8,10 +8,14 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Course\Import\Atlas\Api;
 
+use JsonSerializable;
+
 /**
  * Object representation of an standard from Atlas Rubicon.
+ *
+ * TODO add title and code properly
  */
-class Standard
+class Standard implements JsonSerializable
 {
     /**
      * @var string
@@ -34,5 +38,15 @@ class Standard
     {
         $this->rawText = $rawText;
         return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function jsonSerialize()
+    {
+        return [
+            'rawText' => $this->rawText,
+        ];
     }
 }

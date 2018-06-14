@@ -9,11 +9,12 @@ declare(strict_types=1);
 namespace Schoolbox\Assessment\Course\Import\Atlas\Api;
 
 use Alaress_Date_Format;
+use JsonSerializable;
 
 /**
  * Object representation of a curriculum from Atlas Rubicon.
  */
-class Curriculum
+class Curriculum implements JsonSerializable
 {
     /**
      * @var int
@@ -243,5 +244,24 @@ class Curriculum
     {
         $this->units = $units;
         return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function jsonSerialize()
+    {
+        return [
+            'id'          => $this->id,
+            'title'       => $this->title,
+            'school'      => $this->school,
+            'grade'       => $this->grade,
+            'subject'     => $this->subject,
+            'description' => $this->description,
+            'mapType'     => $this->mapType,
+            'lastUpdated' => $this->lastUpdated,
+            'teachers'    => $this->teachers,
+            'units'       => $this->units,
+        ];
     }
 }

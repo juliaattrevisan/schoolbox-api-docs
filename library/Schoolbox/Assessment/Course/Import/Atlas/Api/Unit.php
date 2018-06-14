@@ -9,11 +9,12 @@ declare(strict_types=1);
 namespace Schoolbox\Assessment\Course\Import\Atlas\Api;
 
 use Alaress_Date_Format;
+use JsonSerializable;
 
 /**
  * Class Unit
  */
-class Unit
+class Unit implements JsonSerializable
 {
     /**
      * @var int
@@ -197,5 +198,22 @@ class Unit
     {
         $this->attachments = $attachments;
         return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function jsonSerialize()
+    {
+        return [
+            'id'          => $this->id,
+            'title'       => $this->timeFrame,
+            'timeFrame'   => $this->timeFrame,
+            'startDate'   => $this->startDate,
+            'lastUpdated' => $this->lastUpdated,
+            'endDate'     => $this->endDate,
+            'assessments' => $this->assessments,
+            'attachments' => $this->attachments,
+        ];
     }
 }

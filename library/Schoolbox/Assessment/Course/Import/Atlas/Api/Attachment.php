@@ -8,10 +8,12 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Course\Import\Atlas\Api;
 
+use JsonSerializable;
+
 /**
  * Object representation of an attachment from Atlas Rubicon.
  */
-class Attachment
+class Attachment implements JsonSerializable
 {
     /**
      * @var int
@@ -172,5 +174,21 @@ class Attachment
     {
         $this->itemId = $itemId;
         return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function jsonSerialize()
+    {
+        return [
+            'id'             => $this->id,
+            'title'          => $this->title,
+            'url'            => $this->url,
+            'sortOrder'      => $this->sortOrder,
+            'itemType'       => $this->itemType,
+            'itemId'         => $this->itemType,
+            'attachmentType' => $this->attachmentType,
+        ];
     }
 }
