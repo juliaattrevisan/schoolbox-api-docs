@@ -69,7 +69,7 @@ class Bridge
     /**
      * Get a list of all curricula.
      *
-     * @return array
+     * @return Curriculum[]
      * @throws \Throwable
      */
     public function getCurriculumList(): array
@@ -79,7 +79,12 @@ class Bridge
             'curriculumList' => ['curriculummap/'],
         ];
         $result   = $this->redisCache->get('curriculumList', [$requests]);
-        return $result['curriculumList'];
+        return array_map(
+            function ($assessment) {
+                return $this->decoder->decodeArray($assessment, Assessment::class);
+            },
+            $result['curriculumList']
+        );
     }
 
 
