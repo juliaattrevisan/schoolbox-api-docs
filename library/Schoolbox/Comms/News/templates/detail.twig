@@ -10,6 +10,16 @@
     <div class="list-item">
         <div class="small-12 column">
             <h1>{{ news.title }}</h1>
+
+            <ul class="meta">
+                <li class="icon-news"><strong>Related Topics:</strong>
+
+                    {# TODO: Have a /news/tag url lol #}
+                    {% for tag in news.tags %}
+                        <a href="/news/tag/{{ tag.slug }}">{{ tag.name }}</a>{% if not loop.last %},{% endif %}
+                    {% endfor %}
+                </li>
+            </ul>
         </div>
     </div>
     <nav>
