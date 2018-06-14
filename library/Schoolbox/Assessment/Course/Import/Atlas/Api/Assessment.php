@@ -39,7 +39,7 @@ class Assessment
     private $content;
 
     /**
-     * @var array
+     * @var Standard[]
      */
     private $standards;
 
@@ -134,7 +134,7 @@ class Assessment
     }
 
     /**
-     * @return array
+     * @return Standard[]
      */
     public function getStandards(): array
     {
@@ -142,7 +142,7 @@ class Assessment
     }
 
     /**
-     * @param array $standards
+     * @param Standard[] $standards
      * @return static
      */
     public function setStandards(array $standards)
