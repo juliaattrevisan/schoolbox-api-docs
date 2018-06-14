@@ -76,7 +76,7 @@ class Unit
     /**
      * @return string
      */
-    public function getTitle(): string
+    public function getTitle(): ?string
     {
         return $this->title;
     }
@@ -85,7 +85,7 @@ class Unit
      * @param string $title
      * @return static
      */
-    public function setTitle(string $title)
+    public function setTitle(?string $title)
     {
         $this->title = $title;
         return $this;
@@ -94,7 +94,7 @@ class Unit
     /**
      * @return string
      */
-    public function getTimeFrame(): string
+    public function getTimeFrame(): ?string
     {
         return $this->timeFrame;
     }
@@ -103,7 +103,7 @@ class Unit
      * @param string $timeFrame
      * @return static
      */
-    public function setTimeFrame(string $timeFrame)
+    public function setTimeFrame(?string $timeFrame)
     {
         $this->timeFrame = $timeFrame;
         return $this;
@@ -112,7 +112,7 @@ class Unit
     /**
      * @return Alaress_Date_Format
      */
-    public function getLastUpdated(): Alaress_Date_Format
+    public function getLastUpdated(): ?Alaress_Date_Format
     {
         return $this->lastUpdated;
     }
@@ -121,7 +121,7 @@ class Unit
      * @param Alaress_Date_Format $lastUpdated
      * @return static
      */
-    public function setLastUpdated(Alaress_Date_Format $lastUpdated)
+    public function setLastUpdated(?Alaress_Date_Format $lastUpdated)
     {
         $this->lastUpdated = $lastUpdated;
         return $this;
@@ -130,7 +130,7 @@ class Unit
     /**
      * @return Alaress_Date_Format
      */
-    public function getStartDate(): Alaress_Date_Format
+    public function getStartDate(): ?Alaress_Date_Format
     {
         return $this->startDate;
     }
@@ -139,7 +139,7 @@ class Unit
      * @param Alaress_Date_Format $startDate
      * @return static
      */
-    public function setStartDate(Alaress_Date_Format $startDate)
+    public function setStartDate(?Alaress_Date_Format $startDate)
     {
         $this->startDate = $startDate;
         return $this;
@@ -148,7 +148,7 @@ class Unit
     /**
      * @return Alaress_Date_Format
      */
-    public function getEndDate(): Alaress_Date_Format
+    public function getEndDate(): ?Alaress_Date_Format
     {
         return $this->endDate;
     }
@@ -157,7 +157,7 @@ class Unit
      * @param Alaress_Date_Format $endDate
      * @return static
      */
-    public function setEndDate(Alaress_Date_Format $endDate)
+    public function setEndDate(?Alaress_Date_Format $endDate)
     {
         $this->endDate = $endDate;
         return $this;

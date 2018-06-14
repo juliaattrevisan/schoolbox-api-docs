@@ -64,7 +64,7 @@ class Assessment
     /**
      * @return string
      */
-    public function getTitle(): string
+    public function getTitle(): ?string
     {
         return $this->title;
     }
@@ -73,7 +73,7 @@ class Assessment
      * @param string $title
      * @return static
      */
-    public function setTitle(string $title)
+    public function setTitle(?string $title)
     {
         $this->title = $title;
         return $this;
@@ -82,7 +82,7 @@ class Assessment
     /**
      * @return string
      */
-    public function getType(): string
+    public function getType(): ?string
     {
         return $this->type;
     }
@@ -91,7 +91,7 @@ class Assessment
      * @param string $type
      * @return static
      */
-    public function setType(string $type)
+    public function setType(?string $type)
     {
         $this->type = $type;
         return $this;
@@ -100,7 +100,7 @@ class Assessment
     /**
      * @return string
      */
-    public function getMethod(): string
+    public function getMethod(): ?string
     {
         return $this->method;
     }
@@ -109,7 +109,7 @@ class Assessment
      * @param string $method
      * @return static
      */
-    public function setMethod(string $method)
+    public function setMethod(?string $method)
     {
         $this->method = $method;
         return $this;
@@ -118,7 +118,7 @@ class Assessment
     /**
      * @return string
      */
-    public function getContent(): string
+    public function getContent(): ?string
     {
         return $this->content;
     }
@@ -127,7 +127,7 @@ class Assessment
      * @param string $content
      * @return static
      */
-    public function setContent(string $content)
+    public function setContent(?string $content)
     {
         $this->content = $content;
         return $this;

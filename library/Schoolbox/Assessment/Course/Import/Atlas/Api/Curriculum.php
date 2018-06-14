@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Course\Import\Atlas\Api;
 
-use Schoolbox\Collection;
+use Alaress_Date_Format;
 
 /**
  * Object representation of a curriculum from Atlas Rubicon.
@@ -86,7 +86,7 @@ class Curriculum
     /**
      * @return string
      */
-    public function getTitle(): string
+    public function getTitle(): ?string
     {
         return $this->title;
     }
@@ -95,7 +95,7 @@ class Curriculum
      * @param string $title
      * @return static
      */
-    public function setTitle(string $title)
+    public function setTitle(?string $title)
     {
         $this->title = $title;
         return $this;
@@ -104,7 +104,7 @@ class Curriculum
     /**
      * @return string
      */
-    public function getSubject(): string
+    public function getSubject(): ?string
     {
         return $this->subject;
     }
@@ -113,7 +113,7 @@ class Curriculum
      * @param string $subject
      * @return static
      */
-    public function setSubject(string $subject)
+    public function setSubject(?string $subject)
     {
         $this->subject = $subject;
         return $this;
@@ -122,7 +122,7 @@ class Curriculum
     /**
      * @return string
      */
-    public function getGrade(): string
+    public function getGrade(): ?string
     {
         return $this->grade;
     }
@@ -131,7 +131,7 @@ class Curriculum
      * @param string $grade
      * @return static
      */
-    public function setGrade(string $grade)
+    public function setGrade(?string $grade)
     {
         $this->grade = $grade;
         return $this;
@@ -140,7 +140,7 @@ class Curriculum
     /**
      * @return string
      */
-    public function getSchool(): string
+    public function getSchool(): ?string
     {
         return $this->school;
     }
@@ -149,7 +149,7 @@ class Curriculum
      * @param string $school
      * @return static
      */
-    public function setSchool(string $school)
+    public function setSchool(?string $school)
     {
         $this->school = $school;
         return $this;
@@ -158,7 +158,7 @@ class Curriculum
     /**
      * @return string
      */
-    public function getDescription(): string
+    public function getDescription(): ?string
     {
         return $this->description;
     }
@@ -174,18 +174,18 @@ class Curriculum
     }
 
     /**
-     * @return \Alaress_Date_Format
+     * @return Alaress_Date_Format
      */
-    public function getLastUpdated(): \Alaress_Date_Format
+    public function getLastUpdated(): ?Alaress_Date_Format
     {
         return $this->lastUpdated;
     }
 
     /**
-     * @param \Alaress_Date_Format $lastUpdated
+     * @param Alaress_Date_Format $lastUpdated
      * @return static
      */
-    public function setLastUpdated(\Alaress_Date_Format $lastUpdated)
+    public function setLastUpdated(?Alaress_Date_Format $lastUpdated)
     {
         $this->lastUpdated = $lastUpdated;
         return $this;
@@ -194,7 +194,7 @@ class Curriculum
     /**
      * @return string
      */
-    public function getMapType(): string
+    public function getMapType(): ?string
     {
         return $this->mapType;
     }
@@ -203,7 +203,7 @@ class Curriculum
      * @param string $mapType
      * @return static
      */
-    public function setMapType(string $mapType)
+    public function setMapType(?string $mapType)
     {
         $this->mapType = $mapType;
         return $this;

@@ -21,7 +21,7 @@ class Standard
     /**
      * @return string
      */
-    public function getRawText(): string
+    public function getRawText(): ?string
     {
         return $this->rawText;
     }
@@ -30,7 +30,7 @@ class Standard
      * @param string $rawText
      * @return static
      */
-    public function setRawText(string $rawText)
+    public function setRawText(?string $rawText)
     {
         $this->rawText = $rawText;
         return $this;

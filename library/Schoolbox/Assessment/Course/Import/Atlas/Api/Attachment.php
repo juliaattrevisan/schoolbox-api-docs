@@ -69,7 +69,7 @@ class Attachment
     /**
      * @return string
      */
-    public function getTitle(): string
+    public function getTitle(): ?string
     {
         return $this->title;
     }
@@ -78,7 +78,7 @@ class Attachment
      * @param string $title
      * @return static
      */
-    public function setTitle(string $title)
+    public function setTitle(?string $title)
     {
         $this->title = $title;
         return $this;
@@ -87,7 +87,7 @@ class Attachment
     /**
      * @return string
      */
-    public function getUrl(): string
+    public function getUrl(): ?string
     {
         return $this->url;
     }
@@ -96,7 +96,7 @@ class Attachment
      * @param string $url
      * @return static
      */
-    public function setUrl(string $url)
+    public function setUrl(?string $url)
     {
         $this->url = $url;
         return $this;
@@ -123,7 +123,7 @@ class Attachment
     /**
      * @return string
      */
-    public function getAttachmentType(): string
+    public function getAttachmentType(): ?string
     {
         return $this->attachmentType;
     }
@@ -132,7 +132,7 @@ class Attachment
      * @param string $attachmentType
      * @return static
      */
-    public function setAttachmentType(string $attachmentType)
+    public function setAttachmentType(?string $attachmentType)
     {
         $this->attachmentType = $attachmentType;
         return $this;
@@ -141,7 +141,7 @@ class Attachment
     /**
      * @return string
      */
-    public function getItemType(): string
+    public function getItemType(): ?string
     {
         return $this->itemType;
     }
@@ -150,7 +150,7 @@ class Attachment
      * @param string $itemType
      * @return static
      */
-    public function setItemType(string $itemType)
+    public function setItemType(?string $itemType)
     {
         $this->itemType = $itemType;
         return $this;

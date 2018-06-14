@@ -49,7 +49,7 @@ class Teacher
     /**
      * @return string
      */
-    public function getFirstName(): string
+    public function getFirstName(): ?string
     {
         return $this->firstName;
     }
@@ -58,7 +58,7 @@ class Teacher
      * @param string $firstName
      * @return static
      */
-    public function setFirstName(string $firstName)
+    public function setFirstName(?string $firstName)
     {
         $this->firstName = $firstName;
         return $this;
@@ -67,7 +67,7 @@ class Teacher
     /**
      * @return string
      */
-    public function getLastName(): string
+    public function getLastName(): ?string
     {
         return $this->lastName;
     }
@@ -76,7 +76,7 @@ class Teacher
      * @param string $lastName
      * @return static
      */
-    public function setLastName(string $lastName)
+    public function setLastName(?string $lastName)
     {
         $this->lastName = $lastName;
         return $this;
