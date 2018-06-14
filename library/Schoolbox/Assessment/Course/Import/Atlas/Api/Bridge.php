@@ -81,7 +81,7 @@ class Bridge
         $result   = $this->redisCache->get('curriculumList', [$requests]);
         return array_map(
             function ($assessment) {
-                return $this->decoder->decodeArray($assessment, Assessment::class);
+                return $this->decoder->decodeArray($assessment, Curriculum::class);
             },
             $result['curriculumList']
         );
