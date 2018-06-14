@@ -74,7 +74,8 @@
         "phpoffice/phpexcel": "dev-master",
         "roave/security-advisories": "dev-master",
         "zendframework/zend-uri": "~2.5.2",
-        "onelogin/php-saml": "^2.12"
+        "onelogin/php-saml": "^2.12",
+        "karriere/json-decoder": "^2.1.1"
     },
     "require-dev": {
         "lox/xhprof": "dev-master",
