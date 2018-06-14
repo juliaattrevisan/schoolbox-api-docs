@@ -117,9 +117,10 @@
                 }
             },
             onXhrDone: function (data) {
-                $('#curriculum-plan-units')
-                    .html(data)
-                    .find('[data-collapser]').collapsable();
+                var units = $('#curriculum-plan-units').html(data);
+
+                // Apply collapser
+                units.find('[data-collapser]').collapsable();
             }
         });
 
