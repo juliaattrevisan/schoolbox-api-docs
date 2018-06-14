@@ -121,6 +121,15 @@
 
                 // Apply collapser
                 units.find('[data-collapser]').collapsable();
+
+                // Update selected counts
+                units.find('[data-checkbox-group]').on('change', function () {
+                    var $this    = $(this),
+                        group    = $this.data('checkboxGroup'),
+                        selected = units.find('[data-checkbox-group="'+group+'"]:checked'),
+                        counter  = units.find('[data-checkbox-group-count="'+group+'"]');
+                    counter.attr('data-show-count', selected.length);
+                });
             }
         });
 

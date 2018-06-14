@@ -61,13 +61,15 @@ ItemID = 49959
                         {% if assessmentCount > 0 %}
                         <p class="meta">
                             {{ assessmentCount }} {% if assessmentCount == 1 %}assessment{% else %}assessments{% endif %},
-                            <span data-show-count="{{ assessmentCount }}"> selected</span>
+                            <span data-checkbox-group-count="unit-{{ unit.id }}-assessments"
+                                  data-show-count="{{ assessmentCount }}"> selected</span>
                         </p>
                         {% endif %}
                         {% if attachmentCount > 0 %}
                         <p class="meta">
                             {{ attachmentCount }} {% if attachmentCount == 1 %}attachment{% else %}attachments{% endif %},
-                            <span data-show-count="{{ attachmentCount }}"> selected</span>
+                            <span data-checkbox-group-count="unit-{{ unit.id }}-attachments"
+                                  data-show-count="{{ attachmentCount }}"> selected</span>
                         </p>
                         {% endif %}
                     </a>
@@ -84,7 +86,13 @@ ItemID = 49959
                         <li>
                             <div>
                                 <div class="selector">
-                                    <input id="assessment-{{ assessment.id }}" name="assessment[{{ assessment.id }}]" value="1" type="checkbox" checked>
+                                    <input id="assessment-{{ assessment.id }}"
+                                           name="assessment[{{ assessment.id }}]"
+                                           value="1"
+                                           type="checkbox"
+                                           checked
+                                           data-checkbox-group="unit-{{ unit.id }}-assessments"
+                                    >
                                     <label for="assessment-{{ assessment.id }}" class="checkbox-label"></label>
                                 </div>
                                 <div class="small-12 card">
@@ -125,7 +133,13 @@ ItemID = 49959
                         <li>
                             <div>
                                 <div class="selector">
-                                    <input id="attachment-{{ attachment.id }}" name="attachment[{{ attachment.id }}]" value="1" type="checkbox" checked>
+                                    <input id="attachment-{{ attachment.id }}"
+                                           name="attachment[{{ attachment.id }}]"
+                                           value="1"
+                                           type="checkbox"
+                                           checked
+                                           data-checkbox-group="unit-{{ unit.id }}-attachments"
+                                    >
                                     <label for="attachment-{{ attachment.id }}" class="checkbox-label"></label>
                                 </div>
                                 <div class="small-12 card">
