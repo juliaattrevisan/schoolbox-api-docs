@@ -1,7 +1,16 @@
-<div class="row">
-    <div class="small-12 columns">
-        <h1>{{ news.title }}</h1>
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 column">
+            <h1>{{ news.title }}</h1>
+        </div>
     </div>
+    <nav>
+        {% set modifyRoute = routeLookupIfAuthorized('commsNews.getUpdate', {newsId: news.id}) %}
+
+        {% if modifyRoute %}
+        <a class="icon-modify" href="{{ modifyRoute }}" title="Actions"></a>
+        {% endif %}
+    </nav>
 </div>
 
 <div class="row">
