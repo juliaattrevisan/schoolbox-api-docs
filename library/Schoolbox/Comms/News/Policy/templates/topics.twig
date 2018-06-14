@@ -9,10 +9,11 @@
         {% if topics|length %}
             <section>
                 <ul class="information-list">
+
+                    {# TODO: Probably add a url to the topic's index page
+                     # So you can see all the articles associated with that topic
+                     #}
                     {% for topic in topics %}
-                        {# TODO: Probably add a url to the topic's index page
-                         # So you can see all the articles associated with that topic
-                         #}
                         <li class="content">{{ topic.name }}</li>
                     {% endfor %}
                 </ul>
@@ -20,10 +21,12 @@
         {% else %}
             <div class="empty-state">
                 <i class="icon-news"></i>
-                <p>News Topics haven't been created.</p>
+                <p>{{ locale.news.proper }} Topics haven't been created.</p>
 
-                {% if configurable %}
-                <p><a href="/adminv2/lists/news-topic" title="Define News Topics">Define News Topics</a> so that content creators can categorise their articles.</p>
+                {% set topicRoute = routeLookupIfAuthorized('adminLists.getIndex', {table: 'news-topic'}) %}
+
+                {% if topicRoute %}
+                <p><a href="{{ topicRoute }}" title="Define News Topics">Define News Topics</a> so that content creators can categorise their articles.</p>
                 {% endif %}
             </div>
         {% endif %}
