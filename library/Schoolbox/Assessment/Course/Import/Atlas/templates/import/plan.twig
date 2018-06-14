@@ -35,22 +35,38 @@ ItemID = 49959
 
 <ul class="information-list card-selectable threaded expandable-card" id="unit-list">
     {% for unit in curriculum.units %}
+        {% set assessmentCount = unit.assessments|length %}
+        {% set attachmentCount = unit.attachments|length %}
+        {% set hasContent      = assessmentCount > 0 or attachmentCount > 0 %}
         <li>
             <div>
-                <div class="expander icon-down-arrow" data-collapser="unit-{{ unit.id }}"></div>
+                {% if hasContent %}
+                    <div class="expander icon-down-arrow" data-collapser="unit-{{ unit.id }}"></div>
+                {% else %}
+                    <div class="expander disabled"></div>
+                {% endif %}
                 <div class="selector">
-                    <input id="unit-{{ unit.id }}" name="unit[{{ unit.id }}]" value="1" type="checkbox" checked>
+                    <input id="unit-{{ unit.id }}"
+                           name="unit[{{ unit.id }}]"
+                           value="1"
+                           type="checkbox"
+                           {% if hasContent %}checked{% endif %}
+                    >
                     <label for="unit-{{ unit.id }}" class="checkbox-label"></label>
                 </div>
                 <div class="small-12 card">
                     <a href="#">
                         <h3>{{ unit.title }}</h3>
                         <p class="meta">{{ unit.timeFrame }}</p>
+                        <p class="meta">
+                            {{ assessmentCount }} {% if assessmentCount == 1 %}assessment{% else %}assessments{% endif %},
+                            {{ attachmentCount }} {% if attachmentCount == 1 %}attachment{% else %}attachments{% endif %}
+                        </p>
                     </a>
                 </div>
             </div>
         </li>
-        {% if unit.assessments|length %}
+        {% if assessmentCount %}
             <li class="child hide" data-collapse-state="collapsed" data-collapsable="unit-{{ unit.id }}">
                 <div class="small-12 card">
                     <h3>Assessments</h3>
@@ -91,7 +107,7 @@ ItemID = 49959
             </li>
         {% endif %}
 
-        {% if unit.attachments|length %}
+        {% if attachmentCount %}
             <li class="child hide" data-collapsable="unit-{{ unit.id }}">
                 <div class="small-12 card">
                     <h3>Attachments</h3>
@@ -101,7 +117,7 @@ ItemID = 49959
                         <li>
                             <div>
                                 <div class="selector">
-                                    <input id="attachment-{{ attachment.id }}" name="attachment[{{ attachment.id }}]" value="1" type="checkbox">
+                                    <input id="attachment-{{ attachment.id }}" name="attachment[{{ attachment.id }}]" value="1" type="checkbox" checked>
                                     <label for="attachment-{{ attachment.id }}" class="checkbox-label"></label>
                                 </div>
                                 <div class="small-12 card">
