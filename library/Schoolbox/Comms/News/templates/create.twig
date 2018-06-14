@@ -104,7 +104,7 @@
                 <fieldset class="content">
                     <div class="small-12 columns">
                         <label>Feature Image</label>
-                        <p class="meta">Attach a feature image to represent your news article.</p>
+                        <p class="meta">Attach a feature image to represent your {{ locale.news.proper }} article.</p>
 
                         {% include 'sub/attachzone.twig' with { attachzone: featureImageZone } %}
                     </div>
@@ -113,7 +113,7 @@
                 <fieldset>
                     <div class="small-12 columns">
                         <label>Topics</label>
-                        <p class="meta">You can assign multiple <a href="{{ routeLookup('commsNewsPolicy.getPolicies') }}#topics" title="Find a list of available topics" target="_blank">topics</a> to to this article to adjust its exposure.</p>
+                        <p class="meta">You can assign multiple <a href="{{ routeLookup('commsNewsPolicy.getPolicies') }}#topics" title="Find a list of available topics" target="_blank">topics</a> to this {{ locale.news.proper }} article to adjust its exposure.</p>
                         <select data-tags name="tags[]" multiple></select>
                     </div>
                 </fieldset>
