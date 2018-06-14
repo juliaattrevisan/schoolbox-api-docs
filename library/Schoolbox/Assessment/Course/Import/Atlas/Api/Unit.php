@@ -46,6 +46,16 @@ class Unit
     private $endDate;
 
     /**
+     * @var Assessment[]
+     */
+    private $assessments;
+
+    /**
+     * @var Attachment[]
+     */
+    private $attachments;
+
+    /**
      * @return int
      */
     public function getId(): int
@@ -150,6 +160,42 @@ class Unit
     public function setEndDate(Alaress_Date_Format $endDate)
     {
         $this->endDate = $endDate;
+        return $this;
+    }
+
+    /**
+     * @return Assessment[]
+     */
+    public function getAssessments(): array
+    {
+        return $this->assessments;
+    }
+
+    /**
+     * @param Assessment[] $assessments
+     * @return static
+     */
+    public function setAssessments(array $assessments)
+    {
+        $this->assessments = $assessments;
+        return $this;
+    }
+
+    /**
+     * @return Attachment[]
+     */
+    public function getAttachments(): array
+    {
+        return $this->attachments;
+    }
+
+    /**
+     * @param Attachment[] $attachments
+     * @return static
+     */
+    public function setAttachments(array $attachments)
+    {
+        $this->attachments = $attachments;
         return $this;
     }
 }
