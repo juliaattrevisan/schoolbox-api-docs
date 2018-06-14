@@ -138,18 +138,18 @@
                 units.find('[data-unit]').on('change', function () {
                     var $this        = $(this),
                         unit         = $this.data('unit'),
-                        isChecked    = $this.prop('checked'),
+                        disable      = !$this.prop('checked'),
                         $assessments = units.find('[data-checkbox-group="unit-'+unit+'-assessments"]'),
-                        $attachments = units.find('[data-checkbox-group="unit-'+unit+'-attachments"]');
-                    $assessments.prop('disabled', !isChecked);
-                    $attachments.prop('disabled', !isChecked);
+                        $attachments = units.find('[data-checkbox-group="unit-'+unit+'-attachments"]'),
+                        unitMeta     = units.find('[data-unit-meta="'+unit+'"]');
+                    $assessments.prop('disabled', disable);
+                    $attachments.prop('disabled', disable);
+                    if (disable) {
+                        unitMeta.slideUp();
+                    } else {
+                        unitMeta.slideDown();
+                    }
                 });
-
-                // Assess/attach:
-                // * change: update counts
-
-                // Update counts when a unit is selected/unselected
-                // Uncheck all when a unit is unselected
             }
         });
 

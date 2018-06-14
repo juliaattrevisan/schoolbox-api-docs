@@ -60,18 +60,18 @@ ItemID = 49959
                         <h3>{{ unit.title }}</h3>
                         <p class="meta">{{ unit.timeFrame }}</p>
                         {% if assessmentCount > 0 %}
-                        <p class="meta">
-                            {{ assessmentCount }} {% if assessmentCount == 1 %}assessment{% else %}assessments{% endif %},
-                            <span data-checkbox-group-count="unit-{{ unit.id }}-assessments"
-                                  data-show-count="{{ assessmentCount }}"> selected</span>
-                        </p>
+                            <p class="meta" data-unit-meta="{{ unit.id }}">
+                                {{ assessmentCount }} {% if assessmentCount == 1 %}assessment{% else %}assessments{% endif %},
+                                <span data-checkbox-group-count="unit-{{ unit.id }}-assessments"
+                                      data-show-count="{{ assessmentCount }}"> selected</span>
+                            </p>
                         {% endif %}
                         {% if attachmentCount > 0 %}
-                        <p class="meta">
-                            {{ attachmentCount }} {% if attachmentCount == 1 %}attachment{% else %}attachments{% endif %},
-                            <span data-checkbox-group-count="unit-{{ unit.id }}-attachments"
-                                  data-show-count="{{ attachmentCount }}"> selected</span>
-                        </p>
+                            <p class="meta" data-unit-meta="{{ unit.id }}">
+                                {{ attachmentCount }} {% if attachmentCount == 1 %}attachment{% else %}attachments{% endif %},
+                                <span data-checkbox-group-count="unit-{{ unit.id }}-attachments"
+                                      data-show-count="{{ attachmentCount }}"> selected</span>
+                            </p>
                         {% endif %}
                     </a>
                 </div>
