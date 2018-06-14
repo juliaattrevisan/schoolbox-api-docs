@@ -11,7 +11,7 @@ namespace Schoolbox\News;
 
 use Schoolbox\Mapper\Traits\Model\Id;
 
-class Topic
+class Topic implements \JsonSerializable
 {
     use Id;
 
@@ -43,6 +43,22 @@ class Topic
 
         return $this;
     }
+
+
+    /**
+     * Serialized representation
+     *
+     * @return array|mixed
+     */
+    public function jsonSerialize()
+    {
+        return [
+            'id' => $this->getId(),
+            'name' => $this->getName(),
+            'sequence' => $this->getSequence()
+        ];
+    }
+
 
     /**
      * @return string
@@ -82,12 +98,12 @@ class Topic
     }
 
     /**
-     * @return int
+     * Sequence may not always be set if you just...accept the defaults
+     *
+     * @return int|null
      */
-    public function getSequence(): int
+    public function getSequence(): ?int
     {
         return $this->sequence;
     }
-
-
-} 
+}

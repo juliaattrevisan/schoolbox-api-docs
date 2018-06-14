@@ -285,11 +285,6 @@ class Controller extends Base
      */
     public function getTags()
     {
-        $allTags = $this->topicMapper->findAll();
-
-        $this->getResponse()->content->set($this->buildJsonOutput([
-            ['name' => 'cat', 'id' => 1],
-            ['name' => 'dog', 'id' => 2],
-        ]));
+        $this->getResponse()->content->set($this->buildJsonOutput($this->topicMapper->findAll()));
     }
 }
