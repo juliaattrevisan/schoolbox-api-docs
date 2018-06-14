@@ -31,9 +31,8 @@ class StandardTransformer implements Transformer
             new CallbackBinding(
                 'title',
                 function ($row) {
-                    // $row... isn't; it's just a string
-                    // Extract title out
-                    return $this->parseStandard($row)['title'];
+                    // Extract title out of parsed raw text
+                    return $this->parseStandard($row['rawText'])['title'];
                 }
             )
         );
@@ -45,7 +44,7 @@ class StandardTransformer implements Transformer
                 function ($row) {
                     // Unfortunately I must parse code twice,
                     // I can't map two attributes in one binding
-                    return $this->parseStandard($row)['code'];
+                    return $this->parseStandard($row['rawText'])['code'];
                 }
             )
         );

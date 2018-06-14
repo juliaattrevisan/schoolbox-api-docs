@@ -126,6 +126,11 @@ class Bridge
                 array_map(
                     function ($assessment) {
                         // No decodeMultipleArray method exists :|
+                        // Also need to massage standards so they're not strings
+                        $assessment['standards'] = array_map(
+                            function ($v) { return ['rawText' => $v]; },
+                            $assessment['standards']
+                        );
                         return $this->decoder->decodeArray($assessment, Assessment::class);
                     },
                     $assessments
