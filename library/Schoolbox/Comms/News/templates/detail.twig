@@ -5,14 +5,16 @@
 </div>
 
 <div class="row">
-    <div class="small-12 columns">
-        <div class="card small-12">
-            <a href="/search/user/{{ news.author.id }}" title="View Profile">
-                <img src="/portrait.php?userId={{ news.author.externalId }}&size=square64" alt="View Profile" />
-                <p>{{ news.author.fullname }}</p>
-            </a>
-            <p class="meta"></p>
-        </div>
+    <div class="small-12 island">
+        <section>
+            <div class="card small-12">
+                <a href="/search/user/{{ news.author.id }}" title="View Profile">
+                    <img src="/portrait.php?userId={{ news.author.externalId }}&size=square64" alt="View Profile" />
+                    <p>{{ news.author.fullname }}</p>
+                </a>
+                <p class="meta">{{ news.publishAt.long }}</p>
+            </div>
+        </section>
     </div>
 </div>
 
