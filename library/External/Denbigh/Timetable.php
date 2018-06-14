@@ -261,6 +261,7 @@ class External_Denbigh_Timetable implements External_TimetableInterface
                 'periodStart'    => '',
                 'periodEnd'      => '',
                 'periodSequence' => '1',
+                'class'          => [],
             ];
         }
 
