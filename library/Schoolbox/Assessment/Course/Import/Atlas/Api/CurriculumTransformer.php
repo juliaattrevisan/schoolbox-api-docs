@@ -44,6 +44,9 @@ class CurriculumTransformer implements Transformer
 
         /** @noinspection PhpUnhandledExceptionInspection */
         $classBindings->register(new ArrayBinding('units', 'units', Unit::class));
+
+        /** @noinspection PhpUnhandledExceptionInspection */
+        $classBindings->register(new ArrayBinding('teachers', 'teachers', Teacher::class));
     }
 
     /**
