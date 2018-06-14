@@ -1,3 +1,11 @@
+{% import 'sub/breadcrumbs.twig' as bread %}
+
+{# TODO: How to do breadcrumbs now? #}
+{{ bread.crumbs(
+    [ 'News', '/news' ],
+    [ news.title ]
+) }}
+
 <div class="actions-small-1 row">
     <div class="list-item">
         <div class="small-12 column">
