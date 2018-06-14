@@ -100,10 +100,8 @@
 
                 <fieldset class="content">
                     <div class="small-12 columns">
-                        <label>
-                            Feature Image
-                            <span data-tooltip class="hint has-tip tip-top" title="Attach a feature image to represent your news article">?</span>
-                        </label>
+                        <label>Feature Image</label>
+                        <p class="meta">Attach a feature image to represent your news article.</p>
 
                         {% include 'sub/attachzone.twig' with { attachzone: featureImageZone } %}
                     </div>
@@ -112,7 +110,7 @@
                 <fieldset>
                     <div class="small-12 columns">
                         <label>Tags</label>
-                        <p class="meta">You can assign multiple tags to to this article.</p>
+                        <p class="meta">You can assign multiple tags to to this article to adjust its exposure across topics.</p>
                         <select data-tags name="tags[]" multiple placeholder="Assign Tags"></select>
                     </div>
                 </fieldset>
