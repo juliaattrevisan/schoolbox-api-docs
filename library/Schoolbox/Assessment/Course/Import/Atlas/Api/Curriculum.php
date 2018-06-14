@@ -56,25 +56,14 @@ class Curriculum
     private $mapType;
 
     /**
-     * @todo write teacher object
-     * @var Collection
+     * @var Teacher[]
      */
-    private $teachers;
+    private $teachers = [];
 
     /**
-     * @todo write unit object
-     * @var Collection
+     * @var Unit[]
      */
-    private $units;
-
-    /**
-     * Constructor
-     */
-    public function __construct()
-    {
-        $this->teachers = new Collection();
-        $this->units    = new Collection();
-    }
+    private $units = [];
 
     /**
      * @return int
@@ -221,36 +210,36 @@ class Curriculum
     }
 
     /**
-     * @return Collection
+     * @return Teacher[]
      */
-    public function getTeachers(): Collection
+    public function getTeachers(): array
     {
         return $this->teachers;
     }
 
     /**
-     * @param Collection $teachers
+     * @param Teacher[] $teachers
      * @return static
      */
-    public function setTeachers(Collection $teachers)
+    public function setTeachers(array $teachers)
     {
         $this->teachers = $teachers;
         return $this;
     }
 
     /**
-     * @return Collection
+     * @return Unit[]
      */
-    public function getUnits(): Collection
+    public function getUnits(): array
     {
         return $this->units;
     }
 
     /**
-     * @param Collection $units
+     * @param Unit[] $units
      * @return static
      */
-    public function setUnits(Collection $units)
+    public function setUnits(array $units)
     {
         $this->units = $units;
         return $this;
