@@ -30,6 +30,7 @@
                 type:     'GET',
                 dataType: 'json'
             },
+            value: {{ news.tags|json_encode|raw }},
             multiple: true
         });
     });
@@ -98,7 +99,6 @@
                 </fieldset>
 
                 <fieldset class="content">
-
                     <div class="small-12 columns">
                         <label>
                             Feature Image
