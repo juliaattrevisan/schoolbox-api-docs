@@ -29,10 +29,23 @@ class StandardTransformer implements Transformer
         /** @noinspection PhpUnhandledExceptionInspection */
         $classBindings->register(
             new CallbackBinding(
-                'rawText',
+                'title',
                 function ($row) {
                     // $row... isn't; it's just a string
-                    return $row;
+                    // Extract title out
+                    return $this->parseStandard($row)['title'];
+                }
+            )
+        );
+
+        /** @noinspection PhpUnhandledExceptionInspection */
+        $classBindings->register(
+            new CallbackBinding(
+                'code',
+                function ($row) {
+                    // Unfortunately I must parse code twice,
+                    // I can't map two attributes in one binding
+                    return $this->parseStandard($row)['code'];
                 }
             )
         );
@@ -44,5 +57,30 @@ class StandardTransformer implements Transformer
     public function transforms(): string
     {
         return Standard::class;
+    }
+
+    /**
+     * Parses a string standard into something renderable.
+     *
+     * This is required because Atlas stores curriculum codes as part of a
+     * string value.
+     *
+     * @param string $standard
+     * @return array
+     */
+    private function parseStandard(string $standard): array
+    {
+        // ACARA strategy: find a link to Scootle, use it
+        if (preg_match('[>(.*?)</a>]i', $standard, $matches)) {
+            [, $code] = $matches;
+            $standard = strip_tags($standard);
+        } else {
+            $code = '';
+        }
+
+        return [
+            'title' => $standard,
+            'code'  => $code,
+        ];
     }
 }

@@ -12,8 +12,6 @@ use JsonSerializable;
 
 /**
  * Object representation of an standard from Atlas Rubicon.
- *
- * TODO add title and code properly
  */
 class Standard implements JsonSerializable
 {
@@ -21,6 +19,52 @@ class Standard implements JsonSerializable
      * @var string
      */
     private $rawText;
+
+    /**
+     * @var string
+     */
+    private $title;
+
+    /**
+     * @var string
+     */
+    private $code;
+
+    /**
+     * @return string
+     */
+    public function getTitle(): ?string
+    {
+        return $this->title;
+    }
+
+    /**
+     * @param string $title
+     * @return static
+     */
+    public function setTitle(?string $title)
+    {
+        $this->title = $title;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCode(): ?string
+    {
+        return $this->code;
+    }
+
+    /**
+     * @param string $code
+     * @return static
+     */
+    public function setCode(?string $code)
+    {
+        $this->code = $code;
+        return $this;
+    }
 
     /**
      * @return string
@@ -46,7 +90,8 @@ class Standard implements JsonSerializable
     public function jsonSerialize()
     {
         return [
-            'rawText' => $this->rawText,
+            'title' => $this->title,
+            'code'  => $this->code,
         ];
     }
 }

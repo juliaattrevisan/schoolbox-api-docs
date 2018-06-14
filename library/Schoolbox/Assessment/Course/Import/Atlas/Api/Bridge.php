@@ -142,26 +142,6 @@ class Bridge
                     $attachments
                 )
             );
-
-//            // Assessments can now be transformed into objects!
-//            $assessmentJson = json_encode($unit['assessments']);
-//            $assessmentOutput = $this->decoder->decodeMultiple($assessmentJson, Assessment::class);
-//
-//            $attachmentJson = json_encode($unit['attachments']);
-//            $attachmentOutput = $this->decoder->decodeMultiple($attachmentJson, Attachment::class);
-
-
-            // Parse assessment standards into something legible
-            // TODO move into standard object itself
-//            foreach ($unit['assessments'] as $j => $assessment) {
-//                if ($assessment['standards']) {
-//                    $unit['assessments'][$j]['standards'] = array_map(
-//                        function ($value) { return $this->parseStandard($value); },
-//                        $assessment['standards']
-//                    );
-//                }
-//            }
-
             $units[$i] = $unit;
         }
 
@@ -232,31 +212,5 @@ class Bridge
         }
 
         return $result;
-    }
-
-
-    /**
-     * Parses a string standard into something renderable.
-     *
-     * This is required because Atlas stores curriculum codes as part of a
-     * string value.
-     *
-     * @param string $standard
-     * @return array
-     */
-    private function parseStandard(string $standard): array
-    {
-        // ACARA strategy: find a link to Scootle, use it
-        if (preg_match('[>(.*?)</a>]i', $standard, $matches)) {
-            [, $code] = $matches;
-            $standard = strip_tags($standard);
-        } else {
-            $code = '';
-        }
-
-        return [
-            'title' => $standard,
-            'code'  => $code,
-        ];
     }
 }
