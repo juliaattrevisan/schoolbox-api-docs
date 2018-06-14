@@ -63,10 +63,11 @@ class Module extends BaseModule
         $preloadNews = function ($params) { return $this->preloadNews($params); };
 
         $this->register('GET', '/create', 'getCreate', $getPerms);
-        $this->register('GET', '/update/{newsId}', 'getUpdate', $getPerms, $preloadNews);
+        $this->register('GET', '/update/{newsId:\d+}', 'getUpdate', $getPerms, $preloadNews);
         $this->register('POST', '/create', 'postCreate', $postPerms);
-        $this->register('POST', '/update/{newsId}', 'postUpdate', $getPerms, $preloadNews);
+        $this->register('POST', '/update/{newsId:\d+}', 'postUpdate', $getPerms, $preloadNews);
         $this->register('GET', '/tags', 'getTags', $getPerms);
+        $this->register('GET', '/{newsId:\d+}', 'getDetail', null, $preloadNews);
     }
 
 

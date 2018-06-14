@@ -1,0 +1,46 @@
+<div class="row">
+    <div class="small-12 columns">
+        <h1>{{ news.title }}</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 columns">
+        <div class="card small-12">
+            <a href="/search/user/{{ news.author.id }}" title="View Profile">
+                <img src="/portrait.php?userId={{ news.author.externalId }}&size=square64" alt="View Profile" />
+                <p>{{ news.author.fullname }}</p>
+            </a>
+            <p class="meta"></p>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <section>
+            <div class="row">
+                {% if news.featuredImage %}
+                    <div class="small-12 medium-3 island">
+                        <section class="content">
+                            {{ news.featuredImage }}
+                        </section>
+                    </div>
+
+                    <div class="small-12 medium-9 island">
+                        <section class="content">
+                            {{ news.body|purify }}
+                        </section>
+                    </div>
+                {% else %}
+                    <div class="small-12 island">
+                        <section class="content">
+                            {{ news.body|purify }}
+                        </section>
+                    </div>
+                {% endif %}
+            </div>
+        </section>
+    </div>
+</div>
+

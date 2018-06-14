@@ -284,4 +284,17 @@ class Controller extends Base
     {
         $this->getResponse()->content->set($this->buildJsonOutput($this->topicMapper->findAll()));
     }
+
+
+    /**
+     * @param Model $news
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     */
+    public function getDetail($news)
+    {
+        $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/detail.twig', [
+            'news' => $news,
+        ])->setTitle($news->getTitle()));
+    }
+
 }
