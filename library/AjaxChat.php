@@ -81,7 +81,7 @@ class AjaxChat {
 
         $time = new DateTime();
         $this->output = array(
-            'time' => $time->format('D M j Y H:i:s \G\M\TO (T)'),
+            'time' => $time->format('D M j Y H:i:s \G\M\TO'),
         );
 
         $validMethods = array('send','receive','poll','mute','config');
