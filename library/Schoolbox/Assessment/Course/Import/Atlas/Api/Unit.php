@@ -49,12 +49,12 @@ class Unit implements JsonSerializable
     /**
      * @var Assessment[]
      */
-    private $assessments;
+    private $assessments = [];
 
     /**
      * @var Attachment[]
      */
-    private $attachments;
+    private $attachments = [];
 
     /**
      * @return int

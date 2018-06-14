@@ -42,7 +42,7 @@ class Assessment implements JsonSerializable
     /**
      * @var Standard[]
      */
-    private $standards;
+    private $standards = [];
 
     /**
      * @return int
