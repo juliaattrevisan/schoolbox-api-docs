@@ -11,6 +11,7 @@ namespace Schoolbox\Assessment\Course\Import\Atlas\Api;
 use Alaress\Redis\Cache as RedisCache;
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Promise;
+use Karriere\JsonDecoder\JsonDecoder;
 use Predis\ClientInterface as RedisClient;
 use Psr\Http\Message\ResponseInterface;
 
@@ -38,12 +39,19 @@ class Bridge
 
 
     /**
+     * @var JsonDecoder
+     */
+    private $decoder;
+
+
+    /**
      * Constructor
      *
      * @param HttpClient  $httpClient
      * @param RedisClient $redisClient
+     * @param JsonDecoder $decoder
      */
-    public function __construct(HttpClient $httpClient, RedisClient $redisClient)
+    public function __construct(HttpClient $httpClient, RedisClient $redisClient, JsonDecoder $decoder)
     {
         $this->httpClient = $httpClient;
         $this->redisCache = new RedisCache(
@@ -54,6 +62,7 @@ class Bridge
             'atlasApi',
             self::CACHE_EXPIRY
         );
+        $this->decoder = $decoder;
     }
 
 

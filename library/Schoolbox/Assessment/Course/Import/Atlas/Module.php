@@ -9,6 +9,7 @@ namespace Schoolbox\Assessment\Course\Import\Atlas;
 use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\ContainerInterface;
 use GuzzleHttp\Client;
+use Karriere\JsonDecoder\JsonDecoder;
 use Schoolbox\Assessment\Course\Import\Atlas\Api\Bridge as ApiBridge;
 use Schoolbox\Learning\Course;
 use Twig\Error\LoaderError;
@@ -72,6 +73,18 @@ class Module extends \Alaress\Module\Module
                                 ]
                             ),
                             'redisClient' => $injector->lazyGet('redis'),
+                            'decoder'     => $injector->lazy(
+                                function () {
+                                    $decoder = new JsonDecoder(true, true);
+                                    $decoder->register(new Api\CurriculumTransformer());
+                                    $decoder->register(new Api\TeacherTransformer());
+                                    $decoder->register(new Api\UnitTransformer());
+                                    $decoder->register(new Api\AssessmentTransformer());
+                                    $decoder->register(new Api\StandardTransformer());
+                                    $decoder->register(new Api\AttachmentTransformer());
+                                    return $decoder;
+                                }
+                            )
                         ]
                     )
                 ]
