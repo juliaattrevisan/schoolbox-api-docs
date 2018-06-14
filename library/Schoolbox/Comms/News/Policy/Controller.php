@@ -12,6 +12,7 @@ namespace Schoolbox\Comms\News\Policy;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\News\TopicMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 
@@ -35,17 +36,24 @@ class Controller extends Base
     private $policyMapper;
 
     /**
+     * @var TopicMapper
+     */
+    private $topicMapper;
+
+    /**
      * Controller constructor.
      *
      * @param ErrorMapper      $errorMapper
      * @param UserAccessMapper $userAccessMapper
      * @param Mapper           $policyMapper
+     * @param TopicMapper      $topicMapper
      */
-    public function __construct(ErrorMapper $errorMapper, UserAccessMapper $userAccessMapper, Mapper $policyMapper)
+    public function __construct(ErrorMapper $errorMapper, UserAccessMapper $userAccessMapper, Mapper $policyMapper, TopicMapper $topicMapper)
     {
         $this->errorMapper = $errorMapper;
         $this->userAccessMapper = $userAccessMapper;
         $this->policyMapper = $policyMapper;
+        $this->topicMapper = $topicMapper;
     }
 
 
@@ -70,7 +78,8 @@ class Controller extends Base
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsPolicy/index.twig', [
             'commsOfficers' => $commsOfficers,
             'isConfigurable' => $isConfigurable,
-            'policies' => $policies
+            'policies' => $policies,
+            'topics' => $this->topicMapper->findAll()
         ])->setTitle('Comms Policies'));
     }
 

@@ -1,0 +1,31 @@
+<div class="row">
+    <div class="small-12 columns">
+        <h2 class="subheader">Topics</h2>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        {% if topics|length %}
+            <section>
+                <ul class="information-list">
+                    {% for topic in topics %}
+                        {# TODO: Probably add a url to the topic's index page
+                         # So you can see all the articles associated with that topic
+                         #}
+                        <li class="content">{{ topic.name }}</li>
+                    {% endfor %}
+                </ul>
+            </section>
+        {% else %}
+            <div class="empty-state">
+                <i class="icon-news"></i>
+                <p>News Topics haven't been created.</p>
+
+                {% if configurable %}
+                <p><a href="/adminv2/lists/news-topic" title="Define News Topics">Define News Topics</a> so that content creators can categorise their articles.</p>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</div>

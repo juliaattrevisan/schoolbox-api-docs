@@ -5,6 +5,7 @@
 </div>
 
 {# Add a list of current Comms Officers
+ # This should be busted out into is own module later, but ok
  #}
 {% include '@commsNewsPolicy/comms-officers.twig' with { commsOfficers: commsOfficers } %}
 
@@ -14,4 +15,12 @@
 {% include '@commsNewsPolicy/policies.twig' with {
     policies: policies,
     configurable: isConfigurable
+} %}
+
+{# Show a list of available Topics that authors can assign to their articles
+ # These are configured specifically in adminv2; I haven't migrated it away
+ #}
+{% include '@commsNewsPolicy/topics.twig' with {
+    topics: topics,
+    configurable: USER.isSuperuser
 } %}
