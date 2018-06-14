@@ -79,7 +79,7 @@ class Controller extends Base
             'commsOfficers' => $commsOfficers,
             'isConfigurable' => $isConfigurable,
             'policies' => $policies,
-            'topics' => $this->topicMapper->findAll()
+            'topics' => $this->topicMapper->findAll(['order' => ['sequence' => 'asc']])
         ])->setTitle('Comms Policies'));
     }
 
