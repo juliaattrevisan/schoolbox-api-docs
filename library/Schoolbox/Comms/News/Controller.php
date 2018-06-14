@@ -278,4 +278,18 @@ class Controller extends Base
 
         return false;
     }
+
+
+    /**
+     * Get a list of available news topics (tags) that can be assigned to an article
+     */
+    public function getTags()
+    {
+        $allTags = $this->topicMapper->findAll();
+
+        $this->getResponse()->content->set($this->buildJsonOutput([
+            ['name' => 'cat', 'id' => 1],
+            ['name' => 'dog', 'id' => 2],
+        ]));
+    }
 }

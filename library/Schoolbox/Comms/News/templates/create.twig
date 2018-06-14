@@ -1,6 +1,8 @@
 <script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
 <script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
 <script type="text/javascript" src="/javascript/shared/comms/draft.js"></script>
+<script src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+<script src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
 
 <script>
     $(function () {
@@ -19,6 +21,16 @@
         $('#createForm').draft({
             inputs: ['title', 'publishAt', 'expiresAt'],
             textareas: ['body', 'blurb']
+        });
+
+
+        $('[data-tags]').selectizeSelector({
+            ajax: {
+                url:      '{{ routeLookup('commsNews.getTags') }}',
+                type:     'GET',
+                dataType: 'json'
+            },
+            multiple: true
         });
     });
 </script>
@@ -97,6 +109,13 @@
                     </div>
                 </fieldset>
 
+                <fieldset>
+                    <div class="small-12 columns">
+                        <label>Tags</label>
+                        <p class="meta">You can assign multiple tags to to this article.</p>
+                        <input data-tags name="tags[]" multiple placeholder="Assign Tags">
+                    </div>
+                </fieldset>
 
                 <fieldset class="content">
                     <legend>Availability</legend>
