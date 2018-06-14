@@ -87,10 +87,10 @@ class Bridge
      * Get a single curriculum and all of its contents in a single request.
      *
      * @param int $curriculumId
-     * @return array
+     * @return Curriculum
      * @throws \Throwable
      */
-    public function getCurriculum(int $curriculumId): array
+    public function getCurriculum(int $curriculumId): Curriculum
     {
         // Get all units, and their assessments/attachments in one shot
         $requests = [
@@ -114,27 +114,48 @@ class Bridge
         $result = $this->redisCache->get('curriculumUnitData.' . $curriculumId, [$requests]);
         foreach ($units as $i => $unit) {
             $unitId = $unit->getId();
-            $unit['assessments'] = $result['assessments:' . $unitId] ?? [];
+
+            // Load assessments and attachments into objects
+            $assessments = $result['assessments:' . $unitId] ?? [];
+            $unit->setAssessments(
+                array_map(
+                    function ($assessment) {
+                        // No decodeMultipleArray method exists :|
+                        return $this->decoder->decodeArray($assessment, Assessment::class);
+                    },
+                    $assessments
+                )
+            );
+
             // Attachments is badly bugged, but can be worked around
-            $unit['attachments'] = isset($result['attachments:' . $unitId][0]) ? $result['attachments:' . $unitId] : [];
+            $attachments = isset($result['attachments:' . $unitId][0]) ? $result['attachments:' . $unitId] : [];
+            $unit->setAttachments(
+                array_map(
+                    function ($attachment) {
+                        return $this->decoder->decodeArray($attachment, Attachment::class);
+                    },
+                    $attachments
+                )
+            );
 
-            // Assessments can now be transformed into objects!
-            $assessmentJson = json_encode($unit['assessments']);
-            $assessmentOutput = $this->decoder->decodeMultiple($assessmentJson, Assessment::class);
-
-            $attachmentJson = json_encode($unit['attachments']);
-            $attachmentOutput = $this->decoder->decodeMultiple($attachmentJson, Attachment::class);
+//            // Assessments can now be transformed into objects!
+//            $assessmentJson = json_encode($unit['assessments']);
+//            $assessmentOutput = $this->decoder->decodeMultiple($assessmentJson, Assessment::class);
+//
+//            $attachmentJson = json_encode($unit['attachments']);
+//            $attachmentOutput = $this->decoder->decodeMultiple($attachmentJson, Attachment::class);
 
 
             // Parse assessment standards into something legible
-            foreach ($unit['assessments'] as $j => $assessment) {
-                if ($assessment['standards']) {
-                    $unit['assessments'][$j]['standards'] = array_map(
-                        function ($value) { return $this->parseStandard($value); },
-                        $assessment['standards']
-                    );
-                }
-            }
+            // TODO move into standard object itself
+//            foreach ($unit['assessments'] as $j => $assessment) {
+//                if ($assessment['standards']) {
+//                    $unit['assessments'][$j]['standards'] = array_map(
+//                        function ($value) { return $this->parseStandard($value); },
+//                        $assessment['standards']
+//                    );
+//                }
+//            }
 
             $units[$i] = $unit;
         }
@@ -144,12 +165,12 @@ class Bridge
         // structure.
         usort(
             $units,
-            function ($a, $b) {
-                return strnatcasecmp($a['time_frame'], $b['time_frame']);
+            function (Unit $a, Unit $b) {
+                return strnatcasecmp($a->getTimeFrame(), $b->getTimeFrame());
             }
         );
 
-        $curriculum['units'] = $units;
+        $curriculum->setUnits($units);
         return $curriculum;
     }
 
