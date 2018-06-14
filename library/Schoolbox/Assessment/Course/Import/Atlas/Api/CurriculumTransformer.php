@@ -10,6 +10,7 @@ namespace Schoolbox\Assessment\Course\Import\Atlas\Api;
 
 use Alaress_Date_Format;
 use Karriere\JsonDecoder\Bindings\AliasBinding;
+use Karriere\JsonDecoder\Bindings\ArrayBinding;
 use Karriere\JsonDecoder\Bindings\CallbackBinding;
 use Karriere\JsonDecoder\ClassBindings;
 use Karriere\JsonDecoder\Transformer;
@@ -30,6 +31,7 @@ class CurriculumTransformer implements Transformer
     {
         /** @noinspection PhpUnhandledExceptionInspection */
         $classBindings->register(new AliasBinding('mapType', 'map_type'));
+
         /** @noinspection PhpUnhandledExceptionInspection */
         $classBindings->register(
             new CallbackBinding(
@@ -39,6 +41,9 @@ class CurriculumTransformer implements Transformer
                 }
             )
         );
+
+        /** @noinspection PhpUnhandledExceptionInspection */
+        $classBindings->register(new ArrayBinding('units', 'units', Unit::class));
     }
 
     /**
