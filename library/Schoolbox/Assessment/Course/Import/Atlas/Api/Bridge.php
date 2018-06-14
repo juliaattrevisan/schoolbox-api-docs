@@ -96,25 +96,35 @@ class Bridge
         $requests = [
             'curriculum' => ['curriculummap/' . $curriculumId],
         ];
+        $result = $this->redisCache->get('curriculumUnits.' . $curriculumId, [$requests]);
 
-        $result     = $this->redisCache->get('curriculumUnits.' . $curriculumId, [$requests]);
-        $curriculum = array_pop($result['curriculum']);
-        $units      = $curriculum['units'];
+        /** @var Curriculum $curriculum */
+        $curriculum = $this->decoder->decodeArray(array_pop($result['curriculum']), Curriculum::class);
+        $units      = $curriculum->getUnits();
 
         // For each unit: get its assessments and attachments
         $requests = [];
         foreach ($units as $unit) {
-            $requests['assessments:' . $unit['id']] = ['assessment/', ['query' => ['unit_id' => $unit['id']]]];
-            $requests['attachments:' . $unit['id']] = ['attachment/', ['query' => ['unit_id' => $unit['id']]]];
+            $unitId = $unit->getId();
+            $requests['assessments:' . $unitId] = ['assessment/', ['query' => ['unit_id' => $unitId]]];
+            $requests['attachments:' . $unitId] = ['attachment/', ['query' => ['unit_id' => $unitId]]];
         }
 
         // Put results into units
         $result = $this->redisCache->get('curriculumUnitData.' . $curriculumId, [$requests]);
         foreach ($units as $i => $unit) {
-            $unitId              = $unit['id'];
+            $unitId = $unit->getId();
             $unit['assessments'] = $result['assessments:' . $unitId] ?? [];
             // Attachments is badly bugged, but can be worked around
             $unit['attachments'] = isset($result['attachments:' . $unitId][0]) ? $result['attachments:' . $unitId] : [];
+
+            // Assessments can now be transformed into objects!
+            $assessmentJson = json_encode($unit['assessments']);
+            $assessmentOutput = $this->decoder->decodeMultiple($assessmentJson, Assessment::class);
+
+            $attachmentJson = json_encode($unit['attachments']);
+            $attachmentOutput = $this->decoder->decodeMultiple($attachmentJson, Attachment::class);
+
 
             // Parse assessment standards into something legible
             foreach ($unit['assessments'] as $j => $assessment) {
