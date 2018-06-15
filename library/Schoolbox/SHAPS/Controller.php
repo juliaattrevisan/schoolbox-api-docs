@@ -244,9 +244,9 @@ class Controller extends Base
     public function getUsersInCourses() {
         $enrolments = $this->getCoursesFromHelp();
 
-        for($i = 0; $i < count($enrolments); $i++) {
-            for($n = 0; $n < count($enrolments[$i]['participants']); $n++) {
-                if (! in_array($enrolments[$i]['participants'][$n]['id'], $this->getProvisionedUserIds())) {
+        foreach($enrolments as $i => $enrolment) {
+            foreach($enrolment['participants'] as $n => $participant) {
+                if (! in_array($participant['id'], $this->getProvisionedUserIds())) {
                     // A convoluted way of saying this user couldn't be matched with anyone on our instance.
                     $enrolments[$i]['participants'][$n]['id'] = null;
                 }
