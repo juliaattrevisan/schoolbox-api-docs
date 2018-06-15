@@ -31,10 +31,7 @@ class Module extends BaseModule
     {
         $perms = new Rule\All(
             new Rule\IsLoggedIn(),
-            new Rule\Any(
-                new Rule\IsSuperuser(),
-                new Rule\HasRole(Role::STAFF)
-            )
+            new Rule\IsSuperuser()
         );
 
         $this->register('GET', '/roster', 'getRoster', $perms);
