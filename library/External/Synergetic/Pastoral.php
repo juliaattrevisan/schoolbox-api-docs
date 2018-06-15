@@ -520,7 +520,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
         // Retrieve all access records stored in Schoolbox
 
-        $access = $this->getPastoralAccessMapper()->findByColumn('pastoral_id', $pastoral->getId());
+        $access = $this->getPastoralAccessMapper()->findByColumn('pastoral_id', $pastoral->getId(), ['cache' => false]);
 
         $order = 1;
 
@@ -550,7 +550,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
                     $this->connector->executeQuery($query, [
                         'externalId' => $pastoral->getExternalId(),
-                        'order' => $order++,
+                        'order' => $order,
                         'email' => $user->getEmail() ?: '',
                         'userId' => $user->getExternalId(),
                     ]);
