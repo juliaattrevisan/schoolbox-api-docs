@@ -81,7 +81,6 @@
             {% set formAction = routeLookupIfAuthorized('commsNews.postCreate') %}
         {% endif %}
 
-        {% if formAction %}
         <form id="createForm" action="{{ formAction }}" method="post">
             <section>
                 <fieldset class="content">
@@ -139,9 +138,6 @@
 
             <input type="submit" value="{{ action|capitalize }} {{ locale.news }}"/>
         </form>
-        {% else %}
-            Not authorised to POST
-        {% endif %}
     </div>
 </div>
 
