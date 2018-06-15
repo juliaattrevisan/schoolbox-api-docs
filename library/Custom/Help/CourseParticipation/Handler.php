@@ -119,7 +119,7 @@ class Handler
                 ];
             }
 
-            for ($i = 0; $i < count($users); $i++) {
+            foreach ($users as $i => $user) {
                 if ($fuzzy) {
                     // if we're doing a fuzzy lookup, search by `year`
                     /** @var string[][] $map */
