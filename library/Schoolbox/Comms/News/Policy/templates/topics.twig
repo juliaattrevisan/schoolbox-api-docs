@@ -26,7 +26,7 @@
                 {% set topicRoute = routeLookupIfAuthorized('adminLists.getIndex', {table: 'news-topic'}) %}
 
                 {% if topicRoute %}
-                <p><a href="{{ topicRoute }}" title="Define News Topics">Define News Topics</a> so that content creators can categorise their articles.</p>
+                <p><a href="{{ topicRoute }}" title="Define {{ locale.news.proper }} Topics">Define {{ locale.news.proper }} Topics</a> so that content creators can categorise their articles.</p>
                 {% endif %}
             </div>
         {% endif %}
