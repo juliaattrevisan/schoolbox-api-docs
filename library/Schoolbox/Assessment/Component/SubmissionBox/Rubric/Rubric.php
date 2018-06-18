@@ -135,9 +135,6 @@ class Rubric extends Core\Rubric
     protected function createORMCriterion(Core\Criteria\Criterion $criterion, $groupName = '')
     {
         if (!$this->cCache->contains($criterion)) {
-
-            // TODO Create a criterion, with its group if required; don't yet persist to db
-
             try {
                 $model    = CriterionMapper::getInstance()->findById($criterion->getId());
                 $parentId = $model->getGroup()->getParentId();
@@ -147,9 +144,12 @@ class Rubric extends Core\Rubric
                 $parentId = $this->box->getCategory()->getId();
             }
 
-            $model->setName($criterion->getName())
+            $model->setName($criterion->getName());
+            $model->getGroup()
+                  ->setName($groupName)
                   ->setParentType(Group::PARENT_TYPE_CATEGORY)
-                  ->setParentId($parentId);
+                  ->setParentId($parentId)
+            ;
 
             $this->cCache->attach($criterion, $model);
         }
