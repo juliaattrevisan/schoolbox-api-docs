@@ -8,14 +8,21 @@
  #}
 {% macro render(news) %}
     {% if news.id %}
-        {% set newStyle = 'style="display:none"' %}
-        {% set draftStyle = 'style="display:none"' %}
-    {% elseif news.draftedAt.local == '' %}
-        {% set newStyle = '' %}
-        {% set draftStyle = 'style="display:none"' %}
+        {% if news.draftedAt.local == '' %}
+            {% set newStyle = 'style="display:none"' %}
+            {% set draftStyle = 'style="display:none"' %}
+        {% else %}
+            {% set newStyle = 'style="display:none"' %}
+            {% set draftStyle = '' %}
+        {% endif %}
     {% else %}
-        {% set newStyle = 'style="display:none"' %}
-        {% set draftStyle = '' %}
+        {% if news.draftedAt.local == '' %}
+            {% set newStyle = '' %}
+            {% set draftStyle = 'style="display:none"' %}
+        {% else %}
+            {% set newStyle = 'style="display:none"' %}
+            {% set draftStyle = '' %}
+        {% endif %}
     {% endif %}
 
     {# Referenced by draft.js #}
