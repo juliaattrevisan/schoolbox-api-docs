@@ -4,7 +4,7 @@
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
-namespace Schoolbox\Service;
+namespace Schoolbox\Admin\Service;
 
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;

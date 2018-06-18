@@ -7,7 +7,7 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Service;
+namespace Schoolbox\Admin\Service;
 
 use ReflectionClass;
 use Schoolbox\Permission\Access;
