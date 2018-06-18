@@ -142,6 +142,7 @@ class Rubric extends Core\Rubric
             } catch (Mapper\Exception $e) {
                 $model    = CriterionMapper::getInstance()->createModel();
                 $parentId = $this->box->getCategory()->getId();
+                $model->setGroup(GroupMapper::getInstance()->createModel());
             }
 
             $model->setName($criterion->getName());
