@@ -11,6 +11,7 @@
         <div class="small-12 column">
             <h1>{{ news.title }}</h1>
 
+            {% if news.tags|length %}
             <ul class="meta">
                 <li class="icon-news">Related Topics:
 
@@ -20,6 +21,7 @@
                     {% endfor %}
                 </li>
             </ul>
+            {% endif %}
         </div>
     </div>
     <nav>
