@@ -146,6 +146,10 @@
                 formContents.push({name: key, value: CKEDITOR.instances[key].getData()});
             }
 
+            /* Send draft flag
+             */
+            formContents.push({name: 'draft', value: true});
+
             /* Disable inputs
              */
             config.element.find('input[type=submit]').prop('disabled', true);

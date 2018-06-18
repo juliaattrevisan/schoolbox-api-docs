@@ -268,6 +268,15 @@ class Controller extends Base
             $news->setFeatureImage((new CollectorFactory())->build($data['attachment'] ?: [])->getFirst());
         }
 
+        /* Identify drafts
+         */
+        if ('' != $data['draft']) {
+            $news->setDraftedAt(\Alaress_Date_Format::now());
+        }
+        else {
+            $news->setDraftedAt(new \Alaress_Date_NullDate());
+        }
+
         if ((new ValidArticle())->isSatisfiedBy($news)) {
             $this->newsMapper->save($news);
             return true;

@@ -58,6 +58,11 @@ class Model
     private $featureImage;
 
     /**
+     * @var \Alaress_Date_Format
+     */
+    private $draftedAt;
+
+    /**
      * The article becomes available to the audience at this time
      *
      * @var \Alaress_Date_Format
@@ -288,4 +293,26 @@ class Model
         $this->tags = $tags;
         return $this;
     }
+
+
+    /**
+     * @return \Alaress_Date_Format
+     */
+    public function getDraftedAt(): ?\Alaress_Date_Format
+    {
+        return $this->draftedAt;
+    }
+
+
+    /**
+     * @param \Alaress_Date_Format $draftedAt
+     * @return $this
+     */
+    public function setDraftedAt(\Alaress_Date_Format $draftedAt): self
+    {
+        $this->draftedAt = $draftedAt;
+        return $this;
+    }
+
+
 }
