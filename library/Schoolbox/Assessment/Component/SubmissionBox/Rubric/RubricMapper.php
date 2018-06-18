@@ -1136,7 +1136,7 @@ class RubricMapper
                 } else {
                     $dstCriterion = clone $srcDescriptor->getCriterion();
                     $dstCriterion->setId(null);
-                    $dstCriterion->setParentId($dstBox->getCategory()->getId());
+                    $dstCriterion->getGroup()->setParentId($dstBox->getCategory()->getId());
                 }
                 $dstCriteria->setOffset($srcCriterionId, $dstCriterion);
             }

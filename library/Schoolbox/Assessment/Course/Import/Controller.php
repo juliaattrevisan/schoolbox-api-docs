@@ -1113,7 +1113,7 @@ class Controller extends Base\Base
 
         //Save copy of criteria with class page as parent
         foreach ($allCriteria as $criteria) {
-            $criteria->setParentId($destinationId);
+            $criteria->getGroup()->setParentId($destinationId);
         }
 
         $criteriaMapper->create($allCriteria);
