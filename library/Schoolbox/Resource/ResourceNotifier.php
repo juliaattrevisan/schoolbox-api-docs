@@ -105,24 +105,6 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 
 
     /**
-     * This version is special for CMS: in addition to the roletypes, also notify the system for logging
-     *
-     * @param string $label
-     * @return array
-     */
-    public function retrieveCallbacks($label)
-    {
-        $callbacks = parent::retrieveCallbacks($label);
-        $method    = 'notifySystem' . ucfirst($label);
-        if (method_exists($this, $method)) {
-            $callbacks[] = [$this, $method];
-        }
-
-        return $callbacks;
-    }
-
-
-    /**
      * Notify the system that a CMS event occurred (will be sent to cmsLog table)
      *
      * @param string                   $action
