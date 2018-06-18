@@ -94,7 +94,7 @@ class ArticleNotifier extends AbstractModuleNotifier
      * @param Article $article
      * @return Envelope
      */
-    public function notifyDeleted(Article $article): Envelope
+    public function notifySystemDeleted(Article $article): Envelope
     {
         $envelope  = new Envelope();
         $bob       = new Builder(false);

@@ -224,11 +224,11 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface
 
         $callbacks = array();
 
-        // notifyDeleted: always associated if it exists,
+        // Always associate notifySystem{$label} if it exists,
         // regardless of source collection
-        $deletedNotifier = 'notifyDeleted';
-        if (isset($availableMethods[$deletedNotifier])) {
-            $callbacks[] = [$this, $deletedNotifier];
+        $systemMethod = sprintf("notifySystem%s", ucfirst(strtolower($label)));
+        if (isset($availableMethods[$systemMethod])) {
+            $callbacks[] = [$this, $systemMethod];
         }
 
         // All other notifiers: notify{$roleType}{$key}
