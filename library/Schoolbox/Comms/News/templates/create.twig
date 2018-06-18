@@ -42,6 +42,15 @@
     <div class="small-12 island">
         <h1>{{ action|capitalize }} {{ locale.news.proper }}</h1>
 
+        {# Not currently a draft; provide a hidden indicator so the autosave can make it appear
+         # while you're changing content and thus making this article drafted
+         #}
+        {% if news.draftedAt.local == '' %}
+            {% set draftStyle = 'style="display:none"' %}
+        {% endif %}
+
+        <span id="status-draft" class="label highlight" {{ draftStyle|purify }}>Draft</span>
+
         <ul class="meta">
             {% if news.publishAt %}
             <li class="icon-calendar">Publishes to audience on {{ news.publishAt.local }}</li>

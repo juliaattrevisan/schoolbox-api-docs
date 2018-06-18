@@ -54,7 +54,11 @@
 
                 /* Textareas to check
                  */
-                textareas: []
+                textareas: [],
+
+                /* Draft Lozenge
+                 */
+                draftIndicator: $('#status-draft')
             };
 
             return $.extend(defaults, options);
@@ -185,6 +189,10 @@
                         text: 'Draft Saved',
                         css: 'success'
                     });
+
+                    /* Show lozenge
+                     */
+                    config.draftIndicator.show();
                 },
                 error: function (response) {
                     var temp = $.parseJSON(response.responseText);
