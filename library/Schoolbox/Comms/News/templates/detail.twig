@@ -1,4 +1,7 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
+{% import '@commsNews/layout.twig' as layout %}
+
+
 
 {# TODO: How to do breadcrumbs now? #}
 {{ bread.crumbs(
@@ -52,23 +55,9 @@
         <section>
             <div class="row">
                 {% if news.featureImage.hash %}
-                    <div class="small-12 medium-3 island">
-                        <section class="content">
-                            <img src="/storage/image.php?hash={{ news.featureImage.hash }}&size=constrain200" />
-                        </section>
-                    </div>
-
-                    <div class="small-12 medium-9 island">
-                        <section class="content">
-                            {{ news.body|purify }}
-                        </section>
-                    </div>
+                    {{ layout.standard(news) }}
                 {% else %}
-                    <div class="small-12 island">
-                        <section class="content">
-                            {{ news.body|purify }}
-                        </section>
-                    </div>
+                    {{ layout.textonly(news) }}
                 {% endif %}
             </div>
         </section>
