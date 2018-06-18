@@ -58,6 +58,7 @@
 
                 /* Draft Lozenge
                  */
+                newIndicator: $('#status-new'),
                 draftIndicator: $('#status-draft')
             };
 
@@ -192,6 +193,7 @@
 
                     /* Show lozenge
                      */
+                    config.newIndicator.hide();
                     config.draftIndicator.show();
                 },
                 error: function (response) {

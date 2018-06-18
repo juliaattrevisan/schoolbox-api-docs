@@ -23,7 +23,6 @@
             textareas: ['body', 'blurb']
         });
 
-
         $('[data-tags]').selectizeSelector({
             ajax: {
                 url:      '{{ routeLookup('commsNews.getTags') }}',
@@ -40,16 +39,24 @@
 </script>
 <div class="row">
     <div class="small-12 island">
-        <h1>{{ action|capitalize }} {{ locale.news.proper }}</h1>
-
         {# Not currently a draft; provide a hidden indicator so the autosave can make it appear
          # while you're changing content and thus making this article drafted
          #}
-        {% if news.draftedAt.local == '' %}
+        {% if news.id %}
+            {% set newStyle = 'style="display:none"' %}
             {% set draftStyle = 'style="display:none"' %}
+        {% elseif news.draftedAt.local == '' %}
+            {% set newStyle = '' %}
+            {% set draftStyle = 'style="display:none"' %}
+        {% else %}
+            {% set newStyle = 'style="display:none"' %}
+            {% set draftStyle = '' %}
         {% endif %}
 
-        <span id="status-draft" class="label highlight" {{ draftStyle|purify }}>Draft</span>
+        <h1>{{ action|capitalize }} {{ locale.news.proper }}
+            <span id="status-new" class="label highlight" {{ newStyle|purify }}>New</span>
+            <span id="status-draft" class="label highlight" {{ draftStyle|purify }}>Draft</span>
+        </h1>
 
         <ul class="meta">
             {% if news.publishAt %}
