@@ -170,7 +170,6 @@ class Handler
      */
     public function getUsersBySchool(string $schoolCode, bool $fuzzy = false) : array
     {
-        // TODO this probably needs to search for all staff types (including administration)
         $roleId = $this->getRoleMapper()->findOneByColumn("name", self::PARTICIPANT_ROLE_NAME)->getId();
 
         // show the list of users for this school
