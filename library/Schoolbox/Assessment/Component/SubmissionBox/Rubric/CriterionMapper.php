@@ -144,7 +144,7 @@ class CriterionMapper extends Schoolbox\Mapper {
     {
         // remove any newlines and consecutive/leading/trailing spaces from input
         $object->setName(preg_replace('`\s+`', ' ', trim($object->getName())));
-        $object->setGrouping(preg_replace('`\s+`', ' ', trim($object->getGroup()->getName())));
+        $object->getGroup()->setName(preg_replace('`\s+`', ' ', trim($object->getGroup()->getName())));
 
         try {
             // attempt lookup
