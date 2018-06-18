@@ -64,7 +64,7 @@ class Notifier extends ResourceNotifier
      * @param array  $diff
      * @return Envelope
      */
-    public function notifyDeletedInternal($roletype, $file, $effector, $diff = null)
+    public function notifyDeleted($roletype, $file, $effector, $diff = null)
     {
         try {
             $category = $this->folderMapper->findById($file->getFolder()->getId());

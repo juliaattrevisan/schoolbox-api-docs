@@ -99,7 +99,7 @@ class Notifier extends ResourceNotifier
      * @param array  $diff
      * @return Envelope
      */
-    public function notifyDeletedInternal($roletype, $resource, $effector, $diff = null)
+    public function notifyDeleted($roletype, $resource, $effector, $diff = null)
     {
         return $this->notifyAffected(self::TRIGGER_DELETED, $roletype, $resource, $effector, $diff);
     }
