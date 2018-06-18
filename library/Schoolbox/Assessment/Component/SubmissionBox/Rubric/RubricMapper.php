@@ -593,22 +593,7 @@ class RubricMapper
 
                 $name = $crit['name'];
 
-                try {
-                    // if the crit exists, just use that
-                    $model = CriterionMapper::getInstance()->findOneForFolderByKey($folderLookup, $name, $group);
-
-                } catch (\Schoolbox\Mapper\Exception $e) {
-
-                    // if the crit doesn't exist, create and save
-                    $model = CriterionMapper::getInstance()
-                                            ->createModel()
-                                            ->setName($name)
-                                            ->setGrouping($group)
-                                            ->setParentType(Group::PARENT_TYPE_CATEGORY)
-                                            ->setParentId($folderId);
-
-                    CriterionMapper::getInstance()->save($model);
-                }
+                $model = CriterionMapper::getInstance()->findOrCreateOneForFolderByKey($folderLookup, $name, $group);
 
                 // yank that ID
                 $criteria[$group][$name]['id'] = $model->getId();

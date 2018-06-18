@@ -290,14 +290,7 @@ class Controller extends BaseController
      */
     protected function saveNewCriterion($folderId, $grouping, $name)
     {
-        $model = CriterionMapper::getInstance()
-            ->createModel()
-            ->setParentType(Group::PARENT_TYPE_CATEGORY)
-            ->setParentId($folderId)
-            ->setGrouping($grouping)
-            ->setName($name);
-
-        CriterionMapper::getInstance()->save($model);
+        $model = CriterionMapper::getInstance()->findOrCreateOneForFolderByKey($folderId, $name, $grouping);
 
         return [
             'name'        => $model->getName(),
