@@ -133,7 +133,7 @@ class Controller extends Base
             $this->buildHtmlOutput(
                 '@shaps/provisioning/provisioned.twig', [
                     'allUsers' => $this->findProvisionedUsers(),
-                    'provisionedUserIds' => $this->findProvisionedUsersIds()
+                    'provisionedUsers' => $this->findProvisionedUsers()
             ])->setTitle('Provisioned Staff - Schoolbox Help Staff Provisioning')
         );
     }
