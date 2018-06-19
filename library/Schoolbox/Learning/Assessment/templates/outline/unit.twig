@@ -37,7 +37,7 @@
                     <li class="separator">Manage</li>
                     {% set courseMarkbookRoute = routeLookupIfAuthorized('courseMarkbook.getRedirect', {courseSpec: unit.specification.course, courseSpecId: unit.specification.course.id, unitSpec: unit.specification, unitSpecId: unit.specification.id, folder: unit.course.folder, folderId: unit.course.folder.id}) %}
                     {% if courseMarkbookRoute %}
-                        <li><a href="{{ courseMarkbookRoute }}" class="icon-curriculum">Course Markbook</a></li>
+                        <li><a href="{{ courseMarkbookRoute }}" class="icon-curriculum">Course Unit Markbook</a></li>
                     {% else %}
                         <li><a href="{{ routeLookup('learningMarkbook.getMarkbookForClass', {folderId: unit.course.folder.id}) }}" class="icon-curriculum">Markbook</a></li>
                     {% endif %}
