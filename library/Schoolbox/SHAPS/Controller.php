@@ -45,7 +45,7 @@ class Controller extends Base
         /* This returns an associative array of (id, email)
          * e.g. [246] => test@alaress.com.au
          */
-        $users = (new HelpRequest($this->getConfigLoader()))->execute('users');
+        $users = (new HelpRequest($this->getConfigLoader(), $this->userMapper))->execute('users');
 
         /* findByColumnList() only returns users that exist in the current installation
          * If it receives an id from help, but this id isn't in the current installation,
@@ -101,11 +101,13 @@ class Controller extends Base
      */
     public function getAll()
     {
+        $provisionedUsers = (new HelpRequest($this->getConfigLoader(), $this->userMapper))->findProvisionedUsers();
+
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@shaps/provisioning/index.twig', [
                 'allUsers' => $this->getAllStaff(),
-                'provisionedUsers' => $this->findProvisionedUsers()
+                'provisionedUsers' => $provisionedUsers
             ])->setTitle('Schoolbox Help Staff Provisioning')
         );
     }
@@ -122,11 +124,13 @@ class Controller extends Base
      */
     public function getProvisioned()
     {
+        $provisionedUsers = (new HelpRequest($this->getConfigLoader(), $this->userMapper))->findProvisionedUsers();
+
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@shaps/provisioning/provisioned.twig', [
                     'allUsers' => $this->findProvisionedUsers(),
-                    'provisionedUsers' => $this->findProvisionedUsers()
+                    'provisionedUsers' => $provisionedUsers
             ])->setTitle('Provisioned Staff - Schoolbox Help Staff Provisioning')
         );
     }
@@ -143,10 +147,12 @@ class Controller extends Base
      */
     public function getUnprovisioned()
     {
+        $provisionedUsers = (new HelpRequest($this->getConfigLoader(), $this->userMapper))->findProvisionedUsers();
+
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@shaps/provisioning/unprovisioned.twig', [
-                    'allUsers' => $this->getAllStaff()->diff($this->findProvisionedUsers())
+                    'allUsers' => $this->getAllStaff()->diff($provisionedUsers)
             ])->setTitle('Unprovisioned Staff - Schoolbox Help Staff Provisioning')
         );
     }
@@ -185,7 +191,8 @@ class Controller extends Base
 
         /* Check if this user's id was in the provisionedUsers index - don't need to use in_array to test
          */
-        $exists = $this->findProvisionedUsers()->offsetGet($user->getId()) !== null;
+        $provisionedUsers = (new HelpRequest($this->getConfigLoader(), $this->userMapper))->findProvisionedUsers();
+        $exists = $provisionedUsers->offsetGet($user->getId()) !== null;
 
         $userJSON = [
             'name' => $user->getFullName(),
@@ -206,9 +213,9 @@ class Controller extends Base
      * @throws \RuntimeException
      */
     public function getUsersInCourses() {
-        $enrolments = (new HelpRequest($this->getConfigLoader()))->execute('courses');
+        $enrolments = (new HelpRequest($this->getConfigLoader(), $this->userMapper))->execute('courses');
 
-        $provisionedUsers = $this->findProvisionedUsers();
+        $provisionedUsers = (new HelpRequest($this->getConfigLoader(), $this->userMapper))->findProvisionedUsers();
 
         foreach($enrolments as $i => $enrolment) {
 

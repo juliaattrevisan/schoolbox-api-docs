@@ -14,7 +14,7 @@ namespace Schoolbox\SHAPS;
 use GuzzleHttp\Client as GuzzleClient;
 use Schoolbox\IConfigLoader;
 use Schoolbox\SHAPS\Auth;
-
+use Schoolbox\UserMapper;
 
 class HelpRequest
 {
@@ -24,14 +24,20 @@ class HelpRequest
      */
     private $configLoader;
 
+    /**
+     * @var UserMapper
+     */
+    private $userMapper;
 
     /**
      * HelpRequest constructor.
      * @param IConfigLoader $configLoader
+     * @param UserMapper    $userMapper
      */
-    public function __construct(IConfigLoader $configLoader)
+    public function __construct(IConfigLoader $configLoader, UserMapper $userMapper)
     {
         $this->configLoader = $configLoader;
+        $this->userMapper = $userMapper;
     }
 
 
@@ -76,4 +82,37 @@ class HelpRequest
          */
         return json_decode($response->getBody()->getContents(), true);
     }
+
+
+    /**
+     * Helper method to get a list of user objects from the raw JSON Help API response.
+     *
+     * This is a list of hydrated users who have an equivalent representation in Help.
+     *
+     * @return \Schoolbox\GenericCollection
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
+     */
+    public function findProvisionedUsers(): \Schoolbox\GenericCollection
+    {
+        /* This returns an associative array of (id, email)
+         * e.g. [246] => test@alaress.com.au
+         */
+        $users = $this->execute('users');
+
+        /* findByColumnList() only returns users that exist in the current installation
+         * If it receives an id from help, but this id isn't in the current installation,
+         * the id is simply ignored
+         *
+         * Order by surname and firstname, then index it by the user id
+         */
+        return $this->userMapper->findByColumn('id', array_keys($users), [
+            'order' => [
+                'lastname' => 'asc',
+                'firstname' => 'asc'
+            ]
+        ])->indexBy('id');
+    }
+
 }
