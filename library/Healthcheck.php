@@ -383,19 +383,20 @@ class Healthcheck
     public function edumateTest(): void
     {
         $db2inst1Tables = [
-            'schoolbox_classes',
-            'schoolbox_parents',
-            'schoolbox_report_periods',
-            'schoolbox_studentclass',
-            'schoolbox_students',
-            'schoolbox_teacherclass',
-            'schoolbox_parent_student',
-            'schoolbox_staff',
-            'schoolbox_timetable',
-            'schoolbox_timetable_definition'
+            'SCHOOLBOX_CLASSES',
+            'SCHOOLBOX_PARENTS',
+            'SCHOOLBOX_REPORT_PERIODS',
+            'SCHOOLBOX_STUDENTCLASS',
+            'SCHOOLBOX_STUDENTS',
+            'SCHOOLBOX_TEACHERCLASS',
+            'SCHOOLBOX_PARENT_STUDENT',
+            'SCHOOLBOX_STAFF',
+            'SCHOOLBOX_TIMETABLE',
+            'SCHOOLBOX_TIMETABLE_DAYS',
+            'SCHOOLBOX_TIMETABLE_DEFINITION'
         ];
 
-        $this->selectTest($db2inst1Tables, null, 'db2inst1', "SELECT * FROM :object FETCH FIRST 1 ROWS ONLY");
+        $this->selectTest($db2inst1Tables, null, 'DB2INST1', "SELECT * FROM :object FETCH FIRST 1 ROWS ONLY");
     }
 
     /**

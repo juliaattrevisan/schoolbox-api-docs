@@ -19,8 +19,8 @@ class External_Edumate_Class extends External_Edumate_Connection implements Exte
     public function getStudents($classCode) {
 
         // fully qualified table names
-        $studentClass = 'db2inst1.schoolbox_studentclass';
-        $students = 'db2inst1.schoolbox_students';
+        $studentClass = 'DB2INST1.SCHOOLBOX_STUDENTCLASS';
+        $students = 'DB2INST1.SCHOOLBOX_STUDENTS';
 
 
         // Setup handling multiple codes
@@ -90,9 +90,9 @@ class External_Edumate_Class extends External_Edumate_Connection implements Exte
 
         // prepare
         $stmt = $this->getConnection()->prepareQuery("
-            SELECT staff_number AS StaffID
-                FROM db2inst1.schoolbox_teacherclass
-                WHERE class_code IN (".implode(',',$codes).")
+            SELECT STAFF_NUMBER AS StaffID
+                FROM DB2INST1.SCHOOLBOX_TEACHERCLASS
+                WHERE CLASS_CODE IN (".implode(',',$codes).")
         ");
 
         // retrieve
