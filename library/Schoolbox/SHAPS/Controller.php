@@ -145,13 +145,10 @@ class Controller extends Base
      */
     public function getUnprovisioned()
     {
-        $allStaff = $this->getAllStaff();
-        $unprovisionedStaff = $allStaff->diff($this->findProvisionedUsers());
-
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@shaps/provisioning/unprovisioned.twig', [
-                    'allUsers' => $unprovisionedStaff
+                    'allUsers' => $this->getAllStaff()->diff($this->findProvisionedUsers())
             ])->setTitle('Unprovisioned Staff - Schoolbox Help Staff Provisioning')
         );
     }
