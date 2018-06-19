@@ -87,7 +87,8 @@ class Module extends BaseModule
     {
         /** @var Container $injector */
         $injector->params[Controller::class] = [
-            'userMapper' => $this->getMapperFactory()->getLazy(UserMapper::class)
+            'userMapper' => $this->getMapperFactory()->getLazy(UserMapper::class),
+            'configLoader' => $this->getConfig()
         ];
     }
 

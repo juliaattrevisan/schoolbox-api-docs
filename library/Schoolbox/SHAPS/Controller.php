@@ -9,6 +9,7 @@
 namespace Schoolbox\SHAPS;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\IConfigLoader;
 use Schoolbox\UserMapper;
 use Schoolbox\Collection;
 
@@ -20,13 +21,23 @@ class Controller extends Base
     private $userMapper;
 
     /**
+     * A telephone to help.schoolbox.com.au where so can ask it things
+     *
+     * @var HelpRequest
+     */
+    private $helpRequest;
+
+
+    /**
      * Controller constructor.
      *
-     * @param UserMapper $userMapper
+     * @param IConfigLoader $configLoader
+     * @param UserMapper    $userMapper
      */
-    public function __construct(UserMapper $userMapper)
+    public function __construct(IConfigLoader $configLoader, UserMapper $userMapper)
     {
         $this->userMapper = $userMapper;
+        $this->helpRequest = new HelpRequest($configLoader, $this->userMapper);
     }
 
 
@@ -45,7 +56,7 @@ class Controller extends Base
         /* This returns an associative array of (id, email)
          * e.g. [246] => test@alaress.com.au
          */
-        $users = (new HelpRequest($this->getConfigLoader(), $this->userMapper))->execute('users');
+        $users = $this->helpRequest->execute('users');
 
         /* findByColumnList() only returns users that exist in the current installation
          * If it receives an id from help, but this id isn't in the current installation,
@@ -101,7 +112,7 @@ class Controller extends Base
      */
     public function getAll()
     {
-        $provisionedUsers = (new HelpRequest($this->getConfigLoader(), $this->userMapper))->findProvisionedUsers();
+        $provisionedUsers = $this->helpRequest->findProvisionedUsers();
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
@@ -124,12 +135,12 @@ class Controller extends Base
      */
     public function getProvisioned()
     {
-        $provisionedUsers = (new HelpRequest($this->getConfigLoader(), $this->userMapper))->findProvisionedUsers();
+        $provisionedUsers = $this->helpRequest->findProvisionedUsers();
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@shaps/provisioning/provisioned.twig', [
-                    'allUsers' => $this->findProvisionedUsers(),
+                    'allUsers' => $provisionedUsers,
                     'provisionedUsers' => $provisionedUsers
             ])->setTitle('Provisioned Staff - Schoolbox Help Staff Provisioning')
         );
@@ -147,7 +158,7 @@ class Controller extends Base
      */
     public function getUnprovisioned()
     {
-        $provisionedUsers = (new HelpRequest($this->getConfigLoader(), $this->userMapper))->findProvisionedUsers();
+        $provisionedUsers = $this->helpRequest->findProvisionedUsers();
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
@@ -191,7 +202,7 @@ class Controller extends Base
 
         /* Check if this user's id was in the provisionedUsers index - don't need to use in_array to test
          */
-        $provisionedUsers = (new HelpRequest($this->getConfigLoader(), $this->userMapper))->findProvisionedUsers();
+        $provisionedUsers = $this->helpRequest->findProvisionedUsers();
         $exists = $provisionedUsers->offsetGet($user->getId()) !== null;
 
         $userJSON = [
@@ -213,9 +224,9 @@ class Controller extends Base
      * @throws \RuntimeException
      */
     public function getUsersInCourses() {
-        $enrolments = (new HelpRequest($this->getConfigLoader(), $this->userMapper))->execute('courses');
+        $enrolments = $this->helpRequest->execute('courses');
 
-        $provisionedUsers = (new HelpRequest($this->getConfigLoader(), $this->userMapper))->findProvisionedUsers();
+        $provisionedUsers = $this->helpRequest->findProvisionedUsers();
 
         foreach($enrolments as $i => $enrolment) {
 
