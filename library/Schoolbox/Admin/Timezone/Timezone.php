@@ -9,13 +9,13 @@ namespace Schoolbox\Admin\Timezone;
 class Timezone
 {
     /** @var string $timezone */
-    protected $timezone;
+    private $timezone;
 
     /** @var int $offset */
-    protected $offset;
+    private $offset;
 
     /** @var string $name */
-    protected $name;
+    private $name;
 
 
     /**
@@ -39,7 +39,7 @@ class Timezone
     /**
      * @return string
      */
-    public function getId()
+    public function getId() : string
     {
         return $this->timezone;
     }
@@ -47,7 +47,7 @@ class Timezone
     /**
      * @return string
      */
-    public function getName()
+    public function getName() : string
     {
         return $this->name;
     }
@@ -56,7 +56,7 @@ class Timezone
     /**
      * @return int
      */
-    public function getOffset()
+    public function getOffset() : int
     {
         return $this->offset;
     }
