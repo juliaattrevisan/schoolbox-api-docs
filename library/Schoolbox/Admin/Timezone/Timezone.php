@@ -28,14 +28,12 @@ class Timezone
         $this->timezone = $timezone;
         $this->offset = $offset;
 
-        $offsetInHours = gmdate('H:i', $offset);
-
         /* Some timezones have an underscore in them, which looks a bit dumb
          * Because phplib, have to do it here
          */
         $formattedTimezone = str_replace('_', ' ', $timezone);
 
-        $this->name = "(GMT+{$offsetInHours}) {$formattedTimezone}";
+        $this->name = sprintf('(GMT%s) %s', $offset, $formattedTimezone);
     }
 
     /**

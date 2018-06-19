@@ -18,11 +18,6 @@ class TimezoneFactory
     private static $instance;
 
     /**
-     * The Home of Greenwich Mean Time...you meany
-     */
-    private const DEFAULT_TIMEZONE_LOCATION = 'Europe/London';
-
-    /**
      * @return TimezoneFactory
      */
     public static function getInstance() : TimezoneFactory
@@ -52,15 +47,13 @@ class TimezoneFactory
         );
 
         $options = new Collection();
-        $gmt = new DateTimeZone(self::DEFAULT_TIMEZONE_LOCATION);
-        $gmtTimezone = new \DateTime('now', $gmt);
 
         foreach($zones as $timezone)
         {
             $dateTimeZone = new DateTimeZone($timezone);
-            $offset = $dateTimeZone->getOffset($gmtTimezone);
+            $date = new \DateTime('now', $dateTimeZone);
 
-            $options->add(new Timezone($timezone, $offset));
+            $options->add(new Timezone($timezone, $date->format('P')));
         }
 
         /* Because the GMT offset is now a prefix on the name, this will sort by
