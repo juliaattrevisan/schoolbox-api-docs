@@ -61,7 +61,7 @@ class HelpRequest
         /* Execute request using guzzle
          */
         $response = (new GuzzleClient())->request(
-            "get",
+            'get',
             "{$auth['url']}/api/course-participation/{$auth['schoolCode']}/{$endpoint}", [
                 'query' => [
                     'ts' => $auth['timestamp'],
