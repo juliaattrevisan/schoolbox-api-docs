@@ -48,11 +48,17 @@ class Controller extends Base
         $users = (new HelpRequest($this->getConfigLoader()))->execute('users');
 
         /* findByColumnList() only returns users that exist in the current installation
-         *
          * If it receives an id from help, but this id isn't in the current installation,
          * the id is simply ignored
+         *
+         * Order by surname and firstname, then index it by the user id
          */
-        return $this->userMapper->findByColumn('id', array_keys($users));
+        return $this->userMapper->findByColumn('id', array_keys($users), [
+            'order' => [
+                'lastname' => 'asc',
+                'firstname' => 'asc'
+            ]
+        ])->indexBy('id');
     }
 
 
