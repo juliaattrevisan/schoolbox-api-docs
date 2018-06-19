@@ -51,54 +51,54 @@ class Sync extends Base implements ISync
     {
         $query = '
             SELECT
-                p.USERNAME               AS "student_contact_network_login",
-                p.CARER_NUMBER           AS "student_contact_id",
+                P.USERNAME               AS "student_contact_network_login",
+                P.CARER_NUMBER           AS "student_contact_id",
                 NULL                     AS "student_contact_title",
-                p.FULL_NAME              AS "student_contact_given_name",
-                p.FULL_NAME              AS "student_contact_preferred",
+                P.FULL_NAME              AS "student_contact_given_name",
+                P.FULL_NAME              AS "student_contact_preferred",
                 NULL                     AS "student_contact_surname",
                 NULL                     AS "student_contact_home_email",
-                p.COMBINED_EMAIL_ADDRESS AS "student_contact_default_email",
+                P.COMBINED_EMAIL_ADDRESS AS "student_contact_default_email",
                 NULL                     AS "student_contact_work_email",
-                s.STUDENT_NUMBER         AS "student_id",
-                s.YEAR_LEVEL             AS "student_year_level",
+                S.STUDENT_NUMBER         AS "student_id",
+                S.YEAR_LEVEL             AS "student_year_level",
                 NULL                     AS "student_campus",
-                s.HOUSE                  AS "student_house",
+                S.HOUSE                  AS "student_house",
                 NULL                     AS "student_gender",
-                s.FIRSTNAME              AS "student_preferred",
-                s.SURNAME                AS "student_surname"
-            FROM DB2INST1.SCHOOLBOX_PARENTS AS p
+                S.FIRSTNAME              AS "student_preferred",
+                S.SURNAME                AS "student_surname"
+            FROM DB2INST1.SCHOOLBOX_PARENTS AS P
             INNER JOIN DB2INST1.SCHOOLBOX_PARENT_STUDENT
-                AS ps ON p.CARER_NUMBER = ps.CARER_NUMBER
+                AS PS ON P.CARER_NUMBER = PS.CARER_NUMBER
             INNER JOIN DB2INST1.SCHOOLBOX_STUDENTS
-                AS s ON ps.STUDENT_NUMBER = s.STUDENT_NUMBER
-            WHERE p.CARER_NUMBER IS NOT NULL
+                AS S ON PS.STUDENT_NUMBER = S.STUDENT_NUMBER
+            WHERE P.CARER_NUMBER IS NOT NULL
 
             UNION ALL
 
             SELECT
-                p.SPOUSE_USERNAME        AS "student_contact_network_login",
-                p.SPOUSE_CARER_NUMBER    AS "student_contact_id",
+                P.SPOUSE_USERNAME        AS "student_contact_network_login",
+                P.SPOUSE_CARER_NUMBER    AS "student_contact_id",
                 NULL                     AS "student_contact_title",
-                p.SPOUSE_FULL_NAME       AS "student_contact_given_name",
-                p.SPOUSE_FULL_NAME       AS "student_contact_preferred",
+                P.SPOUSE_FULL_NAME       AS "student_contact_given_name",
+                P.SPOUSE_FULL_NAME       AS "student_contact_preferred",
                 NULL                     AS "student_contact_surname",
                 NULL                     AS "student_contact_home_email",
-                p.SPOUSE_EMAIL           AS "student_contact_default_email",
+                P.SPOUSE_EMAIL           AS "student_contact_default_email",
                 NULL                     AS "student_contact_work_email",
-                s.STUDENT_NUMBER         AS "student_id",
-                s.YEAR_LEVEL             AS "student_year_level",
+                S.STUDENT_NUMBER         AS "student_id",
+                S.YEAR_LEVEL             AS "student_year_level",
                 NULL                     AS "student_campus",
-                s.HOUSE                  AS "student_house",
+                S.HOUSE                  AS "student_house",
                 NULL                     AS "student_gender",
-                s.FIRSTNAME              AS "student_preferred",
-                s.SURNAME                AS "student_surname"
-            FROM DB2INST1.SCHOOLBOX_PARENTS AS p
+                S.FIRSTNAME              AS "student_preferred",
+                S.SURNAME                AS "student_surname"
+            FROM DB2INST1.SCHOOLBOX_PARENTS AS P
             INNER JOIN DB2INST1.SCHOOLBOX_PARENT_STUDENT
-                AS ps ON p.CARER_NUMBER = ps.CARER_NUMBER
+                AS PS ON P.CARER_NUMBER = PS.CARER_NUMBER
             INNER JOIN DB2INST1.SCHOOLBOX_STUDENTS
-                AS s ON ps.STUDENT_NUMBER = s.STUDENT_NUMBER
-            WHERE p.SPOUSE_CARER_NUMBER IS NOT NULL
+                AS S ON PS.STUDENT_NUMBER = S.STUDENT_NUMBER
+            WHERE P.SPOUSE_CARER_NUMBER IS NOT NULL
         ';
 
         return new Iterator\Guardian(

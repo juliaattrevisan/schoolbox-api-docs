@@ -38,19 +38,19 @@ class External_Edumate_Class extends External_Edumate_Connection implements Exte
         // prepare
         $stmt = $this->getConnection()->prepareQuery("
             SELECT 
-                firstname, 
-                surname AS lastname, 
-                $studentClass.student_number AS synergy_id, 
-                year_level AS yearlevel, 
-                house, 
-                '' AS StudentMedicalAlert, 
-                '' AS StudentSpecialNeedsFlag, 
+                FIRSTNAME,
+                SURNAME AS LASTNAME,
+                $studentClass.STUDENT_NUMBER AS SYNERGY_ID,
+                YEAR_LEVEL AS YEARLEVEL,
+                HOUSE,
+                '' AS StudentMedicalAlert,
+                '' AS StudentSpecialNeedsFlag,
                 '' AS StudentTutorDescription,
                 '' AS ClassCampus
             FROM  $studentClass
-            LEFT JOIN $students ON $studentClass.student_number = $students.student_number
-            WHERE $studentClass.class_code IN (".implode(',',$codes).")
-            ORDER BY surname ASC
+            LEFT JOIN $students ON $studentClass.STUDENT_NUMBER = $students.STUDENT_NUMBER
+            WHERE $studentClass.CLASS_CODE IN (".implode(',',$codes).")
+            ORDER BY SURNAME ASC
         ");
 
         // retrieve
@@ -90,7 +90,7 @@ class External_Edumate_Class extends External_Edumate_Connection implements Exte
 
         // prepare
         $stmt = $this->getConnection()->prepareQuery("
-            SELECT STAFF_NUMBER AS StaffID
+            SELECT STAFF_NUMBER AS STAFFID
                 FROM DB2INST1.SCHOOLBOX_TEACHERCLASS
                 WHERE CLASS_CODE IN (".implode(',',$codes).")
         ");
