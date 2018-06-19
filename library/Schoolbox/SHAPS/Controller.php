@@ -208,10 +208,17 @@ class Controller extends Base
     public function getUsersInCourses() {
         $enrolments = (new HelpRequest($this->getConfigLoader()))->execute('courses');
 
+        $provisionedUsers = $this->findProvisionedUsers();
+
         foreach($enrolments as $i => $enrolment) {
             foreach($enrolment['participants'] as $n => $participant) {
-                if (! in_array($participant['id'], $this->findProvisionedUsersIds())) {
-                    // A convoluted way of saying this user couldn't be matched with anyone on our instance.
+
+                /* Check if this participant's id exists in the provisionedUsers index
+                 *
+                 * If this participant's id wasn't in the provisionedUsers index, then this is
+                 * a convoluted way of saying this user couldn't be matched with anyone on our instance.
+                 */
+                if ($provisionedUsers->offsetGet($participant['id']) === null) {
                     $enrolments[$i]['participants'][$n]['id'] = null;
                 }
             }
