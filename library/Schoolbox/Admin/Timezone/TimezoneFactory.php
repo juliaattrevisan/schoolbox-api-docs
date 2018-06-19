@@ -30,7 +30,7 @@ class TimezoneFactory
     }
 
     /**
-     * @return array
+     * @return Collection|Timezone[]
      */
     public function findAll()
     {
