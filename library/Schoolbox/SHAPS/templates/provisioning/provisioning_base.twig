@@ -41,16 +41,12 @@
                         {% for user in allUsers %}
                             {% if provisionedUsers[user.id] %}
                                 <tr>
+                                <td><i class="icon-course-outline" title="Provisioned"></i></td>
                             {% else %}
                                 <tr class="highlight-warning">
+                                <td>Not Provisioned</td>
                             {% endif %}
-                            <td>
-                                {% if provisionedUsers[user.id] %}
-                                    <i class="icon-course-outline" title="Provisioned"></i>
-                                {% else %}
-                                    Not Provisioned
-                                {% endif %}
-                            </td>
+
                             <td>
                                 {{ user.fullname }}
                             </td>
