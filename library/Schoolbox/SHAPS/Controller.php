@@ -192,7 +192,7 @@ class Controller extends Base
      * @throws \RuntimeException
      */
     public function getUsersInCourses() {
-        $enrolments = $this->helpRequest->execute('courses');
+        $enrolments = $this->helpRequest->courses();
 
         $provisionedUsers = $this->helpRequest->findProvisionedUsers();
 

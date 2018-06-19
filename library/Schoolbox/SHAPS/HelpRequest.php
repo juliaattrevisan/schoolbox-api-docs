@@ -42,6 +42,33 @@ class HelpRequest
 
 
     /**
+     * Alias to the Users endpoint
+     *
+     * @return array
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
+     */
+    public function users(): array
+    {
+        return $this->execute('users');
+    }
+
+
+    /**
+     * Alias to the Courses endpoint
+     *
+     * @return array
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
+     */
+    public function courses(): array
+    {
+        return $this->execute('courses');
+    }
+
+    /**
      * Asks help for information located at $endpoint
      *
      * ->execute('users');
@@ -56,7 +83,7 @@ class HelpRequest
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      */
-    public function execute(string $endpoint) : array
+    private function execute(string $endpoint) : array
     {
         /* Get the four pieces of the puzzle that we need to request data from Help
          */
@@ -99,7 +126,7 @@ class HelpRequest
         /* This returns an associative array of (id, email)
          * e.g. [246] => test@alaress.com.au
          */
-        $users = $this->execute('users');
+        $users = $this->users();
 
         /* findByColumnList() only returns users that exist in the current installation
          * If it receives an id from help, but this id isn't in the current installation,
