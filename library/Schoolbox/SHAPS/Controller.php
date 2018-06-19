@@ -62,17 +62,14 @@ class Controller extends Base
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
+    /**
+     * TODO: This isn't being used, currently: unsure if it was a placeholder for future implementation?
+     *
+     * @return string
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
+     */
     public function getProvisionedUsersJSON() {
         return json_encode($this->findProvisionedUsers());
     }
