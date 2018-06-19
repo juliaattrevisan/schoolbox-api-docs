@@ -192,30 +192,8 @@ class Controller extends Base
      * @throws \RuntimeException
      */
     public function getUsersInCourses() {
-        $enrolments = $this->helpRequest->courses();
-
-        $provisionedUsers = $this->helpRequest->findProvisionedUsers();
-
-        foreach($enrolments as $i => $enrolment) {
-
-            /** @var array $participants */
-            $participants = $enrolment['participants'];
-
-            foreach($participants as $n => $participant) {
-
-                /* Check if this participant's id exists in the provisionedUsers index
-                 *
-                 * If this participant's id wasn't in the provisionedUsers index, then this is
-                 * a convoluted way of saying this user couldn't be matched with anyone on our instance.
-                 */
-                if ($provisionedUsers->offsetGet($participant['id']) === null) {
-                    $enrolments[$i]['participants'][$n]['id'] = null;
-                }
-            }
-        }
-
         $this->getResponse()->content->set($this->buildHtmlOutput('@shaps/courses/index.twig', [
-            'courses' => $enrolments,
+            'courses' => $this->helpRequest->findEnrolments(),
             'serverUrl' => $this->helpRequest->getServerUrl()
         ])->setTitle('Schoolbox Help Course Enrolments'));
     }

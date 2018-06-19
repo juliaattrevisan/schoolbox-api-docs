@@ -144,6 +144,41 @@ class HelpRequest
 
 
     /**
+     * Find all the enrolments and the people in them...I suppose
+     *
+     * @return array
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
+     */
+    public function findEnrolments(): array
+    {
+        $enrolments = $this->courses();
+
+        $provisionedUsers = $this->findProvisionedUsers();
+
+        foreach($enrolments as $i => $enrolment) {
+
+            /** @var array $participants */
+            $participants = $enrolment['participants'];
+
+            foreach($participants as $n => $participant) {
+
+                /* Check if this participant's id exists in the provisionedUsers index
+                 *
+                 * If this participant's id wasn't in the provisionedUsers index, then this is
+                 * a convoluted way of saying this user couldn't be matched with anyone on our instance.
+                 */
+                if ($provisionedUsers->offsetGet($participant['id']) === null) {
+                    $enrolments[$i]['participants'][$n]['id'] = null;
+                }
+            }
+        }
+
+        return $enrolments;
+    }
+
+    /**
      * Officially get the url with trailing slash removed, if it existed
      *
      * @return string
