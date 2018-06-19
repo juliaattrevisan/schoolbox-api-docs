@@ -113,14 +113,11 @@ class Controller extends Base
      */
     public function getAll()
     {
-        $allStaff = $this->getAllStaff();
-        $provisionedUserIds = $this->findProvisionedUsersIds();
-
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@shaps/provisioning/index.twig', [
-                'allUsers' => $allStaff,
-                'provisionedUserIds' => $provisionedUserIds
+                'allUsers' => $this->getAllStaff(),
+                'provisionedUsers' => $this->findProvisionedUsers()
             ])->setTitle('Schoolbox Help Staff Provisioning')
         );
     }

@@ -39,13 +39,13 @@
                         </tr>
 
                         {% for user in allUsers %}
-                            {% if user.id not in provisionedUserIds %}
-                                <tr class="highlight-warning">
-                            {% else %}
+                            {% if provisionedUsers[user.id] %}
                                 <tr>
+                            {% else %}
+                                <tr class="highlight-warning">
                             {% endif %}
                             <td>
-                                {% if user.id in provisionedUserIds %}
+                                {% if provisionedUsers[user.id] %}
                                     <i class="icon-course-outline" title="Provisioned"></i>
                                 {% else %}
                                     Not Provisioned
@@ -57,15 +57,15 @@
 
                             {% block provisioned_column %}
                                 <td>
-                                    {% if user.id not in provisionedUserIds %}
-                                        <div class="checklist">
-                                            <input id="provision-{{ user.id }}" type="checkbox" data-checkbox>
-                                            <label for="provision-{{ user.id }}"></label>
-                                        </div>
-                                    {% else %}
+                                    {% if provisionedUsers[user.id] %}
                                         <div class="checklist">
                                             <input id="provision-{{ user.id }}" type="checkbox" disabled>
                                             <label for="provision-{{ user.id }}" title="Already provisioned"></label>
+                                        </div>
+                                    {% else %}
+                                        <div class="checklist">
+                                            <input id="provision-{{ user.id }}" type="checkbox" data-checkbox>
+                                            <label for="provision-{{ user.id }}"></label>
                                         </div>
                                     {% endif %}
                                 </td>
