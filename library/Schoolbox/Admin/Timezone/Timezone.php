@@ -26,7 +26,7 @@ class Timezone
      */
     public function __construct($timezone, $offset) {
         $this->timezone = $timezone;
-        $this->offset = $offset;
+        $this->offset = str_replace(':', '', $offset);
 
         /* Some timezones have an underscore in them, which looks a bit dumb
          * Because phplib, have to do it here
@@ -50,6 +50,15 @@ class Timezone
     public function getName()
     {
         return $this->name;
+    }
+
+
+    /**
+     * @return int
+     */
+    public function getOffset()
+    {
+        return $this->offset;
     }
 }
 

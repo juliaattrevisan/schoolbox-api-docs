@@ -59,7 +59,7 @@ class TimezoneFactory
         /* Because the GMT offset is now a prefix on the name, this will sort by
          * GMT offset rather than the timezone name itself
          */
-        $options->sortBy('name', 'asc');
+        $options->sortBy('offset', 'asc');
 
         return $options;
     }
