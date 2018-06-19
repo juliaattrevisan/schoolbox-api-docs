@@ -47,8 +47,8 @@ class TimezoneFactory
         );
 
         $options = new Collection();
-        $gmt = new DateTimeZone("Europe/London");
-        $gmtTimezone = new \DateTime("now", $gmt);
+        $gmt = new DateTimeZone('Europe/London');
+        $gmtTimezone = new \DateTime('now', $gmt);
 
         foreach($zones as $timezone)
         {
@@ -58,6 +58,9 @@ class TimezoneFactory
             $options->add(new Timezone($timezone, $offset));
         }
 
+        /* Because the GMT offset is now a prefix on the name, this will sort by
+         * GMT offset rather than the timezone name itself
+         */
         $options->sortBy('name', 'asc');
 
         return $options;
