@@ -18,6 +18,11 @@ class TimezoneFactory
     private static $instance;
 
     /**
+     * The Home of Greenwich Mean Time...you meany
+     */
+    private const DEFAULT_TIMEZONE_LOCATION = 'Europe/London';
+
+    /**
      * @return TimezoneFactory
      */
     public static function getInstance() : TimezoneFactory
@@ -47,7 +52,7 @@ class TimezoneFactory
         );
 
         $options = new Collection();
-        $gmt = new DateTimeZone('Europe/London');
+        $gmt = new DateTimeZone(self::DEFAULT_TIMEZONE_LOCATION);
         $gmtTimezone = new \DateTime('now', $gmt);
 
         foreach($zones as $timezone)
