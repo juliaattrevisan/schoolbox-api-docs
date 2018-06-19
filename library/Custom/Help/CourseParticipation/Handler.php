@@ -97,8 +97,6 @@ class Handler
 
     /**
      * @param string $schoolCode
-     * @throws Mapper\Exception
-     * @throws Mapper\Exception\Deleted
      * @return array
      */
     public function getFolderAccessBySchool(string $schoolCode) : array
@@ -109,12 +107,54 @@ class Handler
         $payload = [];
 
         foreach ($courses as $course) {
-            $participants = $this->userAccessMapper->findUsersInCategory($course)->getColumnValues('email');
+            $participants = $this->userAccessMapper->findUsersInCategory($course);
+            $users = [];
+
+            foreach($participants as $user) {
+                $users[] = [
+                    "id" => $user->getExternalId(),
+                    "firstname" => $user->getFirstname(),
+                    "lastname" => $user->getLastname()
+                ];
+            }
+
+            foreach ($users as $i => $user) {
+                // Existing live data on Help appropriates the Year field to identify which school users are from.
+                // Going forward we should be using the external ID prefixed with school code instead, but we have to work with what we've got.
+                // The 'fuzzy' case was meant to look for the school code in the Year field instead, and if that
+                // was missing or didn't match our given school code, we send the client a null ID so the client
+                // doesn't try to find a user that can't be matched on their instance.
+
+                // However, due to issues with the cron script that generates the external IDs for users,
+                // none of these IDs will ever match with users on the instance, so I am commenting this out for now
+                // until we sort out some kind of migration.
+
+                //if ($fuzzy) {
+                    // if we're doing a fuzzy lookup, search by `year`
+                    /** @var string[][] $map */
+                    //$map = json_decode(file_get_contents(__DIR__ . '/code-map.json'), true);
+
+                    //if (empty($map[$schoolCode])) {
+                        // we don't have this code mapped, therefore nobody matches
+                    //}
+                //}
+
+                // Look up users by external ID
+                $matches = "";
+                $currentUserId = $users[$i]["id"];
+                preg_match("/" . preg_quote($schoolCode) . "\.(\d*)/", $currentUserId, $matches);
+                if (! empty($matches)) {
+                    $users[$i]["id"] = $matches[1];
+                } else {
+                    // This user didn't have a school code, so give them a null ID
+                    $users[$i]["id"] = null;
+                }
+            }
 
             $payload[] = [
                 'folderName'   => $course->getName(),
                 'folderId'     => $course->getId(),
-                'participants' => array_filter($participants)
+                'participants' => $users
             ];
         }
 
@@ -135,6 +175,18 @@ class Handler
         // show the list of users for this school
         // filter to the list of users whose external IDs are prefixed with the given school code
         $predicate = $this->getUserMapper()->getPredicateBuilder()->equals('group_id', $roleId);
+
+        // TODO remove the fuzzy search case, because it can't match Help users to their local Schoolbox instance
+
+        // Existing live data on Help appropriates the Year field to identify which school users are from.
+        // Going forward we should be using the external ID prefixed with school code instead, but we have to work with what we've got.
+        // The 'fuzzy' case was meant to look for the school code in the Year field instead, and if that
+        // was missing or didn't match our given school code, we send the client a null ID so the client
+        // doesn't try to find a user that can't be matched on their instance.
+
+        // However, due to issues with the cron script that generates the external IDs for users,
+        // none of these IDs will ever match with users on the instance, so it should be removed once a migration
+        // path has been determined.
 
         if ($fuzzy) {
             // if we're doing a fuzzy lookup, search by `year`
@@ -314,20 +366,22 @@ class Handler
 
     /**
      * @param string $schoolCode
-     * @throws Mapper\Exception
-     * @throws Mapper\Exception\Deleted
      * @return Collection|IFolder[]
      */
     private function getCoursesBySchool(string $schoolCode) : Collection
     {
         // ok, if you're here, you can see the thing.
-        $folder = $this->folderMapper->findById(
-            $this->codeMapper->findOneByColumn('code', $schoolCode)->getFolder()->getId()
-        );
+        try {
+            $code = $this->codeMapper->findOneByColumn('code', $schoolCode)->getFolder()->getId();
+            $folder = $this->folderMapper->findById($code);
+            // obtain all direct descendants of this folder
+            // the scope of implementation is immediate children only, rather than attempting to gather all descendants
+            return $this->folderMapper->findByParentId($folder->getId());
+        } catch (Mapper\Exception $e) {
+            // No courses? Do nothing, we're going to return an empty collection outside this block
+        }
 
-        // obtain all direct descendants of this folder
-        // the scope of implementation is immediate children only, rather than attempting to gather all descendants
-        return $this->folderMapper->findByParentId($folder->getId());
+        return new Collection();
     }
 
 

@@ -1,4 +1,4 @@
-{% embed "@shaps/provisioning_base.twig" %}
+{% embed "@shaps/provisioning/provisioning_base.twig" %}
     {% block pageSearch %}<li class="active">{% endblock %}
 
     {% block page_specific_content %}
@@ -74,6 +74,7 @@
 
                         }, "json")
                             .fail(function(xhr, status, error) {
+                                // TODO display some kind of error message here
                                 console.log(xhr);
                                 console.log(status + ": " + error);
                             })

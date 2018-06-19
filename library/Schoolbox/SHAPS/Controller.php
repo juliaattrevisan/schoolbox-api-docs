@@ -78,8 +78,32 @@ class Controller extends Base
     }
 
     /**
+     * Get a list of courses available on Help for a particular school, in JSON format.
+     *
+     * @return mixed
+     */
+    private function getCoursesFromHelp()
+    {
+        $client = new GuzzleClient();
+        $auth = $this->getAuthDetails();
+
+        $response = $client->request(
+            "get",
+            "{$auth['url']}/api/course-participation/{$auth['schoolCode']}/courses", [
+            'query' => [
+                'ts' => $auth['timestamp'],
+                'digest' => $auth['digest']
+            ]
+        ]);
+
+        return json_decode($response->getBody()->getContents(), true);
+    }
+
+
+    /**
      * Helper method to get a list of user objects from the raw JSON Help API response.
      *
+     * @api GET /shaps/provisioning/provisionedUsers
      * @return Collection
      */
     private function getProvisionedUsers() : Collection
@@ -87,6 +111,10 @@ class Controller extends Base
         $provisionedUserIds = $this->getProvisionedUserIds();
         $provisionedUsers = $this->userMapper->findByColumn('id', $provisionedUserIds);
         return $provisionedUsers;
+    }
+
+    public function getProvisionedUsersJSON() {
+        return json_encode($this->getProvisionedUsers());
     }
 
     /**
@@ -97,7 +125,12 @@ class Controller extends Base
     private function getProvisionedUserIds() : array
     {
         $provisionedUsers = $this->getUsersFromHelp();
-        return array_keys($provisionedUsers);
+        $matchingUsers = array_filter($provisionedUsers,
+            function($id) {
+                return in_array($id, $this->getAllStaff()->getPropertyValues('id'));
+            }
+        , ARRAY_FILTER_USE_KEY);
+        return array_keys($matchingUsers);
     }
 
     /*
@@ -128,7 +161,7 @@ class Controller extends Base
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
-                '@shaps/index.twig', [
+                '@shaps/provisioning/index.twig', [
                 'allUsers' => $allStaff,
                 'provisionedUserIds' => $provisionedUserIds
             ])->setTitle('Schoolbox Help Staff Provisioning')
@@ -144,7 +177,7 @@ class Controller extends Base
     {
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
-                '@shaps/provisioned.twig', [
+                '@shaps/provisioning/provisioned.twig', [
                     'allUsers' => $this->getProvisionedUsers(),
                     'provisionedUserIds' => $this->getProvisionedUserIds()
             ])->setTitle('Provisioned Staff - Schoolbox Help Staff Provisioning')
@@ -163,7 +196,7 @@ class Controller extends Base
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
-                '@shaps/unprovisioned.twig', [
+                '@shaps/provisioning/unprovisioned.twig', [
                     'allUsers' => $unprovisionedStaff
             ])->setTitle('Unprovisioned Staff - Schoolbox Help Staff Provisioning')
         );
@@ -174,11 +207,11 @@ class Controller extends Base
      *
      * @api GET /shaps/provisioning/search
      */
-    public function getSearch()
+    public function getUserProvisioningSearch()
     {
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
-                '@shaps/search.twig', [
+                '@shaps/provisioning/search.twig', [
             ])->setTitle('Search - Schoolbox Help Staff Provisioning')
         );
     }
@@ -204,4 +237,99 @@ class Controller extends Base
         ];
         $this->getResponse()->content->set($this->buildJsonOutput($userJSON));
     }
+
+    /**
+     * Renders a list of all courses available for your school on Help, and the users enrolled in each.
+     */
+    public function getUsersInCourses() {
+        $enrolments = $this->getCoursesFromHelp();
+
+        foreach($enrolments as $i => $enrolment) {
+            foreach($enrolment['participants'] as $n => $participant) {
+                if (! in_array($participant['id'], $this->getProvisionedUserIds())) {
+                    // A convoluted way of saying this user couldn't be matched with anyone on our instance.
+                    $enrolments[$i]['participants'][$n]['id'] = null;
+                }
+            }
+        }
+
+        $this->getResponse()->content->set($this->buildHtmlOutput('@shaps/courses/index.twig', [
+            'courses' => $enrolments,
+            'serverUrl' => $url = rtrim($this->getConfigLoader()->get('schoolbox_help_url'), '/')
+        ])->setTitle('Schoolbox Help Course Enrolments'));
+    }
+
+    /**
+     * Renders a search form for finding users to view their enrolments.
+     */
+    public function getUserEnrolmentSearch() {
+        $this->getResponse()->content->set($this->buildHtmlOutput('@shaps/courses/search.twig', [
+        ])->setTitle('Schoolbox Help Course Enrolments - User Search'));
+    }
+
+    /**
+     * Takes a user ID and renders a list of all courses that user is enrolled in on Help.
+     *
+     * @param string $userID
+     */
+    public function searchCoursesForUser($userID) {
+        // Some sample users
+        $zsmith = $this->userMapper->findById(151);
+        $jbenson = $this->userMapper->findById(247);
+
+        $mharris = $this->userMapper->findById(248);
+        $mkelley = $this->userMapper->findById(249);
+
+        $coursesForUser = [
+            [
+                "externalID" => $zsmith->getExternalID(),
+                "courses" => [
+                    [
+                        "name" => "Random Course",
+                        "id" => 1
+                    ],
+                    [
+                        "name" => "Schoolbox Teacher Course",
+                        "id" => 2
+                    ]
+                ]
+            ],
+            [
+                "externalID" => $mharris->getExternalID(),
+                "courses" => [
+                    [
+                        "name" => "Random Course",
+                        "id" => 1
+                    ]
+                ]
+            ],
+            [
+                "externalID" => $mkelley->getExternalID(),
+                "courses" => [
+                    [
+                        "name" => "Random Course",
+                        "id" => 1
+                    ]
+                ]
+            ],
+            [
+                "externalID" => $jbenson->getExternalID(),
+                "courses" => [
+                    [
+                        "name" => "Schoolbox Teacher Course",
+                        "id" => 2
+                    ]
+                ]
+            ],
+        ];
+
+        // If the user we searched for has sample data in the array above, render it out
+        foreach($coursesForUser as $user) {
+            if ($user['externalID'] == $userID) {
+                $userCourses = $user['courses'];
+                $this->getResponse()->content->set($this->buildJsonOutput($userCourses));
+            }
+        }
+    }
+
 }
