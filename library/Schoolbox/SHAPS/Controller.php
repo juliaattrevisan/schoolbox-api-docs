@@ -40,7 +40,7 @@ class Controller extends Base
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      */
-    private function findProvisionedUsers()
+    private function findProvisionedUsers(): \Schoolbox\GenericCollection
     {
         /* This returns an associative array of (id, email)
          * e.g. [246] => test@alaress.com.au
