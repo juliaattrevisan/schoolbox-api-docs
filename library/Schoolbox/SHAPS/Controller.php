@@ -9,9 +9,7 @@
 namespace Schoolbox\SHAPS;
 
 use Alaress\Web\Controller\Base;
-use Alaress_Date_Format;
 use Schoolbox\UserMapper;
-use GuzzleHttp\Client as GuzzleClient;
 use Schoolbox\Collection;
 
 class Controller extends Base
@@ -57,10 +55,14 @@ class Controller extends Base
      * Helper method to get a list of IDs of users provisioned on Help.
      *
      * @return array
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
      */
     private function getProvisionedUserIds() : array
     {
-        $provisionedUsers = $this->getUsersFromHelp();
+        $provisionedUsers = (new HelpRequest($this->getConfigLoader()))->execute('users');
+
         $matchingUsers = array_filter($provisionedUsers,
             function($id) {
                 return in_array($id, $this->getAllStaff()->getPropertyValues('id'));
@@ -176,9 +178,14 @@ class Controller extends Base
 
     /**
      * Renders a list of all courses available for your school on Help, and the users enrolled in each.
+     *
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
      */
     public function getUsersInCourses() {
-        $enrolments = $this->getCoursesFromHelp();
+        $enrolments = (new HelpRequest($this->getConfigLoader()))->execute('courses');
 
         foreach($enrolments as $i => $enrolment) {
             foreach($enrolment['participants'] as $n => $participant) {

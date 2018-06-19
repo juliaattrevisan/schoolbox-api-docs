@@ -46,7 +46,7 @@ class HelpRequest
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      */
-    private function execute(string $endpoint)
+    public function execute(string $endpoint)
     {
         /* Get the four pieces of the puzzle that we need to request data from Help
          */
