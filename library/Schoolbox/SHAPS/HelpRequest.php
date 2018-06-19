@@ -142,4 +142,15 @@ class HelpRequest
         ])->indexBy('id');
     }
 
+
+    /**
+     * Officially get the url with trailing slash removed, if it existed
+     *
+     * @return string
+     */
+    public function getServerUrl(): string
+    {
+        return rtrim($this->configLoader->get('schoolbox_help_url'), '/');
+    }
+
 }
