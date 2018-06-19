@@ -40,13 +40,15 @@ class HelpRequest
      *
      * e.g. ->execute('users');
      *
+     * This returns an array of key-value pairs of (id => email)
+     *
      * @param string $endpoint
-     * @return mixed
+     * @return array
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      */
-    public function execute(string $endpoint)
+    public function execute(string $endpoint) : array
     {
         /* Get the four pieces of the puzzle that we need to request data from Help
          */
