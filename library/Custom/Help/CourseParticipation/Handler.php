@@ -17,7 +17,7 @@ use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\IFolder;
 use Schoolbox\RoleMapper;
-use Schoolbox\SHAPS\AuthDigest;
+use Schoolbox\SHAPS\Digest;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use UnexpectedValueException;
@@ -350,7 +350,7 @@ class Handler
      */
     public function computeAuthDigest(int $timestamp, string $schoolCode, string $accessToken) : string
     {
-        return (new AuthDigest($schoolCode, $accessToken))->generate($timestamp);
+        return (new Digest($schoolCode, $accessToken))->generate($timestamp);
     }
 
 

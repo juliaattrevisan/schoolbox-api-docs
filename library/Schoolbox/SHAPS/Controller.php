@@ -47,7 +47,7 @@ class Controller extends Base
 
         $accessToken = $this->getConfigLoader()->get('schoolbox_help_access_token');
 
-        $digest = (new AuthDigest($schoolCode, $accessToken))->generate($now->getUnixTimeStamp());
+        $digest = (new Digest($schoolCode, $accessToken))->generate($now->getUnixTimeStamp());
 
         $timestamp = $now->getUnixTimeStamp();
 

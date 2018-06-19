@@ -6,10 +6,10 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\SHAPS;
+namespace Schoolbox\SHAPS\Auth;
 
 
-class AuthDigest
+class Digest
 {
     /**
      * @var string
