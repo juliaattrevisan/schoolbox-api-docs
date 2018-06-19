@@ -11,16 +11,22 @@ use Schoolbox\Collection;
  */
 class TimezoneFactory
 {
+
+    /**
+     * @var TimezoneFactory
+     */
+    private static $instance;
+
     /**
      * @return TimezoneFactory
      */
-    public static function getInstance()
+    public static function getInstance() : TimezoneFactory
     {
-        static $inst = null;
-        if ($inst === null) {
-            $inst = new self;
+        if (self::$instance === null) {
+            self::$instance = new self;
         }
-        return $inst;
+
+        return self::$instance;
     }
 
     /**
