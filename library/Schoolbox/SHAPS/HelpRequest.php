@@ -38,9 +38,11 @@ class HelpRequest
     /**
      * Asks help for information located at $endpoint
      *
-     * e.g. ->execute('users');
-     *
+     * ->execute('users');
      * This returns an array of key-value pairs of (id => email)
+     *
+     * ->execute('courses');
+     * This returns an array of...stuff
      *
      * @param string $endpoint
      * @return array
