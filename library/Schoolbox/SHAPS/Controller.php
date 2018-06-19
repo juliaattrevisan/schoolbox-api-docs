@@ -30,6 +30,27 @@ class Controller extends Base
     }
 
 
+    /**
+     * Helper method to get a list of user objects from the raw JSON Help API response.
+     *
+     * This is a list of hydrated users who have an equivalent representation in Help.
+     */
+    private function findProvisionedUsers()
+    {
+
+    }
+
+
+    /**
+     * Helper method to get a list of IDs of users provisioned on Help.
+     *
+     * This is a list of ids that were found using findProvisionedUsers() but we can take advantage
+     * of Collection to do this a bit cheaper
+     */
+    private function findProvisionedUsersIds()
+    {
+    }
+
 
 
 
@@ -47,9 +68,6 @@ class Controller extends Base
         return $provisionedUsers;
     }
 
-    public function getProvisionedUsersJSON() {
-        return json_encode($this->getProvisionedUsers());
-    }
 
     /**
      * Helper method to get a list of IDs of users provisioned on Help.
@@ -69,6 +87,30 @@ class Controller extends Base
             }
         , ARRAY_FILTER_USE_KEY);
         return array_keys($matchingUsers);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    public function getProvisionedUsersJSON() {
+        return json_encode($this->getProvisionedUsers());
     }
 
     /*
