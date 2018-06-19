@@ -37,6 +37,8 @@ class Timezone
     }
 
     /**
+     * Returns identifier for this timezone.
+     *
      * @return string
      */
     public function getId() : string
@@ -45,6 +47,8 @@ class Timezone
     }
 
     /**
+     * Returns a label for this timezone.
+     *
      * @return string
      */
     public function getName() : string
@@ -52,8 +56,9 @@ class Timezone
         return $this->name;
     }
 
-
     /**
+     * Returns this timezone's offset from GMT, in HHMM format.
+     *
      * @return int
      */
     public function getOffset() : int
