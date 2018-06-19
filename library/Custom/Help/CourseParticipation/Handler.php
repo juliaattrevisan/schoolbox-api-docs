@@ -176,6 +176,8 @@ class Handler
         // filter to the list of users whose external IDs are prefixed with the given school code
         $predicate = $this->getUserMapper()->getPredicateBuilder()->equals('group_id', $roleId);
 
+        // TODO remove the fuzzy search case, because it can't match Help users to their local Schoolbox instance
+
         // Existing live data on Help appropriates the Year field to identify which school users are from.
         // Going forward we should be using the external ID prefixed with school code instead, but we have to work with what we've got.
         // The 'fuzzy' case was meant to look for the school code in the Year field instead, and if that
@@ -183,25 +185,25 @@ class Handler
         // doesn't try to find a user that can't be matched on their instance.
 
         // However, due to issues with the cron script that generates the external IDs for users,
-        // none of these IDs will ever match with users on the instance, so I am commenting this out for now
-        // until we sort out some kind of migration.
+        // none of these IDs will ever match with users on the instance, so it should be removed once a migration
+        // path has been determined.
 
-        //if ($fuzzy) {
+        if ($fuzzy) {
             // if we're doing a fuzzy lookup, search by `year`
             /** @var string[][] $map */
-            //$map = json_decode(file_get_contents(__DIR__ . '/code-map.json'), true);
+            $map = json_decode(file_get_contents(__DIR__ . '/code-map.json'), true);
 
-            //if (empty($map[$schoolCode])) {
+            if (empty($map[$schoolCode])) {
                 // we don't have this code mapped, therefore nobody matches
-                //return [];
-            //}
+                return [];
+            }
 
-            //$predicate->in('year', $map[$schoolCode]);
+            $predicate->in('year', $map[$schoolCode]);
 
-        //} else {
-            // Look up user by external ID
+        } else {
+            // "normal" behaviour is to look up by external IDs
             $predicate->like('synergy_id', "{$schoolCode}.%");
-        //}
+        }
 
         // we only need the external ID itself, so bypass object hydration
         $rows = $this->getUserMapper()->findColumnsByPredicates([ 'username', 'synergy_id' ], $predicate);
