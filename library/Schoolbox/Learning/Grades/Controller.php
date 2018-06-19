@@ -496,7 +496,7 @@ class Controller extends Base
         $statistics = $markbook->getAssessmentStatistics();
 
         foreach ($markbook->getAssessments() as $assessment) {
-            if ($assessment->isFeedbackVisibleToUser($viewee) && $assessment->getMarkScheme()->isQuantitative()) {
+            if ($assessment->isFeedbackVisibleToUser($this->getUser()) && $assessment->getMarkScheme()->isQuantitative()) {
                 $graphAssessments[] = $assessment->getTitle();
 
                 $participant = $assessment->getParticipantIfExtant($viewee);
