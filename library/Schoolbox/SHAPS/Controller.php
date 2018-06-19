@@ -167,25 +167,33 @@ class Controller extends Base
         );
     }
 
+
     /**
      * Provides details about a user in response to an ajax request for that user's external ID.
      *
      * @api GET /shaps/provisioning/{userId}
      * @param string $userId
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
+     * @throws \Schoolbox\Mapper\Exception
      */
     public function searchUsers(string $userId)
     {
         // Selectize gives us the user's external ID
         $user = $this->userMapper->findByExternalId($userId);
 
-        $provisionedUserIds = $this->findProvisionedUsersIds();
-        $status = in_array($user->getId(), $provisionedUserIds);
+        /* Check if this user's id was in the provisionedUsers index - don't need to use in_array to test
+         */
+        $exists = $this->findProvisionedUsers()->offsetGet($user->getId()) !== null;
+
         $userJSON = [
             'name' => $user->getFullName(),
-            'provisioned' => $status,
+            'provisioned' => $exists,
             'id' => $user->getId(),
             'externalID' => $user->getExternalId(),
         ];
+
         $this->getResponse()->content->set($this->buildJsonOutput($userJSON));
     }
 
