@@ -22,8 +22,8 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
         $caseSensitiveFields = array('ID', 'Email', 'MobilePhone', 'SpouseID', 'SpouseMobilePhone');
 
         $stmt = $this->getConnection()->prepareQuery("
-            SELECT CARER_NUMBER AS ID, FULL_NAME, COMBINED_EMAIL_ADDRESS AS Email, MOBILE AS MobilePhone, SPOUSE_CARER_NUMBER AS SpouseID, SPOUSE_FULL_NAME,
-              SPOUSE_MOBILE AS SpouseMobilePhone
+            SELECT CARER_NUMBER AS ID, FULL_NAME, COMBINED_EMAIL_ADDRESS AS EMAIL, MOBILE AS MOBILEPHONE, SPOUSE_CARER_NUMBER AS SPOUSEID, SPOUSE_FULL_NAME,
+              SPOUSE_MOBILE AS SPOUSEMOBILEPHONE
             FROM DB2INST1.SCHOOLBOX_PARENTS
             WHERE CARER_NUMBER = :id
         ");
@@ -117,21 +117,21 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
         );
 
         $stmt = $this->getConnection()->prepareQuery("
-            SELECT s.STUDENT_NUMBER AS StudentID, s.FIRSTNAME AS StudentGiven1, s.SURNAME AS StudentSurname,
-              s.BIRTHDATE AS StudentBirthDate, s.HOUSE AS StudentHouseDescription, s.YEAR_LEVEL AS StudentYearLevel,
-              s.TUTOR_NAME AS StudentFormStaffName, s.HEAD_OF_HOUSE AS StudentHeadOfHouse, s.FORM_NAME AS StudentForm,
-              s.FORM_STAFF_NAME AS StudentTutor, p.FULL_NAME AS StudentEmergencyName,
-              p.MOBILE AS StudentEmergencyPhone,
-              '' AS Comment,
-              '' AS StudentEnrolmentDate,
-              '' AS StudentLeavingDate,
-              '' AS StudentIBFlag,
-              '' AS StudentStudiesCode,
-              0 AS countIndividualEducationPlans
-            FROM DB2INST1.SCHOOLBOX_STUDENTS s
-            LEFT JOIN DB2INST1.SCHOOLBOX_PARENT_STUDENT ps ON s.STUDENT_NUMBER = ps.STUDENT_NUMBER
-            LEFT JOIN DB2INST1.SCHOOLBOX_PARENTS p ON ps.CARER_NUMBER = p.CARER_NUMBER
-            WHERE s.STUDENT_NUMBER = :id
+            SELECT S.STUDENT_NUMBER AS STUDENTID, S.FIRSTNAME AS STUDENTGIVEN1, S.SURNAME AS STUDENTSURNAME,
+              S.BIRTHDATE AS STUDENTBIRTHDATE, S.HOUSE AS STUDENTHOUSEDESCRIPTION, S.YEAR_LEVEL AS STUDENTYEARLEVEL,
+              S.TUTOR_NAME AS STUDENTFORMSTAFFNAME, S.HEAD_OF_HOUSE AS STUDENTHEADOFHOUSE, S.FORM_NAME AS STUDENTFORM,
+              S.FORM_STAFF_NAME AS STUDENTTUTOR, P.FULL_NAME AS STUDENTEMERGENCYNAME,
+              P.MOBILE AS STUDENTEMERGENCYPHONE,
+              '' AS COMMENT,
+              '' AS STUDENTENROLMENTDATE,
+              '' AS STUDENTLEAVINGDATE,
+              '' AS STUDENTIBFLAG,
+              '' AS STUDENTSTUDIESCODE,
+              0 AS COUNTINDIVIDUALEDUCATIONPLANS
+            FROM DB2INST1.SCHOOLBOX_STUDENTS S
+            LEFT JOIN DB2INST1.SCHOOLBOX_PARENT_STUDENT PS ON S.STUDENT_NUMBER = PS.STUDENT_NUMBER
+            LEFT JOIN DB2INST1.SCHOOLBOX_PARENTS P ON PS.CARER_NUMBER = P.CARER_NUMBER
+            WHERE S.STUDENT_NUMBER = :id
         ");
 
         // retrieve
@@ -214,12 +214,12 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
         );
 
         $stmt = $this->getConnection()->prepareQuery("
-            SELECT p.CARER_NUMBER AS StudentContactID, p.FULL_NAME, p.COMBINED_EMAIL_ADDRESS AS StudentContactDefaultEmail,
-              p.MOBILE AS StudentContactMobilePhone, p.SPOUSE_CARER_NUMBER AS StudentContactSpouseID, p.SPOUSE_FULL_NAME,
-              p.SPOUSE_MOBILE AS StudentContactSpouseMobilePhone, p.COMBINED_EMAIL_ADDRESS AS StudentContactSpouseDefaultEmail
-            FROM DB2INST1.SCHOOLBOX_PARENTS p
-            INNER JOIN DB2INST1.SCHOOLBOX_PARENT_STUDENT ps ON p.carer_number = ps.carer_number
-            WHERE ps.STUDENT_NUMBER = :id
+            SELECT P.CARER_NUMBER AS STUDENTCONTACTID, P.FULL_NAME, P.COMBINED_EMAIL_ADDRESS AS STUDENTCONTACTDEFAULTEMAIL,
+              P.MOBILE AS STUDENTCONTACTMOBILEPHONE, P.SPOUSE_CARER_NUMBER AS STUDENTCONTACTSPOUSEID, P.SPOUSE_FULL_NAME,
+              P.SPOUSE_MOBILE AS STUDENTCONTACTSPOUSEMOBILEPHONE, P.COMBINED_EMAIL_ADDRESS AS STUDENTCONTACTSPOUSEDEFAULTEMAIL
+            FROM DB2INST1.SCHOOLBOX_PARENTS P
+            INNER JOIN DB2INST1.SCHOOLBOX_PARENT_STUDENT PS ON P.CARER_NUMBER = PS.CARER_NUMBER
+            WHERE PS.STUDENT_NUMBER = :id
         ");
 
         $stmt->execute(array(
@@ -290,20 +290,20 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
 
         if ($user->getRole()->isStaff()) {
             $sql = "
-                SELECT c.CLASS_CODE AS code, CLASS AS name, tc.CLASS_TYPE AS classType
-                FROM DB2INST1.SCHOOLBOX_TEACHERCLASS tc
-                LEFT JOIN DB2INST1.SCHOOLBOX_CLASSES c ON tc.CLASS_CODE = c.CLASS_CODE
-                WHERE tc.STAFF_NUMBER = :id
-                ORDER BY class_type, name
+                SELECT C.CLASS_CODE AS CODE, CLASS AS NAME, TC.CLASS_TYPE AS CLASSTYPE
+                FROM DB2INST1.SCHOOLBOX_TEACHERCLASS TC
+                LEFT JOIN DB2INST1.SCHOOLBOX_CLASSES C ON TC.CLASS_CODE = C.CLASS_CODE
+                WHERE TC.STAFF_NUMBER = :id
+                ORDER BY CLASS_TYPE, NAME
             ";
         } else {
             if ($user->getRole()->isStudent()) {
                 $sql = "
-                SELECT c.CLASS_CODE AS code, CLASS AS name, CLASS_TYPE AS classType
-                FROM DB2INST1.SCHOOLBOX_STUDENTCLASS sc
-                LEFT JOIN DB2INST1.SCHOOLBOX_CLASSES c ON sc.CLASS_CODE = c.CLASS_CODE
-                WHERE sc.STUDENT_NUMBER = :id
-                ORDER BY class_type, name
+                SELECT C.CLASS_CODE AS CODE, CLASS AS NAME, CLASS_TYPE AS CLASSTYPE
+                FROM DB2INST1.SCHOOLBOX_STUDENTCLASS SC
+                LEFT JOIN DB2INST1.SCHOOLBOX_CLASSES C ON SC.CLASS_CODE = C.CLASS_CODE
+                WHERE SC.STUDENT_NUMBER = :id
+                ORDER BY CLASS_TYPE, NAME
             ";
             } else {
                 return [];
@@ -402,25 +402,25 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
     public function getParentUserAccountInfo()
     {
         $stmt = $this->getConnection()->prepareQuery('
-	        SELECT
-			p.CARER_NUMBER        AS "StudentContactID",
-			NULL                  AS "StudentContactTitle",
-			p.FULL_NAME           AS "StudentContactPreferred",
-			NULL                  AS "StudentContactSurname",
-			p.COMBINED_EMAIL_ADDRESS AS "StudentContactDefaultEmail",
-			p.SPOUSE_CARER_NUMBER AS "StudentContactSpouseID",
-			NULL                  AS "StudentContactSpouseTitle",
-			p.SPOUSE_FULL_NAME    AS "StudentContactSpousePreferred",
-			NULL                  AS "StudentContactSpouseSurname",
-			p.SPOUSE_EMAIL        AS "StudentContactSpouseDefaultEmail",
-			s.YEAR_LEVEL          AS "StudentYearLevel",
-			s.STUDENT_NUMBER      AS "StudentID"
-            FROM DB2INST1.SCHOOLBOX_PARENTS AS p
+            SELECT
+            P.CARER_NUMBER        AS "StudentContactID",
+            NULL                  AS "StudentContactTitle",
+            P.FULL_NAME           AS "StudentContactPreferred",
+            NULL                  AS "StudentContactSurname",
+            P.COMBINED_EMAIL_ADDRESS AS "StudentContactDefaultEmail",
+            P.SPOUSE_CARER_NUMBER AS "StudentContactSpouseID",
+            NULL                  AS "StudentContactSpouseTitle",
+            P.SPOUSE_FULL_NAME    AS "StudentContactSpousePreferred",
+            NULL                  AS "StudentContactSpouseSurname",
+            P.SPOUSE_EMAIL        AS "StudentContactSpouseDefaultEmail",
+            S.YEAR_LEVEL          AS "StudentYearLevel",
+            S.STUDENT_NUMBER      AS "StudentID"
+            FROM DB2INST1.SCHOOLBOX_PARENTS AS P
             INNER JOIN DB2INST1.SCHOOLBOX_PARENT_STUDENT
-            	AS ps ON p.CARER_NUMBER = ps.CARER_NUMBER
+                AS PS ON P.CARER_NUMBER = PS.CARER_NUMBER
             INNER JOIN DB2INST1.SCHOOLBOX_STUDENTS
-            	AS s ON ps.STUDENT_NUMBER = s.STUDENT_NUMBER
-            ORDER BY INTEGER(p.CARER_NUMBER) ASC, INTEGER(s.STUDENT_NUMBER) ASC
+                AS S ON PS.STUDENT_NUMBER = S.STUDENT_NUMBER
+            ORDER BY INTEGER(P.CARER_NUMBER) ASC, INTEGER(S.STUDENT_NUMBER) ASC
         ');
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
