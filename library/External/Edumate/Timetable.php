@@ -31,10 +31,10 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
 
         $stmt = $this->getConnection()->prepareQuery('
             SELECT PERIOD "desc", START_TIME "start", END_TIME "end", PERIOD_NUMBER "number", 1 "sequence"
-            FROM DB2INST1.SCHOOLBOX_TIMETABLE_DEFINITION td
-            WHERE td.DAY_NUMBER = :day
-            AND td.CAMPUS = :campus
-            ORDER BY td.START_TIME ASC
+            FROM DB2INST1.SCHOOLBOX_TIMETABLE_DEFINITION TD
+            WHERE TD.DAY_NUMBER = :day
+            AND TD.CAMPUS = :campus
+            ORDER BY TD.START_TIME ASC
         ');
 
         $campusCode = explode(',', $campus->getExtTimetableCode());
@@ -220,14 +220,14 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
         if ($this->getGroupHandler()->isStudent($userId)) {
             $type = 'STUDENT';
             $join = "
-                LEFT JOIN DB2INST1.SCHOOLBOX_STUDENTCLASS c ON t.CLASS_CODE = c.CLASS_CODE
-                WHERE c.STUDENT_NUMBER = :sn
+                LEFT JOIN DB2INST1.SCHOOLBOX_STUDENTCLASS C ON T.CLASS_CODE = C.CLASS_CODE
+                WHERE C.STUDENT_NUMBER = :sn
             ";
         } elseif ($this->getGroupHandler()->isStaff($userId)) {
             $type = 'STAFF';
             $join = "
-                LEFT JOIN DB2INST1.SCHOOLBOX_TEACHERCLASS c ON t.CLASS_CODE = c.CLASS_CODE
-                WHERE c.STAFF_NUMBER = :sn
+                LEFT JOIN DB2INST1.SCHOOLBOX_TEACHERCLASS C ON T.CLASS_CODE = C.CLASS_CODE
+                WHERE C.STAFF_NUMBER = :sn
             ";
         } else {
             return false;
@@ -242,9 +242,9 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
 
         $stmt = $this->getConnection()->prepareQuery(
             "
-            SELECT PERIOD_NUMBER, t.CLASS_CODE AS code, c.{$type}_NUMBER AS staffID, ROOM, cl.CLASS
-            FROM DB2INST1.SCHOOLBOX_TIMETABLE t
-            LEFT JOIN DB2INST1.SCHOOLBOX_CLASSES cl ON t.CLASS_CODE = cl.CLASS_CODE
+            SELECT PERIOD_NUMBER, T.CLASS_CODE AS CODE, C.{$type}_NUMBER AS STAFFID, ROOM, CL.CLASS
+            FROM DB2INST1.SCHOOLBOX_TIMETABLE T
+            LEFT JOIN DB2INST1.SCHOOLBOX_CLASSES CL ON T.CLASS_CODE = CL.CLASS_CODE
             $join
             AND DAY_NUMBER = :d AND $campus
         "
@@ -333,13 +333,13 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
 
         if ($this->getGroupHandler()->isStudent($userId)) {
             $join = "
-                LEFT JOIN DB2INST1.SCHOOLBOX_STUDENTCLASS c ON t.CLASS_CODE = c.CLASS_CODE
-                WHERE c.STUDENT_NUMBER = :sn
+                LEFT JOIN DB2INST1.SCHOOLBOX_STUDENTCLASS C ON T.CLASS_CODE = C.CLASS_CODE
+                WHERE C.STUDENT_NUMBER = :sn
             ";
         } elseif ($this->getGroupHandler()->isStaff($userId)) {
             $join = "
-                LEFT JOIN DB2INST1.SCHOOLBOX_TEACHERCLASS c ON t.CLASS_CODE = c.CLASS_CODE
-                WHERE c.STAFF_NUMBER = :sn
+                LEFT JOIN DB2INST1.SCHOOLBOX_TEACHERCLASS C ON T.CLASS_CODE = C.CLASS_CODE
+                WHERE C.STAFF_NUMBER = :sn
             ";
         } else {
             return false;
@@ -355,9 +355,9 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
 
         $stmt = $this->getConnection()->prepareQuery(
             "
-            SELECT PERIOD_NUMBER, t.DAY_NUMBER, t.CLASS_CODE AS code, t.STAFF_NUMBER AS staffID, ROOM, cl.CLASS
-            FROM DB2INST1.SCHOOLBOX_TIMETABLE t
-            LEFT JOIN DB2INST1.SCHOOLBOX_CLASSES cl ON t.CLASS_CODE = cl.CLASS_CODE
+            SELECT PERIOD_NUMBER, T.DAY_NUMBER, T.CLASS_CODE AS CODE, T.STAFF_NUMBER AS STAFFID, ROOM, CL.CLASS
+            FROM DB2INST1.SCHOOLBOX_TIMETABLE T
+            LEFT JOIN DB2INST1.SCHOOLBOX_CLASSES CL ON T.CLASS_CODE = CL.CLASS_CODE
             $join
             AND $campusSql
             AND DAY_NUMBER <= :d
@@ -428,26 +428,26 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
         }
         $statement = $this->getConnection()->prepareQuery('
             SELECT
-                t.ROOM AS "RoomCode",
-                cl.CLASS AS "Description",
-                t.DAY_NUMBER AS "DayNumber",
-                t.PERIOD_NUMBER AS "PeriodNumber",
+                T.ROOM AS "RoomCode",
+                CL.CLASS AS "Description",
+                T.DAY_NUMBER AS "DayNumber",
+                T.PERIOD_NUMBER AS "PeriodNumber",
                 NULL AS "TimetableGroup",
                 NULL AS "TimetableCampus",
-                t.CLASS_CODE AS "ClassCode",
-                t.STAFF_NUMBER AS "StaffID",
-                st.SALUTATION AS "StaffTitle",
-                st.FIRSTNAME AS "StaffPreferredName",
-                st.SURNAME AS "StaffSurname"
-            FROM DB2INST1.SCHOOLBOX_TIMETABLE AS t
-            INNER JOIN DB2INST1.SCHOOLBOX_CLASSES AS cl ON
-                t.CLASS_CODE = cl.CLASS_CODE
-            INNER JOIN DB2INST1.SCHOOLBOX_STAFF AS st ON
-                t.STAFF_NUMBER = st.STAFF_NUMBER
-            WHERE t.ROOM = :room
+                T.CLASS_CODE AS "ClassCode",
+                T.STAFF_NUMBER AS "StaffID",
+                ST.SALUTATION AS "StaffTitle",
+                ST.FIRSTNAME AS "StaffPreferredName",
+                ST.SURNAME AS "StaffSurname"
+            FROM DB2INST1.SCHOOLBOX_TIMETABLE AS T
+            INNER JOIN DB2INST1.SCHOOLBOX_CLASSES AS CL ON
+                T.CLASS_CODE = CL.CLASS_CODE
+            INNER JOIN DB2INST1.SCHOOLBOX_STAFF AS ST ON
+                T.STAFF_NUMBER = ST.STAFF_NUMBER
+            WHERE T.ROOM = :room
             ORDER BY
-                t.DAY_NUMBER ASC,
-                t.PERIOD_NUMBER ASC
+                T.DAY_NUMBER ASC,
+                T.PERIOD_NUMBER ASC
         ');
         $statement->execute(array('room' => $roomCodes));
 
@@ -456,7 +456,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
         $campusTimetable = $this->getTimetableDefinition(null, $campus);
         $result = array();
         foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $row) {
-// Match day and period against a start and end.
+            // Match day and period against a start and end.
             for ($i = 0; $i < $campusTimetable['periodCount']; $i++) {
                 $periodNumber = $campusTimetable['number'][$i];
                 $periodSequence = $campusTimetable['sequence'][$i];
