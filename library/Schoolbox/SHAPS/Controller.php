@@ -62,19 +62,6 @@ class Controller extends Base
     }
 
 
-    /**
-     * Helper method to get a list of IDs of users provisioned on Help.
-     *
-     * This is a list of ids that were found using findProvisionedUsers() but we can take advantage
-     * of Collection to do this a bit cheaper
-     */
-    private function findProvisionedUsersIds()
-    {
-        return $this->findProvisionedUsers()->getPropertyValues('id');
-    }
-
-
-
 
 
 
