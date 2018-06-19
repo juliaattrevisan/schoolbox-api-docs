@@ -34,10 +34,25 @@ class Controller extends Base
      * Helper method to get a list of user objects from the raw JSON Help API response.
      *
      * This is a list of hydrated users who have an equivalent representation in Help.
+     *
+     * @return \Schoolbox\GenericCollection
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
      */
     private function findProvisionedUsers()
     {
+        /* This returns an associative array of (id, email)
+         * e.g. [246] => test@alaress.com.au
+         */
+        $users = (new HelpRequest($this->getConfigLoader()))->execute('users');
 
+        /* findByColumnList() only returns users that exist in the current installation
+         *
+         * If it receives an id from help, but this id isn't in the current installation,
+         * the id is simply ignored
+         */
+        return $this->userMapper->findByColumn('id', array_keys($users));
     }
 
 
@@ -49,6 +64,7 @@ class Controller extends Base
      */
     private function findProvisionedUsersIds()
     {
+        return $this->findProvisionedUsers()->getPropertyValues('id');
     }
 
 
