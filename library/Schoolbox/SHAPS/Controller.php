@@ -41,49 +41,17 @@ class Controller extends Base
     }
 
 
-    /**
-     * Helper method to get a list of user objects from the raw JSON Help API response.
-     *
-     * This is a list of hydrated users who have an equivalent representation in Help.
-     *
-     * @return \Schoolbox\GenericCollection
-     * @throws \GuzzleHttp\Exception\GuzzleException
-     * @throws \InvalidArgumentException
-     * @throws \RuntimeException
-     */
-    private function findProvisionedUsers(): \Schoolbox\GenericCollection
-    {
-        /* This returns an associative array of (id, email)
-         * e.g. [246] => test@alaress.com.au
-         */
-        $users = $this->helpRequest->execute('users');
-
-        /* findByColumnList() only returns users that exist in the current installation
-         * If it receives an id from help, but this id isn't in the current installation,
-         * the id is simply ignored
-         *
-         * Order by surname and firstname, then index it by the user id
-         */
-        return $this->userMapper->findByColumn('id', array_keys($users), [
-            'order' => [
-                'lastname' => 'asc',
-                'firstname' => 'asc'
-            ]
-        ])->indexBy('id');
-    }
-
-
-    /**
-     * TODO: This isn't being used, currently: unsure if it was a placeholder for future implementation?
-     *
-     * @return string
-     * @throws \GuzzleHttp\Exception\GuzzleException
-     * @throws \InvalidArgumentException
-     * @throws \RuntimeException
-     */
-    public function getProvisionedUsersJSON() {
-        return json_encode($this->findProvisionedUsers());
-    }
+//    /**
+//     * TODO: This isn't being used, currently: unsure if it was a placeholder for future implementation?
+//     *
+//     * @return string
+//     * @throws \GuzzleHttp\Exception\GuzzleException
+//     * @throws \InvalidArgumentException
+//     * @throws \RuntimeException
+//     */
+//    public function getProvisionedUsersJSON() {
+//        return json_encode($this->findProvisionedUsers());
+//    }
 
     /*
      * Helper method to get all staff in your Schoolbox instance.
