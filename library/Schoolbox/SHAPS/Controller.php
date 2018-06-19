@@ -31,28 +31,7 @@ class Controller extends Base
         $this->userMapper = $userMapper;
     }
 
-    /*
-     * Helper method to get details required for any Help API request.
-     *
-     * @return array
-     */
-    private function getAuthDetails() : array
-    {
-        $url = rtrim($this->getConfigLoader()->get('schoolbox_help_url'), '/');
 
-        // Query params
-        $schoolCode = strtolower($this->getConfigLoader()->get('site_school_code'));
-
-        $now = new Alaress_Date_Format();
-
-        $accessToken = $this->getConfigLoader()->get('schoolbox_help_access_token');
-
-        $digest = (new Digest($schoolCode, $accessToken))->generate($now->getUnixTimeStamp());
-
-        $timestamp = $now->getUnixTimeStamp();
-
-        return ['url' => $url, 'timestamp' => $timestamp, 'digest' => $digest, 'schoolCode' => $schoolCode];
-    }
 
     /**
      * Get a list of users provisioned on Help for a particular school, in JSON format.
