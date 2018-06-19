@@ -92,22 +92,17 @@ class RubricContext
      *
      * @param DueWork  $dueWork
      * @param User     $student
-     * @param null/User $currentUser
+     * @param bool     $publishedOnly Whether to exclude draft marks
      *
      * @return array
      */
-    public function generateMarkable(DueWork $dueWork, User $student, $currentUser = null)
+    public function generateMarkable(DueWork $dueWork, User $student, bool $publishedOnly = true)
     {
         if (!$dueWork->getUseRubric()) {
             return ['rubric' => null];
         }
 
         $context = $this->generateDefaultContext($dueWork);
-
-        $publishedOnly = true;
-        if ($currentUser instanceof User) {
-            $publishedOnly = !Access::getInstance()->isInstructor($currentUser, $dueWork->getContext()->getFolder());
-        }
 
         /* Spawn rubric grid
          */
