@@ -33,50 +33,7 @@ class Controller extends Base
 
 
 
-    /**
-     * Get a list of users provisioned on Help for a particular school, in JSON format.
-     *
-     * @return mixed
-     */
-    private function getUsersFromHelp()
-    {
-        $client = new GuzzleClient();
-        $auth = $this->getAuthDetails();
 
-        $response = $client->request(
-            "get",
-            "{$auth['url']}/api/course-participation/{$auth['schoolCode']}/users", [
-                'query' => [
-                    'ts' => $auth['timestamp'],
-                    'digest' => $auth['digest']
-                ]
-            ]
-        );
-
-        return json_decode($response->getBody()->getContents(), true);
-    }
-
-    /**
-     * Get a list of courses available on Help for a particular school, in JSON format.
-     *
-     * @return mixed
-     */
-    private function getCoursesFromHelp()
-    {
-        $client = new GuzzleClient();
-        $auth = $this->getAuthDetails();
-
-        $response = $client->request(
-            "get",
-            "{$auth['url']}/api/course-participation/{$auth['schoolCode']}/courses", [
-            'query' => [
-                'ts' => $auth['timestamp'],
-                'digest' => $auth['digest']
-            ]
-        ]);
-
-        return json_decode($response->getBody()->getContents(), true);
-    }
 
 
     /**
