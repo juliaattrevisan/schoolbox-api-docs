@@ -21,23 +21,23 @@ class HelpRequest
     /**
      * Asks help for information located at $endpoint
      *
-     * e.g. ->generateRequest($config, 'users');
+     * e.g. ->execute($config, 'users');
      *
-     * @param IConfigLoader $config
+     * @param IConfigLoader $configLoader
      * @param string $endpoint
      * @return mixed
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      */
-    private function generateRequest(IConfigLoader $config, string $endpoint)
+    private function execute(IConfigLoader $configLoader, string $endpoint)
     {
         /* Get the four pieces of the puzzle that we need to request data from Help
          */
         $auth = (new Auth\Parameters(
-            $config->get('schoolbox_help_url'),
-            $config->get('site_school_code'),
-            $config->get('schoolbox_help_access_token')
+            $configLoader->get('schoolbox_help_url'),
+            $configLoader->get('site_school_code'),
+            $configLoader->get('schoolbox_help_access_token')
         ))->generate();
 
 
