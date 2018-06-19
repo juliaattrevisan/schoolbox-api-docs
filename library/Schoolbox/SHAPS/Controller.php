@@ -214,7 +214,11 @@ class Controller extends Base
         $provisionedUsers = $this->findProvisionedUsers();
 
         foreach($enrolments as $i => $enrolment) {
-            foreach($enrolment['participants'] as $n => $participant) {
+
+            /** @var array $participants */
+            $participants = $enrolment['participants'];
+
+            foreach($participants as $n => $participant) {
 
                 /* Check if this participant's id exists in the provisionedUsers index
                  *
