@@ -93,10 +93,14 @@ class Controller extends Base
         ]);
     }
 
+
     /**
      * Renders a list of all staff in your Schoolbox instance, and whether or not they are provisioned on Help.
      *
-     * @api GET /shaps/provisioning
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
      */
     public function getAll()
     {
@@ -113,6 +117,11 @@ class Controller extends Base
      * Renders a list of staff in your Schoolbox instance that are also provisioned on Help.
      *
      * @api GET /shaps/provisioning/provisioned
+     *
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
      */
     public function getProvisioned()
     {
@@ -129,6 +138,11 @@ class Controller extends Base
      * Renders a list of staff in your Schoolbox instance that are NOT provisioned on Help.
      *
      * @api GET /shaps/provisioning/unprovisioned
+     *
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
      */
     public function getUnprovisioned()
     {
@@ -144,6 +158,8 @@ class Controller extends Base
      * Renders a selectize for searching users in your Schoolbox instance to see if they are provisioned.
      *
      * @api GET /shaps/provisioning/search
+     *
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     public function getUserProvisioningSearch()
     {
@@ -219,6 +235,8 @@ class Controller extends Base
 
     /**
      * Renders a search form for finding users to view their enrolments.
+     *
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     public function getUserEnrolmentSearch() {
         $this->getResponse()->content->set($this->buildHtmlOutput('@shaps/courses/search.twig', [
