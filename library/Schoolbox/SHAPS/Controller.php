@@ -71,51 +71,6 @@ class Controller extends Base
 
 
 
-    /**
-     * Helper method to get a list of user objects from the raw JSON Help API response.
-     *
-     * @api GET /shaps/provisioning/provisionedUsers
-     * @return Collection
-     */
-    private function getProvisionedUsers() : Collection
-    {
-        $provisionedUserIds = $this->getProvisionedUserIds();
-        $provisionedUsers = $this->userMapper->findByColumn('id', $provisionedUserIds);
-        return $provisionedUsers;
-    }
-
-
-    /**
-     * Helper method to get a list of IDs of users provisioned on Help.
-     *
-     * @return array
-     * @throws \GuzzleHttp\Exception\GuzzleException
-     * @throws \InvalidArgumentException
-     * @throws \RuntimeException
-     */
-    private function getProvisionedUserIds() : array
-    {
-        $provisionedUsers = (new HelpRequest($this->getConfigLoader()))->execute('users');
-
-        $matchingUsers = array_filter($provisionedUsers,
-            function($id) {
-                return in_array($id, $this->getAllStaff()->getPropertyValues('id'));
-            }
-        , ARRAY_FILTER_USE_KEY);
-        return array_keys($matchingUsers);
-    }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -126,7 +81,7 @@ class Controller extends Base
 
 
     public function getProvisionedUsersJSON() {
-        return json_encode($this->getProvisionedUsers());
+        return json_encode($this->findProvisionedUsers());
     }
 
     /*
@@ -153,7 +108,7 @@ class Controller extends Base
     public function getAll()
     {
         $allStaff = $this->getAllStaff();
-        $provisionedUserIds = $this->getProvisionedUserIds();
+        $provisionedUserIds = $this->findProvisionedUsersIds();
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
@@ -174,8 +129,8 @@ class Controller extends Base
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@shaps/provisioning/provisioned.twig', [
-                    'allUsers' => $this->getProvisionedUsers(),
-                    'provisionedUserIds' => $this->getProvisionedUserIds()
+                    'allUsers' => $this->findProvisionedUsers(),
+                    'provisionedUserIds' => $this->findProvisionedUsersIds()
             ])->setTitle('Provisioned Staff - Schoolbox Help Staff Provisioning')
         );
     }
@@ -188,7 +143,7 @@ class Controller extends Base
     public function getUnprovisioned()
     {
         $allStaff = $this->getAllStaff();
-        $unprovisionedStaff = $allStaff->diff($this->getProvisionedUsers());
+        $unprovisionedStaff = $allStaff->diff($this->findProvisionedUsers());
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
@@ -223,7 +178,7 @@ class Controller extends Base
         // Selectize gives us the user's external ID
         $user = $this->userMapper->findByExternalId($userId);
 
-        $provisionedUserIds = $this->getProvisionedUserIds();
+        $provisionedUserIds = $this->findProvisionedUsersIds();
         $status = in_array($user->getId(), $provisionedUserIds);
         $userJSON = [
             'name' => $user->getFullName(),
@@ -247,7 +202,7 @@ class Controller extends Base
 
         foreach($enrolments as $i => $enrolment) {
             foreach($enrolment['participants'] as $n => $participant) {
-                if (! in_array($participant['id'], $this->getProvisionedUserIds())) {
+                if (! in_array($participant['id'], $this->findProvisionedUsersIds())) {
                     // A convoluted way of saying this user couldn't be matched with anyone on our instance.
                     $enrolments[$i]['participants'][$n]['id'] = null;
                 }
