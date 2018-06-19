@@ -19,13 +19,18 @@ class HelpRequest
 
 
     /**
+     * Asks help for information located at $endpoint
+     *
+     * e.g. ->generateRequest($config, 'users');
+     *
      * @param IConfigLoader $config
+     * @param string $endpoint
      * @return mixed
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      */
-    private function generateRequest(IConfigLoader $config)
+    private function generateRequest(IConfigLoader $config, string $endpoint)
     {
         /* Get the four pieces of the puzzle that we need to request data from Help
          */
@@ -38,7 +43,7 @@ class HelpRequest
 
         $response = (new GuzzleClient())->request(
             "get",
-            "{$auth['url']}/api/course-participation/{$auth['schoolCode']}/users", [
+            "{$auth['url']}/api/course-participation/{$auth['schoolCode']}/{$endpoint}", [
                 'query' => [
                     'ts' => $auth['timestamp'],
                     'digest' => $auth['digest']
