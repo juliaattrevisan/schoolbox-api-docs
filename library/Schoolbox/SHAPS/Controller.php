@@ -9,9 +9,8 @@
 namespace Schoolbox\SHAPS;
 
 use Alaress\Web\Controller\Base;
-use Alaress_Date_Format;
+use Schoolbox\IConfigLoader;
 use Schoolbox\UserMapper;
-use GuzzleHttp\Client as GuzzleClient;
 use Schoolbox\Collection;
 
 class Controller extends Base
@@ -22,116 +21,37 @@ class Controller extends Base
     private $userMapper;
 
     /**
+     * A telephone to help.schoolbox.com.au where so can ask it things
+     *
+     * @var HelpRequest
+     */
+    private $helpRequest;
+
+
+    /**
      * Controller constructor.
      *
-     * @param UserMapper $userMapper
+     * @param IConfigLoader $configLoader
+     * @param UserMapper    $userMapper
      */
-    public function __construct(UserMapper $userMapper)
+    public function __construct(IConfigLoader $configLoader, UserMapper $userMapper)
     {
         $this->userMapper = $userMapper;
-    }
-
-    /*
-     * Helper method to get details required for any Help API request.
-     *
-     * @return array
-     */
-    private function getAuthDetails() : array
-    {
-        $url = rtrim($this->getConfigLoader()->get('schoolbox_help_url'), '/');
-
-        // Query params
-        $schoolCode = strtolower($this->getConfigLoader()->get('site_school_code'));
-
-        $now = new Alaress_Date_Format();
-
-        $accessToken = $this->getConfigLoader()->get('schoolbox_help_access_token');
-
-        $digest = (new AuthDigest($schoolCode, $accessToken))->generate($now->getUnixTimeStamp());
-
-        $timestamp = $now->getUnixTimeStamp();
-
-        return ['url' => $url, 'timestamp' => $timestamp, 'digest' => $digest, 'schoolCode' => $schoolCode];
-    }
-
-    /**
-     * Get a list of users provisioned on Help for a particular school, in JSON format.
-     *
-     * @return mixed
-     */
-    private function getUsersFromHelp()
-    {
-        $client = new GuzzleClient();
-        $auth = $this->getAuthDetails();
-
-        $response = $client->request(
-            "get",
-            "{$auth['url']}/api/course-participation/{$auth['schoolCode']}/users", [
-                'query' => [
-                    'ts' => $auth['timestamp'],
-                    'digest' => $auth['digest']
-                ]
-            ]
-        );
-
-        return json_decode($response->getBody()->getContents(), true);
-    }
-
-    /**
-     * Get a list of courses available on Help for a particular school, in JSON format.
-     *
-     * @return mixed
-     */
-    private function getCoursesFromHelp()
-    {
-        $client = new GuzzleClient();
-        $auth = $this->getAuthDetails();
-
-        $response = $client->request(
-            "get",
-            "{$auth['url']}/api/course-participation/{$auth['schoolCode']}/courses", [
-            'query' => [
-                'ts' => $auth['timestamp'],
-                'digest' => $auth['digest']
-            ]
-        ]);
-
-        return json_decode($response->getBody()->getContents(), true);
+        $this->helpRequest = new HelpRequest($configLoader, $this->userMapper);
     }
 
 
-    /**
-     * Helper method to get a list of user objects from the raw JSON Help API response.
-     *
-     * @api GET /shaps/provisioning/provisionedUsers
-     * @return Collection
-     */
-    private function getProvisionedUsers() : Collection
-    {
-        $provisionedUserIds = $this->getProvisionedUserIds();
-        $provisionedUsers = $this->userMapper->findByColumn('id', $provisionedUserIds);
-        return $provisionedUsers;
-    }
-
-    public function getProvisionedUsersJSON() {
-        return json_encode($this->getProvisionedUsers());
-    }
-
-    /**
-     * Helper method to get a list of IDs of users provisioned on Help.
-     *
-     * @return array
-     */
-    private function getProvisionedUserIds() : array
-    {
-        $provisionedUsers = $this->getUsersFromHelp();
-        $matchingUsers = array_filter($provisionedUsers,
-            function($id) {
-                return in_array($id, $this->getAllStaff()->getPropertyValues('id'));
-            }
-        , ARRAY_FILTER_USE_KEY);
-        return array_keys($matchingUsers);
-    }
+//    /**
+//     * TODO: This isn't being used, currently: unsure if it was a placeholder for future implementation?
+//     *
+//     * @return string
+//     * @throws \GuzzleHttp\Exception\GuzzleException
+//     * @throws \InvalidArgumentException
+//     * @throws \RuntimeException
+//     */
+//    public function getProvisionedUsersJSON() {
+//        return json_encode($this->findProvisionedUsers());
+//    }
 
     /*
      * Helper method to get all staff in your Schoolbox instance.
@@ -149,21 +69,24 @@ class Controller extends Base
         ]);
     }
 
+
     /**
      * Renders a list of all staff in your Schoolbox instance, and whether or not they are provisioned on Help.
      *
-     * @api GET /shaps/provisioning
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
      */
     public function getAll()
     {
-        $allStaff = $this->getAllStaff();
-        $provisionedUserIds = $this->getProvisionedUserIds();
+        $provisionedUsers = $this->helpRequest->findProvisionedUsers();
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@shaps/provisioning/index.twig', [
-                'allUsers' => $allStaff,
-                'provisionedUserIds' => $provisionedUserIds
+                'allUsers' => $this->getAllStaff(),
+                'provisionedUsers' => $provisionedUsers
             ])->setTitle('Schoolbox Help Staff Provisioning')
         );
     }
@@ -172,14 +95,21 @@ class Controller extends Base
      * Renders a list of staff in your Schoolbox instance that are also provisioned on Help.
      *
      * @api GET /shaps/provisioning/provisioned
+     *
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
      */
     public function getProvisioned()
     {
+        $provisionedUsers = $this->helpRequest->findProvisionedUsers();
+
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@shaps/provisioning/provisioned.twig', [
-                    'allUsers' => $this->getProvisionedUsers(),
-                    'provisionedUserIds' => $this->getProvisionedUserIds()
+                    'allUsers' => $provisionedUsers,
+                    'provisionedUsers' => $provisionedUsers
             ])->setTitle('Provisioned Staff - Schoolbox Help Staff Provisioning')
         );
     }
@@ -188,16 +118,20 @@ class Controller extends Base
      * Renders a list of staff in your Schoolbox instance that are NOT provisioned on Help.
      *
      * @api GET /shaps/provisioning/unprovisioned
+     *
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
      */
     public function getUnprovisioned()
     {
-        $allStaff = $this->getAllStaff();
-        $unprovisionedStaff = $allStaff->diff($this->getProvisionedUsers());
+        $provisionedUsers = $this->helpRequest->findProvisionedUsers();
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@shaps/provisioning/unprovisioned.twig', [
-                    'allUsers' => $unprovisionedStaff
+                    'allUsers' => $this->getAllStaff()->diff($provisionedUsers)
             ])->setTitle('Unprovisioned Staff - Schoolbox Help Staff Provisioning')
         );
     }
@@ -206,6 +140,8 @@ class Controller extends Base
      * Renders a selectize for searching users in your Schoolbox instance to see if they are provisioned.
      *
      * @api GET /shaps/provisioning/search
+     *
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     public function getUserProvisioningSearch()
     {
@@ -216,51 +152,56 @@ class Controller extends Base
         );
     }
 
+
     /**
      * Provides details about a user in response to an ajax request for that user's external ID.
      *
      * @api GET /shaps/provisioning/{userId}
      * @param string $userId
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
+     * @throws \Schoolbox\Mapper\Exception
      */
     public function searchUsers(string $userId)
     {
         // Selectize gives us the user's external ID
         $user = $this->userMapper->findByExternalId($userId);
 
-        $provisionedUserIds = $this->getProvisionedUserIds();
-        $status = in_array($user->getId(), $provisionedUserIds);
+        /* Check if this user's id was in the provisionedUsers index - don't need to use in_array to test
+         */
+        $provisionedUsers = $this->helpRequest->findProvisionedUsers();
+        $exists = $provisionedUsers->offsetGet($user->getId()) !== null;
+
         $userJSON = [
             'name' => $user->getFullName(),
-            'provisioned' => $status,
+            'provisioned' => $exists,
             'id' => $user->getId(),
             'externalID' => $user->getExternalId(),
         ];
+
         $this->getResponse()->content->set($this->buildJsonOutput($userJSON));
     }
 
     /**
      * Renders a list of all courses available for your school on Help, and the users enrolled in each.
+     *
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
      */
     public function getUsersInCourses() {
-        $enrolments = $this->getCoursesFromHelp();
-
-        foreach($enrolments as $i => $enrolment) {
-            foreach($enrolment['participants'] as $n => $participant) {
-                if (! in_array($participant['id'], $this->getProvisionedUserIds())) {
-                    // A convoluted way of saying this user couldn't be matched with anyone on our instance.
-                    $enrolments[$i]['participants'][$n]['id'] = null;
-                }
-            }
-        }
-
         $this->getResponse()->content->set($this->buildHtmlOutput('@shaps/courses/index.twig', [
-            'courses' => $enrolments,
-            'serverUrl' => $url = rtrim($this->getConfigLoader()->get('schoolbox_help_url'), '/')
+            'courses' => $this->helpRequest->findEnrolments(),
+            'serverUrl' => $this->helpRequest->getServerUrl()
         ])->setTitle('Schoolbox Help Course Enrolments'));
     }
 
     /**
      * Renders a search form for finding users to view their enrolments.
+     *
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     public function getUserEnrolmentSearch() {
         $this->getResponse()->content->set($this->buildHtmlOutput('@shaps/courses/search.twig', [
