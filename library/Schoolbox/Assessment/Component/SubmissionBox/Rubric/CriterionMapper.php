@@ -121,12 +121,12 @@ class CriterionMapper extends Schoolbox\Mapper {
                 }
             }
             if (!$rubric_exists) {
-                $new_rubric = clone $rubric;
-                $new_rubric->setId(null)->setParentId($to_id);
-                $new_rubric_list->add($new_rubric);
+                $new_rubric_list->add(
+                    $this->findOrCreateOneForFolderByKey($to_id, $rubric->getName(), $rubric->getGroup()->getName())
+                );
             }
         }
-        return $this->save($new_rubric_list);
+        return $new_rubric_list->getPropertyValues('id');
     }
 
     /**
