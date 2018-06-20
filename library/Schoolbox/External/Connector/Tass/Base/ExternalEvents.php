@@ -57,11 +57,11 @@ class ExternalEvents extends Base implements IExternalEvents
                 ec.room_code AS room,
                 ecd.cat_desc as type,
                 CASE 
-                    WHEN ec.start_time IS NOT NULL THEN ec.start_date + ec.start_time 
+                    WHEN ec.start_time IS NOT NULL THEN ec.start_date + CAST(ec.start_time AS TIME(0))
                     ELSE ec.start_date 
                 END as start,
                 CASE 
-                    WHEN ec.end_time IS NOT NULL THEN ec.end_date + ec.end_time 
+                    WHEN ec.end_time IS NOT NULL THEN ec.end_date + CAST(ec.end_time AS TIME(0))
                     ELSE ec.end_date 
                 END AS finish,
                 ec.campus_code AS location,
