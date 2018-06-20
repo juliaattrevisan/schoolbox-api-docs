@@ -155,7 +155,8 @@ class Rubric extends Core\Rubric
             $this->cCache->attach($criterion, $model);
         }
 
-        return $this->cCache->offsetGet($criterion)->setGrouping($groupName ?: $criterion->getGroup()->getName());
+        return $this->cCache->offsetGet($criterion)
+                            ->getGroup()->setName($groupName ?: $criterion->getGroup()->getName());
     }
 
 
