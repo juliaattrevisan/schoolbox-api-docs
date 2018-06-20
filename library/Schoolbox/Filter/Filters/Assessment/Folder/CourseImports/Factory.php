@@ -219,6 +219,8 @@ class Factory extends FolderFilter\Factory
         if ($folder->isClass() && $options[Definition::KEY_CLASSES]->getAvailable()) {
             return true;
         }
+        // Re-hydrate group
+        $folder = $this->getFolderMapper()->findById($folder->getId());
         if ($folder->isGroup() && $options[Definition::KEY_GROUPS]->getAvailable()) {
             return true;
         }
