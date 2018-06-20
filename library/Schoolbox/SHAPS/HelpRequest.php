@@ -14,7 +14,6 @@ namespace Schoolbox\SHAPS;
 use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\GuzzleException;
-use Schoolbox\IConfigLoader;
 use Schoolbox\SHAPS\Auth;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -23,9 +22,9 @@ class HelpRequest
 {
 
     /**
-     * @var IConfigLoader
+     * @var Auth\Parameters
      */
-    private $configLoader;
+    private $authParams;
 
     /**
      * @var UserMapper
@@ -34,12 +33,12 @@ class HelpRequest
 
     /**
      * HelpRequest constructor.
-     * @param IConfigLoader $configLoader
-     * @param UserMapper    $userMapper
+     * @param Auth\Parameters $authParams
+     * @param UserMapper      $userMapper
      */
-    public function __construct(IConfigLoader $configLoader, UserMapper $userMapper)
+    public function __construct(Auth\Parameters $authParams, UserMapper $userMapper)
     {
-        $this->configLoader = $configLoader;
+        $this->authParams = $authParams;
         $this->userMapper = $userMapper;
     }
 
@@ -90,11 +89,7 @@ class HelpRequest
     {
         /* Get the four pieces of the puzzle that we need to request data from Help
          */
-        $auth = (new Auth\Parameters(
-            $this->configLoader->get('schoolbox_help_url'),
-            $this->configLoader->get('site_school_code'),
-            $this->configLoader->get('schoolbox_help_access_token')
-        ))->generate();
+        $auth = $this->authParams->generate();
 
         /* Execute request using guzzle
          */
@@ -206,11 +201,7 @@ class HelpRequest
         $data    = [];
         if (!empty($payload)) {
             // Send each user to Help
-            $auth = (new Auth\Parameters(
-                $this->configLoader->get('schoolbox_help_url'),
-                $this->configLoader->get('site_school_code'),
-                $this->configLoader->get('schoolbox_help_access_token')
-            ))->generate();
+            $auth = $this->authParams->generate();
 
             // CSRF defeating:
             // set HTTP_ORIGIN and HTTP_HOST to the Help host

@@ -34,13 +34,14 @@ class Controller extends Base
     /**
      * Controller constructor.
      *
-     * @param IConfigLoader $configLoader
-     * @param UserMapper    $userMapper
+     * @param IConfigLoader   $configLoader
+     * @param UserMapper      $userMapper
+     * @param Auth\Parameters $authParams
      */
-    public function __construct(IConfigLoader $configLoader, UserMapper $userMapper)
+    public function __construct(IConfigLoader $configLoader, UserMapper $userMapper, Auth\Parameters $authParams)
     {
         $this->userMapper = $userMapper;
-        $this->helpRequest = new HelpRequest($configLoader, $this->userMapper);
+        $this->helpRequest = new HelpRequest($authParams, $this->userMapper);
     }
 
 

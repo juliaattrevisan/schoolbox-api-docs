@@ -14,6 +14,7 @@ use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
 use Schoolbox\Mapper;
+use Schoolbox\SHAPS\Auth\Parameters;
 use Schoolbox\UserMapper;
 use Alaress\Twig\Loader\IChainLoader;
 
@@ -91,8 +92,16 @@ class Module extends BaseModule
     {
         /** @var Container $injector */
         $injector->params[Controller::class] = [
-            'userMapper' => $this->getMapperFactory()->getLazy(UserMapper::class),
-            'configLoader' => $this->getConfig()
+            'userMapper'   => $this->getMapperFactory()->getLazy(UserMapper::class),
+            'configLoader' => $this->getConfig(),
+            'authParams'   => $injector->lazyNew(
+                Parameters::class,
+                [
+                    'url'         => $this->getConfig()->get('schoolbox_help_url'),
+                    'schoolCode'  => $this->getConfig()->get('site_school_code'),
+                    'accessToken' => $this->getConfig()->get('schoolbox_help_access_token'),
+                ]
+            )
         ];
     }
 
