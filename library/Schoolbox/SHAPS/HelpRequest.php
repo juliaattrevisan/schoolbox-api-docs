@@ -20,13 +20,16 @@ use Schoolbox\UserMapper;
 
 class HelpRequest
 {
-
     /**
+     * API request parameter generator
+     *
      * @var Auth\Parameters
      */
     private $authParams;
 
     /**
+     * Data source for users in the local Schoolbox instance
+     *
      * @var UserMapper
      */
     private $userMapper;
@@ -183,7 +186,7 @@ class HelpRequest
      */
     public function getServerUrl(): string
     {
-        return rtrim($this->configLoader->get('schoolbox_help_url'), '/');
+        return $this->authParams->getServerUrl();
     }
 
 

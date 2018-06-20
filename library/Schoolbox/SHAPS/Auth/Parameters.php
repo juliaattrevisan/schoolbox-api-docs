@@ -71,10 +71,6 @@ class Parameters
      */
     public function generate() : array
     {
-        /* Trim away the trailing slash that may inadvertently exist
-         */
-        $url = rtrim($this->url, '/');
-
         /* Query params that we need to provide in every request to ensure we're who we say we are
          */
         $schoolCode = strtolower($this->schoolCode);
@@ -88,11 +84,21 @@ class Parameters
         /* Return it all in a canonical structure
          */
         return [
-            'url'        => $url,
+            'url'        => $this->getServerUrl(),
             'timestamp'  => $timestamp,
             'digest'     => $digest,
             'schoolCode' => $schoolCode,
             'host'       => parse_url($url, PHP_URL_HOST),
         ];
+    }
+
+    /**
+     * Officially get the url with trailing slash removed, if it existed
+     *
+     * @return string
+     */
+    public function getServerUrl(): string
+    {
+        return rtrim($this->url, '/');
     }
 }
