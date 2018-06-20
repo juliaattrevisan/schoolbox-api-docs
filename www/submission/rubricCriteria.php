@@ -84,14 +84,21 @@ if (count($criterionCollection)) {
     /* Create group structure */
     $criteriaList = [];
     foreach ($criterionCollection as $crit) {
-        $criteriaList[$crit->getGroup()->getName()][] = $crit;
+        $groupId = $crit->getGroup()->getId();
+        $criteriaList[$groupId]['group']      = $crit->getGroup();
+        $criteriaList[$groupId]['criteria'][] = $crit;
     }
 
-    foreach ($criteriaList as $grouping => $crits) {
+    foreach ($criteriaList as $critGroup) {
+        /** @var \Schoolbox\Assessment\Component\SubmissionBox\Rubric\Group $group */
+        $group = $critGroup['group'];
+        /** @var \Schoolbox\Assessment\Component\SubmissionBox\Rubric\Criterion[] $crits */
+        $crits = $critGroup['criteria'];
         $this->setVar([
             'criterion_block'    => '',
             'CRITGROUP_COUNT'    => $groupCount++,
-            'CRITGROUP_NAME'     => $grouping,
+            'CRITGROUP_ID'       => $group->getId(),
+            'CRITGROUP_NAME'     => $group->getName(),
             'CRITGROUP_DISABLED' => '',
         ]);
 
