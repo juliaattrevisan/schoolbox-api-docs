@@ -143,7 +143,7 @@ class RubricMapper
         $in = implode(', :', array_keys($args));
 
         $stmt = $this->database->query("
-            SELECT rc.id, rg.name AS grouping, rc.name, COUNT(ru.submission_box_id) usage_count, rc.parent_id
+            SELECT rc.id, rg.name AS grouping, rc.name, COUNT(ru.submission_box_id) usage_count, rg.parent_id
             FROM rubric_criterion rc
             JOIN      rubric_group rg ON rg.id = rc.rubric_group_id
             LEFT JOIN rubric_usage ru ON rc.id = ru.criterion_id
