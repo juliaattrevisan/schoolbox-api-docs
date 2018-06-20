@@ -53,6 +53,7 @@ foreach ($criteria as $group) {
         foreach ($group['items'] as $critID => $crit) {
             $critID = substr($critID, 1);
             $data[$critID] = [
+                'id'    => $group['id'],
                 'group' => $group['name'],
                 'name'  => $crit,
             ];
@@ -91,6 +92,7 @@ RubricMapper::getInstance()->deleteEmptyLevels($affectedSubmissionBoxes->keys())
 
 
 // iterate through list of provided criteria changes
+/** @var \Schoolbox\Assessment\Component\SubmissionBox\Rubric\Group[] $groupList */
 $groupList  = $groupMapper->createCollection();
 $parentType = \Schoolbox\Assessment\Component\SubmissionBox\Rubric\Group::PARENT_TYPE_CATEGORY;
 foreach ($data as $critID => $critData) {
@@ -121,13 +123,10 @@ foreach ($data as $critID => $critData) {
     $criterionName = $critData['name'];
 
     try {
-        $criteria = $criterionMapper->findOneByColumnList(
-            [
-                'id'        => $critID,
-                'parent_id' => $folderId,
-            ]
-        );
-        $criteria->setGrouping($critData['group']);
+        $criteria = $criterionMapper->findOneByColumnList([
+            'id'              => $critID,
+            'rubric_group_id' => $group->getId(),
+        ]);
         $criteria->setName($critData['name']);
 
         //Do not edit criteria that are in use on a class page, can edit in course though
@@ -137,8 +136,7 @@ foreach ($data as $critID => $critData) {
         }
     } catch (Exception $e) {
         $criteria = new Criterion();
-        $criteria->setParentId($folderId);
-        $criteria->setGrouping($critData['group']);
+        $criteria->setGroup($group);
         $criteria->setName($critData['name']);
     }
 
