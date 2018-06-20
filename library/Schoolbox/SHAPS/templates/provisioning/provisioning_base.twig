@@ -39,13 +39,13 @@
                         </tr>
 
                         {% for user in allUsers %}
-                            {% if user.id not in provisionedUserIds %}
+                            {% if not provisionedUsers[user.id] %}
                                 <tr class="highlight-warning">
                             {% else %}
                                 <tr>
                             {% endif %}
                             <td>
-                                {% if user.id in provisionedUserIds %}
+                                {% if provisionedUsers[user.id] %}
                                     <span data-provision-status class="icon-course-outline" title="Provisioned"></span>
                                 {% else %}
                                     <span data-provision-status>Not Provisioned</span>
