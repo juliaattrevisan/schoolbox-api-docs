@@ -273,7 +273,7 @@ class Handler
                     ->setLocalEmail(false)
                     ->setWebmail(false)
                     ->setUseInternalMail(false)
-                    ->setEportfolioEnable(false)
+                    ->setEportfolioEnable(true)
                 ;
 
                 // no previous data
