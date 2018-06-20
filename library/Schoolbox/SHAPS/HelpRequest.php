@@ -56,7 +56,7 @@ class HelpRequest
      */
     public function users(): array
     {
-        return $this->execute('users');
+        return $this->execute('get', 'users');
     }
 
 
@@ -70,45 +70,55 @@ class HelpRequest
      */
     public function courses(): array
     {
-        return $this->execute('courses');
+        return $this->execute('get', 'courses');
     }
 
     /**
      * Asks help for information located at $endpoint
      *
-     * ->execute('users');
+     * ->execute('get', 'users');
      * This returns an array of key-value pairs of (id => email)
      *
-     * ->execute('courses');
+     * ->execute('get', 'courses');
      * This returns an array of...stuff
      *
+     * @param string $method
      * @param string $endpoint
+     * @param array  $formParams
      * @return array
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      */
-    private function execute(string $endpoint) : array
+    private function execute(string $method, string $endpoint, array $formParams = []): array
     {
         /* Get the four pieces of the puzzle that we need to request data from Help
          */
         $auth = $this->authParams->generate();
 
         /* Execute request using guzzle
+         * Host and Origin headers are for working around CSRF protection
+         * (which shouldn't be necessary for API calls, but is for some reason)
          */
         $response = (new GuzzleClient())->request(
-            'get',
+            $method,
             "{$auth['url']}/api/course-participation/{$auth['schoolCode']}/{$endpoint}", [
                 'query' => [
-                    'ts' => $auth['timestamp'],
+                    'ts'     => $auth['timestamp'],
                     'digest' => $auth['digest']
-                ]
+                ],
+                'form_params' => $formParams,
+                'headers'     => [
+                    'Host'   => $auth['host'],
+                    'Origin' => $auth['host'],
+                ],
             ]
         );
 
         /* Return a json-encoded output of the body contents
          */
-        return json_decode($response->getBody()->getContents(), true);
+        $return = json_decode($response->getBody()->getContents(), true);
+        return \is_array($return) ? $return : [];
     }
 
 
@@ -204,28 +214,8 @@ class HelpRequest
         $data    = [];
         if (!empty($payload)) {
             // Send each user to Help
-            $auth = $this->authParams->generate();
-
-            // CSRF defeating:
-            // set HTTP_ORIGIN and HTTP_HOST to the Help host
-            // This endpoint calls `\Custom\Help\CourseParticipation\Controller::postUserRegistrations`
-            // on host `config.schoolbox_help_url`.
             try {
-                (new GuzzleClient())->request(
-                    'post',
-                    "{$auth['url']}/api/course-participation/{$auth['schoolCode']}/users",
-                    [
-                        'query' => [
-                            'ts'     => $auth['timestamp'],
-                            'digest' => $auth['digest']
-                        ],
-                        'form_params' => ['user' => $payload],
-                        'headers'     => [
-                            'Host'   => $auth['host'],
-                            'Origin' => $auth['host'],
-                        ],
-                    ]
-                );
+                $this->execute('post', 'users', ['user' => $payload,]);
                 $code    = 200;
                 $message = 'OK';
 
