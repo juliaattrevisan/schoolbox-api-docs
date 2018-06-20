@@ -381,7 +381,7 @@ class Controller extends Base
 
         try {
             // check the server is correctly configured
-            $this->getRoleMapper()->findOneByColumn('name', Handler::PARTICIPANT_ROLE_NAME);
+            $this->getRoleMapper()->findOneByColumn('name', Handler::DEFAULT_PARTICIPANT_ROLE_NAME);
             $this->getCampusMapper()->findOneByColumn('id', Handler::PARTICIPANT_CAMPUS);
 
         } catch (Mapper\Exception $e) {
