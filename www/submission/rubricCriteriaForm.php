@@ -10,6 +10,7 @@
 
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Criterion;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\GroupMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\UsageMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
@@ -61,6 +62,7 @@ foreach ($criteria as $group) {
 
 /* @var $criterionMapper CriterionMapper */
 $criterionMapper = CriterionMapper::getInstance();
+$groupMapper     = GroupMapper::getInstance();
 
 // Which submission boxes have criteria deleted? We will need to ensure we don't leave in an invalid state.
 $affectedSubmissionBoxes = SubmissionBoxMapper::getInstance()->createCollection();
@@ -89,7 +91,35 @@ RubricMapper::getInstance()->deleteEmptyLevels($affectedSubmissionBoxes->keys())
 
 
 // iterate through list of provided criteria changes
+$groupList  = $groupMapper->createCollection();
+$parentType = \Schoolbox\Assessment\Component\SubmissionBox\Rubric\Group::PARENT_TYPE_CATEGORY;
 foreach ($data as $critID => $critData) {
+
+    // Find the group; if it doesn't exist create it
+    $groupName = $critData['group'];
+    if (!isset($groupList[$groupName])) {
+        if (isset($critData['id'])) {
+            try {
+                $group = $groupMapper->findOneByColumnList([
+                    'id'          => $critData['id'],
+                    'parent_id'   => $folderId,
+                    'parent_type' => $parentType,
+                ]);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                // ID exists, but not in this context; abort
+                error(Error\Mapper::ERROR_INFORMATION_MISSING);
+            }
+        } else {
+            $group = $groupMapper->findOrCreateOneForFolderByName($folderId, $groupName);
+        }
+        $groupMapper->save($group);
+        $groupList[$groupName] = $group;
+    }
+
+    // Now, find the criterion: if it doesn't exist create it
+    $group         = $groupList[$groupName];
+    $criterionName = $critData['name'];
+
     try {
         $criteria = $criterionMapper->findOneByColumnList(
             [
