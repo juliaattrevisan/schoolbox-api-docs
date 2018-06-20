@@ -87,6 +87,12 @@ class Parameters
 
         /* Return it all in a canonical structure
          */
-        return ['url' => $url, 'timestamp' => $timestamp, 'digest' => $digest, 'schoolCode' => $schoolCode];
+        return [
+            'url'        => $url,
+            'timestamp'  => $timestamp,
+            'digest'     => $digest,
+            'schoolCode' => $schoolCode,
+            'host'       => parse_url($url, PHP_URL_HOST),
+        ];
     }
 }
