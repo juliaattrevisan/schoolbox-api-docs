@@ -143,7 +143,13 @@ class RubricMapper
         $in = implode(', :', array_keys($args));
 
         $stmt = $this->database->query("
-            SELECT rc.id, rg.name AS grouping, rc.name, COUNT(ru.submission_box_id) usage_count, rg.parent_id
+            SELECT
+                rc.id,
+                rg.id AS group_id,
+                rg.name AS grouping,
+                rc.name,
+                COUNT(ru.submission_box_id) AS usage_count,
+                rg.parent_id
             FROM rubric_criterion rc
             JOIN      rubric_group rg ON rg.id = rc.rubric_group_id
             LEFT JOIN rubric_usage ru ON rc.id = ru.criterion_id
@@ -156,9 +162,6 @@ class RubricMapper
             GROUP BY rc.id
         ", $args);
 
-        // TODO what is this magic number
-        $groupId = 21;
-
         // De-duplicate into caches, prioritising parent if duplicate between
         // folder + parentFolder (eg UnitSpec vs CourseSpec)
         while ($r = $stmt->fetch(\PDO::FETCH_ASSOC)) {
@@ -169,7 +172,7 @@ class RubricMapper
             // If first instance of Capability
             if (!array_key_exists($capabilityNormalisedName, $capabilityCache)) {
                 // Save the Capability
-                $capabilityCache[$capabilityNormalisedName] = new Criteria\Group($groupId++, $this->normalizeSpace($r['grouping']));
+                $capabilityCache[$capabilityNormalisedName] = new Criteria\Group($r['group_id'], $this->normalizeSpace($r['grouping']));
 
                 // Instantiate Indicator cache for the Capability
                 $indicatorCache[$capabilityNormalisedName] = [];

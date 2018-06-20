@@ -244,7 +244,7 @@ class CriterionMapper extends Schoolbox\Mapper {
             // Build it
             /** @var GroupMapper $groupMapper */
             $groupMapper = $this->getJoinMapper('group');
-            $group       = $groupMapper->findOrCreateOneForParentByName($parentId, $parentType, $name);
+            $group       = $groupMapper->findOrCreateOneForParentByName($parentId, $parentType, $groupName);
             $criterion   = $this->createModel()
                                 ->setGroup($group)
                                 ->setName($name);
