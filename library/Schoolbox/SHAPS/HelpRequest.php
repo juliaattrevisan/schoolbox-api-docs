@@ -200,27 +200,11 @@ class HelpRequest
      */
     public function provisionUsers($userIds): array
     {
-        $userPayload = [];
-        if (is_iterable($userIds)) {
-            foreach ($this->userMapper->findByColumn('id', $userIds) as $user) {
-                /** @var User $user */
-                if (!$user->getRole()->isStaff()) {
-                    continue;
-                }
-                $userPayload[] = [
-                    'id'        => $user->getId(),
-                    'email'     => $user->getEmail(),
-                    'title'     => $user->getTitle(),
-                    'firstname' => $user->getFirstname(),
-                    'lastname'  => $user->getLastname(),
-                ];
-            }
-        }
-
+        $payload = $this->buildProvisionUsersPayload($userIds);
         $code    = 400;
         $message = 'Bad Request';
         $data    = [];
-        if (!empty($userPayload)) {
+        if (!empty($payload)) {
             // Send each user to Help
             $auth = (new Auth\Parameters(
                 $this->configLoader->get('schoolbox_help_url'),
@@ -241,7 +225,7 @@ class HelpRequest
                             'ts'     => $auth['timestamp'],
                             'digest' => $auth['digest']
                         ],
-                        'form_params' => ['user' => $userPayload],
+                        'form_params' => ['user' => $payload],
                         'headers'     => [
                             'Host'   => $auth['host'],
                             'Origin' => $auth['host'],
@@ -274,5 +258,32 @@ class HelpRequest
                 'message' => $message,
             ],
         ];
+    }
+
+    /**
+     * Build a payload of users to provision to Schoolbox Help.
+     *
+     * @param array $userIds
+     * @return array
+     */
+    private function buildProvisionUsersPayload($userIds): array
+    {
+        $userPayload = [];
+        if (is_iterable($userIds)) {
+            foreach ($this->userMapper->findByColumn('id', $userIds) as $user) {
+                /** @var User $user */
+                if (!$user->getRole()->isStaff()) {
+                    continue;
+                }
+                $userPayload[] = [
+                    'id'        => $user->getId(),
+                    'email'     => $user->getEmail(),
+                    'title'     => $user->getTitle(),
+                    'firstname' => $user->getFirstname(),
+                    'lastname'  => $user->getLastname(),
+                ];
+            }
+        }
+        return $userPayload;
     }
 }
