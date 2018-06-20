@@ -92,44 +92,6 @@ class CriterionMapper extends Schoolbox\Mapper {
 
 
     /**
-     * Clones rubric criteria from one category to another.
-     *
-     * @param int $from_id The category to copy from.
-     * @param int $to_id   The category to copy to.
-     *
-     * @return int[] A list of new rubric IDs
-     * @deprecated
-     * @see RubricMapper::copyRubric()
-     */
-    public function copyFromCategory($from_id, $to_id) {
-        /** @var Criterion[] $from_rubric_list */
-        $from_rubric_list = $this->findForFolder($from_id);
-        /** @var Criterion[] $existing_rubric_list */
-        $existing_rubric_list = $this->findForFolder($to_id);
-        $new_rubric_list = new Schoolbox\Collection();
-        foreach ($from_rubric_list as $rubric) {
-            // search existing for a rubric that matches this one.
-            // If there's not one, then save this rubric.
-            $rubric_exists = false;
-            foreach ($existing_rubric_list as $existing_rubric) {
-                if (
-                    $existing_rubric->getGroup()->getName() === $rubric->getGroup()->getName()
-                    && $existing_rubric->getName() === $rubric->getName()
-                ) {
-                    $rubric_exists = true;
-                    break;
-                }
-            }
-            if (!$rubric_exists) {
-                $new_rubric_list->add(
-                    $this->findOrCreateOneForFolderByKey($to_id, $rubric->getName(), $rubric->getGroup()->getName())
-                );
-            }
-        }
-        return $new_rubric_list->getPropertyValues('id');
-    }
-
-    /**
      * Pre-save callback - if a copy of this criterion already exists, then
      * update it instead of saving a new one.
      *
