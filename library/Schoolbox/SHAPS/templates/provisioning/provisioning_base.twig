@@ -108,12 +108,13 @@
                         }
                     });
 
+                    $checkbox.prop('checked', false);
                     if (isFailed) {
                         $tableRow.removeClass('highlight-warning').addClass('highlight-alert');
                         $tableRow.find('[data-provision-status]').text(reason);
 
                     } else {
-                        $checkbox.prop('checked', false).prop('disabled', true);
+                        $checkbox.prop('disabled', true);
                         $tableRow.removeClass('highlight-warning highlight-alert');
                         $tableRow.find('[data-provision-status]').text('').addClass('icon-course-outline');
                     }
