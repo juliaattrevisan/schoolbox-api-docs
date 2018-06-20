@@ -26,6 +26,7 @@ use UnexpectedValueException;
 class Handler
 {
     const PARTICIPANT_ROLE_NAMES = ['School Staff', 'Hero Teacher', 'Prospect'];
+    const DEFAULT_PARTICIPANT_ROLE_NAME = 'School Staff';
 
     const PARTICIPANT_CAMPUS    = 1;
     const REQUIRED_USER_FIELDS  = [
@@ -230,7 +231,7 @@ class Handler
      */
     public function postUserRegistrations(string $schoolCode, bool $byUsername, iterable $post) : array
     {
-        $participantRole     = $this->getRoleMapper()->findOneByColumn('name', self::PARTICIPANT_ROLE_NAME);
+        $participantRole     = $this->getRoleMapper()->findOneByColumn('name', self::DEFAULT_PARTICIPANT_ROLE_NAME);
         $participantCampuses = $this->getCampusMapper()->findByColumn('id', self::PARTICIPANT_CAMPUS);
 
         $failedUsers = [];
