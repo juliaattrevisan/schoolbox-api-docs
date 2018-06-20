@@ -88,7 +88,7 @@ class Parameters
             'timestamp'  => $timestamp,
             'digest'     => $digest,
             'schoolCode' => $schoolCode,
-            'host'       => parse_url($url, PHP_URL_HOST),
+            'host'       => parse_url($this->url, PHP_URL_HOST),
         ];
     }
 
