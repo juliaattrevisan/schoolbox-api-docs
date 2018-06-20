@@ -8,11 +8,7 @@
  */
 
 
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Criterion;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\GroupMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\UsageMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Permission\Access\Access;
@@ -61,9 +57,8 @@ foreach ($criteria as $group) {
     }
 }
 
-/* @var $criterionMapper CriterionMapper */
-$criterionMapper = CriterionMapper::getInstance();
-$groupMapper     = GroupMapper::getInstance();
+$criterionMapper = Rubric\CriterionMapper::getInstance();
+$groupMapper     = Rubric\GroupMapper::getInstance();
 
 // Which submission boxes have criteria deleted? We will need to ensure we don't leave in an invalid state.
 $affectedSubmissionBoxes = SubmissionBoxMapper::getInstance()->createCollection();
@@ -76,7 +71,7 @@ $criterionCollection = $criterionMapper->findForFolder($folderId);
 foreach ($criterionCollection as $crit) {
     if (!in_array($crit->getID(), $found)) {
         try {
-            $usages = UsageMapper::getInstance()->findByColumn('criterion_id', $crit->getId());
+            $usages = Rubric\UsageMapper::getInstance()->findByColumn('criterion_id', $crit->getId());
             $criterionMapper->delete($crit);
             foreach($usages as $usage){
                 $box = $usage->getSubmissionBox();
@@ -88,13 +83,13 @@ foreach ($criterionCollection as $crit) {
     }
 }
 // Ensure that deletion of a criterion, and its descriptors, does not result in empty levels.
-RubricMapper::getInstance()->deleteEmptyLevels($affectedSubmissionBoxes->keys());
+Rubric\RubricMapper::getInstance()->deleteEmptyLevels($affectedSubmissionBoxes->keys());
 
 
 // iterate through list of provided criteria changes
-/** @var \Schoolbox\Assessment\Component\SubmissionBox\Rubric\Group[] $groupList */
+/** @var Rubric\Group[] $groupList */
 $groupList  = $groupMapper->createCollection();
-$parentType = \Schoolbox\Assessment\Component\SubmissionBox\Rubric\Group::PARENT_TYPE_CATEGORY;
+$parentType = Rubric\Group::PARENT_TYPE_CATEGORY;
 foreach ($data as $critID => $critData) {
 
     // Find the group; if it doesn't exist create it
@@ -107,7 +102,7 @@ foreach ($data as $critID => $critData) {
                     'parent_id'   => $folderId,
                     'parent_type' => $parentType,
                 ]);
-            } catch (\Schoolbox\Mapper\Exception $e) {
+            } catch (Exception $e) {
                 // ID exists, but not in this context; abort
                 error(Error\Mapper::ERROR_INFORMATION_MISSING);
             }
@@ -130,12 +125,12 @@ foreach ($data as $critID => $critData) {
         $criteria->setName($critData['name']);
 
         //Do not edit criteria that are in use on a class page, can edit in course though
-        $usage = UsageMapper::getInstance()->findByColumnList(['criterion_id' => $critID]);
+        $usage = Rubric\UsageMapper::getInstance()->findByColumnList(['criterion_id' => $critID]);
         if (count($usage) && !($folder->hasCourseSpecification() || $folder->hasUnitSpecification())) {
             continue; // possibly throw an error of some kind
         }
     } catch (Exception $e) {
-        $criteria = new Criterion();
+        $criteria = new Rubric\Criterion();
         $criteria->setGroup($group);
         $criteria->setName($critData['name']);
     }
