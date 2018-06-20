@@ -13,7 +13,7 @@ namespace Schoolbox\SHAPS;
 
 use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Exception\ClientException;
-use GuzzleHttp\Exception\TransferException;
+use GuzzleHttp\Exception\GuzzleException;
 use Schoolbox\IConfigLoader;
 use Schoolbox\SHAPS\Auth;
 use Schoolbox\User;
@@ -222,9 +222,6 @@ class HelpRequest
         $data    = [];
         if (!empty($userPayload)) {
             // Send each user to Help
-
-            $client = new GuzzleClient();
-
             $auth = (new Auth\Parameters(
                 $this->configLoader->get('schoolbox_help_url'),
                 $this->configLoader->get('site_school_code'),
@@ -236,7 +233,8 @@ class HelpRequest
             // This endpoint calls `\Custom\Help\CourseParticipation\Controller::postUserRegistrations`
             // on host `config.schoolbox_help_url`.
             try {
-                $client->post(
+                (new GuzzleClient())->request(
+                    'post',
                     "{$auth['url']}/api/course-participation/{$auth['schoolCode']}/users",
                     [
                         'query' => [
@@ -261,7 +259,7 @@ class HelpRequest
                     $data = json_decode($e->getResponse()->getBody()->getContents());
                 }
 
-            } catch (TransferException $e) {
+            } catch (GuzzleException $e) {
                 // any other exception
                 $code    = 500;
                 $message = 'Internal Server Error';
