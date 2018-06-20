@@ -41,7 +41,10 @@ class Definition extends FolderFilter\Definition
      */
     protected function getCustomKeys()
     {
-        return [];
+        return [
+            self::KEY_CLASSES,
+            self::KEY_GROUPS,
+        ];
     }
 
 
@@ -59,6 +62,12 @@ class Definition extends FolderFilter\Definition
      */
     public function getLabel($key)
     {
-        throw new \InvalidArgumentException("Unknown FolderFilter key: $key");
+        switch ($key) {
+            case self::KEY_CLASSES:
+                return 'Classes';
+            case self::KEY_GROUPS:
+                return 'Groups';
+        }
+        throw new \InvalidArgumentException("Unknown FolderFilter key: '$key''");
     }
 }

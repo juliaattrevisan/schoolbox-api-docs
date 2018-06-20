@@ -182,20 +182,46 @@ class Factory extends FolderFilter\Factory
         foreach ($unitImpls as $unitImpl) {
             $folderId = $unitImpl->getFolder()->getId();
             // Ensure user has READ perm to the requested folder (this will also be enforced via key-converter)
-            if ($this->getAccess()->getFolderAccess($user, $folderId) >= UserAccess::ACCESS_READ) {
-                // Insert folder into available options
-                $folders[$folderId] = $unitImpl->getFolder();
-
-                // Tweak overrides to ensure folder is selected
-                if (!$folderOverrides->keyExists($folderId)) {
-                    $folderOverrides[$folderId] = $this->getSelectionMapper()->createModel()
-                                                       ->setFilter($definition->getFilter())
-                                                       ->setUser($user)
-                                                       ->setPage($pageFilter->getPage())
-                                                       ->setKey((string)$folderId)
-                                                       ->setSelected(false);
-                }
+            if ($this->getAccess()->getFolderAccess($user, $folderId) < UserAccess::ACCESS_READ) {
+                continue;
             }
+
+            // Ensure the admin has configured this sort of folder to be available.
+            if (!$this->isAvailable($unitImpl->getFolder(), $pageFilter->getOptions())) {
+                continue;
+            }
+            // Insert folder into available options
+            $folders[$folderId] = $unitImpl->getFolder();
+
+            // Tweak overrides to ensure folder is selected
+            if (!$folderOverrides->keyExists($folderId)) {
+                $folderOverrides[$folderId] = $this->getSelectionMapper()->createModel()
+                                                   ->setFilter($definition->getFilter())
+                                                   ->setUser($user)
+                                                   ->setPage($pageFilter->getPage())
+                                                   ->setKey((string)$folderId)
+                                                   ->setSelected(false);
+            }
+
         }
+    }
+
+
+    /**
+     * Returns whether the admin has configured this sort of folder to be available in the filter options
+     *
+     * @param Folder\Model                                 $folder
+     * @param GenericCollection|Filter\Page\Option\Model[] $options
+     * @return bool
+     */
+    private function isAvailable(Folder\Model $folder, GenericCollection $options): bool
+    {
+        if ($folder->isClass() && $options[Definition::KEY_CLASSES]->getAvailable()) {
+            return true;
+        }
+        if ($folder->isGroup() && $options[Definition::KEY_GROUPS]->getAvailable()) {
+            return true;
+        }
+        return false;
     }
 }
