@@ -1324,6 +1324,11 @@ class User implements JsonSerializable, ISoftDeletable
         if ($this->getConfigLoader() instanceof \__PHP_Incomplete_Class) {
             $this->setConfigLoader(new ConfigLoader());
         }
+        if (!$this->children) {
+            // This property was added in 18.0.0
+            // Any objects serialised in 17.5.x will cause bugs in 18.0.0+ if this property is iterated.
+            $this->children = new GenericCollection(self::class);
+        }
     }
 
     /**
