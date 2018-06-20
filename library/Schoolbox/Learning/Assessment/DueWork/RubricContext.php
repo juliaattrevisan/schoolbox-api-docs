@@ -92,10 +92,11 @@ class RubricContext
      *
      * @param DueWork  $dueWork
      * @param User     $student
+     * @param bool     $publishedOnly Whether to exclude draft marks
      *
      * @return array
      */
-    public function generateMarkable(DueWork $dueWork, User $student)
+    public function generateMarkable(DueWork $dueWork, User $student, bool $publishedOnly = true)
     {
         if (!$dueWork->getUseRubric()) {
             return ['rubric' => null];
@@ -105,7 +106,7 @@ class RubricContext
 
         /* Spawn rubric grid
          */
-        (new GridGenerator($this->rubricMapper, $dueWork->getRubric(), $student))->applyInstructorGivenMark(false);
+        (new GridGenerator($this->rubricMapper, $dueWork->getRubric(), $student))->applyInstructorGivenMark($publishedOnly);
         $context['rubric'] = $dueWork->getRubric()->toContext();
 
         return $context;

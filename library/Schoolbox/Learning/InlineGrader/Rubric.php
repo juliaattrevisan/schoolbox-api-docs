@@ -87,8 +87,9 @@ class Rubric
                 'rubricContext' => $this->rubricContext->generate($this->assessment, $this->participant->getUser(), $this->currentUser, Access::getInstance(), false)
             ];
         } else {
+            $publishedOnly = !Access::getInstance()->isInstructor($this->currentUser, $this->assessment->getBaseContext()->getFolder());
             return [
-                'rubricContext' => $this->rubricContext->generateMarkable($this->assessment, $this->participant->getUser())
+                'rubricContext' => $this->rubricContext->generateMarkable($this->assessment, $this->participant->getUser(), $publishedOnly)
             ];
         }
     }

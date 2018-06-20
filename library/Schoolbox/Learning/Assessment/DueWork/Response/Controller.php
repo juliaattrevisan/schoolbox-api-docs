@@ -185,13 +185,13 @@ class Controller extends Base
             $assessment->setRubric($rubricMapper->findByDueWork($assessment));
         }
 
-        $rubricData = (new InlineGrader\Rubric($assessment, $participant, $this->getUser(), $response, $isInteractionLocked, $rubricContext))->generate();
-        $data = array_merge($data, $rubricData);
-
         // Load self-reflection; if there is one, override the standard grid
         $selfReflectionData = (new SelfReflection\Rubric($assessment, $participant, $response, $rubricContext))->generate();
         if (isset($selfReflectionData['learnerRubricContext'])) {
             $data['rubricContext'] = $selfReflectionData['learnerRubricContext'];
+        } else {
+            $rubricData = (new InlineGrader\Rubric($assessment, $participant, $this->getUser(), $response, $isInteractionLocked, $rubricContext))->generate();
+            $data = array_merge($data, $rubricData);
         }
 
         /* Figure out who's actually here and what screen to show
