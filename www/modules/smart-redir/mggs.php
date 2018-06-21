@@ -35,20 +35,24 @@ if ($_GET) {
 
 		case "worldbook-early":
 			$form                 = "loginForm";
-			$action               = "https://www.worldbookonline.com/ewol/home";
+			$action               = "https://www.worldbookonline.com/wb/products?ed=all";
 			$method               = "POST";
 			$formArray['subacct'] = 'AU04114';
 			$formArray['uid']     = "mggmoh";
 			$formArray['pwd']     = "mggmoh";
+			$formArray['auth']    = "UidPassword";
+			$formArray['tu']      = 'https://www.worldbookonline.com/ewol/home';
 			break;
 
 		case "worldbook-ebooks":
 			$form                 = "loginForm";
-			$action               = "https://www.worldbookonline.com/wb/ebooks";
+			$action               = "https://www.worldbookonline.com/wb/products?ed=all";
 			$method               = "POST";
 			$formArray['subacct'] = 'AU04114';
 			$formArray['uid']     = "mggmoh";
 			$formArray['pwd']     = "mggmoh";
+			$formArray['auth']    = "UidPassword";
+			$formArray['tu']      = 'https://www.worldbookonline.com/wb/ebooks';
 			break;
 
 		case "britannica":
