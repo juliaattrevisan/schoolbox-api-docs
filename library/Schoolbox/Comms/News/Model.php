@@ -60,7 +60,7 @@ class Model
     /**
      * @var \Alaress_Date_Format
      */
-    private $draftedAt;
+    private $submittedAt;
 
     /**
      * The article becomes available to the audience at this time
@@ -296,23 +296,21 @@ class Model
 
 
     /**
-     * @return \Alaress_Date_Format
+     * @return \Alaress_Date_Format|null
      */
-    public function getDraftedAt(): ?\Alaress_Date_Format
+    public function getSubmittedAt(): ?\Alaress_Date_Format
     {
-        return $this->draftedAt;
+        return $this->submittedAt;
     }
 
 
     /**
-     * @param \Alaress_Date_Format $draftedAt
+     * @param \Alaress_Date_Format $submittedAt
      * @return $this
      */
-    public function setDraftedAt(\Alaress_Date_Format $draftedAt): self
+    public function setSubmittedAt(\Alaress_Date_Format $submittedAt): self
     {
-        $this->draftedAt = $draftedAt;
+        $this->submittedAt = $submittedAt;
         return $this;
     }
-
-
 }

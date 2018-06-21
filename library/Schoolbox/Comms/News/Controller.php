@@ -270,11 +270,11 @@ class Controller extends Base
 
         /* Identify drafts
          */
-        if ('' != $data['draft']) {
-            $news->setDraftedAt(\Alaress_Date_Format::now());
+        if (array_key_exists('draft', $data)) {
+            $news->setSubmittedAt(new \Alaress_Date_NullDate());
         }
         else {
-            $news->setDraftedAt(new \Alaress_Date_NullDate());
+            $news->setSubmittedAt(\Alaress_Date_Format::now());
         }
 
         if ((new ValidArticle())->isSatisfiedBy($news)) {

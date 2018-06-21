@@ -34,7 +34,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->joins('author_id', UserMapper::class, 'id', null, null, 'author', 'author');
         $this->joins('moderated_by', UserMapper::class);
         $this->uses('moderated_at', self::TYPE_DATETIME);
-        $this->uses('drafted_at', self::TYPE_DATETIME);
+        $this->uses('submitted_at', self::TYPE_DATETIME);
         $this->uses('publish_at', self::TYPE_DATETIME);
         $this->uses('expires_at', self::TYPE_DATETIME);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
