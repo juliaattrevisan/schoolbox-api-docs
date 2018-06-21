@@ -31,6 +31,7 @@ use UnexpectedValueException;
  * @method User hydrate(array $row, $alias = '', $callback = null)
  * @method User createModel($idValue = null)
  * @method GenericCollection|User[] createCollection($contents = [])
+ * @method GenericCollection|User[] findByColumn($columnName, $columnValue, $options = [])
  */
 class UserMapper extends Mapper
 {

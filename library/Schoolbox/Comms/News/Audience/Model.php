@@ -8,6 +8,9 @@ declare(strict_types=1);
 
 namespace Schoolbox\Comms\News\Audience;
 
+use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
+
 class Model
 {
     // A composite audience segment is composed of the intersection of 2 or more simple segments
@@ -19,7 +22,7 @@ class Model
     public const ENTITY_TYPE_CAMPUS         = 'campus';             // Values = [1,2,...]
     public const ENTITY_TYPE_ROLE           = 'role';               // Values = [1,2,...]
     public const ENTITY_TYPE_ROLE_TYPE      = 'role_type';          // Values = []
-    public const ENTITY_TYPE_HOUSE          = 'house';              // Values = [NULL,1,2,...]
+    public const ENTITY_TYPE_SCHOOL_HOUSE   = 'school_house';       // Values = [NULL,1,2,...]
     public const ENTITY_TYPE_RES_HOUSE      = 'res_house';          // Values = [NULL,1,2,...]
     public const ENTITY_TYPE_YEAR           = 'year';               // Values = [NULL,1,2,...]
     public const ENTITY_TYPE_SERVICE        = 'service';            // Values = ['1.43.3','2.3.*',...]
@@ -32,7 +35,59 @@ class Model
     public const RELATIONSHIP_PARENTS_OF  = 'parents_of';           // eg, Audience = parents of user 15
     public const RELATIONSHIP_TEACHERS_OF = 'teachers_of';          // eg, Audience = teachers of user 15
 
-    /** @var int */
+
+    /**
+     * Returns the set of all known entity types
+     *
+     * @return string[]
+     */
+    public static function getEntityTypes(): array
+    {
+        $entityTypes = self::getSimpleEntityTypes();
+        \array_unshift($entityTypes, self::ENTITY_TYPE_COMPOSITE);
+        return $entityTypes;
+    }
+
+
+    /**
+     * Returns the set of all simple entity types
+     *
+     * @return string[]
+     */
+    public static function getSimpleEntityTypes(): array
+    {
+        return [
+            self::ENTITY_TYPE_USER,
+            self::ENTITY_TYPE_SUPER,
+            self::ENTITY_TYPE_CAMPUS,
+            self::ENTITY_TYPE_ROLE,
+            self::ENTITY_TYPE_ROLE_TYPE,
+            self::ENTITY_TYPE_SCHOOL_HOUSE,
+            self::ENTITY_TYPE_RES_HOUSE,
+            self::ENTITY_TYPE_YEAR,
+            self::ENTITY_TYPE_SERVICE,
+            self::ENTITY_TYPE_PASTORAL_GROUP,
+            self::ENTITY_TYPE_GROUP,
+            self::ENTITY_TYPE_CLASS,
+        ];
+    }
+
+
+    /**
+     * Returns the set of valid relationship modifiers
+     *
+     * @return string[]
+     */
+    public static function getRelationships(): array
+    {
+        return [
+            self::RELATIONSHIP_SELF,
+            self::RELATIONSHIP_PARENTS_OF,
+            self::RELATIONSHIP_TEACHERS_OF,
+        ];
+    }
+
+        /** @var int */
     private $id;
 
     /** @todo declare type */
@@ -49,6 +104,17 @@ class Model
 
     /** @var string */
     private $relationship;
+
+    /** @var GenericCollection|self[] */
+    private $children;
+
+    /**
+     * @throws \UnexpectedValueException
+     */
+    public function __construct()
+    {
+        $this->children = new GenericCollection(self::class);
+    }
 
 
     /**
@@ -168,6 +234,27 @@ class Model
     public function setRelationship(string $relationship): self
     {
         $this->relationship = $relationship;
+        return $this;
+    }
+
+
+    /**
+     * @return Model[]|GenericCollection
+     */
+    public function getChildren(): GenericCollection
+    {
+        return $this->children;
+    }
+
+
+    /**
+     * @param Model[]|Collection $children
+     * @return $this
+     * @throws \DomainException
+     */
+    public function setChildren(Collection $children): self
+    {
+        $this->children->replaceWith($children);
         return $this;
     }
 }
