@@ -7,7 +7,7 @@
 {% endif %}
 
 <div class="switch">
-    <input id="{{ specification.identifier }}" name="{{ specification.name }}" type="checkbox" {% if specification.value %}checked{% endif %} value="{{ specification.checkedValue }}">
+    <input id="{{ specification.identifier }}" name="policy[{{ specification.identifier }}]" type="checkbox" {% if specification.value %}checked{% endif %} value="{{ specification.checkedValue }}">
     <label for="{{ specification.identifier }}">
         <span>On</span>
         <span>Off</span>

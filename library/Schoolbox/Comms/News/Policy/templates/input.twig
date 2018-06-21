@@ -6,7 +6,7 @@
         <p>{{ specification.subtext }}</p>
     {% endif %}
 
-    <input type="text" id="{{ specification.identifier }}" name="{{ specification.name }}" value="{{ specification.value }}" />
+    <input type="text" id="{{ specification.identifier }}" name="policy[{{ specification.identifier }}]" value="{{ specification.value }}" />
 {% endmacro %}
 
 {# Read-only representation #}
