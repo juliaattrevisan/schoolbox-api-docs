@@ -10,15 +10,14 @@ namespace Schoolbox\Comms\News;
 
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Comms\News\Policy;
 use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\Mapper;
-use Schoolbox\News\Topic;
+Use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\News\TopicMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\UserMapper;
-use Schoolbox\Comms\News\Policy;
 
 
 class Controller extends Base
@@ -82,7 +81,7 @@ class Controller extends Base
     /**
      * Provide form to create a news article
      *
-     * @throws Mapper\Exception
+     * @throws MapperException
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \UnexpectedValueException
      */
@@ -134,16 +133,15 @@ class Controller extends Base
     /**
      * Create a news article
      *
-     * @throws Mapper\Exception
+     * @throws MapperException
+     * @throws \Aura\Router\Exception\RouteNotFound
      * @throws \PDOException
      * @throws \Schoolbox\Application\Exception\Exception
-     * @throws \UnexpectedValueException
-     * @throws \Aura\Router\Exception\RouteNotFound
      * @throws \Schoolbox\Resource\Exception
+     * @throws \UnexpectedValueException
      */
     public function postCreate()
     {
-        /** @var Model $news */
         $news = $this->newsMapper->createModel();
 
         $this->postUpdate($news);
@@ -220,7 +218,7 @@ class Controller extends Base
                 return;
             }
         }
-        catch (Mapper\Exception $e) {
+        catch (MapperException $e) {
             if ($this->getRequest()->isXhr()) {
                 $this->getResponse()->status->set(400);
                 $this->getResponse()->content->set($this->buildJsonOutput([
@@ -246,7 +244,7 @@ class Controller extends Base
      * @param Model                          $news
      * @param array|\Aura\Web\Request\Values $data
      * @return bool
-     * @throws Mapper\Exception
+     * @throws MapperException
      * @throws \PDOException
      * @throws \UnexpectedValueException
      * @throws \Schoolbox\Resource\Exception

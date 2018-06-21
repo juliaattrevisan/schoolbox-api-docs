@@ -14,6 +14,14 @@ use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
+
+/**
+ * Class Mapper
+ *
+ * @package Schoolbox\Comms\News
+ * @method Model createModel($idValue = null)
+ * @method Model hydrate(array $row, $alias = '', $callback = null)
+ */
 class Mapper extends \Schoolbox\Mapper
 {
 
@@ -60,7 +68,7 @@ class Mapper extends \Schoolbox\Mapper
      *
      * @return string
      */
-    protected function getSelectString()
+    protected function getSelectString(): string
     {
         return "
             SELECT 
@@ -77,7 +85,7 @@ class Mapper extends \Schoolbox\Mapper
      * @return string
      * @throws \Schoolbox\Mapper\DefinitionException
      */
-    protected function getFromString()
+    protected function getFromString(): string
     {
         return "
             FROM {$this->getTable()}
@@ -92,13 +100,11 @@ class Mapper extends \Schoolbox\Mapper
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\DefinitionException
      */
-    protected function hydrateSelect(\PDOStatement $statement)
+    protected function hydrateSelect(\PDOStatement $statement): \Schoolbox\GenericCollection
     {
         $collection = $this->createCollection();
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-
-            /** @var Model $news */
             $news = $this->hydrate($row);
 
             if ($news) {
