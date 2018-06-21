@@ -44,14 +44,6 @@
         <h1>{{ action|capitalize }} {{ locale.news.proper }} {{ indicator.render(news) }}</h1>
 
         <ul class="meta">
-            {% if news.publishAt %}
-            <li class="icon-calendar">Publishes to audience on {{ news.publishAt.local }}</li>
-            {% endif %}
-
-            {% if news.expiresAt %}
-            <li class="icon-calendar">Automatically archives on {{ news.expiresAt.local }}</li>
-            {% endif %}
-
             {% if news.moderatedBy.id %}
             <li class="icon-staff">Last moderated by {{ news.moderatedBy.fullname }}
                 {% if not news.moderatedAt.isNull %}
