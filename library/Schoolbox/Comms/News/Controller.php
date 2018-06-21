@@ -10,6 +10,7 @@ namespace Schoolbox\Comms\News;
 
 
 use Alaress\Web\Controller\Base;
+use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Comms\News\Policy;
 use Schoolbox\Error\Mapper as ErrorMapper;
 Use Schoolbox\Mapper\Exception as MapperException;
@@ -188,7 +189,6 @@ class Controller extends Base
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Aura\Router\Exception\RouteNotFound
      * @throws \PDOException
-     * @throws \Schoolbox\Application\Exception\Exception
      * @throws \UnexpectedValueException
      * @throws \Schoolbox\Resource\Exception
      */
@@ -218,7 +218,9 @@ class Controller extends Base
 
             return;
         }
-        catch (MapperException $e) {
+        catch (
+            MapperException|RouteNotFound|\PDOException|\UnexpectedValueException|\Schoolbox\Resource\Exception
+        $e) {
             if ($this->getRequest()->isXhr()) {
                 $this->getResponse()->status->set(400);
                 $this->getResponse()->content->set($this->buildJsonOutput([
@@ -231,10 +233,6 @@ class Controller extends Base
 
             throw $e;
         }
-
-        /* TODO: Custom error message
-         */
-        throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
     }
 
 
