@@ -42,15 +42,15 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
         $this->joinsVia(
-            'comms_news_article_tag',
+            'comms_news_article_topic',
             TopicMapper::class,
             'newsTopicID',
-            'tag_id',
+            'topic_id',
             'article_id',
             null,
             null,
             self::COLUMN_JOIN_MULTI,
-            'tags'
+            'topics'
         );
     }
 
@@ -66,7 +66,7 @@ class Mapper extends \Schoolbox\Mapper
             SELECT 
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('author', 'a')},
-                {$this->getJoinColumnString('comms_news_article_tag', 'tags')}
+                {$this->getJoinColumnString('comms_news_article_topic', 'topics')}
         ";
     }
 
@@ -81,7 +81,7 @@ class Mapper extends \Schoolbox\Mapper
     {
         return "
             FROM {$this->getTable()}
-            LEFT JOIN {$this->getJoinSql('comms_news_article_tag', null, 'tags')}
+            LEFT JOIN {$this->getJoinSql('comms_news_article_topic', null, 'topics')}
             LEFT JOIN {$this->getJoinSql('author', null, 'a')}
         ";
     }
@@ -103,10 +103,10 @@ class Mapper extends \Schoolbox\Mapper
 
             if ($news) {
                 try {
-                    $tag = $this->getJoinMapper('comms_news_article_tag')->hydrate($row, 'tags');
+                    $topic = $this->getJoinMapper('comms_news_article_topic')->hydrate($row, 'topics');
 
-                    if ($tag) {
-                        $news->getTags()->add($tag);
+                    if ($topic) {
+                        $news->getTopics()->add($topic);
                     }
 
                     /** @var User $author */

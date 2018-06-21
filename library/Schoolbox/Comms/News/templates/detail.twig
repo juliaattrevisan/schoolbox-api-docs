@@ -14,13 +14,13 @@
         <div class="small-12 column">
             <h1>{{ news.title }}</h1>
 
-            {% if news.tags|length %}
+            {% if news.topics|length %}
             <ul class="meta">
                 <li class="icon-news">Related Topics:
 
-                    {# TODO: Have a /news/tag url lol #}
-                    {% for tag in news.tags %}
-                        <a href="/news/tag/{{ tag.slug }}">{{ tag.name }}</a>{% if not loop.last %},{% endif %}
+                    {# TODO: Have a /news/topic url lol #}
+                    {% for topic in news.topics %}
+                        <a href="/news/topic/{{ topic.slug }}">{{ topic.name }}</a>{% if not loop.last %},{% endif %}
                     {% endfor %}
                 </li>
             </ul>

@@ -66,7 +66,7 @@ class Module extends BaseModule
         $this->register('GET', '/update/{newsId:\d+}', 'getUpdate', $getPerms, $preloadNews);
         $this->register('POST', '/create', 'postCreate', $postPerms);
         $this->register('POST', '/update/{newsId:\d+}', 'postUpdate', $getPerms, $preloadNews);
-        $this->register('GET', '/tags', 'getTags', $getPerms);
+        $this->register('GET', '/topics', 'getTopics', $getPerms);
         $this->register('GET', '/{newsId:\d+}', 'getDetail', null, $preloadNews);
     }
 

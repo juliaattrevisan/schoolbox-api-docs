@@ -258,7 +258,7 @@ class Controller extends Base
             ->setBody($data['body'])
             ->setBlurb($data['blurb'])
             ->setAuthor($this->getUser())
-            ->setTags($this->topicMapper->findByColumn('newsTopicID', $data['tags']))
+            ->setTopics($this->topicMapper->findByColumn('newsTopicID', $data['topics']))
             ->setModeratedBy(null)
             ->setModeratedAt(new \Alaress_Date_NullDate())
             ->setPublishAt(\Alaress_Date_Format::newLocal($data['publishAt']))
@@ -293,9 +293,9 @@ class Controller extends Base
 
 
     /**
-     * Get a list of available news topics (tags) that can be assigned to an article
+     * Get a list of available news topics that can be assigned to an article
      */
-    public function getTags()
+    public function getTopics()
     {
         $this->getResponse()->content->set($this->buildJsonOutput($this->topicMapper->findAll()));
     }

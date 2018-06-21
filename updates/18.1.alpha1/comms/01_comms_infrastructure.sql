@@ -54,17 +54,17 @@ FOREIGN KEY (`moderated_by`) REFERENCES `user` (`id`)
 ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 -- News Article Tag relations
-CREATE TABLE `comms_news_article_tag` (
+CREATE TABLE `comms_news_article_topic` (
   `article_id` int(11) NOT NULL,
-  `tag_id`     int(11) UNSIGNED NOT NULL
+  `topic_id`   int(11) UNSIGNED NOT NULL
 );
 
-ALTER TABLE `comms_news_article_tag`
+ALTER TABLE `comms_news_article_topic`
 ADD CONSTRAINT `fk_comms_news_article_article_id`
 FOREIGN KEY (`article_id`) REFERENCES `comms_news_article` (`id`)
 ON DELETE NO ACTION ON UPDATE NO ACTION;
 
-ALTER TABLE `comms_news_article_tag`
-ADD CONSTRAINT `fk_comms_news_article_tag_id`
-FOREIGN KEY (`tag_id`) REFERENCES `newsTopic` (`newsTopicID`)
+ALTER TABLE `comms_news_article_topic`
+ADD CONSTRAINT `fk_comms_news_article_topic_id`
+FOREIGN KEY (`topic_id`) REFERENCES `newsTopic` (`newsTopicID`)
 ON DELETE NO ACTION ON UPDATE NO ACTION;

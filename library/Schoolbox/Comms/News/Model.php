@@ -96,7 +96,7 @@ class Model
      *
      * @var Collection|Topic[]
      */
-    private $tags;
+    private $topics;
 
     /**
      * @return null|string
@@ -281,19 +281,19 @@ class Model
     /**
      * @return Collection|Topic[]
      */
-    public function getTags(): Collection
+    public function getTopics()
     {
-        return $this->tags;
+        return $this->topics;
     }
 
 
     /**
-     * @param Collection|Topic[] $tags
+     * @param Collection|Topic[] $topics
      * @return $this
      */
-    public function setTags(Collection $tags): self
+    public function setTopics(Collection $topics): self
     {
-        $this->tags = $tags;
+        $this->topics = $topics;
         return $this;
     }
 
