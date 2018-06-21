@@ -337,6 +337,14 @@ class Mapper extends BaseMapper
         throw new OutOfBoundsException("Given team has no future matches");
     }
 
+    /**
+     * Match notifications
+     *
+     * @param Match  $object
+     * @param string $verb
+     * @param Match  $previous
+     * @return bool
+     */
     protected function raiseNotification($object, $verb, $previous = null)
     {
         if (!isset($this->sessionData['user'])) {

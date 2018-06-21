@@ -37,9 +37,10 @@ class Fixture
     }
 
     /**
+     * Gets url to create a match
      * @param int $divisionId
      * @param int $seasonId
-     * @return string
+     * @return string the URL
      */
     public static function getCreateMatchUrl(int $divisionId, int $seasonId): string
     {
@@ -49,11 +50,22 @@ class Fixture
         );
     }
 
+    /**
+     * Gets url to update a match
+     * @param int $matchId
+     * @return string
+     */
     public static function getUpdateMatchUrl(int $matchId): string
     {
         return str_replace(self::URL_MATCH_ID, $matchId, self::URL_UPDATE_MATCH);
     }
 
+    /**
+     * Creates a match step by step
+     * @param array $fields
+     * @param array $jsFields
+     * @return mixed match ID, if created without problem
+     */
     public function createMatch(array $fields, array $jsFields)
     {
         $i = $this->tester;
@@ -88,6 +100,12 @@ class Fixture
         return $matchIds[0];
     }
 
+    /**
+     * Updates a match step by step
+     * @param $matchId
+     * @param array $changes
+     * @param array $jsChanges
+     */
     public function updateMatch($matchId, array $changes, array $jsChanges)
     {
         $i = $this->tester;
@@ -105,7 +123,12 @@ class Fixture
         $i->wait(3);
     }
 
-    public function addItenerary($matchId)
+
+    /**
+     * Updates a match to add an itinerary item
+     * @param $matchId
+     */
+    public function addItinerary($matchId)
     {
         $i = $this->tester;
         $i->amOnPage(self::getUpdateMatchUrl($matchId));
@@ -122,7 +145,11 @@ class Fixture
         $i->wait(3);
     }
 
-    public function deleteItenerary($matchId)
+    /**
+     * Updates a match to delete an itinerary item
+     * @param $matchId
+     */
+    public function deleteItinerary($matchId)
     {
         $i = $this->tester;
         $i->amOnPage(self::getUpdateMatchUrl($matchId));
@@ -132,6 +159,10 @@ class Fixture
         $i->wait(3);
     }
 
+    /**
+     * Verifies that the notification exists
+     * @param $matchId
+     */
     public function assertNofifExists($notif)
     {
         $i = $this->tester;
@@ -146,6 +177,10 @@ class Fixture
         $i->click('Alaress Admin');
     }
 
+    /**
+     * Verifies that the notification does not exist
+     * @param $matchId
+     */
     public function assertNofifNotExists($notif)
     {
         $i = $this->tester;

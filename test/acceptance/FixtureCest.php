@@ -8,24 +8,38 @@
  * Steps:
  * 1. Provision legacy.tar.gz data
  * 2. vagrant ssh
- * 3. Execute cd /vagrant && ./vendor/bin/codecept run --steps acceptance FixtureCest
- * ./vendor/codeception/codeception/codecept --steps run acceptance FixtureCest
+ * 3. Execute cd /vagrant && ./vendor/codeception/codeception/codecept --steps run acceptance FixtureCest
  */
 
 use Page\Fixture;
 
 class FixtureCest
 {
+    /**
+     * Preparations
+     *
+     * @param AcceptanceTester $i
+     * @throws Exception
+     */
     public function _before(AcceptanceTester $i)
     {
         $i->loginAsAdmin();
     }
 
+    /**
+     * Clean up after every test
+     *
+     * @param AcceptanceTester $i
+     */
     public function _after(AcceptanceTester $i)
     {
     }
 
-    // tests
+    /**
+     * Test that match notifications are triggered properly
+     *
+     * @param AcceptanceTester $i
+     */
     public function matchNotifications(AcceptanceTester $i)
     {
         $fixturePage = new Fixture($i);
@@ -77,9 +91,9 @@ class FixtureCest
         $fixturePage->updateMatch($matchId, [Fixture::SELECTOR_START_AT => $start->modify('+45 minutes')], []);
         $fixturePage->assertNofifExists('Your upcoming AFL match ' . $matchName3 . ' has a new start time');
 
-        // Match in 24 hrs - change itenerary and save
+        // Match in 24 hrs - change itinerary and save
 
-        //== Match in 24 hrs - add itenerary and save
+        //== Match in 24 hrs - add itinerary and save
         $matchName4 = 'Fourth Cest Match';
         $start = new \DateTime();
         $start->modify('+30 minutes');
@@ -94,10 +108,10 @@ class FixtureCest
                 Fixture::SELECTOR_JS_HOME_TEAM => Fixture::TEAM_FIRST_XVIII,
                 Fixture::SELECTOR_JS_AWAY_TEAM => Fixture::TEAM_SECOND_XVIII
             ]);
-        $fixturePage->addItenerary($matchId4);
+        $fixturePage->addItinerary($matchId4);
         $fixturePage->assertNofifExists('Your upcoming AFL match ' . $matchName4 . ' has been updated');
 
-        //== Match in 24 hrs - remove itenerary and save
+        //== Match in 24 hrs - remove itinerary and save
         $matchName5 = 'Fifth Cest Match';
         $start = new \DateTime();
         $start->modify('+30 minutes');
@@ -112,7 +126,7 @@ class FixtureCest
                 Fixture::SELECTOR_JS_HOME_TEAM => Fixture::TEAM_FIRST_XVIII,
                 Fixture::SELECTOR_JS_AWAY_TEAM => Fixture::TEAM_SECOND_XVIII
             ]);
-        $fixturePage->deleteItenerary($matchId5);
+        $fixturePage->deleteItinerary($matchId5);
 
     }
 

@@ -37,6 +37,14 @@ class Mapper extends BaseMapper
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
     }
 
+    /**
+     * No notifications. Changes are handled by Match Mapper.
+     *
+     * @param object $object
+     * @param string $verb
+     * @param object $previous
+     * @return bool
+     */
     protected function raiseNotification($object, $verb, $previous = null)
     {
         return true;
