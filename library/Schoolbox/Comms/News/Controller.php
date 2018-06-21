@@ -302,14 +302,15 @@ class Controller extends Base
 
 
     /**
+     * Load a news article so you can read its contents (the detail screen)
+     *
      * @param Model $news
      * @throws \Aura\Di\Exception\ServiceNotFound
      */
-    public function getDetail($news)
+    public function getDetail(Model $news)
     {
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/detail.twig', [
             'news' => $news,
         ])->setTitle($news->getTitle()));
     }
-
 }
