@@ -17,17 +17,16 @@ use Schoolbox\Comms\News\ValidBroadcast;
 use Schoolbox\Comms\News\ValidDateOffset;
 
 
-
 class ValidationTest extends TestCase
 {
 
     /**
      * @dataProvider provider_validBroadcastRequirements
      * @param Model $news
-     * @param int   $moderationRequired
-     * @param int   $expected
+     * @param bool   $moderationRequired
+     * @param bool   $expected
      */
-    public function testValidBroadcastRequirements(Model $news, int $moderationRequired, $expected)
+    public function testValidBroadcastRequirements(Model $news, bool $moderationRequired, bool $expected)
     {
         $validation = new ValidBroadcast();
 
@@ -39,7 +38,7 @@ class ValidationTest extends TestCase
      *
      * @return array
      */
-    public function provider_validBroadcastRequirements() :array {
+    public function provider_validBroadcastRequirements(): array {
         $user = (new \Schoolbox\User())->setId(19);
 
         return [
@@ -47,7 +46,7 @@ class ValidationTest extends TestCase
             // News article can reach the masses
             'Moderation required, moderator set' => [
                 (new Model())->setTitle('cat')->setModeratedBy($user),
-                1,
+                true,
                 true
             ],
 
@@ -55,7 +54,7 @@ class ValidationTest extends TestCase
             // When absent, the article isn't moderated; news article mustn't reach the masses
             'Moderation required, moderator not set' => [
                 (new Model())->setTitle('cat'),
-                1,
+                true,
                 false
             ],
 
@@ -63,7 +62,7 @@ class ValidationTest extends TestCase
             // at the time, but moderation is no longer required now. News article can reach the masses.
             'Moderation not required, moderator set' => [
                 (new Model())->setTitle('cat')->setModeratedBy($user),
-                0,
+                false,
                 true
             ],
 
@@ -71,7 +70,7 @@ class ValidationTest extends TestCase
             // news article can reach the masses. There are no restrictions.
             'Moderation not required, moderator not set' => [
                 (new Model())->setTitle('cat'),
-                0,
+                false,
                 true
             ],
         ];
@@ -94,7 +93,7 @@ class ValidationTest extends TestCase
      *
      * @return array
      */
-    public function provider_validArticle() :array {
+    public function provider_validArticle(): array {
         return [
             'Heading is set' => [
                 (new Model())->setTitle('cat'),
@@ -125,7 +124,7 @@ class ValidationTest extends TestCase
      *
      * @return array
      */
-    public function provider_validDateOffset() :array {
+    public function provider_validDateOffset(): array {
         return [
             'Valid (+1 day)' => [
                 (new Policy\Model())->setValue('+1 day'),

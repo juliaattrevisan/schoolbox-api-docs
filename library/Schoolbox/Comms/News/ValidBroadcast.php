@@ -21,14 +21,14 @@ class ValidBroadcast
      * Definition of a valid news article
      *
      * @param Model $article
-     * @param int $moderationRequired
+     * @param bool $moderationRequired
      * @return bool
      */
-    public function isSatisfiedBy(Model $article, int $moderationRequired)
+    public function isSatisfiedBy(Model $article, bool $moderationRequired): bool
     {
         $isValidArticle = (new ValidArticle())->isSatisfiedBy($article);
-        $hasModerator = (bool)$moderationRequired && $article->getModeratedBy() instanceof User;
-        $moderationNotNeeded = !(bool)$moderationRequired;
+        $hasModerator = $moderationRequired && $article->getModeratedBy() instanceof User;
+        $moderationNotNeeded = !$moderationRequired;
 
         return $isValidArticle && ($hasModerator || $moderationNotNeeded);
     }
