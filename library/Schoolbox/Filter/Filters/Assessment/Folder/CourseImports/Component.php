@@ -65,10 +65,18 @@ class Component extends Filter\BaseComponent
     protected function buildRoleSelections(GenericCollection $abstractOptions)
     {
         $availableSelections = $this->getFilterSelectionMapper()->createCollection();
+        $roleType            = $this->getUser()->getRole()->getType();
+
+        // Had admin configured Groups and/or Classes to be selected for current user's role type?
+        $selectGroups  = $abstractOptions[Definition::KEY_GROUPS]->getDefaults()[$roleType]->getSelected();
+        $selectClasses = $abstractOptions[Definition::KEY_CLASSES]->getDefaults()[$roleType]->getSelected();
 
         foreach ($this->folders as $folder) {
             $key                       = (string)$folder->getId();
-            $availableSelections[$key] = $this->createSelection($key, false);
+            $isClass                   = $folder->isClass() || $folder->wasClass();
+            $isGroup                   = $folder->isGroup();
+            $selected                  = ($selectGroups && $isGroup) || ($selectClasses && $isClass);
+            $availableSelections[$key] = $this->createSelection($key, $selected);
         }
         return $availableSelections;
     }
