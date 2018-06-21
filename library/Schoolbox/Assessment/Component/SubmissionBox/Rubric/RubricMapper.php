@@ -343,8 +343,8 @@ class RubricMapper
     protected function generateCriteriaStatement(SubmissionBox $box, $getParentCriteria)
     {
         $args = [
-            'boxId'    => $box->getId(),
-            'folderId' => $box->getCategory()->getId(),
+            'boxId'       => $box->getId(),
+            'folderId'    => $box->getCategory()->getId(),
             'parent_type' => Criterion::PARENT_TYPE_CATEGORY,
         ];
 
