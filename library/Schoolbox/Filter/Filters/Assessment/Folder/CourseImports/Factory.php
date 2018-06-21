@@ -216,7 +216,7 @@ class Factory extends FolderFilter\Factory
      */
     private function isAvailable(Folder\Model $folder, GenericCollection $options): bool
     {
-        if ($folder->isClass() && $options[Definition::KEY_CLASSES]->getAvailable()) {
+        if ($options[Definition::KEY_CLASSES]->getAvailable() && ($folder->isClass() || $folder->wasClass())) {
             return true;
         }
         // Re-hydrate group
