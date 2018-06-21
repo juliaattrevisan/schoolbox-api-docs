@@ -331,6 +331,9 @@ class RubricMapper
      * * in in use, by sequence
      * * if not in use, by name
      *
+     * Note: A criterion being used by a soft-deleted due-work does not count towards current usages, and
+     * hence does not prevent the user from editing the criterion's name.
+     *
      * @param SubmissionBox $box
      * @param bool          $getParentCriteria - whether to also get criteria from box's folder's parent
      *
