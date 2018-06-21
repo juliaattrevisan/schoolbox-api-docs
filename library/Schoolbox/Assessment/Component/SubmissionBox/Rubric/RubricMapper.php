@@ -375,11 +375,10 @@ class RubricMapper
                 FROM rubric_criterion c
                 LEFT JOIN rubric_usage u ON u.criterion_id = c.id
                 LEFT JOIN submission_box b ON u.submission_box_id = b.id
-                LEFT JOIN assessment a ON b.assessment_id = a.id
+                LEFT JOIN assessment a ON b.assessment_id = a.id AND a.deleted_at IS NULL
                 WHERE c.parent_type = 'category'
                 AND c.parent_id IN (:$in)
                 AND c.deleted_at IS NULL
-                AND a.deleted_at IS NULL
                 ORDER BY selected DESC
             ) t
             GROUP BY crit_id
