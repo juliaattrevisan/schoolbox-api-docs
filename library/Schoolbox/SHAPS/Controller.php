@@ -9,6 +9,9 @@
 namespace Schoolbox\SHAPS;
 
 use Alaress\Web\Controller\Base;
+use Alaress_Date_Format;
+use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\TransferException;
 use Schoolbox\IConfigLoader;
 use Schoolbox\UserMapper;
 use Schoolbox\Collection;
@@ -31,13 +34,14 @@ class Controller extends Base
     /**
      * Controller constructor.
      *
-     * @param IConfigLoader $configLoader
-     * @param UserMapper    $userMapper
+     * @param UserMapper      $userMapper
+     * @param Auth\Parameters $authParams
+     * @param string          $serverUrl
      */
-    public function __construct(IConfigLoader $configLoader, UserMapper $userMapper)
+    public function __construct(UserMapper $userMapper, Auth\Parameters $authParams)
     {
-        $this->userMapper = $userMapper;
-        $this->helpRequest = new HelpRequest($configLoader, $this->userMapper);
+        $this->userMapper  = $userMapper;
+        $this->helpRequest = new HelpRequest($authParams, $this->userMapper);
     }
 
 
@@ -273,4 +277,19 @@ class Controller extends Base
         }
     }
 
+
+    /**
+     * Post users to SHAPS
+     *
+     * @api POST /shaps/provision/
+     * @level 181
+     */
+    public function postProvision(): void
+    {
+        $response = $this->helpRequest->provisionUsers($this->request->post->get('userId'));
+
+        // Build response
+        $this->response->status->set($response['status']['code']);
+        $this->response->content->set($this->buildJsonOutput($response));
+    }
 }

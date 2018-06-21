@@ -21,8 +21,8 @@
         {% block page_specific_content %}
         {% endblock %}
 
-        <div id="statusForm" {% if allUsers | length == 0 %}class="hide"{% endif %}>
-            <form>
+        <div id="statusFormContainer" {% if allUsers | length == 0 %}class="hide"{% endif %}>
+            <form id="statusForm" action="{{ routeLookup('shaps.postProvision') }}" method="post">
                 <section id="statusTable">
                     <table>
                         <tr>
@@ -39,14 +39,18 @@
                         </tr>
 
                         {% for user in allUsers %}
-                            {% if provisionedUsers[user.id] %}
-                                <tr>
-                                <td><i class="icon-course-outline" title="Provisioned"></i></td>
-                            {% else %}
+                            {% if not provisionedUsers[user.id] %}
                                 <tr class="highlight-warning">
-                                <td>Not Provisioned</td>
+                            {% else %}
+                                <tr>
                             {% endif %}
-
+                            <td>
+                                {% if provisionedUsers[user.id] %}
+                                    <span data-provision-status class="icon-course-outline" title="Provisioned"></span>
+                                {% else %}
+                                    <span data-provision-status>Not Provisioned</span>
+                                {% endif %}
+                            </td>
                             <td>
                                 {{ user.fullname }}
                             </td>
@@ -55,12 +59,12 @@
                                 <td>
                                     {% if provisionedUsers[user.id] %}
                                         <div class="checklist">
-                                            <input id="provision-{{ user.id }}" type="checkbox" disabled>
+                                            <input id="provision-{{ user.id }}" name="userId[]" value="{{ user.id }}" type="checkbox" disabled>
                                             <label for="provision-{{ user.id }}" title="Already provisioned"></label>
                                         </div>
                                     {% else %}
                                         <div class="checklist">
-                                            <input id="provision-{{ user.id }}" type="checkbox" data-checkbox>
+                                            <input id="provision-{{ user.id }}" name="userId[]" value="{{ user.id }}" type="checkbox" data-checkbox>
                                             <label for="provision-{{ user.id }}"></label>
                                         </div>
                                     {% endif %}
@@ -87,9 +91,84 @@
 
 <script type="text/javascript" src="/javascript/shared/select-all/jquery.select-all.js"></script>
 <script>
-    $("#statusForm").selectAll({
-        selector: "#select-all",
-        checkboxes: "[data-checkbox]",
-        observerParent: "tbody"
+    $(function() {
+        var form = $("#statusForm"),
+            findSelectedRows = function () {
+                return form.find('#statusTable tr').has(':checkbox:checked');
+            },
+            markRowStatus = function ($tableRow, failedProvisions) {
+                var $checkbox = $tableRow.find(':checkbox');
+                // Did this fail provision?
+                var userId   = $checkbox.attr('value');
+                var isFailed = false;
+                var reason   = '';
+                failedProvisions.forEach(function (failedProvision) {
+                    var payload = failedProvision[1];
+                    if (payload.id === userId) {
+                        isFailed = true;
+                        reason   = failedProvision[0];
+                    }
+                });
+
+                if (isFailed) {
+                    markAsFailed($tableRow, reason);
+                } else {
+                    markAsProvisioned($tableRow);
+                }
+            },
+            markAsFailed = function ($tableRow, reason) {
+                $tableRow.find(':checkbox').prop('checked', false);
+                $tableRow.removeClass('highlight-warning').addClass('highlight-alert');
+                $tableRow.find('[data-provision-status]').text(reason);
+            },
+            markAsProvisioned = function ($tableRow) {
+                $tableRow.find(':checkbox').prop('checked', false).prop('disabled', true);
+                $tableRow.removeClass('highlight-warning highlight-alert');
+                $tableRow.find('[data-provision-status]').text('').addClass('icon-course-outline');
+            };
+
+        form.selectAll({
+            selector: "#select-all",
+            checkboxes: "[data-checkbox]",
+            observerParent: "tbody"
+        });
+
+        form.on('submit', function (event) {
+            event.preventDefault();
+
+            var $toast     = $('#toast'),
+                ajaxParams = {
+                    method:   form.attr('method'),
+                    data:     form.serializeArray(),
+                    dataType: 'json'
+                };
+
+            $toast.toastActivate({text: 'Provisioning users...'});
+            $.ajax(form.attr('action'), ajaxParams)
+                .done(function () {
+                    $toast.toastTimeout({text: 'Provisioned!'});
+                    // Now update DOM w/ provisioned users (assume all submitted were updated)
+                    findSelectedRows().each(function() {
+                        markAsProvisioned($(this));
+                    });
+                })
+                .fail(function (xhr) {
+                    $toast.toastTimeout({text: 'Provision failed!', css: 'alert'});
+
+                    // Maybe the response has more information on what failed?
+                    // Assume error 400 was a partial fail that returns what failed,
+                    // any others unknown.
+                    if (xhr.status === 400) {
+                        findSelectedRows().each(function() {
+                            markRowStatus($(this), xhr.responseJSON.data);
+                        });
+                    } else {
+                        findSelectedRows().each(function() {
+                            markAsFailed($(this), 'Failed');
+                        });
+                    }
+                })
+        });
     });
 </script>
+<div class="toast" id="toast"></div>

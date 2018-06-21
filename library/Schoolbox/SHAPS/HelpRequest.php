@@ -12,31 +12,36 @@
 namespace Schoolbox\SHAPS;
 
 use GuzzleHttp\Client as GuzzleClient;
-use Schoolbox\IConfigLoader;
+use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\GuzzleException;
 use Schoolbox\SHAPS\Auth;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 class HelpRequest
 {
-
     /**
-     * @var IConfigLoader
+     * API request parameter generator
+     *
+     * @var Auth\Parameters
      */
-    private $configLoader;
+    private $authParams;
 
     /**
+     * Data source for users in the local Schoolbox instance
+     *
      * @var UserMapper
      */
     private $userMapper;
 
     /**
      * HelpRequest constructor.
-     * @param IConfigLoader $configLoader
-     * @param UserMapper    $userMapper
+     * @param Auth\Parameters $authParams
+     * @param UserMapper      $userMapper
      */
-    public function __construct(IConfigLoader $configLoader, UserMapper $userMapper)
+    public function __construct(Auth\Parameters $authParams, UserMapper $userMapper)
     {
-        $this->configLoader = $configLoader;
+        $this->authParams = $authParams;
         $this->userMapper = $userMapper;
     }
 
@@ -51,7 +56,7 @@ class HelpRequest
      */
     public function users(): array
     {
-        return $this->execute('users');
+        return $this->execute('get', 'users');
     }
 
 
@@ -65,49 +70,55 @@ class HelpRequest
      */
     public function courses(): array
     {
-        return $this->execute('courses');
+        return $this->execute('get', 'courses');
     }
 
     /**
      * Asks help for information located at $endpoint
      *
-     * ->execute('users');
+     * ->execute('get', 'users');
      * This returns an array of key-value pairs of (id => email)
      *
-     * ->execute('courses');
+     * ->execute('get', 'courses');
      * This returns an array of...stuff
      *
+     * @param string $method
      * @param string $endpoint
+     * @param array  $formParams
      * @return array
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      */
-    private function execute(string $endpoint) : array
+    private function execute(string $method, string $endpoint, array $formParams = []): array
     {
         /* Get the four pieces of the puzzle that we need to request data from Help
          */
-        $auth = (new Auth\Parameters(
-            $this->configLoader->get('schoolbox_help_url'),
-            $this->configLoader->get('site_school_code'),
-            $this->configLoader->get('schoolbox_help_access_token')
-        ))->generate();
+        $auth = $this->authParams->generate();
 
         /* Execute request using guzzle
+         * Host and Origin headers are for working around CSRF protection
+         * (which shouldn't be necessary for API calls, but is for some reason)
          */
         $response = (new GuzzleClient())->request(
-            'get',
+            $method,
             "{$auth['url']}/api/course-participation/{$auth['schoolCode']}/{$endpoint}", [
                 'query' => [
-                    'ts' => $auth['timestamp'],
+                    'ts'     => $auth['timestamp'],
                     'digest' => $auth['digest']
-                ]
+                ],
+                'form_params' => $formParams,
+                'headers'     => [
+                    'Host'   => $auth['host'],
+                    'Origin' => $auth['host'],
+                ],
             ]
         );
 
         /* Return a json-encoded output of the body contents
          */
-        return json_decode($response->getBody()->getContents(), true);
+        $return = json_decode($response->getBody()->getContents(), true);
+        return \is_array($return) ? $return : [];
     }
 
 
@@ -185,7 +196,78 @@ class HelpRequest
      */
     public function getServerUrl(): string
     {
-        return rtrim($this->configLoader->get('schoolbox_help_url'), '/');
+        return $this->authParams->getServerUrl();
     }
 
+
+    /**
+     * Provision users
+     *
+     * @param array $userIds
+     * @return array
+     */
+    public function provisionUsers($userIds): array
+    {
+        $payload = $this->buildProvisionUsersPayload($userIds);
+        $code    = 400;
+        $message = 'Bad Request';
+        $data    = [];
+        if (!empty($payload)) {
+            // Send each user to Help
+            try {
+                $this->execute('post', 'users', ['user' => $payload,]);
+                $code    = 200;
+                $message = 'OK';
+
+            } catch (ClientException $e) {
+                // 400: empty payload (should never get this) or some users failed
+                $code    = 400;
+                $message = 'Bad Request';
+                if ($e->getResponse()) {
+                    $data = json_decode($e->getResponse()->getBody()->getContents());
+                }
+
+            } catch (GuzzleException $e) {
+                // any other exception
+                $code    = 500;
+                $message = 'Internal Server Error';
+            }
+        }
+
+        // Build response
+        return [
+            'data'   => $data,
+            'status' => [
+                'code'    => $code,
+                'message' => $message,
+            ],
+        ];
+    }
+
+    /**
+     * Build a payload of users to provision to Schoolbox Help.
+     *
+     * @param array $userIds
+     * @return array
+     */
+    private function buildProvisionUsersPayload($userIds): array
+    {
+        $userPayload = [];
+        if (is_iterable($userIds)) {
+            foreach ($this->userMapper->findByColumn('id', $userIds) as $user) {
+                /** @var User $user */
+                if (!$user->getRole()->isStaff()) {
+                    continue;
+                }
+                $userPayload[] = [
+                    'id'        => $user->getId(),
+                    'email'     => $user->getEmail(),
+                    'title'     => $user->getTitle(),
+                    'firstname' => $user->getFirstname(),
+                    'lastname'  => $user->getLastname(),
+                ];
+            }
+        }
+        return $userPayload;
+    }
 }

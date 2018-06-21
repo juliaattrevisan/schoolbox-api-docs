@@ -10,7 +10,7 @@
             <script type="text/javascript">
                 $(function() {
 
-                    $("#statusForm").addClass("hide");
+                    var $statusFormContainer = $("#statusFormContainer").addClass("hide");
 
                     var $selectize = $('#users').selectizeSelector({
                         ajax: {
@@ -42,32 +42,40 @@
                                 // Not sure under what circumstances this could possibly happen with a selectize,
                                 // but accommodating it anyway
                                 $("[data-empty-state]").show();
-                                $("#statusForm").addClass("hide");
+                                $statusFormContainer.addClass("hide");
                             } else {
                                 $("[data-empty-state]").hide();
-                                $("#statusForm").removeClass("hide");
+                                $statusFormContainer.removeClass("hide");
                             }
 
                             $(data).each(function(index, user) {
-                                var statusMarkup = '';
-                                var checkboxMarkup = '';
-                                var trMarkup = '';
+                                var statusMarkup = $('<span data-provision-status></span>');
+                                var inputMarkup = $('<input type="checkbox" name="userId[]" data-checkbox>')
+                                    .attr('id', 'provision-'+user.id)
+                                    .attr('value', user.id);
+                                var labelMarkup = $('<label>')
+                                    .attr('for', 'provision-'+user.id);
+                                var trMarkup = $('<tr />').attr('id', user.externalID);
 
                                 // Selectize uses external ID
                                 // So we have to use users' external IDs for the table row ID here, so that we can easily remove them from the DOM based on selectize events
+
+                                {#<input id="provision-{{ user.id }}" name="userId[]" value="{{ user.id }}" type="checkbox" data-checkbox>#}
+                                {#<label for="provision-{{ user.id }}"></label>#}
+
                                 if (user.provisioned) {
-                                    statusMarkup = '<i class="icon-course-outline" title="Provisioned"></i>';
-                                    checkboxMarkup = '<div class="checklist"><input id="provision-' + user.id + '" type="checkbox" data-checkbox disabled><label for="provision-' + user.id + '" title="Already provisioned"></label></div>';
-                                    trMarkup = '<tr id="' + user.externalID + '">';
+                                    statusMarkup.addClass("icon-course-outline").attr('title', 'Provisioned');
+                                    inputMarkup.prop('disabled', true);
+                                    labelMarkup.attr('title', 'Already provisioned')
                                 } else {
-                                    statusMarkup = 'Not Provisioned';
-                                    checkboxMarkup = '<div class="checklist"><input id="provision-' + user.id + '" type="checkbox" data-checkbox><label for="provision-' + user.id + '"></label></div>';
-                                    trMarkup = '<tr class="highlight-warning" id="' + user.externalID + '">';
+                                    statusMarkup.text('Not Provisioned');
+                                    trMarkup.addClass('highlight-warning');
                                 }
 
-                                var markup = trMarkup + "<td>" + statusMarkup + "</td>"
-                                    + "<td>" + user.name + "</td>"
-                                    + "<td>" + checkboxMarkup + "</td></tr>";
+                                var markup = trMarkup
+                                    .append($('<td />').append(statusMarkup))
+                                    .append($('<td />').text(user.name))
+                                    .append($('<td />').append($('<div class="checklist">').append(inputMarkup).append(labelMarkup)));
 
                                 $(tableSelector).append(markup);
                             });
@@ -90,7 +98,7 @@
                         var selectizeEmpty = ($selectize.items.length < 1);
                         if (selectizeEmpty) {
                             $("[data-empty-state]").show();
-                            $("#statusForm").addClass("hide");
+                            $statusFormContainer.addClass("hide");
                         }
                     });
 
