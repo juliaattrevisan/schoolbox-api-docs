@@ -169,46 +169,42 @@
                 type: 'POST',
                 url: config.element.attr('action'),
                 data: formContents,
-
-                complete: function () {
-
-                    /* Re-init the autosave interval
-                     */
-                    initAutosave();
-
-                    /* Re-enable submit
-                     */
-                    config.element.find('input[type=submit]').prop('disabled', false);
-                },
-                success: function (responseText) {
-
-                    /* Recycle the id ><
-                     */
-                    config.element.attr('action', responseText.formAction);
-
-                    /* hehe
-                     */
-                    window.history.pushState({}, null, responseText.formAction);
-
-                    config.toaster.toastTimeout({
-                        text: 'Draft Saved',
-                        css: 'success'
-                    });
-
-                    /* Show lozenge
-                     */
-                    config.newIndicator.hide();
-                    config.draftIndicator.show();
-                },
-                error: function (response) {
-                    var temp = $.parseJSON(response.responseText);
-
-                    config.toaster.toastTimeout({
-                        text: 'Error: ' + temp.message,
-                        css: 'alert'
-                    });
-                },
                 dataType: 'json'
+            }).done(function () {
+
+                /* Re-init the autosave interval
+                 */
+                initAutosave();
+
+                /* Re-enable submit
+                 */
+                config.element.find('input[type=submit]').prop('disabled', false);
+            }).success(function (responseText) {
+
+                /* Recycle the id ><
+                 */
+                config.element.attr('action', responseText.formAction);
+
+                /* hehe
+                 */
+                window.history.pushState({}, null, responseText.formAction);
+
+                config.toaster.toastTimeout({
+                    text: 'Draft Saved',
+                    css: 'success'
+                });
+
+                /* Show lozenge
+                 */
+                config.newIndicator.hide();
+                config.draftIndicator.show();
+            }).error(function (response) {
+                var temp = $.parseJSON(response.responseText);
+
+                config.toaster.toastTimeout({
+                    text: 'Error: ' + temp.message,
+                    css: 'alert'
+                });
             });
         }
     }
