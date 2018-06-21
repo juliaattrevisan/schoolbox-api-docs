@@ -34,6 +34,7 @@ class AdminV2_Nav
         'usage'            => 'Usage',
         'engagement'       => 'Engagement',
         'ups'              => 'User Provisioning System',
+        'shaps'            => 'Schoolbox Help Provisioning',
         'video'            => 'Media Queue',
         'import'           => 'Import',
         'filters'          => 'Filters',
