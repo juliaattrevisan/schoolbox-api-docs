@@ -199,24 +199,24 @@ class Controller extends Base
             /* TODO: Check that the current session user is allowed to modify this $news
              */
 
-            if ($this->persist($news, $this->getRequest()->post)) {
-                $url = $this->getRouter()->generate('commsNews.getUpdate', [ 'newsId' => $news->getId() ]);
+            $this->persist($news, $this->getRequest()->post);
 
-                /* Save a draft of the news article
-                 * This can occur from either the Create or Update context
-                 * Update the form action accordingly
-                 */
-                if ($this->getRequest()->isXhr()) {
-                    $this->getResponse()->content->set($this->buildJsonOutput([
-                        'success' => true,
-                        'formAction' => $url
-                    ]));
-                } else {
-                    $this->getResponse()->redirect->afterPost($url);
-                }
+            $url = $this->getRouter()->generate('commsNews.getUpdate', [ 'newsId' => $news->getId() ]);
 
-                return;
+            /* Save a draft of the news article
+             * This can occur from either the Create or Update context
+             * Update the form action accordingly
+             */
+            if ($this->getRequest()->isXhr()) {
+                $this->getResponse()->content->set($this->buildJsonOutput([
+                    'success' => true,
+                    'formAction' => $url
+                ]));
+            } else {
+                $this->getResponse()->redirect->afterPost($url);
             }
+
+            return;
         }
         catch (MapperException $e) {
             if ($this->getRequest()->isXhr()) {
@@ -243,13 +243,13 @@ class Controller extends Base
      *
      * @param Model                          $news
      * @param array|\Aura\Web\Request\Values $data
-     * @return bool
+     * @return void
      * @throws MapperException
      * @throws \PDOException
      * @throws \UnexpectedValueException
      * @throws \Schoolbox\Resource\Exception
      */
-    private function persist(Model $news, $data): bool
+    private function persist(Model $news, $data): void
     {
         $news
             ->setTitle($data['title'])
@@ -281,12 +281,7 @@ class Controller extends Base
             $news->setSubmittedAt(\Alaress_Date_Format::now());
         }
 
-        if ((new ValidArticle())->isSatisfiedBy($news)) {
-            $this->newsMapper->save($news);
-            return true;
-        }
-
-        return false;
+        $this->newsMapper->save($news);
     }
 
 
