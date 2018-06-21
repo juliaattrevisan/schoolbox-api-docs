@@ -323,15 +323,15 @@ class RubricMapper
      * Find all criteria that are available for the $box.
      *
      * For each criterion, also get:
-     * * how many non-deleted due-works are using the criteria,
+     * * how many non-deleted boxes are using the criteria,
      * * whether the specified box is using the criteria
      *
      * Sort criteria by:
      * * whether they are in use by this box,
-     * * in in use, by sequence, else by name
+     * * if in use, by sequence, else by name
        *
-     * Note: A criterion being used by a soft-deleted assessment does not count towards current usages, and
-     * hence does not prevent the user from editing the criterion's name, or soft-deleting the criterion itself.
+     * Note: A criterion being used by a soft-deleted assessment does not count towards current usages, and hence
+     *       does not prevent the user from editing the criterion's name, or soft-deleting the criterion itself.
      *
      * @param SubmissionBox $box
      * @param bool          $getParentCriteria - whether to also get criteria from box's folder's parent
