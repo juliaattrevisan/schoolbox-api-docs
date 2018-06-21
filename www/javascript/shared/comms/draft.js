@@ -159,6 +159,10 @@
              */
             config.element.find('input[type=submit]').prop('disabled', true);
 
+            /* Clear the autosave interval; it reactivates after drafts transaction occurs
+             */
+            clearInterval(autosaveInterval);
+
             /* Transact
              */
             $.ajax({
