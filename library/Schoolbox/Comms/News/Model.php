@@ -54,7 +54,7 @@ class Model
     private $author;
 
     /**
-     * @var IStorage
+     * @var IStorage|null
      */
     private $featureImage;
 

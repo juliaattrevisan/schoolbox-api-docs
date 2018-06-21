@@ -26,13 +26,14 @@ INSERT INTO `comms_news_policy` (identifier, value)
 VALUES ('expiry_date_offset', '+1 week');
 
 -- News Article
+-- Note the Character Set/Collation settings for that infernal storage table
 CREATE TABLE `comms_news_article` (
   `id`                 int(11)       PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `title`              VARCHAR(255)  NOT NULL,
   `body`               text,
   `blurb`              text,
   `author_id`          int(11)       UNSIGNED,
-  `feature_image_hash` VARCHAR(255)  NULL,
+  `feature_image_hash` VARCHAR(100)  CHARACTER SET ascii COLLATE ascii_general_ci,
   `submitted_at`       DATETIME,
   `moderated_by`       int(11)       UNSIGNED,
   `moderated_at`       DATETIME,
@@ -51,6 +52,11 @@ ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE `comms_news_article`
 ADD CONSTRAINT `fk_comms_news_article_moderated_by`
 FOREIGN KEY (`moderated_by`) REFERENCES `user` (`id`)
+ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+ALTER TABLE `comms_news_article`
+ADD CONSTRAINT `fk_comms_news_article_featured_image_hash`
+FOREIGN KEY (`feature_image_hash`) REFERENCES `storage` (`hash`)
 ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 -- News Article Tag relations
