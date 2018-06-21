@@ -102,23 +102,17 @@ class Mapper extends \Schoolbox\Mapper
             $news = $this->hydrate($row);
 
             if ($news) {
-                try {
-                    $topic = $this->getJoinMapper('comms_news_article_topic')->hydrate($row, 'topics');
+                $topic = $this->getJoinMapper('comms_news_article_topic')->hydrate($row, 'topics');
 
-                    if ($topic) {
-                        $news->getTopics()->add($topic);
-                    }
+                if ($topic) {
+                    $news->getTopics()->add($topic);
+                }
 
-                    /** @var User $author */
-                    $author = $this->getJoinMapper('author')->hydrate($row, 'a');
+                /** @var User $author */
+                $author = $this->getJoinMapper('author')->hydrate($row, 'a');
 
-                    if ($author) {
-                        $news->setAuthor($author);
-                    }
-                } catch (\Schoolbox\Mapper\Exception $e) {
-
-                    /* noop - cannot hydrate for some reason
-                     */
+                if ($author) {
+                    $news->setAuthor($author);
                 }
             }
 
