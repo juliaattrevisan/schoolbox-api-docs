@@ -372,8 +372,8 @@ class RubricMapper
                     u.`sequence`,
                     c.`grouping`,
                     c.`name`
-                FROM rubric_usage u
-                RIGHT JOIN rubric_criterion c ON u.criterion_id = c.id
+                FROM rubric_criterion c
+                LEFT JOIN rubric_usage u ON u.criterion_id = c.id
                 LEFT JOIN submission_box b ON u.submission_box_id = b.id
                 LEFT JOIN assessment a ON b.assessment_id = a.id
                 WHERE c.parent_type = 'category'
