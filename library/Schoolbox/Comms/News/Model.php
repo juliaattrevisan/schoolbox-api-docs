@@ -14,6 +14,7 @@ use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
+use Schoolbox\News\Topic;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\User;
 
@@ -91,7 +92,9 @@ class Model
     private $moderatedAt;
 
     /**
-     * @var Collection
+     * A set of News\Topic instances - there used to be only one, but now there are zero or many
+     *
+     * @var Collection|Topic[]
      */
     private $tags;
 
@@ -276,7 +279,7 @@ class Model
 
 
     /**
-     * @return Collection
+     * @return Collection|Topic[]
      */
     public function getTags(): Collection
     {
@@ -285,7 +288,7 @@ class Model
 
 
     /**
-     * @param Collection $tags
+     * @param Collection|Topic[] $tags
      * @return $this
      */
     public function setTags(Collection $tags): self
