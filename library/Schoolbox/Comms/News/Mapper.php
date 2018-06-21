@@ -90,7 +90,7 @@ class Mapper extends \Schoolbox\Mapper
         return "
             FROM {$this->getTable()}
             LEFT JOIN {$this->getJoinSql('comms_news_article_topic', null, 'topics')}
-            LEFT JOIN {$this->getJoinSql('author', null, 'a')}
+            INNER JOIN {$this->getJoinSql('author', null, 'a', true)}
         ";
     }
 

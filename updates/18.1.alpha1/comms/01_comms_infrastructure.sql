@@ -32,7 +32,7 @@ CREATE TABLE `comms_news_article` (
   `title`              VARCHAR(255)  NOT NULL,
   `body`               text,
   `blurb`              text,
-  `author_id`          int(11)       UNSIGNED,
+  `author_id`          int(11)       UNSIGNED NOT NULL,
   `feature_image_hash` VARCHAR(100)  CHARACTER SET ascii COLLATE ascii_general_ci,
   `submitted_at`       DATETIME,
   `moderated_by`       int(11)       UNSIGNED,
