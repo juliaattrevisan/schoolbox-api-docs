@@ -36,4 +36,9 @@ class Mapper extends BaseMapper
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
     }
+
+    protected function raiseNotification($object, $verb, $previous = null)
+    {
+        return true;
+    }
 }

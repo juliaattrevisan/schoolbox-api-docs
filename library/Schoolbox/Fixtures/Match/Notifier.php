@@ -24,6 +24,7 @@ use Schoolbox\Fixtures\Match\Model as Match;
 use Schoolbox\Fixtures\Match\Notifier\Helper as NotifierHelper;
 use Schoolbox\Fixtures\Snapshot\Snapshot;
 use Schoolbox\User;
+use Alaress_Date_Format;
 
 class Notifier extends AbstractModuleNotifier
 {
@@ -84,8 +85,17 @@ class Notifier extends AbstractModuleNotifier
                     $bundle->attach(self::TRIGGER_SNAPSHOT_CREATED, $startAt);
                     break;
                 case Mapper::METHOD_UPDATE:
-                    $bundle->attach(self::TRIGGER_UPDATED, $notifyTime);
-                    $bundle->attach(self::TRIGGER_SNAPSHOT_UPDATED, $startAt);
+                    $diff = $bundle->getEvent()->getDiff();
+                    $oneday = new Alaress_Date_Format(new \DateTime('+1 day'));
+                    if ($notifyTime < $oneday->getUnixTimeStamp()) {
+                        // if the changed match is happening in 24hrs
+                        $bundle->attach(self::TRIGGER_UPDATED, self::IMMEDIATELY);
+                        $bundle->attach(self::TRIGGER_SNAPSHOT_UPDATED, $startAt);
+                    } else if (array_key_exists('startAt', $diff)) {
+                        // if the start time changed, update the upcoming notification time.
+                        $bundle->detach(self::TRIGGER_CREATED);
+                        $bundle->attach(self::TRIGGER_CREATED, $notifyTime);
+                    }
                     break;
             }
         }
