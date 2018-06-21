@@ -326,6 +326,11 @@ class RubricMapper
      * * how many boxes are using the criteria,
      * * whether the specified box is using the criteria
      *
+     * Sort criteria by:
+     * * whether they are in use by this box,
+     * * in in use, by sequence
+     * * if not in use, by name
+     *
      * @param SubmissionBox $box
      * @param bool          $getParentCriteria - whether to also get criteria from box's folder's parent
      *
@@ -337,6 +342,7 @@ class RubricMapper
         $args = [
             'boxId'    => $box->getId(),
             'folderId' => $box->getCategory()->getId(),
+            'parent_type' => Criterion::PARENT_TYPE_CATEGORY,
         ];
 
         $in = ['folderId'];
@@ -375,7 +381,7 @@ class RubricMapper
                 LEFT JOIN rubric_usage u ON u.criterion_id = c.id
                 LEFT JOIN submission_box b ON u.submission_box_id = b.id
                 LEFT JOIN assessment a ON b.assessment_id = a.id AND a.deleted_at IS NULL
-                WHERE c.parent_type = 'category'
+                WHERE c.parent_type = :parent_type
                 AND c.parent_id IN (:$in)
                 AND c.deleted_at IS NULL
                 ORDER BY selected DESC
