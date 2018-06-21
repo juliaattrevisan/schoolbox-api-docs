@@ -44,12 +44,12 @@ CREATE TABLE `comms_news_article` (
 );
 
 ALTER TABLE `comms_news_article`
-ADD CONSTRAINT `fk_comms_news_article_1`
+ADD CONSTRAINT `fk_comms_news_article_author_id`
 FOREIGN KEY (`author_id`) REFERENCES `user` (`id`)
 ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 ALTER TABLE `comms_news_article`
-ADD CONSTRAINT `fk_comms_news_article_2`
+ADD CONSTRAINT `fk_comms_news_article_moderated_by`
 FOREIGN KEY (`moderated_by`) REFERENCES `user` (`id`)
 ON DELETE NO ACTION ON UPDATE NO ACTION;
 
