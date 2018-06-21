@@ -67,7 +67,7 @@ class Collector extends DataCollector implements Renderable, AssetProvider
         // Used this trying to find where queries came from
 
         foreach ($backtrace as $trace) {
-            if (substr($trace['class'], 0, strlen($prefix)) != $prefix) {
+            if (substr($trace['class'] ?? '', 0, strlen($prefix)) != $prefix) {
                 $sql .= sprintf(
                     "Statement Class: %s\nLine %d: %s::%s()\n\n",
                     get_class($statement),
