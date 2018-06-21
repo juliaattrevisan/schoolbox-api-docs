@@ -105,7 +105,7 @@ class Mapper extends \Schoolbox\Mapper
                 $topic = $this->getJoinMapper('comms_news_article_topic')->hydrate($row, 'topics');
 
                 if ($topic) {
-                    $news->getTopics()->add($topic);
+                    $news->getTopics()->setOffset($topic->getId(), $topic);
                 }
 
                 /** @var User $author */
