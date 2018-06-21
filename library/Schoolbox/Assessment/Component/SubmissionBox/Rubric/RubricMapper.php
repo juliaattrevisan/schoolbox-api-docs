@@ -359,7 +359,6 @@ class RubricMapper
         $criteriaStatement = $this->database->query("
             SELECT
                 COUNT(box_id) usages,
-                MAX(`sequence`) sequence,
                 COALESCE(MAX(selected), 0) selected,
                 crit_id,
                 `grouping`,
@@ -382,7 +381,7 @@ class RubricMapper
                 ORDER BY selected DESC
             ) t
             GROUP BY crit_id
-            ORDER BY selected DESC, `sequence` ASC, `grouping` ASC, `name` ASC;
+            ORDER BY selected DESC, MAX(`sequence`) ASC, `grouping` ASC, `name` ASC;
         ", $args);
 
         return $criteriaStatement;
