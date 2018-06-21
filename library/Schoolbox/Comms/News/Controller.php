@@ -264,8 +264,14 @@ class Controller extends Base
             ->setPublishAt(\Alaress_Date_Format::newLocal($data['publishAt']))
             ->setExpiresAt(\Alaress_Date_Format::newLocal($data['expiresAt']));
 
+        /* If any Feature Image was provided, remember it
+         * Otherwise clear it (remove a Feature Image)
+         */
         if (\is_array($data['attachment'])) {
             $news->setFeatureImage((new CollectorFactory())->build($data['attachment'] ?: [])->getFirst());
+        }
+        else {
+            $news->setFeatureImage(null);
         }
 
         /* Identify drafts

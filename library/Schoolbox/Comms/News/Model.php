@@ -259,7 +259,7 @@ class Model
 
 
     /**
-     * @return IStorage
+     * @return null|IStorage
      */
     public function getFeatureImage(): ?IStorage
     {
@@ -268,10 +268,10 @@ class Model
 
 
     /**
-     * @param IStorage $featureImage
-     * @return $this
+     * @param null|IStorage $featureImage
+     * @return Model
      */
-    public function setFeatureImage(IStorage $featureImage): self
+    public function setFeatureImage(?IStorage $featureImage): self
     {
         $this->featureImage = $featureImage;
         return $this;
