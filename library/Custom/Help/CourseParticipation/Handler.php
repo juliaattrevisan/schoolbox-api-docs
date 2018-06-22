@@ -239,7 +239,7 @@ class Handler
         foreach ($post['user'] as $userData) {
             if (!$this->userPayloadIsValid($userData)) {
                 $failedUsers[] = [
-                    'Invalid payload', $userData
+                    'Failed: required data was missing', $userData
                 ];
                 continue;
             }

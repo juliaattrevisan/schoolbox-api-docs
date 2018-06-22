@@ -14,6 +14,10 @@ use Schoolbox\Collection;
 
 class Controller extends Base
 {
+    const REQUIRED_USER_FIELDS  = [
+        'id', 'email', 'firstname', 'lastname'
+    ];
+
     /**
      * @var UserMapper
      */
@@ -55,6 +59,23 @@ class Controller extends Base
         ]);
     }
 
+    private function getInvalidities(\Schoolbox\User $user) {
+        $errors = [];
+        if (empty($user->getId())) {
+            $errors[] = 'id';
+        }
+        if (empty($user->getEmail())) {
+            $errors[] = 'email';
+        }
+        if (empty($user->getFirstname())) {
+            $errors[] = 'firstname';
+        }
+        if (empty($user->getLastname())) {
+            $errors[] = 'lastname';
+        }
+
+        return $errors;
+    }
 
     /**
      * Renders a list of all staff in your Schoolbox instance, and whether or not they are provisioned on Help.
@@ -66,14 +87,21 @@ class Controller extends Base
      */
     public function getAll()
     {
+        $errors = [];
         $provisionedUsers = $this->helpRequest->findProvisionedUsers();
+
+        $allStaff = $this->getAllStaff();
+        foreach($this->getAllStaff() as $user) {
+            $errors[$user->getId()] = $this->getInvalidities($user);
+        }
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@shaps/provisioning/index.twig', [
-                'allUsers' => $this->getAllStaff(),
+                'allUsers' => $allStaff,
                 'provisionedUsers' => $provisionedUsers,
-                'pageCurrent' => 'shaps/provisioning'
+                'pageCurrent' => 'shaps/provisioning',
+                'errors' => $errors
             ])->setTitle('Schoolbox Help Staff Provisioning')
         );
     }
