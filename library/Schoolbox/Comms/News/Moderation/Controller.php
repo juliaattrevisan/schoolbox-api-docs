@@ -9,6 +9,7 @@
 namespace Schoolbox\Comms\News\Moderation;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Comms\News\Model;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
@@ -70,6 +71,19 @@ class Controller extends Base
         ])->setTitle('Example'));
     }
 
+
+    /**
+     * Load a news article so you can read its contents (the detail screen)
+     *
+     * @param Model $news
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     */
+    public function getDetail(Model $news)
+    {
+        $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsModeration/detail.twig', [
+            'news' => $news,
+        ])->setTitle($news->getTitle()));
+    }
 
     /**
      * Process the form vars

@@ -15,6 +15,7 @@ use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccess;
@@ -43,33 +44,52 @@ class Module extends BaseModule
             )
         );
 
-        $preloadUser = function ($params) { return $this->preloadUser($params); };
+        $preloadNews = function ($params) { return $this->preloadNews($params); };
 
-        $this->register('GET', '', 'getList', $moderatorPerms, null);
+        /* Get a list of articles needing moderation
+         */
+        $this->register('GET', '', 'getList', $moderatorPerms);
+
+        /* Show an article with additional moderator-only powers
+         */
+        $this->register('GET', '/{newsId:\d+}', 'getDetail', $moderatorPerms, $preloadNews);
+
         $this->register('POST', '/user', 'postExample', $moderatorPerms, null);
     }
 
     /**
-     * Preload a User instance
+     * Preload the news article
      *
      * @param array $params
      * @return array
+     * @throws \Schoolbox\Application\Exception\NotFound
      * @throws InvalidArgumentException
      * @throws NotFound
      */
-    private function preloadUser(array $params): array
+    private function preloadNews(array $params) :array
     {
         try {
-            $user = $this->getUserMapper()->findById($params['id']);
+            $news = $this->getNewsMapper()->findById($params['newsId']);
         }
         catch (MapperException $e) {
-            throw new NotFound();
+            throw new NotFound(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
         }
 
         return [
-            'user' => $user,
+            'news' => $news,
         ];
     }
+
+
+    /**
+     * @return Mapper|UserMapper
+     * @throws \InvalidArgumentException If cannot find mapper class
+     */
+    protected function getNewsMapper()
+    {
+        return $this->getMapperFactory()->get(\Schoolbox\Comms\News\Mapper::class);
+    }
+
 
     /**
      * @inheritdoc
