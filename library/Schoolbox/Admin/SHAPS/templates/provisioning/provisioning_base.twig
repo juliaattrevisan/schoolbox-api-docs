@@ -2,6 +2,14 @@
 
 <div class="row">
     <div class="small-12 island">
+        <ul class="sub-nav">
+            {% block pageStaffProvisioning %}<li>{% endblock %}
+                <a href="{{ routeLookup('shaps.getAll') }}">Staff Provisioning</a>
+            </li>
+            {% block pageHelpCourses %}<li>{% endblock %}
+                <a href="{{ routeLookup('shaps.getUsersInCourses') }}">Help Courses</a>
+            </li>
+        </ul>
 
         <h1>Staff Provisioning</h1>
 
