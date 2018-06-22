@@ -14,7 +14,7 @@
             <ul class="information-list">
                 {% for article in articles %}
                     <li class="content">
-                        <h3>{{ article.title }}</h3>
+                        <h3><a href="{{ routeLookup('commsNews.getDetail', {newsId: article.id}) }}">{{ article.title }}</a></h3>
                         <p class="meta">Authored by {{ article.author.fullname }} on {{ article.updatedAt.local }}</p>
                         <p>{{ article.blurb|purify }}</p>
                     </li>
