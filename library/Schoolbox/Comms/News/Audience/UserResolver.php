@@ -102,7 +102,7 @@ class UserResolver
 
         // Simple base case:
         if (Model::ENTITY_TYPE_COMPOSITE !== $entityType) {
-            $userIds = $this->getUserIds($entityType, $audienceSegment[Mapper::FIELD_ENTITY_TYPE]);
+            $userIds = $this->getUserIds($audienceSegment[Mapper::FIELD_ENTITY_TYPE], $audienceSegment[Mapper::FIELD_ENTITY_VALUE]);
             return $this->applyRelationshipFilter($userIds, $audienceSegment[Mapper::FIELD_RELATIONSHIP]);
         }
 
@@ -186,16 +186,16 @@ class UserResolver
      * Returns a set of userIds that match a given entity type and identifier
      *
      * @param string $entityType
-     * @param string $entityValue
+     * @param null|string $entityValue
      * @return int[]
      * @throws UnexpectedValueException If an unrecognised entity type is passed
      */
-    private function getUserIds(string $entityType, string $entityValue): array
+    private function getUserIds(string $entityType, ?string $entityValue): array
     {
         if (null === $entityValue) {
             $predicate = 'IS NULL';
         } else {
-            $predicate = "= {$entityValue}";
+            $predicate = "= '{$entityValue}'";
         }
 
         switch ($entityType) {
