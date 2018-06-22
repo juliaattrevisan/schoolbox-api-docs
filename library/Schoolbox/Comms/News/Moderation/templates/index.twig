@@ -16,7 +16,17 @@
                     <li class="content">
                         <h3><a href="{{ routeLookup('commsNews.getDetail', {newsId: article.id}) }}">{{ article.title }}</a></h3>
                         <p class="meta">Authored by {{ article.author.fullname }} on {{ article.updatedAt.local }}</p>
-                        <p>{{ article.blurb|purify }}</p>
+
+                        {# TODO: Have a /news/topic url lol #}
+                        {% if article.topics|length %}
+                        <p class="meta">Related topics:
+                            {% for topic in article.topics %}
+                            <a href="/news/topic/{{ topic.slug }}">{{ topic.name }}</a>{% if not loop.last %},{% endif %}
+                            {% endfor %}
+                        </p>
+                        {% endif %}
+
+                        <article>{{ article.blurb|purify }}</article>
                     </li>
                 {% endfor %}
             </ul>
