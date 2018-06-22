@@ -9,10 +9,6 @@
 namespace Schoolbox\Admin\SHAPS;
 
 use Alaress\Web\Controller\Base;
-use Alaress_Date_Format;
-use GuzzleHttp\Exception\ClientException;
-use GuzzleHttp\Exception\TransferException;
-use Schoolbox\IConfigLoader;
 use Schoolbox\UserMapper;
 use Schoolbox\Collection;
 
