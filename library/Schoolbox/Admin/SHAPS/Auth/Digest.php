@@ -6,7 +6,7 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\SHAPS\Auth;
+namespace Schoolbox\Admin\SHAPS\Auth;
 
 
 class Digest

@@ -6,7 +6,7 @@
  * @copyright   Copyright 2017, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
-namespace Schoolbox\SHAPS;
+namespace Schoolbox\Admin\SHAPS;
 
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;

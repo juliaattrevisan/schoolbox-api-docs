@@ -6,7 +6,7 @@
  * @copyright   Copyright 2017, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
-namespace Schoolbox\SHAPS;
+namespace Schoolbox\Admin\SHAPS;
 
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
@@ -14,7 +14,7 @@ use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
 use Schoolbox\Mapper;
-use Schoolbox\SHAPS\Auth\Parameters;
+use Schoolbox\Admin\SHAPS\Auth\Parameters;
 use Schoolbox\UserMapper;
 use Alaress\Twig\Loader\IChainLoader;
 
