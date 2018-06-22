@@ -124,5 +124,9 @@ class Admin implements ModuleConfigInterface
         // Service Roster
         $featureTours = new \Schoolbox\Admin\Service\Module($di);
         $featureTours->init('/adminv2/service');
+
+        // SHAPS
+        $shaps = new \Schoolbox\Admin\SHAPS\Module($di);
+        $shaps->init('/adminv2/shaps');
     }
 } 
