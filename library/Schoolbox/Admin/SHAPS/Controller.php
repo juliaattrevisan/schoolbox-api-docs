@@ -32,14 +32,13 @@ class Controller extends Base
      *
      * @param UserMapper      $userMapper
      * @param Auth\Parameters $authParams
-     * @param string          $serverUrl
      */
     public function __construct(UserMapper $userMapper, Auth\Parameters $authParams)
     {
         $this->userMapper  = $userMapper;
         $this->helpRequest = new HelpRequest($authParams, $this->userMapper);
     }
-    
+
     /*
      * Helper method to get all staff in your Schoolbox instance.
      *
