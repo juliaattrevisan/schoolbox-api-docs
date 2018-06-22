@@ -8,6 +8,7 @@
  */
 namespace Schoolbox\Comms\News\Moderation;
 
+use Alaress\Database\Predicate\Builder;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Comms\News\Model;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -59,11 +60,11 @@ class Controller extends Base
         $newsArticles = [];
 
         if ($moderationRequired) {
-            $newsArticles = \Schoolbox\Comms\News\Mapper::getInstance()->findByColumn('moderated_at', null, [
-                'order' => [
-                    'updated_at' => 'asc'
-                ]
-            ]);
+            $newsArticles = \Schoolbox\Comms\News\Mapper::getInstance()->findByColumn('moderated_at', null)->filter(
+                function (Model $item) {
+                    return !$item->getSubmittedAt()->isNull();
+                }
+            );
         }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsModeration/index.twig', [
