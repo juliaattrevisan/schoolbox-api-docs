@@ -30,7 +30,7 @@ class Handler
 
     const PARTICIPANT_CAMPUS    = 1;
     const REQUIRED_USER_FIELDS  = [
-        'id', 'email', 'title', 'firstname', 'lastname'
+        'id', 'email', 'firstname', 'lastname'
     ];
 
     /**
