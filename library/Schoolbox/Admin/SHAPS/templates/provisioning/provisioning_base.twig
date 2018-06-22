@@ -62,7 +62,7 @@
                                     <span data-provision-status class="icon-course-outline" title="Provisioned"></span>
                                 {% else %}
                                     {% if errors[user.id] %}
-                                        <span data-provision-status>Required fields missing -
+                                        <span data-provision-status>Required field/s missing -
                                             <span class="errorList">{{ errors[user.id] | join(', ') }}</span>
                                         </span>
                                     {% else %}
