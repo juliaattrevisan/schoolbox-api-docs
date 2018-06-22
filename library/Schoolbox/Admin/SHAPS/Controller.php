@@ -14,10 +14,6 @@ use Schoolbox\Collection;
 
 class Controller extends Base
 {
-    const REQUIRED_USER_FIELDS  = [
-        'id', 'email', 'firstname', 'lastname'
-    ];
-
     /**
      * @var UserMapper
      */
