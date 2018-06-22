@@ -63,7 +63,7 @@
                                 {% else %}
                                     {% if errors[user.id] %}
                                         <span data-provision-status>Required fields missing -
-                                            {{ errors[user.id] | join(', ') }}
+                                            <span class="errorList">{{ errors[user.id] | join(', ') }}</span>
                                         </span>
                                     {% else %}
                                         <span data-provision-status>Not Provisioned</span>
