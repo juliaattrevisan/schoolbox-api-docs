@@ -71,7 +71,7 @@
                                 {% endif %}
                             </td>
                             <td>
-                                {{ user.fullname }}
+                                <a href="/search/user/{{ user.id }}">{{ user.fullname }}</a>
                             </td>
 
                             {% block provisioned_column %}
