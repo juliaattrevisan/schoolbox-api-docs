@@ -793,6 +793,21 @@ class Controller extends Assessment\Controller
 
         if ($isFinal) {
 
+            // verify that there are actually any files attached; if not, that's a fail case
+            if ($response->getAllFiles()->count() === 0) {
+                $errorMessage = 'One or more files failed to attach to your submission; please try again.';
+                $redirect = $this->getRouter()->generate(
+                    'learningAssessment.getCreateResponseForm',
+                    [
+                        'assessmentId' => $assessment->getId(),
+                        'studentId'    => $student->getId(),
+                    ]
+                );
+
+                $this->configureResponseWithError($errorMessage, $redirect);
+                return;
+            }
+
             /* submitted_at is determined after the next step when creating a self-assessed or self-reflected
              * response. Otherwise, proceed normally
              */
