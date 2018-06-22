@@ -35,6 +35,9 @@ class Model
     public const RELATIONSHIP_PARENTS_OF  = 'parents_of';           // eg, Audience = parents of user 15
     public const RELATIONSHIP_TEACHERS_OF = 'teachers_of';          // eg, Audience = teachers of user 15
 
+    // The value of segments targeted to superusers
+    public const ENTITY_VALUE_SUPER       = 1;
+
 
     /**
      * Returns the set of all known entity types

@@ -38,6 +38,36 @@ class SegmentRelationships
         Model::ENTITY_TYPE_CLASS          => [Model::RELATIONSHIP_SELF, Model::RELATIONSHIP_PARENTS_OF],
     ];
 
+    // Is it valid for segments that target these types to target a null value, eg users
+    // * who are not in a school house, or
+    // * who are not in any groups.
+    public const VALID_SEGMENT_NULL_ENTITIES = [
+        Model::ENTITY_TYPE_USER           => false,
+        Model::ENTITY_TYPE_SUPER          => false,
+        Model::ENTITY_TYPE_CAMPUS         => true,
+        Model::ENTITY_TYPE_ROLE           => false,
+        Model::ENTITY_TYPE_ROLE_TYPE      => false,
+        Model::ENTITY_TYPE_SCHOOL_HOUSE   => true,
+        Model::ENTITY_TYPE_RES_HOUSE      => true,
+        Model::ENTITY_TYPE_YEAR           => true,
+        Model::ENTITY_TYPE_SERVICE        => false,
+        Model::ENTITY_TYPE_PASTORAL_GROUP => true,
+        Model::ENTITY_TYPE_GROUP          => true,
+        Model::ENTITY_TYPE_CLASS          => true,
+    ];
+
+
+    /**
+     * Returns whether it's valid for an segment to target a user who lacks this entity type
+     *
+     * @param string $entityType
+     * @return bool
+     */
+    public static function canTargetNullEntity(string $entityType): bool
+    {
+        return self::VALID_SEGMENT_NULL_ENTITIES[$entityType];
+    }
+
 
     /**
      * Returns the entity types that may use the specified relationship modifier
@@ -54,7 +84,7 @@ class SegmentRelationships
 
         $validEntities = [];
         foreach (self::VALID_SEGMENT_RELATIONSHIPS as $entity => $relationships) {
-            if (\in_array($relationship, $relationships, true)) {
+            if (TRUE || \in_array($relationship, $relationships, true)) {   // TODO REMOVE TESTING SHORT CIRCUIT
                 $validEntities[] = $entity;
             }
         }

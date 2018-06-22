@@ -9,10 +9,7 @@ declare(strict_types=1);
 namespace Schoolbox\Comms\News\Audience;
 
 use Alaress\Database;
-use External_Class;
-use External_User;
 use Schoolbox\Collection;
-use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Role;
 use Schoolbox\User;
@@ -35,38 +32,32 @@ class ArticleResolver
     /** @var UserAccessMapper */
     private $userAccessMapper;
 
-    /** @var External_User */
-    private $externalUser;
-
     /** @var Folder\Mapper */
     private $folderMapper;
 
-    /** @var External_Class */
-    private $externalClass;
+    /** @var RelationshipFilterer */
+    private $relationshipFilter;
 
 
     /**
      * @param Database\Connector\IConnector $db
      * @param UserMapper                    $userMapper
      * @param UserAccessMapper              $userAccessMapper
-     * @param External_User                 $externalUser
      * @param Folder\Mapper                 $folderMapper
-     * @param External_Class                $externalClass
+     * @param RelationshipFilterer          $relationshipFilter
      */
     public function __construct(
         Database\Connector\IConnector $db,
         UserMapper $userMapper,
         UserAccessMapper $userAccessMapper,
-        External_User $externalUser,
         Folder\Mapper $folderMapper,
-        External_Class $externalClass
+        RelationshipFilterer $relationshipFilter
     ) {
         $this->db               = $db;
         $this->userMapper       = $userMapper;
         $this->userAccessMapper = $userAccessMapper;
-        $this->externalUser     = $externalUser;
         $this->folderMapper     = $folderMapper;
-        $this->externalClass    = $externalClass;
+        $this->relationshipFilter = $relationshipFilter;
     }
 
 
@@ -191,7 +182,7 @@ class ArticleResolver
         }
 
         // We are guaranteed to have independent subsets,
-        $query = \implode("\nUNION ALL\n", $queries);
+        $query = \implode("\nUNION\n", $queries);
 
         return $this->db->executeQuery($query)->fetchAll(PDO::FETCH_COLUMN);
     }
@@ -248,14 +239,7 @@ class ArticleResolver
             return;
         }
 
-        $externalChildren = $this->externalUser->getEnrolledStudents($user->getExternalId());
-
-        if (!\count($externalChildren)) {
-            // No children in external SIS? Then this user should never see audience segments targeted to parents of a segment
-            return;
-        }
-
-        $childUsers = $this->userMapper->findByColumn('synergy_id', \array_column($externalChildren, 'RelatedID'));
+        $childUsers = $this->relationshipFilter->getChildren($user);
         if (!\count($childUsers)) {
             // No children in schoolbox? Then this user should never see audience segments targeted to parents of a segment
             return;
@@ -294,51 +278,7 @@ class ArticleResolver
             return;
         }
 
-        $taughtFolders = $this->folderMapper->findForUser($user, true, UserAccess::ACCESS_WRITE, true);
-
-        if (!\count($taughtFolders)) {
-            return;
-        }
-
-        $folderIds = $taughtFolders->getPropertyValues('id');
-
-        $groupMemberIds = $this->userAccessMapper->findScalarByPredicates(
-            'uid',
-            $this->userAccessMapper->getPredicateBuilder()
-                                   ->equals('service', UserAccess::SERVICE_HOMEPAGE)
-                                   ->in('sid', $folderIds)
-                                   ->equals('type', UserAccess::ACCESS_READ)
-        );
-
-        $classStudentExternalIds = [];
-        foreach ($taughtFolders as $taughtFolder) {
-            foreach ($taughtFolder->getCodes() as $code) {
-                $classStudents = $this->externalClass->getStudents($code->getCode());
-                foreach ($classStudents as $classStudent) {
-                    $classStudentExternalIds[] = $classStudent['synergy_id'];
-                }
-            }
-        }
-
-        if (!\count($groupMemberIds) && !\count($classStudentExternalIds)) {
-            return;
-        }
-
-        $innerPredicate = $this->userMapper->getPredicateBuilder();
-
-        if (\count($groupMemberIds)) {
-            $innerPredicate->in('id', $groupMemberIds);
-            $innerPredicate->any(
-                $this->userMapper->getPredicateBuilder()->in('id', $groupMemberIds)
-            );
-        }
-
-        if (\count($classStudentExternalIds)) {
-            $innerPredicate->in('synergy_id', \array_unique($classStudentExternalIds));
-        }
-
-        $taughtUsers = $this->userMapper->findByPredicates($this->userMapper->getPredicateBuilder()->any($innerPredicate));
-
+        $taughtUsers = $this->relationshipFilter->getTaught($user);
         if (!\count($taughtUsers)) {
             // No users found in Schoolbox?
             return;
@@ -385,9 +325,9 @@ class ArticleResolver
         if (\array_key_exists(Model::ENTITY_TYPE_SUPER, $validEntities)) {
             foreach ($users as $user) {
                 if ($user->isSuperuser()) {
-                    $whereClauses->add($this->buildClause(Model::ENTITY_TYPE_SUPER, true, $relationship));
+                    $whereClauses->add($this->buildClause(Model::ENTITY_TYPE_SUPER, Model::ENTITY_VALUE_SUPER, $relationship));
                     if(Model::RELATIONSHIP_SELF !== $relationship){
-                        $relatedWhereClauses->add($this->buildClause(Model::ENTITY_TYPE_SUPER, true, Model::RELATIONSHIP_SELF));
+                        $relatedWhereClauses->add($this->buildClause(Model::ENTITY_TYPE_SUPER,  Model::ENTITY_VALUE_SUPER, Model::RELATIONSHIP_SELF));
                     }
                     break;
                 }
@@ -406,7 +346,7 @@ class ArticleResolver
                     $campusIds[] = $campus->getId();
                 }
             }
-            if ($userFoundWithNoCampus) {
+            if ($userFoundWithNoCampus && SegmentRelationships::canTargetNullEntity(Model::ENTITY_TYPE_CAMPUS)) {
                 $whereClauses->add($this->buildClause(Model::ENTITY_TYPE_CAMPUS, null, $relationship));
                 if(Model::RELATIONSHIP_SELF !== $relationship){
                     $relatedWhereClauses->add($this->buildClause(Model::ENTITY_TYPE_CAMPUS, null, Model::RELATIONSHIP_SELF));
@@ -465,7 +405,7 @@ class ArticleResolver
                     $relatedWhereClauses->add($this->buildClause(Model::ENTITY_TYPE_SCHOOL_HOUSE, $uniqueSchoolHouseIds, Model::RELATIONSHIP_SELF));
                 }
             }
-            if ($userFoundWithNoHouse) {
+            if ($userFoundWithNoHouse && SegmentRelationships::canTargetNullEntity(Model::ENTITY_TYPE_SCHOOL_HOUSE)) {
                 $whereClauses->add($this->buildClause(Model::ENTITY_TYPE_SCHOOL_HOUSE, null, $relationship));
                 if(Model::RELATIONSHIP_SELF !== $relationship){
                     $relatedWhereClauses->add($this->buildClause(Model::ENTITY_TYPE_SCHOOL_HOUSE, null, Model::RELATIONSHIP_SELF));
@@ -491,7 +431,7 @@ class ArticleResolver
                     $relatedWhereClauses->add($this->buildClause(Model::ENTITY_TYPE_RES_HOUSE, $uniqueResidentialHouseIds, Model::RELATIONSHIP_SELF));
                 }
             }
-            if ($userFoundWithNoHouse) {
+            if ($userFoundWithNoHouse && SegmentRelationships::canTargetNullEntity(Model::ENTITY_TYPE_RES_HOUSE)) {
                 $whereClauses->add($this->buildClause(Model::ENTITY_TYPE_RES_HOUSE, null, $relationship));
                 if(Model::RELATIONSHIP_SELF !== $relationship){
                     $relatedWhereClauses->add($this->buildClause(Model::ENTITY_TYPE_RES_HOUSE, null, Model::RELATIONSHIP_SELF));
@@ -517,7 +457,7 @@ class ArticleResolver
                     $relatedWhereClauses->add($this->buildClause(Model::ENTITY_TYPE_YEAR, $uniqueYears, Model::RELATIONSHIP_SELF));
                 }
             }
-            if ($userFoundWithNoYear) {
+            if ($userFoundWithNoYear && SegmentRelationships::canTargetNullEntity(Model::ENTITY_TYPE_YEAR)) {
                 $whereClauses->add($this->buildClause(Model::ENTITY_TYPE_YEAR, null, $relationship));
                 if(Model::RELATIONSHIP_SELF !== $relationship){
                     $relatedWhereClauses->add($this->buildClause(Model::ENTITY_TYPE_YEAR, null, Model::RELATIONSHIP_SELF));
@@ -551,7 +491,7 @@ class ArticleResolver
                     $relatedWhereClauses->add($this->buildClause(Model::ENTITY_TYPE_PASTORAL_GROUP, $nonNullGroupIds, Model::RELATIONSHIP_SELF));
                 }
             }
-            if (\count($groupIds) !== \count($nonNullGroupIds)) {
+            if (SegmentRelationships::canTargetNullEntity(Model::ENTITY_TYPE_PASTORAL_GROUP) && \count($groupIds) !== \count($nonNullGroupIds)) {
                 $whereClauses->add($this->buildClause(Model::ENTITY_TYPE_PASTORAL_GROUP, null, $relationship));
                 if(Model::RELATIONSHIP_SELF !== $relationship){
                     $relatedWhereClauses->add($this->buildClause(Model::ENTITY_TYPE_PASTORAL_GROUP, null, Model::RELATIONSHIP_SELF));
@@ -567,7 +507,10 @@ class ArticleResolver
             $userFoundWithoutGroups = $userFoundWithoutClasses = false;
             foreach ($users as $user) {
                 $groupFound = $classFound = false;
-                foreach ($this->folderMapper->findForUser($user) as $folder) {
+                // TODO is findForUser() args always correct?
+                $accessLevel = 1;
+                $exactAccess = false;
+                foreach ($this->folderMapper->findForUser($user, $canTargetClass, $accessLevel, $exactAccess) as $folder) {
                     if ($folder->isGroup()) {
                         $groupFound = true;
                         $groupIds[] = $folder->getId();
@@ -593,7 +536,7 @@ class ArticleResolver
                         $relatedWhereClauses->add($this->buildClause(Model::ENTITY_TYPE_GROUP, $uniqueGroupIds, Model::RELATIONSHIP_SELF));
                     }
                 }
-                if ($userFoundWithoutGroups) {
+                if ($userFoundWithoutGroups && SegmentRelationships::canTargetNullEntity(Model::ENTITY_TYPE_GROUP)) {
                     $whereClauses->add($this->buildClause(Model::ENTITY_TYPE_GROUP, null, $relationship));
                     if(Model::RELATIONSHIP_SELF !== $relationship){
                         $relatedWhereClauses->add($this->buildClause(Model::ENTITY_TYPE_GROUP, null, Model::RELATIONSHIP_SELF));
@@ -608,7 +551,7 @@ class ArticleResolver
                         $relatedWhereClauses->add($this->buildClause(Model::ENTITY_TYPE_CLASS, $uniqueClassCodes, Model::RELATIONSHIP_SELF));
                     }
                 }
-                if ($userFoundWithoutClasses) {
+                if ($userFoundWithoutClasses && SegmentRelationships::canTargetNullEntity(Model::ENTITY_TYPE_CLASS)) {
                     $whereClauses->add($this->buildClause(Model::ENTITY_TYPE_CLASS, null, $relationship));
                     if(Model::RELATIONSHIP_SELF !== $relationship){
                         $relatedWhereClauses->add($this->buildClause(Model::ENTITY_TYPE_CLASS, null, Model::RELATIONSHIP_SELF));
