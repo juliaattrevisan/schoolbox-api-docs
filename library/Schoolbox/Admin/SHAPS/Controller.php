@@ -91,7 +91,7 @@ class Controller extends Base
         $provisionedUsers = $this->helpRequest->findProvisionedUsers();
 
         $allStaff = $this->getAllStaff();
-        foreach($this->getAllStaff() as $user) {
+        foreach($allStaff as $user) {
             $errors[$user->getId()] = $this->getInvalidities($user);
         }
 
@@ -118,14 +118,21 @@ class Controller extends Base
      */
     public function getProvisioned()
     {
+        $errors = [];
         $provisionedUsers = $this->helpRequest->findProvisionedUsers();
+
+        $allStaff = $this->getAllStaff();
+        foreach($allStaff as $user) {
+            $errors[$user->getId()] = $this->getInvalidities($user);
+        }
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@shaps/provisioning/provisioned.twig', [
                     'allUsers' => $provisionedUsers,
                     'provisionedUsers' => $provisionedUsers,
-                    'pageCurrent' => 'shaps/provisioning'
+                    'pageCurrent' => 'shaps/provisioning',
+                    'errors' => $errors
             ])->setTitle('Provisioned Staff - Schoolbox Help Staff Provisioning')
         );
     }
@@ -142,13 +149,19 @@ class Controller extends Base
      */
     public function getUnprovisioned()
     {
+        $errors = [];
         $provisionedUsers = $this->helpRequest->findProvisionedUsers();
+
+        foreach($this->getAllStaff() as $user) {
+            $errors[$user->getId()] = $this->getInvalidities($user);
+        }
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@shaps/provisioning/unprovisioned.twig', [
                     'allUsers' => $this->getAllStaff()->diff($provisionedUsers),
-                    'pageCurrent' => 'shaps/provisioning'
+                    'pageCurrent' => 'shaps/provisioning',
+                    'errors' => $errors
             ])->setTitle('Unprovisioned Staff - Schoolbox Help Staff Provisioning')
         );
     }
