@@ -79,27 +79,119 @@ class ArticleResolver
      */
     public function findArticlesForUser(User $user): array
     {
-        /** @var Collection|string[] $whereClauses */
-        $whereClauses = new Collection();
+        /* Business Rules + Algorithm:
+         * * An articles is targeted to 0:N audience segments.
+         * * An audience segment may be simple or composite.
+         * * Simple segments are targeted to a entity type and value.
+         * * Composite segments are composed of 1:N simple segments.
+         * * Audience segments may be root segments or child segments.
+         * * There is a maximum of one level of nesting (ie no children of child segments).
+         * * Hence, child segments are always simple.
+         * * A composite segment matches a user if all its child segments match the user (ie AND)
+         * * A article matches a user if any root segment matches the user (ie OR)
+         * * Segments have a relationship modifier
+         * * * self        => user must match segment
+         * * * parents_of  => user's child must match segment
+         * * * teachers_of => user's students must match segment
+         * * If a composite segment targets 'parents_of'/'teachers_of', all child segments must target 'self'.
+         *   (this avoid having to find eg, children of children, which is nonsensical)
+         * * For users with role type 'student' or 'guest', they can only match:
+         * * 1. segments targeted to 'self'
+         * * For users with role type 'parent', they can match:
+         * * 1. segments targeted to 'self' if the segment matches themselves, or
+         * * 2. segments targeted to 'parents_of' if the segment matches one of their children
+         * * For users with role type 'teacher', they can match:
+         * * 1. segments targeted to 'self' if the segment matches themselves, or
+         * * 2. segments targeted to 'teachers_of' if the segment matches one of their taught students
+         * * Hence there are 3 independent methods for matching an article to a user:
+         * * 1. Simple root segment targeted to user, or children/students of user
+         * * 2. Composite root segment targeted to user, composed of child segments that target user or children/students of user
+         * * 3. Composite root segment targeted to parents_of/teachers_of, composed of segments that target children/students of user
+         * * The last method does not apply if the user does not have role type of 'parent' or 'teacher'
+         *
+         * Hence we can build 3 queries, the first two using the same predicates, the latter with a
+         * related set of predicates, then UNION ALL them together.
+         */
 
-        $this->addSelfClauses($user, $whereClauses);
-        $this->addParentsOfClauses($user, $whereClauses);
-        $this->addTeachersOfClauses($user, $whereClauses);
+        /**
+         * @var Collection|string[] $whereClauses
+         * @var Collection|string[] $relatedWhereClauses
+         */
+        $whereClauses        = new Collection();
+        $relatedWhereClauses = new Collection();
+
+        // Insert predicates for each segment relationship modifier.
+        $this->addSelfClauses($user, $whereClauses, $relatedWhereClauses);
+        $this->addParentsOfClauses($user, $whereClauses, $relatedWhereClauses);
+        $this->addTeachersOfClauses($user, $whereClauses, $relatedWhereClauses);
+
+        // Check for the unlikely case where the system is configured to not permit targeting to any segment types
+        if(!$whereClauses->count()){
+            return [];
+        }
 
         $whereClause = \implode(" OR \n", $whereClauses->getAll());
 
-        // An article is a match for this user if either:
-        // * A simple root-segment matches (as root segments are always UNION)
-        // * All child segments of a root composite segment match (child segments are always INTERSECT)
-        $query = "
-            SELECT comms_news_article_id FROM comms_news_audience WHERE parent_id IS NULL AND ($whereClause)
-                UNION
-            SELECT comms_news_article_id FROM comms_news_audience cna
-            JOIN (SELECT parent_id, COUNT(*) as child_count FROM comms_news_audience WHERE parent_id IS NOT NULL AND ($whereClause) GROUP BY parent_id) t2 ON t2.parent_id = cna.id
-            JOIN (SELECT parent_id, COUNT(*) as child_count FROM comms_news_audience WHERE parent_id IS NOT NULL GROUP BY parent_id) t3 ON t3.parent_id = cna.id
-            WHERE t3.child_count = t2.child_count
-            ORDER BY comms_news_article_id;
-         ";
+        $queries = [];
+
+        // Case 1. User matches a simple root segment
+        $queries[] = "
+            SELECT comms_news_article_id
+            FROM comms_news_audience
+            WHERE parent_id IS NULL AND (
+              $whereClause
+            )
+        ";
+
+        // Case 2. User matches a composite root segment, where segment is targeted to 'self'
+        $queries[] = "
+            SELECT t1.comms_news_article_id
+            FROM (
+                -- Find all matching audience sub-segments that are a child of a composite^self segment. Group by parent segment
+                SELECT parent.comms_news_article_id, comms_news_audience.parent_id, COUNT(*) as child_count
+                FROM comms_news_audience comms_news_audience
+                JOIN comms_news_audience parent ON comms_news_audience.parent_id = parent.id
+                WHERE parent.relationship = 'self' AND parent.entity_type = 'composite' AND (
+                  $whereClause
+                )
+                GROUP BY parent.id
+            ) t1
+            JOIN (
+                -- Group all child segments by parent to get count of parents' children.
+                -- If count-matching children == count-available children, then composite segment is a match
+                SELECT parent_id, COUNT(*) as child_count FROM comms_news_audience WHERE parent_id IS NOT NULL GROUP BY parent_id
+            ) t2 ON t1.parent_id = t2.parent_id AND t1.child_count = t2.child_count
+        ";
+
+        // Case 3. User is parent or staff, and may match a composite root segment targeted at their children or students
+        if($relatedWhereClauses->count() && ($user->getRole()->isStaff() || $user->getRole()->isParent())){
+            $compositeRelationship = $user->getRole()->isStaff()
+                ? Model::RELATIONSHIP_TEACHERS_OF
+                : Model::RELATIONSHIP_PARENTS_OF;
+            $compositeType         = Model::ENTITY_TYPE_COMPOSITE;
+            $relatedWhereClause    = \implode(" OR \n", $relatedWhereClauses->getAll());
+            $queries[] = "
+                SELECT t1.comms_news_article_id
+                FROM (
+                    -- Find all matching audience sub-segments that are a child of a composite^self segment. Group by parent segment
+                    SELECT parent.comms_news_article_id, comms_news_audience.parent_id, COUNT(*) as child_count
+                    FROM comms_news_audience comms_news_audience
+                    JOIN comms_news_audience parent ON comms_news_audience.parent_id = parent.id
+                    WHERE parent.relationship = '{$compositeRelationship}' AND parent.entity_type = '{$compositeType}' AND (
+                      {$relatedWhereClause}
+                    )
+                    GROUP BY parent.id
+                ) t1
+                JOIN (
+                    -- Group all child segments by parent to get count of parents' children.
+                    -- If count-matching children == count-available children, then composite segment is a match
+                    SELECT parent_id, COUNT(*) as child_count FROM comms_news_audience WHERE parent_id IS NOT NULL GROUP BY parent_id
+                ) t2 ON t1.parent_id = t2.parent_id AND t1.child_count = t2.child_count
+            ";
+        }
+
+        // We are guaranteed to have independent subsets,
+        $query = \implode("\nUNION ALL\n", $queries);
 
         return $this->db->executeQuery($query)->fetchAll(PDO::FETCH_COLUMN);
     }
@@ -109,11 +201,14 @@ class ArticleResolver
      * Adds set of clauses that will match audiences segments targeted directly to the specified user
      *
      * @param User       $user
-     * @param Collection $whereClauses
-     * @throws \InvalidArgumentException
+     * @param Collection|string[] $whereClauses
+     * @param Collection|string[] $relatedWhereClauses
      */
-    private function addSelfClauses(User $user, Collection $whereClauses): void
-    {
+    private function addSelfClauses(
+        User $user,
+        Collection $whereClauses,
+        Collection $relatedWhereClauses
+    ): void {
         $validEntities = SegmentRelationships::getValidEntities(Model::RELATIONSHIP_SELF);
 
         if (!\count($validEntities)) {
@@ -121,19 +216,28 @@ class ArticleResolver
             return;
         }
 
-        $this->addClauses($this->userMapper->createCollection([$user]), Model::RELATIONSHIP_SELF, $validEntities, $whereClauses);
+        $this->addClauses(
+            $this->userMapper->createCollection([$user]),
+            Model::RELATIONSHIP_SELF,
+            $validEntities,
+            $whereClauses,
+            $relatedWhereClauses
+        );
     }
 
 
     /**
      * Adds WHERE clauses that match a parent's children.
      *
-     * @param User                $user
+     * @param User       $user
      * @param Collection|string[] $whereClauses
-     * @throws \InvalidArgumentException
+     * @param Collection|string[] $relatedWhereClauses
      */
-    private function addParentsOfClauses(User $user, Collection $whereClauses): void
-    {
+    private function addParentsOfClauses(
+        User $user,
+        Collection $whereClauses,
+        Collection $relatedWhereClauses
+    ): void {
         if (Role::PARENT !== $user->getRole()->getType()) {
             return;
         }
@@ -156,7 +260,13 @@ class ArticleResolver
             // No children in schoolbox? Then this user should never see audience segments targeted to parents of a segment
             return;
         }
-        $this->addClauses($childUsers, Model::RELATIONSHIP_PARENTS_OF, $validEntities, $whereClauses);
+        $this->addClauses(
+            $childUsers,
+            Model::RELATIONSHIP_PARENTS_OF,
+            $validEntities,
+            $whereClauses,
+            $relatedWhereClauses
+        );
     }
 
 
@@ -165,14 +275,15 @@ class ArticleResolver
      *
      * Note that this includes users in a teacher's classes and groups.
      *
-     * @param User                $user
+     * @param User       $user
      * @param Collection|string[] $whereClauses
-     * @throws Database\Predicate\InvalidColumnException
-     * @throws \InvalidArgumentException
-     * @throws \UnderflowException
+     * @param Collection|string[] $relatedWhereClauses
      */
-    private function addTeachersOfClauses(User $user, Collection $whereClauses): void
-    {
+    private function addTeachersOfClauses(
+        User $user,
+        Collection $whereClauses,
+        Collection $relatedWhereClauses
+    ): void {
         if (Role::STAFF !== $user->getRole()->getType()) {
             return;
         }
@@ -217,7 +328,6 @@ class ArticleResolver
 
         if (\count($groupMemberIds)) {
             $innerPredicate->in('id', $groupMemberIds);
-
             $innerPredicate->any(
                 $this->userMapper->getPredicateBuilder()->in('id', $groupMemberIds)
             );
@@ -234,7 +344,13 @@ class ArticleResolver
             return;
         }
 
-        $this->addClauses($taughtUsers, Model::RELATIONSHIP_TEACHERS_OF, $validEntities, $whereClauses);
+        $this->addClauses(
+            $taughtUsers,
+            Model::RELATIONSHIP_TEACHERS_OF,
+            $validEntities,
+            $whereClauses,
+            $relatedWhereClauses
+        );
     }
 
 
@@ -243,15 +359,26 @@ class ArticleResolver
      * @param string              $relationship
      * @param string[]            $validEntities
      * @param Collection|string[] $whereClauses
+     * @param Collection|string[] $relatedWhereClauses
+     * @todo consider snapping each segment entity type into helper method, see 'service' example
+     * @todo consider snapping common structure into helper method
      */
-    private function addClauses(Collection $users, string $relationship, array $validEntities, Collection $whereClauses): void
-    {
+    private function addClauses(
+        Collection $users,
+        string $relationship,
+        array $validEntities,
+        Collection $whereClauses,
+        Collection $relatedWhereClauses
+    ): void {
         $validEntities = \array_combine($validEntities, $validEntities);
         $userIds       = $users->getPropertyValues('id');
 
         // Targeted to a user
         if (\array_key_exists(Model::ENTITY_TYPE_USER, $validEntities)) {
             $whereClauses->add($this->buildClause(Model::ENTITY_TYPE_USER, $userIds, $relationship));
+            if(Model::RELATIONSHIP_SELF !== $relationship){
+                $relatedWhereClauses->add($this->buildClause(Model::ENTITY_TYPE_USER, $userIds, Model::RELATIONSHIP_SELF));
+            }
         }
 
         // Targeted to superusers
@@ -259,6 +386,9 @@ class ArticleResolver
             foreach ($users as $user) {
                 if ($user->isSuperuser()) {
                     $whereClauses->add($this->buildClause(Model::ENTITY_TYPE_SUPER, true, $relationship));
+                    if(Model::RELATIONSHIP_SELF !== $relationship){
+                        $relatedWhereClauses->add($this->buildClause(Model::ENTITY_TYPE_SUPER, true, Model::RELATIONSHIP_SELF));
+                    }
                     break;
                 }
             }
@@ -278,9 +408,16 @@ class ArticleResolver
             }
             if ($userFoundWithNoCampus) {
                 $whereClauses->add($this->buildClause(Model::ENTITY_TYPE_CAMPUS, null, $relationship));
+                if(Model::RELATIONSHIP_SELF !== $relationship){
+                    $relatedWhereClauses->add($this->buildClause(Model::ENTITY_TYPE_CAMPUS, null, Model::RELATIONSHIP_SELF));
+                }
             }
             if (\count($campusIds)) {
-                $whereClauses->add($this->buildClause(Model::ENTITY_TYPE_CAMPUS, \array_unique($campusIds), $relationship));
+                $uniqueCampusIds = \array_unique($campusIds);
+                $whereClauses->add($this->buildClause(Model::ENTITY_TYPE_CAMPUS, $uniqueCampusIds, $relationship));
+                if(Model::RELATIONSHIP_SELF !== $relationship){
+                    $relatedWhereClauses->add($this->buildClause(Model::ENTITY_TYPE_CAMPUS, $uniqueCampusIds, Model::RELATIONSHIP_SELF));
+                }
             }
         }
 
@@ -290,7 +427,11 @@ class ArticleResolver
             foreach ($users as $user) {
                 $roleIds[] = $user->getRole()->getId();
             }
-            $whereClauses->add($this->buildClause(Model::ENTITY_TYPE_ROLE, \array_unique($roleIds), $relationship));
+            $uniqueRoleIds = \array_unique($roleIds);
+            $whereClauses->add($this->buildClause(Model::ENTITY_TYPE_ROLE, $uniqueRoleIds, $relationship));
+            if(Model::RELATIONSHIP_SELF !== $relationship){
+                $relatedWhereClauses->add($this->buildClause(Model::ENTITY_TYPE_ROLE, $uniqueRoleIds, Model::RELATIONSHIP_SELF));
+            }
         }
 
         // Targeted to a RoleType
@@ -299,7 +440,11 @@ class ArticleResolver
             foreach ($users as $user) {
                 $roleTypes[] = $user->getRole()->getType();
             }
-            $whereClauses->add($this->buildClause(Model::ENTITY_TYPE_ROLE_TYPE, \array_unique($roleTypes), $relationship));
+            $uniqueRoleTypes = \array_unique($roleTypes);
+            $whereClauses->add($this->buildClause(Model::ENTITY_TYPE_ROLE_TYPE, $uniqueRoleTypes, $relationship));
+            if(Model::RELATIONSHIP_SELF !== $relationship){
+                $relatedWhereClauses->add($this->buildClause(Model::ENTITY_TYPE_ROLE_TYPE, $uniqueRoleTypes, Model::RELATIONSHIP_SELF));
+            }
         }
 
         // Targeted to a School House
@@ -314,10 +459,17 @@ class ArticleResolver
                 }
             }
             if (\count($schoolHouseIds)) {
-                $whereClauses->add($this->buildClause(Model::ENTITY_TYPE_SCHOOL_HOUSE, \array_unique($schoolHouseIds), $relationship));
+                $uniqueSchoolHouseIds = \array_unique($schoolHouseIds);
+                $whereClauses->add($this->buildClause(Model::ENTITY_TYPE_SCHOOL_HOUSE, $uniqueSchoolHouseIds, $relationship));
+                if(Model::RELATIONSHIP_SELF !== $relationship){
+                    $relatedWhereClauses->add($this->buildClause(Model::ENTITY_TYPE_SCHOOL_HOUSE, $uniqueSchoolHouseIds, Model::RELATIONSHIP_SELF));
+                }
             }
             if ($userFoundWithNoHouse) {
                 $whereClauses->add($this->buildClause(Model::ENTITY_TYPE_SCHOOL_HOUSE, null, $relationship));
+                if(Model::RELATIONSHIP_SELF !== $relationship){
+                    $relatedWhereClauses->add($this->buildClause(Model::ENTITY_TYPE_SCHOOL_HOUSE, null, Model::RELATIONSHIP_SELF));
+                }
             }
         }
 
@@ -333,10 +485,17 @@ class ArticleResolver
                 }
             }
             if (\count($residentialHouseIds)) {
-                $whereClauses->add($this->buildClause(Model::ENTITY_TYPE_RES_HOUSE, \array_unique($residentialHouseIds), $relationship));
+                $uniqueResidentialHouseIds = \array_unique($residentialHouseIds);
+                $whereClauses->add($this->buildClause(Model::ENTITY_TYPE_RES_HOUSE, $uniqueResidentialHouseIds, $relationship));
+                if(Model::RELATIONSHIP_SELF !== $relationship){
+                    $relatedWhereClauses->add($this->buildClause(Model::ENTITY_TYPE_RES_HOUSE, $uniqueResidentialHouseIds, Model::RELATIONSHIP_SELF));
+                }
             }
             if ($userFoundWithNoHouse) {
                 $whereClauses->add($this->buildClause(Model::ENTITY_TYPE_RES_HOUSE, null, $relationship));
+                if(Model::RELATIONSHIP_SELF !== $relationship){
+                    $relatedWhereClauses->add($this->buildClause(Model::ENTITY_TYPE_RES_HOUSE, null, Model::RELATIONSHIP_SELF));
+                }
             }
         }
 
@@ -352,16 +511,23 @@ class ArticleResolver
                 }
             }
             if (\count($years)) {
-                $whereClauses->add($this->buildClause(Model::ENTITY_TYPE_YEAR, \array_unique($years), $relationship));
+                $uniqueYears = \array_unique($years);
+                $whereClauses->add($this->buildClause(Model::ENTITY_TYPE_YEAR, $uniqueYears, $relationship));
+                if(Model::RELATIONSHIP_SELF !== $relationship){
+                    $relatedWhereClauses->add($this->buildClause(Model::ENTITY_TYPE_YEAR, $uniqueYears, Model::RELATIONSHIP_SELF));
+                }
             }
             if ($userFoundWithNoYear) {
                 $whereClauses->add($this->buildClause(Model::ENTITY_TYPE_YEAR, null, $relationship));
+                if(Model::RELATIONSHIP_SELF !== $relationship){
+                    $relatedWhereClauses->add($this->buildClause(Model::ENTITY_TYPE_YEAR, null, Model::RELATIONSHIP_SELF));
+                }
             }
         }
 
         // Targeted to a service permission (including homepage learners + instructors)
         if (\array_key_exists(Model::ENTITY_TYPE_SERVICE, $validEntities)) {
-            $this->addServicePermsClause($userIds, $relationship, $whereClauses);
+            $this->addServicePermsClause($userIds, $relationship, $whereClauses, $relatedWhereClauses);
         }
 
         // Targeted to a pastoral group
@@ -381,9 +547,15 @@ class ArticleResolver
             $nonNullGroupIds = \array_filter($groupIds);
             if (\count($nonNullGroupIds)) {
                 $whereClauses->add($this->buildClause(Model::ENTITY_TYPE_PASTORAL_GROUP, $nonNullGroupIds, $relationship));
+                if(Model::RELATIONSHIP_SELF !== $relationship){
+                    $relatedWhereClauses->add($this->buildClause(Model::ENTITY_TYPE_PASTORAL_GROUP, $nonNullGroupIds, Model::RELATIONSHIP_SELF));
+                }
             }
             if (\count($groupIds) !== \count($nonNullGroupIds)) {
                 $whereClauses->add($this->buildClause(Model::ENTITY_TYPE_PASTORAL_GROUP, null, $relationship));
+                if(Model::RELATIONSHIP_SELF !== $relationship){
+                    $relatedWhereClauses->add($this->buildClause(Model::ENTITY_TYPE_PASTORAL_GROUP, null, Model::RELATIONSHIP_SELF));
+                }
             }
         }
 
@@ -415,18 +587,32 @@ class ArticleResolver
 
             if ($canTargetGroup) {
                 if (\count($groupIds)) {
-                    $whereClauses->add($this->buildClause(Model::ENTITY_TYPE_GROUP, \array_unique($groupIds), $relationship));
+                    $uniqueGroupIds = \array_unique($groupIds);
+                    $whereClauses->add($this->buildClause(Model::ENTITY_TYPE_GROUP, $uniqueGroupIds, $relationship));
+                    if(Model::RELATIONSHIP_SELF !== $relationship){
+                        $relatedWhereClauses->add($this->buildClause(Model::ENTITY_TYPE_GROUP, $uniqueGroupIds, Model::RELATIONSHIP_SELF));
+                    }
                 }
                 if ($userFoundWithoutGroups) {
                     $whereClauses->add($this->buildClause(Model::ENTITY_TYPE_GROUP, null, $relationship));
+                    if(Model::RELATIONSHIP_SELF !== $relationship){
+                        $relatedWhereClauses->add($this->buildClause(Model::ENTITY_TYPE_GROUP, null, Model::RELATIONSHIP_SELF));
+                    }
                 }
             }
             if ($canTargetClass) {
                 if (\count($classCodes)) {
-                    $whereClauses->add($this->buildClause(Model::ENTITY_TYPE_CLASS, \array_unique($classCodes), $relationship));
+                    $uniqueClassCodes = \array_unique($classCodes);
+                    $whereClauses->add($this->buildClause(Model::ENTITY_TYPE_CLASS, $uniqueClassCodes, $relationship));
+                    if(Model::RELATIONSHIP_SELF !== $relationship){
+                        $relatedWhereClauses->add($this->buildClause(Model::ENTITY_TYPE_CLASS, $uniqueClassCodes, Model::RELATIONSHIP_SELF));
+                    }
                 }
                 if ($userFoundWithoutClasses) {
                     $whereClauses->add($this->buildClause(Model::ENTITY_TYPE_CLASS, null, $relationship));
+                    if(Model::RELATIONSHIP_SELF !== $relationship){
+                        $relatedWhereClauses->add($this->buildClause(Model::ENTITY_TYPE_CLASS, null, Model::RELATIONSHIP_SELF));
+                    }
                 }
             }
         }
@@ -439,8 +625,14 @@ class ArticleResolver
      * @param int[]               $userIds
      * @param string              $relationship
      * @param Collection|string[] $whereClauses
+     * @param Collection|string[] $relatedWhereClauses
      */
-    private function addServicePermsClause(array $userIds, string $relationship, Collection $whereClauses): void
+    private function addServicePermsClause(
+        array $userIds,
+        string $relationship,
+        Collection $whereClauses,
+        Collection $relatedWhereClauses
+    ): void
     {
         // TODO For now, assume that we cannot target to audiences such as 'all service moderators' ('*.*.3') etc
         if (!\count($userIds)) {
@@ -452,7 +644,11 @@ class ArticleResolver
             $entityValue[] = "{$access->getService()}.{$access->getServiceIdentifier()}.{$access->getAccessLevel()}";
         }
         if (\count($entityValue)) {
-            $whereClauses->add($this->buildClause(Model::ENTITY_TYPE_SERVICE, \array_unique($entityValue), $relationship));
+            $uniqueEntityValues = \array_unique($entityValue);
+            $whereClauses->add($this->buildClause(Model::ENTITY_TYPE_SERVICE, $uniqueEntityValues, $relationship));
+            if(Model::RELATIONSHIP_SELF !== $relationship){
+                $relatedWhereClauses->add($this->buildClause(Model::ENTITY_TYPE_SERVICE, $uniqueEntityValues, Model::RELATIONSHIP_SELF));
+            }
         }
     }
 
@@ -467,8 +663,9 @@ class ArticleResolver
      */
     private function buildClause(string $entityType, $entityValue, string $relationship): string
     {
-        $colEntityType  = Mapper::FIELD_ENTITY_TYPE;
-        $colEntityValue = Mapper::FIELD_ENTITY_VALUE;
+        $colEntityType   = Mapper::FIELD_ENTITY_TYPE;
+        $colRelationship = Mapper::FIELD_RELATIONSHIP;
+        $colEntityValue  = Mapper::FIELD_ENTITY_VALUE;
         if (null === $entityValue) {
             $predicate = 'IS NULL';
         } elseif (\is_iterable($entityValue)) {
@@ -480,6 +677,7 @@ class ArticleResolver
         } else {
             $predicate = "= '$entityValue'";
         }
-        return "($colEntityType = '$entityType' AND relationship = '$relationship' AND $colEntityValue {$predicate})";
+        $table = Mapper::TABLE_NAME;
+        return "($table.$colEntityType = '$entityType' AND $table.$colRelationship = '$relationship' AND $table.$colEntityValue {$predicate})";
     }
 }
