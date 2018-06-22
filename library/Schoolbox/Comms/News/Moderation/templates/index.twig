@@ -4,29 +4,28 @@
 <div class="row">
     <div class="small-12 columns">
         <h1>Moderation Queue</h1>
-
     </div>
 </div>
 <div class="row">
     <div class="small-12 island">
-        {% if articles|length %}
+        {% if newsArticles|length %}
         <section>
             <ul class="information-list">
-                {% for article in articles %}
+                {% for news in newsArticles %}
                     <li class="content">
-                        <h3><a href="{{ routeLookup('commsNewsModeration.getDetail', {newsId: article.id}) }}">{{ article.title }}</a></h3>
-                        <p class="meta">Authored by {{ article.author.fullname }} on {{ article.updatedAt.local }}</p>
+                        <h3><a href="{{ routeLookup('commsNewsModeration.getDetail', {newsId: news.id}) }}">{{ news.title }}</a></h3>
+                        <p class="meta">Authored by {{ news.author.fullname }} on {{ news.updatedAt.local }}</p>
 
                         {# TODO: Have a /news/topic url lol #}
-                        {% if article.topics|length %}
+                        {% if news.topics|length %}
                         <p class="meta">Related topics:
-                            {% for topic in article.topics %}
+                            {% for topic in news.topics %}
                             <a href="/news/topic/{{ topic.slug }}">{{ topic.name }}</a>{% if not loop.last %},{% endif %}
                             {% endfor %}
                         </p>
                         {% endif %}
 
-                        <article>{{ article.blurb|purify }}</article>
+                        <article>{{ news.blurb|purify }}</article>
                     </li>
                 {% endfor %}
             </ul>
@@ -35,12 +34,12 @@
         <div class="empty-state">
             <i class="icon-news"></i>
             {% if moderationRequired %}
-                <p>All articles have been processed.</p>
+                <p>All {{ locale.news.proper }} articles have been processed.</p>
             {% else %}
                 <p>According to Comms Policy, Moderation isn't required.</p>
             {% endif %}
 
-            <p>You can <a href="">view statistics on existing articles</a> to see how they are faring.</p>
+            <p>You can <a href="">view statistics on existing {{ locale.news.proper }} articles</a> to see how they are faring.</p>
         </div>
         {% endif %}
     </div>

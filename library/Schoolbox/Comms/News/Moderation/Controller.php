@@ -55,10 +55,10 @@ class Controller extends Base
             $moderationRequired = false;
         }
 
-        $articles = [];
+        $newsArticles = [];
 
         if ($moderationRequired) {
-            $articles = \Schoolbox\Comms\News\Mapper::getInstance()->findByColumn('moderated_at', null, [
+            $newsArticles = \Schoolbox\Comms\News\Mapper::getInstance()->findByColumn('moderated_at', null, [
                 'order' => [
                     'updated_at' => 'asc'
                 ]
@@ -66,7 +66,7 @@ class Controller extends Base
         }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsModeration/index.twig', [
-            'articles' => $articles,
+            'newsArticles' => $newsArticles,
             'moderationRequired' => $moderationRequired
         ])->setTitle('Example'));
     }
