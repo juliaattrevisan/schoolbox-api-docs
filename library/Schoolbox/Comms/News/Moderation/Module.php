@@ -17,6 +17,7 @@ use InvalidArgumentException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\UserMapper;
 
 
@@ -34,23 +35,18 @@ class Module extends BaseModule
      */
     protected function registerRoutes(): void
     {
-        /* Anyone can see the form
-         */
-        $getPerms = new Rule\All(
-            new Rule\IsLoggedIn()
-        );
-
-        /* Only superusers can receive data from the form
-         */
-        $postPerms = new Rule\All(
+        $moderatorPerms = new Rule\All(
             new Rule\IsLoggedIn(),
-            new Rule\IsSuperuser()
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\HasServicePermission(UserAccess::SERVICE_COMMS_OFFICER, UserAccess::ACCESS_FULL)
+            )
         );
 
         $preloadUser = function ($params) { return $this->preloadUser($params); };
 
-        $this->register('GET', '', 'getList', $getPerms, null);
-        $this->register('POST', '/user', 'postExample', $postPerms, null);
+        $this->register('GET', '', 'getList', $moderatorPerms, null);
+        $this->register('POST', '/user', 'postExample', $moderatorPerms, null);
     }
 
     /**
