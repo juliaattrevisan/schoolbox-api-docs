@@ -39,15 +39,34 @@ class Controller extends Base
     }
 
     /**
-     * Provide form
+     * Get a list of articles that need moderation
      *
-     * @param User $user
      * @throws \Aura\Di\Exception\ServiceNotFound
      */
-    public function getExample(User $user)
+    public function getList()
     {
+        try {
+            $policy = \Schoolbox\Comms\News\Policy\Mapper::getInstance()->findOneByColumn('identifier', 'global_moderation');
+
+            $moderationRequired = (bool)$policy->getValue();
+        }
+        catch (MapperException $e) {
+            $moderationRequired = false;
+        }
+
+        $articles = [];
+
+        if ($moderationRequired) {
+            $articles = \Schoolbox\Comms\News\Mapper::getInstance()->findByColumn('moderated_at', null, [
+                'order' => [
+                    'updated_at' => 'asc'
+                ]
+            ]);
+        }
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsModeration/index.twig', [
-            'user' => $user
+            'articles' => $articles,
+            'moderationRequired' => $moderationRequired
         ])->setTitle('Example'));
     }
 

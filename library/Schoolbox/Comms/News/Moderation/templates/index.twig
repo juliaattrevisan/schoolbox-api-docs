@@ -1,24 +1,37 @@
-{# Add your own javascript, validation etc. #}
-{# Use pantry for styling #}
-
+{# A list of articles that require moderation
+ # Moderation is performed by Comms Officers and their deputy Moderators (if assigned)
+ #}
 <div class="row">
-    <div class="small-12 island">
-        <h2 class="subheader">{{ user.fullname }}</h2>
-        <section class="content">
-        {% set formAction = routeLookupIfAuthorized('commsNewsModeration.postExample') %}
-        {% if formAction %}
-            <form action="{{ formAction }}" method="post">
-                <input type="hidden" name="id" value="{{ user.id }}" />
+    <div class="small-12 columns">
+        <h1>Moderation Queue</h1>
 
-                <label>var1</label>
-                <input type="text" name="var1" />
-
-                <input type="submit" />
-            </form>
-        {% else %}
-            Not authorised to POST
-        {% endif %}
-        </section>
     </div>
 </div>
+<div class="row">
+    <div class="small-12 island">
+        {% if articles|length %}
+        <section>
+            <ul class="information-list">
+                {% for article in articles %}
+                    <li class="content">
+                        <h3>{{ article.title }}</h3>
+                        <p class="meta">Authored by {{ article.author.fullname }} on {{ article.updatedAt.local }}</p>
+                        <p>{{ article.blurb|purify }}</p>
+                    </li>
+                {% endfor %}
+            </ul>
+        </section>
+        {% else %}
+        <div class="empty-state">
+            <i class="icon-news"></i>
+            {% if moderationRequired %}
+                <p>All articles have been processed.</p>
+            {% else %}
+                <p>According to Comms Policy, Moderation isn't required.</p>
+            {% endif %}
 
+            <p>You can <a href="">view statistics on existing articles</a> to see how they are faring.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
