@@ -39,20 +39,7 @@ class Controller extends Base
         $this->userMapper  = $userMapper;
         $this->helpRequest = new HelpRequest($authParams, $this->userMapper);
     }
-
-
-//    /**
-//     * TODO: This isn't being used, currently: unsure if it was a placeholder for future implementation?
-//     *
-//     * @return string
-//     * @throws \GuzzleHttp\Exception\GuzzleException
-//     * @throws \InvalidArgumentException
-//     * @throws \RuntimeException
-//     */
-//    public function getProvisionedUsersJSON() {
-//        return json_encode($this->findProvisionedUsers());
-//    }
-
+    
     /*
      * Helper method to get all staff in your Schoolbox instance.
      *
