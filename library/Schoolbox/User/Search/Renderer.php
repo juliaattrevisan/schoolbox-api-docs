@@ -53,6 +53,7 @@ class Renderer extends Handler
             $this->getPage()->setBlock('user', 'pastoral', 'pastoral_block');
             $this->getPage()->setBlock('user', 'eportfolio', 'eportfolio_block');
             $this->getPage()->setBlock('user', 'modify', 'modify_block');
+            $this->getPage()->setBlock('user', 'tot', 'tot_block');
             $this->getPage()->setBlock('modify', 'modify_enabled', 'modify_enabled_block');
             $this->getPage()->setBlock('modify', 'modify_disabled', 'modify_disabled_block');
             $this->getPage()->setBlock('user', 'position_title', 'position_title_block');
@@ -94,6 +95,7 @@ class Renderer extends Handler
                 $this->getPage()->setVar('eportfolio_block');
                 $this->getPage()->setVar('boarder_leave_block');
                 $this->getPage()->setVar('academic_reports_block');
+                $this->getPage()->setVar('tot_block');
 
                 /* Hide Due Work link from parents, if Due Work access is restricted
                  */
@@ -104,7 +106,6 @@ class Renderer extends Handler
                 } else {
                     $this->getPage()->parse('due_work_block', 'due_work');
                     $hasActions = true;
-                    new \Alaress_Probe('due_work_block b');
                 }
 
                 if (Config::get('external_document_report_enabled')
@@ -113,7 +114,6 @@ class Renderer extends Handler
                 ) {
                     $this->getPage()->parse('academic_reports_block', 'academic_reports');
                     $hasActions = true;
-                    new \Alaress_Probe('academic_reports_block');
                 }
 
                 if ($groupHandler->isParent() && Config::get('restrict_parent_grades')) {
@@ -123,7 +123,6 @@ class Renderer extends Handler
                 } else {
                     $this->getPage()->parse('grades_button_block', 'grades_button');
                     $hasActions = true;
-                    new \Alaress_Probe('grades_button_block');
                 }
 
                 // Hide if disabled or not a student
@@ -138,7 +137,6 @@ class Renderer extends Handler
                     ){
                         $this->getPage()->parse('pastoral_block', 'pastoral');
                         $hasActions = true;
-                        new \Alaress_Probe('pastoral_block');
                     } else {
                         $this->getPage()->setVar('pastoral_block', '');
                     }
@@ -160,7 +158,6 @@ class Renderer extends Handler
                         if (Cfg::get('external_enable') && $user['synergy_id'] && !$user['hide_timetable']) {
                             $this->getPage()->parse('timetable_block', 'timetable');
                             $hasActions = true;
-                            new \Alaress_Probe('timetable_block');
                         } else {
                             $this->getPage()->setVar('timetable_block', '');
                         }
@@ -170,7 +167,6 @@ class Renderer extends Handler
                         if ($groupHandler->isStaff() and $user['residential_house_id']) {
                             $this->getPage()->parse('boarder_leave_block', 'boarder_leave');
                             $hasActions = true;
-                            new \Alaress_Probe('boarder_leave_block');
                         }
                     }
                 } else {
@@ -178,7 +174,6 @@ class Renderer extends Handler
                     if ($_SESSION['user']->getRole()->isStaff() && $groupHandler->isStaff($user['id'])) {
                         $this->getPage()->parse('timetable_block', 'timetable');
                         $hasActions = true;
-                        new \Alaress_Probe('timetable_block');
                     }
                 }
                 if (!$_SESSION['user']->isSuperuser()) {
@@ -202,7 +197,6 @@ class Renderer extends Handler
                 if ($authenticator->canView()) {
                     $this->getPage()->parse('eportfolio_block', 'eportfolio');
                     $hasActions = true;
-                    new \Alaress_Probe('eportfolio_block');
                 }
 
                 /* Calendar link
@@ -222,14 +216,18 @@ class Renderer extends Handler
 
                     $this->getPage()->parse('user_calendar_block', 'user_calendar');
                     $hasActions = true;
-                    new \Alaress_Probe('user_calendar_block');
                 } else {
                     $this->getPage()->setVar('user_calendar_block', '');
                 }
 
+                /* If the tot had any actions in it, show it
+                 * Otherwise, hide it (which it does initially anyway)
+                 */
+                if ($hasActions) {
+                    $this->getPage()->parse('tot_block', 'tot');
+                }
+                
                 $this->getPage()->parse('user_block', 'user', true);
-
-                new \Alaress_Probe($hasActions);
             }
 
             $this->outputSeeMore();
