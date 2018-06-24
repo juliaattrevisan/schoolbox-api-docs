@@ -64,6 +64,7 @@ class ArticleResolver
     /**
      * @param User $user
      * @return int[]
+     * @throws \UnderflowException
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \InvalidArgumentException
      * @throws \UnderflowException
@@ -181,7 +182,7 @@ class ArticleResolver
             ";
         }
 
-        // We are guaranteed to have independent subsets,
+        // We are not guaranteed to have independent subsets,
         $query = \implode("\nUNION\n", $queries);
 
         return $this->db->executeQuery($query)->fetchAll(PDO::FETCH_COLUMN);
@@ -191,9 +192,10 @@ class ArticleResolver
     /**
      * Adds set of clauses that will match audiences segments targeted directly to the specified user
      *
-     * @param User       $user
+     * @param User                $user
      * @param Collection|string[] $whereClauses
      * @param Collection|string[] $relatedWhereClauses
+     * @throws \InvalidArgumentException
      */
     private function addSelfClauses(
         User $user,
@@ -220,9 +222,10 @@ class ArticleResolver
     /**
      * Adds WHERE clauses that match a parent's children.
      *
-     * @param User       $user
+     * @param User                $user
      * @param Collection|string[] $whereClauses
      * @param Collection|string[] $relatedWhereClauses
+     * @throws \InvalidArgumentException
      */
     private function addParentsOfClauses(
         User $user,
@@ -259,9 +262,13 @@ class ArticleResolver
      *
      * Note that this includes users in a teacher's classes and groups.
      *
-     * @param User       $user
+     * @param User                $user
      * @param Collection|string[] $whereClauses
      * @param Collection|string[] $relatedWhereClauses
+     * @throws \UnderflowException
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \InvalidArgumentException
+     * @throws \UnderflowException
      */
     private function addTeachersOfClauses(
         User $user,
