@@ -159,7 +159,7 @@ class UserResolver
 
         switch ($entityType) {
             case Model::ENTITY_TYPE_USER:
-                return [$entityValue];
+                return $this->db->executeQuery("SELECT u.id FROM user u WHERE u.id {$predicate} AND u.deleted_at IS NULL")->fetchAll(PDO::FETCH_COLUMN);
             case Model::ENTITY_TYPE_SUPER:
                 return $this->db->executeQuery('SELECT u.id FROM user u JOIN superusers su ON u.id = su.id AND u.deleted_at IS NULL')->fetchAll(PDO::FETCH_COLUMN);
             case Model::ENTITY_TYPE_CAMPUS:
