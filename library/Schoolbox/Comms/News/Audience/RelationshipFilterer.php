@@ -103,11 +103,15 @@ class RelationshipFilterer
         return $this->userMapper->findByColumn('synergy_id', \array_column($externalChildren, 'RelatedID'));
     }
 
+
     /**
      * Get class teachers and group instructors
      *
      * @param int[] $userIds
      * @return int[]
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \UnderflowException
+     * @throws \UnexpectedValueException
      */
     public function getTeachers(array $userIds): array
     {
@@ -144,17 +148,18 @@ class RelationshipFilterer
             return [];
         }
 
-        $pb = $this->userMapper->getPredicateBuilder();
+        $innerPb = $this->userMapper->getPredicateBuilder();
 
         if(\count($teacherExternalIds)){
-            $pb->any($this->userMapper->getPredicateBuilder()->in('synergy_id', $teacherExternalIds));
+            $innerPb->in('synergy_id', $teacherExternalIds);
         }
 
         if(\count($instructorIds)){
-            $pb->any($this->userMapper->getPredicateBuilder()->in('id', $instructorIds));
+            $innerPb->in('id', $instructorIds);
         }
+        $outerPb = $this->userMapper->getPredicateBuilder()->any($innerPb);
 
-        return $this->userMapper->findScalarByPredicates('id', $pb);
+        return $this->userMapper->findScalarByPredicates('id', $outerPb);
     }
 
 
@@ -163,6 +168,8 @@ class RelationshipFilterer
      *
      * @param User $user
      * @return Collection|User[]
+     * @throws \UnderflowException
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
      */
     public function getTaught(User $user): Collection
     {
