@@ -118,10 +118,15 @@ class UserResolver
      * @param array  $userIds
      * @param string $relationship ['self', 'parents_of', 'teachers_of']
      * @return int[]
+     * @throws \UnderflowException
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws UnexpectedValueException If an unrecognised relationship modifier is encountered
      */
     private function applyRelationshipFilter(array $userIds, string $relationship): array
     {
+        if (!\count($userIds)) {
+            return [];
+        }
         if (Model::RELATIONSHIP_SELF === $relationship) {
             return $userIds;
         }
@@ -189,7 +194,7 @@ class UserResolver
                 $whereClause = \count($whereClauses) ? \implode(' AND ', $whereClauses) : 'TRUE';
                 return $this->db->executeQuery("SELECT u.id FROM user u JOIN userAccess ua ON u.id = ua.uid WHERE {$whereClause} AND u.deleted_at IS NULL")->fetchAll(PDO::FETCH_COLUMN);
             case Model::ENTITY_TYPE_PASTORAL_GROUP:
-                return $this->db->executeQuery("SELECT u.id FROM user u JOIN pastoral_group_member pgm ON pgm.user_id = u.id WHERE pgm.group_id {$predicate} AND u.deleted_at IS NULL")->fetchAll(PDO::FETCH_COLUMN);
+                return $this->db->executeQuery("SELECT u.id FROM user u LEFT JOIN pastoral_group_member pgm ON pgm.user_id = u.id WHERE pgm.group_id {$predicate} AND u.deleted_at IS NULL")->fetchAll(PDO::FETCH_COLUMN);
             case Model::ENTITY_TYPE_GROUP:
                 // Regardless of whether they have read/write/mod perms. (just not deny)
                 $service = UserAccess::SERVICE_HOMEPAGE;
