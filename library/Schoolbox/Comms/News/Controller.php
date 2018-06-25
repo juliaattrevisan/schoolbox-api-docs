@@ -345,7 +345,7 @@ class Controller extends Base
      * @throws \UnexpectedValueException
      * @throws RouteNotFound
      */
-    public function postDetail(Model $news)
+    public function postSubmitForModeration(Model $news)
     {
         $news->setSubmittedAt(\Alaress_Date_Format::now());
         $this->newsMapper->save($news);
