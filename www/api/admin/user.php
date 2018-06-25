@@ -52,7 +52,7 @@ $setUserFields = function(User $user, $getValues) use ($roleMapper, $campusMappe
     if (!empty($getValues['database_id'])) {
         $user = $user->setExternalId($getValues['database_id']);
     }
-    if (is_numeric($getValues['year'])) {
+    if (isset($getValues['year'])) {
         $user = $user->setYear($getValues['year'] == '' ? null : $getValues['year']);
     }
     if (isset($getValues['eportfolio_enabled'])) {
