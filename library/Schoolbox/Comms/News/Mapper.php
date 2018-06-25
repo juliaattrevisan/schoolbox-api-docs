@@ -39,7 +39,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('blurb', self::TYPE_STRING);
         $this->joins('feature_image_hash', Storage\Mapper::class, 'hash', null, null, 'featureImage', 'featureImage');
         $this->joins('author_id', UserMapper::class, 'id', null, null, 'author', 'author');
-        $this->joins('moderated_by', UserMapper::class);
+        $this->joins('moderated_by', UserMapper::class, 'id', null, null, 'moderatedBy', 'moderator');
         $this->uses('moderated_at', self::TYPE_DATETIME);
         $this->uses('submitted_at', self::TYPE_DATETIME);
         $this->uses('publish_at', self::TYPE_DATETIME);
@@ -73,7 +73,8 @@ class Mapper extends \Schoolbox\Mapper
             SELECT 
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('author', 'a')},
-                {$this->getJoinColumnString('comms_news_article_topic', 'topics')}
+                {$this->getJoinColumnString('comms_news_article_topic', 'topics')},
+                {$this->getJoinColumnString('moderator', 'm')}
         ";
     }
 
@@ -90,6 +91,7 @@ class Mapper extends \Schoolbox\Mapper
             FROM {$this->getTable()}
             LEFT JOIN {$this->getJoinSql('comms_news_article_topic', null, 'topics')}
             INNER JOIN {$this->getJoinSql('author', null, 'a', true)}
+            LEFT JOIN {$this->getJoinSql('moderator', null, 'm', true)}
         ";
     }
 
@@ -118,6 +120,13 @@ class Mapper extends \Schoolbox\Mapper
 
                 if ($author) {
                     $news->setAuthor($author);
+                }
+
+                /** @var User $moderator */
+                $moderator = $this->getJoinMapper('moderator')->hydrate($row, 'm');
+
+                if ($moderator) {
+                    $news->setModeratedBy($moderator);
                 }
             }
 

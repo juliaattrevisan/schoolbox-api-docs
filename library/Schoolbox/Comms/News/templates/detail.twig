@@ -14,8 +14,10 @@
         <div class="small-12 column">
             <h1>{{ news.title }}</h1>
 
-            {% if news.topics|length %}
             <ul class="meta">
+
+                {# Topics #}
+                {% if news.topics|length %}
                 <li class="icon-news">Related Topics:
 
                     {# TODO: Have a /news/topic url lol #}
@@ -23,8 +25,21 @@
                         <a href="/news/topic/{{ topic.slug }}">{{ topic.name }}</a>{% if not loop.last %},{% endif %}
                     {% endfor %}
                 </li>
+                {% endif %}
+
+                {# This info only really matters to the author, I suppose
+                 # Submitted at; moderated at; moderated by
+                 #}
+                {% if news.author.id == USER.id %}
+                    {% if news.submittedAt.local|length %}
+                        <li class="icon-calendar">Submitted on {{ news.submittedAt.local }}</li>
+                    {% endif %}
+
+                    {% if news.moderatedAt.local|length %}
+                        <li class="icon-calendar">Last moderated on {{ news.moderatedAt.local }} by {{ news.moderatedBy.fullname }}</li>
+                    {% endif %}
+                {% endif %}
             </ul>
-            {% endif %}
         </div>
     </div>
     <nav>
