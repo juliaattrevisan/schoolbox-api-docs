@@ -120,10 +120,10 @@
  # The penultimate node in the proscribed flow...although, an alternative fate for your article is to be deleted
  # Anyway, tell the user when it was last published
  #}
-{% if news.publishAt.local|length %}
-    {% set alt = 'This article was published on ' ~ news.publishAt.local  %}
-{% else %}
-    {% set alt = 'This article is awaiting publication to its audience' %}
+{% set alt = 'This article is awaiting publication to its audience' %}
+
+{% if news.publishAt.unixTimestamp < 'now'|date('U')|round %}
+    {% set alt = 'This article publishes on ' ~ news.publishAt.local  %}
 {% endif %}
 
 {% set publicationNode = {
