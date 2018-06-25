@@ -36,7 +36,7 @@ class Model
     public const RELATIONSHIP_TEACHERS_OF = 'teachers_of';          // eg, Audience = teachers of user 15
 
     // The value of segments targeted to superusers
-    public const ENTITY_VALUE_SUPER       = 1;
+    public const ENTITY_VALUE_SUPER       = '1';
 
 
     /**

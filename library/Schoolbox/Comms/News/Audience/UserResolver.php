@@ -52,8 +52,10 @@ class UserResolver
      *
      * @param int $articleId
      * @return int[]
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws UnexpectedValueException If we attempt to build a query with an unrecognised entity type
      * @todo consider requiring a hydrated article, with all audience segments hydrated
+     * @throws \UnderflowException
      */
     public function findUsersForArticle(int $articleId): array
     {
@@ -79,7 +81,9 @@ class UserResolver
      *
      * @param array $audienceSegment
      * @return int[]
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws UnexpectedValueException If we attempt to build a query with an unrecognised entity type
+     * @throws \UnderflowException
      */
     private function findUsersForAudienceSegment(array $audienceSegment): array
     {
@@ -135,7 +139,7 @@ class UserResolver
             case Model::RELATIONSHIP_PARENTS_OF:
                 return $this->relationshipFilterer->getParents($userIds);
             case Model::RELATIONSHIP_TEACHERS_OF:
-                return $this->relationshipFilterer->getTeachers($userIds);
+                return $this->relationshipFilterer->getTeachersAndInstructors($userIds);
             default:
                 throw new UnexpectedValueException("Unrecognised relationship modifier: {$relationship}");
         }
@@ -154,7 +158,7 @@ class UserResolver
     {
         if (null === $entityValue) {
             // Is null a valid segment entity value?
-            if(!SegmentRelationships::canTargetNullEntity($entityType)){
+            if(!BusinessRules::canTargetNullEntity($entityType)){
                 return [];
             }
             $predicate = 'IS NULL';

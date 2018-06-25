@@ -1,7 +1,8 @@
 <?php
 /**
- * Author: andy@modernwebservices.com.au
- * Created: 23/06/18 1:29 AM
+ * @author      Andy Ryan <andy.ryan@alaress.com.au>
+ * @copyright   Copyright 2018, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
  */
 declare(strict_types=1);
 
@@ -17,10 +18,12 @@ use Schoolbox\Resource\Folder;
 use External_Class;
 
 /**
- * Responsible for mapping between users sets for a relationship.
+ * Responsible for mapping between users sets as per a segment's relationship modifier.
  *
  * This logic is encapsulates in a single class to ensure consistent treatment of relationships,
- * eg $teacher->getTaughtStudents()->getTeachers()->contains($teacher) must be true
+ * eg the following should be true:
+ * * $teacher->getTaughtStudents()->getTeachers()->contains($teacher)
+ * * $parent->getChildren()->getParents()->contains($parent)
  */
 class RelationshipFilterer
 {
@@ -63,6 +66,8 @@ class RelationshipFilterer
 
 
     /**
+     * Return the user ids of the parents of the specified users
+     *
      * @param int[] $userIds
      * @return int[]
      */
@@ -88,6 +93,8 @@ class RelationshipFilterer
 
 
     /**
+     * Returns the child users of the specified user
+     *
      * @param User $user
      * @return Collection|User[]
      */
@@ -113,15 +120,16 @@ class RelationshipFilterer
      * @throws \UnderflowException
      * @throws \UnexpectedValueException
      */
-    public function getTeachers(array $userIds): array
+    public function getTeachersAndInstructors(array $userIds): array
     {
         $allFolders = $this->folderMapper->createCollection();
         /** @var \Schoolbox\User[] $users */
         $users              = $this->userMapper->findByColumn($this->userMapper->getIdentifierColumn(), $userIds);
         $teacherExternalIds = [];
         foreach ($users as $user) {
-            // Find all folders where the user is a learner-only, or a class member
-            $allFolders = $allFolders->mergeUnique($this->folderMapper->findForUser($user, true, UserAccess::ACCESS_READ, true), 'id');
+            // Find all folders where the user is a learner-only, or a class student.
+            $getSubjects = $user->getRole()->isStudent();
+            $allFolders = $allFolders->mergeUnique($this->folderMapper->findForUser($user, $getSubjects, UserAccess::ACCESS_READ, true), 'id');
         }
         // Then find the teachers of these classes from synergetic.
         // TODO are group instructors considered teachers here?
@@ -171,7 +179,7 @@ class RelationshipFilterer
      * @throws \UnderflowException
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      */
-    public function getTaught(User $user): Collection
+    public function getTaughtStudentsAndLearners(User $user): Collection
     {
 
         $taughtFolders = $this->folderMapper->findForUser($user, true, UserAccess::ACCESS_WRITE, true);

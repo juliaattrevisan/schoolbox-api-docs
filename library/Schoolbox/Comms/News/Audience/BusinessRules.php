@@ -11,21 +11,29 @@ namespace Schoolbox\Comms\News\Audience;
 use InvalidArgumentException;
 
 /**
- * Responsible for encapsulating the business rules around which audience segments can be modified to send to parent/teachers of users in the segment.
+ * Responsible for encapsulating the business rules:
+ * 1. which audience segments can be modified to send to parent/teachers of users in the segment.
+ * 2. whether it is valid to target a segment to a NULL value, eg 'Users without a SchoolHouse'
+ * 3. What relationship modifiers may be applied to a segment of a given entity-type
  *
  * If a segment is composite, then the valid relationships are the intersect of their component segments.
+ * eg Audience = user:X && campus:Y. If we can send to user^[S|P|T] and campus^[S|P], then the composite can only send to composite^[S|P]
  *
- * eg Audience = user:X && campus:Y. If we can send to user:S|P|T and campus:S|P, then the composite can only send to S|P
  */
-class SegmentRelationships
+class BusinessRules
 {
+    // Maximum node paths from a root segment to a leaf segment
+    public const DEPTH_SEGMENT_TREE_MAX = 1;
 
-    // TODO matt.day@alaress.com.au Please ratify
+    // TODO matt.day@alaress.com.au Please review/ratify
     // TODO Should this be configurable by admin? If so, that can sit behind this interface and the system should continue to function.
-    // TODO should we also configure whether you can target NULL, eg 'users without a year level'
+    // TODO Should we also configure whether you can target NULL, eg 'users without a year level'
+
+    // To ensure efficient db queries, only build query predicates that are valid and can actually match a segment.
     public const VALID_SEGMENT_RELATIONSHIPS = [
-        // Composite cannot be targeted to teachers, that would require clauses for every taught student/learner.
-        Model::ENTITY_TYPE_COMPOSITE      => [Model::RELATIONSHIP_SELF, Model::RELATIONSHIP_PARENTS_OF],
+        // For composite, this is a superset of what may ultimately be available. Composites cannot have a relationship modifier
+        // if any sub-segment does not support that modifier.
+        Model::ENTITY_TYPE_COMPOSITE      => [Model::RELATIONSHIP_SELF, Model::RELATIONSHIP_PARENTS_OF, Model::RELATIONSHIP_TEACHERS_OF],
 
         Model::ENTITY_TYPE_USER           => [Model::RELATIONSHIP_SELF, Model::RELATIONSHIP_PARENTS_OF, Model::RELATIONSHIP_TEACHERS_OF],
         Model::ENTITY_TYPE_SUPER          => [Model::RELATIONSHIP_SELF],
@@ -68,6 +76,10 @@ class SegmentRelationships
      */
     public static function canTargetNullEntity(string $entityType): bool
     {
+        // Composites always have NULL entity types
+        if (Model::ENTITY_TYPE_COMPOSITE === $entityType) {
+            return true;
+        }
         return self::VALID_SEGMENT_NULL_ENTITIES[$entityType];
     }
 
@@ -87,7 +99,7 @@ class SegmentRelationships
 
         $validEntities = [];
         foreach (self::VALID_SEGMENT_RELATIONSHIPS as $entity => $relationships) {
-            if (\in_array($relationship, $relationships, true)) {   // TODO REMOVE TESTING SHORT CIRCUIT
+            if (\in_array($relationship, $relationships, true)) {
                 $validEntities[] = $entity;
             }
         }
@@ -103,7 +115,19 @@ class SegmentRelationships
      */
     public static function getValidRelationships(Model $audienceSegment): array
     {
-        return self::VALID_SEGMENT_RELATIONSHIPS[$audienceSegment->getEntityType()];
+        $validRelationships = self::VALID_SEGMENT_RELATIONSHIPS[$audienceSegment->getEntityType()];
+
+        // Base case:
+        if(Model::ENTITY_TYPE_COMPOSITE !== $audienceSegment->getEntityType()){
+            return $validRelationships;
+        }
+
+        // Recursive case:
+        // Composites have their own inherent limitations, but also respect the limitations of any sub-segment.
+        foreach($audienceSegment->getChildren() as $subSegment){
+            $validRelationships = \array_intersect($validRelationships, self::getValidRelationships($subSegment));
+        }
+        return $validRelationships;
     }
 
 
