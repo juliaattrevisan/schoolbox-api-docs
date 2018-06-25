@@ -28,7 +28,7 @@
                 {% set identifier = 'publication' %}
 
                 {# If the publish date is reached: sent it. Presumably. #}
-                {% if news.publishAt.unixTimestamp < 'now'|date('U')|round %}
+                {% if news.publishAt.isPast %}
                     {% set identifier = 'delivered' %}
                 {% endif %}
             {% endif %}
@@ -42,7 +42,7 @@
         {% set identifier = 'publication' %}
 
         {# If the publish date is reached: sent it. Presumably. #}
-        {% if news.publishAt.unixTimestamp < 'now'|date('U')|round %}
+        {% if news.publishAt.isPast %}
             {% set identifier = 'delivered' %}
         {% endif %}
     {% endif %}
@@ -122,8 +122,8 @@
  #}
 {% set alt = 'This article is awaiting publication to its audience' %}
 
-{% if news.publishAt.unixTimestamp < 'now'|date('U')|round %}
-    {% set alt = 'This article publishes on ' ~ news.publishAt.local  %}
+{% if news.publishAt.isPast %}
+    {% set alt = 'This article published on ' ~ news.publishAt.local  %}
 {% endif %}
 
 {% set publicationNode = {
