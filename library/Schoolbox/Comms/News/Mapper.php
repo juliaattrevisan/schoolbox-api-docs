@@ -130,7 +130,7 @@ class Mapper extends \Schoolbox\Mapper
                 }
             }
 
-            $collection->add($news);
+            $collection->setOffset($news->getId(), $news);
         }
 
         /* Reindex the new topics so they're not in an associative array
@@ -139,6 +139,8 @@ class Mapper extends \Schoolbox\Mapper
         foreach ($collection as $current) {
             $current->getTopics()->reindex();
         }
+
+        $collection->reindex();
 
         return $collection;
     }
