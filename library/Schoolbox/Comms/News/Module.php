@@ -18,7 +18,6 @@ use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\News\TopicMapper;
-use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
@@ -60,7 +59,9 @@ class Module extends BaseModule
             )
         );
 
-        $preloadNews = function ($params) { return $this->preloadNews($params); };
+        $preloadNews = function ($params) {
+            return $this->preloadNews($params);
+        };
 
         $this->register('GET', '/create', 'getCreate', $getPerms);
         $this->register('GET', '/update/{newsId:\d+}', 'getUpdate', $getPerms, $preloadNews);
@@ -84,9 +85,8 @@ class Module extends BaseModule
     {
         try {
             $news = $this->getNewsMapper()->findById($params['newsId']);
-        }
-        catch (MapperException $e) {
-            throw new NotFound(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+        } catch (MapperException $e) {
+            throw new NotFound('Unknown news article.');
         }
 
         return [

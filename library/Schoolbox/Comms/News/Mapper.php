@@ -14,7 +14,6 @@ use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
-
 /**
  * Class Mapper
  *
@@ -55,7 +54,7 @@ class Mapper extends \Schoolbox\Mapper
             'newsTopicID',
             'topic_id',
             'article_id',
-            null,
+            'id',
             null,
             self::COLUMN_JOIN_MULTI,
             'topics'

@@ -13,7 +13,7 @@ use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Comms\News\Policy;
 use Schoolbox\Error\Mapper as ErrorMapper;
-Use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\News\TopicMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
@@ -65,11 +65,12 @@ class Controller extends Base
      */
     public function __construct(
         ErrorMapper $errorMapper,
-        UserMapper $userMapper, UserAccessMapper $userAccessMapper,
-        Mapper $newsMapper, Policy\Mapper $policyMapper,
+        UserMapper $userMapper,
+        UserAccessMapper $userAccessMapper,
+        Mapper $newsMapper,
+        Policy\Mapper $policyMapper,
         TopicMapper $topicMapper
-    )
-    {
+    ) {
         $this->errorMapper = $errorMapper;
         $this->userMapper = $userMapper;
         $this->userAccessMapper = $userAccessMapper;
@@ -218,9 +219,7 @@ class Controller extends Base
 
             return;
         }
-        catch (
-            MapperException|RouteNotFound|\PDOException|\UnexpectedValueException|\Schoolbox\Resource\Exception
-        $e) {
+        catch (MapperException|RouteNotFound|\PDOException|\UnexpectedValueException|\Schoolbox\Resource\Exception $e) {
             if ($this->getRequest()->isXhr()) {
                 $this->getResponse()->status->set(400);
                 $this->getResponse()->content->set($this->buildJsonOutput([
