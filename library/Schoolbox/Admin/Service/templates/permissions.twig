@@ -1,0 +1,29 @@
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Service Permissions</h1>
+    </div>
+</div>
+
+{% for service, people in services %}
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">{{ service }}</h2>
+
+        {% if people|length %}
+        <section>
+            <ul class="information-list">
+                {% for person in people %}
+                    <li class="content"><a href="/search/user/{{ person.id }}" title="View Profile">{{ person.fullname }}</a></li>
+                {% endfor %}
+            </ul>
+        </section>
+        {% else %}
+            <div class="empty-state">
+                <i class="icon-staff-students"></i>
+                <p>Nobody is assigned to this service permission.</p>
+            </div>
+
+        {% endif %}
+    </div>
+</div>
+{% endfor %}

@@ -20,6 +20,7 @@ class Admin implements ModuleConfigInterface
      *
      * @param Kernel $kernel
      * @return void
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     public function configure($kernel)
     {
@@ -119,5 +120,9 @@ class Admin implements ModuleConfigInterface
         //Feature Tours
         $featureTours = new \Schoolbox\Admin\FeatureTours\Module($di);
         $featureTours->init('/adminv2/feature-tours');
+
+        // Service Roster
+        $featureTours = new \Schoolbox\Admin\Service\Module($di);
+        $featureTours->init('/adminv2/service');
     }
 } 
