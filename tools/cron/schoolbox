@@ -15,7 +15,7 @@ MAILTO="support@schoolbox.com.au"
 # Video Processing
 */2 * * * *	www-data	php /usr/share/schoolbox/tools/video/processor.php >> /var/lib/schoolbox/cache/logs/transcode.log 2>&1
 
-# Video Processing
+# Image Processing
 */2 * * * *	www-data	php /usr/share/schoolbox/tools/image/processor.php >> /var/lib/schoolbox/cache/logs/transcode-image.log 2>&1
 
 # Cleanup cache  files (minify,zip,stream) (once a week on a Sunday)
