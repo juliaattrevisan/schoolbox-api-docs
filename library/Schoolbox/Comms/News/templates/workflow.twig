@@ -22,10 +22,14 @@
         {% if news.submittedAt.local|length %}
             {% set identifier = 'moderation' %}
 
-            {# Moderation is required and the moderatedAt is set; then we're awaiting publication
-             #}
+            {# Moderation is required and the moderatedAt is set; then we're awaiting publication #}
             {% if news.moderatedAt.local|length %}
                 {% set identifier = 'publication' %}
+
+                {# If the publish date is reached: sent it. Presumably. #}
+                {% if news.publishAt.unixTimestamp < 'now'|date('U')|round %}
+                    {% set identifier = 'delivered' %}
+                {% endif %}
             {% endif %}
         {% endif %}
     {% else %}
@@ -35,6 +39,11 @@
          # finding themselves publishing too quickly
          #}
         {% set identifier = 'publication' %}
+
+        {# If the publish date is reached: sent it. Presumably. #}
+        {% if news.publishAt.unixTimestamp < 'now'|date('U')|round %}
+            {% set identifier = 'delivered' %}
+        {% endif %}
     {% endif %}
 {% endif %}
 
@@ -95,7 +104,7 @@
 {% endif %}
 
 {# Published To Audience
- # The final node in the proscribed flow...although,
+ # The penultimate node in the proscribed flow...although,
  # an alternative fate for your article is to be deleted
  #}
 {% set publicationNode = {
@@ -105,13 +114,23 @@
     label: 'Awaiting Publication'
 } %}
 
+{# Delivery
+ # The final node in the proscribed flow; only highlighted once the publish date is reached
+ #}
+{% set deliveryNode = {
+    identifier: 'delivered',
+    url: null,
+    alt: 'Delivered to the audience on ' ~ news.publishAt.local,
+    label: 'Delivered'
+} %}
+
 
 {# The Great Train Robbery
  # Conditionally manufacture all the stops and their assigned urls
  # Ignore null nodes (they aren't intended to show)
  #}
 {% set nodes = [
-    composeNode, previewNode, awaitingModerationNode, publicationNode
+    composeNode, previewNode, awaitingModerationNode, publicationNode, deliveryNode
 ] %}
 
 <ul class="train-line">
