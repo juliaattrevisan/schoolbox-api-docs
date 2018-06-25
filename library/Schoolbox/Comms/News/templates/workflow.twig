@@ -99,8 +99,10 @@
 {% if moderationRequired %}
     {% if news.moderatedAt.local|length %}
         {% set alt = 'This article was moderated on ' ~ news.moderatedAt.local  %}
+    {% elseif news.submittedAt.local|length %}
+        {% set alt = 'This article is awaiting moderation since ' ~ news.submittedAt.local %}
     {% else %}
-        {% set alt = 'This article is awaiting moderation.' %}
+        {% set alt = 'This article will require moderation before being made available to the audience' %}
     {% endif %}
 
     {% set awaitingModerationNode = {
