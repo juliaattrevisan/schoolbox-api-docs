@@ -290,7 +290,6 @@ class Controller extends Base
             ->setBlurb($data['blurb'])
             ->setAuthor($this->getUser())
             ->setTopics($this->topicMapper->findByColumn('newsTopicID', $data['topics']))
-            ->setSubmittedAt(new \Alaress_Date_NullDate())
             ->setModeratedBy(null)
             ->setModeratedAt(new \Alaress_Date_NullDate())
             ->setPublishAt(\Alaress_Date_Format::newLocal($data['publishAt']))
