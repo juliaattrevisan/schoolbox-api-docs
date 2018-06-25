@@ -40,10 +40,12 @@ class Controller extends Base
         $this->userMapper = $userMapper;
     }
 
+
     /**
      * Get a list of articles that need moderation
      *
      * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
      */
     public function getList()
     {
@@ -56,25 +58,25 @@ class Controller extends Base
             $moderationRequired = false;
         }
 
+        /* A list of submitted articles that require moderation
+         */
         $newsArticles = [];
 
         if ($moderationRequired) {
-            $newsArticles = \Schoolbox\Comms\News\Mapper::getInstance()->findByColumn('moderated_at', null)->filter(
-                function (Model $item) {
-                    return !$item->getSubmittedAt()->isNull();
-                }
-            );
+            $unmoderatedArticles = (new Builder($this->userMapper->getDatabase(), 'comms_news_article'))
+                ->notNull('submitted_at')
+                ->isNull('moderated_at');
+
+            $newsArticles = \Schoolbox\Comms\News\Mapper::getInstance()->findByPredicates($unmoderatedArticles);
         }
 
         /* A list of recently-modified articles
          * Otherwise it's pretty disorienting not knowing what you just did
          */
-        $builder = new Builder($this->userMapper->getDatabase(), 'comms_news_article');
-        $builder->notNull('moderated_at');
+        $recentlyModerated = (new Builder($this->userMapper->getDatabase(), 'comms_news_article'))
+            ->notNull('moderated_at');
 
-        $recentArticles = \Schoolbox\Comms\News\Mapper::getInstance()->findByPredicates($builder);
-
-
+        $recentArticles = \Schoolbox\Comms\News\Mapper::getInstance()->findByPredicates($recentlyModerated);
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsModeration/index.twig', [
             'newsArticles' => $newsArticles,
