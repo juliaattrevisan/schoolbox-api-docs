@@ -59,7 +59,7 @@
                 /* Activation element
                  * The thing that gets disabled while saving
                  */
-                activator: $('input[type=submit]'),
+                activator: element.find('input[type=submit]'),
 
                 /* Draft Lozenge
                  */
@@ -162,7 +162,7 @@
 
             /* Disable inputs
              */
-            config.element.activator.prop('disabled', true);
+            config.activator.prop('disabled', true);
 
             /* Clear the autosave interval; it reactivates after drafts transaction occurs
              */
@@ -183,7 +183,7 @@
 
                 /* Re-enable submit
                  */
-                config.element.activator.prop('disabled', false);
+                config.activator.prop('disabled', false);
             }).success(function (responseText) {
 
                 /* Recycle the id ><
