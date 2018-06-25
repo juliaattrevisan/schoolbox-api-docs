@@ -76,31 +76,6 @@ class Controller extends Base
 
 
     /**
-     * Load a news article so you can read its contents (the detail screen)
-     *
-     * @param Model $news
-     * @throws \Aura\Di\Exception\ServiceNotFound
-     * @throws \Aura\Router\Exception\RouteNotFound
-     */
-    public function getDetail(Model $news)
-    {
-        $policies = \Schoolbox\Comms\News\Policy\Mapper::getInstance()->findAll()->indexBy('identifier');
-
-        /* The only known redirector that obeys a convention
-         */
-        $returnUrl = Redirect::encode(
-            $this->getRouter()->generate('commsNewsModeration.getDetail', ['newsId' => $news->getId()])
-        );
-
-        $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsModeration/detail.twig', [
-            'policies' => $policies,
-            'news' => $news,
-            'returnUrl' => $returnUrl
-        ])->setTitle($news->getTitle()));
-    }
-
-
-    /**
      * Accept an article for publishing to its audience
      *
      * @param Model $news

@@ -1,13 +1,19 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {% import '@commsNews/layout.twig' as layout %}
 
-
-
 {# TODO: How to do breadcrumbs now? #}
+{% if isCommsOfficer %}
+    {{ bread.crumbs(
+        [ locale.news.proper, '/news' ],
+        [ 'Moderation', routeLookup('commsNewsModeration.getList') ],
+        [ news.title ]
+    ) }}
+{% else %}
 {{ bread.crumbs(
     [ locale.news.proper, '/news' ],
     [ news.title ]
 ) }}
+{% endif %}
 
 <div class="actions-small-1 row">
     <div class="list-item">
@@ -87,6 +93,7 @@
     </div>
 </div>
 
+{# Submit for moderation #}
 {% if policies['global_moderation'].value and not news.submittedAt.local|length %}
 <div class="row">
     <div class="small-12 island">
@@ -109,5 +116,21 @@
 </div>
 {% endif %}
 
+{# Publish
+ # Only available to comms officers when:
+ #  - moderation is required and
+ #  - when the article is officially submitted and
+ #  - it hasn't already been published
+ #}
+{% if isCommsOfficer and policies['global_moderation'].value and news.submittedAt.local|length and not news.moderatedAt.local|length %}
+    <div class="row">
+        <div class="small-12 island">
+            <form action="{{ routeLookup('commsNewsModeration.postAccept', {newsId: news.id}) }}" method="post">
+                <input name="publicationConfirmation" value="1" type="hidden" />
 
+                <input type="submit" value="Publish this to the world" />
+            </form>
+        </div>
+    </div>
+{% endif %}
 

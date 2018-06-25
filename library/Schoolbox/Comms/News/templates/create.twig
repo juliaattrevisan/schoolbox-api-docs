@@ -80,11 +80,6 @@
             {% set formAction = routeLookupIfAuthorized('commsNews.postCreate') %}
         {% endif %}
 
-        {# Moderation redirect #}
-        {% if returnUrl|length %}
-            {% set formAction = formAction ~ '?returnUrl=' ~ returnUrl %}
-        {% endif %}
-
         <form id="createForm" action="{{ formAction }}" method="post">
             <section>
                 <fieldset class="content">

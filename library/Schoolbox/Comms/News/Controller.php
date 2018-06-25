@@ -20,6 +20,7 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 
@@ -164,11 +165,6 @@ class Controller extends Base
      */
     public function getUpdate(Model $news)
     {
-        /* Decide if the current user is a Comms Officer
-         */
-        $commsOfficers = $this->userAccessMapper->findUsersForService(UserAccess::SERVICE_COMMS_OFFICER)->getUnique('id')->indexBy('id');
-        $isCommsOfficer = $this->getUser()->isSuperuser() || $commsOfficers->getOffset($this->getUser()->getId());
-
         $policies = $this->policyMapper->findAll()->indexBy('identifier');
 
         /* Feature image
@@ -189,8 +185,7 @@ class Controller extends Base
             'user' => $this->getUser(),
             'news' => $news,
             'featureImageZone' => $zone->getTwigContext(),
-            'returnUrl' => $this->getRequest()->query['returnUrl'],
-            'isCommsOfficer' => $isCommsOfficer,
+            'isCommsOfficer' => $this->isCommsOfficer($this->getUser()),
         ])->setTitle("Update {$news->getTitle()}"));
     }
 
@@ -218,14 +213,6 @@ class Controller extends Base
              */
             $formAction = $this->getRouter()->generate('commsNews.getUpdate', ['newsId' => $news->getId()]);
 
-//            /* Redirect back to Moderation if you edited this from the Moderation workflow
-//             */
-//            $returnUrl = $this->getRequest()->query['returnUrl'];
-//
-//            if ($returnUrl) {
-//                $formAction = "{$formAction}?returnUrl={$returnUrl}";
-//            }
-
             /* Save a draft of the news article
              * This can occur from either the Create or Update context
              * Update the form action accordingly
@@ -236,13 +223,6 @@ class Controller extends Base
                     'formAction' => $formAction
                 ]));
             } else {
-
-//                /* Redirect back to Moderation if you edited this from the Moderation workflow
-//                 */
-//                if (null !== $returnUrl) {
-//                    $this->getResponse()->redirect->to(Redirect::decode($returnUrl));
-//                    return;
-//                }
 
                 /* Otherwise, you're the creator and you're editing this thing normally
                  * Go to the detail screen to see the outcome of your changes
@@ -270,6 +250,23 @@ class Controller extends Base
         }
     }
 
+
+    /**
+     * Decide if the current user is a Comms Officer
+     *
+     * @param User $user
+     * @return bool
+     * @throws MapperException
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \UnexpectedValueException
+     */
+    private function isCommsOfficer(User $user)
+    {
+        $commsOfficers = $this->userAccessMapper->findUsersForService(UserAccess::SERVICE_COMMS_OFFICER)->getUnique('id')->indexBy('id');
+
+        return $user->isSuperuser() || $commsOfficers->getOffset($user->getId());
+    }
 
     /**
      * Persist model to db during news article authorship
@@ -322,7 +319,11 @@ class Controller extends Base
      * Load a news article so you can read its contents (the detail screen)
      *
      * @param Model $news
+     * @throws MapperException
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \UnexpectedValueException
      */
     public function getDetail(Model $news)
     {
@@ -331,6 +332,7 @@ class Controller extends Base
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/detail.twig', [
             'policies' => $policies,
             'news' => $news,
+            'isCommsOfficer' => $this->isCommsOfficer($this->getUser())
         ])->setTitle($news->getTitle()));
     }
 
@@ -340,16 +342,28 @@ class Controller extends Base
      *
      * @param Model $news
      * @throws MapperException
-     * @throws \PDOException
-     * @throws \UnexpectedValueException
      * @throws RouteNotFound
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \UnexpectedValueException
      */
     public function postSubmitForModeration(Model $news)
     {
         $news->setSubmittedAt(\Alaress_Date_Format::now());
         $this->newsMapper->save($news);
 
-        $nextStep = $this->getRouter()->generate('commsNews.getDetail', ['newsId' => $news->getId()]);
-        $this->getResponse()->redirect->afterPost($nextStep);
+        /* If you're a moderator, go back to the Moderation list
+         *
+         * TODO: Otherwise currently recycle the same screen?
+         */
+        if ($this->isCommsOfficer($this->getUser())) {
+            $nextStep = $this->getRouter()->generate('commsNewsModeration.getList');
+        }
+        else {
+            $nextStep = $this->getRouter()->generate('commsNews.getDetail', ['newsId' => $news->getId()]);
+        }
+
+        $this->getResponse()->redirect->to($nextStep);
     }
 }

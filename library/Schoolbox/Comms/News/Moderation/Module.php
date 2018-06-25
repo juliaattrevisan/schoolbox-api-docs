@@ -50,10 +50,6 @@ class Module extends BaseModule
          */
         $this->register('GET', '', 'getList', $moderatorPerms);
 
-        /* Show an article with additional moderator-only powers
-         */
-        $this->register('GET', '/{newsId:\d+}', 'getDetail', $moderatorPerms, $preloadNews);
-
         /* The Fate of the Article: accept/reject/delete it
          */
         $this->register('POST', '/{newsId:\d+}/accept', 'postAccept', $moderatorPerms, $preloadNews);

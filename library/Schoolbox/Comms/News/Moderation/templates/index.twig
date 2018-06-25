@@ -13,7 +13,7 @@
             <ul class="information-list">
                 {% for news in newsArticles %}
                     <li class="content">
-                        <h3><a href="{{ routeLookup('commsNewsModeration.getDetail', {newsId: news.id}) }}">{{ news.title }}</a></h3>
+                        <h3><a href="{{ routeLookup('commsNews.getDetail', {newsId: news.id}) }}">{{ news.title }}</a></h3>
                         <p class="meta">Authored by {{ news.author.fullname }} on {{ news.updatedAt.local }}</p>
 
                         {# TODO: Have a /news/topic url lol #}
