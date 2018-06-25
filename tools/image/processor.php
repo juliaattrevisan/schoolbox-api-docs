@@ -48,7 +48,7 @@ if(is_iterable($result)){
             $hashList[] = Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash($row['hash']);
         }
         catch (Exception $e) {
-            $logger->error(sprintf("[manager] %s %s: %s", $hash, '404', 'File not found'));
+            $logger->error(sprintf("[manager] %s: %s", $hash, 'File not found'));
         }
     }
 } else {
@@ -57,6 +57,7 @@ if(is_iterable($result)){
 }
 
 $totalHashes = count($hashList);
+$logger->info(sprintf('[manager] Hashes in queue: %d', $totalHashes));
 $hashItem = 0;
 $workerList = [];
 $workers = 0;
@@ -100,14 +101,11 @@ while ($totalHashes > 0) {
         // Set next piece of work in the hashList array
         $hashItem++;
 
-        if ($totalHashes > 0) {
-            $logger->info(sprintf('[manager] Hashes in queue: %d', $totalHashes));
-        }
         usleep(5000);
     } else {
         // Start of Worker Process
         $workerId = posix_getpid();
-        $logger->info(sprintf("[%d] Processing: %s", $workerId, $hash));
+        $logger->debug(sprintf("[%d] Processing: %s", $workerId, $hash));
 
         // Check if each transformation size exists cached for this image, otherwise create it
         foreach ($expectedTransform as $transformListType => $transformList) {
@@ -139,12 +137,12 @@ while ($totalHashes > 0) {
 
                     if (!$image->isCached()) {
                         $image->save();
-                        $logger->info(sprintf("[%d] %s %s: %s", $workerId, $hash . '-' . $transformSize, '200', 'Transformed successfully'));
+                        $logger->info(sprintf("[%d] %s: %s", $workerId, $hash . '-' . $transformSize, 'success'));
                     }
                 }
                 catch (Exception $e) {
-                    $logger->error(sprintf("[%d] %s %s: %s", $workerId, $hash . '-' . $transformSize, '500', $e->getMessage()));
-                    $logger->error(sprintf("[%d] %s %s: %s", $workerId, $hash . '-' . $transformSize, '500', $e->getTraceAsString()));
+                    $logger->error(sprintf("[%d] %s: %s", $workerId, $hash . '-' . $transformSize, $e->getMessage()));
+                    $logger->error(sprintf("[%d] %s: %s", $workerId, $hash . '-' . $transformSize, $e->getTraceAsString()));
                 }
             }
         }
