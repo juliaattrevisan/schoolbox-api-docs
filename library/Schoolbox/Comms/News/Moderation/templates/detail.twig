@@ -6,6 +6,7 @@
 {# TODO: How to do breadcrumbs now? #}
 {{ bread.crumbs(
     [ locale.news.proper, '/news' ],
+    [ 'Moderation', routeLookup('commsNewsModeration.getList') ],
     [ news.title ]
 ) }}
 
@@ -28,7 +29,7 @@
         </div>
     </div>
     <nav>
-        {% set modifyRoute = routeLookupIfAuthorized('commsNews.getUpdate', {newsId: news.id}) %}
+        {% set modifyRoute = routeLookupIfAuthorized('commsNews.getUpdate', {newsId: news.id}) ~ '?returnUrl=' ~ returnUrl %}
 
         {% if modifyRoute %}
         <a class="icon-modify" href="{{ modifyRoute }}" title="Actions"></a>

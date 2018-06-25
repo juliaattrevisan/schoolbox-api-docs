@@ -13,7 +13,8 @@ use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Comms\News\Policy;
 use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Learning\Assessment\Redirect;
+Use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\News\TopicMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
@@ -202,7 +203,17 @@ class Controller extends Base
 
             $this->persist($news, $this->getRequest()->post);
 
-            $url = $this->getRouter()->generate('commsNews.getUpdate', [ 'newsId' => $news->getId() ]);
+            /* Re-send the form action back to js
+             */
+            $formAction = $this->getRouter()->generate('commsNews.getUpdate', [ 'newsId' => $news->getId() ]);
+
+            /* Redirect back to Moderation if you edited this from the Moderation workflow
+             */
+            $returnUrl = $this->getRequest()->query['returnUrl'];
+
+            if ($returnUrl) {
+                $formAction = "{$formAction}?returnUrl={$returnUrl}";
+            }
 
             /* Save a draft of the news article
              * This can occur from either the Create or Update context
@@ -211,10 +222,21 @@ class Controller extends Base
             if ($this->getRequest()->isXhr()) {
                 $this->getResponse()->content->set($this->buildJsonOutput([
                     'success' => true,
-                    'formAction' => $url
+                    'formAction' => $formAction
                 ]));
             } else {
-                $this->getResponse()->redirect->afterPost($url);
+
+                /* Redirect back to Moderation if you edited this from the Moderation workflow
+                 */
+                if (null !== $returnUrl) {
+                    $this->getResponse()->redirect->to(Redirect::decode($returnUrl));
+                    return;
+                }
+
+                /* Otherwise, you're the creator and you're editing this thing normally
+                 */
+                $this->getResponse()->redirect->afterPost($formAction);
+                return;
             }
 
             return;

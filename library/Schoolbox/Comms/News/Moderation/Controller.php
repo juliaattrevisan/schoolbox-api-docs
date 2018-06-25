@@ -11,6 +11,7 @@ namespace Schoolbox\Comms\News\Moderation;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Comms\News\Model;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -77,11 +78,19 @@ class Controller extends Base
      *
      * @param Model $news
      * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Aura\Router\Exception\RouteNotFound
      */
     public function getDetail(Model $news)
     {
+        /* The only known redirector that obeys a convention
+         */
+        $returnUrl = Redirect::encode(
+            $this->getRouter()->generate('commsNewsModeration.getDetail', ['newsId' => $news->getId()])
+        );
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsModeration/detail.twig', [
             'news' => $news,
+            'returnUrl' => $returnUrl
         ])->setTitle($news->getTitle()));
     }
 
