@@ -49,8 +49,8 @@ class Controller extends Base
      */
     public function getRoster()
     {
-        $this->getResponse()->content->set($this->buildHtmlOutput('@service/roster.twig', [
-            'services' => (new Roster($this->userAccessMapper))->generate()
+        $this->getResponse()->content->set($this->buildHtmlOutput('@service/permissions.twig', [
+            'services' => (new Permissions($this->userAccessMapper))->generate()
         ]));
     }
 }

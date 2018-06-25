@@ -12,7 +12,7 @@ namespace Schoolbox\Admin\Service;
 use ReflectionClass;
 use Schoolbox\Permission\Access;
 
-class Roster
+class Permissions
 {
     /**
      * Service prefix
