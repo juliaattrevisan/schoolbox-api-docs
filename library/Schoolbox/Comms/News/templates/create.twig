@@ -142,7 +142,7 @@
 
                         <p><strong>Policy</strong>. You need to abide by these standards etc.</p>
 
-                        <input id="submitConfirmation" type="checkbox" value="1" {% if news.submittedAt.local %}checked="checked"{% endif %} />
+                        <input id="submitConfirmation" name="submitConfirmation" type="checkbox" value="1" {% if news.submittedAt.local %}checked="checked"{% endif %} />
                         <label for="submitConfirmation" class="checkbox-label">I want to officially submit this article for moderation</label>
                     </div>
                 </fieldset>
