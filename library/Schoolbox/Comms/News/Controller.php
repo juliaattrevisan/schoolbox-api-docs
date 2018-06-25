@@ -216,7 +216,7 @@ class Controller extends Base
 
             /* Re-send the form action back to js
              */
-            $formAction = $this->getRouter()->generate('commsNews.getUpdate', [ 'newsId' => $news->getId() ]);
+            $formAction = $this->getRouter()->generate('commsNews.getUpdate', ['newsId' => $news->getId()]);
 
             /* Redirect back to Moderation if you edited this from the Moderation workflow
              */
@@ -245,8 +245,11 @@ class Controller extends Base
                 }
 
                 /* Otherwise, you're the creator and you're editing this thing normally
+                 * Go to the detail screen to see the outcome of your changes
+                 * and also use that screen to advance to the next step
                  */
-                $this->getResponse()->redirect->afterPost($formAction);
+                $nextStep = $this->getRouter()->generate('commsNews.getDetail', ['newsId' => $news->getId()]);
+                $this->getResponse()->redirect->afterPost($nextStep);
                 return;
             }
 

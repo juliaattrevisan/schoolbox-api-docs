@@ -31,7 +31,7 @@
         {% set modifyRoute = routeLookupIfAuthorized('commsNews.getUpdate', {newsId: news.id}) %}
 
         {% if modifyRoute %}
-        <a class="icon-modify" href="{{ modifyRoute }}" title="Actions"></a>
+        <a class="icon-modify" href="{{ modifyRoute }}" title="Modify this article"></a>
         {% endif %}
     </nav>
 </div>
