@@ -10,6 +10,7 @@
  # @param string identifier The current node in the workflow to highlight
  #}
 
+
 {# Preselection
  # Choose the active node depending on the current state of the news article
  #}
@@ -47,6 +48,7 @@
     {% endif %}
 {% endif %}
 
+
 {# Compose Node
  # Varies depending on when you're creating a new article, or editing an existing
  #}
@@ -62,6 +64,7 @@
     alt: 'Compose the contents of your article',
     label: 'Compose'
 } %}
+
 
 {# Preview Node
  # From here you can Submit For Moderation (if required)
@@ -89,30 +92,45 @@
     } %}
 {% endif %}
 
+
 {# Awaiting Moderation
  # Varies depending on the moderation policy
  #}
 {% if moderationRequired %}
+    {% if news.moderatedAt.local|length %}
+        {% set alt = 'This article was moderated on ' ~ news.moderatedAt.local  %}
+    {% else %}
+        {% set alt = 'This article is awaiting moderation.' %}
+    {% endif %}
+
     {% set awaitingModerationNode = {
         identifier: 'moderation',
         url: null,
-        alt: 'This article is awaiting moderation.',
+        alt: alt,
         label: 'Awaiting Moderation'
     } %}
 {% else %}
     {% set awaitingModerationNode = null %}
 {% endif %}
 
+
 {# Published To Audience
- # The penultimate node in the proscribed flow...although,
- # an alternative fate for your article is to be deleted
+ # The penultimate node in the proscribed flow...although, an alternative fate for your article is to be deleted
+ # Anyway, tell the user when it was last published
  #}
+{% if news.publishAt.local|length %}
+    {% set alt = 'This article was published on ' ~ news.publishAt.local  %}
+{% else %}
+    {% set alt = 'This article is awaiting publication to its audience' %}
+{% endif %}
+
 {% set publicationNode = {
     identifier: 'publication',
     url: null,
-    alt: 'This article is awaiting publication to its audience',
+    alt: alt,
     label: 'Awaiting Publication'
 } %}
+
 
 {# Delivery
  # The final node in the proscribed flow; only highlighted once the publish date is reached
