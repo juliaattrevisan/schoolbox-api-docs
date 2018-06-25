@@ -122,8 +122,14 @@
  #}
 {% set alt = 'This article is awaiting publication to its audience' %}
 
-{% if news.publishAt.isPast %}
-    {% set alt = 'This article published on ' ~ news.publishAt.local  %}
+{% if news.id %}
+    {% set alt = alt ~ ' on ' ~ news.publishAt.local %}
+
+    {% if moderationRequired and news.moderatedAt.local|length and news.moderatedAt.isPast %}
+        {% if news.publishAt.isPast %}
+            {% set alt = 'This article published on ' ~ news.publishAt.local  %}
+        {% endif %}
+    {% endif %}
 {% endif %}
 
 {% set publicationNode = {
