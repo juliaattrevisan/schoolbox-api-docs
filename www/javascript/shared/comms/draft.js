@@ -171,7 +171,7 @@
             /* Transact
              */
             $.ajax({
-                type: 'POST',
+                type: config.element.attr('method'),
                 url: config.element.attr('action'),
                 data: formContents,
                 dataType: 'json'
