@@ -10,6 +10,7 @@
 namespace Schoolbox\Comms\News;
 
 use Schoolbox\Collection;
+use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
@@ -18,7 +19,7 @@ use Schoolbox\News\Topic;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\User;
 
-class Model
+class Model implements ISoftDeletable
 {
     use Id;
     use CreatedAtDate;
