@@ -1,0 +1,133 @@
+{##
+ # A trainline for all the nodes you might visit from the birth of an article
+ # to its ultimate fate - publishing to the public, or the bin
+ #
+ # Trainline only appears when an article hasn't been broadcast yet to its audience
+ # i.e. publishAt hasn't been reached yet
+ #
+ # @param Model news
+ # @param bool moderationRequired
+ # @param string identifier The current node in the workflow to highlight
+ #}
+
+{# Preselection
+ # Choose the active node depending on the current state of the news article
+ #}
+{% set identifier = 'compose' %}
+
+{% if news.id %}
+    {% set identifier = 'preview' %}
+
+    {% if moderationRequired %}
+        {% if news.submittedAt.local|length %}
+            {% set identifier = 'moderation' %}
+
+            {# Moderation is required and the moderatedAt is set; then we're awaiting publication
+             #}
+            {% if news.moderatedAt.local|length %}
+                {% set identifier = 'publication' %}
+            {% endif %}
+        {% endif %}
+    {% else %}
+
+        {# or, Moderation isn't required; then we're awaiting publication straight out of the gate
+         # The publish date offset should be used to prevent ultra-immediate broadcast if people are
+         # finding themselves publishing too quickly
+         #}
+        {% set identifier = 'publication' %}
+    {% endif %}
+{% endif %}
+
+{# Compose Node
+ # Varies depending on when you're creating a new article, or editing an existing
+ #}
+{% if news.id %}
+    {% set composeUrl = routeLookup('commsNews.getUpdate', {newsId: news.id}) %}
+{% else %}
+    {% set composeUrl = routeLookup('commsNews.getCreate') %}
+{% endif %}
+
+{% set composeNode = {
+    identifier: 'compose',
+    url: composeUrl,
+    alt: 'Compose the contents of your article',
+    label: 'Compose'
+} %}
+
+{# Preview Node
+ # From here you can Submit For Moderation (if required)
+ # Varies depending on the moderation policy
+ #}
+{% if news.id %}
+    {% set previewUrl = routeLookup('commsNews.getDetail', {newsId: news.id}) %}
+{% else %}
+    {% set previewUrl = null %}
+{% endif %}
+
+{% if moderationRequired %}
+    {% set previewNode = {
+        identifier: 'preview',
+        url: previewUrl,
+        alt: 'Preview your article and submit it for moderation',
+        label: 'Preview'
+    } %}
+{% else %}
+    {% set previewNode = {
+        identifier: 'preview',
+        url: previewUrl,
+        alt: 'Preview your article and submit it for publishing',
+        label: 'Preview'
+    } %}
+{% endif %}
+
+{# Awaiting Moderation
+ # Varies depending on the moderation policy
+ #}
+{% if moderationRequired %}
+    {% set awaitingModerationNode = {
+        identifier: 'moderation',
+        url: null,
+        alt: 'This article is awaiting moderation.',
+        label: 'Awaiting Moderation'
+    } %}
+{% else %}
+    {% set awaitingModerationNode = null %}
+{% endif %}
+
+{# Published To Audience
+ # The final node in the proscribed flow...although,
+ # an alternative fate for your article is to be deleted
+ #}
+{% set publicationNode = {
+    identifier: 'publication',
+    url: null,
+    alt: 'This article is awaiting publication to its audience',
+    label: 'Awaiting Publication'
+} %}
+
+
+{# The Great Train Robbery
+ # Conditionally manufacture all the stops and their assigned urls
+ # Ignore null nodes (they aren't intended to show)
+ #}
+{% set nodes = [
+    composeNode, previewNode, awaitingModerationNode, publicationNode
+] %}
+
+<ul class="train-line">
+    {% for node in nodes %}
+        {% if node is not null %}
+            {% if node.identifier == identifier %}
+                {% set css = 'current-stop' %}
+            {% else %}
+                {% set css = '' %}
+            {% endif %}
+
+            <li class="{{ css }}">
+                <a {% if node.url is not null %}href="{{ node.url }}"{% endif %} title="{{ node.alt }}">
+                    <span class="icon-anchor"></span>{{ node.label }}
+                </a>
+            </li>
+        {% endif %}
+    {% endfor %}
+</ul>

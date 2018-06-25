@@ -51,6 +51,14 @@
     </nav>
 </div>
 
+{# Train Line
+ # One of three possibilities are shown here
+ #}
+{% include '@commsNews/workflow.twig' with {
+    news: news,
+    moderationRequired: policies['global_moderation'].value
+} %}
+
 <div class="row">
     <div class="small-12 island">
         <section>

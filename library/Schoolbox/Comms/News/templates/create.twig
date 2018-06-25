@@ -55,6 +55,12 @@
     </div>
 </div>
 
+{# Train Line #}
+{% include '@commsNews/workflow.twig' with {
+    news: news,
+    moderationRequired: policies['global_moderation'].value
+} %}
+
 {% if policies['global_moderation'].value %}
 <div class="row">
     <div class="small-12 columns">
