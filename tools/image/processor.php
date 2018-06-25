@@ -100,11 +100,7 @@ while ($totalHashes > 0) {
         // Set next piece of work in the hashList array
         $hashItem++;
 
-        // When there is no more work to do, exit and leave final works to finish up
-        if ($totalHashes < 1) {
-            $logger->info('[manager] so long, and thanks for all the fish - abandoning all children');
-            exit(0);
-        } else {
+        if ($totalHashes > 0) {
             $logger->info(sprintf('[manager] Hashes in queue: %d', $totalHashes));
         }
         usleep(5000);
@@ -155,3 +151,18 @@ while ($totalHashes > 0) {
         exit(0);
     }
 }
+
+while ($workers > 0) {
+    while (pcntl_wait($status, WNOHANG or WUNTRACED) > 0) {
+        usleep(5000);
+    }
+    while (list($key, $val) = each($workerList)) {
+        if (!posix_kill($val, 0)) {
+            unset($workerList[$key]);
+            $workers = $workers - 1;
+        }
+    }
+    $workerList = array_values($workerList);
+    usleep(50000);
+}
+$logger->info('[manager] so long, and thanks for all the fish');
