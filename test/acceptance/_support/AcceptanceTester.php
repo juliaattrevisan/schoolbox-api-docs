@@ -100,6 +100,7 @@ class AcceptanceTester extends \Codeception\Actor
         $i->click($fullname, '#account-menu');
     }
 
+
     /**
      * Fill in CKEditor
      * @param $element_id

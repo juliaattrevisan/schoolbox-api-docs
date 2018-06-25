@@ -75,7 +75,7 @@ if (!empty($_POST)) {
     $this->backToTheFuture(2);
 }
 else {
-    if (!is_numeric($this->arg[0])) {
+    if (!is_numeric($this->arg[0]) || !is_numeric($this->arg[1]) || !is_numeric($this->arg[2])) {
         error(115);
     }
 
@@ -128,7 +128,10 @@ else {
     $this->parse('answerInputs_block', 'answerFormFragment', true);
 
     $this->setVar(array(
+        'CATEGORY_LIST_ITEM_ASSESS_ID' => $this->arg[1],
+        'SECTION_ID' => $this->arg[2],
 		'QUESTION_BANK_ID' => $question['question_bank_id'],
+        'QUESTION_CATEGORY_ID' => $question['question_category_id'],
         'QUESTIONTYPE_TYPE_ID' => $currentQuestionType['type_id'],
         'QUESTIONTYPE_DESCRIPTION' => Scrub::text($currentQuestionType['description']),
         'QUESTIONTYPE_SELECTED' => $selected,
