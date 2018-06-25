@@ -13,7 +13,6 @@ use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Comms\News\Policy;
 use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\Learning\Assessment\Redirect;
 Use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\News\TopicMapper;
 use Schoolbox\Permission\Access\UserAccess;

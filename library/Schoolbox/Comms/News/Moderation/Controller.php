@@ -8,14 +8,11 @@
  */
 namespace Schoolbox\Comms\News\Moderation;
 
-use Alaress\Database\Predicate\Builder;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Comms\News\Model;
 use Schoolbox\Comms\News\ValidBroadcast;
 use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 class Controller extends Base
