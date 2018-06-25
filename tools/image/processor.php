@@ -18,85 +18,147 @@ spl_autoload_call('Schoolbox\\Application\\Daemon');
 $kernel = new \Schoolbox\Application\Daemon\Kernel('Image Processor', array('level' => 200));
 $logger = $kernel->logger();
 
-$logger->info("Starting Image Processor");
+$maxWorkers = 4;
+$logger->info(sprintf("[manager] Starting Image Processor (maxWorkers: %d)", $maxWorkers));
 
+// List of expected transformations that we expect for each image
+$expectedTransform = [];
 $expectedTransform['custom'] = array('maxsize','square64','square128');
 $expectedTransform['WxH'] = array(
     array(100, 100),
     array(1024, 1024)
 );
 
-$hashList = array();
-// TODO: This gets the last 250 uploaded images to check, maybe should be smarter
+// Retrieve list of images uploaded within the last hour up to a max of 300
+$hashList = [];
 $db = $kernel->get('databaseInternal');
 $query = '
     SELECT `hash` FROM `storage` s
     JOIN allowedFileExtension afe ON s.ext = afe.extension
     JOIN allowedFileTypes aft ON afe.fileTypeID = aft.fileTypeID AND aft.mime LIKE "image%"
+    WHERE s.uploaded_on >= (NOW() - INTERVAL 1 HOUR)
     ORDER BY s.uploaded_on ASC
-    LIMIT 0,250
+    LIMIT 0,300
 ';
 $result = $db->executeQuery($query)->fetchAll();
-if(count($result) > 0){
+if(is_iterable($result)){
     foreach($result as $row) {
-        $hashList[] = $row['hash'];
+        try {
+            // Do the object lookup up front, since forked workers won't have DB access reliably
+            $hashList[] = Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash($row['hash']);
+        }
+        catch (Exception $e) {
+            $logger->error(sprintf("[manager] %s %s: %s", $hash, '404', 'File not found'));
+        }
     }
+} else {
+    $logger->info('[manager] No images found for processing');
+    exit(0);
 }
 
 $totalHashes = count($hashList);
-if(!$totalHashes > 0){
-    $logger->info('No images found for processing');
-    exit(0);
-} else {
-    $logger->info(sprintf('Hashes in queue: %d', $totalHashes));
-}
-
-foreach ($hashList as $hash) {
-    try {
-        $resource = Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash($hash);
+$hashItem = 0;
+$workerList = [];
+$workers = 0;
+while ($totalHashes > 0) {
+    // Check if worker processes are still running, if not remove from workerList
+    while (pcntl_wait($status, WNOHANG or WUNTRACED) > 0) {
+        usleep(5000);
     }
-    catch (Exception $e) {
-        $logger->error(sprintf("%s %s: %s", $hash, '404', 'File not found'));
-    }
-    foreach ($expectedTransform as $transformListType => $transformList) {
-        foreach ($transformList as $transformSize) {
-            try {
-                if ($transformListType == 'WxH') {
-                    // Random Width x Hight transformations
-                    $transform = new Transformation\MyImage((int)$transformSize[0], (int)$transformSize[1]);
-                    $transformSize = implode($transformSize, 'x');
-                    $cache = new Image\Cache\Storage($resource, $transformSize);
-                    $image = new Image\Processor\Freeform(
-                        $cache,
-                        $transform,
-                        new Imagine\Filetype\Factory(),
-                        new Imagine\Processor\Strategy\Factory()
-                    );
-                } else {
-                    // Preset transformations
-                    $transform = new Image\Transformation\Storage();
-                    $cache = new Image\Cache\Storage($resource, $transformSize);
-                    $image = new Image\Processor\Standard(
-                        $cache,
-                        $transform,
-                        new Imagine\Filetype\Factory(),
-                        new Imagine\Processor\Strategy\Factory()
-                    );
-                }
-                $image->load();
-
-                if (!$image->isCached()) {
-                    $image->save();
-                    $logger->info(sprintf("%s %s: %s", $hash . '-' . $transformSize, '200', 'Transformed successfully'));
-                } else {
-                    $logger->notice(sprintf("%s %s: %s", $hash . '-' . $transformSize, '301', 'Cached transform found'));
-                }
-                unset($image, $cache, $transform);
-            }
-            catch (Exception $e) {
-                $logger->error(sprintf("%s %s: %s", $hash . '-' . $transformSize, '500', $e->getMessage()));
-            }
+    while (list($key, $val) = each($workerList)) {
+        if (!posix_kill($val, 0)) {
+            unset($workerList[$key]);
+            $workers = $workers - 1;
         }
     }
-    unset($resource);
+    $workerList = array_values($workerList);
+    if ($workers >= $maxWorkers) {
+        usleep(5000);
+        continue;
+    }
+
+    $hash = $hashList[$hashItem]->getHash();
+    $hashObject = $hashList[$hashItem];
+
+    $pid = pcntl_fork();
+    if ($pid == -1) {
+        // Unable to fork.
+        $logger->error("[manager] Unable to start image processing workers");
+        exit(1);
+    } elseif ($pid) {
+        // Parent Process
+        $logger->info("[manager] Tracking worker $pid with ".$hash);
+
+        // Add new worker to the worker list and worker count for tracking
+        $workerList[$hash] = $pid;
+        $workers++;
+
+        // Remove hash from the list as it has been sent for processing
+        unset($hashList[$hashItem]);
+
+        // Update work list
+        $totalHashes = count($hashList);
+
+        // Set next piece of work in the hashList array
+        $hashItem++;
+
+        $logger->info(sprintf('[manager] Hashes in queue: %d', $totalHashes));
+        $logger->info(sprintf('[manager] Active workers: %d', count($workerList)));
+
+        // When there is no more work to do, exit and leave final works to finish up
+        if ($totalHashes < 1) {
+            $logger->info('[manager] so long, and thanks for all the fish - abandoning all children');
+            exit(0);
+        }
+        usleep(5000);
+    } else {
+        // Start of Worker Process
+        $workerId = posix_getpid();
+        $logger->info(sprintf("[%d] Processing: %s", $workerId, $hash));
+
+        // Check if each transformation size exists cached for this image, otherwise create it
+        foreach ($expectedTransform as $transformListType => $transformList) {
+            foreach ($transformList as $transformSize) {
+                try {
+                    if ($transformListType == 'WxH') {
+                        // Random Width x Hight transformations
+                        $transform = new Transformation\MyImage((int)$transformSize[0], (int)$transformSize[1]);
+                        $transformSize = implode($transformSize, 'x');
+                        $cache = new Image\Cache\Storage($hashObject, $transformSize);
+                        $image = new Image\Processor\Freeform(
+                            $cache,
+                            $transform,
+                            new Imagine\Filetype\Factory(),
+                            new Imagine\Processor\Strategy\Factory()
+                        );
+                    } else {
+                        // Preset transformations
+                        $transform = new Image\Transformation\Storage();
+                        $cache = new Image\Cache\Storage($hashObject, $transformSize);
+                        $image = new Image\Processor\Standard(
+                            $cache,
+                            $transform,
+                            new Imagine\Filetype\Factory(),
+                            new Imagine\Processor\Strategy\Factory()
+                        );
+                    }
+                    $image->load();
+
+                    if (!$image->isCached()) {
+                        $image->save();
+                        $logger->info(sprintf("[%d] %s %s: %s", $workerId, $hash . '-' . $transformSize, '200', 'Transformed successfully'));
+                    } else {
+                        $logger->notice(sprintf("[%d] %s %s: %s", $workerId, $hash . '-' . $transformSize, '301', 'Cached transform found'));
+                    }
+                }
+                catch (Exception $e) {
+                    $logger->error(sprintf("[%d] %s %s: %s", $workerId, $hash . '-' . $transformSize, '500', $e->getMessage()));
+                    $logger->error(sprintf("[%d] %s %s: %s", $workerId, $hash . '-' . $transformSize, '500', $e->getTraceAsString()));
+                }
+            }
+        }
+
+        $logger->info(sprintf("[%d] Work complete ",  $workerId, $hash));
+        exit(0);
+    }
 }
