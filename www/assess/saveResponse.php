@@ -40,8 +40,17 @@ if ($assessHandler->isOwner($section['assess_id'])) {
  * @var AssessmentDataSource $assessmentDataSource
  */
 $assessmentDataSource = $this->getDi()->get('assessmentDataSource');
+$ajax = SitePage::detectAjax();
 
-$assessment       = $assessmentDataSource->findByQuizId($section['assess_id'], $_SESSION['user']);
+try {
+    $assessment = $assessmentDataSource->findByQuizId($section['assess_id'], $_SESSION['user']);
+} catch (\Schoolbox\Mapper\Exception\Deleted $e) {
+    if ($ajax) {
+        http_response_code(404);
+        exit;
+    }
+    error(112);
+}
 $assessmentFolder = $assessment->getBaseContext()->getFolder();
 $accessLevel      = Access::getInstance()->getFolderAccess($_SESSION['user'], $assessmentFolder->getId());
 
@@ -50,12 +59,20 @@ $actionValidator = new ActionValidator(Alaress_Date_Format::now(), Access::getIn
 /* Non-participants are sent to a 404 screen
  */
 if (!$actionValidator->canAttemptQuiz($_SESSION['user'], $assessment)) {
+    if ($ajax) {
+        http_response_code(404);
+        exit;
+    }
     $this->pageNotFound();
 }
 
 if ($accessLevel < UserAccess::ACCESS_WRITE) {
     // I can't attempt a spec assessment
     if ($assessment->isSpecification()) {
+        if ($ajax) {
+            http_response_code(404);
+            exit;
+        }
         error(19);
     }
 } else {
@@ -63,6 +80,10 @@ if ($accessLevel < UserAccess::ACCESS_WRITE) {
 }
 
 if ($assessHandler->isDeleted($section['assess_id'])) {
+    if ($ajax) {
+        http_response_code(404);
+        exit;
+    }
 	error(112);
 }
 
@@ -72,10 +93,18 @@ if ($assessHandler->isDeleted($section['assess_id'])) {
 $assess = $assessHandler->getByID($section['assess_id']);
 
 if (!$assessHandler->isValidUrlAccess($section['assess_id'])) {
+    if ($ajax) {
+        http_response_code(404);
+        exit;
+    }
     $this->pageNotFound();
 }
 
 if (!$question) {
+    if ($ajax) {
+        http_response_code(404);
+        exit;
+    }
     error(119);
 }
 

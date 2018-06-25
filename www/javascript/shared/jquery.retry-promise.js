@@ -38,7 +38,7 @@
                     deferred.resolve(arguments);
                 })
                 .fail(function() {
-                    if (attempts >= settings.maxRetry) {
+                    if (arguments[0].status === 404 || attempts >= settings.maxRetry) {
                         deferred.reject(arguments);
                     } else {
                         // Try again after some jitter
