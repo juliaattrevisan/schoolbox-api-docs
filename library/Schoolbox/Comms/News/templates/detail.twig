@@ -15,7 +15,7 @@
 ) }}
 {% endif %}
 
-<div class="actions-small-1 row">
+<div class="actions-small-2 row">
     <div class="list-item">
         <div class="small-12 column">
             <h1>{{ news.title }}</h1>
@@ -53,6 +53,12 @@
 
         {% if modifyRoute %}
         <a class="icon-modify" href="{{ modifyRoute }}" title="Modify this article"></a>
+        {% endif %}
+
+        {% set moderationListRoute = routeLookupIfAuthorized('commsNewsModeration.getList') %}
+
+        {% if moderationListRoute %}
+        <a class="icon-list" href="{{ moderationListRoute }}" title="Moderation List"></a>
         {% endif %}
     </nav>
 </div>

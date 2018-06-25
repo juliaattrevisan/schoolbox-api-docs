@@ -39,21 +39,31 @@
         });
     });
 </script>
-<div class="row">
-    <div class="small-12 island">
-        <h1>{{ action|capitalize }} {{ locale.news.proper }} {{ indicator.render(news) }}</h1>
 
-        <ul class="meta">
-            {% if news.moderatedBy.id %}
-            <li class="icon-staff">Last moderated by {{ news.moderatedBy.fullname }}
-                {% if not news.moderatedAt.isNull %}
-                    on {{ news.moderatedAt.local }}
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 column">
+            <h1>{{ action|capitalize }} {{ locale.news.proper }} {{ indicator.render(news) }}</h1>
+            <ul class="meta">
+                {% if news.moderatedBy.id %}
+                    <li class="icon-staff">Last moderated by {{ news.moderatedBy.fullname }}
+                        {% if not news.moderatedAt.isNull %}
+                            on {{ news.moderatedAt.local }}
+                        {% endif %}
+                    </li>
                 {% endif %}
-            </li>
-            {% endif %}
-        </ul>
+            </ul>
+        </div>
     </div>
+    <nav>
+        {% set moderationListRoute = routeLookupIfAuthorized('commsNewsModeration.getList') %}
+
+        {% if moderationListRoute %}
+            <a class="icon-list" href="{{ moderationListRoute }}" title="Moderation List"></a>
+        {% endif %}
+    </nav>
 </div>
+
 
 {# Train Line #}
 {% include '@commsNews/workflow.twig' with {
