@@ -64,3 +64,27 @@
     </div>
 </div>
 
+{% if policies['global_moderation'].value and not news.submittedAt.local|length %}
+<div class="row">
+    <div class="small-12 island">
+        <form action="{{ routeLookup('commsNews.postDetail', {newsId: news.id}) }}" method="post">
+            <input name="submitConfirmation" value="1" type="hidden" />
+
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <p>Moderation is required for this {{ locale.news.proper }} article. You can review <a href="{{ routeLookup('commsNewsPolicy.getPolicies') }}" title="view policy settings" target="_blank">current policy settings</a>.</p>
+
+                        <p><strong>Policy</strong>. You need to abide by these standards etc.</p>
+                    </div>
+                </fieldset>
+            </section>
+
+            <input type="submit" value="Submit For Moderation" />
+        </form>
+    </div>
+</div>
+{% endif %}
+
+
+

@@ -218,13 +218,13 @@ class Controller extends Base
              */
             $formAction = $this->getRouter()->generate('commsNews.getUpdate', ['newsId' => $news->getId()]);
 
-            /* Redirect back to Moderation if you edited this from the Moderation workflow
-             */
-            $returnUrl = $this->getRequest()->query['returnUrl'];
-
-            if ($returnUrl) {
-                $formAction = "{$formAction}?returnUrl={$returnUrl}";
-            }
+//            /* Redirect back to Moderation if you edited this from the Moderation workflow
+//             */
+//            $returnUrl = $this->getRequest()->query['returnUrl'];
+//
+//            if ($returnUrl) {
+//                $formAction = "{$formAction}?returnUrl={$returnUrl}";
+//            }
 
             /* Save a draft of the news article
              * This can occur from either the Create or Update context
@@ -237,12 +237,12 @@ class Controller extends Base
                 ]));
             } else {
 
-                /* Redirect back to Moderation if you edited this from the Moderation workflow
-                 */
-                if (null !== $returnUrl) {
-                    $this->getResponse()->redirect->to(Redirect::decode($returnUrl));
-                    return;
-                }
+//                /* Redirect back to Moderation if you edited this from the Moderation workflow
+//                 */
+//                if (null !== $returnUrl) {
+//                    $this->getResponse()->redirect->to(Redirect::decode($returnUrl));
+//                    return;
+//                }
 
                 /* Otherwise, you're the creator and you're editing this thing normally
                  * Go to the detail screen to see the outcome of your changes
@@ -290,6 +290,7 @@ class Controller extends Base
             ->setBlurb($data['blurb'])
             ->setAuthor($this->getUser())
             ->setTopics($this->topicMapper->findByColumn('newsTopicID', $data['topics']))
+            ->setSubmittedAt(new \Alaress_Date_NullDate())
             ->setModeratedBy(null)
             ->setModeratedAt(new \Alaress_Date_NullDate())
             ->setPublishAt(\Alaress_Date_Format::newLocal($data['publishAt']))
@@ -303,16 +304,6 @@ class Controller extends Base
         }
         else {
             $news->setFeatureImage(null);
-        }
-
-        /* Identify drafts
-         * if 'draft' key exists, it's a draft
-         * if 'submitConfirmation' key exists, author ticked the checkbox to signal article is ready for moderation
-         */
-        $news->setSubmittedAt(new \Alaress_Date_NullDate());
-
-        if (array_key_exists('submitConfirmation', $data)) {
-            $news->setSubmittedAt(\Alaress_Date_Format::now());
         }
 
         $this->newsMapper->save($news);
@@ -336,8 +327,30 @@ class Controller extends Base
      */
     public function getDetail(Model $news)
     {
+        $policies = $this->policyMapper->findAll()->indexBy('identifier');
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/detail.twig', [
+            'policies' => $policies,
             'news' => $news,
         ])->setTitle($news->getTitle()));
+    }
+
+
+    /**
+     * Submit For Moderation occurs here
+     *
+     * @param Model $news
+     * @throws MapperException
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
+     * @throws RouteNotFound
+     */
+    public function postDetail(Model $news)
+    {
+        $news->setSubmittedAt(\Alaress_Date_Format::now());
+        $this->newsMapper->save($news);
+
+        $nextStep = $this->getRouter()->generate('commsNews.getDetail', ['newsId' => $news->getId()]);
+        $this->getResponse()->redirect->afterPost($nextStep);
     }
 }

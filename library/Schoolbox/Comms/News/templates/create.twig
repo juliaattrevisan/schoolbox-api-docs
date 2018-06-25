@@ -134,21 +134,6 @@
                 </fieldset>
             </section>
 
-            {% if policies['global_moderation'].value %}
-            <section>
-                <fieldset class="content">
-                    <div class="small-12 columns">
-                        <p>Moderation is required for this {{ locale.news.proper }} article. You can review <a href="{{ routeLookup('commsNewsPolicy.getPolicies') }}" title="view policy settings" target="_blank">current policy settings</a>.</p>
-
-                        <p><strong>Policy</strong>. You need to abide by these standards etc.</p>
-
-                        <input id="submitConfirmation" name="submitConfirmation" type="checkbox" value="1" {% if news.submittedAt.local %}checked="checked"{% endif %} />
-                        <label for="submitConfirmation" class="checkbox-label">I want to officially submit this article for moderation</label>
-                    </div>
-                </fieldset>
-            </section>
-            {% endif %}
-
             <input type="submit" value="{{ action|capitalize }} {{ locale.news }}"/>
         </form>
     </div>

@@ -77,6 +77,10 @@ class Module extends BaseModule
          */
         $this->register('GET', '/{newsId:\d+}', 'getDetail', null, $preloadNews);
 
+        /* Submit For Moderation
+         */
+        $this->register('POST', '/{newsId:\d+}', 'postDetail', null, $preloadNews);
+
         /* Get a list of topics to chooze
          */
         $this->register('GET', '/topics', 'getTopics', $getPerms);
