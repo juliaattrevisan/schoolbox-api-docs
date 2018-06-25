@@ -65,3 +65,14 @@
     </div>
 </div>
 
+{% if policies['global_moderation'].value and news.submittedAt.local|length and not news.moderatedAt.local|length %}
+<div class="row">
+    <div class="small-12 island">
+        <form action="{{ routeLookup('commsNewsModeration.postAccept', {newsId: news.id}) }}" method="post">
+            <input name="publicationConfirmation" value="1" type="hidden" />
+
+            <input type="submit" value="Publish this to the world" />
+        </form>
+    </div>
+</div>
+{% endif %}

@@ -54,7 +54,11 @@ class Module extends BaseModule
          */
         $this->register('GET', '/{newsId:\d+}', 'getDetail', $moderatorPerms, $preloadNews);
 
-        $this->register('POST', '/user', 'postExample', $moderatorPerms, null);
+        /* The Fate of the Article: accept/reject/delete it
+         */
+        $this->register('POST', '/{newsId:\d+}/accept', 'postAccept', $moderatorPerms, $preloadNews);
+        $this->register('POST', '/{newsId:\d+}/reject', 'postReject', $moderatorPerms, $preloadNews);
+        $this->register('POST', '/{newsId:\d+}/delete', 'postDelete', $moderatorPerms, $preloadNews);
     }
 
     /**

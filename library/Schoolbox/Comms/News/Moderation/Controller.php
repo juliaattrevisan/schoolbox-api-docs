@@ -83,6 +83,8 @@ class Controller extends Base
      */
     public function getDetail(Model $news)
     {
+        $policies = \Schoolbox\Comms\News\Policy\Mapper::getInstance()->findAll()->indexBy('identifier');
+
         /* The only known redirector that obeys a convention
          */
         $returnUrl = Redirect::encode(
@@ -90,9 +92,34 @@ class Controller extends Base
         );
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsModeration/detail.twig', [
+            'policies' => $policies,
             'news' => $news,
             'returnUrl' => $returnUrl
         ])->setTitle($news->getTitle()));
+    }
+
+
+    /**
+     * Accept an article for publishing to its audience
+     *
+     * @param Model $news
+     * @throws MapperException
+     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
+     */
+    public function postAccept(Model $news)
+    {
+        $news
+            ->setModeratedAt(\Alaress_Date_Format::now())
+            ->setModeratedBy($this->getUser());
+
+        \Schoolbox\Comms\News\Mapper::getInstance()->save($news);
+
+        /* Return to Moderation Queue
+         */
+        $nextStep = $this->getRouter()->generate('commsNewsModeration.getList');
+        $this->getResponse()->redirect->to($nextStep);
     }
 
     /**
