@@ -24,6 +24,9 @@ class SegmentRelationships
     // TODO Should this be configurable by admin? If so, that can sit behind this interface and the system should continue to function.
     // TODO should we also configure whether you can target NULL, eg 'users without a year level'
     public const VALID_SEGMENT_RELATIONSHIPS = [
+        // Composite cannot be targeted to teachers, that would require clauses for every taught student/learner.
+        Model::ENTITY_TYPE_COMPOSITE      => [Model::RELATIONSHIP_SELF, Model::RELATIONSHIP_PARENTS_OF],
+
         Model::ENTITY_TYPE_USER           => [Model::RELATIONSHIP_SELF, Model::RELATIONSHIP_PARENTS_OF, Model::RELATIONSHIP_TEACHERS_OF],
         Model::ENTITY_TYPE_SUPER          => [Model::RELATIONSHIP_SELF],
         Model::ENTITY_TYPE_CAMPUS         => [Model::RELATIONSHIP_SELF, Model::RELATIONSHIP_PARENTS_OF],
@@ -84,7 +87,7 @@ class SegmentRelationships
 
         $validEntities = [];
         foreach (self::VALID_SEGMENT_RELATIONSHIPS as $entity => $relationships) {
-            if (TRUE || \in_array($relationship, $relationships, true)) {   // TODO REMOVE TESTING SHORT CIRCUIT
+            if (\in_array($relationship, $relationships, true)) {   // TODO REMOVE TESTING SHORT CIRCUIT
                 $validEntities[] = $entity;
             }
         }
@@ -100,23 +103,7 @@ class SegmentRelationships
      */
     public static function getValidRelationships(Model $audienceSegment): array
     {
-        // Base simple case:
-        if (Model::ENTITY_TYPE_COMPOSITE !== $audienceSegment->getEntityType()) {
-            return self::VALID_SEGMENT_RELATIONSHIPS[$audienceSegment->getEntityType()];
-        }
-
-        // Recursive composite case:
-        $firstChild         = true;
-        $validRelationships = [];
-        foreach ($audienceSegment->getChildren() as $childSegment) {
-            if ($firstChild) {
-                $validRelationships = self::getValidRelationships($childSegment);
-                $firstChild         = false;
-            } else {
-                $validRelationships = \array_intersect($validRelationships, self::getValidRelationships($childSegment));
-            }
-        }
-        return $validRelationships;
+        return self::VALID_SEGMENT_RELATIONSHIPS[$audienceSegment->getEntityType()];
     }
 
 
