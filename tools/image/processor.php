@@ -29,14 +29,14 @@ $expectedTransform['WxH'] = array(
     array(1024, 1024)
 );
 
-// Retrieve list of images uploaded within the last hour up to a max of 300
+// Retrieve list of images uploaded within the 15 minutes up to a max of 300
 $hashList = [];
 $db = $kernel->get('databaseInternal');
 $query = '
     SELECT `hash` FROM `storage` s
     JOIN allowedFileExtension afe ON s.ext = afe.extension
     JOIN allowedFileTypes aft ON afe.fileTypeID = aft.fileTypeID AND aft.mime LIKE "image%"
-    WHERE s.uploaded_on >= (NOW() - INTERVAL 1 HOUR)
+    WHERE s.uploaded_on >= (NOW() - INTERVAL 15 MINUTE)
     ORDER BY s.uploaded_on ASC
     LIMIT 0,300
 ';
