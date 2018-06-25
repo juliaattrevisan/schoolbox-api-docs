@@ -59,7 +59,8 @@ CREATE TABLE comms_news_audience(
   CONSTRAINT fk_comms_news_audience_parent_id FOREIGN KEY (`parent_id`) REFERENCES comms_news_audience (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   INDEX idx_comms_news_audience_type (entity_type),
   INDEX idx_comms_news_audience_value (entity_value),
-  INDEX idx_comms_news_audience_relationship (relationship)
+  INDEX idx_comms_news_audience_relationship (relationship),
+  UNIQUE INDEX idx_comms_news_audience_parent_type_value_relationship(parent_id, entity_type, entity_value, relationship)
 );
 
 -- News Article Tag relations
