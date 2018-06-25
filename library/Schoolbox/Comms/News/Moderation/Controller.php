@@ -11,6 +11,7 @@ namespace Schoolbox\Comms\News\Moderation;
 use Alaress\Database\Predicate\Builder;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Comms\News\Model;
+use Schoolbox\Comms\News\ValidBroadcast;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -110,11 +111,17 @@ class Controller extends Base
      */
     public function postAccept(Model $news)
     {
+        $policy = \Schoolbox\Comms\News\Policy\Mapper::getInstance()->findOneByColumn('identifier', 'global_moderation');
+
+        $moderationRequired = (bool)$policy->getValue();
+
         $news
             ->setModeratedAt(\Alaress_Date_Format::now())
             ->setModeratedBy($this->getUser());
 
-        \Schoolbox\Comms\News\Mapper::getInstance()->save($news);
+        if ((new ValidBroadcast())->isSatisfiedBy($news, $moderationRequired)) {
+            \Schoolbox\Comms\News\Mapper::getInstance()->save($news);
+        }
 
         /* Return to Moderation Queue
          */
