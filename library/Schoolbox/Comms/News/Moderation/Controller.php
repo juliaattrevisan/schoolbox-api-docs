@@ -8,6 +8,7 @@
  */
 namespace Schoolbox\Comms\News\Moderation;
 
+use Alaress\Database\Predicate\Builder;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Comms\News\Model;
 use Schoolbox\Comms\News\ValidBroadcast;
@@ -65,8 +66,19 @@ class Controller extends Base
             );
         }
 
+        /* A list of recently-modified articles
+         * Otherwise it's pretty disorienting not knowing what you just did
+         */
+        $builder = new Builder($this->userMapper->getDatabase(), 'comms_news_article');
+        $builder->notNull('moderated_at');
+
+        $recentArticles = \Schoolbox\Comms\News\Mapper::getInstance()->findByPredicates($builder);
+
+
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsModeration/index.twig', [
             'newsArticles' => $newsArticles,
+            'recentArticles' => $recentArticles,
             'moderationRequired' => $moderationRequired
         ])->setTitle('Example'));
     }
