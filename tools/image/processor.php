@@ -87,8 +87,6 @@ while ($totalHashes > 0) {
         exit(1);
     } elseif ($pid) {
         // Parent Process
-        $logger->info("[manager] Tracking worker $pid with ".$hash);
-
         // Add new worker to the worker list and worker count for tracking
         $workerList[$hash] = $pid;
         $workers++;
@@ -102,13 +100,12 @@ while ($totalHashes > 0) {
         // Set next piece of work in the hashList array
         $hashItem++;
 
-        $logger->info(sprintf('[manager] Hashes in queue: %d', $totalHashes));
-        $logger->info(sprintf('[manager] Active workers: %d', count($workerList)));
-
         // When there is no more work to do, exit and leave final works to finish up
         if ($totalHashes < 1) {
             $logger->info('[manager] so long, and thanks for all the fish - abandoning all children');
             exit(0);
+        } else {
+            $logger->info(sprintf('[manager] Hashes in queue: %d', $totalHashes));
         }
         usleep(5000);
     } else {
@@ -147,8 +144,6 @@ while ($totalHashes > 0) {
                     if (!$image->isCached()) {
                         $image->save();
                         $logger->info(sprintf("[%d] %s %s: %s", $workerId, $hash . '-' . $transformSize, '200', 'Transformed successfully'));
-                    } else {
-                        $logger->notice(sprintf("[%d] %s %s: %s", $workerId, $hash . '-' . $transformSize, '301', 'Cached transform found'));
                     }
                 }
                 catch (Exception $e) {
@@ -157,8 +152,6 @@ while ($totalHashes > 0) {
                 }
             }
         }
-
-        $logger->info(sprintf("[%d] Work complete ",  $workerId, $hash));
         exit(0);
     }
 }
