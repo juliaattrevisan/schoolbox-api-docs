@@ -56,6 +56,11 @@
                  */
                 textareas: [],
 
+                /* Activation element
+                 * The thing that gets disabled while saving
+                 */
+                activator: $('input[type=submit]'),
+
                 /* Draft Lozenge
                  */
                 newIndicator: $('#status-new'),
@@ -157,7 +162,7 @@
 
             /* Disable inputs
              */
-            config.element.find('input[type=submit]').prop('disabled', true);
+            config.element.activator.prop('disabled', true);
 
             /* Clear the autosave interval; it reactivates after drafts transaction occurs
              */
@@ -178,7 +183,7 @@
 
                 /* Re-enable submit
                  */
-                config.element.find('input[type=submit]').prop('disabled', false);
+                config.element.activator.prop('disabled', false);
             }).success(function (responseText) {
 
                 /* Recycle the id ><
