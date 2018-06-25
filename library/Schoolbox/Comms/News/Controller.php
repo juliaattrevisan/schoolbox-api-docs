@@ -147,7 +147,11 @@ class Controller extends Base
      */
     public function postCreate()
     {
+        /* Set YOU as the initial author
+         * Otherwise, when a moderator edits your article, they might assume direct authorship instead
+         */
         $news = $this->newsMapper->createModel();
+        $news->setAuthor($this->getUser());
 
         $this->postUpdate($news);
     }
@@ -261,7 +265,7 @@ class Controller extends Base
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \UnexpectedValueException
      */
-    private function isCommsOfficer(User $user)
+    private function isCommsOfficer(User $user): bool
     {
         $commsOfficers = $this->userAccessMapper->findUsersForService(UserAccess::SERVICE_COMMS_OFFICER)->getUnique('id')->indexBy('id');
 
@@ -285,7 +289,6 @@ class Controller extends Base
             ->setTitle($data['title'])
             ->setBody($data['body'])
             ->setBlurb($data['blurb'])
-            ->setAuthor($this->getUser())
             ->setTopics($this->topicMapper->findByColumn('newsTopicID', $data['topics']))
             ->setModeratedBy(null)
             ->setModeratedAt(new \Alaress_Date_NullDate())
