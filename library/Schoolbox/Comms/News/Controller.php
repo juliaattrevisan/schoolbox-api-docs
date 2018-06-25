@@ -16,6 +16,7 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\Redirect;
 Use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\News\TopicMapper;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
@@ -155,11 +156,19 @@ class Controller extends Base
      * Provide form to update a news article
      *
      * @param Model $news
+     * @throws MapperException
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \UnexpectedValueException
      */
     public function getUpdate(Model $news)
     {
+        /* Decide if the current user is a Comms Officer
+         */
+        $commsOfficers = $this->userAccessMapper->findUsersForService(UserAccess::SERVICE_COMMS_OFFICER)->getUnique('id')->indexBy('id');
+        $isCommsOfficer = $this->getUser()->isSuperuser() || $commsOfficers->getOffset($this->getUser()->getId());
+
         $policies = $this->policyMapper->findAll()->indexBy('identifier');
 
         /* Feature image
@@ -180,6 +189,8 @@ class Controller extends Base
             'user' => $this->getUser(),
             'news' => $news,
             'featureImageZone' => $zone->getTwigContext(),
+            'returnUrl' => $this->getRequest()->query['returnUrl'],
+            'isCommsOfficer' => $isCommsOfficer,
         ])->setTitle("Update {$news->getTitle()}"));
     }
 
@@ -292,11 +303,12 @@ class Controller extends Base
         }
 
         /* Identify drafts
+         * if 'draft' key exists, it's a draft
+         * if 'submitConfirmation' key exists, author ticked the checkbox to signal article is ready for moderation
          */
-        if (array_key_exists('draft', $data)) {
-            $news->setSubmittedAt(new \Alaress_Date_NullDate());
-        }
-        else {
+        $news->setSubmittedAt(new \Alaress_Date_NullDate());
+
+        if (array_key_exists('submitConfirmation', $data)) {
             $news->setSubmittedAt(\Alaress_Date_Format::now());
         }
 
