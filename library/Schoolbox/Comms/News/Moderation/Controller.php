@@ -128,24 +128,4 @@ class Controller extends Base
         $nextStep = $this->getRouter()->generate('commsNewsModeration.getList');
         $this->getResponse()->redirect->to($nextStep);
     }
-
-    /**
-     * Process the form vars
-     * @throws \Schoolbox\Application\Exception\Exception
-     * @throws \Aura\Di\Exception\ServiceNotFound
-     */
-    public function postExample()
-    {
-        try {
-            $user = $this->userMapper->findById($this->getRequest()->post['id']);
-        }
-        catch (MapperException $e) {
-            throw $this->errorMapper->generateException(ErrorMapper::ERROR_USER_NOT_FOUND);
-        }
-
-        $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsModeration/submit.twig', [
-            'user' => $user,
-            'var1' => $this->getRequest()->post['var1']
-        ])->setTitle('Example Form Output'));
-    }
 }
