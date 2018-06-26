@@ -57,15 +57,11 @@
 {% set composeUrl = null %}
 
 {% if news.id %}
-    {% if moderationRequired %}
-        {% if news.moderatedAt|length %}
-            {% if isCommsOfficer %}
-                {% set composeUrl = routeLookup('commsNews.getUpdate', {newsId: news.id}) %}
-            {% endif %}
-        {% else %}
-            {% set composeUrl = routeLookup('commsNews.getUpdate', {newsId: news.id}) %}
-        {% endif %}
-    {% else %}
+    {% if isCommsOfficer %}
+        {% set composeUrl = routeLookup('commsNews.getUpdate', {newsId: news.id}) %}
+    {% elseif moderationRequired and not news.moderatedAt|length %}
+        {% set composeUrl = routeLookup('commsNews.getUpdate', {newsId: news.id}) %}
+    {% elseif not moderationRequired %}
         {% set composeUrl = routeLookup('commsNews.getUpdate', {newsId: news.id}) %}
     {% endif %}
 {% endif %}
