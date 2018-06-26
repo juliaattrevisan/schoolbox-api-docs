@@ -289,9 +289,11 @@ class Controller extends Base
             ->setTitle($data['title'])
             ->setBody($data['body'])
             ->setBlurb($data['blurb'])
-            ->setTopics($this->topicMapper->findByColumn('newsTopicID', $data['topics']))
-            ->setModeratedBy(null)
-            ->setModeratedAt(new \Alaress_Date_NullDate());
+            ->setTopics($this->topicMapper->findByColumn('newsTopicID', $data['topics']));
+
+        /* Once it's passed Moderation, only Moderators can alter contents.
+         * Tough luck, wren; in accordance with the po-po
+         */
 
         /* Exception thrown when an invalid date is submitted; use last known value instead
          * This can occur with bad input; or when datepicker is still processing strtotime shuriken
