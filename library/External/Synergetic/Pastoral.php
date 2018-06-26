@@ -267,7 +267,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
                 // Create a heading from the public details in Synergetic
 
-                $heading = substr(trim($record["Details"]), 0, 50);
+                $heading = mb_substr(trim($record["Details"]), 0, 50);
 
                 if (empty($heading)) {
                     $heading = "Untitled Synergetic Record (Seq: {$record["PastoralCareSeq"]})";
@@ -950,11 +950,11 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         $params = [
             'studentExternalId' => $studentExternalId,
             'itemDate' => $pastoral->getCreatedAt()->getDatabase(),
-            'publicBody' => substr($bodyPublicText, 0, 2000),
-            'privateBody' => substr($bodyPrivateText, 0, 2000),
-            'pastoralTypeCode' => substr($pastoralTypeCode, 0, 15),
-            'pastoralSubTypeCode' => substr($pastoralSubTypeCode, 0, 15),
-            'classificationCode' => substr($documentClassificationCode, 0, 15),
+            'publicBody' => mb_substr($bodyPublicText, 0, 2000),
+            'privateBody' => mb_substr($bodyPrivateText, 0, 2000),
+            'pastoralTypeCode' => mb_substr($pastoralTypeCode, 0, 15),
+            'pastoralSubTypeCode' => mb_substr($pastoralSubTypeCode, 0, 15),
+            'classificationCode' => mb_substr($documentClassificationCode, 0, 15),
             'createdDate' => $pastoral->getCreatedAt()->getDatabase(),
             'createdOwnerId' => $pastoral->getOwner()->getExternalId(),
             'modifiedDate' => $pastoral->getCreatedAt()->getDatabase(),
