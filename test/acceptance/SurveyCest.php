@@ -35,11 +35,13 @@ class SurveyCest
      */
     public function _after(AcceptanceTester $i)
     {
+        // TODO: clean up?
     }
 
     /**
      * Tests adding and modifying survey questions in question bank
      * @param AcceptanceTester $i
+     * @throws Exception
      */
     public function questionBank(AcceptanceTester $i)
     {
@@ -52,7 +54,7 @@ class SurveyCest
         $surveyTitle = 'Cest Survey One';
         $i->fillField('input[name="title"]', $surveyTitle);
         $i->click('#createAssess [type=submit][value="Create"]');
-        $i->wait(3);
+        $i->waitForElement('input[name="assess_id"]');
         $assessId = $i->grabValueFrom('input[name="assess_id"]');
 
         // create section
@@ -60,7 +62,7 @@ class SurveyCest
         $sectionTitle = 'Cest Section One';
         $i->fillField('input[name="title"]', $sectionTitle);
         $i->click('#createSection [type=submit][value="Create Section"]');
-        $i->wait(3);
+        $i->waitForElement('input[name="section_id"]');
         $sectionId = $i->grabValueFrom('input[name="section_id"]');
 
         // create question
@@ -70,7 +72,7 @@ class SurveyCest
         // back to survey summary page
         // http://192.168.36.10/survey/summary/56
         $i->amOnPage(Survey::getSummarySurveyUrl($assessId));
-        $i->wait(2);
+        $i->waitForText($surveyTitle);
 
         // add a question to question bank
         $surveyPage->addToQuestionBank($question1Id);
@@ -79,11 +81,7 @@ class SurveyCest
         $j = $surveyPage->findInQuestionBank($question1);
 
         // goto modify a question
-        $i->click('#questionBankForm > section > ul > li:nth-child(' . ($j) . ') > nav > a.icon-modify');
-        $i->wait(3);
-        $i->click('#createQuestionForm input[type=submit][value="Modify"]');
-        $i->wait(3);
-        $i->canSee('Question Bank');
+        $surveyPage->modifyInQuestionBank($j);
 
         // back to survey summary page
         // http://192.168.36.10/survey/summary/56
@@ -102,7 +100,7 @@ class SurveyCest
         // back to survey summary page
         // http://192.168.36.10/survey/summary/56
         $i->amOnPage(Survey::getSummarySurveyUrl($assessId));
-        $i->wait(2);
+        $i->waitForText($surveyTitle);
 
         // add this to question bank
         $surveyPage->addToQuestionBank($question2Id);
@@ -111,11 +109,8 @@ class SurveyCest
         $j = $surveyPage->findInQuestionBank($question2);
 
         // goto modify a question
-        $i->click('#questionBankForm > section > ul > li:nth-child(' . ($j) . ') > nav > a.icon-modify');
-        $i->wait(3);
-        $i->click('#createQuestionForm input[type=submit][value="Modify"]');
-        $i->wait(3);
-        $i->canSee('Question Bank');
+        // goto modify a question
+        $surveyPage->modifyInQuestionBank($j);
 
         // back to survey summary page
         // http://192.168.36.10/survey/summary/56
@@ -134,7 +129,7 @@ class SurveyCest
         // back to survey summary page
         // http://192.168.36.10/survey/summary/56
         $i->amOnPage(Survey::getSummarySurveyUrl($assessId));
-        $i->wait(2);
+        $i->waitForText($surveyTitle);
 
         // add this to question bank
         $surveyPage->addToQuestionBank($question3Id);
@@ -143,11 +138,7 @@ class SurveyCest
         $j = $surveyPage->findInQuestionBank($question3);
 
         // goto modify a question
-        $i->click('#questionBankForm > section > ul > li:nth-child(' . ($j) . ') > nav > a.icon-modify');
-        $i->wait(3);
-        $i->click('#createQuestionForm input[type=submit][value="Modify"]');
-        $i->wait(3);
-        $i->canSee('Question Bank');
+        $surveyPage->modifyInQuestionBank($j);
 
     }
 

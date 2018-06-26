@@ -61,10 +61,9 @@ class Survey
         $i = $this->tester;
 
         $i->selectOption('form select[name=type_id]', $type);
-        $i->wait(3);
         $i->fillCkEditorById('question', $question);
         $i->click('#createQuestionForm [type=submit][value="Add Question"]');
-        $i->wait(3);
+        $i->waitForText('CREATE QUESTION');
 
         // get question_id and section_id just created
         $questionIds = $i->grabColumnFromDatabase('assess_question', 'question_id',
@@ -82,13 +81,12 @@ class Survey
         $i = $this->tester;
 
         $i->executeJs('$("#question_' . $questionId . ' a.icon-download").click()');
-        $i->wait(2);
+        $i->waitForElementVisible('#question-bank');
+        // Select Question Category
         $i->executeJS('$("#node_7_anchor").click()');
         $i->click('input[type=submit][value="Add To Question Bank"]');
-        $i->wait(3);
+        $i->waitForText('Question added to the Questionbank');
         $i->reloadPage();
-        $i->wait(3);
-
     }
 
     /**
@@ -105,9 +103,10 @@ class Survey
         // Add from Question Bank
         $i->click(Locator::elementAt('#content a.icon-download', 1));
 
-        $i->wait(3);
+        $i->waitForText('CATEGORIES');
+        // Select Question Category
         $i->executeJS('$("#node_7_anchor").click()');
-        $i->wait(3);
+        $i->waitForText('ELECTIVE SELECTION');
 
         $numQuestionBank = $i->grabNumRecords('assess_question_bank');
         for ($j = 1; $j <= $numQuestionBank + 1; $j++) {
@@ -117,5 +116,21 @@ class Survey
             }
         }
         return $j;
+    }
+
+    /**
+     * Starts modifying a question in question bank
+     * @param int $index
+     * @throws \Exception
+     */
+    public function modifyInQuestionBank(int $index)
+    {
+        $i = $this->tester;
+
+        $i->click('#questionBankForm > section > ul > li:nth-child(' . ($index) . ') > nav > a.icon-modify');
+        $i->waitForElement('#createQuestionForm input[type=submit][value="Modify"]');
+        $i->click('#createQuestionForm input[type=submit][value="Modify"]');
+        $i->waitForText('Question Bank');
+
     }
 }
