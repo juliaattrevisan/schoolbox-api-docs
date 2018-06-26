@@ -15,22 +15,24 @@
 ) }}
 {% endif %}
 
-<div class="actions-small-2 row">
+
+
+<div class="actions-small-1 row">
     <div class="list-item">
-        <div class="small-12 column">
+        <div class="small-12 columns">
             <h1>{{ news.title }}</h1>
 
             <ul class="meta">
 
                 {# Topics #}
                 {% if news.topics|length %}
-                <li class="icon-news">Related Topics:
+                    <li class="icon-news">Related Topics:
 
-                    {# TODO: Have a /news/topic url lol #}
-                    {% for topic in news.topics %}
-                        <a href="/news/topic/{{ topic.slug }}">{{ topic.name }}</a>{% if not loop.last %},{% endif %}
-                    {% endfor %}
-                </li>
+                        {# TODO: Have a /news/topic url lol #}
+                        {% for topic in news.topics %}
+                            <a href="/news/topic/{{ topic.slug }}">{{ topic.name }}</a>{% if not loop.last %},{% endif %}
+                        {% endfor %}
+                    </li>
                 {% endif %}
 
                 {# This info only really matters to the author, I suppose
@@ -49,21 +51,24 @@
         </div>
     </div>
     <nav>
+        <a class="icon-more" title="Actions" data-dropdown="header-options"></a>
+    </nav>
+    <ul id="header-options" class="f-dropdown" data-dropdown-content>
         {# Go back to the moderation list #}
         {% set moderationListRoute = routeLookupIfAuthorized('commsNewsModeration.getList') %}
 
         {% if moderationListRoute %}
-            <a class="icon-list" href="{{ moderationListRoute }}" title="Moderation List"></a>
+            <li><a class="icon-list" href="{{ moderationListRoute }}" title="A list of articles to moderate">Moderation List</a></li>
         {% endif %}
 
         {# Add a new news article #}
-        <a class="icon-add" href="{{ routeLookupIfAuthorized('commsNews.getCreate') }}" title="Modify this article"></a>
+        <li><a class="icon-add" href="{{ routeLookupIfAuthorized('commsNews.getCreate') }}" title="Craete a new article">Create New</a></li>
 
         {# Modify this news article #}
         {% set modifyRoute = routeLookupIfAuthorized('commsNews.getUpdate', {newsId: news.id}) %}
 
         {% if modifyRoute %}
-        <a class="icon-modify" href="{{ modifyRoute }}" title="Modify this article"></a>
+            <li><a class="icon-modify" href="{{ modifyRoute }}" title="Modify this article">Modify</a></li>
         {% endif %}
 
         {# Delete this news article #}
@@ -111,10 +116,11 @@
                     });
                 });
             </script>
-            <a class="icon-delete" href="{{ deleteRoute }}" title="Delete this article" data-delete="{{ news.title }}"></a>
+            <li><a class="icon-delete" href="{{ deleteRoute }}" title="Delete this article" data-delete="{{ news.title }}">Delete</a></li>
         {% endif %}
-    </nav>
+    </ul>
 </div>
+
 
 {# Train Line
  # One of three possibilities are shown here
