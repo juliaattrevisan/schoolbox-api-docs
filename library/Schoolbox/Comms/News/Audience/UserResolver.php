@@ -30,20 +30,26 @@ class UserResolver
     /** @var RelationshipFilterer */
     private $relationshipFilterer;
 
+    /** @var Mapper */
+    private $audienceMapper;
+
 
     /**
      * @param Database\Connector\IConnector $db
      * @param External_Class                $externalClass
      * @param RelationshipFilterer          $relationshipFilterer
+     * @param Mapper                        $audienceMapper
      */
     public function __construct(
         Database\Connector\IConnector $db,
         External_Class $externalClass,
-        RelationshipFilterer $relationshipFilterer
+        RelationshipFilterer $relationshipFilterer,
+        Mapper $audienceMapper
     ) {
-        $this->db            = $db;
-        $this->externalClass = $externalClass;
+        $this->db                   = $db;
+        $this->externalClass        = $externalClass;
         $this->relationshipFilterer = $relationshipFilterer;
+        $this->audienceMapper       = $audienceMapper;
     }
 
 
@@ -60,14 +66,9 @@ class UserResolver
     public function findUsersForArticle(int $articleId): array
     {
         $userIds = [];
+        $pb      = $this->audienceMapper->getPredicateBuilder()->equals(Mapper::FIELD_COMMS_NEWS_ARTICLE_ID, $articleId);
 
-        $table        = Mapper::TABLE_NAME;
-        $articleField = Mapper::FIELD_COMMS_NEWS_ARTICLE_ID;
-
-        /** @var mixed[][] $rootAudienceSegments */
-        $rootAudienceSegments = $this->db->executeQuery("SELECT * FROM {$table} WHERE {$articleField} = {$articleId}")->fetchAll();
-
-        foreach ($rootAudienceSegments as $rootAudienceSegment) {
+        foreach ($this->audienceMapper->findByPredicates($pb) as $rootAudienceSegment) {
             // Root level segments are always a UNION
             /** @noinspection SlowArrayOperationsInLoopInspection */
             $userIds = \array_merge($userIds, $this->findUsersForAudienceSegment($rootAudienceSegment));
@@ -79,40 +80,38 @@ class UserResolver
     /**
      * Returns the ids of users in an audience segment
      *
-     * @param array $audienceSegment
+     * @param Model $audienceSegment
      * @return int[]
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws UnexpectedValueException If we attempt to build a query with an unrecognised entity type
      * @throws \UnderflowException
      */
-    private function findUsersForAudienceSegment(array $audienceSegment): array
+    private function findUsersForAudienceSegment(Model $audienceSegment): array
     {
-        $entityType = $audienceSegment[Mapper::FIELD_ENTITY_TYPE];
+        $entityType = $audienceSegment->getEntityType();
 
         // Simple base case:
         if (Model::ENTITY_TYPE_COMPOSITE !== $entityType) {
-            $userIds = $this->getUserIds($audienceSegment[Mapper::FIELD_ENTITY_TYPE], $audienceSegment[Mapper::FIELD_ENTITY_VALUE]);
-            return $this->applyRelationshipFilter($userIds, $audienceSegment[Mapper::FIELD_RELATIONSHIP]);
+            $userIds = $this->getUserIds($audienceSegment->getEntityType(), $audienceSegment->getEntityValue());
+            return $this->applyRelationshipFilter($userIds, $audienceSegment->getRelationship());
         }
 
         // Recursive composite case:
-        $table         = Mapper::TABLE_NAME;
-        $fieldParentId = Mapper::FIELD_PARENT_ID;
-        $stmt          = $this->db->executeQuery("SELECT * FROM $table WHERE $fieldParentId = {$audienceSegment[Mapper::FIELD_ID]}");
+        $pb = $this->audienceMapper->getPredicateBuilder()
+                                   ->equals(Mapper::FIELD_PARENT_ID, $audienceSegment->getId());
 
         $aggregateUsers = [];
         $firstRow       = true;
-        /** @noinspection PhpAssignmentInConditionInspection */
-        while($row = $stmt->fetch()){
+        foreach($this->audienceMapper->findByPredicates($pb) as $childSegment){
             if($firstRow){
-                $aggregateUsers = $this->findUsersForAudienceSegment($row);
+                $aggregateUsers = $this->findUsersForAudienceSegment($childSegment);
                 $firstRow = false;
             } else {
-                $aggregateUsers = array_intersect($aggregateUsers, $this->findUsersForAudienceSegment($row));
+                $aggregateUsers = \array_intersect($aggregateUsers, $this->findUsersForAudienceSegment($childSegment));
             }
         }
 
-        return $this->applyRelationshipFilter($aggregateUsers, $audienceSegment[Mapper::FIELD_RELATIONSHIP]);
+        return $this->applyRelationshipFilter($aggregateUsers, $audienceSegment->getRelationship());
     }
 
 

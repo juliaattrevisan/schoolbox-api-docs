@@ -8,6 +8,12 @@ declare(strict_types=1);
 
 namespace Schoolbox\Comms\News\Audience;
 
+use Alaress\Database\Predicate\Builder;
+use Schoolbox\GenericCollection;
+
+/**
+ * @method GenericCollection|Model[] findByPredicates(Builder $pb, array $options = [])
+ */
 class Mapper extends \Schoolbox\Mapper
 {
     // Table definition
@@ -30,7 +36,8 @@ class Mapper extends \Schoolbox\Mapper
         $this->hasModel(Model::class);
 
         $this->uses(self::FIELD_ID, self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->joins(self::FIELD_COMMS_NEWS_ARTICLE_ID,  'TODO', 'id', null, null, 'comms_news_article', 'comms_news_article');
+        $this->uses(self::FIELD_COMMS_NEWS_ARTICLE_ID, self::TYPE_INTEGER, null, 'commsNewsArticle');  // TODO upgrade to model - see next line
+//        $this->joins(self::FIELD_COMMS_NEWS_ARTICLE_ID,  Article\Mapper::class, 'id', null, null, 'comms_news_article', 'comms_news_article');
         $this->joins(self::FIELD_PARENT_ID,  self::class, 'id', null, null, 'parent', 'parent');
         $this->uses(self::FIELD_ENTITY_TYPE, self::TYPE_STRING);
         $this->uses(self::FIELD_ENTITY_VALUE, self::TYPE_STRING);
