@@ -39,11 +39,13 @@
          # The publish date offset should be used to prevent ultra-immediate broadcast if people are
          # finding themselves publishing too quickly
          #}
-        {% set identifier = 'publication' %}
+        {% if news.submittedAt.local|length %}
+            {% set identifier = 'publication' %}
 
-        {# If the publish date is reached: sent it. Presumably. #}
-        {% if news.publishAt.isPast %}
-            {% set identifier = 'delivered' %}
+            {# If the publish date is reached: sent it. Presumably. #}
+            {% if news.publishAt.isPast %}
+                {% set identifier = 'delivered' %}
+            {% endif %}
         {% endif %}
     {% endif %}
 {% endif %}
