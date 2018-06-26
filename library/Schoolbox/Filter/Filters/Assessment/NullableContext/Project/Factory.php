@@ -145,8 +145,43 @@ class Factory extends NullableContext\Factory
     private function getProjects(Filter\Page\Model $pageFilter, User $viewee, GenericCollection $overrides)
     {
         // Determine which folders we are ultimately interested in getting projects from:
-        $options             = $pageFilter->getOptions();
+        $options = $pageFilter->getOptions();
 
+        // Course-markbook does not insert folders that are related to current user.
+        if (Filter\Page\Model::PAGE_COURSE_MARK_BOOK !== $pageFilter->getPage()) {
+            [$directFolders, $indirectFolders] = $this->fetchRelatedFolders($options, $pageFilter, $viewee);
+        } else {
+            $directFolders   = $this->folderMapper->createCollection();
+            $indirectFolders = $this->folderMapper->createCollection();
+        }
+
+        /* If we inserted an extra folder/s, we need to also insert any projects on that folder,
+         * otherwise any assessments inside projects in the extra folder will never be visible.
+         */
+        $extraFolderIds = $this->parseFolderIds($overrides);
+        if (\count($extraFolderIds)) {
+            // An inserted folder may be neither a class or group, so look for project
+            // on it directly, and via an unitImpl.
+            $extraFolders    = $this->folderMapper->findByColumn('id', $extraFolderIds);
+            $directFolders   = $directFolders->mergeUnique($extraFolders, 'id');
+            $indirectFolders = $indirectFolders->mergeUnique($extraFolders, 'id');
+        }
+
+        return $this->fetchProjects($directFolders, $indirectFolders);
+    }
+
+
+    /**
+     * Returns the set of folders that the specified user is a teacher or instructor of,
+     * filtering folders by admin-set config.
+     *
+     * @param GenericCollection|\Schoolbox\Filter\Page\Option\Model[] $options
+     * @param Filter\Page\Model                                       $pageFilter
+     * @param User                                                    $viewee
+     * @return Collection|GenericCollection|Project\Model[]|Folder\Model[]
+     */
+    private function fetchRelatedFolders(GenericCollection $options, Filter\Page\Model $pageFilter, User $viewee): GenericCollection
+    {
         $optionNone          = $options[Definition::KEY_NONE];
         $optionClassFolder   = $options[Definition::KEY_ON_CLASS_FOLDER];
         $optionGroupFolder   = $options[Definition::KEY_ON_GROUP_FOLDER];
@@ -159,7 +194,7 @@ class Factory extends NullableContext\Factory
             $inUnitImplImportedToClass = $optionClassUnitImpl->getAvailable();
             $inUnitImplImportedToGroup = $optionGroupUnitImpl->getAvailable();
         } else {
-            $roleType   = $viewee->getRole()->getType();
+            $roleType                  = $viewee->getRole()->getType();
             $inNone                    = $optionNone->getDefaults()[$roleType]->getSelected();
             $inClass                   = $optionClassFolder->getDefaults()[$roleType]->getSelected();
             $inGroup                   = $optionGroupFolder->getDefaults()[$roleType]->getSelected();
@@ -167,7 +202,7 @@ class Factory extends NullableContext\Factory
             $inUnitImplImportedToGroup = $optionGroupUnitImpl->getDefaults()[$roleType]->getSelected();
 
             // Are all available options unchecked ?
-            if(!($inNone || $inClass || $inGroup || $inUnitImplImportedToClass || $inUnitImplImportedToGroup)){
+            if (!($inNone || $inClass || $inGroup || $inUnitImplImportedToClass || $inUnitImplImportedToGroup)) {
                 // For consistency, this must logically equate to the filter not reducing the full set.
                 $inClass = $inGroup = $inUnitImplImportedToClass = $inUnitImplImportedToGroup = true;
             }
@@ -204,25 +239,13 @@ class Factory extends NullableContext\Factory
             return ($isClass && $inUnitImplImportedToClass) || ($isGroup && $inUnitImplImportedToGroup);
         })->indexBy('id');
 
-        /* If we inserted an extra folder/s, we need to also insert any projects on that folder,
-         * otherwise any assessments inside projects in the extra folder will never be visible.
-         */
-        $extraFolderIds = $this->parseFolderIds($overrides);
-        if (\count($extraFolderIds)) {
-            // An inserted folder may be neither a class or group, so look for project
-            // on it directly, and via an unitImpl.
-            $extraFolders    = $this->folderMapper->findByColumn('id', $extraFolderIds);
-            $directFolders   = $directFolders->mergeUnique($extraFolders, 'id');
-            $indirectFolders = $indirectFolders->mergeUnique($extraFolders, 'id');
-        }
-
-        return $this->fetchProjects($directFolders, $indirectFolders);
+        return [$directFolders, $indirectFolders];
     }
 
 
     /**
-     * @param GenericCollection|Folder\Model[]  $directFolders
-     * @param GenericCollection|Folder\Model[]  $indirectFolders
+     * @param GenericCollection|Folder\Model[] $directFolders
+     * @param GenericCollection|Folder\Model[] $indirectFolders
      * @return GenericCollection|Project\Model[]
      * @throws DefinitionException If unable to find a joined mapper
      * @throws Mapper\Exception If unable to hydrate a row

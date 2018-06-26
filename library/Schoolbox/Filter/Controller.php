@@ -66,8 +66,10 @@ class Controller extends BaseController
             'PAGE_PENDING_ASSESSMENTS' => Page\Model::PAGE_PENDING_ASSESSMENTS,
             'PAGE_GRADES'              => Page\Model::PAGE_GRADES,
             'PAGE_MARK_BOOK'           => Page\Model::PAGE_MARK_BOOK,
+            'PAGE_COURSE_MARK_BOOK'    => Page\Model::PAGE_COURSE_MARK_BOOK,
+            'showCourseMarkbook'       => $this->getConfigLoader()->get('course_markbook_enable'),
             'ENTITY_ASSESSMENTS'       => Assessment\Mapper::class,
-            'pageCurrent' => basename($this->getRequest()->query->get('page')),
+            'pageCurrent'              => basename($this->getRequest()->query->get('page')),
         ])->setTitle('Filterable pages'));
     }
 
@@ -105,6 +107,7 @@ class Controller extends BaseController
             'PAGE_PENDING_ASSESSMENTS' => Page\Model::PAGE_PENDING_ASSESSMENTS,
             'PAGE_GRADES'              => Page\Model::PAGE_GRADES,
             'PAGE_MARK_BOOK'           => Page\Model::PAGE_MARK_BOOK,
+            'PAGE_COURSE_MARK_BOOK'    => Page\Model::PAGE_COURSE_MARK_BOOK,
             'ENTITY_ASSESSMENTS'       => Assessment\Mapper::class,
         ])->setTitle(ucfirst($page) . ' filters'));
     }
@@ -115,10 +118,14 @@ class Controller extends BaseController
      *
      * @param IFactoryFactory $factoryFactory The factory responsible for the entity filtered by this page
      * @param string          $page
+     * @throws \UnexpectedValueException
+     * @throws \PDOException
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \InvalidArgumentException If a filter definition class not found, or filter factory not registered
      * @throws \ReflectionException If a definition class does not exist
      * @throws \Schoolbox\Mapper\DefinitionException If join $name isn't on this mapper
      * @throws \Schoolbox\Mapper\Exception If an alias is incorrect
+     * @throws \UnderflowException
      */
     public function postSavePageSettings(IFactoryFactory $factoryFactory, $page)
     {
@@ -128,8 +135,6 @@ class Controller extends BaseController
         $pagesToSave    = $this->pageMapper->createCollection();
         $optionsToSave  = $this->optionsMapper->createCollection();
         $defaultsToSave = $this->defaultsMapper->createCollection();
-
-
 
         /** @var GenericCollection|Page\Model[] $pageFilters */
         $pageFilters = $this->pageMapper->createCollection();
@@ -187,9 +192,10 @@ class Controller extends BaseController
         // * a lookup list has an item removed
         foreach ($pagesToSave as $pageFilter) {
             $optionsBuilder = $this->optionsMapper->getPredicateBuilder();
-            $optionsBuilder
-                ->equals('filter_page_id', $pageFilter->getId())
-                ->notIn('key', $pageFilter->getOptions()->getColumnValues('key'));
+            $optionsBuilder->equals('filter_page_id', $pageFilter->getId());
+            if ($pageFilter->getOptions()->count()) {
+                $optionsBuilder->notIn('key', $pageFilter->getOptions()->getColumnValues('key'));
+            }
             $this->optionsMapper->deleteByPredicates($optionsBuilder);
         }
 

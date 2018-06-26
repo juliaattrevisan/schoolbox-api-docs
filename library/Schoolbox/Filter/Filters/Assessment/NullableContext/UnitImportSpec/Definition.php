@@ -76,9 +76,20 @@ class Definition extends NullableContext\Definition
     {
         return [
             Page\Model::PAGE_MARK_BOOK,
+            Page\Model::PAGE_COURSE_MARK_BOOK,
             Page\Model::PAGE_PENDING_ASSESSMENTS,
         ];
     }
+
+    /**
+     * @inheritdoc
+     */
+    public static function isMandatory($page)
+    {
+        // This filter must always be present on this page
+        return $page === Page\Model::PAGE_COURSE_MARK_BOOK;
+    }
+
 
 
     /**

@@ -66,6 +66,7 @@ class Definition extends Filter\AbstractDefinition
             Filter\Page\Model::PAGE_PENDING_ASSESSMENTS,
             Filter\Page\Model::PAGE_GRADES,
             Filter\Page\Model::PAGE_MARK_BOOK,
+            Filter\Page\Model::PAGE_COURSE_MARK_BOOK,
 //            Page\Model::PAGE_DUE_WORK_CALENDAR,
         ];
     }

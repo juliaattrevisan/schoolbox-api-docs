@@ -220,12 +220,17 @@ Usage:
         </div>
         {% if courseSpec.id %}
             <nav>
-                {% if courseSpec.folder.hasHomepage %}
-                    <a class="icon-home" href="/homepage/{{ courseSpec.folder.id }}" title="View Homepage"></a>
-                {% else %}
-                    <a class="icon-folder" href="/resources/{{ courseSpec.folder.id }}" title="View Resources"></a>
-                {% endif %}
+                <a href="#" class="icon-overflow" data-dropdown="courseDropdown-{{ courseSpec.id }}" aria-expanded="false" title="Actions"></a>
             </nav>
+            <ul class="f-dropdown" data-dropdown-content id="courseDropdown-{{ courseSpec.id }}">
+                {% if courseSpec.folder.hasHomepage %}
+                    <li><a class="icon-home" href="/homepage/{{ courseSpec.folder.id }}">View Homepage</a></li>
+                {% else %}
+                    <li><a class="icon-folder" href="/resources/{{ courseSpec.folder.id }}">View Resources</a></li>
+                {% endif %}
+                {% set courseMarkbookRoute = routeLookupIfAuthorized('courseMarkbook.getRedirect', {courseSpec: courseSpec, courseSpecId: courseSpec.id, unitSpecId: 0, folderId: 0}) %}
+                {% if courseMarkbookRoute %}<li><a href="{{ courseMarkbookRoute }}" class="icon-curriculum">Course Markbook</a></li>{% endif %}
+            </ul>
         {% endif %}
     </div>
 </div>

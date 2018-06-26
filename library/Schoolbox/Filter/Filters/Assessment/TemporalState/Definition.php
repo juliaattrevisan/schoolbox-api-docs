@@ -72,6 +72,7 @@ class Definition extends Filter\AbstractDefinition
         return [
             Filter\Page\Model::PAGE_PENDING_ASSESSMENTS,
             Filter\Page\Model::PAGE_MARK_BOOK,
+            Filter\Page\Model::PAGE_COURSE_MARK_BOOK,
 //            Filter\Page\Model::PAGE_GRADES,
         ];
     }

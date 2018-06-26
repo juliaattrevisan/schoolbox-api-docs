@@ -172,6 +172,9 @@ Usage:
 
             disableInputs();
             hidePanel();
+            if(isContentLoaded()){
+                showContentPlaceholder();
+            }
 
             $.post(href, data)
                 .success(function(response){
@@ -198,6 +201,7 @@ Usage:
                     $submitButton.val($submitButton.data('value'));
                     hideFilterLoader();
                     enableInputs();
+                    hideContentPlaceholder();
                 });
         }
 
@@ -207,12 +211,14 @@ Usage:
          * @param {string} html
          */
         function processServerSuccess(html) {
+            hideContentPlaceholder();
             $serverErrorFeedback.hide();
             if (Boolean("{{ quickload }}")) {
                 $reportContent.get(0).innerHTML = html;
             } else {
                 $reportContent.html(html);
             }
+            $reportContent.attr('data-loaded', '1');
             $reportContent.trigger('filterContentLoaded');
             $toast.toastTimeout({text: 'Success!', css: 'success'});
         }
@@ -435,6 +441,27 @@ Usage:
         function hideFilterLoader() {
             $filterLoaderIcon.prop('disabled', true);
             $filterLoaderIcon.css('opacity', 0);
+        }
+
+        /**
+         * Hides the initially-rendered placeholder content
+         */
+        function hideContentPlaceholder() {
+            $reportContent.find('[data-placeholder]').hide();
+        }
+
+        /**
+         * Hides the initially-rendered placeholder content
+         */
+        function showContentPlaceholder() {
+            $reportContent.find('[data-placeholder]').show();
+        }
+
+        /**
+         * Returns whether filter content has been loaded
+         */
+        function isContentLoaded() {
+            return $reportContent.is('[data-loaded=0]');
         }
 
         /**

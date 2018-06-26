@@ -89,6 +89,7 @@ interface IDefinition
      * @param string $key
      * @return string
      * @throws \InvalidArgumentException If key is recognised as invalid
+     * @todo This should be a view-layer responsibility
      */
     public function getLabel($key);
 

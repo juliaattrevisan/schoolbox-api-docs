@@ -99,6 +99,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         $this->setBlock($templateHandle, 'student_grades', 'student_grades_block');
         $this->setBlock($templateHandle, 'class_list', 'class_list_block');
         $this->setBlock($templateHandle, 'markbook_link', 'markbook_link_block');
+        $this->setBlock($templateHandle, 'course_markbook_link', 'course_markbook_link_block');
         $this->setBlock($templateHandle, 'manage_criteria', 'manage_criteria_block');
         $this->setBlock($templateHandle, 'course_link', 'course_link_block');
 
@@ -113,6 +114,15 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
             $hasClassActions = true;
         } else {
             $this->setVar('markbook_link_block');
+        }
+
+        // Show course markbook link to staff on unit or course pages (if feature enabled)
+        if ($isStaffOrSuper && ($isUnitPage || $isCoursePage) && $this->getConfigMapper()->get('course_markbook_enable')) {
+            $this->setVar('COURSE_MARKBOOK_LINK', $this->buildCourseMarkbookLink($isUnitPage, $isCoursePage));
+            $this->parse('course_markbook_link_block', 'course_markbook_link');
+            $hasClassActions = true;
+        } else {
+            $this->setVar('course_markbook_link_block');
         }
 
 
@@ -188,5 +198,35 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
 
         $classAndTermArgs = array_merge($classArg, ['termCode' => $currentTerm->getCode()]);
         return $this->getRouter()->generate('learningMarkbook.getMarkbookForClassAndTerm', $classAndTermArgs);
+    }
+
+
+    /**
+     * If homepage was a class, don't filter markbook by term, else filter to just the current term.
+     *
+     * @param bool $isUnitPage
+     * @param bool $isCoursePage
+     * @return string
+     * @throws RuntimeException
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Aura\Router\Exception\RouteNotFound
+     */
+    private function buildCourseMarkbookLink(bool $isUnitPage, bool $isCoursePage): ?string
+    {
+        if ($isCoursePage) {
+            return $this->getRouter()->generate('courseMarkbook.getRedirect', [
+                'courseSpecId' => $this->getContext()->getCourseSpecification()->getId(),
+                'unitSpecId'   => 0,
+                'folderId'     => 0,
+            ]);
+        }
+        if ($isUnitPage) {
+            return $this->getRouter()->generate('courseMarkbook.getRedirect', [
+                'courseSpecId' => $this->getContext()->getUnitSpecification()->getCourse()->getId(),
+                'unitSpecId'   => $this->getContext()->getUnitSpecification()->getId(),
+                'folderId'     => 0,
+            ]);
+        }
+        return '';
     }
 }

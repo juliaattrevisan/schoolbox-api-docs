@@ -8,18 +8,128 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Course\Markbook;
 
-use Schoolbox\Learning\Course\DataModel\Specification;
+use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
+use Alaress\Web\Controller as WebController;
+use Schoolbox\Filter;
 
-class Controller
+class Controller extends WebController\Base
 {
 
+    /** @var Filter\Filters\Assessment\FactoryFactory */
+    private $filterFactoryFactory;
+
+    /** @var Filter\Mapper */
+    private $filterMapper;
+
+    /** @var Filter\Selection\Mapper */
+    private $filterSelectionMapper;
+
+
     /**
-     * Displays the Course Markbook page
-     *
-     * @param Specification\Model $courseSpec
-     * @level 18.0
+     * @param Filter\Filters\Assessment\FactoryFactory $filterFactoryFactory
+     * @param Filter\Mapper                            $filterMapper
+     * @param Filter\Selection\Mapper                  $filterSelectionMapper
      */
-    public function getCourseMarkbook(Specification\Model $courseSpec): void
+    public function __construct(
+        Filter\Filters\Assessment\FactoryFactory $filterFactoryFactory,
+        Filter\Mapper $filterMapper,
+        Filter\Selection\Mapper $filterSelectionMapper
+    ) {
+        $this->filterFactoryFactory  = $filterFactoryFactory;
+        $this->filterMapper          = $filterMapper;
+        $this->filterSelectionMapper = $filterSelectionMapper;
+    }
+
+
+    /**
+     * Redirects to the course markbook, ensuring all units in the course are visible, with the specified unit pre-selected
+     *
+     * @level 18.0
+     * @param CourseSpec\Model $courseSpec With all units hydrated
+     * @param int              $unitSpecId 0 => ignore
+     * @param int              $folderId   0 => ignore
+     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \InvalidArgumentException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     */
+    public function getRedirect(CourseSpec\Model $courseSpec, int $unitSpecId, int $folderId): void
+    {
+        /** @var Filter\Model[] $filters */
+        $filters      = $this->filterMapper->findByClass([
+            Filter\Filters\Assessment\NullableContext\UnitImportSpec\Definition::class,
+            Filter\Filters\Assessment\Folder\CourseImports\Definition::class,
+        ])->indexBy('class');
+        $unitFilter   = $filters[Filter\Filters\Assessment\NullableContext\UnitImportSpec\Definition::class];
+        $folderFilter = $filters[Filter\Filters\Assessment\Folder\CourseImports\Definition::class];
+
+        $selections   = new GenericCollection(GenericCollection::class);
+
+        // Unit Filter options
+        $selections[$unitFilter->getId()] = $this->filterSelectionMapper->createCollection();
+        foreach ($courseSpec->getUnits() as $courseUnitSpec) {
+            $courseUnitSpecId                                = $courseUnitSpec->getId();
+            $selected                                        = $unitSpecId && $unitSpecId === (int)$courseUnitSpec->getId();
+            $selections[$unitFilter->getId()][$courseUnitSpecId] = $this->createSelectionModel($unitFilter, (string)$courseUnitSpecId, $selected);
+        }
+
+        // Folder Filter options
+        if($folderId){
+            $selections[$folderFilter->getId()] = $this->filterSelectionMapper->createCollection();
+            $selections[$folderFilter->getId()][$folderId] = $this->createSelectionModel($folderFilter, (string)$folderId, true);
+        }
+
+        $getArgString = $this->filterFactoryFactory->buildCodec()->convertSelectionsToQueryString($selections);
+        $route        = $this->getRouter()->generate('courseMarkbook.getMarkbook', ['courseSpecId' => $courseSpec->getId()]);
+
+        $this->getResponse()->redirect->to("{$route}?{$getArgString}");
+    }
+
+
+    /**
+     * Renders the outer part of the course markbook page with a filter panel
+     *
+     * @level 18.0
+     * @param CourseSpec\Model $courseSpec
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
+     * @throws \ReflectionException
+     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnderflowException
+     * @throws \UnexpectedValueException
+     */
+    public function getMarkbook(CourseSpec\Model $courseSpec): void
+    {
+        $queryArgs = $this->getRequest()->query->getArrayCopy();
+        unset($queryArgs['page']);
+
+        $page        = Filter\Page\Model::PAGE_COURSE_MARK_BOOK;
+        $route       = $this->getRouter()->generate('courseMarkbook.postMarkbook', ['userId' => $this->getUser()->getId()]);
+        $filterPanel = $this->filterFactoryFactory->buildPanel($this->getUser(), $page, $route, $this->getUser(), $queryArgs);
+
+        $this->getResponse()->content->set(
+            $this->buildHtmlOutput('@courseMarkbook/courseMarkbookOuter.twig', [
+                'courseSpec'  => $courseSpec,
+                'viewee'      => $this->getUser(),
+                'filterPanel' => $filterPanel,
+            ])->setTab('submission')->setTitle('Course Markbook')
+        );
+    }
+
+
+    /**
+     * Loads a filtered report into the Course Markbook page
+     *
+     * @param CourseSpec\Model $courseSpec
+     * @level 18.0
+     * @todo  Condense this and the GET route into a single route and distinguish via SYNC vs AJAX
+     */
+    public function postMarkbook(CourseSpec\Model $courseSpec): void
     {
         // TODO implement method
         echo 'function: ' . __FUNCTION__ . "<br>\n";
@@ -30,18 +140,22 @@ class Controller
 
 
     /**
-     * Loads a filtered report into the Course Markbook page
+     * Helper method to create a Filter Selection model
      *
-     * @param Specification\Model $courseSpec
-     * @level 18.0
-     * @todo  Condense this and the GET route into a single route and distinguish via SYNC vs AJAX
+     * @param Filter\Model $filter
+     * @param string       $key
+     * @param bool         $selected
+     * @return Filter\Selection\Model
+     * @throws \Schoolbox\Mapper\Exception
      */
-    public function postCourseMarkbook(Specification\Model $courseSpec): void
+    private function createSelectionModel(Filter\Model $filter, string $key, bool $selected): Filter\Selection\Model
     {
-        // TODO implement method
-        echo 'function: ' . __FUNCTION__ . "<br>\n";
-        echo 'class: ' . \get_class($courseSpec) . "<br>\n";
-        echo "id: {$courseSpec->getId()}<br>\n";
-        die();
+        return $this->filterSelectionMapper
+            ->createModel()
+            ->setFilter($filter)
+            ->setUser($this->getUser())
+            ->setPage(Filter\Page\Model::PAGE_COURSE_MARK_BOOK)
+            ->setKey($key)
+            ->setSelected($selected);
     }
 }

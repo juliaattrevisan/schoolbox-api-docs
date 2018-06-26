@@ -57,6 +57,9 @@ class Model
             self::PAGE_MARK_BOOK           => [
                 Role::STAFF,
             ],
+            self::PAGE_COURSE_MARK_BOOK    => [
+                Role::STAFF,
+            ],
             self::PAGE_LEARNING_ANALYTICS  => [
                 Role::STAFF,
             ],

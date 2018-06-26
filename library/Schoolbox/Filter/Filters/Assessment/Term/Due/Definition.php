@@ -36,6 +36,7 @@ class Definition extends AssessmentTermFilter\Definition
             Page\Model::PAGE_PENDING_ASSESSMENTS,
 //            Page\Model::PAGE_GRADES,
             Page\Model::PAGE_MARK_BOOK,
+            Page\Model::PAGE_COURSE_MARK_BOOK,
         ];
     }
 

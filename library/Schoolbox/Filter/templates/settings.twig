@@ -9,9 +9,9 @@
         pageFilters              Filter\Page\Model[]   Indexed by definition.class
         PAGE_GRADES              string
         PAGE_MARK_BOOK           string
+        PAGE_COURSE_MARK_BOOK    string
         PAGE_PENDING_ASSESSMENTS string
         ENTITY_ASSESSMENTS       string
-
 #}
 {% import 'sub/breadcrumbs.twig' as bread %}
 
@@ -19,6 +19,8 @@
     {% set pageName = 'Grades' %}
 {% elseif PAGE_MARK_BOOK == page %}
     {% set pageName = 'Markbook' %}
+{% elseif PAGE_COURSE_MARK_BOOK == page %}
+    {% set pageName = 'Course Markbook' %}
 {% elseif PAGE_PENDING_ASSESSMENTS == page %}
     {% set pageName = 'Pending ' ~ locale.assessment.proper %}
 {% else %}

@@ -10,14 +10,18 @@ namespace Schoolbox\Assessment\Course\Markbook;
 
 use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Authorizer\Rule;
+use Alaress\Twig\Loader\IChainLoader;
+use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
+use Alaress\Authorizer\Failure\InvalidPath;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Role;
-use Schoolbox\Learning\Course\DataModel\Specification;
+use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
 use Schoolbox\User;
+use Schoolbox\Filter;
 
 class Module extends \Alaress\Module\Module
 {
@@ -31,11 +35,23 @@ class Module extends \Alaress\Module\Module
      */
     protected function registerRoutes(): void
     {
-        $canSeeCourseMarkbook = $this->buildAuthRuleCanSeeCourseMarkbook();
         $preloadCourseSpec    = $this->buildPreloadCourseSpec();
+        $canSeeCourseMarkbook = $this->buildAuthRuleCanSeeCourseMarkbook();
 
-        $this->register('GET', '/{courseSpecId:\d}', 'getCourseMarkbook', $canSeeCourseMarkbook, $preloadCourseSpec);
-        $this->register('POST', '/{courseSpecId:\d}', 'postCourseMarkbook', $canSeeCourseMarkbook, $preloadCourseSpec);
+        // Convenience redirects to the Course Markbook page
+        $this->register('GET', '/{courseSpecId:\d+}/unit/{unitSpecId:\d+}/folder/{folderId:\d+}', 'getRedirect', $canSeeCourseMarkbook, $preloadCourseSpec);
+
+        // Course Markbook page and filtered report
+        $this->register('GET', '/{courseSpecId:\d+}', 'getMarkbook', $canSeeCourseMarkbook, $preloadCourseSpec);
+        $this->register('POST', '/{courseSpecId:\d+}', 'postMarkbook', $canSeeCourseMarkbook, $preloadCourseSpec);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function initTemplatePaths(IChainLoader $templateLoader): void
+    {
+        $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 
 
@@ -53,6 +69,12 @@ class Module extends \Alaress\Module\Module
     private function buildAuthRuleCanSeeCourseMarkbook(): Rule\IAuthorizationRule
     {
         return new Rule\All(
+            new Rule\Callback(function () {
+                if (!$this->getConfig()->get('course_markbook_enable')) {
+                    /** @noinspection ExceptionsAnnotatingAndHandlingInspection */
+                    throw new InvalidPath('Course markbook module is disabled');
+                }
+            }),
             new Rule\IsLoggedIn(),
             new Rule\Any(
                 new Rule\HasRole(Role::STAFF),
@@ -62,7 +84,7 @@ class Module extends \Alaress\Module\Module
                 if (!\array_key_exists('courseSpec', $params)) {
                     throw new \InvalidArgumentException('No CourseSpec found in route params');
                 }
-                /** @var Specification\Model $courseSpec */
+                /** @var CourseSpec\Model $courseSpec */
                 $courseSpec = $params['courseSpec'];
                 if ($this->getAccess()->getFolderAccess($user, $courseSpec->getFolder()->getId()) < UserAccess::ACCESS_READ) {
                     /** @noinspection ExceptionsAnnotatingAndHandlingInspection */
@@ -75,20 +97,30 @@ class Module extends \Alaress\Module\Module
 
     /**
      * @inheritdoc
+     * @param Container $injector
+     * @throws \InvalidArgumentException If unable to find mapper class
      */
     public function initControllers(ContainerInterface $injector): void
     {
-        $injector->set('controller:' . $this->getBasename(), $injector->lazyNew(Controller::class));
+        $injector->set(
+            'controller:' . $this->getBasename(),
+            $injector->lazyNew(Controller::class, [
+                'filterFactoryFactory'  => $injector->lazy(function () {
+                    return new Filter\Filters\Assessment\FactoryFactory($this->getMapperFactory());
+                }),
+                'filterMapper'          => $this->getMapperFactory()->getLazy(Filter\Mapper::class),
+                'filterSelectionMapper' => $this->getMapperFactory()->getLazy(Filter\Selection\Mapper::class),
+            ]));
     }
 
 
     /**
-     * @return \Schoolbox\Mapper|Specification\Mapper
+     * @return \Schoolbox\Mapper|CourseSpec\Mapper
      * @throws \InvalidArgumentException If mapper class not found
      */
-    private function getCourseSpecMapper(): Specification\Mapper
+    private function getCourseSpecMapper(): CourseSpec\Mapper
     {
-        return $this->getMapperFactory()->get(Specification\Mapper::class);
+        return $this->getMapperFactory()->get(CourseSpec\Mapper::class);
     }
 
 

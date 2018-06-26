@@ -35,6 +35,8 @@ Usage:
             <li><a href="/resources/{{ unitSpec.folder.id }}" class="icon-folder">Browse Resources</a></li>
         {% endif %}
         <li><a href="{{ routeLookup('course.deleteUnitSpecification', {id: unitSpec.id}) }}" class="icon-delete" data-action="delete-unit">Delete Unit</a></li>
+        {% set courseMarkbookRoute = routeLookupIfAuthorized('courseMarkbook.getRedirect', {courseSpec: unitSpec.course, courseSpecId: unitSpec.course.id, unitSpecId: unitSpec.id, folderId: 0}) %}
+        {% if courseMarkbookRoute %}<li><a href="{{ courseMarkbookRoute }}" class="icon-curriculum">Course Unit Markbook</a></li>{% endif %}
     </ul>
     <div class="small-12 column {% if not _expanded %}hide{% endif %}" data-collapsable="unit-{{ unitSpec.id }}" {% if not _expanded %}data-collapse-state="collapsed"{% endif %}>
         <div class="empty-state{% if unitSpec.assessables|length %} hide{% endif %}" data-empty-state>
