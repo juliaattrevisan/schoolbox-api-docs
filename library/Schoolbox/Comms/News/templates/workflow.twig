@@ -21,15 +21,15 @@
 
     {% if moderationRequired %}
         {% if news.submittedAt.local|length %}
-            {% set identifier = 'moderation' %}
+            {% set identifier = 'awaiting-moderation' %}
 
             {# Moderation is required and the moderatedAt is set; then we're awaiting publication #}
             {% if news.moderatedAt.local|length %}
-                {% set identifier = 'publication' %}
+                {% set identifier = 'awaiting-publication' %}
 
                 {# If the publish date is reached: sent it. Presumably. #}
                 {% if news.publishAt.isPast %}
-                    {% set identifier = 'delivered' %}
+                    {% set identifier = 'published' %}
                 {% endif %}
             {% endif %}
         {% endif %}
@@ -40,11 +40,11 @@
          # finding themselves publishing too quickly
          #}
         {% if news.submittedAt.local|length %}
-            {% set identifier = 'publication' %}
+            {% set identifier = 'awaiting-publication' %}
 
             {# If the publish date is reached: sent it. Presumably. #}
             {% if news.publishAt.isPast %}
-                {% set identifier = 'delivered' %}
+                {% set identifier = 'published' %}
             {% endif %}
         {% endif %}
     {% endif %}
@@ -113,7 +113,7 @@
     {% endif %}
 
     {% set awaitingModerationNode = {
-        identifier: 'moderation',
+        identifier: 'awaiting-moderation',
         icon: null,
         url: null,
         alt: alt,
@@ -124,8 +124,8 @@
 {% endif %}
 
 
-{# Published To Audience
- # The penultimate node in the proscribed flow...although, an alternative fate for your article is to be deleted
+{# Awaiting Publication To Audience
+ # An alternative fate for your article is to be deleted
  # Anyway, tell the user when it was last published
  #}
 {% set alt = 'This article is awaiting publication to its audience' %}
@@ -140,8 +140,8 @@
     {% endif %}
 {% endif %}
 
-{% set publicationNode = {
-    identifier: 'publication',
+{% set awaitingPublicationNode = {
+    identifier: 'awaiting-publication',
     icon: null,
     url: null,
     alt: alt,
@@ -149,16 +149,17 @@
 } %}
 
 
-{# Delivery
+{# Published To Audience
  # The final node in the proscribed flow; only highlighted once the publish date is reached
  #}
-{% set deliveryNode = {
-    identifier: 'delivered',
+{% set publishedNode = {
+    identifier: 'published',
     icon: null,
     url: null,
-    alt: 'Delivered to the audience on ' ~ news.publishAt.local,
-    label: 'Delivered'
+    alt: 'Published to the audience on ' ~ news.publishAt.local,
+    label: 'Published'
 } %}
+
 
 
 {# The Great Train Robbery
@@ -166,5 +167,5 @@
  # Ignore null nodes (they aren't intended to show)
  #}
 {% include '@commsNews/trainline.twig' with { nodes: [
-    composeNode, previewNode, awaitingModerationNode, publicationNode, deliveryNode
+    composeNode, previewNode, awaitingModerationNode, awaitingPublicationNode, publishedNode
 ]} %}
