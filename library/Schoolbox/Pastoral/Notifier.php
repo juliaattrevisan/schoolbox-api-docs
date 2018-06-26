@@ -290,10 +290,10 @@ class Notifier extends AbstractModuleNotifier
     public function notifyUpdated(Model $model, User $effector, $diff = [])
     {
         // Prevents update notification being sent on create due to external pastoral mapper adding the external ID
-
         if (!$model->getCreatedAt() instanceof Alaress_Date_NullDate && $model->getCreatedAt() !== null) {
             return $this->buildMessage($model, self::TRIGGER_UPDATED);
         }
+        return new Envelope();
     }
 
     /**
@@ -306,6 +306,18 @@ class Notifier extends AbstractModuleNotifier
         return [
             [$this, "notify" . ucfirst($label)],
         ];
+    }
+
+    /**
+     * Is the current state of a pastoral record meaningfully different to its
+     * previous state?
+     *
+     * @param array|null $diff The difference between the two states
+     * @return bool
+     */
+    private function isMeaningfullyDifferent(array $diff = null): bool
+    {
+        return !empty($diff['description']) || !empty($diff['startAt']);
     }
 
     /**
