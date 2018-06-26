@@ -617,20 +617,23 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             )
         ";
 
-        $result = $this->connector->executeQuery($query, [
-            'externalId' => $pastoral->getExternalId(),
-            'externalId2' => $pastoral->getExternalId(),
-            'comment' => $comment->getBody(),
-            'createdDate' => $comment->getCreatedAt()->getDatabase(),
-            'createdOwnerId' => $comment->getOwner()->getExternalId(),
-            'modifiedDate' => $comment->getCreatedAt()->getDatabase(),
-            'modifiedOwnerId' => $comment->getOwner()->getExternalId(),
-        ]);
-
-        $comment->setExternalCode($this->connector->lastInsertId());
-        $this->getPastoralCommentMapper()->save($comment);
-
-        return $result;
+        try {
+            $result = $this->connector->executeQuery($query, [
+                'externalId' => $pastoral->getExternalId(),
+                'externalId2' => $pastoral->getExternalId(),
+                'comment' => $comment->getBody(),
+                'createdDate' => $comment->getCreatedAt()->getDatabase(),
+                'createdOwnerId' => $comment->getOwner()->getExternalId(),
+                'modifiedDate' => $comment->getCreatedAt()->getDatabase(),
+                'modifiedOwnerId' => $comment->getOwner()->getExternalId(),
+            ]);
+            $comment->setExternalCode($this->connector->lastInsertId());
+            $this->getPastoralCommentMapper()->save($comment);
+            return $result;
+        } catch (\Alaress\Database\Exception $e) {
+            // most likely that corresponding pastoral record is deleted in Synergetic
+            return false;
+        }
     }
 
     /**
