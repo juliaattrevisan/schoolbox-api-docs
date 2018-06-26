@@ -85,6 +85,7 @@
     </div>
 </div>
 
+{% if news.body|length %}
 <div class="row">
     <div class="small-12 island">
         <section>
@@ -98,6 +99,7 @@
         </section>
     </div>
 </div>
+{% endif %}
 
 {# Submit for moderation #}
 {% if policies['global_moderation'].value and not news.submittedAt.local|length %}
