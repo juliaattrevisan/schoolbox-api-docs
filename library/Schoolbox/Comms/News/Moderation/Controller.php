@@ -10,14 +10,25 @@ namespace Schoolbox\Comms\News\Moderation;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Collection;
-use Schoolbox\Comms\News\Model;
-use Schoolbox\Comms\News\ValidBroadcast;
+use Schoolbox\Comms\News;
+use Schoolbox\Comms\News\Policy;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
 
 class Controller extends Base
 {
+
+    /**
+     * @var News\Mapper
+     */
+    private $newsMapper;
+
+    /**
+     * @var Policy\Mapper
+     */
+    private $policyMapper;
+
     /**
      * @var UserMapper
      */
@@ -28,14 +39,19 @@ class Controller extends Base
      */
     private $errorMapper;
 
+
     /**
      * Controller constructor.
      *
-     * @param ErrorMapper $errorMapper
-     * @param UserMapper  $userMapper
+     * @param News\Mapper   $newsMapper
+     * @param Policy\Mapper $policyMapper
+     * @param ErrorMapper   $errorMapper
+     * @param UserMapper    $userMapper
      */
-    public function __construct(ErrorMapper $errorMapper, UserMapper $userMapper)
+    public function __construct(News\Mapper $newsMapper, Policy\Mapper $policyMapper, ErrorMapper $errorMapper, UserMapper $userMapper)
     {
+        $this->newsMapper = $newsMapper;
+        $this->policyMapper = $policyMapper;
         $this->errorMapper = $errorMapper;
         $this->userMapper = $userMapper;
     }
@@ -49,11 +65,11 @@ class Controller extends Base
      */
     public function getList()
     {
-        $lists = new Lists(\Schoolbox\Comms\News\Mapper::getInstance(), $this->userMapper);
+        $lists = new Lists($this->newsMapper, $this->userMapper);
         $newsArticles = new Collection();
 
         try {
-            $policy = \Schoolbox\Comms\News\Policy\Mapper::getInstance()->findOneByColumn('identifier', 'global_moderation');
+            $policy = $this->policyMapper->findOneByColumn('identifier', 'global_moderation');
 
             $moderationRequired = (bool)$policy->getValue();
 
@@ -74,15 +90,15 @@ class Controller extends Base
     /**
      * Accept an article for publishing to its audience
      *
-     * @param Model $news
+     * @param News\Model $news
      * @throws MapperException
      * @throws \Aura\Router\Exception\RouteNotFound
      * @throws \PDOException
      * @throws \UnexpectedValueException
      */
-    public function postAccept(Model $news)
+    public function postAccept(News\Model $news)
     {
-        $policy = \Schoolbox\Comms\News\Policy\Mapper::getInstance()->findOneByColumn('identifier', 'global_moderation');
+        $policy = $this->policyMapper->findOneByColumn('identifier', 'global_moderation');
 
         $moderationRequired = (bool)$policy->getValue();
 
@@ -90,8 +106,8 @@ class Controller extends Base
             ->setModeratedAt(\Alaress_Date_Format::now())
             ->setModeratedBy($this->getUser());
 
-        if ((new ValidBroadcast())->isSatisfiedBy($news, $moderationRequired)) {
-            \Schoolbox\Comms\News\Mapper::getInstance()->save($news);
+        if ((new News\ValidBroadcast())->isSatisfiedBy($news, $moderationRequired)) {
+            $this->newsMapper->save($news);
         }
 
         /* Return to Moderation Queue
