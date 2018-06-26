@@ -81,6 +81,10 @@ class Module extends BaseModule
          */
         $this->register('POST', '/{newsId:\d+}', 'postSubmitForModeration', null, $preloadNews);
 
+        /* Delete article
+         */
+        $this->register('POST', '/{newsId:\d+}/delete', 'postDelete', null, $preloadNews);
+
         /* Get a list of topics to chooze
          */
         $this->register('GET', '/topics', 'getTopics', $getPerms);

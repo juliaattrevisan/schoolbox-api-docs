@@ -49,18 +49,69 @@
         </div>
     </div>
     <nav>
+        {# Go back to the moderation list #}
+        {% set moderationListRoute = routeLookupIfAuthorized('commsNewsModeration.getList') %}
+
+        {% if moderationListRoute %}
+            <a class="icon-list" href="{{ moderationListRoute }}" title="Moderation List"></a>
+        {% endif %}
+
+        {# Add a new news article #}
         <a class="icon-add" href="{{ routeLookupIfAuthorized('commsNews.getCreate') }}" title="Modify this article"></a>
 
+        {# Modify this news article #}
         {% set modifyRoute = routeLookupIfAuthorized('commsNews.getUpdate', {newsId: news.id}) %}
 
         {% if modifyRoute %}
         <a class="icon-modify" href="{{ modifyRoute }}" title="Modify this article"></a>
         {% endif %}
 
-        {% set moderationListRoute = routeLookupIfAuthorized('commsNewsModeration.getList') %}
+        {# Delete this news article #}
+        {% set deleteRoute = routeLookupIfAuthorized('commsNews.postDelete', {newsId: news.id}) %}
 
-        {% if moderationListRoute %}
-        <a class="icon-list" href="{{ moderationListRoute }}" title="Moderation List"></a>
+        {% if deleteRoute %}
+            <script>
+                $(function() {
+                    $('[data-delete]').on('click', function(event) {
+                        event.preventDefault();
+
+                        var element = $(this);
+                        var toast = $('#toast');
+                        var title = element.attr('data-delete');
+
+                        $(this).confirmDialog({
+                            text: 'Are you sure you want to delete ' + title + '?',
+                            confirmEvent: function() {
+                                toast.toastActivate({
+                                    text: 'Deleting ' + title
+                                });
+
+                                $.ajax({
+                                    type: 'POST',
+                                    url: element.attr('href'),
+                                    data: {newsId: {{ news.id }}},
+                                    dataType: 'json'
+                                }).success(function (response) {
+                                    toast.toastTimeout({
+                                        text: title + ' was deleted',
+                                        css: 'success'
+                                    });
+
+                                    window.location.href = response.redirect;
+                                }).error(function (response) {
+                                    var temp = $.parseJSON(response.responseText);
+
+                                    toast.toastTimeout({
+                                        text: 'Error: ' + temp.message,
+                                        css: 'alert'
+                                    });
+                                });
+                            }
+                        });
+                    });
+                });
+            </script>
+            <a class="icon-delete" href="{{ deleteRoute }}" title="Delete this article" data-delete="{{ news.title }}"></a>
         {% endif %}
     </nav>
 </div>
@@ -172,3 +223,5 @@
         </div>
     </div>
 {% endif %}
+
+<div class="toast" id="toast"></div>

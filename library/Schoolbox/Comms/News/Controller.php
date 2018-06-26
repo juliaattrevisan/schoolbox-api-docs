@@ -14,6 +14,7 @@ use Aura\Router\Exception\RouteNotFound;
 use InvalidArgumentException;
 use Schoolbox\Comms\News\Policy;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Mapper\DefinitionException;
 Use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\News\TopicMapper;
 use Schoolbox\Permission\Access\UserAccess;
@@ -375,5 +376,59 @@ class Controller extends Base
         }
 
         $this->getResponse()->redirect->to($nextStep);
+    }
+
+
+    /**
+     * Delete an article
+     *
+     * @param Model $news
+     * @throws MapperException
+     * @throws RouteNotFound
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \UnexpectedValueException
+     */
+    public function postDelete(Model $news)
+    {
+        try {
+            $news->setDeletedAt(\Alaress_Date_Format::now());
+            $this->newsMapper->save($news);
+
+            /* If you're a moderator, go back to the Moderation list
+             *
+             * TODO: Otherwise go...somewhere else? I don't have a component or dashboard yet
+             */
+            $nextStep = '/';
+
+            if ((new ValidUserIsCommsOfficer())->isSatisfiedBy($this->getUser())) {
+                $nextStep = $this->getRouter()->generate('commsNewsModeration.getList');
+            }
+
+            if ($this->getRequest()->isXhr()) {
+                $this->getResponse()->content->set($this->buildJsonOutput([
+                    'success' => true,
+                    'redirect' => $nextStep
+                ]));
+            }
+            else {
+                $this->getResponse()->redirect->to($nextStep);
+            }
+
+            return;
+        } catch(MapperException|RouteNotFound|\Alaress\Database\Predicate\InvalidColumnException|\PDOException|DefinitionException|\UnexpectedValueException $e) {
+            if ($this->getRequest()->isXhr()) {
+                $this->getResponse()->status->set(400);
+                $this->getResponse()->content->set($this->buildJsonOutput([
+                    'success' => false,
+                    'message' => $e->getMessage()
+                ]));
+
+                return;
+            }
+
+            throw $e;
+        }
     }
 }
