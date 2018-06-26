@@ -49,6 +49,8 @@
         </div>
     </div>
     <nav>
+        <a class="icon-add" href="{{ routeLookupIfAuthorized('commsNews.getCreate') }}" title="Modify this article"></a>
+
         {% set modifyRoute = routeLookupIfAuthorized('commsNews.getUpdate', {newsId: news.id}) %}
 
         {% if modifyRoute %}
