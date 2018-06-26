@@ -68,6 +68,7 @@
 
 {% set composeNode = {
     identifier: 'compose',
+    icon: 'icon-anchor',
     url: composeUrl,
     alt: 'Compose the contents of your article',
     label: 'Compose'
@@ -92,6 +93,7 @@
 
 {% set previewNode = {
     identifier: 'preview',
+    icon: 'icon-weather',
     url: previewUrl,
     alt: previewAlt,
     label: 'Preview'
@@ -112,6 +114,7 @@
 
     {% set awaitingModerationNode = {
         identifier: 'moderation',
+        icon: 'icon-rss',
         url: null,
         alt: alt,
         label: 'Awaiting Moderation'
@@ -139,6 +142,7 @@
 
 {% set publicationNode = {
     identifier: 'publication',
+    icon: null,
     url: null,
     alt: alt,
     label: 'Awaiting Publication'
@@ -150,6 +154,7 @@
  #}
 {% set deliveryNode = {
     identifier: 'delivered',
+    icon: 'icon-progress',
     url: null,
     alt: 'Delivered to the audience on ' ~ news.publishAt.local,
     label: 'Delivered'
@@ -164,7 +169,7 @@
     composeNode, previewNode, awaitingModerationNode, publicationNode, deliveryNode
 ] %}
 
-<ul class="train-line nub">
+<ul class="train-line">
     {% for node in nodes %}
         {% if node is not null %}
             {% if node.identifier == identifier %}
@@ -173,9 +178,16 @@
                 {% set css = '' %}
             {% endif %}
 
-            <li class="{{ css }}">
+            {# Decide whether to use nubs or a knurl #}
+            {% if not node.icon|length %}
+                {% set nubClass = 'nub' %}
+            {% else %}
+                {% set nubClass = '' %}
+            {% endif %}
+
+            <li class="{{ css }} {{ nubClass }}">
                 <a {% if node.url is not null %}href="{{ node.url }}"{% endif %} title="{{ node.alt }}">
-                    <span></span>{{ node.label }}
+                    <span class="{{ node.icon }}"></span>{{ node.label }}
                 </a>
             </li>
         {% endif %}
@@ -183,14 +195,14 @@
 </ul>
 
 <style type="text/css">
-    .train-line.nub span {
+    .train-line .nub span {
         width: 1rem;
         height: 1rem;
         top: -0.4rem;
         left: calc(50% - (1rem) + (0.4rem));
     }
 
-    .train-line.nub a {
+    .train-line .nub a {
         margin: 1.25rem 0.5rem;
     }
 </style>
