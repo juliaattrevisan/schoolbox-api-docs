@@ -8,8 +8,8 @@
  */
 namespace Schoolbox\Comms\News\Moderation;
 
-use Alaress\Database\Predicate\Builder;
 use Alaress\Web\Controller\Base;
+use Schoolbox\Collection;
 use Schoolbox\Comms\News\Model;
 use Schoolbox\Comms\News\ValidBroadcast;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -49,38 +49,23 @@ class Controller extends Base
      */
     public function getList()
     {
+        $lists = new Lists(\Schoolbox\Comms\News\Mapper::getInstance(), $this->userMapper);
+        $newsArticles = new Collection();
+
         try {
             $policy = \Schoolbox\Comms\News\Policy\Mapper::getInstance()->findOneByColumn('identifier', 'global_moderation');
 
             $moderationRequired = (bool)$policy->getValue();
+
+            $newsArticles = $lists->getNeedModeration();
         }
         catch (MapperException $e) {
             $moderationRequired = false;
         }
 
-        /* A list of submitted articles that require moderation
-         */
-        $newsArticles = [];
-
-        if ($moderationRequired) {
-            $unmoderatedArticles = (new Builder($this->userMapper->getDatabase(), 'comms_news_article'))
-                ->notNull('submitted_at')
-                ->isNull('moderated_at');
-
-            $newsArticles = \Schoolbox\Comms\News\Mapper::getInstance()->findByPredicates($unmoderatedArticles);
-        }
-
-        /* A list of recently-modified articles
-         * Otherwise it's pretty disorienting not knowing what you just did
-         */
-        $recentlyModerated = (new Builder($this->userMapper->getDatabase(), 'comms_news_article'))
-            ->notNull('moderated_at');
-
-        $recentArticles = \Schoolbox\Comms\News\Mapper::getInstance()->findByPredicates($recentlyModerated);
-
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsModeration/index.twig', [
             'newsArticles' => $newsArticles,
-            'recentArticles' => $recentArticles,
+            'recentArticles' => $lists->getRecentlyModerated(),
             'moderationRequired' => $moderationRequired
         ])->setTitle('Example'));
     }
