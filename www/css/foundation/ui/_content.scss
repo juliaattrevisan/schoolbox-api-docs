@@ -1715,6 +1715,19 @@ $train-line-unvisited-color: $content-ui-background;
                 @include easy-transition(all 200ms ease-out);
             }
         }
+
+        /* Smaller stops
+         * The 0.4 multiplier and offset is empirical - I don't know what the math is
+         * to derive it from the stop size or segment width
+         */
+        &.nub {
+            span {
+                width: 0.5 * $train-line-stop-size;
+                height: 0.5 * $train-line-stop-size;
+                top: -0.4 * (($train-line-stop-size - $train-line-segment-width) / 2);
+                left: calc(50% - (#{$train-line-stop-size / 2}) + 0.4rem);
+            }
+        }
     }
 }
 
