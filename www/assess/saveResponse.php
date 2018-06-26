@@ -12,6 +12,7 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Quiz\ActionValidator;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Error\Mapper as ErrorMapper;
 
 $assessHandler = new Assess_Main();
 $attemptHandler = new Assess_Attempt();
@@ -49,7 +50,7 @@ try {
         http_response_code(404);
         exit;
     }
-    error(112);
+    $this->error(ErrorMapper::ERROR_QUIZ_NOT_FOUND);
 }
 $assessmentFolder = $assessment->getBaseContext()->getFolder();
 $accessLevel      = Access::getInstance()->getFolderAccess($_SESSION['user'], $assessmentFolder->getId());
@@ -70,10 +71,10 @@ if ($accessLevel < UserAccess::ACCESS_WRITE) {
     // I can't attempt a spec assessment
     if ($assessment->isSpecification()) {
         if ($ajax) {
-            http_response_code(404);
+            http_response_code(403);
             exit;
         }
-        error(19);
+        $this->error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
     }
 } else {
     // I can do whatever I want
@@ -84,7 +85,7 @@ if ($assessHandler->isDeleted($section['assess_id'])) {
         http_response_code(404);
         exit;
     }
-	error(112);
+    $this->error(ErrorMapper::ERROR_QUIZ_NOT_FOUND);
 }
 
 /* Participants should be blocked from attempting if it hasn't started,
@@ -105,7 +106,7 @@ if (!$question) {
         http_response_code(404);
         exit;
     }
-    error(119);
+    $this->error(ErrorMapper::ERROR_QUESTION_NOT_FOUND);
 }
 
 $factory = new Assess_Factory();
