@@ -54,10 +54,20 @@
 {# Compose Node
  # Varies depending on when you're creating a new article, or editing an existing
  #}
+{% set composeUrl = null %}
+
 {% if news.id %}
-    {% set composeUrl = routeLookup('commsNews.getUpdate', {newsId: news.id}) %}
-{% else %}
-    {% set composeUrl = null %}
+    {% if moderationRequired %}
+        {% if news.moderatedAt|length %}
+            {% if isCommsOfficer %}
+                {% set composeUrl = routeLookup('commsNews.getUpdate', {newsId: news.id}) %}
+            {% endif %}
+        {% else %}
+            {% set composeUrl = routeLookup('commsNews.getUpdate', {newsId: news.id}) %}
+        {% endif %}
+    {% else %}
+        {% set composeUrl = routeLookup('commsNews.getUpdate', {newsId: news.id}) %}
+    {% endif %}
 {% endif %}
 
 {% set composeNode = {
