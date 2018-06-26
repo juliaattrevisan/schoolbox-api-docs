@@ -164,7 +164,7 @@
     composeNode, previewNode, awaitingModerationNode, publicationNode, deliveryNode
 ] %}
 
-<ul class="train-line">
+<ul class="train-line nub">
     {% for node in nodes %}
         {% if node is not null %}
             {% if node.identifier == identifier %}
@@ -175,9 +175,22 @@
 
             <li class="{{ css }}">
                 <a {% if node.url is not null %}href="{{ node.url }}"{% endif %} title="{{ node.alt }}">
-                    <span class="icon-anchor"></span>{{ node.label }}
+                    <span></span>{{ node.label }}
                 </a>
             </li>
         {% endif %}
     {% endfor %}
 </ul>
+
+<style type="text/css">
+    .train-line.nub span {
+        width: 1rem;
+        height: 1rem;
+        top: -0.4rem;
+        left: calc(50% - (1rem) + (0.4rem));
+    }
+
+    .train-line.nub a {
+        margin: 1.25rem 0.5rem;
+    }
+</style>
