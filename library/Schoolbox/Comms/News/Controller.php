@@ -300,7 +300,7 @@ class Controller extends Base
 
         try {
             $news->setExpiresAt(\Alaress_Date_Format::newLocal($data['expiresAt']));
-        } catch (\InvalidArgumentException $e) {
+        } catch (InvalidArgumentException $e) {
             // noop
         }
 
