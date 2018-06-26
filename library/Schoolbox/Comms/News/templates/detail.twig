@@ -69,7 +69,7 @@
         {# Delete this news article #}
         {% set deleteRoute = routeLookupIfAuthorized('commsNews.postDelete', {newsId: news.id}) %}
 
-        {% if deleteRoute %}
+        {% if deleteRoute and isDeletable %}
             <script>
                 $(function() {
                     $('[data-delete]').on('click', function(event) {

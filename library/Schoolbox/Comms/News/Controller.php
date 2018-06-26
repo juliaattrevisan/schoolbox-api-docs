@@ -344,7 +344,8 @@ class Controller extends Base
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/detail.twig', [
             'policies' => $policies,
             'news' => $news,
-            'isCommsOfficer' => (new ValidUserIsCommsOfficer())->isSatisfiedBy($this->getUser())
+            'isCommsOfficer' => (new ValidUserIsCommsOfficer())->isSatisfiedBy($this->getUser()),
+            'isDeletable' => (new ValidUserCanDelete())->isSatisfiedBy($this->getUser(), $news)
         ])->setTitle($news->getTitle()));
     }
 
