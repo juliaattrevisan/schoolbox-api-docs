@@ -95,32 +95,12 @@ class Factory extends NullableContext\Factory
         }
         $unitSpecOverrides = $overrides[$definition->getFilter()->getId()];
 
-        // Should this role type see classes for this page?
-        $options     = $pageFilter->getOptions();
-        $noneOption  = $options[Definition::KEY_NONE];
-        $classOption = $options[Definition::KEY_IMPORTED_TO_CLASS];
-        $groupOption = $options[Definition::KEY_IMPORTED_TO_GROUP];
+        $folders = $this->folderMapper->createCollection();
 
-        if ($pageFilter->getUserConfigurable()) {
-            $getClasses = $classOption->getAvailable();
-            $getGroups  = $groupOption->getAvailable();
-        } else {
-            $roleType   = $viewee->getRole()->getType();
-            $getNone    = $noneOption->getDefaults()[$roleType]->getSelected();
-            $getClasses = $classOption->getDefaults()[$roleType]->getSelected();
-            $getGroups  = $groupOption->getDefaults()[$roleType]->getSelected();
-
-            // Are all available options unchecked ?
-            if (!$getNone && !$getClasses && !$getGroups) {
-                // For consistency, this must logically equate to the filter not reducing the full set.
-                $getClasses = $getGroups = true;
-            }
+        // Course-markbook does not insert folders that are related to current user.
+        if (Filter\Page\Model::PAGE_COURSE_MARK_BOOK !== $pageFilter->getPage()) {
+            $folders = $folders->mergeUnique($this->fetchRelatedFolders($pageFilter, $viewee), 'id');
         }
-
-        // Note: '4' is a hack to mean 'INVALID', to force no group folders to be matched.
-        $groupAccessLevel = $getGroups ? UserAccess::ACCESS_WRITE : UserAccess::ACCESS_FULL + 1;
-
-        $folders = $this->folderMapper->findForUser($viewee, $getClasses, $groupAccessLevel, false);
 
         /* If we inserted an extra folder/s, we need to also insert any units imported to that folder,
          * otherwise any assessments inside units imported to the extra folder will never be visible.
@@ -195,6 +175,45 @@ class Factory extends NullableContext\Factory
             $unitSpecsImportedToClasses,
             $unitSpecsImportedToGroups
         );
+    }
+
+
+    /**
+     * Returns the folders that the specified user teachers or is an instructor of, depending
+     * on whether groups/classes are configured by the admin to be available.
+     *
+     * @param Filter\Page\Model $pageFilter
+     * @param User              $viewee
+     * @return Collection|Folder\Model[]
+     */
+    private function fetchRelatedFolders(Filter\Page\Model $pageFilter, User $viewee)
+    {
+        // Should this role type see classes for this page?
+        $options     = $pageFilter->getOptions();
+        $noneOption  = $options[Definition::KEY_NONE];
+        $classOption = $options[Definition::KEY_IMPORTED_TO_CLASS];
+        $groupOption = $options[Definition::KEY_IMPORTED_TO_GROUP];
+
+        if ($pageFilter->getUserConfigurable()) {
+            $getClasses = $classOption->getAvailable();
+            $getGroups  = $groupOption->getAvailable();
+        } else {
+            $roleType   = $viewee->getRole()->getType();
+            $getNone    = $noneOption->getDefaults()[$roleType]->getSelected();
+            $getClasses = $classOption->getDefaults()[$roleType]->getSelected();
+            $getGroups  = $groupOption->getDefaults()[$roleType]->getSelected();
+
+            // Are all available options unchecked ?
+            if (!$getNone && !$getClasses && !$getGroups) {
+                // For consistency, this must logically equate to the filter not reducing the full set.
+                $getClasses = $getGroups = true;
+            }
+        }
+
+        // Note: '4' is a hack to mean 'INVALID', to force no group folders to be matched.
+        $groupAccessLevel = $getGroups ? UserAccess::ACCESS_WRITE : UserAccess::ACCESS_FULL + 1;
+
+        return $this->folderMapper->findForUser($viewee, $getClasses, $groupAccessLevel, false);
     }
 
 
