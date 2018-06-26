@@ -8,14 +8,17 @@ declare(strict_types=1);
 
 namespace Schoolbox\Comms\News\Audience;
 
+use Alaress\Database\Connector\IConnector;
 use Schoolbox\Collection;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use External_User;
 use Schoolbox\Resource\Folder;
 use External_Class;
+use PDO;
 
 /**
  * Responsible for mapping between users sets as per a segment's relationship modifier.
@@ -27,6 +30,10 @@ use External_Class;
  */
 class RelationshipFilterer
 {
+
+    /** @var IConnector */
+    private $db;
+
     /** @var UserMapper */
     private $userMapper;
 
@@ -44,6 +51,7 @@ class RelationshipFilterer
 
 
     /**
+     * @param IConnector       $db
      * @param UserMapper       $userMapper
      * @param External_User    $externalUser
      * @param Folder\Mapper    $folderMapper
@@ -51,12 +59,14 @@ class RelationshipFilterer
      * @param UserAccessMapper $userAccessMapper
      */
     public function __construct(
+        IConnector $db,
         UserMapper $userMapper,
         External_User $externalUser,
         Folder\Mapper $folderMapper,
         External_Class $externalClass,
         UserAccessMapper $userAccessMapper
     ) {
+        $this->db               = $db;
         $this->userMapper       = $userMapper;
         $this->externalUser     = $externalUser;
         $this->folderMapper     = $folderMapper;
@@ -68,38 +78,70 @@ class RelationshipFilterer
     /**
      * Return the user ids of the parents of the specified users
      *
+     * Enforces a STUDENT:PARENT role type relationship.
+     *
      * @param int[] $userIds
      * @return int[]
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \UnderflowException
      */
     public function getParents(array $userIds): array
     {
-        /** @var \Schoolbox\User[] $users */
-        $users             = $this->userMapper->findByColumn($this->userMapper->getIdentifierColumn(), $userIds);
+        if (!\count($userIds)) {
+            return [];
+        }
+        $pb                = $this->userMapper->getPredicateBuilder()
+                                              ->equals('g.group_type', Role::STUDENT)
+                                              ->in($this->userMapper->getIdentifierColumn(), $userIds);
+        $users             = $this->userMapper->findByPredicates($pb);
         $parentExternalIds = [];
         foreach ($users as $user) {
             $userContacts = $this->externalUser->getStudentContactList($user->getExternalId());
             foreach ($userContacts as $userContact) {
                 if ($userContact['StudentContactID']) {
-                    $parentExternalIds[] = $userContact['StudentContactID'];
+                    $parentExternalIds[] = "'{$userContact['StudentContactID']}'";
                 }
                 if ($userContact['StudentContactSpouseID']) {
-                    $parentExternalIds[] = $userContact['StudentContactSpouseID'];
+                    $parentExternalIds[] = "'{$userContact['StudentContactSpouseID']}'";
                 }
             }
         }
-        // TODO Use findScalarByPredicates
-        return $this->userMapper->findByColumn('synergy_id', $parentExternalIds)->getPropertyValues($this->userMapper->getIdentifierProperty());
+        if (!\count($parentExternalIds)) {
+            return [];
+        }
+
+        $roleType         = Role::PARENT;
+        $externalIdString = \implode(',', $parentExternalIds);
+
+        $query = "
+            SELECT u.id
+            FROM user u
+            JOIN groups g on u.group_id = g.id
+            WHERE u.synergy_id IN ({$externalIdString})
+            AND g.group_type = '{$roleType}'
+            AND u.deleted_at IS NULL
+        ";
+
+        return $this->db->executeQuery($query)->fetchAll(PDO::FETCH_COLUMN);
     }
 
 
     /**
      * Returns the child users of the specified user
      *
+     * Enforces a PARENT:STUDENT roleType relationship
+     *
      * @param User $user
      * @return Collection|User[]
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \UnderflowException
      */
     public function getChildren(User $user): Collection
     {
+        if (!$user->getRole()->isParent()) {
+            return $this->userMapper->createCollection();
+        }
+
         $externalChildren = $this->externalUser->getEnrolledStudents($user->getExternalId());
 
         if (!\count($externalChildren)) {
@@ -107,12 +149,21 @@ class RelationshipFilterer
             return $this->userMapper->createCollection();
         }
 
-        return $this->userMapper->findByColumn('synergy_id', \array_column($externalChildren, 'RelatedID'));
+        $pb = $this->userMapper->getPredicateBuilder()
+                               ->in('synergy_id', \array_column($externalChildren, 'RelatedID'))
+                               ->equals('g.group_type', Role::STUDENT);
+
+        return $this->userMapper->findByPredicates($pb);
     }
 
 
     /**
-     * Get class teachers and group instructors
+     * Get class teachers and group instructors.
+     *
+     * Enforces a STUDENT:STAFF relationship between TEACHER:TAUGHT.
+     *
+     * This is technically irrelevant for the LEARNER:INSTRUCTOR relationship, but slightly more performance and likely
+     * better reflects expected behaviour.
      *
      * @param int[] $userIds
      * @return int[]
@@ -122,17 +173,23 @@ class RelationshipFilterer
      */
     public function getTeachersAndInstructors(array $userIds): array
     {
-        $allFolders = $this->folderMapper->createCollection();
-        /** @var \Schoolbox\User[] $users */
-        $users              = $this->userMapper->findByColumn($this->userMapper->getIdentifierColumn(), $userIds);
+        if (!\count($userIds)) {
+            return $this->userMapper->createCollection();
+        }
+
+        $pb = $this->userMapper->getPredicateBuilder()
+                               ->in('id', $userIds)
+                               ->equals('g.group_type', Role::STUDENT);
+
+        $students = $this->userMapper->findByPredicates($pb);
+
         $teacherExternalIds = [];
-        foreach ($users as $user) {
-            // Find all folders where the user is a learner-only, or a class student.
-            $getSubjects = $user->getRole()->isStudent();
-            $allFolders = $allFolders->mergeUnique($this->folderMapper->findForUser($user, $getSubjects, UserAccess::ACCESS_READ, true), 'id');
+        $allFolders         = $this->folderMapper->createCollection();
+        foreach ($students as $student) {
+            // Find all folders where the user is a class student or learner-only.
+            $allFolders = $allFolders->mergeUnique($this->folderMapper->findForUser($student, true, UserAccess::ACCESS_READ, true), 'id');
         }
         // Then find the teachers of these classes from synergetic.
-        // TODO are group instructors considered teachers here?
         $folderIds = [];
         foreach ($allFolders as $folder) {
             $folderIds[] = $folder->getId();
@@ -141,7 +198,7 @@ class RelationshipFilterer
                 $teacherExternalIds = \array_merge($teacherExternalIds, $this->externalClass->getTeacherName($code->getCode()));
             }
         }
-        if(!\count($folderIds)){
+        if (!\count($folderIds)) {
             return [];
         }
         $instructorIds = $this->userAccessMapper->findScalarByPredicates(
@@ -152,27 +209,33 @@ class RelationshipFilterer
                                    ->equals('type', UserAccess::ACCESS_WRITE)
         );
 
-        if(!\count($teacherExternalIds) && !\count($instructorIds)){
+        if (!\count($teacherExternalIds) && !\count($instructorIds)) {
             return [];
         }
 
         $innerPb = $this->userMapper->getPredicateBuilder();
 
-        if(\count($teacherExternalIds)){
+        if (\count($teacherExternalIds)) {
             $innerPb->in('synergy_id', $teacherExternalIds);
         }
 
-        if(\count($instructorIds)){
+        if (\count($instructorIds)) {
             $innerPb->in('id', $instructorIds);
         }
-        $outerPb = $this->userMapper->getPredicateBuilder()->any($innerPb);
+        $outerPb = $this->userMapper->getPredicateBuilder()
+                                    ->any($innerPb)
+                                    ->equals('g.group_type', Role::STAFF);
 
-        return $this->userMapper->findScalarByPredicates('id', $outerPb);
+        return $this->userMapper->findByPredicates($outerPb)->getPropertyValues('id');
     }
 
 
     /**
-     * Gets users in classes or groups taught by this user
+     * Gets users in classes or groups taught by this user.
+     *
+     * Enforces a STAFF:STUDENT relationship.
+     *
+     * Note that this only treats STAFF as being class-teachers or group-instructors.
      *
      * @param User $user
      * @return Collection|User[]
@@ -181,7 +244,9 @@ class RelationshipFilterer
      */
     public function getTaughtStudentsAndLearners(User $user): Collection
     {
-
+        if (!$user->getRole()->isStaff()) {
+            return $this->userMapper->createCollection();
+        }
         $taughtFolders = $this->folderMapper->findForUser($user, true, UserAccess::ACCESS_WRITE, true);
 
         if (!\count($taughtFolders)) {
@@ -225,6 +290,10 @@ class RelationshipFilterer
             $innerPredicate->in('synergy_id', \array_unique($classStudentExternalIds));
         }
 
-        return $this->userMapper->findByPredicates($this->userMapper->getPredicateBuilder()->any($innerPredicate));
+        $outerPb = $this->userMapper->getPredicateBuilder()
+                                    ->any($innerPredicate)
+                                    ->equals('g.group_type', Role::STUDENT);
+
+        return $this->userMapper->findByPredicates($outerPb);
     }
 }
