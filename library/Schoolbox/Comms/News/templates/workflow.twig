@@ -57,7 +57,7 @@
 {% if news.id %}
     {% set composeUrl = routeLookup('commsNews.getUpdate', {newsId: news.id}) %}
 {% else %}
-    {% set composeUrl = routeLookup('commsNews.getCreate') %}
+    {% set composeUrl = null %}
 {% endif %}
 
 {% set composeNode = {
@@ -79,20 +79,17 @@
 {% endif %}
 
 {% if moderationRequired %}
-    {% set previewNode = {
-        identifier: 'preview',
-        url: previewUrl,
-        alt: 'Preview your article and submit it for moderation',
-        label: 'Preview'
-    } %}
+    {% set previewAlt = 'Preview your article and submit it for moderation' %}
 {% else %}
-    {% set previewNode = {
-        identifier: 'preview',
-        url: previewUrl,
-        alt: 'Preview your article and submit it for publishing',
-        label: 'Preview'
-    } %}
+    {% set previewAlt = 'Preview your article and submit it for publishing' %}
 {% endif %}
+
+{% set previewNode = {
+    identifier: 'preview',
+    url: previewUrl,
+    alt: previewAlt,
+    label: 'Preview'
+} %}
 
 
 {# Awaiting Moderation
