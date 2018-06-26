@@ -48,6 +48,11 @@
             {% endif %}
         {% endif %}
     {% endif %}
+
+    {# Expired news #}
+    {% if news.expiresAt.isPast %}
+        {% set identifier = 'expired' %}
+    {% endif %}
 {% endif %}
 
 
@@ -161,11 +166,27 @@
 } %}
 
 
+{# Expired
+ # This article is automatically archived once the expiryAt date is reached
+ #}
+{% set expiredNode = {
+    identifier: 'expired',
+    icon: null,
+    url: null,
+    alt: 'Expired and automatically archived on ' ~ news.expiresAt.local,
+    label: 'Expired'
+} %}
+
 
 {# The Great Train Robbery
  # Conditionally manufacture all the stops and their assigned urls
  # Ignore null nodes (they aren't intended to show)
  #}
-{% include '@commsNews/trainline.twig' with { nodes: [
-    composeNode, previewNode, awaitingModerationNode, awaitingPublicationNode, publishedNode
+{% include '@commsNews/trainline.twig' with {nodes: [
+    composeNode,
+    previewNode,
+    awaitingModerationNode,
+    awaitingPublicationNode,
+    publishedNode,
+    expiredNode
 ]} %}
