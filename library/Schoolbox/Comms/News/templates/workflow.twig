@@ -165,8 +165,6 @@
  # Conditionally manufacture all the stops and their assigned urls
  # Ignore null nodes (they aren't intended to show)
  #}
-{% set nodes = [
+{% include '@commsNews/trainline.twig' with { nodes: [
     composeNode, previewNode, awaitingModerationNode, publicationNode, deliveryNode
-] %}
-
-{% include '@commsNews/trainline.twig' with {nodes: nodes} %}
+]} %}
