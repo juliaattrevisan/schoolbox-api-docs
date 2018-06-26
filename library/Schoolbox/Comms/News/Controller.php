@@ -11,6 +11,7 @@ namespace Schoolbox\Comms\News;
 
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
+use InvalidArgumentException;
 use Schoolbox\Comms\News\Policy;
 use Schoolbox\Error\Mapper as ErrorMapper;
 Use Schoolbox\Mapper\Exception as MapperException;
@@ -290,9 +291,22 @@ class Controller extends Base
             ->setBlurb($data['blurb'])
             ->setTopics($this->topicMapper->findByColumn('newsTopicID', $data['topics']))
             ->setModeratedBy(null)
-            ->setModeratedAt(new \Alaress_Date_NullDate())
-            ->setPublishAt(\Alaress_Date_Format::newLocal($data['publishAt']))
-            ->setExpiresAt(\Alaress_Date_Format::newLocal($data['expiresAt']));
+            ->setModeratedAt(new \Alaress_Date_NullDate());
+
+        /* Exception thrown when an invalid date is submitted; use last known value instead
+         * This can occur with bad input; or when datepicker is still processing strtotime shuriken
+         */
+        try {
+            $news->setPublishAt(\Alaress_Date_Format::newLocal($data['publishAt']));
+        } catch (InvalidArgumentException $e) {
+            // noop
+        }
+
+        try {
+            $news->setExpiresAt(\Alaress_Date_Format::newLocal($data['expiresAt']));
+        } catch (\InvalidArgumentException $e) {
+            // noop
+        }
 
         /* If any Feature Image was provided, remember it
          * Otherwise clear it (remove a Feature Image)
