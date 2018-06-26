@@ -59,7 +59,7 @@ class FixtureCest
                 Fixture::SELECTOR_JS_AWAY_TEAM => Fixture::TEAM_SECOND_XVIII
             ]);
 
-        $fixturePage->assertNofifNotExists('You have an upcoming AFL match ' . $matchName1);
+        $fixturePage->assertNotifNotExists('You have an upcoming AFL match ' . $matchName1);
 
         //== Match in 24 hrs - no change and save - No notification ==
         $matchName2 = 'Second Cest Match';
@@ -77,19 +77,19 @@ class FixtureCest
                 Fixture::SELECTOR_JS_AWAY_TEAM => Fixture::TEAM_SECOND_XVIII
             ]);
 
-        $fixturePage->assertNofifExists('You have an upcoming AFL match ' . $matchName2);
+        $fixturePage->assertNotifExists('You have an upcoming AFL match ' . $matchName2);
 
         $fixturePage->updateMatch($matchId, [], []);
-        $fixturePage->assertNofifNotExists('Your upcoming AFL match ' . $matchName2 . ' has been updated');
+        $fixturePage->assertNotifNotExists('Your upcoming AFL match ' . $matchName2 . ' has been updated');
 
         //== Match in 24 hrs - change title and save - Updated notification ==
         $matchName3 = 'Third Cest Match';
         $fixturePage->updateMatch($matchId, [Fixture::SELECTOR_NAME => $matchName3], []);
-        $fixturePage->assertNofifExists('Your upcoming AFL match ' . $matchName3 . ' has been updated');
+        $fixturePage->assertNotifExists('Your upcoming AFL match ' . $matchName3 . ' has been updated');
 
         //== Match in 24 hrs - change date - Updated notification ==
         $fixturePage->updateMatch($matchId, [Fixture::SELECTOR_START_AT => $start->modify('+45 minutes')], []);
-        $fixturePage->assertNofifExists('Your upcoming AFL match ' . $matchName3 . ' has a new start time');
+        $fixturePage->assertNotifExists('Your upcoming AFL match ' . $matchName3 . ' has a new start time');
 
         // Match in 24 hrs - change itinerary and save
 
@@ -109,7 +109,7 @@ class FixtureCest
                 Fixture::SELECTOR_JS_AWAY_TEAM => Fixture::TEAM_SECOND_XVIII
             ]);
         $fixturePage->addItinerary($matchId4);
-        $fixturePage->assertNofifExists('Your upcoming AFL match ' . $matchName4 . ' has been updated');
+        $fixturePage->assertNotifExists('Your upcoming AFL match ' . $matchName4 . ' has been updated');
 
         //== Match in 24 hrs - remove itinerary and save
         $matchName5 = 'Fifth Cest Match';

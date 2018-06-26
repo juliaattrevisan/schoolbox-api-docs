@@ -163,7 +163,7 @@ class Fixture
      * Verifies that the notification exists
      * @param $matchId
      */
-    public function assertNofifExists($notif)
+    public function assertNotifExists($notif)
     {
         $i = $this->tester;
 
@@ -181,7 +181,7 @@ class Fixture
      * Verifies that the notification does not exist
      * @param $matchId
      */
-    public function assertNofifNotExists($notif)
+    public function assertNotifNotExists($notif)
     {
         $i = $this->tester;
 
