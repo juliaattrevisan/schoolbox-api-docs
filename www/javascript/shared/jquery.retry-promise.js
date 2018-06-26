@@ -40,7 +40,7 @@
                 .fail(function() {
                     // If the response is 4xx client error or 500 internal server error,
                     // fail immediately rather than making multiple failing attempts
-                    if ((arguments[0].status >= 400 && arguments[0].status <= 500) || attempts >= settings.maxRetry) {
+                    if ((arguments[0].status >= 400 && arguments[0].status < 500) || attempts >= settings.maxRetry) {
                         deferred.reject(arguments);
                     } else {
                         // Try again after some jitter
