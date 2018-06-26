@@ -169,30 +169,7 @@
     composeNode, previewNode, awaitingModerationNode, publicationNode, deliveryNode
 ] %}
 
-<ul class="train-line">
-    {% for node in nodes %}
-        {% if node is not null %}
-            {% if node.identifier == identifier %}
-                {% set css = 'current-stop' %}
-            {% else %}
-                {% set css = '' %}
-            {% endif %}
-
-            {# Decide whether to use nubs or a knurl #}
-            {% if not node.icon|length %}
-                {% set nubClass = 'nub' %}
-            {% else %}
-                {% set nubClass = '' %}
-            {% endif %}
-
-            <li class="{{ css }} {{ nubClass }}">
-                <a {% if node.url is not null %}href="{{ node.url }}"{% endif %} title="{{ node.alt }}">
-                    <span class="{{ node.icon }}"></span>{{ node.label }}
-                </a>
-            </li>
-        {% endif %}
-    {% endfor %}
-</ul>
+{% include '@commsNews/trainline.twig' with {nodes: nodes} %}
 
 <style type="text/css">
     .train-line .nub span {
