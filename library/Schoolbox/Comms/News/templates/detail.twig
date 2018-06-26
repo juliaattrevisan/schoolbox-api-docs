@@ -101,7 +101,10 @@
 </div>
 {% endif %}
 
-{# Submit for moderation #}
+
+{# Moderation is required
+ # You're prompted to consciously submit for moderation
+ #}
 {% if policies['global_moderation'].value and not news.submittedAt.local|length %}
 <div class="row">
     <div class="small-12 island">
@@ -125,13 +128,12 @@
 {% endif %}
 
 
-{# Publish
- # Only available to comms officers when:
- #  - moderation is required and
- #  - when the article is officially submitted and
- #  - it hasn't already been published
- #}
+{# Publish #}
 {% if policies['global_moderation'].value %}
+
+    {# Moderation is required and you're on the preview screen
+     # As a Moderator, you're prompted to consciously publish this to the world
+     #}
     {% if isCommsOfficer and news.submittedAt.local|length and not news.moderatedAt.local|length %}
         <div class="row">
             <div class="small-12 island">
@@ -144,6 +146,10 @@
         </div>
     {% endif %}
 {% elseif not news.submittedAt.local|length %}
+
+    {# Moderation isn't required and you're on the preview screen
+     # You're prompted to consciously publish to the world
+     #}
     <div class="row">
         <div class="small-12 island">
             <form action="{{ routeLookup('commsNews.postSubmitForModeration', {newsId: news.id}) }}" method="post">
