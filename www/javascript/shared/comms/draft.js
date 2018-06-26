@@ -25,6 +25,12 @@
          */
         initRegistry();
 
+        /* Set up custom event
+         */
+        $(config.element).on('draft', function() {
+            save();
+        });
+
         /* Watch the content for changes
          */
         initAutosave();
@@ -95,7 +101,7 @@
                         text: 'Autosaving'
                     });
 
-                    save();
+                    $(config.element).trigger('draft');
                 }
             }, config.interval * 1000);
         }
