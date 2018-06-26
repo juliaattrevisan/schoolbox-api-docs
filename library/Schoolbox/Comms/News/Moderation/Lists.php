@@ -20,6 +20,12 @@ use Schoolbox\UserMapper;
 
 class Lists
 {
+
+    /**
+     * Maximum number of Recently Moderated articles to show
+     */
+    private const NUM_RECENTLY_MODERATED = 3;
+
     /**
      * @var News\Mapper
      */
@@ -77,6 +83,7 @@ class Lists
             ->notNull('moderated_at');
 
         return $this->newsMapper->findByPredicates($builder, [
+            'limit' => self::NUM_RECENTLY_MODERATED,
             'order' => [
                 'moderated_at' => 'desc'
             ]
