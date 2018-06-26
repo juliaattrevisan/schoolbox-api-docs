@@ -14,7 +14,10 @@ use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
-use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\News\TopicMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
@@ -56,10 +59,59 @@ class Module extends BaseModule
             )
         );
 
-        $this->register('GET', '', 'getNews', $getPerms, null);
-        $this->register('POST', '', 'postNews', $postPerms, null);
+        $preloadNews = function ($params) {
+            return $this->preloadNews($params);
+        };
+
+        $this->register('GET', '/create', 'getCreate', $getPerms);
+        $this->register('GET', '/update/{newsId:\d+}', 'getUpdate', $getPerms, $preloadNews);
+        $this->register('POST', '/create', 'postCreate', $postPerms);
+        $this->register('POST', '/update/{newsId:\d+}', 'postUpdate', $getPerms, $preloadNews);
+        $this->register('GET', '/topics', 'getTopics', $getPerms);
+        $this->register('GET', '/{newsId:\d+}', 'getDetail', null, $preloadNews);
     }
 
+
+    /**
+     * Preload the news article
+     *
+     * @param array $params
+     * @return array
+     * @throws \Schoolbox\Application\Exception\NotFound
+     * @throws InvalidArgumentException
+     * @throws NotFound
+     */
+    private function preloadNews(array $params) :array
+    {
+        try {
+            $news = $this->getNewsMapper()->findById($params['newsId']);
+        } catch (MapperException $e) {
+            throw new NotFound('Unknown news article.');
+        }
+
+        return [
+            'news' => $news,
+        ];
+    }
+
+    /**
+     * @return Mapper|UserMapper
+     * @throws \InvalidArgumentException If cannot find mapper class
+     */
+    protected function getNewsMapper()
+    {
+        return $this->getMapperFactory()->get(Mapper::class);
+    }
+
+
+    /**
+     * @return Mapper|ErrorMapper
+     * @throws \InvalidArgumentException If cannot find mapper class
+     */
+    protected function getErrorMapper()
+    {
+        return $this->getMapperFactory()->get(ErrorMapper::class);
+    }
 
     /**
      * Override with any steps required for a controller and its routes
@@ -77,7 +129,10 @@ class Module extends BaseModule
         $injector->params[Controller::class] = [
             'errorMapper' => $this->getMapperFactory()->getLazy(\Schoolbox\Error\Mapper::class),
             'userMapper' => $this->getMapperFactory()->getLazy(UserMapper::class),
-            'userAccessMapper' => $this->getMapperFactory()->getLazy(UserAccessMapper::class)
+            'userAccessMapper' => $this->getMapperFactory()->getLazy(UserAccessMapper::class),
+            'newsMapper' => $this->getMapperFactory()->getLazy(Mapper::class),
+            'policyMapper' => $this->getMapperFactory()->getLazy(Policy\Mapper::class),
+            'topicMapper' => $this->getMapperFactory()->getLazy(TopicMapper::class),
         ];
     }
 

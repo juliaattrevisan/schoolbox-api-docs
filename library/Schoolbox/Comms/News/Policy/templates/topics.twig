@@ -1,0 +1,34 @@
+<div class="row">
+    <div class="small-12 columns">
+        <h2 class="subheader" id="topics">Topics</h2>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        {% if topics|length %}
+            <section>
+                <ul class="information-list">
+
+                    {# TODO: Probably add a url to the topic's index page
+                     # So you can see all the articles associated with that topic
+                     #}
+                    {% for topic in topics %}
+                        <li class="content">{{ topic.name }}</li>
+                    {% endfor %}
+                </ul>
+            </section>
+        {% else %}
+            <div class="empty-state">
+                <i class="icon-news"></i>
+                <p>{{ locale.news.proper }} Topics haven't been created.</p>
+
+                {% set topicRoute = routeLookupIfAuthorized('adminLists.getIndex', {table: 'news-topic'}) %}
+
+                {% if topicRoute %}
+                <p><a href="{{ topicRoute }}" title="Define {{ locale.news.proper }} Topics">Define {{ locale.news.proper }} Topics</a> so that content creators can categorise their articles.</p>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</div>

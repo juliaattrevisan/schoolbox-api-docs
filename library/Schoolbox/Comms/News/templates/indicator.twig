@@ -1,0 +1,36 @@
+{# Render an indicator of the news article's current state
+ #
+ # A freshly minted news article: indicator lozenge says "New"
+ #
+ # Currently a draft: indicator lozenge says "Draft" after a draft persistence occurs
+ #
+ # Otherwise: article previously existed and the lozenge stays hidden until a draft persistence occurs
+ #}
+{% macro render(news) %}
+    {% if news.id %}
+        {% if news.submittedAt.local == '' %}
+
+            {# Exists as a draft #}
+            {% set newStyle = 'style="display:none"' %}
+            {% set draftStyle = '' %}
+
+        {% else %}
+
+            {# Exists, but not a draft #}
+            {% set newStyle = 'style="display:none"' %}
+            {% set draftStyle = 'style="display:none"' %}
+
+        {% endif %}
+
+    {% elseif news.submittedAt.local == '' %}
+
+        {# New article, never saved before #}
+        {% set newStyle = 'style="display:none"' %}
+        {% set draftStyle = 'style="display:none"' %}
+
+    {% endif %}
+
+    {# Referenced by draft.js #}
+    <span id="status-new" class="label highlight" {{ newStyle|purify }}>New</span>
+    <span id="status-draft" class="label highlight" {{ draftStyle|purify }}>Draft</span>
+{% endmacro %}

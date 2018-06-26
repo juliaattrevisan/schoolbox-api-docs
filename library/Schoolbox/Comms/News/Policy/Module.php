@@ -14,6 +14,7 @@ use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
+use Schoolbox\News\TopicMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Role;
@@ -77,7 +78,8 @@ class Module extends BaseModule
         $injector->params[Controller::class] = [
             'errorMapper' => $this->getMapperFactory()->getLazy(\Schoolbox\Error\Mapper::class),
             'userAccessMapper' => $this->getMapperFactory()->getLazy(UserAccessMapper::class),
-            'policyMapper' => $this->getMapperFactory()->getLazy(Mapper::class)
+            'policyMapper' => $this->getMapperFactory()->getLazy(Mapper::class),
+            'topicMapper' => $this->getMapperFactory()->getLazy(TopicMapper::class)
         ];
     }
 

@@ -6,16 +6,37 @@
  # name: The input name (comes out in POST)
  # identifier: A unique identifier for this policy (stored in db)
  # value: The value that was set for this policy (stored in db)
+ # checkedValue: The value of the checkbox when activated (stored in db, switch.twig only)
+ # type: The type of input it is
  #}
 {% set specifications = {
     'global_moderation': {
         'title': 'Global Moderation',
-        'subtext': 'Enable to require moderation on every article before they are made publicly available',
-        'active': '<strong>Global moderation is on</strong>. Every article requires moderator approval',
-        'inactive': '<strong>Global moderation is off</strong>. You can freely post articles',
-        'name': 'policy[global_moderation]',
+        'subtext': 'Enable to require moderation on every article before they are made publicly available.',
+        'active': '<strong>Global moderation is on</strong>. Every article requires moderator approval.',
+        'inactive': '<strong>Global moderation is off</strong>. You can freely post articles.',
         'identifier': 'global_moderation',
-        'value': 0
+        'value': 0,
+        'checkedValue': 1,
+        'type': 'switch'
+    },
+    'publish_date_offset': {
+        'title': 'Publish Date Offset',
+        'subtext': locale.news.proper ~ ' Articles will initially have their default publish date set to the current datetime plus this value.',
+        'active': locale.news.proper ~ ' Articles are set to <strong>publish using an offset</strong> from time of authorship',
+        'inactive': locale.news.proper ~ ' Articles are set to <strong>publish immediately</strong>.',
+        'identifier': 'publish_date_offset',
+        'value': '',
+        'type': 'input'
+    },
+    'expiry_date_offset': {
+        'title': 'Expiry Date Offset',
+        'subtext': locale.news.proper ~ ' Articles will initially have their default expiry date set to the current datetime plus this value.',
+        'active': locale.news.proper ~ ' Articles are set to <strong>expire using an offset</strong> from time of authorship',
+        'inactive': locale.news.proper ~ ' Articles are set to <strong>expire one week from time of authorship</strong>.',
+        'identifier': 'expiry_date_offset',
+        'value': '+1 week',
+        'type': 'input'
     }
 } %}
 
@@ -44,36 +65,26 @@
                 <section>
                     {% for specification in specifications %}
                         <fieldset>
-                            {% include 'sub/switch.twig' with {
-                                label: specification.title,
-                                name: specification.name,
-                                identifier: specification.identifier,
-                                subtext: specification.subtext,
-                                isChecked: specification.value,
-                                checkedValue: 1
-                            } %}
+                            {% import '@commsNewsPolicy/' ~ specification.type ~ '.twig' as policyMacro %}
+                            {{ policyMacro.writable(specification) }}
                         </fieldset>
                     {% endfor %}
                 </section>
 
-                <input type="submit" value="Update Comms settings"/>
+                <input type="submit" value="Update Comms settings" />
             </form>
         {% else %}
             <section>
                 <ul class="information-list">
                     {% for specification in specifications %}
                         <li class="content">
-                            {% if specification.value %}
-                                {{ specification.active|purify }}
-                            {% else %}
-                                {{ specification.inactive|purify }}
-                            {% endif %}
+                            {% import '@commsNewsPolicy/' ~ specification.type ~ '.twig' as policyMacro %}
+                            {{ policyMacro.readable(specification) }}
                         </li>
                     {% endfor %}
                 </ul>
             </section>
         {% endif %}
-        </section>
     </div>
 </div>
 

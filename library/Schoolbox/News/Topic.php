@@ -9,49 +9,56 @@
 
 namespace Schoolbox\News;
 
-class Topic
-{
+use Schoolbox\Mapper\Traits\Model\Id;
 
-    /** @var int */
-    protected $id;
+class Topic implements \JsonSerializable
+{
+    use Id;
 
     /** @var string */
-    protected $name;
+    private $name;
 
-    /** @var  string */
-    protected $slug;
+    /** @var string */
+    private $slug;
 
-    /** @var  int */
-    protected $sequence;
-
-    /**
-     * @param int $id
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-    }
+    /** @var int */
+    private $sequence;
 
     /**
-     * @return int
+     * @param $name
+     * @return Topic
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
      */
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    /**
-     * @param string $name
-     */
-    public function setName($name)
+    public function setName($name): self
     {
         $this->name = $name;
+
         // This should not happen. Just to make sure that this will not break admin news page.
+        // Slugs cannot be derived from an empty name value, throwing an InvalidArgumentException
         if (!empty($name)) {
             $url = new \Url($name);
             $this->setSlug($url->getSlug());
         }
+
+        return $this;
     }
+
+
+    /**
+     * Serialized representation
+     *
+     * @return array|mixed
+     */
+    public function jsonSerialize()
+    {
+        return [
+            'id' => $this->getId(),
+            'name' => $this->getName(),
+            'sequence' => $this->getSequence()
+        ];
+    }
+
 
     /**
      * @return string
@@ -63,10 +70,12 @@ class Topic
 
     /**
      * @param string $slug
+     * @return $this
      */
-    public function setSlug($slug)
+    public function setSlug($slug): self
     {
         $this->slug = $slug;
+        return $this;
     }
 
     /**
@@ -80,19 +89,21 @@ class Topic
 
     /**
      * @param int $sequence
+     * @return $this
      */
-    public function setSequence($sequence)
+    public function setSequence($sequence): self
     {
         $this->sequence = $sequence;
+        return $this;
     }
 
     /**
-     * @return int
+     * Sequence may not always be set if you just...accept the defaults
+     *
+     * @return int|null
      */
-    public function getSequence()
+    public function getSequence(): ?int
     {
         return $this->sequence;
     }
-
-
-} 
+}
