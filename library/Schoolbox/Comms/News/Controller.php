@@ -172,7 +172,7 @@ class Controller extends Base
     {
         /* Only comms officers can edit articles that have been moderated (that is, accept for publishing)
          */
-        if (!($news->getModeratedAt()->isNull() || $this->isCommsOfficer($this->getUser()))) {
+        if (!(new ValidUserCanEdit())->isSatisfiedBy($this->getUser(), $news)) {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_COMMS_NEWS_ALREADY_MODERATED);
         }
 
@@ -196,7 +196,7 @@ class Controller extends Base
             'user' => $this->getUser(),
             'news' => $news,
             'featureImageZone' => $zone->getTwigContext(),
-            'isCommsOfficer' => $this->isCommsOfficer($this->getUser()),
+            'isCommsOfficer' => (new ValidUserIsCommsOfficer())->isSatisfiedBy($this->getUser()),
         ])->setTitle("Update {$news->getTitle()}"));
     }
 
@@ -262,22 +262,7 @@ class Controller extends Base
     }
 
 
-    /**
-     * Decide if the current user is a Comms Officer
-     *
-     * @param User $user
-     * @return bool
-     * @throws MapperException
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \Schoolbox\Mapper\DefinitionException
-     * @throws \UnexpectedValueException
-     */
-    private function isCommsOfficer(User $user): bool
-    {
-        $commsOfficers = $this->userAccessMapper->findUsersForService(UserAccess::SERVICE_COMMS_OFFICER)->getUnique('id')->indexBy('id');
 
-        return $user->isSuperuser() || $commsOfficers->getOffset($user->getId());
-    }
 
     /**
      * Persist model to db during news article authorship
@@ -357,7 +342,7 @@ class Controller extends Base
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/detail.twig', [
             'policies' => $policies,
             'news' => $news,
-            'isCommsOfficer' => $this->isCommsOfficer($this->getUser())
+            'isCommsOfficer' => (new ValidUserIsCommsOfficer())->isSatisfiedBy($this->getUser())
         ])->setTitle($news->getTitle()));
     }
 
@@ -382,7 +367,7 @@ class Controller extends Base
          *
          * TODO: Otherwise currently recycle the same screen?
          */
-        if ($this->isCommsOfficer($this->getUser())) {
+        if ((new ValidUserIsCommsOfficer())->isSatisfiedBy($this->getUser())) {
             $nextStep = $this->getRouter()->generate('commsNewsModeration.getList');
         }
         else {
