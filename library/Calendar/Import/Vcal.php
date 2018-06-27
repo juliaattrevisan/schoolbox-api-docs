@@ -20,7 +20,7 @@ use \Schoolbox\Calendar\Relation\Role;
 use \Schoolbox\Calendar\Relation\RoleMapper;
 use \Schoolbox\CampusMapper;
 use \Alaress_Date_Format;
-use Schoolbox\Notif\SilentNotif;
+use Schoolbox\Realtime\Schedule\Trigger\Test\MockPropagator;
 
 class Vcal extends Base
 {
@@ -68,12 +68,12 @@ class Vcal extends Base
             $roleRelationMapper = new RoleMapper();
 
             // silence notifications
-            $silence = new SilentNotif();
+            $mockPropagator = new MockPropagator();
 
-            $campusMapper->setNotifier($silence);
-            $eventMapper->setNotifier($silence);
-            $categoryRelationMapper->setNotifier($silence);
-            $roleRelationMapper->setNotifier($silence);
+            $campusMapper->setEventPropagator($mockPropagator);
+            $eventMapper->setEventPropagator($mockPropagator);
+            $categoryRelationMapper->setEventPropagator($mockPropagator);
+            $roleRelationMapper->setEventPropagator($mockPropagator);
 
             /* All the campuses selected in the ui
              */
