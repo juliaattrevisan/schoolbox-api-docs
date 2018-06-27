@@ -792,9 +792,10 @@ class Controller extends Assessment\Controller
         $selfAssessable = $participant ? (new ValidSelfAssessable())->isSatisfiedBy($this->getUser(), $participant) : false;
 
         if ($isFinal) {
+            $validateSubmission = !$rq->post->getBool('submitted_in_person');
 
-            // verify that there are actually any files attached; if not, that's a fail case
-            if ($response->getAllFiles()->count() === 0) {
+            // verify that there should be any files attached; if not, that's a fail case
+            if ($validateSubmission && $response->getAllFiles()->count() === 0) {
                 $errorMessage = 'One or more files failed to attach to your submission; please try again.';
                 $redirect = $this->getRouter()->generate(
                     'learningAssessment.getCreateResponseForm',
