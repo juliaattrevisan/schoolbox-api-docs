@@ -88,7 +88,13 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
     protected function scheduleNotification(TriggerInterface $trigger)
     {
         if ($trigger instanceof CancelTrigger) { // FIREFIGHT
-            $this->log->info('Unscheduling CancelTrigger'); // FIREFIGHT
+            $this->log->info('Unscheduling CancelTrigger '.$trigger->getIdString()); // FIREFIGHT
+            $this->unschedule($trigger);
+            return;
+        }
+
+        if($trigger->getTimestamp() < 0) {
+            $this->log->info('Unscheduling negative timestamp '.$trigger->getIdString()); // FIREFIGHT
             $this->unschedule($trigger);
             return;
         }
@@ -96,7 +102,7 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
         $interval = $trigger->getTimestamp() - $this->clock->time();
 
         if ($interval <= 0) {
-            $this->log->info('Immediately dispatching trigger');
+            $this->log->info('Immediately dispatching trigger '.$trigger->getIdString());
             $previousTriggerExisted = $this->unschedule($trigger);
             $this->log->debug($previousTriggerExisted ? 'Cleared previous trigger' : 'No previous trigger was set', [ 'char' => '-' ]);
 
@@ -186,8 +192,9 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
         $timer->setData($trigger);
         $this->putTimer($model, $label, $timer);
 
-        $this->log->info(sprintf("Scheduling trigger '%s' for %s", $trigger->getIdString(), date('Y-m-d H:i:s', $trigger->getTimestamp())),
-            [ 'char' => '+' ]
+        $this->log->info(
+            sprintf("Scheduling trigger '%s' for %s", $trigger->getIdString(), date('Y-m-d H:i:s', $trigger->getTimestamp())),
+            ['char' => '+']
         );
 
         return true;
