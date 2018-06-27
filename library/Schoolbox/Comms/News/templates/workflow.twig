@@ -39,7 +39,7 @@
          # The publish date offset should be used to prevent ultra-immediate broadcast if people are
          # finding themselves publishing too quickly
          #}
-        {% if news.isSumitted %}
+        {% if news.isSubmitted %}
             {% set identifier = 'awaiting-publication' %}
 
             {# If the publish date is reached: sent it. Presumably. #}
