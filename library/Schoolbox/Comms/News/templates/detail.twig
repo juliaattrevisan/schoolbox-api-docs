@@ -153,6 +153,33 @@
 </div>
 {% endif %}
 
+{# Rejection details, if applicable
+ # Only show rejection info prior to acceptance
+ #}
+{% if news.isRejected and not news.isModerated %}
+<div class="row">
+    <div class="small-12 island">
+        <section class="no-pad no-margin">
+            <p class="content no-margin"><span class="icon-info"></span>
+                This {{ locale.news }} was <strong>rejected</strong>
+                by {{ news.rejectedBy.fullname }}
+                on {{ news.rejectedAt.local }}
+
+                {% if news.rejectedReason|length %}
+                    for the following reason:
+                {% else %}
+                    but no reason was given.
+                {% endif %}
+            </p>
+        </section>
+
+        {% if news.rejectedReason|length %}
+        <blockquote>{{ news.rejectedReason|nl2br }}</blockquote>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
 
 <div class="row">
     <div class="small-12 columns">
