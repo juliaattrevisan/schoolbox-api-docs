@@ -23,7 +23,6 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\UserMapper;
 
-
 class Module extends BaseModule
 {
     /**
@@ -46,7 +45,9 @@ class Module extends BaseModule
             )
         );
 
-        $preloadNews = function ($params) { return $this->preloadNews($params); };
+        $preloadNews = function ($params) {
+            return $this->preloadNews($params);
+        };
 
         /* Get a list of articles needing moderation
          */
@@ -76,9 +77,8 @@ class Module extends BaseModule
     {
         try {
             $news = $this->getNewsMapper()->findById($params['newsId']);
-        }
-        catch (MapperException $e) {
-            throw new NotFound(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+        } catch (MapperException $e) {
+            throw new NotFound($this->getErrorMapper()->getMessageById(ErrorMapper::ERROR_GENERIC_NOT_FOUND));
         }
 
         return [
@@ -93,7 +93,7 @@ class Module extends BaseModule
      */
     protected function getNewsMapper()
     {
-        return $this->getMapperFactory()->get(\Schoolbox\Comms\News\Mapper::class);
+        return $this->getMapperFactory()->get(NewsMapper::class);
     }
 
 
@@ -142,4 +142,15 @@ class Module extends BaseModule
     {
         return $this->getMapperFactory()->get(UserMapper::class);
     }
+
+
+    /**
+     * @return Mapper|ErrorMapper
+     * @throws InvalidArgumentException
+     */
+    protected function getErrorMapper()
+    {
+        return $this->getMapperFactory()->get(ErrorMapper::class);
+    }
+
 }
