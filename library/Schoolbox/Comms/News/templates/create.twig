@@ -47,7 +47,7 @@
             <ul class="meta">
                 {% if news.moderatedBy.id %}
                     <li class="icon-staff">Last moderated by {{ news.moderatedBy.fullname }}
-                        {% if not news.moderatedAt.isNull %}
+                        {% if news.isModerated %}
                             on {{ news.moderatedAt.local }}
                         {% endif %}
                     </li>

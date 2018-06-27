@@ -8,7 +8,7 @@
  #}
 {% macro render(news) %}
     {% if news.id %}
-        {% if news.submittedAt.local == '' %}
+        {% if not news.isSubmitted %}
 
             {# Exists as a draft #}
             {% set newStyle = 'style="display:none"' %}
@@ -22,7 +22,7 @@
 
         {% endif %}
 
-    {% elseif news.submittedAt.local == '' %}
+    {% elseif not news.isSubmitted %}
 
         {# New article, never saved before #}
         {% set newStyle = 'style="display:none"' %}

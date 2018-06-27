@@ -20,11 +20,11 @@
     {% set identifier = 'preview' %}
 
     {% if moderationRequired %}
-        {% if news.submittedAt.local|length %}
+        {% if news.isSubmitted %}
             {% set identifier = 'awaiting-moderation' %}
 
             {# Moderation is required and the moderatedAt is set; then we're awaiting publication #}
-            {% if news.moderatedAt.local|length %}
+            {% if news.isModerated %}
                 {% set identifier = 'awaiting-publication' %}
 
                 {# If the publish date is reached: sent it. Presumably. #}
@@ -39,7 +39,7 @@
          # The publish date offset should be used to prevent ultra-immediate broadcast if people are
          # finding themselves publishing too quickly
          #}
-        {% if news.submittedAt.local|length %}
+        {% if news.isSumitted %}
             {% set identifier = 'awaiting-publication' %}
 
             {# If the publish date is reached: sent it. Presumably. #}
@@ -64,7 +64,7 @@
 {% if news.id %}
     {% if isCommsOfficer %}
         {% set composeUrl = routeLookup('commsNews.getUpdate', {newsId: news.id}) %}
-    {% elseif moderationRequired and not news.moderatedAt|length %}
+    {% elseif moderationRequired and not news.isModerated %}
         {% set composeUrl = routeLookup('commsNews.getUpdate', {newsId: news.id}) %}
     {% elseif not moderationRequired %}
         {% set composeUrl = routeLookup('commsNews.getUpdate', {newsId: news.id}) %}
@@ -109,9 +109,9 @@
  # Varies depending on the moderation policy
  #}
 {% if moderationRequired %}
-    {% if news.moderatedAt.local|length %}
+    {% if news.isModerated %}
         {% set alt = 'This article was moderated on ' ~ news.moderatedAt.local  %}
-    {% elseif news.submittedAt.local|length %}
+    {% elseif news.isSubmittedAt %}
         {% set alt = 'This article is awaiting moderation since ' ~ news.submittedAt.local %}
     {% else %}
         {% set alt = 'This article will require moderation before being made available to the audience' %}
@@ -156,7 +156,7 @@
 {% if news.id %}
     {% set alt = alt ~ ' on ' ~ news.publishAt.local %}
 
-    {% if moderationRequired and news.moderatedAt.local|length and news.moderatedAt.isPast %}
+    {% if moderationRequired and news.isModerated and news.moderatedAt.isPast %}
         {% if news.publishAt.isPast %}
             {% set alt = 'This article publishes on ' ~ news.publishAt.local  %}
         {% endif %}
