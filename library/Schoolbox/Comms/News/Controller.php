@@ -222,17 +222,23 @@ class Controller extends Base
 
             $this->persist($news, $this->getRequest()->post);
 
-            /* Re-send the form action back to js
-             */
-            $formAction = $this->getRouter()->generate('commsNews.getUpdate', ['newsId' => $news->getId()]);
-
             /* Save a draft of the news article
              * This can occur from either the Create or Update context
              * Update the form action accordingly
              */
             if ($this->getRequest()->isXhr()) {
+
+                /* Current url should secretly update to the Update route
+                 */
+                $url = $this->getRouter()->generate('commsNews.getUpdate', ['newsId' => $news->getId()]);
+
+                /* Form action should secretly update to the Update route
+                 */
+                $formAction = $this->getRouter()->generate('commsNews.postUpdate', ['newsId' => $news->getId()]);
+
                 $this->getResponse()->content->set($this->buildJsonOutput([
                     'success' => true,
+                    'url' => $url,
                     'formAction' => $formAction
                 ]));
             } else {

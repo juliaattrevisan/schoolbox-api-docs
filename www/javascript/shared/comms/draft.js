@@ -27,9 +27,7 @@
 
         /* Set up custom event
          */
-        $(config.element).on('draft', function() {
-            save();
-        });
+        $(config.element).on('draft', save);
 
         /* Watch the content for changes
          */
@@ -198,7 +196,7 @@
 
                 /* hehe
                  */
-                window.history.pushState({}, null, responseText.formAction);
+                window.history.pushState({}, null, responseText.url);
 
                 config.toaster.toastTimeout({
                     text: 'Draft Saved',
