@@ -62,7 +62,7 @@
         {% endif %}
 
         {# Add a new news article #}
-        <li><a class="icon-add" href="{{ routeLookupIfAuthorized('commsNews.getCreate') }}" title="Craete a new article">Create New</a></li>
+        <li><a class="icon-add" href="{{ routeLookupIfAuthorized('commsNews.getCreate') }}" title="Create a new article">Create</a></li>
 
         {# Delete this news article #}
         {% set deleteRoute = routeLookupIfAuthorized('commsNews.postDelete', {newsId: news.id}) %}
