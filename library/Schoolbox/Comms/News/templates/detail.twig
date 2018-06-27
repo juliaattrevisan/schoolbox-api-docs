@@ -241,10 +241,7 @@
             {% endif %}
 
 
-            {# Publish this news article
-             # Moderation is required and you're on the preview screen
-             # As a Moderator, you're prompted to consciously publish this to the world
-             #}
+            {# Accept this news article for publication to the world #}
             {% if isAcceptable %}
             <li>
                 <form action="{{ routeLookup('commsNewsModeration.postAccept', {newsId: news.id}) }}" method="post">
