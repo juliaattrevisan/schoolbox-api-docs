@@ -64,65 +64,6 @@
         {# Add a new news article #}
         <li><a class="icon-add" href="{{ routeLookupIfAuthorized('commsNews.getCreate') }}" title="Craete a new article">Create New</a></li>
 
-        {# Modify this news article #}
-        {% set modifyRoute = routeLookupIfAuthorized('commsNews.getUpdate', {newsId: news.id}) %}
-
-        {% if modifyRoute %}
-            <li><a class="icon-modify" href="{{ modifyRoute }}" title="Modify this article">Modify</a></li>
-        {% endif %}
-
-        {# Reject this news article #}
-        {% set rejectRoute = routeLookupIfAuthorized('commsNewsModeration.postReject', {newsId: news.id}) %}
-
-        {% if rejectRoute %}
-            <script>
-                $(function() {
-                    $('[data-reject]').on('click', function(event) {
-                        event.preventDefault();
-
-                        var element = $(this);
-                        var toast = $('#toast');
-                        var title = element.attr('data-reject');
-
-                        $(this).confirmDialog({
-                            header: 'Reject ' + title,
-                            format: 'html',
-                            text: 'Provide brief feedback for rejecting this article to help the author improve this content. <textarea id="rejectedReason"></textarea>',
-                            confirmLabel: 'Reject',
-                            cancelLabel: 'Cancel',
-                            confirmEvent: function() {
-                                toast.toastActivate({
-                                    text: 'Rejecting ' + title
-                                });
-
-                                $.ajax({
-                                    type: 'POST',
-                                    url: element.attr('href'),
-                                    data: {newsId: {{ news.id }}},
-                                    dataType: 'json'
-                                }).success(function (response) {
-                                    toast.toastTimeout({
-                                        text: title + ' was rejected',
-                                        css: 'success'
-                                    });
-
-                                    window.location.href = response.redirect;
-                                }).error(function (response) {
-                                    var temp = $.parseJSON(response.responseText);
-
-                                    toast.toastTimeout({
-                                        text: 'Error: ' + temp.message,
-                                        css: 'alert'
-                                    });
-                                });
-                            }
-                        });
-                    });
-                });
-            </script>
-            <li><a class="icon-weather" href="{{ rejectRoute }}" title="Reject this article" data-reject="{{ news.title }}">Reject</a></li>
-        {% endif %}
-
         {# Delete this news article #}
         {% set deleteRoute = routeLookupIfAuthorized('commsNews.postDelete', {newsId: news.id}) %}
 
@@ -213,74 +154,107 @@
 {% endif %}
 
 
-{# Moderation is required
- # You're prompted to consciously submit for moderation
- #}
-{% if policies['global_moderation'].value and not news.submittedAt.local|length %}
-<div class="row">
-    <div class="small-12 island">
-        <form action="{{ routeLookup('commsNewsModeration.postSubmit', {newsId: news.id}) }}" method="post">
-            <input type="submit" value="Submit for moderation" />
-        </form>
-    </div>
-</div>
-{% endif %}
-
-
-{# Publish #}
-{% if policies['global_moderation'].value %}
-
-    {# Moderation is required and you're on the preview screen
-     # As a Moderator, you're prompted to consciously publish this to the world
-     #}
-    {% if isCommsOfficer and news.submittedAt.local|length and not news.moderatedAt.local|length %}
-        <div class="row">
-            <div class="small-12 island">
-                <form action="{{ routeLookup('commsNewsModeration.postAccept', {newsId: news.id}) }}" method="post">
-                    <input type="submit" value="Publish" />
-                </form>
-            </div>
-        </div>
-    {% endif %}
-{% elseif not news.submittedAt.local|length %}
-
-    {# Moderation isn't required and you're on the preview screen
-     # You're prompted to consciously publish to the world
-     #}
-    <div class="row">
-        <div class="small-12 island">
-            <form action="{{ routeLookup('commsNewsModeration.postSubmit', {newsId: news.id}) }}" method="post">
-                <input type="submit" value="Publish" />
-            </form>
-        </div>
-    </div>
-{% endif %}
-
-<div class="toast" id="toast"></div>
-
-<br /><br /><br /><br /><br /><br />
-
-{% if isCommsOfficer %}
 <div class="row">
     <div class="small-12 columns">
         <ul class="flex-list buttons">
+
+        {# Unsubmitted articles need explicit actions to be made available to the world
+         #
+         # Moderation is required: you're prompted to consciously submit for moderation
+         # Moderation isn't required: you're prompted to consciously publish to the world
+         #}
+        {% if not news.submittedAt.local|length %}
+            {% if policies['global_moderation'].value %}
+                {% set buttonText = 'Submit for moderation' %}
+            {% else %}
+                {% set buttonText = 'Publish' %}
+            {% endif %}
             <li>
                 <form action="{{ routeLookup('commsNewsModeration.postSubmit', {newsId: news.id}) }}" method="post">
-                    <button>Modify</button>
+                    <input type="submit" value="{{ buttonText }}" />
                 </form>
             </li>
+        {% endif %}
+
+
+        {# Moderators #}
+        {% if isCommsOfficer %}
+
+            {# Modify this news article #}
+            {% set modifyRoute = routeLookupIfAuthorized('commsNews.getUpdate', {newsId: news.id}) %}
+
+            {% if modifyRoute %}
+                <li><a class="icon-modify" href="{{ modifyRoute }}" title="Modify this article">Modify</a></li>
+            {% endif %}
+
+
+            {# Reject this news article #}
+            {% set rejectRoute = routeLookupIfAuthorized('commsNewsModeration.postReject', {newsId: news.id}) %}
+
+            {% if rejectRoute %}
+                <script>
+                    $(function() {
+                        $('[data-reject]').on('click', function(event) {
+                            event.preventDefault();
+
+                            var element = $(this);
+                            var toast = $('#toast');
+                            var title = element.attr('data-reject');
+
+                            $(this).confirmDialog({
+                                header: 'Reject ' + title,
+                                format: 'html',
+                                text: 'Provide brief feedback for rejecting this article to help the author improve this content. <textarea id="rejectedReason"></textarea>',
+                                confirmLabel: 'Reject',
+                                cancelLabel: 'Cancel',
+                                confirmEvent: function() {
+                                    toast.toastActivate({
+                                        text: 'Rejecting ' + title
+                                    });
+
+                                    $.ajax({
+                                        type: 'POST',
+                                        url: element.attr('href'),
+                                        data: {newsId: {{ news.id }}},
+                                        dataType: 'json'
+                                    }).success(function (response) {
+                                        toast.toastTimeout({
+                                            text: title + ' was rejected',
+                                            css: 'success'
+                                        });
+
+                                        window.location.href = response.redirect;
+                                    }).error(function (response) {
+                                        var temp = $.parseJSON(response.responseText);
+
+                                        toast.toastTimeout({
+                                            text: 'Error: ' + temp.message,
+                                            css: 'alert'
+                                        });
+                                    });
+                                }
+                            });
+                        });
+                    });
+                </script>
+                <li><a class="icon-weather" href="{{ rejectRoute }}" title="Reject this article" data-reject="{{ news.title }}">Reject</a></li>
+            {% endif %}
+
+            {# Publish this news article
+             # Moderation is required and you're on the preview screen
+             # As a Moderator, you're prompted to consciously publish this to the world
+             #}
+            {% if policies['global_moderation'].value and news.submittedAt.local|length and not news.moderatedAt.local|length %}
             <li>
-                <form action="{{ routeLookup('commsNewsModeration.postSubmit', {newsId: news.id}) }}" method="post">
-                    <button>Reject</button>
-                </form>
-            </li>
-            <li>
-                <form action="{{ routeLookup('commsNewsModeration.postSubmit', {newsId: news.id}) }}" method="post">
+                <form action="{{ routeLookup('commsNewsModeration.postAccept', {newsId: news.id}) }}" method="post">
                     <input type="submit" value="Publish" />
                 </form>
             </li>
-        </ul>
+            {% endif %}
+        {% endif %}
 
+        </ul>
     </div>
 </div>
-{% endif %}
+
+<div class="toast" id="toast"></div>
