@@ -372,10 +372,10 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @param \Alaress_Date_Format $submittedAt
+     * @param null|\Alaress_Date_Format $submittedAt
      * @return $this
      */
-    public function setSubmittedAt(\Alaress_Date_Format $submittedAt): self
+    public function setSubmittedAt(?\Alaress_Date_Format $submittedAt): self
     {
         $this->submittedAt = $submittedAt;
         return $this;

@@ -166,7 +166,9 @@ class Controller extends Base
     public function postReject(Model $news)
     {
         if ((new ValidUserCanReject())->isSatisfiedBy($this->getUser())) {
-            $news->setRejectedBy($this->getUser())
+            $news
+                ->setSubmittedAt(null)
+                ->setRejectedBy($this->getUser())
                 ->setRejectedAt(\Alaress_Date_Format::now())
                 ->setRejectedReason($this->getRequest()->post['rejectedReason']);
 
