@@ -65,6 +65,41 @@ class Model implements ISoftDeletable
     private $submittedAt;
 
     /**
+     * The person who allowed this article to be published
+     *
+     * @var User|null
+     */
+    private $moderatedBy;
+
+    /**
+     * The datetime when this article was allowed to be published
+     *
+     * @var \Alaress_Date_Format
+     */
+    private $moderatedAt;
+
+    /**
+     * The datetime when this article was rejected
+     *
+     * @var \Alaress_Date_Format
+     */
+    private $rejectedAt;
+
+    /**
+     * The person who rejected this article
+     *
+     * @var User|null
+     */
+    private $rejectedBy;
+
+    /**
+     * The reason why this article was rejected
+     *
+     * @var string
+     */
+    private $rejectedReason;
+
+    /**
      * The article becomes available to the audience at this time
      *
      * @var \Alaress_Date_Format
@@ -78,19 +113,6 @@ class Model implements ISoftDeletable
      */
     private $expiresAt;
 
-    /**
-     * The person who allowed this article to be published
-     *
-     * @var User|null
-     */
-    private $moderatedBy;
-
-    /**
-     * The datetime when this article was allowed to be published
-     *
-     * @var \Alaress_Date_Format
-     */
-    private $moderatedAt;
 
     /**
      * A set of News\Topic instances - there used to be only one, but now there are zero or many
@@ -315,6 +337,66 @@ class Model implements ISoftDeletable
     public function setSubmittedAt(\Alaress_Date_Format $submittedAt): self
     {
         $this->submittedAt = $submittedAt;
+        return $this;
+    }
+
+
+    /**
+     * @return \Alaress_Date_Format|null
+     */
+    public function getRejectedAt(): ?\Alaress_Date_Format
+    {
+        return $this->rejectedAt;
+    }
+
+
+    /**
+     * @param \Alaress_Date_Format $rejectedAt
+     * @return $this
+     */
+    public function setRejectedAt(\Alaress_Date_Format $rejectedAt): self
+    {
+        $this->rejectedAt = $rejectedAt;
+        return $this;
+    }
+
+
+    /**
+     * @return null|User
+     */
+    public function getRejectedBy(): ?User
+    {
+        return $this->rejectedBy;
+    }
+
+
+    /**
+     * @param null|User $rejectedBy
+     * @return $this
+     */
+    public function setRejectedBy(?User $rejectedBy): self
+    {
+        $this->rejectedBy = $rejectedBy;
+        return $this;
+    }
+
+
+    /**
+     * @return null|string
+     */
+    public function getRejectedReason(): ?string
+    {
+        return $this->rejectedReason;
+    }
+
+
+    /**
+     * @param null|string $rejectedReason
+     * @return $this
+     */
+    public function setRejectedReason(?string $rejectedReason): self
+    {
+        $this->rejectedReason = $rejectedReason;
         return $this;
     }
 }

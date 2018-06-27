@@ -41,6 +41,9 @@ class Mapper extends \Schoolbox\Mapper
         $this->joins('author_id', UserMapper::class, 'id', null, null, 'author', 'author');
         $this->joins('moderated_by', UserMapper::class, 'id', null, null, 'moderatedBy', 'moderator');
         $this->uses('moderated_at', self::TYPE_DATETIME);
+        $this->joins('rejected_by', UserMapper::class, 'id', null, null, 'rejectedBy', 'rejector');
+        $this->uses('rejected_at', self::TYPE_DATETIME);
+        $this->uses('rejected_reason', self::TYPE_STRING);
         $this->uses('submitted_at', self::TYPE_DATETIME);
         $this->uses('publish_at', self::TYPE_DATETIME);
         $this->uses('expires_at', self::TYPE_DATETIME);
@@ -74,7 +77,8 @@ class Mapper extends \Schoolbox\Mapper
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('author', 'a')},
                 {$this->getJoinColumnString('comms_news_article_topic', 'topics')},
-                {$this->getJoinColumnString('moderator', 'm')}
+                {$this->getJoinColumnString('moderator', 'm')},
+                {$this->getJoinColumnString('rejector', 'r')}
         ";
     }
 
@@ -92,6 +96,7 @@ class Mapper extends \Schoolbox\Mapper
             LEFT JOIN {$this->getJoinSql('comms_news_article_topic', null, 'topics')}
             INNER JOIN {$this->getJoinSql('author', null, 'a', true)}
             LEFT JOIN {$this->getJoinSql('moderator', null, 'm', true)}
+            LEFT JOIN {$this->getJoinSql('rejector', null, 'r', true)}
         ";
     }
 
@@ -127,6 +132,13 @@ class Mapper extends \Schoolbox\Mapper
 
                 if ($moderator) {
                     $news->setModeratedBy($moderator);
+                }
+
+                /** @var User $rejector */
+                $rejector = $this->getJoinMapper('rejector')->hydrate($row, 'r');
+
+                if ($rejector) {
+                    $news->setRejectedBy($rejector);
                 }
             }
 
