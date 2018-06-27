@@ -71,6 +71,58 @@
             <li><a class="icon-modify" href="{{ modifyRoute }}" title="Modify this article">Modify</a></li>
         {% endif %}
 
+        {# Reject this news article #}
+        {% set rejectRoute = routeLookupIfAuthorized('commsNewsModeration.postReject', {newsId: news.id}) %}
+
+        {% if rejectRoute %}
+            <script>
+                $(function() {
+                    $('[data-reject]').on('click', function(event) {
+                        event.preventDefault();
+
+                        var element = $(this);
+                        var toast = $('#toast');
+                        var title = element.attr('data-reject');
+
+                        $(this).confirmDialog({
+                            header: 'Reject ' + title,
+                            format: 'html',
+                            text: 'Provide brief feedback for rejecting this article to help the author improve this content. <textarea id="rejectedReason"></textarea>',
+                            confirmLabel: 'Reject',
+                            cancelLabel: 'Cancel',
+                            confirmEvent: function() {
+                                toast.toastActivate({
+                                    text: 'Rejecting ' + title
+                                });
+
+                                $.ajax({
+                                    type: 'POST',
+                                    url: element.attr('href'),
+                                    data: {newsId: {{ news.id }}},
+                                    dataType: 'json'
+                                }).success(function (response) {
+                                    toast.toastTimeout({
+                                        text: title + ' was rejected',
+                                        css: 'success'
+                                    });
+
+                                    window.location.href = response.redirect;
+                                }).error(function (response) {
+                                    var temp = $.parseJSON(response.responseText);
+
+                                    toast.toastTimeout({
+                                        text: 'Error: ' + temp.message,
+                                        css: 'alert'
+                                    });
+                                });
+                            }
+                        });
+                    });
+                });
+            </script>
+            <li><a class="icon-weather" href="{{ rejectRoute }}" title="Reject this article" data-reject="{{ news.title }}">Reject</a></li>
+        {% endif %}
+
         {# Delete this news article #}
         {% set deleteRoute = routeLookupIfAuthorized('commsNews.postDelete', {newsId: news.id}) %}
 

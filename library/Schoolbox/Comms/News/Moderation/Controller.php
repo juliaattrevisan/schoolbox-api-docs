@@ -149,4 +149,9 @@ class Controller extends Base
         $nextStep = $this->getRouter()->generate('commsNewsModeration.getList');
         $this->getResponse()->redirect->to($nextStep);
     }
+
+    public function postReject(Model $news)
+    {
+        die('haha, rejected ' . $news->getTitle());
+    }
 }
