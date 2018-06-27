@@ -195,7 +195,6 @@ class DescriptorMapper extends Schoolbox\Mapper {
         $toLevels = $this->getJoinMapper('level')->findByColumn('box_id', $to_id);
 
         // And copy each descriptor in the from box into the to box
-        // TODO fix for rubric group mapper
         /** @var SubmissionBox $toBox */
         $toBox  = SubmissionBoxMapper::getInstance()->findById($to_id);
         $toList = new Schoolbox\Collection();
