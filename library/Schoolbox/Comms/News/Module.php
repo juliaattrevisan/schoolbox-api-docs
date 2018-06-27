@@ -71,7 +71,7 @@ class Module extends BaseModule
         /* Update news article
          */
         $this->register('GET', '/{newsId:\d+}/update', 'getUpdate', $getPerms, $preloadNews);
-        $this->register('POST', '/{newsId:\d+}/update', 'postUpdate', $getPerms, $preloadNews);
+        $this->register('POST', '/{newsId:\d+}', 'postUpdate', $getPerms, $preloadNews);
 
         /* View news article
          */
@@ -79,7 +79,7 @@ class Module extends BaseModule
 
         /* Submit For Moderation
          */
-        $this->register('POST', '/{newsId:\d+}', 'postSubmitForModeration', null, $preloadNews);
+        $this->register('POST', '/{newsId:\d+}/submit', 'postSubmitForModeration', null, $preloadNews);
 
         /* Delete article
          */
