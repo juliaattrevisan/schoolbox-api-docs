@@ -5,6 +5,8 @@
  * @link      http://www.alaress.com.au/
  */
 
+declare(strict_types=1);
+
 namespace Page\News;
 
 use AcceptanceTester;
@@ -49,22 +51,48 @@ class Form
     /**
      * Generates route for this page.
      *
-     * @param $id
-     * @return mixed
+     * @param string $id
+     * @return string
      */
-    public function generateRoute($id)
+    private function generateRoute(string $id): string
     {
         return str_replace('{id}', $id, self::URL);
     }
 
-    public function setHeadline($headline)
+    /**
+     * Generates create route for this page.
+     *
+     * @return string
+     */
+    public function generateCreateRoute(): string
     {
-        // TODO add steps for setting headline here
+        return $this->generateRoute('');
     }
 
-    public function setArticle($article)
+    /**
+     * Generates modify route for this page.
+     *
+     * @param int $id
+     * @return string
+     */
+    public function generateModifyRoute(int $id): string
     {
-        // TODO add steps for setting article content here
-        // TODO will need to figure out how to set rich text content
+        return $this->generateRoute((string)$id);
+    }
+
+    /**
+     * @param string $headline
+     */
+    public function setHeadline(string $headline): void
+    {
+        $this->tester->fillField('heading', $headline);
+    }
+
+    /**
+     * @param string $article
+     */
+    public function setArticle(string $article): void
+    {
+        $this->tester->fillField('body', $article);
     }
 }
