@@ -216,6 +216,10 @@ class External_Pcschools_Timetable implements External_TimetableInterface
      */
     public function getDayTimetable($externalUserId, $userId, Campus $campus, $dayNumber)
     {
+        if (!(new External_Pcschools_ValidCampusSpec())->isSatisfiedBy($campus)) {
+            return [];
+        }
+
         try {
             $user = $this->userMapper->findById($userId);
         } catch (MapperException $e) {
@@ -224,12 +228,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
 
         $studentExternalId = '';
         $teacherExternalId = '';
-
-        $timePeriod = $campus->getExtTimetableCode();
-        if('' == $timePeriod) {
-            return [];
-        }
-
+        $timePeriod        = $campus->getExtTimetableCode();
         if ($user->getRole()->isStudent()) {
             $studentExternalId = $user->getExternalId();
         } elseif ($user->getRole()->isStaff()) {
@@ -337,6 +336,10 @@ class External_Pcschools_Timetable implements External_TimetableInterface
      */
     public function getTimetableForDate($externalUserId, $userId, Campus $campus, Alaress_Date_Format $date)
     {
+        if (!(new External_Pcschools_ValidCampusSpec())->isSatisfiedBy($campus)) {
+            return [];
+        }
+
         try {
             $user = $this->userMapper->findById($userId);
         } catch (MapperException $e) {
@@ -489,6 +492,10 @@ class External_Pcschools_Timetable implements External_TimetableInterface
      */
     public function getFullTimetable($externalUserId, $userId, Campus $campus)
     {
+        if (!(new External_Pcschools_ValidCampusSpec())->isSatisfiedBy($campus)) {
+            return [];
+        }
+
         // I need to know if $userId is a teacher or student
         try {
             $user = $this->userMapper->findById($userId);
@@ -499,9 +506,6 @@ class External_Pcschools_Timetable implements External_TimetableInterface
         $studentExternalId = '';
         $teacherExternalId = '';
         $timePeriod        = $campus->getExtTimetableCode();
-        if('' == $timePeriod) {
-            return [];
-        }
         if ($user->getRole()->isStudent()) {
             $studentExternalId = $user->getExternalId();
         } elseif ($user->getRole()->isStaff()) {
@@ -607,9 +611,10 @@ class External_Pcschools_Timetable implements External_TimetableInterface
 
         $campuses = CampusMapper::getInstance()->findAll();
 
+        $spec     = new External_Pcschools_ValidCampusSpec();
         foreach ($campuses as $campus) {
-            $timePeriod = trim($campus->getExtTimetableCode());
-            if ($timePeriod !== '') {
+            if ($spec->isSatisfiedBy($campus)) {
+                $timePeriod = $campus->getExtTimetableCode();
                 break;
             }
         }
