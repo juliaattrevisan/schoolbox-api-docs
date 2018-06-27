@@ -347,6 +347,7 @@ class Controller extends Base
             'policies' => $policies,
             'news' => $news,
             'isCommsOfficer' => (new ValidUserIsCommsOfficer())->isSatisfiedBy($this->getUser()),
+            'isAcceptable' => (new Moderation\ValidCanAccept())->isSatisfiedBy($policies->getOffset('global_moderation')->getValue(), $news),
             'isDeletable' => (new ValidUserCanDelete())->isSatisfiedBy($this->getUser(), $news)
         ])->setTitle($news->getTitle()));
     }

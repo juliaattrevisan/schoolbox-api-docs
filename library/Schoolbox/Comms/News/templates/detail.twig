@@ -240,11 +240,12 @@
                 <li><a class="icon-weather" href="{{ rejectRoute }}" title="Reject this article" data-reject="{{ news.title }}">Reject</a></li>
             {% endif %}
 
+
             {# Publish this news article
              # Moderation is required and you're on the preview screen
              # As a Moderator, you're prompted to consciously publish this to the world
              #}
-            {% if policies['global_moderation'].value and news.submittedAt.local|length and not news.moderatedAt.local|length %}
+            {% if isAcceptable %}
             <li>
                 <form action="{{ routeLookup('commsNewsModeration.postAccept', {newsId: news.id}) }}" method="post">
                     <input type="submit" value="Publish" />
