@@ -1,5 +1,6 @@
 <?php
 
+use Facebook\WebDriver\JavaScriptExecutor;
 
 /**
  * Inherited Methods
@@ -187,5 +188,23 @@ class AcceptanceTester extends \Codeception\Actor
 
                 $webDriver->switchTo()->defaultContent();
             });
+    }
+
+
+    /**
+     * Fill in a rich text area.
+     *
+     * @param string $field
+     * @param string $value
+     */
+    public function fillRichTextField(string $field, string $value)
+    {
+        $this->executeInSelenium(
+            function (JavaScriptExecutor $webDriver) use ($field, $value) {
+                $webDriver->executeScript(
+                    sprintf('CKEDITOR.instances.%s.setData("%s")', addslashes($field), addslashes($value))
+                );
+            }
+        );
     }
 }

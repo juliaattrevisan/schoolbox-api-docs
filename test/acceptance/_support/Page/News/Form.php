@@ -93,6 +93,6 @@ class Form
      */
     public function setArticle(string $article): void
     {
-        $this->tester->fillField('body', $article);
+        $this->tester->fillRichTextField('body', $article);
     }
 }
