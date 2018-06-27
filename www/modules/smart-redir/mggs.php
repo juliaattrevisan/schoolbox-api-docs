@@ -9,136 +9,137 @@ $page = new SitePage;
 
 if ($_GET) {
 
-	$to = $_GET['directTo'];
-	switch ($to) {
+    $to = $_GET['directTo'];
+    switch ($to) {
 
-		case "worldbook":
-			$form                 = "loginForm";
-			$action               = "https://www.worldbookonline.com/wb/products?ed=all";
-			$method               = "POST";
-			$formArray['subacct'] = 'AU04114';
-			$formArray['uid']     = "melbggs";
-			$formArray['pwd']     = "melbourne";
-			$formArray['auth']    = "UidPassword";
-			break;
+        case "worldbook":
+            $form                 = "loginForm";
+            $action               = "https://www.worldbookonline.com/wb/products?ed=all";
+            $method               = "POST";
+            $formArray['subacct'] = 'AU04114';
+            $formArray['uid']     = "melbggs";
+            $formArray['pwd']     = "melbourne";
+            $formArray['auth']    = "UidPassword";
+            break;
 
-		case "worldbook-kids":
-			$form                 = "loginForm";
-			$action               = "https://www.worldbookonline.com/wb/products?ed=all";
-			$method               = "POST";
-			$formArray['subacct'] = 'AU04114';
-			$formArray['uid']     = "melbggs";
-			$formArray['pwd']     = "melbourne";
-			$formArray['auth']    = "UidPassword";
-			$formArray['tu']      = 'https://worldbookonline.com/kids/home';
-			break;
+        case "worldbook-kids":
+            $form                 = "loginForm";
+            $action               = "https://www.worldbookonline.com/wb/products?ed=all";
+            $method               = "POST";
+            $formArray['subacct'] = 'AU04114';
+            $formArray['uid']     = "melbggs";
+            $formArray['pwd']     = "melbourne";
+            $formArray['auth']    = "UidPassword";
+            $formArray['tu']      = 'https://worldbookonline.com/kids/home';
+            break;
 
-		case "worldbook-early":
-			$form                 = "loginForm";
-			$action               = "https://www.worldbookonline.com/wb/products?ed=all";
-			$method               = "POST";
-			$formArray['subacct'] = 'AU04114';
-			$formArray['uid']     = "mggmoh";
-			$formArray['pwd']     = "mggmoh";
-			$formArray['auth']    = "UidPassword";
-			$formArray['tu']      = 'https://www.worldbookonline.com/ewol/home';
-			break;
+        case "worldbook-early":
+            $form                 = "loginForm";
+            $action               = "https://www.worldbookonline.com/wb/products?ed=all";
+            $method               = "POST";
+            $formArray['subacct'] = 'AU04114';
+            $formArray['uid']     = "mggmoh";
+            $formArray['pwd']     = "mggmoh";
+            $formArray['auth']    = "UidPassword";
+            $formArray['tu']      = 'https://www.worldbookonline.com/ewol/home';
+            break;
 
-		case "worldbook-ebooks":
-			$form                 = "loginForm";
-			$action               = "https://www.worldbookonline.com/wb/products?ed=all";
-			$method               = "POST";
-			$formArray['subacct'] = 'AU04114';
-			$formArray['uid']     = "mggmoh";
-			$formArray['pwd']     = "mggmoh";
-			$formArray['auth']    = "UidPassword";
-			$formArray['tu']      = 'https://www.worldbookonline.com/wb/ebooks';
-			break;
+        case "worldbook-ebooks":
+            $form                 = "loginForm";
+            $action               = "https://www.worldbookonline.com/wb/products?ed=all";
+            $method               = "POST";
+            $formArray['subacct'] = 'AU04114';
+            $formArray['uid']     = "mggmoh";
+            $formArray['pwd']     = "mggmoh";
+            $formArray['auth']    = "UidPassword";
+            $formArray['tu']      = 'https://www.worldbookonline.com/wb/ebooks';
+            break;
 
-		case "britannica":
-			$form                  = "loginForm";
-			$action                = "https://school.eb.com.au/login";
-			$method                = "POST";
-			$formArray['username'] = "mggs";
-			$formArray['password'] = "mggs";
-			$formArray['target']   = '/';
-			break;
+        case "britannica":
+            $form                  = "loginForm";
+            $action                = "https://school.eb.com.au/login";
+            $method                = "POST";
+            $formArray['username'] = "mggs";
+            $formArray['password'] = "mggs";
+            $formArray['target']   = '/';
+            break;
 
-		case "britannica-kids":
-			$form                  = "loginForm";
-			$action                = "https://secure.britannica.com/login";
-			$method                = "POST";
-			$formArray['username'] = "mggs";
-			$formArray['password'] = "mggs";
-			$formArray['remember'] = 'false';
-			$formArray['fail']     = 'http://kids.britannica.com/failedlogin';
-			$formArray['target']   = 'http://kids.britannica.com/';
-			break;
+        case "britannica-kids":
+            $form                  = "loginForm";
+            $action                = "https://secure.britannica.com/login";
+            $method                = "POST";
+            $formArray['username'] = "mggs";
+            $formArray['password'] = "mggs";
+            $formArray['remember'] = 'false';
+            $formArray['fail']     = 'http://kids.britannica.com/failedlogin';
+            $formArray['target']   = 'http://kids.britannica.com/';
+            break;
 
-		case "oxford":
-			$form                     = "form";
-			$action                   = "http://www.oxfordreference.com/AUTHENTICATE";
-			$method                   = "POST";
-			$formArray['scope']       = 'global';
-			$formArray['username']    = '';
-			$formArray['password']    = '';
-			$formArray['librarycard'] = 'mggs12345';
-			break;
+        case "oxford":
+            $form                     = "form";
+            $action                   = "http://www.oxfordreference.com/AUTHENTICATE";
+            $method                   = "POST";
+            $formArray['scope']       = 'global';
+            $formArray['username']    = '';
+            $formArray['password']    = '';
+            $formArray['librarycard'] = 'mggs12345';
+            break;
 
-		case "oxford_classic":
-			$form              = "form";
-			$action            = "http://classics.oxfordre.com/LOGIN";
-			$method            = "POST";
-			$formArray['dest'] = '/';
-			$formArray['user'] = 'melbgirls';
-			$formArray['pass'] = 'mggs1893';
-			break;
+        case "oxford_classic":
+            $form              = "form";
+            $action            = "http://classics.oxfordre.com/LOGIN";
+            $method            = "POST";
+            $formArray['dest'] = '/';
+            $formArray['user'] = 'melbgirls';
+            $formArray['pass'] = 'mggs1893';
+            break;
 
-		case "oxford_greek":
-			$form              = "form";
-			$action            = "http://www.oxfordreference.com/LOGIN";
-			$method            = "POST";
-			$formArray['dest'] = '/view/10.1093/acref/9780195170726.001.0001/acref-9780195170726';
-			$formArray['user'] = 'melbgirls';
-			$formArray['pass'] = 'mggs1893';
-			break;
+        case "oxford_greek":
+            $form              = "form";
+            $action            = "http://www.oxfordreference.com/LOGIN";
+            $method            = "POST";
+            $formArray['dest'] = '/view/10.1093/acref/9780195170726.001.0001/acref-9780195170726';
+            $formArray['user'] = 'melbgirls';
+            $formArray['pass'] = 'mggs1893';
+            break;
 
-		case "oxford_shakespeare":
-			$form              = "form";
-			$action            = "http://www.oxfordreference.com/LOGIN";
-			$method            = "POST";
-			$formArray['dest'] = '/view/10.1093/acref/9780198117353.001.0001/acref-9780198117353';
-			$formArray['user'] = 'melbgirls';
-			$formArray['pass'] = 'mggs1893';
-			break;
+        case "oxford_shakespeare":
+            $form              = "form";
+            $action            = "http://www.oxfordreference.com/LOGIN";
+            $method            = "POST";
+            $formArray['dest'] = '/view/10.1093/acref/9780198117353.001.0001/acref-9780198117353';
+            $formArray['user'] = 'melbgirls';
+            $formArray['pass'] = 'mggs1893';
+            break;
 
-		case "oxford_dictionary":
-			$form              = "form";
-			$action            = "http://www.oed.com/LOGIN";
-			$method            = "POST";
-			$formArray['dest'] = '/';
-			$formArray['user'] = 'melbgirls';
-			$formArray['pass'] = 'mggs1893';
-			break;
+        case "oxford_dictionary":
+            $form              = "form";
+            $action            = "http://www.oed.com/LOGIN";
+            $method            = "POST";
+            $formArray['dest'] = '/';
+            $formArray['user'] = 'melbgirls';
+            $formArray['pass'] = 'mggs1893';
+            break;
 
-		case "librarywebs";
-			$form      = "Login";
-			$action    = "http://online.librarywebs.net/Login.aspx";
-			$method    = "post";
-			$formArray = ['inputUsername' => 'mggs',
-						  'inputPassword' => 'mggs05',
-						  '__VIEWSTATE'   => '/wEPDwUKMTQ4NzAxMjMzMA9kFgICAQ9kFgQCAQ9kFgICBw8PFgIeB1Zpc2libGVnZGQCAw8PFgIfAGhkZBgBBR5fX0NvbnRyb2xzUmVxdWlyZVBvc3RCYWNrS2V5X18WAQUIYnRuTG9naW4VXANH39VlWJdsuQPLrmub5mrDNg==',
-						  'btnLogin'      => '',
-			];
+        case "librarywebs";
+            $form      = "Login";
+            $action    = "http://online.librarywebs.net/Login.aspx";
+            $method    = "post";
+            $formArray = [
+                'inputUsername' => 'mggs',
+                'inputPassword' => 'mggs05',
+                '__VIEWSTATE'   => '/wEPDwUKMTQ4NzAxMjMzMA9kFgICAQ9kFgQCAQ9kFgICBw8PFgIeB1Zpc2libGVnZGQCAw8PFgIfAGhkZBgBBR5fX0NvbnRyb2xzUmVxdWlyZVBvc3RCYWNrS2V5X18WAQUIYnRuTG9naW4VXANH39VlWJdsuQPLrmub5mrDNg==',
+                'btnLogin'      => '',
+            ];
 
-			break;
+            break;
 
-		case "active-history":
-			$form                       = "form";
-			$action                     = "http://www.activehistory.co.uk/amember/plugins/protect/new_rewrite/login.php?v=-1,2,6,7,8,9,10,11,12,13,14&url=/main_area/index.php";
-			$method                     = "POST";
-			$formArray['amember_login'] = 'melbgirls';
-			$formArray['amember_pass']  = 'mggs1893';
+        case "active-history":
+            $form                       = "form";
+            $action                     = "http://www.activehistory.co.uk/amember/plugins/protect/new_rewrite/login.php?v=-1,2,6,7,8,9,10,11,12,13,14&url=/main_area/index.php";
+            $method                     = "POST";
+            $formArray['amember_login'] = 'melbgirls';
+            $formArray['amember_pass']  = 'mggs1893';
             //$formArray['login_attempt_id'] = '1312519491';
             break;
 
@@ -178,14 +179,14 @@ if ($_GET) {
             $formArray['AuthenticationMethod'] = 'SchoolAuthenticator';
             $formArray['Username']             = 'Morris Hall';
             $formArray['ViewerPassword']       = 'mohalllibrary';
-			break;
+            break;
 
-		default:
-			echo "Did not recognise the site";
-			break;
+        default:
+            echo "Did not recognise the site";
+            break;
 
-	}
-	?>
+    }
+    ?>
 
     <html>
     <head>
@@ -193,32 +194,31 @@ if ($_GET) {
 
     </head>
 
-	<?php
-        echo "<body>";
+    <?php
+    echo "<body>";
 
-        echo "<form method='{$method}' name='{$form}' action='{$action}'>";
-        if (is_array($formArray)) {
-            foreach ($formArray as $key => $value) {
-                if ($key == "submit") {
-                    echo "<br><br><br><br><br><br><br><br><div align='center'>Please $value to continue<br>";
-                    echo "<input name='$key' type='submit' value='$value'></div>";
-                    $nojs = 1;
-                } else {
-                    echo "<input name='$key' type='hidden' value='$value'>";
-                }
+    echo "<form method='{$method}' name='{$form}' action='{$action}'>";
+    if (is_array($formArray)) {
+        foreach ($formArray as $key => $value) {
+            if ($key == "submit") {
+                echo "<br><br><br><br><br><br><br><br><div align='center'>Please $value to continue<br>";
+                echo "<input name='$key' type='submit' value='$value'></div>";
+                $nojs = 1;
+            } else {
+                echo "<input name='$key' type='hidden' value='$value'>";
             }
         }
-	?>
+    }
+    ?>
     </form>
     <script>
-		<?php
-            if (!($nojs)) {
-                echo "document.{$form}.submit();";
-            }
-		?>
+        <?php
+        if (!($nojs)) {
+            echo "document.{$form}.submit();";
+        }
+        ?>
     </script>
     </body>
     </html>
-<?php
+    <?php
 }
-?>
