@@ -485,6 +485,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
                     // Stop pastoral notifier firing on this update, otherwise they receive both a create/update
                     // notification every time someone creates a pastoral record
+                    // TODO make setting a silent notifier actually silence notifications
                     $pastoralNotif = $this->getPastoralMapper()->getNotifier();
                     $this->getPastoralMapper()->setNotifier(new SilentNotif());
                     $this->getPastoralMapper()->save($pastoral);
