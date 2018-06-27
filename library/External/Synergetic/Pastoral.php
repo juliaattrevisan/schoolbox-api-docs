@@ -9,7 +9,6 @@ use Html2Text\Html2Text;
 use Schoolbox\External\Exception as ExternalException;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Notif\SilentNotif;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Pastoral\Access\Model as PastoralAccess;
 use Schoolbox\Pastoral\Attachment\Mapper as PastoralAttachmentMapper;
@@ -29,6 +28,7 @@ use Schoolbox\Pastoral\SubType\Model as PastoralSubType;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
 use Schoolbox\Pastoral\Type\Model as PastoralType;
 use Schoolbox\Pastoral\UploadQueue\Model as UploadQueue;
+use Schoolbox\Realtime\Schedule\Trigger\Test\MockPropagator;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -485,11 +485,10 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
                     // Stop pastoral notifier firing on this update, otherwise they receive both a create/update
                     // notification every time someone creates a pastoral record
-                    // TODO make setting a silent notifier actually silence notifications
-                    $pastoralNotif = $this->getPastoralMapper()->getNotifier();
-                    $this->getPastoralMapper()->setNotifier(new SilentNotif());
+                    $propagator = $this->getPastoralMapper()->getEventPropagator();
+                    $this->getPastoralMapper()->setEventPropagator(new MockPropagator());
                     $this->getPastoralMapper()->save($pastoral);
-                    $this->getPastoralMapper()->setNotifier($pastoralNotif);
+                    $this->getPastoralMapper()->setEventPropagator($propagator);
                 }
 
                 // Export the permissions/audience of the pastoral record to Synergetic

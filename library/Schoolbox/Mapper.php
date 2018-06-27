@@ -714,7 +714,7 @@ abstract class Mapper implements IMapper, Serializable
      * @param IPropagator $propagator
      * @return static
      */
-    protected function setEventPropagator(IPropagator $propagator = null)
+    public function setEventPropagator(IPropagator $propagator = null)
     {
         $this->propagator = $propagator;
         return $this;
