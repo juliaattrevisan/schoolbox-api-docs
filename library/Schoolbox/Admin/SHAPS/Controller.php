@@ -153,15 +153,16 @@ class Controller extends Base
     {
         $errors = [];
         $provisionedUsers = $this->helpRequest->findProvisionedUsers();
+        $allStaff = $this->getAllStaff();
 
-        foreach($this->getAllStaff() as $user) {
+        foreach($allStaff as $user) {
             $errors[$user->getId()] = $this->getInvalidities($user);
         }
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@shaps/provisioning/unprovisioned.twig', [
-                    'allUsers' => $this->getAllStaff()->diff($provisionedUsers),
+                    'allUsers' => $allStaff->diff($provisionedUsers),
                     'pageCurrent' => 'shaps/provisioning',
                     'errors' => $errors
             ])->setTitle('Unprovisioned Staff - Schoolbox Help Staff Provisioning')
