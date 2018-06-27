@@ -112,6 +112,7 @@ class Notifier extends AbstractModuleNotifier
         // instead of raising an update.
         // (This happens because there's an update which happens directly after
         //  a create, if pastoral sync is on; a create has already been issued.)
+        // TODO remove once setting a silent notifier actually silence notifications
         if ($method === self::TRIGGER_UPDATED && $model->getCreatedAt()->eq($model->getUpdatedAt())) {
             return $envelope;
         }
@@ -302,18 +303,6 @@ class Notifier extends AbstractModuleNotifier
         return [
             [$this, "notify" . ucfirst($label)],
         ];
-    }
-
-    /**
-     * Is the current state of a pastoral record meaningfully different to its
-     * previous state?
-     *
-     * @param array|null $diff The difference between the two states
-     * @return bool
-     */
-    private function isMeaningfullyDifferent(array $diff = null): bool
-    {
-        return !empty($diff['description']) || !empty($diff['startAt']);
     }
 
     /**
