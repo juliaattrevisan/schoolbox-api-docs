@@ -109,7 +109,7 @@ class Controller extends WebController\Base
         unset($queryArgs['page']);
 
         $page        = Filter\Page\Model::PAGE_COURSE_MARK_BOOK;
-        $route       = $this->getRouter()->generate('courseMarkbook.postMarkbook', ['userId' => $this->getUser()->getId()]);
+        $route       = $this->getRouter()->generate('courseMarkbook.postMarkbook', ['courseSpecId' => $courseSpec->getId()]);
         $filterPanel = $this->filterFactoryFactory->buildPanel($this->getUser(), $page, $route, $this->getUser(), $queryArgs);
 
         $this->getResponse()->content->set(
