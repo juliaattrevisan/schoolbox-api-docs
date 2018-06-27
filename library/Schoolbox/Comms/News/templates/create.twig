@@ -45,10 +45,10 @@
         <div class="small-12 column">
             <h1>{{ action|capitalize }} {{ locale.news.proper }} {{ indicator.render(news) }}</h1>
             <ul class="meta">
-                {% if news.moderatedBy.id %}
-                    <li class="icon-staff">Last moderated by {{ news.moderatedBy.fullname }}
-                        {% if news.isModerated %}
-                            on {{ news.moderatedAt.local }}
+                {% if news.acceptedBy.id %}
+                    <li class="icon-staff">Last moderated by {{ news.acceptedBy.fullname }}
+                        {% if news.isAccepted %}
+                            on {{ news.acceptedAt.local }}
                         {% endif %}
                     </li>
                 {% endif %}

@@ -35,8 +35,8 @@ CREATE TABLE `comms_news_article` (
   `author_id`          int(11)       UNSIGNED NOT NULL,
   `feature_image_hash` VARCHAR(100)  CHARACTER SET ascii COLLATE ascii_general_ci,
   `submitted_at`       DATETIME,
-  `moderated_by`       int(11)       UNSIGNED,
-  `moderated_at`       DATETIME,
+  `accepted_by`        int(11)       UNSIGNED,
+  `accepted_at`        DATETIME,
   `rejected_by`        int(11)       UNSIGNED,
   `rejected_at`        DATETIME,
   `rejected_reason`    text,
@@ -53,8 +53,8 @@ FOREIGN KEY (`author_id`) REFERENCES `user` (`id`)
 ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 ALTER TABLE `comms_news_article`
-ADD CONSTRAINT `fk_comms_news_article_moderated_by`
-FOREIGN KEY (`moderated_by`) REFERENCES `user` (`id`)
+ADD CONSTRAINT `fk_comms_news_article_accepted_by`
+FOREIGN KEY (`accepted_by`) REFERENCES `user` (`id`)
 ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 ALTER TABLE `comms_news_article`
@@ -80,7 +80,7 @@ ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 -- Error messages
 INSERT INTO `error` (id, message)
-VALUES (215, 'You cannot edit articles that are already moderated.');
+VALUES (215, 'You cannot edit articles that are already accepted.');
 
 INSERT INTO `error` (id, message)
 VALUES (216, 'You cannot delete this article.');

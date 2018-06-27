@@ -171,10 +171,10 @@ class Controller extends Base
      */
     public function getUpdate(Model $news)
     {
-        /* Only comms officers can edit articles that have been moderated (that is, accept for publishing)
+        /* Only comms officers can edit articles that have been accepted for publishing
          */
         if (!(new ValidUserCanEdit())->isSatisfiedBy($this->getUser(), $news)) {
-            throw $this->errorMapper->generateException(ErrorMapper::ERROR_COMMS_NEWS_ALREADY_MODERATED);
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_COMMS_NEWS_ALREADY_ACCEPTED);
         }
 
         $policies = $this->policyMapper->findAll()->indexBy('identifier');
@@ -374,8 +374,9 @@ class Controller extends Base
         try {
 
             /* Try to delete this article
+             *
              * Moderators can delete any article, but authors can only delete articles
-             * that haven't been witnessed by the world. Such articles have to be unmoderated
+             * that haven't been witnessed by the world. Such articles have to be unaccepted
              * and unpublished
              */
             if ((new ValidUserCanDelete())->isSatisfiedBy($this->getUser(), $news)) {

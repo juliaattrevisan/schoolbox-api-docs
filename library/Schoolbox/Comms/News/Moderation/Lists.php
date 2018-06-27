@@ -22,9 +22,9 @@ class Lists
 {
 
     /**
-     * Maximum number of Recently Moderated articles to show
+     * Maximum number of Recently Accepted articles to show
      */
-    private const NUM_RECENTLY_MODERATED = 3;
+    private const NUM_RECENTLY_ACCEPTED = 3;
 
     /**
      * @var News\Mapper
@@ -60,7 +60,7 @@ class Lists
     {
         $builder = (new Builder($this->userMapper->getDatabase(), 'comms_news_article'))
             ->notNull('submitted_at')
-            ->isNull('moderated_at');
+            ->isNull('accepted_at');
 
         return $this->newsMapper->findByPredicates($builder, [
             'order' => [
@@ -71,21 +71,21 @@ class Lists
 
 
     /**
-     * A list of recently-modified articles
+     * A list of recently-accepted articles
      * Most recently article is listed first
      *
      * @return GenericCollection
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      */
-    public function getRecentlyModerated(): GenericCollection
+    public function getRecentlyAccepted(): GenericCollection
     {
         $builder = (new Builder($this->userMapper->getDatabase(), 'comms_news_article'))
-            ->notNull('moderated_at');
+            ->notNull('accepted_at');
 
         return $this->newsMapper->findByPredicates($builder, [
-            'limit' => self::NUM_RECENTLY_MODERATED,
+            'limit' => self::NUM_RECENTLY_ACCEPTED,
             'order' => [
-                'moderated_at' => 'desc'
+                'accepted_at' => 'desc'
             ]
         ]);
     }

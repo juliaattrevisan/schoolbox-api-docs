@@ -30,6 +30,6 @@ class ValidUserCanEdit
      */
     public function isSatisfiedBy(User $user, Model $news): bool
     {
-        return $news->getModeratedAt()->isNull() || (new ValidUserIsCommsOfficer())->isSatisfiedBy($user);
+        return $news->getAcceptedAt()->isNull() || (new ValidUserIsCommsOfficer())->isSatisfiedBy($user);
     }
 }

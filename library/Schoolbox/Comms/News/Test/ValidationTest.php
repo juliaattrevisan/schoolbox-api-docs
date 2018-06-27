@@ -42,33 +42,33 @@ class ValidationTest extends TestCase
         $user = (new \Schoolbox\User())->setId(19);
 
         return [
-            // Moderation required, a moderator is known
+            // Moderation required, an acceptor is known
             // News article can reach the masses
-            'Moderation required, moderator set' => [
-                (new Model())->setTitle('cat')->setModeratedBy($user),
+            'Moderation required, acceptor set' => [
+                (new Model())->setTitle('cat')->setAcceptedBy($user),
                 true,
                 true
             ],
 
-            // Moderator must be set when moderation is required
-            // When absent, the article isn't moderated; news article mustn't reach the masses
-            'Moderation required, moderator not set' => [
+            // Acceptor must be set when moderation is required
+            // When absent, the article isn't accepted; news article mustn't reach the masses
+            'Moderation required, acceptor not set' => [
                 (new Model())->setTitle('cat'),
                 true,
                 false
             ],
 
-            // Preserve last known moderator in the scenario where moderation was previously required
+            // Preserve last known acceptor in the scenario where moderation was previously required
             // at the time, but moderation is no longer required now. News article can reach the masses.
-            'Moderation not required, moderator set' => [
-                (new Model())->setTitle('cat')->setModeratedBy($user),
+            'Moderation not required, acceptor set' => [
+                (new Model())->setTitle('cat')->setAcceptedBy($user),
                 false,
                 true
             ],
 
-            // If there was never a moderator for this article, and moderation is not required now,
+            // If there was never an acceptor for this article, and moderation is not required now,
             // news article can reach the masses. There are no restrictions.
-            'Moderation not required, moderator not set' => [
+            'Moderation not required, acceptor not set' => [
                 (new Model())->setTitle('cat'),
                 false,
                 true

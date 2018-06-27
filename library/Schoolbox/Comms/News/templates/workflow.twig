@@ -23,8 +23,8 @@
         {% if news.isSubmitted %}
             {% set identifier = 'awaiting-moderation' %}
 
-            {# Moderation is required and the moderatedAt is set; then we're awaiting publication #}
-            {% if news.isModerated %}
+            {# Moderation is required and the acceptedAt is set; then we're awaiting publication #}
+            {% if news.isAccepted %}
                 {% set identifier = 'awaiting-publication' %}
 
                 {# If the publish date is reached: sent it. Presumably. #}
@@ -64,7 +64,7 @@
 {% if news.id %}
     {% if isCommsOfficer %}
         {% set composeUrl = routeLookup('commsNews.getUpdate', {newsId: news.id}) %}
-    {% elseif moderationRequired and not news.isModerated %}
+    {% elseif moderationRequired and not news.isAccepted %}
         {% set composeUrl = routeLookup('commsNews.getUpdate', {newsId: news.id}) %}
     {% elseif not moderationRequired %}
         {% set composeUrl = routeLookup('commsNews.getUpdate', {newsId: news.id}) %}
@@ -109,8 +109,8 @@
  # Varies depending on the moderation policy
  #}
 {% if moderationRequired %}
-    {% if news.isModerated %}
-        {% set alt = 'This article was moderated on ' ~ news.moderatedAt.local  %}
+    {% if news.isAccepted %}
+        {% set alt = 'This article was accepted on ' ~ news.acceptedAt.local  %}
     {% elseif news.isSubmittedAt %}
         {% set alt = 'This article is awaiting moderation since ' ~ news.submittedAt.local %}
     {% else %}
@@ -156,7 +156,7 @@
 {% if news.id %}
     {% set alt = alt ~ ' on ' ~ news.publishAt.local %}
 
-    {% if moderationRequired and news.isModerated and news.moderatedAt.isPast %}
+    {% if moderationRequired and news.isAccepted and news.acceptedAt.isPast %}
         {% if news.publishAt.isPast %}
             {% set alt = 'This article publishes on ' ~ news.publishAt.local  %}
         {% endif %}

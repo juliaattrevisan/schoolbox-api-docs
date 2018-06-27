@@ -37,10 +37,10 @@ class ValidUserCanAccept
          *   User must be a Moderator, and
          *   Moderation must be required, and
          *   Article is submitted, and
-         *   Article is not yet moderated
+         *   Article is not yet accepted
          */
         $isCommsOfficer = (new ValidUserIsCommsOfficer())->isSatisfiedBy($user);
 
-        return $isCommsOfficer && $moderationRequired && $news->isSubmitted() && !$news->isModerated();
+        return $isCommsOfficer && $moderationRequired && $news->isSubmitted() && !$news->isAccepted();
     }
 }

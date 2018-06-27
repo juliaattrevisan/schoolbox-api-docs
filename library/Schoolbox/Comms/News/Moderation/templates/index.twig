@@ -49,13 +49,13 @@
     </div>
 </div>
 
-{# A list of recently-moderated articles
+{# A list of recently-accepted articles
  # Not having this is pretty disorienting
  #}
 {% if recentArticles|length %}
 <div class="row">
     <div class="small-12 island">
-        <h2 class="subheader">Recently Moderated</h2>
+        <h2 class="subheader">Recently Accepted</h2>
 
         <section>
             <ul class="information-list">
@@ -65,7 +65,7 @@
                             <div class="small-12 card">
                                 <h3><a href="{{ routeLookup('commsNews.getDetail', {newsId: news.id}) }}">{{ news.title }}</a></h3>
                                 <p class="meta">Authored by {{ news.author.fullname }} on {{ news.updatedAt.local }}</p>
-                                <p class="meta">Moderated by {{ news.moderatedBy.fullname }} on {{ news.updatedAt.local }}</p>
+                                <p class="meta">Accepted by {{ news.acceptedBy.fullname }} on {{ news.updatedAt.local }}</p>
 
                                 {# TODO: Have a /news/topic url lol #}
                                 {% if news.topics|length %}

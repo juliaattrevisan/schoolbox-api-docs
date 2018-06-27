@@ -69,14 +69,14 @@ class Model implements ISoftDeletable
      *
      * @var User|null
      */
-    private $moderatedBy;
+    private $acceptedBy;
 
     /**
      * The datetime when this article was allowed to be published
      *
      * @var \Alaress_Date_Format
      */
-    private $moderatedAt;
+    private $acceptedAt;
 
     /**
      * The datetime when this article was rejected
@@ -137,13 +137,13 @@ class Model implements ISoftDeletable
 
 
     /**
-     * This news has been moderated
+     * This news has been accepted
      *
      * @return bool
      */
-    public function isModerated(): bool
+    public function isAccepted(): bool
     {
-        return $this->getModeratedAt() !== null && !$this->getModeratedAt()->isNull();
+        return $this->getAcceptedAt() !== null && !$this->getAcceptedAt()->isNull();
     }
 
 
@@ -285,19 +285,19 @@ class Model implements ISoftDeletable
     /**
      * @return null|User
      */
-    public function getModeratedBy(): ?User
+    public function getAcceptedBy(): ?User
     {
-        return $this->moderatedBy;
+        return $this->acceptedBy;
     }
 
 
     /**
-     * @param null|User $moderatedBy
+     * @param null|User $acceptedBy
      * @return Model
      */
-    public function setModeratedBy(?User $moderatedBy): self
+    public function setAcceptedBy(?User $acceptedBy): self
     {
-        $this->moderatedBy = $moderatedBy;
+        $this->acceptedBy = $acceptedBy;
         return $this;
     }
 
@@ -305,19 +305,19 @@ class Model implements ISoftDeletable
     /**
      * @return \Alaress_Date_Format|null
      */
-    public function getModeratedAt(): ?\Alaress_Date_Format
+    public function getAcceptedAt(): ?\Alaress_Date_Format
     {
-        return $this->moderatedAt;
+        return $this->acceptedAt;
     }
 
 
     /**
-     * @param \Alaress_Date_Format $moderatedAt
+     * @param \Alaress_Date_Format $acceptedAt
      * @return $this
      */
-    public function setModeratedAt(\Alaress_Date_Format $moderatedAt): self
+    public function setAcceptedAt(\Alaress_Date_Format $acceptedAt): self
     {
-        $this->moderatedAt = $moderatedAt;
+        $this->acceptedAt = $acceptedAt;
         return $this;
     }
 

@@ -36,9 +36,9 @@ class ValidUserCanDelete
             return true;
         }
 
-        /* Articles that haven't been moderated can be safely deleted
+        /* Articles that haven't been accepted can be safely deleted
          */
-        if ($news->getModeratedAt()->isNull()) {
+        if ($news->getAcceptedAt()->isNull()) {
             return true;
         }
 

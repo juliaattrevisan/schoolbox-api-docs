@@ -39,8 +39,8 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('blurb', self::TYPE_STRING);
         $this->joins('feature_image_hash', Storage\Mapper::class, 'hash', null, null, 'featureImage', 'featureImage');
         $this->joins('author_id', UserMapper::class, 'id', null, null, 'author', 'author');
-        $this->joins('moderated_by', UserMapper::class, 'id', null, null, 'moderatedBy', 'moderator');
-        $this->uses('moderated_at', self::TYPE_DATETIME);
+        $this->joins('accepted_by', UserMapper::class, 'id', null, null, 'acceptedBy', 'moderator');
+        $this->uses('accepted_at', self::TYPE_DATETIME);
         $this->joins('rejected_by', UserMapper::class, 'id', null, null, 'rejectedBy', 'rejector');
         $this->uses('rejected_at', self::TYPE_DATETIME);
         $this->uses('rejected_reason', self::TYPE_STRING);
@@ -131,7 +131,7 @@ class Mapper extends \Schoolbox\Mapper
                 $moderator = $this->getJoinMapper('moderator')->hydrate($row, 'm');
 
                 if ($moderator) {
-                    $news->setModeratedBy($moderator);
+                    $news->setAcceptedBy($moderator);
                 }
 
                 /** @var User $rejector */

@@ -83,7 +83,7 @@ class Controller extends Base
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsModeration/index.twig', [
             'newsArticles' => $newsArticles,
-            'recentArticles' => $lists->getRecentlyModerated(),
+            'recentArticles' => $lists->getRecentlyAccepted(),
             'moderationRequired' => $moderationRequired
         ])->setTitle('Example'));
     }
@@ -137,8 +137,8 @@ class Controller extends Base
         $moderationRequired = (bool)$policy->getValue();
 
         $news
-            ->setModeratedAt(\Alaress_Date_Format::now())
-            ->setModeratedBy($this->getUser());
+            ->setAcceptedAt(\Alaress_Date_Format::now())
+            ->setAcceptedBy($this->getUser());
 
         if ((new News\ValidBroadcast())->isSatisfiedBy($news, $moderationRequired)) {
             $this->newsMapper->save($news);

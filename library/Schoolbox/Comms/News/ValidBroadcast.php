@@ -27,7 +27,7 @@ class ValidBroadcast
     public function isSatisfiedBy(Model $article, bool $moderationRequired): bool
     {
         $isValidArticle = (new ValidArticle())->isSatisfiedBy($article);
-        $hasModerator = $moderationRequired && $article->getModeratedBy() instanceof User;
+        $hasModerator = $moderationRequired && $article->getAcceptedBy() instanceof User;
         $moderationNotNeeded = !$moderationRequired;
 
         return $isValidArticle && ($hasModerator || $moderationNotNeeded);

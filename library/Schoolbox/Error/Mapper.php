@@ -191,7 +191,7 @@ class Mapper extends BaseMapper implements IExceptionGenerator
     /* You cannot view this article because it is already moderated and ready for publishing
      * Only comms officers can crud from this point onwards
      */
-    public const ERROR_COMMS_NEWS_ALREADY_MODERATED = 215;
+    public const ERROR_COMMS_NEWS_ALREADY_ACCEPTED = 215;
 
     /* Only Comms Officers can delete news articles when they're already moderated and/or published
      */

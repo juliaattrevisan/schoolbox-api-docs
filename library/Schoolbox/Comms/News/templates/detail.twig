@@ -36,15 +36,15 @@
                 {% endif %}
 
                 {# This info only really matters to the author, I suppose
-                 # Submitted at; moderated at; moderated by
+                 # Submitted at; accepted at; accepted by
                  #}
                 {% if news.author.id == USER.id %}
                     {% if news.isSubmitted %}
                         <li class="icon-calendar">Submitted on {{ news.submittedAt.local }}</li>
                     {% endif %}
 
-                    {% if news.isModerated %}
-                        <li class="icon-calendar">Last moderated on {{ news.moderatedAt.local }} by {{ news.moderatedBy.fullname }}</li>
+                    {% if news.isAccepted %}
+                        <li class="icon-calendar">Last moderated on {{ news.acceptedAt.local }} by {{ news.acceptedBy.fullname }}</li>
                     {% endif %}
                 {% endif %}
             </ul>
@@ -156,7 +156,7 @@
 {# Rejection details, if applicable
  # Only show rejection info prior to acceptance
  #}
-{% if news.isRejected and not news.isModerated %}
+{% if news.isRejected and not news.isAccepted %}
 <div class="row">
     <div class="small-12 island">
         <section class="no-pad no-margin">
