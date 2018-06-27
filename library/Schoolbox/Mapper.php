@@ -219,6 +219,7 @@ abstract class Mapper implements IMapper, Serializable
     /**
      * Notifier
      *
+     * @deprecated use `$this->propagator` instead
      * @var NotifInterface
      */
     protected $notif;
@@ -612,19 +613,23 @@ abstract class Mapper implements IMapper, Serializable
     }
 
     /**
+     * @deprecated use `$this->setEventPropagator` instead
      * @param NotifInterface $notif
      */
     public function setNotifier($notif)
     {
+        trigger_error('This method is deprecated; use "setEventPropagator" instead', E_USER_DEPRECATED);
         $this->notif = $notif;
     }
 
     /**
+     * @deprecated use `$this->getEventPropagator` instead
      * @return NotifInterface
      */
     public function getNotifier()
     {
         // load on demand, so that we don't get infinite loops
+        trigger_error('This method is deprecated; use "getEventPropagator" instead', E_USER_DEPRECATED);
         if (!$this->notif instanceof NotifInterface) {
             $this->setNotifier(Notifactory::create(Notif::TOPIC_APPLICATION, $this->getConfigLoader()));
         }
