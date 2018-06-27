@@ -1,7 +1,19 @@
+{{ renderAdminNavigation(pageCurrent) }}
+
 <div class="row">
     <div class="small-12 columns">
+        <ul class="sub-nav">
+            <li>
+                <a href="{{ routeLookup('shaps.getAll') }}">Staff Provisioning</a>
+            </li>
+            <li class="active">
+                <a href="{{ routeLookup('shaps.getUsersInCourses') }}">Help Courses</a>
+            </li>
+        </ul>
+
         <h1>Schoolbox Help Enrolment Search</h1>
 
+        {#
         <ul class="sub-nav">
             <li>
                 <a href="{{ routeLookup('shaps.getUsersInCourses') }}">Courses</a>
@@ -10,6 +22,7 @@
                 <a href="{{ routeLookup('shaps.getUserEnrolmentSearch') }}">User Search</a>
             </li>
         </ul>
+        #}
     </div>
 </div>
 
@@ -27,8 +40,6 @@
                     $(function() {
 
                         $("#statusForm").addClass("hide");
-
-                        // TODO limit user search to users on help
 
                         var $selectize = $('#users').selectizeSelector({
                             ajax: {

@@ -9,12 +9,12 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\SHAPS;
+namespace Schoolbox\Admin\SHAPS;
 
 use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\GuzzleException;
-use Schoolbox\SHAPS\Auth;
+use Schoolbox\Admin\SHAPS\Auth;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 

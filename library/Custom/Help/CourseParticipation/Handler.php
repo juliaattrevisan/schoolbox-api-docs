@@ -17,7 +17,7 @@ use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\IFolder;
 use Schoolbox\RoleMapper;
-use Schoolbox\SHAPS\Auth\Digest;
+use Schoolbox\Admin\SHAPS\Auth\Digest;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use UnexpectedValueException;

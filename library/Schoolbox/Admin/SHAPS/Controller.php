@@ -6,13 +6,9 @@
  * @copyright   Copyright 2017, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
-namespace Schoolbox\SHAPS;
+namespace Schoolbox\Admin\SHAPS;
 
 use Alaress\Web\Controller\Base;
-use Alaress_Date_Format;
-use GuzzleHttp\Exception\ClientException;
-use GuzzleHttp\Exception\TransferException;
-use Schoolbox\IConfigLoader;
 use Schoolbox\UserMapper;
 use Schoolbox\Collection;
 
@@ -36,26 +32,12 @@ class Controller extends Base
      *
      * @param UserMapper      $userMapper
      * @param Auth\Parameters $authParams
-     * @param string          $serverUrl
      */
     public function __construct(UserMapper $userMapper, Auth\Parameters $authParams)
     {
         $this->userMapper  = $userMapper;
         $this->helpRequest = new HelpRequest($authParams, $this->userMapper);
     }
-
-
-//    /**
-//     * TODO: This isn't being used, currently: unsure if it was a placeholder for future implementation?
-//     *
-//     * @return string
-//     * @throws \GuzzleHttp\Exception\GuzzleException
-//     * @throws \InvalidArgumentException
-//     * @throws \RuntimeException
-//     */
-//    public function getProvisionedUsersJSON() {
-//        return json_encode($this->findProvisionedUsers());
-//    }
 
     /*
      * Helper method to get all staff in your Schoolbox instance.
@@ -90,7 +72,8 @@ class Controller extends Base
             $this->buildHtmlOutput(
                 '@shaps/provisioning/index.twig', [
                 'allUsers' => $this->getAllStaff(),
-                'provisionedUsers' => $provisionedUsers
+                'provisionedUsers' => $provisionedUsers,
+                'pageCurrent' => 'shaps/provisioning'
             ])->setTitle('Schoolbox Help Staff Provisioning')
         );
     }
@@ -113,7 +96,8 @@ class Controller extends Base
             $this->buildHtmlOutput(
                 '@shaps/provisioning/provisioned.twig', [
                     'allUsers' => $provisionedUsers,
-                    'provisionedUsers' => $provisionedUsers
+                    'provisionedUsers' => $provisionedUsers,
+                    'pageCurrent' => 'shaps/provisioning'
             ])->setTitle('Provisioned Staff - Schoolbox Help Staff Provisioning')
         );
     }
@@ -135,7 +119,8 @@ class Controller extends Base
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@shaps/provisioning/unprovisioned.twig', [
-                    'allUsers' => $this->getAllStaff()->diff($provisionedUsers)
+                    'allUsers' => $this->getAllStaff()->diff($provisionedUsers),
+                    'pageCurrent' => 'shaps/provisioning'
             ])->setTitle('Unprovisioned Staff - Schoolbox Help Staff Provisioning')
         );
     }
@@ -152,6 +137,7 @@ class Controller extends Base
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@shaps/provisioning/search.twig', [
+                'pageCurrent' => 'shaps/provisioning'
             ])->setTitle('Search - Schoolbox Help Staff Provisioning')
         );
     }
@@ -198,7 +184,8 @@ class Controller extends Base
     public function getUsersInCourses() {
         $this->getResponse()->content->set($this->buildHtmlOutput('@shaps/courses/index.twig', [
             'courses' => $this->helpRequest->findEnrolments(),
-            'serverUrl' => $this->helpRequest->getServerUrl()
+            'serverUrl' => $this->helpRequest->getServerUrl(),
+            'pageCurrent' => 'shaps/courses'
         ])->setTitle('Schoolbox Help Course Enrolments'));
     }
 
@@ -209,6 +196,7 @@ class Controller extends Base
      */
     public function getUserEnrolmentSearch() {
         $this->getResponse()->content->set($this->buildHtmlOutput('@shaps/courses/search.twig', [
+            'pageCurrent' => 'shaps/courses/search'
         ])->setTitle('Schoolbox Help Course Enrolments - User Search'));
     }
 
