@@ -121,6 +121,47 @@ class Model implements ISoftDeletable
      */
     private $topics;
 
+
+    /* Conveniences
+     */
+
+    /**
+     * This news has been submitted
+     *
+     * @return bool
+     */
+    public function isSubmitted(): bool
+    {
+        return $this->getSubmittedAt() !== null && !$this->getSubmittedAt()->isNull();
+    }
+
+
+    /**
+     * This news has been moderated
+     *
+     * @return bool
+     */
+    public function isModerated(): bool
+    {
+        return $this->getModeratedAt() !== null && !$this->getModeratedAt()->isNull();
+    }
+
+
+    /**
+     * This news has been rejected
+     *
+     * @return bool
+     */
+    public function isRejected(): bool
+    {
+        return $this->getRejectedAt() !== null && !$this->getRejectedAt()->isNull();
+    }
+
+
+    /* Getters/Setters
+     */
+
+
     /**
      * @return null|string
      */
