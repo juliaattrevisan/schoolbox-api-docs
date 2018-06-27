@@ -150,8 +150,55 @@ class Controller extends Base
         $this->getResponse()->redirect->to($nextStep);
     }
 
+
+    /**
+     * Reject an article
+     *
+     * @param Model $news
+     * @throws MapperException
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \PDOException
+     * @throws \Schoolbox\Application\Exception\Exception
+     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \UnexpectedValueException
+     */
     public function postReject(Model $news)
     {
-        die('haha, rejected ' . $news->getTitle());
+        if ((new ValidUserCanReject())->isSatisfiedBy($this->getUser())) {
+            $news->setRejectedBy($this->getUser())
+                ->setRejectedAt(\Alaress_Date_Format::now())
+                ->setRejectedReason($this->getRequest()->post['rejectedReason']);
+
+            $this->newsMapper->save($news);
+
+            /* Redirect back to the moderation list so you can deal with other articles
+             */
+            $nextStep = $this->getRouter()->generate('commsNewsModeration.getList');
+
+            if ($this->getRequest()->isXhr()) {
+                $this->getResponse()->content->set($this->buildJsonOutput([
+                    'success' => true,
+                    'redirect' => $nextStep
+                ]));
+            }
+            else {
+                $this->getResponse()->redirect->to($nextStep);
+            }
+
+            return;
+        }
+
+        if ($this->getRequest()->isXhr()) {
+            $this->getResponse()->status->set(400);
+            $this->getResponse()->content->set($this->buildJsonOutput([
+                'success' => false,
+                'message' => $this->errorMapper->getMessageById(ErrorMapper::ERROR_PERM_PAGE_VIEW)
+            ]));
+
+            return;
+        }
+
+        throw $this->errorMapper->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
     }
 }

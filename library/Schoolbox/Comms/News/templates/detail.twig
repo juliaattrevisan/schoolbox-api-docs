@@ -215,7 +215,7 @@
                                     $.ajax({
                                         type: 'POST',
                                         url: element.attr('href'),
-                                        data: {newsId: {{ news.id }}},
+                                        data: {newsId: {{ news.id }}, rejectedReason: $('#rejectedReason').val()},
                                         dataType: 'json'
                                     }).success(function (response) {
                                         toast.toastTimeout({
