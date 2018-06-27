@@ -15,7 +15,6 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\User;
 
-
 class ValidUserIsCommsOfficer
 {
 

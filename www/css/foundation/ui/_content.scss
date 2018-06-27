@@ -1722,10 +1722,10 @@ $train-line-unvisited-color: $content-ui-background;
          */
         &.nub {
             span {
-                width: 0.5 * $train-line-stop-size;
                 height: 0.5 * $train-line-stop-size;
-                top: -0.4 * (($train-line-stop-size - $train-line-segment-width) / 2);
                 left: calc(50% - (#{$train-line-stop-size / 2}) + 0.4rem);
+                top: -0.4 * (($train-line-stop-size - $train-line-segment-width) / 2);
+                width: 0.5 * $train-line-stop-size;
             }
         }
     }

@@ -76,8 +76,7 @@ class Controller extends Base
             $moderationRequired = (bool)$policy->getValue();
 
             $newsArticles = $lists->getNeedModeration();
-        }
-        catch (MapperException $e) {
+        } catch (MapperException $e) {
             $moderationRequired = false;
         }
 
@@ -112,8 +111,7 @@ class Controller extends Base
          */
         if ((new ValidUserIsCommsOfficer())->isSatisfiedBy($this->getUser())) {
             $nextStep = $this->getRouter()->generate('commsNewsModeration.getList');
-        }
-        else {
+        } else {
             $nextStep = $this->getRouter()->generate('commsNews.getDetail', ['newsId' => $news->getId()]);
         }
 
@@ -192,8 +190,7 @@ class Controller extends Base
                     'success' => true,
                     'redirect' => $nextStep
                 ]));
-            }
-            else {
+            } else {
                 $this->getResponse()->redirect->to($nextStep);
             }
 

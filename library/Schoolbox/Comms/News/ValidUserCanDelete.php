@@ -13,7 +13,6 @@ namespace Schoolbox\Comms\News;
 
 use Schoolbox\User;
 
-
 class ValidUserCanDelete
 {
 

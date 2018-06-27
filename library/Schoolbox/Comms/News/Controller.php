@@ -13,11 +13,10 @@ use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
 use InvalidArgumentException;
 use Schoolbox\Application\Exception\Exception;
-use Schoolbox\Comms\News\Moderation\ValidUserCanReject;
 use Schoolbox\Comms\News\Policy;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\DefinitionException;
-Use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\News\TopicMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
@@ -419,7 +418,7 @@ class Controller extends Base
             }
 
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_COMMS_NEWS_CANNOT_DELETE);
-        } catch(MapperException|RouteNotFound|\Alaress\Database\Predicate\InvalidColumnException|\PDOException|DefinitionException|\UnexpectedValueException|Exception $e) {
+        } catch (MapperException|RouteNotFound|\Alaress\Database\Predicate\InvalidColumnException|\PDOException|DefinitionException|\UnexpectedValueException|Exception $e) {
             if ($this->getRequest()->isXhr()) {
                 $this->getResponse()->status->set(400);
                 $this->getResponse()->content->set($this->buildJsonOutput([
