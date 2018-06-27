@@ -55,6 +55,14 @@ class Controller extends Base
         ]);
     }
 
+    /**
+     * Contructs an array of field names based on whether the field was empty.
+     * TODO factor this out into a common location; currently the fields are hardcoded seperately here
+     * and in library/Custom/Help/CourseParticipation/Handler.php
+     * 
+     * @param \Schoolbox\User $user
+     * @return array
+     */
     private function getInvalidities(\Schoolbox\User $user) {
         $errors = [];
         if (empty($user->getId())) {
