@@ -121,7 +121,7 @@ class Component extends Filter\BaseComponent
         $isUserConfigurable  = $this->getPageFilter()->getUserConfigurable();
 
         // The '(none)' abstract-option maps to a single '(none)' concrete-option. Should it be available?
-        if ($abstractOptions[Definition::KEY_NONE]->getAvailable()) {
+        if ($abstractOptions[Definition::KEY_NONE] && $abstractOptions[Definition::KEY_NONE]->getAvailable()) {
             $selected                                  = $abstractOptions[Definition::KEY_NONE]->getDefaults()[$roleType]->getSelected();
             $availableSelections[Definition::KEY_NONE] = $this->createSelection(Definition::KEY_NONE, $selected);
         }

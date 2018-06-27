@@ -90,6 +90,22 @@ class Definition extends NullableContext\Definition
         return $page === Page\Model::PAGE_COURSE_MARK_BOOK;
     }
 
+    /**
+     * @inheritdoc
+     */
+    protected function unsetInvalidOptions(Page\Model $pageFilter)
+    {
+        $options = parent::unsetInvalidOptions($pageFilter);
+
+        // This prevents us filtering to assessments that reside directly on the class folder.
+        // ie this will ensure we only ever see assessments on the course markbook if they have been
+        // imported from a course.
+        if(Page\Model::PAGE_COURSE_MARK_BOOK === $pageFilter->getPage()){
+            $options->offsetUnset(self::KEY_NONE);
+        }
+        return $options;
+    }
+
 
 
     /**
