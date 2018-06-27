@@ -172,10 +172,10 @@
 }
 
 @mixin placeholder-color($color, $font-weight) {
-	::-webkit-input-placeholder { color: $color; font-weight: $font-weight; }
-	:-ms-input-placeholder { color: $color; font-weight: $font-weight; }
-	:-moz-placeholder { color: $color; font-weight: $font-weight; }
-	::-moz-placeholder { color: $color; font-weight: $font-weight; }
+	::-webkit-input-placeholder { color: $color; font-weight: $font-weight; opacity: 1; }
+	:-ms-input-placeholder { color: $color; font-weight: $font-weight; opacity: 1; }
+	:-moz-placeholder { color: $color; font-weight: $font-weight; opacity: 1; }
+	::-moz-placeholder { color: $color; font-weight: $font-weight; opacity: 1; }
 }
 
 @mixin placeholder-hover-color($color) {

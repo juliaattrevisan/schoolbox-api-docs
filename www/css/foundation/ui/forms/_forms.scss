@@ -126,14 +126,13 @@ $switch-negative-color: tint($secondary-color, 74%);
 // Custom overrides
 //
 form {
-	@include placeholder-color($base, $font-weight-normal);
+	@include placeholder-color($aluminum, $font-weight-normal);
 	margin: 0 0 $form-spacing / 2 0;
 }
 
 input,
 textarea,
-select{
-	@include placeholder-hover-color($base);
+select {
 	@include single-transition(all, 0.15s, linear);
 	min-height: $global-button-input-height;
 	line-height: inherit;
@@ -149,21 +148,20 @@ select{
 		border-color: $input-focus-border-color;
 		outline: none;
 	}
-}
-
-input:disabled,
-input:read-only,
-textarea:disabled,
-textarea:read-only,
-select:disabled {
-	background-color: $vapor;
-	color: $aluminum;
-	opacity: 1;
-	label:hover & {
-		@include placeholder-hover-color($base);
-	}
-	&:hover {
-		border-color: $form-border-color;
+	&:disabled,
+	&[disabled],
+	&[readonly] {
+		background-color: $input-disabled-bg;
+		color: $aluminum;
+		opacity: 1;
+		label:hover & {
+			@include placeholder-hover-color($base);
+		}
+		&:hover {
+			background-color: $input-disabled-bg;
+			border-color: $form-border-color;
+			color: $aluminum;
+		}
 	}
 }
 
