@@ -77,10 +77,6 @@ class Module extends BaseModule
          */
         $this->register('GET', '/{newsId:\d+}', 'getDetail', null, $preloadNews);
 
-        /* Submit For Moderation
-         */
-        $this->register('POST', '/{newsId:\d+}/submit', 'postSubmitForModeration', null, $preloadNews);
-
         /* Delete article
          */
         $this->register('POST', '/{newsId:\d+}/delete', 'postDelete', null, $preloadNews);

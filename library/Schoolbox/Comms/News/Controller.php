@@ -18,11 +18,9 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\DefinitionException;
 Use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\News\TopicMapper;
-use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
-use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 
@@ -270,8 +268,6 @@ class Controller extends Base
     }
 
 
-
-
     /**
      * Persist model to db during news article authorship
      *
@@ -353,37 +349,6 @@ class Controller extends Base
             'isCommsOfficer' => (new ValidUserIsCommsOfficer())->isSatisfiedBy($this->getUser()),
             'isDeletable' => (new ValidUserCanDelete())->isSatisfiedBy($this->getUser(), $news)
         ])->setTitle($news->getTitle()));
-    }
-
-
-    /**
-     * Submit For Moderation occurs here
-     *
-     * @param Model $news
-     * @throws MapperException
-     * @throws RouteNotFound
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \PDOException
-     * @throws \Schoolbox\Mapper\DefinitionException
-     * @throws \UnexpectedValueException
-     */
-    public function postSubmitForModeration(Model $news)
-    {
-        $news->setSubmittedAt(\Alaress_Date_Format::now());
-        $this->newsMapper->save($news);
-
-        /* If you're a moderator, go back to the Moderation list
-         *
-         * TODO: Otherwise currently recycle the same screen?
-         */
-        if ((new ValidUserIsCommsOfficer())->isSatisfiedBy($this->getUser())) {
-            $nextStep = $this->getRouter()->generate('commsNewsModeration.getList');
-        }
-        else {
-            $nextStep = $this->getRouter()->generate('commsNews.getDetail', ['newsId' => $news->getId()]);
-        }
-
-        $this->getResponse()->redirect->to($nextStep);
     }
 
 

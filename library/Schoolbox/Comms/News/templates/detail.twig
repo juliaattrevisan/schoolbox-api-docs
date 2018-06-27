@@ -167,7 +167,7 @@
 {% if policies['global_moderation'].value and not news.submittedAt.local|length %}
 <div class="row">
     <div class="small-12 island">
-        <form action="{{ routeLookup('commsNews.postSubmitForModeration', {newsId: news.id}) }}" method="post">
+        <form action="{{ routeLookup('commsNewsModeration.postSubmit', {newsId: news.id}) }}" method="post">
             <input type="submit" value="Submit for moderation" />
         </form>
     </div>
@@ -197,7 +197,7 @@
      #}
     <div class="row">
         <div class="small-12 island">
-            <form action="{{ routeLookup('commsNews.postSubmitForModeration', {newsId: news.id}) }}" method="post">
+            <form action="{{ routeLookup('commsNewsModeration.postSubmit', {newsId: news.id}) }}" method="post">
                 <input type="submit" value="Publish" />
             </form>
         </div>

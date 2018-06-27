@@ -11,7 +11,9 @@ namespace Schoolbox\Comms\News\Moderation;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Collection;
 use Schoolbox\Comms\News;
+use Schoolbox\Comms\News\Model;
 use Schoolbox\Comms\News\Policy;
+use Schoolbox\Comms\News\ValidUserIsCommsOfficer;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
@@ -88,15 +90,47 @@ class Controller extends Base
 
 
     /**
+     * Submit For Moderation occurs here
+     * A required action prior to Moderation taking place
+     *
+     * @param Model $news
+     * @throws MapperException
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \UnexpectedValueException
+     */
+    public function postSubmit(Model $news)
+    {
+        $news->setSubmittedAt(\Alaress_Date_Format::now());
+        $this->newsMapper->save($news);
+
+        /* If you're a moderator, go back to the Moderation list
+         *
+         * TODO: Otherwise currently recycle the same screen?
+         */
+        if ((new ValidUserIsCommsOfficer())->isSatisfiedBy($this->getUser())) {
+            $nextStep = $this->getRouter()->generate('commsNewsModeration.getList');
+        }
+        else {
+            $nextStep = $this->getRouter()->generate('commsNews.getDetail', ['newsId' => $news->getId()]);
+        }
+
+        $this->getResponse()->redirect->to($nextStep);
+    }
+
+
+    /**
      * Accept an article for publishing to its audience
      *
-     * @param News\Model $news
+     * @param Model $news
      * @throws MapperException
      * @throws \Aura\Router\Exception\RouteNotFound
      * @throws \PDOException
      * @throws \UnexpectedValueException
      */
-    public function postAccept(News\Model $news)
+    public function postAccept(Model $news)
     {
         $policy = $this->policyMapper->findOneByColumn('identifier', 'global_moderation');
 
