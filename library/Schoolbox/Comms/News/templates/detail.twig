@@ -117,11 +117,14 @@
 
 {# Train Line
  # One of three possibilities are shown here
+ # Only useful to authors and moderators
  #}
+{% if news.author.id == USER.id or isCommsOfficer %}
 {% include '@commsNews/workflow.twig' with {
     news: news,
     moderationRequired: moderationRequired
 } %}
+{% endif %}
 
 <div class="row">
     <div class="small-12 island">
