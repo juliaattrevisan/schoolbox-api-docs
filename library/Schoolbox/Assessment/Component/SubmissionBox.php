@@ -73,11 +73,6 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     protected $task;
 
     /**
-     * @var Task\Instance
-     */
-    protected $task_instance;
-
-    /**
      * @var Collection|IStorage
      */
     protected $attachments;
@@ -380,25 +375,6 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     {
         return $this->task;
     }
-
-    /**
-     * @param  Task\Instance $task_instance
-     * @return $this
-     */
-    public function setTaskInstance($task_instance)
-    {
-        $this->task_instance = $task_instance;
-        return $this;
-    }
-
-    /**
-     * @return Task\Instance
-     */
-    public function getTaskInstance()
-    {
-        return $this->task_instance;
-    }
-
 
     /**
      * @return Collection|IStorage[]
