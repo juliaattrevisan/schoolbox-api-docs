@@ -257,3 +257,30 @@
 {% endif %}
 
 <div class="toast" id="toast"></div>
+
+<br /><br /><br /><br /><br /><br />
+
+{% if isCommsOfficer %}
+<div class="row">
+    <div class="small-12 columns">
+        <ul class="flex-list buttons">
+            <li>
+                <form action="{{ routeLookup('commsNewsModeration.postSubmit', {newsId: news.id}) }}" method="post">
+                    <button>Modify</button>
+                </form>
+            </li>
+            <li>
+                <form action="{{ routeLookup('commsNewsModeration.postSubmit', {newsId: news.id}) }}" method="post">
+                    <button>Reject</button>
+                </form>
+            </li>
+            <li>
+                <form action="{{ routeLookup('commsNewsModeration.postSubmit', {newsId: news.id}) }}" method="post">
+                    <input type="submit" value="Publish" />
+                </form>
+            </li>
+        </ul>
+
+    </div>
+</div>
+{% endif %}
