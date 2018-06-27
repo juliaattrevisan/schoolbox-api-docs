@@ -154,6 +154,13 @@ class Controller extends Base
     /**
      * Reject an article
      *
+     * This clears the submitted_at value, so authors can submit it again
+     * This clears the accepted_at and _by value, to immediately hide from the world
+     * This sets the rejected details
+     *
+     * Rejecting an article will send it back to the Compose/Preview phase, as if it had
+     * never succeeded before lol (but it'll remember that you failed, and if stated, why)
+     *
      * @param Model $news
      * @throws MapperException
      * @throws \Alaress\Database\Predicate\InvalidColumnException
@@ -168,6 +175,8 @@ class Controller extends Base
         if ((new ValidUserCanReject())->isSatisfiedBy($this->getUser())) {
             $news
                 ->setSubmittedAt(null)
+                ->setAcceptedAt(null)
+                ->setAcceptedBy(null)
                 ->setRejectedBy($this->getUser())
                 ->setRejectedAt(\Alaress_Date_Format::now())
                 ->setRejectedReason($this->getRequest()->post['rejectedReason']);

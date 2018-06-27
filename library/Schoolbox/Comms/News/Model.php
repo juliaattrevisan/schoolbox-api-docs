@@ -312,10 +312,10 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @param \Alaress_Date_Format $acceptedAt
+     * @param null|\Alaress_Date_Format $acceptedAt
      * @return $this
      */
-    public function setAcceptedAt(\Alaress_Date_Format $acceptedAt): self
+    public function setAcceptedAt(?\Alaress_Date_Format $acceptedAt): self
     {
         $this->acceptedAt = $acceptedAt;
         return $this;
