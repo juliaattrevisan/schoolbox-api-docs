@@ -12,18 +12,22 @@
         <section>
             <ul class="information-list">
                 {% for news in newsArticles %}
-                    <li class="content">
-                        <h3><a href="{{ routeLookup('commsNews.getDetail', {newsId: news.id}) }}">{{ news.title }}</a></h3>
-                        <p class="meta">Authored by {{ news.author.fullname }} on {{ news.updatedAt.local }}</p>
+                    <li>
+                        <div class="list-item">
+                            <div class="small-12 card">
+                                <h3><a href="{{ routeLookup('commsNews.getDetail', {newsId: news.id}) }}">{{ news.title }}</a></h3>
+                                <p class="meta">Authored by {{ news.author.fullname }} on {{ news.updatedAt.local }}</p>
 
-                        {# TODO: Have a /news/topic url lol #}
-                        {% if news.topics|length %}
-                        <p class="meta">Related topics:
-                            {% for topic in news.topics %}
-                            <a href="/news/topic/{{ topic.slug }}">{{ topic.name }}</a>{% if not loop.last %},{% endif %}
-                            {% endfor %}
-                        </p>
-                        {% endif %}
+                                {# TODO: Have a /news/topic url lol #}
+                                {% if news.topics|length %}
+                                    <p class="meta">Related topics:
+                                        {% for topic in news.topics %}
+                                            <a href="/news/topic/{{ topic.slug }}">{{ topic.name }}</a>{% if not loop.last %},{% endif %}
+                                        {% endfor %}
+                                    </p>
+                                {% endif %}
+                            </div>
+                        </div>
 
                         <article>{{ news.blurb|purify }}</article>
                     </li>
@@ -56,19 +60,23 @@
         <section>
             <ul class="information-list">
                 {% for news in recentArticles %}
-                    <li class="content">
-                        <h3><a href="{{ routeLookup('commsNews.getDetail', {newsId: news.id}) }}">{{ news.title }}</a></h3>
-                        <p class="meta">Authored by {{ news.author.fullname }} on {{ news.updatedAt.local }}</p>
-                        <p class="meta">Moderated by {{ news.moderatedBy.fullname }} on {{ news.updatedAt.local }}</p>
+                    <li>
+                        <div class="list-item">
+                            <div class="small-12 card">
+                                <h3><a href="{{ routeLookup('commsNews.getDetail', {newsId: news.id}) }}">{{ news.title }}</a></h3>
+                                <p class="meta">Authored by {{ news.author.fullname }} on {{ news.updatedAt.local }}</p>
+                                <p class="meta">Moderated by {{ news.moderatedBy.fullname }} on {{ news.updatedAt.local }}</p>
 
-                        {# TODO: Have a /news/topic url lol #}
-                        {% if news.topics|length %}
-                            <p class="meta">Related topics:
-                                {% for topic in news.topics %}
-                                    <a href="/news/topic/{{ topic.slug }}">{{ topic.name }}</a>{% if not loop.last %},{% endif %}
-                                {% endfor %}
-                            </p>
-                        {% endif %}
+                                {# TODO: Have a /news/topic url lol #}
+                                {% if news.topics|length %}
+                                    <p class="meta">Related topics:
+                                        {% for topic in news.topics %}
+                                            <a href="/news/topic/{{ topic.slug }}">{{ topic.name }}</a>{% if not loop.last %},{% endif %}
+                                        {% endfor %}
+                                    </p>
+                                {% endif %}
+                            </div>
+                        </div>
 
                         <article>{{ news.blurb|purify }}</article>
                     </li>
