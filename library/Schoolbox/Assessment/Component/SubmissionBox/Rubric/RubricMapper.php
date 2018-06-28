@@ -600,26 +600,31 @@ class RubricMapper
         // ensure all given criteria exist: create new ones if necessary
         foreach ($criteria as $group => $crits) {
             foreach ($crits as $crit) {
-
-                $name = $crit['name'];
-
-                // Which criterion is used?
-                // If there's a course spec: use a matching criterion from
-                // that course spec.
-                // If there is no course spec, or there's no matching criterion
-                // in the spec:
-                // use a matching criterion from the folder, or create a
-                // criterion if no match exists
+                $name            = $crit['name'];
                 $model           = null;
                 $criterionMapper = CriterionMapper::getInstance();
-                if (null !== $courseSpecFolderId) {
-                    try {
-                        $model = $criterionMapper->findOneForFolderByKey($courseSpecFolderId, $name, $group);
-                    } catch (MapperException $e) {
-                        // noop: fall back to criterion in folder
+
+                // Which criterion is used?
+                try {
+                    // If there's a matching criterion in the folder: use it
+                    $model = $criterionMapper->findOneForFolderByKey($folderId, $name, $group);
+
+                } catch (MapperException $e) {
+                    // If there isn't:
+                    // * If there's a course spec: use a matching criterion from it
+                    if ($courseSpecFolderId) {
+                        try {
+                            $model = $criterionMapper->findOneForFolderByKey($courseSpecFolderId, $name, $group);
+                        } catch (MapperException $e) {
+                            // There's no match in the folder or spec.
+                            // Create a new criterion in the folder
+                        }
                     }
                 }
-                if (null === $model) {
+
+                // If there's no course spec, or there's no match in the spec:
+                // * create a new criterion in the folder
+                if (!$model) {
                     $model = $criterionMapper->findOrCreateOneForFolderByKey($folderId, $name, $group);
                 }
 
