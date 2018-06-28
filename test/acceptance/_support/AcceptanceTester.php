@@ -70,8 +70,7 @@ class AcceptanceTester extends \Codeception\Actor
         $i->amOnPage(self::$loginURL);
         $i->fillField(self::$usernameField, $username);
         $i->fillField(self::$passwordField, $password);
-        //Can't just check a hidden field $i->checkOption('#rememberme'), keeping this as an example:
-        $i->executeJS('$("' . self::$rememberMe . '").val(1);');
+        $i->checkOption(self::$rememberMe);
         $i->click(self::$loginButton);
         $i->amOnPage('/');
 
