@@ -85,9 +85,6 @@ table.rb {
     }
     td {
         overflow: hidden;
-        input[type=text].rb-value {
-            width: 5rem;
-        }
 
         /* So that in readonly view, absolute elements end up in the correct location
          * such as the student's avatar in Self Reflection
