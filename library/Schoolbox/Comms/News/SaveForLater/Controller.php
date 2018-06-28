@@ -23,11 +23,6 @@ class Controller extends Base
     private $saveForLaterMapper;
 
     /**
-     * @var UserMapper
-     */
-    private $userMapper;
-
-    /**
      * @var ErrorMapper
      */
     private $errorMapper;
