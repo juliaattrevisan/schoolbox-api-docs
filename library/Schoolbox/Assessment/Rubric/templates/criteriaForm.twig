@@ -238,24 +238,12 @@ $(function() {
                                                    href="#"
                                                    title="Show {{ locale.assessment.plural }} using {{ locale.rubricCriterion }}"></a>
                                             {% else %}
-                                                <a class="icon-delete"
-                                                   data-role="remove-criterion"
+                                                <a class="icon-more"
+                                                   data-dropdown="dropdown-i{{ criterion.criterion.id }}"
                                                    href="#"
-                                                   title="Delete {{ locale.rubricCriterion.proper }}"></a>
+                                                   title="Actions"></a>
                                             {% endif %}
                                         </nav>
-
-                                        {#
-                                        {% if criterionInUse %}
-                                            <ul id="dropdown-i{{ criterion.criterion.id }}" class="f-dropdown" data-dropdown-content="">
-                                                <li>
-                                                    <a class="icon-info"
-                                                       data-reveal-id="criterion-{{ criterion.criterion.id }}"
-                                                       href="#">Show {{ locale.assessment.plural }} using {{ locale.rubricCriterion }}</a>
-                                                </li>
-                                            </ul>
-                                        {% endif %}
-                                        #}
 
                                         {% if criterionInUse %}
                                             {% set criterionUsageCount = criterion.usage|length %}
@@ -270,79 +258,23 @@ $(function() {
                                                         <li><a href="{{ routeLookup('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id}) }}">{{ assessment.title }}</a></li>
                                                         {% endfor %}
                                                     </ul>
-
                                                 </article>
                                                 <a class="close-reveal-modal" aria-label="Close">&#215;</a>
                                             </div>
+                                        {% else %}
+                                            <ul id="dropdown-i{{ criterion.criterion.id }}" class="f-dropdown" data-dropdown-content="">
+                                                <li>
+                                                    <a class="icon-delete"
+                                                       data-role="remove-criterion"
+                                                       href="#">Delete {{ locale.rubricCriterion.proper }}</a>
+                                                </li>
+                                            </ul>
                                         {% endif %}
 
                                     </li>
                                 {% endfor %}
 
-                                {#
-                                <!-- BEGIN criterion -->
-                                <!-- BEGIN criterion_enabled -->
-                                <li class="actions-small-1" data-rubric-criterion-row="{{ groupCount }}">
-                                    <div class="list-item">
-                                        <input type="text"
-                                               name="crits[{{ groupCount }}][items][i{{ criterion.criterion.id }}]"
-                                               value="{{ criterion.criterion.name }}"
-                                               id="i{{ criterion.criterion.id }}"
-                                               data-rubric-criterion />
-                                    </div>
-                                    <nav>
-                                        <a href="#" class="icon-more" data-dropdown="dropdown-i{{ criterion.criterion.id }}" title="Actions"></a>
-                                    </nav>
-                                    <ul id="dropdown-i{{ criterion.criterion.id }}" class="f-dropdown" data-dropdown-content="">
-                                        <!-- BEGIN criterion_in_use -->
-                                        <li>
-                                            <a class="icon-info"
-                                               data-reveal-id="criterion-{{ criterion.criterion.id }}"
-                                               href="#">Show {{ locale.assessment.plural }} using {{ locale.rubricCriterion }}</a>
-                                        </li>
-                                        <!-- END criterion_in_use -->
-                                        <li>
-                                            <a class="icon-delete"
-                                               data-role="remove-criterion"
-                                               href="#">Delete {{ locale.rubricCriterion.proper }}</a>
-                                        </li>
-                                    </ul>
-                                </li>
-                                <!-- END criterion_enabled -->
-                                <!-- BEGIN criterion_disabled -->
-                                <li class="actions-small-1" data-rubric-criterion-row="{{ groupCount }}">
-                                    <div class="list-item">
-                                        <input type="text"
-                                               name="crits[{{ groupCount }}][items][i{{ criterion.criterion.id }}]"
-                                               value="{{ criterion.criterion.name }}"
-                                               id="i{{ criterion.criterion.id }}"
-                                               readonly
-                                               data-rubric-criterion />
-                                    </div>
-                                    <nav>
-                                        <a class="icon-info"
-                                           data-reveal-id="criterion-{{ criterion.criterion.id }}"
-                                           href="#"
-                                           title="Show {{ locale.assessment.plural }} using {{ locale.rubricCriterion }}"></a>
-                                    </nav>
-                                </li>
-                                <!-- END criterion_disabled -->
-                                <div data-reveal id="criterion-{{ criterion.criterion.id }}" class="reveal-modal">
-                                    <article>
-                                        <h2>{{ criterion.criterion.name }}</h2>
-                                        <p>{{ locale.rubricCriterion.proper }} is in use on {CRITERION_USAGE} {CRITERION_ASSESSMENT_COUNT_LABEL};</p>
-                                        <ul>
-                                            <!-- BEGIN criterion_assessment -->
-                                            <li><a href="{CRITERION_ASSESSMENT_HREF}">{CRITERION_ASSESSMENT_TITLE}</a></li>
-                                            <!-- END criterion_assessment -->
-                                        </ul>
-
-                                    </article>
-                                    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-                                </div>
-                                <!-- END criterion -->
-                                #}
-                                <!-- New criterion within group -->
+                                {# New criterion within group #}
                                 <li class="actions-small-1" data-rubric-unsaved data-rubric-criterion-new-row data-rubric-criterion-row="{{ groupCount }}">
                                     <div class="list-item">
                                         <input type="text"
@@ -367,7 +299,7 @@ $(function() {
                     </fieldset>
                 {% endfor %}
 
-                <!-- New group -->
+                {# New group #}
                 <fieldset class='content' data-rubric-group-row="{{ maxGroupId }}">
                     <div class="small-12 medium-6 columns">
                         <h3>{{ locale.rubricGroup.proper }}</h3>
