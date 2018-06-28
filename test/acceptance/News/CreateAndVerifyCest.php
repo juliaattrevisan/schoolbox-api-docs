@@ -53,17 +53,25 @@ class CreateAndVerifyCest
         $headline = "Random Headline";
         $article  = "Random Article";
         $blurb    = "Blurb";
+        $image    = '';
+        $topic    = 'General';
+        $roles    = ['Teachers'];
+        $campi    = ['Senior', 'Junior'];
+        $users    = ['David Rhodes', 'Rachel Rhodes'];
+        $publish  = \Alaress_Date_Format::now()->addHours(-1)->setTime(0, 0, 0);
+        $expiry   = \Alaress_Date_Format::now()->addDays(7)->setTime(0, 0, 0);
+//        var_dump($publish->getCalendarDateTime());
         $formPage
             ->setHeadline($headline)
             ->setArticle($article)
             ->setBlurb($blurb)
             ->setFeatureImage($image)
-            ->setTopic('General')
-            ->setRoles([])
-            ->setCampuses([])
-            ->setUsers([])
-            ->setPublishDate('')
-            ->setExpiryDate('')
-        ;
+            ->setTopic($topic)
+            ->setRoles($roles)
+            ->setCampuses($campi)
+            ->setUsers($users)
+            ->setPublishDate($publish)
+            ->setExpiryDate($expiry)
+            ->submit();
     }
 }

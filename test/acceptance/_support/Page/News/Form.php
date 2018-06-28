@@ -82,6 +82,16 @@ class Form
     }
 
     /**
+     * @return Form
+     */
+    public function submit(): self
+    {
+        // TODO enable
+//        $this->tester->click(self::FORM_SAVE);
+        return $this;
+    }
+
+    /**
      * @param string $headline
      * @return Form
      */
@@ -129,6 +139,7 @@ class Form
      */
     public function setTopic(string $topic): self
     {
+        $this->tester->selectOption('item_topic_id', $topic);
         return $this;
     }
 
@@ -138,6 +149,7 @@ class Form
      */
     public function setRoles(array $roles): self
     {
+        // TODO Clear all roles, then set only the ones selected
         return $this;
     }
 
@@ -147,6 +159,7 @@ class Form
      */
     public function setCampuses(array $campuses): self
     {
+        // TODO Clear all roles, then set only the ones selected
         return $this;
     }
 
@@ -156,6 +169,7 @@ class Form
      */
     public function setUsers(array $users): self
     {
+        // TODO Clear all selectized, then search for selectized users
         return $this;
     }
 
@@ -165,6 +179,9 @@ class Form
      */
     public function setPublishDate(Alaress_Date_Format $publishDate): self
     {
+        // Type in database format, let strtotime do the work
+        // This is because Codeception has no access to the DB config
+        $this->tester->fillField('item_datetime_published', $publishDate->getDatabase());
         return $this;
     }
 
@@ -174,6 +191,7 @@ class Form
      */
     public function setExpiryDate(Alaress_Date_Format $expiryDate): self
     {
+        $this->tester->fillField('item_datetime_expires', $expiryDate->getDatabase());
         return $this;
     }
 }
