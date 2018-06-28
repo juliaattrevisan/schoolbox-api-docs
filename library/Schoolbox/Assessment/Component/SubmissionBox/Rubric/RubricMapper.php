@@ -598,11 +598,11 @@ class RubricMapper
         }
 
         // ensure all given criteria exist: create new ones if necessary
+        $criterionMapper = CriterionMapper::getInstance();
         foreach ($criteria as $group => $crits) {
             foreach ($crits as $crit) {
-                $name            = $crit['name'];
-                $model           = null;
-                $criterionMapper = CriterionMapper::getInstance();
+                $name  = $crit['name'];
+                $model = null;
 
                 // Which criterion is used?
                 try {
