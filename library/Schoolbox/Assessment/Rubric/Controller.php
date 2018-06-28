@@ -15,6 +15,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Criterion;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Group;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\UsageMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Folder\Model as FolderModel;
@@ -274,7 +275,132 @@ class Controller extends BaseController
      */
     public function getCriteriaForm(FolderModel $folder): void
     {
+        $criterionCollection = CriterionMapper::getInstance()->findForFolder($folder->getId());
 
+        $topId = 0;
+
+        $criteriaList  = [];
+        if (\count($criterionCollection)) {
+
+            /* Create group structure */
+            $criteriaList = [];
+            foreach ($criterionCollection as $crit) {
+                $groupId = $crit->getGroup()->getId();
+                $criteriaList[$groupId]['group']      = $crit->getGroup();
+                $criteriaList[$groupId]['criteria'][] = $crit;
+            }
+        }
+
+        $criterionData = [];
+        foreach ($criteriaList as $critGroup) {
+            /** @var \Schoolbox\Assessment\Component\SubmissionBox\Rubric\Group $group */
+            $group = $critGroup['group'];
+            /** @var \Schoolbox\Assessment\Component\SubmissionBox\Rubric\Criterion[] $crits */
+            $crits     = $critGroup['criteria'];
+            $groupData = [
+                'group'    => $group,
+                'criteria' => [],
+//                'criterion_block'    => '',
+//                'CRITGROUP_COUNT'    => $groupCount++,
+//                'CRITGROUP_ID'       => $group->getId(),
+//                'CRITGROUP_NAME'     => $group->getName(),
+//                'CRITGROUP_DISABLED' => '',
+            ];
+
+            $usageTotal = 0;
+
+            foreach ($crits as $crit) {
+
+                $usage      = UsageMapper::getInstance()->findUsage($crit->getId());
+                $usageCount = \count($usage);
+                $usageTotal += $usageCount;
+
+                $groupData['criteria'][] = [
+                    'criterion'  => $crit,
+                    'usageCount' => $usageCount,
+                ];
+
+                /* @var $crit Criterion */
+                $topId = max($topId, $crit->getId());
+
+//                $this->setVar([
+//                    'CRITERION_ID'   => $crit->getId(),
+//                    'CRITERION_NAME' => $crit->getName(),
+//                ]);
+//
+//                $usage = UsageMapper::getInstance()->findUsage($crit->getId());
+//                $usageCount = count($usage);
+//                $usageTotal += $usageCount;
+//                if ($usageCount > 0) {
+//                    $this->setVar([
+//                        'CRITERION_USAGE'                  => $usageCount,
+//                        'CRITERION_ASSESSMENT_COUNT_LABEL' => $l10n->translate('assessment', $usageCount > 1),
+//                    ]);
+//
+//                    if (!($folder->hasCourseSpecification() || $folder->hasUnitSpecification())) {
+//                        $this->setVar('criterion_enabled_block', '');
+//                        $this->parse('criterion_disabled_block', 'criterion_disabled');
+//                    } else {
+//                        $this->setVar('criterion_disabled_block', '');
+//                        $this->parse('criterion_in_use_block', 'criterion_in_use');
+//                        $this->parse('criterion_enabled_block', 'criterion_enabled');
+//                    }
+//
+//                    // PHPLib the assessments
+//                    $this->setVar('criterion_assessment_block', '');
+//                    foreach ($usage as $assessment) {
+//                        $this->setVar(
+//                            'CRITERION_ASSESSMENT_HREF',
+//                            $this->routeLookup(
+//                                'learningAssessment.getUpdateAssessmentForm',
+//                                [
+//                                    'assessmentId' => $assessment['id'],
+//                                ]
+//                            ) . "#rb[{$assessment['submission_box_id']}][criterion][{$crit->getId()}][on]"
+//                        );
+//                        $this->setVar('CRITERION_ASSESSMENT_TITLE', $assessment['title']);
+//                        $this->parse('criterion_assessment_block', 'criterion_assessment', true);
+//                    }
+//                } else {
+//                    $this->setVar('criterion_assessment_block', '');
+//                    $this->setVar('criterion_disabled_block', '');
+//                    $this->setVar('criterion_in_use_block', '');
+//                    $this->parse('criterion_enabled_block', 'criterion_enabled');
+//                }
+//
+//                $this->parse('criterion_block', 'criterion', true);
+//                if ($usageTotal > 0) {
+//                    $this->setVar('CRITGROUP_DISABLED', 'readonly');
+//                }
+            }
+
+            $groupData['usageTotal'] = $usageTotal;
+
+//            $this->parse('criterion_group_block', 'criterion_group', true);
+
+            $criterionData[] = $groupData;
+        }
+
+        $data = [
+            'groups'     => $criterionData,
+            'maxGroupId' => count($criteriaList),
+            'maxCritId'  => $topId + 1,
+        ];
+
+//        $this->setVar('MAX_CRITGROUP_ID', $groupCount);
+//        $this->setVar('MAX_CRIT_ID', $topId + 1);
+
+//        $stone = $this->getDi()->get('l10n');
+//
+//        $criteriaName = $this->getDi()->get('l10n')->translate('rubricGroup', true, true);
+//        $title = 'Manage Rubric ' . $criteriaName . ' for ' . Scrub::text($folder->getName());
+
+        $this->getResponse()->content->set(
+            $this->buildHtmlOutput('@rubric/criteriaForm.twig', $data)
+//            ->setTitle(
+//                sprintf('Manage Rubric %s for %s',
+//            )
+        );
     }
 
 
