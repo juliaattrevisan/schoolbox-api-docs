@@ -382,6 +382,7 @@ class Controller extends BaseController
         }
 
         $data = [
+            'folder'     => $folder,
             'groups'     => $criterionData,
             'maxGroupId' => count($criteriaList),
             'maxCritId'  => $topId + 1,

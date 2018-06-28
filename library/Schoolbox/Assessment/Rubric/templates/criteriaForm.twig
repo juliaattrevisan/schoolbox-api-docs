@@ -146,7 +146,11 @@ $(function() {
 </script>
 {% endautoescape %}
 
-{BREADCRUMB}
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbs(
+    [ folder.name, '/homepage/' ~ folder.id ],
+    [ 'Manage ' ~ locale.rubricGroup.properPlural ]
+) }}
 
 <div class="row">
     <div class="small-12 columns">
