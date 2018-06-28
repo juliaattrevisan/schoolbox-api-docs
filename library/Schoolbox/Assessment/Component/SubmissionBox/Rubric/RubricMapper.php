@@ -140,10 +140,12 @@ class RubricMapper
             'folderId'   => $folderId,
             'parentType' => Group::PARENT_TYPE_CATEGORY,
         ];
+        $in = ['folderId',];
         if ($parentFolderId) {
+            $in[] = 'parentFolderId';
             $args['parentFolderId'] = $parentFolderId;
         }
-        $in = implode(', :', array_keys($args));
+        $in = implode(', :', $in);
 
         $stmt = $this->database->query("
             SELECT
