@@ -143,4 +143,24 @@ class Controller extends Base
             return;
         }
     }
+
+
+    /**
+     * Remove an item from your Saved list
+     *
+     * @param News\Model $news
+     */
+    public function postRemove(News\Model $news)
+    {
+        if ($this->getRequest()->isXhr()) {
+            $this->saveForLaterMapper->deleteByColumnList([
+                'user_id' => $this->getUser()->getId(),
+                'article_id' => $news->getId()
+            ]);
+
+            $this->getResponse()->content->set($this->buildJsonOutput([
+                'success' => true,
+            ]));
+        }
+    }
 }
