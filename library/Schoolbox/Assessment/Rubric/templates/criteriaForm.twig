@@ -154,18 +154,20 @@ $(function() {
 
 <div class="row">
     <div class="small-12 columns">
-        <h1>{PAGE_TITLE}</h1>
+        <h1>Manage Rubric {{ locale.rubricGroup.properPlural }} for {{ folder.name }}</h1>
     </div>
 </div>
 <div class="row">
     <div class="small-12 island">
         <div class="alert-box">
             <p>
-                {TPL_LOCAL_RUBRICCRITERION_PLURAL_PC} are used as rows in a rubric.  These may be added while creating your rubric or initially setup via this screen.
-                If you want to delete any {TPL_LOCAL_RUBRICCRITERION} that has already been used on an {TPL_LOCAL_ASSESSMENT},
-                you need to first remove it from the {TPL_LOCAL_ASSESSMENT}, then you can delete it.
-                If you remove all the {TPL_LOCAL_RUBRICCRITERION_PLURAL} from any {TPL_LOCAL_RUBRICGROUP}, the {TPL_LOCAL_RUBRICGROUP} will automatically be deleted.
-                <a href="#" data-interaction="show-example-criteria">See example {TPL_LOCAL_RUBRICCRITERION_PLURAL}</a>
+                {{ locale.rubricCriterion.properPlural }} are used as rows in a rubric.
+                These may be added while creating your rubric or initially setup via this screen.
+                If you want to delete any {{ locale.rubricCriterion }} that has already been used on an {{ locale.assessment }},
+                you need to first remove it from the {{ locale.assessment }}, then you can delete it.
+                If you remove all the {{ locale.rubricCriterion.plural}} from any {{ locale.rubricGroup }},
+                the {{ locale.rubricGroup }} will automatically be deleted.
+                <a href="#" data-interaction="show-example-criteria">See example {{ locale.rubricCriterion.plural }}</a>
             </p>
         </div>
     </div>
