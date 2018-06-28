@@ -12,7 +12,6 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\Comms\News;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception;
-use Schoolbox\UserMapper;
 
 class Controller extends Base
 {
@@ -40,14 +39,16 @@ class Controller extends Base
         $this->errorMapper = $errorMapper;
     }
 
+
     /**
      * Provide form
      *
      * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
      */
     public function getList()
     {
-        $articles = $this->saveForLaterMapper->findByColumn('user_id', $this->getUser()->getId());
+        $articles = $this->saveForLaterMapper->findForUser($this->getUser()->getId());
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsSaveForLater/index.twig', [
             'articles' => $articles
