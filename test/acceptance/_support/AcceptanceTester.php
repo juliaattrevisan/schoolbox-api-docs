@@ -191,24 +191,6 @@ class AcceptanceTester extends \Codeception\Actor
 
 
     /**
-     * Fill in a rich text area.
-     *
-     * @param string $field
-     * @param string $value
-     */
-    public function fillRichTextField(string $field, string $value)
-    {
-        $this->executeInSelenium(
-            function (RemoteWebDriver $webDriver) use ($field, $value) {
-                $webDriver->executeScript(
-                    sprintf('CKEDITOR.instances["%s"].setData("%s")', addslashes($field), addslashes($value))
-                );
-            }
-        );
-    }
-
-
-    /**
      * Select the given options in a checkbox group.
      *
      * @param string $group
