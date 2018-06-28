@@ -51,15 +51,26 @@ class Controller extends Base
     /**
      * Provide form
      *
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws Exception
+     * @throws Exception\Deleted
      * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     public function getList()
     {
         $articles = $this->saveForLaterMapper->findForUser($this->getUser()->getId());
 
+        try {
+            $policy = $this->policyMapper->findOneByColumn('identifier', 'save_for_later');
+
+            $canSaveForLater = (bool)$policy->getValue();
+        } catch (Exception $e) {
+            $canSaveForLater = false;
+        }
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsSaveForLater/index.twig', [
-            'articles' => $articles
+            'articles' => $articles,
+            'canSaveForLater' => $canSaveForLater
         ])->setTitle('Saved For Later'));
     }
 

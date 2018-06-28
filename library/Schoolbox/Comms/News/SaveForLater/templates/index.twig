@@ -8,6 +8,12 @@
 <div class="row">
     <div class="small-12 columns">
         <h1>Saved For Later</h1>
+
+        <ul class="meta">
+            {% if not canSaveForLater %}
+            <li class="icon-info">Save For Later has been disabled. You can't add to this list. </li>
+            {% endif %}
+        </ul>
     </div>
 </div>
 <div class="row">
