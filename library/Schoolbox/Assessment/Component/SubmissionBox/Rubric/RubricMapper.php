@@ -25,6 +25,7 @@ use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\User;
@@ -536,14 +537,13 @@ class RubricMapper
     {
         $square = [];
 
-        $folderLookup = [$folderId];
-
         // Determine if the specified folder has a UnitSpec
         /** @var UnitSpecification $unitSpec */
         $unitSpec = UnitSpecificationMapper::getInstance()->findByColumn('folder_id', $folderId)->first();
+        $courseSpecFolderId = null;
         if ($unitSpec) {
             // Add the Unit's Course's Folder's ID
-            $folderLookup[] = $unitSpec->getCourse()->getFolder()->getId();
+            $courseSpecFolderId = $unitSpec->getCourse()->getFolder()->getId();
         }
 
         $fp = $file->readStream();
@@ -603,7 +603,25 @@ class RubricMapper
 
                 $name = $crit['name'];
 
-                $model = CriterionMapper::getInstance()->findOrCreateOneForFolderByKey($folderLookup, $name, $group);
+                // Which criterion is used?
+                // If there's a course spec: use a matching criterion from
+                // that course spec.
+                // If there is no course spec, or there's no matching criterion
+                // in the spec:
+                // use a matching criterion from the folder, or create a
+                // criterion if no match exists
+                $model           = null;
+                $criterionMapper = CriterionMapper::getInstance();
+                if (null !== $courseSpecFolderId) {
+                    try {
+                        $model = $criterionMapper->findOneForFolderByKey($courseSpecFolderId, $name, $group);
+                    } catch (MapperException $e) {
+                        // noop: fall back to criterion in folder
+                    }
+                }
+                if (null === $model) {
+                    $model = $criterionMapper->findOrCreateOneForFolderByKey($folderId, $name, $group);
+                }
 
                 // yank that ID
                 $criteria[$group][$name]['id'] = $model->getId();
@@ -612,7 +630,7 @@ class RubricMapper
         }
 
         // get a new rubric in array form
-        $postdata = $this->createForFolder($folderLookup[0], $folderLookup[1], $levelNames)->toPostData();
+        $postdata = $this->createForFolder($folderId, $courseSpecFolderId, $levelNames)->toPostData();
 
         // overlay descriptor data
         for ($i = 1; $i < count($square); $i += 2) {
