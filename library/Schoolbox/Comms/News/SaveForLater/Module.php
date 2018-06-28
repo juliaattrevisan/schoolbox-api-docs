@@ -37,8 +37,6 @@ class Module extends BaseModule
      */
     protected function registerRoutes(): void
     {
-        /* Anyone can see the form
-         */
         $perms = new Rule\All(
             new Rule\IsLoggedIn()
         );
