@@ -52,7 +52,18 @@ class CreateAndVerifyCest
         // TODO these should be randomizable
         $headline = "Random Headline";
         $article  = "Random Article";
-        $formPage->setHeadline($headline);
-        $formPage->setArticle($article);
+        $blurb    = "Blurb";
+        $formPage
+            ->setHeadline($headline)
+            ->setArticle($article)
+            ->setBlurb($blurb)
+            ->setFeatureImage($image)
+            ->setTopic('General')
+            ->setRoles([])
+            ->setCampuses([])
+            ->setUsers([])
+            ->setPublishDate('')
+            ->setExpiryDate('')
+        ;
     }
 }

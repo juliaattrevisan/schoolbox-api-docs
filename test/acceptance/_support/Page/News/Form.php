@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Page\News;
 
 use AcceptanceTester;
+use Alaress_Date_Format;
 
 /**
  * News form page object
@@ -18,20 +19,20 @@ use AcceptanceTester;
  */
 class Form
 {
-    const URL = '/news/modify/{id}';
+    public const URL = '/news/modify/{id}';
 
     // Selectors
 
     // TODO all of these should have better selectors
     // TODO all of these belong in the main content of a page (#content)
 
-    const LINK_ADD_NEWS = '.icon-add';
+    public const LINK_ADD_NEWS = '.icon-add';
 
     // No crumbtrail on this page?
+    public const FORM = '#newsForm';
 
-    const FORM      = '#newsForm';
     // Not sure if every input should have its own selector constant
-    const FORM_SAVE = self::FORM . ' input[type="submit"]';
+    public const FORM_SAVE = self::FORM . ' input[type="submit"]';
 
     /**
      * @var AcceptanceTester
@@ -82,17 +83,97 @@ class Form
 
     /**
      * @param string $headline
+     * @return Form
      */
-    public function setHeadline(string $headline): void
+    public function setHeadline(string $headline): self
     {
         $this->tester->fillField('heading', $headline);
+        return $this;
     }
 
     /**
      * @param string $article
+     * @return Form
      */
-    public function setArticle(string $article): void
+    public function setArticle(string $article): self
     {
         $this->tester->fillRichTextField('body', $article);
+        return $this;
+    }
+
+    /**
+     * @param string $blurb
+     * @return Form
+     */
+    public function setBlurb(string $blurb): self
+    {
+        // Expand blurb pane, and then enter it in
+        $this->tester->click('[data-collapser="blurb"]');
+        $this->tester->fillRichTextField('blurb', $blurb);
+        return $this;
+    }
+
+    /**
+     * @param string $filename
+     * @return Form
+     */
+    public function setFeatureImage(string $filename): self
+    {
+        // TODO upload files via Codeception
+        return $this;
+    }
+
+    /**
+     * @param string $topic
+     * @return Form
+     */
+    public function setTopic(string $topic): self
+    {
+        return $this;
+    }
+
+    /**
+     * @param array $roles
+     * @return Form
+     */
+    public function setRoles(array $roles): self
+    {
+        return $this;
+    }
+
+    /**
+     * @param array $campuses
+     * @return Form
+     */
+    public function setCampuses(array $campuses): self
+    {
+        return $this;
+    }
+
+    /**
+     * @param array $users
+     * @return Form
+     */
+    public function setUsers(array $users): self
+    {
+        return $this;
+    }
+
+    /**
+     * @param Alaress_Date_Format $publishDate
+     * @return Form
+     */
+    public function setPublishDate(Alaress_Date_Format $publishDate): self
+    {
+        return $this;
+    }
+
+    /**
+     * @param Alaress_Date_Format $expiryDate
+     * @return Form
+     */
+    public function setExpiryDate(Alaress_Date_Format $expiryDate): self
+    {
+        return $this;
     }
 }
