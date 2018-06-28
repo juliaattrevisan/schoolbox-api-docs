@@ -89,7 +89,7 @@ class Controller extends Base
      * @param News\Model $news
      * @return array
      */
-    private function activate(News\Model $news): ?array
+    private function activate(News\Model $news): array
     {
         /* Can only save when the Policy is on
          */
@@ -153,16 +153,7 @@ class Controller extends Base
                 'message' => 'Could not Save For Later.'
             ];
         }
-
-        /* Some other mystical possibility
-         */
-        return [
-            'success' => false,
-            'message' => 'Could not Save For Later.'
-        ];
     }
-
-
 
 
     /**
