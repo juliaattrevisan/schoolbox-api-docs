@@ -220,12 +220,10 @@ interface IAssessable extends ISoftDeletable
     /**
      * Return the name of the "type" of Assessable this is
      *
-     * For Due Works, it'll be "Essay, Homework, etc"
-     * For Quiz, it'll just be "Quiz"
-     * For Task, it'll just be "Task"
      * For Project, it'll just be "Project"
+     * For other assessment types, it will be "Essay, Homework, etc"
      *
-     * @return mixed
+     * @return string
      */
     public function getTypeName();
 
