@@ -11,6 +11,7 @@ namespace Schoolbox\Comms\News\SaveForLater;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Comms\News;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\UserMapper;
 
 class Controller extends Base
@@ -37,13 +38,11 @@ class Controller extends Base
      *
      * @param Mapper      $saveForLaterMapper
      * @param ErrorMapper $errorMapper
-     * @param UserMapper  $userMapper
      */
-    public function __construct(Mapper $saveForLaterMapper, ErrorMapper $errorMapper, UserMapper $userMapper)
+    public function __construct(Mapper $saveForLaterMapper, ErrorMapper $errorMapper)
     {
         $this->saveForLaterMapper = $saveForLaterMapper;
         $this->errorMapper = $errorMapper;
-        $this->userMapper = $userMapper;
     }
 
     /**
@@ -64,7 +63,8 @@ class Controller extends Base
 
 
     /**
-     * Process the form vars
+     * Save For Later
+     *
      * @param News\Model $news
      */
     public function postActivate(News\Model $news)
@@ -77,7 +77,7 @@ class Controller extends Base
                 ]);
 
                 $exists = true;
-            } catch (\Schoolbox\Mapper\Exception $e) {
+            } catch (Exception $e) {
                 $exists = false;
             }
 
@@ -103,30 +103,15 @@ class Controller extends Base
                 $this->getResponse()->content->set($this->buildJsonOutput([
                     'success' => true,
                 ]));
-            } catch (\Exception $e) {
+            } catch (\PDOException|\UnexpectedValueException|Exception $e) {
                 $this->getResponse()->status->set(400);
                 $this->getResponse()->content->set($this->buildJsonOutput([
                     'success' => false,
-                    'message' => $e->getMessage()
+                    'message' => 'Could not Save For Later.'
                 ]));
             }
 
-
             return;
-
-
-
-
-
-//            } catch (\Schoolbox\Mapper\Exception $e) {
-//                $this->getResponse()->status->set(400);
-//                $this->getResponse()->content->set($this->buildJsonOutput([
-//                    'success' => false,
-//                    'message' => $e->getMessage()
-//                ]));
-//            }
         }
-
-        return;
     }
 }

@@ -103,7 +103,7 @@ class Module extends BaseModule
     {
         /** @var Container $injector */
         $injector->params[Controller::class] = [
-            'userMapper' => $this->getMapperFactory()->getLazy(UserMapper::class),
+            'errorMapper' => $this->getMapperFactory()->getLazy(ErrorMapper::class),
             'saveForLaterMapper' => $this->getMapperFactory()->getLazy(SaveForLaterMapper::class),
         ];
     }
