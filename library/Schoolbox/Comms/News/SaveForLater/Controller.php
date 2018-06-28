@@ -68,12 +68,29 @@ class Controller extends Base
      * Save For Later
      *
      * @param News\Model $news
-     * @throws Exception
-     * @throws Exception\Deleted
      */
     public function postActivate(News\Model $news)
     {
+        if ($this->getRequest()->isXhr()) {
+            $outcome = $this->activate($news);
 
+            if (!$outcome['success']) {
+                $this->getResponse()->status->set(400);
+            }
+
+            $this->getResponse()->content->set($this->buildJsonOutput($outcome));
+
+            return;
+        }
+    }
+
+
+    /**
+     * @param News\Model $news
+     * @return array
+     */
+    private function activate(News\Model $news): ?array
+    {
         /* Can only save when the Policy is on
          */
         try {
@@ -82,67 +99,70 @@ class Controller extends Base
             $canSaveForLater = (bool)$policy->getValue();
 
             if (!$canSaveForLater) {
-                $this->getResponse()->status->set(400);
-                $this->getResponse()->content->set($this->buildJsonOutput([
+                return [
                     'success' => false,
                     'message' => 'This feature has been disabled.'
-                ]));
-                return;
+                ];
             }
         } catch (Exception $e) {
 
             /* Unknown settings; just leave
              */
-            return;
+            return [
+                'success' => false,
+                'message' => 'Could not Save For Later.'
+            ];
         }
 
         /* Policy lets you do a thing
          */
-        if ($this->getRequest()->isXhr()) {
-            try {
-                $this->saveForLaterMapper->findOneByColumnList([
-                    'user_id' => $this->getUser()->getId(),
-                    'article_id' => $news->getId()
-                ]);
+        try {
+            $this->saveForLaterMapper->findOneByColumnList([
+                'user_id' => $this->getUser()->getId(),
+                'article_id' => $news->getId()
+            ]);
 
-                $exists = true;
-            } catch (Exception $e) {
-                $exists = false;
-            }
-
-            /* You've already saved this for later...and we know this. Good job.
-             */
-            if ($exists) {
-                $this->getResponse()->content->set($this->buildJsonOutput([
-                    'success' => true
-                ]));
-
-                return;
-            }
-
-            /* Only save a new one if it doesn't already exist
-             */
-            try {
-                $record = $this->saveForLaterMapper->createModel()
-                    ->setUser($this->getUser())
-                    ->setArticle($news);
-
-                $this->saveForLaterMapper->save($record);
-
-                $this->getResponse()->content->set($this->buildJsonOutput([
-                    'success' => true,
-                ]));
-            } catch (\PDOException|\UnexpectedValueException|Exception $e) {
-                $this->getResponse()->status->set(400);
-                $this->getResponse()->content->set($this->buildJsonOutput([
-                    'success' => false,
-                    'message' => 'Could not Save For Later.'
-                ]));
-            }
-
-            return;
+            $exists = true;
+        } catch (Exception $e) {
+            $exists = false;
         }
+
+        /* You've already saved this for later...and we know this. Good job.
+         */
+        if ($exists) {
+            return [
+                'success' => true
+            ];
+        }
+
+        /* Only save a new one if it doesn't already exist
+         */
+        try {
+            $record = $this->saveForLaterMapper->createModel()
+                ->setUser($this->getUser())
+                ->setArticle($news);
+
+            $this->saveForLaterMapper->save($record);
+
+            return [
+                'success' => true,
+            ];
+        } catch (\PDOException|\UnexpectedValueException|Exception $e) {
+            return [
+                'success' => false,
+                'message' => 'Could not Save For Later.'
+            ];
+        }
+
+        /* Some other mystical possibility
+         */
+        return [
+            'success' => false,
+            'message' => 'Could not Save For Later.'
+        ];
     }
+
+
 
 
     /**
