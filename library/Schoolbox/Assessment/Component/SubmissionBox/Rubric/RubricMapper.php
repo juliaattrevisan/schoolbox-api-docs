@@ -153,13 +153,13 @@ class RubricMapper
                 rg.id AS group_id,
                 rg.name AS grouping,
                 rc.name,
-                COUNT(ru.submission_box_id) AS usage_count,
+                COUNT(a.id) AS usage_count,
                 rg.parent_id
             FROM rubric_criterion rc
             JOIN      rubric_group rg ON rg.id = rc.rubric_group_id
             LEFT JOIN rubric_usage ru ON rc.id = ru.criterion_id
             LEFT JOIN submission_box b ON ru.submission_box_id = b.id
-            LEFT JOIN assessment a ON b.assessment_id = a.id AND a.deleted_at IS NOT NULL
+            LEFT JOIN assessment a ON b.assessment_id = a.id AND a.deleted_at IS NULL
             WHERE rg.parent_type = :parentType
             AND rg.parent_id IN (:$in)
             AND rc.deleted_at IS NULL
@@ -397,7 +397,9 @@ class RubricMapper
                 WHERE g.parent_type = :parentType
                 AND g.parent_id IN (:$in)
                 AND c.deleted_at IS NULL
+                AND a.deleted_at IS NULL
                 AND g.deleted_at IS NULL
+                ORDER BY selected DESC
             ) t
             GROUP BY crit_id
             ORDER BY selected DESC, MAX(`sequence`) ASC, `grouping` ASC, `name` ASC;
