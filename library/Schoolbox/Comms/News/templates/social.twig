@@ -5,32 +5,34 @@
  # @param News\Model news
  #}
 
-{% set socialPolicies = {
-    'save_for_later': {
-        'value': policies['save_for_later'].value,
-        'activator': '@commsNewsSaveForLater/activator.twig'
-    }
-} %}
+{% if news.isAccepted %}
+    {% set socialPolicies = {
+        'save_for_later': {
+            'value': policies['save_for_later'].value,
+            'activator': '@commsNewsSaveForLater/activator.twig'
+        }
+    } %}
 
-{# Decide whether to show the social features sland #}
-{% set hasSocial = false %}
+    {# Decide whether to show the social features sland #}
+    {% set hasSocial = false %}
 
-{% for socialPolicy, settings in socialPolicies %}
-    {% if settings.value %}
-        {% set hasSocial = true %}
-    {% endif %}
-{% endfor %}
+    {% for socialPolicy, settings in socialPolicies %}
+        {% if settings.value %}
+            {% set hasSocial = true %}
+        {% endif %}
+    {% endfor %}
 
-{% if hasSocial %}
-    <div class="row">
-        <div class="small-12 island">
-            <section class="content">
-                {% for socialPolicy, settings in socialPolicies %}
-                    {% if settings.value %}
-                        {% include settings.activator with {news: news} %}
-                    {% endif %}
-                {% endfor %}
-            </section>
+    {% if hasSocial %}
+        <div class="row">
+            <div class="small-12 island">
+                <section class="content">
+                    {% for socialPolicy, settings in socialPolicies %}
+                        {% if settings.value %}
+                            {% include settings.activator with {news: news} %}
+                        {% endif %}
+                    {% endfor %}
+                </section>
+            </div>
         </div>
-    </div>
+    {% endif %}
 {% endif %}
