@@ -15,8 +15,7 @@ use Alaress_Date_Format;
 use DateTime;
 use Schoolbox;
 use Schoolbox\Collection;
-use Schoolbox\Notif\NotifInterface;
-use Schoolbox\Notif\SilentNotif;
+use Schoolbox\Realtime\Schedule\Trigger\Test\MockPropagator;
 use Traversable;
 
 class EventRecurrenceMapper
@@ -31,9 +30,6 @@ class EventRecurrenceMapper
      * @var EventMapper
      */
     protected $eventMapper = null;
-
-    /** @var NotifInterface */
-    protected $notif;
 
     /**
      * eventId corresponding to the first instance in a series
@@ -53,11 +49,8 @@ class EventRecurrenceMapper
     {
         $this->setEventMapper($eventMapper);
 
-        // stash the existing notifier so we can use it ourselves
-        $this->notif = $eventMapper->getNotifier();
-
         // silence!! but srsly, in this context, the event mapper needs to not raise notifications
-        $eventMapper->setNotifier(new SilentNotif());
+        $eventMapper->setEventPropagator(new MockPropagator());
     }
 
 

@@ -42,13 +42,13 @@ use Schoolbox\Mapper;
 use Schoolbox\MapperFactory;
 use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\Notifactory;
-use Schoolbox\Notif\SilentNotif;
 use Schoolbox\Pastoral\DataSource as PastoralDataSource;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Revision\DataSource as PastoralRevisionDataSource;
 use Schoolbox\Pastoral\Revision\Mapper as PastoralRevisionMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Routing\Cache\Redis\WriteCache;
+use Schoolbox\Realtime\Schedule\Trigger\Test\MockPropagator;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
 use SitePage;
@@ -543,8 +543,8 @@ abstract class AbstractBootstrap implements BootstrapInterface
                         [
                             'log'        => $di->lazyGet('ups.logger'),
                             'userMapper' => $di->lazy(function () {
-                                $map = new SyncUserMapper;
-                                $map->setNotifier(new SilentNotif());
+                                $map = new SyncUserMapper();
+                                $map->setEventPropagator(new MockPropagator());
                                 return $map;
                             }),
                             'ruleMapper' => $di->lazyNew(SyncRuleMapper::class),

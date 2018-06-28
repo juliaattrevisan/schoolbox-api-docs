@@ -28,6 +28,7 @@ use Schoolbox\Pastoral\SubType\Model as PastoralSubType;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
 use Schoolbox\Pastoral\Type\Model as PastoralType;
 use Schoolbox\Pastoral\UploadQueue\Model as UploadQueue;
+use Schoolbox\Realtime\Schedule\Trigger\Test\MockPropagator;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -480,11 +481,14 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                 // If this is a new record we need to store the ID of the newly created Synergetic record
 
                 if (empty($pastoral->getExternalId())) {
+                    $pastoral->setExternalId($this->connector->lastInsertId());
+
                     // Stop pastoral notifier firing on this update, otherwise they receive both a create/update
                     // notification every time someone creates a pastoral record
-
-                    $pastoral->setExternalId($this->connector->lastInsertId());
+                    $propagator = $this->getPastoralMapper()->getEventPropagator();
+                    $this->getPastoralMapper()->setEventPropagator(new MockPropagator());
                     $this->getPastoralMapper()->save($pastoral);
+                    $this->getPastoralMapper()->setEventPropagator($propagator);
                 }
 
                 // Export the permissions/audience of the pastoral record to Synergetic

@@ -29,9 +29,6 @@ use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Performance\DevMonitor;
 use Schoolbox\Mapper\Performance\IMonitor;
 use Schoolbox\Mapper\Performance\LiveMonitor;
-use Schoolbox\Notif\Notif;
-use Schoolbox\Notif\Notifactory;
-use Schoolbox\Notif\NotifInterface;
 use Schoolbox\Realtime\Schedule\Broker;
 use Schoolbox\Realtime\Schedule\Event\Splitter;
 use Schoolbox\Realtime\Schedule\Trigger\IPropagator;
@@ -215,13 +212,6 @@ abstract class Mapper implements IMapper, Serializable
      * @var IConfigLoader
      */
     protected $config_loader;
-
-    /**
-     * Notifier
-     *
-     * @var NotifInterface
-     */
-    protected $notif;
 
     /** @var array */
     protected $sessionData = [];
@@ -612,26 +602,6 @@ abstract class Mapper implements IMapper, Serializable
     }
 
     /**
-     * @param NotifInterface $notif
-     */
-    public function setNotifier($notif)
-    {
-        $this->notif = $notif;
-    }
-
-    /**
-     * @return NotifInterface
-     */
-    public function getNotifier()
-    {
-        // load on demand, so that we don't get infinite loops
-        if (!$this->notif instanceof NotifInterface) {
-            $this->setNotifier(Notifactory::create(Notif::TOPIC_APPLICATION, $this->getConfigLoader()));
-        }
-        return $this->notif;
-    }
-
-    /**
      * @param array $sessionData
      */
     public function setSessionData($sessionData)
@@ -714,7 +684,7 @@ abstract class Mapper implements IMapper, Serializable
      * @param IPropagator $propagator
      * @return static
      */
-    protected function setEventPropagator(IPropagator $propagator = null)
+    public function setEventPropagator(IPropagator $propagator = null)
     {
         $this->propagator = $propagator;
         return $this;

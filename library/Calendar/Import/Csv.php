@@ -17,10 +17,8 @@ use \Schoolbox\Calendar\Relation\Role;
 use \Schoolbox\Calendar\Relation\RoleMapper;
 use \Schoolbox\CampusMapper;
 use \Alaress_Date_Format;
-use Schoolbox\Notif\SilentNotif;
 use \Schoolbox\Calendar\EventTypeMapper;
-use \Schoolbox\Error\Mapper as ErrorMapper;
-use Alaress\Lumberjack\Logger;
+use Schoolbox\Realtime\Schedule\Trigger\Test\MockPropagator;
 
 class Csv extends Base
 {
@@ -38,12 +36,12 @@ class Csv extends Base
         $roleRelationMapper = new RoleMapper();
 
         // silence notifications
-        $silence = new SilentNotif();
+        $mockPropagator = new MockPropagator();
 
-        $campusMapper->setNotifier($silence);
-        $eventMapper->setNotifier($silence);
-        $categoryRelationMapper->setNotifier($silence);
-        $roleRelationMapper->setNotifier($silence);
+        $campusMapper->setEventPropagator($mockPropagator);
+        $eventMapper->setEventPropagator($mockPropagator);
+        $categoryRelationMapper->setEventPropagator($mockPropagator);
+        $roleRelationMapper->setEventPropagator($mockPropagator);
 
         /* All the campuses selected in the ui
          */

@@ -67,7 +67,7 @@ class UserMapper extends SchoolboxMapper
             $userAccessMapper = $this->getJoinMapper('userAccess');
 
             // make sure any mutes go through correctly
-            $userAccessMapper->setNotifier($this->getNotifier());
+            $userAccessMapper->setEventPropagator($this->getEventPropagator());
 
             /* If you combined 'Groups (Read/Write)' and 'Groups (Remove)' in the
              * same rule, you'll always be added to the groups specified by the
