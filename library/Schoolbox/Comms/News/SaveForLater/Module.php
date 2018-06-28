@@ -38,13 +38,7 @@ class Module extends BaseModule
     {
         /* Anyone can see the form
          */
-        $getPerms = new Rule\All(
-            new Rule\IsLoggedIn()
-        );
-
-        /* Only superusers can receive data from the form
-         */
-        $postPerms = new Rule\All(
+        $perms = new Rule\All(
             new Rule\IsLoggedIn()
         );
 
@@ -52,8 +46,8 @@ class Module extends BaseModule
             return $this->preloadNews($params);
         };
 
-        $this->register('GET', '', 'getList', $getPerms);
-        $this->register('POST', '/{newsId}', 'postExample', $postPerms, $preloadNews);
+        $this->register('GET', '', 'getList', $perms);
+        $this->register('POST', '/{newsId}', 'postActivate', $perms, $preloadNews);
     }
 
     /**

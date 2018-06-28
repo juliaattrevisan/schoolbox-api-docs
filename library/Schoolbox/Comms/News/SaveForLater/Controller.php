@@ -59,17 +59,27 @@ class Controller extends Base
     /**
      * Process the form vars
      * @param News\Model $news
-     * @throws \Aura\Di\Exception\ServiceNotFound
      */
-    public function postExample(News\Model $news)
+    public function postActivate(News\Model $news)
     {
+        if ($this->getRequest()->isXhr()) {
+            try {
 
-        /* TODO: Async save an article to MyLinks for the time being, because cheapness
-         * Recycle the old handlers I suppose
-         */
+                /* TODO: actually save it
+                 */
+                $this->getResponse()->content->set($this->buildJsonOutput([
+                    'success' => true,
+                ]));
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsSaveForLater/submit.twig', [
-            'var1' => $this->getRequest()->post['var1']
-        ])->setTitle('Example Form Output'));
+            } catch (\Exception $e) {
+                $this->getResponse()->status->set(400);
+                $this->getResponse()->content->set($this->buildJsonOutput([
+                    'success' => false,
+                    'message' => "You don't have permission to delete this article."
+                ]));
+            }
+        }
+
+        return;
     }
 }

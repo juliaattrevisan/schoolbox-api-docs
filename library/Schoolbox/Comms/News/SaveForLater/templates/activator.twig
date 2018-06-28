@@ -7,7 +7,38 @@
  #}
 <div class="row">
     <div class="small-12 columns">
-        <a href="{{ routeLookup('commsNewsSaveForLater.getList') }}" class="icon-favourite" title="Save a shortcut to this article">Save For Later</a>
+        <script>
+            $(function() {
+                $('#saveforlater').on('click', function(event) {
+                    event.preventDefault();
+
+                    var element = $(this);
+                    var toast = $('#toast');
+
+                    toast.toastActivate({
+                        text: 'Saving for later...'
+                    });
+
+                    $.ajax({
+                        type: 'POST',
+                        url: element.attr('href'),
+                        dataType: 'json'
+                    }).success(function () {
+                        toast.toastTimeout({
+                            text: 'Saved',
+                            css: 'success'
+                        });
+                    }).error(function (response) {
+                        var temp = $.parseJSON(response.responseText);
+
+                        toast.toastTimeout({
+                            text: 'Error: ' + temp.message,
+                            css: 'alert'
+                        });
+                    });
+                });
+            });
+        </script>
+        <a href="{{ routeLookup('commsNewsSaveForLater.postActivate', {newsId: news.id}) }}" class="icon-favourite" title="Save a shortcut to this article" id="saveforlater">Save For Later</a>
     </div>
 </div>
-
