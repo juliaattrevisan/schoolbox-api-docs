@@ -188,31 +188,4 @@ class AcceptanceTester extends \Codeception\Actor
                 $webDriver->switchTo()->defaultContent();
             });
     }
-
-
-    /**
-     * Select the given options in a checkbox group.
-     *
-     * @param string $group
-     * @param array  $options
-     */
-    public function checkSelectGroupOptions(string $group, array $options)
-    {
-        // Get ID of all available options
-        $optionIds = $this->grabMultiple(
-            sprintf('input[type=checkbox][data-select-all-group="%s"]', addslashes($group)),
-            'id'
-        );
-
-        // Check every option provided in $options, uncheck any not provided
-        foreach ($optionIds as $optionId) {
-            // Find the matching checkbox, and check/uncheck it
-            $optionLabel = $this->grabTextFrom(sprintf('label[for="%s"]', addslashes($optionId)));
-            if (\in_array($optionLabel, $options, true)) {
-                $this->checkOption('#'.$optionId);
-            } else {
-                $this->uncheckOption('#'.$optionId);
-            }
-        }
-    }
 }

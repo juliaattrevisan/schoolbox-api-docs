@@ -102,29 +102,66 @@ class Acceptance extends \Codeception\Module
     }
 
 
-//    /**
-//     * Select the given options in a checkbox group.
-//     *
-//     * @param string $group
-//     * @param array  $options
-//     */
-//    public function checkSelectGroupOptions(string $group, array $options)
-//    {
-//        // Get ID of all available options
-//        $optionIds = $this->grabMultiple(
-//            sprintf('input[type=checkbox][data-select-all-group="%s"]', addslashes($group)),
-//            'id'
-//        );
-//
-//        // Check every option provided in $options, uncheck any not provided
-//        foreach ($optionIds as $optionId) {
-//            // Find the matching checkbox, and check/uncheck it
-//            $optionLabel = $this->grabTextFrom(sprintf('label[for="%s"]', addslashes($optionId)));
-//            if (\in_array($optionLabel, $options, true)) {
-//                $this->checkOption('#'.$optionId);
-//            } else {
-//                $this->uncheckOption('#'.$optionId);
-//            }
-//        }
-//    }
+    /**
+     * Select the given options in a checkbox group.
+     *
+     * @param string $group
+     * @param array  $options
+     */
+    public function checkSelectGroupOptions(string $group, array $options)
+    {
+        /** @var WebDriver $wd */
+        $wd = $this->getModule('WebDriver');
+
+        // Get ID of all available options
+        /** @var WebDriverElement[] $elements */
+        $elements = $wd->_findElements([
+            'css' => sprintf('input[type=checkbox][data-select-all-group="%s"]', addslashes($group))
+        ]);
+        $optionIds = [];
+        foreach ($elements as $element) {
+            $optionIds[] = $element->getAttribute('id');
+        }
+
+        // Check every option provided in $options, uncheck any not provided
+        foreach ($optionIds as $optionId) {
+            // Find the matching checkbox, and check/uncheck it
+            $optionLabel = $wd->grabTextFrom(sprintf('label[for="%s"]', addslashes($optionId)));
+            if (\in_array($optionLabel, $options, true)) {
+                $this->checkOption('#'.$optionId);
+            } else {
+                $this->uncheckOption('#'.$optionId);
+            }
+        }
+    }
+
+
+    /**
+     * Removes a selected option from a selectize.
+     *
+     * @param string $field
+     * @param string $selectizeSearch
+     */
+    public function unselectSelectizeOption(string $field, string $selectizeSearch)
+    {
+    }
+
+
+    /**
+     * Searches for a selectize option, and adds it. If it can't find it,
+     * raises exception.
+     *
+     * @param string $field
+     * @param string $selectizeSearch
+     */
+    public function selectSelectizeOption(string $field, string $selectizeSearch)
+    {
+        // Find field, get its selectize
+
+        // Type $selectizeSearch into input
+
+        // wait for something to come up
+
+        // select the first thing
+    }
 }
