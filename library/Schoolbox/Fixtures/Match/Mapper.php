@@ -336,4 +336,57 @@ class Mapper extends BaseMapper
 
         throw new OutOfBoundsException("Given team has no future matches");
     }
+
+    /**
+     * Match notifications
+     *
+     * @param Match  $object
+     * @param string $verb
+     * @param Match  $previous
+     * @return bool
+     */
+    protected function raiseNotification($object, $verb, $previous = null)
+    {
+        if (!isset($this->sessionData['user'])) {
+            return false;
+        }
+
+        $diff = null;
+
+        // UPDATE
+        if ($previous && ($verb != self::METHOD_DELETE)) {
+            $diff = $this->diff($object, $previous);
+            /** @var Match $object */
+            /** @var Match $previous */
+            $itineraryDiff = $object->getItinerary()->diff($previous->getItinerary(),
+                function (ItineraryItem $a, ItineraryItem $b) {
+                    return $a->getStartAt()->getUnixTimeStamp() === $b->getStartAt()->getUnixTimeStamp()
+                        && $a->getDescription() === $b->getDescription();
+                }
+
+            );
+            if ($itineraryDiff->count() != 0) {
+                $diff['itinerary'] = $itineraryDiff->count();
+            }
+            // If there's no viewable change, we don't want to notify
+            if (count($diff) == 1 && array_key_exists('updatedAt', $diff)) {
+                return true;
+            }
+        }
+
+        // CREATE and if the starting date is in past, we don't want to notify
+        if (!$previous && $object->getStartAt()->isPast()) {
+            return true;
+        }
+
+        // create a new event, and send it to the scheduler
+        try {
+            $this->getEventPropagator()->propagate($this->sessionData['user'], $verb, $object, $this, $diff);
+        } catch (\ErrorException $e) {
+            //Unable to connect to notification system
+            return false;
+        }
+
+        return true;
+    }
 }
