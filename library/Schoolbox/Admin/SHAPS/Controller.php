@@ -59,6 +59,7 @@ class Controller extends Base
      * Contructs an array of field names based on whether the field was empty.
      * TODO factor this out into a common location; currently the fields are hardcoded seperately here
      * and in library/Custom/Help/CourseParticipation/Handler.php
+     * Also, this solution does not work for the ajax search page, as it is not asynchronous.
      * 
      * @param \Schoolbox\User $user
      * @return array
@@ -201,6 +202,7 @@ class Controller extends Base
     {
         // Selectize gives us the user's external ID
         $user = $this->userMapper->findByExternalId($userId);
+        $errors[$user->getId()] = $this->getInvalidities($user);
 
         /* Check if this user's id was in the provisionedUsers index - don't need to use in_array to test
          */
@@ -212,6 +214,7 @@ class Controller extends Base
             'provisioned' => $exists,
             'id' => $user->getId(),
             'externalID' => $user->getExternalId(),
+            'errorList' => $errors
         ];
 
         $this->getResponse()->content->set($this->buildJsonOutput($userJSON));
