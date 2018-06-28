@@ -1,10 +1,10 @@
-<!-- BEGIN custom_head -->
+{% autoescape 'js' %}
 <script type="text/javascript">
 $(function() {
 
     var form           = $('form[data-role="rubric-criteria-form"]');
-    var groupMaxId     = Number('{MAX_CRITGROUP_ID}');
-    var criterionMaxId = Number('{MAX_CRIT_ID}');
+    var groupMaxId     = Number('{{ maxGroupId }}');
+    var criterionMaxId = Number('{{ maxCritId }}');
 
     // If there are no dropdowns at all on initial load; they must be reapplied
     // If there are any; they must not be reapplied. Go figure
@@ -38,7 +38,7 @@ $(function() {
                 var newContainer = container.clone(true, true);
                 newContainer.find('input').val('');
                 newContainer.find('[data-rubric-criterion]').attr('data-rubric-criterion-new', true);
-                input.attr('placeholder', 'Add {TPL_LOCAL_RUBRICCRITERION_PC}...');
+                input.attr('placeholder', 'Add {{ locale.rubricCriterion.proper }}...');
 
                 newContainer.appendTo(container.parent());
 
@@ -113,7 +113,7 @@ $(function() {
                 var $indicatorNameInput = $(this);
 
                 $indicatorNameInput.attr('name',
-                    $indicatorNameInput.attr('name').replace(/crits\[\d+\]/, 'crits[' + capabilityId + ']')
+                    $indicatorNameInput.attr('name').replace(/crits\[\d+]/, 'crits[' + capabilityId + ']')
                 );
             });
         });
@@ -144,7 +144,7 @@ $(function() {
     });
 });
 </script>
-<!-- END custom_head -->
+{% endautoescape %}
 
 {BREADCRUMB}
 
