@@ -52,17 +52,18 @@ class Assess_Attempt extends Evaluation_Attempt {
      * * aren't yet reviewed
      *
      * @param int $assessId
+     * @param bool $excludeReviewed
      * @return array
      */
     public function retrieveLatestReviewableAttemptIds($assessId, $excludeReviewed = false)
     {
         $query = "
-            SELECT user_id, attempt_id
+            SELECT user_id, attempt_id, reviewed_at
             FROM assess_attempt
             WHERE assess_id = '{$this->db->quote($assessId)}'
-            AND   deleted_at IS NULL "
-          . ($excludeReviewed ? ' AND reviewed_at IS NULL ' : '')
-          . " ORDER BY user_id, `start` DESC";
+            AND   deleted_at IS NULL
+            ORDER BY user_id, `start` DESC
+        ";
         $results = [];
         $rows = $this->db->getAll($query);
         if (!$rows) {
@@ -70,6 +71,9 @@ class Assess_Attempt extends Evaluation_Attempt {
         }
         foreach ($rows as $row) {
             $userId = $row['user_id'];
+            if ($excludeReviewed && $results['reviewed_at'] !== null) {
+                continue;
+            }
             if (!isset($results[$userId])) {
                 $results[$userId] = $row['attempt_id'];
             }

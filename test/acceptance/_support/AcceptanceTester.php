@@ -88,4 +88,104 @@ class AcceptanceTester extends \Codeception\Actor
         $i->click('Mr Jack Coles');
     }
 
+    /**
+     * Impersonate
+     * @param $fullname
+     */
+    public function impersonate($fullname)
+    {
+        $i = $this;
+        $i->amOnPage('/user/recoverSession');
+        $i->click('Alaress Admin');
+        $i->click($fullname, '#account-menu');
+    }
+
+    /**
+     * Fill in CKEditor
+     * @param $element_id
+     * @param $content
+     */
+    public function fillCkEditorById($element_id, $content)
+    {
+        $this->fillRteEditor(
+            \Facebook\WebDriver\WebDriverBy::cssSelector(
+                '#cke_' . $element_id . ' .cke_wysiwyg_frame'
+            ),
+            $content
+        );
+    }
+
+    /**
+     * Fill in CKEditor
+     * @param $element_name
+     * @param $content
+     */
+    public function fillCkEditorByName($element_name, $content)
+    {
+        $this->fillRteEditor(
+            \Facebook\WebDriver\WebDriverBy::cssSelector(
+                'textarea[name="' . $element_name . '"] + .cke .cke_wysiwyg_frame'
+            ),
+            $content
+        );
+    }
+
+    /**
+     * Fill in TinyMice editor
+     * @param $id
+     * @param $content
+     */
+    public function fillTinyMceEditorById($id, $content)
+    {
+        $this->fillTinyMceEditor('id', $id, $content);
+    }
+
+    /**
+     * Fill in TinyMice editor
+     * @param $name
+     * @param $content
+     */
+    public function fillTinyMceEditorByName($name, $content)
+    {
+        $this->fillTinyMceEditor('name', $name, $content);
+    }
+
+    /**
+     * Fill in TinyMice editor
+     * @param $attribute
+     * @param $value
+     * @param $content
+     */
+    private function fillTinyMceEditor($attribute, $value, $content)
+    {
+        $this->fillRteEditor(
+            \Facebook\WebDriver\WebDriverBy::xpath(
+                '//textarea[@' . $attribute . '=\'' . $value . '\']/../div[contains(@class, \'mce-tinymce\')]//iframe'
+            ),
+            $content
+        );
+    }
+
+    /**
+     * Fill in RteEditor
+     * @param $selector
+     * @param $content
+     */
+    private function fillRteEditor($selector, $content)
+    {
+        $this->executeInSelenium(
+            function (\Facebook\WebDriver\Remote\RemoteWebDriver $webDriver)
+            use ($selector, $content) {
+                $webDriver->switchTo()->frame(
+                    $webDriver->findElement($selector)
+                );
+
+                $webDriver->executeScript(
+                    'arguments[0].innerHTML = "' . addslashes($content) . '"',
+                    [$webDriver->findElement(\Facebook\WebDriver\WebDriverBy::tagName('body'))]
+                );
+
+                $webDriver->switchTo()->defaultContent();
+            });
+    }
 }
