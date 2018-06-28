@@ -221,31 +221,61 @@ $(function() {
                             <ul class="information-list">
 
                                 {% for criterion in group.criteria %}
+                                    {% set criterionInUse = criterion.usage|length > 0 %}
                                     <li class="actions-small-1" data-rubric-criterion-row="{{ groupCount }}">
                                         <div class="list-item">
                                             <input type="text"
                                                    name="crits[{{ groupCount }}][items][i{{ criterion.criterion.id }}]"
                                                    value="{{ criterion.criterion.name }}"
                                                    id="i{{ criterion.criterion.id }}"
+                                                   {% if criterionInUse %}readonly{% endif %}
                                                    data-rubric-criterion />
                                         </div>
                                         <nav>
-                                            <a href="#" class="icon-more" data-dropdown="dropdown-i{{ criterion.criterion.id }}" title="Actions"></a>
-                                        </nav>
-                                        <ul id="dropdown-i{{ criterion.criterion.id }}" class="f-dropdown" data-dropdown-content="">
-                                            <!-- BEGIN criterion_in_use -->
-                                            <li>
+                                            {% if criterionInUse %}
                                                 <a class="icon-info"
                                                    data-reveal-id="criterion-{{ criterion.criterion.id }}"
-                                                   href="#">Show {{ locale.assessment.plural }} using {{ locale.rubricCriterion }}</a>
-                                            </li>
-                                            <!-- END criterion_in_use -->
-                                            <li>
+                                                   href="#"
+                                                   title="Show {{ locale.assessment.plural }} using {{ locale.rubricCriterion }}"></a>
+                                            {% else %}
                                                 <a class="icon-delete"
                                                    data-role="remove-criterion"
-                                                   href="#">Delete {{ locale.rubricCriterion.proper }}</a>
-                                            </li>
-                                        </ul>
+                                                   href="#"
+                                                   title="Delete {{ locale.rubricCriterion.proper }}"></a>
+                                            {% endif %}
+                                        </nav>
+
+                                        {#
+                                        {% if criterionInUse %}
+                                            <ul id="dropdown-i{{ criterion.criterion.id }}" class="f-dropdown" data-dropdown-content="">
+                                                <li>
+                                                    <a class="icon-info"
+                                                       data-reveal-id="criterion-{{ criterion.criterion.id }}"
+                                                       href="#">Show {{ locale.assessment.plural }} using {{ locale.rubricCriterion }}</a>
+                                                </li>
+                                            </ul>
+                                        {% endif %}
+                                        #}
+
+                                        {% if criterionInUse %}
+                                            {% set criterionUsageCount = criterion.usage|length %}
+                                            <div data-reveal id="criterion-{{ criterion.criterion.id }}" class="reveal-modal">
+                                                <article>
+                                                    <h2>{{ criterion.criterion.name }}</h2>
+                                                    <p>{{ locale.rubricCriterion.proper }} is in use on {{ criterionUsageCount}}
+                                                        {{ criterionUsageCount > 1 ? locale.assessment.plural : locale.assessment }};
+                                                    </p>
+                                                    <ul>
+                                                        {% for assessment in criterion.usage %}
+                                                        <li><a href="{{ routeLookup('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id}) }}">{{ assessment.title }}</a></li>
+                                                        {% endfor %}
+                                                    </ul>
+
+                                                </article>
+                                                <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+                                            </div>
+                                        {% endif %}
+
                                     </li>
                                 {% endfor %}
 

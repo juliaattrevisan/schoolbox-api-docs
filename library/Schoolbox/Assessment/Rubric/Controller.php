@@ -312,12 +312,11 @@ class Controller extends BaseController
             foreach ($crits as $crit) {
 
                 $usage      = UsageMapper::getInstance()->findUsage($crit->getId());
-                $usageCount = \count($usage);
-                $usageTotal += $usageCount;
+                $usageTotal += \count($usage);
 
                 $groupData['criteria'][] = [
                     'criterion'  => $crit,
-                    'usageCount' => $usageCount,
+                    'usage'      => $usage,
                 ];
 
                 /* @var $crit Criterion */
