@@ -28,7 +28,10 @@
                 <section class="content">
                     {% for socialPolicy, settings in socialPolicies %}
                         {% if settings.value %}
-                            {% include settings.activator with {news: news} %}
+                            {% include settings.activator with {
+                                news: news,
+                                state: states[socialPolicy]
+                            } %}
                         {% endif %}
                     {% endfor %}
                 </section>

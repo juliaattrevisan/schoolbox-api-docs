@@ -199,7 +199,13 @@
 
 
 {# Social Features and assorted functionality #}
-{% include '@commsNews/social.twig' with {policies: policies, news: news} %}
+{% include '@commsNews/social.twig' with {
+    policies: policies,
+    news: news,
+    states: {
+        'save_for_later': isSavedForLater
+    }
+} %}
 
 
 <div class="row">

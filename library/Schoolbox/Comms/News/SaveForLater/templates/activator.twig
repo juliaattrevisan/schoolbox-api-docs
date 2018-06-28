@@ -4,6 +4,7 @@
  # UI element and behaviours for this feature
  #
  # @param Model news
+ # @param string state
  #}
 <div class="row">
     <div class="small-12 columns">
@@ -39,6 +40,12 @@
                 });
             });
         </script>
-        <p><a href="{{ routeLookup('commsNewsSaveForLater.postActivate', {newsId: news.id}) }}" class="icon-favourite" title="Save a shortcut to this article" id="saveforlater">Save For Later</a></p>
+        {% if state %}
+            <p><span class="icon-favourite"></span>This {{ locale.news }} article is already
+                <a href="{{ routeLookup('commsNewsSaveForLater.getList') }}" title="View your list of articles">Saved For Later</a>.
+            </p>
+        {% else %}
+            <p><a href="{{ routeLookup('commsNewsSaveForLater.postActivate', {newsId: news.id}) }}" class="icon-favourite" title="Save a shortcut to this article" id="saveforlater">Save For Later</a></p>
+        {% endif %}
     </div>
 </div>

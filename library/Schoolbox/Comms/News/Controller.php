@@ -343,10 +343,24 @@ class Controller extends Base
 
         $moderationRequired = $policies->getOffset('global_moderation')->getValue();
 
+        /* Figure out if this was Saved For Later for the current user
+         */
+        try {
+            SaveForLater\Mapper::getInstance()->findOneByColumnList([
+                'user_id' => $this->getUser()->getId(),
+                'article_id' => $news->getId()
+            ]);
+
+            $isSavedForLater = true;
+        } catch (MapperException $e) {
+            $isSavedForLater = false;
+        }
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/detail.twig', [
             'policies' => $policies,
             'news' => $news,
             'moderationRequired' => $moderationRequired,
+            'isSavedForLater' => $isSavedForLater,
             'isCommsOfficer' => (new ValidUserIsCommsOfficer())->isSatisfiedBy($this->getUser()),
             'isAcceptable' => (new Moderation\ValidUserCanAccept())->isSatisfiedBy($this->getUser(), $news),
             'isRejectable' => (new Moderation\ValidUserCanReject())->isSatisfiedBy($this->getUser(), $news),
