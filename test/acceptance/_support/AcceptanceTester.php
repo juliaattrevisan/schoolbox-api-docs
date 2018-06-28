@@ -1,6 +1,6 @@
 <?php
 
-use Facebook\WebDriver\JavaScriptExecutor;
+use Facebook\WebDriver\Remote\RemoteWebDriver;
 
 /**
  * Inherited Methods
@@ -200,9 +200,9 @@ class AcceptanceTester extends \Codeception\Actor
     public function fillRichTextField(string $field, string $value)
     {
         $this->executeInSelenium(
-            function (JavaScriptExecutor $webDriver) use ($field, $value) {
+            function (RemoteWebDriver $webDriver) use ($field, $value) {
                 $webDriver->executeScript(
-                    sprintf('CKEDITOR.instances.%s.setData("%s")', addslashes($field), addslashes($value))
+                    sprintf('CKEDITOR.instances["%s"].setData("%s")', addslashes($field), addslashes($value))
                 );
             }
         );
