@@ -136,7 +136,10 @@ class RubricMapper
             $rubric->putLevel(new CompetencyLevel($i, $level));
         }
 
-        $args = ['folderId' => $folderId];
+        $args = [
+            'folderId'   => $folderId,
+            'parentType' => Group::PARENT_TYPE_CATEGORY,
+        ];
         if ($parentFolderId) {
             $args['parentFolderId'] = $parentFolderId;
         }
@@ -155,7 +158,7 @@ class RubricMapper
             LEFT JOIN rubric_usage ru ON rc.id = ru.criterion_id
             LEFT JOIN submission_box b ON ru.submission_box_id = b.id
             LEFT JOIN assessment a ON b.assessment_id = a.id AND a.deleted_at IS NOT NULL
-            WHERE rg.parent_type = 'category'
+            WHERE rg.parent_type = :parentType
             AND rg.parent_id IN (:$in)
             AND rc.deleted_at IS NULL
             AND rg.deleted_at IS NULL
@@ -347,9 +350,9 @@ class RubricMapper
     protected function generateCriteriaStatement(SubmissionBox $box, $getParentCriteria)
     {
         $args = [
-            'boxId'       => $box->getId(),
-            'folderId'    => $box->getCategory()->getId(),
-            'parent_type' => Criterion::PARENT_TYPE_CATEGORY,
+            'boxId'      => $box->getId(),
+            'folderId'   => $box->getCategory()->getId(),
+            'parentType' => Group::PARENT_TYPE_CATEGORY,
         ];
 
         $in = ['folderId'];
@@ -389,7 +392,7 @@ class RubricMapper
                 LEFT JOIN rubric_usage u ON u.criterion_id = c.id
                 LEFT JOIN submission_box b ON u.submission_box_id = b.id                  -- This will join to deleted boxes
                 LEFT JOIN assessment a ON b.assessment_id = a.id AND a.deleted_at IS NULL -- But won't join to deleted assessments
-                WHERE g.parent_type = :parent_type
+                WHERE g.parent_type = :parentType
                 AND g.parent_id IN (:$in)
                 AND c.deleted_at IS NULL
                 AND g.deleted_at IS NULL
