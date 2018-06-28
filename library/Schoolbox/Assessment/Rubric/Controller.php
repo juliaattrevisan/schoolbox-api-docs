@@ -17,6 +17,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Group;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Resource\Attachment\Zone;
+use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Resource\Storage\Model as File;
 use Url;
@@ -261,6 +262,32 @@ class Controller extends BaseController
             'format' => 'file',
             'data'   => $content
         ]);
+    }
+
+
+    /**
+     * View the rubric criteria form for a folder.
+     *
+     * @api GET /rubric/criteria/{folderId}
+     * @level 181
+     * @param FolderModel $folder
+     */
+    public function getCriteriaForm(FolderModel $folder): void
+    {
+
+    }
+
+
+    /**
+     * Save the rubric criteria for a folder.
+     *
+     * @api POST /rubric/criteria/{folderId}
+     * @level 181
+     * @param FolderModel $folder
+     */
+    public function postCriteriaForm(FolderModel $folder): void
+    {
+
     }
 
 
