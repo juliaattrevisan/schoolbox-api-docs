@@ -130,6 +130,7 @@ class Form
     public function setFeatureImage(string $filename): self
     {
         // TODO upload files via Codeception
+        // Need to write uploader interaction into the acceptance tester
         return $this;
     }
 
@@ -149,7 +150,7 @@ class Form
      */
     public function setRoles(array $roles): self
     {
-        // TODO Clear all roles, then set only the ones selected
+        $this->tester->checkSelectGroupOptions('role', $roles);
         return $this;
     }
 
@@ -159,7 +160,7 @@ class Form
      */
     public function setCampuses(array $campuses): self
     {
-        // TODO Clear all roles, then set only the ones selected
+        $this->tester->checkSelectGroupOptions('campus', $campuses);
         return $this;
     }
 
