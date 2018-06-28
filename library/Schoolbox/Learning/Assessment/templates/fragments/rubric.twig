@@ -263,6 +263,14 @@ Usage:
             total = total.toFixed(2);
         }
         checkRubricTotal();
+
+        $("#useMarkRange").change(function() {
+            if ($("#useMarkRange").is(":checked")) {
+                $("td[data-descriptor] input").prop("placeholder", "Maximum points");
+            } else {
+                $("td[data-descriptor] input").prop("placeholder", "Points");
+            }
+        })
     });
 </script>
 
