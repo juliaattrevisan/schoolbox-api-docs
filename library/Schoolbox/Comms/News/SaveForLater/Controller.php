@@ -52,13 +52,11 @@ class Controller extends Base
      */
     public function getList()
     {
-
-        /* TODO: Get a list of articles that you saved for later
-         */
+        $articles = $this->saveForLaterMapper->findByColumn('user_id', $this->getUser()->getId());
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsSaveForLater/index.twig', [
-            'user' => []
-        ])->setTitle('Example'));
+            'articles' => $articles
+        ])->setTitle('Saved For Later'));
     }
 
 
