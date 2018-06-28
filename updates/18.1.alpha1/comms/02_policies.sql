@@ -36,7 +36,7 @@ ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 ALTER TABLE `comms_news_saveforlater`
 ADD CONSTRAINT `fk_comms_news_saveforlater_article_id`
-FOREIGN KEY (`id`) REFERENCES `comms_news_article` (`id`)
+FOREIGN KEY (`article_id`) REFERENCES `comms_news_article` (`id`)
 ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 CREATE UNIQUE INDEX `idx_comms_news_saveforlater_user_id_article_id`

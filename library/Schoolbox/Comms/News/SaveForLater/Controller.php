@@ -11,12 +11,16 @@ namespace Schoolbox\Comms\News\SaveForLater;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Comms\News;
 use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 class Controller extends Base
 {
+
+    /**
+     * @var Mapper
+     */
+    private $saveForLaterMapper;
+
     /**
      * @var UserMapper
      */
@@ -27,14 +31,17 @@ class Controller extends Base
      */
     private $errorMapper;
 
+
     /**
      * Controller constructor.
      *
+     * @param Mapper      $saveForLaterMapper
      * @param ErrorMapper $errorMapper
      * @param UserMapper  $userMapper
      */
-    public function __construct(ErrorMapper $errorMapper, UserMapper $userMapper)
+    public function __construct(Mapper $saveForLaterMapper, ErrorMapper $errorMapper, UserMapper $userMapper)
     {
+        $this->saveForLaterMapper = $saveForLaterMapper;
         $this->errorMapper = $errorMapper;
         $this->userMapper = $userMapper;
     }
@@ -64,20 +71,60 @@ class Controller extends Base
     {
         if ($this->getRequest()->isXhr()) {
             try {
+                $this->saveForLaterMapper->findOneByColumnList([
+                    'user_id' => $this->getUser()->getId(),
+                    'article_id' => $news->getId()
+                ]);
 
-                /* TODO: actually save it
-                 */
+                $exists = true;
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                $exists = false;
+            }
+
+            /* You've already saved this for later...and we know this. Good job.
+             */
+            if ($exists) {
+                $this->getResponse()->content->set($this->buildJsonOutput([
+                    'success' => true
+                ]));
+
+                return;
+            }
+
+            /* Only save a new one if it doesn't already exist
+             */
+            try {
+                $record = $this->saveForLaterMapper->createModel()
+                    ->setUser($this->getUser())
+                    ->setArticle($news);
+
+                $this->saveForLaterMapper->save($record);
+
                 $this->getResponse()->content->set($this->buildJsonOutput([
                     'success' => true,
                 ]));
-
             } catch (\Exception $e) {
                 $this->getResponse()->status->set(400);
                 $this->getResponse()->content->set($this->buildJsonOutput([
                     'success' => false,
-                    'message' => "You don't have permission to delete this article."
+                    'message' => $e->getMessage()
                 ]));
             }
+
+
+            return;
+
+
+
+
+
+//            } catch (\Schoolbox\Mapper\Exception $e) {
+//                $this->getResponse()->status->set(400);
+//                $this->getResponse()->content->set($this->buildJsonOutput([
+//                    'success' => false,
+//                    'message' => $e->getMessage()
+//                ]));
+//            }
         }
 
         return;
