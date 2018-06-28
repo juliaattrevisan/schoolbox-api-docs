@@ -175,11 +175,9 @@ $(function() {
 
 <div class="row">
     <div class="small-12 island">
-        <form action="/submission/rubricCriteriaForm.php" method="POST" class='top' data-role="rubric-criteria-form">
-            <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
-
+        <form action="{{ routeLookup('rubric.postCriteriaForm', {folderId: folder.id}) }}" method="POST" class='top' data-role="rubric-criteria-form">
             <section>
-                <!-- BEGIN allow_cascade -->
+                {#
                 <!-- Cascade isn't supported, but if it is: -->
                 <fieldset class='content'>
                     <div class="small-12 columns">
@@ -189,26 +187,29 @@ $(function() {
                             Copy to subfolders?
                             <span class="hint has-tip"
                                   data-tooltip
-                                  title="Should these {TPL_LOCAL_RUBRICCRITERION_PLURAL} be copied to this folder's subfolders?">?</span>
+                                  title="Should these {{ locale.rubricCriterion.plural }} be copied to this folder's subfolders?">?</span>
                         </label>
                     </div>
                 </fieldset>
-                <!-- END allow_cascade -->
+                #}
+
                 <!-- BEGIN criterion_group -->
-                <fieldset class='content' data-rubric-group-row="{CRITGROUP_COUNT}">
+                {% for group in groups %}
+                    {% set groupCount = loop.index0 %}
+                <fieldset class='content' data-rubric-group-row="{{ groupCount }}">
                     <div class="small-12 medium-6 columns">
-                        <h3>{TPL_LOCAL_RUBRICGROUP_PC}</h3>
+                        <h3>{{ locale.rubricGroup.proper }}</h3>
                         <ul class="information-list">
                             <li class="actions-small-0">
                                 <div class="list-item">
                                     <input type="hidden"
-                                           name="crits[{CRITGROUP_COUNT}][id]"
-                                           value="{CRITGROUP_ID}"
-                                           {CRITGROUP_DISABLED} />
+                                           name="crits[{{ groupCount }}][id]"
+                                           value="{{ group.group.id }}"
+                                           {% if group.usageTotal > 0 %}readonly{% endif %} />
                                     <input type="text"
-                                           name="crits[{CRITGROUP_COUNT}][name]"
-                                           value="{CRITGROUP_NAME}"
-                                           {CRITGROUP_DISABLED}
+                                           name="crits[{{ groupCount }}][name]"
+                                           value="{{ group.group.name }}"
+                                           {% if group.usageTotal > 0 %}readonly{% endif %}
                                            data-rubric-group />
                                 </div>
                                 <nav></nav>
@@ -302,6 +303,8 @@ $(function() {
                         </ul>
                     </div>
                 </fieldset>
+                {% endfor %}
+
                 <!-- END criterion_group -->
                 <!-- New group -->
                 <fieldset class='content' data-rubric-group-row="{MAX_CRITGROUP_ID}">
