@@ -95,62 +95,12 @@ class Controller extends BaseController
      */
     public function getForm(FolderModel $folder): void
     {
-        $criterionCollection = $this->criterionMapper->findForFolder($folder->getId());
-
-        $topId = 0;
-
-        $criteriaList = [];
-        if (\count($criterionCollection)) {
-
-            /* Create group structure */
-            $criteriaList = [];
-            foreach ($criterionCollection as $crit) {
-                $groupId                              = $crit->getGroup()->getId();
-                $criteriaList[$groupId]['group']      = $crit->getGroup();
-                $criteriaList[$groupId]['criteria'][] = $crit;
-            }
-        }
-
-        $criterionData = [];
-        foreach ($criteriaList as $critGroup) {
-            /** @var \Schoolbox\Assessment\Component\SubmissionBox\Rubric\Group $group */
-            $group = $critGroup['group'];
-            /** @var \Schoolbox\Assessment\Component\SubmissionBox\Rubric\Criterion[] $crits */
-            $crits     = $critGroup['criteria'];
-            $groupData = [
-                'group'    => $group,
-                'criteria' => [],
-            ];
-
-            $usageTotal = 0;
-
-            foreach ($crits as $crit) {
-                $usage      = $this->usageMapper->findUsage($crit->getId());
-                $usageTotal += \count($usage);
-
-                $groupData['criteria'][] = [
-                    'criterion' => $crit,
-                    'usage'     => $usage,
-                ];
-
-                /* @var $crit Criterion */
-                $topId = max($topId, $crit->getId());
-            }
-
-            $groupData['usageTotal'] = $usageTotal;
-            $criterionData[]         = $groupData;
-        }
-
-        $data = [
-            'folder'     => $folder,
-            'groups'     => $criterionData,
-            'maxGroupId' => \count($criteriaList),
-            'maxCritId'  => $topId + 1,
-        ];
-
         $this->getResponse()->content->set(
             $this
-                ->buildHtmlOutput('@rubricCriteria/form.twig', $data)
+                ->buildHtmlOutput(
+                    '@rubricCriteria/form.twig',
+                    $this->buildTwigDataForForm($folder, $this->criterionMapper->findForFolder($folder->getId()))
+                )
                 ->setTitle(
                     sprintf(
                         'Manage Rubric %s for %s',
@@ -274,5 +224,66 @@ class Controller extends BaseController
         } else {
             $this->response->redirect->to('/homepage/' . $folderId);
         }
+    }
+
+    /**
+     * Build Twig data for the form.
+     *
+     * @param FolderModel $folder
+     * @param Criterion[] $criterionCollection
+     * @return array
+     */
+    private function buildTwigDataForForm(FolderModel $folder, $criterionCollection): array
+    {
+        $topId = 0;
+
+        // Group criterion list by each criterion's rubric group
+        $criteriaList = [];
+        if (\count($criterionCollection)) {
+            $criteriaList = [];
+            foreach ($criterionCollection as $crit) {
+                $groupId                              = $crit->getGroup()->getId();
+                $criteriaList[$groupId]['group']      = $crit->getGroup();
+                $criteriaList[$groupId]['criteria'][] = $crit;
+            }
+        }
+
+        // Build data for each group, including its criteria
+        $criterionData = [];
+        foreach ($criteriaList as $critGroup) {
+            /** @var \Schoolbox\Assessment\Component\SubmissionBox\Rubric\Group $group */
+            /** @var \Schoolbox\Assessment\Component\SubmissionBox\Rubric\Criterion[] $crits */
+            $group     = $critGroup['group'];
+            $crits     = $critGroup['criteria'];
+            $groupData = [
+                'group'    => $group,
+                'criteria' => [],
+            ];
+
+            // Build individual data for each group
+            $usageTotal = 0;
+            foreach ($crits as $crit) {
+                $usage      = $this->usageMapper->findUsage($crit->getId());
+                $usageTotal += \count($usage);
+
+                $groupData['criteria'][] = [
+                    'criterion' => $crit,
+                    'usage'     => $usage,
+                ];
+
+                /* @var $crit Criterion */
+                $topId = max($topId, $crit->getId());
+            }
+
+            $groupData['usageTotal'] = $usageTotal;
+            $criterionData[]         = $groupData;
+        }
+
+        return [
+            'folder'     => $folder,
+            'groups'     => $criterionData,
+            'maxGroupId' => \count($criteriaList),
+            'maxCritId'  => $topId + 1,
+        ];
     }
 }
