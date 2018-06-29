@@ -287,32 +287,35 @@ Usage:
         </div>
     </div>
 </div>
-<div class="row">
-    <div class="small-12 medium-6 columns">
-        <div id="markPerCapabilityPanel" class="{% if not assessment.useRubric %}hide{% endif %}" data-hide-watch="#useRubric">
-            <label for="markPerCapability">Mark Per-Capability</label>
-            <div class="switch round">
-                <input name="markPerCapability" id="markPerCapability" type="checkbox" {% if assessment.markPerCapability %}checked="checked"{% endif %} />
-                <label for="markPerCapability">
-                    <span class="icon-approve"></span>
-                    <span class="icon-cancel"></span>
-                </label>
+<fieldset class="{% if not assessment.useRubric %}hide{% endif %}" data-hide-watch="#useRubric">
+    <legend>Rubric marking options</legend>
+    <div class="row">
+        <div class="small-12 medium-6 columns">
+            <div id="markPerCapabilityPanel">
+                <label for="markPerCapability">Mark Per-Capability</label>
+                <div class="switch round">
+                    <input name="markPerCapability" id="markPerCapability" type="checkbox" {% if assessment.markPerCapability %}checked="checked"{% endif %} />
+                    <label for="markPerCapability">
+                        <span class="icon-approve"></span>
+                        <span class="icon-cancel"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="small-12 medium-6 columns">
+            <div id="useMarkRangePanel">
+                <label for="useMarkRange">Use Mark Range</label>
+                <div class="switch round">
+                    <input name="useMarkRange" id="useMarkRange" type="checkbox" {% if assessment.useMarkRange %}checked="checked"{% endif %} />
+                    <label for="useMarkRange">
+                        <span class="icon-approve"></span>
+                        <span class="icon-cancel"></span>
+                    </label>
+                </div>
             </div>
         </div>
     </div>
-    <div class="small-12 medium-6 columns">
-        <div id="useMarkRangePanel" class="{% if not assessment.useRubric %}hide{% endif %}" data-hide-watch="#useRubric">
-            <label for="useMarkRange">Use Mark Range</label>
-            <div class="switch round">
-                <input name="useMarkRange" id="useMarkRange" type="checkbox" {% if assessment.useMarkRange %}checked="checked"{% endif %} />
-                <label for="useMarkRange">
-                    <span class="icon-approve"></span>
-                    <span class="icon-cancel"></span>
-                </label>
-            </div>
-        </div>
-    </div>
-</div>
+</fieldset>
 
 <div class="row">
     <div id="rubric-section" class="small-12 columns{% if not assessment.useRubric %} hide{% endif %}" data-hide-watch="#useRubric">
