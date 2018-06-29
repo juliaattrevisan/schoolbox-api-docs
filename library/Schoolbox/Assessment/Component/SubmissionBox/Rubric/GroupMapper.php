@@ -6,7 +6,9 @@
 
 namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 
-use Schoolbox;
+use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
+use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Mapper\Exception as MapperException;
 
 /**
  * Mapper for rubric groups.
@@ -17,7 +19,7 @@ use Schoolbox;
  * @method Group[] findByColumnList($columnList, $options = [])
  * @method Group findOneByColumnList($columnList, $order = [], $options = [])
  */
-class GroupMapper extends Schoolbox\Mapper
+class GroupMapper extends BaseMapper
 {
     /**
      * @inheritdoc
@@ -37,6 +39,19 @@ class GroupMapper extends Schoolbox\Mapper
         // as far as I can tell, it's never not "category"
         $this->uses('parent_id', self::TYPE_INTEGER);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+
+        // Add curriculum codes
+        $this->joinsVia(
+            'curriculum_node_for_rubric_group',
+            NodeMapper::class,
+            'id',
+            'curriculum_node_id',
+            'rubric_group_id',
+            null,
+            null,
+            null,
+            'curriculumNodes'
+        );
     }
 
 
@@ -48,7 +63,7 @@ class GroupMapper extends Schoolbox\Mapper
      * @param string $parentType
      * @param string $name
      * @return Group
-     * @throws Schoolbox\Mapper\Exception if for some reason it can't be created
+     * @throws MapperException if for some reason it can't be created
      */
     public function findOrCreateOneForParentByName(int $parentId, string $parentType, string $name): Group
     {
@@ -58,7 +73,7 @@ class GroupMapper extends Schoolbox\Mapper
                 'parent_type' => $parentType,
                 'name'        => $name,
             ]);
-        } catch (Schoolbox\Mapper\Exception $e) {
+        } catch (MapperException $e) {
             // Create one
             $item = $this->createModel()
                          ->setParentId($parentId)
@@ -77,7 +92,7 @@ class GroupMapper extends Schoolbox\Mapper
      * @param int    $folderId
      * @param string $name
      * @return Group
-     * @throws Schoolbox\Mapper\Exception if for some reason it can't be created
+     * @throws MapperException if for some reason it can't be created
      */
     public function findOrCreateOneForFolderByName(int $folderId, string $name): Group
     {
