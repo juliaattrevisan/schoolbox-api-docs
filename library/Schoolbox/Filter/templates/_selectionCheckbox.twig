@@ -26,5 +26,5 @@
             {% if disabled %}disabled data-disabled{% endif %}
             {% block extraAttrs %}{% endblock %}
     >
-    <label for="filter_selection_{{ userSelection.filter.id }}_{{ userSelection.key }}{{ idSuffix }}">{{ label }}</label>
+    <label for="filter_selection_{{ userSelection.filter.id }}_{{ userSelection.key }}{{ idSuffix }}" class="noselect">{{ label }}</label>
 {% endif %}
