@@ -276,7 +276,7 @@ Usage:
 
 
 <div class="row">
-    <div class="small-12 medium-4 columns">
+    <div class="small-12 columns">
         <label for="useRubric">Use Rubric?</label>
         <div class="switch round">
             <input name="useRubric" id="useRubric" type="checkbox" {% if assessment.useRubric %}checked="checked"{% endif %} />
@@ -286,7 +286,9 @@ Usage:
             </label>
         </div>
     </div>
-    <div class="small-12 medium-4 columns">
+</div>
+<div class="row">
+    <div class="small-12 medium-6 columns">
         <div id="markPerCapabilityPanel" class="{% if not assessment.useRubric %}hide{% endif %}" data-hide-watch="#useRubric">
             <label for="markPerCapability">Mark Per-Capability</label>
             <div class="switch round">
@@ -298,7 +300,7 @@ Usage:
             </div>
         </div>
     </div>
-    <div class="small-12 medium-4 columns">
+    <div class="small-12 medium-6 columns">
         <div id="useMarkRangePanel" class="{% if not assessment.useRubric %}hide{% endif %}" data-hide-watch="#useRubric">
             <label for="useMarkRange">Use Mark Range</label>
             <div class="switch round">
