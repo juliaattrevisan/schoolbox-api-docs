@@ -242,28 +242,28 @@ class Controller extends BaseController
         if (\count($criterionCollection)) {
             $groups = [];
             foreach ($criterionCollection as $crit) {
-                $groupId                              = $crit->getGroup()->getId();
+                $groupId                        = $crit->getGroup()->getId();
                 $groups[$groupId]['group']      = $crit->getGroup();
                 $groups[$groupId]['criteria'][] = $crit;
             }
         }
 
         // Build data for each group, including its criteria
-        $criterionData = [];
-        foreach ($groups as $critGroup) {
-            $groupData = [
-                'group'    => $critGroup['group'],
+        $groupData = [];
+        foreach ($groups as $group) {
+            $groupDatum = [
+                'group'    => $group['group'],
                 'criteria' => [],
             ];
 
             // Build individual data for each group
             $usageTotal = 0;
-            foreach ($critGroup['criteria'] as $crit) {
+            foreach ($group['criteria'] as $crit) {
                 /** @var Criterion $crit */
                 $usage      = $this->usageMapper->findUsage($crit->getId());
                 $usageTotal += \count($usage);
 
-                $groupData['criteria'][] = [
+                $groupDatum['criteria'][] = [
                     'criterion' => $crit,
                     'usage'     => $usage,
                 ];
@@ -271,13 +271,13 @@ class Controller extends BaseController
                 $topId = max($topId, $crit->getId());
             }
 
-            $groupData['usageTotal'] = $usageTotal;
-            $criterionData[]         = $groupData;
+            $groupDatum['usageTotal'] = $usageTotal;
+            $groupData[]              = $groupDatum;
         }
 
         return [
             'folder'     => $folder,
-            'groups'     => $criterionData,
+            'groups'     => $groupData,
             'maxGroupId' => \count($groups),
             'maxCritId'  => $topId + 1,
         ];
