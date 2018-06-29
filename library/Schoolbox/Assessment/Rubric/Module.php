@@ -14,10 +14,7 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\ContainerInterface;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
-use Schoolbox\Permission\Access\Access;
-use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
 use Twig_Error_Loader;
 
@@ -58,20 +55,6 @@ class Module extends BaseModule
         $this->register('GET', '/test/box/{boxId}', 'testBox', $permission);
         $this->register('GET', '/test/csv/{boxId}', 'testCSV', $permission);
         $this->register('GET', '/test/folder/{folderId}', 'testFolder', $permission);
-
-        // Criteria form actions
-        $criteriaPermission = new Rule\HasHomepageAccess(
-            UserAccess::ACCESS_WRITE,
-            'folderId',
-            Access::getInstance()
-        );
-        $criteriaPreload = function ($params) {
-            return [
-                'folder' => $this->getMapperFactory()->get(FolderMapper::class)->findById($params['folderId']),
-            ];
-        };
-        $this->register('GET', '/criteria/{folderId}', 'getCriteriaForm', $criteriaPermission, $criteriaPreload);
-        $this->register('POST', '/criteria/{folderId}', 'postCriteriaForm', $criteriaPermission, $criteriaPreload);
     }
 
 

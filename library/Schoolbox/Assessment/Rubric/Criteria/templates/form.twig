@@ -175,7 +175,7 @@ $(function() {
 
 <div class="row">
     <div class="small-12 island">
-        <form action="{{ routeLookup('rubric.postCriteriaForm', {folderId: folder.id}) }}" method="POST" class='top' data-role="rubric-criteria-form">
+        <form action="{{ routeLookup('rubricCriteria.postForm', {folderId: folder.id}) }}" method="POST" class='top' data-role="rubric-criteria-form">
             <section>
                 {#
                 <!-- Cascade isn't supported, but if it is: -->
