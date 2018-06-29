@@ -239,45 +239,30 @@ class Controller extends BaseController
 
         // Group criterion list by each criterion's rubric group
         $groups = [];
-        if (\count($criterionCollection)) {
-            $groups = [];
-            foreach ($criterionCollection as $crit) {
-                $groupId                        = $crit->getGroup()->getId();
-                $groups[$groupId]['group']      = $crit->getGroup();
-                $groups[$groupId]['criteria'][] = $crit;
-            }
-        }
+        foreach ($criterionCollection as $criterion) {
+            $groupId = $criterion->getGroup()->getId();
+            $topId   = max($topId, $criterion->getId());
 
-        // Build data for each group, including its criteria
-        $groupData = [];
-        foreach ($groups as $group) {
-            $groupDatum = [
-                'group'    => $group['group'],
-                'criteria' => [],
-            ];
-
-            // Build individual data for each group
-            $usageTotal = 0;
-            foreach ($group['criteria'] as $crit) {
-                /** @var Criterion $crit */
-                $usage      = $this->usageMapper->findUsage($crit->getId());
-                $usageTotal += \count($usage);
-
-                $groupDatum['criteria'][] = [
-                    'criterion' => $crit,
-                    'usage'     => $usage,
+            // Build group item if it's not there
+            if (!isset($groups[$groupId])) {
+                $groups[$groupId] = [
+                    'group'      => $criterion->getGroup(),
+                    'usageTotal' => 0,
+                    'criteria'   => [],
                 ];
-
-                $topId = max($topId, $crit->getId());
             }
 
-            $groupDatum['usageTotal'] = $usageTotal;
-            $groupData[]              = $groupDatum;
+            $usage                          = $this->usageMapper->findUsage($criterion->getId());
+            $groups[$groupId]['usageTotal'] += \count($usage);
+            $groups[$groupId]['criteria'][] = [
+                'criterion' => $criterion,
+                'usage'     => $usage,
+            ];
         }
 
         return [
             'folder'     => $folder,
-            'groups'     => $groupData,
+            'groups'     => $groups,
             'maxGroupId' => \count($groups),
             'maxCritId'  => $topId + 1,
         ];
