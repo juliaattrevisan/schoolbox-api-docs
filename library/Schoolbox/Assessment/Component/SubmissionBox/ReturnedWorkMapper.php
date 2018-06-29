@@ -58,7 +58,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
         $this->joins('student_submission_id', StudentSubmissionMapper::class, 'id', null, null, 'submission', 'submission');
         $this->uses('comment', self::TYPE_STRING);
         $this->uses('mark', self::TYPE_STRING, null, 'humanReadableMark');
-        $this->uses('norm_mark', self::TYPE_STRING, null, 'normalizedMark');
+        $this->uses('norm_mark', self::TYPE_DECIMAL, null, 'normalizedMark');
         $this->uses('published_at', self::TYPE_DATETIME);
         $this->uses('review_route', self::TYPE_STRING);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
