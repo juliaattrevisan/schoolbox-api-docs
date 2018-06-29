@@ -12,6 +12,11 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\ContainerInterface;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\GroupMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\UsageMapper;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -38,7 +43,7 @@ class Module extends BaseModule
             'folderId',
             Access::getInstance()
         );
-        $preload = function ($params) {
+        $preload    = function ($params) {
             return [
                 'folder' => $this->getMapperFactory()->get(FolderMapper::class)->findById($params['folderId']),
             ];
@@ -65,7 +70,17 @@ class Module extends BaseModule
     {
         $injector->set(
             'controller:' . $this->basename,
-            $injector->lazyNew(Controller::class)
+            $injector->lazyNew(
+                Controller::class,
+                [
+                    'criterionMapper' => $this->getMapperFactory()->getLazy(CriterionMapper::class),
+                    'groupMapper'     => $this->getMapperFactory()->getLazy(GroupMapper::class),
+                    'usageMapper'     => $this->getMapperFactory()->getLazy(UsageMapper::class),
+                    'rubricMapper'    => $this->getMapperFactory()->getLazy(RubricMapper::class),
+                    'errorMapper'     => $this->getMapperFactory()->getLazy(ErrorMapper::class),
+                    'rosettaStone'    => $injector->lazyGet('l10n'),
+                ]
+            )
         );
     }
 }

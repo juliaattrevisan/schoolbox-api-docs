@@ -17,6 +17,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\UsageMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 
 /**
@@ -24,6 +25,68 @@ use Schoolbox\Resource\Folder\Model as FolderModel;
  */
 class Controller extends BaseController
 {
+    /**
+     * @var CriterionMapper
+     */
+    private $criterionMapper;
+
+
+    /**
+     * @var GroupMapper
+     */
+    private $groupMapper;
+
+    /**
+     * @var UsageMapper
+     */
+    private $usageMapper;
+
+
+    /**
+     * @var RubricMapper
+     */
+    private $rubricMapper;
+
+
+    /**
+     * @var ErrorMapper
+     */
+    private $errorMapper;
+
+
+    /**
+     * @var RosettaStone
+     */
+    private $rosettaStone;
+
+
+    /**
+     * Constructor
+     *
+     * @param CriterionMapper $criterionMapper
+     * @param GroupMapper     $groupMapper
+     * @param UsageMapper     $usageMapper
+     * @param RubricMapper    $rubricMapper
+     * @param ErrorMapper     $errorMapper
+     * @param RosettaStone    $rosettaStone
+     */
+    public function __construct(
+        CriterionMapper $criterionMapper,
+        GroupMapper $groupMapper,
+        UsageMapper $usageMapper,
+        RubricMapper $rubricMapper,
+        ErrorMapper $errorMapper,
+        RosettaStone $rosettaStone
+    ) {
+        $this->criterionMapper = $criterionMapper;
+        $this->groupMapper     = $groupMapper;
+        $this->usageMapper     = $usageMapper;
+        $this->rubricMapper    = $rubricMapper;
+        $this->errorMapper     = $errorMapper;
+        $this->rosettaStone    = $rosettaStone;
+    }
+
+
     /**
      * View the rubric criteria form for a folder.
      *
@@ -33,7 +96,7 @@ class Controller extends BaseController
      */
     public function getForm(FolderModel $folder): void
     {
-        $criterionCollection = CriterionMapper::getInstance()->findForFolder($folder->getId());
+        $criterionCollection = $this->criterionMapper->findForFolder($folder->getId());
 
         $topId = 0;
 
@@ -63,7 +126,7 @@ class Controller extends BaseController
             $usageTotal = 0;
 
             foreach ($crits as $crit) {
-                $usage      = UsageMapper::getInstance()->findUsage($crit->getId());
+                $usage      = $this->usageMapper->findUsage($crit->getId());
                 $usageTotal += \count($usage);
 
                 $groupData['criteria'][] = [
@@ -92,7 +155,7 @@ class Controller extends BaseController
                 ->setTitle(
                     sprintf(
                         'Manage Rubric %s for %s',
-                        $this->getDi()->get('l10n')->translate('rubricGroup', true, true),
+                        $this->rosettaStone->translate('rubricGroup', true, true),
                         $folder->getName()
                     )
                 )
@@ -112,6 +175,7 @@ class Controller extends BaseController
         $folderId = $folder->getId();
         $criteria = $this->request->post->get('crits');
 
+        $data = [];
         foreach ($criteria as $group) {
             if (\count($group['items'])) {
                 foreach ($group['items'] as $critId => $crit) {
@@ -125,23 +189,20 @@ class Controller extends BaseController
             }
         }
 
-        $criterionMapper = CriterionMapper::getInstance();
-        $groupMapper     = GroupMapper::getInstance();
-
         // Which submission boxes have criteria deleted? We will need to ensure we don't leave in an invalid state.
-        $affectedSubmissionBoxes = SubmissionBoxMapper::getInstance()->createCollection();
+        $affectedSubmissionBoxes = [];
 
         // work out the diff and delete unnecessary criteria
         $found = array_keys($data);
 
-        $criterionCollection = $criterionMapper->findForFolder($folderId);
+        $criterionCollection = $this->criterionMapper->findForFolder($folderId);
 
         // Delete criteria not submitted
         foreach ($criterionCollection as $crit) {
             if (!\in_array($crit->getId(), $found, true)) {
                 try {
-                    $usages = UsageMapper::getInstance()->findByColumn('criterion_id', $crit->getId());
-                    $criterionMapper->delete($crit);
+                    $usages = $this->usageMapper->findByColumn('criterion_id', $crit->getId());
+                    $this->criterionMapper->delete($crit);
                     foreach ($usages as $usage){
                         $box = $usage->getSubmissionBox();
                         $affectedSubmissionBoxes[$box->getId()] = $box;
@@ -149,17 +210,17 @@ class Controller extends BaseController
 
                 } catch (\Exception $e) {
                     // Couldn't delete criteria!
-                    ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
+                    $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
                 }
             }
         }
 
         // Ensure that deletion of a criterion, and its descriptors, does not result in empty levels.
-        RubricMapper::getInstance()->deleteEmptyLevels($affectedSubmissionBoxes->keys());
+        $this->rubricMapper->deleteEmptyLevels(array_keys($affectedSubmissionBoxes));
 
         // iterate through list of provided criteria changes
         /** @var Group[] $groupList */
-        $groupList  = $groupMapper->createCollection();
+        $groupList  = $this->groupMapper->createCollection();
         $parentType = Group::PARENT_TYPE_CATEGORY;
         foreach ($data as $critId => $critData) {
 
@@ -168,20 +229,19 @@ class Controller extends BaseController
             if (!isset($groupList[$groupName])) {
                 if (isset($critData['id'])) {
                     try {
-                        $group = $groupMapper->findOneByColumnList([
+                        $group = $this->groupMapper->findOneByColumnList([
                             'id'          => $critData['id'],
                             'parent_id'   => $folderId,
                             'parent_type' => $parentType,
                         ]);
                     } catch (\Exception $e) {
                         // ID exists, but not in this context; abort
-                        // TODO inject error mapper
-                        ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
+                        $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
                     }
                 } else {
-                    $group = $groupMapper->findOrCreateOneForFolderByName($folderId, $groupName);
+                    $group = $this->groupMapper->findOrCreateOneForFolderByName($folderId, $groupName);
                 }
-                $groupMapper->save($group);
+                $this->groupMapper->save($group);
                 $groupList[$groupName] = $group;
             }
 
@@ -189,14 +249,14 @@ class Controller extends BaseController
             $group = $groupList[$groupName];
 
             try {
-                $criteria = $criterionMapper->findOneByColumnList([
+                $criteria = $this->criterionMapper->findOneByColumnList([
                     'id'              => $critId,
                     'rubric_group_id' => $group->getId(),
                 ]);
                 $criteria->setName($critData['name']);
 
                 //Do not edit criteria that are in use on a class page, can edit in course though
-                $usage = UsageMapper::getInstance()->findByColumnList(['criterion_id' => $critId]);
+                $usage = $this->usageMapper->findByColumnList(['criterion_id' => $critId]);
                 if (\count($usage) && !($folder->hasCourseSpecification() || $folder->hasUnitSpecification())) {
                     continue; // possibly throw an error of some kind
                 }
@@ -206,7 +266,7 @@ class Controller extends BaseController
                 $criteria->setName($critData['name']);
             }
 
-            $criterionMapper->save($criteria);
+            $this->criterionMapper->save($criteria);
         }
 
         // Done: redirect back to homepage, or AJAX
