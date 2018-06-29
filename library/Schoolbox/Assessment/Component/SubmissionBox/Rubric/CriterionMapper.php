@@ -68,8 +68,28 @@ class CriterionMapper extends BaseMapper {
             SELECT
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('group', 'g')}
+                {$this->getJoinColumnString('curriculum_node_for_rubric_criterion', 'cn')},
+                {$this->getJoinColumnString('curriculum_node_for_rubric_criterion.level', 'cnl')},
+                {$this->getJoinColumnString('curriculum_node_for_rubric_criterion.level.source', 'cnls')},
+                {$this->getJoinColumnString('curriculum_node_for_rubric_criterion.area', 'cna')},
+                {$this->getJoinColumnString('curriculum_node_for_rubric_criterion.area.source', 'cnas')}
+        ";
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    protected function getFromString(): string
+    {
+        return "
             FROM {$this->getTable()}
             LEFT JOIN {$this->getJoinSql('group', '', 'g')}
+            LEFT JOIN {$this->getJoinSql('curriculum_node_for_rubric_criterion', '', 'cn')}
+            LEFT JOIN {$this->getJoinSql('curriculum_node_for_rubric_criterion.level', 'cn', 'cnl')}
+            LEFT JOIN {$this->getJoinSql('curriculum_node_for_rubric_criterion.level.source', 'cnl', 'cnls')}
+            LEFT JOIN {$this->getJoinSql('curriculum_node_for_rubric_criterion.area', 'cn', 'cna')}
+            LEFT JOIN {$this->getJoinSql('curriculum_node_for_rubric_criterion.area.source', 'cna', 'cnas')}
         ";
     }
 

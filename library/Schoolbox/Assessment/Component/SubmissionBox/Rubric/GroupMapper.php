@@ -56,6 +56,39 @@ class GroupMapper extends BaseMapper
 
 
     /**
+     * @inheritdoc
+     */
+    protected function getSelectString(): string
+    {
+        return "
+            SELECT
+                {$this->getColumnString()},
+                {$this->getJoinColumnString('curriculum_node_for_rubric_group', 'cn')},
+                {$this->getJoinColumnString('curriculum_node_for_rubric_group.level', 'cnl')},
+                {$this->getJoinColumnString('curriculum_node_for_rubric_group.level.source', 'cnls')},
+                {$this->getJoinColumnString('curriculum_node_for_rubric_group.area', 'cna')},
+                {$this->getJoinColumnString('curriculum_node_for_rubric_group.area.source', 'cnas')}
+        ";
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    protected function getFromString(): string
+    {
+        return "
+            FROM {$this->getTable()}
+            LEFT JOIN {$this->getJoinSql('curriculum_node_for_rubric_group', '', 'cn')}
+            LEFT JOIN {$this->getJoinSql('curriculum_node_for_rubric_group.level', 'cn', 'cnl')}
+            LEFT JOIN {$this->getJoinSql('curriculum_node_for_rubric_group.level.source', 'cnl', 'cnls')}
+            LEFT JOIN {$this->getJoinSql('curriculum_node_for_rubric_group.area', 'cn', 'cna')}
+            LEFT JOIN {$this->getJoinSql('curriculum_node_for_rubric_group.area.source', 'cna', 'cnas')}
+        ";
+    }
+
+
+    /**
      * Find a group with the given name for the given parent.
      * If none is found, create one and return it.
      *
