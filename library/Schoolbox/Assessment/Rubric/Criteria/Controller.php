@@ -175,10 +175,11 @@ class Controller extends BaseController
         }
 
         return [
-            'folder'     => $folder,
-            'groups'     => $groups,
-            'maxGroupId' => \count($groups),
-            'maxCritId'  => $topId + 1,
+            'folder'              => $folder,
+            'groups'              => $groups,
+            'maxGroupId'          => \count($groups),
+            'maxCritId'           => $topId + 1,
+            'showCurriculumCodes' => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
         ];
     }
 
