@@ -17,7 +17,10 @@
 
 {# TODO move all this into scss file #}
 <style>
-    .course-row,
+    .course-row{
+        background: #bcd;
+        color: #333;
+    }
     .class-row {
         background: #a0d3e8;
         color: #333;
@@ -164,7 +167,7 @@
             </thead>
             <tbody>
             <tr>
-                <td colspan="2" class="course-row class-row-heading">Course Unweighted Average (?)</td>
+                <td colspan="2" class="course-row class-row-heading">Course Unweighted Average <span data-tooltip class="hint has-tip tip-top" title="Average student cohort mark">?</span></td>
                 {% for assessment in collapsedAssessments %}
                     {% if assessment.isSpecification %}
                         <td class="course-row">
