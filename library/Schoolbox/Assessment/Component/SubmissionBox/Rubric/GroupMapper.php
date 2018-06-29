@@ -6,7 +6,9 @@
 
 namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 
+use PDOStatement;
 use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 
@@ -87,6 +89,29 @@ class GroupMapper extends BaseMapper
         ";
     }
 
+
+    /**
+     * @inheritdoc
+     */
+    protected function hydrateSelect(PDOStatement $statement): GenericCollection
+    {
+        /** @var NodeMapper $curriculumNodeMapper */
+        $curriculumNodeMapper = $this->getJoinMapper('curriculum_node_for_rubric_criterion');
+        $collection           = $this->createCollection();
+        foreach ($statement as $row) {
+            /** @var Group $group */
+            $group                       = $this->hydrate($row);
+            $collection[$group->getId()] = $group;
+
+            // Fetching multiple 1-M relations in a single query is still how
+            // you get ants
+            $curriculumNode = $curriculumNodeMapper->hydrateWithRelatedJoins($row, 'cn', 'cna', 'cnas', 'cnl', 'cnls');
+            if ($curriculumNode) {
+                $collection[$group->getId()]->getCurriculumNodes()[$curriculumNode->getId()] = $curriculumNode;
+            }
+        }
+        return $collection;
+    }
 
     /**
      * Find a group with the given name for the given parent.

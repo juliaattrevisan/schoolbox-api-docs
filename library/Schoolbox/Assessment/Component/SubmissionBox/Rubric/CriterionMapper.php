@@ -100,15 +100,24 @@ class CriterionMapper extends BaseMapper {
     protected function hydrateSelect(PDOStatement $statement): GenericCollection
     {
         /** @var GroupMapper $groupMapper */
-        $groupMapper = $this->getJoinMapper('group');
-        $collection = $this->createCollection();
+        /** @var NodeMapper  $curriculumNodeMapper */
+        $groupMapper          = $this->getJoinMapper('group');
+        $curriculumNodeMapper = $this->getJoinMapper('curriculum_node_for_rubric_criterion');
+        $collection           = $this->createCollection();
         foreach ($statement as $row) {
             /** @var Criterion $crit */
             $crit = $this->hydrate($row);
             if ($row['g.id']) {
                 $crit->setGroup($groupMapper->hydrate($row, 'g'));
             }
-            $collection->setOffset($crit->getId(), $crit);
+            $collection[$crit->getId()] = $crit;
+
+            // Fetching multiple 1-M relations in a single query is still how
+            // you get ants
+            $curriculumNode = $curriculumNodeMapper->hydrateWithRelatedJoins($row, 'cn', 'cna', 'cnas', 'cnl', 'cnls');
+            if ($curriculumNode){
+                $collection[$crit->getId()]->getCurriculumNodes()[$curriculumNode->getId()] = $curriculumNode;
+            }
         }
         return $collection;
     }
