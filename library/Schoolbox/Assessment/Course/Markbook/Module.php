@@ -22,6 +22,7 @@ use Schoolbox\Role;
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
 use Schoolbox\User;
 use Schoolbox\Filter;
+use Schoolbox\Learning\Assessment\DataModel as Assessment;
 
 class Module extends \Alaress\Module\Module
 {
@@ -97,19 +98,29 @@ class Module extends \Alaress\Module\Module
 
     /**
      * @inheritdoc
-     * @param Container $injector
-     * @throws \InvalidArgumentException If unable to find mapper class
+     * @param ContainerInterface|Container $injector
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \InvalidArgumentException
      */
     public function initControllers(ContainerInterface $injector): void
     {
         $injector->set(
             'controller:' . $this->getBasename(),
             $injector->lazyNew(Controller::class, [
+                'defaultGradeGroup'     => $this->getInjector()->get('defaultGradeGroup'),
                 'filterFactoryFactory'  => $injector->lazy(function () {
                     return new Filter\Filters\Assessment\FactoryFactory($this->getMapperFactory());
                 }),
                 'filterMapper'          => $this->getMapperFactory()->getLazy(Filter\Mapper::class),
                 'filterSelectionMapper' => $this->getMapperFactory()->getLazy(Filter\Selection\Mapper::class),
+                'assessmentIdFinder'    => $injector->lazy(function(){
+                    /** @var Filter\Mapper $filterMapper */
+                    $filterMapper = $this->getMapperFactory()->get(Filter\Mapper::class);
+                    return Filter\Filters\Assessment\IdFinder::getInstance(
+                        $filterMapper, $this->getMapperFactory()->get(Assessment\Mapper::class)
+                    );
+                }),
+                'assessmentMapperProxy' => $injector->lazyGet('assessmentDataSource'),
             ]));
     }
 

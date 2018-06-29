@@ -2,7 +2,10 @@
 Usage:
     filterPanel: FilterPanel - a filter panel that can filter and AJAX in the report
     courseSpec:  CourseSpec
+    debugMode:   bool
 #}
+<script type="text/javascript" src="/javascript/shared/submissions/jquery.marksheet.js"></script>
+<script type="text/javascript" src="/javascript/shared/submissions/task/jquery.progressTickForm.js"></script>
 
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbs(['Courses', routeLookupIfAuthorized('course.courseList') ], ['Course Markbook']) }}
@@ -18,6 +21,59 @@ Usage:
     panel:     filterPanel,
     quickload: true,
 } only %}
+
+{% autoescape 'js' %}
+    <script type="text/javascript">
+        $(function() {
+            $('#{{ reportContentId }}').on('filterContentLoaded', function() {
+                var $table = $('[data-mark-sheet]');
+                // Use datatables to do fixed headers and left column
+                // Only do this on small up
+                var windowWidthRems = $(window).width() / parseFloat($('html').css('font-size'));
+                if (windowWidthRems >= 40) {
+                    try{
+                        $table.DataTable({
+                            scrollX: true,
+                            scrollCollapse: true,
+                            paging: false,
+                            bFilter: false,
+                            bInfo: false,
+                            ordering: false,
+                            fixedColumns: {
+                                leftColumns: 1
+                            }
+                        });
+                    } catch (e){
+                        // TODO debug whey this is happening. This will at least ensure JS not die.
+                        if({{ debugMode ? 1 : 0 }}){
+                            console.log(e);
+                        }
+                    }
+                }
+
+                $("#show-drafts").click(function () {
+                    if ($(this).is(":checked")) {
+                        $("[data-draft-mark]").show();
+                        $("[data-actual-mark]").hide();
+                        $("[data-student-average]").each(function(idx, elem){
+                            var $elem = $(elem);
+                            $elem.removeClass($elem.attr('data-off-class'));
+                            $elem.addClass($elem.attr('data-on-class'));
+                        });
+                    } else {
+                        $("[data-draft-mark]").hide();
+                        $("[data-actual-mark]").show();
+                        $("[data-student-average]").each(function(idx, elem){
+                            var $elem = $(elem);
+                            $elem.removeClass($elem.attr('data-on-class'));
+                            $elem.addClass($elem.attr('data-off-class'));
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+{% endautoescape %}
 
 
 <div id="{{ reportContentId }}" data-loaded="0">
