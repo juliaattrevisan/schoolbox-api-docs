@@ -67,7 +67,7 @@ class CriterionMapper extends BaseMapper {
         return "
             SELECT
                 {$this->getColumnString()},
-                {$this->getJoinColumnString('group', 'g')}
+                {$this->getJoinColumnString('group', 'g')},
                 {$this->getJoinColumnString('curriculum_node_for_rubric_criterion', 'cn')},
                 {$this->getJoinColumnString('curriculum_node_for_rubric_criterion.level', 'cnl')},
                 {$this->getJoinColumnString('curriculum_node_for_rubric_criterion.level.source', 'cnls')},
