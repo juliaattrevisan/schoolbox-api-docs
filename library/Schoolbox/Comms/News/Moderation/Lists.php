@@ -64,7 +64,7 @@ class Lists
 
         return $this->newsMapper->findByPredicates($builder, [
             'order' => [
-                'submitted_at' => 'asc'
+                'publish_at' => 'asc'
             ]
         ]);
     }
