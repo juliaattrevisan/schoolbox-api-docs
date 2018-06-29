@@ -326,15 +326,20 @@ class Controller extends BaseController
         $data = [
             'folder'     => $folder,
             'groups'     => $criterionData,
-            'maxGroupId' => count($criteriaList),
+            'maxGroupId' => \count($criteriaList),
             'maxCritId'  => $topId + 1,
         ];
 
         $this->getResponse()->content->set(
-            $this->buildHtmlOutput('@rubric/criteriaForm.twig', $data)
-//            ->setTitle(
-//                sprintf('Manage Rubric %s for %s'),
-//            )
+            $this
+                ->buildHtmlOutput('@rubric/criteriaForm.twig', $data)
+                ->setTitle(
+                    sprintf(
+                        'Manage Rubric %s for %s',
+                        $this->getDi()->get('l10n')->translate('rubricGroup', true, true),
+                        $folder->getName()
+                    )
+                )
         );
     }
 
