@@ -17,6 +17,11 @@ use Schoolbox\Error;
 
 require_once __DIR__ . '/../../library/Bootstrap.php';
 
+// This page no longer exists
+SitePage::localRedir('/', null, 410);
+exit;
+
+
 // this is a script and not to be SitePage'd
 if (isset($this)) {
     error(Error\Mapper::ERROR_EMAIL_NOT_RETRIEVED);
