@@ -231,7 +231,7 @@ $(function() {
 
                                         {# Input for curriculum code #}
                                         <select data-curriculum-code-selector
-                                                name="crits[{{ groupCount }}][name]"
+                                                name="crits[{{ groupCount }}][curriculumCode][]"
                                                 multiple>
                                             {% for code in group.group.curriculumCodes %}
                                                 <option label="{{ code.code }}"
@@ -255,11 +255,22 @@ $(function() {
                                     <li class="actions-small-1" data-rubric-criterion-row="{{ groupCount }}">
                                         <div class="list-item">
                                             <input type="text"
-                                                   name="crits[{{ groupCount }}][items][i{{ criterion.criterion.id }}]"
+                                                   name="crits[{{ groupCount }}][items][{{ criterion.criterion.id }}][id]"
                                                    value="{{ criterion.criterion.name }}"
                                                    id="i{{ criterion.criterion.id }}"
                                                    {% if criterionInUse %}readonly{% endif %}
                                                    data-rubric-criterion />
+
+                                            <select data-curriculum-code-selector
+                                                    name="crits[{{ groupCount }}][items][{{ criterion.criterion.id }}][curriculumCode][]"
+                                                    multiple>
+                                                {% for code in criterion.criterion.curriculumCodes %}
+                                                    <option label="{{ code.code }}"
+                                                            value="{{ code.id }}"
+                                                            title="{{ code.description }}"
+                                                    >{{ code.code }}</option>
+                                                {% endfor %}
+                                            </select>
                                         </div>
                                         <nav>
                                             {% if criterionInUse %}
