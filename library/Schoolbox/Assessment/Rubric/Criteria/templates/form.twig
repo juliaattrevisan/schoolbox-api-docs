@@ -148,8 +148,13 @@ $(function() {
 
 
     // Set up the curriculum code selection
-    $(function(){
-        $('[data-curriculum-code-selector]').curriculumSelector();
+    $(function() {
+        $('[data-curriculum-code-selector]').each(function (i, v) {
+            var $this = $(this);
+            $this.curriculumSelector({
+                value: $.selectizeSelector.getValueFromSelect($this)
+            })
+        });
     });
 });
 </script>
@@ -233,10 +238,12 @@ $(function() {
                                         <select data-curriculum-code-selector
                                                 name="crits[{{ groupCount }}][curriculumCode][]"
                                                 multiple>
-                                            {% for code in group.group.curriculumCodes %}
+                                            {% for code in group.group.curriculumNodes %}
                                                 <option label="{{ code.code }}"
                                                         value="{{ code.id }}"
                                                         title="{{ code.description }}"
+                                                        data-value-object="{{ code|json_encode }}"
+                                                        selected
                                                 >{{ code.code }}</option>
                                             {% endfor %}
                                         </select>
@@ -254,20 +261,27 @@ $(function() {
                                     {% set criterionInUse = criterion.usage|length > 0 %}
                                     <li class="actions-small-1" data-rubric-criterion-row="{{ groupCount }}">
                                         <div class="list-item">
-                                            <input type="text"
+                                            <input type="hidden"
                                                    name="crits[{{ groupCount }}][items][{{ criterion.criterion.id }}][id]"
+                                                   value="i{{ criterion.criterion.id }}"
+                                                   {% if group.usageTotal > 0 %}readonly{% endif %} />
+                                            <input type="text"
+                                                   name="crits[{{ groupCount }}][items][{{ criterion.criterion.id }}][name]"
                                                    value="{{ criterion.criterion.name }}"
                                                    id="i{{ criterion.criterion.id }}"
                                                    {% if criterionInUse %}readonly{% endif %}
                                                    data-rubric-criterion />
 
+                                            {# Input for curriculum code #}
                                             <select data-curriculum-code-selector
                                                     name="crits[{{ groupCount }}][items][{{ criterion.criterion.id }}][curriculumCode][]"
                                                     multiple>
-                                                {% for code in criterion.criterion.curriculumCodes %}
+                                                {% for code in criterion.criterion.curriculumNodes %}
                                                     <option label="{{ code.code }}"
                                                             value="{{ code.id }}"
                                                             title="{{ code.description }}"
+                                                            data-value-object="{{ code|json_encode }}"
+                                                            selected
                                                     >{{ code.code }}</option>
                                                 {% endfor %}
                                             </select>
