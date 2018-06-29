@@ -238,31 +238,28 @@ class Controller extends BaseController
         $topId = 0;
 
         // Group criterion list by each criterion's rubric group
-        $criteriaList = [];
+        $groups = [];
         if (\count($criterionCollection)) {
-            $criteriaList = [];
+            $groups = [];
             foreach ($criterionCollection as $crit) {
                 $groupId                              = $crit->getGroup()->getId();
-                $criteriaList[$groupId]['group']      = $crit->getGroup();
-                $criteriaList[$groupId]['criteria'][] = $crit;
+                $groups[$groupId]['group']      = $crit->getGroup();
+                $groups[$groupId]['criteria'][] = $crit;
             }
         }
 
         // Build data for each group, including its criteria
         $criterionData = [];
-        foreach ($criteriaList as $critGroup) {
-            /** @var \Schoolbox\Assessment\Component\SubmissionBox\Rubric\Group $group */
-            /** @var \Schoolbox\Assessment\Component\SubmissionBox\Rubric\Criterion[] $crits */
-            $group     = $critGroup['group'];
-            $crits     = $critGroup['criteria'];
+        foreach ($groups as $critGroup) {
             $groupData = [
-                'group'    => $group,
+                'group'    => $critGroup['group'],
                 'criteria' => [],
             ];
 
             // Build individual data for each group
             $usageTotal = 0;
-            foreach ($crits as $crit) {
+            foreach ($critGroup['criteria'] as $crit) {
+                /** @var Criterion $crit */
                 $usage      = $this->usageMapper->findUsage($crit->getId());
                 $usageTotal += \count($usage);
 
@@ -271,7 +268,6 @@ class Controller extends BaseController
                     'usage'     => $usage,
                 ];
 
-                /* @var $crit Criterion */
                 $topId = max($topId, $crit->getId());
             }
 
@@ -282,7 +278,7 @@ class Controller extends BaseController
         return [
             'folder'     => $folder,
             'groups'     => $criterionData,
-            'maxGroupId' => \count($criteriaList),
+            'maxGroupId' => \count($groups),
             'maxCritId'  => $topId + 1,
         ];
     }
