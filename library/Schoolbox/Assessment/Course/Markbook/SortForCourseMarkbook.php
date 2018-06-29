@@ -190,8 +190,7 @@ class SortForCourseMarkbook implements IAssessableComparator
         /** @var UnitImplementation\Model $firstLeftUnitImpl */
         $firstLeftUnitImpl = null;
         foreach($leftCourse->getUnits() as $unitImpl) {
-            if (!$firstLeftUnitImpl || $unitImpl->getOpenDate()
-                                                ->lt($firstLeftUnitImpl->getOpenDate())) {
+            if (!$firstLeftUnitImpl || $unitImpl->getOpenDate()->lt($firstLeftUnitImpl->getOpenDate())) {
                 $firstLeftUnitImpl = $unitImpl;
             }
         }
@@ -199,14 +198,12 @@ class SortForCourseMarkbook implements IAssessableComparator
         /** @var UnitImplementation\Model $firstRightUnitImpl */
         $firstRightUnitImpl = null;
         foreach($rightCourse->getUnits() as $unitImpl) {
-            if (!$firstRightUnitImpl || $unitImpl->getOpenDate()
-                                                 ->lt($firstRightUnitImpl->getOpenDate())) {
+            if (!$firstRightUnitImpl || $unitImpl->getOpenDate()->lt($firstRightUnitImpl->getOpenDate())) {
                 $firstRightUnitImpl = $unitImpl;
             }
         }
 
-        return $firstLeftUnitImpl->getOpenDate()
-                                 ->compare($firstRightUnitImpl->getOpenDate());
+        return $firstLeftUnitImpl->getOpenDate()->compare($firstRightUnitImpl->getOpenDate());
     }
 
 
