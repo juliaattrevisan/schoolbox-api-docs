@@ -152,7 +152,7 @@ class Factory
         $this->setMarkType(trim($post['markType']));
         $this->setGradingScheme(trim($post['gradingScheme']));
         $this->setUseRubric(trim($post['useRubric']));
-        $this->setMarkPerCapability(trim($post['markPerCapability']));
+        $this->setUseMarkRange(trim($post['markPerCapability']));
         $this->setMaxMark(trim($post['maxMark']));
 
         if (isset($post['self_reviewable'])) {
@@ -256,7 +256,7 @@ class Factory
                 $this->getMarkType(),
                 $this->getGradingScheme(),
                 $this->getUseRubric(),
-                $this->getMarkPerCapability(),
+                $this->getUseMarkRange(),
                 $this->getMaxMark(),
                 $this->getRubricData(),
                 $this->getAttachedFiles(),

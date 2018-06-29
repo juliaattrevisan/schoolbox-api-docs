@@ -32,7 +32,7 @@ class Decorator implements DecoratorInterface
      * @param $markType
      * @param $gradingScheme
      * @param $useRubric
-     * @param $markPerCapability
+     * @param $useMarkRange
      * @param $maxMark
      * @param $rubricData
      * @param $attachedFiles
@@ -43,7 +43,7 @@ class Decorator implements DecoratorInterface
         $markType,
         $gradingScheme,
         $useRubric,
-        $markPerCapability,
+        $useMarkRange,
         $maxMark,
         $rubricData,
         $attachedFiles,
@@ -53,7 +53,7 @@ class Decorator implements DecoratorInterface
         $this->setMarkType(trim($markType));
         $this->setGradingScheme(trim($gradingScheme));
         $this->setUseRubric(trim($useRubric));
-        $this->setMarkPerCapability(trim($markPerCapability));
+        $this->setUseMarkRange(trim($useMarkRange));
         $this->setMaxMark(trim($maxMark));
         $this->setRubricData($rubricData);
         $this->setAttachedFiles($attachedFiles);
@@ -96,7 +96,7 @@ class Decorator implements DecoratorInterface
         $assessment->setMarkScheme($markScheme);
 
         $assessment->setUseRubric($this->getUseRubric());
-        $assessment->setMarkPerCapability($this->getMarkPerCapability());
+        $assessment->setUseMarkRange($this->getUseMarkRange());
 
         if ($this->getSelfReviewable() !== null) {
             // Something has come through from post, set to that

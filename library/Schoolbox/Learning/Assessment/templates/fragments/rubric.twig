@@ -282,7 +282,7 @@ Usage:
         <div id="markPerCapabilityPanel" class="{% if not assessment.useRubric %}hide{% endif %}" data-hide-watch="#useRubric">
             <label for="markPerCapability">Mark Per-Capability</label>
             <div class="switch round">
-                <input name="markPerCapability" id="markPerCapability" type="checkbox" {% if assessment.markPerCapability %}checked="checked"{% endif %} />
+                <input name="markPerCapability" id="markPerCapability" type="checkbox" {% if assessment.useMarkRange %}checked="checked"{% endif %} />
                 <label for="markPerCapability">
                     <span class="icon-approve"></span>
                     <span class="icon-cancel"></span>

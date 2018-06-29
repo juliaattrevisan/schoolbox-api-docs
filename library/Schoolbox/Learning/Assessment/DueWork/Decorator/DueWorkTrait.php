@@ -48,7 +48,7 @@ trait DueWorkTrait
     /**
      * @var bool
      */
-    protected $markPerCapability = false;
+    protected $useMarkRange = false;
 
     /**
      * @var array|string[]
@@ -143,18 +143,18 @@ trait DueWorkTrait
     /**
      * @return boolean
      */
-    protected function getMarkPerCapability()
+    protected function getUseMarkRange()
     {
-        return $this->markPerCapability;
+        return $this->useMarkRange;
     }
 
     /**
-     * @param boolean $markPerCapability
+     * @param boolean $useMarkRange
      * @return $this
      */
-    protected function setMarkPerCapability($markPerCapability)
+    protected function setUseMarkRange($useMarkRange)
     {
-        $this->markPerCapability = $markPerCapability;
+        $this->useMarkRange = $useMarkRange;
         return $this;
     }
 

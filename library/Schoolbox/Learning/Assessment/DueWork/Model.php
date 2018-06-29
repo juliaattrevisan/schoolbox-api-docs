@@ -90,7 +90,7 @@ class Model extends AbstractAssessment implements ISelfAssessable
      *
      * @var bool
      */
-    protected $markPerCapability = false;
+    protected $useMarkRange = false;
 
     /**
      * Only relevant if this DueWork's MarkType is 'TotalMark'
@@ -656,18 +656,18 @@ class Model extends AbstractAssessment implements ISelfAssessable
     /**
      * @return boolean
      */
-    public function getMarkPerCapability()
+    public function getUseMarkRange()
     {
-        return $this->markPerCapability;
+        return $this->useMarkRange;
     }
 
     /**
-     * @param boolean $markPerCapability
+     * @param boolean $useMarkRange
      * @return $this
      */
-    public function setMarkPerCapability($markPerCapability)
+    public function setUseMarkRange($useMarkRange)
     {
-        $this->markPerCapability = $markPerCapability;
+        $this->useMarkRange = $useMarkRange;
         return $this;
     }
 

@@ -58,7 +58,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper
         $this->uses('weight', self::TYPE_INTEGER); // TODO deprecated, lives on `assessment` table now
         $this->uses('max_mark', self::TYPE_DECIMAL);
         $this->uses('use_rubric', self::TYPE_BOOLEAN);
-        $this->uses('rubric_group_marks', self::TYPE_BOOLEAN, null, 'markedPerRubricGroup');
+        $this->uses('rubric_group_marks', self::TYPE_BOOLEAN, null, 'markedUsingRange');
         $this->uses('mark_visibility', self::TYPE_INTEGER);
         $this->uses('skip_unsubmitted', self::TYPE_BOOLEAN);
         $this->uses('self_reviewability', self::TYPE_STRING);
