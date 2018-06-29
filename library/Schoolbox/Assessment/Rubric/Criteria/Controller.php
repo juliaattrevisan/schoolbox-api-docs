@@ -195,13 +195,14 @@ class Controller extends BaseController
         $data = [];
         foreach ($criteria as $group) {
             if (\count($group['items'])) {
-                foreach ($group['items'] as $critId => $crit) {
+                foreach ($group['items'] as $crit) {
                     // Criterion ID is stored as "i{$critId}"
-                    $critId        = (int)substr($critId, 1);
+                    $critId        = (int)$crit['id'];
                     $data[$critId] = [
-                        'id'    => $group['id'],
-                        'group' => $group['name'],
-                        'name'  => $crit,
+                        'groupId'   => (int)$group['id'],
+                        'groupName' => $group['name'],
+                        'id'        => $critId,
+                        'name'      => $crit['name'],
                     ];
                 }
             }
