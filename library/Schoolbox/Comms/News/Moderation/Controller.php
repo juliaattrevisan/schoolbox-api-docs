@@ -89,6 +89,26 @@ class Controller extends Base
 
 
     /**
+     * Find the next article to deal with
+     * Otherwise return to Moderation Queue if there are no more articles to process
+     *
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \Aura\Router\Exception\RouteNotFound
+     */
+    private function getFirst()
+    {
+        $first = (new Lists($this->newsMapper, $this->userMapper))->getNeedModeration()->first();
+
+        if ($first) {
+            $nextStep = $this->getRouter()->generate('commsNews.getDetail', ['newsId' => $first->getId()]);
+        } else {
+            $nextStep = $this->getRouter()->generate('commsNewsModeration.getList');
+        }
+
+        return $nextStep;
+    }
+
+    /**
      * Submit For Moderation occurs here
      * A required action prior to Moderation taking place
      *
@@ -138,6 +158,7 @@ class Controller extends Base
      * @throws \Aura\Router\Exception\RouteNotFound
      * @throws \PDOException
      * @throws \UnexpectedValueException
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
      */
     public function postAccept(Model $news)
     {
@@ -153,10 +174,9 @@ class Controller extends Base
             $this->newsMapper->save($news);
         }
 
-        /* Return to Moderation Queue
+        /* Go back to the first thing in the list; or the list itself
          */
-        $nextStep = $this->getRouter()->generate('commsNewsModeration.getList');
-        $this->getResponse()->redirect->to($nextStep);
+        $this->getResponse()->redirect->to($this->getFirst());
     }
 
 
@@ -192,9 +212,10 @@ class Controller extends Base
 
             $this->newsMapper->save($news);
 
-            /* Redirect back to the moderation list so you can deal with other articles
+            /* Redirect back to the moderation list or most urgent article
+             * so you can deal with the next thing
              */
-            $nextStep = $this->getRouter()->generate('commsNewsModeration.getList');
+            $nextStep = $this->getFirst();
 
             if ($this->getRequest()->isXhr()) {
                 $this->getResponse()->content->set($this->buildJsonOutput([
