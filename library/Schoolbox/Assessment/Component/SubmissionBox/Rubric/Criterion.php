@@ -9,6 +9,8 @@
 
 namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 
+use Schoolbox\Curriculum\Node\Model as NodeModel;
+use Schoolbox\GenericCollection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
@@ -43,6 +45,21 @@ class Criterion implements ISoftDeletable
      * @var Group
      */
     private $group;
+
+
+    /**
+     * @var GenericCollection|NodeModel[]
+     */
+    private $curriculumNodes;
+
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->curriculumNodes = new GenericCollection(NodeModel::class);
+    }
 
 
     /**
@@ -150,6 +167,24 @@ class Criterion implements ISoftDeletable
     public function setGroup(Group $group)
     {
         $this->group = $group;
+        return $this;
+    }
+
+    /**
+     * @return GenericCollection|NodeModel[]
+     */
+    public function getCurriculumNodes(): GenericCollection
+    {
+        return $this->curriculumNodes;
+    }
+
+    /**
+     * @param GenericCollection|NodeModel[] $curriculumNodes
+     * @return static
+     */
+    public function setCurriculumNodes(GenericCollection $curriculumNodes)
+    {
+        $this->curriculumNodes = $curriculumNodes;
         return $this;
     }
 }
