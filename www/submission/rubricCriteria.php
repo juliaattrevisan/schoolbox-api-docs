@@ -16,6 +16,11 @@ use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
+// Redirect to new rubric criteria form
+$this->localRedir('/rubric/criteria/' . $this->arg[0], null, 301);
+exit;
+
+
 // not in SitePage context, redirect to equivalent
 if (!isset($this)) {
     require_once __DIR__ . '/../../library/Bootstrap.php';
