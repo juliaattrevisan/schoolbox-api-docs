@@ -1,0 +1,35 @@
+{##
+ # Params:
+ # * group:      if null this is an input for a new group
+ # * groupCount: the number of the group, used only for array keys
+ #}
+
+<li class="actions-small-0">
+    <div class="list-item">
+        <input type="hidden"
+               name="crits[{{ groupCount }}][id]"
+               value="{{ group.id }}"
+               {% if group.usageTotal > 0 %}readonly{% endif %} />
+
+        <input type="text"
+               name="crits[{{ groupCount }}][name]"
+               value="{{ group.name }}"
+               {% if group.usageTotal > 0 %}readonly{% endif %}
+               data-rubric-group />
+
+        {# Input for curriculum code #}
+        <select data-curriculum-code-selector
+                name="crits[{{ groupCount }}][curriculumCode][]"
+                multiple>
+            {% for code in group.curriculumNodes %}
+                <option label="{{ code.code }}"
+                        value="{{ code.id }}"
+                        title="{{ code.description }}"
+                        data-value-object="{{ code|json_encode }}"
+                        selected
+                >{{ code.code }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <nav></nav>
+</li>
