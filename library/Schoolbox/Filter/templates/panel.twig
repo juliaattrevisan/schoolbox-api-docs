@@ -10,64 +10,16 @@ Usage:
 
     ? TODO convert to JS plugin that is executed against the panel element (so it can get with $this), and takes contentPanelId as single arg
 #}
+<script type="text/javascript" src="/javascript/shared/jquery.select-multi-checkboxes.js"></script>
 
 {% autoescape 'js' %}
 <script type="text/javascript">
 
     $(function() {
-        {#TODO - move this to plugin called 'multi-checkbox-select' or similar#}
-        // Track the most recently changed checkbox per component
-        var mostRecentChangePerComponent = [];
-
-        $(document).on('click', '[data-component] label', function (e) {
-
-            var $component           = $(this).closest('[data-component]');
-            var $componentId         = $component.data('component');
-            var $componentLabels     = $component.find('label');
-            var $componentCheckboxes = $component.find('input[type=checkbox]');
-            var labelIndex           = $componentLabels.index(this);
-
-            // Is this not the first checkbox changed for this component ?
-            var mostRecentChangedIndex = mostRecentChangePerComponent[$componentId];
-
-            // Was this a shiftClick on a different checkbox ?
-            if(e.shiftKey && typeof mostRecentChangedIndex === 'number' && mostRecentChangedIndex !== labelIndex){
-
-                // Change all intervening checkboxes to the new value
-                var changedCheckbox  = $componentCheckboxes.get(labelIndex);
-                var newState         = !$(changedCheckbox).prop('checked');
-                var increment = labelIndex > mostRecentChangedIndex ? +1 : -1;
-                for(var i = mostRecentChangedIndex; i !== labelIndex; i += increment){
-                    var $checkbox = $($componentCheckboxes.get(i));
-
-                    $checkbox.prop('checked', newState);
-
-                    // Ensure 'change' listeners get triggered
-                    $checkbox.trigger('change');
-                }
-                clearSelection();
-            }
-            mostRecentChangePerComponent[$componentId] = labelIndex;
-
-        });
-
-        /**
-         * Clears any text selection that occurred when shift+clicking a selection of text-boxes
-         */
-        function clearSelection() {
-            if ( document.selection ) {
-                document.selection.empty();
-            } else if ( window.getSelection ) {
-                window.getSelection().removeAllRanges();
-            }
-        }
-    });
-
-
-    $(function() {
 
         // ============== Plugins
 
+        $('[data-component]').selectMulti({});
         $('[data-collapser]').collapsable();
 
         // ============== Vars
