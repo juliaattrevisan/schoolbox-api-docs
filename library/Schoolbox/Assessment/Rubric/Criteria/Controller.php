@@ -15,7 +15,6 @@ use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Group;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\GroupMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\UsageMapper;
-use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Resource\Folder\Model as FolderModel;
@@ -90,7 +89,7 @@ class Controller extends BaseController
     /**
      * View the rubric criteria form for a folder.
      *
-     * @api GET /rubric/criteria/{folderId}
+     * @api   GET /rubric/criteria/{folderId}
      * @level 181
      * @param FolderModel $folder
      */
@@ -100,13 +99,13 @@ class Controller extends BaseController
 
         $topId = 0;
 
-        $criteriaList  = [];
+        $criteriaList = [];
         if (\count($criterionCollection)) {
 
             /* Create group structure */
             $criteriaList = [];
             foreach ($criterionCollection as $crit) {
-                $groupId = $crit->getGroup()->getId();
+                $groupId                              = $crit->getGroup()->getId();
                 $criteriaList[$groupId]['group']      = $crit->getGroup();
                 $criteriaList[$groupId]['criteria'][] = $crit;
             }
@@ -130,8 +129,8 @@ class Controller extends BaseController
                 $usageTotal += \count($usage);
 
                 $groupData['criteria'][] = [
-                    'criterion'  => $crit,
-                    'usage'      => $usage,
+                    'criterion' => $crit,
+                    'usage'     => $usage,
                 ];
 
                 /* @var $crit Criterion */
@@ -139,7 +138,7 @@ class Controller extends BaseController
             }
 
             $groupData['usageTotal'] = $usageTotal;
-            $criterionData[] = $groupData;
+            $criterionData[]         = $groupData;
         }
 
         $data = [
@@ -166,7 +165,7 @@ class Controller extends BaseController
     /**
      * Save the rubric criteria for a folder.
      *
-     * @api POST /rubric/criteria/{folderId}
+     * @api   POST /rubric/criteria/{folderId}
      * @level 181
      * @param FolderModel $folder
      */
@@ -179,7 +178,7 @@ class Controller extends BaseController
         foreach ($criteria as $group) {
             if (\count($group['items'])) {
                 foreach ($group['items'] as $critId => $crit) {
-                    $critId = (int)substr($critId, 1);
+                    $critId        = (int)substr($critId, 1);
                     $data[$critId] = [
                         'id'    => $group['id'],
                         'group' => $group['name'],
@@ -200,17 +199,11 @@ class Controller extends BaseController
         // Delete criteria not submitted
         foreach ($criterionCollection as $crit) {
             if (!\in_array($crit->getId(), $found, true)) {
-                try {
-                    $usages = $this->usageMapper->findByColumn('criterion_id', $crit->getId());
-                    $this->criterionMapper->delete($crit);
-                    foreach ($usages as $usage){
-                        $box = $usage->getSubmissionBox();
-                        $affectedSubmissionBoxes[$box->getId()] = $box;
-                    }
-
-                } catch (\Exception $e) {
-                    // Couldn't delete criteria!
-                    $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
+                $usages = $this->usageMapper->findByColumn('criterion_id', $crit->getId());
+                $this->criterionMapper->delete($crit);
+                foreach ($usages as $usage) {
+                    $box                                    = $usage->getSubmissionBox();
+                    $affectedSubmissionBoxes[$box->getId()] = $box;
                 }
             }
         }
