@@ -143,7 +143,7 @@ class Model extends AbstractFeedback
     /**
      * Set the Normalised Mark for an IFeedback
      *
-     * @param float $normalisedMark
+     * @param null|float $normalisedMark
      */
     public function setNormalisedMark($normalisedMark)
     {
