@@ -196,12 +196,10 @@ class Controller extends BaseController
         foreach ($criteria as $group) {
             if (\count($group['items'])) {
                 foreach ($group['items'] as $crit) {
-                    // Criterion ID is stored as "i{$critId}"
-                    $critId        = (int)$crit['id'];
-                    $data[$critId] = [
+                    $data[] = [
                         'groupId'   => (int)$group['id'],
                         'groupName' => $group['name'],
-                        'id'        => $critId,
+                        'id'        => (int)$crit['id'],
                         'name'      => $crit['name'],
                     ];
                 }
@@ -225,7 +223,7 @@ class Controller extends BaseController
         $affectedSubmissionBoxes = [];
 
         // work out the diff and delete unnecessary criteria
-        $found = array_keys($data);
+        $found = array_column($data, 'id');
 
         $criterionCollection = $this->criterionMapper->findForFolder($folder->getId());
 
@@ -262,14 +260,14 @@ class Controller extends BaseController
         $folderId   = $folder->getId();
 
         // iterate through list of provided criteria changes
-        foreach ($data as $critId => $critData) {
+        foreach ($data as $critData) {
             // Find the group; if it doesn't exist create it
-            $groupName = $critData['group'];
+            $groupName = $critData['groupName'];
             if (!isset($groupList[$groupName])) {
-                if (isset($critData['id'])) {
+                if (isset($critData['groupId'])) {
                     try {
                         $group = $this->groupMapper->findOneByColumnList([
-                            'id'          => $critData['id'],
+                            'id'          => $critData['groupId'],
                             'parent_id'   => $folderId,
                             'parent_type' => $parentType,
                         ]);
@@ -285,7 +283,8 @@ class Controller extends BaseController
             }
 
             // Now, find the criterion: if it doesn't exist create it
-            $group = $groupList[$groupName];
+            $group  = $groupList[$groupName];
+            $critId = $data['id'];
             try {
                 $criteria = $this->criterionMapper->findOneByColumnList([
                     'id'              => $critId,
