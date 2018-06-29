@@ -100,6 +100,7 @@ class DueWork implements IAssessmentTypeTranslator
         null === $domainObject->getShowSubmittedOnly() || $dataModel->setSkipUnsubmitted($domainObject->getShowSubmittedOnly());
         null === $domainObject->isAcceptMulti()        || $dataModel->setAcceptMultiple($domainObject->isAcceptMulti());
         null === $domainObject->getUseRubric()         || $dataModel->setUseRubric($domainObject->getUseRubric());
+        null === $domainObject->getMarkPerCapability() || $dataModel->setMarkedPerRubricGroup($domainObject->getMarkPerCapability());
         null === $domainObject->getUseMarkRange()      || $dataModel->setMarkedUsingRange($domainObject->getUseMarkRange());
         null === $domainObject->getCreator()           || $dataModel->setOwner($domainObject->getCreator());
         null === $domainObject->getSelfReviewability() || $dataModel->setSelfReviewability($domainObject->getSelfReviewability());
@@ -162,6 +163,10 @@ class DueWork implements IAssessmentTypeTranslator
         if ($dataModel->getUseRubric()) {
             $domainObject->setUseRubric(true);
 
+            if ($dataModel->isMarkedPerRubricGroup()) {
+                $domainObject->setMarkPerCapability(true);
+            }
+
             if ($dataModel->isMarkedUsingRange()) {
                 $domainObject->setUseMarkRange(true);
             }
@@ -169,6 +174,7 @@ class DueWork implements IAssessmentTypeTranslator
             $domainObject->setRubric($dataModel->getRubric());
         } else {
             $domainObject->setUseRubric(false);
+            $domainObject->setMarkPerCapability(false);
             $domainObject->setUseMarkRange(false);
         }
 

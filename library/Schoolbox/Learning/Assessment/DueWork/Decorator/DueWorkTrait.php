@@ -48,6 +48,11 @@ trait DueWorkTrait
     /**
      * @var bool
      */
+    protected $markPerCapability = false;
+
+    /**
+     * @var bool
+     */
     protected $useMarkRange = false;
 
     /**
@@ -137,6 +142,24 @@ trait DueWorkTrait
     protected function setUseRubric($usesRubric)
     {
         $this->useRubric = $usesRubric;
+        return $this;
+    }
+
+    /**
+     * @return boolean
+     */
+    protected function getMarkPerCapability()
+    {
+        return $this->markPerCapability;
+    }
+
+    /**
+     * @param boolean $markPerCapability
+     * @return $this
+     */
+    protected function setMarkPerCapability($markPerCapability)
+    {
+        $this->markPerCapability = $markPerCapability;
         return $this;
     }
 

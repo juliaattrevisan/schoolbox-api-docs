@@ -90,6 +90,13 @@ class Model extends AbstractAssessment implements ISelfAssessable
      *
      * @var bool
      */
+    protected $markPerCapability = false;
+
+    /**
+     * This DueWork's Rubric has Use Mark Range on
+     *
+     * @var bool
+     */
     protected $useMarkRange = false;
 
     /**
@@ -650,6 +657,24 @@ class Model extends AbstractAssessment implements ISelfAssessable
     public function setMaxMark($maxMark)
     {
         $this->maxMark = $maxMark;
+        return $this;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function getMarkPerCapability()
+    {
+        return $this->markPerCapability;
+    }
+
+    /**
+     * @param boolean $markPerCapability
+     * @return $this
+     */
+    public function setMarkPerCapability($markPerCapability)
+    {
+        $this->markPerCapability = $markPerCapability;
         return $this;
     }
 

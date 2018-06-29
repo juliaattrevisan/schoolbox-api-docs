@@ -385,7 +385,7 @@ class Rubric extends Core\Rubric
             if (!$sessionUser || $box->canViewRubric($sessionUser)) {
 
                 // set the human readable mark
-                if ($box && $box->isMarkedUsingRange()) {
+                if ($box && $box->isMarkedPerRubricGroup()) {
                     $context['groups'][$groupId]['humanReadableMark'] = $this->calculateHumanReadable(
                         $context['groups'][$groupId]['percentage'],
                         $context['groups'][$groupId]['total']
