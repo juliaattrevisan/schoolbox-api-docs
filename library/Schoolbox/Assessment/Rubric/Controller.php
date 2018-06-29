@@ -300,17 +300,11 @@ class Controller extends BaseController
             $groupData = [
                 'group'    => $group,
                 'criteria' => [],
-//                'criterion_block'    => '',
-//                'CRITGROUP_COUNT'    => $groupCount++,
-//                'CRITGROUP_ID'       => $group->getId(),
-//                'CRITGROUP_NAME'     => $group->getName(),
-//                'CRITGROUP_DISABLED' => '',
             ];
 
             $usageTotal = 0;
 
             foreach ($crits as $crit) {
-
                 $usage      = UsageMapper::getInstance()->findUsage($crit->getId());
                 $usageTotal += \count($usage);
 
@@ -321,62 +315,9 @@ class Controller extends BaseController
 
                 /* @var $crit Criterion */
                 $topId = max($topId, $crit->getId());
-
-//                $this->setVar([
-//                    'CRITERION_ID'   => $crit->getId(),
-//                    'CRITERION_NAME' => $crit->getName(),
-//                ]);
-//
-//                $usage = UsageMapper::getInstance()->findUsage($crit->getId());
-//                $usageCount = count($usage);
-//                $usageTotal += $usageCount;
-//                if ($usageCount > 0) {
-//                    $this->setVar([
-//                        'CRITERION_USAGE'                  => $usageCount,
-//                        'CRITERION_ASSESSMENT_COUNT_LABEL' => $l10n->translate('assessment', $usageCount > 1),
-//                    ]);
-//
-//                    if (!($folder->hasCourseSpecification() || $folder->hasUnitSpecification())) {
-//                        $this->setVar('criterion_enabled_block', '');
-//                        $this->parse('criterion_disabled_block', 'criterion_disabled');
-//                    } else {
-//                        $this->setVar('criterion_disabled_block', '');
-//                        $this->parse('criterion_in_use_block', 'criterion_in_use');
-//                        $this->parse('criterion_enabled_block', 'criterion_enabled');
-//                    }
-//
-//                    // PHPLib the assessments
-//                    $this->setVar('criterion_assessment_block', '');
-//                    foreach ($usage as $assessment) {
-//                        $this->setVar(
-//                            'CRITERION_ASSESSMENT_HREF',
-//                            $this->routeLookup(
-//                                'learningAssessment.getUpdateAssessmentForm',
-//                                [
-//                                    'assessmentId' => $assessment['id'],
-//                                ]
-//                            ) . "#rb[{$assessment['submission_box_id']}][criterion][{$crit->getId()}][on]"
-//                        );
-//                        $this->setVar('CRITERION_ASSESSMENT_TITLE', $assessment['title']);
-//                        $this->parse('criterion_assessment_block', 'criterion_assessment', true);
-//                    }
-//                } else {
-//                    $this->setVar('criterion_assessment_block', '');
-//                    $this->setVar('criterion_disabled_block', '');
-//                    $this->setVar('criterion_in_use_block', '');
-//                    $this->parse('criterion_enabled_block', 'criterion_enabled');
-//                }
-//
-//                $this->parse('criterion_block', 'criterion', true);
-//                if ($usageTotal > 0) {
-//                    $this->setVar('CRITGROUP_DISABLED', 'readonly');
-//                }
             }
 
             $groupData['usageTotal'] = $usageTotal;
-
-//            $this->parse('criterion_group_block', 'criterion_group', true);
-
             $criterionData[] = $groupData;
         }
 
@@ -387,18 +328,10 @@ class Controller extends BaseController
             'maxCritId'  => $topId + 1,
         ];
 
-//        $this->setVar('MAX_CRITGROUP_ID', $groupCount);
-//        $this->setVar('MAX_CRIT_ID', $topId + 1);
-
-//        $stone = $this->getDi()->get('l10n');
-//
-//        $criteriaName = $this->getDi()->get('l10n')->translate('rubricGroup', true, true);
-//        $title = 'Manage Rubric ' . $criteriaName . ' for ' . Scrub::text($folder->getName());
-
         $this->getResponse()->content->set(
             $this->buildHtmlOutput('@rubric/criteriaForm.twig', $data)
 //            ->setTitle(
-//                sprintf('Manage Rubric %s for %s',
+//                sprintf('Manage Rubric %s for %s'),
 //            )
         );
     }
