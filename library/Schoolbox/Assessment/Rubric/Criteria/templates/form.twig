@@ -264,7 +264,7 @@ $(function() {
                                             <input type="hidden"
                                                    name="crits[{{ groupCount }}][items][{{ criterion.criterion.id }}][id]"
                                                    value="i{{ criterion.criterion.id }}"
-                                                   {% if group.usageTotal > 0 %}readonly{% endif %} />
+                                                   {% if criterionInUse %}readonly{% endif %} />
                                             <input type="text"
                                                    name="crits[{{ groupCount }}][items][{{ criterion.criterion.id }}][name]"
                                                    value="{{ criterion.criterion.name }}"
@@ -361,11 +361,19 @@ $(function() {
                         <ul class="information-list">
                             <li class="actions-small-0">
                                 <div class="list-item">
+                                    <input type="hidden"
+                                           value=""
+                                           data-rubric-group-new="1" />
+
                                     <input type="text"
                                            value=""
                                            data-rubric-group
                                            data-rubric-group-new="1"
                                            placeholder="Add {{ locale.rubricGroup.proper }}..." />
+
+                                    <select data-curriculum-code-selector
+                                            multiple>
+                                    </select>
                                 </div>
                                 <nav></nav>
                             </li>
@@ -376,11 +384,20 @@ $(function() {
                         <ul class="information-list">
                             <li class="actions-small-1" data-rubric-unsaved data-rubric-criterion-new-row data-rubric-criterion-row="{{ groupCount }}">
                                 <div class="list-item">
+
+                                    <input type="hidden"
+                                           value="" />
+
                                     <input type="text"
                                            value=""
                                            data-rubric-criterion
                                            data-rubric-criterion-new="1"
                                            placeholder="Add {{ locale.rubricCriterion.proper }}..." />
+
+                                    <select data-curriculum-code-selector
+                                            multiple>
+                                    </select>
+
                                 </div>
                                 <nav>
                                     <a href="#" class="icon-more hide" data-dropdown-dormant title="Actions"></a>
