@@ -121,96 +121,9 @@ class Controller extends BaseController
      */
     public function postForm(FolderModel $folder): void
     {
-        $folderId = $folder->getId();
-        $criteria = $this->request->post->get('crits');
-
-        $data = [];
-        foreach ($criteria as $group) {
-            if (\count($group['items'])) {
-                foreach ($group['items'] as $critId => $crit) {
-                    $critId        = (int)substr($critId, 1);
-                    $data[$critId] = [
-                        'id'    => $group['id'],
-                        'group' => $group['name'],
-                        'name'  => $crit,
-                    ];
-                }
-            }
-        }
-
-        // Which submission boxes have criteria deleted? We will need to ensure we don't leave in an invalid state.
-        $affectedSubmissionBoxes = [];
-
-        // work out the diff and delete unnecessary criteria
-        $found = array_keys($data);
-
-        $criterionCollection = $this->criterionMapper->findForFolder($folderId);
-
-        // Delete criteria not submitted
-        foreach ($criterionCollection as $crit) {
-            if (!\in_array($crit->getId(), $found, true)) {
-                $usages = $this->usageMapper->findByColumn('criterion_id', $crit->getId());
-                $this->criterionMapper->delete($crit);
-                foreach ($usages as $usage) {
-                    $box                                    = $usage->getSubmissionBox();
-                    $affectedSubmissionBoxes[$box->getId()] = $box;
-                }
-            }
-        }
-
-        // Ensure that deletion of a criterion, and its descriptors, does not result in empty levels.
-        $this->rubricMapper->deleteEmptyLevels(array_keys($affectedSubmissionBoxes));
-
-        // iterate through list of provided criteria changes
-        /** @var Group[] $groupList */
-        $groupList  = $this->groupMapper->createCollection();
-        $parentType = Group::PARENT_TYPE_CATEGORY;
-        foreach ($data as $critId => $critData) {
-
-            // Find the group; if it doesn't exist create it
-            $groupName = $critData['group'];
-            if (!isset($groupList[$groupName])) {
-                if (isset($critData['id'])) {
-                    try {
-                        $group = $this->groupMapper->findOneByColumnList([
-                            'id'          => $critData['id'],
-                            'parent_id'   => $folderId,
-                            'parent_type' => $parentType,
-                        ]);
-                    } catch (\Exception $e) {
-                        // ID exists, but not in this context; abort
-                        $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
-                    }
-                } else {
-                    $group = $this->groupMapper->findOrCreateOneForFolderByName($folderId, $groupName);
-                }
-                $this->groupMapper->save($group);
-                $groupList[$groupName] = $group;
-            }
-
-            // Now, find the criterion: if it doesn't exist create it
-            $group = $groupList[$groupName];
-
-            try {
-                $criteria = $this->criterionMapper->findOneByColumnList([
-                    'id'              => $critId,
-                    'rubric_group_id' => $group->getId(),
-                ]);
-                $criteria->setName($critData['name']);
-
-                //Do not edit criteria that are in use on a class page, can edit in course though
-                $usage = $this->usageMapper->findByColumnList(['criterion_id' => $critId]);
-                if (\count($usage) && !($folder->hasCourseSpecification() || $folder->hasUnitSpecification())) {
-                    continue; // possibly throw an error of some kind
-                }
-            } catch (\Exception $e) {
-                $criteria = new Criterion();
-                $criteria->setGroup($group);
-                $criteria->setName($critData['name']);
-            }
-
-            $this->criterionMapper->save($criteria);
-        }
+        $data = $this->preprocessPostData($this->request->post->get('crits', []));
+        $this->deleteUnusedCriteria($folder, $data);
+        $this->persistCriteria($folder, $data);
 
         // Done: redirect back to homepage, or AJAX
         if ($this->request->isXhr()) {
@@ -222,9 +135,10 @@ class Controller extends BaseController
             );
 
         } else {
-            $this->response->redirect->to('/homepage/' . $folderId);
+            $this->response->redirect->to('/homepage/' . $folder->getId());
         }
     }
+
 
     /**
      * Build Twig data for the form.
@@ -266,5 +180,129 @@ class Controller extends BaseController
             'maxGroupId' => \count($groups),
             'maxCritId'  => $topId + 1,
         ];
+    }
+
+
+    /**
+     * Pre-process data from POST into a format which the save method can use.
+     *
+     * @param array $criteria
+     * @return array
+     */
+    private function preprocessPostData(array $criteria): array
+    {
+        $data = [];
+        foreach ($criteria as $group) {
+            if (\count($group['items'])) {
+                foreach ($group['items'] as $critId => $crit) {
+                    // Criterion ID is stored as "i{$critId}"
+                    $critId        = (int)substr($critId, 1);
+                    $data[$critId] = [
+                        'id'    => $group['id'],
+                        'group' => $group['name'],
+                        'name'  => $crit,
+                    ];
+                }
+            }
+        }
+        return $data;
+    }
+
+
+    /**
+     * Delete any criteria that were not submitted in POST data.
+     *
+     * @param FolderModel $folder The folder to delete criteria from
+     * @param array       $data   POST data, after having been pre-processed
+     *                            (see `$this->preprocessPostData`)
+     * @throws \Schoolbox\Mapper\Exception if a delete fails?
+     */
+    private function deleteUnusedCriteria(FolderModel $folder, array $data): void
+    {
+        // Which submission boxes have criteria deleted? We will need to ensure we don't leave in an invalid state.
+        $affectedSubmissionBoxes = [];
+
+        // work out the diff and delete unnecessary criteria
+        $found = array_keys($data);
+
+        $criterionCollection = $this->criterionMapper->findForFolder($folder->getId());
+
+        // Delete criteria not submitted
+        foreach ($criterionCollection as $crit) {
+            if (!\in_array($crit->getId(), $found, true)) {
+                $usages = $this->usageMapper->findByColumn('criterion_id', $crit->getId());
+                $this->criterionMapper->delete($crit);
+                foreach ($usages as $usage) {
+                    $box                                    = $usage->getSubmissionBox();
+                    $affectedSubmissionBoxes[$box->getId()] = $box;
+                }
+            }
+        }
+
+        // Ensure that deletion of a criterion, and its descriptors, does not result in empty levels.
+        $this->rubricMapper->deleteEmptyLevels(array_keys($affectedSubmissionBoxes));
+    }
+
+
+    /**
+     * Persists criteria submitted in POST data.
+     *
+     * @param FolderModel $folder The folder to persist criteria for
+     * @param array       $data   POST data, after having been pre-processed
+     *                            (see `$this->preprocessPostData`)
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    private function persistCriteria(FolderModel $folder, array $data): void
+    {
+        /** @var Group[] $groupList */
+        $groupList  = $this->groupMapper->createCollection();
+        $parentType = Group::PARENT_TYPE_CATEGORY;
+        $folderId   = $folder->getId();
+
+        // iterate through list of provided criteria changes
+        foreach ($data as $critId => $critData) {
+            // Find the group; if it doesn't exist create it
+            $groupName = $critData['group'];
+            if (!isset($groupList[$groupName])) {
+                if (isset($critData['id'])) {
+                    try {
+                        $group = $this->groupMapper->findOneByColumnList([
+                            'id'          => $critData['id'],
+                            'parent_id'   => $folderId,
+                            'parent_type' => $parentType,
+                        ]);
+                    } catch (\Exception $e) {
+                        // ID exists, but not in this context; abort
+                        throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
+                    }
+                } else {
+                    $group = $this->groupMapper->findOrCreateOneForFolderByName($folderId, $groupName);
+                }
+                $this->groupMapper->save($group);
+                $groupList[$groupName] = $group;
+            }
+
+            // Now, find the criterion: if it doesn't exist create it
+            $group = $groupList[$groupName];
+            try {
+                $criteria = $this->criterionMapper->findOneByColumnList([
+                    'id'              => $critId,
+                    'rubric_group_id' => $group->getId(),
+                ]);
+                $criteria->setName($critData['name']);
+
+                // Do not edit criteria that are in use on a class page, can edit in course though
+                $usage = $this->usageMapper->findByColumnList(['criterion_id' => $critId]);
+                if (\count($usage) && !($folder->hasCourseSpecification() || $folder->hasUnitSpecification())) {
+                    continue; // possibly throw an error of some kind
+                }
+            } catch (\Exception $e) {
+                $criteria = new Criterion();
+                $criteria->setGroup($group);
+                $criteria->setName($critData['name']);
+            }
+
+            $this->criterionMapper->save($criteria);
+        }
     }
 }
