@@ -207,12 +207,14 @@ Usage:
             // Convert to query args
             var queryArgs = [];
             for (filterId in nestedObj) {
-                var selections = nestedObj[filterId];
-                if (0 === Object.keys(selections).length) {
-                    queryArgs.push(filterId + '='); // empty filter selection syntax
-                } else {
-                    for (optionKey in selections) {
-                        queryArgs.push(filterId + '[' + optionKey + ']=1'); // filter option selected syntax
+                if(nestedObj.hasOwnProperty(filterId)) {
+                    var selections = nestedObj[filterId];
+                    if (0 === Object.keys(selections).length) {
+                        queryArgs.push(filterId + '='); // empty filter selection syntax
+                    } else {
+                        for (optionKey in selections) {
+                            queryArgs.push(filterId + '[' + optionKey + ']=1'); // filter option selected syntax
+                        }
                     }
                 }
             }
