@@ -1,4 +1,7 @@
 {% autoescape 'js' %}
+<script type="text/javascript" src="/curriculum/javascript/jquery.curriculumSelector.js"></script>
+<script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
+<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
 <script type="text/javascript">
 $(function() {
 
@@ -142,6 +145,12 @@ $(function() {
         e.preventDefault();
         $('[data-role="example-criteria"]').foundation('reveal', 'open');
     });
+
+
+    // Set up the curriculum code selection
+    $(function(){
+        $('[data-curriculum-code-selector]').curriculumSelector();
+    });
 });
 </script>
 {% endautoescape %}
@@ -173,6 +182,15 @@ $(function() {
     </div>
 </div>
 
+
+{% if showCurriculumCodes %}
+    {% set groupColumn = 'small-12 medium-4' %}
+    {% set criterionColumn = 'small-12 medium-8' %}
+{% else %}
+    {% set groupColumn = 'small-12 medium-4' %}
+    {% set criterionColumn = 'small-12 medium-8' %}
+{% endif %}
+
 <div class="row">
     <div class="small-12 island">
         <form action="{{ routeLookup('rubricCriteria.postForm', {folderId: folder.id}) }}" method="POST" class='top' data-role="rubric-criteria-form">
@@ -196,7 +214,7 @@ $(function() {
                 {% for group in groups %}
                     {% set groupCount = loop.index0 %}
                     <fieldset class='content' data-rubric-group-row="{{ groupCount }}">
-                        <div class="small-12 medium-6 columns">
+                        <div class="{{ groupColumn }} columns">
                             <h3>{{ locale.rubricGroup.proper }}</h3>
                             <ul class="information-list">
                                 <li class="actions-small-0">
@@ -210,13 +228,25 @@ $(function() {
                                                value="{{ group.group.name }}"
                                                {% if group.usageTotal > 0 %}readonly{% endif %}
                                                data-rubric-group />
+
+                                        {# Input for curriculum code #}
+                                        <select data-curriculum-code-selector
+                                                name="crits[{{ groupCount }}][name]"
+                                                multiple>
+                                            {% for code in group.group.curriculumCodes %}
+                                                <option label="{{ code.code }}"
+                                                        value="{{ code.id }}"
+                                                        title="{{ code.description }}"
+                                                >{{ code.code }}</option>
+                                            {% endfor %}
+                                        </select>
                                     </div>
                                     <nav></nav>
                                 </li>
                             </ul>
                         </div>
 
-                        <div class="small-12 medium-6 columns">
+                        <div class="{{ criterionColumn }} columns">
                             <h3>{{ locale.rubricCriterion.properPlural }}</h3>
                             <ul class="information-list">
 
@@ -301,7 +331,7 @@ $(function() {
 
                 {# New group #}
                 <fieldset class='content' data-rubric-group-row="{{ maxGroupId }}">
-                    <div class="small-12 medium-6 columns">
+                    <div class="{{ groupColumn }} columns">
                         <h3>{{ locale.rubricGroup.proper }}</h3>
                         <ul class="information-list">
                             <li class="actions-small-0">
@@ -316,7 +346,7 @@ $(function() {
                             </li>
                         </ul>
                     </div>
-                    <div class="small-12 medium-6 columns">
+                    <div class="{{ criterionColumn }} columns">
                         <h3>{{ locale.rubricCriterion.properPlural }}</h3>
                         <ul class="information-list">
                             <li class="actions-small-1" data-rubric-unsaved data-rubric-criterion-new-row data-rubric-criterion-row="{{ groupCount }}">
@@ -362,7 +392,7 @@ $(function() {
         <div class="small-12 island">
             <section>
                 <fieldset class="content">
-                    <div class="small-12 medium-6 columns">
+                    <div class="{{ groupColumn }} columns">
                         <h3>{{ locale.rubricGroup.proper }}</h3>
                         <ul class="information-list">
                             <li class="actions-small-0">
@@ -373,7 +403,7 @@ $(function() {
                             </li>
                         </ul>
                     </div>
-                    <div class="small-12 medium-6 columns">
+                    <div class="{{ criterionColumn }} columns">
                         <h3>{{ locale.rubricCriterion.properPlural }}</h3>
                         <ul class="information-list">
                             <li class="actions-small-1">
