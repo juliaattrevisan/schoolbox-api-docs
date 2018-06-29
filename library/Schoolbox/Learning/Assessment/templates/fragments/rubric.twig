@@ -279,11 +279,11 @@ Usage:
         </div>
     </div>
     <div class="small-12 medium-6 columns">
-        <div id="markPerCapabilityPanel" class="{% if not assessment.useRubric %}hide{% endif %}" data-hide-watch="#useRubric">
-            <label for="markPerCapability">Mark Per-Capability</label>
+        <div id="useMarkRangePanel" class="{% if not assessment.useRubric %}hide{% endif %}" data-hide-watch="#useRubric">
+            <label for="useMarkRange">Use Mark Range</label>
             <div class="switch round">
-                <input name="markPerCapability" id="markPerCapability" type="checkbox" {% if assessment.useMarkRange %}checked="checked"{% endif %} />
-                <label for="markPerCapability">
+                <input name="useMarkRange" id="useMarkRange" type="checkbox" {% if assessment.useMarkRange %}checked="checked"{% endif %} />
+                <label for="useMarkRange">
                     <span class="icon-approve"></span>
                     <span class="icon-cancel"></span>
                 </label>
