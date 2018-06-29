@@ -9,7 +9,10 @@
 
 namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 use PDOStatement;
-use Schoolbox;
+use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
+use Schoolbox\GenericCollection;
+use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Mapper\Exception as MapperException;
 
 /**
  * Class CriterionMapper
@@ -20,7 +23,7 @@ use Schoolbox;
  * @method Criterion[] findByColumnList($columnList, $options = array())
  * @method Criterion findOneByColumnList($columnList, $order = [], $options = [])
  */
-class CriterionMapper extends Schoolbox\Mapper {
+class CriterionMapper extends BaseMapper {
 
     protected function mapping() {
         $this->hasTable('rubric_criterion');
@@ -37,6 +40,19 @@ class CriterionMapper extends Schoolbox\Mapper {
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
         $this->joins('rubric_group_id', GroupMapper::class, 'id', null, null, 'group', 'group');
+
+        // Add curriculum codes
+        $this->joinsVia(
+            'curriculum_node_for_rubric_criterion',
+            NodeMapper::class,
+            'id',
+            'curriculum_node_id',
+            'rubric_criterion_id',
+            null,
+            null,
+            null,
+            'curriculumNodes'
+        );
 
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyUniqueness']);
         $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteDescriptors']);
@@ -61,7 +77,7 @@ class CriterionMapper extends Schoolbox\Mapper {
     /**
      * @inheritdoc
      */
-    protected function hydrateSelect(PDOStatement $statement): Schoolbox\GenericCollection
+    protected function hydrateSelect(PDOStatement $statement): GenericCollection
     {
         /** @var GroupMapper $groupMapper */
         $groupMapper = $this->getJoinMapper('group');
@@ -119,7 +135,7 @@ class CriterionMapper extends Schoolbox\Mapper {
 
             // found something! sweet. assign that ID.
             $object->setId($existingObject->getId());
-        } catch (Schoolbox\Mapper\Exception $e) {
+        } catch (MapperException $e) {
             // noop, new object. leave it as-is
         }
         return true;
@@ -132,10 +148,10 @@ class CriterionMapper extends Schoolbox\Mapper {
      * @param int|int[] $parentId   The parent ID (or list thereof) to find for
      * @param string    $parentType One of the `Group::PARENT_TYPE_*` constants
      * @param bool      $cache      If false, bypass result cache
-     * @return Schoolbox\GenericCollection|Criterion[]
-     * @throws Schoolbox\Mapper\Exception
+     * @return GenericCollection|Criterion[]
+     * @throws MapperException
      */
-    public function findForParent($parentId, string $parentType, bool $cache = true): Schoolbox\GenericCollection
+    public function findForParent($parentId, string $parentType, bool $cache = true): GenericCollection
     {
         return $this->findByColumnList(
             [
@@ -155,10 +171,10 @@ class CriterionMapper extends Schoolbox\Mapper {
      *
      * @param int|int[] $folderId The folder ID (or list thereof) to find for
      * @param bool      $cache    If false, bypass result cache
-     * @return Schoolbox\GenericCollection|Criterion[]
-     * @throws Schoolbox\Mapper\Exception
+     * @return GenericCollection|Criterion[]
+     * @throws MapperException
      */
-    public function findForFolder($folderId, bool $cache = true): Schoolbox\GenericCollection
+    public function findForFolder($folderId, bool $cache = true): GenericCollection
     {
         return $this->findForParent($folderId, Group::PARENT_TYPE_CATEGORY, $cache);
     }
@@ -174,8 +190,7 @@ class CriterionMapper extends Schoolbox\Mapper {
      * @param string $groupName  The name of the criterion's group
      * @param bool   $cache      If false, bypass result cache
      * @return Criterion
-     * @throws Schoolbox\Mapper\Exception
-     * @throws Schoolbox\Mapper\Exception\Deleted
+     * @throws MapperException
      */
     public function findOneForParentByKey(
         int $parentId,
@@ -207,8 +222,7 @@ class CriterionMapper extends Schoolbox\Mapper {
      * @param string $groupName The name of the criterion's group
      * @param bool   $cache     If false, bypass result cache
      * @return Criterion
-     * @throws Schoolbox\Mapper\Exception
-     * @throws Schoolbox\Mapper\Exception\Deleted
+     * @throws MapperException
      */
     public function findOneForFolderByKey(int $folderId, string $name, string $groupName, bool $cache = true): Criterion
     {
@@ -228,7 +242,7 @@ class CriterionMapper extends Schoolbox\Mapper {
      * @param string $groupName
      * @param bool   $cache
      * @return Criterion
-     * @throws Schoolbox\Mapper\Exception
+     * @throws MapperException
      */
     public function findOrCreateOneForParentByKey(
         int $parentId,
@@ -240,7 +254,7 @@ class CriterionMapper extends Schoolbox\Mapper {
     {
         try {
             return $this->findOneForParentByKey($parentId, $parentType, $name, $groupName, $cache);
-        } catch (Schoolbox\Mapper\Exception $e) {
+        } catch (MapperException $e) {
             // Build it
             /** @var GroupMapper $groupMapper */
             $groupMapper = $this->getJoinMapper('group');
@@ -265,7 +279,7 @@ class CriterionMapper extends Schoolbox\Mapper {
      * @param string $groupName
      * @param bool   $cache
      * @return Criterion
-     * @throws Schoolbox\Mapper\Exception
+     * @throws MapperException
      */
     public function findOrCreateOneForFolderByKey(
         int $folderId,
