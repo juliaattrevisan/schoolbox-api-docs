@@ -177,7 +177,7 @@ class Controller extends BaseController
                 ];
             }
 
-            $usage                          = $this->usageMapper->findUsage($criterion->getId());
+            $usage                          = $this->usageMapper->findCriterionUsage($criterion->getId());
             $groups[$groupId]['usage']      += $usage;
             $groups[$groupId]['criteria'][] = [
                 'criterion' => $criterion,
@@ -286,6 +286,21 @@ class Controller extends BaseController
                             'parent_id'   => $folderId,
                             'parent_type' => $parentType,
                         ]);
+
+                        // A group's name is changeable if:
+                        // * Its folder is a course or unit spec
+                        // * Any criteria within it aren't in use on any due works
+                        // (Its curriculum codes are always changeable)
+                        if ($isSpecFolder) {
+                            $isChangeable = true;
+                        } else {
+                            $usage        = $this->usageMapper->findGroupUsage($groupId);
+                            $isChangeable = (\count($usage) === 0);
+                        }
+                        if ($isChangeable) {
+                            $group->setName($groupName);
+                        }
+
                     } catch (\Exception $e) {
                         // ID exists, but not in this context; abort
                         throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
@@ -321,8 +336,8 @@ class Controller extends BaseController
                     if ($isSpecFolder) {
                         $isChangeable = true;
                     } else {
-                        $usage        = $this->usageMapper->countByColumn('criterion_id', $critId);
-                        $isChangeable = ($usage === 0);
+                        $usage        = $this->usageMapper->findCriterionUsage($critId);
+                        $isChangeable = (\count($usage) === 0);
                     }
                     if ($isChangeable) {
                         $criterion->setName($critName);

@@ -111,7 +111,7 @@ class UsageMapper extends Schoolbox\Mapper {
      * @param  int $criterionId
      * @return array[] id: the assessment's ID, title: the assessment's title, 'submission_box_id': the box's id
      */
-    public function findUsage($criterionId)
+    public function findCriterionUsage($criterionId): array
     {
         $query = "
             SELECT DISTINCT
@@ -125,6 +125,37 @@ class UsageMapper extends Schoolbox\Mapper {
         ";
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute([$criterionId]);
+        $result = [];
+        foreach ($statement as $row) {
+            $result[$row['id']] = $row;
+        }
+        return $result;
+    }
+
+
+    /**
+     * Retrieves a list of assessment IDs and names in which this group is used.
+     *
+     * This does not include deleted assessments.
+     *
+     * @param  int $groupId
+     * @return array[] id: the assessment's ID, title: the assessment's title, 'submission_box_id': the box's id
+     */
+    public function findGroupUsage($groupId): array
+    {
+        $query = "
+            SELECT DISTINCT
+                a.id,
+                a.title,
+                submission_box_id
+            FROM {$this->getTable()} ru
+            INNER JOIN {$this->getJoinSql('submission_box', 'ru', 'sb')}
+            INNER JOIN {$this->getJoinSql('submission_box.assessmentModel', 'sb', 'a')}
+            INNER JOIN {$this->getJoinSql('criterion', 'ru', 'rc')}
+            WHERE rc.rubric_group_id = ?
+        ";
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute([$groupId]);
         $result = [];
         foreach ($statement as $row) {
             $result[$row['id']] = $row;
