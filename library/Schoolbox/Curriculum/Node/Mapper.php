@@ -12,6 +12,7 @@ namespace Schoolbox\Curriculum\Node;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\LearningArea;
 use Schoolbox\Curriculum\LearningLevel;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 
 class Mapper extends BaseMapper implements BaseMapper\Searchable
@@ -219,5 +220,52 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
         }
 
         return $this;
+    }
+
+
+    /**
+     * @param BaseMapper $otherMapper
+     * @param string     $otherJoin
+     * @param array      $ids
+     * @return array|GenericCollection[]|Model[][]
+     */
+    public function findForOtherMapper(BaseMapper $otherMapper, string $otherJoin, array $ids): array
+    {
+        if (empty($ids)) {
+            // do nothing
+            return [];
+        }
+
+        $nodePb    = $otherMapper->getPredicateBuilder()->in('id', $ids);
+        $where     = implode(' AND ', $nodePb->getWhere());
+        $nodeQuery = "
+                SELECT
+                    {$otherMapper->getTable()}.{$otherMapper->getIdentifierColumn()},
+                    {$otherMapper->getJoinColumnString($otherJoin, 'cn')},
+                    {$otherMapper->getJoinColumnString("$otherJoin.level", 'cnl')},
+                    {$otherMapper->getJoinColumnString("$otherJoin.level.source", 'cnls')},
+                    {$otherMapper->getJoinColumnString("$otherJoin.area", 'cna')},
+                    {$otherMapper->getJoinColumnString("$otherJoin.area.source", 'cnas')}
+                FROM {$otherMapper->getTable()}
+                INNER JOIN {$otherMapper->getJoinSql($otherJoin, '', 'cn')}
+                LEFT  JOIN {$otherMapper->getJoinSql("$otherJoin.level", 'cn', 'cnl')}
+                LEFT  JOIN {$otherMapper->getJoinSql("$otherJoin.level.source", 'cnl', 'cnls')}
+                LEFT  JOIN {$otherMapper->getJoinSql("$otherJoin.area", 'cn', 'cna')}
+                LEFT  JOIN {$otherMapper->getJoinSql("$otherJoin.area.source", 'cna', 'cnas')}
+                WHERE {$where}
+            ";
+
+        $statement = $this->getDatabase()->prepare($nodeQuery);
+        $statement->execute($nodePb->getParams());
+        $result = [];
+        foreach ($statement as $row) {
+            $id   = $row['id'];
+            $node = $this->hydrateWithRelatedJoins($row, 'cn', 'cna', 'cnas', 'cnl', 'cnls');
+            if (!isset($result[$id])) {
+                $result[$id] = $this->createCollection();
+            }
+            $result[$id][$node->getId()] = $node;
+        }
+        return $result;
     }
 }
