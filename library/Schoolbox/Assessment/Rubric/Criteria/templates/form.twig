@@ -222,34 +222,10 @@ $(function() {
                         <div class="{{ groupColumn }} columns">
                             <h3>{{ locale.rubricGroup.proper }}</h3>
                             <ul class="information-list">
-                                <li class="actions-small-0">
-                                    <div class="list-item">
-                                        <input type="hidden"
-                                               name="crits[{{ groupCount }}][id]"
-                                               value="{{ group.group.id }}"
-                                               {% if group.usageTotal > 0 %}readonly{% endif %} />
-                                        <input type="text"
-                                               name="crits[{{ groupCount }}][name]"
-                                               value="{{ group.group.name }}"
-                                               {% if group.usageTotal > 0 %}readonly{% endif %}
-                                               data-rubric-group />
-
-                                        {# Input for curriculum code #}
-                                        <select data-curriculum-code-selector
-                                                name="crits[{{ groupCount }}][curriculumCode][]"
-                                                multiple>
-                                            {% for code in group.group.curriculumNodes %}
-                                                <option label="{{ code.code }}"
-                                                        value="{{ code.id }}"
-                                                        title="{{ code.description }}"
-                                                        data-value-object="{{ code|json_encode }}"
-                                                        selected
-                                                >{{ code.code }}</option>
-                                            {% endfor %}
-                                        </select>
-                                    </div>
-                                    <nav></nav>
-                                </li>
+                                {% include '@rubricCriteria/sub/group.twig' with {
+                                    group:      group.group,
+                                    groupCount: groupCount,
+                                } only %}
                             </ul>
                         </div>
 
@@ -359,24 +335,10 @@ $(function() {
                     <div class="{{ groupColumn }} columns">
                         <h3>{{ locale.rubricGroup.proper }}</h3>
                         <ul class="information-list">
-                            <li class="actions-small-0">
-                                <div class="list-item">
-                                    <input type="hidden"
-                                           value=""
-                                           data-rubric-group-new="1" />
-
-                                    <input type="text"
-                                           value=""
-                                           data-rubric-group
-                                           data-rubric-group-new="1"
-                                           placeholder="Add {{ locale.rubricGroup.proper }}..." />
-
-                                    <select data-curriculum-code-selector
-                                            multiple>
-                                    </select>
-                                </div>
-                                <nav></nav>
-                            </li>
+                            {% include '@rubricCriteria/sub/group.twig' with {
+                                group:      null,
+                                groupCount: null,
+                            } only %}
                         </ul>
                     </div>
                     <div class="{{ criterionColumn }} columns">

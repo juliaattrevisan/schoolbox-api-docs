@@ -1,25 +1,30 @@
 {##
  # Params:
- # * group:      if null this is an input for a new group
- # * groupCount: the number of the group, used only for array keys
+ # * group:      If null, this is an input for a new group
+ # * groupCount: The number of the group, used only for array keys.
+ #               If null, no name is output.
  #}
 
 <li class="actions-small-0">
     <div class="list-item">
         <input type="hidden"
-               name="crits[{{ groupCount }}][id]"
+               data-template="rubric-group-id"
+               {% if groupCount %}name="crits[{{ groupCount }}][id]"{% endif %}
                value="{{ group.id }}"
-               {% if group.usageTotal > 0 %}readonly{% endif %} />
+               {% if group and group.usageTotal > 0 %}readonly{% endif %} />
 
         <input type="text"
-               name="crits[{{ groupCount }}][name]"
+               data-rubric-group
+               data-template="rubric-group-name"
+               {% if groupCount %}name="crits[{{ groupCount }}][name]"{% endif %}
                value="{{ group.name }}"
-               {% if group.usageTotal > 0 %}readonly{% endif %}
-               data-rubric-group />
+               {% if group and group.usageTotal > 0 %}readonly{% endif %}
+        />
 
         {# Input for curriculum code #}
         <select data-curriculum-code-selector
-                name="crits[{{ groupCount }}][curriculumCode][]"
+                data-template="rubric-group-curriculum-codes"
+                {% if groupCount %}name="crits[{{ groupCount }}][curriculumCode][]"{% endif %}
                 multiple>
             {% for code in group.curriculumNodes %}
                 <option label="{{ code.code }}"
