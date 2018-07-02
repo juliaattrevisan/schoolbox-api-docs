@@ -140,7 +140,8 @@
     </div>
 </div>
 
-{% if news.body|length %}
+{# Display body when either there's text content, or an image #}
+{% if news.body|length or news.featureImage.hash %}
 <div class="row">
     <div class="small-12 island">
         <section>
