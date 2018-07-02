@@ -268,9 +268,10 @@ class Controller extends BaseController
     private function persistCriteria(FolderModel $folder, array $data): void
     {
         /** @var Group[] $groupList */
-        $groupList  = $this->groupMapper->createCollection();
-        $parentType = Group::PARENT_TYPE_CATEGORY;
-        $folderId   = $folder->getId();
+        $groupList    = $this->groupMapper->createCollection();
+        $parentType   = Group::PARENT_TYPE_CATEGORY;
+        $folderId     = $folder->getId();
+        $isSpecFolder = $folder->hasCourseSpecification() || $folder->hasUnitSpecification();
 
         // iterate through list of provided criteria changes
         foreach ($data as $critData) {
@@ -314,11 +315,12 @@ class Controller extends BaseController
                     ]);
 
                     // A criterion's name is changeable if any of the following are true:
-                    // * Its folder is a course spec
-                    // * Its folder is a unit spec
+                    // * Its folder is a course or unit spec
                     // * Criterion isn't in use on any due works
-                    $isChangeable = $folder->hasCourseSpecification() || $folder->hasUnitSpecification();
-                    if (!$isChangeable) {
+                    // (Its curriculum codes are always changeable)
+                    if ($isSpecFolder) {
+                        $isChangeable = true;
+                    } else {
                         $usage        = $this->usageMapper->countByColumn('criterion_id', $critId);
                         $isChangeable = ($usage === 0);
                     }
