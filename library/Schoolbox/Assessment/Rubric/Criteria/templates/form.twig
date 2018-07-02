@@ -86,7 +86,10 @@ $(function() {
                         .removeData('rubric-criterion-new')
                     ;
                     idInput.attr('name', 'crits['+groupId+'][items]['+criterionId+'][id]');
-                    codeInput.attr('name', 'crits['+groupId+'][items]['+criterionId+'][curriculumCode]');
+                    codeInput
+                        .attr('name', 'crits['+groupId+'][items]['+criterionId+'][curriculumCode]')
+                        .removeClass('hide')
+                        .curriculumSelector();
                 }
 
                 if (addGroup) {
@@ -99,7 +102,10 @@ $(function() {
                         .removeData('rubric-group-new')
                     ;
                     idInput.attr('name', 'crits['+groupId+'][id]');
-                    codeInput.attr('name', 'crits['+groupId+'][curriculumCode][]');
+                    codeInput
+                        .attr('name', 'crits['+groupId+'][curriculumCode][]')
+                        .removeClass('hide')
+                        .curriculumSelector();
                 }
             }
         }
@@ -163,7 +169,7 @@ $(function() {
 
     // Set up the curriculum code selection
     $(function() {
-        $('[data-curriculum-code-selector]').each(function (i, v) {
+        $('[data-curriculum-code-selector]:visible').each(function (i, v) {
             var $this = $(this);
             $this.curriculumSelector({
                 value: $.selectizeSelector.getValueFromSelect($this)

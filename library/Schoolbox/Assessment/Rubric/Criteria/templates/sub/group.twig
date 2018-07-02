@@ -32,7 +32,9 @@
         <select data-curriculum-code-selector
                 data-template="rubric-group-curriculum-codes"
                 {% if showNames %}name="crits[{{ groupCount }}][curriculumCode][]"{% endif %}
-                multiple>
+                multiple
+                {% if new %}class="hide"{% endif %}
+        >
             {% for code in group.curriculumNodes %}
                 <option label="{{ code.code }}"
                         value="{{ code.id }}"
