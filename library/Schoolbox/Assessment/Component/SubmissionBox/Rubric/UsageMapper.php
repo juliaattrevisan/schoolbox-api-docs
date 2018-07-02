@@ -125,7 +125,11 @@ class UsageMapper extends Schoolbox\Mapper {
         ";
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute([$criterionId]);
-        return $statement->fetchAll();
+        $result = [];
+        foreach ($statement as $row) {
+            $result[$row['id']] = $row;
+        }
+        return $result;
     }
 
 
