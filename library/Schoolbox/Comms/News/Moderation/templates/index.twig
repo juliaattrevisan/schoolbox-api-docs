@@ -42,7 +42,7 @@
             {% if moderationRequired %}
                 <p>All {{ locale.news.proper }} articles have been processed.</p>
             {% else %}
-                <p>According to Comms Policy, Moderation isn't required.</p>
+                <p>According to <a href="{{ routeLookup('commsNewsPolicy.getPolicies') }}" title="Review policies">Comms Policy</a>, Moderation isn't required.</p>
             {% endif %}
 
             <p>You can <a href="">view statistics on existing {{ locale.news.proper }} articles</a> to see how they are faring.</p>
