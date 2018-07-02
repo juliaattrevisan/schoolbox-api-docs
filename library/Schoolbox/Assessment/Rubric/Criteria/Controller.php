@@ -262,12 +262,15 @@ class Controller extends BaseController
         // iterate through list of provided criteria changes
         foreach ($data as $critData) {
             // Find the group; if it doesn't exist create it
+            $critId    = $critData['id'];
+            $critName  = $critData['name'];
+            $groupId   = $critData['groupId'];
             $groupName = $critData['groupName'];
             if (!isset($groupList[$groupName])) {
-                if (isset($critData['groupId'])) {
+                if ($critData['groupId']) {
                     try {
                         $group = $this->groupMapper->findOneByColumnList([
-                            'id'          => $critData['groupId'],
+                            'id'          => $groupId,
                             'parent_id'   => $folderId,
                             'parent_type' => $parentType,
                         ]);
@@ -283,27 +286,30 @@ class Controller extends BaseController
             }
 
             // Now, find the criterion: if it doesn't exist create it
-            $group  = $groupList[$groupName];
-            $critId = $critData['id'];
-            try {
-                $criteria = $this->criterionMapper->findOneByColumnList([
-                    'id'              => $critId,
-                    'rubric_group_id' => $group->getId(),
-                ]);
-                $criteria->setName($critData['name']);
+            $group = $groupList[$groupName];
+            if ($critId) {
+                try {
+                    $criterion = $this->criterionMapper->findOneByColumnList([
+                        'id'              => $critId,
+                        'rubric_group_id' => $group->getId(),
+                    ]);
+                    $criterion->setName($critName);
 
-                // Do not edit criteria that are in use on a class page, can edit in course though
-                $usage = $this->usageMapper->findByColumnList(['criterion_id' => $critId]);
-                if (\count($usage) && !($folder->hasCourseSpecification() || $folder->hasUnitSpecification())) {
-                    continue; // possibly throw an error of some kind
+                    // Do not edit criteria that are in use on a class page, can edit in course though
+                    $usage = $this->usageMapper->findByColumnList(['criterion_id' => $critId]);
+                    if (\count($usage) && !($folder->hasCourseSpecification() || $folder->hasUnitSpecification())) {
+                        continue; // possibly throw an error of some kind
+                    }
+                    $this->criterionMapper->save($criterion);
+
+                } catch (\Exception $e) {
+                    // ID exists, but not in this context; abort
+                    throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
                 }
-            } catch (\Exception $e) {
-                $criteria = new Criterion();
-                $criteria->setGroup($group);
-                $criteria->setName($critData['name']);
+            } else {
+                // Create a new one
+                $this->criterionMapper->findOrCreateOneForFolderByKey($folderId, $critName, $groupName);
             }
-
-            $this->criterionMapper->save($criteria);
         }
     }
 }
