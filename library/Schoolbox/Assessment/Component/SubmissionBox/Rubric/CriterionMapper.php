@@ -67,12 +67,7 @@ class CriterionMapper extends BaseMapper {
         return "
             SELECT
                 {$this->getColumnString()},
-                {$this->getJoinColumnString('group', 'g')},
-                {$this->getJoinColumnString('curriculum_node_for_rubric_criterion', 'cn')},
-                {$this->getJoinColumnString('curriculum_node_for_rubric_criterion.level', 'cnl')},
-                {$this->getJoinColumnString('curriculum_node_for_rubric_criterion.level.source', 'cnls')},
-                {$this->getJoinColumnString('curriculum_node_for_rubric_criterion.area', 'cna')},
-                {$this->getJoinColumnString('curriculum_node_for_rubric_criterion.area.source', 'cnas')}
+                {$this->getJoinColumnString('group', 'g')}
         ";
     }
 
@@ -85,11 +80,6 @@ class CriterionMapper extends BaseMapper {
         return "
             FROM {$this->getTable()}
             LEFT JOIN {$this->getJoinSql('group', '', 'g')}
-            LEFT JOIN {$this->getJoinSql('curriculum_node_for_rubric_criterion', '', 'cn')}
-            LEFT JOIN {$this->getJoinSql('curriculum_node_for_rubric_criterion.level', 'cn', 'cnl')}
-            LEFT JOIN {$this->getJoinSql('curriculum_node_for_rubric_criterion.level.source', 'cnl', 'cnls')}
-            LEFT JOIN {$this->getJoinSql('curriculum_node_for_rubric_criterion.area', 'cn', 'cna')}
-            LEFT JOIN {$this->getJoinSql('curriculum_node_for_rubric_criterion.area.source', 'cna', 'cnas')}
         ";
     }
 
@@ -99,8 +89,9 @@ class CriterionMapper extends BaseMapper {
      */
     protected function hydrateSelect(PDOStatement $statement): GenericCollection
     {
-        /** @var GroupMapper $groupMapper */
-        /** @var NodeMapper  $curriculumNodeMapper */
+        /** @var GroupMapper                   $groupMapper */
+        /** @var NodeMapper                    $curriculumNodeMapper */
+        /** @var GenericCollection|Criterion[] $collection */
         $groupMapper          = $this->getJoinMapper('group');
         $curriculumNodeMapper = $this->getJoinMapper('curriculum_node_for_rubric_criterion');
         $collection           = $this->createCollection();
@@ -111,14 +102,40 @@ class CriterionMapper extends BaseMapper {
                 $crit->setGroup($groupMapper->hydrate($row, 'g'));
             }
             $collection[$crit->getId()] = $crit;
+        }
 
-            // Fetching multiple 1-M relations in a single query is still how
-            // you get ants
-            $curriculumNode = $curriculumNodeMapper->hydrateWithRelatedJoins($row, 'cn', 'cna', 'cnas', 'cnl', 'cnls');
-            if ($curriculumNode){
-                $collection[$crit->getId()]->getCurriculumNodes()[$curriculumNode->getId()] = $curriculumNode;
+        // Fetch curriculum nodes for criterion and group separately
+        // TODO abstract into node mapper somehow
+        $ids = $collection->keys();
+        if (!empty($ids)) {
+            $nodePb    = $this->getPredicateBuilder()->in('id', $ids);
+            $where     = implode(' AND ', $nodePb->getWhere());
+            $nodeQuery = "
+                SELECT
+                    {$this->getTable()}.id,
+                    {$this->getJoinColumnString('curriculum_node_for_rubric_criterion', 'cn')},
+                    {$this->getJoinColumnString('curriculum_node_for_rubric_criterion.level', 'cnl')},
+                    {$this->getJoinColumnString('curriculum_node_for_rubric_criterion.level.source', 'cnls')},
+                    {$this->getJoinColumnString('curriculum_node_for_rubric_criterion.area', 'cna')},
+                    {$this->getJoinColumnString('curriculum_node_for_rubric_criterion.area.source', 'cnas')}
+                FROM {$this->getTable()}
+                INNER JOIN {$this->getJoinSql('curriculum_node_for_rubric_criterion', '', 'cn')}
+                LEFT  JOIN {$this->getJoinSql('curriculum_node_for_rubric_criterion.level', 'cn', 'cnl')}
+                LEFT  JOIN {$this->getJoinSql('curriculum_node_for_rubric_criterion.level.source', 'cnl', 'cnls')}
+                LEFT  JOIN {$this->getJoinSql('curriculum_node_for_rubric_criterion.area', 'cn', 'cna')}
+                LEFT  JOIN {$this->getJoinSql('curriculum_node_for_rubric_criterion.area.source', 'cna', 'cnas')}
+                WHERE {$where}
+            ";
+
+            $nodeStmt = $this->getDatabase()->prepare($nodeQuery);
+            $nodeStmt->execute($nodePb->getParams());
+            foreach ($nodeStmt as $nodeRow) {
+                $id   = $nodeRow['id'];
+                $node = $curriculumNodeMapper->hydrateWithRelatedJoins($nodeRow, 'cn', 'cna', 'cnas', 'cnl', 'cnls');
+                $collection[$id]->getCurriculumNodes()[$node->getId()] = $node;
             }
         }
+
         return $collection;
     }
 

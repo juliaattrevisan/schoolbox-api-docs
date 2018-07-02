@@ -110,6 +110,9 @@ class GroupMapper extends BaseMapper
                 $collection[$group->getId()]->getCurriculumNodes()[$curriculumNode->getId()] = $curriculumNode;
             }
         }
+
+        // Fetch curriculum nodes separately
+
         return $collection;
     }
 
