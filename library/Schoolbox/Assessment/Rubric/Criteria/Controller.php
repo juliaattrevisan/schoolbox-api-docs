@@ -15,6 +15,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Group;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\GroupMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\UsageMapper;
+use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Resource\Folder\Model as FolderModel;
@@ -34,6 +35,13 @@ class Controller extends BaseController
      * @var GroupMapper
      */
     private $groupMapper;
+
+
+    /**
+     * @var NodeMapper
+     */
+    private $nodeMapper;
+
 
     /**
      * @var UsageMapper
@@ -64,6 +72,7 @@ class Controller extends BaseController
      *
      * @param CriterionMapper $criterionMapper
      * @param GroupMapper     $groupMapper
+     * @param NodeMapper      $nodeMapper
      * @param UsageMapper     $usageMapper
      * @param RubricMapper    $rubricMapper
      * @param ErrorMapper     $errorMapper
@@ -72,6 +81,7 @@ class Controller extends BaseController
     public function __construct(
         CriterionMapper $criterionMapper,
         GroupMapper $groupMapper,
+        NodeMapper $nodeMapper,
         UsageMapper $usageMapper,
         RubricMapper $rubricMapper,
         ErrorMapper $errorMapper,
@@ -79,6 +89,7 @@ class Controller extends BaseController
     ) {
         $this->criterionMapper = $criterionMapper;
         $this->groupMapper     = $groupMapper;
+        $this->nodeMapper      = $nodeMapper;
         $this->usageMapper     = $usageMapper;
         $this->rubricMapper    = $rubricMapper;
         $this->errorMapper     = $errorMapper;
@@ -197,10 +208,12 @@ class Controller extends BaseController
             if (\count($group['items'])) {
                 foreach ($group['items'] as $crit) {
                     $data[] = [
-                        'groupId'   => (int)$group['id'],
-                        'groupName' => $group['name'],
-                        'id'        => (int)$crit['id'],
-                        'name'      => $crit['name'],
+                        'groupId'    => (int)$group['id'],
+                        'groupName'  => $group['name'],
+                        'groupCodes' => $group['curriculumCode'],
+                        'id'         => (int)$crit['id'],
+                        'name'       => $crit['name'],
+                        'codes'      => $crit['curriculumCode'],
                     ];
                 }
             }
@@ -279,6 +292,9 @@ class Controller extends BaseController
                 } else {
                     $group = $this->groupMapper->findOrCreateOneForFolderByName($folderId, $groupName, false);
                 }
+
+                // Set curriculum codes
+                $group->setCurriculumNodes($this->nodeMapper->findByColumn('id', $critData['groupCodes']));
                 $this->groupMapper->save($group);
                 $groupList[$groupName] = $group;
             }
@@ -298,12 +314,15 @@ class Controller extends BaseController
                     ]);
                     $criterion->setName($critName);
 
-                    // Do not edit criteria that are in use on a class page, can edit in course though
+                    // Do not change the name of criteria that are in use on a class page, can edit in course though
+                    // DO allow setting of curriculum codes though
                     $usage = $this->usageMapper->findByColumnList(['criterion_id' => $critId]);
                     if (\count($usage) && !($folder->hasCourseSpecification() || $folder->hasUnitSpecification())) {
-                        continue; // possibly throw an error of some kind
+                        // continue; // possibly throw an error of some kind
+                    } else {
+                        $criterion->setName($critName);
                     }
-                    $this->criterionMapper->save($criterion);
+//                    $this->criterionMapper->save($criterion);
 
                 } catch (\Exception $e) {
                     // ID exists, but not in this context; abort
@@ -311,8 +330,16 @@ class Controller extends BaseController
                 }
             } else {
                 // Create a new one
-                $this->criterionMapper->findOrCreateOneForFolderByKey($folderId, $critName, $groupName, false);
+                $criterion = $this->criterionMapper->findOrCreateOneForFolderByKey(
+                    $folderId,
+                    $critName,
+                    $groupName,
+                    false
+                );
             }
+
+            $criterion->setCurriculumNodes($this->nodeMapper->findByColumn('id', $critData['codes']));
+            $this->criterionMapper->save($criterion);
         }
     }
 }

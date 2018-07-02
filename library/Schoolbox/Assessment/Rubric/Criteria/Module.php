@@ -16,6 +16,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\GroupMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\UsageMapper;
+use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
@@ -75,6 +76,7 @@ class Module extends BaseModule
                 [
                     'criterionMapper' => $this->getMapperFactory()->getLazy(CriterionMapper::class),
                     'groupMapper'     => $this->getMapperFactory()->getLazy(GroupMapper::class),
+                    'nodeMapper'      => $this->getMapperFactory()->getLazy(NodeMapper::class),
                     'usageMapper'     => $this->getMapperFactory()->getLazy(UsageMapper::class),
                     'rubricMapper'    => $this->getMapperFactory()->getLazy(RubricMapper::class),
                     'errorMapper'     => $this->getMapperFactory()->getLazy(ErrorMapper::class),
