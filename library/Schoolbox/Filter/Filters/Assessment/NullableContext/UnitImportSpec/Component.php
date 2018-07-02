@@ -165,8 +165,9 @@ class Component extends Filter\BaseComponent
     public function toContext()
     {
         return array_merge(parent::toContext(), [
-            'courseSpecs' => $this->courseSpecs,
-            'keyNone'     => Definition::KEY_NONE,
+            'courseSpecs'     => $this->courseSpecs,
+            'keyNone'         => Definition::KEY_NONE,
+            'hideCourseTitle' => $this->getPageFilter()->getPage() === Filter\Page\Model::PAGE_COURSE_MARK_BOOK,
         ]);
     }
 
