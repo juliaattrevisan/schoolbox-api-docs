@@ -84,7 +84,7 @@ class Controller extends Base
             'newsArticles' => $newsArticles,
             'recentArticles' => $lists->getRecentlyAccepted(),
             'moderationRequired' => $moderationRequired
-        ])->setTitle('Example'));
+        ])->setTitle('Moderation List'));
     }
 
 
