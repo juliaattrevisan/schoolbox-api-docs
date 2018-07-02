@@ -45,15 +45,18 @@
 
     <nav>
         {% if readonly %}
+            {# button for showing assessments which use this criterion #}
             <a class="icon-info"
                data-reveal-id="criterion-{{ criterion.id }}"
                href="#"
                title="Show {{ locale.assessment.plural }} using {{ locale.rubricCriterion }}"></a>
         {% else %}
-            <a class="icon-more"
-               data-dropdown="dropdown-i{{ criterion.id }}"
-               href="#"
-               title="Actions"></a>
+            {# delete button, with "are you sure" if it has been saved already #}
+            <a class="icon-delete"
+               data-rubric-criterion="{{ criterion.id }}"
+               data-role="remove-criterion"
+               title="Delete {{ locale.rubricCriterion.proper }}"
+               href="#"></a>
         {% endif %}
     </nav>
 
@@ -73,13 +76,5 @@
             </article>
             <a class="close-reveal-modal" aria-label="Close">&#215;</a>
         </div>
-    {% else %}
-        <ul id="dropdown-i{{ criterion.id }}" class="f-dropdown" data-dropdown-content="">
-            <li>
-                <a class="icon-delete"
-                   data-role="remove-criterion"
-                   href="#">Delete {{ locale.rubricCriterion.proper }}</a>
-            </li>
-        </ul>
     {% endif %}
 </li>
