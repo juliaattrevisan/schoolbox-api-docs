@@ -245,7 +245,7 @@ $(function() {
                                 {% include '@rubricCriteria/sub/group.twig' with {
                                     group:      group.group,
                                     groupCount: groupCount,
-                                    usageCount: group.usageCount,
+                                    usage:      group.usage,
                                 } only %}
                             </ul>
                         </div>
@@ -281,7 +281,7 @@ $(function() {
                             {% include '@rubricCriteria/sub/group.twig' with {
                                 group:      null,
                                 groupCount: null,
-                                usageCount: null,
+                                usage:      null,
                             } only %}
                         </ul>
                     </div>

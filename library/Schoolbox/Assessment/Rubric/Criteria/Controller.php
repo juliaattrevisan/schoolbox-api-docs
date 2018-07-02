@@ -171,14 +171,14 @@ class Controller extends BaseController
             // Build group item if it's not there
             if (!isset($groups[$groupId])) {
                 $groups[$groupId] = [
-                    'group'      => $criterion->getGroup(),
-                    'usageCount' => 0,
-                    'criteria'   => [],
+                    'group'    => $criterion->getGroup(),
+                    'usage'    => [],
+                    'criteria' => [],
                 ];
             }
 
             $usage                          = $this->usageMapper->findUsage($criterion->getId());
-            $groups[$groupId]['usageCount'] += \count($usage);
+            $groups[$groupId]['usage']      += $usage;
             $groups[$groupId]['criteria'][] = [
                 'criterion' => $criterion,
                 'usage'     => $usage,
