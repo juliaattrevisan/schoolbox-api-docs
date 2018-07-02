@@ -166,7 +166,7 @@
         <section class="no-pad no-margin">
             <p class="content no-margin"><span class="icon-info"></span>
                 This {{ locale.news }} was <strong>rejected</strong>
-                by {{ news.rejectedBy.fullname }}
+                by <a href="/search/user/{{ news.rejectedBy.id }}" title="View Profile">{{ news.rejectedBy.fullname }}</a>
                 on {{ news.rejectedAt.local }}
 
                 {% if news.rejectedReason|length %}
