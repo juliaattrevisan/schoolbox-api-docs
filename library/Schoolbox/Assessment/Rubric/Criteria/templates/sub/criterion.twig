@@ -1,13 +1,15 @@
 {##
  # Params:
- # * criterion:  If null, this is an input for a new criterion
- # * usage:      Assessments that use the criterion
- # * groupCount: The number of the group, used only for array keys.
- #               If null, no name is output.
+ # * criterion:    If null, this is an input for a new criterion
+ # * usage:        Assessments that use the criterion
+ # * groupCount:   The number of the group, used only for array keys.
+ #                 If null, no name is output.
+ # * isSpecFolder: Is the folder this criterion is in a course or unit spec?
+ #                 If so, the group name is never readonly.
  #}
 
 {% set showNames = groupCount is not null and criterion is not null %}
-{% set readonly  = criterion is not null and usage|length > 0 %}
+{% set readonly  = not isSpecFolder and criterion is not null and usage|length > 0 %}
 {% set new       = criterion is null %}
 <li class="actions-small-1"
     data-rubric-criterion-row="{{ groupCount }}"

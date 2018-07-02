@@ -189,6 +189,7 @@ class Controller extends BaseController
             'maxGroupId'          => \count($groups),
             'maxCritId'           => $topId + 1,
             'showCurriculumCodes' => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
+            'isSpecFolder'        => $folder->hasCourseSpecification() || $folder->hasUnitSpecification(),
         ];
     }
 

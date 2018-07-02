@@ -243,9 +243,10 @@ $(function() {
                             <h3>{{ locale.rubricGroup.proper }}</h3>
                             <ul class="information-list">
                                 {% include '@rubricCriteria/sub/group.twig' with {
-                                    group:      group.group,
-                                    groupCount: groupCount,
-                                    usage:      group.usage,
+                                    group:        group.group,
+                                    groupCount:   groupCount,
+                                    usage:        group.usage,
+                                    isSpecFolder: isSpecFolder,
                                 } only %}
                             </ul>
                         </div>
@@ -256,17 +257,19 @@ $(function() {
 
                                 {% for criterion in group.criteria %}
                                     {% include '@rubricCriteria/sub/criterion.twig' with {
-                                        criterion:  criterion.criterion,
-                                        groupCount: groupCount,
-                                        usage:      criterion.usage,
+                                        criterion:    criterion.criterion,
+                                        groupCount:   groupCount,
+                                        usage:        criterion.usage,
+                                        isSpecFolder: isSpecFolder,
                                     } only %}
                                 {% endfor %}
 
                                 {# New criterion within group #}
                                 {% include '@rubricCriteria/sub/criterion.twig' with {
-                                    criterion:  null,
-                                    groupCount: groupCount,
-                                    usage:      null,
+                                    criterion:    null,
+                                    groupCount:   groupCount,
+                                    usage:        null,
+                                    isSpecFolder: isSpecFolder,
                                 } only %}
                             </ul>
                         </div>
@@ -279,9 +282,10 @@ $(function() {
                         <h3>{{ locale.rubricGroup.proper }}</h3>
                         <ul class="information-list">
                             {% include '@rubricCriteria/sub/group.twig' with {
-                                group:      null,
-                                groupCount: null,
-                                usage:      null,
+                                group:        null,
+                                groupCount:   null,
+                                usage:        null,
+                                isSpecFolder: isSpecFolder,
                             } only %}
                         </ul>
                     </div>
@@ -290,9 +294,10 @@ $(function() {
                         <ul class="information-list">
                             {# New criterion within new group #}
                             {% include '@rubricCriteria/sub/criterion.twig' with {
-                                criterion:  null,
-                                groupCount: null,
-                                usage:      null,
+                                criterion:    null,
+                                groupCount:   null,
+                                usage:        null,
+                                isSpecFolder: isSpecFolder,
                             } only %}
                         </ul>
                     </div>
