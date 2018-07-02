@@ -262,8 +262,6 @@ class Controller extends BaseController
         // iterate through list of provided criteria changes
         foreach ($data as $critData) {
             // Find the group; if it doesn't exist create it
-            $critId    = $critData['id'];
-            $critName  = $critData['name'];
             $groupId   = $critData['groupId'];
             $groupName = $critData['groupName'];
             if (!isset($groupList[$groupName])) {
@@ -284,9 +282,14 @@ class Controller extends BaseController
                 $this->groupMapper->save($group);
                 $groupList[$groupName] = $group;
             }
+        }
 
+        foreach ($data as $critData) {
             // Now, find the criterion: if it doesn't exist create it
-            $group = $groupList[$groupName];
+            $critId    = $critData['id'];
+            $critName  = $critData['name'];
+            $groupName = $critData['groupName'];
+            $group     = $groupList[$groupName];
             if ($critId) {
                 try {
                     $criterion = $this->criterionMapper->findOneByColumnList([
