@@ -234,97 +234,19 @@ $(function() {
                             <ul class="information-list">
 
                                 {% for criterion in group.criteria %}
-                                    {% set criterionInUse = criterion.usage|length > 0 %}
-                                    <li class="actions-small-1" data-rubric-criterion-row="{{ groupCount }}">
-                                        <div class="list-item">
-                                            <input type="hidden"
-                                                   name="crits[{{ groupCount }}][items][{{ criterion.criterion.id }}][id]"
-                                                   value="i{{ criterion.criterion.id }}"
-                                                   {% if criterionInUse %}readonly{% endif %} />
-                                            <input type="text"
-                                                   name="crits[{{ groupCount }}][items][{{ criterion.criterion.id }}][name]"
-                                                   value="{{ criterion.criterion.name }}"
-                                                   id="i{{ criterion.criterion.id }}"
-                                                   {% if criterionInUse %}readonly{% endif %}
-                                                   data-rubric-criterion />
-
-                                            {# Input for curriculum code #}
-                                            <select data-curriculum-code-selector
-                                                    name="crits[{{ groupCount }}][items][{{ criterion.criterion.id }}][curriculumCode][]"
-                                                    multiple>
-                                                {% for code in criterion.criterion.curriculumNodes %}
-                                                    <option label="{{ code.code }}"
-                                                            value="{{ code.id }}"
-                                                            title="{{ code.description }}"
-                                                            data-value-object="{{ code|json_encode }}"
-                                                            selected
-                                                    >{{ code.code }}</option>
-                                                {% endfor %}
-                                            </select>
-                                        </div>
-                                        <nav>
-                                            {% if criterionInUse %}
-                                                <a class="icon-info"
-                                                   data-reveal-id="criterion-{{ criterion.criterion.id }}"
-                                                   href="#"
-                                                   title="Show {{ locale.assessment.plural }} using {{ locale.rubricCriterion }}"></a>
-                                            {% else %}
-                                                <a class="icon-more"
-                                                   data-dropdown="dropdown-i{{ criterion.criterion.id }}"
-                                                   href="#"
-                                                   title="Actions"></a>
-                                            {% endif %}
-                                        </nav>
-
-                                        {% if criterionInUse %}
-                                            {% set criterionUsageCount = criterion.usage|length %}
-                                            <div data-reveal id="criterion-{{ criterion.criterion.id }}" class="reveal-modal">
-                                                <article>
-                                                    <h2>{{ criterion.criterion.name }}</h2>
-                                                    <p>{{ locale.rubricCriterion.proper }} is in use on {{ criterionUsageCount}}
-                                                        {{ criterionUsageCount > 1 ? locale.assessment.plural : locale.assessment }};
-                                                    </p>
-                                                    <ul>
-                                                        {% for assessment in criterion.usage %}
-                                                        <li><a href="{{ routeLookup('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id}) }}">{{ assessment.title }}</a></li>
-                                                        {% endfor %}
-                                                    </ul>
-                                                </article>
-                                                <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-                                            </div>
-                                        {% else %}
-                                            <ul id="dropdown-i{{ criterion.criterion.id }}" class="f-dropdown" data-dropdown-content="">
-                                                <li>
-                                                    <a class="icon-delete"
-                                                       data-role="remove-criterion"
-                                                       href="#">Delete {{ locale.rubricCriterion.proper }}</a>
-                                                </li>
-                                            </ul>
-                                        {% endif %}
-
-                                    </li>
+                                    {% include '@rubricCriteria/sub/criterion.twig' with {
+                                        criterion:  criterion.criterion,
+                                        groupCount: groupCount,
+                                        usage:      criterion.usage,
+                                    } only %}
                                 {% endfor %}
 
                                 {# New criterion within group #}
-                                <li class="actions-small-1" data-rubric-unsaved data-rubric-criterion-new-row data-rubric-criterion-row="{{ groupCount }}">
-                                    <div class="list-item">
-                                        <input type="text"
-                                               value=""
-                                               data-rubric-criterion
-                                               data-rubric-criterion-new="1"
-                                               placeholder="Add {{ locale.rubricCriterion.proper }} to {{ group.group.name }}..." />
-                                    </div>
-                                    <nav>
-                                        <a href="#" class="icon-more hide" data-dropdown-dormant title="Actions"></a>
-                                    </nav>
-                                    <ul class="f-dropdown" data-dropdown-content-dormant>
-                                        <li>
-                                            <a class="icon-delete"
-                                               data-role="remove-criterion"
-                                               href="#">Delete {{ locale.rubricCriterion.proper }}</a>
-                                        </li>
-                                    </ul>
-                                </li>
+                                {% include '@rubricCriteria/sub/criterion.twig' with {
+                                    criterion:  null,
+                                    groupCount: groupCount,
+                                    usage:      null,
+                                } only %}
                             </ul>
                         </div>
                     </fieldset>
@@ -344,34 +266,12 @@ $(function() {
                     <div class="{{ criterionColumn }} columns">
                         <h3>{{ locale.rubricCriterion.properPlural }}</h3>
                         <ul class="information-list">
-                            <li class="actions-small-1" data-rubric-unsaved data-rubric-criterion-new-row data-rubric-criterion-row="{{ groupCount }}">
-                                <div class="list-item">
-
-                                    <input type="hidden"
-                                           value="" />
-
-                                    <input type="text"
-                                           value=""
-                                           data-rubric-criterion
-                                           data-rubric-criterion-new="1"
-                                           placeholder="Add {{ locale.rubricCriterion.proper }}..." />
-
-                                    <select data-curriculum-code-selector
-                                            multiple>
-                                    </select>
-
-                                </div>
-                                <nav>
-                                    <a href="#" class="icon-more hide" data-dropdown-dormant title="Actions"></a>
-                                </nav>
-                                <ul class="f-dropdown" data-dropdown-content-dormant>
-                                    <li>
-                                        <a class="icon-delete"
-                                           data-role="remove-criterion"
-                                           href="#">Delete {{ locale.rubricCriterion.proper }}</a>
-                                    </li>
-                                </ul>
-                            </li>
+                            {# New criterion within new group #}
+                            {% include '@rubricCriteria/sub/criterion.twig' with {
+                                criterion:  null,
+                                groupCount: null,
+                                usage:      null,
+                            } only %}
                         </ul>
                     </div>
                 </fieldset>

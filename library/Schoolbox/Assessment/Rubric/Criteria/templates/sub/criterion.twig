@@ -1,26 +1,36 @@
 {##
  # Params:
- # * criterion: if null this is an input for a new criterion
- # * usage:     assessments used
+ # * criterion:  If null, this is an input for a new criterion
+ # * usage:      Assessments that use the criterion
+ # * groupCount: The number of the group, used only for array keys.
+ #               If null, no name is output.
  #}
 
-{% set criterionInUse = criterion.usage|length > 0 %}
-<li class="actions-small-1" data-rubric-criterion-row="{{ groupCount }}">
+{% set showNames = groupCount is not null and criterion is not null %}
+{% set readonly  = criterion is not null and usage|length > 0 %}
+<li class="actions-small-1"
+    data-rubric-criterion-row="{{ groupCount }}"
+    {% if not criterion %}data-rubric-unsaved data-rubric-criterion-new-row{% endif %}
+>
     <div class="list-item">
         <input type="hidden"
-               name="crits[{{ groupCount }}][items][{{ criterion.id }}][id]"
+               data-template="rubric-criterion-id"
+               {% if showNames %}name="crits[{{ groupCount }}][items][{{ criterion.id }}][id]"{% endif %}
                value="i{{ criterion.id }}"
-               {% if criterionInUse %}readonly{% endif %} />
+               {% if readonly %}readonly{% endif %} />
+
         <input type="text"
-               name="crits[{{ groupCount }}][items][{{ criterion.id }}][name]"
+               data-template="rubric-criterion-name"
+               {% if showNames %}name="crits[{{ groupCount }}][items][{{ criterion.id }}][name]"{% endif %}
                value="{{ criterion.name }}"
-               id="i{{ criterion.id }}"
-               {% if criterionInUse %}readonly{% endif %}
+               {% if showNames %}id="i{{ criterion.id }}"{% endif %}
+               {% if readonly %}readonly{% endif %}
                data-rubric-criterion />
 
         {# Input for curriculum code #}
         <select data-curriculum-code-selector
-                name="crits[{{ groupCount }}][items][{{ criterion.id }}][curriculumCode][]"
+                data-template="rubric-criterion-curriculum-codes"
+                {% if showNames %}name="crits[{{ groupCount }}][items][{{ criterion.id }}][curriculumCode][]"{% endif %}
                 multiple>
             {% for code in criterion.curriculumNodes %}
                 <option label="{{ code.code }}"
@@ -32,8 +42,9 @@
             {% endfor %}
         </select>
     </div>
+
     <nav>
-        {% if criterionInUse %}
+        {% if readonly %}
             <a class="icon-info"
                data-reveal-id="criterion-{{ criterion.id }}"
                href="#"
@@ -46,8 +57,8 @@
         {% endif %}
     </nav>
 
-    {% if criterionInUse %}
-        {% set criterionUsageCount = criterion.usage|length %}
+    {% if readonly %}
+        {% set criterionUsageCount = usage|length %}
         <div data-reveal id="criterion-{{ criterion.id }}" class="reveal-modal">
             <article>
                 <h2>{{ criterion.name }}</h2>
@@ -55,7 +66,7 @@
                     {{ criterionUsageCount > 1 ? locale.assessment.plural : locale.assessment }};
                 </p>
                 <ul>
-                    {% for assessment in criterion.usage %}
+                    {% for assessment in usage %}
                         <li><a href="{{ routeLookup('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id}) }}">{{ assessment.title }}</a></li>
                     {% endfor %}
                 </ul>

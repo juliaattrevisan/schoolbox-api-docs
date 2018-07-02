@@ -5,26 +5,30 @@
  #               If null, no name is output.
  #}
 
+{% set showNames = groupCount is not null %}
+{% set readonly  = group is not null and group.usageTotal > 0 %}
 <li class="actions-small-0">
     <div class="list-item">
+        {# Hidden input for group ID #}
         <input type="hidden"
                data-template="rubric-group-id"
-               {% if groupCount %}name="crits[{{ groupCount }}][id]"{% endif %}
+               {% if showNames %}name="crits[{{ groupCount }}][id]"{% endif %}
                value="{{ group.id }}"
-               {% if group and group.usageTotal > 0 %}readonly{% endif %} />
+               {% if readonly %}readonly{% endif %} />
 
+        {# Hidden input for group name #}
         <input type="text"
                data-rubric-group
                data-template="rubric-group-name"
-               {% if groupCount %}name="crits[{{ groupCount }}][name]"{% endif %}
+               {% if showNames %}name="crits[{{ groupCount }}][name]"{% endif %}
                value="{{ group.name }}"
-               {% if group and group.usageTotal > 0 %}readonly{% endif %}
+               {% if readonly > 0 %}readonly{% endif %}
         />
 
-        {# Input for curriculum code #}
+        {# Input for group curriculum code #}
         <select data-curriculum-code-selector
                 data-template="rubric-group-curriculum-codes"
-                {% if groupCount %}name="crits[{{ groupCount }}][curriculumCode][]"{% endif %}
+                {% if showNames %}name="crits[{{ groupCount }}][curriculumCode][]"{% endif %}
                 multiple>
             {% for code in group.curriculumNodes %}
                 <option label="{{ code.code }}"
@@ -36,5 +40,6 @@
             {% endfor %}
         </select>
     </div>
+
     <nav></nav>
 </li>
