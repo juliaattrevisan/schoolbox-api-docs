@@ -152,5 +152,4 @@ class Module extends BaseModule
     {
         return $this->getMapperFactory()->get(ErrorMapper::class);
     }
-
 }
