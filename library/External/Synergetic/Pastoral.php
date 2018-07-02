@@ -488,6 +488,8 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                     $propagator = $this->getPastoralMapper()->getEventPropagator();
                     $this->getPastoralMapper()->setEventPropagator(new MockPropagator());
                     $this->getPastoralMapper()->save($pastoral);
+
+                    // Restore the proper propagator
                     $this->getPastoralMapper()->setEventPropagator($propagator);
                 }
 
@@ -632,7 +634,15 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                 'modifiedOwnerId' => $comment->getOwner()->getExternalId(),
             ]);
             $comment->setExternalCode($this->connector->lastInsertId());
+
+            // Stop pastoral notifier firing on this update, otherwise they receive both a create/update
+            // notification every time someone creates a pastoral record
+            $propagator = $this->getPastoralCommentMapper()->getEventPropagator();
+            $this->getPastoralCommentMapper()->setEventPropagator(new MockPropagator());
             $this->getPastoralCommentMapper()->save($comment);
+
+            // Restore the proper propagator
+            $this->getPastoralCommentMapper()->setEventPropagator($propagator);
             return $result;
         } catch (\Alaress\Database\Exception $e) {
             // most likely that corresponding pastoral record is deleted in Synergetic
