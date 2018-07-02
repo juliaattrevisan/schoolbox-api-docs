@@ -267,7 +267,7 @@ class Controller extends BaseController
             $groupId   = $critData['groupId'];
             $groupName = $critData['groupName'];
             if (!isset($groupList[$groupName])) {
-                if ($critData['groupId']) {
+                if ($groupId) {
                     try {
                         $group = $this->groupMapper->findOneByColumnList([
                             'id'          => $groupId,
@@ -279,7 +279,7 @@ class Controller extends BaseController
                         throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
                     }
                 } else {
-                    $group = $this->groupMapper->findOrCreateOneForFolderByName($folderId, $groupName);
+                    $group = $this->groupMapper->findOrCreateOneForFolderByName($folderId, $groupName, false);
                 }
                 $this->groupMapper->save($group);
                 $groupList[$groupName] = $group;
@@ -308,7 +308,7 @@ class Controller extends BaseController
                 }
             } else {
                 // Create a new one
-                $this->criterionMapper->findOrCreateOneForFolderByKey($folderId, $critName, $groupName);
+                $this->criterionMapper->findOrCreateOneForFolderByKey($folderId, $critName, $groupName, false);
             }
         }
     }

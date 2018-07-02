@@ -94,17 +94,27 @@ class GroupMapper extends BaseMapper
      * @param int    $parentId
      * @param string $parentType
      * @param string $name
+     * @param bool   $cache
      * @return Group
      * @throws MapperException if for some reason it can't be created
      */
-    public function findOrCreateOneForParentByName(int $parentId, string $parentType, string $name): Group
+    public function findOrCreateOneForParentByName(
+        int $parentId,
+        string $parentType,
+        string $name,
+        bool $cache = true
+    ): Group
     {
         try {
-            return $this->findOneByColumnList([
-                'parent_id'   => $parentId,
-                'parent_type' => $parentType,
-                'name'        => $name,
-            ]);
+            return $this->findOneByColumnList(
+                [
+                    'parent_id'   => $parentId,
+                    'parent_type' => $parentType,
+                    'name'        => $name,
+                ],
+                [],
+                ['cache' => $cache,]
+            );
         } catch (MapperException $e) {
             // Create one
             $item = $this->createModel()
@@ -123,12 +133,13 @@ class GroupMapper extends BaseMapper
      *
      * @param int    $folderId
      * @param string $name
+     * @param bool   $cache
      * @return Group
      * @throws MapperException if for some reason it can't be created
      */
-    public function findOrCreateOneForFolderByName(int $folderId, string $name): Group
+    public function findOrCreateOneForFolderByName(int $folderId, string $name, bool $cache = true): Group
     {
-        return $this->findOrCreateOneForParentByName($folderId, Group::PARENT_TYPE_CATEGORY, $name);
+        return $this->findOrCreateOneForParentByName($folderId, Group::PARENT_TYPE_CATEGORY, $name, $cache);
     }
 
 

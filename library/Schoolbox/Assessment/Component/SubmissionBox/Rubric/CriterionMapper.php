@@ -294,7 +294,7 @@ class CriterionMapper extends BaseMapper {
             // Build it
             /** @var GroupMapper $groupMapper */
             $groupMapper = $this->getJoinMapper('group');
-            $group       = $groupMapper->findOrCreateOneForParentByName($parentId, $parentType, $groupName);
+            $group       = $groupMapper->findOrCreateOneForParentByName($parentId, $parentType, $groupName, $cache);
             $criterion   = $this->createModel()
                                 ->setGroup($group)
                                 ->setName($name);
