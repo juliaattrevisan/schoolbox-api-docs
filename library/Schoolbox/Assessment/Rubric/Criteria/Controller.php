@@ -284,7 +284,7 @@ class Controller extends BaseController
 
             // Now, find the criterion: if it doesn't exist create it
             $group  = $groupList[$groupName];
-            $critId = $data['id'];
+            $critId = $critData['id'];
             try {
                 $criteria = $this->criterionMapper->findOneByColumnList([
                     'id'              => $critId,
