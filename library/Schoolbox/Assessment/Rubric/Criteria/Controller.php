@@ -172,13 +172,13 @@ class Controller extends BaseController
             if (!isset($groups[$groupId])) {
                 $groups[$groupId] = [
                     'group'      => $criterion->getGroup(),
-                    'usageTotal' => 0,
+                    'usageCount' => 0,
                     'criteria'   => [],
                 ];
             }
 
             $usage                          = $this->usageMapper->findUsage($criterion->getId());
-            $groups[$groupId]['usageTotal'] += \count($usage);
+            $groups[$groupId]['usageCount'] += \count($usage);
             $groups[$groupId]['criteria'][] = [
                 'criterion' => $criterion,
                 'usage'     => $usage,
