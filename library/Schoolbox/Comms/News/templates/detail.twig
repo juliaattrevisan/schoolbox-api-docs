@@ -222,58 +222,60 @@
 
 
         {# Moderators #}
-        {% if isRejectable %}
+        {% if isCommsOfficer %}
+            {% if isRejectable %}
 
-            {# Reject this news article #}
-            {% set rejectRoute = routeLookupIfAuthorized('commsNewsModeration.postReject', {newsId: news.id}) %}
+                {# Reject this news article #}
+                {% set rejectRoute = routeLookupIfAuthorized('commsNewsModeration.postReject', {newsId: news.id}) %}
 
-            {% if rejectRoute %}
-                <script>
-                    $(function() {
-                        $('#actionButtons').on('click', 'a[data-reject]', function(event) {
-                            event.preventDefault();
+                {% if rejectRoute %}
+                    <script>
+                        $(function() {
+                            $('#actionButtons').on('click', 'a[data-reject]', function(event) {
+                                event.preventDefault();
 
-                            var element = $(this);
-                            var toast = $('#toast');
-                            var title = element.attr('data-reject');
+                                var element = $(this);
+                                var toast = $('#toast');
+                                var title = element.attr('data-reject');
 
-                            $(this).confirmDialog({
-                                header: 'Reject ' + title,
-                                format: 'html',
-                                text: 'Provide brief feedback for rejecting this article to help the author improve their content. <textarea id="rejectedReason" rows="5"></textarea>',
-                                confirmLabel: 'Reject',
-                                cancelLabel: 'Cancel',
-                                confirmEvent: function() {
-                                    toast.toastActivate({
-                                        text: 'Rejecting ' + title
-                                    });
-
-                                    $.ajax({
-                                        type: 'POST',
-                                        url: element.attr('href'),
-                                        data: {newsId: {{ news.id }}, rejectedReason: $('#rejectedReason').val()},
-                                        dataType: 'json'
-                                    }).success(function (response) {
-                                        toast.toastTimeout({
-                                            text: title + ' was rejected',
-                                            css: 'success'
+                                $(this).confirmDialog({
+                                    header: 'Reject ' + title,
+                                    format: 'html',
+                                    text: 'Provide brief feedback for rejecting this article to help the author improve their content. <textarea id="rejectedReason" rows="5"></textarea>',
+                                    confirmLabel: 'Reject',
+                                    cancelLabel: 'Cancel',
+                                    confirmEvent: function() {
+                                        toast.toastActivate({
+                                            text: 'Rejecting ' + title
                                         });
 
-                                        window.location.href = response.redirect;
-                                    }).error(function (response) {
-                                        var temp = $.parseJSON(response.responseText);
+                                        $.ajax({
+                                            type: 'POST',
+                                            url: element.attr('href'),
+                                            data: {newsId: {{ news.id }}, rejectedReason: $('#rejectedReason').val()},
+                                            dataType: 'json'
+                                        }).success(function (response) {
+                                            toast.toastTimeout({
+                                                text: title + ' was rejected',
+                                                css: 'success'
+                                            });
 
-                                        toast.toastTimeout({
-                                            text: 'Error: ' + temp.message,
-                                            css: 'alert'
+                                            window.location.href = response.redirect;
+                                        }).error(function (response) {
+                                            var temp = $.parseJSON(response.responseText);
+
+                                            toast.toastTimeout({
+                                                text: 'Error: ' + temp.message,
+                                                css: 'alert'
+                                            });
                                         });
-                                    });
-                                }
+                                    }
+                                });
                             });
                         });
-                    });
-                </script>
-                <li><a class="icon-undo" href="{{ rejectRoute }}" title="Reject this article" data-reject="{{ news.title }}">Reject</a></li>
+                    </script>
+                    <li><a class="icon-undo" href="{{ rejectRoute }}" title="Reject this article" data-reject="{{ news.title }}">Reject</a></li>
+                {% endif %}
             {% endif %}
 
 
