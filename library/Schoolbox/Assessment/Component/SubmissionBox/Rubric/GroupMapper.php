@@ -60,61 +60,32 @@ class GroupMapper extends BaseMapper
     /**
      * @inheritdoc
      */
-    protected function getSelectString(): string
-    {
-        return "
-            SELECT
-                {$this->getColumnString()},
-                {$this->getJoinColumnString('curriculum_node_for_rubric_group', 'cn')},
-                {$this->getJoinColumnString('curriculum_node_for_rubric_group.level', 'cnl')},
-                {$this->getJoinColumnString('curriculum_node_for_rubric_group.level.source', 'cnls')},
-                {$this->getJoinColumnString('curriculum_node_for_rubric_group.area', 'cna')},
-                {$this->getJoinColumnString('curriculum_node_for_rubric_group.area.source', 'cnas')}
-        ";
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    protected function getFromString(): string
-    {
-        return "
-            FROM {$this->getTable()}
-            LEFT JOIN {$this->getJoinSql('curriculum_node_for_rubric_group', '', 'cn')}
-            LEFT JOIN {$this->getJoinSql('curriculum_node_for_rubric_group.level', 'cn', 'cnl')}
-            LEFT JOIN {$this->getJoinSql('curriculum_node_for_rubric_group.level.source', 'cnl', 'cnls')}
-            LEFT JOIN {$this->getJoinSql('curriculum_node_for_rubric_group.area', 'cn', 'cna')}
-            LEFT JOIN {$this->getJoinSql('curriculum_node_for_rubric_group.area.source', 'cna', 'cnas')}
-        ";
-    }
-
-
-    /**
-     * @inheritdoc
-     */
     protected function hydrateSelect(PDOStatement $statement): GenericCollection
     {
         /** @var NodeMapper $curriculumNodeMapper */
-        $curriculumNodeMapper = $this->getJoinMapper('curriculum_node_for_rubric_criterion');
+        $curriculumNodeMapper = $this->getJoinMapper('curriculum_node_for_rubric_group');
         $collection           = $this->createCollection();
         foreach ($statement as $row) {
             /** @var Group $group */
             $group                       = $this->hydrate($row);
             $collection[$group->getId()] = $group;
-
-            // Fetching multiple 1-M relations in a single query is still how
-            // you get ants
-            $curriculumNode = $curriculumNodeMapper->hydrateWithRelatedJoins($row, 'cn', 'cna', 'cnas', 'cnl', 'cnls');
-            if ($curriculumNode) {
-                $collection[$group->getId()]->getCurriculumNodes()[$curriculumNode->getId()] = $curriculumNode;
-            }
         }
 
         // Fetch curriculum nodes separately
+        $groupNodes = $curriculumNodeMapper->findForOtherMapper(
+            $this,
+            'curriculum_node_for_rubric_group',
+            $collection->keys()
+        );
+        foreach ($collection as $group) {
+            if (isset($groupNodes[$group->getId()])) {
+                $group->setCurriculumNodes($groupNodes[$group->getId()]);
+            }
+        }
 
         return $collection;
     }
+
 
     /**
      * Find a group with the given name for the given parent.
