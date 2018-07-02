@@ -186,7 +186,7 @@
 
 <div class="row">
     <div class="small-12 columns">
-        <ul class="flex-list buttons">
+        <ul class="flex-list buttons" id="actionButtons">
 
 
         {# Modify this news article
@@ -229,7 +229,7 @@
             {% if rejectRoute %}
                 <script>
                     $(function() {
-                        $('[data-reject]').on('click', function(event) {
+                        $('#actionButtons').on('click', 'a[data-reject]', function(event) {
                             event.preventDefault();
 
                             var element = $(this);
