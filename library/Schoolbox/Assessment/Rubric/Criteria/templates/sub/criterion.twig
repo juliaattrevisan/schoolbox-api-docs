@@ -18,7 +18,7 @@
         <input type="hidden"
                data-template="rubric-criterion-id"
                {% if showNames %}name="crits[{{ groupCount }}][items][{{ criterion.id }}][id]"{% endif %}
-               value="i{{ criterion.id }}"
+               value="{{ criterion.id }}"
                {% if readonly %}readonly{% endif %}
         />
 
