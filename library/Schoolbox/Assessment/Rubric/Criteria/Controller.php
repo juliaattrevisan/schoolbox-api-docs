@@ -172,16 +172,14 @@ class Controller extends BaseController
             if (!isset($groups[$groupId])) {
                 $groups[$groupId] = [
                     'group'    => $criterion->getGroup(),
-                    'usage'    => [],
+                    'usage'    => $this->usageMapper->findGroupUsage($groupId),
                     'criteria' => [],
                 ];
             }
 
-            $usage                          = $this->usageMapper->findCriterionUsage($criterion->getId());
-            $groups[$groupId]['usage']      += $usage;
             $groups[$groupId]['criteria'][] = [
                 'criterion' => $criterion,
-                'usage'     => $usage,
+                'usage'     => $this->usageMapper->findCriterionUsage($criterion->getId()),
             ];
         }
 
