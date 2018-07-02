@@ -314,15 +314,18 @@ class Controller extends BaseController
                     ]);
                     $criterion->setName($critName);
 
-                    // Do not change the name of criteria that are in use on a class page, can edit in course though
-                    // DO allow setting of curriculum codes though
-                    $usage = $this->usageMapper->findByColumnList(['criterion_id' => $critId]);
-                    if (\count($usage) && !($folder->hasCourseSpecification() || $folder->hasUnitSpecification())) {
-                        // continue; // possibly throw an error of some kind
-                    } else {
+                    // A criterion's name is changeable if any of the following are true:
+                    // * Its folder is a course spec
+                    // * Its folder is a unit spec
+                    // * Criterion isn't in use on any due works
+                    $isChangeable = $folder->hasCourseSpecification() || $folder->hasUnitSpecification();
+                    if (!$isChangeable) {
+                        $usage        = $this->usageMapper->countByColumn('criterion_id', $critId);
+                        $isChangeable = ($usage === 0);
+                    }
+                    if ($isChangeable) {
                         $criterion->setName($critName);
                     }
-//                    $this->criterionMapper->save($criterion);
 
                 } catch (\Exception $e) {
                     // ID exists, but not in this context; abort
