@@ -22,7 +22,6 @@ class ValidUserCanAccept
      * Definition of an article that can be accepted during moderation process
      *
      * @param User  $user
-     * @param bool  $moderationRequired
      * @param Model $news
      * @return bool
      * @throws \Alaress\Database\Predicate\InvalidColumnException
@@ -30,7 +29,7 @@ class ValidUserCanAccept
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    public function isSatisfiedBy(User $user, bool $moderationRequired, Model $news): bool
+    public function isSatisfiedBy(User $user, Model $news): bool
     {
 
         /* Must fulfil the following criteria
@@ -41,6 +40,12 @@ class ValidUserCanAccept
          */
         $isCommsOfficer = (new ValidUserIsCommsOfficer())->isSatisfiedBy($user);
 
-        return $isCommsOfficer && $moderationRequired && $news->isSubmitted() && !$news->isAccepted();
+        /* Allow Acceptance of articles even when moderation isn't required
+         * Moderation can be disabled after an article is submitted, thus ending up in a weird limbo
+         * when moderation was previously required at the time of submission, but is no longer required now
+         *
+         * Allow moderators to accept the remainder of articles that previously expected moderation acceptance
+         */
+        return $isCommsOfficer && $news->isSubmitted() && !$news->isAccepted();
     }
 }

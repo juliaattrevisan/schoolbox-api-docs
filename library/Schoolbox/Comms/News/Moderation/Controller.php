@@ -72,7 +72,6 @@ class Controller extends Base
 
         try {
             $policy = $this->policyMapper->findOneByColumn('identifier', 'global_moderation');
-
             $moderationRequired = (bool)$policy->getValue();
 
             $newsArticles = $lists->getNeedModeration();
@@ -125,6 +124,22 @@ class Controller extends Base
     {
         if ((new News\ValidArticle())->isSatisfiedBy($news)) {
             $news->setSubmittedAt(\Alaress_Date_Format::now());
+
+            /* If moderation isn't required, automatically accept self-moderation by the author
+             */
+            $policy = $this->policyMapper->findOneByColumn('identifier', 'global_moderation');
+            $moderationRequired = (bool)$policy->getValue();
+
+            try {
+                if (!$moderationRequired) {
+                    $news->setAcceptedBy($this->getUser())
+                        ->setAcceptedAt(\Alaress_Date_Format::now());
+                }
+            } catch (MapperException $e) {
+                // noop
+            }
+
+
             $this->newsMapper->save($news);
 
             /* If you're a moderator, go back to the Moderation list
