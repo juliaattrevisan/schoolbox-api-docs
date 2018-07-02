@@ -312,7 +312,6 @@ class Controller extends BaseController
                         'id'              => $critId,
                         'rubric_group_id' => $group->getId(),
                     ]);
-                    $criterion->setName($critName);
 
                     // A criterion's name is changeable if any of the following are true:
                     // * Its folder is a course spec
