@@ -7,6 +7,7 @@
 
 {% set showNames = groupCount is not null %}
 {% set readonly  = group is not null and group.usageTotal > 0 %}
+{% set new       = group is null %}
 <li class="actions-small-0">
     <div class="list-item">
         {# Hidden input for group ID #}
@@ -14,10 +15,12 @@
                data-template="rubric-group-id"
                {% if showNames %}name="crits[{{ groupCount }}][id]"{% endif %}
                value="{{ group.id }}"
-               {% if readonly %}readonly{% endif %} />
+               {% if readonly %}readonly{% endif %}
+        />
 
-        {# Hidden input for group name #}
+        {# Input for group name #}
         <input type="text"
+               {% if new %}data-rubric-group-new="1"{% endif %}
                data-rubric-group
                data-template="rubric-group-name"
                {% if showNames %}name="crits[{{ groupCount }}][name]"{% endif %}
@@ -25,7 +28,7 @@
                {% if readonly > 0 %}readonly{% endif %}
         />
 
-        {# Input for group curriculum code #}
+        {# Input for group curriculum codes #}
         <select data-curriculum-code-selector
                 data-template="rubric-group-curriculum-codes"
                 {% if showNames %}name="crits[{{ groupCount }}][curriculumCode][]"{% endif %}
