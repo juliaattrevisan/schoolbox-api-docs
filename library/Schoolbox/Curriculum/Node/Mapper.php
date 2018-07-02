@@ -224,10 +224,21 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
 
 
     /**
-     * @param BaseMapper $otherMapper
-     * @param string     $otherJoin
-     * @param array      $ids
-     * @return array|GenericCollection[]|Model[][]
+     * Retrieves curriculum nodes for a set of IDs that reference objects from
+     * a related mapper.
+     *
+     * The related mappers have `joinsVia` relations to this one, but this
+     * mapper doesn't have relations back.
+     *
+     * @param BaseMapper $otherMapper The mapper that joins onto this one
+     * @param string     $otherJoin   The name of the join through which
+     *                                `$otherMapper` joins onto this
+     * @param array      $ids         A list of `$otherMapper` model instances
+     *                                to fetch nodes for
+     *
+     * @return array|GenericCollection[]|Model[][] First level key: `$otherMapper` model instance ID
+     *                                             Second level key: `Model` instance ID
+     *                                             Second level value: `Model` instance
      */
     public function findForOtherMapper(BaseMapper $otherMapper, string $otherJoin, array $ids): array
     {
