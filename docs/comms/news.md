@@ -77,10 +77,12 @@ This workflow imitates the current behaviour of Schoolbox. It is far more libera
 * Visit the *Preview* screen where you can see what you've made so far.
   * Go back to *Update* anything, if applicable/necessary, then revisit the *Preview* screen.
 * *Publish* the article to make it available to the audience on the date specified.
+  * Articles that were created when Moderation was required will still require moderation even if the policy is deactivated.
+  * Articles created when Moderation wasn't required will be considered self-moderated by the author.
 * The article is *Archived* once the Expiry Date is reached.
 * You may *Delete* your article at any time.
 
-### Moderators' Workflow
+## Moderators' Workflow
 There is only one prescribed flow.
 
 > Compose > Preview > Awaiting Moderation > Awaiting Publication > Published > Expired
@@ -93,3 +95,6 @@ It begins at the Moderation Queue found at /comms/news/moderation. From here you
 * *Publish* the article to make it available to its audience when the Publish Date is reached.
 * You can *Reject* an article at any time before it's published to the audience.
 * You may *Delete* an article at any time.
+
+### Edge Cases
+**Trapped Between Settings**. This occurs when moderation is activated, an article is submitted for moderation, but the moderation requirement is then deactivated. This leaves submitted articles in an inconclusive state of being, requiring moderators to accept these articles as if moderation was activated. 
