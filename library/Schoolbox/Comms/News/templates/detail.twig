@@ -62,7 +62,7 @@
         {% endif %}
 
         {# Add a new news article #}
-        <li><a class="icon-add" href="{{ routeLookupIfAuthorized('commsNews.getCreate') }}" title="Create a new article">Create</a></li>
+        <li><a class="icon-add" href="{{ routeLookupIfAuthorized('commsNews.getCreate') }}" title="Create a new article">Create {{ locale.news.proper }}</a></li>
 
         {# Delete this news article #}
         {% set deleteRoute = routeLookupIfAuthorized('commsNews.postDelete', {newsId: news.id}) %}
@@ -109,7 +109,7 @@
                     });
                 });
             </script>
-            <li><a class="icon-delete" href="{{ deleteRoute }}" title="Delete this article" data-delete="{{ news.title }}">Delete</a></li>
+            <li><a class="icon-delete" href="{{ deleteRoute }}" title="Delete this article" data-delete="{{ news.title }}">Delete this {{ locale.news.proper }}</a></li>
         {% endif %}
     </ul>
 </div>
