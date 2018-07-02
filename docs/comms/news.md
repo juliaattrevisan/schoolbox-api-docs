@@ -97,4 +97,6 @@ It begins at the Moderation Queue found at /comms/news/moderation. From here you
 * You may *Delete* an article at any time.
 
 ### Edge Cases
-**Trapped Between Settings**. This occurs when moderation is activated, an article is submitted for moderation, but the moderation requirement is then deactivated. This leaves submitted articles in an inconclusive state of being, requiring moderators to accept these articles as if moderation was activated. 
+**Trapped Between Settings**. This occurs when moderation is activated, an article is submitted for moderation, but the moderation requirement is then deactivated. This leaves submitted articles in an inconclusive state of being, requiring moderators to accept these articles as if moderation was activated.
+
+**Moderator Authors**. Moderators cannot reject their own articles.

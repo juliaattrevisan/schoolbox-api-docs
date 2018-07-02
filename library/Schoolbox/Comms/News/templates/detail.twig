@@ -221,7 +221,7 @@
 
 
         {# Moderators #}
-        {% if isCommsOfficer %}
+        {% if isRejectable %}
 
             {# Reject this news article #}
             {% set rejectRoute = routeLookupIfAuthorized('commsNewsModeration.postReject', {newsId: news.id}) %}

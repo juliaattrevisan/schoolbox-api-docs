@@ -351,6 +351,7 @@ class Controller extends Base
             'moderationRequired' => $moderationRequired,
             'isCommsOfficer' => (new ValidUserIsCommsOfficer())->isSatisfiedBy($this->getUser()),
             'isAcceptable' => (new Moderation\ValidUserCanAccept())->isSatisfiedBy($this->getUser(), $news),
+            'isRejectable' => (new ValidUserCanReject())->isSatisfiedBy($this->getUser(), $news),
             'isDeletable' => (new ValidUserCanDelete())->isSatisfiedBy($this->getUser(), $news)
         ])->setTitle($news->getTitle()));
     }
