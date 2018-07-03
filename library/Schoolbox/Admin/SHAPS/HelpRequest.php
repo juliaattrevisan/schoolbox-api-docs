@@ -171,9 +171,8 @@ class HelpRequest
         // (I'm not sure how to detect this otherwise)
         if (\is_array($decoded_response)) {
             return $decoded_response;
-        } else {
-            throw new UnexpectedResponseException($decoded_response);
         }
+        throw new UnexpectedResponseException($decoded_response);
     }
 
 
