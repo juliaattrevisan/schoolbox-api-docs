@@ -358,16 +358,22 @@ class Mapper extends BaseMapper
             $diff = $this->diff($object, $previous);
             /** @var Match $object */
             /** @var Match $previous */
-            $itineraryDiff = $object->getItinerary()->diff($previous->getItinerary(),
-                function (ItineraryItem $a, ItineraryItem $b) {
-                    return $a->getStartAt()->getUnixTimeStamp() === $b->getStartAt()->getUnixTimeStamp()
-                        && $a->getDescription() === $b->getDescription();
-                }
+            // if number of itinerary items differs, notify
+            if ($object->getItinerary()->count() !== $previous->getItinerary()->count()) {
+                $diff['itinerary'] = true;
+            } else {
+                $itineraryDiff = $object->getItinerary()->diff($previous->getItinerary(),
+                    function (ItineraryItem $a, ItineraryItem $b) {
+                        return $a->getStartAt()->getUnixTimeStamp() === $b->getStartAt()->getUnixTimeStamp()
+                            && $a->getDescription() === $b->getDescription();
+                    }
 
-            );
-            if ($itineraryDiff->count() != 0) {
-                $diff['itinerary'] = $itineraryDiff->count();
+                );
+                if ($itineraryDiff->count() != 0) {
+                    $diff['itinerary'] = true;
+                }
             }
+
             // If there's no viewable change, we don't want to notify
             if (count($diff) == 1 && array_key_exists('updatedAt', $diff)) {
                 return true;
