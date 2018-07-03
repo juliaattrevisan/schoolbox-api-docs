@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Schoolbox\Comms\News\Audience;
 
 use InvalidArgumentException;
+use Schoolbox\Mapper\Exception\InsufficientHydrationException;
 
 /**
  * Responsible for encapsulating the business rules:
@@ -23,14 +24,10 @@ use InvalidArgumentException;
 class BusinessRules
 {
     // Maximum node paths from a root segment to a leaf segment
-    public const DEPTH_SEGMENT_TREE_MAX = 1;
-
-    // TODO matt.day@alaress.com.au Please review/ratify
-    // TODO Should this be configurable by admin? If so, that can sit behind this interface and the system should continue to function.
-    // TODO Should we also configure whether you can target NULL, eg 'users without a year level'
+    private const DEPTH_SEGMENT_TREE_MAX = 1;
 
     // To ensure efficient db queries, only build query predicates that are valid and can actually match a segment.
-    public const VALID_SEGMENT_RELATIONSHIPS = [
+    private const VALID_SEGMENT_RELATIONSHIPS = [
         // For composite, this is a superset of what may ultimately be available. Composites cannot have a relationship modifier
         // if any sub-segment does not support that modifier.
         Model::ENTITY_TYPE_COMPOSITE      => [Model::RELATIONSHIP_SELF, Model::RELATIONSHIP_PARENTS_OF, Model::RELATIONSHIP_TEACHERS_OF],
@@ -52,7 +49,7 @@ class BusinessRules
     // Is it valid for segments that target these types to target a null value, eg users
     // * who are not in a school house, or
     // * who are not in any groups.
-    public const VALID_SEGMENT_NULL_ENTITIES = [
+    private const VALID_SEGMENT_NULL_ENTITIES = [
         Model::ENTITY_TYPE_USER           => false,
         Model::ENTITY_TYPE_SUPER          => false,
         Model::ENTITY_TYPE_CAMPUS         => true,
@@ -69,12 +66,21 @@ class BusinessRules
 
 
     /**
+     * @return int
+     */
+    public function getMaxSegmentTreeHeight(): int
+    {
+        return self::DEPTH_SEGMENT_TREE_MAX;
+    }
+
+
+    /**
      * Returns whether it's valid for an segment to target a user who lacks this entity type
      *
      * @param string $entityType
      * @return bool
      */
-    public static function canTargetNullEntity(string $entityType): bool
+    public function canTargetNullEntity(string $entityType): bool
     {
         // Composites always have NULL entity types
         if (Model::ENTITY_TYPE_COMPOSITE === $entityType) {
@@ -91,7 +97,7 @@ class BusinessRules
      * @return string[]
      * @throws InvalidArgumentException If unable to recognise relationship
      */
-    public static function getValidEntities(string $relationship): array
+    public function getValidEntities(string $relationship): array
     {
         if (!\in_array($relationship, Model::getRelationships(), true)) {
             throw new InvalidArgumentException("Invalid relationship: $relationship");
@@ -112,20 +118,26 @@ class BusinessRules
      *
      * @param Model $audienceSegment
      * @return string[]
+     * @throws InsufficientHydrationException If the segment's entity type is not set
      */
-    public static function getValidRelationships(Model $audienceSegment): array
+    public function getValidRelationships(Model $audienceSegment): array
     {
-        $validRelationships = self::VALID_SEGMENT_RELATIONSHIPS[$audienceSegment->getEntityType()];
+        $entityType = $audienceSegment->getEntityType();
+        if(null === $entityType){
+            throw new InsufficientHydrationException('Cannot determine valid relationships if entity type is not defined');
+        }
+
+        $validRelationships = self::VALID_SEGMENT_RELATIONSHIPS[$entityType];
 
         // Base case:
-        if(Model::ENTITY_TYPE_COMPOSITE !== $audienceSegment->getEntityType()){
+        if(Model::ENTITY_TYPE_COMPOSITE !== $entityType){
             return $validRelationships;
         }
 
         // Recursive case:
         // Composites have their own inherent limitations, but also respect the limitations of any sub-segment.
         foreach($audienceSegment->getChildren() as $subSegment){
-            $validRelationships = \array_intersect($validRelationships, self::getValidRelationships($subSegment));
+            $validRelationships = \array_intersect($validRelationships, $this->getValidRelationships($subSegment));
         }
         return $validRelationships;
     }
@@ -138,12 +150,14 @@ class BusinessRules
      * @param string $candidateRelationship
      * @return bool
      * @throws InvalidArgumentException If the relationship is not recognised
+     * @throws InsufficientHydrationException
      */
-    public static function isValidRelationship(Model $segment, string $candidateRelationship): bool
+    public function isValidRelationship(Model $segment, string $candidateRelationship): bool
     {
+        // Is this an unrecognised relationship (as opposed to a proscribed one)
         if (!\in_array($candidateRelationship, Model::getRelationships(), true)) {
             throw new InvalidArgumentException("Invalid relationship: $candidateRelationship");
         }
-        return \in_array($candidateRelationship, self::getValidRelationships($segment), true);
+        return \in_array($candidateRelationship, $this->getValidRelationships($segment), true);
     }
 }

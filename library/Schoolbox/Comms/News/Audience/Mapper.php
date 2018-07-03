@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Comms\News\Audience;
 
+use Schoolbox\Comms\News;
 use Alaress\Database\Predicate\Builder;
 use Schoolbox\GenericCollection;
 
@@ -36,8 +37,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->hasModel(Model::class);
 
         $this->uses(self::FIELD_ID, self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->uses(self::FIELD_COMMS_NEWS_ARTICLE_ID, self::TYPE_INTEGER, null, 'commsNewsArticle');  // TODO upgrade to model - see next line
-//        $this->joins(self::FIELD_COMMS_NEWS_ARTICLE_ID,  Article\Mapper::class, 'id', null, null, 'comms_news_article', 'comms_news_article');
+        $this->joins(self::FIELD_COMMS_NEWS_ARTICLE_ID, News\Mapper::class, 'id', null, null, 'commsNewsArticle', 'commsNewsArticle');
         $this->joins(self::FIELD_PARENT_ID,  self::class, 'id', null, null, 'parent', 'parent');
         $this->uses(self::FIELD_ENTITY_TYPE, self::TYPE_STRING);
         $this->uses(self::FIELD_ENTITY_VALUE, self::TYPE_STRING);

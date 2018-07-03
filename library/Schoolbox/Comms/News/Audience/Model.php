@@ -10,6 +10,7 @@ namespace Schoolbox\Comms\News\Audience;
 
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
+use Schoolbox\Comms\News;
 
 class Model
 {
@@ -37,6 +38,8 @@ class Model
 
     // The value of segments targeted to superusers
     public const ENTITY_VALUE_SUPER       = '1';
+
+
 
 
     /**
@@ -93,7 +96,7 @@ class Model
         /** @var int */
     private $id;
 
-    /** @todo declare type */
+    /** @var News\Model() */
     private $commsNewsArticle;
 
     /** @var null|self */
@@ -141,20 +144,19 @@ class Model
 
 
     /**
-      * @todo declare return type
+      * @return null|News\Model
      */
-    public function getCommsNewsArticle()
+    public function getCommsNewsArticle(): ?News\Model
     {
         return $this->commsNewsArticle;
     }
 
 
     /**
-     * @param $commsNewsArticle
+     * @param null|News\Model $commsNewsArticle
      * @return $this
-     * @todo declare nullable parameter type
      */
-    public function setCommsNewsArticle($commsNewsArticle): self
+    public function setCommsNewsArticle(?News\Model $commsNewsArticle): self
     {
         $this->commsNewsArticle = $commsNewsArticle;
         return $this;

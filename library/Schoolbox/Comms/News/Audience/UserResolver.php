@@ -20,6 +20,8 @@ use UnexpectedValueException;
  */
 class UserResolver
 {
+    /** @var BusinessRules */
+    private $businessRules;
 
     /** @var Database\Connector\IConnector */
     private $db;
@@ -35,17 +37,20 @@ class UserResolver
 
 
     /**
+     * @param BusinessRules                 $businessRules
      * @param Database\Connector\IConnector $db
      * @param External_Class                $externalClass
      * @param RelationshipFilterer          $relationshipFilterer
      * @param Mapper                        $audienceMapper
      */
     public function __construct(
+        BusinessRules $businessRules,
         Database\Connector\IConnector $db,
         External_Class $externalClass,
         RelationshipFilterer $relationshipFilterer,
         Mapper $audienceMapper
     ) {
+        $this->businessRules        = $businessRules;
         $this->db                   = $db;
         $this->externalClass        = $externalClass;
         $this->relationshipFilterer = $relationshipFilterer;
@@ -157,7 +162,7 @@ class UserResolver
     {
         if (null === $entityValue) {
             // Is null a valid segment entity value?
-            if(!BusinessRules::canTargetNullEntity($entityType)){
+            if(!$this->businessRules->canTargetNullEntity($entityType)){
                 return [];
             }
             $predicate = 'IS NULL';

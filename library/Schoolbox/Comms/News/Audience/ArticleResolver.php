@@ -23,6 +23,8 @@ use PDO;
  */
 class ArticleResolver
 {
+    /** @var BusinessRules */
+    private $businessRules;
 
     /** @var Database\Connector\IConnector */
     private $db;
@@ -38,17 +40,20 @@ class ArticleResolver
 
 
     /**
+     * @param BusinessRules                 $businessRules
      * @param Database\Connector\IConnector $db
      * @param UserAccessMapper              $userAccessMapper
      * @param Folder\Mapper                 $folderMapper
      * @param RelationshipFilterer          $relationshipFilter
      */
     public function __construct(
+        BusinessRules $businessRules,
         Database\Connector\IConnector $db,
         UserAccessMapper $userAccessMapper,
         Folder\Mapper $folderMapper,
         RelationshipFilterer $relationshipFilter
     ) {
+        $this->businessRules      = $businessRules;
         $this->db                 = $db;
         $this->userAccessMapper   = $userAccessMapper;
         $this->folderMapper       = $folderMapper;
@@ -199,7 +204,7 @@ class ArticleResolver
      */
     private function addSelfClauses(User $user, Collection $whereClauses): void
     {
-        $validEntities = BusinessRules::getValidEntities(Model::RELATIONSHIP_SELF);
+        $validEntities = $this->businessRules->getValidEntities(Model::RELATIONSHIP_SELF);
 
         if (!\count($validEntities)) {
             // In the unlikely event you cannot target audience segments that lack a relationship modifier
@@ -216,7 +221,9 @@ class ArticleResolver
      * @param User                $user
      * @param Collection|string[] $whereClauses
      * @param Collection|string[] $relatedWhereClauses
+     * @throws \UnderflowException
      * @throws \InvalidArgumentException
+     * @throws Database\Predicate\InvalidColumnException
      */
     private function addParentsOfClauses(
         User $user,
@@ -227,7 +234,7 @@ class ArticleResolver
             return;
         }
 
-        $validEntities = BusinessRules::getValidEntities(Model::RELATIONSHIP_PARENTS_OF);
+        $validEntities = $this->businessRules->getValidEntities(Model::RELATIONSHIP_PARENTS_OF);
         if (!\count($validEntities)) {
             // If the system is configured to not allow targeting of parents of users in some audience segment
             return;
@@ -273,7 +280,7 @@ class ArticleResolver
             return;
         }
 
-        $validEntities = BusinessRules::getValidEntities(Model::RELATIONSHIP_TEACHERS_OF);
+        $validEntities = $this->businessRules->getValidEntities(Model::RELATIONSHIP_TEACHERS_OF);
         if (!\count($validEntities)) {
             // In the system is configured to not allow targeting of teachers of users in some audience segment
             return;
@@ -322,7 +329,7 @@ class ArticleResolver
         }
 
         // Targeted to a campus
-        if (\array_key_exists(Model::ENTITY_TYPE_CAMPUS, $validEntities) && BusinessRules::canTargetNullEntity(Model::ENTITY_TYPE_CAMPUS)) {
+        if (\array_key_exists(Model::ENTITY_TYPE_CAMPUS, $validEntities) && $this->businessRules->canTargetNullEntity(Model::ENTITY_TYPE_CAMPUS)) {
             $this->buildClause($whereClauses, Model::ENTITY_TYPE_CAMPUS, $user->getCampusCollection()->getPropertyValues('id'), $relationship);
         }
 
@@ -413,7 +420,7 @@ class ArticleResolver
     private function buildClause(Collection $whereClauses, string $entityType, $entityValue, string $relationship): void
     {
         // Don't attempt to match a segment if the system is not configured to permit null entity values for the given entity type
-        if(!BusinessRules::canTargetNullEntity($entityType) && (null === $entityValue || (\is_iterable($entityValue) && !\count($entityValue)))) {
+        if(!$this->businessRules->canTargetNullEntity($entityType) && (null === $entityValue || (\is_iterable($entityValue) && !\count($entityValue)))) {
             return;
         }
 
@@ -427,7 +434,8 @@ class ArticleResolver
                 $predicate = 'IS NULL';
             } else {
                 $quotedValues = array_map(function ($item) {
-                    return "'$item'";
+                    $quoted = str_replace("'", "\\'", $item);
+                    return "'{$quoted}'";
                 }, $entityValue);
                 $valueString  = \implode(',', $quotedValues);
                 $predicate    = "IN ({$valueString})";
