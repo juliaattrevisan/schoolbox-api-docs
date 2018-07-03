@@ -168,7 +168,7 @@ class HelpRequest
      * This is a list of hydrated users who have an equivalent representation in Help.
      *
      * @return \Schoolbox\GenericCollection
-     *      * @throws \Schoolbox\Admin\SHAPS\Exception\RequestException
+     * @throws \Schoolbox\Admin\SHAPS\Exception\RequestException
      * @throws \Schoolbox\Admin\SHAPS\Exception\UnexpectedResponseException
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \InvalidArgumentException

@@ -20,7 +20,12 @@ class Controller extends Base
     private $userMapper;
 
     /**
-     * A telephone to help.schoolbox.com.au where so can ask it things
+     * @var \Schoolbox\Error\Mapper
+     */
+    private $errorMapper;
+
+    /**
+     * A telephone to help.schoolbox.com.au so we can ask it things
      *
      * @var HelpRequest
      */
@@ -60,7 +65,6 @@ class Controller extends Base
      * Renders a list of all staff in your Schoolbox instance, and whether or not they are provisioned on Help.
      *
      * @throws \Aura\Di\Exception\ServiceNotFound
-     * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      */
