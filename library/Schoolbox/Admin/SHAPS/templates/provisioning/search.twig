@@ -91,9 +91,12 @@
 
                         }, "json")
                             .fail(function(xhr, status, error) {
-                                // TODO display some kind of error message here
-                                console.log(xhr);
-                                console.log(status + ": " + error);
+                                var $toast = $('[data-toast]');
+                                // TODO this first message really isn't necessary, but there doesn't seem to be a way to use toast without it
+                                $toast.toastActivate({text: 'Attempting to connect to Schoolbox Help...'});
+                                window.setTimeout( function () {
+                                    $toast.toastTimeout({text: 'Unable to connect to Schoolbox Help: ' + error, duration: 2000, css: 'alert'});
+                                }, 1000);
                             })
                     });
 
@@ -114,6 +117,8 @@
                 });
             </script>
         </section>
+
+        <div id='toaster' class="toast" data-toast></div>
 
     {% endblock %}
     {% block emptyStateText %}Users you search for will appear here.{% endblock %}
