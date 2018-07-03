@@ -238,7 +238,7 @@
                                 var $toast = $('#toast');
                                 var title = $element.attr('data-reject');
 
-                                element.confirmDialog({
+                                $element.confirmDialog({
                                     header: 'Reject ' + title,
                                     format: 'html',
                                     text: 'Provide brief feedback for rejecting this article to help the author improve their content. <textarea id="rejectedReason" rows="5"></textarea>',
