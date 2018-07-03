@@ -152,6 +152,11 @@ class Controller extends Base
     public function getUnprovisioned()
     {
         $provisionedUsers = $this->helpRequest->findProvisionedUsers();
+        $allStaff = $this->getAllStaff();
+        $errors = [];
+        foreach($allStaff as $user) {
+            $errors[$user->getId()] = $this->getInvalidities($user);
+        }
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
