@@ -19,6 +19,7 @@ $(function() {
             var input        = $(this),
                 idInput      = null,
                 codeInput    = null,
+                deleteButton = null,
                 container    = [],
                 groupId      = 0,
                 criterionId  = 0,
@@ -34,6 +35,7 @@ $(function() {
                 addCriterion = true;
                 idInput      = container.find('[data-template="rubric-criterion-id"]');
                 codeInput    = container.find('[data-template="rubric-criterion-curriculum-codes"]');
+                deleteButton = container.find('[data-template="rubric-criterion-delete"]');
 
             } else if (input.data('rubric-group-new')) {
                 // New group?
@@ -90,6 +92,7 @@ $(function() {
                         .attr('name', 'crits['+groupId+'][items]['+criterionId+'][curriculumCode]')
                         .removeClass('hide')
                         .curriculumSelector();
+                    deleteButton.removeClass('hide');
                 }
 
                 if (addGroup) {
