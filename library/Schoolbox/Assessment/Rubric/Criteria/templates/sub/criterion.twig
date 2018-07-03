@@ -36,39 +36,64 @@
         />
 
         {# Input for criterion curriculum codes #}
-        <select data-curriculum-code-selector
-                data-template="rubric-criterion-curriculum-codes"
-                {% if showNames %}name="crits[{{ groupCount }}][items][{{ criterion.id }}][curriculumCode][]"{% endif %}
-                multiple
-                {% if new %}class="hide"{% endif %}
-        >
-            {% for code in criterion.curriculumNodes %}
-                <option label="{{ code.code }}"
-                        value="{{ code.id }}"
-                        title="{{ code.description }}"
-                        data-value-object="{{ code|json_encode }}"
-                        selected
-                >{{ code.code }}</option>
-            {% endfor %}
-        </select>
+        {#<select data-curriculum-code-selector#}
+                {#data-template="rubric-criterion-curriculum-codes"#}
+                {#{% if showNames %}name="crits[{{ groupCount }}][items][{{ criterion.id }}][curriculumCode][]"{% endif %}#}
+                {#multiple#}
+                {#{% if new %}class="hide"{% endif %}#}
+        {#>#}
+            {#{% for code in criterion.curriculumNodes %}#}
+                {#<option label="{{ code.code }}"#}
+                        {#value="{{ code.id }}"#}
+                        {#title="{{ code.description }}"#}
+                        {#data-value-object="{{ code|json_encode }}"#}
+                        {#selected#}
+                {#>{{ code.code }}</option>#}
+            {#{% endfor %}#}
+        {#</select>#}
     </div>
 
     <nav>
-        {% if readonly %}
-            {# button for showing assessments which use this criterion #}
-            <a class="icon-info"
-               data-reveal-id="criterion-{{ criterion.id }}"
-               href="#"
-               title="Show {{ locale.assessment.plural }} using {{ locale.rubricCriterion }}"></a>
-        {% else %}
-            {# delete button, with "are you sure" if it has been saved already #}
+        {% if new %}
+            {# New criteria: show delete button, no are you sure #}
+            {# Hide until the icon actually is new #}
             <a class="icon-delete"
                data-rubric-criterion="{{ criterion.id }}"
                data-role="remove-criterion"
                title="Delete {{ locale.rubricCriterion.proper }}"
                href="#"></a>
+        {% else %}
+            {# Existing criteria: #}
+            {# If in use: show usage #}
+            {# If not readonly: show delete #}
+            {% if readonly %}
+                {# if readonly, show button for showing assessments which use this criterion #}
+                <a class="icon-info"
+                   data-reveal-id="criterion-{{ criterion.id }}"
+                   href="#"
+                   title="Show {{ locale.assessment.plural }} using {{ locale.rubricCriterion }}"></a>
+            {% else %}
+                {# show tot #}
+                {# delete button, with "are you sure" if it has been saved already #}
+                <a href="#" class="icon-more" data-dropdown="dropdown-i{{ criterion.id }}" title="Actions"></a>
+            {% endif %}
         {% endif %}
     </nav>
+
+    {# Tot for something #}
+    <ul id="dropdown-i{{ criterion.id }}" class="f-dropdown" data-dropdown-content="">
+        <li>
+            <a class="icon-info"
+               data-reveal-id="criterion-{{ criterion.id }}"
+               href="#">Show {{ locale.assessment.plural }} using {{ locale.rubricCriterion }}</a>
+        </li>
+        <li>
+            <a class="icon-delete"
+               data-rubric-criterion="{{ criterion.id }}"
+               data-role="remove-criterion"
+               href="#">Delete {{ locale.rubricCriterion.proper }}</a>
+        </li>
+    </ul>
 
     {% if readonly %}
         {% set criterionUsageCount = usage|length %}
