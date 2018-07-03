@@ -17,6 +17,7 @@ use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\Resource\Folder;
 use PDO;
+use Alaress\Database\Predicate;
 
 /**
  * Responsible for returning the set of articles whose audience contains a specific user.
@@ -110,15 +111,17 @@ class ArticleResolver
 
         /**
          * @var Collection|string[]     $whereClauses
+         * @var Collection|mixed[]      $whereParams
          * @var Collection[]|string[][] $relatedWhereClauses
          */
         $whereClauses        = new Collection();
+        $whereParams         = new Collection();
         $relatedWhereClauses = new GenericCollection(Collection::class);
 
         // Insert predicates for each segment relationship modifier.
-        $this->addSelfClauses($user, $whereClauses);
-        $this->addParentsOfClauses($user, $whereClauses, $relatedWhereClauses);
-        $this->addTeachersOfClauses($user, $whereClauses, $relatedWhereClauses);
+        $this->addSelfClauses($user, $whereClauses, $whereParams);
+        $this->addParentsOfClauses($user, $whereClauses, $whereParams, $relatedWhereClauses);
+        $this->addTeachersOfClauses($user, $whereClauses, $whereParams, $relatedWhereClauses);
 
         // Check for the unlikely case where the system is configured to not permit targeting to any segment types
         if (!$whereClauses->count()) {
@@ -126,8 +129,8 @@ class ArticleResolver
         }
 
         $whereClause = \implode(" OR \n", $whereClauses->getAll());
-
-        $queries = [];
+        $parameters  = $whereParams->getAll();
+        $queries     = [];
 
         // Case 1. User matches a simple root segment
         $queries[] = "
@@ -157,7 +160,7 @@ class ArticleResolver
         // We are not guaranteed to have independent subsets, but better to remove duplicates in DB to leverage caching.
         $query = \implode("\nUNION\n", $queries);
 
-        return $this->db->executeQuery($query)->fetchAll(PDO::FETCH_COLUMN);
+        return $this->db->executeQuery($query, $parameters)->fetchAll(PDO::FETCH_COLUMN);
     }
 
 
@@ -198,9 +201,10 @@ class ArticleResolver
      *
      * @param User                $user
      * @param Collection|string[] $whereClauses
+     * @param Collection|mixed[]  $whereParams
      * @throws \InvalidArgumentException
      */
-    private function addSelfClauses(User $user, Collection $whereClauses): void
+    private function addSelfClauses(User $user, Collection $whereClauses, Collection $whereParams): void
     {
         $validEntities = $this->businessRules->getValidEntities(Model::RELATIONSHIP_SELF);
 
@@ -209,7 +213,7 @@ class ArticleResolver
             return;
         }
 
-        $this->addClauses($user, Model::RELATIONSHIP_SELF, $validEntities, $whereClauses);
+        $this->addClauses($user, Model::RELATIONSHIP_SELF, $validEntities, $whereClauses, $whereParams, 0);
     }
 
 
@@ -218,14 +222,16 @@ class ArticleResolver
      *
      * @param User                $user
      * @param Collection|string[] $whereClauses
+     * @param Collection|mixed[]  $whereParams
      * @param Collection|string[] $relatedWhereClauses
-     * @throws \UnderflowException
-     * @throws \InvalidArgumentException
      * @throws Database\Predicate\InvalidColumnException
+     * @throws \InvalidArgumentException
+     * @throws \UnderflowException
      */
     private function addParentsOfClauses(
         User $user,
         Collection $whereClauses,
+        Collection $whereParams,
         Collection $relatedWhereClauses
     ): void {
         if (Role::PARENT !== $user->getRole()->getType()) {
@@ -243,15 +249,18 @@ class ArticleResolver
             // No children in schoolbox? Then this user should never see audience segments targeted to parents of a segment
             return;
         }
-        foreach ($childUsers as $childUser) {
+
+        foreach ($childUsers as $idx => $childUser) {
+            $paramSuffix = 1 + $idx;
 
             // For simple and composite^self segments
-            $this->addClauses($childUser, Model::RELATIONSHIP_PARENTS_OF, $validEntities, $whereClauses);
+            $this->addClauses($childUser, Model::RELATIONSHIP_PARENTS_OF, $validEntities, $whereClauses, $whereParams, $paramSuffix);
 
             // For composite^parent_of segments
             $childUserId                       = $childUser->getId();
             $relatedWhereClauses[$childUserId] = new Collection();
-            $this->addClauses($childUser, Model::RELATIONSHIP_SELF, $validEntities, $relatedWhereClauses[$childUserId]);
+            $relatedWhereParams[$childUserId]  = new Collection();
+            $this->addClauses($childUser, Model::RELATIONSHIP_SELF, $validEntities, $relatedWhereClauses[$childUserId], $whereParams, $paramSuffix);
         }
     }
 
@@ -263,15 +272,16 @@ class ArticleResolver
      *
      * @param User                $user
      * @param Collection|string[] $whereClauses
+     * @param Collection|mixed[]  $whereParams
      * @param Collection|string[] $relatedWhereClauses
-     * @throws \UnderflowException
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws Predicate\InvalidColumnException
      * @throws \InvalidArgumentException
      * @throws \UnderflowException
      */
     private function addTeachersOfClauses(
         User $user,
         Collection $whereClauses,
+        Collection $whereParams,
         Collection $relatedWhereClauses
     ): void {
         if (Role::STAFF !== $user->getRole()->getType()) {
@@ -290,15 +300,18 @@ class ArticleResolver
             return;
         }
 
-        foreach ($taughtUsers as $taughtUser) {
+        foreach ($taughtUsers as $idx => $taughtUser) {
+
+            $paramSuffix = 1 + $idx;
 
             // For simple and composite^self segments
-            $this->addClauses($taughtUser, Model::RELATIONSHIP_TEACHERS_OF, $validEntities, $whereClauses);
+            $this->addClauses($taughtUser, Model::RELATIONSHIP_TEACHERS_OF, $validEntities, $whereClauses, $whereParams, $paramSuffix);
 
             // For composite^teacher_of segments
             $childUserId                       = $taughtUser->getId();
             $relatedWhereClauses[$childUserId] = new Collection();
-            $this->addClauses($taughtUser, Model::RELATIONSHIP_SELF, $validEntities, $relatedWhereClauses[$childUserId]);
+            $relatedWhereParams[$childUserId] = new Collection();
+            $this->addClauses($taughtUser, Model::RELATIONSHIP_SELF, $validEntities, $relatedWhereClauses[$childUserId], $relatedWhereParams[$childUserId], $paramSuffix);
         }
     }
 
@@ -308,54 +321,56 @@ class ArticleResolver
      * @param string              $relationship
      * @param string[]            $validEntities
      * @param Collection|string[] $whereClauses
+     * @param Collection|mixed[]  $whereParams
+     * @param int                 $paramSuffix
      * @todo consider snapping each segment entity type into helper method, see 'service' example
      * @todo consider snapping common structure into helper method
      */
-    private function addClauses(User $user, string $relationship, array $validEntities, Collection $whereClauses): void
+    private function addClauses(User $user, string $relationship, array $validEntities, Collection $whereClauses, Collection $whereParams, int $paramSuffix): void
     {
         $validEntities = \array_combine($validEntities, $validEntities);
         $userId        = $user->getId();
 
         // Targeted to a user
         if (\array_key_exists(Model::ENTITY_TYPE_USER, $validEntities)) {
-            $this->buildClause($whereClauses, Model::ENTITY_TYPE_USER, $userId, $relationship);
+            $this->buildClause($whereClauses, $whereParams, $paramSuffix, Model::ENTITY_TYPE_USER, $userId, $relationship);
         }
 
         // Targeted to superusers
         if (\array_key_exists(Model::ENTITY_TYPE_SUPER, $validEntities) && $user->isSuperuser()) {
-            $this->buildClause($whereClauses, Model::ENTITY_TYPE_SUPER, Model::ENTITY_VALUE_SUPER, $relationship);
+            $this->buildClause($whereClauses, $whereParams, $paramSuffix, Model::ENTITY_TYPE_SUPER, Model::ENTITY_VALUE_SUPER, $relationship);
         }
 
         // Targeted to a campus
         if (\array_key_exists(Model::ENTITY_TYPE_CAMPUS, $validEntities) && $this->businessRules->canTargetNullEntity(Model::ENTITY_TYPE_CAMPUS)) {
-            $this->buildClause($whereClauses, Model::ENTITY_TYPE_CAMPUS, $user->getCampusCollection()->getPropertyValues('id'), $relationship);
+            $this->buildClause($whereClauses, $whereParams, $paramSuffix, Model::ENTITY_TYPE_CAMPUS, $user->getCampusCollection()->getPropertyValues('id'), $relationship);
         }
 
         // Targeted to a Role
         if (\array_key_exists(Model::ENTITY_TYPE_ROLE, $validEntities)) {
-            $this->buildClause($whereClauses, Model::ENTITY_TYPE_ROLE, $user->getRole()->getId(), $relationship);
+            $this->buildClause($whereClauses, $whereParams, $paramSuffix, Model::ENTITY_TYPE_ROLE, $user->getRole()->getId(), $relationship);
         }
 
         // Targeted to a RoleType
         if (\array_key_exists(Model::ENTITY_TYPE_ROLE_TYPE, $validEntities)) {
-            $this->buildClause($whereClauses, Model::ENTITY_TYPE_ROLE_TYPE, $user->getRole()->getType(), $relationship);
+            $this->buildClause($whereClauses, $whereParams, $paramSuffix, Model::ENTITY_TYPE_ROLE_TYPE, $user->getRole()->getType(), $relationship);
         }
 
         // Targeted to a School House
         if (\array_key_exists(Model::ENTITY_TYPE_SCHOOL_HOUSE, $validEntities)) {
             $schoolHouseId = $user->getSchoolHouse() ? $user->getSchoolHouse()->getId() : null;
-            $this->buildClause($whereClauses, Model::ENTITY_TYPE_SCHOOL_HOUSE, $schoolHouseId, $relationship);
+            $this->buildClause($whereClauses, $whereParams, $paramSuffix, Model::ENTITY_TYPE_SCHOOL_HOUSE, $schoolHouseId, $relationship);
         }
 
         // Targeted to a Residential House
         if (\array_key_exists(Model::ENTITY_TYPE_RES_HOUSE, $validEntities)) {
             $residentialHouseId = $user->getResidentialHouse() ? $user->getResidentialHouse()->getId() : null;
-            $this->buildClause($whereClauses, Model::ENTITY_TYPE_RES_HOUSE, $residentialHouseId, $relationship);
+            $this->buildClause($whereClauses, $whereParams, $paramSuffix, Model::ENTITY_TYPE_RES_HOUSE, $residentialHouseId, $relationship);
         }
 
         // Targeted to a Year
         if (\array_key_exists(Model::ENTITY_TYPE_YEAR, $validEntities)) {
-            $this->buildClause($whereClauses, Model::ENTITY_TYPE_YEAR, $user->getYear(), $relationship);
+            $this->buildClause($whereClauses, $whereParams, $paramSuffix, Model::ENTITY_TYPE_YEAR, $user->getYear(), $relationship);
         }
 
         // Targeted to a service permission (including homepage learners + instructors)
@@ -365,14 +380,14 @@ class ArticleResolver
             foreach ($this->userAccessMapper->findByColumn('uid', $userId) as $access) {
                 $services[] = "{$access->getService()}.{$access->getServiceIdentifier()}.{$access->getAccessLevel()}";
             }
-            $this->buildClause($whereClauses, Model::ENTITY_TYPE_SERVICE, \array_unique($services), $relationship);
+            $this->buildClause($whereClauses, $whereParams, $paramSuffix, Model::ENTITY_TYPE_SERVICE, \array_unique($services), $relationship);
         }
 
         // Targeted to a pastoral group
         if (\array_key_exists(Model::ENTITY_TYPE_PASTORAL_GROUP, $validEntities)) {
             $sql      = "SELECT group_id FROM pastoral_group_member WHERE user_id = {$userId} AND deleted_at IS NULL";
             $groupIds = $this->db->executeQuery($sql)->fetchAll(PDO::FETCH_COLUMN);
-            $this->buildClause($whereClauses, Model::ENTITY_TYPE_PASTORAL_GROUP, $groupIds, $relationship);
+            $this->buildClause($whereClauses, $whereParams, $paramSuffix, Model::ENTITY_TYPE_PASTORAL_GROUP, $groupIds, $relationship);
         }
 
         // Targeted to a class or group
@@ -394,10 +409,10 @@ class ArticleResolver
             }
 
             if ($canTargetGroup) {
-                $this->buildClause($whereClauses, Model::ENTITY_TYPE_GROUP, \array_unique($groupIds), $relationship);
+                $this->buildClause($whereClauses, $whereParams, $paramSuffix, Model::ENTITY_TYPE_GROUP, \array_unique($groupIds), $relationship);
             }
             if ($canTargetClass) {
-                $this->buildClause($whereClauses, Model::ENTITY_TYPE_CLASS, \array_unique($classCodes), $relationship);
+                $this->buildClause($whereClauses, $whereParams, $paramSuffix, Model::ENTITY_TYPE_CLASS, \array_unique($classCodes), $relationship);
             }
         }
     }
@@ -411,11 +426,13 @@ class ArticleResolver
      * If entity value is NULL or empty, checks current business rules to determine if that is a valid value
      *
      * @param Collection|string[]   $whereClauses
+     * @param Collection|mixed[]    $whereParams
+     * @param int                   $paramSuffix  So we can distinguish bound args for self and related users.
      * @param string                $entityType
      * @param null|array|string|int $entityValue
      * @param string                $relationship
      */
-    private function buildClause(Collection $whereClauses, string $entityType, $entityValue, string $relationship): void
+    private function buildClause(Collection $whereClauses, Collection $whereParams, int $paramSuffix, string $entityType, $entityValue, string $relationship): void
     {
         // Don't attempt to match a segment if the system is not configured to permit null entity values for the given entity type
         if(!$this->businessRules->canTargetNullEntity($entityType) && (null === $entityValue || (\is_iterable($entityValue) && !\count($entityValue)))) {
@@ -425,22 +442,27 @@ class ArticleResolver
         $colEntityType   = Mapper::FIELD_ENTITY_TYPE;
         $colRelationship = Mapper::FIELD_RELATIONSHIP;
         $colEntityValue  = Mapper::FIELD_ENTITY_VALUE;
-        if (null === $entityValue) {
+
+         if (null === $entityValue) {
             $predicate = 'IS NULL';
-        } elseif (\is_iterable($entityValue)) {
+        } else{
+             // Convert even single items to sets of 1 for consistent treatment
+            if(!\is_iterable($entityValue)){
+                $entityValue = [$entityValue];
+            }
             if (!\count($entityValue)) {
                 $predicate = 'IS NULL';
             } else {
-                $quotedValues = \array_map(function ($item) {
-                    $quoted = \str_replace("'", "\\'", $item);
-                    return "'{$quoted}'";
-                }, $entityValue);
-                $valueString  = \implode(',', $quotedValues);
-                $predicate    = "IN ({$valueString})";
+                $prefix = "{$entityType}_{$paramSuffix}";
+                $params       = Predicate\Builder::getArrayParameters($entityValue, $prefix);
+                $placeholders = Predicate\Builder::getArrayPlaceholders($entityValue, $prefix);
+                $predicate    = "IN {$placeholders}";
+                foreach($params as $placeholder => $val){
+                    $whereParams[$placeholder] = $val;
+                }
             }
-        } else {
-            $predicate = "= '$entityValue'";
         }
+
         $table = Mapper::TABLE_NAME;
         $whereClauses->add("($table.$colEntityType = '$entityType' AND $table.$colRelationship = '$relationship' AND $table.$colEntityValue {$predicate})");
     }
