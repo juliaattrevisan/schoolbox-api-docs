@@ -18,12 +18,8 @@ use Schoolbox\Admin\SHAPS\Auth;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
-use Schoolbox\Admin\SHAPS\Exception\AuthenticationException;
-use Schoolbox\Admin\SHAPS\Exception\AuthorisationException;
-use Schoolbox\Admin\SHAPS\Exception\RequestException;
-use Schoolbox\Admin\SHAPS\Exception\RefusedRequestException;
-use Schoolbox\Admin\SHAPS\Exception\UnexpectedResponseException;
-use Schoolbox\Admin\SHAPS\Exception\InvalidUrlException;
+use Schoolbox\Admin\SHAPS\Exception;
+use Schoolbox\Error;
 
 
 
@@ -44,14 +40,21 @@ class HelpRequest
     private $userMapper;
 
     /**
-     * HelpRequest constructor.
-     * @param Auth\Parameters $authParams
-     * @param UserMapper      $userMapper
+     * @var Error\Mapper
      */
-    public function __construct(Auth\Parameters $authParams, UserMapper $userMapper)
+    private $errorMapper;
+
+    /**
+     * HelpRequest constructor.
+     * @param Auth\Parameters         $authParams
+     * @param UserMapper              $userMapper
+     * @param Error\Mapper $errorMapper
+     */
+    public function __construct(Auth\Parameters $authParams, UserMapper $userMapper, Error\Mapper $errorMapper)
     {
         $this->authParams = $authParams;
         $this->userMapper = $userMapper;
+        $this->errorMapper = $errorMapper;
     }
 
 
@@ -66,20 +69,20 @@ class HelpRequest
     {
         try {
             return $this->execute('get', 'users');
-        } catch (\Schoolbox\Admin\SHAPS\Exception\UnexpectedResponseException $e) {
-            throw \Schoolbox\Error\Mapper::getInstance()->generateException(\Schoolbox\Error\Mapper::ERROR_SHAPS_UNEXPECTED_RESPONSE);
-        } catch (\Schoolbox\Admin\SHAPS\Exception\AuthorisationException $e) {
-            throw \Schoolbox\Error\Mapper::getInstance()->generateException(\Schoolbox\Error\Mapper::ERROR_SHAPS_AUTHORISATION_FAILURE);
-        } catch (\Schoolbox\Admin\SHAPS\Exception\AuthenticationException $e) {
-            throw \Schoolbox\Error\Mapper::getInstance()->generateException(\Schoolbox\Error\Mapper::ERROR_SHAPS_AUTHENTICATION_FAILURE);
-        } catch (\Schoolbox\Admin\SHAPS\Exception\InvalidUrlException $e) {
-            throw \Schoolbox\Error\Mapper::getInstance()->generateException(\Schoolbox\Error\Mapper::ERROR_SHAPS_INVALID_URL);
-        } catch (\Schoolbox\Admin\SHAPS\Exception\RefusedRequestException $e) {
-            throw \Schoolbox\Error\Mapper::getInstance()->generateException(\Schoolbox\Error\Mapper::ERROR_SHAPS_REFUSED_REQUEST);
-        } catch (\Schoolbox\Admin\SHAPS\Exception\RequestException $e) {
-            throw \Schoolbox\Error\Mapper::getInstance()->generateException(\Schoolbox\Error\Mapper::ERROR_SHAPS_GENERIC_CONNECTION_FAILURE, $e);
+        } catch (Exception\UnexpectedResponseException $e) {
+            throw $this->errorMapper->generateException(Error\Mapper::ERROR_SHAPS_UNEXPECTED_RESPONSE);
+        } catch (Exception\AuthorisationException $e) {
+            throw $this->errorMapper->generateException(Error\Mapper::ERROR_SHAPS_AUTHORISATION_FAILURE);
+        } catch (Exception\AuthenticationException $e) {
+            throw $this->errorMapper->generateException(Error\Mapper::ERROR_SHAPS_AUTHENTICATION_FAILURE);
+        } catch (Exception\InvalidUrlException $e) {
+            throw $this->errorMapper->generateException(Error\Mapper::ERROR_SHAPS_INVALID_URL);
+        } catch (Exception\RefusedRequestException $e) {
+            throw $this->errorMapper->generateException(Error\Mapper::ERROR_SHAPS_REFUSED_REQUEST);
+        } catch (Exception\RequestException $e) {
+            throw $this->errorMapper->generateException(Error\Mapper::ERROR_SHAPS_GENERIC_CONNECTION_FAILURE, $e);
         } catch (\GuzzleHttp\Exception\GuzzleException $e) {
-            throw \Schoolbox\Error\Mapper::getInstance()->generateException(\Schoolbox\Error\Mapper::ERROR_SHAPS_GENERIC_CONNECTION_FAILURE, $e);
+            throw $this->errorMapper->generateException(Error\Mapper::ERROR_SHAPS_GENERIC_CONNECTION_FAILURE, $e);
         }
     }
 
@@ -141,24 +144,24 @@ class HelpRequest
                 ]
             );
         } catch (\GuzzleHttp\Exception\ConnectException $e) {
-            throw new InvalidUrlException("Server URL was invalid");
+            throw new Exception\InvalidUrlException("Server URL was invalid");
         } catch (\GuzzleHttp\Exception\ClientException $e) {
             switch ($e->getCode()) {
                 case 403:
                     // Digest does not match
-                    throw new AuthenticationException("Authentication failure - incorrect API key and/or school code");
+                    throw new Exception\AuthenticationException("Authentication failure - incorrect API key and/or school code");
                     break;
                 case 400:
                     // Potential replay attack
-                    throw new AuthorisationException("Authorisation failure - timestamp is out of date");
+                    throw new Exception\AuthorisationException("Authorisation failure - timestamp is out of date");
                     break;
                 default:
                     // Something else happened that the server didn't like
-                    throw new RefusedRequestException("Server refused your request");
+                    throw new Exception\RefusedRequestException("Server refused your request");
             }
         } catch (\GuzzleHttp\Exception\RequestException $e) {
             // Unfortunately, this generic error can sometimes get thrown instead of ConnectException when the URL is invalid
-            throw new RequestException("Unable to connect to the server: " .  $e->getMessage());
+            throw new Exception\RequestException("Unable to connect to the server: " .  $e->getMessage());
         }
 
         /* Return a json-encoded output of the body contents
