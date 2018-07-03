@@ -125,6 +125,7 @@ class Controller extends Base
     {
         $provisionedUsers = $this->helpRequest->findProvisionedUsers();
         $allStaff = $this->getAllStaff();
+        $errors = [];
         foreach($allStaff as $user) {
             $errors[$user->getId()] = $this->getInvalidities($user);
         }
