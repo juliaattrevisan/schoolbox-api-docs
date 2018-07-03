@@ -12,6 +12,7 @@
  */
 
 use Page\Fixture;
+use Page\Common;
 
 class FixtureCest
 {
@@ -23,6 +24,8 @@ class FixtureCest
      */
     public function _before(AcceptanceTester $i)
     {
+        exec('cd /vagrant/tools/notif; sudo php /vagrant/test/socket/destroy-rabbit-data.php;');
+        $i->logout();
         $i->loginAsAdmin();
     }
 
@@ -127,6 +130,7 @@ class FixtureCest
                 Fixture::SELECTOR_JS_AWAY_TEAM => Fixture::TEAM_SECOND_XVIII
             ]);
         $fixturePage->deleteItinerary($matchId5);
+        $fixturePage->assertNotifExists('Your upcoming AFL match ' . $matchName5 . ' has been updated');
 
     }
 
