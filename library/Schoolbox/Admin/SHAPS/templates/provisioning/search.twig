@@ -71,8 +71,8 @@
                                     inputMarkup.prop('disabled', true);
                                     labelMarkup.attr('title', 'Already provisioned')
                                 } else if (errors.length) {
-                                    var errorText = "Required field/s missing - " + (errors.join(', '));
-                                    statusMarkup.text(errorText);
+                                    var errorText = "Required field/s missing - <span class='errorList'>" + (errors.join(', ') + "</span>");
+                                    statusMarkup.html(errorText);
                                     inputMarkup.prop('disabled', true);
                                     labelMarkup.attr('title', 'Cannot provision - missing fields')
                                     trMarkup.addClass('highlight-alert');
