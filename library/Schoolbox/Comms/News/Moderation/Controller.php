@@ -99,23 +99,34 @@ class Controller extends Base
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \UnexpectedValueException
+     * @throws \Schoolbox\Application\Exception\Exception
      */
     public function postSubmit(Model $news)
     {
-        $news->setSubmittedAt(\Alaress_Date_Format::now());
-        $this->newsMapper->save($news);
+        if ((new News\ValidArticle())->isSatisfiedBy($news)) {
+            $news->setSubmittedAt(\Alaress_Date_Format::now());
+            $this->newsMapper->save($news);
 
-        /* If you're a moderator, go back to the Moderation list
-         *
-         * TODO: Otherwise currently recycle the same screen?
-         */
-        if ((new ValidUserIsCommsOfficer())->isSatisfiedBy($this->getUser())) {
-            $nextStep = $this->getRouter()->generate('commsNewsModeration.getList');
+            /* If you're a moderator, go back to the Moderation list
+             *
+             * TODO: Otherwise currently recycle the same screen?
+             */
+            if ((new ValidUserIsCommsOfficer())->isSatisfiedBy($this->getUser())) {
+                $nextStep = $this->getRouter()->generate('commsNewsModeration.getList');
+            } else {
+                $nextStep = $this->getRouter()->generate('commsNews.getDetail', [ 'newsId' => $news->getId() ]);
+            }
+
+            $this->getResponse()->redirect->to($nextStep);
         } else {
-            $nextStep = $this->getRouter()->generate('commsNews.getDetail', ['newsId' => $news->getId()]);
-        }
 
-        $this->getResponse()->redirect->to($nextStep);
+            /* Invalid article; save what you currently sent to us so you don't lose everything,
+             * but warn you about it with a generic error.
+             */
+            $this->newsMapper->save($news);
+
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_COMMS_NEWS_INVALID_ARTICLE);
+        }
     }
 
 

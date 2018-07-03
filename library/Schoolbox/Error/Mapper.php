@@ -197,6 +197,10 @@ class Mapper extends BaseMapper implements IExceptionGenerator
      */
     public const ERROR_COMMS_NEWS_CANNOT_DELETE = 216;
 
+    /* This article isn't valid
+     */
+    public const ERROR_COMMS_NEWS_INVALID_ARTICLE = 217;
+
     const ERROR_SHAPS_INVALID_URL = 215;
     const ERROR_SHAPS_AUTHENTICATION_FAILURE = 216;
     const ERROR_SHAPS_AUTHORISATION_FAILURE = 217;

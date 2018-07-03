@@ -84,3 +84,6 @@ VALUES (215, 'You cannot edit articles that are already accepted.');
 
 INSERT INTO `error` (id, message)
 VALUES (216, 'You cannot delete this article.');
+
+INSERT INTO `error` (id, message)
+VALUES (217, 'This article is missing required details that you need to add, but we saved it anyway.');
