@@ -88,6 +88,13 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
     const BLANK_PRIVATE_RECORD = "No Private Details Entered";
 
+    /**
+     * @const Character encoding for fields within this database.
+     *        Required when converting field values from Schoolbox to Synergetic.
+     * TODO: consider sharing with the one in Markbook.php
+     */
+    const CHARACTER_ENCODING = 'UTF-8';
+
     // Deduplicate query
 
     /** @var string $sqlPastoralSelect */
@@ -267,7 +274,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
                 // Create a heading from the public details in Synergetic
 
-                $heading = mb_substr(trim($record["Details"]), 0, 50);
+                $heading = mb_substr(trim($record["Details"]), 0, 50, self::CHARACTER_ENCODING);
 
                 if (empty($heading)) {
                     $heading = "Untitled Synergetic Record (Seq: {$record["PastoralCareSeq"]})";
@@ -947,11 +954,11 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         $params = [
             'studentExternalId' => $studentExternalId,
             'itemDate' => $pastoral->getCreatedAt()->getDatabase(),
-            'publicBody' => mb_substr($bodyPublicText, 0, 2000),
-            'privateBody' => mb_substr($bodyPrivateText, 0, 2000),
-            'pastoralTypeCode' => mb_substr($pastoralTypeCode, 0, 15),
-            'pastoralSubTypeCode' => mb_substr($pastoralSubTypeCode, 0, 15),
-            'classificationCode' => mb_substr($documentClassificationCode, 0, 15),
+            'publicBody' => mb_substr($bodyPublicText, 0, 2000, self::CHARACTER_ENCODING),
+            'privateBody' => mb_substr($bodyPrivateText, 0, 2000, self::CHARACTER_ENCODING),
+            'pastoralTypeCode' => mb_substr($pastoralTypeCode, 0, 15, self::CHARACTER_ENCODING),
+            'pastoralSubTypeCode' => mb_substr($pastoralSubTypeCode, 0, 15, self::CHARACTER_ENCODING),
+            'classificationCode' => mb_substr($documentClassificationCode, 0, 15, self::CHARACTER_ENCODING),
             'createdDate' => $pastoral->getCreatedAt()->getDatabase(),
             'createdOwnerId' => $pastoral->getOwner()->getExternalId(),
             'modifiedDate' => $pastoral->getCreatedAt()->getDatabase(),
