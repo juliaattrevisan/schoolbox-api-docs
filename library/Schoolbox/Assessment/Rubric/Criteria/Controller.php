@@ -239,10 +239,19 @@ class Controller extends BaseController
 
         $criterionCollection = $this->criterionMapper->findForFolder($folder->getId());
 
+        // Criteria that are in use may not be deleted from non-spec folders
+        $isSpecFolder = $folder->hasCourseSpecification() || $folder->hasUnitSpecification();
+
         // Delete criteria not submitted
         foreach ($criterionCollection as $crit) {
             if (!\in_array($crit->getId(), $found, true)) {
+                // Prevent deletion of criteria in use on a non-spec folder
                 $usages = $this->usageMapper->findCriterionUsage($crit->getId());
+                if (!$isSpecFolder && \count($usages)) {
+                    // TODO figure out a proper error
+                    throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
+                }
+
                 $this->criterionMapper->delete($crit);
                 foreach ($usages as $usage) {
                     $affectedSubmissionBoxes[] = $usage['submission_box_id'];
