@@ -93,6 +93,7 @@ class Module extends BaseModule
         /** @var Container $injector */
         $injector->params[Controller::class] = [
             'userMapper' => $this->getMapperFactory()->getLazy(UserMapper::class),
+            'errorMapper' => $this->getMapperFactory()->getLazy(\Schoolbox\Error\Mapper::class),
             'authParams' => $injector->lazyNew(
                 Parameters::class,
                 [
@@ -112,6 +113,7 @@ class Module extends BaseModule
     {
         return $this->getMapperFactory()->get(UserMapper::class);
     }
+
 }
 
 
