@@ -37,6 +37,7 @@
                 {% if showNames %}name="crits[{{ groupCount }}][curriculumCode][]"{% endif %}
                 multiple
                 {% if new %}class="hide"{% endif %}
+                data-placeholder="Add curriculum codes..."
         >
             {% for code in group.curriculumNodes %}
                 <option label="{{ code.code }}"
