@@ -29,7 +29,7 @@ class ValidSegmentTest extends PHPUnit\Framework\TestCase
     {
         parent::setUp();
         $factory                = new Validation\Factory(new Audience\BusinessRules());
-        $this->validSegmentSpec = $factory->buildValidSegmentSpecification();
+        $this->validSegmentSpec = $factory->makeValidSegmentSpecification();
     }
 
 

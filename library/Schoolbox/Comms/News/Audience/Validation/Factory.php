@@ -35,7 +35,7 @@ class Factory
      *
      * @return Specification\ISpecification
      */
-    public function buildValidSegmentSpecification(): Specification\ISpecification
+    public function makeValidSegmentSpecification(): Specification\ISpecification
     {
         // Candidate must be of correct class
         $instanceOfSegment = new Specification\IsInstanceOf(Audience\Model::class);
