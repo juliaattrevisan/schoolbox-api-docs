@@ -12,7 +12,7 @@ use PHPUnit;
 use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Audience;
 use Schoolbox\Role;
-use Specification;
+use Alaress\Specification;
 use Schoolbox\Comms\News\Audience\Validation;
 
 class ValidSegmentTest extends PHPUnit\Framework\TestCase

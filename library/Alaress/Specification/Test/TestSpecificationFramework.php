@@ -1,28 +1,28 @@
 <?php
 /**
- * Author: andy@modernwebservices.com.au
- * Created: 2/07/18 9:38 PM
+ * @author      Andy Ryan <andy.ryan@alaress.com.au>
+ * @copyright   Copyright 2018, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
  */
 declare(strict_types=1);
 
-namespace library\Specification\Test;
+namespace Alaress\Test;
 
+use Alaress\Specification\Conjunction;
+use Alaress\Specification\Disjunction;
+use Alaress\Specification\Equals;
+use Alaress\Specification\ExclusiveOr;
+use Alaress\Specification\FalseLeaf;
+use Alaress\Specification\IsInstanceOf;
+use Alaress\Specification\ISpecification;
+use Alaress\Specification\Negation;
+use Alaress\Specification\TrueLeaf;
 use PHPUnit\Framework\TestCase;
-use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\AbstractAssessment;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\User;
-use Specification\Conjunction;
-use Specification\Disjunction;
-use Specification\Equals;
-use Specification\ExclusiveOr;
-use Specification\FalseLeaf;
-use Specification\IsInstanceOf;
-use Specification\ISpecification;
-use Specification\Negation;
-use Specification\TrueLeaf;
 
 class TestSpecificationFramework extends TestCase
 {
@@ -30,6 +30,7 @@ class TestSpecificationFramework extends TestCase
     /**
      * @param $candidate
      * @dataProvider provider_candidate
+     * @throws \PHPUnit\Framework\AssertionFailedError
      */
     public function test_true($candidate): void
     {
@@ -39,8 +40,9 @@ class TestSpecificationFramework extends TestCase
 
 
     /**
-     * @param $candidate
+     * @param ISpecification $candidate
      * @dataProvider provider_candidate
+     * @throws \PHPUnit\Framework\AssertionFailedError
      */
     public function test_false($candidate): void
     {
@@ -52,6 +54,7 @@ class TestSpecificationFramework extends TestCase
     /**
      * @param ISpecification $candidate
      * @dataProvider provider_negationValid
+     * @throws \PHPUnit\Framework\AssertionFailedError
      */
     public function test_negationValid(ISpecification $candidate): void
     {
@@ -63,6 +66,7 @@ class TestSpecificationFramework extends TestCase
     /**
      * @param ISpecification $candidate
      * @dataProvider provider_negationInvalid
+     * @throws \PHPUnit\Framework\AssertionFailedError
      */
     public function test_negationInvalid(ISpecification $candidate): void
     {
@@ -74,6 +78,7 @@ class TestSpecificationFramework extends TestCase
     /**
      * @param $components
      * @dataProvider provider_andValid
+     * @throws \PHPUnit\Framework\AssertionFailedError
      */
     public function test_andValid($components): void
     {
@@ -85,6 +90,7 @@ class TestSpecificationFramework extends TestCase
     /**
      * @param $components
      * @dataProvider provider_andInvalid
+     * @throws \PHPUnit\Framework\AssertionFailedError
      */
     public function test_andInvalid($components): void
     {
@@ -96,6 +102,7 @@ class TestSpecificationFramework extends TestCase
     /**
      * @param $components
      * @dataProvider provider_orValid
+     * @throws \PHPUnit\Framework\AssertionFailedError
      */
     public function test_orValid($components): void
     {
@@ -107,6 +114,7 @@ class TestSpecificationFramework extends TestCase
     /**
      * @param $components
      * @dataProvider provider_orInvalid
+     * @throws \PHPUnit\Framework\AssertionFailedError
      */
     public function test_orInvalid($components): void
     {
@@ -118,6 +126,7 @@ class TestSpecificationFramework extends TestCase
     /**
      * @param $components
      * @dataProvider provider_xorValid
+     * @throws \PHPUnit\Framework\AssertionFailedError
      */
     public function test_xorValid($components): void
     {
@@ -129,6 +138,7 @@ class TestSpecificationFramework extends TestCase
     /**
      * @param $components
      * @dataProvider provider_xorInvalid
+     * @throws \PHPUnit\Framework\AssertionFailedError
      */
     public function test_xorInvalid($components): void
     {
@@ -142,6 +152,7 @@ class TestSpecificationFramework extends TestCase
      * @param mixed  $value
      * @param string $property
      * @dataProvider provider_equalsValid
+     * @throws \PHPUnit\Framework\AssertionFailedError
      */
     public function test_equalsValid(User $candidate, $property, $value): void
     {
@@ -155,6 +166,7 @@ class TestSpecificationFramework extends TestCase
      * @param mixed  $value
      * @param string $property
      * @dataProvider provider_equalsInvalid
+     * @throws \PHPUnit\Framework\AssertionFailedError
      */
     public function test_equalsInvalid(User $candidate, $property, $value): void
     {
@@ -167,6 +179,7 @@ class TestSpecificationFramework extends TestCase
      * @param mixed  $candidate
      * @param string $class
      * @dataProvider provider_instanceOfValid
+     * @throws \PHPUnit\Framework\AssertionFailedError
      */
     public function test_instanceOfValid($candidate, string $class): void
     {
@@ -179,6 +192,7 @@ class TestSpecificationFramework extends TestCase
      * @param mixed  $candidate
      * @param string $class
      * @dataProvider provider_instanceOfInvalid
+     * @throws \PHPUnit\Framework\AssertionFailedError
      */
     public function test_instanceOfInvalid($candidate, string $class): void
     {

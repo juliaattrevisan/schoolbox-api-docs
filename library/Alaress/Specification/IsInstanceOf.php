@@ -6,13 +6,26 @@
  */
 declare(strict_types=1);
 
-namespace Specification;
+namespace Alaress\Specification;
 
 /**
- * Any component may be satisfied. Logical OR
+ * Validates that a candidate value is an instance of some class
  */
-class Disjunction extends Composite
+class IsInstanceOf extends Leaf
 {
+
+    /** @var string */
+    private $className;
+
+
+    /**
+     * @param string $className
+     */
+    public function __construct(string $className)
+    {
+        $this->className = $className;
+    }
+
 
     /**
      * Returns whether the candidate audience specification satisfies this specification
@@ -22,11 +35,6 @@ class Disjunction extends Composite
      */
     public function isSatisfiedBy($candidate): bool
     {
-        foreach($this->getComponents() as $component){
-            if($component->isSatisfiedBy($candidate)){
-                return true;
-            }
-        }
-        return false;
+        return $candidate instanceof $this->className;
     }
 }

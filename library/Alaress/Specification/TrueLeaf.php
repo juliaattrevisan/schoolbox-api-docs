@@ -6,12 +6,12 @@
  */
 declare(strict_types=1);
 
-namespace Specification;
+namespace Alaress\Specification;
 
 /**
  * All components must be satisfied. Logical AND
  */
-class ExclusiveOr extends Composite
+class TrueLeaf extends Leaf
 {
 
     /**
@@ -19,10 +19,15 @@ class ExclusiveOr extends Composite
      */
     public function isSatisfiedBy($candidate): bool
     {
-        $value = false;
-        foreach($this->getComponents() as $component){
-            $value = ($value xor $component->isSatisfiedBy($candidate));
-        }
-        return $value;
+        return true;
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function remainderUnsatisfiedBy($candidate): ?ISpecification
+    {
+        return null;
     }
 }

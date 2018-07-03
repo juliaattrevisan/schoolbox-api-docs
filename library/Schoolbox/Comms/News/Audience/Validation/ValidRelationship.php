@@ -9,7 +9,7 @@ declare(strict_types=1);
 namespace Schoolbox\Comms\News\Audience\Validation;
 
 use Schoolbox\Comms\News\Audience;
-use Specification;
+use Alaress\Specification;
 use Schoolbox\Mapper\Exception\InsufficientHydrationException;
 
 /**

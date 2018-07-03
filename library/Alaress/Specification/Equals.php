@@ -6,9 +6,9 @@
  */
 declare(strict_types=1);
 
-namespace Specification;
+namespace Alaress\Specification;
 
-class MoreThan extends ValueBoundSpecification
+class Equals extends ValueBoundSpecification
 {
 
     /**
@@ -16,6 +16,6 @@ class MoreThan extends ValueBoundSpecification
      */
     public function isSatisfiedBy($candidate): bool
     {
-        return $this->getValue() > $this->getPropertyValue($candidate);
+        return $this->getValue() === $this->getPropertyValue($candidate);
     }
 }

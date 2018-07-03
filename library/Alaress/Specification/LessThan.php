@@ -6,12 +6,9 @@
  */
 declare(strict_types=1);
 
-namespace Specification;
+namespace Alaress\Specification;
 
-/**
- * All components must be satisfied. Logical AND
- */
-class TrueLeaf extends Leaf
+class LessThan extends ValueBoundSpecification
 {
 
     /**
@@ -19,15 +16,6 @@ class TrueLeaf extends Leaf
      */
     public function isSatisfiedBy($candidate): bool
     {
-        return true;
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    public function remainderUnsatisfiedBy($candidate): ?ISpecification
-    {
-        return null;
+        return $this->getValue() < $this->getPropertyValue($candidate);
     }
 }

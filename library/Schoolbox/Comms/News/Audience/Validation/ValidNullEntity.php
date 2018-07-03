@@ -9,7 +9,7 @@ declare(strict_types=1);
 namespace Schoolbox\Comms\News\Audience\Validation;
 
 use Schoolbox\Comms\News\Audience;
-use Specification;
+use Alaress\Specification;
 
 /**
  * Ensures the segment is targeted to an entity value of NULL and that is permitted for the segment's entity type

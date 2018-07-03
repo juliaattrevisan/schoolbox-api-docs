@@ -6,7 +6,7 @@
  */
 declare(strict_types=1);
 
-namespace Specification;
+namespace Alaress\Specification;
 
 abstract class Base implements ISpecification
 {
@@ -15,8 +15,7 @@ abstract class Base implements ISpecification
      */
     public function remainderUnsatisfiedBy($candidate): ?ISpecification
     {
-        // Default implementation // TODO
-        $satisified = $this->isSatisfiedBy($candidate);
-        return $satisified ? null : clone $this;
+        // Default implementation
+        return $this->isSatisfiedBy($candidate) ? null : clone $this;
     }
 }
