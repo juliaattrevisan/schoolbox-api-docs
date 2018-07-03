@@ -92,7 +92,7 @@
                         }, "json")
                             .fail(function(xhr, status, error) {
                                 var $toast = $('[data-toast]');
-                                var config = {text: 'Unable to connect to Schoolbox Help: ' + error, duration: 3000, css: 'alert'};
+                                var config = {text: 'Unable to connect to Schoolbox Help: ' + error, duration: 2500, css: 'alert'};
                                 $toast.toastActivate(config);
                                 $toast.toastTimeout(config);
                             })
