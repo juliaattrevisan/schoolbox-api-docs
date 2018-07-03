@@ -17,6 +17,8 @@ use GuzzleHttp\Exception\GuzzleException;
 use Schoolbox\Admin\SHAPS\Auth;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Schoolbox\Admin\SHAPS\UnexpectedResponseException;
+
 
 class HelpRequest
 {
@@ -86,6 +88,7 @@ class HelpRequest
      * @param string $endpoint
      * @param array  $formParams
      * @return array
+     * @throws \Schoolbox\Admin\SHAPS\UnexpectedResponseException
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
@@ -117,8 +120,15 @@ class HelpRequest
 
         /* Return a json-encoded output of the body contents
          */
-        $return = json_decode($response->getBody()->getContents(), true);
-        return \is_array($return) ? $return : [];
+        $decoded_response = json_decode($response->getBody()->getContents(), true);
+
+        // If this is an array, we know we got data back from Help
+        // If it isn't, it either failed to decode or contains an error response code, so throw an exception
+        if (\is_array($decoded_response)) {
+            return $decoded_response;
+        } else {
+            throw new UnexpectedResponseException($decoded_response);
+        }
     }
 
 
