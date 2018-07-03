@@ -95,7 +95,6 @@ class Controller extends Base
      * @api GET /shaps/provisioning/provisioned
      *
      * @throws \Aura\Di\Exception\ServiceNotFound
-     * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      */
@@ -125,7 +124,6 @@ class Controller extends Base
      * @api GET /shaps/provisioning/unprovisioned
      *
      * @throws \Aura\Di\Exception\ServiceNotFound
-     * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      */
@@ -166,7 +164,6 @@ class Controller extends Base
      *
      * @api GET /shaps/provisioning/{userId}
      * @param string $userId
-     * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      * @throws \Schoolbox\Mapper\Exception
