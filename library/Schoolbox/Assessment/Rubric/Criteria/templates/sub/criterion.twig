@@ -36,21 +36,21 @@
         />
 
         {# Input for criterion curriculum codes #}
-        {#<select data-curriculum-code-selector#}
-                {#data-template="rubric-criterion-curriculum-codes"#}
-                {#{% if showNames %}name="crits[{{ groupCount }}][items][{{ criterion.id }}][curriculumCode][]"{% endif %}#}
-                {#multiple#}
-                {#{% if new %}class="hide"{% endif %}#}
-        {#>#}
-            {#{% for code in criterion.curriculumNodes %}#}
-                {#<option label="{{ code.code }}"#}
-                        {#value="{{ code.id }}"#}
-                        {#title="{{ code.description }}"#}
-                        {#data-value-object="{{ code|json_encode }}"#}
-                        {#selected#}
-                {#>{{ code.code }}</option>#}
-            {#{% endfor %}#}
-        {#</select>#}
+        <select data-curriculum-code-selector
+                data-template="rubric-criterion-curriculum-codes"
+                {% if showNames %}name="crits[{{ groupCount }}][items][{{ criterion.id }}][curriculumCode][]"{% endif %}
+                multiple
+                {% if new %}class="hide"{% endif %}
+        >
+            {% for code in criterion.curriculumNodes %}
+                <option label="{{ code.code }}"
+                        value="{{ code.id }}"
+                        title="{{ code.description }}"
+                        data-value-object="{{ code|json_encode }}"
+                        selected
+                >{{ code.code }}</option>
+            {% endfor %}
+        </select>
     </div>
 
     <nav>
