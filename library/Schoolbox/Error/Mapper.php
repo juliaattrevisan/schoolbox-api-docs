@@ -188,6 +188,11 @@ class Mapper extends BaseMapper implements IExceptionGenerator
 
     public const ERROR_SUBMISSION_WINDOW_EXCEEDED = 214;
 
+    /* You cannot view this article because it is already moderated and ready for publishing
+     * Only comms officers can crud from this point onwards
+     */
+    public const ERROR_COMMS_NEWS_ALREADY_MODERATED = 215;
+
     const ERROR_SHAPS_INVALID_URL = 215;
     const ERROR_SHAPS_AUTHENTICATION_FAILURE = 216;
     const ERROR_SHAPS_AUTHORISATION_FAILURE = 217;

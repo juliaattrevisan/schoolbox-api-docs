@@ -166,9 +166,16 @@ class Controller extends Base
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \UnexpectedValueException
+     * @throws \Schoolbox\Application\Exception\Exception
      */
     public function getUpdate(Model $news)
     {
+        /* Only comms officers can edit articles that have been moderated (that is, accept for publishing)
+         */
+        if (!($news->getModeratedAt()->isNull() || $this->isCommsOfficer($this->getUser()))) {
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_COMMS_NEWS_ALREADY_MODERATED);
+        }
+
         $policies = $this->policyMapper->findAll()->indexBy('identifier');
 
         /* Feature image

@@ -74,3 +74,7 @@ ALTER TABLE `comms_news_article_topic`
 ADD CONSTRAINT `fk_comms_news_article_topic_id`
 FOREIGN KEY (`topic_id`) REFERENCES `newsTopic` (`newsTopicID`)
 ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+-- Error messages
+INSERT INTO `error` (id, message)
+VALUES (215, 'You cannot edit articles that are already moderated.');
