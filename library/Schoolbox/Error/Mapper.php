@@ -188,6 +188,15 @@ class Mapper extends BaseMapper implements IExceptionGenerator
 
     public const ERROR_SUBMISSION_WINDOW_EXCEEDED = 214;
 
+    /* Ways in which SHAPS can die
+     */
+    public const ERROR_SHAPS_INVALID_URL = 215;
+    public const ERROR_SHAPS_AUTHENTICATION_FAILURE = 216;
+    public const ERROR_SHAPS_AUTHORISATION_FAILURE = 217;
+    public const ERROR_SHAPS_REFUSED_REQUEST = 218;
+    public const ERROR_SHAPS_GENERIC_CONNECTION_FAILURE = 219;
+    public const ERROR_SHAPS_UNEXPECTED_RESPONSE = 220;
+
     /* You cannot view this article because it is already moderated and ready for publishing
      * Only comms officers can crud from this point onwards
      */
@@ -201,12 +210,6 @@ class Mapper extends BaseMapper implements IExceptionGenerator
      */
     public const ERROR_COMMS_NEWS_INVALID_ARTICLE = 223;
 
-    const ERROR_SHAPS_INVALID_URL = 215;
-    const ERROR_SHAPS_AUTHENTICATION_FAILURE = 216;
-    const ERROR_SHAPS_AUTHORISATION_FAILURE = 217;
-    const ERROR_SHAPS_REFUSED_REQUEST = 218;
-    const ERROR_SHAPS_GENERIC_CONNECTION_FAILURE = 219;
-    const ERROR_SHAPS_UNEXPECTED_RESPONSE = 220;
 
     /**
      * Setup mapping
