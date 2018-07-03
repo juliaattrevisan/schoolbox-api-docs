@@ -142,12 +142,26 @@ class Controller extends Base
 
             $this->newsMapper->save($news);
 
-            /* If you're a moderator, go back to the Moderation list
+            /* If you're a moderator and you authored your own article, redirect back to Detail
+             * so you get immediate access to Publish
              *
-             * TODO: Otherwise currently recycle the same screen?
+             * If you're a content creator and you just submitted, redirect back to Detail so
+             * you can see what you just submitted (because receipts are nice for anxious people)
+             * TODO: Maybe it should do something more obvious to indicate this outcome though.
              */
             if ((new ValidUserIsCommsOfficer())->isSatisfiedBy($this->getUser())) {
-                $nextStep = $this->getRouter()->generate('commsNewsModeration.getList');
+                if ($news->getAuthor()->getId() === $this->getUser()->getId()) {
+                    $nextStep = $this->getRouter()->generate('commsNews.getDetail', [ 'newsId' => $news->getId() ]);
+                }
+                else {
+
+                    /* This represents a moderator submitting for (on behalf of) a content creator
+                     * Normally you can't get here except by visiting a direct link and even that is
+                     * questionable as to availability.
+                     * TODO: SA-7040 Should moderators be able to access unsubmitted (draft) articles
+                     */
+                    $nextStep = $this->getRouter()->generate('commsNewsModeration.getList');
+                }
             } else {
                 $nextStep = $this->getRouter()->generate('commsNews.getDetail', [ 'newsId' => $news->getId() ]);
             }
