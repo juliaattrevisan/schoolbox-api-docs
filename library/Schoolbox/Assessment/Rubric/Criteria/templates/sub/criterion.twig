@@ -80,13 +80,16 @@
         {% endif %}
     </nav>
 
-    {# Tot for something #}
+    {# Tot for existent criteria #}
+    {% set criterionUsageCount = usage|length %}
     <ul id="dropdown-i{{ criterion.id }}" class="f-dropdown" data-dropdown-content="">
-        <li>
-            <a class="icon-info"
-               data-reveal-id="criterion-{{ criterion.id }}"
-               href="#">Show {{ locale.assessment.plural }} using {{ locale.rubricCriterion }}</a>
-        </li>
+        {% if criterionUsageCount > 0 %}
+            <li>
+                <a class="icon-info"
+                   data-reveal-id="criterion-{{ criterion.id }}"
+                   href="#">Show {{ locale.assessment.plural }} using {{ locale.rubricCriterion }}</a>
+            </li>
+        {% endif %}
         <li>
             <a class="icon-delete"
                data-rubric-criterion="{{ criterion.id }}"
@@ -95,8 +98,7 @@
         </li>
     </ul>
 
-    {% if readonly %}
-        {% set criterionUsageCount = usage|length %}
+    {% if criterionUsageCount > 0 %}
         <div data-reveal id="criterion-{{ criterion.id }}" class="reveal-modal">
             <article>
                 <h2>{{ criterion.name }}</h2>
