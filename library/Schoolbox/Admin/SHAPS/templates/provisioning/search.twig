@@ -92,11 +92,9 @@
                         }, "json")
                             .fail(function(xhr, status, error) {
                                 var $toast = $('[data-toast]');
-                                // TODO this first message really isn't necessary, but there doesn't seem to be a way to use toast without it
-                                $toast.toastActivate({text: 'Attempting to connect to Schoolbox Help...'});
-                                window.setTimeout( function () {
-                                    $toast.toastTimeout({text: 'Unable to connect to Schoolbox Help: ' + error, duration: 2000, css: 'alert'});
-                                }, 1000);
+                                var config = {text: 'Unable to connect to Schoolbox Help: ' + error, duration: 2000, css: 'alert'};
+                                $toast.toastActivate(config);
+                                $toast.toastTimeout(config);
                             })
                     });
 
