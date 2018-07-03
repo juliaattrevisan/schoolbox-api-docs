@@ -57,6 +57,31 @@ class Controller extends Base
         ]);
     }
 
+    /**
+     * Contructs an array of field names based on whether the field was empty.
+     * TODO factor this out into a common location; currently the fields are hardcoded seperately here
+     * and in library/Custom/Help/CourseParticipation/Handler.php
+     * Also, this solution does not work for the ajax search page, as it is not asynchronous.
+     *
+     * @param \Schoolbox\User $user
+     * @return array
+     */
+    private function getInvalidities(\Schoolbox\User $user) {
+        $errors = [];
+        if (empty($user->getId())) {
+            $errors[] = 'id';
+        }
+        if (empty($user->getEmail())) {
+            $errors[] = 'email';
+        }
+        if (empty($user->getFirstname())) {
+            $errors[] = 'firstname';
+        }
+        if (empty($user->getLastname())) {
+            $errors[] = 'lastname';
+        }
+        return $errors;
+    }
 
     /**
      * Renders a list of all staff in your Schoolbox instance, and whether or not they are provisioned on Help.
