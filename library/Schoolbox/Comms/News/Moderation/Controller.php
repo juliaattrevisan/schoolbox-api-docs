@@ -88,26 +88,6 @@ class Controller extends Base
 
 
     /**
-     * Find the next article to deal with
-     * Otherwise return to Moderation Queue if there are no more articles to process
-     *
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \Aura\Router\Exception\RouteNotFound
-     */
-    private function getFirst()
-    {
-        $first = (new Lists($this->newsMapper, $this->userMapper))->getNeedModeration()->first();
-
-        if ($first) {
-            $nextStep = $this->getRouter()->generate('commsNews.getDetail', ['newsId' => $first->getId()]);
-        } else {
-            $nextStep = $this->getRouter()->generate('commsNewsModeration.getList');
-        }
-
-        return $nextStep;
-    }
-
-    /**
      * Submit For Moderation occurs here
      * A required action prior to Moderation taking place
      *
@@ -202,9 +182,9 @@ class Controller extends Base
             $this->newsMapper->save($news);
         }
 
-        /* Go back to the first thing in the list; or the list itself
+        /* Go back to the list
          */
-        $this->getResponse()->redirect->to($this->getFirst());
+        $this->getResponse()->redirect->to($this->getRouter()->generate('commsNewsModeration.getList'));
     }
 
 
@@ -240,10 +220,9 @@ class Controller extends Base
 
             $this->newsMapper->save($news);
 
-            /* Redirect back to the moderation list or most urgent article
-             * so you can deal with the next thing
+            /* Redirect back to the moderation list
              */
-            $nextStep = $this->getFirst();
+            $nextStep = $this->getRouter()->generate('commsNewsModeration.getList');
 
             if ($this->getRequest()->isXhr()) {
                 $this->getResponse()->content->set($this->buildJsonOutput([
