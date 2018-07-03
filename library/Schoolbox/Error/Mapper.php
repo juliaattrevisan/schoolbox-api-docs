@@ -193,6 +193,10 @@ class Mapper extends BaseMapper implements IExceptionGenerator
      */
     public const ERROR_COMMS_NEWS_ALREADY_MODERATED = 215;
 
+    /* Only Comms Officers can delete news articles when they're already moderated and/or published
+     */
+    public const ERROR_COMMS_NEWS_CANNOT_DELETE = 216;
+
     const ERROR_SHAPS_INVALID_URL = 215;
     const ERROR_SHAPS_AUTHENTICATION_FAILURE = 216;
     const ERROR_SHAPS_AUTHORISATION_FAILURE = 217;

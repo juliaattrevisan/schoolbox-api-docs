@@ -78,3 +78,6 @@ ON DELETE NO ACTION ON UPDATE NO ACTION;
 -- Error messages
 INSERT INTO `error` (id, message)
 VALUES (215, 'You cannot edit articles that are already moderated.');
+
+INSERT INTO `error` (id, message)
+VALUES (216, 'You cannot delete this article.');

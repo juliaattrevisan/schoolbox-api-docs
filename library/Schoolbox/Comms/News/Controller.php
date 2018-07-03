@@ -12,6 +12,7 @@ namespace Schoolbox\Comms\News;
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
 use InvalidArgumentException;
+use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Comms\News\Policy;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\DefinitionException;
@@ -389,35 +390,58 @@ class Controller extends Base
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \UnexpectedValueException
+     * @throws \Schoolbox\Application\Exception\Exception
      */
     public function postDelete(Model $news)
     {
         try {
-            $news->setDeletedAt(\Alaress_Date_Format::now());
-            $this->newsMapper->save($news);
 
-            /* If you're a moderator, go back to the Moderation list
-             *
-             * TODO: Otherwise go...somewhere else? I don't have a component or dashboard yet
+            /* Try to delete this article
+             * Moderators can delete any article, but authors can only delete articles
+             * that haven't been witnessed by the world. Such articles have to be unmoderated
+             * and unpublished
              */
-            $nextStep = '/';
+            if ((new ValidUserCanDelete())->isSatisfiedBy($this->getUser(), $news)) {
+                $news->setDeletedAt(\Alaress_Date_Format::now());
+                $this->newsMapper->save($news);
 
-            if ((new ValidUserIsCommsOfficer())->isSatisfiedBy($this->getUser())) {
-                $nextStep = $this->getRouter()->generate('commsNewsModeration.getList');
+                /* If you're a moderator, go back to the Moderation list
+                 *
+                 * TODO: Otherwise go...somewhere else? I don't have a component or dashboard yet
+                 */
+                $nextStep = '/';
+
+                if ((new ValidUserIsCommsOfficer())->isSatisfiedBy($this->getUser())) {
+                    $nextStep = $this->getRouter()->generate('commsNewsModeration.getList');
+                }
+
+                if ($this->getRequest()->isXhr()) {
+                    $this->getResponse()->content->set($this->buildJsonOutput([
+                        'success' => true,
+                        'redirect' => $nextStep
+                    ]));
+                }
+                else {
+                    $this->getResponse()->redirect->to($nextStep);
+                }
+
+                return;
             }
 
+            /* Couldn't delete this article; maybe you weren't allowed
+             */
             if ($this->getRequest()->isXhr()) {
+                $this->getResponse()->status->set(400);
                 $this->getResponse()->content->set($this->buildJsonOutput([
-                    'success' => true,
-                    'redirect' => $nextStep
+                    'success' => false,
+                    'message' => "You don't have permission to delete this article."
                 ]));
-            }
-            else {
-                $this->getResponse()->redirect->to($nextStep);
+
+                return;
             }
 
-            return;
-        } catch(MapperException|RouteNotFound|\Alaress\Database\Predicate\InvalidColumnException|\PDOException|DefinitionException|\UnexpectedValueException $e) {
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_COMMS_NEWS_CANNOT_DELETE);
+        } catch(MapperException|RouteNotFound|\Alaress\Database\Predicate\InvalidColumnException|\PDOException|DefinitionException|\UnexpectedValueException|Exception $e) {
             if ($this->getRequest()->isXhr()) {
                 $this->getResponse()->status->set(400);
                 $this->getResponse()->content->set($this->buildJsonOutput([

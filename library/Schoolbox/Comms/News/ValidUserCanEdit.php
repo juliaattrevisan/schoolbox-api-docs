@@ -2,7 +2,7 @@
 /**
  * ValidUserCanEdit
  *
- * Definition of a $user who can edit $article
+ * Definition of a $user who can edit $news
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2018, Alaress Pty Ltd
@@ -18,7 +18,7 @@ class ValidUserCanEdit
 {
 
     /**
-     * Definition of a $user who can edit $article
+     * Definition of a $user who can edit $news
      *
      * @param User  $user
      * @param Model $news
