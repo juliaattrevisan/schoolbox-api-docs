@@ -33,14 +33,7 @@
                 {% set css = '' %}
             {% endif %}
 
-            {# Decide whether to use a nub or a knurl #}
-            {% if not node.icon|length %}
-                {% set nubClass = 'nub' %}
-            {% else %}
-                {% set nubClass = '' %}
-            {% endif %}
-
-            <li class="{{ css }} {{ nubClass }}">
+            <li class="{{ css }} {{ node.icon }}">
                 <a {% if node.url is not null %}href="{{ node.url }}"{% endif %} title="{{ node.alt }}">
                     <span class="{{ node.icon }}"></span>{{ node.label }}
                 </a>
