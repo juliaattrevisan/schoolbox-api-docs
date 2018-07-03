@@ -188,6 +188,13 @@ class Mapper extends BaseMapper implements IExceptionGenerator
 
     public const ERROR_SUBMISSION_WINDOW_EXCEEDED = 214;
 
+    const ERROR_SHAPS_INVALID_URL = 215;
+    const ERROR_SHAPS_AUTHENTICATION_FAILURE = 216;
+    const ERROR_SHAPS_AUTHORISATION_FAILURE = 217;
+    const ERROR_SHAPS_REFUSED_REQUEST = 218;
+    const ERROR_SHAPS_GENERIC_CONNECTION_FAILURE = 219;
+    const ERROR_SHAPS_UNEXPECTED_RESPONSE = 220;
+
     /**
      * Setup mapping
      */
