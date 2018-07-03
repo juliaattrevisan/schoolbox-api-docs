@@ -152,8 +152,7 @@ class Controller extends Base
             if ((new ValidUserIsCommsOfficer())->isSatisfiedBy($this->getUser())) {
                 if ($news->getAuthor()->getId() === $this->getUser()->getId()) {
                     $nextStep = $this->getRouter()->generate('commsNews.getDetail', [ 'newsId' => $news->getId() ]);
-                }
-                else {
+                } else {
 
                     /* This represents a moderator submitting for (on behalf of) a content creator
                      * Normally you can't get here except by visiting a direct link and even that is
