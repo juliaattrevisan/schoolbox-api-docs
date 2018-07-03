@@ -103,20 +103,41 @@ class HelpRequest
          * Host and Origin headers are for working around CSRF protection
          * (which shouldn't be necessary for API calls, but is for some reason)
          */
-        $response = (new GuzzleClient())->request(
-            $method,
-            "{$auth['url']}/api/course-participation/{$auth['schoolCode']}/{$endpoint}", [
-                'query' => [
-                    'ts'     => $auth['timestamp'],
-                    'digest' => $auth['digest']
-                ],
-                'form_params' => $formParams,
-                'headers'     => [
-                    'Host'   => $auth['host'],
-                    'Origin' => $auth['host'],
-                ],
-            ]
-        );
+        try {
+            $response = (new GuzzleClient())->request(
+                $method,
+                "{$auth['url']}/api/course-participation/{$auth['schoolCode']}/{$endpoint}", [
+                    'query' => [
+                        'ts'     => $auth['timestamp'],
+                        'digest' => $auth['digest']
+                    ],
+                    'form_params' => $formParams,
+                    'headers'     => [
+                        'Host'   => $auth['host'],
+                        'Origin' => $auth['host'],
+                    ],
+                ]
+            );
+        } catch (\GuzzleHttp\Exception\ConnectException $e) {
+            throw new UnexpectedResponseException("Server URL was invalid");
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            switch ($e->getCode()) {
+                case 403:
+                    // Digest does not match
+                    throw new UnexpectedResponseException("Authentication failure - incorrect API key and/or school code");
+                    break;
+                case 400:
+                    // Potential replay attack
+                    throw new UnexpectedResponseException("Authorisation failure - timestamp is out of date");
+                    break;
+                default:
+                    // Something else happened that the server didn't like
+                    throw new UnexpectedResponseException("Server refused your request");
+            }
+        } catch (\GuzzleHttp\Exception\RequestException $e) {
+            // Unfortunately, this generic error can sometimes get thrown instead of ConnectException when the URL is invalid
+            throw new UnexpectedResponseException("Unable to connect to the server: " .  $e->getMessage());
+        }
 
         /* Return a json-encoded output of the body contents
          */
