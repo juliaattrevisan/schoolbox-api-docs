@@ -96,7 +96,7 @@ class HelpRequest
      * @param string $endpoint
      * @param array  $formParams
      * @return array
-     * @throws \Schoolbox\Admin\SHAPS\UnexpectedResponseException
+     * @throws \Schoolbox\Admin\SHAPS\Exception\UnexpectedResponseException
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
