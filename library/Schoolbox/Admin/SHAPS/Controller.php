@@ -11,6 +11,7 @@ namespace Schoolbox\Admin\SHAPS;
 use Alaress\Web\Controller\Base;
 use Schoolbox\UserMapper;
 use Schoolbox\Collection;
+use Schoolbox\Error;
 
 class Controller extends Base
 {
@@ -20,7 +21,7 @@ class Controller extends Base
     private $userMapper;
 
     /**
-     * A telephone to help.schoolbox.com.au where so can ask it things
+     * A telephone to help.schoolbox.com.au so we can ask it things
      *
      * @var HelpRequest
      */
@@ -32,11 +33,12 @@ class Controller extends Base
      *
      * @param UserMapper      $userMapper
      * @param Auth\Parameters $authParams
+     * @param Error\Mapper   $errorMapper
      */
-    public function __construct(UserMapper $userMapper, Auth\Parameters $authParams)
+    public function __construct(UserMapper $userMapper, Auth\Parameters $authParams, Error\Mapper $errorMapper)
     {
         $this->userMapper  = $userMapper;
-        $this->helpRequest = new HelpRequest($authParams, $this->userMapper);
+        $this->helpRequest = new HelpRequest($authParams, $this->userMapper, $errorMapper);
     }
 
     /*
@@ -60,7 +62,7 @@ class Controller extends Base
      * TODO factor this out into a common location; currently the fields are hardcoded seperately here
      * and in library/Custom/Help/CourseParticipation/Handler.php
      * Also, this solution does not work for the ajax search page, as it is not asynchronous.
-     * 
+     *
      * @param \Schoolbox\User $user
      * @return array
      */
@@ -78,7 +80,6 @@ class Controller extends Base
         if (empty($user->getLastname())) {
             $errors[] = 'lastname';
         }
-
         return $errors;
     }
 
@@ -86,7 +87,6 @@ class Controller extends Base
      * Renders a list of all staff in your Schoolbox instance, and whether or not they are provisioned on Help.
      *
      * @throws \Aura\Di\Exception\ServiceNotFound
-     * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      */
@@ -117,7 +117,6 @@ class Controller extends Base
      * @api GET /shaps/provisioning/provisioned
      *
      * @throws \Aura\Di\Exception\ServiceNotFound
-     * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      */
@@ -147,16 +146,14 @@ class Controller extends Base
      * @api GET /shaps/provisioning/unprovisioned
      *
      * @throws \Aura\Di\Exception\ServiceNotFound
-     * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      */
     public function getUnprovisioned()
     {
-        $errors = [];
         $provisionedUsers = $this->helpRequest->findProvisionedUsers();
         $allStaff = $this->getAllStaff();
-
+        $errors = [];
         foreach($allStaff as $user) {
             $errors[$user->getId()] = $this->getInvalidities($user);
         }
@@ -194,7 +191,6 @@ class Controller extends Base
      *
      * @api GET /shaps/provisioning/{userId}
      * @param string $userId
-     * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      * @throws \Schoolbox\Mapper\Exception
@@ -250,6 +246,7 @@ class Controller extends Base
 
     /**
      * Takes a user ID and renders a list of all courses that user is enrolled in on Help.
+     * TODO placeholder method for when we actually implement this
      *
      * @param string $userID
      */

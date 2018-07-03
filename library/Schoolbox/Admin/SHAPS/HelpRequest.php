@@ -18,6 +18,11 @@ use Schoolbox\Admin\SHAPS\Auth;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
+use Schoolbox\Admin\SHAPS\Exception;
+use Schoolbox\Error;
+
+
+
 class HelpRequest
 {
     /**
@@ -35,14 +40,21 @@ class HelpRequest
     private $userMapper;
 
     /**
-     * HelpRequest constructor.
-     * @param Auth\Parameters $authParams
-     * @param UserMapper      $userMapper
+     * @var Error\Mapper
      */
-    public function __construct(Auth\Parameters $authParams, UserMapper $userMapper)
+    private $errorMapper;
+
+    /**
+     * HelpRequest constructor.
+     * @param Auth\Parameters         $authParams
+     * @param UserMapper              $userMapper
+     * @param Error\Mapper $errorMapper
+     */
+    public function __construct(Auth\Parameters $authParams, UserMapper $userMapper, Error\Mapper $errorMapper)
     {
         $this->authParams = $authParams;
         $this->userMapper = $userMapper;
+        $this->errorMapper = $errorMapper;
     }
 
 
@@ -50,13 +62,28 @@ class HelpRequest
      * Alias to the Users endpoint
      *
      * @return array
-     * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      */
     public function users(): array
     {
-        return $this->execute('get', 'users');
+        try {
+            return $this->execute('get', 'users');
+        } catch (Exception\UnexpectedResponseException $e) {
+            throw $this->errorMapper->generateException(Error\Mapper::ERROR_SHAPS_UNEXPECTED_RESPONSE);
+        } catch (Exception\AuthorisationException $e) {
+            throw $this->errorMapper->generateException(Error\Mapper::ERROR_SHAPS_AUTHORISATION_FAILURE);
+        } catch (Exception\AuthenticationException $e) {
+            throw $this->errorMapper->generateException(Error\Mapper::ERROR_SHAPS_AUTHENTICATION_FAILURE);
+        } catch (Exception\InvalidUrlException $e) {
+            throw $this->errorMapper->generateException(Error\Mapper::ERROR_SHAPS_INVALID_URL);
+        } catch (Exception\RefusedRequestException $e) {
+            throw $this->errorMapper->generateException(Error\Mapper::ERROR_SHAPS_REFUSED_REQUEST);
+        } catch (Exception\RequestException $e) {
+            throw $this->errorMapper->generateException(Error\Mapper::ERROR_SHAPS_GENERIC_CONNECTION_FAILURE, $e);
+        } catch (\GuzzleHttp\Exception\GuzzleException $e) {
+            throw $this->errorMapper->generateException(Error\Mapper::ERROR_SHAPS_GENERIC_CONNECTION_FAILURE, $e);
+        }
     }
 
 
@@ -86,6 +113,7 @@ class HelpRequest
      * @param string $endpoint
      * @param array  $formParams
      * @return array
+     * @throws \Schoolbox\Admin\SHAPS\Exception\UnexpectedResponseException
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
@@ -100,25 +128,54 @@ class HelpRequest
          * Host and Origin headers are for working around CSRF protection
          * (which shouldn't be necessary for API calls, but is for some reason)
          */
-        $response = (new GuzzleClient())->request(
-            $method,
-            "{$auth['url']}/api/course-participation/{$auth['schoolCode']}/{$endpoint}", [
-                'query' => [
-                    'ts'     => $auth['timestamp'],
-                    'digest' => $auth['digest']
-                ],
-                'form_params' => $formParams,
-                'headers'     => [
-                    'Host'   => $auth['host'],
-                    'Origin' => $auth['host'],
-                ],
-            ]
-        );
+        try {
+            $response = (new GuzzleClient())->request(
+                $method,
+                "{$auth['url']}/api/course-participation/{$auth['schoolCode']}/{$endpoint}", [
+                    'query' => [
+                        'ts'     => $auth['timestamp'],
+                        'digest' => $auth['digest']
+                    ],
+                    'form_params' => $formParams,
+                    'headers'     => [
+                        'Host'   => $auth['host'],
+                        'Origin' => $auth['host'],
+                    ],
+                ]
+            );
+        } catch (\GuzzleHttp\Exception\ConnectException $e) {
+            throw new Exception\InvalidUrlException("Server URL was invalid");
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            switch ($e->getCode()) {
+                case 403:
+                    // Digest does not match
+                    throw new Exception\AuthenticationException("Authentication failure - incorrect API key and/or school code");
+                    break;
+                case 400:
+                    // Potential replay attack
+                    throw new Exception\AuthorisationException("Authorisation failure - timestamp is out of date");
+                    break;
+                default:
+                    // Something else happened that the server didn't like
+                    throw new Exception\RefusedRequestException("Server refused your request");
+            }
+        } catch (\GuzzleHttp\Exception\RequestException $e) {
+            // Unfortunately, this generic error can sometimes get thrown instead of ConnectException when the URL is invalid
+            throw new Exception\RequestException("Unable to connect to the server: " .  $e->getMessage());
+        }
 
         /* Return a json-encoded output of the body contents
          */
-        $return = json_decode($response->getBody()->getContents(), true);
-        return \is_array($return) ? $return : [];
+        $decoded_response = json_decode($response->getBody()->getContents(), true);
+
+        // If this is an array, we know we got data back from Help
+        // If it isn't, it either failed to decode or contains an error response code, so throw an exception
+        // This path will also be executed if a valid URL is given but the server does not have the required routes
+        // (I'm not sure how to detect this otherwise)
+        if (\is_array($decoded_response)) {
+            return $decoded_response;
+        }
+        throw new Exception\UnexpectedResponseException($decoded_response);
     }
 
 
@@ -128,7 +185,6 @@ class HelpRequest
      * This is a list of hydrated users who have an equivalent representation in Help.
      *
      * @return \Schoolbox\GenericCollection
-     * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      */

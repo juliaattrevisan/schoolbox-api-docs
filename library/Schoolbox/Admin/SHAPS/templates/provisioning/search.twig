@@ -71,8 +71,8 @@
                                     inputMarkup.prop('disabled', true);
                                     labelMarkup.attr('title', 'Already provisioned')
                                 } else if (errors.length) {
-                                    var errorText = "Required field/s missing - " + (errors.join(', '));
-                                    statusMarkup.text(errorText);
+                                    var errorText = "Required field/s missing - <span class='errorList'>" + (errors.join(', ') + "</span>");
+                                    statusMarkup.html(errorText);
                                     inputMarkup.prop('disabled', true);
                                     labelMarkup.attr('title', 'Cannot provision - missing fields')
                                     trMarkup.addClass('highlight-alert');
@@ -91,9 +91,10 @@
 
                         }, "json")
                             .fail(function(xhr, status, error) {
-                                // TODO display some kind of error message here
-                                console.log(xhr);
-                                console.log(status + ": " + error);
+                                var $toast = $('[data-toast]');
+                                var config = {text: 'Unable to connect to Schoolbox Help: ' + error, duration: 2500, css: 'alert'};
+                                $toast.toastActivate(config);
+                                $toast.toastTimeout(config);
                             })
                     });
 
@@ -114,6 +115,8 @@
                 });
             </script>
         </section>
+
+        <div id='toaster' class="toast" data-toast></div>
 
     {% endblock %}
     {% block emptyStateText %}Users you search for will appear here.{% endblock %}
