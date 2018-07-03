@@ -9,68 +9,74 @@ declare(strict_types=1);
 namespace Schoolbox\Comms\News\Audience\Test;
 
 use PHPUnit;
-use Schoolbox\Comms\News\Audience\InvalidSegmentException;
-use Schoolbox\Comms\News\Audience\Model;
-use Schoolbox\Comms\News\Audience\ValidSegment;
+use Schoolbox\Comms\News;
+use Schoolbox\Comms\News\Audience;
 use Schoolbox\Role;
+use Specification;
+use Schoolbox\Comms\News\Audience\Validation;
 
 class ValidSegmentTest extends PHPUnit\Framework\TestCase
 {
 
-    /** @var ValidSegment */
-    private $segmentValidator;
+    /** @var Specification\ISpecification */
+    private $validSegmentSpec;
 
 
+    /**
+     * @inheritdoc
+     */
     public function setUp()
     {
         parent::setUp();
-        $this->segmentValidator = new ValidSegment();
+        $factory                = new Validation\Factory(new Audience\BusinessRules());
+        $this->validSegmentSpec = $factory->buildValidSegmentSpecification();
     }
 
 
     /**
      * @dataProvider provider_validSimpleRootSegment
-     * @param Model $segment
+     * @param Audience\Model $segment
      * @throws PHPUnit\Framework\AssertionFailedError
-     * @throws \InvalidArgumentException
-     * @throws \Schoolbox\Comms\News\Audience\InvalidSegmentException
      */
-    public function test_validSimpleRootSegment(Model $segment): void
+    public function test_validSimpleRootSegment(Audience\Model $segment): void
     {
-        $this->segmentValidator->assertValid($segment);
-        $this->assertEmpty($this->segmentValidator->getInvalidReasons());
+        $this->assertTrue($this->validSegmentSpec->isSatisfiedBy($segment));
     }
 
 
     /**
      * @dataProvider provider_invalidSimpleRootSegment
-     * @param Model  $segment
-     * @param string $message
-     * @throws InvalidSegmentException
+     * @param Audience\Model $segment
+     * @param string         $expected
+     * @param string         $message
      * @throws PHPUnit\Framework\AssertionFailedError
      * @throws PHPUnit\Framework\Exception
-     * @throws \InvalidArgumentException
      */
-    public function test_invalidSimpleRootSegment(Model $segment, string $message): void
+    public function test_invalidSimpleRootSegment(Audience\Model $segment, string $expected, string $message): void
     {
-        $this->expectException(InvalidSegmentException::class);
-        $this->segmentValidator->assertValid($segment);
-        $this->assertNotEmpty($this->segmentValidator->getInvalidReasons(), $message);
+        $this->assertFalse($this->validSegmentSpec->isSatisfiedBy($segment), $message);
+
+        $unsatisfied = $this->getFailedSpecification($this->validSegmentSpec, $segment);
+        /** @noinspection UnnecessaryAssertionInspection */
+        $this->assertInstanceOf($expected, $unsatisfied);
     }
 
 
     /**
      * @dataProvider provider_invalidSegmentTrees
-     * @param Model $segment
-     * @throws InvalidSegmentException
+     * @param Audience\Model $segment
      * @throws PHPUnit\Framework\Exception
-     * @throws \InvalidArgumentException
      */
-    public function test_invalidSegmentTree(Model $segment): void
+    public function test_invalidSegmentTree(Audience\Model $segment): void
     {
-        $this->expectException(InvalidSegmentException::class);
-        $this->segmentValidator->assertValid($segment);
+        $this->assertFalse($this->validSegmentSpec->isSatisfiedBy($segment));
+
+        $unsatisfied = $this->getFailedSpecification($this->validSegmentSpec, $segment);
+        /** @noinspection UnnecessaryAssertionInspection */
+        $this->assertInstanceOf(Validation\ValidTreeHeight::class, $unsatisfied);
     }
+
+    // Data Providers
 
 
     /**
@@ -81,36 +87,36 @@ class ValidSegmentTest extends PHPUnit\Framework\TestCase
     {
         return [
             [
-                (new Model())
+                (new Audience\Model())
                     ->setId(1)
-                    ->setCommsNewsArticle(new \stdClass())// TODO replace with real model
-                    ->setEntityType(Model::ENTITY_TYPE_USER)
+                    ->setCommsNewsArticle(new News\Model())
+                    ->setEntityType(Audience\Model::ENTITY_TYPE_USER)
                     ->setEntityValue('230')
-                    ->setRelationship(Model::RELATIONSHIP_SELF),
+                    ->setRelationship(Audience\Model::RELATIONSHIP_SELF),
             ],
             [
-                (new Model())
+                (new Audience\Model())
                     ->setId(2)
-                    ->setCommsNewsArticle(new \stdClass())// TODO replace with real model
-                    ->setEntityType(Model::ENTITY_TYPE_SUPER)
-                    ->setEntityValue(Model::ENTITY_VALUE_SUPER)
-                    ->setRelationship(Model::RELATIONSHIP_SELF),
+                    ->setCommsNewsArticle(new News\Model())
+                    ->setEntityType(Audience\Model::ENTITY_TYPE_SUPER)
+                    ->setEntityValue(Audience\Model::ENTITY_VALUE_SUPER)
+                    ->setRelationship(Audience\Model::RELATIONSHIP_SELF),
             ],
             [
-                (new Model())
+                (new Audience\Model())
                     ->setId(3)
-                    ->setCommsNewsArticle(new \stdClass())// TODO replace with real model
-                    ->setEntityType(Model::ENTITY_TYPE_CAMPUS)
+                    ->setCommsNewsArticle(new News\Model())
+                    ->setEntityType(Audience\Model::ENTITY_TYPE_CAMPUS)
                     ->setEntityValue('2')
-                    ->setRelationship(Model::RELATIONSHIP_SELF),
+                    ->setRelationship(Audience\Model::RELATIONSHIP_SELF),
             ],
             [
-                (new Model())
+                (new Audience\Model())
                     ->setId(4)
-                    ->setCommsNewsArticle(new \stdClass())// TODO replace with real model
-                    ->setEntityType(Model::ENTITY_TYPE_ROLE_TYPE)
+                    ->setCommsNewsArticle(new News\Model())
+                    ->setEntityType(Audience\Model::ENTITY_TYPE_ROLE_TYPE)
                     ->setEntityValue(Role::STUDENT)
-                    ->setRelationship(Model::RELATIONSHIP_SELF),
+                    ->setRelationship(Audience\Model::RELATIONSHIP_SELF),
             ],
         ];
     }
@@ -124,45 +130,41 @@ class ValidSegmentTest extends PHPUnit\Framework\TestCase
     {
         return [
             [
-                (new Model())
+                (new Audience\Model())
                     ->setId(1)
-                    ->setEntityType(Model::ENTITY_TYPE_USER)
+                    ->setEntityType(Audience\Model::ENTITY_TYPE_USER)
                     ->setEntityValue('230')
-                    ->setRelationship(Model::RELATIONSHIP_SELF),
+                    ->setRelationship(Audience\Model::RELATIONSHIP_SELF),
+                Specification\ExclusiveOr::class,
                 'No article or parent',
             ],
             [
-                (new Model())
+                (new Audience\Model())
                     ->setId(2)
-                    ->setCommsNewsArticle(new \stdClass())// TODO replace with real model
-                    ->setParent(new Model())
-                    ->setEntityType(Model::ENTITY_TYPE_SUPER)
-                    ->setEntityValue(Model::ENTITY_VALUE_SUPER)
-                    ->setRelationship(Model::RELATIONSHIP_SELF),
+                    ->setCommsNewsArticle(new News\Model())
+                    ->setParent(new Audience\Model())
+                    ->setEntityType(Audience\Model::ENTITY_TYPE_SUPER)
+                    ->setEntityValue(Audience\Model::ENTITY_VALUE_SUPER)
+                    ->setRelationship(Audience\Model::RELATIONSHIP_SELF),
+                Specification\ExclusiveOr::class,
                 'Article and parent',
             ],
             [
-                (new Model())
+                (new Audience\Model())
                     ->setId(3)
-                    ->setCommsNewsArticle(new \stdClass())// TODO replace with real model
-                    ->setEntityValue('2')
-                    ->setRelationship(Model::RELATIONSHIP_SELF),
-                'No entity type',
-            ],
-            [
-                (new Model())
-                    ->setId(4)
-                    ->setCommsNewsArticle(new \stdClass())// TODO replace with real model
-                    ->setEntityType(Model::ENTITY_TYPE_ROLE_TYPE)
+                    ->setCommsNewsArticle(new News\Model())
+                    ->setEntityType(Audience\Model::ENTITY_TYPE_ROLE_TYPE)
                     ->setEntityValue(Role::STUDENT),
-                'No relationship modifier',
+                Specification\Conjunction::class,
+                'No relationship',
             ],
             [
-                (new Model())
-                    ->setId(5)
-                    ->setCommsNewsArticle(new \stdClass())// TODO replace with real model
-                    ->setEntityType(Model::ENTITY_TYPE_COMPOSITE)
-                    ->setRelationship(Model::RELATIONSHIP_SELF),
+                (new Audience\Model())
+                    ->setId(4)
+                    ->setCommsNewsArticle(new News\Model())
+                    ->setEntityType(Audience\Model::ENTITY_TYPE_COMPOSITE)
+                    ->setRelationship(Audience\Model::RELATIONSHIP_SELF),
+                Specification\ExclusiveOr::class,
                 'No children of composite',
             ],
         ];
@@ -176,23 +178,23 @@ class ValidSegmentTest extends PHPUnit\Framework\TestCase
     public function provider_invalidSegmentTrees(): array
     {
         // Straight chain
-        $grandparent = (new Model())
+        $grandparent = (new Audience\Model())
             ->setId(1)
-            ->setCommsNewsArticle(new \stdClass())// TODO replace with real model
-            ->setEntityType(Model::ENTITY_TYPE_COMPOSITE)
-            ->setRelationship(Model::RELATIONSHIP_SELF);
+            ->setCommsNewsArticle(new News\Model())
+            ->setEntityType(Audience\Model::ENTITY_TYPE_COMPOSITE)
+            ->setRelationship(Audience\Model::RELATIONSHIP_SELF);
 
-        $parent = (new Model())
+        $parent = (new Audience\Model())
             ->setId(2)
             ->setParent($grandparent)
-            ->setEntityType(Model::ENTITY_TYPE_COMPOSITE)
-            ->setRelationship(Model::RELATIONSHIP_SELF);
+            ->setEntityType(Audience\Model::ENTITY_TYPE_COMPOSITE)
+            ->setRelationship(Audience\Model::RELATIONSHIP_SELF);
 
-        $grandchild = (new Model())
+        $grandchild = (new Audience\Model())
             ->setId(2)
             ->setParent($parent)
-            ->setEntityType(Model::ENTITY_TYPE_USER)
-            ->setRelationship(Model::RELATIONSHIP_SELF);
+            ->setEntityType(Audience\Model::ENTITY_TYPE_USER)
+            ->setRelationship(Audience\Model::RELATIONSHIP_SELF);
 
         $grandparent->getChildren()[] = $parent;
         $parent->getChildren()[]      = $grandchild;
@@ -201,4 +203,23 @@ class ValidSegmentTest extends PHPUnit\Framework\TestCase
         return [[$grandparent]];
     }
 
+    // Helpers
+
+
+    /**
+     * Returns the reason/s why an audience segment fails a spec
+     *
+     * @param Specification\ISpecification $spec
+     * @param Audience\Model               $segment
+     * @return Specification\ISpecification
+     */
+    private function getFailedSpecification(Specification\ISpecification $spec, Audience\Model $segment): Specification\ISpecification
+    {
+        $unsatisfied = $spec->remainderUnsatisfiedBy($segment);
+        while ($unsatisfied instanceof Specification\Conjunction && 1 === \count($unsatisfied->getComponents())) {
+            $components  = $unsatisfied->getComponents();
+            $unsatisfied = \array_shift($components);
+        }
+        return $unsatisfied;
+    }
 }
