@@ -64,10 +64,18 @@
                                 {#<input id="provision-{{ user.id }}" name="userId[]" value="{{ user.id }}" type="checkbox" data-checkbox>#}
                                 {#<label for="provision-{{ user.id }}"></label>#}
 
+                                var errors = user.errorList[user.id];
+
                                 if (user.provisioned) {
                                     statusMarkup.addClass("icon-course-outline").attr('title', 'Provisioned');
                                     inputMarkup.prop('disabled', true);
                                     labelMarkup.attr('title', 'Already provisioned')
+                                } else if (errors.length) {
+                                    var errorText = "Required field/s missing - " + (errors.join(', '));
+                                    statusMarkup.text(errorText);
+                                    inputMarkup.prop('disabled', true);
+                                    labelMarkup.attr('title', 'Cannot provision - missing fields')
+                                    trMarkup.addClass('highlight-alert');
                                 } else {
                                     statusMarkup.text('Not Provisioned');
                                     trMarkup.addClass('highlight-warning');

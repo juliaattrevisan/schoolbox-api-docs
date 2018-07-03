@@ -30,7 +30,7 @@ class Handler
 
     const PARTICIPANT_CAMPUS    = 1;
     const REQUIRED_USER_FIELDS  = [
-        'id', 'email', 'title', 'firstname', 'lastname'
+        'id', 'email', 'firstname', 'lastname'
     ];
 
     /**
@@ -239,7 +239,7 @@ class Handler
         foreach ($post['user'] as $userData) {
             if (!$this->userPayloadIsValid($userData)) {
                 $failedUsers[] = [
-                    'Invalid payload', $userData
+                    'Failed: required data was missing', $userData
                 ];
                 continue;
             }

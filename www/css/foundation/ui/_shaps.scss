@@ -15,8 +15,12 @@
   tr.highlight-alert {
     background-color: scale-color($alert-color, $lightness: 75%);
   }
-}
 
-[data-relation='member'] .prospect {
-  font-style: italic;
+  [data-relation='member'] .prospect {
+    font-style: italic;
+  }
+
+  span.errorList {
+    font-weight: bold;
+  }
 }

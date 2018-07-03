@@ -55,6 +55,32 @@ class Controller extends Base
         ]);
     }
 
+    /**
+     * Contructs an array of field names based on whether the field was empty.
+     * TODO factor this out into a common location; currently the fields are hardcoded seperately here
+     * and in library/Custom/Help/CourseParticipation/Handler.php
+     * Also, this solution does not work for the ajax search page, as it is not asynchronous.
+     * 
+     * @param \Schoolbox\User $user
+     * @return array
+     */
+    private function getInvalidities(\Schoolbox\User $user) {
+        $errors = [];
+        if (empty($user->getId())) {
+            $errors[] = 'id';
+        }
+        if (empty($user->getEmail())) {
+            $errors[] = 'email';
+        }
+        if (empty($user->getFirstname())) {
+            $errors[] = 'firstname';
+        }
+        if (empty($user->getLastname())) {
+            $errors[] = 'lastname';
+        }
+
+        return $errors;
+    }
 
     /**
      * Renders a list of all staff in your Schoolbox instance, and whether or not they are provisioned on Help.
@@ -66,14 +92,21 @@ class Controller extends Base
      */
     public function getAll()
     {
+        $errors = [];
         $provisionedUsers = $this->helpRequest->findProvisionedUsers();
+
+        $allStaff = $this->getAllStaff();
+        foreach($allStaff as $user) {
+            $errors[$user->getId()] = $this->getInvalidities($user);
+        }
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@shaps/provisioning/index.twig', [
-                'allUsers' => $this->getAllStaff(),
+                'allUsers' => $allStaff,
                 'provisionedUsers' => $provisionedUsers,
-                'pageCurrent' => 'shaps/provisioning'
+                'pageCurrent' => 'shaps/provisioning',
+                'errors' => $errors
             ])->setTitle('Schoolbox Help Staff Provisioning')
         );
     }
@@ -91,13 +124,19 @@ class Controller extends Base
     public function getProvisioned()
     {
         $provisionedUsers = $this->helpRequest->findProvisionedUsers();
+        $allStaff = $this->getAllStaff();
+        $errors = [];
+        foreach($allStaff as $user) {
+            $errors[$user->getId()] = $this->getInvalidities($user);
+        }
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@shaps/provisioning/provisioned.twig', [
                     'allUsers' => $provisionedUsers,
                     'provisionedUsers' => $provisionedUsers,
-                    'pageCurrent' => 'shaps/provisioning'
+                    'pageCurrent' => 'shaps/provisioning',
+                    'errors' => $errors
             ])->setTitle('Provisioned Staff - Schoolbox Help Staff Provisioning')
         );
     }
@@ -114,13 +153,20 @@ class Controller extends Base
      */
     public function getUnprovisioned()
     {
+        $errors = [];
         $provisionedUsers = $this->helpRequest->findProvisionedUsers();
+        $allStaff = $this->getAllStaff();
+
+        foreach($allStaff as $user) {
+            $errors[$user->getId()] = $this->getInvalidities($user);
+        }
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@shaps/provisioning/unprovisioned.twig', [
-                    'allUsers' => $this->getAllStaff()->diff($provisionedUsers),
-                    'pageCurrent' => 'shaps/provisioning'
+                    'allUsers' => $allStaff->diff($provisionedUsers),
+                    'pageCurrent' => 'shaps/provisioning',
+                    'errors' => $errors
             ])->setTitle('Unprovisioned Staff - Schoolbox Help Staff Provisioning')
         );
     }
@@ -157,6 +203,7 @@ class Controller extends Base
     {
         // Selectize gives us the user's external ID
         $user = $this->userMapper->findByExternalId($userId);
+        $errors[$user->getId()] = $this->getInvalidities($user);
 
         /* Check if this user's id was in the provisionedUsers index - don't need to use in_array to test
          */
@@ -168,6 +215,7 @@ class Controller extends Base
             'provisioned' => $exists,
             'id' => $user->getId(),
             'externalID' => $user->getExternalId(),
+            'errorList' => $errors
         ];
 
         $this->getResponse()->content->set($this->buildJsonOutput($userJSON));
