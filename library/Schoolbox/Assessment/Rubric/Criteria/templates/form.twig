@@ -210,7 +210,7 @@ $(function() {
     </div>
 </div>
 
-{% if showCurriculumCodes %}
+{% if curriculumTaggingEnabled %}
     {% set groupColumn = 'small-12 medium-6' %}
     {% set criterionColumn = 'small-12 medium-6' %}
 {% else %}
@@ -245,10 +245,11 @@ $(function() {
                             <h3>{{ locale.rubricGroup.proper }}</h3>
                             <ul class="information-list">
                                 {% include '@rubricCriteria/sub/group.twig' with {
-                                    group:        group.group,
-                                    groupCount:   groupCount,
-                                    usage:        group.usage,
-                                    isSpecFolder: isSpecFolder,
+                                    group:                    group.group,
+                                    groupCount:               groupCount,
+                                    usage:                    group.usage,
+                                    isSpecFolder:             isSpecFolder,
+                                    curriculumTaggingEnabled: curriculumTaggingEnabled,
                                 } only %}
                             </ul>
                         </div>
@@ -259,19 +260,21 @@ $(function() {
 
                                 {% for criterion in group.criteria %}
                                     {% include '@rubricCriteria/sub/criterion.twig' with {
-                                        criterion:    criterion.criterion,
-                                        groupCount:   groupCount,
-                                        usage:        criterion.usage,
-                                        isSpecFolder: isSpecFolder,
+                                        criterion:                criterion.criterion,
+                                        groupCount:               groupCount,
+                                        usage:                    criterion.usage,
+                                        isSpecFolder:             isSpecFolder,
+                                        curriculumTaggingEnabled: curriculumTaggingEnabled,
                                     } only %}
                                 {% endfor %}
 
                                 {# New criterion within group #}
                                 {% include '@rubricCriteria/sub/criterion.twig' with {
-                                    criterion:    null,
-                                    groupCount:   groupCount,
-                                    usage:        null,
-                                    isSpecFolder: isSpecFolder,
+                                    criterion:                null,
+                                    groupCount:               groupCount,
+                                    usage:                    null,
+                                    isSpecFolder:             isSpecFolder,
+                                    curriculumTaggingEnabled: curriculumTaggingEnabled,
                                 } only %}
                             </ul>
                         </div>
@@ -284,10 +287,11 @@ $(function() {
                         <h3>{{ locale.rubricGroup.proper }}</h3>
                         <ul class="information-list">
                             {% include '@rubricCriteria/sub/group.twig' with {
-                                group:        null,
-                                groupCount:   null,
-                                usage:        null,
-                                isSpecFolder: isSpecFolder,
+                                group:                    null,
+                                groupCount:               null,
+                                usage:                    null,
+                                isSpecFolder:             isSpecFolder,
+                                curriculumTaggingEnabled: curriculumTaggingEnabled,
                             } only %}
                         </ul>
                     </div>
@@ -296,10 +300,11 @@ $(function() {
                         <ul class="information-list">
                             {# New criterion within new group #}
                             {% include '@rubricCriteria/sub/criterion.twig' with {
-                                criterion:    null,
-                                groupCount:   null,
-                                usage:        null,
-                                isSpecFolder: isSpecFolder,
+                                criterion:                null,
+                                groupCount:               null,
+                                usage:                    null,
+                                isSpecFolder:             isSpecFolder,
+                                curriculumTaggingEnabled: curriculumTaggingEnabled,
                             } only %}
                         </ul>
                     </div>

@@ -184,12 +184,12 @@ class Controller extends BaseController
         }
 
         return [
-            'folder'              => $folder,
-            'groups'              => $groups,
-            'maxGroupId'          => \count($groups),
-            'maxCritId'           => $topId + 1,
-            'showCurriculumCodes' => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
-            'isSpecFolder'        => $folder->hasCourseSpecification() || $folder->hasUnitSpecification(),
+            'folder'                   => $folder,
+            'groups'                   => $groups,
+            'maxGroupId'               => \count($groups),
+            'maxCritId'                => $topId + 1,
+            'curriculumTaggingEnabled' => $this->isCurriculumTaggingEnabled(),
+            'isSpecFolder'             => $folder->hasCourseSpecification() || $folder->hasUnitSpecification(),
         ];
     }
 
@@ -316,8 +316,9 @@ class Controller extends BaseController
                     $group = $this->groupMapper->findOrCreateOneForFolderByName($folderId, $groupName, false);
                 }
 
-                // Set curriculum codes
-                $group->setCurriculumNodes($this->nodeMapper->findByColumn('id', $critData['groupCodes']));
+                if ($this->isCurriculumTaggingEnabled()) {
+                    $group->setCurriculumNodes($this->nodeMapper->findByColumn('id', $critData['groupCodes']));
+                }
                 $this->groupMapper->save($group);
                 $groupList[$groupName] = $group;
             }
@@ -364,8 +365,23 @@ class Controller extends BaseController
                 );
             }
 
-            $criterion->setCurriculumNodes($this->nodeMapper->findByColumn('id', $critData['codes']));
+            if ($this->isCurriculumTaggingEnabled()) {
+                $criterion->setCurriculumNodes($this->nodeMapper->findByColumn('id', $critData['codes']));
+            }
             $this->criterionMapper->save($criterion);
         }
+    }
+
+
+    /**
+     * Is curriculum tagging enabled?
+     *
+     * If not: don't save curriculum nodes, or show them in the form.
+     *
+     * @return bool
+     */
+    private function isCurriculumTaggingEnabled(): bool
+    {
+        return (bool)$this->getConfigLoader()->get('curriculum_tagging_enabled');
     }
 }

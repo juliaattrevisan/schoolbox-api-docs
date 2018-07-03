@@ -1,11 +1,12 @@
 {##
  # Params:
- # * group:        If null, this is an input for a new group
- # * usage:        Assessments that use the group
- # * groupCount:   The number of the group, used only for array keys.
- #                 If null, no name is output.
- # * isSpecFolder: Is the folder this group is in a course or unit spec?
- #                 If so, the group name is never readonly.
+ # * group:                    If null, this is an input for a new group
+ # * usage:                    Assessments that use the group
+ # * groupCount:               The number of the group, used only for array keys.
+ #                             If null, no name is output.
+ # * isSpecFolder:             Is the folder this group is in a course or unit spec?
+ #                             If so, the group name is never readonly.
+ # * curriculumTaggingEnabled: Are curriculum code inputs shown?
  #}
 
 {% set showNames = groupCount is not null %}
@@ -32,22 +33,24 @@
         />
 
         {# Input for group curriculum codes #}
-        <select data-curriculum-code-selector
-                data-template="rubric-group-curriculum-codes"
-                {% if showNames %}name="crits[{{ groupCount }}][curriculumCode][]"{% endif %}
-                multiple
-                {% if new %}class="hide"{% endif %}
-                data-placeholder="Add curriculum codes..."
-        >
-            {% for code in group.curriculumNodes %}
-                <option label="{{ code.code }}"
-                        value="{{ code.id }}"
-                        title="{{ code.description }}"
-                        data-value-object="{{ code|json_encode }}"
-                        selected
-                >{{ code.code }}</option>
-            {% endfor %}
-        </select>
+        {% if curriculumTaggingEnabled %}
+            <select data-curriculum-code-selector
+                    data-template="rubric-group-curriculum-codes"
+                    {% if showNames %}name="crits[{{ groupCount }}][curriculumCode][]"{% endif %}
+                    multiple
+                    {% if new %}class="hide"{% endif %}
+                    data-placeholder="Add curriculum codes..."
+            >
+                {% for code in group.curriculumNodes %}
+                    <option label="{{ code.code }}"
+                            value="{{ code.id }}"
+                            title="{{ code.description }}"
+                            data-value-object="{{ code|json_encode }}"
+                            selected
+                    >{{ code.code }}</option>
+                {% endfor %}
+            </select>
+        {% endif %}
     </div>
 
     <nav></nav>
