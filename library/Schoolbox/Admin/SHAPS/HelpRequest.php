@@ -59,14 +59,28 @@ class HelpRequest
      * Alias to the Users endpoint
      *
      * @return array
-     * @throws \Schoolbox\Admin\SHAPS\UnexpectedResponseException
-     * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      */
     public function users(): array
     {
-        return $this->execute('get', 'users');
+        try {
+            return $this->execute('get', 'users');
+        } catch (\Schoolbox\Admin\SHAPS\Exception\UnexpectedResponseException $e) {
+            throw \Schoolbox\Error\Mapper::getInstance()->generateException(\Schoolbox\Error\Mapper::ERROR_SHAPS_UNEXPECTED_RESPONSE);
+        } catch (\Schoolbox\Admin\SHAPS\Exception\AuthorisationException $e) {
+            throw \Schoolbox\Error\Mapper::getInstance()->generateException(\Schoolbox\Error\Mapper::ERROR_SHAPS_AUTHORISATION_FAILURE);
+        } catch (\Schoolbox\Admin\SHAPS\Exception\AuthenticationException $e) {
+            throw \Schoolbox\Error\Mapper::getInstance()->generateException(\Schoolbox\Error\Mapper::ERROR_SHAPS_AUTHENTICATION_FAILURE);
+        } catch (\Schoolbox\Admin\SHAPS\Exception\InvalidUrlException $e) {
+            throw \Schoolbox\Error\Mapper::getInstance()->generateException(\Schoolbox\Error\Mapper::ERROR_SHAPS_INVALID_URL);
+        } catch (\Schoolbox\Admin\SHAPS\Exception\RefusedRequestException $e) {
+            throw \Schoolbox\Error\Mapper::getInstance()->generateException(\Schoolbox\Error\Mapper::ERROR_SHAPS_REFUSED_REQUEST);
+        } catch (\Schoolbox\Admin\SHAPS\Exception\RequestException $e) {
+            throw \Schoolbox\Error\Mapper::getInstance()->generateException(\Schoolbox\Error\Mapper::ERROR_SHAPS_GENERIC_CONNECTION_FAILURE, $e);
+        } catch (\GuzzleHttp\Exception\GuzzleException $e) {
+            throw \Schoolbox\Error\Mapper::getInstance()->generateException(\Schoolbox\Error\Mapper::ERROR_SHAPS_GENERIC_CONNECTION_FAILURE, $e);
+        }
     }
 
 
@@ -169,9 +183,6 @@ class HelpRequest
      * This is a list of hydrated users who have an equivalent representation in Help.
      *
      * @return \Schoolbox\GenericCollection
-     * @throws \Schoolbox\Admin\SHAPS\Exception\RequestException
-     * @throws \Schoolbox\Admin\SHAPS\Exception\UnexpectedResponseException
-     * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      */
