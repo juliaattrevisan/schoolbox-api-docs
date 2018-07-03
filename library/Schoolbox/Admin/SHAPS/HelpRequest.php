@@ -111,7 +111,6 @@ class HelpRequest
          * Host and Origin headers are for working around CSRF protection
          * (which shouldn't be necessary for API calls, but is for some reason)
          */
-        // TODO also need to account for the case where the URL is valid but route does not exist
         try {
             $response = (new GuzzleClient())->request(
                 $method,
@@ -154,6 +153,8 @@ class HelpRequest
 
         // If this is an array, we know we got data back from Help
         // If it isn't, it either failed to decode or contains an error response code, so throw an exception
+        // This path will also be executed if a valid URL is given but the server does not have the required routes
+        // (I'm not sure how to detect this otherwise)
         if (\is_array($decoded_response)) {
             return $decoded_response;
         } else {
