@@ -175,7 +175,7 @@ class HelpRequest
         if (\is_array($decoded_response)) {
             return $decoded_response;
         }
-        throw new UnexpectedResponseException($decoded_response);
+        throw new Exception\UnexpectedResponseException($decoded_response);
     }
 
 
