@@ -17,7 +17,14 @@ use GuzzleHttp\Exception\GuzzleException;
 use Schoolbox\Admin\SHAPS\Auth;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-use Schoolbox\Admin\SHAPS\UnexpectedResponseException;
+
+use Schoolbox\Admin\SHAPS\Exception\AuthenticationException;
+use Schoolbox\Admin\SHAPS\Exception\AuthorisationException;
+use Schoolbox\Admin\SHAPS\Exception\RequestException;
+use Schoolbox\Admin\SHAPS\Exception\RefusedRequestException;
+use Schoolbox\Admin\SHAPS\Exception\UnexpectedResponseException;
+use Schoolbox\Admin\SHAPS\Exception\InvalidUrlException;
+
 
 
 class HelpRequest
@@ -52,6 +59,7 @@ class HelpRequest
      * Alias to the Users endpoint
      *
      * @return array
+     * @throws \Schoolbox\Admin\SHAPS\UnexpectedResponseException
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
@@ -103,6 +111,7 @@ class HelpRequest
          * Host and Origin headers are for working around CSRF protection
          * (which shouldn't be necessary for API calls, but is for some reason)
          */
+        // TODO also need to account for the case where the URL is valid but route does not exist
         try {
             $response = (new GuzzleClient())->request(
                 $method,
@@ -119,24 +128,24 @@ class HelpRequest
                 ]
             );
         } catch (\GuzzleHttp\Exception\ConnectException $e) {
-            throw new UnexpectedResponseException("Server URL was invalid");
+            throw new InvalidUrlException("Server URL was invalid");
         } catch (\GuzzleHttp\Exception\ClientException $e) {
             switch ($e->getCode()) {
                 case 403:
                     // Digest does not match
-                    throw new UnexpectedResponseException("Authentication failure - incorrect API key and/or school code");
+                    throw new AuthenticationException("Authentication failure - incorrect API key and/or school code");
                     break;
                 case 400:
                     // Potential replay attack
-                    throw new UnexpectedResponseException("Authorisation failure - timestamp is out of date");
+                    throw new AuthorisationException("Authorisation failure - timestamp is out of date");
                     break;
                 default:
                     // Something else happened that the server didn't like
-                    throw new UnexpectedResponseException("Server refused your request");
+                    throw new RefusedRequestException("Server refused your request");
             }
         } catch (\GuzzleHttp\Exception\RequestException $e) {
             // Unfortunately, this generic error can sometimes get thrown instead of ConnectException when the URL is invalid
-            throw new UnexpectedResponseException("Unable to connect to the server: " .  $e->getMessage());
+            throw new RequestException("Unable to connect to the server: " .  $e->getMessage());
         }
 
         /* Return a json-encoded output of the body contents
@@ -159,6 +168,8 @@ class HelpRequest
      * This is a list of hydrated users who have an equivalent representation in Help.
      *
      * @return \Schoolbox\GenericCollection
+     *      * @throws \Schoolbox\Admin\SHAPS\Exception\RequestException
+     * @throws \Schoolbox\Admin\SHAPS\Exception\UnexpectedResponseException
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
