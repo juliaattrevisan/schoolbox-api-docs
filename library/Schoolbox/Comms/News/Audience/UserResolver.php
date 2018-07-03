@@ -165,64 +165,70 @@ class UserResolver
             if(!$this->businessRules->canTargetNullEntity($entityType)){
                 return [];
             }
-            $predicate = 'IS NULL';
+            $predicate  = 'IS NULL';
+            $parameters = null;
         } else {
-            $predicate = "= '{$entityValue}'";
+            $predicate   = '= :entity_value';
+            $parameters  = ['entity_value' => $entityValue];
         }
 
         switch ($entityType) {
             case Model::ENTITY_TYPE_USER:
-                return $this->db->executeQuery("SELECT u.id FROM user u WHERE u.id {$predicate} AND u.deleted_at IS NULL")->fetchAll(PDO::FETCH_COLUMN);
+                return $this->db->executeQuery("SELECT u.id FROM user u WHERE u.id {$predicate} AND u.deleted_at IS NULL", $parameters)->fetchAll(PDO::FETCH_COLUMN);
             case Model::ENTITY_TYPE_SUPER:
-                return $this->db->executeQuery('SELECT u.id FROM user u JOIN superusers su ON u.id = su.id AND u.deleted_at IS NULL')->fetchAll(PDO::FETCH_COLUMN);
+                return $this->db->executeQuery('SELECT u.id FROM user u JOIN superusers su ON u.id = su.id AND u.deleted_at IS NULL', $parameters)->fetchAll(PDO::FETCH_COLUMN);
             case Model::ENTITY_TYPE_CAMPUS:
-                return $this->db->executeQuery("SELECT u.id FROM user u JOIN userCampus uc ON u.id = uc.uid WHERE uc.campus {$predicate} AND u.deleted_at IS NULL")->fetchAll(PDO::FETCH_COLUMN);
+                return $this->db->executeQuery("SELECT u.id FROM user u JOIN userCampus uc ON u.id = uc.uid WHERE uc.campus {$predicate} AND u.deleted_at IS NULL", $parameters)->fetchAll(PDO::FETCH_COLUMN);
             case Model::ENTITY_TYPE_ROLE:
-                return $this->db->executeQuery("SELECT u.id FROM user u WHERE u.group_id {$predicate} AND u.deleted_at IS NULL")->fetchAll(PDO::FETCH_COLUMN);
+                return $this->db->executeQuery("SELECT u.id FROM user u WHERE u.group_id {$predicate} AND u.deleted_at IS NULL", $parameters)->fetchAll(PDO::FETCH_COLUMN);
             case Model::ENTITY_TYPE_ROLE_TYPE:
-                return $this->db->executeQuery("SELECT u.id FROM user u JOIN groups g ON u.group_id = g.id WHERE g.group_type {$predicate} AND u.deleted_at IS NULL")->fetchAll(PDO::FETCH_COLUMN);
+                return $this->db->executeQuery("SELECT u.id FROM user u JOIN groups g ON u.group_id = g.id WHERE g.group_type {$predicate} AND u.deleted_at IS NULL", $parameters)->fetchAll(PDO::FETCH_COLUMN);
             case Model::ENTITY_TYPE_SCHOOL_HOUSE:
-                return $this->db->executeQuery("SELECT u.id FROM user u WHERE u.house {$predicate} AND u.deleted_at IS NULL")->fetchAll(PDO::FETCH_COLUMN);
+                return $this->db->executeQuery("SELECT u.id FROM user u WHERE u.house {$predicate} AND u.deleted_at IS NULL", $parameters)->fetchAll(PDO::FETCH_COLUMN);
             case Model::ENTITY_TYPE_RES_HOUSE:
-                return $this->db->executeQuery("SELECT u.id FROM user u WHERE u.residential_house_id {$predicate} AND u.deleted_at IS NULL")->fetchAll(PDO::FETCH_COLUMN);
+                return $this->db->executeQuery("SELECT u.id FROM user u WHERE u.residential_house_id {$predicate} AND u.deleted_at IS NULL", $parameters)->fetchAll(PDO::FETCH_COLUMN);
             case Model::ENTITY_TYPE_YEAR:
-                return $this->db->executeQuery("SELECT u.id FROM user u WHERE u.year {$predicate} AND u.deleted_at IS NULL")->fetchAll(PDO::FETCH_COLUMN);
+                return $this->db->executeQuery("SELECT u.id FROM user u WHERE u.year {$predicate} AND u.deleted_at IS NULL", $parameters)->fetchAll(PDO::FETCH_COLUMN);
             case Model::ENTITY_TYPE_SERVICE:
                 [$service, $sid, $type] = \explode('.', $entityValue);
                 $whereClauses = [];
-                if('*' !== $service){
-                    $whereClauses[] = "ua.service = $service";
+                $parameters   = [];
+                if ('*' !== $service) {
+                    $whereClauses[]        = 'ua.service = :service';
+                    $parameters['service'] = $service;
                 }
-                if('*' !== $sid){
-                    $whereClauses[] = "ua.sid = $sid";
+                if ('*' !== $sid) {
+                    $whereClauses[]    = 'ua.sid = :sid';
+                    $parameters['sid'] = $sid;
                 }
-                if('*' !== $type){
-                    $whereClauses[] = "ua.type = $type";
+                if ('*' !== $type) {
+                    $whereClauses[]     = 'ua.type = :type';
+                    $parameters['type'] = $type;
                 }
                 $whereClause = \count($whereClauses) ? \implode(' AND ', $whereClauses) : 'TRUE';
-                return $this->db->executeQuery("SELECT u.id FROM user u JOIN userAccess ua ON u.id = ua.uid WHERE {$whereClause} AND u.deleted_at IS NULL")->fetchAll(PDO::FETCH_COLUMN);
+                return $this->db->executeQuery("SELECT u.id FROM user u JOIN userAccess ua ON u.id = ua.uid WHERE {$whereClause} AND u.deleted_at IS NULL", $parameters)->fetchAll(PDO::FETCH_COLUMN);
             case Model::ENTITY_TYPE_PASTORAL_GROUP:
-                return $this->db->executeQuery("SELECT u.id FROM user u LEFT JOIN pastoral_group_member pgm ON pgm.user_id = u.id WHERE pgm.group_id {$predicate} AND u.deleted_at IS NULL")->fetchAll(PDO::FETCH_COLUMN);
+                return $this->db->executeQuery("SELECT u.id FROM user u LEFT JOIN pastoral_group_member pgm ON pgm.user_id = u.id WHERE pgm.group_id {$predicate} AND u.deleted_at IS NULL", $parameters)->fetchAll(PDO::FETCH_COLUMN);
             case Model::ENTITY_TYPE_GROUP:
                 // Regardless of whether they have read/write/mod perms. (just not deny)
-                $service = UserAccess::SERVICE_HOMEPAGE;
+                $service  = UserAccess::SERVICE_HOMEPAGE;
                 $denyType = UserAccess::ACCESS_DENY;
-                return $this->db->executeQuery("SELECT u.id FROM user u JOIN userAccess ua on u.id = ua.uid WHERE service = $service AND sid = $entityValue AND type != $denyType AND u.deleted_at IS NULL")->fetchAll(PDO::FETCH_COLUMN);
+                return $this->db->executeQuery("SELECT u.id FROM user u JOIN userAccess ua on u.id = ua.uid WHERE service = $service AND sid = $entityValue AND type != $denyType AND u.deleted_at IS NULL", $parameters)->fetchAll(PDO::FETCH_COLUMN);
             case Model::ENTITY_TYPE_CLASS:
                 // Associated with the class, regardless of role type.
                 // For students/teachers you'd need to use a composite segment that intersects the desired roleType.
                 $externalIds = [];
-                foreach($this->externalClass->getStudents($entityValue) as $student){
+                foreach ($this->externalClass->getStudents($entityValue) as $student) {
                     $externalIds[] = $student['synergy_id'];
                 }
-                foreach($this->externalClass->getTeacherName($entityValue) as $teacherExternalId){
+                foreach ($this->externalClass->getTeacherName($entityValue) as $teacherExternalId) {
                     $externalIds[] = $teacherExternalId;
                 }
-                if(!\count($externalIds)){
+                if (!\count($externalIds)) {
                     return [];
                 }
                 $externalIdString = \implode(',', $externalIds);
-                return $this->db->executeQuery("SELECT u.id FROM user u WHERE synergy_id IN ({$externalIdString}) AND u.deleted_at IS NULL")->fetchAll(PDO::FETCH_COLUMN);
+                return $this->db->executeQuery("SELECT u.id FROM user u WHERE synergy_id IN ({$externalIdString}) AND u.deleted_at IS NULL", $parameters)->fetchAll(PDO::FETCH_COLUMN);
             default:
                 throw new UnexpectedValueException("Entity type not recognised: {$entityType}");
         }
