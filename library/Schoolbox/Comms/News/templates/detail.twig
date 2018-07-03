@@ -73,24 +73,24 @@
                     $('#header-options').on('click', 'a[data-delete]', function(event) {
                         event.preventDefault();
 
-                        var element = $(this);
-                        var toast = $('#toast');
-                        var title = element.attr('data-delete');
+                        var $element = $(this);
+                        var $toast = $('#toast');
+                        var title = $element.attr('data-delete');
 
-                        $(this).confirmDialog({
+                        $element.confirmDialog({
                             text: 'Are you sure you want to delete ' + title + '?',
                             confirmEvent: function() {
-                                toast.toastActivate({
+                                $toast.toastActivate({
                                     text: 'Deleting ' + title
                                 });
 
                                 $.ajax({
                                     type: 'POST',
-                                    url: element.attr('href'),
+                                    url: $element.attr('href'),
                                     data: {newsId: {{ news.id }}},
                                     dataType: 'json'
                                 }).success(function (response) {
-                                    toast.toastTimeout({
+                                    $toast.toastTimeout({
                                         text: title + ' was deleted',
                                         css: 'success'
                                     });
@@ -99,7 +99,7 @@
                                 }).error(function (response) {
                                     var temp = $.parseJSON(response.responseText);
 
-                                    toast.toastTimeout({
+                                    $toast.toastTimeout({
                                         text: 'Error: ' + temp.message,
                                         css: 'alert'
                                     });
@@ -234,28 +234,28 @@
                             $('#actionButtons').on('click', 'a[data-reject]', function(event) {
                                 event.preventDefault();
 
-                                var element = $(this);
-                                var toast = $('#toast');
-                                var title = element.attr('data-reject');
+                                var $element = $(this);
+                                var $toast = $('#toast');
+                                var title = $element.attr('data-reject');
 
-                                $(this).confirmDialog({
+                                element.confirmDialog({
                                     header: 'Reject ' + title,
                                     format: 'html',
                                     text: 'Provide brief feedback for rejecting this article to help the author improve their content. <textarea id="rejectedReason" rows="5"></textarea>',
                                     confirmLabel: 'Reject',
                                     cancelLabel: 'Cancel',
                                     confirmEvent: function() {
-                                        toast.toastActivate({
+                                        $toast.toastActivate({
                                             text: 'Rejecting ' + title
                                         });
 
                                         $.ajax({
                                             type: 'POST',
-                                            url: element.attr('href'),
+                                            url: $element.attr('href'),
                                             data: {newsId: {{ news.id }}, rejectedReason: $('#rejectedReason').val()},
                                             dataType: 'json'
                                         }).success(function (response) {
-                                            toast.toastTimeout({
+                                            $toast.toastTimeout({
                                                 text: title + ' was rejected',
                                                 css: 'success'
                                             });
@@ -264,7 +264,7 @@
                                         }).error(function (response) {
                                             var temp = $.parseJSON(response.responseText);
 
-                                            toast.toastTimeout({
+                                            $toast.toastTimeout({
                                                 text: 'Error: ' + temp.message,
                                                 css: 'alert'
                                             });
