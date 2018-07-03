@@ -139,24 +139,8 @@ class ArticleResolver
         ";
 
         // Case 2. User matches a composite root segment, where segment is targeted to 'self'
-        $queries[] = "
-            SELECT t1.comms_news_article_id
-            FROM (
-                -- Find all matching audience sub-segments that are a child of a composite^self segment. Group by parent segment
-                SELECT parent.comms_news_article_id, comms_news_audience.parent_id, COUNT(*) as child_count
-                FROM comms_news_audience comms_news_audience
-                JOIN comms_news_audience parent ON comms_news_audience.parent_id = parent.id
-                WHERE parent.relationship = 'self' AND parent.entity_type = 'composite' AND (
-                  $whereClause
-                )
-                GROUP BY parent.id
-            ) t1
-            JOIN (
-                -- Group all child segments by parent to get count of parents' children.
-                -- If count-matching children == count-available children, then composite segment is a match
-                SELECT parent_id, COUNT(*) as child_count FROM comms_news_audience WHERE parent_id IS NOT NULL GROUP BY parent_id
-            ) t2 ON t1.parent_id = t2.parent_id AND t1.child_count = t2.child_count
-        ";
+        $queries[] =  $this->buildCompositeSubquery(Model::RELATIONSHIP_SELF, $whereClause);
+
 
         // Case 3. User is parent or staff, and matches a composite root segment targeted at *one* their children or students
         //         Note that we have to UNION per child/student as `[A && B]^parent/teacher !== [A]^parent/teacher && [B]^parent/teacher`
@@ -165,10 +149,31 @@ class ArticleResolver
                 $compositeRelationship = $user->getRole()->isStaff()
                     ? Model::RELATIONSHIP_TEACHERS_OF
                     : Model::RELATIONSHIP_PARENTS_OF;
-                $compositeType         = Model::ENTITY_TYPE_COMPOSITE;
                 $whereClause           = \implode(" OR \n", $whereClauses->getAll());
-                $queries[]             = "
-                SELECT t1.comms_news_article_id
+                $queries[]             = $this->buildCompositeSubquery($compositeRelationship, $whereClause);
+            }
+        }
+
+        // We are not guaranteed to have independent subsets, but better to remove duplicates in DB to leverage caching.
+        $query = \implode("\nUNION\n", $queries);
+
+        return $this->db->executeQuery($query)->fetchAll(PDO::FETCH_COLUMN);
+    }
+
+
+    /**
+     * Returns a sub-query that will match composite audience segments
+     *
+     * @param string $compositeRelationship
+     * @param string $whereClause
+     * @return string
+     */
+    private function buildCompositeSubquery(string $compositeRelationship, string $whereClause): string
+    {
+        $compositeType = Model::ENTITY_TYPE_COMPOSITE;
+
+        return "
+        SELECT t1.comms_news_article_id
                 FROM (
                     -- Find all matching audience sub-segments that are a child of a composite^self segment. Group by parent segment
                     SELECT parent.comms_news_article_id, comms_news_audience.parent_id, COUNT(*) as child_count
@@ -184,14 +189,7 @@ class ArticleResolver
                     -- If count-matching children == count-available children, then composite segment is a match
                     SELECT parent_id, COUNT(*) as child_count FROM comms_news_audience WHERE parent_id IS NOT NULL GROUP BY parent_id
                 ) t2 ON t1.parent_id = t2.parent_id AND t1.child_count = t2.child_count
-            ";
-            }
-        }
-
-        // We are not guaranteed to have independent subsets, but better to remove duplicates in DB to leverage caching.
-        $query = \implode("\nUNION\n", $queries);
-
-        return $this->db->executeQuery($query)->fetchAll(PDO::FETCH_COLUMN);
+        ";
     }
 
 
