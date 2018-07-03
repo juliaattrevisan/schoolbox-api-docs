@@ -433,8 +433,8 @@ class ArticleResolver
             if (!\count($entityValue)) {
                 $predicate = 'IS NULL';
             } else {
-                $quotedValues = array_map(function ($item) {
-                    $quoted = str_replace("'", "\\'", $item);
+                $quotedValues = \array_map(function ($item) {
+                    $quoted = \str_replace("'", "\\'", $item);
                     return "'{$quoted}'";
                 }, $entityValue);
                 $valueString  = \implode(',', $quotedValues);
