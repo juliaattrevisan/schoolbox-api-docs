@@ -11,6 +11,7 @@ namespace Schoolbox\Admin\SHAPS;
 use Alaress\Web\Controller\Base;
 use Schoolbox\UserMapper;
 use Schoolbox\Collection;
+use Schoolbox\Error;
 
 class Controller extends Base
 {
@@ -18,11 +19,6 @@ class Controller extends Base
      * @var UserMapper
      */
     private $userMapper;
-
-    /**
-     * @var \Schoolbox\Error\Mapper
-     */
-    private $errorMapper;
 
     /**
      * A telephone to help.schoolbox.com.au so we can ask it things
@@ -37,11 +33,12 @@ class Controller extends Base
      *
      * @param UserMapper      $userMapper
      * @param Auth\Parameters $authParams
+     * @param Error\Mapper   $errorMapper
      */
-    public function __construct(UserMapper $userMapper, Auth\Parameters $authParams)
+    public function __construct(UserMapper $userMapper, Auth\Parameters $authParams, Error\Mapper $errorMapper)
     {
         $this->userMapper  = $userMapper;
-        $this->helpRequest = new HelpRequest($authParams, $this->userMapper);
+        $this->helpRequest = new HelpRequest($authParams, $this->userMapper, $errorMapper);
     }
 
     /*
