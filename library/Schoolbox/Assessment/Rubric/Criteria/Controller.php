@@ -242,17 +242,16 @@ class Controller extends BaseController
         // Delete criteria not submitted
         foreach ($criterionCollection as $crit) {
             if (!\in_array($crit->getId(), $found, true)) {
-                $usages = $this->usageMapper->findByColumn('criterion_id', $crit->getId());
+                $usages = $this->usageMapper->findCriterionUsage($crit->getId());
                 $this->criterionMapper->delete($crit);
                 foreach ($usages as $usage) {
-                    $box                                    = $usage->getSubmissionBox();
-                    $affectedSubmissionBoxes[$box->getId()] = $box;
+                    $affectedSubmissionBoxes[] = $usage['submission_box_id'];
                 }
             }
         }
 
         // Ensure that deletion of a criterion, and its descriptors, does not result in empty levels.
-        $this->rubricMapper->deleteEmptyLevels(array_keys($affectedSubmissionBoxes));
+        $this->rubricMapper->deleteEmptyLevels($affectedSubmissionBoxes);
     }
 
 
