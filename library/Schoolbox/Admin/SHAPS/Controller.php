@@ -219,6 +219,7 @@ class Controller extends Base
 
     /**
      * Takes a user ID and renders a list of all courses that user is enrolled in on Help.
+     * TODO placeholder method for when we actually implement this
      *
      * @param string $userID
      */
