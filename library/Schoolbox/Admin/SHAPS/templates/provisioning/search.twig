@@ -35,7 +35,7 @@
                     $selectize.on("item_add", function(value, $item) {
                         var userId = getUserIdFromRegex($item.text())
 
-                        var url = '{{ routeLookup("shaps.searchUsers") }}'.replace('{userId}', userId);
+                        var url = '{{ routeLookup("shaps.getSearchUsers") }}'.replace('{userId}', userId);
 
                         $.get(url, function(data) {
 

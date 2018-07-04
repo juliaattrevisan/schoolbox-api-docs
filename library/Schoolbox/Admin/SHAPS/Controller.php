@@ -195,7 +195,7 @@ class Controller extends Base
      * @throws \RuntimeException
      * @throws \Schoolbox\Mapper\Exception
      */
-    public function searchUsers(string $userId)
+    public function getSearchUsers(string $userId): void
     {
         // Selectize gives us the user's external ID
         $user = $this->userMapper->findByExternalId($userId);
