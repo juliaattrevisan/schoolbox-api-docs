@@ -263,12 +263,20 @@ Usage:
             total = total.toFixed(2);
         }
         checkRubricTotal();
+
+        $("#useMarkRange").change(function() {
+            if ($("#useMarkRange").is(":checked")) {
+                $("td[data-descriptor] input").prop("placeholder", "Maximum points");
+            } else {
+                $("td[data-descriptor] input").prop("placeholder", "Points");
+            }
+        })
     });
 </script>
 
 
 <div class="row">
-    <div class="small-12 medium-6 columns">
+    <div class="small-12 columns">
         <label for="useRubric">Use Rubric?</label>
         <div class="switch round">
             <input name="useRubric" id="useRubric" type="checkbox" {% if assessment.useRubric %}checked="checked"{% endif %} />
@@ -278,19 +286,36 @@ Usage:
             </label>
         </div>
     </div>
-    <div class="small-12 medium-6 columns">
-        <div id="markPerCapabilityPanel" class="{% if not assessment.useRubric %}hide{% endif %}" data-hide-watch="#useRubric">
-            <label for="markPerCapability">Mark Per-Capability</label>
-            <div class="switch round">
-                <input name="markPerCapability" id="markPerCapability" type="checkbox" {% if assessment.markPerCapability %}checked="checked"{% endif %} />
-                <label for="markPerCapability">
-                    <span class="icon-approve"></span>
-                    <span class="icon-cancel"></span>
-                </label>
+</div>
+<fieldset class="{% if not assessment.useRubric %}hide{% endif %}" data-hide-watch="#useRubric">
+    <legend>Rubric marking options</legend>
+    <div class="row">
+        <div class="small-12 medium-6 columns">
+            <div id="markPerCapabilityPanel">
+                <label for="markPerCapability">Mark Per-Capability</label>
+                <div class="switch round">
+                    <input name="markPerCapability" id="markPerCapability" type="checkbox" {% if assessment.markPerCapability %}checked="checked"{% endif %} />
+                    <label for="markPerCapability">
+                        <span class="icon-approve"></span>
+                        <span class="icon-cancel"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="small-12 medium-6 columns">
+            <div id="useMarkRangePanel">
+                <label for="useMarkRange">Use Mark Range</label>
+                <div class="switch round">
+                    <input name="useMarkRange" id="useMarkRange" type="checkbox" {% if assessment.useMarkRange %}checked="checked"{% endif %} />
+                    <label for="useMarkRange">
+                        <span class="icon-approve"></span>
+                        <span class="icon-cancel"></span>
+                    </label>
+                </div>
             </div>
         </div>
     </div>
-</div>
+</fieldset>
 
 <div class="row">
     <div id="rubric-section" class="small-12 columns{% if not assessment.useRubric %} hide{% endif %}" data-hide-watch="#useRubric">
@@ -318,7 +343,7 @@ Usage:
             <a href="#" id="apply-resultset" class="button">Apply Result Set</a>
         </div>
         <div class="small-12 columns no-pad">
-            {% include '@rubric/grid-csv.twig' with {rubric: rubric, attachzone: rubricAttachZone, folderId: assessment.context.folder.id } only %}
+            {% include '@rubric/grid-csv.twig' with {rubric: rubric, attachzone: rubricAttachZone, folderId: assessment.context.folder.id, usingMarkRange: assessment.useMarkRange } only %}
         </div>
     </div>
 </div>

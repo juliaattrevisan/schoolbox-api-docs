@@ -708,7 +708,7 @@ section > fieldset {
 
 .mage > section > fieldset fieldset {
 	// second sibling onwards
-	~ fieldset {
+	~ fieldset, ~ fieldset fieldset {
 		border-top: solid $fieldset-border-width $body-bg;
 	}
 }

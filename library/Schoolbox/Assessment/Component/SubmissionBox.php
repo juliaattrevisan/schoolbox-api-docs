@@ -146,6 +146,9 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     /** @var bool */
     protected $markedPerRubricGroup;
 
+    /** @var bool */
+    protected $markedUsingRange;
+
     /**
      * The actual rubric grid in use for this submission box.
      *
@@ -620,6 +623,35 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     public function setMarkedPerRubricGroup($markedPerRubricGroup)
     {
         $this->markedPerRubricGroup = $markedPerRubricGroup;
+        return $this;
+    }
+
+    /**
+     * @deprecated mapper method
+     * @return boolean
+     */
+    public function getMarkedUsingRange()
+    {
+        return $this->isMarkedUsingRange();
+    }
+
+
+    /**
+     * @return bool
+     */
+    public function isMarkedUsingRange()
+    {
+        return $this->markedUsingRange;
+    }
+
+
+    /**
+     * @param boolean $markedUsingRange
+     * @return static
+     */
+    public function setMarkedUsingRange($markedUsingRange)
+    {
+        $this->markedUsingRange = $markedUsingRange;
         return $this;
     }
 

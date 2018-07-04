@@ -51,6 +51,11 @@ trait DueWorkTrait
     protected $markPerCapability = false;
 
     /**
+     * @var bool
+     */
+    protected $useMarkRange = false;
+
+    /**
      * @var array|string[]
      */
     protected $attachedFiles;
@@ -155,6 +160,24 @@ trait DueWorkTrait
     protected function setMarkPerCapability($markPerCapability)
     {
         $this->markPerCapability = $markPerCapability;
+        return $this;
+    }
+
+    /**
+     * @return boolean
+     */
+    protected function getUseMarkRange()
+    {
+        return $this->useMarkRange;
+    }
+
+    /**
+     * @param boolean $useMarkRange
+     * @return $this
+     */
+    protected function setUseMarkRange($useMarkRange)
+    {
+        $this->useMarkRange = $useMarkRange;
         return $this;
     }
 

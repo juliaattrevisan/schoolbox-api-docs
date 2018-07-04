@@ -93,6 +93,13 @@ class Model extends AbstractAssessment implements ISelfAssessable
     protected $markPerCapability = false;
 
     /**
+     * This DueWork's Rubric has Use Mark Range on
+     *
+     * @var bool
+     */
+    protected $useMarkRange = false;
+
+    /**
      * Only relevant if this DueWork's MarkType is 'TotalMark'
      *
      * @var float
@@ -668,6 +675,24 @@ class Model extends AbstractAssessment implements ISelfAssessable
     public function setMarkPerCapability($markPerCapability)
     {
         $this->markPerCapability = $markPerCapability;
+        return $this;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function getUseMarkRange()
+    {
+        return $this->useMarkRange;
+    }
+
+    /**
+     * @param boolean $useMarkRange
+     * @return $this
+     */
+    public function setUseMarkRange($useMarkRange)
+    {
+        $this->useMarkRange = $useMarkRange;
         return $this;
     }
 
