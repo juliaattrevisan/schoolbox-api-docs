@@ -54,17 +54,14 @@
         <a class="icon-more" title="Actions" data-dropdown="header-options"></a>
     </nav>
     <ul id="header-options" class="f-dropdown" data-dropdown-content>
-        {# Go back to the moderation list #}
-        {% set moderationListRoute = routeLookupIfAuthorized('commsNewsModeration.getList') %}
 
-        {% if moderationListRoute %}
-            <li><a class="icon-list" href="{{ moderationListRoute }}" title="A list of articles to moderate">Moderation List</a></li>
+        {# Modify article #}
+        {% set modifyRoute = routeLookupIfAuthorized('commsNews.getUpdate', {newsId: news.id}) %}
+        {% if modifyRoute and (isCommsOfficer or not moderationRequired or not news.isAccepted) %}
+            <li><a class="icon-modify" href="{{ modifyRoute }}">Modify</a></li>
         {% endif %}
 
-        {# Add a new news article #}
-        <li><a class="icon-add" href="{{ routeLookupIfAuthorized('commsNews.getCreate') }}" title="Create a new {{ locale.news.proper }}">Create</a></li>
-
-        {# Delete this news article #}
+        {# Delete article #}
         {% set deleteRoute = routeLookupIfAuthorized('commsNews.postDelete', {newsId: news.id}) %}
 
         {% if deleteRoute and isDeletable %}
@@ -109,8 +106,25 @@
                     });
                 });
             </script>
-            <li><a class="icon-delete" href="{{ deleteRoute }}" title="Delete this {{ locale.news.proper }}" data-delete="{{ news.title }}">Delete</a></li>
+            <li><a class="icon-delete" href="{{ deleteRoute }}" data-delete="{{ news.title }}">Delete</a></li>
         {% endif %}
+
+        {# Helper links #}
+        {# TODO: maybs delete once there's actual ways to get to these places #}
+
+        {# Create new article #}
+        <li><a class="icon-add" href="{{ routeLookupIfAuthorized('commsNews.getCreate') }}" >Create new article</a></li>
+
+        {# Go to the moderation list #}
+        {% if moderationRequired %}
+            {# Go back to the moderation list #}
+            {% set moderationListRoute = routeLookupIfAuthorized('commsNewsModeration.getList') %}
+
+            {% if moderationListRoute %}
+                <li><a class="icon-list" href="{{ moderationListRoute }}" title="A list of articles to moderate">Moderation List</a></li>
+            {% endif %}
+        {% endif %}
+
     </ul>
 </div>
 
