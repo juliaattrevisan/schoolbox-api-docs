@@ -23,14 +23,13 @@ class ValidationTest extends TestCase
     /**
      * @dataProvider provider_validBroadcastRequirements
      * @param Model $news
-     * @param bool   $moderationRequired
      * @param bool   $expected
      */
-    public function testValidBroadcastRequirements(Model $news, bool $moderationRequired, bool $expected)
+    public function testValidBroadcastRequirements(Model $news, bool $expected)
     {
         $validation = new ValidBroadcast();
 
-        $this->assertEquals($expected, $validation->isSatisfiedBy($news, $moderationRequired));
+        $this->assertEquals($expected, $validation->isSatisfiedBy($news));
     }
 
     /**
@@ -40,38 +39,49 @@ class ValidationTest extends TestCase
      */
     public function provider_validBroadcastRequirements(): array {
         $user = (new \Schoolbox\User())->setId(19);
+        $date = (new \Alaress_Date_Format())->setDateTime(2018, 1, 1, 10, 12, 14);
 
         return [
             // Moderation required, an acceptor is known
             // News article can reach the masses
-            'Moderation required, acceptor set' => [
-                (new Model())->setTitle('cat')->setAcceptedBy($user),
-                true,
+            'Moderation required, both acceptor details set' => [
+                (new Model())->setTitle('cat')->setAcceptedBy($user)->setAcceptedAt($date),
                 true
+            ],
+
+            // Moderation required, an acceptor is known, but no date is available for some reason
+            // News article cannot reach the masses
+            'Moderation required, acceptor user set' => [
+                (new Model())->setTitle('cat')->setAcceptedBy($user),
+                false
+            ],
+
+            // Moderation required, an acceptor is known, but no acceptor is available for some reason
+            // News article cannot reach the masses
+            'Moderation required, acceptor date set' => [
+                (new Model())->setTitle('cat')->setAcceptedBy(null)->setAcceptedAt($date),
+                false
             ],
 
             // Acceptor must be set when moderation is required
             // When absent, the article isn't accepted; news article mustn't reach the masses
             'Moderation required, acceptor not set' => [
                 (new Model())->setTitle('cat'),
-                true,
                 false
             ],
 
             // Preserve last known acceptor in the scenario where moderation was previously required
             // at the time, but moderation is no longer required now. News article can reach the masses.
             'Moderation not required, acceptor set' => [
-                (new Model())->setTitle('cat')->setAcceptedBy($user),
-                false,
+                (new Model())->setTitle('cat')->setAcceptedBy($user)->setAcceptedAt($date),
                 true
             ],
 
-            // If there was never an acceptor for this article, and moderation is not required now,
-            // news article can reach the masses. There are no restrictions.
+            // Edge case that no longer exists; when moderation isn't required, authors are their own
+            // acceptor. Otherwise, someone else is the acceptor. In either situation this shouldn't arise
             'Moderation not required, acceptor not set' => [
                 (new Model())->setTitle('cat'),
-                false,
-                true
+                false
             ],
         ];
     }

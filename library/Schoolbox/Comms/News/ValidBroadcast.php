@@ -2,7 +2,7 @@
 /**
  * ValidBroadcast
  *
- * Definition of a valid news article that can be broadcast to its audience
+ * Definition of a valid news article that can be broadcast/viewed by its audience
  * depending on moderation settings and moderation data currently available
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
@@ -18,18 +18,19 @@ class ValidBroadcast
 {
 
     /**
-     * Definition of a valid news article
+     * Definition of a valid news article that can be viewed by its audience
      *
      * @param Model $article
-     * @param bool $moderationRequired
      * @return bool
      */
-    public function isSatisfiedBy(Model $article, bool $moderationRequired): bool
+    public function isSatisfiedBy(Model $article): bool
     {
         $isValidArticle = (new ValidArticle())->isSatisfiedBy($article);
-        $hasModerator = $moderationRequired && $article->getAcceptedBy() instanceof User;
-        $moderationNotNeeded = !$moderationRequired;
+        $isAccepted = $article->isAccepted() && $article->getAcceptedBy() instanceof User;
 
-        return $isValidArticle && ($hasModerator || $moderationNotNeeded);
+        /* Must be valid and have been accepted either by author when moderation isn't required;
+         * or accepted by a moderator
+         */
+        return $isValidArticle && $isAccepted;
     }
 }

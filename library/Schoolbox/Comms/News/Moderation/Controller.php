@@ -162,7 +162,6 @@ class Controller extends Base
      *
      * @param Model $news
      * @throws MapperException
-     * @throws MapperException\Deleted
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Aura\Router\Exception\RouteNotFound
      * @throws \PDOException
@@ -173,15 +172,11 @@ class Controller extends Base
     public function postAccept(Model $news)
     {
         if ((new ValidUserCanAccept())->isSatisfiedBy($this->getUser(), $news)) {
-            $policy = $this->policyMapper->findOneByColumn('identifier', 'global_moderation');
-
-            $moderationRequired = (bool)$policy->getValue();
-
             $news
                 ->setAcceptedAt(\Alaress_Date_Format::now())
                 ->setAcceptedBy($this->getUser());
 
-            if ((new News\ValidBroadcast())->isSatisfiedBy($news, $moderationRequired)) {
+            if ((new News\ValidBroadcast())->isSatisfiedBy($news)) {
                 $this->newsMapper->save($news);
             }
 
