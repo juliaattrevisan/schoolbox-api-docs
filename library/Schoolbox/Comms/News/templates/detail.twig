@@ -320,7 +320,7 @@
 
 
             {# Accept this news article for publication to the world #}
-            {% if isAcceptable and moderationRequired %}
+            {% if isAcceptable %}
             <li>
                 <form action="{{ routeLookup('commsNewsModeration.postAccept', {articleId: article.id}) }}" method="post">
                     <input type="submit" value="Approve" />
