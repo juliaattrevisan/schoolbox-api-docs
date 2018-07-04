@@ -51,7 +51,7 @@ class Module extends BaseModule
 
         $this->register('GET', '/courses', 'getUsersInCourses', $getPerms);
         $this->register('GET', '/courses/search', 'getUserEnrolmentSearch', $getPerms);
-        $this->register('GET', '/courses/{userId}', 'searchCoursesForUser', $getPerms);
+        $this->register('GET', '/courses/{userId}', 'getSearchCoursesForUser', $getPerms);
 
 
         $this->register('GET', '/provisioning/{userId}', 'getSearchUsers', $getPerms);

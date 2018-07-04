@@ -86,11 +86,13 @@ class Controller extends Base
     /**
      * Renders a list of all staff in your Schoolbox instance, and whether or not they are provisioned on Help.
      *
+     * @api /adminv2/shaps/provisioning
+     * @level 18.1
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      */
-    public function getAll()
+    public function getAll(): void
     {
         $errors = [];
         $provisionedUsers = $this->helpRequest->findProvisionedUsers();
@@ -114,13 +116,14 @@ class Controller extends Base
     /**
      * Renders a list of staff in your Schoolbox instance that are also provisioned on Help.
      *
-     * @api GET /shaps/provisioning/provisioned
+     * @api GET /adminv2/shaps/provisioning/provisioned
+     * @level 18.1
      *
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      */
-    public function getProvisioned()
+    public function getProvisioned(): void
     {
         $provisionedUsers = $this->helpRequest->findProvisionedUsers();
         $allStaff = $this->getAllStaff();
@@ -143,13 +146,14 @@ class Controller extends Base
     /**
      * Renders a list of staff in your Schoolbox instance that are NOT provisioned on Help.
      *
-     * @api GET /shaps/provisioning/unprovisioned
+     * @api GET /adminv2/shaps/provisioning/unprovisioned
+     * @level 18.1
      *
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      */
-    public function getUnprovisioned()
+    public function getUnprovisioned(): void
     {
         $provisionedUsers = $this->helpRequest->findProvisionedUsers();
         $allStaff = $this->getAllStaff();
@@ -171,7 +175,8 @@ class Controller extends Base
     /**
      * Renders a selectize for searching users in your Schoolbox instance to see if they are provisioned.
      *
-     * @api GET /shaps/provisioning/search
+     * @api GET /adminv2/shaps/provisioning/search
+     * @level 18.1
      *
      * @throws \Aura\Di\Exception\ServiceNotFound
      */
@@ -189,7 +194,9 @@ class Controller extends Base
     /**
      * Provides details about a user in response to an ajax request for that user's external ID.
      *
-     * @api GET /shaps/provisioning/{userId}
+     * @api GET /adminv2/shaps/provisioning/{userId}
+     * @level 18.1
+     *
      * @param string $userId
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
@@ -220,6 +227,9 @@ class Controller extends Base
     /**
      * Renders a list of all courses available for your school on Help, and the users enrolled in each.
      *
+     * @api GET /adminv2/shaps/courses
+     * @level 18.1
+     *
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \InvalidArgumentException
@@ -236,6 +246,9 @@ class Controller extends Base
     /**
      * Renders a search form for finding users to view their enrolments.
      *
+     * @api GET /adminv2/shaps/courses/search
+     * @level 18.1
+     *
      * @throws \Aura\Di\Exception\ServiceNotFound
      */
     public function getUserEnrolmentSearch() {
@@ -248,9 +261,12 @@ class Controller extends Base
      * Takes a user ID and renders a list of all courses that user is enrolled in on Help.
      * TODO placeholder method for when we actually implement this
      *
+     * @api GET /adminv2/shaps/courses/courses/{userId}
+     * @level 18.1
+     *
      * @param string $userID
      */
-    public function searchCoursesForUser($userID) {
+    public function getSearchCoursesForUser($userID) {
         // Some sample users
         $zsmith = $this->userMapper->findById(151);
         $jbenson = $this->userMapper->findById(247);
@@ -314,7 +330,7 @@ class Controller extends Base
     /**
      * Post users to SHAPS
      *
-     * @api POST /shaps/provision/
+     * @api POST /adminv2/shaps/provision/
      * @level 181
      */
     public function postProvision(): void
