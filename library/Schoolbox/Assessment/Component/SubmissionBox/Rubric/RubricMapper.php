@@ -370,7 +370,7 @@ class RubricMapper
                 grouping,
                 name,
                 COUNT(a_id) AS usages,                                   -- How many non-deleted boxes are using the criterion?
-                COALESCE(MAX(selected), 0) AS selected                   -- Is the criterion in use by this box?
+                MAX(selected) AS selected                                -- Is the criterion in use by this box?
             FROM (
                 SELECT
                     c.id AS crit_id,
