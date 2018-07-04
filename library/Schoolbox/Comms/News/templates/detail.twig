@@ -222,7 +222,7 @@
 
 
         {# Moderators #}
-        {% if isCommsOfficer and moderationRequired %}
+        {% if isCommsOfficer and moderationRequired and news.isSubmitted %}
             {% if isRejectable %}
 
                 {# Reject this news article #}
