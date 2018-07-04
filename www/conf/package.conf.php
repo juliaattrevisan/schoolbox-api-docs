@@ -24,6 +24,14 @@ define("SQL_dsn", "mysql:host=".SQL_host.";dbname=".SQL_db);
 define('SENTRY_TOKEN', null);
 define('SENTRY_PROJECT', null);
 
+// Set Instance ID from environment variable on CLI
+if (php_sapi_name() == "cli") {
+    $instanceIdFromEnv = getenv('INSTANCE_ID', true) ?: getenv('INSTANCE_ID');
+    if ($instanceIdFromEnv) {
+        define('INSTANCE_ID', $instanceIdFromEnv);
+    }
+}
+
 //Instance ID
 if (!defined('INSTANCE_ID')) {
     define('INSTANCE_ID', 'xxxxxxxx');
