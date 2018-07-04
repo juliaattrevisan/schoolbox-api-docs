@@ -193,16 +193,6 @@ class Controller extends Base
             return;
         }
 
-        if ($this->getRequest()->isXhr()) {
-            $this->getResponse()->status->set(400);
-            $this->getResponse()->content->set($this->buildJsonOutput([
-                'success' => false,
-                'message' => $this->errorMapper->getMessageById(ErrorMapper::ERROR_PERM_PAGE_VIEW)
-            ]));
-
-            return;
-        }
-
         throw $this->errorMapper->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
     }
 
