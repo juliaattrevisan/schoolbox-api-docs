@@ -130,7 +130,6 @@ class Module extends BaseModule
             'newsMapper' => $this->getMapperFactory()->getLazy(NewsMapper::class),
             'policyMapper' => $this->getMapperFactory()->getLazy(PolicyMapper::class),
             'errorMapper' => $this->getMapperFactory()->getLazy(ErrorMapper::class),
-            'userMapper' => $this->getMapperFactory()->getLazy(UserMapper::class),
         ];
     }
 

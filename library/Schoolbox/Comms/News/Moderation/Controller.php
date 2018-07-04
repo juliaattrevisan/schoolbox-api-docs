@@ -31,11 +31,6 @@ class Controller extends Base
     private $policyMapper;
 
     /**
-     * @var UserMapper
-     */
-    private $userMapper;
-
-    /**
      * @var ErrorMapper
      */
     private $errorMapper;
@@ -47,14 +42,12 @@ class Controller extends Base
      * @param News\Mapper   $newsMapper
      * @param Policy\Mapper $policyMapper
      * @param ErrorMapper   $errorMapper
-     * @param UserMapper    $userMapper
      */
-    public function __construct(News\Mapper $newsMapper, Policy\Mapper $policyMapper, ErrorMapper $errorMapper, UserMapper $userMapper)
+    public function __construct(News\Mapper $newsMapper, Policy\Mapper $policyMapper, ErrorMapper $errorMapper)
     {
         $this->newsMapper = $newsMapper;
         $this->policyMapper = $policyMapper;
         $this->errorMapper = $errorMapper;
-        $this->userMapper = $userMapper;
     }
 
 
@@ -66,7 +59,7 @@ class Controller extends Base
      */
     public function getList()
     {
-        $lists = new Lists($this->newsMapper, $this->userMapper);
+        $lists = new Lists($this->newsMapper);
         $articles = new Collection();
 
         try {
@@ -117,7 +110,6 @@ class Controller extends Base
             } catch (MapperException $e) {
                 // noop
             }
-
 
             $this->newsMapper->save($article);
 
