@@ -29,10 +29,18 @@ then
 fi
 
 # Collect Credentials
-sqluser=`grep "\"SQL_user" $conffile | grep -v "#" | grep -v "\/\/" | cut -d'"' -f4`;
-sqlpasswd=`grep "\"SQL_passwd" $conffile | grep -v "#" | grep -v "\/\/" | cut -d'"' -f4`;
-sqlhost=`grep "\"SQL_host" $conffile | grep -v "#" | grep -v "\/\/" | cut -d'"' -f4`;
-sqldb=`grep "\"SQL_db" $conffile | grep -v "#" | grep -v "\/\/" | cut -d'"' -f4`;
+if [[ $(which schoolbox-conf) ]];
+then
+    sqluser=$(schoolbox-conf --conf="$conffile" --option=SQL_user);
+    sqlpasswd=$(schoolbox-conf --conf="$conffile" --option=SQL_passwd);
+    sqlhost=$(schoolbox-conf --conf="$conffile" --option=SQL_host);
+    sqldb=$(schoolbox-conf --conf="$conffile" --option=SQL_db);
+else
+    sqluser=`grep "\"SQL_user" $conffile | grep -v "#" | grep -v "\/\/" | cut -d'"' -f4`;
+    sqlpasswd=`grep "\"SQL_passwd" $conffile | grep -v "#" | grep -v "\/\/" | cut -d'"' -f4`;
+    sqlhost=`grep "\"SQL_host" $conffile | grep -v "#" | grep -v "\/\/" | cut -d'"' -f4`;
+    sqldb=`grep "\"SQL_db" $conffile | grep -v "#" | grep -v "\/\/" | cut -d'"' -f4`;
+fi
 
 echo "";
 echo "Looking for Staff accounts with a matching Parent account - ignoring soft-deleted";
