@@ -57,8 +57,6 @@ class Controller extends Base
     /**
      * Provide form
      *
-     * @throws Exception
-     * @throws Exception\Deleted
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Aura\Di\Exception\ServiceNotFound
      */
