@@ -8,7 +8,7 @@
 
 {% set reportContentId = 'report_content' %}
 
-{% include filterPanel.template with {
+{% include '@filters/panel.twig' with {
     contentId: reportContentId,
     panel: filterPanel,
     quickload: true,

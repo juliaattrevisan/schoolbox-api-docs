@@ -7,6 +7,7 @@ Usage:
     quickload bool        - if true, fill contentId with .innerHTML instead of jQuery.html()
                             When true, any JavaScript must be applied on the "filterContentLoaded"
                             event of the contentId element.
+    page:     string      - which filtered page this is. One of the Filter\Page\Model::PAGE_* constants
 
     ? TODO convert to JS plugin that is executed against the panel element (so it can get with $this), and takes contentPanelId as single arg
 #}
@@ -191,6 +192,10 @@ Usage:
             // Convert flat string array to nested object
             for (var i in flatArray) {
                 var result = regEx.exec(flatArray[i]);
+                if(!result){
+                    // TODO make this more elegant. This happens if a filter has no options, eg course import not imported to any classes
+                    continue;
+                }
                 var filterId = result[1];
                 var optionKey = result[2];
                 var optionVal = result[3];
@@ -198,9 +203,17 @@ Usage:
                 if (!nestedObj.hasOwnProperty(filterId)) {
                     nestedObj[filterId] = {};
                 }
-                // We only need to know about checked values
-                if ("1" === optionVal) {
+
+                // TODO SA-7041 insert a callback here so invokers can apply page-specific logic. This JS should not need to know about caller's idiosyncrasies
+                if({% if 'courseMarkbook' == page %}1{% else %}0{% endif %}) {
+                    // (eg course-markbook page needs to always send unit and folder selections, even if optionVal is 0)
+                    // TODO SA-7041 The course-markbook-specific callback needs to know the filterDefinition.id of unit and folder
                     nestedObj[filterId][optionKey] = optionVal;
+                } else {
+                    // We only need to know about checked values
+                    if ("1" === optionVal) {
+                        nestedObj[filterId][optionKey] = optionVal;
+                    }
                 }
             }
 
@@ -213,7 +226,7 @@ Usage:
                         queryArgs.push(filterId + '='); // empty filter selection syntax
                     } else {
                         for (optionKey in selections) {
-                            queryArgs.push(filterId + '[' + optionKey + ']=1'); // filter option selected syntax
+                            queryArgs.push(filterId + '[' + optionKey + ']=' + optionVal); // filter option selected syntax
                         }
                     }
                 }
