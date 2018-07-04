@@ -293,6 +293,11 @@
     font-family: $font-family-icon;
 }
 
+.icon-favourite-hollow:before {
+    content: "\e912";
+    font-family: $font-family-icon;
+}
+
 .icon-files:before {
     content: '\e629';
     font-family: $font-family-icon;
