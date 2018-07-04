@@ -22,11 +22,13 @@ class Quiz
     public const ASSESSMENT_FORM = '#assessmentForm';
     public const SELECTOR_TITLE = self::ASSESSMENT_FORM . ' input[name="title"]';
     public const SELECTOR_WORKTYPE = self::ASSESSMENT_FORM . ' select[name="workType"]';
+    public const SELECTOR_VISIBILITY = self::ASSESSMENT_FORM . ' select[name="visibility"]';
     public const SELECTOR_MAX_ATTEMPTS = self::ASSESSMENT_FORM . ' select[name="maxAttempts"]';
     public const SELECTOR_PUBLISH_DATE = self::ASSESSMENT_FORM . ' input[name="publishDate"]';
     public const SELECTOR_OPEN_DATE = self::ASSESSMENT_FORM . ' input[name="openDate"]';
     public const SELECTOR_DUE_DATE = self::ASSESSMENT_FORM . ' input[name="dueDate"]';
     public const SELECTOR_BUTTON_CREATE = self::ASSESSMENT_FORM . ' [type=submit][value="Create"]';
+    public const SELECTOR_BUTTON_UPDATE = self::ASSESSMENT_FORM . ' [type=submit][value="Update"]';
 
     // create question form
     public const QUESTION_FORM = '#createQuestionForm';
@@ -43,6 +45,10 @@ class Quiz
 //    public const ACCEPT_SUBMISSION_NONE = 0;
 //    public const ACCEPT_SUBMISSION_SINGLE = 1;
 //    public const ACCEPT_SUBMISSION_MULTIPLE = 2;
+
+    public const VISIBILITY_STAFF_ONLY = 0;
+    public const VISIBILITY_STAFF_AND_STUDENT = 1;
+    public const VISIBILITY_ALL = 2;
 
     /**
      * @var AcceptanceTester
@@ -75,7 +81,7 @@ class Quiz
     }
 
 
-        /**
+    /**
      * Verifies that the notification exists
      * @param $notif
      */
@@ -85,6 +91,18 @@ class Quiz
 
         $i->amOnPage('/messages');
         $i->see($notif);
+    }
+
+    /**
+     * Verifies that the notification exists
+     * @param $notif
+     */
+    public function assertNotifNotExists($notif)
+    {
+        $i = $this->tester;
+
+        $i->amOnPage('/messages');
+        $i->cantSee($notif);
     }
 
     /**

@@ -196,16 +196,94 @@ class QuizCest
     }
 
     /**
+     * @param AcceptanceTester $i
+     * @throws Exception
+     */
+    public function testQuizGradeVisibility(AcceptanceTester $i)
+    {
+        $quizPage = new Quiz($i);
+        $quizPage->className = Common::CLASS_CHEMISTRY_1_3;
+        $quizPage->classId = Common::CLASS_ID_CHEMISTRY_1_3;
+        $student1 = Common::USER_RACHEL;
+        $student1Id = Common::USER_ID_RACHEL;
+        $student2 = Common::USER_DAVID;
+        $student2Id = Common::USER_ID_DAVID;
+        $teacher = Common::USER_ZANE;
+
+        $quizTitle = 'Cest Four ' . Common::gentext(6);
+        $this->testCreateQuiz($i, $quizPage, [$student1, $student2], $teacher, $quizTitle, Quiz::VISIBILITY_STAFF_ONLY);
+
+        // As Zane, review attempt
+        $i->canSee('Attempted on time', Quiz::getStatusSelector($student1Id, ''));
+        $i->click('Review Attempt', Quiz::getStatusSelector($student1Id, ''));
+        $i->waitForText('Marking ' . $quizTitle . ' quiz results for ' . $student1);
+
+        // TODO: check whether the displayed answer is what has been entered.
+        // TODO: enter something
+
+        $i->click('Finalise Review');
+        $i->click('Yes');
+        $i->waitForText('Status of ' . $quizTitle);
+
+        // As Rachel, check notification
+        $i->impersonate($student1);
+        $quizPage->assertNotifNotExists($teacher . ' has marked your attempt of ' . $quizTitle . ' in ' . $quizPage->className);
+
+        // As Rachel, click into the due work
+        $i->click($quizTitle, '#content');
+        $i->canSee('ATTEMPTS');
+        // shouldn't see any grades
+        $i->cantSee('2018', '#attempts > tbody > tr:nth-child(1) > td:nth-child(4)');
+        $i->cantSee('10/10', '#attempts > tbody > tr:nth-child(1) > td:nth-child(5)');
+
+        // Az Zane, change visibility
+        $i->impersonate($teacher);
+        $i->amOnPage('/homepage/' . $quizPage->classId);
+        $i->click($quizTitle);
+        $i->waitForText('Begin Quiz');
+
+        // Jelly tot
+        $i->click(Locator::elementAt('#content a.icon-more', 1));
+        // Modify
+        $i->click(Locator::elementAt('#header-options a.icon-modify', 1));
+        $i->waitForText('Finish Modifying');
+
+        // Jelly tot
+        $i->click(Locator::elementAt('#content a.icon-more', 1));
+        // Modify
+        $i->click(Locator::elementAt('#header-options a.icon-modify', 1));
+        $i->waitForElement(Quiz::SELECTOR_BUTTON_UPDATE);
+
+        // change visibility
+        $i->selectOption(Quiz::SELECTOR_VISIBILITY, Quiz::VISIBILITY_STAFF_AND_STUDENT);
+        $i->click(Quiz::SELECTOR_BUTTON_UPDATE);
+
+        // As Rachel, check notification
+        $i->impersonate($student1);
+        $quizPage->assertNotifExists($teacher . ' has marked your attempt of ' . $quizTitle . ' in ' . $quizPage->className);
+
+        // As Rachel, click into the due work
+        $i->click($quizTitle, '#content');
+        $i->canSee('ATTEMPTS');
+        // shouldn't see any grades
+        $i->canSee('2018', '#attempts > tbody > tr:nth-child(1) > td:nth-child(4)');
+        $i->canSee('10/10', '#attempts > tbody > tr:nth-child(1) > td:nth-child(5)');
+
+    }
+
+
+    /**
      * Internal steps to create a quiz
      * @param AcceptanceTester $i
      * @param Quiz $quizPage
      * @param array $students
      * @param String $teacher
      * @param String $quizTitle
+     * @param int $visibility
      * @throws Exception
      */
     private function testCreateQuiz(AcceptanceTester $i, Quiz $quizPage, array $students,
-                                    String $teacher, String $quizTitle)
+                                    String $teacher, String $quizTitle, int $visibility = Quiz::VISIBILITY_STAFF_AND_STUDENT)
     {
 
         // As Zane, create a quiz
@@ -213,6 +291,7 @@ class QuizCest
         $assessId = $quizPage->createQuiz(
             [
                 Quiz::SELECTOR_WORKTYPE => Quiz::WORKTYPE_ASSESSMENT_TASK,
+                Quiz::SELECTOR_VISIBILITY => $visibility,
                 Quiz::SELECTOR_MAX_ATTEMPTS => 0 // unlimited
             ],
             [
