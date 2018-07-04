@@ -22,7 +22,8 @@
         {# Drafting mechanism #}
         $('#createForm').draft({
             inputs: ['title', 'publishAt', 'expiresAt'],
-            textareas: ['body', 'blurb']
+            textareas: ['body', 'blurb'],
+            attachzones: ['attachment']
         });
 
         $('[data-topics]').selectizeSelector({

@@ -60,6 +60,10 @@
                  */
                 textareas: [],
 
+                /* Attachzones to check
+                 */
+                attachzones: [],
+
                 /* Activation element
                  * The thing that gets disabled while saving
                  */
@@ -86,6 +90,18 @@
 
             for (i = 0; i < config.textareas.length; i++) {
                 registry[config.textareas[i]] = CKEDITOR.instances[config.textareas[i]].getData();
+            }
+
+            /* Files that were in the attachzones initially
+             */
+            for (i = 0; i < config.attachzones.length; i++) {
+                registry[config.attachzones[i]] = [];
+
+                $.each($('input[name="'+config.attachzones[i]+'[]"]'), function(index, element) {
+                    if ($(element).val() !== '') {
+                        registry[config.attachzones[i]].push($(element).val());
+                    }
+                });
             }
         }
 
@@ -114,6 +130,7 @@
             var contentChanged = false;
             var key;
             var current;
+            var i, j;
 
             /* Check inputs
              */
@@ -131,7 +148,7 @@
 
             /* Check textareas
              */
-            for (var i = 0; i < config.textareas.length; i++) {
+            for (i = 0; i < config.textareas.length; i++) {
                 key = config.textareas[i];
 
                 current = CKEDITOR.instances[key].getData();
@@ -141,6 +158,39 @@
 
                     registry[key] = current;
                 }
+            }
+
+            /* Check attachzones
+             */
+            for (i = 0; i < config.attachzones.length; i++) {
+                key = config.attachzones[i];
+
+                current = config.element.find('input[name="'+config.attachzones[i]+'[]"]');
+
+                var currentFiles = [];
+
+                /* Check whether there's a different file in the attachzone than the ones we knew
+                 */
+                for (j = 0; j < current.length; j++) {
+                    currentFiles.push($(current[j]).val());
+
+                    if (registry[key].indexOf($(current[j]).val()) === -1) {
+                        contentChanged = true;
+                    }
+                }
+
+                /* If a file has been removed from the list, contentChanged might still be false
+                 * because the current list of files is a subset of what was initially there
+                 * Now check the length to ensure that a) no new files were added and b) no existing
+                 * files were removed
+                 */
+                if (currentFiles.length !== registry[key].length) {
+                    contentChanged = true;
+                }
+
+                /* Remember the current state of things
+                 */
+                registry[key] = currentFiles;
             }
 
             return contentChanged;
