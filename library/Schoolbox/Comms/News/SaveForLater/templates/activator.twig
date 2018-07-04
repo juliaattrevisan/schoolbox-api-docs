@@ -6,49 +6,43 @@
  # @param Model news
  # @param string state
  #}
-<div class="row">
-    <div class="small-12 columns">
-        <script>
-            $(function() {
-                $('#saveforlater').on('click', function(event) {
-                    event.preventDefault();
+<script>
+    $(function() {
+        $('#saveforlater').on('click', function(event) {
+            event.preventDefault();
 
-                    var $element = $(this);
-                    var $toast = $('#toast');
+            var $element = $(this);
+            var $toast = $('#toast');
 
-                    $toast.toastActivate({
-                        text: 'Saving for later...'
-                    });
+            $toast.toastActivate({
+                text: 'Saving for later...'
+            });
 
-                    $.ajax({
-                        type: 'POST',
-                        url: $element.attr('href'),
-                        dataType: 'json'
-                    }).success(function () {
-                        $toast.toastTimeout({
-                            text: 'Saved',
-                            css: 'success'
-                        });
+            $.ajax({
+                type: 'POST',
+                url: $element.attr('href'),
+                dataType: 'json'
+            }).success(function () {
+                $toast.toastTimeout({
+                    text: 'Saved',
+                    css: 'success'
+                });
 
-                        {# Update icon #}
-                        $element.removeClass('icon-favourite-hollow').addClass('icon-favourite');
-                    }).error(function (response) {
-                        var temp = $.parseJSON(response.responseText);
+                {# Update icon #}
+                $element.removeClass('icon-favourite-hollow').addClass('icon-favourite');
+            }).error(function (response) {
+                var temp = $.parseJSON(response.responseText);
 
-                        $toast.toastTimeout({
-                            text: 'Error: ' + temp.message,
-                            css: 'alert'
-                        });
-                    });
+                $toast.toastTimeout({
+                    text: 'Error: ' + temp.message,
+                    css: 'alert'
                 });
             });
-        </script>
-        {% if state %}
-            <p><span class="icon-favourite"></span>This {{ locale.news }} article is already
-                <a href="{{ routeLookup('commsNewsSaveForLater.getList') }}" title="View your list of articles">Saved For Later</a>.
-            </p>
-        {% else %}
-            <p><a href="{{ routeLookup('commsNewsSaveForLater.postActivate', {newsId: news.id}) }}" class="icon-favourite-hollow" title="Save a shortcut to this {{ local.news }}" id="saveforlater">Save For Later</a></p>
-        {% endif %}
-    </div>
-</div>
+        });
+    });
+</script>
+{% if state %}
+    <a href="{{ routeLookup('commsNewsSaveForLater.getList') }}" class="icon-favourite" title="This {{ locale.news }} article is already Saved For Later"></a>
+{% else %}
+    <a href="{{ routeLookup('commsNewsSaveForLater.postActivate', {newsId: news.id}) }}" class="icon-favourite-hollow" title="Save for later" id="saveforlater"></a>
+{% endif %}
