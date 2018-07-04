@@ -121,7 +121,7 @@ class Controller extends Base
              */
             return [
                 'success' => false,
-                'message' => 'Could not Save For Later.'
+                'message' => 'Could not save item.'
             ];
         }
 
@@ -161,7 +161,7 @@ class Controller extends Base
         } catch (\PDOException|\UnexpectedValueException|Exception $e) {
             return [
                 'success' => false,
-                'message' => 'Could not Save For Later.'
+                'message' => 'Could not save item.'
             ];
         }
     }

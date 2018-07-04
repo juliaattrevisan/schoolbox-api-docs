@@ -1,17 +1,16 @@
 {##
- # Save FOr Later
+ # Saved items
  #
  # A list of articles that you've saved for later
  #}
 
-
 <div class="row">
     <div class="small-12 columns">
-        <h1>Saved For Later</h1>
+        <h1>Saved</h1>
 
         <ul class="meta">
             {% if not canSaveForLater %}
-            <li class="icon-info">Save For Later has been disabled. You can't add to this list. </li>
+            <li class="icon-info">Saving items has been disabled. You can't add to this list.</li>
             {% endif %}
         </ul>
     </div>
@@ -87,7 +86,7 @@
                                 </div>
                             </div>
                             <nav>
-                                <a class="icon-close" href="{{ routeLookup('commsNewsSaveForLater.postRemove', {newsId: article.id}) }}" title="Remove this from your Saved For Later list" data-remove="{{ article.title }}"></a>
+                                <a class="icon-close" href="{{ routeLookup('commsNewsSaveForLater.postRemove', {newsId: article.id}) }}" title="Remove this from your saved items" data-remove="{{ article.title }}"></a>
                             </nav>
                             <article>{{ article.blurb|purify }}</article>
                         </li>
