@@ -37,7 +37,7 @@
                 {# This info only really matters to the author, I suppose
                  # Submitted at; accepted at; accepted by
                  #}
-                {% if article.author.id == USER.id %}
+                {% if isAuthor %}
                     {% if article.isSubmitted %}
                         <li class="icon-calendar">Submitted on {{ article.submittedAt.local }}</li>
                     {% endif %}
@@ -149,7 +149,7 @@
  # One of three possibilities are shown here
  # Only useful to authors and moderators
  #}
-{% if article.author.id == USER.id or isCommsOfficer %}
+{% if isAuthor or isCommsOfficer %}
 {% include '@commsNews/workflow.twig' with {
     article: article,
     moderationRequired: moderationRequired
