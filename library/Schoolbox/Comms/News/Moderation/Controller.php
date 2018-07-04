@@ -163,10 +163,13 @@ class Controller extends Base
      *
      * @param Model $news
      * @throws MapperException
+     * @throws MapperException\Deleted
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Aura\Router\Exception\RouteNotFound
      * @throws \PDOException
+     * @throws \Schoolbox\Application\Exception\Exception
+     * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \UnexpectedValueException
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
      */
     public function postAccept(Model $news)
     {
@@ -226,7 +229,7 @@ class Controller extends Base
      */
     public function postReject(Model $news)
     {
-        if ((new ValidUserCanReject())->isSatisfiedBy($this->getUser())) {
+        if ((new ValidUserCanReject())->isSatisfiedBy($this->getUser(), $news)) {
             $news
                 ->setSubmittedAt(null)
                 ->setAcceptedAt(null)
