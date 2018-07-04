@@ -182,6 +182,11 @@ class Attendance_Synergetic_AttendanceMaster
 
         $statement->bindOutputs($outputs);
 
+		$this->connector->executeQuery(
+			"UPDATE wkAttendanceMaster SET CreatedById = StaffID WHERE AttendanceMasterSeq = :attendanceMasterSeq",
+			['attendanceMasterSeq' => $attendanceMasterSeq]
+		);
+
         return $statement->execute();
     }
 
