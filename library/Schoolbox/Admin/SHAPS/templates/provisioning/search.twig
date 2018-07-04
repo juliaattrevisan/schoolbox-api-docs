@@ -91,6 +91,10 @@
 
                         }, "json")
                             .fail(function(xhr, status, error) {
+                                /** @var {Object} xhr.responseJSON */
+                                if ('object' === typeof xhr.responseJSON) {
+                                    error = xhr.responseJSON.errorMessage
+                                }
                                 var $toast = $('[data-toast]');
                                 var config = {text: 'Unable to connect to Schoolbox Help: ' + error, duration: 2500, css: 'alert'};
                                 $toast.toastActivate(config);

@@ -8,6 +8,7 @@
 
 namespace Custom\Help\CourseParticipation;
 
+use Custom\Help\CourseParticipation\Exception\ParticipantRolesNotFoundException;
 use InvalidArgumentException;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
@@ -25,13 +26,12 @@ use UnexpectedValueException;
 
 class Handler
 {
-    const PARTICIPANT_ROLE_NAMES = ['School Staff', 'Hero Teacher', 'Prospect'];
-    const DEFAULT_PARTICIPANT_ROLE_NAME = 'School Staff';
 
-    const PARTICIPANT_CAMPUS    = 1;
-    const REQUIRED_USER_FIELDS  = [
-        'id', 'email', 'firstname', 'lastname'
-    ];
+    public const PARTICIPANT_ROLE_NAMES = ['School Staff', 'Hero Teacher', 'Prospect'];
+    public const DEFAULT_PARTICIPANT_ROLE_NAME = 'School Staff';
+
+    public const PARTICIPANT_CAMPUS = 1;
+    public const REQUIRED_USER_FIELDS = ['id', 'email', 'firstname', 'lastname'];
 
     /**
      * @var UserAccessMapper
@@ -99,6 +99,7 @@ class Handler
     /**
      * @param string $schoolCode
      * @return array
+     * @throws Mapper\Exception      If schoolCode does not have a course area on help
      */
     public function getFolderAccessBySchool(string $schoolCode) : array
     {
@@ -168,10 +169,19 @@ class Handler
      * @param bool   $fuzzy
      * @return array
      * @throws Mapper\DefinitionException
+     * @throws ParticipantRolesNotFoundException If the expected roles are not found on this server
      */
     public function getUsersBySchool(string $schoolCode, bool $fuzzy = false) : array
     {
         $roleIds = $this->getRoleMapper()->findIdsByColumn("name", self::PARTICIPANT_ROLE_NAMES);
+
+        if (!\count($roleIds)) {
+            // No roles with these names on this server? This most likely means the server is misconfigured.
+            // Note this is not a case where we we return an empty set of users, that means the role exists, but no users have that role
+            // for this specified school code.
+            $roleNames = \implode(',', self::PARTICIPANT_ROLE_NAMES);
+            throw new ParticipantRolesNotFoundException("No roles found for roles names: [{$roleNames}]");
+        }
 
         // show the list of users for this school
         // filter to the list of users whose external IDs are prefixed with the given school code
@@ -368,21 +378,17 @@ class Handler
     /**
      * @param string $schoolCode
      * @return Collection|IFolder[]
+     * @throws Mapper\Exception      If there are no courses for the specified schoolCode
      */
     private function getCoursesBySchool(string $schoolCode) : Collection
     {
         // ok, if you're here, you can see the thing.
-        try {
-            $code = $this->codeMapper->findOneByColumn('code', $schoolCode)->getFolder()->getId();
-            $folder = $this->folderMapper->findById($code);
-            // obtain all direct descendants of this folder
-            // the scope of implementation is immediate children only, rather than attempting to gather all descendants
-            return $this->folderMapper->findByParentId($folder->getId());
-        } catch (Mapper\Exception $e) {
-            // No courses? Do nothing, we're going to return an empty collection outside this block
-        }
+        $code   = $this->codeMapper->findOneByColumn('code', $schoolCode);
+        $folder = $this->folderMapper->findById($code->getFolder()->getId());
 
-        return new Collection();
+        // obtain all direct descendants of this folder
+        // the scope of implementation is immediate children only, rather than attempting to gather all descendants
+        return $this->folderMapper->findByParentId($folder->getId());
     }
 
 

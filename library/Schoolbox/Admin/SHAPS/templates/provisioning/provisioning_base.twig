@@ -27,8 +27,16 @@
             </li>
         </ul>
 
-        {% block page_specific_content %}
-        {% endblock %}
+        {% if errorMessage %}
+            <div class="empty-state">
+                <i class="icon-info"></i>
+                <h2>Sorry, we are unable to complete this request </h2>
+
+                <p>{{ errorMessage }}</p>
+            </div>
+        {% else %}
+            {% block page_specific_content %}{% endblock %}
+
 
         <div id="statusFormContainer" {% if allUsers | length == 0 %}class="hide"{% endif %}>
             <form id="statusForm" action="{{ routeLookup('shaps.postProvision') }}" method="post">
@@ -109,7 +117,7 @@
             <i class="icon-staff-students"></i>
             <p>{% block emptyStateText %}No matching users found.{% endblock %}</p>
         </div>
-
+        {% endif %}
     </div>
 </div>
 

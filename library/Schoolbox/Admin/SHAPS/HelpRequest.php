@@ -11,17 +11,16 @@
 
 namespace Schoolbox\Admin\SHAPS;
 
-use GuzzleHttp\Client as GuzzleClient;
+use Guzzle\Http\Exception\TooManyRedirectsException;
+use GuzzleHttp;
 use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\GuzzleException;
 use Schoolbox\Admin\SHAPS\Auth;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-
-use Schoolbox\Admin\SHAPS\Exception;
-use Schoolbox\Error;
-
-
+use InvalidArgumentException;
+use Custom\Help\CourseParticipation;
 
 class HelpRequest
 {
@@ -39,22 +38,16 @@ class HelpRequest
      */
     private $userMapper;
 
-    /**
-     * @var Error\Mapper
-     */
-    private $errorMapper;
 
     /**
      * HelpRequest constructor.
      * @param Auth\Parameters         $authParams
      * @param UserMapper              $userMapper
-     * @param Error\Mapper $errorMapper
      */
-    public function __construct(Auth\Parameters $authParams, UserMapper $userMapper, Error\Mapper $errorMapper)
+    public function __construct(Auth\Parameters $authParams, UserMapper $userMapper)
     {
         $this->authParams = $authParams;
         $this->userMapper = $userMapper;
-        $this->errorMapper = $errorMapper;
     }
 
 
@@ -62,43 +55,28 @@ class HelpRequest
      * Alias to the Users endpoint
      *
      * @return array
-     * @throws \InvalidArgumentException
-     * @throws \RuntimeException
+     * @throws InvalidArgumentException                If unable to instantiate a guzzle client
+     * @throws GuzzleException                         4xx, 5xx, connect, tooManyRedirect
+     * @throws Exception\UnexpectedResponseException   2xx response, but response is unrecognisable
      */
     public function users(): array
     {
-        try {
-            return $this->execute('get', 'users');
-        } catch (Exception\UnexpectedResponseException $e) {
-            throw $this->errorMapper->generateException(Error\Mapper::ERROR_SHAPS_UNEXPECTED_RESPONSE);
-        } catch (Exception\AuthorisationException $e) {
-            throw $this->errorMapper->generateException(Error\Mapper::ERROR_SHAPS_AUTHORISATION_FAILURE);
-        } catch (Exception\AuthenticationException $e) {
-            throw $this->errorMapper->generateException(Error\Mapper::ERROR_SHAPS_AUTHENTICATION_FAILURE);
-        } catch (Exception\InvalidUrlException $e) {
-            throw $this->errorMapper->generateException(Error\Mapper::ERROR_SHAPS_INVALID_URL);
-        } catch (Exception\RefusedRequestException $e) {
-            throw $this->errorMapper->generateException(Error\Mapper::ERROR_SHAPS_REFUSED_REQUEST);
-        } catch (Exception\RequestException $e) {
-            throw $this->errorMapper->generateException(Error\Mapper::ERROR_SHAPS_GENERIC_CONNECTION_FAILURE, $e);
-        } catch (\GuzzleHttp\Exception\GuzzleException $e) {
-            throw $this->errorMapper->generateException(Error\Mapper::ERROR_SHAPS_GENERIC_CONNECTION_FAILURE, $e);
-        }
+        return $this->execute('get', 'users');
     }
-
 
     /**
      * Alias to the Courses endpoint
      *
      * @return array
-     * @throws \GuzzleHttp\Exception\GuzzleException
-     * @throws \InvalidArgumentException
-     * @throws \RuntimeException
+     * @throws InvalidArgumentException                If unable to instantiate a guzzle client
+     * @throws GuzzleException                         4xx, 5xx, connect, tooManyRedirect
+     * @throws Exception\UnexpectedResponseException   2xx response, but response is unrecognisable
      */
     public function courses(): array
     {
         return $this->execute('get', 'courses');
     }
+
 
     /**
      * Asks help for information located at $endpoint
@@ -113,12 +91,11 @@ class HelpRequest
      * @param string $endpoint
      * @param array  $formParams
      * @return array
-     * @throws \Schoolbox\Admin\SHAPS\Exception\UnexpectedResponseException
-     * @throws \GuzzleHttp\Exception\GuzzleException
-     * @throws \InvalidArgumentException
-     * @throws \RuntimeException
+     * @throws InvalidArgumentException                If unable to instantiate a guzzle client
+     * @throws GuzzleException                         4xx, 5xx, connect, tooManyRedirect
+     * @throws Exception\UnexpectedResponseException   2xx response, but response is unrecognisable
      */
-    private function execute(string $method, string $endpoint, array $formParams = []): array
+    private function execute(string $method, string $endpoint, array $formParams = null): array
     {
         /* Get the four pieces of the puzzle that we need to request data from Help
          */
@@ -128,45 +105,34 @@ class HelpRequest
          * Host and Origin headers are for working around CSRF protection
          * (which shouldn't be necessary for API calls, but is for some reason)
          */
-        try {
-            $response = (new GuzzleClient())->request(
-                $method,
-                "{$auth['url']}/api/course-participation/{$auth['schoolCode']}/{$endpoint}", [
-                    'query' => [
-                        'ts'     => $auth['timestamp'],
-                        'digest' => $auth['digest']
-                    ],
-                    'form_params' => $formParams,
-                    'headers'     => [
-                        'Host'   => $auth['host'],
-                        'Origin' => $auth['host'],
-                    ],
-                ]
-            );
-        } catch (\GuzzleHttp\Exception\ConnectException $e) {
-            throw new Exception\InvalidUrlException("Server URL was invalid");
-        } catch (\GuzzleHttp\Exception\ClientException $e) {
-            switch ($e->getCode()) {
-                case 403:
-                    // Digest does not match
-                    throw new Exception\AuthenticationException("Authentication failure - incorrect API key and/or school code");
-                    break;
-                case 400:
-                    // Potential replay attack
-                    throw new Exception\AuthorisationException("Authorisation failure - timestamp is out of date");
-                    break;
-                default:
-                    // Something else happened that the server didn't like
-                    throw new Exception\RefusedRequestException("Server refused your request");
-            }
-        } catch (\GuzzleHttp\Exception\RequestException $e) {
-            // Unfortunately, this generic error can sometimes get thrown instead of ConnectException when the URL is invalid
-            throw new Exception\RequestException("Unable to connect to the server: " .  $e->getMessage());
+        $queryString = \http_build_query(['ts' => $auth['timestamp'], 'digest' => $auth['digest']]);
+        $uri         = "{$auth['url']}/api/course-participation/{$auth['schoolCode']}/{$endpoint}?$queryString";
+        $headers     = [
+            'Host'   => $auth['host'],
+            'Origin' => $auth['host'],
+        ];
+        if(null === $formParams){
+            $body = null;
+        } else {
+            $body = \http_build_query($formParams, '', '&');
+            $headers['Content-Type'] = 'application/x-www-form-urlencoded';
         }
 
-        /* Return a json-encoded output of the body contents
-         */
-        $decoded_response = json_decode($response->getBody()->getContents(), true);
+        // Need to instantiate a Request instance so we can insert into exceptions below.
+        $request  = new GuzzleHttp\Psr7\Request($method, $uri, $headers, $body);
+        $response = (new GuzzleHttp\Client())->send($request);
+
+        if(CourseParticipation\Controller::STATUS_NO_CONTENT === $response->getStatusCode()){
+            // There's no contents to read.
+            return [];
+        }
+
+        // Attempt to json decode the response body
+        try{
+            $decoded_response = json_decode($response->getBody()->getContents(), true);
+        } catch (\RuntimeException $e){
+            throw new Exception\UnexpectedResponseException('Unable to read SHAPS API response', $request, $response, $e);
+        }
 
         // If this is an array, we know we got data back from Help
         // If it isn't, it either failed to decode or contains an error response code, so throw an exception
@@ -175,7 +141,7 @@ class HelpRequest
         if (\is_array($decoded_response)) {
             return $decoded_response;
         }
-        throw new Exception\UnexpectedResponseException($decoded_response);
+        throw new Exception\UnexpectedResponseException("Unable to decode SHAPS API response: {$decoded_response}", $request, $response);
     }
 
 
@@ -185,8 +151,9 @@ class HelpRequest
      * This is a list of hydrated users who have an equivalent representation in Help.
      *
      * @return \Schoolbox\GenericCollection
-     * @throws \InvalidArgumentException
-     * @throws \RuntimeException
+     * @throws InvalidArgumentException                If unable to instantiate a guzzle client
+     * @throws GuzzleException                         4xx, 5xx, connect, tooManyRedirect
+     * @throws Exception\UnexpectedResponseException   2xx response, but response is unrecognisable
      */
     public function findProvisionedUsers(): \Schoolbox\GenericCollection
     {
@@ -214,9 +181,9 @@ class HelpRequest
      * Find all the enrolments and the people in them...I suppose
      *
      * @return array
-     * @throws \GuzzleHttp\Exception\GuzzleException
-     * @throws \InvalidArgumentException
-     * @throws \RuntimeException
+     * @throws InvalidArgumentException                If unable to instantiate a guzzle client
+     * @throws GuzzleException                         4xx, 5xx, connect, tooManyRedirect
+     * @throws Exception\UnexpectedResponseException   2xx response, but response is unrecognisable
      */
     public function findEnrolments(): array
     {
@@ -261,6 +228,7 @@ class HelpRequest
      *
      * @param array $userIds
      * @return array
+     * @throws InvalidArgumentException                If unable to instantiate a guzzle client
      */
     public function provisionUsers($userIds): array
     {
@@ -275,12 +243,17 @@ class HelpRequest
                 $code    = 200;
                 $message = 'OK';
 
-            } catch (ClientException $e) {
+            }  /** @noinspection PhpRedundantCatchClauseInspection */
+            catch (ClientException|Exception\UnexpectedResponseException|ConnectException|TooManyRedirectsException $e) {
                 // 400: empty payload (should never get this) or some users failed
                 $code    = 400;
                 $message = 'Bad Request';
                 if ($e->getResponse()) {
-                    $data = json_decode($e->getResponse()->getBody()->getContents());
+                    try{
+                        $data = json_decode($e->getResponse()->getBody()->getContents());
+                    } catch (\RuntimeException $e){
+                        // Not much we can do here.
+                    }
                 }
 
             } catch (GuzzleException $e) {

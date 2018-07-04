@@ -9,9 +9,12 @@
 namespace Schoolbox\Admin\SHAPS;
 
 use Alaress\Web\Controller\Base;
+use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Exception\RequestException;
 use Schoolbox\UserMapper;
 use Schoolbox\Collection;
-use Schoolbox\Error;
+use Custom\Help\CourseParticipation;
+use InvalidArgumentException;
 
 class Controller extends Base
 {
@@ -33,12 +36,11 @@ class Controller extends Base
      *
      * @param UserMapper      $userMapper
      * @param Auth\Parameters $authParams
-     * @param Error\Mapper   $errorMapper
      */
-    public function __construct(UserMapper $userMapper, Auth\Parameters $authParams, Error\Mapper $errorMapper)
+    public function __construct(UserMapper $userMapper, Auth\Parameters $authParams)
     {
         $this->userMapper  = $userMapper;
-        $this->helpRequest = new HelpRequest($authParams, $this->userMapper, $errorMapper);
+        $this->helpRequest = new HelpRequest($authParams, $this->userMapper);
     }
 
     /*
@@ -83,20 +85,30 @@ class Controller extends Base
         return $errors;
     }
 
+
     /**
      * Renders a list of all staff in your Schoolbox instance, and whether or not they are provisioned on Help.
      *
-     * @api /adminv2/shaps/provisioning
+     * @api   /adminv2/shaps/provisioning
      * @level 18.1
      * @throws \Aura\Di\Exception\ServiceNotFound
-     * @throws \InvalidArgumentException
-     * @throws \RuntimeException
+     * @throws InvalidArgumentException
      */
     public function getAll(): void
     {
-        $errors = [];
-        $provisionedUsers = $this->helpRequest->findProvisionedUsers();
+        $title = 'Schoolbox Help Staff Provisioning';
 
+        try {
+            $provisionedUsers = $this->helpRequest->findProvisionedUsers();
+        } catch (GuzzleException $e) {
+            $this->getResponse()->content->set(
+                $this->buildHtmlOutput('@shaps/provisioning/index.twig', ['errorMessage' => $this->getReasonPhrase($e)])
+                     ->setTitle($title)
+            );
+            return;
+        }
+
+        $errors = [];
         $allStaff = $this->getAllStaff();
         foreach($allStaff as $user) {
             $errors[$user->getId()] = $this->getInvalidities($user);
@@ -109,9 +121,12 @@ class Controller extends Base
                 'provisionedUsers' => $provisionedUsers,
                 'pageCurrent' => 'shaps/provisioning',
                 'errors' => $errors
-            ])->setTitle('Schoolbox Help Staff Provisioning')
+            ])->setTitle($title)
         );
     }
+
+
+
 
     /**
      * Renders a list of staff in your Schoolbox instance that are also provisioned on Help.
@@ -121,11 +136,21 @@ class Controller extends Base
      *
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \InvalidArgumentException
-     * @throws \RuntimeException
      */
     public function getProvisioned(): void
     {
-        $provisionedUsers = $this->helpRequest->findProvisionedUsers();
+        $title = 'Provisioned Staff - Schoolbox Help Staff Provisioning';
+
+        try {
+            $provisionedUsers = $this->helpRequest->findProvisionedUsers();
+        } catch (GuzzleException $e) {
+            $this->getResponse()->content->set(
+                $this->buildHtmlOutput('@shaps/provisioning/provisioned.twig', ['errorMessage' => $this->getReasonPhrase($e),])
+                     ->setTitle($title)
+            );
+            return;
+        }
+
         $allStaff = $this->getAllStaff();
         $errors = [];
         foreach($allStaff as $user) {
@@ -139,7 +164,7 @@ class Controller extends Base
                     'provisionedUsers' => $provisionedUsers,
                     'pageCurrent' => 'shaps/provisioning',
                     'errors' => $errors
-            ])->setTitle('Provisioned Staff - Schoolbox Help Staff Provisioning')
+            ])->setTitle($title)
         );
     }
 
@@ -151,11 +176,21 @@ class Controller extends Base
      *
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \InvalidArgumentException
-     * @throws \RuntimeException
      */
     public function getUnprovisioned(): void
     {
-        $provisionedUsers = $this->helpRequest->findProvisionedUsers();
+        $title = 'Unprovisioned Staff - Schoolbox Help Staff Provisioning';
+
+        try {
+            $provisionedUsers = $this->helpRequest->findProvisionedUsers();
+        } catch (GuzzleException $e) {
+            $this->getResponse()->content->set(
+                $this->buildHtmlOutput('@shaps/provisioning/unprovisioned.twig', ['errorMessage' => $this->getReasonPhrase($e),])
+                     ->setTitle($title)
+            );
+            return;
+        }
+
         $allStaff = $this->getAllStaff();
         $errors = [];
         foreach($allStaff as $user) {
@@ -168,7 +203,7 @@ class Controller extends Base
                     'allUsers' => $allStaff->diff($provisionedUsers),
                     'pageCurrent' => 'shaps/provisioning',
                     'errors' => $errors
-            ])->setTitle('Unprovisioned Staff - Schoolbox Help Staff Provisioning')
+            ])->setTitle($title)
         );
     }
 
@@ -180,7 +215,7 @@ class Controller extends Base
      *
      * @throws \Aura\Di\Exception\ServiceNotFound
      */
-    public function getUserProvisioningSearch()
+    public function getUserProvisioningSearch(): void
     {
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
@@ -194,13 +229,13 @@ class Controller extends Base
     /**
      * Provides details about a user in response to an ajax request for that user's external ID.
      *
-     * @api GET /adminv2/shaps/provisioning/{userId}
+     * @api   GET /adminv2/shaps/provisioning/{userId}
      * @level 18.1
      *
      * @param string $userId
      * @throws \InvalidArgumentException
-     * @throws \RuntimeException
      * @throws \Schoolbox\Mapper\Exception
+     * @throws \Aura\Web\Exception\InvalidStatusCode
      */
     public function getSearchUsers(string $userId): void
     {
@@ -208,9 +243,15 @@ class Controller extends Base
         $user = $this->userMapper->findByExternalId($userId);
         $errors[$user->getId()] = $this->getInvalidities($user);
 
-        /* Check if this user's id was in the provisionedUsers index - don't need to use in_array to test
-         */
-        $provisionedUsers = $this->helpRequest->findProvisionedUsers();
+        try {
+            $provisionedUsers = $this->helpRequest->findProvisionedUsers();
+        } catch (GuzzleException $e) {
+            $this->getResponse()->status->setCode(400);
+            $this->getResponse()->content->set($this->buildJsonOutput(['errorMessage' => $this->getReasonPhrase($e),]));
+            return;
+        }
+
+        // Check if this user's id was in the provisionedUsers index - don't need to use in_array to test
         $exists = $provisionedUsers->offsetGet($user->getId()) !== null;
 
         $userJSON = [
@@ -257,16 +298,20 @@ class Controller extends Base
         ])->setTitle('Schoolbox Help Course Enrolments - User Search'));
     }
 
+
     /**
      * Takes a user ID and renders a list of all courses that user is enrolled in on Help.
      * TODO placeholder method for when we actually implement this
      *
-     * @api GET /adminv2/shaps/courses/courses/{userId}
+     * @api   GET /adminv2/shaps/courses/courses/{userId}
      * @level 18.1
      *
      * @param string $userID
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\Deleted
      */
-    public function getSearchCoursesForUser($userID) {
+    public function getSearchCoursesForUser($userID): void
+    {
         // Some sample users
         $zsmith = $this->userMapper->findById(151);
         $jbenson = $this->userMapper->findById(247);
@@ -330,8 +375,9 @@ class Controller extends Base
     /**
      * Post users to SHAPS
      *
-     * @api POST /adminv2/shaps/provision/
+     * @api   POST /adminv2/shaps/provision/
      * @level 181
+     * @throws InvalidArgumentException                If unable to instantiate a guzzle client
      */
     public function postProvision(): void
     {
@@ -340,5 +386,53 @@ class Controller extends Base
         // Build response
         $this->response->status->set($response['status']['code']);
         $this->response->content->set($this->buildJsonOutput($response));
+    }
+
+
+    /**
+     * Returns a human-readable reason we can give to end-users to advise why their client's request was
+     * unable to be processed by the SHAPs server
+     *
+     * @param GuzzleException $e
+     * @return string
+     */
+    private function getReasonPhrase(GuzzleException $e): string
+    {
+        if($e instanceof RequestException){
+            switch ($e->getCode()){
+                case CourseParticipation\Controller::STATUS_BAD_REQUEST:
+                    return $this->getResponseErrorMessage($e);
+                case CourseParticipation\Controller::STATUS_UNAUTHENTICATED:
+                    return 'Authentication failure - incorrect API key and/or school code';
+                case CourseParticipation\Controller::STATUS_UNAUTHORISED:
+                    return $this->getResponseErrorMessage($e);
+                case CourseParticipation\Controller::STATUS_NOT_FOUND:
+                    return $this->getResponseErrorMessage($e);
+                case CourseParticipation\Controller::STATUS_SERVER_ERROR:
+                    return $this->getResponseErrorMessage($e);
+                default:
+                    // ConnectException + TooManyRedirectsException
+                    return "Unable to connect to Schoolbox HELP API - {$e->getMessage()}";
+            }
+        }
+        // This should never happen. Storm just doesn't recognised that our custom exceptions are descendants of RequestException.
+        return 'Unable to connect to Schoolbox HELP API';
+    }
+
+
+    /**
+     * Returns the custom error message if one was sent by the server, otherwise falls back to the
+     * default message for the exceptions HTTP response code
+     *
+     * @param RequestException $e
+     * @return string
+     */
+    private function getResponseErrorMessage(RequestException $e): string
+    {
+        try{
+            return $e->getResponse() ? $e->getResponse()->getBody()->getContents() : $e->getMessage();
+        } catch (\RuntimeException $e) {
+            return $e->getMessage();
+        }
     }
 }
