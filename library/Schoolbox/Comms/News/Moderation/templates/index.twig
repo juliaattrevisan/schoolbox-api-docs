@@ -1,0 +1,85 @@
+{# A list of articles that require moderation
+ # Moderation is performed by Comms Officers and their deputy Moderators (if assigned)
+ #}
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Moderation List</h1>
+    </div>
+</div>
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Awaiting Acceptance</h2>
+
+        {% if newsArticles|length %}
+        <section>
+            <ul class="information-list">
+                {% for news in newsArticles %}
+                    <li>
+                        <div class="list-item">
+                            <div class="small-12 card">
+                                <h3><a href="{{ routeLookup('commsNews.getDetail', {newsId: news.id}) }}">{{ news.title }}</a></h3>
+                                <p class="meta">Authored by {{ news.author.fullname }} on {{ news.updatedAt.local }}</p>
+
+                                {# TODO: Have a /news/topic url lol #}
+                                {% if news.topics|length %}
+                                    <p class="meta">Related topics:
+                                        {% for topic in news.topics %}
+                                            <a href="/news/topic/{{ topic.slug }}">{{ topic.name }}</a>{% if not loop.last %},{% endif %}
+                                        {% endfor %}
+                                    </p>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <article>{{ news.blurb|purify }}</article>
+                    </li>
+                {% endfor %}
+            </ul>
+        </section>
+        {% else %}
+        <div class="empty-state">
+            <i class="icon-news"></i>
+            <p>All {{ locale.news.proper }} articles have been processed.</p>
+            <p>You can <a href="">view statistics on existing {{ locale.news.proper }} articles</a> to see how they are faring.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{# A list of recently-accepted articles
+ # Not having this is pretty disorienting
+ #}
+{% if recentArticles|length %}
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Recently Accepted</h2>
+
+        <section>
+            <ul class="information-list">
+                {% for news in recentArticles %}
+                    <li>
+                        <div class="list-item">
+                            <div class="small-12 card">
+                                <h3><a href="{{ routeLookup('commsNews.getDetail', {newsId: news.id}) }}">{{ news.title }}</a></h3>
+                                <p class="meta">Authored by {{ news.author.fullname }} on {{ news.updatedAt.local }}</p>
+                                <p class="meta">Accepted by {{ news.acceptedBy.fullname }} on {{ news.updatedAt.local }}</p>
+
+                                {# TODO: Have a /news/topic url lol #}
+                                {% if news.topics|length %}
+                                    <p class="meta">Related topics:
+                                        {% for topic in news.topics %}
+                                            <a href="/news/topic/{{ topic.slug }}">{{ topic.name }}</a>{% if not loop.last %},{% endif %}
+                                        {% endfor %}
+                                    </p>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <article>{{ news.blurb|purify }}</article>
+                    </li>
+                {% endfor %}
+            </ul>
+        </section>
+    </div>
+</div>
+{% endif %}

@@ -39,8 +39,11 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('blurb', self::TYPE_STRING);
         $this->joins('feature_image_hash', Storage\Mapper::class, 'hash', null, null, 'featureImage', 'featureImage');
         $this->joins('author_id', UserMapper::class, 'id', null, null, 'author', 'author');
-        $this->joins('moderated_by', UserMapper::class);
-        $this->uses('moderated_at', self::TYPE_DATETIME);
+        $this->joins('accepted_by', UserMapper::class, 'id', null, null, 'acceptedBy', 'moderator');
+        $this->uses('accepted_at', self::TYPE_DATETIME);
+        $this->joins('rejected_by', UserMapper::class, 'id', null, null, 'rejectedBy', 'rejector');
+        $this->uses('rejected_at', self::TYPE_DATETIME);
+        $this->uses('rejected_reason', self::TYPE_STRING);
         $this->uses('submitted_at', self::TYPE_DATETIME);
         $this->uses('publish_at', self::TYPE_DATETIME);
         $this->uses('expires_at', self::TYPE_DATETIME);
@@ -73,7 +76,9 @@ class Mapper extends \Schoolbox\Mapper
             SELECT 
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('author', 'a')},
-                {$this->getJoinColumnString('comms_news_article_topic', 'topics')}
+                {$this->getJoinColumnString('comms_news_article_topic', 'topics')},
+                {$this->getJoinColumnString('moderator', 'm')},
+                {$this->getJoinColumnString('rejector', 'r')}
         ";
     }
 
@@ -90,6 +95,8 @@ class Mapper extends \Schoolbox\Mapper
             FROM {$this->getTable()}
             LEFT JOIN {$this->getJoinSql('comms_news_article_topic', null, 'topics')}
             INNER JOIN {$this->getJoinSql('author', null, 'a', true)}
+            LEFT JOIN {$this->getJoinSql('moderator', null, 'm', true)}
+            LEFT JOIN {$this->getJoinSql('rejector', null, 'r', true)}
         ";
     }
 
@@ -119,9 +126,23 @@ class Mapper extends \Schoolbox\Mapper
                 if ($author) {
                     $news->setAuthor($author);
                 }
+
+                /** @var User $moderator */
+                $moderator = $this->getJoinMapper('moderator')->hydrate($row, 'm');
+
+                if ($moderator) {
+                    $news->setAcceptedBy($moderator);
+                }
+
+                /** @var User $rejector */
+                $rejector = $this->getJoinMapper('rejector')->hydrate($row, 'r');
+
+                if ($rejector) {
+                    $news->setRejectedBy($rejector);
+                }
             }
 
-            $collection->add($news);
+            $collection->setOffset($news->getId(), $news);
         }
 
         /* Reindex the new topics so they're not in an associative array
@@ -130,6 +151,8 @@ class Mapper extends \Schoolbox\Mapper
         foreach ($collection as $current) {
             $current->getTopics()->reindex();
         }
+
+        $collection->reindex();
 
         return $collection;
     }

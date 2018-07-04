@@ -39,21 +39,37 @@
         });
     });
 </script>
-<div class="row">
-    <div class="small-12 island">
-        <h1>{{ action|capitalize }} {{ locale.news.proper }} {{ indicator.render(news) }}</h1>
 
-        <ul class="meta">
-            {% if news.moderatedBy.id %}
-            <li class="icon-staff">Last moderated by {{ news.moderatedBy.fullname }}
-                {% if not news.moderatedAt.isNull %}
-                    on {{ news.moderatedAt.local }}
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 column">
+            <h1>{{ action|capitalize }} {{ locale.news.proper }} {{ indicator.render(news) }}</h1>
+            <ul class="meta">
+                {% if news.acceptedBy.id %}
+                    <li class="icon-staff">Last moderated by {{ news.acceptedBy.fullname }}
+                        {% if news.isAccepted %}
+                            on {{ news.acceptedAt.local }}
+                        {% endif %}
+                    </li>
                 {% endif %}
-            </li>
-            {% endif %}
-        </ul>
+            </ul>
+        </div>
     </div>
+    <nav>
+        {% set moderationListRoute = routeLookupIfAuthorized('commsNewsModeration.getList') %}
+
+        {% if moderationListRoute %}
+            <a class="icon-list" href="{{ moderationListRoute }}" title="Moderation List"></a>
+        {% endif %}
+    </nav>
 </div>
+
+
+{# Train Line #}
+{% include '@commsNews/workflow.twig' with {
+    news: news,
+    moderationRequired: policies['global_moderation'].value
+} %}
 
 {% if policies['global_moderation'].value %}
 <div class="row">
@@ -115,21 +131,21 @@
                     <div class="small-12 large-6 columns">
                         <label for="publishAt">
                             Publish Date
-                            <p class="meta">This article becomes available to its audience once this date and time is reached.</p>
-                            <input type="text" class="required" name="publishAt" id="publishAt" data-datepicker data-datepicker-time data-datesync-enddate="#expiresAt" maxlength="50" value="{{ news.publishAt.local }}"/>
                         </label>
+                        <p class="meta">This article becomes available to its audience once this date and time is reached.</p>
+                        <input type="text" class="required" name="publishAt" id="publishAt" data-datepicker data-datepicker-time data-datesync-enddate="#expiresAt" maxlength="50" value="{{ news.publishAt.local }}"/>
                     </div>
                     <div class="small-12 large-6 columns">
                         <label for="expiresAt">
                             Expiry Date
-                            <p class="meta">This article is automatically archived once this expiry date is reached.</p>
                         </label>
+                        <p class="meta">This article is automatically archived once this expiry date is reached.</p>
                         <input type="text" class="required" name="expiresAt" id="expiresAt" data-datepicker data-datepicker-time data-datesync-startdate="#publishAt" maxlength="50" value="{{ news.expiresAt.local }}"/>
                     </div>
                 </fieldset>
             </section>
 
-            <input type="submit" value="{{ action|capitalize }} {{ locale.news }}"/>
+            <input type="submit" value="Preview" />
         </form>
     </div>
 </div>

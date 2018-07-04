@@ -188,12 +188,28 @@ class Mapper extends BaseMapper implements IExceptionGenerator
 
     public const ERROR_SUBMISSION_WINDOW_EXCEEDED = 214;
 
-    const ERROR_SHAPS_INVALID_URL = 215;
-    const ERROR_SHAPS_AUTHENTICATION_FAILURE = 216;
-    const ERROR_SHAPS_AUTHORISATION_FAILURE = 217;
-    const ERROR_SHAPS_REFUSED_REQUEST = 218;
-    const ERROR_SHAPS_GENERIC_CONNECTION_FAILURE = 219;
-    const ERROR_SHAPS_UNEXPECTED_RESPONSE = 220;
+    /* Ways in which SHAPS can die
+     */
+    public const ERROR_SHAPS_INVALID_URL = 215;
+    public const ERROR_SHAPS_AUTHENTICATION_FAILURE = 216;
+    public const ERROR_SHAPS_AUTHORISATION_FAILURE = 217;
+    public const ERROR_SHAPS_REFUSED_REQUEST = 218;
+    public const ERROR_SHAPS_GENERIC_CONNECTION_FAILURE = 219;
+    public const ERROR_SHAPS_UNEXPECTED_RESPONSE = 220;
+
+    /* You cannot view this article because it is already moderated and ready for publishing
+     * Only comms officers can crud from this point onwards
+     */
+    public const ERROR_COMMS_NEWS_ALREADY_ACCEPTED = 221;
+
+    /* Only Comms Officers can delete news articles when they're already moderated and/or published
+     */
+    public const ERROR_COMMS_NEWS_CANNOT_DELETE = 222;
+
+    /* This article isn't valid
+     */
+    public const ERROR_COMMS_NEWS_INVALID_ARTICLE = 223;
+
 
     /**
      * Setup mapping

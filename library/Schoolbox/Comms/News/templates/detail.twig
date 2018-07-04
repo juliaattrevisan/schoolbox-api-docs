@@ -1,40 +1,144 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {% import '@commsNews/layout.twig' as layout %}
 
-
-
 {# TODO: How to do breadcrumbs now? #}
+{% if isCommsOfficer %}
+    {{ bread.crumbs(
+        [ locale.news.proper, '/news' ],
+        [ 'Moderation', routeLookup('commsNewsModeration.getList') ],
+        [ news.title ]
+    ) }}
+{% else %}
 {{ bread.crumbs(
     [ locale.news.proper, '/news' ],
     [ news.title ]
 ) }}
+{% endif %}
+
+
 
 <div class="actions-small-1 row">
     <div class="list-item">
-        <div class="small-12 column">
+        <div class="small-12 columns">
             <h1>{{ news.title }}</h1>
 
-            {% if news.topics|length %}
             <ul class="meta">
-                <li class="icon-news">Related Topics:
 
-                    {# TODO: Have a /news/topic url lol #}
-                    {% for topic in news.topics %}
-                        <a href="/news/topic/{{ topic.slug }}">{{ topic.name }}</a>{% if not loop.last %},{% endif %}
-                    {% endfor %}
-                </li>
+                {# Topics #}
+                {% if news.topics|length %}
+                    <li class="icon-news">Related Topics:
+
+                        {# TODO: Have a /news/topic url lol #}
+                        {% for topic in news.topics %}
+                            <a href="/news/topic/{{ topic.slug }}">{{ topic.name }}</a>{% if not loop.last %},{% endif %}
+                        {% endfor %}
+                    </li>
+                {% endif %}
+
+                {# This info only really matters to the author, I suppose
+                 # Submitted at; accepted at; accepted by
+                 #}
+                {% if news.author.id == USER.id %}
+                    {% if news.isSubmitted %}
+                        <li class="icon-calendar">Submitted on {{ news.submittedAt.local }}</li>
+                    {% endif %}
+
+                    {% if news.isAccepted %}
+                        <li class="icon-calendar">Last moderated on {{ news.acceptedAt.local }} by {{ news.acceptedBy.fullname }}</li>
+                    {% endif %}
+                {% endif %}
             </ul>
-            {% endif %}
         </div>
     </div>
     <nav>
-        {% set modifyRoute = routeLookupIfAuthorized('commsNews.getUpdate', {newsId: news.id}) %}
-
-        {% if modifyRoute %}
-        <a class="icon-modify" href="{{ modifyRoute }}" title="Actions"></a>
-        {% endif %}
+        <a class="icon-more" title="Actions" data-dropdown="header-options"></a>
     </nav>
+    <ul id="header-options" class="f-dropdown" data-dropdown-content>
+
+        {# Modify article #}
+        {% set modifyRoute = routeLookupIfAuthorized('commsNews.getUpdate', {newsId: news.id}) %}
+        {% if modifyRoute and (isCommsOfficer or not moderationRequired or not news.isAccepted) %}
+            <li><a class="icon-modify" href="{{ modifyRoute }}">Modify</a></li>
+        {% endif %}
+
+        {# Delete article #}
+        {% set deleteRoute = routeLookupIfAuthorized('commsNews.postDelete', {newsId: news.id}) %}
+
+        {% if deleteRoute and isDeletable %}
+            <script>
+                $(function() {
+                    $('#header-options').on('click', 'a[data-delete]', function(event) {
+                        event.preventDefault();
+
+                        var $element = $(this);
+                        var $toast = $('#toast');
+                        var title = $element.attr('data-delete');
+
+                        $element.confirmDialog({
+                            text: 'Are you sure you want to delete ' + title + '?',
+                            confirmEvent: function() {
+                                $toast.toastActivate({
+                                    text: 'Deleting ' + title
+                                });
+
+                                $.ajax({
+                                    type: 'POST',
+                                    url: $element.attr('href'),
+                                    data: {newsId: {{ news.id }}},
+                                    dataType: 'json'
+                                }).success(function (response) {
+                                    $toast.toastTimeout({
+                                        text: title + ' was deleted',
+                                        css: 'success'
+                                    });
+
+                                    window.location.href = response.redirect;
+                                }).error(function (response) {
+                                    var temp = $.parseJSON(response.responseText);
+
+                                    $toast.toastTimeout({
+                                        text: 'Error: ' + temp.message,
+                                        css: 'alert'
+                                    });
+                                });
+                            }
+                        });
+                    });
+                });
+            </script>
+            <li><a class="icon-delete" href="{{ deleteRoute }}" data-delete="{{ news.title }}">Delete</a></li>
+        {% endif %}
+
+        {# Helper links #}
+        {# TODO: maybs delete once there's actual ways to get to these places #}
+
+        {# Create new article #}
+        <li><a class="icon-add" href="{{ routeLookupIfAuthorized('commsNews.getCreate') }}" >Create new article</a></li>
+
+        {# Go to the moderation list #}
+        {% if moderationRequired %}
+            {# Go back to the moderation list #}
+            {% set moderationListRoute = routeLookupIfAuthorized('commsNewsModeration.getList') %}
+
+            {% if moderationListRoute %}
+                <li><a class="icon-list" href="{{ moderationListRoute }}" title="A list of articles to moderate">Moderation List</a></li>
+            {% endif %}
+        {% endif %}
+
+    </ul>
 </div>
+
+
+{# Train Line
+ # One of three possibilities are shown here
+ # Only useful to authors and moderators
+ #}
+{% if news.author.id == USER.id or isCommsOfficer %}
+{% include '@commsNews/workflow.twig' with {
+    news: news,
+    moderationRequired: moderationRequired
+} %}
+{% endif %}
 
 <div class="row">
     <div class="small-12 island">
@@ -50,6 +154,8 @@
     </div>
 </div>
 
+{# Display body when either there's text content, or an image #}
+{% if news.body|length or news.featureImage.hash %}
 <div class="row">
     <div class="small-12 island">
         <section>
@@ -63,4 +169,142 @@
         </section>
     </div>
 </div>
+{% endif %}
 
+{# Rejection details, if applicable
+ # Only show rejection info prior to acceptance
+ #}
+{% if news.isRejected and not news.isAccepted %}
+<div class="row">
+    <div class="small-12 island">
+        <section class="no-pad no-margin">
+            <p class="content no-margin"><span class="icon-info"></span>
+                This {{ locale.news }} was <strong>rejected</strong>
+                by <a href="/search/user/{{ news.rejectedBy.id }}" title="View Profile">{{ news.rejectedBy.fullname }}</a>
+                on {{ news.rejectedAt.local }}
+
+                {% if news.rejectedReason|length %}
+                    for the following reason:
+                {% else %}
+                    but no reason was given.
+                {% endif %}
+            </p>
+        </section>
+
+        {% if news.rejectedReason|length %}
+        <blockquote>{{ news.rejectedReason|nl2br }}</blockquote>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
+
+<div class="row">
+    <div class="small-12 columns">
+        <ul class="flex-list buttons" id="actionButtons">
+
+
+        {# Modify this news article
+         # Only available before the article has been accepted
+         #}
+        {% if not news.isAccepted %}
+            {% set modifyRoute = routeLookupIfAuthorized('commsNews.getUpdate', {newsId: news.id}) %}
+
+            {% if modifyRoute %}
+                <li><a class="icon-modify" href="{{ modifyRoute }}" title="Modify this article">Modify</a></li>
+            {% endif %}
+        {% endif %}
+
+
+        {# Unsubmitted articles need explicit actions to be made available to the world
+         #
+         # Moderation is required: you're prompted to consciously submit for moderation
+         # Moderation isn't required: you're prompted to consciously publish to the world
+         #}
+        {% if not news.isSubmitted %}
+            {% if moderationRequired %}
+                {% set buttonText = 'Submit for moderation' %}
+            {% else %}
+                {% set buttonText = 'Submit' %}
+            {% endif %}
+            <li>
+                <form action="{{ routeLookup('commsNewsModeration.postSubmit', {newsId: news.id}) }}" method="post">
+                    <input type="submit" value="{{ buttonText }}" />
+                </form>
+            </li>
+        {% endif %}
+
+
+        {# Moderators #}
+        {% if isCommsOfficer and moderationRequired and news.isSubmitted %}
+            {% if isRejectable %}
+
+                {# Reject this news article #}
+                {% set rejectRoute = routeLookupIfAuthorized('commsNewsModeration.postReject', {newsId: news.id}) %}
+
+                {% if rejectRoute %}
+                    <script>
+                        $(function() {
+                            $('#actionButtons').on('click', 'a[data-reject]', function(event) {
+                                event.preventDefault();
+
+                                var $element = $(this);
+                                var $toast = $('#toast');
+                                var title = $element.attr('data-reject');
+
+                                $element.confirmDialog({
+                                    header: 'Reject ' + title,
+                                    format: 'html',
+                                    text: 'Provide brief feedback for rejecting this article to help the author improve their content. <textarea id="rejectedReason" rows="5"></textarea>',
+                                    confirmLabel: 'Reject',
+                                    cancelLabel: 'Cancel',
+                                    confirmEvent: function() {
+                                        $toast.toastActivate({
+                                            text: 'Rejecting ' + title
+                                        });
+
+                                        $.ajax({
+                                            type: 'POST',
+                                            url: $element.attr('href'),
+                                            data: {newsId: {{ news.id }}, rejectedReason: $('#rejectedReason').val()},
+                                            dataType: 'json'
+                                        }).success(function (response) {
+                                            $toast.toastTimeout({
+                                                text: title + ' was rejected',
+                                                css: 'success'
+                                            });
+
+                                            window.location.href = response.redirect;
+                                        }).error(function (response) {
+                                            var temp = $.parseJSON(response.responseText);
+
+                                            $toast.toastTimeout({
+                                                text: 'Error: ' + temp.message,
+                                                css: 'alert'
+                                            });
+                                        });
+                                    }
+                                });
+                            });
+                        });
+                    </script>
+                    <li><a class="icon-undo" href="{{ rejectRoute }}" title="Reject this article" data-reject="{{ news.title }}">Reject</a></li>
+                {% endif %}
+            {% endif %}
+
+
+            {# Accept this news article for publication to the world #}
+            {% if isAcceptable and moderationRequired %}
+            <li>
+                <form action="{{ routeLookup('commsNewsModeration.postAccept', {newsId: news.id}) }}" method="post">
+                    <input type="submit" value="Approve" />
+                </form>
+            </li>
+            {% endif %}
+        {% endif %}
+
+        </ul>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>

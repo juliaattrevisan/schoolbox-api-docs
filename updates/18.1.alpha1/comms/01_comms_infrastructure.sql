@@ -35,8 +35,11 @@ CREATE TABLE `comms_news_article` (
   `author_id`          int(11)       UNSIGNED NOT NULL,
   `feature_image_hash` VARCHAR(100)  CHARACTER SET ascii COLLATE ascii_general_ci,
   `submitted_at`       DATETIME,
-  `moderated_by`       int(11)       UNSIGNED,
-  `moderated_at`       DATETIME,
+  `accepted_by`        int(11)       UNSIGNED,
+  `accepted_at`        DATETIME,
+  `rejected_by`        int(11)       UNSIGNED,
+  `rejected_at`        DATETIME,
+  `rejected_reason`    text,
   `publish_at`         DATETIME      NOT NULL,
   `expires_at`         DATETIME      NOT NULL,
   `created_at`         DATETIME      NOT NULL,
@@ -50,8 +53,8 @@ FOREIGN KEY (`author_id`) REFERENCES `user` (`id`)
 ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 ALTER TABLE `comms_news_article`
-ADD CONSTRAINT `fk_comms_news_article_moderated_by`
-FOREIGN KEY (`moderated_by`) REFERENCES `user` (`id`)
+ADD CONSTRAINT `fk_comms_news_article_accepted_by`
+FOREIGN KEY (`accepted_by`) REFERENCES `user` (`id`)
 ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 ALTER TABLE `comms_news_article`
@@ -74,3 +77,13 @@ ALTER TABLE `comms_news_article_topic`
 ADD CONSTRAINT `fk_comms_news_article_topic_id`
 FOREIGN KEY (`topic_id`) REFERENCES `newsTopic` (`newsTopicID`)
 ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+-- Error messages
+INSERT INTO `error` (id, message)
+VALUES (221, 'You cannot edit articles that are already accepted.');
+
+INSERT INTO `error` (id, message)
+VALUES (222, 'You cannot delete this article.');
+
+INSERT INTO `error` (id, message)
+VALUES (223, 'This article is missing required details that you need to add, but we saved it anyway.');

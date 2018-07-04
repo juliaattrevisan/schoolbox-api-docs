@@ -25,6 +25,10 @@
          */
         initRegistry();
 
+        /* Set up custom event
+         */
+        $(config.element).on('draft', save);
+
         /* Watch the content for changes
          */
         initAutosave();
@@ -95,7 +99,7 @@
                         text: 'Autosaving'
                     });
 
-                    save();
+                    $(config.element).trigger('draft');
                 }
             }, config.interval * 1000);
         }
@@ -192,7 +196,7 @@
 
                 /* hehe
                  */
-                window.history.pushState({}, null, responseText.formAction);
+                window.history.pushState({}, null, responseText.url);
 
                 config.toaster.toastTimeout({
                     text: 'Draft Saved',

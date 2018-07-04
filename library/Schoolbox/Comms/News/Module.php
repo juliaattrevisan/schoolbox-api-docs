@@ -63,12 +63,27 @@ class Module extends BaseModule
             return $this->preloadNews($params);
         };
 
+        /* Create news article
+         */
         $this->register('GET', '/create', 'getCreate', $getPerms);
-        $this->register('GET', '/update/{newsId:\d+}', 'getUpdate', $getPerms, $preloadNews);
         $this->register('POST', '/create', 'postCreate', $postPerms);
-        $this->register('POST', '/update/{newsId:\d+}', 'postUpdate', $getPerms, $preloadNews);
-        $this->register('GET', '/topics', 'getTopics', $getPerms);
+
+        /* Update news article
+         */
+        $this->register('GET', '/{newsId:\d+}/update', 'getUpdate', $getPerms, $preloadNews);
+        $this->register('POST', '/{newsId:\d+}', 'postUpdate', $getPerms, $preloadNews);
+
+        /* View news article
+         */
         $this->register('GET', '/{newsId:\d+}', 'getDetail', null, $preloadNews);
+
+        /* Delete article
+         */
+        $this->register('POST', '/{newsId:\d+}/delete', 'postDelete', null, $preloadNews);
+
+        /* Get a list of topics to chooze
+         */
+        $this->register('GET', '/topics', 'getTopics', $getPerms);
     }
 
 

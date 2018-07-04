@@ -65,6 +65,41 @@ class Model implements ISoftDeletable
     private $submittedAt;
 
     /**
+     * The person who allowed this article to be published
+     *
+     * @var User|null
+     */
+    private $acceptedBy;
+
+    /**
+     * The datetime when this article was allowed to be published
+     *
+     * @var \Alaress_Date_Format
+     */
+    private $acceptedAt;
+
+    /**
+     * The datetime when this article was rejected
+     *
+     * @var \Alaress_Date_Format
+     */
+    private $rejectedAt;
+
+    /**
+     * The person who rejected this article
+     *
+     * @var User|null
+     */
+    private $rejectedBy;
+
+    /**
+     * The reason why this article was rejected
+     *
+     * @var string
+     */
+    private $rejectedReason;
+
+    /**
      * The article becomes available to the audience at this time
      *
      * @var \Alaress_Date_Format
@@ -78,19 +113,6 @@ class Model implements ISoftDeletable
      */
     private $expiresAt;
 
-    /**
-     * The person who allowed this article to be published
-     *
-     * @var User|null
-     */
-    private $moderatedBy;
-
-    /**
-     * The datetime when this article was allowed to be published
-     *
-     * @var \Alaress_Date_Format
-     */
-    private $moderatedAt;
 
     /**
      * A set of News\Topic instances - there used to be only one, but now there are zero or many
@@ -98,6 +120,47 @@ class Model implements ISoftDeletable
      * @var Collection|Topic[]
      */
     private $topics;
+
+
+    /* Conveniences
+     */
+
+    /**
+     * This news has been submitted
+     *
+     * @return bool
+     */
+    public function isSubmitted(): bool
+    {
+        return $this->getSubmittedAt() !== null && !$this->getSubmittedAt()->isNull();
+    }
+
+
+    /**
+     * This news has been accepted
+     *
+     * @return bool
+     */
+    public function isAccepted(): bool
+    {
+        return $this->getAcceptedAt() !== null && !$this->getAcceptedAt()->isNull();
+    }
+
+
+    /**
+     * This news has been rejected
+     *
+     * @return bool
+     */
+    public function isRejected(): bool
+    {
+        return $this->getRejectedAt() !== null && !$this->getRejectedAt()->isNull();
+    }
+
+
+    /* Getters/Setters
+     */
+
 
     /**
      * @return null|string
@@ -222,19 +285,19 @@ class Model implements ISoftDeletable
     /**
      * @return null|User
      */
-    public function getModeratedBy(): ?User
+    public function getAcceptedBy(): ?User
     {
-        return $this->moderatedBy;
+        return $this->acceptedBy;
     }
 
 
     /**
-     * @param null|User $moderatedBy
+     * @param null|User $acceptedBy
      * @return Model
      */
-    public function setModeratedBy(?User $moderatedBy): self
+    public function setAcceptedBy(?User $acceptedBy): self
     {
-        $this->moderatedBy = $moderatedBy;
+        $this->acceptedBy = $acceptedBy;
         return $this;
     }
 
@@ -242,19 +305,19 @@ class Model implements ISoftDeletable
     /**
      * @return \Alaress_Date_Format|null
      */
-    public function getModeratedAt(): ?\Alaress_Date_Format
+    public function getAcceptedAt(): ?\Alaress_Date_Format
     {
-        return $this->moderatedAt;
+        return $this->acceptedAt;
     }
 
 
     /**
-     * @param \Alaress_Date_Format $moderatedAt
+     * @param null|\Alaress_Date_Format $acceptedAt
      * @return $this
      */
-    public function setModeratedAt(\Alaress_Date_Format $moderatedAt): self
+    public function setAcceptedAt(?\Alaress_Date_Format $acceptedAt): self
     {
-        $this->moderatedAt = $moderatedAt;
+        $this->acceptedAt = $acceptedAt;
         return $this;
     }
 
@@ -309,12 +372,72 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @param \Alaress_Date_Format $submittedAt
+     * @param null|\Alaress_Date_Format $submittedAt
      * @return $this
      */
-    public function setSubmittedAt(\Alaress_Date_Format $submittedAt): self
+    public function setSubmittedAt(?\Alaress_Date_Format $submittedAt): self
     {
         $this->submittedAt = $submittedAt;
+        return $this;
+    }
+
+
+    /**
+     * @return \Alaress_Date_Format|null
+     */
+    public function getRejectedAt(): ?\Alaress_Date_Format
+    {
+        return $this->rejectedAt;
+    }
+
+
+    /**
+     * @param \Alaress_Date_Format $rejectedAt
+     * @return $this
+     */
+    public function setRejectedAt(\Alaress_Date_Format $rejectedAt): self
+    {
+        $this->rejectedAt = $rejectedAt;
+        return $this;
+    }
+
+
+    /**
+     * @return null|User
+     */
+    public function getRejectedBy(): ?User
+    {
+        return $this->rejectedBy;
+    }
+
+
+    /**
+     * @param null|User $rejectedBy
+     * @return $this
+     */
+    public function setRejectedBy(?User $rejectedBy): self
+    {
+        $this->rejectedBy = $rejectedBy;
+        return $this;
+    }
+
+
+    /**
+     * @return null|string
+     */
+    public function getRejectedReason(): ?string
+    {
+        return $this->rejectedReason;
+    }
+
+
+    /**
+     * @param null|string $rejectedReason
+     * @return $this
+     */
+    public function setRejectedReason(?string $rejectedReason): self
+    {
+        $this->rejectedReason = $rejectedReason;
         return $this;
     }
 }
