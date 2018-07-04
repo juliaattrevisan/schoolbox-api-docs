@@ -323,8 +323,15 @@ class RubricMapper
      * Find all criteria that are available for the $box.
      *
      * For each criterion, also get:
-     * * how many boxes are using the criteria,
+     * * how many non-deleted boxes are using the criteria,
      * * whether the specified box is using the criteria
+     *
+     * Sort criteria by:
+     * * whether they are in use by this box,
+     * * if in use, by sequence, else by name
+       *
+     * Note: A criterion being used by a soft-deleted assessment does not count towards current usages, and hence
+     *       does not prevent the user from editing the criterion's name, or soft-deleting the criterion itself.
      *
      * @param SubmissionBox $box
      * @param bool          $getParentCriteria - whether to also get criteria from box's folder's parent
@@ -335,8 +342,9 @@ class RubricMapper
     protected function generateCriteriaStatement(SubmissionBox $box, $getParentCriteria)
     {
         $args = [
-            'boxId'    => $box->getId(),
-            'folderId' => $box->getCategory()->getId(),
+            'boxId'       => $box->getId(),
+            'folderId'    => $box->getCategory()->getId(),
+            'parent_type' => Criterion::PARENT_TYPE_CATEGORY,
         ];
 
         $in = ['folderId'];
@@ -358,32 +366,29 @@ class RubricMapper
 
         $criteriaStatement = $this->database->query("
             SELECT
-                COUNT(box_id) usages,
-                MAX(`sequence`) sequence,
-                COALESCE(MAX(selected), 0) selected,
                 crit_id,
-                `grouping`,
-                `name`
+                grouping,
+                name,
+                COUNT(a_id) AS usages,                                   -- How many non-deleted boxes are using the criterion?
+                MAX(selected) AS selected                                -- Is the criterion in use by this box?
             FROM (
                 SELECT
-                    b.id box_id,
-                    b.id = :boxId selected,
-                    c.id crit_id,
-                    u.`sequence`,
-                    c.`grouping`,
-                    c.`name`
-                FROM rubric_usage u
-                RIGHT JOIN rubric_criterion c ON u.criterion_id = c.id
-                LEFT JOIN submission_box b ON u.submission_box_id = b.id
-                LEFT JOIN assessment a ON b.assessment_id = a.id
-                WHERE c.parent_type = 'category'
+                    c.id AS crit_id,
+                    c.grouping,
+                    c.name,
+                    a.id AS a_id,                                        -- Will be NULL if not in use by a box, or box is soft-deleted
+                    IF(b.id = :boxId, 1, 0) AS selected,                 -- Is this criterion in use by this box? (ignores whether box is deleted)
+                    IF(b.id = :boxId, u.sequence, NULL) AS sequence      -- Only get sequence for this box (ignores whether box is deleted)
+                FROM rubric_criterion c
+                LEFT JOIN rubric_usage u ON u.criterion_id = c.id
+                LEFT JOIN submission_box b ON u.submission_box_id = b.id                  -- This will join to deleted boxes
+                LEFT JOIN assessment a ON b.assessment_id = a.id AND a.deleted_at IS NULL -- But won't join to deleted assessments
+                WHERE c.parent_type = :parent_type
                 AND c.parent_id IN (:$in)
                 AND c.deleted_at IS NULL
-                AND a.deleted_at IS NULL
-                ORDER BY selected DESC
             ) t
             GROUP BY crit_id
-            ORDER BY selected DESC, `sequence` ASC, `grouping` ASC, `name` ASC;
+            ORDER BY selected DESC, MAX(`sequence`) ASC, `grouping` ASC, `name` ASC;
         ", $args);
 
         return $criteriaStatement;
