@@ -310,8 +310,7 @@ class Controller extends Base
          */
         if (\is_array($data['attachment'])) {
             $news->setFeatureImage((new CollectorFactory())->build($data['attachment'] ?: [])->getFirst());
-        }
-        else {
+        } else {
             $news->setFeatureImage(null);
         }
 
@@ -397,8 +396,7 @@ class Controller extends Base
                         'success' => true,
                         'redirect' => $nextStep
                     ]));
-                }
-                else {
+                } else {
                     $this->getResponse()->redirect->to($nextStep);
                 }
 
