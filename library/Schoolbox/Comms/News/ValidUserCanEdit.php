@@ -29,6 +29,17 @@ class ValidUserCanEdit
      */
     public function isSatisfiedBy(User $user, Model $news): bool
     {
-        return $news->getAcceptedAt()->isNull() || (new ValidUserIsCommsOfficer())->isSatisfiedBy($user);
+
+        /* User is a comms officer; can edit at any time
+         */
+        if ((new ValidUserIsCommsOfficer())->isSatisfiedBy($user)) {
+            return true;
+        }
+
+        /* Otherwise, you must fulfil all of these requirements:
+         *   You are considered an author of this article
+         *   Article has not been accepted for publication
+         */
+        return (new ValidUserIsAuthor())->isSatisfiedBy($user, $news) && $news->getAcceptedAt()->isNull();
     }
 }

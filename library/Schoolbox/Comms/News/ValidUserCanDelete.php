@@ -11,38 +11,10 @@
 
 namespace Schoolbox\Comms\News;
 
-use Schoolbox\User;
 
-class ValidUserCanDelete
+class ValidUserCanDelete extends ValidUserCanEdit
 {
 
-    /**
-     * Definition of a $user who can delete $news
-     *
-     * @param User  $user
-     * @param Model $news
-     * @return bool
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \Schoolbox\Mapper\DefinitionException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \UnexpectedValueException
+    /* For now, this turned out to be the same conditions as ValidUserCanEdit
      */
-    public function isSatisfiedBy(User $user, Model $news): bool
-    {
-        /* Comms Officers can destroy anything at any time
-         */
-        if ((new ValidUserIsCommsOfficer())->isSatisfiedBy($user)) {
-            return true;
-        }
-
-        /* Articles that haven't been accepted can be safely deleted
-         */
-        if ($news->getAcceptedAt()->isNull()) {
-            return true;
-        }
-
-        /* Cannot delete articles at any other time
-         */
-        return false;
-    }
 }
