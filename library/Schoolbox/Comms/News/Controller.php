@@ -18,28 +18,17 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\News\TopicMapper;
-use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
-use Schoolbox\UserMapper;
 
 
 class Controller extends Base
 {
-    /**
-     * @var UserMapper
-     */
-    private $userMapper;
 
     /**
      * @var ErrorMapper
      */
     private $errorMapper;
-
-    /**
-     * @var UserAccessMapper
-     */
-    private $userAccessMapper;
 
     /**
      * @var Mapper
