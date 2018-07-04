@@ -170,21 +170,38 @@ class Controller extends Base
      */
     public function postAccept(Model $news)
     {
-        $policy = $this->policyMapper->findOneByColumn('identifier', 'global_moderation');
+        if ((new ValidUserCanAccept())->isSatisfiedBy($this->getUser(), $news)) {
+            $policy = $this->policyMapper->findOneByColumn('identifier', 'global_moderation');
 
-        $moderationRequired = (bool)$policy->getValue();
+            $moderationRequired = (bool)$policy->getValue();
 
-        $news
-            ->setAcceptedAt(\Alaress_Date_Format::now())
-            ->setAcceptedBy($this->getUser());
+            $news
+                ->setAcceptedAt(\Alaress_Date_Format::now())
+                ->setAcceptedBy($this->getUser());
 
-        if ((new News\ValidBroadcast())->isSatisfiedBy($news, $moderationRequired)) {
-            $this->newsMapper->save($news);
+            if ((new News\ValidBroadcast())->isSatisfiedBy($news, $moderationRequired)) {
+                $this->newsMapper->save($news);
+            }
+
+            /* Go back to the list
+             */
+            $this->getResponse()->redirect->to($this->getRouter()
+                                                    ->generate('commsNewsModeration.getList'));
+
+            return;
         }
 
-        /* Go back to the list
-         */
-        $this->getResponse()->redirect->to($this->getRouter()->generate('commsNewsModeration.getList'));
+        if ($this->getRequest()->isXhr()) {
+            $this->getResponse()->status->set(400);
+            $this->getResponse()->content->set($this->buildJsonOutput([
+                'success' => false,
+                'message' => $this->errorMapper->getMessageById(ErrorMapper::ERROR_PERM_PAGE_VIEW)
+            ]));
+
+            return;
+        }
+
+        throw $this->errorMapper->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
     }
 
 
