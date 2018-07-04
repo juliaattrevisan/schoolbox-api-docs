@@ -94,7 +94,7 @@ class Quiz
     }
 
     /**
-     * Verifies that the notification exists
+     * Verifies that the notification does not exist
      * @param $notif
      */
     public function assertNotifNotExists($notif)
