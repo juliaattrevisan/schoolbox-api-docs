@@ -175,6 +175,55 @@ class ValidationTest extends TestCase
 
 
     /**
+     * @dataProvider provider_validArticleDates
+     * @param Model $article
+     * @param int   $expected
+     */
+    public function testValidArticleDates(Model $article, $expected)
+    {
+        $validation = new ValidArticle();
+
+        $this->assertEquals($expected, $validation->isSatisfiedBy($article));
+    }
+
+    /**
+     * Data provider for testValidArticle
+     *
+     * @return array
+     */
+    public function provider_validArticleDates(): array {
+        $date1 = (new \Alaress_Date_Format())->setDateTime(2018, 1, 1, 10, 12, 15);
+        $date2 = (new \Alaress_Date_Format())->setDateTime(2018, 1, 1, 10, 12, 16);
+
+        return [
+            'Publish occurs before Expiry' => [
+                (new Model())
+                    ->setTitle('cat')
+                    ->setPublishAt($date1)
+                    ->setExpiresAt($date2),
+                true
+            ],
+
+            // "Publish Immediately" and/or "Expire Immediately" actions for moderators
+            'Publish occurs simultaneously with Expiry' => [
+                (new Model())
+                    ->setTitle('cat')
+                    ->setPublishAt($date1)
+                    ->setExpiresAt($date1),
+                true
+            ],
+            'Expiry occurs before Publish' => [
+                (new Model())
+                    ->setTitle('cat')
+                    ->setPublishAt($date2)
+                    ->setExpiresAt($date1),
+                false
+            ],
+        ];
+    }
+
+
+    /**
      * @dataProvider provider_validDateOffset
      * @param Policy\Model $policy
      * @param int   $expected

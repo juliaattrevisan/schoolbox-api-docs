@@ -23,11 +23,12 @@ class ValidArticle
     public function isSatisfiedBy(Model $article): bool
     {
         /* A valid article consists of title, publish and expiry dates
+         * Publish must occur before, or equal to, expiry
          */
         $hasTitle = '' !== trim($article->getTitle());
         $hasPublishDate = $article->getPublishAt() !== null && !$article->getPublishAt()->isNull();
         $hasExpiryDate = $article->getExpiresAt() !== null && !$article->getExpiresAt()->isNull();
 
-        return $hasTitle && $hasPublishDate && $hasExpiryDate;
+        return $hasTitle && $hasPublishDate && $hasExpiryDate && $article->getPublishAt()->lte($article->getExpiresAt());
     }
 }
