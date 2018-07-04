@@ -109,6 +109,6 @@ Some actions require certain preconditions to exist.
 * To reject an article, it be submitted for moderation and you are not its author. You can't reject draft articles.
 
 ### Edge Cases
-**Trapped Between Settings**. This occurs when moderation is activated, an article is submitted for moderation, but the moderation requirement is then deactivated. This leaves submitted articles in an inconclusive state of being, requiring moderators to accept these articles as if moderation was activated. This can be avoided by clearing the moderation list before deactivating moderation.
+**Limbo (Trapped Between Settings)**. This occurs when moderation is activated, an article is submitted for moderation, but the moderation requirement is then deactivated. This leaves submitted articles in an inconclusive state of being, requiring moderators to accept these articles as if moderation was activated. This can be avoided by clearing the moderation list before deactivating moderation.
 
 **Moderator Authors**. Moderators cannot reject their own articles.
