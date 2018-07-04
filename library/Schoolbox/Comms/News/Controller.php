@@ -60,23 +60,17 @@ class Controller extends Base
      * Controller constructor.
      *
      * @param ErrorMapper      $errorMapper
-     * @param UserMapper       $userMapper
-     * @param UserAccessMapper $userAccessMapper
      * @param Mapper           $newsMapper
      * @param Policy\Mapper    $policyMapper
      * @param TopicMapper      $topicMapper
      */
     public function __construct(
         ErrorMapper $errorMapper,
-        UserMapper $userMapper,
-        UserAccessMapper $userAccessMapper,
         Mapper $newsMapper,
         Policy\Mapper $policyMapper,
         TopicMapper $topicMapper
     ) {
         $this->errorMapper = $errorMapper;
-        $this->userMapper = $userMapper;
-        $this->userAccessMapper = $userAccessMapper;
         $this->newsMapper = $newsMapper;
         $this->policyMapper = $policyMapper;
         $this->topicMapper = $topicMapper;
