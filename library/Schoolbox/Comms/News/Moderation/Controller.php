@@ -13,7 +13,6 @@ use Schoolbox\Collection;
 use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Model;
 use Schoolbox\Comms\News\Policy;
-use Schoolbox\Comms\News\ValidUserIsCommsOfficer;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
@@ -129,8 +128,8 @@ class Controller extends Base
              * you can see what you just submitted (because receipts are nice for anxious people)
              * TODO: Maybe it should do something more obvious to indicate this outcome though.
              */
-            if ((new ValidUserIsCommsOfficer())->isSatisfiedBy($this->getUser())) {
-                if ($news->getAuthor()->getId() === $this->getUser()->getId()) {
+            if ((new News\ValidUserIsCommsOfficer())->isSatisfiedBy($this->getUser())) {
+                if ((new News\ValidUserIsAuthor())->isSatisfiedBy($this->getUser(), $news)) {
                     $nextStep = $this->getRouter()->generate('commsNews.getDetail', [ 'newsId' => $news->getId() ]);
                 } else {
 
