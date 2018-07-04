@@ -6,16 +6,41 @@
  # @param Model news
  # @param string state
  #}
+
+{% set iconSaved = 'icon-favourite' %}
+{% set iconUnsaved = 'icon-favourite-hollow' %}
+{% set titleSaved = 'Unsave article' %}
+{% set titleUnsaved = 'Save article' %}
+
 <script>
     $(function() {
-        $('#saveforlater').on('click', function(event) {
+        $('#saveforlater').on('click', 'a[data-save]', function(event) {
             event.preventDefault();
 
             var $element = $(this);
             var $toast = $('#toast');
+            var toastProcessing;
+            var toastComplete;
+            var newState;
+            var newIcon;
+            var newTitle;
+
+            if ($element.attr('data-save') === '1') {
+                toastProcessing = 'Unsaving...';
+                toastComplete = 'Unsaved';
+                newState = 0;
+                newIcon = '{{ iconUnsaved }}';
+                newTitle = '{{ titleUnsaved }}';
+            } else {
+                toastProcessing = 'Saving...';
+                toastComplete = 'Saved';
+                newState = 1;
+                newIcon = '{{ iconSaved }}';
+                newTitle = '{{ titleSaved }}';
+            }
 
             $toast.toastActivate({
-                text: 'Saving...'
+                text: toastProcessing
             });
 
             $.ajax({
@@ -24,12 +49,19 @@
                 dataType: 'json'
             }).success(function () {
                 $toast.toastTimeout({
-                    text: 'Saved',
+                    text: toastComplete,
                     css: 'success'
                 });
 
-                {# Update icon #}
-                $element.removeClass('icon-favourite-hollow').addClass('icon-favourite');
+                // Update data attribute
+                $element.attr('data-save', newState);
+
+                // Update icon
+                $element.removeClass('{{ iconSaved }}').removeClass('{{ iconUnsaved }}').addClass(newIcon);
+
+                // Update title
+                $element.attr('title', newTitle);
+
             }).error(function (response) {
                 var temp = $.parseJSON(response.responseText);
 
@@ -38,11 +70,14 @@
                     css: 'alert'
                 });
             });
+
         });
     });
 </script>
-{% if state %}
-    <a href="{{ routeLookup('commsNewsSaveForLater.getList') }}" class="icon-favourite" title="This {{ locale.news }} article is already Saved For Later"></a>
-{% else %}
-    <a href="{{ routeLookup('commsNewsSaveForLater.postActivate', {newsId: news.id}) }}" class="icon-favourite-hollow" title="Save for later" id="saveforlater"></a>
-{% endif %}
+<span id="saveforlater">
+    {% if state %}
+        <a href="{{ routeLookup('commsNewsSaveForLater.postRemove', {newsId: news.id}) }}" class="{{ iconSaved }}" title="{{ titleSaved }}" data-save="1"></a>
+    {% else %}
+        <a href="{{ routeLookup('commsNewsSaveForLater.postActivate', {newsId: news.id}) }}" class="{{ iconUnsaved }}" title="{{ titleUnsaved }}" data-save="0"></a>
+    {% endif %}
+</span>

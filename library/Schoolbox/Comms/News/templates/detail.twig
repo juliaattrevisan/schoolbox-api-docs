@@ -52,7 +52,7 @@
     <nav>
         {# Save For Later #}
         {% if policies['save_for_later'].value %}
-            {% include '@commsNewsSaveForLater/activator.twig'with {
+            {% include '@commsNewsSaveForLater/activator.twig' with {
                 news: news,
                 state: isSavedForLater
             } %}
