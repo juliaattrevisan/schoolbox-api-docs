@@ -272,13 +272,20 @@ class Controller extends Base
      * @level 18.1
      *
      * @throws \Aura\Di\Exception\ServiceNotFound
-     * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \InvalidArgumentException
-     * @throws \RuntimeException
      */
-    public function getUsersInCourses() {
+    public function getUsersInCourses(): void
+    {
+        $errorMessage = null;
+        try{
+            $courses = $this->helpRequest->findEnrolments();
+        } catch (GuzzleException $e){
+            $courses      = [];
+            $errorMessage = $this->getReasonPhrase($e);
+        }
         $this->getResponse()->content->set($this->buildHtmlOutput('@shaps/courses/index.twig', [
-            'courses' => $this->helpRequest->findEnrolments(),
+            'errorMessage' => $errorMessage,
+            'courses' => $courses,
             'serverUrl' => $this->helpRequest->getServerUrl(),
             'pageCurrent' => 'shaps/courses'
         ])->setTitle('Schoolbox Help Course Enrolments'));
