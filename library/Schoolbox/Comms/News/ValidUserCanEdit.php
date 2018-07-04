@@ -20,6 +20,7 @@ class ValidUserCanEdit
      * Definition of a $user who can edit $article
      *
      * @param User  $user
+     * @param bool  $moderationRequired
      * @param Model $article
      * @return bool
      * @throws \Alaress\Database\Predicate\InvalidColumnException
@@ -27,7 +28,7 @@ class ValidUserCanEdit
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    public function isSatisfiedBy(User $user, Model $article): bool
+    public function isSatisfiedBy(User $user, bool $moderationRequired, Model $article): bool
     {
 
         /* User is a comms officer; can edit at any time
@@ -37,9 +38,20 @@ class ValidUserCanEdit
         }
 
         /* Otherwise, you must fulfil all of these requirements:
-         *   You are considered an author of this article
-         *   Article has not been accepted for publication
+         *     You are considered an author of this article
+         *         Article has not been accepted for publication
+         *         or, moderation isn't required
          */
-        return (new ValidUserIsAuthor())->isSatisfiedBy($user, $article) && $article->getAcceptedAt()->isNull();
+        if ((new ValidUserIsAuthor())->isSatisfiedBy($user, $article)) {
+            if ($article->getAcceptedAt()->isNull()) {
+                return true;
+            }
+
+            if (!$moderationRequired) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

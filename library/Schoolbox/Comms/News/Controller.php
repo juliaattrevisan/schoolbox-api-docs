@@ -162,13 +162,15 @@ class Controller extends Base
      */
     public function getUpdate(Model $article)
     {
+        $policies = $this->policyMapper->findAll()->indexBy('identifier');
+
+        $moderationRequired = $policies->getOffset('global_moderation')->getValue();
+
         /* Only comms officers can edit articles that have been accepted for publishing
          */
-        if (!(new ValidUserCanEdit())->isSatisfiedBy($this->getUser(), $article)) {
+        if (!(new ValidUserCanEdit())->isSatisfiedBy($this->getUser(), $moderationRequired, $article)) {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_COMMS_NEWS_ALREADY_ACCEPTED);
         }
-
-        $policies = $this->policyMapper->findAll()->indexBy('identifier');
 
         /* Feature image
          */
@@ -361,9 +363,10 @@ class Controller extends Base
             'isSavedForLater' => $isSavedForLater,
             'isCommsOfficer' => (new ValidUserIsCommsOfficer())->isSatisfiedBy($this->getUser()),
             'isAuthor' => (new ValidUserIsAuthor())->isSatisfiedBy($this->getUser(), $article),
+            'isEditable' => (new ValidUserCanEdit())->isSatisfiedBy($this->getUser(), $moderationRequired, $article),
             'isAcceptable' => (new Moderation\ValidUserCanAccept())->isSatisfiedBy($this->getUser(), $article),
             'isRejectable' => (new Moderation\ValidUserCanReject())->isSatisfiedBy($this->getUser(), $article),
-            'isDeletable' => (new ValidUserCanDelete())->isSatisfiedBy($this->getUser(), $article)
+            'isDeletable' => (new ValidUserCanDelete())->isSatisfiedBy($this->getUser(), $moderationRequired, $article)
         ])->setTitle($article->getTitle()));
     }
 
@@ -383,6 +386,9 @@ class Controller extends Base
     public function postDelete(Model $article)
     {
         try {
+            $policies = $this->policyMapper->findAll()->indexBy('identifier');
+
+            $moderationRequired = $policies->getOffset('global_moderation')->getValue();
 
             /* Try to delete this article
              *
@@ -390,7 +396,7 @@ class Controller extends Base
              * that haven't been witnessed by the world. Such articles have to be unaccepted
              * and unpublished
              */
-            if ((new ValidUserCanDelete())->isSatisfiedBy($this->getUser(), $article)) {
+            if ((new ValidUserCanDelete())->isSatisfiedBy($this->getUser(), $moderationRequired, $article)) {
                 $article->setDeletedAt(\Alaress_Date_Format::now());
                 $this->newsMapper->save($article);
 

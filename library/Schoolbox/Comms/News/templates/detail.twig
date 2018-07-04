@@ -73,7 +73,7 @@
 
         {# Modify article #}
         {% set modifyRoute = routeLookupIfAuthorized('commsNews.getUpdate', {articleId: article.id}) %}
-        {% if modifyRoute and (isCommsOfficer or not moderationRequired or not article.isAccepted) %}
+        {% if modifyRoute and isEditable %}
             <li><a class="icon-modify" href="{{ modifyRoute }}">Modify</a></li>
         {% endif %}
 
