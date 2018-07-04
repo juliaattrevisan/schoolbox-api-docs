@@ -225,7 +225,7 @@
             {% if moderationRequired %}
                 {% set buttonText = 'Submit for moderation' %}
             {% else %}
-                {% set buttonText = 'Publish' %}
+                {% set buttonText = 'Submit' %}
             {% endif %}
             <li>
                 <form action="{{ routeLookup('commsNewsModeration.postSubmit', {newsId: news.id}) }}" method="post">
@@ -297,7 +297,7 @@
             {% if isAcceptable and moderationRequired %}
             <li>
                 <form action="{{ routeLookup('commsNewsModeration.postAccept', {newsId: news.id}) }}" method="post">
-                    <input type="submit" value="Publish" />
+                    <input type="submit" value="Approve" />
                 </form>
             </li>
             {% endif %}
