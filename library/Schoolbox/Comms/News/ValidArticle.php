@@ -20,7 +20,7 @@ class ValidArticle
      * @param Model $article
      * @return bool
      */
-    public function isSatisfiedBy(Model $article)
+    public function isSatisfiedBy(Model $article): bool
     {
         return '' !== trim($article->getTitle());
     }
