@@ -16,7 +16,6 @@ namespace Schoolbox\Comms\News\Moderation;
 use Alaress\Database\Predicate\Builder;
 use Schoolbox\Comms\News;
 use Schoolbox\GenericCollection;
-use Schoolbox\UserMapper;
 
 class Lists
 {
