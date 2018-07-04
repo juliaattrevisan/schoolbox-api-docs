@@ -20,6 +20,8 @@ use Codeception\Util\Locator;
 
 class QuizCest
 {
+    private $debugMode;
+
     /**
      * Preparations
      *
@@ -28,6 +30,13 @@ class QuizCest
      */
     public function _before(AcceptanceTester $i)
     {
+        // TODO: move this to a shared place
+        // check debug configuration
+        $this->debugMode = $i->grabFromDatabase('config', 'value', ['name' => 'debug_mode']);
+        if ($this->debugMode !== 0) {
+            $i->updateInDatabase('config', ['value' => 0], ['name' => 'debug_mode']);
+        }
+
         exec('cd /vagrant/tools/notif; sudo php /vagrant/test/socket/destroy-rabbit-data.php;');
         $i->logout();
         $i->loginAsAdmin();
@@ -40,7 +49,11 @@ class QuizCest
      */
     public function _after(AcceptanceTester $i)
     {
+        // TODO: move this to a shared place
         // TODO: clean up?
+        if ($this->debugMode !== 0) {
+            $i->updateInDatabase('config', ['value' => $this->debugMode], ['name' => 'debug_mode']);
+        }
     }
 
     /**
