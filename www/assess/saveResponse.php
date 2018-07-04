@@ -12,6 +12,7 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Quiz\ActionValidator;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Error\Mapper as ErrorMapper;
 
 $assessHandler = new Assess_Main();
 $attemptHandler = new Assess_Attempt();
@@ -40,8 +41,17 @@ if ($assessHandler->isOwner($section['assess_id'])) {
  * @var AssessmentDataSource $assessmentDataSource
  */
 $assessmentDataSource = $this->getDi()->get('assessmentDataSource');
+$ajax = SitePage::detectAjax();
 
-$assessment       = $assessmentDataSource->findByQuizId($section['assess_id'], $_SESSION['user']);
+try {
+    $assessment = $assessmentDataSource->findByQuizId($section['assess_id'], $_SESSION['user']);
+} catch (\Schoolbox\Mapper\Exception\Deleted $e) {
+    if ($ajax) {
+        http_response_code(404);
+        exit;
+    }
+    $this->error(ErrorMapper::ERROR_QUIZ_NOT_FOUND);
+}
 $assessmentFolder = $assessment->getBaseContext()->getFolder();
 $accessLevel      = Access::getInstance()->getFolderAccess($_SESSION['user'], $assessmentFolder->getId());
 
@@ -50,20 +60,32 @@ $actionValidator = new ActionValidator(Alaress_Date_Format::now(), Access::getIn
 /* Non-participants are sent to a 404 screen
  */
 if (!$actionValidator->canAttemptQuiz($_SESSION['user'], $assessment)) {
+    if ($ajax) {
+        http_response_code(404);
+        exit;
+    }
     $this->pageNotFound();
 }
 
 if ($accessLevel < UserAccess::ACCESS_WRITE) {
     // I can't attempt a spec assessment
     if ($assessment->isSpecification()) {
-        error(19);
+        if ($ajax) {
+            http_response_code(403);
+            exit;
+        }
+        $this->error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
     }
 } else {
     // I can do whatever I want
 }
 
 if ($assessHandler->isDeleted($section['assess_id'])) {
-	error(112);
+    if ($ajax) {
+        http_response_code(404);
+        exit;
+    }
+    $this->error(ErrorMapper::ERROR_QUIZ_NOT_FOUND);
 }
 
 /* Participants should be blocked from attempting if it hasn't started,
@@ -72,11 +94,19 @@ if ($assessHandler->isDeleted($section['assess_id'])) {
 $assess = $assessHandler->getByID($section['assess_id']);
 
 if (!$assessHandler->isValidUrlAccess($section['assess_id'])) {
+    if ($ajax) {
+        http_response_code(404);
+        exit;
+    }
     $this->pageNotFound();
 }
 
 if (!$question) {
-    error(119);
+    if ($ajax) {
+        http_response_code(404);
+        exit;
+    }
+    $this->error(ErrorMapper::ERROR_QUESTION_NOT_FOUND);
 }
 
 $factory = new Assess_Factory();
