@@ -84,7 +84,7 @@
 
                         {% block synergeticComments %}
                             {% if externalUser.Comment is not empty and showComments %}
-                                <div class="alert-box highlight icon-info">
+                                <div class="alert-box highlight icon-info no-margin">
                                     {{ externalUser.Comment | nl2br }}
                                 </div>
                             {% endif %}
@@ -93,8 +93,8 @@
                         {% block details %}
                             <dl>
                                 {% if showTitle %}
-                                    <dt class="small-12 medium-3">Position Title:</dt>
-                                    <dd class="small-12 medium-9">
+                                    <dt class="small-4 medium-3 columns">Position Title:</dt>
+                                    <dd class="small-8 medium-9 columns">
                                         {{ user.positionTitle }}
                                     </dd>
                                 {% endif %}
@@ -102,8 +102,8 @@
                                 {% if showEmail %}
                                     {% block details_email %}
                                         {% if user.email %}
-                                            <dt class="small-12 medium-3">Email:</dt>
-                                            <dd class="small-12 medium-9">
+                                            <dt class="small-4 medium-3 columns">Email:</dt>
+                                            <dd class="small-8 medium-9 columns">
                                                 <a href="{{ session.mailhandle }}{{ user.email }}">{{ user.email }}</a>
                                             </dd>
                                         {% endif %}
@@ -112,22 +112,22 @@
 
                                 {% if showDetails %}
                                     {% block details_studentId %}
-                                        <dt class="small-12 medium-3">Student ID:</dt>
-                                        <dd class="small-12 medium-9">{{ user.externalId }}</dd>
+                                        <dt class="small-4 medium-3 columns">Student ID:</dt>
+                                        <dd class="small-8 medium-9 columns">{{ user.externalId }}</dd>
                                     {% endblock details_studentId %}
 
                                     {% block details_dob %}
                                         {% if  externalUser.StudentBirthDate is not empty  %}
-                                            <dt class="small-12 medium-3">Date of Birth:</dt>
-                                            <dd class="small-12 medium-9">{{ externalUser.StudentBirthDate|date(dateFormats.shortDateOnlyFormat) }}</dd>
+                                            <dt class="small-4 medium-3 columns">Date of Birth:</dt>
+                                            <dd class="small-8 medium-9 columns">{{ externalUser.StudentBirthDate|date(dateFormats.shortDateOnlyFormat) }}</dd>
                                         {% endif %}
                                     {% endblock details_dob %}
 
                                     {% block details_formTeacher %}
                                         {% if showClasses %}
                                             {% if formTeacher %}
-                                                <dt class="small-12 medium-3">Class Teacher:</dt>
-                                                <dd class="small-12 medium-9">
+                                                <dt class="small-4 medium-3 columns">Class Teacher:</dt>
+                                                <dd class="small-8 medium-9 columns">
                                                     {% if formTeacher.id %}
                                                         <a href="{{ session.mailhandle }}{{ formTeacher.email }}">{{ formTeacher.formatName }}</a>
                                                     {% else %}
@@ -140,16 +140,16 @@
 
                                     {% block details_yearLevel %}
                                         {% if externalUser.StudentYearLevel %}
-                                            <dt class="small-12 medium-3">Year Level:</dt>
-                                            <dd class="small-12 medium-9">{{ externalUser.StudentYearLevel }}</dd>
+                                            <dt class="small-4 medium-3 columns">Year Level:</dt>
+                                            <dd class="small-8 medium-9 columns">{{ externalUser.StudentYearLevel }}</dd>
                                         {% endif %}
                                     {% endblock details_yearLevel %}
 
                                     {% block details_tutorTeacher %}
                                         {% if showClasses %}
                                             {% if tutorTeacher %}
-                                                <dt class="small-12 medium-3">Tutor:</dt>
-                                                <dd class="small-12 medium-9">
+                                                <dt class="small-4 medium-3 columns">Tutor:</dt>
+                                                <dd class="small-8 medium-9 columns">
                                                     {% if tutorTeacher.id %}
                                                         <a href="{{ session.mailhandle }}{{ tutorTeacher.email }}">{{ tutorTeacher.formatName }}</a>
                                                     {% else %}
@@ -175,16 +175,16 @@
 
                                     {% block details_house %}
                                         {% if externalUser.StudentHouseDescription %}
-                                            <dt class="small-12 medium-3">House:</dt>
-                                            <dd class="small-12 medium-9">{{ externalUser.StudentHouseDescription }}</dd>
+                                            <dt class="small-4 medium-3 columns">House:</dt>
+                                            <dd class="small-8 medium-9 columns">{{ externalUser.StudentHouseDescription }}</dd>
                                         {% endif %}
                                     {% endblock details_house %}
 
                                     {% block details_tutorGroup %}
                                         {% if showClasses %}
                                             {% if externalUser.StudentTutorDescription %}
-                                                <dt class="small-12 medium-3">Tutor Group:</dt>
-                                                <dd class="small-12 medium-9">{{ externalUser.StudentTutorDescription }}</dd>
+                                                <dt class="small-4 medium-3 columns">Tutor Group:</dt>
+                                                <dd class="small-8 medium-9 columns">{{ externalUser.StudentTutorDescription }}</dd>
                                             {% endif %}
                                         {% endif %}
                                     {% endblock details_tutorGroup %}
@@ -192,8 +192,8 @@
                                     {% block details_hohTeacher %}
                                         {% if showClasses %}
                                             {% if hohTeacher %}
-                                                <dt class="small-12 medium-3">Head of House:</dt>
-                                                <dd class="small-12 medium-9">
+                                                <dt class="small-4 medium-3 columns">Head of House:</dt>
+                                                <dd class="small-8 medium-9 columns">
                                                     {% if hohTeacher.id %}
                                                         <a href="{{ session.mailhandle }}{{ hohTeacher.email }}">{{ hohTeacher.formatName }}</a>
                                                     {% else %}
@@ -207,16 +207,16 @@
                                     {% block details_studentForm %}
                                         {% if showClasses %}
                                             {% if externalUser.StudentForm %}
-                                                <dt class="small-12 medium-3">Class:</dt>
-                                                <dd class="small-12 medium-9">{{ externalUser.StudentForm }}</dd>
+                                                <dt class="small-4 medium-3 columns">Class:</dt>
+                                                <dd class="small-8 medium-9 columns">{{ externalUser.StudentForm }}</dd>
                                             {% endif %}
                                         {% endif %}
                                     {% endblock details_studentForm %}
 
                                     {% block details_studentType %}
                                         {% if boarderType %}
-                                            <dt class="small-12 medium-3">Student Type:</dt>
-                                            <dd class="small-12 medium-9">{{ boarderType }}</dd>
+                                            <dt class="small-4 medium-3 columns">Student Type:</dt>
+                                            <dd class="small-8 medium-9 columns">{{ boarderType }}</dd>
                                         {% endif %}
                                     {% endblock details_studentType %}
 
@@ -368,7 +368,7 @@
                                 {% block contacts_alert %}
                                     {# Only staff may view contact alerts #}
                                     {% if showContactsAlert %}
-                                        <div class="alert-box alert icon-alert no-margin">
+                                        <div class="alert-box alert icon-alert">
                                             {{ message }}
                                         </div>
                                     {% endif %}
@@ -384,17 +384,22 @@
                                                 <!-- Expander -->
                                                 <div class="list-item">
                                                     <div class="expander icon-down-arrow" data-collapser="collap-contact-{{ loop.index }}"></div>
-                                                    <div class="card small-12">
+                                                    <div class="compact card small-12">
                                                         {% if contact.main %}
                                                             <a href="/search/user/{{ contact.main.id }}">
                                                                 <img src="/portrait.php?userId={{ contact.StudentContactID }}&amp;size=square64" />
-                                                                <h3>{{ contact.StudentContactTitle }} {{ contact.StudentContactPreferred }} {{ contact.StudentContactSurname }}</h3>
+                                                                <p>
+                                                                    {{ contact.StudentContactTitle }} {{ contact.StudentContactPreferred }} {{ contact.StudentContactSurname }}
+                                                                    <span class="pipe meta">{{ contact.StudentContactRelation }}</span>
+                                                                </p>
                                                             </a>
                                                         {% else %}
                                                             <img src="/portrait.php?userId={{ contact.StudentContactID }}&amp;size=square64" />
-                                                            <h3>{{ contact.StudentContactTitle }} {{ contact.StudentContactPreferred }} {{ contact.StudentContactSurname }}</h3>
+                                                            <p>
+                                                                {{ contact.StudentContactTitle }} {{ contact.StudentContactPreferred }} {{ contact.StudentContactSurname }}
+                                                                <span class="pipe meta">{{ contact.StudentContactRelation }}</span>
+                                                            </p>
                                                         {% endif %}
-                                                        <p class="meta">{{ contact.StudentContactRelation }}</p>
                                                     </div>
                                                 </div>
 
@@ -443,26 +448,31 @@
                                                 {% endif %}
                                             </li>
 
-                                                {% if contact.StudentContactSpouseTitle or contact.StudentContactSpousePreferred %}
-                                                    <li class="small-12">
+                                            {% if contact.StudentContactSpouseTitle or contact.StudentContactSpousePreferred %}
+                                            <li class="small-12">
 
-                                                        <!-- Expander -->
-                                                        <div class="list-item">
-                                                            <div class="expander icon-down-arrow" data-collapser="collap-spouse-{{ loop.index }}"></div>
-                                                            <div class="card small-12">
-                                                                {# need to know user's schoolbox info here #}
-                                                                {% if contact.spouse %}
-                                                                    <a href="/search/user/{{ contact.spouse.id }}">
-                                                                        <img src="/portrait.php?userId={{ contact.StudentContactSpouseID }}&amp;size=square64" />
-                                                                        <h3>{{ contact.StudentContactSpouseTitle }} {{ contact.StudentContactSpousePreferred }} {{ contact.StudentContactSpouseSurname }}</h3>
-                                                                    </a>
-                                                                {% else %}
-                                                                    <img src="/portrait.php?userId={{ contact.StudentContactSpouseID }}&amp;size=square64" />
-                                                                    <h3>{{ contact.StudentContactSpouseTitle }} {{ contact.StudentContactSpousePreferred }} {{ contact.StudentContactSpouseSurname }}</h3>
-                                                                {% endif %}
-                                                                <p class="meta">{{ contact.StudentContactSpouseRelation }}</p>
-                                                            </div>
-                                                        </div>
+                                                <!-- Expander -->
+                                                <div class="list-item">
+                                                    <div class="expander icon-down-arrow" data-collapser="collap-spouse-{{ loop.index }}"></div>
+                                                    <div class="compact card small-12">
+                                                        {# need to know user's schoolbox info here #}
+                                                        {% if contact.spouse %}
+                                                            <a href="/search/user/{{ contact.spouse.id }}">
+                                                                <img src="/portrait.php?userId={{ contact.StudentContactSpouseID }}&amp;size=square64" />
+                                                                <p>
+                                                                    {{ contact.StudentContactSpouseTitle }} {{ contact.StudentContactSpousePreferred }} {{ contact.StudentContactSpouseSurname }}
+                                                                    <span class="pipe meta">{{ contact.StudentContactSpouseRelation }}</span>
+                                                                </p>
+                                                            </a>
+                                                        {% else %}
+                                                            <img src="/portrait.php?userId={{ contact.StudentContactSpouseID }}&amp;size=square64" />
+                                                            <p>
+                                                                {{ contact.StudentContactSpouseTitle }} {{ contact.StudentContactSpousePreferred }} {{ contact.StudentContactSpouseSurname }}
+                                                                <span class="pipe meta">{{ contact.StudentContactSpouseRelation }}</span>
+                                                            </p>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
 
                                                 {% if (contact.StudentContactPhoneActual and not contact.StudentContactSilentPhoneFlag) or contact.StudentContactSpouseMobilePhone or contact.StudentContactSpouseOccupPhone or contact.StudentContactSpouseDefaultEmail %}
                                                     <!-- Collapsable content -->
@@ -509,8 +519,7 @@
                                                 {% endif %}
                                             </li>
                                             {% endif %}
-
-                                            {% endif %}
+                                        {% endif %}
                                     {% endfor %}
                                 </ul>
                             </section>
@@ -589,51 +598,48 @@
                         <div class="small-12 island">
                             <h2 class="subheader">{{ group }}</h2>
                             <section>
-                                <ul class="subject-list">
-                                    {% for subject in subjectGroup %}
-                                        <li class="subject-group">
+                                {% for subject in subjectGroup %}
+                                <ul class="subject-list group">
+                                    <li class="subject-group">
+                                        <div class="content small-12">
+                                            {% if subject.folder.id and subject.perms >= constant('\\Schoolbox\\Permission\\Access\\UserAccess::ACCESS_READ') %}
+                                            <a href="/homepage/code/{{ subject.code|e('url')|e('url')|e('url') }}">
+                                                <h3 class="no-margin">{{ subject.name }} <span class="meta">({{ subject.code }})</span></h3>
+                                            </a>
+                                            {% else %}
+                                            <h3 class="no-margin">{{ subject.name }} <span class="meta">({{ subject.code }})</span></h3>
+                                            {% endif %}
+                                        </div>
+                                    </li>
+                                    {% for teacher in subject.teachers %}
+                                        {% set teacherEmails = teacherEmails ~ teacher.email ~ ',' %}
+                                        <li class="actions-small-1">
                                             <div class="list-item">
-                                                <div class="card small-12">
-                                                    {% if subject.folder.id and subject.perms >= constant('\\Schoolbox\\Permission\\Access\\UserAccess::ACCESS_READ') %}
-                                                        <a href="/homepage/code/{{ subject.code|e('url')|e('url')|e('url') }}">
-                                                            <span class="icon-home size-32 "></span>
-                                                            <h3>{{ subject.name }}</h3>
-                                                        </a>
-                                                    {% else %}
-                                                        <span class="icon-home size-32"></span>
-                                                        <h3>{{ subject.name }}</h3>
-                                                    {% endif %}
-                                                    <p class="meta">{{ subject.code }}</p>
+                                                <div class="compact card small-12">
+                                                    <a href="/search/user/{{ teacher.id }}">
+                                                        <img src="/portrait.php?userId={{ teacher.externalId|e('url') }}&amp;size=square64" />
+                                                        <p>
+                                                            {{ teacher.formatName }}
+                                                            <span class="pipe meta">
+                                                                {% if teacher.positionTitle is empty %}
+                                                                    {{ teacher.role.name }}
+                                                                {% else %}
+                                                                    {{ teacher.positionTitle }}
+                                                                {% endif %}
+                                                            </span>
+                                                        </p>
+                                                    </a>
                                                 </div>
                                             </div>
+                                            <nav>
+                                                {% if not teacher.email is empty %}
+                                                    <a class="icon-email" href="{{ session.mailhandle }}{{ teacher.email }}" title="Email {{ teacher.email }}"></a>
+                                                {% endif %}
+                                            </nav>
                                         </li>
-                                        {% for teacher in subject.teachers %}
-                                            {% set teacherEmails = teacherEmails ~ teacher.email ~ ',' %}
-                                            <li class="actions-small-1">
-                                                <div class="list-item">
-                                                    <div class="card small-12">
-                                                        <a href="/search/user/{{ teacher.id }}">
-                                                            <img src="/portrait.php?userId={{ teacher.externalId|e('url') }}&amp;size=square64" />
-                                                            <h3>{{ teacher.formatName }}</h3>
-                                                        </a>
-                                                        <p class="meta">
-                                                            {% if teacher.positionTitle is empty %}
-                                                                {{ teacher.role.name }}
-                                                            {% else %}
-                                                                {{ teacher.positionTitle }}
-                                                            {% endif %}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                                <nav>
-                                                    {% if not teacher.email is empty %}
-                                                        <a class="icon-email" href="{{ session.mailhandle }}{{ teacher.email }}" title="Email {{ teacher.email }}"></a>
-                                                    {% endif %}
-                                                </nav>
-                                            </li>
-                                        {% endfor %}
                                     {% endfor %}
                                 </ul>
+                                {% endfor %}
 
                                 {% if session.user.role.staff and config.mail_enable %}
                                     <div class="component-action">
@@ -661,49 +667,49 @@
                     <div class="small-12 island">
                         <h2 class="subheader">Groups</h2>
                         <section>
-                            <ul class="subject-list">
-                                {% for group in groups %}
-                                    <li class="subject-group">
-                                        <div class="list-item">
-                                            <div class="card small-12 ">
-                                                {% if group.perms > 0 %}
-                                                    <a href="/homepage/{{ group.id }}">
-                                                        <span class="icon-folder size-32"></span>
-                                                        <h3>{{ group.name }}</h3>
-                                                    </a>
-                                                {% else %}
-                                                    <span class="icon-folder size-32"></span>
-                                                    <h3>{{ group.name }}</h3>
-                                                {% endif %}
-                                            </div>
+                            {% for group in groups %}
+                            <ul class="subject-list group">
+                                <li class="subject-group">
+                                    <div class="list-item">
+                                        <div class="content small-12 ">
+                                            {% if group.perms > 0 %}
+                                                <a href="/homepage/{{ group.id }}">
+                                                    <h3 class="no-margin">{{ group.name }}</h3>
+                                                </a>
+                                            {% else %}
+                                                <h3 class="no-margin">{{ group.name }}</h3>
+                                            {% endif %}
                                         </div>
-                                    </li>
-                                    {% if group.owner %}
-                                        <li class="actions-small-1">
-                                            <div class="list-item">
-                                                <div class="card small-12">
-                                                    <a href="/search/user/{{ group.owner.id }}">
-                                                        <img src="/portrait.php?userId={{ group.owner.externalId }}&amp;size=square64" />
-                                                        <h3>{{ group.owner.formatName }}</h3>
-                                                    </a>
-                                                    <p class="meta">
+                                    </div>
+                                </li>
+                                {% if group.owner %}
+                                <li class="actions-small-1">
+                                    <div class="list-item">
+                                        <div class="compact card small-12">
+                                            <a href="/search/user/{{ group.owner.id }}">
+                                                <img src="/portrait.php?userId={{ group.owner.externalId }}&amp;size=square64" />
+                                                <p>
+                                                    {{ group.owner.formatName }}
+                                                    <span class="pipe meta">
                                                         {% if group.owner.positionTitle is empty %}
                                                             {{ group.owner.role.name }}
                                                         {% else %}
                                                             {{ group.owner.positionTitle }}
                                                         {% endif %}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <nav>
-                                                {% if not group.owner.email is empty %}
-                                                    <a class="icon-email" href="{{ session.mailhandle }}{{ group.owner.email }}" title="Email {{ group.owner.email }}"></a>
-                                                {% endif %}
-                                            </nav>
-                                        </li>
-                                    {% endif %}
-                                {% endfor %}
+                                                    </span>
+                                                </p>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <nav>
+                                        {% if not group.owner.email is empty %}
+                                            <a class="icon-email" href="{{ session.mailhandle }}{{ group.owner.email }}" title="Email {{ group.owner.email }}"></a>
+                                        {% endif %}
+                                    </nav>
+                                </li>
+                                {% endif %}
                             </ul>
+                            {% endfor %}
                         </section>
                     </div>
                 </div>

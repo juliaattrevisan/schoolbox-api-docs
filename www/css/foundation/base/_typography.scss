@@ -141,6 +141,10 @@ h1, h2, h3, h4, h5, h6 {
 		margin-bottom: .25rem;
 		font-weight: $font-weight-bold;
 	}
+	a &{
+		// Fails to inherit link colour when in links
+		color: inherit;
+	}
 }
 
 p{
@@ -162,10 +166,13 @@ a{
 	    font-style: normal;
 	    font-weight: bold;
 	}
-	&.pipe:before{
-		content: '|';
-		margin: 0 0.35rem;
-		font-style: normal;
+	&.pipe {
+		margin: 0;
+		&:before{
+			content: '|';
+			font-style: normal;
+			margin: 0 .35rem;
+		}
 	}
 }
 
