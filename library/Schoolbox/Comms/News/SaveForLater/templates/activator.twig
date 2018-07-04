@@ -13,26 +13,29 @@
                 $('#saveforlater').on('click', function(event) {
                     event.preventDefault();
 
-                    var element = $(this);
-                    var toast = $('#toast');
+                    var $element = $(this);
+                    var $toast = $('#toast');
 
-                    toast.toastActivate({
+                    $toast.toastActivate({
                         text: 'Saving for later...'
                     });
 
                     $.ajax({
                         type: 'POST',
-                        url: element.attr('href'),
+                        url: $element.attr('href'),
                         dataType: 'json'
                     }).success(function () {
-                        toast.toastTimeout({
+                        $toast.toastTimeout({
                             text: 'Saved',
                             css: 'success'
                         });
+
+                        {# Update icon #}
+                        $element.removeClass('icon-favourite-hollow').addClass('icon-favourite');
                     }).error(function (response) {
                         var temp = $.parseJSON(response.responseText);
 
-                        toast.toastTimeout({
+                        $toast.toastTimeout({
                             text: 'Error: ' + temp.message,
                             css: 'alert'
                         });
@@ -45,7 +48,7 @@
                 <a href="{{ routeLookup('commsNewsSaveForLater.getList') }}" title="View your list of articles">Saved For Later</a>.
             </p>
         {% else %}
-            <p><a href="{{ routeLookup('commsNewsSaveForLater.postActivate', {newsId: news.id}) }}" class="icon-favourite" title="Save a shortcut to this article" id="saveforlater">Save For Later</a></p>
+            <p><a href="{{ routeLookup('commsNewsSaveForLater.postActivate', {newsId: news.id}) }}" class="icon-favourite-hollow" title="Save a shortcut to this {{ local.news }}" id="saveforlater">Save For Later</a></p>
         {% endif %}
     </div>
 </div>
