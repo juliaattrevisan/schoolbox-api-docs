@@ -141,7 +141,6 @@ class Controller extends Base
      * @throws MapperException
      * @throws \Aura\Router\Exception\RouteNotFound
      * @throws \PDOException
-     * @throws \Schoolbox\Application\Exception\Exception
      * @throws \Schoolbox\Resource\Exception
      * @throws \UnexpectedValueException
      */
