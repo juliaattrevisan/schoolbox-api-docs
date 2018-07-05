@@ -454,15 +454,18 @@ class Controller extends Base
      * TODO: Incompleted
      *
      * @param int $topicId
+     * @param int $limit
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      */
-    public function getListByTopic(int $topicId)
+    public function getListByTopic(int $topicId, int $limit)
     {
         if ($this->getRequest()->isXhr()) {
 
             /* TODO: Find articles that were audienced to me
              */
-            $articles = $this->newsMapper->findAll();
+            $articles = $this->newsMapper->findAll([
+                'limit' => $limit
+            ]);
 
             /* Figure out which ones were saved for later
              */

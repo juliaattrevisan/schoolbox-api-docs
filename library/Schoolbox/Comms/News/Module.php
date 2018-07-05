@@ -93,7 +93,7 @@ class Module extends BaseModule
 
         /* Get a list of articles audienced to me, by topic
          */
-        $this->register('GET', '/list/{topicId:\d+}', 'getListByTopic', $viewPerms);
+        $this->register('GET', '/list/{topicId:\d+}/{limit:\d+}', 'getListByTopic', $viewPerms);
     }
 
 

@@ -7,7 +7,7 @@
          */
         $.ajax({
             type: 'GET',
-            url: "{{ routeLookup('commsNews.getListByTopic', {topicId: 1}) }}",
+            url: "{{ routeLookup('commsNews.getListByTopic', {topicId: 1, limit: limit}) }}",
             dataType: 'html'
         }).success(function (response) {
             container.html(response).saveForLater();
@@ -34,7 +34,7 @@
 
 <dl class="tabs" data-tab="" id="news-topics-{{ componentInstanceId }}">
     {% for topic in topics %}
-    <dd {% if loop.first %}class="active"{% endif %}><a href="{{ routeLookup('commsNews.getListByTopic', {topicId: topic.id}) }}">{{ topic.name }}</a></dd>
+    <dd {% if loop.first %}class="active"{% endif %}><a href="{{ routeLookup('commsNews.getListByTopic', {topicId: topic.id, limit: limit}) }}">{{ topic.name }}</a></dd>
     {% endfor %}
     <dd><a href="{{ routeLookup('commsNews.getListByTopic', {topicId: 0}) }}">All</a></dd>
 </dl>
