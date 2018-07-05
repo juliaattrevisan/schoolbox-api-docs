@@ -437,6 +437,7 @@ class CourseMarkbook
      *
      * @param GenericCollection|IAssessable[] $assessmentImpls
      * @param User                            $viewingUser
+     * @param IMarkScheme                     $studentAverageMarkScheme
      */
     private function collateStatistics(GenericCollection $assessmentImpls, User $viewingUser, IMarkScheme $studentAverageMarkScheme): void
     {
