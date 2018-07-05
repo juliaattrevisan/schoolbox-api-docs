@@ -521,12 +521,14 @@ class CourseMarkbook
                             $studentAverageMarks[$courseImplId][$userId]['any']['weight'] += $weight;
                         }
 
-                        // Only store 'any' mark if is different from 'published' mark, indicating it is composed
-                        // of at least 1 draft.
-                        // TODO This is not always true. consider when published are 10 + 20 and any are 15 + 15, this will give a false positive
-                        // TODO but to calculate this properly will take more dev time that we have right now.
-                        // TODO Potentially implement Project::hasPendingDraft(User):bool
-                        $pendingDraft = $authNormMark !== $publishedNormMark;
+                        // Only store 'any' mark if is different from 'published' mark, indicating it is composed of at least 1 draft.
+                        if($authNormMark !== $publishedNormMark){
+                            // We can short-circuit the conclusion here if the published-only mark differs from the 'any' mark.
+                            $pendingDraft = true;
+                        } else {
+                            // Not sure. Need to go the long way.
+                            $pendingDraft = $aImpl->hasPendingDraftAuthoritativeFeedback($participant);
+                        }
                         if($pendingDraft){
                             $this->studentMarks[$courseImplId][$aId][$userId]['draft']['norm'] = $authNormMark;
                             $this->studentMarks[$courseImplId][$aId][$userId]['draft']['hr']   = $authHrMark;

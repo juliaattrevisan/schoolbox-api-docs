@@ -384,6 +384,21 @@ interface IAssessable extends ISoftDeletable
      */
     public function hasPublishedFeedback(Participant $participant);
 
+
+    /**
+     * Returns whether the participant has any pending draft authoritative feedback.
+     *
+     * Note that this is not always simply ($anyMark === $publishedOnlyMark) as they may be the same.
+     *
+     * The implication of this is that the participant's mark may change if the draft is published.
+     *
+     * @param Participant $participant
+     * @return bool
+     * @throws DomainException If participant's assessment is not this assessment
+     */
+    public function hasPendingDraftAuthoritativeFeedback(Participant $participant): bool;
+
+
     /**
      * Does this student have a mark for the assessment.
      * (Will return TRUE even if just a comment is given)

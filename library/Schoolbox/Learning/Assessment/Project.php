@@ -402,6 +402,24 @@ class Project extends AbstractAssessment implements AssessmentContext
 
 
     /**
+     * @inheritdoc
+     */
+    public function hasPendingDraftAuthoritativeFeedback(Participant $participant): bool
+    {
+        $this->assertSameAssessment($participant);
+
+        // A project participant has pending draft feedback if any sub-assessable has pending draft feedback.
+        foreach ($this->assessables as $subAssessable) {
+            $subParticipant = $subAssessable->getParticipantIfExtant($participant->getUser());
+            if ($subParticipant && $subAssessable->hasPendingDraftAuthoritativeFeedback($subParticipant)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    /**
      * This does NOT treat the project holistically as an atomic entity.
      *
      * A project has a mark if any of its sub-assessments have marks.

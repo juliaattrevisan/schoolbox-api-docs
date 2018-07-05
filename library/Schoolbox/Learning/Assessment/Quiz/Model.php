@@ -175,6 +175,16 @@ class Model extends AbstractAssessment
     }
 
     /**
+     * @inheritdoc
+     */
+    public function hasPendingDraftAuthoritativeFeedback(Participant $participant): bool
+    {
+        // Quizzes do not have draft marks
+        $this->assertSameAssessment($participant);
+        return false;
+    }
+
+    /**
      * The number of hours and minutes that is represented by getDuration()
      * (which is the duration represented in seconds)
      */
