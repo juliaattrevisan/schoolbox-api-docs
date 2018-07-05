@@ -55,7 +55,7 @@ class Controller extends Base
 
 
     /**
-     * Provide form
+     * A list of articles that you saved for later
      *
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Aura\Di\Exception\ServiceNotFound
@@ -85,7 +85,6 @@ class Controller extends Base
      * and it happens asynchronously
      *
      * @param News\Model $article
-     * @throws \Aura\Router\Exception\RouteNotFound
      */
     public function postToggle(News\Model $article)
     {
