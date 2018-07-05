@@ -461,6 +461,9 @@ class CourseMarkbook
         $this->assessmentImplAverages = [];
         $this->assessmentSpecAverages = [];
 
+        /** @var float[][] $specMarks */
+        $specMarks = [];                         // Indexed by [aSpec.id]['any'|'published']
+
         // bool[]. Track whether any aggregate assessment marks are composed of draft marks
         $assessmentImplMarkContainsDrafts = [];  // indexed by aImpl.id
         $assessmentSpecMarkContainsDrafts = [];  // indexed by aSpec.id
@@ -512,11 +515,19 @@ class CourseMarkbook
                         // of at least 1 draft.
                         // TODO This is not always true. consider when published are 10 + 20 and any are 15 + 15, this will give a false positive
                         // TODO but to calculate this properly will take more dev time that we have right now.
-                        if($authNormMark !== $publishedNormMark){
+                        // TODO Potentially implement Project::hasPendingDraft(User):bool
+                        $pendingDraft = $authNormMark !== $publishedNormMark;
+                        if($pendingDraft){
                             $this->studentMarks[$courseImplId][$aId][$userId]['draft']['norm'] = $authNormMark;
                             $this->studentMarks[$courseImplId][$aId][$userId]['draft']['hr']   = $authHrMark;
 
                             $assessmentImplMarkContainsDrafts[$aImplId] = true;
+                        }
+                        if ($aSpec) {
+                            $specMarks[$aSpec->getId()]['any'][] = $authNormMark;
+                            if ($pendingDraft) {
+                                $assessmentSpecMarkContainsDrafts[$aSpec->getId()] = true;
+                            }
                         }
                     }
                     if(null !== $publishedNormMark){
@@ -526,6 +537,9 @@ class CourseMarkbook
                         // Always store published if it exists
                         $this->studentMarks[$courseImplId][$aId][$userId]['published']['norm'] = $publishedNormMark;
                         $this->studentMarks[$courseImplId][$aId][$userId]['published']['hr']   = $publishedHrMark;
+                        if ($aSpec) {
+                            $specMarks[$aSpec->getId()]['published'][] = $publishedNormMark;
+                        }
                     }
                     continue;
                 }
@@ -560,15 +574,12 @@ class CourseMarkbook
                     $this->studentMarks[$courseImplId][$aId][$userId]['draft']['hr']   = $authAnyFeedback->getHumanReadableMark();
                 }
 
-                // If student has a mark (whether published or not) add it to the assessment's stats
-                if ($authAnyFeedback && null !== $authNormMark) {
-                    // Record that an assessment participant has a mark
-                    $assessmentAnyMarks[] = $authNormMark;
-                }
-
 
                 // Either draft or published mark
-                if ($authAnyFeedback && null !== $authNormMark) {
+                if (null !== $authNormMark) {
+                    // Record that an assessment participant has a mark
+                    $assessmentAnyMarks[] = $authNormMark;
+
                     // First time we've encountered this row (user + course-import) ?
                     if (!\is_array($studentAverageMarks[$courseImplId][$userId])) {
                         $studentAverageMarks[$courseImplId][$userId]['any'] = ['sum' => 0, 'weight' => 0];
@@ -580,16 +591,26 @@ class CourseMarkbook
                         $assessmentImplMarkContainsDrafts[$aImplId] = true;
                         $studentMarkContainsDrafts[$userId]         = true;
                     }
+                    if ($aSpec) {
+                        $specMarks[$aSpec->getId()]['any'][] = $authNormMark;
+                        if ($pendingDraft) {
+                            $assessmentSpecMarkContainsDrafts[$aSpec->getId()] = true;
+                        }
+                    }
                 }
 
                 // Just published marks
-                if ($authPublishedFeedback && null !== $authPublishedFeedback) {
+                if (null !== $publishedNormMark) {
                     // First time we've encountered this row (user + course-import) ?
                     if (!\is_array($studentAverageMarks[$courseImplId][$userId])) {
                         $studentAverageMarks[$courseImplId][$userId]['published'] = ['sum' => 0, 'weight' => 0];
                     }
                     $studentAverageMarks[$courseImplId][$userId]['published']['sum']    += $weight * $publishedNormMark;
                     $studentAverageMarks[$courseImplId][$userId]['published']['weight'] += $weight;
+
+                    if ($aSpec) {
+                        $specMarks[$aSpec->getId()]['published'][] = $publishedNormMark;
+                    }
                 }
             }
 
@@ -603,23 +624,6 @@ class CourseMarkbook
             if(\count($assessmentPublishedMarks)){
                 $this->assessmentImplAverages[$aImplId]['published'] =  \array_sum($assessmentPublishedMarks)/\count($assessmentPublishedMarks);
             }
-
-            // If assessmentImpl was imported, record the average against the source spec
-            $aSpec = $aImpl->getSpecificationAssessment();
-            if ($aSpec) {
-                $aSpecId = $aSpec->getId();
-                if (null !== $this->assessmentImplAverages[$aImplId]['any']) {
-                    $this->assessmentSpecAverages[$aSpecId]['any'][$aImplId] = $this->assessmentImplAverages[$aImplId]['any'];
-
-                    // If this impl's aggregate mark is composed of any drafts, then so will the spec's
-                    if(\array_key_exists($aImplId, $assessmentImplMarkContainsDrafts)){
-                        $assessmentSpecMarkContainsDrafts[$aSpecId] = true;
-                    }
-                }
-                if (null !== $this->assessmentImplAverages[$aImplId]['published']) {
-                    $this->assessmentSpecAverages[$aSpecId]['published'][$aImplId] = $this->assessmentImplAverages[$aImplId]['published'];
-                }
-            }
         }
 
         // Unset any aggregate assessment impl marks that were not built from published only but didn't encounter any drafts
@@ -630,10 +634,10 @@ class CourseMarkbook
         }
 
         // Resolve assessmentSpec averages
-        foreach ($this->assessmentSpecAverages as $aSpecId => $marksForType) {
-            foreach ($marksForType as $type => $marks) {
+        foreach ($specMarks as $aSpecId => $marksForType) {
+            foreach ($marksForType as $markType => $marks) {
                 /** @var float[] $marks */
-                $this->assessmentSpecAverages[$aSpecId][$type] = \array_sum($marks) / \count($marks);
+                $this->assessmentSpecAverages[$aSpecId][$markType] = \array_sum($marks) / \count($marks);
             }
         }
         // Unset any aggregate assessment spec marks that were not built from published only but didn't encounter any drafts
