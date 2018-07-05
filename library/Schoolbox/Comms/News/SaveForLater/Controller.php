@@ -18,6 +18,12 @@ class Controller extends Base
 {
 
     /**
+     * Representations of when an article is in your Saved For Later list
+     */
+    private const SAVED = 1;
+    private const UNSAVED = 0;
+
+    /**
      * @var Mapper
      */
     private $saveForLaterMapper;
@@ -151,7 +157,7 @@ class Controller extends Base
 
             return [
                 'success' => true,
-                'currentValue' => 0
+                'currentValue' => self::UNSAVED
             ];
         }
 
@@ -166,7 +172,7 @@ class Controller extends Base
 
             return [
                 'success' => true,
-                'currentValue' => 1
+                'currentValue' => self::SAVED
             ];
         } catch (\PDOException|\UnexpectedValueException|Exception $e) {
             return [
