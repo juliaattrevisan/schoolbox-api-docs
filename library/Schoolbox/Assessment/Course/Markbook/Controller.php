@@ -141,7 +141,6 @@ class Controller extends WebController\Base
                 'courseSpec'  => $courseSpec,
                 'viewee'      => $this->getUser(),
                 'filterPanel' => $filterPanel,
-                'debugMode'   => $this->getConfigLoader()->get('debug_mode'),
             ])->setTab('submission')->setTitle("Course Markbook: {$courseSpec->getTitle()}")
         );
     }

@@ -2,7 +2,6 @@
 Usage:
     filterPanel: FilterPanel - a filter panel that can filter and AJAX in the report
     courseSpec:  CourseSpec
-    debugMode:   bool
     page:        string      - which filtered page this is. One of the Filter\Page\Model::PAGE_* constants
 #}
 <script type="text/javascript" src="/javascript/shared/submissions/jquery.marksheet.js"></script>
@@ -47,10 +46,7 @@ Usage:
                             }
                         });
                     } catch (e){
-                        // TODO debug whey this is happening. This will at least ensure JS not die.
-                        if({{ debugMode ? 1 : 0 }}){
-                            console.log(e);
-                        }
+                        console.log(e);
                     }
                 }
 
