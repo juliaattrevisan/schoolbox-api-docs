@@ -4,8 +4,8 @@ namespace Helper;
 // here you can define custom actions
 // all public methods declared in helper class will be available in $I
 
+use Codeception\Exception\ModuleException;
 use Codeception\Module\WebDriver;
-use Codeception\Util\Locator;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
 use Facebook\WebDriver\Remote\RemoteWebElement;
 use Facebook\WebDriver\WebDriverBy;
@@ -19,7 +19,7 @@ class Acceptance extends \Codeception\Module
      * @param $option
      * @return WebDriverElement
      */
-    private function findCheckbox($option)
+    private function findCheckbox($option): WebDriverElement
     {
         $wd = $this->getWebDriverModule();
 
@@ -36,7 +36,7 @@ class Acceptance extends \Codeception\Module
      * @param WebDriverElement $checkbox
      * @return WebDriverElement
      */
-    private function findLabelForCheckbox(WebDriverElement $checkbox)
+    private function findLabelForCheckbox(WebDriverElement $checkbox): WebDriverElement
     {
         $id = $checkbox->getAttribute('id');
 
@@ -58,7 +58,7 @@ class Acceptance extends \Codeception\Module
      * @param $option
      * @see \Codeception\Module\WebDriver::checkOption()
      */
-    public function checkOption($option)
+    public function checkOption($option): void
     {
         $checkbox = $this->findCheckbox($option);
         if (!$checkbox->isSelected()) {
@@ -74,7 +74,7 @@ class Acceptance extends \Codeception\Module
      * @param $option
      * @see \Codeception\Module\WebDriver::uncheckOption()
      */
-    public function uncheckOption($option)
+    public function uncheckOption($option): void
     {
         $checkbox = $this->findCheckbox($option);
         if ($checkbox->isSelected()) {
@@ -89,7 +89,7 @@ class Acceptance extends \Codeception\Module
      * @param string $field
      * @param string $value
      */
-    public function fillRichTextField(string $field, string $value)
+    public function fillRichTextField(string $field, string $value): void
     {
         $wd = $this->getWebDriverModule();
         $wd->executeInSelenium(
@@ -108,7 +108,7 @@ class Acceptance extends \Codeception\Module
      * @param string $group
      * @param array  $options
      */
-    public function checkSelectGroupOptions(string $group, array $options)
+    public function checkSelectGroupOptions(string $group, array $options): void
     {
         $wd = $this->getWebDriverModule();
 
@@ -141,7 +141,6 @@ class Acceptance extends \Codeception\Module
      *
      * @param string|array $field A field locator
      * @param string       $value The value to enter
-     * @throws \Codeception\Exception\ModuleException
      */
     public function fillDateField($field, $value): void
     {
@@ -196,37 +195,20 @@ class Acceptance extends \Codeception\Module
 
 
     /**
-     * Removes all selected options from a selectize.
+     * Removes a selected option from a selectize by callback
      *
-     * @param string $field Currently, must be a name
-     * @param string $selectizeSearch
+     * @param string   $field    Currently, must be a name
+     * @param callable $callback If this returns true, unselect the option
+     *                           Takes a `RemoteWebElement` as its parameter.
      */
-    public function clearSelectize(string $field)
-    {
-        $wd = $this->getWebDriverModule();
-
-        // Find all elements in the selectize; click remove button
-        foreach ($wd->_findElements($this->getSelectizeItemsSelector($field)) as $item) {
-            /** @var RemoteWebElement $item */
-            $item->findElement(WebDriverBy::className('remove'))->click();
-        }
-    }
-
-
-    /**
-     * Removes a selected option from a selectize.
-     *
-     * @param string $field Currently, must be a name
-     * @param string $selectizeSearch
-     */
-    public function unselectSelectizeOption(string $field, string $selectizeSearch)
+    public function unselectSelectizeOptionsByCallback(string $field, callable $callback): void
     {
         $wd = $this->getWebDriverModule();
 
         // Find all elements in the selectize; click remove button for those who match
         foreach ($wd->_findElements($this->getSelectizeItemsSelector($field)) as $item) {
             /** @var RemoteWebElement $item */
-            if (strpos($item->getText(), $selectizeSearch) !== false) {
+            if ($callback($item)) {
                 $item->findElement(WebDriverBy::className('remove'))->click();
             }
         }
@@ -234,13 +216,41 @@ class Acceptance extends \Codeception\Module
 
 
     /**
-     * Searches for a selectize option, and adds it. If it can't find it,
-     * raises exception.
+     * Removes all selected options from a selectize.
      *
      * @param string $field Currently, must be a name
-     * @param string $selectizeSearch
      */
-    public function selectSelectizeOption(string $field, string $selectizeSearch)
+    public function clearSelectize(string $field): void
+    {
+        $this->unselectSelectizeOptionsByCallback($field, function () { return true; });
+    }
+
+
+    /**
+     * Removes a selected option from a selectize.
+     *
+     * @param string $field           Currently, must be a name
+     * @param string $selectizeSearch Text in the selected option to match
+     */
+    public function unselectSelectizeOption(string $field, string $selectizeSearch): void
+    {
+        $this->unselectSelectizeOptionsByCallback(
+            $field,
+            function (RemoteWebElement $element) use ($selectizeSearch) {
+                return strpos($element->getText(), $selectizeSearch) !== false;
+            }
+        );
+    }
+
+
+    /**
+     * Searches for a selectize option, and adds the first one it finds.
+     *
+     * @param string $field           Currently, must be a name
+     * @param string $selectizeSearch Text in the selected option to match
+     * @throws \Exception If waiting for the dropdown timed out
+     */
+    public function selectSelectizeOption(string $field, string $selectizeSearch): void
     {
         $wd = $this->getWebDriverModule();
 
@@ -257,7 +267,6 @@ class Acceptance extends \Codeception\Module
      * Relies on `jQuery.active` being set.
      *
      * @param int $timeout
-     * @throws \Codeception\Exception\ModuleException
      */
     public function waitForAjaxDone($timeout = 30): void
     {
@@ -269,11 +278,15 @@ class Acceptance extends \Codeception\Module
      * Return webdriver module in a type-safe manner.
      *
      * @return WebDriver
-     * @throws \Codeception\Exception\ModuleException
      */
     private function getWebDriverModule(): WebDriver
     {
-        return $this->getModule('WebDriver');
+        try {
+            return $this->getModule('WebDriver');
+        } catch (ModuleException $e) {
+            // Wasn't found: return null, let TypeError handle it
+        }
+        return null;
     }
 
 
