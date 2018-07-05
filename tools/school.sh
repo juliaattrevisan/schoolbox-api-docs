@@ -31,18 +31,10 @@ else
 	filepath=`readlink -f $0`;
 	fullpath=${filepath%/*};
 	conffile=`readlink -f $fullpath/../www/conf/conf.php`;
-	if [[ $(which schoolbox-conf) ]];
-	then
-		sqluser=$(schoolbox-conf --conf="$conffile" --option=SQL_user);
-		sqlpasswd=$(schoolbox-conf --conf="$conffile" --option=SQL_passwd);
-		sqlhost=$(schoolbox-conf --conf="$conffile" --option=SQL_host);
-		sqldb=$(schoolbox-conf --conf="$conffile" --option=SQL_db);
-	else
-		sqluser=`grep "\"SQL_user" $conffile | grep -v "#" | grep -v "\/\/" | cut -d'"' -f4`;
-		sqlpasswd=`grep "\"SQL_passwd" $conffile | grep -v "#" | grep -v "\/\/" | cut -d'"' -f4`;
-		sqlhost=`grep "\"SQL_host" $conffile | grep -v "#" | grep -v "\/\/" | cut -d'"' -f4`;
-		sqldb=`grep "\"SQL_db" $conffile | grep -v "#" | grep -v "\/\/" | cut -d'"' -f4`;
-	fi
+	sqluser=$(schoolbox-conf --conf="$conffile" --option=SQL_user);
+	sqlpasswd=$(schoolbox-conf --conf="$conffile" --option=SQL_passwd);
+	sqlhost=$(schoolbox-conf --conf="$conffile" --option=SQL_host);
+	sqldb=$(schoolbox-conf --conf="$conffile" --option=SQL_db);
 	if [ "$1" == "" ]
 	then
 		mysql --skip-column-names -u$sqluser -p$sqlpasswd -h $sqlhost -e "SELECT value FROM config WHERE name='site_location' LIMIT 1" $sqldb

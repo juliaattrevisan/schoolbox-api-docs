@@ -10,18 +10,10 @@ error() {
 
 readconf() {
 	# Collect Credentials from $tempconfile
-	if [[ $(which schoolbox-conf) ]];
-	then
-		tempsqluser=$(schoolbox-conf --conf="$tempconffile" --option=SQL_user);
-		tempsqlpasswd=$(schoolbox-conf --conf="$tempconffile" --option=SQL_passwd);
-		tempsqlhost=$(schoolbox-conf --conf="$tempconffile" --option=SQL_host);
-		tempsqldb=$(schoolbox-conf --conf="$tempconffile" --option=SQL_db);
-	else
-		tempsqluser=`grep "\"SQL_user" $tempconffile | grep -v "#" | grep -v "\/\/" | cut -d'"' -f4`;
-		tempsqlpasswd=`grep "\"SQL_passwd" $tempconffile | grep -v "#" | grep -v "\/\/" | cut -d'"' -f4`;
-		tempsqlhost=`grep "\"SQL_host" $tempconffile | grep -v "#" | grep -v "\/\/" | cut -d'"' -f4`;
-		tempsqldb=`grep "\"SQL_db" $tempconffile | grep -v "#" | grep -v "\/\/" | cut -d'"' -f4`;
-	fi
+  tempsqluser=$(schoolbox-conf --conf="$tempconffile" --option=SQL_user);
+  tempsqlpasswd=$(schoolbox-conf --conf="$tempconffile" --option=SQL_passwd);
+  tempsqlhost=$(schoolbox-conf --conf="$tempconffile" --option=SQL_host);
+  tempsqldb=$(schoolbox-conf --conf="$tempconffile" --option=SQL_db);
 }
 
 echo -e "\nDo you want to query *all* schools' message config? (y/n): \c" && read confirm;

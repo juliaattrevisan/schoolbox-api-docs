@@ -14,18 +14,10 @@ fi
 echo "Using db credentials from: "`readlink -f $conffile`;
 
 # Collect Credentials
-if [[ $(which schoolbox-conf) ]];
-then
-    sqluser=$(schoolbox-conf --conf="$conffile" --option=SQL_user);
-    sqlpasswd=$(schoolbox-conf --conf="$conffile" --option=SQL_passwd);
-    sqlhost=$(schoolbox-conf --conf="$conffile" --option=SQL_host);
-    sqldb=$(schoolbox-conf --conf="$conffile" --option=SQL_db);
-else
-    sqluser=`grep "\"SQL_user" $conffile | grep -v "#" | grep -v "\/\/" | cut -d'"' -f4`;
-    sqlpasswd=`grep "\"SQL_passwd" $conffile | grep -v "#" | grep -v "\/\/" | cut -d'"' -f4`;
-    sqlhost=`grep "\"SQL_host" $conffile | grep -v "#" | grep -v "\/\/" | cut -d'"' -f4`;
-    sqldb=`grep "\"SQL_db" $conffile | grep -v "#" | grep -v "\/\/" | cut -d'"' -f4`;
-fi
+sqluser=$(schoolbox-conf --conf="$conffile" --option=SQL_user);
+sqlpasswd=$(schoolbox-conf --conf="$conffile" --option=SQL_passwd);
+sqlhost=$(schoolbox-conf --conf="$conffile" --option=SQL_host);
+sqldb=$(schoolbox-conf --conf="$conffile" --option=SQL_db);
 
 # ensure the DB itself is defaulting to UTF8
 mysql -B -N -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "ALTER DATABASE $sqldb CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci; "
