@@ -18,8 +18,7 @@ class Acceptance extends \Codeception\Module
      */
     private function findCheckbox($option)
     {
-        /** @var WebDriver $wd */
-        $wd = $this->getModule('WebDriver');
+        $wd = $this->getWebDriverModule();
 
         /** @var WebDriverElement[] $elements */
         $elements = $wd->_findElements($option);
@@ -40,8 +39,7 @@ class Acceptance extends \Codeception\Module
 
         // Must assume that all checkboxes have ID attributes
 
-        /** @var WebDriver $wd */
-        $wd = $this->getModule('WebDriver');
+        $wd = $this->getWebDriverModule();
         /** @var WebDriverElement[] $elements */
         $elements = $wd->_findElements(['css' => "label[for='{$id}']"]);
         $this->assertNotEmpty($elements);
@@ -90,8 +88,7 @@ class Acceptance extends \Codeception\Module
      */
     public function fillRichTextField(string $field, string $value)
     {
-        /** @var WebDriver $wd */
-        $wd = $this->getModule('WebDriver');
+        $wd = $this->getWebDriverModule();
         $wd->executeInSelenium(
             function (RemoteWebDriver $webDriver) use ($field, $value) {
                 $webDriver->executeScript(
@@ -110,8 +107,7 @@ class Acceptance extends \Codeception\Module
      */
     public function checkSelectGroupOptions(string $group, array $options)
     {
-        /** @var WebDriver $wd */
-        $wd = $this->getModule('WebDriver');
+        $wd = $this->getWebDriverModule();
 
         // Get ID of all available options
         /** @var WebDriverElement[] $elements */
@@ -133,6 +129,25 @@ class Acceptance extends \Codeception\Module
                 $this->uncheckOption('#'.$optionId);
             }
         }
+    }
+
+
+    /**
+     * Fill a date field, and waits for the strottime thing it has to finish
+     * processing (and re-enable the element).
+     *
+     * @param string|array $field   A field locator
+     * @param string       $value   The value to enter
+     * @throws \Codeception\Exception\ModuleException
+     */
+    public function fillDateField($field, $value): void
+    {
+        $wd = $this->getWebDriverModule();
+        $wd->fillField($field, $value);
+
+        // WebDriver::findField isn't public, and waitForElement can't find by field name.
+        // Just wait for AJAX to do stuff.
+        $this->waitForAjaxDone(5);
     }
 
 
@@ -163,5 +178,31 @@ class Acceptance extends \Codeception\Module
         // wait for something to come up
 
         // select the first thing
+    }
+
+
+    /**
+     * Wait for all AJAX requests to complete.
+     *
+     * Relies on `jQuery.active` being set.
+     *
+     * @param int $timeout
+     * @throws \Codeception\Exception\ModuleException
+     */
+    public function waitForAjaxDone($timeout = 30): void
+    {
+        $this->getWebDriverModule()->waitForJS("return jQuery.active === 0;", $timeout);
+    }
+
+
+    /**
+     * Return webdriver module in a type-safe manner.
+     *
+     * @return WebDriver
+     * @throws \Codeception\Exception\ModuleException
+     */
+    private function getWebDriverModule(): WebDriver
+    {
+        return $this->getModule('WebDriver');
     }
 }

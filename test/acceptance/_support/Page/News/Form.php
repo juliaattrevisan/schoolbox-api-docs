@@ -182,7 +182,7 @@ class Form
     {
         // Type in database format, let strtotime do the work
         // This is because Codeception has no access to the DB config
-        $this->tester->fillField('item_datetime_published', $publishDate->getDatabase());
+        $this->tester->fillDateField('item_datetime_published', $publishDate->getDatabase());
         return $this;
     }
 
@@ -192,7 +192,7 @@ class Form
      */
     public function setExpiryDate(Alaress_Date_Format $expiryDate): self
     {
-        $this->tester->fillField('item_datetime_expires', $expiryDate->getDatabase());
+        $this->tester->fillDateField('item_datetime_expires', $expiryDate->getDatabase());
         return $this;
     }
 }
