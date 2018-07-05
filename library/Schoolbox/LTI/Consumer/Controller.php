@@ -12,6 +12,7 @@
 namespace Schoolbox\LTI\Consumer;
 
 use Alaress\Web\Controller\Base;
+use Aura\Router\Exception\RouteNotFound as AuraRouteNotFound;
 use Component_Config;
 use Component_ConfigDefinitionMapper;
 use Component_ConfigMapper;
@@ -31,6 +32,9 @@ class Controller extends Base
 
 	/** @var Component_ConfigMapper $componentConfigMapper */
 	private $componentConfigMapper;
+
+	/** @var ConfigMapper $configMapper */
+	private $configMapper;
 
 	/**
 	 * Allowed LTI return types
@@ -61,6 +65,7 @@ class Controller extends Base
 	{
 		$this->componentConfigMapper           = Component_ConfigMapper::getInstance();
 		$this->componentConfigDefinitionMapper = Component_ConfigDefinitionMapper::getInstance();
+		$this->configMapper                    = ConfigMapper::getInstance();
 	}
 
 	/**
@@ -68,6 +73,8 @@ class Controller extends Base
 	 *
 	 * @param Provider                     $provider
 	 * @param Component_ControllerAbstract $component
+	 *
+	 * @throws MapperException
 	 */
 	public function postComponentProvider($provider, $component)
 	{
@@ -96,12 +103,11 @@ class Controller extends Base
 	 * @param Provider                     $provider
 	 * @param Component_ControllerAbstract $component
 	 * @param Folder                       $folder
+	 *
+	 * @throws AuraRouteNotFound
 	 */
 	public function getLaunch($provider, $component, $folder)
 	{
-		/** @var ConfigMapper $configMapper */
-		$configMapper = $this->getDi()->get('config');
-
 		// Retrieve current logged in user
 
 		$user = $this->getUser();
@@ -159,14 +165,14 @@ class Controller extends Base
 			'launch_presentation_return_url'         => "{$baseUrl}homepage/{$folder->getId()}",
 			'ext_content_return_types'               => $returnTypes,
 			'ext_content_return_url'                 => $extContentReturnUrl,
-			'tool_consumer_instance_guid'            => $configMapper->get('site_location'),
-			'tool_consumer_instance_name'            => $configMapper->get('school_name'),
+			'tool_consumer_instance_guid'            => $this->configMapper->get('site_location'),
+			'tool_consumer_instance_name'            => $this->configMapper->get('school_name'),
 			'tool_consumer_instance_description'     => 'Schoolbox LMS',
 			'tool_consumer_instance_url'             => $baseUrl,
-			'tool_consumer_instance_contact_email'   => $configMapper->get('mail_from_address'),
+			'tool_consumer_instance_contact_email'   => $this->configMapper->get('mail_from_address'),
 			'tool_consumer_info_product_family_code' => 'schoolbox',
-			'tool_consumer_info_version'             => $configMapper->get('site_version'),
-			'ext_lms'                                => 'schoolbox-' . $configMapper->get('site_version'),
+			'tool_consumer_info_version'             => $this->configMapper->get('site_version'),
+			'ext_lms'                                => 'schoolbox-' . $this->configMapper->get('site_version'),
 		];
 
 		// Learning Field custom URL mangling
@@ -223,12 +229,11 @@ class Controller extends Base
 	 * Handle callback from an LTI provider
 	 *
 	 * @param Component_ControllerAbstract $component
+	 *
+	 * @throws MapperException
 	 */
 	public function getComponentCallback($component)
 	{
-		/** @var ConfigMapper $configMapper */
-		$configMapper = $this->getDi()->get('config');
-
 		$get = $this->getRequest()->query;
 
 		$return_type = $get['return_type'];
@@ -304,7 +309,7 @@ class Controller extends Base
 				'componentTitle' => $title,
 				'url'            => $url,
 				'height'         => $height,
-				'version'        => $configMapper->get('site_version'),
+				'version'        => $this->configMapper->get('site_version'),
 			],
 		]);
 
@@ -352,6 +357,8 @@ class Controller extends Base
 	 * @param Component_ControllerAbstract $component
 	 * @param string                       $key
 	 * @param mixed                        $value
+	 *
+	 * @throws MapperException
 	 */
 	private function updateComponentValue($component, $key, $value)
 	{
