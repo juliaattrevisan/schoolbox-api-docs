@@ -451,7 +451,7 @@ class Controller extends Base
     /**
      * Get a list of articles that were audienced to me
      *
-     * TODO: Incompleted
+     * TODO: Incomplete
      *
      * @param int $topicId
      * @param int $limit
@@ -461,11 +461,19 @@ class Controller extends Base
     {
         if ($this->getRequest()->isXhr()) {
 
+            /* Component config can set "All" as its limit
+             */
+            $options = [];
+
+            if ($limit) {
+                $options = [
+                    'limit' => $limit
+                ];
+            }
+
             /* TODO: Find articles that were audienced to me
              */
-            $articles = $this->newsMapper->findAll([
-                'limit' => $limit
-            ]);
+            $articles = $this->newsMapper->findAll($options);
 
             /* Figure out which ones were saved for later
              */
