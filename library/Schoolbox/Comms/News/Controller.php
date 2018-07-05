@@ -478,11 +478,14 @@ class Controller extends Base
                 $pb = new Builder($this->newsMapper->getDatabase(), 'comms_news_saveforlater');
                 $pb->equals('user_id', $this->getUser()->getId());
 
-                $savedArticleIds = SaveForLater\Mapper::getInstance()->findScalarByPredicates('article_id', $pb);
+                $ids = SaveForLater\Mapper::getInstance()->findScalarByPredicates('article_id', $pb);
+
+                $savedArticleIds = array_fill_keys($ids, SaveForLater\Mapper::SAVED);
             }
 
             $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@commsNewsDashboard/list.twig', [
                 'articles' => $articles,
+                'unsaved' => SaveForLater\Mapper::UNSAVED,
                 'savedArticleIds' => $savedArticleIds
             ]));
         }

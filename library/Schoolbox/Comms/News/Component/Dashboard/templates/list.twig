@@ -24,7 +24,13 @@
                 </div>
             </div>
             <nav>
-                <a data-saveforlater="{% if article.id in savedArticleIds %}1{% else %}0{% endif %}" href="{{ routeLookup('commsNewsSaveForLater.postToggle', {articleId: article.id}) }}"></a>
+                {% if article.id in savedArticleIds|keys %}
+                    {% set state = savedArticleIds[article.id] %}
+                {% else %}
+                    {% set state = unsaved %}
+                {% endif %}
+
+                <a data-saveforlater="{{ state }}" href="{{ routeLookup('commsNewsSaveForLater.postToggle', {articleId: article.id}) }}"></a>
             </nav>
         </li>
     {% endfor %}

@@ -14,6 +14,11 @@ use Schoolbox\UserMapper;
 
 class Mapper extends \Schoolbox\Mapper
 {
+    /**
+     * Representations of when an article is in your Saved For Later list
+     */
+    public const SAVED = 1;
+    public const UNSAVED = 0;
 
     /**
      * @inheritdoc
