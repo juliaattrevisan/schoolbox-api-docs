@@ -196,7 +196,7 @@ class Controller extends Base
 
             $this->getResponse()->content->set($this->buildJsonOutput([
                 'success' => true,
-                'nextUrl' => $this->getRouter()->generate('commsNewsSaveForLater.postRemove', ['newsId' => $news->getId()])
+                'nextUrl' => $this->getRouter()->generate('commsNewsSaveForLater.postRemove', ['articleId' => $article->getId()])
             ]));
         }
     }
