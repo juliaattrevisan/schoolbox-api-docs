@@ -199,6 +199,10 @@ class UserResolver
                 return $this->db->executeQuery("SELECT u.id FROM user u WHERE u.year {$predicate} AND u.deleted_at IS NULL", $parameters)
                                 ->fetchAll(PDO::FETCH_COLUMN);
             case Model::ENTITY_TYPE_SERVICE:
+                if (null === $entityValue) {
+                    return $this->db->executeQuery("SELECT u.id FROM user u LEFT JOIN userAccess ua ON u.id = ua.uid WHERE ua.uid {$predicate} AND u.deleted_at IS NULL", $parameters)
+                                    ->fetchAll(PDO::FETCH_COLUMN);
+                }
                 [$service, $sid, $type] = \explode('.', $entityValue);
                 $whereClauses = [];
                 $parameters   = [];
