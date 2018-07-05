@@ -8,6 +8,8 @@ declare(strict_types=1);
 
 namespace Alaress\Specification;
 
+use UnexpectedValueException;
+
 abstract class ValueBoundSpecification extends Leaf
 {
 
@@ -25,19 +27,35 @@ abstract class ValueBoundSpecification extends Leaf
     public function __construct(string $property, $value)
     {
         $this->property = $property;
-        $this->value = $value;
+        $this->value    = $value;
     }
 
 
     /**
-     * @param $candidate
+     * @param object $candidate
      * @return mixed
+     * @throws UnexpectedValueException If property is not defined on $candidate
      */
     protected function getPropertyValue($candidate)
     {
-        $getMethod = 'get' . \ucfirst($this->property);
-        return $candidate->{$getMethod}();
+        // We need to distinguish between NULL and undefined
+        if (true !== \property_exists($candidate, $this->property)) {
+            $class = \get_class($candidate);
+            throw new UnexpectedValueException("Property '{$this->property}' is not defined on object of class '$class'");
+        }
+
+        // copy to local var, because $this will refer to $candidate object inside closure
+        $property = $this->property;
+
+        // closure that returns the property value
+        $get = function () use ($property) {
+            return $this->{$property};
+        };
+
+        // call the closure on the object.
+        return $get->call($candidate);
     }
+
 
     /**
      * @return mixed

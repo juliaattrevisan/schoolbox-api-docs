@@ -8,6 +8,8 @@ declare(strict_types=1);
 
 namespace Alaress\Specification;
 
+use UnexpectedValueException;
+
 class MoreThan extends ValueBoundSpecification
 {
 
@@ -16,6 +18,10 @@ class MoreThan extends ValueBoundSpecification
      */
     public function isSatisfiedBy($candidate): bool
     {
-        return $this->getValue() > $this->getPropertyValue($candidate);
+        try {
+            return $this->getValue() > $this->getPropertyValue($candidate);
+        } catch (UnexpectedValueException $e) {
+            return false;
+        }
     }
 }
