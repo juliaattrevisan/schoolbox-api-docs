@@ -8,102 +8,160 @@
  #}
 
 <script>
-    $(function() {
+    (function() {
 
-        {# Title indicates the next state, because this is a toggle #}
-        var states = {
-            saved: {
-                url: "{{ routeLookup('commsNewsSaveForLater.postRemove', {newsId: news.id}) }}",
-                toast: {
-                    processing: 'Saving...',
-                    complete: 'Saved'
-                },
-                value: 1,
-                icon: 'icon-favourite',
-                title: 'Unsave article'
-            },
-            unsaved: {
-                url: "{{ routeLookup('commsNewsSaveForLater.postActivate', {newsId: news.id}) }}",
-                toast: {
-                    processing: 'Unsaving...',
-                    complete: 'Unsaved'
-                },
-                value: 0,
-                icon: 'icon-favourite-hollow',
-                title: 'Save article'
+        /**
+         * Plugin
+         *
+         * @param options
+         */
+        $.fn.saveForLater = function(options) {
+            options = options || {};
+
+            var config = init(options, $(this));
+
+            initSaveForLater();
+            initSaveForLaterActions();
+
+            /**
+             * Init
+             *
+             * @param options
+             * @param element
+             * @returns {*}
+             */
+            function init(options, element) {
+                var defaults = {
+
+                    /* The container which has stars in it
+                     * Title is the description of the next state which will be entered because this is a toggle
+                     */
+                    element: element,
+
+                    /* The current value representing the current save-for-later state
+                     * Used to determine initial conditions
+                     */
+                    currentValue: 0,
+
+                    /* Transitions
+                     */
+                    savedUrl: '/',
+                    saved: {
+                        toast: {
+                            processing: 'Saving...',
+                            complete: 'Saved'
+                        },
+                        value: 1,
+                        icon: 'icon-favourite',
+                        title: 'Unsave article'
+                    },
+                    unsavedUrl: '/',
+                    unsaved: {
+                        url: '/',
+                        toast: {
+                            processing: 'Unsaving...',
+                            complete: 'Unsaved'
+                        },
+                        value: 0,
+                        icon: 'icon-favourite-hollow',
+                        title: 'Save article'
+                    }
+                };
+
+                return $.extend(defaults, options);
             }
-        };
 
-        function init(currentValue) {
-            var currentState;
+            /**
+             * Set up initial state of the button that activates Save For Later
+             */
+            function initSaveForLater() {
+                var currentState;
 
-            if (parseInt(currentValue)) {
-                currentState = states.saved;
+                /* Because of jquery drudgery trying to merge objects and getting them overwritten instead
+                 * keep these vars separated for now
+                 */
+                var currentStateUrl;
+
+                if (config.currentValue) {
+                    currentState = config.saved;
+                    currentStateUrl = config.savedUrl;
+                }
+                else {
+                    currentState = config.unsaved;
+                    currentStateUrl = config.unsavedUrl;
+                }
+
+                $(config.element).find('a[data-saveforlater]')
+                    .attr('href', currentStateUrl)
+                    .attr('title', currentState.title)
+                    .addClass(currentState.icon)
+                    .attr('data-saveforlater', currentState.value)
             }
-            else {
-                currentState = states.unsaved;
-            }
 
-            $('#saveforlater a')
-                .attr('href', currentState.url)
-                .attr('title', currentState.title)
-                .addClass(currentState.icon)
-                .attr('data-saveforlater', currentState.value)
+            /**
+             * Set up event listeners
+             */
+            function initSaveForLaterActions() {
+                $(config.element).on('click', 'a[data-saveforlater]', function(event) {
+                    event.preventDefault();
+
+                    var $element = $(this);
+                    var $toast = $('#toast');
+
+                    /* The state of everything after the action takes place
+                     * Save it, if it's currently unsaved
+                     * Unsave it, if it's currently saved
+                     */
+                    var newState;
+
+                    if ($element.attr('data-saveforlater') === '1') {
+                        newState = config.unsaved;
+                    } else {
+                        newState = config.saved;
+                    }
+
+                    $toast.toastActivate({
+                        text: newState.toast.processing
+                    });
+
+                    $.ajax({
+                        type: 'POST',
+                        url: $element.attr('href'),
+                        dataType: 'json'
+                    }).success(function () {
+                        $toast.toastTimeout({
+                            text: newState.toast.complete,
+                            css: 'success'
+                        });
+
+                        // Update data attribute
+                        $element.attr('data-saveforlater', newState.value);
+
+                        // Update icon by removing all classes and adding the new one
+                        $element.removeClass().addClass(newState.icon);
+
+                        // Update title
+                        $element.attr('title', newState.title);
+
+                    }).error(function (response) {
+                        var temp = $.parseJSON(response.responseText);
+
+                        $toast.toastTimeout({
+                            text: 'Error: ' + temp.message,
+                            css: 'alert'
+                        });
+                    });
+
+                });
+            }
         }
+    }(jQuery));
 
-        init({{ state }});
-
-
-        $('#saveforlater').on('click', 'a[data-saveforlater]', function(event) {
-            event.preventDefault();
-
-            var $element = $(this);
-            var $toast = $('#toast');
-
-            {# The state of everything after the action takes place
-             # Save it, if it's currently unsaved
-             # Unsave it, if it's currently saved
-             #}
-            var newState;
-
-            if ($element.attr('data-saveforlater') === '1') {
-                newState = states.unsaved;
-            } else {
-                newState = states.saved;
-            }
-
-            $toast.toastActivate({
-                text: newState.toast.processing
-            });
-
-            $.ajax({
-                type: 'POST',
-                url: $element.attr('href'),
-                dataType: 'json'
-            }).success(function () {
-                $toast.toastTimeout({
-                    text: newState.toast.complete,
-                    css: 'success'
-                });
-
-                // Update data attribute
-                $element.attr('data-saveforlater', newState.value);
-
-                // Update icon by removing all classes and adding the new one
-                $element.removeClass().addClass(newState.icon);
-
-                // Update title
-                $element.attr('title', newState.title);
-
-            }).error(function (response) {
-                var temp = $.parseJSON(response.responseText);
-
-                $toast.toastTimeout({
-                    text: 'Error: ' + temp.message,
-                    css: 'alert'
-                });
-            });
-
+    $(function() {
+        $('#saveforlater').saveForLater({
+            currentValue: parseInt({{ state }}),
+            savedUrl: "{{ routeLookup('commsNewsSaveForLater.postRemove', {newsId: news.id}) }}",
+            unsavedUrl: "{{ routeLookup('commsNewsSaveForLater.postActivate', {newsId: news.id}) }}"
         });
     });
 </script>
