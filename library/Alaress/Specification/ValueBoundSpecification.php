@@ -14,20 +14,20 @@ abstract class ValueBoundSpecification extends Leaf
 {
 
     /** @var mixed */
-    private $value;
+    private $expectedValue;
 
     /** @var string */
-    private $property;
+    private $propertyName;
 
 
     /**
-     * @param string $property
-     * @param        $value
+     * @param string $propertyName
+     * @param mixed  $expectedValue
      */
-    public function __construct(string $property, $value)
+    public function __construct(string $propertyName, $expectedValue)
     {
-        $this->property = $property;
-        $this->value    = $value;
+        $this->propertyName  = $propertyName;
+        $this->expectedValue = $expectedValue;
     }
 
 
@@ -36,16 +36,16 @@ abstract class ValueBoundSpecification extends Leaf
      * @return mixed
      * @throws UnexpectedValueException If property is not defined on $candidate
      */
-    protected function getPropertyValue($candidate)
+    protected function getActualValue($candidate)
     {
         // We need to distinguish between NULL and undefined
-        if (true !== \property_exists($candidate, $this->property)) {
+        if (true !== \property_exists($candidate, $this->propertyName)) {
             $class = \get_class($candidate);
-            throw new UnexpectedValueException("Property '{$this->property}' is not defined on object of class '$class'");
+            throw new UnexpectedValueException("Property '{$this->propertyName}' is not defined on object of class '$class'");
         }
 
         // copy to local var, because $this will refer to $candidate object inside closure
-        $property = $this->property;
+        $property = $this->propertyName;
 
         // closure that returns the property value
         $get = function () use ($property) {
@@ -60,8 +60,8 @@ abstract class ValueBoundSpecification extends Leaf
     /**
      * @return mixed
      */
-    protected function getValue()
+    protected function getExpectedValue()
     {
-        return $this->value;
+        return $this->expectedValue;
     }
 }

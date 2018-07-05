@@ -19,7 +19,7 @@ class Equals extends ValueBoundSpecification
     public function isSatisfiedBy($candidate): bool
     {
         try {
-            return $this->getValue() === $this->getPropertyValue($candidate);
+            return $this->getExpectedValue() === $this->getActualValue($candidate);
         } catch (UnexpectedValueException $e) {
             return false;
         }

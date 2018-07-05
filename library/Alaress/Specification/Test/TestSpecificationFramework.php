@@ -149,28 +149,28 @@ class TestSpecificationFramework extends TestCase
 
     /**
      * @param User   $candidate
-     * @param mixed  $value
-     * @param string $property
+     * @param mixed  $expectedValue
+     * @param string $propertyName
      * @dataProvider provider_equalsValid
      * @throws \PHPUnit\Framework\AssertionFailedError
      */
-    public function test_equalsValid(User $candidate, $property, $value): void
+    public function test_equalsValid(User $candidate, $propertyName, $expectedValue): void
     {
-        $spec = new Equals($property, $value);
+        $spec = new Equals($propertyName, $expectedValue);
         $this->assertTrue($spec->isSatisfiedBy($candidate));
     }
 
 
     /**
      * @param User   $candidate
-     * @param mixed  $value
-     * @param string $property
+     * @param mixed  $expectedValue
+     * @param string $propertyName
      * @dataProvider provider_equalsInvalid
      * @throws \PHPUnit\Framework\AssertionFailedError
      */
-    public function test_equalsInvalid(User $candidate, $property, $value): void
+    public function test_equalsInvalid(User $candidate, $propertyName, $expectedValue): void
     {
-        $spec = new Equals($property, $value);
+        $spec = new Equals($propertyName, $expectedValue);
         $this->assertFalse($spec->isSatisfiedBy($candidate));
     }
 
