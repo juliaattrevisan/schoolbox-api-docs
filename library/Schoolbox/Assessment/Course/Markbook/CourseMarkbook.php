@@ -145,7 +145,9 @@ class CourseMarkbook
      *
      * assessmentId will be for spec if imported from spec, for impl otherwise
      *
-     * No 'draft' mark included if their is no pending draft
+     * No 'draft' mark included if there is no pending draft.
+     *
+     * Note that it's quite possible for a pending draft to have the same value as the published mark.
      *
      * @var float[][][][][]
      */
