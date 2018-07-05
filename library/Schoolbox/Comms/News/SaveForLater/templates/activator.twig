@@ -40,7 +40,6 @@
 
                     /* Transitions
                      */
-                    savedUrl: '/',
                     saved: {
                         toast: {
                             processing: 'Saving...',
@@ -50,7 +49,6 @@
                         icon: 'icon-favourite',
                         title: 'Unsave article'
                     },
-                    unsavedUrl: '/',
                     unsaved: {
                         url: '/',
                         toast: {
@@ -154,14 +152,10 @@
     }(jQuery));
 
     $(function() {
-        $('[data-saveforlater-container]').saveForLater({
-            savedUrl: "{{ routeLookup('commsNewsSaveForLater.postRemove', {newsId: news.id}) }}",
-            unsavedUrl: "{{ routeLookup('commsNewsSaveForLater.postActivate', {newsId: news.id}) }}"
-        });
+        $('[data-saveforlater-container]').saveForLater();
     });
 </script>
 
 <span data-saveforlater-container>
     <a data-saveforlater="{{ state }}" data-save-url="{{ routeLookup('commsNewsSaveForLater.postActivate', {newsId: news.id}) }}" data-unsave-url="{{ routeLookup('commsNewsSaveForLater.postRemove', {newsId: news.id}) }}"></a>
-    <a data-saveforlater="0" data-save-url="{{ routeLookup('commsNewsSaveForLater.postActivate', {newsId: 2}) }}" data-unsave-url="{{ routeLookup('commsNewsSaveForLater.postRemove', {newsId: 2}) }}"></a>
 </span>
