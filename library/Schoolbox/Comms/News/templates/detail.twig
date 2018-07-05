@@ -52,10 +52,19 @@
     <nav>
         {# Save For Later #}
         {% if policies['save_for_later'].value %}
-            {% include '@commsNewsSaveForLater/activator.twig' with {
-                news: news,
-                state: isSavedForLater
-            } %}
+            <script src="/javascript/shared/comms/saveforlater.js"></script>
+            <script>
+                $(function() {
+                    $('[data-saveforlater-container]').saveForLater();
+                });
+            </script>
+
+            <span data-saveforlater-container>
+                {% include '@commsNewsSaveForLater/activator.twig' with {
+                    news: news,
+                    state: isSavedForLater
+                } %}
+            </span>
         {% endif %}
 
         <a class="icon-more" title="Actions" data-dropdown="header-options"></a>

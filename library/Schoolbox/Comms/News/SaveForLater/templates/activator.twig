@@ -6,13 +6,4 @@
  # @param Model news
  # @param string state
  #}
-<script src="/javascript/shared/comms/saveforlater.js"></script>
-<script>
-    $(function() {
-        $('[data-saveforlater-container]').saveForLater();
-    });
-</script>
-
-<span data-saveforlater-container>
-    <a data-saveforlater="{{ state }}" data-save-url="{{ routeLookup('commsNewsSaveForLater.postActivate', {newsId: news.id}) }}" data-unsave-url="{{ routeLookup('commsNewsSaveForLater.postRemove', {newsId: news.id}) }}"></a>
-</span>
+<a data-saveforlater="{{ state }}" data-save-url="{{ routeLookup('commsNewsSaveForLater.postActivate', {newsId: news.id}) }}" data-unsave-url="{{ routeLookup('commsNewsSaveForLater.postRemove', {newsId: news.id}) }}"></a>
