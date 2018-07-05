@@ -21,12 +21,12 @@
         {% else %}
             <div class="empty-state">
                 <i class="icon-news"></i>
-                <p>{{ locale.news.proper }} Topics haven't been created.</p>
+                <p>{{ locale.news.proper }} topics haven't been created.</p>
 
                 {% set topicRoute = routeLookupIfAuthorized('adminLists.getIndex', {table: 'news-topic'}) %}
 
                 {% if topicRoute %}
-                <p><a href="{{ topicRoute }}" title="Define {{ locale.news.proper }} Topics">Define {{ locale.news.proper }} Topics</a> so that content creators can categorise their articles.</p>
+                <p><a href="{{ topicRoute }}" title="Define {{ locale.news }} topics">Define {{ locale.news }} topics</a> so that content creators can categorise their articles.</p>
                 {% endif %}
             </div>
         {% endif %}

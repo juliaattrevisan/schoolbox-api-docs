@@ -129,7 +129,7 @@
         {# TODO: maybs delete once there's actual ways to get to these places #}
 
         {# Create new article #}
-        <li><a class="icon-add" href="{{ routeLookupIfAuthorized('commsNews.getCreate') }}" >Create new article</a></li>
+        <li><a class="icon-add" href="{{ routeLookupIfAuthorized('commsNews.getCreate') }}" >Create {{ locale.news }}</a></li>
 
         {# Go to the moderation list #}
         {% if moderationRequired %}
