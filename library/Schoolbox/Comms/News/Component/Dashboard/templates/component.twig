@@ -5,16 +5,23 @@
     $(function() {
         var container = $('#news-container-{{ componentInstanceId }}');
 
+        /**
+         * Get articles via url specified
+         */
+        function getArticles(url) {
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'html'
+            }).success(function (response) {
+                container.html(response).saveForLater();
+            }).error(function (response) {
+            });
+        }
+
         /* Initial conditions
          */
-        $.ajax({
-            type: 'GET',
-            url: "{{ routeLookup('commsNews.getListByTopic', {topicId: firstTopic, limit: limit}) }}",
-            dataType: 'html'
-        }).success(function (response) {
-            container.html(response).saveForLater();
-        }).error(function (response) {
-        });
+        getArticles("{{ routeLookup('commsNews.getListByTopic', {topicId: firstTopic, limit: limit}) }}");
 
         {# Retrieve a new set of articles based on topic #}
         $('#news-topics-{{ componentInstanceId }}').on('click', 'a', function(event) {
@@ -22,14 +29,7 @@
 
             container.html('<div class="loader"></div>');
 
-            $.ajax({
-                type: 'GET',
-                url: $(this).attr('href'),
-                dataType: 'html'
-            }).success(function (response) {
-                container.html(response).saveForLater();
-            }).error(function (response) {
-            });
+            getArticles($(this).attr('href'));
         });
     });
 </script>
