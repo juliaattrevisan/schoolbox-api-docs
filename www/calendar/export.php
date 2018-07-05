@@ -31,10 +31,22 @@ use Schoolbox\UserMapper;
  *
  * @param string $className
  * @return Calendar_Api_Config_Record
- * @throws UnexpectedValueException If connector is not configured or not configured as active
+ * @throws InvalidArgumentException If `$className` isn't a `Calendar_Api_EventType_Interface`
+ * @throws UnexpectedValueException If connector is not configured
  */
 function getConnector(string $className)
 {
+    // Must actually be a calendar class we're requesting
+    if (!is_a($className, Calendar_Api_EventType_Interface::class, true)) {
+        throw new InvalidArgumentException(
+            sprintf(
+                'Calendar connector class does not exist, or is not a %s: %s',
+                Calendar_Api_EventType_Interface::class,
+                $className
+            )
+        );
+    }
+
     try {
         $connectorConfig = Calendar_Api_Config_Mapper::getInstance()->findOneForClass($className);
     } catch (\Schoolbox\Mapper\Exception $e) {
@@ -70,7 +82,10 @@ function buildApiClass(string $class, array $params, bool $enabled, ?Raven_Clien
     try {
         $configuration = getConnector($class);
     } catch (UnexpectedValueException $e) {
-        // Config missing: this is not fine, log to Sentry. Response code: 500
+        // Config missing: this is fine. Response code: 404?
+        return new Calendar_Api_Composite();
+    } catch (InvalidArgumentException $e) {
+        // Invalid class: this is not fine, log to Sentry. Response code: 500
         if ($sentry) {
             $sentry->captureException($e);
         }
