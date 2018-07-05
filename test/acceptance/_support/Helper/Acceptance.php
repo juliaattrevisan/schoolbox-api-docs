@@ -7,6 +7,7 @@ namespace Helper;
 use Codeception\Module\WebDriver;
 use Codeception\Util\Locator;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
+use Facebook\WebDriver\Remote\RemoteWebElement;
 use Facebook\WebDriver\WebDriverBy;
 use Facebook\WebDriver\WebDriverElement;
 
@@ -204,7 +205,11 @@ class Acceptance extends \Codeception\Module
     {
         $wd = $this->getWebDriverModule();
 
-        // Use Selectize API?
+        // Find all elements in the selectize; click remove button
+        foreach ($wd->_findElements($this->getSelectizeItemsSelector($field)) as $item) {
+            /** @var RemoteWebElement $item */
+            $item->findElement(WebDriverBy::className('remove'))->click();
+        }
     }
 
 
@@ -219,6 +224,12 @@ class Acceptance extends \Codeception\Module
         $wd = $this->getWebDriverModule();
 
         // Find all elements in the selectize; click remove button for those who match
+        foreach ($wd->_findElements($this->getSelectizeItemsSelector($field)) as $item) {
+            /** @var RemoteWebElement $item */
+            if (strpos($item->getText(), $selectizeSearch) !== false) {
+                $item->findElement(WebDriverBy::className('remove'))->click();
+            }
+        }
     }
 
 
@@ -231,10 +242,9 @@ class Acceptance extends \Codeception\Module
      */
     public function selectSelectizeOption(string $field, string $selectizeSearch)
     {
-//        $xpath = sprintf('//*[@name="%s"]/..//div[contains(@class, "selectize-input")]/input', addslashes($field));
         $wd = $this->getWebDriverModule();
 
-//        $wd->pressKey(['xpath' => $xpath], \Facebook\WebDriver\WebDriverKeys::BACKSPACE);
+        // Fill the selectize, wait for its result, select the first
         $wd->fillField($this->getSelectizeInputSelector($field), $selectizeSearch);
         $wd->waitForElement(['css' => '.selectize-dropdown-content .option.active']);
         $wd->click(['css' => '.selectize-dropdown-content .option.active']);

@@ -170,7 +170,7 @@ class Form
      */
     public function setUsers(array $users): self
     {
-        // TODO Clear all selectized, then search for selectized users
+        $this->tester->clearSelectize('userList[]');
         foreach ($users as $user) {
             $this->tester->selectSelectizeOption('userList[]', $user);
         }
