@@ -38,6 +38,13 @@ class Module extends BaseModule
      */
     protected function registerRoutes()
     {
+        /* For viewing articles you just need to be logged in and controller,
+         * I suppose, deals with whether you are in the audience
+         */
+        $viewPerms = new Rule\All(
+            new Rule\IsLoggedIn()
+        );
+
         /* Any staff can see the form
          */
         $getPerms = new Rule\All(
@@ -83,6 +90,10 @@ class Module extends BaseModule
         /* Get a list of topics to chooze
          */
         $this->register('GET', '/topics', 'getTopics', $getPerms);
+
+        /* Get a list of articles audienced to me, by topic
+         */
+        $this->register('GET', '/list/{topicId:\d+}', 'getListByTopic', $viewPerms);
     }
 
 

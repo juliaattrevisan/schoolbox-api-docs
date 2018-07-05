@@ -445,4 +445,24 @@ class Controller extends Base
             throw $e;
         }
     }
+
+
+    /**
+     * Get a list of articles that were audienced to me
+     *
+     * TODO: Incompleted
+     *
+     * @param int $topicId
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     */
+    public function getListByTopic(int $topicId)
+    {
+        if ($this->getRequest()->isXhr()) {
+            $articles = $this->newsMapper->findAll();
+
+            $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@commsNewsDashboard/list.twig', [
+                'articles' => $articles
+            ]));
+        }
+    }
 }

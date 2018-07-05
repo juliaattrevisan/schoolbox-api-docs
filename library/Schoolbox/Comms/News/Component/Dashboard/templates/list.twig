@@ -1,0 +1,28 @@
+<ul class="information-list">
+    {% for article in articles %}
+        <li>
+            <div class="list-item">
+                <div class="small-12 card">
+                    <a href="{{ routeLookup('commsNews.getDetail', {articleId: article.id}) }}">
+                        {% if article.featureImage.hash %}
+                        <img src="/storage/image.php?hash={{ article.featureImage.hash }}&size=square64">
+                        {% endif %}
+
+                        <h3>{{ article.title }}</h3>
+                    </a>
+
+                    <p class="meta">Published by {{ article.author.fullname }} on {{ article.publishAt.local }}</p>
+
+                    {# TODO: Have a /news/topic url lol #}
+                    {% if article.topics|length %}
+                        <p class="meta">Related topics:
+                            {% for topic in article.topics %}
+                                <a href="/news/topic/{{ topic.slug }}">{{ topic.name }}</a>{% if not loop.last %}, {% endif %}
+                            {% endfor %}
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+        </li>
+    {% endfor %}
+</ul>

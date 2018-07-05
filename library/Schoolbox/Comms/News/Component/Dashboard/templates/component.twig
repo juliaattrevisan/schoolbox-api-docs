@@ -1,6 +1,17 @@
-<div class="row">
-    <div class="small-12 columns">
-        test
-        argh
-    </div>
+<script>
+    $(function() {
+        $.ajax({
+            type: 'GET',
+            url: "{{ routeLookup('commsNews.getListByTopic', {topicId: 1}) }}",
+            dataType: 'html'
+        }).success(function (response) {
+            $('#news-container-{{ componentInstanceId }}').html(response);
+        }).error(function (response) {
+
+        });
+    });
+</script>
+
+<div id="news-container-{{ componentInstanceId }}">
+    <div class="loader"></div>
 </div>

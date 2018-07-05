@@ -8,14 +8,11 @@
  */
 namespace Schoolbox\Comms\News\Component\Dashboard;
 
-use Alaress\Web\Controller\Base;
 use Component_Dashboard_ControllerAbstract;
 use Component_Instance;
-use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Policy;
 use Schoolbox\Comms\News\SaveForLater;
 use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\Mapper\Exception;
 use Schoolbox\User;
 use SitePage;
 
@@ -57,9 +54,9 @@ class Controller extends Component_Dashboard_ControllerAbstract
     /**
      * Get the data to put into the template
      *
-     * @return bool|void
+     * @return bool
      */
-    public function execute()
+    public function execute(): bool
     {
         return true;
     }
@@ -74,29 +71,8 @@ class Controller extends Component_Dashboard_ControllerAbstract
      */
     public function renderTemplate($templateHandle): bool
     {
-        return $this->renderTwigTemplate($templateHandle, '@commsNewsDashboard/component.twig', []);
-    }
-
-    /**
-     * A list of articles that you saved for later
-     *
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \Aura\Di\Exception\ServiceNotFound
-     */
-    public function getList()
-    {
-        $canSaveForLater = true;
-
-
-    }
-
-
-    /**
-     * Asynchronously obtain a list of articles that you can somehow see
-     *
-     * TODO: Audiencing decides whether you can see it
-     */
-    public function getArticlesByTopic()
-    {
+        return $this->renderTwigTemplate($templateHandle, '@commsNewsDashboard/component.twig', [
+            'componentInstanceId' => $this->getInstance()->getId(),
+        ]);
     }
 }
