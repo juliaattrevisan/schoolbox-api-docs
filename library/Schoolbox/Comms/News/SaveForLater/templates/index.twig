@@ -1,0 +1,110 @@
+{##
+ # Saved items
+ #
+ # A list of articles that you've saved for later
+ #}
+
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Saved</h1>
+
+        <ul class="meta">
+            {% if not canSaveForLater %}
+            <li class="icon-info">Saving items has been disabled. You can't add to this list.</li>
+            {% endif %}
+        </ul>
+    </div>
+</div>
+<div class="row">
+    <div class="small-12 island">
+
+        {% if articles|length %}
+            <script>
+                $(function() {
+
+                    $('#saveForLaterList [data-remove]').on('click', function(event) {
+                        event.preventDefault();
+
+                        var element = $(this);
+                        var toast = $('#toast');
+
+                        $(this).confirmDialog({
+                            format: 'html',
+                            text: 'Are you sure you want to remove <em>' + element.attr('data-remove') + '</em>?',
+                            confirmEvent: function() {
+                                toast.toastActivate({
+                                    text: 'Removing...'
+                                });
+
+                                $.ajax({
+                                    type: 'POST',
+                                    url: element.attr('href'),
+                                    dataType: 'json'
+                                }).success(function () {
+                                    toast.toastTimeout({
+                                        text: 'Removed',
+                                        css: 'success'
+                                    });
+
+                                    element.closest('li').remove();
+
+                                    {# If this was the last in the list, respawn Empty State #}
+                                    if (!$('#saveForLaterList li').length) {
+                                        $('#emptyState').show();
+                                    }
+                                }).error(function (response) {
+                                    var temp = $.parseJSON(response.responseText);
+
+                                    toast.toastTimeout({
+                                        text: 'Error: ' + temp.message,
+                                        css: 'alert'
+                                    });
+                                });
+                            }
+                        });
+                    });
+                });
+            </script>
+
+            <section>
+                <ul class="information-list" id="saveForLaterList">
+                    {% for article in articles %}
+                        <li class="actions-small-1">
+                            <div class="list-item">
+                                <div class="small-12 card">
+                                    <h3><a href="{{ routeLookup('commsNews.getDetail', {newsId: article.id}) }}">{{ article.title }}</a></h3>
+                                    <p class="meta">Authored by {{ article.author.fullname }} on {{ article.updatedAt.local }}</p>
+
+                                    {# TODO: Have a /news/topic url lol #}
+                                    {% if article.topics|length %}
+                                        <p class="meta">Related topics:
+                                            {% for topic in article.topics %}
+                                                <a href="/news/topic/{{ topic.slug }}">{{ topic.name }}</a>{% if not loop.last %}, {% endif %}
+                                            {% endfor %}
+                                        </p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <nav>
+                                <a class="icon-close" href="{{ routeLookup('commsNewsSaveForLater.postRemove', {newsId: article.id}) }}" title="Remove this from your saved items" data-remove="{{ article.title }}"></a>
+                            </nav>
+                            <article>{{ article.blurb|purify }}</article>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </section>
+        {% endif %}
+
+        {% if articles|length %}
+            {% set initialEmptyState = 'display:none' %}
+        {% else %}
+            {% set initialEmptyState = '' %}
+        {% endif %}
+        <div class="empty-state" id="emptyState" style="{{ initialEmptyState }}">
+            <i class="icon-news"></i>
+            <p>You don't have any saved articles yet.</p>
+        </div>
+    </div>
+</div>
+
+<div id="toast" class="toast"></div>

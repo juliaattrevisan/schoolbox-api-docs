@@ -1,0 +1,41 @@
+{##
+ # A list of active social features that audiences can use
+ #
+ # @param Collection|Policy\Model[] policies
+ # @param News\Model news
+ #}
+
+{% if news.isAccepted %}
+    {% set socialPolicies = {
+        'save_for_later': {
+            'value': policies['save_for_later'].value,
+            'activator': '@commsNewsSaveForLater/activator.twig'
+        }
+    } %}
+
+    {# Decide whether to show the social features island #}
+    {% set hasSocial = false %}
+
+    {% for socialPolicy, settings in socialPolicies %}
+        {% if settings.value %}
+            {% set hasSocial = true %}
+        {% endif %}
+    {% endfor %}
+
+    {% if hasSocial %}
+        <div class="row">
+            <div class="small-12 island">
+                <section class="content">
+                    {% for socialPolicy, settings in socialPolicies %}
+                        {% if settings.value %}
+                            {% include settings.activator with {
+                                news: news,
+                                state: states[socialPolicy]
+                            } %}
+                        {% endif %}
+                    {% endfor %}
+                </section>
+            </div>
+        </div>
+    {% endif %}
+{% endif %}

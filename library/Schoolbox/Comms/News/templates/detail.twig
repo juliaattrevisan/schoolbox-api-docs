@@ -16,8 +16,7 @@
 {% endif %}
 
 
-
-<div class="actions-small-1 row">
+<div class="actions-small-2 row">
     <div class="list-item">
         <div class="small-12 columns">
             <h1>{{ news.title }}</h1>
@@ -51,6 +50,23 @@
         </div>
     </div>
     <nav>
+        {# Save For Later #}
+        {% if policies['save_for_later'].value %}
+            <script src="/javascript/shared/comms/saveforlater.js"></script>
+            <script>
+                $(function() {
+                    $('#saveforlater-container').saveForLater();
+                });
+            </script>
+
+            <span id="saveforlater-container">
+                {% include '@commsNewsSaveForLater/activator.twig' with {
+                    news: news,
+                    state: isSavedForLater
+                } %}
+            </span>
+        {% endif %}
+
         <a class="icon-more" title="Actions" data-dropdown="header-options"></a>
     </nav>
     <ul id="header-options" class="f-dropdown" data-dropdown-content>
@@ -197,6 +213,16 @@
     </div>
 </div>
 {% endif %}
+
+
+{# Social Features and assorted functionality #}
+{#{% include '@commsNews/social.twig' with {#}
+    {#policies: policies,#}
+    {#news: news,#}
+    {#states: {#}
+        {#'save_for_later': isSavedForLater#}
+    {#}#}
+{#} %}#}
 
 
 <div class="row">
