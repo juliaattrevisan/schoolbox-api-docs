@@ -38,11 +38,6 @@
                      */
                     element: element,
 
-                    /* The current value representing the current save-for-later state
-                     * Used to determine initial conditions
-                     */
-                    currentValue: 0,
-
                     /* Transitions
                      */
                     savedUrl: '/',
@@ -76,26 +71,24 @@
              */
             function initSaveForLater() {
                 var currentState;
-
-                /* Because of jquery drudgery trying to merge objects and getting them overwritten instead
-                 * keep these vars separated for now
-                 */
                 var currentStateUrl;
 
-                if (config.currentValue) {
-                    currentState = config.saved;
-                    currentStateUrl = config.savedUrl;
-                }
-                else {
-                    currentState = config.unsaved;
-                    currentStateUrl = config.unsavedUrl;
-                }
+                $.each($(config.element).find('a[data-saveforlater]'), function(index, element) {
+                    if ($(element).attr('data-saveforlater') === '1') {
+                        currentState = config.saved;
+                        currentStateUrl = $(element).attr('data-unsave-url');
+                    }
+                    else {
+                        currentState = config.unsaved;
+                        currentStateUrl = $(element).attr('data-save-url');
+                    }
 
-                $(config.element).find('a[data-saveforlater]')
-                    .attr('href', currentStateUrl)
-                    .attr('title', currentState.title)
-                    .addClass(currentState.icon)
-                    .attr('data-saveforlater', currentState.value)
+                    $(element)
+                        .attr('href', currentStateUrl)
+                        .attr('title', currentState.title)
+                        .addClass(currentState.icon)
+                        .attr('data-saveforlater', currentState.value)
+                });
             }
 
             /**
@@ -113,11 +106,14 @@
                      * Unsave it, if it's currently saved
                      */
                     var newState;
+                    var newUrl;
 
                     if ($element.attr('data-saveforlater') === '1') {
                         newState = config.unsaved;
+                        newUrl = $element.attr('data-unsave-url');
                     } else {
                         newState = config.saved;
+                        newUrl = $element.attr('data-save-url');
                     }
 
                     $toast.toastActivate({
@@ -126,7 +122,7 @@
 
                     $.ajax({
                         type: 'POST',
-                        url: $element.attr('href'),
+                        url: newUrl,
                         dataType: 'json'
                     }).success(function () {
                         $toast.toastTimeout({
@@ -158,12 +154,14 @@
     }(jQuery));
 
     $(function() {
-        $('#saveforlater').saveForLater({
-            currentValue: parseInt({{ state }}),
+        $('[data-saveforlater-container]').saveForLater({
             savedUrl: "{{ routeLookup('commsNewsSaveForLater.postRemove', {newsId: news.id}) }}",
             unsavedUrl: "{{ routeLookup('commsNewsSaveForLater.postActivate', {newsId: news.id}) }}"
         });
     });
 </script>
 
-<span id="saveforlater"><a data-saveforlater></a></span>
+<span data-saveforlater-container>
+    <a data-saveforlater="{{ state }}" data-save-url="{{ routeLookup('commsNewsSaveForLater.postActivate', {newsId: news.id}) }}" data-unsave-url="{{ routeLookup('commsNewsSaveForLater.postRemove', {newsId: news.id}) }}"></a>
+    <a data-saveforlater="0" data-save-url="{{ routeLookup('commsNewsSaveForLater.postActivate', {newsId: 2}) }}" data-unsave-url="{{ routeLookup('commsNewsSaveForLater.postRemove', {newsId: 2}) }}"></a>
+</span>
