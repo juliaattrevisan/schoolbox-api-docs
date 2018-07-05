@@ -527,69 +527,69 @@ class CourseMarkbook
                         $this->studentMarks[$courseImplId][$aId][$userId]['published']['norm'] = $publishedNormMark;
                         $this->studentMarks[$courseImplId][$aId][$userId]['published']['hr']   = $publishedHrMark;
                     }
-                } else {
+                    continue;
+                }
 
-                    // Quiz/DueWork.
-                    // We need to distinguish when a draft mark is pending, even if the mark is the same.
-                    $authAnyFeedback       = $participant->getAuthoritativeFeedback(false);
-                    $authPublishedFeedback = $participant->getAuthoritativeFeedback(true);
+                // Quiz/DueWork.
+                // We need to distinguish when a draft mark is pending, even if the mark is the same.
+                $authAnyFeedback       = $participant->getAuthoritativeFeedback(false);
+                $authPublishedFeedback = $participant->getAuthoritativeFeedback(true);
 
-                    if ($aImpl instanceof DueWork\Model && $authPublishedFeedback) {
-                        // Store due-work feedback published comments
-                        $this->studentComments[$courseImplId][$userId] = $authPublishedFeedback->getComment();
+                if ($aImpl instanceof DueWork\Model && $authPublishedFeedback) {
+                    // Store due-work feedback published comments
+                    $this->studentComments[$courseImplId][$userId] = $authPublishedFeedback->getComment();
+                }
+
+                $authNormMark      = $authAnyFeedback ? $authAnyFeedback->getNormalisedMark() : null;
+                $publishedNormMark = $authPublishedFeedback ? $authPublishedFeedback->getNormalisedMark() : null;
+
+                // Always store the published mark if one exists for a student
+                if ($authPublishedFeedback && null !== $publishedNormMark) {
+                    // Record that an assessment participant has a published mark
+                    $assessmentPublishedMarks[] = $publishedNormMark;
+
+                    // Record the student's published mark so we can display in a table cell
+                    $this->studentMarks[$courseImplId][$aId][$userId]['published']['norm'] = $publishedNormMark;
+                    $this->studentMarks[$courseImplId][$aId][$userId]['published']['hr']   = $authPublishedFeedback->getHumanReadableMark();
+                }
+
+                // Only store a draft mark if a draft mark is pending for a student (even if it is null)
+                $pendingDraft = $authAnyFeedback && $authAnyFeedback->isDraft();
+                if ($pendingDraft) {
+                    $this->studentMarks[$courseImplId][$aId][$userId]['draft']['norm'] = $authNormMark;
+                    $this->studentMarks[$courseImplId][$aId][$userId]['draft']['hr']   = $authAnyFeedback->getHumanReadableMark();
+                }
+
+                // If student has a mark (whether published or not) add it to the assessment's stats
+                if ($authAnyFeedback && null !== $authNormMark) {
+                    // Record that an assessment participant has a mark
+                    $assessmentAnyMarks[] = $authNormMark;
+                }
+
+
+                // Either draft or published mark
+                if ($authAnyFeedback && null !== $authNormMark) {
+                    // First time we've encountered this row (user + course-import) ?
+                    if (!\is_array($studentAverageMarks[$courseImplId][$userId])) {
+                        $studentAverageMarks[$courseImplId][$userId]['any'] = ['sum' => 0, 'weight' => 0];
                     }
+                    $studentAverageMarks[$courseImplId][$userId]['any']['sum']    += $weight * $authNormMark;
+                    $studentAverageMarks[$courseImplId][$userId]['any']['weight'] += $weight;
 
-                    $authNormMark      = $authAnyFeedback ? $authAnyFeedback->getNormalisedMark() : null;
-                    $publishedNormMark = $authPublishedFeedback ? $authPublishedFeedback->getNormalisedMark() : null;
-
-                    // Always store the published mark if one exists for a student
-                    if ($authPublishedFeedback && null !== $publishedNormMark) {
-                        // Record that an assessment participant has a published mark
-                        $assessmentPublishedMarks[] = $publishedNormMark;
-
-                        // Record the student's published mark so we can display in a table cell
-                        $this->studentMarks[$courseImplId][$aId][$userId]['published']['norm'] = $publishedNormMark;
-                        $this->studentMarks[$courseImplId][$aId][$userId]['published']['hr']   = $authPublishedFeedback->getHumanReadableMark();
+                    if ($authAnyFeedback->isDraft()) {
+                        $assessmentImplMarkContainsDrafts[$aImplId] = true;
+                        $studentMarkContainsDrafts[$userId]         = true;
                     }
+                }
 
-                    // Only store a draft mark if a draft mark is pending for a student (even if it is null)
-                    $pendingDraft = $authAnyFeedback && $authAnyFeedback->isDraft();
-                    if ($pendingDraft) {
-                        $this->studentMarks[$courseImplId][$aId][$userId]['draft']['norm'] = $authNormMark;
-                        $this->studentMarks[$courseImplId][$aId][$userId]['draft']['hr']   = $authAnyFeedback->getHumanReadableMark();
+                // Just published marks
+                if ($authPublishedFeedback && null !== $authPublishedFeedback) {
+                    // First time we've encountered this row (user + course-import) ?
+                    if (!\is_array($studentAverageMarks[$courseImplId][$userId])) {
+                        $studentAverageMarks[$courseImplId][$userId]['published'] = ['sum' => 0, 'weight' => 0];
                     }
-
-                    // If student has a mark (whether published or not) add it to the assessment's stats
-                    if ($authAnyFeedback && null !== $authNormMark) {
-                        // Record that an assessment participant has a mark
-                        $assessmentAnyMarks[] = $authNormMark;
-                    }
-
-
-                    // Either draft or published mark
-                    if ($authAnyFeedback && null !== $authNormMark) {
-                        // First time we've encountered this row (user + course-import) ?
-                        if (!\is_array($studentAverageMarks[$courseImplId][$userId])) {
-                            $studentAverageMarks[$courseImplId][$userId]['any'] = ['sum' => 0, 'weight' => 0];
-                        }
-                        $studentAverageMarks[$courseImplId][$userId]['any']['sum']    += $weight * $authNormMark;
-                        $studentAverageMarks[$courseImplId][$userId]['any']['weight'] += $weight;
-
-                        if ($authAnyFeedback->isDraft()) {
-                            $assessmentImplMarkContainsDrafts[$aImplId] = true;
-                            $studentMarkContainsDrafts[$userId]         = true;
-                        }
-                    }
-
-                    // Just published marks
-                    if ($authPublishedFeedback && null !== $authPublishedFeedback) {
-                        // First time we've encountered this row (user + course-import) ?
-                        if (!\is_array($studentAverageMarks[$courseImplId][$userId])) {
-                            $studentAverageMarks[$courseImplId][$userId]['published'] = ['sum' => 0, 'weight' => 0];
-                        }
-                        $studentAverageMarks[$courseImplId][$userId]['published']['sum']    += $weight * $publishedNormMark;
-                        $studentAverageMarks[$courseImplId][$userId]['published']['weight'] += $weight;
-                    }
+                    $studentAverageMarks[$courseImplId][$userId]['published']['sum']    += $weight * $publishedNormMark;
+                    $studentAverageMarks[$courseImplId][$userId]['published']['weight'] += $weight;
                 }
             }
 
