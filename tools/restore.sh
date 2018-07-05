@@ -64,10 +64,10 @@ error() {
 
 readconf() {
 	# Collect Credentials from $tempconfile
-	tempsqluser=`grep "\"SQL_user" $tempconffile | grep -v "#" | grep -v "\/\/" | cut -d'"' -f4`;
-	tempsqlpasswd=`grep "\"SQL_passwd" $tempconffile | grep -v "#" | grep -v "\/\/" | cut -d'"' -f4`;
-	tempsqlhost=`grep "\"SQL_host" $tempconffile | grep -v "#" | grep -v "\/\/" | cut -d'"' -f4`;
-	tempsqldb=`grep "\"SQL_db" $tempconffile | grep -v "#" | grep -v "\/\/" | cut -d'"' -f4`;
+	tempsqluser=$(schoolbox-conf --conf="$tempconffile" --option=SQL_user);
+	tempsqlpasswd=$(schoolbox-conf --conf="$tempconffile" --option=SQL_passwd);
+	tempsqlhost=$(schoolbox-conf --conf="$tempconffile" --option=SQL_host);
+	tempsqldb=$(schoolbox-conf --conf="$tempconffile" --option=SQL_db);
 }
 
 readsqlver() {
