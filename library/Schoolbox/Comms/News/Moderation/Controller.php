@@ -67,19 +67,19 @@ class Controller extends Base
     public function getList()
     {
         $lists = new Lists($this->newsMapper, $this->userMapper);
-        $newsArticles = new Collection();
+        $articles = new Collection();
 
         try {
             $policy = $this->policyMapper->findOneByColumn('identifier', 'global_moderation');
             $moderationRequired = (bool)$policy->getValue();
 
-            $newsArticles = $lists->getNeedModeration();
+            $articles = $lists->getNeedModeration();
         } catch (MapperException $e) {
             $moderationRequired = false;
         }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsModeration/index.twig', [
-            'newsArticles' => $newsArticles,
+            'articles' => $articles,
             'recentArticles' => $lists->getRecentlyAccepted(),
             'moderationRequired' => $moderationRequired
         ])->setTitle('Moderation List'));
@@ -130,7 +130,7 @@ class Controller extends Base
              */
             if ((new News\ValidUserIsCommsOfficer())->isSatisfiedBy($this->getUser())) {
                 if ((new News\ValidUserIsAuthor())->isSatisfiedBy($this->getUser(), $article)) {
-                    $nextStep = $this->getRouter()->generate('commsNews.getDetail', [ 'newsId' => $article->getId() ]);
+                    $nextStep = $this->getRouter()->generate('commsNews.getDetail', [ 'articleId' => $article->getId() ]);
                 } else {
 
                     /* This represents a moderator submitting for (on behalf of) a content creator
@@ -141,7 +141,7 @@ class Controller extends Base
                     $nextStep = $this->getRouter()->generate('commsNewsModeration.getList');
                 }
             } else {
-                $nextStep = $this->getRouter()->generate('commsNews.getDetail', [ 'newsId' => $article->getId() ]);
+                $nextStep = $this->getRouter()->generate('commsNews.getDetail', [ 'articleId' => $article->getId() ]);
             }
 
             $this->getResponse()->redirect->to($nextStep);

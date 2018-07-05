@@ -34,7 +34,7 @@
             selectize: {
                 placeholder: 'Assign Topics'
             },
-            value: {{ news.topics|json_encode|raw }},
+            value: {{ article.topics|json_encode|raw }},
             multiple: true
         });
     });
@@ -43,12 +43,12 @@
 <div class="actions-small-1 row">
     <div class="list-item">
         <div class="small-12 column">
-            <h1>{{ action|capitalize }} {{ locale.news.proper }} {{ indicator.render(news) }}</h1>
+            <h1>{{ action|capitalize }} {{ locale.news.proper }} {{ indicator.render(article) }}</h1>
             <ul class="meta">
-                {% if news.acceptedBy.id %}
-                    <li class="icon-staff">Last moderated by {{ news.acceptedBy.fullname }}
-                        {% if news.isAccepted %}
-                            on {{ news.acceptedAt.local }}
+                {% if article.acceptedBy.id %}
+                    <li class="icon-staff">Last moderated by {{ article.acceptedBy.fullname }}
+                        {% if article.isAccepted %}
+                            on {{ article.acceptedAt.local }}
                         {% endif %}
                     </li>
                 {% endif %}
@@ -67,7 +67,7 @@
 
 {# Train Line #}
 {% include '@commsNews/workflow.twig' with {
-    news: news,
+    article: article,
     moderationRequired: policies['global_moderation'].value
 } %}
 
@@ -84,8 +84,8 @@
 <div class="row">
     <div class="small-12 island">
 
-        {% if news.id %}
-            {% set formAction = routeLookupIfAuthorized('commsNews.postUpdate', {newsId: news.id}) %}
+        {% if article.id %}
+            {% set formAction = routeLookupIfAuthorized('commsNews.postUpdate', {articleId: article.id}) %}
         {% else %}
             {% set formAction = routeLookupIfAuthorized('commsNews.postCreate') %}
         {% endif %}
@@ -95,24 +95,24 @@
                 <fieldset class="content">
                     <div class="small-12 columns">
                         <label>Title</label>
-                        <input name="title" type="text" maxlength="255" value="{{ news.title }}" />
+                        <input name="title" type="text" maxlength="255" value="{{ article.title }}" />
                     </div>
 
                     <div class="small-12 columns">
                         <label>Body</label>
-                        <textarea name="body">{{ news.body }}</textarea>
+                        <textarea name="body">{{ article.body }}</textarea>
                     </div>
 
                     <div class="small-12 columns">
                         <label>Blurb</label>
-                        <textarea name="blurb">{{ news.blurb }}</textarea>
+                        <textarea name="blurb">{{ article.blurb }}</textarea>
                     </div>
                 </fieldset>
 
                 <fieldset class="content">
                     <div class="small-12 columns">
                         <label>Feature Image</label>
-                        <p class="meta">Attach a feature image to represent your {{ locale.news.proper }} article.</p>
+                        <p class="meta">Attach a feature image to represent your {{ locale.article.proper }} article.</p>
 
                         {% include 'sub/attachzone.twig' with { attachzone: featureImageZone } %}
                     </div>
@@ -133,14 +133,14 @@
                             Publish Date
                         </label>
                         <p class="meta">This article becomes available to its audience once this date and time is reached.</p>
-                        <input type="text" class="required" name="publishAt" id="publishAt" data-datepicker data-datepicker-time data-datesync-enddate="#expiresAt" maxlength="50" value="{{ news.publishAt.local }}"/>
+                        <input type="text" class="required" name="publishAt" id="publishAt" data-datepicker data-datepicker-time data-datesync-enddate="#expiresAt" maxlength="50" value="{{ article.publishAt.local }}"/>
                     </div>
                     <div class="small-12 large-6 columns">
                         <label for="expiresAt">
                             Expiry Date
                         </label>
                         <p class="meta">This article is automatically archived once this expiry date is reached.</p>
-                        <input type="text" class="required" name="expiresAt" id="expiresAt" data-datepicker data-datepicker-time data-datesync-startdate="#publishAt" maxlength="50" value="{{ news.expiresAt.local }}"/>
+                        <input type="text" class="required" name="expiresAt" id="expiresAt" data-datepicker data-datepicker-time data-datesync-startdate="#publishAt" maxlength="50" value="{{ article.expiresAt.local }}"/>
                     </div>
                 </fieldset>
             </section>

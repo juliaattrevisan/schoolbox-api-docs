@@ -22,14 +22,14 @@ class ValidationTest extends TestCase
 
     /**
      * @dataProvider provider_validBroadcastRequirements
-     * @param Model $news
-     * @param bool   $expected
+     * @param Model $article
+     * @param bool  $expected
      */
-    public function testValidBroadcastRequirements(Model $news, bool $expected)
+    public function testValidBroadcastRequirements(Model $article, bool $expected)
     {
         $validation = new ValidBroadcast();
 
-        $this->assertEquals($expected, $validation->isSatisfiedBy($news));
+        $this->assertEquals($expected, $validation->isSatisfiedBy($article));
     }
 
     /**
@@ -88,14 +88,14 @@ class ValidationTest extends TestCase
 
     /**
      * @dataProvider provider_validArticle
-     * @param Model $news
+     * @param Model $article
      * @param int   $expected
      */
-    public function testValidArticle(Model $news, $expected)
+    public function testValidArticle(Model $article, $expected)
     {
         $validation = new ValidArticle();
 
-        $this->assertEquals($expected, $validation->isSatisfiedBy($news));
+        $this->assertEquals($expected, $validation->isSatisfiedBy($article));
     }
 
     /**

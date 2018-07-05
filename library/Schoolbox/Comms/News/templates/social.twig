@@ -5,7 +5,7 @@
  # @param News\Model news
  #}
 
-{% if news.isAccepted %}
+{% if article.isAccepted %}
     {% set socialPolicies = {
         'save_for_later': {
             'value': policies['save_for_later'].value,
@@ -29,7 +29,7 @@
                     {% for socialPolicy, settings in socialPolicies %}
                         {% if settings.value %}
                             {% include settings.activator with {
-                                news: news,
+                                article: article,
                                 state: states[socialPolicy]
                             } %}
                         {% endif %}

@@ -129,7 +129,7 @@ class Controller extends Base
             'policies' => $policies,
             'action' => 'Create',
             'user' => $this->getUser(),
-            'news' => $article,
+            'article' => $article,
             'featureImageZone' => $zone->getTwigContext(),
         ])->setTitle("Create {$this->getDi()->get('sitePage')->getLocalisedTerm('news', false, true)}"));
     }
@@ -192,7 +192,7 @@ class Controller extends Base
             'policies' => $policies,
             'action' => 'Update',
             'user' => $this->getUser(),
-            'news' => $article,
+            'article' => $article,
             'featureImageZone' => $zone->getTwigContext(),
             'isCommsOfficer' => (new ValidUserIsCommsOfficer())->isSatisfiedBy($this->getUser()),
         ])->setTitle("Update {$article->getTitle()}"));
@@ -226,11 +226,11 @@ class Controller extends Base
 
                 /* Current url should secretly update to the Update route
                  */
-                $url = $this->getRouter()->generate('commsNews.getUpdate', ['newsId' => $article->getId()]);
+                $url = $this->getRouter()->generate('commsNews.getUpdate', ['articleId' => $article->getId()]);
 
                 /* Form action should secretly update to the Update route
                  */
-                $formAction = $this->getRouter()->generate('commsNews.postUpdate', ['newsId' => $article->getId()]);
+                $formAction = $this->getRouter()->generate('commsNews.postUpdate', ['articleId' => $article->getId()]);
 
                 $this->getResponse()->content->set($this->buildJsonOutput([
                     'success' => true,
@@ -243,7 +243,7 @@ class Controller extends Base
                  * Go to the detail screen to see the outcome of your changes
                  * and also use that screen to advance to the next step
                  */
-                $nextStep = $this->getRouter()->generate('commsNews.getDetail', ['newsId' => $article->getId()]);
+                $nextStep = $this->getRouter()->generate('commsNews.getDetail', ['articleId' => $article->getId()]);
                 $this->getResponse()->redirect->afterPost($nextStep);
                 return;
             }
@@ -362,7 +362,7 @@ class Controller extends Base
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/detail.twig', [
             'policies' => $policies,
-            'news' => $article,
+            'article' => $article,
             'moderationRequired' => $moderationRequired,
             'isSavedForLater' => $isSavedForLater,
             'isCommsOfficer' => (new ValidUserIsCommsOfficer())->isSatisfiedBy($this->getUser()),
