@@ -36,13 +36,13 @@
                         complete: 'Saved'
                     },
                     icon: 'icon-favourite',
-                    title: 'Unsave article'
+                    title: 'Remove article from saved items'
                 },
                 unsaved: {
                     url: '/',
                     toast: {
-                        processing: 'Unsaving...',
-                        complete: 'Unsaved'
+                        processing: 'Removing...',
+                        complete: 'Removed'
                     },
                     icon: 'icon-favourite-hollow',
                     title: 'Save article'
