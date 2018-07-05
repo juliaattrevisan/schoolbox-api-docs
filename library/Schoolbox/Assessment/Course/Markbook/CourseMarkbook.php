@@ -447,7 +447,7 @@ class CourseMarkbook
         $this->taskProgress    = [];
 
         // Student weighted average across all assessment in a course.
-        // Temporarily indexed by [courseImpl.id][user.id]['sum','weight']. We'll collate at end of iteration.
+        // Temporarily indexed by [courseImpl.id][user.id]['sum'|'weight']. We'll collate at end of iteration.
         $this->studentAverageMarks = [];
 
         // Average (non-weighted) marks per assessment.
