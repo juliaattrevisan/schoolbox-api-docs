@@ -86,7 +86,7 @@
                                 </div>
                             </div>
                             <nav>
-                                <a class="icon-close" href="{{ routeLookup('commsNewsSaveForLater.postRemove', {newsId: article.id}) }}" title="Remove this from your saved items" data-remove="{{ article.title }}"></a>
+                                <a class="icon-close" href="{{ routeLookup('commsNewsSaveForLater.postRemove', {articleId: article.id}) }}" title="Remove this from your saved items" data-remove="{{ article.title }}"></a>
                             </nav>
                             <article>{{ article.blurb|purify }}</article>
                         </li>
