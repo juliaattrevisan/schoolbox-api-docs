@@ -494,6 +494,9 @@ class Controller extends Base
                 $savedArticleIds = array_fill_keys($ids, SaveForLater\Mapper::SAVED);
             }
 
+            /* TODO: Increment Impressions count for everything in $articles
+             */
+
             $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@commsNewsDashboard/list.twig', [
                 'articles' => $articles,
                 'unsaved' => SaveForLater\Mapper::UNSAVED,
