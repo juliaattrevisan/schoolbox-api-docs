@@ -1,0 +1,142 @@
+(function() {
+
+    /**
+     * Save For Later
+     *
+     * @param options
+     */
+    $.fn.saveForLater = function(options) {
+        options = options || {};
+
+        var config = init(options, $(this));
+
+        initSaveForLater();
+        initSaveForLaterActions();
+
+        /**
+         * Init
+         *
+         * @param options
+         * @param element
+         * @returns {*}
+         */
+        function init(options, element) {
+            var defaults = {
+
+                /* The container which has stars in it
+                 * Title is the description of the next state which will be entered because this is a toggle
+                 */
+                element: element,
+
+                /* Transitions
+                 */
+                saved: {
+                    toast: {
+                        processing: 'Saving...',
+                        complete: 'Saved'
+                    },
+                    value: 1,
+                    icon: 'icon-favourite',
+                    title: 'Unsave article'
+                },
+                unsaved: {
+                    url: '/',
+                    toast: {
+                        processing: 'Unsaving...',
+                        complete: 'Unsaved'
+                    },
+                    value: 0,
+                    icon: 'icon-favourite-hollow',
+                    title: 'Save article'
+                }
+            };
+
+            return $.extend(defaults, options);
+        }
+
+        /**
+         * Set up initial state of the button that activates Save For Later
+         */
+        function initSaveForLater() {
+            var currentState;
+            var currentStateUrl;
+
+            $.each($(config.element).find('a[data-saveforlater]'), function(index, element) {
+                if ($(element).attr('data-saveforlater') === '1') {
+                    currentState = config.saved;
+                    currentStateUrl = $(element).attr('data-unsave-url');
+                }
+                else {
+                    currentState = config.unsaved;
+                    currentStateUrl = $(element).attr('data-save-url');
+                }
+
+                $(element)
+                    .attr('href', currentStateUrl)
+                    .attr('title', currentState.title)
+                    .addClass(currentState.icon)
+                    .attr('data-saveforlater', currentState.value)
+            });
+        }
+
+        /**
+         * Set up event listeners
+         */
+        function initSaveForLaterActions() {
+            $(config.element).on('click', 'a[data-saveforlater]', function(event) {
+                event.preventDefault();
+
+                var $element = $(this);
+                var $toast = $('#toast');
+
+                /* The state of everything after the action takes place
+                 * Save it, if it's currently unsaved
+                 * Unsave it, if it's currently saved
+                 */
+                var newState;
+                var newUrl;
+
+                if ($element.attr('data-saveforlater') === '1') {
+                    newState = config.unsaved;
+                    newUrl = $element.attr('data-unsave-url');
+                } else {
+                    newState = config.saved;
+                    newUrl = $element.attr('data-save-url');
+                }
+
+                $toast.toastActivate({
+                    text: newState.toast.processing
+                });
+
+                $.ajax({
+                    type: 'POST',
+                    url: newUrl,
+                    dataType: 'json'
+                }).success(function () {
+                    $toast.toastTimeout({
+                        text: newState.toast.complete,
+                        css: 'success'
+                    });
+
+                    // Update data attribute
+                    $element.attr('data-saveforlater', newState.value);
+
+                    // Update icon by removing all classes and adding the new one
+                    $element.removeClass().addClass(newState.icon);
+
+                    // Update title
+                    $element.attr('title', newState.title);
+
+                }).error(function (response) {
+                    var temp = $.parseJSON(response.responseText);
+
+                    $toast.toastTimeout({
+                        text: 'Error: ' + temp.message,
+                        css: 'alert'
+                    });
+                });
+
+            });
+        }
+    }
+}(jQuery));
