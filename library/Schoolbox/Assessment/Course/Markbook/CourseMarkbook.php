@@ -473,10 +473,8 @@ class CourseMarkbook
             $aImplId                       = $aImpl->getId();
             $aSpec                         = $aImpl->getSpecificationAssessment();
             $aId                           = $aSpec ? $aSpec->getId() : $aImplId;
-            $countAssessmentAnyMarks       = 0;                                    // How may participants have a mark in this assessment? Includes drafts.
-            $countAssessmentPublishedMarks = 0;                                    // How may participants have a published mark in this assessment?
-            $sumAssessmentAnyMarks         = 0;                                    // Sum of participant marks across an assessment. Includes drafts.
-            $sumAssessmentPublishedMarks   = 0;                                    // Sum of participant published marks across an assessment
+            $assessmentAnyMarks            = [];                                   // Participants' marks for this assessment impl, including drafts.
+            $assessmentPublishedMarks      = [];                                   // Participants' marks for this assessment impl, published only.
             $weight                        = $aImpl->getWeight();
 
             /** @var UnitImplementation\Model $unitImpl */
@@ -504,12 +502,11 @@ class CourseMarkbook
 
                 if ($aImpl instanceof Project) {
                     // Special case for project. No directly attached feedbacks.
-                    $authNormMark = $participant->getNormalisedMark(false);
+                    $authNormMark      = $participant->getNormalisedMark(false);
                     $publishedNormMark = $participant->getNormalisedMark(true);
                     if(null !== $authNormMark){
-                        $authHrMark = $participant->getHumanReadableMark(false);
-                        $countAssessmentAnyMarks++;
-                        $sumAssessmentAnyMarks += $authNormMark;
+                        $authHrMark           = $participant->getHumanReadableMark(false);
+                        $assessmentAnyMarks[] = $authNormMark;
 
                         // Only store 'any' mark if is different from 'published' mark, indicating it is composed
                         // of at least 1 draft.
@@ -523,9 +520,8 @@ class CourseMarkbook
                         }
                     }
                     if(null !== $publishedNormMark){
-                        $publishedHrMark = $participant->getHumanReadableMark(true);
-                        $countAssessmentPublishedMarks++;
-                        $sumAssessmentPublishedMarks += $publishedNormMark;
+                        $publishedHrMark            = $participant->getHumanReadableMark(true);
+                        $assessmentPublishedMarks[] = $publishedNormMark;
 
                         // Always store published if it exists
                         $this->studentMarks[$courseImplId][$aId][$userId]['published']['norm'] = $publishedNormMark;
@@ -549,8 +545,7 @@ class CourseMarkbook
                     // Always store the published mark if one exists for a student
                     if ($authPublishedFeedback && null !== $publishedNormMark) {
                         // Record that an assessment participant has a published mark
-                        $countAssessmentPublishedMarks++;
-                        $sumAssessmentPublishedMarks += $publishedNormMark;
+                        $assessmentPublishedMarks[] = $publishedNormMark;
 
                         // Record the student's published mark so we can display in a table cell
                         $this->studentMarks[$courseImplId][$aId][$userId]['published']['norm'] = $publishedNormMark;
@@ -566,9 +561,8 @@ class CourseMarkbook
 
                     // If student has a mark (whether published or not) add it to the assessment's stats
                     if ($authAnyFeedback && null !== $authNormMark) {
-                        // Record that an assessment participant has a published mark
-                        $countAssessmentAnyMarks++;
-                        $sumAssessmentAnyMarks += $authNormMark;
+                        // Record that an assessment participant has a mark
+                        $assessmentAnyMarks[] = $authNormMark;
                     }
 
 
@@ -600,14 +594,14 @@ class CourseMarkbook
             }
 
             // Calculate average mark for this assessmentImpl
-            if($countAssessmentAnyMarks){
-                $this->assessmentImplAverages[$aImplId]['any'] = $sumAssessmentAnyMarks / $countAssessmentAnyMarks;
+            if(\count($assessmentAnyMarks)){
+                $this->assessmentImplAverages[$aImplId]['any'] = \array_sum($assessmentAnyMarks)/\count($assessmentAnyMarks);
             }
 
 
             // Calculate average published mark for this assessmentImpl
-            if($countAssessmentPublishedMarks){
-                $this->assessmentImplAverages[$aImplId]['published'] =  $sumAssessmentPublishedMarks / $countAssessmentPublishedMarks;
+            if(\count($assessmentPublishedMarks)){
+                $this->assessmentImplAverages[$aImplId]['published'] =  \array_sum($assessmentPublishedMarks)/\count($assessmentPublishedMarks);
             }
 
             // If assessmentImpl was imported, record the average against the source spec
