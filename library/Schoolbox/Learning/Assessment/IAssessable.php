@@ -41,6 +41,16 @@ interface IAssessable extends ISoftDeletable
 
 
     /**
+     * Returns whether this IAssessable is a base assessable.
+     *
+     * (ie will return false if inside a project)
+     *
+     * @return bool
+     */
+    public function isBaseAssessable(): bool;
+
+
+    /**
      * Creates a clone of this assessment.
      *
      * This clone must be able to be persisted to create a copy of this assessment,

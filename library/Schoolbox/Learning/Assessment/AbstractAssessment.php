@@ -20,6 +20,7 @@ use \Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
+use Schoolbox\Mapper\Exception\InsufficientHydrationException;
 use \Schoolbox\User;
 use \Schoolbox\Mapper\Traits\Model\Id;
 use \Schoolbox\Mapper\Traits\Model\CreatedAtDate;
@@ -227,6 +228,19 @@ abstract class AbstractAssessment implements IAssessable
             return $this->context->getBaseAssessable();
         }
         return $this;
+    }
+
+
+    /**
+     * @return bool
+     * @throws InsufficientHydrationException
+     */
+    public function isBaseAssessable(): bool
+    {
+        if (null === $this->context) {
+            throw new InsufficientHydrationException('Cannot determine if this assessable is a base assessable if context is not hydrated');
+        }
+        return !$this->context instanceof Project;
     }
 
     /* Delegation Methods

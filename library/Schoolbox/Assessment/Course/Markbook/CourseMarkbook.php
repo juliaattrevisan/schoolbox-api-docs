@@ -479,6 +479,7 @@ class CourseMarkbook
             $assessmentAnyMarks            = [];                                   // Participants' marks for this assessment impl, including drafts.
             $assessmentPublishedMarks      = [];                                   // Participants' marks for this assessment impl, published only.
             $weight                        = $aImpl->getWeight();
+            $isTopLevelAssessable          = $aImpl->isBaseAssessable();           // Don't aggregate student average for project sub-assessments
 
             /** @var UnitImplementation\Model $unitImpl */
             $unitImpl     = $aImpl->getBaseContext();
@@ -511,6 +512,15 @@ class CourseMarkbook
                         $authHrMark           = $participant->getHumanReadableMark(false);
                         $assessmentAnyMarks[] = $authNormMark;
 
+                        if ($isTopLevelAssessable) {
+                            // First time we've encountered this row (user + course-import) ?
+                            if (!\is_array($studentAverageMarks[$courseImplId][$userId])) {
+                                $studentAverageMarks[$courseImplId][$userId]['any'] = ['sum' => 0, 'weight' => 0];
+                            }
+                            $studentAverageMarks[$courseImplId][$userId]['any']['sum']    += $weight * $authNormMark;
+                            $studentAverageMarks[$courseImplId][$userId]['any']['weight'] += $weight;
+                        }
+
                         // Only store 'any' mark if is different from 'published' mark, indicating it is composed
                         // of at least 1 draft.
                         // TODO This is not always true. consider when published are 10 + 20 and any are 15 + 15, this will give a false positive
@@ -533,6 +543,15 @@ class CourseMarkbook
                     if(null !== $publishedNormMark){
                         $publishedHrMark            = $participant->getHumanReadableMark(true);
                         $assessmentPublishedMarks[] = $publishedNormMark;
+
+                        if ($isTopLevelAssessable) {
+                            // First time we've encountered this row (user + course-import) ?
+                            if (!\is_array($studentAverageMarks[$courseImplId][$userId])) {
+                                $studentAverageMarks[$courseImplId][$userId]['published'] = ['sum' => 0, 'weight' => 0];
+                            }
+                            $studentAverageMarks[$courseImplId][$userId]['published']['sum']    += $weight * $publishedNormMark;
+                            $studentAverageMarks[$courseImplId][$userId]['published']['weight'] += $weight;
+                        }
 
                         // Always store published if it exists
                         $this->studentMarks[$courseImplId][$aId][$userId]['published']['norm'] = $publishedNormMark;
@@ -580,12 +599,14 @@ class CourseMarkbook
                     // Record that an assessment participant has a mark
                     $assessmentAnyMarks[] = $authNormMark;
 
-                    // First time we've encountered this row (user + course-import) ?
-                    if (!\is_array($studentAverageMarks[$courseImplId][$userId])) {
-                        $studentAverageMarks[$courseImplId][$userId]['any'] = ['sum' => 0, 'weight' => 0];
+                    if ($isTopLevelAssessable) {
+                        // First time we've encountered this row (user + course-import) ?
+                        if (!\is_array($studentAverageMarks[$courseImplId][$userId])) {
+                            $studentAverageMarks[$courseImplId][$userId]['any'] = ['sum' => 0, 'weight' => 0];
+                        }
+                        $studentAverageMarks[$courseImplId][$userId]['any']['sum']    += $weight * $authNormMark;
+                        $studentAverageMarks[$courseImplId][$userId]['any']['weight'] += $weight;
                     }
-                    $studentAverageMarks[$courseImplId][$userId]['any']['sum']    += $weight * $authNormMark;
-                    $studentAverageMarks[$courseImplId][$userId]['any']['weight'] += $weight;
 
                     if ($authAnyFeedback->isDraft()) {
                         $assessmentImplMarkContainsDrafts[$aImplId] = true;
@@ -601,12 +622,14 @@ class CourseMarkbook
 
                 // Just published marks
                 if (null !== $publishedNormMark) {
-                    // First time we've encountered this row (user + course-import) ?
-                    if (!\is_array($studentAverageMarks[$courseImplId][$userId])) {
-                        $studentAverageMarks[$courseImplId][$userId]['published'] = ['sum' => 0, 'weight' => 0];
+                    if ($isTopLevelAssessable) {
+                        // First time we've encountered this row (user + course-import) ?
+                        if (!\is_array($studentAverageMarks[$courseImplId][$userId])) {
+                            $studentAverageMarks[$courseImplId][$userId]['published'] = ['sum' => 0, 'weight' => 0];
+                        }
+                        $studentAverageMarks[$courseImplId][$userId]['published']['sum']    += $weight * $publishedNormMark;
+                        $studentAverageMarks[$courseImplId][$userId]['published']['weight'] += $weight;
                     }
-                    $studentAverageMarks[$courseImplId][$userId]['published']['sum']    += $weight * $publishedNormMark;
-                    $studentAverageMarks[$courseImplId][$userId]['published']['weight'] += $weight;
 
                     if ($aSpec) {
                         $specMarks[$aSpec->getId()]['published'][] = $publishedNormMark;
