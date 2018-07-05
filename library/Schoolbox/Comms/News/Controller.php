@@ -96,8 +96,8 @@ class Controller extends Base
 
         /* Spawn an empty news with default settings
          */
-        /** @var Model $news */
-        $news = $this->newsMapper->createModel()
+        /** @var Model $article */
+        $article = $this->newsMapper->createModel()
             ->setPublishAt(\Alaress_Date_Format::now())
             ->setExpiresAt(\Alaress_Date_Format::now());
 
@@ -106,7 +106,7 @@ class Controller extends Base
         $policy = $policies->getOffset('publish_date_offset');
 
         if ((new ValidDateOffset())->isSatisfiedBy($policy)) {
-            $news->getPublishAt()->modify($policy->getValue())->endOfDay();
+            $article->getPublishAt()->modify($policy->getValue())->endOfDay();
         }
 
         /* Policies: Expiry Date Offset
@@ -114,7 +114,7 @@ class Controller extends Base
         $policy = $policies->getOffset('expiry_date_offset');
 
         if ((new ValidDateOffset())->isSatisfiedBy($policy)) {
-            $news->getExpiresAt()->modify($policy->getValue())->endOfDay();
+            $article->getExpiresAt()->modify($policy->getValue())->endOfDay();
         }
 
         /* Feature image
@@ -129,7 +129,7 @@ class Controller extends Base
             'policies' => $policies,
             'action' => 'Create',
             'user' => $this->getUser(),
-            'news' => $news,
+            'news' => $article,
             'featureImageZone' => $zone->getTwigContext(),
         ])->setTitle("Create {$this->getDi()->get('sitePage')->getLocalisedTerm('news', false, true)}"));
     }
@@ -149,17 +149,16 @@ class Controller extends Base
         /* Set YOU as the initial author
          * Otherwise, when a moderator edits your article, they might assume direct authorship instead
          */
-        $news = $this->newsMapper->createModel();
-        $news->setAuthor($this->getUser());
+        $article = $this->newsMapper->createModel()->setAuthor($this->getUser());
 
-        $this->postUpdate($news);
+        $this->postUpdate($article);
     }
 
 
     /**
      * Provide form to update a news article
      *
-     * @param Model $news
+     * @param Model $article
      * @throws MapperException
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Aura\Di\Exception\ServiceNotFound
@@ -167,11 +166,11 @@ class Controller extends Base
      * @throws \UnexpectedValueException
      * @throws \Schoolbox\Application\Exception\Exception
      */
-    public function getUpdate(Model $news)
+    public function getUpdate(Model $article)
     {
         /* Only comms officers can edit articles that have been accepted for publishing
          */
-        if (!(new ValidUserCanEdit())->isSatisfiedBy($this->getUser(), $news)) {
+        if (!(new ValidUserCanEdit())->isSatisfiedBy($this->getUser(), $article)) {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_COMMS_NEWS_ALREADY_ACCEPTED);
         }
 
@@ -185,39 +184,39 @@ class Controller extends Base
             ->setAttachmentsLabel('')
             ->setMimeFilter('image/*');
 
-        if ($news->getFeatureImage()) {
-            $zone->attachFiles([$news->getFeatureImage()->getHash()]);
+        if ($article->getFeatureImage()) {
+            $zone->attachFiles([$article->getFeatureImage()->getHash()]);
         }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/create.twig', [
             'policies' => $policies,
             'action' => 'Update',
             'user' => $this->getUser(),
-            'news' => $news,
+            'news' => $article,
             'featureImageZone' => $zone->getTwigContext(),
             'isCommsOfficer' => (new ValidUserIsCommsOfficer())->isSatisfiedBy($this->getUser()),
-        ])->setTitle("Update {$news->getTitle()}"));
+        ])->setTitle("Update {$article->getTitle()}"));
     }
 
 
     /**
      * Update a news article
      *
-     * @param Model $news
+     * @param Model $article
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Aura\Router\Exception\RouteNotFound
      * @throws \PDOException
      * @throws \UnexpectedValueException
      * @throws \Schoolbox\Resource\Exception
      */
-    public function postUpdate(Model $news)
+    public function postUpdate(Model $article)
     {
         try {
 
-            /* TODO: Check that the current session user is allowed to modify this $news
+            /* TODO: Check that the current session user is allowed to modify this $article
              */
 
-            $this->persist($news, $this->getRequest()->post);
+            $this->persist($article, $this->getRequest()->post);
 
             /* Save a draft of the news article
              * This can occur from either the Create or Update context
@@ -227,11 +226,11 @@ class Controller extends Base
 
                 /* Current url should secretly update to the Update route
                  */
-                $url = $this->getRouter()->generate('commsNews.getUpdate', ['newsId' => $news->getId()]);
+                $url = $this->getRouter()->generate('commsNews.getUpdate', ['newsId' => $article->getId()]);
 
                 /* Form action should secretly update to the Update route
                  */
-                $formAction = $this->getRouter()->generate('commsNews.postUpdate', ['newsId' => $news->getId()]);
+                $formAction = $this->getRouter()->generate('commsNews.postUpdate', ['newsId' => $article->getId()]);
 
                 $this->getResponse()->content->set($this->buildJsonOutput([
                     'success' => true,
@@ -244,7 +243,7 @@ class Controller extends Base
                  * Go to the detail screen to see the outcome of your changes
                  * and also use that screen to advance to the next step
                  */
-                $nextStep = $this->getRouter()->generate('commsNews.getDetail', ['newsId' => $news->getId()]);
+                $nextStep = $this->getRouter()->generate('commsNews.getDetail', ['newsId' => $article->getId()]);
                 $this->getResponse()->redirect->afterPost($nextStep);
                 return;
             }
@@ -270,7 +269,7 @@ class Controller extends Base
     /**
      * Persist model to db during news article authorship
      *
-     * @param Model                          $news
+     * @param Model                          $article
      * @param array|\Aura\Web\Request\Values $data
      * @return void
      * @throws MapperException
@@ -278,9 +277,9 @@ class Controller extends Base
      * @throws \UnexpectedValueException
      * @throws \Schoolbox\Resource\Exception
      */
-    private function persist(Model $news, $data): void
+    private function persist(Model $article, $data): void
     {
-        $news
+        $article
             ->setTitle($data['title'])
             ->setBody($data['body'])
             ->setBlurb($data['blurb'])
@@ -294,13 +293,13 @@ class Controller extends Base
          * This can occur with bad input; or when datepicker is still processing strtotime shuriken
          */
         try {
-            $news->setPublishAt(\Alaress_Date_Format::newLocal($data['publishAt']));
+            $article->setPublishAt(\Alaress_Date_Format::newLocal($data['publishAt']));
         } catch (InvalidArgumentException $e) {
             // noop
         }
 
         try {
-            $news->setExpiresAt(\Alaress_Date_Format::newLocal($data['expiresAt']));
+            $article->setExpiresAt(\Alaress_Date_Format::newLocal($data['expiresAt']));
         } catch (InvalidArgumentException $e) {
             // noop
         }
@@ -309,12 +308,12 @@ class Controller extends Base
          * Otherwise clear it (remove a Feature Image)
          */
         if (\is_array($data['attachment'])) {
-            $news->setFeatureImage((new CollectorFactory())->build($data['attachment'] ?: [])->getFirst());
+            $article->setFeatureImage((new CollectorFactory())->build($data['attachment'] ?: [])->getFirst());
         } else {
-            $news->setFeatureImage(null);
+            $article->setFeatureImage(null);
         }
 
-        $this->newsMapper->save($news);
+        $this->newsMapper->save($article);
     }
 
 
@@ -330,14 +329,14 @@ class Controller extends Base
     /**
      * Load a news article so you can read its contents (the detail screen)
      *
-     * @param Model $news
+     * @param Model $article
      * @throws MapperException
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \UnexpectedValueException
      */
-    public function getDetail(Model $news)
+    public function getDetail(Model $article)
     {
         $policies = $this->policyMapper->findAll()->indexBy('identifier');
 
@@ -352,7 +351,7 @@ class Controller extends Base
             try {
                 SaveForLater\Mapper::getInstance()->findOneByColumnList([
                     'user_id' => $this->getUser()->getId(),
-                    'article_id' => $news->getId()
+                    'article_id' => $article->getId()
                 ]);
 
                 $isSavedForLater = true;
@@ -363,21 +362,21 @@ class Controller extends Base
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/detail.twig', [
             'policies' => $policies,
-            'news' => $news,
+            'news' => $article,
             'moderationRequired' => $moderationRequired,
             'isSavedForLater' => $isSavedForLater,
             'isCommsOfficer' => (new ValidUserIsCommsOfficer())->isSatisfiedBy($this->getUser()),
-            'isAcceptable' => (new Moderation\ValidUserCanAccept())->isSatisfiedBy($this->getUser(), $news),
-            'isRejectable' => (new Moderation\ValidUserCanReject())->isSatisfiedBy($this->getUser(), $news),
-            'isDeletable' => (new ValidUserCanDelete())->isSatisfiedBy($this->getUser(), $news)
-        ])->setTitle($news->getTitle()));
+            'isAcceptable' => (new Moderation\ValidUserCanAccept())->isSatisfiedBy($this->getUser(), $article),
+            'isRejectable' => (new Moderation\ValidUserCanReject())->isSatisfiedBy($this->getUser(), $article),
+            'isDeletable' => (new ValidUserCanDelete())->isSatisfiedBy($this->getUser(), $article)
+        ])->setTitle($article->getTitle()));
     }
 
 
     /**
      * Delete an article
      *
-     * @param Model $news
+     * @param Model $article
      * @throws MapperException
      * @throws RouteNotFound
      * @throws \Alaress\Database\Predicate\InvalidColumnException
@@ -386,7 +385,7 @@ class Controller extends Base
      * @throws \UnexpectedValueException
      * @throws \Schoolbox\Application\Exception\Exception
      */
-    public function postDelete(Model $news)
+    public function postDelete(Model $article)
     {
         try {
 
@@ -396,9 +395,9 @@ class Controller extends Base
              * that haven't been witnessed by the world. Such articles have to be unaccepted
              * and unpublished
              */
-            if ((new ValidUserCanDelete())->isSatisfiedBy($this->getUser(), $news)) {
-                $news->setDeletedAt(\Alaress_Date_Format::now());
-                $this->newsMapper->save($news);
+            if ((new ValidUserCanDelete())->isSatisfiedBy($this->getUser(), $article)) {
+                $article->setDeletedAt(\Alaress_Date_Format::now());
+                $this->newsMapper->save($article);
 
                 /* If you're a moderator, go back to the Moderation list
                  *

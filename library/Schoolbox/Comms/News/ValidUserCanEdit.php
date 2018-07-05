@@ -2,7 +2,7 @@
 /**
  * ValidUserCanEdit
  *
- * Definition of a $user who can edit $news
+ * Definition of a $user who can edit $article
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2018, Alaress Pty Ltd
@@ -17,17 +17,17 @@ class ValidUserCanEdit
 {
 
     /**
-     * Definition of a $user who can edit $news
+     * Definition of a $user who can edit $article
      *
      * @param User  $user
-     * @param Model $news
+     * @param Model $article
      * @return bool
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    public function isSatisfiedBy(User $user, Model $news): bool
+    public function isSatisfiedBy(User $user, Model $article): bool
     {
 
         /* User is a comms officer; can edit at any time
@@ -40,6 +40,6 @@ class ValidUserCanEdit
          *   You are considered an author of this article
          *   Article has not been accepted for publication
          */
-        return (new ValidUserIsAuthor())->isSatisfiedBy($user, $news) && $news->getAcceptedAt()->isNull();
+        return (new ValidUserIsAuthor())->isSatisfiedBy($user, $article) && $article->getAcceptedAt()->isNull();
     }
 }

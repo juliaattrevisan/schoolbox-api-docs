@@ -55,13 +55,13 @@ class Module extends BaseModule
 
         /* Submit For Moderation
          */
-        $this->register('POST', '/{newsId:\d+}/submit', 'postSubmit', null, $preloadNews);
+        $this->register('POST', '/{articleId:\d+}/submit', 'postSubmit', null, $preloadNews);
 
         /* The Fate of the Article: accept/reject/delete it
          */
-        $this->register('POST', '/{newsId:\d+}/accept', 'postAccept', $moderatorPerms, $preloadNews);
-        $this->register('POST', '/{newsId:\d+}/reject', 'postReject', $moderatorPerms, $preloadNews);
-        $this->register('POST', '/{newsId:\d+}/delete', 'postDelete', $moderatorPerms, $preloadNews);
+        $this->register('POST', '/{articleId:\d+}/accept', 'postAccept', $moderatorPerms, $preloadNews);
+        $this->register('POST', '/{articleId:\d+}/reject', 'postReject', $moderatorPerms, $preloadNews);
+        $this->register('POST', '/{articleId:\d+}/delete', 'postDelete', $moderatorPerms, $preloadNews);
     }
 
     /**
@@ -76,13 +76,13 @@ class Module extends BaseModule
     private function preloadNews(array $params) :array
     {
         try {
-            $news = $this->getNewsMapper()->findById($params['newsId']);
+            $article = $this->getNewsMapper()->findById($params['articleId']);
         } catch (MapperException $e) {
             throw new NotFound($this->getErrorMapper()->getMessageById(ErrorMapper::ERROR_GENERIC_NOT_FOUND));
         }
 
         return [
-            'news' => $news,
+            'article' => $article,
         ];
     }
 

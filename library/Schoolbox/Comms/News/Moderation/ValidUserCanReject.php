@@ -2,7 +2,7 @@
 /**
  * ValidUserCanReject
  *
- * Definition of a $user who can reject $news
+ * Definition of a $user who can reject $article
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2018, Alaress Pty Ltd
@@ -22,14 +22,14 @@ class ValidUserCanReject
      * Definition of a $user who can reject $news
      *
      * @param User  $user
-     * @param Model $news
+     * @param Model $article
      * @return bool
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    public function isSatisfiedBy(User $user, Model $news): bool
+    public function isSatisfiedBy(User $user, Model $article): bool
     {
         $isCommsOfficer = (new ValidUserIsCommsOfficer())->isSatisfiedBy($user);
 
@@ -38,7 +38,7 @@ class ValidUserCanReject
          * (maybe that's a thing, idk)
          */
         if ($isCommsOfficer) {
-            return !($news->getAuthor()->getId() === $user->getId());
+            return !($article->getAuthor()->getId() === $user->getId());
         }
 
         /* Anyone else cannot reject articles at any other time

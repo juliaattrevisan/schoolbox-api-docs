@@ -22,14 +22,14 @@ class ValidUserCanAccept
      * Definition of an article that can be accepted during moderation process
      *
      * @param User  $user
-     * @param Model $news
+     * @param Model $article
      * @return bool
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    public function isSatisfiedBy(User $user, Model $news): bool
+    public function isSatisfiedBy(User $user, Model $article): bool
     {
 
         /* Must fulfil the following criteria
@@ -46,6 +46,6 @@ class ValidUserCanAccept
          *
          * Allow moderators to accept the remainder of articles that previously expected moderation acceptance
          */
-        return $isCommsOfficer && $news->isSubmitted() && !$news->isAccepted();
+        return $isCommsOfficer && $article->isSubmitted() && !$article->isAccepted();
     }
 }

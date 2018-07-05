@@ -70,16 +70,16 @@ class Module extends BaseModule
 
         /* Update news article
          */
-        $this->register('GET', '/{newsId:\d+}/update', 'getUpdate', $getPerms, $preloadNews);
-        $this->register('POST', '/{newsId:\d+}', 'postUpdate', $getPerms, $preloadNews);
+        $this->register('GET', '/{articleId:\d+}/update', 'getUpdate', $getPerms, $preloadNews);
+        $this->register('POST', '/{articleId:\d+}', 'postUpdate', $getPerms, $preloadNews);
 
         /* View news article
          */
-        $this->register('GET', '/{newsId:\d+}', 'getDetail', null, $preloadNews);
+        $this->register('GET', '/{articleId:\d+}', 'getDetail', null, $preloadNews);
 
         /* Delete article
          */
-        $this->register('POST', '/{newsId:\d+}/delete', 'postDelete', null, $preloadNews);
+        $this->register('POST', '/{articleId:\d+}/delete', 'postDelete', null, $preloadNews);
 
         /* Get a list of topics to chooze
          */
@@ -99,13 +99,13 @@ class Module extends BaseModule
     private function preloadNews(array $params) :array
     {
         try {
-            $news = $this->getNewsMapper()->findById($params['newsId']);
+            $article = $this->getNewsMapper()->findById($params['articleId']);
         } catch (MapperException $e) {
             throw new NotFound('Unknown news article.');
         }
 
         return [
-            'news' => $news,
+            'article' => $article,
         ];
     }
 
