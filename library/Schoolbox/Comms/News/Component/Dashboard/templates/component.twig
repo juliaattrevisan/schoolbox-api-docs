@@ -1,23 +1,38 @@
 <script src="/javascript/shared/comms/saveforlater.js"></script>
 <script>
     $(function() {
+        var container = $('#news-container-{{ componentInstanceId }}');
+
+        /* Initial conditions
+         */
         $.ajax({
             type: 'GET',
             url: "{{ routeLookup('commsNews.getListByTopic', {topicId: 1}) }}",
             dataType: 'html'
         }).success(function (response) {
-            var container = $('#news-container-{{ componentInstanceId }}');
-
             container.html(response).saveForLater();
         }).error(function (response) {
+        });
 
+        {# Retrieve a new set of articles based on topic #}
+        $('#news-topics-{{ componentInstanceId }}').on('click', 'a', function(event) {
+            container.html('<div class="loader"></div>');
+
+            $.ajax({
+                type: 'GET',
+                url: $(this).attr('href'),
+                dataType: 'html'
+            }).success(function (response) {
+                container.html(response).saveForLater();
+            }).error(function (response) {
+            });
         });
     });
 </script>
 
-<dl class="tabs" data-tab="">
+<dl class="tabs" data-tab="" id="news-topics-{{ componentInstanceId }}">
     {% for topic in topics %}
-    <dd {% if loop.first %}class="active"{% endif %}><a data-topic="{{ topic.id }}">{{ topic.name }}</a></dd>
+    <dd {% if loop.first %}class="active"{% endif %}><a href="{{ routeLookup('commsNews.getListByTopic', {topicId: topic.id}) }}">{{ topic.name }}</a></dd>
     {% endfor %}
 </dl>
 
