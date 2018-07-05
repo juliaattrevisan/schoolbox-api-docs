@@ -86,13 +86,13 @@ class Controller extends Base
      * You never really just activate them on their own - it's a toggle of states
      * and it happens asynchronously
      *
-     * @param News\Model $news
+     * @param News\Model $article
      * @throws \Aura\Router\Exception\RouteNotFound
      */
-    public function postToggle(News\Model $news)
+    public function postToggle(News\Model $article)
     {
         if ($this->getRequest()->isXhr()) {
-            $outcome = $this->toggle($news);
+            $outcome = $this->toggle($article);
 
             if (!$outcome['success']) {
                 $this->getResponse()->status->set(400);
@@ -106,10 +106,10 @@ class Controller extends Base
 
 
     /**
-     * @param News\Model $news
+     * @param News\Model $article
      * @return array
      */
-    private function toggle(News\Model $news): array
+    private function toggle(News\Model $article): array
     {
         /* Can only save when the Policy is on
          */
@@ -139,7 +139,7 @@ class Controller extends Base
         try {
             $this->saveForLaterMapper->findOneByColumnList([
                 'user_id' => $this->getUser()->getId(),
-                'article_id' => $news->getId()
+                'article_id' => $article->getId()
             ]);
 
             $exists = true;
@@ -152,7 +152,7 @@ class Controller extends Base
         if ($exists) {
             $this->saveForLaterMapper->deleteByColumnList([
                 'user_id' => $this->getUser()->getId(),
-                'article_id' => $news->getId()
+                'article_id' => $article->getId()
             ]);
 
             return [
@@ -166,7 +166,7 @@ class Controller extends Base
         try {
             $record = $this->saveForLaterMapper->createModel()
                 ->setUser($this->getUser())
-                ->setArticle($news);
+                ->setArticle($article);
 
             $this->saveForLaterMapper->save($record);
 
@@ -186,15 +186,15 @@ class Controller extends Base
     /**
      * Remove an item from your Saved list
      *
-     * @param News\Model $news
      * @throws \Aura\Router\Exception\RouteNotFound
+     * @param News\Model $article
      */
-    public function postRemove(News\Model $news)
+    public function postRemove(News\Model $article)
     {
         if ($this->getRequest()->isXhr()) {
             $this->saveForLaterMapper->deleteByColumnList([
                 'user_id' => $this->getUser()->getId(),
-                'article_id' => $news->getId()
+                'article_id' => $article->getId()
             ]);
 
             $this->getResponse()->content->set($this->buildJsonOutput([
