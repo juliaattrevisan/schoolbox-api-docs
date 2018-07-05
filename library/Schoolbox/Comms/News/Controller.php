@@ -345,15 +345,20 @@ class Controller extends Base
 
         /* Figure out if this was Saved For Later for the current user
          */
-        try {
-            SaveForLater\Mapper::getInstance()->findOneByColumnList([
-                'user_id' => $this->getUser()->getId(),
-                'article_id' => $news->getId()
-            ]);
+        $saveForLater = $policies->getOffset('save_for_later')->getValue();
+        $isSavedForLater = false;
 
-            $isSavedForLater = true;
-        } catch (MapperException $e) {
-            $isSavedForLater = false;
+        if ($saveForLater) {
+            try {
+                SaveForLater\Mapper::getInstance()->findOneByColumnList([
+                    'user_id' => $this->getUser()->getId(),
+                    'article_id' => $news->getId()
+                ]);
+
+                $isSavedForLater = true;
+            } catch (MapperException $e) {
+                // noop; default is fine
+            }
         }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/detail.twig', [
