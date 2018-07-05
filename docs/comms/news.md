@@ -100,7 +100,7 @@ It begins at the Moderation List found at /comms/news/moderation. From here you 
 * *Preview* an article of your choosing.
   * You can *Update* its contents, if applicable/necessary. It'll automatically save as you create.
 * *Publish* the article to make it available to its audience when the Publish Date is reached.
-* You can *Reject* a submitted article at any time before it's published to the audience.
+* You can *Reject* a submitted article at any time.
 * You may *Delete* an article at any time.
 
 ### Actions
