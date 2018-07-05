@@ -103,6 +103,11 @@ class Controller extends Base
 
 
     /**
+     * Toggle the saved-ness of an article
+     *
+     * Add the article to your Saved For Later list, if it's not there
+     * If it's there, remove it
+     *
      * @param News\Model $article
      * @return array
      */
