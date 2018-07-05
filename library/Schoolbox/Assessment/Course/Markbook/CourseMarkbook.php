@@ -304,9 +304,6 @@ class CourseMarkbook
         GenericCollection $assessables
     ): void {
         foreach ($assessables as $assessmentId => $assessable) {
-            if ($assessmentId !== (int)$assessable->getId()) {
-                throw new InvalidArgumentException("Invalid index encountered. Index: {$assessmentId}, A.id: {$assessable->getId()}");
-            }
             /** @var UnitImplementation\Model $baseContext */
             $baseContext = $assessable->getBaseContext();
             if (!$baseContext instanceof UnitImplementation\Model) {
