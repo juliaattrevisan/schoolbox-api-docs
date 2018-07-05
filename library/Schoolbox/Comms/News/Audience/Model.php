@@ -11,6 +11,7 @@ namespace Schoolbox\Comms\News\Audience;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Comms\News;
+use Schoolbox\Mapper\Traits\Model\Id;
 
 class Model
 {
@@ -93,8 +94,7 @@ class Model
         ];
     }
 
-        /** @var int */
-    private $id;
+    use Id;
 
     /** @var News\Model() */
     private $commsNewsArticle;
@@ -120,26 +120,6 @@ class Model
     public function __construct()
     {
         $this->children = new GenericCollection(self::class);
-    }
-
-
-    /**
-     * @return int
-     */
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
-
-
-    /**
-     * @param int $id
-     * @return $this
-     */
-    public function setId(int $id): self
-    {
-        $this->id = $id;
-        return $this;
     }
 
 

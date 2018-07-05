@@ -24,6 +24,7 @@ use Alaress\Database\Predicate;
  */
 class ArticleResolver
 {
+
     /** @var BusinessRules */
     private $businessRules;
 
@@ -142,7 +143,7 @@ class ArticleResolver
         ";
 
         // Case 2. User matches a composite root segment, where segment is targeted to 'self'
-        $queries[] =  $this->buildCompositeSubquery(Model::RELATIONSHIP_SELF, $whereClause);
+        $queries[] = $this->buildCompositeSubquery(Model::RELATIONSHIP_SELF, $whereClause);
 
 
         // Case 3. User is parent or staff, and matches a composite root segment targeted at *one* their children or students
@@ -310,7 +311,7 @@ class ArticleResolver
             // For composite^teacher_of segments
             $childUserId                       = $taughtUser->getId();
             $relatedWhereClauses[$childUserId] = new Collection();
-            $relatedWhereParams[$childUserId] = new Collection();
+            $relatedWhereParams[$childUserId]  = new Collection();
             $this->addClauses($taughtUser, Model::RELATIONSHIP_SELF, $validEntities, $relatedWhereClauses[$childUserId], $relatedWhereParams[$childUserId], $paramSuffix);
         }
     }
@@ -326,8 +327,14 @@ class ArticleResolver
      * @todo consider snapping each segment entity type into helper method, see 'service' example
      * @todo consider snapping common structure into helper method
      */
-    private function addClauses(User $user, string $relationship, array $validEntities, Collection $whereClauses, Collection $whereParams, int $paramSuffix): void
-    {
+    private function addClauses(
+        User $user,
+        string $relationship,
+        array $validEntities,
+        Collection $whereClauses,
+        Collection $whereParams,
+        int $paramSuffix
+    ): void {
         $validEntities = \array_combine($validEntities, $validEntities);
         $userId        = $user->getId();
 
@@ -343,7 +350,14 @@ class ArticleResolver
 
         // Targeted to a campus
         if (\array_key_exists(Model::ENTITY_TYPE_CAMPUS, $validEntities) && $this->businessRules->canTargetNullEntity(Model::ENTITY_TYPE_CAMPUS)) {
-            $this->buildClause($whereClauses, $whereParams, $paramSuffix, Model::ENTITY_TYPE_CAMPUS, $user->getCampusCollection()->getPropertyValues('id'), $relationship);
+            $this->buildClause(
+                $whereClauses,
+                $whereParams,
+                $paramSuffix,
+                Model::ENTITY_TYPE_CAMPUS,
+                $user->getCampusCollection()->getPropertyValues('id'),
+                $relationship
+            );
         }
 
         // Targeted to a Role
@@ -427,15 +441,21 @@ class ArticleResolver
      *
      * @param Collection|string[]   $whereClauses
      * @param Collection|mixed[]    $whereParams
-     * @param int                   $paramSuffix  So we can distinguish bound args for self and related users.
+     * @param int                   $paramSuffix So we can distinguish bound args for self and related users.
      * @param string                $entityType
      * @param null|array|string|int $entityValue
      * @param string                $relationship
      */
-    private function buildClause(Collection $whereClauses, Collection $whereParams, int $paramSuffix, string $entityType, $entityValue, string $relationship): void
-    {
+    private function buildClause(
+        Collection $whereClauses,
+        Collection $whereParams,
+        int $paramSuffix,
+        string $entityType,
+        $entityValue,
+        string $relationship
+    ): void {
         // Don't attempt to match a segment if the system is not configured to permit null entity values for the given entity type
-        if(!$this->businessRules->canTargetNullEntity($entityType) && (null === $entityValue || (\is_iterable($entityValue) && !\count($entityValue)))) {
+        if (!$this->businessRules->canTargetNullEntity($entityType) && (null === $entityValue || (\is_iterable($entityValue) && !\count($entityValue)))) {
             return;
         }
 
@@ -443,21 +463,21 @@ class ArticleResolver
         $colRelationship = Mapper::FIELD_RELATIONSHIP;
         $colEntityValue  = Mapper::FIELD_ENTITY_VALUE;
 
-         if (null === $entityValue) {
+        if (null === $entityValue) {
             $predicate = 'IS NULL';
-        } else{
-             // Convert even single items to sets of 1 for consistent treatment
-            if(!\is_iterable($entityValue)){
+        } else {
+            // Convert even single items to sets of 1 for consistent treatment
+            if (!\is_iterable($entityValue)) {
                 $entityValue = [$entityValue];
             }
             if (!\count($entityValue)) {
                 $predicate = 'IS NULL';
             } else {
-                $prefix = "{$entityType}_{$paramSuffix}";
+                $prefix       = "{$entityType}_{$paramSuffix}";
                 $params       = Predicate\Builder::getArrayParameters($entityValue, $prefix);
                 $placeholders = Predicate\Builder::getArrayPlaceholders($entityValue, $prefix);
                 $predicate    = "IN {$placeholders}";
-                foreach($params as $placeholder => $val){
+                foreach ($params as $placeholder => $val) {
                     $whereParams[$placeholder] = $val;
                 }
             }

@@ -123,20 +123,20 @@ class BusinessRules
     public function getValidRelationships(Model $audienceSegment): array
     {
         $entityType = $audienceSegment->getEntityType();
-        if(null === $entityType){
+        if (null === $entityType) {
             throw new InsufficientHydrationException('Cannot determine valid relationships if entity type is not defined');
         }
 
         $validRelationships = self::VALID_SEGMENT_RELATIONSHIPS[$entityType];
 
         // Base case:
-        if(Model::ENTITY_TYPE_COMPOSITE !== $entityType){
+        if (Model::ENTITY_TYPE_COMPOSITE !== $entityType) {
             return $validRelationships;
         }
 
         // Recursive case:
         // Composites have their own inherent limitations, but also respect the limitations of any sub-segment.
-        foreach($audienceSegment->getChildren() as $subSegment){
+        foreach ($audienceSegment->getChildren() as $subSegment) {
             $validRelationships = \array_intersect($validRelationships, $this->getValidRelationships($subSegment));
         }
         return $validRelationships;

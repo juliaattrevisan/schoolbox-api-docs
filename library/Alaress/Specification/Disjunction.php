@@ -22,8 +22,8 @@ class Disjunction extends Composite
      */
     public function isSatisfiedBy($candidate): bool
     {
-        foreach($this->getComponents() as $component){
-            if($component->isSatisfiedBy($candidate)){
+        foreach ($this->getComponents() as $component) {
+            if ($component->isSatisfiedBy($candidate)) {
                 return true;
             }
         }

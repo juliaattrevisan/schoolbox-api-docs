@@ -19,8 +19,8 @@ class Conjunction extends Composite
      */
     public function isSatisfiedBy($candidate): bool
     {
-        foreach($this->getComponents() as $component){
-            if(!$component->isSatisfiedBy($candidate)){
+        foreach ($this->getComponents() as $component) {
+            if (!$component->isSatisfiedBy($candidate)) {
                 return false;
             }
         }
@@ -35,8 +35,8 @@ class Conjunction extends Composite
     {
         // Special case: do not return the component Specifications that are met
         $unsatisfied = [];
-        foreach($this->getComponents() as $component){
-            if(!$component->isSatisfiedBy($candidate)){
+        foreach ($this->getComponents() as $component) {
+            if (!$component->isSatisfiedBy($candidate)) {
                 $unsatisfied[] = $component;
             }
         }

@@ -20,7 +20,7 @@ class ExclusiveOr extends Composite
     public function isSatisfiedBy($candidate): bool
     {
         $value = false;
-        foreach($this->getComponents() as $component){
+        foreach ($this->getComponents() as $component) {
             $value = ($value xor $component->isSatisfiedBy($candidate));
         }
         return $value;
