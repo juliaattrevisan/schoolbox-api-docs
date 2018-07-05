@@ -16,6 +16,8 @@
 
         {# Retrieve a new set of articles based on topic #}
         $('#news-topics-{{ componentInstanceId }}').on('click', 'a', function(event) {
+            event.preventDefault();
+
             container.html('<div class="loader"></div>');
 
             $.ajax({
@@ -34,6 +36,7 @@
     {% for topic in topics %}
     <dd {% if loop.first %}class="active"{% endif %}><a href="{{ routeLookup('commsNews.getListByTopic', {topicId: topic.id}) }}">{{ topic.name }}</a></dd>
     {% endfor %}
+    <dd><a href="{{ routeLookup('commsNews.getListByTopic', {topicId: 0}) }}">All</a></dd>
 </dl>
 
 <div id="news-container-{{ componentInstanceId }}">
