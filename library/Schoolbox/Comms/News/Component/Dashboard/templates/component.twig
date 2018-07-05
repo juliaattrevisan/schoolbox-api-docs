@@ -1,3 +1,4 @@
+<script src="/javascript/shared/comms/saveforlater.js"></script>
 <script>
     $(function() {
         $.ajax({
@@ -5,7 +6,9 @@
             url: "{{ routeLookup('commsNews.getListByTopic', {topicId: 1}) }}",
             dataType: 'html'
         }).success(function (response) {
-            $('#news-container-{{ componentInstanceId }}').html(response);
+            var container = $('#news-container-{{ componentInstanceId }}');
+
+            container.html(response).saveForLater();
         }).error(function (response) {
 
         });

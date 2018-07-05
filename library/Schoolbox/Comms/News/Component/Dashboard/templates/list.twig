@@ -1,6 +1,6 @@
 <ul class="information-list">
     {% for article in articles %}
-        <li>
+        <li class="actions-small-1">
             <div class="list-item">
                 <div class="small-12 card">
                     <a href="{{ routeLookup('commsNews.getDetail', {articleId: article.id}) }}">
@@ -23,6 +23,9 @@
                     {% endif %}
                 </div>
             </div>
+            <nav>
+                <a data-saveforlater="{% if article.id in savedArticleIds %}1{% else %}0{% endif %}" href="{{ routeLookup('commsNewsSaveForLater.postToggle', {articleId: article.id}) }}"></a>
+            </nav>
         </li>
     {% endfor %}
 </ul>

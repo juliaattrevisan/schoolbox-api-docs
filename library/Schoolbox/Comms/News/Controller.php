@@ -8,6 +8,7 @@
  */
 namespace Schoolbox\Comms\News;
 
+use Alaress\Database\Predicate\Builder;
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
 use InvalidArgumentException;
@@ -453,15 +454,36 @@ class Controller extends Base
      * TODO: Incompleted
      *
      * @param int $topicId
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
      */
     public function getListByTopic(int $topicId)
     {
         if ($this->getRequest()->isXhr()) {
+
+            /* TODO: Find articles that were audienced to me
+             */
             $articles = $this->newsMapper->findAll();
 
+            /* Figure out which ones were saved for later
+             */
+            $policies = $this->policyMapper->findAll()->indexBy('identifier');
+
+            /* Figure out the articles that this user has saved for later
+             */
+            $saveForLater = $policies->getOffset('save_for_later')->getValue();
+
+            $savedArticleIds = [];
+
+            if ($saveForLater) {
+                $pb = new Builder($this->newsMapper->getDatabase(), 'comms_news_saveforlater');
+                $pb->equals('user_id', $this->getUser()->getId());
+
+                $savedArticleIds = SaveForLater\Mapper::getInstance()->findScalarByPredicates('article_id', $pb);
+            }
+
             $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@commsNewsDashboard/list.twig', [
-                'articles' => $articles
+                'articles' => $articles,
+                'savedArticleIds' => $savedArticleIds
             ]));
         }
     }
