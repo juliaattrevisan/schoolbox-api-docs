@@ -8,7 +8,6 @@
  */
 namespace Schoolbox\Comms\News;
 
-
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
 use InvalidArgumentException;
@@ -20,7 +19,6 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\News\TopicMapper;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
-
 
 class Controller extends Base
 {
