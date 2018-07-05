@@ -41,3 +41,4 @@ post-provision.sh
 browscap.ini
 *.lock
 version.json
+codeception.yml
