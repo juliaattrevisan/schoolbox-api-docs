@@ -36,5 +36,3 @@ if (php_sapi_name() == "cli") {
 if (!defined('INSTANCE_ID')) {
     define('INSTANCE_ID', 'xxxxxxxx');
 }
-
-?>
