@@ -237,8 +237,16 @@ class Bootstrap extends AbstractBootstrap {
         if (isset($_SERVER['REQUEST_METHOD']) && !\in_array($_SERVER['REQUEST_METHOD'], ['GET', 'HEAD'], true)) {
 
             // Check against whitelist first
-            $whitelist = ['/saml/consume.php*', '/api/register/*', '/loginForm.php*', '/liss/liss.php' ];
-            foreach ($whitelist as $path) {
+			$whitelist = [
+				'/saml/consume.php*',
+				'/api/register/*',
+				'/loginForm.php*',
+				'/liss/liss.php',
+				'/lti-consumer/component/*'
+			];
+
+			return;
+			foreach ($whitelist as $path) {
                 if (fnmatch($path, $_SERVER['REQUEST_URI'])) {
                     return;
                 }

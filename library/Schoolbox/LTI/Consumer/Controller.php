@@ -18,6 +18,7 @@ use Component_ConfigDefinitionMapper;
 use Component_ConfigMapper;
 use Component_ControllerAbstract;
 use DateTime;
+use Exception;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\LTI\Provider\Model as Provider;
@@ -27,14 +28,42 @@ use Schoolbox\User;
 
 class Controller extends Base
 {
-	/** @var Component_ConfigDefinitionMapper $componentConfigDefinitionMapper */
-	private $componentConfigDefinitionMapper;
+	// ---------------------------------------------------------------------------------------------------
+	// Constants
+	// ---------------------------------------------------------------------------------------------------
 
-	/** @var Component_ConfigMapper $componentConfigMapper */
-	private $componentConfigMapper;
+	/**
+	 * LTI version constants
+	 */
 
-	/** @var ConfigMapper $configMapper */
-	private $configMapper;
+	const LTI_VERSION_1 = 'LTI-1p0';
+	const LTI_VERSION_2 = 'LTI-2p0';
+
+	/**
+	 * LTI request types
+	 */
+
+	const LTI_LAUNCH_TYPE_BASIC  = 'basic-lti-launch-request';
+	const LTI_LAUNCH_TYPE_PICKER = 'ContentItemSelectionRequest';
+
+	/**
+	 * LTI contexts
+	 */
+	const LTI_CONTEXT_CONTENT_ITEM = 'http://purl.imsglobal.org/ctx/lti/v1/ContentItem';
+
+	/**
+	 * LTI media types
+	 */
+	const LTI_MEDIA_TYPE_LINK = 'application/vnd.ims.lti.v1.ltilink';
+
+	/**
+	 * Component config
+	 */
+	const COMPONENT_CONFIG_TITLE                 = 'componentname';
+	const COMPONENT_CONFIG_LTI_PROVIDER          = 'ltiprovider';
+	const COMPONENT_CONFIG_LTI_EMBED_URL         = 'url';
+	const COMPONENT_CONFIG_LTI_CUSTOM_PARAMETERS = 'description';
+	const COMPONENT_CONFIG_HEIGHT                = 'pixel';
 
 	/**
 	 * Allowed LTI return types
@@ -45,11 +74,11 @@ class Controller extends Base
 	 * OEmbed has been intentionally skipped for now as its a pain in the butt to implement and I
 	 * don't currently have any examples of LTI providers that use this
 	 */
-	const RETURN_TYPE_IFRAME = 'iframe';
-	const RETURN_TYPE_URL    = 'url';
-	const RETURN_TYPE_FILE   = 'file';
-	const RETURN_TYPE_IMAGE  = 'image_url';
-	const RETURN_TYPE_LAUNCH = 'lti_launch_url';
+	const LTI_RETURN_TYPE_IFRAME = 'iframe';
+	const LTI_RETURN_TYPE_URL    = 'url';
+	const LTI_RETURN_TYPE_FILE   = 'file';
+	const LTI_RETURN_TYPE_IMAGE  = 'image_url';
+	const LTI_RETURN_TYPE_LAUNCH = 'lti_launch_url';
 
 	/**
 	 * Allowed LTI user roles
@@ -58,33 +87,54 @@ class Controller extends Base
 	const LTI_ROLE_INSTRUCTOR = 'Instructor';
 	const LTI_ROLE_GUEST      = 'Guest';
 
+	// ---------------------------------------------------------------------------------------------------
+	// Variables
+	// ---------------------------------------------------------------------------------------------------
+
+	/** @var Component_ConfigDefinitionMapper $componentConfigDefinitionMapper */
+	private $componentConfigDefinitionMapper;
+
+	/** @var Component_ConfigMapper $componentConfigMapper */
+	private $componentConfigMapper;
+
+	/** @var ConfigMapper $configMapper */
+	private $configMapper;
+
+	/** @var string */
+	private $baseUrl;
+
+	/** @var User */
+	private $user;
+
 	/**
-	 * Controller constructor.
+	 * Controller constructor
 	 */
 	public function __construct()
 	{
 		$this->componentConfigMapper           = Component_ConfigMapper::getInstance();
 		$this->componentConfigDefinitionMapper = Component_ConfigDefinitionMapper::getInstance();
 		$this->configMapper                    = ConfigMapper::getInstance();
+		$this->baseUrl                         = "{$_SERVER['REQUEST_SCHEME']}://{$_SERVER['HTTP_HOST']}";
 	}
 
 	/**
-	 * Update component configuration and set the provider it will use
+	 * Silently update component configuration and set the provider it will use
 	 *
 	 * @param Provider                     $provider
 	 * @param Component_ControllerAbstract $component
 	 *
 	 * @throws MapperException
+	 * @throws Exception
 	 */
 	public function postComponentProvider($provider, $component)
 	{
 		$post = $this->getRequest()->post;
 
-		$this->updateComponentValue($component, 'ltiprovider', $provider->getId());
-		$this->updateComponentValue($component, 'componentname', $provider->getName());
+		$this->updateComponentValue($component, self::COMPONENT_CONFIG_LTI_PROVIDER, $provider->getId());
+		$this->updateComponentValue($component, self::COMPONENT_CONFIG_TITLE, $provider->getName());
 
 		if (isset($post['url'])) {
-			$this->updateComponentValue($component, 'description', $post['url']);
+			$this->updateComponentValue($component, self::COMPONENT_CONFIG_LTI_EMBED_URL, $post['url']);
 		}
 
 		$this->getResponse()->content->set([
@@ -98,7 +148,133 @@ class Controller extends Base
 	}
 
 	/**
-	 * Create LTI launch form
+	 * Parse the result of an LTI resource picker and update the component with the appropriate embed URL
+	 *
+	 * @param Component_ControllerAbstract $component
+	 *
+	 * @throws MapperException
+	 * @throws Exception
+	 */
+	public function postComponentPicker($component)
+	{
+		$post = $this->getRequest()->post;
+
+		// Make sure we got content items back from the provider
+
+		if (!isset($post['content_items'])) {
+			throw new Exception("No content items returned");
+		}
+
+		// Try to decode the content items
+
+		$contentItemsArray = json_decode($post['content_items'], true);
+
+		if (json_last_error() !== JSON_ERROR_NONE) {
+			throw new Exception("Error decoding content items array");
+		}
+
+		// Check the context is correct
+
+		if ($contentItemsArray['@context'] !== self::LTI_CONTEXT_CONTENT_ITEM) {
+			throw new Exception("Unexpected context received");
+		}
+
+		// Check we received a content graph
+
+		if (!isset($contentItemsArray['@graph'])) {
+			throw new Exception("Content graph not found");
+		}
+
+		// Go through each item in the graph
+
+		foreach ($contentItemsArray['@graph'] as $item) {
+
+			// Grab the title if there is one
+
+			if (isset($item['title'])) {
+				$title = $item['title'];
+			}
+
+			// The great thing about the LTI standard is that it seems kinda half finished so each vendor
+			// has hacked int heir own way of passing back the required information- so we have to manually parse
+			// each vendors specific data to find something we can actually use. Yay for "standards"!
+
+			// ---------------------------------------------------------------------------------------------------
+			// Education Perfect picker result
+			// ---------------------------------------------------------------------------------------------------
+
+			// The target URL we need is in the syntax:
+			// {contentUrl}#/{activity}/{module}/activity-starter
+			//
+			//	{
+			//	  "@context": "http://purl.imsglobal.org/ctx/lti/v1/ContentItem",
+			//	  "@graph": [
+			//		{
+			//		  "@type": "LtiLinkItem",
+			//		  "mediaType": "application/vnd.ims.lti.v1.ltilink",
+			//		  "placementAdvice": {
+			//			"presentationDocumentTarget": "frame"
+			//		  },
+			//		  "text": "Happy Pi Day! (Year 5-10) (Education Perfect)",
+			//		  "title": "Happy Pi Day! (Year 5-10) (Education Perfect)",			<--- Component heading
+			//		  "custom": {
+			//			"contentUrl": "https://www.educationperfect.com:443/app/",		<--- Target URL
+			//			"activity": "2551018",											<--- Target URL parameter
+			//			"module": "1719905"												<--- Target URL parameter
+			//		  }
+			//		}
+			//	  ]
+			//	}
+
+			if (isset($item['@type']) && isset($item['mediaType'])) {
+				if ($item['@type'] === 'LtiLinkItem' && $item['mediaType'] === self::LTI_MEDIA_TYPE_LINK) {
+					if (isset($item['custom'])) {
+						if (isset($item['custom']['contentUrl']) &&
+							isset($item['custom']['activity']) &&
+							isset($item['custom']['module'])
+						) {
+							// Construct the URL
+
+							$targetUrl = $item['custom']['contentUrl'] . "#/";
+							$targetUrl .= $item['custom']['activity'] . "/";
+							$targetUrl .= $item['custom']['module'] . "/activity-starter";
+
+							// Found everything we need, get outta here and use it
+
+							break;
+						}
+					}
+				}
+			}
+
+			// Check other provider responses... (none yet)
+		}
+
+		// If we got here without finding and URL, throw an exception because there is nothing else we can do
+
+		if (!isset($targetUrl) || strlen(trim($targetUrl)) === 0) {
+			throw new Exception("No content location header could be found, cannot proceed.");
+		}
+
+		// Update the component with the target URL
+
+		$this->updateComponentValue($component, self::COMPONENT_CONFIG_LTI_EMBED_URL, $targetUrl);
+
+		// Update the component with the title (assuming we found one)
+
+		if (isset($title)) {
+			if (strlen(trim($title)) > 0) {
+				$this->updateComponentValue($component, self::COMPONENT_CONFIG_TITLE, $title);
+			}
+		}
+
+		// Redirect to the target URL
+
+		$this->response->redirect->to($targetUrl);
+	}
+
+	/**
+	 * Create LTI launch request form
 	 *
 	 * @param Provider                     $provider
 	 * @param Component_ControllerAbstract $component
@@ -108,95 +284,147 @@ class Controller extends Base
 	 */
 	public function getLaunch($provider, $component, $folder)
 	{
-		// Retrieve current logged in user
+		$this->user = $this->getUser();
 
-		$user = $this->getUser();
+		switch ($provider->getLaunchType()) {
+			case 'LTI_LAUNCH_TYPE_PICKER':
+				$ltiRequestType = self::LTI_LAUNCH_TYPE_PICKER;
+				break;
 
-		// Disable history tracking so the LTI iframe doesn't cause unexpected page navigation
+			default:
+				$ltiRequestType = self::LTI_LAUNCH_TYPE_BASIC;
+				break;
+		}
+
+		// Disable history tracking so the LTI iframe doesn't cause unexpected page navigation in the main
+		// Schoolbox window
 
 		$this->setAllowBackToTheFuture(false);
 
-		// Check if the LTI component already has a resource URL specified, if it does we will bypass LTI and
-		// just redirect the components iframe to tha address
+		// Define LTI return URL
 
-		$url = $component->getConfig('url');
+		$extContentReturnUrl = $this->baseUrl .
+							   $this->getRouteIfAuthorized('ltiConsumer.getComponentCallback', [
+								   'componentId' => $component->getInstance()->getId(),
+							   ]);
 
-		if (!empty($url)) {
-			$this->getResponse()->redirect->to($url);
+		$launchPresentationReturnUrl = "{$this->baseUrl}homepage/{$folder->getId()}";
+
+		// Check if the LTI component is a picker and already has a resource URL specified
+
+		$embedUrl = trim($component->getConfig(self::COMPONENT_CONFIG_LTI_EMBED_URL));
+
+		// ---------------------------------------------------------------------------------------------------
+		// Create array to hold launch data
+		// ---------------------------------------------------------------------------------------------------
+
+		$launch_data = [];
+
+		// ---------------------------------------------------------------------------------------------------
+		// Education perfect URL mangling
+		// ---------------------------------------------------------------------------------------------------
+
+		if (stristr($embedUrl, 'educationperfect') !== false) {
+			if (strlen($embedUrl) > 0) {
+				if ($ltiRequestType == self::LTI_LAUNCH_TYPE_PICKER) {
+					$ltiRequestType = self::LTI_LAUNCH_TYPE_BASIC;
+
+					// Put the resource url into the launch data
+
+					$launch_data['contentUrl'] = $embedUrl;
+				}
+			}
+		} else {
+			// Maintain current behaviour (for fear of breaking any existing integrations)
+
+			$this->response->redirect->to($embedUrl);
+			return;
 		}
-
-		// Otherwise go to the LTI provider
-
-		$baseUrl = "{$_SERVER['REQUEST_SCHEME']}://{$_SERVER['SERVER_NAME']}";
-
-		// Define return URL
-
-		$extContentReturnUrl = $baseUrl . $this->getRouteIfAuthorized('ltiConsumer.getComponentCallback', [
-				'componentId' => $component->getInstance()->getId(),
-			]);
 
 		// Define allowed return types from LTI providers
 
 		$returnTypes = implode(',', [
-			self::RETURN_TYPE_IFRAME,
-			self::RETURN_TYPE_URL,
-			self::RETURN_TYPE_FILE,
-			self::RETURN_TYPE_IMAGE,
-			self::RETURN_TYPE_LAUNCH,
+			self::LTI_RETURN_TYPE_IFRAME,
+			self::LTI_RETURN_TYPE_URL,
+			self::LTI_RETURN_TYPE_FILE,
+			self::LTI_RETURN_TYPE_IMAGE,
+			self::LTI_RETURN_TYPE_LAUNCH,
 		]);
 
-		$launch_data = [
+		$now = new DateTime();
+
+		$launch_data = array_merge($launch_data, [
 			'resource_link_id'                       => $folder->getId() . '_' . $component->getInstance()->getId(),
-			'resource_link_title'                    => $component->getConfig('componentname'),
+			'resource_link_title'                    => $component->getConfig(self::COMPONENT_CONFIG_TITLE),
 			'resource_link_description'              => '',
-			'user_id'                                => $user->getId(),
-			'user_image'                             => $this->getUserPortraitUrl($user),
-			'roles'                                  => $this->getLTIRole($user),
-			'lis_person_name_given'                  => $user->getFirstname(),
-			'lis_person_name_family'                 => $user->getLastname(),
-			'lis_person_name_full'                   => $user->getFullName(),
-			'lis_person_contact_email_primary'       => $user->getEmail(),
+			'user_id'                                => $this->user->getId(),
+			'user_image'                             => $this->getUserPortraitUrl($this->user),
+			'roles'                                  => $this->getLTIRole($this->user),
+			'lis_person_name_given'                  => $this->user->getFirstname(),
+			'lis_person_name_family'                 => $this->user->getLastname(),
+			'lis_person_name_full'                   => $this->user->getFullName(),
+			'lis_person_contact_email_primary'       => $this->user->getEmail(),
 			'context_id'                             => $folder->getId(),
 			'context_type'                           => 'CourseSection',
 			'context_title'                          => $folder->getName(),
 			'context_label'                          => $folder->getCodeString(),
 			'launch_presentation_locale'             => 'en-US',
 			'launch_presentation_document_target'    => 'iframe',
-			'launch_presentation_return_url'         => "{$baseUrl}homepage/{$folder->getId()}",
+			'launch_presentation_return_url'         => $launchPresentationReturnUrl,
 			'ext_content_return_types'               => $returnTypes,
 			'ext_content_return_url'                 => $extContentReturnUrl,
 			'tool_consumer_instance_guid'            => $this->configMapper->get('site_location'),
 			'tool_consumer_instance_name'            => $this->configMapper->get('school_name'),
 			'tool_consumer_instance_description'     => 'Schoolbox LMS',
-			'tool_consumer_instance_url'             => $baseUrl,
+			'tool_consumer_instance_url'             => $this->baseUrl,
 			'tool_consumer_instance_contact_email'   => $this->configMapper->get('mail_from_address'),
 			'tool_consumer_info_product_family_code' => 'schoolbox',
 			'tool_consumer_info_version'             => $this->configMapper->get('site_version'),
 			'ext_lms'                                => 'schoolbox-' . $this->configMapper->get('site_version'),
-		];
+			'lti_version'                            => self::LTI_VERSION_1,
+			'lti_message_type'                       => $ltiRequestType,
+			'oauth_callback'                         => 'about:blank',
+			'oauth_consumer_key'                     => $provider->getKey(),
+			'oauth_version'                          => '1.0',
+			'oauth_nonce'                            => uniqid('', true),
+			'oauth_timestamp'                        => $now->getTimestamp(),
+			'oauth_signature_method'                 => 'HMAC-SHA1',
+		]);
 
+		// Add picker specific option
+
+		if ($ltiRequestType === self::LTI_LAUNCH_TYPE_PICKER) {
+			$launch_data = array_merge($launch_data, [
+				'request_type'                         => 'content',
+				'accept_presentation_document_targets' => 'embed,frame,iframe,window',
+				'accept_media_types'                   => '*/*',
+				'accept_unsigned'                      => 'true',
+				'accept_multiple'                      => 'false',
+				'content_item_return_url'              => $this->baseUrl .
+														  $this->getRouteIfAuthorized('ltiConsumer.postComponentPicker', [
+															  'componentId' => $component->getInstance()->getId(),
+															  'providerId'  => $provider->getId(),
+														  ]),
+			]);
+		}
+
+		// ---------------------------------------------------------------------------------------------------
 		// Learning Field custom URL mangling
+		// ---------------------------------------------------------------------------------------------------
 
 		if (strtolower($provider->getUrl()) == 'https://bc.vitalsource.com/books/book') {
-			$custom = $component->getConfig('description');
+			$custom = $component->getConfig(self::COMPONENT_CONFIG_LTI_CUSTOM_PARAMETERS);
+
 			preg_match('/\/books\/([A-Z0-9]+)\//i', $custom, $matches);
 			$launch_data['custom_vbid'] = $matches[1];
+
 			preg_match('/\/pageid\/(.*)/i', $custom, $matches);
 			$launch_data['custom_book_location'] = 'pageid/' . $matches[1];
 		}
 
-		// Sign LTI request using OAuth
-
-		$now = new DateTime();
-
-		$launch_data["lti_version"]            = "LTI-1p0";
-		$launch_data["lti_message_type"]       = "basic-lti-launch-request";
-		$launch_data["oauth_callback"]         = "about:blank";
-		$launch_data["oauth_consumer_key"]     = $provider->getKey();
-		$launch_data["oauth_version"]          = "1.0";
-		$launch_data["oauth_nonce"]            = uniqid('', true);
-		$launch_data["oauth_timestamp"]        = $now->getTimestamp();
-		$launch_data["oauth_signature_method"] = "HMAC-SHA1";
+		// ---------------------------------------------------------------------------------------------------
+		// Sign the request
+		// ---------------------------------------------------------------------------------------------------
 
 		// OAuth requires that all passed keys be sorted alphabetically
 
@@ -247,29 +475,29 @@ class Controller extends Base
 		$title  = null;
 
 		switch ($return_type) {
-			case self::RETURN_TYPE_IFRAME:
+			case self::LTI_RETURN_TYPE_IFRAME:
 				$url    = $get['url'];
 				$title  = $get['title'];
 				$height = $get['height'];
 				break;
 
-			case self::RETURN_TYPE_URL:
+			case self::LTI_RETURN_TYPE_URL:
 				$url   = $get['url'];
 				$title = $get['text'];
 				break;
 
-			case self::RETURN_TYPE_FILE:
+			case self::LTI_RETURN_TYPE_FILE:
 				$url   = $get['url'];
 				$title = $get['text'];
 				break;
 
-			case self::RETURN_TYPE_IMAGE:
+			case self::LTI_RETURN_TYPE_IMAGE:
 				$url    = $get['url'];
 				$title  = $get['text'];
 				$height = $get['height'];
 				break;
 
-			case self::RETURN_TYPE_LAUNCH:
+			case self::LTI_RETURN_TYPE_LAUNCH:
 				$url   = $get['url'];
 				$title = $get['text'];
 				break;
@@ -283,15 +511,15 @@ class Controller extends Base
 		// Update the component configuration with any details we are able to retrieve
 
 		if (!empty($title)) {
-			$this->updateComponentValue($component, 'componentname', $title);
+			$this->updateComponentValue($component, self::COMPONENT_CONFIG_TITLE, $title);
 		}
 
 		if (!empty($url)) {
-			$this->updateComponentValue($component, 'url', $url);
+			$this->updateComponentValue($component, self::COMPONENT_CONFIG_LTI_EMBED_URL, $url);
 		}
 
 		if (!empty($height)) {
-			$this->updateComponentValue($component, 'pixel', $height);
+			$this->updateComponentValue($component, self::COMPONENT_CONFIG_HEIGHT, $height);
 		}
 
 		// Rather than just redirecting the iframe directly to the requested resource we need to do a bit
@@ -326,9 +554,7 @@ class Controller extends Base
 	 */
 	private function getUserPortraitUrl($user, $size = 'square80')
 	{
-		$baseUrl = "{$_SERVER['REQUEST_SCHEME']}://{$_SERVER['SERVER_NAME']}";
-
-		return "{$baseUrl}portrait.php?userId={$user->getExternalId()}&size={$size}";
+		return "{$this->baseUrl}/portrait.php?userId={$user->getExternalId()}&size={$size}";
 	}
 
 	/**
