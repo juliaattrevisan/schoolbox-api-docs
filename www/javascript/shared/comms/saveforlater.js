@@ -35,7 +35,6 @@
                         processing: 'Saving...',
                         complete: 'Saved'
                     },
-                    value: 1,
                     icon: 'icon-favourite',
                     title: 'Unsave article'
                 },
@@ -45,7 +44,6 @@
                         processing: 'Unsaving...',
                         complete: 'Unsaved'
                     },
-                    value: 0,
                     icon: 'icon-favourite-hollow',
                     title: 'Save article'
                 }
@@ -70,8 +68,7 @@
 
                 $(element)
                     .attr('title', currentState.title)
-                    .addClass(currentState.icon)
-                    .attr('data-saveforlater', currentState.value)
+                    .addClass(currentState.icon);
             });
         }
 
