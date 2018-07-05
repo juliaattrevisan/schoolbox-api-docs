@@ -191,7 +191,7 @@
             {% for courseImpl in courseImpls %}
                 {% set courseImplAssessements = courseAssessments[courseImpl.id] %}
                 <tr>
-                    <td colspan="2" class="class-row class-row-heading">{{ courseImpl.folder.title }}</td>
+                    <td colspan="2" class="class-row class-row-heading"><a href="/homepage/{{ courseImpl.folder.id }}">{{ courseImpl.folder.title }}</a></td>
                     {% for assessment in collapsedAssessments %}
                         {% set assessmentImpl = courseImportAssessments[courseImpl.id][assessment.id] %}
                         {% if assessmentImpl %}
