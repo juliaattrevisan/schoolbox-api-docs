@@ -449,8 +449,13 @@ class CourseMarkbook
         $this->taskProgress    = [];
 
         // Student weighted average across all assessment in a course.
-        // Temporarily indexed by [courseImpl.id][user.id]['sum'|'weight']. We'll collate at end of iteration.
         $this->studentAverageMarks = [];
+
+        /** @var float[][][][] $studentAverageMarks */
+        $studentAverageMarks = [];               // Indexed by [courseImpl.id][user.id]['any'|'published']['sum'|'weight'].
+
+        /** @var bool[] $studentMarkContainsDrafts Track whether a student's weighted average contains a draft mark */
+        $studentMarkContainsDrafts = [];         // indexed by user.id
 
         // Average (non-weighted) marks per assessment.
         $this->assessmentImplAverages = [];
@@ -459,7 +464,7 @@ class CourseMarkbook
         // bool[]. Track whether any aggregate assessment marks are composed of draft marks
         $assessmentImplMarkContainsDrafts = [];  // indexed by aImpl.id
         $assessmentSpecMarkContainsDrafts = [];  // indexed by aSpec.id
-        $studentMarkContainsDrafts        = [];  // indexed by user.id
+
 
         foreach ($assessmentImpls as $aImpl) {
             if (!$aImpl->isFeedbackVisibleToUser($viewingUser)) {
@@ -570,11 +575,11 @@ class CourseMarkbook
                     // Either draft or published mark
                     if ($authAnyFeedback && null !== $authNormMark) {
                         // First time we've encountered this row (user + course-import) ?
-                        if (!\is_array($this->studentAverageMarks[$courseImplId][$userId])) {
-                            $this->studentAverageMarks[$courseImplId][$userId]['any'] = ['sum' => 0, 'weight' => 0];
+                        if (!\is_array($studentAverageMarks[$courseImplId][$userId])) {
+                            $studentAverageMarks[$courseImplId][$userId]['any'] = ['sum' => 0, 'weight' => 0];
                         }
-                        $this->studentAverageMarks[$courseImplId][$userId]['any']['sum']    += $weight * $authNormMark;
-                        $this->studentAverageMarks[$courseImplId][$userId]['any']['weight'] += $weight;
+                        $studentAverageMarks[$courseImplId][$userId]['any']['sum']    += $weight * $authNormMark;
+                        $studentAverageMarks[$courseImplId][$userId]['any']['weight'] += $weight;
 
                         if ($authAnyFeedback->isDraft()) {
                             $assessmentImplMarkContainsDrafts[$aImplId] = true;
@@ -585,11 +590,11 @@ class CourseMarkbook
                     // Just published marks
                     if ($authPublishedFeedback && null !== $authPublishedFeedback) {
                         // First time we've encountered this row (user + course-import) ?
-                        if (!\is_array($this->studentAverageMarks[$courseImplId][$userId])) {
-                            $this->studentAverageMarks[$courseImplId][$userId]['published'] = ['sum' => 0, 'weight' => 0];
+                        if (!\is_array($studentAverageMarks[$courseImplId][$userId])) {
+                            $studentAverageMarks[$courseImplId][$userId]['published'] = ['sum' => 0, 'weight' => 0];
                         }
-                        $this->studentAverageMarks[$courseImplId][$userId]['published']['sum']    += $weight * $publishedNormMark;
-                        $this->studentAverageMarks[$courseImplId][$userId]['published']['weight'] += $weight;
+                        $studentAverageMarks[$courseImplId][$userId]['published']['sum']    += $weight * $publishedNormMark;
+                        $studentAverageMarks[$courseImplId][$userId]['published']['weight'] += $weight;
                     }
                 }
             }
@@ -645,10 +650,10 @@ class CourseMarkbook
         }
 
         // Resolve student weighted averages
-        foreach ($this->studentAverageMarks as $courseImplId => $courseMarks) {
+        foreach ($studentAverageMarks as $courseImplId => $courseMarks) {
             foreach ($courseMarks as $userId => $studentCourseMarks) {
                 foreach ($studentCourseMarks as $type => $sumAndWeight) {
-                    $this->studentAverageMarks[$courseImplId][$userId][$type] = $sumAndWeight['weight']
+                    $studentAverageMarks[$courseImplId][$userId][$type] = $sumAndWeight['weight']
                         ? $sumAndWeight['sum'] / $sumAndWeight['weight']
                         : null;
                 }
@@ -656,16 +661,16 @@ class CourseMarkbook
         }
 
         // Unset any student aggregate mark if it was not composed of any drafts
-        foreach($this->studentAverageMarks as $courseImplId => $courseMarks){
+        foreach($studentAverageMarks as $courseImplId => $courseMarks){
             foreach ($courseMarks as $userId => $studentCourseMarks) {
                 if(!\array_key_exists($userId, $studentMarkContainsDrafts)){
-                    unset($this->studentAverageMarks[$courseImplId][$userId]['any']);
+                    unset($studentAverageMarks[$courseImplId][$userId]['any']);
                 }
             }
         }
 
         // And convert into human-readable form
-        foreach($this->studentAverageMarks as $courseImplId => $courseMarks){
+        foreach($studentAverageMarks as $courseImplId => $courseMarks){
             foreach ($courseMarks as $userId => $studentCourseMarks) {
                 foreach ($studentCourseMarks as $publishType => $normalised){
                     /** @var float $normalised */
