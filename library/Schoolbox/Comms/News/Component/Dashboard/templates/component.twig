@@ -15,6 +15,12 @@
     });
 </script>
 
+<dl class="tabs" data-tab="">
+    {% for topic in topics %}
+    <dd {% if loop.first %}class="active"{% endif %}><a data-topic="{{ topic.id }}">{{ topic.name }}</a></dd>
+    {% endfor %}
+</dl>
+
 <div id="news-container-{{ componentInstanceId }}">
     <div class="loader"></div>
 </div>

@@ -13,6 +13,7 @@ use Component_Instance;
 use Schoolbox\Comms\News\Policy;
 use Schoolbox\Comms\News\SaveForLater;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\News\TopicMapper;
 use Schoolbox\User;
 use SitePage;
 
@@ -73,6 +74,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
     {
         return $this->renderTwigTemplate($templateHandle, '@commsNewsDashboard/component.twig', [
             'componentInstanceId' => $this->getInstance()->getId(),
+            'topics' => TopicMapper::getInstance()->findAll(),
         ]);
     }
 }
