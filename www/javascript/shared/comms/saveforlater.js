@@ -28,6 +28,10 @@
                  */
                 element: element,
 
+                /* The toaster
+                 */
+                toast: $('#toast'),
+
                 /* Transitions
                  */
                 saved: {
@@ -80,7 +84,7 @@
                 event.preventDefault();
 
                 var $element = $(this);
-                var $toast = $('#toast');
+                var $toast = config.toast;
 
                 /* The state of everything after the action takes place
                  */
