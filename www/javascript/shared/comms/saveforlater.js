@@ -59,20 +59,16 @@
          */
         function initSaveForLater() {
             var currentState;
-            var currentStateUrl;
 
             $.each($(config.element).find('a[data-saveforlater]'), function(index, element) {
                 if ($(element).attr('data-saveforlater') === '1') {
                     currentState = config.saved;
-                    currentStateUrl = $(element).attr('data-unsave-url');
                 }
                 else {
                     currentState = config.unsaved;
-                    currentStateUrl = $(element).attr('data-save-url');
                 }
 
                 $(element)
-                    .attr('href', currentStateUrl)
                     .attr('title', currentState.title)
                     .addClass(currentState.icon)
                     .attr('data-saveforlater', currentState.value)
@@ -90,18 +86,13 @@
                 var $toast = $('#toast');
 
                 /* The state of everything after the action takes place
-                 * Save it, if it's currently unsaved
-                 * Unsave it, if it's currently saved
                  */
                 var newState;
-                var newUrl;
 
                 if ($element.attr('data-saveforlater') === '1') {
                     newState = config.unsaved;
-                    newUrl = $element.attr('data-unsave-url');
                 } else {
                     newState = config.saved;
-                    newUrl = $element.attr('data-save-url');
                 }
 
                 $toast.toastActivate({
@@ -110,23 +101,22 @@
 
                 $.ajax({
                     type: 'POST',
-                    url: newUrl,
+                    url: $element.attr('href'),
                     dataType: 'json'
-                }).success(function () {
+                }).success(function (response) {
                     $toast.toastTimeout({
                         text: newState.toast.complete,
                         css: 'success'
                     });
 
                     // Update data attribute
-                    $element.attr('data-saveforlater', newState.value);
+                    $element.attr('data-saveforlater', response.currentValue);
 
                     // Update icon by removing all classes and adding the new one
                     $element.removeClass().addClass(newState.icon);
 
                     // Update title
                     $element.attr('title', newState.title);
-
                 }).error(function (response) {
                     var temp = $.parseJSON(response.responseText);
 

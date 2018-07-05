@@ -45,7 +45,7 @@ class Module extends BaseModule
         };
 
         $this->register('GET', '', 'getList', $perms);
-        $this->register('POST', '/{newsId}', 'postActivate', $perms, $preloadNews);
+        $this->register('POST', '/{newsId}', 'postToggle', $perms, $preloadNews);
         $this->register('POST', '/{newsId}/remove', 'postRemove', $perms, $preloadNews);
     }
 

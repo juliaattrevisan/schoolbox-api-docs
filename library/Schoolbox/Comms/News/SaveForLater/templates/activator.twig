@@ -6,4 +6,4 @@
  # @param Model news
  # @param string state
  #}
-<a data-saveforlater="{{ state }}" data-save-url="{{ routeLookup('commsNewsSaveForLater.postActivate', {newsId: news.id}) }}" data-unsave-url="{{ routeLookup('commsNewsSaveForLater.postRemove', {newsId: news.id}) }}"></a>
+<a data-saveforlater="{{ state }}" href="{{ routeLookup('commsNewsSaveForLater.postToggle', {newsId: news.id}) }}"></a>

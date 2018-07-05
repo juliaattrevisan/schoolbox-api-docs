@@ -76,14 +76,17 @@ class Controller extends Base
 
 
     /**
-     * Save For Later
+     * Toggle the current state of this article in a user's Saved For Later list
+     * You never really just activate them on their own - it's a toggle of states
+     * and it happens asynchronously
      *
      * @param News\Model $news
+     * @throws \Aura\Router\Exception\RouteNotFound
      */
-    public function postActivate(News\Model $news)
+    public function postToggle(News\Model $news)
     {
         if ($this->getRequest()->isXhr()) {
-            $outcome = $this->activate($news);
+            $outcome = $this->toggle($news);
 
             if (!$outcome['success']) {
                 $this->getResponse()->status->set(400);
@@ -100,7 +103,7 @@ class Controller extends Base
      * @param News\Model $news
      * @return array
      */
-    private function activate(News\Model $news): array
+    private function toggle(News\Model $news): array
     {
         /* Can only save when the Policy is on
          */
@@ -138,11 +141,17 @@ class Controller extends Base
             $exists = false;
         }
 
-        /* You've already saved this for later...and we know this. Good job.
+        /* It's already in your list; remove it
          */
         if ($exists) {
+            $this->saveForLaterMapper->deleteByColumnList([
+                'user_id' => $this->getUser()->getId(),
+                'article_id' => $news->getId()
+            ]);
+
             return [
-                'success' => true
+                'success' => true,
+                'currentValue' => 0
             ];
         }
 
@@ -157,6 +166,7 @@ class Controller extends Base
 
             return [
                 'success' => true,
+                'currentValue' => 1
             ];
         } catch (\PDOException|\UnexpectedValueException|Exception $e) {
             return [
@@ -171,6 +181,7 @@ class Controller extends Base
      * Remove an item from your Saved list
      *
      * @param News\Model $news
+     * @throws \Aura\Router\Exception\RouteNotFound
      */
     public function postRemove(News\Model $news)
     {
@@ -182,6 +193,7 @@ class Controller extends Base
 
             $this->getResponse()->content->set($this->buildJsonOutput([
                 'success' => true,
+                'nextUrl' => $this->getRouter()->generate('commsNewsSaveForLater.postRemove', ['newsId' => $news->getId()])
             ]));
         }
     }
