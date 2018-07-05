@@ -7,40 +7,73 @@
  # @param string state
  #}
 
-{% set iconSaved = 'icon-favourite' %}
-{% set iconUnsaved = 'icon-favourite-hollow' %}
-{% set titleSaved = 'Unsave article' %}
-{% set titleUnsaved = 'Save article' %}
-
 <script>
     $(function() {
-        $('#saveforlater').on('click', 'a[data-save]', function(event) {
+
+        {# Title indicates the next state, because this is a toggle #}
+        var states = {
+            saved: {
+                url: "{{ routeLookup('commsNewsSaveForLater.postRemove', {newsId: news.id}) }}",
+                toast: {
+                    processing: 'Saving...',
+                    complete: 'Saved'
+                },
+                value: 1,
+                icon: 'icon-favourite',
+                title: 'Unsave article'
+            },
+            unsaved: {
+                url: "{{ routeLookup('commsNewsSaveForLater.postActivate', {newsId: news.id}) }}",
+                toast: {
+                    processing: 'Unsaving...',
+                    complete: 'Unsaved'
+                },
+                value: 0,
+                icon: 'icon-favourite-hollow',
+                title: 'Save article'
+            }
+        };
+
+        function init(currentValue) {
+            var currentState;
+
+            if (parseInt(currentValue)) {
+                currentState = states.saved;
+            }
+            else {
+                currentState = states.unsaved;
+            }
+
+            $('#saveforlater a')
+                .attr('href', currentState.url)
+                .attr('title', currentState.title)
+                .addClass(currentState.icon)
+                .attr('data-saveforlater', currentState.value)
+        }
+
+        init({{ state }});
+
+
+        $('#saveforlater').on('click', 'a[data-saveforlater]', function(event) {
             event.preventDefault();
 
             var $element = $(this);
             var $toast = $('#toast');
-            var toastProcessing;
-            var toastComplete;
-            var newState;
-            var newIcon;
-            var newTitle;
 
-            if ($element.attr('data-save') === '1') {
-                toastProcessing = 'Unsaving...';
-                toastComplete = 'Unsaved';
-                newState = 0;
-                newIcon = '{{ iconUnsaved }}';
-                newTitle = '{{ titleUnsaved }}';
+            {# The state of everything after the action takes place
+             # Save it, if it's currently unsaved
+             # Unsave it, if it's currently saved
+             #}
+            var newState;
+
+            if ($element.attr('data-saveforlater') === '1') {
+                newState = states.unsaved;
             } else {
-                toastProcessing = 'Saving...';
-                toastComplete = 'Saved';
-                newState = 1;
-                newIcon = '{{ iconSaved }}';
-                newTitle = '{{ titleSaved }}';
+                newState = states.saved;
             }
 
             $toast.toastActivate({
-                text: toastProcessing
+                text: newState.toast.processing
             });
 
             $.ajax({
@@ -49,18 +82,18 @@
                 dataType: 'json'
             }).success(function () {
                 $toast.toastTimeout({
-                    text: toastComplete,
+                    text: newState.toast.complete,
                     css: 'success'
                 });
 
                 // Update data attribute
-                $element.attr('data-save', newState);
+                $element.attr('data-saveforlater', newState.value);
 
-                // Update icon
-                $element.removeClass('{{ iconSaved }}').removeClass('{{ iconUnsaved }}').addClass(newIcon);
+                // Update icon by removing all classes and adding the new one
+                $element.removeClass().addClass(newState.icon);
 
                 // Update title
-                $element.attr('title', newTitle);
+                $element.attr('title', newState.title);
 
             }).error(function (response) {
                 var temp = $.parseJSON(response.responseText);
@@ -74,10 +107,5 @@
         });
     });
 </script>
-<span id="saveforlater">
-    {% if state %}
-        <a href="{{ routeLookup('commsNewsSaveForLater.postRemove', {newsId: news.id}) }}" class="{{ iconSaved }}" title="{{ titleSaved }}" data-save="1"></a>
-    {% else %}
-        <a href="{{ routeLookup('commsNewsSaveForLater.postActivate', {newsId: news.id}) }}" class="{{ iconUnsaved }}" title="{{ titleUnsaved }}" data-save="0"></a>
-    {% endif %}
-</span>
+
+<span id="saveforlater"><a data-saveforlater></a></span>
