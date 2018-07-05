@@ -170,7 +170,7 @@ class SubmissionNotifier extends AbstractModuleNotifier
                     break;
                 }
                 // if we've gone from draft to not, notify submission
-                if (array_key_exists('draft', $diff) && $diff['draft'] == true) {
+                if (array_key_exists('submittedAt', $diff) && $diff['submittedAt'][1] === null) {
                     // is this the first? or a resubmit?
                     $counts = $mapper->findCountsForSubmissionBoxes(array($boxId), $studentId);
                     if (array_key_exists($boxId, $counts) && $counts[$boxId] > 1) {
