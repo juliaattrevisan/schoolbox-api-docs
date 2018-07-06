@@ -8,7 +8,6 @@
  */
 namespace Schoolbox\Comms\News;
 
-use Alaress\Database\Predicate\Builder;
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
 use InvalidArgumentException;
@@ -460,48 +459,9 @@ class Controller extends Base
     public function getListByTopic(int $topicId, int $limit)
     {
         if ($this->getRequest()->isXhr()) {
+            $outcome = (new Lists($this->newsMapper, $this->policyMapper))->findForTopic($this->getUser(), $topicId, $limit);
 
-            /* Component config can set "All" as its limit
-             */
-            $options = [];
-
-            if ($limit) {
-                $options = [
-                    'limit' => $limit
-                ];
-            }
-
-            /* TODO: Find articles that were audienced to me
-             */
-            $articles = $this->newsMapper->findAll($options);
-
-            /* Figure out which ones were saved for later
-             */
-            $policies = $this->policyMapper->findAll()->indexBy('identifier');
-
-            /* Figure out the articles that this user has saved for later
-             */
-            $saveForLater = $policies->getOffset('save_for_later')->getValue();
-
-            $savedArticleIds = [];
-
-            if ($saveForLater) {
-                $pb = new Builder($this->newsMapper->getDatabase(), 'comms_news_saveforlater');
-                $pb->equals('user_id', $this->getUser()->getId());
-
-                $ids = SaveForLater\Mapper::getInstance()->findScalarByPredicates('article_id', $pb);
-
-                $savedArticleIds = array_fill_keys($ids, SaveForLater\Mapper::SAVED);
-            }
-
-            /* TODO: Increment Impressions count for everything in $articles
-             */
-
-            $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@commsNewsDashboard/list.twig', [
-                'articles' => $articles,
-                'unsaved' => SaveForLater\Mapper::UNSAVED,
-                'savedArticleIds' => $savedArticleIds
-            ]));
+            $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@commsNewsDashboard/list.twig', $outcome));
         }
     }
 }
