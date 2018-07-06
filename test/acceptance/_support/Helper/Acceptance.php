@@ -270,14 +270,22 @@ class Acceptance extends \Codeception\Module
      */
     public function attachAttachzoneFile($field, $file)
     {
-        // This script attempts to encode the file, and add it to the attachzone
-        $script = sprintf(
-            "jQuery('%s').data('plugin_resourceAttach').dropzone.addFile(new File([new Blob(new Uint8Array([%s]))], '%s', {type: '%s'}))",
-            addslashes($field),
+        // Create a file programatically
+        $fileScript = sprintf(
+            "new File([new Blob([window.atob('%s')], {type: '%s'})], '%s', {type: '%s'})",
             // Convert this file to a list of bytes
-            addslashes(implode(',', array_map('\ord', str_split(file_get_contents($file), 1)))),
+            addslashes(base64_encode(file_get_contents($file))),
+            addslashes(mime_content_type($file)),
             addslashes(basename($file)),
             addslashes(mime_content_type($file))
+        );
+//        echo $fileScript;
+
+        // And attach it to the attachzone
+        $script = sprintf(
+            "jQuery('%s').data('plugin_resourceAttach').dropzone.addFile(%s)",
+            addslashes($field),
+            $fileScript
         );
         $this->getWebDriverModule()->executeJS($script);
     }
