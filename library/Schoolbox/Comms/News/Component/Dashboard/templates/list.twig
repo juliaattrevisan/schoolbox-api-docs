@@ -32,8 +32,13 @@
 {% endspaceless %}
 {% endmacro %}
 
-{# A list of news articles that can be seen by the world
+{##
+ # A list of news articles that can be seen by the world
  # Typically async'd into components
+ #
+ # @param Collection|News\Model[] articles
+ # @param array|int[] savedArticleIds
+ # @param int unsaved
  #}
 <ul class="information-list">
     {% for article in articles %}
