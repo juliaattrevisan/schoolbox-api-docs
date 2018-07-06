@@ -65,10 +65,11 @@ class Lists
         /* TODO: Increment Impressions count for everything in $articles
          */
 
-        /* Three pieces are needed to represent an article, due to Save For Later
+        /* These pieces are needed to represent an article, due to Save For Later
          */
         return [
             'articles' => $articles,
+            'readMore' => $policies->getOffset('read_more')->getValue(),
             'saveForLater' => $policy->getValue(),
             'savedArticleIds' => $savedArticleIds,
             'unsaved' => SaveForLater\Mapper::UNSAVED
