@@ -9,7 +9,10 @@
 
 namespace Schoolbox;
 
+use InvalidArgumentException;
+
 /**
+ * @method Role createModel($idValue = null)
  * @method Role hydrate(array $row, $alias = '', $callback = null)
  * @method Role findOneByColumn($columnName, $columnValue, $order = [], $options = [])
  */
@@ -26,6 +29,8 @@ class RoleMapper extends Mapper
 
     /**
      * Setup mapper
+     *
+     * @throws InvalidArgumentException
      */
     protected function mapping()
     {
