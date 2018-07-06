@@ -134,13 +134,12 @@ class HelpRequest
             throw new Exception\UnexpectedResponseException('Unable to read SHAPS API response', $request, $response, $e);
         }
 
-        // If this is an array, we know we got data back from Help
-        // If it isn't, it either failed to decode or contains an error response code, so throw an exception
-        // This path will also be executed if a valid URL is given but the server does not have the required routes
-        // (I'm not sure how to detect this otherwise)
+        // If this is an array, we can assume we got some data back from Help
         if (\is_array($decoded_response)) {
             return $decoded_response;
         }
+        // If it isn't, it either failed to decode or we hit an incorrect server endpoint, but that server endpoint returned a 2xx, likely
+        // with a HTML payload. This happens for example if you hit a login wall, which redirected you to a login page.
         throw new Exception\UnexpectedResponseException("Unable to decode SHAPS API response: {$decoded_response}", $request, $response);
     }
 
