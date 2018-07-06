@@ -51,8 +51,8 @@ class Module extends BaseModule
 	{
 		$this->registerRoutesArray([
 			'GET'  => [
-				'/launch/{providerId}/{componentId}/{folderId}' => 'getLaunch',
-				'/component/{componentId}/callback'             => 'getComponentCallback',
+				'/component/{componentId}/provider/{providerId}/folder/{folderId}/launch' => 'getLaunch',
+				'/component/{componentId}/callback'                                       => 'getComponentCallback',
 			],
 			'POST' => [
 				'/component/{componentId}/provider/{providerId}' => 'postComponentProvider',

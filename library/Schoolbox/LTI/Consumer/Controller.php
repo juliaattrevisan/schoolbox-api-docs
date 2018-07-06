@@ -266,11 +266,30 @@ class Controller extends Base
 			if (strlen(trim($title)) > 0) {
 				$this->updateComponentValue($component, self::COMPONENT_CONFIG_TITLE, $title);
 			}
+		} else {
+			$title = $component->getConfig(self::COMPONENT_CONFIG_TITLE);
 		}
 
 		// Redirect to the target URL
 
-		$this->response->redirect->to($targetUrl);
+		// Rather than just redirecting the iframe directly to the requested resource we need to do a bit
+		// of javascript shenanigans.
+		//
+		// Because this code is operating inside the LTI iframe, the component on the homepage will not have
+		// has its title or iframe height adjusted to the new parameters until the page is reloaded. The
+		// javascript inside this template updates these in the DOM.
+
+		$this->getResponse()->content->set([
+			'template' => '@ltiConsumer/redirect.twig',
+			'format'   => 'nochrome',
+			'data'     => [
+				'componentId'    => $component->getInstance()->getId(),
+				'componentTitle' => $title,
+				'url'            => $targetUrl,
+				'height'         => $component->getConfig(self::COMPONENT_CONFIG_HEIGHT),
+				'version'        => $this->configMapper->get('site_version'),
+			],
+		]);
 	}
 
 	/**
@@ -324,8 +343,8 @@ class Controller extends Base
 		// Education perfect URL mangling
 		// ---------------------------------------------------------------------------------------------------
 
-		if (stristr($embedUrl, 'educationperfect') !== false) {
-			if (strlen($embedUrl) > 0) {
+		if (strlen($embedUrl) > 0) {
+			if (stristr($embedUrl, 'educationperfect') !== false) {
 				if ($ltiRequestType == self::LTI_LAUNCH_TYPE_PICKER) {
 					$ltiRequestType = self::LTI_LAUNCH_TYPE_BASIC;
 
@@ -333,12 +352,11 @@ class Controller extends Base
 
 					$launch_data['contentUrl'] = $embedUrl;
 				}
+			} else {
+				// Maintain current behaviour (for fear of breaking any existing integrations)
+				$this->response->redirect->to($embedUrl);
+				return;
 			}
-		} else {
-			// Maintain current behaviour (for fear of breaking any existing integrations)
-
-			$this->response->redirect->to($embedUrl);
-			return;
 		}
 
 		// Define allowed return types from LTI providers

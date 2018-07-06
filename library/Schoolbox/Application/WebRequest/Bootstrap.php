@@ -242,10 +242,9 @@ class Bootstrap extends AbstractBootstrap {
 				'/api/register/*',
 				'/loginForm.php*',
 				'/liss/liss.php',
-				'/lti-consumer/component/*'
+				'/lti-consumer/*'
 			];
 
-			return;
 			foreach ($whitelist as $path) {
                 if (fnmatch($path, $_SERVER['REQUEST_URI'])) {
                     return;
