@@ -33,7 +33,7 @@ use Schoolbox\UserMapper;
 class Controller extends Base
 {
     /* While these look like plain HTTP response codes, they are more than that.
-     * But the both the server and client apply semantics to them in addition to their inherent HTTP semantics.
+     * Both the server and client apply semantics to them in addition to their inherent HTTP semantics.
      * Hence we need to enforce a single source-of-truth regarding their semantics so that the client and server
      * can both use them reliably.
      */
