@@ -120,6 +120,7 @@ abstract class Mapper implements IMapper, Serializable
     const COLUMN_JOIN_REVERSE      = 32;
     const COLUMN_SOFTDELETE        = 64;
     const COLUMN_IDENTIFIER_UUID   = 128;
+    public const COLUMN_ENUM       = 256;  // May only be persisted as one of a set of declared values
 
     /**
      * @var IDatabase|IQuoter
@@ -149,6 +150,13 @@ abstract class Mapper implements IMapper, Serializable
      * @var MappingCollection
      */
     protected $map;
+
+    /**
+     * Valid enum values. Indexed by [propertyName]
+     *
+     * @var string[][]
+     */
+    private $enums = [];
 
     /**
      * A list of joins that this mapper has had defined.
@@ -1036,11 +1044,21 @@ abstract class Mapper implements IMapper, Serializable
      * @param int|IColumnType $type
      * @param int             $options
      * @param string          $property
+     * @param null|mixed      $params   Any extra params required for a special column type, eg permitted enum values
      * @return bool
+     * @throws InvalidArgumentException
      */
-    protected function uses($column, $type, $options = null, $property = null)
+    protected function uses($column, $type, $options = null, $property = null, $params = null)
     {
-        return $this->hasMap($this->buildColumnMap($column, $type, $options, $property));
+        if (!$this->hasMap($this->buildColumnMap($column, $type, $options, $property))) {
+            return false;
+        }
+
+        if (self::COLUMN_ENUM & $options) {
+            $this->registerEnum($this->getPropertyFromColumn($column), $params);
+        }
+
+        return true;
     }
 
 
@@ -2666,6 +2684,11 @@ abstract class Mapper implements IMapper, Serializable
             }
         }
 
+        foreach ($collection as $model) {
+            $this->assertValidEnums($model);
+        }
+
+
         $id_property     = $this->getIdentifierProperty();
         $id_column       = $this->getIdentifierColumn();
 
@@ -2855,6 +2878,44 @@ abstract class Mapper implements IMapper, Serializable
      * @return void
      */
     protected abstract function mapping();
+
+
+    /**
+     * Registers a property as being an ENUM.
+     *
+     * This will prevent the mapper from saving a model with a property that is not a valid enum
+     *
+     * @param string $propertyName
+     * @param array  $permittedValues
+     * @throws InvalidArgumentException
+     */
+    protected function registerEnum(string $propertyName, array $permittedValues): void
+    {
+        if (\array_key_exists($propertyName, $this->enums)) {
+            throw new InvalidArgumentException("'$propertyName' is already registered as an enum");
+        }
+        $this->enums[$propertyName] = $permittedValues;
+    }
+
+
+    /**
+     * Asserts all registered enums are valid
+     *
+     * @param $model
+     * @throws UnexpectedValueException
+     */
+    protected function assertValidEnums($model): void
+    {
+        foreach ($this->enums as $propertyName => $permittedValues) {
+            $propertyValue = $this->getModelProperty($model, $propertyName);
+            foreach ($permittedValues as $permittedValue) {
+                if ($propertyValue === $permittedValue) {
+                    continue 2;
+                }
+            }
+            throw new UnexpectedValueException("$propertyName has invalid enum value: '$propertyValue'");
+        }
+    }
 
 
     protected function hasTable($table)
