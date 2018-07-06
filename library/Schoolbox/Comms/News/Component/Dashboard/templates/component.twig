@@ -1,12 +1,9 @@
-{# TODO: Probably remove this magic number 0, which means "all topics" #}
-{% set firstTopic = allDefault ? 0 : topics.first.id %}
-
 <script src="/javascript/shared/comms/articletabs.js"></script>
 <script src="/javascript/shared/comms/saveforlater.js"></script>
 <script>
     $(function() {
         $('#news-container-{{ componentInstanceId }}').articleTabs({
-            'firstUrl': "{{ routeLookup('commsNews.getListByTopic', {topicId: firstTopic, limit: limit}) }}",
+            'firstUrl': "{{ routeLookup('commsNews.getListByTopic', {topicId: firstTopicId, limit: limit}) }}",
             'topicTabs': '#news-topics-{{ componentInstanceId }}'
         });
     });

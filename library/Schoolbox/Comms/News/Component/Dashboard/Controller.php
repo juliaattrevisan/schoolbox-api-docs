@@ -10,6 +10,7 @@ namespace Schoolbox\Comms\News\Component\Dashboard;
 
 use Component_Dashboard_ControllerAbstract;
 use Component_Instance;
+use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Policy;
 use Schoolbox\Comms\News\SaveForLater;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -72,10 +73,14 @@ class Controller extends Component_Dashboard_ControllerAbstract
      */
     public function renderTemplate($templateHandle): bool
     {
+        $topics = TopicMapper::getInstance()->findAll();
+        $allDefault = $this->getConfig('default');
+
         return $this->renderTwigTemplate($templateHandle, '@commsNewsDashboard/component.twig', [
             'componentInstanceId' => $this->getInstance()->getId(),
-            'topics' => TopicMapper::getInstance()->findAll(),
-            'allDefault' => $this->getConfig('default'),
+            'topics' => $topics,
+            'firstTopicId' => $allDefault ? News\Mapper::TOPIC_ALL : $topics->first()->getId(),
+            'allDefault' => $allDefault,
             'limit' => $this->getConfig('size')
         ]);
     }
