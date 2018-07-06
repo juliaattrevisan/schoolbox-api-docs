@@ -53,7 +53,7 @@
                         <h3>{{ article.title }}</h3>
                     </a>
 
-                    <p class="meta">Published by {{ article.author.fullname }} on {{ article.publishAt.local }}</p>
+                    <p class="meta">Published by {{ article.author.fullname }} <time title="{{ article.publishAt.local }}">{{ article.publishAt.relativeTime }}</time></p>
 
                     {# TODO: Have a /news/topic url lol #}
                     {% if article.topics|length %}
