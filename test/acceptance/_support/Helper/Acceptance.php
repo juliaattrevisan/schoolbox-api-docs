@@ -271,24 +271,16 @@ class Acceptance extends \Codeception\Module
      */
     public function attachAttachzoneFile($field, $file)
     {
-        $wd = $this->getWebDriverModule();
-        $wd->click($field);
-
-        // Wait for the filepicker
-        $wd->waitForElement('#attachment-browser');
-
-        // Should be open at pane "internal-upload"; if not choose that pane?
-
-        // Attachzone lives at '#ab-upload'
-        $wd->executeJS(
-            sprintf(
-                "jQuery('%s').data('plugin_resourceAttach').dropzone.addFile(new File(['%s'], '%s', {type: '%s'}))",
-                addslashes($field),
-                addslashes(file_get_contents($file)),
-                addslashes(basename($file)),
-                addslashes(mime_content_type($file))
-            )
+        // This script attempts to encode the file, and add it to the attachzone
+        $script = sprintf(
+            "jQuery('%s').data('plugin_resourceAttach').dropzone.addFile(new File([new Blob(new Uint8Array([%s]))], '%s', {type: '%s'}))",
+            addslashes($field),
+            // Convert this file to a list of bytes
+            addslashes(implode(',', array_map('\ord', str_split(file_get_contents($file), 1)))),
+            addslashes(basename($file)),
+            addslashes(mime_content_type($file))
         );
+        $this->getWebDriverModule()->executeJS($script);
     }
 
 
