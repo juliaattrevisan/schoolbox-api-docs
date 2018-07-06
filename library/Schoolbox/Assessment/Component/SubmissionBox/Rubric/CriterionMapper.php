@@ -198,23 +198,17 @@ class CriterionMapper extends BaseMapper {
         // remove any newlines and consecutive/leading/trailing spaces from input
         $object->setName(preg_replace('`\s+`', ' ', trim($object->getName())));
 
-        // Don't mangle name here
-//        $object->getGroup()->setName(preg_replace('`\s+`', ' ', trim($object->getGroup()->getName())));
+        // Lookup existing IDs
+        $existingIds = $this->findIdsByColumnList([
+            'rubric_group_id' => $object->getGroup()->getId(),
+            'name'            => $object->getName(),
+        ]);
 
-        try {
-            // attempt lookup
-            $existingObject = $this->findOneForParentByKey(
-                $object->getGroup()->getParentId(),
-                $object->getGroup()->getParentType(),
-                $object->getName(),
-                $object->getGroup()->getName()
-            );
-
-            // found something! sweet. assign that ID.
-            $object->setId($existingObject->getId());
-        } catch (MapperException $e) {
-            // noop, new object. leave it as-is
+        // found something? assign that ID if so
+        if ($existingIds) {
+            $object->setId(array_shift($existingIds));
         }
+
         return true;
     }
 

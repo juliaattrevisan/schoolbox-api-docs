@@ -107,19 +107,18 @@ class GroupMapper extends BaseMapper
         // remove any newlines and consecutive/leading/trailing spaces from input
         $object->setName(preg_replace('`\s+`', ' ', trim($object->getName())));
 
-        try {
-            // attempt lookup
-            $existingObject = $this->findOneByColumnList([
-                'parent_id'   => $object->getParentId(),
-                'parent_type' => $object->getParentType(),
-                'name'        => $object->getName(),
-            ]);
+        // Lookup existing IDs
+        $existingIds = $this->findIdsByColumnList([
+            'parent_id'   => $object->getParentId(),
+            'parent_type' => $object->getParentType(),
+            'name'        => $object->getName(),
+        ]);
 
-            // found something! sweet. assign that ID.
-            $object->setId($existingObject->getId());
-        } catch (MapperException $e) {
-            // noop, new object. leave it as-is
+        // found something? assign that ID if so
+        if ($existingIds) {
+            $object->setId(array_shift($existingIds));
         }
+
         return true;
     }
 
