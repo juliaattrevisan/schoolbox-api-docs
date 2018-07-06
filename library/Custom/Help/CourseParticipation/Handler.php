@@ -177,8 +177,8 @@ class Handler
 
         if (!\count($roleIds)) {
             // No roles with these names on this server? This most likely means the server is misconfigured.
-            // Note this is not a case where we we return an empty set of users, that means the role exists, but no users have that role
-            // for this specified school code.
+            // Note this is not a case where we should simply return an empty set of users.
+            // An empty set implies the role exists, but no users have that role for the specified school code.
             $roleNames = \implode(',', self::PARTICIPANT_ROLE_NAMES);
             throw new ParticipantRolesNotFoundException("No roles found for roles names: [{$roleNames}]");
         }
