@@ -50,11 +50,14 @@
 
             /* Check for a cached version and load that, if possible
              * Otherwise fetch it
+             *
+             * Temporarily disabled due to action-at-a-distance with saved for later
+             * and articles that appear in multiple topics with different saved for later states
              */
-            if (config.cache[url] !== undefined) {
-                $(config.element).html(config.cache[url]).saveForLater();
-                return;
-            }
+            // if (config.cache[url] !== undefined) {
+            //     $(config.element).html(config.cache[url]).saveForLater();
+            //     return;
+            // }
 
             $.ajax({
                 type: 'GET',
@@ -65,7 +68,7 @@
 
                 /* Cache the response so we don't need to refetch it
                  */
-                config.cache[url] = response;
+                // config.cache[url] = response;
             }).error(function (response) {
             });
         }
