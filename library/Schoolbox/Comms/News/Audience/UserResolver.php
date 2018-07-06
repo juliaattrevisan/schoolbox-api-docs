@@ -18,7 +18,7 @@ use UnexpectedValueException;
  * Responsible for:
  * * Given an article, finding the set of users who are in its audience.
  */
-class UserResolver
+class UserResolver implements IUserResolver
 {
 
     /** @var BusinessRules */
@@ -66,7 +66,6 @@ class UserResolver
      * @return int[]
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws UnexpectedValueException If we attempt to build a query with an unrecognised entity type
-     * @todo consider requiring a hydrated article, with all audience segments hydrated
      * @throws \UnderflowException
      */
     public function findUsersForArticle(int $articleId): array

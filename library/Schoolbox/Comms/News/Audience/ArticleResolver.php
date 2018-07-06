@@ -22,7 +22,7 @@ use Alaress\Database\Predicate;
 /**
  * Responsible for returning the set of articles whose audience contains a specific user.
  */
-class ArticleResolver
+class ArticleResolver implements IArticleResolver
 {
 
     /** @var BusinessRules */
