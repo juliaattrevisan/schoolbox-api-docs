@@ -54,6 +54,10 @@ class GroupMapper extends BaseMapper
             null,
             'curriculumNodes'
         );
+
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyUniqueness']);
+
+//        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deleteCriteria']);
     }
 
 
@@ -84,6 +88,39 @@ class GroupMapper extends BaseMapper
         }
 
         return $collection;
+    }
+
+
+    /**
+     * Pre-save callback - if a copy of this group already exists, update it
+     * instead of saving a new one.
+     *
+     * This replaces the unique index on this table, which needs to be removed
+     * because MySQL max index size doesn't allow more than about ~330 UTF-8
+     * characters.
+     *
+     * @param  Group $object
+     * @return bool  Always true
+     */
+    public function verifyUniqueness(Group $object)
+    {
+        // remove any newlines and consecutive/leading/trailing spaces from input
+        $object->setName(preg_replace('`\s+`', ' ', trim($object->getName())));
+
+        try {
+            // attempt lookup
+            $existingObject = $this->findOneByColumnList([
+                'parent_id'   => $object->getParentId(),
+                'parent_type' => $object->getParentType(),
+                'name'        => $object->getName(),
+            ]);
+
+            // found something! sweet. assign that ID.
+            $object->setId($existingObject->getId());
+        } catch (MapperException $e) {
+            // noop, new object. leave it as-is
+        }
+        return true;
     }
 
 

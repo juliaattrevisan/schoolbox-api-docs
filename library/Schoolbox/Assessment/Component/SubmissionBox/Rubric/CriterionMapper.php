@@ -197,7 +197,9 @@ class CriterionMapper extends BaseMapper {
     {
         // remove any newlines and consecutive/leading/trailing spaces from input
         $object->setName(preg_replace('`\s+`', ' ', trim($object->getName())));
-        $object->getGroup()->setName(preg_replace('`\s+`', ' ', trim($object->getGroup()->getName())));
+
+        // Don't mangle name here
+//        $object->getGroup()->setName(preg_replace('`\s+`', ' ', trim($object->getGroup()->getName())));
 
         try {
             // attempt lookup
