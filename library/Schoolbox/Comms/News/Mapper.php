@@ -176,7 +176,6 @@ class Mapper extends \Schoolbox\Mapper
     public function findForTopic(int $topicId, int $limit): \Schoolbox\GenericCollection
     {
         $articlesInTopic = [];
-        $options = [];
 
         /* If $topicId is provided, only get articles for that topic
          * Otherwise get $limit articles from any topic
@@ -225,6 +224,10 @@ class Mapper extends \Schoolbox\Mapper
         /* TODO: Filter $articlesInTopic vs articles that I can see
          */
 
-        return $this->findByColumn('id', $articlesInTopic, $options);
+        return $this->findByColumn('id', $articlesInTopic, [
+            'order' => [
+                'publish_at' => 'desc'
+            ]
+        ]);
     }
 }
