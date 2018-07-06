@@ -35,7 +35,7 @@
     });
 </script>
 
-<dl class="tabs" data-tab="" id="news-topics-{{ componentInstanceId }}">
+<dl class="tabs-material" data-tab="" id="news-topics-{{ componentInstanceId }}">
     {% for topic in topics %}
     <dd {% if loop.first and not allDefault %}class="active"{% endif %}><a href="{{ routeLookup('commsNews.getListByTopic', {topicId: topic.id, limit: limit}) }}">{{ topic.name }}</a></dd>
     {% endfor %}
