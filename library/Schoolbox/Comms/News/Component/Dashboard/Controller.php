@@ -79,8 +79,9 @@ class Controller extends Component_Dashboard_ControllerAbstract
         return $this->renderTwigTemplate($templateHandle, '@commsNewsDashboard/component.twig', [
             'componentInstanceId' => $this->getInstance()->getId(),
             'topics' => $topics,
+            'topicAll' => News\Mapper::TOPIC_ALL,
             'firstTopicId' => $allDefault ? News\Mapper::TOPIC_ALL : $topics->first()->getId(),
-            'allDefault' => $allDefault,
+            'allDefault' => (bool)$allDefault,
             'compactMode' => $this->getConfig('compactMode'),
             'limit' => $this->getConfig('size')
         ]);

@@ -1,3 +1,15 @@
+{##
+ # A list of all the available Topics to chooze
+ # Sets up a container for async article loading
+ #
+ # @param int componentInstanceId
+ # @param int firstTopicId
+ # @param int topicAll
+ # @param int limit
+ # @param Collection|Topic[] topics
+ # @param bool allDefault
+ # @param int compactMode
+ #}
 <script src="/javascript/shared/comms/articletabs.js"></script>
 <script src="/javascript/shared/comms/saveforlater.js"></script>
 <script>
@@ -15,7 +27,7 @@
     {% endfor %}
 
     {# Select "All" by default if the component config is set #}
-    <dd {% if allDefault %}class="active"{% endif %}><a href="{{ routeLookup('commsNews.getListByTopic', {topicId: 0, limit: limit}) ~ '?compactMode=' ~ compactMode }}">All</a></dd>
+    <dd {% if allDefault %}class="active"{% endif %}><a href="{{ routeLookup('commsNews.getListByTopic', {topicId: topicAll, limit: limit}) ~ '?compactMode=' ~ compactMode }}">All</a></dd>
 </dl>
 
 <div id="news-container-{{ componentInstanceId }}">
