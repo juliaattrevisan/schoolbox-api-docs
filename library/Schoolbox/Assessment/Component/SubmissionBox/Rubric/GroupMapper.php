@@ -115,6 +115,13 @@ class GroupMapper extends BaseMapper
                 [],
                 ['cache' => $cache,]
             );
+
+        } catch (MapperException\Deleted $e) {
+            // It was deleted; restore it
+            $item = $e->getDeletedObject();
+            $this->restoreSoftDeleted($item);
+            return $item;
+
         } catch (MapperException $e) {
             // Create one
             $item = $this->createModel()

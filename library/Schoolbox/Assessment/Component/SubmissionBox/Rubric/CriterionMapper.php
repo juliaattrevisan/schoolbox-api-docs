@@ -329,6 +329,13 @@ class CriterionMapper extends BaseMapper {
     {
         try {
             return $this->findOneForParentByKey($parentId, $parentType, $name, $groupName, $cache);
+
+        } catch (MapperException\Deleted $e) {
+            // It was deleted; restore it
+            $item = $e->getDeletedObject();
+            $this->restoreSoftDeleted($item);
+            return $item;
+
         } catch (MapperException $e) {
             // Build it
             /** @var GroupMapper $groupMapper */
