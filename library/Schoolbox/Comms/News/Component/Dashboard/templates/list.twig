@@ -7,6 +7,7 @@
  #
  # @param News\Model text
  # @param string readMore
+ # @param bool compactMode
  #}
 {% macro pacify(article, readMore) %}
 {% spaceless %}
@@ -75,11 +76,13 @@
                 <a data-saveforlater="{{ state }}" href="{{ routeLookup('commsNewsSaveForLater.postToggle', {articleId: article.id}) }}"></a>
             </nav>
 
-            {# Hide the article tag when there's no content to show #}
-            {% set blurb = macro.pacify(article, readMore) %}
+            {# Hide the article tag when there's no content to show, or when compactMode is on #}
+            {% if not compactMode %}
+                {% set blurb = macro.pacify(article, readMore) %}
 
-            {% if blurb|length %}
-            <article>{{ blurb }}</article>
+                {% if blurb|length %}
+                <article>{{ blurb }}</article>
+                {% endif %}
             {% endif %}
         </li>
     {% endfor %}

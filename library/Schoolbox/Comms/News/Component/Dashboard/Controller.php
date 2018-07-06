@@ -81,6 +81,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
             'topics' => $topics,
             'firstTopicId' => $allDefault ? News\Mapper::TOPIC_ALL : $topics->first()->getId(),
             'allDefault' => $allDefault,
+            'compactMode' => $this->getConfig('compactMode'),
             'limit' => $this->getConfig('size')
         ]);
     }

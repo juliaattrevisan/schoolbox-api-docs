@@ -37,7 +37,11 @@
 
                 /* Load this data upon start
                  */
-                firstUrl: ''
+                firstUrl: '',
+
+                /* Return in compact mode or normal mode
+                 */
+                compactMode: false
             };
 
             return $.extend(defaults, options);

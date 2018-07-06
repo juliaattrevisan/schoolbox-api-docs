@@ -3,7 +3,7 @@
 <script>
     $(function() {
         $('#news-container-{{ componentInstanceId }}').articleTabs({
-            'firstUrl': "{{ routeLookup('commsNews.getListByTopic', {topicId: firstTopicId, limit: limit}) }}",
+            'firstUrl': "{{ routeLookup('commsNews.getListByTopic', {topicId: firstTopicId, limit: limit}) ~ '?compactMode=' ~ compactMode }}",
             'topicTabs': '#news-topics-{{ componentInstanceId }}'
         });
     });
@@ -11,11 +11,11 @@
 
 <dl class="tabs-material" data-tab="" id="news-topics-{{ componentInstanceId }}">
     {% for topic in topics %}
-    <dd {% if loop.first and not allDefault %}class="active"{% endif %}><a href="{{ routeLookup('commsNews.getListByTopic', {topicId: topic.id, limit: limit}) }}">{{ topic.name }}</a></dd>
+    <dd {% if loop.first and not allDefault %}class="active"{% endif %}><a href="{{ routeLookup('commsNews.getListByTopic', {topicId: topic.id, limit: limit}) ~ '?compactMode=' ~ compactMode }}">{{ topic.name }}</a></dd>
     {% endfor %}
 
     {# Select "All" by default if the component config is set #}
-    <dd {% if allDefault %}class="active"{% endif %}><a href="{{ routeLookup('commsNews.getListByTopic', {topicId: 0, limit: limit}) }}">All</a></dd>
+    <dd {% if allDefault %}class="active"{% endif %}><a href="{{ routeLookup('commsNews.getListByTopic', {topicId: 0, limit: limit}) ~ '?compactMode=' ~ compactMode }}">All</a></dd>
 </dl>
 
 <div id="news-container-{{ componentInstanceId }}">
