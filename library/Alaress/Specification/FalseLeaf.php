@@ -9,7 +9,9 @@ declare(strict_types=1);
 namespace Alaress\Specification;
 
 /**
- * All components must be satisfied. Logical AND
+ * No candidates will ever satisfy this spec
+ *
+ * Exists primarily for testing purposes
  */
 class FalseLeaf extends Leaf
 {

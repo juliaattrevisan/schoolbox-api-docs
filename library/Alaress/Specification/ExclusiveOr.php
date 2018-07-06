@@ -9,7 +9,9 @@ declare(strict_types=1);
 namespace Alaress\Specification;
 
 /**
- * All components must be satisfied. Logical AND
+ * Either one or the other, but not both, component specs must be satisfied by the candidate.
+ *
+ * Logical XOR
  */
 class ExclusiveOr extends Composite
 {

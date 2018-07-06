@@ -10,6 +10,11 @@ namespace Alaress\Specification;
 
 use UnexpectedValueException;
 
+/**
+ * Note:
+ *  not(lessThan()) === moreThanOrEqualTo()
+ *  not(moreThan()) === lessThanOrEqualTo()
+ */
 class LessThan extends ValueBoundSpecification
 {
 
