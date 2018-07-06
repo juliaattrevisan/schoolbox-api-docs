@@ -56,6 +56,8 @@ class CriterionMapper extends BaseMapper {
 
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyUniqueness']);
         $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteDescriptors']);
+
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deleteGroup']);
     }
 
 
@@ -139,6 +141,25 @@ class CriterionMapper extends BaseMapper {
     public function softDeleteDescriptors(Criterion $criterion)
     {
         DescriptorMapper::getInstance()->deleteByColumn('criterion_id', $criterion->getId());
+        return true;
+    }
+
+
+    /**
+     * Post-delete callback for this criterion.
+     *
+     * If there's no remaining non-deleted criteria for this group, delete the
+     * group.
+     *
+     * @param Criterion $criterion
+     * @return bool
+     */
+    public function deleteGroup(Criterion $criterion)
+    {
+        $remaining = $this->countByColumn('rubric_group_id', $criterion->getGroup()->getId());
+        if (0 === $remaining) {
+            $this->getJoinMapper('group')->delete($criterion->getGroup());
+        }
         return true;
     }
 
