@@ -358,29 +358,34 @@ th, td{
 }
 
 // Radio button blocks
-input[type=radio]{
-	+ .block{
-		background-color: $white;
-		border: $input-border-width solid $content-ui-background;
+.button-block {
+	display: block;
+	background-color: $white;
+	border: $input-border-width solid $content-ui-background;
+	color: $content-ui-foreground;
+	margin: 0 0 1rem 0;
+	padding: ($base-font-size - 4);
+	width: 100%;
+	font-size: $base-font-size;
+	font-weight: $font-weight-normal;
+	line-height: 2;
+	text-align: left;
+	@include transition(all, 0.1s, ease-in);
+	i {
+		@extend .size-32;
 		color: $content-ui-foreground;
-		margin: 0 0 1rem 0;
-		padding: ($base-font-size - 4);
-		width: 100%;
-		font-size: $base-font-size;
-		font-weight: $font-weight-normal;
-		line-height: 2;
-		@include transition(all, 0.1s, ease-in);
-		i{
-			@extend .size-32;
-			color: $content-ui-foreground;
-			padding-right: 0.35rem;
-			float: left;
-			line-height: 1;
-		}
-		&:hover{
-			background-color: $content-ui-background;
-			color: $content-ui-foreground;
-		}
+		padding-right: 0.35rem;
+		float: left;
+		line-height: 1;
+	}
+	&:hover {
+		background-color: $content-ui-background;
+		color: $content-ui-foreground;
+	}
+}
+input[type=radio] {
+	+ .block {
+		@extend .block;
 	}
 	&:checked + .block{
 		background-color: $content-ui-foreground;
