@@ -509,7 +509,7 @@ class Controller extends Base
         $authDigest       = $query->get('digest');
         $expectedDigest   = $this->handler->computeAuthDigest($requestTimestamp->getUnixTimeStamp(), $schoolCode, $accessToken);
         if ($authDigest !== $expectedDigest) {
-            $this->sendGenericStatus(self::STATUS_UNAUTHENTICATED);
+            $this->sendGenericStatus(self::STATUS_UNAUTHENTICATED, 'Incorrect API key and/or school code');
             return false;
         }
 

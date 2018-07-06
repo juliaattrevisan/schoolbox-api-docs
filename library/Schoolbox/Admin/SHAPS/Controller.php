@@ -408,13 +408,9 @@ class Controller extends Base
         if($e instanceof RequestException){
             switch ($e->getCode()){
                 case CourseParticipation\Controller::STATUS_BAD_REQUEST:
-                    return $this->getResponseErrorMessage($e);
                 case CourseParticipation\Controller::STATUS_UNAUTHENTICATED:
-                    return 'Authentication failure - incorrect API key and/or school code';
                 case CourseParticipation\Controller::STATUS_UNAUTHORISED:
-                    return $this->getResponseErrorMessage($e);
                 case CourseParticipation\Controller::STATUS_NOT_FOUND:
-                    return $this->getResponseErrorMessage($e);
                 case CourseParticipation\Controller::STATUS_SERVER_ERROR:
                     return $this->getResponseErrorMessage($e);
                 default:
