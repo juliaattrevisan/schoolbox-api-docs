@@ -58,6 +58,7 @@ class CriterionMapper extends BaseMapper {
         $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteDescriptors']);
 
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deleteGroup']);
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'restoreGroup']);
     }
 
 
@@ -159,6 +160,23 @@ class CriterionMapper extends BaseMapper {
         $remaining = $this->countByColumn('rubric_group_id', $criterion->getGroup()->getId());
         if (0 === $remaining) {
             $this->getJoinMapper('group')->delete($criterion->getGroup());
+        }
+        return true;
+    }
+
+
+    /**
+     * Post-restore callback for this criterion.
+     *
+     * Undelete the criterion's group, if it's deleted.
+     *
+     * @param Criterion $criterion
+     * @return bool
+     */
+    public function restoreGroup(Criterion $criterion)
+    {
+        if ($criterion->getGroup()->isDeleted()) {
+            $this->getJoinMapper('group')->restoreSoftDeleted($criterion->getGroup());
         }
         return true;
     }
