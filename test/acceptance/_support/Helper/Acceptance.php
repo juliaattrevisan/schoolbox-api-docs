@@ -272,14 +272,12 @@ class Acceptance extends \Codeception\Module
     {
         // Create a file programatically
         $fileScript = sprintf(
-            "new File([new Blob([window.atob('%s')], {type: '%s'})], '%s', {type: '%s'})",
+            "new File([new Uint8Array([%s])], '%s', {type: '%s'})",
             // Convert this file to a list of bytes
-            addslashes(base64_encode(file_get_contents($file))),
-            addslashes(mime_content_type($file)),
+            addslashes(implode(',', array_map('\ord', str_split(file_get_contents($file), 1)))),
             addslashes(basename($file)),
             addslashes(mime_content_type($file))
         );
-//        echo $fileScript;
 
         // And attach it to the attachzone
         $script = sprintf(
