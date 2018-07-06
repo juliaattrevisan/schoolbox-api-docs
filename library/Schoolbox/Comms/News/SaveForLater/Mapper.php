@@ -9,7 +9,6 @@
 
 namespace Schoolbox\Comms\News\SaveForLater;
 
-use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Predicate\InvalidColumnException;
 use Schoolbox\Collection;
 use Schoolbox\Comms\News;
@@ -52,7 +51,11 @@ class Mapper extends \Schoolbox\Mapper
         $ids = $this->findSavedIdsForUser($userId);
 
         if (\count($ids)) {
-            return News\Mapper::getInstance()->findByColumn('id', array_keys($ids));
+            return News\Mapper::getInstance()->findByColumn('id', array_keys($ids), [
+                'order' => [
+                    'publish_at' => 'asc'
+                ]
+            ]);
         }
 
         return new Collection();
@@ -70,7 +73,7 @@ class Mapper extends \Schoolbox\Mapper
      */
     public function findSavedIdsForUser(int $userId): array
     {
-        $pb = new Builder($this->getDatabase(), 'comms_news_saveforlater');
+        $pb = $this->getPredicateBuilder();
         $pb->equals('user_id', $userId);
 
         $ids = $this->findScalarByPredicates('article_id', $pb);
