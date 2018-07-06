@@ -5,10 +5,12 @@
  # Currently a draft: indicator lozenge says "Draft" after a draft persistence occurs
  #
  # Otherwise: article previously existed and the lozenge stays hidden until a draft persistence occurs
+ #
+ # @param News\Model article
  #}
-{% macro render(news) %}
-    {% if news.id %}
-        {% if not news.isSubmitted %}
+{% macro render(article) %}
+    {% if article.id %}
+        {% if not article.isSubmitted %}
 
             {# Exists as a draft #}
             {% set newStyle = 'style="display:none"' %}
@@ -22,7 +24,7 @@
 
         {% endif %}
 
-    {% elseif not news.isSubmitted %}
+    {% elseif not article.isSubmitted %}
 
         {# New article, never saved before #}
         {% set newStyle = 'style="display:none"' %}

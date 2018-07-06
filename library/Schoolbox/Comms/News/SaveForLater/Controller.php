@@ -55,10 +55,8 @@ class Controller extends Base
 
 
     /**
-     * Provide form
+     * A list of articles that you saved for later
      *
-     * @throws Exception
-     * @throws Exception\Deleted
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Aura\Di\Exception\ServiceNotFound
      */
@@ -86,13 +84,12 @@ class Controller extends Base
      * You never really just activate them on their own - it's a toggle of states
      * and it happens asynchronously
      *
-     * @param News\Model $news
-     * @throws \Aura\Router\Exception\RouteNotFound
+     * @param News\Model $article
      */
-    public function postToggle(News\Model $news)
+    public function postToggle(News\Model $article)
     {
         if ($this->getRequest()->isXhr()) {
-            $outcome = $this->toggle($news);
+            $outcome = $this->toggle($article);
 
             if (!$outcome['success']) {
                 $this->getResponse()->status->set(400);
@@ -106,10 +103,15 @@ class Controller extends Base
 
 
     /**
-     * @param News\Model $news
+     * Toggle the saved-ness of an article
+     *
+     * Add the article to your Saved For Later list, if it's not there
+     * If it's there, remove it
+     *
+     * @param News\Model $article
      * @return array
      */
-    private function toggle(News\Model $news): array
+    private function toggle(News\Model $article): array
     {
         /* Can only save when the Policy is on
          */
@@ -139,7 +141,7 @@ class Controller extends Base
         try {
             $this->saveForLaterMapper->findOneByColumnList([
                 'user_id' => $this->getUser()->getId(),
-                'article_id' => $news->getId()
+                'article_id' => $article->getId()
             ]);
 
             $exists = true;
@@ -152,7 +154,7 @@ class Controller extends Base
         if ($exists) {
             $this->saveForLaterMapper->deleteByColumnList([
                 'user_id' => $this->getUser()->getId(),
-                'article_id' => $news->getId()
+                'article_id' => $article->getId()
             ]);
 
             return [
@@ -166,7 +168,7 @@ class Controller extends Base
         try {
             $record = $this->saveForLaterMapper->createModel()
                 ->setUser($this->getUser())
-                ->setArticle($news);
+                ->setArticle($article);
 
             $this->saveForLaterMapper->save($record);
 
@@ -186,20 +188,20 @@ class Controller extends Base
     /**
      * Remove an item from your Saved list
      *
-     * @param News\Model $news
      * @throws \Aura\Router\Exception\RouteNotFound
+     * @param News\Model $article
      */
-    public function postRemove(News\Model $news)
+    public function postRemove(News\Model $article)
     {
         if ($this->getRequest()->isXhr()) {
             $this->saveForLaterMapper->deleteByColumnList([
                 'user_id' => $this->getUser()->getId(),
-                'article_id' => $news->getId()
+                'article_id' => $article->getId()
             ]);
 
             $this->getResponse()->content->set($this->buildJsonOutput([
                 'success' => true,
-                'nextUrl' => $this->getRouter()->generate('commsNewsSaveForLater.postRemove', ['newsId' => $news->getId()])
+                'nextUrl' => $this->getRouter()->generate('commsNewsSaveForLater.postRemove', ['articleId' => $article->getId()])
             ]));
         }
     }

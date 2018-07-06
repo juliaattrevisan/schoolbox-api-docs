@@ -22,14 +22,14 @@ class ValidationTest extends TestCase
 
     /**
      * @dataProvider provider_validBroadcastRequirements
-     * @param Model $news
-     * @param bool   $expected
+     * @param Model $article
+     * @param bool  $expected
      */
-    public function testValidBroadcastRequirements(Model $news, bool $expected)
+    public function testValidBroadcastRequirements(Model $article, bool $expected)
     {
         $validation = new ValidBroadcast();
 
-        $this->assertEquals($expected, $validation->isSatisfiedBy($news));
+        $this->assertEquals($expected, $validation->isSatisfiedBy($article));
     }
 
     /**
@@ -40,47 +40,74 @@ class ValidationTest extends TestCase
     public function provider_validBroadcastRequirements(): array {
         $user = (new \Schoolbox\User())->setId(19);
         $date = (new \Alaress_Date_Format())->setDateTime(2018, 1, 1, 10, 12, 14);
+        $publishAt = (new \Alaress_Date_Format())->setDateTime(2018, 1, 1, 10, 12, 15);
+        $expiresAt = (new \Alaress_Date_Format())->setDateTime(2018, 1, 1, 10, 12, 16);
 
         return [
             // Moderation required, an acceptor is known
             // News article can reach the masses
             'Moderation required, both acceptor details set' => [
-                (new Model())->setTitle('cat')->setAcceptedBy($user)->setAcceptedAt($date),
+                (new Model())
+                    ->setTitle('cat')
+                    ->setPublishAt($publishAt)
+                    ->setExpiresAt($expiresAt)
+                    ->setAcceptedBy($user)
+                    ->setAcceptedAt($date),
                 true
             ],
 
             // Moderation required, an acceptor is known, but no date is available for some reason
             // News article cannot reach the masses
             'Moderation required, acceptor user set' => [
-                (new Model())->setTitle('cat')->setAcceptedBy($user),
+                (new Model())
+                    ->setTitle('cat')
+                    ->setPublishAt($publishAt)
+                    ->setExpiresAt($expiresAt)
+                    ->setAcceptedBy($user),
                 false
             ],
 
             // Moderation required, an acceptor is known, but no acceptor is available for some reason
             // News article cannot reach the masses
             'Moderation required, acceptor date set' => [
-                (new Model())->setTitle('cat')->setAcceptedBy(null)->setAcceptedAt($date),
+                (new Model())
+                    ->setTitle('cat')
+                    ->setPublishAt($publishAt)
+                    ->setExpiresAt($expiresAt)
+                    ->setAcceptedBy(null)
+                    ->setAcceptedAt($date),
                 false
             ],
 
             // Acceptor must be set when moderation is required
             // When absent, the article isn't accepted; news article mustn't reach the masses
             'Moderation required, acceptor not set' => [
-                (new Model())->setTitle('cat'),
+                (new Model())
+                    ->setTitle('cat')
+                    ->setPublishAt($publishAt)
+                    ->setExpiresAt($expiresAt),
                 false
             ],
 
             // Preserve last known acceptor in the scenario where moderation was previously required
             // at the time, but moderation is no longer required now. News article can reach the masses.
             'Moderation not required, acceptor set' => [
-                (new Model())->setTitle('cat')->setAcceptedBy($user)->setAcceptedAt($date),
+                (new Model())
+                    ->setTitle('cat')
+                    ->setPublishAt($publishAt)
+                    ->setExpiresAt($expiresAt)
+                    ->setAcceptedBy($user)
+                    ->setAcceptedAt($date),
                 true
             ],
 
             // Edge case that no longer exists; when moderation isn't required, authors are their own
             // acceptor. Otherwise, someone else is the acceptor. In either situation this shouldn't arise
             'Moderation not required, acceptor not set' => [
-                (new Model())->setTitle('cat'),
+                (new Model())
+                    ->setTitle('cat')
+                    ->setPublishAt($publishAt)
+                    ->setExpiresAt($expiresAt),
                 false
             ],
         ];
@@ -88,14 +115,14 @@ class ValidationTest extends TestCase
 
     /**
      * @dataProvider provider_validArticle
-     * @param Model $news
+     * @param Model $article
      * @param int   $expected
      */
-    public function testValidArticle(Model $news, $expected)
+    public function testValidArticle(Model $article, $expected)
     {
         $validation = new ValidArticle();
 
-        $this->assertEquals($expected, $validation->isSatisfiedBy($news));
+        $this->assertEquals($expected, $validation->isSatisfiedBy($article));
     }
 
     /**
@@ -104,13 +131,92 @@ class ValidationTest extends TestCase
      * @return array
      */
     public function provider_validArticle(): array {
+        $publishAt = (new \Alaress_Date_Format())->setDateTime(2018, 1, 1, 10, 12, 15);
+        $expiresAt = (new \Alaress_Date_Format())->setDateTime(2018, 1, 1, 10, 12, 16);
+
         return [
-            'Heading is set' => [
-                (new Model())->setTitle('cat'),
+            'Heading is set, both dates provided' => [
+                (new Model())
+                    ->setTitle('cat')
+                    ->setPublishAt($publishAt)
+                    ->setExpiresAt($expiresAt),
                 true
             ],
-            'Heading is missing' => [
-                new Model(),
+            'Publish date is missing' => [
+                (new Model())
+                    ->setTitle('cat')
+                    ->setExpiresAt($expiresAt),
+                false
+            ],
+            'Expiry date is missing' => [
+                (new Model())
+                    ->setTitle('cat')
+                    ->setPublishAt($publishAt),
+                false
+            ],
+            'Heading is missing 1' => [
+                (new Model())
+                    ->setPublishAt($publishAt)
+                    ->setExpiresAt($expiresAt),
+                false
+            ],
+            'Heading is missing 2' => [
+                (new Model())
+                    ->setExpiresAt($expiresAt),
+                false
+            ],
+            'Heading is missing 3' => [
+                (new Model())
+                    ->setPublishAt($publishAt),
+                false
+            ],
+        ];
+    }
+
+
+    /**
+     * @dataProvider provider_validArticleDates
+     * @param Model $article
+     * @param int   $expected
+     */
+    public function testValidArticleDates(Model $article, $expected)
+    {
+        $validation = new ValidArticle();
+
+        $this->assertEquals($expected, $validation->isSatisfiedBy($article));
+    }
+
+    /**
+     * Data provider for testValidArticle
+     *
+     * @return array
+     */
+    public function provider_validArticleDates(): array {
+        $date1 = (new \Alaress_Date_Format())->setDateTime(2018, 1, 1, 10, 12, 15);
+        $date2 = (new \Alaress_Date_Format())->setDateTime(2018, 1, 1, 10, 12, 16);
+
+        return [
+            'Publish occurs before Expiry' => [
+                (new Model())
+                    ->setTitle('cat')
+                    ->setPublishAt($date1)
+                    ->setExpiresAt($date2),
+                true
+            ],
+
+            // "Publish Immediately" and/or "Expire Immediately" actions for moderators
+            'Publish occurs simultaneously with Expiry' => [
+                (new Model())
+                    ->setTitle('cat')
+                    ->setPublishAt($date1)
+                    ->setExpiresAt($date1),
+                true
+            ],
+            'Expiry occurs before Publish' => [
+                (new Model())
+                    ->setTitle('cat')
+                    ->setPublishAt($date2)
+                    ->setExpiresAt($date1),
                 false
             ],
         ];

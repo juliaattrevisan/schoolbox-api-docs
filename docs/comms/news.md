@@ -48,9 +48,16 @@ Both workflows are illustrated with a railway at the top of every relevant scree
 
 Content Creators start at /comms/news/create
 
-## Draft Interval
+### Draft Interval
 This isn't listed as a publicly-facing setting, but the default autosave interval is 5 seconds. We can expose this as a configurable control later, if desired.
 
+### Actions
+Some actions require certain preconditions to exist.
+* To create an article, you don't actually need any content. You can create placeholder articles.
+* To edit an article, you must be considered its author and the article must not be accepted for publication.
+* To submit an article for moderation, you must have a title, publish and expire dates.
+* To publish an article to its audience, moderation must be deactivated; technically, this assumes the author to be the moderator (thus, self moderating) but operationally allows you to choose when to make it available.
+* To delete an article, you must be considered its author and the article must not be accepted for publication.
 
 ### Moderated Workflow
 This workflow requires more people and infrastructure to introduce more control over content creators.
@@ -83,20 +90,25 @@ This workflow imitates the current behaviour of Schoolbox. It is far more libera
 * You may *Delete* your article at any time.
 
 ## Moderators' Workflow
-There is only one prescribed flow.
+There is only one prescribed flow when moderation is required.
 
 > Compose > Preview > Awaiting Moderation > Awaiting Publication > Published > Expired
 
-It begins at the Moderation Queue found at /comms/news/moderation. From here you can view a list of articles that require moderation in accordance with the current Policy settings; it also shows you a list of recently-moderated articles where applicable.
+It begins at the Moderation List found at /comms/news/moderation. From here you can view a list of articles that require moderation in accordance with the current Policy settings; it also shows you a list of recently-moderated articles where applicable.
 
 * *View* a list of articles requiring Moderation.
 * *Preview* an article of your choosing.
   * You can *Update* its contents, if applicable/necessary. It'll automatically save as you create.
 * *Publish* the article to make it available to its audience when the Publish Date is reached.
-* You can *Reject* an article at any time before it's published to the audience.
+* You can *Reject* a submitted article at any time.
 * You may *Delete* an article at any time.
 
+### Actions
+Some actions require certain preconditions to exist.
+* To accept an article for publication to its audience, it must have a title, publish and expire dates and be accepted by a moderator.
+* To reject an article, it be submitted for moderation and you are not its author. You can't reject draft articles.
+
 ### Edge Cases
-**Trapped Between Settings**. This occurs when moderation is activated, an article is submitted for moderation, but the moderation requirement is then deactivated. This leaves submitted articles in an inconclusive state of being, requiring moderators to accept these articles as if moderation was activated.
+**Limbo (Trapped Between Settings)**. This occurs when moderation is activated, an article is submitted for moderation, but the moderation requirement is then deactivated. This leaves submitted articles in an inconclusive state of being, requiring moderators to accept these articles as if moderation was activated. This can be avoided by clearing the moderation list before deactivating moderation.
 
 **Moderator Authors**. Moderators cannot reject their own articles.

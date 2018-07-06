@@ -31,11 +31,6 @@ class Controller extends Base
     private $policyMapper;
 
     /**
-     * @var UserMapper
-     */
-    private $userMapper;
-
-    /**
      * @var ErrorMapper
      */
     private $errorMapper;
@@ -47,14 +42,12 @@ class Controller extends Base
      * @param News\Mapper   $newsMapper
      * @param Policy\Mapper $policyMapper
      * @param ErrorMapper   $errorMapper
-     * @param UserMapper    $userMapper
      */
-    public function __construct(News\Mapper $newsMapper, Policy\Mapper $policyMapper, ErrorMapper $errorMapper, UserMapper $userMapper)
+    public function __construct(News\Mapper $newsMapper, Policy\Mapper $policyMapper, ErrorMapper $errorMapper)
     {
         $this->newsMapper = $newsMapper;
         $this->policyMapper = $policyMapper;
         $this->errorMapper = $errorMapper;
-        $this->userMapper = $userMapper;
     }
 
 
@@ -66,20 +59,20 @@ class Controller extends Base
      */
     public function getList()
     {
-        $lists = new Lists($this->newsMapper, $this->userMapper);
-        $newsArticles = new Collection();
+        $lists = new Lists($this->newsMapper);
+        $articles = new Collection();
 
         try {
             $policy = $this->policyMapper->findOneByColumn('identifier', 'global_moderation');
             $moderationRequired = (bool)$policy->getValue();
 
-            $newsArticles = $lists->getNeedModeration();
+            $articles = $lists->getNeedModeration();
         } catch (MapperException $e) {
             $moderationRequired = false;
         }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsModeration/index.twig', [
-            'newsArticles' => $newsArticles,
+            'articles' => $articles,
             'recentArticles' => $lists->getRecentlyAccepted(),
             'moderationRequired' => $moderationRequired
         ])->setTitle('Moderation List'));
@@ -90,7 +83,7 @@ class Controller extends Base
      * Submit For Moderation occurs here
      * A required action prior to Moderation taking place
      *
-     * @param Model $news
+     * @param Model $article
      * @throws MapperException
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Aura\Router\Exception\RouteNotFound
@@ -99,10 +92,10 @@ class Controller extends Base
      * @throws \UnexpectedValueException
      * @throws \Schoolbox\Application\Exception\Exception
      */
-    public function postSubmit(Model $news)
+    public function postSubmit(Model $article)
     {
-        if ((new News\ValidArticle())->isSatisfiedBy($news)) {
-            $news->setSubmittedAt(\Alaress_Date_Format::now());
+        if ((new News\ValidArticle())->isSatisfiedBy($article)) {
+            $article->setSubmittedAt(\Alaress_Date_Format::now());
 
             /* If moderation isn't required, automatically accept self-moderation by the author
              */
@@ -111,15 +104,14 @@ class Controller extends Base
 
             try {
                 if (!$moderationRequired) {
-                    $news->setAcceptedBy($this->getUser())
+                    $article->setAcceptedBy($this->getUser())
                         ->setAcceptedAt(\Alaress_Date_Format::now());
                 }
             } catch (MapperException $e) {
                 // noop
             }
 
-
-            $this->newsMapper->save($news);
+            $this->newsMapper->save($article);
 
             /* If you're a moderator and you authored your own article, redirect back to Detail
              * so you get immediate access to Publish
@@ -129,8 +121,8 @@ class Controller extends Base
              * TODO: Maybe it should do something more obvious to indicate this outcome though.
              */
             if ((new News\ValidUserIsCommsOfficer())->isSatisfiedBy($this->getUser())) {
-                if ((new News\ValidUserIsAuthor())->isSatisfiedBy($this->getUser(), $news)) {
-                    $nextStep = $this->getRouter()->generate('commsNews.getDetail', [ 'newsId' => $news->getId() ]);
+                if ((new News\ValidUserIsAuthor())->isSatisfiedBy($this->getUser(), $article)) {
+                    $nextStep = $this->getRouter()->generate('commsNews.getDetail', [ 'articleId' => $article->getId() ]);
                 } else {
 
                     /* This represents a moderator submitting for (on behalf of) a content creator
@@ -141,7 +133,7 @@ class Controller extends Base
                     $nextStep = $this->getRouter()->generate('commsNewsModeration.getList');
                 }
             } else {
-                $nextStep = $this->getRouter()->generate('commsNews.getDetail', [ 'newsId' => $news->getId() ]);
+                $nextStep = $this->getRouter()->generate('commsNews.getDetail', [ 'articleId' => $article->getId() ]);
             }
 
             $this->getResponse()->redirect->to($nextStep);
@@ -150,7 +142,7 @@ class Controller extends Base
             /* Invalid article; save what you currently sent to us so you don't lose everything,
              * but warn you about it with a generic error.
              */
-            $this->newsMapper->save($news);
+            $this->newsMapper->save($article);
 
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_COMMS_NEWS_INVALID_ARTICLE);
         }
@@ -160,7 +152,7 @@ class Controller extends Base
     /**
      * Accept an article for publishing to its audience
      *
-     * @param Model $news
+     * @param Model $article
      * @throws MapperException
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Aura\Router\Exception\RouteNotFound
@@ -169,15 +161,15 @@ class Controller extends Base
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \UnexpectedValueException
      */
-    public function postAccept(Model $news)
+    public function postAccept(Model $article)
     {
-        if ((new ValidUserCanAccept())->isSatisfiedBy($this->getUser(), $news)) {
-            $news
+        if ((new ValidUserCanAccept())->isSatisfiedBy($this->getUser(), $article)) {
+            $article
                 ->setAcceptedAt(\Alaress_Date_Format::now())
                 ->setAcceptedBy($this->getUser());
 
-            if ((new News\ValidBroadcast())->isSatisfiedBy($news)) {
-                $this->newsMapper->save($news);
+            if ((new News\ValidBroadcast())->isSatisfiedBy($article)) {
+                $this->newsMapper->save($article);
             }
 
             /* Go back to the list
@@ -202,7 +194,7 @@ class Controller extends Base
      * Rejecting an article will send it back to the Compose/Preview phase, as if it had
      * never succeeded before lol (but it'll remember that you failed, and if stated, why)
      *
-     * @param Model $news
+     * @param Model $article
      * @throws MapperException
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Aura\Router\Exception\RouteNotFound
@@ -211,10 +203,10 @@ class Controller extends Base
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \UnexpectedValueException
      */
-    public function postReject(Model $news)
+    public function postReject(Model $article)
     {
-        if ((new ValidUserCanReject())->isSatisfiedBy($this->getUser(), $news)) {
-            $news
+        if ((new ValidUserCanReject())->isSatisfiedBy($this->getUser(), $article)) {
+            $article
                 ->setSubmittedAt(null)
                 ->setAcceptedAt(null)
                 ->setAcceptedBy(null)
@@ -222,7 +214,7 @@ class Controller extends Base
                 ->setRejectedAt(\Alaress_Date_Format::now())
                 ->setRejectedReason($this->getRequest()->post['rejectedReason']);
 
-            $this->newsMapper->save($news);
+            $this->newsMapper->save($article);
 
             /* Redirect back to the moderation list
              */

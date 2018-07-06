@@ -2,7 +2,7 @@
 /**
  * ValidUserCanDelete
  *
- * Definition of a $user who can delete $news
+ * Definition of a $user who can delete $article
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2018, Alaress Pty Ltd

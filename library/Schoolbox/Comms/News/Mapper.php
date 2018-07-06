@@ -111,38 +111,38 @@ class Mapper extends \Schoolbox\Mapper
         $collection = $this->createCollection();
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $news = $this->hydrate($row);
+            $article = $this->hydrate($row);
 
-            if ($news) {
+            if ($article) {
                 $topic = $this->getJoinMapper('comms_news_article_topic')->hydrate($row, 'topics');
 
                 if ($topic) {
-                    $news->getTopics()->setOffset($topic->getId(), $topic);
+                    $article->getTopics()->setOffset($topic->getId(), $topic);
                 }
 
                 /** @var User $author */
                 $author = $this->getJoinMapper('author')->hydrate($row, 'a');
 
                 if ($author) {
-                    $news->setAuthor($author);
+                    $article->setAuthor($author);
                 }
 
                 /** @var User $moderator */
                 $moderator = $this->getJoinMapper('moderator')->hydrate($row, 'm');
 
                 if ($moderator) {
-                    $news->setAcceptedBy($moderator);
+                    $article->setAcceptedBy($moderator);
                 }
 
                 /** @var User $rejector */
                 $rejector = $this->getJoinMapper('rejector')->hydrate($row, 'r');
 
                 if ($rejector) {
-                    $news->setRejectedBy($rejector);
+                    $article->setRejectedBy($rejector);
                 }
             }
 
-            $collection->setOffset($news->getId(), $news);
+            $collection->setOffset($article->getId(), $article);
         }
 
         /* Reindex the new topics so they're not in an associative array

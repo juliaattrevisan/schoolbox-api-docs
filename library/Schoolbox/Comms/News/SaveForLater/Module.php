@@ -45,8 +45,8 @@ class Module extends BaseModule
         };
 
         $this->register('GET', '', 'getList', $perms);
-        $this->register('POST', '/{newsId}', 'postToggle', $perms, $preloadNews);
-        $this->register('POST', '/{newsId}/remove', 'postRemove', $perms, $preloadNews);
+        $this->register('POST', '/{articleId}', 'postToggle', $perms, $preloadNews);
+        $this->register('POST', '/{articleId}/remove', 'postRemove', $perms, $preloadNews);
     }
 
     /**
@@ -61,13 +61,13 @@ class Module extends BaseModule
     private function preloadNews(array $params) :array
     {
         try {
-            $news = $this->getNewsMapper()->findById($params['newsId']);
+            $article = $this->getNewsMapper()->findById($params['articleId']);
         } catch (MapperException $e) {
             throw new NotFound($this->getErrorMapper()->getMessageById(ErrorMapper::ERROR_GENERIC_NOT_FOUND));
         }
 
         return [
-            'news' => $news,
+            'article' => $article,
         ];
     }
 

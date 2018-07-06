@@ -5,7 +5,7 @@
  # Trainline only appears when an article hasn't been broadcast yet to its audience
  # i.e. publishAt hasn't been reached yet
  #
- # @param Model news
+ # @param News\Model article
  # @param bool moderationRequired
  # @param string identifier The current node in the workflow to highlight
  #}
@@ -16,19 +16,19 @@
  #}
 {% set identifier = 'compose' %}
 
-{% if news.id %}
+{% if article.id %}
     {% set identifier = 'preview' %}
 
     {% if moderationRequired %}
-        {% if news.isSubmitted %}
+        {% if article.isSubmitted %}
             {% set identifier = 'awaiting-moderation' %}
 
             {# Moderation is required and the acceptedAt is set; then we're awaiting publication #}
-            {% if news.isAccepted %}
+            {% if article.isAccepted %}
                 {% set identifier = 'awaiting-publication' %}
 
                 {# If the publish date is reached: sent it. Presumably. #}
-                {% if news.publishAt.isPast %}
+                {% if article.publishAt.isPast %}
                     {% set identifier = 'published' %}
                 {% endif %}
             {% endif %}
@@ -39,18 +39,18 @@
          # The publish date offset should be used to prevent ultra-immediate broadcast if people are
          # finding themselves publishing too quickly
          #}
-        {% if news.isSubmitted %}
+        {% if article.isSubmitted %}
             {% set identifier = 'awaiting-publication' %}
 
             {# If the publish date is reached: sent it. Presumably. #}
-            {% if news.publishAt.isPast %}
+            {% if article.publishAt.isPast %}
                 {% set identifier = 'published' %}
             {% endif %}
         {% endif %}
     {% endif %}
 
     {# Expired news #}
-    {% if news.expiresAt.isPast %}
+    {% if article.expiresAt.isPast %}
         {% set identifier = 'expired' %}
     {% endif %}
 {% endif %}
@@ -61,13 +61,13 @@
  #}
 {% set composeUrl = null %}
 
-{% if news.id %}
+{% if article.id %}
     {% if isCommsOfficer %}
-        {% set composeUrl = routeLookup('commsNews.getUpdate', {newsId: news.id}) %}
-    {% elseif moderationRequired and not news.isAccepted %}
-        {% set composeUrl = routeLookup('commsNews.getUpdate', {newsId: news.id}) %}
+        {% set composeUrl = routeLookup('commsNews.getUpdate', {articleId: article.id}) %}
+    {% elseif moderationRequired and not article.isAccepted %}
+        {% set composeUrl = routeLookup('commsNews.getUpdate', {articleId: article.id}) %}
     {% elseif not moderationRequired %}
-        {% set composeUrl = routeLookup('commsNews.getUpdate', {newsId: news.id}) %}
+        {% set composeUrl = routeLookup('commsNews.getUpdate', {articleId: article.id}) %}
     {% endif %}
 {% endif %}
 
@@ -84,8 +84,8 @@
  # From here you can Submit For Moderation (if required)
  # Varies depending on the moderation policy
  #}
-{% if news.id %}
-    {% set previewUrl = routeLookup('commsNews.getDetail', {newsId: news.id}) %}
+{% if article.id %}
+    {% set previewUrl = routeLookup('commsNews.getDetail', {articleId: article.id}) %}
 {% else %}
     {% set previewUrl = null %}
 {% endif %}
@@ -109,10 +109,10 @@
  # Varies depending on the moderation policy
  #}
 {% if moderationRequired %}
-    {% if news.isAccepted %}
-        {% set alt = 'This article was accepted on ' ~ news.acceptedAt.local  %}
-    {% elseif news.isSubmittedAt %}
-        {% set alt = 'This article is awaiting moderation since ' ~ news.submittedAt.local %}
+    {% if article.isAccepted %}
+        {% set alt = 'This article was accepted on ' ~ article.acceptedAt.local  %}
+    {% elseif article.isSubmittedAt %}
+        {% set alt = 'This article is awaiting moderation since ' ~ article.submittedAt.local %}
     {% else %}
         {% set alt = 'This article will require moderation before being made available to the audience' %}
     {% endif %}
@@ -135,8 +135,8 @@
  #}
 {% set alt = 'This article is awaiting publication to its audience' %}
 
-{% if news.id %}
-    {% set alt = alt ~ ' on ' ~ news.publishAt.local %}
+{% if article.id %}
+    {% set alt = alt ~ ' on ' ~ article.publishAt.local %}
 {% endif %}
 
 {% set awaitingPublicationNode = {
@@ -153,12 +153,12 @@
  #}
 {% set alt = 'This article is awaiting publication to its audience' %}
 
-{% if news.id %}
-    {% set alt = alt ~ ' on ' ~ news.publishAt.local %}
+{% if article.id %}
+    {% set alt = alt ~ ' on ' ~ article.publishAt.local %}
 
-    {% if moderationRequired and news.isAccepted and news.acceptedAt.isPast %}
-        {% if news.publishAt.isPast %}
-            {% set alt = 'This article publishes on ' ~ news.publishAt.local  %}
+    {% if moderationRequired and article.isAccepted and article.acceptedAt.isPast %}
+        {% if article.publishAt.isPast %}
+            {% set alt = 'This article publishes on ' ~ article.publishAt.local  %}
         {% endif %}
     {% endif %}
 {% endif %}
@@ -177,8 +177,8 @@
  #}
 {% set alt = 'This article expires and automatically archives' %}
 
-{% if news.id %}
-    {% set alt = 'Expires and automatically archives on ' ~ news.expiresAt.local %}
+{% if article.id %}
+    {% set alt = 'Expires and automatically archives on ' ~ article.expiresAt.local %}
 {% endif %}
 
 {% set expiredNode = {

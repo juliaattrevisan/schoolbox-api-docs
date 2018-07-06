@@ -16,7 +16,6 @@ namespace Schoolbox\Comms\News\Moderation;
 use Alaress\Database\Predicate\Builder;
 use Schoolbox\Comms\News;
 use Schoolbox\GenericCollection;
-use Schoolbox\UserMapper;
 
 class Lists
 {
@@ -31,21 +30,14 @@ class Lists
      */
     private $newsMapper;
 
-    /**
-     * @var UserMapper
-     */
-    private $userMapper;
-
 
     /**
      * Lists constructor.
      * @param News\Mapper $newsMapper
-     * @param UserMapper  $userMapper
      */
-    public function __construct(News\Mapper $newsMapper, UserMapper $userMapper)
+    public function __construct(News\Mapper $newsMapper)
     {
         $this->newsMapper = $newsMapper;
-        $this->userMapper = $userMapper;
     }
 
 
@@ -58,7 +50,7 @@ class Lists
      */
     public function getNeedModeration(): GenericCollection
     {
-        $builder = (new Builder($this->userMapper->getDatabase(), 'comms_news_article'))
+        $builder = (new Builder($this->newsMapper->getDatabase(), 'comms_news_article'))
             ->notNull('submitted_at')
             ->isNull('accepted_at');
 
@@ -79,7 +71,7 @@ class Lists
      */
     public function getRecentlyAccepted(): GenericCollection
     {
-        $builder = (new Builder($this->userMapper->getDatabase(), 'comms_news_article'))
+        $builder = (new Builder($this->newsMapper->getDatabase(), 'comms_news_article'))
             ->notNull('accepted_at');
 
         return $this->newsMapper->findByPredicates($builder, [

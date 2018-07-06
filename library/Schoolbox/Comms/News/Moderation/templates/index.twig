@@ -10,28 +10,26 @@
     <div class="small-12 island">
         <h2 class="subheader">Awaiting Acceptance</h2>
 
-        {% if newsArticles|length %}
+        {% if articles|length %}
         <section>
             <ul class="information-list">
-                {% for news in newsArticles %}
+                {% for article in articles %}
                     <li>
                         <div class="list-item">
                             <div class="small-12 card">
-                                <h3><a href="{{ routeLookup('commsNews.getDetail', {newsId: news.id}) }}">{{ news.title }}</a></h3>
-                                <p class="meta">Authored by {{ news.author.fullname }} on {{ news.updatedAt.local }}</p>
+                                <h3><a href="{{ routeLookup('commsNews.getDetail', {articleId: article.id}) }}">{{ article.title }}</a></h3>
+                                <p class="meta">Authored by {{ article.author.fullname }} on {{ article.updatedAt.local }}</p>
 
                                 {# TODO: Have a /news/topic url lol #}
-                                {% if news.topics|length %}
+                                {% if article.topics|length %}
                                     <p class="meta">Related topics:
-                                        {% for topic in news.topics %}
-                                            <a href="/news/topic/{{ topic.slug }}">{{ topic.name }}</a>{% if not loop.last %},{% endif %}
+                                        {% for topic in article.topics %}
+                                            <a href="/news/topic/{{ topic.slug }}">{{ topic.name }}</a>{% if not loop.last %}, {% endif %}
                                         {% endfor %}
                                     </p>
                                 {% endif %}
                             </div>
                         </div>
-
-                        <article>{{ news.blurb|purify }}</article>
                     </li>
                 {% endfor %}
             </ul>
@@ -39,8 +37,8 @@
         {% else %}
         <div class="empty-state">
             <i class="icon-news"></i>
-            <p>All {{ locale.news.proper }} articles have been processed.</p>
-            <p>You can <a href="">view statistics on existing {{ locale.news.proper }} articles</a> to see how they are faring.</p>
+            <p>All {{ locale.news }} have been processed.</p>
+            <p>You can <a href="">view statistics on existing {{ locale.news }} articles</a> to see how they are faring.</p>
         </div>
         {% endif %}
     </div>
@@ -56,26 +54,24 @@
 
         <section>
             <ul class="information-list">
-                {% for news in recentArticles %}
+                {% for article in recentArticles %}
                     <li>
                         <div class="list-item">
                             <div class="small-12 card">
-                                <h3><a href="{{ routeLookup('commsNews.getDetail', {newsId: news.id}) }}">{{ news.title }}</a></h3>
-                                <p class="meta">Authored by {{ news.author.fullname }} on {{ news.updatedAt.local }}</p>
-                                <p class="meta">Accepted by {{ news.acceptedBy.fullname }} on {{ news.updatedAt.local }}</p>
+                                <h3><a href="{{ routeLookup('commsNews.getDetail', {articleId: article.id}) }}">{{ article.title }}</a></h3>
+                                <p class="meta">Authored by {{ article.author.fullname }} on {{ article.updatedAt.local }}</p>
+                                <p class="meta">Accepted by {{ article.acceptedBy.fullname }} on {{ article.updatedAt.local }}</p>
 
                                 {# TODO: Have a /news/topic url lol #}
-                                {% if news.topics|length %}
+                                {% if article.topics|length %}
                                     <p class="meta">Related topics:
-                                        {% for topic in news.topics %}
-                                            <a href="/news/topic/{{ topic.slug }}">{{ topic.name }}</a>{% if not loop.last %},{% endif %}
+                                        {% for topic in article.topics %}
+                                            <a href="/news/topic/{{ topic.slug }}">{{ topic.name }}</a>{% if not loop.last %}, {% endif %}
                                         {% endfor %}
                                     </p>
                                 {% endif %}
                             </div>
                         </div>
-
-                        <article>{{ news.blurb|purify }}</article>
                     </li>
                 {% endfor %}
             </ul>

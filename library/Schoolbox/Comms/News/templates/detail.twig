@@ -6,12 +6,12 @@
     {{ bread.crumbs(
         [ locale.news.proper, '/news' ],
         [ 'Moderation', routeLookup('commsNewsModeration.getList') ],
-        [ news.title ]
+        [ article.title ]
     ) }}
 {% else %}
 {{ bread.crumbs(
     [ locale.news.proper, '/news' ],
-    [ news.title ]
+    [ article.title ]
 ) }}
 {% endif %}
 
@@ -19,16 +19,16 @@
 <div class="actions-small-2 row">
     <div class="list-item">
         <div class="small-12 columns">
-            <h1>{{ news.title }}</h1>
+            <h1>{{ article.title }}</h1>
 
             <ul class="meta">
 
                 {# Topics #}
-                {% if news.topics|length %}
+                {% if article.topics|length %}
                     <li class="icon-news">Related Topics:
 
                         {# TODO: Have a /news/topic url lol #}
-                        {% for topic in news.topics %}
+                        {% for topic in article.topics %}
                             <a href="/news/topic/{{ topic.slug }}">{{ topic.name }}</a>{% if not loop.last %},{% endif %}
                         {% endfor %}
                     </li>
@@ -37,13 +37,13 @@
                 {# This info only really matters to the author, I suppose
                  # Submitted at; accepted at; accepted by
                  #}
-                {% if news.author.id == USER.id %}
-                    {% if news.isSubmitted %}
-                        <li class="icon-calendar">Submitted on {{ news.submittedAt.local }}</li>
+                {% if isAuthor %}
+                    {% if article.isSubmitted %}
+                        <li class="icon-calendar">Submitted on {{ article.submittedAt.local }}</li>
                     {% endif %}
 
-                    {% if news.isAccepted %}
-                        <li class="icon-calendar">Last moderated on {{ news.acceptedAt.local }} by {{ news.acceptedBy.fullname }}</li>
+                    {% if article.isAccepted %}
+                        <li class="icon-calendar">Last moderated on {{ article.acceptedAt.local }} by {{ article.acceptedBy.fullname }}</li>
                     {% endif %}
                 {% endif %}
             </ul>
@@ -72,13 +72,13 @@
     <ul id="header-options" class="f-dropdown" data-dropdown-content>
 
         {# Modify article #}
-        {% set modifyRoute = routeLookupIfAuthorized('commsNews.getUpdate', {newsId: news.id}) %}
-        {% if modifyRoute and (isCommsOfficer or not moderationRequired or not news.isAccepted) %}
+        {% set modifyRoute = routeLookupIfAuthorized('commsNews.getUpdate', {articleId: article.id}) %}
+        {% if modifyRoute and isEditable %}
             <li><a class="icon-modify" href="{{ modifyRoute }}">Modify</a></li>
         {% endif %}
 
         {# Delete article #}
-        {% set deleteRoute = routeLookupIfAuthorized('commsNews.postDelete', {newsId: news.id}) %}
+        {% set deleteRoute = routeLookupIfAuthorized('commsNews.postDelete', {articleId: article.id}) %}
 
         {% if deleteRoute and isDeletable %}
             <script>
@@ -100,7 +100,7 @@
                                 $.ajax({
                                     type: 'POST',
                                     url: $element.attr('href'),
-                                    data: {newsId: {{ news.id }}},
+                                    data: {articleId: {{ article.id }}},
                                     dataType: 'json'
                                 }).success(function (response) {
                                     $toast.toastTimeout({
@@ -122,14 +122,14 @@
                     });
                 });
             </script>
-            <li><a class="icon-delete" href="{{ deleteRoute }}" data-delete="{{ news.title }}">Delete</a></li>
+            <li><a class="icon-delete" href="{{ deleteRoute }}" data-delete="{{ article.title }}">Delete</a></li>
         {% endif %}
 
         {# Helper links #}
         {# TODO: maybs delete once there's actual ways to get to these places #}
 
         {# Create new article #}
-        <li><a class="icon-add" href="{{ routeLookupIfAuthorized('commsNews.getCreate') }}" >Create new article</a></li>
+        <li><a class="icon-add" href="{{ routeLookupIfAuthorized('commsNews.getCreate') }}" >Create {{ locale.news }}</a></li>
 
         {# Go to the moderation list #}
         {% if moderationRequired %}
@@ -149,9 +149,9 @@
  # One of three possibilities are shown here
  # Only useful to authors and moderators
  #}
-{% if news.author.id == USER.id or isCommsOfficer %}
+{% if isAuthor or isCommsOfficer %}
 {% include '@commsNews/workflow.twig' with {
-    news: news,
+    article: article,
     moderationRequired: moderationRequired
 } %}
 {% endif %}
@@ -160,26 +160,26 @@
     <div class="small-12 island">
         <section>
             <div class="card small-12">
-                <a href="/search/user/{{ news.author.id }}" title="View Profile">
-                    <img src="/portrait.php?userId={{ news.author.externalId }}&size=square64" alt="View Profile" />
-                    <p>{{ news.author.fullname }}</p>
+                <a href="/search/user/{{ article.author.id }}" title="View Profile">
+                    <img src="/portrait.php?userId={{ article.author.externalId }}&size=square64" alt="View Profile" />
+                    <p>{{ article.author.fullname }}</p>
                 </a>
-                <p class="meta">{{ news.publishAt.long }}</p>
+                <p class="meta">{{ article.publishAt.long }}</p>
             </div>
         </section>
     </div>
 </div>
 
 {# Display body when either there's text content, or an image #}
-{% if news.body|length or news.featureImage.hash %}
+{% if article.body|length or article.featureImage.hash %}
 <div class="row">
     <div class="small-12 island">
         <section>
             <div class="row">
-                {% if news.featureImage.hash %}
-                    {{ layout.standard(news) }}
+                {% if article.featureImage.hash %}
+                    {{ layout.standard(article) }}
                 {% else %}
-                    {{ layout.textonly(news) }}
+                    {{ layout.textonly(article) }}
                 {% endif %}
             </div>
         </section>
@@ -190,16 +190,16 @@
 {# Rejection details, if applicable
  # Only show rejection info prior to acceptance
  #}
-{% if news.isRejected and not news.isAccepted %}
+{% if article.isRejected and not article.isAccepted %}
 <div class="row">
     <div class="small-12 island">
         <section class="no-pad no-margin">
             <p class="content no-margin"><span class="icon-info"></span>
                 This {{ locale.news }} was <strong>rejected</strong>
-                by <a href="/search/user/{{ news.rejectedBy.id }}" title="View Profile">{{ news.rejectedBy.fullname }}</a>
-                on {{ news.rejectedAt.local }}
+                by <a href="/search/user/{{ article.rejectedBy.id }}" title="View Profile">{{ article.rejectedBy.fullname }}</a>
+                on {{ article.rejectedAt.local }}
 
-                {% if news.rejectedReason|length %}
+                {% if article.rejectedReason|length %}
                     for the following reason:
                 {% else %}
                     but no reason was given.
@@ -207,8 +207,8 @@
             </p>
         </section>
 
-        {% if news.rejectedReason|length %}
-        <blockquote>{{ news.rejectedReason|nl2br }}</blockquote>
+        {% if article.rejectedReason|length %}
+        <blockquote>{{ article.rejectedReason|nl2br }}</blockquote>
         {% endif %}
     </div>
 </div>
@@ -218,7 +218,7 @@
 {# Social Features and assorted functionality #}
 {#{% include '@commsNews/social.twig' with {#}
     {#policies: policies,#}
-    {#news: news,#}
+    {#article: article,#}
     {#states: {#}
         {#'save_for_later': isSavedForLater#}
     {#}#}
@@ -233,8 +233,8 @@
         {# Modify this news article
          # Only available before the article has been accepted
          #}
-        {% if not news.isAccepted %}
-            {% set modifyRoute = routeLookupIfAuthorized('commsNews.getUpdate', {newsId: news.id}) %}
+        {% if not article.isAccepted %}
+            {% set modifyRoute = routeLookupIfAuthorized('commsNews.getUpdate', {articleId: article.id}) %}
 
             {% if modifyRoute %}
                 <li><a class="icon-modify" href="{{ modifyRoute }}" title="Modify this article">Modify</a></li>
@@ -247,14 +247,14 @@
          # Moderation is required: you're prompted to consciously submit for moderation
          # Moderation isn't required: you're prompted to consciously publish to the world
          #}
-        {% if not news.isSubmitted %}
+        {% if not article.isSubmitted %}
             {% if moderationRequired %}
                 {% set buttonText = 'Submit for moderation' %}
             {% else %}
                 {% set buttonText = 'Submit' %}
             {% endif %}
             <li>
-                <form action="{{ routeLookup('commsNewsModeration.postSubmit', {newsId: news.id}) }}" method="post">
+                <form action="{{ routeLookup('commsNewsModeration.postSubmit', {articleId: article.id}) }}" method="post">
                     <input type="submit" value="{{ buttonText }}" />
                 </form>
             </li>
@@ -262,11 +262,11 @@
 
 
         {# Moderators #}
-        {% if isCommsOfficer and moderationRequired and news.isSubmitted %}
+        {% if isCommsOfficer %}
             {% if isRejectable %}
 
                 {# Reject this news article #}
-                {% set rejectRoute = routeLookupIfAuthorized('commsNewsModeration.postReject', {newsId: news.id}) %}
+                {% set rejectRoute = routeLookupIfAuthorized('commsNewsModeration.postReject', {articleId: article.id}) %}
 
                 {% if rejectRoute %}
                     <script>
@@ -292,7 +292,7 @@
                                         $.ajax({
                                             type: 'POST',
                                             url: $element.attr('href'),
-                                            data: {newsId: {{ news.id }}, rejectedReason: $('#rejectedReason').val()},
+                                            data: {articleId: {{ article.id }}, rejectedReason: $('#rejectedReason').val()},
                                             dataType: 'json'
                                         }).success(function (response) {
                                             $toast.toastTimeout({
@@ -314,15 +314,15 @@
                             });
                         });
                     </script>
-                    <li><a class="icon-undo" href="{{ rejectRoute }}" title="Reject this article" data-reject="{{ news.title }}">Reject</a></li>
+                    <li><a class="icon-undo" href="{{ rejectRoute }}" title="Reject this article" data-reject="{{ article.title }}">Reject</a></li>
                 {% endif %}
             {% endif %}
 
 
             {# Accept this news article for publication to the world #}
-            {% if isAcceptable and moderationRequired %}
+            {% if isAcceptable %}
             <li>
-                <form action="{{ routeLookup('commsNewsModeration.postAccept', {newsId: news.id}) }}" method="post">
+                <form action="{{ routeLookup('commsNewsModeration.postAccept', {articleId: article.id}) }}" method="post">
                     <input type="submit" value="Approve" />
                 </form>
             </li>
