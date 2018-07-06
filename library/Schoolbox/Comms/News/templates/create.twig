@@ -38,6 +38,18 @@
             value: {{ article.topics|json_encode|raw }},
             multiple: true
         });
+
+        $('#audience-search').selectizeSelector({
+            multiple: true,
+            {% if audienceList | length > 0 %} value: {{ audienceList }}, {% endif %}
+            ajax: {
+                url:      '/ajax/audience.php',
+                type:     'GET',
+                data:     {groupID: 50},
+                dataType: 'json'
+            }
+        });
+
     });
 </script>
 
@@ -103,6 +115,17 @@
 
                 <fieldset class="content">
                     <div class="small-12 columns">
+                        <label>Audience</label>
+                        <p class="meta">Target your article. Search for campuses, year levels, groups, people, or use Browse to find your audience.</p>
+                        <div class="input-group">
+                            <input type="text" id="audience-search" />
+                            <button class="button icon-drag-drop" data-reveal-id="audience-browse">Browse...</button>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <fieldset class="content">
+                    <div class="small-12 columns">
                         <label>Feature Image</label>
                         <p class="meta">Attach a feature image to represent your {{ locale.article.proper }} article.</p>
 
@@ -143,3 +166,8 @@
 </div>
 
 <div class="toast" id="saveDraft"></div>
+
+<div data-reveal="" id="audience-browse" class="reveal-modal">
+    <h2>Browse Audience</h2>
+    <a class="close-reveal-modal" aria-label="Close">×</a>
+</div>
