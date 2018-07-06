@@ -102,6 +102,7 @@ class Controller extends Base
             $provider->setKey($post['key']);
             $provider->setSecret($post['secret']);
             $provider->setXml($post['xml']);
+			$provider->setLaunchType($post['launch_type']);
             $provider->setIcon(null);
             $provider->setUrl(null);
 

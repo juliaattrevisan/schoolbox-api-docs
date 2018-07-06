@@ -33,6 +33,15 @@
                 <input type="text" name="secret" value="{{ provider.secret }}">
             </label>
         </div>
+        <div class="small-12 columns">
+            <label>
+                LTI Request Type
+                <select name="launch_type">
+                    <option {% if provider.launchType == 'LTI_LAUNCH_TYPE_BASIC' %}selected{% endif %} value="LTI_LAUNCH_TYPE_BASIC">Basic Launch</option>
+                    <option {% if provider.launchType == 'LTI_LAUNCH_TYPE_PICKER' %}selected{% endif %} value="LTI_LAUNCH_TYPE_PICKER">Picker</option>
+                </select>
+            </label>
+        </div>
         <input type="submit" class="expand" value="{{ saveValue }}" data-mage-working="Saving..." data-mage-reset="{{ saveValue }}" />
         <!-- Don't delete the inline style, it's needed -->
         <p data-mage-error style="display:none;" class="alert alert-box icon-alert"></p>

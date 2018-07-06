@@ -146,24 +146,45 @@ class Model implements ISoftDeletable
         return $this->xml;
     }
 
-    /** @var string */
-    protected $icon;
+	/** @var string */
+	protected $icon;
 
-    /**
-     * @param string $icon
-     * @return self
-     */
-    public function setIcon($icon)
-    {
-        $this->icon = $icon;
-        return $this;
-    }
+	/**
+	 * @param string $icon
+	 * @return self
+	 */
+	public function setIcon($icon)
+	{
+		$this->icon = $icon;
+		return $this;
+	}
 
-    /**
-     * @return string
-     */
-    public function getIcon()
-    {
-        return $this->icon;
-    }
+	/**
+	 * @return string
+	 */
+	public function getIcon()
+	{
+		return $this->icon;
+	}
+
+	/** @var string */
+	protected $launchType;
+
+	/**
+	 * @param string $launchType
+	 * @return self
+	 */
+	public function setLaunchType($launchType)
+	{
+		$this->launchType = $launchType;
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getLaunchType()
+	{
+		return $this->launchType;
+	}
 }
