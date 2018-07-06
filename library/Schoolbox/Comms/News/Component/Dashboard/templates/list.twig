@@ -27,7 +27,7 @@
                 </div>
             </div>
             <nav>
-                {% if article.id in savedArticleIds|keys %}
+                {% if savedArticleIds[article.id] is defined %}
                     {% set state = savedArticleIds[article.id] %}
                 {% else %}
                     {% set state = unsaved %}
