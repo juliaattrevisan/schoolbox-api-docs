@@ -354,10 +354,8 @@ class Mapper extends BaseMapper
         $diff = null;
 
         // UPDATE
-        if ($previous && ($verb != self::METHOD_DELETE)) {
+        if ($previous && ($verb === self::METHOD_UPDATE)) {
             $diff = $this->diff($object, $previous);
-            /** @var Match $object */
-            /** @var Match $previous */
             // if number of itinerary items differs, notify
             if ($object->getItinerary()->count() !== $previous->getItinerary()->count()) {
                 $diff['itinerary'] = true;
