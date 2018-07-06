@@ -92,12 +92,8 @@ class Acceptance extends \Codeception\Module
     public function fillRichTextField(string $field, string $value): void
     {
         $wd = $this->getWebDriverModule();
-        $wd->executeInSelenium(
-            function (RemoteWebDriver $webDriver) use ($field, $value) {
-                $webDriver->executeScript(
-                    sprintf('CKEDITOR.instances["%s"].setData("%s")', addslashes($field), addslashes($value))
-                );
-            }
+        $wd->executeJS(
+            sprintf('CKEDITOR.instances["%s"].setData("%s")', addslashes($field), addslashes($value))
         );
     }
 
@@ -146,6 +142,9 @@ class Acceptance extends \Codeception\Module
     {
         $wd = $this->getWebDriverModule();
         $wd->fillField($field, $value);
+
+        // Trigger blur on whatever I just typed into, to trigger strtotime
+        $wd->executeJS("jQuery(':focus').blur()");
 
         // WebDriver::findField isn't public, and waitForElement can't find by field name.
         // Just wait for AJAX to do stuff.

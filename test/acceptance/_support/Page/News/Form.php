@@ -86,8 +86,7 @@ class Form
      */
     public function submit(): self
     {
-        // TODO enable
-//        $this->tester->click(self::FORM_SAVE);
+        $this->tester->click(self::FORM_SAVE);
         return $this;
     }
 
