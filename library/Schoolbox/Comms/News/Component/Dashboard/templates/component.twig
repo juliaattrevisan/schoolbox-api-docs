@@ -5,17 +5,31 @@
 <script>
     $(function() {
         var container = $('#news-container-{{ componentInstanceId }}');
+        var cache = [];
 
         /**
          * Get articles via url specified
          */
         function getArticles(url) {
+
+            /* Check for a cached version and load that, if possible
+             * Otherwise fetch it
+             */
+            if (cache[url] !== undefined) {
+                container.html(cache[url]).saveForLater();
+                return;
+            }
+
             $.ajax({
                 type: 'GET',
                 url: url,
                 dataType: 'html'
             }).success(function (response) {
                 container.html(response).saveForLater();
+
+                /* Cache the response so we don't need to refetch it
+                 */
+                cache[url] = response;
             }).error(function (response) {
             });
         }
