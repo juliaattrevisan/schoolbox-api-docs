@@ -156,4 +156,39 @@ class Mapper extends \Schoolbox\Mapper
 
         return $collection;
     }
+
+
+    /**
+     * Find a list of articles that are somehow related to $topicId
+     *
+     * @param int $topicId
+     * @param int $limit
+     * @return \Schoolbox\GenericCollection
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     */
+    public function findForTopic(int $topicId, int $limit): \Schoolbox\GenericCollection
+    {
+        /* TODO: Find articles that were audienced to me
+         */
+        $pb = $this->getPredicateBuilder()
+            ->equals('topics.newsTopicID', $topicId);
+
+        $articlesInTopic = $this->findScalarByPredicates('id', $pb);
+
+        /* Find the articles and all their deets
+         */
+        $options = [
+            'order' => [
+                'publish_at' => 'desc'
+            ]
+        ];
+
+        /* $limit 0 === "All articles"
+         */
+        if ($limit) {
+            $options['limit'] = $limit;
+        }
+
+        return $this->findByColumn('id', $articlesInTopic, $options);
+    }
 }

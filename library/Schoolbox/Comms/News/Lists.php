@@ -56,20 +56,7 @@ class Lists
 
         /* Component config can set "All" as its limit
          */
-        $options = [];
-
-        if ($limit) {
-            $options = [
-                'limit' => $limit
-            ];
-        }
-
-        /* TODO: Find articles that were audienced to me
-         */
-        $pb = $this->newsMapper->getPredicateBuilder()
-            ->equals('topics.newsTopicID', $topicId);
-
-        $articles = $this->newsMapper->findByPredicates($pb);
+        $articles = $this->newsMapper->findForTopic($topicId, $limit);
 
         /* Figure out the articles that this user has saved for later
          */
