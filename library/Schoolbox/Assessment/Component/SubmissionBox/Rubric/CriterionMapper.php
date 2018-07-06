@@ -79,7 +79,7 @@ class CriterionMapper extends BaseMapper {
     {
         return "
             FROM {$this->getTable()}
-            LEFT JOIN {$this->getJoinSql('group', '', 'g')}
+            INNER JOIN {$this->getJoinSql('group', '', 'g', true)}
         ";
     }
 
