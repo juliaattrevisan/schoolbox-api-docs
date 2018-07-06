@@ -166,40 +166,64 @@ class Mapper extends \Schoolbox\Mapper
     /**
      * Find a list of articles that are somehow related to $topicId
      *
+     * The n-n relational between articles and topics precludes proper usage of findAll()
+     * with a limit - it doesn't count properly
+     *
      * @param int $topicId
      * @param int $limit
      * @return \Schoolbox\GenericCollection
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
      */
     public function findForTopic(int $topicId, int $limit): \Schoolbox\GenericCollection
     {
-        /* Find the articles and all their deets
-         */
-        $options = [
-            'order' => [
-                'publish_at' => 'desc'
-            ]
-        ];
-
-        /* $limit 0 === "All articles"
-         */
-        if ($limit) {
-            $options['limit'] = $limit;
-        }
+        $articlesInTopic = [];
+        $options = [];
 
         /* If $topicId is provided, only get articles for that topic
          * Otherwise get $limit articles from any topic
          */
-        if ($topicId === self::TOPIC_ALL) {
-            return $this->findAll($options);
+        $query = "
+            SELECT id
+            FROM {$this->table}
+            WHERE publish_at IS NOT NULL
+            ORDER BY publish_at DESC
+        ";
+
+        if ($topicId !== self::TOPIC_ALL) {
+            $query = "
+                SELECT id
+                FROM {$this->table}
+                INNER JOIN comms_news_article_topic cnat ON {$this->table}.id = cnat.article_id 
+                WHERE publish_at IS NOT NULL
+                AND cnat.topic_id = :topicId
+                GROUP BY id
+                ORDER BY publish_at DESC
+            ";
         }
 
-        /* TODO: Find articles that were audienced to me
-         */
-        $pb = $this->getPredicateBuilder()
-            ->equals('topics.newsTopicID', $topicId);
+        if ($limit) {
+            $query .= 'LIMIT :limit';
+        }
 
-        $articlesInTopic = $this->findScalarByPredicates('id', $pb);
+        $statement = $this->database->prepare($query);
+
+        /* Because pdo does some micky mouse shenanigans
+         */
+        if ($topicId !== self::TOPIC_ALL) {
+            $statement->bindValue('topicId', $topicId, \PDO::PARAM_INT);
+        }
+
+        if ($limit) {
+            $statement->bindValue('limit', $limit, \PDO::PARAM_INT);
+        }
+
+        $statement->execute();
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $articlesInTopic[] = $row['id'];
+        }
+
+        /* TODO: Filter $articlesInTopic vs articles that I can see
+         */
 
         return $this->findByColumn('id', $articlesInTopic, $options);
     }
