@@ -1106,22 +1106,14 @@ class Controller extends Base\Base
     {
         $criteriaMapper = CriterionMapper::getInstance();
 
-        /** @var GenericCollection | Criterion[] $allCriteria */
-        $allCriteria = $criteriaMapper->findByColumnList(
-            [
-                'parent_id'   => $sourceIds,
-                'parent_type' => Criterion::PARENT_TYPE_CATEGORY,
-            ]
-        );
-
-        $allCriteria = $allCriteria->deepClone();
-
-        //Save copy of criteria with class page as parent
-        foreach ($allCriteria as $criteria) {
-            $criteria->setParentId($destinationId);
+        // Save copy of criteria with class page as parent
+        foreach ($criteriaMapper->findForFolder($sourceIds) as $criteria) {
+            $criteriaMapper->findOrCreateOneForFolderByKey(
+                $destinationId,
+                $criteria->getName(),
+                $criteria->getGroup()->getName()
+            );
         }
-
-        $criteriaMapper->create($allCriteria);
 
         return $this;
     }

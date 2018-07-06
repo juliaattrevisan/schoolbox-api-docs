@@ -25,6 +25,7 @@ use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\User;
@@ -136,26 +137,36 @@ class RubricMapper
             $rubric->putLevel(new CompetencyLevel($i, $level));
         }
 
-        $args = ['folderId' => $folderId];
+        $args = [
+            'folderId'   => $folderId,
+            'parentType' => Group::PARENT_TYPE_CATEGORY,
+        ];
+        $in = ['folderId',];
         if ($parentFolderId) {
+            $in[] = 'parentFolderId';
             $args['parentFolderId'] = $parentFolderId;
         }
-        $in = implode(', :', array_keys($args));
+        $in = implode(', :', $in);
 
         $stmt = $this->database->query("
-            SELECT rc.id, rc.grouping, rc.name, COUNT(ru.submission_box_id) usage_count, rc.parent_id
+            SELECT
+                rc.id,
+                rg.id AS group_id,
+                rg.name AS grouping,
+                rc.name,
+                COUNT(a.id) AS usage_count,
+                rg.parent_id
             FROM rubric_criterion rc
+            JOIN      rubric_group rg ON rg.id = rc.rubric_group_id
             LEFT JOIN rubric_usage ru ON rc.id = ru.criterion_id
             LEFT JOIN submission_box b ON ru.submission_box_id = b.id
-            LEFT JOIN assessment a ON b.assessment_id = a.id AND a.deleted_at IS NOT NULL
-            WHERE rc.parent_type = 'category'
-            AND rc.parent_id IN (:$in)
+            LEFT JOIN assessment a ON b.assessment_id = a.id AND a.deleted_at IS NULL
+            WHERE rg.parent_type = :parentType
+            AND rg.parent_id IN (:$in)
             AND rc.deleted_at IS NULL
+            AND rg.deleted_at IS NULL
             GROUP BY rc.id
         ", $args);
-
-        // TODO what is this magic number
-        $groupId = 21;
 
         // De-duplicate into caches, prioritising parent if duplicate between
         // folder + parentFolder (eg UnitSpec vs CourseSpec)
@@ -167,7 +178,7 @@ class RubricMapper
             // If first instance of Capability
             if (!array_key_exists($capabilityNormalisedName, $capabilityCache)) {
                 // Save the Capability
-                $capabilityCache[$capabilityNormalisedName] = new Criteria\Group($groupId++, $this->normalizeSpace($r['grouping']));
+                $capabilityCache[$capabilityNormalisedName] = new Criteria\Group($r['group_id'], $this->normalizeSpace($r['grouping']));
 
                 // Instantiate Indicator cache for the Capability
                 $indicatorCache[$capabilityNormalisedName] = [];
@@ -342,9 +353,9 @@ class RubricMapper
     protected function generateCriteriaStatement(SubmissionBox $box, $getParentCriteria)
     {
         $args = [
-            'boxId'       => $box->getId(),
-            'folderId'    => $box->getCategory()->getId(),
-            'parent_type' => Criterion::PARENT_TYPE_CATEGORY,
+            'boxId'      => $box->getId(),
+            'folderId'   => $box->getCategory()->getId(),
+            'parentType' => Group::PARENT_TYPE_CATEGORY,
         ];
 
         $in = ['folderId'];
@@ -374,18 +385,22 @@ class RubricMapper
             FROM (
                 SELECT
                     c.id AS crit_id,
-                    c.grouping,
+                    g.name AS grouping,
                     c.name,
                     a.id AS a_id,                                        -- Will be NULL if not in use by a box, or box is soft-deleted
                     IF(b.id = :boxId, 1, 0) AS selected,                 -- Is this criterion in use by this box? (ignores whether box is deleted)
                     IF(b.id = :boxId, u.sequence, NULL) AS sequence      -- Only get sequence for this box (ignores whether box is deleted)
                 FROM rubric_criterion c
+                JOIN      rubric_group g ON g.id = c.rubric_group_id
                 LEFT JOIN rubric_usage u ON u.criterion_id = c.id
                 LEFT JOIN submission_box b ON u.submission_box_id = b.id                  -- This will join to deleted boxes
                 LEFT JOIN assessment a ON b.assessment_id = a.id AND a.deleted_at IS NULL -- But won't join to deleted assessments
-                WHERE c.parent_type = :parent_type
-                AND c.parent_id IN (:$in)
+                WHERE g.parent_type = :parentType
+                AND g.parent_id IN (:$in)
                 AND c.deleted_at IS NULL
+                AND a.deleted_at IS NULL
+                AND g.deleted_at IS NULL
+                ORDER BY selected DESC
             ) t
             GROUP BY crit_id
             ORDER BY selected DESC, MAX(`sequence`) ASC, `grouping` ASC, `name` ASC;
@@ -522,14 +537,13 @@ class RubricMapper
     {
         $square = [];
 
-        $folderLookup = [$folderId];
-
         // Determine if the specified folder has a UnitSpec
         /** @var UnitSpecification $unitSpec */
         $unitSpec = UnitSpecificationMapper::getInstance()->findByColumn('folder_id', $folderId)->first();
+        $courseSpecFolderId = null;
         if ($unitSpec) {
             // Add the Unit's Course's Folder's ID
-            $folderLookup[] = $unitSpec->getCourse()->getFolder()->getId();
+            $courseSpecFolderId = $unitSpec->getCourse()->getFolder()->getId();
         }
 
         $fp = $file->readStream();
@@ -584,31 +598,34 @@ class RubricMapper
         }
 
         // ensure all given criteria exist: create new ones if necessary
+        $criterionMapper = CriterionMapper::getInstance();
         foreach ($criteria as $group => $crits) {
             foreach ($crits as $crit) {
+                $name  = $crit['name'];
+                $model = null;
 
-                $name = $crit['name'];
-
+                // Which criterion is used?
                 try {
-                    // if the crit exists, just use that
-                    $model = CriterionMapper::getInstance()->findOneByColumnList([
-                        'grouping'    => $group,
-                        'name'        => $name,
-                        'parent_type' => 'category',
-                        'parent_id'   => $folderLookup,
-                    ]);
+                    // If there's a matching criterion in the folder: use it
+                    $model = $criterionMapper->findOneForFolderByKey($folderId, $name, $group);
 
-                } catch (\Schoolbox\Mapper\Exception $e) {
+                } catch (MapperException $e) {
+                    // If there isn't:
+                    // * If there's a course spec: use a matching criterion from it
+                    if ($courseSpecFolderId) {
+                        try {
+                            $model = $criterionMapper->findOneForFolderByKey($courseSpecFolderId, $name, $group);
+                        } catch (MapperException $e) {
+                            // There's no match in the folder or spec.
+                            // Create a new criterion in the folder
+                        }
+                    }
+                }
 
-                    // if the crit doesn't exist, create and save
-                    $model = CriterionMapper::getInstance()
-                                            ->createModel()
-                                            ->setName($name)
-                                            ->setGrouping($group)
-                                            ->setParentType('category')
-                                            ->setParentId($folderId);
-
-                    CriterionMapper::getInstance()->save($model);
+                // If there's no course spec, or there's no match in the spec:
+                // * create a new criterion in the folder
+                if (!$model) {
+                    $model = $criterionMapper->findOrCreateOneForFolderByKey($folderId, $name, $group);
                 }
 
                 // yank that ID
@@ -618,7 +635,7 @@ class RubricMapper
         }
 
         // get a new rubric in array form
-        $postdata = $this->createForFolder($folderLookup[0], $folderLookup[1], $levelNames)->toPostData();
+        $postdata = $this->createForFolder($folderId, $courseSpecFolderId, $levelNames)->toPostData();
 
         // overlay descriptor data
         for ($i = 1; $i < count($square); $i += 2) {
@@ -969,6 +986,7 @@ class RubricMapper
             ->isNull('rd.deleted_at')
             ->isNull('rl.deleted_at')
             ->isNull('rc.deleted_at')
+            ->isNull('rg.deleted_at')
             ->isNull('a.deleted_at');
 
         $where = implode(' AND ', $pb->getWhere());
@@ -986,12 +1004,13 @@ class RubricMapper
         // see http://stackoverflow.com/questions/7745609/sql-select-only-rows-with-max-value-on-a-column
 
         $stmt = $this->database->prepare("
-            SELECT rc.grouping, rc.name, a.id, a.title, rd.description
+            SELECT rg.name AS grouping, rc.name, a.id, a.title, rd.description
             FROM assessment         a
             JOIN submission_box    sb ON  a.id = sb.assessment_id
             JOIN rubric_level      rl ON sb.id = rl.box_id
             JOIN rubric_descriptor rd ON rl.id = rd.level_id
             JOIN rubric_criterion  rc ON rc.id = rd.criterion_id
+            JOIN rubric_group      rg ON rg.id = rc.rubric_group_id
             JOIN rubric_mark       rm ON rd.id = rm.descriptor_id
             JOIN submission_return sr ON sr.id = rm.return_id
             JOIN (
@@ -999,6 +1018,7 @@ class RubricMapper
                 FROM rubric_mark       rm
                 JOIN rubric_descriptor rd ON rd.id = rm.descriptor_id
                 JOIN rubric_criterion  rc ON rc.id = rd.criterion_id
+                JOIN rubric_group      rg ON rg.id = rc.rubric_group_id
                 JOIN rubric_level      rl ON rl.id = rd.level_id
                 JOIN submission_box    sb ON sb.id = rl.box_id
                 JOIN assessment         a ON  a.id = sb.assessment_id
@@ -1007,7 +1027,7 @@ class RubricMapper
                 GROUP BY sb.assessment_id, rd.criterion_id
             ) t ON `a`.`id` = `t`.`a.id` AND `rc`.`id` = `t`.`rc.id` AND `sr`.`published_at` = `t`.`sr.max_published_at`
             WHERE {$where}
-            ORDER BY rc.grouping ASC, rc.name ASC, a.due_date DESC;
+            ORDER BY rg.name ASC, rc.name ASC, a.due_date DESC;
         ");
 
         $stmt->execute($pb->getParams());
@@ -1105,15 +1125,16 @@ class RubricMapper
          */
         /** @var Descriptor $firstSrcDescriptor */
         $firstSrcDescriptor = $srcDescriptors->first();
-        $existingCriteria   = $criterionMapper->findByColumnList([
-            'parent_id'   => $dstBox->getCategory()->getId(),
-            'parent_type' => $firstSrcDescriptor->getCriterion()->getParentType(),
-        ], ['cache' => false]);
+        $existingCriteria   = $criterionMapper->findForParent(
+            $dstBox->getCategory()->getId(),
+            $firstSrcDescriptor->getCriterion()->getGroup()->getParentType(),
+            false
+        );
         // Convert to 2-D arrays, indexed by 'group' then 'name', so we can later find duplicates.
         /** @var Criterion[][] $existingGroupMap */
         $existingGroupMap = [];
         foreach ($existingCriteria as $existingCriterion) {
-            $group                           = $this->normaliseForComparison($existingCriterion->getGrouping());
+            $group                           = $this->normaliseForComparison($existingCriterion->getGroup()->getName());
             $name                            = $this->normaliseForComparison($existingCriterion->getName());
             $existingGroupMap[$group][$name] = $existingCriterion;
         }
@@ -1133,7 +1154,7 @@ class RubricMapper
                 // Does this Criterion already exist on destination folder ?
 
                 $duplicate = false;
-                $group     = $this->normaliseForComparison($srcCriterion->getGrouping());
+                $group     = $this->normaliseForComparison($srcCriterion->getGroup()->getName());
                 $name      = null;
                 if (array_key_exists($group, $existingGroupMap)) {
                     $name = $this->normaliseForComparison($srcCriterion->getName());
@@ -1148,7 +1169,7 @@ class RubricMapper
                 } else {
                     $dstCriterion = clone $srcDescriptor->getCriterion();
                     $dstCriterion->setId(null);
-                    $dstCriterion->setParentId($dstBox->getCategory()->getId());
+                    $dstCriterion->getGroup()->setParentId($dstBox->getCategory()->getId());
                 }
                 $dstCriteria->setOffset($srcCriterionId, $dstCriterion);
             }

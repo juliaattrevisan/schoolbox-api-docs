@@ -13,6 +13,7 @@ use Alaress\Web\Controller\Base as BaseController;
 use Alaress\Web\Template\DebugTwig;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Criterion;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Group;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Resource\Attachment\Zone;
@@ -107,15 +108,11 @@ class Controller extends BaseController
                 return;
             }
 
-            $columnList = [
-                'parent_type' => Criterion::PARENT_TYPE_CATEGORY,
-                'parent_id'   => $folderId,
-            ];
-            $criteria = CriterionMapper::getInstance()->findByColumnList($columnList);
+            $criteria      = CriterionMapper::getInstance()->findForFolder($folderId);
             $proposedGroup = $this->mapper->normaliseForComparison($group);
             $proposedName  = $this->mapper->normaliseForComparison($name);
             foreach ($criteria as $criterion){
-                $normGroup = $this->mapper->normaliseForComparison($criterion->getGrouping());
+                $normGroup = $this->mapper->normaliseForComparison($criterion->getGroup()->getName());
                 $normName = $this->mapper->normaliseForComparison($criterion->getName());
                 if($normGroup == $proposedGroup && $normName == $proposedName){
                     $this->sendJSONError("Indicator already exists in this Group");
@@ -135,14 +132,10 @@ class Controller extends BaseController
         elseif ($post->get('type') == 'group') {
 
             // Ensure the proposed Group name is not already in use.
-            $columnList = [
-                'parent_type' => Criterion::PARENT_TYPE_CATEGORY,
-                'parent_id'   => $folderId,
-            ];
-            $criteria = CriterionMapper::getInstance()->findByColumnList($columnList);
+            $criteria = CriterionMapper::getInstance()->findForFolder($folderId);
             $proposed = $this->mapper->normaliseForComparison($post->get('name'));
             foreach ($criteria as $criterion){
-                $grouping = $this->mapper->normaliseForComparison($criterion->getGrouping());
+                $grouping = $this->mapper->normaliseForComparison($criterion->getGroup()->getName());
                 if($proposed == $grouping){
                     $this->sendJSONError("Group name already exists in this context");
                     return;
@@ -297,14 +290,7 @@ class Controller extends BaseController
      */
     protected function saveNewCriterion($folderId, $grouping, $name)
     {
-        $model = CriterionMapper::getInstance()
-            ->createModel()
-            ->setParentType('category')
-            ->setParentId($folderId)
-            ->setGrouping($grouping)
-            ->setName($name);
-
-        CriterionMapper::getInstance()->save($model);
+        $model = CriterionMapper::getInstance()->findOrCreateOneForFolderByKey($folderId, $name, $grouping);
 
         return [
             'name'        => $model->getName(),

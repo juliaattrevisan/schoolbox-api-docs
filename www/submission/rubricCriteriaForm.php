@@ -8,10 +8,7 @@
  */
 
 
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Criterion;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\UsageMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Permission\Access\Access;
@@ -52,6 +49,7 @@ foreach ($criteria as $group) {
         foreach ($group['items'] as $critID => $crit) {
             $critID = substr($critID, 1);
             $data[$critID] = [
+                'id'    => $group['id'],
                 'group' => $group['name'],
                 'name'  => $crit,
             ];
@@ -59,8 +57,8 @@ foreach ($criteria as $group) {
     }
 }
 
-/* @var $criterionMapper CriterionMapper */
-$criterionMapper = CriterionMapper::getInstance();
+$criterionMapper = Rubric\CriterionMapper::getInstance();
+$groupMapper     = Rubric\GroupMapper::getInstance();
 
 // Which submission boxes have criteria deleted? We will need to ensure we don't leave in an invalid state.
 $affectedSubmissionBoxes = SubmissionBoxMapper::getInstance()->createCollection();
@@ -68,17 +66,12 @@ $affectedSubmissionBoxes = SubmissionBoxMapper::getInstance()->createCollection(
 //work out the diff and delete unnecessary criteria
 $found = array_keys($data);
 
-$criterionCollection = $criterionMapper->findByColumnList(
-    [
-        'parent_id'   => $folderId,
-        'parent_type' => Criterion::PARENT_TYPE_CATEGORY,
-    ]
-);
+$criterionCollection = $criterionMapper->findForFolder($folderId);
 
 foreach ($criterionCollection as $crit) {
     if (!in_array($crit->getID(), $found)) {
         try {
-            $usages = UsageMapper::getInstance()->findByColumn('criterion_id', $crit->getId());
+            $usages = Rubric\UsageMapper::getInstance()->findByColumn('criterion_id', $crit->getId());
             $criterionMapper->delete($crit);
             foreach($usages as $usage){
                 $box = $usage->getSubmissionBox();
@@ -90,30 +83,55 @@ foreach ($criterionCollection as $crit) {
     }
 }
 // Ensure that deletion of a criterion, and its descriptors, does not result in empty levels.
-RubricMapper::getInstance()->deleteEmptyLevels($affectedSubmissionBoxes->keys());
+Rubric\RubricMapper::getInstance()->deleteEmptyLevels($affectedSubmissionBoxes->keys());
 
 
 // iterate through list of provided criteria changes
+/** @var Rubric\Group[] $groupList */
+$groupList  = $groupMapper->createCollection();
+$parentType = Rubric\Group::PARENT_TYPE_CATEGORY;
 foreach ($data as $critID => $critData) {
+
+    // Find the group; if it doesn't exist create it
+    $groupName = $critData['group'];
+    if (!isset($groupList[$groupName])) {
+        if (isset($critData['id'])) {
+            try {
+                $group = $groupMapper->findOneByColumnList([
+                    'id'          => $critData['id'],
+                    'parent_id'   => $folderId,
+                    'parent_type' => $parentType,
+                ]);
+            } catch (Exception $e) {
+                // ID exists, but not in this context; abort
+                error(Error\Mapper::ERROR_INFORMATION_MISSING);
+            }
+        } else {
+            $group = $groupMapper->findOrCreateOneForFolderByName($folderId, $groupName);
+        }
+        $groupMapper->save($group);
+        $groupList[$groupName] = $group;
+    }
+
+    // Now, find the criterion: if it doesn't exist create it
+    $group         = $groupList[$groupName];
+    $criterionName = $critData['name'];
+
     try {
-        $criteria = $criterionMapper->findOneByColumnList(
-            [
-                'id'        => $critID,
-                'parent_id' => $folderId,
-            ]
-        );
-        $criteria->setGrouping($critData['group']);
+        $criteria = $criterionMapper->findOneByColumnList([
+            'id'              => $critID,
+            'rubric_group_id' => $group->getId(),
+        ]);
         $criteria->setName($critData['name']);
 
         //Do not edit criteria that are in use on a class page, can edit in course though
-        $usage = UsageMapper::getInstance()->findByColumnList(['criterion_id' => $critID]);
+        $usage = Rubric\UsageMapper::getInstance()->findByColumnList(['criterion_id' => $critID]);
         if (count($usage) && !($folder->hasCourseSpecification() || $folder->hasUnitSpecification())) {
             continue; // possibly throw an error of some kind
         }
     } catch (Exception $e) {
-        $criteria = new Criterion();
-        $criteria->setParentId($folderId);
-        $criteria->setGrouping($critData['group']);
+        $criteria = new Rubric\Criterion();
+        $criteria->setGroup($group);
         $criteria->setName($critData['name']);
     }
 

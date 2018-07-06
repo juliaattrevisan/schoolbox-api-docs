@@ -70,13 +70,7 @@ $this->setTitle($title);
 $this->setVar('PAGE_TITLE', $title);
 
 // get rubric details
-$criterionCollection = CriterionMapper::getInstance()->findByColumnList(
-    [
-        'parent_id'   => $folderId,
-        'parent_type' => Criterion::PARENT_TYPE_CATEGORY,
-    ],
-    ['order' => ['grouping' => 'ASC', 'name' => 'ASC']]
-);
+$criterionCollection = CriterionMapper::getInstance()->findForFolder($folderId);
 
 
 // for now, we're not supporting inheritance
@@ -90,14 +84,21 @@ if (count($criterionCollection)) {
     /* Create group structure */
     $criteriaList = [];
     foreach ($criterionCollection as $crit) {
-        $criteriaList[$crit->getGrouping()][] = $crit;
+        $groupId = $crit->getGroup()->getId();
+        $criteriaList[$groupId]['group']      = $crit->getGroup();
+        $criteriaList[$groupId]['criteria'][] = $crit;
     }
 
-    foreach ($criteriaList as $grouping => $crits) {
+    foreach ($criteriaList as $critGroup) {
+        /** @var \Schoolbox\Assessment\Component\SubmissionBox\Rubric\Group $group */
+        $group = $critGroup['group'];
+        /** @var \Schoolbox\Assessment\Component\SubmissionBox\Rubric\Criterion[] $crits */
+        $crits = $critGroup['criteria'];
         $this->setVar([
             'criterion_block'    => '',
             'CRITGROUP_COUNT'    => $groupCount++,
-            'CRITGROUP_NAME'     => $grouping,
+            'CRITGROUP_ID'       => $group->getId(),
+            'CRITGROUP_NAME'     => $group->getName(),
             'CRITGROUP_DISABLED' => '',
         ]);
 

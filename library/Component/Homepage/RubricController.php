@@ -20,9 +20,9 @@ class Component_Homepage_RubricController extends Component_Homepage_ControllerA
     protected $rubric_handler;
 
     /**
-     * @var array
+     * @var Criterion[]
      */
-    protected $criteria = array();
+    protected $criteria = [];
 
     /**
      * {@inheritdoc}
@@ -36,13 +36,7 @@ class Component_Homepage_RubricController extends Component_Homepage_ControllerA
         }
 
         // get rubric details
-        $this->criteria = CriterionMapper::getInstance()->findByColumnList(
-            array(
-                'parent_id'   => $this->getContext()->getId(),
-                'parent_type' => Criterion::PARENT_TYPE_CATEGORY,
-            ),
-            array('order' => array('grouping' => 'ASC', 'name' => 'ASC'))
-        );
+        $this->criteria = CriterionMapper::getInstance()->findForFolder($this->getContext()->getId());
         return true;
     }
 
@@ -60,7 +54,7 @@ class Component_Homepage_RubricController extends Component_Homepage_ControllerA
         $this->setBlock($templateHandle, 'rubric', 'rubric_block');
         $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
 
-        if (!$this->criteria->count()) {
+        if (count($this->criteria) === 0) {
 
             $this->setBlock('empty_state', 'empty_read', 'empty_read_block');
             $this->setBlock('empty_state', 'empty_write', 'empty_write_block');
@@ -95,10 +89,11 @@ class Component_Homepage_RubricController extends Component_Homepage_ControllerA
             $i = 0;
 
             /* Create group structure */
-            $criteriaList = array();
+            /** @var Criterion[][] $criteriaList */
+            $criteriaList = [];
 
             foreach ($this->criteria as $crit) {
-                $criteriaList[$crit->getGrouping()][] = $crit;
+                $criteriaList[$crit->getGroup()->getName()][] = $crit;
             }
 
             foreach ($criteriaList as $criterion_group => $criterions) {

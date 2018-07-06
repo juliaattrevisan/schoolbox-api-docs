@@ -139,6 +139,7 @@ class Acquisition
         $pb->equals('sb.use_rubric', 1);
         $pb->isNull('rd.deleted_at');
         $pb->isNull('rc.deleted_at');
+        $pb->isNull('rg.deleted_at');
         $pb->notNull('sr.published_at');
 
         /* Show only unaccredited users
@@ -163,7 +164,8 @@ class Acquisition
             INNER JOIN rubric_mark rm ON sr.`id` = rm.`return_id`
             INNER JOIN rubric_descriptor rd ON rm.`descriptor_id` = rd.`id`
             INNER JOIN rubric_criterion rc ON rd.`criterion_id`  = rc.`id`
-            INNER JOIN userAccess ua ON ua.uid = u.`id` AND rc.parent_id = ua.`sid` AND parent_type = 'category'
+            INNER JOIN rubric_group rg ON rc.rubric_group_id = rg.id
+            INNER JOIN userAccess ua ON ua.uid = u.`id` AND rg.parent_id = ua.`sid` AND rg.parent_type = :parentType
             INNER JOIN course_implementation ci ON ua.sid = ci.`folder_id` AND ua.service = :homepageService
             INNER JOIN course_specification cs ON ci.`course_specification_id` = cs.`id`
             INNER JOIN course_unit_implementation cui ON cui.`course_implementation_id` = ci.`id`
@@ -182,6 +184,7 @@ class Acquisition
 
         $statement->execute(array_merge([
             'homepageService' => UserAccess::SERVICE_HOMEPAGE,
+            'parentType'      => Rubric\Group::PARENT_TYPE_CATEGORY,
         ], $pb->getParams()));
 
         $hierarchy = [];

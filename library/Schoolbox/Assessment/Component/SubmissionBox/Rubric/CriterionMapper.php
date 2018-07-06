@@ -8,6 +8,7 @@
  */
 
 namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
+use PDOStatement;
 use Schoolbox;
 
 /**
@@ -26,17 +27,54 @@ class CriterionMapper extends Schoolbox\Mapper {
         $this->hasModel(Criterion::class);
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->uses('grouping', self::TYPE_STRING);
         $this->uses('name', self::TYPE_STRING);
-        $this->uses('parent_type', self::TYPE_STRING);
-        // Parent ID can reference any of:
-        // submission, category, curriculum
-        // as far as I can tell, it's never not "category"
-        $this->uses('parent_id', self::TYPE_INTEGER);
+
+        // These fields now belong to rubric_group
+//        $this->uses('grouping', self::TYPE_STRING);
+//        $this->uses('parent_id', self::TYPE_INTEGER);
+//        $this->uses('parent_type', self::TYPE_STRING);
+
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+
+        $this->joins('rubric_group_id', GroupMapper::class, 'id', null, null, 'group', 'group');
 
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyUniqueness']);
         $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteDescriptors']);
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    protected function getSelectString(): string
+    {
+        return "
+            SELECT
+                {$this->getColumnString()},
+                {$this->getJoinColumnString('group', 'g')}
+            FROM {$this->getTable()}
+            LEFT JOIN {$this->getJoinSql('group', '', 'g')}
+        ";
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    protected function hydrateSelect(PDOStatement $statement): Schoolbox\GenericCollection
+    {
+        /** @var GroupMapper $groupMapper */
+        $groupMapper = $this->getJoinMapper('group');
+        $collection = $this->createCollection();
+        foreach ($statement as $row) {
+            /** @var Criterion $crit */
+            $crit = $this->hydrate($row);
+            if ($row['g.id']) {
+                $crit->setGroup($groupMapper->hydrate($row, 'g'));
+            }
+            $collection->setOffset($crit->getId(), $crit);
+        }
+        return $collection;
     }
 
 
@@ -54,54 +92,6 @@ class CriterionMapper extends Schoolbox\Mapper {
 
 
     /**
-     * Clones rubric criteria from one category to another.
-     *
-     * @param int $from_id The category to copy from.
-     * @param int $to_id   The category to copy to.
-     *
-     * @return int[] A list of new rubric IDs
-     * @deprecated
-     * @see RubricMapper::copyRubric()
-     */
-    public function copyFromCategory($from_id, $to_id) {
-        /** @var Criterion[] $from_rubric_list */
-        $from_rubric_list = $this->findByColumnList(
-            array(
-                'parent_id'   => $from_id,
-                'parent_type' => Criterion::PARENT_TYPE_CATEGORY,
-            )
-        );
-        /** @var Criterion[] $existing_rubric_list */
-        $existing_rubric_list = $this->findByColumnList(
-            array(
-                'parent_id'   => $to_id,
-                'parent_type' => Criterion::PARENT_TYPE_CATEGORY,
-            )
-        );
-        $new_rubric_list = new Schoolbox\Collection();
-        foreach ($from_rubric_list as $rubric) {
-            // search existing for a rubric that matches this one.
-            // If there's not one, then save this rubric.
-            $rubric_exists = false;
-            foreach ($existing_rubric_list as $existing_rubric) {
-                if (
-                    $existing_rubric->getGrouping() === $rubric->getGrouping()
-                    && $existing_rubric->getName() === $rubric->getName()
-                ) {
-                    $rubric_exists = true;
-                    break;
-                }
-            }
-            if (!$rubric_exists) {
-                $new_rubric = clone $rubric;
-                $new_rubric->setId(null)->setParentId($to_id);
-                $new_rubric_list->add($new_rubric);
-            }
-        }
-        return $this->save($new_rubric_list);
-    }
-
-    /**
      * Pre-save callback - if a copy of this criterion already exists, then
      * update it instead of saving a new one.
      *
@@ -116,16 +106,16 @@ class CriterionMapper extends Schoolbox\Mapper {
     {
         // remove any newlines and consecutive/leading/trailing spaces from input
         $object->setName(preg_replace('`\s+`', ' ', trim($object->getName())));
-        $object->setGrouping(preg_replace('`\s+`', ' ', trim($object->getGrouping())));
+        $object->getGroup()->setName(preg_replace('`\s+`', ' ', trim($object->getGroup()->getName())));
 
         try {
             // attempt lookup
-            $existingObject = $this->findOneByColumnList([
-                'grouping'    => $object->getGrouping(),
-                'name'        => $object->getName(),
-                'parent_id'   => $object->getParentId(),
-                'parent_type' => $object->getParentType(),
-            ]);
+            $existingObject = $this->findOneForParentByKey(
+                $object->getGroup()->getParentId(),
+                $object->getGroup()->getParentType(),
+                $object->getName(),
+                $object->getGroup()->getName()
+            );
 
             // found something! sweet. assign that ID.
             $object->setId($existingObject->getId());
@@ -133,6 +123,158 @@ class CriterionMapper extends Schoolbox\Mapper {
             // noop, new object. leave it as-is
         }
         return true;
+    }
+
+
+    /**
+     * Find all criteria for a parent type.
+     *
+     * @param int|int[] $parentId   The parent ID (or list thereof) to find for
+     * @param string    $parentType One of the `Group::PARENT_TYPE_*` constants
+     * @param bool      $cache      If false, bypass result cache
+     * @return Schoolbox\GenericCollection|Criterion[]
+     * @throws Schoolbox\Mapper\Exception
+     */
+    public function findForParent($parentId, string $parentType, bool $cache = true): Schoolbox\GenericCollection
+    {
+        return $this->findByColumnList(
+            [
+                'g.parent_id'   => $parentId,
+                'g.parent_type' => $parentType,
+            ],
+            [
+                'order' => ['g.name' => 'ASC', 'name' => 'ASC'],
+                'cache' => $cache,
+            ]
+        );
+    }
+
+
+    /**
+     * Find all criteria for a folder.
+     *
+     * @param int|int[] $folderId The folder ID (or list thereof) to find for
+     * @param bool      $cache    If false, bypass result cache
+     * @return Schoolbox\GenericCollection|Criterion[]
+     * @throws Schoolbox\Mapper\Exception
+     */
+    public function findForFolder($folderId, bool $cache = true): Schoolbox\GenericCollection
+    {
+        return $this->findForParent($folderId, Group::PARENT_TYPE_CATEGORY, $cache);
+    }
+
+
+    /**
+     * Find a single criterion for a parent type, given its unique identifier
+     * (parentId+parentType+name+groupName).
+     *
+     * @param int    $parentId   The parent ID (or list thereof) to find for
+     * @param string $parentType One of the `Group::PARENT_TYPE_*` constants
+     * @param string $name       The name of the criterion
+     * @param string $groupName  The name of the criterion's group
+     * @param bool   $cache      If false, bypass result cache
+     * @return Criterion
+     * @throws Schoolbox\Mapper\Exception
+     * @throws Schoolbox\Mapper\Exception\Deleted
+     */
+    public function findOneForParentByKey(
+        int $parentId,
+        string $parentType,
+        string $name,
+        string $groupName,
+        bool $cache = true
+    ): Criterion
+    {
+        return $this->findOneByColumnList(
+            [
+                'g.name'        => $groupName,
+                'name'          => $name,
+                'g.parent_type' => $parentType,
+                'g.parent_id'   => $parentId,
+            ],
+            [],
+            ['cache' => $cache,]
+        );
+    }
+
+
+    /**
+     * Find a single criterion for a folder, given its unique identifier
+     * (folder+name+groupName).
+     *
+     * @param int    $folderId  The folder ID (or list thereof) to find for
+     * @param string $name      The name of the criterion
+     * @param string $groupName The name of the criterion's group
+     * @param bool   $cache     If false, bypass result cache
+     * @return Criterion
+     * @throws Schoolbox\Mapper\Exception
+     * @throws Schoolbox\Mapper\Exception\Deleted
+     */
+    public function findOneForFolderByKey(int $folderId, string $name, string $groupName, bool $cache = true): Criterion
+    {
+        return $this->findOneForParentByKey($folderId, Group::PARENT_TYPE_CATEGORY, $name, $groupName, $cache);
+    }
+
+
+    /**
+     * Find a single criterion for a parent type, given its unique identifier
+     * (parentId+parentType+name+groupName).
+     *
+     * If none exists: create it
+     *
+     * @param int    $parentId
+     * @param string $parentType
+     * @param string $name
+     * @param string $groupName
+     * @param bool   $cache
+     * @return Criterion
+     * @throws Schoolbox\Mapper\Exception
+     */
+    public function findOrCreateOneForParentByKey(
+        int $parentId,
+        string $parentType,
+        string $name,
+        string $groupName,
+        bool $cache = true
+    ): Criterion
+    {
+        try {
+            return $this->findOneForParentByKey($parentId, $parentType, $name, $groupName, $cache);
+        } catch (Schoolbox\Mapper\Exception $e) {
+            // Build it
+            /** @var GroupMapper $groupMapper */
+            $groupMapper = $this->getJoinMapper('group');
+            $group       = $groupMapper->findOrCreateOneForParentByName($parentId, $parentType, $groupName);
+            $criterion   = $this->createModel()
+                                ->setGroup($group)
+                                ->setName($name);
+            $this->save($criterion);
+            return $criterion;
+        }
+    }
+
+
+    /**
+     * Find a single criterion for a folder, given its unique identifier
+     * (folder+name+groupName).
+     *
+     * If none exists: create it
+     *
+     * @param int    $folderId
+     * @param string $name
+     * @param string $groupName
+     * @param bool   $cache
+     * @return Criterion
+     * @throws Schoolbox\Mapper\Exception
+     */
+    public function findOrCreateOneForFolderByKey(
+        int $folderId,
+        string $name,
+        string $groupName,
+        bool $cache = true
+    ): Criterion
+    {
+        return $this->findOrCreateOneForParentByKey($folderId, Group::PARENT_TYPE_CATEGORY, $name, $groupName, $cache);
     }
 
 

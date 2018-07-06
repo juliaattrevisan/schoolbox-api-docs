@@ -87,11 +87,6 @@ class Model implements ISoftDeletable, IAssessableDataModel
     protected $task;
 
     /**
-    * @var Task\Instance
-    */
-    protected $task_instance;
-
-    /**
      * @var string
      */
     protected $description;
@@ -367,24 +362,6 @@ class Model implements ISoftDeletable, IAssessableDataModel
     public function getTask()
     {
         return $this->task;
-    }
-
-    /**
-    * @param  Task\Instance $task_instance
-    * @return $this
-    */
-    public function setTaskInstance($task_instance)
-    {
-        $this->task_instance = $task_instance;
-        return $this;
-    }
-
-    /**
-    * @return Task\Instance
-    */
-    public function getTaskInstance()
-    {
-        return $this->task_instance;
     }
 
     /**
