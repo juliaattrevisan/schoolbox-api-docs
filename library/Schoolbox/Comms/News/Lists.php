@@ -14,7 +14,6 @@ namespace Schoolbox\Comms\News;
 
 use Schoolbox\User;
 
-
 class Lists
 {
 
@@ -67,7 +66,10 @@ class Lists
 
         /* TODO: Find articles that were audienced to me
          */
-        $articles = $this->newsMapper->findAll($options);
+        $pb = $this->newsMapper->getPredicateBuilder()
+            ->equals('topics.newsTopicID', $topicId);
+
+        $articles = $this->newsMapper->findByPredicates($pb);
 
         /* Figure out the articles that this user has saved for later
          */
