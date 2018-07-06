@@ -45,32 +45,6 @@ class Assess_Attempt extends Evaluation_Attempt {
     }
 
     /**
-     * Update the reviewed_at for all the latest attempts for a particular assess :D
-     * How do you like them apples
-     *
-     * @param $assessId
-     */
-    public function finaliseAllLatestAttempts($assessId)
-    {
-        // Retrieve all attempts
-        $attempts = $this->retrieveLatestReviewableAttemptIds($assessId);
-        if (empty($attempts)) {
-            return;
-        }
-        $now = Alaress_Date_Format::now();
-
-        // Review them right now
-        // (Don't update review date of anything already reviewed)
-        $query = "
-            UPDATE assess_attempt
-            SET reviewed_at = '{$this->db->quote($now->getUsingFormat(Alaress_Date_Format::DATABASE_FORMAT))}'
-            WHERE attempt_id IN ({$this->buildReviewableAttemptsForQuery($attempts)})
-            AND   reviewed_at IS NULL
-        ";
-        $this->db->query($query);
-    }
-
-    /**
      * Retrieves the IDs for each participant's most recent reviewable attempt.
      *
      * Reviewable attempts:
@@ -78,20 +52,28 @@ class Assess_Attempt extends Evaluation_Attempt {
      * * aren't yet reviewed
      *
      * @param int $assessId
+     * @param bool $excludeReviewed
      * @return array
      */
-    private function retrieveLatestReviewableAttemptIds($assessId)
+    public function retrieveLatestReviewableAttemptIds($assessId, $excludeReviewed = false)
     {
         $query = "
-            SELECT user_id, attempt_id
+            SELECT user_id, attempt_id, reviewed_at
             FROM assess_attempt
             WHERE assess_id = '{$this->db->quote($assessId)}'
             AND   deleted_at IS NULL
             ORDER BY user_id, `start` DESC
         ";
         $results = [];
-        foreach ($this->db->getAll($query) as $row) {
+        $rows = $this->db->getAll($query);
+        if (!$rows) {
+            return [];
+        }
+        foreach ($rows as $row) {
             $userId = $row['user_id'];
+            if ($excludeReviewed && $results['reviewed_at'] !== null) {
+                continue;
+            }
             if (!isset($results[$userId])) {
                 $results[$userId] = $row['attempt_id'];
             }

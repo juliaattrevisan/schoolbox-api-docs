@@ -513,6 +513,19 @@ class Mapper extends BaseMapper
         );
     }
 
+    /**
+     * Mark the attempt as reviewed
+     * @return bool|\int[]
+     * @param Model $attempt
+     * @param User $reviewer
+     * @throws BaseMapper\Exception
+     */
+    public function finalizeReview(Model $attempt, User $reviewer)
+    {
+        $attempt->setReviewed(Alaress_Date_Format::now());
+        $attempt->setReviewer($reviewer);
+        return $this->save($attempt);
+    }
 
     /**
      * @return BaseMapper|QuizMapper

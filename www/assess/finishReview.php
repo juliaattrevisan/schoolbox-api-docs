@@ -81,9 +81,7 @@ if($assess->getUser()->getId() != $sessionUser->getId() && $groupHandler->getPer
 	error(Error\Mapper::ERROR_PERM_TEST_REVIEW);
 }
 
-$attempt->setReviewed(Alaress_Date_Format::now());
-$attempt->setReviewer($sessionUser);
-$attemptMapper->save($attempt);
+$attemptMapper->finalizeReview($attempt, $sessionUser);
 
 $assessmentId = $assess->getAssessmentModel()->getId();
 

@@ -823,7 +823,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                         if ($feedbackMapper instanceof BaseMapper) {
                             $this->raiseNotification(
                                 $authoritativeFeedback->getReviewer(),
-                                BaseMapper::METHOD_CREATE,
+                                BaseMapper::METHOD_UPDATE,
                                 $feedbackMapper->findById($authoritativeFeedback->getId()),
                                 $feedbackMapper
                             );
