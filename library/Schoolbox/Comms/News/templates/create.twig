@@ -171,21 +171,84 @@
     <h2>Browse Audience</h2>
     <a class="close-reveal-modal" aria-label="Close">×</a>
 
-    <div id="audience-browse-index">
+    <div id="audience-browse-step1">
         <div class="small-12 medium-4 columns">
-            <button class="button-block"><i class="icon-location"></i>By Campus</button>
+            <button class="button-block" data-audience-select="campus"><i class="icon-location"></i>By Campus</button>
         </div>
         <div class="small-12 medium-4 columns">
-            <button class="button-block"><i class="icon-staff-students"></i>By Role</button>
+            <button class="button-block" data-audience-select="role"><i class="icon-staff-students"></i>By Role</button>
         </div>
         <div class="small-12 medium-4 columns">
-            <button class="button-block"><i class="icon-home"></i>By House</button>
+            <button class="button-block" data-audience-select="house"><i class="icon-home"></i>By House</button>
         </div>
         <div class="small-12 medium-4 columns">
-            <button class="button-block"><i class="icon-teacher"></i>By Class</button>
+            <button class="button-block" data-audience-select="class"><i class="icon-teacher"></i>By Class</button>
         </div>
         <div class="small-12 medium-4 columns">
-            <button class="button-block"><i class="icon-group"></i>By Group</button>
+            <button class="button-block" data-audience-select="group"><i class="icon-group"></i>By Group</button>
         </div>
     </div>
+
+    <div id="audience-browse-step2" class="hide">
+
+        <ul class="breadcrumb">
+            <li><a href="#" id="audience-browse-return">Browse Audience</a></li>
+            <li class="active"><a>By Role</a></li>
+        </ul>
+
+        <form id="audience-browse-form">
+            <fieldset class="checklist">
+                <input id="checkbox1" type="checkbox" /><label for="checkbox1">Administration</label>
+                <input id="checkbox2" type="checkbox" /><label for="checkbox2">Teacher</label>
+                <input id="checkbox3" type="checkbox" /><label for="checkbox3">Senior Student</label>
+                <input id="checkbox4" type="checkbox" /><label for="checkbox4">Junior Student</label>
+                <input id="checkbox5" type="checkbox" /><label for="checkbox5">Parent</label>
+            </fieldset>
+
+            <fieldset class="checklist">
+                <input id="checkbox6" type="checkbox" selected /><label for="checkbox6">Users in role</label>
+                <input id="checkbox7" type="checkbox" /><label for="checkbox7">Parents of students</label>
+            </fieldset>
+
+            <button type="submit" class="button">Add</button>
+        </form>
+
+    </div>
+
 </div>
+
+<script>
+    $(function() {
+
+        // On open of the modal - reset back to the initial page
+        $(document).on('open.fndtn.reveal', '#audience-browse', function () {
+            $('#audience-browse-step2').addClass('hide');
+            $('#audience-browse-step1').removeClass('hide');
+        });
+
+        // Clicking an initial option
+        $('#audience-browse-step1 button[data-audience-select]').click(function() {
+            $('#audience-browse-step1').addClass('hide');
+            $('#audience-browse-step2').removeClass('hide');
+        });
+
+        $('#audience-browse-form').submit(function(event) {
+
+            event.preventDefault();
+
+            // Populate selectize
+
+            // Close modal
+            $('#audience-browse').foundation('reveal', 'close');
+
+        });
+
+        $('#audience-browse-return').click(function(event) {
+            event.preventDefault();
+
+            $('#audience-browse-step2').addClass('hide');
+            $('#audience-browse-step1').removeClass('hide');
+        });
+
+    });
+</script>
