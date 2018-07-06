@@ -25,6 +25,11 @@ class Mapper extends \Schoolbox\Mapper
 {
 
     /**
+     * This const represents "all topics"
+     */
+    public const TOPIC_ALL = 0;
+
+    /**
      * @inheritdoc
      * @throws \Schoolbox\Mapper\Exception
      */
@@ -168,13 +173,6 @@ class Mapper extends \Schoolbox\Mapper
      */
     public function findForTopic(int $topicId, int $limit): \Schoolbox\GenericCollection
     {
-        /* TODO: Find articles that were audienced to me
-         */
-        $pb = $this->getPredicateBuilder()
-            ->equals('topics.newsTopicID', $topicId);
-
-        $articlesInTopic = $this->findScalarByPredicates('id', $pb);
-
         /* Find the articles and all their deets
          */
         $options = [
@@ -188,6 +186,20 @@ class Mapper extends \Schoolbox\Mapper
         if ($limit) {
             $options['limit'] = $limit;
         }
+
+        /* If $topicId is provided, only get articles for that topic
+         * Otherwise get $limit articles from any topic
+         */
+        if ($topicId === self::TOPIC_ALL) {
+            return $this->findAll($options);
+        }
+
+        /* TODO: Find articles that were audienced to me
+         */
+        $pb = $this->getPredicateBuilder()
+            ->equals('topics.newsTopicID', $topicId);
+
+        $articlesInTopic = $this->findScalarByPredicates('id', $pb);
 
         return $this->findByColumn('id', $articlesInTopic, $options);
     }
