@@ -53,7 +53,7 @@ class CreateAndVerifyCest
         $headline = "Random Headline";
         $article  = "Random Article";
         $blurb    = "Blurb";
-        $image    = '';
+        $image    = __DIR__ . '/upload/test.jpg';
         $topic    = 'General';
         $roles    = ['Teachers'];
         $campi    = ['Senior', 'Junior'];

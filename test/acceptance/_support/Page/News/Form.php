@@ -129,8 +129,7 @@ class Form
      */
     public function setFeatureImage(string $filename): self
     {
-        // TODO upload files via Codeception
-        // Need to write uploader interaction into the acceptance tester
+        $this->tester->attachAttachzoneFile('#news-feature-zone', $filename);
         return $this;
     }
 

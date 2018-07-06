@@ -222,7 +222,9 @@ class Acceptance extends \Codeception\Module
      */
     public function clearSelectize(string $field): void
     {
-        $this->unselectSelectizeOptionsByCallback($field, function () { return true; });
+        $this->unselectSelectizeOptionsByCallback($field, function () {
+            return true;
+        });
     }
 
 
@@ -258,6 +260,35 @@ class Acceptance extends \Codeception\Module
         $wd->fillField($this->getSelectizeInputSelector($field), $selectizeSearch);
         $wd->waitForElement(['css' => '.selectize-dropdown-content .option.active']);
         $wd->click(['css' => '.selectize-dropdown-content .option.active']);
+    }
+
+
+    /**
+     * Attach a file to an attachzone.
+     *
+     * @param string|array $field Currently, must be the ID of the attachzone
+     * @param string       $file
+     */
+    public function attachAttachzoneFile($field, $file)
+    {
+        $wd = $this->getWebDriverModule();
+        $wd->click($field);
+
+        // Wait for the filepicker
+        $wd->waitForElement('#attachment-browser');
+
+        // Should be open at pane "internal-upload"; if not choose that pane?
+
+        // Attachzone lives at '#ab-upload'
+        $wd->executeJS(
+            sprintf(
+                "jQuery('%s').data('plugin_resourceAttach').dropzone.addFile(new File(['%s'], '%s', {type: '%s'}))",
+                addslashes($field),
+                addslashes(file_get_contents($file)),
+                addslashes(basename($file)),
+                addslashes(mime_content_type($file))
+            )
+        );
     }
 
 
