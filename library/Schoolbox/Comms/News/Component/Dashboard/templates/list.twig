@@ -35,6 +35,8 @@
 
                 <a data-saveforlater="{{ state }}" href="{{ routeLookup('commsNewsSaveForLater.postToggle', {articleId: article.id}) }}"></a>
             </nav>
+
+            <article>{{ article.blurb|purify }}</article>
         </li>
     {% endfor %}
 </ul>
