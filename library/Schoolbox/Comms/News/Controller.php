@@ -461,7 +461,7 @@ class Controller extends Base
         if ($this->getRequest()->isXhr()) {
             $outcome = (new Lists($this->newsMapper, $this->policyMapper))->findForTopic($this->getUser(), $topicId, $limit);
 
-            $outcome['compactMode'] = (bool)$this->getRequest()->query['compactMode'];
+            $outcome['compactMode'] = $this->getRequest()->query['compactMode'];
 
             $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@commsNewsDashboard/list.twig', $outcome));
         }

@@ -5,9 +5,8 @@
  # Cut to the maximum length specified
  # Provide a "Read More" link if specified
  #
- # @param News\Model text
+ # @param News\Model article
  # @param string readMore
- # @param bool compactMode
  #}
 {% macro pacify(article, readMore) %}
 {% spaceless %}
@@ -40,6 +39,7 @@
  # @param Collection|News\Model[] articles
  # @param array|int[] savedArticleIds
  # @param int unsaved
+ # @param int compactMode
  #}
 <ul class="information-list">
     {% for article in articles %}
