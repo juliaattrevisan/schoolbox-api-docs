@@ -272,7 +272,7 @@
 
                                 {% else %}
                                     {% set participationRoute = routeLookup('learningAssessment.getSummary', {assessmentId: aImpl.id, studentId: student.id}) %}
-                                    {% set comment            = studentComments[courseImpl.id][assessment.id][student.id] %}
+                                    {% set comment            = studentComments[courseImpl.id][student.id][assessment.id] %}
                                     {% set marks              = studentMarks[courseImpl.id][assessment.id][student.id] %}
                                     {% set publishedMark      = marks.published %}
                                     {% set draftMark          = marks.draft %}

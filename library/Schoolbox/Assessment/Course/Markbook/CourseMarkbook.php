@@ -572,7 +572,7 @@ class CourseMarkbook
 
                 if ($aImpl instanceof DueWork\Model && $authPublishedFeedback) {
                     // Store due-work feedback published comments
-                    $this->studentComments[$courseImplId][$userId] = $authPublishedFeedback->getComment();
+                    $this->studentComments[$courseImplId][$userId][$aId] = $authPublishedFeedback->getComment();
                 }
 
                 $authNormMark      = $authAnyFeedback ? $authAnyFeedback->getNormalisedMark() : null;
