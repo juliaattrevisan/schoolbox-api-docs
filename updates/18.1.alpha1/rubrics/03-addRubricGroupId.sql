@@ -3,7 +3,7 @@
  * This will be populated in the next update script.
  */
 ALTER TABLE `rubric_criterion`
-    ADD COLUMN `rubric_group_id` int(11) NULL DEFAULT NULL AFTER `id`,
+    ADD COLUMN `rubric_group_id` int(11) UNSIGNED NULL DEFAULT NULL AFTER `id`,
     ADD INDEX `rubric_criterion_rubric_group_idx` (`rubric_group_id` ASC),
     ADD CONSTRAINT `rubric_criterion_rubric_group`
         FOREIGN KEY (`rubric_group_id`)

@@ -4,7 +4,7 @@
  * (`grouping`, `parent_id`, `parent_type`) there will become a new row here.
  */
 CREATE TABLE `rubric_group` (
-    `id` int(11) NOT NULL AUTO_INCREMENT,
+    `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
     -- Nullable in rubric_criterion, but should not be?
     `name` varchar(1000) CHARACTER SET utf8mb4 DEFAULT NULL,
     `parent_id` int(11) NOT NULL,
