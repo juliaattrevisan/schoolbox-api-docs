@@ -1,3 +1,4 @@
+#!/usr/bin/php
 <?php
 /**
  *
@@ -12,8 +13,8 @@ $logger = $kernel->logger();
 pcntl_signal(SIGCHLD, SIG_DFL);
 
 
-define('SKIN_FILE', dirname(__FILE__) .'/../../www/css/foundation/utils/_skin.scss');
-define('CUSTOM_CSS_FILE', dirname(__FILE__) .'/../../www/css/foundation/utils/_custom.scss');
+define('SKIN_FILE', dirname(__FILE__) .'/../../www/css/foundation/utils/_skin-'.INSTANCE_ID.'.scss');
+define('CUSTOM_CSS_FILE', dirname(__FILE__) .'/../../www/css/foundation/utils/_custom-'.INSTANCE_ID.'.scss');
 
 
 $opts  = getopt('f', ['force']);
@@ -90,10 +91,17 @@ if ($origSha != $newSha || $origCustomSha != $newCustomSha || $force) {
     $logger->info('Skin has changed, or build was forced - rebuilding');
     // Compile the new sass file.
     $infile  = SITE_root . '/www/css/foundation/chrome-foundation.scss';
+    $infileInstance  = SITE_root . '/www/css/foundation/chrome-foundation-'.INSTANCE_ID.'.scss';
     $outfile = SITE_root . '/www/css/'.$siteLocation.'/chrome-foundation.css';
     $outdir  = dirname($outfile);
     $tmpfile = sb_tempnam('css');
-    $cmd     = sprintf('sass --style compressed %s %s', escapeshellarg($infile), escapeshellarg($tmpfile));
+
+    $infileContent = file_get_contents($infile);
+    $infileContent = str_replace('utils/skin', 'utils/skin-'.INSTANCE_ID, $infileContent);
+    $infileContent = str_replace('utils/custom', 'utils/custom-'.INSTANCE_ID, $infileContent);
+    file_put_contents($infileInstance, $infileContent);
+
+    $cmd     = sprintf('sass --style compressed %s %s', escapeshellarg($infileInstance), escapeshellarg($tmpfile));
     $logger->info("Building SASS...");
     exec($cmd, $output, $outputCode);
 
@@ -121,8 +129,15 @@ if ($origSha != $newSha || $origCustomSha != $newCustomSha || $force) {
 
         $logger->info("Building stripped down CSS for editor");
         $editorIn = SITE_root . '/www/css/foundation/editor.scss';
+        $editorInInstance = SITE_root . '/www/css/foundation/editor-'.INSTANCE_ID.'.scss';
         $editorOut = SITE_root . '/www/css/'.$siteLocation.'/editor.css';
-        $cmd     = sprintf('sass --style compressed --sourcemap=none %s %s', escapeshellarg($editorIn), escapeshellarg($editorOut));
+
+        $editorInContent = file_get_contents($editorIn);
+        $editorInContent = str_replace('utils/skin', 'utils/skin-'.INSTANCE_ID, $editorInContent);
+        $editorInContent = str_replace('utils/custom', 'utils/custom-'.INSTANCE_ID, $editorInContent);
+        file_put_contents($editorInInstance, $editorInContent);
+
+        $cmd     = sprintf('sass --style compressed --sourcemap=none %s %s', escapeshellarg($editorInInstance), escapeshellarg($editorOut));
         exec($cmd, $output, $outputCode);
 
         if ($outputCode !== 0) {
@@ -156,6 +171,12 @@ if ($origSha != $newSha || $origCustomSha != $newCustomSha || $force) {
         foreach ($output as $line) {
             $logger->info($line);
         }
+    }
+    if (is_readable($tmpfile)) {
+        unlink($tmpfile);
+    }
+    if (is_readable($tmpfile.'.map')) {
+        unlink($tmpfile.'.map');
     }
     exit($outputCode);
 } else {
