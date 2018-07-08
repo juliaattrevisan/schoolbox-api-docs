@@ -578,10 +578,12 @@ class CourseMarkbook
                 $authNormMark      = $authAnyFeedback ? $authAnyFeedback->getNormalisedMark() : null;
                 $publishedNormMark = $authPublishedFeedback ? $authPublishedFeedback->getNormalisedMark() : null;
 
-                // Always store the published mark if one exists for a student
-                if ($authPublishedFeedback && null !== $publishedNormMark) {
+                // Always store the published mark if one exists for a student (even if null)
+                if ($authPublishedFeedback) {
                     // Record that an assessment participant has a published mark
-                    $assessmentPublishedMarks[] = $publishedNormMark;
+                    if (null !== $publishedNormMark) {
+                        $assessmentPublishedMarks[] = $publishedNormMark;
+                    }
 
                     // Record the student's published mark so we can display in a table cell
                     $this->studentMarks[$courseImplId][$aId][$userId]['published']['norm'] = $publishedNormMark;
