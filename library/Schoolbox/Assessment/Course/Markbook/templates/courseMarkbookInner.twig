@@ -229,17 +229,17 @@
                         {% set marks             = studentAverageMarks[courseImpl.id][student.id] %}
                         {% set publishedNormMark = marks.published.norm %}
                         {% set draftNormMark     = marks.any.norm %}
-                        {% set publishedHrMark   = marks.published.hr %}
-                        {% set draftHrMark       = marks.any.hr %}
+                        {% set publishedHrMark   = marks.published.hr | default('–') %}
+                        {% set draftHrMark       = marks.any.hr | default('–') %}
 
                         {% set draftsOffClass = publishedNormMark is null ? 'gradient-off-bg' : urgency.marks(publishedNormMark) ~ '-bg' %}
                         {% set draftsOnClass = draftNormMark is null ? 'gradient-off-bg' : urgency.marks(draftNormMark) ~ '-bg' %}
 
                         <td class="student-average {{ draftsOffClass }}" {% if marks.any is defined %}data-student-average{% endif %} data-off-class="{{ draftsOffClass }}" data-on-class="{{ draftsOnClass }}">
                             {% set gradesRoute = routeLookup('learningGrades.getGrades', {viewee: student, userId: student.id, termCode: ''}) %}
-                            <a href="{{ gradesRoute }}" {% if marks.any is defined %}data-actual-mark{% endif %} title="View students {{ locale.grades.plural }}">{% if publishedNormMark is null %}–{% else %}{{ publishedHrMark }}{% endif %}</a>
+                            <a href="{{ gradesRoute }}" {% if marks.any is defined %}data-actual-mark{% endif %} title="View students {{ locale.grades.plural }}">{{ publishedHrMark }}</a>
                             {% if marks.any is defined %}
-                                  <a href="{{ gradesRoute }}" data-draft-mark style="display: none" data-tooltip="right" class="meta has-tip tip-right" data-width="105" title="Draft Mark">{% if draftNormMark is null %}–{% else %}{{ draftHrMark }}{% endif %}</a>
+                                  <a href="{{ gradesRoute }}" data-draft-mark style="display: none" data-tooltip="right" class="meta has-tip tip-right" data-width="105" title="Draft Mark">{{ draftHrMark }}</a>
                             {% endif %}
                         </td>
 
@@ -279,15 +279,13 @@
                                     {% set indicator = (marks.draft is defined) ? 'pending' : ((marks.published is defined) ? 'published' : 'none') %}
 
                                     {% if publishedMark %}
-                                        {% set publishedMarkHr = publishedMark['hr'] is null ? '–' : publishedMark['hr'] %}
-                                        <a href="{{ participationRoute }}" {% if marks.draft is defined %}data-actual-mark{% endif %} title="{{ comment }}" >{{ publishedMarkHr }}</a>
+                                        <a href="{{ participationRoute }}" {% if marks.draft is defined %}data-actual-mark{% endif %} title="{{ comment }}" >{{ publishedMark['hr'] | default('–') }}</a>
                                     {% else %}
                                         <a href="{{ participationRoute }}" {% if marks.draft is defined %}data-actual-mark{% endif %} title="Pending" >–</a>
                                     {% endif %}
 
                                     {% if marks.draft is defined %}
-                                        {% set draftMarkHr = draftMark['hr'] is null ? '–' : draftMark['hr'] %}
-                                        <a href="#" data-draft-mark style="display: none" data-tooltip="right" class="has-tip tip-right meta" data-width="105" title="Draft Mark">{{ draftMarkHr }}</a>
+                                        <a href="#" data-draft-mark style="display: none" data-tooltip="right" class="has-tip tip-right meta" data-width="105" title="Draft Mark">{{ draftMark['hr'] | default('–') }}</a>
                                     {% endif %}
                                 {% endif %}
                                     <span class="indicator indicator-{{ indicator }}"></span>
