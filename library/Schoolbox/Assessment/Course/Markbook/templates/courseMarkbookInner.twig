@@ -108,9 +108,9 @@
         </div>
 
         <div class="legend" style="float:right;">
+            <p class="meta"><span class="indicator indicator-none"></span>No published mark</p>
+            <p class="meta"><span class="indicator indicator-pending"></span>Published mark, draft pending</p>
             <p class="meta"><span class="indicator indicator-published"></span>Published mark</p>
-            <p class="meta"><span class="indicator indicator-pending"></span>Pending draft mark</p>
-            <p class="meta"><span class="indicator indicator-none"></span>No marks</p>
         </div>
 
         <table class="square-grid marksheet" data-mark-sheet>
@@ -276,7 +276,7 @@
                                     {% set marks              = studentMarks[courseImpl.id][assessment.id][student.id] %}
                                     {% set publishedMark      = marks.published %}
                                     {% set draftMark          = marks.draft %}
-                                    {% set indicator = (marks.draft is defined) ? 'pending' : ((marks.published is defined) ? 'published' : 'none') %}
+                                    {% set indicator = (marks.published is defined) ? (marks.draft is defined ? 'pending' : 'published') : 'none' %}
 
                                     {% if publishedMark %}
                                         <a href="{{ participationRoute }}" {% if marks.draft is defined %}data-actual-mark{% endif %} title="{{ comment }}" >{{ publishedMark['hr'] | default('–') }}</a>
