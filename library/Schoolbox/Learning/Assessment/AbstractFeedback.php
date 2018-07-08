@@ -119,7 +119,7 @@ abstract class AbstractFeedback implements IFeedback
      */
 
     /**
-     * @return float
+     * @return string
      */
     public function getHumanReadableMark()
     {
