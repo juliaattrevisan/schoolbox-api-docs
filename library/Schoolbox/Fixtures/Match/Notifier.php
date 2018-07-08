@@ -81,11 +81,18 @@ class Notifier extends AbstractModuleNotifier
 
             switch ($method) {
                 case Mapper::METHOD_CREATE:
-                    $bundle->attach(self::TRIGGER_CREATED, $notifyTime);
-                    $bundle->attach(self::TRIGGER_SNAPSHOT_CREATED, $startAt);
+                    // If the starting date is in past, we don't want to notify
+                    if (!$match->getStartAt()->isPast()) {
+                        $bundle->attach(self::TRIGGER_CREATED, $notifyTime);
+                        $bundle->attach(self::TRIGGER_SNAPSHOT_CREATED, $startAt);
+                    }
                     break;
                 case Mapper::METHOD_UPDATE:
                     $diff = $bundle->getEvent()->getDiff();
+                    // If there's no viewable change, we don't want to notify
+                    if (count($diff) === 1 && array_key_exists('updatedAt', $diff)) {
+                        break;
+                    }
                     $oneday = new Alaress_Date_Format(new \DateTime('+1 day'));
                     if ($notifyTime < $oneday->getUnixTimeStamp()) {
                         // if the changed match is happening in 24hrs
