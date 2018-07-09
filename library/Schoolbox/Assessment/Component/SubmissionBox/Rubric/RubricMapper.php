@@ -1226,22 +1226,39 @@ class RubricMapper
         }
 
         // Get Source Usages
-        /** @var Usage[]|GenericCollection $srcUsages */
-        $srcUsages = $criterionUsageMapper->findByColumnList([
-            'criterion_id'      => $srcCriteria->getColumnValues('id'),
+        /** @var GroupUsage[]|GenericCollection $srcGroupUsages */
+        /** @var Usage[]|GenericCollection $srcCriterionUsages */
+        $srcGroupUsages = $groupUsageMapper->findByColumnList([
+            'group_id'          => $srcGroups->getPropertyValues('id'),
+            'submission_box_id' => $sourceBox->getId(),
+        ]);
+        $srcCriterionUsages = $criterionUsageMapper->findByColumnList([
+            'criterion_id'      => $srcCriteria->getPropertyValues('id'),
             'submission_box_id' => $sourceBox->getId(),
         ]);
 
-        // Copy Usages
-        foreach ($srcUsages as $srcUsage) {
-            $dstUsage = clone $srcUsage;
+        // Copy Group Usages
+        foreach ($srcGroupUsages as $srcGroupUsage) {
+            $dstGroupUsage = clone $srcGroupUsage;
+
+            /** @var Group $dstGroup */
+            $dstGroup = $dstCriteria->getOffset($srcGroupUsage->getId());
+
+            $dstGroupUsage->setGroup($dstGroup);
+            $dstGroupUsage->setSubmissionBox($dstBox);
+            $dstGroupUsages->add($dstGroupUsage);
+        }
+
+        // Copy Criterion Usages
+        foreach ($srcCriterionUsages as $srcCriterionUsage) {
+            $dstCriterionUsage = clone $srcCriterionUsage;
 
             /** @var Criterion $dstCriterion */
-            $dstCriterion = $dstCriteria->getOffset($srcUsage->getCriterion()->getId());
+            $dstCriterion = $dstCriteria->getOffset($srcCriterionUsage->getCriterion()->getId());
 
-            $dstUsage->setCriterion($dstCriterion);
-            $dstUsage->setSubmissionBox($dstBox);
-            $dstCriterionUsages->add($dstUsage);
+            $dstCriterionUsage->setCriterion($dstCriterion);
+            $dstCriterionUsage->setSubmissionBox($dstBox);
+            $dstCriterionUsages->add($dstCriterionUsage);
         }
 
         // Save (order is important to ensure IDs are assigned to parents b4 saving children)
@@ -1249,6 +1266,7 @@ class RubricMapper
         $groupMapper->save($dstGroups);
         $criterionMapper->save($dstCriteria);
         $descriptorMapper->save($dstDescriptors);
+        $groupUsageMapper->save($dstGroupUsages);
         $criterionUsageMapper->save($dstCriterionUsages);
 
         return true;
