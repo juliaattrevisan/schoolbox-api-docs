@@ -487,11 +487,11 @@ class Controller extends Base
         /* By default, select the All tab...
          * but try to find the topic whose slug matches the url param
          */
-        $topicId = Mapper::TOPIC_ALL;
+        $firstTopicId = Mapper::TOPIC_ALL;
 
         foreach($topics as $topic) {
             if ($topic->getSlug() === $slug) {
-                $topicId = $topic->getId();
+                $firstTopicId = $topic->getId();
                 break;
             }
         }
@@ -503,7 +503,16 @@ class Controller extends Base
 
         /* Once we found the topicId, get a bunch of articles for that topic
          */
-        $outcome = (new Lists($this->newsMapper, $this->policyMapper))->findForTopic($this->getUser(), $topicId, $limit);
+        $outcome = (new Lists($this->newsMapper, $this->policyMapper))->findForTopic($this->getUser(), $firstTopicId, $limit);
+
+        $outcome = array_merge($outcome, [
+            'topics' => $topics,
+            'topicAll' => Mapper::TOPIC_ALL,
+            'firstTopicId' => $firstTopicId,
+            'allDefault' => false,
+            'compactMode' => false,
+            'limit' => $limit
+        ]);
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/index.twig', $outcome));
     }
