@@ -230,8 +230,19 @@
 
             $('[data-role=rubric-sum]').text(rubricSummary.text());
 
+            showHideRangeInput($changed);
         });
 
+        function showHideRangeInput($changedCell) {
+            var $allCells = $("[data-rubric], [data-rubric-group]")
+            console.log("Inside showHideRangeInput");
+
+            $allCells.siblings("select").addClass("hide");
+            if ($changedCell.prop('checked')) {
+                // TODO if changedCell has a range:
+                $changedCell.siblings("select.used").removeClass("hide");
+            }
+        }
 
         function getSum(elements)
         {
