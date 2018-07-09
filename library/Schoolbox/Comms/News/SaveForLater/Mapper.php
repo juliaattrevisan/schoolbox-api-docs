@@ -58,7 +58,7 @@ class Mapper extends \Schoolbox\Mapper
             ]);
         }
 
-        return new Collection();
+        return News\Mapper::getInstance()->createCollection();
     }
 
 
