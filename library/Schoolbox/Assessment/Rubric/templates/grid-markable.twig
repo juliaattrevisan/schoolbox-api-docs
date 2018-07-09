@@ -92,7 +92,7 @@
                             </label>
                             {# Render a dropdown to select a value from the range #}
                             <select id="rangeDropdown-{{ descriptor.id }}"
-                                    class="{% if not descriptor.selected %} hide{% endif %}
+                                    class="{% if not descriptor.selected or descriptorMin == descriptorMax %} hide{% endif %}
                                     {% if useMarkRange and descriptorMin != descriptorMax %}used{% endif %}">
                                 {% for i in range(descriptorMin, descriptorMax) %}
                                     <option
