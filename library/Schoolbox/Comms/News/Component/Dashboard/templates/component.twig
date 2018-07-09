@@ -16,7 +16,7 @@
     $(function() {
         $('#news-container-{{ componentInstanceId }}').articleTabs({
             'firstUrl': "{{ routeLookup('commsNews.getListByTopic', {topicId: firstTopicId, limit: limit}) ~ '?compactMode=' ~ compactMode }}",
-            'topicTabs': $("news-topics-{{ componentInstanceId }}")
+            'topicTabs': $("#news-topics-{{ componentInstanceId }}")
         });
     });
 </script>
