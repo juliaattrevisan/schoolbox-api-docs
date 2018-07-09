@@ -221,6 +221,53 @@ class Rubric extends Core\Rubric
 
 
     /**
+     * Returns a collection containing all the groups in this grid, for DB persistence.
+     *
+     * @return GroupUsage[]|Collection
+     */
+    public function getORMGroupUsages()
+    {
+        $c = GroupUsageMapper::getInstance()->createCollection();
+
+        foreach ($this->criteriaGroups as $group) {
+            $addGroup = false;
+            foreach ($group->getAllCriteria() as $criterion) {
+                if ($criterion->getAllDescriptors()->count()) {
+                    $addGroup = true;
+                    break;
+                }
+            }
+            if ($addGroup) {
+                $c->add($this->createORMGroupUsage($group));
+            }
+        }
+
+        return $c;
+    }
+
+
+    /**
+     * @param Core\Criteria\Group $group
+     * @return Usage
+     */
+    protected function createORMGroupUsage(Core\Criteria\Group $group)
+    {
+        if (!$this->groupUsageCache->contains($group)) {
+
+            // TODO set group max mark here
+            $this->groupUsageCache->attach(
+                $group,
+                GroupUsageMapper::getInstance()->createModel()
+                                               ->setGroup($this->groupCache->offsetGet($group))
+                                               ->setSubmissionBox($this->box)
+            );
+        }
+
+        return $this->groupUsageCache->offsetGet($group);
+    }
+
+
+    /**
      * Returns a collection containing all the criteria in this grid, for DB persistence.
      *
      * @return Usage[]|Collection

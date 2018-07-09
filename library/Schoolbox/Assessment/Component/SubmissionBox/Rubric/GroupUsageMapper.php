@@ -13,6 +13,8 @@ use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 
 /**
  * Mapper for usage of a rubric group on a due work.
+ *
+ * @method GroupUsage createModel($idValue = null)
  */
 class GroupUsageMapper extends Schoolbox\Mapper
 {
