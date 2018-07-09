@@ -43,7 +43,6 @@
                     title: 'Remove article from saved items'
                 },
                 unsaved: {
-                    url: '/',
                     toast: {
                         processing: 'Removing...',
                         complete: 'Removed'
@@ -110,6 +109,7 @@
                         css: 'success'
                     });
 
+                    console.log(response);
                     // Update data attribute
                     $element.attr('data-saveforlater', response.currentValue);
 
