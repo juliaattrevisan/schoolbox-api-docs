@@ -95,7 +95,7 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
         $user,
         $keyword,
         $offset = 0,
-        $limit = self::DEFAULT_LIMIT,
+        $limit = 0,
         $sortProperty = '',
         $sortDirection = 'DESC'
     ) {
@@ -111,7 +111,7 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
             'codeLike' => $quotedLike . '%',
             'nameLike' => '%' . $quotedLike . '%',
         ];
-        if ($limit) {
+        if ($limit > 0) {
             $query .= ' LIMIT :limit';
         }
         if ($offset) {
@@ -121,7 +121,7 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
         foreach ($params as $param => $value) {
             $statement->bindValue($param, $value);
         }
-        if ($limit) {
+        if ($limit > 0) {
             $statement->bindValue('limit', (int) $limit, \PDO::PARAM_INT);
         }
         if ($offset) {
