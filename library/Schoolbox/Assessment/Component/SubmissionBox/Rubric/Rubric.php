@@ -171,31 +171,12 @@ class Rubric extends Core\Rubric
     {
         if (!$this->criterionCache->contains($criterion)) {
             $model = CriterionMapper::getInstance()->findByIdWithFallback($criterion->getId());
-
-//            try {
-//                $model    = CriterionMapper::getInstance()->findById($criterion->getId());
-//                $parentId = $model->getGroup()->getParentId();
-//
-//            } catch (Mapper\Exception $e) {
-//                $model    = CriterionMapper::getInstance()->createModel();
-//                $parentId = $this->box->getCategory()->getId();
-//                $model->setGroup(GroupMapper::getInstance()->createModel());
-//            }
-
             $model->setName($criterion->getName())
                   ->setGroup($this->createORMGroup($criterion->getGroup()));
-//            $model->getGroup()
-//                  ->setName($groupName)
-//                  ->setParentType(Group::PARENT_TYPE_CATEGORY)
-//                  ->setParentId($parentId)
-//            ;
-
             $this->criterionCache->attach($criterion, $model);
         }
 
         return $this->criterionCache->offsetGet($criterion);
-//        $return->getGroup()->setName($groupName ?: $criterion->getGroup()->getName());
-//        return $return;
     }
 
 
@@ -222,13 +203,6 @@ class Rubric extends Core\Rubric
     {
         if (!$this->groupCache->contains($group)) {
             $model = GroupMapper::getInstance()->findByIdWithFallback($group->getId());
-
-//            try {
-//                $model = GroupMapper::getInstance()->findById($group->getId());
-//            } catch (Mapper\Exception $e) {
-//                $model = GroupMapper::getInstance()->createModel();
-//            }
-
             $model->setName($group->getName())
                   ->setParentType(Group::PARENT_TYPE_CATEGORY)
                   ->setParentId($this->box->getCategory()->getId());
