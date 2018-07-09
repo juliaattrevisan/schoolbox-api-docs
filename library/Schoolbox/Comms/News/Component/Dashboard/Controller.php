@@ -24,16 +24,6 @@ class Controller extends Component_Dashboard_ControllerAbstract
 {
 
     /**
-     * @var SaveForLater\Mapper
-     */
-    private $saveForLaterMapper;
-
-    /**
-     * @var Policy\Mapper
-     */
-    private $policyMapper;
-
-    /**
      * @var News\Mapper
      */
     private $newsMapper;
