@@ -51,6 +51,25 @@ class Rubric extends Core\Rubric
     private $criterionUsageCache;
 
     /**
+     * Maps domain object Group to ORM Group.
+     *
+     * This contains all groups that are available to the rubric grid,
+     * whether or not this rubric's box is using them.
+     *
+     * @var SplObjectStorage|Core\Criteria\Group[]
+     */
+    private $groupCache;
+
+    /**
+     * Maps domain object Group to ORM Group.
+     *
+     * This contains only the groups this rubric's box is actually using.
+     *
+     * @var SplObjectStorage|Core\Criteria\Group[]
+     */
+    private $groupUsageCache;
+
+    /**
      * Maps domain object Level to ORM Level.
      *
      * This contains the levels that have been assigned to this rubric's box.
@@ -174,6 +193,46 @@ class Rubric extends Core\Rubric
         $return = $this->criterionCache->offsetGet($criterion);
         $return->getGroup()->setName($groupName ?: $criterion->getGroup()->getName());
         return $return;
+    }
+
+
+    /**
+     * Returns a collection containing all the groups in this grid, for DB persistence.
+     *
+     * @return Usage[]|Collection
+     */
+    public function getORMGroups()
+    {
+        $c = GroupMapper::getInstance()->createCollection();
+        foreach ($this->criteriaGroups as $group) {
+            $c->add($this->createORMGroup($group));
+        }
+        return $c;
+    }
+
+
+    /**
+     * @param Core\Criteria\Group $group
+     * @return Group
+     */
+    protected function createORMGroup(Core\Criteria\Group $group)
+    {
+        if (!$this->groupCache->contains($group)) {
+            $model = GroupMapper::getInstance()->findByIdWithFallback($group->getId());
+
+//            try {
+//                $model = GroupMapper::getInstance()->findById($group->getId());
+//            } catch (Mapper\Exception $e) {
+//                $model = GroupMapper::getInstance()->createModel();
+//            }
+
+            $model->setName($group->getName())
+                  ->setParentType(Group::PARENT_TYPE_CATEGORY)
+                  ->setParentId($this->box->getCategory()->getId());
+            $this->groupCache->attach($group, $model);
+        }
+
+        return $this->groupCache->offsetGet($group);
     }
 
 
