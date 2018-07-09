@@ -523,7 +523,7 @@ class Controller extends Base
          * We always fetched everything, then manually sorted by slug
          * Inherit this situation, improvise and adapt (or just use ids...)
          */
-        $topics = TopicMapper::getInstance()->findAll();
+        $topics = $this->topicMapper->findAll();
 
         /* By default, select the All tab...
          * but try to find the topic whose slug matches the url param
