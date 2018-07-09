@@ -36,7 +36,7 @@ class Module extends BaseModule
      * @return void
      * @throws InvalidArgumentException
      */
-    protected function registerRoutes()
+    protected function registerRoutes(): void
     {
         /* For viewing articles you just need to be logged in and controller,
          * I suppose, deals with whether you are in the audience
@@ -68,6 +68,10 @@ class Module extends BaseModule
         $preloadNews = function ($params) {
             return $this->preloadNews($params);
         };
+
+        /* Index of articles audienced to you
+         */
+        $this->register('GET', '', 'getIndex', $viewPerms);
 
         /* Create news article
          */

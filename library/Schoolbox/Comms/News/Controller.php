@@ -12,6 +12,7 @@ use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
 use InvalidArgumentException;
 use Schoolbox\Application\Exception\Exception;
+use Schoolbox\Comms\News\Lists;
 use Schoolbox\Comms\News\Policy;
 use Schoolbox\Comms\News\SaveForLater;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -465,7 +466,19 @@ class Controller extends Base
 
             $outcome['compactMode'] = $this->getRequest()->query['compactMode'];
 
-            $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@commsNewsDashboard/list.twig', $outcome));
+            $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@commsNews/list.twig', $outcome));
         }
+    }
+
+
+    /**
+     *
+     */
+    public function getIndex()
+    {
+
+        echo 'test';
+
+        return;
     }
 }
