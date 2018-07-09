@@ -80,33 +80,27 @@
                                 {% set descriptorMax = descriptor.value %}
 
                                 {# Just show a text value if the descriptor is not selected #}
-                                {% if not descriptor.selected %}
-                                    {% if useMarkRange and levelIndex > 0 and descriptorMin != descriptorMax %}
-                                        {% if descriptor.value is not null and showDescriptorValue and (config.rubric_show_points or not studentView) %}
-                                            <span class="rb-value">
-                                                {{- descriptorMin -}} - {{- descriptorMax -}}
-                                            </span>
-                                        {% endif %}
-                                    {% elseif descriptor.value is not null and showDescriptorValue and (config.rubric_show_points or not studentView) %}
-                                        <span class="rb-value">
+                                {% if descriptor.value is not null and showDescriptorValue and (config.rubric_show_points or not studentView) %}
+                                    <span class="rb-value {% if descriptor.selected %}hide{% endif %}">
+                                        {% if useMarkRange and levelIndex > 0 and descriptorMin != descriptorMax %}
+                                            {{- descriptorMin -}} - {{- descriptorMax -}}
+                                        {% else %}
                                             {{ descriptor.value }}
-                                        </span>
-                                    {% endif %}
+                                        {% endif %}
+                                    </span>
                                 {% endif %}
                             </label>
-                            {% if descriptor.selected and useMarkRange %}
-                                {# If we selected this descriptor, render a dropdown to select a value from the range #}
-                                <select id="rangeDropdown-{{ descriptor.id }}">
-                                    {% for i in range(descriptorMin, descriptorMax) %}
-                                        <option
-                                            value={{ i }}
-                                            {# TODO make sure this uses the actual selected value when the user changes it #}
-                                            {% if i == descriptorMax %}selected{% endif %}
-                                        >{{ i }}
-                                        </option>
-                                    {% endfor %}
-                                </select>
-                            {% endif %}
+                            {# Render a dropdown to select a value from the range #}
+                            <select id="rangeDropdown-{{ descriptor.id }}" {% if not useMarkRange or not descriptor.selected %}class="hide"{% endif %}>
+                                {% for i in range(descriptorMin, descriptorMax) %}
+                                    <option
+                                        value={{ i }}
+                                        {# TODO make sure this uses the actual selected value when the user changes it #}
+                                        {% if i == descriptorMax %}selected{% endif %}
+                                    >{{ i }}
+                                    </option>
+                                {% endfor %}
+                            </select>
 
                             {% if learnerSelected %}
                                 <img class="rb-self-reflection-choice"
