@@ -41,6 +41,7 @@
  # @param int unsaved
  # @param int compactMode
  #}
+{% if articles|length %}
 <ul class="information-list">
     {% for article in articles %}
         <li class="actions-small-1">
@@ -87,3 +88,9 @@
         </li>
     {% endfor %}
 </ul>
+{% else %}
+    <div class="empty-state">
+        <i class="icon-news"></i>
+        <p>There aren't any {{ locale.news }} articles in this topic.</p>
+    </div>
+{% endif %}
