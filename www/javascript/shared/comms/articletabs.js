@@ -31,7 +31,7 @@
 
                 /* The ul containing tabs that trigger async requests
                  */
-                topicTabs: null,
+                topicTabs: $(element).parents('[data-component]').find('[data-tab]'),
 
                 /* Cache for async responses
                  */
