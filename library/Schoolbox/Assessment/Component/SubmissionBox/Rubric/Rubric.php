@@ -24,42 +24,58 @@ use SplObjectStorage;
  */
 class Rubric extends Core\Rubric
 {
-
-    /** @var SubmissionBox|null */
+    /**
+     * The due work that this rubric is for, if there is one.
+     *
+     * @var SubmissionBox|null
+     */
     private $box;
 
     /**
-     * Maps domain object Criterion to ORM Criterion
+     * Maps domain object Criterion to ORM Criterion.
+     *
+     * This contains all criteria that are available to the rubric grid,
+     * whether or not this rubric's box is using them.
      *
      * @var SplObjectStorage|Core\Criteria\Criterion[]
      */
     private $cCache;
 
     /**
-     * Maps domain object Criterion to ORM Usage
+     * Maps domain object Criterion to ORM Usage.
+     *
+     * This contains only the criteria this rubric's box is actually using.
      *
      * @var SplObjectStorage|Core\Criteria\Criterion[]
      */
     private $uCache;
 
     /**
-     * Maps domain object Level to ORM Level
+     * Maps domain object Level to ORM Level.
+     *
+     * This contains the levels that have been assigned to this rubric's box.
      *
      * @var SplObjectStorage|Core\Competency\Level[]
      */
     private $lCache;
 
     /**
-     * Maps domain object Descriptor to ORM Descriptor
+     * Maps domain object Descriptor to ORM Descriptor.
+     *
+     * This contains all the descriptors that have been assigned to one of the
+     * criteria/level combinations for the rubric's box.
      *
      * @var SplObjectStorage|Core\Descriptor[]
      */
     private $dCache;
 
     /**
-     * Maps domain object Descriptor to ORM Mark
+     * Maps domain object Descriptor to ORM Mark.
      *
-     * @var SplObjectStorage|Core\Descriptor[]
+     * This contains all rubric marks that have been assigned to a participant
+     * for this rubric's box, for a particular descriptor within the rubric.
+     *
+     * @var SplObjectStorage|Mark[]
      */
     private $mCache;
 
