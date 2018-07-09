@@ -110,10 +110,17 @@ class Rubric extends Core\Rubric
         $this->setSubmissionBox($submissionBox);
 
         // setup caching
+        // Groups and criteria for a folder
+        $this->groupCache          = new SplObjectStorage();
         $this->criterionCache      = new SplObjectStorage();
-        $this->descriptorCache     = new SplObjectStorage();
-        $this->levelCache          = new SplObjectStorage();
+
+        // Rubric grid for a due work
+        $this->groupUsageCache     = new SplObjectStorage();
         $this->criterionUsageCache = new SplObjectStorage();
+        $this->levelCache          = new SplObjectStorage();
+        $this->descriptorCache     = new SplObjectStorage();
+
+        // Marks for a due work
         $this->markCache           = new SplObjectStorage();
     }
 
@@ -218,7 +225,7 @@ class Rubric extends Core\Rubric
      *
      * @return Usage[]|Collection
      */
-    public function getORMUsages()
+    public function getORMCriterionUsages()
     {
         $c = UsageMapper::getInstance()->createCollection();
 
@@ -226,7 +233,7 @@ class Rubric extends Core\Rubric
         foreach ($this->criteriaGroups as $group) {
             foreach ($group->getAllCriteria() as $criterion) {
                 if ($criterion->getAllDescriptors()->count()) {
-                    $c->add($this->createORMUsage($criterion, ++$sequence));
+                    $c->add($this->createORMCriterionUsage($criterion, ++$sequence));
                 }
             }
         }
@@ -240,7 +247,7 @@ class Rubric extends Core\Rubric
      * @param int $sequence
      * @return Usage
      */
-    protected function createORMUsage(Core\Criteria\Criterion $criterion, $sequence)
+    protected function createORMCriterionUsage(Core\Criteria\Criterion $criterion, $sequence)
     {
         if (!$this->criterionUsageCache->contains($criterion)) {
             $this->criterionUsageCache->attach($criterion,

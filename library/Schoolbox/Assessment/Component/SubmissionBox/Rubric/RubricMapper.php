@@ -765,7 +765,7 @@ class RubricMapper
 
         // usages are a join table with a sequence, not a strict "object" - as such, we can purge the relevant records and simply re-create them
         UsageMapper::getInstance()->deleteByColumn('submission_box_id', $submissionBox->getId());
-        UsageMapper::getInstance()->save($usages = $rubric->getORMUsages());
+        UsageMapper::getInstance()->save($usages = $rubric->getORMCriterionUsages());
 
         // finally, now that everything else is saved, save the descriptors
         $descIds = DescriptorMapper::getInstance()->save($descs = $rubric->getORMDescriptors());
