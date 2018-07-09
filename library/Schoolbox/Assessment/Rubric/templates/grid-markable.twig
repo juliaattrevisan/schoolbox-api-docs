@@ -52,44 +52,46 @@
 
                 {% for levelIndex, level in rubric.levels %}
                     {% set descriptor = rubric.descriptors[crit.id][levelIndex] %}
+
                     {% if descriptor %}
 
-                    {% set inputId %}{{ formField }}[{{ crit.id }}][{{ level.id }}]{% endset %}
+                        {% set inputId %}{{ formField }}[{{ crit.id }}][{{ level.id }}]{% endset %}
 
-                    {# Self-Assessment #}
-                    {% set learnerSelected = learnerRubric.descriptors[crit.id][levelIndex]['selected'] %}
-                    <td>
-                        <input id="{{ inputId }}"
-                               name="{{ formField }}[descriptors][{{ descriptor.id }}]"
-                               value="1"
-                               type="checkbox"
-                               data-value="{{ descriptor.value }}"
-                               data-rubric="{{ rubric.id }}"
-                               data-rubric-group="{{ group.id }}"
-                               data-rubric-descriptor="{{ descriptor.id }}"
-                               {% if descriptor.selected %}checked="checked"{% endif %}
-                        />
-                        <label for="{{ inputId }}">
-                        <span class="rb-description">
-                            {{- descriptor.text|nl2br -}}
-                        </span>
+                        {# Self-Assessment #}
+                        {% set learnerSelected = learnerRubric.descriptors[crit.id][levelIndex]['selected'] %}
+                        <td>
+                            <input id="{{ inputId }}"
+                                   name="{{ formField }}[descriptors][{{ descriptor.id }}]"
+                                   value="1"
+                                   type="checkbox"
+                                   data-value="{{ descriptor.value }}"
+                                   data-rubric="{{ rubric.id }}"
+                                   data-rubric-group="{{ group.id }}"
+                                   data-rubric-descriptor="{{ descriptor.id }}"
+                                   {% if descriptor.selected %}checked="checked"{% endif %}
+                            />
+                            <label for="{{ inputId }}">
+                                <span class="rb-description">
+                                    {{- descriptor.text|nl2br -}}
+                                </span>
 
-                        {% if descriptor.value is not null and showDescriptorValue and (config.rubric_show_points or not studentView) %}
-                        <span class="rb-value">
-                            {{- descriptor.value -}}
-                        </span>
+                                {% if descriptor.value is not null and showDescriptorValue and (config.rubric_show_points or not studentView) %}
+                                    <span class="rb-value">
+                                        {{- descriptor.value -}}
+                                    </span>
+                                {% endif %}
+                            </label>
+                            {% if learnerSelected %}
+                                <img class="rb-self-reflection-choice"
+                                     src="/portrait.php?userId={{ learner.externalId }}&amp;size=square32"
+                                     title="{% if latestSelfReflectedFeedback.normalisedMark != null %}{{ locale.selfAssessment.proper }}{% else %}{{ locale.selfReflection.proper }}{% endif %} choice" />
                             {% endif %}
-                        </label>
-                        {% if learnerSelected %}
-                            <img class="rb-self-reflection-choice"
-                                 src="/portrait.php?userId={{ learner.externalId }}&amp;size=square32"
-                                 title="{% if latestSelfReflectedFeedback.normalisedMark != null %}{{ locale.selfAssessment.proper }}{% else %}{{ locale.selfReflection.proper }}{% endif %} choice" />
-                        {% endif %}
-                    </td>
+                        </td>
 
                     {% else %}
-                    <td class="rb-blank">&nbsp;</td>
+                        <td class="rb-blank">&nbsp;</td>
                     {% endif %}
+
                 {% endfor %}
             </tr>
             {% endfor %}
