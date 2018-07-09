@@ -132,6 +132,35 @@ class FixtureCest
         $fixturePage->deleteItinerary($matchId5);
         $fixturePage->assertNotifExists('Your upcoming AFL match ' . $matchName5 . ' has been updated');
 
+        //== Match in future - No instant notification ==
+        $matchName1 = 'Sixth Cest Match';
+        $start = new \DateTime();
+        $start->modify('+ 1 day 2 minutes');
+        $matchId = $fixturePage->createMatch(
+            [
+                Fixture::SELECTOR_NAME => $matchName1,
+                Fixture::SELECTOR_START_AT => $start
+            ],
+            [
+                Fixture::SELECTOR_JS_VENUE => Fixture::VENUE_HAILEYBURY,
+                Fixture::SELECTOR_JS_HOME_TEAM => Fixture::TEAM_FIRST_XVIII,
+                Fixture::SELECTOR_JS_AWAY_TEAM => Fixture::TEAM_SECOND_XVIII
+            ]);
+
+        $fixturePage->assertNotifNotExists('You have an upcoming AFL match ' . $matchName1);
+
+        $fixturePage->updateMatch($matchId, [], []);
+        $fixturePage->assertNotifNotExists('Your upcoming AFL match ' . $matchName1 . ' has been updated');
+
+        //Change title and save - Updated notification ==
+        $matchName2 = 'Third Cest Modified Sixth';
+        $fixturePage->updateMatch($matchId, [Fixture::SELECTOR_NAME => $matchName2], []);
+        $fixturePage->assertNotifNotExists('Your upcoming AFL match ' . $matchName2 . ' has been updated');
+
+        // wait 2 minutes and should receive upcoming notification
+        $i->wait(120);
+        $fixturePage->assertNotifExists('You have an upcoming AFL match ' . $matchName2);
+        $fixturePage->assertNotifNotExists('Your upcoming AFL match ' . $matchName2 . ' has been updated');
     }
 
 }

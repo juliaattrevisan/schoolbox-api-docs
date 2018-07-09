@@ -93,8 +93,8 @@ class Notifier extends AbstractModuleNotifier
                     if (count($diff) === 1 && array_key_exists('updatedAt', $diff)) {
                         break;
                     }
-                    $oneday = new Alaress_Date_Format(new \DateTime('+1 day'));
-                    if ($notifyTime < $oneday->getUnixTimeStamp()) {
+                    $now = new Alaress_Date_Format(new \DateTime());
+                    if ($notifyTime < $now->getUnixTimeStamp()) {
                         // if the changed match is happening in 24hrs
                         $bundle->attach(self::TRIGGER_UPDATED, self::IMMEDIATELY);
                         $bundle->attach(self::TRIGGER_SNAPSHOT_UPDATED, $startAt);
