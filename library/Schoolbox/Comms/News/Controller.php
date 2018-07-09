@@ -526,7 +526,6 @@ class Controller extends Base
             'topics' => $topics,
             'topicAll' => Mapper::TOPIC_ALL,
             'firstTopicId' => $firstTopicId,
-            'allDefault' => false,
             'compactMode' => false,
             'limit' => $limit
         ]);

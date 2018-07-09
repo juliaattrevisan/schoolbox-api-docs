@@ -38,11 +38,6 @@ class Controller extends Component_Dashboard_ControllerAbstract
     /**
      * @var bool
      */
-    private $allDefault;
-
-    /**
-     * @var int
-     */
     private $firstTopicId;
 
 
@@ -75,9 +70,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
         /* Figure out the first topic to select by default
          * This initiates an async to load actual articles
          */
-        $this->allDefault = (bool)$this->getConfig('default');
-
-        $this->firstTopicId = $this->allDefault ? News\Mapper::TOPIC_ALL : $this->topics->first()->getId();
+        $this->firstTopicId = (bool)$this->getConfig('default') ? News\Mapper::TOPIC_ALL : $this->topics->first()->getId();
 
         /* Only render component if there's potentially content somewhere
          * If there's any non-deleted articles for any of the topics
@@ -103,7 +96,6 @@ class Controller extends Component_Dashboard_ControllerAbstract
             'topics' => $this->topics,
             'topicAll' => News\Mapper::TOPIC_ALL,
             'firstTopicId' => $this->firstTopicId,
-            'allDefault' => $this->allDefault,
             'compactMode' => $this->getConfig('compactMode'),
             'limit' => $this->getConfig('size')
         ]);
