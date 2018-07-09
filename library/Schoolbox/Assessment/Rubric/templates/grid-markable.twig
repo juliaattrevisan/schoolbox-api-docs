@@ -75,11 +75,21 @@
                                     {{- descriptor.text|nl2br -}}
                                 </span>
 
-                                {% if descriptor.value is not null and showDescriptorValue and (config.rubric_show_points or not studentView) %}
+                                {% set descriptorMin = levelIndex > 0 ? rubric.descriptors[crit.id][levelIndex - 1].value + 1 : descriptor.value %}
+                                {% set descriptorMax = descriptor.value %}
+
+                                {% if useMarkRange and levelIndex > 0 and descriptorMin != descriptorMax %}
+                                    {% if descriptor.value is not null and showDescriptorValue and (config.rubric_show_points or not studentView) %}
+                                        <span class="rb-value">
+                                            {{- descriptorMin -}} - {{- descriptorMax -}}
+                                        </span>
+                                    {% endif %}
+                                {% elseif descriptor.value is not null and showDescriptorValue and (config.rubric_show_points or not studentView) %}
                                     <span class="rb-value">
-                                        {{- descriptor.value -}}
+                                        {{ descriptor.value }}
                                     </span>
                                 {% endif %}
+
                             </label>
                             {% if learnerSelected %}
                                 <img class="rb-self-reflection-choice"
