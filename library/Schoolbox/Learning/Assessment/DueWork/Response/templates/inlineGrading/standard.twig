@@ -163,6 +163,7 @@ Usage:
                             : 'grid-markable.twig'
                             %}
                             {% include '@rubric/' ~ rubricTemplate with {
+                                useMarkRange: assessment.useMarkRange,
                                 rubric: rubricContext.rubric,
                                 learnerRubric: learnerRubricContext.rubric,
                                 learner: participant.user,
