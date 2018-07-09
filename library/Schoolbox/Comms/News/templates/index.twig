@@ -26,7 +26,8 @@
                 $(function() {
                     $('#news-container').articleTabs({
                         'firstUrl': "{{ routeLookup('commsNews.getListByTopic', {topicId: firstTopicId, limit: limit}) ~ '?compactMode=' ~ compactMode }}",
-                        'topicTabs': $('#news-topics')
+                        'topicTabs': $('#news-topics'),
+                        'updateUrl': true
                     });
                 });
             </script>

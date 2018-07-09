@@ -450,12 +450,15 @@ class Controller extends Base
 
     /**
      * Get a list of articles that were audienced to me
+     * This is the central piece of the puzzle
      *
      * TODO: Incomplete
      *
      * @param int $topicId
      * @param int $limit
+     * @throws RouteNotFound
      * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     public function getListByTopic(int $topicId, int $limit)
     {
@@ -466,7 +469,21 @@ class Controller extends Base
 
             $outcome['compactMode'] = $this->getRequest()->query['compactMode'];
 
-            $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@commsNews/list.twig', $outcome));
+            /* Figure out the slug from the id
+             */
+            try {
+                $slug = TopicMapper::getInstance()->findById($topicId)->getSlug();
+            }
+            catch (MapperException $e) {
+                $slug = null;
+            }
+
+            $this->getResponse()->content->set($this->buildJsonOutput([
+                'success' => true,
+                'title' => $this->getDi()->get('l10n')->translate('news', false, true),
+                'url' => $this->getRouter()->generate('commsNews.getIndex', ['slug' => $slug]),
+                'fragment' => $this->buildUnthemedHtmlOutput('@commsNews/list.twig', $outcome)->getAsString()
+            ]));
         }
     }
 

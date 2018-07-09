@@ -43,7 +43,12 @@
 
                 /* Return in compact mode or normal mode
                  */
-                compactMode: false
+                compactMode: false,
+
+                /* Update the url upon tab change
+                 * The url comes from backend, telling you the url of the topic requested
+                 */
+                updateUrl: false
             };
 
             return $.extend(defaults, options);
@@ -62,12 +67,18 @@
             $.ajax({
                 type: 'GET',
                 url: url,
-                dataType: 'html'
+                dataType: 'json'
             }).success(function (response) {
 
                 /* Note that we don't need to reapply initSaveForLaterActions() again
                  */
-                $(config.element).html(response).saveForLater();
+                $(config.element).html(response.fragment).saveForLater();
+
+                /* Update the url if desired
+                 */
+                if (config.updateUrl) {
+                    window.history.pushState('', response.title, response.url);
+                }
 
                 /* TODO: Cache the response so we don't need to refetch it
                  */
