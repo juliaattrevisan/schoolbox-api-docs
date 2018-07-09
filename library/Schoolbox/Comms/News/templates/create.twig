@@ -173,31 +173,33 @@
 
     <div id="audience-browse-step1">
         <div class="small-12 medium-4 columns">
-            <button class="button-block" data-audience-select="campus"><i class="icon-location"></i>By Campus</button>
+            <button class="button-block" data-audience-select="campus"><i class="icon-location"></i>Campuses</button>
         </div>
         <div class="small-12 medium-4 columns">
-            <button class="button-block" data-audience-select="role"><i class="icon-staff-students"></i>By Role</button>
+            <button class="button-block" data-audience-select="role"><i class="icon-staff-students"></i>Roles</button>
         </div>
         <div class="small-12 medium-4 columns">
-            <button class="button-block" data-audience-select="house"><i class="icon-home"></i>By House</button>
+            <button class="button-block" data-audience-select="house"><i class="icon-home"></i>Houses</button>
         </div>
         <div class="small-12 medium-4 columns">
-            <button class="button-block" data-audience-select="class"><i class="icon-teacher"></i>By Class</button>
+            <button class="button-block" data-audience-select="class"><i class="icon-teacher"></i>Classes</button>
         </div>
         <div class="small-12 medium-4 columns">
-            <button class="button-block" data-audience-select="group"><i class="icon-group"></i>By Group</button>
+            <button class="button-block" data-audience-select="group"><i class="icon-group"></i>Groups</button>
         </div>
     </div>
 
     <div id="audience-browse-step2" class="hide">
 
-        <ul class="breadcrumb">
+        <ul class="breadcrumb" style="margin-bottom:10px;">
             <li><a href="#" id="audience-browse-return">Browse Audience</a></li>
-            <li class="active"><a>By Role</a></li>
+            <li class="active"><a>Roles</a></li>
         </ul>
 
+        <p class="meta">Some help text here</p>
+
         <form id="audience-browse-form">
-            <fieldset class="checklist">
+            <fieldset class="checklist checklist-table">
                 <input id="checkbox1" type="checkbox" /><label for="checkbox1">Administration</label>
                 <input id="checkbox2" type="checkbox" /><label for="checkbox2">Teacher</label>
                 <input id="checkbox3" type="checkbox" /><label for="checkbox3">Senior Student</label>
@@ -205,8 +207,8 @@
                 <input id="checkbox5" type="checkbox" /><label for="checkbox5">Parent</label>
             </fieldset>
 
-            <fieldset class="checklist">
-                <input id="checkbox6" type="checkbox" selected /><label for="checkbox6">Users in role</label>
+            <fieldset class="checklist" id="" style="border: none;">
+                <input id="checkbox6" type="checkbox" checked /><label for="checkbox6">Users in role</label>
                 <input id="checkbox7" type="checkbox" /><label for="checkbox7">Parents of students</label>
             </fieldset>
 
@@ -217,30 +219,88 @@
 
 </div>
 
+<style>
+    .checklist-table {
+        padding: 0;
+        height: 200px;
+        overflow-y: scroll;
+    }
+
+    .checklist-table input {
+        border: none;
+    }
+
+    .checklist-table input:checked + label {
+        background: #eee;
+    }
+
+    .checklist-table label {
+        border-bottom: 1px solid #eee;
+        margin: 0 !important;
+        padding: 0.5rem 0 0.5rem 2rem !important;
+    }
+
+    .checklist-table label:before {
+        background: none !important;
+    }
+
+    .checklist.checklist-table input[type=checkbox]:not(.plain) + label:after,
+    .checklist.checklist-table input[type=checkbox]:not(.plain) + label:before {
+        padding: 0.5rem 0 0.5rem 0 !important;
+    }
+
+    .checklist.checklist-table input[type=checkbox]:not(.plain):checked + label:hover:after,
+    .checklist.checklist-table input[type=checkbox]:not(.plain):checked + label:hover:before {
+        background-color: transparent !important;
+    }
+
+    .checklist.checklist-table input[type=checkbox]:not(.plain):checked + label:after,
+    .checklist.checklist-table input[type=checkbox]:not(.plain):checked + label:before {
+        background-color: transparent !important;
+    }
+
+    .checklist-table label:hover {
+        background: #f0f0f0;
+    }
+
+    .checklist-table.checklist input[type=radio]:not(.plain):not(:disabled) + label:hover:before,
+    .checklist-table.checklist input[type=radio]:not(.plain):not(:disabled) + label:hover:after,
+    .checklist-table.checklist input[type=checkbox]:not(.plain):not(:disabled) + label:hover:before,
+    .checklist-table.checklist input[type=checkbox]:not(.plain):not(:disabled) + label:hover:after {
+        background-color: transparent !important;
+    }
+
+</style>
+
 <script>
     $(function() {
 
-        // On open of the modal - reset back to the initial page
+        // Reset stuffs on modal open
         $(document).on('open.fndtn.reveal', '#audience-browse', function () {
+            // Back to initial page
             $('#audience-browse-step2').addClass('hide');
             $('#audience-browse-step1').removeClass('hide');
+
+            // Uncheck thangs
+            $('#audience-browse .checklist-table input[type=checkbox]').prop('checked', false);
         });
 
         // Clicking an initial option
         $('#audience-browse-step1 button[data-audience-select]').click(function() {
+
+            //
+
             $('#audience-browse-step1').addClass('hide');
             $('#audience-browse-step2').removeClass('hide');
         });
 
         $('#audience-browse-form').submit(function(event) {
-
             event.preventDefault();
 
             // Populate selectize
 
             // Close modal
             $('#audience-browse').foundation('reveal', 'close');
-
         });
 
         $('#audience-browse-return').click(function(event) {
