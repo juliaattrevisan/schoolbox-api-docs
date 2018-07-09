@@ -81,7 +81,7 @@
 
                                 {# Just show a text value if the descriptor is not selected #}
                                 {% if descriptor.value is not null and showDescriptorValue and (config.rubric_show_points or not studentView) %}
-                                    <span class="rb-value {% if descriptor.selected and descriptorMin != descriptorMax %}hide{% endif %}">
+                                    <span class="rb-value {% if descriptorMin == descriptorMax %}used {% endif %}{% if descriptor.selected and descriptorMin != descriptorMax %}hide{% endif %}">
                                         {% if useMarkRange and levelIndex > 0 and descriptorMin != descriptorMax %}
                                             {{- descriptorMin -}} - {{- descriptorMax -}}
                                         {% else %}
@@ -91,7 +91,7 @@
                                 {% endif %}
                             </label>
                             {# Render a dropdown to select a value from the range #}
-                            <select id="rangeDropdown-{{ descriptor.id }}" {% if not useMarkRange or not descriptor.selected or descriptorMin == descriptorMax %}class="hide"{% endif %}>
+                            <select id="rangeDropdown-{{ descriptor.id }}" class="{% if useMarkRange and descriptorMin != descriptorMax %}used{% endif %}{% if not useMarkRange or not descriptor.selected or descriptorMin == descriptorMax %} hide{% endif %}">
                                 {% for i in range(descriptorMin, descriptorMax) %}
                                     <option
                                         value={{ i }}
@@ -235,12 +235,18 @@
 
         function showHideRangeInput($changedCell) {
             var $allCells = $("[data-rubric], [data-rubric-group]")
-            console.log("Inside showHideRangeInput");
+            console.log($allCells.siblings("label").find("rb-value.used"));
 
+            // Reset grid before showing appropriate elements
             $allCells.siblings("select").addClass("hide");
+            $allCells.siblings("label").find("rb-value.used").removeClass("hide");
+
             if ($changedCell.prop('checked')) {
-                // TODO if changedCell has a range:
+                // This will only un-hide an element if that element is the one we need to use on that cell:
+                // - Dropdowns are only used on cells with a range
+                // - Cells with a single value just get a text display label
                 $changedCell.siblings("select.used").removeClass("hide");
+                $changedCell.siblings("label").find("rb-value.used").removeClass("hide");
             }
         }
 
