@@ -11,8 +11,7 @@
 
         var config = init(options, $(this));
 
-        initSaveForLater();
-        // initSaveForLaterActions();
+        initialConditions();
 
         /**
          * Init
@@ -59,7 +58,7 @@
         /**
          * Set up initial state of the button that activates Save For Later
          */
-        function initSaveForLater() {
+        function initialConditions() {
             var currentState;
 
             $.each($(config.element).find('a[data-saveforlater]'), function(index, element) {
@@ -79,7 +78,7 @@
         /**
          * Set up event listeners
          */
-        this.initSaveForLaterActions = function() {
+        this.initAsync = function() {
             $(config.element).on('click', 'a[data-saveforlater]', function(event) {
                 event.preventDefault();
 

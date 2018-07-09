@@ -16,7 +16,7 @@
         getArticles(config.firstUrl);
         initListeners();
 
-        $('#component3').saveForLater().initSaveForLaterActions();
+        $(config.element).saveForLater().initAsync();
 
         /**
          * Init
