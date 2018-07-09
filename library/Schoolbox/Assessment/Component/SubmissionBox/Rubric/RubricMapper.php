@@ -157,10 +157,10 @@ class RubricMapper
                 COUNT(a.id) AS usage_count,
                 rg.parent_id
             FROM rubric_criterion rc
-            JOIN      rubric_group rg ON rg.id = rc.rubric_group_id
-            LEFT JOIN rubric_usage ru ON rc.id = ru.criterion_id
-            LEFT JOIN submission_box b ON ru.submission_box_id = b.id
-            LEFT JOIN assessment a ON b.assessment_id = a.id AND a.deleted_at IS NULL
+            INNER JOIN rubric_group           rg ON rg.id = rc.rubric_group_id
+            LEFT JOIN  rubric_criterion_usage ru ON rc.id = ru.criterion_id
+            LEFT JOIN  submission_box          b ON ru.submission_box_id = b.id
+            LEFT JOIN  assessment              a ON b.assessment_id = a.id AND a.deleted_at IS NULL
             WHERE rg.parent_type = :parentType
             AND rg.parent_id IN (:$in)
             AND rc.deleted_at IS NULL
@@ -391,10 +391,10 @@ class RubricMapper
                     IF(b.id = :boxId, 1, 0) AS selected,                 -- Is this criterion in use by this box? (ignores whether box is deleted)
                     IF(b.id = :boxId, u.sequence, NULL) AS sequence      -- Only get sequence for this box (ignores whether box is deleted)
                 FROM rubric_criterion c
-                JOIN      rubric_group g ON g.id = c.rubric_group_id
-                LEFT JOIN rubric_usage u ON u.criterion_id = c.id
-                LEFT JOIN submission_box b ON u.submission_box_id = b.id                  -- This will join to deleted boxes
-                LEFT JOIN assessment a ON b.assessment_id = a.id AND a.deleted_at IS NULL -- But won't join to deleted assessments
+                JOIN      rubric_group           g ON g.id = c.rubric_group_id
+                LEFT JOIN rubric_criterion_usage u ON u.criterion_id = c.id
+                LEFT JOIN submission_box         b ON u.submission_box_id = b.id                      -- This will join to deleted boxes
+                LEFT JOIN assessment             a ON b.assessment_id = a.id AND a.deleted_at IS NULL -- But won't join to deleted assessments
                 WHERE g.parent_type = :parentType
                 AND g.parent_id IN (:$in)
                 AND c.deleted_at IS NULL

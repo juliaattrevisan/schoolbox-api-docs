@@ -23,7 +23,7 @@ use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 class UsageMapper extends Schoolbox\Mapper {
 
     protected function mapping() {
-        $this->hasTable('rubric_usage');
+        $this->hasTable('rubric_criterion_usage');
         $this->hasModel(Usage::class);
         $this->uses('sequence', self::TYPE_INTEGER);
         $this->joins('criterion_id', CriterionMapper::class, 'id', null, null, 'criterion', 'criterion');
