@@ -81,7 +81,7 @@
 
                                 {# Just show a text value if the descriptor is not selected #}
                                 {% if descriptor.value is not null and showDescriptorValue and (config.rubric_show_points or not studentView) %}
-                                    <span class="rb-value {% if descriptorMin == descriptorMax %}used {% endif %}{% if descriptor.selected and descriptorMin != descriptorMax %}hide{% endif %}">
+                                    <span class="rb-value {% if descriptorMin == descriptorMax %}used {% elseif descriptor.selected %}hide{% endif %}">
                                         {% if useMarkRange and levelIndex > 0 and descriptorMin != descriptorMax %}
                                             {{- descriptorMin -}} - {{- descriptorMax -}}
                                         {% else %}
