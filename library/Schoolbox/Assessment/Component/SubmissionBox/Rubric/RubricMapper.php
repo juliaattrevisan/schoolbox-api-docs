@@ -287,9 +287,6 @@ class RubricMapper
      */
     protected function findCriteria(SubmissionBox $box, $getParentCriteria)
     {
-        // why 20? because it's not 0. (arbitrary start of group indexes)
-        $groupId = 20;
-
         /** @var array $groupIdMap - indexed by criterion-group name */
         $groupIdMap = [];
 
@@ -307,7 +304,7 @@ class RubricMapper
 
             // First time we've encountered this Group ?
             if (empty($groupIdMap[$groupName])) {
-                ++$groupId;
+                $groupId = $r['group_id'];
 
                 $groupIdMap[$groupName] = $groupId;
                 $groups[$groupId]       = ['name' => $groupName];
@@ -378,6 +375,7 @@ class RubricMapper
         $criteriaStatement = $this->database->query("
             SELECT
                 crit_id,
+                group_id,
                 grouping,
                 name,
                 COUNT(a_id) AS usages,                                   -- How many non-deleted boxes are using the criterion?
@@ -385,6 +383,7 @@ class RubricMapper
             FROM (
                 SELECT
                     c.id AS crit_id,
+                    g.id AS group_id,
                     g.name AS grouping,
                     c.name,
                     a.id AS a_id,                                        -- Will be NULL if not in use by a box, or box is soft-deleted
@@ -402,7 +401,7 @@ class RubricMapper
                 AND g.deleted_at IS NULL
                 ORDER BY selected DESC
             ) t
-            GROUP BY crit_id
+            GROUP BY crit_id, group_id, grouping, name
             ORDER BY selected DESC, MAX(`sequence`) ASC, `grouping` ASC, `name` ASC;
         ", $args);
 
