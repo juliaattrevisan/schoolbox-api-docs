@@ -432,8 +432,20 @@ class Controller extends Base
      */
     private function getResponseErrorMessage(RequestException $e): string
     {
-        try{
-            return $e->getResponse() ? $e->getResponse()->getBody()->getContents() : $e->getMessage();
+        $response = $e->getResponse();
+        if (!$response) {
+            return $e->getMessage();
+        }
+
+        // The SHAPs API is JSON. If we got HTML, we're probably hitting somewhere random.
+        $contentTypes = $response->getHeader('Content-Type');
+        foreach ($contentTypes as $contentType) {
+            if (0 === \strpos($contentType, 'text/html')) {
+                return 'Schoolbox Help API address appears misconfigured.';
+            }
+        }
+        try {
+            return $response->getBody()->getContents();
         } catch (\RuntimeException $e) {
             return $e->getMessage();
         }
