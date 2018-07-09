@@ -91,11 +91,13 @@
                                 {% endif %}
                             </label>
                             {# Render a dropdown to select a value from the range #}
-                            <select id="rangeDropdown-{{ descriptor.id }}" class="{% if useMarkRange and descriptorMin != descriptorMax %}used{% endif %}{% if not useMarkRange or not descriptor.selected or descriptorMin == descriptorMax %} hide{% endif %}">
+                            <select id="rangeDropdown-{{ descriptor.id }}"
+                                    class="{% if not descriptor.selected %} hide{% endif %}
+                                    {% if useMarkRange and descriptorMin != descriptorMax %}used{% endif %}">
                                 {% for i in range(descriptorMin, descriptorMax) %}
                                     <option
                                         value={{ i }}
-                                        {# TODO make sure this uses the actual selected value when the user changes it #}
+                                        {# TODO once DB writeback is implemented, make sure this uses the actual selected value when the user changes it #}
                                         {% if i == descriptorMax %}selected{% endif %}
                                     >{{ i }}
                                     </option>
