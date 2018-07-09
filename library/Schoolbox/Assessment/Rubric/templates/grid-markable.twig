@@ -70,6 +70,7 @@
                                    data-rubric-descriptor="{{ descriptor.id }}"
                                    {% if descriptor.selected %}checked="checked"{% endif %}
                             />
+                            
                             <label for="{{ inputId }}">
                                 <span class="rb-description">
                                     {{- descriptor.text|nl2br -}}
@@ -89,8 +90,8 @@
                                         {{ descriptor.value }}
                                     </span>
                                 {% endif %}
-
                             </label>
+
                             {% if learnerSelected %}
                                 <img class="rb-self-reflection-choice"
                                      src="/portrait.php?userId={{ learner.externalId }}&amp;size=square32"
