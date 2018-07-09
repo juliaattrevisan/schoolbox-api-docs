@@ -29,11 +29,10 @@
                                     on {{ article.updatedAt.local }}
                                 </p>
 
-                                {# TODO: Have a /news/topic url lol #}
                                 {% if article.topics|length %}
                                     <p class="meta">Related topics:
                                         {% for topic in article.topics %}
-                                            <a href="/news/topic/{{ topic.slug }}">{{ topic.name }}</a>{% if not loop.last %}, {% endif %}
+                                            <a href="{{ routeLookup('commsNews.getIndex', {slug: topic.slug}) }}" title="More {{ locale.news }} in {{ topic.name }}">{{ topic.name }}</a>{% if not loop.last %}, {% endif %}
                                         {% endfor %}
                                     </p>
                                 {% endif %}
@@ -71,11 +70,10 @@
                                 <p class="meta">Authored by {{ article.author.fullname }} on {{ article.updatedAt.local }}</p>
                                 <p class="meta">Accepted by {{ article.acceptedBy.fullname }} on {{ article.updatedAt.local }}</p>
 
-                                {# TODO: Have a /news/topic url lol #}
                                 {% if article.topics|length %}
                                     <p class="meta">Related topics:
                                         {% for topic in article.topics %}
-                                            <a href="/news/topic/{{ topic.slug }}">{{ topic.name }}</a>{% if not loop.last %}, {% endif %}
+                                            <a href="{{ routeLookup('commsNews.getIndex', {slug: topic.slug}) }}" title="More {{ locale.news }} in {{ topic.name }}">{{ topic.name }}</a>{% if not loop.last %}, {% endif %}
                                         {% endfor %}
                                     </p>
                                 {% endif %}
