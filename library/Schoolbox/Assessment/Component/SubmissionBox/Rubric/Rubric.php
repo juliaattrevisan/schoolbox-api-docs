@@ -39,7 +39,7 @@ class Rubric extends Core\Rubric
      *
      * @var SplObjectStorage|Core\Criteria\Criterion[]
      */
-    private $cCache;
+    private $criterionCache;
 
     /**
      * Maps domain object Criterion to ORM Usage.
@@ -48,7 +48,7 @@ class Rubric extends Core\Rubric
      *
      * @var SplObjectStorage|Core\Criteria\Criterion[]
      */
-    private $uCache;
+    private $criterionUsageCache;
 
     /**
      * Maps domain object Level to ORM Level.
@@ -57,7 +57,7 @@ class Rubric extends Core\Rubric
      *
      * @var SplObjectStorage|Core\Competency\Level[]
      */
-    private $lCache;
+    private $levelCache;
 
     /**
      * Maps domain object Descriptor to ORM Descriptor.
@@ -67,7 +67,7 @@ class Rubric extends Core\Rubric
      *
      * @var SplObjectStorage|Core\Descriptor[]
      */
-    private $dCache;
+    private $descriptorCache;
 
     /**
      * Maps domain object Descriptor to ORM Mark.
@@ -77,7 +77,7 @@ class Rubric extends Core\Rubric
      *
      * @var SplObjectStorage|Mark[]
      */
-    private $mCache;
+    private $markCache;
 
 
     /**
@@ -91,11 +91,11 @@ class Rubric extends Core\Rubric
         $this->setSubmissionBox($submissionBox);
 
         // setup caching
-        $this->cCache = new SplObjectStorage();
-        $this->dCache = new SplObjectStorage();
-        $this->lCache = new SplObjectStorage();
-        $this->uCache = new SplObjectStorage();
-        $this->mCache = new SplObjectStorage();
+        $this->criterionCache      = new SplObjectStorage();
+        $this->descriptorCache     = new SplObjectStorage();
+        $this->levelCache          = new SplObjectStorage();
+        $this->criterionUsageCache = new SplObjectStorage();
+        $this->markCache           = new SplObjectStorage();
     }
 
 
@@ -150,7 +150,7 @@ class Rubric extends Core\Rubric
      */
     protected function createORMCriterion(Core\Criteria\Criterion $criterion, $groupName = '')
     {
-        if (!$this->cCache->contains($criterion)) {
+        if (!$this->criterionCache->contains($criterion)) {
             try {
                 $model    = CriterionMapper::getInstance()->findById($criterion->getId());
                 $parentId = $model->getGroup()->getParentId();
@@ -168,10 +168,10 @@ class Rubric extends Core\Rubric
                   ->setParentId($parentId)
             ;
 
-            $this->cCache->attach($criterion, $model);
+            $this->criterionCache->attach($criterion, $model);
         }
 
-        $return = $this->cCache->offsetGet($criterion);
+        $return = $this->criterionCache->offsetGet($criterion);
         $return->getGroup()->setName($groupName ?: $criterion->getGroup()->getName());
         return $return;
     }
@@ -206,16 +206,16 @@ class Rubric extends Core\Rubric
      */
     protected function createORMUsage(Core\Criteria\Criterion $criterion, $sequence)
     {
-        if (!$this->uCache->contains($criterion)) {
-            $this->uCache->attach($criterion,
+        if (!$this->criterionUsageCache->contains($criterion)) {
+            $this->criterionUsageCache->attach($criterion,
                 UsageMapper::getInstance()
                   ->createModel()
-                  ->setCriterion($this->cCache->offsetGet($criterion))
+                  ->setCriterion($this->criterionCache->offsetGet($criterion))
                   ->setSubmissionBox($this->box)
             );
         }
 
-        return $this->uCache->offsetGet($criterion)->setSequence($sequence);
+        return $this->criterionUsageCache->offsetGet($criterion)->setSequence($sequence);
     }
 
 
@@ -244,7 +244,7 @@ class Rubric extends Core\Rubric
      */
     protected function createORMLevel(Core\Competency\Level $level, $sequence)
     {
-        if (!$this->lCache->contains($level)) {
+        if (!$this->levelCache->contains($level)) {
 
             if ($level->getId()) {
                 $model = LevelMapper::getInstance()->findById($level->getId());
@@ -260,12 +260,12 @@ class Rubric extends Core\Rubric
                 }
             }
 
-            $this->lCache->attach($level, $model
+            $this->levelCache->attach($level, $model
                   ->setName($level->getName())
                   ->setSubmissionBox($this->box)
             );
         }
-        return $this->lCache->offsetGet($level)->setSequence($sequence);
+        return $this->levelCache->offsetGet($level)->setSequence($sequence);
     }
 
 
@@ -296,7 +296,7 @@ class Rubric extends Core\Rubric
      */
     protected function createORMDescriptor(Core\Descriptor $descriptor, Core\Competency\Level $level, $sequence)
     {
-        if (!$this->dCache->contains($descriptor)) {
+        if (!$this->descriptorCache->contains($descriptor)) {
             // models we need
             $critModel = $this->createORMCriterion($descriptor->getCriterion());
             $lvlModel  = $this->createORMLevel($level, $sequence);
@@ -322,10 +322,10 @@ class Rubric extends Core\Rubric
                 ->setLevel($lvlModel)
                 ->setDeletedAt(new \Alaress_Date_NullDate());
 
-            $this->dCache->attach($descriptor, $model);
+            $this->descriptorCache->attach($descriptor, $model);
         }
 
-        return $this->dCache->offsetGet($descriptor);
+        return $this->descriptorCache->offsetGet($descriptor);
     }
 
 
@@ -373,8 +373,8 @@ class Rubric extends Core\Rubric
      */
     protected function createORMMark(Core\Descriptor $descriptor, Alaress_Date_Format $timestamp, User $student)
     {
-        if (!$this->mCache->contains($descriptor)) {
-            $this->mCache->attach($descriptor,
+        if (!$this->markCache->contains($descriptor)) {
+            $this->markCache->attach($descriptor,
                 MarkMapper::getInstance()
                  ->createModel()
                  ->setDescriptor($this->createORMDescriptor($descriptor, $descriptor->getLevel(), 0))
@@ -382,9 +382,9 @@ class Rubric extends Core\Rubric
             );
         }
 
-        return $this->mCache->offsetGet($descriptor)
-            ->setCreatedAt($timestamp)
-            ->setStudent($student);
+        return $this->markCache->offsetGet($descriptor)
+                               ->setCreatedAt($timestamp)
+                               ->setStudent($student);
     }
 
 
