@@ -69,10 +69,6 @@ class Module extends BaseModule
             return $this->preloadNews($params);
         };
 
-        /* Index of articles audienced to you
-         */
-        $this->register('GET', '{/slug}', 'getIndex', $viewPerms);
-
         /* Create news article
          */
         $this->register('GET', '/create', 'getCreate', $getPerms);
@@ -98,6 +94,10 @@ class Module extends BaseModule
         /* Get a list of articles audienced to me, by topic
          */
         $this->register('GET', '/list/{topicId:\d+}/{limit:\d+}', 'getListByTopic', $viewPerms);
+
+        /* Index of articles audienced to you
+         */
+        $this->register('GET', '{/slug}', 'getIndex', $viewPerms);
     }
 
 
