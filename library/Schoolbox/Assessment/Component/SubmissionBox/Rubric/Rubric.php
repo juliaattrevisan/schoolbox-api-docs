@@ -170,29 +170,32 @@ class Rubric extends Core\Rubric
     protected function createORMCriterion(Core\Criteria\Criterion $criterion, $groupName = '')
     {
         if (!$this->criterionCache->contains($criterion)) {
-            try {
-                $model    = CriterionMapper::getInstance()->findById($criterion->getId());
-                $parentId = $model->getGroup()->getParentId();
+            $model = CriterionMapper::getInstance()->findByIdWithFallback($criterion->getId());
 
-            } catch (Mapper\Exception $e) {
-                $model    = CriterionMapper::getInstance()->createModel();
-                $parentId = $this->box->getCategory()->getId();
-                $model->setGroup(GroupMapper::getInstance()->createModel());
-            }
+//            try {
+//                $model    = CriterionMapper::getInstance()->findById($criterion->getId());
+//                $parentId = $model->getGroup()->getParentId();
+//
+//            } catch (Mapper\Exception $e) {
+//                $model    = CriterionMapper::getInstance()->createModel();
+//                $parentId = $this->box->getCategory()->getId();
+//                $model->setGroup(GroupMapper::getInstance()->createModel());
+//            }
 
-            $model->setName($criterion->getName());
-            $model->getGroup()
-                  ->setName($groupName)
-                  ->setParentType(Group::PARENT_TYPE_CATEGORY)
-                  ->setParentId($parentId)
-            ;
+            $model->setName($criterion->getName())
+                  ->setGroup($this->createORMGroup($criterion->getGroup()));
+//            $model->getGroup()
+//                  ->setName($groupName)
+//                  ->setParentType(Group::PARENT_TYPE_CATEGORY)
+//                  ->setParentId($parentId)
+//            ;
 
             $this->criterionCache->attach($criterion, $model);
         }
 
-        $return = $this->criterionCache->offsetGet($criterion);
-        $return->getGroup()->setName($groupName ?: $criterion->getGroup()->getName());
-        return $return;
+        return $this->criterionCache->offsetGet($criterion);
+//        $return->getGroup()->setName($groupName ?: $criterion->getGroup()->getName());
+//        return $return;
     }
 
 
