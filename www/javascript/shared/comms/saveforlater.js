@@ -1,5 +1,6 @@
 (function() {
 
+
     /**
      * Save For Later
      *
@@ -11,7 +12,7 @@
         var config = init(options, $(this));
 
         initSaveForLater();
-        initSaveForLaterActions();
+        // initSaveForLaterActions();
 
         /**
          * Init
@@ -78,7 +79,7 @@
         /**
          * Set up event listeners
          */
-        function initSaveForLaterActions() {
+        this.initSaveForLaterActions = function() {
             $(config.element).on('click', 'a[data-saveforlater]', function(event) {
                 event.preventDefault();
 
@@ -109,7 +110,6 @@
                         css: 'success'
                     });
 
-                    console.log(response);
                     // Update data attribute
                     $element.attr('data-saveforlater', response.currentValue);
 
@@ -128,6 +128,8 @@
                 });
 
             });
-        }
-    }
+        };
+
+        return this;
+    };
 }(jQuery));

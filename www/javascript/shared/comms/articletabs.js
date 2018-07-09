@@ -16,6 +16,8 @@
         getArticles(config.firstUrl);
         initListeners();
 
+        $('#component3').saveForLater().initSaveForLaterActions();
+
         /**
          * Init
          *
@@ -68,6 +70,9 @@
                 url: url,
                 dataType: 'html'
             }).success(function (response) {
+
+                /* Note that we don't need to reapply initSaveForLaterActions() again
+                 */
                 $(config.element).html(response).saveForLater();
 
                 /* Cache the response so we don't need to refetch it
