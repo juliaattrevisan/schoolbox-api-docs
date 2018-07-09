@@ -474,15 +474,37 @@ class Controller extends Base
     /**
      * @param string $slug
      * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     public function getIndex(?string $slug)
     {
-        new \Alaress_Probe($slug);
-        return;
-//        $outcome = (new Lists($this->newsMapper, $this->policyMapper))->findForTopic($this->getUser(), $topicId, $limit);
-//
-//        echo 'test';
+        /* News Topics were never obtainable by slug
+         * We always fetched everything, then manually sorted by slug
+         * Inherit this situation, improvise and adapt (or just use ids...)
+         */
+        $topics = TopicMapper::getInstance()->findAll();
 
-        return;
+        /* By default, select the All tab...
+         * but try to find the topic whose slug matches the url param
+         */
+        $topicId = Mapper::TOPIC_ALL;
+
+        foreach($topics as $topic) {
+            if ($topic->getSlug() === $slug) {
+                $topicId = $topic->getId();
+                break;
+            }
+        }
+
+        /* Get this many articles per page
+         * TODO: Add pagination
+         */
+        $limit = 10;
+
+        /* Once we found the topicId, get a bunch of articles for that topic
+         */
+        $outcome = (new Lists($this->newsMapper, $this->policyMapper))->findForTopic($this->getUser(), $topicId, $limit);
+
+        $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/index.twig', $outcome));
     }
 }
