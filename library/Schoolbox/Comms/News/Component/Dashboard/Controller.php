@@ -91,7 +91,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
         /* Figure out the first topic to select by default
          * This initiates an async to load actual articles
          */
-        $this->allDefault = $this->getConfig('default');
+        $this->allDefault = (bool)$this->getConfig('default');
 
         $this->firstTopicId = $this->allDefault ? News\Mapper::TOPIC_ALL : $this->topics->first()->getId();
 
@@ -119,7 +119,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
             'topics' => $this->topics,
             'topicAll' => News\Mapper::TOPIC_ALL,
             'firstTopicId' => $this->firstTopicId,
-            'allDefault' => (bool)$this->allDefault,
+            'allDefault' => $this->allDefault,
             'compactMode' => $this->getConfig('compactMode'),
             'limit' => $this->getConfig('size')
         ]);
