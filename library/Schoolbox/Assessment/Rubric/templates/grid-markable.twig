@@ -81,7 +81,7 @@
 
                                 {# Just show a text value if the descriptor is not selected #}
                                 {% if descriptor.value is not null and showDescriptorValue and (config.rubric_show_points or not studentView) %}
-                                    <span class="rb-value {% if descriptor.selected %}hide{% endif %}">
+                                    <span class="rb-value {% if descriptor.selected and descriptorMin != descriptorMax %}hide{% endif %}">
                                         {% if useMarkRange and levelIndex > 0 and descriptorMin != descriptorMax %}
                                             {{- descriptorMin -}} - {{- descriptorMax -}}
                                         {% else %}
@@ -91,7 +91,7 @@
                                 {% endif %}
                             </label>
                             {# Render a dropdown to select a value from the range #}
-                            <select id="rangeDropdown-{{ descriptor.id }}" {% if not useMarkRange or not descriptor.selected %}class="hide"{% endif %}>
+                            <select id="rangeDropdown-{{ descriptor.id }}" {% if not useMarkRange or not descriptor.selected or descriptorMin == descriptorMax %}class="hide"{% endif %}>
                                 {% for i in range(descriptorMin, descriptorMax) %}
                                     <option
                                         value={{ i }}
