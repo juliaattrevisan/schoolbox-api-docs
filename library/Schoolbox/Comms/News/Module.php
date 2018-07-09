@@ -71,7 +71,7 @@ class Module extends BaseModule
 
         /* Index of articles audienced to you
          */
-        $this->register('GET', '', 'getIndex', $viewPerms);
+        $this->register('GET', '{/slug}', 'getIndex', $viewPerms);
 
         /* Create news article
          */

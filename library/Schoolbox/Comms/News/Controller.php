@@ -472,12 +472,16 @@ class Controller extends Base
 
 
     /**
-     *
+     * @param string $slug
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
      */
-    public function getIndex()
+    public function getIndex(?string $slug)
     {
-
-        echo 'test';
+        new \Alaress_Probe($slug);
+        return;
+//        $outcome = (new Lists($this->newsMapper, $this->policyMapper))->findForTopic($this->getUser(), $topicId, $limit);
+//
+//        echo 'test';
 
         return;
     }
