@@ -14,26 +14,26 @@ use AcceptanceTester;
  */
 class Index
 {
-    const URL = '/news/{topic}';
+    public const URL = '/news/{topic}';
 
     // Selectors
 
     // TODO all of these should have better selectors
     // TODO all of these belong in the main content of a page (#content)
 
-    const LINK_ADD_NEWS = '.icon-add';
-    const LINK_ARCHIVE  = '.icon-archive';
-    const LINK_RSS      = '.icon-rss';
+    public const LINK_ADD_NEWS = '.icon-add';
+    public const LINK_ARCHIVE  = '.icon-archive';
+    public const LINK_RSS      = '.icon-rss';
 
-    CONST ELEMENT_BREADCRUMB   = '.breadcrumb';
-    CONST ELEMENT_FILTER_TOPIC = '.tabs';
+    public const ELEMENT_BREADCRUMB   = '.breadcrumb';
+    public const ELEMENT_FILTER_TOPIC = '.tabs';
 
-    CONST ELEMENT_NEWS_LIST             = '.information-list';
-    CONST ELEMENT_NEWS_ITEM             = self::ELEMENT_NEWS_LIST . ' .actions-small-1';
-    CONST ELEMENT_NEWS_ITEM_META_AUTHOR = self::ELEMENT_NEWS_ITEM . ' .card > .meta:nth-of-type(1)';
-    CONST ELEMENT_NEWS_ITEM_META_DATE   = self::ELEMENT_NEWS_ITEM . ' .card > .meta:nth-of-type(2)';
-    CONST LINK_NEWS_ITEM_VIEW           = self::ELEMENT_NEWS_ITEM . ' .card > a';
-    CONST LINK_NEWS_ITEM_MODIFY         = self::ELEMENT_NEWS_ITEM . ' .icon-modify';
+    public const ELEMENT_NEWS_LIST             = '.information-list';
+    public const ELEMENT_NEWS_ITEM             = self::ELEMENT_NEWS_LIST . ' .actions-small-1';
+    public const ELEMENT_NEWS_ITEM_META_AUTHOR = self::ELEMENT_NEWS_ITEM . ' .card > .meta:nth-of-type(1)';
+    public const ELEMENT_NEWS_ITEM_META_DATE   = self::ELEMENT_NEWS_ITEM . ' .card > .meta:nth-of-type(2)';
+    public const LINK_NEWS_ITEM_VIEW           = self::ELEMENT_NEWS_ITEM . ' .card > a';
+    public const LINK_NEWS_ITEM_MODIFY         = self::ELEMENT_NEWS_ITEM . ' .icon-modify';
 
     /**
      * @var AcceptanceTester
