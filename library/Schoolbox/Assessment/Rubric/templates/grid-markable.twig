@@ -70,7 +70,7 @@
                                    data-rubric-descriptor="{{ descriptor.id }}"
                                    {% if descriptor.selected %}checked="checked"{% endif %}
                             />
-                            
+
                             <label for="{{ inputId }}">
                                 <span class="rb-description">
                                     {{- descriptor.text|nl2br -}}
@@ -79,18 +79,29 @@
                                 {% set descriptorMin = levelIndex > 0 ? rubric.descriptors[crit.id][levelIndex - 1].value + 1 : descriptor.value %}
                                 {% set descriptorMax = descriptor.value %}
 
-                                {% if useMarkRange and levelIndex > 0 and descriptorMin != descriptorMax %}
-                                    {% if descriptor.value is not null and showDescriptorValue and (config.rubric_show_points or not studentView) %}
+                                {# Just show a text value if the descriptor is not selected #}
+                                {% if not descriptor.selected %}
+                                    {% if useMarkRange and levelIndex > 0 and descriptorMin != descriptorMax %}
+                                        {% if descriptor.value is not null and showDescriptorValue and (config.rubric_show_points or not studentView) %}
+                                            <span class="rb-value">
+                                                {{- descriptorMin -}} - {{- descriptorMax -}}
+                                            </span>
+                                        {% endif %}
+                                    {% elseif descriptor.value is not null and showDescriptorValue and (config.rubric_show_points or not studentView) %}
                                         <span class="rb-value">
-                                            {{- descriptorMin -}} - {{- descriptorMax -}}
+                                            {{ descriptor.value }}
                                         </span>
                                     {% endif %}
-                                {% elseif descriptor.value is not null and showDescriptorValue and (config.rubric_show_points or not studentView) %}
-                                    <span class="rb-value">
-                                        {{ descriptor.value }}
-                                    </span>
                                 {% endif %}
                             </label>
+                            {% if descriptor.selected and useMarkRange %}
+                                {# If we selected this descriptor, render a dropdown to select a value from the range #}
+                                <select>
+                                    {% for i in range(descriptorMin, descriptorMax) %}
+                                        <option value={{ i }}>{{ i }}</option>
+                                    {% endfor %}
+                                </select>
+                            {% endif %}
 
                             {% if learnerSelected %}
                                 <img class="rb-self-reflection-choice"
