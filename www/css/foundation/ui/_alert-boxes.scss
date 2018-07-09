@@ -119,33 +119,32 @@ $alert-default-background: darken($body-bg, 10%);
     }
 }
 
-/* Crouton pop-up alert...
-*  A less obnoxious pop-up alert
-*/
+// Crouton pop-up alert...
+// A less obnoxious pop-up alert
 .crouton {
     background-color: $tuatara;
-    color: $white;
-    text-align: center;
-    font-size: $base-font-size;
-    padding: 0.875rem 1.25rem;
-    position: fixed;
     bottom: 1rem;
-    right: 1rem;
-    z-index: 100;
+    color: $white;
     display: block;
+    font-size: $base-font-size;
     opacity: 0;
+    padding: .875rem 1.25rem;
+    position: fixed;
+    right: 1rem;
+    text-align: center;
+    z-index: 100;
     @include transition(all, .3s, cubic-bezier(0.65, 0.05, 0.36, 1), 0s);
     &.pop {
         @include transform(translateY(0));
         opacity: 1;
     }
-    &.success:before {
+    &.success::before {
         background-color: $success-color;
         border-radius: .75rem;
         content: '';
         display: inline-block;
-        margin-right: 0.5rem;
         height: .75rem;
+        margin-right: .5rem;
         width: .75rem;
     }
 }
