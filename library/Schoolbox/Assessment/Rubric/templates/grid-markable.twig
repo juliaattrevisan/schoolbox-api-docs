@@ -98,7 +98,12 @@
                                 {# If we selected this descriptor, render a dropdown to select a value from the range #}
                                 <select id="rangeDropdown-{{ descriptor.id }}">
                                     {% for i in range(descriptorMin, descriptorMax) %}
-                                        <option value={{ i }}>{{ i }}</option>
+                                        <option
+                                            value={{ i }}
+                                            {# TODO make sure this uses the actual selected value when the user changes it #}
+                                            {% if i == descriptorMax %}selected{% endif %}
+                                        >{{ i }}
+                                        </option>
                                     {% endfor %}
                                 </select>
                             {% endif %}
