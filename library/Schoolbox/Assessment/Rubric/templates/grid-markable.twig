@@ -76,6 +76,7 @@
                                     {{- descriptor.text|nl2br -}}
                                 </span>
 
+                                {# TODO most of this calculating should be done in PHP probably #}
                                 {# TODO fix this for descending #}
                                 {% set descriptorStart = levelIndex > 0 ? rubric.descriptors[crit.id][levelIndex - 1].value + 1 : descriptor.value %}
                                 {% set descriptorEnd = descriptor.value %}
