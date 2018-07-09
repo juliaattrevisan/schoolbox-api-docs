@@ -234,19 +234,26 @@
         });
 
         function showHideRangeInput($changedCell) {
-            var $allCells = $("[data-rubric], [data-rubric-group]")
-            console.log($allCells.siblings("label").find("rb-value.used"));
+            var $allCellsInRow = $changedCell.parents("tr").find("[data-rubric], [data-rubric-group]");
 
-            // Reset grid before showing appropriate elements
-            $allCells.siblings("select").addClass("hide");
-            $allCells.siblings("label").find("rb-value.used").removeClass("hide");
+            // Hide dropdowns on all cells in the same row
+            $allCellsInRow.siblings("select").addClass("hide");
+
+            // Show text labels on all cells in the same row
+            $allCellsInRow.siblings("label").find(".rb-value").removeClass("hide");
 
             if ($changedCell.prop('checked')) {
+                console.log("Checked");
+
+                // Hide the text label on the selected cell
+                $changedCell.siblings("label").find(".rb-value").addClass("hide");
+
                 // This will only un-hide an element if that element is the one we need to use on that cell:
                 // - Dropdowns are only used on cells with a range
-                // - Cells with a single value just get a text display label
+                // - Cells with a single value just get a text label
+
                 $changedCell.siblings("select.used").removeClass("hide");
-                $changedCell.siblings("label").find("rb-value.used").removeClass("hide");
+                $changedCell.siblings("label").find(".rb-value.used").removeClass("hide");
             }
         }
 
