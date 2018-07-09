@@ -764,8 +764,13 @@ class RubricMapper
         LevelMapper::getInstance()->save($levels = $rubric->getORMLevels());
 
         // usages are a join table with a sequence, not a strict "object" - as such, we can purge the relevant records and simply re-create them
+        // TODO consider removing submission_box_id, associating with group ID instead
         UsageMapper::getInstance()->deleteByColumn('submission_box_id', $submissionBox->getId());
         UsageMapper::getInstance()->save($usages = $rubric->getORMCriterionUsages());
+
+        // ditto group usages
+        GroupUsageMapper::getInstance()->deleteByColumn('submission_box_id', $submissionBox->getId());
+        GroupUsageMapper::getInstance()->save($rubric->getORMGroupUsages());
 
         // finally, now that everything else is saved, save the descriptors
         $descIds = DescriptorMapper::getInstance()->save($descs = $rubric->getORMDescriptors());
