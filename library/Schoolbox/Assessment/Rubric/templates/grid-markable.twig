@@ -96,7 +96,7 @@
                             </label>
                             {% if descriptor.selected and useMarkRange %}
                                 {# If we selected this descriptor, render a dropdown to select a value from the range #}
-                                <select>
+                                <select id="rangeDropdown-{{ descriptor.id }}">
                                     {% for i in range(descriptorMin, descriptorMax) %}
                                         <option value={{ i }}>{{ i }}</option>
                                     {% endfor %}
