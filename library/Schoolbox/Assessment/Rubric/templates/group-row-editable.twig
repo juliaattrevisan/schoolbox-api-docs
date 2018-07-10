@@ -31,8 +31,10 @@
         {% endif %}
 
         {# Max value: default to max from criteria #}
-        <input type="number" value="{{ group.maxValue }}" name="{{ groupInput }}[maxValue]" />
-        {#{{ dump(group) }}#}
+        <input type="number"
+               value="{{ group.maxValue }}"
+               name="{{ groupInput }}[maxValue]"
+               data-group-max-value />
     </th>
 </tr>
 {%- endif %}

@@ -242,24 +242,11 @@
             var max = 0;
 
             // iterate the grid, and sum the max of each row
-            $('[data-rb-grid]').find('tr[data-sequencer-group]').each(function () {
-                var $row = $(this),
-                    rowMax = 0;
-
-                if ($row.find('[data-criterion-name]:checked').length === 0) {
-                    return true; // jq.continue
+            $('[data-rb-grid]').find('[data-group-max-value]').each(function () {
+                var i = parseFloat($(this).val());
+                if (!isNaN(i)) {
+                    max += i;
                 }
-
-                $row.find('[data-descriptor-value]').each(function () {
-                    var i = parseFloat($(this).val());
-
-                    if (!isNaN(i)) {
-                        rowMax = Math.max(rowMax, i);
-                    }
-
-                });
-
-                max += rowMax;
             });
 
             max = parseFloat(max.toFixed(2));
@@ -304,7 +291,5 @@
             });
             return groupTotals;
         }
-
-        console.log(calculateRubricGroupTotals());
     });
 </script>
