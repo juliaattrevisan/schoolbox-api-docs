@@ -318,12 +318,14 @@ class Controller extends Base
         $rubric = $rubricData['rubricContext']['rubric'];
         $markRangeMetadata = $this->getMarkRangeMetadata($rubric);
 
-        $data = array_merge($data, $rubricData, $markRangeMetadata);
+        $data = array_merge($data, $rubricData);
 
         /* Augment with self-reflection rubric data
          */
         $selfReflectionData = (new SelfReflection\Rubric($assessment, $participant, $response, $rubricContext))->generate();
         $data = array_merge($data, $selfReflectionData);
+
+        $data['descriptorMetadata'] = $markRangeMetadata;
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/inlineGrading/standard.twig', $data));
     }
