@@ -32,6 +32,14 @@
         {% else %}
             <label class="meta">{{ groupName }}</label>
         {% endif %}
+
+        {# Max value: default to max from criteria #}
+        <input type="number"
+               value=""
+               name="{{ groupInput }}[maxValue]"
+               data-group-max-value
+               {% if not usingMarkPerCapability %}disabled class="hide"{% endif %}
+        />
     </th>
 </tr>
 {% endif %}

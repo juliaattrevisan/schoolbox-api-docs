@@ -95,6 +95,7 @@ class Controller extends BaseController
                 'id' => $post->get('rubricId'),
                 'levels' => $post->get('levelCount') ? array_fill(0, $post->get('levelCount'), ':)') : [],
             ],
+            'markPerCapability' => $post->getBool('markPerCapability', false),
         ];
 
         $folderId = $post->get('folderId');

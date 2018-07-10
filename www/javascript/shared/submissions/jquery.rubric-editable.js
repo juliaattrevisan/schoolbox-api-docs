@@ -113,7 +113,8 @@
                 groupId: groupId,
                 name: name,
                 levelCount: $rb.children('thead').find('input').length,
-                folderId: $('input[name=folderId]').val()
+                folderId: $('input[name=folderId]').val(),
+                markPerCapability: $('#markPerCapability').prop('checked')
             };
 
             if (type == 'criterion') {
