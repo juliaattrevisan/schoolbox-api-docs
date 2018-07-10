@@ -57,7 +57,6 @@ class Controller extends Base
      */
     private $limit = 1;
 
-
     /**
      * Controller constructor.
      *
@@ -471,29 +470,30 @@ class Controller extends Base
     public function getListByTopic(int $topicId, int $limit)
     {
         if ($this->getRequest()->isXhr()) {
+
+            /* The page number to obtain
+             */
+            $pageNum = $this->determinePageNum($this->getRequest()->query[Mapper::PAGE_NUMBER_PARAM]);
+
             $lists = new Lists($this->newsMapper, $this->policyMapper, $this->saveForLaterMapper);
-
-            $outcome = $lists->findForTopic($this->getUser(), $topicId, $limit);
-
-            $outcome['compactMode'] = $this->getRequest()->query['compactMode'];
 
             /* Figure out the slug from the id
              */
             try {
                 $slug = TopicMapper::getInstance()->findById($topicId)->getSlug();
             } catch (MapperException $e) {
-                $slug = 'all';
+                $slug = Mapper::TOPIC_ALL_SLUG;
             }
 
             /* Get this an accompanying paginator
              */
             $paginator = $lists->generatePaginator(
-                $this->getRouter()->generate('commsNews.getIndex', [ 'slug' => $slug ]),
+                $this->getRouter()->generate('commsNews.getIndex', ['slug' => $slug]),
                 $topicId,
                 $this->limit
             );
 
-            $outcome = $lists->findForTopic($this->getUser(), $topicId, $limit);
+            $outcome = $lists->findForTopic($this->getUser(), $topicId, $limit, $pageNum);
 
             /* Merge a whole bunch of other settings too
              */
@@ -513,12 +513,30 @@ class Controller extends Base
 
 
     /**
+     * The page number to obtain; default to 1
+     * Otherwise use the page number provided
+     *
+     * @param null|string $param
+     * @return int
+     */
+    private function determinePageNum(?string $param): int
+    {
+        return (int)$param ?: 1;
+    }
+
+
+    /**
      * @param string $slug
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws RouteNotFound
      */
     public function getIndex(string $slug)
     {
+        /* The page number to obtain
+         */
+        $pageNum = $this->determinePageNum($this->getRequest()->query[Mapper::PAGE_NUMBER_PARAM]);
+
         /* News Topics were never obtainable by slug
          * We always fetched everything, then manually sorted by slug
          * Inherit this situation, improvise and adapt (or just use ids...)
@@ -540,16 +558,24 @@ class Controller extends Base
         /* Once we found the topicId, get a bunch of articles for that topic
          */
         $outcome = (new Lists($this->newsMapper, $this->policyMapper, $this->saveForLaterMapper))
-            ->findForTopic($this->getUser(), $selectedTopicId, $this->limit);
+            ->findForTopic($this->getUser(), $selectedTopicId, $this->limit, $pageNum);
+
+        /* The currently requested async url
+         */
+        $selectedUrl = $this->getRouter()->generate('commsNews.getListByTopic', [
+            'topicId' => $selectedTopicId,
+            'limit' => $this->limit,
+        ]) . "?p={$pageNum}";
 
         /* Merge a whole bunch of other settings too
          */
         $outcome = array_merge($outcome, [
+            'firstUrl' => $selectedUrl,
             'topics' => $topics,
             'topicAll' => Mapper::TOPIC_ALL_ID,
             'selectedTopicId' => $selectedTopicId,
             'compactMode' => false,
-            'pageNum' => $this->getRequest()->query['p'],
+            'pageNum' => $pageNum,
             'limit' => $this->limit
         ]);
 

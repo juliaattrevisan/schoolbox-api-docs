@@ -24,7 +24,7 @@
             <script>
                 $(function() {
                     $('#news-container').articleTabs({
-                        'firstUrl': "{{ routeLookup('commsNews.getListByTopic', {topicId: selectedTopicId, limit: limit}) ~ '?compactMode=' ~ compactMode }}",
+                        'firstUrl': "{{ firstUrl }}",
                         'topicTabs': $('#news-topics'),
                         'updateUrl': true,
                         'pageNum': '{{ pageNum }}'
@@ -39,7 +39,8 @@
                 topics: topics,
                 topicAll: topicAll,
                 limit: limit,
-                compactMode: compactMode
+                compactMode: compactMode,
+                pageNum: pageNum
             } %}
         </section>
     </div>

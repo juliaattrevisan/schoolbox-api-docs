@@ -53,10 +53,11 @@ class Lists
      * @param User $user
      * @param int  $topicId
      * @param int  $limit
+     * @param int  $pageNum
      * @return array
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      */
-    public function findForTopic(User $user, int $topicId, int $limit): array
+    public function findForTopic(User $user, int $topicId, int $limit, int $pageNum): array
     {
         /* Figure out which ones were saved for later
          */
@@ -65,7 +66,7 @@ class Lists
 
         /* Component config can set "All" as its limit
          */
-        $articles = $this->newsMapper->findForTopic($topicId, $limit);
+        $articles = $this->newsMapper->findForTopic($topicId, $limit, $pageNum);
 
         /* Figure out the articles that this user has saved for later
          */

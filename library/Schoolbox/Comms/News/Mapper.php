@@ -35,6 +35,11 @@ class Mapper extends \Schoolbox\Mapper
     public const TOPIC_ALL_SLUG = 'all';
 
     /**
+     * Querystring param for the current Page Number chosen
+     */
+    public const PAGE_NUMBER_PARAM = 'p';
+
+    /**
      * @inheritdoc
      * @throws \Schoolbox\Mapper\Exception
      */
@@ -185,9 +190,10 @@ class Mapper extends \Schoolbox\Mapper
      *
      * @param int $topicId
      * @param int $limit
+     * @param int $pageNum
      * @return \Schoolbox\GenericCollection
      */
-    public function findForTopic(int $topicId, int $limit): \Schoolbox\GenericCollection
+    public function findForTopic(int $topicId, int $limit, int $pageNum): \Schoolbox\GenericCollection
     {
 
         /* TODO: Filter $articlesInTopic vs articles that I can see
