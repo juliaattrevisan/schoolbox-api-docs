@@ -398,7 +398,8 @@ class Controller extends Base
                         $currentDescriptorMin = $currentDescriptorMax === $nextDescriptorMax ? $nextDescriptorMax : $nextDescriptorMax + 1;
                     }
 
-                    $metadata[$critId][$levelDescriptors[$i]['id']] = [
+                    // Index min and max by level ID for this criterion
+                    $metadata[$critId][$i] = [
                         'min' => $currentDescriptorMin,
                         'max' => $currentDescriptorMax
                     ];
