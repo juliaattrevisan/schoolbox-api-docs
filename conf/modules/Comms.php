@@ -23,6 +23,7 @@ class Comms extends ModuleLoader
     {
         $namespace = 'comms';
 
+        $this->loadModule($kernel, News\AudienceBrowser\Module::class, "/{$namespace}/news/audiencebrowser");
         $this->loadModule($kernel, News\Policy\Module::class, "/{$namespace}/news/policy");
         $this->loadModule($kernel, News\Moderation\Module::class, "/{$namespace}/news/moderation");
         $this->loadModule($kernel, News\SaveForLater\Module::class, "/{$namespace}/news/saved");
