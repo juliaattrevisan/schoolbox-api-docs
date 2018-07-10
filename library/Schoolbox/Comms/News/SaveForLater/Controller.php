@@ -11,7 +11,6 @@ namespace Schoolbox\Comms\News\SaveForLater;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Policy;
-use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception;
 
 class Controller extends Base
@@ -38,11 +37,6 @@ class Controller extends Base
      */
     private $newsMapper;
 
-    /**
-     * @var ErrorMapper
-     */
-    private $errorMapper;
-
 
     /**
      * Controller constructor.
@@ -50,14 +44,12 @@ class Controller extends Base
      * @param Mapper        $saveForLaterMapper
      * @param Policy\Mapper $policyMapper
      * @param News\Mapper   $newsMapper
-     * @param ErrorMapper   $errorMapper
      */
-    public function __construct(Mapper $saveForLaterMapper, Policy\Mapper $policyMapper, News\Mapper $newsMapper, ErrorMapper $errorMapper)
+    public function __construct(Mapper $saveForLaterMapper, Policy\Mapper $policyMapper, News\Mapper $newsMapper)
     {
         $this->saveForLaterMapper = $saveForLaterMapper;
         $this->policyMapper = $policyMapper;
         $this->newsMapper = $newsMapper;
-        $this->errorMapper = $errorMapper;
     }
 
 

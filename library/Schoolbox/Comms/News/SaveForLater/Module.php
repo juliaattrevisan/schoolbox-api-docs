@@ -105,7 +105,6 @@ class Module extends BaseModule
             'saveForLaterMapper' => $this->getMapperFactory()->getLazy(SaveForLaterMapper::class),
             'policyMapper' => $this->getMapperFactory()->getLazy(PolicyMapper::class),
             'newsMapper' => $this->getMapperFactory()->getLazy(NewsMapper::class),
-            'errorMapper' => $this->getMapperFactory()->getLazy(ErrorMapper::class),
         ];
     }
 
