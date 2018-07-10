@@ -340,6 +340,7 @@ class Controller extends Base
         $metadata = [];
 
         foreach($descriptors as $critId => $levelDescriptors) {
+            // TODO not sure indexes like this will work the way I'm currently using them, because the key is the level ID??
             $endIndex = \count($descriptors[$critId]) - 1;
 
             // TODO test these with empty descriptors
@@ -357,7 +358,6 @@ class Controller extends Base
 
             $prevDescriptorMax = $startValue; // Used for ascending order calculations
 
-            // TODO account for missing levels in the list of descriptors when a descriptor is blank
             $numLevels = \count($levelDescriptors);
 
             for ($i = 0; $i < $numLevels; $i++) {
@@ -394,10 +394,14 @@ class Controller extends Base
                     $currentDescriptorMin = $currentDescriptorMax === $nextDescriptorMax ? $nextDescriptorMax : $nextDescriptorMax + 1;
                 }
 
-                $metadata[$critId][$levelDescriptors[$i]['id']] = [
-                    'min' => $currentDescriptorMin,
-                    'max' => $currentDescriptorMax
-                ];
+                // Don't try to add empty descriptors to the metadata
+                // TODO this shouldn't be necessary because we shouldn't even be iterating them in the first place
+                if (! empty($levelDescriptors[$i]['id'])) {
+                    $metadata[$critId][$levelDescriptors[$i]['id']] = [
+                        'min' => $currentDescriptorMin,
+                        'max' => $currentDescriptorMax
+                    ];
+                }
 
                 $prevDescriptorMax = $currentDescriptorMax;
             }
