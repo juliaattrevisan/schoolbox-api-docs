@@ -34,6 +34,11 @@ class Controller extends Base
     private $policyMapper;
 
     /**
+     * @var News\Mapper
+     */
+    private $newsMapper;
+
+    /**
      * @var ErrorMapper
      */
     private $errorMapper;
@@ -44,12 +49,14 @@ class Controller extends Base
      *
      * @param Mapper        $saveForLaterMapper
      * @param Policy\Mapper $policyMapper
+     * @param News\Mapper   $newsMapper
      * @param ErrorMapper   $errorMapper
      */
-    public function __construct(Mapper $saveForLaterMapper, Policy\Mapper $policyMapper, ErrorMapper $errorMapper)
+    public function __construct(Mapper $saveForLaterMapper, Policy\Mapper $policyMapper, News\Mapper $newsMapper, ErrorMapper $errorMapper)
     {
         $this->saveForLaterMapper = $saveForLaterMapper;
         $this->policyMapper = $policyMapper;
+        $this->newsMapper = $newsMapper;
         $this->errorMapper = $errorMapper;
     }
 
@@ -62,7 +69,7 @@ class Controller extends Base
      */
     public function getList()
     {
-        $articles = $this->saveForLaterMapper->findForUser($this->getUser()->getId());
+        $articles = (new Lists($this->saveForLaterMapper, $this->newsMapper))->findForUser($this->getUser()->getId());
 
         try {
             $policy = $this->policyMapper->findOneByColumn('identifier', 'save_for_later');

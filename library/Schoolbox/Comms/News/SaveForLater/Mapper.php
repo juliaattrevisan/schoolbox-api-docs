@@ -33,24 +33,4 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
     }
-
-
-    /**
-     * @param int $userId
-     * @return Collection
-     * @throws InvalidColumnException
-     */
-    public function findForUser(int $userId): Collection
-    {
-        $builder = (new Builder($this->getDatabase(), 'comms_news_saveforlater'))
-            ->equals('user_id', $userId);
-
-        $ids = $this->findScalarByPredicates('article_id', $builder);
-
-        if (\count($ids)) {
-            return News\Mapper::getInstance()->findByColumn('id', $ids);
-        }
-
-        return new Collection();
-    }
 }
