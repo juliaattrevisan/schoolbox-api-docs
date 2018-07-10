@@ -100,10 +100,12 @@
     {% endfor %}
 </ul>
 
+{% if showPaginator %}
 {% include 'sub/paginator.twig' with {
     paginator: paginator,
     page: pageNum
 } %}
+{% endif %}
 
 {% else %}
     <div class="empty-state">
