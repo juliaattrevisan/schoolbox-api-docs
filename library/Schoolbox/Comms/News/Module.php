@@ -18,7 +18,6 @@ use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\News\TopicMapper;
-use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
 
@@ -138,21 +137,22 @@ class Module extends BaseModule
      * @param Container|ContainerInterface $injector The dependency injection container.
      * @throws InvalidArgumentException
      */
-    protected function preInitControllerDependencies(ContainerInterface $injector)
+    protected function preInitControllerDependencies(ContainerInterface $injector): void
     {
         /** @var Container $injector */
         $injector->params[Controller::class] = [
-            'errorMapper' => $this->getMapperFactory()->getLazy(\Schoolbox\Error\Mapper::class),
+            'errorMapper' => $this->getMapperFactory()->getLazy(ErrorMapper::class),
             'newsMapper' => $this->getMapperFactory()->getLazy(Mapper::class),
             'policyMapper' => $this->getMapperFactory()->getLazy(Policy\Mapper::class),
             'topicMapper' => $this->getMapperFactory()->getLazy(TopicMapper::class),
+            'saveForLaterMapper' => $this->getMapperFactory()->getLazy(SaveForLater\Mapper::class),
         ];
     }
 
     /**
      * @inheritdoc
      */
-    public function initControllers(ContainerInterface $injector)
+    public function initControllers(ContainerInterface $injector): void
     {
         $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
     }
@@ -160,7 +160,7 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initTemplatePaths(IChainLoader $templateLoader)
+    public function initTemplatePaths(IChainLoader $templateLoader): void
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }

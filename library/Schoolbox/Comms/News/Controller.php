@@ -13,6 +13,7 @@ use Aura\Router\Exception\RouteNotFound;
 use InvalidArgumentException;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Comms\News\Policy;
+use Schoolbox\Comms\News\SaveForLater;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -44,23 +45,31 @@ class Controller extends Base
     private $topicMapper;
 
     /**
+     * @var SaveForLater\Mapper
+     */
+    private $saveForLaterMapper;
+
+    /**
      * Controller constructor.
      *
-     * @param ErrorMapper      $errorMapper
-     * @param Mapper           $newsMapper
-     * @param Policy\Mapper    $policyMapper
-     * @param TopicMapper      $topicMapper
+     * @param ErrorMapper         $errorMapper
+     * @param Mapper              $newsMapper
+     * @param Policy\Mapper       $policyMapper
+     * @param TopicMapper         $topicMapper
+     * @param SaveForLater\Mapper $saveForLaterMapper
      */
     public function __construct(
         ErrorMapper $errorMapper,
         Mapper $newsMapper,
         Policy\Mapper $policyMapper,
-        TopicMapper $topicMapper
+        TopicMapper $topicMapper,
+        SaveForLater\Mapper $saveForLaterMapper
     ) {
         $this->errorMapper = $errorMapper;
         $this->newsMapper = $newsMapper;
         $this->policyMapper = $policyMapper;
         $this->topicMapper = $topicMapper;
+        $this->saveForLaterMapper = $saveForLaterMapper;
     }
 
 
@@ -332,7 +341,7 @@ class Controller extends Base
 
         if ($saveForLater) {
             try {
-                SaveForLater\Mapper::getInstance()->findOneByColumnList([
+                $this->saveForLaterMapper->findOneByColumnList([
                     'user_id' => $this->getUser()->getId(),
                     'article_id' => $article->getId()
                 ]);
