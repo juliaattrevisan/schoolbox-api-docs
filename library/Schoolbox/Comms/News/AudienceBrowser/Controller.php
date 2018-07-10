@@ -75,6 +75,8 @@ class Controller extends Base
      */
     private function generate(Collection $collection): \Alaress\Web\Output\Json
     {
+        $items = [];
+
         foreach($collection as $item) {
             $items[] = array_combine(['id', 'name'], $item->findValueLabelPair());
         }
