@@ -83,7 +83,7 @@ class Controller extends Base
      *
      * @param News\Model $article
      */
-    public function postToggle(News\Model $article)
+    public function postAdd(News\Model $article): void
     {
         if ($this->getRequest()->isXhr()) {
             $outcome = $this->toggle($article);
