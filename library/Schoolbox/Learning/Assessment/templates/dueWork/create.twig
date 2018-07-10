@@ -234,13 +234,8 @@
             'change',
             '[data-descriptor-value], [data-criterion-name]',
             function () {
-                // Calculate this group's total
-                var $this = $(this),
-                    $thisCriterionRow = $this.closest('[data-group]'),
-                    thisGroupIdentifier = $thisCriterionRow.data('group');
-
-                // Calculate total for the given group that is available
-                calculateGroupTotal(thisGroupIdentifier);
+                // Calculate total for this descriptor's group
+                calculateGroupTotal($(this).closest('[data-group]').data('group'));
 
                 // Then calculate the entire grid total
                 calculateGridTotal();
