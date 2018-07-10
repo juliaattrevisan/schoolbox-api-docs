@@ -342,6 +342,7 @@ class Controller extends Base
         foreach($descriptors as $critId => $levelDescriptors) {
             $endIndex = \count($descriptors[$critId]) - 1;
 
+            // TODO test these with empty descriptors
             $startValue = $descriptors[$critId][0] ? $descriptors[$critId][0]['value'] : null;
             $endValue = $descriptors[$critId][$endIndex] ? $descriptors[$critId][$endIndex]['value'] : null;
             $direction = 'asc';
@@ -355,9 +356,25 @@ class Controller extends Base
             ];
 
             $prevDescriptorMax = $startValue; // Used for ascending order calculations
-            $nextDescriptorMax = $endValue; // Used for descending order calculations
+
             for ($i = 0; $i < \count($levelDescriptors) - 1; $i++) {
+                // For descending descriptors, calculate the values we need to determine the cell's min value later on
+                if ($direction === 'desc') {
+                    $finalIteration = ($i === \count($levelDescriptors) - 1);
+
+                    /* - If it's the last iteration, there's no 'next' descriptor - so just use the same value as this cell
+                     * - Otherwise use the value of the next cell
+                     */
+                    if ($finalIteration) {
+                        $nextDescriptorMax = $endValue;
+                    } else {
+                        $nextDescriptorMax = $levelDescriptors[$i + 1]['value'];
+                    }
+                }
+
+                // The cell's stored value will always be its maximum regardless of order
                 $currentDescriptorMax = $levelDescriptors[$i]['value'];
+
                 /* Assume ascending order by default
                  * - If the value for this descriptor is the same as the previous cell, we're either on the first cell,
                  *   or on a cell without a range
@@ -365,7 +382,7 @@ class Controller extends Base
                  */
                 $currentDescriptorMin = $prevDescriptorMax === $currentDescriptorMax ? $prevDescriptorMax : $prevDescriptorMax + 1;
 
-                // Do something different if we know it's descending
+                // Calculate min value differently if descriptors are descending
                 if ($direction === 'desc') {
                     /* - If the value for this descriptor is the same as the next cell, we're either on the last cell,
                      *   or on a cell without a range
@@ -380,13 +397,6 @@ class Controller extends Base
                 ];
 
                 $prevDescriptorMax = $currentDescriptorMax;
-
-                $finalIteration = ($i === \count($levelDescriptors) - 1);
-                if ($finalIteration) {
-                    $nextDescriptorMax = $endValue;
-                } else {
-                    $nextDescriptorMax = $levelDescriptors[$i + 1]['value'];
-                }
             }
         }
 
