@@ -87,6 +87,7 @@ class Fixture
         //<input type="text" name="itinerary[date][]" id="itineraryDate-new-1529450182910" placeholder="Date" data-itinerary-date="" data-datepicker-time="" value="" data-datepicker-id="2">
         $i->fillField(['name' => 'itinerary[date][]'], $startAt);
         $i->fillField(['name' => 'itinerary[description][]'], 'aaa');
+        $i->wait(3);
 
         // $i->click('.selectize-input');
         foreach ($jsFields as $fieldName => $fieldValue) {
@@ -94,7 +95,7 @@ class Fixture
         }
 
         $i->click('#matchForm [type=submit][value="Create Match"]');
-        $i->wait(3);
+        $i->waitForText('Seasons');
         $matchIds = $i->grabColumnFromDatabase('sportsfixtures_match', 'id',
             ['name' => $fields[self::SELECTOR_NAME], 'start_at' => $startAtDb]);
         return $matchIds[0];

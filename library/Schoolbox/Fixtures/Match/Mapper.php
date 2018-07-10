@@ -375,21 +375,35 @@ class Mapper extends BaseMapper
      */
     private function diffForNotification($object, $previous)
     {
+        // Get diff of match
         $diff = $this->diff($object, $previous);
-        // if number of itinerary items differs
-        if ($object->getItinerary()->count() !== $previous->getItinerary()->count()) {
-            $diff['itinerary'] = true;
-        } else {
-            $itineraryDiff = $object->getItinerary()->diff($previous->getItinerary(),
-                function (ItineraryItem $a, ItineraryItem $b) {
-                    return $a->getStartAt()->getUnixTimeStamp() === $b->getStartAt()->getUnixTimeStamp()
-                        && $a->getDescription() === $b->getDescription();
-                }
 
-            );
-            if ($itineraryDiff->count() != 0) {
-                $diff['itinerary'] = true;
+        // Append itinerary changes to the diff
+        $diffMethod = function (ItineraryItem $a, ItineraryItem $b) {
+            return $a->getStartAt()->getUnixTimeStamp() === $b->getStartAt()->getUnixTimeStamp()
+                && $a->getDescription() === $b->getDescription();
+        };
+
+        // Diff in the both directions to catch deleted itineraries
+        $itineraryModifiedCurrent = $object->getItinerary()->diff($previous->getItinerary(), $diffMethod);
+        $itineraryModifiedPrevious = $previous->getItinerary()->diff($object->getItinerary(), $diffMethod);
+
+        // If any itinerary changes, add earliest time of current and previous itineraries into $diff
+        // The time will be used to determine whether to trigger itinerary change notification
+        if ($itineraryModifiedCurrent->count() > 0 || $itineraryModifiedPrevious->count() > 0) {
+            $itineraryStartAtCurrent = 0;
+            foreach ($itineraryModifiedCurrent as $itinerary) {
+                if ($itineraryStartAtCurrent === 0 || $itinerary->getStartAt()->getUnixTimeStamp() < $itineraryStartAtCurrent) {
+                    $itineraryStartAtCurrent = $itinerary->getStartAt()->getUnixTimeStamp();
+                }
             }
+            $itineraryStartAtPrevious = 0;
+            foreach ($itineraryModifiedPrevious as $itinerary) {
+                if ($itineraryStartAtPrevious === 0 || $itinerary->getStartAt()->getUnixTimeStamp() < $itineraryStartAtPrevious) {
+                    $itineraryStartAtPrevious = $itinerary->getStartAt()->getUnixTimeStamp();
+                }
+            }
+            $diff['itineraryStartAt'] = [$itineraryStartAtCurrent, $itineraryStartAtPrevious];
         }
         return $diff;
     }
