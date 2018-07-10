@@ -311,7 +311,10 @@ class RubricMapper
                 $groupId = $r['group_id'];
 
                 $groupIdMap[$groupName] = $groupId;
-                $groups[$groupId]       = ['name' => $groupName];
+                $groups[$groupId]       = [
+                    'name'     => $groupName,
+                    'maxValue' => $r['max_value'],
+                ];
             }
 
             // check for usage
@@ -382,30 +385,33 @@ class RubricMapper
                 group_id,
                 grouping,
                 name,
+                max_value,
                 COUNT(a_id) AS usages,                                   -- How many non-deleted boxes are using the criterion?
                 MAX(selected) AS selected                                -- Is the criterion in use by this box?
             FROM (
                 SELECT
-                    c.id AS crit_id,
-                    g.id AS group_id,
-                    g.name AS grouping,
-                    c.name,
+                    rc.id AS crit_id,
+                    rg.id AS group_id,
+                    rg.name AS grouping,
+                    rc.name,
+                    rgu.max_value AS max_value,
                     a.id AS a_id,                                        -- Will be NULL if not in use by a box, or box is soft-deleted
-                    IF(b.id = :boxId, 1, 0) AS selected,                 -- Is this criterion in use by this box? (ignores whether box is deleted)
-                    IF(b.id = :boxId, u.sequence, NULL) AS sequence      -- Only get sequence for this box (ignores whether box is deleted)
-                FROM rubric_criterion c
-                JOIN      rubric_group           g ON g.id = c.rubric_group_id
-                LEFT JOIN rubric_criterion_usage u ON u.criterion_id = c.id
-                LEFT JOIN submission_box         b ON u.submission_box_id = b.id                      -- This will join to deleted boxes
-                LEFT JOIN assessment             a ON b.assessment_id = a.id AND a.deleted_at IS NULL -- But won't join to deleted assessments
-                WHERE g.parent_type = :parentType
-                AND g.parent_id IN (:$in)
-                AND c.deleted_at IS NULL
+                    IF(sb.id = :boxId, 1, 0) AS selected,                 -- Is this criterion in use by this box? (ignores whether box is deleted)
+                    IF(sb.id = :boxId, rcu.sequence, NULL) AS sequence      -- Only get sequence for this box (ignores whether box is deleted)
+                FROM rubric_criterion rc
+                INNER JOIN rubric_group           rg  ON rg.id = rc.rubric_group_id
+                LEFT JOIN  rubric_criterion_usage rcu ON rcu.criterion_id = rc.id
+                LEFT JOIN  rubric_group_usage     rgu ON rgu.rubric_group_id = rg.id
+                LEFT JOIN  submission_box         sb  ON rcu.submission_box_id = sb.id                      -- This will join to deleted boxes
+                LEFT JOIN  assessment             a   ON sb.assessment_id = a.id AND a.deleted_at IS NULL -- But won't join to deleted assessments
+                WHERE rg.parent_type = :parentType
+                AND rg.parent_id IN (:$in)
+                AND rc.deleted_at IS NULL
                 AND a.deleted_at IS NULL
-                AND g.deleted_at IS NULL
+                AND rg.deleted_at IS NULL
                 ORDER BY selected DESC
             ) t
-            GROUP BY crit_id, group_id, grouping, name
+            GROUP BY crit_id, group_id, grouping, name, max_value
             ORDER BY selected DESC, MAX(`sequence`) ASC, `grouping` ASC, `name` ASC;
         ", $args);
 
