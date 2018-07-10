@@ -222,8 +222,62 @@
         /**
          * Update max available mark on descriptor point value changes
          * Purposefully placed outside of the document.ready in order to work for a rubric grid that is imported via csv
+         * (Yet it appears to work within document.ready regardless?)
          */
-        $(document).on('change', '[data-rb-grid] [data-descriptor-value], [data-rb-grid] [data-criterion-name]', calculateGridTotal);
+        $('[data-rb-grid]').on('change', '[data-group-max-value]', calculateGridTotal);
+
+
+        // Change a descriptor value: update the group's total
+        // (cascades to grid total, too)
+        $('[data-rb-grid]').on(
+            'change',
+            '[data-descriptor-value], [data-criterion-name]',
+            function () {
+                // Calculate this group's total
+                var $this = $(this),
+                    $thisCriterionRow = $this.closest('[data-group]'),
+                    $thisMaxValueInput = $(),
+                    thisGroupIdentifier = $thisCriterionRow.data('group'),
+                    groupMax = 0;
+
+                // Calculate total for the given group that is available
+                $('[data-rb-grid]').find('[data-group]').each(function () {
+                    var $groupRow = $(this),
+                        groupIdentifier = $groupRow.data('group'),
+                        rowMax = 0;
+
+                    // Parse group ID out of group identifier
+                    if (groupIdentifier === thisGroupIdentifier) {
+
+                        // Is there a max value input here?
+                        var $groupMaxValueInput = $groupRow.find('[data-group-max-value]');
+                        if ($groupMaxValueInput.length > 0) {
+                            $thisMaxValueInput = $groupMaxValueInput;
+                        }
+
+                        if ($groupRow.find('[data-criterion-name]:checked').length === 0) {
+                            return true; // jq.continue
+                        }
+
+                        $groupRow.find('[data-descriptor-value]').each(function () {
+                            var i = parseFloat($(this).val());
+
+                            if (!isNaN(i)) {
+                                rowMax = Math.max(rowMax, i);
+                            }
+                        });
+                    }
+
+                    groupMax += rowMax;
+                });
+
+                // Figure out where the group setting even is
+                $thisMaxValueInput.val(groupMax);
+
+                // Then calculate the entire grid total
+                calculateGridTotal();
+            }
+        );
 
 
         /**
@@ -253,43 +307,6 @@
 
             // Set and validate the max mark
             $('#maxMark').val(max).valid();
-        }
-
-
-        /**
-         * Calculate total for each group that is available
-         */
-        function calculateRubricGroupTotals() {
-            var groupTotals = {};
-            $('[data-rb-grid]').find('tr[data-sequencer-group]').each(function () {
-                var $row         = $(this),
-                    rowMax       = 0,
-                    groupIdMatch = $row.data('group').match(/rb-\d+-(\d)/);
-
-                // Parse group ID out of group identifier
-                if (groupIdMatch) {
-                    var groupId = Number(groupIdMatch[1]);
-
-                    if ($row.find('[data-criterion-name]:checked').length === 0) {
-                        return true; // jq.continue
-                    }
-
-                    $row.find('[data-descriptor-value]').each(function () {
-                        var i = parseFloat($(this).val());
-
-                        if (!isNaN(i)) {
-                            rowMax = Math.max(rowMax, i);
-                        }
-
-                    });
-
-                    if (!(groupId in groupTotals)) {
-                        groupTotals[groupId] = 0;
-                    }
-                    groupTotals[groupId] += rowMax;
-                }
-            });
-            return groupTotals;
         }
     });
 </script>
