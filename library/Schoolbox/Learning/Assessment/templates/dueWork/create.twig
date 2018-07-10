@@ -213,7 +213,7 @@
         // configure callbacks into the grid
         $grid.rubricEditable({
             // Recalculate total for all groups, then recalculate grid total
-            afterApplyResultSet: calculateGridTotal
+            afterApplyResultSet: calculateAllGroupTotals
         });
 
         // Initiate
@@ -225,12 +225,12 @@
          * Purposefully placed outside of the document.ready in order to work for a rubric grid that is imported via csv
          * (Yet it appears to work within document.ready regardless?)
          */
-        $('[data-rb-grid]').on('change', '[data-group-max-value]', calculateGridTotal);
+        $grid.on('change', '[data-group-max-value]', calculateGridTotal);
 
 
         // Change a descriptor value: update the group's total
         // (cascades to grid total, too)
-        $('[data-rb-grid]').on(
+        $grid.on(
             'change',
             '[data-descriptor-value], [data-criterion-name]',
             function () {
@@ -252,9 +252,25 @@
          * Catch a custom event that's fired on rubric csv import
          * Use it to update the max available mark field
          */
-        $('#rubric-attachable').on('rubric-grid-imported', function () {
+        $('#rubric-attachable').on('rubric-grid-imported', calculateAllGroupTotals);
+
+
+        /**
+         * Calculates max available marks for all groups, and then the overall
+         * grid total.
+         */
+        function calculateAllGroupTotals() {
+            // List of all groups, no duplicates
+            var groupIdentifiers = new Set(
+                $grid.find('[data-group]')
+                     .map(function() { return $(this).data('group'); })
+                     .toArray()
+            );
+            groupIdentifiers.forEach(function (groupIdentifier) {
+                calculateGroupTotal(groupIdentifier)
+            });
             calculateGridTotal();
-        });
+        }
 
 
         /**
@@ -267,7 +283,7 @@
             var $thisMaxValueInput = $(),
                 groupMax = 0;
 
-            $('[data-rb-grid]').find('[data-group="'+groupIdentifier+'"]').each(function () {
+            $grid.find('[data-group="'+groupIdentifier+'"]').each(function () {
                 var $criterionRow = $(this),
                     rowMax = 0;
 
@@ -311,7 +327,7 @@
             var max = 0;
 
             // iterate the grid, and sum the max of each row
-            $('[data-rb-grid]').find('[data-group-max-value]').each(function () {
+            $grid.find('[data-group-max-value]').each(function () {
                 var i = parseFloat($(this).val());
                 if (!isNaN(i)) {
                     max += i;
