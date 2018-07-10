@@ -539,7 +539,8 @@ class Controller extends Base
 
         /* Once we found the topicId, get a bunch of articles for that topic
          */
-        $outcome = (new Lists($this->newsMapper, $this->policyMapper))->findForTopic($this->getUser(), $selectedTopicId, $this->limit);
+        $outcome = (new Lists($this->newsMapper, $this->policyMapper, $this->saveForLaterMapper))
+            ->findForTopic($this->getUser(), $selectedTopicId, $this->limit);
 
         /* Merge a whole bunch of other settings too
          */
