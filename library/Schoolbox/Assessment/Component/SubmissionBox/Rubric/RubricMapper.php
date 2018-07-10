@@ -1229,7 +1229,7 @@ class RubricMapper
         /** @var GroupUsage[]|GenericCollection $srcGroupUsages */
         /** @var Usage[]|GenericCollection $srcCriterionUsages */
         $srcGroupUsages = $groupUsageMapper->findByColumnList([
-            'group_id'          => $srcGroups->getPropertyValues('id'),
+            'rubric_group_id'   => $srcGroups->getPropertyValues('id'),
             'submission_box_id' => $sourceBox->getId(),
         ]);
         $srcCriterionUsages = $criterionUsageMapper->findByColumnList([
