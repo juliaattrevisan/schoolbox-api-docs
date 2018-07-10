@@ -42,7 +42,7 @@ class Lists
 
     /**
      * @param int $userId
-     * @return Collection
+     * @return Collection|News\Model[]
      * @throws InvalidColumnException
      */
     public function findForUser(int $userId): Collection
