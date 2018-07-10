@@ -482,7 +482,7 @@ class Controller extends Base
             try {
                 $slug = TopicMapper::getInstance()->findById($topicId)->getSlug();
             } catch (MapperException $e) {
-                $slug = null;
+                $slug = 'all';
             }
 
             /* Get this an accompanying paginator
@@ -528,7 +528,7 @@ class Controller extends Base
         /* By default, select the All tab...
          * but try to find the topic whose slug matches the url param
          */
-        $selectedTopicId = Mapper::TOPIC_ALL;
+        $selectedTopicId = Mapper::TOPIC_ALL_ID;
 
         foreach ($topics as $topic) {
             if ($topic->getSlug() === $slug) {
@@ -546,7 +546,7 @@ class Controller extends Base
          */
         $outcome = array_merge($outcome, [
             'topics' => $topics,
-            'topicAll' => Mapper::TOPIC_ALL,
+            'topicAll' => Mapper::TOPIC_ALL_ID,
             'selectedTopicId' => $selectedTopicId,
             'compactMode' => false,
             'limit' => $this->limit

@@ -25,9 +25,14 @@ class Mapper extends \Schoolbox\Mapper
 {
 
     /**
-     * This const represents "all topics"
+     * This const represents "all topics", as an int id
      */
-    public const TOPIC_ALL = 0;
+    public const TOPIC_ALL_ID = 0;
+
+    /**
+     * This const represents "all topics", as a slug
+     */
+    public const TOPIC_ALL_SLUG = 'all';
 
     /**
      * @inheritdoc
@@ -223,7 +228,7 @@ class Mapper extends \Schoolbox\Mapper
             ORDER BY publish_at DESC, created_at DESC
         ";
 
-        if ($topicId !== self::TOPIC_ALL) {
+        if ($topicId !== self::TOPIC_ALL_ID) {
             $query = "
                 SELECT id
                 FROM {$this->table}
@@ -245,7 +250,7 @@ class Mapper extends \Schoolbox\Mapper
 
         /* Because pdo does some micky mouse shenanigans
          */
-        if ($topicId !== self::TOPIC_ALL) {
+        if ($topicId !== self::TOPIC_ALL_ID) {
             $statement->bindValue('topicId', $topicId, \PDO::PARAM_INT);
         }
 

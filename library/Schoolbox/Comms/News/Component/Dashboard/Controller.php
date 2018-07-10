@@ -70,7 +70,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
         /* Figure out the first topic to select by default
          * This initiates an async to load actual articles
          */
-        $this->selectedTopicId = (bool)$this->getConfig('default') ? News\Mapper::TOPIC_ALL : $this->topics->first()->getId();
+        $this->selectedTopicId = (bool)$this->getConfig('default') ? News\Mapper::TOPIC_ALL_ID : $this->topics->first()->getId();
 
         /* Only render component if there's potentially content somewhere
          * If there's any non-deleted articles for any of the topics
@@ -94,7 +94,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
         return $this->renderTwigTemplate($templateHandle, '@commsNewsDashboard/component.twig', [
             'componentInstanceId' => $this->getInstance()->getId(),
             'topics' => $this->topics,
-            'topicAll' => News\Mapper::TOPIC_ALL,
+            'topicAll' => News\Mapper::TOPIC_ALL_ID,
             'selectedTopicId' => $this->selectedTopicId,
             'compactMode' => $this->getConfig('compactMode'),
             'limit' => $this->getConfig('size')
