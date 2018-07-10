@@ -41,12 +41,12 @@ class Module extends BaseModule
             new Rule\IsLoggedIn()
         );
 
-        $this->register('GET', '/campus', 'getCampuses', $getPerms);
+        $this->register('GET', '/campuses', 'getCampuses', $getPerms);
         $this->register('GET', '/roles', 'getRoles', $getPerms);
-        $this->register('GET', '/house', 'getHouses', $getPerms);
-        $this->register('GET', '/class', 'getClasses', $getPerms);
-        $this->register('GET', '/group', 'getGroups', $getPerms);
-        $this->register('GET', '/pastoral', 'getPastoralGroups', $getPerms);
+        $this->register('GET', '/houses', 'getHouses', $getPerms);
+        $this->register('GET', '/classes', 'getClasses', $getPerms);
+        $this->register('GET', '/groups', 'getGroups', $getPerms);
+        $this->register('GET', '/pastoralgroups', 'getPastoralGroups', $getPerms);
     }
 
 

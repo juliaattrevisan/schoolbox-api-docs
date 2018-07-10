@@ -15,8 +15,10 @@ use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Pastoral\Group\Member\Model as PastoralGroupMember;
 use Schoolbox\User;
+use Schoolbox\ValueLabelInterface;
 
-class Model implements ISoftDeletable
+
+class Model implements ISoftDeletable, ValueLabelInterface
 {
     use Id;
     use CreatedAtDate;
@@ -93,5 +95,25 @@ class Model implements ISoftDeletable
     public function getMembers()
     {
         return $this->members;
+    }
+
+    /**
+     * Find a key/value representation of this model's data
+     * and return it as a 2D array of value (an identifier)
+     * and label (a human-readable description, usually)
+     *
+     * return [
+     *     'value' => ...
+     *     'label' => ...
+     * ];
+     *
+     * @return array
+     */
+    public function findValueLabelPair(): array
+    {
+        return [
+            'value' => $this->getId(),
+            'label' => $this->getName()
+        ];
     }
 }

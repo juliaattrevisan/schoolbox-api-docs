@@ -11,6 +11,7 @@ namespace Schoolbox\Comms\News\AudienceBrowser;
 use Alaress\Web\Controller\Base;
 use HouseMapper;
 use Schoolbox\CampusMapper;
+use Schoolbox\Collection;
 use Schoolbox\Pastoral;
 use Schoolbox\RoleMapper;
 
@@ -57,19 +58,47 @@ class Controller extends Base
         $this->pastoralGroupMapper = $pastoralGroupMapper;
     }
 
+
+    /**
+     * @param Collection $collection
+     * @return \Alaress\Web\Output\Json
+     */
+    private function generate(Collection $collection): \Alaress\Web\Output\Json
+    {
+        foreach($collection as $item) {
+            $items[] = array_combine(['id', 'name'], $item->findValueLabelPair());
+        }
+
+        return $this->buildJsonOutput([
+            'success' => true,
+            'data' => $items
+        ]);
+    }
+
+
+    /**
+     * Get (id, name) tuples for every Campus
+     */
     public function getCampuses()
     {
-        echo 'testCampus';
+        $this->getResponse()->content->set($this->generate($this->campusMapper->findAll()));
     }
 
+
+    /**
+     * Get (id, name) tuples for every Role
+     */
     public function getRoles()
     {
-        echo 'testRoles';
+        $this->getResponse()->content->set($this->generate($this->roleMapper->findAll()));
     }
 
+    /**
+     * Get (id, name) tuples for every House
+     */
     public function getHouses()
     {
-        echo 'testHouses';
+        $this->getResponse()->content->set($this->generate($this->houseMapper->findAll()));
     }
 
     public function getClasses()
@@ -79,11 +108,15 @@ class Controller extends Base
 
     public function getGroups()
     {
+
         echo 'testGroups';
     }
 
+    /**
+     * Get (id, name) tuples for every Pastoral Group
+     */
     public function getPastoralGroups()
     {
-        echo 'testPastoralGroups';
+        $this->getResponse()->content->set($this->generate($this->pastoralGroupMapper->findAll()));
     }
 }
