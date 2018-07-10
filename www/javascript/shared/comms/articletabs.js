@@ -48,7 +48,11 @@
                 /* Update the url upon tab change
                  * The url comes from backend, telling you the url of the topic requested
                  */
-                updateUrl: false
+                updateUrl: false,
+
+                /* The current page number
+                 */
+                pageNum: -1
             };
 
             return $.extend(defaults, options);
