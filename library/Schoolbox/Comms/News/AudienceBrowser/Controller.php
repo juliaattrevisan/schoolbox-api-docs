@@ -112,6 +112,10 @@ class Controller extends Base
         $this->getResponse()->content->set($this->generate($this->houseMapper->findAll()));
     }
 
+
+    /**
+     * TODO: We need to figger out how we do this; Andy has some ideas
+     */
     public function getClasses()
     {
         echo 'testClasses';
