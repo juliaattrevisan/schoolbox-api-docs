@@ -129,127 +129,87 @@
                         <h2>Browse Audience</h2>
                         <a class="close-reveal-modal" aria-label="Close">×</a>
 
-                        <div v-show="audienceSelectPage1">
-                            <div class="small-12 medium-4 columns" v-for="audienceOption in audienceOptions">
-                                <button class="button-block" @click="changePage(audienceOption)">
-                                    <i v-bind:class="'icon-' + audienceOption.icon"></i>
-                                    ${ audienceOption.name }
-                                </button>
+                            <div v-show="pageShow[0]">
+                                <div class="small-12 medium-4 columns" v-for="audienceOption in audienceOptions">
+                                    <button class="button-block" @click="changePage(audienceOption)">
+                                        <i v-bind:class="'icon-' + audienceOption.icon"></i>
+                                        ${ audienceOption.name }
+                                    </button>
+                                </div>
                             </div>
+
+                            <div v-show="pageShow[1]">
+
+                                <ul class="breadcrumb" style="margin-bottom:10px;">
+                                    <li><a href="#" @click.prevent="showPage(0)">Browse Audience</a></li>
+                                    <li class="active"><a>${ audienceSelectBreadcrumb }</a></li>
+                                </ul>
+
+                                <p class="meta">Some help text here</p>
+
+                                <fieldset class="checklist checklist-table" id="audience-select-options">
+                                    <template v-for="audienceListItem in audienceListItems">
+                                        <input v-bind:id="'audience-list-' + audienceListItem.id" type="checkbox" />
+                                        <label v-bind:for="'audience-list-' + audienceListItem.id">${ audienceListItem.label }</label>
+                                    </template>
+                                </fieldset>
+
+                                <fieldset class="checklist" id="" style="border: none;">
+                                    <input id="checkbox6" type="checkbox" checked /><label for="checkbox6" id="audience-select-checkbox-label">${ audienceSelectCheckbox }</label>
+                                    <input id="checkbox7" type="checkbox" /><label for="checkbox7">Parents of students</label>
+                                </fieldset>
+
+                                <button class="button submit" @click.prevent="addAudience">Add</button>
+
+                            </div>
+
                         </div>
+                    </fieldset>
 
-                        <div v-show="audienceSelectPage2">
+                    <fieldset class="content">
+                        <div class="small-12 columns">
+                            <label>Feature Image</label>
+                            <p class="meta">Attach a feature image to represent your {{ locale.article.proper }} article.</p>
 
-                            <ul class="breadcrumb" style="margin-bottom:10px;">
-                                <li><a href="#" @click.prevent="audienceSelectReturn">Browse Audience</a></li>
-                                <li class="active"><a>${ audienceSelectBreadcrumb }</a></li>
-                            </ul>
-
-                            <p class="meta">Some help text here</p>
-
-                            <fieldset class="checklist checklist-table" id="audience-select-options">
-                                <template v-for="audienceListItem in audienceListItems">
-                                    <input v-bind:id="'audience-list-' + audienceListItem.id" type="checkbox" />
-                                    <label v-bind:for="'audience-list-' + audienceListItem.id">${ audienceListItem.label }</label>
-                                </template>
-                            </fieldset>
-
-                            <fieldset class="checklist" id="" style="border: none;">
-                                <input id="checkbox6" type="checkbox" checked /><label for="checkbox6" id="audience-select-checkbox-label">${ audienceSelectCheckbox }</label>
-                                <input id="checkbox7" type="checkbox" /><label for="checkbox7">Parents of students</label>
-                            </fieldset>
-
-                            <button class="button submit" @click.prevent="addAudience">Add</button>
-
+                            {% include 'sub/attachzone.twig' with { attachzone: featureImageZone } %}
                         </div>
+                    </fieldset>
 
-                    </div>
-                </fieldset>
+                    <fieldset class="content">
+                        <div class="small-12 columns">
+                            <label>Topics</label>
+                            <p class="meta">You can assign multiple <a href="{{ routeLookup('commsNewsPolicy.getPolicies') }}#topics" title="Find a list of available topics" target="_blank">topics</a> to this {{ locale.news }} to adjust its exposure.</p>
+                            <select data-topics name="topics[]" multiple></select>
+                        </div>
+                    </fieldset>
 
-                <fieldset class="content">
-                    <div class="small-12 columns">
-                        <label>Feature Image</label>
-                        <p class="meta">Attach a feature image to represent your {{ locale.article.proper }} article.</p>
+                    <fieldset class="content">
+                        <legend>Availability</legend>
+                        <div class="small-12 large-6 columns">
+                            <label for="publishAt">
+                                Publish Date
+                            </label>
+                            <p class="meta">This article becomes available to its audience once this date and time is reached.</p>
+                            <input type="text" class="required" name="publishAt" id="publishAt" data-datepicker data-datepicker-time data-datesync-enddate="#expiresAt" maxlength="50" value="{{ article.publishAt.local }}"/>
+                        </div>
+                        <div class="small-12 large-6 columns">
+                            <label for="expiresAt">
+                                Expiry Date
+                            </label>
+                            <p class="meta">This article is automatically archived once this expiry date is reached.</p>
+                            <input type="text" class="required" name="expiresAt" id="expiresAt" data-datepicker data-datepicker-time data-datesync-startdate="#publishAt" maxlength="50" value="{{ article.expiresAt.local }}"/>
+                        </div>
+                    </fieldset>
+                </section>
 
-                        {% include 'sub/attachzone.twig' with { attachzone: featureImageZone } %}
-                    </div>
-                </fieldset>
-
-                <fieldset class="content">
-                    <div class="small-12 columns">
-                        <label>Topics</label>
-                        <p class="meta">You can assign multiple <a href="{{ routeLookup('commsNewsPolicy.getPolicies') }}#topics" title="Find a list of available topics" target="_blank">topics</a> to this {{ locale.news }} to adjust its exposure.</p>
-                        <select data-topics name="topics[]" multiple></select>
-                    </div>
-                </fieldset>
-
-                <fieldset class="content">
-                    <legend>Availability</legend>
-                    <div class="small-12 large-6 columns">
-                        <label for="publishAt">
-                            Publish Date
-                        </label>
-                        <p class="meta">This article becomes available to its audience once this date and time is reached.</p>
-                        <input type="text" class="required" name="publishAt" id="publishAt" data-datepicker data-datepicker-time data-datesync-enddate="#expiresAt" maxlength="50" value="{{ article.publishAt.local }}"/>
-                    </div>
-                    <div class="small-12 large-6 columns">
-                        <label for="expiresAt">
-                            Expiry Date
-                        </label>
-                        <p class="meta">This article is automatically archived once this expiry date is reached.</p>
-                        <input type="text" class="required" name="expiresAt" id="expiresAt" data-datepicker data-datepicker-time data-datesync-startdate="#publishAt" maxlength="50" value="{{ article.expiresAt.local }}"/>
-                    </div>
-                </fieldset>
-            </section>
-
-            <input type="submit" value="Preview" />
-        </form>
-    </div>
-</div>
-
-<div class="toast" id="saveDraft"></div>
-
-<div data-reveal="" id="audience-browse" class="reveal-modal">
-    <h2>Browse Audience</h2>
-    <a class="close-reveal-modal" aria-label="Close">×</a>
-
-    <div v-show="audienceSelectPage1">
-        <div class="small-12 medium-4 columns" v-for="audienceOption in audienceOptions">
-            <button class="button-block" @click="changePage(audienceOption)">
-                <i v-bind:class="'icon-' + audienceOption.icon"></i>
-                ${ audienceOption.name }
-            </button>
+                <input type="submit" value="Preview" />
+            </form>
         </div>
     </div>
 
-    <div v-show="audienceSelectPage2">
-
-        <ul class="breadcrumb" style="margin-bottom:10px;">
-            <li><a href="#" @click.prevent="audienceSelectReturn">Browse Audience</a></li>
-            <li class="active"><a>${ audienceSelectBreadcrumb }</a></li>
-        </ul>
-
-        <p class="meta">Some help text here</p>
-
-        <form @submit.prevent="addAudience">
-            <fieldset class="checklist checklist-table" id="audience-select-options">
-                <template v-for="audienceListItem in audienceListItems">
-                    <input v-bind:id="'audience-list-' + audienceListItem.id" type="checkbox" />
-                    <label v-bind:for="'audience-list-' + audienceListItem.id">${ audienceListItem.label }</label>
-                </template>
-            </fieldset>
-
-            <fieldset class="checklist" id="" style="border: none;">
-                <input id="checkbox6" type="checkbox" checked /><label for="checkbox6" id="audience-select-checkbox-label">${ audienceSelectCheckbox }</label>
-                <input id="checkbox7" type="checkbox" /><label for="checkbox7">Parents of students</label>
-            </fieldset>
-
-            <button type="submit" class="button">Add</button>
-        </form>
-
-    </div>
-
+    <div class="toast" id="saveDraft"></div>
 </div>
+
 
 <style>
     .checklist-table {
@@ -305,7 +265,6 @@
 </style>
 
 <script>
-
     var app = new Vue({
         el: '#audience-select-container',
         delimiters: ['${', '}'],
@@ -351,9 +310,11 @@
                 },
             },
 
-            // Modal sections
-            audienceSelectPage1: true,
-            audienceSelectPage2: false,
+            // Modal sections showing and hiding
+            pageShow: [
+                true,
+                false
+            ],
 
             // Page 2 specifics
             audienceSelectBreadcrumb: '',
@@ -384,8 +345,7 @@
         methods: {
             openBrowseModal: function () {
                 // Reset everythang
-                this.audienceSelectPage1 = true;
-                this.audienceSelectPage2 = false;
+                this.showPage(0);
 
                 // Open the modal
                 $('#audience-browse').foundation('reveal', 'open');
@@ -393,19 +353,21 @@
 
             // Selecting an initial page
             changePage: function (audienceOption) {
-                this.audienceSelectPage1 = false;
-                this.audienceSelectPage2 = true;
-                this.audienceSelectBreadcrumb = audienceOption.name;
-                this.audienceSelectCheckbox = audienceOption.checkbox;
+                // Request a list of options with the uri listed in the object above
+                axios.get(audienceOption.ajax).then(function(response) {
+                    // Update the list of options
+                    this.audienceListItems = response;
 
-                // Get the list of options via ajax
-                axios.get(audienceOption.ajax);
-            },
+                    // Update the breadcrumb and checkbox text
+                    this.audienceSelectBreadcrumb = audienceOption.name;
+                    this.audienceSelectCheckbox = audienceOption.checkbox;
 
-            // Returning back to the initial page
-            audienceSelectReturn: function () {
-                this.audienceSelectPage1 = true;
-                this.audienceSelectPage2 = false;
+                    // Show the page
+                    this.showPage(1);
+
+                }).catch(function (error) {
+                    console.log('no dice');
+                });
             },
 
             // Submitting the modal form
@@ -414,6 +376,12 @@
 
                 // Close modal
                 $('#audience-browse').foundation('reveal', 'close');
+            },
+
+            showPage: function (page) {
+                this.pageShow[0] = false;
+                this.pageShow[1] = false;
+                this.pageShow[page] = true;
             }
         }
     });
