@@ -549,6 +549,7 @@ class Controller extends Base
             'topicAll' => Mapper::TOPIC_ALL_ID,
             'selectedTopicId' => $selectedTopicId,
             'compactMode' => false,
+            'pageNum' => $this->getRequest()->query['p'],
             'limit' => $this->limit
         ]);
 

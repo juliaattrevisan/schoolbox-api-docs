@@ -80,7 +80,7 @@
 
                     /* TODO: Retain pagination value here somewhere
                      */
-                    window.history.pushState('', response.title, response.url);
+                    window.history.pushState('', response.title, response.url + '?p=' + config.pageNum);
                 }
 
                 /* TODO: Cache the response so we don't need to refetch it
