@@ -171,44 +171,34 @@
     <h2>Browse Audience</h2>
     <a class="close-reveal-modal" aria-label="Close">×</a>
 
-    <div id="audience-browse-step1">
-        <div class="small-12 medium-4 columns">
-            <button class="button-block" data-audience-select="campus"><i class="icon-location"></i>Campuses</button>
-        </div>
-        <div class="small-12 medium-4 columns">
-            <button class="button-block" data-audience-select="role"><i class="icon-staff-students"></i>Roles</button>
-        </div>
-        <div class="small-12 medium-4 columns">
-            <button class="button-block" data-audience-select="house"><i class="icon-home"></i>Houses</button>
-        </div>
-        <div class="small-12 medium-4 columns">
-            <button class="button-block" data-audience-select="class"><i class="icon-teacher"></i>Classes</button>
-        </div>
-        <div class="small-12 medium-4 columns">
-            <button class="button-block" data-audience-select="group"><i class="icon-group"></i>Groups</button>
+    <div v-show="audienceSelectPage1">
+        <div class="small-12 medium-4 columns" v-for="audienceOption in audienceOptions">
+            <button class="button-block" @click="changePage(audienceOption)">
+                <i v-bind:class="'icon-' + audienceOption.icon"></i>
+                ${ audienceOption.name }
+            </button>
         </div>
     </div>
 
-    <div id="audience-browse-step2" class="hide">
+    <div v-show="audienceSelectPage2">
 
         <ul class="breadcrumb" style="margin-bottom:10px;">
-            <li><a href="#" id="audience-browse-return">Browse Audience</a></li>
-            <li class="active"><a>Roles</a></li>
+            <li><a href="#" @click.prevent="audienceSelectReturn">Browse Audience</a></li>
+            <li class="active"><a>${ audienceSelectBreadcrumb }</a></li>
         </ul>
 
         <p class="meta">Some help text here</p>
 
-        <form id="audience-browse-form">
-            <fieldset class="checklist checklist-table">
-                <input id="checkbox1" type="checkbox" /><label for="checkbox1">Administration</label>
-                <input id="checkbox2" type="checkbox" /><label for="checkbox2">Teacher</label>
-                <input id="checkbox3" type="checkbox" /><label for="checkbox3">Senior Student</label>
-                <input id="checkbox4" type="checkbox" /><label for="checkbox4">Junior Student</label>
-                <input id="checkbox5" type="checkbox" /><label for="checkbox5">Parent</label>
+        <form @submit.prevent="addAudience">
+            <fieldset class="checklist checklist-table" id="audience-select-options">
+                <template v-for="audienceListItem in audienceListItems">
+                    <input v-bind:id="'audience-list-' + audienceListItem.id" type="checkbox" />
+                    <label v-bind:for="'audience-list-' + audienceListItem.id">${ audienceListItem.label }</label>
+                </template>
             </fieldset>
 
             <fieldset class="checklist" id="" style="border: none;">
-                <input id="checkbox6" type="checkbox" checked /><label for="checkbox6">Users in role</label>
+                <input id="checkbox6" type="checkbox" checked /><label for="checkbox6" id="audience-select-checkbox-label">${ audienceSelectCheckbox }</label>
                 <input id="checkbox7" type="checkbox" /><label for="checkbox7">Parents of students</label>
             </fieldset>
 
@@ -273,42 +263,97 @@
 </style>
 
 <script>
-    $(function() {
+    var app = new Vue({
+        el: '#audience-browse',
+        delimiters: ['${', '}'],
+        data: {
 
-        // Reset stuffs on modal open
-        $(document).on('open.fndtn.reveal', '#audience-browse', function () {
-            // Back to initial page
-            $('#audience-browse-step2').addClass('hide');
-            $('#audience-browse-step1').removeClass('hide');
+            // Modal options
+            audienceOptions: {
+                campus: {
+                    name: 'Campuses',
+                    icon: 'location',
+                    checkbox: 'Students in campus'
+                },
+                roles: {
+                    name: 'Roles',
+                    icon: 'staff-students',
+                    checkbox: 'Users in role'
+                },
+                houses: {
+                    name: 'Houses',
+                    icon: 'home',
+                    checkbox: 'House members'
+                },
+                classes: {
+                    name: 'Classes',
+                    icon: 'teacher',
+                    checkbox: 'Users in class'
+                },
+                groups: {
+                    name: 'Groups',
+                    icon: 'group',
+                    checkbox: 'Group members'
+                },
+                pastoralGroups: {
+                    name: 'Pastoral Groups',
+                    icon: 'pastoral',
+                    checkbox: 'Group members'
+                },
+            },
 
-            // Uncheck thangs
-            $('#audience-browse .checklist-table input[type=checkbox]').prop('checked', false);
-        });
+            // Modal sections
+            audienceSelectPage1: true,
+            audienceSelectPage2: false,
 
-        // Clicking an initial option
-        $('#audience-browse-step1 button[data-audience-select]').click(function() {
+            // Page 2 specifics
+            audienceSelectBreadcrumb: '',
+            audienceSelectCheckbox: '',
+            audienceListItems: [
+                {
+                    id: 1,
+                    label: 'Administration'
+                },
+                {
+                    id: 2,
+                    label: 'Teacher'
+                },
+                {
+                    id: 3,
+                    label: 'Senior Student'
+                },
+                {
+                    id: 4,
+                    label: 'Junior Student'
+                },
+                {
+                    id: 5,
+                    label: 'Parent'
+                }
+            ]
+        },
+        methods: {
+            // Selecting an initial page
+            changePage: function (audienceOption) {
+                this.audienceSelectPage1 = false;
+                this.audienceSelectPage2 = true;
+                this.audienceSelectBreadcrumb = audienceOption.name;
+                this.audienceSelectCheckbox = audienceOption.checkbox;
+            },
 
-            //
+            // Returning back to the initial page
+            audienceSelectReturn: function () {
+                this.audienceSelectPage1 = true;
+                this.audienceSelectPage2 = false;
+            },
 
-            $('#audience-browse-step1').addClass('hide');
-            $('#audience-browse-step2').removeClass('hide');
-        });
+            // Submitting the modal form
+            addAudience: function () {
+                // Add to selectize
 
-        $('#audience-browse-form').submit(function(event) {
-            event.preventDefault();
-
-            // Populate selectize
-
-            // Close modal
-            $('#audience-browse').foundation('reveal', 'close');
-        });
-
-        $('#audience-browse-return').click(function(event) {
-            event.preventDefault();
-
-            $('#audience-browse-step2').addClass('hide');
-            $('#audience-browse-step1').removeClass('hide');
-        });
-
+                // Close modal
+                $('#audience-browse').foundation('reveal', 'close');
+            }
+        }
     });
 </script>
