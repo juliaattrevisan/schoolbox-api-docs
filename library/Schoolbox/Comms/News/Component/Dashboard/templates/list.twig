@@ -55,7 +55,7 @@
                         <h3>{{ article.title }}</h3>
                     </a>
 
-                    <p class="meta">Published by {{ article.author.fullname }} <time title="{{ article.publishAt.local }}">{{ article.publishAt.relativeTime }}</time></p>
+                    <p class="meta">Published by <a href="/search/user/{{ article.author.id }}" title="View Profile">{{ article.author.fullname }}</a> <time title="{{ article.publishAt.local }}">{{ article.publishAt.relativeTime }}</time></p>
 
                     {# TODO: Have a /news/topic url lol #}
                     {% if article.topics|length %}
