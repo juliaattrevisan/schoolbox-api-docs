@@ -16,6 +16,7 @@ use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Comms\News\Mapper as NewsMapper;
+use Schoolbox\Comms\News\Policy\Mapper as PolicyMapper;
 use Schoolbox\Comms\News\SaveForLater\Mapper as SaveForLaterMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper;
@@ -101,14 +102,15 @@ class Module extends BaseModule
     {
         /** @var Container $injector */
         $injector->params[Controller::class] = [
-            'errorMapper' => $this->getMapperFactory()->getLazy(ErrorMapper::class),
             'saveForLaterMapper' => $this->getMapperFactory()->getLazy(SaveForLaterMapper::class),
+            'policyMapper' => $this->getMapperFactory()->getLazy(PolicyMapper::class),
+            'newsMapper' => $this->getMapperFactory()->getLazy(NewsMapper::class),
         ];
     }
 
 
     /**
-     * @return Mapper|UserMapper
+     * @return Mapper|NewsMapper
      * @throws \InvalidArgumentException If cannot find mapper class
      */
     protected function getNewsMapper()

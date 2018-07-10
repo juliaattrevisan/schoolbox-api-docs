@@ -11,7 +11,6 @@ namespace Schoolbox\Comms\News\SaveForLater;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Policy;
-use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception;
 
 class Controller extends Base
@@ -34,9 +33,9 @@ class Controller extends Base
     private $policyMapper;
 
     /**
-     * @var ErrorMapper
+     * @var News\Mapper
      */
-    private $errorMapper;
+    private $newsMapper;
 
 
     /**
@@ -44,13 +43,13 @@ class Controller extends Base
      *
      * @param Mapper        $saveForLaterMapper
      * @param Policy\Mapper $policyMapper
-     * @param ErrorMapper   $errorMapper
+     * @param News\Mapper   $newsMapper
      */
-    public function __construct(Mapper $saveForLaterMapper, Policy\Mapper $policyMapper, ErrorMapper $errorMapper)
+    public function __construct(Mapper $saveForLaterMapper, Policy\Mapper $policyMapper, News\Mapper $newsMapper)
     {
         $this->saveForLaterMapper = $saveForLaterMapper;
         $this->policyMapper = $policyMapper;
-        $this->errorMapper = $errorMapper;
+        $this->newsMapper = $newsMapper;
     }
 
 
@@ -62,7 +61,7 @@ class Controller extends Base
      */
     public function getList()
     {
-        $articles = $this->saveForLaterMapper->findForUser($this->getUser()->getId());
+        $articles = (new Lists($this->saveForLaterMapper, $this->newsMapper))->findForUser($this->getUser()->getId());
 
         try {
             $policy = $this->policyMapper->findOneByColumn('identifier', 'save_for_later');
