@@ -9,9 +9,6 @@
 
 namespace Schoolbox\Comms\News\SaveForLater;
 
-use Alaress\Database\Predicate\Builder;
-use Alaress\Database\Predicate\InvalidColumnException;
-use Schoolbox\Collection;
 use Schoolbox\Comms\News;
 use Schoolbox\UserMapper;
 
