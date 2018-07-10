@@ -120,7 +120,7 @@ class HelpRequest
 
         // Need to instantiate a Request instance so we can insert into exceptions below.
         $request  = new GuzzleHttp\Psr7\Request($method, $uri, $headers, $body);
-        $response = (new GuzzleHttp\Client())->send($request);
+        $response = (new GuzzleHttp\Client())->send($request, ['allow_redirects' => ['strict' => true]]);
 
         if(CourseParticipation\Controller::STATUS_NO_CONTENT === $response->getStatusCode()){
             // There's no contents to read.
