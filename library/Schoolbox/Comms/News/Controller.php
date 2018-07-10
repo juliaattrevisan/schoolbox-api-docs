@@ -517,7 +517,7 @@ class Controller extends Base
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Aura\Di\Exception\ServiceNotFound
      */
-    public function getIndex(?string $slug)
+    public function getIndex(string $slug)
     {
         /* News Topics were never obtainable by slug
          * We always fetched everything, then manually sorted by slug
@@ -552,5 +552,14 @@ class Controller extends Base
         ]);
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/index.twig', $outcome));
+    }
+
+
+    /**
+     * Redirect to the actual index location, arranged by topic
+     */
+    public function getIndexRedirect()
+    {
+        $this->getResponse()->redirect->to($this->getRouter()->generate('commsNews.getIndex', ['slug' => 'all']));
     }
 }

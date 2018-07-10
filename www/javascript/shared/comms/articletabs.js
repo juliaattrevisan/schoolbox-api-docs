@@ -77,6 +77,9 @@
                 /* Update the url if desired
                  */
                 if (config.updateUrl) {
+
+                    /* TODO: Retain pagination value here somewhere
+                     */
                     window.history.pushState('', response.title, response.url);
                 }
 
