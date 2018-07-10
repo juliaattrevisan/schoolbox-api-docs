@@ -357,10 +357,13 @@ class Controller extends Base
 
             $prevDescriptorMax = $startValue; // Used for ascending order calculations
 
-            for ($i = 0; $i < \count($levelDescriptors) - 1; $i++) {
+            // TODO account for missing levels in the list of descriptors when a descriptor is blank
+            $numLevels = \count($levelDescriptors);
+
+            for ($i = 0; $i < $numLevels; $i++) {
                 // For descending descriptors, calculate the values we need to determine the cell's min value later on
                 if ($direction === 'desc') {
-                    $finalIteration = ($i === \count($levelDescriptors) - 1);
+                    $finalIteration = ($i === $numLevels - 1);
 
                     /* - If it's the last iteration, there's no 'next' descriptor - so just use the same value as this cell
                      * - Otherwise use the value of the next cell
