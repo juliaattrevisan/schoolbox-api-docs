@@ -528,25 +528,25 @@ class Controller extends Base
         /* By default, select the All tab...
          * but try to find the topic whose slug matches the url param
          */
-        $firstTopicId = Mapper::TOPIC_ALL;
+        $selectedTopicId = Mapper::TOPIC_ALL;
 
         foreach ($topics as $topic) {
             if ($topic->getSlug() === $slug) {
-                $firstTopicId = $topic->getId();
+                $selectedTopicId = $topic->getId();
                 break;
             }
         }
 
         /* Once we found the topicId, get a bunch of articles for that topic
          */
-        $outcome = (new Lists($this->newsMapper, $this->policyMapper))->findForTopic($this->getUser(), $firstTopicId, $this->limit);
+        $outcome = (new Lists($this->newsMapper, $this->policyMapper))->findForTopic($this->getUser(), $selectedTopicId, $this->limit);
 
         /* Merge a whole bunch of other settings too
          */
         $outcome = array_merge($outcome, [
             'topics' => $topics,
             'topicAll' => Mapper::TOPIC_ALL,
-            'firstTopicId' => $firstTopicId,
+            'selectedTopicId' => $selectedTopicId,
             'compactMode' => false,
             'limit' => $this->limit
         ]);

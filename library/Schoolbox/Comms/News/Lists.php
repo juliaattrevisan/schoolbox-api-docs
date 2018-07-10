@@ -110,14 +110,14 @@ class Lists
      * Generate a standard paginator to go with your article list
      *
      * @param string   $url
-     * @param int      $firstTopicId
+     * @param int      $selectedTopicId
      * @param int|null $limit
      * @return UrlPaginator
      * @throws \OutOfRangeException
      */
-    public function generatePaginator(string $url, int $firstTopicId, ?int $limit)
+    public function generatePaginator(string $url, int $selectedTopicId, ?int $limit)
     {
-        $allArticles = $this->newsMapper->findArticleIdsForTopic($firstTopicId, null);
+        $allArticles = $this->newsMapper->findArticleIdsForTopic($selectedTopicId, null);
 
         $paginator = (new Paginator())
             ->setPageSize($limit)

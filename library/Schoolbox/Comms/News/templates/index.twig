@@ -13,7 +13,7 @@
              # Sets up a container for async article loading
              #
              # @param int componentInstanceId
-             # @param int firstTopicId
+             # @param int selectedTopicId
              # @param int topicAll
              # @param int limit
              # @param Collection|Topic[] topics
@@ -24,7 +24,7 @@
             <script>
                 $(function() {
                     $('#news-container').articleTabs({
-                        'firstUrl': "{{ routeLookup('commsNews.getListByTopic', {topicId: firstTopicId, limit: limit}) ~ '?compactMode=' ~ compactMode }}",
+                        'firstUrl': "{{ routeLookup('commsNews.getListByTopic', {topicId: selectedTopicId, limit: limit}) ~ '?compactMode=' ~ compactMode }}",
                         'topicTabs': $('#news-topics'),
                         'updateUrl': true
                     });
@@ -34,7 +34,7 @@
             {% include '@commsNews/tabs.twig' with {
                 topicContainerId: 'news-topics',
                 articleContainerId: 'news-container',
-                firstTopicId: firstTopicId,
+                selectedTopicId: selectedTopicId,
                 topics: topics,
                 topicAll: topicAll,
                 limit: limit,

@@ -4,7 +4,7 @@
  #
  # @param string topicContainerId
  # @param string articleContainerId
- # @param int firstTopicId
+ # @param int selectedTopicId
  # @param int topicAll
  # @param int limit
  # @param Collection|Topic[] topics
@@ -14,10 +14,10 @@
 <dl class="tabs-material" data-tab="" id="{{ topicContainerId }}">
 
     {# Select "All" by default if the component config is set #}
-    <dd {% if not firstTopicId %}class="active"{% endif %}><a href="{{ routeLookup('commsNews.getListByTopic', {topicId: topicAll, limit: limit}) ~ '?compactMode=' ~ compactMode }}">All</a></dd>
+    <dd {% if not selectedTopicId %}class="active"{% endif %}><a href="{{ routeLookup('commsNews.getListByTopic', {topicId: topicAll, limit: limit}) ~ '?compactMode=' ~ compactMode }}">All</a></dd>
 
     {% for topic in topics %}
-        {% if topic.id == firstTopicId %}
+        {% if topic.id == selectedTopicId %}
             {% set selected = 'class="active"' %}
         {% else %}
             {% set selected = '' %}
