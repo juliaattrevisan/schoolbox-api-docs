@@ -21,9 +21,9 @@ FROM (
         ru.submission_box_id,
         MAX(rd.value) as max_value_for_criterion_and_box
     FROM rubric_criterion rc
-        INNER JOIN rubric_group      rg ON rc.rubric_group_id=rg.id
-        INNER JOIN rubric_usage      ru ON rc.id=ru.criterion_id
-        INNER JOIN rubric_descriptor rd ON rc.id=rd.criterion_id
+        INNER JOIN rubric_group           rg ON rc.rubric_group_id=rg.id
+        INNER JOIN rubric_criterion_usage ru ON rc.id=ru.criterion_id
+        INNER JOIN rubric_descriptor      rd ON rc.id=rd.criterion_id
     WHERE
         rc.deleted_at IS NULL
         AND rg.deleted_at IS NULL
