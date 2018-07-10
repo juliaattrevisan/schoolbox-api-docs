@@ -160,10 +160,17 @@
     <div class="small-12 island">
         <section>
             <div class="card small-12">
-                <a href="/search/user/{{ article.author.id }}" title="View Profile">
+
+                {% if article.author.deletedAt.isNull %}
+                    <a href="/search/user/{{ article.author.id }}" title="View Profile">
+                        <img src="/portrait.php?userId={{ article.author.externalId }}&size=square64" alt="View Profile" />
+                        <p>{{ article.author.fullname }}</p>
+                    </a>
+                {% else %}
                     <img src="/portrait.php?userId={{ article.author.externalId }}&size=square64" alt="View Profile" />
                     <p>{{ article.author.fullname }}</p>
-                </a>
+                {% endif %}
+
                 <p class="meta">{{ article.publishAt.long }}</p>
             </div>
         </section>
