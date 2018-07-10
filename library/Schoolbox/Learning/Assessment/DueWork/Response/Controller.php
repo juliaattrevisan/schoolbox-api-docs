@@ -336,16 +336,17 @@ class Controller extends Base
     private function getMarkRangeMetadata(array $rubric) : array
     {
         $descriptors = $rubric['descriptors'];
+        $levelIds = array_keys($rubric['levels']);
 
         $metadata = [];
 
         foreach($descriptors as $critId => $levelDescriptors) {
-            // TODO not sure indexes like this will work the way I'm currently using them, because the key is the level ID??
-            $endIndex = \count($descriptors[$critId]) - 1;
+            $firstLevel = $levelIds[0];
+            $lastLevel = $levelIds[\count($levelIds) - 1];
 
             // TODO test these with empty descriptors
-            $startValue = $descriptors[$critId][0] ? $descriptors[$critId][0]['value'] : null;
-            $endValue = $descriptors[$critId][$endIndex] ? $descriptors[$critId][$endIndex]['value'] : null;
+            $startValue = $descriptors[$critId][$firstLevel] ? $descriptors[$critId][$firstLevel]['value'] : null;
+            $endValue = $descriptors[$critId][$lastLevel] ? $descriptors[$critId][$lastLevel]['value'] : null;
             $direction = 'asc';
 
             if ($startValue > $endValue) {
@@ -358,52 +359,56 @@ class Controller extends Base
 
             $prevDescriptorMax = $startValue; // Used for ascending order calculations
 
-            $numLevels = \count($levelDescriptors);
+            // Loop through level ids
+            $numLevels = \count($levelIds);
 
             for ($i = 0; $i < $numLevels; $i++) {
-                // For descending descriptors, calculate the values we need to determine the cell's min value later on
-                if ($direction === 'desc') {
-                    $finalIteration = ($i === $numLevels - 1);
+                // If this level has descriptors, calculate the range
+                if (array_key_exists($i, $levelDescriptors)) {
 
-                    /* - If it's the last iteration, there's no 'next' descriptor - so just use the same value as this cell
-                     * - Otherwise use the value of the next cell
-                     */
-                    if ($finalIteration) {
-                        $nextDescriptorMax = $endValue;
-                    } else {
-                        $nextDescriptorMax = $levelDescriptors[$i + 1]['value'];
+                    // For descending descriptors, calculate the values we need to determine the cell's min value later on
+                    if ($direction === 'desc') {
+
+                        /* - If there is a 'next' cell, use its value
+                         * - Otherwise just use the same value as this cell
+                         */
+                        if ($levelDescriptors[$i + 1]) {
+                            $nextDescriptorMax = $levelDescriptors[$i + 1]['value'];
+                        } else {
+                            $nextDescriptorMax = $endValue;
+                        }
                     }
-                }
 
-                // The cell's stored value will always be its maximum regardless of order
-                $currentDescriptorMax = $levelDescriptors[$i]['value'];
+                    // The cell's stored value will always be its maximum regardless of order
+                    $currentDescriptorMax = $levelDescriptors[$i]['value'];
 
-                /* Assume ascending order by default
-                 * - If the value for this descriptor is the same as the previous cell, we're either on the first cell,
-                 *   or on a cell without a range
-                 * - Otherwise, this cell's min value is 1 greater than the previous cell's max, since we're ascending
-                 */
-                $currentDescriptorMin = $prevDescriptorMax === $currentDescriptorMax ? $prevDescriptorMax : $prevDescriptorMax + 1;
-
-                // Calculate min value differently if descriptors are descending
-                if ($direction === 'desc') {
-                    /* - If the value for this descriptor is the same as the next cell, we're either on the last cell,
+                    /* Assume ascending order by default
+                     * - If the value for this descriptor is the same as the previous cell, we're either on the first cell,
                      *   or on a cell without a range
-                     * - Otherwise, this cell's min value is 1 greater than the next cell's max, since we're descending
+                     * - Otherwise, this cell's min value is 1 greater than the previous cell's max, since we're ascending
                      */
-                    $currentDescriptorMin = $currentDescriptorMax === $nextDescriptorMax ? $nextDescriptorMax : $nextDescriptorMax + 1;
-                }
+                    $currentDescriptorMin = $prevDescriptorMax === $currentDescriptorMax ? $prevDescriptorMax : $prevDescriptorMax + 1;
 
-                // Don't try to add empty descriptors to the metadata
-                // TODO this shouldn't be necessary because we shouldn't even be iterating them in the first place
-                if (! empty($levelDescriptors[$i]['id'])) {
+                    // Calculate min value differently if descriptors are descending
+                    if ($direction === 'desc') {
+                        /* - If the value for this descriptor is the same as the next cell, we're either on the last cell,
+                         *   or on a cell without a range
+                         * - Otherwise, this cell's min value is 1 greater than the next cell's max, since we're descending
+                         */
+                        $currentDescriptorMin = $currentDescriptorMax === $nextDescriptorMax ? $nextDescriptorMax : $nextDescriptorMax + 1;
+                    }
+
                     $metadata[$critId][$levelDescriptors[$i]['id']] = [
                         'min' => $currentDescriptorMin,
                         'max' => $currentDescriptorMax
                     ];
+
+                    $prevDescriptorMax = $currentDescriptorMax;
+
+                } else {
+                    continue;
                 }
 
-                $prevDescriptorMax = $currentDescriptorMax;
             }
         }
 
