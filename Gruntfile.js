@@ -137,7 +137,10 @@ var jsSrc = {
 
         // Feature tours
         'www/javascript/components/intro.js/intro.js',
-        'www/javascript/shared/tour/tour.js'
+        'www/javascript/shared/tour/tour.js',
+
+        // VueJS son!
+        'node_modules/vue/dist/vue.js'
 
     ],
     masonry: [
