@@ -8,7 +8,7 @@ ALTER TABLE rubric_criterion
     DROP FOREIGN KEY `rubric_criterion_rubric_group`;
 ALTER TABLE rubric_criterion
     DROP INDEX `rubric_criterion_rubric_group_idx` ;
-ALTER TABLE rubric_criterion CHANGE COLUMN rubric_group_id rubric_group_id INT(11) NOT NULL;
+ALTER TABLE rubric_criterion CHANGE COLUMN rubric_group_id rubric_group_id INT(11) UNSIGNED NOT NULL;
 ALTER TABLE rubric_criterion
     ADD INDEX `rubric_criterion_rubric_group_idx` (`rubric_group_id` ASC),
     ADD CONSTRAINT `rubric_criterion_rubric_group`
