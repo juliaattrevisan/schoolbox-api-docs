@@ -101,7 +101,8 @@
 </ul>
 
 {% include 'sub/paginator.twig' with {
-    paginator: paginator
+    paginator: paginator,
+    page: pageNum
 } %}
 
 {% else %}

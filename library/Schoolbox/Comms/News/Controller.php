@@ -500,6 +500,7 @@ class Controller extends Base
             $outcome = array_merge($outcome, [
                 'compactMode' => $this->getRequest()->query['compactMode'],
                 'paginator' => $paginator,
+                'pageNum' => $pageNum
             ]);
 
             $this->getResponse()->content->set($this->buildJsonOutput([
