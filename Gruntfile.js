@@ -140,7 +140,8 @@ var jsSrc = {
         'www/javascript/shared/tour/tour.js',
 
         // VueJS son!
-        'node_modules/vue/dist/vue.js'
+        'node_modules/vue/dist/vue.js',
+        'node_modules/axios/dist/axios.js'
 
     ],
     masonry: [
