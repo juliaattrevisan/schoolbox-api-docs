@@ -29,6 +29,10 @@
             <label class="meta">{{ groupName }}</label>
             <input type="hidden" value="" name="{{ groupInput }}[name]" />
         {% endif %}
+
+        {# Max value: default to max from criteria #}
+        <input type="number" value="{{ group.maxValue }}" name="{{ groupInput }}[maxValue]" />
+        {#{{ dump(group) }}#}
     </th>
 </tr>
 {%- endif %}

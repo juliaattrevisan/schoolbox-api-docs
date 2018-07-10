@@ -47,7 +47,7 @@ class Group implements Twiggable, Calculable
      *
      * @param int|null    $id
      * @param string|null $name
-     * @param int|null    $maxValue
+     * @param float|null  $maxValue
      * @param bool|null   $readOnly
      */
     public function __construct($id = null, $name = '', $maxValue = null, $readOnly = false)
@@ -186,10 +186,6 @@ class Group implements Twiggable, Calculable
      */
     public function getTotal()
     {
-        if (null !== $this->maxValue) {
-            return $this->maxValue;
-        }
-
         $total = 0;
 
         foreach ($this->criteria as $crit) {
@@ -197,6 +193,23 @@ class Group implements Twiggable, Calculable
         }
 
         return $total;
+    }
+
+
+    /**
+     * Get the maximum allowable mark value for this group.
+     *
+     * If this group has a max value, use that; otherwise, use the total from
+     * its criteria.
+     *
+     * @return float
+     */
+    public function getMaxValue()
+    {
+        if (null !== $this->maxValue) {
+            return $this->maxValue;
+        }
+        return $this->getTotal();
     }
 
 
@@ -233,6 +246,7 @@ class Group implements Twiggable, Calculable
             'name'       => $this->getName(),
             'sum'        => $this->getSum(),
             'total'      => $this->getTotal(),
+            'maxValue'   => $this->getMaxValue(),
             'percentage' => $this->getPercentage(),
             'humanReadableMark' => $this->getHumanReadableMark(),
             'used'       => $this->isReadOnly(),
