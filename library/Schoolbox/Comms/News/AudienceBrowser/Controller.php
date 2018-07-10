@@ -13,6 +13,7 @@ use HouseMapper;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
 use Schoolbox\Pastoral;
+use Schoolbox\Resource;
 use Schoolbox\RoleMapper;
 
 
@@ -35,26 +36,35 @@ class Controller extends Base
     private $houseMapper;
 
     /**
+     * @var Resource\GroupMapper
+     */
+    private $groupMapper;
+
+    /**
      * @var Pastoral\Group\Mapper
      */
     private $pastoralGroupMapper;
+
 
     /**
      * Controller constructor.
      * @param CampusMapper          $campusMapper
      * @param RoleMapper            $roleMapper
      * @param HouseMapper           $houseMapper
+     * @param Resource\GroupMapper  $groupMapper
      * @param Pastoral\Group\Mapper $pastoralGroupMapper
      */
     public function __construct(
         CampusMapper $campusMapper,
         RoleMapper $roleMapper,
         HouseMapper $houseMapper,
+        Resource\GroupMapper $groupMapper,
         Pastoral\Group\Mapper $pastoralGroupMapper
     ) {
         $this->campusMapper = $campusMapper;
         $this->roleMapper = $roleMapper;
         $this->houseMapper = $houseMapper;
+        $this->groupMapper = $groupMapper;
         $this->pastoralGroupMapper = $pastoralGroupMapper;
     }
 
@@ -93,6 +103,7 @@ class Controller extends Base
         $this->getResponse()->content->set($this->generate($this->roleMapper->findAll()));
     }
 
+
     /**
      * Get (id, name) tuples for every House
      */
@@ -106,11 +117,26 @@ class Controller extends Base
         echo 'testClasses';
     }
 
+
+    /**
+     * Get (id, name) tuples for every Group
+     */
     public function getGroups()
     {
+        $groups = $this->groupMapper->findAll();
 
-        echo 'testGroups';
+        $items = [];
+
+        foreach ($groups as $group) {
+            $items[] = array_combine(['id', 'name'], $group->getCategory()->findValueLabelPair());
+        }
+
+        $this->getResponse()->content->set($this->buildJsonOutput([
+            'success' => true,
+            'data' => $items
+        ]));
     }
+
 
     /**
      * Get (id, name) tuples for every Pastoral Group

@@ -17,6 +17,7 @@ use InvalidArgumentException;
 use Schoolbox\CampusMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Pastoral;
+use Schoolbox\Resource;
 use Schoolbox\RoleMapper;
 use Schoolbox\UserMapper;
 
@@ -84,6 +85,7 @@ class Module extends BaseModule
             'campusMapper' => $this->getMapperFactory()->getLazy(CampusMapper::class),
             'roleMapper' => $this->getMapperFactory()->getLazy(RoleMapper::class),
             'houseMapper' => $this->getMapperFactory()->getLazy(\HouseMapper::class),
+            'groupMapper' => $this->getMapperFactory()->getLazy(Resource\GroupMapper::class),
             'pastoralGroupMapper' => $this->getMapperFactory()->getLazy(Pastoral\Group\Mapper::class),
         ];
     }
