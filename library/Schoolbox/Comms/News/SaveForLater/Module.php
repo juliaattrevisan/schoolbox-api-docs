@@ -110,7 +110,7 @@ class Module extends BaseModule
 
 
     /**
-     * @return Mapper|UserMapper
+     * @return Mapper|NewsMapper
      * @throws \InvalidArgumentException If cannot find mapper class
      */
     protected function getNewsMapper()
