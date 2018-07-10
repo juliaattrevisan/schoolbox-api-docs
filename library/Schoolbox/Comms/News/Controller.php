@@ -12,11 +12,13 @@ use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
 use InvalidArgumentException;
 use Schoolbox\Application\Exception\Exception;
+use Schoolbox\Collection;
 use Schoolbox\Comms\News\Policy;
 use Schoolbox\Comms\News\SaveForLater;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\News\Topic;
 use Schoolbox\News\TopicMapper;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
@@ -526,6 +528,30 @@ class Controller extends Base
 
 
     /**
+     * From a slug, figure out what topic matches it
+     *
+     * By default, select the All tab...
+     * but try to find the topic whose slug matches the url param
+     *
+     * @param Collection|Topic[] $topics
+     * @param string             $slug
+     * @return int
+     */
+    private function determineSelectedTopicId(Collection $topics, string $slug): int
+    {
+        $selectedTopicId = Mapper::TOPIC_ALL_ID;
+
+        foreach ($topics as $topic) {
+            if ($topic->getSlug() === $slug) {
+                return $topic->getId();
+            }
+        }
+
+        return $selectedTopicId;
+    }
+
+
+    /**
      * @param string $slug
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Aura\Di\Exception\ServiceNotFound
@@ -543,17 +569,9 @@ class Controller extends Base
          */
         $topics = $this->topicMapper->findAll();
 
-        /* By default, select the All tab...
-         * but try to find the topic whose slug matches the url param
+        /* Figure out which topic was chozen
          */
-        $selectedTopicId = Mapper::TOPIC_ALL_ID;
-
-        foreach ($topics as $topic) {
-            if ($topic->getSlug() === $slug) {
-                $selectedTopicId = $topic->getId();
-                break;
-            }
-        }
+        $selectedTopicId = $this->determineSelectedTopicId($topics, $slug);
 
         /* Once we found the topicId, get a bunch of articles for that topic
          */
