@@ -47,6 +47,9 @@
                 postdata.task = 1;
             }
 
+            // Is this mark-per-capability?
+            postdata.markPerCapability = body.find('#markPerCapability:checked').length > 0;
+
             // show/hide appropriate things
             wrap.find('[data-hideable]').addClass('hide');
             wrap.find('[data-waiting-msg]').removeClass('hide');

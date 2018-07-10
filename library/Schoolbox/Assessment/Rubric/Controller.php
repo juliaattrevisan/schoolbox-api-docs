@@ -229,8 +229,9 @@ class Controller extends BaseController
         }
 
         $context = [
-            'formField' => $post->get('formField', 'rb'),
-            'rubric'    => $grid->toContext()
+            'formField'              => $post->get('formField', 'rb'),
+            'rubric'                 => $grid->toContext(),
+            'usingMarkPerCapability' => $post->getBool('markPerCapability', false),
         ];
 
         $this->getResponse()->content->set([
