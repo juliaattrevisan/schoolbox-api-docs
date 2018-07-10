@@ -481,16 +481,14 @@ class Controller extends Base
 
             /* Figure out the slug from the id
              */
-            try {
-                $slug = TopicMapper::getInstance()->findById($topicId)->getSlug();
-            } catch (MapperException $e) {
-                $slug = Mapper::TOPIC_ALL_SLUG;
-            }
+            $slug = $this->determineSlug($topicId);
 
             /* Get this an accompanying paginator
              */
+            $url = $this->getRouter()->generate('commsNews.getIndex', ['slug' => $slug]);
+
             $paginator = $lists->generatePaginator(
-                $this->getRouter()->generate('commsNews.getIndex', ['slug' => $slug]),
+                $url,
                 $topicId,
                 $this->limit
             );
@@ -507,12 +505,29 @@ class Controller extends Base
             $this->getResponse()->content->set($this->buildJsonOutput([
                 'success' => true,
                 'title' => $this->getDi()->get('l10n')->translate('news', false, true),
-                'url' => $this->getRouter()->generate('commsNews.getIndex', ['slug' => $slug]),
+                'url' => $url,
                 'fragment' => $this->buildUnthemedHtmlOutput('@commsNews/list.twig', $outcome)->getAsString()
             ]));
         }
     }
 
+
+    /**
+     * Determine a slug from a topic id
+     *
+     * @param int $topicId
+     * @return string
+     */
+    private function determineSlug(int $topicId): string
+    {
+        try {
+            return TopicMapper::getInstance()->findById($topicId)->getSlug();
+        } catch (MapperException $e) {
+            // unknown topic id; just return the default All Topics slug
+        }
+
+        return Mapper::TOPIC_ALL_SLUG;
+    }
 
     /**
      * The page number to obtain; default to 1
