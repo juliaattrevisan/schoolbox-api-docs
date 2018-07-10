@@ -27,16 +27,23 @@ class Lists
      */
     private $policyMapper;
 
+    /**
+     * @var SaveForLater\Mapper
+     */
+    private $saveForLaterMapper;
+
 
     /**
      * Lists constructor.
-     * @param Mapper        $newsMapper
-     * @param Policy\Mapper $policyMapper
+     * @param Mapper              $newsMapper
+     * @param Policy\Mapper       $policyMapper
+     * @param SaveForLater\Mapper $saveForLaterMapper
      */
-    public function __construct(Mapper $newsMapper, Policy\Mapper $policyMapper)
+    public function __construct(Mapper $newsMapper, Policy\Mapper $policyMapper, SaveForLater\Mapper $saveForLaterMapper)
     {
         $this->newsMapper = $newsMapper;
         $this->policyMapper = $policyMapper;
+        $this->saveForLaterMapper = $saveForLaterMapper;
     }
 
 
@@ -90,7 +97,7 @@ class Lists
         $savedArticleIds = [];
 
         if ($policy->getValue()) {
-            $savedArticleIds = SaveForLater\Mapper::getInstance()->findSavedIdsForUser($user->getId());
+            $savedArticleIds = (new SaveForLater\Lists($this->saveForLaterMapper, $this->newsMapper))->findSavedIdsForUser($user->getId());
         }
 
         return $savedArticleIds;

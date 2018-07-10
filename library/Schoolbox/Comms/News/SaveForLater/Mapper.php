@@ -37,47 +37,4 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
     }
-
-
-    /**
-     * Find articles that were saved by $userId
-     *
-     * @param int $userId
-     * @return Collection
-     * @throws InvalidColumnException
-     */
-    public function findForUser(int $userId): Collection
-    {
-        $ids = $this->findSavedIdsForUser($userId);
-
-        if (\count($ids)) {
-            return News\Mapper::getInstance()->findByColumn('id', array_keys($ids), [
-                'order' => [
-                    'publish_at' => 'asc'
-                ]
-            ]);
-        }
-
-        return News\Mapper::getInstance()->createCollection();
-    }
-
-
-    /**
-     * Returns an array of (article_id, 1) tuples for saved articles
-     * This allows you to quickly figger out if an article was Saved For Later
-     * and assign the state to the Save For Later button accordingly
-     *
-     * @param int $userId
-     * @return array
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     */
-    public function findSavedIdsForUser(int $userId): array
-    {
-        $pb = $this->getPredicateBuilder();
-        $pb->equals('user_id', $userId);
-
-        $ids = $this->findScalarByPredicates('article_id', $pb);
-
-        return array_fill_keys($ids, self::SAVED);
-    }
 }

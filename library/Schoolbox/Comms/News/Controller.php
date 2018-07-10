@@ -459,7 +459,9 @@ class Controller extends Base
     public function getListByTopic(int $topicId, int $limit)
     {
         if ($this->getRequest()->isXhr()) {
-            $outcome = (new Lists($this->newsMapper, $this->policyMapper))->findForTopic($this->getUser(), $topicId, $limit);
+            $lists = new Lists($this->newsMapper, $this->policyMapper, $this->saveForLaterMapper);
+
+            $outcome = $lists->findForTopic($this->getUser(), $topicId, $limit);
 
             $outcome['compactMode'] = $this->getRequest()->query['compactMode'];
 
