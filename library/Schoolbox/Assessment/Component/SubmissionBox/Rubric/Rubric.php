@@ -260,7 +260,7 @@ class Rubric extends Core\Rubric
                 GroupUsageMapper::getInstance()->createModel()
                                                ->setGroup($this->groupCache->offsetGet($group))
                                                ->setSubmissionBox($this->box)
-                                               ->setMaxValue($group->getTotal())
+                                               ->setMaxValue($group->getMaxValue())
             );
         }
 
