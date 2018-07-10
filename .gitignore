@@ -11,8 +11,9 @@ jquery-ui.css
 chrome.css
 chrome.css.map
 chrome-ie9*.css
-chrome-foundation.css
-chrome-foundation.css.map
+chrome-foundation*.css
+chrome-foundation*.scss
+chrome-foundation*.css.map
 chrome-foundation-ie9*.css
 editor.css
 legacy.css
@@ -20,7 +21,8 @@ variables.css
 mixins.css
 dr.css
 print.css
-editor.css
+editor*.css
+editor*.scss
 *.log
 screen.css
 vendor/
@@ -33,8 +35,8 @@ vagrantcache/
 tools/browscap/
 tools/xdebug.ini
 vagrant.yaml
-www/css/foundation/utils/_skin.scss
-www/css/foundation/utils/_custom.scss
+www/css/foundation/utils/_skin*.scss
+www/css/foundation/utils/_custom*.scss
 .sass-cache/
 post-provision.sh
 .idea/
