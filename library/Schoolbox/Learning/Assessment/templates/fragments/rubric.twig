@@ -343,7 +343,13 @@ Usage:
             <a href="#" id="apply-resultset" class="button">Apply Result Set</a>
         </div>
         <div class="small-12 columns no-pad">
-            {% include '@rubric/grid-csv.twig' with {rubric: rubric, attachzone: rubricAttachZone, folderId: assessment.context.folder.id, usingMarkRange: assessment.useMarkRange } only %}
+            {% include '@rubric/grid-csv.twig' with {
+                rubric: rubric,
+                attachzone: rubricAttachZone,
+                folderId: assessment.context.folder.id,
+                usingMarkPerCapability: assessment.markPerCapability,
+                usingMarkRange: assessment.useMarkRange
+            } only %}
         </div>
     </div>
 </div>
