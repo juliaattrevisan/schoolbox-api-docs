@@ -169,170 +169,177 @@
 {# ----------------------------------------------------------- #}
 <script>
     $(function () {
-
-        var $maxMarkInput = $('#maxMark');
-        var $useRubricSwitch = $('#useRubric');
-        var $grid = $('[data-rb-grid]');
-
         /**
-         * Disable the field, but allow us to show its value
-         * which will be programmatically generated
+         * Initializes the rubric grid.
          */
-        function disableMaxMark() {
-            $maxMarkInput.prop('readonly', true);
-        }
+        function initRubricGrid() {
+            var $maxMarkInput = $('#maxMark');
+            var $useRubricSwitch = $('#useRubric');
+            var $grid = $('[data-rb-grid]');
 
-        /**
-         * Enable the field for humans to change its value
-         */
-        function enableMaxMark() {
-            $maxMarkInput.prop('readonly', false);
-        }
-
-        /**
-         * Callback when the 'Has Rubric' switch is clicked
-         */
-        function processUseRubricClick($element)
-        {
-            if ($element.is(':checked')) {
-                disableMaxMark();
-                calculateGridTotal();
-            } else {
-                enableMaxMark();
-                // Need to validate the max mark
-                $maxMarkInput.valid();
+            /**
+             * Disable the field, but allow us to show its value
+             * which will be programmatically generated
+             */
+            function disableMaxMark() {
+                $maxMarkInput.prop('readonly', true);
             }
-        }
 
-        /* Rubrics switcher
-         */
-        $useRubricSwitch.on('click', function () {
-            processUseRubricClick($(this));
-        });
-
-        // configure callbacks into the grid
-        $grid.rubricEditable({
-            // Recalculate total for all groups, then recalculate grid total
-            afterApplyResultSet: calculateAllGroupTotals
-        });
-
-        // Initiate
-        processUseRubricClick($useRubricSwitch);
-
-
-        /**
-         * Update max available mark on descriptor point value changes
-         * Purposefully placed outside of the document.ready in order to work for a rubric grid that is imported via csv
-         * (Yet it appears to work within document.ready regardless?)
-         */
-        $grid.on('change', '[data-group-max-value]', calculateGridTotal);
-
-
-        // Change a descriptor value: update the group's total
-        // (cascades to grid total, too)
-        $grid.on(
-            'change',
-            '[data-descriptor-value], [data-criterion-name]',
-            function () {
-                // Calculate total for this descriptor's group
-                calculateGroupTotal($(this).closest('[data-group]').data('group'));
-
-                // Then calculate the entire grid total
-                calculateGridTotal();
+            /**
+             * Enable the field for humans to change its value
+             */
+            function enableMaxMark() {
+                $maxMarkInput.prop('readonly', false);
             }
-        );
 
+            /**
+             * Callback when the 'Has Rubric' switch is clicked
+             */
+            function processUseRubricClick($element)
+            {
+                if ($element.is(':checked')) {
+                    disableMaxMark();
+                    calculateGridTotal();
+                } else {
+                    enableMaxMark();
+                    // Need to validate the max mark
+                    $maxMarkInput.valid();
+                }
+            }
 
-        /**
-         * Catch a custom event that's fired on rubric csv import
-         * Use it to update the max available mark field
-         */
-        $('#rubric-attachable').on('rubric-grid-imported', calculateAllGroupTotals);
-
-
-        /**
-         * Calculates max available marks for all groups, and then the overall
-         * grid total.
-         */
-        function calculateAllGroupTotals() {
-            // List of all groups, no duplicates
-            var groupIdentifiers = new Set(
-                $grid.find('[data-group]')
-                     .map(function() { return $(this).data('group'); })
-                     .toArray()
-            );
-            groupIdentifiers.forEach(function (groupIdentifier) {
-                calculateGroupTotal(groupIdentifier)
+            /* Rubrics switcher
+             */
+            $useRubricSwitch.on('click', function () {
+                processUseRubricClick($(this));
             });
-            calculateGridTotal();
-        }
+
+            // configure callbacks into the grid
+            $grid.rubricEditable({
+                // Recalculate total for all groups, then recalculate grid total
+                afterApplyResultSet: calculateAllGroupTotals
+            });
+
+            // Initiate
+            processUseRubricClick($useRubricSwitch);
 
 
-        /**
-         * Calculates a group's max available marks, and fills that group's max
-         * value input with that value.
-         *
-         * @param groupIdentifier The value of this row's data-group attribute
-         */
-        function calculateGroupTotal(groupIdentifier) {
-            var $thisMaxValueInput = $(),
-                groupMax = 0;
+            /**
+             * Update max available mark on descriptor point value changes
+             * Purposefully placed outside of the document.ready in order to work for a rubric grid that is imported via csv
+             * (Yet it appears to work within document.ready regardless?)
+             */
+            $grid.on('change', '[data-group-max-value]', calculateGridTotal);
 
-            $grid.find('[data-group="'+groupIdentifier+'"]').each(function () {
-                var $criterionRow = $(this),
-                    rowMax = 0;
 
-                // Does this criterion row have a max value input?
-                // Update it later
-                var $groupMaxValueInput = $criterionRow.find('[data-group-max-value]');
-                if ($groupMaxValueInput.length > 0) {
-                    $thisMaxValueInput = $groupMaxValueInput;
+            // Change a descriptor value: update the group's total
+            // (cascades to grid total, too)
+            $grid.on(
+                'change',
+                '[data-descriptor-value], [data-criterion-name]',
+                function () {
+                    // Calculate total for this descriptor's group
+                    calculateGroupTotal($(this).closest('[data-group]').data('group'));
+
+                    // Then calculate the entire grid total
+                    calculateGridTotal();
                 }
+            );
 
-                // Not checked? Don't count this criterion toward total
-                if ($criterionRow.find('[data-criterion-name]:checked').length === 0) {
-                    return true; // jq.continue
-                }
 
-                // Find all this criterion's descriptors;
-                // figure out what the highest value is
-                $criterionRow.find('[data-descriptor-value]').each(function () {
+            /**
+             * Catch a custom event that's fired on rubric csv import
+             * Use it to re-init the entire rubric grid
+             */
+            $('#rubric-attachable').on('rubric-grid-imported', initRubricGrid);
+
+
+            /**
+             * Calculates max available marks for all groups, and then the overall
+             * grid total.
+             */
+            function calculateAllGroupTotals() {
+                // List of all groups, no duplicates
+                var groupIdentifiers = new Set(
+                    $grid.find('[data-group]')
+                        .map(function() { return $(this).data('group'); })
+                        .toArray()
+                );
+                groupIdentifiers.forEach(function (groupIdentifier) {
+                    calculateGroupTotal(groupIdentifier)
+                });
+                calculateGridTotal();
+            }
+
+
+            /**
+             * Calculates a group's max available marks, and fills that group's max
+             * value input with that value.
+             *
+             * @param groupIdentifier The value of this row's data-group attribute
+             */
+            function calculateGroupTotal(groupIdentifier) {
+                var $thisMaxValueInput = $(),
+                    groupMax = 0;
+
+                $grid.find('[data-group="'+groupIdentifier+'"]').each(function () {
+                    var $criterionRow = $(this),
+                        rowMax = 0;
+
+                    // Does this criterion row have a max value input?
+                    // Update it later
+                    var $groupMaxValueInput = $criterionRow.find('[data-group-max-value]');
+                    if ($groupMaxValueInput.length > 0) {
+                        $thisMaxValueInput = $groupMaxValueInput;
+                    }
+
+                    // Not checked? Don't count this criterion toward total
+                    if ($criterionRow.find('[data-criterion-name]:checked').length === 0) {
+                        return true; // jq.continue
+                    }
+
+                    // Find all this criterion's descriptors;
+                    // figure out what the highest value is
+                    $criterionRow.find('[data-descriptor-value]').each(function () {
+                        var i = parseFloat($(this).val());
+
+                        if (!isNaN(i)) {
+                            rowMax = Math.max(rowMax, i);
+                        }
+                    });
+
+                    groupMax += rowMax;
+                });
+
+                $thisMaxValueInput.val(groupMax);
+            }
+
+
+            /**
+             * Calculates the assessment's max available marks from the rubric grid,
+             * and fills the max mark input with that value.
+             *
+             * Now uses the defined max value for each group, instead of the max
+             * descriptor value for each criterion.
+             */
+            function calculateGridTotal() {
+                var max = 0;
+
+                // iterate the grid, and sum the max of each row
+                $grid.find('[data-group-max-value]').each(function () {
                     var i = parseFloat($(this).val());
-
                     if (!isNaN(i)) {
-                        rowMax = Math.max(rowMax, i);
+                        max += i;
                     }
                 });
 
-                groupMax += rowMax;
-            });
+                max = parseFloat(max.toFixed(2));
 
-            $thisMaxValueInput.val(groupMax);
+                // Set and validate the max mark
+                $('#maxMark').val(max).valid();
+            }
         }
 
-
-        /**
-         * Calculates the assessment's max available marks from the rubric grid,
-         * and fills the max mark input with that value.
-         *
-         * Now uses the defined max value for each group, instead of the max
-         * descriptor value for each criterion.
-         */
-        function calculateGridTotal() {
-            var max = 0;
-
-            // iterate the grid, and sum the max of each row
-            $grid.find('[data-group-max-value]').each(function () {
-                var i = parseFloat($(this).val());
-                if (!isNaN(i)) {
-                    max += i;
-                }
-            });
-
-            max = parseFloat(max.toFixed(2));
-
-            // Set and validate the max mark
-            $('#maxMark').val(max).valid();
-        }
+        // Init the entire grid on document.ready
+        initRubricGrid();
     });
 </script>
