@@ -35,7 +35,7 @@
                     $selectize.on("item_add", function(value, $item) {
                         var userId = getUserIdFromRegex($item.text())
 
-                        var url = '{{ routeLookup("shaps.searchUsers") }}'.replace('{userId}', userId);
+                        var url = '{{ routeLookup("shaps.getSearchUsers") }}'.replace('{userId}', userId);
 
                         $.get(url, function(data) {
 
@@ -91,6 +91,10 @@
 
                         }, "json")
                             .fail(function(xhr, status, error) {
+                                /** @var {Object} xhr.responseJSON */
+                                if ('object' === typeof xhr.responseJSON) {
+                                    error = xhr.responseJSON.errorMessage
+                                }
                                 var $toast = $('[data-toast]');
                                 var config = {text: 'Unable to connect to Schoolbox Help: ' + error, duration: 2500, css: 'alert'};
                                 $toast.toastActivate(config);

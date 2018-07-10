@@ -26,12 +26,14 @@ class Module extends BaseModule
      */
     protected $basename = 'shaps';
 
+
     /**
      * Hook method for setting up routes via self::register()
      *
      * @return void
+     * @throws InvalidArgumentException
      */
-    protected function registerRoutes()
+    protected function registerRoutes(): void
     {
         /* Only superusers are allowed to access SHAPS in any capacity */
         $getPerms = new Rule\All(
@@ -51,10 +53,10 @@ class Module extends BaseModule
 
         $this->register('GET', '/courses', 'getUsersInCourses', $getPerms);
         $this->register('GET', '/courses/search', 'getUserEnrolmentSearch', $getPerms);
-        $this->register('GET', '/courses/{userId}', 'searchCoursesForUser', $getPerms);
+        $this->register('GET', '/courses/{userId}', 'getSearchCoursesForUser', $getPerms);
 
 
-        $this->register('GET', '/provisioning/{userId}', 'searchUsers', $getPerms);
+        $this->register('GET', '/provisioning/{userId}', 'getSearchUsers', $getPerms);
         $this->register('GET', '/provisioning/provisionedUsers', 'getProvisionedUsersJSON', $getPerms);
 
 
@@ -65,7 +67,7 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function initControllers(ContainerInterface $injector)
+    public function initControllers(ContainerInterface $injector): void
     {
         $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
     }
@@ -73,7 +75,7 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initTemplatePaths(IChainLoader $templateLoader)
+    public function initTemplatePaths(IChainLoader $templateLoader): void
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
@@ -88,12 +90,11 @@ class Module extends BaseModule
      * @param Container|ContainerInterface $injector The dependency injection container.
      * @throws InvalidArgumentException
      */
-    protected function preInitControllerDependencies(ContainerInterface $injector)
+    protected function preInitControllerDependencies(ContainerInterface $injector): void
     {
         /** @var Container $injector */
         $injector->params[Controller::class] = [
             'userMapper' => $this->getMapperFactory()->getLazy(UserMapper::class),
-            'errorMapper' => $this->getMapperFactory()->getLazy(\Schoolbox\Error\Mapper::class),
             'authParams' => $injector->lazyNew(
                 Parameters::class,
                 [

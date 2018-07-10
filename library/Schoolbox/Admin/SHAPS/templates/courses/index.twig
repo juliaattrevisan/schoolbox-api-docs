@@ -1,3 +1,7 @@
+{#
+    errorMessage:   null|string       If present, the page cannot be displayed for this reason
+#}
+
 {{ renderAdminNavigation(pageCurrent) }}
 
 <!-- BEGIN custom_head -->
@@ -40,6 +44,14 @@
 
 <div class="row">
     <div class="small-12 island">
+        {% if errorMessage %}
+            <div class="empty-state">
+                <i class="icon-info"></i>
+                <h2>Sorry, we are unable to complete this request </h2>
+
+                <p>{{ errorMessage }}</p>
+            </div>
+        {% else %}
         <section>
             <ul class="information-list expandable-card">
                 {% for course in courses %}
@@ -208,5 +220,6 @@
             <i class="icon-course"></i>
             <p>{% block emptyStateText %}No courses found for your school.{% endblock %}</p>
         </div>
+        {% endif %}
     </div>
 </div>

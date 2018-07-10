@@ -12,6 +12,7 @@ use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
 use Aura\Di\Exception\ServiceNotFound;
 use Aura\Web\Request\Values;
+use Custom\Help\CourseParticipation\Exception\ParticipantRolesNotFoundException;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Psr7\Response;
@@ -31,6 +32,20 @@ use Schoolbox\UserMapper;
 
 class Controller extends Base
 {
+    /* While these look like plain HTTP response codes, they are more than that.
+     * Both the server and client apply semantics to them in addition to their inherent HTTP semantics.
+     * Hence we need to enforce a single source-of-truth regarding their semantics so that the client and server
+     * can both use them reliably.
+     */
+    public const STATUS_OK                    = 200;
+    public const STATUS_NO_CONTENT            = 204; // Server successfully processed the request and is not returning any content.
+    public const STATUS_MULTI_STATUS          = 207; // Server partially processed the request but errors occurred.
+    public const STATUS_BAD_REQUEST           = 400; // Apparent client error. Eg missing method parameters. Includes if timestamp has expired.
+    public const STATUS_UNAUTHENTICATED       = 401; // Authentication details not provided or incorrect.
+    public const STATUS_UNAUTHORISED          = 403; // Authentication passed, but the request is not permitted.
+    public const STATUS_NOT_FOUND             = 404; // The requested thing does not exist. Eg no schoolCode in 'site_access', no course area for school.
+    public const STATUS_SERVER_ERROR          = 500; // Something went wrong server side while processing the request.
+
     /**
      * Client requests are considered unauthorised if they are older than this many seconds.
      */
@@ -127,27 +142,25 @@ class Controller extends Base
      * @level 170
      *
      * @param string $schoolCode
-     * @throws Mapper\Exception
-     * @throws Mapper\Exception\Deleted
      */
-    public function refreshDigest($schoolCode)
+    public function getRefreshDigest($schoolCode): void
     {
         $now = Alaress_Date_Format::now();
 
         try {
             $accessToken = $this->tokenMapper->findById($schoolCode)->getAccessToken();
-            $digest = $this->handler->computeAuthDigest($schoolCode, $now->getUnixTimeStamp(), $accessToken);
-
-            $this->getResponse()->content->set($this->buildJsonOutput([
-                'ts'    => $now->getUnixTimeStamp(),
-                'digest' => $digest
-            ]));
-
-        } catch (\Schoolbox\Mapper\Exception|Mapper\DefinitionException $e) {
-            // bad request
-            $this->sendGenericStatus(400);
+        } catch (Mapper\Exception $e) {
+            // bad request (we don't care about authentication/authorisation as this is Alaress-SU-only route)
+            $this->sendGenericStatus(self::STATUS_NOT_FOUND, "No token registered for school code: {$schoolCode}");
+            return;
         }
 
+        $digest = $this->handler->computeAuthDigest($schoolCode, $now->getUnixTimeStamp(), $accessToken);
+
+        $this->getResponse()->content->set($this->buildJsonOutput([
+            'ts'    => $now->getUnixTimeStamp(),
+            'digest' => $digest
+        ]));
     }
 
     /**
@@ -209,7 +222,7 @@ class Controller extends Base
         $rq = $this->getRequest();
         $rs = $this->getResponse();
 
-        if ($this->isInvalidAuth($rq->query, $schoolCode)) {
+        if (!$this->isValidAuth($rq->query, $schoolCode)) {
             return;
         }
 
@@ -225,18 +238,16 @@ class Controller extends Base
 
 
     /**
+     * // TODO. Add route description.
+     *
      * @param string $schoolCode
-     * @throws ServiceNotFound
-     * @throws Mapper\Exception
-     * @throws Mapper\Exception\Deleted
-     * @throws Mapper\DefinitionException
      */
-    public function getFolderAccessBySchool(string $schoolCode)
+    public function getFolderAccessBySchool(string $schoolCode): void
     {
         $rq = $this->getRequest();
         $rs = $this->getResponse();
 
-        if ($this->isInvalidAuth($rq->query, $schoolCode)) {
+        if (!$this->isValidAuth($rq->query, $schoolCode)) {
             return;
         }
 
@@ -248,7 +259,7 @@ class Controller extends Base
                 )
             );
         } catch (Mapper\Exception $e) {
-            $this->sendGenericStatus(404);
+            $this->sendGenericStatus(self::STATUS_NOT_FOUND, "No course area found for school: {$schoolCode}");
             return;
         }
     }
@@ -264,12 +275,12 @@ class Controller extends Base
      * @throws Mapper\Exception\Deleted
      * @throws \Aura\Web\Exception\InvalidStatusCode
      */
-    public function postFolderAccessBySchool(string $schoolCode)
+    public function postFolderAccessBySchool(string $schoolCode): void
     {
         $rq = $this->getRequest();
         $rs = $this->getResponse();
 
-        if ($this->isInvalidAuth($rq->query, $schoolCode)) {
+        if (!$this->isValidAuth($rq->query, $schoolCode)) {
             return;
         }
 
@@ -277,7 +288,7 @@ class Controller extends Base
 
         if (empty($post['course'])) {
             // empty payload: do nothing
-            $this->sendGenericStatus(400);
+            $this->sendGenericStatus(self::STATUS_BAD_REQUEST, "No 'course' parameter found");
             return;
         }
 
@@ -298,7 +309,7 @@ class Controller extends Base
                 /*
                  * Business rule: A request that specifies folder IDs that do not belong to the school given returns 403
                  */
-                $this->sendGenericStatus(403);
+                $this->sendGenericStatus(self::STATUS_UNAUTHORISED, "Folder {$folderId} does not belong to school '{$schoolCode}'");
                 return;
             }
 
@@ -331,12 +342,12 @@ class Controller extends Base
         }
 
         if ($failures) {
-            $rs->status->setCode(207);
+            $rs->status->setCode(self::STATUS_MULTI_STATUS);
             $rs->content->set($this->buildJsonOutput(array_keys($failures)));
             return;
         }
 
-        $this->sendGenericStatus(204);
+        $this->sendGenericStatus(self::STATUS_NO_CONTENT);
     }
 
 
@@ -347,22 +358,25 @@ class Controller extends Base
      * @param string $schoolCode
      * @throws Mapper\DefinitionException
      */
-    public function getUsersBySchool(string $schoolCode)
+    public function getUsersBySchool(string $schoolCode): void
     {
         $rq = $this->getRequest();
         $rs = $this->getResponse();
 
-        if ($this->isInvalidAuth($rq->query, $schoolCode)) {
+        if (!$this->isValidAuth($rq->query, $schoolCode)) {
             return;
         }
 
         $fuzzy = $rq->query->getBool('fuzzy', false);
 
-        $rs->content->set(
-            $this->buildJsonOutput(
-                $this->handler->getUsersBySchool($schoolCode, $fuzzy)
-            )
-        );
+        try{
+            $users = $this->handler->getUsersBySchool($schoolCode, $fuzzy);
+        } catch (ParticipantRolesNotFoundException $e) {
+            $this->sendGenericStatus(self::STATUS_SERVER_ERROR);
+            return;
+        }
+
+        $rs->content->set($this->buildJsonOutput($users));
     }
 
 
@@ -374,32 +388,33 @@ class Controller extends Base
      * @throws Mapper\DefinitionException
      * @throws PDOException
      */
-    public function postUserRegistrations(string $schoolCode)
+    public function postUserRegistrations(string $schoolCode): void
     {
         $rq = $this->getRequest();
         $rs = $this->getResponse();
+
+        if (!$this->isValidAuth($rq->query, $schoolCode)) {
+            return;
+        }
 
         try {
             // check the server is correctly configured
             $this->getRoleMapper()->findOneByColumn('name', Handler::DEFAULT_PARTICIPANT_ROLE_NAME);
             $this->getCampusMapper()->findOneByColumn('id', Handler::PARTICIPANT_CAMPUS);
-
         } catch (Mapper\Exception $e) {
             // if this role doesn't exist, that's *bad* bad
-            $this->sendGenericStatus(500);
+            // No need to advise a client of the cause of this error.
+            $this->sendGenericStatus(self::STATUS_SERVER_ERROR);
             return;
         }
 
-        if ($this->isInvalidAuth($rq->query, $schoolCode)) {
-            return;
-        }
 
         // process the payload
         $post = $rq->post;
 
         if (empty($post['user'])) {
             // empty payload: do nothing
-            $this->sendGenericStatus(400);
+            $this->sendGenericStatus(self::STATUS_BAD_REQUEST, "No 'user' parameter provided");
             return;
         }
 
@@ -409,12 +424,12 @@ class Controller extends Base
 
         if (\count($failedUsers)) {
             // just blame the client :P
-            $this->sendGenericStatus(400);
+            $this->sendGenericStatus(self::STATUS_BAD_REQUEST);
             $rs->content->set($this->buildJsonOutput($failedUsers));
 
         } else {
             // everything went fine, nothing to respond with
-            $this->sendGenericStatus(204);
+            $this->sendGenericStatus(self::STATUS_NO_CONTENT);
         }
     }
 
@@ -438,87 +453,90 @@ class Controller extends Base
 
 
     /**
-     * @param Values $query
-     * @param string $schoolCode
-     * @return bool
-     */
-    private function isInvalidAuth(Values $query, string $schoolCode) : bool
-    {
-        $requestTimestamp = Alaress_Date_Format::newFromTimestamp($query->get('ts', 0));
-
-        $authDigest = $query->get('digest', '');
-
-        $responseCode = $this->getResponseCode($schoolCode, $requestTimestamp, $authDigest);
-
-        if ($responseCode === 200) {
-            return false;
-        }
-
-        // if the request didn't pass the gauntlet, bounce the request
-        $this->sendGenericStatus($responseCode);
-        return true;
-    }
-
-
-    /**
-     * Standard token auth for all routes in this controller.
+     * Returns whether the a request is authenticated and authorised to use the API
+     *
+     * Standard token authentication/authorisation for all routes in this controller.
      *
      * Business rules:
      * - Client is required to supply a school code, timestamp, and digest hash.
      * - If timestamp is more than 10 seconds old: return `400 Bad Request`
      * - If the school code given does not exist, return `404 Not Found`
-     * - If the digest hash does not meet expectations based on the other 2 data, return `403 Forbidden`
+     * - If the digest hash does not meet expectations based on the other 2 data, return `401 Forbidden`
      *
-     * @param string              $schoolCode
-     * @param Alaress_Date_Format $requestTimestamp
-     * @param string              $authDigest
-     * @return int
+     * If not, also sets up a JSON-formatted response.
+     *
+     * @param Values $query
+     * @param string $schoolCode
+     * @return bool
      */
-    private function getResponseCode(string $schoolCode, Alaress_Date_Format $requestTimestamp, string $authDigest) : int
+    private function isValidAuth(Values $query, string $schoolCode): bool
     {
-        $deltaTimestamp = abs(Alaress_Date_Format::now()->diffInSeconds($requestTimestamp));
+        // 1. Check we have all the pieces we need
+        $missing = [];
+        foreach (['ts', 'digest'] as $required) {
+            if (null === $query->get($required)) {
+                $missing[] = $required;
+            }
+        }
+        if (\count($missing)) {
+            $message = implode(',', $missing);
+            $this->sendGenericStatus(self::STATUS_BAD_REQUEST, "Missing authentication parameters: [{$message}]");
+            return false;
+        }
+
+        // 2. Check the request's timestamp is valid
 
         // Client requests are considered unauthorised if they are older than self::REQUEST_TIMESTAMP_EXPIRY.
         // This is to guard against replay attacks.
+        $requestTimestamp = Alaress_Date_Format::newFromTimestamp($query->get('ts', 0));
+        $deltaTimestamp   = abs(Alaress_Date_Format::now()->diffInSeconds($requestTimestamp));
         if ($deltaTimestamp > self::REQUEST_TIMESTAMP_EXPIRY) {
-            return 400;
+            // Advise the reason to distinguish from other bad requests
+            $this->sendGenericStatus(self::STATUS_BAD_REQUEST, 'Timestamp has expired');
+            return false;
         }
 
+        // 3. Ensure the route is valid (ie the school-code exists)
         try {
             $accessToken = $this->tokenMapper->findById($schoolCode)->getAccessToken();
         } catch (Mapper\Exception $e) {
-            return 404;
+            $this->sendGenericStatus(self::STATUS_NOT_FOUND, "No school found for school code '{$schoolCode}'");
+            return false;
         }
 
-        try {
-            $expectedDigest = $this->handler->computeAuthDigest(
-                $requestTimestamp->getUnixTimeStamp(),
-                $schoolCode,
-                $accessToken
-            );
-        } catch (Mapper\DefinitionException $e) {
-            return 500;
+        // 4. Check the requester is who they say they are
+
+        $authDigest       = $query->get('digest');
+        $expectedDigest   = $this->handler->computeAuthDigest($requestTimestamp->getUnixTimeStamp(), $schoolCode, $accessToken);
+        if ($authDigest !== $expectedDigest) {
+            $this->sendGenericStatus(self::STATUS_UNAUTHENTICATED, 'Incorrect API key and/or school code');
+            return false;
         }
 
-        if ($expectedDigest !== $authDigest) {
-            return 403;
-        }
-
-        return 200;
+        return true;
     }
 
 
     /**
-     * @param $code
+     * Prepares a consistent JSON response.
+     *
+     * Optionally supports a reason phrase to distinguish different cases that may give the same response code.
+     *
+     * @param int         $code
+     * @param null|string $reason
      * @return void
      */
-    private function sendGenericStatus($code)
+    private function sendGenericStatus(int $code, ?string $reason = null): void
     {
-        $r = new Response($code);
+        $r = $reason
+            ? new Response($code, [], null, '1.1', $reason)
+            : new Response($code);
 
         $this->getResponse()->status->set($r->getStatusCode());
 
-        $content = $code === 204 ? null : $this->buildJsonOutput($r->getReasonPhrase());
+        $content = $code === self::STATUS_NO_CONTENT
+            ? null
+            : $this->buildJsonOutput($r->getReasonPhrase());
 
         $this->getResponse()->content->set($content);
     }

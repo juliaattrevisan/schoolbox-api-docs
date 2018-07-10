@@ -1076,6 +1076,8 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     /**
      * @param int $id
      * @return Model
+     * @throws \Schoolbox\Mapper\Exception\Deleted
+     * @throws \Schoolbox\Mapper\Exception
      */
     public function findById($id)
     {
