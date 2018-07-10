@@ -113,14 +113,56 @@
                     </div>
                 </fieldset>
 
-                <fieldset class="content">
+                <fieldset class="content" id="audience-select-container">
+
                     <div class="small-12 columns">
                         <label>Audience</label>
                         <p class="meta">Target your article. Search for campuses, year levels, groups, people, or use Browse to find your audience.</p>
                         <div class="input-group">
                             <input type="text" id="audience-search" />
-                            <button class="button icon-drag-drop" data-reveal-id="audience-browse">Browse...</button>
+                            <button class="button icon-drag-drop" @click.prevent="openBrowseModal">Browse...</button>
                         </div>
+                    </div>
+
+                    {# the modal #}
+                    <div data-reveal id="audience-browse" class="reveal-modal">
+                        <h2>Browse Audience</h2>
+                        <a class="close-reveal-modal" aria-label="Close">×</a>
+
+                        <div v-show="audienceSelectPage1">
+                            <div class="small-12 medium-4 columns" v-for="audienceOption in audienceOptions">
+                                <button class="button-block" @click="changePage(audienceOption)">
+                                    <i v-bind:class="'icon-' + audienceOption.icon"></i>
+                                    ${ audienceOption.name }
+                                </button>
+                            </div>
+                        </div>
+
+                        <div v-show="audienceSelectPage2">
+
+                            <ul class="breadcrumb" style="margin-bottom:10px;">
+                                <li><a href="#" @click.prevent="audienceSelectReturn">Browse Audience</a></li>
+                                <li class="active"><a>${ audienceSelectBreadcrumb }</a></li>
+                            </ul>
+
+                            <p class="meta">Some help text here</p>
+
+                            <fieldset class="checklist checklist-table" id="audience-select-options">
+                                <template v-for="audienceListItem in audienceListItems">
+                                    <input v-bind:id="'audience-list-' + audienceListItem.id" type="checkbox" />
+                                    <label v-bind:for="'audience-list-' + audienceListItem.id">${ audienceListItem.label }</label>
+                                </template>
+                            </fieldset>
+
+                            <fieldset class="checklist" id="" style="border: none;">
+                                <input id="checkbox6" type="checkbox" checked /><label for="checkbox6" id="audience-select-checkbox-label">${ audienceSelectCheckbox }</label>
+                                <input id="checkbox7" type="checkbox" /><label for="checkbox7">Parents of students</label>
+                            </fieldset>
+
+                            <button class="button submit" @click.prevent="addAudience">Add</button>
+
+                        </div>
+
                     </div>
                 </fieldset>
 
@@ -263,8 +305,9 @@
 </style>
 
 <script>
+
     var app = new Vue({
-        el: '#audience-browse',
+        el: '#audience-select-container',
         delimiters: ['${', '}'],
         data: {
 
@@ -273,32 +316,38 @@
                 campus: {
                     name: 'Campuses',
                     icon: 'location',
-                    checkbox: 'Students in campus'
+                    checkbox: 'Students in campus',
+                    ajax: 'campus/all'
                 },
                 roles: {
                     name: 'Roles',
                     icon: 'staff-students',
-                    checkbox: 'Users in role'
+                    checkbox: 'Users in role',
+                    ajax: 'roles/all'
                 },
                 houses: {
                     name: 'Houses',
                     icon: 'home',
-                    checkbox: 'House members'
+                    checkbox: 'House members',
+                    ajax: 'house/all'
                 },
                 classes: {
                     name: 'Classes',
                     icon: 'teacher',
-                    checkbox: 'Users in class'
+                    checkbox: 'Users in class',
+                    ajax: 'class/all'
                 },
                 groups: {
                     name: 'Groups',
                     icon: 'group',
-                    checkbox: 'Group members'
+                    checkbox: 'Group members',
+                    ajax: 'group/all'
                 },
                 pastoralGroups: {
                     name: 'Pastoral Groups',
                     icon: 'pastoral',
-                    checkbox: 'Group members'
+                    checkbox: 'Group members',
+                    ajax: 'pastoral_groups/all'
                 },
             },
 
@@ -333,12 +382,24 @@
             ]
         },
         methods: {
+            openBrowseModal: function () {
+                // Reset everythang
+                this.audienceSelectPage1 = true;
+                this.audienceSelectPage2 = false;
+
+                // Open the modal
+                $('#audience-browse').foundation('reveal', 'open');
+            },
+
             // Selecting an initial page
             changePage: function (audienceOption) {
                 this.audienceSelectPage1 = false;
                 this.audienceSelectPage2 = true;
                 this.audienceSelectBreadcrumb = audienceOption.name;
                 this.audienceSelectCheckbox = audienceOption.checkbox;
+
+                // Get the list of options via ajax
+                axios.get(audienceOption.ajax);
             },
 
             // Returning back to the initial page
