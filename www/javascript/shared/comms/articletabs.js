@@ -78,9 +78,15 @@
                  */
                 if (config.updateUrl) {
 
-                    /* TODO: Retain pagination value here somewhere
+                    /* Append pagenum if specified
+                     * Otherwise, we changed tabs and want to clear away this param
                      */
-                    window.history.pushState('', response.title, response.url + '?p=' + config.pageNum);
+                    if (config.pageNum) {
+                        window.history.pushState('', response.title, response.url + '?p=' + config.pageNum);
+                    }
+                    else {
+                        window.history.pushState('', response.title, response.url);
+                    }
                 }
 
                 /* TODO: Cache the response so we don't need to refetch it
@@ -99,6 +105,12 @@
 
                 $(config.element).html('<div class="loader"></div>');
 
+                /* Clear the current page number when changing topics
+                 */
+                config.pageNum = null;
+
+                /* Reload article list afresh
+                 */
                 getArticles($(this).attr('href'));
             });
         }
