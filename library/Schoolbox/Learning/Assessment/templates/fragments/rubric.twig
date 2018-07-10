@@ -270,7 +270,18 @@ Usage:
             } else {
                 $("td[data-descriptor] input").prop("placeholder", "Points");
             }
-        })
+        });
+
+
+        // Show/hide capability marks based upon mark-per-capability
+        $('#markPerCapability').change(function() {
+            var $groupMaxValueInputs = $('[data-group-max-value]');
+            if (this.checked) {
+                $groupMaxValueInputs.removeClass('hide').prop('disabled', false);
+            } else {
+                $groupMaxValueInputs.addClass('hide').prop('disabled', true);
+            }
+        });
     });
 </script>
 
