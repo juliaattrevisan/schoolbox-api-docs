@@ -22,13 +22,13 @@
             <script src="/javascript/shared/comms/articletabs.js"></script>
             <script src="/javascript/shared/comms/saveforlater.js"></script>
             <script>
-                {#$(function() {#}
-                    {#$('#news-container').articleTabs({#}
-                        {#'firstUrl': "{{ routeLookup('commsNews.getListByTopic', {topicId: firstTopicId, limit: limit}) ~ '?compactMode=' ~ compactMode }}",#}
-                        {#'topicTabs': $('#news-topics'),#}
-                        {#'updateUrl': true#}
-                    {#});#}
-                {#});#}
+                $(function() {
+                    $('#news-container').articleTabs({
+                        'firstUrl': "{{ routeLookup('commsNews.getListByTopic', {topicId: firstTopicId, limit: limit}) ~ '?compactMode=' ~ compactMode }}",
+                        'topicTabs': $('#news-topics'),
+                        'updateUrl': true
+                    });
+                });
             </script>
 
             {% include '@commsNews/tabs.twig' with {
@@ -41,10 +41,6 @@
                 compactMode: compactMode
             } %}
         </section>
-
-        {% include 'sub/paginator.twig' with {
-            paginator: paginator
-        } %}
     </div>
 </div>
 

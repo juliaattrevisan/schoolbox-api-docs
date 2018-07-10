@@ -99,6 +99,11 @@
         </li>
     {% endfor %}
 </ul>
+
+{% include 'sub/paginator.twig' with {
+    paginator: paginator
+} %}
+
 {% else %}
     <div class="empty-state">
         <i class="icon-news"></i>

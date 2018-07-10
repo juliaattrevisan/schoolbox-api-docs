@@ -8,13 +8,10 @@
  */
 namespace Schoolbox\Comms\News;
 
-use Alaress\Paginator\Paginator;
-use Alaress\Paginator\UrlPaginator;
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
 use InvalidArgumentException;
 use Schoolbox\Application\Exception\Exception;
-use Schoolbox\Comms\News\Lists;
 use Schoolbox\Comms\News\Policy;
 use Schoolbox\Comms\News\SaveForLater;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -51,6 +48,15 @@ class Controller extends Base
      * @var SaveForLater\Mapper
      */
     private $saveForLaterMapper;
+
+    /**
+     * Number of items per page
+     * TODO: Make it a config option
+     *
+     * @var int
+     */
+    private $limit = 1;
+
 
     /**
      * Controller constructor.
@@ -244,8 +250,7 @@ class Controller extends Base
             }
 
             return;
-        }
-        catch (MapperException|RouteNotFound|\PDOException|\UnexpectedValueException|\Schoolbox\Resource\Exception $e) {
+        } catch (MapperException|RouteNotFound|\PDOException|\UnexpectedValueException|\Schoolbox\Resource\Exception $e) {
             if ($this->getRequest()->isXhr()) {
                 $this->getResponse()->status->set(400);
                 $this->getResponse()->content->set($this->buildJsonOutput([
@@ -339,7 +344,7 @@ class Controller extends Base
 
         /* Figure out if this was Saved For Later for the current user
          */
-        $saveForLater = $policies->getOffset('save_for_later')->getValue();
+        $saveForLater    = $policies->getOffset('save_for_later')->getValue();
         $isSavedForLater = false;
 
         if ($saveForLater) {
@@ -461,6 +466,7 @@ class Controller extends Base
      * @throws RouteNotFound
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \OutOfRangeException
      */
     public function getListByTopic(int $topicId, int $limit)
     {
@@ -475,10 +481,26 @@ class Controller extends Base
              */
             try {
                 $slug = TopicMapper::getInstance()->findById($topicId)->getSlug();
-            }
-            catch (MapperException $e) {
+            } catch (MapperException $e) {
                 $slug = null;
             }
+
+            /* Get this an accompanying paginator
+             */
+            $paginator = $lists->generatePaginator(
+                $this->getRouter()->generate('commsNews.getIndex', [ 'slug' => $slug ]),
+                $topicId,
+                $this->limit
+            );
+
+            $outcome = $lists->findForTopic($this->getUser(), $topicId, $limit);
+
+            /* Merge a whole bunch of other settings too
+             */
+            $outcome = array_merge($outcome, [
+                'compactMode' => $this->getRequest()->query['compactMode'],
+                'paginator' => $paginator,
+            ]);
 
             $this->getResponse()->content->set($this->buildJsonOutput([
                 'success' => true,
@@ -494,8 +516,6 @@ class Controller extends Base
      * @param string $slug
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Aura\Di\Exception\ServiceNotFound
-     * @throws \OutOfRangeException
-     * @throws RouteNotFound
      */
     public function getIndex(?string $slug)
     {
@@ -510,37 +530,25 @@ class Controller extends Base
          */
         $firstTopicId = Mapper::TOPIC_ALL;
 
-        foreach($topics as $topic) {
+        foreach ($topics as $topic) {
             if ($topic->getSlug() === $slug) {
                 $firstTopicId = $topic->getId();
                 break;
             }
         }
 
-        /* Get this many articles per page and an accompanying paginator
-         */
-        $lists = new Lists($this->newsMapper, $this->policyMapper);
-
-        $limit = 10;
-        $paginator = $lists->generatePaginator(
-            $this->getRouter()->generate('commsNews.getIndex', ['slug' => $slug]),
-            $firstTopicId,
-            $limit
-        );
-
         /* Once we found the topicId, get a bunch of articles for that topic
          */
-        $outcome = $lists->findForTopic($this->getUser(), $firstTopicId, $limit);
+        $outcome = (new Lists($this->newsMapper, $this->policyMapper))->findForTopic($this->getUser(), $firstTopicId, $this->limit);
 
         /* Merge a whole bunch of other settings too
          */
         $outcome = array_merge($outcome, [
-            'paginator' => $paginator,
             'topics' => $topics,
             'topicAll' => Mapper::TOPIC_ALL,
             'firstTopicId' => $firstTopicId,
             'compactMode' => false,
-            'limit' => $limit
+            'limit' => $this->limit
         ]);
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/index.twig', $outcome));
