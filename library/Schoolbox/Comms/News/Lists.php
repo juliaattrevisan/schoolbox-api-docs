@@ -112,11 +112,11 @@ class Lists
      *
      * @param string   $url
      * @param int      $selectedTopicId
-     * @param int|null $limit
+     * @param int      $limit
      * @return UrlPaginator
      * @throws \OutOfRangeException
      */
-    public function generatePaginator(string $url, int $selectedTopicId, ?int $limit): UrlPaginator
+    public function generatePaginator(string $url, int $selectedTopicId, int $limit): UrlPaginator
     {
         $allArticles = $this->newsMapper->findArticleIdsForTopic($selectedTopicId);
 
