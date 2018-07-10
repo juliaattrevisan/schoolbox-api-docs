@@ -314,7 +314,11 @@ class Controller extends Base
         }
 
         $rubricData = (new InlineGrader\Rubric($assessment, $participant, $this->getUser(), $response, $isInteractionLocked, $rubricContext))->generate();
-        $data = array_merge($data, $rubricData);
+
+        $rubric = $rubricData['rubricContext']['rubric'];
+        $markRangeMetadata = $this->getMarkRangeMetadata($rubric);
+
+        $data = array_merge($data, $rubricData, $markRangeMetadata);
 
         /* Augment with self-reflection rubric data
          */
@@ -322,6 +326,71 @@ class Controller extends Base
         $data = array_merge($data, $selfReflectionData);
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/inlineGrading/standard.twig', $data));
+    }
+
+    /**
+     * Get an array containing data about the range and direction of descriptor values
+     * @param array $rubric
+     * @return array
+     */
+    private function getMarkRangeMetadata(array $rubric) : array
+    {
+        $descriptors = $rubric['descriptors'];
+
+        $metadata = [];
+
+        foreach($descriptors as $critId => $levelDescriptors) {
+            $endIndex = \count($descriptors[$critId]) - 1;
+
+            $startValue = $descriptors[$critId][0] ? $descriptors[$critId][0]['value'] : null;
+            $endValue = $descriptors[$critId][$endIndex] ? $descriptors[$critId][$endIndex]['value'] : null;
+            $direction = 'asc';
+
+            if ($startValue > $endValue) {
+                $direction = 'desc';
+            }
+
+            $metadata[$critId] = [
+                'direction' => $direction
+            ];
+
+            $prevDescriptorMax = $startValue; // Used for ascending order calculations
+            $nextDescriptorMax = $endValue; // Used for descending order calculations
+            for ($i = 0; $i < \count($levelDescriptors) - 1; $i++) {
+                $currentDescriptorMax = $levelDescriptors[$i]['value'];
+                /* Assume ascending order by default
+                 * - If the value for this descriptor is the same as the previous cell, we're either on the first cell,
+                 *   or on a cell without a range
+                 * - Otherwise, this cell's min value is 1 greater than the previous cell's max, since we're ascending
+                 */
+                $currentDescriptorMin = $prevDescriptorMax === $currentDescriptorMax ? $prevDescriptorMax : $prevDescriptorMax + 1;
+
+                // Do something different if we know it's descending
+                if ($direction === 'desc') {
+                    /* - If the value for this descriptor is the same as the next cell, we're either on the last cell,
+                     *   or on a cell without a range
+                     * - Otherwise, this cell's min value is 1 greater than the next cell's max, since we're descending
+                     */
+                    $currentDescriptorMin = $currentDescriptorMax === $nextDescriptorMax ? $nextDescriptorMax : $nextDescriptorMax + 1;
+                }
+
+                $metadata[$critId][$levelDescriptors[$i]['id']] = [
+                    'min' => $currentDescriptorMin,
+                    'max' => $currentDescriptorMax
+                ];
+
+                $prevDescriptorMax = $currentDescriptorMax;
+
+                $finalIteration = ($i === \count($levelDescriptors) - 1);
+                if ($finalIteration) {
+                    $nextDescriptorMax = $endValue;
+                } else {
+                    $nextDescriptorMax = $levelDescriptors[$i + 1]['value'];
+                }
+            }
+        }
+
+        return $metadata;
     }
 
 
