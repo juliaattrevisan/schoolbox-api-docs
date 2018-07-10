@@ -1242,7 +1242,7 @@ class RubricMapper
             $dstGroupUsage = clone $srcGroupUsage;
 
             /** @var Group $dstGroup */
-            $dstGroup = $dstCriteria->getOffset($srcGroupUsage->getId());
+            $dstGroup = $dstGroups->getOffset($srcGroupUsage->getGroup()->getId());
 
             $dstGroupUsage->setGroup($dstGroup);
             $dstGroupUsage->setSubmissionBox($dstBox);
