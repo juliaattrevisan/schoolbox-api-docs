@@ -251,6 +251,10 @@ class Mapper extends \Schoolbox\Mapper
 
         if ($limit) {
             $query .= 'LIMIT :limit';
+
+            if ($pageNum) {
+                $query .= ' OFFSET :offset';
+            }
         }
 
         $statement = $this->database->prepare($query);
@@ -263,6 +267,10 @@ class Mapper extends \Schoolbox\Mapper
 
         if ($limit) {
             $statement->bindValue('limit', $limit, \PDO::PARAM_INT);
+
+            if ($pageNum) {
+                $statement->bindValue('offset', $limit*($pageNum-1), \PDO::PARAM_INT);
+            }
         }
 
         $statement->execute();
