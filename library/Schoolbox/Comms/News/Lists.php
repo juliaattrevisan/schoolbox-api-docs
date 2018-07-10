@@ -127,8 +127,7 @@ class Lists
         $urlPaginator = (new UrlPaginator())
             ->setPaginator($paginator)
             ->setUrl($url)
-            ->setParam('p');
-
+            ->setParam(Mapper::PAGE_NUMBER_PARAM);
 
         return $urlPaginator;
     }
