@@ -34,7 +34,9 @@
         <input type="number"
                value="{{ group.maxValue }}"
                name="{{ groupInput }}[maxValue]"
-               data-group-max-value />
+               data-group-max-value
+               {% if not usingMarkPerCapability %}disabled class="hide"{% endif %}
+        />
     </th>
 </tr>
 {%- endif %}
