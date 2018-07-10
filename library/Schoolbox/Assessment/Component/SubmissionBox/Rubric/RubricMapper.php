@@ -305,6 +305,7 @@ class RubricMapper
         while ($r = $criteriaStatement->fetch(PDO::FETCH_ASSOC)) {
 
             $groupName = $r['grouping'];
+            $selected  = $r['selected'] > 0;
 
             // First time we've encountered this Group ?
             if (empty($groupIdMap[$groupName])) {
@@ -313,7 +314,7 @@ class RubricMapper
                 $groupIdMap[$groupName] = $groupId;
                 $groups[$groupId]       = [
                     'name'     => $groupName,
-                    'maxValue' => $r['max_value'],
+                    'maxValue' => $selected ? $r['max_value'] : null,
                 ];
             }
 
@@ -322,7 +323,7 @@ class RubricMapper
 
             $criteria[$r['crit_id']] = [
                 'groupId'  => $groupIdMap[$groupName],
-                'on'       => $r['selected'] > 0,
+                'on'       => $selected,
                 'name'     => $r['name'],
                 'readonly' => $usedElsewhere,
             ];
@@ -401,9 +402,9 @@ class RubricMapper
                 FROM rubric_criterion rc
                 INNER JOIN rubric_group           rg  ON rg.id = rc.rubric_group_id
                 LEFT JOIN  rubric_criterion_usage rcu ON rcu.criterion_id = rc.id
-                LEFT JOIN  rubric_group_usage     rgu ON rgu.rubric_group_id = rg.id
                 LEFT JOIN  submission_box         sb  ON rcu.submission_box_id = sb.id                      -- This will join to deleted boxes
                 LEFT JOIN  assessment             a   ON sb.assessment_id = a.id AND a.deleted_at IS NULL -- But won't join to deleted assessments
+                LEFT JOIN  rubric_group_usage     rgu ON rgu.rubric_group_id = rg.id AND rgu.submission_box_id = sb.id
                 WHERE rg.parent_type = :parentType
                 AND rg.parent_id IN (:$in)
                 AND rc.deleted_at IS NULL
