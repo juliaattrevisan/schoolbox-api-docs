@@ -1193,6 +1193,7 @@ class RubricMapper
                 $dstGroup = clone $srcDescriptor->getCriterion()->getGroup();
                 $dstGroup->setId(null);
                 $dstGroup->setParentId($dstBox->getCategory()->getId());
+                $existingGroupMap[$groupName] = $dstGroup;
             }
             $dstGroups->setOffset($srcGroupId, $dstGroup);
 
@@ -1204,6 +1205,7 @@ class RubricMapper
                 $dstCriterion = clone $srcDescriptor->getCriterion();
                 $dstCriterion->setId(null);
                 $dstCriterion->setGroup($dstGroup);
+                $existingCriterionMap[$groupName][$criterionName] = $dstCriterion;
             }
             $dstCriteria->setOffset($srcCriterionId, $dstCriterion);
 
