@@ -12,6 +12,7 @@ chrome.css
 chrome.css.map
 chrome-ie9*.css
 chrome-foundation*.css
+chrome-foundation*.scss
 chrome-foundation*.css.map
 chrome-foundation-ie9*.css
 editor.css
@@ -21,6 +22,7 @@ mixins.css
 dr.css
 print.css
 editor*.css
+editor*.scss
 *.log
 screen.css
 vendor/
