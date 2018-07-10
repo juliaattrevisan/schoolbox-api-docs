@@ -26,6 +26,16 @@ class Group implements Twiggable, Calculable
     /** @var string */
     protected $name;
 
+    /**
+     * The maximum allowable mark for this group.
+     *
+     * Usually this is determined from the group's criteria, but it's now
+     * possible to override it.
+     *
+     * @var float
+     */
+    protected $maxValue;
+
     /** @var Criterion[]|CalculableAggregator */
     protected $criteria;
 
@@ -35,15 +45,17 @@ class Group implements Twiggable, Calculable
     /**
      * Insert convenience here
      *
-     * @param int    $id
-     * @param string $name
-     * @param bool   $readOnly
+     * @param int|null    $id
+     * @param string|null $name
+     * @param int|null    $maxValue
+     * @param bool|null   $readOnly
      */
-    public function __construct($id = null, $name = '', $readOnly = false)
+    public function __construct($id = null, $name = '', $maxValue = null, $readOnly = false)
     {
         $this->setName($name);
         $this->setId($id);
         $this->setReadOnly($readOnly);
+        $this->maxValue = $maxValue;
         $this->criteria = new CalculableAggregator();
     }
 
@@ -174,6 +186,10 @@ class Group implements Twiggable, Calculable
      */
     public function getTotal()
     {
+        if (null !== $this->maxValue) {
+            return $this->maxValue;
+        }
+
         $total = 0;
 
         foreach ($this->criteria as $crit) {

@@ -178,7 +178,11 @@ class RubricMapper
             // If first instance of Capability
             if (!array_key_exists($capabilityNormalisedName, $capabilityCache)) {
                 // Save the Capability
-                $capabilityCache[$capabilityNormalisedName] = new Criteria\Group($r['group_id'], $this->normalizeSpace($r['grouping']));
+                $capabilityCache[$capabilityNormalisedName] = new Criteria\Group(
+                    $r['group_id'],
+                    $this->normalizeSpace($r['grouping']),
+                    null
+                );
 
                 // Instantiate Indicator cache for the Capability
                 $indicatorCache[$capabilityNormalisedName] = [];
