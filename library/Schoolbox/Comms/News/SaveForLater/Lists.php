@@ -56,6 +56,6 @@ class Lists
             return $this->newsMapper->findByColumn('id', $ids);
         }
 
-        return new Collection();
+        return $this->newsMapper->createCollection();
     }
 }
