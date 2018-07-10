@@ -199,7 +199,7 @@ class Mapper extends \Schoolbox\Mapper
         /* TODO: Filter $articlesInTopic vs articles that I can see
          */
 
-        return $this->findByColumn('id', $this->findArticleIdsForTopic($topicId, $limit), [
+        return $this->findByColumn('id', $this->findArticleIdsForTopic($topicId, $limit, $pageNum), [
             'order' => [
                 'publish_at' => 'desc',
                 'created_at' => 'desc',
@@ -215,10 +215,11 @@ class Mapper extends \Schoolbox\Mapper
      * Pass null as $limit to disable it; beware the n-n join on articles-topics
      *
      * @param int      $topicId
-     * @param int|null $limit
+     * @param int      $limit
+     * @param int      $pageNum
      * @return array
      */
-    public function findArticleIdsForTopic(int $topicId, ?int $limit): array
+    public function findArticleIdsForTopic(int $topicId, int $limit = 0, int $pageNum = 0): array
     {
         $articlesInTopic = [];
 

@@ -116,9 +116,9 @@ class Lists
      * @return UrlPaginator
      * @throws \OutOfRangeException
      */
-    public function generatePaginator(string $url, int $selectedTopicId, ?int $limit)
+    public function generatePaginator(string $url, int $selectedTopicId, ?int $limit): UrlPaginator
     {
-        $allArticles = $this->newsMapper->findArticleIdsForTopic($selectedTopicId, null);
+        $allArticles = $this->newsMapper->findArticleIdsForTopic($selectedTopicId);
 
         $paginator = (new Paginator())
             ->setPageSize($limit)
