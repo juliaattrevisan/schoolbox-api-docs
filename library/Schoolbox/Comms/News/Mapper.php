@@ -19,6 +19,7 @@ use Schoolbox\UserMapper;
  *
  * @package Schoolbox\Comms\News
  * @method Model createModel($idValue = null)
+ * @method Model findById($identifierValue)
  * @method Model hydrate(array $row, $alias = '', $callback = null)
  */
 class Mapper extends \Schoolbox\Mapper
