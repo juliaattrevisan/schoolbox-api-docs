@@ -5,6 +5,7 @@
         {% include '@rubric/grid.twig' with {
             rubric: rubricContext.rubric,
             markVisibility: markVisibility ?? participant.assessable.isFeedbackVisibleToUser(USER),
+            useMarkRange: assessment.useMarkRange
         } only %}
     </div>
 </div>
