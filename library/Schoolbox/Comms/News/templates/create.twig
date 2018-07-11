@@ -150,7 +150,7 @@
                                 <fieldset class="checklist checklist-table" id="audience-select-options">
                                     <template v-for="audienceListItem in audienceListItems">
                                         <input v-bind:id="'audience-list-' + audienceListItem.id" type="checkbox" />
-                                        <label v-bind:for="'audience-list-' + audienceListItem.id">${ audienceListItem.label }</label>
+                                        <label v-bind:for="'audience-list-' + audienceListItem.id">${ audienceListItem.name }</label>
                                     </template>
                                 </fieldset>
 
@@ -261,7 +261,6 @@
     .checklist-table.checklist input[type=checkbox]:not(.plain):not(:disabled) + label:hover:after {
         background-color: transparent !important;
     }
-
 </style>
 
 <script>
@@ -276,38 +275,38 @@
                     name: 'Campuses',
                     icon: 'location',
                     checkbox: 'Students in campus',
-                    ajax: 'campus/all'
+                    ajax: '/comms/news/audiencebrowser/campuses'
                 },
                 roles: {
                     name: 'Roles',
                     icon: 'staff-students',
                     checkbox: 'Users in role',
-                    ajax: 'roles/all'
+                    ajax: '/comms/news/audiencebrowser/roles'
                 },
                 houses: {
                     name: 'Houses',
                     icon: 'home',
                     checkbox: 'House members',
-                    ajax: 'house/all'
+                    ajax: '/comms/news/audiencebrowser/houses'
                 },
                 classes: {
                     name: 'Classes',
                     icon: 'teacher',
                     checkbox: 'Users in class',
-                    ajax: 'class/all'
+                    ajax: '/comms/news/audiencebrowser/classes'
                 },
                 groups: {
                     name: 'Groups',
                     icon: 'group',
                     checkbox: 'Group members',
-                    ajax: 'group/all'
+                    ajax: '/comms/news/audiencebrowser/groups'
                 },
                 pastoralGroups: {
                     name: 'Pastoral Groups',
                     icon: 'pastoral',
                     checkbox: 'Group members',
-                    ajax: 'pastoral_groups/all'
-                },
+                    ajax: '/comms/news/audiencebrowser/pastoralgroups'
+                }
             },
 
             // Modal sections showing and hiding
@@ -319,28 +318,7 @@
             // Page 2 specifics
             audienceSelectBreadcrumb: '',
             audienceSelectCheckbox: '',
-            audienceListItems: [
-                {
-                    id: 1,
-                    label: 'Administration'
-                },
-                {
-                    id: 2,
-                    label: 'Teacher'
-                },
-                {
-                    id: 3,
-                    label: 'Senior Student'
-                },
-                {
-                    id: 4,
-                    label: 'Junior Student'
-                },
-                {
-                    id: 5,
-                    label: 'Parent'
-                }
-            ]
+            audienceListItems: []
         },
         methods: {
             openBrowseModal: function () {
@@ -353,20 +331,25 @@
 
             // Selecting an initial page
             changePage: function (audienceOption) {
+                var self = this;
+
+                // Empty the select list
+                self.audienceListItems = [];
+
+                // Show the page
+                self.showPage(1);
+
+                // Update the breadcrumb and checkbox text
+                self.audienceSelectBreadcrumb = audienceOption.name;
+                self.audienceSelectCheckbox = audienceOption.checkbox;
+
                 // Request a list of options with the uri listed in the object above
                 axios.get(audienceOption.ajax).then(function(response) {
                     // Update the list of options
-                    this.audienceListItems = response;
-
-                    // Update the breadcrumb and checkbox text
-                    this.audienceSelectBreadcrumb = audienceOption.name;
-                    this.audienceSelectCheckbox = audienceOption.checkbox;
-
-                    // Show the page
-                    this.showPage(1);
+                    self.audienceListItems = response.data.data;
 
                 }).catch(function (error) {
-                    console.log('no dice');
+                    console.log(error);
                 });
             },
 
@@ -379,9 +362,9 @@
             },
 
             showPage: function (page) {
-                this.pageShow[0] = false;
-                this.pageShow[1] = false;
-                this.pageShow[page] = true;
+                this.$set(this.pageShow, 0, false);
+                this.$set(this.pageShow, 1, false);
+                this.$set(this.pageShow, page, true);
             }
         }
     });
