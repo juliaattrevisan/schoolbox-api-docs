@@ -37,10 +37,6 @@
                  */
                 topicTabs: $(element).parents('[data-component]').find('[data-tab]'),
 
-                /* Cache for async responses
-                 */
-                cache: [],
-
                 /* Load this data upon start
                  */
                 firstUrl: '',
@@ -58,16 +54,10 @@
          */
         function getArticles(url) {
 
-            /* Check for a cached version and load that, if possible
-             * Otherwise fetch it
-             *
+            /* TODO: Check for a cached version and load that, if possible; otherwise fetch it
              * Temporarily disabled due to action-at-a-distance with saved for later
              * and articles that appear in multiple topics with different saved for later states
              */
-            // if (config.cache[url] !== undefined) {
-            //     $(config.element).html(config.cache[url]).saveForLater();
-            //     return;
-            // }
 
             $.ajax({
                 type: 'GET',
@@ -79,9 +69,9 @@
                  */
                 $(config.element).html(response).saveForLater();
 
-                /* Cache the response so we don't need to refetch it
+                /* TODO: Cache the response so we don't need to refetch it
                  */
-                // config.cache[url] = response;
+
             }).error(function (response) {
             });
         }
