@@ -42,7 +42,9 @@
 
             <div id="news-container">
 
-                {# TODO: Purifying pre-built content strips data-saveforlater var #}
+                {# TODO: Purifying pre-built content strips data-saveforlater var
+                 # For now, presume this was previously filtered elsewhere server-side
+                 #}
                 {{ initialContent|raw }}
             </div>
         </section>
