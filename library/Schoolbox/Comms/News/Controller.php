@@ -572,7 +572,6 @@ class Controller extends Base
      * @param string $slug
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Aura\Di\Exception\ServiceNotFound
-     * @throws RouteNotFound
      */
     public function getIndex(string $slug)
     {
@@ -595,21 +594,17 @@ class Controller extends Base
         $outcome = (new Lists($this->newsMapper, $this->policyMapper, $this->saveForLaterMapper))
             ->findForTopic($this->getUser(), $selectedTopicId, $this->limit, $pageNum);
 
-        /* The currently requested async url
+        /* The initial data set to load, given the params provided
          */
-        $selectedUrl = $this->getRouter()->generate('commsNews.getListByTopic', [
-            'topicId' => $selectedTopicId,
-            'limit' => $this->limit,
-        ]) . "?p={$pageNum}";
+        $initialContent = $this->buildUnthemedHtmlOutput('@commsNews/list.twig', $outcome)->getAsString();
 
         /* Merge a whole bunch of other settings too
          */
         $outcome = array_merge($outcome, [
-            'selectedUrl' => $selectedUrl,
+            'initialContent' => $initialContent,
             'topics' => $topics,
             'topicAll' => Mapper::TOPIC_ALL_ID,
             'selectedTopicId' => $selectedTopicId,
-            'compactMode' => false,
             'pageNum' => $pageNum,
             'limit' => $this->limit
         ]);

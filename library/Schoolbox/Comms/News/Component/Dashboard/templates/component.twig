@@ -22,10 +22,13 @@
 
 {% include '@commsNews/tabs.twig' with {
     topicContainerId: 'news-topics-' ~ componentInstanceId,
-    articleContainerId: 'news-container-' ~ componentInstanceId,
     selectedTopicId: selectedTopicId,
     topics: topics,
     topicAll: topicAll,
     limit: limit,
     compactMode: compactMode
 } %}
+
+<div id="news-container-{{ componentInstanceId }}">
+    <div class="loader"></div>
+</div>

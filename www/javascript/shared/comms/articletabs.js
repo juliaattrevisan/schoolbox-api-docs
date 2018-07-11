@@ -13,14 +13,19 @@
 
         var config = init(options, $(this));
 
-        /* Only work when url is provided
+        /* Only work initially when url is provided
+         * Otherwise, it must load upon topic change
          */
         if (config.selectedUrl.length) {
             getArticles(config.selectedUrl);
-            initListeners();
-
-            $(config.element).saveForLater().initAsync();
         }
+
+        /* Set everything else up as normal
+         */
+        initListeners();
+
+        $(config.element).saveForLater().initAsync();
+
 
         /**
          * Init
@@ -37,7 +42,8 @@
                  */
                 topicTabs: $(element).parents('[data-component]').find('[data-tab]'),
 
-                /* Load this data upon start
+                /* Asynchronously load this data upon start
+                 * If empty, it'll do nothing until you change topics
                  */
                 selectedUrl: '',
 

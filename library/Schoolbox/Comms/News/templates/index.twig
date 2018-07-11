@@ -24,7 +24,6 @@
             <script>
                 $(function() {
                     $('#news-container').articleTabs({
-                        'selectedUrl': "{{ selectedUrl }}",
                         'topicTabs': $('#news-topics'),
                         'updateUrl': true,
                         'pageNum': '{{ pageNum }}'
@@ -34,15 +33,20 @@
 
             {% include '@commsNews/tabs.twig' with {
                 topicContainerId: 'news-topics',
-                articleContainerId: 'news-container',
                 selectedTopicId: selectedTopicId,
                 topics: topics,
                 topicAll: topicAll,
                 limit: limit,
-                compactMode: compactMode,
-                pageNum: pageNum
+                compactMode: false
             } %}
+
+            <div id="news-container">
+
+                {# TODO: Purifying pre-built content strips data-saveforlater var #}
+                {{ initialContent|raw }}
+            </div>
         </section>
     </div>
 </div>
 
+<div id="toast" class="toast"></div>
