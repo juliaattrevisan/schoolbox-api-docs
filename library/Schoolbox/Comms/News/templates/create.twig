@@ -1,133 +1,89 @@
 {% import '@commsNews/indicator.twig' as indicator %}
 
-<script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
-<script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
-<script type="text/javascript" src="/javascript/shared/comms/draft.js"></script>
-<script src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
-<script src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
-
-<script>
-    $(function () {
-
-        {# CKEditors #}
-        $.fn.alaressEditor({
-            targetElements: $('#createForm textarea[name=body]')
-        });
-
-        $.fn.alaressEditor({
-            targetElements: $('#createForm textarea[name=blurb]'),
-            removePlugins: 'autoembed,uploadimage,schoolboxresource,schoolboxiframe,link'
-        });
-
-        {# Drafting mechanism #}
-        $('#createForm').draft({
-            inputs: ['title', 'publishAt', 'expiresAt'],
-            textareas: ['body', 'blurb'],
-            attachzones: ['attachment']
-        });
-
-        $('[data-topics]').selectizeSelector({
-            ajax: {
-                url:      '{{ routeLookup('commsNews.getTopics') }}',
-                type:     'GET',
-                dataType: 'json'
-            },
-            selectize: {
-                placeholder: 'Assign Topics'
-            },
-            value: {{ article.topics|json_encode|raw }},
-            multiple: true
-        });
-
-        $('#audience-search').selectizeSelector({
-            multiple: true,
-            {% if audienceList | length > 0 %} value: {{ audienceList }}, {% endif %}
-            ajax: {
-                url:      '/ajax/audience.php',
-                type:     'GET',
-                data:     {groupID: 50},
-                dataType: 'json'
-            }
-        });
-
-    });
-</script>
-
-<div class="row">
-    <div class="small-12 columns">
-        <h1>{{ action|capitalize }} {{ locale.news }} {{ indicator.render(article) }}</h1>
-        <ul class="meta">
-            {% if article.acceptedBy.id %}
-                <li class="icon-staff">Last moderated by {{ article.acceptedBy.fullname }}
-                    {% if article.isAccepted %}
-                        on {{ article.acceptedAt.local }}
+<div id="comms-news-create">
+    <div class="actions-small-1 row">
+        <div class="list-item">
+            <div class="small-12 column">
+                <h1>{{ action|capitalize }} {{ locale.news }} {{ indicator.render(article) }}</h1>
+                <ul class="meta">
+                    {% if article.acceptedBy.id %}
+                        <li class="icon-staff">Last moderated by {{ article.acceptedBy.fullname }}
+                            {% if article.isAccepted %}
+                                on {{ article.acceptedAt.local }}
+                            {% endif %}
+                        </li>
                     {% endif %}
-                </li>
+                </ul>
+            </div>
+        </div>
+        <nav>
+            {% set moderationListRoute = routeLookupIfAuthorized('commsNewsModeration.getList') %}
+
+            {% if moderationListRoute %}
+                <a class="icon-list" href="{{ moderationListRoute }}" title="Moderation List"></a>
             {% endif %}
-        </ul>
+        </nav>
     </div>
-</div>
 
+    {# Train Line #}
+    {% include '@commsNews/workflow.twig' with {
+        article: article,
+        moderationRequired: policies['global_moderation'].value
+    } %}
 
-{# Train Line #}
-{% include '@commsNews/workflow.twig' with {
-    article: article,
-    moderationRequired: policies['global_moderation'].value
-} %}
-
-{% if policies['global_moderation'].value %}
-<div class="row">
-    <div class="small-12 columns">
-        <div class="alert-box">
-            Moderation is required for this {{ locale.news }}. You can review <a href="{{ routeLookup('commsNewsPolicy.getPolicies') }}" title="view policy settings" target="_blank">current policy settings</a>.
+    {% if policies['global_moderation'].value %}
+    <div class="row">
+        <div class="small-12 columns">
+            <div class="alert-box">
+                Moderation is required for this {{ locale.news }}. You can review <a href="{{ routeLookup('commsNewsPolicy.getPolicies') }}" title="view policy settings" target="_blank">current policy settings</a>.
+            </div>
         </div>
     </div>
-</div>
-{% endif %}
+    {% endif %}
 
-<div class="row">
-    <div class="small-12 island">
+    <div class="row">
+        <div class="small-12 island">
 
-        {% if article.id %}
-            {% set formAction = routeLookupIfAuthorized('commsNews.postUpdate', {articleId: article.id}) %}
-        {% else %}
-            {% set formAction = routeLookupIfAuthorized('commsNews.postCreate') %}
-        {% endif %}
+            {% if article.id %}
+                {% set formAction = routeLookupIfAuthorized('commsNews.postUpdate', {articleId: article.id}) %}
+            {% else %}
+                {% set formAction = routeLookupIfAuthorized('commsNews.postCreate') %}
+            {% endif %}
 
-        <form id="createForm" action="{{ formAction }}" method="post">
-            <section>
-                <fieldset class="content">
-                    <div class="small-12 columns">
-                        <label>Title</label>
-                        <input name="title" type="text" maxlength="255" value="{{ article.title }}" />
-                    </div>
-
-                    <div class="small-12 columns">
-                        <label>Body</label>
-                        <textarea name="body">{{ article.body }}</textarea>
-                    </div>
-
-                    <div class="small-12 columns">
-                        <label>Blurb</label>
-                        <textarea name="blurb">{{ article.blurb }}</textarea>
-                    </div>
-                </fieldset>
-
-                <fieldset class="content" id="audience-select-container">
-
-                    <div class="small-12 columns">
-                        <label>Audience</label>
-                        <p class="meta">Target your article. Search for campuses, year levels, groups, people, or use Browse to find your audience.</p>
-                        <div class="input-group">
-                            <input type="text" id="audience-search" />
-                            <button class="button icon-drag-drop" @click.prevent="openBrowseModal">Browse...</button>
+            <form id="createForm" action="{{ formAction }}" method="post">
+                <section>
+                    <fieldset class="content">
+                        <div class="small-12 columns">
+                            <label>Title</label>
+                            <input name="title" type="text" maxlength="255" value="{{ article.title }}" />
                         </div>
-                    </div>
 
-                    {# the modal #}
-                    <div data-reveal id="audience-browse" class="reveal-modal">
-                        <h2>Browse Audience</h2>
-                        <a class="close-reveal-modal" aria-label="Close">×</a>
+                        <div class="small-12 columns">
+                            <label>Body</label>
+                            <textarea name="body">{{ article.body }}</textarea>
+                        </div>
+
+                        <div class="small-12 columns">
+                            <label>Blurb</label>
+                            <textarea name="blurb">{{ article.blurb }}</textarea>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="content" id="audience-select-container">
+
+                        <div class="small-12 columns">
+                            <label>Audience</label>
+                            <p class="meta">Target your article. Search for campuses, year levels, groups, people, or use Browse to find your audience.</p>
+                            <div class="input-group">
+                                <input type="text" id="audience-search" />
+                                <button class="button icon-drag-drop" @click.prevent="openBrowseModal">Browse...</button>
+                            </div>
+                        </div>
+
+                        {# the modal #}
+                        <div data-reveal id="audience-browse" class="reveal-modal">
+                            <h2>Browse Audience</h2>
+                            <a class="close-reveal-modal" aria-label="Close">×</a>
 
                             <div v-show="pageShow[0]">
                                 <div class="small-12 medium-4 columns" v-for="audienceOption in audienceOptions">
@@ -148,6 +104,7 @@
                                 <p class="meta">Some help text here</p>
 
                                 <fieldset class="checklist checklist-table" id="audience-select-options">
+                                    <div class="loader" v-show="showLoader"></div>
                                     <template v-for="audienceListItem in audienceListItems">
                                         <input v-bind:id="'audience-list-' + audienceListItem.id" type="checkbox" />
                                         <label v-bind:for="'audience-list-' + audienceListItem.id">${ audienceListItem.name }</label>
@@ -263,12 +220,59 @@
     }
 </style>
 
+<script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
+<script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
+<script type="text/javascript" src="/javascript/shared/comms/draft.js"></script>
+<script src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+<script src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
 <script>
+    $(function () {
+        {# CKEditors #}
+        $.fn.alaressEditor({
+            targetElements: $('#createForm textarea[name=body]')
+        });
+
+        $.fn.alaressEditor({
+            targetElements: $('#createForm textarea[name=blurb]'),
+            removePlugins: 'autoembed,uploadimage,schoolboxresource,schoolboxiframe,link'
+        });
+
+        {# Drafting mechanism #}
+        $('#createForm').draft({
+            inputs: ['title', 'publishAt', 'expiresAt'],
+            textareas: ['body', 'blurb'],
+            attachzones: ['attachment']
+        });
+
+        $('[data-topics]').selectizeSelector({
+            ajax: {
+                url:      '{{ routeLookup('commsNews.getTopics') }}',
+                type:     'GET',
+                dataType: 'json'
+            },
+            selectize: {
+                placeholder: 'Assign Topics'
+            },
+            value: {{ article.topics|json_encode|raw }},
+            multiple: true
+        });
+
+       $('#audience-search').selectizeSelector({
+            multiple: true,
+            {% if audienceList | length > 0 %} value: {{ audienceList }}, {% endif %}
+            ajax: {
+                url:      '/ajax/audience.php',
+                type:     'GET',
+                data:     {groupID: 50},
+                dataType: 'json'
+            }
+        });
+    });
+
     var app = new Vue({
         el: '#audience-select-container',
         delimiters: ['${', '}'],
         data: {
-
             // Modal options
             audienceOptions: {
                 campus: {
@@ -319,13 +323,14 @@
             audienceSelectBreadcrumb: '',
             audienceSelectCheckbox: '',
             audienceListItems: [],
-            cachedOptions: []
+            cachedOptions: [],
+            showLoader: true
         },
         methods: {
             openBrowseModal: function () {
                 // Reset everythang
                 this.showPage(0);
-                this.audienceListItems = [];
+                this.resetModal();
 
                 // Open the modal
                 $('#audience-browse').foundation('reveal', 'open');
@@ -335,8 +340,8 @@
             changePage: function (audienceOption) {
                 var self = this;
 
-                // Empty the select list
-                self.audienceListItems = [];
+                // Reset errtang
+                self.resetModal();
 
                 // Show the page
                 self.showPage(1);
@@ -347,10 +352,17 @@
 
                 // Try for cached list
                 if (self.cachedOptions[audienceOption.name] !== undefined) {
+                    // Hide the loader
+                    self.showLoader = false;
+
+                    // Populate the list with cached version
                     self.audienceListItems = self.cachedOptions[audienceOption.name];
                 } else { // Nope, ajax time
                     // Request a list of options with the uri listed in the object above
                     axios.get(audienceOption.ajax).then(function(response) {
+                        // Hide the loader
+                        self.showLoader = false;
+
                         // Update the list of options
                         self.audienceListItems = response.data.data;
 
@@ -366,15 +378,25 @@
             // Submitting the modal form
             addAudience: function () {
                 // Add to selectize
+                $('#audience-search').data('selectize').addOption({id: 1, name: 'wevs'});
+                $('#audience-search').data('selectize').addItem(1);
+                $('#audience-search').data('selectize').refreshItems();
 
                 // Close modal
                 $('#audience-browse').foundation('reveal', 'close');
             },
 
+            // Show the page specified, hiding the other
             showPage: function (page) {
                 this.$set(this.pageShow, 0, false);
                 this.$set(this.pageShow, 1, false);
                 this.$set(this.pageShow, page, true);
+            },
+
+            // Reset a few things
+            resetModal: function () {
+                this.audienceListItems = [];
+                this.showLoader = true;
             }
         }
     });
