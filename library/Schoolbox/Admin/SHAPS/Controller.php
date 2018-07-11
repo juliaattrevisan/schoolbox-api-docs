@@ -240,7 +240,7 @@ class Controller extends Base
     public function getSearchUsers(string $userId): void
     {
         // Selectize gives us the user's external ID
-        $user = $this->userMapper->findByExternalId($userId);
+        $user = $this->userMapper->findById($userId);
         $errors[$user->getId()] = $this->getInvalidities($user);
 
         try {

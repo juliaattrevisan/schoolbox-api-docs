@@ -32,9 +32,7 @@
                     var tableSelector = "#statusTable table";
 
                     $selectize = $selectize[0].selectize;
-                    $selectize.on("item_add", function(value, $item) {
-                        var userId = getUserIdFromRegex($item.text())
-
+                    $selectize.on("item_add", function(userId, $item) {
                         var url = '{{ routeLookup("shaps.getSearchUsers") }}'.replace('{userId}', userId);
 
                         $.get(url, function(data) {
