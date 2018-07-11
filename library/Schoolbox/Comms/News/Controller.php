@@ -509,61 +509,6 @@ class Controller extends Base
         }
     }
 
-
-    /**
-     * Determine a slug from a topic id
-     *
-     * @param int $topicId
-     * @return string
-     */
-    private function determineSlug(int $topicId): string
-    {
-        try {
-            return TopicMapper::getInstance()->findById($topicId)->getSlug();
-        } catch (MapperException $e) {
-            // unknown topic id; just return the default All Topics slug
-        }
-
-        return Mapper::TOPIC_ALL_SLUG;
-    }
-
-    /**
-     * The page number to obtain; default to 1
-     * Otherwise use the page number provided
-     *
-     * @param null|string $param
-     * @return int
-     */
-    private function determinePageNum(?string $param): int
-    {
-        return (int)$param ?: 1;
-    }
-
-
-    /**
-     * From a slug, figure out what topic matches it
-     *
-     * By default, select the All tab...
-     * but try to find the topic whose slug matches the url param
-     *
-     * @param Collection|Topic[] $topics
-     * @param string             $slug
-     * @return int
-     */
-    private function determineSelectedTopicId(Collection $topics, string $slug): int
-    {
-        $selectedTopicId = Mapper::TOPIC_ALL_ID;
-
-        foreach ($topics as $topic) {
-            if ($topic->getSlug() === $slug) {
-                return $topic->getId();
-            }
-        }
-
-        return $selectedTopicId;
-    }
-
-
     /**
      * @param string $slug
      * @throws \Alaress\Database\Predicate\InvalidColumnException
@@ -630,5 +575,58 @@ class Controller extends Base
     public function getIndexRedirect()
     {
         $this->getResponse()->redirect->to($this->getRouter()->generate('commsNews.getIndex', ['slug' => 'all']));
+    }
+
+    /**
+     * Determine a slug from a topic id
+     *
+     * @param int $topicId
+     * @return string
+     */
+    private function determineSlug(int $topicId): string
+    {
+        try {
+            return TopicMapper::getInstance()->findById($topicId)->getSlug();
+        } catch (MapperException $e) {
+            // unknown topic id; just return the default All Topics slug
+        }
+
+        return Mapper::TOPIC_ALL_SLUG;
+    }
+
+    /**
+     * The page number to obtain; default to 1
+     * Otherwise use the page number provided
+     *
+     * @param null|string $param
+     * @return int
+     */
+    private function determinePageNum(?string $param): int
+    {
+        return (int)$param ?: 1;
+    }
+
+
+    /**
+     * From a slug, figure out what topic matches it
+     *
+     * By default, select the All tab...
+     * but try to find the topic whose slug matches the url param
+     *
+     * @param Collection|Topic[] $topics
+     * @param string             $slug
+     * @return int
+     */
+    private function determineSelectedTopicId(Collection $topics, string $slug): int
+    {
+        $selectedTopicId = Mapper::TOPIC_ALL_ID;
+
+        foreach ($topics as $topic) {
+            if ($topic->getSlug() === $slug) {
+                return $topic->getId();
+            }
+        }
+
+        return $selectedTopicId;
     }
 }
