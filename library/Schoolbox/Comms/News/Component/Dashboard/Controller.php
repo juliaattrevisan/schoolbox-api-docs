@@ -12,8 +12,6 @@ use Component_Dashboard_ControllerAbstract;
 use Component_Instance;
 use Schoolbox\Collection;
 use Schoolbox\Comms\News;
-use Schoolbox\Comms\News\Policy;
-use Schoolbox\Comms\News\SaveForLater;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\News\TopicMapper;
 use Schoolbox\User;
@@ -44,7 +42,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
     private $topics;
 
     /**
-     * @var int
+     * @var bool
      */
     private $allDefault;
 
