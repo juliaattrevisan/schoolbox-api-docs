@@ -505,7 +505,7 @@ class Controller extends Base
                 'paginator' => $paginator,
                 'pageNum' => $pageNum,
                 'limit' => $limit,
-                'showPaginator' => $this->getRequest()->query[Mapper::PAGE_NUMBER_PARAM]
+                'showPaginator' => isset($this->getRequest()->query[Mapper::LIMIT_PARAM])
             ]);
 
             $this->getResponse()->content->set($this->buildJsonOutput([
