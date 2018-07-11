@@ -125,19 +125,16 @@
                 .done(function (data) {
                     var $data = $(data);
 
-                    if (type === 'criterion') {
+                    // simple case: prepend the row
+                    $row.before($data);
 
-                        // Criterion: add before the max-value-row
-                        $row.prev('[data-group-max-value-row]').before($data);
+                    if (type === 'criterion') {
 
                         // just gotta extend that rowspan
                         var $span = $row.parent().children('[data-group="' + $row.data('group') + '"][data-groupname]').children('[rowspan]');
                         $span.attr('rowspan', parseInt($span.attr('rowspan')) + 1);
 
-                    } else {
-
-                        // all other cases: prepend the row
-                        $row.before($data);
+//                    $data.find('[type=checkbox]').prop('checked', true).trigger('change');
                     }
                     $toastFeedback.toastTimeout({text: type.charAt(0).toUpperCase() + type.substr(1) + ' created!', css: 'success'});
 

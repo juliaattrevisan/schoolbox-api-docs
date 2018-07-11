@@ -42,10 +42,16 @@
 </tr>
 {% endif %}
 
-{# Input for rubric result set #}
+<tr data-group="{{ groupId }}" class="rb-new-criterion">
+    <th colspan="{{ rubric.levels|length + 2 }}">
+        <textarea data-spawn="criterion" placeholder="+ Type to add new {{ locale.translate('rubricCriterion') }} {{ group.name ? ('to ' ~ group.name) : ('with no ' ~ locale.translate('rubricGroup')) }}"></textarea>
+    </th>
+</tr>
+
+{# Input for max value #}
 {% set showGroupMaxValue = usingMarkPerCapability and hasSelectedDescriptor %}
 <tr data-group="{{ groupId }}" data-group-max-value-row {% if not showGroupMaxValue %}class="hide"{% endif %}>
-    <th class="rb-group-summary" data-group-max-value-cell colspan="{{ rubric.levels|length + 2 }}">
+    <th class="rb-group-summary" data-group-max-value-cell colspan="{{ rubric.levels|length + 3 }}">
         <label>
             Max value
             <input type="number"
@@ -55,11 +61,5 @@
                    {% if not showGroupMaxValue %}disabled class="hide"{% endif %}
             />
         </label>
-    </th>
-</tr>
-
-<tr data-group="{{ groupId }}" class="rb-new-criterion">
-    <th colspan="{{ rubric.levels|length + 2 }}">
-        <textarea data-spawn="criterion" placeholder="+ Type to add new {{ locale.translate('rubricCriterion') }} {{ group.name ? ('to ' ~ group.name) : ('with no ' ~ locale.translate('rubricGroup')) }}"></textarea>
     </th>
 </tr>
