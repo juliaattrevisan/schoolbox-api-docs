@@ -96,6 +96,7 @@
                                 {% endif %}
                             </label>
                             {# Render a dropdown to select a value from the range #}
+                            {# TODO this select needs a label; technically it should be the one above but that's already in use for the descriptor checkbox #}
                             <select id="rangeDropdown-{{ descriptor.id }}"
                                     class="{% if not descriptor.selected or descriptorMin == descriptorMax %} hide{% endif %}
                                     {% if useMarkRange and descriptorMin != descriptorMax %}used{% endif %}">
