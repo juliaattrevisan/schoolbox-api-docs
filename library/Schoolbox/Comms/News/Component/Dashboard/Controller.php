@@ -12,11 +12,9 @@ use Component_Dashboard_ControllerAbstract;
 use Component_Instance;
 use Schoolbox\Collection;
 use Schoolbox\Comms\News;
-use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\News\TopicMapper;
 use Schoolbox\User;
 use SitePage;
-
 
 class Controller extends Component_Dashboard_ControllerAbstract
 {
@@ -53,7 +51,8 @@ class Controller extends Component_Dashboard_ControllerAbstract
      * @param User               $user
      * @param SitePage           $sitepage
      */
-    public function __construct(Component_Instance $instance, User $user, SitePage $sitepage) {
+    public function __construct(Component_Instance $instance, User $user, SitePage $sitepage)
+    {
         parent::__construct($instance, $user, $sitepage);
 
         $this->newsMapper  = News\Mapper::getInstance();
