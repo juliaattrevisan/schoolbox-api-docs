@@ -27,30 +27,19 @@ $return = [];
 
 // Include all the folders by themselves
 foreach ($allResults as $currentResult) {
+    // Group users
     $return[] = [
         'id'   => 'folder_' . $currentResult->getId(),
         'name' => $currentResult->getName() . ' - /homepage/' . $currentResult->getId(),
         'type' => 'homepage',
     ];
-}
 
-// Also include them with roles attached
-foreach ($allResults as $currentResult) {
-    foreach ($roles as $role) {
-        $return[] = [
-            'id'   => 'role_' . $role->getName() . '_inFolder_' . $currentResult->getId(),
-            'name' => $role->getName() . ' in ' . $currentResult->getName() . ' - /homepage/' . $currentResult->getId(),
-            'type' => 'homepage',
-        ];
-
-        if ($role->getType() == 'parent') {
-            $return[] = [
-                'id'   => 'role_' . $role->getName() . '_ofFolder_' . $currentResult->getId(),
-                'name' => $role->getName() . ' of ' . $currentResult->getName() . ' - /homepage/' . $currentResult->getId(),
-                'type' => 'homepage',
-            ];
-        }
-    }
+    // Parents of users in the group
+    $return[] = [
+        'id'   => 'folder_' . $currentResult->getId() . '_parents',
+        'name' => 'Parents of ' . $currentResult->getName() . ' - /homepage/' . $currentResult->getId(),
+        'type' => 'homepage',
+    ];
 }
 
 

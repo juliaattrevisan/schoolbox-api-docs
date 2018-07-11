@@ -106,14 +106,16 @@
                                 <fieldset class="checklist checklist-table" id="audience-select-options">
                                     <div class="loader" v-show="showLoader"></div>
                                     <template v-for="audienceListItem in audienceListItems">
-                                        <input v-bind:id="'audience-list-' + audienceListItem.id" type="checkbox" />
+                                        <input type="checkbox" v-bind:id="'audience-list-' + audienceListItem.id" v-bind:value="audienceListItem" v-model="audienceListChecked" />
                                         <label v-bind:for="'audience-list-' + audienceListItem.id">${ audienceListItem.name }</label>
                                     </template>
                                 </fieldset>
 
-                                <fieldset class="checklist" id="" style="border: none;">
-                                    <input id="checkbox6" type="checkbox" checked /><label for="checkbox6" id="audience-select-checkbox-label">${ audienceSelectCheckbox }</label>
-                                    <input id="checkbox7" type="checkbox" /><label for="checkbox7">Parents of students</label>
+                                <fieldset class="checklist" style="border: none;">
+                                    <input type="checkbox" id="audience-select-users" v-model="includeUsers" />
+                                    <label for="audience-select-users">${ audienceSelectCheckbox }</label>
+                                    <input type="checkbox" id="audience-select-parents" v-model="includeParents" />
+                                    <label for="audience-select-parents">Parents of students</label>
                                 </fieldset>
 
                                 <button class="button submit" @click.prevent="addAudience">Add</button>
@@ -226,6 +228,9 @@
 <script src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
 <script src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
 <script>
+
+    "use strict";
+
     $(function () {
         {# CKEditors #}
         $.fn.alaressEditor({
@@ -274,44 +279,50 @@
         delimiters: ['${', '}'],
         data: {
             // Modal options
-            audienceOptions: {
-                campus: {
+            audienceOptions: [
+                {
+                    id: 'campus',
                     name: 'Campuses',
                     icon: 'location',
                     checkbox: 'Students in campus',
                     ajax: '/comms/news/audiencebrowser/campuses'
                 },
-                roles: {
+                {
+                    id: 'role',
                     name: 'Roles',
                     icon: 'staff-students',
                     checkbox: 'Users in role',
                     ajax: '/comms/news/audiencebrowser/roles'
                 },
-                houses: {
+                {
+                    id: 'house',
                     name: 'Houses',
                     icon: 'home',
                     checkbox: 'House members',
                     ajax: '/comms/news/audiencebrowser/houses'
                 },
-                classes: {
+                {
+                    id: 'class',
                     name: 'Classes',
                     icon: 'teacher',
                     checkbox: 'Users in class',
                     ajax: '/comms/news/audiencebrowser/classes'
                 },
-                groups: {
+                {
+                    id: 'folder',
                     name: 'Groups',
                     icon: 'group',
                     checkbox: 'Group members',
                     ajax: '/comms/news/audiencebrowser/groups'
                 },
-                pastoralGroups: {
+                {
+                    id: 'pastoral_group',
                     name: 'Pastoral Groups',
                     icon: 'pastoral',
                     checkbox: 'Group members',
                     ajax: '/comms/news/audiencebrowser/pastoralgroups'
                 }
-            },
+            ],
 
             // Modal sections showing and hiding
             pageShow: [
@@ -324,7 +335,12 @@
             audienceSelectCheckbox: '',
             audienceListItems: [],
             cachedOptions: [],
-            showLoader: true
+
+            showLoader: true,
+
+            audienceListChecked: [],
+            includeUsers: true,
+            includeParents: false
         },
         methods: {
             openBrowseModal: function () {
@@ -363,11 +379,20 @@
                         // Hide the loader
                         self.showLoader = false;
 
-                        // Update the list of options
-                        self.audienceListItems = response.data.data;
+                        // Modify the response slightly to have prefixed IDs (eg. 'campus_1')
+                        var modifiedOptions = [];
+                        response.data.data.forEach(function(option) {
+                            modifiedOptions.push({
+                                id: audienceOption.id + '_' + option.id,
+                                name: option.name
+                            });
+                        });
+
+                        // Update the list of options on the UI
+                        self.audienceListItems = modifiedOptions;
 
                         // Cache the options
-                        self.cachedOptions[audienceOption.name] = response.data.data;
+                        self.cachedOptions[audienceOption.name] = modifiedOptions;
 
                     }).catch(function (error) {
                         console.log(error);
@@ -377,9 +402,20 @@
 
             // Submitting the modal form
             addAudience: function () {
+                var self = this;
+
                 // Add to selectize
-                $('#audience-search').data('selectize').addOption({id: 1, name: 'wevs'});
-                $('#audience-search').data('selectize').addItem(1);
+                self.audienceListChecked.forEach(function(option) {
+                    if (self.includeUsers) {
+                        $('#audience-search').data('selectize').addOption({id: option.id, name: option.name});
+                        $('#audience-search').data('selectize').addItem(option.id);
+                    }
+                    if (self.includeParents) {
+                        $('#audience-search').data('selectize').addOption({id: option.id + '_parents', name: 'Parents of ' + option.name});
+                        $('#audience-search').data('selectize').addItem(option.id + '_parents');
+                    }
+                });
+
                 $('#audience-search').data('selectize').refreshItems();
 
                 // Close modal
@@ -396,7 +432,10 @@
             // Reset a few things
             resetModal: function () {
                 this.audienceListItems = [];
+                this.audienceListChecked = [];
                 this.showLoader = true;
+                this.includeUsers = true;
+                this.includeParents = false;
             }
         }
     });
