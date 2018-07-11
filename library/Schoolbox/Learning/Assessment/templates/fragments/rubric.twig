@@ -275,10 +275,13 @@ Usage:
 
         // Show/hide capability marks based upon mark-per-capability
         $('#markPerCapability').change(function() {
-            var $groupMaxValueInputs = $('[data-group-max-value]');
+            var $groupMaxValueInputs = $('[data-group-max-value]'),
+                $groupMaxValueRows = $('[data-group-max-value-row]');
             if (this.checked) {
+                $groupMaxValueRows.removeClass('hide');
                 $groupMaxValueInputs.removeClass('hide').prop('disabled', false);
             } else {
+                $groupMaxValueRows.addClass('hide');
                 $groupMaxValueInputs.addClass('hide').prop('disabled', true);
             }
         });
