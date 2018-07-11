@@ -15,6 +15,20 @@ use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 
 class Model implements ISoftDeletable
 {
+    /**
+     * DB representation of basic launch type.
+     *
+     * @var string
+     */
+    public const LAUNCH_TYPE_BASIC = 'LTI_LAUNCH_TYPE_BASIC';
+
+    /**
+     * DB representation of picker launch type.
+     *
+     * @var string
+     */
+    public const LAUNCH_TYPE_PICKER = 'LTI_LAUNCH_TYPE_PICKER';
+
     use Id;
     use DeletedAtDate;
     use CreatedAtDate;
@@ -146,45 +160,45 @@ class Model implements ISoftDeletable
         return $this->xml;
     }
 
-	/** @var string */
-	protected $icon;
+    /** @var string */
+    protected $icon;
 
-	/**
-	 * @param string $icon
-	 * @return self
-	 */
-	public function setIcon($icon)
-	{
-		$this->icon = $icon;
-		return $this;
-	}
+    /**
+     * @param string $icon
+     * @return self
+     */
+    public function setIcon($icon)
+    {
+        $this->icon = $icon;
+        return $this;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getIcon()
-	{
-		return $this->icon;
-	}
+    /**
+     * @return string
+     */
+    public function getIcon()
+    {
+        return $this->icon;
+    }
 
-	/** @var string */
-	protected $launchType;
+    /** @var string */
+    protected $launchType;
 
-	/**
-	 * @param string $launchType
-	 * @return self
-	 */
-	public function setLaunchType($launchType)
-	{
-		$this->launchType = $launchType;
-		return $this;
-	}
+    /**
+     * @param string $launchType
+     * @return self
+     */
+    public function setLaunchType($launchType)
+    {
+        $this->launchType = $launchType;
+        return $this;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getLaunchType()
-	{
-		return $this->launchType;
-	}
+    /**
+     * @return string
+     */
+    public function getLaunchType()
+    {
+        return $this->launchType;
+    }
 }

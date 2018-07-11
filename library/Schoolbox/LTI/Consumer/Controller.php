@@ -306,7 +306,7 @@ class Controller extends Base
         $this->user = $this->getUser();
 
         switch ($provider->getLaunchType()) {
-            case 'LTI_LAUNCH_TYPE_PICKER':
+            case Provider::LAUNCH_TYPE_PICKER:
                 $ltiRequestType = self::LTI_LAUNCH_TYPE_PICKER;
                 break;
 
