@@ -125,3 +125,16 @@ Some actions require certain preconditions to exist.
 **Limbo (Trapped Between Settings)**. This occurs when moderation is activated, an article is submitted for moderation, but the moderation requirement is then deactivated. This leaves submitted articles in an inconclusive state of being, requiring moderators to accept these articles as if moderation was activated. This can be avoided by clearing the moderation list before deactivating moderation.
 
 **Moderator Authors**. Moderators cannot reject their own articles.
+
+
+## Known Issues
+There a number of known issues.
+
+* **Selectable Topics**. On the create/update screen, the Topics selectize doesn't show you all the options you can choose when you click into its input field.
+
+* **Topics don't initiate drafts**. For some reason changing the Topics relating to an article isn't being detected and won't trigger a draft autosave on the create/update screen.
+
+* **Uncached results**. Every time you click a tab in the News Component, it'll asynchronously retrieve the appropriate set of articles. I did have a dirty fling with caching at @andrewryantech request, but I found myself stuck on Save For Later. This is a toggle and articles can appear across multiple topics; this requires some bmf w.r.t. cache invalidation (it was able to remember the previous state of an article that you Saved For Later, which was very confusing)
+
+* **Hiding empty topics**. Without some bmf I can't really hide topics that have no articles. This is because the articles available in each topic are determined by audiencing logic; this is costly regardless of how many articles could be retrieved. To hide topics that have no content that you can access means I have to do audiencing checks on every article in every topic to determine their potential visibility to the current user. For now, the News Component hides when there are exactly 0 articles in the db. Otherwise it'll do its aforementioned async behaviour and return an empty state when there was nothing to see.
+
