@@ -40,6 +40,11 @@ class Mapper extends \Schoolbox\Mapper
     public const PAGE_NUMBER_PARAM = 'p';
 
     /**
+     * Querystring param for the current Limit chosen
+     */
+    public const LIMIT_PARAM = 'l';
+
+    /**
      * @inheritdoc
      * @throws \Schoolbox\Mapper\Exception
      */

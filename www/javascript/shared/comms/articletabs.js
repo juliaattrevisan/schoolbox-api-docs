@@ -58,7 +58,11 @@
 
                 /* The current page number
                  */
-                pageNum: -1
+                pageNum: -1,
+
+                /* The current limit
+                 */
+                limit: null
             };
 
             return $.extend(defaults, options);
@@ -88,11 +92,18 @@
                  */
                 if (config.updateUrl) {
 
+                    /* TODO Surely there's a nicer way than this; I'll find out tomorrow I guess
+                     */
+                    var querystringParams = [
+                        'p=' + config.pageNum,
+                        'l=' + config.limit
+                    ].join('&');
+
                     /* Append pagenum if specified
                      * Otherwise, we changed tabs and want to clear away this param
                      */
                     if (config.pageNum) {
-                        window.history.pushState('', response.title, response.url + '?p=' + config.pageNum);
+                        window.history.pushState('', response.title, response.url + '?p' + querystringParams);
                     }
                     else {
                         window.history.pushState('', response.title, response.url);

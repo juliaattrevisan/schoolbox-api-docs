@@ -27,6 +27,12 @@ class Controller extends Base
 {
 
     /**
+     * Number of news articles per page
+     * TODO: This is a config var
+     */
+    private const ARTICLES_PER_PAGE = 1;
+
+    /**
      * @var ErrorMapper
      */
     private $errorMapper;
@@ -50,14 +56,6 @@ class Controller extends Base
      * @var SaveForLater\Mapper
      */
     private $saveForLaterMapper;
-
-    /**
-     * Number of items per page
-     * TODO: Make it a config option
-     *
-     * @var int
-     */
-    private $limit = 1;
 
     /**
      * Controller constructor.
@@ -463,19 +461,26 @@ class Controller extends Base
      * TODO: Incomplete
      *
      * @param int $topicId
-     * @param int $limit
      * @throws RouteNotFound
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \OutOfRangeException
      */
-    public function getListByTopic(int $topicId, int $limit)
+    public function getListByTopic(int $topicId)
     {
         if ($this->getRequest()->isXhr()) {
 
-            /* The page number to obtain
+            /* Querystring params:
+             * The page number to obtain
+             * Any requested limits via component configs
              */
             $pageNum = $this->determinePageNum($this->getRequest()->query[Mapper::PAGE_NUMBER_PARAM]);
+            $limit = $this->determineLimit($this->getRequest()->query[Mapper::LIMIT_PARAM]);
+
+            $querystring = http_build_query([
+                Mapper::PAGE_NUMBER_PARAM => $pageNum,
+                Mapper::LIMIT_PARAM => $limit
+            ]);
 
             $lists = new Lists($this->newsMapper, $this->policyMapper, $this->saveForLaterMapper);
 
@@ -485,11 +490,11 @@ class Controller extends Base
 
             /* Get this an accompanying paginator
              */
-            $url = $this->getRouter()->generate('commsNews.getIndex', ['slug' => $slug]);
+            $url = $this->getRouter()->generate('commsNews.getIndex', ['slug' => $slug]) . "?{$querystring}";
 
-            $paginator = $lists->generatePaginator($url, $topicId, $this->limit);
+            $paginator = $lists->generatePaginator($url, $topicId, $limit ?: self::ARTICLES_PER_PAGE);
 
-            $outcome = $lists->findForTopic($this->getUser(), $topicId, $limit, $pageNum);
+            $outcome = $lists->findForTopic($this->getUser(), $topicId, $limit ?: self::ARTICLES_PER_PAGE, $pageNum);
 
             /* Merge a whole bunch of other settings too
              */
@@ -497,6 +502,7 @@ class Controller extends Base
                 'compactMode' => $this->getRequest()->query['compactMode'],
                 'paginator' => $paginator,
                 'pageNum' => $pageNum,
+                'limit' => $limit,
                 'showPaginator' => $this->getRequest()->query[Mapper::PAGE_NUMBER_PARAM]
             ]);
 
@@ -508,6 +514,7 @@ class Controller extends Base
             ]));
         }
     }
+
 
     /**
      * @param string $slug
@@ -525,9 +532,17 @@ class Controller extends Base
         $topics = $this->topicMapper->findAll();
         $topicId = $this->determineSelectedTopicId($topics, $slug);
 
-        /* The page number to obtain
+        /* Querystring params:
+         * The page number to obtain
+         * Any requested limits TODO: This is a config option that users can't control on this screen
          */
         $pageNum = $this->determinePageNum($this->getRequest()->query[Mapper::PAGE_NUMBER_PARAM]);
+        $limit = $this->determineLimit($this->getRequest()->query[Mapper::LIMIT_PARAM]);
+
+        $querystring = http_build_query([
+            Mapper::PAGE_NUMBER_PARAM => $pageNum,
+            Mapper::LIMIT_PARAM => $limit
+        ]);
 
         $lists = new Lists($this->newsMapper, $this->policyMapper, $this->saveForLaterMapper);
 
@@ -537,11 +552,11 @@ class Controller extends Base
 
         /* Get this an accompanying paginator
          */
-        $url = $this->getRouter()->generate('commsNews.getIndex', ['slug' => $slug]);
+        $url = $this->getRouter()->generate('commsNews.getIndex', ['slug' => $slug]) . "?{$querystring}";
 
-        $paginator = $lists->generatePaginator($url, $topicId, $this->limit);
+        $paginator = $lists->generatePaginator($url, $topicId, $limit ?: self::ARTICLES_PER_PAGE);
 
-        $outcome = $lists->findForTopic($this->getUser(), $topicId, $this->limit, $pageNum);
+        $outcome = $lists->findForTopic($this->getUser(), $topicId, $limit ?: self::ARTICLES_PER_PAGE, $pageNum);
 
         /* Always provide paginator from this context
          */
@@ -562,7 +577,7 @@ class Controller extends Base
             'topicAll' => Mapper::TOPIC_ALL_ID,
             'selectedTopicId' => $topicId,
             'pageNum' => $pageNum,
-            'limit' => $this->limit
+            'limit' => $limit
         ]);
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/index.twig', $outcome));
@@ -629,4 +644,32 @@ class Controller extends Base
 
         return $selectedTopicId;
     }
+
+
+    /**
+     * $limit can be 'all' or unspecified; this equates to "don't impose a limit"
+     * ("all" could come from a component config option)
+     *
+     * @param null|string $limit
+     * @return null|int
+     */
+    private function determineLimit(?string $limit): ?int
+    {
+        /* limit not set at all; don't impose limits
+         */
+        if (('all' === $limit) || (null === $limit)) {
+            return null;
+        }
+
+        /* limit was set to zero; load a predetermined amount
+         */
+        if (!(int)$limit) {
+            return self::ARTICLES_PER_PAGE;
+        }
+
+        /* use whatever was provided
+         */
+        return (int)$limit;
+    }
+
 }
