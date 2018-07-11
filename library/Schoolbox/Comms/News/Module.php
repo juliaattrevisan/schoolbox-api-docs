@@ -88,7 +88,7 @@ class Module extends BaseModule
         $this->register('POST', '/{articleId:\d+}/delete', 'postDelete', null, $preloadNews);
 
         /* (async) Get a list of topics to chooze
-         *          */
+         */
         $this->register('GET', '/topics', 'getTopics', $getPerms);
 
         /* (async) Get a list of articles audienced to me, by topic

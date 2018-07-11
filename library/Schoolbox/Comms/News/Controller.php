@@ -577,7 +577,7 @@ class Controller extends Base
             'initialContent' => $initialContent,
             'topics' => $topics,
             'topicAll' => Mapper::TOPIC_ALL_SLUG,
-            'selectedTopicId' => $topicId,
+            'slug' => $slug,
             'pageNum' => $pageNum,
             'limit' => $limit
         ]);

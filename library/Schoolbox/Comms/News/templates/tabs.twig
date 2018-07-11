@@ -3,7 +3,6 @@
  # Sets up a container for async article loading
  #
  # @param string topicContainerId
- # @param int selectedTopicId
  # @param Collection|Topic[] topics
  # @param int topicAll
  # @param int limit
@@ -19,10 +18,10 @@
 <dl class="tabs-material" data-tab="" id="{{ topicContainerId }}">
 
     {# Select "All" by default if the component config is set #}
-    <dd {% if not selectedTopicId %}class="active"{% endif %}><a href="{{ routeLookup('commsNews.getListByTopic', {slug: topicAll}) ~ '?' ~ params}}">All</a></dd>
+    <dd {% if slug == 'all' %}class="active"{% endif %}><a href="{{ routeLookup('commsNews.getListByTopic', {slug: topicAll}) ~ '?' ~ params}}">All</a></dd>
 
     {% for topic in topics %}
-        {% if topic.id == selectedTopicId %}
+        {% if topic.getSlug == slug %}
             {% set selected = 'class="active"' %}
         {% else %}
             {% set selected = '' %}

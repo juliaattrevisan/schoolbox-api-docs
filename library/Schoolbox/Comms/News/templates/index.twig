@@ -34,9 +34,9 @@
 
             {% include '@commsNews/tabs.twig' with {
                 topicContainerId: 'news-topics',
-                selectedTopicId: selectedTopicId,
                 topics: topics,
                 topicAll: topicAll,
+                slug: slug,
                 limit: limit,
                 compactMode: false
             } %}
