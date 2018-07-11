@@ -38,6 +38,18 @@ Setting a value here will enable the Expiry Date to have a default offset from t
 
 Leaving this empty will cause articles to expire one week from time of creation.
 
+### "Read More" Link
+Some news articles are quite long - even in their blurbs - and they get truncated for brevity in some displays such as email digests, components, etc. Truncation occurs after 300 characters and to the nearest word. Unfortunately some users don't realise that there is more to the article than they can see; there is no prompt to "read more". 
+
+Providing a value for this policy will enable a link to prompt them to "read more" but you can use any phrase you want. 
+
+Leaving it empty will disable the link from being available. 
+
+### Save For Later
+This is an in-built bookmarking system specifically for news articles. Activating this policy allows users to add articles to their lists. 
+
+Deactivating this will prevent articles from being added to their lists, but their previously-saved articles will still be available and removable.
+
 ### Topics
 A reference list of Topics that were configured by the Superuser in admin. Only Superusers can alter this list.
 
@@ -57,6 +69,7 @@ Some actions require certain preconditions to exist.
 * To edit an article, you must be considered its author and the article must not be accepted for publication.
 * To submit an article for moderation, you must have a title, publish and expire dates.
 * To publish an article to its audience, moderation must be deactivated; technically, this assumes the author to be the moderator (thus, self moderating) but operationally allows you to choose when to make it available.
+* To publish an article to its audience, the article must have a title, publish date and expiry date.
 * To delete an article, you must be considered its author and the article must not be accepted for publication.
 
 ### Moderated Workflow
