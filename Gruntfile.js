@@ -139,7 +139,7 @@ var jsSrc = {
         'www/javascript/components/intro.js/intro.js',
         'www/javascript/shared/tour/tour.js',
 
-        // VueJS son!
+        // Death to jQuery!
         'node_modules/vue/dist/vue.js',
         'node_modules/axios/dist/axios.js'
 
