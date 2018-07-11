@@ -8,6 +8,8 @@
  */
 namespace Schoolbox\Comms\News\SaveForLater;
 
+use Alaress\Authorizer\Failure\InvalidPath;
+use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
@@ -16,12 +18,11 @@ use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Comms\News\Mapper as NewsMapper;
-use Schoolbox\Comms\News\Policy\Mapper as PolicyMapper;
+use Schoolbox\Comms\News\Policy;
 use Schoolbox\Comms\News\SaveForLater\Mapper as SaveForLaterMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\UserMapper;
 
 class Module extends BaseModule
 {
@@ -30,6 +31,7 @@ class Module extends BaseModule
      */
     protected $basename = 'commsNewsSaveForLater';
 
+
     /**
      * Hook method for setting up routes via self::register()
      *
@@ -37,17 +39,17 @@ class Module extends BaseModule
      */
     protected function registerRoutes(): void
     {
-        $perms = new Rule\All(
-            new Rule\IsLoggedIn()
-        );
+        $canViewList = $this->getAuthRuleCanViewList();
+        $canAdd      = $this->getAuthRuleCanAddSavedForLater();
+        $canRemove   = $this->getAuthRuleCanRemoveSavedForLater();
 
         $preloadNews = function ($params) {
             return $this->preloadNews($params);
         };
 
-        $this->register('GET', '', 'getList', $perms);
-        $this->register('POST', '/{articleId}', 'postAdd', $perms, $preloadNews);
-        $this->register('POST', '/{articleId}/remove', 'postRemove', $perms, $preloadNews);
+        $this->register('GET', '', 'getList', $canViewList);
+        $this->register('POST', '/{articleId}/add', 'postAdd', $canAdd, $preloadNews);
+        $this->register('POST', '/{articleId}/remove', 'postRemove', $canRemove, $preloadNews);
     }
 
     /**
@@ -63,7 +65,8 @@ class Module extends BaseModule
     {
         try {
             $article = $this->getNewsMapper()->findById($params['articleId']);
-        } catch (MapperException $e) {
+        } /** @noinspection PhpRedundantCatchClauseInspection */
+        catch (MapperException $e) {
             throw new NotFound($this->getErrorMapper()->getMessageById(ErrorMapper::ERROR_GENERIC_NOT_FOUND));
         }
 
@@ -103,7 +106,6 @@ class Module extends BaseModule
         /** @var Container $injector */
         $injector->params[Controller::class] = [
             'saveForLaterMapper' => $this->getMapperFactory()->getLazy(SaveForLaterMapper::class),
-            'policyMapper' => $this->getMapperFactory()->getLazy(PolicyMapper::class),
             'newsMapper' => $this->getMapperFactory()->getLazy(NewsMapper::class),
         ];
     }
@@ -113,27 +115,101 @@ class Module extends BaseModule
      * @return Mapper|NewsMapper
      * @throws \InvalidArgumentException If cannot find mapper class
      */
-    protected function getNewsMapper()
+    private function getNewsMapper()
     {
         return $this->getMapperFactory()->get(NewsMapper::class);
     }
 
 
     /**
-     * @return Mapper|UserMapper
-     * @throws \InvalidArgumentException If cannot find mapper class
-     */
-    protected function getUserMapper()
-    {
-        return $this->getMapperFactory()->get(UserMapper::class);
-    }
-
-    /**
      * @return Mapper|ErrorMapper
      * @throws InvalidArgumentException
      */
-    protected function getErrorMapper()
+    private function getErrorMapper()
     {
         return $this->getMapperFactory()->get(ErrorMapper::class);
+    }
+
+
+    /**
+     * @return Mapper|Policy\Mapper
+     * @throws InvalidArgumentException
+     */
+    private function getPolicyMapper(): Policy\Mapper
+    {
+        return $this->getMapperFactory()->get(Policy\Mapper::class);
+    }
+
+
+    /**
+     * Returns a lazy auth rule do determine if a user can add an article to their 'save-for-later' list
+     *
+     * @return Rule\IAuthorizationRule
+     */
+    private function getAuthRuleCanViewList(): Rule\IAuthorizationRule
+    {
+        return new Rule\LazyCallback(function () {
+            return new Rule\Callback(function () {
+                // Intentionally not catching mapper exception, that's a 5xx, not 4xx
+                $policy = $this->getPolicyMapper()->findOneByColumn('identifier', 'save_for_later');
+                if (!$policy->getValue()) {
+                    throw new Unauthorized('This feature has been disabled.');
+                }
+                return true;
+            });
+        });
+    }
+
+    /**
+     * Returns a lazy auth rule do determine if a user can add an article to their 'save-for-later' list
+     *
+     * @return Rule\IAuthorizationRule
+     */
+    private function getAuthRuleCanAddSavedForLater(): Rule\IAuthorizationRule
+    {
+        return new Rule\LazyCallback(function () {
+            return new Rule\Callback(function (array $params = []) {
+                // Intentionally not catching mapper exception, that's a 5xx, not 4xx
+                $policy = $this->getPolicyMapper()->findOneByColumn('identifier', 'save_for_later');
+                if (!$policy->getValue()) {
+                    throw new Unauthorized('This feature has been disabled.');
+                }
+                try {
+                    $article = $this->getNewsMapper()->findById($params['articleId']);
+                } catch (MapperException $e) {
+                    throw new InvalidPath("Article ({$params['articleId']}) not found", 0, $e);
+                }
+                if (!$article->isPublished() && !$article->isExpired()) {
+                    throw new Unauthorized('Only published or expired articles may be saved for later');
+                }
+                // TODO, can the user see this article? Probably: $article->isSharable() || isUserInAudience($user, $article)
+                return true;
+            });
+        });
+    }
+
+
+    /**
+     * Returns a lazy auth rule do determine if a user can remove an article from their 'save-for-later' list
+     *
+     * @return Rule\IAuthorizationRule
+     */
+    private function getAuthRuleCanRemoveSavedForLater(): Rule\IAuthorizationRule
+    {
+        return new Rule\LazyCallback(function(){
+            return new Rule\Callback(function (array $params = []) {
+                // Intentionally not catching mapper exception, that's a 5xx, not 4xx
+                $policy = $this->getPolicyMapper()->findOneByColumn('identifier', 'save_for_later');
+                if (!$policy->getValue()) {
+                    throw new Unauthorized('This feature has been disabled.');
+                }
+                try {
+                    $this->getNewsMapper()->findById($params['articleId']);
+                } catch (MapperException $e) {
+                    throw new InvalidPath("Article ({$params['articleId']}) not found", 0, $e);
+                }
+                return true;
+            });
+        });
     }
 }

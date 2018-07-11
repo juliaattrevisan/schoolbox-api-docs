@@ -1,17 +1,19 @@
 (function() {
 
+    var pluginName = 'saveForLater';
 
     /**
      * Save For Later
      *
-     * @param options
+     * @param {dom}    element
+     * @param {Object} options
      */
-    $.fn.saveForLater = function(options) {
+    function SaveForLater(element, options) {
         options = options || {};
 
-        var config = init(options, $(this));
+        var config = init(options, element);
 
-        initialConditions();
+        initSaveForLaterActions();
 
         /**
          * Init
@@ -21,114 +23,59 @@
          * @returns {*}
          */
         function init(options, element) {
-            var defaults = {
+            var derived = {
 
                 /* The container which has stars in it
-                 * Title is the description of the next state which will be entered because this is a toggle
                  */
-                element: element,
-
-                /* The toaster
-                 */
-                toast: $('#toast'),
-
-                /* Transitions
-                 */
-                saved: {
-                    toast: {
-                        processing: 'Saving...',
-                        complete: 'Saved'
-                    },
-                    icon: 'icon-favourite',
-                    title: 'Remove article from saved items'
-                },
-                unsaved: {
-                    toast: {
-                        processing: 'Removing...',
-                        complete: 'Removed'
-                    },
-                    icon: 'icon-favourite-hollow',
-                    title: 'Save article'
-                }
+                element: $(element)
             };
 
-            return $.extend(defaults, options);
+            return $.extend(derived, options);
         }
 
-        /**
-         * Set up initial state of the button that activates Save For Later
-         */
-        function initialConditions() {
-            var currentState;
-
-            $.each($(config.element).find('a[data-saveforlater]'), function(index, element) {
-                if ($(element).attr('data-saveforlater') === '1') {
-                    currentState = config.saved;
-                }
-                else {
-                    currentState = config.unsaved;
-                }
-
-                $(element)
-                    .attr('title', currentState.title)
-                    .addClass(currentState.icon);
-            });
-        }
 
         /**
          * Set up event listeners
          */
-        this.initAsync = function() {
-            $(config.element).on('click', 'a[data-saveforlater]', function(event) {
+        function initSaveForLaterActions() {
+            $(config.element).on('click', '[data-action]', function(event) {
                 event.preventDefault();
 
-                var $element = $(this);
-                var $toast = config.toast;
-
-                /* The state of everything after the action takes place
-                 */
-                var newState;
-
-                if ($element.attr('data-saveforlater') === '1') {
-                    newState = config.unsaved;
-                } else {
-                    newState = config.saved;
-                }
+                var $element = $(this),
+                    $toast   = $('#toast'),
+                    action   = $element.attr('data-action');
 
                 $toast.toastActivate({
-                    text: newState.toast.processing
+                    text: $element.attr('data-toast-processing')
                 });
 
                 $.ajax({
                     type: 'POST',
-                    url: $element.attr('href'),
-                    dataType: 'json'
-                }).success(function (response) {
+                    url: $element.attr('href')
+                }).success(function () {
                     $toast.toastTimeout({
-                        text: newState.toast.complete,
+                        text: $element.attr('data-toast-complete'),
                         css: 'success'
                     });
-
-                    // Update data attribute
-                    $element.attr('data-saveforlater', response.currentValue);
-
-                    // Update icon by removing all classes and adding the new one
-                    $element.removeClass().addClass(newState.icon);
-
-                    // Update title
-                    $element.attr('title', newState.title);
-                }).error(function (response) {
-                    var temp = $.parseJSON(response.responseText);
-
+                    $element.hide();
+                    var otherAction = action === 'add' ? 'remove' : 'add';
+                    config.element.find('[data-action=' + otherAction + ']').show();
+                }).error(function () {
+                    var textSuffix = action === 'add' ? 'save article for later' : 'remove article from saved list';
                     $toast.toastTimeout({
-                        text: 'Error: ' + temp.message,
+                        text: 'Error: Unable to ' + textSuffix,
                         css: 'alert'
                     });
                 });
-
             });
-        };
+        }
+    }
 
-        return this;
-    };
+    $.fn[pluginName] = function (options) {
+        return this.each(function () {
+            if (!$.data(this, 'plugin_' + pluginName)) {
+                $.data(this, 'plugin_' + pluginName, new SaveForLater(this, options));
+            }
+        });
+    }
 }(jQuery));

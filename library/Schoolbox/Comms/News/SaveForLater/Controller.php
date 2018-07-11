@@ -6,12 +6,15 @@
  * @copyright   Copyright 2017, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
+
 namespace Schoolbox\Comms\News\SaveForLater;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Comms\News;
-use Schoolbox\Comms\News\Policy;
-use Schoolbox\Mapper\Exception;
+use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\User;
+use PDOException;
+use UnexpectedValueException;
 
 class Controller extends Base
 {
@@ -20,11 +23,6 @@ class Controller extends Base
      * @var Mapper
      */
     private $saveForLaterMapper;
-
-    /**
-     * @var Policy\Mapper
-     */
-    private $policyMapper;
 
     /**
      * @var News\Mapper
@@ -36,14 +34,12 @@ class Controller extends Base
      * Controller constructor.
      *
      * @param Mapper        $saveForLaterMapper
-     * @param Policy\Mapper $policyMapper
      * @param News\Mapper   $newsMapper
      */
-    public function __construct(Mapper $saveForLaterMapper, Policy\Mapper $policyMapper, News\Mapper $newsMapper)
+    public function __construct(Mapper $saveForLaterMapper, News\Mapper $newsMapper)
     {
         $this->saveForLaterMapper = $saveForLaterMapper;
-        $this->policyMapper = $policyMapper;
-        $this->newsMapper = $newsMapper;
+        $this->newsMapper         = $newsMapper;
     }
 
 
@@ -55,29 +51,20 @@ class Controller extends Base
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Aura\Di\Exception\ServiceNotFound
      */
-    public function getList()
+    public function getList(): void
     {
         $articles = (new Lists($this->saveForLaterMapper, $this->newsMapper))->findForUser($this->getUser()->getId());
 
-        try {
-            $policy = $this->policyMapper->findOneByColumn('identifier', 'save_for_later');
-
-            $canSaveForLater = (bool)$policy->getValue();
-        } catch (Exception $e) {
-            $canSaveForLater = false;
-        }
-
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsSaveForLater/index.twig', [
-            'articles' => $articles,
-            'canSaveForLater' => $canSaveForLater
+            'articles'        => $articles,
         ])->setTitle('Saved For Later'));
     }
 
 
     /**
-     * Toggle the current state of this article in a user's Saved For Later list
-     * You never really just activate them on their own - it's a toggle of states
-     * and it happens asynchronously
+     * Add an article to a user's 'saved-for-later' list.
+     *
+     * No error if item is already added to list when this is called.
      *
      * @api POST /comms/news/saved/{articleId}
      *
@@ -85,99 +72,17 @@ class Controller extends Base
      */
     public function postAdd(News\Model $article): void
     {
+        try {
+            $this->addArticleToUserSavedList($article, $this->getUser());
+        } catch (BaseMapper\Exception|PDOException|UnexpectedValueException $e) {
+            // Server-side error, not the client's fault. Developers to be alerted.
+            $this->captureException($e);
+            $this->getResponse()->status->set(500);
+        }
+
         if ($this->getRequest()->isXhr()) {
-            $outcome = $this->toggle($article);
-
-            if (!$outcome['success']) {
-                $this->getResponse()->status->set(400);
-            }
-
-            $this->getResponse()->content->set($this->buildJsonOutput($outcome));
-
+            $this->getResponse()->content->set($this->buildJsonOutput([]));
             return;
-        }
-    }
-
-
-    /**
-     * Toggle the saved-ness of an article
-     *
-     * Add the article to your Saved For Later list, if it's not there
-     * If it's there, remove it
-     *
-     * @param News\Model $article
-     * @return array
-     */
-    private function toggle(News\Model $article): array
-    {
-        /* Can only save when the Policy is on
-         */
-        try {
-            $policy = $this->policyMapper->findOneByColumn('identifier', 'save_for_later');
-
-            $canSaveForLater = (bool)$policy->getValue();
-
-            if (!$canSaveForLater) {
-                return [
-                    'success' => false,
-                    'message' => 'This feature has been disabled.'
-                ];
-            }
-        } catch (Exception $e) {
-
-            /* Unknown settings; just leave
-             */
-            return [
-                'success' => false,
-                'message' => 'Could not save item.'
-            ];
-        }
-
-        /* Policy lets you do a thing
-         */
-        try {
-            $this->saveForLaterMapper->findOneByColumnList([
-                'user_id' => $this->getUser()->getId(),
-                'article_id' => $article->getId()
-            ]);
-
-            $exists = true;
-        } catch (Exception $e) {
-            $exists = false;
-        }
-
-        /* It's already in your list; remove it
-         */
-        if ($exists) {
-            $this->saveForLaterMapper->deleteByColumnList([
-                'user_id' => $this->getUser()->getId(),
-                'article_id' => $article->getId()
-            ]);
-
-            return [
-                'success' => true,
-                'currentValue' => Mapper::UNSAVED
-            ];
-        }
-
-        /* Only save a new one if it doesn't already exist
-         */
-        try {
-            $record = $this->saveForLaterMapper->createModel()
-                ->setUser($this->getUser())
-                ->setArticle($article);
-
-            $this->saveForLaterMapper->save($record);
-
-            return [
-                'success' => true,
-                'currentValue' => Mapper::SAVED
-            ];
-        } catch (\PDOException|\UnexpectedValueException|Exception $e) {
-            return [
-                'success' => false,
-                'message' => 'Could not save item.'
-            ];
         }
     }
 
@@ -185,23 +90,90 @@ class Controller extends Base
     /**
      * Remove an item from your Saved list
      *
-     * @api POST /comms/news/saved/{articleId}/remove
+     * No error if item was not in list when route was called.
      *
-     * @throws \Aura\Router\Exception\RouteNotFound
      * @param News\Model $article
      */
-    public function postRemove(News\Model $article)
+    public function postRemove(News\Model $article): void
     {
-        if ($this->getRequest()->isXhr()) {
-            $this->saveForLaterMapper->deleteByColumnList([
-                'user_id' => $this->getUser()->getId(),
-                'article_id' => $article->getId()
-            ]);
-
-            $this->getResponse()->content->set($this->buildJsonOutput([
-                'success' => true,
-                'nextUrl' => $this->getRouter()->generate('commsNewsSaveForLater.postRemove', ['articleId' => $article->getId()])
-            ]));
+        $response = [];
+        try {
+            $this->removeArticleFromUserSavedList($article, $this->getUser());
+        } catch (BaseMapper\Exception $e) {
+            // Server-side error, not the client's fault. Developers to be alerted.
+            $this->captureException($e);
+            $this->getResponse()->status->set(500);
         }
+
+        if ($this->getRequest()->isXhr()) {
+            $this->getResponse()->content->set($this->buildJsonOutput($response));
+            return;
+        }
+    }
+
+
+    /**
+     * Adds the article to the user's 'saved-for-later' list
+     *
+     * Returns whether the item was inserted, as opposed to already existing
+     *
+     * @param News\Model $article
+     * @param User       $user
+     * @return bool
+     * @throws BaseMapper\Exception
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
+     */
+    private function addArticleToUserSavedList(News\Model $article, User $user): bool
+    {
+        $columnList = ['user_id' => $user->getId(), 'article_id' => $article->getId()];
+
+        try {
+            $savedForLater = $this->saveForLaterMapper->findOneByColumnList($columnList, [], ['deleted' => true]);
+        } catch (BaseMapper\Exception $e) {
+            $savedForLater = null;
+        }
+
+        // No record? Create one.
+        if (!$savedForLater) {
+            $savedForLater = $this->saveForLaterMapper->createModel()->setUser($user)->setArticle($article);
+            $this->saveForLaterMapper->save($savedForLater);
+            return true;
+        }
+
+        // Was in list, but was removed. Treated as an update action, not a restore action.
+        if ($savedForLater->isDeleted()) {
+            $savedForLater->setDeletedAt(null);
+            $this->saveForLaterMapper->save($savedForLater);
+            return true;
+        }
+        return false;
+    }
+
+
+    /**
+     * Removes the article from the user's 'saved-for-later' list
+     *
+     * Returns whether an item was removed, as opposed to never existing
+     *
+     * @param News\Model $article
+     * @param User       $user
+     * @return bool
+     * @throws BaseMapper\Exception
+     */
+    private function removeArticleFromUserSavedList(News\Model $article, User $user): bool
+    {
+        $columnList = ['user_id' => $user->getId(), 'article_id' => $article->getId()];
+
+        try {
+            $savedForLater = $this->saveForLaterMapper->findOneByColumnList($columnList, [], ['deleted' => true]);
+        } catch (BaseMapper\Exception $e) {
+            return false;
+        }
+
+        if ($savedForLater->isDeleted()) {
+            return false;
+        }
+        return $this->saveForLaterMapper->delete($savedForLater);
     }
 }

@@ -14,6 +14,10 @@ use Schoolbox\Collection;
 use Schoolbox\Comms\News;
 use Schoolbox\UserMapper;
 
+/**
+ * @method Model createModel($idValue = null)
+ * @method Model findOneByColumnList($columnList, $order = [], $options = [])
+ */
 class Mapper extends \Schoolbox\Mapper
 {
     /**
@@ -25,7 +29,7 @@ class Mapper extends \Schoolbox\Mapper
     /**
      * @inheritdoc
      */
-    protected function mapping()
+    protected function mapping(): void
     {
         $this->hasTable('comms_news_saveforlater');
         $this->hasModel(Model::class);

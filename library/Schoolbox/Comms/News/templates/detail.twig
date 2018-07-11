@@ -49,21 +49,19 @@
     </div>
     <nav>
         {# Save For Later #}
-        {% if policies['save_for_later'].value %}
-            <script src="/javascript/shared/comms/saveforlater.js"></script>
-            <script>
-                $(function() {
-                    $('#saveforlater-container').saveForLater().initAsync();
-                });
-            </script>
+        <script src="/javascript/shared/comms/saveforlater.js"></script>
+        <script>
+            $(function() {
+                $('[data-saveforlater]').saveForLater();
+            });
+        </script>
 
-            <span id="saveforlater-container">
-                {% include '@commsNewsSaveForLater/activator.twig' with {
-                    news: news,
-                    state: isSavedForLater
-                } %}
-            </span>
-        {% endif %}
+        <span data-saveforlater="{{ article.id }}">
+            {% include '@commsNewsSaveForLater/activator.twig' with {
+                article: article,
+                isSaved: isSavedForLater
+            } only %}
+        </span>
 
         <a class="icon-more" title="Actions" data-dropdown="header-options"></a>
     </nav>

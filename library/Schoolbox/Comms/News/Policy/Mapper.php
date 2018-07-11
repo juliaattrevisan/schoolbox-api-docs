@@ -9,6 +9,9 @@
 
 namespace Schoolbox\Comms\News\Policy;
 
+/**
+ * @method Model findOneByColumn($columnName, $columnValue, $order = array(), $options = array())
+ */
 class Mapper extends \Schoolbox\Mapper
 {
 

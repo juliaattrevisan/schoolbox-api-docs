@@ -7,12 +7,6 @@
 <div class="row">
     <div class="small-12 columns">
         <h1>Saved</h1>
-
-        <ul class="meta">
-            {% if not canSaveForLater %}
-            <li class="icon-info">Saving items has been disabled. You can't add to this list.</li>
-            {% endif %}
-        </ul>
     </div>
 </div>
 <div class="row">
@@ -52,11 +46,9 @@
                                     if (!$('#saveForLaterList li').length) {
                                         $('#emptyState').show();
                                     }
-                                }).error(function (response) {
-                                    var temp = $.parseJSON(response.responseText);
-
-                                    toast.toastTimeout({
-                                        text: 'Error: ' + temp.message,
+                                }).error(function () {
+                                      toast.toastTimeout({
+                                        text: 'Unable to remove item from list',
                                         css: 'alert'
                                     });
                                 });
@@ -69,7 +61,8 @@
             <section>
                 <ul class="information-list" id="saveForLaterList">
                     {% for article in articles %}
-                        <li class="actions-small-1">
+                        {% set routeRemove = routeLookupIfAuthorized('commsNewsSaveForLater.postRemove', {article: article, articleId: article.id}) %}
+                        <li class="{% if routeRemove %}actions-small-1{% endif %}">
                             <div class="list-item">
                                 <div class="small-12 card">
                                     <h3><a href="{{ routeLookup('commsNews.getDetail', {articleId: article.id}) }}">{{ article.title }}</a></h3>
@@ -84,9 +77,11 @@
                                     {% endif %}
                                 </div>
                             </div>
+                            {% if routeRemove %}
                             <nav>
-                                <a class="icon-close" href="{{ routeLookup('commsNewsSaveForLater.postRemove', {articleId: article.id}) }}" title="Remove this from your saved items" data-remove="{{ article.title }}"></a>
+                                <a class="icon-close" href="{{ routeRemove }}" title="Remove this from your saved items" data-remove="{{ article.title }}"></a>
                             </nav>
+                            {% endif %}
                             <article>{{ article.blurb|purify }}</article>
                         </li>
                     {% endfor %}
