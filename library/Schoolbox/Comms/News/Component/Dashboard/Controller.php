@@ -45,19 +45,21 @@ class Controller extends Component_Dashboard_ControllerAbstract
      */
     private $firstTopicId;
 
+
     /**
      * Controller constructor.
      *
      * @param Component_Instance $instance
      * @param User               $user
      * @param SitePage           $sitepage
+     * @throws \InvalidArgumentException
      */
     public function __construct(Component_Instance $instance, User $user, SitePage $sitepage)
     {
         parent::__construct($instance, $user, $sitepage);
 
-        $this->newsMapper  = News\Mapper::getInstance();
-        $this->topicMapper = TopicMapper::getInstance();
+        $this->newsMapper  = $this->getMapperFactory()->get(News\Mapper::class);
+        $this->topicMapper = $this->getMapperFactory()->get(TopicMapper::class);
     }
 
 
