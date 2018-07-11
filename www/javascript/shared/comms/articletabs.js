@@ -13,10 +13,14 @@
 
         var config = init(options, $(this));
 
-        getArticles(config.firstUrl);
-        initListeners();
+        /* Only work when url is provided
+         */
+        if (config.firstUrl.length) {
+            getArticles(config.firstUrl);
+            initListeners();
 
-        $(config.element).saveForLater().initAsync();
+            $(config.element).saveForLater().initAsync();
+        }
 
         /**
          * Init
