@@ -45,6 +45,11 @@ class Mapper extends \Schoolbox\Mapper
     public const LIMIT_PARAM = 'l';
 
     /**
+     * Querystring param for the current topic chosen
+     */
+    public const TOPIC_SLUG_PARAM = 't';
+
+    /**
      * @inheritdoc
      * @throws \Schoolbox\Mapper\Exception
      */
