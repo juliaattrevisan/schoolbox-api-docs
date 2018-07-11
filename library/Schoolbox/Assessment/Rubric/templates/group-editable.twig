@@ -37,8 +37,8 @@
 {% endif %}
 
 {# Input for rubric result set #}
-<tr data-group="{{ groupId }}">
-    <th class="rb-group-summary" data-group-max-value-container colspan="{{ rubric.levels|length + 2 }}">
+<tr data-group="{{ groupId }}" data-group-max-value-row>
+    <th class="rb-group-summary" data-group-max-value-cell colspan="{{ rubric.levels|length + 2 }}">
         <label>
             Max value
             <input type="number"
