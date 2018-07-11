@@ -30,8 +30,8 @@ class Mapper extends BaseMapper
         $this->uses('xml', self::TYPE_STRING);
         $this->uses('icon', self::TYPE_STRING);
         $this->uses('url', self::TYPE_STRING);
-		$this->uses('custom', self::TYPE_STRING);
-		$this->uses('launch_type', self::TYPE_STRING);
+        $this->uses('custom', self::TYPE_STRING);
+        $this->uses('launch_type', self::TYPE_STRING);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
