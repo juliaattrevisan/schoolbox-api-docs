@@ -312,9 +312,10 @@ class RubricMapper
                 $groupId = $r['group_id'];
 
                 $groupIdMap[$groupName] = $groupId;
+                $maxValue               = isset($r['max_value']) ? (float)$r['max_value'] : null;
                 $groups[$groupId]       = [
                     'name'     => $groupName,
-                    'maxValue' => $selected ? $r['max_value'] : null,
+                    'maxValue' => $selected ? $maxValue : null,
                 ];
             }
 
