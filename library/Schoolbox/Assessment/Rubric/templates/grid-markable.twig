@@ -76,9 +76,10 @@
                                     {{- descriptor.text|nl2br -}}
                                 </span>
 
-                                {% set direction = descriptorMetadata[crit.id]['direction'] %}
-                                {% set descriptorMin = descriptorMetadata[crit.id][levelIndex]['min']%}
-                                {% set descriptorMax = descriptorMetadata[crit.id][levelIndex]['max']%}
+
+                                {% set direction = rubric.descriptorMetadata[crit.id]['direction'] %}
+                                {% set descriptorMin = rubric.descriptorMetadata[crit.id][levelIndex]['min']%}
+                                {% set descriptorMax = rubric.descriptorMetadata[crit.id][levelIndex]['max']%}
 
                                 {# Just show a text value if the descriptor is not selected #}
                                 {% if descriptor.value is not null and showDescriptorValue and (config.rubric_show_points or not studentView) %}

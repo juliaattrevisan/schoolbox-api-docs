@@ -107,7 +107,8 @@ class RubricContext
         /* Spawn rubric grid
          */
         (new GridGenerator($this->rubricMapper, $dueWork->getRubric(), $student))->applyInstructorGivenMark($publishedOnly);
-        $context['rubric'] = $dueWork->getRubric()->toContext();
+        $rubric = $dueWork->getRubric()->toContext();
+        $context['rubric'] = array_merge($rubric, ['descriptorMetadata' => $this->generateDescriptorMetadata($rubric)]);
 
         return $context;
     }
