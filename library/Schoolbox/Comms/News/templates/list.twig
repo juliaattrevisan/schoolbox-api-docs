@@ -40,6 +40,7 @@
  # @param array|int[] savedArticleIds
  # @param int unsaved
  # @param int compactMode
+ # @param bool showPaginator
  #}
 {% if articles|length %}
 <ul class="information-list">
@@ -101,10 +102,10 @@
 </ul>
 
 {% if showPaginator %}
-{% include 'sub/paginator.twig' with {
-    paginator: paginator,
-    page: pageNum
-} %}
+    {% include 'sub/paginator.twig' with {
+        paginator: paginator,
+        page: pageNum
+    } %}
 {% endif %}
 
 {% else %}
