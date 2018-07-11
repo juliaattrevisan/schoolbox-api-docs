@@ -460,15 +460,21 @@ class Controller extends Base
      *
      * TODO: Incomplete
      *
-     * @param int $topicId
+     * @param string $slug
      * @throws RouteNotFound
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \OutOfRangeException
      */
-    public function getListByTopic(int $topicId)
+    public function getListByTopic(string $slug)
     {
         if ($this->getRequest()->isXhr()) {
+            /* News Topics were never obtainable by slug
+             * We always fetched everything, then manually sorted by slug
+             * Inherit this situation, improvise and adapt (or just use ids...)
+             */
+            $topics = $this->topicMapper->findAll();
+            $topicId = $this->determineSelectedTopicId($topics, $slug);
 
             /* Querystring params:
              * The page number to obtain
@@ -483,10 +489,6 @@ class Controller extends Base
             ]);
 
             $lists = new Lists($this->newsMapper, $this->policyMapper, $this->saveForLaterMapper);
-
-            /* Figure out the slug from the id
-             */
-            $slug = $this->determineSlug($topicId);
 
             /* Get this an accompanying paginator
              */
@@ -574,7 +576,7 @@ class Controller extends Base
         $outcome = array_merge($outcome, [
             'initialContent' => $initialContent,
             'topics' => $topics,
-            'topicAll' => Mapper::TOPIC_ALL_ID,
+            'topicAll' => Mapper::TOPIC_ALL_SLUG,
             'selectedTopicId' => $topicId,
             'pageNum' => $pageNum,
             'limit' => $limit

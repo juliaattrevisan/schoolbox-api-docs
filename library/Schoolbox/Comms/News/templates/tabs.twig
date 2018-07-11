@@ -20,7 +20,7 @@
 <dl class="tabs-material" data-tab="" id="{{ topicContainerId }}">
 
     {# Select "All" by default if the component config is set #}
-    <dd {% if not selectedTopicId %}class="active"{% endif %}><a href="{{ routeLookup('commsNews.getListByTopic', {topicId: topicAll}) ~ '?' ~ params}}">All</a></dd>
+    <dd {% if not selectedTopicId %}class="active"{% endif %}><a href="{{ routeLookup('commsNews.getListByTopic', {slug: topicAll}) ~ '?' ~ params}}">All</a></dd>
 
     {% for topic in topics %}
         {% if topic.id == selectedTopicId %}
@@ -29,7 +29,7 @@
             {% set selected = '' %}
         {% endif %}
 
-        <dd {{ selected|purify }}><a href="{{ routeLookup('commsNews.getListByTopic', {topicId: topic.id}) ~ '?' ~ params }}">{{ topic.name }}</a></dd>
+        <dd {{ selected|purify }}><a href="{{ routeLookup('commsNews.getListByTopic', {slug: topic.getSlug}) ~ '?' ~ params }}">{{ topic.name }}</a></dd>
     {% endfor %}
 </dl>
 
