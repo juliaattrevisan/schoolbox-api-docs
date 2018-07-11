@@ -27,11 +27,6 @@ class Controller extends Component_Dashboard_ControllerAbstract
     private $newsMapper;
 
     /**
-     * @var ErrorMapper
-     */
-    private $errorMapper;
-
-    /**
      * @var TopicMapper
      */
     private $topicMapper;
@@ -63,7 +58,6 @@ class Controller extends Component_Dashboard_ControllerAbstract
 
         $this->newsMapper  = News\Mapper::getInstance();
         $this->topicMapper = TopicMapper::getInstance();
-        $this->errorMapper = ErrorMapper::getInstance();
     }
 
 
