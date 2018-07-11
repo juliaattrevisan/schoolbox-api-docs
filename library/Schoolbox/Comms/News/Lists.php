@@ -110,14 +110,20 @@ class Lists
     /**
      * Generate a standard paginator to go with your article list
      *
-     * @param string   $url
-     * @param int      $selectedTopicId
-     * @param int      $limit
-     * @return UrlPaginator
+     * @param string $url
+     * @param int    $selectedTopicId
+     * @param int    $limit
+     * @return UrlPaginator|null
      * @throws \OutOfRangeException
      */
-    public function generatePaginator(string $url, int $selectedTopicId, int $limit): UrlPaginator
+    public function generatePaginator(string $url, int $selectedTopicId, int $limit): ?UrlPaginator
     {
+        /* No limit specified; no pagination required
+         */
+        if (!$limit) {
+            return null;
+        }
+
         $allArticles = $this->newsMapper->findArticleIdsForTopic($selectedTopicId);
 
         $paginator = (new Paginator())

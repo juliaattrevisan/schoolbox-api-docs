@@ -492,9 +492,9 @@ class Controller extends Base
              */
             $url = $this->getRouter()->generate('commsNews.getIndex', ['slug' => $slug]) . "?{$querystring}";
 
-            $paginator = $lists->generatePaginator($url, $topicId, $limit ?: self::ARTICLES_PER_PAGE);
+            $paginator = $lists->generatePaginator($url, $topicId, $limit);
 
-            $outcome = $lists->findForTopic($this->getUser(), $topicId, $limit ?: self::ARTICLES_PER_PAGE, $pageNum);
+            $outcome = $lists->findForTopic($this->getUser(), $topicId, $limit, $pageNum);
 
             /* Merge a whole bunch of other settings too
              */
@@ -554,9 +554,9 @@ class Controller extends Base
          */
         $url = $this->getRouter()->generate('commsNews.getIndex', ['slug' => $slug]) . "?{$querystring}";
 
-        $paginator = $lists->generatePaginator($url, $topicId, $limit ?: self::ARTICLES_PER_PAGE);
+        $paginator = $lists->generatePaginator($url, $topicId, $limit);
 
-        $outcome = $lists->findForTopic($this->getUser(), $topicId, $limit ?: self::ARTICLES_PER_PAGE, $pageNum);
+        $outcome = $lists->findForTopic($this->getUser(), $topicId, $limit, $pageNum);
 
         /* Always provide paginator from this context
          */
@@ -651,25 +651,18 @@ class Controller extends Base
      * ("all" could come from a component config option)
      *
      * @param null|string $limit
-     * @return null|int
+     * @return int
      */
-    private function determineLimit(?string $limit): ?int
+    private function determineLimit(?string $limit): int
     {
         /* limit not set at all; don't impose limits
          */
-        if (('all' === $limit) || (null === $limit)) {
-            return null;
-        }
-
-        /* limit was set to zero; load a predetermined amount
-         */
-        if (!(int)$limit) {
-            return self::ARTICLES_PER_PAGE;
+        if (('all' === $limit) || (null === $limit) || !(int)$limit) {
+            return 0;
         }
 
         /* use whatever was provided
          */
         return (int)$limit;
     }
-
 }
