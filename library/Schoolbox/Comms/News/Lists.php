@@ -94,12 +94,12 @@ class Lists
      */
     private function findSavedArticles(User $user, Policy\Model $policy): array
     {
-        $savedArticleIds = [];
-
         if ($policy->getValue()) {
             $savedArticleIds = (new SaveForLater\Lists($this->saveForLaterMapper, $this->newsMapper))->findSavedIdsForUser($user->getId());
+
+            return array_fill_keys($savedArticleIds, SaveForLater\Mapper::SAVED);
         }
 
-        return $savedArticleIds;
+        return [];
     }
 }

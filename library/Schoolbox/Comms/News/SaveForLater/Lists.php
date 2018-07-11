@@ -13,7 +13,6 @@ use Alaress\Database\Predicate\InvalidColumnException;
 use Schoolbox\Collection;
 use Schoolbox\Comms\News;
 
-
 class Lists
 {
 
@@ -52,7 +51,7 @@ class Lists
         $ids = $this->findSavedIdsForUser($userId);
 
         if (\count($ids)) {
-            return $this->newsMapper->findByColumn('id', array_keys($ids), [
+            return $this->newsMapper->findByColumn('id', $ids, [
                 'order' => [
                     'publish_at' => 'asc'
                 ]
@@ -77,8 +76,6 @@ class Lists
         $pb = $this->saveForLaterMapper->getPredicateBuilder();
         $pb->equals('user_id', $userId);
 
-        $ids = $this->saveForLaterMapper->findScalarByPredicates('article_id', $pb);
-
-        return array_fill_keys($ids, Mapper::SAVED);
+        return $this->saveForLaterMapper->findScalarByPredicates('article_id', $pb);
     }
 }
