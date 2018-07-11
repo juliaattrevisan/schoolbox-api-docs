@@ -18,9 +18,20 @@ use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\News\Topic;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\User;
+use Alaress_Date_Format;
 
 class Model implements ISoftDeletable
 {
+    // The discrete, atomic states this article may be in.
+    // It is quite valid for composite states to be composed of 2+ more atomic states. eg isAccepted = [AWAITING_PUBLICATION|PUBLISHED|EXPIRED]
+    // Although explicit usage of the atomics is probably clearer.
+    private const STATE_DRAFT                = 1;
+    private const STATE_AWAITING_MODERATION  = 2;
+    private const STATE_AWAITING_PUBLICATION = 3;
+    private const STATE_REJECTED             = 4;
+    private const STATE_PUBLISHED            = 5;
+    private const STATE_EXPIRED              = 6;
+
     use Id;
     use CreatedAtDate;
     use UpdatedAtDate;
@@ -125,25 +136,24 @@ class Model implements ISoftDeletable
     /* Conveniences
      */
 
+
     /**
-     * This news has been submitted
+     * Returns whether articles is a draft. Stubs will return true.
      *
      * @return bool
      */
-    public function isSubmitted(): bool
+    public function isDraft(): bool
     {
-        return $this->getSubmittedAt() !== null && !$this->getSubmittedAt()->isNull();
+        return self::STATE_DRAFT === $this->getDiscreteState();
     }
 
 
     /**
-     * This news has been accepted
-     *
      * @return bool
      */
-    public function isAccepted(): bool
+    public function isAwaitingModeration(): bool
     {
-        return $this->getAcceptedAt() !== null && !$this->getAcceptedAt()->isNull();
+        return self::STATE_AWAITING_MODERATION === $this->getDiscreteState();
     }
 
 
@@ -154,7 +164,107 @@ class Model implements ISoftDeletable
      */
     public function isRejected(): bool
     {
-        return $this->getRejectedAt() !== null && !$this->getRejectedAt()->isNull();
+        return self::STATE_REJECTED === $this->getDiscreteState();
+    }
+
+
+    /**
+     * @return bool
+     */
+    public function isAwaitingPublication(): bool
+    {
+        return self::STATE_AWAITING_PUBLICATION === $this->getDiscreteState();
+    }
+
+
+    /**
+     * Returns whether this article is in the 'published' state
+     *
+     * @return bool
+     */
+    public function isPublished(): bool
+    {
+        return self::STATE_PUBLISHED === $this->getDiscreteState();
+    }
+
+
+    /**
+     * Returns whether this article is in the 'expired' (aka 'archived') state
+     *
+     * @return bool
+     */
+    public function isExpired(): bool
+    {
+        return self::STATE_PUBLISHED === $this->getDiscreteState();
+    }
+
+
+    /**
+     * This news has been submitted
+     *
+     * @param Alaress_Date_Format|null $now
+     * @return bool
+     */
+    public function isSubmitted(Alaress_Date_Format $now = null): bool
+    {
+        return self::STATE_DRAFT !== $this->getDiscreteState($now);
+    }
+
+
+    /**
+     * This news has been accepted
+     *
+     * @param Alaress_Date_Format|null $now
+     * @return bool
+     */
+    public function isAccepted(Alaress_Date_Format $now = null): bool
+    {
+        $acceptedStates = [self::STATE_AWAITING_PUBLICATION, self::STATE_PUBLISHED, self::STATE_EXPIRED];
+        return \in_array($this->getDiscreteState($now), $acceptedStates, true);
+    }
+
+
+    /**
+     * Returns the discrete atomic state of this article.
+     *
+     * Stub articles will return 'DRAFT'.
+     *
+     * Does not cater for deleted articles, that is a different dimension.
+     *
+     * @param Alaress_Date_Format|null $now
+     * @return int
+     */
+    private function getDiscreteState(Alaress_Date_Format $now = null): int
+    {
+        // Needed to compensate for AlaressNullDate object/null duality
+        $submittedAt = $this->submittedAt && !$this->submittedAt->isNull() ? $this->submittedAt : null;
+        $acceptedAt  = $this->acceptedAt && !$this->acceptedAt->isNull() ? $this->acceptedAt : null;
+        $rejectedAt  = $this->rejectedAt && !$this->rejectedAt->isNull() ? $this->rejectedAt : null;
+
+        // Stubs will be treated as drafts. Assumes not possible to enter a different state if never submitted.
+        if (null === $submittedAt) {
+            return self::STATE_DRAFT;
+        }
+
+        // (Never accepted or resubmitted after acceptance) && (never rejected or resubmitted after rejection)
+        if ((!$acceptedAt || $submittedAt->gt($acceptedAt)) && (!$rejectedAt || $submittedAt->gt($rejectedAt))) {
+            return self::STATE_AWAITING_MODERATION;
+        }
+
+        if ($rejectedAt && (!$acceptedAt || $rejectedAt->gt($acceptedAt))) {
+            return self::STATE_REJECTED;
+        }
+
+        // $submittedAt is not null and $acceptedAt is later than both $submittedAt and $rejectedAt
+
+        $now = $now ?? Alaress_Date_Format::now();
+
+        // An article may be archived prior to it being published
+        if ($now->gt($this->expiresAt)) {
+            return self::STATE_EXPIRED;
+        }
+
+        return $now->lt($this->publishAt) ? self::STATE_AWAITING_PUBLICATION : self::STATE_PUBLISHED;
     }
 
 
