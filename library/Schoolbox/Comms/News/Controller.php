@@ -469,12 +469,6 @@ class Controller extends Base
     public function getListByTopic(string $slug)
     {
         if ($this->getRequest()->isXhr()) {
-            /* News Topics were never obtainable by slug
-             * We always fetched everything, then manually sorted by slug
-             * Inherit this situation, improvise and adapt (or just use ids...)
-             */
-            $topics = $this->topicMapper->findAll();
-            $topicId = $this->determineSelectedTopicId($topics, $slug);
 
             /* Querystring params:
              * The page number to obtain
@@ -484,11 +478,19 @@ class Controller extends Base
             $limit = $this->determineLimit($this->getRequest()->query[Mapper::LIMIT_PARAM]);
 
             $querystring = http_build_query([
+                Mapper::TOPIC_SLUG_PARAM => $slug,
                 Mapper::PAGE_NUMBER_PARAM => $pageNum,
                 Mapper::LIMIT_PARAM => $limit
             ]);
 
             $lists = new Lists($this->newsMapper, $this->policyMapper, $this->saveForLaterMapper);
+
+            /* News Topics were never obtainable by slug
+             * We always fetched everything, then manually sorted by slug
+             * Inherit this situation, improvise and adapt (or just use ids...)
+             */
+            $topics = $this->topicMapper->findAll();
+            $topicId = $this->determineSelectedTopicId($topics, $slug);
 
             /* Get this an accompanying paginator
              */
@@ -519,38 +521,35 @@ class Controller extends Base
 
 
     /**
-     * @param string $slug
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws RouteNotFound
      * @throws \OutOfRangeException
      */
-    public function getIndex(string $slug)
+    public function getIndex()
     {
-        /* News Topics were never obtainable by slug
-         * We always fetched everything, then manually sorted by slug
-         * Inherit this situation, improvise and adapt (or just use ids...)
-         */
-        $topics = $this->topicMapper->findAll();
-        $topicId = $this->determineSelectedTopicId($topics, $slug);
-
         /* Querystring params:
          * The page number to obtain
          * Any requested limits TODO: This is a config option that users can't control on this screen
          */
+        $slug = $this->getRequest()->query[Mapper::TOPIC_SLUG_PARAM];
         $pageNum = $this->determinePageNum($this->getRequest()->query[Mapper::PAGE_NUMBER_PARAM]);
         $limit = $this->determineLimit($this->getRequest()->query[Mapper::LIMIT_PARAM]) ?: self::ARTICLES_PER_PAGE;
 
         $querystring = http_build_query([
+            Mapper::TOPIC_SLUG_PARAM => $slug,
             Mapper::PAGE_NUMBER_PARAM => $pageNum,
             Mapper::LIMIT_PARAM => $limit
         ]);
 
         $lists = new Lists($this->newsMapper, $this->policyMapper, $this->saveForLaterMapper);
 
-        /* Figure out the slug from the id
+        /* News Topics were never obtainable by slug
+         * We always fetched everything, then manually sorted by slug
+         * Inherit this situation, improvise and adapt (or just use ids...)
          */
-        $slug = $this->determineSlug($topicId);
+        $topics = $this->topicMapper->findAll();
+        $topicId = $this->determineSelectedTopicId($topics, $slug);
 
         /* Get this an accompanying paginator
          */
@@ -596,6 +595,7 @@ class Controller extends Base
 
     /**
      * Determine a slug from a topic id
+     * TODO: Probably should be assertSlug()
      *
      * @param int $topicId
      * @return string
@@ -630,11 +630,11 @@ class Controller extends Base
      * By default, select the All tab...
      * but try to find the topic whose slug matches the url param
      *
-     * @param Collection|Topic[] $topics
-     * @param string             $slug
+     * @param Collection  $topics
+     * @param null|string $slug
      * @return int
      */
-    private function determineSelectedTopicId(Collection $topics, string $slug): int
+    private function determineSelectedTopicId(Collection $topics, ?string $slug): int
     {
         $selectedTopicId = Mapper::TOPIC_ALL_ID;
 

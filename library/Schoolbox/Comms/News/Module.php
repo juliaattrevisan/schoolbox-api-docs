@@ -97,7 +97,7 @@ class Module extends BaseModule
 
         /* Index of articles audienced to you
          */
-        $this->register('GET', '/topic/{slug}', 'getIndex', $viewPerms);
+        $this->register('GET', '/topic', 'getIndex', $viewPerms);
 
         /* Redirect to the intended place, getIndex, from the old place
          */
