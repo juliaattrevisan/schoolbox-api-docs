@@ -91,7 +91,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
          *
          * Otherwise, hide the component (nothing to see)
          */
-        return $this->newsMapper->findAll(['limit' => 1])->count();
+        return $this->newsMapper->findAll(['limit' => 1])->count() > 0;
     }
 
 
