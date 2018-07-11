@@ -7,8 +7,6 @@
 {% set showGroupTotal = showGroupTotal ? true : false %}
 {% set showRubricTotal = showRubricTotal ? true : false %}
 
-{{ dump(descriptorMetadata) }}
-
 <div class="scrollable">
     <table class="rb markable stack-for-medium-down" id="{{ rubricId }}">
 
@@ -78,19 +76,19 @@
                                     {{- descriptor.text|nl2br -}}
                                 </span>
 
-                                {# TODO most of this calculating should be done in PHP probably #}
-                                {# TODO fix this for descending #}
-                                {% set descriptorStart = levelIndex > 0 ? rubric.descriptors[crit.id][levelIndex - 1].value + 1 : descriptor.value %}
-                                {% set descriptorEnd = descriptor.value %}
-                                {% set descriptorMin = descriptorEnd < descriptorStart ? descriptorEnd : descriptorStart %}
-                                {% set descriptorMax = descriptorEnd > descriptorStart ? descriptorEnd : descriptorStart %}
+                                {% set direction = descriptorMetadata[crit.id]['direction'] %}
+                                {% set descriptorMin = descriptorMetadata[crit.id][levelIndex]['min']%}
+                                {% set descriptorMax = descriptorMetadata[crit.id][levelIndex]['max']%}
 
                                 {# Just show a text value if the descriptor is not selected #}
                                 {% if descriptor.value is not null and showDescriptorValue and (config.rubric_show_points or not studentView) %}
                                     <span class="rb-value {% if descriptorMin == descriptorMax %}used {% elseif descriptor.selected %}hide{% endif %}">
-                                        {% if useMarkRange and levelIndex > 0 and descriptorMin != descriptorMax %}
-                                            {# TODO fix this for descending #}
-                                            {{- descriptorMin -}} - {{- descriptorMax -}}
+                                        {% if useMarkRange and descriptorMin != descriptorMax %}
+                                            {% if direction == 'asc' %}
+                                                {{- descriptorMin -}} - {{- descriptorMax -}}
+                                            {% else %}
+                                                {{- descriptorMax -}} - {{- descriptorMin -}}
+                                            {% endif %}
                                         {% else %}
                                             {{ descriptor.value }}
                                         {% endif %}
@@ -101,14 +99,25 @@
                             <select id="rangeDropdown-{{ descriptor.id }}"
                                     class="{% if not descriptor.selected or descriptorMin == descriptorMax %} hide{% endif %}
                                     {% if useMarkRange and descriptorMin != descriptorMax %}used{% endif %}">
-                                {% for i in descriptorStart..descriptorEnd %}
-                                    <option
-                                        value={{ i }}
-                                        {# TODO once DB writeback is implemented, make sure this uses the actual selected value when the user changes it #}
-                                        {% if i == descriptorMax %}selected{% endif %}
-                                    >{{ i }} / {{ descriptorMax }}
-                                    </option>
-                                {% endfor %}
+                                {% if direction == 'asc' %}
+                                    {% for i in descriptorMin..descriptorMax %}
+                                        <option
+                                            value={{ i }}
+                                            {# TODO once DB writeback is implemented, make sure this uses the actual selected value when the user changes it #}
+                                            {% if i == descriptorMax %}selected{% endif %}
+                                        >{{ i }} / {{ descriptorMax }}
+                                        </option>
+                                    {% endfor %}
+                                {% else %}
+                                    {% for i in descriptorMax..descriptorMin %}
+                                        <option
+                                            value={{ i }}
+                                            {# TODO once DB writeback is implemented, make sure this uses the actual selected value when the user changes it #}
+                                            {% if i == descriptorMax %}selected{% endif %}
+                                        >{{ i }} / {{ descriptorMax }}
+                                        </option>
+                                    {% endfor %}
+                                {% endif %}
                             </select>
 
                             {% if learnerSelected %}
