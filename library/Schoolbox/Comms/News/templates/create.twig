@@ -318,12 +318,14 @@
             // Page 2 specifics
             audienceSelectBreadcrumb: '',
             audienceSelectCheckbox: '',
-            audienceListItems: []
+            audienceListItems: [],
+            cachedOptions: []
         },
         methods: {
             openBrowseModal: function () {
                 // Reset everythang
                 this.showPage(0);
+                this.audienceListItems = [];
 
                 // Open the modal
                 $('#audience-browse').foundation('reveal', 'open');
@@ -343,14 +345,22 @@
                 self.audienceSelectBreadcrumb = audienceOption.name;
                 self.audienceSelectCheckbox = audienceOption.checkbox;
 
-                // Request a list of options with the uri listed in the object above
-                axios.get(audienceOption.ajax).then(function(response) {
-                    // Update the list of options
-                    self.audienceListItems = response.data.data;
+                // Try for cached list
+                if (self.cachedOptions[audienceOption.name] !== undefined) {
+                    self.audienceListItems = self.cachedOptions[audienceOption.name];
+                } else { // Nope, ajax time
+                    // Request a list of options with the uri listed in the object above
+                    axios.get(audienceOption.ajax).then(function(response) {
+                        // Update the list of options
+                        self.audienceListItems = response.data.data;
 
-                }).catch(function (error) {
-                    console.log(error);
-                });
+                        // Cache the options
+                        self.cachedOptions[audienceOption.name] = response.data.data;
+
+                    }).catch(function (error) {
+                        console.log(error);
+                    });
+                }
             },
 
             // Submitting the modal form
