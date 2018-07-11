@@ -49,6 +49,7 @@ class ValidationTest extends TestCase
             'Moderation required, both acceptor details set' => [
                 (new Model())
                     ->setTitle('cat')
+                    ->setSubmittedAt($date)
                     ->setPublishAt($publishAt)
                     ->setExpiresAt($expiresAt)
                     ->setAcceptedBy($user)
@@ -94,6 +95,7 @@ class ValidationTest extends TestCase
             'Moderation not required, acceptor set' => [
                 (new Model())
                     ->setTitle('cat')
+                    ->setSubmittedAt($date)
                     ->setPublishAt($publishAt)
                     ->setExpiresAt($expiresAt)
                     ->setAcceptedBy($user)
