@@ -106,7 +106,7 @@
                                             value={{ i }}
                                             {# TODO once DB writeback is implemented, make sure this uses the actual selected value when the user changes it #}
                                             {% if i == descriptorMax %}selected{% endif %}
-                                        >{{ i }} / {{ descriptorMax }}
+                                        >{{ i }}
                                         </option>
                                     {% endfor %}
                                 {% else %}
@@ -115,7 +115,7 @@
                                             value={{ i }}
                                             {# TODO once DB writeback is implemented, make sure this uses the actual selected value when the user changes it #}
                                             {% if i == descriptorMax %}selected{% endif %}
-                                        >{{ i }} / {{ descriptorMax }}
+                                        >{{ i }}
                                         </option>
                                     {% endfor %}
                                 {% endif %}
