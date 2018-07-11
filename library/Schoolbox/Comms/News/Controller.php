@@ -537,7 +537,7 @@ class Controller extends Base
          * Any requested limits TODO: This is a config option that users can't control on this screen
          */
         $pageNum = $this->determinePageNum($this->getRequest()->query[Mapper::PAGE_NUMBER_PARAM]);
-        $limit = $this->determineLimit($this->getRequest()->query[Mapper::LIMIT_PARAM]);
+        $limit = $this->determineLimit($this->getRequest()->query[Mapper::LIMIT_PARAM]) ?: self::ARTICLES_PER_PAGE;
 
         $querystring = http_build_query([
             Mapper::PAGE_NUMBER_PARAM => $pageNum,
