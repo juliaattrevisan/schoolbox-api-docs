@@ -12,6 +12,7 @@ use Component_Dashboard_ControllerAbstract;
 use Component_Instance;
 use Schoolbox\Collection;
 use Schoolbox\Comms\News;
+use Schoolbox\News\Topic;
 use Schoolbox\News\TopicMapper;
 use Schoolbox\User;
 use SitePage;
@@ -30,7 +31,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
     private $topicMapper;
 
     /**
-     * @var Collection
+     * @var Collection|Topic[]
      */
     private $topics;
 
