@@ -14,7 +14,7 @@
 <script>
     $(function() {
         $('#news-container-{{ componentInstanceId }}').articleTabs({
-            'firstUrl': "{{ routeLookup('commsNews.getListByTopic', {topicId: selectedTopicId, limit: limit}) ~ '?compactMode=' ~ compactMode }}",
+            'selectedUrl': "{{ routeLookup('commsNews.getListByTopic', {topicId: selectedTopicId, limit: limit}) ~ '?compactMode=' ~ compactMode }}",
             'topicTabs': $("#news-topics-{{ componentInstanceId }}")
         });
     });

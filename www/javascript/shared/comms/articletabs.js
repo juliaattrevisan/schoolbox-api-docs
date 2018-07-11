@@ -15,8 +15,8 @@
 
         /* Only work when url is provided
          */
-        if (config.firstUrl.length) {
-            getArticles(config.firstUrl);
+        if (config.selectedUrl.length) {
+            getArticles(config.selectedUrl);
             initListeners();
 
             $(config.element).saveForLater().initAsync();
@@ -39,7 +39,7 @@
 
                 /* Load this data upon start
                  */
-                firstUrl: '',
+                selectedUrl: '',
 
                 /* Return in compact mode or normal mode
                  */

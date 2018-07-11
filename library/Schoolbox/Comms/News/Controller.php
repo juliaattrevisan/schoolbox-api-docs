@@ -603,7 +603,7 @@ class Controller extends Base
         /* Merge a whole bunch of other settings too
          */
         $outcome = array_merge($outcome, [
-            'firstUrl' => $selectedUrl,
+            'selectedUrl' => $selectedUrl,
             'topics' => $topics,
             'topicAll' => Mapper::TOPIC_ALL_ID,
             'selectedTopicId' => $selectedTopicId,
