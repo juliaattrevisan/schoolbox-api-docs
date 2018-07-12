@@ -6,6 +6,8 @@ namespace Helper;
 
 use Codeception\Exception\ModuleException;
 use Codeception\Module\WebDriver;
+use Codeception\Module\Db;
+use Codeception\TestInterface;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
 use Facebook\WebDriver\Remote\RemoteWebElement;
 use Facebook\WebDriver\WebDriverBy;
@@ -13,6 +15,84 @@ use Facebook\WebDriver\WebDriverElement;
 
 class Acceptance extends \Codeception\Module
 {
+
+    private $originalConfig = [];
+
+    /**
+     * Executed before suite
+     * @param array $settings
+     */
+    public function _beforeSuite($settings = [])
+    {
+        parent::_beforeSuite($settings);
+        self::changeDBConfig('debug_mode', 0);
+    }
+
+    /**
+     * Executed after suite
+     */
+    public function _afterSuite()
+    {
+        self::restoreDBConfig();
+        parent::_afterSuite();
+    }
+
+    /**
+     * Executed before test
+     * @param TestInterface $test
+     */
+    public function _before(TestInterface $test)
+    {
+        parent::_before($test);
+        self::changeDBConfig('debug_mode', 0);
+        exec('sudo php /vagrant/test/socket/destroy-rabbit-data.php;');
+    }
+
+    /**
+     * Executed after test
+     * @param TestInterface $test
+     */
+    public function _after(TestInterface $test)
+    {
+        self::restoreDBConfig();
+        parent::_after($test);
+    }
+
+    /**
+     * Sets database config value temporally
+     * @param string $name
+     * @param string $value
+     */
+    private function changeDBConfig(string $name, string $value)
+    {
+        $db = $this->getDbModule();
+        if (key_exists($name, $this->originalConfig)) {
+            // already stored
+            return;
+        }
+
+        $currentValue = $db->grabFromDatabase('config', 'value', ['name' => $name]);
+        if ($value === $currentValue) {
+            // no need to change
+            return;
+        }
+
+        $this->originalConfig[$name] = $currentValue;
+        $db->updateInDatabase('config', ['value' => $value], ['name' => 'debug_mode']);
+
+    }
+
+    /**
+     * Resets database value back
+     */
+    private function restoreDBConfig()
+    {
+        $db = $this->getDbModule();
+        foreach ($this->originalConfig as $name => $value) {
+            $db->updateInDatabase('config', ['value' => $value], ['name' => $name]);
+        }
+    }
+
     /**
      * Find a checkbox to "click".
      *
@@ -317,6 +397,42 @@ class Acceptance extends \Codeception\Module
         return null;
     }
 
+    /**
+     * Return webdriver module in a type-safe manner.
+     *
+     * @return WebDriver
+     */
+    private function getDbModule(): Db
+    {
+        try {
+            return $this->getModule('Db');
+        } catch (ModuleException $e) {
+            // Wasn't found: return null, let TypeError handle it
+        }
+        return null;
+    }
+
+    /**
+     * Verifies that the notification exists
+     * @param $notif
+     */
+    public function assertNotifExists($notif)
+    {
+        $i = $this->getWebDriverModule();
+        $i->amOnPage('/messages');
+        $i->see($notif);
+    }
+
+    /**
+     * Verifies that the notification does not exist
+     * @param $notif
+     */
+    public function assertNotifNotExists($notif)
+    {
+        $i = $this->getWebDriverModule();
+        $i->amOnPage('/messages');
+        $i->dontSee($notif);
+    }
 
 //    private function findField(WebDriver $webDriver, $field): ?WebDriverElement
 //    {
