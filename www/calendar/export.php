@@ -61,7 +61,7 @@ function getConnector(string $className)
 }
 
 /**
- * Builds an API class, and also returns an appropriate response code.
+ * Builds an API class.
  *
  * @todo move this to a factory class; but there already is one, Calendar_Api_Factory
  *
@@ -75,17 +75,17 @@ function getConnector(string $className)
 function buildApiClass(string $class, array $params, bool $enabled, ?Raven_Client $sentry): Calendar_Api_EventType_Interface
 {
     if (!$enabled) {
-        // Not enabled; this is fine. Response code: 404
+        // Not enabled; this is fine
         return new Calendar_Api_Composite();
     }
 
     try {
         $configuration = getConnector($class);
     } catch (UnexpectedValueException $e) {
-        // Config missing: this is fine. Response code: 404?
+        // Config missing: this is fine
         return new Calendar_Api_Composite();
     } catch (InvalidArgumentException $e) {
-        // Invalid class: this is not fine, log to Sentry. Response code: 500
+        // Invalid class: this is not fine, log to Sentry
         if ($sentry) {
             $sentry->captureException($e);
         }
@@ -93,13 +93,13 @@ function buildApiClass(string $class, array $params, bool $enabled, ?Raven_Clien
     }
 
     if ($configuration->isActive()) {
-        // Active: build API class. Response code: 200
+        // Active: build API class
         $constructorParams = array_merge([$configuration->getId()], $params);
         $reflectionClass   = new ReflectionClass($class);
         return $reflectionClass->newInstanceArgs($constructorParams);
     }
 
-    // Inactive: this is fine. Response code: 404
+    // Inactive: this is fine
     return new Calendar_Api_Composite();
 }
 
