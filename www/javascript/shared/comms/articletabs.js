@@ -69,19 +69,7 @@
                 limit: null
             };
 
-            var config = $.extend(defaults, options);
-
-            /* TODO Surely there's a nicer way than this; I'll find out tomorrow I guess
-             */
-            var querystringParams = {
-                querystringParams: [
-                    'p=' + config.pageNum,
-                    'l=' + config.limit,
-                    'sp=' + config.showPaginator ? 1 : 0
-                ].join('&')
-            };
-
-            return $.extend(config, querystringParams);
+            return $.extend(defaults, options);
         }
 
         /**
@@ -107,16 +95,8 @@
                 /* Update the url if desired
                  */
                 if (config.updateUrl) {
-
-
-                    /* Append pagenum if specified
-                     * Otherwise, we changed tabs and want to clear away this param
-                     */
                     window.history.pushState('', response.title, response.url);
                 }
-
-                /* TODO: Cache the response so we don't need to refetch it
-                 */
 
             }).error(function (response) {
             });
@@ -130,10 +110,6 @@
                 event.preventDefault();
 
                 $(config.element).html('<div class="loader"></div>');
-
-                /* Clear the current page number when changing topics
-                 */
-                config.pageNum = null;
 
                 /* Reload article list afresh
                  */
