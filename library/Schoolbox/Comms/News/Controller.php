@@ -462,41 +462,15 @@ class Controller extends Base
     public function getListByTopic()
     {
         if ($this->getRequest()->isXhr()) {
-
-            /* Querystring params:
-             * The page number to obtain
-             * Any requested limits via component configs
-             */
             $params = new Querystring($this->getRequest()->query);
-
-            $lists = new Lists($this->newsMapper, $this->policyMapper, $this->saveForLaterMapper);
-
-            /* News Topics were never obtainable by slug
-             * We always fetched everything, then manually sorted by slug
-             * Inherit this situation, improvise and adapt (or just use ids...)
-             */
             $topics = $this->topicMapper->findAll();
-            $topicId = $this->determineSelectedTopicId($topics, $params->getSlug());
 
-            /* Get this an accompanying paginator
-             */
-            $url = $this->getRouter()->generate('commsNews.getIndex') . "?{$params}";
-
-            $paginator = $lists->generatePaginator($url, $topicId, $params->getLimit());
-
-            $outcome = $lists->findForTopic($this->getUser(), $topicId, $params->getLimit(), $params->getPageNum());
-
-            /* Merge a whole bunch of other settings too
-             */
-            $outcome = array_merge($outcome, $params->toArray(), [
-                'paginator' => $paginator,
-                'showPaginator' => $params->getShowPaginator()
-            ]);
+            $outcome = $this->generatePartial($params, $topics, $params->getShowPaginator());
 
             $this->getResponse()->content->set($this->buildJsonOutput([
                 'success' => true,
                 'title' => $this->getDi()->get('l10n')->translate('news', false, true),
-                'url' => $url,
+                'url' => $outcome['currentUrl'],
                 'fragment' => $this->buildUnthemedHtmlOutput('@commsNews/list.twig', $outcome)->getAsString()
             ]));
         }
@@ -511,35 +485,10 @@ class Controller extends Base
      */
     public function getIndex()
     {
-        /* Querystring params:
-         * The page number to obtain
-         * Any requested limits
-         */
         $params = new Querystring($this->getRequest()->query);
-
-        $lists = new Lists($this->newsMapper, $this->policyMapper, $this->saveForLaterMapper);
-
-        /* News Topics were never obtainable by slug
-         * We always fetched everything, then manually sorted by slug
-         * Inherit this situation, improvise and adapt (or just use ids...)
-         */
         $topics = $this->topicMapper->findAll();
-        $topicId = $this->determineSelectedTopicId($topics, $params->getSlug());
 
-        /* Get this an accompanying paginator
-         */
-        $url = $this->getRouter()->generate('commsNews.getIndex') . "?{$params}";
-
-        $paginator = $lists->generatePaginator($url, $topicId, $params->getLimit());
-
-        $outcome = $lists->findForTopic($this->getUser(), $topicId, $params->getLimit(), $params->getPageNum());
-
-        /* Always provide paginator from this context
-         */
-        $outcome = array_merge($outcome, [
-            'paginator' => $paginator,
-            'showPaginator' => true
-        ]);
+        $outcome = $this->generatePartial($params, $topics,true);
 
         /* The initial data set to load, given the params provided
          */
@@ -558,13 +507,45 @@ class Controller extends Base
 
 
     /**
-     * Redirect to the actual index location, arranged by topic
+     * Generate a partial fragment containing articles
+     * Used in both synchronous and asynchronous requests
+     *
+     * @param Querystring         $params
+     * @param Collection|Topic[]  $topics
+     * @param bool                $showPaginator
+     * @return array
+     * @throws RouteNotFound
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \OutOfRangeException
      */
-    public function getIndexRedirect()
+    private function generatePartial(Querystring $params, Collection $topics, bool $showPaginator): array
     {
-        $this->getResponse()->redirect->to($this->getRouter()->generate('commsNews.getIndex', ['slug' => 'all']));
-    }
+        $lists = new Lists($this->newsMapper, $this->policyMapper, $this->saveForLaterMapper);
 
+        /* News Topics were never obtainable by slug
+         * We always fetched everything, then manually sorted by slug
+         * Inherit this situation, improvise and adapt (or just use ids...)
+         */
+        $topicId = $this->determineSelectedTopicId($topics, $params->getSlug());
+
+        /* Get this an accompanying paginator
+         */
+        $url = $this->getRouter()->generate('commsNews.getIndex') . "?{$params}";
+
+        $paginator = $lists->generatePaginator($url, $topicId, $params->getLimit());
+
+        $outcome = $lists->findForTopic($this->getUser(), $topicId, $params->getLimit(), $params->getPageNum());
+
+        /* Always provide paginator from this context
+         */
+        $outcome = array_merge($outcome, [
+            'currentUrl' => $url,
+            'paginator' => $paginator,
+            'showPaginator' => $showPaginator
+        ]);
+
+        return $outcome;
+    }
 
     /**
      * From a slug, figure out what topic matches it
@@ -588,4 +569,14 @@ class Controller extends Base
 
         return $selectedTopicId;
     }
+
+
+    /**
+     * Redirect to the actual index location, arranged by topic
+     */
+    public function getIndexRedirect()
+    {
+        $this->getResponse()->redirect->to($this->getRouter()->generate('commsNews.getIndex', ['slug' => 'all']));
+    }
+
 }
