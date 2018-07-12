@@ -101,12 +101,32 @@ class Form
     }
 
     /**
+     * @param string $headline
+     * @return Form
+     */
+    public function seeHeadline(string $headline): self
+    {
+        $this->tester->seeInField('heading', $headline);
+        return $this;
+    }
+
+    /**
      * @param string $article
      * @return Form
      */
     public function setArticle(string $article): self
     {
         $this->tester->fillRichTextField('body', $article);
+        return $this;
+    }
+
+    /**
+     * @param string $headline
+     * @return Form
+     */
+    public function seeArticle(string $headline): self
+    {
+        $this->tester->seeInRichTextField('body', $headline);
         return $this;
     }
 
@@ -123,12 +143,40 @@ class Form
     }
 
     /**
+     * @param string $blurb
+     * @return Form
+     */
+    public function seeBlurb(string $blurb): self
+    {
+        // Expand blurb pane, and then ensure I see its contents
+        $this->tester->click('[data-collapser="blurb"]');
+        $this->tester->seeInRichTextField('blurb', $blurb);
+        return $this;
+    }
+
+    /**
      * @param string $filename
      * @return Form
      */
     public function setFeatureImage(string $filename): self
     {
         $this->tester->attachAttachzoneFile('#news-feature-zone', $filename);
+        return $this;
+    }
+
+    /**
+     * @param string $filename
+     * @return Form
+     */
+    public function seeFeatureImage(string $filename): self
+    {
+        // TODO implement file comparison
+        // How do I verify a file matches another?
+        // Guess:
+        // * upload file contents to /asyncUpload
+        // * see what hash I get back
+        // * compare hash to what I tested
+//        $this->tester->attachAttachzoneFile('#news-feature-zone', $filename);
         return $this;
     }
 
@@ -143,6 +191,16 @@ class Form
     }
 
     /**
+     * @param string $topic
+     * @return Form
+     */
+    public function seeTopic(string $topic): self
+    {
+        $this->tester->seeOptionIsSelected('item_topic_id', $topic);
+        return $this;
+    }
+
+    /**
      * @param array $roles
      * @return Form
      */
@@ -153,12 +211,33 @@ class Form
     }
 
     /**
+     * @param array $roles
+     * @return Form
+     */
+    public function seeRoles(array $roles): self
+    {
+        // TODO implement see selectgroup options
+//        $this->tester->checkSelectGroupOptions('role', $roles);
+        return $this;
+    }
+
+    /**
      * @param array $campuses
      * @return Form
      */
     public function setCampuses(array $campuses): self
     {
         $this->tester->checkSelectGroupOptions('campus', $campuses);
+        return $this;
+    }
+
+    /**
+     * @param array $campuses
+     * @return Form
+     */
+    public function seeCampuses(array $campuses): self
+    {
+//        $this->tester->checkSelectGroupOptions('campus', $campuses);
         return $this;
     }
 
@@ -176,6 +255,20 @@ class Form
     }
 
     /**
+     * @param array $users
+     * @return Form
+     */
+    public function seeUsers(array $users): self
+    {
+        // TODO implement seeSelectizeOptionIsSelected
+//        $this->tester->clearSelectize('userList[]');
+//        foreach ($users as $user) {
+//            $this->tester->selectSelectizeOption('userList[]', $user);
+//        }
+        return $this;
+    }
+
+    /**
      * @param Alaress_Date_Format $publishDate
      * @return Form
      */
@@ -188,12 +281,37 @@ class Form
     }
 
     /**
+     * @param Alaress_Date_Format $publishDate
+     * @return Form
+     */
+    public function seePublishDate(Alaress_Date_Format $publishDate): self
+    {
+        // TODO implement seeInDateField
+        // Possible methods: get field value, then create a date out of it?
+        // Alternate: strtotime publishDate's value, compare it to what's in the field?
+//        // Type in database format, let strtotime do the work
+//        // This is because Codeception has no access to the DB config
+//        $this->tester->fillDateField('item_datetime_published', $publishDate->getDatabase());
+        return $this;
+    }
+
+    /**
      * @param Alaress_Date_Format $expiryDate
      * @return Form
      */
     public function setExpiryDate(Alaress_Date_Format $expiryDate): self
     {
         $this->tester->fillDateField('item_datetime_expires', $expiryDate->getDatabase());
+        return $this;
+    }
+
+    /**
+     * @param Alaress_Date_Format $expiryDate
+     * @return Form
+     */
+    public function seeExpiryDate(Alaress_Date_Format $expiryDate): self
+    {
+//        $this->tester->fillDateField('item_datetime_expires', $expiryDate->getDatabase());
         return $this;
     }
 }

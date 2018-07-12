@@ -130,5 +130,16 @@ class CreateAndVerifyCest
 
         // Now, I'm back on the form page.
         // Verify what is there is what I entered
+        $formPage
+            ->seeHeadline($headline)
+            ->seeArticle($article)
+            ->seeBlurb($blurb)
+            ->seeFeatureImage($image)
+            ->seeTopic($topic)
+            ->seeRoles($roles)
+            ->seeCampuses($campi)
+            ->seeUsers($users)
+            ->seePublishDate($publish)
+            ->seeExpiryDate($expiry);
     }
 }

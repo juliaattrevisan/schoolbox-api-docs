@@ -217,6 +217,23 @@ class Acceptance extends \Codeception\Module
 
 
     /**
+     * Assert content of rich text area is equivalent to a value.
+     *
+     * @param string $field
+     * @param string $value
+     */
+    public function seeInRichTextField(string $field, string $value): void
+    {
+        $this->assertEquals(
+            $value,
+            $this->getWebDriverModule()->executeJS(
+                sprintf('return CKEDITOR.instances["%s"].getData()', addslashes($field))
+            )
+        );
+    }
+
+
+    /**
      * Select the given options in a checkbox group.
      *
      * @param string $group
