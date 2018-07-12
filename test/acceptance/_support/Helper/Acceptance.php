@@ -210,7 +210,7 @@ class Acceptance extends \Codeception\Module
      */
     private function normalizeSpace(string $value): string
     {
-        return trim(preg_replace('/\\s+', ' ', $value));
+        return trim(preg_replace('/\\s+/', ' ', $value));
     }
 
 
