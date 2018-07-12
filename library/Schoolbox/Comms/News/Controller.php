@@ -569,14 +569,4 @@ class Controller extends Base
 
         return $selectedTopicId;
     }
-
-
-    /**
-     * Redirect to the actual index location, arranged by topic
-     */
-    public function getIndexRedirect()
-    {
-        $this->getResponse()->redirect->to($this->getRouter()->generate('commsNews.getIndex', ['slug' => 'all']));
-    }
-
 }
