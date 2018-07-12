@@ -4,15 +4,15 @@
 {# TODO: How to do breadcrumbs now? #}
 {% if isCommsOfficer %}
     {{ bread.crumbs(
-        [ locale.news.proper, '/news' ],
+        [ locale.news.proper, routeLookup('commsNews.getIndex') ],
         [ 'Moderation', routeLookup('commsNewsModeration.getList') ],
         [ article.title ]
     ) }}
 {% else %}
-{{ bread.crumbs(
-    [ locale.news.proper, '/news' ],
-    [ article.title ]
-) }}
+    {{ bread.crumbs(
+        [ locale.news.proper, routeLookup('commsNews.getIndex') ],
+        [ article.title ]
+    ) }}
 {% endif %}
 
 
