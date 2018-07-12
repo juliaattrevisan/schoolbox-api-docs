@@ -273,12 +273,7 @@ class Form
      */
     public function seePublishDate(Alaress_Date_Format $publishDate): self
     {
-        // TODO implement seeInDateField
-        // Possible methods: get field value, then create a date out of it?
-        // Alternate: strtotime publishDate's value, compare it to what's in the field?
-//        // Type in database format, let strtotime do the work
-//        // This is because Codeception has no access to the DB config
-//        $this->tester->fillDateField('item_datetime_published', $publishDate->getDatabase());
+        $this->tester->seeInDateField('item_datetime_published', $publishDate->getDatabase());
         return $this;
     }
 
