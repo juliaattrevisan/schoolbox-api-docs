@@ -322,7 +322,7 @@ th, td{
         + #{$label-selector} {
             &:before, &:after {
                 color: $content-ui-foreground !important;
-                background-color: $content-ui-background !important;
+                background-color: $content-ui-background;
             }
         }
     }
@@ -462,6 +462,51 @@ input[type=checkbox].plain {
 .checklist .checklist {
 	margin-left: 2rem;
 }
+
+// Checklist Table
+.checklist.checklist-table {
+	padding: 0;
+	height: 13rem;
+	overflow-y: scroll;
+
+	input[type=checkbox]:not(.plain):not(:disabled) {
+		border: none;
+
+		&:checked + label {
+			background: #eee;
+		}
+
+		+ label {
+			border-bottom: 1px solid #eee;
+			margin: 0;
+			padding: 0.5rem 0 0.5rem 2rem;
+
+			&:after,
+			&:before {
+				padding: 0.5rem 0 0.5rem 0;
+				background-color: transparent;
+			}
+
+			&:hover {
+				background: #f0f0f0;
+
+				&:after,
+				&:before {
+					padding: 0.5rem 0 0.5rem 0;
+					background-color: transparent;
+				}
+			}
+		}
+
+		&:focus {
+			&:after,
+			&:before {
+				background-color: transparent;
+			}
+		}
+	}
+}
+
 
 .toggle-set {
 	@include flex;

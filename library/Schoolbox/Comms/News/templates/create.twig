@@ -170,65 +170,13 @@
 </div>
 
 
-<style>
-    .checklist-table {
-        padding: 0;
-        height: 200px;
-        overflow-y: scroll;
-    }
-
-    .checklist-table input {
-        border: none;
-    }
-
-    .checklist-table input:checked + label {
-        background: #eee;
-    }
-
-    .checklist-table label {
-        border-bottom: 1px solid #eee;
-        margin: 0 !important;
-        padding: 0.5rem 0 0.5rem 2rem !important;
-    }
-
-    .checklist-table label:before {
-        background: none !important;
-    }
-
-    .checklist.checklist-table input[type=checkbox]:not(.plain) + label:after,
-    .checklist.checklist-table input[type=checkbox]:not(.plain) + label:before {
-        padding: 0.5rem 0 0.5rem 0 !important;
-    }
-
-    .checklist.checklist-table input[type=checkbox]:not(.plain):checked + label:hover:after,
-    .checklist.checklist-table input[type=checkbox]:not(.plain):checked + label:hover:before {
-        background-color: transparent !important;
-    }
-
-    .checklist.checklist-table input[type=checkbox]:not(.plain):checked + label:after,
-    .checklist.checklist-table input[type=checkbox]:not(.plain):checked + label:before {
-        background-color: transparent !important;
-    }
-
-    .checklist-table label:hover {
-        background: #f0f0f0;
-    }
-
-    .checklist-table.checklist input[type=radio]:not(.plain):not(:disabled) + label:hover:before,
-    .checklist-table.checklist input[type=radio]:not(.plain):not(:disabled) + label:hover:after,
-    .checklist-table.checklist input[type=checkbox]:not(.plain):not(:disabled) + label:hover:before,
-    .checklist-table.checklist input[type=checkbox]:not(.plain):not(:disabled) + label:hover:after {
-        background-color: transparent !important;
-    }
-</style>
-
-<script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
-<script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
-<script type="text/javascript" src="/javascript/shared/comms/draft.js"></script>
+{# le scripts #}
+<script src="/javascript/ckeditor/ckeditor.js"></script>
+<script src="/javascript/shared/editor/jquery.editor.js"></script>
+<script src="/javascript/shared/comms/draft.js"></script>
 <script src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
 <script src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
 <script>
-
     "use strict";
 
     $(function () {
@@ -321,13 +269,6 @@
                     icon: 'pastoral',
                     checkbox: 'Group members',
                     ajax: '/comms/news/audiencebrowser/pastoralgroups'
-                },
-                {
-                    id: 'res_house',
-                    name: 'Boarder House',
-                    icon: 'boarder-leave',
-                    checkbox: 'House members',
-                    ajax: '/comms/news/audiencebrowser/res_houses'
                 }
             ],
 
