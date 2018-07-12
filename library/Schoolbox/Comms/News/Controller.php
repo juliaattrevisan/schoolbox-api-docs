@@ -541,7 +541,7 @@ class Controller extends Base
 
         /* Always provide paginator from this context
          */
-        $outcome = array_merge($outcome, [
+        $outcome = array_merge($outcome, $params->toArray(), [
             'currentUrl' => $url,
             'paginator' => $paginator,
             'showPaginator' => $showPaginator
