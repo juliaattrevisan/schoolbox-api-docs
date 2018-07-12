@@ -425,6 +425,23 @@ class Acceptance extends \Codeception\Module
 
 
     /**
+     * Clears selectize selected options, then searches for all options in
+     * `$options`, and for each adds the first match it finds.
+     *
+     * @param string $field
+     * @param array  $options
+     * @throws \Exception If waiting for the dropdown timed out
+     */
+    public function selectSelectizeOptions(string $field, array $options): void
+    {
+        $this->clearSelectize($field);
+        foreach ($options as $option) {
+            $this->selectSelectizeOption($field, $option);
+        }
+    }
+
+
+    /**
      * Searches for a selectize option, and adds the first one it finds.
      *
      * @param string $field           Currently, must be a name
@@ -439,6 +456,20 @@ class Acceptance extends \Codeception\Module
         $wd->fillField($this->getSelectizeInputSelector($field), $selectizeSearch);
         $wd->waitForElement(['css' => '.selectize-dropdown-content .option.active']);
         $wd->click(['css' => '.selectize-dropdown-content .option.active']);
+    }
+
+
+    /**
+     * Asserts that selectize field identified by `$field` only has the options
+     * in `$options` selected.
+     *
+     * @param string $field
+     * @param array  $options
+     */
+    public function seeSelectizeOptionsAreSelected(string $field, array $options): void
+    {
+        // TODO implement seeSelectizeOptionsAreSelected
+        $this->debug('seeSelectizeOptionsAreSelected is not yet implemented');
     }
 
 

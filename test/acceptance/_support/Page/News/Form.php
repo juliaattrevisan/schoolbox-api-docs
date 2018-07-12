@@ -241,10 +241,7 @@ class Form
      */
     public function fillUsers(array $users): self
     {
-        $this->tester->clearSelectize('userList[]');
-        foreach ($users as $user) {
-            $this->tester->selectSelectizeOption('userList[]', $user);
-        }
+        $this->tester->selectSelectizeOptions('userList[]', $users);
         return $this;
     }
 
@@ -254,11 +251,7 @@ class Form
      */
     public function seeUsers(array $users): self
     {
-        // TODO implement seeSelectizeOptionIsSelected
-//        $this->tester->clearSelectize('userList[]');
-//        foreach ($users as $user) {
-//            $this->tester->selectSelectizeOption('userList[]', $user);
-//        }
+        $this->tester->seeSelectizeOptionsAreSelected('userList[]', $users);
         return $this;
     }
 
