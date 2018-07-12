@@ -73,9 +73,9 @@
 
                         <div class="small-12 columns">
                             <label>Audience</label>
-                            <p class="meta">Target your article. Search for campuses, year levels, groups, people, or use Browse to find your audience.</p>
+                            <p class="meta">Target your article to a specific audience. Use the input box below to search, or use the 'Browse' button to select from a list of possible options.</p>
                             <div class="input-group">
-                                <input type="text" id="audience-search" />
+                                <input type="text" id="audience-search" placeholder="Search for classes, groups, year levels, roles, individual users" />
                                 <button class="button icon-drag-drop" @click.prevent="openBrowseModal">Browse...</button>
                             </div>
                         </div>
@@ -95,13 +95,12 @@
                             </div>
 
                             <div v-show="pageShow[1]">
-
                                 <ul class="breadcrumb" style="margin-bottom:10px;">
                                     <li><a href="#" @click.prevent="showPage(0)">Browse Audience</a></li>
                                     <li class="active"><a>${ audienceSelectBreadcrumb }</a></li>
                                 </ul>
 
-                                <p class="meta">Some help text here</p>
+                                <p class="meta">Select ${ audienceSelectBreadcrumb } below, then choose whether you would like to include the users themselves, the parents of the users, or both.</p>
 
                                 <fieldset class="checklist checklist-container" id="audience-select-options">
                                     <div class="loader" v-show="showLoader"></div>
@@ -119,7 +118,6 @@
                                 </fieldset>
 
                                 <button class="button submit" @click.prevent="addAudience">Add</button>
-
                             </div>
 
                         </div>
@@ -230,28 +228,32 @@
             audienceOptions: [
                 {
                     id: 'campus',
-                    name: 'Campuses',
+                    name: 'Campus',
+                    namePlural: 'Campuses',
                     icon: 'location',
                     checkbox: 'Students in campus',
                     ajax: '/comms/news/audiencebrowser/campuses'
                 },
                 {
                     id: 'role',
-                    name: 'Roles',
+                    name: 'Role',
+                    namePlural: 'Roles',
                     icon: 'staff-students',
                     checkbox: 'Users in role',
                     ajax: '/comms/news/audiencebrowser/roles'
                 },
                 {
                     id: 'house',
-                    name: 'Houses',
+                    name: 'House',
+                    namePlural: 'Houses',
                     icon: 'home',
                     checkbox: 'House members',
                     ajax: '/comms/news/audiencebrowser/houses'
                 },
                 {
                     id: 'folder',
-                    name: 'Classes & Groups',
+                    name: 'Class/Group',
+                    namePlural: 'Classes & Groups',
                     icon: 'group',
                     checkbox: 'Class/group members',
                     ajax: '/comms/news/audiencebrowser/folders'
@@ -259,13 +261,15 @@
                 {
                     id: 'year_level',
                     name: 'Year Level',
+                    namePlural: 'Year Levels',
                     icon: 'teacher',
                     checkbox: 'Students in year level/s',
                     ajax: '/comms/news/audiencebrowser/year_levels'
                 },
                 {
                     id: 'pastoral_group',
-                    name: 'Pastoral Groups',
+                    name: 'Pastoral Group',
+                    namePlural: 'Pastoral Groups',
                     icon: 'pastoral',
                     checkbox: 'Group members',
                     ajax: '/comms/news/audiencebrowser/pastoralgroups'
@@ -311,16 +315,16 @@
                 self.showPage(1);
 
                 // Update the breadcrumb and checkbox text
-                self.audienceSelectBreadcrumb = audienceOption.name;
+                self.audienceSelectBreadcrumb = audienceOption.namePlural;
                 self.audienceSelectCheckbox = audienceOption.checkbox;
 
                 // Try for cached list
-                if (self.cachedOptions[audienceOption.name] !== undefined) {
+                if (self.cachedOptions[audienceOption.id] !== undefined) {
                     // Hide the loader
                     self.showLoader = false;
 
                     // Populate the list with cached version
-                    self.audienceListItems = self.cachedOptions[audienceOption.name];
+                    self.audienceListItems = self.cachedOptions[audienceOption.id];
                 } else { // Nope, ajax time
                     // Request a list of options with the uri listed in the object above
                     axios.get(audienceOption.ajax).then(function(response) {
@@ -332,7 +336,8 @@
                         response.data.data.forEach(function(option) {
                             modifiedOptions.push({
                                 id: audienceOption.id + '_' + option.id,
-                                name: option.name
+                                name: option.name,
+                                selectizeLabel: option.name + ' (' + audienceOption.name + ')'
                             });
                         });
 
@@ -340,7 +345,7 @@
                         self.audienceListItems = modifiedOptions;
 
                         // Cache the options
-                        self.cachedOptions[audienceOption.name] = modifiedOptions;
+                        self.cachedOptions[audienceOption.id] = modifiedOptions;
 
                     }).catch(function (error) {
                         console.log(error);
@@ -355,11 +360,11 @@
                 // Add to selectize
                 self.audienceListChecked.forEach(function(option) {
                     if (self.includeUsers) {
-                        $('#audience-search').data('selectize').addOption({id: option.id, name: option.name});
+                        $('#audience-search').data('selectize').addOption({id: option.id, name: option.selectizeLabel});
                         $('#audience-search').data('selectize').addItem(option.id);
                     }
                     if (self.includeParents) {
-                        $('#audience-search').data('selectize').addOption({id: option.id + '_parents', name: 'Parents of ' + option.name});
+                        $('#audience-search').data('selectize').addOption({id: option.id + '_parents', name: 'Parents of ' + option.selectizeLabel});
                         $('#audience-search').data('selectize').addItem(option.id + '_parents');
                     }
                 });
