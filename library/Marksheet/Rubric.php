@@ -8,15 +8,11 @@
  */
 class Marksheet_Rubric extends Marksheet_Abstract
 {
-
-    private $rubricHandler;
-
     protected $actionButtonCount = 1;
 
     public function __construct($mark_type, $submissionBox, $extraParams)
     {
         parent::__construct($mark_type, $submissionBox, $extraParams);
-        $this->rubricHandler = new DueWork_Rubric_Handler();
     }
 
     /**
@@ -79,13 +75,5 @@ class Marksheet_Rubric extends Marksheet_Abstract
             'caption'  => 'RUBRIC_GRADE_TEXT',
         ));
 
-    }
-
-    /**
-     * @return DueWork_Rubric_Handler
-     */
-    public function getRubricHandler()
-    {
-        return $this->rubricHandler;
     }
 }
