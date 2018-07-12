@@ -93,7 +93,7 @@ class Module extends BaseModule
 
         /* (async) Get a list of articles audienced to me, by topic
          */
-        $this->register('GET', '/list/{slug}', 'getListByTopic', $viewPerms);
+        $this->register('GET', '/list', 'getListByTopic', $viewPerms);
 
         /* Index of articles audienced to you
          */

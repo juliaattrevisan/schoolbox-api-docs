@@ -34,25 +34,6 @@ class Mapper extends \Schoolbox\Mapper
      */
     public const TOPIC_ALL_SLUG = 'all';
 
-    /**
-     * Querystring param for the current Page Number chosen
-     */
-    public const PAGE_NUMBER_PARAM = 'p';
-
-    /**
-     * Querystring param for the current Limit chosen
-     */
-    public const LIMIT_PARAM = 'l';
-
-    /**
-     * Querystring param for the current topic chosen
-     */
-    public const TOPIC_SLUG_PARAM = 't';
-
-    /**
-     * Querystring param for the Show Pagination option
-     */
-    public const SHOW_PAGINATOR_PARAM = 'sp';
 
     /**
      * @inheritdoc

@@ -27,12 +27,6 @@ class Controller extends Base
 {
 
     /**
-     * Number of news articles per page
-     * TODO: This is a config var
-     */
-    private const ARTICLES_PER_PAGE = 10;
-
-    /**
      * @var ErrorMapper
      */
     private $errorMapper;
@@ -460,13 +454,12 @@ class Controller extends Base
      *
      * TODO: Incomplete
      *
-     * @param string $slug
      * @throws RouteNotFound
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \OutOfRangeException
      */
-    public function getListByTopic(string $slug)
+    public function getListByTopic()
     {
         if ($this->getRequest()->isXhr()) {
 
@@ -474,16 +467,7 @@ class Controller extends Base
              * The page number to obtain
              * Any requested limits via component configs
              */
-            $pageNum = $this->determinePageNum($this->getRequest()->query[Mapper::PAGE_NUMBER_PARAM]);
-            $limit = $this->determineLimit($this->getRequest()->query[Mapper::LIMIT_PARAM]);
-            $showPaginator = $this->getRequest()->query[Mapper::SHOW_PAGINATOR_PARAM];
-
-            $querystring = http_build_query([
-                Mapper::TOPIC_SLUG_PARAM => $slug,
-                Mapper::PAGE_NUMBER_PARAM => $pageNum,
-                Mapper::LIMIT_PARAM => $limit,
-                Mapper::SHOW_PAGINATOR_PARAM => $showPaginator
-            ]);
+            $params = new Querystring($this->getRequest()->query);
 
             $lists = new Lists($this->newsMapper, $this->policyMapper, $this->saveForLaterMapper);
 
@@ -492,24 +476,21 @@ class Controller extends Base
              * Inherit this situation, improvise and adapt (or just use ids...)
              */
             $topics = $this->topicMapper->findAll();
-            $topicId = $this->determineSelectedTopicId($topics, $slug);
+            $topicId = $this->determineSelectedTopicId($topics, $params->getSlug());
 
             /* Get this an accompanying paginator
              */
-            $url = $this->getRouter()->generate('commsNews.getIndex', ['slug' => $slug]) . "?{$querystring}";
+            $url = $this->getRouter()->generate('commsNews.getIndex') . "?{$params}";
 
-            $paginator = $lists->generatePaginator($url, $topicId, $limit);
+            $paginator = $lists->generatePaginator($url, $topicId, $params->getLimit());
 
-            $outcome = $lists->findForTopic($this->getUser(), $topicId, $limit, $pageNum);
+            $outcome = $lists->findForTopic($this->getUser(), $topicId, $params->getLimit(), $params->getPageNum());
 
             /* Merge a whole bunch of other settings too
              */
-            $outcome = array_merge($outcome, [
-                'compactMode' => $this->getRequest()->query['compactMode'],
+            $outcome = array_merge($outcome, $params->toArray(), [
                 'paginator' => $paginator,
-                'pageNum' => $pageNum,
-                'limit' => $limit,
-                'showPaginator' => (bool)$this->getRequest()->query['sp']
+                'showPaginator' => $params->getShowPaginator()
             ]);
 
             $this->getResponse()->content->set($this->buildJsonOutput([
@@ -532,19 +513,9 @@ class Controller extends Base
     {
         /* Querystring params:
          * The page number to obtain
-         * Any requested limits TODO: This is a config option that users can't control on this screen
+         * Any requested limits
          */
-        $slug = $this->getRequest()->query[Mapper::TOPIC_SLUG_PARAM];
-        $pageNum = $this->determinePageNum($this->getRequest()->query[Mapper::PAGE_NUMBER_PARAM]);
-        $limit = $this->determineLimit($this->getRequest()->query[Mapper::LIMIT_PARAM]) ?: self::ARTICLES_PER_PAGE;
-        $showPaginator = false;
-
-        $querystring = http_build_query([
-            Mapper::TOPIC_SLUG_PARAM => $slug,
-            Mapper::PAGE_NUMBER_PARAM => $pageNum,
-            Mapper::LIMIT_PARAM => $limit,
-            Mapper::SHOW_PAGINATOR_PARAM => $showPaginator
-        ]);
+        $params = new Querystring($this->getRequest()->query);
 
         $lists = new Lists($this->newsMapper, $this->policyMapper, $this->saveForLaterMapper);
 
@@ -553,15 +524,15 @@ class Controller extends Base
          * Inherit this situation, improvise and adapt (or just use ids...)
          */
         $topics = $this->topicMapper->findAll();
-        $topicId = $this->determineSelectedTopicId($topics, $slug);
+        $topicId = $this->determineSelectedTopicId($topics, $params->getSlug());
 
         /* Get this an accompanying paginator
          */
-        $url = $this->getRouter()->generate('commsNews.getIndex', ['slug' => $slug]) . "?{$querystring}";
+        $url = $this->getRouter()->generate('commsNews.getIndex') . "?{$params}";
 
-        $paginator = $lists->generatePaginator($url, $topicId, $limit);
+        $paginator = $lists->generatePaginator($url, $topicId, $params->getLimit());
 
-        $outcome = $lists->findForTopic($this->getUser(), $topicId, $limit, $pageNum);
+        $outcome = $lists->findForTopic($this->getUser(), $topicId, $params->getLimit(), $params->getPageNum());
 
         /* Always provide paginator from this context
          */
@@ -576,13 +547,10 @@ class Controller extends Base
 
         /* Merge a whole bunch of other settings too
          */
-        $outcome = array_merge($outcome, [
+        $outcome = array_merge($outcome, $params->toArray(), [
             'initialContent' => $initialContent,
             'topics' => $topics,
             'topicAll' => Mapper::TOPIC_ALL_SLUG,
-            'slug' => $slug,
-            'pageNum' => $pageNum,
-            'limit' => $limit
         ]);
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/index.twig', $outcome));
@@ -595,36 +563,6 @@ class Controller extends Base
     public function getIndexRedirect()
     {
         $this->getResponse()->redirect->to($this->getRouter()->generate('commsNews.getIndex', ['slug' => 'all']));
-    }
-
-    /**
-     * Determine a slug from a topic id
-     * TODO: Probably should be assertSlug()
-     *
-     * @param int $topicId
-     * @return string
-     */
-    private function determineSlug(int $topicId): string
-    {
-        try {
-            return TopicMapper::getInstance()->findById($topicId)->getSlug();
-        } catch (MapperException $e) {
-            // unknown topic id; just return the default All Topics slug
-        }
-
-        return Mapper::TOPIC_ALL_SLUG;
-    }
-
-    /**
-     * The page number to obtain; default to 1
-     * Otherwise use the page number provided
-     *
-     * @param null|string $param
-     * @return int
-     */
-    private function determinePageNum(?string $param): int
-    {
-        return (int)$param ?: 1;
     }
 
 
@@ -649,26 +587,5 @@ class Controller extends Base
         }
 
         return $selectedTopicId;
-    }
-
-
-    /**
-     * $limit can be 'all' or unspecified; this equates to "don't impose a limit"
-     * ("all" could come from a component config option)
-     *
-     * @param null|string $limit
-     * @return int
-     */
-    private function determineLimit(?string $limit): int
-    {
-        /* limit not set at all; don't impose limits
-         */
-        if (('all' === $limit) || (null === $limit) || !(int)$limit) {
-            return 0;
-        }
-
-        /* use whatever was provided
-         */
-        return (int)$limit;
     }
 }
