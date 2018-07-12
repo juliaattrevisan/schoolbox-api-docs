@@ -26,6 +26,7 @@
                     $('#news-container').articleTabs({
                         'topicTabs': $('#news-topics'),
                         'updateUrl': true,
+                        'showPaginator': true,
                         'pageNum': '{{ pageNum }}',
                         'limit': '{{ limit }}'
                     });
@@ -37,6 +38,7 @@
                 topics: topics,
                 topicAll: topicAll,
                 slug: slug,
+                pageNum: pageNum,
                 limit: limit,
                 compactMode: false
             } %}

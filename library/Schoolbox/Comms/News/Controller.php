@@ -476,11 +476,13 @@ class Controller extends Base
              */
             $pageNum = $this->determinePageNum($this->getRequest()->query[Mapper::PAGE_NUMBER_PARAM]);
             $limit = $this->determineLimit($this->getRequest()->query[Mapper::LIMIT_PARAM]);
+            $showPaginator = $this->getRequest()->query['sp'];
 
             $querystring = http_build_query([
                 Mapper::TOPIC_SLUG_PARAM => $slug,
                 Mapper::PAGE_NUMBER_PARAM => $pageNum,
-                Mapper::LIMIT_PARAM => $limit
+                Mapper::LIMIT_PARAM => $limit,
+                'sp' => $showPaginator
             ]);
 
             $lists = new Lists($this->newsMapper, $this->policyMapper, $this->saveForLaterMapper);
@@ -507,7 +509,7 @@ class Controller extends Base
                 'paginator' => $paginator,
                 'pageNum' => $pageNum,
                 'limit' => $limit,
-                'showPaginator' => isset($this->getRequest()->query[Mapper::LIMIT_PARAM])
+                'showPaginator' => (bool)$this->getRequest()->query['sp']
             ]);
 
             $this->getResponse()->content->set($this->buildJsonOutput([
@@ -536,10 +538,12 @@ class Controller extends Base
         $pageNum = $this->determinePageNum($this->getRequest()->query[Mapper::PAGE_NUMBER_PARAM]);
         $limit = $this->determineLimit($this->getRequest()->query[Mapper::LIMIT_PARAM]) ?: self::ARTICLES_PER_PAGE;
 
+
         $querystring = http_build_query([
             Mapper::TOPIC_SLUG_PARAM => $slug,
             Mapper::PAGE_NUMBER_PARAM => $pageNum,
-            Mapper::LIMIT_PARAM => $limit
+            Mapper::LIMIT_PARAM => $limit,
+            'sp' => true
         ]);
 
         $lists = new Lists($this->newsMapper, $this->policyMapper, $this->saveForLaterMapper);

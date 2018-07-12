@@ -5,13 +5,17 @@
  # @param string topicContainerId
  # @param Collection|Topic[] topics
  # @param int topicAll
- # @param int limit
  # @param int compactMode
+ # @param int pageNum
+ # @param int limit
+ # @param int showPaginator
  #}
 
 {% set params = [
     'compactMode=' ~ compactMode,
-    'l=' ~ limit
+    'p=' ~ pageNum,
+    'l=' ~ limit,
+    'sp=' ~ showPaginator
 ]|join('&')
 %}
 

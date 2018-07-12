@@ -56,6 +56,10 @@
                  */
                 updateUrl: false,
 
+                /* Show paginator
+                 */
+                showPaginator: false,
+
                 /* The current page number
                  */
                 pageNum: -1,
@@ -65,7 +69,19 @@
                 limit: null
             };
 
-            return $.extend(defaults, options);
+            var config = $.extend(defaults, options);
+
+            /* TODO Surely there's a nicer way than this; I'll find out tomorrow I guess
+             */
+            var querystringParams = {
+                querystringParams: [
+                    'p=' + config.pageNum,
+                    'l=' + config.limit,
+                    'sp=' + config.showPaginator ? 1 : 0
+                ].join('&')
+            };
+
+            return $.extend(config, querystringParams);
         }
 
         /**
@@ -92,22 +108,11 @@
                  */
                 if (config.updateUrl) {
 
-                    /* TODO Surely there's a nicer way than this; I'll find out tomorrow I guess
-                     */
-                    var querystringParams = [
-                        'p=' + config.pageNum,
-                        'l=' + config.limit
-                    ].join('&');
 
                     /* Append pagenum if specified
                      * Otherwise, we changed tabs and want to clear away this param
                      */
-                    if (config.pageNum) {
-                        window.history.pushState('', response.title, response.url + '?p' + querystringParams);
-                    }
-                    else {
-                        window.history.pushState('', response.title, response.url);
-                    }
+                    window.history.pushState('', response.title, response.url);
                 }
 
                 /* TODO: Cache the response so we don't need to refetch it
