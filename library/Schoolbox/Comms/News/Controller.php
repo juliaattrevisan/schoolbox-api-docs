@@ -465,13 +465,16 @@ class Controller extends Base
             $params = new Querystring($this->getRequest()->query);
             $topics = $this->topicMapper->findAll();
 
+            /* The requested data set to load, given the params provided
+             */
             $outcome = $this->generatePartial($params, $topics, $params->getShowPaginator());
+            $content = $this->buildUnthemedHtmlOutput('@commsNews/list.twig', $outcome)->getAsString();
 
             $this->getResponse()->content->set($this->buildJsonOutput([
                 'success' => true,
                 'title' => $this->getDi()->get('l10n')->translate('news', false, true),
                 'url' => $outcome['currentUrl'],
-                'fragment' => $this->buildUnthemedHtmlOutput('@commsNews/list.twig', $outcome)->getAsString()
+                'fragment' => $content
             ]));
         }
     }
@@ -488,21 +491,21 @@ class Controller extends Base
         $params = new Querystring($this->getRequest()->query);
         $topics = $this->topicMapper->findAll();
 
-        $outcome = $this->generatePartial($params, $topics,true);
-
         /* The initial data set to load, given the params provided
          */
-        $initialContent = $this->buildUnthemedHtmlOutput('@commsNews/list.twig', $outcome)->getAsString();
+        $outcome = $this->generatePartial($params, $topics,true);
+        $content = $this->buildUnthemedHtmlOutput('@commsNews/list.twig', $outcome)->getAsString();
 
         /* Merge a whole bunch of other settings too
+         * Specifically applies to the index page which loads slightly differently than component variant
          */
-        $outcome = array_merge($outcome, $params->toArray(), [
-            'initialContent' => $initialContent,
+        $data = array_merge($params->toArray(), [
+            'initialContent' => $content,
             'topics' => $topics,
             'topicAll' => Mapper::TOPIC_ALL_SLUG,
         ]);
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/index.twig', $outcome));
+        $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/index.twig', $data));
     }
 
 
