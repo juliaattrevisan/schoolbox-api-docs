@@ -31,6 +31,7 @@ class Index
     public const ELEMENT_NEWS_LIST                  = '.information-list';
     public const ELEMENT_NEWS_LIST_ITEM             = '.actions-small-1';
     public const ELEMENT_NEWS_LIST_ITEM_HEADLINE    = '.card h3';
+    public const ELEMENT_NEWS_LIST_ITEM_ARTICLE     = '.card article';
     public const ELEMENT_NEWS_LIST_ITEM_META_AUTHOR = '.card > .meta:nth-of-type(1)';
     public const ELEMENT_NEWS_LIST_ITEM_META_DATE   = '.card > .meta:nth-of-type(2)';
 
@@ -98,6 +99,18 @@ class Index
 
 
     /**
+     * Generate a news item article selector.
+     *
+     * @param int|null $position If set: select only this number news item
+     * @return string
+     */
+    private function generateNewsItemArticleSelector(?int $position = null): string
+    {
+        return sprintf('%s %s', $this->generateNewsItemSelector($position), self::ELEMENT_NEWS_LIST_ITEM_ARTICLE);
+    }
+
+
+    /**
      * Do I see this headline on this page?
      *
      * @param string   $headline
@@ -118,5 +131,51 @@ class Index
     public function dontSeeHeadline(string $headline, ?int $position = null): void
     {
         $this->tester->dontSee($headline, $this->generateNewsItemHeadlineSelector($position));
+    }
+
+
+    /**
+     * Do I see this article summary on this page?
+     *
+     * @param string   $article  Raw HTML version of article
+     * @param int|null $position If set: search only this number news item
+     */
+    public function seeArticleSummary(string $article, ?int $position = null): void
+    {
+        $this->tester->seeInSource($article, $this->generateNewsItemArticleSelector($position));
+    }
+
+
+    /**
+     * Do I NOT see this article summary on this page?
+     *
+     * @param string   $article  Raw HTML version of article
+     * @param int|null $position If set: search only this number news item
+     */
+    public function dontSeeArticleSummary(string $article, ?int $position = null): void
+    {
+        $this->tester->dontSeeInSource($article, $this->generateNewsItemArticleSelector($position));
+    }
+
+
+    /**
+     * View an article.
+     *
+     * @param int $position Article number to view
+     */
+    public function viewArticle(int $position): void
+    {
+        $this->tester->click($this->generateNewsItemSelector($position) . ' ' . self::LINK_NEWS_ITEM_VIEW);
+    }
+
+
+    /**
+     * Modify an article.
+     *
+     * @param int $position Article number to view
+     */
+    public function modifyArticle(int $position): void
+    {
+        $this->tester->click($this->generateNewsItemSelector($position) . ' ' . self::LINK_NEWS_ITEM_MODIFY);
     }
 }

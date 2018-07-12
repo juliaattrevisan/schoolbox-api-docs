@@ -15,6 +15,7 @@ use AcceptanceTester;
 use Page\Login as LoginPage;
 use Page\News\Form;
 use Page\News\Index;
+use Page\News\Item;
 
 class CreateAndVerifyCest
 {
@@ -65,8 +66,9 @@ class CreateAndVerifyCest
      * @param AcceptanceTester $i
      * @param Form             $formPage
      * @param Index            $indexPage
+     * @param Item             $itemPage
      */
-    public function createNews(AcceptanceTester $i, Form $formPage, Index $indexPage)
+    public function createNews(AcceptanceTester $i, Form $formPage, Index $indexPage, Item $itemPage)
     {
         $i->login('zsmith', 'password');
         $i->amOnPage($formPage->generateCreateRoute());
@@ -102,13 +104,31 @@ class CreateAndVerifyCest
         $position = 1;
         $indexPage->seeHeadline($headline, $position);
 
+        // The blurb shows, not the article I entered
+        $indexPage->seeArticleSummary($blurb, $position);
+        $indexPage->dontSeeArticleSummary($article, $position);
+
+        // Do I see the feature image?
+        // (How do I compare the image I provided to what is uploaded?)
+
         // Verify I don't see it at all in some other topic
         $i->amOnPage($indexPage->generateRoute('music'));
-        $indexPage->dontSeeHeadline($headline);
+        $indexPage->dontSeeHeadline($headline, $position);
 
         // Verify I see it in the topic I put it in
         // (URL has invisible dependency on config; all I want is a slug)
         $i->amOnPage($indexPage->generateRoute((new \Url($topic,''))->getSlug()));
         $indexPage->seeHeadline($headline, $position);
+
+        // View the article I'm searched for
+        $indexPage->viewArticle($position);
+
+        // Verify I see the article, and not the blurb
+        $itemPage->seeHeadline($headline);
+        $itemPage->seeArticle($article);
+        $itemPage->modifyArticle();
+
+        // Now, I'm back on the form page.
+        // Verify what is there is what I entered
     }
 }

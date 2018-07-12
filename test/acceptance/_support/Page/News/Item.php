@@ -14,23 +14,24 @@ use AcceptanceTester;
  */
 class Item
 {
-    const URL = '/news/item/{id}';
+    public const URL = '/news/item/{id}';
 
     // Selectors
 
     // TODO all of these should have better selectors
     // TODO all of these belong in the main content of a page (#content)
 
-    const LINK_MODIFY   = '.icon-modify';
-    const LINK_PREVIOUS = '.icon-previous';
-    const LINK_NEXT     = '.icon-next';
+    public const LINK_MODIFY   = '.icon-modify';
+    public const LINK_PREVIOUS = '.icon-previous';
+    public const LINK_NEXT     = '.icon-next';
 
-    const ELEMENT_BREADCRUMB = '.breadcrumb';
+    public const ELEMENT_BREADCRUMB = '.breadcrumb';
 
-    const ELEMENT_META_AUTHOR   = '.card > .meta:nth-of-type(1)';
-    const ELEMENT_META_DATE     = '.card > .meta:nth-of-type(2)';
-    const ELEMENT_FEATURE_IMAGE = '.large-3 img';
-    const ELEMENT_ARTICLE       = '.large-9 article';
+    public const ELEMENT_HEADLINE      = 'h1';
+    public const ELEMENT_META_AUTHOR   = '.card > .meta:nth-of-type(1)';
+    public const ELEMENT_META_DATE     = '.card > .meta:nth-of-type(2)';
+    public const ELEMENT_FEATURE_IMAGE = '.large-3 img';
+    public const ELEMENT_ARTICLE       = '.large-9 article';
 
     /**
      * @var AcceptanceTester
@@ -56,5 +57,36 @@ class Item
     public function generateRoute($id)
     {
         return str_replace('{id}', $id, self::URL);
+    }
+
+
+    /**
+     * Do I see this headline?
+     *
+     * @param string $headline
+     */
+    public function seeHeadline(string $headline): void
+    {
+        $this->tester->see($headline, self::ELEMENT_HEADLINE);
+    }
+
+
+    /**
+     * Do I see this article's contents?
+     *
+     * @param string $article
+     */
+    public function seeArticle(string $article): void
+    {
+        $this->tester->seeInSource($article, self::ELEMENT_ARTICLE);
+    }
+
+
+    /**
+     * Follow this article's modify link.
+     */
+    public function modifyArticle(): void
+    {
+        $this->tester->click(self::LINK_MODIFY);
     }
 }
