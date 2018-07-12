@@ -21,6 +21,22 @@ Running tests
 These tests are currently configured to run within Schoolbox's Vagrant box.
 The acceptance tests are configured to automatically start chromedriver (the web driver for Chrome Headless).
 
+### Configuration
+
+Base configuration is stored in `codeception.dist.yml` within the project's
+root folder.
+
+You may provide your own overrides by adding them to `codeception.yml`. This
+file is in `.gitignore`, so should not be committed to the base repository.
+
+> An example override is if you do not want to delete records of successful
+  test runs:
+>
+>     extensions:
+>         enabled:
+>             - Codeception\Extension\Recorder:
+>                 delete_successful: false
+
 ### Reprovision
 
 If you've not yet reprovisioned after checking out this branch: run
@@ -33,6 +49,11 @@ To run the Codeception tests:
     vagrant ssh
     cd /vagrant
     ./vendor/bin/codecept run --steps
+
+To run a single test, provide the suite (`acceptance`) and the test file name,
+relative to `test/acceptance`:
+
+    ./vendor/bin/codecept run --steps acceptance LoginCest.php
 
 Writing tests
 ---
