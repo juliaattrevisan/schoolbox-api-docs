@@ -19,6 +19,28 @@ use Page\News\Index;
 class CreateAndVerifyCest
 {
     /**
+     * Prepare for test
+     *
+     * @param AcceptanceTester $i
+     */
+    public function _before(AcceptanceTester $i)
+    {
+        $i->suspendDebugMode();
+    }
+
+
+    /**
+     * Restore to pre-test state
+     *
+     * @param AcceptanceTester $i
+     */
+    public function _after(AcceptanceTester $i)
+    {
+        $i->restoreDebugMode();
+    }
+
+
+    /**
      * Test that a news item I create retains the settings I chose
      *
      * as zsmith:
@@ -60,7 +82,6 @@ class CreateAndVerifyCest
         $users    = ['David Rhodes', 'Rachel Rhodes'];
         $publish  = \Alaress_Date_Format::now()->addHours(-1)->setTime(0, 0, 0);
         $expiry   = \Alaress_Date_Format::now()->addDays(7)->setTime(0, 0, 0);
-//        var_dump($publish->getCalendarDateTime());
         $formPage
             ->setHeadline($headline)
             ->setArticle($article)
@@ -73,5 +94,8 @@ class CreateAndVerifyCest
             ->setPublishDate($publish)
             ->setExpiryDate($expiry)
             ->submit();
+
+        // Verify that the news is as saved
+
     }
 }
