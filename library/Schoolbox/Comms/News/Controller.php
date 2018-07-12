@@ -504,12 +504,12 @@ class Controller extends Base
         /* Merge a whole bunch of other settings too
          * Specifically applies to the index page which loads slightly differently than component variant
          */
-        $data = array_merge($params->toArray(), [
+        $data = [
             'initialContent' => $content,
             'topics' => $topics,
             'topicAll' => Mapper::TOPIC_ALL_SLUG,
             'showPaginator' => $showPaginator
-        ]);
+        ];
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/index.twig', $data));
     }
@@ -547,7 +547,7 @@ class Controller extends Base
 
         /* Always provide paginator from this context
          */
-        $outcome = array_merge($outcome, $params->toArray(), [
+        $outcome = array_merge($outcome, [
             'currentUrl' => $url,
             'paginator' => $paginator,
             'showPaginator' => $showPaginator,
