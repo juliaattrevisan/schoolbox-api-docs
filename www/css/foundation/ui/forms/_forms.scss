@@ -452,7 +452,8 @@ input[type=checkbox].plain {
     min-height: inherit;
 }
 
-.checklist, .radiolist {
+.checklist,
+.radiolist {
     input[type=radio]:not(.plain),
     input[type=checkbox]:not(.plain) {
         @include fancy-check();
@@ -463,11 +464,11 @@ input[type=checkbox].plain {
 	margin-left: 2rem;
 }
 
-// Checklist Table
-.checklist.checklist-table {
+// Checklist Container
+.checklist.checklist-container {
 	padding: 0;
-	height: 13rem;
-	overflow-y: scroll;
+	max-height: 13rem;
+	border: $fieldset-border-width $fieldset-border-style $fieldset-border-color;
 
 	input[type=checkbox]:not(.plain):not(:disabled) {
 		border: none;

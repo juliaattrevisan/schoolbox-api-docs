@@ -103,7 +103,7 @@
 
                                 <p class="meta">Some help text here</p>
 
-                                <fieldset class="checklist checklist-table" id="audience-select-options">
+                                <fieldset class="checklist checklist-container" id="audience-select-options">
                                     <div class="loader" v-show="showLoader"></div>
                                     <template v-for="audienceListItem in audienceListItems">
                                         <input type="checkbox" v-bind:id="'audience-list-' + audienceListItem.id" v-bind:value="audienceListItem" v-model="audienceListChecked" />
