@@ -36,7 +36,7 @@ class Querystring
     /**
      * Querystring param for the current Page Number chosen
      */
-    public const PAGE_NUMBER_PARAM = 'p';
+    public const PAGE_NUMBER_PARAM = 'page';
 
     /**
      * Querystring param for the current Limit chosen
@@ -46,7 +46,7 @@ class Querystring
     /**
      * Querystring param for the current topic chosen
      */
-    public const TOPIC_SLUG_PARAM = 't';
+    public const TOPIC_SLUG_PARAM = 'topic';
 
     /**
      * Querystring param for the Show Pagination option
