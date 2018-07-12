@@ -1300,6 +1300,8 @@ class RubricMapper
      *
      * Normalised mark: (0.0 - 100.0)
      *
+     * TODO this is copied wholesale from now-deleted `Duework_Rubric_Handler`; consider modernizing
+     *
      * @param int[]     $folderIds
      * @param TermModel $term
      * @return array
@@ -1436,6 +1438,8 @@ class RubricMapper
 
     /**
      * Get all criteria available on the specified parent
+     *
+     * TODO this is copied wholesale from now-deleted `Duework_Rubric_Handler`; consider modernizing
      *
      * @param int[]  $parentIds
      * @param string $parentType
