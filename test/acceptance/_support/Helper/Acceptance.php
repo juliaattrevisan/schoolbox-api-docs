@@ -202,6 +202,19 @@ class Acceptance extends \Codeception\Module
 
 
     /**
+     * Normalize space characters to no more than a single space.
+     * Used for rich text comparisons.
+     *
+     * @param string $value
+     * @return string
+     */
+    private function normalizeSpace(string $value): string
+    {
+        return trim(preg_replace('/\\s+', ' ', $value));
+    }
+
+
+    /**
      * Fill in a rich text area.
      *
      * @param string $field
@@ -224,12 +237,12 @@ class Acceptance extends \Codeception\Module
      */
     public function seeInRichTextField(string $field, string $value): void
     {
-        $this->assertEquals(
-            $value,
-            $this->getWebDriverModule()->executeJS(
-                sprintf('return CKEDITOR.instances["%s"].getData()', addslashes($field))
-            )
+        // $field could've been set as plain text, without <p> tags.
+        // Test both the raw field, and the normalized value too.
+        $expectedValue = $this->getWebDriverModule()->executeJS(
+            sprintf('return CKEDITOR.instances["%s"].getData()', addslashes($field))
         );
+        $this->assertEquals($this->normalizeSpace($value), $this->normalizeSpace($expectedValue));
     }
 
 
