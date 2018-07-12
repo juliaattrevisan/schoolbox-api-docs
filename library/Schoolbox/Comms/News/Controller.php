@@ -488,12 +488,17 @@ class Controller extends Base
      */
     public function getIndex()
     {
+        /* This is always on in this News Index context
+         * If you visit comms/news, the querystring param is empty so you have to forcibly set it to true
+         */
+        $showPaginator = true;
+
         $params = new Querystring($this->getRequest()->query);
         $topics = $this->topicMapper->findAll();
 
         /* The initial data set to load, given the params provided
          */
-        $outcome = $this->generatePartial($params, $topics,true);
+        $outcome = $this->generatePartial($params, $topics,$showPaginator);
         $content = $this->buildUnthemedHtmlOutput('@commsNews/list.twig', $outcome)->getAsString();
 
         /* Merge a whole bunch of other settings too
@@ -503,6 +508,7 @@ class Controller extends Base
             'initialContent' => $content,
             'topics' => $topics,
             'topicAll' => Mapper::TOPIC_ALL_SLUG,
+            'showPaginator' => $showPaginator
         ]);
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/index.twig', $data));
