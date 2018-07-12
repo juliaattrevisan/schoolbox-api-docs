@@ -13,12 +13,6 @@ use \Schoolbox\Permission\Access\UserAccess;
 
 class Component_Homepage_RubricController extends Component_Homepage_ControllerAbstract
 {
-
-    /**
-     * @var DueWork_Rubric_Handler
-     */
-    protected $rubric_handler;
-
     /**
      * @var Criterion[]
      */
