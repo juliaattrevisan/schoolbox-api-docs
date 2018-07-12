@@ -30,7 +30,7 @@ class Controller extends Base
      * Number of news articles per page
      * TODO: This is a config var
      */
-    private const ARTICLES_PER_PAGE = 1;
+    private const ARTICLES_PER_PAGE = 10;
 
     /**
      * @var ErrorMapper
