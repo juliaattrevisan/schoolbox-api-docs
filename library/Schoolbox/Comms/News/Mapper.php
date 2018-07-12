@@ -50,6 +50,11 @@ class Mapper extends \Schoolbox\Mapper
     public const TOPIC_SLUG_PARAM = 't';
 
     /**
+     * Querystring param for the Show Pagination option
+     */
+    public const SHOW_PAGINATOR_PARAM = 'sp';
+
+    /**
      * @inheritdoc
      * @throws \Schoolbox\Mapper\Exception
      */
