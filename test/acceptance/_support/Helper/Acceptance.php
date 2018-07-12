@@ -333,21 +333,6 @@ class Acceptance extends \Codeception\Module
 
 
     /**
-     * Assert that a given value is set in a date field.
-     *
-     * @param string|array $field A field locator
-     * @param string       $value The value to enter
-     */
-    public function seeInDateField($field, $value): void
-    {
-        // TODO implement seeInDateField
-        // Possible methods: get field value, then create a date out of it?
-        // Alternate: strtotime publishDate's value, compare it to what's in the field?
-        $this->debug('seeInDateField is not yet implemented');
-    }
-
-
-    /**
      * Gets the XPath selector for a selectize container, so the selectize can
      * be interacted with.
      *

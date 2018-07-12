@@ -273,7 +273,10 @@ class Form
      */
     public function seePublishDate(Alaress_Date_Format $publishDate): self
     {
-        $this->tester->seeInDateField('item_datetime_published', $publishDate->getDatabase());
+        $this->tester->seeInField(
+            'item_datetime_published',
+            $publishDate->getUsingFormat(Common::FORMAT_INPUT_DATETIME)
+        );
         return $this;
     }
 
@@ -293,7 +296,10 @@ class Form
      */
     public function seeExpiryDate(Alaress_Date_Format $expiryDate): self
     {
-//        $this->tester->fillDateField('item_datetime_expires', $expiryDate->getDatabase());
+        $this->tester->seeInField(
+            'item_datetime_expires',
+            $expiryDate->getUsingFormat(Common::FORMAT_INPUT_DATETIME)
+        );
         return $this;
     }
 }

@@ -58,9 +58,29 @@ class Common
      */
     public const ELEMENT_NOTIFICATIONS = '#msgs';
 
+    /**
+     * Date format as used in form inputs.
+     *
+     * This should match `config.date_local`; you can set it if you want.
+     */
+    public const FORMAT_INPUT_DATE = 'd/m/Y';
+
+    /**
+     * Time format as used in form inputs.
+     *
+     * This should match `config.date_time`; you can set it if you want.
+     */
+    public const FORMAT_INPUT_TIME = 'g:ia';
+
+    /**
+     * Date+time format as used in form inputs.
+     */
+    public const FORMAT_INPUT_DATETIME = self::FORMAT_INPUT_DATE . ' ' . self::FORMAT_INPUT_TIME;
+
+
     public static function toDatepickerFormat(\Datetime $datetime)
     {
-        return $datetime->format('d/m/Y h:ia');
+        return $datetime->format(self::FORMAT_INPUT_DATETIME);
     }
 
     public static function gentext(int $length)
