@@ -64,8 +64,9 @@ class CreateAndVerifyCest
      *
      * @param AcceptanceTester $i
      * @param Form             $formPage
+     * @param Index            $indexPage
      */
-    public function createNews(AcceptanceTester $i, Form $formPage)
+    public function createNews(AcceptanceTester $i, Form $formPage, Index $indexPage)
     {
         $i->login('zsmith', 'password');
         $i->amOnPage($formPage->generateCreateRoute());
@@ -95,7 +96,19 @@ class CreateAndVerifyCest
             ->setExpiryDate($expiry)
             ->submit();
 
-        // Verify that the news is as saved
+        // Verify that the news is in the All topic, and is the first news item
+        $i->amOnPage($indexPage->generateRoute(''));
 
+        $position = 1;
+        $indexPage->seeHeadline($headline, $position);
+
+        // Verify I don't see it at all in some other topic
+        $i->amOnPage($indexPage->generateRoute('music'));
+        $indexPage->dontSeeHeadline($headline);
+
+        // Verify I see it in the topic I put it in
+        // (URL has invisible dependency on config; all I want is a slug)
+        $i->amOnPage($indexPage->generateRoute((new \Url($topic,''))->getSlug()));
+        $indexPage->seeHeadline($headline, $position);
     }
 }
