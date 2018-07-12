@@ -3,11 +3,11 @@
  # Sets up a container for async article loading
  #
  # @param int componentInstanceId
- # @param string slug
  # @param Collection|Topic[] topics
  # @param int topicAll
- # @param int limit
  # @param int compactMode
+ # @param int pageNum
+ # @param int limit
  #}
 <script src="/javascript/shared/comms/articletabs.js"></script>
 <script src="/javascript/shared/comms/saveforlater.js"></script>
@@ -22,11 +22,11 @@
 
 {% include '@commsNews/tabs.twig' with {
     topicContainerId: 'news-topics-' ~ componentInstanceId,
-    slug: slug,
     topics: topics,
     topicAll: topicAll,
-    limit: limit,
-    compactMode: compactMode
+    slug: slug,
+    compactMode: compactMode,
+    limit: limit
 } %}
 
 <div id="news-container-{{ componentInstanceId }}">
