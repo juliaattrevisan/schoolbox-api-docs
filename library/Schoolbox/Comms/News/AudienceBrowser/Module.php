@@ -61,14 +61,6 @@ class Module extends BaseModule
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function initTemplatePaths(IChainLoader $templateLoader): void
-    {
-        $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
-    }
-
-    /**
      * Override with any steps required for a controller and its routes
      *
      * You should use this method to initialize any mappers or other objects
