@@ -76,7 +76,7 @@ class CreateAndVerifyCest
         // Fill in form values
         // TODO these should be randomizable
         $headline = "Random Headline";
-        $article  = "<h1>Random Article</h1><p>Random article text</p>";
+        $article  = "<h2>Random Article</h2> <p>Random article text</p>";
         $blurb    = "<p>Blurb</p>";
         $image    = __DIR__ . '/upload/test.jpg';
         $topic    = 'General';
