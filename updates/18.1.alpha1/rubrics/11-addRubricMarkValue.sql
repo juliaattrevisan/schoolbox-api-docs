@@ -1,0 +1,2 @@
+ALTER TABLE `rubric_mark`
+    ADD COLUMN `value` DECIMAL(14,11) UNSIGNED NULL DEFAULT NULL AFTER `descriptor_id`;
