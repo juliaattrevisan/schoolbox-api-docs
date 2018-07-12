@@ -510,7 +510,8 @@ class Controller extends Base
             'initialContent' => $content,
             'topics' => $topics,
             'topicAll' => Mapper::TOPIC_ALL_SLUG,
-            'showPaginator' => $showPaginator
+            'showPaginator' => $showPaginator,
+            'slug' => $params->getSlug()
         ];
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/index.twig', $data));
