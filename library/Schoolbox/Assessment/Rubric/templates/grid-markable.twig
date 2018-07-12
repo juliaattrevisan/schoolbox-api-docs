@@ -253,6 +253,9 @@
             // Hide dropdowns on all cells in the same row
             $allCellsInRow.siblings("select").addClass("hide");
 
+            // Disable all dropdowns so they don't get POSTed
+            $allCellsInRow.siblings("select").prop("disabled", true);
+
             // Show text labels on all cells in the same row
             $allCellsInRow.siblings("label").find(".rb-value").removeClass("hide");
 
@@ -265,6 +268,7 @@
                 // - Cells with a single value just get a text label
 
                 $changedCell.siblings("select.used").removeClass("hide");
+                $changedCell.siblings("select.used").prop("disabled", false); // Re-enable so we can use it and it gets POSTed
                 $changedCell.siblings("label").find(".rb-value.used").removeClass("hide");
             }
         }
