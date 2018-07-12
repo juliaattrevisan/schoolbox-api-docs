@@ -94,7 +94,7 @@ class Form
      * @param string $headline
      * @return Form
      */
-    public function setHeadline(string $headline): self
+    public function fillHeadline(string $headline): self
     {
         $this->tester->fillField('heading', $headline);
         return $this;
@@ -114,7 +114,7 @@ class Form
      * @param string $article
      * @return Form
      */
-    public function setArticle(string $article): self
+    public function fillArticle(string $article): self
     {
         $this->tester->fillRichTextField('body', $article);
         return $this;
@@ -134,7 +134,7 @@ class Form
      * @param string $blurb
      * @return Form
      */
-    public function setBlurb(string $blurb): self
+    public function fillBlurb(string $blurb): self
     {
         // Expand blurb pane, and then enter it in
         $this->tester->click('[data-collapser="blurb"]');
@@ -158,7 +158,7 @@ class Form
      * @param string $filename
      * @return Form
      */
-    public function setFeatureImage(string $filename): self
+    public function fillFeatureImage(string $filename): self
     {
         $this->tester->attachAttachzoneFile('#news-feature-zone', $filename);
         return $this;
@@ -184,7 +184,7 @@ class Form
      * @param string $topic
      * @return Form
      */
-    public function setTopic(string $topic): self
+    public function fillTopic(string $topic): self
     {
         $this->tester->selectOption('item_topic_id', $topic);
         return $this;
@@ -204,7 +204,7 @@ class Form
      * @param array $roles
      * @return Form
      */
-    public function setRoles(array $roles): self
+    public function fillRoles(array $roles): self
     {
         $this->tester->checkSelectGroupOptions('role', $roles);
         return $this;
@@ -225,7 +225,7 @@ class Form
      * @param array $campuses
      * @return Form
      */
-    public function setCampuses(array $campuses): self
+    public function fillCampuses(array $campuses): self
     {
         $this->tester->checkSelectGroupOptions('campus', $campuses);
         return $this;
@@ -245,7 +245,7 @@ class Form
      * @param array $users
      * @return Form
      */
-    public function setUsers(array $users): self
+    public function fillUsers(array $users): self
     {
         $this->tester->clearSelectize('userList[]');
         foreach ($users as $user) {
@@ -272,7 +272,7 @@ class Form
      * @param Alaress_Date_Format $publishDate
      * @return Form
      */
-    public function setPublishDate(Alaress_Date_Format $publishDate): self
+    public function fillPublishDate(Alaress_Date_Format $publishDate): self
     {
         // Type in database format, let strtotime do the work
         // This is because Codeception has no access to the DB config
@@ -299,7 +299,7 @@ class Form
      * @param Alaress_Date_Format $expiryDate
      * @return Form
      */
-    public function setExpiryDate(Alaress_Date_Format $expiryDate): self
+    public function fillExpiryDate(Alaress_Date_Format $expiryDate): self
     {
         $this->tester->fillDateField('item_datetime_expires', $expiryDate->getDatabase());
         return $this;

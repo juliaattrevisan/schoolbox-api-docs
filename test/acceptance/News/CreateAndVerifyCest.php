@@ -86,16 +86,16 @@ class CreateAndVerifyCest
         $publish  = \Alaress_Date_Format::now()->addHours(-1)->setTime(0, 0, 0);
         $expiry   = \Alaress_Date_Format::now()->addDays(7)->setTime(0, 0, 0);
         $formPage
-            ->setHeadline($headline)
-            ->setArticle($article)
-            ->setBlurb($blurb)
-            ->setFeatureImage($image)
-            ->setTopic($topic)
-            ->setRoles($roles)
-            ->setCampuses($campi)
-            ->setUsers($users)
-            ->setPublishDate($publish)
-            ->setExpiryDate($expiry)
+            ->fillHeadline($headline)
+            ->fillArticle($article)
+            ->fillBlurb($blurb)
+            ->fillFeatureImage($image)
+            ->fillTopic($topic)
+            ->fillRoles($roles)
+            ->fillCampuses($campi)
+            ->fillUsers($users)
+            ->fillPublishDate($publish)
+            ->fillExpiryDate($expiry)
             ->submit();
 
         // Verify that the news is in the All topic, and is the first news item
