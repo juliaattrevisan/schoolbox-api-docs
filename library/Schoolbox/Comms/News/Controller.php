@@ -497,6 +497,8 @@ class Controller extends Base
         $topics = $this->topicMapper->findAll();
 
         /* The initial data set to load, given the params provided
+         * Compact Mode is hardcoded to be disabled from this context
+         * ShowPaginator is always true in this context
          */
         $outcome = $this->generatePartial($params, $topics,$showPaginator);
         $content = $this->buildUnthemedHtmlOutput('@commsNews/list.twig', $outcome)->getAsString();
