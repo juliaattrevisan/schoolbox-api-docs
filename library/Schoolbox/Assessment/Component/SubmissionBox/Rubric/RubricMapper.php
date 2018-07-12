@@ -1344,7 +1344,7 @@ class RubricMapper
         $whereClauseOuter = implode(' AND ', $pb->getWhere());
 
         // 1. Get latest published student marks
-        $stmt = Database::getInstance()->prepare("
+        $stmt = $this->database->prepare("
             SELECT sr.owner, sb.id AS 'sb.id', rc.id AS 'rc.id', rd.value AS 'mark'
             FROM rubric_mark rm
             JOIN rubric_descriptor rd ON rd.id = rm.descriptor_id AND rd.deleted_at IS NULL
@@ -1381,12 +1381,12 @@ class RubricMapper
         $studentMarks = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         // 2. Get max mark per criterion and dueWork
-        $pb = new Builder($this->db, '');
+        $pb = new Builder($this->database, '');
         $pb->in('rg.parent_id', $folderIds)
            ->equals('rg.parent_type', Group::PARENT_TYPE_CATEGORY)
            ->greaterThan('rd.value', 0.0);
         $whereClause = implode(' AND ', $pb->getWhere());
-        $stmt        = Database::getInstance()->prepare("
+        $stmt        = $this->database->prepare("
             SELECT rl.box_id AS 'sb.id', rc.id AS 'rc.id', rg.name AS grouping, rc.name, MAX(rd.value) AS 'max_mark'
             FROM rubric_descriptor rd
             JOIN rubric_criterion rc ON rc.id = rd.criterion_id AND rc.deleted_at IS NULL
