@@ -12,9 +12,17 @@
 <script src="/javascript/shared/comms/articletabs.js"></script>
 <script src="/javascript/shared/comms/saveforlater.js"></script>
 <script>
+
+    {% set querystringParams = [
+        'c=' ~ compactMode,
+        't=' ~ slug,
+        'l=' ~ limit,
+        'sp=0'
+    ]|join('&') %}
+
     $(function() {
         $('#news-container-{{ componentInstanceId }}').articleTabs({
-            'selectedUrl': "{{ routeLookup('commsNews.getListByTopic', {slug: slug}) ~ '?c=' ~ compactMode }}",
+            'selectedUrl': "{{ routeLookup('commsNews.getListByTopic')}}?{{ querystringParams|raw }}",
             'topicTabs': $("#news-topics-{{ componentInstanceId }}")
         });
     });
