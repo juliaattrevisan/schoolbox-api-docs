@@ -448,7 +448,7 @@ class Acceptance extends \Codeception\Module
      * @param string|array $field Currently, must be the ID of the attachzone
      * @param string       $file
      */
-    public function attachAttachzoneFile($field, $file)
+    public function attachAttachzoneFile($field, $file): void
     {
         // Create a file programatically
         $fileScript = sprintf(
@@ -466,6 +466,24 @@ class Acceptance extends \Codeception\Module
             $fileScript
         );
         $this->getWebDriverModule()->executeJS($script);
+    }
+
+
+    /**
+     * Asserts that an attachzone field has a given file attached.
+     *
+     * @param string|array $field Currently, must be the ID of the attachzone
+     * @param string       $file
+     */
+    public function seeAttachzoneFile($field, $file): void
+    {
+        // TODO implement file comparison
+        // How do I verify a file matches another?
+        // Guess:
+        // * upload file contents to /asyncUpload
+        // * see what hash I get back
+        // * compare hash to what I tested
+        $this->debug('seeAttachzoneFile is not yet implemented');
     }
 
 

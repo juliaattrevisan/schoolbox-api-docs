@@ -171,13 +171,7 @@ class Form
      */
     public function seeFeatureImage(string $filename): self
     {
-        // TODO implement file comparison
-        // How do I verify a file matches another?
-        // Guess:
-        // * upload file contents to /asyncUpload
-        // * see what hash I get back
-        // * compare hash to what I tested
-//        $this->tester->attachAttachzoneFile('#news-feature-zone', $filename);
+        $this->tester->seeAttachzoneFile('#news-feature-zone', $filename);
         return $this;
     }
 
