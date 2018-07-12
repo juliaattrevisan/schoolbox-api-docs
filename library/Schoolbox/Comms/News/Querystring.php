@@ -31,7 +31,7 @@ class Querystring
     /**
      * Querystring param for the Compact Mode option
      */
-    public const COMPACT_MODE_PARAM = 'compactMode';
+    public const COMPACT_MODE_PARAM = 'c';
 
     /**
      * Querystring param for the current Page Number chosen
