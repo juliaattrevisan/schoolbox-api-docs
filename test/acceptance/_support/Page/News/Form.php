@@ -11,6 +11,7 @@ namespace Page\News;
 
 use AcceptanceTester;
 use Alaress_Date_Format;
+use Page\Common;
 
 /**
  * News form page object
@@ -29,7 +30,7 @@ class Form
     public const LINK_ADD_NEWS = '.icon-add';
 
     // No crumbtrail on this page?
-    public const FORM = '#newsForm';
+    public const FORM = Common::ELEMENT_CONTENT . ' #newsForm';
 
     // Not sure if every input should have its own selector constant
     public const FORM_SAVE = self::FORM . ' input[type="submit"]';

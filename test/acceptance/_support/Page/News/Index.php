@@ -8,6 +8,7 @@
 namespace Page\News;
 
 use AcceptanceTester;
+use Page\Common;
 
 /**
  * News index page object
@@ -78,7 +79,8 @@ class Index
             ? sprintf(':nth-child(%d)', $position)
             : '';
         return sprintf(
-            '%s %s%s',
+            '%s %s %s%s',
+            Common::ELEMENT_CONTENT,
             self::ELEMENT_NEWS_LIST,
             self::ELEMENT_NEWS_LIST_ITEM,
             $positionSelector

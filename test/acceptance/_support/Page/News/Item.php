@@ -8,6 +8,7 @@
 namespace Page\News;
 
 use AcceptanceTester;
+use Page\Common;
 
 /**
  * News item page object
@@ -21,17 +22,17 @@ class Item
     // TODO all of these should have better selectors
     // TODO all of these belong in the main content of a page (#content)
 
-    public const LINK_MODIFY   = '.icon-modify';
-    public const LINK_PREVIOUS = '.icon-previous';
-    public const LINK_NEXT     = '.icon-next';
+    public const LINK_MODIFY   = Common::ELEMENT_CONTENT . ' .icon-modify';
+    public const LINK_PREVIOUS = Common::ELEMENT_CONTENT . ' .icon-previous';
+    public const LINK_NEXT     = Common::ELEMENT_CONTENT . ' .icon-next';
 
-    public const ELEMENT_BREADCRUMB = '.breadcrumb';
+    public const ELEMENT_BREADCRUMB = Common::ELEMENT_CONTENT . ' .breadcrumb';
 
-    public const ELEMENT_HEADLINE      = 'h1';
-    public const ELEMENT_META_AUTHOR   = '.card > .meta:nth-of-type(1)';
-    public const ELEMENT_META_DATE     = '.card > .meta:nth-of-type(2)';
-    public const ELEMENT_FEATURE_IMAGE = '.large-3 img';
-    public const ELEMENT_ARTICLE       = '.large-9 article';
+    public const ELEMENT_HEADLINE      = Common::ELEMENT_CONTENT . ' h1';
+    public const ELEMENT_META_AUTHOR   = Common::ELEMENT_CONTENT . ' .card > .meta:nth-of-type(1)';
+    public const ELEMENT_META_DATE     = Common::ELEMENT_CONTENT . ' .card > .meta:nth-of-type(2)';
+    public const ELEMENT_FEATURE_IMAGE = Common::ELEMENT_CONTENT . ' .large-3 img';
+    public const ELEMENT_ARTICLE       = Common::ELEMENT_CONTENT . ' .large-9 article';
 
     /**
      * @var AcceptanceTester
