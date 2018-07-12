@@ -247,12 +247,12 @@ class Acceptance extends \Codeception\Module
 
 
     /**
-     * Select the given options in a checkbox group.
+     * Finds all available options within a select group.
      *
      * @param string $group
-     * @param array  $options
+     * @return array key: the checkbox's ID, value: the checkbox label's text
      */
-    public function checkSelectGroupOptions(string $group, array $options): void
+    private function findSelectGroupOptions(string $group): array
     {
         $wd = $this->getWebDriverModule();
 
@@ -261,19 +261,51 @@ class Acceptance extends \Codeception\Module
         $elements  = $wd->_findElements([
             'css' => sprintf('input[type=checkbox][data-select-all-group="%s"]', addslashes($group))
         ]);
-        $optionIds = [];
+        $options = [];
         foreach ($elements as $element) {
-            $optionIds[] = $element->getAttribute('id');
+            $id           = $element->getAttribute('id');
+            $options[$id] = $wd->grabTextFrom(sprintf('label[for="%s"]', addslashes($id)));
         }
+        return $options;
+    }
 
+
+    /**
+     * Select the given options in a checkbox group.
+     *
+     * @param string $group
+     * @param array  $options
+     */
+    public function checkSelectGroupOptions(string $group, array $options): void
+    {
         // Check every option provided in $options, uncheck any not provided
-        foreach ($optionIds as $optionId) {
+        foreach ($this->findSelectGroupOptions($group) as $id => $label) {
             // Find the matching checkbox, and check/uncheck it
-            $optionLabel = $wd->grabTextFrom(sprintf('label[for="%s"]', addslashes($optionId)));
-            if (\in_array($optionLabel, $options, true)) {
-                $this->checkOption('#' . $optionId);
+            if (\in_array($label, $options, true)) {
+                $this->checkOption('#' . $id);
             } else {
-                $this->uncheckOption('#' . $optionId);
+                $this->uncheckOption('#' . $id);
+            }
+        }
+    }
+
+
+    /**
+     * Assert selected select group options are exactly as selected.
+     *
+     * @param string $group
+     * @param array  $options
+     */
+    public function seeSelectGroupOptionsAreSelected(string $group, array $options): void
+    {
+        $wd = $this->getWebDriverModule();
+
+        // Check every option provided in $options, verify/don't verify all are selected
+        foreach ($this->findSelectGroupOptions($group) as $id => $label) {
+            if (\in_array($label, $options, true)) {
+                $wd->seeCheckboxIsChecked('#' . $id);
+            } else {
+                $wd->dontSeeCheckboxIsChecked('#' . $id);
             }
         }
     }

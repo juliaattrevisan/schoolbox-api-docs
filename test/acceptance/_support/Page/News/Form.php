@@ -217,8 +217,7 @@ class Form
      */
     public function seeRoles(array $roles): self
     {
-        // TODO implement see selectgroup options
-//        $this->tester->checkSelectGroupOptions('role', $roles);
+        $this->tester->seeSelectGroupOptionsAreSelected('role', $roles);
         return $this;
     }
 
@@ -238,7 +237,7 @@ class Form
      */
     public function seeCampuses(array $campuses): self
     {
-//        $this->tester->checkSelectGroupOptions('campus', $campuses);
+        $this->tester->seeSelectGroupOptionsAreSelected('campus', $campuses);
         return $this;
     }
 
