@@ -315,9 +315,6 @@ class Controller extends Base
 
         $rubricData = (new InlineGrader\Rubric($assessment, $participant, $this->getUser(), $response, $isInteractionLocked, $rubricContext))->generate();
 
-        $rubric = $rubricData['rubricContext']['rubric'];
-        $markRangeMetadata = $this->getMarkRangeMetadata($rubric);
-
         $data = array_merge($data, $rubricData);
 
         /* Augment with self-reflection rubric data
@@ -325,100 +322,9 @@ class Controller extends Base
         $selfReflectionData = (new SelfReflection\Rubric($assessment, $participant, $response, $rubricContext))->generate();
         $data = array_merge($data, $selfReflectionData);
 
-        $data['descriptorMetadata'] = $markRangeMetadata;
-
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/inlineGrading/standard.twig', $data));
     }
-
-    /**
-     * Get an array containing data about the range and direction of descriptor values
-     * @param array $rubric
-     * @return array
-     */
-    private function getMarkRangeMetadata(array $rubric) : array
-    {
-        $descriptors = $rubric['descriptors'];
-        $levelIds = array_keys($rubric['levels']);
-
-        $metadata = [];
-
-        foreach($descriptors as $critId => $levelDescriptors) {
-            $firstLevel = $levelIds[0];
-            $lastLevel = $levelIds[\count($levelIds) - 1];
-
-            // TODO test these with empty descriptors
-            $startValue = $descriptors[$critId][$firstLevel] ? $descriptors[$critId][$firstLevel]['value'] : null;
-            $endValue = $descriptors[$critId][$lastLevel] ? $descriptors[$critId][$lastLevel]['value'] : null;
-            $direction = 'asc';
-
-            if ($startValue > $endValue) {
-                $direction = 'desc';
-            }
-
-            $metadata[$critId] = [
-                'direction' => $direction
-            ];
-
-            $prevDescriptorMax = $startValue; // Used for ascending order calculations
-
-            // Loop through level ids
-            $numLevels = \count($levelIds);
-
-            for ($i = 0; $i < $numLevels; $i++) {
-                // If this level has descriptors, calculate the range
-                if (array_key_exists($i, $levelDescriptors)) {
-
-                    // For descending descriptors, calculate the values we need to determine the cell's min value later on
-                    if ($direction === 'desc') {
-
-                        /* - If there is a 'next' cell, use its value
-                         * - Otherwise just use the same value as this cell
-                         */
-                        if ($levelDescriptors[$i + 1]) {
-                            $nextDescriptorMax = $levelDescriptors[$i + 1]['value'];
-                        } else {
-                            $nextDescriptorMax = $endValue;
-                        }
-                    }
-
-                    // The cell's stored value will always be its maximum regardless of order
-                    $currentDescriptorMax = $levelDescriptors[$i]['value'];
-
-                    /* Assume ascending order by default
-                     * - If the value for this descriptor is the same as the previous cell, we're either on the first cell,
-                     *   or on a cell without a range
-                     * - Otherwise, this cell's min value is 1 greater than the previous cell's max, since we're ascending
-                     */
-                    $currentDescriptorMin = $prevDescriptorMax === $currentDescriptorMax ? $prevDescriptorMax : $prevDescriptorMax + 1;
-
-                    // Calculate min value differently if descriptors are descending
-                    if ($direction === 'desc') {
-                        /* - If the value for this descriptor is the same as the next cell, we're either on the last cell,
-                         *   or on a cell without a range
-                         * - Otherwise, this cell's min value is 1 greater than the next cell's max, since we're descending
-                         */
-                        $currentDescriptorMin = $currentDescriptorMax === $nextDescriptorMax ? $nextDescriptorMax : $nextDescriptorMax + 1;
-                    }
-
-                    // Index min and max by level ID for this criterion
-                    $metadata[$critId][$i] = [
-                        'min' => $currentDescriptorMin,
-                        'max' => $currentDescriptorMax
-                    ];
-
-                    $prevDescriptorMax = $currentDescriptorMax;
-
-                } else {
-                    continue;
-                }
-
-            }
-        }
-
-        return $metadata;
-    }
-
-
+    
     /**
      * Display a kami document in an iFrame
      *
