@@ -47,7 +47,7 @@ class Module extends BaseModule
         $this->register('GET', '/roles', 'getRoles', $getPerms);
         $this->register('GET', '/houses', 'getHouses', $getPerms);
         $this->register('GET', '/classes', 'getClasses', $getPerms);
-        $this->register('GET', '/groups', 'getGroups', $getPerms);
+        $this->register('GET', '/folders', 'getFolders', $getPerms);
         $this->register('GET', '/pastoralgroups', 'getPastoralGroups', $getPerms);
     }
 

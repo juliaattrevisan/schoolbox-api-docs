@@ -15,6 +15,7 @@ use Schoolbox\Collection;
 use Schoolbox\Pastoral;
 use Schoolbox\Resource;
 use Schoolbox\RoleMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 
 class Controller extends Base
@@ -36,9 +37,9 @@ class Controller extends Base
     private $houseMapper;
 
     /**
-     * @var Resource\GroupMapper
+     * @var FolderMapper
      */
-    private $groupMapper;
+    private $folderMapper;
 
     /**
      * @var Pastoral\Group\Mapper
@@ -51,20 +52,20 @@ class Controller extends Base
      * @param CampusMapper          $campusMapper
      * @param RoleMapper            $roleMapper
      * @param HouseMapper           $houseMapper
-     * @param Resource\GroupMapper  $groupMapper
+     * @param FolderMapper          $folderMapper
      * @param Pastoral\Group\Mapper $pastoralGroupMapper
      */
     public function __construct(
         CampusMapper $campusMapper,
         RoleMapper $roleMapper,
         HouseMapper $houseMapper,
-        Resource\GroupMapper $groupMapper,
+        FolderMapper $folderMapper,
         Pastoral\Group\Mapper $pastoralGroupMapper
     ) {
         $this->campusMapper = $campusMapper;
         $this->roleMapper = $roleMapper;
         $this->houseMapper = $houseMapper;
-        $this->groupMapper = $groupMapper;
+        $this->folderMapper = $folderMapper;
         $this->pastoralGroupMapper = $pastoralGroupMapper;
     }
 
@@ -116,25 +117,16 @@ class Controller extends Base
 
 
     /**
-     * TODO: We need to figger out how we do this; Andy has some ideas
+     * Get (id, name) tuples for every folder
      */
-    public function getClasses()
+    public function getFolders()
     {
-        echo 'testClasses';
-    }
-
-
-    /**
-     * Get (id, name) tuples for every Group
-     */
-    public function getGroups()
-    {
-        $groups = $this->groupMapper->findAll();
+        $folders = $this->folderMapper->findForUser($_SESSION['user']);
 
         $items = [];
 
-        foreach ($groups as $group) {
-            $items[] = array_combine(['id', 'name'], $group->getCategory()->findValueLabelPair());
+        foreach ($folders as $folder) {
+            $items[] = array_combine(['id', 'name'], $folder->findValueLabelPair());
         }
 
         $this->getResponse()->content->set($this->buildJsonOutput([
