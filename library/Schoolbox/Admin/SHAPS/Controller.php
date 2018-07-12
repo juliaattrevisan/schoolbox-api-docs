@@ -228,18 +228,17 @@ class Controller extends Base
 
     /**
      * Provides details about a user in response to an ajax request for that user's external ID.
+     * Selectize gives us the user's Id
      *
      * @api   GET /adminv2/shaps/provisioning/{userId}
      * @level 18.1
      *
      * @param string $userId
      * @throws \InvalidArgumentException
-     * @throws \Schoolbox\Mapper\Exception
      * @throws \Aura\Web\Exception\InvalidStatusCode
      */
     public function getSearchUsers(string $userId): void
     {
-        // Selectize gives us the user's external ID
         $user = $this->userMapper->findById($userId);
         $errors[$user->getId()] = $this->getInvalidities($user);
 
