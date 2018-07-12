@@ -5,6 +5,7 @@ namespace Helper;
 // all public methods declared in helper class will be available in $I
 
 use Codeception\Exception\ModuleException;
+use Codeception\Module\Db;
 use Codeception\Module\WebDriver;
 use Codeception\Module\Db;
 use Codeception\TestInterface;
@@ -92,6 +93,43 @@ class Acceptance extends \Codeception\Module
             $db->updateInDatabase('config', ['value' => $value], ['name' => $name]);
         }
     }
+
+    /**
+     * Was debug mode on when the test started?
+     *
+     * @var bool
+     */
+    private $wasDebugModeOn = false;
+
+
+    /**
+     * Suspends debug mode, if it is on.
+     *
+     * It can then be restored using `restoreDebugMode`.
+     */
+    public function suspendDebugMode(): void
+    {
+        $db = $this->getDbModule();
+        $this->wasDebugModeOn = (bool)$db->grabFromDatabase('config', 'value', ['name' => 'debug_mode']);
+        if ($this->wasDebugModeOn !== 0) {
+            $db->updateInDatabase('config', ['value' => 0], ['name' => 'debug_mode']);
+        }
+    }
+
+
+    /**
+     * Switches debug mode back on, if it was off when `suspendDebugMode` was
+     * called.
+     */
+    public function restoreDebugMode(): void
+    {
+        $this->getDbModule()->updateInDatabase(
+            'config',
+            ['value' => $this->wasDebugModeOn ? 1 : 0],
+            ['name' => 'debug_mode']
+        );
+    }
+
 
     /**
      * Find a checkbox to "click".
@@ -433,6 +471,22 @@ class Acceptance extends \Codeception\Module
         $i->amOnPage('/messages');
         $i->dontSee($notif);
     }
+
+    /**
+     * Return DB module in a type-safe manner.
+     *
+     * @return Db
+     */
+    private function getDbModule(): Db
+    {
+        try {
+            return $this->getModule('Db');
+        } catch (ModuleException $e) {
+            // Wasn't found: return null, let TypeError handle it
+        }
+        return null;
+    }
+
 
 //    private function findField(WebDriver $webDriver, $field): ?WebDriverElement
 //    {
