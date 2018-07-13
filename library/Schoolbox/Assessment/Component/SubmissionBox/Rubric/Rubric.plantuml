@@ -34,10 +34,12 @@ class RubricGroupUsage {
 
 class RubricCriterionUsage {
     criterion : RubricCriterion
+    descriptors : RubricDescriptor[]
 }
 
 class RubricLevel {
     name : string
+    descriptors : RubricDescriptor[]
 }
 
 interface IAssessable
@@ -49,7 +51,9 @@ RubricGrid *-d- RubricGroupUsage
 RubricGroupUsage *-l- RubricGroup
 RubricGroupUsage *-d- RubricCriterionUsage
 RubricCriterionUsage *-l- RubricCriterion
+RubricCriterionUsage *-r- RubricDescriptor
 RubricGrid *-d- RubricLevel
+RubricLevel *-r- RubricDescriptor
 
 class RubricMarkedGrid {
     grid : RubricGrid
