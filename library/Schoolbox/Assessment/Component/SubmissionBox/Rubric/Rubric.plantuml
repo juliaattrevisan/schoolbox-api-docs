@@ -1,14 +1,29 @@
 @startuml
 
-namespace RubricRowset {
+namespace Assessment {
     interface AssessmentContext {
         getFolder() : Folder
         getBaseContext() : AssessmentContext
     }
 
+    interface IAssessable {
+        getContext() : AssessmentContext
+    }
+
+    interface IFeedback {
+        getAssessable() : IAssessable
+        getReviewee() : User
+    }
+
+    IAssessable *-l- AssessmentContext
+    IFeedback *-l- IAssessable
+}
+
+namespace RubricRowset {
+
     class RubricRowset {
         groups : RubricGroup[]
-        context : IAssessmentContext
+        context : AssessmentContext
     }
 
     class RubricGroup {
@@ -20,7 +35,7 @@ namespace RubricRowset {
         name : string
     }
 
-    RubricRowset *-u- AssessmentContext
+    RubricRowset *-u- Assessment.AssessmentContext
     RubricRowset *-d- RubricGroup
     RubricGroup *-d- RubricCriterion
 }
@@ -28,9 +43,6 @@ namespace RubricRowset {
 
 
 namespace RubricGrid {
-    interface IAssessable {
-        getContext() : AssessmentContext
-    }
 
     class RubricGrid {
         assessment : IAssessable
@@ -65,7 +77,7 @@ namespace RubricGrid {
     }
 
     RubricGrid *-l- RubricRowset.RubricRowset
-    RubricGrid *-u- IAssessable
+    RubricGrid *-u- Assessment.IAssessable
     RubricGrid *-d- RubricDescriptor
     RubricGrid *-d- RubricGroupUsage
     RubricGroupUsage *-l- RubricRowset.RubricGroup
@@ -75,15 +87,9 @@ namespace RubricGrid {
     RubricGrid *-d- RubricLevel
     RubricLevel *-r- RubricDescriptor
 
-    IAssessable *-l- RubricRowset.AssessmentContext
 }
 
 namespace RubricMarkedGrid {
-
-    interface IFeedback {
-        getAssessable() : IAssessable
-        getReviewee() : User
-    }
 
     class RubricMarkedGrid {
         grid : RubricGrid
@@ -97,13 +103,10 @@ namespace RubricMarkedGrid {
         value : float
     }
 
-
     RubricMarkedGrid *-l- RubricGrid.RubricGrid
-    RubricMarkedGrid *-u- IFeedback
+    RubricMarkedGrid *-u- Assessment.IFeedback
     RubricMarkedGrid *-d- RubricMark
     RubricMark *-l- RubricGrid.RubricDescriptor
-
-    IFeedback *-l- RubricGrid.IAssessable
 }
 
 @enduml
