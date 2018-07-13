@@ -1,0 +1,90 @@
+@startuml
+
+interface IAssessable
+
+Folder *-- RubricGroup
+RubricGroup *-- RubricCriterion
+
+Folder *-- IAssessable
+IAssessable <|-- DueWork
+
+DueWork *-- RubricGroupUsage
+RubricGroup *-- RubricGroupUsage
+' Duework has a RubricGroup through RubricGroupUsage
+'(DueWork, RubricGroup) .. RubricGroupUsage
+RubricGroupUsage *-- RubricCriterionUsage
+RubricCriterionUsage *-- RubricCriterion
+
+' DueWork has rubric descriptors through level*critusage
+DueWork *-- RubricLevel
+RubricCriterionUsage -- RubricLevel
+(RubricCriterionUsage, RubricLevel) .. RubricDescriptor
+@enduml
+
+
+
+@startuml
+class RubricRowset {
+    groups : RubricGroup[]
+    folder : Folder
+}
+class RubricGroup {
+    criteria : RubricCriterion[]
+    name : string
+}
+class RubricCriterion {
+    name : string
+}
+
+RubricRowset -- Folder
+
+RubricRowset *-- RubricGroup
+
+RubricGroup *-- RubricCriterion
+@enduml
+
+
+@startuml
+class RubricGrid {
+    assessment : IAssessable
+    rowset : RubricRowset
+    levels : RubricLevel[]
+    criteria : RubricCriterion[]
+    descriptors : RubricDescriptor[]
+    getRow(RubricCriterion) : RubricDescriptor[]
+    getColumn(RubricLevel) : RubricDescriptor[]
+    getDescriptor(RubricCriterion, RubricLevel) : RubricDescriptor
+}
+
+class RubricLevel {
+    name : string
+}
+
+interface IAssessable
+
+RubricGrid *-- RubricRowset
+RubricGrid *-- IAssessable
+RubricGrid *-- RubricDescriptor
+RubricGrid *-- RubricCriterion
+RubricGrid *-- RubricLevel
+@enduml
+
+
+@startuml
+class RubricMarkedGrid {
+    grid : RubricGrid
+    feedback : IFeedback
+    marks : RubricMark[]
+}
+
+class RubricMark {
+    descriptor : RubricDescriptor
+    value : float
+}
+
+interface IFeedback
+
+RubricMarkedGrid *-- IFeedback
+RubricMarkedGrid *-- RubricMark
+RubricMark *-- RubricDescriptor
+@enduml
