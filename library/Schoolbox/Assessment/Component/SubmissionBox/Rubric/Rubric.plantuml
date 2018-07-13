@@ -17,8 +17,8 @@ namespace Assessment {
     }
 
     ' internal relations
-    IAssessable *-l- AssessmentContext
-    IFeedback *-l- IAssessable
+    AssessmentContext *-r- IAssessable
+    IAssessable *-r- IFeedback
 }
 
 
@@ -82,7 +82,6 @@ namespace RubricGrid {
     }
 
     ' internal relations
-    RubricGrid *-l- RubricRowset.RubricRowset
     RubricGrid *-d- RubricDescriptor
     RubricGrid *-d- RubricGroupUsage
     RubricGroupUsage *-d- RubricCriterionUsage
@@ -94,8 +93,9 @@ namespace RubricGrid {
     Assessment.IAssessable *-d- RubricGrid
 
     ' relation to RubricRowset
-    RubricGroupUsage *-l- RubricRowset.RubricGroup
-    RubricCriterionUsage *-l- RubricRowset.RubricCriterion
+    RubricGrid -l-* RubricRowset.RubricRowset
+    RubricGroupUsage -l-* RubricRowset.RubricGroup
+    RubricCriterionUsage -l-* RubricRowset.RubricCriterion
 }
 
 
@@ -114,14 +114,14 @@ namespace RubricMarkedGrid {
     }
 
     ' internal relations
-    RubricMarkedGrid *-l- RubricGrid.RubricGrid
     RubricMarkedGrid *-d- RubricMark
 
     ' relation to Assessment
     Assessment.IFeedback *-d- RubricMarkedGrid
 
     ' relation to RubricGrid
-    RubricMark *-l- RubricGrid.RubricDescriptor
+    RubricMarkedGrid -l-* RubricGrid.RubricGrid
+    RubricMark -l-* RubricGrid.RubricDescriptor
 }
 
 @enduml
