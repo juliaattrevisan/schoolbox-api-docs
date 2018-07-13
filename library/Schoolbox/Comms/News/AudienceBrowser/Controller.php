@@ -121,7 +121,7 @@ class Controller extends Base
      */
     public function getFolders()
     {
-        $folders = $this->folderMapper->findForUser($_SESSION['user']);
+        $folders = $this->folderMapper->findForUser($_SESSION['user'])->sortBy('title', 'asc');
 
         $items = [];
 
