@@ -89,7 +89,7 @@
                                 <div class="small-12 medium-4 columns" v-for="audienceOption in audienceOptions">
                                     <button class="button-block" @click="changePage(audienceOption)">
                                         <i v-bind:class="'icon-' + audienceOption.icon"></i>
-                                        ${ audienceOption.name }
+                                        ${ audienceOption.namePlural }
                                     </button>
                                 </div>
                             </div>
@@ -264,7 +264,7 @@
                     namePlural: 'Year Levels',
                     icon: 'teacher',
                     checkbox: 'Students in year level/s',
-                    ajax: '/comms/news/audiencebrowser/year_levels'
+                    ajax: '/comms/news/audiencebrowser/yearlevels'
                 },
                 {
                     id: 'pastoral_group',

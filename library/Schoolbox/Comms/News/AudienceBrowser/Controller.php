@@ -137,6 +137,80 @@ class Controller extends Base
 
 
     /**
+     * Get all year levels
+     * @return string
+     */
+    public function getYearLevels()
+    {
+        $this->getResponse()->content->set($this->buildJsonOutput([
+            'success' => true,
+            'data' => [
+                [
+                    'id' => 1,
+                    'name' => 'Junior Kindergarten',
+                ],
+                [
+                    'id' => 2,
+                    'name' => 'Senior Kindergarten',
+                ],
+                [
+                    'id' => 3,
+                    'name' => 'Prep',
+                ],
+                [
+                    'id' => 4,
+                    'name' => 'Year 1',
+                ],
+                [
+                    'id' => 5,
+                    'name' => 'Year 2',
+                ],
+                [
+                    'id' => 6,
+                    'name' => 'Year 3',
+                ],
+                [
+                    'id' => 7,
+                    'name' => 'Year 4',
+                ],
+                [
+                    'id' => 8,
+                    'name' => 'Year 5',
+                ],
+                [
+                    'id' => 9,
+                    'name' => 'Year 6',
+                ],
+                [
+                    'id' => 10,
+                    'name' => 'Year 7',
+                ],
+                [
+                    'id' => 11,
+                    'name' => 'Year 8',
+                ],
+                [
+                    'id' => 12,
+                    'name' => 'Year 9',
+                ],
+                [
+                    'id' => 13,
+                    'name' => 'Year 10',
+                ],
+                [
+                    'id' => 14,
+                    'name' => 'Year 11',
+                ],
+                [
+                    'id' => 15,
+                    'name' => 'Year 12',
+                ]
+            ]
+        ]));
+    }
+
+
+    /**
      * Get (id, name) tuples for every Pastoral Group
      */
     public function getPastoralGroups()
