@@ -11,7 +11,7 @@ class RubricCriterion {
     name : string
 }
 
-RubricRowset -u- Folder
+RubricRowset *-u- Folder
 RubricRowset *-d- RubricGroup
 RubricGroup *-d- RubricCriterion
 
