@@ -362,18 +362,34 @@
 
                 // Add to selectize
                 self.audienceListChecked.forEach(function(option) {
+                    var selectizeOptions = [];
+                    var baseName = option.name + ' (' + option.type + ')';
+
                     if (self.includeUsers) {
-                        $('#audience-search').data('selectize').addOption({id: option.id, name: option.name + ' (' + option.type + ')'});
-                        $('#audience-search').data('selectize').addItem(option.id);
+                        selectizeOptions.push({
+                            id: option.id,
+                            name: baseName
+                        });
                     }
+
                     if (self.includeParents) {
-                        $('#audience-search').data('selectize').addOption({id: option.id + '_parents', name: 'Parents of ' + option.name + ' students ' + ' (' + option.type + ')'});
-                        $('#audience-search').data('selectize').addItem(option.id + '_parents');
+                        selectizeOptions.push({
+                            id: option.id + '_parents',
+                            name: baseName + ' [Parents of students]'
+                        });
                     }
+
                     if (self.includeTeachers) {
-                        $('#audience-search').data('selectize').addOption({id: option.id + '_teachers', name: 'Teachers of ' + option.name + ' students ' + ' (' + option.type + ')'});
-                        $('#audience-search').data('selectize').addItem(option.id + '_teachers');
+                        selectizeOptions.push({
+                            id: option.id + '_teachers',
+                            name: baseName + ' [Teachers of students]'
+                        });
                     }
+
+                    selectizeOptions.forEach(function (selectizeOption) {
+                        $('#audience-search').data('selectize').addOption(selectizeOption);
+                        $('#audience-search').data('selectize').addItem(selectizeOption.id);
+                    });
                 });
 
                 $('#audience-search').data('selectize').refreshItems();
