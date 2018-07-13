@@ -359,7 +359,9 @@ function Calendar(id, bubbleId, opts) {
                     if (n !== undefined) {
                         var base = n.match(/^\D+/);
                         if (base) {
-                            flist[i][1][k++] = n;
+                            if (checked) {
+                                flist[i][1][k++] = n;
+                            }
                             var ids = n.match(/\d+/g);
                             if (ids) {
                                 ids.forEach(function (id) {
@@ -377,7 +379,9 @@ function Calendar(id, bubbleId, opts) {
             calendarControls.find(cal.options.filter.listSelector + ' .events input').each(function() {
                 var n = $(this).attr('value');
                 // show related entries
-                flist[i][1][l++] = n;
+                if (this.checked) {
+                    flist[i][1][l++] = n;
+                }
                 availableClasses[n] = this.checked;
             });
 
