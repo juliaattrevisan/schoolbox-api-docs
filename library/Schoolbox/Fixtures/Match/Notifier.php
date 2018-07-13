@@ -72,7 +72,7 @@ class Notifier extends AbstractModuleNotifier
         /** @var Match $match */
         $match = $bundle->getEvent()->getObject();
 
-        if($match instanceof Match) {
+        if ($match instanceof Match) {
             $startAt = $match->getStartAt()->getUnixTimeStamp();
 
             // Notify 24 hours before the match start time
@@ -81,20 +81,39 @@ class Notifier extends AbstractModuleNotifier
 
             switch ($method) {
                 case Mapper::METHOD_CREATE:
-                    $bundle->attach(self::TRIGGER_CREATED, $notifyTime);
-                    $bundle->attach(self::TRIGGER_SNAPSHOT_CREATED, $startAt);
+                    // If the starting date is in past, we don't want to notify
+                    if (!$match->getStartAt()->isPast()) {
+                        $bundle->attach(self::TRIGGER_CREATED, $notifyTime);
+                        $bundle->attach(self::TRIGGER_SNAPSHOT_CREATED, $startAt);
+                    }
                     break;
                 case Mapper::METHOD_UPDATE:
                     $diff = $bundle->getEvent()->getDiff();
-                    $oneday = new Alaress_Date_Format(new \DateTime('+1 day'));
-                    if ($notifyTime < $oneday->getUnixTimeStamp()) {
+                    // If there's no viewable change, we don't want to notify
+                    if (count($diff) === 1 && array_key_exists('updatedAt', $diff)) {
+                        break;
+                    }
+
+                    $now = new \DateTime();
+                    $dayAhead = $now->modify('+ 1 day')->getTimestamp();
+                    if ($match->getStartAt()->getUnixTimeStamp() < $dayAhead) {
                         // if the changed match is happening in 24hrs
                         $bundle->attach(self::TRIGGER_UPDATED, self::IMMEDIATELY);
                         $bundle->attach(self::TRIGGER_SNAPSHOT_UPDATED, $startAt);
                     } else if (array_key_exists('startAt', $diff)) {
+                        // if the start time changed and the original start time was in 24hrs, notify
+                        $startAtPrevious = \DateTime::createFromFormat('Y-m-d H:i:s', $diff['startAt'][1]);
+                        if ($startAtPrevious->getTimestamp() < $dayAhead) {
+                            $bundle->attach(self::TRIGGER_UPDATED, self::IMMEDIATELY);
+                        }
                         // if the start time changed, update the upcoming notification time.
                         $bundle->detach(self::TRIGGER_CREATED);
                         $bundle->attach(self::TRIGGER_CREATED, $notifyTime);
+                    } else if (array_key_exists('itineraryStartAt', $diff)
+                        && (0 < $diff['itineraryStartAt'][0] && $diff['itineraryStartAt'][0] < $dayAhead
+                            || 0 < $diff['itineraryStartAt'][1] && $diff['itineraryStartAt'][1] < $dayAhead)) {
+                        $bundle->attach(self::TRIGGER_UPDATED, self::IMMEDIATELY);
+
                     }
                     break;
             }
@@ -238,6 +257,14 @@ class Notifier extends AbstractModuleNotifier
                     ->setParam('attribute', new Param('start time', null, Param::STACKING_APPEND)),
                 $match
             );
+        } elseif (isset($diff['itineraryStartAt'])) {
+            // Itinerary has changed
+            $envelope = $this->notifierHelper->postToTeams(
+                $envelope,
+                $this->notifierHelper->buildBuilder($match, $effector, $this->getSlug(), self::TRIGGER_UPDATED)
+                    ->setTitle('Your upcoming :sport match :match itinerary has been changed'),
+                $match
+            );
         }
 
         if ($envelope->count() == 0 && count($diff)) {
@@ -337,6 +364,14 @@ class Notifier extends AbstractModuleNotifier
                 $this->notifierHelper->buildBuilder($match, $effector, $this->getSlug(), self::TRIGGER_UPDATED)
                     ->setTitle('Upcoming :sport match :match for :child has a new :attribute')
                     ->setParam('attribute', new Param('start time', null, Param::STACKING_APPEND)),
+                $match
+            );
+        } elseif (isset($diff['itineraryStartAt'])) {
+            // Itinerary has changed
+            $envelope = $this->notifierHelper->postToParentsOfTeams(
+                $envelope,
+                $this->notifierHelper->buildBuilder($match, $effector, $this->getSlug(), self::TRIGGER_UPDATED)
+                    ->setTitle(':child\'s upcoming :sport match :match itinerary has been changed'),
                 $match
             );
         }

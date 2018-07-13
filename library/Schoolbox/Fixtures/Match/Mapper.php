@@ -339,11 +339,12 @@ class Mapper extends BaseMapper
 
     /**
      * Match notifications
-     *
+     * @see  \Schoolbox\Mapper::raiseNotification()
      * @param Match  $object
      * @param string $verb
      * @param Match  $previous
      * @return bool
+     * @throws \Exception
      */
     protected function raiseNotification($object, $verb, $previous = null)
     {
@@ -351,48 +352,59 @@ class Mapper extends BaseMapper
             return false;
         }
 
-        $diff = null;
-
-        // UPDATE
-        if ($previous && ($verb != self::METHOD_DELETE)) {
-            $diff = $this->diff($object, $previous);
-            /** @var Match $object */
-            /** @var Match $previous */
-            // if number of itinerary items differs, notify
-            if ($object->getItinerary()->count() !== $previous->getItinerary()->count()) {
-                $diff['itinerary'] = true;
-            } else {
-                $itineraryDiff = $object->getItinerary()->diff($previous->getItinerary(),
-                    function (ItineraryItem $a, ItineraryItem $b) {
-                        return $a->getStartAt()->getUnixTimeStamp() === $b->getStartAt()->getUnixTimeStamp()
-                            && $a->getDescription() === $b->getDescription();
-                    }
-
-                );
-                if ($itineraryDiff->count() != 0) {
-                    $diff['itinerary'] = true;
-                }
-            }
-
-            // If there's no viewable change, we don't want to notify
-            if (count($diff) == 1 && array_key_exists('updatedAt', $diff)) {
-                return true;
-            }
-        }
-
-        // CREATE and if the starting date is in past, we don't want to notify
-        if (!$previous && $object->getStartAt()->isPast()) {
-            return true;
-        }
+        $diff = $previous && ($verb != self::METHOD_DELETE) ? $this->diffForNotification($object, $previous) : null;
 
         // create a new event, and send it to the scheduler
         try {
             $this->getEventPropagator()->propagate($this->sessionData['user'], $verb, $object, $this, $diff);
-        } catch (\ErrorException $e) {
+        }
+        catch( \ErrorException $e) {
             //Unable to connect to notification system
             return false;
         }
 
         return true;
+    }
+
+    /**
+     * Diff Match objects for notification purpose.
+     * @param Match $object
+     * @param Match $previous
+     * @return array
+     * @throws Exception
+     */
+    private function diffForNotification($object, $previous)
+    {
+        // Get diff of match
+        $diff = $this->diff($object, $previous);
+
+        // Append itinerary changes to the diff
+        $diffMethod = function (ItineraryItem $a, ItineraryItem $b) {
+            return $a->getStartAt()->getUnixTimeStamp() === $b->getStartAt()->getUnixTimeStamp()
+                && $a->getDescription() === $b->getDescription();
+        };
+
+        // Diff in the both directions to catch deleted itineraries
+        $itineraryModifiedCurrent = $object->getItinerary()->diff($previous->getItinerary(), $diffMethod);
+        $itineraryModifiedPrevious = $previous->getItinerary()->diff($object->getItinerary(), $diffMethod);
+
+        // If any itinerary changes, add earliest time of current and previous itineraries into $diff
+        // The time will be used to determine whether to trigger itinerary change notification
+        if ($itineraryModifiedCurrent->count() > 0 || $itineraryModifiedPrevious->count() > 0) {
+            $itineraryStartAtCurrent = 0;
+            foreach ($itineraryModifiedCurrent as $itinerary) {
+                if ($itineraryStartAtCurrent === 0 || $itinerary->getStartAt()->getUnixTimeStamp() < $itineraryStartAtCurrent) {
+                    $itineraryStartAtCurrent = $itinerary->getStartAt()->getUnixTimeStamp();
+                }
+            }
+            $itineraryStartAtPrevious = 0;
+            foreach ($itineraryModifiedPrevious as $itinerary) {
+                if ($itineraryStartAtPrevious === 0 || $itinerary->getStartAt()->getUnixTimeStamp() < $itineraryStartAtPrevious) {
+                    $itineraryStartAtPrevious = $itinerary->getStartAt()->getUnixTimeStamp();
+                }
+            }
+            $diff['itineraryStartAt'] = [$itineraryStartAtCurrent, $itineraryStartAtPrevious];
+        }
+        return $diff;
     }
 }
