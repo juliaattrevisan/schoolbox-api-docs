@@ -12,6 +12,7 @@ namespace Page;
 class Common
 {
     public const USER_ZANE = 'Mr Zane Smith';
+    public const USER_ID_ZANE = 151;
     public const USER_RACHEL = 'Rachel Rhodes';
     public const USER_ID_RACHEL = 229;
     public const USER_DAVID = 'David Rhodes';
@@ -20,6 +21,7 @@ class Common
     public const CLASS_CHEMISTRY_1_3 = 'Chemistry 1 3';
     public const CLASS_ID_CHEMISTRY_1_3 = 176;
 
+    public const SELECTOR_JELLY_TOT = '#content a.icon-more';
 
     public static function toDatepickerFormat(\Datetime $datetime)
     {
@@ -39,5 +41,12 @@ class Common
             $randomString .= $characters[rand(0, strlen($characters) - 1)];
         }
         return $randomString;
+    }
+
+    public static function surnameFirst($fullname)
+    {
+        $name = str_replace(['Mr ', 'Mrs '], '', $fullname);
+        $parts = explode(' ', $name);
+        return $parts[1] . ', ' . $parts[0];
     }
 }
