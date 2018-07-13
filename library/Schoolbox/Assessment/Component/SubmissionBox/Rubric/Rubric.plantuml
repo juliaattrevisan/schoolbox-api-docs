@@ -1,29 +1,4 @@
 @startuml
-
-interface IAssessable
-
-Folder *-- RubricGroup
-RubricGroup *-- RubricCriterion
-
-Folder *-- IAssessable
-IAssessable <|-- DueWork
-
-DueWork *-- RubricGroupUsage
-RubricGroup *-- RubricGroupUsage
-' Duework has a RubricGroup through RubricGroupUsage
-'(DueWork, RubricGroup) .. RubricGroupUsage
-RubricGroupUsage *-- RubricCriterionUsage
-RubricCriterionUsage *-- RubricCriterion
-
-' DueWork has rubric descriptors through level*critusage
-DueWork *-- RubricLevel
-RubricCriterionUsage -- RubricLevel
-(RubricCriterionUsage, RubricLevel) .. RubricDescriptor
-@enduml
-
-
-
-@startuml
 class RubricRowset {
     groups : RubricGroup[]
     folder : Folder
@@ -41,10 +16,7 @@ RubricRowset -- Folder
 RubricRowset *-- RubricGroup
 
 RubricGroup *-- RubricCriterion
-@enduml
 
-
-@startuml
 class RubricGrid {
     assessment : IAssessable
     rowset : RubricRowset
@@ -78,10 +50,7 @@ RubricGrid *-- RubricDescriptor
 RubricGrid *-- RubricGroupUsage
 RubricGroupUsage *-- RubricCriterionUsage
 RubricGrid *-- RubricLevel
-@enduml
 
-
-@startuml
 class RubricMarkedGrid {
     grid : RubricGrid
     feedback : IFeedback
@@ -98,5 +67,6 @@ interface IFeedback
 
 RubricMarkedGrid *-- IFeedback
 RubricMarkedGrid *-- RubricMark
+RubricMarkedGrid *-- RubricGrid
 RubricMark *-- RubricDescriptor
 @enduml
