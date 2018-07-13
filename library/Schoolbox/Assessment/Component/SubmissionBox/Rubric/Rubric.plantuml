@@ -49,11 +49,21 @@ class RubricGrid {
     assessment : IAssessable
     rowset : RubricRowset
     levels : RubricLevel[]
-    criteria : RubricCriterion[]
+    groups : RubricGroupUsage[]
     descriptors : RubricDescriptor[]
     getRow(RubricCriterion) : RubricDescriptor[]
     getColumn(RubricLevel) : RubricDescriptor[]
     getDescriptor(RubricCriterion, RubricLevel) : RubricDescriptor
+}
+
+class RubricGroupUsage {
+    group : RubricGroup
+    criteria : RubricCriterionUsage[]
+    maxValue : float
+}
+
+class RubricCriterionUsage {
+    criterion : RubricCriterion
 }
 
 class RubricLevel {
@@ -65,7 +75,8 @@ interface IAssessable
 RubricGrid *-- RubricRowset
 RubricGrid *-- IAssessable
 RubricGrid *-- RubricDescriptor
-RubricGrid *-- RubricCriterion
+RubricGrid *-- RubricGroupUsage
+RubricGroupUsage *-- RubricCriterionUsage
 RubricGrid *-- RubricLevel
 @enduml
 
@@ -75,6 +86,7 @@ class RubricMarkedGrid {
     grid : RubricGrid
     feedback : IFeedback
     marks : RubricMark[]
+    getTotalMark() : float
 }
 
 class RubricMark {
