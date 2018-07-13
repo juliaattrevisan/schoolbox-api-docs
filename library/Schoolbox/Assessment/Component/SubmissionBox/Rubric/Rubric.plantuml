@@ -11,11 +11,9 @@ class RubricCriterion {
     name : string
 }
 
-RubricRowset -- Folder
-
-RubricRowset *-- RubricGroup
-
-RubricGroup *-- RubricCriterion
+RubricRowset -u- Folder
+RubricRowset *-d- RubricGroup
+RubricGroup *-d- RubricCriterion
 
 class RubricGrid {
     assessment : IAssessable
@@ -44,12 +42,14 @@ class RubricLevel {
 
 interface IAssessable
 
-RubricGrid *-- RubricRowset
-RubricGrid *-- IAssessable
-RubricGrid *-- RubricDescriptor
-RubricGrid *-- RubricGroupUsage
-RubricGroupUsage *-- RubricCriterionUsage
-RubricGrid *-- RubricLevel
+RubricGrid *-l- RubricRowset
+RubricGrid *-u- IAssessable
+RubricGrid *-d- RubricDescriptor
+RubricGrid *-d- RubricGroupUsage
+RubricGroupUsage *-l- RubricGroup
+RubricGroupUsage *-d- RubricCriterionUsage
+RubricCriterionUsage *-l- RubricCriterion
+RubricGrid *-d- RubricLevel
 
 class RubricMarkedGrid {
     grid : RubricGrid
@@ -63,10 +63,15 @@ class RubricMark {
     value : float
 }
 
+class RubricDescriptor {
+    description : string
+    value : float
+}
+
 interface IFeedback
 
-RubricMarkedGrid *-- IFeedback
-RubricMarkedGrid *-- RubricMark
-RubricMarkedGrid *-- RubricGrid
-RubricMark *-- RubricDescriptor
+RubricMarkedGrid *-l- RubricGrid
+RubricMarkedGrid *-u- IFeedback
+RubricMarkedGrid *-d- RubricMark
+RubricMark *-l- RubricDescriptor
 @enduml
