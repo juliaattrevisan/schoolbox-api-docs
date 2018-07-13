@@ -115,6 +115,8 @@
                                     <label for="audience-select-users">${ audienceSelectCheckbox }</label>
                                     <input type="checkbox" id="audience-select-parents" v-model="includeParents" />
                                     <label for="audience-select-parents">Parents of students</label>
+                                    <input type="checkbox" id="audience-select-teachers" v-model="includeTeachers" />
+                                    <label for="audience-select-teachers">Teachers of students</label>
                                 </fieldset>
 
                                 <button class="button submit" @click.prevent="addAudience">Add</button>
@@ -292,7 +294,8 @@
 
             audienceListChecked: [],
             includeUsers: true,
-            includeParents: false
+            includeParents: false,
+            includeTeachers: false
         },
         methods: {
             openBrowseModal: function () {
@@ -337,7 +340,7 @@
                             modifiedOptions.push({
                                 id: audienceOption.id + '_' + option.id,
                                 name: option.name,
-                                selectizeLabel: option.name + ' (' + audienceOption.name + ')'
+                                type: audienceOption.name
                             });
                         });
 
@@ -360,12 +363,16 @@
                 // Add to selectize
                 self.audienceListChecked.forEach(function(option) {
                     if (self.includeUsers) {
-                        $('#audience-search').data('selectize').addOption({id: option.id, name: option.selectizeLabel});
+                        $('#audience-search').data('selectize').addOption({id: option.id, name: option.name + ' (' + option.type + ')'});
                         $('#audience-search').data('selectize').addItem(option.id);
                     }
                     if (self.includeParents) {
-                        $('#audience-search').data('selectize').addOption({id: option.id + '_parents', name: 'Parents of ' + option.selectizeLabel});
+                        $('#audience-search').data('selectize').addOption({id: option.id + '_parents', name: 'Parents of ' + option.name + ' students ' + ' (' + option.type + ')'});
                         $('#audience-search').data('selectize').addItem(option.id + '_parents');
+                    }
+                    if (self.includeTeachers) {
+                        $('#audience-search').data('selectize').addOption({id: option.id + '_teachers', name: 'Teachers of ' + option.name + ' students ' + ' (' + option.type + ')'});
+                        $('#audience-search').data('selectize').addItem(option.id + '_teachers');
                     }
                 });
 
