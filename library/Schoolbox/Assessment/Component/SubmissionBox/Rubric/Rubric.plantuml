@@ -54,7 +54,6 @@ namespace RubricGrid {
         rowset : RubricRowset
         levels : RubricLevel[]
         groups : RubricGroupUsage[]
-        descriptors : RubricDescriptor[]
         getRow(RubricCriterion) : RubricDescriptor[]
         getColumn(RubricLevel) : RubricDescriptor[]
         getDescriptor(RubricCriterion, RubricLevel) : RubricDescriptor
@@ -82,7 +81,6 @@ namespace RubricGrid {
     }
 
     ' internal relations
-    RubricGrid *-d- RubricDescriptor
     RubricGrid *-d- RubricGroupUsage
     RubricGroupUsage *-d- RubricCriterionUsage
     RubricCriterionUsage *-r- RubricDescriptor
