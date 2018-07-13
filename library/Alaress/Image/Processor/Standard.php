@@ -216,7 +216,7 @@ class Standard extends BaseProcessor
      *
      * @return static
      */
-    private function save()
+    public function save()
     {
         $this->getFiletypeStrategy()->save($this->getImage(), $this->getCache()->loadCache());
         return $this;
@@ -225,7 +225,7 @@ class Standard extends BaseProcessor
     /**
      * @return bool
      */
-    private function isCached()
+    public function isCached()
     {
         return $this->getCache()->isLoadedFromCache();
     }
