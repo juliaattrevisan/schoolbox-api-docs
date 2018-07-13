@@ -1,6 +1,7 @@
 @startuml
 
 namespace Assessment {
+
     interface AssessmentContext {
         getFolder() : Folder
         getBaseContext() : AssessmentContext
@@ -15,9 +16,11 @@ namespace Assessment {
         getReviewee() : User
     }
 
+    ' internal relations
     IAssessable *-l- AssessmentContext
     IFeedback *-l- IAssessable
 }
+
 
 namespace RubricRowset {
 
@@ -35,11 +38,13 @@ namespace RubricRowset {
         name : string
     }
 
-    RubricRowset *-u- Assessment.AssessmentContext
+    ' internal relations
     RubricRowset *-d- RubricGroup
     RubricGroup *-d- RubricCriterion
-}
 
+    ' relation to Assessment
+    Assessment.AssessmentContext *-d- RubricRowset
+}
 
 
 namespace RubricGrid {
@@ -76,18 +81,23 @@ namespace RubricGrid {
         value : float
     }
 
+    ' internal relations
     RubricGrid *-l- RubricRowset.RubricRowset
-    RubricGrid *-u- Assessment.IAssessable
     RubricGrid *-d- RubricDescriptor
     RubricGrid *-d- RubricGroupUsage
-    RubricGroupUsage *-l- RubricRowset.RubricGroup
     RubricGroupUsage *-d- RubricCriterionUsage
-    RubricCriterionUsage *-l- RubricRowset.RubricCriterion
     RubricCriterionUsage *-r- RubricDescriptor
     RubricGrid *-d- RubricLevel
     RubricLevel *-r- RubricDescriptor
 
+    ' relation to Assessment
+    Assessment.IAssessable *-d- RubricGrid
+
+    ' relation to RubricRowset
+    RubricGroupUsage *-l- RubricRowset.RubricGroup
+    RubricCriterionUsage *-l- RubricRowset.RubricCriterion
 }
+
 
 namespace RubricMarkedGrid {
 
@@ -103,9 +113,14 @@ namespace RubricMarkedGrid {
         value : float
     }
 
+    ' internal relations
     RubricMarkedGrid *-l- RubricGrid.RubricGrid
-    RubricMarkedGrid *-u- Assessment.IFeedback
     RubricMarkedGrid *-d- RubricMark
+
+    ' relation to Assessment
+    Assessment.IFeedback *-d- RubricMarkedGrid
+
+    ' relation to RubricGrid
     RubricMark *-l- RubricGrid.RubricDescriptor
 }
 
