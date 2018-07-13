@@ -1,95 +1,109 @@
 @startuml
-class RubricRowset {
-    groups : RubricGroup[]
-    context : IAssessmentContext
-}
-class RubricGroup {
-    criteria : RubricCriterion[]
-    name : string
-}
-class RubricCriterion {
-    name : string
-}
 
-interface AssessmentContext {
-    getFolder() : Folder
-    getBaseContext() : AssessmentContext
-}
+namespace RubricRowset {
+    interface AssessmentContext {
+        getFolder() : Folder
+        getBaseContext() : AssessmentContext
+    }
 
-RubricRowset *-u- AssessmentContext
-RubricRowset *-d- RubricGroup
-RubricGroup *-d- RubricCriterion
+    class RubricRowset {
+        groups : RubricGroup[]
+        context : IAssessmentContext
+    }
 
-class RubricGrid {
-    assessment : IAssessable
-    rowset : RubricRowset
-    levels : RubricLevel[]
-    groups : RubricGroupUsage[]
-    descriptors : RubricDescriptor[]
-    getRow(RubricCriterion) : RubricDescriptor[]
-    getColumn(RubricLevel) : RubricDescriptor[]
-    getDescriptor(RubricCriterion, RubricLevel) : RubricDescriptor
+    class RubricGroup {
+        criteria : RubricCriterion[]
+        name : string
+    }
+
+    class RubricCriterion {
+        name : string
+    }
+
+    RubricRowset *-u- AssessmentContext
+    RubricRowset *-d- RubricGroup
+    RubricGroup *-d- RubricCriterion
 }
 
-class RubricGroupUsage {
-    group : RubricGroup
-    criteria : RubricCriterionUsage[]
-    maxValue : float
+
+
+namespace RubricGrid {
+    interface IAssessable {
+        getContext() : AssessmentContext
+    }
+
+    class RubricGrid {
+        assessment : IAssessable
+        rowset : RubricRowset
+        levels : RubricLevel[]
+        groups : RubricGroupUsage[]
+        descriptors : RubricDescriptor[]
+        getRow(RubricCriterion) : RubricDescriptor[]
+        getColumn(RubricLevel) : RubricDescriptor[]
+        getDescriptor(RubricCriterion, RubricLevel) : RubricDescriptor
+    }
+
+    class RubricGroupUsage {
+        group : RubricGroup
+        criteria : RubricCriterionUsage[]
+        maxValue : float
+    }
+
+    class RubricCriterionUsage {
+        criterion : RubricCriterion
+        descriptors : RubricDescriptor[]
+    }
+
+    class RubricLevel {
+        name : string
+        descriptors : RubricDescriptor[]
+    }
+
+    class RubricDescriptor {
+        description : string
+        value : float
+    }
+
+    RubricGrid *-l- RubricRowset.RubricRowset
+    RubricGrid *-u- IAssessable
+    RubricGrid *-d- RubricDescriptor
+    RubricGrid *-d- RubricGroupUsage
+    RubricGroupUsage *-l- RubricRowset.RubricGroup
+    RubricGroupUsage *-d- RubricCriterionUsage
+    RubricCriterionUsage *-l- RubricRowset.RubricCriterion
+    RubricCriterionUsage *-r- RubricDescriptor
+    RubricGrid *-d- RubricLevel
+    RubricLevel *-r- RubricDescriptor
+
+    IAssessable *-l- RubricRowset.AssessmentContext
 }
 
-class RubricCriterionUsage {
-    criterion : RubricCriterion
-    descriptors : RubricDescriptor[]
+namespace RubricMarkedGrid {
+
+    interface IFeedback {
+        getAssessable() : IAssessable
+        getReviewee() : User
+    }
+
+    class RubricMarkedGrid {
+        grid : RubricGrid
+        feedback : IFeedback
+        marks : RubricMark[]
+        getTotalMark() : float
+    }
+
+    class RubricMark {
+        descriptor : RubricDescriptor
+        value : float
+    }
+
+
+    RubricMarkedGrid *-l- RubricGrid.RubricGrid
+    RubricMarkedGrid *-u- IFeedback
+    RubricMarkedGrid *-d- RubricMark
+    RubricMark *-l- RubricGrid.RubricDescriptor
+
+    IFeedback *-l- RubricGrid.IAssessable
 }
-
-class RubricLevel {
-    name : string
-    descriptors : RubricDescriptor[]
-}
-
-interface IAssessable {
-    getContext() : AssessmentContext
-}
-
-RubricGrid *-l- RubricRowset
-RubricGrid *-u- IAssessable
-RubricGrid *-d- RubricDescriptor
-RubricGrid *-d- RubricGroupUsage
-RubricGroupUsage *-l- RubricGroup
-RubricGroupUsage *-d- RubricCriterionUsage
-RubricCriterionUsage *-l- RubricCriterion
-RubricCriterionUsage *-r- RubricDescriptor
-RubricGrid *-d- RubricLevel
-RubricLevel *-r- RubricDescriptor
-
-class RubricMarkedGrid {
-    grid : RubricGrid
-    feedback : IFeedback
-    marks : RubricMark[]
-    getTotalMark() : float
-}
-
-class RubricMark {
-    descriptor : RubricDescriptor
-    value : float
-}
-
-class RubricDescriptor {
-    description : string
-    value : float
-}
-
-interface IFeedback {
-    getAssessable() : IAssessable
-    getReviewee() : User
-}
-
-RubricMarkedGrid *-l- RubricGrid
-RubricMarkedGrid *-u- IFeedback
-RubricMarkedGrid *-d- RubricMark
-RubricMark *-l- RubricDescriptor
-
-IAssessable *-l- AssessmentContext
-IFeedback *-l- IAssessable
 
 @enduml
