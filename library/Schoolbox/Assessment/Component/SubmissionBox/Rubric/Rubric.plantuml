@@ -1,7 +1,7 @@
 @startuml
 class RubricRowset {
     groups : RubricGroup[]
-    folder : Folder
+    context : IAssessmentContext
 }
 class RubricGroup {
     criteria : RubricCriterion[]
@@ -11,7 +11,12 @@ class RubricCriterion {
     name : string
 }
 
-RubricRowset *-u- Folder
+interface AssessmentContext {
+    getFolder() : Folder
+    getBaseContext() : AssessmentContext
+}
+
+RubricRowset *-u- AssessmentContext
 RubricRowset *-d- RubricGroup
 RubricGroup *-d- RubricCriterion
 
@@ -42,7 +47,9 @@ class RubricLevel {
     descriptors : RubricDescriptor[]
 }
 
-interface IAssessable
+interface IAssessable {
+    getContext() : AssessmentContext
+}
 
 RubricGrid *-l- RubricRowset
 RubricGrid *-u- IAssessable
@@ -72,10 +79,17 @@ class RubricDescriptor {
     value : float
 }
 
-interface IFeedback
+interface IFeedback {
+    getAssessable() : IAssessable
+    getReviewee() : User
+}
 
 RubricMarkedGrid *-l- RubricGrid
 RubricMarkedGrid *-u- IFeedback
 RubricMarkedGrid *-d- RubricMark
 RubricMark *-l- RubricDescriptor
+
+IAssessable *-l- AssessmentContext
+IFeedback *-l- IAssessable
+
 @enduml
