@@ -26,4 +26,32 @@ class MockArticleResolver implements IArticleResolver
         }
         return $articles;
     }
+
+
+    /**
+     * Returns random, consistent, proportionally sane, mock data
+     *
+     * @inheritdoc
+     */
+    public function findArticlesForAudience(string $entityType, $entityValue, string $relationship = null): array
+    {
+        $allArticleIds   = \array_keys(MockUserResolver::ARTICLE_AUDIENCES);
+        $countArticleIds = \count($allArticleIds);
+
+        // Hash the type and value into an an array index
+        $idx = \abs(\crc32($entityType . $entityValue)) % $countArticleIds;
+
+        // Always return one article
+        $articlesForAudience = [$allArticleIds[$idx] => true];
+
+        // And add a few more if no relationship filter
+        if (!$relationship) {
+            $articlesForAudience[$allArticleIds[\abs(\crc32($entityType . $entityValue . 1)) % $countArticleIds]] = true;
+            $articlesForAudience[$allArticleIds[\abs(\crc32($entityType . $entityValue . 2)) % $countArticleIds]] = true;
+        }
+        // And sort them to simulate a database query
+        $articlesForAudience = \array_keys($articlesForAudience);
+        \sort($articlesForAudience);
+        return $articlesForAudience;
+    }
 }
