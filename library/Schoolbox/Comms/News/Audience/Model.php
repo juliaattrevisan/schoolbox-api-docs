@@ -29,8 +29,7 @@ class Model
     public const ENTITY_TYPE_YEAR           = 'year';               // Values = [NULL,1,2,...]
     public const ENTITY_TYPE_SERVICE        = 'service';            // Values = ['1.43.3','2.3.*',...]
     public const ENTITY_TYPE_PASTORAL_GROUP = 'pastoral_group';     // Values = [NULL,1,2,...]
-    public const ENTITY_TYPE_GROUP          = 'group';              // Values = [NULL,1,2,...]
-    public const ENTITY_TYPE_CLASS          = 'class';              // Values = [NULL,'ENG34','ABC123',...]
+    public const ENTITY_TYPE_FOLDER         = 'folder';             // Values = [NULL,1,2,...]
 
     // Any audience modifier?
     public const RELATIONSHIP_SELF        = 'self';                 // eg, Audience = the user 15
@@ -74,8 +73,7 @@ class Model
             self::ENTITY_TYPE_YEAR,
             self::ENTITY_TYPE_SERVICE,
             self::ENTITY_TYPE_PASTORAL_GROUP,
-            self::ENTITY_TYPE_GROUP,
-            self::ENTITY_TYPE_CLASS,
+            self::ENTITY_TYPE_FOLDER,
         ];
     }
 

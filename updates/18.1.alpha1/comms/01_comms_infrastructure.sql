@@ -52,7 +52,7 @@ CREATE TABLE comms_news_audience(
   id                    INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
   comms_news_article_id INT NULL,
   parent_id             INT NULL,
-  entity_type           ENUM('composite', 'user', 'super', 'campus', 'role', 'role_type', 'school_house', 'res_house', 'year', 'service', 'pastoral_group', 'group', 'class') NOT NULL,
+  entity_type           ENUM('composite', 'user', 'super', 'campus', 'role', 'role_type', 'school_house', 'res_house', 'year', 'service', 'pastoral_group', 'folder') NOT NULL,
   entity_value          VARCHAR(32) NULL,
   relationship          ENUM('self','parents_of','teachers_of') NOT NULL,
   CONSTRAINT fk_comms_news_audience_comms_news_article_id FOREIGN KEY (`comms_news_article_id`) REFERENCES comms_news_article (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,

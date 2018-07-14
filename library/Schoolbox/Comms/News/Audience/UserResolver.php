@@ -157,6 +157,8 @@ class UserResolver implements IUserResolver
      * @param null|string $entityValue
      * @return int[]
      * @throws UnexpectedValueException If an unrecognised entity type is passed
+     * @throws Database\Predicate\InvalidColumnException
+     * @throws \UnderflowException
      */
     private function getUserIds(string $entityType, ?string $entityValue): array
     {
@@ -171,6 +173,9 @@ class UserResolver implements IUserResolver
             $predicate  = '= :entity_value';
             $parameters = ['entity_value' => $entityValue];
         }
+
+        // TODO This logic is tightly coupled to ArticleResolver::addClauses(). Snap each out into class behind interface so coupled
+        // TODO  pairs have their implementations inside a single class in adjacent methods.
 
         switch ($entityType) {
             case Model::ENTITY_TYPE_USER:
@@ -223,13 +228,15 @@ class UserResolver implements IUserResolver
             case Model::ENTITY_TYPE_PASTORAL_GROUP:
                 return $this->db->executeQuery("SELECT u.id FROM user u LEFT JOIN pastoral_group_member pgm ON pgm.user_id = u.id WHERE pgm.group_id {$predicate} AND u.deleted_at IS NULL", $parameters)
                                 ->fetchAll(PDO::FETCH_COLUMN);
-            case Model::ENTITY_TYPE_GROUP:
-                // Regardless of whether they have read/write/mod perms. (just not deny)
-                $service  = UserAccess::SERVICE_HOMEPAGE;
-                $denyType = UserAccess::ACCESS_DENY;
-                return $this->db->executeQuery("SELECT u.id FROM user u JOIN userAccess ua on u.id = ua.uid WHERE service = $service AND sid = $entityValue AND type != $denyType AND u.deleted_at IS NULL", $parameters)
-                                ->fetchAll(PDO::FETCH_COLUMN);
-            case Model::ENTITY_TYPE_CLASS:
+            case Model::ENTITY_TYPE_FOLDER:
+                // Get group users, regardless of whether they have read/write/mod perms. (but not deny)
+                $innerPbGroup = (new Database\Predicate\Builder($this->db, 'user'))
+                    ->equals('ua.service', UserAccess::SERVICE_HOMEPAGE)
+                    ->equals('ua.sid', $entityValue)
+                    ->notEquals('ua.type', UserAccess::ACCESS_DENY);
+                $outerPb      = (new Database\Predicate\Builder($this->db, 'user'))
+                    ->all($innerPbGroup);
+
                 // Associated with the class, regardless of role type.
                 // For students/teachers you'd need to use a composite segment that intersects the desired roleType.
                 $externalIds = [];
@@ -239,12 +246,13 @@ class UserResolver implements IUserResolver
                 foreach ($this->externalClass->getTeacherName($entityValue) as $teacherExternalId) {
                     $externalIds[] = $teacherExternalId;
                 }
-                if (!\count($externalIds)) {
-                    return [];
+                if (\count($externalIds)) {
+                    $outerPb->in('synergy_id', $externalIds);
                 }
-                $externalIdString = \implode(',', $externalIds);
-                return $this->db->executeQuery("SELECT u.id FROM user u WHERE synergy_id IN ({$externalIdString}) AND u.deleted_at IS NULL", $parameters)
-                                ->fetchAll(PDO::FETCH_COLUMN);
+
+                $whereClause = \implode(' OR ', $outerPb->getWhere());
+                $sql         = "SELECT u.id FROM user u JOIN userAccess ua on u.id = ua.uid WHERE {$whereClause}  AND u.deleted_at IS NULL";
+                return $this->db->executeQuery($sql, $outerPb->getParams())->fetchAll(PDO::FETCH_COLUMN);
             default:
                 throw new UnexpectedValueException("Entity type not recognised: {$entityType}");
         }

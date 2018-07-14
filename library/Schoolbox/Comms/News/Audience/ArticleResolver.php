@@ -18,6 +18,7 @@ use Schoolbox\User;
 use Schoolbox\Resource\Folder;
 use PDO;
 use Alaress\Database\Predicate;
+use External_User;
 
 /**
  * Responsible for returning the set of articles whose audience contains a specific user.
@@ -40,6 +41,9 @@ class ArticleResolver implements IArticleResolver
     /** @var RelationshipFilterer */
     private $relationshipFilter;
 
+    /** @var External_User */
+    private $externalUser;
+
 
     /**
      * @param BusinessRules                 $businessRules
@@ -47,19 +51,22 @@ class ArticleResolver implements IArticleResolver
      * @param UserAccessMapper              $userAccessMapper
      * @param Folder\Mapper                 $folderMapper
      * @param RelationshipFilterer          $relationshipFilter
+     * @param External_User                 $externalUser
      */
     public function __construct(
         BusinessRules $businessRules,
         Database\Connector\IConnector $db,
         UserAccessMapper $userAccessMapper,
         Folder\Mapper $folderMapper,
-        RelationshipFilterer $relationshipFilter
+        RelationshipFilterer $relationshipFilter,
+        External_User $externalUser
     ) {
         $this->businessRules      = $businessRules;
         $this->db                 = $db;
         $this->userAccessMapper   = $userAccessMapper;
         $this->folderMapper       = $folderMapper;
         $this->relationshipFilter = $relationshipFilter;
+        $this->externalUser       = $externalUser;
     }
 
 
@@ -203,6 +210,7 @@ class ArticleResolver implements IArticleResolver
      * @param User                $user
      * @param Collection|string[] $whereClauses
      * @param Collection|mixed[]  $whereParams
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \InvalidArgumentException
      */
     private function addSelfClauses(User $user, Collection $whereClauses, Collection $whereParams): void
@@ -326,6 +334,7 @@ class ArticleResolver implements IArticleResolver
      * @param int                 $paramSuffix
      * @todo consider snapping each segment entity type into helper method, see 'service' example
      * @todo consider snapping common structure into helper method
+     * @throws Predicate\InvalidColumnException
      */
     private function addClauses(
         User $user,
@@ -404,30 +413,17 @@ class ArticleResolver implements IArticleResolver
             $this->buildClause($whereClauses, $whereParams, $paramSuffix, Model::ENTITY_TYPE_PASTORAL_GROUP, $groupIds, $relationship);
         }
 
-        // Targeted to a class or group
-        $canTargetGroup = \array_key_exists(Model::ENTITY_TYPE_GROUP, $validEntities);
-        $canTargetClass = \array_key_exists(Model::ENTITY_TYPE_CLASS, $validEntities);
-        if ($canTargetGroup || $canTargetClass) {
-            $groupIds = $classCodes = [];
-
-            // TODO is findForUser() args always correct?
-            $accessLevel = UserAccess::ACCESS_READ;
-            $exactAccess = false;
-            foreach ($this->folderMapper->findForUser($user, $canTargetClass, $accessLevel, $exactAccess) as $folder) {
-                if ($folder->isGroup()) {
-                    $groupIds[] = $folder->getId();
-                }
-                foreach ($folder->getCodes() as $code) {
-                    $classCodes[] = $code->getCode();
-                }
-            }
-
-            if ($canTargetGroup) {
-                $this->buildClause($whereClauses, $whereParams, $paramSuffix, Model::ENTITY_TYPE_GROUP, \array_unique($groupIds), $relationship);
-            }
-            if ($canTargetClass) {
-                $this->buildClause($whereClauses, $whereParams, $paramSuffix, Model::ENTITY_TYPE_CLASS, \array_unique($classCodes), $relationship);
-            }
+        // Targeted to a folder (includes class && group association)
+        if (\array_key_exists(Model::ENTITY_TYPE_FOLDER, $validEntities)) {
+            // Get groups where learner or instructor (but not admin)
+            $pb             = $this->userAccessMapper->getPredicateBuilder()
+                                                     ->equals('uid', $userId)
+                                                     ->equals('service', UserAccess::SERVICE_HOMEPAGE)
+                                                     ->notEquals('type', UserAccess::ACCESS_DENY);
+            $groupFolderIds = $this->userAccessMapper->findScalarByPredicates('sid', $pb);
+            $classFolderIds = $this->folderMapper->findAllBySubjectList($this->externalUser->getSubjectList($user))->getPropertyValues('id');
+            $foldersIds     = \array_unique(\array_merge($groupFolderIds, $classFolderIds));
+            $this->buildClause($whereClauses, $whereParams, $paramSuffix, Model::ENTITY_TYPE_FOLDER, $foldersIds, $relationship);
         }
     }
 

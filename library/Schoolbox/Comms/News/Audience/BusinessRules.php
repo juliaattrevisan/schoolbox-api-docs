@@ -42,8 +42,7 @@ class BusinessRules
         Model::ENTITY_TYPE_YEAR           => [Model::RELATIONSHIP_SELF, Model::RELATIONSHIP_PARENTS_OF, Model::RELATIONSHIP_TEACHERS_OF],
         Model::ENTITY_TYPE_SERVICE        => [Model::RELATIONSHIP_SELF, Model::RELATIONSHIP_PARENTS_OF],
         Model::ENTITY_TYPE_PASTORAL_GROUP => [Model::RELATIONSHIP_SELF, Model::RELATIONSHIP_PARENTS_OF, Model::RELATIONSHIP_TEACHERS_OF],
-        Model::ENTITY_TYPE_GROUP          => [Model::RELATIONSHIP_SELF, Model::RELATIONSHIP_PARENTS_OF],
-        Model::ENTITY_TYPE_CLASS          => [Model::RELATIONSHIP_SELF, Model::RELATIONSHIP_PARENTS_OF],
+        Model::ENTITY_TYPE_FOLDER         => [Model::RELATIONSHIP_SELF, Model::RELATIONSHIP_PARENTS_OF],
     ];
 
     // Is it valid for segments that target these types to target a null value, eg users
@@ -60,8 +59,7 @@ class BusinessRules
         Model::ENTITY_TYPE_YEAR           => true,
         Model::ENTITY_TYPE_SERVICE        => false,
         Model::ENTITY_TYPE_PASTORAL_GROUP => true,
-        Model::ENTITY_TYPE_GROUP          => true,
-        Model::ENTITY_TYPE_CLASS          => true,
+        Model::ENTITY_TYPE_FOLDER         => true,
     ];
 
 
