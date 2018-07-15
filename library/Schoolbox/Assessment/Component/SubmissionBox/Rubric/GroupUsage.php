@@ -28,7 +28,7 @@ class GroupUsage
 
 
     /**
-     * @var int|null
+     * @var float|null
      */
     private $maxValue;
 
@@ -82,19 +82,19 @@ class GroupUsage
 
 
     /**
-     * @return int|null
+     * @return float|null
      */
-    public function getMaxValue(): ?int
+    public function getMaxValue(): ?float
     {
         return $this->maxValue;
     }
 
 
     /**
-     * @param int|null $maxValue
+     * @param float|null $maxValue
      * @return static
      */
-    public function setMaxValue(int $maxValue): self
+    public function setMaxValue(float $maxValue): self
     {
         $this->maxValue = $maxValue;
         return $this;
