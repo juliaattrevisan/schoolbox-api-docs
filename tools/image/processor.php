@@ -35,7 +35,10 @@ $db = $kernel->get('databaseInternal');
 $query = '
     SELECT `hash` FROM `storage` s
     JOIN allowedFileExtension afe ON s.ext = afe.extension
-    JOIN allowedFileTypes aft ON afe.fileTypeID = aft.fileTypeID AND aft.mime LIKE "image%"
+    JOIN allowedFileTypes aft
+        ON afe.fileTypeID = aft.fileTypeID
+        AND aft.mime LIKE "image%"
+        AND aft.mime NOT LIKE "image%svg"
     WHERE s.uploaded_on >= (NOW() - INTERVAL 15 MINUTE)
     ORDER BY s.uploaded_on ASC
     LIMIT 0,300
