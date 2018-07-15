@@ -253,8 +253,6 @@ class Rubric extends Core\Rubric
     protected function createORMGroupUsage(Core\Criteria\Group $group)
     {
         if (!$this->groupUsageCache->contains($group)) {
-
-            // TODO set group max mark here
             $this->groupUsageCache->attach(
                 $group,
                 GroupUsageMapper::getInstance()->createModel()
