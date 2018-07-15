@@ -59,52 +59,39 @@ $(function() {
                 // Update the new form input - make it no longer new
                 if (addCriterion) {
                     // This is no longer a new row
-                    container.removeAttr('data-rubric-criterion-new-row');
                     container
+                        .removeAttr('data-rubric-criterion-new-row')
                         .attr('data-rubric-criterion-row', criterionId)
-                        .data('rubric-criterion-row', criterionId)
-                    ;
-
-                    // // Show and setup dropdown
-                    // var newDropdownId = 'dropdown-i' + String(criterionId);
-                    // container.find('[data-dropdown-dormant]')
-                    //     .removeAttr('data-dropdown-dormant')
-                    //     .removeClass('hide disabled')
-                    //     .removeAttr('aria-disabled')
-                    //     .attr('data-dropdown', newDropdownId);
-                    // container.find('[data-dropdown-content-dormant]')
-                    //     .removeAttr('data-dropdown-content-dormant')
-                    //     .attr('data-dropdown-content', '')
-                    //     .attr('id', newDropdownId);
-                    //
-                    // // and reapply if required
-                    // if (!hasDropdowns) {
-                    //     container.foundation('dropdown', 'reflow');
-                    // }
+                        .data('rubric-criterion-row', criterionId);
 
                     input
                         .attr('name', 'crits['+groupId+'][items]['+criterionId+'][name]')
                         .removeAttr('data-rubric-criterion-new')
-                        .removeData('rubric-criterion-new')
-                    ;
+                        .removeData('rubric-criterion-new');
+
                     idInput.attr('name', 'crits['+groupId+'][items]['+criterionId+'][id]');
+
                     codeInput
                         .attr('name', 'crits['+groupId+'][items]['+criterionId+'][curriculumCode][]')
                         .removeClass('hide')
                         .curriculumSelector();
+
                     deleteButton.removeClass('hide');
                 }
 
                 if (addGroup) {
                     container.data('rubric-group-row', groupId);
+
                     // Clear all non-empty rows
                     newContainer.find('[data-rubric-criterion-row]').not('[data-rubric-criterion-new-row]').remove();
+
                     input
                         .attr('name', 'crits['+groupId+'][name]')
                         .removeAttr('data-rubric-group-new')
-                        .removeData('rubric-group-new')
-                    ;
+                        .removeData('rubric-group-new');
+
                     idInput.attr('name', 'crits['+groupId+'][id]');
+
                     codeInput
                         .attr('name', 'crits['+groupId+'][curriculumCode][]')
                         .removeClass('hide')
