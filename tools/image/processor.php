@@ -38,7 +38,7 @@ $query = '
     JOIN allowedFileTypes aft
         ON afe.fileTypeID = aft.fileTypeID
         AND aft.mime LIKE "image%"
-        AND aft.mime NOT LIKE "image%svg"
+        AND aft.mime NOT LIKE "image%svg%"
     WHERE s.uploaded_on >= (NOW() - INTERVAL 15 MINUTE)
     ORDER BY s.uploaded_on ASC
     LIMIT 0,300
