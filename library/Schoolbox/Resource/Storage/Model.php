@@ -101,10 +101,8 @@ class Model extends File implements IStorage
                 return null;
             }
 
-            $stream = $this->readStream();
-            $hp     = hash_init('sha1');
-            hash_update_stream($hp, $stream);
-            $this->setHash(hash_final($hp));
+            // TODO hash generator should be injected
+            $this->setHash((new HashGenerator())->generateHash($this->readStream()));
         }
 
         return $this->hash;
