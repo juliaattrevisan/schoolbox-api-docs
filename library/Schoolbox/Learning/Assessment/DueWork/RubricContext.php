@@ -307,13 +307,11 @@ class RubricContext
                         /* - If there is a 'next' cell, use its value
                          * - Otherwise just use the same value as this cell
                          */
-                        if ($levelDescriptors[$i + 1]) {
+                        if ($levelDescriptors[$i + 1] && ($levelDescriptors[$i + 1]['value'] !== null)) {
                             $nextDescriptorMax = $levelDescriptors[$i + 1]['value'];
                         } else {
                             $nextDescriptorMax = $endValue;
                         }
-
-                        // TODO what do we do if the next descriptor has no points?
                     }
 
                     // The cell's stored value will always be its maximum regardless of order
