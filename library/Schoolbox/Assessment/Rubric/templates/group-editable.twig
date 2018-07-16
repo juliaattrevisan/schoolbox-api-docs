@@ -53,7 +53,7 @@
 <tr data-group="{{ groupId }}" data-group-max-value-row {% if not showGroupMaxValue %}class="hide"{% endif %}>
     <th class="rb-group-summary" data-group-max-value-cell colspan="{{ rubric.levels|length + 3 }}">
         <label>
-            Max value
+            Maximum points for {{ locale.translate('rubricGroup') }}
             <input type="number"
                    min="0"
                    value="{{ group.maxValue }}"
