@@ -12,35 +12,12 @@
 namespace News;
 
 use AcceptanceTester;
-use Page\Login as LoginPage;
 use Page\News\Form;
 use Page\News\Index;
 use Page\News\Item;
 
 class CreateAndVerifyCest
 {
-    /**
-     * Prepare for test
-     *
-     * @param AcceptanceTester $i
-     */
-    public function _before(AcceptanceTester $i)
-    {
-        $i->suspendDebugMode();
-    }
-
-
-    /**
-     * Restore to pre-test state
-     *
-     * @param AcceptanceTester $i
-     */
-    public function _after(AcceptanceTester $i)
-    {
-        $i->restoreDebugMode();
-    }
-
-
     /**
      * Test that a news item I create retains the settings I chose
      *

@@ -92,42 +92,6 @@ class Acceptance extends \Codeception\Module
         }
     }
 
-    /**
-     * Was debug mode on when the test started?
-     *
-     * @var bool
-     */
-    private $wasDebugModeOn = false;
-
-
-    /**
-     * Suspends debug mode, if it is on.
-     *
-     * It can then be restored using `restoreDebugMode`.
-     */
-    public function suspendDebugMode(): void
-    {
-        $db = $this->getDbModule();
-        $this->wasDebugModeOn = (bool)$db->grabFromDatabase('config', 'value', ['name' => 'debug_mode']);
-        if ($this->wasDebugModeOn !== 0) {
-            $db->updateInDatabase('config', ['value' => 0], ['name' => 'debug_mode']);
-        }
-    }
-
-
-    /**
-     * Switches debug mode back on, if it was off when `suspendDebugMode` was
-     * called.
-     */
-    public function restoreDebugMode(): void
-    {
-        $this->getDbModule()->updateInDatabase(
-            'config',
-            ['value' => $this->wasDebugModeOn ? 1 : 0],
-            ['name' => 'debug_mode']
-        );
-    }
-
 
     /**
      * Find a checkbox to "click".
