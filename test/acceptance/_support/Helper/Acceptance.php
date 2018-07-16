@@ -430,8 +430,17 @@ class Acceptance extends \Codeception\Module
      */
     public function seeSelectizeOptionsAreSelected(string $field, array $options): void
     {
-        // TODO implement seeSelectizeOptionsAreSelected
-        $this->debug('seeSelectizeOptionsAreSelected is not yet implemented');
+        $wd = $this->getWebDriverModule();
+
+        $actualOptions = [];
+        foreach ($wd->_findElements($this->getSelectizeItemsSelector($field)) as $item) {
+            /** @var RemoteWebElement $item */
+            // Selectize elements have got a '×' text at the end, for their
+            // remove element link: strip it
+            $actualOptions[] = preg_replace('/×$/u', '', $item->getText());
+        }
+
+        $this->assertEquals($options, $actualOptions);
     }
 
 
