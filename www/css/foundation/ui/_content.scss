@@ -1783,3 +1783,8 @@ li article ol {
         }
     }
 }
+
+// TODO: this can be deleted when Foundation is updated to >= 6 (because it exists already in Foundation 6)
+.border-none {
+    border: none !important
+}

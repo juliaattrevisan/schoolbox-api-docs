@@ -95,7 +95,7 @@
                             </div>
 
                             <div v-show="pageShow[1]">
-                                <ul class="breadcrumb" style="margin-bottom:10px;">
+                                <ul class="breadcrumb">
                                     <li><a href="#" @click.prevent="showPage(0)">Browse Audience</a></li>
                                     <li class="active"><a>${ audienceSelectBreadcrumb }</a></li>
                                 </ul>
@@ -114,7 +114,7 @@
                                     </template>
                                 </fieldset>
 
-                                <fieldset class="checklist" style="border: none;">
+                                <fieldset class="checklist border-none">
                                     <input type="checkbox" id="audience-select-users" v-model="includeUsers" />
                                     <label for="audience-select-users">${ audienceSelectCheckbox }</label>
                                     <input type="checkbox" id="audience-select-parents" v-model="includeParents" />
