@@ -186,7 +186,6 @@ class Mapper extends \Schoolbox\Mapper
             WHERE publish_at IS NOT NULL
             AND accepted_at IS NOT NULL
             AND expires_at > NOW()
-            ORDER BY publish_at DESC
         ";
 
         if ($topicId !== self::TOPIC_ALL) {
@@ -199,7 +198,6 @@ class Mapper extends \Schoolbox\Mapper
                 AND expires_at > NOW()
                 AND cnat.topic_id = :topicId
                 GROUP BY id
-                ORDER BY publish_at DESC
             ";
         }
 
@@ -230,7 +228,8 @@ class Mapper extends \Schoolbox\Mapper
 
         return $this->findByColumn('id', $articlesInTopic, [
             'order' => [
-                'publish_at' => 'desc'
+                'publish_at' => 'desc',
+                'created_at' => 'desc',
             ]
         ]);
     }
