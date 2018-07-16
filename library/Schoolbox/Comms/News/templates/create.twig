@@ -123,7 +123,7 @@
                                     <label for="audience-select-teachers">Teachers of students</label>
                                 </fieldset>
 
-                                <button class="button submit" @click.prevent="addAudience">Add</button>
+                                <button class="button submit" @click.prevent="addAudience" :disabled="!submitEnable">Add</button>
                             </div>
 
                         </div>
@@ -425,6 +425,12 @@
                 this.includeParents = false;
                 this.includeTeachers = false;
                 this.showEmptyState = false;
+            }
+        },
+        computed: {
+            // Disable the modal submit button until each of the checklists has something checked
+            submitEnable: function () {
+                return !!(this.audienceListChecked.length && (this.includeUsers || this.includeParents || this.includeTeachers));
             }
         }
     });
