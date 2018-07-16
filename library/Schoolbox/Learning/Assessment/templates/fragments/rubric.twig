@@ -220,49 +220,6 @@ Usage:
             }
         {% endif %}
 
-        // var $markTypeInput = $('#markType');
-        // $markTypeInput.on('change', checkRubricTotal);
-        //
-        // // Each time the user changes the value of a descriptor
-        // $rubric.on('blur keyup', '[data-descriptor-value]', function(){
-        //     checkRubricTotal();
-        // });
-        //
-        // // Each time the user toggles on/off a indicator
-        // $rubric.on('change', '[data-criterion-name]', function(){
-        //     checkRubricTotal();
-        // });
-        //
-        // /*
-        //  * A rubric's total is a float, but the dueWork maxMark is an int.
-        //  *
-        //  * If dueWork.markType = maxMark, and rubricTotal has fractional component, warn the user
-        //  * this will cause rounding errors.
-        //  */
-        // function checkRubricTotal()
-        // {
-        //     var total = 0;
-        //     $rubric.find('tr[data-sequencer-group]').each(function () {
-        //         var $row = $(this),
-        //             rowMax = 0;
-        //
-        //         if ($row.find('[data-criterion-name]:checked').length == 0) {
-        //             return true; // jq.continue
-        //         }
-        //
-        //         $row.find('[data-descriptor-value]').each(function () {
-        //             var i = parseFloat($(this).val());
-        //
-        //             if (!isNaN(i)) {
-        //                 rowMax = Math.max(rowMax, i);
-        //             }
-        //         });
-        //         total += rowMax;
-        //     });
-        //
-        //     total = total.toFixed(2);
-        // }
-        // checkRubricTotal();
 
         $("#useMarkRange").change(function() {
             if ($("#useMarkRange").is(":checked")) {
