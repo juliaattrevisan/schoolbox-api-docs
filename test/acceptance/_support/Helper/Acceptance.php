@@ -440,6 +440,8 @@ class Acceptance extends \Codeception\Module
             $actualOptions[] = preg_replace('/×$/u', '', $item->getText());
         }
 
+        sort($options);
+        sort($actualOptions);
         $this->assertEquals($options, $actualOptions);
     }
 
