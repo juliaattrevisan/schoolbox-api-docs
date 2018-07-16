@@ -102,7 +102,11 @@
 
                                 <p class="meta">Select ${ audienceSelectBreadcrumb } below, then choose whether you would like to include the users themselves, the parents of the users, or both.</p>
 
-                                <fieldset class="checklist checklist-container" id="audience-select-options">
+                                <div class="empty-state" v-show="showEmptyState">
+                                    <p>No ${ audienceSelectBreadcrumb } found.</p>
+                                </div>
+
+                                <fieldset class="checklist checklist-container" v-show="!showEmptyState">
                                     <div class="loader" v-show="showLoader"></div>
                                     <template v-for="audienceListItem in audienceListItems">
                                         <input type="checkbox" v-bind:id="'audience-list-' + audienceListItem.id" v-bind:value="audienceListItem" v-model="audienceListChecked" />
@@ -291,6 +295,7 @@
             cachedOptions: [],
 
             showLoader: true,
+            showEmptyState: false,
 
             audienceListChecked: [],
             includeUsers: true,
@@ -323,16 +328,10 @@
 
                 // Try for cached list
                 if (self.cachedOptions[audienceOption.id] !== undefined) {
-                    // Hide the loader
-                    self.showLoader = false;
-
-                    // Populate the list with cached version
-                    self.audienceListItems = self.cachedOptions[audienceOption.id];
+                    this.populateAudienceList(self.cachedOptions[audienceOption.id]);
                 } else { // Nope, ajax time
                     // Request a list of options with the uri listed in the object above
                     axios.get(audienceOption.ajax).then(function(response) {
-                        // Hide the loader
-                        self.showLoader = false;
 
                         // Modify the response slightly to have prefixed IDs (eg. 'campus_1')
                         var modifiedOptions = [];
@@ -344,8 +343,7 @@
                             });
                         });
 
-                        // Update the list of options on the UI
-                        self.audienceListItems = modifiedOptions;
+                        self.populateAudienceList(modifiedOptions);
 
                         // Cache the options
                         self.cachedOptions[audienceOption.id] = modifiedOptions;
@@ -353,6 +351,19 @@
                     }).catch(function (error) {
                         console.log(error);
                     });
+                }
+            },
+
+            populateAudienceList: function (data) {
+                // Hide the loader
+                this.showLoader = false;
+
+                if (data.length) {
+                    // Populate the list with cached version
+                    this.audienceListItems = data;
+                } else {
+                    // Show empty state
+                    this.showEmptyState = true;
                 }
             },
 
@@ -412,6 +423,8 @@
                 this.showLoader = true;
                 this.includeUsers = true;
                 this.includeParents = false;
+                this.includeTeachers = false;
+                this.showEmptyState = false;
             }
         }
     });
