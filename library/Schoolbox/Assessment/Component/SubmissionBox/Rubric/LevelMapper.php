@@ -98,34 +98,6 @@ class LevelMapper extends Mapper
 
 
     /**
-     * Clones levels from one submission box to another.
-     *
-     * @param int $fromId The ID of the submission box to copy from.
-     * @param int $toId   The ID of the submission box to copy to.
-     *
-     * @return int[] A list of new rubric levels
-     * @deprecated
-     * @see RubricMapper::copyRubric()
-     */
-    public function copyFromCopiedSubmissionBox($fromId, $toId)
-    {
-        $levels = $this->createCollection();
-        foreach ($this->findByColumn('box_id', $fromId) as $level) {
-            // Don't recopy a level that already exists in $toId
-            $levelCount = $this->countByColumnList([
-                'box_id'   => $toId,
-                'sequence' => $level->getSequence()
-            ]);
-            if (!$levelCount) {
-                $level->getSubmissionBox()->setId($toId);
-                $levels->add($level);
-            }
-        }
-        return $this->create($levels);
-    }
-
-
-    /**
      * No notifications.
      *
      * @param object $object

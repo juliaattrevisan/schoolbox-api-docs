@@ -23,85 +23,13 @@ use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 class UsageMapper extends Schoolbox\Mapper {
 
     protected function mapping() {
-        $this->hasTable('rubric_usage');
+        $this->hasTable('rubric_criterion_usage');
         $this->hasModel(Usage::class);
         $this->uses('sequence', self::TYPE_INTEGER);
         $this->joins('criterion_id', CriterionMapper::class, 'id', null, null, 'criterion', 'criterion');
         $this->joins('submission_box_id', SubmissionBoxMapper::class, 'id', null, null, 'submissionBox', 'submission_box');
     }
 
-    /**
-     * Clones rubric usage from one submission box to another.
-     *
-     * @param int $from_id The ID of the submission box to copy from.
-     * @param int $to_id   The ID of the submission box to copy to.
-     *
-     * @return int[] A list of new rubric usages
-     * @deprecated
-     * @see RubricMapper::copyRubric()
-     */
-    public function copyFromCopiedSubmissionBox($from_id, $to_id) {
-
-        // Load list of criteria to load from and to.
-        /** @var CriterionMapper $criterion_mapper */
-        $criterion_mapper = $this->getJoinMapper('criterion');
-        $query = "
-            SELECT
-                {$this->getColumnString('ru')},
-                {$this->getJoinColumnString('criterion', 'rc')}
-            FROM `{$this->getTable()}` `ru`
-            INNER JOIN {$this->getJoinSql('criterion', 'ru', 'rc')}
-            WHERE `ru`.`submission_box_id` = ?
-        ";
-        $statement = $this->getDatabase()->prepare($query);
-
-        $statement->execute(array($from_id));
-        /** @var Criterion[] $from_criterion_list */
-        $from_criterion_list = $criterion_mapper->hydrateList($statement, 'rc');
-
-        $statement->execute(array($to_id));
-        /** @var Criterion[] $to_criterion_list */
-        $to_criterion_list = $criterion_mapper->hydrateList($statement, 'rc');
-
-        // Load the submission box
-        $box_mapper = $this->getJoinMapper('submission_box');
-        /** @var SubmissionBox $to_box */
-        $to_box = $box_mapper->findById($to_id);
-
-        // Search for list of rubrics to load.
-        $new_criterion_list = new Schoolbox\Collection();
-        foreach ($from_criterion_list as $from_criterion) {
-            $is_used = false;
-            foreach ($to_criterion_list as $to_criterion) {
-                if (
-                    $from_criterion->getGroup()->getName() === $to_criterion->getGroup()->getName()
-                    && $from_criterion->getName() === $to_criterion->getName()
-                ) {
-                    $is_used = true;
-                    break;
-                }
-            }
-            if (!$is_used) {
-                $criterion_usage = new Usage();
-                $criterion_usage->setSubmissionBox($to_box);
-                // Find the criterion to link this one to.
-                try {
-                    $criterion_usage->setCriterion(
-                        $criterion_mapper->findOneForFolderByKey(
-                            $to_box->getCategory()->getId(),
-                            $from_criterion->getName(),
-                            $from_criterion->getGroup()->getName()
-                        )
-                    );
-                    $new_criterion_list->add($criterion_usage);
-                }
-                catch (Schoolbox\Mapper\Exception $e) {
-                    // Add this to the list of exceptions somewhere but don't do anything.
-                }
-            }
-        }
-        return $this->save($new_criterion_list);
-    }
 
     /**
      * Retrieves a list of assessment IDs and names in which this criterion is used.
@@ -111,7 +39,7 @@ class UsageMapper extends Schoolbox\Mapper {
      * @param  int $criterionId
      * @return array[] id: the assessment's ID, title: the assessment's title, 'submission_box_id': the box's id
      */
-    public function findUsage($criterionId)
+    public function findCriterionUsage($criterionId): array
     {
         $query = "
             SELECT DISTINCT
@@ -125,7 +53,42 @@ class UsageMapper extends Schoolbox\Mapper {
         ";
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute([$criterionId]);
-        return $statement->fetchAll();
+        $result = [];
+        foreach ($statement as $row) {
+            $result[$row['id']] = $row;
+        }
+        return $result;
+    }
+
+
+    /**
+     * Retrieves a list of assessment IDs and names in which this group is used.
+     *
+     * This does not include deleted assessments.
+     *
+     * @param  int $groupId
+     * @return array[] id: the assessment's ID, title: the assessment's title, 'submission_box_id': the box's id
+     */
+    public function findGroupUsage($groupId): array
+    {
+        $query = "
+            SELECT DISTINCT
+                a.id,
+                a.title,
+                submission_box_id
+            FROM {$this->getTable()} ru
+            INNER JOIN {$this->getJoinSql('submission_box', 'ru', 'sb')}
+            INNER JOIN {$this->getJoinSql('submission_box.assessmentModel', 'sb', 'a')}
+            INNER JOIN {$this->getJoinSql('criterion', 'ru', 'rc')}
+            WHERE rc.rubric_group_id = ?
+        ";
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute([$groupId]);
+        $result = [];
+        foreach ($statement as $row) {
+            $result[$row['id']] = $row;
+        }
+        return $result;
     }
 
 

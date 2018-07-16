@@ -14,9 +14,13 @@ use Alaress\Web\Template\DebugTwig;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Criterion;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Group;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\GroupMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\UsageMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Resource\Attachment\Zone;
+use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Resource\Storage\Model as File;
 use Url;
@@ -91,6 +95,7 @@ class Controller extends BaseController
                 'id' => $post->get('rubricId'),
                 'levels' => $post->get('levelCount') ? array_fill(0, $post->get('levelCount'), ':)') : [],
             ],
+            'markPerCapability' => $post->getBool('markPerCapability', false),
         ];
 
         $folderId = $post->get('folderId');
@@ -224,8 +229,9 @@ class Controller extends BaseController
         }
 
         $context = [
-            'formField' => $post->get('formField', 'rb'),
-            'rubric'    => $grid->toContext()
+            'formField'              => $post->get('formField', 'rb'),
+            'rubric'                 => $grid->toContext(),
+            'usingMarkPerCapability' => $post->getBool('markPerCapability', false),
         ];
 
         $this->getResponse()->content->set([

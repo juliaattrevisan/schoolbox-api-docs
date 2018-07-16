@@ -5,10 +5,16 @@
 {%- set levelLimit = levelLimit ?: config.rubric_max_levels -%}
 {%- set groupInput = groupInput ?: formField ~ '[' ~ rubric.id ~ '][group]['  ~ group.id ~ ']' -%}
 
+{# Don't show the max value if there are no selected criteria in the group #}
+{% set hasSelectedDescriptor = false %}
+
 {%- for critIndex, crit in group.criteria -%}
     {% include '@rubric/group-row-editable.twig' %}
     {# this may seem bizarre, but we only ever want this applied the first time through an interation #}
     {% set rowspan = null %}
+    {% if crit.descriptors|length > 0 %}
+        {% set hasSelectedDescriptor = true %}
+    {% endif %}
 {%- endfor -%}
 
 {% if not group.criteria %}
@@ -39,5 +45,22 @@
 <tr data-group="{{ groupId }}" class="rb-new-criterion">
     <th colspan="{{ rubric.levels|length + 2 }}">
         <textarea data-spawn="criterion" placeholder="+ Type to add new {{ locale.translate('rubricCriterion') }} {{ group.name ? ('to ' ~ group.name) : ('with no ' ~ locale.translate('rubricGroup')) }}"></textarea>
+    </th>
+</tr>
+
+{# Input for max value #}
+{% set showGroupMaxValue = usingMarkPerCapability and hasSelectedDescriptor %}
+<tr data-group="{{ groupId }}" data-group-max-value-row {% if not showGroupMaxValue %}class="hide"{% endif %}>
+    <th class="rb-group-summary" data-group-max-value-cell colspan="{{ rubric.levels|length + 3 }}">
+        <label>
+            Maximum points for {{ locale.translate('rubricGroup') }}
+            <input type="number"
+                   min="0"
+                   value="{{ group.maxValue }}"
+                   name="{{ groupInput }}[maxValue]"
+                   data-group-max-value
+                   {% if not showGroupMaxValue %}disabled class="hide"{% endif %}
+            />
+        </label>
     </th>
 </tr>

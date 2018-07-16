@@ -26,6 +26,16 @@ class Group implements Twiggable, Calculable
     /** @var string */
     protected $name;
 
+    /**
+     * The maximum allowable mark for this group.
+     *
+     * Usually this is determined from the group's criteria, but it's now
+     * possible to override it.
+     *
+     * @var float
+     */
+    protected $maxValue;
+
     /** @var Criterion[]|CalculableAggregator */
     protected $criteria;
 
@@ -35,15 +45,17 @@ class Group implements Twiggable, Calculable
     /**
      * Insert convenience here
      *
-     * @param int    $id
-     * @param string $name
-     * @param bool   $readOnly
+     * @param int|null    $id
+     * @param string|null $name
+     * @param float|null  $maxValue
+     * @param bool|null   $readOnly
      */
-    public function __construct($id = null, $name = '', $readOnly = false)
+    public function __construct($id = null, $name = '', $maxValue = null, $readOnly = false)
     {
         $this->setName($name);
         $this->setId($id);
         $this->setReadOnly($readOnly);
+        $this->maxValue = $maxValue;
         $this->criteria = new CalculableAggregator();
     }
 
@@ -185,6 +197,23 @@ class Group implements Twiggable, Calculable
 
 
     /**
+     * Get the maximum allowable mark value for this group.
+     *
+     * If this group has a max value, use that; otherwise, use the total from
+     * its criteria.
+     *
+     * @return float
+     */
+    public function getMaxValue()
+    {
+        if (null !== $this->maxValue) {
+            return $this->maxValue;
+        }
+        return $this->getTotal();
+    }
+
+
+    /**
      * @return float
      */
     public function getPercentage()
@@ -217,6 +246,7 @@ class Group implements Twiggable, Calculable
             'name'       => $this->getName(),
             'sum'        => $this->getSum(),
             'total'      => $this->getTotal(),
+            'maxValue'   => $this->getMaxValue(),
             'percentage' => $this->getPercentage(),
             'humanReadableMark' => $this->getHumanReadableMark(),
             'used'       => $this->isReadOnly(),

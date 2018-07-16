@@ -74,7 +74,10 @@
 
 
     $.fn.curriculumSelector = function(options) {
-        options.value = normaliseValues(options.value);
+        if (!options) {
+            options = {};
+        }
+        options.value = normaliseValues('value' in options ? options.value : []);
         this.selectizeSelector($.extend(true, {}, defaults, options));
         return this;
     };

@@ -1,0 +1,122 @@
+{##
+ # Params:
+ # * criterion:                If null, this is an input for a new criterion
+ # * usage:                    Assessments that use the criterion
+ # * groupCount:               The number of the group, used only for array keys.
+ #                             If null, no name is output.
+ # * isSpecFolder:             Is the folder this criterion is in a course or unit spec?
+ #                             If so, the group name is never readonly.
+ # * curriculumTaggingEnabled: Are curriculum code inputs shown?
+ #}
+
+{% set showNames = groupCount is not null and criterion is not null %}
+{% set readonly  = not isSpecFolder and criterion is not null and usage|length > 0 %}
+{% set new       = criterion is null %}
+<li class="actions-small-1"
+    data-rubric-criterion-row="{{ groupCount }}"
+    {% if not criterion %}data-rubric-unsaved data-rubric-criterion-new-row{% endif %}
+>
+    <div class="list-item">
+        {# Hidden input for criterion ID #}
+        <input type="hidden"
+               data-template="rubric-criterion-id"
+               {% if showNames %}name="crits[{{ groupCount }}][items][{{ criterion.id }}][id]"{% endif %}
+               value="{{ criterion.id }}"
+               {% if readonly %}readonly{% endif %}
+        />
+
+        {# Input for criterion name #}
+        <input type="text"
+               {% if new %}data-rubric-criterion-new="1"{% endif %}
+               data-rubric-criterion
+               data-template="rubric-criterion-name"
+               {% if showNames %}name="crits[{{ groupCount }}][items][{{ criterion.id }}][name]"{% endif %}
+               value="{{ criterion.name }}"
+               {% if showNames %}id="i{{ criterion.id }}"{% endif %}
+               {% if readonly %}readonly{% endif %}
+        />
+
+        {# Input for criterion curriculum codes #}
+        {% if curriculumTaggingEnabled %}
+            <select data-curriculum-code-selector
+                    data-template="rubric-criterion-curriculum-codes"
+                    {% if showNames %}name="crits[{{ groupCount }}][items][{{ criterion.id }}][curriculumCode][]"{% endif %}
+                    multiple
+                    {% if new %}class="hide"{% endif %}
+                    data-placeholder="Add curriculum codes..."
+            >
+                {% for code in criterion.curriculumNodes %}
+                    <option label="{{ code.code }}"
+                            value="{{ code.id }}"
+                            title="{{ code.description }}"
+                            data-value-object="{{ code|json_encode }}"
+                            selected
+                    >{{ code.code }}</option>
+                {% endfor %}
+            </select>
+        {% endif %}
+    </div>
+
+    <nav>
+        {% if new %}
+            {# New criterion: show delete button, no are you sure #}
+            {# Hide it until the item is actually in use, though #}
+            <a class="icon-delete hide"
+               data-template="rubric-criterion-delete"
+               data-rubric-criterion="{{ criterion.id }}"
+               data-role="remove-criterion"
+               title="Delete {{ locale.rubricCriterion.proper }}"
+               href="#"></a>
+        {% else %}
+            {# Existing criteria: #}
+            {# If in use: show usage #}
+            {# If not readonly: show delete #}
+            {% if readonly %}
+                {# if readonly, show button for showing assessments which use this criterion #}
+                <a class="icon-info"
+                   data-reveal-id="criterion-{{ criterion.id }}"
+                   href="#"
+                   title="Show {{ locale.assessment.plural }} using {{ locale.rubricCriterion }}"></a>
+            {% else %}
+                {# show tot #}
+                {# delete button, with "are you sure" if it has been saved already #}
+                <a href="#" class="icon-more" data-dropdown="dropdown-i{{ criterion.id }}" title="Actions"></a>
+            {% endif %}
+        {% endif %}
+    </nav>
+
+    {# Tot for existent criteria #}
+    {% set criterionUsageCount = usage|length %}
+    <ul id="dropdown-i{{ criterion.id }}" class="f-dropdown" data-dropdown-content="">
+        {% if criterionUsageCount > 0 %}
+            <li>
+                <a class="icon-info"
+                   data-reveal-id="criterion-{{ criterion.id }}"
+                   href="#">Show {{ locale.assessment.plural }} using {{ locale.rubricCriterion }}</a>
+            </li>
+        {% endif %}
+        <li>
+            <a class="icon-delete"
+               data-rubric-criterion="{{ criterion.id }}"
+               data-role="remove-criterion"
+               href="#">Delete {{ locale.rubricCriterion.proper }}</a>
+        </li>
+    </ul>
+
+    {% if criterionUsageCount > 0 %}
+        <div data-reveal id="criterion-{{ criterion.id }}" class="reveal-modal">
+            <article>
+                <h2>{{ criterion.name }}</h2>
+                <p>{{ locale.rubricCriterion.proper }} is in use on {{ criterionUsageCount}}
+                    {{ criterionUsageCount > 1 ? locale.assessment.plural : locale.assessment }};
+                </p>
+                <ul>
+                    {% for assessment in usage %}
+                        <li><a href="{{ routeLookup('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id}) }}">{{ assessment.title }}</a></li>
+                    {% endfor %}
+                </ul>
+            </article>
+            <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+        </div>
+    {% endif %}
+</li>

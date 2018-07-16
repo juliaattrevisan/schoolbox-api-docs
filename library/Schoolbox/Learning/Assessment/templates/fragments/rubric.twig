@@ -113,7 +113,7 @@ Usage:
                                         applyOriginalDescriptorValues(originalDescriptorValues);
                                         detectChangedDescriptorValues();
                                     {% endif %}
-                                    checkRubricTotal();
+                                    // checkRubricTotal();
                                 }, 100);
                             }
                         }
@@ -220,49 +220,6 @@ Usage:
             }
         {% endif %}
 
-        var $markTypeInput = $('#markType');
-        $markTypeInput.on('change', checkRubricTotal);
-
-        // Each time the user changes the value of a descriptor
-        $rubric.on('blur keyup', '[data-descriptor-value]', function(){
-            checkRubricTotal();
-        });
-
-        // Each time the user toggles on/off a indicator
-        $rubric.on('change', '[data-criterion-name]', function(){
-            checkRubricTotal();
-        });
-
-        /*
-         * A rubric's total is a float, but the dueWork maxMark is an int.
-         *
-         * If dueWork.markType = maxMark, and rubricTotal has fractional component, warn the user
-         * this will cause rounding errors.
-         */
-        function checkRubricTotal()
-        {
-            var total = 0;
-            $rubric.find('tr[data-sequencer-group]').each(function () {
-                var $row = $(this),
-                    rowMax = 0;
-
-                if ($row.find('[data-criterion-name]:checked').length == 0) {
-                    return true; // jq.continue
-                }
-
-                $row.find('[data-descriptor-value]').each(function () {
-                    var i = parseFloat($(this).val());
-
-                    if (!isNaN(i)) {
-                        rowMax = Math.max(rowMax, i);
-                    }
-                });
-                total += rowMax;
-            });
-
-            total = total.toFixed(2);
-        }
-        checkRubricTotal();
 
         $("#useMarkRange").change(function() {
             if ($("#useMarkRange").is(":checked")) {
@@ -270,7 +227,62 @@ Usage:
             } else {
                 $("td[data-descriptor] input").prop("placeholder", "Points");
             }
-        })
+        });
+
+
+        var toggleGroupMaxValues = function() {
+            var $groupMaxValueInputs = $('[data-group-max-value]'),
+                $groupMaxValueRows = $('[data-group-max-value-row]');
+
+            if (!$('#markPerCapability').prop('checked')) {
+                // Not using mark-per-group? Easy, hide all max value inputs
+                $groupMaxValueRows.addClass('hide');
+                $groupMaxValueInputs.addClass('hide').prop('disabled', true);
+
+            } else {
+                // Using mark-per-group? A little harder, show max value inputs for all in use
+                var $allCriterionRows = $('[data-group]');
+
+                // List of all groups, no duplicates
+                // TODO this is copypasted from elsewhere; figure out how to get it into a plugin!
+                var groupIdentifiers = new Set(
+                    $allCriterionRows
+                        .map(function() { return $(this).data('group'); })
+                        .toArray()
+                );
+
+                // Which groups are actually used?
+                var groupsInUse = {};
+                groupIdentifiers.forEach(function (groupIdentifier) {
+                    var $selectedCriteria = $allCriterionRows
+                        .filter('[data-group="'+groupIdentifier+'"]')
+                        .find('input[data-criterion-name]:checked');
+                    groupsInUse[groupIdentifier] = $selectedCriteria.length > 0;
+                });
+
+                // Switch on/off groups by whether they have a criterion in use
+                $groupMaxValueRows.each(function () {
+                    var $this = $(this),
+                        groupIdentifier = $this.data('group'),
+                        $thisGroupMaxValueRows = $groupMaxValueRows.filter('[data-group="'+groupIdentifier+'"]'),
+                        $thisGroupMaxValueInputs = $thisGroupMaxValueRows.find('[data-group-max-value]');
+                    if (groupIdentifier in groupsInUse && groupsInUse[groupIdentifier]) {
+                        $thisGroupMaxValueRows.removeClass('hide');
+                        $thisGroupMaxValueInputs.removeClass('hide').prop('disabled', false);
+                    } else {
+                        $thisGroupMaxValueRows.addClass('hide');
+                        $thisGroupMaxValueInputs.addClass('hide').prop('disabled', true);
+                    }
+                });
+            }
+        };
+
+
+        // Show/hide group marks based upon mark-per-group (NOT capability)
+        // Only show the group mark if at least one criterion is selected
+        // in the group
+        $("#markPerCapability").change(toggleGroupMaxValues);
+        $('#rubric-attachable').on('change', 'input[data-criterion-name]', toggleGroupMaxValues);
     });
 </script>
 
@@ -343,7 +355,13 @@ Usage:
             <a href="#" id="apply-resultset" class="button">Apply Result Set</a>
         </div>
         <div class="small-12 columns no-pad">
-            {% include '@rubric/grid-csv.twig' with {rubric: rubric, attachzone: rubricAttachZone, folderId: assessment.context.folder.id, usingMarkRange: assessment.useMarkRange } only %}
+            {% include '@rubric/grid-csv.twig' with {
+                rubric: rubric,
+                attachzone: rubricAttachZone,
+                folderId: assessment.context.folder.id,
+                usingMarkPerCapability: assessment.markPerCapability,
+                usingMarkRange: assessment.useMarkRange
+            } only %}
         </div>
     </div>
 </div>

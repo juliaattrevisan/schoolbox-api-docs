@@ -24,44 +24,79 @@ use SplObjectStorage;
  */
 class Rubric extends Core\Rubric
 {
-
-    /** @var SubmissionBox|null */
+    /**
+     * The due work that this rubric is for, if there is one.
+     *
+     * @var SubmissionBox|null
+     */
     private $box;
 
     /**
-     * Maps domain object Criterion to ORM Criterion
+     * Maps domain object Criterion to ORM Criterion.
+     *
+     * This contains all criteria that are available to the rubric grid,
+     * whether or not this rubric's box is using them.
      *
      * @var SplObjectStorage|Core\Criteria\Criterion[]
      */
-    private $cCache;
+    private $criterionCache;
 
     /**
-     * Maps domain object Criterion to ORM Usage
+     * Maps domain object Criterion to ORM Usage.
+     *
+     * This contains only the criteria this rubric's box is actually using.
      *
      * @var SplObjectStorage|Core\Criteria\Criterion[]
      */
-    private $uCache;
+    private $criterionUsageCache;
 
     /**
-     * Maps domain object Level to ORM Level
+     * Maps domain object Group to ORM Group.
+     *
+     * This contains all groups that are available to the rubric grid,
+     * whether or not this rubric's box is using them.
+     *
+     * @var SplObjectStorage|Core\Criteria\Group[]
+     */
+    private $groupCache;
+
+    /**
+     * Maps domain object Group to ORM Group.
+     *
+     * This contains only the groups this rubric's box is actually using.
+     *
+     * @var SplObjectStorage|Core\Criteria\Group[]
+     */
+    private $groupUsageCache;
+
+    /**
+     * Maps domain object Level to ORM Level.
+     *
+     * This contains the levels that have been assigned to this rubric's box.
      *
      * @var SplObjectStorage|Core\Competency\Level[]
      */
-    private $lCache;
+    private $levelCache;
 
     /**
-     * Maps domain object Descriptor to ORM Descriptor
+     * Maps domain object Descriptor to ORM Descriptor.
+     *
+     * This contains all the descriptors that have been assigned to one of the
+     * criteria/level combinations for the rubric's box.
      *
      * @var SplObjectStorage|Core\Descriptor[]
      */
-    private $dCache;
+    private $descriptorCache;
 
     /**
-     * Maps domain object Descriptor to ORM Mark
+     * Maps domain object Descriptor to ORM Mark.
      *
-     * @var SplObjectStorage|Core\Descriptor[]
+     * This contains all rubric marks that have been assigned to a participant
+     * for this rubric's box, for a particular descriptor within the rubric.
+     *
+     * @var SplObjectStorage|Mark[]
      */
-    private $mCache;
+    private $markCache;
 
 
     /**
@@ -75,11 +110,18 @@ class Rubric extends Core\Rubric
         $this->setSubmissionBox($submissionBox);
 
         // setup caching
-        $this->cCache = new SplObjectStorage();
-        $this->dCache = new SplObjectStorage();
-        $this->lCache = new SplObjectStorage();
-        $this->uCache = new SplObjectStorage();
-        $this->mCache = new SplObjectStorage();
+        // Groups and criteria for a folder
+        $this->groupCache          = new SplObjectStorage();
+        $this->criterionCache      = new SplObjectStorage();
+
+        // Rubric grid for a due work
+        $this->groupUsageCache     = new SplObjectStorage();
+        $this->criterionUsageCache = new SplObjectStorage();
+        $this->levelCache          = new SplObjectStorage();
+        $this->descriptorCache     = new SplObjectStorage();
+
+        // Marks for a due work
+        $this->markCache           = new SplObjectStorage();
     }
 
 
@@ -134,30 +176,93 @@ class Rubric extends Core\Rubric
      */
     protected function createORMCriterion(Core\Criteria\Criterion $criterion, $groupName = '')
     {
-        if (!$this->cCache->contains($criterion)) {
-            try {
-                $model    = CriterionMapper::getInstance()->findById($criterion->getId());
-                $parentId = $model->getGroup()->getParentId();
-
-            } catch (Mapper\Exception $e) {
-                $model    = CriterionMapper::getInstance()->createModel();
-                $parentId = $this->box->getCategory()->getId();
-                $model->setGroup(GroupMapper::getInstance()->createModel());
-            }
-
-            $model->setName($criterion->getName());
-            $model->getGroup()
-                  ->setName($groupName)
-                  ->setParentType(Group::PARENT_TYPE_CATEGORY)
-                  ->setParentId($parentId)
-            ;
-
-            $this->cCache->attach($criterion, $model);
+        if (!$this->criterionCache->contains($criterion)) {
+            $model = CriterionMapper::getInstance()->findByIdWithFallback($criterion->getId());
+            $model->setName($criterion->getName())
+                  ->setGroup($this->createORMGroup($criterion->getGroup()));
+            $this->criterionCache->attach($criterion, $model);
         }
 
-        $return = $this->cCache->offsetGet($criterion);
-        $return->getGroup()->setName($groupName ?: $criterion->getGroup()->getName());
-        return $return;
+        return $this->criterionCache->offsetGet($criterion);
+    }
+
+
+    /**
+     * Returns a collection containing all the groups in this grid, for DB persistence.
+     *
+     * @return Usage[]|Collection
+     */
+    public function getORMGroups()
+    {
+        $c = GroupMapper::getInstance()->createCollection();
+        foreach ($this->criteriaGroups as $group) {
+            $c->add($this->createORMGroup($group));
+        }
+        return $c;
+    }
+
+
+    /**
+     * @param Core\Criteria\Group $group
+     * @return Group
+     */
+    protected function createORMGroup(Core\Criteria\Group $group)
+    {
+        if (!$this->groupCache->contains($group)) {
+            $model = GroupMapper::getInstance()->findByIdWithFallback($group->getId());
+            $model->setName($group->getName())
+                  ->setParentType(Group::PARENT_TYPE_CATEGORY)
+                  ->setParentId($this->box->getCategory()->getId());
+            $this->groupCache->attach($group, $model);
+        }
+
+        return $this->groupCache->offsetGet($group);
+    }
+
+
+    /**
+     * Returns a collection containing all the groups in this grid, for DB persistence.
+     *
+     * @return GroupUsage[]|Collection
+     */
+    public function getORMGroupUsages()
+    {
+        $c = GroupUsageMapper::getInstance()->createCollection();
+
+        foreach ($this->criteriaGroups as $group) {
+            $addGroup = false;
+            foreach ($group->getAllCriteria() as $criterion) {
+                if ($criterion->getAllDescriptors()->count()) {
+                    $addGroup = true;
+                    break;
+                }
+            }
+            if ($addGroup) {
+                $c->add($this->createORMGroupUsage($group));
+            }
+        }
+
+        return $c;
+    }
+
+
+    /**
+     * @param Core\Criteria\Group $group
+     * @return Usage
+     */
+    protected function createORMGroupUsage(Core\Criteria\Group $group)
+    {
+        if (!$this->groupUsageCache->contains($group)) {
+            $this->groupUsageCache->attach(
+                $group,
+                GroupUsageMapper::getInstance()->createModel()
+                                               ->setGroup($this->groupCache->offsetGet($group))
+                                               ->setSubmissionBox($this->box)
+                                               ->setMaxValue($group->getMaxValue())
+            );
+        }
+
+        return $this->groupUsageCache->offsetGet($group);
     }
 
 
@@ -166,7 +271,7 @@ class Rubric extends Core\Rubric
      *
      * @return Usage[]|Collection
      */
-    public function getORMUsages()
+    public function getORMCriterionUsages()
     {
         $c = UsageMapper::getInstance()->createCollection();
 
@@ -174,7 +279,7 @@ class Rubric extends Core\Rubric
         foreach ($this->criteriaGroups as $group) {
             foreach ($group->getAllCriteria() as $criterion) {
                 if ($criterion->getAllDescriptors()->count()) {
-                    $c->add($this->createORMUsage($criterion, ++$sequence));
+                    $c->add($this->createORMCriterionUsage($criterion, ++$sequence));
                 }
             }
         }
@@ -188,18 +293,18 @@ class Rubric extends Core\Rubric
      * @param int $sequence
      * @return Usage
      */
-    protected function createORMUsage(Core\Criteria\Criterion $criterion, $sequence)
+    protected function createORMCriterionUsage(Core\Criteria\Criterion $criterion, $sequence)
     {
-        if (!$this->uCache->contains($criterion)) {
-            $this->uCache->attach($criterion,
+        if (!$this->criterionUsageCache->contains($criterion)) {
+            $this->criterionUsageCache->attach($criterion,
                 UsageMapper::getInstance()
                   ->createModel()
-                  ->setCriterion($this->cCache->offsetGet($criterion))
+                  ->setCriterion($this->criterionCache->offsetGet($criterion))
                   ->setSubmissionBox($this->box)
             );
         }
 
-        return $this->uCache->offsetGet($criterion)->setSequence($sequence);
+        return $this->criterionUsageCache->offsetGet($criterion)->setSequence($sequence);
     }
 
 
@@ -228,7 +333,7 @@ class Rubric extends Core\Rubric
      */
     protected function createORMLevel(Core\Competency\Level $level, $sequence)
     {
-        if (!$this->lCache->contains($level)) {
+        if (!$this->levelCache->contains($level)) {
 
             if ($level->getId()) {
                 $model = LevelMapper::getInstance()->findById($level->getId());
@@ -244,12 +349,12 @@ class Rubric extends Core\Rubric
                 }
             }
 
-            $this->lCache->attach($level, $model
+            $this->levelCache->attach($level, $model
                   ->setName($level->getName())
                   ->setSubmissionBox($this->box)
             );
         }
-        return $this->lCache->offsetGet($level)->setSequence($sequence);
+        return $this->levelCache->offsetGet($level)->setSequence($sequence);
     }
 
 
@@ -280,7 +385,7 @@ class Rubric extends Core\Rubric
      */
     protected function createORMDescriptor(Core\Descriptor $descriptor, Core\Competency\Level $level, $sequence)
     {
-        if (!$this->dCache->contains($descriptor)) {
+        if (!$this->descriptorCache->contains($descriptor)) {
             // models we need
             $critModel = $this->createORMCriterion($descriptor->getCriterion());
             $lvlModel  = $this->createORMLevel($level, $sequence);
@@ -306,10 +411,10 @@ class Rubric extends Core\Rubric
                 ->setLevel($lvlModel)
                 ->setDeletedAt(new \Alaress_Date_NullDate());
 
-            $this->dCache->attach($descriptor, $model);
+            $this->descriptorCache->attach($descriptor, $model);
         }
 
-        return $this->dCache->offsetGet($descriptor);
+        return $this->descriptorCache->offsetGet($descriptor);
     }
 
 
@@ -357,8 +462,8 @@ class Rubric extends Core\Rubric
      */
     protected function createORMMark(Core\Descriptor $descriptor, Alaress_Date_Format $timestamp, User $student)
     {
-        if (!$this->mCache->contains($descriptor)) {
-            $this->mCache->attach($descriptor,
+        if (!$this->markCache->contains($descriptor)) {
+            $this->markCache->attach($descriptor,
                 MarkMapper::getInstance()
                  ->createModel()
                  ->setDescriptor($this->createORMDescriptor($descriptor, $descriptor->getLevel(), 0))
@@ -366,9 +471,9 @@ class Rubric extends Core\Rubric
             );
         }
 
-        return $this->mCache->offsetGet($descriptor)
-            ->setCreatedAt($timestamp)
-            ->setStudent($student);
+        return $this->markCache->offsetGet($descriptor)
+                               ->setCreatedAt($timestamp)
+                               ->setStudent($student);
     }
 
 

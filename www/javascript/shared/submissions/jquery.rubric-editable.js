@@ -48,7 +48,7 @@
         $rb.on('click', '[data-spawn]', function (e) {
             e.preventDefault();
 
-            if ($(this).data('spawn') == 'level') {
+            if ($(this).data('spawn') === 'level') {
                 rubricEditable.addLevel();
             }
 
@@ -58,7 +58,7 @@
         $rb.on('blur keydown', '[data-spawn]', function (e) {
 
             // ignore anything except hitting return
-            if (e.type == 'keydown' && e.keyCode != 13) {
+            if (e.type === 'keydown' && e.keyCode != 13) {
                 return true;
             }
 
@@ -69,7 +69,7 @@
                 $row, groupId;
 
             // prevent blank, but also prevent double-fire from keydown to blur
-            if (name.length == 0 || $input.prop('disabled')) {
+            if (name.length === 0 || $input.prop('disabled')) {
                 return true;
             }
 
@@ -77,7 +77,7 @@
 
             groupId = $row.data('group');
 
-            if (typeof groupId != 'undefined') {
+            if (typeof groupId !== 'undefined') {
                 groupId = groupId.split('-')[2];
             } else {
                 groupId = null;
@@ -91,7 +91,7 @@
              * duplicate criterion, but cannot prevent duplicate groups as they are not persisted until a indicator
              * name is entered.
              */
-            if('group' == type){
+            if('group' === type){
                 var normalisedNewGroup = normaliseForComparison(name);
                 var $groups =  $('[data-groupname]');
                 for (var i = 0; i < $groups.length; i++) {
@@ -113,10 +113,11 @@
                 groupId: groupId,
                 name: name,
                 levelCount: $rb.children('thead').find('input').length,
-                folderId: $('input[name=folderId]').val()
+                folderId: $('input[name=folderId]').val(),
+                markPerCapability: $('#markPerCapability').prop('checked')
             };
 
-            if (type == 'criterion') {
+            if (type === 'criterion') {
                 payload.groupName = $rb.find('[name="' + ( opt.formField + '[' + [ payload.rubricId, 'group', groupId, 'name' ].join('][') + ']' ) + '"]').val();
             }
 
@@ -127,7 +128,8 @@
                     // simple case: prepend the row
                     $row.before($data);
 
-                    if (type == 'criterion') {
+                    if (type === 'criterion') {
+
                         // just gotta extend that rowspan
                         var $span = $row.parent().children('[data-group="' + $row.data('group') + '"][data-groupname]').children('[rowspan]');
                         $span.attr('rowspan', parseInt($span.attr('rowspan')) + 1);
@@ -231,7 +233,7 @@
                     return;
                 }
 
-                if (axis == 'horizontal') {
+                if (axis === 'horizontal') {
                     // horizontal swap
 
                     var rows = $(this).children('tbody').children('[data-sequencer-group]');
@@ -397,7 +399,7 @@
         }
 
         // disallow removal of the last level (because we lose our template)
-        if (levelCount == 1) {
+        if (levelCount === 1) {
             throw "Only 1 level, cannot remove it";
         }
 
@@ -432,7 +434,7 @@
         var $levels = $rb.children('thead').find('input[data-level]');
 
         // permit up to opt.levelLimit levels
-        if (opt.levelLimit == 0 || $levels.length < opt.levelLimit) {
+        if (opt.levelLimit === 0 || $levels.length < opt.levelLimit) {
             $levels.find('[data-spawn]').removeClass('hide');
         }
 

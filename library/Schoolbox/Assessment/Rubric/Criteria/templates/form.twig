@@ -1,0 +1,446 @@
+{% autoescape 'js' %}
+<script type="text/javascript" src="/curriculum/javascript/jquery.curriculumSelector.js"></script>
+<script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
+<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+<script type="text/javascript">
+$(function() {
+
+    var form           = $('form[data-role="rubric-criteria-form"]');
+    var groupMaxId     = Number('{{ maxGroupId }}');
+    var criterionMaxId = Number('{{ maxCritId }}');
+
+    // If there are no dropdowns at all on initial load; they must be reapplied
+    // If there are any; they must not be reapplied. Go figure
+    var hasDropdowns = form.find('[data-dropdown]').length > 0;
+
+    // logic for adding new inputs
+    var onCriterionUpdate = function() {
+        if (this.value.length > 0) {
+            var input        = $(this),
+                idInput      = null,
+                codeInput    = null,
+                deleteButton = null,
+                container    = [],
+                groupId      = 0,
+                criterionId  = 0,
+                addGroup     = false,
+                addCriterion = false;
+
+            if (input.data('rubric-criterion-new')) {
+                // New criterion?
+                // Set the criterion ID of this row
+                container    = input.closest('[data-rubric-criterion-row]');
+                groupId      = input.closest('[data-rubric-group-row]').data('rubric-group-row');
+                criterionId  = criterionMaxId++;
+                addCriterion = true;
+                idInput      = container.find('[data-template="rubric-criterion-id"]');
+                codeInput    = container.find('[data-template="rubric-criterion-curriculum-codes"]');
+                deleteButton = container.find('[data-template="rubric-criterion-delete"]');
+
+            } else if (input.data('rubric-group-new')) {
+                // New group?
+                // Set the group ID of this row
+                container   = input.closest('[data-rubric-group-row]');
+                groupId     = groupMaxId++;
+                criterionId = criterionMaxId++;
+                addGroup    = true;
+                idInput     = container.find('[data-template="rubric-group-id"]');
+                codeInput   = container.find('[data-template="rubric-group-curriculum-codes"]');
+            }
+
+            if (container.length) {
+                var newContainer = container.clone(true, true);
+                newContainer.find('input').val('');
+                newContainer.find('[data-rubric-criterion]').attr('data-rubric-criterion-new', true);
+                input.attr('placeholder', 'Add {{ locale.rubricCriterion.proper }}...');
+
+                newContainer.appendTo(container.parent());
+
+                // Update the new form input - make it no longer new
+                if (addCriterion) {
+                    // This is no longer a new row
+                    container
+                        .removeAttr('data-rubric-criterion-new-row')
+                        .attr('data-rubric-criterion-row', criterionId)
+                        .data('rubric-criterion-row', criterionId);
+
+                    input
+                        .attr('name', 'crits['+groupId+'][items]['+criterionId+'][name]')
+                        .removeAttr('data-rubric-criterion-new')
+                        .removeData('rubric-criterion-new');
+
+                    idInput.attr('name', 'crits['+groupId+'][items]['+criterionId+'][id]');
+
+                    codeInput
+                        .attr('name', 'crits['+groupId+'][items]['+criterionId+'][curriculumCode][]')
+                        .removeClass('hide')
+                        .curriculumSelector();
+
+                    deleteButton.removeClass('hide');
+                }
+
+                if (addGroup) {
+                    container.data('rubric-group-row', groupId);
+
+                    // Clear all non-empty rows
+                    newContainer.find('[data-rubric-criterion-row]').not('[data-rubric-criterion-new-row]').remove();
+
+                    input
+                        .attr('name', 'crits['+groupId+'][name]')
+                        .removeAttr('data-rubric-group-new')
+                        .removeData('rubric-group-new');
+
+                    idInput.attr('name', 'crits['+groupId+'][id]');
+
+                    codeInput
+                        .attr('name', 'crits['+groupId+'][curriculumCode][]')
+                        .removeClass('hide')
+                        .curriculumSelector();
+                }
+            }
+        }
+    };
+    // Apply to both keyup and paste
+    form.on('keyup', 'input', onCriterionUpdate);
+    form.on('paste', 'input', onCriterionUpdate);
+
+    // last-minute post-processing
+    form.on('submit', function (e) {
+
+        // reapply all indices to the indicator name attributes
+        $('form[data-role=rubric-criteria-form]').find('fieldset').each(function () {
+
+            var $capabilityFieldset = $(this);
+            var $capabilityNameInput = $capabilityFieldset.find('input[name*="name"]');
+
+            var capabilityFieldName = $capabilityNameInput.attr('name');
+
+            // if this is a blank capability row, push it off the bottom of the list
+            var capabilityId = -1;
+            if (capabilityFieldName) {
+                capabilityId = $capabilityNameInput.attr('name').split(/[\[\]]/)[1];
+            }
+
+            $capabilityFieldset.find('input[name*="items"]').each(function () {
+
+                var $indicatorNameInput = $(this);
+
+                $indicatorNameInput.attr('name',
+                    $indicatorNameInput.attr('name').replace(/crits\[\d+]/, 'crits[' + capabilityId + ']')
+                );
+            });
+        });
+    });
+
+    // logic for removing inputs
+    form.find('[data-role="remove-criterion"]').click(function(e) {
+        e.preventDefault();
+        var self      = $(this);
+        var container = self.closest('[data-rubric-criterion-row]');
+
+        // Is this new? if so no dialog
+        if (container.is('[data-rubric-unsaved]')) {
+            container.remove();
+        } else {
+            self.confirmDialog({
+                text: $('#criterion-remove-text').text(),
+                confirmEvent: function() {
+                    container.remove();
+                }
+            });
+        }
+    });
+
+    $('[data-interaction="show-example-criteria"]').click(function(e) {
+        e.preventDefault();
+        $('[data-role="example-criteria"]').foundation('reveal', 'open');
+    });
+
+
+    // Set up the curriculum code selection
+    $(function() {
+        $('[data-curriculum-code-selector]:visible').each(function (i, v) {
+            var $this = $(this);
+            $this.curriculumSelector({
+                value: $.selectizeSelector.getValueFromSelect($this)
+            })
+        });
+    });
+});
+</script>
+{% endautoescape %}
+
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbs(
+    [ folder.name, '/homepage/' ~ folder.id ],
+    [ 'Manage ' ~ locale.rubricGroup.properPlural ]
+) }}
+
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Manage Rubric {{ locale.rubricGroup.properPlural }} for {{ folder.name }}</h1>
+    </div>
+</div>
+<div class="row">
+    <div class="small-12 island">
+        <div class="alert-box">
+            <p>
+                {{ locale.rubricCriterion.properPlural }} are used as rows in a rubric.
+                These may be added while creating your rubric or initially setup via this screen.
+                If you want to delete any {{ locale.rubricCriterion }} that has already been used on an {{ locale.assessment }},
+                you need to first remove it from the {{ locale.assessment }}, then you can delete it.
+                If you remove all the {{ locale.rubricCriterion.plural}} from any {{ locale.rubricGroup }},
+                the {{ locale.rubricGroup }} will automatically be deleted.
+                <a href="#" data-interaction="show-example-criteria">See example {{ locale.rubricCriterion.plural }}</a>
+            </p>
+        </div>
+    </div>
+</div>
+
+{% if curriculumTaggingEnabled %}
+    {% set groupColumn = 'small-12 medium-6' %}
+    {% set criterionColumn = 'small-12 medium-6' %}
+{% else %}
+    {% set groupColumn = 'small-12 medium-6' %}
+    {% set criterionColumn = 'small-12 medium-6' %}
+{% endif %}
+
+<div class="row">
+    <div class="small-12 island">
+        <form action="{{ routeLookup('rubricCriteria.postForm', {folderId: folder.id}) }}" method="POST" class='top' data-role="rubric-criteria-form">
+            <section>
+                {#
+                <!-- Cascade isn't supported, but if it is: -->
+                <fieldset class='content'>
+                    <div class="small-12 columns">
+                        <input type="hidden" name="cascade" value="0" />
+                        <input id="cascade" type="checkbox" name="cascade" value="1" />
+                        <label for="cascade" class="checkbox-label">
+                            Copy to subfolders?
+                            <span class="hint has-tip"
+                                  data-tooltip
+                                  title="Should these {{ locale.rubricCriterion.plural }} be copied to this folder's subfolders?">?</span>
+                        </label>
+                    </div>
+                </fieldset>
+                #}
+
+                {% for group in groups %}
+                    {% set groupCount = loop.index0 %}
+                    <fieldset class='content' data-rubric-group-row="{{ groupCount }}">
+                        <div class="{{ groupColumn }} columns">
+                            <h3>{{ locale.rubricGroup.proper }}</h3>
+                            <ul class="information-list">
+                                {% include '@rubricCriteria/sub/group.twig' with {
+                                    group:                    group.group,
+                                    groupCount:               groupCount,
+                                    usage:                    group.usage,
+                                    isSpecFolder:             isSpecFolder,
+                                    curriculumTaggingEnabled: curriculumTaggingEnabled,
+                                } only %}
+                            </ul>
+                        </div>
+
+                        <div class="{{ criterionColumn }} columns">
+                            <h3>{{ locale.rubricCriterion.properPlural }}</h3>
+                            <ul class="information-list">
+
+                                {% for criterion in group.criteria %}
+                                    {% include '@rubricCriteria/sub/criterion.twig' with {
+                                        criterion:                criterion.criterion,
+                                        groupCount:               groupCount,
+                                        usage:                    criterion.usage,
+                                        isSpecFolder:             isSpecFolder,
+                                        curriculumTaggingEnabled: curriculumTaggingEnabled,
+                                    } only %}
+                                {% endfor %}
+
+                                {# New criterion within group #}
+                                {% include '@rubricCriteria/sub/criterion.twig' with {
+                                    criterion:                null,
+                                    groupCount:               groupCount,
+                                    usage:                    null,
+                                    isSpecFolder:             isSpecFolder,
+                                    curriculumTaggingEnabled: curriculumTaggingEnabled,
+                                } only %}
+                            </ul>
+                        </div>
+                    </fieldset>
+                {% endfor %}
+
+                {# New group #}
+                <fieldset class='content' data-rubric-group-row="{{ maxGroupId }}">
+                    <div class="{{ groupColumn }} columns">
+                        <h3>{{ locale.rubricGroup.proper }}</h3>
+                        <ul class="information-list">
+                            {% include '@rubricCriteria/sub/group.twig' with {
+                                group:                    null,
+                                groupCount:               null,
+                                usage:                    null,
+                                isSpecFolder:             isSpecFolder,
+                                curriculumTaggingEnabled: curriculumTaggingEnabled,
+                            } only %}
+                        </ul>
+                    </div>
+                    <div class="{{ criterionColumn }} columns">
+                        <h3>{{ locale.rubricCriterion.properPlural }}</h3>
+                        <ul class="information-list">
+                            {# New criterion within new group #}
+                            {% include '@rubricCriteria/sub/criterion.twig' with {
+                                criterion:                null,
+                                groupCount:               null,
+                                usage:                    null,
+                                isSpecFolder:             isSpecFolder,
+                                curriculumTaggingEnabled: curriculumTaggingEnabled,
+                            } only %}
+                        </ul>
+                    </div>
+                </fieldset>
+            </section>
+
+            <div class="row">
+                <div class="small-12 columns">
+                    <input type="submit" value="Save Changes" />
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div data-role="example-criteria" class="reveal-modal" data-reveal>
+    <p>
+        Each {{ locale.rubricCriterion }} should be a word or short sentence that describes what is being assessed,
+        organised into logical groupings.
+    </p>
+
+    <div class="row">
+        <div class="small-12 island">
+            <section>
+                <fieldset class="content">
+                    <div class="{{ groupColumn }} columns">
+                        <h3>{{ locale.rubricGroup.proper }}</h3>
+                        <ul class="information-list">
+                            <li class="actions-small-0">
+                                <div class="list-item">
+                                    <input readonly type="text" value="Algebra" />
+                                </div>
+                                <nav></nav>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="{{ criterionColumn }} columns">
+                        <h3>{{ locale.rubricCriterion.properPlural }}</h3>
+                        <ul class="information-list">
+                            <li class="actions-small-1">
+                                <div class="list-item">
+                                    <input readonly type="text" value="Factorisation" />
+                                </div>
+                                <nav>
+                                    <a class="icon-info"
+                                       href="#"
+                                       title="Show {{ locale.assessment.plural }} using {{ locale.rubricCriterion }}"></a>
+                                </nav>
+                            </li>
+                            <li class="actions-small-1">
+                                <div class="list-item">
+                                    <input readonly type="text" value="Algebraic simplification using index laws" />
+                                </div>
+                                <nav>
+                                    <a class="icon-info"
+                                       href="#"
+                                       title="Show {{ locale.assessment.plural }} using {{ locale.rubricCriterion }}"></a>
+                                </nav>
+                            </li>
+                            <li class="actions-small-1">
+                                <div class="list-item">
+                                    <input readonly type="text" value="Fraction operations" />
+                                </div>
+                                <nav>
+                                    <a class="icon-info"
+                                       href="#"
+                                       title="Show {{ locale.assessment.plural }} using {{ locale.rubricCriterion }}"></a>
+                                </nav>
+                            </li>
+                            <li class="actions-small-1">
+                                <div class="list-item">
+                                    <input readonly type="text" value="Determining an unknown by substitution" />
+                                </div>
+                                <nav>
+                                    <a class="icon-info"
+                                       href="#"
+                                       title="Show {{ locale.assessment.plural }} using {{ locale.rubricCriterion }}"></a>
+                                </nav>
+                            </li>
+                        </ul>
+                    </div>
+                </fieldset>
+
+                <fieldset>
+                    <div class="small-12 medium-6 columns">
+                        <h3>{{ locale.rubricGroup.proper }}</h3>
+                        <ul class="information-list">
+                            <li class="action-small-0">
+                                <div class="list-item">
+                                    <input readonly type="text" value="Linear and non-linear relations" />
+                                </div>
+                                <nav></nav>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="small-12 medium-6 columns">
+                        <h3>{{ locale.rubricCriterion.properPlural }}</h3>
+
+                        <ul class="information-list">
+                            <li class="actions-small-1">
+                                <div class="list-item">
+                                    <input readonly type="text" value="Solving linear equations" />
+                                </div>
+                                <nav>
+                                    <a class="icon-info"
+                                       href="#"
+                                       title="Show {{ locale.assessment.plural }} using {{ locale.rubricCriterion }}"></a>
+                                </nav>
+                            </li>
+                            <li class="actions-small-1">
+                                <div class="list-item">
+                                    <input readonly type="text" value="Solving simultaneous equations" />
+                                </div>
+                                <nav>
+                                    <a class="icon-info"
+                                       href="#"
+                                       title="Show {{ locale.assessment.plural }} using {{ locale.rubricCriterion }}"></a>
+                                </nav>
+                            </li>
+                            <li class="actions-small-1">
+                                <div class="list-item">
+                                    <input readonly type="text" value="Solving simple quadratic equations" />
+                                </div>
+                                <nav>
+                                    <a class="icon-info"
+                                       href="#"
+                                       title="Show {{ locale.assessment.plural }} using {{ locale.rubricCriterion }}"></a>
+                                </nav>
+                            </li>
+                        </ul>
+                    </div>
+                </fieldset>
+            </section>
+        </div>
+    </div>
+
+    <a href="#" class="close-reveal-modal">&#215;</a>
+</div>
+
+<div data-role="ajax-error" class="reveal-modal" data-reveal>
+    <div class="alert-box alert">
+        <h5>Something went wrong while saving</h5>
+        <p>You may try pressing the "Save Changes" button. If this persists, please contact your IT support.</p>
+    </div>
+</div>
+
+<!-- Hidden text for remove criterion -->
+<div class="hide" id="criterion-remove-text">
+    If you remove this {{ locale.rubricCriterion }}, it will not be available to add to future {{ locale.assessment.plural }}.
+    Are you sure you want to do this?
+    (Make sure you click save at the end of this form to save all changes you have made.)
+</div>

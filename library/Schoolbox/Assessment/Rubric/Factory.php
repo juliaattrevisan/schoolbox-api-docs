@@ -97,12 +97,13 @@ class Factory
         }
 
         /** @var Group[] $groupCache */
-        $groupCache = [ 0 => new Group(null, '') ];
+        $groupCache = [ 0 => new Group(null, '', null) ];
 
         // cache groups
         foreach ($groups as $groupId => $groupData) {
-            $groupName = $groupData['name'];
-            $groupCache[$groupId] = new Group($groupId, $groupName);
+            $groupName     = $groupData['name'];
+            $groupMaxValue = $groupData['maxValue'] ?? null;
+            $groupCache[$groupId] = new Group($groupId, $groupName, $groupMaxValue);
         }
 
         foreach ($criteria as $criterionId => $criterion) {

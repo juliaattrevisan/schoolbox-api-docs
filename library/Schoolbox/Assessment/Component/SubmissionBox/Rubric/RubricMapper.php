@@ -157,10 +157,10 @@ class RubricMapper
                 COUNT(a.id) AS usage_count,
                 rg.parent_id
             FROM rubric_criterion rc
-            JOIN      rubric_group rg ON rg.id = rc.rubric_group_id
-            LEFT JOIN rubric_usage ru ON rc.id = ru.criterion_id
-            LEFT JOIN submission_box b ON ru.submission_box_id = b.id
-            LEFT JOIN assessment a ON b.assessment_id = a.id AND a.deleted_at IS NULL
+            INNER JOIN rubric_group           rg ON rg.id = rc.rubric_group_id
+            LEFT JOIN  rubric_criterion_usage ru ON rc.id = ru.criterion_id
+            LEFT JOIN  submission_box          b ON ru.submission_box_id = b.id
+            LEFT JOIN  assessment              a ON b.assessment_id = a.id AND a.deleted_at IS NULL
             WHERE rg.parent_type = :parentType
             AND rg.parent_id IN (:$in)
             AND rc.deleted_at IS NULL
@@ -178,7 +178,11 @@ class RubricMapper
             // If first instance of Capability
             if (!array_key_exists($capabilityNormalisedName, $capabilityCache)) {
                 // Save the Capability
-                $capabilityCache[$capabilityNormalisedName] = new Criteria\Group($r['group_id'], $this->normalizeSpace($r['grouping']));
+                $capabilityCache[$capabilityNormalisedName] = new Criteria\Group(
+                    $r['group_id'],
+                    $this->normalizeSpace($r['grouping']),
+                    null
+                );
 
                 // Instantiate Indicator cache for the Capability
                 $indicatorCache[$capabilityNormalisedName] = [];
@@ -287,9 +291,6 @@ class RubricMapper
      */
     protected function findCriteria(SubmissionBox $box, $getParentCriteria)
     {
-        // why 20? because it's not 0. (arbitrary start of group indexes)
-        $groupId = 20;
-
         /** @var array $groupIdMap - indexed by criterion-group name */
         $groupIdMap = [];
 
@@ -304,13 +305,18 @@ class RubricMapper
         while ($r = $criteriaStatement->fetch(PDO::FETCH_ASSOC)) {
 
             $groupName = $r['grouping'];
+            $selected  = $r['selected'] > 0;
 
             // First time we've encountered this Group ?
             if (empty($groupIdMap[$groupName])) {
-                ++$groupId;
+                $groupId = $r['group_id'];
 
                 $groupIdMap[$groupName] = $groupId;
-                $groups[$groupId]       = ['name' => $groupName];
+                $maxValue               = isset($r['max_value']) ? (float)$r['max_value'] : null;
+                $groups[$groupId]       = [
+                    'name'     => $groupName,
+                    'maxValue' => $selected ? $maxValue : null,
+                ];
             }
 
             // check for usage
@@ -318,7 +324,7 @@ class RubricMapper
 
             $criteria[$r['crit_id']] = [
                 'groupId'  => $groupIdMap[$groupName],
-                'on'       => $r['selected'] > 0,
+                'on'       => $selected,
                 'name'     => $r['name'],
                 'readonly' => $usedElsewhere,
             ];
@@ -378,31 +384,36 @@ class RubricMapper
         $criteriaStatement = $this->database->query("
             SELECT
                 crit_id,
+                group_id,
                 grouping,
                 name,
+                max_value,
                 COUNT(a_id) AS usages,                                   -- How many non-deleted boxes are using the criterion?
                 MAX(selected) AS selected                                -- Is the criterion in use by this box?
             FROM (
                 SELECT
-                    c.id AS crit_id,
-                    g.name AS grouping,
-                    c.name,
+                    rc.id AS crit_id,
+                    rg.id AS group_id,
+                    rg.name AS grouping,
+                    rc.name,
+                    rgu.max_value AS max_value,
                     a.id AS a_id,                                        -- Will be NULL if not in use by a box, or box is soft-deleted
-                    IF(b.id = :boxId, 1, 0) AS selected,                 -- Is this criterion in use by this box? (ignores whether box is deleted)
-                    IF(b.id = :boxId, u.sequence, NULL) AS sequence      -- Only get sequence for this box (ignores whether box is deleted)
-                FROM rubric_criterion c
-                JOIN      rubric_group g ON g.id = c.rubric_group_id
-                LEFT JOIN rubric_usage u ON u.criterion_id = c.id
-                LEFT JOIN submission_box b ON u.submission_box_id = b.id                  -- This will join to deleted boxes
-                LEFT JOIN assessment a ON b.assessment_id = a.id AND a.deleted_at IS NULL -- But won't join to deleted assessments
-                WHERE g.parent_type = :parentType
-                AND g.parent_id IN (:$in)
-                AND c.deleted_at IS NULL
+                    IF(sb.id = :boxId, 1, 0) AS selected,                 -- Is this criterion in use by this box? (ignores whether box is deleted)
+                    IF(sb.id = :boxId, rcu.sequence, NULL) AS sequence      -- Only get sequence for this box (ignores whether box is deleted)
+                FROM rubric_criterion rc
+                INNER JOIN rubric_group           rg  ON rg.id = rc.rubric_group_id
+                LEFT JOIN  rubric_criterion_usage rcu ON rcu.criterion_id = rc.id
+                LEFT JOIN  submission_box         sb  ON rcu.submission_box_id = sb.id                      -- This will join to deleted boxes
+                LEFT JOIN  assessment             a   ON sb.assessment_id = a.id AND a.deleted_at IS NULL -- But won't join to deleted assessments
+                LEFT JOIN  rubric_group_usage     rgu ON rgu.rubric_group_id = rg.id AND rgu.submission_box_id = sb.id
+                WHERE rg.parent_type = :parentType
+                AND rg.parent_id IN (:$in)
+                AND rc.deleted_at IS NULL
                 AND a.deleted_at IS NULL
-                AND g.deleted_at IS NULL
+                AND rg.deleted_at IS NULL
                 ORDER BY selected DESC
             ) t
-            GROUP BY crit_id
+            GROUP BY crit_id, group_id, grouping, name, max_value
             ORDER BY selected DESC, MAX(`sequence`) ASC, `grouping` ASC, `name` ASC;
         ", $args);
 
@@ -764,8 +775,13 @@ class RubricMapper
         LevelMapper::getInstance()->save($levels = $rubric->getORMLevels());
 
         // usages are a join table with a sequence, not a strict "object" - as such, we can purge the relevant records and simply re-create them
+        // TODO consider removing submission_box_id, associating with group ID instead
         UsageMapper::getInstance()->deleteByColumn('submission_box_id', $submissionBox->getId());
-        UsageMapper::getInstance()->save($usages = $rubric->getORMUsages());
+        UsageMapper::getInstance()->save($usages = $rubric->getORMCriterionUsages());
+
+        // ditto group usages
+        GroupUsageMapper::getInstance()->deleteByColumn('submission_box_id', $submissionBox->getId());
+        GroupUsageMapper::getInstance()->save($rubric->getORMGroupUsages());
 
         // finally, now that everything else is saved, save the descriptors
         $descIds = DescriptorMapper::getInstance()->save($descs = $rubric->getORMDescriptors());
@@ -1071,12 +1087,16 @@ class RubricMapper
      */
     public function copyRubric($sourceAssessmentId, $destinationAssessmentId)
     {
+        // TODO extract this entire monstrosity elsewhere
+
         // Get required mappers
-        $boxMapper        = SubmissionBoxMapper::getInstance();
-        $levelMapper      = LevelMapper::getInstance();
-        $descriptorMapper = DescriptorMapper::getInstance();
-        $criterionMapper  = CriterionMapper::getInstance();
-        $usageMapper      = UsageMapper::getInstance();
+        $boxMapper            = SubmissionBoxMapper::getInstance();
+        $levelMapper          = LevelMapper::getInstance();
+        $descriptorMapper     = DescriptorMapper::getInstance();
+        $groupMapper          = GroupMapper::getInstance();
+        $criterionMapper      = CriterionMapper::getInstance();
+        $groupUsageMapper     = GroupUsageMapper::getInstance();
+        $criterionUsageMapper = UsageMapper::getInstance();
 
         $sourceBox = $boxMapper->findOneByColumn('assessment_id', $sourceAssessmentId);
 
@@ -1096,10 +1116,14 @@ class RubricMapper
         $dstLevels = $levelMapper->createCollection();
         /** @var Descriptor[]|GenericCollection $dstDescriptors */
         $dstDescriptors = $descriptorMapper->createCollection();
+        /** @var Group[]|GenericCollection $dstGroups */
+        $dstGroups = $groupMapper->createCollection();
         /** @var Criterion[]|GenericCollection $dstCriteria */
         $dstCriteria = $criterionMapper->createCollection();
-        /** @var Usage[]|GenericCollection $dstUsages */
-        $dstUsages = $usageMapper->createCollection();
+        /** @var Group[]|GenericCollection $dstGroups */
+        $dstGroupUsages = $groupUsageMapper->createCollection();
+        /** @var Usage[]|GenericCollection $dstCriterionUsages */
+        $dstCriterionUsages = $criterionUsageMapper->createCollection();
 
         // Copy Levels
         foreach ($srcLevels as $srcLevel) {
@@ -1114,6 +1138,7 @@ class RubricMapper
         /** @var Descriptor[]|GenericCollection $srcDescriptors */
         $srcDescriptors = $descriptorMapper->findByColumn('level_id', $srcLevels->getColumnValues('id'))->indexBy('id');
         $srcCriteria    = $criterionMapper->createCollection();
+        $srcGroups      = $groupMapper->createCollection();
 
         /* Get existing destination criteria.
          *
@@ -1131,53 +1156,77 @@ class RubricMapper
             false
         );
         // Convert to 2-D arrays, indexed by 'group' then 'name', so we can later find duplicates.
-        /** @var Criterion[][] $existingGroupMap */
+        /** @var Criterion[][] $existingCriterionMap */
+        $existingCriterionMap = [];
+        /** @var Group[] $existingGroupMap */
         $existingGroupMap = [];
         foreach ($existingCriteria as $existingCriterion) {
-            $group                           = $this->normaliseForComparison($existingCriterion->getGroup()->getName());
-            $name                            = $this->normaliseForComparison($existingCriterion->getName());
-            $existingGroupMap[$group][$name] = $existingCriterion;
+            $groupName                           = $this->normaliseForComparison($existingCriterion->getGroup()->getName());
+            $criterionName                       = $this->normaliseForComparison($existingCriterion->getName());
+            $existingCriterionMap[$groupName][$criterionName] = $existingCriterion;
+            $existingGroupMap[$groupName]                     = $existingCriterion->getGroup();
         }
 
         // Build new Rubric for destination box
         foreach ($srcDescriptors as $srcDescriptor) {
 
+            // Copy source group, or reuse existing
+            $srcGroupId = $srcDescriptor->getCriterion()->getGroup()->getId();
+            if (!$srcGroups->getOffset($srcGroupId)) {
+                $srcGroup = $srcDescriptor->getCriterion()->getGroup();
+                $srcGroups->setOffset($srcGroupId, $srcGroup);
+            }
+
+
             // Copy source Criterion or re-use existing Criterion
             $srcCriterionId = $srcDescriptor->getCriterion()->getId();
-
-            // First time we've traversed this Criterion ?
             if (!$srcCriteria->getOffset($srcCriterionId)) {
-
                 $srcCriterion = $srcDescriptor->getCriterion();
                 $srcCriteria->setOffset($srcCriterionId, $srcCriterion);
-
-                // Does this Criterion already exist on destination folder ?
-
-                $duplicate = false;
-                $group     = $this->normaliseForComparison($srcCriterion->getGroup()->getName());
-                $name      = null;
-                if (array_key_exists($group, $existingGroupMap)) {
-                    $name = $this->normaliseForComparison($srcCriterion->getName());
-                    if (array_key_exists($name, $existingGroupMap[$group])) {
-                        $duplicate = true;
-                    }
-                }
-
-                // Did we find an existing Criterion with the same name?
-                if ($duplicate) {
-                    $dstCriterion = $existingGroupMap[$group][$name];
-                } else {
-                    $dstCriterion = clone $srcDescriptor->getCriterion();
-                    $dstCriterion->setId(null);
-                    $dstCriterion->getGroup()->setParentId($dstBox->getCategory()->getId());
-                }
-                $dstCriteria->setOffset($srcCriterionId, $dstCriterion);
             }
+
+
+            // Does this Criterion already exist on destination folder ?
+            $duplicateGroup     = false;
+            $duplicateCriterion = false;
+            $groupName          = $this->normaliseForComparison($srcGroups->getOffset($srcGroupId)->getName());
+            $criterionName      = $this->normaliseForComparison($srcCriteria->getOffset($srcCriterionId)->getName());
+            if (array_key_exists($groupName, $existingGroupMap)) {
+                $duplicateGroup = true;
+                if (array_key_exists($criterionName, $existingCriterionMap[$groupName])) {
+                    $duplicateCriterion = true;
+                }
+            }
+
+            // Did we find an existing group with the same name?
+            if ($duplicateGroup) {
+                $dstGroup = $existingGroupMap[$groupName];
+            } else {
+                $dstGroup = clone $srcDescriptor->getCriterion()->getGroup();
+                $dstGroup->setId(null);
+                $dstGroup->setParentId($dstBox->getCategory()->getId());
+                $existingGroupMap[$groupName] = $dstGroup;
+            }
+            $dstGroups->setOffset($srcGroupId, $dstGroup);
+
+
+            // Did we find an existing Criterion with the same name?
+            if ($duplicateCriterion) {
+                $dstCriterion = $existingCriterionMap[$groupName][$criterionName];
+            } else {
+                $dstCriterion = clone $srcDescriptor->getCriterion();
+                $dstCriterion->setId(null);
+                $dstCriterion->setGroup($dstGroup);
+                $existingCriterionMap[$groupName][$criterionName] = $dstCriterion;
+            }
+            $dstCriteria->setOffset($srcCriterionId, $dstCriterion);
+
 
             // Descriptor
             $dstDescriptor = clone $srcDescriptor;
             $dstDescriptor->setId(null);
             $dstDescriptors->setOffset($srcDescriptor->getId(), $dstDescriptor);
+
 
             // Link Descriptor + Level
             /** @var Level $dstLevel */
@@ -1185,34 +1234,54 @@ class RubricMapper
             $dstDescriptor->setLevel($dstLevel);
             $dstLevel->getDescriptors()->setOffset($srcDescriptor->getId(), $dstDescriptor);
 
+
             // Link Descriptor + Criterion
             $dstDescriptor->setCriterion($dstCriteria->getOffset($srcCriterionId));
         }
 
         // Get Source Usages
-        /** @var Usage[]|GenericCollection $srcUsages */
-        $srcUsages = $usageMapper->findByColumnList([
-            'criterion_id'      => $srcCriteria->getColumnValues('id'),
+        /** @var GroupUsage[]|GenericCollection $srcGroupUsages */
+        /** @var Usage[]|GenericCollection $srcCriterionUsages */
+        $srcGroupUsages = $groupUsageMapper->findByColumnList([
+            'rubric_group_id'   => $srcGroups->getPropertyValues('id'),
+            'submission_box_id' => $sourceBox->getId(),
+        ]);
+        $srcCriterionUsages = $criterionUsageMapper->findByColumnList([
+            'criterion_id'      => $srcCriteria->getPropertyValues('id'),
             'submission_box_id' => $sourceBox->getId(),
         ]);
 
-        // Copy Usages
-        foreach ($srcUsages as $srcUsage) {
-            $dstUsage = clone $srcUsage;
+        // Copy Group Usages
+        foreach ($srcGroupUsages as $srcGroupUsage) {
+            $dstGroupUsage = clone $srcGroupUsage;
+
+            /** @var Group $dstGroup */
+            $dstGroup = $dstGroups->getOffset($srcGroupUsage->getGroup()->getId());
+
+            $dstGroupUsage->setGroup($dstGroup);
+            $dstGroupUsage->setSubmissionBox($dstBox);
+            $dstGroupUsages->add($dstGroupUsage);
+        }
+
+        // Copy Criterion Usages
+        foreach ($srcCriterionUsages as $srcCriterionUsage) {
+            $dstCriterionUsage = clone $srcCriterionUsage;
 
             /** @var Criterion $dstCriterion */
-            $dstCriterion = $dstCriteria->getOffset($srcUsage->getCriterion()->getId());
+            $dstCriterion = $dstCriteria->getOffset($srcCriterionUsage->getCriterion()->getId());
 
-            $dstUsage->setCriterion($dstCriterion);
-            $dstUsage->setSubmissionBox($dstBox);
-            $dstUsages->add($dstUsage);
+            $dstCriterionUsage->setCriterion($dstCriterion);
+            $dstCriterionUsage->setSubmissionBox($dstBox);
+            $dstCriterionUsages->add($dstCriterionUsage);
         }
 
         // Save (order is important to ensure IDs are assigned to parents b4 saving children)
         $levelMapper->save($dstLevels);
+        $groupMapper->save($dstGroups);
         $criterionMapper->save($dstCriteria);
         $descriptorMapper->save($dstDescriptors);
-        $usageMapper->save($dstUsages);
+        $groupUsageMapper->save($dstGroupUsages);
+        $criterionUsageMapper->save($dstCriterionUsages);
 
         return true;
     }

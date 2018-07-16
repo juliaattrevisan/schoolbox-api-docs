@@ -219,10 +219,9 @@ class DueWork_Rubric_Handler
         $stmt = $this->db->prepare("
             SELECT rg.name AS grouping, rc.id, rc.name
             FROM rubric_criterion rc
-            JOIN rubric_group     rg ON rg.id = rc.rubric_group_id AND rg.deleted_at IS NULL
+            INNER JOIN rubric_group rg ON rg.id = rc.rubric_group_id AND rg.deleted_at IS NULL
             WHERE {$whereClause}
             AND rc.deleted_at IS NULL
-            AND rg.deleted_at IS NULL
             ORDER BY rg.name ASC, rc.name ASC
         ");
         $stmt->execute($pb->getParams());

@@ -49,6 +49,7 @@
                 {% if checkChecked %}data-descriptor-original{% endif %}
                 class="rb-value"
                 type="number"
+                min="0"
                 placeholder={% if usingMarkRange %}"Maximum points"{% else %}"Points"{% endif %}
                 value="{{ descriptor.value }}"
                 name="{{ descInput }}[{{ levelIndex }}][points]" />

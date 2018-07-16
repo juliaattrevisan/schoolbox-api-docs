@@ -6,6 +6,9 @@
 
 namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 
+use Schoolbox\Curriculum\Node\Model as NodeModel;
+use Schoolbox\Curriculum\Node\Traits\HasCurriculumNodes;
+use Schoolbox\GenericCollection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
@@ -17,6 +20,7 @@ class Group implements ISoftDeletable
 {
     use Id;
     use DeletedAtDate;
+    use HasCurriculumNodes;
 
     /**
      * Constant for the 'category' parent type; this indicates that
@@ -68,6 +72,14 @@ class Group implements ISoftDeletable
      * @var string
      */
     private $parentType = self::PARENT_TYPE_CATEGORY;
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->curriculumNodes = new GenericCollection(NodeModel::class);
+    }
 
     /**
      * @return string
