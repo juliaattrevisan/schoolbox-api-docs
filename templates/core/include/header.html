@@ -87,9 +87,12 @@
             }
 
             splash = $(this).find(".splash");
-            splash.removeClass("animate");
 
-            if(!splash.height() && !splash.width()){
+            if (splash.length === 0) {
+                $(this).prepend("<span class='splash'></span>");
+            }
+
+            if (!splash.height() && !splash.width()) {
                 d = Math.max($(this).outerWidth(), $(this).outerHeight());
                 splash.css({height: d, width: d});
             }
@@ -98,6 +101,11 @@
             y = e.pageY - $(this).offset().top - splash.height()/2;
 
             splash.css({top: y+'px', left: x+'px'}).addClass("animate");
+
+            // Remove the animation after a bit of time, otherwise this animation will happen every time the element hides and becomes visible again
+            setTimeout(function() {
+                splash.removeClass('animate');
+            }, 500);
         });
     });
 
