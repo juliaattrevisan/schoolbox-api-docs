@@ -7,9 +7,7 @@ namespace Helper;
 use Codeception\Exception\ModuleException;
 use Codeception\Module\Db;
 use Codeception\Module\WebDriver;
-use Codeception\Module\Db;
 use Codeception\TestInterface;
-use Facebook\WebDriver\Remote\RemoteWebDriver;
 use Facebook\WebDriver\Remote\RemoteWebElement;
 use Facebook\WebDriver\WebDriverBy;
 use Facebook\WebDriver\WebDriverElement;
@@ -26,7 +24,7 @@ class Acceptance extends \Codeception\Module
     public function _beforeSuite($settings = [])
     {
         parent::_beforeSuite($settings);
-        self::changeDBConfig('debug_mode', 0);
+        $this->changeDBConfig('debug_mode', 0);
     }
 
     /**
@@ -34,7 +32,7 @@ class Acceptance extends \Codeception\Module
      */
     public function _afterSuite()
     {
-        self::restoreDBConfig();
+        $this->restoreDBConfig();
         parent::_afterSuite();
     }
 
@@ -45,7 +43,7 @@ class Acceptance extends \Codeception\Module
     public function _before(TestInterface $test)
     {
         parent::_before($test);
-        self::changeDBConfig('debug_mode', 0);
+        $this->changeDBConfig('debug_mode', 0);
         exec('sudo php /vagrant/test/socket/destroy-rabbit-data.php;');
     }
 
@@ -55,7 +53,7 @@ class Acceptance extends \Codeception\Module
      */
     public function _after(TestInterface $test)
     {
-        self::restoreDBConfig();
+        $this->restoreDBConfig();
         parent::_after($test);
     }
 
