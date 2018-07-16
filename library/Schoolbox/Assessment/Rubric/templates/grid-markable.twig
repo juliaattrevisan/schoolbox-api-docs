@@ -80,10 +80,11 @@
                                 {% set direction = rubric.descriptorMetadata[crit.id]['direction'] %}
                                 {% set descriptorMin = rubric.descriptorMetadata[crit.id][levelIndex]['min']%}
                                 {% set descriptorMax = rubric.descriptorMetadata[crit.id][levelIndex]['max']%}
+                                {% set selfReflect = (learnerRubric and not latestSelfReflectedFeedback.isSelfGrading) %}
 
                                 {# Just show a text value if the descriptor is not selected #}
                                 {% if descriptor.value is not null and showDescriptorValue and (config.rubric_show_points or not studentView) %}
-                                    <span class="rb-value {% if descriptorMin == descriptorMax or not useMarkRange %}used {% elseif descriptor.selected %}hide{% endif %}">
+                                    <span class="rb-value {% if (descriptorMin == descriptorMax or not useMarkRange) and not selfReflect %}used {% elseif descriptor.selected %}hide{% endif %}">
                                         {% if useMarkRange and descriptorMin != descriptorMax %}
                                             {% if direction == 'asc' %}
                                                 {{- descriptorMin -}} - {{- descriptorMax -}}
@@ -100,7 +101,7 @@
                             {# TODO this select needs a label; technically it should be the one above but that's already in use for the descriptor checkbox #}
                             <select id="rangeDropdown-{{ descriptor.id }}"
                                     class="{% if not descriptor.selected or descriptorMin == descriptorMax or not useMarkRange %} hide{% endif %}
-                                    {% if useMarkRange and descriptorMin != descriptorMax %}used{% endif %}"
+                                    {% if useMarkRange and descriptorMin != descriptorMax and not selfReflect %}used{% endif %}"
                                     {% if not descriptor.selected or not useMarkRange %}disabled{% endif %}>
 
                                 {% set rangeStart = direction == 'asc' ? descriptorMin : descriptorMax %}
