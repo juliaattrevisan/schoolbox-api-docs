@@ -385,9 +385,9 @@ th, td{
 }
 input[type=radio] {
 	+ .block {
-		@extend .block;
+		@extend .button-block;
 	}
-	&:checked + .block{
+	&:checked + .block {
 		background-color: $content-ui-foreground;
 		border: $input-border-width solid $content-ui-foreground;
 		color: $content-ui-selected;
