@@ -8,6 +8,8 @@
  */
 namespace Schoolbox\Comms\News;
 
+use Alaress\Paginator\Paginator;
+use Alaress\Paginator\UrlPaginator;
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
 use InvalidArgumentException;
@@ -492,6 +494,8 @@ class Controller extends Base
      * @param string $slug
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \OutOfRangeException
+     * @throws RouteNotFound
      */
     public function getIndex(?string $slug)
     {
@@ -513,16 +517,25 @@ class Controller extends Base
             }
         }
 
-        /* Get this many articles per page
-         * TODO: Add pagination
+        /* Get this many articles per page and an accompanying paginator
          */
+        $lists = new Lists($this->newsMapper, $this->policyMapper);
+
         $limit = 10;
+        $paginator = $lists->generatePaginator(
+            $this->getRouter()->generate('commsNews.getIndex', ['slug' => $slug]),
+            $firstTopicId,
+            $limit
+        );
 
         /* Once we found the topicId, get a bunch of articles for that topic
          */
-        $outcome = (new Lists($this->newsMapper, $this->policyMapper))->findForTopic($this->getUser(), $firstTopicId, $limit);
+        $outcome = $lists->findForTopic($this->getUser(), $firstTopicId, $limit);
 
+        /* Merge a whole bunch of other settings too
+         */
         $outcome = array_merge($outcome, [
+            'paginator' => $paginator,
             'topics' => $topics,
             'topicAll' => Mapper::TOPIC_ALL,
             'firstTopicId' => $firstTopicId,

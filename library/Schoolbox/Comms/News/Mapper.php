@@ -184,6 +184,31 @@ class Mapper extends \Schoolbox\Mapper
      */
     public function findForTopic(int $topicId, int $limit): \Schoolbox\GenericCollection
     {
+
+        /* TODO: Filter $articlesInTopic vs articles that I can see
+         */
+
+        return $this->findByColumn('id', $this->findArticleIdsForTopic($topicId, $limit), [
+            'order' => [
+                'publish_at' => 'desc',
+                'created_at' => 'desc',
+            ]
+        ]);
+    }
+
+
+    /**
+     * Find just the ids for the articles in a topic
+     * We generally use this for pagination counts where we need a count instead of hydrated things
+     *
+     * Pass null as $limit to disable it; beware the n-n join on articles-topics
+     *
+     * @param int      $topicId
+     * @param int|null $limit
+     * @return array
+     */
+    public function findArticleIdsForTopic(int $topicId, ?int $limit): array
+    {
         $articlesInTopic = [];
 
         /* If $topicId is provided, only get articles for that topic
@@ -237,11 +262,6 @@ class Mapper extends \Schoolbox\Mapper
         /* TODO: Filter $articlesInTopic vs articles that I can see
          */
 
-        return $this->findByColumn('id', $articlesInTopic, [
-            'order' => [
-                'publish_at' => 'desc',
-                'created_at' => 'desc',
-            ]
-        ]);
+        return $articlesInTopic;
     }
 }

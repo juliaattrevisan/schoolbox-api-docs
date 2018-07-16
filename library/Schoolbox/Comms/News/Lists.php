@@ -12,6 +12,8 @@
 
 namespace Schoolbox\Comms\News;
 
+use Alaress\Paginator\Paginator;
+use Alaress\Paginator\UrlPaginator;
 use Schoolbox\User;
 
 class Lists
@@ -101,5 +103,32 @@ class Lists
         }
 
         return [];
+    }
+
+
+    /**
+     * Generate a standard paginator to go with your article list
+     *
+     * @param string   $url
+     * @param int      $firstTopicId
+     * @param int|null $limit
+     * @return UrlPaginator
+     * @throws \OutOfRangeException
+     */
+    public function generatePaginator(string $url, int $firstTopicId, ?int $limit)
+    {
+        $allArticles = $this->newsMapper->findArticleIdsForTopic($firstTopicId, null);
+
+        $paginator = (new Paginator())
+            ->setPageSize($limit)
+            ->setTotal(\count($allArticles));
+
+        $urlPaginator = (new UrlPaginator())
+            ->setPaginator($paginator)
+            ->setUrl($url)
+            ->setParam('p');
+
+
+        return $urlPaginator;
     }
 }
