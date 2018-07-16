@@ -771,6 +771,7 @@ class RubricMapper
         });
 
         // first, persist the row and column headers (criteria and levels, respectively)
+        GroupMapper::getInstance()->save($rubric->getORMGroups());
         CriterionMapper::getInstance()->save($criteria = $rubric->getORMCriteria());
         LevelMapper::getInstance()->save($levels = $rubric->getORMLevels());
 
