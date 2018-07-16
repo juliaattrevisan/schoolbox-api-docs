@@ -11,6 +11,7 @@ use Codeception\TestInterface;
 use Facebook\WebDriver\Remote\RemoteWebElement;
 use Facebook\WebDriver\WebDriverBy;
 use Facebook\WebDriver\WebDriverElement;
+use Schoolbox\Resource\Storage\HashGenerator;
 
 class Acceptance extends \Codeception\Module
 {
@@ -481,13 +482,25 @@ class Acceptance extends \Codeception\Module
      */
     public function seeAttachzoneFile($field, $file): void
     {
-        // TODO implement file comparison
-        // How do I verify a file matches another?
-        // Guess:
-        // * upload file contents to /asyncUpload
-        // * see what hash I get back
-        // * compare hash to what I tested
-        $this->debug('seeAttachzoneFile is not yet implemented');
+        // Extract attached file hashes
+        $actualFileHashes = [];
+        $script           = sprintf(
+            "return jQuery('%s').data('plugin_resourceAttach').dropzone.files.map(function (f) { return f.hash; })",
+            addslashes($field)
+        );
+        foreach ($this->getWebDriverModule()->executeJS($script) as $fileHashes) {
+            // Hashes are in the form "source:hash"
+            [, $actualFileHash] = explode(':', $fileHashes);
+            $actualFileHashes[] = $actualFileHash;
+        }
+
+        // determine hash of $file
+        $hashGenerator    = new HashGenerator();
+        $fp               = fopen($file, 'rb');
+        $expectedFileHash = $hashGenerator->generateHash($fp);
+        fclose($fp);
+
+        $this->assertContains($expectedFileHash, $actualFileHashes);
     }
 
 
