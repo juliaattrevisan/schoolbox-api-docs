@@ -185,6 +185,7 @@ class Mapper extends \Schoolbox\Mapper
             FROM {$this->table}
             WHERE publish_at IS NOT NULL
             AND accepted_at IS NOT NULL
+            AND expires_at > NOW()
             ORDER BY publish_at DESC
         ";
 
@@ -195,6 +196,7 @@ class Mapper extends \Schoolbox\Mapper
                 INNER JOIN comms_news_article_topic cnat ON {$this->table}.id = cnat.article_id 
                 WHERE publish_at IS NOT NULL
                 AND accepted_at IS NOT NULL
+                AND expires_at > NOW()
                 AND cnat.topic_id = :topicId
                 GROUP BY id
                 ORDER BY publish_at DESC
