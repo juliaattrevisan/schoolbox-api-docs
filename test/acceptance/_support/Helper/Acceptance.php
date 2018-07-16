@@ -545,9 +545,9 @@ class Acceptance extends \Codeception\Module
     }
 
     /**
-     * Return webdriver module in a type-safe manner.
+     * Return DB module in a type-safe manner.
      *
-     * @return WebDriver
+     * @return Db
      */
     private function getDbModule(): Db
     {
@@ -580,22 +580,6 @@ class Acceptance extends \Codeception\Module
         $i->amOnPage('/messages');
         $i->dontSee($notif);
     }
-
-    /**
-     * Return DB module in a type-safe manner.
-     *
-     * @return Db
-     */
-    private function getDbModule(): Db
-    {
-        try {
-            return $this->getModule('Db');
-        } catch (ModuleException $e) {
-            // Wasn't found: return null, let TypeError handle it
-        }
-        return null;
-    }
-
 
 //    private function findField(WebDriver $webDriver, $field): ?WebDriverElement
 //    {
