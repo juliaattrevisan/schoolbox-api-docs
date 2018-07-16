@@ -279,6 +279,11 @@ class RubricContext
             $endValue = $descriptors[$critId][$lastLevel] ? $descriptors[$critId][$lastLevel]['value'] : null;
             $direction = 'asc';
 
+            // If the first or last descriptor doesn't have points, skip this iteration
+            if ($startValue === null || $endValue === null) {
+                continue;
+            }
+
             if ($startValue > $endValue) {
                 $direction = 'desc';
             }
@@ -307,10 +312,17 @@ class RubricContext
                         } else {
                             $nextDescriptorMax = $endValue;
                         }
+
+                        // TODO what do we do if the next descriptor has no points?
                     }
 
                     // The cell's stored value will always be its maximum regardless of order
                     $currentDescriptorMax = $levelDescriptors[$i]['value'];
+
+                    // Skip this iteration if this descriptor
+                    if ($currentDescriptorMax === null) {
+                        continue;
+                    }
 
                     /* Assume ascending order by default
                      * - If the value for this descriptor is the same as the previous cell, we're either on the first cell,
