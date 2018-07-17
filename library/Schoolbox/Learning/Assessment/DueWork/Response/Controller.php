@@ -174,6 +174,7 @@ class Controller extends Base
             'plagscanEnabled' => PlagscanMapper::getInstance()->isEnabled($this->getUser()),
             'interactionLocked' => $isInteractionLocked,
             'reviewRoute'       => $reviewRoute,
+            'studentView'       => true,
         ];
 
         /* Rubrics data
@@ -194,12 +195,17 @@ class Controller extends Base
             $data = array_merge($data, $rubricData);
         }
 
+        $data['selfReflect'] = false;
+        $data['selfAssess'] = false;
+
         /* Figure out who's actually here and what screen to show
          */
         if ($selfAssessedWithResponse) {
+            $data['selfAssess'] = true;
             $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/inlineGrading/selfAssessment.twig', $data));
         }
         elseif ($selfReflectedWithResponse) {
+            $data['selfReflect'] = true;
             $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/inlineGrading/selfReflection.twig', $data));
         }
     }
