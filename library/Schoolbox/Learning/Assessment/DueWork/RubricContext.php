@@ -278,16 +278,24 @@ class RubricContext
 
         $metadata = [];
 
+        $startIndex = 0;
+        $endIndex = \count($levelIds);
+
         foreach($descriptors as $critId => $levelDescriptors) {
-            $firstLevel = $levelIds[0];
-            $lastLevel = $levelIds[\count($levelIds) - 1];
+            $firstLevel = $levelIds[$startIndex];
+            $lastLevel = $levelIds[$endIndex - 1];
 
             $startValue = $descriptors[$critId][$firstLevel] ? $descriptors[$critId][$firstLevel]['value'] : null;
             $endValue = $descriptors[$critId][$lastLevel] ? $descriptors[$critId][$lastLevel]['value'] : null;
             $direction = 'asc';
 
-            // If the first or last descriptor doesn't have points, skip this iteration
-            if ($startValue === null || $endValue === null) {
+            // If the first or last descriptor doesn't have points, skip this iteration and adjust our idea of where the values start
+            if ($startValue === null) {
+                $startIndex++;
+                continue;
+            }
+            if ($endValue === null) {
+                $endIndex--;
                 continue;
             }
 
