@@ -118,6 +118,10 @@ table.rb {
             transition: all 360ms cubic-bezier(0.2, 1, 0, 1);
             font-weight: normal;
         }
+        // Fix textarea width getting pushed over cells by checkbox
+        .rb-criterion {
+            width: calc(100% - 2rem);
+        }
     }
     .hide-h {
         padding-left: 0;
@@ -179,7 +183,7 @@ table.rb {
 }
 .rb-editable {
     &:before {
-        top: 13px !important;
+        top: 14px !important;
     }
     &:after {
         top: 15px !important;
