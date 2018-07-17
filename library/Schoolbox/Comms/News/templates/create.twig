@@ -97,13 +97,13 @@
                             <div v-show="pageShow[1]">
                                 <ul class="breadcrumb" v-show="writeOnly">
                                     <li><a href="#" @click.prevent="showPage(0)">Browse Audience</a></li>
-                                    <li class="active"><a>${ audienceSelectBreadcrumb }</a></li>
+                                    <li class="active"><a>${ selectedAudienceOption.namePlural }</a></li>
                                 </ul>
 
-                                <p class="meta">Select ${ audienceSelectBreadcrumb } below, then choose whether you would like to include the users themselves, the parents of the users, or both.</p>
+                                <p class="meta">Select ${ selectedAudienceOption.namePlural } below, then choose whether you would like to include the users themselves, the parents of the users, or both.</p>
 
                                 <div class="empty-state" v-show="showEmptyState">
-                                    <p>No ${ audienceSelectBreadcrumb } found.</p>
+                                    <p>No ${ selectedAudienceOption.namePlural } found.</p>
                                 </div>
 
                                 <fieldset class="checklist checklist-container" v-show="!showEmptyState">
@@ -116,7 +116,7 @@
 
                                 <fieldset class="checklist border-none" v-show="writeOnly">
                                     <input type="checkbox" id="audience-select-users" v-model="includeUsers" />
-                                    <label for="audience-select-users">${ audienceSelectCheckbox }</label>
+                                    <label for="audience-select-users">${ selectedAudienceOption.checkboxLabel }</label>
                                     {% if user.role.staff %}
                                     <input type="checkbox" id="audience-select-parents" v-model="includeParents" />
                                     <label for="audience-select-parents">Parents of students</label>
@@ -183,7 +183,7 @@
 <script src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
 <script src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
 <script>
-    "use strict";
+    'use strict';
 
     $(function () {
         {# CKEditors #}
@@ -232,7 +232,7 @@
         el: '#audience-select-container',
         delimiters: ['${', '}'],
         data: {
-            // Modal options
+            // The set of options on the initial modal screen
             audienceOptions: {
                 {% if user.role.staff %}
                 'campus': {
@@ -240,7 +240,7 @@
                     name: 'Campus',
                     namePlural: 'Campuses',
                     icon: 'location',
-                    checkbox: 'Students in campus',
+                    checkboxLabel: 'Students in campus',
                     ajax: '/comms/news/audiencebrowser/campuses'
                 },
                 'role': {
@@ -248,7 +248,7 @@
                     name: 'Role',
                     namePlural: 'Roles',
                     icon: 'staff-students',
-                    checkbox: 'Users in role',
+                    checkboxLabel: 'Users in role',
                     ajax: '/comms/news/audiencebrowser/roles'
                 },
                 'house': {
@@ -256,7 +256,7 @@
                     name: 'House',
                     namePlural: 'Houses',
                     icon: 'home',
-                    checkbox: 'House members',
+                    checkboxLabel: 'House members',
                     ajax: '/comms/news/audiencebrowser/houses'
                 },
                 'year_level': {
@@ -264,7 +264,7 @@
                     name: 'Year Level',
                     namePlural: 'Year Levels',
                     icon: 'teacher',
-                    checkbox: 'Students in year level/s',
+                    checkboxLabel: 'Students in year level/s',
                     ajax: '/comms/news/audiencebrowser/yearlevels'
                 },
                 {% endif %}
@@ -273,7 +273,7 @@
                     name: 'Class/Group',
                     namePlural: 'Classes & Groups',
                     icon: 'group',
-                    checkbox: 'Class/group members',
+                    checkboxLabel: 'Class/group members',
                     ajax: '/comms/news/audiencebrowser/folders'
                 },
                 {% if user.role.staff %}
@@ -282,7 +282,7 @@
                     name: 'Pastoral Group',
                     namePlural: 'Pastoral Groups',
                     icon: 'pastoral',
-                    checkbox: 'Group members',
+                    checkboxLabel: 'Group members',
                     ajax: '/comms/news/audiencebrowser/pastoralgroups'
                 }
                 {% endif %}
@@ -294,24 +294,36 @@
                 false
             ],
 
-            // Page 2 specifics
-            audienceSelectBreadcrumb: '',
-            audienceSelectCheckbox: '',
+            // The option selected by the user from the initial modal screen
+            selectedAudienceOption: {},
+
+            // The list of options populated by ajax after the user selects an initial option
             audienceListItems: [],
+
+            // The checked state of the above list items
+            audienceListChecked: [],
+
+            // Ajax responses of the above are stored in here, so that we don't do multiple ajax calls for the same thing
             cachedOptions: [],
 
+            // Preloader and empty state showing/hiding for the 2nd screen
             showLoader: true,
             showEmptyState: false,
 
-            audienceListChecked: [],
-
+            // The checked state of the three checkboxes at the bottom of the 2nd modal screen
             includeUsers: true,
             includeParents: false,
             includeTeachers: false,
 
+            // Whether the user should see the write version of the modal or not.
+            // Read users will not see the write options even if this is set to true (because of twig conditionals), this just makes the experience easier
+            // for read users
             writeOnly: {{ (user.role.staff) ? 'true' : 'false' }}
         },
         methods: {
+            /**
+             * Opening the 'browse...' modal
+             */
             openBrowseModal: function () {
                 // Reset everythang
                 this.showPage(0);
@@ -321,6 +333,10 @@
                 $('#audience-browse').foundation('reveal', 'open');
             },
 
+            /**
+             * Opening the 'browse...' modal as a read user
+             * You get sent straight to the folder select option
+             */
             openBrowseModalRead: function () {
                 this.resetModal();
                 this.changePage(this.audienceOptions.folder);
@@ -329,19 +345,21 @@
                 $('#audience-browse').foundation('reveal', 'open');
             },
 
-            // Selecting an initial page
+            /**
+             * Selecting one of the initial options
+             * @param audienceOption
+             */
             changePage: function (audienceOption) {
                 var self = this;
 
-                // Reset errtang
+                // Reset everything
                 self.resetModal();
 
                 // Show the page
                 self.showPage(1);
 
-                // Update the breadcrumb and checkbox text
-                self.audienceSelectBreadcrumb = audienceOption.namePlural;
-                self.audienceSelectCheckbox = audienceOption.checkbox;
+                // Update the selected option
+                self.selectedAudienceOption = audienceOption;
 
                 // Try for cached list
                 if (self.cachedOptions[audienceOption.id] !== undefined) {
@@ -371,6 +389,10 @@
                 }
             },
 
+            /**
+             * Show the list of items, or show the empty state
+             * @param data
+             */
             populateAudienceList: function (data) {
                 // Hide the loader
                 this.showLoader = false;
@@ -384,7 +406,9 @@
                 }
             },
 
-            // Submitting the modal form
+            /**
+             * Submitting the modal form
+             */
             addAudience: function () {
                 var self = this;
 
@@ -426,26 +450,33 @@
                 $('#audience-browse').foundation('reveal', 'close');
             },
 
-            // Show the page specified, hiding the other
+            /**
+             * Show the page specified, hiding the other
+             * @param page
+             */
             showPage: function (page) {
                 this.$set(this.pageShow, 0, false);
                 this.$set(this.pageShow, 1, false);
                 this.$set(this.pageShow, page, true);
             },
 
-            // Reset a few things
+            /**
+             * Reset the second modal section back to a default state
+             */
             resetModal: function () {
                 this.audienceListItems = [];
                 this.audienceListChecked = [];
-                this.showLoader = true;
                 this.includeUsers = true;
                 this.includeParents = false;
                 this.includeTeachers = false;
+                this.showLoader = true;
                 this.showEmptyState = false;
             }
         },
         computed: {
-            // Disable the modal submit button until each of the checklists has something checked
+            /**
+             * Disable the modal submit button until each of the checklists has something checked
+             */
             submitEnable: function () {
                 return !!(this.audienceListChecked.length && (this.includeUsers || this.includeParents || this.includeTeachers));
             }
