@@ -289,6 +289,7 @@ class RubricContext
             $endValue = $descriptors[$critId][$lastLevel] ? $descriptors[$critId][$lastLevel]['value'] : null;
             $direction = 'asc';
 
+            // TODO this is working for the second group but not the first...
             // If the first or last descriptor doesn't have points, skip this iteration and adjust our idea of where the values start
             if ($startValue === null) {
                 $startIndex++;
