@@ -40,6 +40,7 @@ class Module extends BaseModule
      */
     protected function registerRoutes(): void
     {
+        /* Anyone can see the form
         /* For viewing articles you just need to be logged in and controller,
          * I suppose, deals with whether you are in the audience
          */
@@ -50,21 +51,13 @@ class Module extends BaseModule
         /* Any staff can see the form
          */
         $getPerms = new Rule\All(
-            new Rule\IsLoggedIn(),
-            new Rule\Any(
-                new Rule\IsSuperuser(),
-                new Rule\HasRole(Role::STAFF)
-            )
+            new Rule\IsLoggedIn()
         );
 
-        /* Any staff can receive data from the form
+        /* Anyone can receive data from the form
          */
         $postPerms = new Rule\All(
-            new Rule\IsLoggedIn(),
-            new Rule\Any(
-                new Rule\IsSuperuser(),
-                new Rule\HasRole(Role::STAFF)
-            )
+            new Rule\IsLoggedIn()
         );
 
         $preloadArticle = function ($params) {
