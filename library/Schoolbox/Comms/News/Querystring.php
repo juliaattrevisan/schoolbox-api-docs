@@ -22,11 +22,6 @@ use Schoolbox\News\TopicMapper;
 
 class Querystring
 {
-    /**
-     * Number of news articles per page
-     * TODO: This is a config var
-     */
-    private const ARTICLES_PER_PAGE = 10;
 
     /**
      * Querystring param for the Compact Mode option
@@ -64,16 +59,15 @@ class Querystring
     /**
      * Querystring constructor.
      *
-     * @param $data
+     * @param int $articlesPerPage
+     * @param     $data
      */
-    public function __construct($data)
+    public function __construct(int $articlesPerPage, $data)
     {
         $compactMode = $data[self::COMPACT_MODE_PARAM];
         $slug = $data[self::TOPIC_SLUG_PARAM];
         $pageNum = $this->determinePageNum($data[self::PAGE_NUMBER_PARAM]);
-
-        // TODO: ARTICLES_PER_PAGE is a config option that users can't control on this screen
-        $limit = $this->determineLimit($data[self::LIMIT_PARAM]) ?: self::ARTICLES_PER_PAGE;
+        $limit = $this->determineLimit($data[self::LIMIT_PARAM]) ?: $articlesPerPage;
         $showPaginator = $data[self::SHOW_PAGINATOR_PARAM];
 
         $this->querystring = [

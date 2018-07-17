@@ -462,7 +462,7 @@ class Controller extends Base
     public function getListByTopic()
     {
         if ($this->getRequest()->isXhr()) {
-            $params = new Querystring($this->getRequest()->query);
+            $params = new Querystring($this->getConfigLoader()->get('search_type_limit'), $this->getRequest()->query);
             $topics = $this->topicMapper->findAll();
 
             /* The requested data set to load, given the params provided
@@ -493,7 +493,7 @@ class Controller extends Base
          */
         $showPaginator = true;
 
-        $params = new Querystring($this->getRequest()->query);
+        $params = new Querystring($this->getConfigLoader()->get('search_type_limit'), $this->getRequest()->query);
         $topics = $this->topicMapper->findAll();
 
         /* The initial data set to load, given the params provided
