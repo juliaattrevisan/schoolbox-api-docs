@@ -23,12 +23,12 @@
     .legend {
         .indicator {
             position: relative;
-            top: 14px;
-            right: 8px;
+            top: .75rem;
+            right: .5rem;
         }
         p {
             display: inline-block;
-            margin-right: 28px;
+            margin-right: 2rem;
         }
     }
 
@@ -86,10 +86,10 @@
             background: $submit-button-bg-color;
             color: $submit-button-color;
             text-transform: uppercase;
-            font-size: 12px;
+            //font-size: 12px;
             text-align: center;
-            padding-top: 5px;
-            padding-bottom: 5px;
+            padding-top: .25rem;
+            padding-bottom: .25rem;
             border-right: 1px solid #eee;
         }
         .course-headers th.transparent {
