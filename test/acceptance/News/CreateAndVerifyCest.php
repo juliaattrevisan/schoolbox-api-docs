@@ -52,16 +52,17 @@ class CreateAndVerifyCest
 
         // Fill in form values
         // TODO these should be randomizable
-        $headline = "Random Headline";
-        $article  = "<h2>Random Article</h2> <p>Random article text</p>";
-        $blurb    = "<p>Blurb</p>";
-        $image    = __DIR__ . '/upload/test.jpg';
-        $topic    = 'General';
-        $roles    = ['Teachers'];
-        $campi    = ['Senior', 'Junior'];
-        $users    = ['David Rhodes', 'Rachel Rhodes'];
-        $publish  = \Alaress_Date_Format::now()->addHours(-1)->setTime(0, 0, 0);
-        $expiry   = \Alaress_Date_Format::now()->addDays(7)->setTime(0, 0, 0);
+        $headline  = "Random Headline";
+        $article   = "<h2>Random Article</h2> <p>Random article text</p>";
+        $blurb     = "<p>Blurb</p>";
+        $image     = __DIR__ . '/upload/test.jpg';
+        $topic     = 'General';
+        $topicSlug = (new \Url($topic,''))->getSlug();
+        $roles     = ['Teachers'];
+        $campi     = ['Senior', 'Junior'];
+        $users     = ['David Rhodes', 'Rachel Rhodes'];
+        $publish   = \Alaress_Date_Format::now()->addHours(-1)->setTime(0, 0, 0);
+        $expiry    = \Alaress_Date_Format::now()->addDays(7)->setTime(0, 0, 0);
         $formPage
             ->fillHeadline($headline)
             ->fillArticle($article)
@@ -94,7 +95,7 @@ class CreateAndVerifyCest
 
         // Verify I see it in the topic I put it in
         // (URL has invisible dependency on config; all I want is a slug)
-        $i->amOnPage($indexPage->generateRoute((new \Url($topic,''))->getSlug()));
+        $i->amOnPage($indexPage->generateRoute($topicSlug));
         $indexPage->seeHeadline($headline, $position);
 
         // View the article I'm searched for
@@ -118,5 +119,52 @@ class CreateAndVerifyCest
             ->seeUsers($users)
             ->seePublishDate($publish)
             ->seeExpiryDate($expiry);
+
+        // Verify that user Scott Berryhill cannot see it
+        $scott = $i->haveFriend('scott');
+        $scott->does(function (AcceptanceTester $i) use ($headline, $topicSlug) {
+            $i->login('sberryhill', 'password');
+            $indexPage = new Index($i);
+
+            // Go to all page
+            $i->amOnPage($indexPage->generateRoute(''));
+            $position = 1;
+            $indexPage->dontSeeHeadline($headline, $position);
+
+            $i->amOnPage($indexPage->generateRoute($topicSlug));
+            $indexPage->dontSeeHeadline($headline, $position);
+        });
+
+        // Verify that user Celia Glenn can see it
+        $celia = $i->haveFriend('celia');
+        $celia->does(function (AcceptanceTester $i) use ($headline, $topicSlug) {
+            $i->login('cglenn', 'password');
+            $indexPage = new Index($i);
+
+            // Go to all page
+            $i->amOnPage($indexPage->generateRoute(''));
+            $position = 1;
+            $indexPage->seeHeadline($headline, $position);
+
+            $i->amOnPage($indexPage->generateRoute($topicSlug));
+            $indexPage->seeHeadline($headline, $position);
+        });
+
+        // Make it unpublished
+        $formPage->fillPublishDate(\Alaress_Date_Format::now()->addDays(2)->setTime(0, 0, 0));
+
+        // Verify that user Celia Glenn can no longer see it
+        $celia->does(function (AcceptanceTester $i) use ($headline, $topicSlug) {
+            $i->login('cglenn', 'password');
+            $indexPage = new Index($i);
+
+            // Go to all page
+            $i->amOnPage($indexPage->generateRoute(''));
+            $position = 1;
+            $indexPage->dontSeeHeadline($headline, $position);
+
+            $i->amOnPage($indexPage->generateRoute($topicSlug));
+            $indexPage->dontSeeHeadline($headline, $position);
+        });
     }
 }
