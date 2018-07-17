@@ -75,8 +75,8 @@
                             <label>Audience</label>
                             <p class="meta">Target your article to a specific audience. Use the input box below to search, or use the 'Browse' button to select from a list of possible options.</p>
                             <div class="input-group">
-                                <input type="text" id="audience-search" placeholder="Search for classes, groups, year levels, roles, individual users&hellip;" />
-                                <button class="button icon-drag-drop" @click.prevent="openBrowseModal">Browse&hellip;</button>
+                                <input type="text" id="audience-search" placeholder="{{ (user.role.staff) ? 'Search for classes, groups, year levels, roles, individual users&hellip;' : 'Search for classes or groups&hellip;' }}" />
+                                <button class="button icon-drag-drop" @click.prevent="{{ (user.role.staff) ? 'openBrowseModal' : 'openBrowseModalRead' }}">Browse&hellip;</button>
                             </div>
                         </div>
 
@@ -95,7 +95,7 @@
                             </div>
 
                             <div v-show="pageShow[1]">
-                                <ul class="breadcrumb">
+                                <ul class="breadcrumb" v-show="writeOnly">
                                     <li><a href="#" @click.prevent="showPage(0)">Browse Audience</a></li>
                                     <li class="active"><a>${ audienceSelectBreadcrumb }</a></li>
                                 </ul>
@@ -114,13 +114,15 @@
                                     </template>
                                 </fieldset>
 
-                                <fieldset class="checklist border-none">
+                                <fieldset class="checklist border-none" v-show="writeOnly">
                                     <input type="checkbox" id="audience-select-users" v-model="includeUsers" />
                                     <label for="audience-select-users">${ audienceSelectCheckbox }</label>
+                                    {% if user.role.staff %}
                                     <input type="checkbox" id="audience-select-parents" v-model="includeParents" />
                                     <label for="audience-select-parents">Parents of students</label>
                                     <input type="checkbox" id="audience-select-teachers" v-model="includeTeachers" />
                                     <label for="audience-select-teachers">Teachers of students</label>
+                                    {% endif %}
                                 </fieldset>
 
                                 <button class="button submit" @click.prevent="addAudience" :disabled="!submitEnable">Add</button>
@@ -231,8 +233,9 @@
         delimiters: ['${', '}'],
         data: {
             // Modal options
-            audienceOptions: [
-                {
+            audienceOptions: {
+                {% if user.role.staff %}
+                'campus': {
                     id: 'campus',
                     name: 'Campus',
                     namePlural: 'Campuses',
@@ -240,7 +243,7 @@
                     checkbox: 'Students in campus',
                     ajax: '/comms/news/audiencebrowser/campuses'
                 },
-                {
+                'role': {
                     id: 'role',
                     name: 'Role',
                     namePlural: 'Roles',
@@ -248,7 +251,7 @@
                     checkbox: 'Users in role',
                     ajax: '/comms/news/audiencebrowser/roles'
                 },
-                {
+                'house': {
                     id: 'house',
                     name: 'House',
                     namePlural: 'Houses',
@@ -256,15 +259,7 @@
                     checkbox: 'House members',
                     ajax: '/comms/news/audiencebrowser/houses'
                 },
-                {
-                    id: 'folder',
-                    name: 'Class/Group',
-                    namePlural: 'Classes & Groups',
-                    icon: 'group',
-                    checkbox: 'Class/group members',
-                    ajax: '/comms/news/audiencebrowser/folders'
-                },
-                {
+                'year_level': {
                     id: 'year_level',
                     name: 'Year Level',
                     namePlural: 'Year Levels',
@@ -272,7 +267,17 @@
                     checkbox: 'Students in year level/s',
                     ajax: '/comms/news/audiencebrowser/yearlevels'
                 },
-                {
+                {% endif %}
+                'folder': {
+                    id: 'folder',
+                    name: 'Class/Group',
+                    namePlural: 'Classes & Groups',
+                    icon: 'group',
+                    checkbox: 'Class/group members',
+                    ajax: '/comms/news/audiencebrowser/folders'
+                },
+                {% if user.role.staff %}
+                'pastoral_group': {
                     id: 'pastoral_group',
                     name: 'Pastoral Group',
                     namePlural: 'Pastoral Groups',
@@ -280,7 +285,8 @@
                     checkbox: 'Group members',
                     ajax: '/comms/news/audiencebrowser/pastoralgroups'
                 }
-            ],
+                {% endif %}
+            },
 
             // Modal sections showing and hiding
             pageShow: [
@@ -298,15 +304,26 @@
             showEmptyState: false,
 
             audienceListChecked: [],
+
             includeUsers: true,
             includeParents: false,
-            includeTeachers: false
+            includeTeachers: false,
+
+            writeOnly: {{ (user.role.staff) ? 'true' : 'false' }}
         },
         methods: {
             openBrowseModal: function () {
                 // Reset everythang
                 this.showPage(0);
                 this.resetModal();
+
+                // Open the modal
+                $('#audience-browse').foundation('reveal', 'open');
+            },
+
+            openBrowseModalRead: function () {
+                this.resetModal();
+                this.changePage(this.audienceOptions.folder);
 
                 // Open the modal
                 $('#audience-browse').foundation('reveal', 'open');
