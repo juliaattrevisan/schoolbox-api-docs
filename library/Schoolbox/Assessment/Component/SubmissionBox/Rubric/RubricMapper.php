@@ -282,18 +282,16 @@ class RubricMapper
      * @var array           $return            [0]                 Groups
      * @var array           $return            [0][]               A single Criteria-Group
      * @var string          $return            [0][]['name']       Name of the Criteria-Group
+     * @var string          $return            [0][]['maxValue']   Maximum points value of the Criteria-Group
      * @var array           $return            [1]                 Criteria
      * @var array           $return            [1][]               A single Criterion
-     * @var int             $return            [1][]['groupId']    Arbitrary GroupId (not stored in DB, just used to link to a Criteria-Group)
-     * @var bool            $return            [1][]['on']         Whether this criteria is selected to be used in the $box
+     * @var int             $return            [1][]['groupId']    The Criterion's Group's Id
+     * @var bool            $return            [1][]['on']         Whether this criterion is selected in the $box
      * @var string          $return            [1][]['name']       Name of Criterion
      * @var bool            $return            [1][]['readonly']   Whether user should be prevented from changing name
      */
     protected function findCriteria(SubmissionBox $box, $getParentCriteria)
     {
-        /** @var array $groupIdMap - indexed by criterion-group name */
-        $groupIdMap = [];
-
         /** @var array $groups - indexed by groupId */
         $groups = [];
 
@@ -304,30 +302,31 @@ class RubricMapper
 
         while ($r = $criteriaStatement->fetch(PDO::FETCH_ASSOC)) {
 
-            $groupName = $r['grouping'];
-            $selected  = $r['selected'] > 0;
+            $groupId     = $r['group_id'];
+            $selected    = $r['selected'] > 0;
+            $criterionId = $r['crit_id'];
 
-            // First time we've encountered this Group ?
-            if (empty($groupIdMap[$groupName])) {
-                $groupId = $r['group_id'];
-
-                $groupIdMap[$groupName] = $groupId;
+            // First time we've encountered this group?
+            // Add it to the list of groups to return
+            if (empty($groups[$groupId])) {
                 $maxValue               = isset($r['max_value']) ? (float)$r['max_value'] : null;
                 $groups[$groupId]       = [
-                    'name'     => $groupName,
+                    'name'     => $r['grouping'],
                     'maxValue' => $selected ? $maxValue : null,
                 ];
             }
 
-            // check for usage
-            $usedElsewhere = ($r['usages'] - $r['selected']) > 0;
-
-            $criteria[$r['crit_id']] = [
-                'groupId'  => $groupIdMap[$groupName],
-                'on'       => $selected,
-                'name'     => $r['name'],
-                'readonly' => $usedElsewhere,
-            ];
+            // First time we've encountered this criterion?
+            // Add it to the list of criteria to return
+            if (empty($criteria[$criterionId])) {
+                $usedElsewhere          = ($r['usages'] - $r['selected']) > 0;
+                $criteria[$criterionId] = [
+                    'groupId'  => $groupId,
+                    'on'       => $selected,
+                    'name'     => $r['name'],
+                    'readonly' => $usedElsewhere,
+                ];
+            }
         }
 
         // umm... I have *never* had to do this before... how does the while() loop break if not EOF??
