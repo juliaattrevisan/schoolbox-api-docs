@@ -72,12 +72,12 @@
 
         // Various rows and headers
         .course-row {
-            background: #bcd;
-            color: #333;
+            background: $content-ui-background;
+            color: $body-font-color;
         }
         .class-row {
-            background: #a0d3e8;
-            color: #333;
+            background: $content-ui-selected;
+            color: $body-font-color;
         }
         .class-row-heading {
             font-weight: 700;
@@ -104,10 +104,11 @@
 
         // Not applicable: the student didn't attempt this assessment
         .na {
-            background-color: $input-disabled-bg;
+            // In develop, $input-disabled-bg is appropriate:
+            background-color: $vapor;
         }
         .has-tip.meta {
-            color: #9a9a9a;
+            color: $aluminum;
             font-weight: normal;
         }
     }
