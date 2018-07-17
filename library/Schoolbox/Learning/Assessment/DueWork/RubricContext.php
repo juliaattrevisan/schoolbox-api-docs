@@ -263,6 +263,14 @@ class RubricContext
         return $context;
     }
 
+    /**
+     * Generates an array of metadata about the values of descriptors in a rubric
+     *
+     * @param array $rubric     Rubric data structure return by Rubric::toContext()
+     * @return array            Array indexed by criteria and level IDs, containing
+     *                          - sort order for criteria
+     *                          - max and min value for each level (descriptor) in the criteria
+     */
     private function generateDescriptorMetadata(array $rubric) : array
     {
         $descriptors = $rubric['descriptors'];
