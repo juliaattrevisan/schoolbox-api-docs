@@ -76,9 +76,8 @@ $(function() {
                     </div>
                 </div>
                 <div class="small-12 column">
-                    <!-- BEGIN terms --><!--
-                    <p>Use of {SITE_TITLE} is governed by School policy which is deemed to be accepted at login time. A summary of the policy can be found <a href="/policy.php">here</a>. Staff and Students are expected to keep themselves informed of the full policy requirements which are available in {SITE_TITLE}.</p>
-                    --><!-- END terms -->
+                    <!-- BEGIN terms -->
+                    <!-- END terms -->
                     <p id="error-msg" class="alert-box alert">{ERROR}</p>
                 </div>
                 <div class="small-12 column">
@@ -103,38 +102,19 @@ $(function() {
                     </label>
                 </div>
                 <!-- END login_terms -->
-                <div class="small-7 medium-12 column">
+                <div class="small-12 column">
                     <!-- BEGIN remember_me -->
                     <input id="rememberme" type="checkbox" name="rememberme" value="1" />
                     <label for="rememberme">Remember me</label>
                     <!-- END remember_me -->
                 </div>
-                <div class="small-5 medium-12 column">
+                <div class="small-12 column">
                     <input type="submit" name="Submit" value="Sign in" alt="Sign in" />
                     <p>or</p>
                     <p><a href="/account/anonymous.php?{GET_PARAMS}" class="guest button expand">Sign in as Guest</a></p>
                 </div>
-                <!-- BEGIN terms_acceptance --><!--
-                <div class="small-12 column">
-                    <input required class="required" id="tandc" name="tandc" type="checkbox" title="You must agree to the Terms and Conditions before proceeding" />
-                    <label for="tandc" class="tandc">
-                        I agree to be legally bound by the <a href="/policy.php"> Terms and Conditions</a> of use for this website.
-                    </label>
-                </div>
-                <script type="text/javascript">
-                    $(function () {
-                        $('#login').alaressValidate({
-                            errorPlacement: function(error, element) {
-                                if (element.attr("name") == "tandc") {
-                                    error.appendTo("#error-msg");
-                                } else {
-                                    error.appendTo(element);
-                                }
-                            }
-                        });
-                    });
-                </script>
-                --><!-- END terms_acceptance -->
+                <!-- BEGIN terms_acceptance -->
+                <!-- END terms_acceptance -->
             </div>
             <div class="row collapse">
                 <div class="small-12 column">
@@ -155,6 +135,7 @@ $(function() {
             <!-- BEGIN feedback_link -->
             <li><a href="{FEEDBACK_URL}">{FEEDBACK_TEXT}</a></li>
             <!-- END feedback_link -->
+            <li><a href="/saml/index.php?{GET_PARAMS}">Alaress staff sign in</a></li>
         </ul>
     </div>
 </div>
