@@ -58,7 +58,7 @@
                         {% set inputId %}{{ formField }}[{{ crit.id }}][{{ level.id }}]{% endset %}
 
                         {# Self-Assessment #}
-                        {% set learnerSelected = learnerRubric.descriptors[crit.id][levelIndex]['selected'] %}
+                        {% set learnerSelected = learnerRubric.descriptors[crit.id][levelIndex].selected %}
                         <td>
                             <input id="{{ inputId }}"
                                    name="{{ formField }}[descriptors][{{ descriptor.id }}]"
@@ -76,11 +76,11 @@
                                     {{- descriptor.text|nl2br -}}
                                 </span>
 
-                                {% set direction = rubric.descriptorMetadata[crit.id]['direction'] %}
-                                {% set descriptorMin = rubric.descriptorMetadata[crit.id][levelIndex]['min']%}
-                                {% set descriptorMax = rubric.descriptorMetadata[crit.id][levelIndex]['max']%}
+                                {% set direction = rubric.descriptorMetadata[crit.id].direction %}
+                                {% set descriptorMin = rubric.descriptorMetadata[crit.id][levelIndex].min %}
+                                {% set descriptorMax = rubric.descriptorMetadata[crit.id][levelIndex].max %}
                                 {% set hidePoints = not config.rubric_show_points or (studentView and selfReflect) %}
-                                
+
                                 {# Just show a text value if the descriptor is not selected #}
                                 {% if descriptor.value is not null and showDescriptorValue and not hidePoints %}
                                     <span class="rb-value {% if descriptorMin == descriptorMax or not useMarkRange %}used {% elseif descriptor.selected %}hide{% endif %}">
