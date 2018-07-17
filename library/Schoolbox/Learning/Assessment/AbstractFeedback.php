@@ -119,7 +119,7 @@ abstract class AbstractFeedback implements IFeedback
      */
 
     /**
-     * @return float
+     * @return string
      */
     public function getHumanReadableMark()
     {
@@ -145,7 +145,7 @@ abstract class AbstractFeedback implements IFeedback
     }
 
     /**
-     * @param mixed $normalisedMark
+     * @param null|float $normalisedMark
      * @return $this
      */
     public function setNormalisedMark($normalisedMark)

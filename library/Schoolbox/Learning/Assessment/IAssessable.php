@@ -41,6 +41,16 @@ interface IAssessable extends ISoftDeletable
 
 
     /**
+     * Returns whether this IAssessable is a base assessable.
+     *
+     * (ie will return false if inside a project)
+     *
+     * @return bool
+     */
+    public function isBaseAssessable(): bool;
+
+
+    /**
      * Creates a clone of this assessment.
      *
      * This clone must be able to be persisted to create a copy of this assessment,
@@ -220,12 +230,10 @@ interface IAssessable extends ISoftDeletable
     /**
      * Return the name of the "type" of Assessable this is
      *
-     * For Due Works, it'll be "Essay, Homework, etc"
-     * For Quiz, it'll just be "Quiz"
-     * For Task, it'll just be "Task"
      * For Project, it'll just be "Project"
+     * For other assessment types, it will be "Essay, Homework, etc"
      *
-     * @return mixed
+     * @return string
      */
     public function getTypeName();
 
@@ -375,6 +383,21 @@ interface IAssessable extends ISoftDeletable
      * @return bool
      */
     public function hasPublishedFeedback(Participant $participant);
+
+
+    /**
+     * Returns whether the participant has any pending draft authoritative feedback.
+     *
+     * Note that this is not always simply ($anyMark === $publishedOnlyMark) as they may be the same.
+     *
+     * The implication of this is that the participant's mark may change if the draft is published.
+     *
+     * @param Participant $participant
+     * @return bool
+     * @throws DomainException If participant's assessment is not this assessment
+     */
+    public function hasPendingDraftAuthoritativeFeedback(Participant $participant): bool;
+
 
     /**
      * Does this student have a mark for the assessment.

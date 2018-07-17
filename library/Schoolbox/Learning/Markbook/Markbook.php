@@ -20,6 +20,7 @@ use Schoolbox\Learning\Assessment\Summator\StandardDeviation;
 use Schoolbox\Learning\Assessment\Summator\WeightedAverage;
 use Schoolbox\Learning\MarkScheme\LetterGrade;
 use Schoolbox\Learning\MarkScheme\Percentage;
+use Schoolbox\SortUsersByName;
 use Schoolbox\User;
 
 /**
@@ -149,16 +150,7 @@ class Markbook
                 $participants[$student->getId()] = $student;
             }
         }
-        $participants->sortByCallback(
-            function (User $a, User $b) {
-                $cmp = strcasecmp($a->getLastname(), $b->getLastname());
-                if ($cmp === 0) {
-                    $cmp = strcasecmp($a->getFirstname(), $b->getFirstname());
-                }
-                return $cmp;
-            },
-            true
-        );
+        $participants->sortByCallback((new SortUsersByName())->getCallable(), true);
         return $participants;
     }
 

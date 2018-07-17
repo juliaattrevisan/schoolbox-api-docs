@@ -27,7 +27,6 @@ use \Schoolbox\Resource\Storage\Model as StorageFile;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\Assessment\Task\Feedback\Model as TaskFeedback;
 use Schoolbox\Learning\Assessment\Task\Response\Model as TaskResponse;
-use UnexpectedValueException;
 
 /**
  * When a student self-assesses a task, it will generate an IResponse only, with a mark of 'incomplete' or 'self-assessed'.
@@ -287,6 +286,17 @@ class Model extends AbstractAssessment
         // Note this distinguishes between implicit 'Incomplete' and explicit 'Incomplete'.
         // The former returns FALSE, while the latter returns TRUE
         return $participant->getAllResponses()->count() > 0;
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function hasPendingDraftAuthoritativeFeedback(Participant $participant): bool
+    {
+        // Tasks do not have draft marks
+        $this->assertSameAssessment($participant);
+        return false;
     }
 
 

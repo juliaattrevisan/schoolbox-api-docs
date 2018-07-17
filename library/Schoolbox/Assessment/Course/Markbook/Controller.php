@@ -8,10 +8,16 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Course\Markbook;
 
+use Schoolbox\Assessment\Course\Task\Completion;
+use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
 use Alaress\Web\Controller as WebController;
 use Schoolbox\Filter;
+use Schoolbox\Learning\MarkScheme\LetterGrade;
+use Schoolbox\Learning\Assessment\DataModel as Assessment;
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group as GradeGroup;
+use Throwable;
 
 class Controller extends WebController\Base
 {
@@ -25,20 +31,38 @@ class Controller extends WebController\Base
     /** @var Filter\Selection\Mapper */
     private $filterSelectionMapper;
 
+    /** @var Filter\Filters\Assessment\IdFinder */
+    private $assessmentIdFinder;
+
+    /** @var Assessment\MapperProxy */
+    private $assessmentMapperProxy;
+
+    /** @var GradeGroup\Model */
+    private $defaultGradeGroup;
+
 
     /**
      * @param Filter\Filters\Assessment\FactoryFactory $filterFactoryFactory
      * @param Filter\Mapper                            $filterMapper
      * @param Filter\Selection\Mapper                  $filterSelectionMapper
+     * @param Filter\Filters\Assessment\IdFinder       $assessmentIdFinder
+     * @param Assessment\MapperProxy                   $assessmentMapperProxy
+     * @param GradeGroup\Model                         $defaultGradeGroup
      */
     public function __construct(
         Filter\Filters\Assessment\FactoryFactory $filterFactoryFactory,
         Filter\Mapper $filterMapper,
-        Filter\Selection\Mapper $filterSelectionMapper
+        Filter\Selection\Mapper $filterSelectionMapper,
+        Filter\Filters\Assessment\IdFinder $assessmentIdFinder,
+        Assessment\MapperProxy $assessmentMapperProxy,
+        GradeGroup\Model $defaultGradeGroup
     ) {
         $this->filterFactoryFactory  = $filterFactoryFactory;
         $this->filterMapper          = $filterMapper;
         $this->filterSelectionMapper = $filterSelectionMapper;
+        $this->assessmentIdFinder    = $assessmentIdFinder;
+        $this->assessmentMapperProxy = $assessmentMapperProxy;
+        $this->defaultGradeGroup     = $defaultGradeGroup;
     }
 
 
@@ -109,7 +133,7 @@ class Controller extends WebController\Base
         unset($queryArgs['page']);
 
         $page        = Filter\Page\Model::PAGE_COURSE_MARK_BOOK;
-        $route       = $this->getRouter()->generate('courseMarkbook.postMarkbook', ['userId' => $this->getUser()->getId()]);
+        $route       = $this->getRouter()->generate('courseMarkbook.postMarkbook', ['courseSpecId' => $courseSpec->getId()]);
         $filterPanel = $this->filterFactoryFactory->buildPanel($this->getUser(), $page, $route, $this->getUser(), $queryArgs);
 
         $this->getResponse()->content->set(
@@ -117,7 +141,7 @@ class Controller extends WebController\Base
                 'courseSpec'  => $courseSpec,
                 'viewee'      => $this->getUser(),
                 'filterPanel' => $filterPanel,
-            ])->setTab('submission')->setTitle('Course Markbook')
+            ])->setTab('submission')->setTitle("Course Markbook: {$courseSpec->getTitle()}")
         );
     }
 
@@ -131,11 +155,115 @@ class Controller extends WebController\Base
      */
     public function postMarkbook(CourseSpec\Model $courseSpec): void
     {
-        // TODO implement method
-        echo 'function: ' . __FUNCTION__ . "<br>\n";
-        echo 'class: ' . \get_class($courseSpec) . "<br>\n";
-        echo "id: {$courseSpec->getId()}<br>\n";
-        die();
+        try {
+            $request = $this->request->post['filter_selection'] ?: [];
+
+            /**
+             * @var null[]|Collection[]        $filters
+             * @var Filter\Codec               $codec
+             * @var Filter\Selection\Model[][] $selectionsPerFilter
+             */
+            // TODO add some intelligence around which filter settings to save (eg AssessmentType but not units)
+            [$filters, $codec, $selectionsPerFilter] = $this->convertRequestToFilters($request, false);
+
+            $assessmentIds  = $this->assessmentIdFinder->findIdsByFilters($filters);
+            $courseMarkbook = $this->buildCourseMarkbook($courseSpec, $assessmentIds);
+
+            $this->getResponse()->content->set($this->buildJsonOutput([
+                'status'  => 200,
+                'content' => $this->buildUnthemedHtmlOutput('@courseMarkbook/courseMarkbookInner.twig', [
+                    'collapsedAssessments'    => $courseMarkbook->getCollapsedAssessments(),
+                    'unitSpecs'               => $courseMarkbook->getUnitSpecs(),
+                    'courseImpls'             => $courseMarkbook->getCourseImpls(),
+                    'courseImportAssessments' => $courseMarkbook->getCourseImportAssessments(),
+                    'courseImportStudents'    => $courseMarkbook->getCourseImportStudents(),
+                    'assessmentSpecMarks'     => $courseMarkbook->getAssessmentSpecAverages(),
+                    'assessmentImplMarks'     => $courseMarkbook->getAssessmentImplAverages(),
+                    'studentMarks'            => $courseMarkbook->getStudentMarks(),
+                    'studentAverageMarks'     => $courseMarkbook->getStudentAverageMarks(),
+                    'studentComments'         => $courseMarkbook->getStudentComments(),
+                    'taskProgress'            => $courseMarkbook->getTaskProgress(),
+                    'taskProgressPending'     => Completion::STATUS_SELF_ASSESSED_COMPLETE,
+                    'taskProgressComplete'    => Completion::STATUS_TEACHER_ASSESSED_COMPLETE,
+                ])->getAsString(),
+            ]));
+
+        } catch (Filter\BrokenFilterException $e) {
+            $data = [
+                'status'  => 500,
+                'message' => "Sorry, the {$e->getFilterName()} filter appears to be broken. Please deselect all options and try again",
+            ];
+            if ($this->getConfigLoader()->get('debug_mode')) {
+                $data = array_merge($data, [
+                    'code'    => $e->getCode(),
+                    'message' => $e->getMessage(),
+                    'line'    => $e->getLine(),
+                    'file'    => $e->getFile(),
+                ]);
+            }
+            $this->getResponse()->content->set($this->buildJsonOutput($data));
+        } catch (Throwable $e) {
+            $this->returnJsonError($e);
+        }
+    }
+
+
+    /**
+     * @param array $request  Indexed by filter.id, option.key
+     * @param bool  $saveToDB Should we persist these selections to the DB ?
+     * @return array
+     * @throws \InvalidArgumentException If unable to find the filter mapper class
+     * @throws \ReflectionException If the specified class does not exist
+     * @throws \DomainException If this class has not defined what entity it is filtering
+     * @throws \Schoolbox\Mapper\DefinitionException If join $name isn't on this mapper
+     * @throws \Schoolbox\Mapper\Exception If an alias is incorrect
+     * @throws \UnexpectedValueException
+     */
+    private function convertRequestToFilters(array $request, $saveToDB): array
+    {
+        $page            = Filter\Page\Model::PAGE_COURSE_MARK_BOOK;
+        $codec           = $this->filterFactoryFactory->buildCodec();
+
+        // Convert Request to Selection models
+        $selectionsPerFilter = $codec->convertRequestToSelections($this->getUser(), $page, $request);
+        if ($saveToDB) {
+            $this->filterSelectionMapper->updateSelections($this->getUser(), $page, $selectionsPerFilter);
+        }
+
+        $filters = $this->filterFactoryFactory->convertSelectionsToFilters($selectionsPerFilter, $this->getUser(), $page);
+
+        // Ensure that assessments are not Assessment Specs
+        $filters = array_merge($filters, [
+            Filter\Filters\Assessment\NullableContext\UnitSpec\Definition::class => [],
+        ]);
+
+        return [$filters, $codec, $selectionsPerFilter];
+    }
+
+
+    /**
+     * @param CourseSpec\Model $courseSpec
+     * @param array            $assessmentIds
+     * @return CourseMarkbook
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
+     * @throws \LogicException
+     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \UnexpectedValueException
+     */
+    private function buildCourseMarkbook(CourseSpec\Model $courseSpec, array $assessmentIds): CourseMarkbook
+    {
+        // Fetch assessments & participants
+        $assessments = $this->assessmentMapperProxy->findAllByIds($assessmentIds)->indexBy('id');
+        $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessments);
+
+        // Build a course markbook
+        return new CourseMarkbook(
+            $courseSpec,
+            $assessments,
+            $this->getUser(),
+            new LetterGrade($this->defaultGradeGroup)
+        );
     }
 
 
@@ -157,5 +285,27 @@ class Controller extends WebController\Base
             ->setPage(Filter\Page\Model::PAGE_COURSE_MARK_BOOK)
             ->setKey($key)
             ->setSelected($selected);
+    }
+
+    /**
+     * Returns a JSON representation of an exception suitable for AJAX HTML alert divs
+     *
+     * @param Throwable $e
+     */
+    private function returnJsonError(Throwable $e): void
+    {
+        $data = [
+            'status'  => 500,
+            'message' => 'Sorry, an error occurred during your request and has been logged. Please try deselecting filter options',
+        ];
+        if ($this->getConfigLoader()->get('debug_mode')) {
+            $data = array_merge($data, [
+                'code'    => $e->getCode(),
+                'message' => $e->getMessage(),
+                'line'    => $e->getLine(),
+                'file'    => $e->getFile(),
+            ]);
+        }
+        $this->getResponse()->content->set($this->buildJsonOutput($data));
     }
 }

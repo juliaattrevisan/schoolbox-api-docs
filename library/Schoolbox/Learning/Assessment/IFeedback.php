@@ -77,7 +77,7 @@ interface IFeedback
     /**
      * Set the Normalised Mark for an IFeedback
      *
-     * @param float $normalisedMark
+     * @param null|float $normalisedMark
      * @return $this
      */
     public function setNormalisedMark($normalisedMark);

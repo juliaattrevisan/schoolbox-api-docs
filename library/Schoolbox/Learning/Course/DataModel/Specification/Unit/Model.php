@@ -43,6 +43,15 @@ class Model extends AbstractUnit
     private $unitImplementations;
 
     /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        parent::__construct();
+        $this->unitImplementations = new GenericCollection(UnitImplementation::class);
+    }
+
+    /**
      * Returns title of folder, for AssessmentContext Interface
      *
      * @return string

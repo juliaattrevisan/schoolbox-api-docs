@@ -70,6 +70,8 @@ class TestableIdFinder extends IdFinder
     /**
      * Build a registry of filters known to this class
      *
+     * We need to override this for the testable version as we cannot access the database dependency in unit tests
+     *
      * @param Filter\Mapper $filterMapper The filter instance mapper
      * @param IMapper       $entityMapper A mapper for the entity being filtered, eg 'assessments'
      */
@@ -79,6 +81,7 @@ class TestableIdFinder extends IdFinder
             AssessmentType\Definition::class,
             Folder\TeacherInvolved\Definition::class,
             Folder\StudentInteractions\Definition::class,
+            Folder\CourseImports\Definition::class,
             NullableContext\UnitImportSpec\Definition::class,
             NullableContext\Project\Definition::class,
             NullableContext\UnitImpl\Definition::class,

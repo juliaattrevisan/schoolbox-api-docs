@@ -19,6 +19,8 @@ use Schoolbox\Curriculum\Node\Mapper as CurriculumNodeMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\Project;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
+use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Schoolbox\Learning\Quiz;
@@ -740,19 +742,23 @@ class Mapper extends BaseMapper
                     ->setFolder($this->hydrateJoin($row, 'assessment_course_unit_specification.folder', 'usf'));
             } elseif ($row['ui.id']) {
                 // Unit impl
-                $context = $this->hydrateJoin($row, 'assessment_course_unit_implementation', 'ui')
-                    ->setCourse(
-                        $this->hydrateJoin($row, 'assessment_course_unit_implementation.course', 'uic')
-                            ->setFolder(
-                                $this->hydrateJoin($row, 'assessment_course_unit_implementation.course.folder', 'uicf')
-                            )
-                    )
-                    ->setSpecification(
-                        $this->hydrateJoin($row, 'assessment_course_unit_implementation.specification', 'uis')
-                             ->setFolder(
-                                 $this->hydrateJoin($row, 'assessment_course_unit_implementation.specification.folder', 'uisf')
-                             )
-                    );
+                /** @var UnitImpl\Model $unitImpl */
+                $unitImpl = $this->hydrateJoin($row, 'assessment_course_unit_implementation', 'ui');
+                /** @var CourseImpl\Model $courseImpl */
+                $courseImpl = $this->hydrateJoin($row, 'assessment_course_unit_implementation.course', 'uic')
+                                   ->setFolder(
+                                       $this->hydrateJoin($row, 'assessment_course_unit_implementation.course.folder', 'uicf')
+                                   );
+                $unitImpl->setCourse($courseImpl);
+                $courseImpl->getUnits()[$unitImpl->getId()] = $unitImpl;
+                /** @var UnitSpec\Model $unitSpec */
+                $unitSpec = $this->hydrateJoin($row, 'assessment_course_unit_implementation.specification', 'uis')
+                                 ->setFolder(
+                                     $this->hydrateJoin($row, 'assessment_course_unit_implementation.specification.folder', 'uisf')
+                                 );
+                $unitImpl->setSpecification($unitSpec);
+                $unitSpec->getUnitImplementations()[$unitImpl->getId()] = $unitImpl;
+                $context = $unitImpl;
             } elseif ($row['pa.id']) {
                 // Project
                 $context = $this->hydrateJoin($row, 'project_assessment', 'pa');

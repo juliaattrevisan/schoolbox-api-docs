@@ -326,6 +326,27 @@ class Model extends AbstractAssessment implements ISelfAssessable
     /**
      * @inheritdoc
      */
+    public function hasPendingDraftAuthoritativeFeedback(Participant $participant): bool
+    {
+        $this->assertSameAssessment($participant);
+
+        $anyAuthoritativeFeedback = $this->getAuthoritativeFeedback($participant, false);
+        if (!$anyAuthoritativeFeedback) {
+            // No feedback at all? Then there cannot be a pending draft.
+            return false;
+        }
+        if ($anyAuthoritativeFeedback->isDraft()) {
+            // Latest feedback is a draft.
+            return true;
+        }
+        // latest feedback is published. No draft pending.
+        return false;
+    }
+
+
+    /**
+     * @inheritdoc
+     */
     public function getFamilyName()
     {
         return 'dueWork';

@@ -16,3 +16,100 @@
         background-color: #f9f9f9;
     }
 }
+
+// Course markbook styles
+#courseMarkbookContent {
+    // Legend
+    .legend {
+        .indicator {
+            position: relative;
+            top: .75rem;
+            right: .5rem;
+        }
+        p {
+            display: inline-block;
+            margin-right: 2rem;
+        }
+    }
+
+    // Indicators: used in legend, so don't put in .marksheet
+    .indicator {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 0;
+        height: 0;
+    }
+    .indicator.indicator-none {
+        border-top: .75rem solid $base;
+        border-left: .75rem solid transparent;
+    }
+    .indicator.indicator-pending {
+        border-top: .75rem solid $warning-color;
+        border-left: .75rem solid transparent;
+    }
+    .indicator.indicator-published {
+        border-top: .75rem solid $success-color;
+        border-left: .75rem solid transparent;
+    }
+
+    // Marksheet content
+    .marksheet {
+        // Table cells
+        td {
+            position: relative;
+            a.meta {
+                border-bottom: 0;
+            }
+        }
+        td.student-average a,
+        td.student-average a.meta {
+            color: $white;
+        }
+        //td.gradient-off-bg a {
+        //    color: #0066b0;
+        //}
+
+        // Various rows and headers
+        .course-row {
+            background: $content-ui-background;
+            color: $body-font-color;
+        }
+        .class-row {
+            background: $content-ui-selected;
+            color: $body-font-color;
+        }
+        .class-row-heading {
+            font-weight: 700;
+        }
+        .course-headers th {
+            background: $submit-button-bg-color;
+            color: $submit-button-color;
+            text-transform: uppercase;
+            //font-size: 12px;
+            text-align: center;
+            padding-top: .25rem;
+            padding-bottom: .25rem;
+            border-right: 1px solid #eee;
+        }
+        .course-headers th.transparent {
+            background: $body-bg;
+        }
+        .course-headers th.white {
+            background: $white;
+        }
+        .row-header, .island table.dataTable thead th {
+            border-bottom: none;
+        }
+
+        // Not applicable: the student didn't attempt this assessment
+        .na {
+            // In develop, $input-disabled-bg is appropriate:
+            background-color: $vapor;
+        }
+        .has-tip.meta {
+            color: $aluminum;
+            font-weight: normal;
+        }
+    }
+}

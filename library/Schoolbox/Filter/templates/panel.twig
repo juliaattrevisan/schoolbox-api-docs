@@ -7,67 +7,20 @@ Usage:
     quickload bool        - if true, fill contentId with .innerHTML instead of jQuery.html()
                             When true, any JavaScript must be applied on the "filterContentLoaded"
                             event of the contentId element.
+    page:     string      - which filtered page this is. One of the Filter\Page\Model::PAGE_* constants
 
     ? TODO convert to JS plugin that is executed against the panel element (so it can get with $this), and takes contentPanelId as single arg
 #}
+<script type="text/javascript" src="/javascript/shared/jquery.select-multi-checkboxes.js"></script>
 
 {% autoescape 'js' %}
 <script type="text/javascript">
 
     $(function() {
-        {#TODO - move this to plugin called 'multi-checkbox-select' or similar#}
-        // Track the most recently changed checkbox per component
-        var mostRecentChangePerComponent = [];
-
-        $(document).on('click', '[data-component] label', function (e) {
-
-            var $component           = $(this).closest('[data-component]');
-            var $componentId         = $component.data('component');
-            var $componentLabels     = $component.find('label');
-            var $componentCheckboxes = $component.find('input[type=checkbox]');
-            var labelIndex           = $componentLabels.index(this);
-
-            // Is this not the first checkbox changed for this component ?
-            var mostRecentChangedIndex = mostRecentChangePerComponent[$componentId];
-
-            // Was this a shiftClick on a different checkbox ?
-            if(e.shiftKey && typeof mostRecentChangedIndex === 'number' && mostRecentChangedIndex !== labelIndex){
-
-                // Change all intervening checkboxes to the new value
-                var changedCheckbox  = $componentCheckboxes.get(labelIndex);
-                var newState         = !$(changedCheckbox).prop('checked');
-                var increment = labelIndex > mostRecentChangedIndex ? +1 : -1;
-                for(var i = mostRecentChangedIndex; i !== labelIndex; i += increment){
-                    var $checkbox = $($componentCheckboxes.get(i));
-
-                    $checkbox.prop('checked', newState);
-
-                    // Ensure 'change' listeners get triggered
-                    $checkbox.trigger('change');
-                }
-                clearSelection();
-            }
-            mostRecentChangePerComponent[$componentId] = labelIndex;
-
-        });
-
-        /**
-         * Clears any text selection that occurred when shift+clicking a selection of text-boxes
-         */
-        function clearSelection() {
-            if ( document.selection ) {
-                document.selection.empty();
-            } else if ( window.getSelection ) {
-                window.getSelection().removeAllRanges();
-            }
-        }
-    });
-
-
-    $(function() {
 
         // ============== Plugins
 
+        $('[data-component]').selectMulti({});
         $('[data-collapser]').collapsable();
 
         // ============== Vars
@@ -239,6 +192,10 @@ Usage:
             // Convert flat string array to nested object
             for (var i in flatArray) {
                 var result = regEx.exec(flatArray[i]);
+                if(!result){
+                    // TODO make this more elegant. This happens if a filter has no options, eg course import not imported to any classes
+                    continue;
+                }
                 var filterId = result[1];
                 var optionKey = result[2];
                 var optionVal = result[3];
@@ -246,21 +203,31 @@ Usage:
                 if (!nestedObj.hasOwnProperty(filterId)) {
                     nestedObj[filterId] = {};
                 }
-                // We only need to know about checked values
-                if ("1" === optionVal) {
+
+                // TODO SA-7041 insert a callback here so invokers can apply page-specific logic. This JS should not need to know about caller's idiosyncrasies
+                if({% if 'courseMarkbook' == page %}1{% else %}0{% endif %}) {
+                    // (eg course-markbook page needs to always send unit and folder selections, even if optionVal is 0)
+                    // TODO SA-7041 The course-markbook-specific callback needs to know the filterDefinition.id of unit and folder
                     nestedObj[filterId][optionKey] = optionVal;
+                } else {
+                    // We only need to know about checked values
+                    if ("1" === optionVal) {
+                        nestedObj[filterId][optionKey] = optionVal;
+                    }
                 }
             }
 
             // Convert to query args
             var queryArgs = [];
             for (filterId in nestedObj) {
-                var selections = nestedObj[filterId];
-                if (0 === Object.keys(selections).length) {
-                    queryArgs.push(filterId + '='); // empty filter selection syntax
-                } else {
-                    for (optionKey in selections) {
-                        queryArgs.push(filterId + '[' + optionKey + ']=1'); // filter option selected syntax
+                if(nestedObj.hasOwnProperty(filterId)) {
+                    var selections = nestedObj[filterId];
+                    if (0 === Object.keys(selections).length) {
+                        queryArgs.push(filterId + '='); // empty filter selection syntax
+                    } else {
+                        for (optionKey in selections) {
+                            queryArgs.push(filterId + '[' + optionKey + ']=' + optionVal); // filter option selected syntax
+                        }
                     }
                 }
             }
