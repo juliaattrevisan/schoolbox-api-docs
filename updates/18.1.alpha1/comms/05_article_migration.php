@@ -215,14 +215,14 @@ function createHomepageNewsCampusRoleAudience(IDatabase $db, int $oldId, int $ne
             /* Assign campus
              */
             $db->query("
-                INSERT INTO `comms_news_audience` (article_id, entity_type, relationship)
+                INSERT INTO `comms_news_audience` (article_id, entity_type, entity_value, relationship)
                 VALUES ('{$compositeSegmentId}', ".ENTITY_TYPE_CAMPUS.", '{$campus['id']}', ".RELATIONSHIP_SELF.")
             ");
 
             /* Assign role
              */
             $db->query("
-                INSERT INTO `comms_news_audience` (article_id, entity_type, relationship)
+                INSERT INTO `comms_news_audience` (article_id, entity_type, entity_value, relationship)
                 VALUES ('{$compositeSegmentId}', ".ENTITY_TYPE_ROLE.", '{$role['id']}', ".RELATIONSHIP_SELF.")
             ");
         }
@@ -250,7 +250,7 @@ function createHomepageNewsUserAudience(IDatabase $db, int $oldId, int $newId)
         /* Assign user
          */
         $db->query("
-            INSERT INTO `comms_news_audience` (article_id, entity_type, relationship)
+            INSERT INTO `comms_news_audience` (article_id, entity_type,  entity_value, relationship)
             VALUES ('{$newId}', ".ENTITY_TYPE_USER.", '{$user['id']}', ".RELATIONSHIP_SELF.")
         ");
     }
