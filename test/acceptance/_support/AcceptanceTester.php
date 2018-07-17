@@ -63,7 +63,8 @@ class AcceptanceTester extends \Codeception\Actor
         $i = $this;
 
         // if snapshot exists - skipping login
-        if ($i->loadSessionSnapshot('login')) {
+        $snapshotName = 'login:'.$username;
+        if ($i->loadSessionSnapshot($snapshotName)) {
             return;
         }
 
@@ -74,7 +75,7 @@ class AcceptanceTester extends \Codeception\Actor
         $i->click(self::$loginButton);
         $i->amOnPage('/');
 
-        $i->saveSessionSnapshot('login');
+        $i->saveSessionSnapshot($snapshotName);
 
     }
 
