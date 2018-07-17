@@ -151,11 +151,12 @@ class CreateAndVerifyCest
         });
 
         // Make it unpublished
-        $formPage->fillPublishDate(\Alaress_Date_Format::now()->addDays(2)->setTime(0, 0, 0));
+        $formPage
+            ->fillPublishDate(\Alaress_Date_Format::now()->addDays(2)->setTime(0, 0, 0))
+            ->submit();
 
         // Verify that user Celia Glenn can no longer see it
         $celia->does(function (AcceptanceTester $i) use ($headline, $topicSlug) {
-            $i->login('cglenn', 'password');
             $indexPage = new Index($i);
 
             // Go to all page
