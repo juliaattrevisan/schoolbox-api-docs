@@ -12,6 +12,11 @@
 {% spaceless %}
     {% set pacified = article.blurb|striptags %}
 
+    {# If the blurb was nonexistent, assume some body content instead #}
+    {% if pacified|length == 0 %}
+        {% set pacified = article.body|striptags %}
+    {% endif %}
+
     {# Maximum length chars #}
     {% set max = 300 %}
 
