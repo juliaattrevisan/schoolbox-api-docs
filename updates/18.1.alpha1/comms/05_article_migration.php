@@ -182,9 +182,9 @@ function createHomepageNewsArticle(IDatabase $db, array $row)
  *
  * @param IDatabase $db
  * @param int       $oldId
- * @param int       $newId
+ * @param int       $articleId
  */
-function createHomepageNewsCampusRoleAudience(IDatabase $db, int $oldId, int $newId)
+function createHomepageNewsCampusRoleAudience(IDatabase $db, int $oldId, int $articleId)
 {
     $roles = $db->query("
         SELECT gid AS id
@@ -205,26 +205,35 @@ function createHomepageNewsCampusRoleAudience(IDatabase $db, int $oldId, int $ne
 
             /* Create composite
              */
-            $db->query("
+            $query = "
                 INSERT INTO `comms_news_audience` (article_id, entity_type, relationship)
-                VALUES ('{$newId}', ".ENTITY_TYPE_COMPOSITE.", ".RELATIONSHIP_SELF.");
-            ");
+                VALUES ('{$articleId}', ".ENTITY_TYPE_COMPOSITE.", ".RELATIONSHIP_SELF.");
+            ";
+
+            $db->query($query);
+            echo $query;
 
             $compositeSegmentId = $db->lastInsertId();
+            echo "COMPOSITE: {$compositeSegmentId}";
 
             /* Assign campus
              */
-            $db->query("
+            $query = "
                 INSERT INTO `comms_news_audience` (article_id, entity_type, entity_value, relationship)
                 VALUES ('{$compositeSegmentId}', ".ENTITY_TYPE_CAMPUS.", '{$campus['id']}', ".RELATIONSHIP_SELF.")
-            ");
+            ";
 
+            $db->query($query);
+            echo $query;
             /* Assign role
              */
-            $db->query("
+            $query = "
                 INSERT INTO `comms_news_audience` (article_id, entity_type, entity_value, relationship)
                 VALUES ('{$compositeSegmentId}', ".ENTITY_TYPE_ROLE.", '{$role['id']}', ".RELATIONSHIP_SELF.")
-            ");
+            ";
+
+            $db->query($query);
+            echo $query;
         }
     }
 }
@@ -234,9 +243,9 @@ function createHomepageNewsCampusRoleAudience(IDatabase $db, int $oldId, int $ne
  *
  * @param IDatabase $db
  * @param int       $oldId
- * @param int       $newId
+ * @param int       $articleId
  */
-function createHomepageNewsUserAudience(IDatabase $db, int $oldId, int $newId)
+function createHomepageNewsUserAudience(IDatabase $db, int $oldId, int $articleId)
 {
     $users = $db->query("
         SELECT userID AS id
@@ -251,7 +260,7 @@ function createHomepageNewsUserAudience(IDatabase $db, int $oldId, int $newId)
          */
         $db->query("
             INSERT INTO `comms_news_audience` (article_id, entity_type,  entity_value, relationship)
-            VALUES ('{$newId}', ".ENTITY_TYPE_USER.", '{$user['id']}', ".RELATIONSHIP_SELF.")
+            VALUES ('{$articleId}', ".ENTITY_TYPE_USER.", '{$user['id']}', ".RELATIONSHIP_SELF.")
         ");
     }
 }
