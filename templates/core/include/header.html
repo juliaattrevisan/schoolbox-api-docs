@@ -80,13 +80,12 @@
             $(this).css({'top': $(window).scrollTop() + modalTop + 'px'});
         });
 
-        var splash, d, x, y;
+        var splash, d, x, y, splashTimeout;
         $(document).on('click', ".button, button, .sub-nav a, .pagination a, .flex-list a, [data-component-palette]", function(e) {
-            if($(this).find(".splash").length === 0){
-                $(this).prepend("<span class='splash'></span>");
-            }
 
             splash = $(this).find(".splash");
+            splash.removeClass('animate');
+            clearTimeout(splashTimeout);
 
             if (splash.length === 0) {
                 $(this).prepend("<span class='splash'></span>");
@@ -103,9 +102,9 @@
             splash.css({top: y+'px', left: x+'px'}).addClass("animate");
 
             // Remove the animation after a bit of time, otherwise this animation will happen every time the element hides and becomes visible again
-            setTimeout(function() {
+            splashTimeout = setTimeout(function() {
                 splash.removeClass('animate');
-            }, 500);
+            }, 300);
         });
     });
 
