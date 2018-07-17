@@ -18,57 +18,21 @@
 }
 
 // Course markbook styles
-#courseMarkbookContent .marksheet {
-    .course-row{
-        background: #bcd;
-        color: #333;
+#courseMarkbookContent {
+    // Legend
+    .legend {
+        .indicator {
+            position: relative;
+            top: 14px;
+            right: 8px;
+        }
+        p {
+            display: inline-block;
+            margin-right: 28px;
+        }
     }
-    .class-row {
-        background: #a0d3e8;
-        color: #333;
-    }
-    .class-row-heading {
-        font-weight: 700;
-    }
-    .course-headers th {
-        background: #0066b0;
-        color: #eee;
-        text-transform: uppercase;
-        font-size: 12px;
-        text-align: center;
-        padding-top: 5px;
-        padding-bottom: 5px;
-        border-right: 1px solid #eee;
-    }
-    .course-headers th.transparent {
-        background: #ededed;
-    }
-    .course-headers th.white {
-        background: #fff;
-    }
-    .row-header, .island table.dataTable thead th {
-        border-bottom: none;
-    }
-    .marksheet td {
-        position: relative;
-    }
-    td a.meta {
-        border-bottom: 0;
-    }
-    td.student-average a,
-    td.student-average a.meta {
-        color: #fff;
-    }
-    td.gradient-off-bg a {
-        color: #0066b0;
-    }
-    .na {
-        background-color: #F6F6F6;
-    }
-    .has-tip.meta {
-        color: #9a9a9a;
-        font-weight: normal;
-    }
+
+    // Indicators: used in legend, so don't put in .marksheet
     .indicator {
         position: absolute;
         top: 0;
@@ -88,13 +52,63 @@
         border-top: .75rem solid #4fa74f;
         border-left: .75rem solid transparent;
     }
-    .legend .indicator {
-        position: relative;
-        top: 14px;
-        right: 8px;
-    }
-    .legend p {
-        display: inline-block;
-        margin-right: 28px;
+
+    // Marksheet content
+    .marksheet {
+        // Table cells
+        td {
+            position: relative;
+            a.meta {
+                border-bottom: 0;
+            }
+        }
+        td.student-average a,
+        td.student-average a.meta {
+            color: #fff;
+        }
+        td.gradient-off-bg a {
+            color: #0066b0;
+        }
+
+        // Various rows and headers
+        .course-row {
+            background: #bcd;
+            color: #333;
+        }
+        .class-row {
+            background: #a0d3e8;
+            color: #333;
+        }
+        .class-row-heading {
+            font-weight: 700;
+        }
+        .course-headers th {
+            background: #0066b0;
+            color: #eee;
+            text-transform: uppercase;
+            font-size: 12px;
+            text-align: center;
+            padding-top: 5px;
+            padding-bottom: 5px;
+            border-right: 1px solid #eee;
+        }
+        .course-headers th.transparent {
+            background: #ededed;
+        }
+        .course-headers th.white {
+            background: #fff;
+        }
+        .row-header, .island table.dataTable thead th {
+            border-bottom: none;
+        }
+
+        // Not applicable: the student didn't attempt this assessment
+        .na {
+            background-color: #F6F6F6;
+        }
+        .has-tip.meta {
+            color: #9a9a9a;
+            font-weight: normal;
+        }
     }
 }
