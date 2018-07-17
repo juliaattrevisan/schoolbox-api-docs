@@ -146,7 +146,10 @@ class Markbook
         foreach ($this->getAssessments() as $assessment) {
             foreach ($assessment->getAllParticipants() as $participant) {
                 $student = $participant->getUser();
-                $participants[$student->getId()] = $student;
+                // If a participant is a teacher and excluded, do not show.
+                if ($student->getRole()->isStudent() || !$participant->isExcluded()) {
+                    $participants[$student->getId()] = $student;
+                }
             }
         }
         $participants->sortByCallback(

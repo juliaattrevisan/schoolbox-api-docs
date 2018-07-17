@@ -26,6 +26,9 @@ class SubmitForm
      */
     protected $tester;
 
+    private $filename;
+    private $contents;
+
     /**
      * Constructor
      *
@@ -60,6 +63,7 @@ class SubmitForm
         $i->wait(random_int(1, 3));
         $i->fillCkEditorById('editor-body', $contents);
         $i->wait(random_int(1, 3));
+        $this->contents = $contents;
 
         return $this;
     }
@@ -71,6 +75,7 @@ class SubmitForm
     public function setAttachment(string $filename): self
     {
         $this->tester->attachAttachzoneFile('#files-zone', $filename);
+        $this->filename = $filename;
         return $this;
     }
 
@@ -86,6 +91,16 @@ class SubmitForm
         $i->wait(1); // just to make sure that auto save is gone.
         $i->click(self::SELECTOR_BUTTON_SUBMISSION);
         $i->waitForText('SUBMISSION HISTORY');
+        // verify
+        if (!empty($this->contents)) {
+            $i->canSee('Online Submission');
+        }
+        if (!empty($this->filename)) {
+            $dot = strrpos($this->filename, '.');
+            $slash = strrpos($this->filename, '/') + 1;
+            $attachName = substr($this->filename, $slash, $dot - $slash);
+            $i->canSee($attachName);
+        }
         return $this;
     }
 
