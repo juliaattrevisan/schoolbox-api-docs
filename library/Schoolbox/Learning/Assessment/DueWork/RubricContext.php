@@ -282,7 +282,6 @@ class RubricContext
             $firstLevel = $levelIds[0];
             $lastLevel = $levelIds[\count($levelIds) - 1];
 
-            // TODO test these with empty descriptors
             $startValue = $descriptors[$critId][$firstLevel] ? $descriptors[$critId][$firstLevel]['value'] : null;
             $endValue = $descriptors[$critId][$lastLevel] ? $descriptors[$critId][$lastLevel]['value'] : null;
             $direction = 'asc';
