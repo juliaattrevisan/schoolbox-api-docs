@@ -41,15 +41,15 @@
         height: 0;
     }
     .indicator.indicator-none {
-        border-top: .75rem solid #CCCCCC;
+        border-top: .75rem solid $base;
         border-left: .75rem solid transparent;
     }
     .indicator.indicator-pending {
-        border-top: .75rem solid #ff7d00;
+        border-top: .75rem solid $warning-color;
         border-left: .75rem solid transparent;
     }
     .indicator.indicator-published {
-        border-top: .75rem solid #4fa74f;
+        border-top: .75rem solid $success-color;
         border-left: .75rem solid transparent;
     }
 
@@ -64,11 +64,11 @@
         }
         td.student-average a,
         td.student-average a.meta {
-            color: #fff;
+            color: $white;
         }
-        td.gradient-off-bg a {
-            color: #0066b0;
-        }
+        //td.gradient-off-bg a {
+        //    color: #0066b0;
+        //}
 
         // Various rows and headers
         .course-row {
@@ -83,8 +83,8 @@
             font-weight: 700;
         }
         .course-headers th {
-            background: #0066b0;
-            color: #eee;
+            background: $submit-button-bg-color;
+            color: $submit-button-color;
             text-transform: uppercase;
             font-size: 12px;
             text-align: center;
@@ -93,10 +93,10 @@
             border-right: 1px solid #eee;
         }
         .course-headers th.transparent {
-            background: #ededed;
+            background: $body-bg;
         }
         .course-headers th.white {
-            background: #fff;
+            background: $white;
         }
         .row-header, .island table.dataTable thead th {
             border-bottom: none;
@@ -104,7 +104,7 @@
 
         // Not applicable: the student didn't attempt this assessment
         .na {
-            background-color: #F6F6F6;
+            background-color: $input-disabled-bg;
         }
         .has-tip.meta {
             color: #9a9a9a;
