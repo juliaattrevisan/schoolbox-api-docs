@@ -7,15 +7,21 @@
 namespace Schoolbox\Assessment\Course\Import\Atlas;
 
 use Alaress\Web\Controller\Base as BaseController;
+use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 use Schoolbox\Assessment\Course\Import\Atlas\Api;
+use Schoolbox\Assessment\Rubric\Competency\Level;
+use Schoolbox\Assessment\Rubric\Criteria\Criterion;
+use Schoolbox\Assessment\Rubric\Criteria\Group;
 use Schoolbox\Assessment\Rubric\Descriptor;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpec;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpec;
+use Schoolbox\Learning\MarkScheme\Percentage;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -87,17 +93,11 @@ class Controller extends BaseController
 
 
     /**
-     * Constructor
-     *
-     * @param Api\Bridge             $apiBridge
-     * @param FolderMapper           $folderMapper
-     * @param HomepageConfigMapper   $homepageConfigMapper
-     * @param HomepageTemplateMapper $homepageTemplateMapper
-     * @param CourseSpecMapper       $courseSpecMapper
-     * @param UnitSpecMapper         $unitSpecMapper
-     * @param Access                 $access
-     * @param UserAccessMapper       $userAccessMapper
+     * @var AssessmentDataSource
      */
+    private $assessmentDataSource;
+
+
     /**
      * Constructor
      *
@@ -111,6 +111,7 @@ class Controller extends BaseController
      * @param UserAccessMapper       $userAccessMapper
      * @param Rubric\GroupMapper     $rubricGroupMapper
      * @param Rubric\CriterionMapper $rubricCriterionMapper
+     * @param AssessmentDataSource   $assessmentDataSource
      */
     public function __construct(
         Api\Bridge $apiBridge,
@@ -122,7 +123,8 @@ class Controller extends BaseController
         Access $access,
         UserAccessMapper $userAccessMapper,
         Rubric\GroupMapper $rubricGroupMapper,
-        Rubric\CriterionMapper $rubricCriterionMapper
+        Rubric\CriterionMapper $rubricCriterionMapper,
+        AssessmentDataSource $assessmentDataSource
     ) {
         $this->apiBridge              = $apiBridge;
         $this->folderMapper           = $folderMapper;
@@ -134,6 +136,7 @@ class Controller extends BaseController
         $this->userAccessMapper       = $userAccessMapper;
         $this->rubricGroupMapper      = $rubricGroupMapper;
         $this->rubricCriterionMapper  = $rubricCriterionMapper;
+        $this->assessmentDataSource   = $assessmentDataSource;
     }
 
 
@@ -351,7 +354,7 @@ class Controller extends BaseController
         $unitSpec = $this->unitSpecMapper->createModel()
             ->setFolder($courseSpec->getFolder())
             ->setCourse($courseSpec);
-        $this->courseSpecMapper->save($unitSpec);
+        $this->unitSpecMapper->save($unitSpec);
         return $unitSpec;
     }
 
@@ -369,36 +372,39 @@ class Controller extends BaseController
         $dueWork
             ->setContext($unitSpec)
             ->setTitle($assessment->getTitle())
-            ->setDescription($assessment->getContent());
+            ->setDescription($assessment->getContent())
+            ->setWeight(0)
+            ->setSelfReviewability(SubmissionBox::SELF_REVIEWABILITY_NONE)
+            ->setCreator($this->getUser())
+            ->setMarkScheme(new Percentage());
 
         // Build a rubric for this due work
         if (\count($assessment->getStandards())) {
             $rubric = new Rubric\Rubric();
 
             // Dummy data
-            $level = new Rubric\Level();
-            $level
-                ->setName('Level')
-                ->setSequence(0);
-
+            $level = new Level();
+            $level->setName('Level');
             $rubric->putLevel($level);
 
             // I can only create groups, as there's no sub-standards.
             // Provided there's mark-by-group without needing a criterion,
             // this should be okay.
             foreach ($assessment->getStandards() as $standard) {
-                $group = $this->rubricGroupMapper->findOrCreateOneForFolderByName(
+                $groupDataModel = $this->rubricGroupMapper->findOrCreateOneForFolderByName(
                     $unitSpec->getFolder()->getId(),
                     $standard->getTitle()
                 );
+                $group = new Group($groupDataModel->getId());
                 $rubric->putGroup($group);
 
                 // Add an empty criterion for now, I guess
-                $criterion = $this->rubricCriterionMapper->findOrCreateOneForFolderByKey(
+                $criterionDataModel = $this->rubricCriterionMapper->findOrCreateOneForFolderByKey(
                     $unitSpec->getFolder()->getId(),
                     $standard->getTitle(),
                     ''
                 );
+                $criterion = new Criterion($criterionDataModel->getId());
                 $rubric->putCriterion($group, $criterion);
 
                 // And an empty descriptor for that level?
@@ -417,6 +423,7 @@ class Controller extends BaseController
                 ->setRubric($rubric);
         }
 
+        $this->assessmentDataSource->save($dueWork);
         return $dueWork;
     }
 

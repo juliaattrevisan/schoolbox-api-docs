@@ -74,6 +74,7 @@ class Module extends \Alaress\Module\Module
                     'userAccessMapper'       => $this->getMapperFactory()->getLazy(UserAccessMapper::class),
                     'rubricGroupMapper'      => $this->getMapperFactory()->getLazy(RubricGroupMapper::class),
                     'rubricCriterionMapper'  => $this->getMapperFactory()->getLazy(RubricCriterionMapper::class),
+                    'assessmentDataSource'   => $injector->lazyGet('assessmentDataSource'),
                     'access'                 => $injector->lazy(function () { return Access::getInstance(); }),
                     'apiBridge'              => $injector->lazyNew(
                         ApiBridge::class,
