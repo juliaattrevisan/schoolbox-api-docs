@@ -18,7 +18,7 @@ $border-bottom-width: 1px;
 .tabs {
   width: 100%;
   border-bottom: 1px solid $silver;
-  padding: 0.25rem 0 0;
+  padding: 0.25rem 0.5rem 0;
   font-size: 0; // This is to remove the spacing between centered inline-block'ed elements
   background: $ghost;
 
@@ -34,16 +34,26 @@ $border-bottom-width: 1px;
 
     a {
       padding: 0.75rem 1rem;
-      border-bottom: $border-bottom-width solid transparent;
+      //border-bottom: $border-bottom-width solid transparent;
+      color: $anchor-font-color;
+
 
       &:hover {
         color: $body-font-color;
-        border-bottom: $border-bottom-width solid $content-ui-hover;
+        //border-bottom: $border-bottom-width solid $content-ui-hover;
       }
     }
 
     &.active a {
-      border-bottom: $border-bottom-width solid $accent-foreground;
+      //border-bottom: $border-bottom-width solid $accent-foreground;
+      background: white;
+      border-top: $border-bottom-width solid #ddd;
+      border-right: $border-bottom-width solid #ddd;
+      border-left: $border-bottom-width solid #ddd;
+      border-top-right-radius: 4px;
+      border-top-left-radius: 4px;
+      position: relative;
+      bottom: -1px;
     }
   }
 }
