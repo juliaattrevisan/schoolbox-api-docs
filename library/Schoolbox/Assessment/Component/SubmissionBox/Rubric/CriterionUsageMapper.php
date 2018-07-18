@@ -1,6 +1,6 @@
 <?php
 /**
- * Mapper for rubric usage.
+ * Mapper for rubric criterion usage.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2013, Alaress Pty Ltd
@@ -14,7 +14,7 @@ use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 
 /**
- * Class UsageMapper
+ * Class CriterionUsageMapper
  *
  * @package Schoolbox\Assessment\Component\SubmissionBox\Rubric
  * @method CriterionUsage createModel($idValue = null)
