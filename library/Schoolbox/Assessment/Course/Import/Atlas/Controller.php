@@ -433,11 +433,11 @@ class Controller extends BaseController
                 $group = new Group($groupDataModel->getId());
                 $rubric->putGroup($group);
 
-                // Add an empty criterion for now, I guess
+                // Add a criterion with an empty name for now, I guess
                 $criterionDataModel = $this->rubricCriterionMapper->findOrCreateOneForFolderByKey(
                     $unitSpec->getFolder()->getId(),
-                    $standard->getTitle(),
                     '',
+                    $standard->getTitle(),
                     false
                 );
                 $criterion = new Criterion($criterionDataModel->getId());
@@ -450,8 +450,6 @@ class Controller extends BaseController
                     $level,
                     new Descriptor('', 1)
                 );
-
-                // Add a code if there is one? ¯\_(ツ)_/¯
             }
 
             $dueWork
