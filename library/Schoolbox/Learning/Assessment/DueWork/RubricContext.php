@@ -108,7 +108,7 @@ class RubricContext
          */
         (new GridGenerator($this->rubricMapper, $dueWork->getRubric(), $student))->applyInstructorGivenMark($publishedOnly);
         $rubric = $dueWork->getRubric()->toContext();
-        $context['rubric'] = array_merge($rubric, ['descriptorMetadata' => $this->generateDescriptorMetadata($rubric)]);
+        $context['rubric'] = array_merge($rubric, ['descriptorMetadata' => $this->generateRubricMarkMetadata($rubric)]);
 
         return $context;
     }
@@ -175,7 +175,7 @@ class RubricContext
 
         $rubric = $dueWork->getRubric()->toContext($currentUser);
         $context = [
-            'rubric' => array_merge($rubric, ['descriptorMetadata' => $this->generateDescriptorMetadata($rubric)])
+            'rubric' => array_merge($rubric, ['descriptorMetadata' => $this->generateRubricMarkMetadata($rubric)])
         ];
 
         // Don't show total mark here at all (it's zero anyway when there is no Participant)
@@ -251,7 +251,7 @@ class RubricContext
 
         $rubric = $dueWork->getRubric()->toContext($currentUser);
         $context = [
-            'rubric' => array_merge($rubric, ['descriptorMetadata' => $this->generateDescriptorMetadata($rubric)])
+            'rubric' => array_merge($rubric, ['descriptorMetadata' => $this->generateRubricMarkMetadata($rubric)])
         ];
 
         // Hide total mark from students and parents
@@ -271,41 +271,61 @@ class RubricContext
      *                          - sort order for criteria
      *                          - max and min value for each level (descriptor) in the criteria
      */
-    private function generateDescriptorMetadata(array $rubric) : array
+    private function generateRubricMarkMetadata(array $rubric) : array
     {
+        // Array of descriptors indexed by criteria and level ID
         $descriptors = $rubric['descriptors'];
+
+        // Get a list of all levels in this rubric.
+        // The descriptor array contains only the levels that have descriptors,
+        // so we can't get this info on the fly when looping through descriptors.
         $levelIds = array_keys($rubric['levels']);
-        $startIndex = 0;
-        $endIndex = \count($levelIds);
 
-        $metadata = $this->generateCriterionMetadata($descriptors, $levelIds, $startIndex, $endIndex);
-
-        return $metadata;
+        return $this->generateCriterionMetadata($descriptors, $levelIds);
     }
 
-    private function generateCriterionMetadata(array $descriptors, array $levelIds, int $startIndex, int $endIndex) : array
+    /**
+     * Loop through criteria and determine
+     * - the sorting direction of their descriptors
+     * - metadata for each descriptor
+     *
+     * @param array $descriptors    Descriptors indexed by the level they belong to.
+     * @param array $levelIds       List of IDs of all the levels in this rubric.
+     * @return array
+     */
+    private function generateCriterionMetadata(array $descriptors, array $levelIds) : array
     {
         $metadata = [];
 
-        foreach ($descriptors as $critId => $levelDescriptors) {
-            $firstLevel = $levelIds[$startIndex];
-            $lastLevel = $levelIds[$endIndex - 1];
+        // Indexes of the first and last levels that have descriptor values
+        $firstValuedLevelIndex = 0;
+        $lastValuedLevelIndex = \count($levelIds);
 
+        foreach ($descriptors as $critId => $levelDescriptors) {
+            // The IDs of the first and last level in the criterion
+            $firstLevel = $levelIds[$firstValuedLevelIndex];
+            $lastLevel = $levelIds[$lastValuedLevelIndex - 1];
+
+            // Descriptor values of the first and last level; if no value is found, null
             $startValue = $descriptors[$critId][$firstLevel] ? $descriptors[$critId][$firstLevel]['value'] : null;
             $endValue = $descriptors[$critId][$lastLevel] ? $descriptors[$critId][$lastLevel]['value'] : null;
-            $direction = 'asc';
 
             // TODO this is working for the second group but not the first...
             // If the first or last descriptor doesn't have points, skip this iteration and adjust our idea of where the values start
+
             if ($startValue === null) {
-                $startIndex++;
+                // If the first level has no points, try the next level...and so on
+                $firstValuedLevelIndex++;
                 continue;
             }
             if ($endValue === null) {
-                $endIndex--;
+                // If the last level has no points, try the second-to-last...and so on
+                $lastValuedLevelIndex--;
                 continue;
             }
 
+            // Assume ascending values by default
+            $direction = 'asc';
             if ($startValue > $endValue) {
                 $direction = 'desc';
             }
@@ -314,67 +334,79 @@ class RubricContext
                 'direction' => $direction
             ];
 
-            $prevDescriptorMax = $startValue; // Used for ascending order calculations
-
-            // Loop through level ids
-            $numLevels = \count($levelIds);
-
-            for ($i = 0; $i < $numLevels; $i++) {
-                // If this level has descriptors, calculate the range
-                if (array_key_exists($i, $levelDescriptors)) {
-
-                    // For descending descriptors, calculate the values we need to determine the cell's min value later on
-                    if ($direction === 'desc') {
-
-                        /* - If there is a 'next' cell, use its value
-                         * - Otherwise just use the same value as this cell
-                         */
-                        if ($levelDescriptors[$i + 1] && ($levelDescriptors[$i + 1]['value'] !== null)) {
-                            $nextDescriptorMax = $levelDescriptors[$i + 1]['value'];
-                        } else {
-                            $nextDescriptorMax = $endValue;
-                        }
-                    }
-
-                    // The cell's stored value will always be its maximum regardless of order
-                    $currentDescriptorMax = $levelDescriptors[$i]['value'];
-
-                    // Skip this iteration if this descriptor
-                    if ($currentDescriptorMax === null) {
-                        continue;
-                    }
-
-                    /* Assume ascending order by default
-                     * - If the value for this descriptor is the same as the previous cell, we're either on the first cell,
-                     *   or on a cell without a range
-                     * - Otherwise, this cell's min value is 1 greater than the previous cell's max, since we're ascending
-                     */
-                    $currentDescriptorMin = $prevDescriptorMax === $currentDescriptorMax ? $prevDescriptorMax : $prevDescriptorMax + 1;
-
-                    // Calculate min value differently if descriptors are descending
-                    if ($direction === 'desc') {
-                        /* - If the value for this descriptor is the same as the next cell, we're either on the last cell,
-                         *   or on a cell without a range
-                         * - Otherwise, this cell's min value is 1 greater than the next cell's max, since we're descending
-                         */
-                        $currentDescriptorMin = $currentDescriptorMax === $nextDescriptorMax ? $nextDescriptorMax : $nextDescriptorMax + 1;
-                    }
-
-                    // Index min and max by level ID for this criterion
-                    $metadata[$critId][$i] = [
-                        'min' => $currentDescriptorMin,
-                        'max' => $currentDescriptorMax
-                    ];
-
-                    $prevDescriptorMax = $currentDescriptorMax;
-                } else {
-                    continue;
-                }
-            }
+            $this->generateDescriptorMetadata($metadata, $levelDescriptors, $lastValuedLevelIndex, $direction, $startValue, $endValue, $critId);
         }
 
         return $metadata;
     }
+
+    /**
+     * Loops through descriptors in a criterion and stores their min and max value in the $metadata array, indexed by $critId.
+     *
+     * @param array $metadata               Passed by reference, as we need to mutate this array.
+     * @param array $levelDescriptors       Descriptors indexed by the level they belong to.
+     * @param int $lastValuedLevelIndex     ID of the last level we know of that has a descriptor with a value.
+     * @param string $direction             Ordering of the descriptor values - asc or desc
+     * @param int $startValue               Value of the first descriptor with a value
+     * @param int $endValue                 Value of the last descriptor with a value
+     * @param int $critId                   ID of the criterion whose descriptors we are currently examining.
+     */
+    private function generateDescriptorMetadata(array &$metadata, array $levelDescriptors, int $lastValuedLevelIndex, string $direction, int $startValue, int $endValue, int $critId) : void
+    {
+        // At this point there is no "previous" cell yet since we're at the start, so assign the first cell's value
+        $prevDescriptorMax = $startValue;
+
+        for ($i = 0; $i < $lastValuedLevelIndex; $i++) {
+            // If this level has descriptors, calculate the range
+            if (array_key_exists($i, $levelDescriptors)) {
+
+                // The cell's stored value will always be its maximum
+                $currentDescriptorMax = $levelDescriptors[$i]['value'];
+
+                // Skip this iteration if this descriptor has no value
+                if ($currentDescriptorMax === null) {
+                    continue;
+                }
+
+                /* Assume ascending order by default
+                 * - If the value for this descriptor is the same as the previous cell, we're either on the first cell,
+                 *   or on a cell without a range
+                 * - Otherwise, this cell's min value is 1 greater than the previous cell's max, since we're ascending
+                 */
+                $currentDescriptorMin = $prevDescriptorMax === $currentDescriptorMax ? $prevDescriptorMax : $prevDescriptorMax + 1;
+
+                // If descending....
+                if ($direction === 'desc') {
+                    /* - If there is a 'next' cell, use its value
+                     * - Otherwise just use the same value as this cell
+                     */
+                    if ($levelDescriptors[$i + 1] && ($levelDescriptors[$i + 1]['value'] !== null)) {
+                        $nextDescriptorMax = $levelDescriptors[$i + 1]['value'];
+                    } else {
+                        $nextDescriptorMax = $endValue;
+                    }
+
+                    /* - If the value for this descriptor is the same as the next cell, we're either on the last cell,
+                     *   or on a cell without a range
+                     * - Otherwise, this cell's min value is 1 greater than the next cell's max, since we're descending
+                     */
+                    $currentDescriptorMin = $currentDescriptorMax === $nextDescriptorMax ? $nextDescriptorMax : $nextDescriptorMax + 1;
+                }
+
+                // Index min and max by level ID for this criterion
+                $metadata[$critId][$i] = [
+                    'min' => $currentDescriptorMin,
+                    'max' => $currentDescriptorMax
+                ];
+
+                $prevDescriptorMax = $currentDescriptorMax;
+            } else {
+                // If this level has no descriptors, skip the iteration
+                continue;
+            }
+        }
+    }
+
 
 
     /**
