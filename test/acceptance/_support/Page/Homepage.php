@@ -16,22 +16,21 @@ class Homepage
     public const URL = '/homepage/{id}';
 
     public const ELEMENT_ADD_COMPONENT_TAB = '#tabs-1';
-
     public const ELEMENT_ADD_COMPONENT_SECTION_INFORMATION = '#tabs-sub-1';
-
     public const ELEMENT_ADD_COMPONENT_SECTION_COLLABORATION = '#tabs-sub-2';
-
     public const ELEMENT_ADD_COMPONENT_SECTION_LEARNING = '#tabs-sub-3';
-
     public const ELEMENT_ADD_COMPONENT_SECTION_MULTIMEDIA = '#tabs-sub-4';
-
     public const ELEMENT_ADD_COMPONENT_SECTION_RESOURCES = '#tabs-sub-5';
-
     public const ELEMENT_ADD_COMPONENT_SECTION_FEEDS = '#tabs-sub-6';
 
     public const ELEMENT_EDIT_COLUMNS_TAB = '#tabs-2';
 
     public const LINK_MENU = 'a[data-dropdown="tab-control"]';
+
+    public const ELEMENT_COMPONENT_LAYOUT = '#component-layout';
+    public const ELEMENT_COMPONENT_LAYOUT_TOP = self::ELEMENT_COMPONENT_LAYOUT . ' div.column-top';
+    public const ELEMENT_COMPONENT_LAYOUT_LEFT = self::ELEMENT_COMPONENT_LAYOUT . ' div.column-left';
+    public const ELEMENT_COMPONENT_LAYOUT_RIGHT = self::ELEMENT_COMPONENT_LAYOUT . ' div.column-right';
 
     /**
      * @var AcceptanceTester
@@ -79,7 +78,37 @@ class Homepage
 
         // Wait for it to load
         $this->tester->waitForAjaxDone();
+    }
 
+    /**
+     * @param string $layout   The layout in which the component lives: one of the
+     *                         `self::ELEMENT_COMPONENT_LAYOUT_*` constants
+     * @param int    $position The position of the component (1-indexed)
+     * @return string a locator for the component
+     */
+    public function locateComponent(string $layout, int $position): string
+    {
+        // TODO somehow fix this so that it is able to actually use nth-child
+        return sprintf(
+            '%s div.component-container',
+            $layout
+//            ,
+//            // Offset position by 1, due to the presence of a placeholder in first position
+//            $position + 1
+        );
+    }
+
+    /**
+     * Clicks a component empty state link.
+     *
+     * @param string $layout
+     * @param int    $position
+     */
+    public function clickComponentEmptyStateLink(string $layout, int $position): void
+    {
+        $this->tester->click([
+            'css' => $this->locateComponent($layout, $position) . ' .empty-state a',
+        ]);
     }
 
     /**

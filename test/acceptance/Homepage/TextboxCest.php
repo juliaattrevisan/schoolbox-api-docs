@@ -48,5 +48,6 @@ class TextboxCest
 
         // With the new component:
         // enter stuff into it
+        $homepage->clickComponentEmptyStateLink(Homepage::ELEMENT_COMPONENT_LAYOUT_TOP, 1);
     }
 }
