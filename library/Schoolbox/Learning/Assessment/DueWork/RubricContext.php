@@ -373,7 +373,8 @@ class RubricContext
                  *   or on a cell without a range
                  * - Otherwise, this cell's min value is 1 greater than the previous cell's max, since we're ascending
                  */
-                $currentDescriptorMin = $prevDescriptorMax === $currentDescriptorMax ? $prevDescriptorMax : $prevDescriptorMax + 1;
+                // TODO strict comparison should return true here, why isn't it
+                $currentDescriptorMin = ($prevDescriptorMax == $currentDescriptorMax) ? $prevDescriptorMax : $prevDescriptorMax + 1;
 
                 // If descending....
                 if ($direction === 'desc') {
@@ -390,7 +391,8 @@ class RubricContext
                      *   or on a cell without a range
                      * - Otherwise, this cell's min value is 1 greater than the next cell's max, since we're descending
                      */
-                    $currentDescriptorMin = $currentDescriptorMax === $nextDescriptorMax ? $nextDescriptorMax : $nextDescriptorMax + 1;
+                    // TODO strict comparison should return true here, why isn't it
+                    $currentDescriptorMin = ($currentDescriptorMax == $nextDescriptorMax) ? $nextDescriptorMax : $nextDescriptorMax + 1;
                 }
 
                 // Index min and max by level ID for this criterion
