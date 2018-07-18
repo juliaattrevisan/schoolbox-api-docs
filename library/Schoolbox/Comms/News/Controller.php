@@ -554,6 +554,7 @@ class Controller extends Base
             'currentUrl' => $url,
             'paginator' => $paginator,
             'showPaginator' => $showPaginator,
+            'compactMode' => $params->getCompactMode(),
             'pageNum' => $params->getPageNum()
         ]);
 
