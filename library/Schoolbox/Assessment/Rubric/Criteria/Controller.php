@@ -14,7 +14,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Group;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\GroupMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\UsageMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionUsageMapper;
 use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\L10n\RosettaStone;
@@ -44,7 +44,7 @@ class Controller extends BaseController
 
 
     /**
-     * @var UsageMapper
+     * @var CriterionUsageMapper
      */
     private $usageMapper;
 
@@ -70,19 +70,19 @@ class Controller extends BaseController
     /**
      * Constructor
      *
-     * @param CriterionMapper $criterionMapper
-     * @param GroupMapper     $groupMapper
-     * @param NodeMapper      $nodeMapper
-     * @param UsageMapper     $usageMapper
-     * @param RubricMapper    $rubricMapper
-     * @param ErrorMapper     $errorMapper
-     * @param RosettaStone    $rosettaStone
+     * @param CriterionMapper      $criterionMapper
+     * @param GroupMapper          $groupMapper
+     * @param NodeMapper           $nodeMapper
+     * @param CriterionUsageMapper $usageMapper
+     * @param RubricMapper         $rubricMapper
+     * @param ErrorMapper          $errorMapper
+     * @param RosettaStone         $rosettaStone
      */
     public function __construct(
         CriterionMapper $criterionMapper,
         GroupMapper $groupMapper,
         NodeMapper $nodeMapper,
-        UsageMapper $usageMapper,
+        CriterionUsageMapper $usageMapper,
         RubricMapper $rubricMapper,
         ErrorMapper $errorMapper,
         RosettaStone $rosettaStone

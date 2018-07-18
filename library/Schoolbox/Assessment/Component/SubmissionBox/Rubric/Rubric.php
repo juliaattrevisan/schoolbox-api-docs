@@ -190,7 +190,7 @@ class Rubric extends Core\Rubric
     /**
      * Returns a collection containing all the groups in this grid, for DB persistence.
      *
-     * @return Usage[]|Collection
+     * @return CriterionUsage[]|Collection
      */
     public function getORMGroups()
     {
@@ -248,7 +248,7 @@ class Rubric extends Core\Rubric
 
     /**
      * @param Core\Criteria\Group $group
-     * @return Usage
+     * @return CriterionUsage
      */
     protected function createORMGroupUsage(Core\Criteria\Group $group)
     {
@@ -269,11 +269,11 @@ class Rubric extends Core\Rubric
     /**
      * Returns a collection containing all the criteria in this grid, for DB persistence.
      *
-     * @return Usage[]|Collection
+     * @return CriterionUsage[]|Collection
      */
     public function getORMCriterionUsages()
     {
-        $c = UsageMapper::getInstance()->createCollection();
+        $c = CriterionUsageMapper::getInstance()->createCollection();
 
         $sequence = 0;
         foreach ($this->criteriaGroups as $group) {
@@ -291,16 +291,16 @@ class Rubric extends Core\Rubric
     /**
      * @param Core\Criteria\Criterion $criterion
      * @param int $sequence
-     * @return Usage
+     * @return CriterionUsage
      */
     protected function createORMCriterionUsage(Core\Criteria\Criterion $criterion, $sequence)
     {
         if (!$this->criterionUsageCache->contains($criterion)) {
             $this->criterionUsageCache->attach($criterion,
-                UsageMapper::getInstance()
-                  ->createModel()
-                  ->setCriterion($this->criterionCache->offsetGet($criterion))
-                  ->setSubmissionBox($this->box)
+                CriterionUsageMapper::getInstance()
+                                    ->createModel()
+                                    ->setCriterion($this->criterionCache->offsetGet($criterion))
+                                    ->setSubmissionBox($this->box)
             );
         }
 

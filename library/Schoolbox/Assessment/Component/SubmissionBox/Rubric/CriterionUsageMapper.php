@@ -1,6 +1,6 @@
 <?php
 /**
- * Mapper for rubric usage.
+ * Mapper for rubric criterion usage.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2013, Alaress Pty Ltd
@@ -14,17 +14,18 @@ use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 
 /**
- * Class UsageMapper
+ * Class CriterionUsageMapper
  *
  * @package Schoolbox\Assessment\Component\SubmissionBox\Rubric
- * @method Usage createModel($idValue = null)
- * @method Usage[]|Schoolbox\GenericCollection findByColumn($columnName, $columnValue, $options = [])
+ * @method CriterionUsage createModel($idValue = null)
+ * @method CriterionUsage[]|Schoolbox\GenericCollection findByColumn($columnName, $columnValue, $options = [])
  */
-class UsageMapper extends Schoolbox\Mapper {
-
-    protected function mapping() {
+class CriterionUsageMapper extends Schoolbox\Mapper
+{
+    protected function mapping()
+    {
         $this->hasTable('rubric_criterion_usage');
-        $this->hasModel(Usage::class);
+        $this->hasModel(CriterionUsage::class);
         $this->uses('sequence', self::TYPE_INTEGER);
         $this->joins('criterion_id', CriterionMapper::class, 'id', null, null, 'criterion', 'criterion');
         $this->joins('submission_box_id', SubmissionBoxMapper::class, 'id', null, null, 'submissionBox', 'submission_box');

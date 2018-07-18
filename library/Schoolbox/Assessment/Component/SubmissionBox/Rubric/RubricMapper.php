@@ -771,13 +771,14 @@ class RubricMapper
         });
 
         // first, persist the row and column headers (criteria and levels, respectively)
+        GroupMapper::getInstance()->save($rubric->getORMGroups());
         CriterionMapper::getInstance()->save($criteria = $rubric->getORMCriteria());
         LevelMapper::getInstance()->save($levels = $rubric->getORMLevels());
 
         // usages are a join table with a sequence, not a strict "object" - as such, we can purge the relevant records and simply re-create them
         // TODO consider removing submission_box_id, associating with group ID instead
-        UsageMapper::getInstance()->deleteByColumn('submission_box_id', $submissionBox->getId());
-        UsageMapper::getInstance()->save($usages = $rubric->getORMCriterionUsages());
+        CriterionUsageMapper::getInstance()->deleteByColumn('submission_box_id', $submissionBox->getId());
+        CriterionUsageMapper::getInstance()->save($usages = $rubric->getORMCriterionUsages());
 
         // ditto group usages
         GroupUsageMapper::getInstance()->deleteByColumn('submission_box_id', $submissionBox->getId());
@@ -1096,7 +1097,7 @@ class RubricMapper
         $groupMapper          = GroupMapper::getInstance();
         $criterionMapper      = CriterionMapper::getInstance();
         $groupUsageMapper     = GroupUsageMapper::getInstance();
-        $criterionUsageMapper = UsageMapper::getInstance();
+        $criterionUsageMapper = CriterionUsageMapper::getInstance();
 
         $sourceBox = $boxMapper->findOneByColumn('assessment_id', $sourceAssessmentId);
 
@@ -1122,7 +1123,7 @@ class RubricMapper
         $dstCriteria = $criterionMapper->createCollection();
         /** @var Group[]|GenericCollection $dstGroups */
         $dstGroupUsages = $groupUsageMapper->createCollection();
-        /** @var Usage[]|GenericCollection $dstCriterionUsages */
+        /** @var CriterionUsage[]|GenericCollection $dstCriterionUsages */
         $dstCriterionUsages = $criterionUsageMapper->createCollection();
 
         // Copy Levels
@@ -1241,7 +1242,7 @@ class RubricMapper
 
         // Get Source Usages
         /** @var GroupUsage[]|GenericCollection $srcGroupUsages */
-        /** @var Usage[]|GenericCollection $srcCriterionUsages */
+        /** @var CriterionUsage[]|GenericCollection $srcCriterionUsages */
         $srcGroupUsages = $groupUsageMapper->findByColumnList([
             'rubric_group_id'   => $srcGroups->getPropertyValues('id'),
             'submission_box_id' => $sourceBox->getId(),

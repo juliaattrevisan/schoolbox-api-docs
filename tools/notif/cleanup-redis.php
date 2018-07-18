@@ -46,7 +46,7 @@ $kernel->run(function(Di\Container $di, LoopInterface $loop, Logger $log, array 
         Rubric\LevelMapper::getInstance(),
         Rubric\MarkMapper::getInstance(),
         Rubric\ResultMapper::getInstance(),
-        Rubric\UsageMapper::getInstance(),
+        Rubric\CriterionUsageMapper::getInstance(),
     ];
 
     $modelClasses = [];
