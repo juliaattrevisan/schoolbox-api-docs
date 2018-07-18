@@ -84,6 +84,7 @@
             </tr>
         {% endfor %}
 
+        {# TODO group.total is meant to be null when the student is self reflecting #}
         {% if group.total %}
         <tr>
             {% if group.humanReadableMark %}
@@ -100,7 +101,6 @@
         {% endif %}
 
     {% endfor %}
-
 
     {% if rubric.total %}
     <tr>
