@@ -25,6 +25,11 @@ class Mapper extends \Schoolbox\Mapper
 {
 
     /**
+     * This const represents "all topics"
+     */
+    public const TOPIC_ALL = 0;
+
+    /**
      * @inheritdoc
      * @throws \Schoolbox\Mapper\Exception
      */
@@ -155,5 +160,88 @@ class Mapper extends \Schoolbox\Mapper
         $collection->reindex();
 
         return $collection;
+    }
+
+
+    /**
+     * Find a list of articles that are somehow related to $topicId
+     *
+     * The list consists of articles that fulfil this criteria, which accounts for all the articles that are
+     * presentable to the audience:
+     *
+     *   - has a publish_at date
+     *   - has been accepted for publication by the moderator
+     *   - has not yet expired
+     *
+     * This equates to articles in the states "Awaiting Publication", "Published", "Expired" (Archived)
+     *
+     * The n-n relational between articles and topics precludes proper usage of findAll()
+     * with a limit - it doesn't count properly
+     *
+     * @param int $topicId
+     * @param int $limit
+     * @return \Schoolbox\GenericCollection
+     */
+    public function findForTopic(int $topicId, int $limit): \Schoolbox\GenericCollection
+    {
+        $articlesInTopic = [];
+
+        /* If $topicId is provided, only get articles for that topic
+         * Otherwise get $limit articles from any topic
+         */
+        $query = "
+            SELECT id
+            FROM {$this->table}
+            WHERE publish_at IS NOT NULL
+            AND accepted_at IS NOT NULL
+            AND expires_at > NOW()
+            ORDER BY publish_at DESC, created_at DESC
+        ";
+
+        if ($topicId !== self::TOPIC_ALL) {
+            $query = "
+                SELECT id
+                FROM {$this->table}
+                INNER JOIN comms_news_article_topic cnat ON {$this->table}.id = cnat.article_id 
+                WHERE publish_at IS NOT NULL
+                AND accepted_at IS NOT NULL
+                AND expires_at > NOW()
+                AND cnat.topic_id = :topicId
+                GROUP BY id
+                ORDER BY publish_at DESC, created_at DESC
+            ";
+        }
+
+        if ($limit) {
+            $query .= 'LIMIT :limit';
+        }
+
+        $statement = $this->database->prepare($query);
+
+        /* Because pdo does some micky mouse shenanigans
+         */
+        if ($topicId !== self::TOPIC_ALL) {
+            $statement->bindValue('topicId', $topicId, \PDO::PARAM_INT);
+        }
+
+        if ($limit) {
+            $statement->bindValue('limit', $limit, \PDO::PARAM_INT);
+        }
+
+        $statement->execute();
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $articlesInTopic[] = $row['id'];
+        }
+
+        /* TODO: Filter $articlesInTopic vs articles that I can see
+         */
+
+        return $this->findByColumn('id', $articlesInTopic, [
+            'order' => [
+                'publish_at' => 'desc',
+                'created_at' => 'desc',
+            ]
+        ]);
     }
 }

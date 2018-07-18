@@ -20,58 +20,58 @@ $tabs-content-padding: 0;
 @import "../../../../javascript/components/foundation/scss/foundation/components/tabs";
 
 .tabs {
-    dd, li.tab-title {
-        /* This comes from some global ul or body element
-         * and is usually 1.5rem - which contributes to how
-         * this element is dimensioned, leading to some
-         * sometimes-unexpected behaviour if you don't know this
-         */
-        margin-right: 1px;
-        a {
-            @include button-dimensions();
-        }
+  dd, li.tab-title {
+    /* This comes from some global ul or body element
+     * and is usually 1.5rem - which contributes to how
+     * this element is dimensioned, leading to some
+     * sometimes-unexpected behaviour if you don't know this
+     */
+    margin-right: 1px;
+    a {
+      @include button-dimensions();
     }
+  }
 }
 
 .tabs-material {
-    width: 100%;
-    border-bottom: 1px solid #eee;
-    padding: 0 0.5rem;
-    margin-bottom: 0;
-    font-size: 0; // This is to remove the spacing between centered inline-block'ed elements
+  width: 100%;
+  border-bottom: 1px solid #eee;
+  padding: 0 0.5rem;
+  margin-bottom: 0;
+  font-size: 0; // This is to remove the spacing between centered inline-block'ed elements
 
-    :focus {
-        outline: none;
+  :focus {
+    outline: none;
+  }
+
+  &.center {
+    text-align: center;
+  }
+
+  dd, li.tab-title {
+    display: inline-block;
+    vertical-align: bottom;
+    list-style: none;
+    position: relative;
+    text-transform: uppercase;
+    font-weight: $font-weight-semibold;
+    margin: 0 0 -1px;
+    font-size: rem-calc($base-font-size - 2);
+
+    a {
+      min-height: 2.5rem;
+      padding: 0.75rem 1rem;
+      position: relative;
+      overflow: hidden;
+      vertical-align: middle;
+      display: block;
+      color: $body-font-color;
+      border-bottom: 2px solid transparent;
     }
 
-    &.center {
-        text-align: center;
+    &.active a {
+      border-bottom: 2px solid $accent-foreground;
+      color: $accent-foreground;
     }
-
-    dd, li.tab-title {
-        display: inline-block;
-        vertical-align: bottom;
-        list-style: none;
-        position: relative;
-        text-transform: uppercase;
-        font-weight: $font-weight-semibold;
-        margin: 0 0 -1px;
-        font-size: rem-calc($base-font-size - 2);
-
-        a {
-            min-height: 2.5rem;
-            padding: 0.75rem 1rem;
-            position: relative;
-            overflow: hidden;
-            vertical-align: middle;
-            display: block;
-            color: $body-font-color;
-            border-bottom: 2px solid transparent;
-        }
-
-        &.active a {
-            border-bottom: 2px solid $accent-foreground;
-            color: $accent-foreground;
-        }
-    }
+  }
 }

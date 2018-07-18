@@ -1,5 +1,6 @@
 (function() {
 
+
     /**
      * Save For Later
      *
@@ -10,8 +11,7 @@
 
         var config = init(options, $(this));
 
-        initSaveForLater();
-        initSaveForLaterActions();
+        initialConditions();
 
         /**
          * Init
@@ -28,6 +28,10 @@
                  */
                 element: element,
 
+                /* The toaster
+                 */
+                toast: $('#toast'),
+
                 /* Transitions
                  */
                 saved: {
@@ -39,7 +43,6 @@
                     title: 'Remove article from saved items'
                 },
                 unsaved: {
-                    url: '/',
                     toast: {
                         processing: 'Removing...',
                         complete: 'Removed'
@@ -55,7 +58,7 @@
         /**
          * Set up initial state of the button that activates Save For Later
          */
-        function initSaveForLater() {
+        function initialConditions() {
             var currentState;
 
             $.each($(config.element).find('a[data-saveforlater]'), function(index, element) {
@@ -75,12 +78,12 @@
         /**
          * Set up event listeners
          */
-        function initSaveForLaterActions() {
+        this.initAsync = function() {
             $(config.element).on('click', 'a[data-saveforlater]', function(event) {
                 event.preventDefault();
 
                 var $element = $(this);
-                var $toast = $('#toast');
+                var $toast = config.toast;
 
                 /* The state of everything after the action takes place
                  */
@@ -124,6 +127,8 @@
                 });
 
             });
-        }
-    }
+        };
+
+        return this;
+    };
 }(jQuery));

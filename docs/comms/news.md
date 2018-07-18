@@ -38,6 +38,18 @@ Setting a value here will enable the Expiry Date to have a default offset from t
 
 Leaving this empty will cause articles to expire one week from time of creation.
 
+### "Read More" Link
+Some news articles are quite long - even in their blurbs - and they get truncated for brevity in some displays such as email digests, components, etc. Truncation occurs after 300 characters and to the nearest word. Unfortunately some users don't realise that there is more to the article than they can see; there is no prompt to "read more". 
+
+Providing a value for this policy will enable a link to prompt them to "read more" but you can use any phrase you want. 
+
+Leaving it empty will disable the link from being available. 
+
+### Save For Later
+This is an in-built bookmarking system specifically for news articles. Activating this policy allows users to add articles to their lists. 
+
+Deactivating this will prevent articles from being added to their lists, but their previously-saved articles will still be available and removable.
+
 ### Topics
 A reference list of Topics that were configured by the Superuser in admin. Only Superusers can alter this list.
 
@@ -57,6 +69,7 @@ Some actions require certain preconditions to exist.
 * To edit an article, you must be considered its author and the article must not be accepted for publication.
 * To submit an article for moderation, you must have a title, publish and expire dates.
 * To publish an article to its audience, moderation must be deactivated; technically, this assumes the author to be the moderator (thus, self moderating) but operationally allows you to choose when to make it available.
+* To publish an article to its audience, the article must have a title, publish date and expiry date.
 * To delete an article, you must be considered its author and the article must not be accepted for publication.
 
 ### Moderated Workflow
@@ -112,3 +125,16 @@ Some actions require certain preconditions to exist.
 **Limbo (Trapped Between Settings)**. This occurs when moderation is activated, an article is submitted for moderation, but the moderation requirement is then deactivated. This leaves submitted articles in an inconclusive state of being, requiring moderators to accept these articles as if moderation was activated. This can be avoided by clearing the moderation list before deactivating moderation.
 
 **Moderator Authors**. Moderators cannot reject their own articles.
+
+
+## Known Issues
+There a number of known issues.
+
+* **Selectable Topics**. On the create/update screen, the Topics selectize doesn't show you all the options you can choose when you click into its input field.
+
+* **Topics don't initiate drafts**. For some reason changing the Topics relating to an article isn't being detected and won't trigger a draft autosave on the create/update screen.
+
+* **Uncached results**. Every time you click a tab in the News Component, it'll asynchronously retrieve the appropriate set of articles. I did have a dirty fling with caching at @andrewryantech request, but I found myself stuck on Save For Later. This is a toggle and articles can appear across multiple topics; this requires some bmf w.r.t. cache invalidation (it was able to remember the previous state of an article that you Saved For Later, which was very confusing)
+
+* **Hiding empty topics**. Without some bmf I can't really hide topics that have no articles. This is because the articles available in each topic are determined by audiencing logic; this is costly regardless of how many articles could be retrieved. To hide topics that have no content that you can access means I have to do audiencing checks on every article in every topic to determine their potential visibility to the current user. For now, the News Component hides when there are exactly 0 articles in the db. Otherwise it'll do its aforementioned async behaviour and return an empty state when there was nothing to see.
+

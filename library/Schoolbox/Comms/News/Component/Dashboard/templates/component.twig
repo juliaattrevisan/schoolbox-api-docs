@@ -1,0 +1,41 @@
+{##
+ # A list of all the available Topics to chooze
+ # Sets up a container for async article loading
+ #
+ # @param int componentInstanceId
+ # @param int firstTopicId
+ # @param int topicAll
+ # @param int limit
+ # @param Collection|Topic[] topics
+ # @param bool allDefault
+ # @param int compactMode
+ #}
+<script src="/javascript/shared/comms/articletabs.js"></script>
+<script src="/javascript/shared/comms/saveforlater.js"></script>
+<script>
+    $(function() {
+        $('#news-container-{{ componentInstanceId }}').articleTabs({
+            'firstUrl': "{{ routeLookup('commsNews.getListByTopic', {topicId: firstTopicId, limit: limit}) ~ '?compactMode=' ~ compactMode }}"
+        });
+    });
+</script>
+
+<dl class="tabs" data-tab id="news-topics-{{ componentInstanceId }}">
+    {# Select "All" by default if the component config is set #}
+    <dd {% if allDefault %}class="active"{% endif %}>
+        <a href="{{ routeLookup('commsNews.getListByTopic', {topicId: topicAll, limit: limit}) ~ '?compactMode=' ~ compactMode }}">All</a>
+    </dd>
+
+    {% set defaultSet = false %}
+
+    {% for topic in topics %}
+    <dd {% if not defaultSet and not allDefault %}class="active"{% set defaultSet = true %}{% endif %}>
+        <a href="{{ routeLookup('commsNews.getListByTopic', {topicId: topic.id, limit: limit}) ~ '?compactMode=' ~ compactMode }}">{{ topic.name }}</a>
+    </dd>
+    {% endfor %}
+
+</dl>
+
+<div id="news-container-{{ componentInstanceId }}">
+    <div class="loader"></div>
+</div>

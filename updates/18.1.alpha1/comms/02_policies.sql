@@ -15,6 +15,12 @@ VALUES ('publish_date_offset', '');
 INSERT INTO `comms_news_policy` (identifier, value)
 VALUES ('expiry_date_offset', '+1 week');
 
+-- News Policy: Read More
+-- When provided, long articles are truncated and have a "read more" link appended
+-- The content of the link is specified here
+INSERT INTO `comms_news_policy` (identifier, value)
+VALUES ('read_more', '');
+
 -- Social Policy: Save For Later
 -- When enabled, articles can be saved for later
 INSERT INTO `comms_news_policy` (identifier, value)

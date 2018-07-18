@@ -445,4 +445,27 @@ class Controller extends Base
             throw $e;
         }
     }
+
+
+    /**
+     * Get a list of articles that were audienced to me
+     *
+     * TODO: Incomplete
+     *
+     * @param int $topicId
+     * @param int $limit
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     */
+    public function getListByTopic(int $topicId, int $limit)
+    {
+        if ($this->getRequest()->isXhr()) {
+            $lists = new Lists($this->newsMapper, $this->policyMapper, $this->saveForLaterMapper);
+
+            $outcome = $lists->findForTopic($this->getUser(), $topicId, $limit);
+
+            $outcome['compactMode'] = $this->getRequest()->query['compactMode'];
+
+            $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@commsNewsDashboard/list.twig', $outcome));
+        }
+    }
 }
