@@ -14,6 +14,7 @@ use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpec;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Resource\HomepageConfigMapper;
+use Schoolbox\Resource\HomepageTemplateMapper;
 
 class Controller extends BaseController
 {
@@ -36,6 +37,12 @@ class Controller extends BaseController
 
 
     /**
+     * @var HomepageTemplateMapper
+     */
+    private $homepageTemplateMapper;
+
+
+    /**
      * @var CourseSpecMapper
      */
     private $courseSpecMapper;
@@ -44,15 +51,24 @@ class Controller extends BaseController
     /**
      * Constructor
      *
-     * @param ApiBridge        $apiBridge
-     * @param FolderMapper     $folderMapper
-     * @param CourseSpecMapper $courseSpecMapper
+     * @param ApiBridge              $apiBridge
+     * @param FolderMapper           $folderMapper
+     * @param HomepageConfigMapper   $homepageConfigMapper
+     * @param HomepageTemplateMapper $homepageTemplateMapper
+     * @param CourseSpecMapper       $courseSpecMapper
      */
-    public function __construct(ApiBridge $apiBridge, FolderMapper $folderMapper, CourseSpecMapper $courseSpecMapper)
-    {
-        $this->apiBridge        = $apiBridge;
-        $this->folderMapper     = $folderMapper;
-        $this->courseSpecMapper = $courseSpecMapper;
+    public function __construct(
+        ApiBridge $apiBridge,
+        FolderMapper $folderMapper,
+        HomepageConfigMapper $homepageConfigMapper,
+        HomepageTemplateMapper $homepageTemplateMapper,
+        CourseSpecMapper $courseSpecMapper
+    ) {
+        $this->apiBridge              = $apiBridge;
+        $this->folderMapper           = $folderMapper;
+        $this->homepageConfigMapper   = $homepageConfigMapper;
+        $this->homepageTemplateMapper = $homepageTemplateMapper;
+        $this->courseSpecMapper       = $courseSpecMapper;
     }
 
 
@@ -181,7 +197,7 @@ class Controller extends BaseController
         // at an earlier time we should've asked for a location to import into?
         // alternately, ask now?
 
-//        $this->response->redirect->afterPost($this->router->generate('course.courseList'));
+        $this->response->redirect->afterPost($this->router->generate('course.courseList'));
     }
 
 
@@ -197,25 +213,20 @@ class Controller extends BaseController
 
         // In addition, need to apply:
         // * Curriculum codes (if any)
-        // * Course builder template
         // * Permissions
-        // ** Inheritance
         $this->folderMapper->save($courseSpecFolder);
 
 
         // Apply the course builder homepage template
-        $template = $this->getConfigLoader()->get('course_builder_default_course_page_template');
-        $courseSpecFolderConfig = $this->homepageConfigMapper->createModel()
-            ->setTemplate($template);
-
-
-
-//        $homepageConfig->setTemplate($tplMapper->findById($template));
-//
-//        // Save homepage config
-//        $confMapper->save($homepageConfig);
-//        $confMapper->resetToTemplate($homepageConfig);
-
+        $coursespecTemplateId = $this->getConfigLoader()->get('course_builder_default_course_page_template');
+        if ($coursespecTemplateId) {
+            $courseSpecTemplate     = $this->homepageTemplateMapper->findById($coursespecTemplateId);
+            $courseSpecFolderConfig = $this->homepageConfigMapper->createModel()
+                ->setCategory($courseSpecFolder)
+                ->setTemplate($courseSpecTemplate);
+            $this->homepageConfigMapper->save($courseSpecFolderConfig);
+            $this->homepageConfigMapper->resetToTemplate($courseSpecFolderConfig);
+        }
 
 
         // Save the course spec
