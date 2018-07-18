@@ -53,6 +53,7 @@ class Renderer extends Handler
             $this->getPage()->setBlock('user', 'pastoral', 'pastoral_block');
             $this->getPage()->setBlock('user', 'eportfolio', 'eportfolio_block');
             $this->getPage()->setBlock('user', 'modify', 'modify_block');
+            $this->getPage()->setBlock('user', 'tot', 'tot_block');
             $this->getPage()->setBlock('modify', 'modify_enabled', 'modify_enabled_block');
             $this->getPage()->setBlock('modify', 'modify_disabled', 'modify_disabled_block');
             $this->getPage()->setBlock('user', 'position_title', 'position_title_block');
@@ -68,6 +69,13 @@ class Renderer extends Handler
             ));
 
             foreach ($result as $user) {
+
+                /* Remember if any actions were available to render in a tot
+                * If the`re were no actions, hide the tot
+                * because phplib, have to do it here
+                */
+                $hasActions = false;
+
                 $this->getPage()->setVar(array(
                     'USER_SEARCH_ID' => $user['id'],
                     'USER_SEARCH_SYNERGY_ID' => $user['synergy_id'],
@@ -87,15 +95,17 @@ class Renderer extends Handler
                 $this->getPage()->setVar('eportfolio_block');
                 $this->getPage()->setVar('boarder_leave_block');
                 $this->getPage()->setVar('academic_reports_block');
+                $this->getPage()->setVar('tot_block');
 
                 /* Hide Due Work link from parents, if Due Work access is restricted
                  */
                 if ($groupHandler->isParent() && Config::get('restrict_parent_duework_access')) {
                     $this->getPage()->setVar('due_work_block', '');
                 } elseif (!$groupHandler->isStudent($user['id']) || (!$groupHandler->isStaff() && !$groupHandler->isParentOfChild($user['id']))) {
-                    $this->getPage()->setVar('due_work_block');
+                    $this->getPage()->setVar('due_work_block', '');
                 } else {
                     $this->getPage()->parse('due_work_block', 'due_work');
+                    $hasActions = true;
                 }
 
                 if (Config::get('external_document_report_enabled')
@@ -103,6 +113,7 @@ class Renderer extends Handler
                     && ($groupHandler->isStaff() || $groupHandler->isParentOfChild($user['id']))
                 ) {
                     $this->getPage()->parse('academic_reports_block', 'academic_reports');
+                    $hasActions = true;
                 }
 
                 if ($groupHandler->isParent() && Config::get('restrict_parent_grades')) {
@@ -111,6 +122,7 @@ class Renderer extends Handler
                     $this->getPage()->setVar('grades_button_block', '');
                 } else {
                     $this->getPage()->parse('grades_button_block', 'grades_button');
+                    $hasActions = true;
                 }
 
                 // Hide if disabled or not a student
@@ -124,14 +136,13 @@ class Renderer extends Handler
                         ($groupHandler->isParentOfChild($user['id']) && \Config::get('pastoral_parent_access'))
                     ){
                         $this->getPage()->parse('pastoral_block', 'pastoral');
+                        $hasActions = true;
                     } else {
                         $this->getPage()->setVar('pastoral_block', '');
                     }
                 }
 
-
-
-                    //Show student timetables to staff and parents of child
+                //Show student timetables to staff and parents of child
                 if (empty($user['position_title'])) {
                     $this->getPage()->parse('normal_title_block', 'normal_title');
                     $this->getPage()->setVar('position_title_block', '');
@@ -146,6 +157,7 @@ class Renderer extends Handler
                         // Timetable shouldn't appear if synergy is disabled in the conf, or the students timetable is marked as hidden
                         if (Cfg::get('external_enable') && $user['synergy_id'] && !$user['hide_timetable']) {
                             $this->getPage()->parse('timetable_block', 'timetable');
+                            $hasActions = true;
                         } else {
                             $this->getPage()->setVar('timetable_block', '');
                         }
@@ -154,12 +166,14 @@ class Renderer extends Handler
                     if (Cfg::get('boarder_leave_enabled') == '1') {
                         if ($groupHandler->isStaff() and $user['residential_house_id']) {
                             $this->getPage()->parse('boarder_leave_block', 'boarder_leave');
+                            $hasActions = true;
                         }
                     }
                 } else {
                     //Show staff timetables to other staff
                     if ($_SESSION['user']->getRole()->isStaff() && $groupHandler->isStaff($user['id'])) {
                         $this->getPage()->parse('timetable_block', 'timetable');
+                        $hasActions = true;
                     }
                 }
                 if (!$_SESSION['user']->isSuperuser()) {
@@ -182,6 +196,7 @@ class Renderer extends Handler
 
                 if ($authenticator->canView()) {
                     $this->getPage()->parse('eportfolio_block', 'eportfolio');
+                    $hasActions = true;
                 }
 
                 /* Calendar link
@@ -200,10 +215,18 @@ class Renderer extends Handler
                         ));
 
                     $this->getPage()->parse('user_calendar_block', 'user_calendar');
+                    $hasActions = true;
                 } else {
                     $this->getPage()->setVar('user_calendar_block', '');
                 }
 
+                /* If the tot had any actions in it, show it
+                 * Otherwise, hide it (which it does initially anyway)
+                 */
+                if ($hasActions) {
+                    $this->getPage()->parse('tot_block', 'tot');
+                }
+                
                 $this->getPage()->parse('user_block', 'user', true);
             }
 
