@@ -81,7 +81,12 @@
                     {% set state = unsaved %}
                 {% endif %}
 
-                <a data-saveforlater="{{ state }}" href="{{ routeLookup('commsNewsSaveForLater.postToggle', {articleId: article.id}) }}"></a>
+                {# Check that you can save this for later #}
+                {% set saveForLaterRoute = routeLookup('commsNewsSaveForLater.postToggle', {articleId: article.id}) %}
+
+                {% if saveForLaterRoute %}
+                <a data-saveforlater="{{ state }}" href="{{ saveForLaterRoute }}"></a>
+                {% endif %}
             </nav>
 
             {# Hide the article tag when there's no content to show, or when compactMode is on #}
