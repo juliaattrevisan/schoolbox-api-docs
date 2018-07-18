@@ -49,7 +49,7 @@ ItemID = 49959
                 {% endif %}
                 <div class="selector">
                     <input id="unit-{{ unit.id }}"
-                           name="unit[{{ unit.id }}]"
+                           name="unit[{{ unit.id }}][selected]"
                            value="1"
                            type="checkbox"
                            {% if hasContent %}checked{% endif %}

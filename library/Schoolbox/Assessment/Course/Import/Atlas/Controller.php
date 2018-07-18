@@ -9,13 +9,16 @@ namespace Schoolbox\Assessment\Course\Import\Atlas;
 use Alaress\Web\Controller\Base as BaseController;
 use Schoolbox\Assessment\Course\Import\Atlas\Api\Bridge as ApiBridge;
 use Schoolbox\Assessment\Course\Import\Atlas\Api\Curriculum;
+use Schoolbox\Assessment\Course\Import\Atlas\Api\Unit;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpec;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpec;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Resource\Folder\Model as FolderModel;
+use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\HomepageConfigMapper;
 use Schoolbox\Resource\HomepageTemplateMapper;
 
@@ -52,6 +55,12 @@ class Controller extends BaseController
 
 
     /**
+     * @var UnitSpecMapper
+     */
+    private $unitSpecMapper;
+
+
+    /**
      * @var Access
      */
     private $access;
@@ -71,6 +80,7 @@ class Controller extends BaseController
      * @param HomepageConfigMapper   $homepageConfigMapper
      * @param HomepageTemplateMapper $homepageTemplateMapper
      * @param CourseSpecMapper       $courseSpecMapper
+     * @param UnitSpecMapper         $unitSpecMapper
      * @param Access                 $access
      * @param UserAccessMapper       $userAccessMapper
      */
@@ -80,6 +90,7 @@ class Controller extends BaseController
         HomepageConfigMapper $homepageConfigMapper,
         HomepageTemplateMapper $homepageTemplateMapper,
         CourseSpecMapper $courseSpecMapper,
+        UnitSpecMapper $unitSpecMapper,
         Access $access,
         UserAccessMapper $userAccessMapper
     ) {
@@ -88,6 +99,7 @@ class Controller extends BaseController
         $this->homepageConfigMapper   = $homepageConfigMapper;
         $this->homepageTemplateMapper = $homepageTemplateMapper;
         $this->courseSpecMapper       = $courseSpecMapper;
+        $this->unitSpecMapper         = $unitSpecMapper;
         $this->access                 = $access;
         $this->userAccessMapper       = $userAccessMapper;
     }
@@ -206,13 +218,21 @@ class Controller extends BaseController
 
         // Alternately should the API call occur in AJAX?
 
-        foreach ($this->request->post->get('unit') as $unitId => $unitParts) {
-            // Build a unit page out of this
-
-            // Which attachments are selected?
-
-            // Which assessments are selected?
+        $selectedUnits = $this->request->post->get('unit');
+        foreach ($curriculumPlan->getUnits() as $unit) {
+            if (!empty($selectedUnits[$unit->getId()]['selected'])) {
+                // This unit was selected; create it
+            } else {
+                // This unit wasn't selected; delete it
+            }
         }
+//        foreach ( as $unitId => $unitParts) {
+//            // Build a unit page out of this
+//
+//            // Which attachments are selected?
+//
+//            // Which assessments are selected?
+//        }
 
         // we're done here?
         // at an earlier time we should've asked for a location to import into?
@@ -222,8 +242,17 @@ class Controller extends BaseController
     }
 
 
-    private function createCourse(Curriculum $curriculum, FolderModel $baseFolder): CourseSpec
+    /**
+     * Create a course spec out of `$curriculum` in `$folder`.
+     *
+     * @param Curriculum $curriculum
+     * @param Folder     $baseFolder
+     * @return CourseSpec
+     * @throws \Schoolbox\Mapper\Exception if for some reason a model couldn't be created?
+     */
+    private function createCourse(Curriculum $curriculum, Folder $baseFolder): CourseSpec
     {
+        // Create and save course spec folder
         // TODO this all should be moved to a helper class
         // (as \Schoolbox\Assessment\Course\Controller::persistFolder does much the same thing)
         // TODO figure out if this course has already been imported, and update instead of create if so
@@ -231,20 +260,12 @@ class Controller extends BaseController
             ->setParent($baseFolder)
             ->setName($curriculum->getTitle())
             ->setInherit($this->getConfigLoader()->get('course_builder_default_course_page_inherit'));
-
-        // In addition, need to apply:
-        // * Curriculum codes (if any) from curriculum
-        // * Permissions (only if not inheriting permissions)
         $this->folderMapper->save($courseSpecFolder);
-        if (!$courseSpecFolder->getInherit()
-            && $this->access->getFolderAccess($this->getUser(), $courseSpecFolder->getId()) > UserAccess::ACCESS_WRITE
-        ) {
-            $userAccess = $this->userAccessMapper->createModel()
-                ->setUser($this->getUser())
-                ->setService(UserAccess::SERVICE_HOMEPAGE)
-                ->setAccessLevel(UserAccess::ACCESS_WRITE);
-            $this->userAccessMapper->save($userAccess);
-        }
+
+
+        // Allow the current user to write to the course folder
+        // (if for some reason they can't).
+        $this->ensureCurrentUserHasWriteAccess($courseSpecFolder);
 
 
         // Apply the course builder homepage template
@@ -265,5 +286,45 @@ class Controller extends BaseController
         $this->courseSpecMapper->save($courseSpec);
 
         return $courseSpec;
+    }
+
+
+    /**
+     * Create a unit spec out of `$unit` in `$courseSpec`.
+     *
+     * @param Unit       $unit
+     * @param CourseSpec $courseSpec
+     * @return UnitSpec
+     * @throws \Schoolbox\Mapper\Exception if for some reason a model couldn't be created?
+     */
+    private function createUnit(Unit $unit, CourseSpec $courseSpec): UnitSpec
+    {
+        // Create and save unit spec folder
+        $unitSpecFolder = $this->folderMapper->createModel()
+            ->setParent($courseSpec->getFolder())
+            ->setName($unit->getTitle())
+            ->setInherit($this->getConfigLoader()->get('course_builder_default_unit_page_inherit'));
+        $this->folderMapper->save($unitSpecFolder);
+    }
+
+
+    /**
+     * Ensures that the current user has write access to `$folder`, as long as
+     * the folder doesn't have inherit permissions.
+     *
+     * @param Folder $folder The folder to grant access for
+     * @throws \Schoolbox\Mapper\Exception if for some reason a model couldn't be created?
+     */
+    private function ensureCurrentUserHasWriteAccess(Folder $folder): void
+    {
+        if (!$folder->getInherit()
+            && $this->access->getFolderAccess($this->getUser(), $folder->getId()) > UserAccess::ACCESS_WRITE
+        ) {
+            $userAccess = $this->userAccessMapper->createModel()
+                ->setUser($this->getUser())
+                ->setService(UserAccess::SERVICE_HOMEPAGE)
+                ->setAccessLevel(UserAccess::ACCESS_WRITE);
+            $this->userAccessMapper->save($userAccess);
+        }
     }
 }
