@@ -13,6 +13,8 @@ use Karriere\JsonDecoder\JsonDecoder;
 use Schoolbox\Assessment\Course\Import\Atlas\Api\Bridge as ApiBridge;
 use Schoolbox\Learning\Course;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecMapper;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\HomepageConfigMapper;
 use Schoolbox\Resource\HomepageTemplateMapper;
@@ -65,6 +67,8 @@ class Module extends \Alaress\Module\Module
                     'homepageConfigMapper'   => $this->getMapperFactory()->getLazy(HomepageConfigMapper::class),
                     'homepageTemplateMapper' => $this->getMapperFactory()->getLazy(HomepageTemplateMapper::class),
                     'folderMapper'           => $this->getMapperFactory()->getLazy(FolderMapper::class),
+                    'userAccessMapper'       => $this->getMapperFactory()->getLazy(UserAccessMapper::class),
+                    'access'                 => $injector->lazy(function () { return Access::getInstance(); }),
                     'apiBridge'              => $injector->lazyNew(
                         ApiBridge::class,
                         [

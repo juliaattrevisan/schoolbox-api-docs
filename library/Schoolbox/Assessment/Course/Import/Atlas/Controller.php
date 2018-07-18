@@ -11,6 +11,9 @@ use Schoolbox\Assessment\Course\Import\Atlas\Api\Bridge as ApiBridge;
 use Schoolbox\Assessment\Course\Import\Atlas\Api\Curriculum;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpec;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Resource\HomepageConfigMapper;
@@ -49,6 +52,18 @@ class Controller extends BaseController
 
 
     /**
+     * @var Access
+     */
+    private $access;
+
+
+    /**
+     * @var UserAccessMapper
+     */
+    private $userAccessMapper;
+
+
+    /**
      * Constructor
      *
      * @param ApiBridge              $apiBridge
@@ -56,19 +71,25 @@ class Controller extends BaseController
      * @param HomepageConfigMapper   $homepageConfigMapper
      * @param HomepageTemplateMapper $homepageTemplateMapper
      * @param CourseSpecMapper       $courseSpecMapper
+     * @param Access                 $access
+     * @param UserAccessMapper       $userAccessMapper
      */
     public function __construct(
         ApiBridge $apiBridge,
         FolderMapper $folderMapper,
         HomepageConfigMapper $homepageConfigMapper,
         HomepageTemplateMapper $homepageTemplateMapper,
-        CourseSpecMapper $courseSpecMapper
+        CourseSpecMapper $courseSpecMapper,
+        Access $access,
+        UserAccessMapper $userAccessMapper
     ) {
         $this->apiBridge              = $apiBridge;
         $this->folderMapper           = $folderMapper;
         $this->homepageConfigMapper   = $homepageConfigMapper;
         $this->homepageTemplateMapper = $homepageTemplateMapper;
         $this->courseSpecMapper       = $courseSpecMapper;
+        $this->access                 = $access;
+        $this->userAccessMapper       = $userAccessMapper;
     }
 
 
@@ -212,15 +233,24 @@ class Controller extends BaseController
             ->setInherit($this->getConfigLoader()->get('course_builder_default_course_page_inherit'));
 
         // In addition, need to apply:
-        // * Curriculum codes (if any)
-        // * Permissions
+        // * Curriculum codes (if any) from curriculum
+        // * Permissions (only if not inheriting permissions)
         $this->folderMapper->save($courseSpecFolder);
+        if (!$courseSpecFolder->getInherit()
+            && $this->access->getFolderAccess($this->getUser(), $courseSpecFolder->getId()) > UserAccess::ACCESS_WRITE
+        ) {
+            $userAccess = $this->userAccessMapper->createModel()
+                ->setUser($this->getUser())
+                ->setService(UserAccess::SERVICE_HOMEPAGE)
+                ->setAccessLevel(UserAccess::ACCESS_WRITE);
+            $this->userAccessMapper->save($userAccess);
+        }
 
 
         // Apply the course builder homepage template
-        $coursespecTemplateId = $this->getConfigLoader()->get('course_builder_default_course_page_template');
-        if ($coursespecTemplateId) {
-            $courseSpecTemplate     = $this->homepageTemplateMapper->findById($coursespecTemplateId);
+        $courseSpecTemplateId = $this->getConfigLoader()->get('course_builder_default_course_page_template');
+        if ($courseSpecTemplateId) {
+            $courseSpecTemplate     = $this->homepageTemplateMapper->findById($courseSpecTemplateId);
             $courseSpecFolderConfig = $this->homepageConfigMapper->createModel()
                 ->setCategory($courseSpecFolder)
                 ->setTemplate($courseSpecTemplate);
