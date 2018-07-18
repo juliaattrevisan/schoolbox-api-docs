@@ -11,7 +11,7 @@ namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 
 use Schoolbox\Assessment\Component\SubmissionBox;
 
-class Usage
+class CriterionUsage
 {
 
     /**
