@@ -297,7 +297,7 @@ class Controller extends BaseController
                 // TODO implement deletion
             }
         }
-        $this->response->redirect->afterPost($this->router->generate('course.courseList'));
+        $this->getResponse()->content->set($this->buildJsonOutput($courseSpec->getFolder()));
     }
 
 
