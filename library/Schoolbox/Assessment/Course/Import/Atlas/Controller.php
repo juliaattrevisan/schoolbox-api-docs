@@ -116,6 +116,15 @@ class Controller extends BaseController
      */
     private function postImportPart2(): void
     {
+        // Which curriculum plan got selected?
+
+        // Which units were selected?
+        // * Create a new unit out of them
+        // Which assessments within get imported?
+        // * Create a new Schoolbox assessment out of them
+        $curriculumPlanId = $this->request->post->getInt('curriculum-plan', 0);
+        $curriculumPlan   = $this->apiBridge->getCurriculum($curriculumPlanId);
+
         $this->response->redirect->afterPost($this->router->generate('course.courseList'));
     }
 }

@@ -33,6 +33,8 @@ ItemID = 49959
 
 <p>Pick and choose which units and content you wish to import.</p>
 
+<input name="curriculum-plan" value="{{ curriculum.id }}" type="hidden" />
+
 <ul class="information-list card-selectable threaded expandable-card" id="unit-list">
     {% for unit in curriculum.units %}
         {% set assessmentCount = unit.assessments|length %}
