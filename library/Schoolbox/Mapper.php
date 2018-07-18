@@ -2908,7 +2908,7 @@ abstract class Mapper implements IMapper, Serializable
     {
         foreach ($this->enums as $propertyName => $permittedValues) {
             $propertyValue = $this->getModelProperty($model, $propertyName);
-            if(\in_array($propertyValue, $permittedValues, true)){
+            if (\in_array($propertyValue, $permittedValues, true)) {
                 continue;
             }
             throw new UnexpectedValueException("$propertyName has invalid enum value: '$propertyValue'");
