@@ -13,6 +13,7 @@ use Karriere\JsonDecoder\JsonDecoder;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper as RubricCriterionMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\GroupMapper as RubricGroupMapper;
 use Schoolbox\Assessment\Course\Import\Atlas\Api\Bridge as ApiBridge;
+use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
 use Schoolbox\Learning\Course;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecMapper;
@@ -74,6 +75,7 @@ class Module extends \Alaress\Module\Module
                     'userAccessMapper'       => $this->getMapperFactory()->getLazy(UserAccessMapper::class),
                     'rubricGroupMapper'      => $this->getMapperFactory()->getLazy(RubricGroupMapper::class),
                     'rubricCriterionMapper'  => $this->getMapperFactory()->getLazy(RubricCriterionMapper::class),
+                    'nodeMapper'             => $this->getMapperFactory()->getLazy(NodeMapper::class),
                     'assessmentDataSource'   => $injector->lazyGet('assessmentDataSource'),
                     'access'                 => $injector->lazy(function () { return Access::getInstance(); }),
                     'apiBridge'              => $injector->lazyNew(

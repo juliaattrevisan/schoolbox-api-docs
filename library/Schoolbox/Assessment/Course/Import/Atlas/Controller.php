@@ -14,6 +14,8 @@ use Schoolbox\Assessment\Rubric\Competency\Level;
 use Schoolbox\Assessment\Rubric\Criteria\Criterion;
 use Schoolbox\Assessment\Rubric\Criteria\Group;
 use Schoolbox\Assessment\Rubric\Descriptor;
+use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
+use Schoolbox\Curriculum\Node\Model as Node;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -99,6 +101,12 @@ class Controller extends BaseController
 
 
     /**
+     * @var NodeMapper
+     */
+    private $nodeMapper;
+
+
+    /**
      * Constructor
      *
      * @param Api\Bridge             $apiBridge
@@ -112,6 +120,7 @@ class Controller extends BaseController
      * @param Rubric\GroupMapper     $rubricGroupMapper
      * @param Rubric\CriterionMapper $rubricCriterionMapper
      * @param AssessmentDataSource   $assessmentDataSource
+     * @param NodeMapper             $nodeMapper
      */
     public function __construct(
         Api\Bridge $apiBridge,
@@ -124,7 +133,8 @@ class Controller extends BaseController
         UserAccessMapper $userAccessMapper,
         Rubric\GroupMapper $rubricGroupMapper,
         Rubric\CriterionMapper $rubricCriterionMapper,
-        AssessmentDataSource $assessmentDataSource
+        AssessmentDataSource $assessmentDataSource,
+        NodeMapper $nodeMapper
     ) {
         $this->apiBridge              = $apiBridge;
         $this->folderMapper           = $folderMapper;
@@ -137,6 +147,7 @@ class Controller extends BaseController
         $this->rubricGroupMapper      = $rubricGroupMapper;
         $this->rubricCriterionMapper  = $rubricCriterionMapper;
         $this->assessmentDataSource   = $assessmentDataSource;
+        $this->nodeMapper             = $nodeMapper;
     }
 
 
@@ -425,6 +436,36 @@ class Controller extends BaseController
 
         $this->assessmentDataSource->save($dueWork);
         return $dueWork;
+    }
+
+
+    /**
+     * Create a curriculum node.
+     *
+     * @param string    $name
+     * @param string    $code
+     * @param string    $reference
+     * @param string    $description
+     * @param null|Node $parent
+     * @return Node
+     * @throws \Schoolbox\Mapper\Exception if somehow creation fails?
+     */
+    private function createCurriculumNode(
+        string $name,
+        string $code,
+        string $reference,
+        string $description,
+        ?Node $parent
+    ): Node {
+        // Atlas-imported assessments have to tie back to curriculum nodes somehow.
+        $node = $this->nodeMapper->createModel()
+            ->setName($name)
+            ->setCode($code)
+            ->setDescription($description)
+            ->setReference($reference)
+            ->setParent($parent);
+        $this->nodeMapper->save($node);
+        return $node;
     }
 
 
