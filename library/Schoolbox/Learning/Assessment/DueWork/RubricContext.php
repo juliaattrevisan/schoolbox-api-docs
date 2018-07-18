@@ -275,13 +275,19 @@ class RubricContext
     {
         $descriptors = $rubric['descriptors'];
         $levelIds = array_keys($rubric['levels']);
-
-        $metadata = [];
-
         $startIndex = 0;
         $endIndex = \count($levelIds);
 
-        foreach($descriptors as $critId => $levelDescriptors) {
+        $metadata = $this->generateCriterionMetadata($descriptors, $levelIds, $startIndex, $endIndex);
+
+        return $metadata;
+    }
+
+    private function generateCriterionMetadata(array $descriptors, array $levelIds, int $startIndex, int $endIndex) : array
+    {
+        $metadata = [];
+
+        foreach ($descriptors as $critId => $levelDescriptors) {
             $firstLevel = $levelIds[$startIndex];
             $lastLevel = $levelIds[$endIndex - 1];
 
@@ -361,11 +367,9 @@ class RubricContext
                     ];
 
                     $prevDescriptorMax = $currentDescriptorMax;
-
                 } else {
                     continue;
                 }
-
             }
         }
 
