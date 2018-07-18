@@ -352,7 +352,7 @@ class Controller extends BaseController
 
         // Save the unit spec
         $unitSpec = $this->unitSpecMapper->createModel()
-            ->setFolder($courseSpec->getFolder())
+            ->setFolder($unitSpecFolder)
             ->setCourse($courseSpec);
         $this->unitSpecMapper->save($unitSpec);
         return $unitSpec;
