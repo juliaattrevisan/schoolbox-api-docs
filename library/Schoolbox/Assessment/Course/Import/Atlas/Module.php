@@ -10,6 +10,8 @@ use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\ContainerInterface;
 use GuzzleHttp\Client;
 use Karriere\JsonDecoder\JsonDecoder;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper as RubricCriterionMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\GroupMapper as RubricGroupMapper;
 use Schoolbox\Assessment\Course\Import\Atlas\Api\Bridge as ApiBridge;
 use Schoolbox\Learning\Course;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecMapper;
@@ -70,6 +72,8 @@ class Module extends \Alaress\Module\Module
                     'homepageTemplateMapper' => $this->getMapperFactory()->getLazy(HomepageTemplateMapper::class),
                     'folderMapper'           => $this->getMapperFactory()->getLazy(FolderMapper::class),
                     'userAccessMapper'       => $this->getMapperFactory()->getLazy(UserAccessMapper::class),
+                    'rubricGroupMapper'      => $this->getMapperFactory()->getLazy(RubricGroupMapper::class),
+                    'rubricCriterionMapper'  => $this->getMapperFactory()->getLazy(RubricCriterionMapper::class),
                     'access'                 => $injector->lazy(function () { return Access::getInstance(); }),
                     'apiBridge'              => $injector->lazyNew(
                         ApiBridge::class,

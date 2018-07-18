@@ -7,7 +7,10 @@
 namespace Schoolbox\Assessment\Course\Import\Atlas;
 
 use Alaress\Web\Controller\Base as BaseController;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 use Schoolbox\Assessment\Course\Import\Atlas\Api;
+use Schoolbox\Assessment\Rubric\Descriptor;
+use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpec;
@@ -72,6 +75,18 @@ class Controller extends BaseController
 
 
     /**
+     * @var Rubric\GroupMapper
+     */
+    private $rubricGroupMapper;
+
+
+    /**
+     * @var Rubric\CriterionMapper
+     */
+    private $rubricCriterionMapper;
+
+
+    /**
      * Constructor
      *
      * @param Api\Bridge             $apiBridge
@@ -83,6 +98,20 @@ class Controller extends BaseController
      * @param Access                 $access
      * @param UserAccessMapper       $userAccessMapper
      */
+    /**
+     * Constructor
+     *
+     * @param Api\Bridge             $apiBridge
+     * @param FolderMapper           $folderMapper
+     * @param HomepageConfigMapper   $homepageConfigMapper
+     * @param HomepageTemplateMapper $homepageTemplateMapper
+     * @param CourseSpecMapper       $courseSpecMapper
+     * @param UnitSpecMapper         $unitSpecMapper
+     * @param Access                 $access
+     * @param UserAccessMapper       $userAccessMapper
+     * @param Rubric\GroupMapper     $rubricGroupMapper
+     * @param Rubric\CriterionMapper $rubricCriterionMapper
+     */
     public function __construct(
         Api\Bridge $apiBridge,
         FolderMapper $folderMapper,
@@ -91,7 +120,9 @@ class Controller extends BaseController
         CourseSpecMapper $courseSpecMapper,
         UnitSpecMapper $unitSpecMapper,
         Access $access,
-        UserAccessMapper $userAccessMapper
+        UserAccessMapper $userAccessMapper,
+        Rubric\GroupMapper $rubricGroupMapper,
+        Rubric\CriterionMapper $rubricCriterionMapper
     ) {
         $this->apiBridge              = $apiBridge;
         $this->folderMapper           = $folderMapper;
@@ -101,6 +132,8 @@ class Controller extends BaseController
         $this->unitSpecMapper         = $unitSpecMapper;
         $this->access                 = $access;
         $this->userAccessMapper       = $userAccessMapper;
+        $this->rubricGroupMapper      = $rubricGroupMapper;
+        $this->rubricCriterionMapper  = $rubricCriterionMapper;
     }
 
 
@@ -329,10 +362,62 @@ class Controller extends BaseController
      * @param Api\Assessment $assessment
      * @param UnitSpec       $unitSpec
      * @return IAssessable In practise, this will always be a due work
-     * @throws \Schoolbox\Mapper\Exception if for some reason a model couldn't be created?
      */
     private function createDueWork(Api\Assessment $assessment, UnitSpec $unitSpec): IAssessable
     {
+        $dueWork = new DueWork();
+        $dueWork
+            ->setContext($unitSpec)
+            ->setTitle($assessment->getTitle())
+            ->setDescription($assessment->getContent());
+
+        // Build a rubric for this due work
+        if (\count($assessment->getStandards())) {
+            $rubric = new Rubric\Rubric();
+
+            // Dummy data
+            $level = new Rubric\Level();
+            $level
+                ->setName('Level')
+                ->setSequence(0);
+
+            $rubric->putLevel($level);
+
+            // I can only create groups, as there's no sub-standards.
+            // Provided there's mark-by-group without needing a criterion,
+            // this should be okay.
+            foreach ($assessment->getStandards() as $standard) {
+                $group = $this->rubricGroupMapper->findOrCreateOneForFolderByName(
+                    $unitSpec->getFolder()->getId(),
+                    $standard->getTitle()
+                );
+                $rubric->putGroup($group);
+
+                // Add an empty criterion for now, I guess
+                $criterion = $this->rubricCriterionMapper->findOrCreateOneForFolderByKey(
+                    $unitSpec->getFolder()->getId(),
+                    $standard->getTitle(),
+                    ''
+                );
+                $rubric->putCriterion($group, $criterion);
+
+                // And an empty descriptor for that level?
+                $rubric->putDescriptor(
+                    $group,
+                    $criterion,
+                    $level,
+                    new Descriptor('pants')
+                );
+
+                // Add a code if there is one? ¯\_(ツ)_/¯
+            }
+
+            $dueWork
+                ->setUseRubric(true)
+                ->setRubric($rubric);
+        }
+
+        return $dueWork;
     }
 
 
