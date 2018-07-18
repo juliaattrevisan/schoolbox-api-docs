@@ -20,14 +20,18 @@
     });
 </script>
 
-<dl class="tabs-material" data-tab="" id="news-topics-{{ componentInstanceId }}">
+<dl class="tabs" data-tab id="news-topics-{{ componentInstanceId }}">
     {# Select "All" by default if the component config is set #}
-    <dd {% if allDefault %}class="active"{% endif %}><a href="{{ routeLookup('commsNews.getListByTopic', {topicId: topicAll, limit: limit}) ~ '?compactMode=' ~ compactMode }}">All</a></dd>
+    <dd {% if allDefault %}class="active"{% endif %}>
+        <a href="{{ routeLookup('commsNews.getListByTopic', {topicId: topicAll, limit: limit}) ~ '?compactMode=' ~ compactMode }}">All</a>
+    </dd>
 
     {% set defaultSet = false %}
 
     {% for topic in topics %}
-    <dd {% if not defaultSet and not allDefault %}class="active"{% set defaultSet = true %}{% endif %}><a href="{{ routeLookup('commsNews.getListByTopic', {topicId: topic.id, limit: limit}) ~ '?compactMode=' ~ compactMode }}">{{ topic.name }}</a></dd>
+    <dd {% if not defaultSet and not allDefault %}class="active"{% set defaultSet = true %}{% endif %}>
+        <a href="{{ routeLookup('commsNews.getListByTopic', {topicId: topic.id, limit: limit}) ~ '?compactMode=' ~ compactMode }}">{{ topic.name }}</a>
+    </dd>
     {% endfor %}
 
 </dl>
