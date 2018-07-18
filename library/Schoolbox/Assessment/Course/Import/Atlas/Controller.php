@@ -222,22 +222,13 @@ class Controller extends BaseController
         foreach ($curriculumPlan->getUnits() as $unit) {
             if (!empty($selectedUnits[$unit->getId()]['selected'])) {
                 // This unit was selected; create it
+                $unitSpec = $this->createUnit($unit, $courseSpec);
+
+                // Put the assessment inside that unit
             } else {
                 // This unit wasn't selected; delete it
             }
         }
-//        foreach ( as $unitId => $unitParts) {
-//            // Build a unit page out of this
-//
-//            // Which attachments are selected?
-//
-//            // Which assessments are selected?
-//        }
-
-        // we're done here?
-        // at an earlier time we should've asked for a location to import into?
-        // alternately, ask now?
-
         $this->response->redirect->afterPost($this->router->generate('course.courseList'));
     }
 
@@ -269,15 +260,10 @@ class Controller extends BaseController
 
 
         // Apply the course builder homepage template
-        $courseSpecTemplateId = $this->getConfigLoader()->get('course_builder_default_course_page_template');
-        if ($courseSpecTemplateId) {
-            $courseSpecTemplate     = $this->homepageTemplateMapper->findById($courseSpecTemplateId);
-            $courseSpecFolderConfig = $this->homepageConfigMapper->createModel()
-                ->setCategory($courseSpecFolder)
-                ->setTemplate($courseSpecTemplate);
-            $this->homepageConfigMapper->save($courseSpecFolderConfig);
-            $this->homepageConfigMapper->resetToTemplate($courseSpecFolderConfig);
-        }
+        $this->applyHomepageTemplate(
+            $courseSpecFolder,
+            $this->getConfigLoader()->get('course_builder_default_course_page_template')
+        );
 
 
         // Save the course spec
@@ -305,6 +291,26 @@ class Controller extends BaseController
             ->setName($unit->getTitle())
             ->setInherit($this->getConfigLoader()->get('course_builder_default_unit_page_inherit'));
         $this->folderMapper->save($unitSpecFolder);
+
+
+        // Allow the current user to write to the course folder
+        // (if for some reason they can't).
+        $this->ensureCurrentUserHasWriteAccess($unitSpecFolder);
+
+
+        // Apply the course builder homepage template
+        $this->applyHomepageTemplate(
+            $unitSpecFolder,
+            $this->getConfigLoader()->get('course_builder_default_unit_page_template')
+        );
+
+
+        // Save the unit spec
+        $unitSpec = $this->unitSpecMapper->createModel()
+            ->setFolder($courseSpec->getFolder())
+            ->setCourse($courseSpec);
+        $this->courseSpecMapper->save($unitSpec);
+        return $unitSpec;
     }
 
 
@@ -325,6 +331,26 @@ class Controller extends BaseController
                 ->setService(UserAccess::SERVICE_HOMEPAGE)
                 ->setAccessLevel(UserAccess::ACCESS_WRITE);
             $this->userAccessMapper->save($userAccess);
+        }
+    }
+
+
+    /**
+     * Apply the given template to `$folder`.
+     *
+     * @param Folder   $folder
+     * @param int|null $templateId
+     * @throws \Schoolbox\Mapper\Exception if for some reason a model couldn't be created?
+     */
+    private function applyHomepageTemplate(Folder $folder, ?int $templateId): void
+    {
+        if ($templateId) {
+            $template     = $this->homepageTemplateMapper->findById($templateId);
+            $folderConfig = $this->homepageConfigMapper->createModel()
+                ->setCategory($folder)
+                ->setTemplate($template);
+            $this->homepageConfigMapper->save($folderConfig);
+            $this->homepageConfigMapper->resetToTemplate($folderConfig);
         }
     }
 }
