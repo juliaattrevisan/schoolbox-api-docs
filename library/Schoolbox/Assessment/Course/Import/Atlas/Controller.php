@@ -286,6 +286,7 @@ class Controller extends BaseController
                 foreach ($unit->getAttachments() as $attachment) {
                     // Is this attachment private?
                     // What kind of attachment is it?
+                    $this->createAttachment($attachment, $unitSpec->getFolder());
                 }
 
                 foreach ($unit->getAssessments() as $assessment) {
@@ -459,6 +460,41 @@ class Controller extends BaseController
 
         $this->assessmentDataSource->save($dueWork);
         return $dueWork;
+    }
+
+
+    /**
+     * Add an attachment to the folder.
+     *
+     * @param Api\Attachment $attachment
+     * @param Folder         $folder
+     */
+    private function createAttachment(Api\Attachment $attachment, Folder $folder)
+    {
+        // TODO did I pass the attachment as private?
+        // How to create the item?
+        switch ($attachment->getAttachmentType()) {
+            case Api\Attachment::ATTACHMENT_TYPE_FILE:
+            case Api\Attachment::ATTACHMENT_TYPE_IMAGE:
+            case Api\Attachment::ATTACHMENT_TYPE_LESSON:
+                // upload as a file to the folder
+                // (Consider creating a files component if there's not one there?)
+                break;
+
+            case Api\Attachment::ATTACHMENT_TYPE_LINK:
+                // upload as a link to the folder
+                // (Consider creating a links component if there's not one there?)
+                break;
+
+            case Api\Attachment::ATTACHMENT_TYPE_GOOGLE_DRIVE:
+                // not sure. Probably save to Links as well?
+                // Otherwise: consider creating a textbox, which contains drive file?
+                break;
+
+            default:
+                // Dunno what to do with it
+                break;
+        }
     }
 
 
