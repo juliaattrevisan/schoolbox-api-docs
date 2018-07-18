@@ -8,6 +8,12 @@ namespace Schoolbox\Assessment\Course\Import\Atlas;
 
 use Alaress\Web\Controller\Base as BaseController;
 use Schoolbox\Assessment\Course\Import\Atlas\Api\Bridge as ApiBridge;
+use Schoolbox\Assessment\Course\Import\Atlas\Api\Curriculum;
+use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpec;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder\Model as FolderModel;
+use Schoolbox\Resource\HomepageConfigMapper;
 
 class Controller extends BaseController
 {
@@ -17,9 +23,36 @@ class Controller extends BaseController
     private $apiBridge;
 
 
-    public function __construct(ApiBridge $apiBridge)
+    /**
+     * @var FolderMapper
+     */
+    private $folderMapper;
+
+
+    /**
+     * @var HomepageConfigMapper
+     */
+    private $homepageConfigMapper;
+
+
+    /**
+     * @var CourseSpecMapper
+     */
+    private $courseSpecMapper;
+
+
+    /**
+     * Constructor
+     *
+     * @param ApiBridge        $apiBridge
+     * @param FolderMapper     $folderMapper
+     * @param CourseSpecMapper $courseSpecMapper
+     */
+    public function __construct(ApiBridge $apiBridge, FolderMapper $folderMapper, CourseSpecMapper $courseSpecMapper)
     {
-        $this->apiBridge = $apiBridge;
+        $this->apiBridge        = $apiBridge;
+        $this->folderMapper     = $folderMapper;
+        $this->courseSpecMapper = $courseSpecMapper;
     }
 
 
@@ -125,6 +158,17 @@ class Controller extends BaseController
         $curriculumPlanId = $this->request->post->getInt('curriculum-plan', 0);
         $curriculumPlan   = $this->apiBridge->getCurriculum($curriculumPlanId);
 
+        // Hard-coded folder for testing (faculty root)
+        $baseFolder = $this->courseSpecMapper->getFacultyRootFolder();
+
+        $courseSpec = $this->createCourse($curriculumPlan, $baseFolder);
+
+
+        // Should this be an API call to createCourse? I think so
+        // It should maybe happen on the frontend itself?
+
+        // Alternately should the API call occur in AJAX?
+
         foreach ($this->request->post->get('unit') as $unitId => $unitParts) {
             // Build a unit page out of this
 
@@ -138,5 +182,47 @@ class Controller extends BaseController
         // alternately, ask now?
 
 //        $this->response->redirect->afterPost($this->router->generate('course.courseList'));
+    }
+
+
+    private function createCourse(Curriculum $curriculum, FolderModel $baseFolder): CourseSpec
+    {
+        // TODO this all should be moved to a helper class
+        // (as \Schoolbox\Assessment\Course\Controller::persistFolder does much the same thing)
+        // TODO figure out if this course has already been imported, and update instead of create if so
+        $courseSpecFolder = $this->folderMapper->createModel()
+            ->setParent($baseFolder)
+            ->setName($curriculum->getTitle())
+            ->setInherit($this->getConfigLoader()->get('course_builder_default_course_page_inherit'));
+
+        // In addition, need to apply:
+        // * Curriculum codes (if any)
+        // * Course builder template
+        // * Permissions
+        // ** Inheritance
+        $this->folderMapper->save($courseSpecFolder);
+
+
+        // Apply the course builder homepage template
+        $template = $this->getConfigLoader()->get('course_builder_default_course_page_template');
+        $courseSpecFolderConfig = $this->homepageConfigMapper->createModel()
+            ->setTemplate($template);
+
+
+
+//        $homepageConfig->setTemplate($tplMapper->findById($template));
+//
+//        // Save homepage config
+//        $confMapper->save($homepageConfig);
+//        $confMapper->resetToTemplate($homepageConfig);
+
+
+
+        // Save the course spec
+        $courseSpec = $this->courseSpecMapper->createModel()
+            ->setFolder($courseSpecFolder);
+        $this->courseSpecMapper->save($courseSpec);
+
+        return $courseSpec;
     }
 }

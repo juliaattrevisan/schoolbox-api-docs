@@ -12,6 +12,9 @@ use GuzzleHttp\Client;
 use Karriere\JsonDecoder\JsonDecoder;
 use Schoolbox\Assessment\Course\Import\Atlas\Api\Bridge as ApiBridge;
 use Schoolbox\Learning\Course;
+use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\HomepageConfigMapper;
 use Twig\Error\LoaderError;
 
 class Module extends \Alaress\Module\Module
@@ -57,7 +60,10 @@ class Module extends \Alaress\Module\Module
             $injector->lazyNew(
                 Controller::class,
                 [
-                    'apiBridge' => $injector->lazyNew(
+                    'courseSpecMapper'     => $this->getMapperFactory()->getLazy(CourseSpecMapper::class),
+                    'homepageConfigMapper' => $this->getMapperFactory()->getLazy(HomepageConfigMapper::class),
+                    'folderMapper'         => $this->getMapperFactory()->getLazy(FolderMapper::class),
+                    'apiBridge'            => $injector->lazyNew(
                         ApiBridge::class,
                         [
                             'httpClient' => $injector->lazyNew(
