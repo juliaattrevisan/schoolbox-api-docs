@@ -125,6 +125,18 @@ class Controller extends BaseController
         $curriculumPlanId = $this->request->post->getInt('curriculum-plan', 0);
         $curriculumPlan   = $this->apiBridge->getCurriculum($curriculumPlanId);
 
-        $this->response->redirect->afterPost($this->router->generate('course.courseList'));
+        foreach ($this->request->post->get('unit') as $unitId => $unitParts) {
+            // Build a unit page out of this
+
+            // Which attachments are selected?
+
+            // Which assessments are selected?
+        }
+
+        // we're done here?
+        // at an earlier time we should've asked for a location to import into?
+        // alternately, ask now?
+
+//        $this->response->redirect->afterPost($this->router->generate('course.courseList'));
     }
 }

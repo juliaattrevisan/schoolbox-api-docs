@@ -90,7 +90,7 @@ ItemID = 49959
                             <div>
                                 <div class="selector">
                                     <input id="assessment-{{ assessment.id }}"
-                                           name="assessment[{{ assessment.id }}]"
+                                           name="unit[{{ unit.id }}][assessment][{{ assessment.id }}]"
                                            value="1"
                                            type="checkbox"
                                            checked
@@ -137,7 +137,7 @@ ItemID = 49959
                             <div>
                                 <div class="selector">
                                     <input id="attachment-{{ attachment.id }}"
-                                           name="attachment[{{ attachment.id }}]"
+                                           name="unit[{{ unit.id }}][attachment][{{ attachment.id }}]"
                                            value="1"
                                            type="checkbox"
                                            checked
