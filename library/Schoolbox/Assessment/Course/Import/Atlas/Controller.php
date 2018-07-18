@@ -430,7 +430,7 @@ class Controller extends BaseController
                 $this->rubricGroupMapper->save($groupDataModel);
 
                 // Add that rubric group
-                $group = new Group($groupDataModel->getId());
+                $group = new Group($groupDataModel->getId(), $groupDataModel->getName());
                 $rubric->putGroup($group);
 
                 // Add a criterion with an empty name for now, I guess
@@ -440,7 +440,7 @@ class Controller extends BaseController
                     $standard->getTitle(),
                     false
                 );
-                $criterion = new Criterion($criterionDataModel->getId());
+                $criterion = new Criterion($criterionDataModel->getId(), $criterionDataModel->getName());
                 $rubric->putCriterion($group, $criterion);
 
                 // And an empty descriptor for that level?
