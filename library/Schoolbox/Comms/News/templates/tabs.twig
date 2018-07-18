@@ -1,0 +1,32 @@
+{##
+ # A list of all the available Topics to chooze
+ # Sets up a container for async article loading
+ #
+ # @param string topicContainerId
+ # @param string articleContainerId
+ # @param int firstTopicId
+ # @param int topicAll
+ # @param int limit
+ # @param Collection|Topic[] topics
+ # @param int compactMode
+ #}
+
+<dl class="tabs-material" data-tab="" id="{{ topicContainerId }}">
+
+    {# Select "All" by default if the component config is set #}
+    <dd {% if not firstTopicId %}class="active"{% endif %}><a href="{{ routeLookup('commsNews.getListByTopic', {topicId: topicAll, limit: limit}) ~ '?compactMode=' ~ compactMode }}">All</a></dd>
+
+    {% for topic in topics %}
+        {% if topic.id == firstTopicId %}
+            {% set selected = 'class="active"' %}
+        {% else %}
+            {% set selected = '' %}
+        {% endif %}
+
+        <dd {{ selected|purify }}><a href="{{ routeLookup('commsNews.getListByTopic', {topicId: topic.id, limit: limit}) ~ '?compactMode=' ~ compactMode }}">{{ topic.name }}</a></dd>
+    {% endfor %}
+</dl>
+
+<div id="{{ articleContainerId }}">
+    <div class="loader"></div>
+</div>

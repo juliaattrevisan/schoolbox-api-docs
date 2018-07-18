@@ -21,24 +21,12 @@
     });
 </script>
 
-<dl class="tabs" data-tab id="news-topics-{{ componentInstanceId }}">
-    {# Select "All" by default if the component config is set #}
-    <dd {% if not firstTopicId %}class="active"{% endif %}><a href="{{ routeLookup('commsNews.getListByTopic', {topicId: topicAll, limit: limit}) ~ '?compactMode=' ~ compactMode }}">All</a></dd>
-
-    {% for topic in topics %}
-    <dd {% if not defaultSet and not allDefault %}class="active"{% set defaultSet = true %}{% endif %}>
-        <a href="{{ routeLookup('commsNews.getListByTopic', {topicId: topic.id, limit: limit}) ~ '?compactMode=' ~ compactMode }}">{{ topic.name }}</a>
-    </dd>
-        {% if topic.id == firstTopicId %}
-            {% set selected = 'class="active"' %}
-        {% else %}
-            {% set selected = '' %}
-        {% endif %}
-
-        <dd {{ selected|purify }}><a href="{{ routeLookup('commsNews.getListByTopic', {topicId: topic.id, limit: limit}) ~ '?compactMode=' ~ compactMode }}">{{ topic.name }}</a></dd>
-    {% endfor %}
-</dl>
-
-<div id="news-container-{{ componentInstanceId }}">
-    <div class="loader"></div>
-</div>
+{% include '@commsNews/tabs.twig' with {
+    topicContainerId: 'news-topics-' ~ componentInstanceId,
+    articleContainerId: 'news-container-' ~ componentInstanceId,
+    firstTopicId: firstTopicId,
+    topics: topics,
+    topicAll: topicAll,
+    limit: limit,
+    compactMode: compactMode
+} %}
