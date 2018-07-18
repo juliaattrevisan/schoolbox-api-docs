@@ -258,6 +258,12 @@ class Controller extends BaseController
 
         $courseSpec = $this->createCourse($curriculumPlan, $baseFolder);
 
+        $courseSpecNode = $this->createCurriculumNodeFromCurriculumPlan($curriculumPlan);
+
+        // Associate courseSpecNode with courseSpec's folder
+        $courseSpec->getFolder()->getCurriculumNodes()->add($courseSpecNode);
+        $this->folderMapper->save($courseSpec->getFolder());
+
 
         // Should this be an API call to createCourse? I think so
         // It should maybe happen on the frontend itself?
@@ -270,6 +276,12 @@ class Controller extends BaseController
                 // This unit was selected; create it
                 $unitSpec = $this->createUnit($unit, $courseSpec);
 
+                $unitSpecNode = $this->createCurriculumNodeFromUnit($unit, $courseSpecNode);
+                $unitSpec->getFolder()->getCurriculumNodes()->add($unitSpecNode);
+                $this->folderMapper->save($unitSpec->getFolder());
+
+                // Associate unitSpecNode with unitspec's folder
+
                 // Put the assessment inside that unit
                 foreach ($unit->getAttachments() as $attachment) {
                     // Is this attachment private?
@@ -277,7 +289,7 @@ class Controller extends BaseController
                 }
 
                 foreach ($unit->getAssessments() as $assessment) {
-                    $this->createDueWork($assessment, $unitSpec);
+                    $this->createDueWork($assessment, $unitSpec, $unitSpecNode);
                 }
 
             } else {
@@ -375,9 +387,10 @@ class Controller extends BaseController
      *
      * @param Api\Assessment $assessment
      * @param UnitSpec       $unitSpec
+     * @param Node           $unitSpecNode
      * @return IAssessable In practise, this will always be a due work
      */
-    private function createDueWork(Api\Assessment $assessment, UnitSpec $unitSpec): IAssessable
+    private function createDueWork(Api\Assessment $assessment, UnitSpec $unitSpec, Node $unitSpecNode): IAssessable
     {
         $dueWork = new DueWork();
         $dueWork
@@ -388,6 +401,9 @@ class Controller extends BaseController
             ->setSelfReviewability(SubmissionBox::SELF_REVIEWABILITY_NONE)
             ->setCreator($this->getUser())
             ->setMarkScheme(new Percentage());
+
+        $dueWorkNode = $this->createCurriculumNodeFromAssessment($assessment, $unitSpecNode);
+        $dueWork->getCurriculumNodes()->add($dueWorkNode);
 
         // Build a rubric for this due work
         if (\count($assessment->getStandards())) {
@@ -406,6 +422,13 @@ class Controller extends BaseController
                     $unitSpec->getFolder()->getId(),
                     $standard->getTitle()
                 );
+
+                // Create node and re-save
+                $standardNode = $this->createCurriculumNodeFromStandard($standard, $dueWorkNode);
+                $groupDataModel->getCurriculumNodes()->add($standardNode);
+                $this->rubricGroupMapper->save($groupDataModel);
+
+                // Add that rubric group
                 $group = new Group($groupDataModel->getId());
                 $rubric->putGroup($group);
 
@@ -442,19 +465,19 @@ class Controller extends BaseController
     /**
      * Create a curriculum node.
      *
-     * @param string    $name
-     * @param string    $code
-     * @param string    $reference
-     * @param string    $description
-     * @param null|Node $parent
+     * @param string      $name
+     * @param null|string $code
+     * @param null|string $reference
+     * @param null|string $description
+     * @param null|Node   $parent
      * @return Node
      * @throws \Schoolbox\Mapper\Exception if somehow creation fails?
      */
     private function createCurriculumNode(
         string $name,
-        string $code,
-        string $reference,
-        string $description,
+        ?string $code,
+        ?string $reference,
+        ?string $description,
         ?Node $parent
     ): Node {
         // Atlas-imported assessments have to tie back to curriculum nodes somehow.
@@ -466,6 +489,85 @@ class Controller extends BaseController
             ->setParent($parent);
         $this->nodeMapper->save($node);
         return $node;
+    }
+
+
+    /**
+     * Create a curriculum node from a curriculum plan.
+     *
+     * @param Api\Curriculum $curriculumPlan
+     * @return Node
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    private function createCurriculumNodeFromCurriculumPlan(Api\Curriculum $curriculumPlan): Node
+    {
+        return $this->createCurriculumNode(
+            $curriculumPlan->getTitle(),
+            null,
+            null,
+            $curriculumPlan->getDescription(),
+            null
+        );
+    }
+
+
+    /**
+     * Create a curriculum node from a unit.
+     *
+     * @param Api\Unit $unit
+     * @param Node     $parent
+     * @return Node
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    private function createCurriculumNodeFromUnit(Api\Unit $unit, Node $parent): Node
+    {
+        return $this->createCurriculumNode(
+            $unit->getTitle(),
+            null,
+            null,
+            null,
+            $parent
+        );
+    }
+
+
+    /**
+     * Create a curriculum node from an assessment.
+     *
+     * @param Api\Assessment $assessment
+     * @param Node           $parent
+     * @return Node
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    private function createCurriculumNodeFromAssessment(Api\Assessment $assessment, Node $parent): Node
+    {
+        return $this->createCurriculumNode(
+            $assessment->getTitle(),
+            null,
+            null,
+            $assessment->getContent(),
+            $parent
+        );
+    }
+
+
+    /**
+     * Create a curriculum node from a standard.
+     *
+     * @param Api\Standard $standard
+     * @param Node         $parent
+     * @return Node
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    private function createCurriculumNodeFromStandard(Api\Standard $standard, Node $parent): Node
+    {
+        return $this->createCurriculumNode(
+            $standard->getTitle(),
+            $standard->getCode(),
+            null,
+            $standard->getRawText(),
+            $parent
+        );
     }
 
 
