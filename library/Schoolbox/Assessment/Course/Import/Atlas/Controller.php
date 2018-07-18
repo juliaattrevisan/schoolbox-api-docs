@@ -412,7 +412,7 @@ class Controller extends BaseController
                     $group,
                     $criterion,
                     $level,
-                    new Descriptor('pants')
+                    new Descriptor('', 1)
                 );
 
                 // Add a code if there is one? ¯\_(ツ)_/¯
