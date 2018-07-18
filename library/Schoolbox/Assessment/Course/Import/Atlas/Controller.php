@@ -420,7 +420,8 @@ class Controller extends BaseController
             foreach ($assessment->getStandards() as $standard) {
                 $groupDataModel = $this->rubricGroupMapper->findOrCreateOneForFolderByName(
                     $unitSpec->getFolder()->getId(),
-                    $standard->getTitle()
+                    $standard->getTitle(),
+                    false
                 );
 
                 // Create node and re-save
@@ -436,7 +437,8 @@ class Controller extends BaseController
                 $criterionDataModel = $this->rubricCriterionMapper->findOrCreateOneForFolderByKey(
                     $unitSpec->getFolder()->getId(),
                     $standard->getTitle(),
-                    ''
+                    '',
+                    false
                 );
                 $criterion = new Criterion($criterionDataModel->getId());
                 $rubric->putCriterion($group, $criterion);
