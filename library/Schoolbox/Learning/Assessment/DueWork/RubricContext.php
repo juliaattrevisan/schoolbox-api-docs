@@ -334,7 +334,7 @@ class RubricContext
                 'direction' => $direction
             ];
 
-            $this->generateDescriptorMetadata($metadata, $levelDescriptors, $lastValuedLevelIndex, $direction, $startValue, $endValue, $critId);
+            $this->generateDescriptorMetadata($metadata, $levelDescriptors, $lastValuedLevelIndex, $direction, $startValue, $critId);
         }
 
         return $metadata;
@@ -348,10 +348,9 @@ class RubricContext
      * @param int $lastValuedLevelIndex     ID of the last level we know of that has a descriptor with a value.
      * @param string $direction             Ordering of the descriptor values - asc or desc
      * @param int $startValue               Value of the first descriptor with a value
-     * @param int $endValue                 Value of the last descriptor with a value
      * @param int $critId                   ID of the criterion whose descriptors we are currently examining.
      */
-    private function generateDescriptorMetadata(array &$metadata, array $levelDescriptors, int $lastValuedLevelIndex, string $direction, int $startValue, int $endValue, int $critId) : void
+    private function generateDescriptorMetadata(array &$metadata, array $levelDescriptors, int $lastValuedLevelIndex, string $direction, int $startValue, int $critId) : void
     {
         // At this point there is no "previous" cell yet since we're at the start, so assign the first cell's value
         $prevDescriptorMax = $startValue;
@@ -378,13 +377,9 @@ class RubricContext
 
                 // If descending....
                 if ($direction === 'desc') {
-                    /* - If there is a 'next' cell, use its value
-                     * - Otherwise just use the same value as this cell
-                     */
+                    // If there is a 'next' cell, use its value
                     if ($levelDescriptors[$i + 1] && ($levelDescriptors[$i + 1]['value'] !== null)) {
                         $nextDescriptorMax = $levelDescriptors[$i + 1]['value'];
-                    } else {
-                        $nextDescriptorMax = $endValue;
                     }
 
                     /* - If the value for this descriptor is the same as the next cell, we're either on the last cell,
