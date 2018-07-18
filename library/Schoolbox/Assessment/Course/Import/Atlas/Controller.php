@@ -7,9 +7,8 @@
 namespace Schoolbox\Assessment\Course\Import\Atlas;
 
 use Alaress\Web\Controller\Base as BaseController;
-use Schoolbox\Assessment\Course\Import\Atlas\Api\Bridge as ApiBridge;
-use Schoolbox\Assessment\Course\Import\Atlas\Api\Curriculum;
-use Schoolbox\Assessment\Course\Import\Atlas\Api\Unit;
+use Schoolbox\Assessment\Course\Import\Atlas\Api;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpec;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecMapper;
@@ -25,7 +24,7 @@ use Schoolbox\Resource\HomepageTemplateMapper;
 class Controller extends BaseController
 {
     /**
-     * @var ApiBridge
+     * @var Api\Bridge
      */
     private $apiBridge;
 
@@ -75,7 +74,7 @@ class Controller extends BaseController
     /**
      * Constructor
      *
-     * @param ApiBridge              $apiBridge
+     * @param Api\Bridge             $apiBridge
      * @param FolderMapper           $folderMapper
      * @param HomepageConfigMapper   $homepageConfigMapper
      * @param HomepageTemplateMapper $homepageTemplateMapper
@@ -85,7 +84,7 @@ class Controller extends BaseController
      * @param UserAccessMapper       $userAccessMapper
      */
     public function __construct(
-        ApiBridge $apiBridge,
+        Api\Bridge $apiBridge,
         FolderMapper $folderMapper,
         HomepageConfigMapper $homepageConfigMapper,
         HomepageTemplateMapper $homepageTemplateMapper,
@@ -225,8 +224,18 @@ class Controller extends BaseController
                 $unitSpec = $this->createUnit($unit, $courseSpec);
 
                 // Put the assessment inside that unit
+                foreach ($unit->getAttachments() as $attachment) {
+                    // Is this attachment private?
+                    // What kind of attachment is it?
+                }
+
+                foreach ($unit->getAssessments() as $assessment) {
+                    $this->createDueWork($assessment, $unitSpec);
+                }
+
             } else {
                 // This unit wasn't selected; delete it
+                // TODO implement deletion
             }
         }
         $this->response->redirect->afterPost($this->router->generate('course.courseList'));
@@ -236,12 +245,12 @@ class Controller extends BaseController
     /**
      * Create a course spec out of `$curriculum` in `$folder`.
      *
-     * @param Curriculum $curriculum
-     * @param Folder     $baseFolder
+     * @param Api\Curriculum $curriculum
+     * @param Folder         $baseFolder
      * @return CourseSpec
      * @throws \Schoolbox\Mapper\Exception if for some reason a model couldn't be created?
      */
-    private function createCourse(Curriculum $curriculum, Folder $baseFolder): CourseSpec
+    private function createCourse(Api\Curriculum $curriculum, Folder $baseFolder): CourseSpec
     {
         // Create and save course spec folder
         // TODO this all should be moved to a helper class
@@ -278,12 +287,12 @@ class Controller extends BaseController
     /**
      * Create a unit spec out of `$unit` in `$courseSpec`.
      *
-     * @param Unit       $unit
+     * @param Api\Unit   $unit
      * @param CourseSpec $courseSpec
      * @return UnitSpec
      * @throws \Schoolbox\Mapper\Exception if for some reason a model couldn't be created?
      */
-    private function createUnit(Unit $unit, CourseSpec $courseSpec): UnitSpec
+    private function createUnit(Api\Unit $unit, CourseSpec $courseSpec): UnitSpec
     {
         // Create and save unit spec folder
         $unitSpecFolder = $this->folderMapper->createModel()
@@ -311,6 +320,19 @@ class Controller extends BaseController
             ->setCourse($courseSpec);
         $this->courseSpecMapper->save($unitSpec);
         return $unitSpec;
+    }
+
+
+    /**
+     * Create a Schoolbox due work out of `$assessment` in `$unitSpec`.
+     *
+     * @param Api\Assessment $assessment
+     * @param UnitSpec       $unitSpec
+     * @return IAssessable In practise, this will always be a due work
+     * @throws \Schoolbox\Mapper\Exception if for some reason a model couldn't be created?
+     */
+    private function createDueWork(Api\Assessment $assessment, UnitSpec $unitSpec): IAssessable
+    {
     }
 
 
