@@ -15,6 +15,12 @@ use JsonSerializable;
  */
 class Attachment implements JsonSerializable
 {
+    public const ATTACHMENT_TYPE_LINK         = 'link';
+    public const ATTACHMENT_TYPE_GOOGLE_DRIVE = 'googleDrive';
+    public const ATTACHMENT_TYPE_FILE         = 'file';
+    public const ATTACHMENT_TYPE_LESSON       = 'lesson';
+    public const ATTACHMENT_TYPE_IMAGE        = 'image';
+
     /**
      * @var int
      */
