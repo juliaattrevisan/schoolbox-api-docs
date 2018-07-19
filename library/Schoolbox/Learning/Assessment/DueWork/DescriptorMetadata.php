@@ -87,7 +87,7 @@ class DescriptorMetadata {
      * Min and max values for this descriptor
      * @return array
      */
-    public function toArray() : array
+    public function toArray() : ?array
     {
         // TODO handle nulls
         $min = $this->calculateMin();
