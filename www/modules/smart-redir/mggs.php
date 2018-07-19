@@ -64,6 +64,15 @@ if ($_GET) {
             $formArray['target']   = '/';
             break;
 
+        case "britannica-primary":
+            $form                  = "loginForm";
+            $action                = "https://school.eb.com.au/login";
+            $method                = "POST";
+            $formArray['username'] = "melbgirls";
+            $formArray['password'] = "school";
+            $formArray['target']   = 'http://school.eb.com.au/levels/primary';
+            break;
+
         case "britannica-kids":
             $form                  = "loginForm";
             $action                = "https://secure.britannica.com/login";
