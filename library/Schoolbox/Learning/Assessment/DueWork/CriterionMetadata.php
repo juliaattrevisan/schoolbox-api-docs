@@ -19,38 +19,29 @@ class CriterionMetadata {
     private $id;
 
     /**
-     * Number of levels in this rubric
-     * @var int $numLevels
-     */
-    private $numLevels;
-
-    /**
      * Order of the descriptor values for this criterion
      * @var string $direction
      */
     private $direction;
 
     /**
-     * ID of the first level with a descriptor value
-     * @var int $firstValuedLevelIndex
+     * Array of descriptor metadata for this criterion, indexed by level ID
+     * @var array $descriptorMetadata
      */
-    private $firstValuedLevelIndex;
+    private $descriptorMetadata;
+
 
     /**
-     * ID of the last level with a descriptor value
-     * @var int $lastValuedLevelIndex
+     * IDs of all available levels in the rubric
+     * @var array $levelIds;
      */
-    private $lastValuedLevelIndex;
+    private $levelIds;
 
     /**
-     * @var int $firstLevelValue
+     * Number of levels in the rubric
+     * @var int $numLevels
      */
-    private $firstLevelValue;
-
-    /**
-     * @var int $lastLevelValue
-     */
-    private $lastLevelValue;
+    private $numLevels;
 
     /**
      * Descriptors in this criterion, indexed by level ID
@@ -58,16 +49,6 @@ class CriterionMetadata {
      */
     private $levelDescriptors;
 
-    /**
-     * @var array $levelIds;
-     */
-    private $levelIds;
-
-    /**
-     * Array of descriptor metadata for this criterion, indexed by level ID
-     * @var array $descriptorMetadata
-     */
-    private $descriptorMetadata;
 
     /**
      * CriterionMetadata constructor.
@@ -78,23 +59,43 @@ class CriterionMetadata {
     public function __construct(int $id, array $levelIds, array $levelDescriptors) {
         $this->id = $id;
         $this->levelIds = $levelIds;
-        $this->numLevels = \count($levelIds) - 1;
+        $this->numLevels = \count($levelIds);
         $this->levelDescriptors = $levelDescriptors;
 
-        $this->firstValuedLevelIndex = $this->calculateFirstValuedLevelIndex();
+        $this->direction = $this->calculateDirection();
     }
 
-    private function calculateFirstValuedLevelIndex() : int
+    /**
+     * Work out whether the values of descriptors in this criterion go up or down.
+     * @return string
+     */
+    private function calculateDirection() : string
+    {
+        $startValue = $this->calculateStartValue();
+        $endValue = $this->calculateEndValue();
+
+        if ($startValue > $endValue) {
+            return self::DIRECTION_ASCENDING;
+        }
+
+        return self::DIRECTION_DESCENDING;
+    }
+
+    /**
+     * Work out the value of the first descriptor that has a value. Used to calculate direction
+     * @return int
+     */
+    private function calculateStartValue() : int
     {
         // By default, assume the first level has a value
-        $this->firstValuedLevelIndex = 0;
-        $firstLevel = $this->levelIds[$this->firstValuedLevelIndex];
+        $firstValuedLevelIndex = 0;
+        $firstLevel = $this->levelIds[$firstValuedLevelIndex];
         $startValue = $this->levelDescriptors[$this->id][$firstLevel]['value'];
 
         // Loop until we find a level that has a value
-        while ($startValue === null && ($this->firstValuedLevelIndex < $this->numLevels)) {
-            $this->firstValuedLevelIndex++;
-            $firstLevel = $this->levelIds[$this->firstValuedLevelIndex];
+        while ($startValue === null && ($firstValuedLevelIndex < $this->numLevels)) {
+            $firstValuedLevelIndex++;
+            $firstLevel = $this->levelIds[$firstValuedLevelIndex];
             $startValue = $this->levelDescriptors[$this->id][$firstLevel]['value'];
         }
 
@@ -102,16 +103,39 @@ class CriterionMetadata {
         return $startValue;
     }
 
-    private function calculateLastValuedLevelIndex() : int
+    /**
+     * Work out the value of the last descriptor that has a value. Used to calculate direction
+     * @return int
+     */
+    private function calculateEndValue() : int
     {
+        // By default, assume the last level has a value
+        $lastValuedLevelIndex = $this->numLevels - 1;
+        $lastLevel = $this->levelIds[$lastValuedLevelIndex];
+        $endValue = $this->levelDescriptors[$this->id][$lastLevel]['value'];
 
+        // Loop until we find a level that has a value
+        while ($endValue === null && ($lastValuedLevelIndex > 0)) {
+            $lastValuedLevelIndex--;
+            $lastLevel = $this->levelIds[$lastValuedLevelIndex];
+            $endValue = $this->levelDescriptors[$this->id][$lastLevel]['value'];
+        }
+
+        // $endValue will be null if none of the levels have a value
+        return $endValue;
     }
 
+    /**
+     * @return int
+     */
     public function getId() : int
     {
         return $this->id;
     }
 
+    /**
+     * @return string
+     */
     public function getDirection() : string
     {
         return $this->direction;
