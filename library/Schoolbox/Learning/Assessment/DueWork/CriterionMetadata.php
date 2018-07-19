@@ -75,21 +75,29 @@ class CriterionMetadata {
         $meta = [];
 
         $prevDescriptor = null;
-        $nextDescriptor = $this->levelDescriptors[$this->numLevels - 1];
+        $nextDescriptor = null;
 
+        $iteration = 0;
         foreach ($this->levelDescriptors as $levelId => $descriptor) {
+            $isLastDescriptor = ($iteration === \count($this->levelDescriptors));
+
             // Don't reassign next/prev descriptor if its value is null
 
             if ($this->levelDescriptors[$levelId - 1]['value'] !== null) {
                 $prevDescriptor = $this->levelDescriptors[$levelId - 1];
             }
 
-            if ($this->levelDescriptors[$levelId + 1]['value'] !== null) {
+            if ($isLastDescriptor) {
+                // If this is the last iteration we know there can't possibly be a next descriptor
+                $nextDescriptor = null;
+            } else if ($this->levelDescriptors[$levelId + 1]['value'] !== null) {
                 $nextDescriptor = $this->levelDescriptors[$levelId + 1];
             }
 
             $dm = new DescriptorMetadata($levelId, $descriptor, $prevDescriptor, $nextDescriptor, $this->direction);
             $meta[$levelId] = $dm->toArray();
+
+            $iteration++;
         }
 
         return $meta;
