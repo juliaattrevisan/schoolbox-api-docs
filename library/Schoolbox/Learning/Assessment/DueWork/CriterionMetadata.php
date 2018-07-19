@@ -73,12 +73,20 @@ class CriterionMetadata {
     private function generateDescriptorMetadata() : array
     {
         $meta = [];
+
+        $prevDescriptor = null;
+        $nextDescriptor = $this->levelDescriptors[$this->numLevels - 1];
+
         foreach ($this->levelDescriptors as $levelId => $descriptor) {
-            // TODO if one of these has a null value and it's not the first or last valued descriptor,
-            // don't reassign
-            // These need to be outside the loop
-            $prevDescriptor = $this->levelDescriptors[$levelId - 1];
-            $nextDescriptor = $this->levelDescriptors[$levelId + 1];
+            // Don't reassign next/prev descriptor if its value is null
+
+            if ($this->levelDescriptors[$levelId - 1]['value'] !== null) {
+                $prevDescriptor = $this->levelDescriptors[$levelId - 1];
+            }
+
+            if ($this->levelDescriptors[$levelId + 1]['value'] !== null) {
+                $nextDescriptor = $this->levelDescriptors[$levelId + 1];
+            }
 
             $dm = new DescriptorMetadata($levelId, $descriptor, $prevDescriptor, $nextDescriptor, $this->direction);
             $meta[$levelId] = $dm->toArray();
