@@ -8,6 +8,8 @@
  * @link        http://www.alaress.com.au/
  */
 
+namespace Schoolbox\Learning\Assessment\DueWork;
+
 class CriterionMetadata {
     public const DIRECTION_ASCENDING = 'asc';
     public const DIRECTION_DESCENDING = 'desc';
@@ -28,7 +30,7 @@ class CriterionMetadata {
      * Array of descriptor metadata for this criterion, indexed by level ID
      * @var array $descriptorMetadata
      */
-    private $descriptorMetadata;
+    private $descriptorMetadata = [];
 
 
     /**
@@ -65,6 +67,14 @@ class CriterionMetadata {
         $this->direction = $this->calculateDirection();
     }
 
+    public function generateDescriptorMetadata() : void
+    {
+        foreach ($this->levelDescriptors as $levelId => $descriptor) {
+            $dm = new DescriptorMetadata($levelId, $descriptor, $this->direction);
+            $this->descriptorMetadata[$levelId] = $dm->toArray();
+        }
+    }
+
     /**
      * Work out whether the values of descriptors in this criterion go up or down.
      * @return string
@@ -83,9 +93,9 @@ class CriterionMetadata {
 
     /**
      * Work out the value of the first descriptor that has a value. Used to calculate direction
-     * @return int
+     * @return int|null
      */
-    private function calculateStartValue() : int
+    private function calculateStartValue() : ?int
     {
         // By default, assume the first level has a value
         $firstValuedLevelIndex = 0;
@@ -105,9 +115,9 @@ class CriterionMetadata {
 
     /**
      * Work out the value of the last descriptor that has a value. Used to calculate direction
-     * @return int
+     * @return int|null
      */
-    private function calculateEndValue() : int
+    private function calculateEndValue() : ?int
     {
         // By default, assume the last level has a value
         $lastValuedLevelIndex = $this->numLevels - 1;
@@ -139,6 +149,11 @@ class CriterionMetadata {
     public function getDirection() : string
     {
         return $this->direction;
+    }
+
+    public function getDescriptorMetadata() : array
+    {
+        return $this->descriptorMetadata;
     }
 
 }

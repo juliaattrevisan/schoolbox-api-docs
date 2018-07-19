@@ -8,6 +8,8 @@
  * @link        http://www.alaress.com.au/
  */
 
+namespace Schoolbox\Learning\Assessment\DueWork;
+
 class DescriptorMetadata {
     private $prevDescriptorMax;
 
@@ -32,6 +34,12 @@ class DescriptorMetadata {
     private $direction;
 
 
+    /**
+     * DescriptorMetadata constructor.
+     * @param int $levelId
+     * @param array $descriptor
+     * @param string $direction
+     */
     public function __construct(int $levelId, array $descriptor, string $direction) {
         $this->levelId = $levelId;
         $this->descriptor = $descriptor;
@@ -39,8 +47,12 @@ class DescriptorMetadata {
     }
 
 
+    /**
+     * @return int
+     */
     public function calculateMin() {
-
+        // TODO hard-coded value for testing; replace
+        return 0;
     }
 
     /**
@@ -53,7 +65,8 @@ class DescriptorMetadata {
     }
 
     /**
-     *
+     * Min and max values for this descriptor
+     * @return array
      */
     public function toArray() : array
     {
