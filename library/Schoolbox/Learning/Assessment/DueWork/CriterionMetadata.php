@@ -65,14 +65,19 @@ class CriterionMetadata {
         $this->levelDescriptors = $levelDescriptors;
 
         $this->direction = $this->calculateDirection();
+
+        $this->descriptorMetadata = $this->generateDescriptorMetadata();
     }
 
-    public function generateDescriptorMetadata() : void
+    public function generateDescriptorMetadata() : array
     {
+        $meta = [];
         foreach ($this->levelDescriptors as $levelId => $descriptor) {
             $dm = new DescriptorMetadata($levelId, $descriptor, $this->direction);
-            $this->descriptorMetadata[$levelId] = $dm->toArray();
+            $meta[$levelId] = $dm->toArray();
         }
+
+        return $meta;
     }
 
     /**
