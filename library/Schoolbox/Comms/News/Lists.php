@@ -59,10 +59,7 @@ class Lists
      */
     public function findForTopic(User $user, int $topicId, int $limit, int $pageNum): array
     {
-        /* Figure out which ones were saved for later
-         */
         $policies = $this->policyMapper->findAll()->indexBy('identifier');
-        $policy = $policies->getOffset('save_for_later');
 
         /* Component config can set "All" as its limit
          */
@@ -70,7 +67,7 @@ class Lists
 
         /* Figure out the articles that this user has saved for later
          */
-        $savedArticleIds = $this->findSavedArticles($user, $policy);
+        $savedArticleIds = $this->findSavedArticles($user, $policies->getOffset('save_for_later'));
 
         /* TODO: Increment Impressions count for everything in $articles
          */
@@ -80,7 +77,7 @@ class Lists
         return [
             'articles' => $articles,
             'readMore' => $policies->getOffset('read_more')->getValue(),
-            'saveForLater' => $policy->getValue(),
+            'saveForLater' => $policies->getOffset('save_for_later')->getValue(),
             'savedArticleIds' => $savedArticleIds,
             'unsaved' => SaveForLater\Mapper::UNSAVED
         ];
