@@ -30,7 +30,7 @@ class CriterionMetadata {
      * Array of descriptor metadata for this criterion, indexed by level ID
      * @var array $descriptorMetadata
      */
-    private $descriptorMetadata = [];
+    private $metadata = [];
 
 
     /**
@@ -66,10 +66,11 @@ class CriterionMetadata {
 
         $this->direction = $this->calculateDirection();
 
-        $this->descriptorMetadata = $this->generateDescriptorMetadata();
+        $this->metadata['direction'] = $this->direction;
+        $this->metadata = array_merge($this->metadata, $this->generateDescriptorMetadata());
     }
 
-    public function generateDescriptorMetadata() : array
+    private function generateDescriptorMetadata() : array
     {
         $meta = [];
         foreach ($this->levelDescriptors as $levelId => $descriptor) {
@@ -159,9 +160,9 @@ class CriterionMetadata {
         return $this->direction;
     }
 
-    public function getDescriptorMetadata() : array
+    public function getMetadata() : array
     {
-        return $this->descriptorMetadata;
+        return $this->metadata;
     }
 
 }

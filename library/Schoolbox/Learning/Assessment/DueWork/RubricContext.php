@@ -285,7 +285,7 @@ class RubricContext
 
         foreach ($descriptors as $critId => $levelDescriptors) {
             $critMetadata = new CriterionMetadata($critId, $levelIds, $levelDescriptors);
-            $metadata[$critId] = $critMetadata->getDescriptorMetadata();
+            $metadata[$critId] = $critMetadata->getMetadata();
         }
 
         return $metadata;

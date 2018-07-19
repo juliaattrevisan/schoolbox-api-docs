@@ -44,11 +44,11 @@ class DescriptorMetadata {
      * DescriptorMetadata constructor.
      * @param int $levelId
      * @param array $descriptor
-     * @param array $prevDescriptor
-     * @param array $nextDescriptor
+     * @param array $prevDescriptor     Can be null
+     * @param array $nextDescriptor     Can be null
      * @param string $direction
      */
-    public function __construct(int $levelId, array $descriptor, array $prevDescriptor, array $nextDescriptor, string $direction) {
+    public function __construct(int $levelId, array $descriptor, ?array $prevDescriptor, ?array $nextDescriptor, string $direction) {
         $this->levelId = $levelId;
         $this->descriptor = $descriptor;
         $this->prevDescriptor = $prevDescriptor;
@@ -58,13 +58,19 @@ class DescriptorMetadata {
 
 
     /**
-     * @return int
+     * @return int|null     Returns null if the descriptor has no value.
      */
     public function calculateMin() : ?int
     {
-        // TODO hard-coded value for testing; replace
         // TODO handle nulls
-        return 0;
+
+        // Assume ascending by default
+        $min = ($this->prevDescriptor['value'] ? $this->prevDescriptor['value'] + 1 : $this->descriptor['value']);
+        if ($this->direction === CriterionMetadata::DIRECTION_ASCENDING) {
+            $min = ($this->nextDescriptor['value'] ? $this->nextDescriptor['value'] + 1 : $this->descriptor['value']);
+        }
+
+        return $min;
     }
 
     /**
@@ -84,6 +90,13 @@ class DescriptorMetadata {
     public function toArray() : array
     {
         // TODO handle nulls
+        $min = $this->calculateMin();
+        $max = $this->calculateMax();
+
+        if ($min === null || $max === null) {
+            return null;
+        }
+
         return ['min' => $this->calculateMin(), 'max' => $this->calculateMax()];
     }
 }
