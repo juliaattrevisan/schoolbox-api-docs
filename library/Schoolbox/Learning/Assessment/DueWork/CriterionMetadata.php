@@ -114,11 +114,11 @@ class CriterionMetadata {
         $startValue = $this->calculateStartValue();
         $endValue = $this->calculateEndValue();
 
-        if ($startValue < $endValue) {
-            return self::DIRECTION_ASCENDING;
+        if ($startValue > $endValue) {
+            return self::DIRECTION_DESCENDING;
         }
 
-        return self::DIRECTION_DESCENDING;
+        return self::DIRECTION_ASCENDING;
     }
 
     /**
