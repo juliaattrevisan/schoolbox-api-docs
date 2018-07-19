@@ -3,6 +3,11 @@
 <script type="text/javascript">
     $(function() {
         $('#createQuestionForm').shortCreate({
+            rules: {
+                answer: {
+                    minlength: 1,
+                }
+            },
             customValidationRules: function(config) {
                 $.fn.addCustomRules_greaterThanZero(config);
                 $.fn.addCustomRules_emptyAnswer(config);
