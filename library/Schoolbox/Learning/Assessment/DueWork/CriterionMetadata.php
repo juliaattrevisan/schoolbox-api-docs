@@ -77,6 +77,8 @@ class CriterionMetadata {
         $prevDescriptor = null;
         $nextDescriptor = null;
 
+        // TODO something weird is happening with a single value with blank start and end on either side
+
         $iteration = 0;
         foreach ($this->levelDescriptors as $levelId => $descriptor) {
             $isLastDescriptor = ($iteration === \count($this->levelDescriptors) - 1);
