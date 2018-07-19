@@ -79,7 +79,7 @@ class CriterionMetadata {
 
         $iteration = 0;
         foreach ($this->levelDescriptors as $levelId => $descriptor) {
-            $isLastDescriptor = ($iteration === \count($this->levelDescriptors));
+            $isLastDescriptor = ($iteration === \count($this->levelDescriptors) - 1);
 
             // Don't reassign next/prev descriptor if its value is null
 
