@@ -1,0 +1,50 @@
+@startuml
+namespace Rubicon.Atlas {
+    class CurriculumPlan
+    class Unit
+    class Assessment
+    'class Attachment
+    class Standard
+
+    ' Internal links
+    CurriculumPlan *-d- Unit
+    Unit *-d- Assessment
+    'Unit *-d- Attachment
+    Assessment *-d- Standard
+}
+
+namespace Schoolbox.Course {
+    class CourseSpecification
+    class UnitSpecification
+    class Assessment
+    class RubricGroupUsage
+    class RubricGroup
+
+    ' Internal links
+    CourseSpecification *-d- UnitSpecification
+    UnitSpecification *-d- Assessment
+    Assessment *-d- RubricGroupUsage
+    RubricGroupUsage *-d- RubricGroup
+
+    ' External links
+    CourseSpecification .l. Rubicon.Atlas.CurriculumPlan
+    UnitSpecification .l. Rubicon.Atlas.Unit
+    Assessment .l. Rubicon.Atlas.Assessment
+    RubricGroup .l. Rubicon.Atlas.Standard
+}
+
+namespace Schoolbox.Curriculum {
+    class Node {
+        code: string
+    }
+
+    ' Internal links; Nodes may have child nodes
+    Node o-- Node
+
+    ' External Links
+    Node .l. Schoolbox.Course.CourseSpecification
+    Node .l. Schoolbox.Course.UnitSpecification
+    Node .l. Schoolbox.Course.Assessment
+    Node .l. Schoolbox.Course.RubricGroup
+}
+@enduml
