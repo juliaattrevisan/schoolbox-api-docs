@@ -97,6 +97,6 @@ class DescriptorMetadata {
             return null;
         }
 
-        return ['min' => $this->calculateMin(), 'max' => $this->calculateMax()];
+        return ['min' => $min, 'max' => $max];
     }
 }
