@@ -60,8 +60,10 @@ class DescriptorMetadata {
     /**
      * @return int
      */
-    public function calculateMin() {
+    public function calculateMin() : ?int
+    {
         // TODO hard-coded value for testing; replace
+        // TODO handle nulls
         return 0;
     }
 
@@ -69,8 +71,9 @@ class DescriptorMetadata {
      * The persisted value of this descriptor is always its maximum value.
      * @return int
      */
-    public function calculateMax() : int
+    public function calculateMax() : ?int
     {
+        // TODO handle nulls
         return $this->descriptor['value'];
     }
 
@@ -80,6 +83,7 @@ class DescriptorMetadata {
      */
     public function toArray() : array
     {
+        // TODO handle nulls
         return ['min' => $this->calculateMin(), 'max' => $this->calculateMax()];
     }
 }
