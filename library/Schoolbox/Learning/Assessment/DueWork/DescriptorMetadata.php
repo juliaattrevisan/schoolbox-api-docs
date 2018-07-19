@@ -11,9 +11,15 @@
 namespace Schoolbox\Learning\Assessment\DueWork;
 
 class DescriptorMetadata {
-    private $prevDescriptorMax;
+    /**
+     * @var array $prevDescriptor
+     */
+    private $prevDescriptor;
 
-    private $nextDescriptorMax;
+    /**
+     * @var array $nextDescriptor
+     */
+    private $nextDescriptor;
 
     /**
      * A single descriptor object in array form
@@ -38,11 +44,15 @@ class DescriptorMetadata {
      * DescriptorMetadata constructor.
      * @param int $levelId
      * @param array $descriptor
+     * @param array $prevDescriptor
+     * @param array $nextDescriptor
      * @param string $direction
      */
-    public function __construct(int $levelId, array $descriptor, string $direction) {
+    public function __construct(int $levelId, array $descriptor, array $prevDescriptor, array $nextDescriptor, string $direction) {
         $this->levelId = $levelId;
         $this->descriptor = $descriptor;
+        $this->prevDescriptor = $prevDescriptor;
+        $this->nextDescriptor = $nextDescriptor;
         $this->direction = $direction;
     }
 

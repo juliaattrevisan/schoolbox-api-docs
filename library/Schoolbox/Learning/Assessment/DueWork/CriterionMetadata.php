@@ -73,7 +73,10 @@ class CriterionMetadata {
     {
         $meta = [];
         foreach ($this->levelDescriptors as $levelId => $descriptor) {
-            $dm = new DescriptorMetadata($levelId, $descriptor, $this->direction);
+            $prevDescriptor = $this->levelDescriptors[$levelId - 1];
+            $nextDescriptor = $this->levelDescriptors[$levelId + 1];
+            
+            $dm = new DescriptorMetadata($levelId, $descriptor, $prevDescriptor, $nextDescriptor, $this->direction);
             $meta[$levelId] = $dm->toArray();
         }
 
