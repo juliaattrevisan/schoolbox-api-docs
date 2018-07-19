@@ -86,10 +86,12 @@
                     {% set state = unsaved %}
                 {% endif %}
 
-                {# Check that you can save this for later #}
+                {# Check that you can save this for later
+                 # You must have access to the route and the policy must be enabled
+                 #}
                 {% set saveForLaterRoute = routeLookup('commsNewsSaveForLater.postToggle', {articleId: article.id}) %}
 
-                {% if saveForLaterRoute %}
+                {% if saveForLaterRoute and saveForLater %}
                 <a data-saveforlater="{{ state }}" href="{{ saveForLaterRoute }}"></a>
                 {% endif %}
             </nav>
