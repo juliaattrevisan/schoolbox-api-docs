@@ -93,7 +93,7 @@ class CriterionMetadata {
         $startValue = $this->calculateStartValue();
         $endValue = $this->calculateEndValue();
 
-        if ($startValue > $endValue) {
+        if ($startValue < $endValue) {
             return self::DIRECTION_ASCENDING;
         }
 
@@ -109,13 +109,13 @@ class CriterionMetadata {
         // By default, assume the first level has a value
         $firstValuedLevelIndex = 0;
         $firstLevel = $this->levelIds[$firstValuedLevelIndex];
-        $startValue = $this->levelDescriptors[$this->id][$firstLevel]['value'];
+        $startValue = $this->levelDescriptors[$firstLevel]['value'];
 
         // Loop until we find a level that has a value
         while ($startValue === null && ($firstValuedLevelIndex < $this->numLevels)) {
             $firstValuedLevelIndex++;
             $firstLevel = $this->levelIds[$firstValuedLevelIndex];
-            $startValue = $this->levelDescriptors[$this->id][$firstLevel]['value'];
+            $startValue = $this->levelDescriptors[$firstLevel]['value'];
         }
 
         // $startValue will be null if none of the levels have a value
@@ -131,13 +131,13 @@ class CriterionMetadata {
         // By default, assume the last level has a value
         $lastValuedLevelIndex = $this->numLevels - 1;
         $lastLevel = $this->levelIds[$lastValuedLevelIndex];
-        $endValue = $this->levelDescriptors[$this->id][$lastLevel]['value'];
+        $endValue = $this->levelDescriptors[$lastLevel]['value'];
 
         // Loop until we find a level that has a value
         while ($endValue === null && ($lastValuedLevelIndex > 0)) {
             $lastValuedLevelIndex--;
             $lastLevel = $this->levelIds[$lastValuedLevelIndex];
-            $endValue = $this->levelDescriptors[$this->id][$lastLevel]['value'];
+            $endValue = $this->levelDescriptors[$lastLevel]['value'];
         }
 
         // $endValue will be null if none of the levels have a value
