@@ -66,7 +66,7 @@ class DescriptorMetadata {
 
         // Assume ascending by default
         $min = ($this->prevDescriptor['value'] !== null ? $this->prevDescriptor['value'] + 1 : $this->descriptor['value']);
-        if ($this->direction === CriterionMetadata::DIRECTION_ASCENDING) {
+        if ($this->direction === CriterionMetadata::DIRECTION_DESCENDING) {
             $min = ($this->nextDescriptor['value'] ? $this->nextDescriptor['value'] + 1 : $this->descriptor['value']);
         }
 
