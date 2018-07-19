@@ -77,14 +77,13 @@ class CriterionMetadata {
         $prevDescriptor = null;
         $nextDescriptor = null;
 
-        // TODO something weird is happening with a single value with blank start and end on either side
-
         $iteration = 0;
         foreach ($this->levelDescriptors as $levelId => $descriptor) {
             $isLastDescriptor = ($iteration === \count($this->levelDescriptors) - 1);
 
             // Don't reassign next/prev descriptor if its value is null
 
+            // TODO this logic is wrong because the levelIds might not be contiguous (i.e. if there's a blank desc)
             if ($this->levelDescriptors[$levelId - 1]['value'] !== null) {
                 $prevDescriptor = $this->levelDescriptors[$levelId - 1];
             }
