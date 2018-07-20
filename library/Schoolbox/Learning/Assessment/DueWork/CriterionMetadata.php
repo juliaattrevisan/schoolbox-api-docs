@@ -105,7 +105,7 @@ class CriterionMetadata {
 
                 // Send data to our helper class for processing
                 // DescriptorMetadata works out for us whether a descriptor has a value or not
-                $dm = new DescriptorMetadata($levelIndex, $this->levelDescriptors[$levelIndex], $prevDescriptor, $nextDescriptor, $this->direction);
+                $dm = new DescriptorMetadata($this->levelDescriptors[$levelIndex], $prevDescriptor, $nextDescriptor, $this->direction);
                 $meta[$levelIndex] = $dm->toArray();
 
                 // Set prevDescriptor to currentDescriptor before moving on

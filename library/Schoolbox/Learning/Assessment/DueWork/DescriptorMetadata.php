@@ -28,12 +28,6 @@ class DescriptorMetadata {
     private $descriptor;
 
     /**
-     * ID of the level this descriptor belongs too
-     * @var int $levelId
-     */
-    private $levelId;
-
-    /**
      * Order of the descriptor values in the criterion this descriptor belongs to
      * @var string
      */
@@ -42,14 +36,12 @@ class DescriptorMetadata {
 
     /**
      * DescriptorMetadata constructor.
-     * @param int $levelId
      * @param array $descriptor
      * @param array $prevDescriptor     Can be null
      * @param array $nextDescriptor     Can be null
      * @param string $direction
      */
-    public function __construct(int $levelId, array $descriptor, ?array $prevDescriptor, ?array $nextDescriptor, string $direction) {
-        $this->levelId = $levelId;
+    public function __construct(array $descriptor, ?array $prevDescriptor, ?array $nextDescriptor, string $direction) {
         $this->descriptor = $descriptor;
         $this->prevDescriptor = $prevDescriptor;
         $this->nextDescriptor = $nextDescriptor;
