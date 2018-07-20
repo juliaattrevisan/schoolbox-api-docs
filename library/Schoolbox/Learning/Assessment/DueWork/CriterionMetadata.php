@@ -69,7 +69,7 @@ class CriterionMetadata {
         $this->direction = $this->calculateDirection();
 
         $this->metadata['direction'] = $this->direction;
-        $this->metadata = array_merge($this->metadata, $this->generateDescriptorMetadata());
+        $this->metadata = $this->metadata + $this->generateDescriptorMetadata();
     }
 
     private function generateDescriptorMetadata() : array
