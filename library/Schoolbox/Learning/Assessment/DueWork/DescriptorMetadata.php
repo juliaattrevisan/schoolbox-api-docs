@@ -1,7 +1,7 @@
 <?php
 
 /**
- * DescriptorMetadata
+ * Calculates the min and max values for a single descriptor
  *
  * @author      Dorothea Baker <dorothea.baker@alaress.com.au>
  * @copyright   Copyright 2018, Alaress Pty Ltd
