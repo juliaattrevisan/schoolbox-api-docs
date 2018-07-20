@@ -13,7 +13,7 @@ iframe:not(.phpdebugbar-widgets-iframe) {
 article iframe,
 .cke_editable iframe
 {
-  height: rem-calc(($base-font-size) * 25);
+  min-height: rem-calc(($base-font-size) * 25);
 }
 
 .scroll-wrapper {
