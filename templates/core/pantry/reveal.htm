@@ -140,14 +140,6 @@
                     <div id='toaster' class="toast" data-toast></div>
                 </section>
             </div>
-            <div class="small-12 medium-6 columns">
-                <h2 class="subheader">Crouton Reveal</h2>
-                <p class="meta">Use the class <code>.crouton</code> on your element using the same Toast JavaScript.</p>
-                <section class="content">
-                    <a class="button" crouton-save-draft>Save Draft</a>
-                    <div id='save-draft' class="crouton" data-crouton></div>
-                </section>
-            </div>
         </div>
         <script type="text/javascript">
             // Toast
@@ -165,15 +157,6 @@
                 $toast.toastActivate({text: 'Warming toaster...'});
                 window.setTimeout( function () {
                     $toast.toastTimeout({text: 'Burnt Toast!', duration: 3000, css: 'alert'});
-                }, 1000);
-            });
-            // Crouton
-            $('a[crouton-save-draft]').on('click', function(event) {
-                event.preventDefault();
-                var $crouton = $('[data-crouton]');
-                $crouton.toastActivate({text: 'Saving your work...', duration: 6000});
-                window.setTimeout( function () {
-                    $crouton.toastTimeout({text: 'Draft saved', duration: 5000});
                 }, 1000);
             });
         </script>

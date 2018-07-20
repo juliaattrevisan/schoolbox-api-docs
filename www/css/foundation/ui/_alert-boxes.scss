@@ -52,8 +52,7 @@ $alert-transition-ease: ease-out;
 $alert-tint-amount: 90%;
 $alert-default-background: darken($body-bg, 10%);
 
-.alert-box,
-.toast{
+.alert-box {
     background-color: $alert-default-background;
     color: calc-text-color($alert-default-background, tint($alert-default-background, $alert-tint-amount), darken($alert-default-background, $alert-tint-amount));
 
@@ -88,45 +87,14 @@ $alert-default-background: darken($body-bg, 10%);
     display: none;
 }
 
-/* Toast pop-up alert
-*/
-.toast{
-    @include alert();
-    background-color: $accent-background;
-    color: $accent-foreground;
-    text-align: center;
-    font-size: $base-font-size;
-    position: fixed;
-    bottom: 0;
-    margin: 0 10%;
-    left: $off-canvas-width;
-    right: 0;
-    z-index: 100;
-    display: block;
-    @include transform(translateY(100%));
-    @include transition(all, .3s, cubic-bezier(0.65, 0.05, 0.36, 1), 0s);
-    &.pop{
-        @include transform(translateY(0));
-    }
-    .close {
-        @include alert-close();
-        &:hover {
-            text-decoration: none;
-        }
-        color: inherit;
-        margin: 0;
-        line-height: .8;
-    }
-}
-
-// Crouton pop-up alert...
+// Toast pop-up alert...
 // A less obnoxious pop-up alert
-.crouton {
+.toast {
     background-color: $tuatara;
     bottom: 1rem;
     color: $white;
     display: block;
-    font-size: $base-font-size;
+    font-size: $base-font-size - 2;
     opacity: 0;
     padding: .875rem 1.25rem;
     position: fixed;
@@ -138,8 +106,8 @@ $alert-default-background: darken($body-bg, 10%);
         @include transform(translateY(0));
         opacity: 1;
     }
-    &.success::before {
-        background-color: $success-color;
+
+    &::before {
         border-radius: .75rem;
         content: '';
         display: inline-block;
@@ -147,25 +115,16 @@ $alert-default-background: darken($body-bg, 10%);
         margin-right: .5rem;
         width: .75rem;
     }
-}
 
-/* Adjust toast width depending if
-*  notifications shown
-*/
-@media #{$xlarge-up} {
-    .inner-wrap.docking{
-        .toast{
-            right: $off-canvas-width;
-        }
+    &.success::before {
+        background-color: $success-color;
     }
-}
+    &.warning::before {
+        background-color: $warning-color;
+    }
+    &.alert::before {
+        background-color: $alert-color;
+    }
 
-/* Full width toast on smaller devices
-*/
-@media #{$medium-down} {
-    .toast{
-        left: 0;
-        margin: 0;
-    }
 }
 
