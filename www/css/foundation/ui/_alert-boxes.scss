@@ -107,6 +107,17 @@ $alert-default-background: darken($body-bg, 10%);
         opacity: 1;
     }
 
+    &::before {
+        background-color: $white;
+        border-radius: .75rem;
+        content: '';
+        display: inline-block;
+        height: .75rem;
+        margin-right: .5rem;
+        width: .75rem;
+        animation: pulse 1.5s infinite;
+    }
+
     &.success::before {
         background-color: $success-color;
         border-radius: .75rem;
@@ -115,6 +126,8 @@ $alert-default-background: darken($body-bg, 10%);
         height: .75rem;
         margin-right: .5rem;
         width: .75rem;
+        animation: none;
+
     }
     &.warning::before {
         background-color: $warning-color;
@@ -124,6 +137,8 @@ $alert-default-background: darken($body-bg, 10%);
         height: .75rem;
         margin-right: .5rem;
         width: .75rem;
+        animation: none;
+
     }
     &.alert::before {
         background-color: $alert-color;
@@ -133,6 +148,8 @@ $alert-default-background: darken($body-bg, 10%);
         height: .75rem;
         margin-right: .5rem;
         width: .75rem;
+        animation: none;
+
     }
 
 }
