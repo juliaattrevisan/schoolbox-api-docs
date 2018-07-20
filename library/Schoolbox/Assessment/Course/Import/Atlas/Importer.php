@@ -180,6 +180,7 @@ class Importer
     public function import(Api\Curriculum $curriculum, Folder $folder, array $selectedUnits): void
     {
         // Preparation: setup the curriculum nodes
+        // TODO consider extracting to separate method
         $baseNode       = $this->findOrCreateBaseCurriculumNode();
         $standardsNode  = $this->findOrCreateBaseCurriculumStandardsNode($baseNode);
 
@@ -191,7 +192,7 @@ class Importer
 
         // Associate curriculum node to course's folder
         // TODO use an existing node if it's there
-        $courseSpecNode = $this->createCurriculumNodeFromCurriculumPlan($curriculum, $baseNode);
+        $courseSpecNode = $this->findOrCreateCurriculumNodeForCurriculumPlan($curriculum, $baseNode);
         $courseSpec->getFolder()->getCurriculumNodes()->add($courseSpecNode);
         $this->folderMapper->save($courseSpec->getFolder());
 
@@ -204,7 +205,7 @@ class Importer
 
 
                 // Associate curriculum node to unit's folder
-                $unitSpecNode = $this->createCurriculumNodeFromUnit($unit, $courseSpecNode);
+                $unitSpecNode = $this->findOrCreateCurriculumNodeFromUnit($unit, $courseSpecNode);
                 $unitSpec->getFolder()->getCurriculumNodes()->add($unitSpecNode);
                 $this->folderMapper->save($unitSpec->getFolder());
 
@@ -338,17 +339,20 @@ class Importer
             ->setCreator($this->currentUser)
             ->setMarkScheme(new Percentage());
 
-        $dueWorkNode = $this->createCurriculumNodeFromAssessment($assessment, $unitSpecNode);
+        $dueWorkNode = $this->findOrCreateCurriculumNodeFromAssessment($assessment, $unitSpecNode);
         $dueWork->getCurriculumNodes()->add($dueWorkNode);
+
 
         // Build a rubric for this due work
         if (\count($assessment->getStandards())) {
             $rubric = new Rubric\Rubric();
 
-            // Dummy data
+
+            // Dummy data: I have nothing better to put here
             $level = new Level();
             $level->setName('Level');
             $rubric->putLevel($level);
+
 
             // I can only create groups, as there's no sub-standards.
             // Provided there's mark-by-group without needing a criterion,
@@ -361,7 +365,7 @@ class Importer
                 );
 
                 // Create node and re-save
-                $standardNode = $this->createCurriculumNodeFromStandard($standard, $standardsNode);
+                $standardNode = $this->findOrCreateCurriculumNodeFromStandard($standard, $standardsNode);
                 if ($standardNode) {
                     $groupDataModel->getCurriculumNodes()->add($standardNode);
                     $this->rubricGroupMapper->save($groupDataModel);
@@ -501,22 +505,29 @@ class Importer
      * @return Node
      * @throws \Schoolbox\Mapper\Exception if somehow creation fails?
      */
-    private function createCurriculumNode(
+    private function findOrCreateCurriculumNode(
         string $name,
         ?string $code,
         ?string $reference,
         ?string $description,
         ?Node $parent
     ): Node {
-        // Atlas-imported assessments have to tie back to curriculum nodes somehow.
-        $node = $this->nodeMapper->createModel()
-                                 ->setName($name)
-                                 ->setCode($code)
-                                 ->setDescription($description)
-                                 ->setReference($reference)
-                                 ->setParent($parent);
-        $this->nodeMapper->save($node);
-        return $node;
+        try {
+            // Does the base node exist? Anywhere?
+            return $this->nodeMapper->findOneByColumn('code', $code);
+
+        } catch (MapperException $e) {
+            // It was not found: create it
+            // Consider soft-deletion the same as hard deletion
+            $node = $this->nodeMapper->createModel()
+                                     ->setName($name)
+                                     ->setCode($code)
+                                     ->setDescription($description)
+                                     ->setReference($reference)
+                                     ->setParent($parent);
+            $this->nodeMapper->save($node);
+            return $node;
+        }
     }
 
 
@@ -528,9 +539,9 @@ class Importer
      * @return Node
      * @throws \Schoolbox\Mapper\Exception
      */
-    private function createCurriculumNodeFromCurriculumPlan(Api\Curriculum $curriculumPlan, Node $parent): Node
+    private function findOrCreateCurriculumNodeForCurriculumPlan(Api\Curriculum $curriculumPlan, Node $parent): Node
     {
-        return $this->createCurriculumNode(
+        return $this->findOrCreateCurriculumNode(
             $curriculumPlan->getTitle(),
             sprintf('atlas:curriculum:%d', $curriculumPlan->getId()),
             null,
@@ -548,9 +559,9 @@ class Importer
      * @return Node
      * @throws \Schoolbox\Mapper\Exception
      */
-    private function createCurriculumNodeFromUnit(Api\Unit $unit, Node $parent): Node
+    private function findOrCreateCurriculumNodeFromUnit(Api\Unit $unit, Node $parent): Node
     {
-        return $this->createCurriculumNode(
+        return $this->findOrCreateCurriculumNode(
             $unit->getTitle(),
             sprintf('atlas:unit:%d', $unit->getId()),
             null,
@@ -568,9 +579,9 @@ class Importer
      * @return Node
      * @throws \Schoolbox\Mapper\Exception
      */
-    private function createCurriculumNodeFromAssessment(Api\Assessment $assessment, Node $parent): Node
+    private function findOrCreateCurriculumNodeFromAssessment(Api\Assessment $assessment, Node $parent): Node
     {
-        return $this->createCurriculumNode(
+        return $this->findOrCreateCurriculumNode(
             $assessment->getTitle(),
             sprintf('atlas:assessment:%d', $assessment->getId()),
             null,
@@ -588,10 +599,10 @@ class Importer
      * @return null|Node
      * @throws \Schoolbox\Mapper\Exception
      */
-    private function createCurriculumNodeFromStandard(Api\Standard $standard, Node $parent): ?Node
+    private function findOrCreateCurriculumNodeFromStandard(Api\Standard $standard, Node $parent): ?Node
     {
         if ('' !== $standard->getCode()) {
-            return $this->createCurriculumNode(
+            return $this->findOrCreateCurriculumNode(
                 $standard->getTitle(),
                 $standard->getCode(),
                 null,
