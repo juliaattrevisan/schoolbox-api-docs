@@ -405,7 +405,7 @@ class Decorator extends NotificationBundle
 
         if ($isPortrait || $isBlank) {
             // change to be the generic icon for the namespace
-            return '/images/icon.php?size=48&icon=' . $notification->getNamespace();
+            return '/images/icon.php?size=64&icon=' . $notification->getNamespace();
         }
         return $notification->getIcon();
     }

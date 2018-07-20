@@ -13,6 +13,7 @@ namespace Schoolbox\Sync\Log;
 use Alaress\Async\Notification\Instance\Builder;
 use Alaress_Date_Format;
 use Monolog\Logger;
+use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundleInterface;
@@ -28,7 +29,7 @@ class Notifier extends AbstractModuleNotifier
      */
     protected function getSlug()
     {
-        return 'ups';
+        return NSMapper::NS_UPS;
     }
 
 
@@ -90,7 +91,7 @@ class Notifier extends AbstractModuleNotifier
         }
 
         $bob->setTitle("User provisioning dry run has completed")
-            ->setIcon('/images/icon.php?icon=bolt&size=72') // TODO find some better image than a bolt icon....
+            ->setIcon('/images/icon.php?size='.$this->iconSize.'&icon='.NSMapper::NS_UPS)
             ->setHref('/adminv2/ups/log/'.$log->getId())
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::NOTICE)

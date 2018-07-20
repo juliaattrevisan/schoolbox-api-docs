@@ -19,37 +19,41 @@ class Icon extends BaseTransformation
     /**
     * Create the list of valid transforms
     */
-    public function __construct($icon, $size = 72)
+    public function __construct($icon, $size = 64)
     {
 
-        $validSizes = array(16,24,32,48,64,72);
+        $validSizes = array(16,32,48,64);
         $validCrops = array(
             // ensure this list accurately reflects the sprite file!
-            'pin','doc','clock','tick','link','bolt','grade','poll','chat','comment','cross','reload','work','alert','upload','wiki'
+            'news','calendar','tick','link','list','comment','forum','users','import','wiki','group','sstream','eotc','resource','report','sports'
         );
 
         // map namespaces to appropriate icons
         $namespaceMap = array(
-            NSMapper::NS_PASTORAL               => 'comment',
-            NSMapper::NS_PASTORAL_COMMENT       => 'chat',
-            NSMapper::NS_PASTORAL_LOG           => 'bolt',
-            NSMapper::NS_DUEWORK                => 'work',
-            NSMapper::NS_ONLINE_ASSESS          => 'work',
+            NSMapper::NS_PASTORAL               => 'news',
+            NSMapper::NS_PASTORAL_COMMENT       => 'comment',
+            NSMapper::NS_PASTORAL_LOG           => 'list',
+            NSMapper::NS_DUEWORK                => 'import',
+            NSMapper::NS_OLDDUEWORK             => 'import',
+            NSMapper::NS_ONLINE_ASSESS          => 'import',
             NSMapper::NS_HOMEPAGE_BLOG          => 'comment',
             NSMapper::NS_EPORTFOLIO_BLOG        => 'comment',
-            NSMapper::NS_FORUM                  => 'chat',
-            NSMapper::NS_NEWS                   => 'pin',
-            NSMapper::NS_CALENDAR               => 'clock',
+            NSMapper::NS_FORUM                  => 'forum',
+            NSMapper::NS_NEWS                   => 'news',
+            NSMapper::NS_CALENDAR               => 'calendar',
             NSMapper::NS_BOARDER_LEAVE          => 'tick',
             NSMapper::NS_WIKI                   => 'wiki',
-            NSMapper::NS_GROUP                  => 'chat',
+            NSMapper::NS_GROUP                  => 'group',
             NSMapper::NS_CMS                    => 'link',
-            NSMapper::NS_SSTREAM                => 'chat',
-            NSMapper::NS_EOTC                   => 'clock',
-            NSMapper::NS_RESOURCE_BOOKING       => 'clock',
-            NSMapper::NS_REPORT_CARD            => 'chat',
-            NSMapper::NS_SPORTS_FIXTURES        => 'bolt',
-            NSMapper::NS_SPORTS_FIXTURES_IMPORT => 'bolt',
+            NSMapper::NS_SSTREAM                => 'sstream',
+            NSMapper::NS_EOTC                   => 'eotc',
+            NSMapper::NS_RESOURCE_BOOKING       => 'resource',
+            NSMapper::NS_REPORT_CARD            => 'report',
+            NSMapper::NS_SPORTS_FIXTURES        => 'sports',
+            NSMapper::NS_SPORTS_FIXTURES_IMPORT => 'import',
+            NSMapper::NS_MESSAGE                => 'comment',
+            NSMapper::NS_TIMETABLE              => 'calendar',
+            NSMapper::NS_UPS                    => 'import',
         );
 
         if (!in_array($size, $validSizes)) {
