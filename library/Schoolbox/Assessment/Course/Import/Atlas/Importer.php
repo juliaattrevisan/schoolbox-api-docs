@@ -152,6 +152,7 @@ class Importer
         AssessmentDataSource $assessmentDataSource,
         NodeMapper $nodeMapper
     ) {
+        // TODO: consider passing $currentUser in import()
         $this->currentUser            = $currentUser;
         $this->config                 = $config;
         $this->folderMapper           = $folderMapper;
@@ -174,38 +175,49 @@ class Importer
      * @param Api\Curriculum $curriculum
      * @param Folder         $folder
      * @param array          $selectedUnits
+     * @throws MapperException if something couldn't be found somewhere?
      */
     public function import(Api\Curriculum $curriculum, Folder $folder, array $selectedUnits): void
     {
-        $courseSpec = $this->createCourse($curriculum, $folder);
-
+        // Preparation: setup the curriculum nodes
         $baseNode       = $this->findOrCreateBaseCurriculumNode();
         $standardsNode  = $this->findOrCreateBaseCurriculumStandardsNode($baseNode);
-        $courseSpecNode = $this->createCurriculumNodeFromCurriculumPlan($curriculum, $baseNode);
 
-        // Associate courseSpecNode with courseSpec's folder
+
+        // Create the course in the prescribed folder
+        // TODO use an existing course if it's there (or at least have the option)
+        $courseSpec = $this->createCourse($curriculum, $folder);
+
+
+        // Associate curriculum node to course's folder
+        // TODO use an existing node if it's there
+        $courseSpecNode = $this->createCurriculumNodeFromCurriculumPlan($curriculum, $baseNode);
         $courseSpec->getFolder()->getCurriculumNodes()->add($courseSpecNode);
         $this->folderMapper->save($courseSpec->getFolder());
 
-        // Which units were selected?
+
+        // Import the units that were requested
         foreach ($curriculum->getUnits() as $unit) {
             if (!empty($selectedUnits[$unit->getId()]['selected'])) {
                 // This unit was selected; create it
                 $unitSpec = $this->createUnit($unit, $courseSpec);
 
+
+                // Associate curriculum node to unit's folder
                 $unitSpecNode = $this->createCurriculumNodeFromUnit($unit, $courseSpecNode);
                 $unitSpec->getFolder()->getCurriculumNodes()->add($unitSpecNode);
                 $this->folderMapper->save($unitSpec->getFolder());
 
-                // Associate unitSpecNode with unitspec's folder
 
-                // Put the assessment inside that unit
+                // Import requested attachments
                 foreach ($unit->getAttachments() as $attachment) {
                     // Is this attachment private?
                     // What kind of attachment is it?
                     $this->createAttachment($attachment, $unitSpec->getFolder());
                 }
 
+
+                // Import requested assessments
                 foreach ($unit->getAssessments() as $assessment) {
                     $this->createDueWork($assessment, $unitSpec, $unitSpecNode, $standardsNode);
                 }
@@ -266,7 +278,7 @@ class Importer
      * @param Api\Unit   $unit
      * @param CourseSpec $courseSpec
      * @return UnitSpec
-     * @throws \Schoolbox\Mapper\Exception if for some reason a model couldn't be created?
+     * @throws MapperException if for some reason a model couldn't be created?
      */
     private function createUnit(Api\Unit $unit, CourseSpec $courseSpec): UnitSpec
     {
@@ -306,7 +318,8 @@ class Importer
      * @param UnitSpec       $unitSpec
      * @param Node           $unitSpecNode
      * @param Node           $standardsNode
-     * @return IAssessable In practise, this will always be a due work
+     * @return IAssessable
+     * @throws MapperException if for some reason a model couldn't be created?
      */
     private function createDueWork(
         Api\Assessment $assessment,
@@ -392,8 +405,9 @@ class Importer
      *
      * @param Api\Attachment $attachment
      * @param Folder         $folder
+     * @return void Don't need to return what was attached?
      */
-    private function createAttachment(Api\Attachment $attachment, Folder $folder)
+    private function createAttachment(Api\Attachment $attachment, Folder $folder): void
     {
         // TODO did I pass the attachment as private?
         // How to create the item?
