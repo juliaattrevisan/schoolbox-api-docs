@@ -641,7 +641,7 @@ class Controller extends Base
             ->setSeverity(Logger::INFO)
             ->setNamespace('ALERT')
             ->setHref('#')
-            ->setIcon('/images/icon.php?size=32&icon='.NSMapper::NS_MESSAGE)
+            ->setIcon('/images/icon.php?size=64&icon='.NSMapper::NS_MESSAGE)
             ->addTopic("notify.user.$userId")
             ->putMeta('ttl', 30)
             ->putMeta('title', 'Message from ' . $this->getUser()->getFullName());

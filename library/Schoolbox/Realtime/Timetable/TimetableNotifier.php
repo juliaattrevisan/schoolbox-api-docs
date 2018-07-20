@@ -267,7 +267,7 @@ class TimetableNotifier extends WorkNotifier {
                     ->setTitle($body)
                     ->setTopics([ "notify.campus.$campusId" ])
                     ->putMeta('title', $title ?: 'Timetable')
-                    ->setIcon($icon ?: '/images/icon.php?size=32&icon='.NSMapper::NS_TIMETABLE); // {$this->iconSize}
+                    ->setIcon($icon ?: '/images/icon.php?size=64&icon='.NSMapper::NS_TIMETABLE); // {$this->iconSize}
 
         $instance = $bob->build();
 

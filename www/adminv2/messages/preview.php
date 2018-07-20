@@ -142,7 +142,7 @@ switch ($this->arg[0]) {
                 $image = "/storage/image.php?size=square64&hash=$hash";
                 $thumb = "/storage/image.php?size=square200&hash=$hash";
             } catch (\Schoolbox\Mapper\Exception $e) {
-                $image = '/images/icon.php?size=32&icon='.NSMapper::NS_NEWS;
+                $image = '/images/icon.php?size=64&icon='.NSMapper::NS_NEWS;
                 $thumb = '/images/emails/spacer.gif';
             }
 

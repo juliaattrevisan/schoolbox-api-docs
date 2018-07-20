@@ -56,7 +56,7 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface
     protected $srcMapper;
 
     /** @var int */
-    protected $iconSize = 'square32';
+    protected $iconSize = 'square64';
 
     /**
      * Default behaviour is to allow propagation of sub-events

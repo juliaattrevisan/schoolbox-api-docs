@@ -91,7 +91,7 @@ class Notifier extends AbstractModuleNotifier
         }
 
         $bob->setTitle("User provisioning dry run has completed")
-            ->setIcon('/images/icon.php?size=32&icon='.NSMapper::NS_UPS)
+            ->setIcon('/images/icon.php?size='.$this->iconSize.'&icon='.NSMapper::NS_UPS)
             ->setHref('/adminv2/ups/log/'.$log->getId())
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::NOTICE)
