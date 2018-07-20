@@ -23,12 +23,14 @@ class DescriptorMetadata {
 
     /**
      * A single descriptor object in array form
+     *
      * @var array $descriptor
      */
     private $descriptor;
 
     /**
      * Order of the descriptor values in the criterion this descriptor belongs to
+     *
      * @var string
      */
     private $direction;
@@ -50,12 +52,16 @@ class DescriptorMetadata {
 
 
     /**
-     * @return int|null     Returns null if the descriptor has no value.
+     * A descriptor's minimum value is:
+     * - if criterion is ascending, the previous non-null descriptor value + 1
+     * - if criterion is descending, the next non-null descriptor value + 1
+     *
+     * If previous or next descriptor has a null value, use the current descriptor value (which may also be null...)
+     *
+     * @return int|null
      */
     public function calculateMin() : ?int
     {
-        // TODO handle nulls
-
         // Assume ascending by default
         $min = ($this->prevDescriptor['value'] !== null ? $this->prevDescriptor['value'] + 1 : $this->descriptor['value']);
         if ($this->direction === CriterionMetadata::DIRECTION_DESCENDING) {
@@ -66,22 +72,23 @@ class DescriptorMetadata {
     }
 
     /**
-     * The persisted value of this descriptor is always its maximum value.
-     * @return int
+     * The persisted value of a descriptor is always its maximum value.
+     * May be null.
+     *
+     * @return int|null
      */
     public function calculateMax() : ?int
     {
-        // TODO handle nulls
         return $this->descriptor['value'];
     }
 
     /**
-     * Min and max values for this descriptor
+     * Min and max values for this descriptor.
+     *
      * @return array
      */
     public function toArray() : ?array
     {
-        // TODO handle nulls
         $min = $this->calculateMin();
         $max = $this->calculateMax();
 

@@ -16,18 +16,21 @@ class CriterionMetadata {
 
     /**
      * ID of the criterion
+     *
      * @var int $id
      */
     private $id;
 
     /**
      * Order of the descriptor values for this criterion
+     *
      * @var string $direction
      */
     private $direction;
 
     /**
      * Array of descriptor metadata for this criterion, indexed by level ID
+     *
      * @var array $descriptorMetadata
      */
     private $metadata = [];
@@ -35,20 +38,29 @@ class CriterionMetadata {
 
     /**
      * IDs of all available levels in the rubric
+     *
      * @var array $levelIds;
      */
     private $levelIds;
 
     /**
      * Number of levels in the rubric
+     *
      * @var int $numLevels
      */
     private $numLevels;
 
+    /**
+     * Index of the last level that has a descriptor with a value -
+     * effectively the array boundary when looking for $nextDescriptor
+     *
+     * @var int $lastValuedLevelIndex
+     */
     private $lastValuedLevelIndex;
 
     /**
      * Descriptors in this criterion, indexed by level ID
+     *
      * @var array $levelDescriptors
      */
     private $levelDescriptors;
@@ -69,6 +81,8 @@ class CriterionMetadata {
         $this->direction = $this->calculateDirection();
 
         $this->metadata['direction'] = $this->direction;
+
+        // Can't use array_merge here because it would re-index the descriptors, which need to be indexed by level ID
         $this->metadata = $this->metadata + $this->generateDescriptorMetadata();
     }
 
@@ -76,10 +90,10 @@ class CriterionMetadata {
     {
         $meta = [];
 
-        // These get assigned in the loop
         $prevDescriptor = null;
         $nextDescriptor = null;
 
+        // Need this to work out when we reach the last descriptor-having level
         $iteration = 0;
 
         // Loop through all the levels in the rubric. Not all of them may have a descriptor in a given criterion...
@@ -88,13 +102,13 @@ class CriterionMetadata {
             // Have we already seen all the descriptors that have levels?
             $isLastDescriptor = ($iteration === \count($this->levelDescriptors) - 1);
 
-            // So we check, does the level have a descriptor in this criterion?
+            // Does the level have a descriptor in this criterion?
             if (array_key_exists($levelIndex, $this->levelDescriptors)) {
                 if ($isLastDescriptor) {
                     // If this is the last iteration we know there can't possibly be a next descriptor
                     $nextDescriptor = null;
                 } else {
-                    // Otherwise, look ahead until we find a level with a descriptor, and set that as the Next descriptor
+                    // Otherwise, look ahead until we find a level with a descriptor value, and use that as the Next descriptor
                     $nextDescriptorIndex = $levelIndex + 1;
                     $nextDescriptor = $this->levelDescriptors[$nextDescriptorIndex];
                     while ($nextDescriptor['value'] === null && $nextDescriptorIndex < $this->lastValuedLevelIndex) {
@@ -103,17 +117,14 @@ class CriterionMetadata {
                     }
                 }
 
-                // Send data to our helper class for processing
-                // DescriptorMetadata works out for us whether a descriptor has a value or not
                 $dm = new DescriptorMetadata($this->levelDescriptors[$levelIndex], $prevDescriptor, $nextDescriptor, $this->direction);
                 $meta[$levelIndex] = $dm->toArray();
 
-                // Set prevDescriptor to currentDescriptor before moving on
                 if ($this->levelDescriptors[$levelIndex]['value'] !== null) {
                     $prevDescriptor = $this->levelDescriptors[$levelIndex];
                 }
 
-                // How many levels with descriptors have we seen? Need this to work out when we reach the last descriptor-having level.
+                // How many levels with descriptors have we seen?
                 $iteration++;
             }
 

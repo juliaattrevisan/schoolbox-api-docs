@@ -276,9 +276,9 @@ class RubricContext
         // Array of descriptors indexed by criteria and level ID
         $descriptors = $rubric['descriptors'];
 
-        // Get a list of all levels in this rubric.
-        // The descriptor array contains only the levels that have descriptors,
-        // so we can't get this info on the fly when looping through descriptors.
+        // Get a list of all levels in this rubric. Needed for look-ahead/look-behind on next/prev descriptors.
+        // The descriptor array contains only the levels that have a descriptor in the current criterion,
+        // so we have to get this data separately.
         $levelIds = array_keys($rubric['levels']);
 
         $metadata = [];
