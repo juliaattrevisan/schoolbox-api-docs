@@ -448,20 +448,13 @@ class Importer
      */
     private function findOrCreateBaseCurriculumNode(): Node
     {
-        $code = 'atlas:root';
-        try {
-            // Does the base node exist? Anywhere?
-            return $this->nodeMapper->findOneByColumn('code', $code);
-
-        } catch (MapperException $e) {
-            // It was not found: create it
-            // Consider soft-deletion the same as hard deletion
-            $node = $this->nodeMapper->createModel()
-                                     ->setParent(null)
-                                     ->setCode($code);
-            $this->nodeMapper->save($node);
-            return $node;
-        }
+        return $this->findOrCreateCurriculumNode(
+            'Atlas',
+            'atlas:root',
+            null,
+            null,
+            null
+        );
     }
 
 
@@ -474,23 +467,13 @@ class Importer
      */
     private function findOrCreateBaseCurriculumStandardsNode(Node $parent): Node
     {
-        $code = 'atlas:standards';
-        try {
-            // Does the base node exist? Anywhere?
-            return $this->nodeMapper->findOneByColumnList([
-                'code'                      => $code,
-                'curriculum_node_parent_id' => $parent->getId(),
-            ]);
-
-        } catch (MapperException $e) {
-            // It was not found: create it
-            // Consider soft-deletion the same as hard deletion
-            $node = $this->nodeMapper->createModel()
-                                     ->setParent($parent)
-                                     ->setCode($code);
-            $this->nodeMapper->save($node);
-            return $node;
-        }
+        return $this->findOrCreateCurriculumNode(
+            'Atlas Standards',
+            'atlas:standards',
+            null,
+            null,
+            $parent
+        );
     }
 
 
