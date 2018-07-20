@@ -41,6 +41,11 @@ use Schoolbox\User;
  */
 class Importer
 {
+    private const CURRICULUM_CODE_ATLAS_ROOT       = 'atlas:root';
+    private const CURRICULUM_CODE_ATLAS_STANDARDS  = 'atlas:standards';
+    private const CURRICULUM_CODE_ATLAS_CURRICULUM = 'atlas:curriculum:%d';
+    private const CURRICULUM_CODE_ATLAS_UNIT       = 'atlas:unit:%d';
+    private const CURRICULUM_CODE_ATLAS_ASSESSMENT = 'atlas:assessment:%d';
 
     /**
      * @var FolderMapper
@@ -450,7 +455,7 @@ class Importer
     {
         return $this->findOrCreateCurriculumNode(
             'Atlas',
-            'atlas:root',
+            self::CURRICULUM_CODE_ATLAS_ROOT,
             null,
             null,
             null
@@ -469,7 +474,7 @@ class Importer
     {
         return $this->findOrCreateCurriculumNode(
             'Atlas Standards',
-            'atlas:standards',
+            self::CURRICULUM_CODE_ATLAS_STANDARDS,
             null,
             null,
             $parent
@@ -526,7 +531,7 @@ class Importer
     {
         return $this->findOrCreateCurriculumNode(
             $curriculumPlan->getTitle(),
-            sprintf('atlas:curriculum:%d', $curriculumPlan->getId()),
+            sprintf(self::CURRICULUM_CODE_ATLAS_CURRICULUM, $curriculumPlan->getId()),
             null,
             $curriculumPlan->getDescription(),
             $parent
@@ -546,7 +551,7 @@ class Importer
     {
         return $this->findOrCreateCurriculumNode(
             $unit->getTitle(),
-            sprintf('atlas:unit:%d', $unit->getId()),
+            sprintf(self::CURRICULUM_CODE_ATLAS_UNIT, $unit->getId()),
             null,
             null,
             $parent
@@ -566,7 +571,7 @@ class Importer
     {
         return $this->findOrCreateCurriculumNode(
             $assessment->getTitle(),
-            sprintf('atlas:assessment:%d', $assessment->getId()),
+            sprintf(self::CURRICULUM_CODE_ATLAS_ASSESSMENT, $assessment->getId()),
             null,
             $assessment->getContent(),
             $parent
