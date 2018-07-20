@@ -121,6 +121,54 @@ class Importer
 
 
     /**
+     * Constructor
+     *
+     * @param User                   $currentUser
+     * @param IConfigLoader          $config
+     * @param FolderMapper           $folderMapper
+     * @param HomepageConfigMapper   $homepageConfigMapper
+     * @param HomepageTemplateMapper $homepageTemplateMapper
+     * @param CourseSpecMapper       $courseSpecMapper
+     * @param UnitSpecMapper         $unitSpecMapper
+     * @param Access                 $access
+     * @param UserAccessMapper       $userAccessMapper
+     * @param Rubric\GroupMapper     $rubricGroupMapper
+     * @param Rubric\CriterionMapper $rubricCriterionMapper
+     * @param AssessmentDataSource   $assessmentDataSource
+     * @param NodeMapper             $nodeMapper
+     */
+    public function __construct(
+        User $currentUser,
+        IConfigLoader $config,
+        FolderMapper $folderMapper,
+        HomepageConfigMapper $homepageConfigMapper,
+        HomepageTemplateMapper $homepageTemplateMapper,
+        CourseSpecMapper $courseSpecMapper,
+        UnitSpecMapper $unitSpecMapper,
+        Access $access,
+        UserAccessMapper $userAccessMapper,
+        Rubric\GroupMapper $rubricGroupMapper,
+        Rubric\CriterionMapper $rubricCriterionMapper,
+        AssessmentDataSource $assessmentDataSource,
+        NodeMapper $nodeMapper
+    ) {
+        $this->currentUser            = $currentUser;
+        $this->config                 = $config;
+        $this->folderMapper           = $folderMapper;
+        $this->homepageConfigMapper   = $homepageConfigMapper;
+        $this->homepageTemplateMapper = $homepageTemplateMapper;
+        $this->courseSpecMapper       = $courseSpecMapper;
+        $this->unitSpecMapper         = $unitSpecMapper;
+        $this->access                 = $access;
+        $this->userAccessMapper       = $userAccessMapper;
+        $this->rubricGroupMapper      = $rubricGroupMapper;
+        $this->rubricCriterionMapper  = $rubricCriterionMapper;
+        $this->assessmentDataSource   = $assessmentDataSource;
+        $this->nodeMapper             = $nodeMapper;
+    }
+
+
+    /**
      * Imports the Atlas curriculum into the given course folder.
      *
      * @param Api\Curriculum $curriculum
