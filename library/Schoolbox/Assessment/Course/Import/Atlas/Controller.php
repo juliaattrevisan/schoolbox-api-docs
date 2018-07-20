@@ -24,6 +24,7 @@ use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpec;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpec;
 use Schoolbox\Learning\MarkScheme\Percentage;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -258,7 +259,9 @@ class Controller extends BaseController
 
         $courseSpec = $this->createCourse($curriculumPlan, $baseFolder);
 
-        $courseSpecNode = $this->createCurriculumNodeFromCurriculumPlan($curriculumPlan);
+        $baseNode       = $this->findOrCreateBaseCurriculumNode();
+        $standardsNode  = $this->findOrCreateBaseCurriculumStandardsNode($baseNode);
+        $courseSpecNode = $this->createCurriculumNodeFromCurriculumPlan($curriculumPlan, $baseNode);
 
         // Associate courseSpecNode with courseSpec's folder
         $courseSpec->getFolder()->getCurriculumNodes()->add($courseSpecNode);
@@ -427,8 +430,10 @@ class Controller extends BaseController
 
                 // Create node and re-save
                 $standardNode = $this->createCurriculumNodeFromStandard($standard, $dueWorkNode);
-                $groupDataModel->getCurriculumNodes()->add($standardNode);
-                $this->rubricGroupMapper->save($groupDataModel);
+                if ($standardNode) {
+                    $groupDataModel->getCurriculumNodes()->add($standardNode);
+                    $this->rubricGroupMapper->save($groupDataModel);
+                }
 
                 // Add that rubric group
                 $group = new Group($groupDataModel->getId(), $groupDataModel->getName());
@@ -499,6 +504,60 @@ class Controller extends BaseController
 
 
     /**
+     * Create the base-level curriculum node for all Atlas imports.
+     *
+     * @return Node
+     * @throws MapperException if somehow it couldn't be created
+     */
+    private function findOrCreateBaseCurriculumNode(): Node
+    {
+        $code = 'atlas:root';
+        try {
+            // Does the base node exist? Anywhere?
+            return $this->nodeMapper->findOneByColumn('code', $code);
+
+        } catch (MapperException $e) {
+            // It was not found: create it
+            // Consider soft-deletion the same as hard deletion
+            $node = $this->nodeMapper->createModel()
+                                     ->setParent(null)
+                                     ->setCode($code);
+            $this->nodeMapper->save($node);
+            return $node;
+        }
+    }
+
+
+    /**
+     * Create the base-level curriculum node for all Atlas standards.
+     *
+     * @param Node $parent The node in which this lives.
+     * @return Node
+     * @throws MapperException if somehow it couldn't be created
+     */
+    private function findOrCreateBaseCurriculumStandardsNode(Node $parent): Node
+    {
+        $code = 'atlas:standards';
+        try {
+            // Does the base node exist? Anywhere?
+            return $this->nodeMapper->findOneByColumnList([
+                'code'                      => $code,
+                'curriculum_node_parent_id' => $parent->getId(),
+            ]);
+
+        } catch (MapperException $e) {
+            // It was not found: create it
+            // Consider soft-deletion the same as hard deletion
+            $node = $this->nodeMapper->createModel()
+                                     ->setParent($parent)
+                                     ->setCode($code);
+            $this->nodeMapper->save($node);
+            return $node;
+        }
+    }
+
+
+    /**
      * Create a curriculum node.
      *
      * @param string      $name
@@ -532,17 +591,18 @@ class Controller extends BaseController
      * Create a curriculum node from a curriculum plan.
      *
      * @param Api\Curriculum $curriculumPlan
+     * @param Node           $parent
      * @return Node
      * @throws \Schoolbox\Mapper\Exception
      */
-    private function createCurriculumNodeFromCurriculumPlan(Api\Curriculum $curriculumPlan): Node
+    private function createCurriculumNodeFromCurriculumPlan(Api\Curriculum $curriculumPlan, Node $parent): Node
     {
         return $this->createCurriculumNode(
             $curriculumPlan->getTitle(),
-            null,
+            sprintf('atlas:curriculum:%d', $curriculumPlan->getId()),
             null,
             $curriculumPlan->getDescription(),
-            null
+            $parent
         );
     }
 
@@ -559,7 +619,7 @@ class Controller extends BaseController
     {
         return $this->createCurriculumNode(
             $unit->getTitle(),
-            null,
+            sprintf('atlas:unit:%d', $unit->getId()),
             null,
             null,
             $parent
@@ -579,7 +639,7 @@ class Controller extends BaseController
     {
         return $this->createCurriculumNode(
             $assessment->getTitle(),
-            null,
+            sprintf('atlas:assessment:%d', $assessment->getId()),
             null,
             $assessment->getContent(),
             $parent
@@ -588,22 +648,25 @@ class Controller extends BaseController
 
 
     /**
-     * Create a curriculum node from a standard.
+     * Create a curriculum node from a standard, if it has a code.
      *
      * @param Api\Standard $standard
      * @param Node         $parent
-     * @return Node
+     * @return null|Node
      * @throws \Schoolbox\Mapper\Exception
      */
-    private function createCurriculumNodeFromStandard(Api\Standard $standard, Node $parent): Node
+    private function createCurriculumNodeFromStandard(Api\Standard $standard, Node $parent): ?Node
     {
-        return $this->createCurriculumNode(
-            $standard->getTitle(),
-            $standard->getCode(),
-            null,
-            $standard->getRawText(),
-            $parent
-        );
+        if ('' !== $standard->getCode()) {
+            return $this->createCurriculumNode(
+                $standard->getTitle(),
+                $standard->getCode(),
+                null,
+                $standard->getRawText(),
+                $parent
+            );
+        }
+        return null;
     }
 
 
