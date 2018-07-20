@@ -120,34 +120,16 @@ $alert-default-background: darken($body-bg, 10%);
 
     &.success::before {
         background-color: $success-color;
-        border-radius: .75rem;
-        content: '';
-        display: inline-block;
-        height: .75rem;
-        margin-right: .5rem;
-        width: .75rem;
         animation: none;
 
     }
     &.warning::before {
         background-color: $warning-color;
-        border-radius: .75rem;
-        content: '';
-        display: inline-block;
-        height: .75rem;
-        margin-right: .5rem;
-        width: .75rem;
         animation: none;
 
     }
     &.alert::before {
         background-color: $alert-color;
-        border-radius: .75rem;
-        content: '';
-        display: inline-block;
-        height: .75rem;
-        margin-right: .5rem;
-        width: .75rem;
         animation: none;
 
     }
