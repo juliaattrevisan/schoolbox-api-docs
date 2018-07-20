@@ -293,7 +293,7 @@ class Controller extends BaseController
                 }
 
                 foreach ($unit->getAssessments() as $assessment) {
-                    $this->createDueWork($assessment, $unitSpec, $unitSpecNode);
+                    $this->createDueWork($assessment, $unitSpec, $unitSpecNode, $standardsNode);
                 }
 
             } else {
@@ -392,9 +392,15 @@ class Controller extends BaseController
      * @param Api\Assessment $assessment
      * @param UnitSpec       $unitSpec
      * @param Node           $unitSpecNode
+     * @param Node           $standardsNode
      * @return IAssessable In practise, this will always be a due work
      */
-    private function createDueWork(Api\Assessment $assessment, UnitSpec $unitSpec, Node $unitSpecNode): IAssessable
+    private function createDueWork(
+        Api\Assessment $assessment,
+        UnitSpec $unitSpec,
+        Node $unitSpecNode,
+        Node $standardsNode
+    ): IAssessable
     {
         $dueWork = new DueWork();
         $dueWork
@@ -429,7 +435,7 @@ class Controller extends BaseController
                 );
 
                 // Create node and re-save
-                $standardNode = $this->createCurriculumNodeFromStandard($standard, $dueWorkNode);
+                $standardNode = $this->createCurriculumNodeFromStandard($standard, $standardsNode);
                 if ($standardNode) {
                     $groupDataModel->getCurriculumNodes()->add($standardNode);
                     $this->rubricGroupMapper->save($groupDataModel);
