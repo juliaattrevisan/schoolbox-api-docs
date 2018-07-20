@@ -125,11 +125,48 @@ class Importer
      *
      * @param Api\Curriculum $curriculum
      * @param Folder         $folder
-     * @param array          $selections
+     * @param array          $selectedUnits
      */
-    public function import(Api\Curriculum $curriculum, Folder $folder, array $selections): void
+    public function import(Api\Curriculum $curriculum, Folder $folder, array $selectedUnits): void
     {
-        //
+        $courseSpec = $this->createCourse($curriculum, $folder);
+
+        $baseNode       = $this->findOrCreateBaseCurriculumNode();
+        $standardsNode  = $this->findOrCreateBaseCurriculumStandardsNode($baseNode);
+        $courseSpecNode = $this->createCurriculumNodeFromCurriculumPlan($curriculum, $baseNode);
+
+        // Associate courseSpecNode with courseSpec's folder
+        $courseSpec->getFolder()->getCurriculumNodes()->add($courseSpecNode);
+        $this->folderMapper->save($courseSpec->getFolder());
+
+        // Which units were selected?
+        foreach ($curriculum->getUnits() as $unit) {
+            if (!empty($selectedUnits[$unit->getId()]['selected'])) {
+                // This unit was selected; create it
+                $unitSpec = $this->createUnit($unit, $courseSpec);
+
+                $unitSpecNode = $this->createCurriculumNodeFromUnit($unit, $courseSpecNode);
+                $unitSpec->getFolder()->getCurriculumNodes()->add($unitSpecNode);
+                $this->folderMapper->save($unitSpec->getFolder());
+
+                // Associate unitSpecNode with unitspec's folder
+
+                // Put the assessment inside that unit
+                foreach ($unit->getAttachments() as $attachment) {
+                    // Is this attachment private?
+                    // What kind of attachment is it?
+                    $this->createAttachment($attachment, $unitSpec->getFolder());
+                }
+
+                foreach ($unit->getAssessments() as $assessment) {
+                    $this->createDueWork($assessment, $unitSpec, $unitSpecNode, $standardsNode);
+                }
+
+            } else {
+                // This unit wasn't selected; delete it
+                // TODO implement deletion
+            }
+        }
     }
 
 
