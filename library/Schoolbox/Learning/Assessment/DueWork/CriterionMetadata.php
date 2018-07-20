@@ -45,6 +45,8 @@ class CriterionMetadata {
      */
     private $numLevels;
 
+    private $lastValuedLevelIndex;
+
     /**
      * Descriptors in this criterion, indexed by level ID
      * @var array $levelDescriptors
@@ -75,7 +77,7 @@ class CriterionMetadata {
         $meta = [];
 
         $prevDescriptor = null;
-        $nextDescriptor = null;
+        $nextDescriptor = $this->levelDescriptors[$this->lastValuedLevelIndex];
 
         $iteration = 0;
         foreach ($this->levelDescriptors as $levelId => $descriptor) {
@@ -149,14 +151,14 @@ class CriterionMetadata {
     private function calculateEndValue() : ?int
     {
         // By default, assume the last level has a value
-        $lastValuedLevelIndex = $this->numLevels - 1;
-        $lastLevel = $this->levelIds[$lastValuedLevelIndex];
+        $this->lastValuedLevelIndex = $this->numLevels - 1;
+        $lastLevel = $this->levelIds[$this->lastValuedLevelIndex];
         $endValue = $this->levelDescriptors[$lastLevel]['value'];
 
         // Loop until we find a level that has a value
-        while ($endValue === null && ($lastValuedLevelIndex > 0)) {
-            $lastValuedLevelIndex--;
-            $lastLevel = $this->levelIds[$lastValuedLevelIndex];
+        while ($endValue === null && ($this->lastValuedLevelIndex > 0)) {
+            $this->lastValuedLevelIndex--;
+            $lastLevel = $this->levelIds[$this->lastValuedLevelIndex];
             $endValue = $this->levelDescriptors[$lastLevel]['value'];
         }
 
