@@ -76,31 +76,47 @@ class CriterionMetadata {
     {
         $meta = [];
 
+        // These get assigned in the loop
         $prevDescriptor = null;
-        $nextDescriptor = $this->levelDescriptors[$this->lastValuedLevelIndex];
+        $nextDescriptor = null;
 
         $iteration = 0;
-        foreach ($this->levelDescriptors as $levelId => $descriptor) {
+
+        // Loop through all the levels in the rubric. Not all of them may have a descriptor in a given criterion...
+        for ($levelIndex = 0; $levelIndex < $this->numLevels; $levelIndex++) {
+
+            // Have we already seen all the descriptors that have levels?
             $isLastDescriptor = ($iteration === \count($this->levelDescriptors) - 1);
 
-            // Don't reassign next/prev descriptor if its value is null
+            // So we check, does the level have a descriptor in this criterion?
+            if (array_key_exists($levelIndex, $this->levelDescriptors)) {
+                if ($isLastDescriptor) {
+                    // If this is the last iteration we know there can't possibly be a next descriptor
+                    $nextDescriptor = null;
+                } else {
+                    // Otherwise, look ahead until we find a level with a descriptor, and set that as the Next descriptor
+                    $nextDescriptorIndex = $levelIndex + 1;
+                    $nextDescriptor = $this->levelDescriptors[$nextDescriptorIndex];
+                    while ($nextDescriptor['value'] === null && $nextDescriptorIndex < $this->lastValuedLevelIndex) {
+                        $nextDescriptorIndex++;
+                        $nextDescriptor = $this->levelDescriptors[$nextDescriptorIndex];
+                    }
+                }
 
-            // TODO this logic is wrong because the levelIds might not be contiguous (i.e. if there's a blank desc)
-            if ($this->levelDescriptors[$levelId - 1]['value'] !== null) {
-                $prevDescriptor = $this->levelDescriptors[$levelId - 1];
+                // Send data to our helper class for processing
+                // DescriptorMetadata works out for us whether a descriptor has a value or not
+                $dm = new DescriptorMetadata($levelIndex, $this->levelDescriptors[$levelIndex], $prevDescriptor, $nextDescriptor, $this->direction);
+                $meta[$levelIndex] = $dm->toArray();
+
+                // Set prevDescriptor to currentDescriptor before moving on
+                if ($this->levelDescriptors[$levelIndex]['value'] !== null) {
+                    $prevDescriptor = $this->levelDescriptors[$levelIndex];
+                }
+
+                // How many levels with descriptors have we seen? Need this to work out when we reach the last descriptor-having level.
+                $iteration++;
             }
 
-            if ($isLastDescriptor) {
-                // If this is the last iteration we know there can't possibly be a next descriptor
-                $nextDescriptor = null;
-            } else if ($this->levelDescriptors[$levelId + 1]['value'] !== null) {
-                $nextDescriptor = $this->levelDescriptors[$levelId + 1];
-            }
-
-            $dm = new DescriptorMetadata($levelId, $descriptor, $prevDescriptor, $nextDescriptor, $this->direction);
-            $meta[$levelId] = $dm->toArray();
-
-            $iteration++;
         }
 
         return $meta;
