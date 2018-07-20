@@ -107,7 +107,8 @@ $alert-default-background: darken($body-bg, 10%);
         opacity: 1;
     }
 
-    &::before {
+    &.success::before {
+        background-color: $success-color;
         border-radius: .75rem;
         content: '';
         display: inline-block;
@@ -115,15 +116,23 @@ $alert-default-background: darken($body-bg, 10%);
         margin-right: .5rem;
         width: .75rem;
     }
-
-    &.success::before {
-        background-color: $success-color;
-    }
     &.warning::before {
         background-color: $warning-color;
+        border-radius: .75rem;
+        content: '';
+        display: inline-block;
+        height: .75rem;
+        margin-right: .5rem;
+        width: .75rem;
     }
     &.alert::before {
         background-color: $alert-color;
+        border-radius: .75rem;
+        content: '';
+        display: inline-block;
+        height: .75rem;
+        margin-right: .5rem;
+        width: .75rem;
     }
 
 }
