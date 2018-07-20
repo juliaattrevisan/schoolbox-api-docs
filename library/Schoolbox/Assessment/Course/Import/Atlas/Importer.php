@@ -260,7 +260,7 @@ class Importer
         // Apply the course builder homepage template
         $this->applyHomepageTemplate(
             $courseSpecFolder,
-            $this->config->get('course_builder_default_course_page_template')
+            (int)$this->config->get('course_builder_default_course_page_template') ?: null
         );
 
 
@@ -299,7 +299,7 @@ class Importer
         // Apply the course builder homepage template
         $this->applyHomepageTemplate(
             $unitSpecFolder,
-            $this->config->get('course_builder_default_unit_page_template')
+            (int)$this->config->get('course_builder_default_unit_page_template') ?: null
         );
 
 
