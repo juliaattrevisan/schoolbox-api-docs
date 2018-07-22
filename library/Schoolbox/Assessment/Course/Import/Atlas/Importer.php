@@ -251,9 +251,9 @@ class Importer
         // (as \Schoolbox\Assessment\Course\Controller::persistFolder does much the same thing)
         // TODO figure out if this course has already been imported, and update instead of create if so
         $courseSpecFolder = $this->folderMapper->createModel()
-                                               ->setParent($baseFolder)
-                                               ->setName($curriculum->getTitle())
-                                               ->setInherit($this->config->get('course_builder_default_course_page_inherit'));
+            ->setParent($baseFolder)
+            ->setName($curriculum->getTitle())
+            ->setInherit((bool)$this->config->get('course_builder_default_course_page_inherit'));
         $this->folderMapper->save($courseSpecFolder);
 
 
@@ -271,7 +271,7 @@ class Importer
 
         // Save the course spec
         $courseSpec = $this->courseSpecMapper->createModel()
-                                             ->setFolder($courseSpecFolder);
+            ->setFolder($courseSpecFolder);
         $this->courseSpecMapper->save($courseSpec);
 
         return $courseSpec;
@@ -290,9 +290,9 @@ class Importer
     {
         // Create and save unit spec folder
         $unitSpecFolder = $this->folderMapper->createModel()
-                                             ->setParent($courseSpec->getFolder())
-                                             ->setName($unit->getTitle())
-                                             ->setInherit($this->config->get('course_builder_default_unit_page_inherit'));
+            ->setParent($courseSpec->getFolder())
+            ->setName($unit->getTitle())
+            ->setInherit((bool)$this->config->get('course_builder_default_unit_page_inherit'));
         $this->folderMapper->save($unitSpecFolder);
 
 
@@ -310,8 +310,8 @@ class Importer
 
         // Save the unit spec
         $unitSpec = $this->unitSpecMapper->createModel()
-                                         ->setFolder($unitSpecFolder)
-                                         ->setCourse($courseSpec);
+            ->setFolder($unitSpecFolder)
+            ->setCourse($courseSpec);
         $this->unitSpecMapper->save($unitSpec);
         return $unitSpec;
     }
@@ -508,11 +508,11 @@ class Importer
             // It was not found: create it
             // Consider soft-deletion the same as hard deletion
             $node = $this->nodeMapper->createModel()
-                                     ->setName($name)
-                                     ->setCode($code)
-                                     ->setDescription($description)
-                                     ->setReference($reference)
-                                     ->setParent($parent);
+                ->setName($name)
+                ->setCode($code)
+                ->setDescription($description)
+                ->setReference($reference)
+                ->setParent($parent);
             $this->nodeMapper->save($node);
             return $node;
         }
@@ -615,9 +615,9 @@ class Importer
             && $this->access->getFolderAccess($this->currentUser, $folder->getId()) > UserAccess::ACCESS_WRITE
         ) {
             $userAccess = $this->userAccessMapper->createModel()
-                                                 ->setUser($this->currentUser)
-                                                 ->setService(UserAccess::SERVICE_HOMEPAGE)
-                                                 ->setAccessLevel(UserAccess::ACCESS_WRITE);
+                ->setUser($this->currentUser)
+                ->setService(UserAccess::SERVICE_HOMEPAGE)
+                ->setAccessLevel(UserAccess::ACCESS_WRITE);
             $this->userAccessMapper->save($userAccess);
         }
     }
@@ -635,8 +635,8 @@ class Importer
         if ($templateId) {
             $template     = $this->homepageTemplateMapper->findById($templateId);
             $folderConfig = $this->homepageConfigMapper->createModel()
-                                                       ->setCategory($folder)
-                                                       ->setTemplate($template);
+                ->setCategory($folder)
+                ->setTemplate($template);
             $this->homepageConfigMapper->save($folderConfig);
             $this->homepageConfigMapper->resetToTemplate($folderConfig);
         }
