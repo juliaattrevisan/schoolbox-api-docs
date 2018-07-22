@@ -101,7 +101,9 @@ class Module extends \Alaress\Module\Module
                                     $decoder->register(new Api\TeacherTransformer());
                                     $decoder->register(new Api\UnitTransformer());
                                     $decoder->register(new Api\AssessmentTransformer());
-                                    $decoder->register(new Api\StandardTransformer());
+                                    $decoder->register(new Api\StandardTransformer(
+                                        new Api\StandardTransformer\Acara()
+                                    ));
                                     $decoder->register(new Api\AttachmentTransformer());
                                     return $decoder;
                                 }
