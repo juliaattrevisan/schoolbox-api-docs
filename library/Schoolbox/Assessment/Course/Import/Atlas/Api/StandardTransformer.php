@@ -11,12 +11,30 @@ namespace Schoolbox\Assessment\Course\Import\Atlas\Api;
 use Karriere\JsonDecoder\Bindings\CallbackBinding;
 use Karriere\JsonDecoder\ClassBindings;
 use Karriere\JsonDecoder\Transformer;
+use Schoolbox\Assessment\Course\Import\Atlas\Api\StandardTransformer\IStrategy;
 
 /**
  * Transformer definition for JSON standard responses to PHP objects.
  */
 class StandardTransformer implements Transformer
 {
+    /**
+     * @var IStrategy[]
+     */
+    private $strategies;
+
+
+    /**
+     * Constructor
+     *
+     * @param IStrategy ...$strategies
+     */
+    public function __construct(IStrategy ...$strategies)
+    {
+        $this->strategies = $strategies;
+    }
+
+
     /**
      * Register bindings for this class.
      *
@@ -50,6 +68,7 @@ class StandardTransformer implements Transformer
         );
     }
 
+
     /**
      * @return string
      */
@@ -57,6 +76,7 @@ class StandardTransformer implements Transformer
     {
         return Standard::class;
     }
+
 
     /**
      * Parses a string standard into something renderable.
@@ -69,17 +89,17 @@ class StandardTransformer implements Transformer
      */
     private function parseStandard(string $standard): array
     {
-        // ACARA strategy: find a link to Scootle, use it
-        if (preg_match('[>(.*?)</a>]i', $standard, $matches)) {
-            [, $code] = $matches;
-            $standard = strip_tags($standard);
-        } else {
-            $code = '';
+        foreach ($this->strategies as $strategy) {
+            $result = $strategy->parseStandard($standard);
+            if ($result) {
+                return $result;
+            }
         }
 
+        // Fallback: title is standard, code is null
         return [
             'title' => $standard,
-            'code'  => $code,
+            'code'  => null,
         ];
     }
 }
