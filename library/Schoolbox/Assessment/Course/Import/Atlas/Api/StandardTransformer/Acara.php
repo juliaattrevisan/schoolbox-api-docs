@@ -36,16 +36,16 @@ class Acara implements IStrategy
 
         // Find a link to Scootle
         $xpath = new \DOMXPath($domDocument);
-        $links = $xpath->query('//a[contains(@href, "scootle.edu.au")]');
+        $link  = $xpath->query('//a[contains(@href, "scootle.edu.au")]')->item(0);
 
-        if (\count($links)) {
+
+        if ($link) {
             // Found one: use it as the code
-            $link = $links->item(0);
             $code = trim($link->textContent);
 
-            // For the title: strip HTML and the code
+            // For the title: strip HTML and the code out of the standard
             $title = strip_tags($domDocument->saveHTML());
-            $title = preg_replace('/\\(' . preg_quote($title, '/') . '\\)', '', $title);
+            $title = preg_replace('/\\(' . preg_quote($code, '/') . '\\)/', '', $title);
             $title = trim($title);
 
             $result = [
@@ -56,6 +56,7 @@ class Acara implements IStrategy
         } else {
             $result = null;
         }
+
         $this->resultCache[$standard] = $result;
         return $result;
     }
