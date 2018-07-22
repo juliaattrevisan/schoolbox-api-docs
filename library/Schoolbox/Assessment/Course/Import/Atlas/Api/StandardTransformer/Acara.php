@@ -14,19 +14,49 @@ namespace Schoolbox\Assessment\Course\Import\Atlas\Api\StandardTransformer;
 class Acara implements IStrategy
 {
     /**
+     * @var array[]
+     */
+    private $resultCache = [];
+
+    /**
      * @inheritdoc
      */
     public function parseStandard(string $standard): ?array
     {
-        // ACARA strategy: find a link to Scootle, use it
-        if (preg_match('[>(.*?)</a>]i', $standard, $matches)) {
-            [, $code] = $matches;
-            $standard = strip_tags($standard);
-            return [
-                'code'  => $code,
-                'title' => $standard,
-            ];
+        // Have I already found this result?
+        if (array_key_exists($standard, $this->resultCache)) {
+            return $this->resultCache[$standard];
         }
-        return null;
+
+
+        // No? Load the document
+        $domDocument = new \DOMDocument();
+        $domDocument->loadHTML($standard, LIBXML_NOWARNING | LIBXML_NOERROR);
+
+
+        // Find a link to Scootle
+        $xpath = new \DOMXPath($domDocument);
+        $links = $xpath->query('//a[contains(@href, "scootle.edu.au")]');
+
+        if (\count($links)) {
+            // Found one: use it as the code
+            $link = $links->item(0);
+            $code = trim($link->textContent);
+
+            // For the title: strip HTML and the code
+            $title = strip_tags($domDocument->saveHTML());
+            $title = preg_replace('/\\(' . preg_quote($title, '/') . '\\)', '', $title);
+            $title = trim($title);
+
+            $result = [
+                'code'  => $code,
+                'title' => $title,
+            ];
+
+        } else {
+            $result = null;
+        }
+        $this->resultCache[$standard] = $result;
+        return $result;
     }
 }
