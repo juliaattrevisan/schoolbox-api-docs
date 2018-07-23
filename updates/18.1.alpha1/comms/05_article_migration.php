@@ -76,12 +76,10 @@ function createSchoolNewsArticle(IDatabase $db, array $row, LoggerInterface $log
 
     $values = implode(', ', array_keys($params));
 
-    $query = "
+    $db->prepare("
         INSERT INTO comms_news_article ({$keys}) 
         VALUES ({$values})
-    ";
-
-    $db->prepare($query)->execute($params);
+    ")->execute($params);
 
     $lastInsertId = $db->lastInsertId();
 
@@ -178,12 +176,10 @@ function createSchoolNewsCampusRoleAudience(IDatabase $db, int $oldId, int $arti
 
             /* Create composite
              */
-            $query = "
+            $db->query("
                 INSERT INTO `comms_news_audience` (comms_news_article_id, entity_type, relationship)
                 VALUES ('{$articleId}', '".Model::ENTITY_TYPE_COMPOSITE."', '".Model::RELATIONSHIP_SELF."');
-            ";
-
-            $db->query($query);
+            ");
 
             $compositeSegmentId = $db->lastInsertId();
 
@@ -193,12 +189,10 @@ function createSchoolNewsCampusRoleAudience(IDatabase $db, int $oldId, int $arti
 
             /* Assign campus
              */
-            $query = "
+            $db->query("
                 INSERT INTO `comms_news_audience` (comms_news_article_id, parent_id, entity_type, entity_value, relationship)
                 VALUES ('{$articleId}', '{$compositeSegmentId}', '".Model::ENTITY_TYPE_CAMPUS."', '{$campus['id']}', '".Model::RELATIONSHIP_SELF."')
-            ";
-
-            $db->query($query);
+            ");
 
             /* Log it
              */
@@ -206,12 +200,10 @@ function createSchoolNewsCampusRoleAudience(IDatabase $db, int $oldId, int $arti
 
             /* Assign role
              */
-            $query = "
+            $db->query("
                 INSERT INTO `comms_news_audience` (comms_news_article_id, parent_id, entity_type, entity_value, relationship)
                 VALUES ('{$articleId}', '{$compositeSegmentId}', '".Model::ENTITY_TYPE_ROLE."', '{$role['id']}', '".Model::RELATIONSHIP_SELF."')
-            ";
-
-            $db->query($query);
+            ");
 
             /* Log it
              */
@@ -321,7 +313,6 @@ function createHomepageNewsAudience(IDatabase $db, int $oldId, int $articleId, L
         /* Log it
          */
         $log->info("Homepage News article_id {$articleId} assigned Folder audience {$folder['id']}");
-
     }
 }
 
