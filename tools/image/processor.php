@@ -61,12 +61,11 @@ if(is_iterable($result)){
     exit(0);
 }
 
-$totalHashes = count($hashList);
-$logger->info(sprintf('[manager] Hashes in queue: %d', $totalHashes));
+$logger->info(sprintf('[manager] Hashes in queue: %d', \count($hashList)));
 $hashItem = 0;
 $workerList = [];
 $workers = 0;
-while ($totalHashes > 0) {
+while (count($hashList) > 0) {
     // Check if worker processes are still running, if not remove from workerList
     while (pcntl_wait($status, WNOHANG or WUNTRACED) > 0) {
         usleep(5000);
@@ -99,9 +98,6 @@ while ($totalHashes > 0) {
 
         // Remove hash from the list as it has been sent for processing
         unset($hashList[$hashItem]);
-
-        // Update work list
-        $totalHashes = count($hashList);
 
         // Set next piece of work in the hashList array
         $hashItem++;
