@@ -18,10 +18,8 @@ spl_autoload_call('Schoolbox\\Application\\Daemon');
 
 define('LOG_LEVEL', 200); // default log level to INFO
 define('MAX_WORKERS', 4); // default maximum number of workers
-
 define('TIME_INTERVAL', 15); // time period in minutes to look up images for processing
 define('LIMIT', 300); // maximum amount of images to be processed
-
 define('SPINLOCK_WAIT_TIME', 5000); // default spinlock wait time in microseconds
 define('WORKER_CLEANUP_TIME', 50000); // default wait timeout for worker cleanup in microseconds
 
@@ -63,17 +61,24 @@ $query = "
 $result = $db->executeQuery($query)->fetchAll();
 if(is_iterable($result)){
     foreach($result as $row) {
-        try {
-            // Do the object lookup up front, since forked workers won't have DB access reliably
-            $hashList[] = Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash($row['hash']);
-        }
-        catch (Exception $e) {
-            $logger->error(sprintf("[manager] %s: %s", $hash, 'File not found'));
-        }
+        $hashList[] = $row['hash'];
     }
 } else {
     $logger->info('[manager] No images found for processing');
     exit(0);
+}
+
+$hashObjects = \Schoolbox\Resource\Storage\Mapper::getInstance()
+    ->findByColumn('hash', $hashList)
+    ->indexBy('hash');
+$filesFound = $hashObjects->getPropertyValues('hash');
+$filesNotFound = array_diff($hashList, $filesFound);
+
+if (count($filesNotFound)) {
+    foreach($filesNotFound as $hash) {
+        $logger->error(sprintf("[manager] %s: %s", $hash, 'File not found'));
+        unset($hashList[$hash]);
+    }
 }
 
 function workerCleanup($workers) {
@@ -103,8 +108,8 @@ while (count($hashList) > 0) {
         continue;
     }
 
-    $hash = $hashList[$hashItem]->getHash();
-    $hashObject = $hashList[$hashItem];
+    $hash = $hashList[$hashItem];
+    $hashObject = $hashObjects->getOffset($hash);
 
     $pid = pcntl_fork();
     if ($pid == -1) {
