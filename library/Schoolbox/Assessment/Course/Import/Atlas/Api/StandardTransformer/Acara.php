@@ -43,10 +43,8 @@ class Acara implements IStrategy
             // Found one: use it as the code
             $code = trim($link->textContent);
 
-            // For the title: strip HTML and the code out of the standard
-            $title = strip_tags($domDocument->saveHTML());
-            $title = preg_replace('/\\(' . preg_quote($code, '/') . '\\)/', '', $title);
-            $title = trim($title);
+            // Use the text of the standard as the title
+            $title = trim(strip_tags($domDocument->saveHTML()));
 
             $result = [
                 'code'  => $code,
