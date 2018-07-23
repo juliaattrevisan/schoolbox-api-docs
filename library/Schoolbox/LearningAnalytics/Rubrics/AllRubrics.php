@@ -8,11 +8,9 @@
 
 namespace Schoolbox\LearningAnalytics\Rubrics;
 
-use DueWork_Rubric_Handler;
-use Schoolbox\Collection;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImplementation;
-use Schoolbox\User;
 use Schoolbox\Assessment\Term;
 
 class AllRubrics
@@ -47,16 +45,15 @@ class AllRubrics
      */
     public function __construct(GenericCollection $unitImplementations, Term\Model $term)
     {
-        // TODO attempt to remove reliance on deprecated class
-        $rubricHandler = new DueWork_Rubric_Handler();
+        $rubricMapper = RubricMapper::getInstance();
 
         $folderIds = $unitImplementations->map(function (UnitImplementation\Model $unitImpl) {
             return $unitImpl->getFolder()->getId();
         })->getAll();
         $folderIds = array_unique($folderIds);
 
-        $studentRubricMarks = $rubricHandler->getStudentMarksByCriteriaInFolder($folderIds, $term);
-        $allCriteria        = $rubricHandler->getAvailableCriteria($folderIds);
+        $studentRubricMarks = $rubricMapper->getStudentMarksByCriteriaInFolder($folderIds, $term);
+        $allCriteria        = $rubricMapper->getAvailableCriteria($folderIds);
 
         // Aggregate criteria by grouping+name
         $rubricData = [];
