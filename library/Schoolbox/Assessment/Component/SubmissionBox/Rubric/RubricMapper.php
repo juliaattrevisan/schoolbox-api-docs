@@ -385,7 +385,7 @@ class RubricMapper
                 rg.name AS grouping,
                 rc.name,
                 rgu.max_value AS max_value,
-                -- Only get sequence for this box (ignores whether box is deleted)
+                -- Only get sequence for the requested box (don't care about other usages)
                 IF(sb.id = :boxId, rcu.sequence, NULL) AS sequence
             FROM rubric_criterion rc
             INNER JOIN rubric_group           rg  ON rg.id = rc.rubric_group_id
