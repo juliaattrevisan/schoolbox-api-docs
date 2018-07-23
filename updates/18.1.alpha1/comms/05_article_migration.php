@@ -2,16 +2,10 @@
 
 use Alaress\IDatabase;
 use Psr\Log\LoggerInterface;
-
+use Schoolbox\Comms\News\Audience\Model;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
 spl_autoload_call('\\Schoolbox\\Application\\Daemon');
-
-define('ENTITY_TYPE_COMPOSITE', 1000);
-define('ENTITY_TYPE_CAMPUS', 999);
-define('ENTITY_TYPE_ROLE', 888);
-define('ENTITY_TYPE_USER', 777);
-define('RELATIONSHIP_SELF', 456);
 
 
 /**
@@ -30,7 +24,11 @@ function importSchoolNews(IDatabase $db)
     for ($i = 0; $row = $result->fetch(\PDO::FETCH_ASSOC); $i++) {
         $articleId = createSchoolNewsArticle($db, $row);
 
+        /* Figger out all the relations, ram them in accordingly
+         */
         createSchoolNewsTopics($db, $articleId, $row);
+        createSchoolNewsUserAudience($db, $row['id'], $articleId);
+        createSchoolNewsCampusRoleAudience($db, $row['id'], $articleId);
     }
 
     return $i;
@@ -109,6 +107,94 @@ function createSchoolNewsTopics(IDatabase $db, int $articleId, array $row)
     ]);
 }
 
+
+/**
+ * Find out all the Users for this school news
+ *
+ * @param IDatabase $db
+ * @param int       $oldId
+ * @param int       $articleId
+ */
+function createSchoolNewsUserAudience(IDatabase $db, int $oldId, int $articleId)
+{
+    $users = $db->query("
+        SELECT userID AS id
+        FROM news_items ni
+        LEFT JOIN newsUser nu ON ni.item_id = nu.newsID
+        WHERE ni.item_id = {$oldId}
+    ");
+
+    foreach ($users as $user) {
+
+        /* Assign user
+         */
+        $db->query("
+            INSERT INTO `comms_news_audience` (comms_news_article_id, entity_type,  entity_value, relationship)
+            VALUES ('{$articleId}', '".Model::ENTITY_TYPE_USER."', '{$user['id']}', '".Model::RELATIONSHIP_SELF."')
+        ");
+    }
+}
+
+
+/**
+ * Find out all the Roles+Campuses for this school news
+ *
+ * @param IDatabase $db
+ * @param int       $oldId
+ * @param int       $articleId
+ */
+function createSchoolNewsCampusRoleAudience(IDatabase $db, int $oldId, int $articleId)
+{
+    $roles = $db->query("
+        SELECT gid AS id
+        FROM news_items ni
+        LEFT JOIN newsGroup ng ON ni.item_id = ng.id
+        WHERE ni.item_id = {$oldId}
+    ");
+
+    $campuses = $db->query("
+        SELECT campus AS id
+        FROM news_items ni
+        LEFT JOIN newsCampus nc ON ni.item_id = nc.id
+        WHERE ni.item_id = {$oldId}
+    ");
+
+    foreach ($roles as $role) {
+        foreach ($campuses as $campus) {
+
+            /* Create composite
+             */
+            $query = "
+                INSERT INTO `comms_news_audience` (comms_news_article_id, entity_type, relationship)
+                VALUES ('{$articleId}', '".Model::ENTITY_TYPE_COMPOSITE."', '".Model::RELATIONSHIP_SELF."');
+            ";
+
+            $db->query($query);
+
+            $compositeSegmentId = $db->lastInsertId();
+
+            /* Assign campus
+             */
+            $query = "
+                INSERT INTO `comms_news_audience` (comms_news_article_id, parent_id, entity_type, entity_value, relationship)
+                VALUES ('{$articleId}', '{$compositeSegmentId}', '".Model::ENTITY_TYPE_CAMPUS."', '{$campus['id']}', '".Model::RELATIONSHIP_SELF."')
+            ";
+
+            $db->query($query);
+
+            /* Assign role
+             */
+            $query = "
+                INSERT INTO `comms_news_audience` (comms_news_article_id, parent_id, entity_type, entity_value, relationship)
+                VALUES ('{$articleId}', '{$compositeSegmentId}', '".Model::ENTITY_TYPE_ROLE."', '{$role['id']}', '".Model::RELATIONSHIP_SELF."')
+            ";
+
+            $db->query($query);
+        }
+    }
+}
+
+
 /**
  * Import all the homepage news too
  *
@@ -124,11 +210,6 @@ function importHomepageNews(IDatabase $db)
 
     for ($i = 0; $row = $result->fetch(\PDO::FETCH_ASSOC); $i++) {
         $articleId = createHomepageNewsArticle($db, $row);
-
-        /* Figger out all the relations, ram them in accordingly
-         */
-        createHomepageNewsCampusRoleAudience($db, $row['id'], $articleId);
-        createHomepageNewsUserAudience($db, $row['id'], $articleId);
     }
 
     return $i;
@@ -177,94 +258,6 @@ function createHomepageNewsArticle(IDatabase $db, array $row)
     return $db->lastInsertId();
 }
 
-/**
- * Find out all the Roles for this homepage news
- *
- * @param IDatabase $db
- * @param int       $oldId
- * @param int       $articleId
- */
-function createHomepageNewsCampusRoleAudience(IDatabase $db, int $oldId, int $articleId)
-{
-    $roles = $db->query("
-        SELECT gid AS id
-        FROM subject_news sn
-        LEFT JOIN newsGroup ng ON sn.id = ng.id
-        WHERE sn.id = {$oldId}
-    ");
-
-    $campuses = $db->query("
-        SELECT campus AS id
-        FROM subject_news sn
-        LEFT JOIN newsCampus nc ON sn.id = nc.id
-        WHERE sn.id = {$oldId}
-    ");
-
-    foreach ($roles as $role) {
-        foreach ($campuses as $campus) {
-
-            /* Create composite
-             */
-            $query = "
-                INSERT INTO `comms_news_audience` (article_id, entity_type, relationship)
-                VALUES ('{$articleId}', ".ENTITY_TYPE_COMPOSITE.", ".RELATIONSHIP_SELF.");
-            ";
-
-            $db->query($query);
-            echo $query;
-
-            $compositeSegmentId = $db->lastInsertId();
-            echo "COMPOSITE: {$compositeSegmentId}";
-
-            /* Assign campus
-             */
-            $query = "
-                INSERT INTO `comms_news_audience` (article_id, entity_type, entity_value, relationship)
-                VALUES ('{$compositeSegmentId}', ".ENTITY_TYPE_CAMPUS.", '{$campus['id']}', ".RELATIONSHIP_SELF.")
-            ";
-
-            $db->query($query);
-            echo $query;
-            /* Assign role
-             */
-            $query = "
-                INSERT INTO `comms_news_audience` (article_id, entity_type, entity_value, relationship)
-                VALUES ('{$compositeSegmentId}', ".ENTITY_TYPE_ROLE.", '{$role['id']}', ".RELATIONSHIP_SELF.")
-            ";
-
-            $db->query($query);
-            echo $query;
-        }
-    }
-}
-
-/**
- * Find out all the Users for this homepage news
- *
- * @param IDatabase $db
- * @param int       $oldId
- * @param int       $articleId
- */
-function createHomepageNewsUserAudience(IDatabase $db, int $oldId, int $articleId)
-{
-    $users = $db->query("
-        SELECT userID AS id
-        FROM subject_news sn
-        LEFT JOIN newsUser nu ON sn.id = nu.newsID
-        WHERE sn.id = {$oldId}
-    ");
-
-    foreach ($users as $user) {
-
-        /* Assign user
-         */
-        $db->query("
-            INSERT INTO `comms_news_audience` (article_id, entity_type,  entity_value, relationship)
-            VALUES ('{$articleId}', ".ENTITY_TYPE_USER.", '{$user['id']}', ".RELATIONSHIP_SELF.")
-        ");
-    }
-}
-
 
 $kernel = new Schoolbox\Application\Daemon\Kernel('Migrate elderly School News to Comms', [
     'verbose' => [false, false, false],
@@ -274,6 +267,6 @@ $kernel = new Schoolbox\Application\Daemon\Kernel('Migrate elderly School News t
 $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
     $db = Database::getInstance();
 
-//    importSchoolNews($db);
+    importSchoolNews($db);
     importHomepageNews($db);
 });
