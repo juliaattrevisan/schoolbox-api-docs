@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 
 use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\GenericCollection;
 
 /**
  * Model for usage of a rubric group on a due work.
@@ -39,6 +40,21 @@ class GroupUsage
      * @var int
      */
     private $sequence = 0;
+
+
+    /**
+     * @var CriterionUsage[]|GenericCollection
+     */
+    private $criterionUsages;
+
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->criterionUsages = new GenericCollection(CriterionUsage::class);
+    }
 
 
     /**
@@ -117,6 +133,26 @@ class GroupUsage
     public function setSequence(int $sequence): self
     {
         $this->sequence = $sequence;
+        return $this;
+    }
+
+
+    /**
+     * @return CriterionUsage[]|GenericCollection
+     */
+    public function getCriterionUsages(): GenericCollection
+    {
+        return $this->criterionUsages;
+    }
+
+
+    /**
+     * @param CriterionUsage[]|GenericCollection $criterionUsages
+     * @return static
+     */
+    public function setCriterionUsages(GenericCollection $criterionUsages): self
+    {
+        $this->criterionUsages = $criterionUsages;
         return $this;
     }
 }
