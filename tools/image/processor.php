@@ -22,12 +22,14 @@ $maxWorkers = 4;
 $logger->info(sprintf("[manager] Starting Image Processor (maxWorkers: %d)", $maxWorkers));
 
 // List of expected transformations that we expect for each image
-$expectedTransform = [];
-$expectedTransform['custom'] = array('maxsize','square64','square128');
-$expectedTransform['WxH'] = array(
-    array(100, 100),
-    array(1024, 1024)
-);
+$expectedTransform = [
+    'custom' => [
+        'maxsize', 'square64', 'square128'
+    ],
+    'WxH' => [
+        [100, 100], [1024, 1024]
+    ]
+];
 
 // Retrieve list of images uploaded within the 15 minutes up to a max of 300
 $hashList = [];
