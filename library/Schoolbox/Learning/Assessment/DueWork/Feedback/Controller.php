@@ -124,9 +124,6 @@ class Controller extends Base
                     && $feedback->getId() != $mostRecentFeedback->getId()
                 ) {
                     $this->rubricMapper->copySelections($mostRecentFeedback->getId(), $feedback->getId());
-                } else if ($post['saveEmpty'] == true) {
-                    //We are at the inline grader and we have deselected a rubric - save empty
-                    $this->rubricMapper->saveForFeedback([], $feedback->getId());
                 }
             }
         }
@@ -203,6 +200,9 @@ class Controller extends Base
         // Did we just give some rubric marks?
         if (\is_array($post['rubric'])) {
             $this->rubricMapper->saveForFeedback($post['rubric']['descriptors'], $feedback->getId());
+            return true;
+        } else if (array_key_exists('saveEmpty', $post) && $post['saveEmpty']) {
+            $this->rubricMapper->saveForFeedback([], $feedback->getId());
             return true;
         }
         return false;
@@ -302,7 +302,7 @@ class Controller extends Base
         IFeedback $mostRecentFeedback = null,
         IResponse $response = null
     ):Model {
-        $hasRubric = array_key_exists('rubric', $postVars);
+        $hasRubric = array_key_exists('rubric', $postVars) || array_key_exists('saveEmpty', $postVars);
 
         $dueWorkFeedbackFactory = new DueWork\Feedback\Factory(
             $this->getFeedbackDataSource(),
