@@ -45,3 +45,38 @@ This is to follow the standard packaging process linux distributions use for web
 /var/lib/schoolbox
 * replaces previous data folder
 * directory structure auto created on install/update by tools/create-data-dirs.sh
+
+## Table of Contents
+1. Only top-level docs should be listed here, sub-docs should be listed in their parent README.md.
+1. Sub-docs should link back to parent README.md
+
+* Architecture:
+  * [Quickstart](./docs/quickstart.md)
+  * [MVC](./docs/mvc/readme.md)
+* Technical Processes:
+  * [Build Process](./docs/build-process.md)
+  * [Sanitisation](./docs/scrub.md)
+  * [Updates](./updates/README.md)
+  * [Packaging](./tools/pkg-build/README.md)
+* Team Processes:
+  * [Team Charter](./docs/charter.md)
+  * [Spiking](./docs/spike.md)
+* Core Modules:
+  * [Bell Daemon](./tools/notif/bell/README.md)
+  * [Curriculum](./library/Schoolbox/Curriculum/README.md)
+  * [EOTC](./www/modules/eotc/README.md)
+  * [NESA](./docs/nesa.md)
+  * [Notifications](./docs/notifications/README.md)
+  * [ResourceBooking](./library/Schoolbox/ResourceBooking/README.md)
+* Custom Modules
+  * [Loyola: Survey](./library/Custom/Loyola/Survey/README.md)
+  * [Meriden: Pastoral](./library/Custom/Meriden/Pastoral/README.md)
+* Javascript
+  * [Selectize](./www/css/core/selectize/README.md)
+* Custom Templates:
+  * [For Aura modules](./docs/custom/custom-templates-for-aura-modules.md)
+  * [Outside Aura modules](./docs/custom/custom-templates-outside-aura-modules.md)
+* Testing:
+  * [Acceptance Tests](./test/acceptance/README.md)
+  * [Behaviour Tests](./test/behavior/README.md)
+  * [Unit Tests](./docs/unit-test.md)
