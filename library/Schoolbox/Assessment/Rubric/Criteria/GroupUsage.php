@@ -42,7 +42,7 @@ class GroupUsage implements Twiggable, Calculable
      */
     private $criteria;
 
-    
+
     /**
      * Constructor
      *

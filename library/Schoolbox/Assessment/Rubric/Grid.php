@@ -8,9 +8,9 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric;
 
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\GroupUsage;
 use Schoolbox\Assessment\Rubric\Competency\Level;
 use Schoolbox\Assessment\Rubric\Criteria\Criterion;
+use Schoolbox\Assessment\Rubric\Criteria\GroupUsage;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
 
