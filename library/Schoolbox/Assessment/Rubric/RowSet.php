@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric;
 
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Group;
+use Schoolbox\Assessment\Rubric\Criteria\Group;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\AssessmentContext;
 
