@@ -6,8 +6,9 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
+namespace Schoolbox\Assessment\Rubric;
 
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Group;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\AssessmentContext;
 
