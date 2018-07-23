@@ -16,8 +16,8 @@ use Alaress\Image\Transformation;
 require_once __DIR__ . '/../../conf/core/require.php';
 spl_autoload_call('Schoolbox\\Application\\Daemon');
 
-define('defaultLogLevel', 200); // default log level to INFO
-define('defaultMaxWorkers', 4); // default maximum number of workers
+define('LOG_LEVEL', 200); // default log level to INFO
+define('MAX_WORKERS', 4); // default maximum number of workers
 
 // Override default values from ENV variables
 $logLevel = (int)getenv('LOG_LEVEL', true) ?: defaultLogLevel;
