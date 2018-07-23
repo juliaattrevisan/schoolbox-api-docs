@@ -7,14 +7,14 @@ use Schoolbox\Comms\News\Audience\Model;
 require_once __DIR__ . '/../../../conf/core/require.php';
 spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
-
 /**
  * Import all the School News into Comms
  *
- * @param IDatabase $db
+ * @param IDatabase       $db
+ * @param LoggerInterface $log
  * @return int
  */
-function importSchoolNews(IDatabase $db)
+function importSchoolNews(IDatabase $db, LoggerInterface $log)
 {
     $result = $db->query('
         SELECT * 
@@ -22,28 +22,28 @@ function importSchoolNews(IDatabase $db)
     ');
 
     for ($i = 0; $row = $result->fetch(\PDO::FETCH_ASSOC); $i++) {
-        $articleId = createSchoolNewsArticle($db, $row);
+        $articleId = createSchoolNewsArticle($db, $row, $log);
 
         /* Figger out all the relations, ram them in accordingly
          */
-        createSchoolNewsTopics($db, $articleId, $row);
-        createSchoolNewsUserAudience($db, $row['item_id'], $articleId);
-        createSchoolNewsCampusRoleAudience($db, $row['item_id'], $articleId);
+        createSchoolNewsTopics($db, $articleId, $row, $log);
+        createSchoolNewsUserAudience($db, $row['item_id'], $articleId, $log);
+        createSchoolNewsCampusRoleAudience($db, $row['item_id'], $articleId, $log);
     }
 
     return $i;
 }
 
-
 /**
  * Create an article record in the db
  * Return its identifier
  *
- * @param IDatabase $db
- * @param           $row
+ * @param IDatabase       $db
+ * @param array           $row
+ * @param LoggerInterface $log
  * @return string
  */
-function createSchoolNewsArticle(IDatabase $db, array $row)
+function createSchoolNewsArticle(IDatabase $db, array $row, LoggerInterface $log)
 {
     $mapping = [
         'id' => $row['item_id'],
@@ -83,18 +83,24 @@ function createSchoolNewsArticle(IDatabase $db, array $row)
 
     $db->prepare($query)->execute($params);
 
-    return $db->lastInsertId();
-}
+    $lastInsertId = $db->lastInsertId();
 
+    /* Log it
+     */
+    $log->debug("School News {$row['item_id']} {$row['item_heading']} is now article_id {$lastInsertId}");
+
+    return $lastInsertId;
+}
 
 /**
  * Assign topicId to articleId
  *
- * @param IDatabase $db
- * @param int       $articleId
- * @param array     $row
+ * @param IDatabase       $db
+ * @param int             $articleId
+ * @param array           $row
+ * @param LoggerInterface $log
  */
-function createSchoolNewsTopics(IDatabase $db, int $articleId, array $row)
+function createSchoolNewsTopics(IDatabase $db, int $articleId, array $row, LoggerInterface $log)
 {
     $query = '
         INSERT INTO comms_news_article_topic (article_id, topic_id) 
@@ -105,22 +111,26 @@ function createSchoolNewsTopics(IDatabase $db, int $articleId, array $row)
         'articleId' => $articleId,
         'topicId' => $row['item_topic_id']
     ]);
-}
 
+    /* Log it
+     */
+    $log->info("School News article_id {$articleId} assigned topic {$row['item_topic_id']}");
+}
 
 /**
  * Find out all the Users for this school news
  *
- * @param IDatabase $db
- * @param int       $oldId
- * @param int       $articleId
+ * @param IDatabase       $db
+ * @param int             $oldId
+ * @param int             $articleId
+ * @param LoggerInterface $log
  */
-function createSchoolNewsUserAudience(IDatabase $db, int $oldId, int $articleId)
+function createSchoolNewsUserAudience(IDatabase $db, int $oldId, int $articleId, LoggerInterface $log)
 {
     $users = $db->query("
         SELECT userID AS id
         FROM news_items ni
-        LEFT JOIN newsUser nu ON ni.item_id = nu.newsID
+        INNER JOIN newsUser nu ON ni.item_id = nu.newsID
         WHERE ni.item_id = {$oldId}
     ");
 
@@ -132,18 +142,22 @@ function createSchoolNewsUserAudience(IDatabase $db, int $oldId, int $articleId)
             INSERT INTO `comms_news_audience` (comms_news_article_id, entity_type,  entity_value, relationship)
             VALUES ('{$articleId}', '".Model::ENTITY_TYPE_USER."', '{$user['id']}', '".Model::RELATIONSHIP_SELF."')
         ");
+
+        /* Log it
+         */
+        $log->info("School News article_id {$articleId} assigned User audience for user {$user['id']}");
     }
 }
-
 
 /**
  * Find out all the Roles+Campuses for this school news
  *
- * @param IDatabase $db
- * @param int       $oldId
- * @param int       $articleId
+ * @param IDatabase       $db
+ * @param int             $oldId
+ * @param int             $articleId
+ * @param LoggerInterface $log
  */
-function createSchoolNewsCampusRoleAudience(IDatabase $db, int $oldId, int $articleId)
+function createSchoolNewsCampusRoleAudience(IDatabase $db, int $oldId, int $articleId, LoggerInterface $log)
 {
     $roles = $db->query("
         SELECT gid AS id
@@ -173,6 +187,10 @@ function createSchoolNewsCampusRoleAudience(IDatabase $db, int $oldId, int $arti
 
             $compositeSegmentId = $db->lastInsertId();
 
+            /* Log it
+             */
+            $log->info("School News article_id {$articleId} assigned Composite audience {$compositeSegmentId}");
+
             /* Assign campus
              */
             $query = "
@@ -182,6 +200,10 @@ function createSchoolNewsCampusRoleAudience(IDatabase $db, int $oldId, int $arti
 
             $db->query($query);
 
+            /* Log it
+             */
+            $log->info("School News article_id {$articleId} assigned Campus audience {$campus['id']}");
+
             /* Assign role
              */
             $query = "
@@ -190,18 +212,22 @@ function createSchoolNewsCampusRoleAudience(IDatabase $db, int $oldId, int $arti
             ";
 
             $db->query($query);
+
+            /* Log it
+             */
+            $log->info("School News article_id {$articleId} assigned Role audience {$role['id']}");
         }
     }
 }
 
-
 /**
  * Import all the homepage news too
  *
- * @param IDatabase $db
+ * @param IDatabase       $db
+ * @param LoggerInterface $log
  * @return int
  */
-function importHomepageNews(IDatabase $db)
+function importHomepageNews(IDatabase $db, LoggerInterface $log)
 {
     $result = $db->query('
         SELECT * 
@@ -209,26 +235,26 @@ function importHomepageNews(IDatabase $db)
     ');
 
     for ($i = 0; $row = $result->fetch(\PDO::FETCH_ASSOC); $i++) {
-        $articleId = createHomepageNewsArticle($db, $row);
+        $articleId = createHomepageNewsArticle($db, $row, $log);
 
         /* Figger out all the relations, ram them in accordingly
          */
-        createHomepageNewsAudience($db, $row['id'], $articleId);
+        createHomepageNewsAudience($db, $row['id'], $articleId, $log);
     }
 
     return $i;
 }
 
-
 /**
  * Create an article record in the db
  * Return its identifier
  *
- * @param IDatabase $db
- * @param array     $row
+ * @param IDatabase       $db
+ * @param array           $row
+ * @param LoggerInterface $log
  * @return string
  */
-function createHomepageNewsArticle(IDatabase $db, array $row)
+function createHomepageNewsArticle(IDatabase $db, array $row, LoggerInterface $log)
 {
     $mapping = [
         'title' => $row['heading'],
@@ -259,18 +285,24 @@ function createHomepageNewsArticle(IDatabase $db, array $row)
 
     $db->prepare($query)->execute($params);
 
-    return $db->lastInsertId();
-}
+    $lastInsertId = $db->lastInsertId();
 
+    /* Log it
+     */
+    $log->debug("Homepage News {$row['id']} {$row['heading']} is now article_id {$lastInsertId}");
+
+    return $lastInsertId;
+}
 
 /**
  * Find out all the Folders for this homepage news
  *
- * @param IDatabase $db
- * @param int       $oldId
- * @param int       $articleId
+ * @param IDatabase       $db
+ * @param int             $oldId
+ * @param int             $articleId
+ * @param LoggerInterface $log
  */
-function createHomepageNewsAudience(IDatabase $db, int $oldId, int $articleId)
+function createHomepageNewsAudience(IDatabase $db, int $oldId, int $articleId, LoggerInterface $log)
 {
     $folders = $db->query("
         SELECT code AS id
@@ -285,6 +317,11 @@ function createHomepageNewsAudience(IDatabase $db, int $oldId, int $articleId)
             INSERT INTO `comms_news_audience` (comms_news_article_id, entity_type,  entity_value, relationship)
             VALUES ('{$articleId}', '" . Model::ENTITY_TYPE_FOLDER . "', '{$folder['id']}', '" . Model::RELATIONSHIP_SELF . "')
         ");
+
+        /* Log it
+         */
+        $log->info("Homepage News article_id {$articleId} assigned Folder audience {$folder['id']}");
+
     }
 }
 
@@ -297,6 +334,6 @@ $kernel = new Schoolbox\Application\Daemon\Kernel('Migrate elderly School News t
 $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
     $db = Database::getInstance();
 
-    importSchoolNews($db);
-    importHomepageNews($db);
+    importSchoolNews($db, $log);
+    importHomepageNews($db, $log);
 });
