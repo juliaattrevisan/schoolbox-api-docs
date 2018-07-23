@@ -79,6 +79,24 @@ class RubricGrid
 
 
     /**
+     * @return IAssessable
+     */
+    public function getAssessment(): IAssessable
+    {
+        return $this->assessment;
+    }
+
+
+    /**
+     * @return RowSet
+     */
+    public function getRowSet(): RowSet
+    {
+        return $this->rowSet;
+    }
+
+
+    /**
      * @return GroupUsage[]|GenericCollection
      */
     public function getGroupUsages(): GenericCollection

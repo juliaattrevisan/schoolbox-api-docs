@@ -53,24 +53,13 @@ class RowSet
     }
 
 
-//    /**
-//     * @return AssessmentContext
-//     */
-//    public function getContext(): AssessmentContext
-//    {
-//        return $this->context;
-//    }
-//
-//
-//    /**
-//     * @param AssessmentContext $context
-//     * @return static
-//     */
-//    public function setContext(AssessmentContext $context): self
-//    {
-//        $this->context = $context;
-//        return $this;
-//    }
+    /**
+     * @return AssessmentContext
+     */
+    public function getContext(): AssessmentContext
+    {
+        return $this->context;
+    }
 
 
     /**
