@@ -10,7 +10,6 @@
 namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 
 use Schoolbox\Assessment\Component\SubmissionBox;
-use Schoolbox\GenericCollection;
 
 class CriterionUsage
 {
@@ -31,19 +30,6 @@ class CriterionUsage
      * @var int
      */
     private $sequence = 0;
-
-    /**
-     * @var Descriptor[]|GenericCollection
-     */
-    private $descriptors;
-
-    /**
-     * Constructor
-     */
-    public function __construct()
-    {
-        $this->descriptors = new GenericCollection(Descriptor::class);
-    }
 
     /**
      * @param  Criterion $criterion
@@ -101,21 +87,4 @@ class CriterionUsage
         return $this;
     }
 
-    /**
-     * @return Descriptor[]|GenericCollection
-     */
-    public function getDescriptors(): GenericCollection
-    {
-        return $this->descriptors;
-    }
-
-    /**
-     * @param Descriptor[]|GenericCollection $descriptors
-     * @return static
-     */
-    public function setDescriptors(GenericCollection $descriptors): self
-    {
-        $this->descriptors = $descriptors;
-        return $this;
-    }
 }
