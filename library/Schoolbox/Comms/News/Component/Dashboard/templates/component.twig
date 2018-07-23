@@ -22,7 +22,7 @@
 
     $(function() {
         $('#news-container-{{ componentInstanceId }}').articleTabs({
-            'selectedUrl': "{{ routeLookup('commsNews.getListByTopic')}}?{{ querystringParams|raw }}",
+            'selectedUrl': "{{ routeLookup('commsNews.getListByTopic') }}?{{ querystringParams|raw }}",
             'topicTabs': $("#news-topics-{{ componentInstanceId }}")
         });
     });
@@ -39,4 +39,10 @@
 
 <div id="news-container-{{ componentInstanceId }}">
     <div class="loader"></div>
+</div>
+
+<div class="component-action">
+    <section>
+        <a href="{{ routeLookup('commsNews.getIndex') }}" class="button">View All</a>
+    </section>
 </div>
