@@ -15,7 +15,8 @@ use Alaress\Image\Transformation;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 spl_autoload_call('Schoolbox\\Application\\Daemon');
-$kernel = new \Schoolbox\Application\Daemon\Kernel('Image Processor', array('level' => 200));
+$logLevel = (int)getenv('LOG_LEVEL', true) > 0 ? (int)getenv('LOG_LEVEL', true) : 200;
+$kernel = new \Schoolbox\Application\Daemon\Kernel('Image Processor', array('level' => $logLevel));
 $logger = $kernel->logger();
 
 $maxWorkers = (int)getenv('MAX_WORKERS', true) > 0 ? (int)getenv('MAX_WORKERS', true) : 4;
@@ -145,6 +146,8 @@ while (count($hashList) > 0) {
                     if (!$image->isCached()) {
                         $image->save();
                         $logger->info(sprintf("[%d] %s: %s", $workerId, $hash . '-' . $transformSize, 'success'));
+                    } else {
+                        $logger->debug(sprintf("[%d] %s: %s", $workerId, $hash . '-' . $transformSize, 'already cached'));
                     }
                 }
                 catch (Exception $e) {
