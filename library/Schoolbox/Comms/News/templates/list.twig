@@ -53,13 +53,14 @@
         <li class="actions-small-1">
             <div class="list-item">
                 <div class="small-12 card">
-                    <a href="{{ routeLookup('commsNews.getDetail', {articleId: article.id}) }}">
-                        {% if article.featureImage.hash %}
-                        <img src="/storage/image.php?hash={{ article.featureImage.hash }}&size=square64">
-                        {% endif %}
 
-                        <h3>{{ article.title }}</h3>
-                    </a>
+                    {% if article.featureImage.hash %}
+                        <a href="{{ routeLookup('commsNews.getDetail', {articleId: article.id}) }}">
+                            <img src="/storage/image.php?hash={{ article.featureImage.hash }}&size=square64">
+                        </a>
+                    {% endif %}
+
+                    <h3><a href="{{ routeLookup('commsNews.getDetail', {articleId: article.id}) }}">{{ article.title }}</a></h3>
 
                     <p class="meta">Published by
                         {% if article.author.deletedAt.isNull %}
