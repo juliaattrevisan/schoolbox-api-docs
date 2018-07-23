@@ -4,17 +4,31 @@
             <h1>{{ locale.news.proper }}</h1>
         </div>
     </div>
+    {% set saveForLaterRoute = routeLookupIfAuthorized('commsNewsSaveForLater.getList') %}
     <nav>
         {% set createRoute = routeLookupIfAuthorized('commsNews.getCreate') %}
+        {% set moderationRoute = routeLookupIfAuthorized('commsNewsModeration.getList') %}
+        {% set archiveRoute = 1 %} {# TODO: fill in route when archive is created #}
+        {% set authorRoute = 1 %} {# TODO: fill in route when /me is created #}
         {% if createRoute %}
             <a href="{{ createRoute }}" class="icon-add" title="Create {{ locale.news }}"></a>
         {% endif %}
-
-        {% set saveForLaterRoute = routeLookupIfAuthorized('commsNewsSaveForLater.getList') %}
-        {% if saveForLaterRoute %}
-            <a href="{{ saveForLaterRoute }}" class="icon-list" title="View a list of saved articles"></a>
+        {% if moderationRoute or saveForLaterRoute or archiveRoute or authorRoute %}
+            <a href="#" class="icon-more" data-dropdown="tab-control" title="Actions"></a>
         {% endif %}
     </nav>
+    {% if moderationRoute or saveForLaterRoute or archiveRoute or authorRoute %}
+    <ul id="tab-control" class="f-dropdown" data-dropdown-content>
+        <li><a href="#" onclick="alert('Coming soon');" class="icon-archive">{{ locale.news | capitalize }} archive</a></li> {# TODO: fill in link when archive is created #}
+        <li><a href="#" onclick="alert('Coming soon');" class="icon-staff-students">Articles authored by me</a></li> {# TODO: fill in link when /me is created #}
+        {% if moderationRoute %}
+            <li><a href="{{ moderationRoute }}" class="icon-list">Moderation list</a></li>
+        {% endif %}
+        {% if saveForLaterRoute %}
+            <li><a href="{{ saveForLaterRoute }}" class="icon-star">Saved items</a></li>
+        {% endif %}
+    </ul>
+    {% endif %}
 </div>
 
 <div class="row">
