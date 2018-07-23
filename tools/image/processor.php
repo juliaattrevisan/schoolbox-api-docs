@@ -15,11 +15,17 @@ use Alaress\Image\Transformation;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 spl_autoload_call('Schoolbox\\Application\\Daemon');
-$logLevel = (int)getenv('LOG_LEVEL', true) > 0 ? (int)getenv('LOG_LEVEL', true) : 200;
+
+define('defaultLogLevel', 200); // default log level to INFO
+define('defaultMaxWorkers', 4); // default maximum number of workers
+
+// Override default values from ENV variables
+$logLevel = (int)getenv('LOG_LEVEL', true) ?: defaultLogLevel;
+$maxWorkers = (int)getenv('MAX_WORKERS', true) ?: defaultMaxWorkers;
+
 $kernel = new \Schoolbox\Application\Daemon\Kernel('Image Processor', array('level' => $logLevel));
 $logger = $kernel->logger();
 
-$maxWorkers = (int)getenv('MAX_WORKERS', true) > 0 ? (int)getenv('MAX_WORKERS', true) : 4;
 $logger->info(sprintf("[manager] Starting Image Processor (maxWorkers: %d)", $maxWorkers));
 
 // List of expected transformations that we expect for each image
