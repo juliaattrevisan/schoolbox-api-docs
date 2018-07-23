@@ -210,6 +210,10 @@ function importHomepageNews(IDatabase $db)
 
     for ($i = 0; $row = $result->fetch(\PDO::FETCH_ASSOC); $i++) {
         $articleId = createHomepageNewsArticle($db, $row);
+
+        /* Figger out all the relations, ram them in accordingly
+         */
+        createHomepageNewsAudience($db, $row['id'], $articleId);
     }
 
     return $i;
@@ -259,6 +263,31 @@ function createHomepageNewsArticle(IDatabase $db, array $row)
 }
 
 
+/**
+ * Find out all the Folders for this homepage news
+ *
+ * @param IDatabase $db
+ * @param int       $oldId
+ * @param int       $articleId
+ */
+function createHomepageNewsAudience(IDatabase $db, int $oldId, int $articleId)
+{
+    $folders = $db->query("
+        SELECT code AS id
+        FROM subject_news sn
+        WHERE sn.id = {$oldId}
+    ");
+
+    /* Assign folder
+     */
+    foreach ($folders as $folder) {
+        $db->query("
+            INSERT INTO `comms_news_audience` (comms_news_article_id, entity_type,  entity_value, relationship)
+            VALUES ('{$articleId}', '" . Model::ENTITY_TYPE_FOLDER . "', '{$folder['id']}', '" . Model::RELATIONSHIP_SELF . "')
+        ");
+    }
+}
+
 $kernel = new Schoolbox\Application\Daemon\Kernel('Migrate elderly School News to Comms', [
     'verbose' => [false, false, false],
     'errors'  => E_ALL,
@@ -267,6 +296,6 @@ $kernel = new Schoolbox\Application\Daemon\Kernel('Migrate elderly School News t
 $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
     $db = Database::getInstance();
 
-    importSchoolNews($db);
+//    importSchoolNews($db);
     importHomepageNews($db);
 });
