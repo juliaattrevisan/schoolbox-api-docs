@@ -78,6 +78,8 @@ class Controller extends Base
     /**
      * Provide form to create a news article
      *
+     * @api GET /comms/news/create
+     *
      * @throws MapperException
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \UnexpectedValueException
@@ -130,6 +132,8 @@ class Controller extends Base
     /**
      * Create a news article
      *
+     * @api POST /comms/news/create
+     *
      * @throws MapperException
      * @throws \Aura\Router\Exception\RouteNotFound
      * @throws \PDOException
@@ -149,6 +153,8 @@ class Controller extends Base
 
     /**
      * Provide form to update a news article
+     *
+     * @api GET /comms/news/{articleId}/update
      *
      * @param Model $article
      * @throws MapperException
@@ -195,6 +201,8 @@ class Controller extends Base
 
     /**
      * Update a news article
+     *
+     * @api POST /comms/news/{articleId}
      *
      * @param Model $article
      * @throws \Schoolbox\Mapper\Exception
@@ -312,6 +320,8 @@ class Controller extends Base
 
     /**
      * Get a list of available news topics that can be assigned to an article
+     *
+     * @api GET /comms/news/topics
      */
     public function getTopics()
     {
@@ -321,6 +331,8 @@ class Controller extends Base
 
     /**
      * Load a news article so you can read its contents (the detail screen)
+     *
+     * @api GET /comms/news/{articleId}
      *
      * @param Model $article
      * @throws MapperException
@@ -370,6 +382,8 @@ class Controller extends Base
 
     /**
      * Delete an article
+     *
+     * @api POST /comms/news/{articleId}/delete
      *
      * @param Model $article
      * @throws MapperException
@@ -454,6 +468,8 @@ class Controller extends Base
      *
      * TODO: Incomplete
      *
+     * @api GET /comms/news/list
+     *
      * @throws RouteNotFound
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Aura\Di\Exception\ServiceNotFound
@@ -481,6 +497,10 @@ class Controller extends Base
 
 
     /**
+     * Get a list of articles audienced to you
+     *
+     * @api GET /comms/news
+     *
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws RouteNotFound
