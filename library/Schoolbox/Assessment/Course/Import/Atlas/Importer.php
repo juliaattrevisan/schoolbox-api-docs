@@ -223,7 +223,7 @@ class Importer
                         $this->createAttachment(
                             $attachment,
                             $unitSpec->getFolder(),
-                            !empty($attachmentSelection['private'])
+                            !empty($attachmentSelection['visibleToStudents'])
                         );
                     } else {
                         // This attachment wasn't selected; delete it
@@ -429,10 +429,10 @@ class Importer
      *
      * @param Api\Attachment $attachment
      * @param Folder         $folder
-     * @param bool           $private
+     * @param bool           $visibleToStudents
      * @return void Don't need to return what was attached?
      */
-    private function createAttachment(Api\Attachment $attachment, Folder $folder, bool $private): void
+    private function createAttachment(Api\Attachment $attachment, Folder $folder, bool $visibleToStudents): void
     {
         // TODO did I pass the attachment as private?
         // How to create the item?
