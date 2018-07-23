@@ -18,7 +18,7 @@ spl_autoload_call('Schoolbox\\Application\\Daemon');
 $kernel = new \Schoolbox\Application\Daemon\Kernel('Image Processor', array('level' => 200));
 $logger = $kernel->logger();
 
-$maxWorkers = 4;
+$maxWorkers = is_int(getenv('MAX_WORKERS', true)) ?: 4;
 $logger->info(sprintf("[manager] Starting Image Processor (maxWorkers: %d)", $maxWorkers));
 
 // List of expected transformations that we expect for each image
