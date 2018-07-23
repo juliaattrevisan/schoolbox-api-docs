@@ -12,6 +12,11 @@ namespace Schoolbox\Assessment\Rubric\Criteria;
 
 use Schoolbox\Assessment\Rubric\DescriptorList;
 
+/**
+ * Object representation of a rubric criterion.
+ *
+ * TODO consider removing descriptors, as they only have meaning when a criterion is part of a grid
+ */
 class Criterion extends DescriptorList
 {
     /** @var bool */

@@ -17,6 +17,11 @@ use Schoolbox\Assessment\Rubric\Twiggable;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 
+/**
+ * Object representation of a rubric group.
+ *
+ * TODO consider extracting max value from this, as it only has meaning when a rubric group is part of a grid
+ */
 class Group implements Twiggable, Calculable
 {
 
