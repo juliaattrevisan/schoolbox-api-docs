@@ -50,6 +50,8 @@ class Controller extends Base
     /**
      * A list of articles that you saved for later
      *
+     * @api GET /comms/news/saved
+     *
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Aura\Di\Exception\ServiceNotFound
      */
@@ -76,6 +78,8 @@ class Controller extends Base
      * Toggle the current state of this article in a user's Saved For Later list
      * You never really just activate them on their own - it's a toggle of states
      * and it happens asynchronously
+     *
+     * @api POST /comms/news/saved/{articleId}
      *
      * @param News\Model $article
      */
@@ -180,6 +184,8 @@ class Controller extends Base
 
     /**
      * Remove an item from your Saved list
+     *
+     * @api POST /comms/news/saved/{articleId}/remove
      *
      * @throws \Aura\Router\Exception\RouteNotFound
      * @param News\Model $article

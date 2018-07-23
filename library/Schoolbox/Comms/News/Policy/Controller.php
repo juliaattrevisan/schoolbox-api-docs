@@ -90,7 +90,7 @@ class Controller extends Base
      * Save policy settings
      *
      * @api POST /comms/news/policy
-     *      
+     *
      * @throws MapperException
      * @throws \Aura\Router\Exception\RouteNotFound
      * @throws \PDOException
