@@ -79,6 +79,46 @@ class RubricGrid
 
 
     /**
+     * Return a set of descriptors for a row.
+     *
+     * @param Criterion $criterion
+     * @return GenericCollection|Descriptor[]
+     */
+    public function getRow(Criterion $criterion): GenericCollection
+    {
+        // TODO implement
+        return new GenericCollection(Descriptor::class);
+    }
+
+
+    /**
+     * Return a set of descriptors for a column.
+     *
+     * @param Level $level
+     * @return GenericCollection
+     */
+    public function getColumn(Level $level): GenericCollection
+    {
+        // TODO implement
+        return new GenericCollection(Descriptor::class);
+    }
+
+
+    /**
+     * Return a descriptor for a row and column.
+     *
+     * @param Criterion $criterion
+     * @param Level     $level
+     * @return null|Descriptor
+     */
+    public function getDescriptor(Criterion $criterion, Level $level): ?Descriptor
+    {
+        // TODO implement
+        return null;
+    }
+
+
+    /**
      * @return IAssessable
      */
     public function getAssessment(): IAssessable
