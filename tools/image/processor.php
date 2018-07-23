@@ -19,9 +19,17 @@ spl_autoload_call('Schoolbox\\Application\\Daemon');
 define('LOG_LEVEL', 200); // default log level to INFO
 define('MAX_WORKERS', 4); // default maximum number of workers
 
+define('TIME_INTERVAL', 15); // time period in minutes to look up images for processing
+define('LIMIT', 300); // maximum amount of images to be processed
+
+define('SPINLOCK_WAIT_TIME', 5000); // default spinlock wait time in microseconds
+define('WORKER_CLEANUP_TIME', 50000); // default wait timeout for worker cleanup in microseconds
+
 // Override default values from ENV variables
-$logLevel = (int)getenv('LOG_LEVEL', true) ?: defaultLogLevel;
-$maxWorkers = (int)getenv('MAX_WORKERS', true) ?: defaultMaxWorkers;
+$logLevel = (int)getenv('LOG_LEVEL', true) ?: LOG_LEVEL;
+$maxWorkers = (int)getenv('MAX_WORKERS', true) ?: MAX_WORKERS;
+$timeInterval = (int)getenv('TIME_INTERVAL', true) ?: TIME_INTERVAL;
+$limit = (int)getenv('LIMIT', true) ?: LIMIT;
 
 $kernel = new \Schoolbox\Application\Daemon\Kernel('Image Processor', array('level' => $logLevel));
 $logger = $kernel->logger();
@@ -41,17 +49,17 @@ $expectedTransform = [
 // Retrieve list of images uploaded within the 15 minutes up to a max of 300
 $hashList = [];
 $db = $kernel->get('databaseInternal');
-$query = '
+$query = "
     SELECT `hash` FROM `storage` s
     JOIN allowedFileExtension afe ON s.ext = afe.extension
     JOIN allowedFileTypes aft
         ON afe.fileTypeID = aft.fileTypeID
-        AND aft.mime LIKE "image%"
-        AND aft.mime NOT LIKE "image%svg%"
-    WHERE s.uploaded_on >= (NOW() - INTERVAL 15 MINUTE)
+        AND aft.mime LIKE 'image%'
+        AND aft.mime NOT LIKE 'image%svg%'
+    WHERE s.uploaded_on >= (NOW() - INTERVAL {$timeInterval} MINUTE)
     ORDER BY s.uploaded_on ASC
-    LIMIT 0,300
-';
+    LIMIT 0,{$limit}
+";
 $result = $db->executeQuery($query)->fetchAll();
 if(is_iterable($result)){
     foreach($result as $row) {
@@ -71,7 +79,7 @@ if(is_iterable($result)){
 function workerCleanup($workers) {
     // Check if worker processes are still running, if not remove from workerList
     while (pcntl_wait($status, WNOHANG or WUNTRACED) > 0) {
-        usleep(5000);
+        usleep(SPINLOCK_WAIT_TIME);
     }
     while (list($hash, $val) = each($workers->list)) {
         if (!posix_kill($val, 0)) {
@@ -91,7 +99,7 @@ $workers = new class {
 while (count($hashList) > 0) {
     workerCleanup($workers);
     if ($workers->count >= $maxWorkers) {
-        usleep(5000);
+        usleep(SPINLOCK_WAIT_TIME);
         continue;
     }
 
@@ -115,7 +123,7 @@ while (count($hashList) > 0) {
         // Set next piece of work in the hashList array
         $hashItem++;
 
-        usleep(5000);
+        usleep(SPINLOCK_WAIT_TIME);
     } else {
         // Start of Worker Process
         $workerId = posix_getpid();
@@ -168,6 +176,6 @@ while (count($hashList) > 0) {
 
 while ($workers->count > 0) {
     workerCleanup($workers);
-    usleep(50000);
+    usleep(WORKER_CLEANUP_TIME);
 }
 $logger->info('[manager] so long, and thanks for all the fish');
