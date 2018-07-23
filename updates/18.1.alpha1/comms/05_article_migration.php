@@ -27,8 +27,8 @@ function importSchoolNews(IDatabase $db)
         /* Figger out all the relations, ram them in accordingly
          */
         createSchoolNewsTopics($db, $articleId, $row);
-        createSchoolNewsUserAudience($db, $row['id'], $articleId);
-        createSchoolNewsCampusRoleAudience($db, $row['id'], $articleId);
+        createSchoolNewsUserAudience($db, $row['item_id'], $articleId);
+        createSchoolNewsCampusRoleAudience($db, $row['item_id'], $articleId);
     }
 
     return $i;
