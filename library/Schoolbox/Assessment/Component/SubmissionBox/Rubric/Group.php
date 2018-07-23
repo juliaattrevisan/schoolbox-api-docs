@@ -74,11 +74,17 @@ class Group implements ISoftDeletable
     private $parentType = self::PARENT_TYPE_CATEGORY;
 
     /**
+     * @var Criterion[]|GenericCollection
+     */
+    private $criteria;
+
+    /**
      * Constructor
      */
     public function __construct()
     {
         $this->curriculumNodes = new GenericCollection(NodeModel::class);
+        $this->criteria        = new GenericCollection(Criterion::class);
     }
 
     /**
@@ -132,6 +138,24 @@ class Group implements ISoftDeletable
     public function setParentType(string $parentType)
     {
         $this->parentType = $parentType;
+        return $this;
+    }
+
+    /**
+     * @return Criterion[]|GenericCollection
+     */
+    public function getCriteria(): GenericCollection
+    {
+        return $this->criteria;
+    }
+
+    /**
+     * @param Criterion[]|GenericCollection $criteria
+     * @return static
+     */
+    public function setCriteria(GenericCollection $criteria)
+    {
+        $this->criteria = $criteria;
         return $this;
     }
 }
