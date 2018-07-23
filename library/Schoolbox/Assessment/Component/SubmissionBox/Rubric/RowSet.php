@@ -16,6 +16,10 @@ use Schoolbox\Learning\AssessmentContext;
  *
  * This is a representation of the groups (and their constituent criteria)
  * which are available to an assessment context.
+ *
+ * It contains:
+ * * an assessment context (in practise, always a folder)
+ * * a set of rubric groups
  */
 class RowSet
 {
@@ -39,31 +43,34 @@ class RowSet
 
     /**
      * Constructor
-     */
-    public function __construct()
-    {
-        $this->groups = new GenericCollection(Group::class);
-    }
-
-
-    /**
-     * @return AssessmentContext
-     */
-    public function getContext(): AssessmentContext
-    {
-        return $this->context;
-    }
-
-
-    /**
+     *
      * @param AssessmentContext $context
-     * @return static
      */
-    public function setContext(AssessmentContext $context)
+    public function __construct(AssessmentContext $context)
     {
         $this->context = $context;
-        return $this;
+        $this->groups  = new GenericCollection(Group::class);
     }
+
+
+//    /**
+//     * @return AssessmentContext
+//     */
+//    public function getContext(): AssessmentContext
+//    {
+//        return $this->context;
+//    }
+//
+//
+//    /**
+//     * @param AssessmentContext $context
+//     * @return static
+//     */
+//    public function setContext(AssessmentContext $context): self
+//    {
+//        $this->context = $context;
+//        return $this;
+//    }
 
 
     /**
@@ -79,7 +86,7 @@ class RowSet
      * @param Group[]|GenericCollection $groups
      * @return static
      */
-    public function setGroups(GenericCollection $groups)
+    public function setGroups(GenericCollection $groups): self
     {
         $this->groups = $groups;
         return $this;
