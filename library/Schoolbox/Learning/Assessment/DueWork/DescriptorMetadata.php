@@ -8,6 +8,8 @@
  * @link        http://www.alaress.com.au/
  */
 
+declare(strict_types=1);
+
 namespace Schoolbox\Learning\Assessment\DueWork;
 
 class DescriptorMetadata {

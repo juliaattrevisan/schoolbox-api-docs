@@ -1,12 +1,14 @@
 <?php
 
 /**
- * Calculates the direction of descriptor values for a single criterion, and defer to DescriptorMetadata for range calculation
+ * Calculates the direction of descriptor values for a single criterion, and defers to DescriptorMetadata for range calculation
  *
  * @author      Dorothea Baker <dorothea.baker@alaress.com.au>
  * @copyright   Copyright 2018, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
+
+declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\DueWork;
 
