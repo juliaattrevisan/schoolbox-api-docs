@@ -404,7 +404,7 @@ class RubricMapper
         // Group result by criterion, and track which boxes use the criterion
         $result = [];
         while ($row = $criteriaStatement->fetch(PDO::FETCH_ASSOC)) {
-            $criterionId = $row['crit_id'];
+            $criterionId = (int)$row['crit_id'];
             if (!isset($result[$criterionId])) {
                 $result[$criterionId] = $row;
             }
