@@ -18,7 +18,7 @@ spl_autoload_call('Schoolbox\\Application\\Daemon');
 $kernel = new \Schoolbox\Application\Daemon\Kernel('Image Processor', array('level' => 200));
 $logger = $kernel->logger();
 
-$maxWorkers = is_int(getenv('MAX_WORKERS', true)) ?: 4;
+$maxWorkers = (int)getenv('MAX_WORKERS', true) > 0 ? (int)getenv('MAX_WORKERS', true) : 4;
 $logger->info(sprintf("[manager] Starting Image Processor (maxWorkers: %d)", $maxWorkers));
 
 // List of expected transformations that we expect for each image
@@ -61,23 +61,29 @@ if(is_iterable($result)){
     exit(0);
 }
 
-$logger->info(sprintf('[manager] Hashes in queue: %d', \count($hashList)));
-$hashItem = 0;
-$workerList = [];
-$workers = 0;
-while (count($hashList) > 0) {
+function workerCleanup($workers) {
     // Check if worker processes are still running, if not remove from workerList
     while (pcntl_wait($status, WNOHANG or WUNTRACED) > 0) {
         usleep(5000);
     }
-    while (list($key, $val) = each($workerList)) {
+    while (list($hash, $val) = each($workers->list)) {
         if (!posix_kill($val, 0)) {
-            unset($workerList[$key]);
-            $workers = $workers - 1;
+            unset($workers->list[$hash]);
+            $workers->count--;
         }
     }
-    $workerList = array_values($workerList);
-    if ($workers >= $maxWorkers) {
+    $workers->list = array_values($workers->list);
+}
+
+$logger->info(sprintf('[manager] Hashes in queue: %d', \count($hashList)));
+$hashItem = 0;
+$workers = new class {
+    public $count = 0;
+    public $list = [];
+};
+while (count($hashList) > 0) {
+    workerCleanup($workers);
+    if ($workers->count >= $maxWorkers) {
         usleep(5000);
         continue;
     }
@@ -93,8 +99,8 @@ while (count($hashList) > 0) {
     } elseif ($pid) {
         // Parent Process
         // Add new worker to the worker list and worker count for tracking
-        $workerList[$hash] = $pid;
-        $workers++;
+        $workers->list[$hash] = $pid;
+        $workers->count++;
 
         // Remove hash from the list as it has been sent for processing
         unset($hashList[$hashItem]);
@@ -151,17 +157,8 @@ while (count($hashList) > 0) {
     }
 }
 
-while ($workers > 0) {
-    while (pcntl_wait($status, WNOHANG or WUNTRACED) > 0) {
-        usleep(5000);
-    }
-    while (list($key, $val) = each($workerList)) {
-        if (!posix_kill($val, 0)) {
-            unset($workerList[$key]);
-            $workers = $workers - 1;
-        }
-    }
-    $workerList = array_values($workerList);
+while ($workers->count > 0) {
+    workerCleanup($workers);
     usleep(50000);
 }
 $logger->info('[manager] so long, and thanks for all the fish');
