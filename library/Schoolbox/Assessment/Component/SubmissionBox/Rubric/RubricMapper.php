@@ -282,18 +282,16 @@ class RubricMapper
      * @var array           $return            [0]                 Groups
      * @var array           $return            [0][]               A single Criteria-Group
      * @var string          $return            [0][]['name']       Name of the Criteria-Group
+     * @var string          $return            [0][]['maxValue']   Maximum points value of the Criteria-Group
      * @var array           $return            [1]                 Criteria
      * @var array           $return            [1][]               A single Criterion
-     * @var int             $return            [1][]['groupId']    Arbitrary GroupId (not stored in DB, just used to link to a Criteria-Group)
-     * @var bool            $return            [1][]['on']         Whether this criteria is selected to be used in the $box
+     * @var int             $return            [1][]['groupId']    The Criterion's Group's Id
+     * @var bool            $return            [1][]['on']         Whether this criterion is selected in the $box
      * @var string          $return            [1][]['name']       Name of Criterion
      * @var bool            $return            [1][]['readonly']   Whether user should be prevented from changing name
      */
     protected function findCriteria(SubmissionBox $box, $getParentCriteria)
     {
-        /** @var array $groupIdMap - indexed by criterion-group name */
-        $groupIdMap = [];
-
         /** @var array $groups - indexed by groupId */
         $groups = [];
 
@@ -302,36 +300,34 @@ class RubricMapper
 
         $criteriaStatement = $this->generateCriteriaStatement($box, $getParentCriteria);
 
-        while ($r = $criteriaStatement->fetch(PDO::FETCH_ASSOC)) {
+        foreach ($criteriaStatement as $r) {
 
-            $groupName = $r['grouping'];
-            $selected  = $r['selected'] > 0;
+            $groupId     = $r['group_id'];
+            $selected    = $r['selected'] > 0;
+            $criterionId = $r['crit_id'];
 
-            // First time we've encountered this Group ?
-            if (empty($groupIdMap[$groupName])) {
-                $groupId = $r['group_id'];
-
-                $groupIdMap[$groupName] = $groupId;
+            // First time we've encountered this group?
+            // Add it to the list of groups to return
+            if (empty($groups[$groupId])) {
                 $maxValue               = isset($r['max_value']) ? (float)$r['max_value'] : null;
                 $groups[$groupId]       = [
-                    'name'     => $groupName,
+                    'name'     => $r['grouping'],
                     'maxValue' => $selected ? $maxValue : null,
                 ];
             }
 
-            // check for usage
-            $usedElsewhere = ($r['usages'] - $r['selected']) > 0;
-
-            $criteria[$r['crit_id']] = [
-                'groupId'  => $groupIdMap[$groupName],
-                'on'       => $selected,
-                'name'     => $r['name'],
-                'readonly' => $usedElsewhere,
-            ];
+            // First time we've encountered this criterion?
+            // Add it to the list of criteria to return
+            if (empty($criteria[$criterionId])) {
+                $usedElsewhere          = ($r['usages'] - $r['selected']) > 0;
+                $criteria[$criterionId] = [
+                    'groupId'  => $groupId,
+                    'on'       => $selected,
+                    'name'     => $r['name'],
+                    'readonly' => $usedElsewhere,
+                ];
+            }
         }
-
-        // umm... I have *never* had to do this before... how does the while() loop break if not EOF??
-        $criteriaStatement->closeCursor();
 
         return [$groups, $criteria];
     }
@@ -354,7 +350,7 @@ class RubricMapper
      * @param bool          $getParentCriteria - whether to also get criteria from box's folder's parent
      *
      * @throws \Schoolbox\Mapper\Exception
-     * @return \PDOStatement
+     * @return array
      */
     protected function generateCriteriaStatement(SubmissionBox $box, $getParentCriteria)
     {
@@ -383,41 +379,49 @@ class RubricMapper
 
         $criteriaStatement = $this->database->query("
             SELECT
-                crit_id,
-                group_id,
-                grouping,
-                name,
-                max_value,
-                COUNT(a_id) AS usages,                                   -- How many non-deleted boxes are using the criterion?
-                MAX(selected) AS selected                                -- Is the criterion in use by this box?
-            FROM (
-                SELECT
-                    rc.id AS crit_id,
-                    rg.id AS group_id,
-                    rg.name AS grouping,
-                    rc.name,
-                    rgu.max_value AS max_value,
-                    a.id AS a_id,                                        -- Will be NULL if not in use by a box, or box is soft-deleted
-                    IF(sb.id = :boxId, 1, 0) AS selected,                 -- Is this criterion in use by this box? (ignores whether box is deleted)
-                    IF(sb.id = :boxId, rcu.sequence, NULL) AS sequence      -- Only get sequence for this box (ignores whether box is deleted)
-                FROM rubric_criterion rc
-                INNER JOIN rubric_group           rg  ON rg.id = rc.rubric_group_id
-                LEFT JOIN  rubric_criterion_usage rcu ON rcu.criterion_id = rc.id
-                LEFT JOIN  submission_box         sb  ON rcu.submission_box_id = sb.id                      -- This will join to deleted boxes
-                LEFT JOIN  assessment             a   ON sb.assessment_id = a.id AND a.deleted_at IS NULL -- But won't join to deleted assessments
-                LEFT JOIN  rubric_group_usage     rgu ON rgu.rubric_group_id = rg.id AND rgu.submission_box_id = sb.id
-                WHERE rg.parent_type = :parentType
-                AND rg.parent_id IN (:$in)
-                AND rc.deleted_at IS NULL
-                AND a.deleted_at IS NULL
-                AND rg.deleted_at IS NULL
-                ORDER BY selected DESC
-            ) t
-            GROUP BY crit_id, group_id, grouping, name, max_value
-            ORDER BY selected DESC, MAX(`sequence`) ASC, `grouping` ASC, `name` ASC;
+                sb.id AS box_id,
+                rc.id AS crit_id,
+                rg.id AS group_id,
+                rg.name AS grouping,
+                rc.name,
+                rgu.max_value AS max_value,
+                -- Only get sequence for the requested box (don't care about other usages)
+                IF(sb.id = :boxId, rcu.sequence, NULL) AS sequence
+            FROM rubric_criterion rc
+            INNER JOIN rubric_group           rg  ON rg.id = rc.rubric_group_id
+            LEFT JOIN  rubric_criterion_usage rcu ON rcu.criterion_id = rc.id
+            LEFT JOIN  submission_box         sb  ON rcu.submission_box_id = sb.id
+            LEFT JOIN  assessment             a   ON sb.assessment_id = a.id AND a.deleted_at IS NULL
+            LEFT JOIN  rubric_group_usage     rgu ON rgu.rubric_group_id = rg.id AND rgu.submission_box_id = sb.id
+            WHERE rg.parent_type = :parentType
+            AND rg.parent_id IN (:$in)
+            AND rc.deleted_at IS NULL
+            AND a.deleted_at IS NULL
+            AND rg.deleted_at IS NULL
+            ORDER BY sequence DESC
         ", $args);
 
-        return $criteriaStatement;
+        // Group result by criterion, and track which boxes use the criterion
+        $result = [];
+        while ($row = $criteriaStatement->fetch(PDO::FETCH_ASSOC)) {
+            $criterionId = (int)$row['crit_id'];
+            if (!isset($result[$criterionId])) {
+                $result[$criterionId] = $row;
+            }
+
+            $result[$criterionId]['box_ids'][] = (int)$row['box_id'];
+        }
+        $criteriaStatement->closeCursor();
+
+        // Add these fields in post-processing:
+        // * selected: is this criterion used by $box?
+        // * usages:   how many boxes (including $box) use this criterion?
+        foreach ($result as $criterionId => $row) {
+            $result[$criterionId]['selected'] = \in_array($box->getId(), $row['box_ids'], true);
+            $result[$criterionId]['usages']   = \count($row['box_ids']);
+        }
+
+        return $result;
     }
 
     /**
