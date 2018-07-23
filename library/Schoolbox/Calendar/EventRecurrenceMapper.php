@@ -48,9 +48,6 @@ class EventRecurrenceMapper
     public function __construct($eventMapper)
     {
         $this->setEventMapper($eventMapper);
-
-        // silence!! but srsly, in this context, the event mapper needs to not raise notifications
-        $eventMapper->setEventPropagator(new MockPropagator());
     }
 
 
@@ -133,6 +130,10 @@ class EventRecurrenceMapper
          */
         $eventRecurrence = new EventRecurrence($this->getEventMapper(), $efficacy, $repeatSetting, $until, $startDate, $endDate);
 
+        // silence!! but srsly, in this context, the event mapper needs to not raise notifications
+        $eventPropagator = $this->eventMapper->getEventPropagator();
+        $this->eventMapper->setEventPropagator(new MockPropagator());
+
         if (is_numeric($event->getId())) {
             // pre-existing event
 
@@ -161,6 +162,7 @@ class EventRecurrenceMapper
         $action = $previous ? Schoolbox\Mapper::METHOD_UPDATE : Schoolbox\Mapper::METHOD_CREATE;
 
         // generate the notification on behalf of the EventMapper that was suppressed
+        $this->eventMapper->setEventPropagator($eventPropagator);
         $this->raiseNotification($event, $action, $previous);
     }
 
