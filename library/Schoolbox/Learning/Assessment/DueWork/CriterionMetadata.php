@@ -86,6 +86,10 @@ class CriterionMetadata {
         $this->metadata = $this->metadata + $this->generateDescriptorMetadata();
     }
 
+    /**
+     * Returns an array of level ID => metadata for the level descriptor
+     * @return array
+     */
     private function generateDescriptorMetadata() : array
     {
         $meta = [];
@@ -209,6 +213,9 @@ class CriterionMetadata {
         return $this->direction;
     }
 
+    /**
+     * @return array
+     */
     public function getMetadata() : array
     {
         return $this->metadata;
