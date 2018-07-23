@@ -288,6 +288,7 @@ function createHomepageNewsAudience(IDatabase $db, int $oldId, int $articleId)
     }
 }
 
+
 $kernel = new Schoolbox\Application\Daemon\Kernel('Migrate elderly School News to Comms', [
     'verbose' => [false, false, false],
     'errors'  => E_ALL,
@@ -296,6 +297,6 @@ $kernel = new Schoolbox\Application\Daemon\Kernel('Migrate elderly School News t
 $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
     $db = Database::getInstance();
 
-//    importSchoolNews($db);
+    importSchoolNews($db);
     importHomepageNews($db);
 });
