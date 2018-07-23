@@ -12,11 +12,13 @@ use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
 use InvalidArgumentException;
 use Schoolbox\Application\Exception\Exception;
+use Schoolbox\Collection;
 use Schoolbox\Comms\News\Policy;
 use Schoolbox\Comms\News\SaveForLater;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\News\Topic;
 use Schoolbox\News\TopicMapper;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
@@ -76,6 +78,8 @@ class Controller extends Base
     /**
      * Provide form to create a news article
      *
+     * @api GET /comms/news/create
+     *
      * @throws MapperException
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \UnexpectedValueException
@@ -128,6 +132,8 @@ class Controller extends Base
     /**
      * Create a news article
      *
+     * @api POST /comms/news/create
+     *
      * @throws MapperException
      * @throws \Aura\Router\Exception\RouteNotFound
      * @throws \PDOException
@@ -147,6 +153,8 @@ class Controller extends Base
 
     /**
      * Provide form to update a news article
+     *
+     * @api GET /comms/news/{articleId}/update
      *
      * @param Model $article
      * @throws MapperException
@@ -193,6 +201,8 @@ class Controller extends Base
 
     /**
      * Update a news article
+     *
+     * @api POST /comms/news/{articleId}
      *
      * @param Model $article
      * @throws \Schoolbox\Mapper\Exception
@@ -241,8 +251,7 @@ class Controller extends Base
             }
 
             return;
-        }
-        catch (MapperException|RouteNotFound|\PDOException|\UnexpectedValueException|\Schoolbox\Resource\Exception $e) {
+        } catch (MapperException|RouteNotFound|\PDOException|\UnexpectedValueException|\Schoolbox\Resource\Exception $e) {
             if ($this->getRequest()->isXhr()) {
                 $this->getResponse()->status->set(400);
                 $this->getResponse()->content->set($this->buildJsonOutput([
@@ -311,6 +320,8 @@ class Controller extends Base
 
     /**
      * Get a list of available news topics that can be assigned to an article
+     *
+     * @api GET /comms/news/topics
      */
     public function getTopics()
     {
@@ -320,6 +331,8 @@ class Controller extends Base
 
     /**
      * Load a news article so you can read its contents (the detail screen)
+     *
+     * @api GET /comms/news/{articleId}
      *
      * @param Model $article
      * @throws MapperException
@@ -336,7 +349,7 @@ class Controller extends Base
 
         /* Figure out if this was Saved For Later for the current user
          */
-        $saveForLater = $policies->getOffset('save_for_later')->getValue();
+        $saveForLater    = $policies->getOffset('save_for_later')->getValue();
         $isSavedForLater = false;
 
         if ($saveForLater) {
@@ -369,6 +382,8 @@ class Controller extends Base
 
     /**
      * Delete an article
+     *
+     * @api POST /comms/news/{articleId}/delete
      *
      * @param Model $article
      * @throws MapperException
@@ -449,23 +464,143 @@ class Controller extends Base
 
     /**
      * Get a list of articles that were audienced to me
+     * This is the central piece of the puzzle
      *
      * TODO: Incomplete
      *
-     * @param int $topicId
-     * @param int $limit
+     * @api GET /comms/news/list
+     *
+     * @throws RouteNotFound
      * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \OutOfRangeException
      */
-    public function getListByTopic(int $topicId, int $limit)
+    public function getListByTopic()
     {
         if ($this->getRequest()->isXhr()) {
-            $lists = new Lists($this->newsMapper, $this->policyMapper, $this->saveForLaterMapper);
+            $params = new Querystring($this->getConfigLoader()->get('search_type_limit'), $this->getRequest()->query);
+            $topics = $this->topicMapper->findAll();
 
-            $outcome = $lists->findForTopic($this->getUser(), $topicId, $limit);
+            /* The requested data set to load, given the params provided
+             */
+            $outcome = $this->generatePartial($params, $topics, $params->getShowPaginator());
+            $content = $this->buildUnthemedHtmlOutput('@commsNews/list.twig', $outcome)->getAsString();
 
-            $outcome['compactMode'] = $this->getRequest()->query['compactMode'];
-
-            $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@commsNewsDashboard/list.twig', $outcome));
+            $this->getResponse()->content->set($this->buildJsonOutput([
+                'success' => true,
+                'title' => $this->getDi()->get('l10n')->translate('news', false, true),
+                'url' => $outcome['currentUrl'],
+                'fragment' => $content
+            ]));
         }
+    }
+
+
+    /**
+     * Get a list of articles audienced to you
+     *
+     * @api GET /comms/news
+     *
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws RouteNotFound
+     * @throws \OutOfRangeException
+     */
+    public function getIndex()
+    {
+        /* This is always on in this News Index context
+         * If you visit comms/news, the querystring param is empty so you have to forcibly set it to true
+         */
+        $showPaginator = true;
+
+        $params = new Querystring($this->getConfigLoader()->get('search_type_limit'), $this->getRequest()->query);
+        $topics = $this->topicMapper->findAll();
+
+        /* The initial data set to load, given the params provided
+         * Compact Mode is hardcoded to be disabled from this context
+         * ShowPaginator is always true in this context
+         */
+        $outcome = $this->generatePartial($params, $topics,$showPaginator);
+        $content = $this->buildUnthemedHtmlOutput('@commsNews/list.twig', $outcome)->getAsString();
+
+        /* Merge a whole bunch of other settings too
+         * Specifically applies to the index page which loads slightly differently than component variant
+         */
+        $data = [
+            'initialContent' => $content,
+            'topics' => $topics,
+            'topicAll' => Mapper::TOPIC_ALL_SLUG,
+            'showPaginator' => $showPaginator,
+            'slug' => $params->getSlug()
+        ];
+
+        $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/index.twig', $data));
+    }
+
+
+    /**
+     * Generate a partial fragment containing articles
+     * Used in both synchronous and asynchronous requests
+     *
+     * @param Querystring         $params
+     * @param Collection|Topic[]  $topics
+     * @param bool                $showPaginator
+     * @return array
+     * @throws RouteNotFound
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \OutOfRangeException
+     */
+    private function generatePartial(Querystring $params, Collection $topics, bool $showPaginator): array
+    {
+        $lists = new Lists($this->newsMapper, $this->policyMapper, $this->saveForLaterMapper);
+
+        /* News Topics were never obtainable by slug
+         * We always fetched everything, then manually sorted by slug
+         * Inherit this situation, improvise and adapt (or just use ids...)
+         */
+        $topicId = $this->determineSelectedTopicId($topics, $params->getSlug());
+
+        /* Get this an accompanying paginator
+         */
+        $url = $this->getRouter()->generate('commsNews.getIndex') . "?{$params}";
+
+        $paginator = $lists->generatePaginator($url, $topicId, $params->getLimit());
+
+        $outcome = $lists->findForTopic($this->getUser(), $topicId, $params->getLimit(), $params->getPageNum());
+
+        /* Always provide paginator from this context
+         */
+        $outcome = array_merge($outcome, [
+            'currentUrl' => $url,
+            'paginator' => $paginator,
+            'showPaginator' => $showPaginator,
+            'compactMode' => $params->getCompactMode(),
+            'pageNum' => $params->getPageNum()
+        ]);
+
+        return $outcome;
+    }
+
+    /**
+     * From a slug, figure out what topic matches it
+     *
+     * By default, select the All tab...
+     * but try to find the topic whose slug matches the url param
+     *
+     * @param Collection  $topics
+     * @param null|string $slug
+     * @return int
+     */
+    private function determineSelectedTopicId(Collection $topics, ?string $slug): int
+    {
+        $selectedTopicId = Mapper::TOPIC_ALL_ID;
+
+        foreach ($topics as $topic) {
+            if ($topic->getSlug() === $slug) {
+                return $topic->getId();
+            }
+        }
+
+        return $selectedTopicId;
     }
 }

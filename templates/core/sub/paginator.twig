@@ -1,3 +1,12 @@
+{##
+ # Paginator
+ #
+ # Builds a paginator that displays when there are meaningful options
+ #
+ # @param UrlPaginator paginator
+ # @param string class
+ # @param int page
+ #}
 {% if paginator.pageCount > 1 %}
     <ul class="pagination {{ class }}">
         {# back/forward page links #}
@@ -7,7 +16,7 @@
                {% if page == 1 %}disabled{% endif %} >«</a></li>
         <li class="arrow {% if page == 1 %}unavailable{% endif %}">
             <a href="{{ paginator.urlForPage(max(page-1, 1)) }}"
-               title="Next Page"
+               title="Previous Page"
                {% if page == 1 %}disabled{% endif %}>‹</a></li>
         {% for currentPage, url in paginator.pageUrls %}
             <li{% if currentPage == page %} class="active"{% endif %}>
@@ -16,7 +25,7 @@
         {% endfor %}
         <li class="arrow {% if page == paginator.pageCount %}unavailable{% endif %}">
             <a href="{{ paginator.urlForPage(min(page+1, paginator.pageCount)) }}"
-               title="Previous Page"
+               title="Next Page"
                {% if page == paginator.pageCount %}disabled{% endif %}>›</a></li>
         <li class="arrow {% if page == paginator.pageCount %}unavailable{% endif %}">
             <a href="{{ paginator.urlForPage(paginator.pageCount) }}"

@@ -9,6 +9,9 @@
  *
  */
 
+// Temporary redirect to the new system
+$this->localRedir('/comms/news');
+
 use \Schoolbox\Permission\Access\UserAccess;
 use \Schoolbox\UserMapper;
 use \Schoolbox\Mapper\Exception;

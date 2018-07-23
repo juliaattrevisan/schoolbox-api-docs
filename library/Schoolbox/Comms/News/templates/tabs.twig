@@ -1,0 +1,40 @@
+{##
+ # A list of all the available Topics to chooze
+ # Sets up a container for async article loading
+ #
+ # @param string topicContainerId
+ # @param Collection|Topic[] topics
+ # @param int topicAll
+ # @param string slug
+ # @param int compactMode
+ # @param int limit
+ #}
+
+{% set params = [
+    'c=' ~ compactMode,
+    'page=1',
+    'l=' ~ limit,
+    'sp=' ~ showPaginator
+]|join('&')
+%}
+
+<dl class="tabs" data-tab="" id="{{ topicContainerId }}">
+
+    {# Select "All" by default if the component config is set #}
+    <dd {% if slug == 'all' or not slug %}class="active"{% endif %}>
+        <a href="{{ routeLookup('commsNews.getListByTopic') ~ '?' ~ params ~ '&topic=' ~ topicAll }}">All</a>
+    </dd>
+
+    {% for topic in topics %}
+        {% if topic.getSlug == slug %}
+            {% set selected = 'class="active"' %}
+        {% else %}
+            {% set selected = '' %}
+        {% endif %}
+
+        <dd {{ selected|purify }}>
+            <a href="{{ routeLookup('commsNews.getListByTopic') ~ '?' ~ params ~ '&topic=' ~ topic.getSlug }}">{{ topic.name }}</a>
+        </dd>
+    {% endfor %}
+</dl>
+

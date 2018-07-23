@@ -12,6 +12,8 @@
 
 namespace Schoolbox\Comms\News;
 
+use Alaress\Paginator\Paginator;
+use Alaress\Paginator\UrlPaginator;
 use Schoolbox\User;
 
 class Lists
@@ -51,23 +53,21 @@ class Lists
      * @param User $user
      * @param int  $topicId
      * @param int  $limit
+     * @param int  $pageNum
      * @return array
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      */
-    public function findForTopic(User $user, int $topicId, int $limit): array
+    public function findForTopic(User $user, int $topicId, int $limit, int $pageNum): array
     {
-        /* Figure out which ones were saved for later
-         */
         $policies = $this->policyMapper->findAll()->indexBy('identifier');
-        $policy = $policies->getOffset('save_for_later');
 
         /* Component config can set "All" as its limit
          */
-        $articles = $this->newsMapper->findForTopic($topicId, $limit);
+        $articles = $this->newsMapper->findForTopic($topicId, $limit, $pageNum);
 
         /* Figure out the articles that this user has saved for later
          */
-        $savedArticleIds = $this->findSavedArticles($user, $policy);
+        $savedArticleIds = $this->findSavedArticles($user, $policies->getOffset('save_for_later'));
 
         /* TODO: Increment Impressions count for everything in $articles
          */
@@ -77,7 +77,7 @@ class Lists
         return [
             'articles' => $articles,
             'readMore' => $policies->getOffset('read_more')->getValue(),
-            'saveForLater' => $policy->getValue(),
+            'saveForLater' => $policies->getOffset('save_for_later')->getValue(),
             'savedArticleIds' => $savedArticleIds,
             'unsaved' => SaveForLater\Mapper::UNSAVED
         ];
@@ -101,5 +101,37 @@ class Lists
         }
 
         return [];
+    }
+
+
+    /**
+     * Generate a standard paginator to go with your article list
+     *
+     * @param string $url
+     * @param int    $selectedTopicId
+     * @param int    $limit
+     * @return UrlPaginator|null
+     * @throws \OutOfRangeException
+     */
+    public function generatePaginator(string $url, int $selectedTopicId, int $limit): ?UrlPaginator
+    {
+        /* No limit specified; no pagination required
+         */
+        if (!$limit) {
+            return null;
+        }
+
+        $allArticles = $this->newsMapper->findArticleIdsForTopic($selectedTopicId);
+
+        $paginator = (new Paginator())
+            ->setPageSize($limit)
+            ->setTotal(\count($allArticles));
+
+        $urlPaginator = (new UrlPaginator())
+            ->setPaginator($paginator)
+            ->setUrl($url)
+            ->setParam(Querystring::PAGE_NUMBER_PARAM);
+
+        return $urlPaginator;
     }
 }

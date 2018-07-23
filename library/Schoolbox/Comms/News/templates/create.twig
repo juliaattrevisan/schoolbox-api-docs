@@ -41,28 +41,19 @@
     });
 </script>
 
-<div class="actions-small-1 row">
-    <div class="list-item">
-        <div class="small-12 column">
-            <h1>{{ action|capitalize }} {{ locale.news }} {{ indicator.render(article) }}</h1>
-            <ul class="meta">
-                {% if article.acceptedBy.id %}
-                    <li class="icon-staff">Last moderated by {{ article.acceptedBy.fullname }}
-                        {% if article.isAccepted %}
-                            on {{ article.acceptedAt.local }}
-                        {% endif %}
-                    </li>
-                {% endif %}
-            </ul>
-        </div>
+<div class="row">
+    <div class="small-12 columns">
+        <h1>{{ action|capitalize }} {{ locale.news }} {{ indicator.render(article) }}</h1>
+        <ul class="meta">
+            {% if article.acceptedBy.id %}
+                <li class="icon-staff">Last moderated by {{ article.acceptedBy.fullname }}
+                    {% if article.isAccepted %}
+                        on {{ article.acceptedAt.local }}
+                    {% endif %}
+                </li>
+            {% endif %}
+        </ul>
     </div>
-    <nav>
-        {% set moderationListRoute = routeLookupIfAuthorized('commsNewsModeration.getList') %}
-
-        {% if moderationListRoute %}
-            <a class="icon-list" href="{{ moderationListRoute }}" title="Moderation List"></a>
-        {% endif %}
-    </nav>
 </div>
 
 

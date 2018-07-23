@@ -25,9 +25,15 @@ class Mapper extends \Schoolbox\Mapper
 {
 
     /**
-     * This const represents "all topics"
+     * This const represents "all topics", as an int id
      */
-    public const TOPIC_ALL = 0;
+    public const TOPIC_ALL_ID = 0;
+
+    /**
+     * This const represents "all topics", as a slug
+     */
+    public const TOPIC_ALL_SLUG = 'all';
+
 
     /**
      * @inheritdoc
@@ -180,9 +186,36 @@ class Mapper extends \Schoolbox\Mapper
      *
      * @param int $topicId
      * @param int $limit
+     * @param int $pageNum
      * @return \Schoolbox\GenericCollection
      */
-    public function findForTopic(int $topicId, int $limit): \Schoolbox\GenericCollection
+    public function findForTopic(int $topicId, int $limit, int $pageNum): \Schoolbox\GenericCollection
+    {
+
+        /* TODO: Filter $articlesInTopic vs articles that I can see
+         */
+
+        return $this->findByColumn('id', $this->findArticleIdsForTopic($topicId, $limit, $pageNum), [
+            'order' => [
+                'publish_at' => 'desc',
+                'created_at' => 'desc',
+            ]
+        ]);
+    }
+
+
+    /**
+     * Find just the ids for the articles in a topic
+     * We generally use this for pagination counts where we need a count instead of hydrated things
+     *
+     * Pass null as $limit to disable it; beware the n-n join on articles-topics
+     *
+     * @param int      $topicId
+     * @param int      $limit
+     * @param int      $pageNum
+     * @return array
+     */
+    public function findArticleIdsForTopic(int $topicId, int $limit = 0, int $pageNum = 0): array
     {
         $articlesInTopic = [];
 
@@ -198,7 +231,7 @@ class Mapper extends \Schoolbox\Mapper
             ORDER BY publish_at DESC, created_at DESC
         ";
 
-        if ($topicId !== self::TOPIC_ALL) {
+        if ($topicId !== self::TOPIC_ALL_ID) {
             $query = "
                 SELECT id
                 FROM {$this->table}
@@ -214,18 +247,26 @@ class Mapper extends \Schoolbox\Mapper
 
         if ($limit) {
             $query .= 'LIMIT :limit';
+
+            if ($pageNum) {
+                $query .= ' OFFSET :offset';
+            }
         }
 
         $statement = $this->database->prepare($query);
 
         /* Because pdo does some micky mouse shenanigans
          */
-        if ($topicId !== self::TOPIC_ALL) {
+        if ($topicId !== self::TOPIC_ALL_ID) {
             $statement->bindValue('topicId', $topicId, \PDO::PARAM_INT);
         }
 
         if ($limit) {
             $statement->bindValue('limit', $limit, \PDO::PARAM_INT);
+
+            if ($pageNum) {
+                $statement->bindValue('offset', $limit*($pageNum-1), \PDO::PARAM_INT);
+            }
         }
 
         $statement->execute();
@@ -237,11 +278,6 @@ class Mapper extends \Schoolbox\Mapper
         /* TODO: Filter $articlesInTopic vs articles that I can see
          */
 
-        return $this->findByColumn('id', $articlesInTopic, [
-            'order' => [
-                'publish_at' => 'desc',
-                'created_at' => 'desc',
-            ]
-        ]);
+        return $articlesInTopic;
     }
 }

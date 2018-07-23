@@ -4,15 +4,15 @@
 {# TODO: How to do breadcrumbs now? #}
 {% if isCommsOfficer %}
     {{ bread.crumbs(
-        [ locale.news.proper, '/news' ],
+        [ locale.news.proper, routeLookup('commsNews.getIndex') ],
         [ 'Moderation', routeLookup('commsNewsModeration.getList') ],
         [ article.title ]
     ) }}
 {% else %}
-{{ bread.crumbs(
-    [ locale.news.proper, '/news' ],
-    [ article.title ]
-) }}
+    {{ bread.crumbs(
+        [ locale.news.proper, routeLookup('commsNews.getIndex') ],
+        [ article.title ]
+    ) }}
 {% endif %}
 
 
@@ -26,10 +26,8 @@
                 {# Topics #}
                 {% if article.topics|length %}
                     <li class="icon-news">Related Topics:
-
-                        {# TODO: Have a /news/topic url lol #}
                         {% for topic in article.topics %}
-                            <a href="/news/topic/{{ topic.slug }}">{{ topic.name }}</a>{% if not loop.last %},{% endif %}
+                            <a href="{{ routeLookup('commsNews.getIndex') }}?topic={{ topic.slug }}" title="More {{ locale.news }} in {{ topic.name }}">{{ topic.name }}</a>{% if not loop.last %}, {% endif %}
                         {% endfor %}
                     </li>
                 {% endif %}

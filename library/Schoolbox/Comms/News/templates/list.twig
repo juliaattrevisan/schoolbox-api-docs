@@ -12,6 +12,11 @@
 {% spaceless %}
     {% set pacified = article.blurb|striptags %}
 
+    {# If the blurb was nonexistent, assume some body content instead #}
+    {% if pacified|length == 0 %}
+        {% set pacified = article.body|striptags %}
+    {% endif %}
+
     {# Maximum length chars #}
     {% set max = 300 %}
 
@@ -40,6 +45,7 @@
  # @param array|int[] savedArticleIds
  # @param int unsaved
  # @param int compactMode
+ # @param bool showPaginator
  #}
 {% if articles|length %}
 <ul class="information-list">
@@ -47,13 +53,14 @@
         <li class="actions-small-1">
             <div class="list-item">
                 <div class="small-12 card">
-                    <a href="{{ routeLookup('commsNews.getDetail', {articleId: article.id}) }}">
-                        {% if article.featureImage.hash %}
-                        <img src="/storage/image.php?hash={{ article.featureImage.hash }}&size=square64">
-                        {% endif %}
 
-                        <h3>{{ article.title }}</h3>
-                    </a>
+                    {% if article.featureImage.hash %}
+                        <a href="{{ routeLookup('commsNews.getDetail', {articleId: article.id}) }}">
+                            <img src="/storage/image.php?hash={{ article.featureImage.hash }}&size=square64">
+                        </a>
+                    {% endif %}
+
+                    <h3><a href="{{ routeLookup('commsNews.getDetail', {articleId: article.id}) }}">{{ article.title }}</a></h3>
 
                     <p class="meta">Published by
                         {% if article.author.deletedAt.isNull %}
@@ -64,11 +71,10 @@
                         <time title="{{ article.publishAt.local }}">{{ article.publishAt.relativeTime }}</time>
                     </p>
 
-                    {# TODO: Have a /news/topic url lol #}
                     {% if article.topics|length %}
                         <p class="meta">Related topics:
                             {% for topic in article.topics %}
-                                <a href="/news/topic/{{ topic.slug }}">{{ topic.name }}</a>{% if not loop.last %}, {% endif %}
+                                <a href="{{ routeLookup('commsNews.getIndex') }}?topic={{ topic.slug }}" title="More {{ locale.news }} in {{ topic.name }}">{{ topic.name }}</a>{% if not loop.last %}, {% endif %}
                             {% endfor %}
                         </p>
                     {% endif %}
@@ -81,10 +87,12 @@
                     {% set state = unsaved %}
                 {% endif %}
 
-                {# Check that you can save this for later #}
+                {# Check that you can save this for later
+                 # You must have access to the route and the policy must be enabled
+                 #}
                 {% set saveForLaterRoute = routeLookup('commsNewsSaveForLater.postToggle', {articleId: article.id}) %}
 
-                {% if saveForLaterRoute %}
+                {% if saveForLaterRoute and saveForLater %}
                 <a data-saveforlater="{{ state }}" href="{{ saveForLaterRoute }}"></a>
                 {% endif %}
             </nav>
@@ -100,8 +108,16 @@
         </li>
     {% endfor %}
 </ul>
+
+{% if showPaginator %}
+    {% include 'sub/paginator.twig' with {
+        paginator: paginator,
+        page: pageNum
+    } %}
+{% endif %}
+
 {% else %}
-    <div class="empty-state">
+    <div class="empty-state no-margin">
         <i class="icon-news"></i>
         <p>There aren't any {{ locale.news }} articles in this topic.</p>
     </div>

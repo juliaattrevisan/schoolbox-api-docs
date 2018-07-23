@@ -13,14 +13,19 @@
 
         var config = init(options, $(this));
 
-        /* Only work when url is provided
+        /* Only work initially when url is provided
+         * Otherwise, it must load upon topic change
          */
-        if (config.firstUrl.length) {
-            getArticles(config.firstUrl);
-            initListeners();
-
-            $(config.element).saveForLater().initAsync();
+        if (config.selectedUrl.length) {
+            getArticles(config.selectedUrl);
         }
+
+        /* Set everything else up as normal
+         */
+        initListeners();
+
+        $(config.element).saveForLater().initAsync();
+
 
         /**
          * Init
@@ -37,13 +42,31 @@
                  */
                 topicTabs: $(element).parents('[data-component]').find('[data-tab]'),
 
-                /* Load this data upon start
+                /* Asynchronously load this data upon start
+                 * If empty, it'll do nothing until you change topics
                  */
-                firstUrl: '',
+                selectedUrl: '',
 
                 /* Return in compact mode or normal mode
                  */
-                compactMode: false
+                compactMode: false,
+
+                /* Update the url upon tab change
+                 * The url comes from backend, telling you the url of the topic requested
+                 */
+                updateUrl: false,
+
+                /* Show paginator
+                 */
+                showPaginator: false,
+
+                /* The current page number
+                 */
+                pageNum: -1,
+
+                /* The current limit
+                 */
+                limit: null
             };
 
             return $.extend(defaults, options);
@@ -62,15 +85,18 @@
             $.ajax({
                 type: 'GET',
                 url: url,
-                dataType: 'html'
+                dataType: 'json'
             }).success(function (response) {
 
                 /* Note that we don't need to reapply initSaveForLaterActions() again
                  */
-                $(config.element).html(response).saveForLater();
+                $(config.element).html(response.fragment).saveForLater();
 
-                /* TODO: Cache the response so we don't need to refetch it
+                /* Update the url if desired
                  */
+                if (config.updateUrl) {
+                    window.history.pushState('', response.title, response.url);
+                }
 
             }).error(function (response) {
             });
@@ -85,6 +111,8 @@
 
                 $(config.element).html('<div class="loader"></div>');
 
+                /* Reload article list afresh
+                 */
                 getArticles($(this).attr('href'));
             });
         }
