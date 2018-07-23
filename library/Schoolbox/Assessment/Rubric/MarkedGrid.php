@@ -8,7 +8,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric;
 
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Mark;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IFeedback;
 
@@ -38,7 +37,7 @@ class MarkedGrid
 
 
     /**
-     * @var GenericCollection|Mark[]
+     * @var GenericCollection|DescriptorMark[]
      */
     private $marks;
 
@@ -53,7 +52,7 @@ class MarkedGrid
     {
         $this->feedback = $feedback;
         $this->grid     = $grid;
-        $this->marks    = new GenericCollection(Mark::class);
+        $this->marks    = new GenericCollection(DescriptorMark::class);
     }
 
 
@@ -98,7 +97,7 @@ class MarkedGrid
 
 
     /**
-     * @return Mark[]|GenericCollection
+     * @return DescriptorMark[]|GenericCollection
      */
     public function getMarks(): GenericCollection
     {
@@ -107,7 +106,7 @@ class MarkedGrid
 
 
     /**
-     * @param Mark[]|GenericCollection $marks
+     * @param DescriptorMark[]|GenericCollection $marks
      * @return static
      */
     public function setMarks(GenericCollection $marks): self
