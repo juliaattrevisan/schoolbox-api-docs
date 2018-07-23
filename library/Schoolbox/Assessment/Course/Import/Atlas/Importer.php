@@ -204,7 +204,8 @@ class Importer
 
         // Import the units that were requested
         foreach ($curriculum->getUnits() as $unit) {
-            if (!empty($selectedUnits[$unit->getId()]['selected'])) {
+            $unitSelection = $selectedUnits[$unit->getId()] ?? [];
+            if (!empty($unitSelection['selected'])) {
                 // This unit was selected; create it
                 $unitSpec = $this->createUnit($unit, $courseSpec);
 
@@ -217,20 +218,34 @@ class Importer
 
                 // Import requested attachments
                 foreach ($unit->getAttachments() as $attachment) {
-                    // Is this attachment private?
-                    // What kind of attachment is it?
-                    $this->createAttachment($attachment, $unitSpec->getFolder());
+                    $attachmentSelection = $unitSelection['attachment'][$attachment->getId()] ?? [];
+                    if (!empty($attachmentSelection['selected'])) {
+                        $this->createAttachment(
+                            $attachment,
+                            $unitSpec->getFolder(),
+                            !empty($attachmentSelection['private'])
+                        );
+                    } else {
+                        // This attachment wasn't selected; delete it
+                        // TODO implement attachment deletion
+                    }
                 }
 
 
                 // Import requested assessments
                 foreach ($unit->getAssessments() as $assessment) {
-                    $this->createDueWork($assessment, $unitSpec, $unitSpecNode, $standardsNode);
+                    $assessmentSelection = $unitSelection['assessment'][$assessment->getId()] ?? [];
+                    if (!empty($assessmentSelection['selected'])) {
+                        $this->createDueWork($assessment, $unitSpec, $unitSpecNode, $standardsNode);
+                    } else {
+                        // This assessment wasn't selected; delete it
+                        // TODO implement assessment deletion
+                    }
                 }
 
             } else {
                 // This unit wasn't selected; delete it
-                // TODO implement deletion
+                // TODO implement unit deletion
             }
         }
     }
@@ -414,9 +429,10 @@ class Importer
      *
      * @param Api\Attachment $attachment
      * @param Folder         $folder
+     * @param bool           $private
      * @return void Don't need to return what was attached?
      */
-    private function createAttachment(Api\Attachment $attachment, Folder $folder): void
+    private function createAttachment(Api\Attachment $attachment, Folder $folder, bool $private): void
     {
         // TODO did I pass the attachment as private?
         // How to create the item?
