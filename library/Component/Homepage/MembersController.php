@@ -154,7 +154,7 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
 
             // Get admin
             $userAccessMapper = new UserAccessMapper();
-            $admin            = $userAccessMapper->findAdminsInCategory($this->getContext())->first();
+            $admins           = $userAccessMapper->findAdminsInCategory($this->getContext());
 
             $emailObj = new Email();
             $emailall = [];
@@ -181,9 +181,14 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
 
                         $name = $user->getFullName();
 
-                        if ($admin !== null && $user->getId() === $admin->getId()) {
-                            $name .= " (Group Admin)";
+                        if(count($admins)){
+                            foreach($admins as $admin) {
+                                if ($user->getId() === $admin->getId()) {
+                                    $name .= " (Group Admin)";
+                                }
+                            }
                         }
+
 
                         $this->setVar(
                             [
