@@ -25,7 +25,7 @@ use Schoolbox\Learning\Assessment\IAssessable;
  * The grid's descriptors are able to be inferred from the grid's level set and
  * group usage set.
  */
-class RubricGrid
+class Grid
 {
     /**
      * The assessment for which the grid exists.
