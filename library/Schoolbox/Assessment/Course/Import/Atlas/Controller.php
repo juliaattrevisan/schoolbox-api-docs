@@ -126,7 +126,7 @@ class Controller extends BaseController
         // Get the curriculum if possible
         try {
             $curriculumPlan = $this->apiBridge->getCurriculum($curriculumPlanId);
-        } catch (HttpException\RequestException $e) {
+        } catch (\Throwable $e) {
             $this->throwCurriculumPlanFetchError($e);
             return;
         }
@@ -159,7 +159,7 @@ class Controller extends BaseController
         // Get the curriculum if possible
         try {
             $curriculumPlan = $this->apiBridge->getCurriculum($curriculumPlanId);
-        } catch (HttpException\RequestException $e) {
+        } catch (\Throwable $e) {
             $this->throwCurriculumPlanFetchError($e);
             return;
         }
