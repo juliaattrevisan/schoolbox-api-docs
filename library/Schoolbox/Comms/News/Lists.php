@@ -50,6 +50,49 @@ class Lists
 
 
     /**
+     * A list of articles that $user can see for $topicId
+     *
+     * @param User $user
+     * @param int  $topicId
+     * @param int  $limit
+     * @param int  $pageNum
+     * @return \Schoolbox\GenericCollection
+     */
+    private function findArticlesForUser(User $user, int $topicId, int $limit, int $pageNum)
+    {
+        /* Component config can set "All" as its limit
+         */
+        $articleIds = $this->newsMapper->findArticleIdsForTopic($topicId, $limit, $pageNum);
+
+        /* TODO: Filter $articlesInTopic vs articles that I can see
+         */
+
+
+        /* Hydrate the objects
+         */
+        return $this->newsMapper->findByColumn('id', $articleIds, [
+            'order' => [
+                'publish_at' => 'desc',
+                'created_at' => 'desc',
+            ]
+        ]);
+    }
+
+    /**
+     * Find a list of articles that are somehow related to $topicId
+     *
+     * The list consists of articles that fulfil this criteria, which accounts for all the articles that are
+     * presentable to the audience:
+     *
+     *   - has a publish_at date
+     *   - has been accepted for publication by the moderator
+     *   - has not yet expired
+     *
+     * This equates to articles in the states "Awaiting Publication", "Published", "Expired" (Archived)
+     *
+     * The n-n relational between articles and topics precludes proper usage of findAll()
+     * with a limit - it doesn't count properly
+     *
      * @param User $user
      * @param int  $topicId
      * @param int  $limit
@@ -61,9 +104,9 @@ class Lists
     {
         $policies = $this->policyMapper->findAll()->indexBy('identifier');
 
-        /* Component config can set "All" as its limit
+        /* Articles that $user can see
          */
-        $articles = $this->newsMapper->findForTopic($topicId, $limit, $pageNum);
+        $articles = $this->findArticlesForUser($user, $topicId, $limit, $pageNum);
 
         /* Figure out the articles that this user has saved for later
          */
