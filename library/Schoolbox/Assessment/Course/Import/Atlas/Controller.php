@@ -7,31 +7,8 @@
 namespace Schoolbox\Assessment\Course\Import\Atlas;
 
 use Alaress\Web\Controller\Base as BaseController;
-use Schoolbox\Assessment\Component\SubmissionBox;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 use Schoolbox\Assessment\Course\Import\Atlas\Api;
-use Schoolbox\Assessment\Rubric\Competency\Level;
-use Schoolbox\Assessment\Rubric\Criteria\Criterion;
-use Schoolbox\Assessment\Rubric\Criteria\Group;
-use Schoolbox\Assessment\Rubric\Descriptor;
-use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
-use Schoolbox\Curriculum\Node\Model as Node;
-use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
-use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
-use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecMapper;
-use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpec;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecMapper;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpec;
-use Schoolbox\Learning\MarkScheme\Percentage;
-use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Permission\Access\Access;
-use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Permission\Access\UserAccessMapper;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Resource\Folder\Model as Folder;
-use Schoolbox\Resource\HomepageConfigMapper;
-use Schoolbox\Resource\HomepageTemplateMapper;
 
 class Controller extends BaseController
 {
@@ -138,8 +115,8 @@ class Controller extends BaseController
                 $this->buildUnthemedHtmlOutput('sub/mage-error.twig',
                     [
                         'error' => [
-                            'problem' => 'You must select a curriculum plan.'
-                        ]
+                            'problem' => 'You must select a curriculum plan.',
+                        ],
                     ]
                 )
             );

@@ -67,21 +67,11 @@ class Module extends \Alaress\Module\Module
             $injector->lazyNew(
                 Controller::class,
                 [
-                    'courseSpecMapper'       => $this->getMapperFactory()->getLazy(CourseSpecMapper::class),
-                    'unitSpecMapper'         => $this->getMapperFactory()->getLazy(UnitSpecMapper::class),
-                    'homepageConfigMapper'   => $this->getMapperFactory()->getLazy(HomepageConfigMapper::class),
-                    'homepageTemplateMapper' => $this->getMapperFactory()->getLazy(HomepageTemplateMapper::class),
-                    'folderMapper'           => $this->getMapperFactory()->getLazy(FolderMapper::class),
-                    'userAccessMapper'       => $this->getMapperFactory()->getLazy(UserAccessMapper::class),
-                    'rubricGroupMapper'      => $this->getMapperFactory()->getLazy(RubricGroupMapper::class),
-                    'rubricCriterionMapper'  => $this->getMapperFactory()->getLazy(RubricCriterionMapper::class),
-                    'nodeMapper'             => $this->getMapperFactory()->getLazy(NodeMapper::class),
-                    'assessmentDataSource'   => $injector->lazyGet('assessmentDataSource'),
-                    'access'                 => $injector->lazy(function () { return Access::getInstance(); }),
-                    'apiBridge'              => $injector->lazyNew(
+                    'courseSpecMapper' => $this->getMapperFactory()->getLazy(CourseSpecMapper::class),
+                    'apiBridge'        => $injector->lazyNew(
                         ApiBridge::class,
                         [
-                            'httpClient' => $injector->lazyNew(
+                            'httpClient'  => $injector->lazyNew(
                                 Client::class,
                                 [
                                     'config' => [
@@ -90,7 +80,7 @@ class Module extends \Alaress\Module\Module
                                             'Authorization' => 'Bearer ' . $this->getConfig()->get('rubicon_atlas_api_token'),
                                             'Accept'        => 'application/json',
                                         ],
-                                    ]
+                                    ],
                                 ]
                             ),
                             'redisClient' => $injector->lazyGet('redis'),
@@ -107,10 +97,10 @@ class Module extends \Alaress\Module\Module
                                     $decoder->register(new Api\AttachmentTransformer());
                                     return $decoder;
                                 }
-                            )
+                            ),
                         ]
                     ),
-                    'importer' => $injector->lazyNew(
+                    'importer'         => $injector->lazyNew(
                         Importer::class,
                         [
                             'currentUser'            => $injector->lazyGet('user'),
@@ -127,7 +117,7 @@ class Module extends \Alaress\Module\Module
                             'assessmentDataSource'   => $injector->lazyGet('assessmentDataSource'),
                             'nodeMapper'             => $this->getMapperFactory()->getLazy(NodeMapper::class),
                         ]
-                    )
+                    ),
                 ]
             )
         );
