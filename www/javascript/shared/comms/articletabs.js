@@ -98,6 +98,10 @@
 
                 // Show the component actions if the param is set and there's articles
                 if (config.componentActions && response.empty) {
+                    // Update href with the topic
+                    config.componentActions.find('[data-news-component-view-all]').attr('href', response.viewAllLink);
+
+                    // Show the action bar
                     config.componentActions.removeClass('hide');
                 }
 

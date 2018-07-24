@@ -486,12 +486,20 @@ class Controller extends Base
             $outcome = $this->generatePartial($params, $topics, $params->getShowPaginator());
             $content = $this->buildUnthemedHtmlOutput('@commsNews/list.twig', $outcome)->getAsString();
 
+            $selectedTopic = $topics->getBy('id', $outcome['topicId']);
+            $viewAllLink = $this->getRouteIfAuthorized('commsNews.getIndex');
+
+            if ($selectedTopic) {
+                $viewAllLink .= '?topic=' . $selectedTopic->getSlug();
+            }
+
             $this->getResponse()->content->set($this->buildJsonOutput([
                 'success' => true,
                 'title' => $this->getDi()->get('l10n')->translate('news', false, true),
                 'url' => $outcome['currentUrl'],
                 'fragment' => $content,
-                'empty' => ($outcome['articles'] ->count())
+                'empty' => ($outcome['articles'] ->count()),
+                'viewAllLink' => $viewAllLink
             ]));
         }
     }
@@ -576,7 +584,8 @@ class Controller extends Base
             'paginator' => $paginator,
             'showPaginator' => $showPaginator,
             'compactMode' => $params->getCompactMode(),
-            'pageNum' => $params->getPageNum()
+            'pageNum' => $params->getPageNum(),
+            'topicId' => $topicId
         ]);
 
         return $outcome;
