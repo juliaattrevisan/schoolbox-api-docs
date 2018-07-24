@@ -9,6 +9,7 @@ namespace Schoolbox\Assessment\Course\Import\Atlas;
 use Alaress\Web\Controller\Base as BaseController;
 use GuzzleHttp\Exception as HttpException;
 use Schoolbox\Assessment\Course\Import\Atlas\Api;
+use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecMapper;
 
 class Controller extends BaseController
@@ -55,7 +56,14 @@ class Controller extends BaseController
     public function getImport(): void
     {
         $this->response->content->set(
-            $this->buildHtmlOutput('@courseImportAtlas/import.twig', [], 'Atlas Import', 'course')
+            $this->buildHtmlOutput(
+                '@courseImportAtlas/import.twig',
+                [
+                    'returnUrl' => Redirect::decode($this->getRequest()->query->get(Redirect::RETURN_URL))
+                ],
+                'Atlas Import',
+                'course'
+            )
         );
     }
 

@@ -88,7 +88,7 @@
                                 <p class="alert alert-box icon-alert" data-mage-error></p>
                             </div>
                             <div class="small-12 medium-4 column">
-                                <input type="submit" name="part-2" value="Import these units" data-mage-next="part-3" data-mage-working="Importing...." />
+                                <input type="submit" name="part-2" value="Import these units" data-mage-next="none" data-mage-working="Importing...." />
                             </div>
                         </div>
                     </div>
@@ -145,6 +145,13 @@
                         unitMeta.slideDown();
                     }
                 });
+            }
+        });
+
+        // Last step: redirect whence I came
+        $('input[data-mage-next="none"]').mage({
+            onXhrDone: function () {
+                location.href = "{{ returnUrl }}" || "{{ routeLookup('course.courseList') }}";
             }
         });
 
