@@ -115,71 +115,8 @@ class Lists
 
 
     /**
-     * A list of articles that $user can see for $topicId. This wraps around the hyperdrive
-     * to abstract away some pagination details
-     *
-     * @param User $user
-     * @param int  $topicId
-     * @param int  $limit
-     * @param int  $pageNum
-     * @return array
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \InvalidArgumentException
-     * @throws \UnderflowException
-     * @throws \UnexpectedValueException
-     */
-    private function findArticlesForUser(User $user, int $topicId, int $limit, int $pageNum): array
-    {
-
-        /* Articles that $user can see
-         */
-        $articleIdsForUser = (new ArticleResolver(
-            new BusinessRules(),
-            $this->databaseInternal,
-            $this->userAccessMapper,
-            $this->folderMapper,
-            new RelationshipFilterer(
-                $this->databaseInternal,
-                $this->userMapper,
-                $this->externalUser,
-                $this->folderMapper,
-                $this->externalClass,
-                $this->userAccessMapper
-            ),
-            $this->externalUser
-        ))->findArticlesForUser($user);
-
-        /* Component config can set "All" as its limit, filtered to the list of articles that can be seen
-         */
-        $articleIds = $this->newsMapper->findArticleIdsForTopic($articleIdsForUser, $topicId, $limit, $pageNum);
-        $total = \count($this->newsMapper->findArticleIdsForTopic($articleIdsForUser, $topicId));
-
-        /* Acquire hydrated items, and reorder them in the order requested
-         */
-        $records = $this->newsMapper->findByColumn('id', $articleIds)->indexBy('id');
-
-        $articles = $this->newsMapper->createCollection();
-
-        foreach ($articleIds as $articleId) {
-            $record = $records->getOffset($articleId);
-
-            if (null !== $record) {
-                $articles->add($records->getOffset($articleId));
-            }
-        }
-
-        /* Hydrate the objects and hope for the best
-         * Include a total, because pagination
-         */
-        return [
-            'articles' => $articles,
-            'total' => $total
-        ];
-    }
-
-
-    /**
      * Find a list of articles that are somehow related to $topicId
+     * This wraps around the hyperdrive to abstract away some pagination details
      *
      * The list consists of articles that fulfil this criteria, which accounts for all the articles that are
      * presentable to the audience:
@@ -187,6 +124,7 @@ class Lists
      *   - has a publish_at date
      *   - has been accepted for publication by the moderator
      *   - has not yet expired
+     *   - has not been deleted
      *
      * This equates to articles in the states "Awaiting Publication", "Published", "Expired" (Archived)
      *
@@ -214,14 +152,45 @@ class Lists
          */
         $topicId = $this->determineSelectedTopicId($topics, $params->getSlug());
 
+        /* Articles that $user can see
+          */
+        $articleIdsForUser = (new ArticleResolver(
+            new BusinessRules(),
+            $this->databaseInternal,
+            $this->userAccessMapper,
+            $this->folderMapper,
+            new RelationshipFilterer(
+                $this->databaseInternal,
+                $this->userMapper,
+                $this->externalUser,
+                $this->folderMapper,
+                $this->externalClass,
+                $this->userAccessMapper
+            ),
+            $this->externalUser
+        ))->findArticlesForUser($user);
+
         /* Articles in $topicId that $user can see
+         * Component config can set "All" as its limit, filtered to the list of articles that can be seen
+         * Hydrate the objects and hope for the best; reorder them in the order requested
          */
-        $articleData = $this->findArticlesForUser($user, $topicId, $params->getLimit(), $params->getPageNum());
+        $articleIds = $this->newsMapper->findArticleIdsForTopic($articleIdsForUser, $topicId, $params->getLimit(), $params->getPageNum());
+        $records = $this->newsMapper->findByColumn('id', $articleIds)->indexBy('id');
+
+        $articles = $this->newsMapper->createCollection();
+
+        foreach ($articleIds as $articleId) {
+            $record = $records->getOffset($articleId);
+
+            if (null !== $record) {
+                $articles->add($records->getOffset($articleId));
+            }
+        }
 
         /* Get an accompanying paginator
          */
         $url = "{$urlPrefix}?{$params}";
-        $paginator = $this->generatePaginator($url, $params->getLimit(), $articleData['total']);
+        $paginator = $this->generatePaginator($url, $params->getLimit(), \count($this->newsMapper->findArticleIdsForTopic($articleIdsForUser, $topicId)));
 
         /* Figure out the articles that this user has saved for later
          */
@@ -233,7 +202,7 @@ class Lists
         /* These pieces are needed to represent an article, due to Save For Later
          */
         return [
-            'articles' => $articleData['articles'],
+            'articles' => $articles,
             'readMore' => $policies->getOffset('read_more')->getValue(),
             'saveForLater' => $policies->getOffset('save_for_later')->getValue(),
             'savedArticleIds' => $savedArticleIds,
