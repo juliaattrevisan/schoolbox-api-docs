@@ -67,6 +67,10 @@ class StudentCarousel
         $allPeople = [];
 
         foreach ($this->assessment->getAllParticipants() as $currentParticipant) {
+            // Skip, if excluded from the assessment
+            if ($currentParticipant->isExcluded()) {
+                continue;
+            }
 
             // CSS/label rules
             // TODO move CSS/label generation to participant class, and dedupe usages
