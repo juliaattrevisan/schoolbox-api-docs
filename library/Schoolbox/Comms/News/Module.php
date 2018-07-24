@@ -97,6 +97,10 @@ class Module extends BaseModule
          */
         $this->register('GET', '/list', 'getListByTopic', $viewPerms);
 
+        /* News Archive
+         */
+        $this->register('GET', '/archive{/year,month}', 'getArchive', $viewPerms);
+
         /* Index of articles audienced to you
          */
         $this->register('GET', '', 'getIndex', $viewPerms);

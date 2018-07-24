@@ -556,6 +556,12 @@ class Controller extends Base
     }
 
 
+    public function getArchive(int $year = null, string $month = null)
+    {
+        new \Alaress_Probe($year, $month);
+        die();
+    }
+
     /**
      * Get a list of articles audienced to you
      *
