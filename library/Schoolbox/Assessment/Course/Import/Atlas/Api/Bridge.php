@@ -73,7 +73,7 @@ class Bridge
      * @return Curriculum[]
      * @throws HttpException\ClientException for a 4xx error
      * @throws HttpException\ServerException for a 5xx error
-     * @throws HttpException\TransferException for all other request errors
+     * @throws HttpException\RequestException for all other request errors
      */
     public function getCurriculumList(): array
     {
@@ -98,7 +98,7 @@ class Bridge
      * @return Curriculum
      * @throws HttpException\ClientException for a 4xx error
      * @throws HttpException\ServerException for a 5xx error
-     * @throws HttpException\TransferException for all other request errors
+     * @throws HttpException\RequestException for all other request errors
      */
     public function getCurriculum(int $curriculumId): Curriculum
     {
@@ -176,7 +176,7 @@ class Bridge
      * @param array $requests
      * @param int   $currentPage
      * @return array
-     * @throws HttpException\TransferException if a HTTP request fails
+     * @throws HttpException\RequestException if a HTTP request fails
      */
     private function makeRequests(array $requests, $currentPage = 1): array
     {
