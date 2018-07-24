@@ -682,31 +682,33 @@
                                         </div>
                                     </div>
                                 </li>
-                                {% if group.owner %}
-                                <li class="actions-small-1">
-                                    <div class="list-item">
-                                        <div class="compact card small-12">
-                                            <a href="/search/user/{{ group.owner.id }}">
-                                                <img src="/portrait.php?userId={{ group.owner.externalId }}&amp;size=square64" />
-                                                <p>
-                                                    {{ group.owner.formatName }}
-                                                    <span class="pipe meta">
-                                                        {% if group.owner.positionTitle is empty %}
-                                                            {{ group.owner.role.name }}
-                                                        {% else %}
-                                                            {{ group.owner.positionTitle }}
-                                                        {% endif %}
-                                                    </span>
-                                                </p>
-                                            </a>
-                                        </div>
-                                    </div>
-                                    <nav>
-                                        {% if not group.owner.email is empty %}
-                                            <a class="icon-email" href="{{ session.mailhandle }}{{ group.owner.email }}" title="Email {{ group.owner.email }}"></a>
-                                        {% endif %}
-                                    </nav>
-                                </li>
+                                {% if group.owners %}
+                                    {% for owner in group.owners %}
+                                        <li class="actions-small-1">
+                                            <div class="list-item">
+                                                <div class="compact card small-12">
+                                                    <a href="/search/user/{{ owner.id }}">
+                                                        <img src="/portrait.php?userId={{ owner.externalId }}&amp;size=square64" />
+                                                        <p>
+                                                            {{ owner.formatName }}
+                                                            <span class="pipe meta">
+                                                                {% if owner.positionTitle is empty %}
+                                                                    {{ owner.role.name }}
+                                                                {% else %}
+                                                                    {{ owner.positionTitle }}
+                                                                {% endif %}
+                                                            </span>
+                                                        </p>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                            <nav>
+                                                {% if not owner.email is empty %}
+                                                    <a class="icon-email" href="{{ session.mailhandle }}{{ owner.email }}" title="Email {{ owner.email }}"></a>
+                                                {% endif %}
+                                            </nav>
+                                        </li>
+                                    {% endfor %}
                                 {% endif %}
                             </ul>
                             {% endfor %}

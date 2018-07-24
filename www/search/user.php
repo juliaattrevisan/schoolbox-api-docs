@@ -185,12 +185,14 @@ function renderStudent(
     foreach ($groups as &$group) {
         $group['perms'] = $groupHandler->getPermission($group['id']);
 
-        $owner = $groupHandler->getOwner($group['id']);
-        if (is_array($owner)) {
-            try {
-                $group['owner'] = $userMapper->findById($owner['uid']);
-            } catch (MapperException $e) {
-                $group['owner'] = $userMapper->getUnknownUser();
+        $owners = $groupHandler->getOwner($group['id']);
+        if (is_array($owners)) {
+            foreach ($owners as $owner) {
+                try {
+                    $group['owners'][] = $userMapper->findById($owner['uid']);
+                } catch (MapperException $e) {
+                    $group['owners'][] = $userMapper->getUnknownUser();
+                }
             }
         }
     }
