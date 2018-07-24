@@ -8,8 +8,11 @@
  */
 namespace Schoolbox\Comms\News;
 
+use Alaress\Database\Connector\IConnector;
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
+use External_Class;
+use External_User;
 use InvalidArgumentException;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Collection;
@@ -20,8 +23,11 @@ use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\News\Topic;
 use Schoolbox\News\TopicMapper;
+use Schoolbox\Permission\Access;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
+use Schoolbox\Resource\Folder;
+use Schoolbox\UserMapper;
 
 class Controller extends Base
 {
@@ -52,26 +58,77 @@ class Controller extends Base
     private $saveForLaterMapper;
 
     /**
+     * @var IConnector
+     */
+    private $databaseInternal;
+
+    /**
+     * @var Folder\Mapper
+     */
+    private $folderMapper;
+
+    /**
+     * @var Access\UserAccessMapper
+     */
+    private $userAccessMapper;
+
+    /**
+     * @var UserMapper
+     */
+    private $userMapper;
+
+    /**
+     * @var External_User
+     */
+    private $externalUser;
+
+    /**
+     * @var External_Class
+     */
+    private $externalClass;
+
+    /**
      * Controller constructor.
      *
-     * @param ErrorMapper         $errorMapper
-     * @param Mapper              $newsMapper
-     * @param Policy\Mapper       $policyMapper
-     * @param TopicMapper         $topicMapper
-     * @param SaveForLater\Mapper $saveForLaterMapper
+     * @param ErrorMapper             $errorMapper
+     * @param Mapper                  $newsMapper
+     * @param Policy\Mapper           $policyMapper
+     * @param TopicMapper             $topicMapper
+     * @param SaveForLater\Mapper     $saveForLaterMapper
+     * @param IConnector              $databaseInternal
+     * @param Folder\Mapper           $folderMapper
+     * @param Access\UserAccessMapper $userAccessMapper
+     * @param UserMapper              $userMapper
+     * @param External_User           $externalUser
+     * @param External_Class          $externalClass
      */
     public function __construct(
         ErrorMapper $errorMapper,
         Mapper $newsMapper,
         Policy\Mapper $policyMapper,
         TopicMapper $topicMapper,
-        SaveForLater\Mapper $saveForLaterMapper
+        SaveForLater\Mapper $saveForLaterMapper,
+        IConnector $databaseInternal,
+        Folder\Mapper $folderMapper,
+        Access\UserAccessMapper $userAccessMapper,
+        UserMapper $userMapper,
+        External_User $externalUser,
+        External_Class $externalClass
     ) {
         $this->errorMapper = $errorMapper;
         $this->newsMapper = $newsMapper;
         $this->policyMapper = $policyMapper;
         $this->topicMapper = $topicMapper;
         $this->saveForLaterMapper = $saveForLaterMapper;
+
+        /* Hyperdrive injection
+         */
+        $this->databaseInternal = $databaseInternal;
+        $this->folderMapper = $folderMapper;
+        $this->userAccessMapper = $userAccessMapper;
+        $this->userMapper = $userMapper;
+        $this->externalUser = $externalUser;
+        $this->externalClass = $externalClass;
     }
 
 
@@ -470,10 +527,13 @@ class Controller extends Base
      *
      * @api GET /comms/news/list
      *
+     * @throws InvalidArgumentException
      * @throws RouteNotFound
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \OutOfRangeException
+     * @throws \UnderflowException
+     * @throws \UnexpectedValueException
      */
     public function getListByTopic()
     {
@@ -503,10 +563,13 @@ class Controller extends Base
      *
      * @api GET /comms/news
      *
+     * @throws InvalidArgumentException
+     * @throws RouteNotFound
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Aura\Di\Exception\ServiceNotFound
-     * @throws RouteNotFound
      * @throws \OutOfRangeException
+     * @throws \UnderflowException
+     * @throws \UnexpectedValueException
      */
     public function getIndex()
     {
@@ -544,17 +607,30 @@ class Controller extends Base
      * Generate a partial fragment containing articles
      * Used in both synchronous and asynchronous requests
      *
-     * @param Querystring         $params
-     * @param Collection|Topic[]  $topics
-     * @param bool                $showPaginator
+     * @param Querystring        $params
+     * @param Collection|Topic[] $topics
+     * @param bool               $showPaginator
      * @return array
+     * @throws InvalidArgumentException
      * @throws RouteNotFound
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \OutOfRangeException
+     * @throws \UnderflowException
+     * @throws \UnexpectedValueException
      */
     private function generatePartial(Querystring $params, Collection $topics, bool $showPaginator): array
     {
-        $lists = new Lists($this->newsMapper, $this->policyMapper, $this->saveForLaterMapper);
+        $lists = new Lists(
+            $this->newsMapper,
+            $this->policyMapper,
+            $this->saveForLaterMapper,
+            $this->databaseInternal,
+            $this->folderMapper,
+            $this->userAccessMapper,
+            $this->userMapper,
+            $this->externalUser,
+            $this->externalClass
+        );
 
         /* News Topics were never obtainable by slug
          * We always fetched everything, then manually sorted by slug
@@ -562,19 +638,11 @@ class Controller extends Base
          */
         $topicId = $this->determineSelectedTopicId($topics, $params->getSlug());
 
-        /* Get this an accompanying paginator
-         */
-        $url = $this->getRouter()->generate('commsNews.getIndex') . "?{$params}";
-
-        $paginator = $lists->generatePaginator($url, $topicId, $params->getLimit());
-
-        $outcome = $lists->findForTopic($this->getUser(), $topicId, $params->getLimit(), $params->getPageNum());
+        $outcome = $lists->findForTopic($this->getUser(), $topicId, $params, $this->getRouter()->generate('commsNews.getIndex'));
 
         /* Always provide paginator from this context
          */
         $outcome = array_merge($outcome, [
-            'currentUrl' => $url,
-            'paginator' => $paginator,
             'showPaginator' => $showPaginator,
             'compactMode' => $params->getCompactMode(),
             'pageNum' => $params->getPageNum()
