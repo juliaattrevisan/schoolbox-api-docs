@@ -8,7 +8,7 @@
     <nav>
         {% set createRoute = routeLookupIfAuthorized('commsNews.getCreate') %}
         {% set moderationRoute = routeLookupIfAuthorized('commsNewsModeration.getList') %}
-        {% set archiveRoute = 1 %} {# TODO: fill in route when archive is created #}
+        {% set archiveRoute = routeLookupIfAuthorized('commsNews.getArchive') %}
         {% set authorRoute = 1 %} {# TODO: fill in route when /me is created #}
         {% if createRoute %}
             <a href="{{ createRoute }}" class="icon-add" title="Create {{ locale.news }}"></a>
@@ -19,7 +19,7 @@
     </nav>
     {% if moderationRoute or saveForLaterRoute or archiveRoute or authorRoute %}
     <ul id="tab-control" class="f-dropdown" data-dropdown-content>
-        <li><a href="#" onclick="alert('Coming soon');" class="icon-archive">{{ locale.news | capitalize }} archive</a></li> {# TODO: fill in link when archive is created #}
+        <li><a href="{{ archiveRoute }}" class="icon-archive">{{ locale.news | capitalize }} archive</a></li>
         <li><a href="#" onclick="alert('Coming soon');" class="icon-staff-students">Articles authored by me</a></li> {# TODO: fill in link when /me is created #}
         {% if moderationRoute %}
             <li><a href="{{ moderationRoute }}" class="icon-list">Moderation list</a></li>
