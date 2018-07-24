@@ -60,9 +60,9 @@ class DescriptorMetadata {
      *
      * If previous or next descriptor has a null value, use the current descriptor value (which may also be null...)
      *
-     * @return int|null
+     * @return float|null
      */
-    public function calculateMin() : ?int
+    public function calculateMin() : ?float
     {
         // Assume ascending by default
         $min = ($this->prevDescriptor['value'] !== null ? $this->prevDescriptor['value'] + 1 : $this->descriptor['value']);
@@ -77,9 +77,9 @@ class DescriptorMetadata {
      * The persisted value of a descriptor is always its maximum value.
      * May be null.
      *
-     * @return int|null
+     * @return float|null
      */
-    public function calculateMax() : ?int
+    public function calculateMax() : ?float
     {
         return $this->descriptor['value'];
     }

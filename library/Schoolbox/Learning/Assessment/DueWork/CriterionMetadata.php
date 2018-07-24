@@ -148,9 +148,9 @@ class CriterionMetadata {
 
     /**
      * Work out the value of the first descriptor that has a value. Used to calculate direction
-     * @return int|null
+     * @return float|null
      */
-    private function calculateStartValue() : ?int
+    private function calculateStartValue() : ?float
     {
         // By default, assume the first level has a value
         $firstValuedLevelIndex = 0;
@@ -170,9 +170,9 @@ class CriterionMetadata {
 
     /**
      * Work out the value of the last descriptor that has a value. Used to calculate direction
-     * @return int|null
+     * @return float|null
      */
-    private function calculateEndValue() : ?int
+    private function calculateEndValue() : ?float
     {
         // By default, assume the last level has a value
         $this->lastValuedLevelIndex = $this->numLevels - 1;
