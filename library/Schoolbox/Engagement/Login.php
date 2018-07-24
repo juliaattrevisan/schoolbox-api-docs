@@ -11,6 +11,7 @@ namespace Schoolbox\Engagement;
 
 use Alaress\Database\Connector\IConnector;
 use Alaress_Date_Format;
+use Schoolbox\Collection;
 
 class Login
 {
@@ -106,17 +107,20 @@ class Login
 
         $statement = $this->database->prepareQuery($query);
         $statement->execute();
-        $summary = [];
+        $summary = new Collection();
 
         /** @noinspection PhpAssignmentInConditionInspection */
         while ($group = $statement->fetch()) {
-            $summary[$group['id']] = [
+            $summary->offsetSet($group['id'], [
                 'id'        => $group['id'],
                 'name'      => $group['name'],
                 'total'     => $group['total'],
                 'logged_in' => 0,
-            ];
+            ]);
         }
+        $summary->sortByCallback(function (array $a, array $b) {
+            return strnatcasecmp($a['name'], $b['name']);
+        });
 
         $interval = $this->sessionLength * 2;
         $query = "
@@ -132,9 +136,11 @@ class Login
 
         /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $statement->fetch()) {
-            $summary[$row['group_id']]['logged_in'] = $row['logged_in'];
+            $groupData = $summary->offsetGet($row['group_id']);
+            $groupData['logged_in'] = $row['logged_in'];
+            $summary->offsetSet($row['group_id'], $groupData);
         }
 
-        return $summary;
+        return $summary->getAll();
     }
 }
