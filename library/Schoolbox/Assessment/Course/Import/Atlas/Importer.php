@@ -510,7 +510,7 @@ class Importer
      * @throws \Schoolbox\Mapper\Exception if somehow creation fails?
      */
     private function findOrCreateCurriculumNode(
-        string $name,
+        ?string $name,
         ?string $code,
         ?string $reference,
         ?string $description,
