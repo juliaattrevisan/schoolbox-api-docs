@@ -17,9 +17,11 @@ use Alaress\Paginator\Paginator;
 use Alaress\Paginator\UrlPaginator;
 use External_Class;
 use External_User;
+use Schoolbox\Collection;
 use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Comms\News\Audience\BusinessRules;
 use Schoolbox\Comms\News\Audience\RelationshipFilterer;
+use Schoolbox\News\Topic;
 use Schoolbox\Permission\Access;
 use Schoolbox\Resource\Folder;
 use Schoolbox\User;
@@ -191,10 +193,10 @@ class Lists
      * The n-n relational between articles and topics precludes proper usage of findAll()
      * with a limit - it doesn't count properly
      *
-     * @param User        $user
-     * @param int         $topicId
-     * @param Querystring $params
-     * @param string      $urlPrefix
+     * @param User                $user
+     * @param Collection|Topic[]  $topics
+     * @param Querystring         $params
+     * @param string              $urlPrefix
      * @return array
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \InvalidArgumentException
@@ -202,9 +204,15 @@ class Lists
      * @throws \UnderflowException
      * @throws \UnexpectedValueException
      */
-    public function findForTopic(User $user, int $topicId, Querystring $params, string $urlPrefix): array
+    public function findForTopic(User $user, Collection $topics, Querystring $params, string $urlPrefix): array
     {
         $policies = $this->policyMapper->findAll()->indexBy('identifier');
+
+        /* News Topics were never obtainable by slug
+         * We always fetched everything, then manually sorted by slug
+         * Inherit this situation, improvise and adapt (or just use ids...)
+         */
+        $topicId = $this->determineSelectedTopicId($topics, $params->getSlug());
 
         /* Articles in $topicId that $user can see
          */
@@ -238,6 +246,29 @@ class Lists
         ];
     }
 
+
+    /**
+     * From a slug, figure out what topic matches it
+     *
+     * By default, select the All tab...
+     * but try to find the topic whose slug matches the url param
+     *
+     * @param Collection|Topic[]  $topics
+     * @param null|string         $slug
+     * @return int
+     */
+    private function determineSelectedTopicId(Collection $topics, ?string $slug): int
+    {
+        $selectedTopicId = Mapper::TOPIC_ALL_ID;
+
+        foreach ($topics as $topic) {
+            if ($topic->getSlug() === $slug) {
+                return $topic->getId();
+            }
+        }
+
+        return $selectedTopicId;
+    }
 
     /**
      * Find the article ids that were saved by $user in accordance with policy setting

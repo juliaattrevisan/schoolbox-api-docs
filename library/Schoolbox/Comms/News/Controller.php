@@ -523,8 +523,6 @@ class Controller extends Base
      * Get a list of articles that were audienced to me
      * This is the central piece of the puzzle
      *
-     * TODO: Incomplete
-     *
      * @api GET /comms/news/list
      *
      * @throws InvalidArgumentException
@@ -585,7 +583,7 @@ class Controller extends Base
          * Compact Mode is hardcoded to be disabled from this context
          * ShowPaginator is always true in this context
          */
-        $outcome = $this->generatePartial($params, $topics,$showPaginator);
+        $outcome = $this->generatePartial($params, $topics, $showPaginator);
         $content = $this->buildUnthemedHtmlOutput('@commsNews/list.twig', $outcome)->getAsString();
 
         /* Merge a whole bunch of other settings too
@@ -632,13 +630,7 @@ class Controller extends Base
             $this->externalClass
         );
 
-        /* News Topics were never obtainable by slug
-         * We always fetched everything, then manually sorted by slug
-         * Inherit this situation, improvise and adapt (or just use ids...)
-         */
-        $topicId = $this->determineSelectedTopicId($topics, $params->getSlug());
-
-        $outcome = $lists->findForTopic($this->getUser(), $topicId, $params, $this->getRouter()->generate('commsNews.getIndex'));
+        $outcome = $lists->findForTopic($this->getUser(), $topics, $params, $this->getRouter()->generate('commsNews.getIndex'));
 
         /* Always provide paginator from this context
          */
@@ -649,28 +641,5 @@ class Controller extends Base
         ]);
 
         return $outcome;
-    }
-
-    /**
-     * From a slug, figure out what topic matches it
-     *
-     * By default, select the All tab...
-     * but try to find the topic whose slug matches the url param
-     *
-     * @param Collection  $topics
-     * @param null|string $slug
-     * @return int
-     */
-    private function determineSelectedTopicId(Collection $topics, ?string $slug): int
-    {
-        $selectedTopicId = Mapper::TOPIC_ALL_ID;
-
-        foreach ($topics as $topic) {
-            if ($topic->getSlug() === $slug) {
-                return $topic->getId();
-            }
-        }
-
-        return $selectedTopicId;
     }
 }
