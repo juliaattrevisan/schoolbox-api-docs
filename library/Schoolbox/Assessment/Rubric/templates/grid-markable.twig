@@ -137,24 +137,24 @@
             {% endfor %}
 
         {% if group.total and showGroupTotal %}
-        <tr>
-            {% if config.rubric_show_points or not studentView %}
-                <th class="rb-group-summary" colspan="{{ rubric.levels|length + 1 }}">
-                    <span data-group-summary="{{ rubricId }}-{{ group.id }}"
+            {% if (config.rubric_show_points or not studentView) and markSchemeName != "None" %}
+                <tr>
+                    <th class="rb-group-summary" colspan="{{ rubric.levels|length + 1 }}">
+                        <span data-group-summary="{{ rubricId }}-{{ group.id }}"
 
-                        data-numerator="{{ limit_decimal.limit(group.sum, 2) }}"
-                        data-denominator="{{ limit_decimal.limit(group.total, 2) }}">
+                            data-numerator="{{ limit_decimal.limit(group.sum, 2) }}"
+                            data-denominator="{{ limit_decimal.limit(group.total, 2) }}">
 
-                        {% if markSchemeName == 'TotalMarkFractional' %}
-                            {# TODO constrained number input field / total (validated) #}
-                            {{ limit_decimal.limit(group.sum, 2) }} / {{ limit_decimal.limit(group.total, 2) }}
-                        {% elseif markSchemeName == 'LetterGrade' %}
-                            {# TODO if letter grade: provide dropdown for letters #}
-                        {% else if markSchemeName == 'Percentage '%}
-                            {# TODO if percentage: number input constrained to allowable percentage value (validated) #}
-                            {{ group.humanReadableMark }}
-                        {% endif %}
-                    </span>
+                            {% if markSchemeName == 'TotalMarkFractional' %}
+                                {# TODO constrained number input field / total (validated) #}
+                                {{ limit_decimal.limit(group.sum, 2) }} / {{ limit_decimal.limit(group.total, 2) }}
+                            {% elseif markSchemeName == 'LetterGrade' %}
+                                {# TODO if letter grade: provide dropdown for letters #}
+                            {% elseif markSchemeName == 'Percentage'%}
+                                {# TODO if percentage: number input constrained to allowable percentage value (validated) #}
+                                <input type="number" min=0 max="{{ limit_decimal.limit(group.total, 2) }}" value="{{ limit_decimal.limit(group.sum, 2) }}"/> %
+                            {% endif %}
+                        </span>
 
                         {# Self-Assessment #}
                         {% if learnerRubric %}
@@ -167,10 +167,11 @@
                             ({{ learnerRubric.groups[groupIndex].humanReadableMark }} given in {{ selfReflectionName }})
                         {% endif %}
                     </th>
-                {% endif %}
             </tr>
             {% endif %}
-            {% endfor %}
+        {% endif %}
+
+    {% endfor %}
 
     {% if rubric.total and showRubricTotal and (config.rubric_show_points or not studentView) %}
     <tr>
