@@ -146,8 +146,12 @@
                         data-denominator="{{ limit_decimal.limit(group.total, 2) }}">
 
                         {% if markSchemeName == 'TotalMarkFractional' %}
+                            {# TODO constrained number input field / total (validated) #}
                             {{ limit_decimal.limit(group.sum, 2) }} / {{ limit_decimal.limit(group.total, 2) }}
-                        {% else %}
+                        {% elseif markSchemeName == 'LetterGrade' %}
+                            {# TODO if letter grade: provide dropdown for letters #}
+                        {% else if markSchemeName == 'Percentage '%}
+                            {# TODO if percentage: number input constrained to allowable percentage value (validated) #}
                             {{ group.humanReadableMark }}
                         {% endif %}
                     </span>
