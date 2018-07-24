@@ -618,7 +618,7 @@ class Controller extends Base
      */
     private function generatePartial(Querystring $params, Collection $topics, bool $showPaginator): array
     {
-        $lists = new Lists(
+        $outcome = (new Lists(
             $this->newsMapper,
             $this->policyMapper,
             $this->saveForLaterMapper,
@@ -628,9 +628,12 @@ class Controller extends Base
             $this->userMapper,
             $this->externalUser,
             $this->externalClass
+        ))->findForTopic(
+            $this->getUser(),
+            $topics,
+            $params,
+            $this->getRouter()->generate('commsNews.getIndex')
         );
-
-        $outcome = $lists->findForTopic($this->getUser(), $topics, $params, $this->getRouter()->generate('commsNews.getIndex'));
 
         /* Always provide paginator from this context
          */
