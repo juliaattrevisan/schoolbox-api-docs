@@ -17,13 +17,6 @@ class CriterionMetadata {
     public const DIRECTION_DESCENDING = 'desc';
 
     /**
-     * ID of the criterion
-     *
-     * @var int $id
-     */
-    private $id;
-
-    /**
      * Order of the descriptor values for this criterion
      *
      * @var string $direction
@@ -70,12 +63,10 @@ class CriterionMetadata {
 
     /**
      * CriterionMetadata constructor.
-     * @param int $id
      * @param array $levelIds
      * @param array $levelDescriptors
      */
-    public function __construct(int $id, array $levelIds, array $levelDescriptors) {
-        $this->id = $id;
+    public function __construct(array $levelIds, array $levelDescriptors) {
         $this->levelIds = $levelIds;
         $this->numLevels = \count($levelIds);
         $this->levelDescriptors = $levelDescriptors;
@@ -85,7 +76,7 @@ class CriterionMetadata {
         $this->metadata['direction'] = $this->direction;
 
         // Can't use array_merge here because it would re-index the descriptors, which need to be indexed by level ID
-        $this->metadata = $this->metadata + $this->generateDescriptorMetadata();
+        $this->metadata += $this->generateDescriptorMetadata();
     }
 
     /**
@@ -199,21 +190,6 @@ class CriterionMetadata {
         return $endValue;
     }
 
-    /**
-     * @return int
-     */
-    public function getId() : int
-    {
-        return $this->id;
-    }
-
-    /**
-     * @return string
-     */
-    public function getDirection() : string
-    {
-        return $this->direction;
-    }
 
     /**
      * @return array
