@@ -308,13 +308,14 @@ class Controller extends Base
         $hasRubric = array_key_exists('rubric', $postVars) || array_key_exists('saveEmpty', $postVars);
 
         // Check whether the latest feedback actually has rubric data set.
-        if ($mostRecentFeedback !== null && $mostRecentFeedback->getAssessable() instanceof DueWork\Model) {
-            if ($mostRecentFeedback->getAssessable()->getUseRubric()) {
-                $mostRecentFeedback->getAssessable()->setRubric($this->rubricMapper->findByDueWork($mostRecentFeedback->getAssessable()));
-            }
+        if ($mostRecentFeedback !== null
+            && $mostRecentFeedback->getAssessable() instanceof DueWork\Model
+            && $mostRecentFeedback->getAssessable()->getUseRubric()
+        ) {
+            $mostRecentFeedback->getAssessable()->setRubric($this->rubricMapper->findByDueWork($mostRecentFeedback->getAssessable()));
             $rubricContext = new RubricContext($this->rubricMapper);
-            $rub = $rubricContext->generateForFeedback($mostRecentFeedback, $this->getUser(), Access::getInstance());
-            if (!empty($rub)) {
+            $rubricData = $rubricContext->generateForFeedback($mostRecentFeedback, $this->getUser(), Access::getInstance());
+            if (!empty($rubricData)) {
                 $hasRubric = true;
             }
         }
