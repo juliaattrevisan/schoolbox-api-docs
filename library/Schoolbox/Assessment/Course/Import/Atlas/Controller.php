@@ -42,21 +42,9 @@ class Controller extends BaseController
 
 
     /**
-     * @var FolderMapper
+     * @var Importer
      */
-    private $folderMapper;
-
-
-    /**
-     * @var HomepageConfigMapper
-     */
-    private $homepageConfigMapper;
-
-
-    /**
-     * @var HomepageTemplateMapper
-     */
-    private $homepageTemplateMapper;
+    private $importer;
 
 
     /**
@@ -66,89 +54,20 @@ class Controller extends BaseController
 
 
     /**
-     * @var UnitSpecMapper
-     */
-    private $unitSpecMapper;
-
-
-    /**
-     * @var Access
-     */
-    private $access;
-
-
-    /**
-     * @var UserAccessMapper
-     */
-    private $userAccessMapper;
-
-
-    /**
-     * @var Rubric\GroupMapper
-     */
-    private $rubricGroupMapper;
-
-
-    /**
-     * @var Rubric\CriterionMapper
-     */
-    private $rubricCriterionMapper;
-
-
-    /**
-     * @var AssessmentDataSource
-     */
-    private $assessmentDataSource;
-
-
-    /**
-     * @var NodeMapper
-     */
-    private $nodeMapper;
-
-
-    /**
      * Constructor
      *
-     * @param Api\Bridge             $apiBridge
-     * @param FolderMapper           $folderMapper
-     * @param HomepageConfigMapper   $homepageConfigMapper
-     * @param HomepageTemplateMapper $homepageTemplateMapper
-     * @param CourseSpecMapper       $courseSpecMapper
-     * @param UnitSpecMapper         $unitSpecMapper
-     * @param Access                 $access
-     * @param UserAccessMapper       $userAccessMapper
-     * @param Rubric\GroupMapper     $rubricGroupMapper
-     * @param Rubric\CriterionMapper $rubricCriterionMapper
-     * @param AssessmentDataSource   $assessmentDataSource
-     * @param NodeMapper             $nodeMapper
+     * @param Api\Bridge       $apiBridge
+     * @param Importer         $importer
+     * @param CourseSpecMapper $courseSpecMapper
      */
     public function __construct(
         Api\Bridge $apiBridge,
-        FolderMapper $folderMapper,
-        HomepageConfigMapper $homepageConfigMapper,
-        HomepageTemplateMapper $homepageTemplateMapper,
-        CourseSpecMapper $courseSpecMapper,
-        UnitSpecMapper $unitSpecMapper,
-        Access $access,
-        UserAccessMapper $userAccessMapper,
-        Rubric\GroupMapper $rubricGroupMapper,
-        Rubric\CriterionMapper $rubricCriterionMapper,
-        AssessmentDataSource $assessmentDataSource,
-        NodeMapper $nodeMapper
+        Importer $importer,
+        CourseSpecMapper $courseSpecMapper
     ) {
-        $this->apiBridge              = $apiBridge;
-        $this->folderMapper           = $folderMapper;
-        $this->homepageConfigMapper   = $homepageConfigMapper;
-        $this->homepageTemplateMapper = $homepageTemplateMapper;
-        $this->courseSpecMapper       = $courseSpecMapper;
-        $this->unitSpecMapper         = $unitSpecMapper;
-        $this->access                 = $access;
-        $this->userAccessMapper       = $userAccessMapper;
-        $this->rubricGroupMapper      = $rubricGroupMapper;
-        $this->rubricCriterionMapper  = $rubricCriterionMapper;
-        $this->assessmentDataSource   = $assessmentDataSource;
-        $this->nodeMapper             = $nodeMapper;
+        $this->apiBridge        = $apiBridge;
+        $this->importer         = $importer;
+        $this->courseSpecMapper = $courseSpecMapper;
     }
 
 
@@ -258,23 +177,7 @@ class Controller extends BaseController
         $baseFolder = $this->courseSpecMapper->getFacultyRootFolder();
 
         // Import
-        // TODO inject?
-        $importer = new Importer(
-            $this->getUser(),
-            $this->getConfigLoader(),
-            $this->folderMapper,
-            $this->homepageConfigMapper,
-            $this->homepageTemplateMapper,
-            $this->courseSpecMapper,
-            $this->unitSpecMapper,
-            $this->access,
-            $this->userAccessMapper,
-            $this->rubricGroupMapper,
-            $this->rubricCriterionMapper,
-            $this->assessmentDataSource,
-            $this->nodeMapper
-        );
-        $importer->import(
+        $this->importer->import(
             $curriculumPlan,
             $baseFolder,
             $this->request->post->get('unit')

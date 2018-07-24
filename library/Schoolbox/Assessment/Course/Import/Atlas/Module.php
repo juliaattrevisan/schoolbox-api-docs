@@ -109,6 +109,24 @@ class Module extends \Alaress\Module\Module
                                 }
                             )
                         ]
+                    ),
+                    'importer' => $injector->lazyNew(
+                        Importer::class,
+                        [
+                            'currentUser'            => $injector->lazyGet('user'),
+                            'config'                 => $this->getConfig(),
+                            'folderMapper'           => $this->getMapperFactory()->getLazy(FolderMapper::class),
+                            'homepageConfigMapper'   => $this->getMapperFactory()->getLazy(HomepageConfigMapper::class),
+                            'homepageTemplateMapper' => $this->getMapperFactory()->getLazy(HomepageTemplateMapper::class),
+                            'courseSpecMapper'       => $this->getMapperFactory()->getLazy(CourseSpecMapper::class),
+                            'unitSpecMapper'         => $this->getMapperFactory()->getLazy(UnitSpecMapper::class),
+                            'access'                 => $injector->lazy(function () { return Access::getInstance(); }),
+                            'userAccessMapper'       => $this->getMapperFactory()->getLazy(UserAccessMapper::class),
+                            'rubricGroupMapper'      => $this->getMapperFactory()->getLazy(RubricGroupMapper::class),
+                            'rubricCriterionMapper'  => $this->getMapperFactory()->getLazy(RubricCriterionMapper::class),
+                            'assessmentDataSource'   => $injector->lazyGet('assessmentDataSource'),
+                            'nodeMapper'             => $this->getMapperFactory()->getLazy(NodeMapper::class),
+                        ]
                     )
                 ]
             )
