@@ -73,7 +73,11 @@
             <ul>
             {% for year, months in availableYears %}
                 {% for month, val in months %}
-                    <li><a href="{{ routeLookup('commsNews.getArchive', {year: year, month: month}) }}">{{ year }}, {{ month }}</a></li>
+                    <li><a href="{{ routeLookup('commsNews.getArchive', {year: year, month: month}) }}">
+                            {% set archiveDate = year ~ '-' ~ month ~ '-01' %}
+                            {{ year }} {{ archiveDate|date('M')}}
+                        </a>
+                    </li>
                 {% endfor %}
             {% endfor %}
             </ul>
