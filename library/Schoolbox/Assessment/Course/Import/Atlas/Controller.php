@@ -7,6 +7,7 @@
 namespace Schoolbox\Assessment\Course\Import\Atlas;
 
 use Alaress\Web\Controller\Base as BaseController;
+use GuzzleHttp\Exception as HttpException;
 use Schoolbox\Assessment\Course\Import\Atlas\Api;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecMapper;
 
@@ -114,7 +115,13 @@ class Controller extends BaseController
             return;
         }
 
-        $curriculumPlan = $this->apiBridge->getCurriculum($curriculumPlanId);
+        // Get the curriculum if possible
+        try {
+            $curriculumPlan = $this->apiBridge->getCurriculum($curriculumPlanId);
+        } catch (HttpException\RequestException $e) {
+            $this->throwCurriculumPlanFetchError($e);
+            return;
+        }
 
         $this->response->content->set(
             $this->buildUnthemedHtmlOutput(
@@ -141,7 +148,13 @@ class Controller extends BaseController
             return;
         }
 
-        $curriculumPlan = $this->apiBridge->getCurriculum($curriculumPlanId);
+        // Get the curriculum if possible
+        try {
+            $curriculumPlan = $this->apiBridge->getCurriculum($curriculumPlanId);
+        } catch (HttpException\RequestException $e) {
+            $this->throwCurriculumPlanFetchError($e);
+            return;
+        }
 
         // Hard-coded folder for testing (faculty root)
         // TODO pass from form
@@ -173,6 +186,47 @@ class Controller extends BaseController
                 [
                     'error' => [
                         'problem' => 'You must select a curriculum plan.',
+                    ],
+                ]
+            )
+        );
+    }
+
+
+    /**
+     * Render an error if retrieving the plan failed for some reason.
+     *
+     * @param \Throwable $e The error that was raised on attempting to retrieve.
+     */
+    private function throwCurriculumPlanFetchError(\Throwable $e): void
+    {
+        $message = 'Something went wrong while retrieving the curriculum plan.';
+        if ($e instanceof HttpException\ServerException) {
+            // Something went wrong with Atlas
+            $message .= ' Please try again later.';
+
+        } elseif ($e instanceof HttpException\ClientException) {
+            // Something went wrong with us, probably configuration
+            $message .= ' Please contact your system administrator.';
+
+        } elseif ($e instanceof HttpException\RequestException) {
+            // Something went wrong somewhere; probably a timeout
+            $message .= ' Please try again later.';
+
+        } else {
+            // Something unpredictable went wrong
+            $message .= ' Please try again later.';
+        }
+
+
+        // SHUP.
+        /** @noinspection PhpUnhandledExceptionInspection */
+        $this->response->status->setCode($e->getCode() ?? 400);
+        $this->response->content->set(
+            $this->buildUnthemedHtmlOutput('sub/mage-error.twig',
+                [
+                    'error' => [
+                        'problem' => $message,
                     ],
                 ]
             )
