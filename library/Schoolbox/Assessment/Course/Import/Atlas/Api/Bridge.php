@@ -10,6 +10,7 @@ namespace Schoolbox\Assessment\Course\Import\Atlas\Api;
 
 use Alaress\Redis\Cache as RedisCache;
 use GuzzleHttp\Client as HttpClient;
+use GuzzleHttp\Exception as HttpException;
 use GuzzleHttp\Promise;
 use Karriere\JsonDecoder\JsonDecoder;
 use Predis\ClientInterface as RedisClient;
@@ -70,7 +71,9 @@ class Bridge
      * Get a list of all curricula.
      *
      * @return Curriculum[]
-     * @throws \Throwable
+     * @throws HttpException\ClientException for a 4xx error
+     * @throws HttpException\ServerException for a 5xx error
+     * @throws HttpException\TransferException for all other request errors
      */
     public function getCurriculumList(): array
     {
@@ -93,7 +96,9 @@ class Bridge
      *
      * @param int $curriculumId
      * @return Curriculum
-     * @throws \Throwable
+     * @throws HttpException\ClientException for a 4xx error
+     * @throws HttpException\ServerException for a 5xx error
+     * @throws HttpException\TransferException for all other request errors
      */
     public function getCurriculum(int $curriculumId): Curriculum
     {
@@ -171,7 +176,7 @@ class Bridge
      * @param array $requests
      * @param int   $currentPage
      * @return array
-     * @throws \Throwable
+     * @throws HttpException\TransferException if a HTTP request fails
      */
     private function makeRequests(array $requests, $currentPage = 1): array
     {
@@ -187,6 +192,7 @@ class Bridge
         }
 
         // Await request completion
+        /** @noinspection PhpUnhandledExceptionInspection */
         $responses        = Promise\unwrap($asyncRequests);
         $result           = [];
         $nextPageRequests = [];
