@@ -569,7 +569,7 @@ class Controller extends Base
      * News Archive
      *
      * @param int|null    $year
-     * @param string|null $month
+     * @param int|null $month
      * @throws InvalidArgumentException
      * @throws RouteNotFound
      * @throws \Alaress\Database\Predicate\InvalidColumnException
@@ -578,7 +578,7 @@ class Controller extends Base
      * @throws \UnderflowException
      * @throws \UnexpectedValueException
      */
-    public function getArchive(int $year = null, string $month = null)
+    public function getArchive(int $year = null, int $month = null)
     {
 
         /* This is always on in this News Index context
