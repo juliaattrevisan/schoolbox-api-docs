@@ -1350,7 +1350,7 @@ class RubricMapper
 
         // 1. Get latest published student marks
         $stmt = $this->database->prepare("
-            SELECT sr.owner, sb.id AS 'sb.id', rc.id AS 'rc.id', rd.value AS 'mark'
+            SELECT sr.owner, sb.id AS 'sb.id', rc.id AS 'rc.id', rm.value AS 'mark'
             FROM rubric_mark rm
             JOIN rubric_descriptor rd ON rd.id = rm.descriptor_id AND rd.deleted_at IS NULL
             JOIN rubric_criterion  rc ON rc.id = rd.criterion_id AND rc.deleted_at IS NULL
