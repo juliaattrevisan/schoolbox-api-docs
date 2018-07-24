@@ -205,7 +205,7 @@ class Bridge
             $decoded = json_decode($response->getBody()->getContents(), true);
             if ($currentPage < $decoded['page']['last_page']) {
                 // Make a new request for the next page
-                [$uri, $params] = $request;
+                [$uri, $params] = $requests[$requestName];
                 $params['query']['page']        = $currentPage + 1;
                 $nextPageRequests[$requestName] = [$uri, $params];
             }
