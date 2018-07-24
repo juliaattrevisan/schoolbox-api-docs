@@ -565,6 +565,19 @@ class Controller extends Base
     }
 
 
+    /**
+     * News Archive
+     *
+     * @param int|null    $year
+     * @param string|null $month
+     * @throws InvalidArgumentException
+     * @throws RouteNotFound
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \OutOfRangeException
+     * @throws \UnderflowException
+     * @throws \UnexpectedValueException
+     */
     public function getArchive(int $year = null, string $month = null)
     {
 
