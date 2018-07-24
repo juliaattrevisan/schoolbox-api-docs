@@ -38,6 +38,7 @@ class Mapper extends \Schoolbox\Mapper
     /**
      * @inheritdoc
      * @throws \Schoolbox\Mapper\Exception
+     * @throws \InvalidArgumentException
      */
     protected function mapping()
     {
@@ -198,7 +199,9 @@ class Mapper extends \Schoolbox\Mapper
             FROM {$this->table}
             WHERE publish_at IS NOT NULL
             AND accepted_at IS NOT NULL
-            AND expires_at > NOW()";
+            AND expires_at > NOW()
+            AND deleted_at IS NULL
+        ";
 
         if (\count($availableArticleIds)) {
             $query .= "
@@ -214,6 +217,7 @@ class Mapper extends \Schoolbox\Mapper
                 WHERE publish_at IS NOT NULL
                 AND accepted_at IS NOT NULL
                 AND expires_at > NOW()
+                AND deleted_at IS NULL
                 AND cnat.topic_id = :topicId
             ";
 

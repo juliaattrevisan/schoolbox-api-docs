@@ -152,19 +152,25 @@ class Lists
         $articleIds = $this->newsMapper->findArticleIdsForTopic($articleIdsForUser, $topicId, $limit, $pageNum);
         $total = \count($this->newsMapper->findArticleIdsForTopic($articleIdsForUser, $topicId));
 
-        /* TODO: Acquire hydrated items, and reorder them in the order requested
+        /* Acquire hydrated items, and reorder them in the order requested
          */
+        $records = $this->newsMapper->findByColumn('id', $articleIds)->indexBy('id');
+
+        $articles = $this->newsMapper->createCollection();
+
+        foreach ($articleIds as $articleId) {
+            $record = $records->getOffset($articleId);
+
+            if (null !== $record) {
+                $articles->add($records->getOffset($articleId));
+            }
+        }
 
         /* Hydrate the objects and hope for the best
          * Include a total, because pagination
          */
         return [
-            'articles' => $this->newsMapper->findByColumn('id', $articleIds, [
-                'order' => [
-                    'publish_at' => 'desc',
-                    'created_at' => 'desc',
-                ]
-            ]),
+            'articles' => $articles,
             'total' => $total
         ];
     }
