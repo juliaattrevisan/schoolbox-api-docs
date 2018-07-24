@@ -220,6 +220,10 @@ class Lists
             'savedArticleIds' => $savedArticleIds,
             'unsaved' => SaveForLater\Mapper::UNSAVED,
 
+            /* Because this is really convenient
+             */
+            'articleIdsForUser' => $articleIdsForUser,
+
             /* For the paginator
              */
             'currentUrl' => $url,

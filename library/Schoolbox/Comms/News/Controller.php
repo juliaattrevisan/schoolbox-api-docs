@@ -580,8 +580,7 @@ class Controller extends Base
      */
     public function getArchive(int $year = null, int $month = null)
     {
-
-        /* This is always on in this News Index context
+        /* This is always on in this News Archive context
          * If you visit comms/news, the querystring param is empty so you have to forcibly set it to true
          */
         $showPaginator = true;
@@ -607,7 +606,7 @@ class Controller extends Base
             'topicAll' => Mapper::TOPIC_ALL_SLUG,
             'showPaginator' => $showPaginator,
             'slug' => $params->getSlug(),
-            'availableYears' => $this->newsMapper->findYearsAndMonthsWithArticles(),
+            'availableYears' => $this->newsMapper->findYearsAndMonthsWithArticles($outcome['articleIdsForUser']),
             'year' => $year,
             'month' => $month
         ];

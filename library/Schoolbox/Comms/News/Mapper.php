@@ -173,12 +173,13 @@ class Mapper extends \Schoolbox\Mapper
 
 
     /**
-     * Get a list of years that have article(s) in them
+     * Get a list of years that have article(s) in them that could be seen by the user
      *
+     * @param array $articleIdsForUser
      * @return array
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      */
-    public function findYearsAndMonthsWithArticles(): array
+    public function findYearsAndMonthsWithArticles(array $articleIdsForUser): array
     {
         /* Dates - must be expired, accepted, published and not deleted
          */
@@ -190,12 +191,18 @@ class Mapper extends \Schoolbox\Mapper
 
         $where = implode ("\nAND ", $pb->getWhere());
 
+        /* These are articles that the user could see
+         * Don't provide year/month combinations that contain articles, but the user isn't in their audience lol
+         */
+        $availableArticleIdsSql = implode(', ', $articleIdsForUser);
+
         $query = "
             SELECT 
                 SUBSTRING(publish_at, 1, 4) AS year,
                 SUBSTRING(publish_at, 6, 2) AS month
             FROM {$this->getTable()}
             WHERE {$where}
+            AND {$this->getIdentifierColumn()} IN ({$availableArticleIdsSql})
             GROUP BY year, month 
             ORDER BY year, month
         ";
