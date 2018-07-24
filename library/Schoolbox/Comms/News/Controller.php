@@ -541,7 +541,9 @@ class Controller extends Base
 
             /* The requested data set to load, given the params provided
              */
-            $outcome = $this->generatePartial($params, $topics, $params->getShowPaginator());
+            $urlPrefix = $this->getRouter()->generate('commsNews.getIndex');
+
+            $outcome = $this->generatePartial($urlPrefix, $params, $topics, $params->getShowPaginator());
             $content = $this->buildUnthemedHtmlOutput('@commsNews/list.twig', $outcome)->getAsString();
             $viewAllLink = $this->getRouteIfAuthorized('commsNews.getIndex') . '?' . $params;
 
@@ -558,8 +560,36 @@ class Controller extends Base
 
     public function getArchive(int $year = null, string $month = null)
     {
-        new \Alaress_Probe($year, $month);
-        die();
+
+        /* This is always on in this News Index context
+         * If you visit comms/news, the querystring param is empty so you have to forcibly set it to true
+         */
+        $showPaginator = true;
+
+        $params = new Querystring($this->getConfigLoader()->get('search_type_limit'), $this->getRequest()->query);
+        $topics = $this->topicMapper->findAll();
+
+        /* The initial data set to load, given the params provided
+         * Compact Mode is hardcoded to be disabled from this context
+         * ShowPaginator is always true in this context
+         */
+        $urlPrefix = $this->getRouter()->generate('commsNews.getArchive', ['year' => $year, 'month' => $month]);
+
+        $outcome = $this->generatePartial($urlPrefix, $params, $topics, $showPaginator, $year, $month);
+        $content = $this->buildUnthemedHtmlOutput('@commsNews/list.twig', $outcome)->getAsString();
+
+        /* Merge a whole bunch of other settings too
+         * Specifically applies to the index page which loads slightly differently than component variant
+         */
+        $data = [
+            'initialContent' => $content,
+            'topics' => $topics,
+            'topicAll' => Mapper::TOPIC_ALL_SLUG,
+            'showPaginator' => $showPaginator,
+            'slug' => $params->getSlug()
+        ];
+
+        $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/index.twig', $data));
     }
 
     /**
@@ -589,7 +619,9 @@ class Controller extends Base
          * Compact Mode is hardcoded to be disabled from this context
          * ShowPaginator is always true in this context
          */
-        $outcome = $this->generatePartial($params, $topics, $showPaginator);
+        $urlPrefix = $this->getRouter()->generate('commsNews.getIndex');
+
+        $outcome = $this->generatePartial($urlPrefix, $params, $topics, $showPaginator, null, null);
         $content = $this->buildUnthemedHtmlOutput('@commsNews/list.twig', $outcome)->getAsString();
 
         /* Merge a whole bunch of other settings too
@@ -611,18 +643,20 @@ class Controller extends Base
      * Generate a partial fragment containing articles
      * Used in both synchronous and asynchronous requests
      *
+     * @param string             $urlPrefix
      * @param Querystring        $params
      * @param Collection|Topic[] $topics
      * @param bool               $showPaginator
+     * @param int|null           $year
+     * @param int|null           $month
      * @return array
      * @throws InvalidArgumentException
-     * @throws RouteNotFound
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \OutOfRangeException
      * @throws \UnderflowException
      * @throws \UnexpectedValueException
      */
-    private function generatePartial(Querystring $params, Collection $topics, bool $showPaginator): array
+    private function generatePartial(string $urlPrefix, Querystring $params, Collection $topics, bool $showPaginator, ?int $year, ?int $month): array
     {
         $outcome = (new Lists(
             $this->newsMapper,
@@ -635,10 +669,12 @@ class Controller extends Base
             $this->externalUser,
             $this->externalClass
         ))->findForTopic(
+            $urlPrefix,
+            $params,
             $this->getUser(),
             $topics,
-            $params,
-            $this->getRouter()->generate('commsNews.getIndex')
+            $year,
+            $month
         );
 
         /* Always provide paginator from this context

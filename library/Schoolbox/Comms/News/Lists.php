@@ -131,10 +131,12 @@ class Lists
      * The n-n relational between articles and topics precludes proper usage of findAll()
      * with a limit - it doesn't count properly
      *
-     * @param User                $user
-     * @param Collection|Topic[]  $topics
-     * @param Querystring         $params
-     * @param string              $urlPrefix
+     * @param string             $urlPrefix
+     * @param Querystring        $params
+     * @param User               $user
+     * @param Collection|Topic[] $topics
+     * @param int|null           $year
+     * @param int|null           $month
      * @return array
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \InvalidArgumentException
@@ -142,7 +144,7 @@ class Lists
      * @throws \UnderflowException
      * @throws \UnexpectedValueException
      */
-    public function findForTopic(User $user, Collection $topics, Querystring $params, string $urlPrefix): array
+    public function findForTopic(string $urlPrefix, Querystring $params, User $user, Collection $topics, ?int $year, ?int $month): array
     {
         $policies = $this->policyMapper->findAll()->indexBy('identifier');
 
@@ -171,10 +173,15 @@ class Lists
         ))->findArticlesForUser($user);
 
         /* Articles in $topicId that $user can see
+         * The total available articles that the user can see
+         *
          * Component config can set "All" as its limit, filtered to the list of articles that can be seen
-         * Hydrate the objects and hope for the best; reorder them in the order requested
          */
-        $articleIds = $this->newsMapper->findArticleIdsForTopic($articleIdsForUser, $topicId, $params->getLimit(), $params->getPageNum());
+        $articleIds = $this->newsMapper->findArticleIdsForTopic($articleIdsForUser, $topicId, $params->getLimit(), $params->getPageNum(), $year, $month);
+        $availableIds = $this->newsMapper->findArticleIdsForTopic($articleIdsForUser, $topicId, 0, 0, $year, $month);
+
+        /* Hydrate the objects and hope for the best; reorder them in the order requested
+         */
         $records = $this->newsMapper->findByColumn('id', $articleIds)->indexBy('id');
 
         $articles = $this->newsMapper->createCollection();
@@ -190,7 +197,12 @@ class Lists
         /* Get an accompanying paginator
          */
         $url = "{$urlPrefix}?{$params}";
-        $paginator = $this->generatePaginator($url, $params->getLimit(), \count($this->newsMapper->findArticleIdsForTopic($articleIdsForUser, $topicId)));
+
+        $paginator = $this->generatePaginator(
+            $url,
+            $params->getLimit(),
+            \count($availableIds)
+        );
 
         /* Figure out the articles that this user has saved for later
          */

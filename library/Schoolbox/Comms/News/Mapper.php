@@ -179,13 +179,15 @@ class Mapper extends \Schoolbox\Mapper
      *
      * Filters to the $availableArticleIds that can be seen
      *
-     * @param array $availableArticleIds
-     * @param int   $topicId
-     * @param int   $limit
-     * @param int   $pageNum
+     * @param array    $availableArticleIds
+     * @param int      $topicId
+     * @param int      $limit
+     * @param int      $pageNum
+     * @param int|null $year
+     * @param int|null $month
      * @return array
      */
-    public function findArticleIdsForTopic(array $availableArticleIds, int $topicId, int $limit = 0, int $pageNum = 0): array
+    public function findArticleIdsForTopic(array $availableArticleIds, int $topicId, int $limit = 0, int $pageNum = 0, ?int $year, ?int $month): array
     {
 
         /* Filter to articles that I can see
