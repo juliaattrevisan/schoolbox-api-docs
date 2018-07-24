@@ -56,7 +56,9 @@ Usage:
     {% if hasAdd %}
         <nav>
             <a href="{{ routeLookup('course.newCourse') }}" class="icon-add"></a>
-            <a href="{{ routeLookup('courseImportAtlas.getImport') }}?{{ returnUrlKey }}={{ encodedReturnUrl }}" class="icon-curriculum" title="Import from Atlas"></a>
+            {% if config.rubicon_atlas_api_token %}
+                <a href="{{ routeLookup('courseImportAtlas.getImport') }}?{{ returnUrlKey }}={{ encodedReturnUrl }}" class="icon-curriculum" title="Import from Atlas"></a>
+            {% endif %}
         </nav>
     {% endif %}
 </div>
