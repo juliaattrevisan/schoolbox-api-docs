@@ -6,7 +6,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Assessment\Course\Import\Atlas\Api\StandardTransformer;
+namespace Schoolbox\Assessment\Course\Import\Atlas\Api\StandardParser;
 
 /**
  * Parser for standards from ACARA.

@@ -11,7 +11,7 @@ namespace Schoolbox\Assessment\Course\Import\Atlas\Api;
 use Karriere\JsonDecoder\Bindings\CallbackBinding;
 use Karriere\JsonDecoder\ClassBindings;
 use Karriere\JsonDecoder\Transformer;
-use Schoolbox\Assessment\Course\Import\Atlas\Api\StandardTransformer\IStrategy;
+use Schoolbox\Assessment\Course\Import\Atlas\Api\StandardParser\IStrategy;
 
 /**
  * Transformer definition for JSON standard responses to PHP objects.
