@@ -47,11 +47,6 @@
                         <div class="small-12 medium-6 column">
                             <label>Curriculum Plans</label>
                             <ul class="information-list card-selectable" id="curriculum-plan-list">
-                                <li data-loading>
-                                    <div class="small-12 card">
-                                        <h3>Loading...</h3>
-                                    </div>
-                                </li>
                                 <li id="curriculum-plan-template" class="hide" data-template="curriculum-plan">
                                     <div>
                                         <div class="selector">
@@ -170,7 +165,7 @@
                 });
             };
 
-        $toast.toastActivate({text: 'Loading curricula...'});
+        $toast.toastActivate({text: 'Loading curriculum plans...'});
 
         $.ajax("{{ routeLookup('courseImportAtlas.getCurriculumList') }}", {dataType: 'json'})
             .done(function(response) {
@@ -259,3 +254,5 @@
     });
 </script>
 {% endautoescape %}
+
+<div id="toast" class="toast"></div>
