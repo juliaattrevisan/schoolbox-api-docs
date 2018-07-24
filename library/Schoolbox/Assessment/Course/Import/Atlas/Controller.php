@@ -110,16 +110,7 @@ class Controller extends BaseController
 
         // None: render an error
         if ($curriculumPlanId === 0) {
-            $this->response->status->setCode(400);
-            $this->response->content->set(
-                $this->buildUnthemedHtmlOutput('sub/mage-error.twig',
-                    [
-                        'error' => [
-                            'problem' => 'You must select a curriculum plan.',
-                        ],
-                    ]
-                )
-            );
+            $this->throwNoCurriculumPlanSelectedError();
             return;
         }
 
@@ -142,23 +133,49 @@ class Controller extends BaseController
     private function postImportPart2(): void
     {
         // Which curriculum plan got selected?
-
-        // Which units were selected?
-        // * Create a new unit out of them
-        // Which assessments within get imported?
-        // * Create a new Schoolbox assessment out of them
         $curriculumPlanId = $this->request->post->getInt('curriculum-plan', 0);
-        $curriculumPlan   = $this->apiBridge->getCurriculum($curriculumPlanId);
+
+        // None: render an error
+        if ($curriculumPlanId === 0) {
+            $this->throwNoCurriculumPlanSelectedError();
+            return;
+        }
+
+        $curriculumPlan = $this->apiBridge->getCurriculum($curriculumPlanId);
 
         // Hard-coded folder for testing (faculty root)
+        // TODO pass from form
         $baseFolder = $this->courseSpecMapper->getFacultyRootFolder();
 
-        // Import
+        // Import:
+        // Pass through plan, folder, selected units
         $this->importer->import(
             $curriculumPlan,
             $baseFolder,
             $this->request->post->get('unit')
         );
+
+        // TODO pass something real
         $this->getResponse()->content->set($this->buildJsonOutput([]));
+    }
+
+
+    /**
+     * Render an error if no plan was selected when I needed one.
+     */
+    private function throwNoCurriculumPlanSelectedError(): void
+    {
+        // SHUP.
+        /** @noinspection PhpUnhandledExceptionInspection */
+        $this->response->status->setCode(400);
+        $this->response->content->set(
+            $this->buildUnthemedHtmlOutput('sub/mage-error.twig',
+                [
+                    'error' => [
+                        'problem' => 'You must select a curriculum plan.',
+                    ],
+                ]
+            )
+        );
     }
 }
