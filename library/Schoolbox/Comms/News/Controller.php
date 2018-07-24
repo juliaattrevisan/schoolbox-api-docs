@@ -607,6 +607,7 @@ class Controller extends Base
             'topicAll' => Mapper::TOPIC_ALL_SLUG,
             'showPaginator' => $showPaginator,
             'slug' => $params->getSlug(),
+            'availableYears' => $this->newsMapper->findYearsAndMonthsWithArticles(),
             'year' => $year,
             'month' => $month
         ];

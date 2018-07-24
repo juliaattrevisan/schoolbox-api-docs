@@ -173,6 +173,49 @@ class Mapper extends \Schoolbox\Mapper
 
 
     /**
+     * Get a list of years that have article(s) in them
+     *
+     * @return array
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     */
+    public function findYearsAndMonthsWithArticles(): array
+    {
+        /* Dates - must be expired, accepted, published and not deleted
+         */
+        $pb = $this->getPredicateBuilder()
+            ->lessThan('expires_at', \Alaress_Date_Format::now())
+            ->notNull('publish_at')
+            ->notNull('accepted_at')
+            ->isNull('deleted_at');
+
+        $where = implode ("\nAND ", $pb->getWhere());
+
+        $query = "
+            SELECT 
+                SUBSTRING(publish_at, 1, 4) AS year,
+                SUBSTRING(publish_at, 6, 2) AS month
+            FROM {$this->getTable()}
+            WHERE {$where}
+            GROUP BY year, month 
+            ORDER BY year, month
+        ";
+
+        $statement = $this->database->prepare($query);
+
+        $statement->execute([
+            'expires_at_0' => \Alaress_Date_Format::now()
+        ]);
+
+        $years = [];
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $years[$row['year']][(int)$row['month']] = true;
+        }
+
+        return $years;
+    }
+
+    /**
      * Find just the ids for the articles in a topic
      * We generally use this for pagination counts where we need a count instead of hydrated things
      *

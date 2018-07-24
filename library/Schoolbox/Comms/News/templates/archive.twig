@@ -70,6 +70,14 @@
                 limit: limit
             } %}
 
+            <ul>
+            {% for year, months in availableYears %}
+                {% for month, val in months %}
+                    <li><a href="{{ routeLookup('commsNews.getArchive', {year: year, month: month}) }}">{{ year }}, {{ month }}</a></li>
+                {% endfor %}
+            {% endfor %}
+            </ul>
+
             <div id="news-container" class="news-container">
 
                 {# TODO: Purifying pre-built content strips data-saveforlater var
