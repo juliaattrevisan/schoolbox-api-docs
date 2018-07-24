@@ -490,7 +490,8 @@ class Controller extends Base
                 'success' => true,
                 'title' => $this->getDi()->get('l10n')->translate('news', false, true),
                 'url' => $outcome['currentUrl'],
-                'fragment' => $content
+                'fragment' => $content,
+                'empty' => ($outcome['articles'] ->count())
             ]));
         }
     }

@@ -42,6 +42,10 @@
                  */
                 topicTabs: $(element).parents('[data-component]').find('[data-tab]'),
 
+                // The component action bar, which will be hidden and shown based on if there's any articles
+                // This can be left empty for implementations where there's no action bar
+                componentActions: '',
+
                 /* Asynchronously load this data upon start
                  * If empty, it'll do nothing until you change topics
                  */
@@ -92,6 +96,11 @@
                  */
                 $(config.element).html(response.fragment).saveForLater();
 
+                // Show the component actions if the param is set and there's articles
+                if (config.componentActions && response.empty) {
+                    config.componentActions.removeClass('hide');
+                }
+
                 /* Update the url if desired
                  */
                 if (config.updateUrl) {
@@ -110,6 +119,11 @@
                 event.preventDefault();
 
                 $(config.element).html('<div class="loader"></div>');
+
+                if (config.componentActions) {
+                    // Hide the component actions
+                    config.componentActions.addClass('hide');
+                }
 
                 /* Reload article list afresh
                  */
