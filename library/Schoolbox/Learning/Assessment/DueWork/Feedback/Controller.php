@@ -20,6 +20,7 @@ use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\DueWork;
+use Schoolbox\Learning\Assessment\DueWork\RubricContext;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
@@ -302,8 +303,22 @@ class Controller extends Base
         IFeedback $mostRecentFeedback = null,
         IResponse $response = null
     ):Model {
+
+        // Check whether new rubric data is being passed through
         $hasRubric = array_key_exists('rubric', $postVars) || array_key_exists('saveEmpty', $postVars);
 
+        // Check whether the latest feedback actually has rubric data set.
+        if ($mostRecentFeedback !== null && $mostRecentFeedback->getAssessable() instanceof DueWork\Model) {
+            if ($mostRecentFeedback->getAssessable()->getUseRubric()) {
+                $mostRecentFeedback->getAssessable()->setRubric($this->rubricMapper->findByDueWork($mostRecentFeedback->getAssessable()));
+            }
+            $rubricContext = new RubricContext($this->rubricMapper);
+            $rub = $rubricContext->generateForFeedback($mostRecentFeedback, $this->getUser(), Access::getInstance());
+            if (!empty($rub)) {
+                $hasRubric = true;
+            }
+        }
+        
         $dueWorkFeedbackFactory = new DueWork\Feedback\Factory(
             $this->getFeedbackDataSource(),
             $participant,
