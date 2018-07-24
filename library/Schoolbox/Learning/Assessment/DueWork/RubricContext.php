@@ -107,7 +107,8 @@ class RubricContext
         /* Spawn rubric grid
          */
         (new GridGenerator($this->rubricMapper, $dueWork->getRubric(), $student))->applyInstructorGivenMark($publishedOnly);
-        $context['rubric'] = $dueWork->getRubric()->toContext();
+        $rubric = $dueWork->getRubric()->toContext();
+        $context['rubric'] = array_merge($rubric, ['descriptorMetadata' => $this->generateRubricMarkMetadata($rubric)]);
 
         return $context;
     }
@@ -172,8 +173,9 @@ class RubricContext
             return ['rubric' => null];
         }
 
+        $rubric = $dueWork->getRubric()->toContext($currentUser);
         $context = [
-            'rubric' => $dueWork->getRubric()->toContext($currentUser),
+            'rubric' => array_merge($rubric, ['descriptorMetadata' => $this->generateRubricMarkMetadata($rubric)])
         ];
 
         // Don't show total mark here at all (it's zero anyway when there is no Participant)
@@ -247,8 +249,9 @@ class RubricContext
             $gridGenerator->applyInstructorGivenMark($publishedOnly);
         }
 
+        $rubric = $dueWork->getRubric()->toContext($currentUser);
         $context = [
-            'rubric' => $dueWork->getRubric()->toContext($currentUser),
+            'rubric' => array_merge($rubric, ['descriptorMetadata' => $this->generateRubricMarkMetadata($rubric)])
         ];
 
         // Hide total mark from students and parents
@@ -258,6 +261,34 @@ class RubricContext
         }
 
         return $context;
+    }
+
+    /**
+     * Generates an array of metadata about the values of descriptors in a rubric
+     *
+     * @param array $rubric     Rubric data structure return by Rubric::toContext()
+     * @return array            Array indexed by criteria and level IDs, containing
+     *                          - sort order for criteria
+     *                          - max and min value for each level (descriptor) in the criteria
+     */
+    private function generateRubricMarkMetadata(array $rubric) : array
+    {
+        // Array of descriptors indexed by criteria and level ID
+        $descriptors = $rubric['descriptors'];
+
+        // Get a list of all levels in this rubric. Needed for look-ahead/look-behind on next/prev descriptors.
+        // The descriptor array contains only the levels that have a descriptor in the current criterion,
+        // so we have to get this data separately.
+        $levelIds = array_keys($rubric['levels']);
+
+        $metadata = [];
+
+        foreach ($descriptors as $critId => $levelDescriptors) {
+            $critMetadata = new CriterionMetadata($levelIds, $levelDescriptors);
+            $metadata[$critId] = $critMetadata->getMetadata();
+        }
+
+        return $metadata;
     }
 
 

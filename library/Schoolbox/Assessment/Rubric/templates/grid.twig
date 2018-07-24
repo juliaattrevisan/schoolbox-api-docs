@@ -21,55 +21,70 @@
         {% set rowspan = group.criteria|length + (group.total ? 1 : 0) %}
 
         {% for critIndex, crit in group.criteria %}
-    <tr>
-        {# yay html tables... -_-; #}
-        {% if rowspan %}
-            <th rowspan="{{ rowspan }}">{{ group.name }}</th>
-            {% set rowspan = 0 %}
-        {% endif %}
-
-        <th>{{ crit.name }}</th>
-
-            {% for levelIndex, level in rubric.levels %}
-
-                {% set descriptor = rubric.descriptors[crit.id][levelIndex] %}
-
-                {% if descriptor %}
-
-                    {# Self-Assessment #}
-                    {% set learnerSelected = learnerRubric.descriptors[crit.id][levelIndex]['selected'] %}
-
-                    <td {% if descriptor.selected and markVisibility %}class="rb-selected"{% endif %}>
-                        <div>
-                            <p>
-                                {{- descriptor.text|nl2br -}}
-                            </p>
-                            {% if descriptor.value is not null and config.rubric_show_points %}
-                            <aside>
-                                {{- descriptor.value -}}
-                            </aside>
-                            {% endif %}
-
-                        {# Self-Assessment #}
-                        {% if learnerSelected %}
-                            <img class="rb-self-reflection-choice"
-                                 src="/portrait.php?userId={{ learner.externalId }}&amp;size=square32"
-                                 title="{% if latestSelfReflectedFeedback.normalisedMark != null %}{{ locale.selfAssessment.proper }}{% else %}{{ locale.selfReflection.proper }}{% endif %} choice" />
-                        {% endif %}
-                        </div>
-                    </td>
-
-                {% else %}
-                    <td class="rb-blank">&nbsp;</td>
+            <tr>
+                {# yay html tables... -_-; #}
+                {% if rowspan %}
+                    <th rowspan="{{ rowspan }}">{{ group.name }}</th>
+                    {% set rowspan = 0 %}
                 {% endif %}
 
-            {% endfor %}
+                <th>{{ crit.name }}</th>
 
+                {% for levelIndex, level in rubric.levels %}
 
+                    {% set descriptor = rubric.descriptors[crit.id][levelIndex] %}
 
-    </tr>
+                    {% if descriptor %}
+
+                        {# Self-Assessment #}
+                        {% set learnerSelected = learnerRubric.descriptors[crit.id][levelIndex].selected %}
+
+                        <td {% if descriptor.selected and markVisibility %}class="rb-selected"{% endif %}>
+                            <div>
+                                <p>
+                                    {{- descriptor.text|nl2br -}}
+                                </p>
+                                {% if descriptor.value is not null and config.rubric_show_points %}
+                                    <aside>
+                                        {% set direction = rubric.descriptorMetadata[crit.id].direction %}
+                                        {% set descriptorMin = rubric.descriptorMetadata[crit.id][levelIndex].min %}
+                                        {% set descriptorMax = rubric.descriptorMetadata[crit.id][levelIndex].max %}
+
+                                        {% if useMarkRange and descriptorMin != descriptorMax %}
+                                            {% if descriptor.selected and markVisibility %}
+                                                {# TODO once we can store this descriptor's discrete mark, replace first twig var with that #}
+                                                {{ descriptorMax }} / {{ descriptorMax }}
+                                            {% else %}
+                                                {% if direction == 'asc' %}
+                                                    {{- descriptorMin -}} - {{- descriptorMax -}}
+                                                {% else %}
+                                                    {{- descriptorMax -}} - {{- descriptorMin -}}
+                                                {% endif %}
+                                            {% endif %}
+                                        {% else %}
+                                            {{ descriptor.value }}
+                                        {% endif %}
+                                    </aside>
+                                {% endif %}
+
+                            {# Self-Assessment #}
+                            {% if learnerSelected %}
+                                <img class="rb-self-reflection-choice"
+                                     src="/portrait.php?userId={{ learner.externalId }}&amp;size=square32"
+                                     title="{% if latestSelfReflectedFeedback.normalisedMark != null %}{{ locale.selfAssessment.proper }}{% else %}{{ locale.selfReflection.proper }}{% endif %} choice" />
+                            {% endif %}
+                            </div>
+                        </td>
+
+                    {% else %}
+                        <td class="rb-blank">&nbsp;</td>
+                    {% endif %}
+
+                {% endfor %}
+            </tr>
         {% endfor %}
 
+        {# TODO group.total is meant to be null when the student is self reflecting #}
         {% if group.total %}
         <tr>
             {% if group.humanReadableMark %}
@@ -86,7 +101,6 @@
         {% endif %}
 
     {% endfor %}
-
 
     {% if rubric.total %}
     <tr>

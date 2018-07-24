@@ -52,44 +52,80 @@
 
                 {% for levelIndex, level in rubric.levels %}
                     {% set descriptor = rubric.descriptors[crit.id][levelIndex] %}
+
                     {% if descriptor %}
 
-                    {% set inputId %}{{ formField }}[{{ crit.id }}][{{ level.id }}]{% endset %}
+                        {% set inputId %}{{ formField }}[{{ crit.id }}][{{ level.id }}]{% endset %}
 
-                    {# Self-Assessment #}
-                    {% set learnerSelected = learnerRubric.descriptors[crit.id][levelIndex]['selected'] %}
-                    <td>
-                        <input id="{{ inputId }}"
-                               name="{{ formField }}[descriptors][{{ descriptor.id }}]"
-                               value="1"
-                               type="checkbox"
-                               data-value="{{ descriptor.value }}"
-                               data-rubric="{{ rubric.id }}"
-                               data-rubric-group="{{ group.id }}"
-                               data-rubric-descriptor="{{ descriptor.id }}"
-                               {% if descriptor.selected %}checked="checked"{% endif %}
-                        />
-                        <label for="{{ inputId }}">
-                        <span class="rb-description">
-                            {{- descriptor.text|nl2br -}}
-                        </span>
+                        {# Self-Assessment #}
+                        {% set learnerSelected = learnerRubric.descriptors[crit.id][levelIndex].selected %}
+                        <td>
+                            <input id="{{ inputId }}"
+                                   name="{{ formField }}[descriptors][{{ descriptor.id }}]"
+                                   value="1"
+                                   type="checkbox"
+                                   data-value="{{ descriptor.value }}"
+                                   data-rubric="{{ rubric.id }}"
+                                   data-rubric-group="{{ group.id }}"
+                                   data-rubric-descriptor="{{ descriptor.id }}"
+                                   {% if descriptor.selected %}checked="checked"{% endif %}
+                            />
 
-                        {% if descriptor.value is not null and showDescriptorValue and (config.rubric_show_points or not studentView) %}
-                        <span class="rb-value">
-                            {{- descriptor.value -}}
-                        </span>
+                            <label for="{{ inputId }}">
+                                <span class="rb-description">
+                                    {{- descriptor.text|nl2br -}}
+                                </span>
+
+                                {% set direction = rubric.descriptorMetadata[crit.id].direction %}
+                                {% set descriptorMin = rubric.descriptorMetadata[crit.id][levelIndex].min %}
+                                {% set descriptorMax = rubric.descriptorMetadata[crit.id][levelIndex].max %}
+                                {% set hidePoints = not config.rubric_show_points or (studentView and selfReflect) %}
+
+                                {# Just show a text value if the descriptor is not selected #}
+                                {% if descriptor.value is not null and showDescriptorValue and not hidePoints %}
+                                    <span class="rb-value {% if descriptorMin == descriptorMax or not useMarkRange %}used {% elseif descriptor.selected %}hide{% endif %}">
+                                        {% if useMarkRange and descriptorMin != descriptorMax %}
+                                            {% if direction == 'asc' %}
+                                                {{- descriptorMin -}} - {{- descriptorMax -}}
+                                            {% else %}
+                                                {{- descriptorMax -}} - {{- descriptorMin -}}
+                                            {% endif %}
+                                        {% else %}
+                                            {{ descriptor.value }}
+                                        {% endif %}
+                                    </span>
+                                {% endif %}
+                            </label>
+                            {# Render a dropdown to select a value from the range #}
+                            {# TODO this select needs a label; technically it should be the one above but that's already in use for the descriptor checkbox #}
+                            <select id="rangeDropdown-{{ descriptor.id }}"
+                                    class="{% if not descriptor.selected or descriptorMin == descriptorMax or not useMarkRange %} hide{% endif %}
+                                    {% if useMarkRange and descriptorMin != descriptorMax and not hidePoints %}used{% endif %}"
+                            >
+                                {% set rangeStart = direction == 'asc' ? descriptorMin : descriptorMax %}
+                                {% set rangeEnd = direction == 'asc' ? descriptorMax : descriptorMin %}
+
+                                {% for i in rangeStart..rangeEnd %}
+                                    <option
+                                        value={{ i }}
+                                        {# TODO once DB writeback is implemented, make sure this uses the actual selected value when the user changes it #}
+                                        {% if i == descriptorMax %}selected{% endif %}
+                                    >{{ i }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+
+                            {% if learnerSelected %}
+                                <img class="rb-self-reflection-choice"
+                                     src="/portrait.php?userId={{ learner.externalId }}&amp;size=square32"
+                                     title="{% if latestSelfReflectedFeedback.normalisedMark != null %}{{ locale.selfAssessment.proper }}{% else %}{{ locale.selfReflection.proper }}{% endif %} choice" />
                             {% endif %}
-                        </label>
-                        {% if learnerSelected %}
-                            <img class="rb-self-reflection-choice"
-                                 src="/portrait.php?userId={{ learner.externalId }}&amp;size=square32"
-                                 title="{% if latestSelfReflectedFeedback.normalisedMark != null %}{{ locale.selfAssessment.proper }}{% else %}{{ locale.selfReflection.proper }}{% endif %} choice" />
-                        {% endif %}
-                    </td>
+                        </td>
 
                     {% else %}
-                    <td class="rb-blank">&nbsp;</td>
+                        <td class="rb-blank">&nbsp;</td>
                     {% endif %}
+
                 {% endfor %}
             </tr>
             {% endfor %}
@@ -207,8 +243,34 @@
 
             $('[data-role=rubric-sum]').text(rubricSummary.text());
 
+            showHideRangeInput($changed);
         });
 
+        function showHideRangeInput($changedCell) {
+            var $allCellsInRow = $changedCell.parents("tr").find("[data-rubric], [data-rubric-group]");
+
+            // Hide dropdowns on all cells in the same row
+            $allCellsInRow.siblings("select").addClass("hide");
+
+            // Disable all dropdowns so they don't get POSTed
+            $allCellsInRow.siblings("select").prop("disabled", true);
+
+            // Show text labels on all cells in the same row
+            $allCellsInRow.siblings("label").find(".rb-value").removeClass("hide");
+
+            if ($changedCell.prop('checked')) {
+                // Hide the text label on the selected cell
+                $changedCell.siblings("label").find(".rb-value").addClass("hide");
+
+                // This will only un-hide an element if that element is the one we need to use on that cell:
+                // - Dropdowns are only used on cells with a range
+                // - Cells with a single value just get a text label
+
+                $changedCell.siblings("select.used").removeClass("hide");
+                $changedCell.siblings("select.used").prop("disabled", false); // Re-enable so we can use it and it gets POSTed
+                $changedCell.siblings("label").find(".rb-value.used").removeClass("hide");
+            }
+        }
 
         function getSum(elements)
         {

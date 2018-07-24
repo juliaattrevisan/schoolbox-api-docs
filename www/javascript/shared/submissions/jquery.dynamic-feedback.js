@@ -122,6 +122,7 @@
          * Set up listeners
          */
         function setupListeners() {
+            // TODO attach onFeedbackChanged to dropdown
             $(config.assessmentList)
                 .on('keydown paste keypress', 'textarea', timeoutUpdate)
                 .on('change', ':input', timeoutUpdate)

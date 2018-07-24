@@ -163,6 +163,7 @@ Usage:
                             : 'grid-markable.twig'
                             %}
                             {% include '@rubric/' ~ rubricTemplate with {
+                                useMarkRange: assessment.useMarkRange,
                                 rubric: rubricContext.rubric,
                                 learnerRubric: learnerRubricContext.rubric,
                                 learner: participant.user,
@@ -173,7 +174,11 @@ Usage:
                                 showRubricTotal: showRubricTotal,
                                 latestSelfReflectedFeedback: latestSelfReflectedFeedback,
                                 self: self,
-                                markSchemeName: markSchemeName
+                                studentView: studentView,
+                                selfAssess: selfAssess,
+                                selfReflect: selfReflect,
+                                markSchemeName: markSchemeName,
+                                descriptorMetadata: descriptorMetadata
                             } only %}
                         </fieldset>
                     {% endif %}
