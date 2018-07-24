@@ -256,7 +256,11 @@ class Mapper extends \Schoolbox\Mapper
         $yearMonth = '';
 
         if ($year || $month) {
-            $paddedMonth = str_pad($month, 2, '0', STR_PAD_LEFT);
+            $paddedMonth = '';
+
+            if ($month) {
+                $paddedMonth = str_pad($month, 2, '0', STR_PAD_LEFT);
+            }
 
             $yearMonth = "{$year}-{$paddedMonth}%";
 
