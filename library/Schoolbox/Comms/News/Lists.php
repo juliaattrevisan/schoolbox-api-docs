@@ -159,6 +159,7 @@ class Lists
             $this->databaseInternal,
             $this->userAccessMapper,
             $this->folderMapper,
+            $this->externalUser,
             new RelationshipFilterer(
                 $this->databaseInternal,
                 $this->userMapper,
@@ -166,8 +167,7 @@ class Lists
                 $this->folderMapper,
                 $this->externalClass,
                 $this->userAccessMapper
-            ),
-            $this->externalUser
+            )
         ))->findArticlesForUser($user);
 
         /* Articles in $topicId that $user can see

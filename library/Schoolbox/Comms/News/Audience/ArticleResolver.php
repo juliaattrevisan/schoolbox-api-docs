@@ -50,23 +50,23 @@ class ArticleResolver implements IArticleResolver
      * @param Database\Connector\IConnector $db
      * @param UserAccessMapper              $userAccessMapper
      * @param Folder\Mapper                 $folderMapper
-     * @param RelationshipFilterer          $relationshipFilter
      * @param External_User                 $externalUser
+     * @param RelationshipFilterer          $relationshipFilter
      */
     public function __construct(
         BusinessRules $businessRules,
         Database\Connector\IConnector $db,
         UserAccessMapper $userAccessMapper,
         Folder\Mapper $folderMapper,
-        RelationshipFilterer $relationshipFilter,
-        External_User $externalUser
+        External_User $externalUser,
+        RelationshipFilterer $relationshipFilter
     ) {
         $this->businessRules      = $businessRules;
         $this->db                 = $db;
         $this->userAccessMapper   = $userAccessMapper;
         $this->folderMapper       = $folderMapper;
-        $this->relationshipFilter = $relationshipFilter;
         $this->externalUser       = $externalUser;
+        $this->relationshipFilter = $relationshipFilter;
     }
 
 
