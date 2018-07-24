@@ -203,9 +203,36 @@ class Mapper extends \Schoolbox\Mapper
             WHERE publish_at IS NOT NULL
             AND publish_at < NOW()
             AND accepted_at IS NOT NULL
-            AND expires_at > NOW()
             AND deleted_at IS NULL
+            
         ";
+
+        /* If either year or month is specified, we're looking in the news archive
+         */
+        if ($year || $month) {
+            $query .= "
+                AND expires_at < NOW()
+            ";
+
+            if ($year && $month) {
+                if ($month) {
+                    $query .= "
+                        AND publish_at LIKE '{$year}-{$month}%'
+                    ";
+                }
+            }
+
+            if ($year) {
+                $query .= "
+                    AND publish_at LIKE '{$year}%'
+                ";
+            }
+        }
+        else {
+            $query .= '
+                AND expires_at > NOW()
+            ';
+        }
 
         if (\count($availableArticleIds)) {
             $query .= "
@@ -221,16 +248,43 @@ class Mapper extends \Schoolbox\Mapper
                 WHERE publish_at IS NOT NULL
                 AND publish_at < NOW()
                 AND accepted_at IS NOT NULL
-                AND expires_at > NOW()
                 AND deleted_at IS NULL
                 AND cnat.topic_id = :topicId
             ";
+
+            /* If either year or month is specified, we're looking in the news archive
+             */
+            if ($year || $month) {
+                $query .= "
+                    AND expires_at < NOW()
+                ";
+
+                if ($year && $month) {
+                    if ($month) {
+                        $query .= "
+                            AND publish_at LIKE '{$year}-{$month}%'
+                        ";
+                    }
+                }
+
+                if ($year) {
+                    $query .= "
+                        AND publish_at LIKE '{$year}%'
+                    ";
+                }
+            }
+            else {
+                $query .= '
+                    AND expires_at > NOW()
+                ';
+            }
 
             if (\count($availableArticleIds)) {
                 $query .= "
                     AND id IN ({$availableArticleIdsSql}) 
                 ";
             }
+
 
             $query .= '
                 GROUP BY id
