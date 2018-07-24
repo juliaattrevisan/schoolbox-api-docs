@@ -63,6 +63,7 @@
             </script>
 
             {% include '@commsNews/tabs.twig' with {
+                url: routeLookup('commsNews.getListByTopic'),
                 topicContainerId: 'news-topics',
                 topics: topics,
                 topicAll: topicAll,

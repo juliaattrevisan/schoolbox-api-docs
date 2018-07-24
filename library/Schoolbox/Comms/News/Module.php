@@ -95,7 +95,7 @@ class Module extends BaseModule
 
         /* (async) Get a list of articles audienced to me, by topic
          */
-        $this->register('GET', '/list', 'getListByTopic', $viewPerms);
+        $this->register('GET', '/list{/year,month}', 'getListByTopic', $viewPerms);
 
         /* News Archive
          */

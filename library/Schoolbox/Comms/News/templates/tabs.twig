@@ -2,6 +2,7 @@
  # A list of all the available Topics to chooze
  # Sets up a container for async article loading
  #
+ # @param string url
  # @param string topicContainerId
  # @param Collection|Topic[] topics
  # @param int topicAll
@@ -22,7 +23,7 @@
 
     {# Select "All" by default if the component config is set #}
     <dd {% if slug == 'all' or not slug %}class="active"{% endif %}>
-        <a href="{{ routeLookup('commsNews.getListByTopic') ~ '?' ~ params ~ '&topic=' ~ topicAll }}">All</a>
+        <a href="{{ url ~ '?' ~ params ~ '&topic=' ~ topicAll }}">All</a>
     </dd>
 
     {% for topic in topics %}
@@ -33,7 +34,7 @@
         {% endif %}
 
         <dd {{ selected|purify }}>
-            <a href="{{ routeLookup('commsNews.getListByTopic') ~ '?' ~ params ~ '&topic=' ~ topic.getSlug }}">{{ topic.name }}</a>
+            <a href="{{ url ~ '?' ~ params ~ '&topic=' ~ topic.getSlug }}">{{ topic.name }}</a>
         </dd>
     {% endfor %}
 </dl>

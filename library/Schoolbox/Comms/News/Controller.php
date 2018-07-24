@@ -525,6 +525,8 @@ class Controller extends Base
      *
      * @api GET /comms/news/list
      *
+     * @param int|null $year
+     * @param int|null $month
      * @throws InvalidArgumentException
      * @throws RouteNotFound
      * @throws \Alaress\Database\Predicate\InvalidColumnException
@@ -533,7 +535,7 @@ class Controller extends Base
      * @throws \UnderflowException
      * @throws \UnexpectedValueException
      */
-    public function getListByTopic()
+    public function getListByTopic(?int $year, ?int $month)
     {
         if ($this->getRequest()->isXhr()) {
             $params = new Querystring($this->getConfigLoader()->get('search_type_limit'), $this->getRequest()->query);
@@ -543,7 +545,7 @@ class Controller extends Base
              */
             $urlPrefix = $this->getRouter()->generate('commsNews.getIndex');
 
-            $outcome = $this->generatePartial($urlPrefix, $params, $topics, $params->getShowPaginator());
+            $outcome = $this->generatePartial($urlPrefix, $params, $topics, $params->getShowPaginator(), $year, $month);
             $content = $this->buildUnthemedHtmlOutput('@commsNews/list.twig', $outcome)->getAsString();
             $viewAllLink = $this->getRouteIfAuthorized('commsNews.getIndex') . '?' . $params;
 
