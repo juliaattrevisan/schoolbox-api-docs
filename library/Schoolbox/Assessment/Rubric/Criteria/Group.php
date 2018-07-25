@@ -184,7 +184,7 @@ class Group implements Twiggable, Calculable
      *
      * @return float
      */
-    public function getTotal()
+    private function getCriteriaSum()
     {
         $total = 0;
 
@@ -204,12 +204,12 @@ class Group implements Twiggable, Calculable
      *
      * @return float
      */
-    public function getMaxValue()
+    public function getTotal()
     {
         if (null !== $this->maxValue) {
             return $this->maxValue;
         }
-        return $this->getTotal();
+        return $this->getCriteriaSum();
     }
 
 
@@ -246,7 +246,6 @@ class Group implements Twiggable, Calculable
             'name'       => $this->getName(),
             'sum'        => $this->getSum(),
             'total'      => $this->getTotal(),
-            'maxValue'   => $this->getMaxValue(),
             'percentage' => $this->getPercentage(),
             'humanReadableMark' => $this->getHumanReadableMark(),
             'used'       => $this->isReadOnly(),
