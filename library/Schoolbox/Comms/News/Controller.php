@@ -485,9 +485,7 @@ class Controller extends Base
              */
             $outcome = $this->generatePartial($params, $topics, $params->getShowPaginator());
             $content = $this->buildUnthemedHtmlOutput('@commsNews/list.twig', $outcome)->getAsString();
-
-            $viewAllLink = $this->getRouteIfAuthorized('commsNews.getIndex');
-            $viewAllLink = "{$viewAllLink}?{$params}"; // $params can be dumped as a string because of __toString() method
+            $viewAllLink = $this->getRouteIfAuthorized('commsNews.getIndex') . '?' . $params;
 
             $this->getResponse()->content->set($this->buildJsonOutput([
                 'success' => true,
