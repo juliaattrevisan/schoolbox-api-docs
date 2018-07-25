@@ -6,7 +6,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Assessment\Rubric;
+namespace Schoolbox\Assessment\Rubric\RowSet;
 
 use Schoolbox\Assessment\Rubric\Criteria\Group;
 use Schoolbox\GenericCollection;
