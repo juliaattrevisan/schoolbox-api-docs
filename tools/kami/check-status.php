@@ -124,7 +124,7 @@ HELP;
     $StatusChecker = new Kami\StatusUpdater($connector, $kamiMapper, $jitter, $log);
 
     // Ensure only one instance of checker is running at a time
-    $lockFile = "{$config->get('stream_dir')}/.kami_status_check.lock";
+    $lockFile = "{$config->get('stream_dir')}/.kami_status_check_".INSTANCE_ID.".lock";
     $lock     = new Alaress_Lock($lockFile);
     if (!$lock->acquire()) {
         $log->warning('A status-checker is already running. Checking last mod time');
