@@ -488,10 +488,7 @@ class Controller extends Base
 
             $selectedTopic = $topics->getBy('id', $outcome['topicId']);
             $viewAllLink = $this->getRouteIfAuthorized('commsNews.getIndex');
-
-            if ($selectedTopic) {
-                $viewAllLink .= '?topic=' . $selectedTopic->getSlug();
-            }
+            $viewAllLink = "{$viewAllLink}?{$params}"; // $params can be dumped as a string because of __toString() method
 
             $this->getResponse()->content->set($this->buildJsonOutput([
                 'success' => true,
