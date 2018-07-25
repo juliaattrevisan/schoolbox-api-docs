@@ -68,6 +68,7 @@ namespace RubricGrid {
     class RubricCriterionUsage {
         criterion : RubricCriterion
         descriptors : RubricDescriptor[]
+        maxValue : float
     }
 
     class RubricLevel {
