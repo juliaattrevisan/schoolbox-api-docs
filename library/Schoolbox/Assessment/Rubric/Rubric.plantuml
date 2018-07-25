@@ -71,7 +71,7 @@ namespace RubricGrid {
     class RubricCriterionUsage {
         criterion : RubricCriterion
         descriptors : RubricDescriptor[]
-        maxValue : float
+        getMaxValue() : float
     }
 
     class RubricLevel {
@@ -120,7 +120,7 @@ namespace RubricMarkedGrid {
     class RubricCriterionMark {
         criterion : RubricCriterionUsage
         descriptors: RubricDescriptorMark[]
-        value : float
+        getValue() : float
     }
 
     class RubricDescriptorMark {
