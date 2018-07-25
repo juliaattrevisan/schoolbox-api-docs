@@ -22,8 +22,22 @@ class Descriptor implements Calculable, Twiggable
     /** @var string */
     protected $text;
 
-    /** @var float */
+    /**
+     * The value of the descriptor, as set in the rubric grid.
+     *
+     * @var float
+     */
     protected $value;
+
+    /**
+     * The actual selected value value of the descriptor, as set when marking
+     * the rubric.
+     *
+     * As of 18.1 this may be different from `$this->value`.
+     *
+     * @var null|float
+     */
+    protected $selectedValue;
 
     /**
      * Is this descriptor checked? (to indicate it represents the student's attainment for the criterion)
@@ -44,8 +58,9 @@ class Descriptor implements Calculable, Twiggable
      * @param float  $value
      * @param int    $id
      * @param bool   $selected
+     * @param float  $selectedValue
      */
-    public function __construct($text = '', $value = null, $id = null, $selected = false)
+    public function __construct($text = '', $value = null, $id = null, $selected = false, $selectedValue = null)
     {
         $this->setId($id);
         $this->setText($text);
@@ -110,6 +125,26 @@ class Descriptor implements Calculable, Twiggable
     public function setValue($value)
     {
         $this->value = $value;
+        return $this;
+    }
+
+
+    /**
+     * @return float|null
+     */
+    public function getSelectedValue(): ?float
+    {
+        return $this->selectedValue;
+    }
+
+
+    /**
+     * @param float|null $selectedValue
+     * @return static
+     */
+    public function setSelectedValue(?float $selectedValue): self
+    {
+        $this->selectedValue = $selectedValue;
         return $this;
     }
 

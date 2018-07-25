@@ -55,7 +55,7 @@ class GridGenerator
             $selected = \array_key_exists($descriptor->getId(), $selectedDescriptors);
             $descriptor->setSelected($selected);
             if ($selected) {
-                $descriptor->setValue($selectedDescriptors[$descriptor->getId()]);
+                $descriptor->setSelectedValue($selectedDescriptors[$descriptor->getId()]);
             }
         }
 
