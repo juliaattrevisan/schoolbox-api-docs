@@ -187,6 +187,8 @@ class Controller extends Base
     /**
      * Process any rubric data attached to the Feedback
      *
+     * TODO SA-6627: validate selected descriptor value
+     *
      * @param Participant $participant
      * @param array       $post
      * @param IFeedback   $feedback
@@ -212,6 +214,8 @@ class Controller extends Base
 
     /**
      * Create a Feedback that is associated with a particular Response
+     *
+     * TODO SA-6627: pass selected descriptor's value in POST, not just which descriptor was selected
      *
      * @api POST /learning/assessments/{assessmentId}/{studentId}/{responseId}/feedback
      * @param DueWork\Model          $assessment
