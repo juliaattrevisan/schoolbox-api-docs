@@ -42,10 +42,6 @@
                  */
                 topicTabs: $(element).parents('[data-component]').find('[data-tab]'),
 
-                // The component action bar, which will be hidden and shown based on if there's any articles
-                // This can be left empty for implementations where there's no action bar
-                componentActions: '',
-
                 /* Asynchronously load this data upon start
                  * If empty, it'll do nothing until you change topics
                  */
@@ -70,7 +66,13 @@
 
                 /* The current limit
                  */
-                limit: null
+                limit: null,
+
+                // Callback on tab change
+                onChange: function () {},
+
+                // Callback on articles loaded
+                onChangeSuccess: function () {}
             };
 
             return $.extend(defaults, options);
@@ -96,14 +98,8 @@
                  */
                 $(config.element).html(response.fragment).saveForLater();
 
-                // Show the component actions if the param is set and there's articles
-                if (config.componentActions && response.empty) {
-                    // Update href with the topic
-                    config.componentActions.find('[data-news-component-view-all]').attr('href', response.viewAllLink);
-
-                    // Show the action bar
-                    config.componentActions.removeClass('hide');
-                }
+                // Fire onChangeSuccess callback
+                config.onChangeSuccess(response);
 
                 /* Update the url if desired
                  */
@@ -122,12 +118,10 @@
             $(config.topicTabs).on('click', 'a', function(event) {
                 event.preventDefault();
 
-                $(config.element).html('<div class="loader"></div>');
+                // Fire onChange callback
+                config.onChange();
 
-                if (config.componentActions) {
-                    // Hide the component actions
-                    config.componentActions.addClass('hide');
-                }
+                $(config.element).html('<div class="loader"></div>');
 
                 /* Reload article list afresh
                  */

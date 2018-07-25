@@ -24,7 +24,22 @@
         $('#news-container-{{ componentInstanceId }}').articleTabs({
             'selectedUrl': "{{ routeLookup('commsNews.getListByTopic') }}?{{ querystringParams|raw }}",
             'topicTabs': $("#news-topics-{{ componentInstanceId }}"),
-            'componentActions': $("#news-component-actions-{{ componentInstanceId }}")
+            onChange: function() {
+                // Hide the component action bar
+                $('#news-component-actions-{{ componentInstanceId }}').addClass('hide');
+            },
+            onChangeSuccess: function (response) {
+                if (!response.empty) {
+                    var $actionBar = $('#news-component-actions-{{ componentInstanceId }}');
+                    var $viewAllBtn = $actionBar.find('a[data-news-component-view-all]');
+
+                    // Update view all href with the topic
+                    $viewAllBtn.attr('href', response.viewAllLink);
+
+                    // Show the action bar
+                    $actionBar.removeClass('hide');
+                }
+            }
         });
     });
 </script>
