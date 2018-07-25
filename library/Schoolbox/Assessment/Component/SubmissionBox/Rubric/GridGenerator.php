@@ -100,7 +100,7 @@ class GridGenerator
         $descriptorIds = [];
 
         foreach ($statement as $row) {
-            $descriptorIds[$row['id']] = $row['value'];
+            $descriptorIds[(int)$row['descriptor_id']] = isset($row['value']) ? (float)$row['value'] : null;
         }
 
         return $this->applyMark($descriptorIds);
