@@ -27,25 +27,25 @@
         {% endif %}
         <tbody>
             {% for groupIndex, group in rubric.groups %}
-            {# Use rowspans when group total is visible, otherwise don't need it
-             # This is only off when self-reflecting with a grid that doesn't show descriptor points
-             # and groups - here, it never shows the group subtotal, and rowspan calcs are off
-             #}
-            {% set rowspan = group.criteria|length %}
+                {# Use rowspans when group total is visible, otherwise don't need it
+                 # This is only off when self-reflecting with a grid that doesn't show descriptor points
+                 # and groups - here, it never shows the group subtotal, and rowspan calcs are off
+                 #}
+                {% set rowspan = group.criteria|length %}
 
-            {% if self != 'selfReflection' and showGroupTotal %}
-                {% set rowspan = group.criteria|length + (group.total ? 1 : 0) %}
-            {% endif %}
-
-            {% for critIndex, crit in group.criteria %}
-            <tr data-group="{{ rubricId }}-{{ group.id }}">
-                {# yay html tables... -_-; #}
-                {% if rowspan %}
-                    <th class="rb-group-name" rowspan="{{ rowspan }}"><span>{{ group.name }}</span></th>
-                    {% set rowspan = 0 %}
+                {% if self != 'selfReflection' and showGroupTotal %}
+                    {% set rowspan = group.criteria|length + (group.total ? 1 : 0) %}
                 {% endif %}
 
-                <th class="rb-criterion-name">{{ crit.name }}</th>
+                {% for critIndex, crit in group.criteria %}
+                <tr data-group="{{ rubricId }}-{{ group.id }}">
+                    {# yay html tables... -_-; #}
+                    {% if rowspan %}
+                        <th class="rb-group-name" rowspan="{{ rowspan }}"><span>{{ group.name }}</span></th>
+                        {% set rowspan = 0 %}
+                    {% endif %}
+
+                    <th class="rb-criterion-name">{{ crit.name }}</th>
 
                 {# Required so that this form is recognised as containing a rubric, even if nothing is submitted #}
                 <input name="saveEmpty" value="true" type="hidden"/>
@@ -81,33 +81,33 @@
                                     {% set descriptorMax = rubric.descriptorMetadata[crit.id][levelIndex].max %}
                                     {% set hidePoints = not config.rubric_show_points or (studentView and selfReflect) %}
 
-                                {# Just show a text value if the descriptor is not selected #}
-                                {% if descriptor.value is not null and showDescriptorValue and not hidePoints %}
-                                    <span class="rb-value {% if descriptorMin == descriptorMax or not useMarkRange %}used {% elseif descriptor.selected %}hide{% endif %}">
-                                        {% if useMarkRange and descriptorMin != descriptorMax %}
-                                            {% if direction == 'asc' %}
-                                                {{- descriptorMin -}} - {{- descriptorMax -}}
+                                    {# Just show a text value if the descriptor is not selected #}
+                                    {% if descriptor.value is not null and showDescriptorValue and not hidePoints %}
+                                        <span class="rb-value {% if descriptorMin == descriptorMax or not useMarkRange %}used {% elseif descriptor.selected %}hide{% endif %}">
+                                            {% if useMarkRange and descriptorMin != descriptorMax %}
+                                                {% if direction == 'asc' %}
+                                                    {{- descriptorMin -}} - {{- descriptorMax -}}
+                                                {% else %}
+                                                    {{- descriptorMax -}} - {{- descriptorMin -}}
+                                                {% endif %}
                                             {% else %}
-                                                {{- descriptorMax -}} - {{- descriptorMin -}}
+                                                {{ descriptor.value }}
                                             {% endif %}
-                                        {% else %}
-                                            {{ descriptor.value }}
-                                        {% endif %}
-                                    </span>
-                                {% endif %}
-                            </label>
-                            {# Render a dropdown to select a value from the range #}
-                            {# TODO this select needs a label; technically it should be the one above but that's already in use for the descriptor checkbox #}
-                            <select id="rangeDropdown-{{ descriptor.id }}"
-                                    name="{{ formField }}[descriptors][{{ descriptor.id }}][value]"
-                                    class="{% if not descriptor.selected or descriptorMin == descriptorMax or not useMarkRange %} hide{% endif %}
-                                    {% if useMarkRange and descriptorMin != descriptorMax and not hidePoints %}used{% endif %}"
-                                    data-rubric="{{ rubric.id }}"
-                                    data-rubric-group="{{ group.id }}"
-                                    data-rubric-descriptor="{{ descriptor.id }}"
-                            >
-                                {% set rangeStart = direction == 'asc' ? descriptorMin : descriptorMax %}
-                                {% set rangeEnd = direction == 'asc' ? descriptorMax : descriptorMin %}
+                                        </span>
+                                    {% endif %}
+                                </label>
+                                {# Render a dropdown to select a value from the range #}
+                                {# TODO this select needs a label; technically it should be the one above but that's already in use for the descriptor checkbox #}
+                                <select id="rangeDropdown-{{ descriptor.id }}"
+                                        name="{{ formField }}[descriptors][{{ descriptor.id }}][value]"
+                                        class="{% if not descriptor.selected or descriptorMin == descriptorMax or not useMarkRange %} hide{% endif %}
+                                        {% if useMarkRange and descriptorMin != descriptorMax and not hidePoints %}used{% endif %}"
+                                        data-rubric="{{ rubric.id }}"
+                                        data-rubric-group="{{ group.id }}"
+                                        data-rubric-descriptor="{{ descriptor.id }}"
+                                >
+                                    {% set rangeStart = direction == 'asc' ? descriptorMin : descriptorMax %}
+                                    {% set rangeEnd = direction == 'asc' ? descriptorMax : descriptorMin %}
 
                                 {# Selected value: if not provided, use max #}
                                 {% set selectedValue = descriptor.selectedValue ?? descriptorMax %}
@@ -127,12 +127,12 @@
                             {% endif %}
                         </td>
 
-                    {% else %}
-                        <td class="rb-blank">&nbsp;</td>
-                    {% endif %}
+                        {% else %}
+                            <td class="rb-blank">&nbsp;</td>
+                        {% endif %}
 
-                {% endfor %}
-            </tr>
+                    {% endfor %}
+                </tr>
             {% endfor %}
 
         {% if group.total and showGroupTotal %}
