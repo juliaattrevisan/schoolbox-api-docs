@@ -485,12 +485,14 @@ class Controller extends Base
              */
             $outcome = $this->generatePartial($params, $topics, $params->getShowPaginator());
             $content = $this->buildUnthemedHtmlOutput('@commsNews/list.twig', $outcome)->getAsString();
+            $viewAllLink = $this->getRouteIfAuthorized('commsNews.getIndex') . '?' . $params;
 
             $this->getResponse()->content->set($this->buildJsonOutput([
                 'success' => true,
                 'title' => $this->getDi()->get('l10n')->translate('news', false, true),
                 'url' => $outcome['currentUrl'],
-                'fragment' => $content
+                'fragment' => $content,
+                'viewAllLink' => $outcome['articles']->count() ? $viewAllLink : null
             ]));
         }
     }

@@ -23,7 +23,23 @@
     $(function() {
         $('#news-container-{{ componentInstanceId }}').articleTabs({
             'selectedUrl': "{{ routeLookup('commsNews.getListByTopic') }}?{{ querystringParams|raw }}",
-            'topicTabs': $("#news-topics-{{ componentInstanceId }}")
+            'topicTabs': $("#news-topics-{{ componentInstanceId }}"),
+            onChange: function() {
+                // Hide the component action bar
+                $('#news-component-actions-{{ componentInstanceId }}').addClass('hide');
+            },
+            onChangeSuccess: function (response) {
+                if (response.viewAllLink !== null) {
+                    var $actionBar = $('#news-component-actions-{{ componentInstanceId }}');
+                    var $viewAllBtn = $actionBar.find('a[data-news-component-view-all]');
+
+                    // Update view all href with the topic
+                    $viewAllBtn.attr('href', response.viewAllLink);
+
+                    // Show the action bar
+                    $actionBar.removeClass('hide');
+                }
+            }
         });
     });
 </script>
@@ -41,8 +57,9 @@
     <div class="loader"></div>
 </div>
 
-<div class="component-action">
+<div class="component-action hide" id="news-component-actions-{{ componentInstanceId }}">
     <section>
-        <a href="{{ routeLookup('commsNews.getIndex') }}" class="button">View All</a>
+        <a href="#" class="button" data-news-component-view-all>View All</a>
+        {# ^ href is populated by js in articletabs.js #}
     </section>
 </div>

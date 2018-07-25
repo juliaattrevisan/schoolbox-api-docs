@@ -66,7 +66,13 @@
 
                 /* The current limit
                  */
-                limit: null
+                limit: null,
+
+                // Callback on tab change
+                onChange: function () {},
+
+                // Callback on articles loaded
+                onChangeSuccess: function () {}
             };
 
             return $.extend(defaults, options);
@@ -82,6 +88,9 @@
              * and articles that appear in multiple topics with different saved for later states
              */
 
+            // Fire onChange callback
+            config.onChange();
+
             $.ajax({
                 type: 'GET',
                 url: url,
@@ -91,6 +100,9 @@
                 /* Note that we don't need to reapply initSaveForLaterActions() again
                  */
                 $(config.element).html(response.fragment).saveForLater();
+
+                // Fire onChangeSuccess callback
+                config.onChangeSuccess(response);
 
                 /* Update the url if desired
                  */
