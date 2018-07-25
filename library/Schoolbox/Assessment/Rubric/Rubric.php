@@ -236,9 +236,9 @@ class Rubric implements Twiggable
             'id'          => $this->getId() ?: 0,
             'multiSelect' => $this->isMultiSelect(),
             'sum'         => $this->criteriaGroups->getSum(),
-            'total'       => $this->getTotal(),
-            'percentage'  => $this->getPercentage(),
-            'humanReadableMark' => $this->getHumanReadableMark(),
+            'total'       => $this->getTotal(), // TODO
+            'percentage'  => $this->getPercentage(), // TODO
+            'humanReadableMark' => $this->getHumanReadableMark(), // TODO
             'levels'      => [],
             'groups'      => [],
         ];
