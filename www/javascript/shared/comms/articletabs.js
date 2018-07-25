@@ -88,6 +88,9 @@
              * and articles that appear in multiple topics with different saved for later states
              */
 
+            // Fire onChange callback
+            config.onChange();
+
             $.ajax({
                 type: 'GET',
                 url: url,
@@ -117,9 +120,6 @@
         function initListeners() {
             $(config.topicTabs).on('click', 'a', function(event) {
                 event.preventDefault();
-
-                // Fire onChange callback
-                config.onChange();
 
                 $(config.element).html('<div class="loader"></div>');
 
