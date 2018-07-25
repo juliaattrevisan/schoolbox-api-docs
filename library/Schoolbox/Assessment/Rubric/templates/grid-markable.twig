@@ -27,7 +27,6 @@
         {% endif %}
         <tbody>
             {% for groupIndex, group in rubric.groups %}
-
             {# Use rowspans when group total is visible, otherwise don't need it
              # This is only off when self-reflecting with a grid that doesn't show descriptor points
              # and groups - here, it never shows the group subtotal, and rowspan calcs are off
@@ -42,8 +41,8 @@
             <tr data-group="{{ rubricId }}-{{ group.id }}">
                 {# yay html tables... -_-; #}
                 {% if rowspan %}
-                <th class="rb-group-name" rowspan="{{ rowspan }}"><span>{{ group.name }}</span></th>
-                {% set rowspan = 0 %}
+                    <th class="rb-group-name" rowspan="{{ rowspan }}"><span>{{ group.name }}</span></th>
+                    {% set rowspan = 0 %}
                 {% endif %}
 
                 <th class="rb-criterion-name">{{ crit.name }}</th>
@@ -51,36 +50,36 @@
                 {# Required so that this form is recognised as containing a rubric, even if nothing is submitted #}
                 <input name="saveEmpty" value="true" type="hidden"/>
 
-                {% for levelIndex, level in rubric.levels %}
-                    {% set descriptor = rubric.descriptors[crit.id][levelIndex] %}
+                    {% for levelIndex, level in rubric.levels %}
+                        {% set descriptor = rubric.descriptors[crit.id][levelIndex] %}
 
-                    {% if descriptor %}
+                        {% if descriptor %}
 
-                        {% set inputId %}{{ formField }}[{{ crit.id }}][{{ level.id }}]{% endset %}
+                            {% set inputId %}{{ formField }}[{{ crit.id }}][{{ level.id }}]{% endset %}
 
-                        {# Self-Assessment #}
-                        {% set learnerSelected = learnerRubric.descriptors[crit.id][levelIndex].selected %}
-                        <td>
-                            <input id="{{ inputId }}"
-                                   name="{{ formField }}[descriptors][{{ descriptor.id }}][selected]"
-                                   value="1"
-                                   type="checkbox"
-                                   data-value="{{ descriptor.value }}"
-                                   data-rubric="{{ rubric.id }}"
-                                   data-rubric-group="{{ group.id }}"
-                                   data-rubric-descriptor="{{ descriptor.id }}"
-                                   {% if descriptor.selected %}checked="checked"{% endif %}
-                            />
+                            {# Self-Assessment #}
+                            {% set learnerSelected = learnerRubric.descriptors[crit.id][levelIndex].selected %}
+                            <td>
+                                <input id="{{ inputId }}"
+                                       name="{{ formField }}[descriptors][{{ descriptor.id }}][selected]"
+                                       value="1"
+                                       type="checkbox"
+                                       data-value="{{ descriptor.value }}"
+                                       data-rubric="{{ rubric.id }}"
+                                       data-rubric-group="{{ group.id }}"
+                                       data-rubric-descriptor="{{ descriptor.id }}"
+                                       {% if descriptor.selected %}checked="checked"{% endif %}
+                                />
 
-                            <label for="{{ inputId }}">
-                                <span class="rb-description">
-                                    {{- descriptor.text|nl2br -}}
-                                </span>
+                                <label for="{{ inputId }}">
+                                    <span class="rb-description">
+                                        {{- descriptor.text|nl2br -}}
+                                    </span>
 
-                                {% set direction = rubric.descriptorMetadata[crit.id].direction %}
-                                {% set descriptorMin = rubric.descriptorMetadata[crit.id][levelIndex].min %}
-                                {% set descriptorMax = rubric.descriptorMetadata[crit.id][levelIndex].max %}
-                                {% set hidePoints = not config.rubric_show_points or (studentView and selfReflect) %}
+                                    {% set direction = rubric.descriptorMetadata[crit.id].direction %}
+                                    {% set descriptorMin = rubric.descriptorMetadata[crit.id][levelIndex].min %}
+                                    {% set descriptorMax = rubric.descriptorMetadata[crit.id][levelIndex].max %}
+                                    {% set hidePoints = not config.rubric_show_points or (studentView and selfReflect) %}
 
                                 {# Just show a text value if the descriptor is not selected #}
                                 {% if descriptor.value is not null and showDescriptorValue and not hidePoints %}
