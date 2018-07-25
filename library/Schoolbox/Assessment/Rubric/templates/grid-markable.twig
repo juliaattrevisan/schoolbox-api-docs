@@ -282,7 +282,16 @@
             // in lieu of a reduce() function
             elements.map(function () {
                 if ($(this).prop('checked')) {
-                    var fl = parseFloat($(this).data('value'));
+                    // Is there a select box for this? If so use its value instead
+                    var $this = $(this),
+                        descriptorId = $this.data('rubricDescriptor'),
+                        $select = $rb.find('#rangeDropdown-'+String(descriptorId)),
+                        fl;
+                    if ($select.length) {
+                        fl = parseFloat($select.val());
+                    } else {
+                        fl = parseFloat($(this).data('value'));
+                    }
                     if (!isNaN(fl)) {
                         groupSum += fl;
                     }
