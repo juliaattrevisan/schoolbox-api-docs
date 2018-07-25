@@ -111,10 +111,8 @@
                                 {% set selectedValue = descriptor.selectedValue ?? descriptorMax %}
 
                                 {% for i in rangeStart..rangeEnd %}
-                                    <option
-                                        value={{ i }}
-                                        {# TODO once DB writeback is implemented, make sure this uses the actual selected value when the user changes it #}
-                                        {% if i == selectedValue %}selected{% endif %}
+                                    <option value={{ i }}
+                                            {% if i == selectedValue %}selected{% endif %}
                                     >{{ i }}
                                     </option>
                                 {% endfor %}
