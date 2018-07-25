@@ -235,7 +235,7 @@ class Rubric implements Twiggable
         $context = [
             'id'          => $this->getId() ?: 0,
             'multiSelect' => $this->isMultiSelect(),
-            'sum'         => $this->criteriaGroups->calculateMark(),
+            'sum'         => $this->criteriaGroups->calculateScaledMark(),
             'total'       => $this->calculateMax(), // TODO
             'percentage'  => $this->getPercentage(), // TODO
             'humanReadableMark' => $this->getHumanReadableMark(), // TODO
@@ -348,9 +348,9 @@ class Rubric implements Twiggable
     /**
      * @return float
      */
-    public function calculateMark()
+    public function calculateScaledMark()
     {
-        return $this->criteriaGroups->calculateMark();
+        return $this->criteriaGroups->calculateScaledMark();
     }
 
 
@@ -360,7 +360,7 @@ class Rubric implements Twiggable
     public function getPercentage()
     {
         if ($total = $this->calculateMax()) {
-            return $this->calculateMark() / $this->calculateMax();
+            return $this->calculateScaledMark() / $this->calculateMax();
         }
         return 0;
     }
@@ -371,6 +371,6 @@ class Rubric implements Twiggable
      */
     public function getHumanReadableMark()
     {
-        return sprintf("%0.2d / %0.2d (%0.2d%%)", $this->calculateMark(), $this->calculateMax(), round($this->getPercentage() * 100));
+        return sprintf("%0.2d / %0.2d (%0.2d%%)", $this->calculateScaledMark(), $this->calculateMax(), round($this->getPercentage() * 100));
     }
 }

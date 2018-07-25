@@ -167,7 +167,7 @@ class Group implements Twiggable, Calculable
      *
      * @return float
      */
-    private function calculateRowMaxSum() : float
+    public function calculateRowMaxSum() : float
     {
         $total = 0;
 
@@ -211,6 +211,11 @@ class Group implements Twiggable, Calculable
         return $sum;
     }
 
+    /**
+     * The mark given for this group, scaled by the max possible marks for this group
+     *
+     * @return float
+     */
     public function calculateScaledMark() : float
     {
         return $this->calculateMark() * ($this->calculateMax() / $this->calculateRowMaxSum());
