@@ -494,8 +494,7 @@ class Controller extends Base
                 'title' => $this->getDi()->get('l10n')->translate('news', false, true),
                 'url' => $outcome['currentUrl'],
                 'fragment' => $content,
-                'empty' => !($outcome['articles'] ->count()),
-                'viewAllLink' => $viewAllLink
+                'viewAllLink' => $outcome['articles']->count() ? $viewAllLink : null
             ]));
         }
     }

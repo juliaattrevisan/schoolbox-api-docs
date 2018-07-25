@@ -29,7 +29,7 @@
                 $('#news-component-actions-{{ componentInstanceId }}').addClass('hide');
             },
             onChangeSuccess: function (response) {
-                if (!response.empty) {
+                if (response.viewAllLink !== null) {
                     var $actionBar = $('#news-component-actions-{{ componentInstanceId }}');
                     var $viewAllBtn = $actionBar.find('a[data-news-component-view-all]');
 
