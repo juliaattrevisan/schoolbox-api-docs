@@ -1399,7 +1399,7 @@ class RubricMapper
            ->greaterThan('rd.value', 0.0);
         $whereClause = implode(' AND ', $pb->getWhere());
         $stmt        = $this->database->prepare("
-            SELECT rl.box_id AS 'sb.id', rc.id AS 'rc.id', rg.name AS grouping, rc.name, MAX(rd.value) AS 'max_mark'
+            SELECT rl.box_id AS 'sb.id', rc.id AS 'rc.id', rg.name AS grouping, rc.name, MAX(rd.max_value) AS 'max_mark'
             FROM rubric_descriptor rd
             JOIN rubric_criterion rc ON rc.id = rd.criterion_id AND rc.deleted_at IS NULL
             JOIN rubric_group     rg ON rg.id = rc.rubric_group_id AND rg.deleted_at IS NULL
