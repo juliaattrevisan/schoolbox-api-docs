@@ -176,7 +176,7 @@ class Descriptor implements Calculable, Twiggable
      */
     public function getSum()
     {
-        return $this->isSelected() ? $this->value : null;
+        return $this->isSelected() ? $this->selectedValue : null;
     }
 
 
