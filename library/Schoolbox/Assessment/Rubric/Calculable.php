@@ -18,7 +18,7 @@ interface Calculable
      *
      * @return float|null
      */
-    public function getMark();
+    public function calculateMark();
 
 
     /**
@@ -26,6 +26,6 @@ interface Calculable
      *
      * @return float
      */
-    public function getMax();
+    public function calculateMax();
 
 }

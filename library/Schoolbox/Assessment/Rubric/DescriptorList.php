@@ -100,8 +100,8 @@ abstract class DescriptorList implements Twiggable, Calculable
      */
     public function getPercentage()
     {
-        if ($total = $this->getMax()) {
-            return $this->getMark() / $total;
+        if ($total = $this->calculateMax()) {
+            return $this->calculateMark() / $total;
         }
 
         return 0;
@@ -118,8 +118,8 @@ abstract class DescriptorList implements Twiggable, Calculable
         $context = [
             'id'          => $this->getId(),
             'name'        => $this->getName(),
-            'sum'         => $this->getMark(),
-            'total'       => $this->getMax(),
+            'sum'         => $this->calculateMark(),
+            'total'       => $this->calculateMax(),
             'percentage'  => $this->getPercentage(),
             'descriptors' => [],
         ];
@@ -138,14 +138,14 @@ abstract class DescriptorList implements Twiggable, Calculable
      *
      * @return float|null
      */
-    public function getMark()
+    public function calculateMark()
     {
         $sum = null;
 
         foreach ($this->descriptors as $descriptor) {
-            $ds = $descriptor->getMark();
+            $ds = $descriptor->calculateMark();
             if (!is_null($ds)) {
-                $sum += $descriptor->getMark();
+                $sum += $descriptor->calculateMark();
             }
         }
 

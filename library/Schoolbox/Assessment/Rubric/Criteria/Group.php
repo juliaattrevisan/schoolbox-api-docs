@@ -167,12 +167,12 @@ class Group implements Twiggable, Calculable
      *
      * @return float
      */
-    private function getRowMaxSum() : float
+    private function calculateRowMaxSum() : float
     {
         $total = 0;
 
         foreach ($this->criteria as $crit) {
-            $total += $crit->getMax();
+            $total += $crit->calculateMax();
         }
 
         return $total;
@@ -186,12 +186,12 @@ class Group implements Twiggable, Calculable
      *
      * @return float
      */
-    public function getMax() : float
+    public function calculateMax() : float
     {
         if (null !== $this->maxValue) {
             return $this->maxValue;
         }
-        return $this->getRowMaxSum();
+        return $this->calculateRowMaxSum();
     }
 
 
@@ -200,20 +200,20 @@ class Group implements Twiggable, Calculable
      *
      * @return float
      */
-    public function getMark() : float
+    public function calculateMark() : float
     {
         $sum = 0;
 
         foreach ($this->criteria as $crit) {
-            $sum += $crit->getMark();
+            $sum += $crit->calculateMark();
         }
 
         return $sum;
     }
 
-    public function getScaledMark() : float
+    public function calculateScaledMark() : float
     {
-        return $this->getMark() * ($this->getMax() / $this->getRowMaxSum());
+        return $this->calculateMark() * ($this->calculateMax() / $this->calculateRowMaxSum());
     }
 
 
@@ -222,8 +222,8 @@ class Group implements Twiggable, Calculable
      */
     public function getPercentage() : float
     {
-        if ($total = $this->getMax()) {
-            return $this->getMark() / $total;
+        if ($total = $this->calculateMax()) {
+            return $this->calculateMark() / $total;
         }
 
         return 0;
@@ -234,7 +234,7 @@ class Group implements Twiggable, Calculable
      */
     public function getHumanReadableMark()
     {
-        return sprintf("%0.2d / %0.2d (%0.2d%%)", $this->getScaledMark(), $this->getMax(), round($this->getPercentage() * 100));
+        return sprintf("%0.2d / %0.2d (%0.2d%%)", $this->calculateScaledMark(), $this->calculateMax(), round($this->getPercentage() * 100));
     }
 
 
@@ -248,8 +248,8 @@ class Group implements Twiggable, Calculable
         $context = [
             'id'         => $this->getId(),
             'name'       => $this->getName(),
-            'sum'        => $this->getRowMaxSum(),
-            'total'      => $this->getMax(),
+            'sum'        => $this->calculateRowMaxSum(),
+            'total'      => $this->calculateMax(),
             'percentage' => $this->getPercentage(),
             'humanReadableMark' => $this->getHumanReadableMark(),
             'used'       => $this->isReadOnly(),

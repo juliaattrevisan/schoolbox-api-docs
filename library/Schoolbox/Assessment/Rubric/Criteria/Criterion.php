@@ -25,13 +25,13 @@ class Criterion extends DescriptorList
      *
      * @return float
      */
-    public function getMax()
+    public function calculateMax()
     {
         $total = 0;
 
         foreach ($this->descriptors as $descriptor) {
-            if(is_numeric($descriptor->getMax())) {
-                $total = max($total, $descriptor->getMax());
+            if(is_numeric($descriptor->calculateMax())) {
+                $total = max($total, $descriptor->calculateMax());
             }
         }
 

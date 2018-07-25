@@ -175,7 +175,7 @@ class Descriptor implements Calculable, Twiggable
      *
      * @return float|null
      */
-    public function getMark()
+    public function calculateMark()
     {
         return $this->isSelected() ? $this->selectedValue : null;
     }
@@ -187,7 +187,7 @@ class Descriptor implements Calculable, Twiggable
      * @alias getValue()
      * @return float
      */
-    public function getMax()
+    public function calculateMax()
     {
         return $this->getValue();
     }
@@ -215,8 +215,8 @@ class Descriptor implements Calculable, Twiggable
             'value'    => $this->getValue(),
             'selectedValue' => $this->getSelectedValue(),
             'selected' => $this->isSelected(),
-            'sum'      => $this->getMark(),
-            'total'    => $this->getMax(),
+            'sum'      => $this->calculateMark(),
+            'total'    => $this->calculateMax(),
             'position' => [
                 'level' => [
                     'id' => $this->level->getId(),

@@ -258,7 +258,7 @@ class Rubric extends Core\Rubric
                 GroupUsageMapper::getInstance()->createModel()
                                                ->setGroup($this->groupCache->offsetGet($group))
                                                ->setSubmissionBox($this->box)
-                                               ->setMaxValue($group->getMax())
+                                               ->setMaxValue($group->calculateMax())
             );
         }
 
@@ -625,7 +625,7 @@ class Rubric extends Core\Rubric
      */
     public function getHumanReadableMark()
     {
-        return $this->calculateHumanReadable($this->getPercentage(), $this->getTotal());
+        return $this->calculateHumanReadable($this->getPercentage(), $this->calculateMax());
     }
 
 

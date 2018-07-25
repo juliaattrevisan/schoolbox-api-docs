@@ -20,12 +20,12 @@ class CalculableAggregator extends SplObjectStorage implements Calculable
      *
      * @return float
      */
-    public function getMark()
+    public function calculateMark()
     {
         $value = 0;
 
         foreach ($this as $calc) {
-            $value += $calc->getMark();
+            $value += $calc->calculateMark();
         }
 
         return $value;
@@ -37,12 +37,12 @@ class CalculableAggregator extends SplObjectStorage implements Calculable
      *
      * @return float
      */
-    public function getMax()
+    public function calculateMax()
     {
         $total = 0;
 
         foreach ($this as $calc) {
-            $total += $calc->getMax();
+            $total += $calc->calculateMax();
         }
 
         return $total;
@@ -53,10 +53,10 @@ class CalculableAggregator extends SplObjectStorage implements Calculable
      * Returns the percentage of the Calculables contained herein
      * @return float
      */
-    public function getPercentage()
+    public function calculatePercentage()
     {
-        if ($total = $this->getMax()) {
-            return $this->getMark() / $total;
+        if ($total = $this->calculateMax()) {
+            return $this->calculateMark() / $total;
         }
         return 0;
     }
