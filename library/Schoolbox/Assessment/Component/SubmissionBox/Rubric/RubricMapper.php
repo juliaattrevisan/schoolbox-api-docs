@@ -700,8 +700,6 @@ class RubricMapper
     /**
      * Save rubrics selections for a particular feedback.
      *
-     * TODO SA-6627: set mark value from form, not from descriptor directly
-     *
      * @param bool[] $descriptors key = descriptor.id, val = whether it is checked
      * @param int    $returnId    Feedback
      */
@@ -717,11 +715,16 @@ class RubricMapper
 
         $marksToSave = $markMapper->createCollection();
 
-        $descriptorModels = $descriptorMapper->findByColumn('id', array_keys($descriptors));
-        foreach ($descriptors as $descriptorId => $isChecked) {
-            if (!$isChecked) {
-                continue;
+        // What actually got saved?
+        $selectedDescriptors = [];
+        foreach ($descriptors as $id => $descriptor) {
+            if (!empty($descriptor['selected'])) {
+                $selectedDescriptors[$id] = $descriptor['value'];
             }
+        }
+
+        $descriptorModels = $descriptorMapper->findByColumn('id', array_keys($selectedDescriptors));
+        foreach ($selectedDescriptors as $descriptorId => $value) {
 
             // If this isn't set: this is an issue
             $descriptor = $descriptorModels[$descriptorId];
@@ -731,7 +734,8 @@ class RubricMapper
                            ->setSubmissionReturn($returnedWorkMapper->createModel($returnId))
                            ->setDescriptor($descriptor)
                            ->setValid(true)
-                           ->setValue($descriptor->getMaxValue())
+                           // Take value from form preferentially, then descriptor
+                           ->setValue($value ?? $descriptor->getMaxValue())
             );
         }
 
