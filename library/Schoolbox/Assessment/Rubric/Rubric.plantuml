@@ -107,7 +107,7 @@ namespace RubricMarkedGrid {
     class RubricMarkedGrid {
         grid : RubricGrid
         feedback : IFeedback
-        marks : RubricDescriptorMark[]
+        groups : RubricGroupMark[]
         getTotalMark() : float
     }
 
