@@ -100,6 +100,7 @@ class AcceptanceTester extends \Codeception\Actor
         $i->click($fullname, '#account-menu');
     }
 
+
     /**
      * Fill in CKEditor
      * @param $element_id
@@ -107,6 +108,8 @@ class AcceptanceTester extends \Codeception\Actor
      */
     public function fillCkEditorById($element_id, $content)
     {
+        $i = $this;
+        $i->waitForElement('#cke_' . $element_id);
         $this->fillRteEditor(
             \Facebook\WebDriver\WebDriverBy::cssSelector(
                 '#cke_' . $element_id . ' .cke_wysiwyg_frame'

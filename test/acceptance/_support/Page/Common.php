@@ -42,4 +42,11 @@ class Common
         }
         return $randomString;
     }
+
+    public static function surnameFirst($fullname)
+    {
+        $name = str_replace(['Mr ', 'Mrs '], '', $fullname);
+        $parts = explode(' ', $name);
+        return $parts[1] . ', ' . $parts[0];
+    }
 }

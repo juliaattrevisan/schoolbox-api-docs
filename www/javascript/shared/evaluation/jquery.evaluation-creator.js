@@ -440,8 +440,11 @@
                             data.question_bank_id = theForm.find('input[name=question_bank_id]').val();
                             data.assess_id = theForm.find('input[name=assess_id]').val();
                             data.section_id = theForm.find('input[name=section_id]').val();
-
-                            redirect = config.questionBank.url + '/0/' + data.assess_id + '/' + data.section_id;
+                            var catId = theForm.find('input[name=question_category_id]').val();
+                            if (typeof catId === 'undefined') {
+                                catId = '0';
+                            }
+                            redirect = config.questionBank.url + '/' + catId + '/' + data.assess_id + '/' + data.section_id;
                         }
                     }
 
