@@ -61,7 +61,7 @@
                         {% set learnerSelected = learnerRubric.descriptors[crit.id][levelIndex].selected %}
                         <td>
                             <input id="{{ inputId }}"
-                                   name="{{ formField }}[descriptors][{{ descriptor.id }}]"
+                                   name="{{ formField }}[descriptors][{{ descriptor.id }}][selected]"
                                    value="1"
                                    type="checkbox"
                                    data-value="{{ descriptor.value }}"
@@ -99,6 +99,7 @@
                             {# Render a dropdown to select a value from the range #}
                             {# TODO this select needs a label; technically it should be the one above but that's already in use for the descriptor checkbox #}
                             <select id="rangeDropdown-{{ descriptor.id }}"
+                                    name="{{ formField }}[descriptors][{{ descriptor.id }}][value]"
                                     class="{% if not descriptor.selected or descriptorMin == descriptorMax or not useMarkRange %} hide{% endif %}
                                     {% if useMarkRange and descriptorMin != descriptorMax and not hidePoints %}used{% endif %}"
                             >
