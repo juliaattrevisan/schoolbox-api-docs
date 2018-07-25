@@ -77,7 +77,7 @@ namespace RubricGrid {
 
     class RubricDescriptor {
         description : string
-        value : float
+        maxValue : float
     }
 
     ' internal relations
@@ -86,7 +86,7 @@ namespace RubricGrid {
     RubricCriterionUsage *-d- RubricDescriptor
     RubricGrid *-d- RubricLevel
     RubricLevel *-r- RubricDescriptor
-    RubricLevel *-[hidden]l- RubricGroupUsage
+    RubricLevel *-[hidden]r- RubricGroupUsage
 
     ' relation to Assessment
     Assessment.IAssessable *-d- RubricGrid
@@ -107,19 +107,35 @@ namespace RubricMarkedGrid {
         getTotalMark() : float
     }
 
+    class RubricGroupMark {
+        group : RubricGroupUsage
+        criteria: RubricCriterionMark[]
+        value : float
+    }
+
+    class RubricCriterionMark {
+        criterion : RubricCriterionUsage
+        descriptors: RubricDescriptorMark[]
+        value : float
+    }
+
     class RubricDescriptorMark {
         descriptor : RubricDescriptor
         value : float
     }
 
     ' internal relations
-    RubricMarkedGrid *-d- RubricDescriptorMark
+    RubricMarkedGrid *-d- RubricGroupMark
+    RubricGroupMark *-d- RubricCriterionMark
+    RubricCriterionMark *-d- RubricDescriptorMark
 
     ' relation to Assessment
     Assessment.IFeedback *-d- RubricMarkedGrid
 
     ' relation to RubricGrid
     RubricMarkedGrid -l-* RubricGrid.RubricGrid
+    RubricGroupMark -l-* RubricGrid.RubricGroupUsage
+    RubricCriterionMark -l-* RubricGrid.RubricCriterionUsage
     RubricDescriptorMark -l-* RubricGrid.RubricDescriptor
 }
 
