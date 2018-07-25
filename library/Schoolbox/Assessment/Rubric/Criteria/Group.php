@@ -167,7 +167,7 @@ class Group implements Twiggable, Calculable
      *
      * @return float
      */
-    private function getSum() : float
+    private function getRowMaxSum() : float
     {
         $total = 0;
 
@@ -191,7 +191,7 @@ class Group implements Twiggable, Calculable
         if (null !== $this->maxValue) {
             return $this->maxValue;
         }
-        return $this->getSum();
+        return $this->getRowMaxSum();
     }
 
 
@@ -213,7 +213,7 @@ class Group implements Twiggable, Calculable
 
     public function getScaledMark() : float
     {
-        return $this->getMark() * ($this->getMax() / $this->getSum());
+        return $this->getMark() * ($this->getMax() / $this->getRowMaxSum());
     }
 
 
@@ -248,7 +248,7 @@ class Group implements Twiggable, Calculable
         $context = [
             'id'         => $this->getId(),
             'name'       => $this->getName(),
-            'sum'        => $this->getSum(),
+            'sum'        => $this->getRowMaxSum(),
             'total'      => $this->getMax(),
             'percentage' => $this->getPercentage(),
             'humanReadableMark' => $this->getHumanReadableMark(),
