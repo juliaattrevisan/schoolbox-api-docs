@@ -177,4 +177,30 @@ class AssessmentForm
         $this->tester->fillDateField(self::SELECTOR_OPEN_DATE, $openDate->getDatabase());
         return $this;
     }
+
+    /**
+     * Excludes an user from participants
+     * @param $userId
+     * @param $confirm
+     * @param $openSection
+     * @return AssessmentForm
+     * @throws \Exception
+     */
+    public function modifyParticipation(int $userId, bool $confirm, bool $openSection): self
+    {
+        $i = $this->tester;
+        if ($openSection) {
+            $i->click('#participation-container > legend');
+            $i->waitForElementVisible('#participants > li[data-participant="' . $userId . '"]');
+        }
+        $i->click('#participants > li[data-participant="' . $userId . '"]');
+        $i->click('#customise-dropdown');
+        $i->click('Exclude from assessment', '#customise-options');
+        // If the user has submitted something, it'll display Please Confirm popup.
+        if ($confirm) {
+            $i->waitForText('Please Confirm');
+            $i->click('Yes');
+        }
+        return $this;
+    }
 }

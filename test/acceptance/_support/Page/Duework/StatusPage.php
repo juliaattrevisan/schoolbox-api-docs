@@ -22,6 +22,7 @@ class StatusPage
     public const LINK_JELLY_TOT = '#content a.icon-more';
     public const LINK_REVIEW_HORIZONTAL = '#header-options a.icon-class-list';
     public const LINK_BULK_REVIEW = '#header-options a.icon-approve';
+    public const LINK_MODIFY = '#header-options a.icon-modify';
 
     public const SELECTOR_MARK = 'input[name="mark"]';
     public const SELECTOR_COMMENT = 'textarea[name="comment"]';
