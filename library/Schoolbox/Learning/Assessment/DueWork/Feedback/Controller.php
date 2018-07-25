@@ -215,8 +215,6 @@ class Controller extends Base
     /**
      * Create a Feedback that is associated with a particular Response
      *
-     * TODO SA-6627: pass selected descriptor's value in POST, not just which descriptor was selected
-     *
      * @api POST /learning/assessments/{assessmentId}/{studentId}/{responseId}/feedback
      * @param DueWork\Model          $assessment
      * @param User                   $student
