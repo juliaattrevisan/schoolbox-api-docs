@@ -144,12 +144,9 @@
 
                         <label for="groupMark">{{ locale.rubricGroup.proper }} mark</label>
                         {% if markSchemeName == 'TotalMarkFractional' %}
-                            <input class="groupMax" id="groupMark" type="number" min=0 max="{{ limit_decimal.limit(group.total, 2) }}" value="{{ limit_decimal.limit(group.sum, 2) }}"/> / {{ limit_decimal.limit(group.total, 2) }}
-                        {% elseif markSchemeName == 'LetterGrade' %}
-                            {# TODO if letter grade: provide dropdown for letters #}
-                            <select id="groupMark"></select>
-                        {% elseif markSchemeName == 'Percentage'%}
-                            <input class="groupMax" id="groupMark" type="number" min=0 max="{{ limit_decimal.limit(group.total, 2) }}" value="{{ limit_decimal.limit(group.sum, 2) }}"/> %
+                            {{ limit_decimal.limit(group.mark, 2) }} / {{ limit_decimal.limit(group.total, 2) }}
+                        {% else %}
+                            {{ group.humanReadableMark }}
                         {% endif %}
                     </span>
 
