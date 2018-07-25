@@ -93,6 +93,7 @@ class Descriptor implements ISoftDeletable
     }
 
     /**
+     * @deprecated use `$this->setMaxValue()` instead
      * @param  float|null $value
      * @return $this
      */
@@ -104,6 +105,7 @@ class Descriptor implements ISoftDeletable
     }
 
     /**
+     * @deprecated use `$this->getMaxValue()` instead
      * @return float|null
      */
     public function getValue()
