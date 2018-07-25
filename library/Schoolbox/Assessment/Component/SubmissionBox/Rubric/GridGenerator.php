@@ -45,15 +45,18 @@ class GridGenerator
     }
 
     /**
-     * @param int[]  $selectedDescriptorIds
+     * @param array $selectedDescriptors key: descriptor ID, value: descriptor's value
      *
      * @return Rubric
      */
-    private function applyMark(array $selectedDescriptorIds): Rubric
+    private function applyMark(array $selectedDescriptors): Rubric
     {
         foreach ($this->grid->getAllDescriptors() as $descriptor) {
-            $selected = \in_array($descriptor->getId(), $selectedDescriptorIds, false);
+            $selected = \array_key_exists($descriptor->getId(), $selectedDescriptors);
             $descriptor->setSelected($selected);
+            if ($selected) {
+                $descriptor->setValue($selectedDescriptors[$descriptor->getId()]);
+            }
         }
 
         return $this->grid;
@@ -77,7 +80,9 @@ class GridGenerator
 
         // retrieve marks (descriptor selections for student)
         $query = "
-            SELECT rm.descriptor_id
+            SELECT
+                rm.descriptor_id,
+                rm.value
             FROM rubric_mark rm
             LEFT JOIN submission_return sr ON sr.id = rm.return_id
             WHERE rm.valid = TRUE
@@ -94,11 +99,11 @@ class GridGenerator
 
         $descriptorIds = [];
 
-        while ($id = $statement->fetchColumn()) {
-            $descriptorIds[$id] = true;
+        foreach ($statement as $row) {
+            $descriptorIds[$row['id']] = $row['value'];
         }
 
-        return $this->applyMark(array_keys($descriptorIds));
+        return $this->applyMark($descriptorIds);
     }
 
 
