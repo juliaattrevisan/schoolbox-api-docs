@@ -163,45 +163,11 @@ class Group implements Twiggable, Calculable
 
 
     /**
-     * Return the calculated sum value of this Calculable (NOT the total possible value)
+     * The sum of all the highest descriptor values in this group
      *
      * @return float
      */
-    public function getSum()
-    {
-        $sum = 0;
-
-        foreach ($this->criteria as $crit) {
-            $sum += $crit->getSum();
-        }
-
-        return $sum;
-    }
-
-
-    /**
-     * Get the maximum allowable mark value for this group.
-     *
-     * If this group has a max value, use that; otherwise, use the total from
-     * its criteria.
-     *
-     * @return float
-     */
-    public function getTotal()
-    {
-        if (null !== $this->maxValue) {
-            return $this->maxValue;
-        }
-        return $this->getCriteriaSum();
-    }
-
-
-    /**
-     * Summates the max descriptor values from each criterion.
-     *
-     * @return float
-     */
-    private function getCriteriaSum()
+    private function getSum() : float
     {
         $total = 0;
 
@@ -214,12 +180,50 @@ class Group implements Twiggable, Calculable
 
 
     /**
+     * Either:
+     * - the custom maximum value specified by the user at assessment creation time, if present
+     * - or otherwise, the sum of criteria in this group
+     *
      * @return float
      */
-    public function getPercentage()
+    public function getMax() : float
     {
-        if ($total = $this->getTotal()) {
-            return $this->getSum() / $total;
+        if (null !== $this->maxValue) {
+            return $this->maxValue;
+        }
+        return $this->getSum();
+    }
+
+
+    /**
+     * The sum of the descriptor values selected at marking time
+     *
+     * @return float
+     */
+    public function getMark() : float
+    {
+        $sum = 0;
+
+        foreach ($this->criteria as $crit) {
+            $sum += $crit->getSum();
+        }
+
+        return $sum;
+    }
+
+    public function getScaledMark() : float
+    {
+        return $this->getMark() * ($this->getMax() / $this->getSum());
+    }
+
+
+    /**
+     * @return float
+     */
+    public function getPercentage() : float
+    {
+        if ($total = $this->getMax()) {
+            return $this->getMark() / $total;
         }
 
         return 0;
@@ -230,7 +234,7 @@ class Group implements Twiggable, Calculable
      */
     public function getHumanReadableMark()
     {
-        return sprintf("%0.2d / %0.2d (%0.2d%%)", $this->getSum(), $this->getTotal(), round($this->getPercentage() * 100));
+        return sprintf("%0.2d / %0.2d (%0.2d%%)", $this->getScaledMark(), $this->getMax(), round($this->getPercentage() * 100));
     }
 
 
