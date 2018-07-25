@@ -173,33 +173,34 @@
     {% endfor %}
 
     {% if rubric.total and showRubricTotal and (config.rubric_show_points or not studentView) %}
-    <tr>
-        <th class="rb-final-summary" colspan="{{ rubric.levels|length + 2 }}">
-            <span data-final-summary="{{ rubricId }}"
+        <tr>
+            <th class="rb-final-summary" colspan="{{ rubric.levels|length + 2 }}">
+                <span data-final-summary="{{ rubricId }}"
 
-                data-numerator="{{ limit_decimal.limit(rubric.sum, 2) }}"
-                data-denominator="{{ limit_decimal.limit(rubric.total, 2) }}">
+                    data-numerator="{{ limit_decimal.limit(rubric.sum, 2) }}"
+                    data-denominator="{{ limit_decimal.limit(rubric.total, 2) }}">
 
-                {% if markSchemeName == 'TotalMarkFractional' %}
-                   {{ limit_decimal.limit(rubric.sum, 2) }} / {{ limit_decimal.limit(rubric.total, 2) }}
-                {% else %}
-                   {{ rubric.humanReadableMark }}
-                {% endif %}
-            </span>
-
-                    {# Self-Assessment #}
-                    {% if learnerRubric %}
-                        {% if latestSelfReflectedFeedback.isSelfGrading %}
-                            {% set selfReflectionName = locale.selfAssessment.proper %}
-                        {% else %}
-                            {% set selfReflectionName = locale.selfReflection.proper %}
-                        {% endif %}
-
-                        ({{ learnerRubric.humanReadableMark }} given in {{ selfReflectionName }})
+                    {% if markSchemeName == 'TotalMarkFractional' %}
+                       {{ limit_decimal.limit(rubric.sum, 2) }} / {{ limit_decimal.limit(rubric.total, 2) }}
+                    {% else %}
+                       {{ rubric.humanReadableMark }}
                     {% endif %}
-                </th>
-            </tr>
-            {% endif %}
+                </span>
+    
+                {# Self-Assessment #}
+                {% if learnerRubric %}
+                    {% if latestSelfReflectedFeedback.isSelfGrading %}
+                        {% set selfReflectionName = locale.selfAssessment.proper %}
+                    {% else %}
+                        {% set selfReflectionName = locale.selfReflection.proper %}
+                    {% endif %}
+
+                    ({{ learnerRubric.humanReadableMark }} given in {{ selfReflectionName }})
+                {% endif %}
+            </th>
+        </tr>
+    {% endif %}
+
         </tbody>
     </table>
 </div>
