@@ -47,8 +47,8 @@
 
                     <th class="rb-criterion-name">{{ crit.name }}</th>
 
-                {# Required so that this form is recognised as containing a rubric, even if nothing is submitted #}
-                <input name="saveEmpty" value="true" type="hidden"/>
+                    {# Required so that this form is recognised as containing a rubric, even if nothing is submitted #}
+                    <input name="saveEmpty" value="true" type="hidden"/>
 
                     {% for levelIndex, level in rubric.levels %}
                         {% set descriptor = rubric.descriptors[crit.id][levelIndex] %}
@@ -109,23 +109,23 @@
                                     {% set rangeStart = direction == 'asc' ? descriptorMin : descriptorMax %}
                                     {% set rangeEnd = direction == 'asc' ? descriptorMax : descriptorMin %}
 
-                                {# Selected value: if not provided, use max #}
-                                {% set selectedValue = descriptor.selectedValue ?? descriptorMax %}
+                                    {# Selected value: if not provided, use max #}
+                                    {% set selectedValue = descriptor.selectedValue ?? descriptorMax %}
 
-                                {% for i in rangeStart..rangeEnd %}
-                                    <option value={{ i }}
-                                            {% if i == selectedValue %}selected{% endif %}
-                                    >{{ i }}
-                                    </option>
-                                {% endfor %}
-                            </select>
+                                    {% for i in rangeStart..rangeEnd %}
+                                        <option value={{ i }}
+                                                {% if i == selectedValue %}selected{% endif %}
+                                        >{{ i }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
 
-                            {% if learnerSelected %}
-                                <img class="rb-self-reflection-choice"
-                                     src="/portrait.php?userId={{ learner.externalId }}&amp;size=square32"
-                                     title="{% if latestSelfReflectedFeedback.normalisedMark != null %}{{ locale.selfAssessment.proper }}{% else %}{{ locale.selfReflection.proper }}{% endif %} choice" />
-                            {% endif %}
-                        </td>
+                                {% if learnerSelected %}
+                                    <img class="rb-self-reflection-choice"
+                                         src="/portrait.php?userId={{ learner.externalId }}&amp;size=square32"
+                                         title="{% if latestSelfReflectedFeedback.normalisedMark != null %}{{ locale.selfAssessment.proper }}{% else %}{{ locale.selfReflection.proper }}{% endif %} choice" />
+                                {% endif %}
+                            </td>
 
                         {% else %}
                             <td class="rb-blank">&nbsp;</td>
