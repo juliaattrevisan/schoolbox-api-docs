@@ -135,39 +135,36 @@
                 </tr>
             {% endfor %}
 
-        {% if group.total and showGroupTotal %}
-            {% if (config.rubric_show_points or not studentView) and markSchemeName != "None" %}
-                <tr>
-                    <th class="rb-group-summary" colspan="{{ rubric.levels|length + 1 }}">
-                        <span data-group-summary="{{ rubricId }}-{{ group.id }}"
+        {% if group.total and showGroupTotal and markSchemeName != "None" and (config.rubric_show_points or not studentView) %}
+            <tr>
+                <th class="rb-group-summary" colspan="{{ rubric.levels|length + 1 }}">
+                    <span data-group-summary="{{ rubricId }}-{{ group.id }}"
+                        data-numerator="{{ limit_decimal.limit(group.sum, 2) }}"
+                        data-denominator="{{ limit_decimal.limit(group.total, 2) }}">
 
-                            data-numerator="{{ limit_decimal.limit(group.sum, 2) }}"
-                            data-denominator="{{ limit_decimal.limit(group.total, 2) }}">
-
-                            <label for="groupMark">{{ locale.rubricGroup.proper }} mark</label>
-                            {% if markSchemeName == 'TotalMarkFractional' %}
-                                <input class="groupMax" id="groupMark" type="number" min=0 max="{{ limit_decimal.limit(group.total, 2) }}" value="{{ limit_decimal.limit(group.sum, 2) }}"/> / {{ limit_decimal.limit(group.total, 2) }}
-                            {% elseif markSchemeName == 'LetterGrade' %}
-                                {# TODO if letter grade: provide dropdown for letters #}
-                                <select id="groupMark"></select>
-                            {% elseif markSchemeName == 'Percentage'%}
-                                <input class="groupMax" id="groupMark" type="number" min=0 max="{{ limit_decimal.limit(group.total, 2) }}" value="{{ limit_decimal.limit(group.sum, 2) }}"/> %
-                            {% endif %}
-                        </span>
-
-                        {# Self-Assessment #}
-                        {% if learnerRubric %}
-                            {% if latestSelfReflectedFeedback.isSelfGrading %}
-                                {% set selfReflectionName = locale.selfAssessment.proper %}
-                            {% else %}
-                                {% set selfReflectionName = locale.selfReflection.proper %}
-                            {% endif %}
-
-                            ({{ learnerRubric.groups[groupIndex].humanReadableMark }} given in {{ selfReflectionName }})
+                        <label for="groupMark">{{ locale.rubricGroup.proper }} mark</label>
+                        {% if markSchemeName == 'TotalMarkFractional' %}
+                            <input class="groupMax" id="groupMark" type="number" min=0 max="{{ limit_decimal.limit(group.total, 2) }}" value="{{ limit_decimal.limit(group.sum, 2) }}"/> / {{ limit_decimal.limit(group.total, 2) }}
+                        {% elseif markSchemeName == 'LetterGrade' %}
+                            {# TODO if letter grade: provide dropdown for letters #}
+                            <select id="groupMark"></select>
+                        {% elseif markSchemeName == 'Percentage'%}
+                            <input class="groupMax" id="groupMark" type="number" min=0 max="{{ limit_decimal.limit(group.total, 2) }}" value="{{ limit_decimal.limit(group.sum, 2) }}"/> %
                         {% endif %}
-                    </th>
+                    </span>
+
+                    {# Self-Assessment #}
+                    {% if learnerRubric %}
+                        {% if latestSelfReflectedFeedback.isSelfGrading %}
+                            {% set selfReflectionName = locale.selfAssessment.proper %}
+                        {% else %}
+                            {% set selfReflectionName = locale.selfReflection.proper %}
+                        {% endif %}
+
+                        ({{ learnerRubric.groups[groupIndex].humanReadableMark }} given in {{ selfReflectionName }})
+                    {% endif %}
+                </th>
             </tr>
-            {% endif %}
         {% endif %}
 
     {% endfor %}
