@@ -103,6 +103,9 @@
                                     name="{{ formField }}[descriptors][{{ descriptor.id }}][value]"
                                     class="{% if not descriptor.selected or descriptorMin == descriptorMax or not useMarkRange %} hide{% endif %}
                                     {% if useMarkRange and descriptorMin != descriptorMax and not hidePoints %}used{% endif %}"
+                                    data-rubric="{{ rubric.id }}"
+                                    data-rubric-group="{{ group.id }}"
+                                    data-rubric-descriptor="{{ descriptor.id }}"
                             >
                                 {% set rangeStart = direction == 'asc' ? descriptorMin : descriptorMax %}
                                 {% set rangeEnd = direction == 'asc' ? descriptorMax : descriptorMin %}
@@ -246,7 +249,12 @@
 
             $('[data-role=rubric-sum]').text(rubricSummary.text());
 
-            showHideRangeInput($changed);
+            // What cell was actually changed?
+            if ($changed.is(':checkbox')) {
+                showHideRangeInput($changed);
+            } else {
+                showHideRangeInput($changed.siblings(':checkbox'));
+            }
         });
 
         function showHideRangeInput($changedCell) {
