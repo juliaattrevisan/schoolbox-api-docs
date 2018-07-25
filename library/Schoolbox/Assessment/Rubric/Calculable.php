@@ -18,7 +18,7 @@ interface Calculable
      *
      * @return float|null
      */
-    public function getSum();
+    public function getMark();
 
 
     /**
@@ -26,6 +26,6 @@ interface Calculable
      *
      * @return float
      */
-    public function getTotal();
+    public function getMax();
 
 }

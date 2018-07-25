@@ -184,7 +184,7 @@ class Rubric implements Twiggable
 
         foreach ($this->criteriaGroups as $group)
         {
-            $os->attach($group, $group->getSum());
+            $os->attach($group, $group->getMark());
         }
 
         return $os;
@@ -200,7 +200,7 @@ class Rubric implements Twiggable
 
         foreach ($this->criteriaGroups as $group)
         {
-            $os->attach($group, $group->getTotal());
+            $os->attach($group, $group->getMax());
         }
 
         return $os;
@@ -235,7 +235,7 @@ class Rubric implements Twiggable
         $context = [
             'id'          => $this->getId() ?: 0,
             'multiSelect' => $this->isMultiSelect(),
-            'sum'         => $this->criteriaGroups->getSum(),
+            'sum'         => $this->criteriaGroups->getMark(),
             'total'       => $this->getTotal(), // TODO
             'percentage'  => $this->getPercentage(), // TODO
             'humanReadableMark' => $this->getHumanReadableMark(), // TODO
@@ -337,7 +337,7 @@ class Rubric implements Twiggable
         $total = 0;
 
         foreach ($this->criteriaGroups as $calc) {
-            $total += $calc->getTotal();
+            $total += $calc->getMax();
         }
 
         return $total;
@@ -348,9 +348,9 @@ class Rubric implements Twiggable
     /**
      * @return float
      */
-    public function getSum()
+    public function getMark()
     {
-        return $this->criteriaGroups->getSum();
+        return $this->criteriaGroups->getMark();
     }
 
 
@@ -360,7 +360,7 @@ class Rubric implements Twiggable
     public function getPercentage()
     {
         if ($total = $this->getTotal()) {
-            return $this->getSum() / $this->getTotal();
+            return $this->getMark() / $this->getTotal();
         }
         return 0;
     }

@@ -20,13 +20,13 @@ class Level extends DescriptorList
      *
      * @return float
      */
-    public function getTotal()
+    public function getMax()
     {
         $total = 0;
 
         foreach ($this->descriptors as $descriptor) {
-            if(is_numeric($descriptor->getTotal())) {
-                $total += $descriptor->getTotal();
+            if(is_numeric($descriptor->getMax())) {
+                $total += $descriptor->getMax();
             }
         }
 

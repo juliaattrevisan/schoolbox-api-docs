@@ -175,7 +175,7 @@ class Descriptor implements Calculable, Twiggable
      *
      * @return float|null
      */
-    public function getSum()
+    public function getMark()
     {
         return $this->isSelected() ? $this->selectedValue : null;
     }
@@ -187,7 +187,7 @@ class Descriptor implements Calculable, Twiggable
      * @alias getValue()
      * @return float
      */
-    public function getTotal()
+    public function getMax()
     {
         return $this->getValue();
     }
@@ -210,14 +210,14 @@ class Descriptor implements Calculable, Twiggable
     public function toContext()
     {
         return [
-            'id'            => $this->getId(),
-            'text'          => $this->getText(),
-            'value'         => $this->getValue(),
+            'id'       => $this->getId(),
+            'text'     => $this->getText(),
+            'value'    => $this->getValue(),
             'selectedValue' => $this->getSelectedValue(),
-            'selected'      => $this->isSelected(),
-            'sum'           => $this->getSum(),
-            'total'         => $this->getTotal(),
-            'position'      => [
+            'selected' => $this->isSelected(),
+            'sum'      => $this->getMark(),
+            'total'    => $this->getMax(),
+            'position' => [
                 'level' => [
                     'id' => $this->level->getId(),
                     'name' => $this->level->getName(),

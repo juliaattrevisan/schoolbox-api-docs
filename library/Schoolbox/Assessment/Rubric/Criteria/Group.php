@@ -172,7 +172,7 @@ class Group implements Twiggable, Calculable
         $total = 0;
 
         foreach ($this->criteria as $crit) {
-            $total += $crit->getTotal();
+            $total += $crit->getMax();
         }
 
         return $total;
@@ -205,7 +205,7 @@ class Group implements Twiggable, Calculable
         $sum = 0;
 
         foreach ($this->criteria as $crit) {
-            $sum += $crit->getSum();
+            $sum += $crit->getMark();
         }
 
         return $sum;
@@ -249,7 +249,7 @@ class Group implements Twiggable, Calculable
             'id'         => $this->getId(),
             'name'       => $this->getName(),
             'sum'        => $this->getSum(),
-            'total'      => $this->getTotal(),
+            'total'      => $this->getMax(),
             'percentage' => $this->getPercentage(),
             'humanReadableMark' => $this->getHumanReadableMark(),
             'used'       => $this->isReadOnly(),
