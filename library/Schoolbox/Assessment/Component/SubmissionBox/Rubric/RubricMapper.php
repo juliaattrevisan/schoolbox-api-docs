@@ -444,7 +444,7 @@ class RubricMapper
             $descriptors[$d->getCriterion()->getId()][$d->getLevel()->getSequence()] = [
                 'id'     => $d->getId(),
                 'text'   => $d->getDescription(),
-                'points' => $d->getValue(),
+                'points' => $d->getMaxValue(),
             ];
         }
 
@@ -731,7 +731,7 @@ class RubricMapper
                            ->setSubmissionReturn($returnedWorkMapper->createModel($returnId))
                            ->setDescriptor($descriptor)
                            ->setValid(true)
-                           ->setValue($descriptor->getValue())
+                           ->setValue($descriptor->getMaxValue())
             );
         }
 
@@ -911,8 +911,8 @@ class RubricMapper
                 }
 
                 // Has the value changed ?
-                $existingValue = $existingDescriptor->getValue();
-                $newValue      = $newDescriptor->getValue();
+                $existingValue = $existingDescriptor->getMaxValue();
+                $newValue      = $newDescriptor->getMaxValue();
                 if ($existingValue != $newValue) {
                     $hasDescriptorValuesChanged = true;
                     break;
