@@ -1,5 +1,8 @@
 @startuml
 
+hide empty fields
+hide empty methods
+
 namespace Assessment {
 
     interface AssessmentContext {
