@@ -107,11 +107,14 @@
                                 {% set rangeStart = direction == 'asc' ? descriptorMin : descriptorMax %}
                                 {% set rangeEnd = direction == 'asc' ? descriptorMax : descriptorMin %}
 
+                                {# Selected value: if not provided, use max #}
+                                {% set selectedValue = descriptor.selectedValue ?? descriptorMax %}
+
                                 {% for i in rangeStart..rangeEnd %}
                                     <option
                                         value={{ i }}
                                         {# TODO once DB writeback is implemented, make sure this uses the actual selected value when the user changes it #}
-                                        {% if i == descriptorMax %}selected{% endif %}
+                                        {% if i == selectedValue %}selected{% endif %}
                                     >{{ i }}
                                     </option>
                                 {% endfor %}
