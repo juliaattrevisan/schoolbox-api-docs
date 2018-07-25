@@ -167,8 +167,6 @@
     {% endfor %}
 
     {% if rubric.total and showRubricTotal and (config.rubric_show_points or not studentView) %}
-        {# TODO rubric.total needs to be calculated correctly from capability points #}
-
         <tr>
             <th class="rb-final-summary" colspan="{{ rubric.levels|length + 2 }}">
                 <span data-final-summary="{{ rubricId }}"
