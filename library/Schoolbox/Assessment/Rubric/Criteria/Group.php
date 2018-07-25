@@ -180,23 +180,6 @@ class Group implements Twiggable, Calculable
 
 
     /**
-     * Returns the total possible value of this Calculable
-     *
-     * @return float
-     */
-    private function getCriteriaSum()
-    {
-        $total = 0;
-
-        foreach ($this->criteria as $crit) {
-            $total += $crit->getTotal();
-        }
-
-        return $total;
-    }
-
-
-    /**
      * Get the maximum allowable mark value for this group.
      *
      * If this group has a max value, use that; otherwise, use the total from
@@ -210,6 +193,23 @@ class Group implements Twiggable, Calculable
             return $this->maxValue;
         }
         return $this->getCriteriaSum();
+    }
+
+
+    /**
+     * Summates the max descriptor values from each criterion.
+     *
+     * @return float
+     */
+    private function getCriteriaSum()
+    {
+        $total = 0;
+
+        foreach ($this->criteria as $crit) {
+            $total += $crit->getTotal();
+        }
+
+        return $total;
     }
 
 
