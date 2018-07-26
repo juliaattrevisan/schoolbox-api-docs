@@ -91,23 +91,4 @@ class CalculableAggregator extends SplObjectStorage implements Calculable
         return $rowMaxSum;
     }
 
-
-    /**
-     * Turns the scaled mark for the Calculable into a percentage of the total possible marks
-     *
-     * @return float
-     */
-    public function calculatePercentage()
-    {
-        $percentage = 0;
-
-        foreach ($this as $calc) {
-            if ($max = $calc->calculateMax()) {
-                $percentage = $calc->calculateScaledMark() / $max;
-            }
-        }
-
-        return $percentage;
-    }
-
 }

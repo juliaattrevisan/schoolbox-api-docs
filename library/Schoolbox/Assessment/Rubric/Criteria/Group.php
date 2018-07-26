@@ -227,6 +227,8 @@ class Group implements Twiggable, Calculable
 
 
     /**
+     * Turns the scaled mark into a percentage of the total possible marks
+
      * @return float
      */
     public function getPercentage()
