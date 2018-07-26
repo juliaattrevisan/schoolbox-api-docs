@@ -1,11 +1,9 @@
-Acceptance tests
-===
+# Acceptance tests
 
 All Codeception acceptance tests go in this folder.
 
 
-Structure
----
+## Structure
 
     _data/ # not sure yet
     _output/ # logs and screenshots of runs
@@ -14,12 +12,14 @@ Structure
         phantomjs/ # created by phantomjs-server.sh
         phantomjs-server.sh
     *Cest.php # individual test scenarios
+    
 
-Running tests
----
+## Running tests
 
 These tests are currently configured to run within Schoolbox's Vagrant box.
-The acceptance tests are configured to automatically start chromedriver (the web driver for Chrome Headless).
+The acceptance tests are configured to automatically start chromedriver
+(the web driver for Chrome Headless).
+
 
 ### Configuration
 
@@ -55,8 +55,14 @@ relative to `test/acceptance`:
 
     ./vendor/bin/codecept run --steps acceptance LoginCest.php
 
-Writing tests
----
+
+
+## Writing tests
 
 See `test/acceptance/LoginCest.php` for an example - it shows an example of
 driving a web browser to perform commands, and of a direct database query.
+
+
+### Guidelines
+
+Document intent, not just actions
