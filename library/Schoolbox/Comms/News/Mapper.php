@@ -198,6 +198,7 @@ class Mapper extends \Schoolbox\Mapper
             SELECT id
             FROM {$this->table}
             WHERE publish_at IS NOT NULL
+            AND publish_at < NOW()
             AND accepted_at IS NOT NULL
             AND expires_at > NOW()
             AND deleted_at IS NULL
@@ -215,6 +216,7 @@ class Mapper extends \Schoolbox\Mapper
                 FROM {$this->table}
                 INNER JOIN comms_news_article_topic cnat ON {$this->table}.id = cnat.article_id 
                 WHERE publish_at IS NOT NULL
+                AND publish_at < NOW()
                 AND accepted_at IS NOT NULL
                 AND expires_at > NOW()
                 AND deleted_at IS NULL
