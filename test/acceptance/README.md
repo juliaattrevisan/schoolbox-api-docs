@@ -61,25 +61,58 @@ driving a web browser to perform commands, and of a direct database query.
 
 ### Guidelines
 
-Document intent, not just actions
+#### Document intent, not just actions
 
-Codeception tests, in their simplest form, are a list of actions that take place in a browser.
+Codeception tests, in their simplest form, are a list of actions that take
+place in a browser:
 
-This isn't overly helpful to someone reading the test, as from a user's point of view
-an interaction isn't just them filling in a form field, or clicking on something:
-it's part of a larger whole which involves them fulfilling some sort of business need.
+```php
+$i->amOnPage('/news/);
+$i->click('#content .icon-modify');
+$i->fillField('heading', 'My Headline');
+$i->click('input[type="submit"]');
+$i->seeInField('heading', 'My Headline');
+```
 
-In addition: the user isn't interacting with a field with a particular ID, name
-or CSS selector, so don't show these in Cests; abstract them in page objects.
+However, simply defining a test as a list of actions has issues:
+* it doesn't really document what the end user is actually doing, from their
+  perspective
+* its intent isn't clear from reading; what is the user actually modifying?
+* it's fragile; what happens if the page's design changes?
 
+> If a selector for an element that a test needs to find is complicated, this
+  is a sign that either the page's layout needs to be simplified, or the
+  selector needs to be simplified (by adding an ID, perhaps?)
 
-My current recommendation is:
+A possible solution to these issues is to create
+[page objects](https://codeception.com/docs/06-ReusingTestCode#PageObjects)
+for each type of page for which a test is being written.
 
-Create [page objects] for each page class you're testing
-* it should have a `generateRoute` method, with a negotiable param count
-  * used by `$i->amOnPage()`
-* if it's a form, create fill/see methods for each input
+I've found that these basics elements have been useful for page objects:
+* it should have a `generateRoute` method, which can generate a URL to a page
+  * this can be used by `$i->amOnPage()` to easily visit a URL represented by
+    the page object
+* if it's a form, it should have `fill`/`see` methods for each input
+  * this can be used in the test to set input values, without it having to know
+    exactly what type of field it is
+  * ideally, the base test will not have to interact with form inputs at all
 
+This means that this can be rewritten as:
 
-Sophisticated but generic interactions (example: selectize, file uploads) 
-should be written into acceptance tester.
+```php
+// in test
+$i->amOnPage($newsIndexPage->generateUrl());
+$newsFormPage->modifyNewsItem(1);
+$newsFormPage->fillHeadline('My Headline');
+$newsFormPage->submit();
+$newsFormPage->seeInHeadline('My Headline');
+
+// in newsIndexPage object
+public function generateUrl() { ... }
+
+// in newsFormPage object
+public function modifyNewsItem($position) { ... }
+public function fillHeadline($headline) { ... }
+public function seeInHeadline($headline) { ... }
+public function submit() { ... }
+```
