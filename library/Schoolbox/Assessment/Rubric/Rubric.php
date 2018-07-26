@@ -358,8 +358,8 @@ class Rubric implements Twiggable
      */
     public function getPercentage()
     {
-        if ($total = $this->calculateMax()) {
-            return $this->calculateScaledMark() / $this->calculateMax();
+        if ($max = $this->calculateMax()) {
+            return $this->calculateScaledMark() / $max;
         }
         return 0;
     }

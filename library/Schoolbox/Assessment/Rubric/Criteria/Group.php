@@ -231,8 +231,8 @@ class Group implements Twiggable, Calculable
      */
     public function getPercentage()
     {
-        if ($total = $this->calculateMax()) {
-            return $this->calculateMark() / $total;
+        if ($max = $this->calculateMax()) {
+            return $this->calculateScaledMark() / $max;
         }
 
         return 0;
