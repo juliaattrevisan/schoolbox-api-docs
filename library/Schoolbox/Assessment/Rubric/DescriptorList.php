@@ -118,9 +118,6 @@ abstract class DescriptorList implements Twiggable, Calculable
         $context = [
             'id'          => $this->getId(),
             'name'        => $this->getName(),
-            'sum'         => $this->calculateMark(),
-            'total'       => $this->calculateMax(),
-            'percentage'  => $this->getPercentage(),
             'descriptors' => [],
         ];
 
