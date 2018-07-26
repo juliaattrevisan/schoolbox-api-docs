@@ -18,6 +18,8 @@ use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\News\TopicMapper;
+use Schoolbox\Permission\Access;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
 
@@ -161,6 +163,17 @@ class Module extends BaseModule
             'policyMapper' => $this->getMapperFactory()->getLazy(Policy\Mapper::class),
             'topicMapper' => $this->getMapperFactory()->getLazy(TopicMapper::class),
             'saveForLaterMapper' => $this->getMapperFactory()->getLazy(SaveForLater\Mapper::class),
+
+            /* Hyperdrive injection
+             */
+            'databaseInternal' => $injector->lazy(function () {
+                return $this->getInjector()->get('databaseInternal');
+            }),
+            'folderMapper' => $this->getMapperFactory()->getLazy(FolderMapper::class),
+            'userAccessMapper' => $this->getMapperFactory()->getLazy(Access\UserAccessMapper::class),
+            'userMapper' => $this->getMapperFactory()->getLazy(UserMapper::class),
+            'externalUser' => $injector->lazyGet('externalUser'),
+            'externalClass' => $injector->lazyGet('externalClass'),
         ];
     }
 

@@ -12,9 +12,20 @@
 
 namespace Schoolbox\Comms\News;
 
+use Alaress\Database\Connector\IConnector;
 use Alaress\Paginator\Paginator;
 use Alaress\Paginator\UrlPaginator;
+use External_Class;
+use External_User;
+use Schoolbox\Collection;
+use Schoolbox\Comms\News\Audience\ArticleResolver;
+use Schoolbox\Comms\News\Audience\BusinessRules;
+use Schoolbox\Comms\News\Audience\RelationshipFilterer;
+use Schoolbox\News\Topic;
+use Schoolbox\Permission\Access;
+use Schoolbox\Resource\Folder;
 use Schoolbox\User;
+use Schoolbox\UserMapper;
 
 class Lists
 {
@@ -34,36 +45,152 @@ class Lists
      */
     private $saveForLaterMapper;
 
+    /**
+     * @var IConnector
+     */
+    private $databaseInternal;
+
+    /**
+     * @var Folder\Mapper
+     */
+    private $folderMapper;
+
+    /**
+     * @var Access\UserAccessMapper
+     */
+    private $userAccessMapper;
+
+    /**
+     * @var UserMapper
+     */
+    private $userMapper;
+
+    /**
+     * @var External_User
+     */
+    private $externalUser;
+
+    /**
+     * @var External_Class
+     */
+    private $externalClass;
 
     /**
      * Lists constructor.
-     * @param Mapper              $newsMapper
-     * @param Policy\Mapper       $policyMapper
-     * @param SaveForLater\Mapper $saveForLaterMapper
+     *
+     * @param Mapper                  $newsMapper
+     * @param Policy\Mapper           $policyMapper
+     * @param SaveForLater\Mapper     $saveForLaterMapper
+     * @param IConnector              $databaseInternal
+     * @param Folder\Mapper           $folderMapper
+     * @param Access\UserAccessMapper $userAccessMapper
+     * @param UserMapper              $userMapper
+     * @param External_User           $externalUser
+     * @param External_Class          $externalClass
      */
-    public function __construct(Mapper $newsMapper, Policy\Mapper $policyMapper, SaveForLater\Mapper $saveForLaterMapper)
-    {
+    public function __construct(
+        Mapper $newsMapper,
+        Policy\Mapper $policyMapper,
+        SaveForLater\Mapper $saveForLaterMapper,
+        IConnector $databaseInternal,
+        Folder\Mapper $folderMapper,
+        Access\UserAccessMapper $userAccessMapper,
+        UserMapper $userMapper,
+        External_User $externalUser,
+        External_Class $externalClass
+    ) {
         $this->newsMapper = $newsMapper;
         $this->policyMapper = $policyMapper;
         $this->saveForLaterMapper = $saveForLaterMapper;
+
+        /* Hyperdrive injection
+         */
+        $this->databaseInternal = $databaseInternal;
+        $this->folderMapper = $folderMapper;
+        $this->userAccessMapper = $userAccessMapper;
+        $this->userMapper = $userMapper;
+        $this->externalUser = $externalUser;
+        $this->externalClass = $externalClass;
     }
 
 
     /**
-     * @param User $user
-     * @param int  $topicId
-     * @param int  $limit
-     * @param int  $pageNum
+     * Find a list of articles that are somehow related to $topicId
+     * This wraps around the hyperdrive to abstract away some pagination details
+     *
+     * The list consists of articles that fulfil this criteria, which accounts for all the articles that are
+     * presentable to the audience:
+     *
+     *   - has a publish_at date
+     *   - has been accepted for publication by the moderator
+     *   - has not yet expired
+     *   - has not been deleted
+     *
+     * This equates to articles in the states "Awaiting Publication", "Published", "Expired" (Archived)
+     *
+     * The n-n relational between articles and topics precludes proper usage of findAll()
+     * with a limit - it doesn't count properly
+     *
+     * @param User                $user
+     * @param Collection|Topic[]  $topics
+     * @param Querystring         $params
+     * @param string              $urlPrefix
      * @return array
      * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \InvalidArgumentException
+     * @throws \OutOfRangeException
+     * @throws \UnderflowException
+     * @throws \UnexpectedValueException
      */
-    public function findForTopic(User $user, int $topicId, int $limit, int $pageNum): array
+    public function findForTopic(User $user, Collection $topics, Querystring $params, string $urlPrefix): array
     {
         $policies = $this->policyMapper->findAll()->indexBy('identifier');
 
-        /* Component config can set "All" as its limit
+        /* News Topics were never obtainable by slug
+         * We always fetched everything, then manually sorted by slug
+         * Inherit this situation, improvise and adapt (or just use ids...)
          */
-        $articles = $this->newsMapper->findForTopic($topicId, $limit, $pageNum);
+        $topicId = $this->determineSelectedTopicId($topics, $params->getSlug());
+
+        /* Articles that $user can see
+          */
+        $articleIdsForUser = (new ArticleResolver(
+            new BusinessRules(),
+            $this->databaseInternal,
+            $this->userAccessMapper,
+            $this->folderMapper,
+            $this->externalUser,
+            new RelationshipFilterer(
+                $this->databaseInternal,
+                $this->userMapper,
+                $this->externalUser,
+                $this->folderMapper,
+                $this->externalClass,
+                $this->userAccessMapper
+            )
+        ))->findArticlesForUser($user);
+
+        /* Articles in $topicId that $user can see
+         * Component config can set "All" as its limit, filtered to the list of articles that can be seen
+         * Hydrate the objects and hope for the best; reorder them in the order requested
+         */
+        $articleIds = $this->newsMapper->findArticleIdsForTopic($articleIdsForUser, $topicId, $params->getLimit(), $params->getPageNum());
+        $records = $this->newsMapper->findByColumn('id', $articleIds)->indexBy('id');
+
+        $articles = $this->newsMapper->createCollection();
+
+        foreach ($articleIds as $articleId) {
+            $record = $records->getOffset($articleId);
+
+            if (null !== $record) {
+                $articles->add($records->getOffset($articleId));
+            }
+        }
+
+        /* Get an accompanying paginator
+         */
+        $url = "{$urlPrefix}?{$params}";
+        $paginator = $this->generatePaginator($url, $params->getLimit(), \count($this->newsMapper->findArticleIdsForTopic($articleIdsForUser, $topicId)));
 
         /* Figure out the articles that this user has saved for later
          */
@@ -79,10 +206,38 @@ class Lists
             'readMore' => $policies->getOffset('read_more')->getValue(),
             'saveForLater' => $policies->getOffset('save_for_later')->getValue(),
             'savedArticleIds' => $savedArticleIds,
-            'unsaved' => SaveForLater\Mapper::UNSAVED
+            'unsaved' => SaveForLater\Mapper::UNSAVED,
+
+            /* For the paginator
+             */
+            'currentUrl' => $url,
+            'paginator' => $paginator,
         ];
     }
 
+
+    /**
+     * From a slug, figure out what topic matches it
+     *
+     * By default, select the All tab...
+     * but try to find the topic whose slug matches the url param
+     *
+     * @param Collection|Topic[]  $topics
+     * @param null|string         $slug
+     * @return int
+     */
+    private function determineSelectedTopicId(Collection $topics, ?string $slug): int
+    {
+        $selectedTopicId = Mapper::TOPIC_ALL_ID;
+
+        foreach ($topics as $topic) {
+            if ($topic->getSlug() === $slug) {
+                return $topic->getId();
+            }
+        }
+
+        return $selectedTopicId;
+    }
 
     /**
      * Find the article ids that were saved by $user in accordance with policy setting
@@ -108,12 +263,12 @@ class Lists
      * Generate a standard paginator to go with your article list
      *
      * @param string $url
-     * @param int    $selectedTopicId
      * @param int    $limit
+     * @param int    $total
      * @return UrlPaginator|null
      * @throws \OutOfRangeException
      */
-    public function generatePaginator(string $url, int $selectedTopicId, int $limit): ?UrlPaginator
+    private function generatePaginator(string $url, int $limit, int $total): ?UrlPaginator
     {
         /* No limit specified; no pagination required
          */
@@ -121,11 +276,9 @@ class Lists
             return null;
         }
 
-        $allArticles = $this->newsMapper->findArticleIdsForTopic($selectedTopicId);
-
         $paginator = (new Paginator())
             ->setPageSize($limit)
-            ->setTotal(\count($allArticles));
+            ->setTotal($total);
 
         $urlPaginator = (new UrlPaginator())
             ->setPaginator($paginator)

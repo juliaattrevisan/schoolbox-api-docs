@@ -38,6 +38,7 @@ class Mapper extends \Schoolbox\Mapper
     /**
      * @inheritdoc
      * @throws \Schoolbox\Mapper\Exception
+     * @throws \InvalidArgumentException
      */
     protected function mapping()
     {
@@ -170,54 +171,25 @@ class Mapper extends \Schoolbox\Mapper
 
 
     /**
-     * Find a list of articles that are somehow related to $topicId
-     *
-     * The list consists of articles that fulfil this criteria, which accounts for all the articles that are
-     * presentable to the audience:
-     *
-     *   - has a publish_at date
-     *   - has been accepted for publication by the moderator
-     *   - has not yet expired
-     *
-     * This equates to articles in the states "Awaiting Publication", "Published", "Expired" (Archived)
-     *
-     * The n-n relational between articles and topics precludes proper usage of findAll()
-     * with a limit - it doesn't count properly
-     *
-     * @param int $topicId
-     * @param int $limit
-     * @param int $pageNum
-     * @return \Schoolbox\GenericCollection
-     */
-    public function findForTopic(int $topicId, int $limit, int $pageNum): \Schoolbox\GenericCollection
-    {
-
-        /* TODO: Filter $articlesInTopic vs articles that I can see
-         */
-
-        return $this->findByColumn('id', $this->findArticleIdsForTopic($topicId, $limit, $pageNum), [
-            'order' => [
-                'publish_at' => 'desc',
-                'created_at' => 'desc',
-            ]
-        ]);
-    }
-
-
-    /**
      * Find just the ids for the articles in a topic
      * We generally use this for pagination counts where we need a count instead of hydrated things
      *
      * Pass null as $limit to disable it; beware the n-n join on articles-topics
      *
-     * @param int      $topicId
-     * @param int      $limit
-     * @param int      $pageNum
+     * Filters to the $availableArticleIds that can be seen
+     *
+     * @param array $availableArticleIds
+     * @param int   $topicId
+     * @param int   $limit
+     * @param int   $pageNum
      * @return array
      */
-    public function findArticleIdsForTopic(int $topicId, int $limit = 0, int $pageNum = 0): array
+    public function findArticleIdsForTopic(array $availableArticleIds, int $topicId, int $limit = 0, int $pageNum = 0): array
     {
-        $articlesInTopic = [];
+
+        /* Filter to articles that I can see
+         */
+        $availableArticleIdsSql = implode(', ', $availableArticleIds);
 
         /* If $topicId is provided, only get articles for that topic
          * Otherwise get $limit articles from any topic
@@ -226,10 +198,17 @@ class Mapper extends \Schoolbox\Mapper
             SELECT id
             FROM {$this->table}
             WHERE publish_at IS NOT NULL
+            AND publish_at < NOW()
             AND accepted_at IS NOT NULL
             AND expires_at > NOW()
-            ORDER BY publish_at DESC, created_at DESC
+            AND deleted_at IS NULL
         ";
+
+        if (\count($availableArticleIds)) {
+            $query .= "
+                AND id IN ({$availableArticleIdsSql}) 
+            ";
+        }
 
         if ($topicId !== self::TOPIC_ALL_ID) {
             $query = "
@@ -237,14 +216,32 @@ class Mapper extends \Schoolbox\Mapper
                 FROM {$this->table}
                 INNER JOIN comms_news_article_topic cnat ON {$this->table}.id = cnat.article_id 
                 WHERE publish_at IS NOT NULL
+                AND publish_at < NOW()
                 AND accepted_at IS NOT NULL
                 AND expires_at > NOW()
+                AND deleted_at IS NULL
                 AND cnat.topic_id = :topicId
-                GROUP BY id
-                ORDER BY publish_at DESC, created_at DESC
             ";
+
+            if (\count($availableArticleIds)) {
+                $query .= "
+                    AND id IN ({$availableArticleIdsSql}) 
+                ";
+            }
+
+            $query .= '
+                GROUP BY id
+            ';
         }
 
+        /* TODO: Sorting algorithm
+         */
+        $query .= '
+            ORDER BY publish_at DESC, created_at DESC
+        ';
+
+        /* Limits and offsets
+         */
         if ($limit) {
             $query .= 'LIMIT :limit';
 
@@ -271,12 +268,11 @@ class Mapper extends \Schoolbox\Mapper
 
         $statement->execute();
 
+        $articlesInTopic = [];
+
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $articlesInTopic[] = $row['id'];
         }
-
-        /* TODO: Filter $articlesInTopic vs articles that I can see
-         */
 
         return $articlesInTopic;
     }
