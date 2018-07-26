@@ -39,6 +39,24 @@ class CalculableAggregator extends SplObjectStorage implements Calculable
         return $mark;
     }
 
+
+    /**
+     * Calculates the highest available mark for this Calculable
+     *
+     * @return float
+     */
+    public function calculateMax()
+    {
+        $total = 0;
+
+        foreach ($this as $calc) {
+            $total += $calc->calculateMax();
+        }
+
+        return $total;
+    }
+
+
     /**
      * Scale the summated marks given for a Calculable, based on the total possible marks for the Calculable
      *
@@ -71,24 +89,6 @@ class CalculableAggregator extends SplObjectStorage implements Calculable
         }
 
         return $rowMaxSum;
-    }
-
-
-
-    /**
-     * Calculates the highest available mark for this Calculable
-     *
-     * @return float
-     */
-    public function calculateMax()
-    {
-        $total = 0;
-
-        foreach ($this as $calc) {
-            $total += $calc->calculateMax();
-        }
-
-        return $total;
     }
 
 
