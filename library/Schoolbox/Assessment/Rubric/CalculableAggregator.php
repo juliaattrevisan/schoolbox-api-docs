@@ -94,7 +94,7 @@ class CalculableAggregator extends SplObjectStorage implements Calculable
 
     /**
      * Turns the scaled mark for the Calculable into a percentage of the total possible marks
-     * 
+     *
      * @return float
      */
     public function calculatePercentage()

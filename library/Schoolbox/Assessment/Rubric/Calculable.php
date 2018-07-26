@@ -14,7 +14,7 @@ interface Calculable
 {
 
     /**
-     * Return the calculated sum value of this Calculable (NOT the total possible value)
+     * Return the mark given for this Calculable
      *
      * @return float|null
      */
@@ -22,7 +22,7 @@ interface Calculable
 
 
     /**
-     * Returns the total possible value of this Calculable
+     * Returns the highest possible mark for this Calculable (takes into account custom max capability marks)
      *
      * @return float
      */
