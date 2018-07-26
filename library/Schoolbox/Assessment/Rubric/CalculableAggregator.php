@@ -49,7 +49,7 @@ class CalculableAggregator extends SplObjectStorage implements Calculable
      *
      * @return float
      */
-    private function calculateRowMaxSum() : float
+    public function calculateRowMaxSum() : float
     {
         $total = 0;
 
