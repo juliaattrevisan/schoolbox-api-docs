@@ -307,7 +307,7 @@ class Mapper extends \Schoolbox\Mapper
             ";
         }
 
-        /* TODO: Sorting algorithm
+        /* TODO: Sorting algorithm SA-7097
          */
         $query .= '
             ORDER BY publish_at DESC, created_at DESC
