@@ -183,9 +183,11 @@ class Mapper extends \Schoolbox\Mapper
     {
         /* Dates - must be expired, accepted, published and not deleted
          */
+        $now = \Alaress_Date_Format::now()->getDatabase();
+
         $pb = $this->getPredicateBuilder()
-            ->lessThan('expires_at', \Alaress_Date_Format::now())
-            ->notNull('publish_at')
+            ->lessThan('expires_at', $now)
+            ->lessThan('publish_at', $now)
             ->notNull('accepted_at')
             ->isNull('deleted_at');
 
@@ -210,7 +212,8 @@ class Mapper extends \Schoolbox\Mapper
         $statement = $this->database->prepare($query);
 
         $statement->execute([
-            'expires_at_0' => \Alaress_Date_Format::now()
+            'expires_at_0' => $now,
+            'publish_at_0' => $now,
         ]);
 
         $years = [];
@@ -242,18 +245,19 @@ class Mapper extends \Schoolbox\Mapper
      */
     public function findArticleIdsForTopic(array $availableArticleIds, int $topicId, int $limit = 0, int $pageNum = 0, ?int $year, ?int $month): array
     {
-        /* Dates - must be accepted, published and not deleted
-         */
-        $pb = $this->getPredicateBuilder()
-            ->notNull('publish_at')
-            ->notNull('accepted_at')
-            ->isNull('deleted_at');
 
         /* If either year or month is specified, we're looking in the news archive
          * Look for expired items matching a certain year/month combination
          */
-        $now = \Alaress_Date_Format::now();
+        $now = \Alaress_Date_Format::now()->getDatabase();
         $yearMonth = '';
+
+        /* Dates - must be accepted, published and not deleted
+         */
+        $pb = $this->getPredicateBuilder()
+            ->lessThan('publish_at', $now)
+            ->notNull('accepted_at')
+            ->isNull('deleted_at');
 
         if ($year || $month) {
             $paddedMonth = '';
@@ -338,9 +342,10 @@ class Mapper extends \Schoolbox\Mapper
         /* ...wow
          */
         $statement->bindValue('expires_at_0', $now, \PDO::PARAM_STR);
+        $statement->bindValue('publish_at_0', $now, \PDO::PARAM_STR);
 
         if ($year || $month) {
-            $statement->bindValue('publish_at_0', $yearMonth, \PDO::PARAM_STR);
+            $statement->bindValue('publish_at_1', $yearMonth, \PDO::PARAM_STR);
         }
 
         /* finally
