@@ -294,14 +294,14 @@
                     var $this = $(this),
                         descriptorId = $this.data('rubricDescriptor'),
                         $select = $rb.find('#rangeDropdown-'+String(descriptorId)),
-                        fl;
+                        descriptorValue;
                     if ($select.length) {
-                        fl = parseFloat($select.val());
+                        descriptorValue = parseFloat($select.val());
                     } else {
-                        fl = parseFloat($(this).data('value'));
+                        descriptorValue = parseFloat($this.data('value'));
                     }
-                    if (!isNaN(fl)) {
-                        groupSum += fl;
+                    if (!isNaN(descriptorValue)) {
+                        groupSum += descriptorValue;
                     }
                 }
             });
