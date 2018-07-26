@@ -568,9 +568,8 @@ class RubricMapper
                 [$this, 'normalizeEncoding'],
                 array_map(
                     [$this, 'normalizeSpace'],
-                    array_slice($line, 0, $limit)
-                ),
-                array_slice($line, 0, $limit)
+                    \array_slice($line, 0, $limit)
+                )
             );
         }
 
