@@ -543,7 +543,12 @@ class Controller extends Base
 
             /* The requested data set to load, given the params provided
              */
-            $urlPrefix = $this->getRouter()->generate('commsNews.getIndex');
+            if ($year) {
+                $urlPrefix = $this->getRouter()->generate('commsNews.getArchive', ['year' => $year, 'month' => $month]);
+            }
+            else {
+                $urlPrefix = $this->getRouter()->generate('commsNews.getIndex');
+            }
 
             $outcome = $this->generatePartial($urlPrefix, $params, $topics, $params->getShowPaginator(), $year, $month);
             $content = $this->buildUnthemedHtmlOutput('@commsNews/list.twig', $outcome)->getAsString();
@@ -588,10 +593,12 @@ class Controller extends Base
             'topics' => $topics,
             'topicAll' => Mapper::TOPIC_ALL_SLUG,
             'showPaginator' => $showPaginator,
-            'slug' => $params->getSlug()
+            'slug' => $params->getSlug(),
+            'year' => $year,
+            'month' => $month
         ];
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/index.twig', $data));
+        $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/archive.twig', $data));
     }
 
     /**

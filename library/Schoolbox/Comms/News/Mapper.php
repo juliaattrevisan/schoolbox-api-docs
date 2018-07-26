@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Comms\News;
 
+use Alaress\Database\Predicate\Builder;
 use Schoolbox\News\TopicMapper;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
@@ -186,13 +187,47 @@ class Mapper extends \Schoolbox\Mapper
      * @param int|null $year
      * @param int|null $month
      * @return array
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \UnderflowException
      */
     public function findArticleIdsForTopic(array $availableArticleIds, int $topicId, int $limit = 0, int $pageNum = 0, ?int $year, ?int $month): array
     {
+        /* Dates - must be accepted, published and not deleted
+         */
+        $pb = $this->getPredicateBuilder()
+            ->notNull('publish_at')
+            ->notNull('accepted_at')
+            ->isNull('deleted_at');
+
+        /* If either year or month is specified, we're looking in the news archive
+         * Look for expired items matching a certain year/month combination
+         */
+        $now = \Alaress_Date_Format::now();
+        $yearMonth = '';
+
+        if ($year || $month) {
+            $paddedMonth = str_pad($month, 2, '0', STR_PAD_LEFT);
+
+            $yearMonth = "{$year}-{$paddedMonth}%";
+
+            $pb->lessThan('expires_at', $now);
+            $pb->like('publish_at', $yearMonth);
+        }
+        else {
+            $pb->greaterThan('expires_at', $now);
+        }
+
+        /* String representation of the WHERE clause
+         */
+        $where = implode("\nAND ", $pb->getWhere());
 
         /* Filter to articles that I can see
          */
-        $availableArticleIdsSql = implode(', ', $availableArticleIds);
+        if (\count($availableArticleIds)) {
+            $availableArticleIdsSql = implode(', ', $availableArticleIds);
+
+            $where .= "\nAND id IN ({$availableArticleIdsSql})";
+        }
 
         /* If $topicId is provided, only get articles for that topic
          * Otherwise get $limit articles from any topic
@@ -200,95 +235,18 @@ class Mapper extends \Schoolbox\Mapper
         $query = "
             SELECT id
             FROM {$this->table}
-            WHERE publish_at IS NOT NULL
-            AND publish_at < NOW()
-            AND accepted_at IS NOT NULL
-            AND deleted_at IS NULL
-            
+            WHERE {$where}
         ";
-
-        /* If either year or month is specified, we're looking in the news archive
-         */
-        if ($year || $month) {
-            $query .= "
-                AND expires_at < NOW()
-            ";
-
-            if ($year && $month) {
-                if ($month) {
-                    $query .= "
-                        AND publish_at LIKE '{$year}-{$month}%'
-                    ";
-                }
-            }
-
-            if ($year) {
-                $query .= "
-                    AND publish_at LIKE '{$year}%'
-                ";
-            }
-        }
-        else {
-            $query .= '
-                AND expires_at > NOW()
-            ';
-        }
-
-        if (\count($availableArticleIds)) {
-            $query .= "
-                AND id IN ({$availableArticleIdsSql}) 
-            ";
-        }
 
         if ($topicId !== self::TOPIC_ALL_ID) {
             $query = "
                 SELECT id
                 FROM {$this->table}
                 INNER JOIN comms_news_article_topic cnat ON {$this->table}.id = cnat.article_id 
-                WHERE publish_at IS NOT NULL
-                AND publish_at < NOW()
-                AND accepted_at IS NOT NULL
-                AND deleted_at IS NULL
-                AND cnat.topic_id = :topicId
-            ";
-
-            /* If either year or month is specified, we're looking in the news archive
-             */
-            if ($year || $month) {
-                $query .= "
-                    AND expires_at < NOW()
-                ";
-
-                if ($year && $month) {
-                    if ($month) {
-                        $query .= "
-                            AND publish_at LIKE '{$year}-{$month}%'
-                        ";
-                    }
-                }
-
-                if ($year) {
-                    $query .= "
-                        AND publish_at LIKE '{$year}%'
-                    ";
-                }
-            }
-            else {
-                $query .= '
-                    AND expires_at > NOW()
-                ';
-            }
-
-            if (\count($availableArticleIds)) {
-                $query .= "
-                    AND id IN ({$availableArticleIdsSql}) 
-                ";
-            }
-
-
-            $query .= '
+                WHERE cnat.topic_id = :topicId
+                AND {$where}                
                 GROUP BY id
-            ';
+            ";
         }
 
         /* TODO: Sorting algorithm
@@ -323,6 +281,16 @@ class Mapper extends \Schoolbox\Mapper
             }
         }
 
+        /* ...wow
+         */
+        $statement->bindValue('expires_at_0', $now, \PDO::PARAM_STR);
+
+        if ($year || $month) {
+            $statement->bindValue('publish_at_0', $yearMonth, \PDO::PARAM_STR);
+        }
+
+        /* finally
+         */
         $statement->execute();
 
         $articlesInTopic = [];
