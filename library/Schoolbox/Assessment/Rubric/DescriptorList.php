@@ -95,18 +95,6 @@ abstract class DescriptorList implements Twiggable, Calculable
     }
 
 
-    /**
-     * @return float
-     */
-    public function getPercentage()
-    {
-        if ($total = $this->calculateMax()) {
-            return $this->calculateMark() / $total;
-        }
-
-        return 0;
-    }
-
 
     /**
      * Convert yourself into a Twig context array
