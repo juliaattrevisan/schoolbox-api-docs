@@ -16,7 +16,9 @@ class Level extends DescriptorList
 {
 
     /**
-     * Returns the total possible value of this Calculable
+     * Returns the highest possible mark for this Calculable
+     * TODO I'm not sure where, if at all, this is actually being used?
+     * it appears to be summating a column of descriptor values, which we never actually do...
      *
      * @return float
      */

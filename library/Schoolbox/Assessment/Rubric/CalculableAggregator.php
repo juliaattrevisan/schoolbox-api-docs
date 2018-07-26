@@ -15,7 +15,7 @@ use SplObjectStorage;
 
 /**
  * Class CalculableAggregator
- * Superclass for rubric elements that need to summate values on collections of children, in order to calculate grades.
+ * Superclass for rubric elements that need to summate values on collections of children, in order to calculate overall grades.
  *
  * @package Schoolbox\Assessment\Rubric
  */
