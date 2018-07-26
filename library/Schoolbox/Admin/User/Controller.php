@@ -171,8 +171,8 @@ class Controller extends Base
             'name' => 'Housemaster',
             'identifier' => self::IDENTIFIER_RESIDENTIAL_HOUSE,
             'availability' => [
-                'read' => true,
-                'write' => true,
+                'read' => false,
+                'write' => false,
                 'moderate' => true
             ]
         ],
