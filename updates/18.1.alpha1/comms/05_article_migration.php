@@ -7,6 +7,11 @@ use Schoolbox\Comms\News\Audience\Model;
 require_once __DIR__ . '/../../../conf/core/require.php';
 spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
+/* A default datetime value that is easily identifiable
+ * Only really corrupt articles should result in having this date at the end of migration
+ */
+define('DEFAULT_DATE', '1999-01-01 00:00:00');
+
 /**
  * Import all the School News into Comms
  *
@@ -45,6 +50,64 @@ function importSchoolNews(IDatabase $db, LoggerInterface $log)
  */
 function createSchoolNewsArticle(IDatabase $db, array $row, LoggerInterface $log)
 {
+
+    /* Some articles can exist without certain timestamps because...reasons
+     * Use item_datetime_posted as the default datetime value
+     * If extant, other dates override the default datetime value
+     */
+
+    /* Assume every article had a posted (created) date
+     * If not, it's indeterminate
+     */
+    $createdAt = DEFAULT_DATE;
+
+    if (\strlen($row['item_datetime_posted']) > 0) {
+        if ((new \Alaress_Date_Format($row['item_datetime_posted'], \Alaress_Date_Format::DATABASE_FORMAT))->isValid()) {
+            $createdAt = $row['item_datetime_posted'];
+        }
+    }
+
+    /* Some articles were never modified, so item_datetime_modified is null
+     * Assume it to be the same as createdAt as per contemporary understanding
+     */
+    $modifiedAt = $createdAt;
+
+    if (\strlen($row['item_datetime_modified']) > 0) {
+        if ((new \Alaress_Date_Format($row['item_datetime_modified'], \Alaress_Date_Format::DATABASE_FORMAT))->isValid()) {
+            $modifiedAt = $row['item_datetime_modified'];
+        }
+    }
+
+    /* If publish date is null, assume it went out immediately
+     */
+    $publishAt = $createdAt;
+
+    if (\strlen($row['item_datetime_published']) > 0) {
+        if ((new \Alaress_Date_Format($row['item_datetime_published'], \Alaress_Date_Format::DATABASE_FORMAT))->isValid()) {
+            $publishAt = $row['item_datetime_published'];
+        }
+    }
+
+    /* If expiry date is null, assume it archived immediately as well
+     */
+    $expiresAt = $publishAt;
+
+    if (\strlen($row['item_datetime_expires']) > 0) {
+        if ((new \Alaress_Date_Format($row['item_datetime_expires'], \Alaress_Date_Format::DATABASE_FORMAT))->isValid()) {
+            $expiresAt = $row['item_datetime_expires'];
+        }
+    }
+
+    /* Deleted boolean equates to last modified
+     */
+    $deletedAt = null;
+
+    if ($row['item_deleted']) {
+        $deletedAt = $modifiedAt;
+    }
+
+    /* Now that we've accommodated random data configurations, reassign the repaired version
+     */
     $mapping = [
         'id' => $row['item_id'],
         'title' => $row['item_heading'],
@@ -52,14 +115,14 @@ function createSchoolNewsArticle(IDatabase $db, array $row, LoggerInterface $log
         'blurb' => $row['item_blurb'] ?: '',
         'author_id' => $row['item_owner'],
         'feature_image_hash' => $row['item_image'],
-        'submitted_at' => $row['item_datetime_modified'],
+        'submitted_at' => $modifiedAt,
         'accepted_by' => $row['item_owner'],
-        'accepted_at' => $row['item_datetime_modified'],
-        'publish_at' => $row['item_datetime_published'],
-        'expires_at' => $row['item_datetime_expires'],
-        'created_at' => $row['item_datetime_posted'],
-        'updated_at' => $row['item_datetime_modified'],
-        'deleted_at' => $row['item_deleted'] ? $row['item_datetime_modified'] : null
+        'accepted_at' => $modifiedAt,
+        'publish_at' => $publishAt,
+        'expires_at' => $expiresAt,
+        'created_at' => $createdAt,
+        'updated_at' => $modifiedAt,
+        'deleted_at' => $deletedAt
     ];
 
     /* If empty, skip adding this thing
