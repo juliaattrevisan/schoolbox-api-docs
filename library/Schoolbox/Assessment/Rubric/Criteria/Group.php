@@ -218,7 +218,11 @@ class Group implements Twiggable, Calculable
      */
     public function calculateScaledMark()
     {
-        return $this->calculateMark() * ($this->calculateMax() / $this->calculateRowMaxSum());
+        $scaledMark = 0;
+        if ($rowMaxSum = $this->calculateRowMaxSum()) {
+            $scaledMark = $this->calculateMark() * ($this->calculateMax() / $rowMaxSum);
+        }
+        return $scaledMark;
     }
 
 

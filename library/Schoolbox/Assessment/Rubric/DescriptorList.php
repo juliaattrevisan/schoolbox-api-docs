@@ -139,10 +139,11 @@ abstract class DescriptorList implements Twiggable, Calculable
     {
         $sum = null;
 
-        // TODO for some reason all the descriptors are null
         foreach ($this->descriptors as $descriptor) {
-            $ds = $descriptor->calculateMark();
-            if (!is_null($ds)) {
+            $descriptorMark = $descriptor->calculateMark();
+
+            // Only adds to the sum if descriptor is selected, due to logic in Descriptor::calculateMark()
+            if ($descriptorMark !== null) {
                 $sum += $descriptor->calculateMark();
             }
         }

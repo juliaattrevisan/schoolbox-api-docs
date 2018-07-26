@@ -34,17 +34,6 @@ class CalculableAggregator extends SplObjectStorage implements Calculable
 
 
     /**
-     * The mark given for this group, scaled by the max possible marks for this group
-     *
-     * @return float
-     */
-    public function calculateScaledMark()
-    {
-        return $this->calculateMark() * ($this->calculateMax() / $this->calculateRowMaxSum());
-    }
-
-
-    /**
      * The sum of all the highest descriptor values in this group
      *
      * @return float
@@ -85,10 +74,15 @@ class CalculableAggregator extends SplObjectStorage implements Calculable
      */
     public function calculatePercentage()
     {
-        if ($total = $this->calculateMax()) {
-            return $this->calculateScaledMark() / $total;
+        $value = 0;
+
+        foreach ($this as $calc) {
+            if ($max = $calc->calculateMax()) {
+                $value = $calc->calculateScaledMark() / $max;
+            }
         }
-        return 0;
+
+        return $value;
     }
 
 }

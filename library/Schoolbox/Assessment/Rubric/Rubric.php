@@ -235,7 +235,7 @@ class Rubric implements Twiggable
         $context = [
             'id'          => $this->getId() ?: 0,
             'multiSelect' => $this->isMultiSelect(),
-            'scaledMark'  => $this->criteriaGroups->calculateScaledMark(),
+            'scaledMark'  => $this->calculateScaledMark(),
             'max'         => $this->calculateMax(),
             'humanReadableMark' => $this->getHumanReadableMark(),
             'levels'      => [],
@@ -349,7 +349,7 @@ class Rubric implements Twiggable
      */
     public function calculateScaledMark()
     {
-        return $this->criteriaGroups->calculateScaledMark();
+        return $this->criteriaGroups->calculateMark();
     }
 
 
