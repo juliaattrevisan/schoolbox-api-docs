@@ -52,8 +52,7 @@
 
                                         {% if useMarkRange and descriptorMin != descriptorMax %}
                                             {% if descriptor.selected and markVisibility %}
-                                                {# TODO once we can store this descriptor's discrete mark, replace first twig var with that #}
-                                                {{ descriptorMax }} / {{ descriptorMax }}
+                                                {{ descriptor.selectedValue }} / {{ descriptorMax }}
                                             {% else %}
                                                 {% if direction == 'asc' %}
                                                     {{- descriptorMin -}} - {{- descriptorMax -}}
