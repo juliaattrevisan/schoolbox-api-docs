@@ -12,11 +12,19 @@ namespace Schoolbox\Assessment\Rubric;
 
 use SplObjectStorage;
 
+
+/**
+ * Class CalculableAggregator
+ * Superclass for rubric elements that need to summate values on collections of children, in order to calculate grades.
+ *
+ * @package Schoolbox\Assessment\Rubric
+ */
+
 class CalculableAggregator extends SplObjectStorage implements Calculable
 {
 
     /**
-     * Returns the sum of the Calculables contained herein
+     * Summate the marks given for a Calculable
      *
      * @return float
      */
@@ -31,7 +39,11 @@ class CalculableAggregator extends SplObjectStorage implements Calculable
         return $mark;
     }
 
-
+    /**
+     * Scale the summated marks given for a Calculable, based on the total possible marks for the Calculable
+     *
+     * @return float
+     */
     public function calculateScaledMark()
     {
         $scaledMark = $this->calculateMark();
@@ -45,7 +57,8 @@ class CalculableAggregator extends SplObjectStorage implements Calculable
 
 
     /**
-     * The sum of all the highest descriptor values in this group
+     * Summate the highest values from each row in the Calculable (help this is very hard to put into words)
+     * This is essentially the highest mark that can be achieved for the Calculable, without scaling
      *
      * @return float
      */
@@ -63,7 +76,7 @@ class CalculableAggregator extends SplObjectStorage implements Calculable
 
 
     /**
-     * Returns the total of the Calculables contained herein
+     * Calculates the highest available mark for this Calculable
      *
      * @return float
      */
@@ -80,7 +93,8 @@ class CalculableAggregator extends SplObjectStorage implements Calculable
 
 
     /**
-     * Returns the percentage of the Calculables contained herein
+     * Turns the scaled mark for the Calculable into a percentage of the total possible marks
+     * 
      * @return float
      */
     public function calculatePercentage()
