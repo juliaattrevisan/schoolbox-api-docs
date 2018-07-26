@@ -122,13 +122,19 @@ class Controller extends Base
         $this->validateAccess();
         $emailAddress = $this->getRequest()->post->get('email');
         $sessionSegment = $this->getSessionSegment();
-        $sessionSegment->setFlash('email', $emailAddress);
         $sessionSegment->setFlash('isEmailSubmitted', true);
 
-        $this->passwordMailService->sendResetLinkToAddress(
-            $emailAddress,
-            $this->getRequest()->server->get('REMOTE_ADDR')
-        );
+        if(strlen($emailAddress) > 0) {
+            $sessionSegment->setFlash('email', $emailAddress);
+
+            $this->passwordMailService->sendResetLinkToAddress(
+                $emailAddress,
+                $this->getRequest()->server->get('REMOTE_ADDR')
+            );
+        }
+        else {
+            $sessionSegment->setFlash('isEmailValid', false);
+        }
 
         $this->getResponse()->redirect->to(
             $this->getRouter()->generate('userPasswordReset.displayCreateRequestForm')
