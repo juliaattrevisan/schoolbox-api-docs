@@ -37,10 +37,6 @@ file is in `.gitignore`, so should not be committed to the base repository.
 >             - Codeception\Extension\Recorder:
 >                 delete_successful: false
 
-### Reprovision
-
-If you've not yet reprovisioned after checking out this branch: run
-`vagrant provision` to install Chrome, Chromium WebDriver and its dependencies.
 
 ### Codeception test
 
