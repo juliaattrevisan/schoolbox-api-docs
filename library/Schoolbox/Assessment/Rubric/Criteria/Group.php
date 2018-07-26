@@ -253,8 +253,10 @@ class Group implements Twiggable, Calculable
         $context = [
             'id'         => $this->getId(),
             'name'       => $this->getName(),
-            'mark'        => $this->calculateScaledMark(),
-            'total'      => $this->calculateMax(),
+            'mark'        => $this->calculateMark(),
+            'scaledMark'  => $this->calculateScaledMark(),
+            'max'         => $this->calculateMax(),
+            'rowMaxSum'   => $this->calculateRowMaxSum(),
             'percentage' => $this->getPercentage(),
             'humanReadableMark' => $this->getHumanReadableMark(),
             'used'       => $this->isReadOnly(),

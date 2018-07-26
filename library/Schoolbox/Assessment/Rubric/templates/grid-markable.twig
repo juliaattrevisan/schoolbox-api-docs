@@ -135,12 +135,14 @@
                 </tr>
             {% endfor %}
 
-        {% if group.total and showGroupTotal and markSchemeName != "None" and (config.rubric_show_points or not studentView) %}
+        {% if group.max and showGroupTotal and markSchemeName != "None" and (config.rubric_show_points or not studentView) %}
             <tr>
                 <th class="rb-group-summary" colspan="{{ rubric.levels|length + 1 }}">
                     <span data-group-summary="{{ rubricId }}-{{ group.id }}"
-                        data-numerator="{{ limit_decimal.limit(group.sum, 2) }}"
-                        data-denominator="{{ limit_decimal.limit(group.total, 2) }}">
+                          data-mark="{{ limit_decimal.limit(group.mark, 2) }}"
+                          data-scaled-mark="{{ limit_decimal.limit(group.scaledMark, 2) }}"
+                          data-max="{{ limit_decimal.limit(group.max, 2) }}"
+                          data-row-max-sum="{{ limit_decimal.limit(group.rowMaxSum, 2) }}">
 
                         <label for="groupMark">{{ locale.rubricGroup.proper }} mark</label>
                         {% if markSchemeName == 'TotalMarkFractional' %}
@@ -166,16 +168,15 @@
 
     {% endfor %}
 
-    {% if rubric.total and showRubricTotal and (config.rubric_show_points or not studentView) %}
+    {% if rubric.max and showRubricTotal and (config.rubric_show_points or not studentView) %}
         <tr>
             <th class="rb-final-summary" colspan="{{ rubric.levels|length + 2 }}">
                 <span data-final-summary="{{ rubricId }}"
-
-                    data-numerator="{{ limit_decimal.limit(rubric.sum, 2) }}"
-                    data-denominator="{{ limit_decimal.limit(rubric.total, 2) }}">
+                      data-scaled-mark="{{ limit_decimal.limit(rubric.scaledMark, 2) }}"
+                      data-max="{{ limit_decimal.limit(rubric.max, 2) }}">
 
                     {% if markSchemeName == 'TotalMarkFractional' %}
-                       {{ limit_decimal.limit(rubric.sum, 2) }} / {{ limit_decimal.limit(rubric.total, 2) }}
+                       {{ limit_decimal.limit(rubric.scaledMark, 2) }} / {{ limit_decimal.limit(rubric.max, 2) }}
                     {% else %}
                        {{ rubric.humanReadableMark }}
                     {% endif %}
@@ -219,34 +220,35 @@
 
             var $groupRows = $(rowSelector);
 
-            var rubricSum = 0;
+            var rubricTotalMark = 0;
 
             if ($groupRows.length) {
 
-                var groupSum = getSum($groupRows.find('input'));
-
                 var groupSummarySelector = '[data-group-summary="rb-' + rubricId + '-' + groupId + '"]';
-
                 var groupSummary = $rb.find(groupSummarySelector);
 
-                groupSummary.attr('data-numerator', groupSum);
+                var scaledGroupMark = getScaledGroupMark($groupRows.find('input'), groupSummary);
 
                 if (groupSummary.length) {
+                    groupSummary.attr('data-scaled-mark', scaledGroupMark);
+
                     parseFraction(groupSummary, null);
                 }
 
-                rubricSum = getSum($rb.find('input'));
+                rubricTotalMark = getTotalMark($rb.find('input'));
             }
 
             var rubricSummarySelector = '[data-final-summary="rb-' + rubricId + '"]';
 
             var rubricSummary = $rb.find(rubricSummarySelector);
 
-            rubricSummary.attr('data-numerator', rubricSum);
+            // TODO fix up markup for these
+            rubricSummary.attr('data-scaled-mark', rubricTotalMark);
 
             parseFraction(rubricSummary, e.namespace);
 
-            $('[data-role=rubric-sum]').text(rubricSummary.text());
+            // This seems to be unused
+            // $('[data-role=rubric-scaled-mark]').text(rubricSummary.text());
 
             // What cell was actually changed?
             if ($changed.is(':checkbox')) {
@@ -282,13 +284,17 @@
             }
         }
 
-        function getSum($descriptorCheckboxes)
+        function getScaledGroupMark($descriptorCheckboxes, groupSummary)
         {
+            var groupMax = groupSummary.attr('data-max');
+            var groupRowMaxSum = groupSummary.attr('data-row-max-sum');
+
             var groupSum = 0;
 
             // in lieu of a reduce() function
             $descriptorCheckboxes.map(function () {
                 var $descriptorCheckbox = $(this);
+
                 if ($descriptorCheckbox.prop('checked')) {
                     // Is there a select box for this? If so use its value instead
                     var descriptorId = $descriptorCheckbox.data('rubricDescriptor'),
@@ -299,6 +305,32 @@
                     } else {
                         descriptorValue = parseFloat($descriptorCheckbox.data('value'));
                     }
+                    if (!isNaN(descriptorValue)) {
+                        groupSum += descriptorValue;
+                    }
+                }
+            });
+
+            var scaledGroupSum = groupSum * (groupMax / groupRowMaxSum);
+
+            if(scaledGroupSum % 1 != 0){
+                scaledGroupSum = scaledGroupSum.toFixed(2);
+            }
+
+            return scaledGroupSum;
+        }
+
+
+        function getTotalMark(elements)
+        {
+            var groupSum = 0;
+
+            // in lieu of a reduce() function
+            elements.map(function () {
+                if ($(this).prop('checked')) {
+
+                    var descriptorValue = parseFloat($(this).data('value'));
+
                     if (!isNaN(descriptorValue)) {
                         groupSum += descriptorValue;
                     }
@@ -344,7 +376,7 @@
             }
 
             $elem.each(function () {
-                if (this.hasAttribute('data-numerator') && this.hasAttribute('data-denominator')) {
+                if (this.hasAttribute('data-scaled-mark') && this.hasAttribute('data-max')) {
                     $(this).trigger(ev);
                 }
             });
