@@ -260,6 +260,7 @@ class Group implements Twiggable, Calculable
             'mark'        => $this->calculateMark(),
             'scaledMark'  => $this->calculateScaledMark(),
             'max'         => $this->calculateMax(),
+            'percentage'  => $this->getPercentage(),
             'rowMaxSum'   => $this->calculateRowMaxSum(),
             'humanReadableMark' => $this->getHumanReadableMark(),
             'used'       => $this->isReadOnly(),

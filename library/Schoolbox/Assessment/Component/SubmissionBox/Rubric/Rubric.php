@@ -499,22 +499,26 @@ class Rubric extends Core\Rubric
                 if ($box && $box->isMarkedPerRubricGroup()) {
                     $context['groups'][$groupId]['humanReadableMark'] = $this->calculateHumanReadable(
                         $context['groups'][$groupId]['percentage'],
-                        $context['groups'][$groupId]['total']
+                        $context['groups'][$groupId]['max']
                     );
                 } else {
                     // nothing per-group? unset the mark data if any exists
                     unset(
-                        $context['groups'][$groupId]['sum'],
-                        $context['groups'][$groupId]['total'],
-                        $context['groups'][$groupId]['percentage']
+                        $context['groups'][$groupId]['mark'],
+                        $context['groups'][$groupId]['scaledMark'],
+                        $context['groups'][$groupId]['max'],
+                        $context['groups'][$groupId]['percentage'],
+                        $context['groups'][$groupId]['rowMaxSum']
                     );
                 }
             } else {
                 // nothing per-group? unset the mark data if any exists
                 unset(
-                    $context['groups'][$groupId]['sum'],
-                    $context['groups'][$groupId]['total'],
-                    $context['groups'][$groupId]['percentage']
+                    $context['groups'][$groupId]['mark'],
+                    $context['groups'][$groupId]['scaledMark'],
+                    $context['groups'][$groupId]['max'],
+                    $context['groups'][$groupId]['percentage'],
+                    $context['groups'][$groupId]['rowMaxSum']
                 );
             }
 
@@ -522,9 +526,8 @@ class Rubric extends Core\Rubric
 
         if (!$box || ($sessionUser && !$box->canViewRubric($sessionUser))) {
             unset(
-                $context['sum'],
-                $context['total'],
-                $context['percentage'],
+                $context['scaledMark'],
+                $context['max'],
                 $context['humanReadableMark']
             );
         }
