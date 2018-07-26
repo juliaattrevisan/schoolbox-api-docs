@@ -351,7 +351,7 @@
                 });
             } else {
                 $(config.formSaveLabel).toastTimeout({
-                    text: 'Could not save',
+                    text: 'Unable to save draft',
                     css: 'alert'
                 });
             }
