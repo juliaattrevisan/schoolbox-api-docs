@@ -231,14 +231,17 @@ function createSchoolNewsCampusRoleAudience(IDatabase $db, int $oldId, int $arti
         WHERE ni.item_id = {$oldId}
     ");
 
-    $campuses = $db->query("
-        SELECT campus AS id
-        FROM news_items ni
-        LEFT JOIN newsCampus nc ON ni.item_id = nc.id
-        WHERE ni.item_id = {$oldId}
-    ");
-
     foreach ($roles as $role) {
+
+        /* The data set doesn't rewind itself lol
+         */
+        $campuses = $db->query("
+            SELECT campus AS id
+            FROM news_items ni
+            LEFT JOIN newsCampus nc ON ni.item_id = nc.id
+            WHERE ni.item_id = {$oldId}
+        ");
+
         foreach ($campuses as $campus) {
 
             /* Create composite
