@@ -1,5 +1,5 @@
 {% extends '@core/user/student.twig' %}
 
 {% block buttons_miscellaneous %}
-    <li><a href="/modules/tassportal/studentProfile/{{ user.getExternalId() }}" target="_blank" class="icon-files">Tass Profile</a></li>
+    <li><a href="/modules/tassportal/studentProfile/{{ user.id }}" target="_blank" class="icon-files">Tass Profile</a></li>
 {% endblock buttons_miscellaneous %}
