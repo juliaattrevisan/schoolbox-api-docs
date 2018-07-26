@@ -62,3 +62,24 @@ driving a web browser to perform commands, and of a direct database query.
 ### Guidelines
 
 Document intent, not just actions
+
+Codeception tests, in their simplest form, are a list of actions that take place in a browser.
+
+This isn't overly helpful to someone reading the test, as from a user's point of view
+an interaction isn't just them filling in a form field, or clicking on something:
+it's part of a larger whole which involves them fulfilling some sort of business need.
+
+In addition: the user isn't interacting with a field with a particular ID, name
+or CSS selector, so don't show these in Cests; abstract them in page objects.
+
+
+My current recommendation is:
+
+Create [page objects] for each page class you're testing
+* it should have a `generateRoute` method, with a negotiable param count
+  * used by `$i->amOnPage()`
+* if it's a form, create fill/see methods for each input
+
+
+Sophisticated but generic interactions (example: selectize, file uploads) 
+should be written into acceptance tester.
