@@ -39,7 +39,7 @@ class Rubric implements Twiggable
     {
         $this->criteriaGroups = new CalculableAggregator();
         $this->levels = new CalculableAggregator();
-        $this->setId($id ?: rand(1,5038576));
+        $this->setId($id ?: rand(1,5038576)); // TODO omg WHAT is that
         $this->setMultiSelect($multiSelect);
     }
 
@@ -349,7 +349,7 @@ class Rubric implements Twiggable
      */
     public function calculateScaledMark()
     {
-        return $this->criteriaGroups->calculateMark();
+        return $this->criteriaGroups->calculateScaledMark();
     }
 
 

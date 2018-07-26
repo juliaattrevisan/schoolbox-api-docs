@@ -22,15 +22,26 @@ class CalculableAggregator extends SplObjectStorage implements Calculable
      */
     public function calculateMark()
     {
-        $value = 0;
+        $mark = 0;
 
         foreach ($this as $calc) {
-            $value += $calc->calculateMark();
+            $mark += $calc->calculateMark();
         }
 
-        return $value;
+        return $mark;
     }
 
+
+    public function calculateScaledMark()
+    {
+        $scaledMark = $this->calculateMark();
+
+        if ($rowMaxSum = $this->calculateRowMaxSum()) {
+            $scaledMark = $this->calculateMark() * ($this->calculateMax() / $this->calculateRowMaxSum());
+        }
+
+        return $scaledMark;
+    }
 
 
     /**
@@ -40,13 +51,13 @@ class CalculableAggregator extends SplObjectStorage implements Calculable
      */
     public function calculateRowMaxSum()
     {
-        $total = 0;
+        $rowMaxSum = 0;
 
         foreach ($this as $calc) {
-            $total += $calc->calculateRowMaxSum();
+            $rowMaxSum += $calc->calculateRowMaxSum();
         }
 
-        return $total;
+        return $rowMaxSum;
     }
 
 
@@ -74,15 +85,15 @@ class CalculableAggregator extends SplObjectStorage implements Calculable
      */
     public function calculatePercentage()
     {
-        $value = 0;
+        $percentage = 0;
 
         foreach ($this as $calc) {
             if ($max = $calc->calculateMax()) {
-                $value = $calc->calculateScaledMark() / $max;
+                $percentage = $calc->calculateScaledMark() / $max;
             }
         }
 
-        return $value;
+        return $percentage;
     }
 
 }
