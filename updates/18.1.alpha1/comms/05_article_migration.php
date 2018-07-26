@@ -31,9 +31,13 @@ function importSchoolNews(IDatabase $db, LoggerInterface $log)
 
         /* Figger out all the relations, ram them in accordingly
          */
-        createSchoolNewsTopics($db, $articleId, $row, $log);
-        createSchoolNewsUserAudience($db, $row['item_id'], $articleId, $log);
-        createSchoolNewsCampusRoleAudience($db, $row['item_id'], $articleId, $log);
+        if ($articleId) {
+            createSchoolNewsTopics($db, $articleId, $row, $log);
+            createSchoolNewsUserAudience($db, $row['item_id'], $articleId, $log);
+            createSchoolNewsCampusRoleAudience($db, $row['item_id'], $articleId, $log);
+        } else {
+            $log->warning("Could not create/migrate school news {$row['item_id']} {$row['item_heading']}");
+        }
     }
 
     return $i;
@@ -294,7 +298,11 @@ function importHomepageNews(IDatabase $db, LoggerInterface $log)
 
         /* Figger out all the relations, ram them in accordingly
          */
-        createHomepageNewsAudience($db, $row['id'], $articleId, $log);
+        if ($articleId) {
+            createHomepageNewsAudience($db, $row['id'], $articleId, $log);
+        } else {
+            $log->warning("Could not create/migrate homepage news {$row['id']} {$row['heading']}");
+        }
     }
 
     return $i;
