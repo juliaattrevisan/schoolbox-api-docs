@@ -34,7 +34,7 @@
                 {% set rowspan = group.criteria|length %}
 
                 {% if self != 'selfReflection' and showGroupTotal %}
-                    {% set rowspan = group.criteria|length + (group.total ? 1 : 0) %}
+                    {% set rowspan = group.criteria|length + (group.max ? 1 : 0) %}
                 {% endif %}
 
                 {% for critIndex, crit in group.criteria %}
@@ -146,7 +146,7 @@
 
                         <label for="groupMark">{{ locale.rubricGroup.proper }} mark</label>
                         {% if markSchemeName == 'TotalMarkFractional' %}
-                            {{ limit_decimal.limit(group.mark, 2) }} / {{ limit_decimal.limit(group.total, 2) }}
+                            {{ limit_decimal.limit(group.mark, 2) }} / {{ limit_decimal.limit(group.max, 2) }}
                         {% else %}
                             {{ group.humanReadableMark }}
                         {% endif %}
