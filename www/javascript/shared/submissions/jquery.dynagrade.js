@@ -67,8 +67,6 @@
             den = this.attr('data-max'),
             prc = parseInt(num / den * 100);
 
-        console.log(num);
-
         callback.call(this, prc + ' %');
     }
 
@@ -78,8 +76,6 @@
             den = this.attr('data-max'),
             prc = parseInt(num / den * 100),
             $el = this;
-
-        console.log(num);
 
         var rev = [];
 
@@ -118,8 +114,6 @@
     function calcRaw(callback) {
         var num = this.attr('data-scaled-mark'),
             den = this.attr('data-max');
-
-        console.log(num);
 
         callback.call(this, num + ' / ' + den);
     }

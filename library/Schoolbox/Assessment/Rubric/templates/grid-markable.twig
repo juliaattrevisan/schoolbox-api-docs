@@ -235,14 +235,13 @@
                     parseFraction(groupSummary, null);
                 }
 
-                rubricTotalMark = getTotalMark($rb.find('input'));
+                rubricTotalMark = getTotalMark(rubricId);
             }
 
             var rubricSummarySelector = '[data-final-summary="rb-' + rubricId + '"]';
 
             var rubricSummary = $rb.find(rubricSummarySelector);
 
-            // TODO fix up markup for these
             rubricSummary.attr('data-scaled-mark', rubricTotalMark);
 
             parseFraction(rubricSummary, e.namespace);
@@ -321,28 +320,24 @@
         }
 
 
-        function getTotalMark(elements)
+        function getTotalMark()
         {
-            var groupSum = 0;
+            var groupSummary = $rb.find('[data-group-summary]');
+            var totalMark = 0;
 
-            // in lieu of a reduce() function
-            elements.map(function () {
-                if ($(this).prop('checked')) {
-
-                    var descriptorValue = parseFloat($(this).data('value'));
-
-                    if (!isNaN(descriptorValue)) {
-                        groupSum += descriptorValue;
-                    }
+            groupSummary.each(function() {
+                var groupScaledMark = parseFloat($(this).attr('data-scaled-mark'));
+                if (!isNaN(groupScaledMark)) {
+                    totalMark += groupScaledMark;
                 }
             });
 
             // If sum isn't a whole number: round to 2dp
-            if (groupSum % 1 !== 0){
-                groupSum = groupSum.toFixed(2);
+            if(totalMark % 1 != 0){
+                totalMark = totalMark.toFixed(2);
             }
 
-            return groupSum;
+            return totalMark;
         }
 
         // If not multi-select, simulate radio behaviour per row (simpler to do this than intercept radio checked event!)
