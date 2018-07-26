@@ -171,7 +171,7 @@ class Descriptor implements Calculable, Twiggable
 
 
     /**
-     * Return the calculated sum value of this Calculable (NOT the total possible value)
+     * @inheritdoc
      *
      * @return float|null
      */
@@ -182,7 +182,7 @@ class Descriptor implements Calculable, Twiggable
 
 
     /**
-     * Returns the total possible value of this Calculable
+     * @inheritdoc
      *
      * @alias getValue()
      * @return float

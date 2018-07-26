@@ -119,7 +119,7 @@ abstract class DescriptorList implements Twiggable, Calculable
 
 
     /**
-     * Return the calculated sum value of this Calculable (NOT the total possible value)
+     * @inheritdoc
      *
      * @return float|null
      */

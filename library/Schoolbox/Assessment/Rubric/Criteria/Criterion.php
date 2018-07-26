@@ -21,7 +21,7 @@ class Criterion extends DescriptorList
     protected $group;
 
     /**
-     * Returns the total of the values of descriptors contained herein, irrespective of selection
+     * @inheritdoc
      *
      * @return float
      */
