@@ -283,22 +283,22 @@
             }
         }
 
-        function getSum(elements)
+        function getSum($descriptorCheckboxes)
         {
             var groupSum = 0;
 
             // in lieu of a reduce() function
-            elements.map(function () {
-                if ($(this).prop('checked')) {
+            $descriptorCheckboxes.map(function () {
+                var $descriptorCheckbox = $(this);
+                if ($descriptorCheckbox.prop('checked')) {
                     // Is there a select box for this? If so use its value instead
-                    var $this = $(this),
-                        descriptorId = $this.data('rubricDescriptor'),
+                    var descriptorId = $descriptorCheckbox.data('rubricDescriptor'),
                         $select = $rb.find('#rangeDropdown-'+String(descriptorId)),
                         descriptorValue;
                     if ($select.length) {
                         descriptorValue = parseFloat($select.val());
                     } else {
-                        descriptorValue = parseFloat($this.data('value'));
+                        descriptorValue = parseFloat($descriptorCheckbox.data('value'));
                     }
                     if (!isNaN(descriptorValue)) {
                         groupSum += descriptorValue;
@@ -306,7 +306,8 @@
                 }
             });
 
-            if(groupSum % 1 != 0){
+            // If sum isn't a whole number: round to 2dp
+            if (groupSum % 1 !== 0){
                 groupSum = groupSum.toFixed(2);
             }
 
