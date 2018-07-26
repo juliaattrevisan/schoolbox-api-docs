@@ -311,18 +311,68 @@ function importHomepageNews(IDatabase $db, LoggerInterface $log)
  */
 function createHomepageNewsArticle(IDatabase $db, array $row, LoggerInterface $log)
 {
+
+    /* Some articles can exist without certain timestamps because...reasons
+     * Use datetime_posted as the default datetime value
+     * If extant, other dates override the default datetime value
+     */
+
+    /* Assume every article had a posted (created) date
+     * If not, it's indeterminate
+     */
+    $createdAt = DEFAULT_DATE;
+
+    if (\strlen($row['datetime_posted']) > 0) {
+        if ((new \Alaress_Date_Format($row['datetime_posted'], \Alaress_Date_Format::DATABASE_FORMAT))->isValid()) {
+            $createdAt = $row['datetime_posted'];
+        }
+    }
+
+    /* There isn't a modifiedAt equivalent for homepage news
+     */
+    $modifiedAt = $createdAt;
+
+    /* If publish date is null, assume it went out immediately
+     */
+    $publishAt = $createdAt;
+
+    if (\strlen($row['datetime_published']) > 0) {
+        if ((new \Alaress_Date_Format($row['datetime_published'], \Alaress_Date_Format::DATABASE_FORMAT))->isValid()) {
+            $publishAt = $row['datetime_published'];
+        }
+    }
+
+    /* If expiry date is null, assume it archived immediately as well
+     */
+    $expiresAt = $publishAt;
+
+    if (\strlen($row['datetime_expires']) > 0) {
+        if ((new \Alaress_Date_Format($row['datetime_expires'], \Alaress_Date_Format::DATABASE_FORMAT))->isValid()) {
+            $expiresAt = $row['datetime_expires'];
+        }
+    }
+
+    /* Deleted boolean equates to last modified
+     */
+    $deletedAt = null;
+
+    if ($row['deleted']) {
+        $deletedAt = $modifiedAt;
+    }
+
     $mapping = [
         'title' => $row['heading'],
         'body' => $row['body'] ?: '',
         'blurb' => '',
         'author_id' => $row['owner'],
-        'submitted_at' => $row['datetime_posted'],
+        'submitted_at' =>$createdAt,
         'accepted_by' => $row['owner'],
-        'accepted_at' => $row['datetime_posted'],
-        'publish_at' => $row['datetime_published'],
-        'expires_at' => $row['datetime_expires'],
-        'created_at' => $row['datetime_posted'],
-        'updated_at' => $row['datetime_posted'],
+        'accepted_at' => $createdAt,
+        'publish_at' => $publishAt,
+        'expires_at' => $expiresAt,
+        'created_at' => $createdAt,
+        'updated_at' => $modifiedAt,
+        'deleted_at' => $deletedAt
     ];
 
     $keys = implode(', ', array_keys($mapping));
