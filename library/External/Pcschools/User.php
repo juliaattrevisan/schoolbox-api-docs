@@ -783,8 +783,11 @@ class External_Pcschools_User implements External_UserInterface
         $teacherExternalId = '';
         $timePeriods       = [];
         $classes           = [];
+        $spec              = new External_Pcschools_ValidCampusSpec();
         foreach ($user->getCampusCollection() as $campus) {
-            $timePeriods[$campus->getExtTimetableCode()] = $campus->getExtTimetableCode();
+            if ($spec->isSatisfiedBy($campus)) {
+                $timePeriods[$campus->getExtTimetableCode()] = $campus->getExtTimetableCode();
+            }
         }
         foreach ($timePeriods as $timePeriod) {
             if ($user->getRole()->isStudent()) {
