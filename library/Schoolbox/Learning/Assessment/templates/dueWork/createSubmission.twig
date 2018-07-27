@@ -243,6 +243,13 @@ Data:
 
 <div class="row">
     <div class="small-12 island">
+
+        {% if errorMessage %}
+        <noscript>
+            <div class="alert-box alert">{{ errorMessage }}</div>
+        </noscript>
+        {% endif %}
+
         <h1>{{ assessment.title }}</h1>
         <ul class="meta">
             {% include '@learning/fragments/meta/dueDate.twig' %}

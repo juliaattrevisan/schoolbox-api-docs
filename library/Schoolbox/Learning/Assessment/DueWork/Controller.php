@@ -653,6 +653,29 @@ class Controller extends Assessment\Controller
 
 
     /**
+     * @param string $errorMessage
+     * @param string $redirectTo
+     * @param int    $errorCode
+     * @throws \Aura\Web\Exception\InvalidStatusCode
+     */
+    private function configureResponseWithError(string $errorMessage, string $redirectTo, int $errorCode = 403)
+    {
+        $rs = $this->getResponse();
+
+        if ($this->getRequest()->isXhr()) {
+            $result['success'] = false;
+            $result['message'] = $errorMessage;
+
+            $rs->status->setCode($errorCode);
+            $rs->content->set($this->buildJsonOutput($result));
+        } else {
+            // Show some error message?
+            $this->getSession()->getSegment(static::class)->set('errorMessage', $errorMessage);
+            $rs->redirect->to($redirectTo);
+        }
+    }
+
+    /**
      * Save a Response, on behalf of a User, for a particular Assessment
      *
      * @api POST /learning/assessments/:assessmentId/:studentId/submit
@@ -732,25 +755,15 @@ class Controller extends Assessment\Controller
 
             } catch (\InvalidArgumentException $e) {
                 $errorMessage = 'One or more files were not able to be attached';
-                if ($this->getRequest()->isXhr()) {
-                    $result['success'] = false;
-                    $result['message'] = $errorMessage;
+                $redirect = $this->getRouter()->generate(
+                    'learningAssessment.getCreateResponseForm',
+                    [
+                        'assessmentId' => $assessment->getId(),
+                        'studentId'    => $student->getId(),
+                    ]
+                );
 
-                    $rs->status->setCode(403);
-                    $rs->content->set($this->buildJsonOutput($result));
-                } else {
-                    // Show some error message?
-                    $this->getSession()->getSegment(static::class)->set('errorMessage', $errorMessage);
-                    $rs->redirect->to(
-                        $this->getRouter()->generate(
-                            'learningAssessment.getCreateResponseForm',
-                            [
-                                'assessmentId' => $assessment->getId(),
-                                'studentId'    => $student->getId(),
-                            ]
-                        )
-                    );
-                }
+                $this->configureResponseWithError($errorMessage, $redirect);
                 return;
             }
 
@@ -779,6 +792,22 @@ class Controller extends Assessment\Controller
         $selfAssessable = $participant ? (new ValidSelfAssessable())->isSatisfiedBy($this->getUser(), $participant) : false;
 
         if ($isFinal) {
+            $validateSubmission = !$rq->post->getBool('submitted_in_person');
+
+            // verify that there should be any files attached; if not, that's a fail case
+            if ($validateSubmission && $response->getAllFiles()->count() === 0) {
+                $errorMessage = 'One or more files failed to attach to your submission; please try again.';
+                $redirect = $this->getRouter()->generate(
+                    'learningAssessment.getCreateResponseForm',
+                    [
+                        'assessmentId' => $assessment->getId(),
+                        'studentId'    => $student->getId(),
+                    ]
+                );
+
+                $this->configureResponseWithError($errorMessage, $redirect);
+                return;
+            }
 
             /* submitted_at is determined after the next step when creating a self-assessed or self-reflected
              * response. Otherwise, proceed normally
