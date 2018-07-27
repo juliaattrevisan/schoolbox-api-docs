@@ -32,22 +32,8 @@
 </div>
 
 <div class="row">
-    <div class="small-12 island">
 
-        {# Archive Selector #}
-        <ul>
-            {% for year, months in availableYears %}
-                {% for month, val in months %}
-                    {% set archiveDate = year ~ '-' ~ month ~ '-01' %}
-                    <li>
-                        <a href="{{ routeLookup('commsNews.getArchive', {year: year, month: month}) }}">
-                            {{ year }} {{ archiveDate|date('M')}}
-                        </a>
-                    </li>
-                {% endfor %}
-            {% endfor %}
-        </ul>
-
+    <div class="small-9 island">
         {% if year %}
         <section>
 
@@ -96,6 +82,25 @@
         </section>
         {% endif %}
     </div>
+
+    {# Archive Selector #}
+    <div class="small-3 island">
+        <section>
+            <ul class="side-nav">
+                {% for year, months in availableYears %}
+                    {% for month, val in months %}
+                        {% set archiveDate = year ~ '-' ~ month ~ '-01' %}
+                        <li>
+                            <a href="{{ routeLookup('commsNews.getArchive', {year: year, month: month}) }}">
+                                {{ year }} {{ archiveDate|date('M')}}
+                            </a>
+                        </li>
+                    {% endfor %}
+                {% endfor %}
+            </ul>
+        </section>
+    </div>
+
 </div>
 
 <div id="toast" class="toast"></div>
