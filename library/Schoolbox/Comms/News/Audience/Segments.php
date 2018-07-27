@@ -20,6 +20,7 @@ class Segments
      * e.g. house:12345, role:5678
      */
     private const AUDIENCE_SEPARATOR = ':';
+
     /**
      * @var Mapper
      */
@@ -42,7 +43,7 @@ class Segments
      * @param News\Model $article
      * @return array
      */
-    public function load(News\Model $article)
+    public function load(News\Model $article): array
     {
         $audiencing = $this->audienceMapper->findByColumn('comms_news_article_id', $article->getId());
 
@@ -82,35 +83,37 @@ class Segments
          */
         $this->audienceMapper->deleteByColumn('comms_news_article_id', $article->getId());
 
-        $audiencingOptions = explode(',', $segments);
+        if ('' !== $segments) {
+            $audiencingOptions = explode(',', $segments);
 
-        foreach ($audiencingOptions as $audiencingOption) {
+            foreach ($audiencingOptions as $audiencingOption) {
 
-            /* explode again on the separator
-             */
-            $pieces = explode(self::AUDIENCE_SEPARATOR, $audiencingOption);
+                /* explode again on the separator
+                 */
+                $pieces = explode(self::AUDIENCE_SEPARATOR, $audiencingOption);
 
-            $audienceModel = $this->audienceMapper->createModel()
-                ->setCommsNewsArticle($article)
-                ->setEntityType($pieces[0])
-                ->setEntityValue(base64_decode($pieces[1]));
+                $audienceModel = $this->audienceMapper->createModel()
+                    ->setCommsNewsArticle($article)
+                    ->setEntityType($pieces[0])
+                    ->setEntityValue(base64_decode($pieces[1]));
 
-            /* This has a Parents or Teachers modifier if the audiencing segment has 3 pieces
-             */
-            $modifierCount = 3;
-            $piecesCount = \count($pieces);
+                /* This has a Parents or Teachers modifier if the audiencing segment has 3 pieces
+                 */
+                $modifierCount = 3;
+                $piecesCount   = \count($pieces);
 
-            if ($piecesCount === $modifierCount) {
-                if ($pieces[$piecesCount-1] === Model::RELATIONSHIP_PARENTS_OF) {
-                    $audienceModel->setRelationship(Model::RELATIONSHIP_PARENTS_OF);
-                } elseif ($pieces[$piecesCount-1] === Model::RELATIONSHIP_TEACHERS_OF) {
-                    $audienceModel->setRelationship(Model::RELATIONSHIP_TEACHERS_OF);
+                if ($piecesCount === $modifierCount) {
+                    if ($pieces[$piecesCount - 1] === Model::RELATIONSHIP_PARENTS_OF) {
+                        $audienceModel->setRelationship(Model::RELATIONSHIP_PARENTS_OF);
+                    } elseif ($pieces[$piecesCount - 1] === Model::RELATIONSHIP_TEACHERS_OF) {
+                        $audienceModel->setRelationship(Model::RELATIONSHIP_TEACHERS_OF);
+                    }
+                } else {
+                    $audienceModel->setRelationship(Model::RELATIONSHIP_SELF);
                 }
-            } else {
-                $audienceModel->setRelationship(Model::RELATIONSHIP_SELF);
-            }
 
-            $this->audienceMapper->save($audienceModel);
+                $this->audienceMapper->save($audienceModel);
+            }
         }
     }
 }

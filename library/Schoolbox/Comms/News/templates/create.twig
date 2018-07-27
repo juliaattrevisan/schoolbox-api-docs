@@ -206,8 +206,10 @@
         });
 
        $('#audience-search').selectizeSelector({
-            multiple: true,
-            value: {{ audience|json_encode|raw }}
+        {% if audience|length %}
+            value: {{ audience|json_encode|raw }},
+        {% endif %}
+            multiple: true
         });
     });
 
