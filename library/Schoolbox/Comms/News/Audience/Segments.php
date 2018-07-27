@@ -50,7 +50,7 @@ class Segments
         $pieces = [];
 
         foreach ($audiencing as $audience) {
-            $segment = $audience->getEntityType() . self::AUDIENCE_SEPARATOR . $audience->getEntityValue();
+            $segment = $audience->getEntityType() . self::AUDIENCE_SEPARATOR . base64_encode($audience->getEntityValue());
 
             if ($audience->getRelationship() !== Model::RELATIONSHIP_SELF) {
                 $segment .= self::AUDIENCE_SEPARATOR . $audience->getRelationship();
