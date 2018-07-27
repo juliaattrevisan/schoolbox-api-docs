@@ -205,8 +205,8 @@ class Mapper extends \Schoolbox\Mapper
             FROM {$this->getTable()}
             WHERE {$where}
             AND {$this->getIdentifierColumn()} IN ({$availableArticleIdsSql})
-            GROUP BY year, month 
-            ORDER BY year, month
+            GROUP BY year, month
+            ORDER BY year DESC, month DESC
         ";
 
         $statement = $this->database->prepare($query);
