@@ -33,11 +33,6 @@ use Schoolbox\UserMapper;
 class Controller extends Base
 {
 
-    /**
-     * Separates the audiencing option type from its value
-     * e.g. house:12345, role:5678
-     */
-    private const AUDIENCE_SEPARATOR = ':';
 
     /**
      * @var ErrorMapper
@@ -390,54 +385,7 @@ class Controller extends Base
 
         /* Set audiencing options via the hyperdrive
          */
-        $this->saveAudienceSegments($article, $this->getRequest()->post['audience']);
-    }
-
-
-    /**
-     * Save the audiencing segments for a given article
-     *
-     * @param Model  $article
-     * @param string $segments
-     * @throws MapperException
-     * @throws \PDOException
-     * @throws \UnexpectedValueException
-     */
-    private function saveAudienceSegments(Model $article, string $segments)
-    {
-        $audiencingOptions = explode(',', $segments);
-
-        foreach ($audiencingOptions as $audiencingOption) {
-
-            /* explode again on the separator
-             */
-            $pieces = explode(self::AUDIENCE_SEPARATOR, $audiencingOption);
-
-            $audienceModel = $this->audienceMapper->createModel()
-                ->setCommsNewsArticle($article)
-                ->setEntityType($pieces[0])
-                ->setEntityValue(base64_decode($pieces[1]));
-
-            /* This has a Parents or Teachers modifier if the audiencing segment has 3 pieces
-             */
-            $modifierCount = 3;
-            $piecesCount = \count($pieces);
-
-            if ($piecesCount === $modifierCount) {
-                if ($pieces[$piecesCount-1] === Audience\Model::RELATIONSHIP_PARENTS_OF) {
-                    $audienceModel->setRelationship(Audience\Model::RELATIONSHIP_PARENTS_OF);
-                } elseif ($pieces[$piecesCount-1] === Audience\Model::RELATIONSHIP_TEACHERS_OF) {
-                    $audienceModel->setRelationship(Audience\Model::RELATIONSHIP_TEACHERS_OF);
-                }
-            } else {
-                $audienceModel->setRelationship(Audience\Model::RELATIONSHIP_SELF);
-            }
-
-            /* Purge existing records before resaving the new ones
-             */
-            $this->audienceMapper->deleteByColumn('comms_news_article_id', $article->getId());
-            $this->audienceMapper->save($audienceModel);
-        }
+        (new Audience\Segments($this->audienceMapper))->save($article, $this->getRequest()->post['audience']);
     }
 
 
