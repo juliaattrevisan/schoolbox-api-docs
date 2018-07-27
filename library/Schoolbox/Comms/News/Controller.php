@@ -33,6 +33,12 @@ class Controller extends Base
 {
 
     /**
+     * Separates the audiencing option type from its value
+     * e.g. house_12345, role_5678
+     */
+    private const AUDIENCE_SEPARATOR = '_';
+
+    /**
      * @var ErrorMapper
      */
     private $errorMapper;
@@ -375,6 +381,38 @@ class Controller extends Base
 
         /* TODO: Set audiencing options via the hyperdrive
          */
+        $audienceMapper = \Schoolbox\Comms\News\Audience\Mapper::getInstance();
+
+        $audiencingOptions = explode(',', $this->getRequest()->post['audience']);
+
+        foreach ($audiencingOptions as $audiencingOption) {
+
+            /* explode again on the separator
+             */
+            $pieces = explode(self::AUDIENCE_SEPARATOR, $audiencingOption);
+
+            $audienceModel = $audienceMapper->createModel()
+                ->setCommsNewsArticle($article)
+                ->setEntityType($pieces[0])
+                ->setEntityValue(base64_decode($pieces[1]));
+
+            /* This has a Parents or Teachers modifier if the audiencing segment has 3 pieces
+             */
+            $piecesCount = \count($pieces);
+            $hasParentModifier = ($piecesCount === 3) && $pieces[$piecesCount-1] === \Schoolbox\Comms\News\Audience\Model::RELATIONSHIP_PARENTS_OF;
+            $hasTeacherModifier = ($piecesCount === 3) && $pieces[$piecesCount-1] === \Schoolbox\Comms\News\Audience\Model::RELATIONSHIP_TEACHERS_OF;
+
+            if ($hasParentModifier) {
+                $audienceModel->setRelationship(\Schoolbox\Comms\News\Audience\Model::RELATIONSHIP_PARENTS_OF);
+            } elseif ($hasTeacherModifier) {
+                $audienceModel->setRelationship(\Schoolbox\Comms\News\Audience\Model::RELATIONSHIP_TEACHERS_OF);
+            } else {
+                $audienceModel->setRelationship(\Schoolbox\Comms\News\Audience\Model::RELATIONSHIP_SELF);
+            }
+
+            $audienceMapper->save($audienceModel);
+        }
+        die();
     }
 
 
