@@ -357,11 +357,11 @@
                     // Request a list of options with the uri listed in the object above
                     axios.get(audienceOption.ajax).then(function(response) {
 
-                        // Modify the response slightly to have prefixed IDs (eg. 'campus_1')
+                        // Modify the response slightly to have prefixed IDs (eg. 'campus:1')
                         var modifiedOptions = [];
                         response.data.data.forEach(function(option) {
                             modifiedOptions.push({
-                                id: audienceOption.id + '_' + option.id,
+                                id: audienceOption.id + ':' + option.id,
                                 name: option.name,
                                 type: audienceOption.name
                             });
@@ -415,14 +415,14 @@
 
                     if (self.includeParents) {
                         selectizeOptions.push({
-                            id: option.id + '_parents',
+                            id: option.id + ':parents',
                             name: baseName + ' [Parents of students]'
                         });
                     }
 
                     if (self.includeTeachers) {
                         selectizeOptions.push({
-                            id: option.id + '_teachers',
+                            id: option.id + ':teachers',
                             name: baseName + ' [Teachers of students]'
                         });
                     }

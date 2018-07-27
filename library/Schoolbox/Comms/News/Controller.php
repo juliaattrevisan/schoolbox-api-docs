@@ -34,9 +34,9 @@ class Controller extends Base
 
     /**
      * Separates the audiencing option type from its value
-     * e.g. house_12345, role_5678
+     * e.g. house:12345, role:5678
      */
-    private const AUDIENCE_SEPARATOR = '_';
+    private const AUDIENCE_SEPARATOR = ':';
 
     /**
      * @var ErrorMapper
