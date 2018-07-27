@@ -411,10 +411,7 @@ class Controller extends Base
             }
 
             $audienceMapper->save($audienceModel);
-            new \Alaress_Probe($audienceModel->getEntityType());
         }
-
-        die();
     }
 
 
