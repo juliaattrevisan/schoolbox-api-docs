@@ -261,6 +261,7 @@ class Controller extends Base
             'user' => $this->getUser(),
             'article' => $article,
             'featureImageZone' => $zone->getTwigContext(),
+            'audience' => (new Audience\Segments($this->audienceMapper))->load($article),
             'isCommsOfficer' => (new ValidUserIsCommsOfficer())->isSatisfiedBy($this->getUser()),
         ])->setTitle("Update {$article->getTitle()}"));
     }

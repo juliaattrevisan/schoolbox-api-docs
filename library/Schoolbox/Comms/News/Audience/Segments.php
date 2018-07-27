@@ -35,6 +35,35 @@ class Segments
         $this->audienceMapper = $audienceMapper;
     }
 
+
+    /**
+     * Load the audiencing segments for a given article
+     *
+     * @param News\Model $article
+     * @return array
+     */
+    public function load(News\Model $article)
+    {
+        $audiencing = $this->audienceMapper->findByColumn('comms_news_article_id', $article->getId());
+
+        $pieces = [];
+
+        foreach ($audiencing as $audience) {
+            $segment = $audience->getEntityType() . self::AUDIENCE_SEPARATOR . $audience->getEntityValue();
+
+            if ($audience->getRelationship() !== Model::RELATIONSHIP_SELF) {
+                $segment .= self::AUDIENCE_SEPARATOR . $audience->getRelationship();
+            }
+
+            $pieces[] = [
+                'id' => $segment,
+                'name' => $segment
+            ];
+        }
+
+        return $pieces;
+    }
+
     /**
      * Save the audiencing segments for a given article
      *

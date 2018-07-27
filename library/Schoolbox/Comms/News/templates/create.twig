@@ -207,13 +207,7 @@
 
        $('#audience-search').selectizeSelector({
             multiple: true,
-            {% if audienceList | length > 0 %} value: {{ audienceList }}, {% endif %}
-            ajax: {
-                url:      '/ajax/audience.php',
-                type:     'GET',
-                data:     {groupID: 50},
-                dataType: 'json'
-            }
+            value: {{ audience|json_encode|raw }}
         });
     });
 
