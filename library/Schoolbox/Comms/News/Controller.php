@@ -420,14 +420,18 @@ class Controller extends Base
 
             /* This has a Parents or Teachers modifier if the audiencing segment has 3 pieces
              */
+            $modifierCount = 3;
             $piecesCount = \count($pieces);
-            $hasParentModifier = ($piecesCount === 3) && $pieces[$piecesCount-1] === Audience\Model::RELATIONSHIP_PARENTS_OF;
-            $hasTeacherModifier = ($piecesCount === 3) && $pieces[$piecesCount-1] === Audience\Model::RELATIONSHIP_TEACHERS_OF;
 
-            if ($hasParentModifier) {
-                $audienceModel->setRelationship(Audience\Model::RELATIONSHIP_PARENTS_OF);
-            } elseif ($hasTeacherModifier) {
-                $audienceModel->setRelationship(Audience\Model::RELATIONSHIP_TEACHERS_OF);
+            if ($piecesCount === $modifierCount) {
+                $hasParentModifier = $pieces[$piecesCount-1] === Audience\Model::RELATIONSHIP_PARENTS_OF;
+                $hasTeacherModifier = $pieces[$piecesCount-1] === Audience\Model::RELATIONSHIP_TEACHERS_OF;
+
+                if ($hasParentModifier) {
+                    $audienceModel->setRelationship(Audience\Model::RELATIONSHIP_PARENTS_OF);
+                } elseif ($hasTeacherModifier) {
+                    $audienceModel->setRelationship(Audience\Model::RELATIONSHIP_TEACHERS_OF);
+                }
             } else {
                 $audienceModel->setRelationship(Audience\Model::RELATIONSHIP_SELF);
             }
