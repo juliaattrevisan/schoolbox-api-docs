@@ -98,9 +98,9 @@
 
                             <fieldset class="checklist checklist-container" v-show="!showEmptyState">
                                 <div class="loader" v-show="showLoader"></div>
-                                <template v-for="audienceListItem in audienceListItems">
-                                    <input type="checkbox" v-bind:id="'audience-list-' + audienceListItem.id" v-bind:value="audienceListItem" v-model="audienceListChecked" />
-                                    <label v-bind:for="'audience-list-' + audienceListItem.id">${ audienceListItem.name }</label>
+                                <template v-for="(audienceListItem, index) in audienceListItems">
+                                    <input type="checkbox" v-bind:id="'audience-list-input' + index" v-bind:value="audienceListItem" v-model="audienceListChecked" />
+                                    <label v-bind:for="'audience-list-input' + index">${ audienceListItem.name }</label>
                                 </template>
                             </fieldset>
 
