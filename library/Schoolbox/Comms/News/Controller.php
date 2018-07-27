@@ -16,6 +16,7 @@ use External_User;
 use InvalidArgumentException;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Collection;
+use Schoolbox\Comms\News\Audience;
 use Schoolbox\Comms\News\Policy;
 use Schoolbox\Comms\News\SaveForLater;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -94,6 +95,11 @@ class Controller extends Base
     private $externalClass;
 
     /**
+     * @var Audience\Mapper
+     */
+    private $audienceMapper;
+
+    /**
      * Controller constructor.
      *
      * @param ErrorMapper             $errorMapper
@@ -107,6 +113,7 @@ class Controller extends Base
      * @param UserMapper              $userMapper
      * @param External_User           $externalUser
      * @param External_Class          $externalClass
+     * @param Audience\Mapper         $audienceMapper
      */
     public function __construct(
         ErrorMapper $errorMapper,
@@ -119,7 +126,8 @@ class Controller extends Base
         Access\UserAccessMapper $userAccessMapper,
         UserMapper $userMapper,
         External_User $externalUser,
-        External_Class $externalClass
+        External_Class $externalClass,
+        Audience\Mapper $audienceMapper
     ) {
         $this->errorMapper = $errorMapper;
         $this->newsMapper = $newsMapper;
@@ -135,6 +143,7 @@ class Controller extends Base
         $this->userMapper = $userMapper;
         $this->externalUser = $externalUser;
         $this->externalClass = $externalClass;
+        $this->audienceMapper = $audienceMapper;
     }
 
 
@@ -396,8 +405,6 @@ class Controller extends Base
      */
     private function saveAudienceSegments(Model $article, string $segments)
     {
-        $audienceMapper = \Schoolbox\Comms\News\Audience\Mapper::getInstance();
-
         $audiencingOptions = explode(',', $segments);
 
         foreach ($audiencingOptions as $audiencingOption) {
@@ -406,7 +413,7 @@ class Controller extends Base
              */
             $pieces = explode(self::AUDIENCE_SEPARATOR, $audiencingOption);
 
-            $audienceModel = $audienceMapper->createModel()
+            $audienceModel = $this->audienceMapper->createModel()
                 ->setCommsNewsArticle($article)
                 ->setEntityType($pieces[0])
                 ->setEntityValue(base64_decode($pieces[1]));
@@ -414,21 +421,20 @@ class Controller extends Base
             /* This has a Parents or Teachers modifier if the audiencing segment has 3 pieces
              */
             $piecesCount = \count($pieces);
-            $hasParentModifier = ($piecesCount === 3) && $pieces[$piecesCount-1] === \Schoolbox\Comms\News\Audience\Model::RELATIONSHIP_PARENTS_OF;
-            $hasTeacherModifier = ($piecesCount === 3) && $pieces[$piecesCount-1] === \Schoolbox\Comms\News\Audience\Model::RELATIONSHIP_TEACHERS_OF;
+            $hasParentModifier = ($piecesCount === 3) && $pieces[$piecesCount-1] === Audience\Model::RELATIONSHIP_PARENTS_OF;
+            $hasTeacherModifier = ($piecesCount === 3) && $pieces[$piecesCount-1] === Audience\Model::RELATIONSHIP_TEACHERS_OF;
 
             if ($hasParentModifier) {
-                $audienceModel->setRelationship(\Schoolbox\Comms\News\Audience\Model::RELATIONSHIP_PARENTS_OF);
+                $audienceModel->setRelationship(Audience\Model::RELATIONSHIP_PARENTS_OF);
             } elseif ($hasTeacherModifier) {
-                $audienceModel->setRelationship(\Schoolbox\Comms\News\Audience\Model::RELATIONSHIP_TEACHERS_OF);
+                $audienceModel->setRelationship(Audience\Model::RELATIONSHIP_TEACHERS_OF);
             } else {
-                $audienceModel->setRelationship(\Schoolbox\Comms\News\Audience\Model::RELATIONSHIP_SELF);
+                $audienceModel->setRelationship(Audience\Model::RELATIONSHIP_SELF);
             }
 
-            $audienceMapper->save($audienceModel);
+            $this->audienceMapper->save($audienceModel);
         }
     }
-
 
 
     /**

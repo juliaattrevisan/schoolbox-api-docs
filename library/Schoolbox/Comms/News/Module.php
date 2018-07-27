@@ -171,6 +171,7 @@ class Module extends BaseModule
             'userMapper' => $this->getMapperFactory()->getLazy(UserMapper::class),
             'externalUser' => $injector->lazyGet('externalUser'),
             'externalClass' => $injector->lazyGet('externalClass'),
+            'audienceMapper' => $this->getMapperFactory()->getLazy(Audience\Mapper::class),
         ];
     }
 
