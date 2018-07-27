@@ -79,7 +79,13 @@ class Controller extends Base
         $items = [];
 
         foreach($collection as $item) {
-            $items[] = array_combine(['id', 'name'], $item->findValueLabelPair());
+            $data = array_combine(['id', 'name'], $item->findValueLabelPair());
+
+            /* base64_encode the value because Year Level is a user-configurable string
+             */
+            $data['id'] = base64_encode($data['id']);
+
+            $items[] = $data;
         }
 
         return $this->buildJsonOutput([

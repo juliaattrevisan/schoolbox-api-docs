@@ -372,6 +372,9 @@ class Controller extends Base
         }
 
         $this->newsMapper->save($article);
+
+        /* TODO: Set audiencing options via the hyperdrive
+         */
     }
 
 
