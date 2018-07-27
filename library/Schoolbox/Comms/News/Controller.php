@@ -433,6 +433,9 @@ class Controller extends Base
                 $audienceModel->setRelationship(Audience\Model::RELATIONSHIP_SELF);
             }
 
+            /* Purge existing records before resaving the new ones
+             */
+            $this->audienceMapper->deleteByColumn('comms_news_article_id', $article->getId());
             $this->audienceMapper->save($audienceModel);
         }
     }
