@@ -65,7 +65,7 @@
                         <label>Audience</label>
                         <p class="meta">Target your article to a specific audience. Use the input box below to search, or use the 'Browse' button to select from a list of possible options.</p>
                         <div class="input-group">
-                            <input type="text" id="audience-search" placeholder="{{ (user.role.staff) ? 'Search for classes, groups, year levels, roles, individual users&hellip;' : 'Search for classes or groups&hellip;' }}" />
+                            <input type="text" id="audience-search" name="audience" placeholder="{{ (user.role.staff) ? 'Search for classes, groups, year levels, roles, individual users&hellip;' : 'Search for classes or groups&hellip;' }}" />
                             <button class="button icon-drag-drop" @click.prevent="{{ (user.role.staff) ? 'openBrowseModal' : 'openBrowseModalRead' }}">Browse&hellip;</button>
                         </div>
                     </div>
