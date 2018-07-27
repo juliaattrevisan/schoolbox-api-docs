@@ -379,11 +379,26 @@ class Controller extends Base
 
         $this->newsMapper->save($article);
 
-        /* TODO: Set audiencing options via the hyperdrive
+        /* Set audiencing options via the hyperdrive
          */
+        $this->saveAudienceSegments($article, $this->getRequest()->post['audience']);
+    }
+
+
+    /**
+     * Save the audiencing segments for a given article
+     *
+     * @param Model  $article
+     * @param string $segments
+     * @throws MapperException
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
+     */
+    private function saveAudienceSegments(Model $article, string $segments)
+    {
         $audienceMapper = \Schoolbox\Comms\News\Audience\Mapper::getInstance();
 
-        $audiencingOptions = explode(',', $this->getRequest()->post['audience']);
+        $audiencingOptions = explode(',', $segments);
 
         foreach ($audiencingOptions as $audiencingOption) {
 
@@ -413,6 +428,7 @@ class Controller extends Base
             $audienceMapper->save($audienceModel);
         }
     }
+
 
 
     /**
