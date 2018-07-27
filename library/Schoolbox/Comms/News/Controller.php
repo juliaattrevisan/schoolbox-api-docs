@@ -424,12 +424,9 @@ class Controller extends Base
             $piecesCount = \count($pieces);
 
             if ($piecesCount === $modifierCount) {
-                $hasParentModifier = $pieces[$piecesCount-1] === Audience\Model::RELATIONSHIP_PARENTS_OF;
-                $hasTeacherModifier = $pieces[$piecesCount-1] === Audience\Model::RELATIONSHIP_TEACHERS_OF;
-
-                if ($hasParentModifier) {
+                if ($pieces[$piecesCount-1] === Audience\Model::RELATIONSHIP_PARENTS_OF) {
                     $audienceModel->setRelationship(Audience\Model::RELATIONSHIP_PARENTS_OF);
-                } elseif ($hasTeacherModifier) {
+                } elseif ($pieces[$piecesCount-1] === Audience\Model::RELATIONSHIP_TEACHERS_OF) {
                     $audienceModel->setRelationship(Audience\Model::RELATIONSHIP_TEACHERS_OF);
                 }
             } else {
