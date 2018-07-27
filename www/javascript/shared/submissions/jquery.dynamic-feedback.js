@@ -344,10 +344,17 @@
          */
         function toast(text, isSuccess, openActionBar) {
 
-            $(config.formSaveLabel).toastTimeout({
-                text: text || 'Draft saved',
-                css: (isSuccess) ? 'success' : 'alert'
-            });
+            if (isSuccess) {
+                $(config.formSaveLabel).toastTimeout({
+                    text: text || 'Draft saved',
+                    css: 'success'
+                });
+            } else {
+                $(config.formSaveLabel).toastTimeout({
+                    text: 'Unable to save draft',
+                    css: 'alert'
+                });
+            }
 
             if(openActionBar){
                 this.find('[data-action-bar]').slideDown();
