@@ -126,7 +126,7 @@ class Builder implements IBuilder
             // Does this cause a collision?
             if (array_key_exists($placeholder, $this->params)) {
                 $uniquePlaceholder                = $this->getNonCollidingParamAlias($placeholder);
-                $where                            = preg_replace("/({$placeholder})([,)]+)/", "$uniquePlaceholder$2", $where);
+                $where                            = preg_replace("/({$placeholder})([,)\ ]+)/", "$uniquePlaceholder$2", $where);
                 $this->params[$uniquePlaceholder] = $param;
             } else {
                 $this->params[$placeholder] = $param;
