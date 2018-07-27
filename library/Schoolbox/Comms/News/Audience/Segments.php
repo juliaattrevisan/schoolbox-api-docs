@@ -55,6 +55,8 @@ class Segments
                 $segment .= self::AUDIENCE_SEPARATOR . $audience->getRelationship();
             }
 
+            /* TODO: translate "name" into something nicer to read for humans
+             */
             $pieces[] = [
                 'id' => $segment,
                 'name' => $segment
