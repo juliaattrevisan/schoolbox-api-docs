@@ -4,7 +4,6 @@
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2014, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 
 
@@ -78,7 +77,7 @@ class Decorator extends NotificationBundle
     public function renderAsTwigContext($coreContext = array(), $limit = 0, $sortDirection = SORT_DESC)
     {
         $array = $this->toArray();
-        $fqdn  = isset($coreContext['config']['fqdn']) ? 'http://' . $coreContext['config']['fqdn'] : '';
+        $fqdn  = isset($coreContext['config']['fqdn']) ? 'https://' . $coreContext['config']['fqdn'] : '';
 
         foreach ($this->getNotifications($limit, $sortDirection) as $n) {
             // compile the title
