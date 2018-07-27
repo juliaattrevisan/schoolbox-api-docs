@@ -611,7 +611,8 @@ class Controller extends Base
              */
             'availableYears' => $this->newsMapper->findYearsAndMonthsWithArticles($outcome['articleIdsForUser']),
             'year' => $year,
-            'month' => $month
+            'month' => $month,
+            'selectedDate' => $year . '-' . $month . '-01'
         ];
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/archive.twig', $data));
