@@ -49,18 +49,30 @@ class TextboxForm
         return strtr(static::URL, ['{homepageId}' => $homepageId, '{componentId}' => $componentId]);
     }
 
+    /**
+     * @param string $heading
+     * @return $this
+     */
     public function fillHeading(string $heading): self
     {
         $this->tester->fillField(['css' => self::FORM . ' input[name="textBoxHeading"]'], $heading);
         return $this;
     }
 
+    /**
+     * @param string $heading
+     * @return $this
+     */
     public function seeInHeading(string $heading): self
     {
         $this->tester->seeInField(['css' => self::FORM . ' input[name="textBoxHeading"]'], $heading);
         return $this;
     }
 
+    /**
+     * @param string $content
+     * @return $this
+     */
     public function fillContent(string $content): self
     {
         // Need to figure out what the id of this rich text field SHOULD be
@@ -75,6 +87,10 @@ class TextboxForm
         return $this;
     }
 
+    /**
+     * @param string $content
+     * @return $this
+     */
     public function seeInContent(string $content): self
     {
         // Need to figure out what the id of this rich text field SHOULD be
@@ -89,6 +105,9 @@ class TextboxForm
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function submit(): self
     {
         $this->tester->click(self::FORM_SAVE);
