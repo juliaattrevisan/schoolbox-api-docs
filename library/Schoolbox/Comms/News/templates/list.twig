@@ -81,20 +81,10 @@
                 </div>
             </div>
             <nav>
-                {% if savedArticleIds[article.id] is defined %}
-                    {% set state = savedArticleIds[article.id] %}
-                {% else %}
-                    {% set state = unsaved %}
-                {% endif %}
-
-                {# Check that you can save this for later
-                 # You must have access to the route and the policy must be enabled
-                 #}
-                {% set saveForLaterRoute = routeLookup('commsNewsSaveForLater.postToggle', {articleId: article.id}) %}
-
-                {% if saveForLaterRoute and saveForLater %}
-                <a data-saveforlater="{{ state }}" href="{{ saveForLaterRoute }}"></a>
-                {% endif %}
+                {% include '@commsNewsSaveForLater/activator.twig' with {
+                    article: article,
+                    isSaved: savedArticleIds[article.id]
+                } only %}
             </nav>
 
             {# Hide the article tag when there's no content to show, or when compactMode is on #}

@@ -9,26 +9,28 @@
 {% set routeAdd    = routeLookupIfAuthorized('commsNewsSaveForLater.postAdd', {article: article, articleId: article.id}) %}
 {% set routeRemove = routeLookupIfAuthorized('commsNewsSaveForLater.postRemove', {article: article, articleId: article.id}) %}
 
-{# Add to List #}
-{% if routeAdd %}
-<a
-        data-action="add"
-        href="{{ routeAdd }}"
-        class="icon-favourite-hollow {% if isSaved %}hide{% endif %}"
-        title="Save article"
-        data-toast-processing="Saving..."
-        data-toast-complete="Saved"
-></a>
-{% endif %}
+<span data-save-for-later="{{ article.id }}">
+    {# Add to List #}
+    {% if routeAdd %}
+    <a
+            data-action="add"
+            href="{{ routeAdd }}"
+            class="icon-favourite-hollow {% if isSaved %}hide{% endif %}"
+            title="Save article"
+            data-toast-processing="Saving..."
+            data-toast-complete="Saved"
+    ></a>
+    {% endif %}
 
-{# Remove from list #}
-{% if routeRemove %}
-<a
-        data-action="remove"
-        href="{{ routeRemove }}"
-        class="icon-favourite {% if not isSaved %}hide{% endif %}"
-        title="Remove article from saved items"
-        data-toast-processing="Removing..."
-        data-toast-complete="Removed"
-></a>
-{% endif %}
+    {# Remove from list #}
+    {% if routeRemove %}
+    <a
+            data-action="remove"
+            href="{{ routeRemove }}"
+            class="icon-favourite {% if not isSaved %}hide{% endif %}"
+            title="Remove article from saved items"
+            data-toast-processing="Removing..."
+            data-toast-complete="Removed"
+    ></a>
+    {% endif %}
+</span>

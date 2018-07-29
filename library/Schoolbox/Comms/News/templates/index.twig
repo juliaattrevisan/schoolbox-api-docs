@@ -50,13 +50,15 @@
             <script src="/javascript/shared/comms/saveforlater.js"></script>
             <script>
                 $(function() {
-                    $('#news-container').articleTabs({
+                    var $newContainer = $('#news-container');
+                    $newContainer.articleTabs({
                         'topicTabs': $('#news-topics'),
                         'updateUrl': true,
                         'showPaginator': true,
                         'pageNum': '{{ pageNum }}',
                         'limit': '{{ limit }}'
                     });
+                    $newContainer.saveForLater();
                 });
             </script>
 

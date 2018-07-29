@@ -23,14 +23,15 @@
          * @returns {*}
          */
         function init(options, element) {
-            var derived = {
+            var defaults = {
+                onChangeSuccess: function (isSaved, articleId) {}
+            };
 
-                /* The container which has stars in it
-                 */
+            var derived = {
                 element: $(element)
             };
 
-            return $.extend(derived, options);
+            return $.extend(true, defaults, derived, options);
         }
 
 
@@ -38,10 +39,11 @@
          * Set up event listeners
          */
         function initSaveForLaterActions() {
-            $(config.element).on('click', '[data-action]', function(event) {
+            $(config.element).on('click', '[data-save-for-later] [data-action]', function(event) {
                 event.preventDefault();
 
                 var $element = $(this),
+                    $wrapper = $element.closest('[data-save-for-later]'),
                     $toast   = $('#toast'),
                     action   = $element.attr('data-action');
 
@@ -57,9 +59,10 @@
                         text: $element.attr('data-toast-complete'),
                         css: 'success'
                     });
-                    $element.hide();
+                    $element.addClass('hide');
                     var otherAction = action === 'add' ? 'remove' : 'add';
-                    config.element.find('[data-action=' + otherAction + ']').show();
+                    $wrapper.find('[data-action=' + otherAction + ']').removeClass('hide');
+                    config.onChangeSuccess(action === 'add', $wrapper.attr('data-save-for-later'));
                 }).error(function () {
                     var textSuffix = action === 'add' ? 'save article for later' : 'remove article from saved list';
                     $toast.toastTimeout({

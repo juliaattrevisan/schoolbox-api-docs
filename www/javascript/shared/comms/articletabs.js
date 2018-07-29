@@ -24,9 +24,6 @@
          */
         initListeners();
 
-        $(config.element).saveForLater().initAsync();
-
-
         /**
          * Init
          *
@@ -97,9 +94,7 @@
                 dataType: 'json'
             }).success(function (response) {
 
-                /* Note that we don't need to reapply initSaveForLaterActions() again
-                 */
-                $(config.element).html(response.fragment).saveForLater();
+                $(config.element).html(response.fragment);
 
                 // Fire onChangeSuccess callback
                 config.onChangeSuccess(response);
