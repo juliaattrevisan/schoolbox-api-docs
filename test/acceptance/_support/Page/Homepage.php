@@ -67,6 +67,9 @@ class Homepage
      */
     public function addComponent(string $componentSection, string $componentName): void
     {
+        // Animations off
+        $this->tester->disableAnimation();
+
         // Open the component tab
         $this->openTabPanel(self::ELEMENT_ADD_COMPONENT_TAB);
 
@@ -78,6 +81,9 @@ class Homepage
 
         // Wait for it to load
         $this->tester->waitForAjaxDone();
+
+        // Animations on again
+        $this->tester->enableAnimation();
     }
 
     /**
