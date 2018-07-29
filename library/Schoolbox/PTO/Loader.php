@@ -54,7 +54,7 @@ class Loader
         /* Student/Parent
          */
         if ($this->getUser()->getRole()->isStudent() || $this->getUser()->getRole()->isParent()) {
-            return 'S';
+            return 'P';
         }
         /* Teacher
          */
