@@ -52,11 +52,11 @@
         <script src="/javascript/shared/comms/saveforlater.js"></script>
         <script>
             $(function() {
-                $('[data-saveforlater]').saveForLater();
+                $('#saveforlater-container').saveForLater();
             });
         </script>
 
-        <span data-saveforlater="{{ article.id }}">
+        <span id="saveforlater-container">
             {% include '@commsNewsSaveForLater/activator.twig' with {
                 article: article,
                 isSaved: isSavedForLater
