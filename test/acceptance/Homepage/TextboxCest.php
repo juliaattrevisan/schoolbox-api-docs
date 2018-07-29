@@ -48,12 +48,26 @@ class TextboxCest
         $homepage->addComponent(Homepage::ELEMENT_ADD_COMPONENT_SECTION_INFORMATION, 'Text Box');
 
         // Enter content into the new component
-        $homepage->clickComponentEmptyStateLink(Homepage::ELEMENT_COMPONENT_LAYOUT_TOP, 1);
+        $layout   = Homepage::ELEMENT_COMPONENT_LAYOUT_TOP;
+        $position = 1;
+
+        $homepage->clickComponentEmptyStateLink($layout, $position);
         $heading = 'Heading';
         $content = '<p>I am textbox content</p>';
         $textboxForm
             ->fillHeading($heading)
             ->fillContent($content)
             ->submit();
+
+        // Verify what I entered is there
+        $homepage
+            ->seeInComponentHeading($heading, $layout, $position)
+            ->seeInComponentContent($content, $layout, $position);
+
+        // Modify the textbox, verify what I entered is in the form
+        $homepage->clickComponentActionBarButton('modify', $layout, $position);
+        $textboxForm
+            ->seeInHeading($heading)
+            ->seeInContent($content);
     }
 }
