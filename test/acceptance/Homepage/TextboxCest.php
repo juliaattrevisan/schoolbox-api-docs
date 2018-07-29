@@ -65,7 +65,7 @@ class TextboxCest
             ->seeInComponentContent($content, $layout, $position);
 
         // Modify the textbox, verify what I entered is in the form
-        $homepage->clickComponentActionBarButton('modify', $layout, $position);
+        $homepage->clickComponentActionBarButton('Modify', $layout, $position);
         $textboxForm
             ->seeInHeading($heading)
             ->seeInContent($content);
