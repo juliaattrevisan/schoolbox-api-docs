@@ -14,9 +14,8 @@
 <a
         data-action="add"
         href="{{ routeAdd }}"
-        class="icon-favourite-hollow"
+        class="icon-favourite-hollow {% if isSaved %}hide{% endif %}"
         title="Save article"
-        {% if isSaved %}style="display: none;"{% endif %}
         data-toast-processing="Saving..."
         data-toast-complete="Saved"
 ></a>
@@ -27,10 +26,9 @@
 <a
         data-action="remove"
         href="{{ routeRemove }}"
-        class="icon-favourite"
+        class="icon-favourite {% if not isSaved %}hide{% endif %}"
         title="Remove article from saved items"
-        {% if not isSaved %}style="display: none;"{% endif %}
         data-toast-processing="Removing..."
         data-toast-complete="Removed"
 ></a>
-
+{% endif %}
