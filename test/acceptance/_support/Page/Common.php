@@ -23,9 +23,64 @@ class Common
 
     public const SELECTOR_JELLY_TOT = '#content a.icon-more';
 
+    /**
+     * Content element selector. This is where most of Schoolbox's dynamic
+     * content goes.
+     */
+    public const ELEMENT_CONTENT = '#content';
+
+    /**
+     * Footer selector. This is where the copyright, policy, version number and
+     * support link go.
+     */
+    public const ELEMENT_FOOTER = '#footer';
+
+    /**
+     * Top menu selector. This is where the configurable top menu items go.
+     */
+    public const ELEMENT_TOP_MENU = '#top-menu';
+
+    /**
+     * Search field selector; used as a text input for site searches.
+     */
+    public const ELEMENT_SEARCH = '#search-field';
+
+    /**
+     * Side menu selector; this is where the configurable side menu items go,
+     * as well as the current user's groups, classes and links.
+     *
+     * (for some reason, this has no ID?)
+     */
+    public const ELEMENT_SIDEBAR = '.left-off-canvas-menu';
+
+    /**
+     * Notification center selector; this is where new notifications go.
+     */
+    public const ELEMENT_NOTIFICATIONS = '#msgs';
+
+    /**
+     * Date format as used in form inputs.
+     *
+     * This should match `config.date_local`; you can set it if you want.
+     */
+    public const FORMAT_INPUT_DATE = 'd/m/Y';
+
+    /**
+     * Time format as used in form inputs.
+     *
+     * This should match `config.date_time`; you can set it if you want.
+     */
+    public const FORMAT_INPUT_TIME = 'g:ia';
+
+    /**
+     * Date+time format as used in form inputs.
+     */
+    public const FORMAT_INPUT_DATETIME = self::FORMAT_INPUT_DATE . ' ' . self::FORMAT_INPUT_TIME;
+
+
     public static function toDatepickerFormat(\Datetime $datetime)
     {
-        return $datetime->format('d/m/Y h:ia');
+        return $datetime->format(self::FORMAT_INPUT_DATETIME);
     }
 
     public static function gentext(int $length)

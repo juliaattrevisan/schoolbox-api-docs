@@ -5,13 +5,13 @@ namespace Helper;
 // all public methods declared in helper class will be available in $I
 
 use Codeception\Exception\ModuleException;
-use Codeception\Module\WebDriver;
 use Codeception\Module\Db;
+use Codeception\Module\WebDriver;
 use Codeception\TestInterface;
-use Facebook\WebDriver\Remote\RemoteWebDriver;
 use Facebook\WebDriver\Remote\RemoteWebElement;
 use Facebook\WebDriver\WebDriverBy;
 use Facebook\WebDriver\WebDriverElement;
+use Schoolbox\Resource\Storage\HashGenerator;
 
 class Acceptance extends \Codeception\Module
 {
@@ -25,7 +25,7 @@ class Acceptance extends \Codeception\Module
     public function _beforeSuite($settings = [])
     {
         parent::_beforeSuite($settings);
-        self::changeDBConfig('debug_mode', 0);
+        $this->changeDBConfig('debug_mode', 0);
     }
 
     /**
@@ -33,7 +33,7 @@ class Acceptance extends \Codeception\Module
      */
     public function _afterSuite()
     {
-        self::restoreDBConfig();
+        $this->restoreDBConfig();
         parent::_afterSuite();
     }
 
@@ -44,7 +44,7 @@ class Acceptance extends \Codeception\Module
     public function _before(TestInterface $test)
     {
         parent::_before($test);
-        self::changeDBConfig('debug_mode', 0);
+        $this->changeDBConfig('debug_mode', 0);
         exec('sudo php /vagrant/test/socket/destroy-rabbit-data.php;');
     }
 
@@ -54,7 +54,7 @@ class Acceptance extends \Codeception\Module
      */
     public function _after(TestInterface $test)
     {
-        self::restoreDBConfig();
+        $this->restoreDBConfig();
         parent::_after($test);
     }
 
@@ -92,6 +92,7 @@ class Acceptance extends \Codeception\Module
             $db->updateInDatabase('config', ['value' => $value], ['name' => $name]);
         }
     }
+
 
     /**
      * Find a checkbox to "click".
@@ -164,6 +165,19 @@ class Acceptance extends \Codeception\Module
 
 
     /**
+     * Normalize space characters to no more than a single space.
+     * Used for rich text comparisons.
+     *
+     * @param string $value
+     * @return string
+     */
+    private function normalizeSpace(string $value): string
+    {
+        return trim(preg_replace('/\\s+/', ' ', $value));
+    }
+
+
+    /**
      * Fill in a rich text area.
      *
      * @param string $field
@@ -179,12 +193,29 @@ class Acceptance extends \Codeception\Module
 
 
     /**
-     * Select the given options in a checkbox group.
+     * Assert content of rich text area is equivalent to a value.
+     *
+     * @param string $field
+     * @param string $value
+     */
+    public function seeInRichTextField(string $field, string $value): void
+    {
+        // $field could've been set as plain text, without <p> tags.
+        // Test both the raw field, and the normalized value too.
+        $expectedValue = $this->getWebDriverModule()->executeJS(
+            sprintf('return CKEDITOR.instances["%s"].getData()', addslashes($field))
+        );
+        $this->assertEquals($this->normalizeSpace($value), $this->normalizeSpace($expectedValue));
+    }
+
+
+    /**
+     * Finds all available options within a select group.
      *
      * @param string $group
-     * @param array  $options
+     * @return array key: the checkbox's ID, value: the checkbox label's text
      */
-    public function checkSelectGroupOptions(string $group, array $options): void
+    private function findSelectGroupOptions(string $group): array
     {
         $wd = $this->getWebDriverModule();
 
@@ -193,19 +224,51 @@ class Acceptance extends \Codeception\Module
         $elements  = $wd->_findElements([
             'css' => sprintf('input[type=checkbox][data-select-all-group="%s"]', addslashes($group))
         ]);
-        $optionIds = [];
+        $options = [];
         foreach ($elements as $element) {
-            $optionIds[] = $element->getAttribute('id');
+            $id           = $element->getAttribute('id');
+            $options[$id] = $wd->grabTextFrom(sprintf('label[for="%s"]', addslashes($id)));
         }
+        return $options;
+    }
 
+
+    /**
+     * Select the given options in a checkbox group.
+     *
+     * @param string $group
+     * @param array  $options
+     */
+    public function checkSelectGroupOptions(string $group, array $options): void
+    {
         // Check every option provided in $options, uncheck any not provided
-        foreach ($optionIds as $optionId) {
+        foreach ($this->findSelectGroupOptions($group) as $id => $label) {
             // Find the matching checkbox, and check/uncheck it
-            $optionLabel = $wd->grabTextFrom(sprintf('label[for="%s"]', addslashes($optionId)));
-            if (\in_array($optionLabel, $options, true)) {
-                $this->checkOption('#' . $optionId);
+            if (\in_array($label, $options, true)) {
+                $this->checkOption('#' . $id);
             } else {
-                $this->uncheckOption('#' . $optionId);
+                $this->uncheckOption('#' . $id);
+            }
+        }
+    }
+
+
+    /**
+     * Assert selected select group options are exactly as selected.
+     *
+     * @param string $group
+     * @param array  $options
+     */
+    public function seeSelectGroupOptionsAreSelected(string $group, array $options): void
+    {
+        $wd = $this->getWebDriverModule();
+
+        // Check every option provided in $options, verify/don't verify all are selected
+        foreach ($this->findSelectGroupOptions($group) as $id => $label) {
+            if (\in_array($label, $options, true)) {
+                $wd->seeCheckboxIsChecked('#' . $id);
+            } else {
+                $wd->dontSeeCheckboxIsChecked('#' . $id);
             }
         }
     }
@@ -325,6 +388,23 @@ class Acceptance extends \Codeception\Module
 
 
     /**
+     * Clears selectize selected options, then searches for all options in
+     * `$options`, and for each adds the first match it finds.
+     *
+     * @param string $field
+     * @param array  $options
+     * @throws \Exception If waiting for the dropdown timed out
+     */
+    public function selectSelectizeOptions(string $field, array $options): void
+    {
+        $this->clearSelectize($field);
+        foreach ($options as $option) {
+            $this->selectSelectizeOption($field, $option);
+        }
+    }
+
+
+    /**
      * Searches for a selectize option, and adds the first one it finds.
      *
      * @param string $field           Currently, must be a name
@@ -343,12 +423,37 @@ class Acceptance extends \Codeception\Module
 
 
     /**
+     * Asserts that selectize field identified by `$field` only has the options
+     * in `$options` selected.
+     *
+     * @param string $field
+     * @param array  $options
+     */
+    public function seeSelectizeOptionsAreSelected(string $field, array $options): void
+    {
+        $wd = $this->getWebDriverModule();
+
+        $actualOptions = [];
+        foreach ($wd->_findElements($this->getSelectizeItemsSelector($field)) as $item) {
+            /** @var RemoteWebElement $item */
+            // Selectize elements have got a '×' text at the end, for their
+            // remove element link: strip it
+            $actualOptions[] = preg_replace('/×$/u', '', $item->getText());
+        }
+
+        sort($options);
+        sort($actualOptions);
+        $this->assertEquals($options, $actualOptions);
+    }
+
+
+    /**
      * Attach a file to an attachzone.
      *
      * @param string|array $field Currently, must be the ID of the attachzone
      * @param string       $file
      */
-    public function attachAttachzoneFile($field, $file)
+    public function attachAttachzoneFile($field, $file): void
     {
         // Create a file programatically
         $fileScript = sprintf(
@@ -366,6 +471,36 @@ class Acceptance extends \Codeception\Module
             $fileScript
         );
         $this->getWebDriverModule()->executeJS($script);
+    }
+
+
+    /**
+     * Asserts that an attachzone field has a given file attached.
+     *
+     * @param string|array $field Currently, must be the ID of the attachzone
+     * @param string       $file
+     */
+    public function seeAttachzoneFile($field, $file): void
+    {
+        // Extract attached file hashes
+        $actualFileHashes = [];
+        $script           = sprintf(
+            "return jQuery('%s').data('plugin_resourceAttach').dropzone.files.map(function (f) { return f.hash; })",
+            addslashes($field)
+        );
+        foreach ($this->getWebDriverModule()->executeJS($script) as $fileHashes) {
+            // Hashes are in the form "source:hash"
+            [, $actualFileHash] = explode(':', $fileHashes);
+            $actualFileHashes[] = $actualFileHash;
+        }
+
+        // determine hash of $file
+        $hashGenerator    = new HashGenerator();
+        $fp               = fopen($file, 'rb');
+        $expectedFileHash = $hashGenerator->generateHash($fp);
+        fclose($fp);
+
+        $this->assertContains($expectedFileHash, $actualFileHashes);
     }
 
 
@@ -398,9 +533,9 @@ class Acceptance extends \Codeception\Module
     }
 
     /**
-     * Return webdriver module in a type-safe manner.
+     * Return DB module in a type-safe manner.
      *
-     * @return WebDriver
+     * @return Db
      */
     private function getDbModule(): Db
     {

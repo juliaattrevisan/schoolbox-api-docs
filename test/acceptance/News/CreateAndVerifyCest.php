@@ -12,9 +12,9 @@
 namespace News;
 
 use AcceptanceTester;
-use Page\Login as LoginPage;
 use Page\News\Form;
 use Page\News\Index;
+use Page\News\Item;
 
 class CreateAndVerifyCest
 {
@@ -42,36 +42,130 @@ class CreateAndVerifyCest
      *
      * @param AcceptanceTester $i
      * @param Form             $formPage
+     * @param Index            $indexPage
+     * @param Item             $itemPage
      */
-    public function createNews(AcceptanceTester $i, Form $formPage)
+    public function createNews(AcceptanceTester $i, Form $formPage, Index $indexPage, Item $itemPage)
     {
         $i->login('zsmith', 'password');
         $i->amOnPage($formPage->generateCreateRoute());
 
         // Fill in form values
         // TODO these should be randomizable
-        $headline = "Random Headline";
-        $article  = "Random Article";
-        $blurb    = "Blurb";
-        $image    = __DIR__ . '/upload/test.jpg';
-        $topic    = 'General';
-        $roles    = ['Teachers'];
-        $campi    = ['Senior', 'Junior'];
-        $users    = ['David Rhodes', 'Rachel Rhodes'];
-        $publish  = \Alaress_Date_Format::now()->addHours(-1)->setTime(0, 0, 0);
-        $expiry   = \Alaress_Date_Format::now()->addDays(7)->setTime(0, 0, 0);
-//        var_dump($publish->getCalendarDateTime());
+        $headline  = "Random Headline";
+        $article   = "<h2>Random Article</h2> <p>Random article text</p>";
+        $blurb     = "<p>Blurb</p>";
+        $image     = __DIR__ . '/upload/test.jpg';
+        $topic     = 'General';
+        $topicSlug = (new \Url($topic,''))->getSlug();
+        $roles     = ['Teachers'];
+        $campi     = ['Senior', 'Junior'];
+        $users     = ['David Rhodes', 'Rachel Rhodes'];
+        $publish   = \Alaress_Date_Format::now()->addHours(-1)->setTime(0, 0, 0);
+        $expiry    = \Alaress_Date_Format::now()->addDays(7)->setTime(0, 0, 0);
         $formPage
-            ->setHeadline($headline)
-            ->setArticle($article)
-            ->setBlurb($blurb)
-            ->setFeatureImage($image)
-            ->setTopic($topic)
-            ->setRoles($roles)
-            ->setCampuses($campi)
-            ->setUsers($users)
-            ->setPublishDate($publish)
-            ->setExpiryDate($expiry)
+            ->fillHeadline($headline)
+            ->fillArticle($article)
+            ->fillBlurb($blurb)
+            ->fillFeatureImage($image)
+            ->fillTopic($topic)
+            ->fillRoles($roles)
+            ->fillCampuses($campi)
+            ->fillUsers($users)
+            ->fillPublishDate($publish)
+            ->fillExpiryDate($expiry)
             ->submit();
+
+        // Verify that the news is in the All topic, and is the first news item
+        $i->amOnPage($indexPage->generateRoute(''));
+
+        $position = 1;
+        $indexPage->seeHeadline($headline, $position);
+
+        // The blurb shows, not the article I entered
+        $indexPage->seeArticleSummary($blurb, $position);
+        $indexPage->dontSeeArticleSummary($article, $position);
+
+        // Do I see the feature image?
+        // (How do I compare the image I provided to what is uploaded?)
+
+        // Verify I don't see it at all in some other topic
+        $i->amOnPage($indexPage->generateRoute('music'));
+        $indexPage->dontSeeHeadline($headline, $position);
+
+        // Verify I see it in the topic I put it in
+        // (URL has invisible dependency on config; all I want is a slug)
+        $i->amOnPage($indexPage->generateRoute($topicSlug));
+        $indexPage->seeHeadline($headline, $position);
+
+        // View the article I'm searched for
+        $indexPage->viewArticle($position);
+
+        // Verify I see the article, and not the blurb
+        $itemPage->seeHeadline($headline);
+        $itemPage->seeArticle($article);
+        $itemPage->modifyArticle();
+
+        // Now, I'm back on the form page.
+        // Verify what is there is what I entered
+        $formPage
+            ->seeHeadline($headline)
+            ->seeArticle($article)
+            ->seeBlurb($blurb)
+            ->seeFeatureImage($image)
+            ->seeTopic($topic)
+            ->seeRoles($roles)
+            ->seeCampuses($campi)
+            ->seeUsers($users)
+            ->seePublishDate($publish)
+            ->seeExpiryDate($expiry);
+
+        // Verify that user Scott Berryhill cannot see it
+        $scott = $i->haveFriend('scott');
+        $scott->does(function (AcceptanceTester $i) use ($headline, $topicSlug) {
+            $i->login('sberryhill', 'password');
+            $indexPage = new Index($i);
+
+            // Go to all page
+            $i->amOnPage($indexPage->generateRoute(''));
+            $position = 1;
+            $indexPage->dontSeeHeadline($headline, $position);
+
+            $i->amOnPage($indexPage->generateRoute($topicSlug));
+            $indexPage->dontSeeHeadline($headline, $position);
+        });
+
+        // Verify that user Celia Glenn can see it
+        $celia = $i->haveFriend('celia');
+        $celia->does(function (AcceptanceTester $i) use ($headline, $topicSlug) {
+            $i->login('cglenn', 'password');
+            $indexPage = new Index($i);
+
+            // Go to all page
+            $i->amOnPage($indexPage->generateRoute(''));
+            $position = 1;
+            $indexPage->seeHeadline($headline, $position);
+
+            $i->amOnPage($indexPage->generateRoute($topicSlug));
+            $indexPage->seeHeadline($headline, $position);
+        });
+
+        // Make it unpublished
+        $formPage
+            ->fillPublishDate(\Alaress_Date_Format::now()->addDays(2)->setTime(0, 0, 0))
+            ->submit();
+
+        // Verify that user Celia Glenn can no longer see it
+        $celia->does(function (AcceptanceTester $i) use ($headline, $topicSlug) {
+            $indexPage = new Index($i);
+
+            // Go to all page
+            $i->amOnPage($indexPage->generateRoute(''));
+            $position = 1;
+            $indexPage->dontSeeHeadline($headline, $position);
+
+            $i->amOnPage($indexPage->generateRoute($topicSlug));
+            $indexPage->dontSeeHeadline($headline, $position);
+        });
     }
 }
