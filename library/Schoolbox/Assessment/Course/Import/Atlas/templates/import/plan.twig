@@ -14,34 +14,35 @@
                 {% else %}
                     <div class="expander disabled"></div>
                 {% endif %}
-                <div class="selector">
-                    <input id="unit-{{ unit.id }}"
-                           name="unit[{{ unit.id }}][selected]"
-                           value="1"
-                           type="checkbox"
-                           {% if hasContent %}checked{% endif %}
-                           data-unit="{{ unit.id }}"
-                    >
-                    <label for="unit-{{ unit.id }}" class="checkbox-label">
-                        {{ unit.title }}
-                    </label>
-                </div>
+
                 <div class="small-12 card">
-                        <p class="meta">{{ unit.timeFrame }}</p>
-                        {% if assessmentCount > 0 %}
-                            <p class="meta" data-unit-meta="{{ unit.id }}">
-                                {{ assessmentCount }} {% if assessmentCount == 1 %}assessment{% else %}assessments{% endif %},
-                                <span data-checkbox-group-count="unit-{{ unit.id }}-assessments"
-                                      data-show-count="{{ assessmentCount }}"> selected</span>
-                            </p>
-                        {% endif %}
-                        {% if attachmentCount > 0 %}
-                            <p class="meta" data-unit-meta="{{ unit.id }}">
-                                {{ attachmentCount }} {% if attachmentCount == 1 %}attachment{% else %}attachments{% endif %},
-                                <span data-checkbox-group-count="unit-{{ unit.id }}-attachments"
-                                      data-show-count="{{ attachmentCount }}"> selected</span>
-                            </p>
-                        {% endif %}
+                    <div class="selector">
+                        <input id="unit-{{ unit.id }}"
+                               name="unit[{{ unit.id }}][selected]"
+                               value="1"
+                               type="checkbox"
+                               {% if hasContent %}checked{% endif %}
+                               data-unit="{{ unit.id }}"
+                        >
+                        <label for="unit-{{ unit.id }}" class="checkbox-label">
+                            <span class="title">{{ unit.title }}</span>
+                        </label>
+                    </div>
+                    <p class="meta">{{ unit.timeFrame }}</p>
+                    {% if assessmentCount > 0 %}
+                        <p class="meta" data-unit-meta="{{ unit.id }}">
+                            {{ assessmentCount }} {% if assessmentCount == 1 %}assessment{% else %}assessments{% endif %},
+                            <span data-checkbox-group-count="unit-{{ unit.id }}-assessments"
+                                  data-show-count="{{ assessmentCount }}"> selected</span>
+                        </p>
+                    {% endif %}
+                    {% if attachmentCount > 0 %}
+                        <p class="meta" data-unit-meta="{{ unit.id }}">
+                            {{ attachmentCount }} {% if attachmentCount == 1 %}attachment{% else %}attachments{% endif %},
+                            <span data-checkbox-group-count="unit-{{ unit.id }}-attachments"
+                                  data-show-count="{{ attachmentCount }}"> selected</span>
+                        </p>
+                    {% endif %}
                 </div>
             </div>
         </li>
@@ -54,19 +55,19 @@
                     {% for assessment in unit.assessments %}
                         <li>
                             <div>
-                                <div class="selector">
-                                    <input id="assessment-{{ assessment.id }}"
-                                           name="unit[{{ unit.id }}][assessment][{{ assessment.id }}][selected]"
-                                           value="1"
-                                           type="checkbox"
-                                           checked
-                                           data-checkbox-group="unit-{{ unit.id }}-assessments"
-                                    >
-                                    <label for="assessment-{{ assessment.id }}" class="checkbox-label">
-                                        {{ assessment.title }}
-                                    </label>
-                                </div>
                                 <div class="small-12 card">
+                                    <div class="selector">
+                                        <input id="assessment-{{ assessment.id }}"
+                                               name="unit[{{ unit.id }}][assessment][{{ assessment.id }}][selected]"
+                                               value="1"
+                                               type="checkbox"
+                                               checked
+                                               data-checkbox-group="unit-{{ unit.id }}-assessments"
+                                        >
+                                        <label for="assessment-{{ assessment.id }}" class="checkbox-label">
+                                            <span class="title">{{ assessment.title }}</span>
+                                        </label>
+                                    </div>
                                     {% if assessment.type %}<p class="meta">Type: {{ assessment.type }}</p>{% endif %}
                                     {% if assessment.method %}<p class="meta">Method: {{ assessment.method }}</p>{% endif %}
                                     {% if assessment.standards|length %}
@@ -100,17 +101,17 @@
                     {% for attachment in unit.attachments %}
                         <li>
                             <div>
-                                <div class="selector">
-                                    <input id="attachment-{{ attachment.id }}"
-                                           name="unit[{{ unit.id }}][attachment][{{ attachment.id }}][selected]"
-                                           value="1"
-                                           type="checkbox"
-                                           checked
-                                           data-checkbox-group="unit-{{ unit.id }}-attachments"
-                                    >
-                                    <label for="attachment-{{ attachment.id }}" class="checkbox-label">{{ attachment.title }}</label>
-                                </div>
                                 <div class="small-12 card">
+                                    <div class="selector">
+                                        <input id="attachment-{{ attachment.id }}"
+                                               name="unit[{{ unit.id }}][attachment][{{ attachment.id }}][selected]"
+                                               value="1"
+                                               type="checkbox"
+                                               checked
+                                               data-checkbox-group="unit-{{ unit.id }}-attachments"
+                                        >
+                                        <label for="attachment-{{ attachment.id }}" class="checkbox-label"><span class="title">{{ attachment.title }}</span></label>
+                                    </div>
                                     <input id="attachment-{{ attachment.id }}-visible-to-students"
                                            name="unit[{{ unit.id }}][attachment][{{ attachment.id }}][visibleToStudents]"
                                            value="1"

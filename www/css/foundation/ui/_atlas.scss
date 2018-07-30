@@ -1,27 +1,34 @@
 #curriculum-plan-list, #curriculum-plan-units {
   padding-bottom: 1.5rem;
+
   .card {
     padding: .5rem 0 .5rem 0;
   }
+
+  label span.title {
+    display: inline-block;
+    margin-left: 2rem;
+    font-size: 1rem;
+  }
+
 }
 
 #curriculum-plan-list {
   input[type="radio"]:not(.plain) + label.radio-label {
     margin: 0!important;
   }
+
+  .meta {
+    margin-left: 2rem !important;
+  }
 }
 
-#curriculum-plan-units li.child {
-  margin-left: 2rem;
-}
+#curriculum-plan-units {
+  .meta {
+    margin-left: 2.75rem !important;
+  }
 
-[data-template="curriculum-plan-label"] span {
-  display: inline-block;
-  margin-left: 2rem;
-  font-size: 1rem;
+  li.child {
+    margin-left: 2rem;
+  }
 }
-
-[data-template="curriculum-plan"] .meta {
-  margin-left: 2rem !important;
-}
-
