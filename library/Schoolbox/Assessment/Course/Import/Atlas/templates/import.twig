@@ -48,21 +48,19 @@
                             <label>Curriculum Plans</label>
                             <ul class="information-list card-selectable" id="curriculum-plan-list">
                                 <li id="curriculum-plan-template" class="hide" data-template="curriculum-plan">
-                                    <div>
-                                        <div class="selector">
+                                    <div class="small-12 card">
+                                        <div class="selector no-pad">
                                             <input data-template="curriculum-plan-input" id="curriculum-plan" name="curriculum-plan" type="radio">
-                                            <label data-template="curriculum-plan-label" for="curriculum-plan" class="radio-label"></label>
-                                        </div>
-                                        <div class="small-12 card">
+                                            <label data-template="curriculum-plan-label" for="curriculum-plan" class="radio-label">
+                                                <span class="title"></span>
+                                            </label>
+
                                             {# Clicking this shows curriculum information? #}
-                                            <a href="#">
-                                                <h3 data-template="curriculum-plan-title"></h3>
-                                                <p class="meta">
-                                                    <span data-template="curriculum-plan-school"></span>;
-                                                    <span data-template="curriculum-plan-grade"></span>,
-                                                    <span data-template="curriculum-plan-subject"></span>
-                                                </p>
-                                            </a>
+                                            <p class="meta">
+                                                <span data-template="curriculum-plan-school"></span>;
+                                                <span data-template="curriculum-plan-grade"></span>,
+                                                <span data-template="curriculum-plan-subject"></span>
+                                            </p>
                                         </div>
                                     </div>
                                 </li>
@@ -223,7 +221,7 @@
                         .attr('id', 'curriculum-plan-' + String(item.id))
                         .attr('value', item.id);
                     planItem.find('[data-template="curriculum-plan-label"]').attr('for', 'curriculum-plan-' + String(item.id));
-                    planItem.find('[data-template="curriculum-plan-title"]').text(item.title);
+                    planItem.find('[data-template="curriculum-plan-label"] span').text(item.title);
                     planItem.find('[data-template="curriculum-plan-school"]').text(item.school);
                     planItem.find('[data-template="curriculum-plan-grade"]').text(item.grade);
                     planItem.find('[data-template="curriculum-plan-subject"]').text(item.subject);

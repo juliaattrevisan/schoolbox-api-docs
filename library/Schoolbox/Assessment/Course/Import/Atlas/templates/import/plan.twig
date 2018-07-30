@@ -22,11 +22,11 @@
                            {% if hasContent %}checked{% endif %}
                            data-unit="{{ unit.id }}"
                     >
-                    <label for="unit-{{ unit.id }}" class="checkbox-label"></label>
+                    <label for="unit-{{ unit.id }}" class="checkbox-label">
+                        {{ unit.title }}
+                    </label>
                 </div>
                 <div class="small-12 card">
-                    <a href="#">
-                        <h3>{{ unit.title }}</h3>
                         <p class="meta">{{ unit.timeFrame }}</p>
                         {% if assessmentCount > 0 %}
                             <p class="meta" data-unit-meta="{{ unit.id }}">
@@ -42,7 +42,6 @@
                                       data-show-count="{{ attachmentCount }}"> selected</span>
                             </p>
                         {% endif %}
-                    </a>
                 </div>
             </div>
         </li>
@@ -63,14 +62,13 @@
                                            checked
                                            data-checkbox-group="unit-{{ unit.id }}-assessments"
                                     >
-                                    <label for="assessment-{{ assessment.id }}" class="checkbox-label"></label>
+                                    <label for="assessment-{{ assessment.id }}" class="checkbox-label">
+                                        {{ assessment.title }}
+                                    </label>
                                 </div>
                                 <div class="small-12 card">
-                                    <a href="#">
-                                        <h3>{{ assessment.title }}</h3>
-                                        {% if assessment.type %}<p class="meta">Type: {{ assessment.type }}</p>{% endif %}
-                                        {% if assessment.method %}<p class="meta">Method: {{ assessment.method }}</p>{% endif %}
-                                    </a>
+                                    {% if assessment.type %}<p class="meta">Type: {{ assessment.type }}</p>{% endif %}
+                                    {% if assessment.method %}<p class="meta">Method: {{ assessment.method }}</p>{% endif %}
                                     {% if assessment.standards|length %}
                                         <article>
                                             <h4>Standards</h4>
@@ -110,13 +108,9 @@
                                            checked
                                            data-checkbox-group="unit-{{ unit.id }}-attachments"
                                     >
-                                    <label for="attachment-{{ attachment.id }}" class="checkbox-label"></label>
+                                    <label for="attachment-{{ attachment.id }}" class="checkbox-label">{{ attachment.title }}</label>
                                 </div>
                                 <div class="small-12 card">
-                                    <a href="#">
-                                        <h3>{{ attachment.title }}</h3>
-                                    </a>
-
                                     <input id="attachment-{{ attachment.id }}-visible-to-students"
                                            name="unit[{{ unit.id }}][attachment][{{ attachment.id }}][visibleToStudents]"
                                            value="1"
