@@ -11,6 +11,7 @@ namespace Schoolbox\Resource;
 
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
+use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
 use Schoolbox\ISoftDeletable;
 use Url;
@@ -21,16 +22,16 @@ class Link implements ISoftDeletable
     use DeletedAtDate;
 
     /**
-     * Owner Id
+     * Owner
      *
-     * @var int
+     * @var User
      */
     protected $owner;
 
     /**
-     * Category Id
+     * Category
      *
-     * @var int
+     * @var Folder
      */
     protected $folder;
 
@@ -207,7 +208,7 @@ class Link implements ISoftDeletable
     /**
      * Set category id
      *
-     * @param  \Schoolbox\Resource\Folder\Model $folder
+     * @param  Folder $folder
      * @return $this
      */
     public function setFolder($folder)
@@ -219,7 +220,7 @@ class Link implements ISoftDeletable
     /**
      * Get category
      *
-     * @return \Schoolbox\Resource\Folder\Model
+     * @return Folder
      */
     public function getFolder()
     {
@@ -237,7 +238,7 @@ class Link implements ISoftDeletable
     }
 
     /**
-     * @param  int $owner
+     * @param  User $owner
      * @return $this
      */
     public function setOwner($owner)
