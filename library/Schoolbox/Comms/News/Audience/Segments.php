@@ -80,14 +80,16 @@ class Segments
      * like ajax requests needing a translation service in a single point of control
      *
      * Return a string like "User (230) [Parents of]"
+     *
+     * @param array  $tc Translation Cache associative array of (id => nice words) tuples
      * @param string $entityType
      * @param string $value
      * @param string $relationship
      * @return string
      */
-    private function translate(string $entityType, string $value, string $relationship): string
+    private function translate(array $tc, string $entityType, string $value, string $relationship): string
     {
-        $string = "{$value} ({$this->entityTranslation[$entityType]})";
+        $string = "{$tc[$entityType][$value]} ({$this->entityTranslation[$entityType]})";
 
         if ($relationship !== Model::RELATIONSHIP_SELF) {
             $string .= " [{$this->modifierTranslation[$relationship]}]";
@@ -214,9 +216,7 @@ class Segments
 
         $pieces = [];
 
-
         $tc = $this->translationCache($article->getId());
-        die();
 
         foreach ($audiencing as $audience) {
             $segment = $audience->getEntityType() . self::AUDIENCE_SEPARATOR . base64_encode($audience->getEntityValue());
@@ -229,7 +229,12 @@ class Segments
              */
             $pieces[] = [
                 'id' => $segment,
-                'name' => $this->translate($audience->getEntityType(), $audience->getEntityValue(), $audience->getRelationship()),
+                'name' => $this->translate(
+                    $tc,
+                    $audience->getEntityType(),
+                    $audience->getEntityValue(),
+                    $audience->getRelationship()
+                ),
             ];
         }
 
