@@ -26,6 +26,19 @@ class Segments
      */
     private $audienceMapper;
 
+    /**
+     * Translate entity types into something humanreadable
+     *
+     * @var array
+     */
+    private $entityTranslation = [];
+
+    /**
+     * Translate parents_of and teachers_of into something humanreadable
+     *
+     * @var array
+     */
+    private $modifierTranslation = [];
 
     /**
      * Segments constructor.
@@ -34,6 +47,53 @@ class Segments
     public function __construct(Mapper $audienceMapper)
     {
         $this->audienceMapper = $audienceMapper;
+
+        /* Entity names
+         */
+        $this->entityTranslation = array_combine(Model::getSimpleEntityTypes(), [
+            'User',
+            'Superuser',
+            'Campus',
+            'Role',
+            'Role Type',
+            'House',
+            'Residential House',
+            'Year Level',
+            'Service',
+            'Pastoral Group',
+            'Folder'
+        ]);
+
+        /* Relationship modifiers
+         */
+        $this->modifierTranslation = array_combine(Model::getRelationships(), [
+            'Self',
+            'Parents',
+            'Teachers'
+        ]);
+    }
+
+
+    /**
+     * Take a schematic entity type such as school_house and decide what a human would see in the ui
+     * Yes, this is presentation logic, but backend is the cleanest place to put it for now due to other data sources
+     * like ajax requests needing a translation service in a single point of control
+     *
+     * Return a string like "User (230) [Parents of]"
+     * @param string $entityType
+     * @param string $value
+     * @param string $relationship
+     * @return string
+     */
+    private function translate(string $entityType, string $value, string $relationship): string
+    {
+        $string = "{$value} ({$this->entityTranslation[$entityType]})";
+
+        if ($relationship !== Model::RELATIONSHIP_SELF) {
+            $string .= " [{$this->modifierTranslation[$relationship]}]";
+        }
+
+        return $string;
     }
 
 
@@ -56,16 +116,17 @@ class Segments
                 $segment .= self::AUDIENCE_SEPARATOR . $audience->getRelationship();
             }
 
-            /* TODO: translate "name" into something nicer to read for humans
+            /* translate "name" into something nicer to read for humans
              */
             $pieces[] = [
                 'id' => $segment,
-                'name' => $segment
+                'name' => $this->translate($audience->getEntityType(), $audience->getEntityValue(), $audience->getRelationship()),
             ];
         }
 
         return $pieces;
     }
+
 
     /**
      * Save the audiencing segments for a given article
