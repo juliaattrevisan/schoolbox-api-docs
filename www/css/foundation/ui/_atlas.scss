@@ -33,7 +33,11 @@
   }
 
   .card {
-    padding: 0.5rem 0 0.5rem 1rem;
+    padding: .5rem 0 .5rem .5rem;
+  }
+
+  .threaded .child .card {
+    margin-left: .5rem;
   }
 
   .threaded .child .card.meta {
