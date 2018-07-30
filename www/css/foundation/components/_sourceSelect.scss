@@ -1,7 +1,7 @@
 /* Source Select Shard-ines
  */
 .source-select {
-    border: solid 0.125rem $input-border-color;
+    @include form-element;
     font-weight: normal;
     background-color: $input-bg-color;
     display: block;
