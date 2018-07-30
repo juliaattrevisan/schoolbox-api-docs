@@ -11,6 +11,7 @@ use GuzzleHttp\Exception as HttpException;
 use Schoolbox\Assessment\Course\Import\Atlas\Api;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 class Controller extends BaseController
 {
@@ -27,6 +28,12 @@ class Controller extends BaseController
 
 
     /**
+     * @var FolderMapper
+     */
+    private $folderMapper;
+
+
+    /**
      * @var CourseSpecMapper
      */
     private $courseSpecMapper;
@@ -37,15 +44,18 @@ class Controller extends BaseController
      *
      * @param Api\Bridge       $apiBridge
      * @param Importer         $importer
+     * @param FolderMapper     $folderMapper
      * @param CourseSpecMapper $courseSpecMapper
      */
     public function __construct(
         Api\Bridge $apiBridge,
         Importer $importer,
+        FolderMapper $folderMapper,
         CourseSpecMapper $courseSpecMapper
     ) {
         $this->apiBridge        = $apiBridge;
         $this->importer         = $importer;
+        $this->folderMapper     = $folderMapper;
         $this->courseSpecMapper = $courseSpecMapper;
     }
 
@@ -173,8 +183,7 @@ class Controller extends BaseController
         }
 
         // Hard-coded folder for testing (faculty root)
-        // TODO pass from form
-        $baseFolder = $this->courseSpecMapper->getFacultyRootFolder();
+        $baseFolder = $this->folderMapper->findById($this->request->post->get('parent'));
 
         // Import:
         // Pass through plan, folder, selected units

@@ -71,6 +71,7 @@ class Module extends \Alaress\Module\Module
             $injector->lazyNew(
                 Controller::class,
                 [
+                    'folderMapper'     => $this->getMapperFactory()->getLazy(FolderMapper::class),
                     'courseSpecMapper' => $this->getMapperFactory()->getLazy(CourseSpecMapper::class),
                     'apiBridge'        => $injector->lazyNew(
                         ApiBridge::class,
