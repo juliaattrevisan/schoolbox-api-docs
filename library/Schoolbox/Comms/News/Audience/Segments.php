@@ -178,25 +178,27 @@ class Segments
 
         /* For each of the folders, get their class codes as well
          */
-        $folders = array_keys($refined['folder']);
+        if (array_key_exists('folder', $refined)) {
+            $folders = array_keys($refined['folder']);
 
-        if (\count($folders)) {
-            $statement = $this->audienceMapper->getDatabase()->prepare("
-                SELECT folder.id, CONCAT('(', GROUP_CONCAT(code SEPARATOR ', '), ')') AS codes
-                FROM folder
-                LEFT JOIN folder_code ON folder.id = folder_code.folder_id AND folder_code.deleted_at IS NULL
-                WHERE FIND_IN_SET(id, :folderIds)
-                GROUP BY folder_code.folder_id
-            ");
+            if (\count($folders)) {
+                $statement = $this->audienceMapper->getDatabase()->prepare("
+                    SELECT folder.id, CONCAT('(', GROUP_CONCAT(code SEPARATOR ', '), ')') AS codes
+                    FROM folder
+                    LEFT JOIN folder_code ON folder.id = folder_code.folder_id AND folder_code.deleted_at IS NULL
+                    WHERE FIND_IN_SET(id, :folderIds)
+                    GROUP BY folder_code.folder_id
+                ");
 
-            $statement->execute([
-                'folderIds' => implode(',', $folders)
-            ]);
+                $statement->execute([
+                    'folderIds' => implode(',', $folders)
+                ]);
 
-            /* Augment array with folder codes
-             */
-            while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-                $refined['folder'][$row['id']] .= " {$row['codes']}";
+                /* Augment array with folder codes
+                 */
+                while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+                    $refined['folder'][$row['id']] .= " {$row['codes']}";
+                }
             }
         }
 
