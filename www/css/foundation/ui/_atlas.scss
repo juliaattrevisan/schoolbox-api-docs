@@ -6,6 +6,10 @@
     margin-left: 2rem;
     font-size: 1rem;
   }
+
+  .empty-state {
+    background-color: unset; // Not enough contrast to read otherwise
+  }
 }
 
 #curriculum-plan-list {
@@ -34,6 +38,7 @@
 
   .card {
     padding: .5rem 0 .5rem .5rem;
+    margin-bottom: 0;
   }
 
   .threaded .child .card {
@@ -54,6 +59,10 @@
 
   label.checkbox-label {
     font-style: normal; // Otherwise italics affect the tick
+  }
+
+  .card.meta > p:last-child {
+    padding-bottom: 0;
   }
 
 }
