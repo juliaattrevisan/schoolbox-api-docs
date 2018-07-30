@@ -26,7 +26,7 @@
                     </div>
                 </div>
 
-                <div class="small-6 card">
+                <div class="small-6 card meta">
                     <p class="meta">{{ unit.timeFrame }}</p>
                     {% if assessmentCount > 0 %}
                         <p class="meta" data-unit-meta="{{ unit.id }}">
@@ -79,7 +79,7 @@
                                     </div>
                                 </div>
 
-                                <div class="small-6 card">
+                                <div class="small-6 card meta">
                                     {% if assessment.type %}<p class="meta">Type: {{ assessment.type }}</p>{% endif %}
                                     {% if assessment.method %}<p class="meta">Method: {{ assessment.method }}</p>{% endif %}
                                     {% if assessment.content %}
@@ -118,7 +118,7 @@
 
                                 </div>
 
-                                <div class="small-6 card">
+                                <div class="small-6 card meta">
                                     <input id="attachment-{{ attachment.id }}-visible-to-students"
                                            name="unit[{{ unit.id }}][attachment][{{ attachment.id }}][visibleToStudents]"
                                            value="1"

@@ -1,16 +1,11 @@
 #curriculum-plan-list, #curriculum-plan-units {
   padding-bottom: 1.5rem;
 
-  .card {
-    padding: .5rem 0 .5rem 0;
-  }
-
   label span.title {
     display: inline-block;
     margin-left: 2rem;
     font-size: 1rem;
   }
-
 }
 
 #curriculum-plan-list {
@@ -21,11 +16,15 @@
   .meta {
     margin-left: 2rem !important;
   }
+
+  .card {
+    padding: .5rem 0 .5rem 0;
+  }
 }
 
 #curriculum-plan-units {
   li.child {
-    margin-left: 3.75rem;
+    margin-left: 1.75rem;
     padding: 0;
   }
 
@@ -33,8 +32,13 @@
     padding: 0;
   }
 
-  .small-6 .card {
-    padding: 0;
+  .card {
+    padding: 0.5rem 0 0.5rem 1rem;
+  }
+
+  .threaded .child .card.meta {
+    margin: 0;
+    padding: 0!important;
   }
 
   .assessments, .attachments {
@@ -42,7 +46,10 @@
       font-size: 0.75rem;
       font-weight: bold;
     }
-
-
   }
+
+  label.checkbox-label {
+    font-style: normal; // Otherwise italics affect the tick
+  }
+
 }
