@@ -212,7 +212,10 @@ Usage:
                         </label>
                     </div>
 
-                    {% include '@course/sub/sourceSelector.twig' %}
+                    {% include '@course/sub/sourceSelector.twig' with {
+                        courseSpec:         courseSpec,
+                        isValidFacultyRoot: isValidFacultyRoot,
+                    } only %}
 
                     {% if curriculumEnabled %}
                         <div class="small-12 column">
