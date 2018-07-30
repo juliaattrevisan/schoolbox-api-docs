@@ -156,6 +156,10 @@
 
         // Last step: redirect whence I came
         $('input[data-mage-next="none"]').mage({
+            setFormData: function (formData) {
+                var $parentInput = $('#parent');
+                formData.push({ name: $parentInput.attr('name'), value: $parentInput.val() });
+            },
             onXhrDone: function () {
                 location.href = "{{ returnUrl.value.raw }}" || "{{ routeLookup('course.courseList') }}";
             }
