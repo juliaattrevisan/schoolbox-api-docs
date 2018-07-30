@@ -89,7 +89,7 @@ class Segments
      */
     private function translate(array $tc, string $entityType, string $value, string $relationship): string
     {
-        $string = "{$tc[$entityType][$value]} ({$this->entityTranslation[$entityType]})";
+        $string = "{$tc[$entityType][$value]['name']} ({$this->entityTranslation[$entityType]})";
 
         if ($relationship !== Model::RELATIONSHIP_SELF) {
             $string .= " [{$this->modifierTranslation[$relationship]}]";
@@ -173,7 +173,8 @@ class Segments
         $refined = [];
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $refined[$row['entity_type']][$row['entity_value']] = $row['name'];
+            $refined[$row['entity_type']][$row['entity_value']]['name'] = $row['name'];
+            $refined[$row['entity_type']][$row['entity_value']]['relationship'] = $row['relationship'];
         }
 
         /* For each of the folders, get their class codes as well
@@ -197,7 +198,7 @@ class Segments
                 /* Augment array with folder codes
                  */
                 while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-                    $refined['folder'][$row['id']] .= " {$row['codes']}";
+                    $refined['folder'][$row['id']]['name'] .= " {$row['codes']}";
                 }
             }
         }
@@ -214,35 +215,31 @@ class Segments
      */
     public function load(News\Model $article): array
     {
-
-        /* TODO: I can probably remove this and use $tc instead...in a crappier sort of way
-         */
-        $audiencing = $this->audienceMapper->findByColumn('comms_news_article_id', $article->getId());
-
         $pieces = [];
 
-        $tc = $this->translationCache($article->getId());
+        $audiencing = $this->translationCache($article->getId());
 
-        foreach ($audiencing as $audience) {
-            $segment = $audience->getEntityType() . self::AUDIENCE_SEPARATOR . base64_encode($audience->getEntityValue());
+        foreach ($audiencing as $entityType => $values) {
+            foreach ($values as $value => $data) {
+                $segment = $entityType . self::AUDIENCE_SEPARATOR . base64_encode($value);
 
-            if ($audience->getRelationship() !== Model::RELATIONSHIP_SELF) {
-                $segment .= self::AUDIENCE_SEPARATOR . $audience->getRelationship();
+                if ($data['relationship'] !== Model::RELATIONSHIP_SELF) {
+                    $segment .= self::AUDIENCE_SEPARATOR . $data['relationship'];
+                }
+
+                /* translate "name" into something nicer to read for humans
+                 */
+                $pieces[] = [
+                    'id' => $segment,
+                    'name' => $this->translate(
+                        $audiencing,
+                        $entityType,
+                        $value,
+                        $data['relationship']
+                    ),
+                ];
             }
-
-            /* translate "name" into something nicer to read for humans
-             */
-            $pieces[] = [
-                'id' => $segment,
-                'name' => $this->translate(
-                    $tc,
-                    $audience->getEntityType(),
-                    $audience->getEntityValue(),
-                    $audience->getRelationship()
-                ),
-            ];
         }
-
         return $pieces;
     }
 
