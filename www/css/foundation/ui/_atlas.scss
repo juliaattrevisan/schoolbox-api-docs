@@ -36,4 +36,13 @@
   .small-6 .card {
     padding: 0;
   }
+
+  .assessments, .attachments {
+    li .title {
+      font-size: 0.75rem;
+      font-weight: bold;
+    }
+
+
+  }
 }
