@@ -119,11 +119,13 @@ class Link implements ISoftDeletable
     /**
      * Set url
      *
-     * @param string $url
+     * @param  string $url
+     * @return $this
      */
     public function setUrl($url)
     {
         $this->url = new Url($url);
+        return $this;
     }
 
     /**
