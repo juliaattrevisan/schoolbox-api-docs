@@ -9,18 +9,16 @@
 
 namespace Schoolbox\Resource;
 
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
+use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\User;
 use Schoolbox\ISoftDeletable;
 use Url;
 
 class Link implements ISoftDeletable
 {
-    /**
-     * Identifier
-     *
-     * @var int
-     */
-    protected $id;
+    use Id;
+    use DeletedAtDate;
 
     /**
      * Owner Id
@@ -78,26 +76,8 @@ class Link implements ISoftDeletable
      */
     protected $modified;
 
-    /**
-     * Deleted at
-     *
-     * @var \Alaress_Date_Format
-     */
-    protected $deletedAt;
-
     /** @var string */
     protected $target;
-
-
-    /**
-     * Is deleted
-     *
-     * @return bool
-     */
-    public function isDeleted()
-    {
-        return ($this->getDeletedAt() instanceof \Alaress_Date_Format && !$this->getDeletedAt()->isNull());
-    }
 
     /**
      * Get link url
@@ -225,31 +205,15 @@ class Link implements ISoftDeletable
      */
 
     /**
-     * @param  int $id
-     * @return $this
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    /**
      * Set category id
      *
-     * @param \Schoolbox\Resource\Folder\Model $folder
+     * @param  \Schoolbox\Resource\Folder\Model $folder
+     * @return $this
      */
     public function setFolder($folder)
     {
         $this->folder = $folder;
+        return $this;
     }
 
     /**
@@ -293,11 +257,13 @@ class Link implements ISoftDeletable
     /**
      * Set comment
      *
-     * @param string $comment
+     * @param  string $comment
+     * @return $this
      */
     public function setComment($comment)
     {
         $this->comment = $comment;
+        return $this;
     }
 
     /**
@@ -313,11 +279,13 @@ class Link implements ISoftDeletable
     /**
      * Set description
      *
-     * @param string $description
+     * @param  string $description
+     * @return $this
      */
     public function setDescription($description)
     {
         $this->description = $description;
+        return $this;
     }
 
     /**
@@ -333,11 +301,13 @@ class Link implements ISoftDeletable
     /**
      * Set hidden
      *
-     * @param bool $hidden
+     * @param  bool $hidden
+     * @return $this
      */
     public function setHidden($hidden)
     {
         $this->hidden = $hidden;
+        return $this;
     }
 
     /**
@@ -363,11 +333,13 @@ class Link implements ISoftDeletable
     /**
      * Set target
      *
-     * @param string $target
+     * @param  string $target
+     * @return $this
      */
     public function setTarget($target)
     {
         $this->target = $target;
+        return $this;
     }
 
     /**
@@ -410,25 +382,5 @@ class Link implements ISoftDeletable
     public function getModified()
     {
         return $this->modified;
-    }
-
-    /**
-     * Set deleted at
-     *
-     * @param \Alaress_Date_Format $deletedAt
-     */
-    public function setDeletedAt($deletedAt)
-    {
-        $this->deletedAt = $deletedAt;
-    }
-
-    /**
-     * Get deleted at
-     *
-     * @return \Alaress_Date_Format $deletedAt
-     */
-    public function getDeletedAt()
-    {
-        return $this->deletedAt;
     }
 }
