@@ -191,8 +191,10 @@ class Segments
                 'folderIds' => implode(',', $folders)
             ]);
 
+            /* Augment array with folder codes
+             */
             while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-                new \Alaress_Probe($row);
+                $refined['folder'][$row['id']] .= " {$row['codes']}";
             }
         }
 
