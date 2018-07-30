@@ -131,11 +131,7 @@ class Controller extends Base
         try {
             $savedForLater = $this->saveForLaterMapper->findOneByColumnList($columnList, [], ['deleted' => true]);
         } catch (BaseMapper\Exception $e) {
-            $savedForLater = null;
-        }
-
-        // No record? Create one.
-        if (!$savedForLater) {
+            // No record? Create one.
             $savedForLater = $this->saveForLaterMapper->createModel()->setUser($user)->setArticle($article);
             $this->saveForLaterMapper->save($savedForLater);
             return true;
