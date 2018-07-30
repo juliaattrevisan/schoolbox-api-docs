@@ -60,13 +60,14 @@ class Controller extends BaseController
             $this->buildHtmlOutput(
                 '@courseImportAtlas/import.twig',
                 [
-                    'returnUrl' => [
+                    'isValidFacultyRoot' => $this->courseSpecMapper->isConfiguredFacultyRootValid(),
+                    'returnUrl'          => [
                         'key'   => Redirect::RETURN_URL,
                         'value' => [
                             'raw'     => Redirect::decode($returnUrl),
                             'encoded' => $returnUrl,
                         ]
-                    ]
+                    ],
                 ],
                 'Atlas Import',
                 'course'

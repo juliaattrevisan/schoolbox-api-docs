@@ -69,7 +69,10 @@
                             </ul>
                         </div>
 
-                        {% include '@course/sub/sourceSelector.twig' %}
+                        {% include '@course/sub/sourceSelector.twig' with {
+                            courseSpec:         null,
+                            isValidFacultyRoot: isValidFacultyRoot,
+                        } only %}
 
                     </div>
                     <div data-mage-submitrow>
