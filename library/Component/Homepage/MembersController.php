@@ -181,14 +181,13 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
 
                         $name = $user->getFullName();
 
-                        if(count($admins)){
-                            foreach($admins as $admin) {
+                        if (count($admins)) {
+                            foreach ($admins as $admin) {
                                 if ($user->getId() === $admin->getId()) {
                                     $name .= " (Group Admin)";
                                 }
                             }
                         }
-
 
                         $this->setVar(
                             [
