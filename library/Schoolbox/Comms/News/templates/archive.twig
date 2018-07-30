@@ -12,23 +12,39 @@
     <div class="small-12 medium-3 island">
         <h2 class="subheader">Select Month</h2>
         <section>
-            <ul class="side-nav">
-                {% for year, months in availableYears %}
-                    {% for month, val in months %}
-                        {% set archiveDate = year ~ '-' ~ month ~ '-01' %}
-                        <li class="{{ archiveDate == selectedDate ? 'active' : '' }}">
-                            <a href="{{ routeLookup('commsNews.getArchive', {year: year, month: month}) }}">
-                                {{ archiveDate|date('F Y')}}
+            <nav>
+                <ul class="side-nav">
+                    {% for year, months in availableYears %}
+                        <li class="{{ selectedYear|length and year == selectedYear ? 'active' : '' }}" role="menuitem">
+                            <a href="{{ routeLookup('commsNews.getArchive', {year: year}) }}">
+                                {{ year }}
                             </a>
+                            <ul>
+                                {% for month, val in months %}
+                                    {% set archiveDate = year ~ '-' ~ month ~ '-01' %}
+                                    <li class="{{ selectedDate|length and archiveDate == selectedDate ? 'active' : '' }}" role="menuitem">
+                                        <a href="{{ routeLookup('commsNews.getArchive', {year: year, month: month}) }}">
+                                            {{ archiveDate | date('F') }}
+                                        </a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
                         </li>
+                        <li class="divider"></li>
                     {% endfor %}
-                {% endfor %}
-            </ul>
+                </ul>
+            </nav>
         </section>
     </div>
 
     <div class="small-12 medium-9 island">
-        <h2 class="subheader">{{ (selectedDate) ? selectedDate | date('F Y') : '' }}</h2>
+        <h2 class="subheader">
+            {% if selectedDate|length %}
+                {{ selectedDate | date('F Y') }}
+            {% elseif selectedYear|length %}
+                {{ selectedYear }}
+            {% endif %}
+        </h2>
         {% if year %}
         <section>
 

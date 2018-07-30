@@ -597,6 +597,14 @@ class Controller extends Base
         $outcome = $this->generatePartial($urlPrefix, $params, $topics, $showPaginator, $year, $month);
         $content = $this->buildUnthemedHtmlOutput('@commsNews/list.twig', $outcome)->getAsString();
 
+        $selectedDate = '';
+        $selectedYear = '';
+        if (strlen($year) && strlen($month)) {
+            $selectedDate = $year . '-' . $month . '-01';
+        } elseif (strlen($year)) {
+            $selectedYear = $year;
+        }
+
         /* Merge a whole bunch of other settings too
          * Specifically applies to the index page which loads slightly differently than component variant
          */
@@ -612,7 +620,8 @@ class Controller extends Base
             'availableYears' => $this->newsMapper->findYearsAndMonthsWithArticles($outcome['articleIdsForUser']),
             'year' => $year,
             'month' => $month,
-            'selectedDate' => (strlen($year) && strlen($month)) ? $year . '-' . $month . '-01' : ''
+            'selectedDate' => $selectedDate,
+            'selectedYear' => $selectedYear
         ];
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/archive.twig', $data));
