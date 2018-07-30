@@ -24,11 +24,11 @@
 }
 
 #curriculum-plan-units {
-  .meta {
-    margin-left: 2.75rem !important;
-  }
-
   li.child {
     margin-left: 2rem;
+  }
+
+  .small-6 .card {
+    padding: 0;
   }
 }

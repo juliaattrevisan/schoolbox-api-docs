@@ -15,7 +15,7 @@
                     <div class="expander disabled"></div>
                 {% endif %}
 
-                <div class="small-12 card">
+                <div class="small-6 card">
                     <div class="selector">
                         <input id="unit-{{ unit.id }}"
                                name="unit[{{ unit.id }}][selected]"
@@ -28,6 +28,9 @@
                             <span class="title">{{ unit.title }}</span>
                         </label>
                     </div>
+                </div>
+
+                <div class="small-6 card">
                     <p class="meta">{{ unit.timeFrame }}</p>
                     {% if assessmentCount > 0 %}
                         <p class="meta" data-unit-meta="{{ unit.id }}">
@@ -55,7 +58,8 @@
                     {% for assessment in unit.assessments %}
                         <li>
                             <div>
-                                <div class="small-12 card">
+
+                                <div class="small-6 card">
                                     <div class="selector">
                                         <input id="assessment-{{ assessment.id }}"
                                                name="unit[{{ unit.id }}][assessment][{{ assessment.id }}][selected]"
@@ -68,23 +72,16 @@
                                             <span class="title">{{ assessment.title }}</span>
                                         </label>
                                     </div>
+                                </div>
+
+                                <div class="small-6 card">
                                     {% if assessment.type %}<p class="meta">Type: {{ assessment.type }}</p>{% endif %}
                                     {% if assessment.method %}<p class="meta">Method: {{ assessment.method }}</p>{% endif %}
-                                    {% if assessment.standards|length %}
-                                        <article>
-                                            <h4>Standards</h4>
-                                            <dl>
-                                                {% for standard in assessment.standards %}
-                                                    {% if standard.code %}<dt>({{ standard.code }})</dt>{% endif %}
-                                                    <dd>{{ standard.title }}</dd>
-                                                {% endfor %}
-                                            </dl>
-                                        </article>
-                                    {% endif %}
                                     {% if assessment.content %}
                                         <article>{{ assessment.content | purify }}</article>
                                     {% endif %}
                                 </div>
+
                             </div>
                         </li>
                     {% endfor %}
@@ -101,7 +98,8 @@
                     {% for attachment in unit.attachments %}
                         <li>
                             <div>
-                                <div class="small-12 card">
+
+                                <div class="small-6 card">
                                     <div class="selector">
                                         <input id="attachment-{{ attachment.id }}"
                                                name="unit[{{ unit.id }}][attachment][{{ attachment.id }}][selected]"
@@ -112,6 +110,10 @@
                                         >
                                         <label for="attachment-{{ attachment.id }}" class="checkbox-label"><span class="title">{{ attachment.title }}</span></label>
                                     </div>
+
+                                </div>
+
+                                <div class="small-6 card">
                                     <input id="attachment-{{ attachment.id }}-visible-to-students"
                                            name="unit[{{ unit.id }}][attachment][{{ attachment.id }}][visibleToStudents]"
                                            value="1"
@@ -121,6 +123,7 @@
                                         Visible to students?
                                     </label>
                                 </div>
+
                             </div>
                         </li>
                     {% endfor %}
