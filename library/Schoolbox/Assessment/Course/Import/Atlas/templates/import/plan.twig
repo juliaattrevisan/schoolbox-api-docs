@@ -9,11 +9,7 @@
         {% set hasContent      = assessmentCount > 0 or attachmentCount > 0 %}
         <li>
             <div>
-                {% if hasContent %}
-                    <div class="expander icon-down-arrow" data-collapser="unit-{{ unit.id }}"></div>
-                {% else %}
-                    <div class="expander disabled"></div>
-                {% endif %}
+                <div class="expander icon-down-arrow" data-collapser="unit-{{ unit.id }}"></div>
 
                 <div class="small-6 card">
                     <div class="selector">
