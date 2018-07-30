@@ -45,6 +45,15 @@
                 </div>
             </div>
         </li>
+
+        {% if not hasContent %}
+            <li class="child hide" data-collapse-state="collapsed" data-collapsable="unit-{{ unit.id }}">
+                <div class="empty-state">
+                    <p>This unit has no assessments or attachments.</p>
+                </div>
+            </li>
+        {% endif %}
+
         {% if assessmentCount %}
             <li class="child hide" data-collapse-state="collapsed" data-collapsable="unit-{{ unit.id }}">
                 <div class="small-12 card">
