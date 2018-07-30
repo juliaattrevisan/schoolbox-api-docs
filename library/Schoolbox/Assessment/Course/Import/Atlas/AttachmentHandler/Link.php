@@ -9,9 +9,9 @@ declare(strict_types=1);
 namespace Schoolbox\Assessment\Course\Import\Atlas\AttachmentHandler;
 
 use Schoolbox\Assessment\Course\Import\Atlas\Api\Attachment;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\LinkMapper;
-use Schoolbox\Resource\Link as LinkModel;
 
 /**
  * Handler for importation of links from Atlas to Schoolbox.
@@ -53,11 +53,15 @@ class Link
      * @param Folder     $folder
      * @param Attachment $attachment
      * @param bool       $private
+     * @throws MapperException if something goes wrong whilst saving link
      */
     public function attach(Folder $folder, Attachment $attachment, bool $private): void
     {
         $linkModel = $this->linkMapper->createModel()
             ->setFolder($folder)
-            ->setU
+            ->setDescription($attachment->getTitle())
+            ->setUrl($attachment->getUrl())
+            ->setHidden($private);
+        $this->linkMapper->save($linkModel);
     }
 }
