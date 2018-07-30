@@ -1,0 +1,63 @@
+<?php
+/**
+ * @copyright Copyright 2018, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
+ */
+
+declare(strict_types=1);
+
+namespace Schoolbox\Assessment\Course\Import\Atlas\AttachmentHandler;
+
+use Schoolbox\Assessment\Course\Import\Atlas\Api\Attachment;
+use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Resource\LinkMapper;
+use Schoolbox\Resource\Link as LinkModel;
+
+/**
+ * Handler for importation of links from Atlas to Schoolbox.
+ */
+class Link
+{
+    /**
+     * @var LinkMapper
+     */
+    private $linkMapper;
+
+
+    /**
+     * Constructor
+     *
+     * @param LinkMapper $linkMapper
+     */
+    public function __construct(LinkMapper $linkMapper)
+    {
+        $this->linkMapper = $linkMapper;
+    }
+
+
+    /**
+     * Create a component for this item to live in.
+     *
+     * @param Folder $folder
+     */
+    public function createComponent(Folder $folder): void
+    {
+        // Does this already have a Link component for this folder?
+        // Create it if it doesn't.
+    }
+
+
+    /**
+     * Attach this attachment to the given folder.
+     *
+     * @param Folder     $folder
+     * @param Attachment $attachment
+     * @param bool       $private
+     */
+    public function attach(Folder $folder, Attachment $attachment, bool $private): void
+    {
+        $linkModel = $this->linkMapper->createModel()
+            ->setFolder($folder)
+            ->setU
+    }
+}
