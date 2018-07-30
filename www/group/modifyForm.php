@@ -180,6 +180,7 @@ if (!empty($_POST['accessLevel'])) {
 		/* Set new owner/administrator */
 		$user = new User();
 		$user->setId($userId);
+        $ua = new UserAccess();
 		if ($accessLevel == UserAccess::ACCESS_FULL) {
 			//check if member is allowed to become a owner
 			if (!$groupHandler->allowOwner($userId)) {
@@ -191,29 +192,12 @@ if (!empty($_POST['accessLevel'])) {
 				$groupHandler->createGroup($categoryId);
 			}
 
-			// demote current owner
-			try {
-				/** @var UserAccess $ua */
-				$ua = $uaMapper->findOneByColumnList(array(
-					'service' => UserAccess::SERVICE_HOMEPAGE,
-					'sid'     => $folder->getId(),
-					'type'    => UserAccess::ACCESS_FULL
-				));
-
-				$ua->setAccessLevel(UserAccess::ACCESS_WRITE);
-				$uaMapper->save($ua);
-
-                // If we've given admin rights to another user, we no longer have them, so update this variable
-                $currentUserPermission = UserAccess::ACCESS_WRITE;
-            } catch (Schoolbox\Mapper\Exception $e) {
-				// just ignore it, this kingdom had no king
-				$ua->setUser(new User())
-					->setServiceIdentifier($folder->getId());
-			}
-
 			// promote new owner
-			$ua->setAccessLevel(UserAccess::ACCESS_FULL)
-				->setUser($user);
+			$ua->setAccessLevel($accessLevel)
+				->setUser($user)
+                ->setServiceIdentifier($folder->getId())
+                ->setService(UserAccess::SERVICE_HOMEPAGE);
+
 			$uaMapper->save($ua);
 
 		} elseif ($accessLevel == UserAccess::ACCESS_DENY) {
@@ -223,11 +207,17 @@ if (!empty($_POST['accessLevel'])) {
 				'sid'     => $categoryId,
 			]);
 		} else {
-			$ua->setServiceIdentifier($categoryId)
+			$ua->setServiceIdentifier($folder->getId())
 				->setAccessLevel($accessLevel)
-				->setUser($user);
+				->setUser($user)
+                ->setService(UserAccess::SERVICE_HOMEPAGE);
+
 			$uaMapper->save($ua);
 		}
+
+        if($user->getId() == $_SESSION['user']->getId()) {
+            $currentUserPermission = $accessLevel;
+        }
 	}
 }
 
@@ -274,7 +264,7 @@ if(isset($_POST['bulkAdd'])) {
 	}
 }
 
-if ($currentUserPermission < UserAccess::ACCESS_FULL)
+if ($currentUserPermission < UserAccess::ACCESS_FULL && !$_SESSION['su'])
 {
     // If the user has less then full permission they can no longer stay on the modify group page
 

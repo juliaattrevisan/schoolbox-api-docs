@@ -156,6 +156,9 @@ if (is_numeric($this->arg[0])) {
                 'OWNER_ID'          => Scrub::text($member->getId()),
                 'OWNER_EXTERNAL_ID' => Scrub::text($member->getExternalId()),
             ]);
+
+            $this->parse('groupOwner_block', 'groupOwner', true);
+
             $hasAdmin = true;
         } else {
             $hasMembers = true;
@@ -237,7 +240,6 @@ if (is_numeric($this->arg[0])) {
 
     if ($hasAdmin) {
         $this->parse('msg_enabled_followadmin_block', 'msg_enabled_followadmin');
-        $this->parse('groupOwner_block', 'groupOwner');
     } else {
         $this->parse('groupUnmanaged_block', 'groupUnmanaged');
     }
@@ -291,13 +293,26 @@ if (is_numeric($this->arg[0])) {
         $this->setVar("authorisation_block", "");
     }
 
-    /* The currently-logged in user and the current category owner
-	 * Use for comparing and summoning a warning message that you
-	 * could lose control
-	 */
-    $this->setVar([
-        'MAKEADMIN_SUPER' => isset($_SESSION['su']) ? $_SESSION['su'] : 0,
-    ]);
+    /* Check if current user is admin, and if they are not a super user
+       Warning will show if they decrease their perms
+    */
+
+    $access = $userAccessMapper->findByColumnList(['uid' => $_SESSION['user']->getId(), 'sid' =>$this->arg[0], 'service' => HOMEPAGE_SERVICE, 'type' => '3']);
+    $admin = $access->count();
+
+    $su = isset($_SESSION['su']) ? $_SESSION['su'] : 0;
+
+    if($admin && !$su) {
+        $this->setVar([
+            'ADMIN_NOT_SU' => 1
+        ]);
+    } else {
+        $this->setVar([
+            'ADMIN_NOT_SU' => 0
+        ]);
+    }
+
+
 
     $trail = new \Schoolbox\Breadcrumbs();
     $trail->renderIntoSitePage($this, 'BREADCRUMB', [

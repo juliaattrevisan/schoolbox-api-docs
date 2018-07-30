@@ -151,7 +151,7 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
 
             // Get admin
             $userAccessMapper = new UserAccessMapper();
-            $admin = $userAccessMapper->findAdminsInCategory($this->getContext())->first();
+            $admins = $userAccessMapper->findAdminsInCategory($this->getContext());
 
             $staffPhotoVisibility = $this->getConfigMapper()->get('protect_teacher_photo');
             $studentPhotoHidden  = $this->getConfigMapper()->get('protect_student_photo');
@@ -184,9 +184,14 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
 
                     $name = $manager->getFullName();
 
-                    if ($admin !== null && $manager->getId() === $admin->getId()) {
-                        $name .= " (Group Admin)";
+                    if (count($admins)) {
+                        foreach ($admins as $admin) {
+                            if ($manager->getId() === $admin->getId()) {
+                                $name .= " (Group Admin)";
+                            }
+                        }
                     }
+
 
                     $this->setVar([
                         'PERSON_UID'         => $manager->getId(),

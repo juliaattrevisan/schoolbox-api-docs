@@ -90,19 +90,24 @@
                     });
         });
 
+        var removeSelf = $('[name^="accessLevel[159]"][value="0"]');
+        var readSelf = $('[name^="accessLevel[159]"][value="1"]');
+        var writeSelf = $('[name^="accessLevel[159]"][value="2"]');
+
         // Admin? Throw the standard warning before allowing this to happen
-        memberList.on('click', '[name^="accessLevel"][value="3"]', function(e) {
-            e.preventDefault();
-            var text = 'Are you sure you wish to change the group\'s admin?';
-            if (!(Number('{MAKEADMIN_SUPER}'))) {
-                text += ' If you make someone else group admin, you will lose your group admin privileges.'
+        removeSelf.add(readSelf).add(writeSelf).on('click', function(e) {
+            if({ADMIN_NOT_SU}) {
+                e.preventDefault();
+
+
+                $(this).confirmDialog({
+                    text: "Are you sure you would like to remove your admin privileges?" +
+                    " You will lose access to this page.",
+                    confirmEvent: function (element) {
+                        element.prop('checked', !element.prop('checked')).trigger('change');
+                    }
+                });
             }
-            $(this).confirmDialog({
-                text: text,
-                confirmEvent: function(element) {
-                    element.prop('checked', !element.prop('checked')).trigger('change');
-                }
-            });
         });
 
         // Remove user from group? Another standard warning
@@ -118,6 +123,7 @@
 
         // On change of group form - ajax submit
         memberList.on('change', '[name^="accessLevel"]', function() {
+
             var $this  = $(this);
             var form   = $this.closest('form');
             var member = $this.closest('[data-relation="member"]');
@@ -168,6 +174,27 @@
                             // success stuff. Reload memberlist and waitlist
                             waitingList.empty().append($response.find('#waitingList').children());
                             memberList.empty().append($response.find('#members').children());
+
+                            var removeSelf = $('[name^="accessLevel[159]"][value="0"]');
+                            var readSelf = $('[name^="accessLevel[159]"][value="1"]');
+                            var writeSelf = $('[name^="accessLevel[159]"][value="2"]');
+
+                            // Admin? Throw the standard warning before allowing this to happen
+                            removeSelf.add(readSelf).add(writeSelf).on('click', function(e) {
+                                if({ADMIN_NOT_SU}) {
+                                    e.preventDefault();
+
+
+                                    $(this).confirmDialog({
+                                        text: "Are you sure you would like to remove your admin privileges?" +
+                                        " You will lose access to this page.",
+                                        confirmEvent: function (element) {
+                                            element.prop('checked', !element.prop('checked')).trigger('change');
+                                        }
+                                    });
+                                }
+                            });
+
 
                             $('[data-delete-members]').off('click').click(deleteMembers);
                             $('[data-toggle-all]').off('change').change(deleteAllToggled);
@@ -363,7 +390,7 @@
                                             <img src="/portrait.php?userId={OWNER_EXTERNAL_ID}&size=square64" />
                                             {GROUP_OWNER}
                                         </a>
-                                        <p class="meta"><i class="icon-favourite"></i>Group Admins</p>
+                                        <p class="meta"><i class="icon-favourite"></i>Group Admin</p>
                                     </div>
                                 </div>
                                 <nav>
