@@ -174,8 +174,32 @@ class Segments
             $refined[$row['entity_type']][$row['entity_value']] = $row['name'];
         }
 
+        /* For each of the folders, get their class codes as well
+         */
+        $folders = array_keys($refined['folder']);
+
+        if (\count($folders)) {
+            $statement = $this->audienceMapper->getDatabase()->prepare("
+                SELECT folder.id, CONCAT('(', GROUP_CONCAT(code SEPARATOR ', '), ')') AS codes
+                FROM folder
+                LEFT JOIN folder_code ON folder.id = folder_code.folder_id AND folder_code.deleted_at IS NULL
+                WHERE FIND_IN_SET(id, :folderIds)
+                GROUP BY folder_code.folder_id
+            ");
+
+            $statement->execute([
+                'folderIds' => implode(',', $folders)
+            ]);
+
+            while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+                new \Alaress_Probe($row);
+            }
+        }
+
         return $refined;
     }
+
+
     /**
      * Load the audiencing segments for a given article
      *
