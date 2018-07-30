@@ -71,56 +71,6 @@ class Segments
             'Parents',
             'Teachers'
         ]);
-
-        /*
-         * We asked dadt for permission, don't worry
-         *
-(SELECT cna.*, luCampus.`name` AS `name`
-FROM schoolbox.comms_news_audience cna
-INNER JOIN luCampus ON entity_type = 'campus' AND entity_value = luCampus.id
-WHERE comms_news_article_id = 83)
-
-UNION
-
-(SELECT cna.*, groups.name AS `name`
-FROM schoolbox.comms_news_audience cna
-INNER JOIN groups ON entity_type = 'role' AND entity_value = groups.id
-WHERE comms_news_article_id = 83)
-
-UNION
-
-(SELECT cna.*, house.house AS `name`
-FROM schoolbox.comms_news_audience cna
-INNER JOIN house ON entity_type = 'school_house' AND entity_value = house.id
-WHERE comms_news_article_id = 83)
-
-UNION
-
-SELECT cna.*, folder.`name` AS `name`
-FROM schoolbox.comms_news_audience cna
-INNER JOIN folder ON entity_type = 'folder' AND entity_value = folder.id
-WHERE comms_news_article_id = 83
-
-UNION
-
-(SELECT cna.*,
-	CASE
-	WHEN CONCAT('', 1*`user`.year) = `user`.year
-	THEN CONCAT('Year ', `user`.year)
-	ELSE `user`.year
-	END
-AS `name`
-FROM schoolbox.comms_news_audience cna
-INNER JOIN `user` ON entity_type = 'year' AND entity_value = `user`.year
-WHERE comms_news_article_id = 83)
-
-UNION
-
-(SELECT cna.*, pastoral_group.`name` COLLATE utf8mb4_general_ci AS `name`
-FROM schoolbox.comms_news_audience cna
-INNER JOIN pastoral_group ON entity_type = 'pastoral_group' AND entity_value = pastoral_group.id
-WHERE comms_news_article_id = 83)
-         */
     }
 
 
@@ -151,12 +101,15 @@ WHERE comms_news_article_id = 83)
      * Translation cache
      * All the audiencing segments and their human-readable names are collected here
      * There are six types: campus role house year folder pastoralgroup
+     *
+     * We asked dadt for permission, don't worry
+     *
      * @param int $articleId
+     * @return array
      */
-    private function translationCache(int $articleId)
+    private function translationCache(int $articleId): array
     {
-
-        $query = "
+        $statement = $this->audienceMapper->getDatabase()->prepare("
             (SELECT cna.*, luCampus.`name` AS `name`
             FROM schoolbox.comms_news_audience cna
             INNER JOIN luCampus ON entity_type = 'campus' AND entity_value = luCampus.id
@@ -202,9 +155,7 @@ WHERE comms_news_article_id = 83)
             FROM schoolbox.comms_news_audience cna
             INNER JOIN pastoral_group ON entity_type = 'pastoral_group' AND entity_value = pastoral_group.id
             WHERE comms_news_article_id = :articleId_5)
-        ";
-
-        $statement = $this->audienceMapper->getDatabase()->prepare($query);
+        ");
 
         $statement->execute([
             'articleId_0' => $articleId,
@@ -217,13 +168,13 @@ WHERE comms_news_article_id = 83)
 
         /* Build associative array for quick lookup
          */
-        $struct = [];
+        $refined = [];
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            new \Alaress_Probe($row);
+            $refined[$row['entity_type']][$row['entity_value']] = $row['name'];
         }
 
-        die();
+        return $refined;
     }
     /**
      * Load the audiencing segments for a given article
