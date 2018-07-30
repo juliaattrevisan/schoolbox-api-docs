@@ -132,7 +132,13 @@ class Controller extends Base
         $items = [];
 
         foreach ($folders as $folder) {
-            $items[] = array_combine(['id', 'name'], $folder->findValueLabelPair());
+            $data = array_combine(['id', 'name'], $folder->findValueLabelPair());
+
+            /* base64_encode the value because Year Level is a user-configurable string
+             */
+            $data['id'] = base64_encode($data['id']);
+
+            $items[] = $data;
         }
 
         $this->getResponse()->content->set($this->buildJsonOutput([
@@ -152,63 +158,63 @@ class Controller extends Base
             'success' => true,
             'data' => [
                 [
-                    'id' => base64_encode(1),
+                    'id' => base64_encode('Junior Kindergarten'),
                     'name' => 'Junior Kindergarten',
                 ],
                 [
-                    'id' => base64_encode(2),
+                    'id' => base64_encode('Senior Kindergarten'),
                     'name' => 'Senior Kindergarten',
                 ],
                 [
-                    'id' => base64_encode(3),
+                    'id' => base64_encode('Prep'),
                     'name' => 'Prep',
                 ],
                 [
-                    'id' => base64_encode(4),
+                    'id' => base64_encode(1),
                     'name' => 'Year 1',
                 ],
                 [
-                    'id' => base64_encode(5),
+                    'id' => base64_encode(2),
                     'name' => 'Year 2',
                 ],
                 [
-                    'id' => base64_encode(6),
+                    'id' => base64_encode(3),
                     'name' => 'Year 3',
                 ],
                 [
-                    'id' => base64_encode(7),
+                    'id' => base64_encode(4),
                     'name' => 'Year 4',
                 ],
                 [
-                    'id' => base64_encode(8),
+                    'id' => base64_encode(5),
                     'name' => 'Year 5',
                 ],
                 [
-                    'id' => base64_encode(9),
+                    'id' => base64_encode(6),
                     'name' => 'Year 6',
                 ],
                 [
-                    'id' => base64_encode(10),
+                    'id' => base64_encode(7),
                     'name' => 'Year 7',
                 ],
                 [
-                    'id' => base64_encode(11),
+                    'id' => base64_encode(8),
                     'name' => 'Year 8',
                 ],
                 [
-                    'id' => base64_encode(12),
+                    'id' => base64_encode(9),
                     'name' => 'Year 9',
                 ],
                 [
-                    'id' => base64_encode(13),
+                    'id' => base64_encode(10),
                     'name' => 'Year 10',
                 ],
                 [
-                    'id' => base64_encode(14),
+                    'id' => base64_encode(11),
                     'name' => 'Year 11',
                 ],
                 [
-                    'id' => base64_encode(15),
+                    'id' => base64_encode(12),
                     'name' => 'Year 12',
                 ]
             ]
