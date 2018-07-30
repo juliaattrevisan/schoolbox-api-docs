@@ -25,7 +25,12 @@
 
 #curriculum-plan-units {
   li.child {
-    margin-left: 2rem;
+    margin-left: 3.75rem;
+    padding: 0;
+  }
+
+  .selector {
+    padding: 0;
   }
 
   .small-6 .card {
