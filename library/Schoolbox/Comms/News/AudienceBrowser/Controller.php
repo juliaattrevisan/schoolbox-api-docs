@@ -152,63 +152,63 @@ class Controller extends Base
             'success' => true,
             'data' => [
                 [
-                    'id' => 1,
+                    'id' => base64_encode(1),
                     'name' => 'Junior Kindergarten',
                 ],
                 [
-                    'id' => 2,
+                    'id' => base64_encode(2),
                     'name' => 'Senior Kindergarten',
                 ],
                 [
-                    'id' => 3,
+                    'id' => base64_encode(3),
                     'name' => 'Prep',
                 ],
                 [
-                    'id' => 4,
+                    'id' => base64_encode(4),
                     'name' => 'Year 1',
                 ],
                 [
-                    'id' => 5,
+                    'id' => base64_encode(5),
                     'name' => 'Year 2',
                 ],
                 [
-                    'id' => 6,
+                    'id' => base64_encode(6),
                     'name' => 'Year 3',
                 ],
                 [
-                    'id' => 7,
+                    'id' => base64_encode(7),
                     'name' => 'Year 4',
                 ],
                 [
-                    'id' => 8,
+                    'id' => base64_encode(8),
                     'name' => 'Year 5',
                 ],
                 [
-                    'id' => 9,
+                    'id' => base64_encode(9),
                     'name' => 'Year 6',
                 ],
                 [
-                    'id' => 10,
+                    'id' => base64_encode(10),
                     'name' => 'Year 7',
                 ],
                 [
-                    'id' => 11,
+                    'id' => base64_encode(11),
                     'name' => 'Year 8',
                 ],
                 [
-                    'id' => 12,
+                    'id' => base64_encode(12),
                     'name' => 'Year 9',
                 ],
                 [
-                    'id' => 13,
+                    'id' => base64_encode(13),
                     'name' => 'Year 10',
                 ],
                 [
-                    'id' => 14,
+                    'id' => base64_encode(14),
                     'name' => 'Year 11',
                 ],
                 [
-                    'id' => 15,
+                    'id' => base64_encode(15),
                     'name' => 'Year 12',
                 ]
             ]
