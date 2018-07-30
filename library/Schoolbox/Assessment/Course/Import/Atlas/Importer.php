@@ -450,6 +450,7 @@ class Importer
                 break;
 
             case Api\Attachment::ATTACHMENT_TYPE_GOOGLE_DRIVE:
+            case Api\Attachment::ATTACHMENT_TYPE_ONEDRIVE:
                 // not sure. Probably save to Links as well?
                 // Otherwise: consider creating a textbox, which contains drive file?
                 break;
