@@ -35,10 +35,11 @@ class TextboxCest
      * ** the heading is as I entered it
      * ** the content is as I entered it
      *
-     * @param AcceptanceTester $i
-     * @param Homepage         $homepage
+     * @param AcceptanceTester     $i
+     * @param Homepage             $homepage
+     * @param Homepage\TextboxForm $textboxForm
      */
-    public function createTextbox(AcceptanceTester $i, Homepage $homepage): void
+    public function createTextbox(AcceptanceTester $i, Homepage $homepage, Homepage\TextboxForm $textboxForm): void
     {
         $i->login('zsmith', 'password');
 
@@ -46,8 +47,27 @@ class TextboxCest
 
         $homepage->addComponent(Homepage::ELEMENT_ADD_COMPONENT_SECTION_INFORMATION, 'Text Box');
 
-        // With the new component:
-        // enter stuff into it
-        $homepage->clickComponentEmptyStateLink(Homepage::ELEMENT_COMPONENT_LAYOUT_TOP, 1);
+        // Enter content into the new component
+        $layout   = Homepage::ELEMENT_COMPONENT_LAYOUT_TOP;
+        $position = 1;
+
+        $homepage->clickComponentEmptyStateLink($layout, $position);
+        $heading = 'Heading';
+        $content = '<p>I am textbox content</p>';
+        $textboxForm
+            ->fillHeading($heading)
+            ->fillContent($content)
+            ->submit();
+
+        // Verify what I entered is there
+        $homepage
+            ->seeInComponentHeading($heading, $layout, $position)
+            ->seeInComponentContent($content, $layout, $position);
+
+        // Modify the textbox, verify what I entered is in the form
+        $homepage->clickComponentActionBarButton('Modify', $layout, $position);
+        $textboxForm
+            ->seeInHeading($heading)
+            ->seeInContent($content);
     }
 }

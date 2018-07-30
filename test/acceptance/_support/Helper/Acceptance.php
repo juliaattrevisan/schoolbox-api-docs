@@ -518,6 +518,28 @@ class Acceptance extends \Codeception\Module
 
 
     /**
+     * Switch off jQuery animations.
+     *
+     * This may be required for tests which test elements that are displayed
+     * with `jQuery.fadeIn` or similar methods; they don't yet fully exist
+     * whilst animated, so a test which checks for their existence will fail.
+     */
+    public function disableAnimation(): void
+    {
+        $this->getWebDriverModule()->executeJS("$.fx.off = true");
+    }
+
+
+    /**
+     * Switch on jQuery animations.
+     */
+    public function enableAnimation(): void
+    {
+        $this->getWebDriverModule()->executeJS("$.fx.off = false");
+    }
+
+
+    /**
      * Return webdriver module in a type-safe manner.
      *
      * @return WebDriver
