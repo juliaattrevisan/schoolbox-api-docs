@@ -212,6 +212,9 @@ class Segments
      */
     public function load(News\Model $article): array
     {
+
+        /* TODO: I can probably remove this and use $tc instead...in a crappier sort of way
+         */
         $audiencing = $this->audienceMapper->findByColumn('comms_news_article_id', $article->getId());
 
         $pieces = [];
