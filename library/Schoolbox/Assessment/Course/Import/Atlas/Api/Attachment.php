@@ -20,6 +20,7 @@ class Attachment implements JsonSerializable
     public const ATTACHMENT_TYPE_FILE         = 'file';
     public const ATTACHMENT_TYPE_LESSON       = 'lesson';
     public const ATTACHMENT_TYPE_IMAGE        = 'image';
+    public const ATTACHMENT_TYPE_ONEDRIVE     = 'oneDrive';
 
     /**
      * @var int
