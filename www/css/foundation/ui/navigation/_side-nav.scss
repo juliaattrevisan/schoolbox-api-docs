@@ -1,1 +1,31 @@
+$side-nav-font-weight-active: $font-weight-bold;
+$side-nav-padding: 0;
+$side-nav-list-margin: 0;
+
 @import '../../../../javascript/components/foundation/scss/foundation/components/side-nav';
+
+// Schoolbox specific vars
+$border-bottom-width: 2px;
+
+.side-nav {
+  li {
+    margin: 0;
+    a {
+      display: block;
+      padding: 0.5rem 0.75rem;
+      border-left: $border-bottom-width solid transparent;
+
+      &:hover {
+        border-left: $border-bottom-width solid $content-ui-hover;
+        color: $body-font-color;
+      }
+    }
+
+    &.active {
+      a {
+        font-weight: $side-nav-font-weight-active;
+        border-left: $border-bottom-width solid $accent-foreground;
+      }
+    }
+  }
+}

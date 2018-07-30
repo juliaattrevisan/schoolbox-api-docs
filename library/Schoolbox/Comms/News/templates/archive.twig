@@ -16,7 +16,7 @@
                 {% for year, months in availableYears %}
                     {% for month, val in months %}
                         {% set archiveDate = year ~ '-' ~ month ~ '-01' %}
-                        <li>
+                        <li class="{{ archiveDate == selectedDate ? 'active' : '' }}">
                             <a href="{{ routeLookup('commsNews.getArchive', {year: year, month: month}) }}">
                                 {{ archiveDate|date('F Y')}}
                             </a>
