@@ -85,51 +85,98 @@ class Controller extends Base
      */
     public function search()
     {
-        $keyword = $this->getRequest()->query['query'];
+        $keyword = '%' . $this->getRequest()->query['query'] . '%';
         $searchResult = [];
 
-        /* Campuses
+        /* Any old mapper will do
          */
-        $campusResults = $this->campusMapper->findCampuses($keyword);
+        $statement = $this->userMapper->getDatabase()->prepare("
+            (SELECT id, name, 'campus' AS entity_type
+            FROM luCampus
+            WHERE `name` LIKE :keyword)
+            
+            UNION
+            
+            (SELECT id, house AS name, 'house' AS entity_type
+            FROM house
+            WHERE house LIKE :keyword)
+            
+            UNION
+            
+            (SELECT id, CONCAT(firstname, ' ', lastname) AS name, 'user' AS entity_type
+            FROM `user`
+            WHERE firstname LIKE :keyword OR lastname LIKE :keyword)
+             
+            UNION
+            
+            (SELECT id, 
+                CASE
+                WHEN CONCAT('', 1*`user`.year) = `user`.year
+                THEN CONCAT('Year ', `user`.year)
+                ELSE `user`.year
+                END
+             AS name, 'year' AS entity_type
+            FROM `user`
+            WHERE year LIKE :keyword)
+            
+            UNION
+            
+            (SELECT id, name, 'role' AS entity_type
+            FROM groups
+            WHERE `name` LIKE :keyword)
+            
+            UNION 
+            
+            (SELECT id, name COLLATE utf8mb4_general_ci, 'pastoral_group' AS entity_type 
+            FROM `pastoral_group`
+            WHERE `name` LIKE :keyword)
+        ");
 
-        foreach ($campusResults as $campusResult) {
+        $statement->execute([
+            'keyword' => $keyword,
+        ]);
+
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $segment = null;
+
+            switch ($row['entity_type']) {
+                case 'campus':
+                case 'house':
+                case 'pastoral_group':
+                case 'role':
+                case 'user':
+                case 'year':
+                    $segment = SegmentCodec::encode($row['entity_type'], $row['id'], Model::RELATIONSHIP_SELF);
+                    break;
+
+            }
+
             $searchResult[] = [
-                'id' => SegmentCodec::encode('campus', $campusResult->getId(), Model::RELATIONSHIP_SELF),
-                'name' => "{$campusResult->getName()} (Campus)"
+                'id' => $segment,
+                'name' => "{$row['name']} ({$row['entity_type']})"
             ];
         }
 
-        /* Roles
-         */
-        $roleResults = $this->roleMapper->findByName($keyword);
+        new \Alaress_Probe($searchResult);
 
-        foreach ($roleResults as $roleResult) {
-            $searchResult[] = [
-                'id' => SegmentCodec::encode('role', $roleResult->getId(), Model::RELATIONSHIP_SELF),
-                'name' => "{$roleResult->getName()} (Role)"
-            ];
-        }
-
-        /* Houses
-         */
-
-        /* Year Levels
-         */
-
-        /* Folders
-         */
-        $folderResults = $this->folderMapper->search($this->getUser(), $keyword);
-
-        foreach ($folderResults->getResult() as $folderResult) {
-            $searchResult[] = [
-                'id' => SegmentCodec::encode('folder', $folderResult->getId(), Model::RELATIONSHIP_SELF),
-                'name' => "{$folderResult->getNameWithCodes()} (Folder)"
-            ];
-        }
-
-        /* Pastoral Groups
-         */
-        $this->getResponse()->content->set($this->buildJsonOutput($searchResult));
+        die();
+//
+//
+//        /* Folders
+//         */
+//        $folderResults = $this->folderMapper->search($this->getUser(), $keyword);
+//
+//        foreach ($folderResults->getResult() as $folderResult) {
+//            $searchResult[] = [
+//                'id' => SegmentCodec::encode('folder', $folderResult->getId(), Model::RELATIONSHIP_SELF),
+//                'name' => "{$folderResult->getNameWithCodes()} (Folder)"
+//            ];
+//        }
+//
+//        /* Pastoral Groups
+//         */
+//        $this->getResponse()->content->set($this->buildJsonOutput($searchResult));
     }
 
 
