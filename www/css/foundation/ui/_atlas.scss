@@ -29,6 +29,9 @@
 #curriculum-plan-units {
   .unit-empty {
     background: #f9f9f9;
+    .title {
+      color: #888;
+    }
   }
 
   li.child {
