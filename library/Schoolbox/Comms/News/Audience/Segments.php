@@ -53,16 +53,11 @@ class Segments
         foreach ($audiencing as $entityType => $values) {
             foreach ($values as $value => $data) {
                 foreach ($data['relationships'] as $relationship) {
-                    $segment = $entityType . self::AUDIENCE_SEPARATOR . base64_encode($value);
-
-                    if ($relationship !== Model::RELATIONSHIP_SELF) {
-                        $segment .= self::AUDIENCE_SEPARATOR . $relationship;
-                    }
 
                     /* translate "name" into something nicer to read for humans
                      */
                     $pieces[] = [
-                        'id' => $segment,
+                        'id' => SegmentCodec::encode($entityType, $value, $relationship),
                         'name' => $translator->translate(
                             $entityType,
                             $value,
@@ -97,30 +92,13 @@ class Segments
             $audiencingOptions = explode(',', $segments);
 
             foreach ($audiencingOptions as $audiencingOption) {
-
-                /* explode again on the separator
-                 */
-                $pieces = explode(self::AUDIENCE_SEPARATOR, $audiencingOption);
+                $segment = SegmentCodec::decode($audiencingOption);
 
                 $audienceModel = $this->audienceMapper->createModel()
                     ->setCommsNewsArticle($article)
-                    ->setEntityType($pieces[0])
-                    ->setEntityValue(base64_decode($pieces[1]));
-
-                /* This has a Parents or Teachers modifier if the audiencing segment has 3 pieces
-                 */
-                $modifierCount = 3;
-                $piecesCount   = \count($pieces);
-
-                if ($piecesCount === $modifierCount) {
-                    if ($pieces[$piecesCount - 1] === Model::RELATIONSHIP_PARENTS_OF) {
-                        $audienceModel->setRelationship(Model::RELATIONSHIP_PARENTS_OF);
-                    } elseif ($pieces[$piecesCount - 1] === Model::RELATIONSHIP_TEACHERS_OF) {
-                        $audienceModel->setRelationship(Model::RELATIONSHIP_TEACHERS_OF);
-                    }
-                } else {
-                    $audienceModel->setRelationship(Model::RELATIONSHIP_SELF);
-                }
+                    ->setEntityType($segment['entityType'])
+                    ->setEntityValue($segment['entityValue'])
+                    ->setRelationship($segment['relationship']);
 
                 $this->audienceMapper->save($audienceModel);
             }
