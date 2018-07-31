@@ -88,6 +88,59 @@ class Controller extends Base
         $keyword = '%' . $this->getRequest()->query['query'] . '%';
         $searchResult = [];
 
+        /* Folders must be in one of these two possibilities:
+         * Have a class code, or be a Group
+         * Anything else is rolled over and shouldn't appear as a search result
+         */
+        $restrictions = [];
+
+        /* These folders are groups
+         */
+        $groups = [];
+
+        $statement = $this->folderMapper->getDatabase()->prepare('
+            SELECT DISTINCT cid
+            FROM userGroups
+        ');
+
+        $statement->execute();
+
+        foreach ($statement as $group) {
+            $groups[] = $group['cid'];
+        }
+
+        if (\count($groups)) {
+            $restrictions[] = 'id IN (' . implode(', ', $groups) . ') ';
+        }
+
+        /* These folders have folder codes
+         */
+        $folderCodes = [];
+
+        $statement = $this->folderMapper->getDatabase()->prepare("
+            SELECT DISTINCT id
+            FROM {$this->folderMapper->getTable()} f
+            INNER JOIN folder_code ON f.id = folder_code.folder_id
+        ");
+
+        $statement->execute();
+
+        foreach ($statement as $folder) {
+            $folderCodes[] = $folder['id'];
+        }
+
+        if (\count($groups)) {
+            $restrictions[] = 'id IN (' . implode(', ', $folderCodes) . ') ';
+        }
+
+        /* Enforce restrictions
+         */
+        $where = '';
+
+        if (\count($restrictions)) {
+            $where = ' AND (' . implode(' OR ', $restrictions) . ') ';
+        }
+
         /* Any old mapper will do
          */
         $statement = $this->userMapper->getDatabase()->prepare("
@@ -127,6 +180,7 @@ class Controller extends Base
                 WHERE folder.name LIKE :keyword or folder_code.code LIKE :keyword
                 AND folder.deleted_at IS NULL)
             AND folder.deleted_at IS NULL
+            {$where}
             GROUP BY folder.id
 
             UNION
