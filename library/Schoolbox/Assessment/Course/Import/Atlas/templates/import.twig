@@ -22,7 +22,7 @@
             </li>
         </ul>
 
-        <form action="#" method="post" class="mage" data-mage-preventsubmit="true">
+        <form action="{{ routeLookup('courseImportAtlas.postImport') }}?{{ returnUrl.key|e('url') }}={{ returnUrl.value.encoded|e('url') }}" method="post" class="mage" data-mage-preventsubmit="true">
             <section>
                 <fieldset data-mage="part-1" class="content">
                     <legend>Select a Curriculum Plan</legend>
@@ -151,7 +151,7 @@
         // Last step: redirect whence I came
         $('input[data-mage-next="none"]').mage({
             onXhrDone: function () {
-                location.href = "{{ returnUrl }}" || "{{ routeLookup('course.courseList') }}";
+                location.href = "{{ returnUrl.value.raw }}" || "{{ routeLookup('course.courseList') }}";
             }
         });
 
