@@ -466,7 +466,7 @@ class Importer
             $this->attachmentHandlers[$attachmentType]->attach(
                 $attachment,
                 $folder,
-                $visibleToStudents,
+                !$visibleToStudents,
                 $this->currentUser
             );
         }
