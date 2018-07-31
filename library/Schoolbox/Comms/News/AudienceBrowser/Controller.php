@@ -16,6 +16,7 @@ use Schoolbox\Pastoral;
 use Schoolbox\Resource;
 use Schoolbox\RoleMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\UserMapper;
 
 
 class Controller extends Base
@@ -46,6 +47,10 @@ class Controller extends Base
      */
     private $pastoralGroupMapper;
 
+    /**
+     * @var UserMapper
+     */
+    private $userMapper;
 
     /**
      * Controller constructor.
@@ -54,19 +59,22 @@ class Controller extends Base
      * @param HouseMapper           $houseMapper
      * @param FolderMapper          $folderMapper
      * @param Pastoral\Group\Mapper $pastoralGroupMapper
+     * @param UserMapper            $userMapper
      */
     public function __construct(
         CampusMapper $campusMapper,
         RoleMapper $roleMapper,
         HouseMapper $houseMapper,
         FolderMapper $folderMapper,
-        Pastoral\Group\Mapper $pastoralGroupMapper
+        Pastoral\Group\Mapper $pastoralGroupMapper,
+        UserMapper $userMapper
     ) {
         $this->campusMapper = $campusMapper;
         $this->roleMapper = $roleMapper;
         $this->houseMapper = $houseMapper;
         $this->folderMapper = $folderMapper;
         $this->pastoralGroupMapper = $pastoralGroupMapper;
+        $this->userMapper = $userMapper;
     }
 
 
@@ -150,74 +158,26 @@ class Controller extends Base
 
     /**
      * Get all year levels
-     * @return string
+     * @throws \Schoolbox\Mapper\Exception
      */
     public function getYearLevels()
     {
+        $years = array_filter($this->userMapper->findDistinct('year'));
+
+        sort($years);
+
+        $data = [];
+
+        foreach ($years as $year) {
+            $data[] = [
+                'id' => base64_encode($year),
+                'name' => \is_numeric($year) ? "Year {$year}" : $year
+            ];
+        }
+
         $this->getResponse()->content->set($this->buildJsonOutput([
             'success' => true,
-            'data' => [
-                [
-                    'id' => base64_encode('Junior Kindergarten'),
-                    'name' => 'Junior Kindergarten',
-                ],
-                [
-                    'id' => base64_encode('Senior Kindergarten'),
-                    'name' => 'Senior Kindergarten',
-                ],
-                [
-                    'id' => base64_encode('Prep'),
-                    'name' => 'Prep',
-                ],
-                [
-                    'id' => base64_encode(1),
-                    'name' => 'Year 1',
-                ],
-                [
-                    'id' => base64_encode(2),
-                    'name' => 'Year 2',
-                ],
-                [
-                    'id' => base64_encode(3),
-                    'name' => 'Year 3',
-                ],
-                [
-                    'id' => base64_encode(4),
-                    'name' => 'Year 4',
-                ],
-                [
-                    'id' => base64_encode(5),
-                    'name' => 'Year 5',
-                ],
-                [
-                    'id' => base64_encode(6),
-                    'name' => 'Year 6',
-                ],
-                [
-                    'id' => base64_encode(7),
-                    'name' => 'Year 7',
-                ],
-                [
-                    'id' => base64_encode(8),
-                    'name' => 'Year 8',
-                ],
-                [
-                    'id' => base64_encode(9),
-                    'name' => 'Year 9',
-                ],
-                [
-                    'id' => base64_encode(10),
-                    'name' => 'Year 10',
-                ],
-                [
-                    'id' => base64_encode(11),
-                    'name' => 'Year 11',
-                ],
-                [
-                    'id' => base64_encode(12),
-                    'name' => 'Year 12',
-                ]
-            ]
+            'data' => $data
         ]));
     }
 
