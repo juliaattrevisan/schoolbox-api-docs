@@ -84,6 +84,7 @@ class Controller extends Base
     public function search()
     {
         $keyword = $this->getRequest()->query['query'];
+        $searchResult = [];
 
         /* Campuses
          */
@@ -99,9 +100,22 @@ class Controller extends Base
 
         /* Folders
          */
+        $folderMapper = \Schoolbox\Resource\Folder\Mapper::getInstance();
+
+        $folderResults = $folderMapper->search($this->getUser(), $keyword);
+
+        foreach ($folderResults->getResult() as $folderResult) {
+            $searchResult[] = [
+                'id' => "folder_{$folderResult->getId()}",
+                'name' => "{$folderResult->getNameWithCodes()}"
+            ];
+        }
 
         /* Pastoral Groups
          */
+
+        new \Alaress_Probe($searchResult);
+        die();
     }
 
 
