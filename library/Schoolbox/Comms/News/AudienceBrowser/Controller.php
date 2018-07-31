@@ -144,24 +144,7 @@ class Controller extends Base
      */
     public function getFolders()
     {
-        $folders = $this->folderMapper->findForUser($_SESSION['user'])->sortBy('title', 'asc');
-
-        $items = [];
-
-        foreach ($folders as $folder) {
-            $data = array_combine(['id', 'name'], $folder->findValueLabelPair());
-
-            /* base64_encode the value because Year Level is a user-configurable string
-             */
-            $data['id'] = base64_encode($data['id']);
-
-            $items[] = $data;
-        }
-
-        $this->getResponse()->content->set($this->buildJsonOutput([
-            'success' => true,
-            'data' => $items
-        ]));
+        $this->getResponse()->content->set($this->generate($this->folderMapper->findForUser($_SESSION['user'])->sortBy('title', 'asc')));
     }
 
 
