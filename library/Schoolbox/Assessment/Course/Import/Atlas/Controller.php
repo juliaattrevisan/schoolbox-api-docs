@@ -198,7 +198,8 @@ class Controller extends BaseController
             $this->request->post->get('unit')
         );
 
-        // TODO pass something real
+        // TODO consider passing something meaningful here
+        // Example: response code, redirect destination, attachment upload status
         $this->response->content->set($this->buildJsonOutput([]));
         // SHUP.
         /** @noinspection PhpUnhandledExceptionInspection */
