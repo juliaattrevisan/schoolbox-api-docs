@@ -10,6 +10,8 @@
 namespace Schoolbox\Comms\News\Audience\Segment;
 
 use Alaress\IDatabase;
+use Schoolbox\User;
+
 
 class SearchRegistry implements ISearch
 {
@@ -18,23 +20,32 @@ class SearchRegistry implements ISearch
      * @var array
      */
     private $registry;
-    
+
+
     /**
      * Registry constructor.
      *
+     * @param User      $user
      * @param IDatabase $db
      */
-    public function __construct(IDatabase $db)
+    public function __construct(User $user, IDatabase $db)
     {
         $this->registry = [
             $campusSql = new Strategy\Campus(),
-            $roleSql = new Strategy\Role(),
             $folderSql = new Strategy\Folder($db),
             $houseSql = new Strategy\House(),
-            $userSql = new Strategy\User(),
-            $yearSql = new Strategy\Year(),
-            $pastoralGroupSql = new Strategy\PastoralGroup()
         ];
+
+        /* Staff-only search capability
+         */
+        if ($user->getRole()->isStaff()) {
+            $this->registry = array_merge($this->registry, [
+                $yearSql = new Strategy\Year(),
+                $roleSql = new Strategy\Role(),
+                $userSql = new Strategy\User(),
+                $pastoralGroupSql = new Strategy\PastoralGroup(),
+            ]);
+        }
     }
 
     /**
