@@ -12,6 +12,8 @@ use Alaress\Web\Controller\Base;
 use HouseMapper;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
+use Schoolbox\Comms\News\Audience\Model;
+use Schoolbox\Comms\News\Audience\SegmentCodec;
 use Schoolbox\Comms\News\Audience\Segments;
 use Schoolbox\Pastoral;
 use Schoolbox\RoleMapper;
@@ -85,17 +87,14 @@ class Controller extends Base
     {
         $keyword = $this->getRequest()->query['query'];
         $searchResult = [];
-        $separator = Segments::AUDIENCE_SEPARATOR;
 
         /* Campuses
          */
         $campusResults = $this->campusMapper->findCampuses($keyword);
 
         foreach ($campusResults as $campusResult) {
-            $val = base64_encode($campusResult->getId());
-
             $searchResult[] = [
-                'id' => "campus{$separator}{$val}",
+                'id' => SegmentCodec::encode('campus', $campusResult->getId(), Model::RELATIONSHIP_SELF),
                 'name' => "{$campusResult->getName()} (Campus)"
             ];
         }
@@ -105,10 +104,8 @@ class Controller extends Base
         $roleResults = $this->roleMapper->findByName($keyword);
 
         foreach ($roleResults as $roleResult) {
-            $val = base64_encode($roleResult->getId());
-
             $searchResult[] = [
-                'id' => "role{$separator}{$val}",
+                'id' => SegmentCodec::encode('role', $roleResult->getId(), Model::RELATIONSHIP_SELF),
                 'name' => "{$roleResult->getName()} (Role)"
             ];
         }
@@ -124,10 +121,8 @@ class Controller extends Base
         $folderResults = $this->folderMapper->search($this->getUser(), $keyword);
 
         foreach ($folderResults->getResult() as $folderResult) {
-            $val = base64_encode($folderResult->getId());
-
             $searchResult[] = [
-                'id' => "folder{$separator}{$val}",
+                'id' => SegmentCodec::encode('folder', $folderResult->getId(), Model::RELATIONSHIP_SELF),
                 'name' => "{$folderResult->getNameWithCodes()} (Folder)"
             ];
         }
