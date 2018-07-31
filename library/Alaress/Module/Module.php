@@ -17,6 +17,7 @@ use Alaress\Authorizer\Authorizer;
 use Alaress\Web\Router\PathMatcher;
 use Alaress\Web\Router\RouteCollection;
 use LogicException;
+use Schoolbox\IConfigLoader;
 use Schoolbox\MapperFactory;
 use Alaress\Twig\Loader\IChainLoader;
 use Twig\Loader\FilesystemLoader;
@@ -653,9 +654,9 @@ class Module {
     }
 
     /**
-     * @return IConfigLoader|object
+     * @return IConfigLoader
      */
-    protected function getConfig()
+    protected function getConfig(): IConfigLoader
     {
         return $this->getInjector()->get('config');
     }
