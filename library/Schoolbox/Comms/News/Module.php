@@ -97,7 +97,8 @@ class Module extends BaseModule
 
         /* Index of articles authored by you
          */
-        $this->register('GET', '/authored', 'getAuthored', $getPerms);
+        $this->register('GET', '/me', 'getAuthored', $getPerms);
+        $this->register('GET', '/meTable', 'getAuthoredTable', $getPerms);
 
         /* Find out who will receive this article
          */

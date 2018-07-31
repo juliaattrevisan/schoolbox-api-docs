@@ -1,0 +1,175 @@
+{% import _self as macro %}
+
+{##
+ # Pacify $text by removing everything except <p> tags
+ # Cut to the maximum length specified
+ # Provide a "Read More" link if specified
+ #
+ # @param News\Model article
+ # @param string readMore
+ #}
+{% macro pacify(article, readMore) %}
+    {% spaceless %}
+        {% set pacified = article.blurb|striptags %}
+
+        {# If the blurb was nonexistent, assume some body content instead #}
+        {% if pacified|length == 0 %}
+            {% set pacified = article.body|striptags %}
+        {% endif %}
+
+        {# Maximum length chars #}
+        {% set max = 300 %}
+
+        {# Split on the nearest word #}
+        {% if pacified|length > max %}
+            {% set detailUrl = routeLookup('commsNews.getDetail', {articleId: article.id}) %}
+            {% set pacified = pacified|slice(0, max+1)|split(' ')|slice(0, -1)|join(' ') ~ '...'%}
+
+            {# If read_mre policy has a value, append a "Read More" style link
+             # Otherwise, don't do anything except the appended  ellipsis
+             #}
+            {% if readMore|length %}
+                {% set pacified = pacified ~ '<a href="' ~ detailUrl ~ '" title="Read more">' ~ readMore ~ '</a>' %}
+            {% endif %}
+        {% endif %}
+
+        {{ pacified|trim|purify }}
+    {% endspaceless %}
+{% endmacro %}
+
+<div id="authored-container">
+    <div class="row actions-small-1">
+        <div class="list-item">
+            <div class="small-12 columns">
+                <h1>My Articles</h1>
+            </div>
+        </div>
+        <nav>
+            {% set createRoute = routeLookupIfAuthorized('commsNews.getCreate') %}
+            {% if createRoute %}
+                <a href="{{ createRoute }}" class="icon-add" title="Create {{ locale.news }}"></a>
+            {% endif %}
+        </nav>
+    </div>
+
+    <ul class="filters">
+        <li>
+            <input type="checkbox" id="filter-incom" checked>
+            <label for="filter-incom">
+                <span class="progress-tick tiny"></span> Drafts
+            </label>
+        </li>
+        <li>
+            <input type="checkbox" id="filter-act" checked>
+            <label for="filter-act">
+                <span class="progress-tick tiny pending"></span> Rejected
+            </label>
+        </li>
+        <li>
+            <input type="checkbox" id="filter-comp" checked>
+            <label for="filter-comp">
+                <span class="progress-tick tiny reviewed"></span> Awaiting Moderation
+            </label>
+        </li>
+        <li>
+            <input type="checkbox" id="filter-comp" checked>
+            <label for="filter-comp">
+                <span class="progress-tick tiny reviewed"></span> Awaiting Publication
+            </label>
+        </li>
+        <li>
+            <input type="checkbox" id="filter-comp" checked>
+            <label for="filter-comp">
+                <span class="progress-tick tiny reviewed"></span> Published
+            </label>
+        </li>
+        <li>
+            <input type="checkbox" id="filter-comp" checked>
+            <label for="filter-comp">
+                <span class="progress-tick tiny reviewed"></span> Expired
+            </label>
+        </li>
+    </ul>
+
+    <div class="row">
+        <div class="small-12 island">
+            <section>
+
+                <ul class="information-list">
+                    {% for article in articles %}
+                        <li class="actions-small-1">
+                            <div class="list-item">
+                                <div class="small-12 card">
+
+                                    {% if article.featureImage.hash %}
+                                        <a href="{{ routeLookup('commsNews.getDetail', {articleId: article.id}) }}">
+                                            <img src="/storage/image.php?hash={{ article.featureImage.hash }}&size=square64">
+                                        </a>
+                                    {% endif %}
+
+                                    <h3><a href="{{ routeLookup('commsNews.getDetail', {articleId: article.id}) }}">{{ article.title }}</a></h3>
+
+                                    {# TODO: use andy's status stuff from https://github.com/alaress/schoolbox/pull/16893 once it's merged #}
+                                    {% if article.isRejected %}
+                                        {% set articleStatus = 'Rejected' %}
+                                        {% set articleStatusDate = article.rejectedAt %}
+                                        {% set articleStatusLabel = 'alert' %}
+                                        {% set articleStatusTitle = article.rejectedReason %}
+                                    {% elseif not article.isSubmitted %}
+                                        {% set articleStatus = 'Drafted' %}
+                                        {% set articleStatusDate = article.createdAt %}
+                                        {% set articleStatusLabel = 'highlight' %}
+                                        {% set articleStatusTitle = '' %}
+                                    {% elseif article.isAccepted %}
+                                        {% if article.expiresAt < NOW %}
+                                            {% set articleStatus = 'Archived' %}
+                                            {% set articleStatusDate = article.expiresAt %}
+                                            {% set articleStatusLabel = 'neutral' %}
+                                            {% set articleStatusTitle = '' %}
+                                        {% elseif article.publishAt < NOW %}
+                                            {% set articleStatus = 'Published' %}
+                                            {% set articleStatusDate = article.publishAt %}
+                                            {% set articleStatusLabel = 'success' %}
+                                            {% set articleStatusTitle = '' %}
+                                        {% else %}
+                                            {% set articleStatus = 'Awaiting Publication' %}
+                                            {% set articleStatusDate = article.publishAt %}
+                                            {% set articleStatusLabel = 'neutral' %}
+                                            {% set articleStatusTitle = '' %}
+                                        {% endif %}
+                                    {% endif %}
+
+                                    <p class="meta">
+                                        {#<span class="label {{ articleStatusLabel }}" title="{{ articleStatusTitle }}">{{ articleStatus }}</span>#}
+                                        <b>{{  articleStatus }}</b>
+                                        <time title="{{ articleStatusDate.long }}">{{ articleStatusDate.relativeTime }}</time>
+                                    </p>
+
+                                </div>
+                            </div>
+                            {% set modifyRoute = routeLookupIfAuthorized('commsNews.getUpdate', {articleId: article.id}) %}
+                            {% if modifyRoute %}
+                                <nav>
+                                    <a href="{{ modifyRoute }}" class="icon-modify no-text" title="Modify this article"></a>
+                                </nav>
+                            {% endif %}
+
+                            {% set blurb = macro.pacify(article, readMore) %}
+                            {% if blurb|length %}
+                                <article>{{ blurb }}</article>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </section>
+        </div>
+    </div>
+
+    <paginate
+            :page-count="10"
+            :container-class="pagination"
+            :prev-text="prev"
+            :next-text="next"
+            :click-handler="clickCallback">
+    </paginate>
+</div>

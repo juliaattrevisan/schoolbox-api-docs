@@ -1,0 +1,86 @@
+<script type="text/javascript">
+    $(function () {
+        $('#authored-table').DataTable({
+            "order": [[ 3, "desc" ]]
+        });
+    });
+</script>
+
+<div class="row actions-small-1">
+    <div class="list-item">
+        <div class="small-12 columns">
+            <h1>My Articles</h1>
+        </div>
+    </div>
+    <nav>
+        {% set createRoute = routeLookupIfAuthorized('commsNews.getCreate') %}
+        {% if createRoute %}
+            <a href="{{ createRoute }}" class="icon-add" title="Create {{ locale.news }}"></a>
+        {% endif %}
+    </nav>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <section>
+
+            <table id="authored-table">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Status</th>
+                        <th>Last Updated</th>
+                        <th>Saves</th>
+                        <th></th>
+                        {#<th>Reactions</th>
+                        <th>Comments</th>
+                        <th>Shares</th>#}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for article in articles %}
+
+                        {# TODO: use andy's status stuff from https://github.com/alaress/schoolbox/pull/16893 once it's merged #}
+                        {% if article.isRejected %}
+                            {% set articleStatus = 'Rejected' %}
+                            {% set articleStatusDate = article.rejectedAt %}
+                            {% set articleStatusLabel = 'alert' %}
+                            {% set articleStatusTitle = article.rejectedReason %}
+                        {% elseif not article.isSubmitted %}
+                            {% set articleStatus = 'Draft' %}
+                            {% set articleStatusDate = article.createdAt %}
+                            {% set articleStatusLabel = '' %}
+                            {% set articleStatusTitle = '' %}
+                        {% elseif article.isAccepted %}
+                            {% if article.expiresAt < NOW %}
+                                {% set articleStatus = 'Archived' %}
+                                {% set articleStatusDate = article.expiresAt %}
+                                {% set articleStatusLabel = '' %}
+                                {% set articleStatusTitle = '' %}
+                            {% elseif article.publishAt < NOW %}
+                                {% set articleStatus = 'Published' %}
+                                {% set articleStatusDate = article.publishAt %}
+                                {% set articleStatusLabel = '' %}
+                                {% set articleStatusTitle = '' %}
+                            {% else %}
+                                {% set articleStatus = 'Awaiting Publication' %}
+                                {% set articleStatusDate = article.publishAt %}
+                                {% set articleStatusLabel = '' %}
+                                {% set articleStatusTitle = '' %}
+                            {% endif %}
+                        {% endif %}
+
+                        <tr class="{{ articleStatusLabel }}">
+                            <td><a href="#">{{ article.title }}</a></td>
+                            <td>{{ articleStatus }}</td>
+                            <td>{{ articleStatusDate.relativeDay | capitalize }}</td>
+                            <td>0</td>
+                            <td><a href="" class="icon-modify"></a></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+        </section>
+    </div>
+</div>

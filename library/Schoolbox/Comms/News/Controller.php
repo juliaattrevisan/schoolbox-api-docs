@@ -816,9 +816,28 @@ class Controller extends Base
      *
      * @throws \Aura\Di\Exception\ServiceNotFound
      */
-    public function getAuthored()
+    public function getAuthored($user)
     {
-        $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/authored.twig', $data));
+        // Get list of articles the user has authored
+        $articles = $this->newsMapper->findByColumn('author_id', $_SESSION['user']->getId())->sortBy('createdAt', 'desc');
+
+        // Twig time
+        $data = [
+            'articles' => $articles
+        ];
+        $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/authored_tabs.twig', $data));
+    }
+
+    public function getAuthoredTable($user)
+    {
+        // Get list of articles the user has authored
+        $articles = $this->newsMapper->findByColumn('author_id', $_SESSION['user']->getId())->sortBy('createdAt', 'desc');
+
+        // Twig time
+        $data = [
+            'articles' => $articles
+        ];
+        $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/authored_table.twig', $data));
     }
 
 
