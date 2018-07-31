@@ -15,6 +15,30 @@ class Codec
 {
 
     /**
+     * Takes a value string $value and encodes it
+     *
+     * @param string $value
+     * @return string
+     */
+    public static function encodeValue(string $value): string
+    {
+        return base64_encode($value);
+    }
+
+
+    /**
+     * Taks an encoded value string $value and decodes it
+     *
+     * @param string $value
+     * @return string
+     */
+    public static function decodeValue(string $value): string
+    {
+        return base64_decode($value);
+    }
+
+
+    /**
      * Takes three strings, encodes them into the format below
      *
      * user:230:parents
@@ -26,7 +50,7 @@ class Codec
      */
     public static function encode(string $entityType, string $entityValue, string $relationship): string
     {
-        $segment = $entityType . Transactor::AUDIENCE_SEPARATOR . base64_encode($entityValue);
+        $segment = $entityType . Transactor::AUDIENCE_SEPARATOR . self::encodeValue($entityValue);
 
         if ($relationship !== Model::RELATIONSHIP_SELF) {
             $segment .= Transactor::AUDIENCE_SEPARATOR . $relationship;
@@ -47,7 +71,7 @@ class Codec
         $pieces = explode(Transactor::AUDIENCE_SEPARATOR, $segment);
 
         $entityType = $pieces[0];
-        $entityValue = base64_decode($pieces[1]);
+        $entityValue = self::decodeValue($pieces[1]);
 
         /* This has a Parents or Teachers modifier if the audiencing segment has 3 pieces
          */

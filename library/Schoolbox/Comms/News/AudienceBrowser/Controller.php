@@ -120,10 +120,10 @@ class Controller extends Base
         foreach($collection as $item) {
             $data = array_combine(['id', 'name'], $item->findValueLabelPair());
 
-            /* base64_encode the value because Year Level is a user-configurable string
+            /* Encode the value because Year Level is a user-configurable string
              * TODO: Check frontend as to why this is slightly different
              */
-            $data['id'] = base64_encode($data['id']);
+            $data['id'] = Segment\Codec::encodeValue($data['id']);
 
             $items[] = $data;
         }
@@ -196,7 +196,7 @@ class Controller extends Base
             $data[] = [
                 /* TODO: Check frontend as to why this is slightly different
                  */
-                'id' => base64_encode($year),
+                'id' => Segment\Codec::encodeValue($year),
                 'name' => \is_numeric($year) ? "Year {$year}" : $year
             ];
         }
