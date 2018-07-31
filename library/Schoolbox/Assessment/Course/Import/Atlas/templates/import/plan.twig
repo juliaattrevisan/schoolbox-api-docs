@@ -117,6 +117,7 @@
                                                name="unit[{{ unit.id }}][attachment][{{ attachment.id }}][selected]"
                                                value="1"
                                                type="checkbox"
+                                               {% if enabled is null %}disabled{% endif %}
                                                {% if enabled %}checked{% endif %}
                                                data-checkbox-group="unit-{{ unit.id }}-attachments"
                                         >
@@ -126,7 +127,9 @@
                                 </div>
 
                                 <div class="small-6 card meta">
-                                    {% if private is not null %}
+                                    {% if enabled is null %}
+                                        This content is not able to be imported.
+                                    {% elseif private is not null %}
                                         <div class="switch round">
                                             <input id="attachment-{{ attachment.id }}-visible-to-students"
                                                    name="unit[{{ unit.id }}][attachment][{{ attachment.id }}][visibleToStudents]"
