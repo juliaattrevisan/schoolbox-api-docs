@@ -95,6 +95,10 @@ class Module extends BaseModule
          */
         $this->register('GET', '/archive{/year,month}', 'getArchive', $viewPerms);
 
+        /* Index of articles authored by you
+         */
+        $this->register('GET', '/authored', 'getAuthored', $getPerms);
+
         /* Find out who will receive this article
          */
         $this->register('GET', '/{articleId:\d+}/recipients', 'getRecipients', $modifyPerms, $preloadArticle);

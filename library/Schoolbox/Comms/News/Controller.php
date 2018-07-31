@@ -192,8 +192,8 @@ class Controller extends Base
          */
         /** @var Model $article */
         $article = $this->newsMapper->createModel()
-            ->setPublishAt(\Alaress_Date_Format::now())
-            ->setExpiresAt(\Alaress_Date_Format::now());
+                                    ->setPublishAt(\Alaress_Date_Format::now())
+                                    ->setExpiresAt(\Alaress_Date_Format::now());
 
         /* Policies: Publish Date Offset
          */
@@ -806,6 +806,19 @@ class Controller extends Base
         ];
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/index.twig', $data));
+    }
+
+
+    /**
+     * Index of articles you've authored
+     *
+     * @api GET /comms/news/authored
+     *
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     */
+    public function getAuthored()
+    {
+        $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/authored.twig', $data));
     }
 
 
