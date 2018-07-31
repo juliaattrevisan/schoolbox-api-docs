@@ -13,7 +13,9 @@ use GuzzleHttp\Client;
 use Karriere\JsonDecoder\JsonDecoder;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper as RubricCriterionMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\GroupMapper as RubricGroupMapper;
+use Schoolbox\Assessment\Course\Import\Atlas\Api\Attachment;
 use Schoolbox\Assessment\Course\Import\Atlas\Api\Bridge as ApiBridge;
+use Schoolbox\Assessment\Course\Import\Atlas\AttachmentHandler;
 use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
 use Schoolbox\Learning\Course;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecMapper;
@@ -23,6 +25,7 @@ use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\HomepageConfigMapper;
 use Schoolbox\Resource\HomepageTemplateMapper;
+use Schoolbox\Resource\LinkMapper;
 use Twig\Error\LoaderError;
 
 class Module extends \Alaress\Module\Module
@@ -105,23 +108,40 @@ class Module extends \Alaress\Module\Module
                             ),
                         ]
                     ),
-                    'importer'         => $injector->lazyNew(
-                        Importer::class,
-                        [
-                            'currentUser'            => $injector->lazyGet('user'),
-                            'config'                 => $this->getConfig(),
-                            'folderMapper'           => $this->getMapperFactory()->getLazy(FolderMapper::class),
-                            'homepageConfigMapper'   => $this->getMapperFactory()->getLazy(HomepageConfigMapper::class),
-                            'homepageTemplateMapper' => $this->getMapperFactory()->getLazy(HomepageTemplateMapper::class),
-                            'courseSpecMapper'       => $this->getMapperFactory()->getLazy(CourseSpecMapper::class),
-                            'unitSpecMapper'         => $this->getMapperFactory()->getLazy(UnitSpecMapper::class),
-                            'access'                 => $injector->lazy(function () { return Access::getInstance(); }),
-                            'userAccessMapper'       => $this->getMapperFactory()->getLazy(UserAccessMapper::class),
-                            'rubricGroupMapper'      => $this->getMapperFactory()->getLazy(RubricGroupMapper::class),
-                            'rubricCriterionMapper'  => $this->getMapperFactory()->getLazy(RubricCriterionMapper::class),
-                            'assessmentDataSource'   => $injector->lazyGet('assessmentDataSource'),
-                            'nodeMapper'             => $this->getMapperFactory()->getLazy(NodeMapper::class),
-                        ]
+                    'importer'         => $injector->lazy(
+                        function () use ($injector) {
+                            $importer = new Importer(
+                                $injector->get('user'),
+                                $this->getConfig(),
+                                $this->getMapperFactory()->get(FolderMapper::class),
+                                $this->getMapperFactory()->get(HomepageConfigMapper::class),
+                                $this->getMapperFactory()->get(HomepageTemplateMapper::class),
+                                $this->getMapperFactory()->get(CourseSpecMapper::class),
+                                $this->getMapperFactory()->get(UnitSpecMapper::class),
+                                Access::getInstance(),
+                                $this->getMapperFactory()->get(UserAccessMapper::class),
+                                $this->getMapperFactory()->get(RubricGroupMapper::class),
+                                $this->getMapperFactory()->get(RubricCriterionMapper::class),
+                                $injector->get('assessmentDataSource'),
+                                $this->getMapperFactory()->get(NodeMapper::class)
+                            );
+                            return $importer
+                                ->registerAttachmentHandler(
+                                    new AttachmentHandler\Link(
+                                        $this->getMapperFactory()->get(LinkMapper::class)
+                                    ),
+                                    [
+                                        Attachment::ATTACHMENT_TYPE_LINK,
+                                        // TODO these should be handled by the file handler, once it works
+                                        Attachment::ATTACHMENT_TYPE_FILE,
+                                        Attachment::ATTACHMENT_TYPE_IMAGE,
+                                        Attachment::ATTACHMENT_TYPE_LESSON,
+                                        // TODO these should be handled by an embed handler
+                                        Attachment::ATTACHMENT_TYPE_GOOGLE_DRIVE,
+                                        Attachment::ATTACHMENT_TYPE_ONEDRIVE,
+                                    ]
+                                );
+                        }
                     ),
                 ]
             )

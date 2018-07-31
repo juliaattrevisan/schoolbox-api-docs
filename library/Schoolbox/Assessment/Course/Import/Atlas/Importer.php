@@ -11,6 +11,7 @@ namespace Schoolbox\Assessment\Course\Import\Atlas;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 use Schoolbox\Assessment\Course\Import\Atlas\Api;
+use Schoolbox\Assessment\Course\Import\Atlas\AttachmentHandler\IAttachmentHandler;
 use Schoolbox\Assessment\Rubric\Competency\Level;
 use Schoolbox\Assessment\Rubric\Criteria\Criterion;
 use Schoolbox\Assessment\Rubric\Criteria\Group;
@@ -123,6 +124,16 @@ class Importer
      * @var User
      */
     private $currentUser;
+
+
+    /**
+     * A collection of attachment handlers.
+     * * key:   the attachment type this handler can handle
+     * * value: the handler
+     *
+     * @var IAttachmentHandler[]
+     */
+    private $attachmentHandlers;
 
 
     /**
@@ -425,6 +436,22 @@ class Importer
 
 
     /**
+     * Registers an attachment handler for this importer.
+     *
+     * @param IAttachmentHandler $handler         The handler
+     * @param array|string[]     $attachmentTypes The types of attachment this handles.
+     * @return Importer
+     */
+    public function registerAttachmentHandler(IAttachmentHandler $handler, array $attachmentTypes): self
+    {
+        foreach ($attachmentTypes as $attachmentType) {
+            $this->attachmentHandlers[$attachmentType] = $handler;
+        }
+        return $this;
+    }
+
+
+    /**
      * Add an attachment to the folder.
      *
      * @param Api\Attachment $attachment
@@ -434,31 +461,36 @@ class Importer
      */
     private function createAttachment(Api\Attachment $attachment, Folder $folder, bool $visibleToStudents): void
     {
-        // TODO did I pass the attachment as private?
-        // How to create the item?
-        switch ($attachment->getAttachmentType()) {
-            case Api\Attachment::ATTACHMENT_TYPE_FILE:
-            case Api\Attachment::ATTACHMENT_TYPE_IMAGE:
-            case Api\Attachment::ATTACHMENT_TYPE_LESSON:
-                // upload as a file to the folder
-                // (Consider creating a files component if there's not one there?)
-                break;
-
-            case Api\Attachment::ATTACHMENT_TYPE_LINK:
-                // upload as a link to the folder
-                // (Consider creating a links component if there's not one there?)
-                break;
-
-            case Api\Attachment::ATTACHMENT_TYPE_GOOGLE_DRIVE:
-            case Api\Attachment::ATTACHMENT_TYPE_ONEDRIVE:
-                // not sure. Probably save to Links as well?
-                // Otherwise: consider creating a textbox, which contains drive file?
-                break;
-
-            default:
-                // Dunno what to do with it
-                break;
+        $attachmentType = $attachment->getAttachmentType();
+        if (isset($this->attachmentHandlers[$attachmentType])) {
+            $this->attachmentHandlers[$attachmentType]->attach($folder, $attachment, $visibleToStudents);
         }
+
+//        // TODO did I pass the attachment as private?
+//        // How to create the item?
+//        switch ($attachment->getAttachmentType()) {
+//            case Api\Attachment::ATTACHMENT_TYPE_FILE:
+//            case Api\Attachment::ATTACHMENT_TYPE_IMAGE:
+//            case Api\Attachment::ATTACHMENT_TYPE_LESSON:
+//                // upload as a file to the folder
+//                // (Consider creating a files component if there's not one there?)
+//                break;
+//
+//            case Api\Attachment::ATTACHMENT_TYPE_LINK:
+//                // upload as a link to the folder
+//                // (Consider creating a links component if there's not one there?)
+//                break;
+//
+//            case Api\Attachment::ATTACHMENT_TYPE_GOOGLE_DRIVE:
+//            case Api\Attachment::ATTACHMENT_TYPE_ONEDRIVE:
+//                // not sure. Probably save to Links as well?
+//                // Otherwise: consider creating a textbox, which contains drive file?
+//                break;
+//
+//            default:
+//                // Dunno what to do with it
+//                break;
+//        }
     }
 
 
