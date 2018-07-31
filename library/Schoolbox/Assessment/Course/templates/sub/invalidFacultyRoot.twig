@@ -1,0 +1,15 @@
+{##
+ # Display the invalid faculty root message.
+ #}
+
+<div data-alert="" class="alert-box warning">
+    <p>
+        <strong>Warning</strong>: The configured faculty folder is invalid and the system has fallen back to the top-level folder.<br>
+        <br>Please
+        {% if USER.isSuperuser %}
+            <a href="/adminv2/setting/LMS+Policy#course_homepage">configure a valid faculty root</a> in the Administration system.
+        {% else %}
+            ask your System Administrator to configure a valid faculty root
+        {% endif %}
+    </p>
+</div>

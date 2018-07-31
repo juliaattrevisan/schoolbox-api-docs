@@ -2,8 +2,7 @@
  # Display a source selector.
  #
  # Params:
- # * courseSpec:         a course specification object, show this course spec's folder in the selector if provided
- # * isValidFacultyRoot: does the default source exist?
+ # * courseSpec: a course specification object, show this course spec's folder in the selector if provided
  #}
 
 {% autoescape 'js' %}
@@ -52,32 +51,14 @@
 </script>
 {% endautoescape %}
 
-<div class="small-12 column">
-    <label>
-        {{ locale.faculty.proper }} / {{ locale.subject.proper }}
+<label>
+    {{ locale.faculty.proper }} / {{ locale.subject.proper }}
 
-        <a data-course-parent-selector data-source="parent"
-           title="Click to change the {{ locale.faculty }} / {{ locale.subject }} this course belongs to"
-           class="source-select icon-folder"
-           href="#" >
-            {{ courseSpec.id ? courseSpec.folder.parent.name : '(Click to select)' }}
-        </a>
-        <input class="hide" name="parent" id="parent" value="{{ courseSpec.folder.parent.id }}" />
-    </label>
-</div>
-
-{% if not isValidFacultyRoot %}
-    <div class="small-12 column">
-        <div data-alert="" class="alert-box warning">
-            <p>
-                <strong>Warning</strong>: The configured faculty folder is invalid and the system has fallen back to the top-level folder.<br>
-                <br>Please
-                {% if USER.isSuperuser %}
-                    <a href="/adminv2/setting/LMS+Policy#course_homepage">configure a valid faculty root</a> in the Administration system.
-                {% else %}
-                    ask your System Administrator to configure a valid faculty root
-                {% endif %}
-            </p>
-        </div>
-    </div>
-{% endif %}
+    <a data-course-parent-selector data-source="parent"
+       title="Click to change the {{ locale.faculty }} / {{ locale.subject }} this course belongs to"
+       class="source-select icon-folder"
+       href="#" >
+       {{ courseSpec.id ? courseSpec.folder.parent.name : '(Click to select)' }}
+    </a>
+    <input class="hide" name="parent" id="parent" value="{{ courseSpec.folder.parent.id }}" />
+</label>
