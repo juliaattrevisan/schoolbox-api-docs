@@ -31,7 +31,7 @@
     <a class="button icon-modify" href="{{ renderer.getEditURL() }}">Modify</a>
     {% endif %}
     {% if renderer.getCancelURL() != '' %}
-    <a class="button icon-delete" href="{{ renderer.getCancelURL() }}">Delete</a>
+        <a class="button icon-delete" id="delete-event-{{ event.eventId }}">Delete</a>
     {% endif %}
     {% if renderer.getApproveURL() != '' %}
     <a class="button icon-approve" href="{{ renderer.getApproveURL() }}">Approve</a>
@@ -41,3 +41,63 @@
     {% endif %}
 </div>
 {% endblock eventBubbleButtons %}
+    {% block deleteSeriesModal %}
+        {% if event.booking.event.seriesId() %}
+            <div class="reveal-modal" data-reveal data-dialog="bulk-delete">
+                <h2>This booking is part of a series</h2>
+                <p class="icon-alert">
+                    Would you like to delete only this booking, or all in the series?
+                </p>
+                <ul class="flex-list buttons">
+                    <li><a href="#" class="button" data-action="self">Only this booking</a></li>
+                    <li><a href="#" class="button" data-action="series">All bookings in the series</a></li>
+                    <li><a href="#" class="button" data-action="cancel">Cancel</a></li>
+                </ul>
+            </div>
+        {% endif %}
+    {% endblock deleteSeriesModal %}
+{% block deleteJs %}
+    <script type="text/javascript">
+        {% if event.booking.event.seriesId() %}
+        $(function() {
+            $('#delete-event-{{ event.eventId }}').on('click', function () {
+                event.preventDefault();
+                var dialog = $('[data-dialog="bulk-delete"]');
+                dialog.foundation('reveal', 'open');
+                dialog.find('[data-action="self"]')
+                    .off('click')
+                    .on('click', function(e) {
+                        e.preventDefault();
+                        dialog.foundation('reveal', 'close');
+                        window.location.href = "{{ renderer.getCancelURL() }}";
+                    });
+                dialog.find('[data-action="series"]')
+                    .off('click')
+                    .on('click', function(e) {
+                        e.preventDefault();
+                        dialog.foundation('reveal', 'close');
+                        window.location.href = "{{ renderer.getCancelURL() }}?efficacy=series&seriesId={{ event.booking.event.seriesId() }}#";
+                    });
+                dialog.find('[data-action="cancel"]')
+                    .off('click')
+                    .on('click', function(e) {
+                        e.preventDefault();
+                        dialog.foundation('reveal', 'close');
+                    });
+            });
+        });
+        {% else %}
+        $(function() {
+            $('#delete-event-{{ event.eventId }}').on('click', function () {
+                $('[data-reveal]').hide();
+                $(this).confirmDialog({
+                    text: 'Are you sure you wish to delete this booking?',
+                    confirmEvent: function() {
+                        window.location.href = "{{ renderer.getCancelURL() }}";
+                    }
+                });
+            });
+        });
+        {% endif %}
+    </script>
+{% endblock deleteJs %}
