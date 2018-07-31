@@ -67,8 +67,8 @@ class SegmentTranslator
          */
         $this->modifierTranslation = array_combine(Model::getRelationships(), [
             'Self',
-            'Parents',
-            'Teachers'
+            'Parents of students',
+            'Teachers of students'
         ]);
     }
 
