@@ -18,13 +18,13 @@ class SegmentCodec
      * user:230:parents
      *
      * @param string $entityType
-     * @param string $value
+     * @param string $entityValue
      * @param string $relationship
      * @return string
      */
-    public static function encode(string $entityType, string $value, string $relationship): string
+    public static function encode(string $entityType, string $entityValue, string $relationship): string
     {
-        $segment = $entityType . Segments::AUDIENCE_SEPARATOR . base64_encode($value);
+        $segment = $entityType . Segments::AUDIENCE_SEPARATOR . base64_encode($entityValue);
 
         if ($relationship !== Model::RELATIONSHIP_SELF) {
             $segment .= Segments::AUDIENCE_SEPARATOR . $relationship;
