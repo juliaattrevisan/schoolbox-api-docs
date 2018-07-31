@@ -967,9 +967,6 @@ class MapperProxy
                     $domainObjects[$idx] = $this->translateToDomainModel($dataModel);
                 } catch (\UnexpectedValueException $e) {
                     // Broken object from database - not much I can do but...
-                    if(function_exists('newrelic_notice_error')){
-                        newrelic_notice_error(null, $e);
-                    }
                     continue;
                 }
             }

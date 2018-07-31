@@ -98,10 +98,6 @@ class Participant
         try {
             return $this->plan->getAssessable()->isResponseRequired($this);
         } catch (DomainException $e) {
-            // Impossible to throw when calling $this->assessable($this)
-            if (function_exists('newrelic_notice_error')) {
-                newrelic_notice_error(null, $e);
-            }
             return null;
         }
     }
@@ -122,10 +118,6 @@ class Participant
         try {
             return $this->plan->getAssessable()->isFeedbackRequired($this);
         } catch (DomainException $e) {
-            // Impossible to throw when calling $this->assessable($this)
-            if (function_exists('newrelic_notice_error')) {
-                newrelic_notice_error(null, $e);
-            }
             return null;
         }
     }
@@ -142,10 +134,6 @@ class Participant
         try {
             return $this->plan->getAssessable()->isReviewComplete($this);
         } catch (DomainException $e) {
-            // Impossible to throw when calling $this->assessable($this)
-            if (function_exists('newrelic_notice_error')) {
-                newrelic_notice_error(null, $e);
-            }
             return null;
         }
     }
@@ -165,10 +153,6 @@ class Participant
         try {
             return $this->plan->getAssessable()->hasSubmittedResponse($this);
         } catch (DomainException $e) {
-            // Impossible to throw when calling $this->assessable($this)
-            if (function_exists('newrelic_notice_error')) {
-                newrelic_notice_error(null, $e);
-            }
             return null;
         }
     }
@@ -188,10 +172,6 @@ class Participant
         try {
             return $this->plan->getAssessable()->hasPublishedFeedback($this);
         } catch (DomainException $e) {
-            // Impossible to throw when calling $this->assessable($this)
-            if (function_exists('newrelic_notice_error')) {
-                newrelic_notice_error(null, $e);
-            }
             return null;
         }
     }
@@ -365,10 +345,6 @@ class Participant
         try {
             return $this->plan->getAssessable()->getNormalisedMark($this, $publishedOnly);
         } catch (DomainException $e) {
-            // Impossible to throw when calling $this->assessable($this)
-            if (function_exists('newrelic_notice_error')) {
-                newrelic_notice_error(null, $e);
-            }
             return null;
         }
     }
@@ -385,10 +361,6 @@ class Participant
         try {
             return $this->plan->getAssessable()->getHumanReadableMark($this, $publishedOnly);
         } catch (DomainException $e) {
-            // Impossible to throw when calling $this->assessable($this)
-            if (function_exists('newrelic_notice_error')) {
-                newrelic_notice_error(null, $e);
-            }
             return null;
         }
     }
@@ -405,10 +377,6 @@ class Participant
         try {
             return $this->plan->getAssessable()->getAuthoritativeResponse($this, $publishedOnly);
         } catch (DomainException $e) {
-            // Impossible to throw when calling $this->assessable($this)
-            if (function_exists('newrelic_notice_error')) {
-                newrelic_notice_error(null, $e);
-            }
             return null;
         }
     }
@@ -425,10 +393,6 @@ class Participant
         try {
             return $this->plan->getAssessable()->getAuthoritativeFeedback($this, $publishedOnly);
         } catch (DomainException $e) {
-            // Impossible to throw when calling $this->assessable($this)
-            if (function_exists('newrelic_notice_error')) {
-                newrelic_notice_error(null, $e);
-            }
             return null;
         }
     }
