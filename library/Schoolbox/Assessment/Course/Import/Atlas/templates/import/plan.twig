@@ -124,11 +124,15 @@
                                 </div>
 
                                 <div class="small-6 card meta">
-                                    <input id="attachment-{{ attachment.id }}-visible-to-students"
-                                           name="unit[{{ unit.id }}][attachment][{{ attachment.id }}][visibleToStudents]"
-                                           value="1"
-                                           type="checkbox"
-                                    >
+                                    <div class="switch round">
+                                        <input id="attachment-{{ attachment.id }}-visible-to-students"
+                                               name="unit[{{ unit.id }}][attachment][{{ attachment.id }}][visibleToStudents]"
+                                               type="checkbox">
+                                        <label for="attachment-{{ attachment.id }}-visible-to-students">
+                                            <span class="icon-approve"></span>
+                                            <span class="icon-cancel"></span>
+                                        </label>
+                                    </div>
                                     <label for="attachment-{{ attachment.id }}-visible-to-students" class="checkbox-label">
                                         Visible to students?
                                     </label>
