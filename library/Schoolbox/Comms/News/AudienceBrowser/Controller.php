@@ -99,7 +99,8 @@ class Controller extends Base
 
             (SELECT id, name, 'role' AS entity_type
             FROM groups
-            WHERE `name` LIKE :keyword)
+            WHERE `name` LIKE :keyword
+            AND deleted_at IS NULL)
             
             UNION 
             
@@ -123,14 +124,17 @@ class Controller extends Base
                 (SELECT folder.id
                 FROM folder
                 LEFT JOIN folder_code ON folder.id = folder_code.folder_id AND folder_code.deleted_at IS NULL
-                WHERE folder.name LIKE :keyword or folder_code.code LIKE :keyword)
+                WHERE folder.name LIKE :keyword or folder_code.code LIKE :keyword
+                AND folder.deleted_at IS NULL)
+            AND folder.deleted_at IS NULL
             GROUP BY folder.id
 
             UNION
                         
             (SELECT id, CONCAT(firstname, ' ', lastname) AS name, 'user' AS entity_type
             FROM `user`
-            WHERE firstname LIKE :keyword OR lastname LIKE :keyword)
+            WHERE firstname LIKE :keyword OR lastname LIKE :keyword
+            AND deleted_at IS NULL)
              
             UNION
             
@@ -142,13 +146,15 @@ class Controller extends Base
                 END
              AS name, 'year' AS entity_type
             FROM `user`
-            WHERE year LIKE :keyword)
+            WHERE year LIKE :keyword
+            AND deleted_at IS NULL)
             
             UNION
             
             (SELECT id, name COLLATE utf8mb4_general_ci, 'pastoral_group' AS entity_type 
             FROM `pastoral_group`
-            WHERE `name` LIKE :keyword)
+            WHERE `name` LIKE :keyword
+            AND deleted_at IS NULL)
         ");
 
         $statement->execute([
