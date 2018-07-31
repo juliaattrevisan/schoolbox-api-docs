@@ -52,14 +52,14 @@ class SegmentCodec
         $modifierCount = 3;
         $piecesCount   = \count($pieces);
 
+        $relationship = Model::RELATIONSHIP_SELF;
+
         if ($piecesCount === $modifierCount) {
             if ($pieces[$piecesCount - 1] === Model::RELATIONSHIP_PARENTS_OF) {
                 $relationship = Model::RELATIONSHIP_PARENTS_OF;
             } elseif ($pieces[$piecesCount - 1] === Model::RELATIONSHIP_TEACHERS_OF) {
                 $relationship = Model::RELATIONSHIP_TEACHERS_OF;
             }
-        } else {
-            $relationship = Model::RELATIONSHIP_SELF;
         }
 
         return [
