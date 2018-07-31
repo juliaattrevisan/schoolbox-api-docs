@@ -142,7 +142,7 @@ class Module extends BaseModule
 
 
     /**
-     * Returns a lazy auth rule do determine if a user can add an article to their 'save-for-later' list
+     * Returns a lazy auth rule do determine if a user can view their 'save-for-later' list
      *
      * @return Rule\IAuthorizationRule
      */
