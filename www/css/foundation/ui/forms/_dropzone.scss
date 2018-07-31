@@ -228,9 +228,10 @@ ul.az-error-list {
     }
     .dzone {
         @extend .icon-attach;
-        background-size: 1rem;
-        min-height: 2.7rem;
         background-position: 0.875rem;
+        background-size: 1rem;
+        margin-bottom: $form-spacing;
+        height: $input-height;
         padding-left: 2.75rem;
         &:before {
             position: absolute;
