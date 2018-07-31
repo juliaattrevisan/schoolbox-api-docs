@@ -193,6 +193,8 @@ class Controller extends Base
 
         foreach ($years as $year) {
             $data[] = [
+                /* TODO: Check frontend as to why this is slightly different
+                 */
                 'id' => base64_encode($year),
                 'name' => \is_numeric($year) ? "Year {$year}" : $year
             ];
