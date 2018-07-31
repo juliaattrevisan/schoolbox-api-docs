@@ -50,6 +50,7 @@ class Module extends BaseModule
         $this->register('GET', '/folders', 'getFolders', $getPerms);
         $this->register('GET', '/yearlevels', 'getYearLevels', $getPerms);
         $this->register('GET', '/pastoralgroups', 'getPastoralGroups', $getPerms);
+        $this->register('GET', '/search', 'search', $getPerms);
     }
 
 

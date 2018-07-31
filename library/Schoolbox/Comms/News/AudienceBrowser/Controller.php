@@ -79,6 +79,33 @@ class Controller extends Base
 
 
     /**
+     * Look for all the audience pieces that might somehow match $keyword
+     */
+    public function search()
+    {
+        $keyword = $this->getRequest()->query['query'];
+
+        /* Campuses
+         */
+
+        /* Roles
+         */
+
+        /* Houses
+         */
+
+        /* Year Levels
+         */
+
+        /* Folders
+         */
+
+        /* Pastoral Groups
+         */
+    }
+
+
+    /**
      * @param Collection $collection
      * @return \Alaress\Web\Output\Json
      */

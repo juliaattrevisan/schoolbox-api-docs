@@ -206,6 +206,11 @@
         });
 
        $('#audience-search').selectizeSelector({
+           ajax: {
+               url: '{{ routeLookup('commsNewsAudienceBrowser.search') }}',
+               type: 'GET',
+               dataType: 'json'
+           },
         {% if audience|length %}
             value: {{ audience|json_encode|raw }},
         {% endif %}
