@@ -126,10 +126,25 @@ class SegmentTranslator
             
             UNION
             
-            SELECT cna.*, folder.`name` AS `name`
-            FROM schoolbox.comms_news_audience cna
-            INNER JOIN folder ON entity_type = 'folder' AND entity_value = folder.id
-            WHERE comms_news_article_id = :articleId
+            SELECT cna1.*, f.name 
+            FROM 
+            (SELECT folder.id,
+                CONCAT(name,  
+                CASE
+                WHEN COUNT(code) > 0
+                THEN CONCAT(' (', GROUP_CONCAT(code SEPARATOR ', '), ')')
+                ELSE ''
+                END) AS name
+            FROM folder
+            LEFT JOIN folder_code ON folder.id = folder_code.folder_id AND folder_code.deleted_at IS NULL
+            WHERE folder.id IN 
+                (SELECT DISTINCT entity_value
+                FROM comms_news_audience cna2
+                WHERE entity_type = 'folder'
+                AND cna2.comms_news_article_id = :articleId)
+            AND folder.deleted_at IS NULL
+            GROUP BY folder.id) AS f 
+            INNER JOIN comms_news_audience cna1 ON cna1.entity_value = f.id AND entity_type = 'folder'
             
             UNION
             
@@ -163,32 +178,6 @@ class SegmentTranslator
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $refined[$row['entity_type']][$row['entity_value']]['name'] = $row['name'];
             $refined[$row['entity_type']][$row['entity_value']]['relationships'][] = $row['relationship'];
-        }
-
-        /* For each of the folders, get their class codes as well
-         */
-        if (array_key_exists('folder', $refined)) {
-            $folders = array_keys($refined['folder']);
-
-            if (\count($folders)) {
-                $statement = $this->audienceMapper->getDatabase()->prepare("
-                    SELECT folder.id, CONCAT('(', GROUP_CONCAT(code SEPARATOR ', '), ')') AS codes
-                    FROM folder
-                    LEFT JOIN folder_code ON folder.id = folder_code.folder_id AND folder_code.deleted_at IS NULL
-                    WHERE FIND_IN_SET(id, :folderIds)
-                    GROUP BY folder_code.folder_id
-                ");
-
-                $statement->execute([
-                    'folderIds' => implode(',', $folders)
-                ]);
-
-                /* Augment array with folder codes
-                 */
-                while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-                    $refined['folder'][$row['id']]['name'] .= " {$row['codes']}";
-                }
-            }
         }
 
         $this->cache = $refined;
