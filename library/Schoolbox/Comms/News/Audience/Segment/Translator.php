@@ -107,6 +107,8 @@ class Translator
      * Yes, this is presentation logic, but backend is the cleanest place to put it for now due to other data sources
      * like ajax requests needing a translation service in a single point of control
      *
+     * Uses a cached array of the audiencing rules for an article (ie. when the rules are known)
+     *
      * Return a string like "User (230) [Parents of]"
      *
      * @param string $entityType
@@ -116,7 +118,27 @@ class Translator
      */
     public function translateToSegment(string $entityType, string $entityValue, string $relationship): string
     {
-        $string = "{$this->cache[$entityType][$entityValue]['name']} ({$this->entityTranslation[$entityType]})";
+        return $this->assembleSegment($this->cache[$entityType][$entityValue]['name'], $entityType, $relationship);
+    }
+
+
+    /**
+     * Take a schematic entity type such as school_house and decide what a human would see in the ui
+     * Yes, this is presentation logic, but backend is the cleanest place to put it for now due to other data sources
+     * like ajax requests needing a translation service in a single point of control
+     *
+     * But you can feed it three values for it to assemble a segment (ie. when you're searching for items)
+     *
+     * Return a string like "User (230) [Parents of]"
+     *
+     * @param        $name
+     * @param string $entityType
+     * @param string $relationship
+     * @return string
+     */
+    public function assembleSegment($name, string $entityType, string $relationship): string
+    {
+        $string = "{$name} ({$this->translateEntityType($entityType)})";
 
         if ($relationship !== Model::RELATIONSHIP_SELF) {
             $string .= " [{$this->modifierTranslation[$relationship]}]";
