@@ -20,14 +20,14 @@ class SegmentTranslator
      *
      * @var array
      */
-    private $entityTranslation = [];
+    private $entityTranslation;
 
     /**
      * Translate parents_of and teachers_of into something humanreadable
      *
      * @var array
      */
-    private $modifierTranslation = [];
+    private $modifierTranslation;
 
     /**
      * @var Mapper
