@@ -162,6 +162,11 @@
                         $metaSelected  = units.find('[data-unit-meta="'+unit+'"] [data-checkbox-group-count]');
                     $assessments.prop('disabled', disable);
                     $attachments.prop('disabled', disable);
+
+                    // Select/deselect all
+                    $assessments.prop('checked', !disable);
+                    $attachments.prop('checked', !disable);
+
                     if (disable) {
                         $metaSelected.hide();
                     } else {
