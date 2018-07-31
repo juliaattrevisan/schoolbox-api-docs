@@ -47,9 +47,17 @@
                     $toast   = $('#toast'),
                     action   = $element.attr('data-action');
 
+                if ($element.data('inflight')) {
+                    // don't allow more than one concurrent POST
+                    return;
+                }
+
                 $toast.toastActivate({
                     text: $element.attr('data-toast-processing')
                 });
+
+                // set the blocking flag
+                $element.data('inflight', true);
 
                 $.ajax({
                     type: 'POST',
@@ -69,6 +77,8 @@
                         text: 'Error: Unable to ' + textSuffix,
                         css: 'alert'
                     });
+                }).always(function () {
+                    $element.data('inflight', false);
                 });
             });
         }
