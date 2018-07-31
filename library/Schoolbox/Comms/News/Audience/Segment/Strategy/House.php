@@ -23,7 +23,7 @@ class House implements ISearch, ITranslate
     public function getSearchSql(): string
     {
         return "
-            (SELECT id, house AS name, 'house' AS entity_type
+            (SELECT id, house AS name, 'school_house' AS entity_type
             FROM house
             WHERE house LIKE :keyword)
         ";
