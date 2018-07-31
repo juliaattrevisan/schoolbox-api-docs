@@ -55,7 +55,8 @@ class Embed implements IAttachmentHandler
         $textbox = $this->textboxMapper->createModel()
             ->setCategory($folder)
             ->setHeading($attachment->getTitle())
-            ->setBody(sprintf('<iframe src="%s"></iframe>', htmlspecialchars($attachment->getUrl())));
+            ->setBody(sprintf('<iframe src="%s"></iframe>', htmlspecialchars($attachment->getUrl())))
+            ->setDeletedAt(null);
         $this->textboxMapper->save($textbox);
 
         // Create the component
