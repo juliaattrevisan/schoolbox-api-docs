@@ -183,11 +183,11 @@ class Controller extends BaseController
         }
 
         // Hard-coded folder for testing (faculty root)
-        $parentFolderId = $this->request->post->get('parent');
-        if (null === $parentFolderId) {
-            $baseFolder = $this->courseSpecMapper->getFacultyRootFolder();
-        } else {
+        $parentFolderId = $this->request->post->getInt('parent');
+        if ($parentFolderId) {
             $baseFolder = $this->folderMapper->findById($parentFolderId);
+        } else {
+            $baseFolder = $this->courseSpecMapper->getFacultyRootFolder();
         }
 
         // Import:
