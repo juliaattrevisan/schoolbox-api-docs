@@ -452,6 +452,43 @@ class Importer
 
 
     /**
+     * Retrieves the attachment handler registered for this attachment.
+     *
+     * @param Api\Attachment $attachment
+     * @return null|IAttachmentHandler
+     */
+    private function retrieveAttachmentHandler(Api\Attachment $attachment): ?IAttachmentHandler
+    {
+        $attachmentType = $attachment->getAttachmentType();
+        if (isset($this->attachmentHandlers[$attachmentType])) {
+            return $this->attachmentHandlers[$attachmentType];
+        }
+        return null;
+    }
+
+
+    /**
+     * Builds a list of default settings for each attachment.
+     *
+     * @param Api\Curriculum $curriculum
+     * @return array [attachment ID => defaults for attachment]
+     */
+    public function buildDefaultSettingsForAttachments(Api\Curriculum $curriculum): array
+    {
+        $results = [];
+        foreach ($curriculum->getUnits() as $unit) {
+            foreach ($unit->getAttachments() as $attachment) {
+                $attachmentHandler = $this->retrieveAttachmentHandler($attachment);
+                if ($attachmentHandler) {
+                    $results[$attachment->getId()] = $attachmentHandler->getDefaultSettings($attachment);
+                }
+            }
+        }
+        return $results;
+    }
+
+
+    /**
      * Add an attachment to the folder.
      *
      * @param Api\Attachment $attachment
@@ -461,9 +498,9 @@ class Importer
      */
     private function createAttachment(Api\Attachment $attachment, Folder $folder, bool $visibleToStudents): void
     {
-        $attachmentType = $attachment->getAttachmentType();
-        if (isset($this->attachmentHandlers[$attachmentType])) {
-            $this->attachmentHandlers[$attachmentType]->attach(
+        $attachmentHandler = $this->retrieveAttachmentHandler($attachment);
+        if ($attachmentHandler) {
+            $attachmentHandler->attach(
                 $attachment,
                 $folder,
                 !$visibleToStudents,
