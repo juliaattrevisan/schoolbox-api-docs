@@ -48,7 +48,7 @@ class Segments
     {
         $pieces = [];
 
-        $translator = (new SegmentTranslator($this->audienceMapper->getDatabase()))->buildCache($article->getId());
+        $translator = (new Segment\Translator($this->audienceMapper->getDatabase()))->buildCache($article->getId());
         $audiencing = $translator->getCache();
 
         foreach ($audiencing as $entityType => $values) {

@@ -1,19 +1,19 @@
 <?php
 /**
- * SegmentTranslator
+ * Translator
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2018, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Comms\News\Audience;
+namespace Schoolbox\Comms\News\Audience\Segment;
 
 use Alaress\IDatabase;
-use Schoolbox\Comms\News\Audience\Segment\TranslatorRegistry;
+use Schoolbox\Comms\News\Audience\Model;
 
 
-class SegmentTranslator
+class Translator
 {
     /**
      * Translate entity types into something humanreadable
@@ -105,7 +105,7 @@ class SegmentTranslator
      * We asked dadt for permission, don't worry
      *
      * @param int $articleId
-     * @return SegmentTranslator
+     * @return $this
      */
     public function buildCache(int $articleId): self
     {
