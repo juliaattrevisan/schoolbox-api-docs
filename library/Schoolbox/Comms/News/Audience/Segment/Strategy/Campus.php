@@ -10,8 +10,9 @@
 namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
 use Schoolbox\Comms\News\Audience\Segment\ISearch;
+use Schoolbox\Comms\News\Audience\Segment\ITranslate;
 
-class Campus implements ISearch
+class Campus implements ISearch, ITranslate
 {
 
     /**
@@ -25,6 +26,22 @@ class Campus implements ISearch
             (SELECT id, name, 'campus' AS entity_type
             FROM luCampus
             WHERE `name` LIKE :keyword)
+        ";
+    }
+
+
+    /**
+     * Translate this ITranslate instance from an entity_type to a human-readable version
+     *
+     * @return string
+     */
+    public function getTranslateSql(): string
+    {
+        return "
+            (SELECT cna.*, luCampus.`name` AS `name`
+            FROM schoolbox.comms_news_audience cna
+            INNER JOIN luCampus ON entity_type = 'campus' AND entity_value = luCampus.id
+            WHERE comms_news_article_id = :articleId)
         ";
     }
 }

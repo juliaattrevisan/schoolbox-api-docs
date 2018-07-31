@@ -11,8 +11,9 @@ namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
 use Alaress\IDatabase;
 use Schoolbox\Comms\News\Audience\Segment\ISearch;
+use Schoolbox\Comms\News\Audience\Segment\ITranslate;
 
-class Folder implements ISearch
+class Folder implements ISearch, ITranslate
 {
 
     /**
@@ -110,6 +111,37 @@ class Folder implements ISearch
             AND folder.deleted_at IS NULL
             {$where}
             GROUP BY folder.id
+        ";
+    }
+
+
+    /**
+     * Translate this ITranslate instance from an entity_type to a human-readable version
+     *
+     * @return string
+     */
+    public function getTranslateSql(): string
+    {
+        return "
+            SELECT cna1.*, f.name 
+            FROM 
+            (SELECT folder.id,
+                CONCAT(name,  
+                CASE
+                WHEN COUNT(code) > 0
+                THEN CONCAT(' (', GROUP_CONCAT(code SEPARATOR ', '), ')')
+                ELSE ''
+                END) AS name
+            FROM folder
+            LEFT JOIN folder_code ON folder.id = folder_code.folder_id AND folder_code.deleted_at IS NULL
+            WHERE folder.id IN 
+                (SELECT DISTINCT entity_value
+                FROM comms_news_audience cna2
+                WHERE entity_type = 'folder'
+                AND cna2.comms_news_article_id = :articleId)
+            AND folder.deleted_at IS NULL
+            GROUP BY folder.id) AS f 
+            INNER JOIN comms_news_audience cna1 ON cna1.entity_value = f.id AND entity_type = 'folder'
         ";
     }
 }

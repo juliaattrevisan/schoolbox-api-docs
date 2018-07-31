@@ -10,8 +10,9 @@
 namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
 use Schoolbox\Comms\News\Audience\Segment\ISearch;
+use Schoolbox\Comms\News\Audience\Segment\ITranslate;
 
-class House implements ISearch
+class House implements ISearch, ITranslate
 {
 
     /**
@@ -25,6 +26,22 @@ class House implements ISearch
             (SELECT id, house AS name, 'house' AS entity_type
             FROM house
             WHERE house LIKE :keyword)
+        ";
+    }
+
+
+    /**
+     * Translate this ITranslate instance from an entity_type to a human-readable version
+     *
+     * @return string
+     */
+    public function getTranslateSql(): string
+    {
+        return "
+            (SELECT cna.*, house.house AS `name`
+            FROM schoolbox.comms_news_audience cna
+            INNER JOIN house ON entity_type = 'school_house' AND entity_value = house.id
+            WHERE comms_news_article_id = :articleId)
         ";
     }
 }
