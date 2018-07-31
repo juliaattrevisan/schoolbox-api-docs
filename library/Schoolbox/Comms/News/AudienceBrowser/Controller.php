@@ -81,6 +81,8 @@ class Controller extends Base
 
     /**
      * Look for all the audience pieces that might somehow match $keyword
+     *
+     * @api /comms/news/audiencebrowser/search
      */
     public function search()
     {
@@ -147,6 +149,8 @@ class Controller extends Base
 
     /**
      * Get (id, name) tuples for every Campus
+     *
+     * @api /comms/news/audiencebrowser/campuses
      */
     public function getCampuses()
     {
@@ -156,6 +160,8 @@ class Controller extends Base
 
     /**
      * Get (id, name) tuples for every Role
+     *
+     * @api /comms/news/audiencebrowser/roles
      */
     public function getRoles()
     {
@@ -165,6 +171,8 @@ class Controller extends Base
 
     /**
      * Get (id, name) tuples for every Pastoral Group
+     *
+     * @api /comms/news/audiencebrowser/pastoralgroups
      */
     public function getPastoralGroups()
     {
@@ -174,6 +182,8 @@ class Controller extends Base
 
     /**
      * Get (id, name) tuples for every House
+     *
+     * @api /comms/news/audiencebrowser/houses
      */
     public function getHouses()
     {
@@ -183,6 +193,8 @@ class Controller extends Base
 
     /**
      * Get (id, name) tuples for every folder
+     *
+     * @api /comms/news/audiencebrowser/folders
      */
     public function getFolders()
     {
@@ -192,6 +204,9 @@ class Controller extends Base
 
     /**
      * Get all year levels
+     *
+     * @api /comms/news/audiencebrowser/yearlevels
+     *
      * @throws \Schoolbox\Mapper\Exception
      */
     public function getYearLevels()
