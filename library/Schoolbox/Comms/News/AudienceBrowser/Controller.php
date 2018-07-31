@@ -98,6 +98,13 @@ class Controller extends Base
 
         /* Roles
          */
+        $roleMapper = \Schoolbox\RoleMapper::getInstance();
+
+        $roleResults = $roleMapper->findByName($keyword);
+
+        foreach ($roleResults as $roleResult) {
+            $searchResult[] = array_combine(['id', 'name'], $roleResult->findValueLabelPair());
+        }
 
         /* Houses
          */
