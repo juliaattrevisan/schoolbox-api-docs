@@ -13,6 +13,13 @@ use HouseMapper;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
 use Schoolbox\Comms\News\Audience\Model;
+use Schoolbox\Comms\News\Audience\Segment\Search\Campus;
+use Schoolbox\Comms\News\Audience\Segment\Search\Folder;
+use Schoolbox\Comms\News\Audience\Segment\Search\House;
+use Schoolbox\Comms\News\Audience\Segment\Search\PastoralGroup;
+use Schoolbox\Comms\News\Audience\Segment\Search\Role;
+use Schoolbox\Comms\News\Audience\Segment\Search\User;
+use Schoolbox\Comms\News\Audience\Segment\Search\Year;
 use Schoolbox\Comms\News\Audience\SegmentCodec;
 use Schoolbox\Comms\News\Audience\Segments;
 use Schoolbox\Pastoral;
@@ -88,127 +95,40 @@ class Controller extends Base
         $keyword = '%' . $this->getRequest()->query['query'] . '%';
         $searchResult = [];
 
-        /* Folders must be in one of these two possibilities:
-         * Have a class code, or be a Group
-         * Anything else is rolled over and shouldn't appear as a search result
-         */
-        $restrictions = [];
+        $campusSql = (new Campus())->getSearchSql();
+        $roleSql = (new Role())->getSearchSql();
+        $folderSql = (new Folder($this->folderMapper->getDatabase()))->getSearchSql();
+        $houseSql = (new House())->getSearchSql();
+        $userSql = (new User())->getSearchSql();
+        $yearSql = (new Year())->getSearchSql();
+        $pastoralGroupSql = (new PastoralGroup())->getSearchSql();
 
-        /* These folders are groups
-         */
-        $groups = [];
-
-        $statement = $this->folderMapper->getDatabase()->prepare('
-            SELECT DISTINCT cid
-            FROM userGroups
-        ');
-
-        $statement->execute();
-
-        foreach ($statement as $group) {
-            $groups[] = $group['cid'];
-        }
-
-        if (\count($groups)) {
-            $restrictions[] = 'id IN (' . implode(', ', $groups) . ') ';
-        }
-
-        /* These folders have folder codes
-         */
-        $folderCodes = [];
-
-        $statement = $this->folderMapper->getDatabase()->prepare("
-            SELECT DISTINCT id
-            FROM {$this->folderMapper->getTable()} f
-            INNER JOIN folder_code ON f.id = folder_code.folder_id
-        ");
-
-        $statement->execute();
-
-        foreach ($statement as $folder) {
-            $folderCodes[] = $folder['id'];
-        }
-
-        if (\count($groups)) {
-            $restrictions[] = 'id IN (' . implode(', ', $folderCodes) . ') ';
-        }
-
-        /* Enforce restrictions
-         */
-        $where = '';
-
-        if (\count($restrictions)) {
-            $where = ' AND (' . implode(' OR ', $restrictions) . ') ';
-        }
-
-        /* Any old mapper will do
-         */
         $statement = $this->userMapper->getDatabase()->prepare("
-            (SELECT id, name, 'campus' AS entity_type
-            FROM luCampus
-            WHERE `name` LIKE :keyword)
+            {$campusSql}
             
             UNION
 
-            (SELECT id, name, 'role' AS entity_type
-            FROM groups
-            WHERE `name` LIKE :keyword
-            AND deleted_at IS NULL)
+            {$roleSql}
             
             UNION 
             
-            (SELECT id, house AS name, 'house' AS entity_type
-            FROM house
-            WHERE house LIKE :keyword)
+            {$houseSql}
             
             UNION
 
-            SELECT id, 
-                CONCAT(name,  
-                    CASE
-                    WHEN COUNT(code) > 0
-                    THEN CONCAT(' (', GROUP_CONCAT(code SEPARATOR ', '), ')')
-                    ELSE ''
-                    END) AS name,
-                'folder' AS entity_type
-            FROM folder
-            LEFT JOIN folder_code ON folder.id = folder_code.folder_id AND folder_code.deleted_at IS NULL
-            WHERE id IN 
-                (SELECT folder.id
-                FROM folder
-                LEFT JOIN folder_code ON folder.id = folder_code.folder_id AND folder_code.deleted_at IS NULL
-                WHERE folder.name LIKE :keyword or folder_code.code LIKE :keyword
-                AND folder.deleted_at IS NULL)
-            AND folder.deleted_at IS NULL
-            {$where}
-            GROUP BY folder.id
+            {$folderSql}
 
             UNION
                         
-            (SELECT id, CONCAT(firstname, ' ', lastname) AS name, 'user' AS entity_type
-            FROM `user`
-            WHERE firstname LIKE :keyword OR lastname LIKE :keyword
-            AND deleted_at IS NULL)
-             
-            UNION
-            
-            (SELECT id, 
-                CASE
-                WHEN CONCAT('', 1*`user`.year) = `user`.year
-                THEN CONCAT('Year ', `user`.year)
-                ELSE `user`.year
-                END
-             AS name, 'year' AS entity_type
-            FROM `user`
-            WHERE year LIKE :keyword
-            AND deleted_at IS NULL)
+            {$userSql}
             
             UNION
             
-            (SELECT id, name COLLATE utf8mb4_general_ci, 'pastoral_group' AS entity_type 
-            FROM `pastoral_group`
-            WHERE `name` LIKE :keyword
-            AND deleted_at IS NULL)
+            {$yearSql}
+            
+            UNION
+            
+            {$pastoralGroupSql}
         ");
 
         $statement->execute([
