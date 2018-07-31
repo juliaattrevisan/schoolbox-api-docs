@@ -98,7 +98,7 @@ class Translator
      * @param string $relationship
      * @return string
      */
-    public function translate(string $entityType, string $entityValue, string $relationship): string
+    public function translateToSegment(string $entityType, string $entityValue, string $relationship): string
     {
         $string = "{$this->cache[$entityType][$entityValue]['name']} ({$this->entityTranslation[$entityType]})";
 

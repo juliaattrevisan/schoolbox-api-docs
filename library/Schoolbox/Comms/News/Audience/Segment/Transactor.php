@@ -60,7 +60,7 @@ class Transactor
                      */
                     $pieces[] = [
                         'id' => Codec::encode($entityType, $value, $relationship),
-                        'name' => $translator->translate(
+                        'name' => $translator->translateToSegment(
                             $entityType,
                             $value,
                             $relationship
