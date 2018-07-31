@@ -48,9 +48,6 @@ class Logger implements LoggerInterface {
     /** @var Monologger */
     protected $log;
 
-    /** @var HandlerInterface[] */
-    protected $handlers;
-
     /** @var bool */
     protected $porcelain;
 
@@ -98,7 +95,6 @@ class Logger implements LoggerInterface {
      * @param int $level
      */
     private function setLevel($level) {
-        $this->handlers = array();
         // attach STDOUT
         if(is_resource($this->out)) {
             $handler = new StreamHandler($this->out, $level);
