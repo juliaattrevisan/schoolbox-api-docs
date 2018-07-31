@@ -261,7 +261,7 @@ class Controller extends Base
             'user' => $this->getUser(),
             'article' => $article,
             'featureImageZone' => $zone->getTwigContext(),
-            'audience' => (new Audience\Segments($this->audienceMapper))->load($article),
+            'audience' => (new Audience\Segment\Transactor($this->audienceMapper))->load($article),
             'isCommsOfficer' => (new ValidUserIsCommsOfficer())->isSatisfiedBy($this->getUser()),
         ])->setTitle("Update {$article->getTitle()}"));
     }
@@ -386,7 +386,7 @@ class Controller extends Base
 
         /* Set audiencing options via the hyperdrive
          */
-        (new Audience\Segments($this->audienceMapper))->save($article, $this->getRequest()->post['audience']);
+        (new Audience\Segment\Transactor($this->audienceMapper))->save($article, $this->getRequest()->post['audience']);
     }
 
 

@@ -10,7 +10,6 @@
 namespace Schoolbox\Comms\News\Audience\Segment;
 
 use Schoolbox\Comms\News\Audience\Model;
-use Schoolbox\Comms\News\Audience\Segments;
 
 class Codec
 {
@@ -27,10 +26,10 @@ class Codec
      */
     public static function encode(string $entityType, string $entityValue, string $relationship): string
     {
-        $segment = $entityType . Segments::AUDIENCE_SEPARATOR . base64_encode($entityValue);
+        $segment = $entityType . Transactor::AUDIENCE_SEPARATOR . base64_encode($entityValue);
 
         if ($relationship !== Model::RELATIONSHIP_SELF) {
-            $segment .= Segments::AUDIENCE_SEPARATOR . $relationship;
+            $segment .= Transactor::AUDIENCE_SEPARATOR . $relationship;
         }
 
         return $segment;
@@ -45,7 +44,7 @@ class Codec
      */
     public static function decode(string $segment): array
     {
-        $pieces = explode(Segments::AUDIENCE_SEPARATOR, $segment);
+        $pieces = explode(Transactor::AUDIENCE_SEPARATOR, $segment);
 
         $entityType = $pieces[0];
         $entityValue = base64_decode($pieces[1]);

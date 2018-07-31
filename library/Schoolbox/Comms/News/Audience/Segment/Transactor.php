@@ -1,19 +1,20 @@
 <?php
 /**
- * Segments
+ * Transactor
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2018, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Comms\News\Audience;
+namespace Schoolbox\Comms\News\Audience\Segment;
 
 use PDOException;
 use Schoolbox\Comms\News;
+use Schoolbox\Comms\News\Audience\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 
-class Segments
+class Transactor
 {
 
     /**
@@ -48,7 +49,7 @@ class Segments
     {
         $pieces = [];
 
-        $translator = (new Segment\Translator($this->audienceMapper->getDatabase()))->buildCache($article->getId());
+        $translator = (new Translator($this->audienceMapper->getDatabase()))->buildCache($article->getId());
         $audiencing = $translator->getCache();
 
         foreach ($audiencing as $entityType => $values) {
@@ -58,7 +59,7 @@ class Segments
                     /* translate "name" into something nicer to read for humans
                      */
                     $pieces[] = [
-                        'id' => Segment\Codec::encode($entityType, $value, $relationship),
+                        'id' => Codec::encode($entityType, $value, $relationship),
                         'name' => $translator->translate(
                             $entityType,
                             $value,
@@ -93,7 +94,7 @@ class Segments
             $audiencingOptions = explode(',', $segments);
 
             foreach ($audiencingOptions as $audiencingOption) {
-                $segment = Segment\Codec::decode($audiencingOption);
+                $segment = Codec::decode($audiencingOption);
 
                 $audienceModel = $this->audienceMapper->createModel()
                     ->setCommsNewsArticle($article)
