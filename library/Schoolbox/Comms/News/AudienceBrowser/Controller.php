@@ -88,22 +88,24 @@ class Controller extends Base
 
         /* Campuses
          */
-        $campusMapper = \Schoolbox\CampusMapper::getInstance();
-
-        $campusResults = $campusMapper->findCampuses($keyword);
+        $campusResults = $this->campusMapper->findCampuses($keyword);
 
         foreach ($campusResults as $campusResult) {
-            $searchResult[] = array_combine(['id', 'name'], $campusResult->findValueLabelPair());
+            $searchResult[] = [
+                'id' => "campus_{$campusResult->getId()}",
+                'name' => $campusResult->getName()
+            ];
         }
 
         /* Roles
          */
-        $roleMapper = \Schoolbox\RoleMapper::getInstance();
-
-        $roleResults = $roleMapper->findByName($keyword);
+        $roleResults = $this->roleMapper->findByName($keyword);
 
         foreach ($roleResults as $roleResult) {
-            $searchResult[] = array_combine(['id', 'name'], $roleResult->findValueLabelPair());
+            $searchResult[] = [
+                'id' => "role_{$roleResult->getId()}",
+                'name' => $roleResult->getName()
+            ];
         }
 
         /* Houses
@@ -114,9 +116,7 @@ class Controller extends Base
 
         /* Folders
          */
-        $folderMapper = \Schoolbox\Resource\Folder\Mapper::getInstance();
-
-        $folderResults = $folderMapper->search($this->getUser(), $keyword);
+        $folderResults = $this->folderMapper->search($this->getUser(), $keyword);
 
         foreach ($folderResults->getResult() as $folderResult) {
             $searchResult[] = [
