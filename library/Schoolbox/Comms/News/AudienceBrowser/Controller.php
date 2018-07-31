@@ -12,8 +12,8 @@ use Alaress\Web\Controller\Base;
 use HouseMapper;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
+use Schoolbox\Comms\News\Audience\Segments;
 use Schoolbox\Pastoral;
-use Schoolbox\Resource;
 use Schoolbox\RoleMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\UserMapper;
@@ -85,14 +85,17 @@ class Controller extends Base
     {
         $keyword = $this->getRequest()->query['query'];
         $searchResult = [];
+        $separator = Segments::AUDIENCE_SEPARATOR;
 
         /* Campuses
          */
         $campusResults = $this->campusMapper->findCampuses($keyword);
 
         foreach ($campusResults as $campusResult) {
+            $val = base64_encode($campusResult->getId());
+
             $searchResult[] = [
-                'id' => "campus_{$campusResult->getId()}",
+                'id' => "campus{$separator}{$val}",
                 'name' => "{$campusResult->getName()} (Campus)"
             ];
         }
@@ -102,8 +105,10 @@ class Controller extends Base
         $roleResults = $this->roleMapper->findByName($keyword);
 
         foreach ($roleResults as $roleResult) {
+            $val = base64_encode($roleResult->getId());
+
             $searchResult[] = [
-                'id' => "role_{$roleResult->getId()}",
+                'id' => "role{$separator}{$val}",
                 'name' => "{$roleResult->getName()} (Role)"
             ];
         }
@@ -119,8 +124,10 @@ class Controller extends Base
         $folderResults = $this->folderMapper->search($this->getUser(), $keyword);
 
         foreach ($folderResults->getResult() as $folderResult) {
+            $val = base64_encode($folderResult->getId());
+
             $searchResult[] = [
-                'id' => "folder_{$folderResult->getId()}",
+                'id' => "folder{$separator}{$val}",
                 'name' => "{$folderResult->getNameWithCodes()} (Folder)"
             ];
         }
