@@ -73,6 +73,19 @@ class Translator
         ]);
     }
 
+
+    /**
+     * Take a schematic entity type such as school_house and decide what a human would see in the ui
+     * This doesn't assemble a full audiencing segment
+     *
+     * @param string $entityType
+     * @return mixed
+     */
+    public function translateEntityType(string $entityType)
+    {
+        return $this->entityTranslation[$entityType];
+    }
+
     /**
      * Take a schematic entity type such as school_house and decide what a human would see in the ui
      * Yes, this is presentation logic, but backend is the cleanest place to put it for now due to other data sources

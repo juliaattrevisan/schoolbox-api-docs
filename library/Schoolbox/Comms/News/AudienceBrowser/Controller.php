@@ -90,6 +90,7 @@ class Controller extends Base
         /* TODO: Inject a generic IDatabase
          */
         $registry = new Segment\SearchRegistry($this->folderMapper->getDatabase());
+        $translator = new Segment\Translator($this->folderMapper->getDatabase());
 
         $statement = $this->userMapper->getDatabase()->prepare($registry->getSearchSql());
 
@@ -100,7 +101,7 @@ class Controller extends Base
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $searchResult[] = [
                 'id' => Segment\Codec::encode($row['entity_type'], $row['id'], Model::RELATIONSHIP_SELF),
-                'name' => "{$row['name']} ({$row['entity_type']})"
+                'name' => "{$row['name']} ({$translator->translateEntityType($row['entity_type'])})"
             ];
         }
 
