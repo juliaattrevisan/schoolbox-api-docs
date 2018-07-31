@@ -14,7 +14,7 @@ use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
 use Schoolbox\Comms\News\Audience\Model;
 use Schoolbox\Comms\News\Audience\Segment\SearchRegistry;
-use Schoolbox\Comms\News\Audience\SegmentCodec;
+use Schoolbox\Comms\News\Audience\Segment;
 use Schoolbox\Pastoral;
 use Schoolbox\RoleMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -100,7 +100,7 @@ class Controller extends Base
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $searchResult[] = [
-                'id' => SegmentCodec::encode($row['entity_type'], $row['id'], Model::RELATIONSHIP_SELF),
+                'id' => Segment\Codec::encode($row['entity_type'], $row['id'], Model::RELATIONSHIP_SELF),
                 'name' => "{$row['name']} ({$row['entity_type']})"
             ];
         }

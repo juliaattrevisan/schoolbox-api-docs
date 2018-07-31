@@ -58,7 +58,7 @@ class Segments
                     /* translate "name" into something nicer to read for humans
                      */
                     $pieces[] = [
-                        'id' => SegmentCodec::encode($entityType, $value, $relationship),
+                        'id' => Segment\Codec::encode($entityType, $value, $relationship),
                         'name' => $translator->translate(
                             $entityType,
                             $value,
@@ -93,7 +93,7 @@ class Segments
             $audiencingOptions = explode(',', $segments);
 
             foreach ($audiencingOptions as $audiencingOption) {
-                $segment = SegmentCodec::decode($audiencingOption);
+                $segment = Segment\Codec::decode($audiencingOption);
 
                 $audienceModel = $this->audienceMapper->createModel()
                     ->setCommsNewsArticle($article)
