@@ -184,7 +184,10 @@ class Controller extends BaseController
         );
 
         // TODO pass something real
-        $this->getResponse()->content->set($this->buildJsonOutput([]));
+        $this->response->content->set($this->buildJsonOutput([]));
+        // SHUP.
+        /** @noinspection PhpUnhandledExceptionInspection */
+        $this->response->status->setCode(204);
     }
 
 
