@@ -107,17 +107,17 @@ class External_Denbigh_Timetable implements External_TimetableInterface
             /** @noinspection SqlDialectInspection */
             $queryTimetable = $this->externalDatabase->prepareQuery(
                 "
-                    SELECT      l.day, 
-                                l.period, 
-                                startTime, 
-                                endTime, 
-                                l.classCode, 
-                                l.staffCode, 
-                                l.room, 
+                    SELECT      l.day,
+                                l.period,
+                                startTime,
+                                endTime,
+                                l.classCode,
+                                l.staffCode,
+                                l.room,
                                 co.subjectName
                     FROM        People p
                     RIGHT JOIN  Staff s ON s.peopleDenbighID = p.denbighID
-                    RIGHT JOIN  Lessons l ON l.staffCode = s.staffCode
+                    RIGHT JOIN  Lessons l ON l.staffCode = s.staffCode OR l.staffCodeSecond = s.staffCode
                     RIGHT JOIN  Classes cl ON cl.classCode = l.classCode
                     RIGHT JOIN  Courses co ON co.courseCode = cl.courseCode
                     WHERE       p.denbighID = :externalUserId
@@ -127,13 +127,13 @@ class External_Denbigh_Timetable implements External_TimetableInterface
             /** @noinspection SqlDialectInspection */
             $queryTimetable = $this->externalDatabase->prepareQuery(
                 "
-                    SELECT      l.day, 
-                                l.period, 
-                                startTime, 
-                                endTime, 
-                                l.classCode, 
-                                l.staffCode, 
-                                l.room, 
+                    SELECT      l.day,
+                                l.period,
+                                startTime,
+                                endTime,
+                                l.classCode,
+                                l.staffCode,
+                                l.room,
                                 co.subjectName
                     FROM        People p
                     RIGHT JOIN  Enrolments e ON e.studentID = p.denbighID
@@ -269,17 +269,17 @@ class External_Denbigh_Timetable implements External_TimetableInterface
             /** @noinspection SqlDialectInspection */
             $queryTimetable = $this->externalDatabase->prepareQuery(
                 "
-                    SELECT      l.day, 
-                                l.period, 
-                                startTime, 
-                                endTime, 
-                                l.classCode, 
-                                l.staffCode, 
-                                l.room, 
+                    SELECT      l.day,
+                                l.period,
+                                startTime,
+                                endTime,
+                                l.classCode,
+                                l.staffCode,
+                                l.room,
                                 co.subjectName
                     FROM        People p
                     RIGHT JOIN  Staff s ON s.peopleDenbighID = p.denbighID
-                    RIGHT JOIN  Lessons l ON l.staffCode = s.staffCode
+                    RIGHT JOIN  Lessons l ON l.staffCode = s.staffCode OR l.staffCodeSecond = s.staffCode
                     RIGHT JOIN  Classes cl ON cl.classCode = l.classCode
                     RIGHT JOIN  Courses co ON co.courseCode = cl.courseCode
                     WHERE       p.denbighID = :externalUserId AND
@@ -290,13 +290,13 @@ class External_Denbigh_Timetable implements External_TimetableInterface
             /** @noinspection SqlDialectInspection */
             $queryTimetable = $this->externalDatabase->prepareQuery(
                 "
-                    SELECT      l.day, 
-                                l.period, 
-                                startTime, 
-                                endTime, 
-                                l.classCode, 
-                                l.staffCode, 
-                                l.room, 
+                    SELECT      l.day,
+                                l.period,
+                                startTime,
+                                endTime,
+                                l.classCode,
+                                l.staffCode,
+                                l.room,
                                 co.subjectName
                     FROM        People p
                     RIGHT JOIN  Enrolments e ON e.studentID = p.denbighID
@@ -370,8 +370,8 @@ class External_Denbigh_Timetable implements External_TimetableInterface
         /** @noinspection SqlDialectInspection */
         $queryCampus = $this->internalDatabase->executeQuery(
             "
-              SELECT    ext_timetable_code 
-              FROM      luCampus 
+              SELECT    ext_timetable_code
+              FROM      luCampus
               LIMIT     1
             "
         );
@@ -391,16 +391,16 @@ class External_Denbigh_Timetable implements External_TimetableInterface
         /** @noinspection SqlDialectInspection */
         return $this->externalDatabase->executeQuery(
             "
-                SELECT      l.day AS DayNumber, 
-                            l.period AS PeriodNumber, 
-                            startTime AS PeriodStart, 
-                            endTime AS PeriodEnd, 
-                            l.classCode AS ClassCode, 
-                            l.staffCode AS StaffID, 
-                            l.room AS RoomCode, 
+                SELECT      l.day AS DayNumber,
+                            l.period AS PeriodNumber,
+                            startTime AS PeriodStart,
+                            endTime AS PeriodEnd,
+                            l.classCode AS ClassCode,
+                            l.staffCode AS StaffID,
+                            l.room AS RoomCode,
                             co.subjectName AS Description,
                             :timetableGroup AS TimetableGroup
-                FROM        Lessons l 
+                FROM        Lessons l
                 RIGHT JOIN  Classes cl ON cl.classCode = l.classCode
                 RIGHT JOIN  Courses co ON co.courseCode = cl.courseCode
                 WHERE       l.room IN ({$predicate["placeholders"]})
