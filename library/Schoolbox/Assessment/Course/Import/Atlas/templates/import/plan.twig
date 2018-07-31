@@ -127,7 +127,10 @@
                                     <div class="switch round">
                                         <input id="attachment-{{ attachment.id }}-visible-to-students"
                                                name="unit[{{ unit.id }}][attachment][{{ attachment.id }}][visibleToStudents]"
-                                               type="checkbox">
+                                               type="checkbox"
+                                               data-checkbox-group="unit-{{ unit.id }}-attachments"
+                                               class="round-switch"
+                                        >
                                         <label for="attachment-{{ attachment.id }}-visible-to-students">
                                             <span class="icon-approve"></span>
                                             <span class="icon-cancel"></span>
