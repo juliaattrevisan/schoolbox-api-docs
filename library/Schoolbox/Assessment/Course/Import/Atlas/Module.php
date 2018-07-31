@@ -9,6 +9,7 @@ namespace Schoolbox\Assessment\Course\Import\Atlas;
 use Alaress\Authorizer\Rule;
 use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\ContainerInterface;
+use Component_InstanceMapper;
 use GuzzleHttp\Client;
 use Karriere\JsonDecoder\JsonDecoder;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper as RubricCriterionMapper;
@@ -25,6 +26,7 @@ use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\HomepageConfigMapper;
 use Schoolbox\Resource\HomepageTemplateMapper;
+use Schoolbox\Resource\Textbox\Mapper as TextboxMapper;
 use Schoolbox\Resource\LinkMapper;
 use Twig\Error\LoaderError;
 
@@ -136,7 +138,14 @@ class Module extends \Alaress\Module\Module
                                         Attachment::ATTACHMENT_TYPE_FILE,
                                         Attachment::ATTACHMENT_TYPE_IMAGE,
                                         Attachment::ATTACHMENT_TYPE_LESSON,
-                                        // TODO these should be handled by an embed handler
+                                    ]
+                                )
+                                ->registerAttachmentHandler(
+                                    new AttachmentHandler\Embed(
+                                        $this->getMapperFactory()->get(TextboxMapper::class),
+                                        $this->getMapperFactory()->get(Component_InstanceMapper::class)
+                                    ),
+                                    [
                                         Attachment::ATTACHMENT_TYPE_GOOGLE_DRIVE,
                                         Attachment::ATTACHMENT_TYPE_ONEDRIVE,
                                     ]
