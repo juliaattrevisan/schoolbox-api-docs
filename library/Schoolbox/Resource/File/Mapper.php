@@ -24,6 +24,7 @@ use Schoolbox\User;
  * @package Schoolbox\Resource\File
  * @method Model hydrate(array $row, $alias = '', $callback = null)
  * @method Model findById($id)
+ * @method Model createModel($idValue = null)
  */
 class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMapper, Searchable, IHomepageCleanable
 {
