@@ -99,9 +99,21 @@ class Controller extends Base
         ]);
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $name = "{$row['name']} ({$translator->translateEntityType($row['entity_type'])})";
+
             $searchResult[] = [
                 'id' => Segment\Codec::encode($row['entity_type'], $row['id'], Model::RELATIONSHIP_SELF),
-                'name' => "{$row['name']} ({$translator->translateEntityType($row['entity_type'])})"
+                'name' => $name
+            ];
+
+            $searchResult[] = [
+                'id' => Segment\Codec::encode($row['entity_type'], $row['id'], Model::RELATIONSHIP_PARENTS_OF),
+                'name' => "{$name} [{$translator->translateModifier(Model::RELATIONSHIP_PARENTS_OF)}]"
+            ];
+
+            $searchResult[] = [
+                'id' => Segment\Codec::encode($row['entity_type'], $row['id'], Model::RELATIONSHIP_TEACHERS_OF),
+                'name' => "{$name} [{$translator->translateModifier(Model::RELATIONSHIP_TEACHERS_OF)}]"
             ];
         }
 

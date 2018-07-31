@@ -86,6 +86,20 @@ class Translator
         return $this->entityTranslation[$entityType];
     }
 
+
+    /**
+     * Take a schematic modifier such as parents_of and decide what a human would see in the ui
+     * This doesn't assemble a full audiencing segment
+     *
+     * @param string $modifier
+     * @return mixed
+     */
+    public function translateModifier(string $modifier)
+    {
+        return $this->modifierTranslation[$modifier];
+    }
+
+
     /**
      * Take a schematic entity type such as school_house and decide what a human would see in the ui
      * Yes, this is presentation logic, but backend is the cleanest place to put it for now due to other data sources
