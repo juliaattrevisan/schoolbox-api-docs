@@ -88,6 +88,13 @@ class Controller extends Base
 
         /* Campuses
          */
+        $campusMapper = \Schoolbox\CampusMapper::getInstance();
+
+        $campusResults = $campusMapper->findCampuses($keyword);
+
+        foreach ($campusResults as $campusResult) {
+            $searchResult[] = array_combine(['id', 'name'], $campusResult->findValueLabelPair());
+        }
 
         /* Roles
          */
