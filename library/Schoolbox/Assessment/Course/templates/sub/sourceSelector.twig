@@ -27,7 +27,7 @@
                 target = $selector.data('source'),
                 $input = $('[name="' + target + '"]');
 
-            var modal = $('#parent-select');
+            var modal = $('<div data-reveal class="reveal-modal" />');
 
             modal.foundation('reveal', 'open', '{{ routeLookup('course.parentList') }}/' + $("#parent").val()).one('click', '[data-selection]', function (e) {
                 e.preventDefault();
@@ -81,5 +81,3 @@
         </div>
     </div>
 {% endif %}
-
-<div id="parent-select" data-reveal class="reveal-modal"></div>
