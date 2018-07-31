@@ -131,11 +131,11 @@
                 units.find('[data-checkbox-group]').on('change', function () {
                     var $this    = $(this),
                         group    = $this.data('checkboxGroup'),
-                        selected = units.find('[data-checkbox-group="'+group+'"]:checked:not(:disabled)'),
-                        counter  = units.find('[data-checkbox-group-count="'+group+'"]');
+                        $selected = units.find('[data-checkbox-group="'+group+'"]:checked:not(:disabled)'),
+                        $counter  = units.find('[data-checkbox-group-count="'+group+'"]');
 
                     // Update selected counts when an assess/attach is selected/unselected
-                    counter.attr('data-show-count', "- " + (selected.length === 0 ? "none" : selected.length));
+                    $counter.attr('data-show-count', "- " + ($selected.length === 0 ? "none" : $selected.length));
 
                     // Disable the visibility toggle when its associated attachment is unchecked
                     if ($this.is(':not(.round-switch)')) {
