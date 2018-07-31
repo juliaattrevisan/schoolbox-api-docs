@@ -191,22 +191,31 @@ th, td{
 	}
 }
 
-// Input & buttons to sit next to eachother
+// Input & buttons to sit next to each other
 .input-group{
 	@include flex;
 	align-items: flex-start;
+
 	input,
-	select {
-		flex: 0 auto;
+	select,
+	.attachzone {
+		flex: 1 1 auto;
 		& + .button{
-			flex: 1 0 auto;
+			flex: 0 0 auto;
 		}
 	}
 	@media #{$small-only} {
-		input{
-			margin: 0;
-		}
 		flex-wrap: wrap;
+
+		input,
+		select,
+		.attachzone {
+			margin: 0;
+
+			& + .button {
+				flex: 1 0 auto;
+			}
+		}
 	}
 }
 
