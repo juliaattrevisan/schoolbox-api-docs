@@ -134,7 +134,7 @@
                         group    = $this.data('checkboxGroup'),
                         selected = units.find('[data-checkbox-group="'+group+'"]:checked:not(:disabled)'),
                         counter  = units.find('[data-checkbox-group-count="'+group+'"]');
-                    counter.attr('data-show-count', selected.length);
+                    counter.attr('data-show-count', "- " + (selected.length === 0 ? "none" : selected.length));
                 });
 
                 // Unit:
@@ -147,13 +147,13 @@
                         disable      = !$this.prop('checked'),
                         $assessments = units.find('[data-checkbox-group="unit-'+unit+'-assessments"]'),
                         $attachments = units.find('[data-checkbox-group="unit-'+unit+'-attachments"]'),
-                        unitMeta     = units.find('[data-unit-meta="'+unit+'"]');
+                        metaSelected  = units.find('[data-unit-meta="'+unit+'"] [data-checkbox-group-count]');
                     $assessments.prop('disabled', disable);
                     $attachments.prop('disabled', disable);
                     if (disable) {
-                        unitMeta.slideUp();
+                        metaSelected.hide();
                     } else {
-                        unitMeta.slideDown();
+                        metaSelected.show();
                     }
                 });
             }

@@ -27,6 +27,10 @@
 }
 
 #curriculum-plan-units {
+  .unit-empty {
+    background: #f9f9f9;
+  }
+
   li.child {
     margin-left: 1.75rem;
     padding: 0;
