@@ -10,7 +10,6 @@ namespace Schoolbox\Assessment\Course\Import\Atlas\AttachmentHandler;
 
 use GuzzleHttp\Client as HttpClient;
 use Schoolbox\Assessment\Course\Import\Atlas\Api\Attachment;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
@@ -18,7 +17,7 @@ use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 /**
  * Handler for importation of files from Atlas to Schoolbox.
  */
-class File
+class File implements IAttachmentHandler
 {
     /**
      * @var HttpClient
@@ -54,12 +53,7 @@ class File
 
 
     /**
-     * Attach this attachment to the given folder.
-     *
-     * @param Folder     $folder
-     * @param Attachment $attachment
-     * @param bool       $private
-     * @throws MapperException if something goes wrong whilst saving link
+     * @inheritdoc
      */
     public function attach(Folder $folder, Attachment $attachment, bool $private): void
     {

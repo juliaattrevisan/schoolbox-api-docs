@@ -9,14 +9,13 @@ declare(strict_types=1);
 namespace Schoolbox\Assessment\Course\Import\Atlas\AttachmentHandler;
 
 use Schoolbox\Assessment\Course\Import\Atlas\Api\Attachment;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\LinkMapper;
 
 /**
  * Handler for importation of links from Atlas to Schoolbox.
  */
-class Link
+class Link implements IAttachmentHandler
 {
     /**
      * @var LinkMapper
@@ -38,6 +37,8 @@ class Link
     /**
      * Create a component for this item to live in.
      *
+     * TODO implement component creation
+     *
      * @param Folder $folder
      */
     public function createComponent(Folder $folder): void
@@ -48,12 +49,7 @@ class Link
 
 
     /**
-     * Attach this attachment to the given folder.
-     *
-     * @param Folder     $folder
-     * @param Attachment $attachment
-     * @param bool       $private
-     * @throws MapperException if something goes wrong whilst saving link
+     * @inheritdoc
      */
     public function attach(Folder $folder, Attachment $attachment, bool $private): void
     {
