@@ -1,3 +1,9 @@
+// UGH had to do this because of faculty selector being wrapped in a div in its twig fragment
+// TODO make fragment not include the div wrapper
+.atlas-labels .small-12.column {
+  padding: 0;
+}
+
 #curriculum-plan-list, #curriculum-plan-units {
   padding-bottom: 1.5rem;
 

@@ -27,7 +27,7 @@
                 <fieldset data-mage="part-1" class="content">
                     <legend>Select a Curriculum Plan</legend>
                     <div data-mage-collapsefinal>
-                        <div class="small-12 medium-6 column">
+                        <div class="small-12 medium-6 column atlas-labels">
                             <label>School
                                 <select id="curriculum-school">
                                     <option value="">(all schools)</option>
@@ -43,7 +43,19 @@
                                     <option value="">(all subjects)</option>
                                 </select>
                             </label>
+                            <div class="small-12 column">
+                                {% include '@course/sub/sourceSelector.twig' with {
+                                    courseSpec: null,
+                                } only %}
+                            </div>
+
+                            {% if not isValidFacultyRoot %}
+                                <div class="small-12 column">
+                                    {% include '@course/sub/invalidFacultyRoot.twig' %}
+                                </div>
+                            {% endif %}
                         </div>
+
                         <div class="small-12 medium-6 column">
                             <label>Curriculum Plans</label>
                             <ul class="information-list card-selectable" id="curriculum-plan-list">
@@ -66,18 +78,6 @@
                                 </li>
                             </ul>
                         </div>
-
-                        <div class="small-12 column">
-                            {% include '@course/sub/sourceSelector.twig' with {
-                                courseSpec: null,
-                            } only %}
-                        </div>
-
-                        {% if not isValidFacultyRoot %}
-                            <div class="small-12 column">
-                                {% include '@course/sub/invalidFacultyRoot.twig' %}
-                            </div>
-                        {% endif %}
 
                     </div>
                     <div data-mage-submitrow>
