@@ -463,7 +463,7 @@ class Importer
     {
         $attachmentType = $attachment->getAttachmentType();
         if (isset($this->attachmentHandlers[$attachmentType])) {
-            $this->attachmentHandlers[$attachmentType]->attach($folder, $attachment, $visibleToStudents);
+            $this->attachmentHandlers[$attachmentType]->attach($attachment, $folder, $visibleToStudents);
         }
 
 //        // TODO did I pass the attachment as private?

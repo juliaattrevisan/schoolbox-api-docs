@@ -21,10 +21,10 @@ interface IAttachmentHandler
     /**
      * Attach this attachment to the given folder.
      *
-     * @param Folder     $folder
      * @param Attachment $attachment
+     * @param Folder     $folder
      * @param bool       $private
      * @throws MapperException if something goes wrong whilst attaching
      */
-    public function attach(Folder $folder, Attachment $attachment, bool $private): void;
+    public function attach(Attachment $attachment, Folder $folder, bool $private): void;
 }

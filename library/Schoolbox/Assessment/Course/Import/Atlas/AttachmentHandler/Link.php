@@ -51,7 +51,7 @@ class Link implements IAttachmentHandler
     /**
      * @inheritdoc
      */
-    public function attach(Folder $folder, Attachment $attachment, bool $private): void
+    public function attach(Attachment $attachment, Folder $folder, bool $private): void
     {
         $linkModel = $this->linkMapper->createModel()
             ->setFolder($folder)

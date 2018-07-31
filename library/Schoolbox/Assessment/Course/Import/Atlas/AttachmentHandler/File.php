@@ -55,7 +55,7 @@ class File implements IAttachmentHandler
     /**
      * @inheritdoc
      */
-    public function attach(Folder $folder, Attachment $attachment, bool $private): void
+    public function attach(Attachment $attachment, Folder $folder, bool $private): void
     {
         // This needs to download the file from a private Atlas instance.
         // I assume I can do this with the same auth token as the API has?
