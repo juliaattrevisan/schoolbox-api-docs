@@ -96,13 +96,38 @@ class Controller extends Base
             WHERE `name` LIKE :keyword)
             
             UNION
+
+            (SELECT id, name, 'role' AS entity_type
+            FROM groups
+            WHERE `name` LIKE :keyword)
+            
+            UNION 
             
             (SELECT id, house AS name, 'house' AS entity_type
             FROM house
             WHERE house LIKE :keyword)
             
             UNION
-            
+
+            SELECT id, 
+                CONCAT(name,  
+                    CASE
+                    WHEN COUNT(code) > 0
+                    THEN CONCAT(' (', GROUP_CONCAT(code SEPARATOR ', '), ')')
+                    ELSE ''
+                    END) AS name,
+                'folder' AS entity_type
+            FROM folder
+            LEFT JOIN folder_code ON folder.id = folder_code.folder_id AND folder_code.deleted_at IS NULL
+            WHERE id IN 
+                (SELECT folder.id
+                FROM folder
+                LEFT JOIN folder_code ON folder.id = folder_code.folder_id AND folder_code.deleted_at IS NULL
+                WHERE folder.name LIKE :keyword or folder_code.code LIKE :keyword)
+            GROUP BY folder.id
+
+            UNION
+                        
             (SELECT id, CONCAT(firstname, ' ', lastname) AS name, 'user' AS entity_type
             FROM `user`
             WHERE firstname LIKE :keyword OR lastname LIKE :keyword)
@@ -121,12 +146,6 @@ class Controller extends Base
             
             UNION
             
-            (SELECT id, name, 'role' AS entity_type
-            FROM groups
-            WHERE `name` LIKE :keyword)
-            
-            UNION 
-            
             (SELECT id, name COLLATE utf8mb4_general_ci, 'pastoral_group' AS entity_type 
             FROM `pastoral_group`
             WHERE `name` LIKE :keyword)
@@ -136,47 +155,14 @@ class Controller extends Base
             'keyword' => $keyword,
         ]);
 
-
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $segment = null;
-
-            switch ($row['entity_type']) {
-                case 'campus':
-                case 'house':
-                case 'pastoral_group':
-                case 'role':
-                case 'user':
-                case 'year':
-                    $segment = SegmentCodec::encode($row['entity_type'], $row['id'], Model::RELATIONSHIP_SELF);
-                    break;
-
-            }
-
             $searchResult[] = [
-                'id' => $segment,
+                'id' => SegmentCodec::encode($row['entity_type'], $row['id'], Model::RELATIONSHIP_SELF),
                 'name' => "{$row['name']} ({$row['entity_type']})"
             ];
         }
 
-        new \Alaress_Probe($searchResult);
-
-        die();
-//
-//
-//        /* Folders
-//         */
-//        $folderResults = $this->folderMapper->search($this->getUser(), $keyword);
-//
-//        foreach ($folderResults->getResult() as $folderResult) {
-//            $searchResult[] = [
-//                'id' => SegmentCodec::encode('folder', $folderResult->getId(), Model::RELATIONSHIP_SELF),
-//                'name' => "{$folderResult->getNameWithCodes()} (Folder)"
-//            ];
-//        }
-//
-//        /* Pastoral Groups
-//         */
-//        $this->getResponse()->content->set($this->buildJsonOutput($searchResult));
+        $this->getResponse()->content->set($this->buildJsonOutput($searchResult));
     }
 
 
