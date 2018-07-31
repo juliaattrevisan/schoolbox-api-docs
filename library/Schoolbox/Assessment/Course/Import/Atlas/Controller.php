@@ -162,8 +162,9 @@ class Controller extends BaseController
             $this->buildUnthemedHtmlOutput(
                 '@courseImportAtlas/import/plan.twig',
                 [
-                    'curriculum'   => $curriculumPlan,
-                    'previousPost' => $previousPost,
+                    'curriculum'         => $curriculumPlan,
+                    'previousPost'       => $previousPost,
+                    'attachmentDefaults' => $this->importer->buildDefaultSettingsForAttachments($curriculumPlan),
                 ]
             )
         );
