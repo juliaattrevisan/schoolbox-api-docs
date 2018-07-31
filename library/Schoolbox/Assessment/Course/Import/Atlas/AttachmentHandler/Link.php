@@ -62,4 +62,19 @@ class Link implements IAttachmentHandler
             ->setHidden($private);
         $this->linkMapper->save($linkModel);
     }
+
+
+    /**
+     * Links are enabled and private by default.
+     *
+     * @param Attachment $attachment
+     * @return array
+     */
+    public function getDefaultSettings(Attachment $attachment): array
+    {
+        return [
+            'enabled' => true,
+            'private' => true,
+        ];
+    }
 }

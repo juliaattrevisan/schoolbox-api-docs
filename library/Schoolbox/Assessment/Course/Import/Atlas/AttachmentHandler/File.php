@@ -76,4 +76,19 @@ class File implements IAttachmentHandler
             ->setHidden($private);
         $this->fileMapper->save($fileModel);
     }
+
+
+    /**
+     * Files are enabled and private by default.
+     *
+     * @param Attachment $attachment
+     * @return array
+     */
+    public function getDefaultSettings(Attachment $attachment): array
+    {
+        return [
+            'enabled' => true,
+            'private' => true,
+        ];
+    }
 }

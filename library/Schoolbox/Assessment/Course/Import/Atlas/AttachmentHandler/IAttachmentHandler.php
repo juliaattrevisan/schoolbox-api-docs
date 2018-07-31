@@ -29,4 +29,15 @@ interface IAttachmentHandler
      * @throws MapperException if something goes wrong whilst attaching
      */
     public function attach(Attachment $attachment, Folder $folder, bool $private, User $owner): void;
+
+
+    /**
+     * Retrieves the default settings for this attachment.
+     *
+     * @param Attachment $attachment
+     * @return array enabled: is this attachment enabled by default?
+     *               private: is this attachment private by default?
+     *                        (if not set, this doesn't support private)
+     */
+    public function getDefaultSettings(Attachment $attachment): array;
 }
