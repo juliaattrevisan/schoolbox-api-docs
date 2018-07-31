@@ -122,6 +122,15 @@ class Controller extends Base
 
 
     /**
+     * Get (id, name) tuples for every Pastoral Group
+     */
+    public function getPastoralGroups()
+    {
+        $this->getResponse()->content->set($this->generate($this->pastoralGroupMapper->findAll()));
+    }
+
+
+    /**
      * Get (id, name) tuples for every House
      */
     public function getHouses()
@@ -179,14 +188,5 @@ class Controller extends Base
             'success' => true,
             'data' => $data
         ]));
-    }
-
-
-    /**
-     * Get (id, name) tuples for every Pastoral Group
-     */
-    public function getPastoralGroups()
-    {
-        $this->getResponse()->content->set($this->generate($this->pastoralGroupMapper->findAll()));
     }
 }
