@@ -13,6 +13,7 @@ use Schoolbox\Assessment\Course\Import\Atlas\Api\Attachment;
 use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
+use Schoolbox\User;
 
 /**
  * Handler for importation of files from Atlas to Schoolbox.
@@ -55,7 +56,7 @@ class File implements IAttachmentHandler
     /**
      * @inheritdoc
      */
-    public function attach(Attachment $attachment, Folder $folder, bool $private): void
+    public function attach(Attachment $attachment, Folder $folder, bool $private, User $owner): void
     {
         // This needs to download the file from a private Atlas instance.
         // I assume I can do this with the same auth token as the API has?
@@ -71,6 +72,7 @@ class File implements IAttachmentHandler
             ->setFolder($folder)
             ->setTitle($attachment->getTitle())
             ->setStorage($storageModel)
+            ->setOwner($owner)
             ->setHidden($private);
         $this->fileMapper->save($fileModel);
     }

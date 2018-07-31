@@ -11,6 +11,7 @@ namespace Schoolbox\Assessment\Course\Import\Atlas\AttachmentHandler;
 use Schoolbox\Assessment\Course\Import\Atlas\Api\Attachment;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\LinkMapper;
+use Schoolbox\User;
 
 /**
  * Handler for importation of links from Atlas to Schoolbox.
@@ -51,12 +52,13 @@ class Link implements IAttachmentHandler
     /**
      * @inheritdoc
      */
-    public function attach(Attachment $attachment, Folder $folder, bool $private): void
+    public function attach(Attachment $attachment, Folder $folder, bool $private, User $owner): void
     {
         $linkModel = $this->linkMapper->createModel()
             ->setFolder($folder)
             ->setDescription($attachment->getTitle())
             ->setUrl($attachment->getUrl())
+            ->setOwner($owner)
             ->setHidden($private);
         $this->linkMapper->save($linkModel);
     }
