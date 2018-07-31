@@ -182,7 +182,7 @@ class Controller extends BaseController
             return;
         }
 
-        // Hard-coded folder for testing (faculty root)
+        // Get the folder the course is to be imported into
         $parentFolderId = $this->request->post->getInt('parent');
         if ($parentFolderId) {
             $baseFolder = $this->folderMapper->findById($parentFolderId);
