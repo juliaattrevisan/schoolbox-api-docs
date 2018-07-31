@@ -17,6 +17,7 @@ use Schoolbox\Comms\News\Audience\Segment\Search\Campus;
 use Schoolbox\Comms\News\Audience\Segment\Search\Folder;
 use Schoolbox\Comms\News\Audience\Segment\Search\House;
 use Schoolbox\Comms\News\Audience\Segment\Search\PastoralGroup;
+use Schoolbox\Comms\News\Audience\Segment\Search\Registry;
 use Schoolbox\Comms\News\Audience\Segment\Search\Role;
 use Schoolbox\Comms\News\Audience\Segment\Search\User;
 use Schoolbox\Comms\News\Audience\Segment\Search\Year;
@@ -95,41 +96,11 @@ class Controller extends Base
         $keyword = '%' . $this->getRequest()->query['query'] . '%';
         $searchResult = [];
 
-        $campusSql = (new Campus())->getSearchSql();
-        $roleSql = (new Role())->getSearchSql();
-        $folderSql = (new Folder($this->folderMapper->getDatabase()))->getSearchSql();
-        $houseSql = (new House())->getSearchSql();
-        $userSql = (new User())->getSearchSql();
-        $yearSql = (new Year())->getSearchSql();
-        $pastoralGroupSql = (new PastoralGroup())->getSearchSql();
+        /* TODO: Inject a generic IDatabase
+         */
+        $registry = new Registry($this->folderMapper->getDatabase());
 
-        $statement = $this->userMapper->getDatabase()->prepare("
-            {$campusSql}
-            
-            UNION
-
-            {$roleSql}
-            
-            UNION 
-            
-            {$houseSql}
-            
-            UNION
-
-            {$folderSql}
-
-            UNION
-                        
-            {$userSql}
-            
-            UNION
-            
-            {$yearSql}
-            
-            UNION
-            
-            {$pastoralGroupSql}
-        ");
+        $statement = $this->userMapper->getDatabase()->prepare($registry->getSearchSql());
 
         $statement->execute([
             'keyword' => $keyword,
