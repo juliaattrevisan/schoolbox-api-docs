@@ -52,24 +52,27 @@ class Segments
 
         foreach ($audiencing as $entityType => $values) {
             foreach ($values as $value => $data) {
-                $segment = $entityType . self::AUDIENCE_SEPARATOR . base64_encode($value);
+                foreach ($data['relationships'] as $relationship) {
+                    $segment = $entityType . self::AUDIENCE_SEPARATOR . base64_encode($value);
 
-                if ($data['relationship'] !== Model::RELATIONSHIP_SELF) {
-                    $segment .= self::AUDIENCE_SEPARATOR . $data['relationship'];
+                    if ($relationship !== Model::RELATIONSHIP_SELF) {
+                        $segment .= self::AUDIENCE_SEPARATOR . $relationship;
+                    }
+
+                    /* translate "name" into something nicer to read for humans
+                     */
+                    $pieces[] = [
+                        'id' => $segment,
+                        'name' => $translator->translate(
+                            $entityType,
+                            $value,
+                            $relationship
+                        ),
+                    ];
                 }
-
-                /* translate "name" into something nicer to read for humans
-                 */
-                $pieces[] = [
-                    'id' => $segment,
-                    'name' => $translator->translate(
-                        $entityType,
-                        $value,
-                        $data['relationship']
-                    ),
-                ];
             }
         }
+
         return $pieces;
     }
 

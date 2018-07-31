@@ -167,7 +167,7 @@ class SegmentTranslator
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $refined[$row['entity_type']][$row['entity_value']]['name'] = $row['name'];
-            $refined[$row['entity_type']][$row['entity_value']]['relationship'] = $row['relationship'];
+            $refined[$row['entity_type']][$row['entity_value']]['relationships'][] = $row['relationship'];
         }
 
         /* For each of the folders, get their class codes as well
