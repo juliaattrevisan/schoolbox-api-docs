@@ -444,7 +444,7 @@ class RubricMapper
             $descriptors[$d->getCriterion()->getId()][$d->getLevel()->getSequence()] = [
                 'id'     => $d->getId(),
                 'text'   => $d->getDescription(),
-                'points' => $d->getValue(),
+                'points' => $d->getMaxValue(),
             ];
         }
 
@@ -715,16 +715,27 @@ class RubricMapper
 
         $marksToSave = $markMapper->createCollection();
 
-        foreach ($descriptors as $descriptorId => $isChecked) {
-            if (!$isChecked) {
-                continue;
+        // What actually got saved?
+        $selectedDescriptors = [];
+        foreach ($descriptors as $id => $descriptor) {
+            if (!empty($descriptor['selected'])) {
+                $selectedDescriptors[$id] = $descriptor['value'];
             }
+        }
+
+        $descriptorModels = $descriptorMapper->findByColumn('id', array_keys($selectedDescriptors));
+        foreach ($selectedDescriptors as $descriptorId => $value) {
+
+            // If this isn't set: this is an issue
+            $descriptor = $descriptorModels[$descriptorId];
 
             $marksToSave->add(
                 $markMapper->createModel()
                            ->setSubmissionReturn($returnedWorkMapper->createModel($returnId))
-                           ->setDescriptor($descriptorMapper->createModel($descriptorId))
+                           ->setDescriptor($descriptor)
                            ->setValid(true)
+                           // Take value from form preferentially, then descriptor
+                           ->setValue($value ?? $descriptor->getMaxValue())
             );
         }
 
@@ -904,8 +915,8 @@ class RubricMapper
                 }
 
                 // Has the value changed ?
-                $existingValue = $existingDescriptor->getValue();
-                $newValue      = $newDescriptor->getValue();
+                $existingValue = $existingDescriptor->getMaxValue();
+                $newValue      = $newDescriptor->getMaxValue();
                 if ($existingValue != $newValue) {
                     $hasDescriptorValuesChanged = true;
                     break;
@@ -1350,7 +1361,7 @@ class RubricMapper
 
         // 1. Get latest published student marks
         $stmt = $this->database->prepare("
-            SELECT sr.owner, sb.id AS 'sb.id', rc.id AS 'rc.id', rd.value AS 'mark'
+            SELECT sr.owner, sb.id AS 'sb.id', rc.id AS 'rc.id', rm.value AS 'mark'
             FROM rubric_mark rm
             JOIN rubric_descriptor rd ON rd.id = rm.descriptor_id AND rd.deleted_at IS NULL
             JOIN rubric_criterion  rc ON rc.id = rd.criterion_id AND rc.deleted_at IS NULL
@@ -1392,7 +1403,7 @@ class RubricMapper
            ->greaterThan('rd.value', 0.0);
         $whereClause = implode(' AND ', $pb->getWhere());
         $stmt        = $this->database->prepare("
-            SELECT rl.box_id AS 'sb.id', rc.id AS 'rc.id', rg.name AS grouping, rc.name, MAX(rd.value) AS 'max_mark'
+            SELECT rl.box_id AS 'sb.id', rc.id AS 'rc.id', rg.name AS grouping, rc.name, MAX(rd.max_value) AS 'max_mark'
             FROM rubric_descriptor rd
             JOIN rubric_criterion rc ON rc.id = rd.criterion_id AND rc.deleted_at IS NULL
             JOIN rubric_group     rg ON rg.id = rc.rubric_group_id AND rg.deleted_at IS NULL

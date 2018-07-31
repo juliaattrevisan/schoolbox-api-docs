@@ -32,6 +32,10 @@ class Mark
     /** @var bool */
     private $valid;
 
+    /**
+     * @var float|null
+     */
+    private $value;
 
     /**
      * @return null|ReturnedWork
@@ -93,6 +97,24 @@ class Mark
     public function setValid($valid)
     {
         $this->valid = $valid;
+        return $this;
+    }
+
+    /**
+     * @return float|null
+     */
+    public function getValue(): ?float
+    {
+        return $this->value;
+    }
+
+    /**
+     * @param float|null $value
+     * @return static
+     */
+    public function setValue(?float $value): self
+    {
+        $this->value = $value;
         return $this;
     }
 }

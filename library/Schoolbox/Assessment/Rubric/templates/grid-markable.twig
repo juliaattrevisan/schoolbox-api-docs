@@ -48,6 +48,7 @@
 
                 <th class="rb-criterion-name">{{ crit.name }}</th>
 
+                {# Required so that this form is recognised as containing a rubric, even if nothing is submitted #}
                 <input name="saveEmpty" value="true" type="hidden"/>
 
                 {% for levelIndex, level in rubric.levels %}
@@ -61,7 +62,7 @@
                         {% set learnerSelected = learnerRubric.descriptors[crit.id][levelIndex].selected %}
                         <td>
                             <input id="{{ inputId }}"
-                                   name="{{ formField }}[descriptors][{{ descriptor.id }}]"
+                                   name="{{ formField }}[descriptors][{{ descriptor.id }}][selected]"
                                    value="1"
                                    type="checkbox"
                                    data-value="{{ descriptor.value }}"
@@ -99,17 +100,22 @@
                             {# Render a dropdown to select a value from the range #}
                             {# TODO this select needs a label; technically it should be the one above but that's already in use for the descriptor checkbox #}
                             <select id="rangeDropdown-{{ descriptor.id }}"
+                                    name="{{ formField }}[descriptors][{{ descriptor.id }}][value]"
                                     class="{% if not descriptor.selected or descriptorMin == descriptorMax or not useMarkRange %} hide{% endif %}
                                     {% if useMarkRange and descriptorMin != descriptorMax and not hidePoints %}used{% endif %}"
+                                    data-rubric="{{ rubric.id }}"
+                                    data-rubric-group="{{ group.id }}"
+                                    data-rubric-descriptor="{{ descriptor.id }}"
                             >
                                 {% set rangeStart = direction == 'asc' ? descriptorMin : descriptorMax %}
                                 {% set rangeEnd = direction == 'asc' ? descriptorMax : descriptorMin %}
 
+                                {# Selected value: if not provided, use max #}
+                                {% set selectedValue = descriptor.selectedValue ?? descriptorMax %}
+
                                 {% for i in rangeStart..rangeEnd %}
-                                    <option
-                                        value={{ i }}
-                                        {# TODO once DB writeback is implemented, make sure this uses the actual selected value when the user changes it #}
-                                        {% if i == descriptorMax %}selected{% endif %}
+                                    <option value={{ i }}
+                                            {% if i == selectedValue %}selected{% endif %}
                                     >{{ i }}
                                     </option>
                                 {% endfor %}
@@ -243,7 +249,12 @@
 
             $('[data-role=rubric-sum]').text(rubricSummary.text());
 
-            showHideRangeInput($changed);
+            // What cell was actually changed?
+            if ($changed.is(':checkbox')) {
+                showHideRangeInput($changed);
+            } else {
+                showHideRangeInput($changed.siblings(':checkbox'));
+            }
         });
 
         function showHideRangeInput($changedCell) {
@@ -272,21 +283,31 @@
             }
         }
 
-        function getSum(elements)
+        function getSum($descriptorCheckboxes)
         {
             var groupSum = 0;
 
             // in lieu of a reduce() function
-            elements.map(function () {
-                if ($(this).prop('checked')) {
-                    var fl = parseFloat($(this).data('value'));
-                    if (!isNaN(fl)) {
-                        groupSum += fl;
+            $descriptorCheckboxes.map(function () {
+                var $descriptorCheckbox = $(this);
+                if ($descriptorCheckbox.prop('checked')) {
+                    // Is there a select box for this? If so use its value instead
+                    var descriptorId = $descriptorCheckbox.data('rubricDescriptor'),
+                        $select = $rb.find('#rangeDropdown-'+String(descriptorId)),
+                        descriptorValue;
+                    if ($select.length) {
+                        descriptorValue = parseFloat($select.val());
+                    } else {
+                        descriptorValue = parseFloat($descriptorCheckbox.data('value'));
+                    }
+                    if (!isNaN(descriptorValue)) {
+                        groupSum += descriptorValue;
                     }
                 }
             });
 
-            if(groupSum % 1 != 0){
+            // If sum isn't a whole number: round to 2dp
+            if (groupSum % 1 !== 0){
                 groupSum = groupSum.toFixed(2);
             }
 

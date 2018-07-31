@@ -34,7 +34,7 @@ class DescriptorMapper extends Schoolbox\Mapper {
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins('criterion_id', CriterionMapper::class, 'id', null, null, 'criterion', 'criterion');
         $this->joins('level_id', LevelMapper::class, 'id', null, null, 'level', 'level');
-        $this->uses('value', self::TYPE_DECIMAL);
+        $this->uses('max_value', self::TYPE_DECIMAL);
         $this->uses('description', self::TYPE_STRING);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 

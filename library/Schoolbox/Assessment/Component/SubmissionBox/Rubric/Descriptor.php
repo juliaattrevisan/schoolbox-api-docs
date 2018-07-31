@@ -31,7 +31,7 @@ class Descriptor implements ISoftDeletable
     /**
      * @var float
      */
-    private $value;
+    private $maxValue;
 
     /**
      * @var string
@@ -93,20 +93,42 @@ class Descriptor implements ISoftDeletable
     }
 
     /**
-     * @param  float $value|null
+     * @deprecated use `$this->setMaxValue()` instead
+     * @param  float|null $value
      * @return $this
      */
     public function setValue($value)
     {
-        $this->value = $value;
+        trigger_error('This method is deprecated; use "setMaxValue()" instead', E_USER_DEPRECATED);
+        $this->setMaxValue($value);
+        return $this;
+    }
+
+    /**
+     * @deprecated use `$this->getMaxValue()` instead
+     * @return float|null
+     */
+    public function getValue()
+    {
+        trigger_error('This method is deprecated; use "getMaxValue()" instead', E_USER_DEPRECATED);
+        return $this->getMaxValue();
+    }
+
+    /**
+     * @param  float|null $maxValue
+     * @return $this
+     */
+    public function setMaxValue($maxValue)
+    {
+        $this->maxValue = $maxValue;
         return $this;
     }
 
     /**
      * @return float|null
      */
-    public function getValue()
+    public function getMaxValue()
     {
-        return $this->value;
+        return $this->maxValue;
     }
 }

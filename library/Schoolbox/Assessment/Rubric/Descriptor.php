@@ -22,8 +22,22 @@ class Descriptor implements Calculable, Twiggable
     /** @var string */
     protected $text;
 
-    /** @var float */
+    /**
+     * The value of the descriptor, as set in the rubric grid.
+     *
+     * @var float
+     */
     protected $value;
+
+    /**
+     * The actual selected value value of the descriptor, as set when marking
+     * the rubric.
+     *
+     * As of 18.1 this may be different from `$this->value`.
+     *
+     * @var null|float
+     */
+    protected $selectedValue;
 
     /**
      * Is this descriptor checked? (to indicate it represents the student's attainment for the criterion)
@@ -44,13 +58,15 @@ class Descriptor implements Calculable, Twiggable
      * @param float  $value
      * @param int    $id
      * @param bool   $selected
+     * @param float  $selectedValue
      */
-    public function __construct($text = '', $value = null, $id = null, $selected = false)
+    public function __construct($text = '', $value = null, $id = null, $selected = false, $selectedValue = null)
     {
-        $this->setId($id);
-        $this->setText($text);
-        $this->setValue($value);
-        $this->setSelected($selected);
+        $this->id            = $id;
+        $this->text          = $text;
+        $this->value         = $value;
+        $this->selected      = $selected;
+        $this->selectedValue = $selectedValue;
     }
 
 
@@ -115,6 +131,26 @@ class Descriptor implements Calculable, Twiggable
 
 
     /**
+     * @return float|null
+     */
+    public function getSelectedValue(): ?float
+    {
+        return $this->selectedValue;
+    }
+
+
+    /**
+     * @param float|null $selectedValue
+     * @return static
+     */
+    public function setSelectedValue(?float $selectedValue): self
+    {
+        $this->selectedValue = $selectedValue;
+        return $this;
+    }
+
+
+    /**
      * @return boolean
      */
     public function isSelected()
@@ -141,7 +177,7 @@ class Descriptor implements Calculable, Twiggable
      */
     public function getSum()
     {
-        return $this->isSelected() ? $this->value : null;
+        return $this->isSelected() ? $this->selectedValue : null;
     }
 
 
@@ -174,13 +210,14 @@ class Descriptor implements Calculable, Twiggable
     public function toContext()
     {
         return [
-            'id'       => $this->getId(),
-            'text'     => $this->getText(),
-            'value'    => $this->getValue(),
-            'selected' => $this->isSelected(),
-            'sum'      => $this->getSum(),
-            'total'    => $this->getTotal(),
-            'position' => [
+            'id'            => $this->getId(),
+            'text'          => $this->getText(),
+            'value'         => $this->getValue(),
+            'selectedValue' => $this->getSelectedValue(),
+            'selected'      => $this->isSelected(),
+            'sum'           => $this->getSum(),
+            'total'         => $this->getTotal(),
+            'position'      => [
                 'level' => [
                     'id' => $this->level->getId(),
                     'name' => $this->level->getName(),

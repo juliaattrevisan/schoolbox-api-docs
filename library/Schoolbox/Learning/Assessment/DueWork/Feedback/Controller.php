@@ -187,6 +187,8 @@ class Controller extends Base
     /**
      * Process any rubric data attached to the Feedback
      *
+     * TODO SA-6627: validate selected descriptor value
+     *
      * @param Participant $participant
      * @param array       $post
      * @param IFeedback   $feedback

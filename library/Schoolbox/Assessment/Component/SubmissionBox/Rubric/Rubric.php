@@ -407,7 +407,7 @@ class Rubric extends Core\Rubric
             $model
                 ->setCriterion($critModel)
                 ->setDescription($descriptor->getText())
-                ->setValue($descriptor->getValue())
+                ->setMaxValue($descriptor->getValue())
                 ->setLevel($lvlModel)
                 ->setDeletedAt(new \Alaress_Date_NullDate());
 
