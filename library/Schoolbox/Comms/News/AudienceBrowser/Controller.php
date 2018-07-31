@@ -93,7 +93,7 @@ class Controller extends Base
         foreach ($campusResults as $campusResult) {
             $searchResult[] = [
                 'id' => "campus_{$campusResult->getId()}",
-                'name' => $campusResult->getName()
+                'name' => "{$campusResult->getName()} (Campus)"
             ];
         }
 
@@ -104,7 +104,7 @@ class Controller extends Base
         foreach ($roleResults as $roleResult) {
             $searchResult[] = [
                 'id' => "role_{$roleResult->getId()}",
-                'name' => $roleResult->getName()
+                'name' => "{$roleResult->getName()} (Role)"
             ];
         }
 
@@ -121,15 +121,13 @@ class Controller extends Base
         foreach ($folderResults->getResult() as $folderResult) {
             $searchResult[] = [
                 'id' => "folder_{$folderResult->getId()}",
-                'name' => "{$folderResult->getNameWithCodes()}"
+                'name' => "{$folderResult->getNameWithCodes()} (Folder)"
             ];
         }
 
         /* Pastoral Groups
          */
-
-        new \Alaress_Probe($searchResult);
-        die();
+        $this->getResponse()->content->set($this->buildJsonOutput($searchResult));
     }
 
 
