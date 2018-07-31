@@ -6,6 +6,7 @@
 
 namespace Schoolbox\Assessment\Course\Import\Atlas;
 
+use Alaress\Authorizer\Rule;
 use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\ContainerInterface;
 use GuzzleHttp\Client;
@@ -37,7 +38,10 @@ class Module extends \Alaress\Module\Module
      */
     protected function registerRoutes(): void
     {
-        $staffOnly = $this->getAuthRule('isStaffOrSuper');
+        $staffOnly = new Rule\All(
+            new Rule\IsConfigOn('rubicon_atlas_api_token', $this->getConfig()),
+            $this->getAuthRule('isStaffOrSuper')
+        );
         $this->register('GET', '', 'getImport', $staffOnly);
         $this->register('POST', '', 'postImport', $staffOnly);
         $this->register('GET', '/curriculum/list', 'getCurriculumList', $staffOnly, null);
