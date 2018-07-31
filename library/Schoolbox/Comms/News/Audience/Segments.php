@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Comms\News\Audience;
 
+use PDOException;
 use Schoolbox\Comms\News;
 use Schoolbox\Mapper\Exception as MapperException;
 
@@ -47,7 +48,7 @@ class Segments
     {
         $pieces = [];
 
-        $translator = (new SegmentTranslator($this->audienceMapper))->buildCache($article->getId());
+        $translator = (new SegmentTranslator($this->audienceMapper->getDatabase()))->buildCache($article->getId());
         $audiencing = $translator->getCache();
 
         foreach ($audiencing as $entityType => $values) {
@@ -78,7 +79,7 @@ class Segments
      * @param News\Model  $article
      * @param string $segments
      * @throws MapperException
-     * @throws \PDOException
+     * @throws PDOException
      * @throws \UnexpectedValueException
      */
     public function save(News\Model $article, string $segments): void

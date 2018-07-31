@@ -9,7 +9,7 @@
 
 namespace Schoolbox\Comms\News\Audience;
 
-use Schoolbox\Comms\News\Audience\Segment\Strategy\Campus;
+use Alaress\IDatabase;
 use Schoolbox\Comms\News\Audience\Segment\TranslatorRegistry;
 
 
@@ -30,22 +30,23 @@ class SegmentTranslator
     private $modifierTranslation;
 
     /**
-     * @var Mapper
+     * @var IDatabase
      */
-    private $audienceMapper;
+    private $database;
 
     /**
      * @var array
      */
     private $cache = [];
 
+
     /**
      * SegmentTranslator constructor.
-     * @param Mapper $audienceMapper
+     * @param IDatabase $db
      */
-    public function __construct(Mapper $audienceMapper)
+    public function __construct(IDatabase $db)
     {
-        $this->audienceMapper = $audienceMapper;
+        $this->database = $db;
 
         /* Entity names
          */
@@ -108,9 +109,9 @@ class SegmentTranslator
      */
     public function buildCache(int $articleId): self
     {
-        $translator = new TranslatorRegistry($this->audienceMapper->getDatabase());
+        $translator = new TranslatorRegistry($this->database);
 
-        $statement = $this->audienceMapper->getDatabase()->prepare($translator->getTranslateSql());
+        $statement = $this->database->prepare($translator->getTranslateSql());
 
         $statement->execute([
             'articleId' => $articleId,
