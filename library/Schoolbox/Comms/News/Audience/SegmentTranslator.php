@@ -76,13 +76,13 @@ class SegmentTranslator
      * Return a string like "User (230) [Parents of]"
      *
      * @param string $entityType
-     * @param string $value
+     * @param string $entityValue
      * @param string $relationship
      * @return string
      */
-    public function translate(string $entityType, string $value, string $relationship): string
+    public function translate(string $entityType, string $entityValue, string $relationship): string
     {
-        $string = "{$this->cache[$entityType][$value]['name']} ({$this->entityTranslation[$entityType]})";
+        $string = "{$this->cache[$entityType][$entityValue]['name']} ({$this->entityTranslation[$entityType]})";
 
         if ($relationship !== Model::RELATIONSHIP_SELF) {
             $string .= " [{$this->modifierTranslation[$relationship]}]";
