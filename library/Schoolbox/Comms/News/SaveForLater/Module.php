@@ -153,7 +153,7 @@ class Module extends BaseModule
                 // Intentionally not catching mapper exception, that's a 5xx, not 4xx
                 $policy = $this->getPolicyMapper()->findOneByColumn('identifier', 'save_for_later');
                 if (!$policy->getValue()) {
-                    throw new Unauthorized('This feature has been disabled.');
+                    throw new InvalidPath('This feature has been disabled.');
                 }
                 return true;
             });
@@ -172,7 +172,7 @@ class Module extends BaseModule
                 // Intentionally not catching mapper exception, that's a 5xx, not 4xx
                 $policy = $this->getPolicyMapper()->findOneByColumn('identifier', 'save_for_later');
                 if (!$policy->getValue()) {
-                    throw new Unauthorized('This feature has been disabled.');
+                    throw new InvalidPath('This feature has been disabled.');
                 }
                 try {
                     $article = $this->getNewsMapper()->findById($params['articleId']);
@@ -201,7 +201,7 @@ class Module extends BaseModule
                 // Intentionally not catching mapper exception, that's a 5xx, not 4xx
                 $policy = $this->getPolicyMapper()->findOneByColumn('identifier', 'save_for_later');
                 if (!$policy->getValue()) {
-                    throw new Unauthorized('This feature has been disabled.');
+                    throw new InvalidPath('This feature has been disabled.');
                 }
                 try {
                     $this->getNewsMapper()->findById($params['articleId']);
