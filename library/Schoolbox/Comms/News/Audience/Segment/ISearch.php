@@ -7,7 +7,7 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Comms\News\Audience\Segment\Search;
+namespace Schoolbox\Comms\News\Audience\Segment;
 
 interface ISearch
 {

@@ -1,15 +1,17 @@
 <?php
 /**
- * Role
+ * PastoralGroup
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2018, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Comms\News\Audience\Segment\Search;
+namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
-class Role implements ISearch
+use Schoolbox\Comms\News\Audience\Segment\ISearch;
+
+class PastoralGroup implements ISearch
 {
 
     /**
@@ -20,8 +22,8 @@ class Role implements ISearch
     public function getSearchSql(): string
     {
         return "
-            (SELECT id, name, 'role' AS entity_type
-            FROM groups
+            (SELECT id, name COLLATE utf8mb4_general_ci, 'pastoral_group' AS entity_type 
+            FROM `pastoral_group`
             WHERE `name` LIKE :keyword
             AND deleted_at IS NULL)
         ";

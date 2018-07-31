@@ -1,15 +1,17 @@
 <?php
 /**
- * Campus
+ * House
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2018, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Comms\News\Audience\Segment\Search;
+namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
-class Campus implements ISearch
+use Schoolbox\Comms\News\Audience\Segment\ISearch;
+
+class House implements ISearch
 {
 
     /**
@@ -20,9 +22,9 @@ class Campus implements ISearch
     public function getSearchSql(): string
     {
         return "
-            (SELECT id, name, 'campus' AS entity_type
-            FROM luCampus
-            WHERE `name` LIKE :keyword)
+            (SELECT id, house AS name, 'house' AS entity_type
+            FROM house
+            WHERE house LIKE :keyword)
         ";
     }
 }

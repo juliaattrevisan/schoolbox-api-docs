@@ -1,15 +1,17 @@
 <?php
 /**
- * User
+ * Campus
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2018, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Comms\News\Audience\Segment\Search;
+namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
-class User implements ISearch
+use Schoolbox\Comms\News\Audience\Segment\ISearch;
+
+class Campus implements ISearch
 {
 
     /**
@@ -20,10 +22,9 @@ class User implements ISearch
     public function getSearchSql(): string
     {
         return "
-            (SELECT id, CONCAT(firstname, ' ', lastname) AS name, 'user' AS entity_type
-            FROM `user`
-            WHERE firstname LIKE :keyword OR lastname LIKE :keyword
-            AND deleted_at IS NULL)
+            (SELECT id, name, 'campus' AS entity_type
+            FROM luCampus
+            WHERE `name` LIKE :keyword)
         ";
     }
 }

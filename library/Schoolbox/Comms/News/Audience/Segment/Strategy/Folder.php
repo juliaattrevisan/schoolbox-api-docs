@@ -7,10 +7,10 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Comms\News\Audience\Segment\Search;
+namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
 use Alaress\IDatabase;
-
+use Schoolbox\Comms\News\Audience\Segment\ISearch;
 
 class Folder implements ISearch
 {

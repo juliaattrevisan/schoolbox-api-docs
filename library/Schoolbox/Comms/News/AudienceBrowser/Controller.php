@@ -13,16 +13,8 @@ use HouseMapper;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
 use Schoolbox\Comms\News\Audience\Model;
-use Schoolbox\Comms\News\Audience\Segment\Search\Campus;
-use Schoolbox\Comms\News\Audience\Segment\Search\Folder;
-use Schoolbox\Comms\News\Audience\Segment\Search\House;
-use Schoolbox\Comms\News\Audience\Segment\Search\PastoralGroup;
-use Schoolbox\Comms\News\Audience\Segment\Search\Registry;
-use Schoolbox\Comms\News\Audience\Segment\Search\Role;
-use Schoolbox\Comms\News\Audience\Segment\Search\User;
-use Schoolbox\Comms\News\Audience\Segment\Search\Year;
+use Schoolbox\Comms\News\Audience\Segment\SearchRegistry;
 use Schoolbox\Comms\News\Audience\SegmentCodec;
-use Schoolbox\Comms\News\Audience\Segments;
 use Schoolbox\Pastoral;
 use Schoolbox\RoleMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -98,7 +90,7 @@ class Controller extends Base
 
         /* TODO: Inject a generic IDatabase
          */
-        $registry = new Registry($this->folderMapper->getDatabase());
+        $registry = new SearchRegistry($this->folderMapper->getDatabase());
 
         $statement = $this->userMapper->getDatabase()->prepare($registry->getSearchSql());
 

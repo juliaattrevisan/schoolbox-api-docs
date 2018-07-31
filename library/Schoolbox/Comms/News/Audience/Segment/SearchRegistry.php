@@ -7,12 +7,11 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Comms\News\Audience\Segment\Search;
+namespace Schoolbox\Comms\News\Audience\Segment;
 
 use Alaress\IDatabase;
 
-
-class Registry implements ISearch
+class SearchRegistry implements ISearch
 {
 
     /**
@@ -28,13 +27,13 @@ class Registry implements ISearch
     public function __construct(IDatabase $db)
     {
         $this->registry = [
-            $campusSql = new Campus(),
-            $roleSql = new Role(),
-            $folderSql = new Folder($db),
-            $houseSql = new House(),
-            $userSql = new User(),
-            $yearSql = new Year(),
-            $pastoralGroupSql = new PastoralGroup()
+            $campusSql = new Strategy\Campus(),
+            $roleSql = new Strategy\Role(),
+            $folderSql = new Strategy\Folder($db),
+            $houseSql = new Strategy\House(),
+            $userSql = new Strategy\User(),
+            $yearSql = new Strategy\Year(),
+            $pastoralGroupSql = new Strategy\PastoralGroup()
         ];
     }
 
