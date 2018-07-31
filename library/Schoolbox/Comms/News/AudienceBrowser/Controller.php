@@ -120,6 +120,7 @@ class Controller extends Base
             $data = array_combine(['id', 'name'], $item->findValueLabelPair());
 
             /* base64_encode the value because Year Level is a user-configurable string
+             * TODO: Check frontend as to why this is slightly different
              */
             $data['id'] = base64_encode($data['id']);
 
