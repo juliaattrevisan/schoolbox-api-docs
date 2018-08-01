@@ -13,7 +13,7 @@ use Alaress\Database\Predicate\Builder;
 use Schoolbox\GenericCollection;
 
 /**
- * @method Model createModel()
+ * @method Model createModel($idValue = null)
  * @method GenericCollection|Model[] findByPredicates(Builder $pb, array $options = [])
  */
 class Mapper extends \Schoolbox\Mapper

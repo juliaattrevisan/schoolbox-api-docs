@@ -43,7 +43,7 @@ class TranslatorRegistry implements ITranslate
     {
         $pieces = [];
 
-        foreach($this->registry as $strategy) {
+        foreach ($this->registry as $strategy) {
             $pieces[] = $strategy->getTranslateSql();
         }
 

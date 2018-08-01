@@ -64,7 +64,7 @@ class SearchRegistry implements ISearch
     {
         $pieces = [];
 
-        foreach($this->registry as $strategy) {
+        foreach ($this->registry as $strategy) {
             $pieces[] = $strategy->getSearchSql();
         }
 

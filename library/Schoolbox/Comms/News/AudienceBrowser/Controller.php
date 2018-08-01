@@ -19,7 +19,6 @@ use Schoolbox\RoleMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\UserMapper;
 
-
 class Controller extends Base
 {
 
@@ -133,7 +132,7 @@ class Controller extends Base
     {
         $items = [];
 
-        foreach($collection as $item) {
+        foreach ($collection as $item) {
             $tuple = $item->findValueLabelPair();
 
             /* Encode the value because Year Level is a user-configurable string

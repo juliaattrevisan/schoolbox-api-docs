@@ -21,7 +21,6 @@ use Schoolbox\Resource;
 use Schoolbox\RoleMapper;
 use Schoolbox\UserMapper;
 
-
 class Module extends BaseModule
 {
     /**

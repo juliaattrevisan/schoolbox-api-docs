@@ -14,7 +14,6 @@ namespace Schoolbox\Comms\News\Audience\Segment;
 use Alaress\IDatabase;
 use Schoolbox\Comms\News\Audience\Model;
 
-
 class Translator
 {
     /**
