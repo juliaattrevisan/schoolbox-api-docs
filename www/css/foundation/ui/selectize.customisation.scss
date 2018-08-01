@@ -60,6 +60,7 @@ fieldset[disabled] div.selectize-control div.selectize-input.items > div.item > 
 
 .selectize-control {
 	margin: 0 0 $form-spacing 0;
+	width: 100%;
 
 	&.single, &.multi {
 		.selectize-input > div {
@@ -119,6 +120,7 @@ fieldset[disabled] div.selectize-control div.selectize-input.items > div.item > 
 	margin-bottom: 0;
 	padding: 3px 0;
 	vertical-align: middle;
+	min-height: 2.5rem;
     input {
         height: 1.875rem;
 		font-size: $selectize-font-size;
