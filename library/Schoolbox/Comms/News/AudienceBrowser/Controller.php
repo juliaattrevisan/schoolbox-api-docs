@@ -157,7 +157,7 @@ class Controller extends Base
      */
     public function getCampuses()
     {
-        $this->getResponse()->content->set($this->generate($this->campusMapper->findAll(), Model::ENTITY_TYPE_CAMPUS));
+        $this->getResponse()->content->set($this->generate($this->campusMapper->findAll()->sortBy('name', 'asc'), Model::ENTITY_TYPE_CAMPUS));
     }
 
 
@@ -168,7 +168,7 @@ class Controller extends Base
      */
     public function getRoles()
     {
-        $this->getResponse()->content->set($this->generate($this->roleMapper->findAll(), Model::ENTITY_TYPE_ROLE));
+        $this->getResponse()->content->set($this->generate($this->roleMapper->findAll()->sortBy('name', 'asc'), Model::ENTITY_TYPE_ROLE));
     }
 
 
@@ -179,7 +179,7 @@ class Controller extends Base
      */
     public function getPastoralGroups()
     {
-        $this->getResponse()->content->set($this->generate($this->pastoralGroupMapper->findAll(), Model::ENTITY_TYPE_PASTORAL_GROUP));
+        $this->getResponse()->content->set($this->generate($this->pastoralGroupMapper->findAll()->sortBy('name', 'asc'), Model::ENTITY_TYPE_PASTORAL_GROUP));
     }
 
 
@@ -190,7 +190,7 @@ class Controller extends Base
      */
     public function getHouses()
     {
-        $this->getResponse()->content->set($this->generate($this->houseMapper->findAll(), Model::ENTITY_TYPE_SCHOOL_HOUSE));
+        $this->getResponse()->content->set($this->generate($this->houseMapper->findAll()->sortBy('house', 'asc'), Model::ENTITY_TYPE_SCHOOL_HOUSE));
     }
 
 
