@@ -16,22 +16,22 @@ use JsonSerializable;
 class Standard implements JsonSerializable
 {
     /**
-     * @var string
+     * @var null|string
      */
     private $rawText;
 
     /**
-     * @var string
+     * @var null|string
      */
     private $title;
 
     /**
-     * @var string
+     * @var null|string
      */
     private $code;
 
     /**
-     * @return string
+     * @return null|string
      */
     public function getTitle(): ?string
     {
@@ -39,7 +39,7 @@ class Standard implements JsonSerializable
     }
 
     /**
-     * @param string $title
+     * @param null|string $title
      * @return static
      */
     public function setTitle(?string $title)
@@ -49,7 +49,7 @@ class Standard implements JsonSerializable
     }
 
     /**
-     * @return string
+     * @return null|string
      */
     public function getCode(): ?string
     {
@@ -57,7 +57,7 @@ class Standard implements JsonSerializable
     }
 
     /**
-     * @param string $code
+     * @param null|string $code
      * @return static
      */
     public function setCode(?string $code)
@@ -67,7 +67,7 @@ class Standard implements JsonSerializable
     }
 
     /**
-     * @return string
+     * @return null|string
      */
     public function getRawText(): ?string
     {
@@ -75,7 +75,7 @@ class Standard implements JsonSerializable
     }
 
     /**
-     * @param string $rawText
+     * @param null|string $rawText
      * @return static
      */
     public function setRawText(?string $rawText)

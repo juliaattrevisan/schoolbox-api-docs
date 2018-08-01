@@ -22,27 +22,27 @@ class Unit implements JsonSerializable
     private $id;
 
     /**
-     * @var string
+     * @var null|string
      */
     private $title;
 
     /**
-     * @var string
+     * @var null|string
      */
     private $timeFrame;
 
     /**
-     * @var Alaress_Date_Format
+     * @var null|Alaress_Date_Format
      */
     private $lastUpdated;
 
     /**
-     * @var Alaress_Date_Format
+     * @var null|Alaress_Date_Format
      */
     private $startDate;
 
     /**
-     * @var Alaress_Date_Format
+     * @var null|Alaress_Date_Format
      */
     private $endDate;
 
@@ -75,7 +75,7 @@ class Unit implements JsonSerializable
     }
 
     /**
-     * @return string
+     * @return null|string
      */
     public function getTitle(): ?string
     {
@@ -83,7 +83,7 @@ class Unit implements JsonSerializable
     }
 
     /**
-     * @param string $title
+     * @param null|string $title
      * @return static
      */
     public function setTitle(?string $title)
@@ -93,7 +93,7 @@ class Unit implements JsonSerializable
     }
 
     /**
-     * @return string
+     * @return null|string
      */
     public function getTimeFrame(): ?string
     {
@@ -101,7 +101,7 @@ class Unit implements JsonSerializable
     }
 
     /**
-     * @param string $timeFrame
+     * @param null|string $timeFrame
      * @return static
      */
     public function setTimeFrame(?string $timeFrame)
@@ -111,7 +111,7 @@ class Unit implements JsonSerializable
     }
 
     /**
-     * @return Alaress_Date_Format
+     * @return null|Alaress_Date_Format
      */
     public function getLastUpdated(): ?Alaress_Date_Format
     {
@@ -119,7 +119,7 @@ class Unit implements JsonSerializable
     }
 
     /**
-     * @param Alaress_Date_Format $lastUpdated
+     * @param null|Alaress_Date_Format $lastUpdated
      * @return static
      */
     public function setLastUpdated(?Alaress_Date_Format $lastUpdated)
@@ -129,7 +129,7 @@ class Unit implements JsonSerializable
     }
 
     /**
-     * @return Alaress_Date_Format
+     * @return null|Alaress_Date_Format
      */
     public function getStartDate(): ?Alaress_Date_Format
     {
@@ -137,7 +137,7 @@ class Unit implements JsonSerializable
     }
 
     /**
-     * @param Alaress_Date_Format $startDate
+     * @param null|Alaress_Date_Format $startDate
      * @return static
      */
     public function setStartDate(?Alaress_Date_Format $startDate)
@@ -147,7 +147,7 @@ class Unit implements JsonSerializable
     }
 
     /**
-     * @return Alaress_Date_Format
+     * @return null|Alaress_Date_Format
      */
     public function getEndDate(): ?Alaress_Date_Format
     {
@@ -155,7 +155,7 @@ class Unit implements JsonSerializable
     }
 
     /**
-     * @param Alaress_Date_Format $endDate
+     * @param null|Alaress_Date_Format $endDate
      * @return static
      */
     public function setEndDate(?Alaress_Date_Format $endDate)

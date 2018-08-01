@@ -21,12 +21,12 @@ class Teacher implements JsonSerializable
     private $id;
 
     /**
-     * @var string
+     * @var null|string
      */
     private $firstName;
 
     /**
-     * @var string
+     * @var null|string
      */
     private $lastName;
 
@@ -49,7 +49,7 @@ class Teacher implements JsonSerializable
     }
 
     /**
-     * @return string
+     * @return null|string
      */
     public function getFirstName(): ?string
     {
@@ -57,7 +57,7 @@ class Teacher implements JsonSerializable
     }
 
     /**
-     * @param string $firstName
+     * @param null|string $firstName
      * @return static
      */
     public function setFirstName(?string $firstName)
@@ -67,7 +67,7 @@ class Teacher implements JsonSerializable
     }
 
     /**
-     * @return string
+     * @return null|string
      */
     public function getLastName(): ?string
     {
@@ -75,7 +75,7 @@ class Teacher implements JsonSerializable
     }
 
     /**
-     * @param string $lastName
+     * @param null|string $lastName
      * @return static
      */
     public function setLastName(?string $lastName)

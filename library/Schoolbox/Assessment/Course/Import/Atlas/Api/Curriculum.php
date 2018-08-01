@@ -22,37 +22,37 @@ class Curriculum implements JsonSerializable
     private $id;
 
     /**
-     * @var string
+     * @var null|string
      */
     private $title;
 
     /**
-     * @var string
+     * @var null|string
      */
     private $subject;
 
     /**
-     * @var string
+     * @var null|string
      */
     private $grade;
 
     /**
-     * @var string
+     * @var null|string
      */
     private $school;
 
     /**
-     * @var string
+     * @var null|string
      */
     private $description;
 
     /**
-     * @var \Alaress_Date_Format
+     * @var null|\Alaress_Date_Format
      */
     private $lastUpdated;
 
     /**
-     * @var string
+     * @var null|string
      */
     private $mapType;
 
@@ -85,7 +85,7 @@ class Curriculum implements JsonSerializable
     }
 
     /**
-     * @return string
+     * @return null|string
      */
     public function getTitle(): ?string
     {
@@ -93,7 +93,7 @@ class Curriculum implements JsonSerializable
     }
 
     /**
-     * @param string $title
+     * @param null|string $title
      * @return static
      */
     public function setTitle(?string $title)
@@ -103,7 +103,7 @@ class Curriculum implements JsonSerializable
     }
 
     /**
-     * @return string
+     * @return null|string
      */
     public function getSubject(): ?string
     {
@@ -111,7 +111,7 @@ class Curriculum implements JsonSerializable
     }
 
     /**
-     * @param string $subject
+     * @param null|string $subject
      * @return static
      */
     public function setSubject(?string $subject)
@@ -121,7 +121,7 @@ class Curriculum implements JsonSerializable
     }
 
     /**
-     * @return string
+     * @return null|string
      */
     public function getGrade(): ?string
     {
@@ -129,7 +129,7 @@ class Curriculum implements JsonSerializable
     }
 
     /**
-     * @param string $grade
+     * @param null|string $grade
      * @return static
      */
     public function setGrade(?string $grade)
@@ -139,7 +139,7 @@ class Curriculum implements JsonSerializable
     }
 
     /**
-     * @return string
+     * @return null|string
      */
     public function getSchool(): ?string
     {
@@ -147,7 +147,7 @@ class Curriculum implements JsonSerializable
     }
 
     /**
-     * @param string $school
+     * @param null|string $school
      * @return static
      */
     public function setSchool(?string $school)
@@ -157,7 +157,7 @@ class Curriculum implements JsonSerializable
     }
 
     /**
-     * @return string
+     * @return null|string
      */
     public function getDescription(): ?string
     {
@@ -165,7 +165,7 @@ class Curriculum implements JsonSerializable
     }
 
     /**
-     * @param string $description
+     * @param null|string $description
      * @return static
      */
     public function setDescription(string $description)
@@ -175,7 +175,7 @@ class Curriculum implements JsonSerializable
     }
 
     /**
-     * @return Alaress_Date_Format
+     * @return null|Alaress_Date_Format
      */
     public function getLastUpdated(): ?Alaress_Date_Format
     {
@@ -183,7 +183,7 @@ class Curriculum implements JsonSerializable
     }
 
     /**
-     * @param Alaress_Date_Format $lastUpdated
+     * @param null|Alaress_Date_Format $lastUpdated
      * @return static
      */
     public function setLastUpdated(?Alaress_Date_Format $lastUpdated)
@@ -193,7 +193,7 @@ class Curriculum implements JsonSerializable
     }
 
     /**
-     * @return string
+     * @return null|string
      */
     public function getMapType(): ?string
     {
@@ -201,7 +201,7 @@ class Curriculum implements JsonSerializable
     }
 
     /**
-     * @param string $mapType
+     * @param null|string $mapType
      * @return static
      */
     public function setMapType(?string $mapType)

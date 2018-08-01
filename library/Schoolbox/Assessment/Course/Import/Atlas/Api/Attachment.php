@@ -27,12 +27,12 @@ class Attachment implements JsonSerializable
     private $id;
 
     /**
-     * @var string
+     * @var null|string
      */
     private $title;
 
     /**
-     * @var string
+     * @var null|string
      */
     private $url;
 
@@ -42,12 +42,12 @@ class Attachment implements JsonSerializable
     private $sortOrder;
 
     /**
-     * @var string
+     * @var null|string
      */
     private $attachmentType;
 
     /**
-     * @var string
+     * @var null|string
      */
     private $itemType;
 
@@ -75,7 +75,7 @@ class Attachment implements JsonSerializable
     }
 
     /**
-     * @return string
+     * @return null|string
      */
     public function getTitle(): ?string
     {
@@ -83,7 +83,7 @@ class Attachment implements JsonSerializable
     }
 
     /**
-     * @param string $title
+     * @param null|string $title
      * @return static
      */
     public function setTitle(?string $title)
@@ -93,7 +93,7 @@ class Attachment implements JsonSerializable
     }
 
     /**
-     * @return string
+     * @return null|string
      */
     public function getUrl(): ?string
     {
@@ -101,7 +101,7 @@ class Attachment implements JsonSerializable
     }
 
     /**
-     * @param string $url
+     * @param null|string $url
      * @return static
      */
     public function setUrl(?string $url)
@@ -129,7 +129,7 @@ class Attachment implements JsonSerializable
     }
 
     /**
-     * @return string
+     * @return null|string
      */
     public function getAttachmentType(): ?string
     {
@@ -137,7 +137,7 @@ class Attachment implements JsonSerializable
     }
 
     /**
-     * @param string $attachmentType
+     * @param null|string $attachmentType
      * @return static
      */
     public function setAttachmentType(?string $attachmentType)
@@ -147,7 +147,7 @@ class Attachment implements JsonSerializable
     }
 
     /**
-     * @return string
+     * @return null|string
      */
     public function getItemType(): ?string
     {
@@ -155,7 +155,7 @@ class Attachment implements JsonSerializable
     }
 
     /**
-     * @param string $itemType
+     * @param null|string $itemType
      * @return static
      */
     public function setItemType(?string $itemType)

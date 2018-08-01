@@ -20,22 +20,22 @@ class Assessment implements JsonSerializable
     private $id;
 
     /**
-     * @var string
+     * @var null|string
      */
     private $title;
 
     /**
-     * @var string
+     * @var null|string
      */
     private $type;
 
     /**
-     * @var string
+     * @var null|string
      */
     private $method;
 
     /**
-     * @var string
+     * @var null|string
      */
     private $content;
 
@@ -63,7 +63,7 @@ class Assessment implements JsonSerializable
     }
 
     /**
-     * @return string
+     * @return null|string
      */
     public function getTitle(): ?string
     {
@@ -71,7 +71,7 @@ class Assessment implements JsonSerializable
     }
 
     /**
-     * @param string $title
+     * @param null|string $title
      * @return static
      */
     public function setTitle(?string $title)
@@ -81,7 +81,7 @@ class Assessment implements JsonSerializable
     }
 
     /**
-     * @return string
+     * @return null|string
      */
     public function getType(): ?string
     {
@@ -89,7 +89,7 @@ class Assessment implements JsonSerializable
     }
 
     /**
-     * @param string $type
+     * @param null|string $type
      * @return static
      */
     public function setType(?string $type)
@@ -99,7 +99,7 @@ class Assessment implements JsonSerializable
     }
 
     /**
-     * @return string
+     * @return null|string
      */
     public function getMethod(): ?string
     {
@@ -107,7 +107,7 @@ class Assessment implements JsonSerializable
     }
 
     /**
-     * @param string $method
+     * @param null|string $method
      * @return static
      */
     public function setMethod(?string $method)
@@ -117,7 +117,7 @@ class Assessment implements JsonSerializable
     }
 
     /**
-     * @return string
+     * @return null|string
      */
     public function getContent(): ?string
     {
@@ -125,7 +125,7 @@ class Assessment implements JsonSerializable
     }
 
     /**
-     * @param string $content
+     * @param null|string $content
      * @return static
      */
     public function setContent(?string $content)
