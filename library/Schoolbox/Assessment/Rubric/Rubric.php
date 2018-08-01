@@ -303,9 +303,14 @@ class Rubric implements Twiggable
                 $square[$currentDRow][0] = $groupRendered ? '' : Scrub::csv($group->getName());
                 $square[$currentDRow][1] = Scrub::csv($criterion->getName());
 
-                $groupRendered = true;
-
                 $currentVRow = $currentDRow + 1;
+
+                // Max points per capability (if enabled)
+                if (!$groupRendered) {
+                    $square[$currentVRow][0] = $group->getMaxValue();
+                }
+
+                $groupRendered = true;
 
                 foreach ($this->levels as $currentColumn => $level) {
                     foreach ($level->getAllDescriptors() as $levelD) {
