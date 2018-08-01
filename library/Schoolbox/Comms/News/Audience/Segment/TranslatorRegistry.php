@@ -9,6 +9,9 @@
 
 namespace Schoolbox\Comms\News\Audience\Segment;
 
+use Schoolbox\User;
+use Schoolbox\Resource\Folder;
+
 class TranslatorRegistry implements ITranslate
 {
 
@@ -17,15 +20,18 @@ class TranslatorRegistry implements ITranslate
      */
     private $registry;
 
+
     /**
      * Registry constructor.
+     * @param User          $user
+     * @param Folder\Mapper $folderMapper
      */
-    public function __construct()
+    public function __construct(User $user, Folder\Mapper $folderMapper)
     {
         $this->registry = [
             $campusSql = new Strategy\Campus(),
             $roleSql = new Strategy\Role(),
-            $folderSql = new Strategy\Folder(),
+            $folderSql = new Strategy\Folder($user, $folderMapper),
             $houseSql = new Strategy\House(),
             $userSql = new Strategy\User(),
             $yearSql = new Strategy\Year(),

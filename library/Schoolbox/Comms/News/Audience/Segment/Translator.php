@@ -13,6 +13,8 @@ namespace Schoolbox\Comms\News\Audience\Segment;
 
 use Alaress\IDatabase;
 use Schoolbox\Comms\News\Audience\Model;
+use Schoolbox\Resource\Folder;
+use Schoolbox\User;
 
 class Translator
 {
@@ -36,6 +38,16 @@ class Translator
     private $database;
 
     /**
+     * @var User
+     */
+    private $user;
+
+    /**
+     * @var Folder\Mapper
+     */
+    private $folderMapper;
+
+    /**
      * @var array
      */
     private $cache = [];
@@ -43,11 +55,15 @@ class Translator
 
     /**
      * SegmentTranslator constructor.
-     * @param IDatabase $db
+     * @param IDatabase     $db
+     * @param User          $user
+     * @param Folder\Mapper $folderMapper
      */
-    public function __construct(IDatabase $db)
+    public function __construct(IDatabase $db, User $user, Folder\Mapper $folderMapper)
     {
         $this->database = $db;
+        $this->user = $user;
+        $this->folderMapper = $folderMapper;
 
         /* Entity names
          */
@@ -159,7 +175,7 @@ class Translator
      */
     public function buildCache(int $articleId): self
     {
-        $translator = new TranslatorRegistry();
+        $translator = new TranslatorRegistry($this->user, $this->folderMapper);
 
         $statement = $this->database->prepare($translator->getTranslateSql());
 

@@ -89,7 +89,7 @@ class Controller extends Base
         $searchResult = [];
 
         $registry = new Segment\SearchRegistry($this->getUser(), $this->folderMapper);
-        $translator = new Segment\Translator($this->folderMapper->getDatabase());
+        $translator = new Segment\Translator($this->folderMapper->getDatabase(), $this->getUser(), $this->folderMapper);
 
         $statement = $this->userMapper->getDatabase()->prepare($registry->getSearchSql());
 
