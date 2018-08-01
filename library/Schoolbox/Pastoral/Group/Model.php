@@ -17,7 +17,6 @@ use Schoolbox\Pastoral\Group\Member\Model as PastoralGroupMember;
 use Schoolbox\User;
 use Schoolbox\ValueLabelInterface;
 
-
 class Model implements ISoftDeletable, ValueLabelInterface
 {
     use Id;
