@@ -80,46 +80,6 @@ Usage:
             });
         });
 
-        /**
-         * Course Parent selector popup
-         */
-        $('[data-course-parent-selector]').on('click', function (e) {
-            e.preventDefault();
-
-            $.magnificPopup.open({
-                showCloseBtn: false,
-                items: {
-                    src: "<div class='preview loader'></div>",
-                    type: 'inline'
-                }
-            });
-
-            var $selector = $(this),
-                target = $selector.data('source'),
-                $input = $('[name="' + target + '"]');
-
-            var modal = $('#parent-select');
-
-            modal.foundation('reveal', 'open', '{{ routeLookup('course.parentList') }}/' + $("#parent").val()).one('click', '[data-selection]', function (e) {
-                e.preventDefault();
-
-                var $selection = $(this);
-
-                // selector takes the name, input takes the ID
-                $selector.addClass('icon-folder').text($selection.data('label'));
-                $input.val($selection.data('selection'));
-
-                //Hacky way to remove error message - could not find alternative
-                $input.click();
-                $input.blur();
-
-                modal.foundation('reveal', 'close');
-            });
-            $(document).on('opened.fndtn.reveal', '[data-reveal]', function () {
-                $.magnificPopup.close();
-            });
-        });
-
         var noonitName = $('#noonit-name');
 
         // 'Next' Button
@@ -251,34 +211,17 @@ Usage:
                             />
                         </label>
                     </div>
-                    <div class="small-12 column">
-                        <label>
-                            {{ locale.faculty.proper }} / {{ locale.subject.proper }}
 
-                            <a data-course-parent-selector data-source="parent"
-                               title="Click to change the {{ locale.faculty }} / {{ locale.subject }} this course belongs to"
-                               class="source-select icon-folder"
-                               href="#" >
-                                {{ courseSpec.id ? courseSpec.folder.parent.name : '(Click to select)' }}
-                            </a>
-                            <input class="hide" name="parent" id="parent" value="{{ courseSpec.folder.parent.id }}" />
-                        </label>
+                    <div class="small-12 column">
+                        {% include '@course/sub/sourceSelector.twig' with {
+                            courseSpec: courseSpec,
+                        } only %}
                     </div>
 
                     {% if not isValidFacultyRoot %}
-                    <div class="small-12 column">
-                        <div data-alert="" class="alert-box warning">
-                            <p>
-                            <strong>Warning</strong>: The configured faculty folder is invalid and the system has fallen back to the top-level folder.<br>
-                            <br>Please
-                            {% if USER.isSuperuser %}
-                                <a href="/adminv2/setting/LMS+Policy#course_homepage">configure a valid faculty root</a> in the Administration system.
-                            {% else %}
-                                ask your System Administrator to configure a valid faculty root
-                            {% endif %}
-                            </p>
+                        <div class="small-12 column">
+                            {% include '@course/sub/invalidFacultyRoot.twig' %}
                         </div>
-                    </div>
                     {% endif %}
 
                     {% if curriculumEnabled %}
@@ -365,7 +308,6 @@ Usage:
         </form>
     </div>
 </div>
-<div id="parent-select" data-reveal class="reveal-modal"></div>
 
 <div class="toast" data-alert data-relation="ajax-response"></div>
 

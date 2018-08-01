@@ -1,7 +1,5 @@
 <?php
 /**
- * Mapper for curriculum nodes.
- *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2014, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
@@ -15,6 +13,14 @@ use Schoolbox\Curriculum\LearningLevel;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 
+/**
+ * Mapper for curriculum nodes
+ *
+ * @method Model createModel($idValue = null)
+ * @method Model findById($identifierValue)
+ * @method Model findOneByColumn($columnName, $columnValue, $order = [], $options = [])
+ * @method Model findOneByColumnList($columnList, $order = [], $options = [])
+ */
 class Mapper extends BaseMapper implements BaseMapper\Searchable
 {
     public function mapping()

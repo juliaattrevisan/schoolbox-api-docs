@@ -55,7 +55,11 @@ Usage:
     </div>
     {% if hasAdd %}
         <nav>
-            <a href="/course/new" class="icon-add"></a>
+            <a href="{{ routeLookup('course.newCourse') }}" class="icon-add"></a>
+            {% set atlasImportUrl = routeLookupIfAuthorized('courseImportAtlas.getImport') %}
+            {% if atlasImportUrl %}
+                <a href="{{ atlasImportUrl }}?{{ returnUrlKey }}={{ encodedReturnUrl }}" class="icon-curriculum" title="Import from Atlas"></a>
+            {% endif %}
         </nav>
     {% endif %}
 </div>

@@ -1,0 +1,67 @@
+{##
+ # Display a source selector.
+ #
+ # Params:
+ # * courseSpec: a course specification object, show this course spec's folder in the selector if provided
+ #}
+
+{% autoescape 'js' %}
+<script type="text/javascript">
+    $(function() {
+        /**
+         * Course Parent selector popup
+         */
+        $('[data-course-parent-selector]').on('click', function (e) {
+            e.preventDefault();
+
+            // $.magnificPopup.open({
+            //     showCloseBtn: false,
+            //     items: {
+            //         src: "<div class='preview loader'></div>",
+            //         type: 'inline'
+            //     }
+            // });
+
+            var $selector = $(this),
+                target = $selector.data('source'),
+                $input = $('[name="' + target + '"]');
+
+            var modal = $('<div data-reveal class="reveal-modal" />');
+
+            modal.foundation('reveal', 'open', '{{ routeLookup('course.parentList') }}/' + $("#parent").val()).one('click', '[data-selection]', function (e) {
+                e.preventDefault();
+
+                var $selection = $(this);
+
+                // selector takes the name, input takes the ID
+                $selector
+                    .addClass('icon-folder')
+                    .text($selection.data('label'))
+                    .removeClass('placeholder');
+                $input.val($selection.data('selection'));
+
+                //Hacky way to remove error message - could not find alternative
+                $input.click();
+                $input.blur();
+
+                modal.foundation('reveal', 'close');
+            });
+            // $(document).on('opened.fndtn.reveal', '[data-reveal]', function () {
+            //     $.magnificPopup.close();
+            // });
+        });
+    })
+</script>
+{% endautoescape %}
+
+<label>
+    {{ locale.faculty.proper }} / {{ locale.subject.proper }}
+
+    <a data-course-parent-selector data-source="parent"
+       title="Click to change the {{ locale.faculty }} / {{ locale.subject }} this course belongs to"
+       class="source-select icon-folder {% if not courseSpec.id %}placeholder{% endif %}"
+       href="#" >
+       {{ courseSpec.id ? courseSpec.folder.parent.name : '(Click to select)' }}
+    </a>
+    <input class="hide" name="parent" id="parent" value="{{ courseSpec.folder.parent.id }}" />
+</label>

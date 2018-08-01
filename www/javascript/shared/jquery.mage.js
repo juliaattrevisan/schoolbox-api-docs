@@ -23,7 +23,8 @@
         onRevert: $.noop,
         confirmRevert: $.noop,
         setFormData: $.noop,
-        validateOptions: false
+        validateOptions: false,
+        defaultErrorMessage: 'Something went wrong when submitting the form. Please try again.'
     };
 
     function Mage(element, options) {
@@ -445,7 +446,12 @@
                 xhrDone.call(mage, mage.options.onXhrDone, targetElement, parseJSON(data));
             })
             .fail(function (xhr/*, status, error*/) {
-                xhrFail.call(mage, mage.options.onXhrFail, targetElement, parseJSON(xhr.responseText));
+                xhrFail.call(
+                    mage,
+                    mage.options.onXhrFail,
+                    targetElement,
+                    parseJSON(xhr.responseText) || mage.options.defaultErrorMessage)
+                ;
             })
             .always(function (/*xhrOrData, status, xhrOrError*/) {
                 xhrAlways.call(mage, mage.options.onXhrAlways);
