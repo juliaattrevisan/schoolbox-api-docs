@@ -587,8 +587,6 @@ class RubricMapper
         $workingGroupName = '';
         $workingCritName = '';
 
-//        $criteria = [];
-
         // build the square, extracting data as we go
         $groups = [];
         $isLastRowNewGroup = false;
@@ -596,7 +594,7 @@ class RubricMapper
             if ($isLastRowNewGroup) {
                 $isLastRowNewGroup = false;
                 if ($row[0]) {
-                    $groupMaxPoints = $row[0];
+                    $groupMaxValue = $row[0];
                 }
             } else {
                 // list of criteria, grouped by... uh, group
@@ -616,14 +614,10 @@ class RubricMapper
             $row[1] = $workingCritName;
 
             // extract the criterion uniquely (can be blank)
-//            $criteria[$workingGroupName][$workingCritName] = [
-//                'id'   => null,
-//                'name' => $workingCritName,
-//            ];
-
-            // These values persist from previous rows
+            // (The group values persist from previous rows)
+            $groups[$workingGroupName]['id']                         = null;
             $groups[$workingGroupName]['name']                       = $workingGroupName;
-            $groups[$workingGroupName]['maxPoints']                  = $groupMaxPoints ?? null;
+            $groups[$workingGroupName]['maxValue']                   = $groupMaxValue ?? null;
             $groups[$workingGroupName]['criteria'][$workingCritName] = [
                 'id'   => null,
                 'name' => $workingCritName,
@@ -635,7 +629,6 @@ class RubricMapper
         // ensure all given criteria exist: create new ones if necessary
         $criterionMapper = CriterionMapper::getInstance();
         foreach ($groups as $groupName => $group) {
-            $maxPoints = $group['maxPoints'];
             foreach ($group['criteria'] as $crit) {
                 $criterionName = $crit['name'];
                 $model         = null;
@@ -664,8 +657,8 @@ class RubricMapper
                     $model = $criterionMapper->findOrCreateOneForFolderByKey($folderId, $criterionName, $groupName);
                 }
 
-                // yank that ID
-//                $criteria[$groupName][$criterionName]['id'] = $model->getId();
+                // yank those IDs
+                $groups[$groupName]['id']                             = $model->getGroup()->getId();
                 $groups[$groupName]['criteria'][$criterionName]['id'] = $model->getId();
             }
 
@@ -674,7 +667,7 @@ class RubricMapper
         // get a new rubric in array form
         $postdata = $this->createForFolder($folderId, $courseSpecFolderId, $levelNames)->toPostData();
 
-        // overlay descriptor data
+        // overlay descriptor and max points data
         for ($i = 1; $i < count($square); $i += 2) {
 
             $gLookup = $square[$i][0];
@@ -687,7 +680,8 @@ class RubricMapper
                 continue;
             }
 
-            $critId = $crit['id'];
+            $groupId = $groups[$gLookup]['id'];
+            $critId  = $crit['id'];
 
             for ($j = 2; $j < count($square[$i]); ++$j) {
 
@@ -697,6 +691,9 @@ class RubricMapper
                 $dVal  = trim($square[$i + 1][$j]);
 
                 if (strlen($dText) || strlen($dVal)) {
+
+                    // Set the group's max value
+                    $postdata['group'][$groupId]['maxValue'] = $groups[$gLookup]['maxValue'];
 
                     // turn this criterion on
                     $postdata['criterion'][$critId]['on'] = true;
