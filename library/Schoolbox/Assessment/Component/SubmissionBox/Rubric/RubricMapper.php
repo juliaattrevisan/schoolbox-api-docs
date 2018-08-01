@@ -548,7 +548,10 @@ class RubricMapper
      * @param int      $maxLevels
      *
      * @throws \Schoolbox\Resource\Exception
-     * @return Rubric
+     * @return array 0: Rubric
+     *               1: bool: does the rubric have customised max mark per group values?
+     *                        (required as the rubric object doesn't store this separately
+     *                         from their actual value)
      */
     public function buildFromCSV(IStorage $file, $folderId, $maxLevels)
     {
@@ -588,13 +591,15 @@ class RubricMapper
         $workingCritName = '';
 
         // build the square, extracting data as we go
-        $groups = [];
+        $groups            = [];
+        $hasCustomMaxValue = false;
         $isLastRowNewGroup = false;
         while ($row = $this->getcsv($fp, $maxLevels + 2)) {
             if ($isLastRowNewGroup) {
                 $isLastRowNewGroup = false;
                 if ($row[0]) {
-                    $groupMaxValue = $row[0];
+                    $hasCustomMaxValue = true;
+                    $groupMaxValue     = $row[0];
                 }
             } else {
                 // list of criteria, grouped by... uh, group
@@ -711,7 +716,7 @@ class RubricMapper
         /** @var Rubric $rubric */
         $rubric = $this->factory->buildFromPostData([0 => $postdata], true);
 
-        return $rubric;
+        return [$rubric, $hasCustomMaxValue];
     }
 
     /**
