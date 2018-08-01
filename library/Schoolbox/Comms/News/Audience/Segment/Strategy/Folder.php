@@ -33,84 +33,35 @@ class Folder implements ISearch, ITranslate
     /**
      * Gets an sql fragment for the ISearch instance
      *
+     * Folders must be in one of these two possibilities:
+     * Have a class code, or be a Group
+     *
+     * Anything else is rolled over and shouldn't appear as a search result
+     *
      * @return string
      */
     public function getSearchSql(): string
     {
-
-        /* Folders must be in one of these two possibilities:
-         * Have a class code, or be a Group
-         * Anything else is rolled over and shouldn't appear as a search result
-         */
-        $restrictions = [];
-
-        /* These folders are groups
-         */
-        $groups = [];
-
-        $statement = $this->database->prepare('
-            SELECT DISTINCT cid
-            FROM userGroups
-        ');
-
-        $statement->execute();
-
-        foreach ($statement as $group) {
-            $groups[] = $group['cid'];
-        }
-
-        if (\count($groups)) {
-            $restrictions[] = 'id IN (' . implode(', ', $groups) . ') ';
-        }
-
-        /* These folders have folder codes
-         */
-        $folderCodes = [];
-
-        $statement = $this->database->prepare('
-            SELECT DISTINCT id
-            FROM folder f
-            INNER JOIN folder_code ON f.id = folder_code.folder_id
-        ');
-
-        $statement->execute();
-
-        foreach ($statement as $folder) {
-            $folderCodes[] = $folder['id'];
-        }
-
-        if (\count($groups)) {
-            $restrictions[] = 'id IN (' . implode(', ', $folderCodes) . ') ';
-        }
-
-        /* Enforce restrictions
-         */
-        $where = '';
-
-        if (\count($restrictions)) {
-            $where = ' AND (' . implode(' OR ', $restrictions) . ') ';
-        }
-
         return "
-            SELECT id, 
-                CONCAT(name,  
+            SELECT folder.id, 
+                CONCAT(folder.name,  
                     CASE
-                    WHEN COUNT(code) > 0
-                    THEN CONCAT(' (', GROUP_CONCAT(code SEPARATOR ', '), ')')
+                    WHEN COUNT(folder_code.code) > 0
+                    THEN CONCAT(' (', GROUP_CONCAT(folder_code.code SEPARATOR ', '), ')')
                     ELSE ''
-                    END) AS name,
+                    END) AS `name`,
                 'folder' AS entity_type
             FROM folder
             LEFT JOIN folder_code ON folder.id = folder_code.folder_id AND folder_code.deleted_at IS NULL
-            WHERE id IN 
-                (SELECT folder.id
-                FROM folder
-                LEFT JOIN folder_code ON folder.id = folder_code.folder_id AND folder_code.deleted_at IS NULL
-                WHERE folder.name LIKE :keyword or folder_code.code LIKE :keyword
-                AND folder.deleted_at IS NULL)
+            WHERE (
+                folder.id IN (SELECT folder_id FROM folder_code WHERE deleted_at IS NULL)
+                OR
+                folder.id IN (SELECT cid FROM userGroups)
+            )
+            AND (folder.name LIKE :keyword OR folder_code.code LIKE :keyword)
             AND folder.deleted_at IS NULL
-            {$where}
             GROUP BY folder.id
+            ORDER BY folder.name
         ";
     }
 
