@@ -12,7 +12,7 @@
 
         hideHorizontalClass: 'hide-h',
         hideVerticalClass: 'hide-v',
-        inputSelector: 'input[type=text],input[type=number],textarea',
+        inputSelector: 'input[type=text],input[type=tel],textarea',
         levelLimit: 0,
         url: '',
         swap: function (move, first, second) {
