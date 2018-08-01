@@ -1,5 +1,5 @@
 <?php
-
+/** @var SitePage $this */
 $attendanceController = new Event_Attendance_Controller($this);
 
 $method = $this->arg[0];
@@ -54,4 +54,6 @@ else if ($method == 'exportRejected') {
 	$data = $attendanceController->executeRejected($this->arg[1]);
 
 	$attendanceController->renderExportCSV($data);
+} else {
+    $this->pageNotFound();
 }
