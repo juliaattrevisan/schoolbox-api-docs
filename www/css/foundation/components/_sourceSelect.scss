@@ -30,6 +30,9 @@
 
     &.placeholder {
         color: $aluminum;
+        &.icon-folder:before {
+            color: $aluminum;
+        }
     }
 }
 
