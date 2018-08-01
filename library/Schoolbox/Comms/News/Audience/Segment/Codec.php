@@ -15,6 +15,13 @@ class Codec
 {
 
     /**
+     * Separates the audiencing option type from its value
+     * e.g. house:12345, role:5678
+     */
+    private const AUDIENCE_SEPARATOR = ':';
+
+
+    /**
      * Takes a value string $value and encodes it
      *
      * @param string $value
@@ -50,10 +57,10 @@ class Codec
      */
     public static function encode(string $entityType, string $entityValue, string $relationship): string
     {
-        $segment = $entityType . Transactor::AUDIENCE_SEPARATOR . self::encodeValue($entityValue);
+        $segment = $entityType . self::AUDIENCE_SEPARATOR . self::encodeValue($entityValue);
 
         if ($relationship !== Model::RELATIONSHIP_SELF) {
-            $segment .= Transactor::AUDIENCE_SEPARATOR . $relationship;
+            $segment .= self::AUDIENCE_SEPARATOR . $relationship;
         }
 
         return $segment;
@@ -68,7 +75,7 @@ class Codec
      */
     public static function decode(string $segment): array
     {
-        $pieces = explode(Transactor::AUDIENCE_SEPARATOR, $segment);
+        $pieces = explode(self::AUDIENCE_SEPARATOR, $segment);
 
         $entityType = $pieces[0];
         $entityValue = self::decodeValue($pieces[1]);
