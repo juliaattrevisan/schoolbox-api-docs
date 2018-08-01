@@ -90,9 +90,9 @@
                     });
         });
 
-        var removeSelf = $('[name^="accessLevel[159]"][value="0"]');
-        var readSelf = $('[name^="accessLevel[159]"][value="1"]');
-        var writeSelf = $('[name^="accessLevel[159]"][value="2"]');
+        var removeSelf = $('[name^="accessLevel[{USER_ID}]"][value="0"]');
+        var readSelf = $('[name^="accessLevel[{USER_ID}]"][value="1"]');
+        var writeSelf = $('[name^="accessLevel[{USER_ID}]"][value="2"]');
 
         // Admin? Throw the standard warning before allowing this to happen
         removeSelf.add(readSelf).add(writeSelf).on('click', function(e) {
@@ -175,9 +175,9 @@
                             waitingList.empty().append($response.find('#waitingList').children());
                             memberList.empty().append($response.find('#members').children());
 
-                            var removeSelf = $('[name^="accessLevel[159]"][value="0"]');
-                            var readSelf = $('[name^="accessLevel[159]"][value="1"]');
-                            var writeSelf = $('[name^="accessLevel[159]"][value="2"]');
+                            var removeSelf = $('[name^="accessLevel[{USER_ID}]"][value="0"]');
+                            var readSelf = $('[name^="accessLevel[{USER_ID}]"][value="1"]');
+                            var writeSelf = $('[name^="accessLevel[{USER_ID}]"][value="2"]');
 
                             // Admin? Throw the standard warning before allowing this to happen
                             removeSelf.add(readSelf).add(writeSelf).on('click', function(e) {
