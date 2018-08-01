@@ -37,7 +37,8 @@
                 $selector
                     .addClass('icon-folder')
                     .text($selection.data('label'))
-                    .removeClass('placeholder');
+                    .removeClass('placeholder')
+                    .addClass('icon-folder');
                 $input.val($selection.data('selection'));
 
                 //Hacky way to remove error message - could not find alternative
@@ -59,7 +60,7 @@
 
     <a data-course-parent-selector data-source="parent"
        title="Click to change the {{ locale.faculty }} / {{ locale.subject }} this course belongs to"
-       class="source-select icon-folder {% if not courseSpec.id %}placeholder{% endif %}"
+       class="source-select {% if courseSpec.id %}icon-folder{% endif %} {% if not courseSpec.id %}placeholder{% endif %}"
        href="#" >
        {{ courseSpec.id ? courseSpec.folder.parent.name : '(Click to select)' }}
     </a>
