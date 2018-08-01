@@ -91,7 +91,7 @@ class Controller extends Base
 
         /* TODO: Inject a generic IDatabase
          */
-        $registry = new Segment\SearchRegistry($this->getUser(), $this->folderMapper->getDatabase());
+        $registry = new Segment\SearchRegistry($this->getUser());
         $translator = new Segment\Translator($this->folderMapper->getDatabase());
 
         $statement = $this->userMapper->getDatabase()->prepare($registry->getSearchSql());

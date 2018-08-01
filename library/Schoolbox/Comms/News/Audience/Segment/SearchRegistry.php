@@ -9,9 +9,7 @@
 
 namespace Schoolbox\Comms\News\Audience\Segment;
 
-use Alaress\IDatabase;
 use Schoolbox\User;
-
 
 class SearchRegistry implements ISearch
 {
@@ -26,13 +24,12 @@ class SearchRegistry implements ISearch
      * Registry constructor.
      *
      * @param User      $user
-     * @param IDatabase $db
      */
-    public function __construct(User $user, IDatabase $db)
+    public function __construct(User $user)
     {
         $this->registry = [
             $campusSql = new Strategy\Campus(),
-            $folderSql = new Strategy\Folder($db),
+            $folderSql = new Strategy\Folder(),
             $houseSql = new Strategy\House(),
         ];
 

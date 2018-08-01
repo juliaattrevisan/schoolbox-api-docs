@@ -9,26 +9,11 @@
 
 namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
-use Alaress\IDatabase;
 use Schoolbox\Comms\News\Audience\Segment\ISearch;
 use Schoolbox\Comms\News\Audience\Segment\ITranslate;
 
 class Folder implements ISearch, ITranslate
 {
-
-    /**
-     * @var IDatabase
-     */
-    private $database;
-
-    /**
-     * Folder constructor.
-     * @param IDatabase $db
-     */
-    public function __construct(IDatabase $db)
-    {
-        $this->database = $db;
-    }
 
     /**
      * Gets an sql fragment for the ISearch instance

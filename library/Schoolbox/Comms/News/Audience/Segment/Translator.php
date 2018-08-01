@@ -160,7 +160,7 @@ class Translator
      */
     public function buildCache(int $articleId): self
     {
-        $translator = new TranslatorRegistry($this->database);
+        $translator = new TranslatorRegistry();
 
         $statement = $this->database->prepare($translator->getTranslateSql());
 

@@ -9,8 +9,6 @@
 
 namespace Schoolbox\Comms\News\Audience\Segment;
 
-use Alaress\IDatabase;
-
 class TranslatorRegistry implements ITranslate
 {
 
@@ -21,14 +19,13 @@ class TranslatorRegistry implements ITranslate
 
     /**
      * Registry constructor.
-     * @param IDatabase $db
      */
-    public function __construct(IDatabase $db)
+    public function __construct()
     {
         $this->registry = [
             $campusSql = new Strategy\Campus(),
             $roleSql = new Strategy\Role(),
-            $folderSql = new Strategy\Folder($db),
+            $folderSql = new Strategy\Folder(),
             $houseSql = new Strategy\House(),
             $userSql = new Strategy\User(),
             $yearSql = new Strategy\Year(),
