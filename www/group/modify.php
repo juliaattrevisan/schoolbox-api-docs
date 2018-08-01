@@ -311,11 +311,7 @@ if (is_numeric($this->arg[0])) {
             'ADMIN_NOT_SU' => 0
         ]);
     }
-
-    $this->setVar([
-        'USER_ID' => $_SESSION['user']->getId()
-    ]);
-
+    
     $trail = new \Schoolbox\Breadcrumbs();
     $trail->renderIntoSitePage($this, 'BREADCRUMB', [
         [
