@@ -85,7 +85,6 @@ class Controller extends Base
      */
     public function search()
     {
-        $keyword = '%' . $this->getRequest()->query['query'] . '%';
         $searchResult = [];
 
         $registry = new Segment\SearchRegistry($this->getUser(), $this->folderMapper);
@@ -94,7 +93,7 @@ class Controller extends Base
         $statement = $this->userMapper->getDatabase()->prepare($registry->getSearchSql());
 
         $statement->execute([
-            'keyword' => $keyword,
+            'keyword' => "%{$this->getRequest()->query['query']}%",
         ]);
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
