@@ -67,6 +67,53 @@
     </nav>
     <ul id="header-options" class="f-dropdown" data-dropdown-content>
 
+        {% set recipientsRoute = routeLookupIfAuthorized('commsNews.getRecipients', {articleId: article.id}) %}
+        {% if recipientsRoute %}
+            <script>
+                $(function() {
+                    $('#header-options').on('click', 'a[data-recipients]', function(event) {
+                        event.preventDefault();
+
+                        var $element = $(this);
+                        var $toast = $('#toast');
+
+                        $toast.toastActivate({
+                            text: 'Fetching recipient list...'
+                        });
+
+                        $.ajax({
+                            type: 'GET',
+                            url: $element.attr('href'),
+                            data: {articleId: {{ article.id }}},
+                            dataType: 'html'
+                        }).success(function (response) {
+                            $('#recipientsModal').foundation('reveal', 'open', {
+                                url: "{{ recipientsRoute }}",
+                                success: function (data) {
+                                    $toast.toastTimeout({
+                                        text: 'Retrieved',
+                                        css: 'success'
+                                    });
+                                },
+                                error: function () {
+                                    $toast.toastTimeout({
+                                        text: 'Error: a could not get recipients for this article',
+                                        css: 'alert'
+                                    });
+                                }
+                            });
+                        }).error(function (response) {
+                            $toast.toastTimeout({
+                                text: 'Error: b could not get recipients for this article',
+                                css: 'alert'
+                            });
+                        });
+                    });
+                });
+            </script>
+            <li><a class="icon-staff-students" href="{{ recipientsRoute }}" data-recipients>Recipient List</a></li>
+        {% endif %}
+
         {# Modify article #}
         {% set modifyRoute = routeLookupIfAuthorized('commsNews.getUpdate', {articleId: article.id}) %}
         {% if modifyRoute and isEditable %}
@@ -337,3 +384,7 @@
 </div>
 
 <div class="toast" id="toast"></div>
+
+<div id="recipientsModal" class="reveal-modal" data-reveal>
+    <a class="close-reveal-modal">&#215;</a>
+</div>

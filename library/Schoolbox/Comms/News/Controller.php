@@ -17,6 +17,8 @@ use InvalidArgumentException;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Collection;
 use Schoolbox\Comms\News\Audience;
+use Schoolbox\Comms\News\Audience\BusinessRules;
+use Schoolbox\Comms\News\Audience\RelationshipFilterer;
 use Schoolbox\Comms\News\Policy;
 use Schoolbox\Comms\News\SaveForLater;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -719,5 +721,43 @@ class Controller extends Base
         ]);
 
         return $partialData;
+    }
+
+
+    /**
+     * Compute the recipients so author can identify
+     *
+     * @api /comms/news/:articleId/recipients
+     *
+     * @param Model $article
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \UnderflowException
+     * @throws \UnexpectedValueException
+     */
+    public function getRecipients(Model $article)
+    {
+        $userIds = (new Audience\UserResolver(
+            new BusinessRules(),
+            $this->databaseInternal,
+            $this->externalClass,
+            new RelationshipFilterer(
+                $this->databaseInternal,
+                $this->userMapper,
+                $this->externalUser,
+                $this->folderMapper,
+                $this->externalClass,
+                $this->userAccessMapper
+            ),
+            $this->audienceMapper
+        ))->findUsersForArticle($article->getId());
+
+        if (\count($userIds)) {
+            $users = $this->userMapper->findByColumn('id', $userIds)->sortBy('lastname', 'asc');
+        }
+        else {
+            $users = $this->userMapper->createCollection();
+        }
+
+        $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@commsNews/recipients.twig', ['users' => $users]));
     }
 }
