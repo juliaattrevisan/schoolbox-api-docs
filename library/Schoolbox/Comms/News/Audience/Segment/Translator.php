@@ -131,12 +131,12 @@ class Translator
      *
      * Return a string like "User (230) [Parents of]"
      *
-     * @param        $name
+     * @param string $name
      * @param string $entityType
      * @param string $relationship
      * @return string
      */
-    public function assembleSegment($name, string $entityType, string $relationship): string
+    public function assembleSegment(string $name, string $entityType, string $relationship): string
     {
         $string = "{$name} ({$this->translateEntityType($entityType)})";
 
