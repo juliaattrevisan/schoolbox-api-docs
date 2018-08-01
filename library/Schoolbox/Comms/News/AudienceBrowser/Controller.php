@@ -89,8 +89,6 @@ class Controller extends Base
         $keyword = '%' . $this->getRequest()->query['query'] . '%';
         $searchResult = [];
 
-        /* TODO: Inject a generic IDatabase
-         */
         $registry = new Segment\SearchRegistry($this->getUser());
         $translator = new Segment\Translator($this->folderMapper->getDatabase());
 
