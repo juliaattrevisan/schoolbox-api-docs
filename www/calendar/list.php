@@ -201,6 +201,13 @@ $this->dropDown(
     array('type' => 'EXPORT_TYPE_NAME', 'id' => 'EXPORT_TYPE_ID')
 );
 
+//Bastardise the folder names to get the codes in
+//Better than changing checkList()
+foreach($category_list as $key => $value) {
+    if(!empty($category_list[$key]['code'])) {
+        $category_list[$key]['name'] = $category_list[$key]['name'].' ('.$category_list[$key]['code'].')';
+    }
+}
 $this->checkList(
     'filter_group',
     $category_list,

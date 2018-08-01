@@ -760,7 +760,7 @@ class Group extends DeprecatedModel
             : '';
         $query = "
 			SELECT
-			folder.name, folder.id, type,
+			folder.name, folder.id, type, 
 			GROUP_CONCAT(cc.code) as code
 			FROM userAccess, folder LEFT JOIN folder_code cc ON folder.id = cc.folder_id AND cc.deleted_at IS NULL
 			WHERE userAccess.uid = '$userID'
