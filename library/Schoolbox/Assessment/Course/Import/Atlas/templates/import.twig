@@ -43,11 +43,9 @@
                                     <option value="">(all subjects)</option>
                                 </select>
                             </label>
-                            <div class="small-12 column">
-                                {% include '@course/sub/sourceSelector.twig' with {
-                                    courseSpec: null,
-                                } only %}
-                            </div>
+                            {% include '@course/sub/sourceSelector.twig' with {
+                                courseSpec: null,
+                            } only %}
 
                             {% if not isValidFacultyRoot %}
                                 <div class="small-12 column">
@@ -58,6 +56,7 @@
 
                         <div class="small-12 medium-6 column">
                             <label>Curriculum Plans</label>
+                            <div class="loader"></div>
                             <ul class="information-list card-selectable" id="curriculum-plan-list">
                                 <li id="curriculum-plan-template" class="hide" data-template="curriculum-plan">
                                     <div class="small-12 card">
@@ -205,6 +204,7 @@
         $.ajax("{{ routeLookup('courseImportAtlas.getCurriculumList') }}", {dataType: 'json'})
             .done(function(response) {
                 $toast.toastTimeout({text: 'Loaded', css: 'success'});
+                $(".loader").hide();
 
                 // Load list of schools, grades, subjects
                 response.forEach(function(item) {
