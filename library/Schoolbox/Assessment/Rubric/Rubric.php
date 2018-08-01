@@ -274,9 +274,11 @@ class Rubric implements Twiggable
     /**
      * Return a CSV-compatible (ie. rectangular) array representation of the data structure this rubric contains
      *
+     * @param bool $includePointsPerCapability Does the array include max marks
+     *                                         per capability?
      * @return array
      */
-    public function toGrid()
+    public function toGrid(bool $includePointsPerCapability): array
     {
         // start by generating a rectangle which is (w+2 x 2h+1)
         $width  = $this->levels->count();
@@ -306,7 +308,7 @@ class Rubric implements Twiggable
                 $currentVRow = $currentDRow + 1;
 
                 // Max points per capability (if enabled)
-                if (!$groupRendered) {
+                if ($includePointsPerCapability && !$groupRendered) {
                     $square[$currentVRow][0] = $group->getMaxValue();
                 }
 
