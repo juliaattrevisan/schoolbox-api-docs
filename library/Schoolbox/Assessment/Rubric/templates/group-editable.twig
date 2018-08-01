@@ -56,7 +56,7 @@
             Maximum points for {{ locale.translate('rubricGroup') }}
             <input type="number"
                    min="0"
-                   value="{{ group.maxValue }}"
+                   value="{{ group.max }}"
                    name="{{ groupInput }}[maxValue]"
                    data-group-max-value
                    {% if not showGroupMaxValue %}disabled class="hide"{% endif %}
