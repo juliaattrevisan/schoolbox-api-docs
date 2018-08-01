@@ -128,21 +128,22 @@ class Controller extends Base
 
     /**
      * @param Collection $collection
+     * @param string     $entityType
      * @return \Alaress\Web\Output\Json
      */
-    private function generate(Collection $collection): \Alaress\Web\Output\Json
+    private function generate(Collection $collection, string $entityType): \Alaress\Web\Output\Json
     {
         $items = [];
 
         foreach($collection as $item) {
-            $data = array_combine(['id', 'name'], $item->findValueLabelPair());
+            $tuple = $item->findValueLabelPair();
 
             /* Encode the value because Year Level is a user-configurable string
-             * TODO: Check frontend as to why this is slightly different
              */
-            $data['id'] = Segment\Codec::encodeValue($data['id']);
-
-            $items[] = $data;
+            $items[] = [
+                'id' => Segment\Codec::encode($entityType, $tuple['value'], Model::RELATIONSHIP_SELF),
+                'name' => $tuple['label']
+            ];
         }
 
         return $this->buildJsonOutput([
@@ -159,7 +160,7 @@ class Controller extends Base
      */
     public function getCampuses()
     {
-        $this->getResponse()->content->set($this->generate($this->campusMapper->findAll()));
+        $this->getResponse()->content->set($this->generate($this->campusMapper->findAll(), 'campus'));
     }
 
 
@@ -170,7 +171,7 @@ class Controller extends Base
      */
     public function getRoles()
     {
-        $this->getResponse()->content->set($this->generate($this->roleMapper->findAll()));
+        $this->getResponse()->content->set($this->generate($this->roleMapper->findAll(), 'role'));
     }
 
 
@@ -181,7 +182,7 @@ class Controller extends Base
      */
     public function getPastoralGroups()
     {
-        $this->getResponse()->content->set($this->generate($this->pastoralGroupMapper->findAll()));
+        $this->getResponse()->content->set($this->generate($this->pastoralGroupMapper->findAll(), 'pastoral_group'));
     }
 
 
@@ -192,7 +193,7 @@ class Controller extends Base
      */
     public function getHouses()
     {
-        $this->getResponse()->content->set($this->generate($this->houseMapper->findAll()));
+        $this->getResponse()->content->set($this->generate($this->houseMapper->findAll(), 'school_house'));
     }
 
 
@@ -203,7 +204,7 @@ class Controller extends Base
      */
     public function getFolders()
     {
-        $this->getResponse()->content->set($this->generate($this->folderMapper->findForUser($this->getUser())->sortBy('title', 'asc')));
+        $this->getResponse()->content->set($this->generate($this->folderMapper->findForUser($this->getUser())->sortBy('title', 'asc'), 'folder'));
     }
 
 
@@ -220,20 +221,21 @@ class Controller extends Base
 
         sort($years);
 
-        $data = [];
+        $items = [];
 
         foreach ($years as $year) {
-            $data[] = [
-                /* TODO: Check frontend as to why this is slightly different
-                 */
-                'id' => Segment\Codec::encodeValue($year),
+
+            /* Encode the value because Year Level is a user-configurable string
+             */
+            $items[] = [
+                'id' => Segment\Codec::encode('year', $year, Model::RELATIONSHIP_SELF),
                 'name' => \is_numeric($year) ? "Year {$year}" : $year
             ];
         }
 
         $this->getResponse()->content->set($this->buildJsonOutput([
             'success' => true,
-            'data' => $data
+            'data' => $items
         ]));
     }
 }

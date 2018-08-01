@@ -362,7 +362,7 @@
                         var modifiedOptions = [];
                         response.data.data.forEach(function(option) {
                             modifiedOptions.push({
-                                id: audienceOption.id + ':' + option.id,
+                                id: option.id,
                                 name: option.name,
                                 type: audienceOption.name
                             });
