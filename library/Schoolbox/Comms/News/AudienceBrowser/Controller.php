@@ -157,7 +157,7 @@ class Controller extends Base
      */
     public function getCampuses()
     {
-        $this->getResponse()->content->set($this->generate($this->campusMapper->findAll(), 'campus'));
+        $this->getResponse()->content->set($this->generate($this->campusMapper->findAll(), Model::ENTITY_TYPE_CAMPUS));
     }
 
 
@@ -168,7 +168,7 @@ class Controller extends Base
      */
     public function getRoles()
     {
-        $this->getResponse()->content->set($this->generate($this->roleMapper->findAll(), 'role'));
+        $this->getResponse()->content->set($this->generate($this->roleMapper->findAll(), Model::ENTITY_TYPE_ROLE));
     }
 
 
@@ -179,7 +179,7 @@ class Controller extends Base
      */
     public function getPastoralGroups()
     {
-        $this->getResponse()->content->set($this->generate($this->pastoralGroupMapper->findAll(), 'pastoral_group'));
+        $this->getResponse()->content->set($this->generate($this->pastoralGroupMapper->findAll(), Model::ENTITY_TYPE_PASTORAL_GROUP));
     }
 
 
@@ -190,7 +190,7 @@ class Controller extends Base
      */
     public function getHouses()
     {
-        $this->getResponse()->content->set($this->generate($this->houseMapper->findAll(), 'school_house'));
+        $this->getResponse()->content->set($this->generate($this->houseMapper->findAll(), Model::ENTITY_TYPE_SCHOOL_HOUSE));
     }
 
 
@@ -201,7 +201,7 @@ class Controller extends Base
      */
     public function getFolders()
     {
-        $this->getResponse()->content->set($this->generate($this->folderMapper->findForUser($this->getUser())->sortBy('title', 'asc'), 'folder'));
+        $this->getResponse()->content->set($this->generate($this->folderMapper->findForUser($this->getUser())->sortBy('title', 'asc'), Model::ENTITY_TYPE_FOLDER));
     }
 
 
@@ -225,7 +225,7 @@ class Controller extends Base
             /* Encode the value because Year Level is a user-configurable string
              */
             $items[] = [
-                'id' => Segment\Codec::encode('year', $year, Model::RELATIONSHIP_SELF),
+                'id' => Segment\Codec::encode(Model::ENTITY_TYPE_YEAR, $year, Model::RELATIONSHIP_SELF),
                 'name' => \is_numeric($year) ? "Year {$year}" : $year
             ];
         }
