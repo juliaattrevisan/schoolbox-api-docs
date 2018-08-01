@@ -8,16 +8,16 @@
 
     &:hover {
         background-color: $input-hover-bg-color;
-        color: $input-hover-color;
-        border-color: $input-border-color;
-        text-decoration: none !important;
+        //color: $input-hover-color;
+        //border-color: $input-border-color;
+        //text-decoration: none !important;
     }
-    &:focus {
-        color: $input-focus-color;
-        background-color: $input-focus-bg-color;
-        border-color: $input-focus-border-color;
-        outline: none;
-    }
+    //&:focus {
+    //    color: $input-focus-color;
+    //    background-color: $input-focus-bg-color;
+    //    border-color: $input-focus-border-color;
+    //    outline: none;
+    //}
 
     &.icon-folder {
         color: #000;
