@@ -24,6 +24,7 @@ elseif ( $method == 'processRemoveAttendance' && is_numeric($this->arg[1]) && is
     \Schoolbox\Calendar\EventMapper::getInstance()->removeAttendance($eventId, $userId);
 
     header('Location: '."/calendar/attendance/list/".$eventId);
+    exit;
 }
 
 /* Show all upcoming events with the number of attendees
