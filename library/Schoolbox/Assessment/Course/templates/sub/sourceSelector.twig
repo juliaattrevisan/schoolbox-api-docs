@@ -34,7 +34,10 @@
                 var $selection = $(this);
 
                 // selector takes the name, input takes the ID
-                $selector.addClass('icon-folder').text($selection.data('label'));
+                $selector
+                    .addClass('icon-folder')
+                    .text($selection.data('label'))
+                    .removeClass('placeholder');
                 $input.val($selection.data('selection'));
 
                 //Hacky way to remove error message - could not find alternative
@@ -56,7 +59,7 @@
 
     <a data-course-parent-selector data-source="parent"
        title="Click to change the {{ locale.faculty }} / {{ locale.subject }} this course belongs to"
-       class="source-select icon-folder"
+       class="source-select icon-folder {% if not courseSpec.id %}placeholder{% endif %}"
        href="#" >
        {{ courseSpec.id ? courseSpec.folder.parent.name : '(Click to select)' }}
     </a>

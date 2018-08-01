@@ -26,6 +26,10 @@
             color: #0066b0;
         }
     }
+
+    &.placeholder {
+        color: $aluminum;
+    }
 }
 
 fieldset[disabled] {
