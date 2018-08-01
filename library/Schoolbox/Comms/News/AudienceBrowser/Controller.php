@@ -88,7 +88,7 @@ class Controller extends Base
         $keyword = '%' . $this->getRequest()->query['query'] . '%';
         $searchResult = [];
 
-        $registry = new Segment\SearchRegistry($this->getUser());
+        $registry = new Segment\SearchRegistry($this->getUser(), $this->folderMapper);
         $translator = new Segment\Translator($this->folderMapper->getDatabase());
 
         $statement = $this->userMapper->getDatabase()->prepare($registry->getSearchSql());

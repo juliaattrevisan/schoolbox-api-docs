@@ -10,6 +10,7 @@
 namespace Schoolbox\Comms\News\Audience\Segment;
 
 use Schoolbox\User;
+use Schoolbox\Resource\Folder;
 
 class SearchRegistry implements ISearch
 {
@@ -30,16 +31,18 @@ class SearchRegistry implements ISearch
         'campus', 'folder', 'school_house', 'year', 'role', 'pastoral_group'
     ];
 
+
     /**
      * Registry constructor.
      *
-     * @param User      $user
+     * @param User          $user
+     * @param Folder\Mapper $folderMapper
      */
-    public function __construct(User $user)
+    public function __construct(User $user, Folder\Mapper $folderMapper)
     {
         $this->registry = [
             $campusSql = new Strategy\Campus(),
-            $folderSql = new Strategy\Folder(),
+            $folderSql = new Strategy\Folder($user, $folderMapper),
             $houseSql = new Strategy\House(),
         ];
 

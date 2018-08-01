@@ -11,22 +11,58 @@ namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
 use Schoolbox\Comms\News\Audience\Segment\ISearch;
 use Schoolbox\Comms\News\Audience\Segment\ITranslate;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\User;
 
 class Folder implements ISearch, ITranslate
 {
 
     /**
+     * @var User
+     */
+    private $user;
+
+
+    /**
+     * @var FolderMapper
+     */
+    private $folderMapper;
+
+
+    /**
+     * Folder constructor.
+     * @param User         $user
+     * @param FolderMapper $folderMapper
+     */
+    public function __construct(User $user, FolderMapper $folderMapper)
+    {
+        $this->user = $user;
+        $this->folderMapper = $folderMapper;
+    }
+
+
+    /**
      * Gets an sql fragment for the ISearch instance
      *
-     * Folders must be in one of these two possibilities:
-     * Have a class code, or be a Group
+     * To use a Folder as an audiencing target,
+     *    - Folders must have a class code or be a Group
+     *    - Current user must have at least READ access to a folder via class membership
+     *    - Folder can't be deleted
      *
-     * Anything else is rolled over and shouldn't appear as a search result
+     * Anything else is rolled over or otherwise inaccessible and shouldn't appear as a search result
      *
      * @return string
+     * @throws \Schoolbox\Mapper\DefinitionException
      */
     public function getSearchSql(): string
     {
+        $classMembership = $this->folderMapper->findFolderIdsForUser($this->user);
+        $classMembershipSql = '';
+
+        if (\count($classMembership)) {
+            $classMembershipSql = ' AND folder.id IN (' . implode(', ', $classMembership) . ')';
+        }
+
         return "
             (SELECT folder.id, 
                 CONCAT(folder.name,  
@@ -43,6 +79,7 @@ class Folder implements ISearch, ITranslate
                 OR
                 folder.id IN (SELECT cid FROM userGroups)
             )
+            {$classMembershipSql}
             AND (folder.name LIKE :keyword OR folder_code.code LIKE :keyword)
             AND folder.deleted_at IS NULL
             GROUP BY folder.id
