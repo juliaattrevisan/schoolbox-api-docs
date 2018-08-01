@@ -106,15 +106,20 @@ class Controller extends Base
                 'name' => $translator->assembleSegment($row['name'], $row['entity_type'], Model::RELATIONSHIP_SELF)
             ];
 
-            $searchResult[] = [
-                'id' => Segment\Codec::encode($row['entity_type'], $row['id'], Model::RELATIONSHIP_PARENTS_OF),
-                'name' => $translator->assembleSegment($row['name'], $row['entity_type'], Model::RELATIONSHIP_PARENTS_OF)
-            ];
+            /* Only provide the Parents and Teachers modifiers to strats which support them
+             * We exclude Parents and Teachers modifiers from Users due to privacy reasons
+             */
+            if ($registry->hasModifier($row['entity_type'])) {
+                $searchResult[] = [
+                    'id' => Segment\Codec::encode($row['entity_type'], $row['id'], Model::RELATIONSHIP_PARENTS_OF),
+                    'name' => $translator->assembleSegment($row['name'], $row['entity_type'], Model::RELATIONSHIP_PARENTS_OF)
+                ];
 
-            $searchResult[] = [
-                'id' => Segment\Codec::encode($row['entity_type'], $row['id'], Model::RELATIONSHIP_TEACHERS_OF),
-                'name' => $translator->assembleSegment($row['name'], $row['entity_type'], Model::RELATIONSHIP_TEACHERS_OF)
-            ];
+                $searchResult[] = [
+                    'id' => Segment\Codec::encode($row['entity_type'], $row['id'], Model::RELATIONSHIP_TEACHERS_OF),
+                    'name' => $translator->assembleSegment($row['name'], $row['entity_type'], Model::RELATIONSHIP_TEACHERS_OF)
+                ];
+            }
         }
 
         $this->getResponse()->content->set($this->buildJsonOutput($searchResult));
