@@ -250,7 +250,6 @@ class Mapper extends \Schoolbox\Mapper
          * Look for expired items matching a certain year/month combination
          */
         $now = \Alaress_Date_Format::now()->getDatabase();
-        $yearMonth = '';
 
         /* Dates - must be accepted, published and not deleted
          */
@@ -275,34 +274,34 @@ class Mapper extends \Schoolbox\Mapper
             $pb->greaterThan('expires_at', $now);
         }
 
-        /* String representation of the WHERE clause
-         */
-        $where = implode("\nAND ", $pb->getWhere());
-
         /* Filter to articles that I can see
          */
         if (\count($availableArticleIds)) {
-            $availableArticleIdsSql = implode(', ', $availableArticleIds);
-
-            $where .= "\nAND id IN ({$availableArticleIdsSql})";
+            $pb->in('id', $availableArticleIds);
         }
 
         /* If $topicId is provided, only get articles for that topic
          * Otherwise get $limit articles from any topic
          */
-        $query = "
-            SELECT id
-            FROM {$this->table}
-            WHERE {$where}
-        ";
+        if ($topicId === self::TOPIC_ALL_ID) {
+            $where = implode("\nAND ", $pb->getWhere());
 
-        if ($topicId !== self::TOPIC_ALL_ID) {
+            $query = "
+                SELECT id
+                FROM {$this->table}
+                WHERE {$where}
+            ";
+        }
+        else {
+            $pb->equals('cnat.topic_id', $topicId);
+
+            $where = implode("\nAND ", $pb->getWhere());
+
             $query = "
                 SELECT id
                 FROM {$this->table}
                 INNER JOIN comms_news_article_topic cnat ON {$this->table}.id = cnat.article_id 
-                WHERE cnat.topic_id = :topicId
-                AND {$where}                
+                WHERE {$where}              
                 GROUP BY id
             ";
         }
@@ -325,27 +324,20 @@ class Mapper extends \Schoolbox\Mapper
 
         $statement = $this->database->prepare($query);
 
-        /* Because pdo does some micky mouse shenanigans
+        /* Bind the pb params
          */
-        if ($topicId !== self::TOPIC_ALL_ID) {
-            $statement->bindValue('topicId', $topicId, \PDO::PARAM_INT);
+        foreach ($pb->getParams() as $key => $value) {
+            $statement->bindValue($key, $value);
         }
 
+        /* Because pdo does some mickey mouse shenanigans
+         */
         if ($limit) {
             $statement->bindValue('limit', $limit, \PDO::PARAM_INT);
 
             if ($pageNum) {
                 $statement->bindValue('offset', $limit*($pageNum-1), \PDO::PARAM_INT);
             }
-        }
-
-        /* ...wow
-         */
-        $statement->bindValue('expires_at_0', $now, \PDO::PARAM_STR);
-        $statement->bindValue('publish_at_0', $now, \PDO::PARAM_STR);
-
-        if ($year || $month) {
-            $statement->bindValue('publish_at_1', $yearMonth, \PDO::PARAM_STR);
         }
 
         /* finally
