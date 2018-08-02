@@ -692,6 +692,7 @@ class Controller extends Base
     private function generatePartial(string $urlPrefix, Querystring $params, Collection $topics, bool $hidePaginator, ?int $year, ?int $month): array
     {
         $outcome = (new Lists(
+            $this->getConfigLoader(),
             $this->newsMapper,
             $this->policyMapper,
             $this->saveForLaterMapper,
@@ -733,6 +734,7 @@ class Controller extends Base
         $month = null;
 
         $result = (new Lists(
+            $this->getConfigLoader(),
             $this->newsMapper,
             $this->policyMapper,
             $this->saveForLaterMapper,

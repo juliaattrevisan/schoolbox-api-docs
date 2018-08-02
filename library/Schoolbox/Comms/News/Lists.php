@@ -21,6 +21,7 @@ use Schoolbox\Collection;
 use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Comms\News\Audience\BusinessRules;
 use Schoolbox\Comms\News\Audience\RelationshipFilterer;
+use Schoolbox\IConfigLoader;
 use Schoolbox\News\Topic;
 use Schoolbox\Permission\Access;
 use Schoolbox\Resource\Folder;
@@ -29,6 +30,11 @@ use Schoolbox\UserMapper;
 
 class Lists
 {
+
+    /**
+     * @var IConfigLoader
+     */
+    private $configLoader;
 
     /**
      * @var Mapper
@@ -75,9 +81,11 @@ class Lists
      */
     private $externalClass;
 
+
     /**
      * Lists constructor.
      *
+     * @param IConfigLoader           $configLoader
      * @param Mapper                  $newsMapper
      * @param Policy\Mapper           $policyMapper
      * @param SaveForLater\Mapper     $saveForLaterMapper
@@ -89,6 +97,7 @@ class Lists
      * @param External_Class          $externalClass
      */
     public function __construct(
+        IConfigLoader $configLoader,
         Mapper $newsMapper,
         Policy\Mapper $policyMapper,
         SaveForLater\Mapper $saveForLaterMapper,
@@ -99,6 +108,7 @@ class Lists
         External_User $externalUser,
         External_Class $externalClass
     ) {
+        $this->configLoader = $configLoader;
         $this->newsMapper = $newsMapper;
         $this->policyMapper = $policyMapper;
         $this->saveForLaterMapper = $saveForLaterMapper;
@@ -217,7 +227,7 @@ class Lists
         elseif ($params->getLimit() === null) {
             $paginator = $this->generatePaginator(
                 $url,
-                7,
+                $this->configLoader->get('search_type_limit'),
                 \count($availableIds)
             );
         }
