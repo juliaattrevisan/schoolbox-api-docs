@@ -578,11 +578,6 @@ class Controller extends Base
      */
     public function getArchive(int $year = null, int $month = null)
     {
-        /* This is always on in this News Archive context
-         * If you visit comms/news, the querystring param is empty so you have to forcibly set it to true
-         */
-        $hidePaginator = false;
-
         $params = new Querystring($this->getRequest()->query);
         $topics = $this->topicMapper->findAll();
 
@@ -592,7 +587,7 @@ class Controller extends Base
          */
         $urlPrefix = $this->getRouter()->generate('commsNews.getArchive', ['year' => $year, 'month' => $month]);
 
-        $outcome = $this->generatePartial($urlPrefix, $params, $topics, $hidePaginator, $year, $month);
+        $outcome = $this->generatePartial($urlPrefix, $params, $topics, false, $year, $month);
         $content = $this->buildUnthemedHtmlOutput('@commsNews/partial.twig', $outcome)->getAsString();
 
         /* Merge a whole bunch of other settings too
@@ -602,7 +597,6 @@ class Controller extends Base
             'initialContent' => $content,
             'topics' => $topics,
             'topicAll' => Mapper::TOPIC_ALL_SLUG,
-            'hidePaginator' => $hidePaginator,
             'slug' => $params->getSlug(),
 
             /* Archive-specific vars that don't appear anywhere else
@@ -630,11 +624,6 @@ class Controller extends Base
      */
     public function getIndex()
     {
-        /* This is always on in this News Index context
-         * If you visit comms/news, the querystring param is empty so you have to forcibly set it to true
-         */
-        $hidePaginator = false;
-
         $params = new Querystring($this->getRequest()->query);
         $topics = $this->topicMapper->findAll();
 
@@ -644,7 +633,7 @@ class Controller extends Base
          */
         $urlPrefix = $this->getRouter()->generate('commsNews.getIndex');
 
-        $outcome = $this->generatePartial($urlPrefix, $params, $topics, $hidePaginator, null, null);
+        $outcome = $this->generatePartial($urlPrefix, $params, $topics, false, null, null);
         $content = $this->buildUnthemedHtmlOutput('@commsNews/partial.twig', $outcome)->getAsString();
 
         /* Merge a whole bunch of other settings too
@@ -654,8 +643,6 @@ class Controller extends Base
             'initialContent' => $content,
             'topics' => $topics,
             'topicAll' => Mapper::TOPIC_ALL_SLUG,
-            'hidePaginator' => $hidePaginator,
-            'pageNum' => $params->getPageNum(),
             'slug' => $params->getSlug()
         ];
 
