@@ -35,7 +35,10 @@ note left
     the Worker's output streams.
 end note
 WorkerPool -> Worker : setTask()
-...Command is running......
+
+group Worker Process
+Worker -> Notifier : notify{roleType}{action}()
+end group
 
 Scheduler <- WorkerPool : handleResponse()
 note right
