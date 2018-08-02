@@ -21,8 +21,11 @@
     {% set params = params ~ '&l=' ~limit %}
 {% endif %}
 
-{% if showPaginator %}
-    {% set params = params ~ '&sp=' ~ showPaginator %}
+{# The paginator is enabled by default
+ # You can provide a param here to turn it off
+ #}
+{% if hidePaginator %}
+    {% set params = params ~ '&hp=' ~ hidePaginator %}
 {% endif %}
 
 <dl class="tabs" data-tab="" id="{{ topicContainerId }}">

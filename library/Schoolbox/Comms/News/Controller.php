@@ -549,7 +549,7 @@ class Controller extends Base
             $urlPrefix = $this->getRouter()->generate('commsNews.getIndex');
         }
 
-        $outcome = $this->generatePartial($urlPrefix, $params, $topics, $params->getShowPaginator(), $year, $month);
+        $outcome = $this->generatePartial($urlPrefix, $params, $topics, $params->getHIdePaginator(), $year, $month);
         $content = $this->buildUnthemedHtmlOutput('@commsNews/partial.twig', $outcome)->getAsString();
         $viewAllLink = $this->getRouteIfAuthorized('commsNews.getIndex') . '?' . $params;
 
@@ -581,18 +581,18 @@ class Controller extends Base
         /* This is always on in this News Archive context
          * If you visit comms/news, the querystring param is empty so you have to forcibly set it to true
          */
-        $showPaginator = true;
+        $hidePaginator = false;
 
         $params = new Querystring($this->getRequest()->query);
         $topics = $this->topicMapper->findAll();
 
         /* The initial data set to load, given the params provided
          * Compact Mode is hardcoded to be disabled from this context
-         * ShowPaginator is always true in this context
+         * HidePaginator is always false in this context
          */
         $urlPrefix = $this->getRouter()->generate('commsNews.getArchive', ['year' => $year, 'month' => $month]);
 
-        $outcome = $this->generatePartial($urlPrefix, $params, $topics, $showPaginator, $year, $month);
+        $outcome = $this->generatePartial($urlPrefix, $params, $topics, $hidePaginator, $year, $month);
         $content = $this->buildUnthemedHtmlOutput('@commsNews/partial.twig', $outcome)->getAsString();
 
         $selectedDate = '';
@@ -610,7 +610,7 @@ class Controller extends Base
             'initialContent' => $content,
             'topics' => $topics,
             'topicAll' => Mapper::TOPIC_ALL_SLUG,
-            'showPaginator' => $showPaginator,
+            'hidePaginator' => $hidePaginator,
             'slug' => $params->getSlug(),
 
             /* Archive-specific vars that don't appear anywhere else
@@ -643,18 +643,18 @@ class Controller extends Base
         /* This is always on in this News Index context
          * If you visit comms/news, the querystring param is empty so you have to forcibly set it to true
          */
-        $showPaginator = true;
+        $hidePaginator = false;
 
         $params = new Querystring($this->getRequest()->query);
         $topics = $this->topicMapper->findAll();
 
         /* The initial data set to load, given the params provided
          * Compact Mode is hardcoded to be disabled from this context
-         * ShowPaginator is always true in this context
+         * HidePaginator is always false in this context
          */
         $urlPrefix = $this->getRouter()->generate('commsNews.getIndex');
 
-        $outcome = $this->generatePartial($urlPrefix, $params, $topics, $showPaginator, null, null);
+        $outcome = $this->generatePartial($urlPrefix, $params, $topics, $hidePaginator, null, null);
         $content = $this->buildUnthemedHtmlOutput('@commsNews/partial.twig', $outcome)->getAsString();
 
         /* Merge a whole bunch of other settings too
@@ -664,7 +664,7 @@ class Controller extends Base
             'initialContent' => $content,
             'topics' => $topics,
             'topicAll' => Mapper::TOPIC_ALL_SLUG,
-            'showPaginator' => $showPaginator,
+            'hidePaginator' => $hidePaginator,
             'slug' => $params->getSlug()
         ];
 
@@ -679,7 +679,7 @@ class Controller extends Base
      * @param string             $urlPrefix
      * @param Querystring        $params
      * @param Collection|Topic[] $topics
-     * @param bool               $showPaginator
+     * @param bool               $hidePaginator
      * @param int|null           $year
      * @param int|null           $month
      * @return array
@@ -689,7 +689,7 @@ class Controller extends Base
      * @throws \UnderflowException
      * @throws \UnexpectedValueException
      */
-    private function generatePartial(string $urlPrefix, Querystring $params, Collection $topics, bool $showPaginator, ?int $year, ?int $month): array
+    private function generatePartial(string $urlPrefix, Querystring $params, Collection $topics, bool $hidePaginator, ?int $year, ?int $month): array
     {
         $outcome = (new Lists(
             $this->newsMapper,
@@ -713,7 +713,7 @@ class Controller extends Base
         /* Always provide paginator from this context
          */
         $outcome = array_merge($outcome, [
-            'showPaginator' => $showPaginator,
+            'hidePaginator' => $hidePaginator,
             'compactMode' => $params->getCompactMode(),
             'pageNum' => $params->getPageNum()
         ]);
@@ -728,7 +728,7 @@ class Controller extends Base
         $topicSlug = 'all';
         $pageNum = null;
         $limit = 0;
-        $showPaginator = null;
+        $hidePaginator = null;
         $year = null;
         $month = null;
 
@@ -749,7 +749,7 @@ class Controller extends Base
                 Querystring::TOPIC_SLUG_PARAM => $topicSlug,
                 Querystring::PAGE_NUMBER_PARAM => $pageNum,
                 Querystring::LIMIT_PARAM => $limit,
-                Querystring::SHOW_PAGINATOR_PARAM => $showPaginator
+                Querystring::HIDE_PAGINATOR_PARAM => $hidePaginator
             ]),
             $this->getUser(),
             $this->topicMapper->findAll(),

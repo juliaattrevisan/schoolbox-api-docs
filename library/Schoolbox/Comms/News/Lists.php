@@ -198,12 +198,26 @@ class Lists
          */
         $url = "{$urlPrefix}?{$params}";
 
+        /* Limits and offsets
+         * Apply either the $limit provided, or use the system default
+         *
+         *     $limit === int:  use the value of the int for the number of items per page
+         *     $limit === null: use system default for number of items per page
+         *     $limit === 0:    explicitly get all the items and disregard pagination ('all' is cast to zero)
+         */
         $paginator = null;
 
-        if ((int)$params->getLimit()) {
+        if ($params->getLimit()) {
             $paginator = $this->generatePaginator(
                 $url,
                 $params->getLimit(),
+                \count($availableIds)
+            );
+        }
+        elseif ($params->getLimit() === null) {
+            $paginator = $this->generatePaginator(
+                $url,
+                7,
                 \count($availableIds)
             );
         }

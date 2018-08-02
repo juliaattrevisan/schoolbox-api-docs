@@ -44,9 +44,9 @@ class Querystring
     public const TOPIC_SLUG_PARAM = 'topic';
 
     /**
-     * Querystring param for the Show Pagination option
+     * Querystring param for the Hide Pagination option
      */
-    public const SHOW_PAGINATOR_PARAM = 'sp';
+    public const HIDE_PAGINATOR_PARAM = 'hp';
 
     /**
      * An array of key/value pairs corresponding to GET params
@@ -67,14 +67,14 @@ class Querystring
 //        $slug = $data[self::TOPIC_SLUG_PARAM];
 //        $pageNum = $this->determinePageNum($data[self::PAGE_NUMBER_PARAM]);
 //        $limit = $this->determineLimit($data[self::LIMIT_PARAM]) ?: $articlesPerPage;
-//        $showPaginator = $data[self::SHOW_PAGINATOR_PARAM];
+//        $hidePaginator = $data[self::SHOW_PAGINATOR_PARAM];
 
         $this->querystring = [
             self::COMPACT_MODE_PARAM => $data[self::COMPACT_MODE_PARAM],
             self::TOPIC_SLUG_PARAM => $data[self::TOPIC_SLUG_PARAM],
             self::PAGE_NUMBER_PARAM => $data[self::PAGE_NUMBER_PARAM],
             self::LIMIT_PARAM => $data[self::LIMIT_PARAM],
-            self::SHOW_PAGINATOR_PARAM => $data[self::SHOW_PAGINATOR_PARAM]
+            self::HIDE_PAGINATOR_PARAM => $data[self::HIDE_PAGINATOR_PARAM]
         ];
     }
 
@@ -127,9 +127,9 @@ class Querystring
      *
      * @return bool
      */
-    public function getShowPaginator(): bool
+    public function getHidePaginator(): bool
     {
-        return (bool)$this->querystring[self::SHOW_PAGINATOR_PARAM];
+        return (bool)$this->querystring[self::HIDE_PAGINATOR_PARAM];
     }
 
 

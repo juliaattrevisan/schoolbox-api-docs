@@ -45,67 +45,67 @@
  # @param array|int[] savedArticleIds
  # @param int unsaved
  # @param int compactMode
- # @param bool showPaginator
+ # @param bool hidePaginator
  #}
 {% if articles|length %}
-<ul class="information-list">
-    {% for article in articles %}
-        <li class="actions-small-1">
-            <div class="list-item">
-                <div class="small-12 card">
+    <ul class="information-list">
+        {% for article in articles %}
+            <li class="actions-small-1">
+                <div class="list-item">
+                    <div class="small-12 card">
 
-                    {% if article.featureImage.hash %}
-                        <a href="{{ routeLookup('commsNews.getDetail', {articleId: article.id}) }}">
-                            <img src="/storage/image.php?hash={{ article.featureImage.hash }}&size=square64">
-                        </a>
-                    {% endif %}
-
-                    <h3><a href="{{ routeLookup('commsNews.getDetail', {articleId: article.id}) }}">{{ article.title }}</a></h3>
-
-                    <p class="meta">Published by
-                        {% if article.author.deletedAt.isNull %}
-                            <a href="/search/user/{{ article.author.id }}" title="View Profile">{{ article.author.fullname }}</a>
-                        {% else %}
-                            {{ article.author.fullname }}
+                        {% if article.featureImage.hash %}
+                            <a href="{{ routeLookup('commsNews.getDetail', {articleId: article.id}) }}">
+                                <img src="/storage/image.php?hash={{ article.featureImage.hash }}&size=square64">
+                            </a>
                         {% endif %}
-                        <time title="{{ article.publishAt.local }}">{{ article.publishAt.relativeTime }}</time>
-                    </p>
 
-                    {% if article.topics|length %}
-                        <p class="meta">Related topics:
-                            {% for topic in article.topics %}
-                                <a href="{{ routeLookup('commsNews.getIndex') }}?topic={{ topic.slug }}" title="More {{ locale.news }} in {{ topic.name }}">{{ topic.name }}</a>{% if not loop.last %}, {% endif %}
-                            {% endfor %}
+                        <h3><a href="{{ routeLookup('commsNews.getDetail', {articleId: article.id}) }}">{{ article.title }}</a></h3>
+
+                        <p class="meta">Published by
+                            {% if article.author.deletedAt.isNull %}
+                                <a href="/search/user/{{ article.author.id }}" title="View Profile">{{ article.author.fullname }}</a>
+                            {% else %}
+                                {{ article.author.fullname }}
+                            {% endif %}
+                            <time title="{{ article.publishAt.local }}">{{ article.publishAt.relativeTime }}</time>
                         </p>
-                    {% endif %}
+
+                        {% if article.topics|length %}
+                            <p class="meta">Related topics:
+                                {% for topic in article.topics %}
+                                    <a href="{{ routeLookup('commsNews.getIndex') }}?topic={{ topic.slug }}" title="More {{ locale.news }} in {{ topic.name }}">{{ topic.name }}</a>{% if not loop.last %}, {% endif %}
+                                {% endfor %}
+                            </p>
+                        {% endif %}
+                    </div>
                 </div>
-            </div>
-            <nav>
-                {% include '@commsNewsSaveForLater/activator.twig' with {
-                    article: article,
-                    isSaved: savedArticleIds[article.id]
-                } only %}
-            </nav>
+                <nav>
+                    {% include '@commsNewsSaveForLater/activator.twig' with {
+                        article: article,
+                        isSaved: savedArticleIds[article.id]
+                    } only %}
+                </nav>
 
-            {# Hide the article tag when there's no content to show, or when compactMode is on #}
-            {% if not compactMode %}
-                {% set blurb = macro.pacify(article, readMore) %}
+                {# Hide the article tag when there's no content to show, or when compactMode is on #}
+                {% if not compactMode %}
+                    {% set blurb = macro.pacify(article, readMore) %}
 
-                {% if blurb|length %}
-                <article>{{ blurb }}</article>
+                    {% if blurb|length %}
+                    <article>{{ blurb }}</article>
+                    {% endif %}
                 {% endif %}
-            {% endif %}
-        </li>
-    {% endfor %}
-</ul>
+            </li>
+        {% endfor %}
+    </ul>
 
-{% if showPaginator %}
-    {% include 'sub/paginator.twig' with {
-        paginator: paginator,
-        page: pageNum
-    } %}
-{% endif %}
-
+    {# Paginator is enabled by default #}
+    {% if not hidePaginator %}
+        {% include 'sub/paginator.twig' with {
+            paginator: paginator,
+            page: pageNum
+        } %}
+    {% endif %}
 {% else %}
     <div class="empty-state no-margin">
         <i class="icon-news"></i>
