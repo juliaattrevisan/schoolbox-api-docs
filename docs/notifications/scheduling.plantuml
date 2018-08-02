@@ -1,0 +1,51 @@
+@startuml
+
+== Startup ==
+
+Scheduler -> ScheduleMessageBroker : registerConsumer()
+Scheduler -> ScheduleSignalQueue : psubscribe()
+
+== On consume from ScheduleMessageBroker ==
+
+' Workflow on receive msg from msg broker
+Scheduler <- ScheduleMessageBroker : onMessage()
+Scheduler -> Scheduler : scheduleNotification()
+note right
+    The notification may be
+    dispatched immediately,
+    or deferred until its
+    trigger time.
+end note
+Scheduler -> Scheduler : schedule()
+
+alt notification is in future
+Scheduler -> EventLoop : addTimer()
+...
+Scheduler <- EventLoop : callback
+end
+
+Scheduler -> Scheduler : dispatchTrigger()
+Scheduler -> Dispatcher : enqueue()
+Dispatcher -> WorkerPool
+Dispatcher <- WorkerPool
+Dispatcher -> Worker
+Worker -> Task
+Worker <- Task
+Dispatcher <- Worker
+Scheduler <- Dispatcher
+Scheduler -> ResponseHandler
+Scheduler <- ResponseHandler
+Scheduler -> MessageBroker
+Scheduler <- MessageBroker
+
+'== On receive from Worker ==
+'
+'Scheduler <- Worker : handleResponse()
+'Scheduler -> ScheduleMessageBroker
+
+== On receive from ScheduleSignalQueue ==
+
+Scheduler <- ScheduleSignalQueue : handle()
+Scheduler -> Scheduler : onHangup()
+
+@enduml
