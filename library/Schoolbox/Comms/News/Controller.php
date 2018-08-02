@@ -537,7 +537,7 @@ class Controller extends Base
      */
     public function getListByTopic(?int $year, ?int $month)
     {
-        $params = new Querystring($this->getConfigLoader(), $this->getRequest()->query);
+        $params = new Querystring($this->getRequest()->query);
         $topics = $this->topicMapper->findAll();
 
         /* The requested data set to load, given the params provided
@@ -583,7 +583,7 @@ class Controller extends Base
          */
         $hidePaginator = false;
 
-        $params = new Querystring($this->getConfigLoader(), $this->getRequest()->query);
+        $params = new Querystring($this->getRequest()->query);
 
         /* Set initial page number behaviour
          */
@@ -652,7 +652,7 @@ class Controller extends Base
          */
         $hidePaginator = false;
 
-        $params = new Querystring($this->getConfigLoader(), $this->getRequest()->query);
+        $params = new Querystring($this->getRequest()->query);
 
         /* Set initial page number behaviour
          */

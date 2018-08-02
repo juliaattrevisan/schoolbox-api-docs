@@ -17,7 +17,6 @@
 
 namespace Schoolbox\Comms\News;
 
-use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\News\TopicMapper;
 
@@ -49,10 +48,6 @@ class Querystring
      */
     public const HIDE_PAGINATOR_PARAM = 'hp';
 
-    /**
-     * @var IConfigLoader
-     */
-    private $configLoader;
 
     /**
      * An array of key/value pairs corresponding to GET params
@@ -67,16 +62,8 @@ class Querystring
      *
      * @param $data
      */
-    public function __construct(IConfigLoader $configLoader, $data)
+    public function __construct($data)
     {
-        $this->configLoader = $configLoader;
-
-//        $compactMode = $data[self::COMPACT_MODE_PARAM];
-//        $slug = $data[self::TOPIC_SLUG_PARAM];
-//        $pageNum = $this->determinePageNum($data[self::PAGE_NUMBER_PARAM]);
-//        $limit = $this->determineLimit($data[self::LIMIT_PARAM]) ?: $articlesPerPage;
-//        $hidePaginator = $data[self::SHOW_PAGINATOR_PARAM];
-
         $this->querystring = [
             self::COMPACT_MODE_PARAM => $data[self::COMPACT_MODE_PARAM],
             self::TOPIC_SLUG_PARAM => $data[self::TOPIC_SLUG_PARAM],
@@ -126,7 +113,7 @@ class Querystring
      */
     public function getLimit()
     {
-        return $this->determineLimit($this->querystring[self::LIMIT_PARAM]);
+        return $this->querystring[self::LIMIT_PARAM];
     }
 
 
@@ -192,36 +179,5 @@ class Querystring
     private function determinePageNum(?string $param): int
     {
         return (int)$param ?: 1;
-    }
-
-
-    /**
-     * $limit can be 'all' or 0; this equates to "don't impose a limit"
-     * ("all" could come from a component config option)
-     *
-     * If limit was unspecified, use a system default
-     *
-     * @param null|string $limit
-     * @return int
-     */
-    private function determineLimit(?string $limit): int
-    {
-
-        /* If the limit was explicitly null, return the system default
-         */
-        if (null === $limit) {
-            return (int)$this->configLoader->get('search_type_limit');
-        }
-
-        /* limit set to 'all'; don't impose limits
-         * limit set to 0; don't impose limitss
-         */
-        if (('all' === $limit) || !(int)$limit) {
-            return 0;
-        }
-
-        /* use whatever was provided
-         */
-        return (int)$limit;
     }
 }
