@@ -550,7 +550,7 @@ class Controller extends Base
         }
 
         $outcome = $this->generatePartial($urlPrefix, $params, $topics, $params->getShowPaginator(), $year, $month);
-        $content = $this->buildUnthemedHtmlOutput('@commsNews/list.twig', $outcome)->getAsString();
+        $content = $this->buildUnthemedHtmlOutput('@commsNews/partial.twig', $outcome)->getAsString();
         $viewAllLink = $this->getRouteIfAuthorized('commsNews.getIndex') . '?' . $params;
 
         $this->getResponse()->content->set($this->buildJsonOutput([
@@ -593,7 +593,7 @@ class Controller extends Base
         $urlPrefix = $this->getRouter()->generate('commsNews.getArchive', ['year' => $year, 'month' => $month]);
 
         $outcome = $this->generatePartial($urlPrefix, $params, $topics, $showPaginator, $year, $month);
-        $content = $this->buildUnthemedHtmlOutput('@commsNews/list.twig', $outcome)->getAsString();
+        $content = $this->buildUnthemedHtmlOutput('@commsNews/partial.twig', $outcome)->getAsString();
 
         $selectedDate = '';
         $selectedYear = '';
@@ -655,7 +655,7 @@ class Controller extends Base
         $urlPrefix = $this->getRouter()->generate('commsNews.getIndex');
 
         $outcome = $this->generatePartial($urlPrefix, $params, $topics, $showPaginator, null, null);
-        $content = $this->buildUnthemedHtmlOutput('@commsNews/list.twig', $outcome)->getAsString();
+        $content = $this->buildUnthemedHtmlOutput('@commsNews/partial.twig', $outcome)->getAsString();
 
         /* Merge a whole bunch of other settings too
          * Specifically applies to the index page which loads slightly differently than component variant
