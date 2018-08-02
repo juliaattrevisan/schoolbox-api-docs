@@ -43,7 +43,7 @@
         {% endif %}
 
         <dd {{ selected|purify }}>
-            <a href="{{ url ~ '?&topic=' ~ topic.getSlug ~ params }}">{{ topic.name }}</a>
+            <a href="{{ url ~ '?topic=' ~ topic.getSlug ~ params }}">{{ topic.name }}</a>
         </dd>
     {% endfor %}
 </dl>
