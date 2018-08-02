@@ -13,7 +13,6 @@ participant "Notifier\n<size:10>//\Schoolbox\Realtime\Schedule\Module\ModuleNoti
 ==Startup==
 
 Scheduler -> ScheduleMessageBroker : registerConsumer()
-Scheduler -> RouterMessageBroker : __construct()
 Scheduler -> ScheduleSignalQueue : psubscribe()
 
 ==On consume from ScheduleMessageBroker==
