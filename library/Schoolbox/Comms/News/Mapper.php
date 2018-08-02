@@ -320,10 +320,9 @@ class Mapper extends \Schoolbox\Mapper
          *     $limit === null: use system default for number of items per page
          *     $limit === 0:    explicitly get all the items and disregard pagination ('all' is cast to zero)
          */
-        if ($limit || $limit === null) {
-            $query .= 'LIMIT :limit';
-
-            if ($pageNum) {
+        if ($pageNum) {
+            if ($limit || $limit === null) {
+                $query .= ' LIMIT :limit';
                 $query .= ' OFFSET :offset';
             }
         }
@@ -338,22 +337,22 @@ class Mapper extends \Schoolbox\Mapper
 
         /* Because pdo does some mickey mouse shenanigans
          */
-        if ($limit || $limit === null) {
+        if ($pageNum) {
+            if ($limit || $limit === null) {
 
-            /* Apply either the $limit provided, or use the system default
-             */
-            $derivedLimit = $limit;
+                /* Apply either the $limit provided, or use the system default
+                 */
+                $derivedLimit = $limit;
 
-            if (!$limit) {
-                $derivedLimit = (int)$this->getConfigLoader()->get('search_type_limit');
-            }
+                if (!$limit) {
+                    $derivedLimit = (int)$this->getConfigLoader()->get('search_type_limit');
+                }
 
-            $statement->bindValue('limit', $derivedLimit, \PDO::PARAM_INT);
+                $statement->bindValue('limit', $derivedLimit, \PDO::PARAM_INT);
 
-            /* Paginate
-             */
-            if ($pageNum) {
-                $statement->bindValue('offset', $limit*($pageNum-1), \PDO::PARAM_INT);
+                /* Paginate
+                 */
+                $statement->bindValue('offset', $derivedLimit*($pageNum-1), \PDO::PARAM_INT);
             }
         }
 
