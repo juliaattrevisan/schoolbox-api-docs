@@ -25,7 +25,7 @@
         {% set detailUrl = routeLookup('commsNews.getDetail', {articleId: article.id}) %}
         {% set pacified = pacified|slice(0, max+1)|split(' ')|slice(0, -1)|join(' ') ~ '...'%}
 
-        {# If read_mre policy has a value, append a "Read More" style link
+        {# If read_more policy has a value, append a "Read More" style link
          # Otherwise, don't do anything except the appended  ellipsis
          #}
         {% if readMore|length %}
