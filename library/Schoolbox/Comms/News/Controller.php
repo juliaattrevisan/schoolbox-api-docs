@@ -607,7 +607,7 @@ class Controller extends Base
 
             /* Archive-specific vars that don't appear anywhere else
              */
-            'availableYears' => $this->newsMapper->findYearsAndMonthsWithArticles($outcome['articleIdsForUser']),
+            'availableYearsAndMonths' => $this->newsMapper->findYearsAndMonthsWithArticles($outcome['articleIdsForUser']),
             'year' => $year,
             'month' => $month,
         ];

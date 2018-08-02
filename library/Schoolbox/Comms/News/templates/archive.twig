@@ -18,6 +18,13 @@
     </div>
 </div>
 
+{% if year and month %}
+    {% set selectedDate = year ~ '-' ~ month ~ '-01' %}
+    {% set subheading = selectedDate|date('F Y') %}
+{% elseif year %}
+    {% set subheading = year %}
+{% endif %}
+
 <div class="row">
 
     {# Month/Year Selector #}
@@ -26,18 +33,18 @@
         <section>
             <nav>
                 <ul class="side-nav">
-                    {% for year, months in availableYears %}
+                    {% for availableYear, availableMonths in availableYearsAndMonths %}
 
-                        {# TODO ned to repair this check #}
-                        <li class="{{ selectedYear|length and year == selectedYear ? 'active' : '' }}" role="menuitem">
-                            <a href="{{ routeLookup('commsNews.getArchive', {year: year}) }}">
-                                {{ year }}
+                        <li class="{{ year == availableYear ? 'active' : '' }}" role="menuitem">
+                            <a href="{{ routeLookup('commsNews.getArchive', {year: availableYear}) }}">
+                                {{ availableYear }}
                             </a>
                             <ul>
-                                {% for month, val in months %}
-                                    {% set archiveDate = year ~ '-' ~ month ~ '-01' %}
-                                    <li class="{{ selectedDate|length and archiveDate == selectedDate ? 'active' : '' }}" role="menuitem">
-                                        <a href="{{ routeLookup('commsNews.getArchive', {year: year, month: month}) }}">
+                                {% for availableMonth, val in availableMonths %}
+                                    {% set archiveDate = availableYear ~ '-' ~ availableMonth ~ '-01' %}
+
+                                    <li class="{{ archiveDate == selectedDate ? 'active' : '' }}" role="menuitem">
+                                        <a href="{{ routeLookup('commsNews.getArchive', {year: availableYear, month: availableMonth}) }}">
                                             {{ archiveDate | date('F') }}
                                         </a>
                                     </li>
@@ -52,15 +59,7 @@
     </div>
 
     <div class="small-12 medium-9 island">
-        <h2 class="subheader">
-            {% if year and month %}
-                {% set selectedDate = year ~ '-' ~ month ~ '-01' %}
-
-                {{ selectedDate | date('F Y') }}
-            {% elseif year %}
-                {{ year }}
-            {% endif %}
-        </h2>
+        <h2 class="subheader">{{ subheading }}</h2>
         {% if year %}
         <section>
             <script src="/javascript/shared/comms/articletabs.js"></script>
