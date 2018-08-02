@@ -17,6 +17,9 @@ use Schoolbox\User;
 
 /**
  * Handler for importation of files from Atlas to Schoolbox.
+ *
+ * Currently this is not in use, due to being unable to configure a HTTP client
+ * to pass Atlas' auth challenge.
  */
 class File implements IAttachmentHandler
 {
@@ -58,8 +61,7 @@ class File implements IAttachmentHandler
      */
     public function attach(Attachment $attachment, Folder $folder, bool $private, User $owner): void
     {
-        // This needs to download the file from a private Atlas instance.
-        // I assume I can do this with the same auth token as the API has?
+        // TODO somehow configure a HTTP client to pass Atlas' auth challenge
         $download = $this->httpClient->get($attachment->getUrl());
 
         $storageModel = $this->storageMapper->acceptStream(
