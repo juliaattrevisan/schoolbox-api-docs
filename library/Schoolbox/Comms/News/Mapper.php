@@ -178,6 +178,7 @@ class Mapper extends \Schoolbox\Mapper
      * @param array $articleIdsForUser
      * @return array
      * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \UnderflowException
      */
     public function findYearsAndMonthsWithArticles(array $articleIdsForUser): array
     {
@@ -191,12 +192,14 @@ class Mapper extends \Schoolbox\Mapper
             ->notNull('accepted_at')
             ->isNull('deleted_at');
 
-        $where = implode ("\nAND ", $pb->getWhere());
-
         /* These are articles that the user could see
          * Don't provide year/month combinations that contain articles, but the user isn't in their audience lol
          */
-        $availableArticleIdsSql = implode(', ', $articleIdsForUser);
+        if (\count($articleIdsForUser)) {
+            $pb->in('id', $articleIdsForUser);
+        }
+
+        $where = implode ("\nAND ", $pb->getWhere());
 
         $query = "
             SELECT 
@@ -204,17 +207,13 @@ class Mapper extends \Schoolbox\Mapper
                 SUBSTRING(publish_at, 6, 2) AS month
             FROM {$this->getTable()}
             WHERE {$where}
-            AND {$this->getIdentifierColumn()} IN ({$availableArticleIdsSql})
             GROUP BY year, month
             ORDER BY year DESC, month DESC
         ";
 
         $statement = $this->database->prepare($query);
 
-        $statement->execute([
-            'expires_at_0' => $now,
-            'publish_at_0' => $now,
-        ]);
+        $statement->execute($pb->getParams());
 
         $years = [];
 
