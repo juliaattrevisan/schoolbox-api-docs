@@ -67,8 +67,8 @@ class Module extends BaseModule
             )
         );
 
-        $preloadNews = function ($params) {
-            return $this->preloadNews($params);
+        $preloadArticle = function ($params) {
+            return $this->preloadArticle($params);
         };
 
         /* Create news article
@@ -78,16 +78,16 @@ class Module extends BaseModule
 
         /* Update news article
          */
-        $this->register('GET', '/{articleId:\d+}/update', 'getUpdate', $getPerms, $preloadNews);
-        $this->register('POST', '/{articleId:\d+}', 'postUpdate', $getPerms, $preloadNews);
+        $this->register('GET', '/{articleId:\d+}/update', 'getUpdate', $getPerms, $preloadArticle);
+        $this->register('POST', '/{articleId:\d+}', 'postUpdate', $getPerms, $preloadArticle);
 
         /* View news article
          */
-        $this->register('GET', '/{articleId:\d+}', 'getDetail', null, $preloadNews);
+        $this->register('GET', '/{articleId:\d+}', 'getDetail', null, $preloadArticle);
 
         /* Delete article
          */
-        $this->register('POST', '/{articleId:\d+}/delete', 'postDelete', null, $preloadNews);
+        $this->register('POST', '/{articleId:\d+}/delete', 'postDelete', null, $preloadArticle);
 
         /* (async) Get a list of topics to chooze
          */
@@ -116,7 +116,7 @@ class Module extends BaseModule
      * @throws InvalidArgumentException
      * @throws NotFound
      */
-    private function preloadNews(array $params) :array
+    private function preloadArticle(array $params) :array
     {
         try {
             $article = $this->getNewsMapper()->findById($params['articleId']);
