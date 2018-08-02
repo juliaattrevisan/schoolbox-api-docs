@@ -141,12 +141,15 @@ class Querystring
 
     /**
      * String representation of the original values provided
+     * Remove keys that have empty values
      *
      * @return string
      */
     public function __toString()
     {
-        return http_build_query($this->querystring);
+        return http_build_query(array_filter($this->querystring, function($value, $key) {
+            return \strlen($value);
+        }, ARRAY_FILTER_USE_BOTH));
     }
 
 

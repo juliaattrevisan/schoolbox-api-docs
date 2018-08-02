@@ -549,9 +549,9 @@ class Controller extends Base
             $urlPrefix = $this->getRouter()->generate('commsNews.getIndex');
         }
 
-        $outcome = $this->generatePartial($urlPrefix, $params, $topics, $params->getHIdePaginator(), $year, $month);
+        $outcome = $this->generatePartial($urlPrefix, $params, $topics, $params->getHidePaginator(), $year, $month);
         $content = $this->buildUnthemedHtmlOutput('@commsNews/partial.twig', $outcome)->getAsString();
-        $viewAllLink = $this->getRouteIfAuthorized('commsNews.getIndex') . '?' . $params;
+        $viewAllLink = "{$this->getRouteIfAuthorized('commsNews.getIndex')}?topic={$params->getSlug()}";
 
         $this->getResponse()->content->set($this->buildJsonOutput([
             'success' => true,
