@@ -44,22 +44,10 @@
                  */
                 selectedUrl: '',
 
-                /* Return in compact mode or normal mode
-                 */
-                compactMode: false,
-
                 /* Update the url upon tab change
                  * The url comes from backend, telling you the url of the topic requested
                  */
                 updateUrl: false,
-
-                /* The current page number
-                 */
-                pageNum: -1,
-
-                /* The current limit
-                 */
-                limit: null,
 
                 // Callback on tab change
                 onChange: function () {},
