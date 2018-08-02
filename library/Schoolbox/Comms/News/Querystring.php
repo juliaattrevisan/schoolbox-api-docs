@@ -80,8 +80,8 @@ class Querystring
         $this->querystring = [
             self::COMPACT_MODE_PARAM => $data[self::COMPACT_MODE_PARAM],
             self::TOPIC_SLUG_PARAM => $data[self::TOPIC_SLUG_PARAM],
-            self::PAGE_NUMBER_PARAM => $this->determinePageNum($data[self::PAGE_NUMBER_PARAM]),
-            self::LIMIT_PARAM => $this->determineLimit($data[self::LIMIT_PARAM]),
+            self::PAGE_NUMBER_PARAM => $data[self::PAGE_NUMBER_PARAM],
+            self::LIMIT_PARAM => $data[self::LIMIT_PARAM],
             self::HIDE_PAGINATOR_PARAM => $data[self::HIDE_PAGINATOR_PARAM]
         ];
     }
@@ -115,7 +115,7 @@ class Querystring
      */
     public function getPageNum()
     {
-        return $this->querystring[self::PAGE_NUMBER_PARAM];
+        return $this->determinePageNum($this->querystring[self::PAGE_NUMBER_PARAM]);
     }
 
 
@@ -126,7 +126,7 @@ class Querystring
      */
     public function getLimit()
     {
-        return $this->querystring[self::LIMIT_PARAM];
+        return $this->determineLimit($this->querystring[self::LIMIT_PARAM]);
     }
 
 
@@ -153,7 +153,7 @@ class Querystring
 
 
     /**
-     * String representatin
+     * String representation of the original values provided
      *
      * @return string
      */
@@ -189,7 +189,7 @@ class Querystring
      * @param null|string $param
      * @return int
      */
-    public function determinePageNum(?string $param): int
+    private function determinePageNum(?string $param): int
     {
         return (int)$param ?: 1;
     }
