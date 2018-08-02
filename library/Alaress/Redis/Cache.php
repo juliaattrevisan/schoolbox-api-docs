@@ -79,26 +79,12 @@ class Cache extends BaseCache
         if ($invalidateCache) {
             $this->invalidate($key);
         } else {
-            // Avoid race condition by querying TTL and content in transaction
-            [$ttl, $cachedResult] = $this->redis->transaction(function (MultiExec $tx) use ($redisKey) {
-                $tx->ttl($redisKey)
+            // Avoid race condition by querying cached status and result in transaction
+            [$exists, $cachedResult] = $this->redis->transaction(function (MultiExec $tx) use ($redisKey) {
+                $tx->exists($redisKey)
                    ->get($redisKey);
             });
-
-            switch ($ttl) {
-                case -2:
-                    // Key does not exist or has expired: refetch
-                    break;
-
-                case -1:
-                    // Key exists and has no expiry: don't refetch
-                    $cached = true;
-                    break;
-
-                default:
-                    // Key exists but has an expiry: refetch if TTL > expiry
-                    $cached = ($ttl <= $this->expiry);
-            }
+            $cached = (bool)$exists;
         }
 
         if ($cached) {
