@@ -31,7 +31,7 @@ class Querystring
     /**
      * Querystring param for the current Page Number chosen
      */
-    public const PAGE_NUMBER_PARAM = 'page';
+    public const PAGE_NUMBER_PARAM = 'p';
 
     /**
      * Querystring param for the current Limit chosen
