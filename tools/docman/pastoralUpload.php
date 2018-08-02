@@ -43,7 +43,7 @@ $kernel->run(function ($di, $loop, $log, $opts) {
 
     $pastoralUploadQueueMapper = new PastoralUploadQueueMapper();
 
-    $lock = new Alaress_Lock('pastoral_upload.lock');
+    $lock = new Alaress_Lock('pastoral_upload.' . INSTANCE_ID . '.lock');
 
     if (!$lock->acquire()) {
         $log->critical("A pastoral uploader is already running, checking timeout.");
