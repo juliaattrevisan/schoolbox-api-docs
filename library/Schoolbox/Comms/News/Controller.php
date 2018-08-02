@@ -716,7 +716,7 @@ class Controller extends Base
         $outcome = array_merge($outcome, [
             'hidePaginator' => $hidePaginator,
             'compactMode' => $params->getCompactMode(),
-            'pageNum' => $params->getPageNum()
+            'pageNum' => $params->getPageNum() ?: 1
         ]);
 
         return $outcome;
