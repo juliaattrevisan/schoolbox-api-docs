@@ -699,44 +699,4 @@ class Controller extends Base
 
         return $outcome;
     }
-
-
-    public function getTest()
-    {
-        $compactMode = null;
-        $topicSlug = 'all';
-        $pageNum = null;
-        $limit = 0;
-        $hidePaginator = null;
-        $year = null;
-        $month = null;
-
-        $result = (new Lists(
-            $this->getConfigLoader(),
-            $this->newsMapper,
-            $this->policyMapper,
-            $this->saveForLaterMapper,
-            $this->databaseInternal,
-            $this->folderMapper,
-            $this->userAccessMapper,
-            $this->userMapper,
-            $this->externalUser,
-            $this->externalClass
-        ))->findForTopic(
-            'cat',
-            new Querystring([
-                Querystring::COMPACT_MODE_PARAM => $compactMode,
-                Querystring::TOPIC_SLUG_PARAM => $topicSlug,
-                Querystring::PAGE_NUMBER_PARAM => $pageNum,
-                Querystring::LIMIT_PARAM => $limit,
-                Querystring::HIDE_PAGINATOR_PARAM => $hidePaginator
-            ]),
-            $this->getUser(),
-            $this->topicMapper->findAll(),
-            $year,
-            $month
-        );
-
-        new \Alaress_Probe($result['articles']->getPropertyValues('id'));
-    }
 }
