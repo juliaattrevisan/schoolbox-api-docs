@@ -59,23 +59,22 @@ class Querystring
     /**
      * Querystring constructor.
      *
-     * @param int $articlesPerPage
-     * @param     $data
+     * @param $data
      */
-    public function __construct(int $articlesPerPage, $data)
+    public function __construct($data)
     {
-        $compactMode = $data[self::COMPACT_MODE_PARAM];
-        $slug = $data[self::TOPIC_SLUG_PARAM];
-        $pageNum = $this->determinePageNum($data[self::PAGE_NUMBER_PARAM]);
-        $limit = $this->determineLimit($data[self::LIMIT_PARAM]) ?: $articlesPerPage;
-        $showPaginator = $data[self::SHOW_PAGINATOR_PARAM];
+//        $compactMode = $data[self::COMPACT_MODE_PARAM];
+//        $slug = $data[self::TOPIC_SLUG_PARAM];
+//        $pageNum = $this->determinePageNum($data[self::PAGE_NUMBER_PARAM]);
+//        $limit = $this->determineLimit($data[self::LIMIT_PARAM]) ?: $articlesPerPage;
+//        $showPaginator = $data[self::SHOW_PAGINATOR_PARAM];
 
         $this->querystring = [
-            self::COMPACT_MODE_PARAM => $compactMode,
-            self::TOPIC_SLUG_PARAM => $slug,
-            self::PAGE_NUMBER_PARAM => $pageNum,
-            self::LIMIT_PARAM => $limit,
-            self::SHOW_PAGINATOR_PARAM => $showPaginator
+            self::COMPACT_MODE_PARAM => $data[self::COMPACT_MODE_PARAM],
+            self::TOPIC_SLUG_PARAM => $data[self::TOPIC_SLUG_PARAM],
+            self::PAGE_NUMBER_PARAM => $data[self::PAGE_NUMBER_PARAM],
+            self::LIMIT_PARAM => $data[self::LIMIT_PARAM],
+            self::SHOW_PAGINATOR_PARAM => $data[self::SHOW_PAGINATOR_PARAM]
         ];
     }
 
