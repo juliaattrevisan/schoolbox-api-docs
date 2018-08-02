@@ -101,6 +101,10 @@ class Module extends BaseModule
          */
         $this->register('GET', '/archive{/year,month}', 'getArchive', $viewPerms);
 
+        /* Test location
+         */
+        $this->register('GET', '/test', 'getTest', $viewPerms);
+
         /* Index of articles audienced to you
          */
         $this->register('GET', '', 'getIndex', $viewPerms);

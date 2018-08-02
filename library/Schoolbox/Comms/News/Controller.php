@@ -722,4 +722,23 @@ class Controller extends Base
 
         return $outcome;
     }
+
+
+    public function getTest()
+    {
+        $availableArticleIds = [];
+        $topicId = 0;
+        $limit = 0;
+        $pageNum = null;
+        $year = null;
+        $month = null;
+
+        $result = $this->newsMapper->findArticleIdsForTopic($availableArticleIds, $topicId, $limit, $pageNum, $year, $month);
+
+        new \Alaress_Probe(\count($result));
+
+        foreach ($result as $current) {
+            new \Alaress_Probe($current);
+        }
+    }
 }

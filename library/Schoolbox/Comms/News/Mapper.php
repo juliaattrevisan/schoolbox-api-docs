@@ -225,6 +225,7 @@ class Mapper extends \Schoolbox\Mapper
         return $years;
     }
 
+
     /**
      * Find just the ids for the articles in a topic
      * We generally use this for pagination counts where we need a count instead of hydrated things
@@ -235,15 +236,15 @@ class Mapper extends \Schoolbox\Mapper
      *
      * @param array    $availableArticleIds
      * @param int      $topicId
-     * @param int      $limit
-     * @param int      $pageNum
+     * @param int|null $limit
+     * @param int|null $pageNum
      * @param int|null $year
      * @param int|null $month
      * @return array
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \UnderflowException
      */
-    public function findArticleIdsForTopic(array $availableArticleIds, int $topicId, int $limit = 0, int $pageNum = 0, ?int $year, ?int $month): array
+    public function findArticleIdsForTopic(array $availableArticleIds, int $topicId, ?int $limit, ?int $pageNum, ?int $year, ?int $month): array
     {
 
         /* If either year or month is specified, we're looking in the news archive
@@ -313,8 +314,13 @@ class Mapper extends \Schoolbox\Mapper
         ';
 
         /* Limits and offsets
+         * Apply either the $limit provided, or use the system default
+         *
+         *     $limit === int:  use the value of the int for the number of items per page
+         *     $limit === null: use system default for number of items per page
+         *     $limit === 0:    explicitly get all the items and disregard pagination ('all' is cast to zero)
          */
-        if ($limit) {
+        if ($limit || $limit === null) {
             $query .= 'LIMIT :limit';
 
             if ($pageNum) {
@@ -332,9 +338,20 @@ class Mapper extends \Schoolbox\Mapper
 
         /* Because pdo does some mickey mouse shenanigans
          */
-        if ($limit) {
-            $statement->bindValue('limit', $limit, \PDO::PARAM_INT);
+        if ($limit || $limit === null) {
 
+            /* Apply either the $limit provided, or use the system default
+             */
+            $derivedLimit = $limit;
+
+            if (!$limit) {
+                $derivedLimit = (int)$this->getConfigLoader()->get('search_type_limit');
+            }
+
+            $statement->bindValue('limit', $derivedLimit, \PDO::PARAM_INT);
+
+            /* Paginate
+             */
             if ($pageNum) {
                 $statement->bindValue('offset', $limit*($pageNum-1), \PDO::PARAM_INT);
             }
