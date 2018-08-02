@@ -39,10 +39,12 @@
 
     <div class="small-12 medium-9 island">
         <h2 class="subheader">
-            {% if selectedDate|length %}
+            {% if year and month %}
+                {% set selectedDate = year ~ '-' ~ month ~ '-01' %}
+
                 {{ selectedDate | date('F Y') }}
-            {% elseif selectedYear|length %}
-                {{ selectedYear }}
+            {% elseif year %}
+                {{ year }}
             {% endif %}
         </h2>
         {% if year %}
