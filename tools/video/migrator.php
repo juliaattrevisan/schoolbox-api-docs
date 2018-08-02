@@ -66,7 +66,7 @@ try {
         // Allow only a single migration at a time
         // ------------------------------------------------------------------------------------------------------------
 
-        $lock = new Alaress_Lock($configLoader->get('video_dir') . '/.migration.lock');
+        $lock = new Alaress_Lock($configLoader->get('video_dir') . '/.migration_'.INSTANCE_ID.'.lock');
 
         if (!$lock->acquire()) {
             $log->warning("Media migration already running, checking timeout...");

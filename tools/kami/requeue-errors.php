@@ -127,7 +127,7 @@ HELP;
     $requeueErrors = new Kami\ReQueueErrors($connector, $kamiMapper, $jitter, $log);
 
     // Ensure only one instance of tool is running at a time
-    $lockFile = "{$config->get('stream_dir')}/.kami_requeue_errors.lock";
+    $lockFile = "{$config->get('stream_dir')}/.kami_requeue_errors_".INSTANCE_ID.".lock";
     $lock     = new Alaress_Lock($lockFile);
     if (!$lock->acquire()) {
         $log->warning('A errors-requeue instance is already running. Checking last mod time');

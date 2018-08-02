@@ -169,7 +169,8 @@ $kernel->run(function (Di\Container $di,
     );
 
     // Check timeout before anything else
-    $lock = new Alaress_Lock($config->get('stream_dir') . '/.kami_upload.lock');
+    $lockFile = $config->get('stream_dir') . '/.kami_upload_'.INSTANCE_ID.'.lock';
+    $lock = new Alaress_Lock($lockFile);
     if (!$lock->acquire()) {
         $log->critical('An uploader is already running, checking timeout');
 
