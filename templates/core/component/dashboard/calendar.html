@@ -3,6 +3,17 @@
         $(function() {
             // Attach rsvp/unattend functionality to rsvp butttons
             $('form[data-rsvp-form]').calendarAttendance();
+            $('a[data-delete-single]').on('click', function () {
+                $('[data-reveal]').hide();
+                var eventId = $(this).attr('data-event-id');
+                var eventName = $(this).attr('data-event-type');
+                $(this).confirmDialog({
+                    text: 'Are you sure you wish to delete this '+eventName+'?',
+                    confirmEvent: function() {
+                        window.location.href = $('#delete-single-'+eventId).val();
+                    }
+                });
+            });
         });
     </script>
 
@@ -61,17 +72,6 @@
                         e.preventDefault();
                         dialog.foundation('reveal', 'close');
                     });
-            });
-            $('a[data-delete-single]').on('click', function () {
-                $('[data-reveal]').hide();
-                var eventId = $(this).attr('data-event-id');
-                var eventName = $(this).attr('data-event-type');
-                $(this).confirmDialog({
-                    text: 'Are you sure you wish to delete this '+eventName+'?',
-                    confirmEvent: function() {
-                        window.location.href = $('#delete-single-'+eventId).val();
-                    }
-                });
             });
         });
     </script>
