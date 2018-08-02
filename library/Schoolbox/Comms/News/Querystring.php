@@ -147,7 +147,7 @@ class Querystring
      */
     public function __toString()
     {
-        return http_build_query(array_filter($this->querystring, function($value, $key) {
+        return http_build_query(array_filter($this->querystring, function ($value, $key) {
             return \strlen($value);
         }, ARRAY_FILTER_USE_BOTH));
     }

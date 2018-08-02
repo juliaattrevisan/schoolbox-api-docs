@@ -199,7 +199,7 @@ class Mapper extends \Schoolbox\Mapper
             $pb->in('id', $articleIdsForUser);
         }
 
-        $where = implode ("\nAND ", $pb->getWhere());
+        $where = implode("\nAND ", $pb->getWhere());
 
         $query = "
             SELECT 
@@ -262,15 +262,14 @@ class Mapper extends \Schoolbox\Mapper
             $paddedMonth = '';
 
             if ($month) {
-                $paddedMonth = str_pad($month, 2, '0', STR_PAD_LEFT);
+                $paddedMonth = str_pad((string)$month, 2, '0', STR_PAD_LEFT);
             }
 
             $yearMonth = "{$year}-{$paddedMonth}%";
 
             $pb->lessThan('expires_at', $now);
             $pb->like('publish_at', $yearMonth);
-        }
-        else {
+        } else {
             $pb->greaterThan('expires_at', $now);
         }
 
@@ -291,8 +290,7 @@ class Mapper extends \Schoolbox\Mapper
                 FROM {$this->table}
                 WHERE {$where}
             ";
-        }
-        else {
+        } else {
             $pb->equals('cnat.topic_id', $topicId);
 
             $where = implode("\nAND ", $pb->getWhere());

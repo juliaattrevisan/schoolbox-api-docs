@@ -12,7 +12,6 @@ namespace Schoolbox\Comms\News;
 use Alaress\Paginator\UrlPaginator;
 use Zend\Uri\Uri;
 
-
 class Paginator extends UrlPaginator
 {
     /**
@@ -23,7 +22,8 @@ class Paginator extends UrlPaginator
      * @throws \Zend\Uri\Exception\InvalidArgumentException
      * @throws \Zend\Uri\Exception\InvalidUriException
      */
-    public function getUrlForPage($page) {
+    public function getUrlForPage($page)
+    {
         // Building a URL using PHP builtins is a complete pain!
         // (There's no http_build_str equivalent for parse_str)
         // That's why I use Zend\Uri internally.

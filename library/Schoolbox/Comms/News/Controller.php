@@ -544,8 +544,7 @@ class Controller extends Base
          */
         if ($year) {
             $urlPrefix = $this->getRouter()->generate('commsNews.getArchive', ['year' => $year, 'month' => $month]);
-        }
-        else {
+        } else {
             $urlPrefix = $this->getRouter()->generate('commsNews.getIndex');
         }
 

@@ -222,8 +222,7 @@ class Lists
                 $params->getLimit(),
                 \count($availableIds)
             );
-        }
-        elseif ($params->getLimit() === null) {
+        } elseif ($params->getLimit() === null) {
             $paginator = $this->generatePaginator(
                 $url,
                 $this->configLoader->get('search_type_limit'),
