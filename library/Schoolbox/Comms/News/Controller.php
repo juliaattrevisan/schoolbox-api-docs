@@ -726,19 +726,39 @@ class Controller extends Base
 
     public function getTest()
     {
-        $availableArticleIds = [];
-        $topicId = 0;
-        $limit = 0;
+        $compactMode = null;
+        $topicSlug = 'all';
         $pageNum = null;
+        $limit = 0;
+        $showPaginator = null;
         $year = null;
         $month = null;
 
-        $result = $this->newsMapper->findArticleIdsForTopic($availableArticleIds, $topicId, $limit, $pageNum, $year, $month);
+        $result = (new Lists(
+            $this->newsMapper,
+            $this->policyMapper,
+            $this->saveForLaterMapper,
+            $this->databaseInternal,
+            $this->folderMapper,
+            $this->userAccessMapper,
+            $this->userMapper,
+            $this->externalUser,
+            $this->externalClass
+        ))->findForTopic(
+            'cat',
+            new Querystring([
+                Querystring::COMPACT_MODE_PARAM => $compactMode,
+                Querystring::TOPIC_SLUG_PARAM => $topicSlug,
+                Querystring::PAGE_NUMBER_PARAM => $pageNum,
+                Querystring::LIMIT_PARAM => $limit,
+                Querystring::SHOW_PAGINATOR_PARAM => $showPaginator
+            ]),
+            $this->getUser(),
+            $this->topicMapper->findAll(),
+            $year,
+            $month
+        );
 
-        new \Alaress_Probe(\count($result));
-
-        foreach ($result as $current) {
-            new \Alaress_Probe($current);
-        }
+        new \Alaress_Probe($result['articles']->getPropertyValues('id'));
     }
 }

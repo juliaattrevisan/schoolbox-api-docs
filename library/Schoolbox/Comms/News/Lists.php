@@ -198,11 +198,15 @@ class Lists
          */
         $url = "{$urlPrefix}?{$params}";
 
-        $paginator = $this->generatePaginator(
-            $url,
-            $params->getLimit(),
-            \count($availableIds)
-        );
+        $paginator = null;
+
+        if ((int)$params->getLimit()) {
+            $paginator = $this->generatePaginator(
+                $url,
+                $params->getLimit(),
+                \count($availableIds)
+            );
+        }
 
         /* Figure out the articles that this user has saved for later
          */
