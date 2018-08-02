@@ -114,14 +114,21 @@ class Controller extends BaseController
      */
     public function postImport(): void
     {
+        // Part 1: I have chosen a curriculum plan, now get its contents
         if ($this->request->post->getBool('part-1')) {
             $this->postImportPart1();
             return;
         }
 
-        // Part 2: I have chosen units, now import them
+        // Part 2: I have chosen units, now prepare to import them
         if ($this->request->post->getBool('part-2')) {
             $this->postImportPart2();
+            return;
+        }
+
+        // Part 3: I have chosen the folder to import into, now complete the import
+        if ($this->request->post->getBool('part-3')) {
+            $this->postImportPart3();
             return;
         }
     }
@@ -167,6 +174,29 @@ class Controller extends BaseController
      * POST part 2: I have chosen parts of a plan, now import them
      */
     private function postImportPart2(): void
+    {
+        // Which curriculum plan got selected?
+        $curriculumPlanId = $this->request->post->getInt('curriculum-plan', 0);
+
+        // None: render an error
+        if ($curriculumPlanId === 0) {
+            $this->throwNoCurriculumPlanSelectedError();
+            return;
+        }
+
+        // Get the curriculum if possible
+        try {
+            $curriculumPlan = $this->apiBridge->getCurriculum($curriculumPlanId);
+        } catch (\Throwable $e) {
+            $this->throwCurriculumPlanFetchError($e);
+            return;
+        }
+    }
+
+    /**
+     * Part 3: I have chosen the folder to import into, now complete the import
+     */
+    private function postImportPart3(): void
     {
         // Which curriculum plan got selected?
         $curriculumPlanId = $this->request->post->getInt('curriculum-plan', 0);
