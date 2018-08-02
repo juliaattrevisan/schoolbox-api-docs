@@ -13,8 +13,7 @@
 namespace Schoolbox\Comms\News;
 
 use Alaress\Database\Connector\IConnector;
-use Alaress\Paginator\Paginator;
-use Alaress\Paginator\UrlPaginator;
+use Alaress\Paginator\Paginator as BasePaginator;
 use External_Class;
 use External_User;
 use Schoolbox\Collection;
@@ -309,10 +308,10 @@ class Lists
      * @param string $url
      * @param int    $limit
      * @param int    $total
-     * @return UrlPaginator|null
+     * @return Paginator|null
      * @throws \OutOfRangeException
      */
-    private function generatePaginator(string $url, int $limit, int $total): ?UrlPaginator
+    private function generatePaginator(string $url, int $limit, int $total): ?Paginator
     {
         /* No limit specified; no pagination required
          */
@@ -320,11 +319,11 @@ class Lists
             return null;
         }
 
-        $paginator = (new Paginator())
+        $paginator = (new BasePaginator())
             ->setPageSize($limit)
             ->setTotal($total);
 
-        $urlPaginator = (new UrlPaginator())
+        $urlPaginator = (new Paginator())
             ->setPaginator($paginator)
             ->setUrl($url)
             ->setParam(Querystring::PAGE_NUMBER_PARAM);
