@@ -10,29 +10,29 @@ Scheduler -> ScheduleSignalQueue : psubscribe()
 
 ' Workflow on receive msg from msg broker
 Scheduler <- ScheduleMessageBroker : onMessage()
-Scheduler -> Scheduler : scheduleNotification()
-note right
-    The notification may be
-    dispatched immediately,
-    or deferred until its
-    trigger time.
-end note
-Scheduler -> Scheduler : schedule()
+'Scheduler -> Scheduler : scheduleNotification()
+'Scheduler -> Scheduler : schedule()
 
 alt notification is in future
 Scheduler -> EventLoop : addTimer()
 ...
 Scheduler <- EventLoop : callback
 end
+note right
+    The notification may be
+    dispatched immediately,
+    or deferred until its
+    trigger time.
+end note
 
-Scheduler -> Scheduler : dispatchTrigger()
+'Scheduler -> Scheduler : dispatchTrigger()
 Scheduler -> Dispatcher : enqueue()
-Dispatcher -> Dispatcher : dispatch()
+'Dispatcher -> Dispatcher : dispatch()
 Dispatcher -> WorkerPool : accept()
-WorkerPool -> WorkerPool : attachWorker()
+'WorkerPool -> WorkerPool : attachWorker()
 note left
-    The WorkerPool is now listening
-    on the Worker's output streams.
+    The WorkerPool is listening on
+    the Worker's output streams.
 end note
 WorkerPool -> Worker : setTask()
 ...Command is running......
@@ -44,12 +44,6 @@ note right
 end note
 
 Scheduler -> RouterMessageBroker : publish()
-
-
-'==On receive from Worker==
-'
-'Scheduler <- Worker : handleResponse()
-'Scheduler -> ScheduleMessageBroker
 
 ==On receive from ScheduleSignalQueue==
 
