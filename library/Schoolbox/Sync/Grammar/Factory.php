@@ -18,6 +18,7 @@ use ReflectionException;
 use Schoolbox\Sync\Rule\Mapper as RuleMapper;
 use Schoolbox\Sync\Rule\Model as Rule;
 use Schoolbox\UserMapper;
+use TypeError;
 
 class Factory
 {
@@ -251,7 +252,11 @@ class Factory
             throw new OutOfRangeException("$classname expects $expectedCount arguments, got $actualCount");
         }
 
-        return $rc->newInstanceArgs($arguments);
+        try {
+            return $rc->newInstanceArgs($arguments);
+        } catch (TypeError $e) {
+            // Cast Error to Exception to be picked up by custom exception handler and provide informative message to user.
+            throw new OutOfRangeException($e->getMessage(), $e->getCode(), $e);
+        }
     }
-
 }
