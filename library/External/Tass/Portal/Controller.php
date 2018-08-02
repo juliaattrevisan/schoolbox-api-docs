@@ -95,20 +95,14 @@ class Controller extends Alaress\Web\Controller\Base
         try {
             $token = $this->sso->getUserToken($config, $deepLinkV2, $prodMenu, $deepLinkV1);
         } catch (SsoTokenGenerationException|\RuntimeException $e) {
-            $this->captureException($e);
-            $token = '';
+            throw $this->errorMapper->generateException(Error\Mapper::ERROR_TASS_SSO_FAILURE, $e);
         }
 
         // If we successfully got a token, redirect the user to the Tass product URL
         if ($token) {
             $this->getResponse()->redirect->to("{$this->portalHost}{$productPath}?sso_token={$token}");
         } else {
-            try {
-                $this->getResponse()->status->setCode(404);
-            } catch (InvalidStatusCode $e) {
-                $this->captureException($e);
-                throw $e;
-            }
+            $this->getResponse()->status->setCode(404);
         }
     }
 

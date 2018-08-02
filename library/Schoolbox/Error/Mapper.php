@@ -187,6 +187,7 @@ class Mapper extends BaseMapper implements IExceptionGenerator
     public const ERROR_WIKI_NAME_IN_USE = 213;
 
     public const ERROR_SUBMISSION_WINDOW_EXCEEDED = 214;
+    public const ERROR_TASS_SSO_FAILURE = 215;
 
     /* You cannot view this article because it is already moderated and ready for publishing
      * Only comms officers can crud from this point onwards
