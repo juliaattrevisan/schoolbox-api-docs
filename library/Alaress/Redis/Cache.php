@@ -10,6 +10,7 @@ namespace Alaress\Redis;
 
 use Alaress\Cache as BaseCache;
 use Predis\ClientInterface;
+use Predis\Transaction\MultiExec;
 
 /**
  * A cache that uses Redis as its backend.
@@ -71,14 +72,39 @@ class Cache extends BaseCache
      */
     public function get($key, array $fetchArgs = [], $invalidateCache = false)
     {
-        // Is it in redis already?
-        $redisKey = $this->buildRedisKey($key);
-
-        // Try to fetch from Redis (but not if invalidated)
-        if (!$invalidateCache && $this->redis->exists($redisKey)) {
-            $result = json_decode($this->redis->get($redisKey), true);
+        // Try to fetch the value from Redis (but not if invalidating)
+        $redisKey     = $this->buildRedisKey($key);
+        $cached       = false;
+        $cachedResult = null;
+        if ($invalidateCache) {
+            $this->invalidate($key);
         } else {
-            $result = parent::get($key, $fetchArgs, $invalidateCache);
+            // Avoid race condition by querying TTL and content in transaction
+            [$ttl, $cachedResult] = $this->redis->transaction(function (MultiExec $tx) use ($redisKey) {
+                $tx->ttl($redisKey)
+                   ->get($redisKey);
+            });
+
+            switch ($ttl) {
+                case -2:
+                    // Key does not exist or has expired: refetch
+                    break;
+
+                case -1:
+                    // Key exists and has no expiry: don't refetch
+                    $cached = true;
+                    break;
+
+                default:
+                    // Key exists but has an expiry: refetch if TTL > expiry
+                    $cached = ($ttl <= $this->expiry);
+            }
+        }
+
+        if ($cached) {
+            $result = json_decode($cachedResult, true);
+        } else {
+            $result = $this->fetch($fetchArgs);
             if ($this->expiry > 0) {
                 $this->redis->setex($redisKey, $this->expiry, json_encode($result));
             } else {
