@@ -1,11 +1,11 @@
 @startuml
 
-== Startup ==
+==Startup==
 
 Scheduler -> ScheduleMessageBroker : registerConsumer()
 Scheduler -> ScheduleSignalQueue : psubscribe()
 
-== On consume from ScheduleMessageBroker ==
+==On consume from ScheduleMessageBroker==
 
 ' Workflow on receive msg from msg broker
 Scheduler <- ScheduleMessageBroker : onMessage()
@@ -26,7 +26,8 @@ end
 
 Scheduler -> Scheduler : dispatchTrigger()
 Scheduler -> Dispatcher : enqueue()
-Dispatcher -> WorkerPool
+Dispatcher -> Dispatcher : dispatch()
+Dispatcher -> WorkerPool : accept()
 Dispatcher <- WorkerPool
 Dispatcher -> Worker
 Worker -> Task
@@ -38,14 +39,33 @@ Scheduler <- ResponseHandler
 Scheduler -> MessageBroker
 Scheduler <- MessageBroker
 
-'== On receive from Worker ==
+'==On receive from Worker==
 '
 'Scheduler <- Worker : handleResponse()
 'Scheduler -> ScheduleMessageBroker
 
-== On receive from ScheduleSignalQueue ==
+==On receive from ScheduleSignalQueue==
 
 Scheduler <- ScheduleSignalQueue : handle()
 Scheduler -> Scheduler : onHangup()
 
+@enduml
+
+
+@startuml
+==Dispatcher::enqueue($command)==
+Dispatcher -> Dispatcher : dispatch()
+Dispatcher -> WorkerPool : accept()
+WorkerPool -> WorkerPool : attachWorker()
+note right
+    The WorkerPool is now listening
+    on the Worker's output streams.
+end note
+WorkerPool -> Worker : setTask()
+Worker -> Task : __construct()
+...$command is running...
+
+==On Task completion==
+DataIOListener <- IOStream : dataReceived()
+WorkerPool <- DataIOListener : handleResponse()
 @enduml
