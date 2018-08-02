@@ -665,6 +665,7 @@ class Controller extends Base
             'topics' => $topics,
             'topicAll' => Mapper::TOPIC_ALL_SLUG,
             'hidePaginator' => $hidePaginator,
+            'pageNum' => $params->getPageNum(),
             'slug' => $params->getSlug()
         ];
 
@@ -716,7 +717,7 @@ class Controller extends Base
         $outcome = array_merge($outcome, [
             'hidePaginator' => $hidePaginator,
             'compactMode' => $params->getCompactMode(),
-            'pageNum' => $params->getPageNum() ?: 1
+            'pageNum' => $params->getPageNum()
         ]);
 
         return $outcome;

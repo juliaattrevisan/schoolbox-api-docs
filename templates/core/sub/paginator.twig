@@ -7,6 +7,12 @@
  # @param string class
  # @param int page
  #}
+
+{# Set default page number #}
+{% if not page %}
+    {% set page = 1 %}
+{% endif %}
+
 {% if paginator.pageCount > 1 %}
     <ul class="pagination {{ class }}">
         {# back/forward page links #}
