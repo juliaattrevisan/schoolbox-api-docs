@@ -537,31 +537,29 @@ class Controller extends Base
      */
     public function getListByTopic(?int $year, ?int $month)
     {
-        if ($this->getRequest()->isXhr()) {
-            $params = new Querystring($this->getConfigLoader()->get('search_type_limit'), $this->getRequest()->query);
-            $topics = $this->topicMapper->findAll();
+        $params = new Querystring($this->getRequest()->query);
+        $topics = $this->topicMapper->findAll();
 
-            /* The requested data set to load, given the params provided
-             */
-            if ($year) {
-                $urlPrefix = $this->getRouter()->generate('commsNews.getArchive', ['year' => $year, 'month' => $month]);
-            }
-            else {
-                $urlPrefix = $this->getRouter()->generate('commsNews.getIndex');
-            }
-
-            $outcome = $this->generatePartial($urlPrefix, $params, $topics, $params->getShowPaginator(), $year, $month);
-            $content = $this->buildUnthemedHtmlOutput('@commsNews/list.twig', $outcome)->getAsString();
-            $viewAllLink = $this->getRouteIfAuthorized('commsNews.getIndex') . '?' . $params;
-
-            $this->getResponse()->content->set($this->buildJsonOutput([
-                'success' => true,
-                'title' => $this->getDi()->get('l10n')->translate('news', false, true),
-                'url' => $outcome['currentUrl'],
-                'fragment' => $content,
-                'viewAllLink' => $outcome['articles']->count() ? $viewAllLink : null
-            ]));
+        /* The requested data set to load, given the params provided
+         */
+        if ($year) {
+            $urlPrefix = $this->getRouter()->generate('commsNews.getArchive', ['year' => $year, 'month' => $month]);
         }
+        else {
+            $urlPrefix = $this->getRouter()->generate('commsNews.getIndex');
+        }
+
+        $outcome = $this->generatePartial($urlPrefix, $params, $topics, $params->getShowPaginator(), $year, $month);
+        $content = $this->buildUnthemedHtmlOutput('@commsNews/list.twig', $outcome)->getAsString();
+        $viewAllLink = $this->getRouteIfAuthorized('commsNews.getIndex') . '?' . $params;
+
+        $this->getResponse()->content->set($this->buildJsonOutput([
+            'success' => true,
+            'title' => $this->getDi()->get('l10n')->translate('news', false, true),
+            'url' => $outcome['currentUrl'],
+            'fragment' => $content,
+            'viewAllLink' => $outcome['articles']->count() ? $viewAllLink : null
+        ]));
     }
 
 
@@ -585,7 +583,7 @@ class Controller extends Base
          */
         $showPaginator = true;
 
-        $params = new Querystring($this->getConfigLoader()->get('search_type_limit'), $this->getRequest()->query);
+        $params = new Querystring($this->getRequest()->query);
         $topics = $this->topicMapper->findAll();
 
         /* The initial data set to load, given the params provided
@@ -647,7 +645,7 @@ class Controller extends Base
          */
         $showPaginator = true;
 
-        $params = new Querystring($this->getConfigLoader()->get('search_type_limit'), $this->getRequest()->query);
+        $params = new Querystring($this->getRequest()->query);
         $topics = $this->topicMapper->findAll();
 
         /* The initial data set to load, given the params provided
