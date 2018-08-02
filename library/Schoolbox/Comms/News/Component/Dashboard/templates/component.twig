@@ -5,8 +5,8 @@
  # @param int componentInstanceId
  # @param Collection|Topic[] topics
  # @param int topicAll
+ # @param string slug
  # @param int compactMode
- # @param int pageNum
  # @param int limit
  #}
 <script src="/javascript/shared/comms/articletabs.js"></script>
@@ -14,8 +14,8 @@
 <script>
 
     {% set querystringParams = [
-        'c=' ~ compactMode,
         'topic=' ~ slug,
+        'c=' ~ compactMode,
         'l=' ~ limit,
         'hp=1'
     ]|join('&') %}

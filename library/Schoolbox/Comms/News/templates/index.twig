@@ -1,3 +1,13 @@
+{##
+ # A list of all the available Topics to chooze
+ # Sets up a container for async article loading
+ #
+ # @param Collection|Topic[] topics
+ # @param int topicAll
+ # @param string slug
+ # @param int compactMode
+ # @param int limit
+ #}
 <div class="actions-small-2 row">
     <div class="list-item">
         <div class="small-12 columns">
@@ -34,28 +44,17 @@
 <div class="row">
     <div class="small-12 island">
         <section>
-
-            {##
-             # A list of all the available Topics to chooze
-             # Sets up a container for async article loading
-             #
-             # @param int componentInstanceId
-             # @param Collection|Topic[] topics
-             # @param int topicAll
-             # @param int compactMode
-             # @param int pageNum
-             # @param int limit
-             #}
             <script src="/javascript/shared/comms/articletabs.js"></script>
             <script src="/javascript/shared/comms/saveforlater.js"></script>
             <script>
                 $(function() {
                     var $newContainer = $('#news-container');
+
                     $newContainer.articleTabs({
                         'topicTabs': $('#news-topics'),
-                        'updateUrl': true,
-                        'hidePaginator': false
+                        'updateUrl': true
                     });
+
                     $newContainer.saveForLater();
                 });
             </script>

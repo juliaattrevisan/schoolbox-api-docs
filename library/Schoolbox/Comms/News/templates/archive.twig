@@ -1,3 +1,15 @@
+{##
+ # A list of all the available Topics to chooze
+ # Sets up a container for async article loading
+ #
+ # @param Collection|Topic[] topics
+ # @param int topicAll
+ # @param string slug
+ # @param int compactMode
+ # @param int limit
+ # @param int year
+ # @param int month
+ #}
 <div class="row">
     <div class="list-item">
         <div class="small-12 columns">
@@ -15,6 +27,8 @@
             <nav>
                 <ul class="side-nav">
                     {% for year, months in availableYears %}
+
+                        {# TODO ned to repair this check #}
                         <li class="{{ selectedYear|length and year == selectedYear ? 'active' : '' }}" role="menuitem">
                             <a href="{{ routeLookup('commsNews.getArchive', {year: year}) }}">
                                 {{ year }}
@@ -49,26 +63,13 @@
         </h2>
         {% if year %}
         <section>
-
-            {##
-             # A list of all the available Topics to chooze
-             # Sets up a container for async article loading
-             #
-             # @param int componentInstanceId
-             # @param Collection|Topic[] topics
-             # @param int topicAll
-             # @param int compactMode
-             # @param int pageNum
-             # @param int limit
-             #}
             <script src="/javascript/shared/comms/articletabs.js"></script>
             <script src="/javascript/shared/comms/saveforlater.js"></script>
             <script>
                 $(function() {
                     $('#news-container').articleTabs({
                         'topicTabs': $('#news-topics'),
-                        'updateUrl': true,
-                        'hidePaginator': false
+                        'updateUrl': true
                     });
                 });
             </script>
