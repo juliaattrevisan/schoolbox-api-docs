@@ -3,6 +3,7 @@
 ==Startup==
 
 Scheduler -> ScheduleMessageBroker : registerConsumer()
+Scheduler -> RouterMessageBroker : __construct()
 Scheduler -> ScheduleSignalQueue : psubscribe()
 
 ==On consume from ScheduleMessageBroker==
@@ -28,16 +29,22 @@ Scheduler -> Scheduler : dispatchTrigger()
 Scheduler -> Dispatcher : enqueue()
 Dispatcher -> Dispatcher : dispatch()
 Dispatcher -> WorkerPool : accept()
-Dispatcher <- WorkerPool
-Dispatcher -> Worker
-Worker -> Task
-Worker <- Task
-Dispatcher <- Worker
-Scheduler <- Dispatcher
-Scheduler -> ResponseHandler
-Scheduler <- ResponseHandler
-Scheduler -> MessageBroker
-Scheduler <- MessageBroker
+WorkerPool -> WorkerPool : attachWorker()
+note left
+    The WorkerPool is now listening
+    on the Worker's output streams.
+end note
+WorkerPool -> Worker : setTask()
+...Command is running......
+
+Scheduler <- WorkerPool : handleResponse()
+note right
+    The WorkerPool determined from the Worker's
+    output stream that the command finished.
+end note
+
+Scheduler -> RouterMessageBroker : publish()
+
 
 '==On receive from Worker==
 '
@@ -48,24 +55,9 @@ Scheduler <- MessageBroker
 
 Scheduler <- ScheduleSignalQueue : handle()
 Scheduler -> Scheduler : onHangup()
-
-@enduml
-
-
-@startuml
-==Dispatcher::enqueue($command)==
-Dispatcher -> Dispatcher : dispatch()
-Dispatcher -> WorkerPool : accept()
-WorkerPool -> WorkerPool : attachWorker()
 note right
-    The WorkerPool is now listening
-    on the Worker's output streams.
+    onHangup releases any workers in
+    the Scheduler's WorkerPool.
 end note
-WorkerPool -> Worker : setTask()
-Worker -> Task : __construct()
-...$command is running...
 
-==On Task completion==
-DataIOListener <- IOStream : dataReceived()
-WorkerPool <- DataIOListener : handleResponse()
 @enduml
