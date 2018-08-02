@@ -53,10 +53,6 @@
                  */
                 updateUrl: false,
 
-                /* Show paginator
-                 */
-                showPaginator: false,
-
                 /* The current page number
                  */
                 pageNum: -1,
