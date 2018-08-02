@@ -17,6 +17,7 @@
 
 namespace Schoolbox\Comms\News;
 
+use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\News\TopicMapper;
 
@@ -49,6 +50,11 @@ class Querystring
     public const HIDE_PAGINATOR_PARAM = 'hp';
 
     /**
+     * @var IConfigLoader
+     */
+    private $configLoader;
+
+    /**
      * An array of key/value pairs corresponding to GET params
      *
      * @var array
@@ -61,8 +67,10 @@ class Querystring
      *
      * @param $data
      */
-    public function __construct($data)
+    public function __construct(IConfigLoader $configLoader, $data)
     {
+        $this->configLoader = $configLoader;
+
 //        $compactMode = $data[self::COMPACT_MODE_PARAM];
 //        $slug = $data[self::TOPIC_SLUG_PARAM];
 //        $pageNum = $this->determinePageNum($data[self::PAGE_NUMBER_PARAM]);
@@ -72,8 +80,8 @@ class Querystring
         $this->querystring = [
             self::COMPACT_MODE_PARAM => $data[self::COMPACT_MODE_PARAM],
             self::TOPIC_SLUG_PARAM => $data[self::TOPIC_SLUG_PARAM],
-            self::PAGE_NUMBER_PARAM => $data[self::PAGE_NUMBER_PARAM],
-            self::LIMIT_PARAM => $data[self::LIMIT_PARAM],
+            self::PAGE_NUMBER_PARAM => $this->determinePageNum($data[self::PAGE_NUMBER_PARAM]),
+            self::LIMIT_PARAM => $this->determineLimit($data[self::LIMIT_PARAM]),
             self::HIDE_PAGINATOR_PARAM => $data[self::HIDE_PAGINATOR_PARAM]
         ];
     }
@@ -143,6 +151,7 @@ class Querystring
         return $this->querystring;
     }
 
+
     /**
      * String representatin
      *
@@ -172,6 +181,7 @@ class Querystring
         return Mapper::TOPIC_ALL_SLUG;
     }
 
+
     /**
      * The page number to obtain; default to 1
      * Otherwise use the page number provided
@@ -179,23 +189,34 @@ class Querystring
      * @param null|string $param
      * @return int
      */
-    private function determinePageNum(?string $param): int
+    public function determinePageNum(?string $param): int
     {
         return (int)$param ?: 1;
     }
 
+
     /**
-     * $limit can be 'all' or unspecified; this equates to "don't impose a limit"
+     * $limit can be 'all' or 0; this equates to "don't impose a limit"
      * ("all" could come from a component config option)
+     *
+     * If limit was unspecified, use a system default
      *
      * @param null|string $limit
      * @return int
      */
     private function determineLimit(?string $limit): int
     {
-        /* limit not set at all; don't impose limits
+
+        /* If the limit was explicitly null, return the system default
          */
-        if (('all' === $limit) || (null === $limit) || !(int)$limit) {
+        if (null === $limit) {
+            return (int)$this->configLoader->get('search_type_limit');
+        }
+
+        /* limit set to 'all'; don't impose limits
+         * limit set to 0; don't impose limitss
+         */
+        if (('all' === $limit) || !(int)$limit) {
             return 0;
         }
 
