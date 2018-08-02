@@ -1,5 +1,15 @@
 @startuml
 
+participant "Scheduler\n<size:10>//\Schoolbox\Realtime\Schedule\Scheduler//</size>" as Scheduler
+participant "ScheduleMessageBroker\n<size:10>//\Schoolbox\Realtime\Schedule\Broker//</size>" as ScheduleMessageBroker
+participant "RouterMessageBroker\n<size:10>//\Schoolbox\Realtime\Routing\Broker//</size>" as RouterMessageBroker
+participant "ScheduleSignalQueue\n<size:10>//\Alaress\Redis\Async\Client//</size>" as ScheduleSignalQueue
+participant "EventLoop\n<size:10>//\React\EventLoop\LoopInterface//</size>" as EventLoop
+participant "Dispatcher\n<size:10>//\Schoolbox\Realtime\Schedule\SchedulerDispatchStrategy//</size>" as Dispatcher
+participant "WorkerPool\n<size:10>//\Alaress\WorkerCrew\PoolInterface//</size>" as WorkerPool
+participant "Worker\n<size:10>//\Alaress\WorkerCrew\Worker\Worker//</size>" as Worker
+participant "Notifier\n<size:10>//\Schoolbox\Realtime\Schedule\Module\ModuleNotifierInterface//</size>" as Notifier
+
 ==Startup==
 
 Scheduler -> ScheduleMessageBroker : registerConsumer()
