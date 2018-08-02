@@ -91,6 +91,7 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
         }
 
         $this->setBlock($templateHandle, 'day', 'day_block');
+        $this->setBlock($templateHandle, 'has_series', 'has_series_block');
         $this->setBlock('day', 'has_events', 'has_events_block');
         $this->setBlock('has_events', 'event', 'event_block');
         $this->setBlock('day', 'no_events', 'no_events_block');
@@ -101,11 +102,14 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
             'has_events_block' => '',
             'no_events_block' => '',
             'event_block' => '',
+            'has_series_block' => '',
 
             'LIST_DATE' => $this->start->getLongDateOnly(),
             'DATE' => $this->start->getLongDateOnly(),
             'CALENDAR_DATE' => $this->start->getURLDate(),
         ));
+
+        $hasSeries = false;
 
         if (count($this->eventRenderer->getAllEvents()) === 0) {
             $this->parse('no_events_block', 'no_events');
@@ -134,6 +138,12 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
                     $this->setVar('event_block', '');
                 }
 
+                if ($currentEvent->getSeriesId()
+                    || ($currentEvent instanceof \Calendar\Event\Type\ResourceBooking\Event
+                        && $currentEvent->getBooking()->getEvent()->getSeriesId())) {
+                    $hasSeries = true;
+                }
+
                 $htmlEvent = $this->eventRenderer->renderEvent($currentEvent, 'html');
                 if ($htmlEvent) {
                     $this->setVar('EVENT_CONTENT', $htmlEvent);
@@ -147,6 +157,9 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
         }
 
         $this->parse('day_block', 'day', true);
+        if ($hasSeries) {
+            $this->parse('has_series_block', 'has_series', true);
+        }
 
         return true;
     }

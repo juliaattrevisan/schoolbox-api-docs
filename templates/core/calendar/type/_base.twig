@@ -77,7 +77,8 @@
                     <a class="button icon-modify" href="/calendar/modify.php?eventID={{ event.eventId }}{{ returnStr }}">Modify</a>
                     {% endblock %}
                     {% block deleteButton %}
-                    <a class="button icon-delete" id="delete-event-{{ event.eventId }}">Delete</a>
+                    <a class="button icon-delete" {{ event.seriesId() ? 'data-delete-series' : 'data-delete-single' }} id="delete-event-{{ event.eventId }}"
+                        data-event-id="{{ event.eventId }}" data-event-type="event">Delete</a>
                     {% endblock %}
                 {% endif %}
             </div>
@@ -86,64 +87,11 @@
 
         <a class="close-reveal-modal">&#215;</a>
     </div>
-    {% block deleteSeriesModal %}
+    {% block deleteUrls %}
+        <input type="hidden" id="delete-single-{{ event.eventId }}" value="/calendar/modifyForm.php?action=Delete&id={{ event.eventId }}{{ returnStr | raw }}">
         {% if event.seriesId() %}
-            <div class="reveal-modal" data-reveal data-dialog="bulk-delete">
-                <h2>This event is part of a series</h2>
-                <p class="icon-alert">
-                    Would you like to delete only this event, or all in the series?
-                </p>
-                <ul class="flex-list buttons">
-                    <li><a href="#" class="button" data-action="self">Only this event</a></li>
-                    <li><a href="#" class="button" data-action="series">All events in the series</a></li>
-                    <li><a href="#" class="button" data-action="cancel">Cancel</a></li>
-                </ul>
-            </div>
+            <input type="hidden" id="delete-series-self-{{ event.eventId }}" value="/calendar/modifyForm.php?action=Delete&id={{ event.eventId }}{{ returnStr | raw }}&efficacy=self">
+            <input type="hidden" id="delete-series-all-{{ event.eventId }}" value="/calendar/modifyForm.php?action=Delete&id={{ event.eventId }}{{ returnStr | raw }}&efficacy=series">
         {% endif %}
-    {% endblock deleteSeriesModal %}
+    {% endblock deleteUrls %}
 </li>
-{% block deleteJs %}
-    <script type="text/javascript">
-        {% if event.seriesId() %}
-        $(function() {
-            $('#delete-event-{{ event.eventId }}').on('click', function () {
-                event.preventDefault();
-                var dialog = $('[data-dialog="bulk-delete"]');
-                dialog.foundation('reveal', 'open');
-                dialog.find('[data-action="self"]')
-                    .off('click')
-                    .on('click', function(e) {
-                        e.preventDefault();
-                        dialog.foundation('reveal', 'close');
-                        window.location.href = "/calendar/modifyForm.php?action=Delete&id={{ event.eventId }}{{ returnStr | raw }}&efficacy=self";
-                    });
-                dialog.find('[data-action="series"]')
-                    .off('click')
-                    .on('click', function(e) {
-                        e.preventDefault();
-                        dialog.foundation('reveal', 'close');
-                        window.location.href = "/calendar/modifyForm.php?action=Delete&id={{ event.eventId }}{{ returnStr | raw }}&efficacy=series";
-                    });
-                dialog.find('[data-action="cancel"]')
-                    .off('click')
-                    .on('click', function(e) {
-                        e.preventDefault();
-                        dialog.foundation('reveal', 'close');
-                    });
-            });
-        });
-        {% else %}
-        $(function() {
-            $('#delete-event-{{ event.eventId }}').on('click', function () {
-                $('[data-reveal]').hide();
-                $(this).confirmDialog({
-                    text: 'Are you sure you wish to delete this event?',
-                    confirmEvent: function() {
-                        window.location.href = "/calendar/modifyForm.php?action=Delete&id={{ event.eventId }}{{ returnStr | raw }}";
-                    }
-                });
-            });
-        });
-        {% endif %}
-    </script>
-{% endblock deleteJs %}
