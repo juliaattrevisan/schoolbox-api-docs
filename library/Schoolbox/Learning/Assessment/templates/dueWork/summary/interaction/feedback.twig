@@ -205,7 +205,9 @@ feedback: currentFeedback,
                     rubric:         feedbackRubricContexts[currentFeedback.id].rubric,
                     markVisibility: currentFeedback.isSelfAssessment
                                     or participant.assessable.isFeedbackVisibleToUser(USER),
-                    useMarkRange: assessment.useMarkRange
+                    useMarkRange: assessment.useMarkRange,
+                    showRubricTotal: showRubricTotal,
+                    showGroupTotal: showGroupTotal
                 } only %}
             </div>
         {% endif %}

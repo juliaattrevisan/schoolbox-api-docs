@@ -489,7 +489,6 @@ class Rubric extends Core\Rubric
 
         $box = $this->getSubmissionBox();
 
-        // if the box doesn't mark by group, then we need to remove the group subtotals from the context
         foreach ($context['groups'] as $groupId => $group) {
 
             // if no user specified, OR the specified user is allowed to view
@@ -501,35 +500,9 @@ class Rubric extends Core\Rubric
                         $context['groups'][$groupId]['percentage'],
                         $context['groups'][$groupId]['max']
                     );
-                } else {
-                    // nothing per-group? unset the mark data if any exists
-                    unset(
-                        $context['groups'][$groupId]['mark'],
-                        $context['groups'][$groupId]['scaledMark'],
-                        $context['groups'][$groupId]['max'],
-                        $context['groups'][$groupId]['percentage'],
-                        $context['groups'][$groupId]['rowMaxSum']
-                    );
                 }
-            } else {
-                // nothing per-group? unset the mark data if any exists
-                unset(
-                    $context['groups'][$groupId]['mark'],
-                    $context['groups'][$groupId]['scaledMark'],
-                    $context['groups'][$groupId]['max'],
-                    $context['groups'][$groupId]['percentage'],
-                    $context['groups'][$groupId]['rowMaxSum']
-                );
             }
 
-        }
-
-        if (!$box || ($sessionUser && !$box->canViewRubric($sessionUser))) {
-            unset(
-                $context['scaledMark'],
-                $context['max'],
-                $context['humanReadableMark']
-            );
         }
 
         $context['boxId'] = $this->box ? $this->box->getId() : 0;
