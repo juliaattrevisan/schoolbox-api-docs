@@ -357,21 +357,10 @@
                 } else { // Nope, ajax time
                     // Request a list of options with the uri listed in the object above
                     axios.get(audienceOption.ajax).then(function(response) {
-
-                        // Modify the response slightly to have prefixed IDs (eg. 'campus:1')
-                        var modifiedOptions = [];
-                        response.data.data.forEach(function(option) {
-                            modifiedOptions.push({
-                                id: option.id,
-                                name: option.name,
-                                type: audienceOption.name
-                            });
-                        });
-
-                        self.populateAudienceList(modifiedOptions);
+                        self.populateAudienceList(response.data.data);
 
                         // Cache the options
-                        self.cachedOptions[audienceOption.id] = modifiedOptions;
+                        self.cachedOptions[audienceOption.id] = response.data.data;
 
                     }).catch(function (error) {
                         console.log(error);
@@ -405,26 +394,25 @@
                 // Add to selectize
                 self.audienceListChecked.forEach(function(option) {
                     var selectizeOptions = [];
-                    var baseName = option.name + ' (' + option.type + ')';
 
                     if (self.includeUsers) {
                         selectizeOptions.push({
                             id: option.id,
-                            name: baseName
+                            name: option.nameType
                         });
                     }
 
                     if (self.includeParents) {
                         selectizeOptions.push({
                             id: option.id + ':parents_of',
-                            name: baseName + ' [Parents of students]'
+                            name: option.nameParents
                         });
                     }
 
                     if (self.includeTeachers) {
                         selectizeOptions.push({
                             id: option.id + ':teachers_of',
-                            name: baseName + ' [Teachers of students]'
+                            name: option.nameTeachers
                         });
                     }
 

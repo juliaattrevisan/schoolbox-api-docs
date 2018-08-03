@@ -130,6 +130,7 @@ class Controller extends Base
     private function generate(Collection $collection, string $entityType): \Alaress\Web\Output\Json
     {
         $items = [];
+        $translator = new Segment\Translator($this->folderMapper->getDatabase(), $this->getUser(), $this->folderMapper);
 
         foreach ($collection as $item) {
             $tuple = $item->findValueLabelPair();
@@ -138,7 +139,10 @@ class Controller extends Base
              */
             $items[] = [
                 'id' => Segment\Codec::encode($entityType, $tuple['value'], Model::RELATIONSHIP_SELF),
-                'name' => $tuple['label']
+                'name' => $tuple['label'],
+                'nameType' => $tuple['label'] . ' (' . \ucfirst($entityType) . ')', // TODO is there a translator method for this @stevechan?
+                'nameParents' => $translator->assembleSegment($tuple['label'], $entityType, Model::RELATIONSHIP_PARENTS_OF),
+                'nameTeachers' => $translator->assembleSegment($tuple['label'], $entityType, Model::RELATIONSHIP_TEACHERS_OF)
             ];
         }
 
