@@ -16,15 +16,22 @@ $auth = new OneLogin_Saml2_Auth($settingsInfo);
 
 /* Handle Single Logout commands */
 if (isset($_GET['sls'])) {
+    if (isset($_GET['SAMLRequest'])) {
+        SAMLDebugLog('SLS Request:'.base64_decode($_GET['SAMLRequest']));
+    }
     try {
+        SAMLDebugLog("Attempting SLS");
         $auth->processSLO(false, null, true);
     } catch (OneLogin_Saml2_Error $e) {
+        SAMLDebugLog("SLS Error: ".$e->getMessage());
         error(ErrorMapper::ERROR_PROCESSING, $e->getMessage());
     }
 
     $errors = $auth->getErrors();
     $errorReason = $auth->getLastErrorReason();
     if (!empty($errors)) {
+        SAMLDebugLog("SLS Error(s): ".json_encode($errors));
+        SAMLDebugLog("SLS Error: ".$errorReason);
         error(ErrorMapper::ERROR_PROCESSING, $errorReason);
     }
 
