@@ -33,24 +33,36 @@
                 <tr>
                     <td>{{ currentArea }}</td>
                     <td>
-                        {% if values.letters.term4 != '' %}
-                            {{ values.letters.term4 }}
-                        {% else %}
-                            {{ values.letters.term2 }}
-                        {% endif %}
+                        {% set letter = '' %}
+
+                        {% for i in ['term1', 'term2', 'term3', 'term4'] %}
+                            {% if values.letters[i] != '' %}
+                                {% set letter = values.letters[i] %}
+                            {% endif %}
+                        {% endfor %}
+
+                        {{ letter }}
                     </td>
                 </tr>
-                {% elseif (values.letters.term4 != '' or values.letters.term2 != '') %}
-                <tr>
-                    <td>{{ currentArea }}</td>
-                    <td>
-                        {% if values.letters.term4 != '' %}
-                            {{ values.letters.term4 }}
-                        {% else %}
-                            {{ values.letters.term2 }}
+                {% else %}
+
+                    {# Hide course areas that did not get a mark, in a previous year
+                     # Not sure if they still want to do this, though
+                     #}
+                    {% set letter = '' %}
+
+                    {% for i in ['term1', 'term2', 'term3', 'term4'] %}
+                        {% if values.letters[i] != '' %}
+                            {% set letter = values.letters[i] %}
                         {% endif %}
-                    </td>
-                </tr>
+                    {% endfor %}
+
+                    {% if letter|length %}
+                    <tr>
+                        <td>{{ currentArea }}</td>
+                        <td>{{ letter }}</td>
+                    </tr>
+                    {% endif %}
                 {% endif %}
                 {% endfor %}
                 {% if not loop.last %}
