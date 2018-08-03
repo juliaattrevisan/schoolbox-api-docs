@@ -180,9 +180,10 @@
                                         {% set progressClass = 'reviewed' %}
                                         {% set notchTitle = labelPublishedMark %}
                                     {% elseif taskProgressPending == progressStatus %}
-                                        {% set indicator = 'pending' %}
+                                        {# note there is no such thing as draft task masks #}
+                                        {% set indicator = 'published' %}
                                         {% set progressClass = 'pending' %}
-                                        {% set notchTitle = labelPubMarkDraftPending %}
+                                        {% set notchTitle = labelPublishedMark %}
                                     {% else %}
                                         {% set indicator = 'none' %}
                                         {% set progressClass = 'readonly' %}
