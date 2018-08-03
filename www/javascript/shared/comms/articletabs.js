@@ -77,7 +77,6 @@
                 url: url,
                 dataType: 'json'
             }).success(function (response) {
-
                 $(config.element).html(response.fragment);
 
                 // Fire onChangeSuccess callback
@@ -97,6 +96,12 @@
          * Set up event listeners
          */
         function initListeners() {
+            if (config.updateUrl) {
+                window.addEventListener('popstate', function () {
+                    window.location = location.href;
+                });
+            }
+
             $(config.topicTabs).on('click', 'a', function(event) {
                 event.preventDefault();
 
