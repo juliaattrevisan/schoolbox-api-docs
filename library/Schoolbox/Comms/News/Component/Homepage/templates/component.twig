@@ -64,6 +64,11 @@
 
 <div class="component-action hide" id="news-component-actions-{{ componentInstanceId }}">
     <section>
+        {% set createRoute = routeLookupIfAuthorized('commsNews.getCreate') %}
+        {% if createRoute %}
+        <a href="{{ createRoute }}" class="button">Create {{ locale.news }}</a>
+        {% endif %}
+
         <a href="#" class="button" data-news-component-view-all>View All</a>
         {# ^ href is populated by js in articletabs.js #}
     </section>
