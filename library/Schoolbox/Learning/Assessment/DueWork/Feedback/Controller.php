@@ -15,18 +15,15 @@ use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfAssessable;
 use Schoolbox\Learning\Assessment\Feedback\IFeedbackDataSource;
-use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\DueWork;
-use Schoolbox\Learning\Assessment\DueWork\RubricContext;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
 use Schoolbox\Learning\Assessment\Response\DataSource as ResponseDataSource;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Permission\Access\Access;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Alaress_Date_Format;
@@ -314,12 +311,7 @@ class Controller extends Base
             && $mostRecentFeedback->getAssessable() instanceof DueWork\Model
             && $mostRecentFeedback->getAssessable()->getUseRubric()
         ) {
-            $mostRecentFeedback->getAssessable()->setRubric($this->rubricMapper->findByDueWork($mostRecentFeedback->getAssessable()));
-            $rubricContext = new RubricContext($this->rubricMapper);
-            $rubricData = $rubricContext->generateForFeedback($mostRecentFeedback, $this->getUser(), Access::getInstance());
-            if (!empty($rubricData)) {
-                $hasRubric = true;
-            }
+            $hasRubric = true;
         }
         
         $dueWorkFeedbackFactory = new DueWork\Feedback\Factory(
