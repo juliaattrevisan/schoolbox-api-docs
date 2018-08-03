@@ -17,6 +17,7 @@ use ErrorException;
 use InvalidArgumentException;
 use Predis\ClientInterface;
 use Predis\Collection\Iterator\Keyspace;
+use Predis\Transaction\MultiExec;
 
 abstract class RedisQueue implements QueueInterface
 {
@@ -81,14 +82,14 @@ abstract class RedisQueue implements QueueInterface
         $id    = $this->getRedisMsgKey($instance);
         $data  = $this->deflate($instance);
 
-        // insert the msg payload ONLY if it doesn't already exist
-        $this->redis->setnx($id, $data);
-
-        // set the expiry; if the key already existed, this has the effect of resetting the TTL
-        $this->redis->expire($id, $this->getMessageExpiry());
-
-        // insert the msg reference into this 'queue'
-        $this->redis->sadd($this->getRedisSetKey(), [ $id ]);
+        $this->redis->transaction(function (MultiExec $tx) use ($id, $data) {
+            // insert the msg payload ONLY if it doesn't already exist
+            $tx->setnx($id, $data)
+                // set the expiry; if the key already existed, this has the effect of resetting the TTL
+               ->expire($id, $this->getMessageExpiry())
+                // insert the msg reference into this 'queue'
+               ->sadd($this->getRedisSetKey(), [ $id ]);
+        });
     }
 
 

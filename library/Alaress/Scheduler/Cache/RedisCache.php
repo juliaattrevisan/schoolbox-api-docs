@@ -189,16 +189,17 @@ class RedisCache implements ICache
     {
         $itemKey = $this->getNamespacedKey($key);
 
-        // don't override data if it already exists (it probably doesn't matter, but hey. integrity, yo.)
-        $isset = !!$this->redis->setnx($itemKey, $compressedData);
-
-        // REGARDLESS of whether we just set the key, reset its TTL
-        $this->redis->expire($itemKey, self::EXPIRY_WINDOW);
-
-        // ensure the key is in the index
-        $this->redis->sadd($this->getNamespacedKey('index'), $itemKey);
-
-        return $isset;
+        [$isset] = $this->redis->transaction(
+            function (Predis\Transaction\MultiExec $tx) use ($itemKey, $compressedData) {
+                // don't override data if it already exists (it probably doesn't matter, but hey. integrity, yo.)
+                $tx->setnx($itemKey, $compressedData)
+                    // REGARDLESS of whether we just set the key, reset its TTL
+                   ->expire($itemKey, self::EXPIRY_WINDOW)
+                    // ensure the key is in the index
+                   ->sadd($this->getNamespacedKey('index'), $itemKey);
+            }
+        );
+        return (bool)$isset;
     }
 
 
