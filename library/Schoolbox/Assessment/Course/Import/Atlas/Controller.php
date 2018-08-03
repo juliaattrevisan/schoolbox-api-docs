@@ -191,6 +191,16 @@ class Controller extends BaseController
             $this->throwCurriculumPlanFetchError($e);
             return;
         }
+
+        // TODO pass the right stuff here
+        $this->response->content->set(
+            $this->buildUnthemedHtmlOutput(
+                '@courseImportAtlas/import/plan.twig',
+                [
+                    'curriculum' => $curriculumPlan,
+                ]
+            )
+        );
     }
 
     /**
