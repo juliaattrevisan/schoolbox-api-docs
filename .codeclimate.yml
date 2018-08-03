@@ -1,24 +1,37 @@
-exclude_paths:
-- "vendor/"
-- "**/tests/**/*"
-- "test/"
-- "**/Test/**/*"
-- "javascript/components/"
-- "node_modules/"
-- "sql/"
-- "updates/"
-- "debian/"
-- "www/"
-- "!www/css/**/*"
-- "tools/"
-
-engines:
-  duplication:
-    enabled: true
-    config:
-      languages:
-      - javascript:
-      - php:
+---
+version: "2"
+#checks:
+#  argument-count:
+#    config:
+#      threshold: 4
+#  complex-logic:
+#    config:
+#      threshold: 4
+#  file-lines:
+#    config:
+#      threshold: 250
+#  method-complexity:
+#    config:
+#      threshold: 5
+#  method-count:
+#    config:
+#      threshold: 20
+#  method-lines:
+#    config:
+#      threshold: 25
+#  nested-control-flow:
+#    config:
+#      threshold: 4
+#  return-statements:
+#    config:
+#      threshold: 4
+#  similar-code:
+#    config:
+#      threshold: # language-specific defaults. an override will affect all languages.
+#  identical-code:
+#    config:
+#      threshold: # language-specific defaults. an override will affect all languages.
+plugins:
   phpcodesniffer:
     enabled: true
     checks:
@@ -30,16 +43,21 @@ engines:
     enabled: true
     config:
       file_extensions: "php"
-      ignore_undeclared: true
       ignore-undeclared: true
-  phpmd:
-    enabled: false
-    config:
-      file_extensions: "php"
-      rulesets: "cleancode"
   scss-lint:
     enabled: true
-ratings:
-  paths:
-  - "**.php"
-  - "**.scss"
+  sonar-php:
+    enabled: true
+exclude_patterns:
+  - "vendor/"
+  - "**/tests/**/*"
+  - "test/"
+  - "**/Test/**/*"
+  - "javascript/components/"
+  - "node_modules/"
+  - "sql/"
+  - "updates/"
+  - "debian/"
+  - "www/"
+  - "!www/css/**/*"
+  - "tools/"
