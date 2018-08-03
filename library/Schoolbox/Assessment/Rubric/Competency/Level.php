@@ -16,17 +16,19 @@ class Level extends DescriptorList
 {
 
     /**
-     * Returns the total possible value of this Calculable
+     * Returns the highest possible mark for this Calculable
+     * TODO I'm not sure where, if at all, this is actually being used?
+     * it appears to be summating a column of descriptor values, which we never actually do...
      *
      * @return float
      */
-    public function getTotal()
+    public function calculateMax()
     {
         $total = 0;
 
         foreach ($this->descriptors as $descriptor) {
-            if(is_numeric($descriptor->getTotal())) {
-                $total += $descriptor->getTotal();
+            if(is_numeric($descriptor->calculateMax())) {
+                $total += $descriptor->calculateMax();
             }
         }
 

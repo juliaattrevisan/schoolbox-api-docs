@@ -63,19 +63,27 @@
     }
 
     function calcPercent(callback) {
-        var num = this.attr('data-numerator'),
-            den = this.attr('data-denominator'),
-            prc = parseInt(num / den * 100);
+        var scaledMark = this.attr('data-scaled-mark'),
+            max        = this.attr('data-max'),
+            percentage = parseInt(scaledMark / max * 100);
 
-        callback.call(this, prc + ' %');
+        if (isNaN(percentage)) {
+            percentage = 0;
+        }
+
+        callback.call(this, percentage + ' %');
     }
 
     function calcLetter(conf, callback) {
         // start by getting the percentage
-        var num = this.attr('data-numerator'),
-            den = this.attr('data-denominator'),
-            prc = parseInt(num / den * 100),
-            $el = this;
+        var scaledMark = this.attr('data-scaled-mark'),
+            max        = this.attr('data-max'),
+            percentage = parseInt(scaledMark / max * 100),
+            $el        = this;
+
+        if (isNaN(percentage)) {
+            percentage = 0;
+        }
 
         var rev = [];
 
@@ -97,7 +105,7 @@
                 caption    = v[1];
 
             // bound is too high, ignore this one
-            if (prc < lowerBound) {
+            if (percentage < lowerBound) {
                 return true; // jq:continue
             }
 
@@ -112,10 +120,10 @@
     }
 
     function calcRaw(callback) {
-        var num = this.attr('data-numerator'),
-            den = this.attr('data-denominator');
+        var scaledMark = this.attr('data-scaled-mark'),
+            max        = this.attr('data-max');
 
-        callback.call(this, num + ' / ' + den);
+        callback.call(this, scaledMark + ' / ' + max);
     }
 
     function calcNone(callback) {

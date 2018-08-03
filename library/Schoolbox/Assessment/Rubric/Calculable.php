@@ -14,18 +14,18 @@ interface Calculable
 {
 
     /**
-     * Return the calculated sum value of this Calculable (NOT the total possible value)
+     * Return the mark given for this Calculable
      *
      * @return float|null
      */
-    public function getSum();
+    public function calculateMark();
 
 
     /**
-     * Returns the total possible value of this Calculable
+     * Returns the highest possible mark for this Calculable (takes into account custom max capability marks)
      *
      * @return float
      */
-    public function getTotal();
+    public function calculateMax();
 
 }

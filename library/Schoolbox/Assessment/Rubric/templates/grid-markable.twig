@@ -27,161 +27,125 @@
         {% endif %}
         <tbody>
             {% for groupIndex, group in rubric.groups %}
+                {# Use rowspans when group total is visible, otherwise don't need it
+                 # This is only off when self-reflecting with a grid that doesn't show descriptor points
+                 # and groups - here, it never shows the group subtotal, and rowspan calcs are off
+                 #}
+                {% set rowspan = group.criteria|length + (showGroupTotal ? 1 : 0) %}
 
-            {# Use rowspans when group total is visible, otherwise don't need it
-             # This is only off when self-reflecting with a grid that doesn't show descriptor points
-             # and groups - here, it never shows the group subtotal, and rowspan calcs are off
-             #}
-            {% set rowspan = group.criteria|length %}
-
-            {% if self != 'selfReflection' and showGroupTotal %}
-                {% set rowspan = group.criteria|length + (group.total ? 1 : 0) %}
-            {% endif %}
-
-            {% for critIndex, crit in group.criteria %}
-            <tr data-group="{{ rubricId }}-{{ group.id }}">
-                {# yay html tables... -_-; #}
-                {% if rowspan %}
-                <th class="rb-group-name" rowspan="{{ rowspan }}"><span>{{ group.name }}</span></th>
-                {% set rowspan = 0 %}
-                {% endif %}
-
-                <th class="rb-criterion-name">{{ crit.name }}</th>
-
-                {# Required so that this form is recognised as containing a rubric, even if nothing is submitted #}
-                <input name="saveEmpty" value="true" type="hidden"/>
-
-                {% for levelIndex, level in rubric.levels %}
-                    {% set descriptor = rubric.descriptors[crit.id][levelIndex] %}
-
-                    {% if descriptor %}
-
-                        {% set inputId %}{{ formField }}[{{ crit.id }}][{{ level.id }}]{% endset %}
-
-                        {# Self-Assessment #}
-                        {% set learnerSelected = learnerRubric.descriptors[crit.id][levelIndex].selected %}
-                        <td>
-                            <input id="{{ inputId }}"
-                                   name="{{ formField }}[descriptors][{{ descriptor.id }}][selected]"
-                                   value="1"
-                                   type="checkbox"
-                                   data-value="{{ descriptor.value }}"
-                                   data-rubric="{{ rubric.id }}"
-                                   data-rubric-group="{{ group.id }}"
-                                   data-rubric-descriptor="{{ descriptor.id }}"
-                                   {% if descriptor.selected %}checked="checked"{% endif %}
-                            />
-
-                            <label for="{{ inputId }}">
-                                <span class="rb-description">
-                                    {{- descriptor.text|nl2br -}}
-                                </span>
-
-                                {% set direction = rubric.descriptorMetadata[crit.id].direction %}
-                                {% set descriptorMin = rubric.descriptorMetadata[crit.id][levelIndex].min %}
-                                {% set descriptorMax = rubric.descriptorMetadata[crit.id][levelIndex].max %}
-                                {% set hidePoints = not config.rubric_show_points or (studentView and selfReflect) %}
-
-                                {# Just show a text value if the descriptor is not selected #}
-                                {% if descriptor.value is not null and showDescriptorValue and not hidePoints %}
-                                    <span class="rb-value {% if descriptorMin == descriptorMax or not useMarkRange %}used {% elseif descriptor.selected %}hide{% endif %}">
-                                        {% if useMarkRange and descriptorMin != descriptorMax %}
-                                            {% if direction == 'asc' %}
-                                                {{- descriptorMin -}} - {{- descriptorMax -}}
-                                            {% else %}
-                                                {{- descriptorMax -}} - {{- descriptorMin -}}
-                                            {% endif %}
-                                        {% else %}
-                                            {{ descriptor.value }}
-                                        {% endif %}
-                                    </span>
-                                {% endif %}
-                            </label>
-                            {# Render a dropdown to select a value from the range #}
-                            {# TODO this select needs a label; technically it should be the one above but that's already in use for the descriptor checkbox #}
-                            <select id="rangeDropdown-{{ descriptor.id }}"
-                                    name="{{ formField }}[descriptors][{{ descriptor.id }}][value]"
-                                    class="{% if not descriptor.selected or descriptorMin == descriptorMax or not useMarkRange %} hide{% endif %}
-                                    {% if useMarkRange and descriptorMin != descriptorMax and not hidePoints %}used{% endif %}"
-                                    data-rubric="{{ rubric.id }}"
-                                    data-rubric-group="{{ group.id }}"
-                                    data-rubric-descriptor="{{ descriptor.id }}"
-                            >
-                                {% set rangeStart = direction == 'asc' ? descriptorMin : descriptorMax %}
-                                {% set rangeEnd = direction == 'asc' ? descriptorMax : descriptorMin %}
-
-                                {# Selected value: if not provided, use max #}
-                                {% set selectedValue = descriptor.selectedValue ?? descriptorMax %}
-
-                                {% for i in rangeStart..rangeEnd %}
-                                    <option value={{ i }}
-                                            {% if i == selectedValue %}selected{% endif %}
-                                    >{{ i }}
-                                    </option>
-                                {% endfor %}
-                            </select>
-
-                            {% if learnerSelected %}
-                                <img class="rb-self-reflection-choice"
-                                     src="/portrait.php?userId={{ learner.externalId }}&amp;size=square32"
-                                     title="{% if latestSelfReflectedFeedback.normalisedMark != null %}{{ locale.selfAssessment.proper }}{% else %}{{ locale.selfReflection.proper }}{% endif %} choice" />
-                            {% endif %}
-                        </td>
-
-                    {% else %}
-                        <td class="rb-blank">&nbsp;</td>
+                {% for critIndex, crit in group.criteria %}
+                <tr data-group="{{ rubricId }}-{{ group.id }}">
+                    {# yay html tables... -_-; #}
+                    {% if rowspan %}
+                        <th class="rb-group-name" rowspan="{{ rowspan }}"><span>{{ group.name }}</span></th>
+                        {% set rowspan = 0 %}
                     {% endif %}
 
-                {% endfor %}
-            </tr>
+                    <th class="rb-criterion-name">{{ crit.name }}</th>
+
+                    {# Required so that this form is recognised as containing a rubric, even if nothing is submitted #}
+                    <input name="saveEmpty" value="true" type="hidden"/>
+
+                    {% for levelIndex, level in rubric.levels %}
+                        {% set descriptor = rubric.descriptors[crit.id][levelIndex] %}
+
+                        {% if descriptor %}
+
+                            {% set inputId %}{{ formField }}[{{ crit.id }}][{{ level.id }}]{% endset %}
+
+                            {# Self-Assessment #}
+                            {% set learnerSelected = learnerRubric.descriptors[crit.id][levelIndex].selected %}
+                            <td>
+                                <input id="{{ inputId }}"
+                                       name="{{ formField }}[descriptors][{{ descriptor.id }}][selected]"
+                                       value="1"
+                                       type="checkbox"
+                                       data-value="{{ descriptor.value }}"
+                                       data-rubric="{{ rubric.id }}"
+                                       data-rubric-group="{{ group.id }}"
+                                       data-rubric-descriptor="{{ descriptor.id }}"
+                                       {% if descriptor.selected %}checked="checked"{% endif %}
+                                />
+
+                                <label for="{{ inputId }}">
+                                    <span class="rb-description">
+                                        {{- descriptor.text|nl2br -}}
+                                    </span>
+
+                                    {% set direction = rubric.descriptorMetadata[crit.id].direction %}
+                                    {% set descriptorMin = rubric.descriptorMetadata[crit.id][levelIndex].min %}
+                                    {% set descriptorMax = rubric.descriptorMetadata[crit.id][levelIndex].max %}
+                                    {% set hidePoints = not config.rubric_show_points or (studentView and selfReflect) %}
+
+                                    {# Just show a text value if the descriptor is not selected #}
+                                    {% if descriptor.value is not null and showDescriptorValue and not hidePoints %}
+                                        <span class="rb-value {% if descriptorMin == descriptorMax or not useMarkRange %}used {% elseif descriptor.selected %}hide{% endif %}">
+                                            {% if useMarkRange and descriptorMin != descriptorMax %}
+                                                {% if direction == 'asc' %}
+                                                    {{- descriptorMin -}} - {{- descriptorMax -}}
+                                                {% else %}
+                                                    {{- descriptorMax -}} - {{- descriptorMin -}}
+                                                {% endif %}
+                                            {% else %}
+                                                {{ descriptor.value }}
+                                            {% endif %}
+                                        </span>
+                                    {% endif %}
+                                </label>
+                                {# Render a dropdown to select a value from the range #}
+                                {# TODO this select needs a label; technically it should be the one above but that's already in use for the descriptor checkbox #}
+                                <select id="rangeDropdown-{{ descriptor.id }}"
+                                        name="{{ formField }}[descriptors][{{ descriptor.id }}][value]"
+                                        class="{% if not descriptor.selected or descriptorMin == descriptorMax or not useMarkRange %} hide{% endif %}
+                                        {% if useMarkRange and descriptorMin != descriptorMax and not hidePoints %}used{% endif %}"
+                                        data-rubric="{{ rubric.id }}"
+                                        data-rubric-group="{{ group.id }}"
+                                        data-rubric-descriptor="{{ descriptor.id }}"
+                                >
+                                    {% set rangeStart = direction == 'asc' ? descriptorMin : descriptorMax %}
+                                    {% set rangeEnd = direction == 'asc' ? descriptorMax : descriptorMin %}
+
+                                    {# Selected value: if not provided, use max #}
+                                    {% set selectedValue = descriptor.selectedValue ?? descriptorMax %}
+
+                                    {% for i in rangeStart..rangeEnd %}
+                                        <option value={{ i }}
+                                                {% if i == selectedValue %}selected{% endif %}
+                                        >{{ i }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+
+                                {% if learnerSelected %}
+                                    <img class="rb-self-reflection-choice"
+                                         src="/portrait.php?userId={{ learner.externalId }}&amp;size=square32"
+                                         title="{% if latestSelfReflectedFeedback.normalisedMark != null %}{{ locale.selfAssessment.proper }}{% else %}{{ locale.selfReflection.proper }}{% endif %} choice" />
+                                {% endif %}
+                            </td>
+
+                        {% else %}
+                            <td class="rb-blank">&nbsp;</td>
+                        {% endif %}
+
+                    {% endfor %}
+                </tr>
             {% endfor %}
 
-        {% if group.total and showGroupTotal %}
-        <tr>
-            {% if config.rubric_show_points or not studentView %}
+        {% if showGroupTotal and markSchemeName != "None" and (config.rubric_show_points or not studentView) %}
+            <tr>
                 <th class="rb-group-summary" colspan="{{ rubric.levels|length + 1 }}">
                     <span data-group-summary="{{ rubricId }}-{{ group.id }}"
-
-                        data-numerator="{{ limit_decimal.limit(group.sum, 2) }}"
-                        data-denominator="{{ limit_decimal.limit(group.total, 2) }}">
+                          data-mark="{{ limit_decimal.limit(group.mark, 2) }}"
+                          data-scaled-mark="{{ limit_decimal.limit(group.scaledMark, 2) }}"
+                          data-max="{{ limit_decimal.limit(group.max, 2) }}"
+                          data-row-max-sum="{{ limit_decimal.limit(group.rowMaxSum, 2) }}">
 
                         {% if markSchemeName == 'TotalMarkFractional' %}
-                            {{ limit_decimal.limit(group.sum, 2) }} / {{ limit_decimal.limit(group.total, 2) }}
+                            {{ limit_decimal.limit(group.scaledMark, 2) }} / {{ limit_decimal.limit(group.max, 2) }}
                         {% else %}
                             {{ group.humanReadableMark }}
                         {% endif %}
                     </span>
-
-                        {# Self-Assessment #}
-                        {% if learnerRubric %}
-                            {% if latestSelfReflectedFeedback.isSelfGrading %}
-                                {% set selfReflectionName = locale.selfAssessment.proper %}
-                            {% else %}
-                                {% set selfReflectionName = locale.selfReflection.proper %}
-                            {% endif %}
-
-                            ({{ learnerRubric.groups[groupIndex].humanReadableMark }} given in {{ selfReflectionName }})
-                        {% endif %}
-                    </th>
-                {% endif %}
-            </tr>
-            {% endif %}
-            {% endfor %}
-
-    {% if rubric.total and showRubricTotal and (config.rubric_show_points or not studentView) %}
-    <tr>
-        <th class="rb-final-summary" colspan="{{ rubric.levels|length + 2 }}">
-            <span data-final-summary="{{ rubricId }}"
-
-                data-numerator="{{ limit_decimal.limit(rubric.sum, 2) }}"
-                data-denominator="{{ limit_decimal.limit(rubric.total, 2) }}">
-
-                {% if markSchemeName == 'TotalMarkFractional' %}
-                   {{ limit_decimal.limit(rubric.sum, 2) }} / {{ limit_decimal.limit(rubric.total, 2) }}
-                {% else %}
-                   {{ rubric.humanReadableMark }}
-                {% endif %}
-            </span>
 
                     {# Self-Assessment #}
                     {% if learnerRubric %}
@@ -191,11 +155,42 @@
                             {% set selfReflectionName = locale.selfReflection.proper %}
                         {% endif %}
 
-                        ({{ learnerRubric.humanReadableMark }} given in {{ selfReflectionName }})
+                        ({{ learnerRubric.groups[groupIndex].humanReadableMark }} given in {{ selfReflectionName }})
                     {% endif %}
                 </th>
             </tr>
-            {% endif %}
+        {% endif %}
+
+    {% endfor %}
+
+    {% if showRubricTotal and markSchemeName != "None" and (config.rubric_show_points or not studentView) %}
+        <tr>
+            <th class="rb-final-summary" colspan="{{ rubric.levels|length + 2 }}">
+                <span data-final-summary="{{ rubricId }}"
+                      data-scaled-mark="{{ limit_decimal.limit(rubric.scaledMark, 2) }}"
+                      data-max="{{ limit_decimal.limit(rubric.max, 2) }}">
+
+                    {% if markSchemeName == 'TotalMarkFractional' %}
+                       {{ limit_decimal.limit(rubric.scaledMark, 2) }} / {{ limit_decimal.limit(rubric.max, 2) }}
+                    {% else %}
+                       {{ rubric.humanReadableMark }}
+                    {% endif %}
+                </span>
+
+                {# Self-Assessment #}
+                {% if learnerRubric %}
+                    {% if latestSelfReflectedFeedback.isSelfGrading %}
+                        {% set selfReflectionName = locale.selfAssessment.proper %}
+                    {% else %}
+                        {% set selfReflectionName = locale.selfReflection.proper %}
+                    {% endif %}
+
+                    ({{ learnerRubric.humanReadableMark }} given in {{ selfReflectionName }})
+                {% endif %}
+            </th>
+        </tr>
+    {% endif %}
+
         </tbody>
     </table>
 </div>
@@ -220,34 +215,34 @@
 
             var $groupRows = $(rowSelector);
 
-            var rubricSum = 0;
+            var rubricTotalMark = 0;
 
             if ($groupRows.length) {
 
-                var groupSum = getSum($groupRows.find('input'));
-
                 var groupSummarySelector = '[data-group-summary="rb-' + rubricId + '-' + groupId + '"]';
-
                 var groupSummary = $rb.find(groupSummarySelector);
+                var $descriptorCheckboxes = $groupRows.find('input');
 
-                groupSummary.attr('data-numerator', groupSum);
+                var scaledGroupMark = getScaledGroupMark($descriptorCheckboxes, groupSummary);
 
                 if (groupSummary.length) {
+                    groupSummary.attr('data-scaled-mark', scaledGroupMark);
+
                     parseFraction(groupSummary, null);
                 }
 
-                rubricSum = getSum($rb.find('input'));
+                rubricTotalMark = getTotalMark();
             }
-
             var rubricSummarySelector = '[data-final-summary="rb-' + rubricId + '"]';
 
             var rubricSummary = $rb.find(rubricSummarySelector);
 
-            rubricSummary.attr('data-numerator', rubricSum);
+            rubricSummary.attr('data-scaled-mark', rubricTotalMark);
 
             parseFraction(rubricSummary, e.namespace);
 
-            $('[data-role=rubric-sum]').text(rubricSummary.text());
+            // This seems to be unused
+            // $('[data-role=rubric-scaled-mark]').text(rubricSummary.text());
 
             // What cell was actually changed?
             if ($changed.is(':checkbox')) {
@@ -283,13 +278,28 @@
             }
         }
 
-        function getSum($descriptorCheckboxes)
+        function getScaledGroupMark($descriptorCheckboxes, groupSummary)
         {
-            var groupSum = 0;
+            var groupMax = groupSummary.attr('data-max');
+            var groupRowMaxSum = groupSummary.attr('data-row-max-sum');
 
-            // in lieu of a reduce() function
-            $descriptorCheckboxes.map(function () {
+            var groupSum = summateDescriptors($descriptorCheckboxes);
+
+            var scaledGroupSum = groupSum * (groupMax / groupRowMaxSum);
+
+            if(scaledGroupSum % 1 != 0){
+                scaledGroupSum = scaledGroupSum.toFixed(2);
+            }
+
+            return scaledGroupSum;
+        }
+
+        function summateDescriptors($descriptorCheckboxes) {
+            var descriptorSummation = 0;
+
+            $descriptorCheckboxes.each(function () {
                 var $descriptorCheckbox = $(this);
+
                 if ($descriptorCheckbox.prop('checked')) {
                     // Is there a select box for this? If so use its value instead
                     var descriptorId = $descriptorCheckbox.data('rubricDescriptor'),
@@ -301,17 +311,38 @@
                         descriptorValue = parseFloat($descriptorCheckbox.data('value'));
                     }
                     if (!isNaN(descriptorValue)) {
-                        groupSum += descriptorValue;
+                        descriptorSummation += descriptorValue;
                     }
                 }
             });
 
-            // If sum isn't a whole number: round to 2dp
-            if (groupSum % 1 !== 0){
-                groupSum = groupSum.toFixed(2);
+            return descriptorSummation;
+        }
+
+
+        function getTotalMark()
+        {
+            var totalMark = 0;
+            var groupSummary = $rb.find('[data-group-summary]');
+
+            if (groupSummary.length) {
+                groupSummary.each(function() {
+                    var groupScaledMark = parseFloat($(this).attr('data-scaled-mark'));
+                    if (!isNaN(groupScaledMark)) {
+                        totalMark += groupScaledMark;
+                    }
+                });
+            } else {
+                var $descriptorCheckboxes = $("[data-rubric-descriptor]");
+                totalMark = summateDescriptors($descriptorCheckboxes);
             }
 
-            return groupSum;
+            // If sum isn't a whole number: round to 2dp
+            if(totalMark % 1 != 0){
+                totalMark = totalMark.toFixed(2);
+            }
+
+            return totalMark;
         }
 
         // If not multi-select, simulate radio behaviour per row (simpler to do this than intercept radio checked event!)
@@ -345,7 +376,7 @@
             }
 
             $elem.each(function () {
-                if (this.hasAttribute('data-numerator') && this.hasAttribute('data-denominator')) {
+                if (this.hasAttribute('data-scaled-mark') && this.hasAttribute('data-max')) {
                     $(this).trigger(ev);
                 }
             });

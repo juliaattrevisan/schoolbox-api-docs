@@ -95,18 +95,6 @@ abstract class DescriptorList implements Twiggable, Calculable
     }
 
 
-    /**
-     * @return float
-     */
-    public function getPercentage()
-    {
-        if ($total = $this->getTotal()) {
-            return $this->getSum() / $total;
-        }
-
-        return 0;
-    }
-
 
     /**
      * Convert yourself into a Twig context array
@@ -118,9 +106,6 @@ abstract class DescriptorList implements Twiggable, Calculable
         $context = [
             'id'          => $this->getId(),
             'name'        => $this->getName(),
-            'sum'         => $this->getSum(),
-            'total'       => $this->getTotal(),
-            'percentage'  => $this->getPercentage(),
             'descriptors' => [],
         ];
 
@@ -134,18 +119,20 @@ abstract class DescriptorList implements Twiggable, Calculable
 
 
     /**
-     * Return the calculated sum value of this Calculable (NOT the total possible value)
+     * @inheritdoc
      *
      * @return float|null
      */
-    public function getSum()
+    public function calculateMark()
     {
         $sum = null;
 
         foreach ($this->descriptors as $descriptor) {
-            $ds = $descriptor->getSum();
-            if (!is_null($ds)) {
-                $sum += $descriptor->getSum();
+            $descriptorMark = $descriptor->calculateMark();
+
+            // Only adds to the sum if descriptor is selected, due to logic in Descriptor::calculateMark()
+            if ($descriptorMark !== null) {
+                $sum += $descriptor->calculateMark();
             }
         }
 

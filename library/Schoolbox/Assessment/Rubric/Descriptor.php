@@ -171,23 +171,23 @@ class Descriptor implements Calculable, Twiggable
 
 
     /**
-     * Return the calculated sum value of this Calculable (NOT the total possible value)
+     * @inheritdoc
      *
      * @return float|null
      */
-    public function getSum()
+    public function calculateMark()
     {
         return $this->isSelected() ? $this->selectedValue : null;
     }
 
 
     /**
-     * Returns the total possible value of this Calculable
+     * @inheritdoc
      *
      * @alias getValue()
      * @return float
      */
-    public function getTotal()
+    public function calculateMax()
     {
         return $this->getValue();
     }
@@ -210,14 +210,14 @@ class Descriptor implements Calculable, Twiggable
     public function toContext()
     {
         return [
-            'id'            => $this->getId(),
-            'text'          => $this->getText(),
-            'value'         => $this->getValue(),
+            'id'       => $this->getId(),
+            'text'     => $this->getText(),
+            'value'    => $this->getValue(),
             'selectedValue' => $this->getSelectedValue(),
-            'selected'      => $this->isSelected(),
-            'sum'           => $this->getSum(),
-            'total'         => $this->getTotal(),
-            'position'      => [
+            'selected' => $this->isSelected(),
+            'sum'      => $this->calculateMark(),
+            'total'    => $this->calculateMax(),
+            'position' => [
                 'level' => [
                     'id' => $this->level->getId(),
                     'name' => $this->level->getName(),

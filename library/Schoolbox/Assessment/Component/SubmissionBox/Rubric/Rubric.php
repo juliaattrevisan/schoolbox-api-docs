@@ -258,7 +258,7 @@ class Rubric extends Core\Rubric
                 GroupUsageMapper::getInstance()->createModel()
                                                ->setGroup($this->groupCache->offsetGet($group))
                                                ->setSubmissionBox($this->box)
-                                               ->setMaxValue($group->getMaxValue())
+                                               ->setMaxValue($group->calculateMax())
             );
         }
 
@@ -489,7 +489,6 @@ class Rubric extends Core\Rubric
 
         $box = $this->getSubmissionBox();
 
-        // if the box doesn't mark by group, then we need to remove the group subtotals from the context
         foreach ($context['groups'] as $groupId => $group) {
 
             // if no user specified, OR the specified user is allowed to view
@@ -499,34 +498,11 @@ class Rubric extends Core\Rubric
                 if ($box && $box->isMarkedPerRubricGroup()) {
                     $context['groups'][$groupId]['humanReadableMark'] = $this->calculateHumanReadable(
                         $context['groups'][$groupId]['percentage'],
-                        $context['groups'][$groupId]['total']
-                    );
-                } else {
-                    // nothing per-group? unset the mark data if any exists
-                    unset(
-                        $context['groups'][$groupId]['sum'],
-                        $context['groups'][$groupId]['total'],
-                        $context['groups'][$groupId]['percentage']
+                        $context['groups'][$groupId]['max']
                     );
                 }
-            } else {
-                // nothing per-group? unset the mark data if any exists
-                unset(
-                    $context['groups'][$groupId]['sum'],
-                    $context['groups'][$groupId]['total'],
-                    $context['groups'][$groupId]['percentage']
-                );
             }
 
-        }
-
-        if (!$box || ($sessionUser && !$box->canViewRubric($sessionUser))) {
-            unset(
-                $context['sum'],
-                $context['total'],
-                $context['percentage'],
-                $context['humanReadableMark']
-            );
         }
 
         $context['boxId'] = $this->box ? $this->box->getId() : 0;
@@ -625,7 +601,7 @@ class Rubric extends Core\Rubric
      */
     public function getHumanReadableMark()
     {
-        return $this->calculateHumanReadable($this->getPercentage(), $this->getTotal());
+        return $this->calculateHumanReadable($this->getPercentage(), $this->calculateMax());
     }
 
 

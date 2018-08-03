@@ -21,17 +21,17 @@ class Criterion extends DescriptorList
     protected $group;
 
     /**
-     * Returns the total of the values of descriptors contained herein, irrespective of selection
+     * @inheritdoc
      *
      * @return float
      */
-    public function getTotal()
+    public function calculateMax()
     {
         $total = 0;
 
         foreach ($this->descriptors as $descriptor) {
-            if(is_numeric($descriptor->getTotal())) {
-                $total = max($total, $descriptor->getTotal());
+            if(is_numeric($descriptor->calculateMax())) {
+                $total = max($total, $descriptor->calculateMax());
             }
         }
 

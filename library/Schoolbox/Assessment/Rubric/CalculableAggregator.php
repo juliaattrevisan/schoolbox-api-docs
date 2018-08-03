@@ -12,37 +12,45 @@ namespace Schoolbox\Assessment\Rubric;
 
 use SplObjectStorage;
 
+
+/**
+ * Class CalculableAggregator
+ * Superclass for rubric elements that need to summate values on collections of children, in order to calculate overall grades.
+ *
+ * @package Schoolbox\Assessment\Rubric
+ */
+
 class CalculableAggregator extends SplObjectStorage implements Calculable
 {
 
     /**
-     * Returns the sum of the Calculables contained herein
+     * Summate the marks given for a Calculable
      *
      * @return float
      */
-    public function getSum()
+    public function calculateMark()
     {
-        $value = 0;
+        $mark = 0;
 
         foreach ($this as $calc) {
-            $value += $calc->getSum();
+            $mark += $calc->calculateMark();
         }
 
-        return $value;
+        return $mark;
     }
 
 
     /**
-     * Returns the total of the Calculables contained herein
+     * Calculates the highest available mark for this Calculable
      *
      * @return float
      */
-    public function getTotal()
+    public function calculateMax()
     {
         $total = 0;
 
         foreach ($this as $calc) {
-            $total += $calc->getTotal();
+            $total += $calc->calculateMax();
         }
 
         return $total;
@@ -50,15 +58,37 @@ class CalculableAggregator extends SplObjectStorage implements Calculable
 
 
     /**
-     * Returns the percentage of the Calculables contained herein
+     * Scale the summated marks given for a Calculable, based on the total possible marks for the Calculable
+     *
      * @return float
      */
-    public function getPercentage()
+    public function calculateScaledMark()
     {
-        if ($total = $this->getTotal()) {
-            return $this->getSum() / $total;
+        $scaledMark = $this->calculateMark();
+
+        if ($rowMaxSum = $this->calculateRowMaxSum()) {
+            $scaledMark = $this->calculateMark() * ($this->calculateMax() / $this->calculateRowMaxSum());
         }
-        return 0;
+
+        return $scaledMark;
+    }
+
+
+    /**
+     * Summate the highest values from each row in the Calculable (help this is very hard to put into words)
+     * This is essentially the highest mark that can be achieved for the Calculable, without scaling
+     *
+     * @return float
+     */
+    public function calculateRowMaxSum()
+    {
+        $rowMaxSum = 0;
+
+        foreach ($this as $calc) {
+            $rowMaxSum += $calc->calculateRowMaxSum();
+        }
+
+        return $rowMaxSum;
     }
 
 }

@@ -102,7 +102,7 @@ class Factory
         // cache groups
         foreach ($groups as $groupId => $groupData) {
             $groupName     = $groupData['name'];
-            $groupMaxValue = $groupData['maxValue'] ?? null;
+            $groupMaxValue = isset($groupData['maxValue']) ? (float)$groupData['maxValue'] : null;
             $groupCache[$groupId] = new Group($groupId, $groupName, $groupMaxValue);
         }
 
