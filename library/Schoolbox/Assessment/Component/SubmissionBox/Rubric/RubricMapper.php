@@ -548,7 +548,10 @@ class RubricMapper
      * @param int      $maxLevels
      *
      * @throws \Schoolbox\Resource\Exception
-     * @return Rubric
+     * @return array 0: Rubric
+     *               1: bool: does the rubric have customised max mark per group values?
+     *                        (required as the rubric object doesn't store this separately
+     *                         from their actual value)
      */
     public function buildFromCSV(IStorage $file, $folderId, $maxLevels)
     {
@@ -587,15 +590,25 @@ class RubricMapper
         $workingGroupName = '';
         $workingCritName = '';
 
-        $criteria = [];
-
         // build the square, extracting data as we go
+        $groups            = [];
+        $hasCustomMaxValue = false;
+        $isLastRowNewGroup = false;
         while ($row = $this->getcsv($fp, $maxLevels + 2)) {
-
-            // list of criteria, grouped by... uh, group
-            if ($row[0]) {
-                $workingGroupName = $row[0];
+            if ($isLastRowNewGroup) {
+                $isLastRowNewGroup = false;
+                if ($row[0]) {
+                    $hasCustomMaxValue = true;
+                    $groupMaxValue     = $row[0];
+                }
+            } else {
+                // list of criteria, grouped by... uh, group
+                if ($row[0]) {
+                    $workingGroupName  = $row[0];
+                    $isLastRowNewGroup = true;
+                }
             }
+
             // copy the groupname into the row
             $row[0] = $workingGroupName;
 
@@ -606,7 +619,11 @@ class RubricMapper
             $row[1] = $workingCritName;
 
             // extract the criterion uniquely (can be blank)
-            $criteria[$workingGroupName][$workingCritName] = [
+            // (The group values persist from previous rows)
+            $groups[$workingGroupName]['id']                         = null;
+            $groups[$workingGroupName]['name']                       = $workingGroupName;
+            $groups[$workingGroupName]['maxValue']                   = $groupMaxValue ?? null;
+            $groups[$workingGroupName]['criteria'][$workingCritName] = [
                 'id'   => null,
                 'name' => $workingCritName,
             ];
@@ -616,22 +633,22 @@ class RubricMapper
 
         // ensure all given criteria exist: create new ones if necessary
         $criterionMapper = CriterionMapper::getInstance();
-        foreach ($criteria as $group => $crits) {
-            foreach ($crits as $crit) {
-                $name  = $crit['name'];
-                $model = null;
+        foreach ($groups as $groupName => $group) {
+            foreach ($group['criteria'] as $crit) {
+                $criterionName = $crit['name'];
+                $model         = null;
 
                 // Which criterion is used?
                 try {
                     // If there's a matching criterion in the folder: use it
-                    $model = $criterionMapper->findOneForFolderByKey($folderId, $name, $group);
+                    $model = $criterionMapper->findOneForFolderByKey($folderId, $criterionName, $groupName);
 
                 } catch (MapperException $e) {
                     // If there isn't:
                     // * If there's a course spec: use a matching criterion from it
                     if ($courseSpecFolderId) {
                         try {
-                            $model = $criterionMapper->findOneForFolderByKey($courseSpecFolderId, $name, $group);
+                            $model = $criterionMapper->findOneForFolderByKey($courseSpecFolderId, $criterionName, $groupName);
                         } catch (MapperException $e) {
                             // There's no match in the folder or spec.
                             // Create a new criterion in the folder
@@ -642,11 +659,12 @@ class RubricMapper
                 // If there's no course spec, or there's no match in the spec:
                 // * create a new criterion in the folder
                 if (!$model) {
-                    $model = $criterionMapper->findOrCreateOneForFolderByKey($folderId, $name, $group);
+                    $model = $criterionMapper->findOrCreateOneForFolderByKey($folderId, $criterionName, $groupName);
                 }
 
-                // yank that ID
-                $criteria[$group][$name]['id'] = $model->getId();
+                // yank those IDs
+                $groups[$groupName]['id']                             = $model->getGroup()->getId();
+                $groups[$groupName]['criteria'][$criterionName]['id'] = $model->getId();
             }
 
         }
@@ -654,20 +672,21 @@ class RubricMapper
         // get a new rubric in array form
         $postdata = $this->createForFolder($folderId, $courseSpecFolderId, $levelNames)->toPostData();
 
-        // overlay descriptor data
+        // overlay descriptor and max points data
         for ($i = 1; $i < count($square); $i += 2) {
 
             $gLookup = $square[$i][0];
             $cLookup = $square[$i][1];
 
-            $crit = $criteria[$gLookup][$cLookup];
+            $crit = $groups[$gLookup]['criteria'][$cLookup];
 
             if (!$crit) {
                 // given the way we're working with data we've expressly set up just above, this should be impossible...
                 continue;
             }
 
-            $critId = $crit['id'];
+            $groupId = $groups[$gLookup]['id'];
+            $critId  = $crit['id'];
 
             for ($j = 2; $j < count($square[$i]); ++$j) {
 
@@ -677,6 +696,9 @@ class RubricMapper
                 $dVal  = trim($square[$i + 1][$j]);
 
                 if (strlen($dText) || strlen($dVal)) {
+
+                    // Set the group's max value
+                    $postdata['group'][$groupId]['maxValue'] = $groups[$gLookup]['maxValue'];
 
                     // turn this criterion on
                     $postdata['criterion'][$critId]['on'] = true;
@@ -694,7 +716,7 @@ class RubricMapper
         /** @var Rubric $rubric */
         $rubric = $this->factory->buildFromPostData([0 => $postdata], true);
 
-        return $rubric;
+        return [$rubric, $hasCustomMaxValue];
     }
 
     /**

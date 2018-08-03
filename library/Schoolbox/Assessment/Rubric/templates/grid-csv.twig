@@ -48,7 +48,8 @@
             }
 
             // Is this mark-per-capability?
-            postdata.markPerCapability = body.find('#markPerCapability:checked').length > 0;
+            var markPerCapabilityInput = body.find('#markPerCapability');
+            postdata.markPerCapability = markPerCapabilityInput.is(':checked');
 
             // show/hide appropriate things
             wrap.find('[data-hideable]').addClass('hide');
@@ -84,6 +85,12 @@
                 // restore the grid
                 wrap.find('[data-hideable]').removeClass('hide');
                 wrap.find('[data-waiting-msg]').addClass('hide');
+
+                // Is mark-per-capability on in the rubric? switch it on in the main form
+                // (Don't switch it off if it's off in the rubric; allow the user to decide)
+                if ($('#rubric-attachable{{ idSuffix }}').find('input[data-group-max-value]:visible').length) {
+                    markPerCapabilityInput.prop('checked', true);
+                }
 
                 // you're free to leave now
                 submits.prop('disabled', false);
