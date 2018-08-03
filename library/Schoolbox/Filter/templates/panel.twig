@@ -226,7 +226,9 @@ Usage:
                         queryArgs.push(filterId + '='); // empty filter selection syntax
                     } else {
                         for (optionKey in selections) {
-                            queryArgs.push(filterId + '[' + optionKey + ']=' + optionVal); // filter option selected syntax
+                            if (selections.hasOwnProperty(optionKey)) {
+                                queryArgs.push(filterId + '[' + optionKey + ']=' + selections[optionKey]); // filter option selected syntax
+                            }
                         }
                     }
                 }

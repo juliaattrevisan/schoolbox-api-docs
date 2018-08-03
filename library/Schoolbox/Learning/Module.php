@@ -78,6 +78,7 @@ class Module extends BaseModule
                 new Rule\Any(
                     new Rule\IsSuperuser(),
                     new Rule\All(
+                        new Rule\IsLoggedIn(),
                         new Rule\IsUser('userId'),
                         new Rule\HasRole(Role::STAFF)
                     )
