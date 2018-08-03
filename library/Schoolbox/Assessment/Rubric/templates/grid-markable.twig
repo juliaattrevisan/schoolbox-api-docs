@@ -225,8 +225,9 @@
 
                 var groupSummarySelector = '[data-group-summary="rb-' + rubricId + '-' + groupId + '"]';
                 var groupSummary = $rb.find(groupSummarySelector);
+                var $descriptorCheckboxes = $groupRows.find('input');
 
-                var scaledGroupMark = getScaledGroupMark($groupRows.find('input'), groupSummary);
+                var scaledGroupMark = getScaledGroupMark($descriptorCheckboxes, groupSummary);
 
                 if (groupSummary.length) {
                     groupSummary.attr('data-scaled-mark', scaledGroupMark);
@@ -234,9 +235,8 @@
                     parseFraction(groupSummary, null);
                 }
 
-                rubricTotalMark = getTotalMark(rubricId);
+                rubricTotalMark = getTotalMark();
             }
-
             var rubricSummarySelector = '[data-final-summary="rb-' + rubricId + '"]';
 
             var rubricSummary = $rb.find(rubricSummarySelector);
@@ -287,9 +287,20 @@
             var groupMax = groupSummary.attr('data-max');
             var groupRowMaxSum = groupSummary.attr('data-row-max-sum');
 
-            var groupSum = 0;
+            var groupSum = summateDescriptors($descriptorCheckboxes);
 
-            // in lieu of a reduce() function
+            var scaledGroupSum = groupSum * (groupMax / groupRowMaxSum);
+
+            if(scaledGroupSum % 1 != 0){
+                scaledGroupSum = scaledGroupSum.toFixed(2);
+            }
+
+            return scaledGroupSum;
+        }
+
+        function summateDescriptors($descriptorCheckboxes) {
+            var descriptorSummation = 0;
+
             $descriptorCheckboxes.each(function () {
                 var $descriptorCheckbox = $(this);
 
@@ -304,32 +315,31 @@
                         descriptorValue = parseFloat($descriptorCheckbox.data('value'));
                     }
                     if (!isNaN(descriptorValue)) {
-                        groupSum += descriptorValue;
+                        descriptorSummation += descriptorValue;
                     }
                 }
             });
 
-            var scaledGroupSum = groupSum * (groupMax / groupRowMaxSum);
-
-            if(scaledGroupSum % 1 != 0){
-                scaledGroupSum = scaledGroupSum.toFixed(2);
-            }
-
-            return scaledGroupSum;
+            return descriptorSummation;
         }
 
 
         function getTotalMark()
         {
-            var groupSummary = $rb.find('[data-group-summary]');
             var totalMark = 0;
+            var groupSummary = $rb.find('[data-group-summary]');
 
-            groupSummary.each(function() {
-                var groupScaledMark = parseFloat($(this).attr('data-scaled-mark'));
-                if (!isNaN(groupScaledMark)) {
-                    totalMark += groupScaledMark;
-                }
-            });
+            if (groupSummary.length) {
+                groupSummary.each(function() {
+                    var groupScaledMark = parseFloat($(this).attr('data-scaled-mark'));
+                    if (!isNaN(groupScaledMark)) {
+                        totalMark += groupScaledMark;
+                    }
+                });
+            } else {
+                var $descriptorCheckboxes = $("[data-rubric-descriptor]");
+                totalMark = summateDescriptors($descriptorCheckboxes);
+            }
 
             // If sum isn't a whole number: round to 2dp
             if(totalMark % 1 != 0){
