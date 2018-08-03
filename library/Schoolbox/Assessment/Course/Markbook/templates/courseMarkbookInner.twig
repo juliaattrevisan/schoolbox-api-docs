@@ -16,21 +16,20 @@
 {% import '@learning/macro/urgency.twig' as urgency %}
 
 <div class="row">
-    <div class="small-12 island" style="overflow-x: scroll;">
-
+    <div class="small-12 island">
         <div class="checklist" style="float:right;">
             <input type="checkbox" id="show-drafts">
             <label for="show-drafts">
                 Show Drafts
             </label>
         </div>
-
         <div class="legend" style="float:right;">
             <p class="meta"><span class="indicator indicator-none"></span>No published mark</p>
             <p class="meta"><span class="indicator indicator-pending"></span>Published mark, draft pending</p>
             <p class="meta"><span class="indicator indicator-published"></span>Published mark</p>
         </div>
-
+    </div>
+    <div class="small-12 island" style="overflow-x: scroll;">
         <table class="square-grid marksheet" data-mark-sheet>
             <thead>
             <tr class="rotate-headers">
