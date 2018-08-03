@@ -206,8 +206,8 @@ feedback: currentFeedback,
                     markVisibility: currentFeedback.isSelfAssessment
                                     or participant.assessable.isFeedbackVisibleToUser(USER),
                     useMarkRange: assessment.useMarkRange,
-                    showRubricTotal: showRubricTotal,
-                    showGroupTotal: showGroupTotal
+                    showRubricTotal: true,
+                    showGroupTotal: assessment.markPerCapability
                 } only %}
             </div>
         {% endif %}
