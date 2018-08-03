@@ -96,7 +96,6 @@ class Controller extends Component_Homepage_ControllerAbstract
             'topics' => $this->topics,
             'topicAll' => News\Mapper::TOPIC_ALL_SLUG,
             'slug' => $this->slug,
-            'hidePaginator' => true,
             'compactMode' => $this->getConfig('compactMode'),
             'limit' => $this->getConfig('size'),
             'folderId' => $this->getSource()->getId()
