@@ -134,7 +134,8 @@ class Module extends \Alaress\Module\Module
                                     ),
                                     [
                                         Attachment::ATTACHMENT_TYPE_LINK,
-                                        // TODO these should be handled by the file handler, once it works
+                                        // TODO consider handling these with the file handler
+                                        // Can't do this now, as I can't pass the auth challenge
                                         Attachment::ATTACHMENT_TYPE_FILE,
                                         Attachment::ATTACHMENT_TYPE_IMAGE,
                                         Attachment::ATTACHMENT_TYPE_LESSON,
