@@ -17,7 +17,7 @@
     {% set params = params ~ '&c=' ~ compactMode %}
 {% endif %}
 
-{% if limit %}
+{% if limit is not null %}
     {% set params = params ~ '&l=' ~limit %}
 {% endif %}
 

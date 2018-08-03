@@ -98,7 +98,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
             'slug' => $this->slug,
             'hidePaginator' => true,
             'compactMode' => $this->getConfig('compactMode'),
-            'limit' => $this->getConfig('size')
+            'limit' => (int)$this->getConfig('size')
         ]);
     }
 }
