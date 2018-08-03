@@ -34,7 +34,7 @@ class External_Synergetic_Ping implements External_PingInterface
             // If all else fails we will default to reporting version 67 as this is the
             // baseline functionality level for the Synergetic connector
 
-            return 67;
+            return '67';
         }
 
         return $version;
