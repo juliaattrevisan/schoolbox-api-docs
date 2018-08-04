@@ -97,23 +97,30 @@ class Controller extends Base
         ]);
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $twigData = [
+                'name' => $row['name'],
+                'entityType' => $row['entity_type'] // TODO: needs slight adjustment for human consumption- returns 'School_house' instead of 'School House'
+            ];
+
             $searchResult[] = [
                 'id' => Segment\Codec::encode($row['entity_type'], $row['id'], Model::RELATIONSHIP_SELF),
-                'name' => $translator->assembleSegment($row['name'], $row['entity_type'], Model::RELATIONSHIP_SELF)
+                'itemHtml' => $this->getDi()->get('templateEngine')->render('@commsNews/audienceItem.twig', $twigData)
             ];
 
             /* Only provide the Parents and Teachers modifiers to strats which support them
              * We exclude Parents and Teachers modifiers from Users due to privacy reasons
              */
             if ($registry->hasModifier($row['entity_type'])) {
+                $twigData['modifier'] = $translator->translateModifier(Model::RELATIONSHIP_PARENTS_OF);
                 $searchResult[] = [
                     'id' => Segment\Codec::encode($row['entity_type'], $row['id'], Model::RELATIONSHIP_PARENTS_OF),
-                    'name' => $translator->assembleSegment($row['name'], $row['entity_type'], Model::RELATIONSHIP_PARENTS_OF)
+                    'itemHtml' => $this->getDi()->get('templateEngine')->render('@commsNews/audienceItem.twig', $twigData)
                 ];
 
+                $twigData['modifier'] = $translator->translateModifier(Model::RELATIONSHIP_TEACHERS_OF);
                 $searchResult[] = [
                     'id' => Segment\Codec::encode($row['entity_type'], $row['id'], Model::RELATIONSHIP_TEACHERS_OF),
-                    'name' => $translator->assembleSegment($row['name'], $row['entity_type'], Model::RELATIONSHIP_TEACHERS_OF)
+                    'itemHtml' => $this->getDi()->get('templateEngine')->render('@commsNews/audienceItem.twig', $twigData)
                 ];
             }
         }
@@ -135,14 +142,21 @@ class Controller extends Base
         foreach ($collection as $item) {
             $tuple = $item->findValueLabelPair();
 
+            $twigData = [
+                'name' => $tuple['label'],
+                'entityType' => $entityType // TODO: needs slight adjustment for human consumption- returns 'School_house' instead of 'School House'
+            ];
+            $twigDataParents = array_merge($twigData, ['modifier' => $translator->translateModifier(Model::RELATIONSHIP_PARENTS_OF)]);
+            $twigDataTeachers = array_merge($twigData, ['modifier' => $translator->translateModifier(Model::RELATIONSHIP_TEACHERS_OF)]);
+
             /* Encode the value because Year Level is a user-configurable string
              */
             $items[] = [
                 'id' => Segment\Codec::encode($entityType, $tuple['value'], Model::RELATIONSHIP_SELF),
                 'name' => $tuple['label'],
-                'nameType' => $translator->assembleSegment($tuple['label'], $entityType, Model::RELATIONSHIP_SELF),
-                'nameParents' => $translator->assembleSegment($tuple['label'], $entityType, Model::RELATIONSHIP_PARENTS_OF),
-                'nameTeachers' => $translator->assembleSegment($tuple['label'], $entityType, Model::RELATIONSHIP_TEACHERS_OF)
+                'itemHtml' => $this->getDi()->get('templateEngine')->render('@commsNews/audienceItem.twig', $twigData),
+                'itemHtmlParents' => $this->getDi()->get('templateEngine')->render('@commsNews/audienceItem.twig', $twigDataParents),
+                'itemHtmlTeachers' => $this->getDi()->get('templateEngine')->render('@commsNews/audienceItem.twig', $twigDataTeachers)
             ];
         }
 

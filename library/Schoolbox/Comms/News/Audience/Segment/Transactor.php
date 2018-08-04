@@ -65,6 +65,11 @@ class Transactor
             foreach ($values as $value => $data) {
                 foreach ($data['relationships'] as $relationship) {
 
+                    $twigData = [
+                        'name' => $value,
+                        'entityType' => $entityType
+                    ];
+
                     /* translate "name" into something nicer to read for humans
                      */
                     $pieces[] = [
@@ -74,6 +79,7 @@ class Transactor
                             $value,
                             $relationship
                         ),
+                        'itemHtml' => 'asdasd' // TODO: how to getDi() from here so that this can get twig output plz?
                     ];
                 }
             }

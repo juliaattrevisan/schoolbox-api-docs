@@ -211,6 +211,16 @@
                type: 'GET',
                dataType: 'json'
            },
+           selectize: {
+               render: {
+                   option: function(item, escape) {
+                       return item.itemHtml;
+                   },
+                   item: function(item, escape) {
+                       return item.itemHtml;
+                   }
+               }
+           },
         {% if audience|length %}
             value: {{ audience|json_encode|raw }},
         {% endif %}
@@ -398,21 +408,24 @@
                     if (self.includeUsers) {
                         selectizeOptions.push({
                             id: option.id,
-                            name: option.nameType
+                            name: option.name,
+                            itemHtml: option.itemHtml
                         });
                     }
 
                     if (self.includeParents) {
                         selectizeOptions.push({
                             id: option.id + ':parents_of',
-                            name: option.nameParents
+                            name: option.name,
+                            itemHtml: option.itemHtmlParents
                         });
                     }
 
                     if (self.includeTeachers) {
                         selectizeOptions.push({
                             id: option.id + ':teachers_of',
-                            name: option.nameTeachers
+                            name: option.name,
+                            itemHtml: option.itemHtmlTeachers
                         });
                     }
 
