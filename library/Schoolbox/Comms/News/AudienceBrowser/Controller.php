@@ -140,7 +140,7 @@ class Controller extends Base
             $items[] = [
                 'id' => Segment\Codec::encode($entityType, $tuple['value'], Model::RELATIONSHIP_SELF),
                 'name' => $tuple['label'],
-                'nameType' => $tuple['label'] . ' (' . \ucfirst($entityType) . ')', // TODO is there a translator method for this @stevechan?
+                'nameType' => $translator->assembleSegment($tuple['label'], $entityType, Model::RELATIONSHIP_SELF),
                 'nameParents' => $translator->assembleSegment($tuple['label'], $entityType, Model::RELATIONSHIP_PARENTS_OF),
                 'nameTeachers' => $translator->assembleSegment($tuple['label'], $entityType, Model::RELATIONSHIP_TEACHERS_OF)
             ];
