@@ -161,7 +161,7 @@ class Acquisition
             FROM user_professionaldevelopment upd
             INNER JOIN `user` u ON upd.user_id = u.`id`
             INNER JOIN submission_return sr ON u.`id` = sr.`owner`
-            INNER JOIN rubric_mark rm ON sr.`id` = rm.`return_id`
+            INNER JOIN rubric_descriptor_mark rm ON sr.`id` = rm.`return_id`
             INNER JOIN rubric_descriptor rd ON rm.`descriptor_id` = rd.`id`
             INNER JOIN rubric_criterion rc ON rd.`criterion_id`  = rc.`id`
             INNER JOIN rubric_group rg ON rc.rubric_group_id = rg.id

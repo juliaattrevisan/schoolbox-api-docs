@@ -83,7 +83,7 @@ class GridGenerator
             SELECT
                 rm.descriptor_id,
                 rm.value
-            FROM rubric_mark rm
+            FROM rubric_descriptor_mark rm
             LEFT JOIN submission_return sr ON sr.id = rm.return_id
             WHERE rm.valid = TRUE
             AND rm.return_id = (

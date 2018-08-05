@@ -1133,24 +1133,24 @@ class RubricMapper
 
         $stmt = $this->database->prepare("
             SELECT rg.name AS grouping, rc.name, a.id, a.title, rd.description
-            FROM assessment         a
-            JOIN submission_box    sb ON  a.id = sb.assessment_id
-            JOIN rubric_level      rl ON sb.id = rl.box_id
-            JOIN rubric_descriptor rd ON rl.id = rd.level_id
-            JOIN rubric_criterion  rc ON rc.id = rd.criterion_id
-            JOIN rubric_group      rg ON rg.id = rc.rubric_group_id
-            JOIN rubric_mark       rm ON rd.id = rm.descriptor_id
+            FROM assessment              a
+            JOIN submission_box         sb ON  a.id = sb.assessment_id
+            JOIN rubric_level           rl ON sb.id = rl.box_id
+            JOIN rubric_descriptor      rd ON rl.id = rd.level_id
+            JOIN rubric_criterion       rc ON rc.id = rd.criterion_id
+            JOIN rubric_group           rg ON rg.id = rc.rubric_group_id
+            JOIN rubric_descriptor_mark rm ON rd.id = rm.descriptor_id
             JOIN submission_return sr ON sr.id = rm.return_id
             JOIN (
                 SELECT a.id AS 'a.id', rc.id AS 'rc.id', max(sr.published_at) AS 'sr.max_published_at'
-                FROM rubric_mark       rm
-                JOIN rubric_descriptor rd ON rd.id = rm.descriptor_id
-                JOIN rubric_criterion  rc ON rc.id = rd.criterion_id
-                JOIN rubric_group      rg ON rg.id = rc.rubric_group_id
-                JOIN rubric_level      rl ON rl.id = rd.level_id
-                JOIN submission_box    sb ON sb.id = rl.box_id
-                JOIN assessment         a ON  a.id = sb.assessment_id
-                JOIN submission_return sr ON sr.id = rm.return_id
+                FROM rubric_descriptor_mark rm
+                JOIN rubric_descriptor      rd ON rd.id = rm.descriptor_id
+                JOIN rubric_criterion       rc ON rc.id = rd.criterion_id
+                JOIN rubric_group           rg ON rg.id = rc.rubric_group_id
+                JOIN rubric_level           rl ON rl.id = rd.level_id
+                JOIN submission_box         sb ON sb.id = rl.box_id
+                JOIN assessment              a ON  a.id = sb.assessment_id
+                JOIN submission_return      sr ON sr.id = rm.return_id
                 WHERE {$where}
                 GROUP BY sb.assessment_id, rd.criterion_id
             ) t ON `a`.`id` = `t`.`a.id` AND `rc`.`id` = `t`.`rc.id` AND `sr`.`published_at` = `t`.`sr.max_published_at`
@@ -1456,13 +1456,13 @@ class RubricMapper
         // 1. Get latest published student marks
         $stmt = $this->database->prepare("
             SELECT sr.owner, sb.id AS 'sb.id', rc.id AS 'rc.id', rm.value AS 'mark'
-            FROM rubric_mark rm
-            JOIN rubric_descriptor rd ON rd.id = rm.descriptor_id AND rd.deleted_at IS NULL
-            JOIN rubric_criterion  rc ON rc.id = rd.criterion_id AND rc.deleted_at IS NULL
-            JOIN rubric_group      rg ON rg.id = rc.rubric_group_id AND rg.deleted_at IS NULL
-            JOIN submission_return sr ON sr.id = rm.return_id
-            JOIN submission_box sb    ON sb.id = sr.box_id
-            JOIN assessment a         ON  a.id = sb.assessment_id
+            FROM rubric_descriptor_mark rm
+            JOIN rubric_descriptor      rd ON rd.id = rm.descriptor_id AND rd.deleted_at IS NULL
+            JOIN rubric_criterion       rc ON rc.id = rd.criterion_id AND rc.deleted_at IS NULL
+            JOIN rubric_group           rg ON rg.id = rc.rubric_group_id AND rg.deleted_at IS NULL
+            JOIN submission_return      sr ON sr.id = rm.return_id
+            JOIN submission_box         sb ON sb.id = sr.box_id
+            JOIN assessment              a ON  a.id = sb.assessment_id
             JOIN (
                 -- ^Changed from LEFT JOIN to JOIN to allow filter out deleted feedbacks 
                 -- Get the latest published marks
@@ -1471,13 +1471,13 @@ class RubricMapper
                     sr.id AS r_id,
                     sr.owner AS 'student_id',
                     sr.box_id AS 'sb_id'
-                FROM rubric_mark rm
-                JOIN rubric_descriptor rd ON rd.id = rm.descriptor_id AND rd.deleted_at IS NULL
-                JOIN rubric_criterion  rc ON rc.id = rd.criterion_id AND rc.deleted_at IS NULL
-                JOIN rubric_group      rg ON rg.id = rc.rubric_group_id AND rg.deleted_at IS NULL
-                JOIN submission_return sr ON sr.id = rm.return_id
-                JOIN submission_box sb    ON sb.id = sr.box_id
-                JOIN assessment a         ON  a.id = sb.assessment_id
+                FROM rubric_descriptor_mark rm
+                JOIN rubric_descriptor      rd ON rd.id = rm.descriptor_id AND rd.deleted_at IS NULL
+                JOIN rubric_criterion       rc ON rc.id = rd.criterion_id AND rc.deleted_at IS NULL
+                JOIN rubric_group           rg ON rg.id = rc.rubric_group_id AND rg.deleted_at IS NULL
+                JOIN submission_return      sr ON sr.id = rm.return_id
+                JOIN submission_box         sb ON sb.id = sr.box_id
+                JOIN assessment              a ON  a.id = sb.assessment_id
                 WHERE {$whereClauseInner}
                 AND rm.valid
                 AND sr.published_at IS NOT NULL

@@ -35,7 +35,7 @@ class MarkMapper extends Mapper
      */
     protected function mapping()
     {
-        $this->hasTable('rubric_mark');
+        $this->hasTable('rubric_descriptor_mark');
         $this->hasModel(Mark::class);
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
@@ -106,7 +106,7 @@ class MarkMapper extends Mapper
     public function deleteFeedbackMarks($returnId)
     {
         $query = "
-            DELETE FROM rubric_mark 
+            DELETE FROM rubric_descriptor_mark
                 WHERE return_id = :return_id;
         ";
 
@@ -128,7 +128,7 @@ class MarkMapper extends Mapper
     {
         $query = "
             SELECT            sr.owner AS student_id, COUNT(rm.id)
-            FROM              rubric_mark rm
+            FROM              rubric_descriptor_mark rm
             INNER JOIN        rubric_descriptor rd ON rd.id = rm.descriptor_id
             INNER JOIN        rubric_level rl ON rl.id = rd.level_id
             INNER JOIN        submission_box sb ON sb.id = rl.box_id
