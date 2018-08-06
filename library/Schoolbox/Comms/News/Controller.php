@@ -668,7 +668,7 @@ class Controller extends Base
      */
     private function generatePartial(string $urlPrefix, Querystring $params, Collection $topics, bool $hidePaginator, ?int $year, ?int $month): array
     {
-        $outcome = (new Lists(
+        $topicData = (new Lists(
             $this->getConfigLoader(),
             $this->newsMapper,
             $this->policyMapper,
@@ -690,12 +690,12 @@ class Controller extends Base
 
         /* Always provide paginator from this context
          */
-        $outcome = array_merge($outcome, [
+        $partialData = array_merge($topicData, [
             'hidePaginator' => $hidePaginator,
             'compactMode' => $params->getCompactMode(),
             'pageNum' => $params->getPageNum()
         ]);
 
-        return $outcome;
+        return $partialData;
     }
 }
