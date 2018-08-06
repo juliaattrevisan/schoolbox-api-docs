@@ -548,16 +548,16 @@ class Controller extends Base
             $urlPrefix = $this->getRouter()->generate('commsNews.getIndex');
         }
 
-        $outcome = $this->generatePartial($urlPrefix, $params, $topics, $params->getHidePaginator(), $year, $month);
-        $content = $this->buildUnthemedHtmlOutput('@commsNews/partial.twig', $outcome)->getAsString();
+        $partialData = $this->generatePartial($urlPrefix, $params, $topics, $params->getHidePaginator(), $year, $month);
+        $content = $this->buildUnthemedHtmlOutput('@commsNews/partial.twig', $partialData)->getAsString();
         $viewAllLink = "{$this->getRouteIfAuthorized('commsNews.getIndex')}?topic={$params->getSlug()}";
 
         $this->getResponse()->content->set($this->buildJsonOutput([
             'success' => true,
             'title' => $this->getDi()->get('l10n')->translate('news', false, true),
-            'url' => $outcome['currentUrl'],
+            'url' => $partialData['currentUrl'],
             'fragment' => $content,
-            'viewAllLink' => $outcome['articles']->count() ? $viewAllLink : null
+            'viewAllLink' => $partialData['articles']->count() ? $viewAllLink : null
         ]));
     }
 
@@ -586,8 +586,8 @@ class Controller extends Base
          */
         $urlPrefix = $this->getRouter()->generate('commsNews.getArchive', ['year' => $year, 'month' => $month]);
 
-        $outcome = $this->generatePartial($urlPrefix, $params, $topics, false, $year, $month);
-        $content = $this->buildUnthemedHtmlOutput('@commsNews/partial.twig', $outcome)->getAsString();
+        $partialData = $this->generatePartial($urlPrefix, $params, $topics, false, $year, $month);
+        $content = $this->buildUnthemedHtmlOutput('@commsNews/partial.twig', $partialData)->getAsString();
 
         /* Merge a whole bunch of other settings too
          * Specifically applies to the index page which loads slightly differently than component variant
@@ -600,7 +600,7 @@ class Controller extends Base
 
             /* Archive-specific vars that don't appear anywhere else
              */
-            'availableYearsAndMonths' => $this->newsMapper->findYearsAndMonthsWithArticles($outcome['articleIdsForUser']),
+            'availableYearsAndMonths' => $this->newsMapper->findYearsAndMonthsWithArticles($partialData['articleIdsForUser']),
             'year' => $year,
             'month' => $month,
         ];
@@ -632,8 +632,8 @@ class Controller extends Base
          */
         $urlPrefix = $this->getRouter()->generate('commsNews.getIndex');
 
-        $outcome = $this->generatePartial($urlPrefix, $params, $topics, false, null, null);
-        $content = $this->buildUnthemedHtmlOutput('@commsNews/partial.twig', $outcome)->getAsString();
+        $partialData = $this->generatePartial($urlPrefix, $params, $topics, false, null, null);
+        $content = $this->buildUnthemedHtmlOutput('@commsNews/partial.twig', $partialData)->getAsString();
 
         /* Merge a whole bunch of other settings too
          * Specifically applies to the index page which loads slightly differently than component variant
