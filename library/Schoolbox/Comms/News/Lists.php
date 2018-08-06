@@ -31,9 +31,12 @@ class Lists
 {
 
     /**
-     * @var IConfigLoader
+     * System default for the number of items per page
+     * Typically connects to search_type_limit
+     *
+     * @var int
      */
-    private $configLoader;
+    private $defaultLimit;
 
     /**
      * @var Mapper
@@ -84,7 +87,7 @@ class Lists
     /**
      * Lists constructor.
      *
-     * @param IConfigLoader           $configLoader
+     * @param int                     $defaultLimit
      * @param Mapper                  $newsMapper
      * @param Policy\Mapper           $policyMapper
      * @param SaveForLater\Mapper     $saveForLaterMapper
@@ -96,7 +99,7 @@ class Lists
      * @param External_Class          $externalClass
      */
     public function __construct(
-        IConfigLoader $configLoader,
+        int $defaultLimit,
         Mapper $newsMapper,
         Policy\Mapper $policyMapper,
         SaveForLater\Mapper $saveForLaterMapper,
@@ -107,7 +110,7 @@ class Lists
         External_User $externalUser,
         External_Class $externalClass
     ) {
-        $this->configLoader = $configLoader;
+        $this->defaultLimit = $defaultLimit;
         $this->newsMapper = $newsMapper;
         $this->policyMapper = $policyMapper;
         $this->saveForLaterMapper = $saveForLaterMapper;
@@ -225,7 +228,7 @@ class Lists
         } elseif ($params->getLimit() === null) {
             $paginator = $this->generatePaginator(
                 $url,
-                $this->configLoader->get('search_type_limit'),
+                $this->defaultLimit,
                 \count($availableIds)
             );
         }

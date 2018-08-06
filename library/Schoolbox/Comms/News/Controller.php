@@ -671,7 +671,7 @@ class Controller extends Base
     private function generatePartial(string $urlPrefix, Querystring $params, Collection $topics, bool $hidePaginator, ?int $year, ?int $month): array
     {
         $topicData = (new Lists(
-            $this->getConfigLoader(),
+            $this->getConfigLoader()->get('search_type_limit'),
             $this->newsMapper,
             $this->policyMapper,
             $this->saveForLaterMapper,
