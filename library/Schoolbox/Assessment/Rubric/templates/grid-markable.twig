@@ -140,10 +140,28 @@
                           data-max="{{ limit_decimal.limit(group.max, 2) }}"
                           data-row-max-sum="{{ limit_decimal.limit(group.rowMaxSum, 2) }}">
 
+                        <label for="groupMark">{{ locale.rubricGroup.proper }} mark</label>
+
                         {% if markSchemeName == 'TotalMarkFractional' %}
-                            {{ limit_decimal.limit(group.scaledMark, 2) }} / {{ limit_decimal.limit(group.max, 2) }}
-                        {% else %}
-                            {{ group.humanReadableMark }}
+
+                            <input class="groupMax"
+                                   id="groupMark"
+                                   type="tel"
+                                   value="{{ limit_decimal.limit(group.sum, 2) }}"/> / {{ limit_decimal.limit(group.total, 2) }}
+
+                        {% elseif markSchemeName == 'LetterGrade' %}
+
+                            <select id="groupMark">
+                                {# TODO if letter grade: provide dropdown for letters #}
+                            </select>
+
+                        {% elseif markSchemeName == 'Percentage'%}
+
+                            <input class="groupMax"
+                                   id="groupMark"
+                                   type="tel"
+                                   value="{{ limit_decimal.limit(group.sum, 2) }}"/> %
+
                         {% endif %}
                     </span>
 
