@@ -297,10 +297,10 @@ if (is_numeric($this->arg[0])) {
        Warning will show if they decrease their perms
     */
 
-    $access = $userAccessMapper->findByColumnList(['uid' => $_SESSION['user']->getId(), 'sid' =>$this->arg[0], 'service' => HOMEPAGE_SERVICE, 'type' => '3']);
-    $admin = $access->count();
+    $userAccess = $userAccessMapper->findByColumnList(['uid' => $_SESSION['user']->getId(), 'sid' =>$this->arg[0], 'service' => HOMEPAGE_SERVICE, 'type' => UserAccess::ACCESS_FULL]);
+    $admin = $userAccess->count();
 
-    $su = isset($_SESSION['su']) ? $_SESSION['su'] : 0;
+    $su = isset($_SESSION['su']) ?? 0;
 
     if($admin && !$su) {
         $this->setVar([
