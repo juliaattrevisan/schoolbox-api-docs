@@ -104,6 +104,7 @@ class Controller extends Base
 
             $searchResult[] = [
                 'id' => Segment\Codec::encode($row['entity_type'], $row['id'], Model::RELATIONSHIP_SELF),
+                'name' => $row['name'], // For some reason this is needed for selectize to work properly, even though this is not what will be used
                 'itemHtml' => $this->getDi()->get('templateEngine')->render('@commsNews/audienceItem.twig', $twigData)
             ];
 
@@ -114,12 +115,14 @@ class Controller extends Base
                 $twigData['modifier'] = $translator->translateModifier(Model::RELATIONSHIP_PARENTS_OF);
                 $searchResult[] = [
                     'id' => Segment\Codec::encode($row['entity_type'], $row['id'], Model::RELATIONSHIP_PARENTS_OF),
+                    'name' => $row['name'], // For some reason this is needed for selectize to work properly, even though this is not what will be used
                     'itemHtml' => $this->getDi()->get('templateEngine')->render('@commsNews/audienceItem.twig', $twigData)
                 ];
 
                 $twigData['modifier'] = $translator->translateModifier(Model::RELATIONSHIP_TEACHERS_OF);
                 $searchResult[] = [
                     'id' => Segment\Codec::encode($row['entity_type'], $row['id'], Model::RELATIONSHIP_TEACHERS_OF),
+                    'name' => $row['name'], // For some reason this is needed for selectize to work properly, even though this is not what will be used
                     'itemHtml' => $this->getDi()->get('templateEngine')->render('@commsNews/audienceItem.twig', $twigData)
                 ];
             }
