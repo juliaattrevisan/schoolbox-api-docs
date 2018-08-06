@@ -245,6 +245,7 @@
 
                 if (groupSummary.length) {
                     groupSummary.find(".groupMax").val(scaledGroupMark);
+                    groupSummary.attr('data-scaled-mark', scaledGroupMark);
                 }
 
                 rubricTotalMark = getTotalMark();
