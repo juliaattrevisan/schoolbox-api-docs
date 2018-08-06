@@ -231,6 +231,7 @@ class Controller extends Base
      */
     public function getYearLevels()
     {
+        $translator = new Segment\Translator($this->folderMapper->getDatabase(), $this->getUser(), $this->folderMapper);
         $years = array_filter($this->userMapper->findDistinct('year'));
 
         sort($years);
@@ -239,11 +240,23 @@ class Controller extends Base
 
         foreach ($years as $year) {
 
+            $name = \is_numeric($year) ? "Year {$year}" : $year;
+
+            $twigData = [
+                'name' => $name,
+                'entityType' => $translator->translateEntityType(Model::ENTITY_TYPE_YEAR)
+            ];
+            $twigDataParents = array_merge($twigData, ['modifier' => $translator->translateModifier(Model::RELATIONSHIP_PARENTS_OF)]);
+            $twigDataTeachers = array_merge($twigData, ['modifier' => $translator->translateModifier(Model::RELATIONSHIP_TEACHERS_OF)]);
+
             /* Encode the value because Year Level is a user-configurable string
              */
             $items[] = [
                 'id' => Segment\Codec::encode(Model::ENTITY_TYPE_YEAR, $year, Model::RELATIONSHIP_SELF),
-                'name' => \is_numeric($year) ? "Year {$year}" : $year
+                'name' => $name,
+                'itemHtml' => $this->getDi()->get('templateEngine')->render('@commsNews/audienceItem.twig', $twigData),
+                'itemHtmlParents' => $this->getDi()->get('templateEngine')->render('@commsNews/audienceItem.twig', $twigDataParents),
+                'itemHtmlTeachers' => $this->getDi()->get('templateEngine')->render('@commsNews/audienceItem.twig', $twigDataTeachers)
             ];
         }
 
