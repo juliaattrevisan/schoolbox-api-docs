@@ -21,6 +21,7 @@ use React\EventLoop\LoopInterface;
 use RuntimeException;
 use Monolog\Handler\RavenHandler;
 use Monolog\Logger as Monologger;
+use Raven_Client;
 
 class Kernel extends \Alaress\Application\Kernel
 {
@@ -397,9 +398,13 @@ EOL;
             $porcelain = in_array('porcelain', $fields);
             $this->log = new Logger(STDOUT, STDERR, $level, $fields, $porcelain);
 
-            // Add Sentry handler into logging system
-            $ravenHandler = new RavenHandler($this->getDependencyInjector()->get('sentry'), Monologger::CRITICAL);
-            $this->log->pushHandler($ravenHandler);
+            // Add Sentry handler into logging system if possible
+            if ($this->getDependencyInjector()->has('sentry')) {
+                /** @var Raven_Client $ravenClient */
+                $ravenClient  = $this->getDependencyInjector()->get('sentry');
+                $ravenHandler = new RavenHandler($ravenClient, Monologger::CRITICAL);
+                $this->log->pushHandler($ravenHandler);
+            }
         }
 
 
