@@ -65,21 +65,13 @@ class Transactor
             foreach ($values as $value => $data) {
                 foreach ($data['relationships'] as $relationship) {
 
-                    $twigData = [
-                        'name' => $value,
-                        'entityType' => $entityType
-                    ];
-
                     /* translate "name" into something nicer to read for humans
                      */
                     $pieces[] = [
                         'id' => Codec::encode($entityType, $value, $relationship),
-                        'name' => $translator->translateToSegment(
-                            $entityType,
-                            $value,
-                            $relationship
-                        ),
-                        'itemHtml' => 'asdasd' // TODO: how to getDi() from here so that this can get twig output plz?
+                        'name' => $translator->translateNameFromEntityType($entityType, $value),
+                        'entityType' => $translator->translateEntityType($entityType),
+                        'modifier' => $translator->translateModifier($relationship),
                     ];
                 }
             }

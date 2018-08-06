@@ -257,13 +257,18 @@ class Controller extends Base
             $zone->attachFiles([$article->getFeatureImage()->getHash()]);
         }
 
+        /* Audiencing decoration
+         */
+        $audiencingData = (new Audience\Segment\Transactor($this->getUser(), $this->audienceMapper, $this->folderMapper))->load($article);
+        $audiencingHtml = (new Audience\Segment\HtmlFormatter($this->getDi(), $audiencingData))->decorate();
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/create.twig', [
             'policies' => $policies,
             'action' => 'Update',
             'user' => $this->getUser(),
             'article' => $article,
             'featureImageZone' => $zone->getTwigContext(),
-            'audience' => (new Audience\Segment\Transactor($this->getUser(), $this->audienceMapper, $this->folderMapper))->load($article),
+            'audience' => $audiencingHtml,
             'isCommsOfficer' => (new ValidUserIsCommsOfficer())->isSatisfiedBy($this->getUser()),
         ])->setTitle("Update {$article->getTitle()}"));
     }

@@ -113,27 +113,26 @@ class Translator
      */
     public function translateModifier(string $modifier)
     {
+        if ($modifier === Model::RELATIONSHIP_SELF) {
+            return '';
+        }
+
         return $this->modifierTranslation[$modifier];
     }
 
 
     /**
-     * Take a schematic entity type such as school_house and decide what a human would see in the ui
-     * Yes, this is presentation logic, but backend is the cleanest place to put it for now due to other data sources
-     * like ajax requests needing a translation service in a single point of control
+     * From an entityType and entityValue, determine a human-readable name
      *
-     * Uses a cached array of the audiencing rules for an article (ie. when the rules are known)
-     *
-     * Return a string like "User (230) [Parents of]"
+     * e.g. school_house 1234 equates to "Dalton House"
      *
      * @param string $entityType
      * @param string $entityValue
-     * @param string $relationship
      * @return string
      */
-    public function translateToSegment(string $entityType, string $entityValue, string $relationship): string
+    public function translateNameFromEntityType(string $entityType, string $entityValue): string
     {
-        return $this->assembleSegment($this->cache[$entityType][$entityValue]['name'], $entityType, $relationship);
+        return $this->cache[$entityType][$entityValue]['name'];
     }
 
 
