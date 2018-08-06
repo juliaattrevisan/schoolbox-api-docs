@@ -14,12 +14,6 @@ use Aura\Di;
 class HtmlFormatter
 {
     /**
-     * An array of (id, name, entityType, modifier) tuples
-     * @var array
-     */
-    private $data;
-
-    /**
      * Dependency Injector
      *
      * @var Di\Container
@@ -30,11 +24,9 @@ class HtmlFormatter
      * HtmlFormatter constructor.
      *
      * @param Di\Container $di
-     * @param array        $data
      */
-    public function __construct(Di\Container $di, array $data)
+    public function __construct(Di\Container $di)
     {
-        $this->data = $data;
         $this->di = $di;
     }
 
@@ -42,17 +34,22 @@ class HtmlFormatter
     /**
      * Manufacture an nice html version of the data tuples
      * Augment the original data set with this html content
+     *
+     * $data is an array of (id, name, entityType, modifier) tuples
+     * @param array $data
+     * @return array
+     * @throws Di\Exception\ServiceNotFound
      */
-    public function decorate(): array
+    public function decorate(array $data): array
     {
         $output = $this->di->get('webOutput:nochrome');
 
-        foreach ($this->data as &$current) {
+        foreach ($data as $key => &$current) {
             $current['itemHtml'] = $output->setTemplate('@commsNews/audienceItem.twig')->setData($current)->getAsString();
         }
 
         unset($current);
 
-        return $this->data;
+        return $data;
     }
 }

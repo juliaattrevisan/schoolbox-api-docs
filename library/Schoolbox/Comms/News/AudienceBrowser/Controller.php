@@ -89,6 +89,7 @@ class Controller extends Base
 
         $registry = new Segment\SearchRegistry($this->getUser(), $this->folderMapper);
         $translator = new Segment\Translator($this->folderMapper->getDatabase(), $this->getUser(), $this->folderMapper);
+        $formatter = new Segment\HtmlFormatter($this->getDi());
 
         $statement = $this->userMapper->getDatabase()->prepare($registry->getSearchSql());
 
@@ -96,36 +97,45 @@ class Controller extends Base
             'keyword' => "%{$this->getRequest()->query['query']}%",
         ]);
 
+        /* Set up the RELATIONSHIP_SELF variant first then add Parents and Teachers modifiers
+         */
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $twigData = [
-                'name' => $row['name'],
-                'entityType' => $translator->translateEntityType($row['entity_type'])
-            ];
+            $data = [];
 
-            $searchResult[] = [
+            $data[Model::RELATIONSHIP_SELF] = [
                 'id' => Segment\Codec::encode($row['entity_type'], $row['id'], Model::RELATIONSHIP_SELF),
-                'name' => $row['name'], // For some reason this is needed for selectize to work properly, even though this is not what will be used
-                'itemHtml' => $this->getDi()->get('templateEngine')->render('@commsNews/audienceItem.twig', $twigData)
+                'name' => $row['name'],
+                'entityType' => $translator->translateEntityType($row['entity_type']),
+                'modifier' => null,
             ];
 
             /* Only provide the Parents and Teachers modifiers to strats which support them
              * We exclude Parents and Teachers modifiers from Users due to privacy reasons
              */
             if ($registry->hasModifier($row['entity_type'])) {
-                $twigData['modifier'] = $translator->translateModifier(Model::RELATIONSHIP_PARENTS_OF);
-                $searchResult[] = [
+
+                /* Parents modifier
+                 */
+                $data[Model::RELATIONSHIP_PARENTS_OF] = [
                     'id' => Segment\Codec::encode($row['entity_type'], $row['id'], Model::RELATIONSHIP_PARENTS_OF),
-                    'name' => $row['name'], // For some reason this is needed for selectize to work properly, even though this is not what will be used
-                    'itemHtml' => $this->getDi()->get('templateEngine')->render('@commsNews/audienceItem.twig', $twigData)
+                    'name' => $row['name'],
+                    'entityType' => $translator->translateEntityType($row['entity_type']),
+                    'modifier' => $translator->translateModifier(Model::RELATIONSHIP_PARENTS_OF),
                 ];
 
-                $twigData['modifier'] = $translator->translateModifier(Model::RELATIONSHIP_TEACHERS_OF);
-                $searchResult[] = [
+                /* Teachers modifier
+                 */
+                $data[Model::RELATIONSHIP_TEACHERS_OF] = [
                     'id' => Segment\Codec::encode($row['entity_type'], $row['id'], Model::RELATIONSHIP_TEACHERS_OF),
-                    'name' => $row['name'], // For some reason this is needed for selectize to work properly, even though this is not what will be used
-                    'itemHtml' => $this->getDi()->get('templateEngine')->render('@commsNews/audienceItem.twig', $twigData)
+                    'name' => $row['name'],
+                    'entityType' => $translator->translateEntityType($row['entity_type']),
+                    'modifier' => $translator->translateModifier(Model::RELATIONSHIP_TEACHERS_OF),
                 ];
             }
+
+            /* Generate nice html versions of each data point
+             */
+            $searchResult[] = array_values($formatter->decorate($data));
         }
 
         $this->getResponse()->content->set($this->buildJsonOutput($searchResult));
@@ -136,6 +146,7 @@ class Controller extends Base
      * @param Collection $collection
      * @param string     $entityType
      * @return \Alaress\Web\Output\Json
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     private function generate(Collection $collection, string $entityType): \Alaress\Web\Output\Json
     {

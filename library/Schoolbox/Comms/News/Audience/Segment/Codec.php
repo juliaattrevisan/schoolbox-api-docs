@@ -18,7 +18,7 @@ class Codec
      * Separates the audiencing option type from its value
      * e.g. house:12345, role:5678
      */
-    private const AUDIENCE_SEPARATOR = ':';
+    public const AUDIENCE_SEPARATOR = ':';
 
 
     /**

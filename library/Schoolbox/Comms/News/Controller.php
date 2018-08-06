@@ -260,7 +260,7 @@ class Controller extends Base
         /* Audiencing decoration
          */
         $audiencingData = (new Audience\Segment\Transactor($this->getUser(), $this->audienceMapper, $this->folderMapper))->load($article);
-        $audiencingHtml = (new Audience\Segment\HtmlFormatter($this->getDi(), $audiencingData))->decorate();
+        $audiencingHtml = (new Audience\Segment\HtmlFormatter($this->getDi()))->decorate($audiencingData);
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/create.twig', [
             'policies' => $policies,

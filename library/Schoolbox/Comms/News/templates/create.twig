@@ -407,25 +407,25 @@
 
                     if (self.includeUsers) {
                         selectizeOptions.push({
-                            id: option.id,
-                            name: option.name,
-                            itemHtml: option.itemHtml
+                            id: option['self'].id,
+                            name: option['self'].name,
+                            itemHtml: option['self'].itemHtml
                         });
                     }
 
                     if (self.includeParents) {
                         selectizeOptions.push({
-                            id: option.id + ':parents_of',
-                            name: option.name,
-                            itemHtml: option.itemHtmlParents
+                            id: option['parents_of'].id,
+                            name: option['parents_of'].name,
+                            itemHtml: option['parents_of'].itemHtml
                         });
                     }
 
                     if (self.includeTeachers) {
                         selectizeOptions.push({
-                            id: option.id + ':teachers_of',
-                            name: option.name,
-                            itemHtml: option.itemHtmlTeachers
+                            id: option['teachers_of'].id,
+                            name: option['teachers_of'].name,
+                            itemHtml: option['teachers_of'].itemHtml
                         });
                     }
 
