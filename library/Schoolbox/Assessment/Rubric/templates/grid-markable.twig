@@ -147,7 +147,7 @@
                             <input class="groupMax"
                                    id="groupMark"
                                    type="tel"
-                                   value="{{ limit_decimal.limit(group.sum, 2) }}"/> / {{ limit_decimal.limit(group.max, 2) }}
+                                   value="{{ limit_decimal.limit(group.scaledMark) }}"/> / {{ limit_decimal.limit(group.max) }}
 
                         {% elseif markSchemeName == 'LetterGrade' %}
 
@@ -160,7 +160,7 @@
                             <input class="groupMax"
                                    id="groupMark"
                                    type="tel"
-                                   value="{{ limit_decimal.limit(group.sum, 2) }}"/> %
+                                   value="{{ limit_decimal.limit(group.scaledMark) }}"/> %
 
                         {% endif %}
                     </span>
@@ -179,7 +179,7 @@
             </tr>
         {% endif %}
 
-    {% endfor %}
+    {% endfor %}n
 
     {% if showRubricTotal and markSchemeName != "None" and (config.rubric_show_points or not studentView) %}
         <tr>
