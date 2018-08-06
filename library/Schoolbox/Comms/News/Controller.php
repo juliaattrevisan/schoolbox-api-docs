@@ -537,28 +537,30 @@ class Controller extends Base
      */
     public function getListByTopic(?int $year, ?int $month)
     {
-        $params = new Querystring($this->getRequest()->query);
-        $topics = $this->topicMapper->findAll();
+        if ($this->getRequest()->isXhr()) {
+            $params = new Querystring($this->getRequest()->query);
+            $topics = $this->topicMapper->findAll();
 
-        /* The requested data set to load, given the params provided
-         */
-        if ($year) {
-            $urlPrefix = $this->getRouter()->generate('commsNews.getArchive', ['year' => $year, 'month' => $month]);
-        } else {
-            $urlPrefix = $this->getRouter()->generate('commsNews.getIndex');
+            /* The requested data set to load, given the params provided
+             */
+            if ($year) {
+                $urlPrefix = $this->getRouter()->generate('commsNews.getArchive', [ 'year' => $year, 'month' => $month ]);
+            } else {
+                $urlPrefix = $this->getRouter()->generate('commsNews.getIndex');
+            }
+
+            $partialData = $this->generatePartial($urlPrefix, $params, $topics, $params->getHidePaginator(), $year, $month);
+            $content     = $this->buildUnthemedHtmlOutput('@commsNews/partial.twig', $partialData)->getAsString();
+            $viewAllLink = "{$this->getRouteIfAuthorized('commsNews.getIndex')}?topic={$params->getSlug()}";
+
+            $this->getResponse()->content->set($this->buildJsonOutput([
+                'success' => true,
+                'title' => $this->getDi()->get('l10n')->translate('news', false, true),
+                'url' => $partialData['currentUrl'],
+                'fragment' => $content,
+                'viewAllLink' => $partialData['articles']->count() ? $viewAllLink : null
+            ]));
         }
-
-        $partialData = $this->generatePartial($urlPrefix, $params, $topics, $params->getHidePaginator(), $year, $month);
-        $content = $this->buildUnthemedHtmlOutput('@commsNews/partial.twig', $partialData)->getAsString();
-        $viewAllLink = "{$this->getRouteIfAuthorized('commsNews.getIndex')}?topic={$params->getSlug()}";
-
-        $this->getResponse()->content->set($this->buildJsonOutput([
-            'success' => true,
-            'title' => $this->getDi()->get('l10n')->translate('news', false, true),
-            'url' => $partialData['currentUrl'],
-            'fragment' => $content,
-            'viewAllLink' => $partialData['articles']->count() ? $viewAllLink : null
-        ]));
     }
 
 
