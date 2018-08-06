@@ -7,6 +7,7 @@ CREATE TABLE `rubric_group_mark` (
     `return_id` INT(11) UNSIGNED NOT NULL,
     `rubric_group_id` INT(11) UNSIGNED NOT NULL,
     `value` DECIMAL(14,11) UNSIGNED DEFAULT NULL,
+    `valid` BOOL NOT NULL DEFAULT TRUE,
     PRIMARY KEY (`id`),
     KEY `rubric_group_id` (`rubric_group_id`),
     KEY `return_id` (`return_id`),
