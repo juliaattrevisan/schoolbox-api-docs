@@ -32,8 +32,8 @@ class Paginator extends UrlPaginator
         $query[$this->param] = $page;
 
         $url->setQuery(array_intersect_key($query, [
-            Querystring::TOPIC_SLUG_PARAM => '',
-            Querystring::PAGE_NUMBER_PARAM => ''
+            Querystring::TOPIC_SLUG => '',
+            Querystring::PAGE_NUMBER => ''
         ]));
 
         return $url->toString();

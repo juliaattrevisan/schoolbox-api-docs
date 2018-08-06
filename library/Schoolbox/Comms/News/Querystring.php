@@ -26,28 +26,27 @@ class Querystring
     /**
      * Querystring param for the Compact Mode option
      */
-    public const COMPACT_MODE_PARAM = 'c';
+    public const COMPACT_MODE = 'c';
 
     /**
      * Querystring param for the current Page Number chosen
      */
-    public const PAGE_NUMBER_PARAM = 'p';
+    public const PAGE_NUMBER = 'p';
 
     /**
      * Querystring param for the current Limit chosen
      */
-    public const LIMIT_PARAM = 'l';
+    public const LIMIT = 'l';
 
     /**
      * Querystring param for the current topic chosen
      */
-    public const TOPIC_SLUG_PARAM = 'topic';
+    public const TOPIC_SLUG = 'topic';
 
     /**
      * Querystring param for the Hide Pagination option
      */
-    public const HIDE_PAGINATOR_PARAM = 'hp';
-
+    public const HIDE_PAGINATOR = 'hp';
 
     /**
      * An array of key/value pairs corresponding to GET params
@@ -65,11 +64,11 @@ class Querystring
     public function __construct($data)
     {
         $this->querystring = [
-            self::COMPACT_MODE_PARAM => $data[self::COMPACT_MODE_PARAM],
-            self::TOPIC_SLUG_PARAM => $data[self::TOPIC_SLUG_PARAM],
-            self::PAGE_NUMBER_PARAM => $data[self::PAGE_NUMBER_PARAM],
-            self::LIMIT_PARAM => $data[self::LIMIT_PARAM],
-            self::HIDE_PAGINATOR_PARAM => $data[self::HIDE_PAGINATOR_PARAM]
+            self::COMPACT_MODE => $data[self::COMPACT_MODE],
+            self::TOPIC_SLUG => $data[self::TOPIC_SLUG],
+            self::PAGE_NUMBER => $data[self::PAGE_NUMBER],
+            self::LIMIT => $data[self::LIMIT],
+            self::HIDE_PAGINATOR => $data[self::HIDE_PAGINATOR]
         ];
     }
 
@@ -81,7 +80,7 @@ class Querystring
      */
     public function getCompactMode()
     {
-        return $this->querystring[self::COMPACT_MODE_PARAM];
+        return $this->querystring[self::COMPACT_MODE];
     }
 
     /**
@@ -91,7 +90,7 @@ class Querystring
      */
     public function getSlug()
     {
-        return $this->querystring[self::TOPIC_SLUG_PARAM];
+        return $this->querystring[self::TOPIC_SLUG];
     }
 
 
@@ -102,7 +101,7 @@ class Querystring
      */
     public function getPageNum()
     {
-        return $this->determinePageNum($this->querystring[self::PAGE_NUMBER_PARAM]);
+        return $this->determinePageNum($this->querystring[self::PAGE_NUMBER]);
     }
 
 
@@ -113,7 +112,7 @@ class Querystring
      */
     public function getLimit()
     {
-        return $this->querystring[self::LIMIT_PARAM];
+        return $this->querystring[self::LIMIT];
     }
 
 
@@ -124,7 +123,7 @@ class Querystring
      */
     public function getHidePaginator(): bool
     {
-        return (bool)$this->querystring[self::HIDE_PAGINATOR_PARAM];
+        return (bool)$this->querystring[self::HIDE_PAGINATOR];
     }
 
 

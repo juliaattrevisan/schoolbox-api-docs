@@ -328,7 +328,7 @@ class Lists
         $urlPaginator = (new Paginator())
             ->setPaginator($paginator)
             ->setUrl($url)
-            ->setParam(Querystring::PAGE_NUMBER_PARAM);
+            ->setParam(Querystring::PAGE_NUMBER);
 
         return $urlPaginator;
     }
