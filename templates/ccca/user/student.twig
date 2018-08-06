@@ -1,5 +1,11 @@
 {% extends '@core/user/student.twig' %}
 
+{% block extraDetails %}
+    <dt class="small-4 medium-3 columns">Student Mobile:</dt>
+    <dd class="small-8 medium-9 columns">{{ externalUser.StudentMobilePhone }}</dd>
+{% endblock extraDetails %}
+
+
 {% block buttons %}
     {{ parent() }}
     {% if isStaff %}
