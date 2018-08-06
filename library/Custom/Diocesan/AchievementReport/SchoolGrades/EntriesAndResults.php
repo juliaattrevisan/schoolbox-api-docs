@@ -70,16 +70,18 @@ class EntriesAndResults extends Base {
                 }
             }
 
-            /* Initialise Term 2 and Term 4 marks
+            /* Initialise marks for All Terms
              */
             if (!is_array($finalStack[$year][$courseName]['allAreas'][$assessArea]['letters'])) {
                 $finalStack[$year][$courseName]['allAreas'][$assessArea]['letters'] = array(
+                    'term1' => '',
                     'term2' => '',
+                    'term3' => '',
                     'term4' => ''
                 );
             }
 
-            /* Term 2 and Term 4 marks
+            /* Marks
              */
             $finalStack[$year][$courseName]['allAreas'][$assessArea]['letters']['term' . $term] = $result;
         }

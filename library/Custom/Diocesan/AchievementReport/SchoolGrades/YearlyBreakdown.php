@@ -78,7 +78,7 @@ class YearlyBreakdown extends Base {
                 /* Explore all the areas
                  */
                 foreach ($allAreas as $currentArea => $allTerms) {
-                    foreach (array('term4', 'term2') as $term) {
+                    foreach (array('term4', 'term3', 'term2', 'term1') as $term) {
                         if ($allTerms[$term] != '') {
                             $data = $allTerms[$term];
                             $letter = $data['StrippedResult'];
