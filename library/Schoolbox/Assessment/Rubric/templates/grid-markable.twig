@@ -220,6 +220,12 @@
 <script type="text/javascript" src="/javascript/shared/submissions/jquery.dynagrade.js"></script>
 <script type="text/javascript">
     $(function () {
+        // Keep track of which groups the user has customised the mark for
+        var customisedMark = {};
+        $("[data-group-summary]").each(function(index, groupSummary) {
+            var id = $(groupSummary).data('group-id');
+            customisedMark[id] = false;
+        })
 
         var $rb = $('#{{ rubricId }}');
 
@@ -248,8 +254,10 @@
                 var scaledGroupMark = getScaledGroupMark($descriptorCheckboxes, groupSummary);
 
                 if (groupSummary.length) {
-                    groupSummary.find(".groupMax").val(scaledGroupMark);
-                    groupSummary.attr('data-scaled-mark', scaledGroupMark);
+                    if (! customisedMark[groupId]) {
+                        groupSummary.find(".groupMax").val(scaledGroupMark);
+                        groupSummary.attr('data-scaled-mark', scaledGroupMark);
+                    }
                 }
 
                 rubricTotalMark = getTotalMark();
@@ -286,6 +294,7 @@
 
             if (groupSummary.length) {
                 groupSummary.attr('data-scaled-mark', customMark);
+                customisedMark[groupId] = true;
             }
 
             var rubricTotalMark = getTotalMark();
@@ -314,6 +323,10 @@
 
             $gradeInput.val(scaledGroupMark);
             groupSummary.attr('data-scaled-mark', scaledGroupMark);
+
+            // Up for discussion, but I'd imagine the user would like the marks to update automatically
+            // with descriptor changes once they've clicked this button
+            customisedMark[groupId] = false;
 
             var rubricTotalMark = getTotalMark();
 
