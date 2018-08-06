@@ -135,10 +135,10 @@
             <tr>
                 <th class="rb-group-summary" colspan="{{ rubric.levels|length + 1 }}">
                     <span data-group-summary="{{ rubricId }}-{{ group.id }}"
-                          data-mark="{{ limit_decimal.limit(group.mark, 2) }}"
-                          data-scaled-mark="{{ limit_decimal.limit(group.scaledMark, 2) }}"
-                          data-max="{{ limit_decimal.limit(group.max, 2) }}"
-                          data-row-max-sum="{{ limit_decimal.limit(group.rowMaxSum, 2) }}">
+                          data-mark="{{ group.mark }}"
+                          data-scaled-mark="{{ group.scaledMark }}"
+                          data-max="{{ group.max }}"
+                          data-row-max-sum="{{ group.rowMaxSum }}">
 
                         <label for="groupMark">{{ locale.rubricGroup.proper }} mark</label>
 
@@ -147,7 +147,7 @@
                             <input class="groupMax"
                                    id="groupMark"
                                    type="tel"
-                                   value="{{ limit_decimal.limit(group.scaledMark) }}"/> / {{ limit_decimal.limit(group.max) }}
+                                   value="{{ group.scaledMark }}"/> / {{ group.max }}
 
                         {% elseif markSchemeName == 'LetterGrade' %}
 
@@ -160,7 +160,7 @@
                             <input class="groupMax"
                                    id="groupMark"
                                    type="tel"
-                                   value="{{ limit_decimal.limit(group.scaledMark) }}"/> %
+                                   value="{{ group.scaledMark }}"/> %
 
                         {% endif %}
                     </span>
@@ -185,11 +185,11 @@
         <tr>
             <th class="rb-final-summary" colspan="{{ rubric.levels|length + 2 }}">
                 <span data-final-summary="{{ rubricId }}"
-                      data-scaled-mark="{{ limit_decimal.limit(rubric.scaledMark, 2) }}"
-                      data-max="{{ limit_decimal.limit(rubric.max, 2) }}">
+                      data-scaled-mark="{{ rubric.scaledMark}}"
+                      data-max="{{ rubric.max }}">
 
                     {% if markSchemeName == 'TotalMarkFractional' %}
-                       {{ limit_decimal.limit(rubric.scaledMark, 2) }} / {{ limit_decimal.limit(rubric.max, 2) }}
+                       {{ rubric.scaledMark }} / {{ rubric.max }}
                     {% else %}
                        {{ rubric.humanReadableMark }}
                     {% endif %}
