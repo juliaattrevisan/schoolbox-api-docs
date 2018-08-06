@@ -142,12 +142,12 @@
                           data-group-id="{{ group.id }}"
                           data-rubric-id="{{ rubric.id }}">
 
-                        <label for="groupMark">{{ locale.rubricGroup.proper }} mark</label>
+                        <label for="group-{{ group.id }}-mark">{{ locale.rubricGroup.proper }} mark</label>
 
                         {% if markSchemeName == 'TotalMarkFractional' %}
 
                             <input class="groupMax"
-                                   id="groupMark"
+                                   id="group-{{ group.id }}-mark"
                                    type="tel"
                                    value="{{ group.scaledMark }}"/> / {{ group.max }}
 
@@ -160,7 +160,7 @@
                         {% elseif markSchemeName == 'Percentage'%}
 
                             <input class="groupMax"
-                                   id="groupMark"
+                                   id="group-{{ group.id }}-mark"
                                    type="tel"
                                    value="{{ group.scaledMark }}"/> %
 
