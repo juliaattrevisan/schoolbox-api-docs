@@ -173,7 +173,7 @@ class Mapper extends \Schoolbox\Mapper
 
 
     /**
-     * Get a list of years that have article(s) in them that could be seen by the user
+     * Get a list of years that have article(s) that were audienced to a user
      *
      * @param array $articleIdsForUser
      * @return array
@@ -182,6 +182,13 @@ class Mapper extends \Schoolbox\Mapper
      */
     public function findYearsAndMonthsWithArticles(array $articleIdsForUser): array
     {
+
+        /* If you aren't able to see anything at all, the archive will be empty
+         */
+        if (!\count($articleIdsForUser)) {
+            return [];
+        }
+
         /* Dates - must be expired, accepted, published and not deleted
          */
         $now = \Alaress_Date_Format::now()->getDatabase();
@@ -195,9 +202,7 @@ class Mapper extends \Schoolbox\Mapper
         /* These are articles that the user could see
          * Don't provide year/month combinations that contain articles, but the user isn't in their audience lol
          */
-        if (\count($articleIdsForUser)) {
-            $pb->in('id', $articleIdsForUser);
-        }
+        $pb->in('id', $articleIdsForUser);
 
         $where = implode("\nAND ", $pb->getWhere());
 
