@@ -176,11 +176,7 @@ abstract class Marksheet_Abstract
             return $blankZero ? '' : 0;
         }
 
-        if ($decimals < 1) {
-            $num = number_format($value, 1, '.', '');
-            return substr($num, 0, strpos($num, '.'));
-        }
-        return trim(trim(number_format($value, $decimals, '.', ''), '0'), '.');
+        return (float)number_format($value, $decimals, '.', '');
     }
 
     /* Abstract functions for extending classes to implement */
