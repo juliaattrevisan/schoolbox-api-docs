@@ -247,6 +247,7 @@ class Mapper extends \Schoolbox\Mapper
      * @return array
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \UnderflowException
+     * @throws \DomainException
      */
     public function findArticleIdsForTopic(array $availableArticleIds, int $topicId, ?int $limit, ?int $pageNum, ?int $year, ?int $month): array
     {
@@ -254,6 +255,12 @@ class Mapper extends \Schoolbox\Mapper
          */
         if (!\count($availableArticleIds)) {
             return [];
+        }
+
+        /* Invalid combination of year/month params
+         */
+        if ($month && !$year) {
+            throw new \DomainException('Invalid year/month combination');
         }
 
         /* If either year or month is specified, we're looking in the news archive
