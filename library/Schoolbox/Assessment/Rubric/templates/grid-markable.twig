@@ -244,9 +244,7 @@
                 var scaledGroupMark = getScaledGroupMark($descriptorCheckboxes, groupSummary);
 
                 if (groupSummary.length) {
-                    groupSummary.attr('data-scaled-mark', scaledGroupMark);
-
-                    parseFraction(groupSummary, null);
+                    groupSummary.find(".groupMax").val(scaledGroupMark);
                 }
 
                 rubricTotalMark = getTotalMark();
