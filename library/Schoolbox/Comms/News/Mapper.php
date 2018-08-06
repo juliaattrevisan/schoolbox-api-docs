@@ -250,6 +250,11 @@ class Mapper extends \Schoolbox\Mapper
      */
     public function findArticleIdsForTopic(array $availableArticleIds, int $topicId, ?int $limit, ?int $pageNum, ?int $year, ?int $month): array
     {
+        /* This user can't see any articles
+         */
+        if (!\count($availableArticleIds)) {
+            return [];
+        }
 
         /* If either year or month is specified, we're looking in the news archive
          * Look for expired items matching a certain year/month combination
@@ -261,7 +266,8 @@ class Mapper extends \Schoolbox\Mapper
         $pb = $this->getPredicateBuilder()
             ->lessThan('publish_at', $now)
             ->notNull('accepted_at')
-            ->isNull('deleted_at');
+            ->isNull('deleted_at')
+            ->in('id', $availableArticleIds);
 
         if ($year || $month) {
             $paddedMonth = '';
@@ -276,12 +282,6 @@ class Mapper extends \Schoolbox\Mapper
             $pb->like('publish_at', $yearMonth);
         } else {
             $pb->greaterThan('expires_at', $now);
-        }
-
-        /* Filter to articles that I can see
-         */
-        if (\count($availableArticleIds)) {
-            $pb->in('id', $availableArticleIds);
         }
 
         /* If $topicId is provided, only get articles for that topic
