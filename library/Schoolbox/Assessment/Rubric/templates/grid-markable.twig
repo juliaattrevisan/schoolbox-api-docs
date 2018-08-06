@@ -147,7 +147,7 @@
                             <input class="groupMax"
                                    id="groupMark"
                                    type="tel"
-                                   value="{{ limit_decimal.limit(group.sum, 2) }}"/> / {{ limit_decimal.limit(group.total, 2) }}
+                                   value="{{ limit_decimal.limit(group.sum, 2) }}"/> / {{ limit_decimal.limit(group.max, 2) }}
 
                         {% elseif markSchemeName == 'LetterGrade' %}
 
