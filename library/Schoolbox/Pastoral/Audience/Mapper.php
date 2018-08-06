@@ -1,0 +1,125 @@
+<?php
+/**
+ * Pastoral care pastoral type audience defaults
+ *
+ * This allows the user to set a default audience for a pastoral type/subtype
+ *
+ * @author      Mattherw Schembri <matt.schembri@alaress.com.au>
+ * @copyright   Copyright 2018, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ */
+
+namespace Schoolbox\Pastoral\Audience;
+
+use PDO;
+use PDOStatement;
+use Schoolbox\GenericCollection;
+use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Mapper\Exception;
+use Schoolbox\Pastoral\Group\Mapper as GroupMapper;
+use Schoolbox\Pastoral\Mapper as PastoralMapper;
+use Schoolbox\RoleMapper;
+use Schoolbox\User;
+use Schoolbox\UserMapper;
+
+/**
+ * Class Mapper
+ * @method Model hydrate(array $row, $alias = '', $callback = null)
+ *
+ * @package Schoolbox\Pastoral\Audience
+ */
+class Mapper extends BaseMapper
+{
+    // Define record access levels
+
+    const ACCESS_DENY = 0;                      // Deny trumps all other access to allow exclusion of a user/group/role
+    const ACCESS_PUBLIC = 1;
+    const ACCESS_PRIVATE = 2;
+
+    /**
+     * Setup mapper
+     */
+    protected function mapping()
+    {
+        $this->hasTable('pastoral_audience');
+        $this->hasModel(Model::class);
+        $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+        $this->uses('type_id', self::TYPE_INTEGER);
+        $this->uses('subtype_id', self::TYPE_INTEGER);
+        $this->uses('access', self::TYPE_INTEGER);
+        $this->joins('user_id', UserMapper::class, 'id', null, null, 'user', 'user');
+        $this->joins('role_id', RoleMapper::class, 'id', null, null, 'role', 'role');
+        $this->joins('group_id', GroupMapper::class, 'id', null, null, 'pastoralGroup', 'group');
+        $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+    }
+
+    /**
+     * Return the first part of the string required to select from this mapper
+     *
+     * @throws BaseMapper\DefinitionException
+     * @return string
+     */
+    protected function getSelectString()
+    {
+        // Intentionally does not join onto soft-deleted strong entities
+        // (e.g. An access is for a User, and user is soft-deleted)
+
+        return "
+			SELECT      {$this->getColumnString()},
+                        {$this->getJoinColumnString('role', 'r')},
+                        {$this->getJoinColumnString('user', 'u')},
+                        {$this->getJoinColumnString('group', 'g')}
+			FROM        {$this->getTable()}
+            LEFT JOIN   {$this->getJoinSql('role', '', 'r')}
+            LEFT JOIN   {$this->getJoinSql('user', '', 'u')}
+            LEFT JOIN   {$this->getJoinSql('group', '', 'g')}
+        ";
+    }
+
+    /**
+     * @param PDOStatement $statement
+     *
+     * @throws Exception
+     * @return GenericCollection
+     */
+    protected function hydrateSelect(PDOStatement $statement)
+    {
+        $results = $this->createCollection();
+
+        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
+            // The record must have a user, role or group specified
+
+            if (empty($row['u.id']) && empty($row['r.id']) && empty($row['g.id'])) {
+                continue;
+            }
+
+            $access = $this->hydrate($row);
+
+            // Hydrate user
+
+            if (!empty($row['u.id'])) {
+                /** @var User $user */
+                $user = $this->hydrateJoin($row, 'user', 'u');
+                $user->setRole = $this->getJoinMapper('role')->findByIdWithFallback($user->getRole()->getId());
+                $access->setUser($user);
+            }
+
+            // Hydrate role
+
+            if (!empty($row['r.id'])) {
+                $access->setRole($this->hydrateJoin($row, 'role', 'r'));
+            }
+
+            // Hydrate group
+
+            if (!empty($row['g.id'])) {
+                $access->setGroup($this->hydrateJoin($row, 'group', 'g'));
+            }
+
+            $results->add($access);
+        }
+
+        return $results;
+    }
+}

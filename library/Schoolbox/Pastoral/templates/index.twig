@@ -12,12 +12,16 @@
     <nav>
         {% set routeGetGroups = routeLookupIfAuthorized('pastoralManagement.getGroups') %}
         {% set routeReportBuilder = routeLookupIfAuthorized('pastoralReportBuilder.getIndex') %}
+        {% set routeGetAudiences = routeLookupIfAuthorized('pastoralManagement.getAudiences') %}
 
         {% if routeReportBuilder %}
             <a href="{{ routeReportBuilder }}" class="icon-result" title="{{ locale.pastoral.proper }} Report Builder"></a>
         {% endif %}
         {% if routeGetGroups %}
             <a href="{{ routeGetGroups }}" class="icon-group" title="Manage {{ locale.pastoral.proper }} Groups"></a>
+        {% endif %}
+        {% if routeGetAudiences %}
+            <a href="{{ routeGetAudiences }}" class="icon-group" title="Manage {{ locale.pastoral.proper }} Audience Defaults"></a>
         {% endif %}
     </nav>
 </div>

@@ -8,13 +8,21 @@
 namespace Schoolbox\Pastoral\Management;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Collection;
+use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Pastoral\Audience\Mapper as PastoralAudienceMapper;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Pastoral\Group\Mapper as PastoralGroupMapper;
 use Schoolbox\Pastoral\Group\Member\Mapper as PastoralGroupMemberMapper;
 use Schoolbox\Pastoral\Group\Member\Model as PastoralGroupMember;
 use Schoolbox\Pastoral\Group\Model as PastoralGroup;
+use Schoolbox\Pastoral\SubType\Mapper as PastoralSubTypeMapper;
+use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
 use Schoolbox\Resource\Search\Results;
+use Schoolbox\Role;
+use Schoolbox\RoleMapper;
 use Schoolbox\UserMapper;
+use Schoolbox\Mapper\Exception as MapperException;
 
 class Controller extends Base
 {
@@ -30,6 +38,13 @@ class Controller extends Base
     /** @var UserMapper $userMapper */
     private $userMapper;
 
+    /**@var PastoralAudienceMapper $pastoralAudienceMapper */
+    private $pastoralAudienceMapper;
+
+    /** @var RoleMapper $roleMapper */
+    private $roleMapper;
+
+
     /**
      * Constructor
      *
@@ -37,17 +52,22 @@ class Controller extends Base
      * @param PastoralAccessMapper      $pastoralAccessMapper
      * @param PastoralGroupMapper       $pastoralGroupMapper
      * @param PastoralGroupMemberMapper $pastoralGroupMemberMapper
+     * @param PastoralAudienceMapper    $pastoralAudienceMapper
      */
     public function __construct(
         UserMapper $userMapper,
         PastoralAccessMapper $pastoralAccessMapper,
         PastoralGroupMapper $pastoralGroupMapper,
-        PastoralGroupMemberMapper $pastoralGroupMemberMapper
+        PastoralGroupMemberMapper $pastoralGroupMemberMapper,
+        PastoralAudienceMapper $pastoralAudienceMapper,
+        RoleMapper $roleMapper
     ) {
         $this->userMapper                = $userMapper;
         $this->pastoralAccessMapper      = $pastoralAccessMapper;
         $this->pastoralGroupMapper       = $pastoralGroupMapper;
         $this->pastoralGroupMemberMapper = $pastoralGroupMemberMapper;
+        $this->pastoralAudienceMapper    = $pastoralAudienceMapper;
+        $this->roleMapper                = $roleMapper;
     }
 
     /**
@@ -62,6 +82,165 @@ class Controller extends Base
             ],
             'title' => 'Pastoral Group Management',
         ]);
+    }
+
+    /**
+     * Display default audiences for pastoral types and sub-types
+     */
+    public function getAudiences()
+    {
+        $this->getResponse()->content->set([
+            'template' => '@pastoralManagement/audiences.twig',
+            'data'     => [
+                'types'     => PastoralTypeMapper::getInstance()->findAll(),
+                'subtypes'  => PastoralSubTypeMapper::getInstance()->findAll()
+            ],
+            'title' => 'Pastoral Group Management',
+        ]);
+    }
+
+
+    /**
+     *  Edit the defaults for a particular type and subtype
+     *
+     * @param $typeId
+     * @param $subtypeId
+     */
+    public function getAudiencesModify($typeId, $subtypeId)
+    {
+        $roles = new Collection();
+        $roleUsers = [];
+        $rolesAll = RoleMapper::getInstance()->findAll(['order' => ['name' => 'ASC']]);
+
+        //Staff roles only for default audiences
+        /** @var Role $roleCurrent */
+        foreach ($rolesAll as $roleCurrent) {
+            // Staff role? Show all users
+            if ($roleCurrent->isStaff()) {
+                $roles->add($roleCurrent);
+                $roleUsers[$roleCurrent->getId()] = $this->userMapper->countByColumn('group_id', $roleCurrent->getId());
+            }
+        }
+
+        //This is fudged using the same audience screen from the record. So to get the saved records to display, it is easiest to attach them to $record
+        $rolePerms = $this->pastoralAudienceMapper->findByColumnList(['type_id' => $typeId, 'subtype_id' => $subtypeId]);
+
+        $record = [];
+        $record['id'] = "fakeId";
+        $record['access'] = $rolePerms;
+
+        $this->getResponse()->content->set([
+            'template' => '@pastoralManagement/audiences_modify.twig',
+            'data'     => [
+
+                'record'            => $record,
+                'allowIndividual'   => ConfigMapper::getInstance()->get('pastoral_individual_access'),
+                'allowParents'      => false,
+                'roles'             => $roles,
+                'groups'            => $this->pastoralGroupMapper->findAll(['name' => ['order' => 'ASC']]),
+                'typeId'            => $typeId,
+                'subtypeId'         => $subtypeId,
+                'groups'            => $this->pastoralGroupMapper->findAll(['name' => ['order' => 'ASC']]),
+            ],
+            'title' => 'Pastoral Group Management',
+        ]);
+    }
+
+    public function getAudiencesModifyNoSub($typeId) {
+        $this->getAudiencesModify($typeId, null);
+    }
+
+    public function postAudienceUpdateNoSub($typeId) {
+        $this->postAudienceUpdate($typeId, null);
+    }
+
+    public function postAudienceUpdate($typeId, $subtypeId) {
+        //Delete the old ones
+        $oldPerms = $this->pastoralAudienceMapper->findByColumnList(['type_id' => $typeId, 'subtype_id' => $subtypeId], ['deleted' => true]);
+
+        if(count($oldPerms) > 0) {
+            foreach ($oldPerms as $oldie) {
+                $this->pastoralAudienceMapper->hardDelete($oldie);
+            }
+        }
+
+        // Save system role permissions, de-duplicating as we go
+
+        $foundRoles = [];
+
+        if (is_array($_POST["role"])) {
+            foreach ($_POST["role"] as $role_id => $accessLevel) {
+                if (!in_array($role_id, $foundRoles)) {
+                    $foundRoles[] = $role_id;
+
+                    try {
+                        /** @var Role $role */
+                        $role = $this->roleMapper->findById($role_id);
+                        $audience = $this->pastoralAudienceMapper->createModel();
+                        $audience->setTypeId($typeId);
+                        $audience->setSubtypeId($subtypeId);
+                        $audience->setRole($role);
+                        $audience->setAccess($accessLevel);
+                        $this->pastoralAudienceMapper->save($audience);
+                    } catch (MapperException $e) {
+                        // Noop
+                    }
+                }
+            }
+        }
+
+        // Save pastoral group permissions, de-duplicating as we go
+
+        $foundGroups = [];
+
+        if (is_array($_POST["group"])) {
+            foreach ($_POST["group"] as $group_id => $accessLevel) {
+                if (!in_array($group_id, $foundGroups)) {
+                    $foundGroups[] = $group_id;
+
+                    try {
+                        /** @var PastoralGroup $group */
+                        $group = $this->pastoralGroupMapper->findById($group_id);
+                        $audience = $this->pastoralAudienceMapper->createModel();
+                        $audience->setTypeId($typeId);
+                        $audience->setSubtypeId($subtypeId);
+                        $audience->setPastoralGroup($group);
+                        $audience->setAccess($accessLevel);
+
+                        $this->pastoralAudienceMapper->save($audience);
+                    } catch (MapperException $e) {
+                        // Noop
+                    }
+                }
+            }
+        }
+
+        // Save individual user permissions, de-duplicating as we go
+
+        $foundUsers = [];
+
+        if (is_array($_POST["user"])) {
+            foreach ($_POST["user"] as $user_id => $accessLevel) {
+                if (!in_array($user_id, $foundUsers)) {
+                    $foundUsers[] = $user_id;
+
+                    try {
+                        /** @var UserMapper $user */
+                        $user = $this->userMapper->findById($user_id);
+                        $audience = $this->pastoralAudienceMapper->createModel();
+                        $audience->setTypeId($typeId);
+                        $audience->setSubtypeId($subtypeId);
+                        $audience->setAccess($accessLevel);
+                        $audience->setUser($user);
+                        $this->pastoralAudienceMapper->save($audience);
+                    } catch (MapperException $e) {
+                        // Noop
+                    }
+                }
+            }
+        }
+
+        $this->response->redirect->to($this->getRouteIfAuthorized('pastoralManagement.getAudiences'));
     }
 
     /**
@@ -86,10 +265,10 @@ class Controller extends Base
      */
     public function postGroupsDelete()
     {
-        $post = $this->getRequest()->post;
+        $_POST = $this->getRequest()->post;
 
-        $this->pastoralGroupMapper->deleteByColumn('id', $post['id']);
-        $this->pastoralAccessMapper->deleteByColumn('group_id', $post['id']);
+        $this->pastoralGroupMapper->deleteByColumn('id', $_POST['id']);
+        $this->pastoralAccessMapper->deleteByColumn('group_id', $_POST['id']);
 
         $this->getResponse()->redirect->afterPost(
             $this->router->generate('pastoralManagement.getGroups')
@@ -101,13 +280,13 @@ class Controller extends Base
      */
     public function postGroupsModify()
     {
-        $post = $this->getRequest()->post;
+        $_POST = $this->getRequest()->post;
 
-        $memberIds = explode(",", $post['members']);
+        $memberIds = explode(",", $_POST['members']);
 
         /** @var PastoralGroup $group */
 
-        if (empty($post['id'])) {
+        if (empty($_POST['id'])) {
             // Creating new group
 
             $group = $this->pastoralGroupMapper->createModel();
@@ -115,14 +294,14 @@ class Controller extends Base
         } else {
             // Updating existing group (or create a new one if its been deleted from under us)
 
-            $group = $this->pastoralGroupMapper->findByIdWithFallback($post['id']);
+            $group = $this->pastoralGroupMapper->findByIdWithFallback($_POST['id']);
         }
 
-        if (empty(trim($post['name']))) {
-            $post['name'] = 'Untitled Group';
+        if (empty(trim($_POST['name']))) {
+            $_POST['name'] = 'Untitled Group';
         }
 
-        $group->setName($post['name']);
+        $group->setName($_POST['name']);
         $this->pastoralGroupMapper->save($group);
 
         // If we are updating an existing group, we need to delete unwanted existing group members
@@ -131,7 +310,7 @@ class Controller extends Base
 
         $membersToSkip = [];
 
-        if (!empty($post['id'])) {
+        if (!empty($_POST['id'])) {
             $membersExisting = $this->pastoralGroupMemberMapper->findByColumn('group_id', $group->getId());
 
             // Go through every member in the database

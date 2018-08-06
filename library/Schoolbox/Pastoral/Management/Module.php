@@ -13,12 +13,14 @@ use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
+use Schoolbox\Pastoral\Audience\Mapper as PastoralAudienceMapper;
 use Schoolbox\Pastoral\Group\Mapper as GroupMapper;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
 use Schoolbox\Pastoral\Tag\Mapper as PastoralTagMapper;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\RoleMapper;
 use Schoolbox\UserMapper;
 use Alaress\Twig\Loader\IChainLoader;
 
@@ -42,12 +44,17 @@ class Module extends BaseModule
 
         $this->registerRoutesArray([
             'GET'  => [
-                '/groups'                  => ['getGroups' => $permissionPastoralModeratorWrite],
-                '/groups/modify{/groupId}' => ['getGroupsModify' => $permissionPastoralModeratorWrite],
+                '/audience'                                             => ['getAudiences' => $permissionPastoralModeratorWrite],
+                '/audience/type/{typeId}/modify'                        => ['getAudiencesModifyNoSub' => $permissionPastoralModeratorWrite],
+                '/audience/type/{typeId}/subtype/{subtypeId}/modify'    => ['getAudiencesModify' => $permissionPastoralModeratorWrite],
+                '/groups'                                               => ['getGroups' => $permissionPastoralModeratorWrite],
+                '/groups/modify{/groupId}'                              => ['getGroupsModify' => $permissionPastoralModeratorWrite],
             ],
             'POST' => [
-                '/groups/delete' => ['postGroupsDelete' => $permissionPastoralModeratorWrite],
-                '/groups/modify' => ['postGroupsModify' => $permissionPastoralModeratorWrite],
+                '/groups/delete'                                        => ['postGroupsDelete'      => $permissionPastoralModeratorWrite],
+                '/groups/modify'                                        => ['postGroupsModify'      => $permissionPastoralModeratorWrite],
+                '/audience/type/{typeId}/modify'                        => ['postAudienceUpdateNoSub' => $permissionPastoralModeratorWrite],
+                '/audience/type/{typeId}/subtype/{subtypeId}/modify'    => ['postAudienceUpdate' => $permissionPastoralModeratorWrite],
             ],
         ]);
     }
@@ -64,6 +71,8 @@ class Module extends BaseModule
             'pastoralTypeMapper'     => PastoralTypeMapper::getInstance(),
             'pastoralAccessMapper'   => PastoralAccessMapper::getInstance(),
             'pastoralTagMapper'      => PastoralTagMapper::getInstance(),
+            'audienceMapper'         => PastoralAudienceMapper::getInstance(),
+            'roleMapper'             => RoleMapper::getInstance(),
         ];
 
         $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class, $mappers));

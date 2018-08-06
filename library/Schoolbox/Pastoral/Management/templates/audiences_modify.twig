@@ -1,0 +1,24 @@
+{% if subtypeId is null %}
+ {% set action = routeLookupIfAuthorized('pastoralManagement.postAudienceUpdateNoSub', {typeId: typeId}) %}
+{% else %}
+ {% set action = routeLookupIfAuthorized('pastoralManagement.postAudienceUpdate', {typeId: typeId, subtypeId: subtypeId}) %}
+{% endif %}
+
+
+
+<div class="small-12 island" id="formPastoral">
+    <form class="top" id="pastoralForm" method="post" enctype="multipart/form-data"
+          action="{{ action }}">
+        {% include "@pastoral/modify_section_visibility.twig" with
+            {
+                record: record,
+                allowIndividual: allowIndividual,
+                groups: groups,
+                allowParents: allowParents,
+                roles: roles
+
+            } only
+        %}
+        <input type="submit" value="Save Audience">
+    </form>
+</div>

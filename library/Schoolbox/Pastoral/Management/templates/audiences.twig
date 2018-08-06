@@ -1,0 +1,96 @@
+{% import '@pastoral/macros/profile.twig' as profile %}
+
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbs(
+[ locale.pastoralCare.proper,      routeLookup('pastoral.getIndex') ],
+[ 'Groups Management' ]
+) }}
+
+<div class='row'>
+    <div class='small-12 columns'>
+        <h1>{{ locale.pastoralCare.proper }}</h1>
+    </div>
+</div>
+
+<div class="row actions-small-1">
+    <div class="list-item">
+        <div class="small-12 columns">
+            <h2 class="subheader">Pastoral Type Defaults</h2>
+        </div>
+    </div>
+    <nav>
+        <a href="{{ routeLookup('pastoral.getIndex') }}" class="icon-home" title="{{ locale.pastoralCare.proper }} Dashboard"></a>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        {% if types is not empty %}
+            <section>
+                <ul class="action-list">
+                    {% for type in types %}
+                        <li class="actions-small-2">
+                            <div class="list-item">
+                                <div class="card small-12 actions-1">
+                                    {{ type.name }} : No SubType
+                                </div>
+                            </div>
+                            <nav>
+                                <a class="icon-pen" href={{ routeLookupIfAuthorized('pastoralManagement.getAudiencesModifyNoSub', {typeId: type.id}) }}></a>
+                                <a class="icon-down-arrow"></a>
+                            </nav>
+                        </li>
+                        {% for subtype in subtypes %}
+                            {% if subtype.pastoralType.Id == type.id %}
+                                <li class="actions-small-2">
+                                    <div class="list-item">
+                                        <div class="card small-12">
+                                            {{ type.name }} : {{ subtype.name }}
+                                        </div>
+                                    </div>
+                                    <nav>
+                                        <a class="icon-pen" href={{ routeLookupIfAuthorized('pastoralManagement.getAudiencesModify', {typeId: type.id, subtypeId: subtype.id}) }}></a>
+                                        <a class="icon-down-arrow"></a>
+                                    </nav>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                    {% endfor %}
+                </ul>
+            </section>
+        {% else %}
+            <div class="empty-state">
+                <i class="icon-group"></i>
+                <p>No {{ locale.pastoral }} groups have been created.</p>
+                {% if isRouteAuthorized('pastoralManagement.getGroupsModify') %}
+                    <p>{{ locale.pastoral.proper }} groups can be used to dynamically audience {{ locale.pastoral }}
+                        records. Do you want to <a href="{{ routeLookup('pastoralManagement.getGroupsModify') }}">create
+                            a {{ locale.pastoral }} group</a>?</p>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<form id="formDelete" class="hide" method="post" action="">
+    <input type="hidden" name="id" value="{{ group.id }}">
+</form>
+
+<script>
+    $(function () {
+        $('[data-delete]').click(function (e) {
+            e.preventDefault();
+            var groupId = $(this).attr('data-delete');
+            $(this).confirmDialog({
+                text: 'Are you sure you want to delete this group? Their access will be permanently removed from any associated {{ locale.pastoral }} records.',
+                confirmEvent: function () {
+                    $.post('{{ routeLookup('pastoralManagement.postGroupsDelete') }}', {
+                        id: groupId
+                    }).done(function () {
+                        $('[data-delete="' + groupId + '"]').closest('li').remove();
+                    })
+                }
+            });
+        });
+    });
+</script>
