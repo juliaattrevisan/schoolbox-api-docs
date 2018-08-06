@@ -395,6 +395,7 @@ class External_Doublefirst_User implements External_UserInterface
                 m.Comments                                          AS StudentMedicalAlert,
                 ''                                                  AS StudentMobilePhone,
                 ''                                                  AS StudentSpecialNeedsFlag,
+                ''                                                  AS EnglishSecondFlag,
                 ''                                                  AS StudentStudiesCode,
                 UrgentNotes                                         AS AlertMessage,
                 ''                                                  AS CourtOrderType,
