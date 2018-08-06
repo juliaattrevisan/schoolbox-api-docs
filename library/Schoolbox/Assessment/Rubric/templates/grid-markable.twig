@@ -269,6 +269,28 @@
             }
         });
 
+        $rb.on('change change.preload', '.groupMax', function (e) {
+            var $changed = $(this);
+            var rubricId = $changed.closest('[data-rubric]').data('rubric');
+
+            var groupSummary = $changed.closest('[data-group-summary]');
+            var customMark = $changed.val();
+
+            if (groupSummary.length) {
+                groupSummary.attr('data-scaled-mark', customMark);
+            }
+
+            var rubricTotalMark = getTotalMark();
+
+            console.log(rubricTotalMark);
+
+            var rubricSummarySelector = '[data-final-summary="rb-' + rubricId + '"]';
+            var rubricSummary = $rb.find(rubricSummarySelector);
+
+            rubricSummary.attr('data-scaled-mark', rubricTotalMark);
+            parseFraction(rubricSummary, e.namespace);
+        });
+
         function showHideRangeInput($changedCell) {
             var $allCellsInRow = $changedCell.parents("tr").find("[data-rubric], [data-rubric-group]");
 
@@ -345,6 +367,8 @@
             if (groupSummary.length) {
                 groupSummary.each(function() {
                     var groupScaledMark = parseFloat($(this).attr('data-scaled-mark'));
+                    console.log(groupScaledMark);
+
                     if (!isNaN(groupScaledMark)) {
                         totalMark += groupScaledMark;
                     }
