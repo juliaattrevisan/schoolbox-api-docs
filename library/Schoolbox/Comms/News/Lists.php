@@ -184,8 +184,8 @@ class Lists
             )
         ))->findArticlesForUser($user);
 
-        /* Articles in $topicId that $user can see
-         * The total available articles that the user can see
+        /* $articleIds:   Articles in $topicId that were audienced to $user
+         * $availableIds: The total available articles that were audienced to user
          *
          * Component config can set "All" as its limit, filtered to the list of articles that can be seen
          */
