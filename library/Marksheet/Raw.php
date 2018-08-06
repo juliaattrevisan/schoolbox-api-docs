@@ -9,6 +9,7 @@
 class Marksheet_Raw extends Marksheet_Abstract
 {
 
+    // TODO where the hell is rawmark coming from, it's entirely wrong??
     public function convertRawMark($rawMark, $maxMark = 0, $asText = false, $blankZero = true)
     {
         // do we trust what's stored in the database?

@@ -245,7 +245,8 @@ class Group implements Twiggable, Calculable
      */
     public function getHumanReadableMark()
     {
-        return sprintf("%0.2d / %0.2d (%0.2d%%)", $this->calculateScaledMark(), $this->calculateMax(), round($this->getPercentage() * 100));
+        $humanReadableMark = sprintf("%0.2d / %0.2d (%0.2d%%)", $this->calculateScaledMark(), $this->calculateMax(), round($this->getPercentage() * 100));
+        return $humanReadableMark;
     }
 
 

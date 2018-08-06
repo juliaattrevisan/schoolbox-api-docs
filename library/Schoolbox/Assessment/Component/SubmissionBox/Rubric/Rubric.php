@@ -497,7 +497,7 @@ class Rubric extends Core\Rubric
                 // set the human readable mark
                 if ($box && $box->isMarkedPerRubricGroup()) {
                     $context['groups'][$groupId]['humanReadableMark'] = $this->calculateHumanReadable(
-                        $context['groups'][$groupId]['percentage'],
+                        $context['groups'][$groupId]['percentage'], // TODO what is this?
                         $context['groups'][$groupId]['max']
                     );
                 }
@@ -590,6 +590,7 @@ class Rubric extends Core\Rubric
         }
 
         $marksheet = \Marksheet_Factory::build($markType->getSlug(), $this->box);
+        // TODO where is percentage coming from? it's totally wrong
         $value = $marksheet->convertRawMark($percentage * 100, $total, true, false);
 
         return $value;
@@ -601,6 +602,7 @@ class Rubric extends Core\Rubric
      */
     public function getHumanReadableMark()
     {
+        // TODO what is percentage?
         return $this->calculateHumanReadable($this->getPercentage(), $this->calculateMax());
     }
 

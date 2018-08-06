@@ -128,6 +128,7 @@ class SubmissionReturn extends DeprecatedModel
                 $r['visible_mark'] = $r['mark'];
             } else {
                 // for anything other than legacy
+                // TODO what is the value of $r['norm-mark']? it's wrong
                 $r['visible_mark'] = $mark->convertRawMark($r['norm_mark'], $r['max_mark'], true, false);
             }
         }
