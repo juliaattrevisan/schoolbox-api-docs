@@ -63,6 +63,13 @@ Note that `AbstractScheduler` implements
 Schedulers may also be set up as the Response Handler for a Daemon.
 
 
+### Message Consumption
+
+A Scheduler is a Consumer for a Message Broker; it receives Trigger objects
+from the Broker, and acknowledges that Message as having been processed once it
+has been Dispatched.
+
+
 ### Trigger
 
 The Trigger is an implementation of
@@ -101,3 +108,13 @@ the Dispatcher.)
 
 More information on the Dispatcher can be found in the
 [Dispatcher documentation](dispatcher.md).
+
+
+### Response Handling
+
+The Scheduler is also a Response Handler; its `handleResponse` method
+determines what happens when the Dispatcher returns a response from the Trigger
+that was passed to it.
+
+`handleResponse` may execute arbitrary code; what exactly it does depends on
+the purpose of the Scheduler instance.
