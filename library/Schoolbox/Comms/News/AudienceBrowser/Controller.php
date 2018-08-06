@@ -100,47 +100,15 @@ class Controller extends Base
         /* Set up the RELATIONSHIP_SELF variant first then add Parents and Teachers modifiers
          */
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $data = [];
+            $data = $this->generateDecoratedDataTuple($row, $registry, $translator, $formatter);
 
-            $data[Model::RELATIONSHIP_SELF] = [
-                'id' => Segment\Codec::encode($row['entity_type'], $row['id'], Model::RELATIONSHIP_SELF),
-                'name' => $row['name'],
-                'entityType' => $translator->translateEntityType($row['entity_type']),
-                'modifier' => null,
-            ];
-
-            /* Only provide the Parents and Teachers modifiers to strats which support them
-             * We exclude Parents and Teachers modifiers from Users due to privacy reasons
-             */
-            if ($registry->hasModifier($row['entity_type'])) {
-
-                /* Parents modifier
-                 */
-                $data[Model::RELATIONSHIP_PARENTS_OF] = [
-                    'id' => Segment\Codec::encode($row['entity_type'], $row['id'], Model::RELATIONSHIP_PARENTS_OF),
-                    'name' => $row['name'],
-                    'entityType' => $translator->translateEntityType($row['entity_type']),
-                    'modifier' => $translator->translateModifier(Model::RELATIONSHIP_PARENTS_OF),
-                ];
-
-                /* Teachers modifier
-                 */
-                $data[Model::RELATIONSHIP_TEACHERS_OF] = [
-                    'id' => Segment\Codec::encode($row['entity_type'], $row['id'], Model::RELATIONSHIP_TEACHERS_OF),
-                    'name' => $row['name'],
-                    'entityType' => $translator->translateEntityType($row['entity_type']),
-                    'modifier' => $translator->translateModifier(Model::RELATIONSHIP_TEACHERS_OF),
-                ];
-            }
-
-            /* Generate nice html versions of each data point
+            /* One-dimensional stack, please
              */
             $searchResult[] = array_values($formatter->decorate($data));
         }
 
         $this->getResponse()->content->set($this->buildJsonOutput($searchResult));
     }
-
 
     /**
      * @param Collection $collection
@@ -151,33 +119,74 @@ class Controller extends Base
     private function generate(Collection $collection, string $entityType): \Alaress\Web\Output\Json
     {
         $items = [];
+
+        $registry = new Segment\SearchRegistry($this->getUser(), $this->folderMapper);
         $translator = new Segment\Translator($this->folderMapper->getDatabase(), $this->getUser(), $this->folderMapper);
+        $formatter = new Segment\HtmlFormatter($this->getDi());
 
         foreach ($collection as $item) {
-            $tuple = $item->findValueLabelPair();
+            $row = array_combine(['id', 'name'], $item->findValueLabelPair());
 
-            $twigData = [
-                'name' => $tuple['label'],
-                'entityType' => $translator->translateEntityType($entityType)
-            ];
-            $twigDataParents = array_merge($twigData, ['modifier' => $translator->translateModifier(Model::RELATIONSHIP_PARENTS_OF)]);
-            $twigDataTeachers = array_merge($twigData, ['modifier' => $translator->translateModifier(Model::RELATIONSHIP_TEACHERS_OF)]);
+            $row['entity_type'] = $entityType;
 
-            /* Encode the value because Year Level is a user-configurable string
-             */
-            $items[] = [
-                'id' => Segment\Codec::encode($entityType, $tuple['value'], Model::RELATIONSHIP_SELF),
-                'name' => $tuple['label'],
-                'itemHtml' => $this->getDi()->get('templateEngine')->render('@commsNews/audienceItem.twig', $twigData),
-                'itemHtmlParents' => $this->getDi()->get('templateEngine')->render('@commsNews/audienceItem.twig', $twigDataParents),
-                'itemHtmlTeachers' => $this->getDi()->get('templateEngine')->render('@commsNews/audienceItem.twig', $twigDataTeachers)
-            ];
+            $items[] = $this->generateDecoratedDataTuple($row, $registry, $translator, $formatter);
         }
 
         return $this->buildJsonOutput([
             'success' => true,
             'data' => $items
         ]);
+    }
+
+
+    /**
+     * Return an (id, name, entityType, modifier, itemHtml) tuple
+     *
+     * @param array                  $row
+     * @param Segment\SearchRegistry $registry
+     * @param Segment\Translator     $translator
+     * @param Segment\HtmlFormatter  $formatter
+     * @return array
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     */
+    private function generateDecoratedDataTuple(array $row, Segment\SearchRegistry $registry, Segment\Translator $translator, Segment\HtmlFormatter $formatter): array
+    {
+        $data = [];
+
+        $data[Model::RELATIONSHIP_SELF] = [
+            'id' => Segment\Codec::encode($row['entity_type'], $row['id'], Model::RELATIONSHIP_SELF),
+            'name' => $row['name'],
+            'entityType' => $translator->translateEntityType($row['entity_type']),
+            'modifier' => null
+        ];
+
+        /* Only provide the Parents and Teachers modifiers to strats which support them
+         * We exclude Parents and Teachers modifiers from Users due to privacy reasons
+         */
+        if ($registry->hasModifier($row['entity_type'])) {
+
+            /* Parents modifier
+             */
+            $data[Model::RELATIONSHIP_PARENTS_OF] = [
+                'id' => Segment\Codec::encode($row['entity_type'], $row['id'], Model::RELATIONSHIP_PARENTS_OF),
+                'name' => $row['name'],
+                'entityType' => $translator->translateEntityType($row['entity_type']),
+                'modifier' => $translator->translateModifier(Model::RELATIONSHIP_PARENTS_OF),
+            ];
+
+            /* Teachers modifier
+             */
+            $data[Model::RELATIONSHIP_TEACHERS_OF] = [
+                'id' => Segment\Codec::encode($row['entity_type'], $row['id'], Model::RELATIONSHIP_TEACHERS_OF),
+                'name' => $row['name'],
+                'entityType' => $translator->translateEntityType($row['entity_type']),
+                'modifier' => $translator->translateModifier(Model::RELATIONSHIP_TEACHERS_OF),
+            ];
+        }
+
+        /* Generate nice html versions of each data point
+         */
+        return $formatter->decorate($data);
     }
 
 
