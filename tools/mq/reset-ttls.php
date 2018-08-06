@@ -91,7 +91,7 @@ try {
                     $expireTime = Alaress_Date_Format::newFromTimestamp($data['time'])->addDays(14);
 
                     // reset the expiry
-//                    $redis->expireat($key, $expireTime->getUnixTimeStamp());
+                    $redis->expireat($key, $expireTime->getUnixTimeStamp());
 
                     $log->notice(sprintf('%s NEW EXPIRY: %s', $key, $expireTime->getDatabase()), [ 'char' => '+' ]);
                 }
