@@ -22,7 +22,6 @@ use RuntimeException;
 use Monolog\Handler\RavenHandler;
 use Monolog\Logger as Monologger;
 
-
 class Kernel extends \Alaress\Application\Kernel
 {
     const RLIMIT_CORE_FILESIZE = 'core';
@@ -399,7 +398,7 @@ EOL;
             $this->log = new Logger(STDOUT, STDERR, $level, $fields, $porcelain);
 
             // Add Sentry handler into logging system
-            $ravenHandler = new RavenHandler($this->getDependencyInjector()->get('sentry'),Monologger::CRITICAL);
+            $ravenHandler = new RavenHandler($this->getDependencyInjector()->get('sentry'), Monologger::CRITICAL);
             $this->log->pushHandler($ravenHandler);
         }
 

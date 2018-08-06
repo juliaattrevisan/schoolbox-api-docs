@@ -87,14 +87,14 @@ class Logger implements LoggerInterface {
 
         $this->log = new Monologger('cli', array(), $processors);
         $this->setLevel($threshold);
-
     }
 
 
     /**
      * @param int $level
      */
-    private function setLevel($level) {
+    private function setLevel($level)
+    {
         // attach STDOUT
         if(is_resource($this->out)) {
             $handler = new StreamHandler($this->out, $level);
@@ -116,7 +116,8 @@ class Logger implements LoggerInterface {
      * Push a new handler into log stack
      * @param HandlerInterface $handler
      */
-    public function pushHandler(HandlerInterface $handler) {
+    public function pushHandler(HandlerInterface $handler)
+    {
         $this->log->pushHandler($handler);
     }
 
@@ -139,7 +140,6 @@ class Logger implements LoggerInterface {
     public function emergency($message, array $context = array())
     {
         $this->log(Monologger::EMERGENCY, $message, $context);
-
     }
 
 
