@@ -32,26 +32,19 @@
                         <li class="actions-small-2">
                             <div class="list-item">
                                 <div class="card small-12 actions-1">
-                                    {{ type.name }} : No SubType
+                                    <a href={{ routeLookupIfAuthorized('pastoralManagement.getAudiencesModifyNoSub', {typeId: type.id}) }}>{{ type.name }} : No Subtype</a>
                                 </div>
                             </div>
-                            <nav>
-                                <a class="icon-pen" href={{ routeLookupIfAuthorized('pastoralManagement.getAudiencesModifyNoSub', {typeId: type.id}) }}></a>
-                                <a class="icon-down-arrow"></a>
-                            </nav>
                         </li>
                         {% for subtype in subtypes %}
                             {% if subtype.pastoralType.Id == type.id %}
                                 <li class="actions-small-2">
                                     <div class="list-item">
                                         <div class="card small-12">
-                                            {{ type.name }} : {{ subtype.name }}
+                                            <a href={{ routeLookupIfAuthorized('pastoralManagement.getAudiencesModify', {typeId: type.id, subtypeId: subtype.id}) }}>
+                                            {{ type.name }} : {{ subtype.name }}</a>
                                         </div>
                                     </div>
-                                    <nav>
-                                        <a class="icon-pen" href={{ routeLookupIfAuthorized('pastoralManagement.getAudiencesModify', {typeId: type.id, subtypeId: subtype.id}) }}></a>
-                                        <a class="icon-down-arrow"></a>
-                                    </nav>
                                 </li>
                             {% endif %}
                         {% endfor %}
