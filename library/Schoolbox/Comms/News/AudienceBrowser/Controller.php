@@ -99,7 +99,7 @@ class Controller extends Base
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $twigData = [
                 'name' => $row['name'],
-                'entityType' => $row['entity_type'] // TODO: needs slight adjustment for human consumption- returns 'School_house' instead of 'School House'
+                'entityType' => $translator->translateEntityType($row['entity_type'])
             ];
 
             $searchResult[] = [
@@ -144,7 +144,7 @@ class Controller extends Base
 
             $twigData = [
                 'name' => $tuple['label'],
-                'entityType' => $entityType // TODO: needs slight adjustment for human consumption- returns 'School_house' instead of 'School House'
+                'entityType' => $translator->translateEntityType($entityType)
             ];
             $twigDataParents = array_merge($twigData, ['modifier' => $translator->translateModifier(Model::RELATIONSHIP_PARENTS_OF)]);
             $twigDataTeachers = array_merge($twigData, ['modifier' => $translator->translateModifier(Model::RELATIONSHIP_TEACHERS_OF)]);
