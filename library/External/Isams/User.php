@@ -175,6 +175,7 @@ class External_Isams_User implements External_UserInterface
                         ''                      AS CourtOrderType,
                         ''                      AS StudentMobilePhone,
                         ''                      AS StudentSpecialNeedsFlag,
+                        ''                      AS EnglishSecondFlag,
                         ''                      AS StudentStudiesCode,
                         ''                      AS StudentBoarder,
                         ''                      AS StudentIBFlag,

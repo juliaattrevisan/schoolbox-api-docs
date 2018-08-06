@@ -253,6 +253,7 @@ class External_Denbigh_User implements External_UserInterface
             'StudentMedicalAlert'      => '',
             'StudentMobilePhone'       => '',
             'StudentSpecialNeedsFlag'  => 0,
+            'EnglishSecondFlag'			=> '',
             'AlertMessage'             => '',
             'StudentBoarder'           => '',
             'Comment'                  => '',

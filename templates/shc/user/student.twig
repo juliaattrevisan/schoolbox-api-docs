@@ -1,0 +1,9 @@
+{% extends '@core/user/student.twig' %}
+
+{% block specialAlert %}
+    {% if externalUser.EnglishSecondFlag and showSpecialAlert %}
+        <div class="alert-box warning icon-bell">
+            English as a second language
+        </div>
+    {% endif %}
+{% endblock specialAlert %}

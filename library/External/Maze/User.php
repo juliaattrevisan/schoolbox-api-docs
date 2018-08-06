@@ -338,6 +338,7 @@ class External_Maze_User implements External_UserInterface
 				'' AS StudentMobilePhone,
 				'' AS StudentStudiesCode,
 				'' AS StudentSpecialNeedsFlag,
+				'' AS EnglishSecondFlag,
 				'' AS AlertMessage,
 				'' AS CourtOrderType,
 				'' AS StudentBoarder,
