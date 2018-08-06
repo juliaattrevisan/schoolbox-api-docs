@@ -161,11 +161,10 @@ abstract class Marksheet_Abstract
      * Handle the differences between 0, 0.0, '', null, and false
      *
      * @param $value
-     * @param $decimals
      * @param bool $blankZero
      * @return int|string
      */
-    protected function cleanNumber($value, $decimals = 2, $blankZero = true)
+    protected function cleanNumber($value, $blankZero = true)
     {
 
         // handle null value and blank string, distinct from zero
@@ -176,7 +175,7 @@ abstract class Marksheet_Abstract
             return $blankZero ? '' : 0;
         }
 
-        return number_format($value, $decimals, '.', '');
+        return number_format($value, 2, '.', '');
     }
 
     /* Abstract functions for extending classes to implement */
