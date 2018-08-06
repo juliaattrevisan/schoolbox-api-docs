@@ -83,7 +83,6 @@
             </tr>
         {% endfor %}
 
-        {{ dump(group.humanReadableMark) }}
         {% if showGroupTotal and group.humanReadableMark %}
             <tr>
                 <th class="rb-group-summary" colspan="{{ rubric.levels|length + 1 }}">
