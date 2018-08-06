@@ -38,7 +38,7 @@ if(isset($opts['v'])) {
     }
 }
 
-$l = new \Alaress\Lumberjack\Logger(STDOUT, STDERR, $threshold, $display, isset($opts['porcelain']));
+$l = new \Alaress\Lumberjack\Logger(STDOUT, STDERR, $limits[$threshold], $display, isset($opts['porcelain']));
 
 $l->info("CLI Logger Demo", array('char' => '>'));
 
