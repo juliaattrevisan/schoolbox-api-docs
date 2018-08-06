@@ -66,12 +66,13 @@ class CalculableAggregator extends SplObjectStorage implements Calculable
     {
         // TODO this is correct
         $mark = $this->calculateMark();
+
         $max = $this->calculateMax();
         $scaledMark = 0;
 
         // TODO rowmaxsum is 32 - correct
         if ($rowMaxSum = $this->calculateRowMaxSum()) {
-            $scaledMark = $mark * ($max() / $rowMaxSum);
+            $scaledMark = $mark * ($max / $rowMaxSum);
         }
 
         return $scaledMark;
