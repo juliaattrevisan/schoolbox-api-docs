@@ -100,7 +100,7 @@
                                 <div class="loader" v-show="showLoader"></div>
                                 <template v-for="(audienceListItem, index) in audienceListItems">
                                     <input type="checkbox" v-bind:id="'audience-list-input' + index" v-bind:value="audienceListItem" v-model="audienceListChecked" />
-                                    <label v-bind:for="'audience-list-input' + index">${ audienceListItem.name }</label>
+                                    <label v-bind:for="'audience-list-input' + index">${ audienceListItem.self.name }</label>
                                 </template>
                             </fieldset>
 
