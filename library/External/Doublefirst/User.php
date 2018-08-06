@@ -393,6 +393,7 @@ class External_Doublefirst_User implements External_UserInterface
                 )                                                   AS StudentEmergencyPhone, 
                 ecmPhoneHome.TelephoneNumber                        AS StudentEmergencyPhoneAlt,
                 m.Comments                                          AS StudentMedicalAlert,
+                ''                                          		AS StudentMobilePhone,
                 ''                                                  AS StudentSpecialNeedsFlag,
                 ''                                                  AS StudentStudiesCode,
                 UrgentNotes                                         AS AlertMessage,

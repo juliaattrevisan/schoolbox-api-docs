@@ -79,6 +79,7 @@ class External_Humanedge_User implements External_UserInterface
                 c.PhoneHome AS StudentEmergencyPhone,
                 c.PhoneWork AS StudentEmergencyPhoneAlt,
                 '' AS StudentMedicalAlert,
+                '' AS StudentMobilePhone,
                 s.SpecialNeeds AS StudentSpecialNeedsFlag,
                 '' AS StudentStudiesCode,
                 '' AS AlertMessage,

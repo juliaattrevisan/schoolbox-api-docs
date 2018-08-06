@@ -113,7 +113,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
         $caseSensitiveFields = array(
             'StudentID', 'StudentGiven1', 'StudentSurname', 'StudentBirthDate',
             'StudentHouseDescription', 'StudentYearLevel', 'StudentTutor', 'StudentHeadOfHouse', 'StudentForm',
-            'StudentFormStaffName', 'StudentEmergencyName', 'StudentEmergencyPhone'
+            'StudentFormStaffName', 'StudentEmergencyName', 'StudentEmergencyPhone', 'StudentMobilePhone'
         );
 
         $stmt = $this->getConnection()->prepareQuery("
