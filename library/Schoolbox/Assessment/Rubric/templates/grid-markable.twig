@@ -274,12 +274,14 @@
         });
 
         // Update the overall rubric mark when the user changes the custom capabilty mark
-        // TODO not yet working
         $rb.on('change change.preload', '.groupMax', function (e) {
             var $changed = $(this);
-            var rubricId = $changed.closest('[data-rubric]').data('rubric');
+            var rubricId = $changed.closest('[data-group-summary]').data('rubric-id');
+            var groupId = $changed.closest('[data-group-summary]').data('group-id');
 
-            var groupSummary = $changed.closest('[data-group-summary]');
+            var groupSummarySelector = '[data-group-summary="rb-' + rubricId + '-' + groupId + '"]';
+            var groupSummary = $rb.find(groupSummarySelector);
+
             var customMark = $changed.val();
 
             if (groupSummary.length) {
