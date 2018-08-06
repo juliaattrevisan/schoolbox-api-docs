@@ -641,7 +641,7 @@
                                 </ul>
                                 {% endfor %}
 
-                                {% if session.user.role.staff and config.mail_enable %}
+                                {% if session.user.role.staff and config.email_all_staff and config.mail_enable %}
                                     <div class="component-action">
                                         <section>
                                             <form action="/mail/createMail.php" method="post">
