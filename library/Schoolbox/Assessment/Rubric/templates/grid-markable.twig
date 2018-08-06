@@ -138,7 +138,9 @@
                           data-mark="{{ group.mark }}"
                           data-scaled-mark="{{ group.scaledMark }}"
                           data-max="{{ group.max }}"
-                          data-row-max-sum="{{ group.rowMaxSum }}">
+                          data-row-max-sum="{{ group.rowMaxSum }}"
+                          data-group-id="{{ group.id }}"
+                          data-rubric-id="{{ rubric.id }}">
 
                         <label for="groupMark">{{ locale.rubricGroup.proper }} mark</label>
 
@@ -164,7 +166,7 @@
 
                         {% endif %}
 
-                        <button id="use-descriptor-values">Assign Grade from Descriptors</button>
+                        <button class="use-descriptor-values">Assign Grade from Descriptors</button>
                     </span>
 
                     {# Self-Assessment #}
@@ -271,6 +273,8 @@
             }
         });
 
+        // Update the overall rubric mark when the user changes the custom capabilty mark
+        // TODO not yet working
         $rb.on('change change.preload', '.groupMax', function (e) {
             var $changed = $(this);
             var rubricId = $changed.closest('[data-rubric]').data('rubric');
@@ -284,14 +288,39 @@
 
             var rubricTotalMark = getTotalMark();
 
-            console.log(rubricTotalMark);
-
             var rubricSummarySelector = '[data-final-summary="rb-' + rubricId + '"]';
             var rubricSummary = $rb.find(rubricSummarySelector);
 
             rubricSummary.attr('data-scaled-mark', rubricTotalMark);
             parseFraction(rubricSummary, e.namespace);
         });
+
+        // Overwrite any custom mark in the capability mark field with the scaled mark calculated from descriptor values
+        $(".use-descriptor-values").click(function(e) {
+            var $button = $(e.target);
+            var $gradeInput = $button.siblings('.groupMax');
+            var rubricId = $button.closest('[data-group-summary]').data('rubric-id');
+            var groupId = $button.closest('[data-group-summary]').data('group-id');
+
+            var rowSelector = '[data-group="rb-' + rubricId + '-' + groupId + '"]';
+            var $groupRows = $(rowSelector);
+            var groupSummarySelector = '[data-group-summary="rb-' + rubricId + '-' + groupId + '"]';
+            var groupSummary = $rb.find(groupSummarySelector);
+
+            var $descriptorCheckboxes = $groupRows.find('input');
+            var scaledGroupMark = getScaledGroupMark($descriptorCheckboxes, groupSummary);
+
+            $gradeInput.val(scaledGroupMark);
+            groupSummary.attr('data-scaled-mark', scaledGroupMark);
+
+            var rubricTotalMark = getTotalMark();
+
+            var rubricSummarySelector = '[data-final-summary="rb-' + rubricId + '"]';
+            var rubricSummary = $rb.find(rubricSummarySelector);
+            rubricSummary.attr('data-scaled-mark', rubricTotalMark);
+
+            parseFraction(rubricSummary, e.namespace);
+        })
 
         function showHideRangeInput($changedCell) {
             var $allCellsInRow = $changedCell.parents("tr").find("[data-rubric], [data-rubric-group]");
@@ -369,8 +398,6 @@
             if (groupSummary.length) {
                 groupSummary.each(function() {
                     var groupScaledMark = parseFloat($(this).attr('data-scaled-mark'));
-                    console.log(groupScaledMark);
-
                     if (!isNaN(groupScaledMark)) {
                         totalMark += groupScaledMark;
                     }
