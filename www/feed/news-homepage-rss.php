@@ -30,7 +30,7 @@ if (\strlen($matches[3])) {
 /* TODO: This should ideally use a routeLookup but we're in Old Town
  * Redirect to new module
  */
-$this->localRedir("/comms/news/{$userKey}{$folderId}");
+$page->localRedir("/comms/news/feed/{$userKey}{$folderId}");
 
 
 /* Find all the bits

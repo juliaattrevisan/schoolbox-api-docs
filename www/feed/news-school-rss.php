@@ -34,7 +34,7 @@ try {
 /* TODO: This should ideally use a routeLookup but we're in Old Town
  * Redirect to new module
  */
-$page->localRedir("/comms/news/{$userKey}?topic={$topic->getSlug()}");
+$page->localRedir("/comms/news/feed/{$userKey}?topic={$topic->getSlug()}");
 
 
 ///* Find all the bits
