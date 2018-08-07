@@ -666,7 +666,9 @@ class SitePage extends Page
      */
     public function initSession()
     {
-        session_start();
+        if (PHP_SESSION_NONE === session_status()) {
+            session_start();
+        }
 
         // Validate the session ID - it has no right to be empty after it's started
         $sessionHandler = new Session();
