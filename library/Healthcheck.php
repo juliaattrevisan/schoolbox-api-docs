@@ -590,7 +590,7 @@ class Healthcheck
         }
 
         $externalPing = new \External_Ping();
-        if ($externalPing->getVersion() != "67") {
+        if ($externalPing->getVersion() > 67) {
             $mediaDb     = null;
             $mediaSchema = 'media';
         } else {
