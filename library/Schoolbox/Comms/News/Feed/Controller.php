@@ -8,18 +8,108 @@
  */
 namespace Schoolbox\Comms\News\Feed;
 
+use Alaress\Database\Connector\IConnector;
 use Alaress\Web\Controller\Base;
+use External_Class;
+use External_User;
+use Schoolbox\Comms\News;
+use Schoolbox\News\TopicMapper;
+use Schoolbox\Permission\Access;
 use Schoolbox\Resource\Folder;
 use Schoolbox\User;
+use Schoolbox\UserMapper;
 
 class Controller extends Base
 {
+    /**
+     * @var News\Mapper
+     */
+    private $newsMapper;
+
+    /**
+     * @var News\Policy\Mapper
+     */
+    private $policyMapper;
+
+    /**
+     * @var TopicMapper
+     */
+    private $topicMapper;
+
+    /**
+     * @var News\SaveForLater\Mapper
+     */
+    private $saveForLaterMapper;
+
+    /**
+     * @var IConnector
+     */
+    private $databaseInternal;
+
+    /**
+     * @var Folder\Mapper
+     */
+    private $folderMapper;
+
+    /**
+     * @var Access\UserAccessMapper
+     */
+    private $userAccessMapper;
+
+    /**
+     * @var UserMapper
+     */
+    private $userMapper;
+
+    /**
+     * @var External_User
+     */
+    private $externalUser;
+
+    /**
+     * @var External_Class
+     */
+    private $externalClass;
+
 
     /**
      * Controller constructor.
+     * @param News\Mapper              $newsMapper
+     * @param News\Policy\Mapper       $policyMapper
+     * @param TopicMapper              $topicMapper
+     * @param News\SaveForLater\Mapper $saveForLaterMapper
+     * @param IConnector               $databaseInternal
+     * @param Folder\Mapper            $folderMapper
+     * @param Access\UserAccessMapper  $userAccessMapper
+     * @param UserMapper               $userMapper
+     * @param External_User            $externalUser
+     * @param External_Class           $externalClass
      */
-    public function __construct()
-    {
+    public function __construct(
+        News\Mapper $newsMapper,
+        News\Policy\Mapper $policyMapper,
+        TopicMapper $topicMapper,
+        News\SaveForLater\Mapper $saveForLaterMapper,
+        IConnector $databaseInternal,
+        Folder\Mapper $folderMapper,
+        Access\UserAccessMapper $userAccessMapper,
+        UserMapper $userMapper,
+        External_User $externalUser,
+        External_Class $externalClass
+    ) {
+        $this->newsMapper = $newsMapper;
+        $this->policyMapper = $policyMapper;
+        $this->topicMapper = $topicMapper;
+        $this->saveForLaterMapper = $saveForLaterMapper;
+
+        /* Hyperdrive injection
+         */
+        $this->databaseInternal = $databaseInternal;
+        $this->folderMapper = $folderMapper;
+        $this->userAccessMapper = $userAccessMapper;
+        $this->userMapper = $userMapper;
+        $this->externalUser = $externalUser;
+        $this->externalClass = $externalClass;
     }
 
 
@@ -28,11 +118,44 @@ class Controller extends Base
      *
      * @param User              $user
      * @param null|Folder\Model $folder
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \InvalidArgumentException
+     * @throws \OutOfRangeException
+     * @throws \UnderflowException
+     * @throws \UnexpectedValueException
+     * @throws \DomainException
      */
     public function getFeed(User $user, ?Folder\Model $folder)
     {
         new \Alaress_Probe($user, $folder);
+
+        $args = [];
+
+        $params = new News\Querystring($args);
+
+        $topicData = (new News\Lists(
+            $this->getConfigLoader()->get('search_type_limit'),
+            $this->newsMapper,
+            $this->policyMapper,
+            $this->saveForLaterMapper,
+            $this->databaseInternal,
+            $this->folderMapper,
+            $this->userAccessMapper,
+            $this->userMapper,
+            $this->externalUser,
+            $this->externalClass
+        ))->findForTopic(
+            '',
+            $params,
+            $this->getUser(),
+            $this->topicMapper->findAll(),
+            null,
+            null
+        );
+
+        new \Alaress_Probe($topicData);
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsFeed/rss.twig', [
             'user' => $user,
             'folder' => $folder

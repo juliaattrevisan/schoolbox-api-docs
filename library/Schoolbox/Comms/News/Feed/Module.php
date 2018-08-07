@@ -15,8 +15,11 @@ use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Comms\News;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\News\TopicMapper;
+use Schoolbox\Permission\Access;
 use Schoolbox\Resource\Folder;
 use Schoolbox\UserMapper;
 
@@ -104,7 +107,24 @@ class Module extends BaseModule
      */
     protected function preInitControllerDependencies(ContainerInterface $injector): void
     {
+        /** @var Container $injector */
+        $injector->params[Controller::class] = [
+            'newsMapper' => $this->getMapperFactory()->getLazy(News\Mapper::class),
+            'policyMapper' => $this->getMapperFactory()->getLazy(News\Policy\Mapper::class),
+            'topicMapper' => $this->getMapperFactory()->getLazy(TopicMapper::class),
+            'saveForLaterMapper' => $this->getMapperFactory()->getLazy(News\SaveForLater\Mapper::class),
 
+            /* Hyperdrive injection
+             */
+            'databaseInternal' => $injector->lazy(function () {
+                return $this->getInjector()->get('databaseInternal');
+            }),
+            'folderMapper' => $this->getMapperFactory()->getLazy(Folder\Mapper::class),
+            'userAccessMapper' => $this->getMapperFactory()->getLazy(Access\UserAccessMapper::class),
+            'userMapper' => $this->getMapperFactory()->getLazy(UserMapper::class),
+            'externalUser' => $injector->lazyGet('externalUser'),
+            'externalClass' => $injector->lazyGet('externalClass'),
+        ];
     }
 
 
