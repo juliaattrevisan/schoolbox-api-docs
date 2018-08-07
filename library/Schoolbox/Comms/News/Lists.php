@@ -166,9 +166,7 @@ class Lists
          */
         $topicId = $this->determineSelectedTopicId($topics, $params->getSlug());
 
-        /* Articles that $user can see
-          */
-        $articleIdsForUser = (new ArticleResolver(
+        $articleResolver = new ArticleResolver(
             new BusinessRules(),
             $this->databaseInternal,
             $this->userAccessMapper,
@@ -182,13 +180,17 @@ class Lists
                 $this->externalClass,
                 $this->userAccessMapper
             )
-        ))->findArticlesForUser($user);
+        );
 
-        /* TODO: Limit to the $params->getFolderId() value, if one was specified
+        /* Articles that were audienced to $user
+         */
+        $articleIdsForUser = $articleResolver->findArticlesForUser($user);
+
+        /* Limit to the $params->getFolderId() value, if one was specified
          * This limits you to the articles you can see in a given topic, for a specified homepage
          */
         if ($params->getFolderId()) {
-            $homepageArticleIds = range(80, 100);
+            $homepageArticleIds = $articleResolver->findArticlesForAudience(Audience\Model::ENTITY_TYPE_FOLDER, $params->getFolderId(), Audience\Model::RELATIONSHIP_SELF);
 
             $articleIdsForUser = array_intersect($articleIdsForUser, $homepageArticleIds);
         }
