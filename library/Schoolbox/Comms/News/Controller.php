@@ -465,8 +465,7 @@ class Controller extends Base
              * and unpublished
              */
             if ((new ValidUserCanDelete())->isSatisfiedBy($this->getUser(), $moderationRequired, $article)) {
-                $article->setDeletedAt(\Alaress_Date_Format::now());
-                $this->newsMapper->save($article);
+                $this->newsMapper->delete($article);
 
                 /* If you're a moderator, go back to the Moderation list
                  *
