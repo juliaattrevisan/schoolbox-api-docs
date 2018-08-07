@@ -224,7 +224,7 @@ class Notifier extends AbstractModuleNotifier
      * @param User    $user
      * @return Envelope
      */
-    protected function generateNotification($roleType, $article, $user)
+    private function notifyPosted($roleType, $article, $user)
     {
         $envelope = new Envelope();
 
@@ -332,7 +332,7 @@ class Notifier extends AbstractModuleNotifier
      */
     public function notifyStudentPosted($article, $user, $diff = array())
     {
-        return $this->generateNotification(Role::STUDENT, $article, $user);
+        return $this->notifyPosted(Role::STUDENT, $article, $user);
     }
 
     /**
@@ -345,7 +345,7 @@ class Notifier extends AbstractModuleNotifier
      */
     public function notifyStaffPosted($article, $user, $diff = array())
     {
-        return $this->generateNotification(Role::STAFF, $article, $user);
+        return $this->notifyPosted(Role::STAFF, $article, $user);
     }
 
     /**
@@ -358,7 +358,7 @@ class Notifier extends AbstractModuleNotifier
      */
     public function notifyParentPosted($article, $user, $diff = array())
     {
-        return $this->generateNotification(Role::PARENT, $article, $user);
+        return $this->notifyPosted(Role::PARENT, $article, $user);
     }
 
 
