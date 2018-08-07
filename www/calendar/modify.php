@@ -343,10 +343,16 @@ foreach ($allFolderList as $currentFolder) {
         $selected = '';
     }
 
+    $codeString = "";
+
+    if($currentFolder['code'] !== null) {
+        $codeString = ' ('.$currentFolder['code'].')';
+    }
+
     $page->setVar(
         array(
             'EVENT_GROUP_ID'          => $currentFolder['id'],
-            'EVENT_GROUP_NAME'        => $currentFolder['name'],
+            'EVENT_GROUP_NAME'        => $currentFolder['name'].$codeString,
             'EVENT_GROUP_ID_SELECTED' => $selected
         )
     );
