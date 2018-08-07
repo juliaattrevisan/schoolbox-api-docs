@@ -20,7 +20,9 @@ use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\News\TopicMapper;
 use Schoolbox\Permission\Access;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 class Module extends BaseModule
@@ -40,7 +42,10 @@ class Module extends BaseModule
         /* Anyone can see the feed
          */
         $getPerms = new Rule\All(
-            new Rule\IsLoggedIn()
+            new Rule\IsLoggedIn(),
+            new Rule\HasHomepageAccess(UserAccess::ACCESS_READ, function(array $params = array(), User $user = null) {
+                return $params['folderId'];
+            }, Access\Access::getInstance())
         );
 
         $preloadUserAndFolder = function ($params) {
