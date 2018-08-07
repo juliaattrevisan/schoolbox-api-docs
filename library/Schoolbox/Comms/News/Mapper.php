@@ -297,33 +297,25 @@ class Mapper extends \Schoolbox\Mapper
         /* If $topicId is provided, only get articles for that topic
          * Otherwise get $limit articles from any topic
          */
-        if ($topicId === self::TOPIC_ALL_ID) {
-            $where = implode("\nAND ", $pb->getWhere());
-
-            $query = "
-                SELECT id
-                FROM {$this->table}
-                WHERE {$where}
-            ";
-        } else {
+        $join = $groupBy = '';
+        if ($topicId !== self::TOPIC_ALL_ID) {
+            $join    = "INNER JOIN comms_news_article_topic cnat ON {$this->table}.id = cnat.article_id ";
+            $groupBy = 'GROUP BY id';
             $pb->equals('cnat.topic_id', $topicId);
-
-            $where = implode("\nAND ", $pb->getWhere());
-
-            $query = "
-                SELECT id
-                FROM {$this->table}
-                INNER JOIN comms_news_article_topic cnat ON {$this->table}.id = cnat.article_id 
-                WHERE {$where}              
-                GROUP BY id
-            ";
         }
+
+        $where = implode("\nAND ", $pb->getWhere());
 
         /* TODO: Sorting algorithm SA-7097
          */
-        $query .= '
+        $query = "
+            SELECT id
+            FROM {$this->table}
+            {$join}
+            WHERE {$where}
+            {$groupBy}
             ORDER BY publish_at DESC, created_at DESC
-        ';
+        ";
 
         /* Limits and offsets
          * Apply either the $limit provided, or use the system default
