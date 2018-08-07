@@ -51,7 +51,7 @@ class RedisCache implements ICache
      */
     public function restoreSchedule(Connector $mq)
     {
-        $queueName = $this->getNamespacedQueue('sched');
+        $queueName = 'sb.schedule';
 
         $this->log->notice("Restoring $queueName from Redis cache");
 
@@ -212,18 +212,6 @@ class RedisCache implements ICache
     protected function getNamespacedKey($key)
     {
         return $this->implodeFiltered(':', [ 'schedule', $this->instanceId, $key ]);
-    }
-
-
-    /**
-     * Return the given queue with a full RabbitMQ namespace
-     *
-     * @param string $queue
-     * @return string
-     */
-    protected function getNamespacedQueue($queue)
-    {
-        return $this->implodeFiltered('.', [ $this->instanceId, 'sb', $queue ]);
     }
 
 

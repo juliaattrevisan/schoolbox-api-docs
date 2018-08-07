@@ -48,7 +48,7 @@ $k->run(function ($di, $loop, $log, $opts) {
         'passive' => true
     ]);
 
-    $q = INSTANCE_ID . '.sb.sched';
+    $q = 'sb.schedule';
 
     try {
         $mq->declareQueue($q);
