@@ -120,7 +120,7 @@ class Login
         }
         $summary->sortByCallback(function (array $a, array $b) {
             return strnatcasecmp($a['name'], $b['name']);
-        });
+        }, true);
 
         $interval = $this->sessionLength * 2;
         $query = "
