@@ -178,6 +178,10 @@ class Controller extends Base
             null
         );
 
+        /* I haven't seen an outputter for xml in Web/Output
+         * TODO: I guess I could make one here...?
+         */
+        header('Content-type: application/rss+xml; charset=UTF-8');
         $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@commsNewsFeed/rss.twig', [
             'folder' => $folder,
             'title' => $this->getConfigLoader()->get('title'),
