@@ -217,6 +217,71 @@ class Notifier extends AbstractModuleNotifier
 
 
     /**
+     * @param string  $roleType
+     * @param Article $article
+     * @param User    $effector
+     * @param array $diff
+     * @return Envelope
+     */
+    private function notifyRejected($roleType, $article, $effector, $diff = [])
+    {
+        $envelope  = new Envelope();
+
+        $bob = new Builder();
+
+        $bob->setTitle(':user rejected your article, :title')
+            ->setHref(sprintf(self::PATTERN_POSTED_HREF, $article->getId()))
+            ->setParams([
+                'user' => new UserParam($effector),
+                'title' => new Param($article->getTitle())
+            ])
+            ->setIcon("/portrait.php?userId={$effector->getExternalId()}&size={$this->iconSize}")
+            ->addTopic("news.{$article->getId()}.rejected")
+        ;
+
+        $envelope->targetToUser($article->getAuthor()->getId(), $bob->build());
+
+        return $envelope;
+    }
+
+
+    /**
+     * @param Article $article
+     * @param User    $effector
+     * @param array   $diff
+     * @return Envelope
+     */
+    public function notifyStaffRejected($article, $effector, $diff = [])
+    {
+        return $this->notifyRejected(Role::STAFF, $article, $effector, $diff);
+    }
+
+
+    /**
+     * @param Article $article
+     * @param User    $effector
+     * @param array   $diff
+     * @return Envelope
+     */
+    public function notifyStudentRejected($article, $effector, $diff = [])
+    {
+        return $this->notifyRejected(Role::STUDENT, $article, $effector, $diff);
+    }
+
+
+    /**
+     * @param Article $article
+     * @param User    $effector
+     * @param array   $diff
+     * @return Envelope
+     */
+    public function notifyParentRejected($article, $effector, $diff = [])
+    {
+        return $this->notifyRejected(Role::PARENT, $article, $effector, $diff);
+    }
+
+
+    /**
      * Notify a group type that news has been posted
      *
      * @param string  $roleType
