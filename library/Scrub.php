@@ -72,8 +72,8 @@ class Scrub
             return $text;
         }
 
-        // squeeze it plaintextification, smart quotation, kill newlines, and escape quotes
-        return str_replace('"', '\"', preg_replace("`\s+`", ' ', self::smartQuotes(self::text(trim($text)))));
+        // escape quotes for csv
+        return str_replace('"', '\"', trim($text));
     }
 
     /**
