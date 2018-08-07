@@ -25,17 +25,25 @@ preg_match('/user=([a-zA-Z0-9]+)(&topic=)?(\d*)/', $params['path'], $matches);
 $userKey = $matches[1];
 $topicId = $matches[3];
 
-try {
-    $topic = TopicMapper::getInstance()->findById($topicId);
-} catch (\Schoolbox\Mapper\Exception $e) {
-    error(\Schoolbox\Error\Mapper::ERROR_COMMS_NEWS_INVALID_TOPIC);
+if (\strlen($topicId)) {
+    try {
+        $topic = TopicMapper::getInstance()->findById($topicId);
+    } catch (\Schoolbox\Mapper\Exception $e) {
+        error(\Schoolbox\Error\Mapper::ERROR_COMMS_NEWS_INVALID_TOPIC);
+    }
+
+    /* TODO: This should ideally use a routeLookup but we're in Old Town
+     * Redirect to new module
+     */
+    $page->localRedir("/comms/news/feed/{$userKey}?topic={$topic->getSlug()}");
 }
 
 /* TODO: This should ideally use a routeLookup but we're in Old Town
  * Redirect to new module
  */
-$page->localRedir("/comms/news/feed/{$userKey}?topic={$topic->getSlug()}");
+$topicSlug = \Schoolbox\Comms\News\Mapper::TOPIC_ALL_SLUG;
 
+$page->localRedir("/comms/news/feed/{$userKey}?topic={$topicSlug}");
 
 ///* Find all the bits
 // */
