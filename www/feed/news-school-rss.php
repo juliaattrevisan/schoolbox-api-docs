@@ -25,6 +25,12 @@ preg_match('/user=([a-zA-Z0-9]+)(&topic=)?(\d*)/', $params['path'], $matches);
 $userKey = $matches[1];
 $topicId = $matches[3];
 
+/* Redirect to new module
+ */
+$di = $kernel->getDependencyInjector();
+$router = $di->get('router');
+$baseUrl = $router->generate('commsNewsFeed.getFeed', ['key' => $userKey]);
+
 if (\strlen($topicId)) {
     try {
         $topic = TopicMapper::getInstance()->findById($topicId);
@@ -32,18 +38,13 @@ if (\strlen($topicId)) {
         error(\Schoolbox\Error\Mapper::ERROR_COMMS_NEWS_INVALID_TOPIC);
     }
 
-    /* TODO: This should ideally use a routeLookup but we're in Old Town
-     * Redirect to new module
-     */
-    $page->localRedir("/comms/news/feed/{$userKey}?topic={$topic->getSlug()}");
+    $page->localRedir("{$baseUrl}?topic={$topic->getSlug()}");
 }
 
-/* TODO: This should ideally use a routeLookup but we're in Old Town
- * Redirect to new module
+/* Redirect to All Topics url
  */
 $topicSlug = \Schoolbox\Comms\News\Mapper::TOPIC_ALL_SLUG;
-
-$page->localRedir("/comms/news/feed/{$userKey}?topic={$topicSlug}");
+$page->localRedir("{$baseUrl}?topic={$topicSlug}");
 
 ///* Find all the bits
 // */

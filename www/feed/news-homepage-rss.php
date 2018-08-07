@@ -22,15 +22,17 @@ $params = parse_url($_SERVER['QUERY_STRING']);
 preg_match('/user=([a-zA-Z0-9]+)(&category=)?(\d*)/', $params['path'], $matches);
 
 $userKey = $matches[1];
+$folderId = $matches[3];
 
-if (\strlen($matches[3])) {
-    $folderId = "/{$matches[3]}";
-}
-
-/* TODO: This should ideally use a routeLookup but we're in Old Town
- * Redirect to new module
+/* Redirect to new module
  */
-$page->localRedir("/comms/news/feed/{$userKey}{$folderId}");
+$di = $kernel->getDependencyInjector();
+$router = $di->get('router');
+$url = $router->generate('commsNewsFeed.getFeed', ['key' => $userKey, 'folderId' => $folderId]);
+
+/* Redirect to new module
+ */
+$page->localRedir($url);
 
 
 /* Find all the bits

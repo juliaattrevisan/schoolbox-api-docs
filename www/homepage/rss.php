@@ -9,13 +9,17 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/Bootstrap.php';
 $page = trim($_GET['page'], '/');
 $args = explode('/', $page);
 
-$catID = isset($args[2]) ? "/{$args[2]}" : '';
+$catID = isset($args[2]) ? $args[2] : '';
 $token = isset($args[3]) && !empty($args[3]) ? $args[3] : '';
 
-/* TODO: This should ideally use a routeLookup but we're in Old Town
- * Redirect to new module
+/* Redirect to new module
  */
-$page->localRedir("/comms/news/feed/{$token}{$catID}");
+$di = $kernel->getDependencyInjector();
+$router = $di->get('router');
+$url = $router->generate('commsNewsFeed.getFeed', ['key' => $token, 'folderId' => $catID]);
+
+$page = new SitePage(false);
+$page->localRedir($url);
 
 
 //try {
