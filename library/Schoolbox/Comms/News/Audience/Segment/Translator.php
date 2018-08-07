@@ -113,10 +113,6 @@ class Translator
      */
     public function translateModifier(string $modifier)
     {
-        if ($modifier === Model::RELATIONSHIP_SELF) {
-            return '';
-        }
-
         return $this->modifierTranslation[$modifier];
     }
 

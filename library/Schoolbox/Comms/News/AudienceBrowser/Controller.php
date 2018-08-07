@@ -156,8 +156,9 @@ class Controller extends Base
         $data[Model::RELATIONSHIP_SELF] = [
             'id' => Segment\Codec::encode($row['entity_type'], $row['id'], Model::RELATIONSHIP_SELF),
             'name' => $row['name'],
+            'entityTypeOriginal' => $row['entity_type'],
             'entityType' => $translator->translateEntityType($row['entity_type']),
-            'modifier' => null
+            'modifier' => $translator->translateModifier(Model::RELATIONSHIP_SELF),
         ];
 
         /* Only provide the Parents and Teachers modifiers to strats which support them
@@ -170,6 +171,7 @@ class Controller extends Base
             $data[Model::RELATIONSHIP_PARENTS_OF] = [
                 'id' => Segment\Codec::encode($row['entity_type'], $row['id'], Model::RELATIONSHIP_PARENTS_OF),
                 'name' => $row['name'],
+                'entityTypeOriginal' => $row['entity_type'],
                 'entityType' => $translator->translateEntityType($row['entity_type']),
                 'modifier' => $translator->translateModifier(Model::RELATIONSHIP_PARENTS_OF),
             ];
@@ -179,6 +181,7 @@ class Controller extends Base
             $data[Model::RELATIONSHIP_TEACHERS_OF] = [
                 'id' => Segment\Codec::encode($row['entity_type'], $row['id'], Model::RELATIONSHIP_TEACHERS_OF),
                 'name' => $row['name'],
+                'entityTypeOriginal' => $row['entity_type'],
                 'entityType' => $translator->translateEntityType($row['entity_type']),
                 'modifier' => $translator->translateModifier(Model::RELATIONSHIP_TEACHERS_OF),
             ];

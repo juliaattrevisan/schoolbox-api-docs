@@ -71,6 +71,7 @@ class Transactor
                         'id' => Codec::encode($entityType, $value, $relationship),
                         'name' => $translator->translateNameFromEntityType($entityType, $value),
                         'entityType' => $translator->translateEntityType($entityType),
+                        'entityTypeOriginal' => $entityType,
                         'modifier' => $translator->translateModifier($relationship),
                     ];
                 }
