@@ -9,9 +9,7 @@
  */
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/Bootstrap.php';
 
-use Schoolbox\News\ArticleMapper;
 use Schoolbox\News\TopicMapper;
-use Schoolbox\News\Topic;
 
 $page = new SitePage(false);
 
@@ -27,10 +25,16 @@ preg_match('/user=([a-zA-Z0-9]+)(&topic=)?(\d*)/', $params['path'], $matches);
 $userKey = $matches[1];
 $topicId = $matches[3];
 
+try {
+    $topic = TopicMapper::getInstance()->findById($topicId);
+} catch (\Schoolbox\Mapper\Exception $e) {
+    error(\Schoolbox\Error\Mapper::ERROR_COMMS_NEWS_INVALID_TOPIC);
+}
+
 /* TODO: This should ideally use a routeLookup but we're in Old Town
  * Redirect to new module
  */
-$this->localRedir("/comms/news/{$userKey}?topic={$topicId}");
+$page->localRedir("/comms/news/{$userKey}?topic={$topic->getSlug()}");
 
 
 ///* Find all the bits
