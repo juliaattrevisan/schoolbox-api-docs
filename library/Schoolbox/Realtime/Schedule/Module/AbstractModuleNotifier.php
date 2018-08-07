@@ -15,24 +15,24 @@ use ReflectionClass;
 use ReflectionMethod;
 use RuntimeException;
 use Schoolbox\Collection;
+use Schoolbox\Di\IDiConfigurable;
 use Schoolbox\IConfigLoader;
 use Schoolbox\IMapper;
 use Schoolbox\Mapper;
-use Schoolbox\Notif\NotifInterface;
+use Schoolbox\MapperFactory;
 use Schoolbox\Realtime\Message\NS;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Message\Source;
 use Schoolbox\Realtime\Message\SourceMapper;
-use Schoolbox\Realtime\Schedule\Event\Event;
 use Schoolbox\Realtime\Schedule\ScheduleException;
 use Schoolbox\User;
 
-abstract class AbstractModuleNotifier implements ModuleNotifierInterface
+abstract class AbstractModuleNotifier implements ModuleNotifierInterface, IDiConfigurable
 {
     /**
      * Generic deleted trigger, available to all notifiers
      */
-    const TRIGGER_DELETED = 'deleted';
+    protected const TRIGGER_DELETED = 'deleted';
 
     /** @var callable[] */
     protected $closures = array();
@@ -63,6 +63,38 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface
      * @var bool
      */
     private $propagation = true;
+
+
+    /**
+     * Returns the $di->params[static:class] for this class
+     *
+     * @param \Aura\Di\ContainerInterface $di
+     * @return array
+     */
+    public static function getParams(\Aura\Di\ContainerInterface $di): array
+    {
+        return [
+            'configLoader' => $di->lazyGet('config'),
+        ];
+    }
+
+
+    /**
+     * Returns the $di->setters[static:class] for this class
+     *
+     * @param \Aura\Di\ContainerInterface $di
+     * @return array
+     */
+    public static function getSetters(\Aura\Di\ContainerInterface $di): ?array
+    {
+        /** @var MapperFactory $mf */
+        $mf = $di->get('mapperFactory');
+
+        return [
+            'setNsMapper'  => $mf->getLazy(NSMapper::class),
+            'setSrcMapper' => $mf->getLazy(SourceMapper::class),
+        ];
+    }
 
 
     /**
@@ -117,7 +149,7 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface
      * @param Mapper $mapper
      * @throws ScheduleException
      */
-    protected function setMapper($mapper = null)
+    public function setMapper($mapper = null)
     {
         if ($mapper instanceof IMapper) {
             $this->mapper = $mapper;
@@ -144,7 +176,7 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface
     /**
      * @param NSMapper $nsMapper
      */
-    protected function setNsMapper($nsMapper)
+    public function setNsMapper($nsMapper)
     {
         $this->nsMapper = $nsMapper;
     }
@@ -153,7 +185,7 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface
     /**
      * @param SourceMapper $srcMapper
      */
-    protected function setSrcMapper($srcMapper)
+    public function setSrcMapper($srcMapper)
     {
         $this->srcMapper = $srcMapper;
     }
