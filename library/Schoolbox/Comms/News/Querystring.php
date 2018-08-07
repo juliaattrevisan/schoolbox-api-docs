@@ -52,7 +52,7 @@ class Querystring
     /**
      * Querystring param for the Folder option
      */
-    public const FOLDER_PARAM = 'f';
+    public const FOLDER = 'f';
 
     /**
      * An array of key/value pairs corresponding to GET params
@@ -75,7 +75,7 @@ class Querystring
             self::PAGE_NUMBER => $data[self::PAGE_NUMBER],
             self::LIMIT => $data[self::LIMIT],
             self::HIDE_PAGINATOR => $data[self::HIDE_PAGINATOR],
-            self::FOLDER_PARAM => $data[self::FOLDER_PARAM],
+            self::FOLDER => $data[self::FOLDER],
         ];
     }
 
@@ -141,7 +141,7 @@ class Querystring
      */
     public function getFolderId()
     {
-        return $this->querystring[self::FOLDER_PARAM];
+        return $this->querystring[self::FOLDER];
     }
 
 
