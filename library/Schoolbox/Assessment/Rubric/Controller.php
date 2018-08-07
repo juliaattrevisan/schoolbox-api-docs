@@ -283,7 +283,7 @@ class Controller extends BaseController
         $rows = [];
 
         foreach ($array as $row) {
-            $rows[] = '"' . implode('","', $row) . '"';
+            $rows[] = '"' . html_entity_decode(implode('","', $row),ENT_QUOTES) . '"';
         }
 
         return implode("\n", $rows);
