@@ -145,8 +145,36 @@ returns the following:
 
 ### Variants
 
+> TODO verify the veracity of this section's statements
+
+The Resolver has two variants, for two different use cases:
+* read performance
+* writeability
+
+
 #### Read-only (flattened)
+
+This variant is optimised for read performance: 
+
 
 #### Writable (hydrated)
 
+This variant is optimised for writeability:
+
+
 ### Rebinding
+
+> TODO figure out why rebinding happens only upon update, rather than create?
+
+Any action within Schoolbox that changes the audience of a message must rebind
+the values stored within the resolver.
+
+These actions include:
+* Changing the alternate source of a component
+  * in order to notify users on the component's folder when the source
+    changes, all redirects must be updated
+* Changing a user's access to a folder
+  * in order to determine which routes a user is subscribed to, all of their
+    routes must be recalculated
+* Importing users
+  * all imported users must be rebound
