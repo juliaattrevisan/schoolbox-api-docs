@@ -508,6 +508,35 @@ class RubricMapper
     }
 
     /**
+     * Normalize encoding of a cell from the uploaded CSV.
+     *
+     * `$string` _should_ be UTF-8, but the CSV could've been saved in another
+     * encoding. (So far, we only recognise Windows-1252)
+     *
+     * @param string $string
+     * @return string
+     */
+    protected function normalizeEncoding(string $string): string
+    {
+        // Assume $string is utf-8 encoded, unless proven otherwise
+        // If it isn't, assume it's Windows-1252
+        $encoding = mb_detect_encoding($string, ['UTF-8', 'Windows-1252', 'ISO-8859-1'], true);
+
+        switch ($encoding) {
+            case 'Windows-1252':
+            case 'CP1252':
+            case 'ISO-8859-1':
+                // All the CP1252 test strings I used detected as ISO-8859-1.
+                // You actually want CP1252
+                return mb_convert_encoding($string, 'UTF-8', 'CP1252');
+
+            case 'UTF-8':
+            default:
+                return $string;
+        }
+    }
+
+    /**
      * Converts a Criterion name for comparison. Do NOT use for mutation before storage.
      *
      * * converts to lowercase
@@ -535,7 +564,13 @@ class RubricMapper
         if (is_array($line)) {
             // normal data
             // Normalize line values
-            return array_map([$this, 'normalizeSpace'], array_slice($line, 0, $limit));
+            return array_map(
+                [$this, 'normalizeEncoding'],
+                array_map(
+                    [$this, 'normalizeSpace'],
+                    \array_slice($line, 0, $limit)
+                )
+            );
         }
 
         // bad data, but not EOF
