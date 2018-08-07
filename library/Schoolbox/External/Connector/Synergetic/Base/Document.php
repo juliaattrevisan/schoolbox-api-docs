@@ -52,7 +52,7 @@ class Document extends Base implements IDocument
         // TODO inject ping/diagnostic object
         $externalPing = new External_Ping();
 
-        if ($externalPing->getVersion() == "68") {
+        if ($externalPing->getVersion() > 67) {
             return "media";
         }
 

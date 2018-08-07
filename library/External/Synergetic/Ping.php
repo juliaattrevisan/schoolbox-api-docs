@@ -30,14 +30,13 @@ class External_Synergetic_Ping implements External_PingInterface
     {
         try {
             $version = $this->getDatabase()->getOne("SELECT TOP 1 [VALUE] FROM Config WHERE Key1 = 'System' AND Key2 = 'Network' AND Key3 = 'Version' AND Key4 = 'DataStructure'");
+            return intval($version);
         } catch (\Exception $e) {
             // If all else fails we will default to reporting version 67 as this is the
             // baseline functionality level for the Synergetic connector
 
             return 67;
         }
-
-        return $version;
     }
 
     /**

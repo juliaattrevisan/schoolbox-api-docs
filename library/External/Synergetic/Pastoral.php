@@ -157,7 +157,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
         // The upload location varies depending on the version of Synergetic
 
-        if ($externalPing->getVersion() == "68") {
+        if ($externalPing->getVersion() > 67) {
             $this->schemaMedia = "media";
         } else {
             $this->schemaMedia = "SynergyOneMedia.dbo";
