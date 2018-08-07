@@ -10,10 +10,15 @@
         <atom:link href="{{ url }}" rel="self" type="application/rss+xml" />
 
         {% for article in articles %}
+            {% set image = '' %}
+            {% if article.featureImage %}
+                {% set image = '<img src="'~ baseUrl ~'/image.php?hash=' ~ article.featureImage.hash ~ '&size=constrain200">' %}
+            {% endif %}
         <item>
             <title>{{ article.title }}</title>
             <category>{% for topic in article.topics %}{{ topic.name }}{% if not loop.last %}, {% endif %}{% endfor %}</category>
-            <description><![CDATA[{{ article.body|escape('html') }}]]></description>
+            <description><![CDATA[{{ image ~ article.body|escape('html') }}]]>
+            </description>
             <link>{{ routeLookup('commsNews.getDetail', {articleId: article.id}) }}</link>
             <pubDate>{{ article.publishAt|date('r') }}</pubDate>
             <guid>{{ routeLookup('commsNews.getDetail', {articleId: article.id}) }}</guid>

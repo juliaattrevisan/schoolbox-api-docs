@@ -191,6 +191,7 @@ class Controller extends Base
             'folder' => $folder,
             'title' => $this->getConfigLoader()->get('title'),
             'schoolName' => $this->getConfigLoader()->get('school_name'),
+            'baseUrl' => $this->getRequest()->url->get(PHP_URL_SCHEME) . '://' . $this->getRequest()->url->get(PHP_URL_HOST),
             'url' => $this->getRequest()->url->get(),
             'articles' => $topicData['articles']
         ]));
