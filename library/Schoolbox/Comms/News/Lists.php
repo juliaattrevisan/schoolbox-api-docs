@@ -155,6 +155,7 @@ class Lists
      * @throws \OutOfRangeException
      * @throws \UnderflowException
      * @throws \UnexpectedValueException
+     * @throws \DomainException
      */
     public function findForTopic(string $urlPrefix, Querystring $params, User $user, Collection $topics, ?int $year, ?int $month): array
     {

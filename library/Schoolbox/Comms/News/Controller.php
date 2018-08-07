@@ -534,6 +534,7 @@ class Controller extends Base
      * @throws \OutOfRangeException
      * @throws \UnderflowException
      * @throws \UnexpectedValueException
+     * @throws \DomainException
      */
     public function getListByTopic(?int $year, ?int $month)
     {
@@ -567,7 +568,7 @@ class Controller extends Base
     /**
      * News Archive
      *
-     * @param int|null    $year
+     * @param int|null $year
      * @param int|null $month
      * @throws InvalidArgumentException
      * @throws RouteNotFound
@@ -576,6 +577,7 @@ class Controller extends Base
      * @throws \OutOfRangeException
      * @throws \UnderflowException
      * @throws \UnexpectedValueException
+     * @throws \DomainException
      */
     public function getArchive(int $year = null, int $month = null)
     {
@@ -610,6 +612,7 @@ class Controller extends Base
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/archive.twig', $data));
     }
 
+
     /**
      * Get a list of articles audienced to you
      *
@@ -622,6 +625,7 @@ class Controller extends Base
      * @throws \OutOfRangeException
      * @throws \UnderflowException
      * @throws \UnexpectedValueException
+     * @throws \DomainException
      */
     public function getIndex()
     {
@@ -667,6 +671,7 @@ class Controller extends Base
      * @throws \OutOfRangeException
      * @throws \UnderflowException
      * @throws \UnexpectedValueException
+     * @throws \DomainException
      */
     private function generatePartial(string $urlPrefix, Querystring $params, Collection $topics, bool $hidePaginator, ?int $year, ?int $month): array
     {
