@@ -236,9 +236,9 @@ abstract class Calendar_Layout_Full_Abstract
 
         //Bastardise the folder names to get the codes in
         //Better than changing checkList()
-        foreach($category_list as $key => $value) {
-            if(!empty($category_list[$key]['code'])) {
-                $category_list[$key]['name'] = $category_list[$key]['name'].' ('.$category_list[$key]['code'].')';
+        foreach ($category_list as $key => $value) {
+            if (!empty($category_list[$key]['code'])) {
+                $category_list[$key]['name'] = $category_list[$key]['name'] . ' (' . $category_list[$key]['code'] . ')';
             }
         }
         $this->getPage()->checkList(
