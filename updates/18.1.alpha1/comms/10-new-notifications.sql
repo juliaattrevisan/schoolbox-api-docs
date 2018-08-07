@@ -7,3 +7,8 @@ INSERT INTO msg_source (namespace, `key`, role_type, description) VALUES
 (5, 'rejected', 'student', 'a moderator rejects a news article you have submitted'),
 (5, 'rejected', 'parent', 'a moderator rejects a news article you have submitted');
 
+INSERT INTO msg_route_perm
+SELECT ms.id, r.id, 'MU,DI,IN,MO,EM', 'IN,MO,EM'
+FROM groups r, msg_source ms
+WHERE ms.namespace = 5
+AND ms.key IN ('submitted', 'rejected');
