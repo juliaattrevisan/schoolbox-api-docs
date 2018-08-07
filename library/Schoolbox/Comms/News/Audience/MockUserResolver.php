@@ -10,6 +10,18 @@ namespace Schoolbox\Comms\News\Audience;
 
 class MockUserResolver implements IUserResolver
 {
+    /** @var int */
+    private $defaultSet;
+
+
+    /**
+     * @param int $defaultSet
+     */
+    public function __construct(int $defaultSet = 0)
+    {
+        $this->defaultSet = $defaultSet;
+    }
+
     // Maps article ids to user ids
     // 1 => [ [role:3]^s && [year:10]^s ]^s
     // 2 => [user:3]^s || [user:10]^s || [user:151]^s || [user:230]^s
@@ -22,6 +34,7 @@ class MockUserResolver implements IUserResolver
     // 9 => [ [class:ENG34]^s && [role:teachers]^s ]^s
     //10 => [ [school_house:3]^s && [year:10]^s ]^p
     public const ARTICLE_AUDIENCES = [
+        0 => [],
         1 => [10,15,17,31,222,223,224,225,226,227,228],
         2 => [3,10,151,230],
         3 => [74,75],
@@ -43,6 +56,6 @@ class MockUserResolver implements IUserResolver
         if (\array_key_exists($articleId, self::ARTICLE_AUDIENCES)) {
             return self::ARTICLE_AUDIENCES[$articleId];
         }
-        return [];
+        return self::ARTICLE_AUDIENCES[$this->defaultSet];
     }
 }
