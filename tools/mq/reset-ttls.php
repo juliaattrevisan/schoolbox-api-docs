@@ -13,10 +13,7 @@ use Psr\Log\LoggerInterface as Logger;
 use React\EventLoop\LoopInterface;
 use Schoolbox\Application\Daemon\App;
 
-
 $fields = array('porcelain', 'mem', 'truemem', 'pid');
-
-$opts = getopt('v', $fields);
 
 foreach($fields as $k => $name) {
     if(!isset($opts[$name])) {
@@ -29,7 +26,7 @@ require_once __DIR__ . '/../../conf/core/require.php';
 spl_autoload_call('Schoolbox\\Application\\Daemon');
 
 $k = new \Schoolbox\Application\Daemon\Kernel('TTL Reset', [
-    'verbose' => isset($opts['v']) ? $opts['v'] : null,
+    'verbose' => [true, true],
     'errors'  => E_ALL,
     'fields'  => array_values($fields),
 ]);
