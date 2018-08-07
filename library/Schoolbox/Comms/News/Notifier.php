@@ -32,8 +32,9 @@ use Schoolbox\User;
 
 class Notifier extends AbstractModuleNotifier
 {
-    public const TRIGGER_POSTED   = 'posted';
-    public const TRIGGER_REJECTED = 'rejected';
+    public const TRIGGER_POSTED    = 'posted';
+    public const TRIGGER_REJECTED  = 'rejected';
+    public const TRIGGER_SUBMITTED = 'submitted';
 
     // These patterns need to be consts to ensure consistency between methods (revocation relies on these strings matching)
 
@@ -152,6 +153,11 @@ class Notifier extends AbstractModuleNotifier
             if (isset($diff['acceptedAt'])) {
                 // this action is removing the accepted-at: this is a REVOCATION
                 $bundle->attach(self::TRIGGER_DELETED, self::IMMEDIATELY);
+            }
+
+            if (isset($diff['submittedAt'])) {
+                // this action is submitting the article, send in the mods!
+                $bundle->attach(self::TRIGGER_SUBMITTED, self::IMMEDIATELY);
             }
 
             // if the article is not accepted, no further checks are relevant
