@@ -140,9 +140,16 @@ class Controller extends Base
          */
         $args = [];
 
-        /* Get articles across all topics
+        /* If a topic slug exists, use it
+         * Otherwise, get articles across all topics
          */
         $args[News\Querystring::TOPIC_SLUG] = News\Mapper::TOPIC_ALL_SLUG;
+
+        $slug = $this->getRequest()->query[News\Querystring::TOPIC_SLUG];
+
+        if (\strlen($slug)) {
+            $args[News\Querystring::TOPIC_SLUG] = News\Mapper::TOPIC_ALL_SLUG;
+        }
 
         /* No limit to the number of articles
          */
