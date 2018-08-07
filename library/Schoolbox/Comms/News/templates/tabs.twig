@@ -7,8 +7,9 @@
  # @param Collection|Topic[] topics
  # @param int topicAll
  # @param string slug
- # @param int compactMode
- # @param int limit
+ # @param int|null compactMode
+ # @param int|null limit
+ # @param int|null folderId
  # @param bool hidePaginator
  #}
 
@@ -20,6 +21,10 @@
 
 {% if limit is not null %}
     {% set params = params ~ '&l=' ~limit %}
+{% endif %}
+
+{% if folderId %}
+    {% set params = params ~ '&f=' ~ folderId %}
 {% endif %}
 
 {# The paginator is enabled by default

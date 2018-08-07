@@ -91,14 +91,15 @@ class Controller extends Component_Homepage_ControllerAbstract
      */
     public function renderTemplate($templateHandle): bool
     {
-        return $this->renderTwigTemplate($templateHandle, '@commsNewsDashboard/component.twig', [
+        return $this->renderTwigTemplate($templateHandle, '@commsNewsHomepage/component.twig', [
             'componentInstanceId' => $this->getInstance()->getId(),
             'topics' => $this->topics,
             'topicAll' => News\Mapper::TOPIC_ALL_SLUG,
             'slug' => $this->slug,
             'hidePaginator' => true,
             'compactMode' => $this->getConfig('compactMode'),
-            'limit' => $this->getConfig('size')
+            'limit' => $this->getConfig('size'),
+            'folderId' => $this->getSource()->getId()
         ]);
     }
 }

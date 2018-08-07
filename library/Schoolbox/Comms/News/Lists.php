@@ -20,7 +20,6 @@ use Schoolbox\Collection;
 use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Comms\News\Audience\BusinessRules;
 use Schoolbox\Comms\News\Audience\RelationshipFilterer;
-use Schoolbox\IConfigLoader;
 use Schoolbox\News\Topic;
 use Schoolbox\Permission\Access;
 use Schoolbox\Resource\Folder;
@@ -184,6 +183,15 @@ class Lists
                 $this->userAccessMapper
             )
         ))->findArticlesForUser($user);
+
+        /* TODO: Limit to the $params->getFolderId() value, if one was specified
+         * This limits you to the articles you can see in a given topic, for a specified homepage
+         */
+        if ($params->getFolderId()) {
+            $homepageArticleIds = range(80, 100);
+
+            $articleIdsForUser = array_intersect($articleIdsForUser, $homepageArticleIds);
+        }
 
         /* $articleIds:   Articles in $topicId that were audienced to $user
          * $availableIds: The total available articles that were audienced to user

@@ -17,6 +17,7 @@
         'topic=' ~ slug,
         'c=' ~ compactMode,
         'l=' ~ limit,
+        'f=' ~ folderId,
         'hp=1'
     ]|join('&') %}
 
@@ -53,7 +54,8 @@
     topicAll: topicAll,
     slug: slug,
     compactMode: compactMode,
-    limit: limit
+    limit: limit,
+    folderId: folderId
 } %}
 
 <div id="news-container-{{ componentInstanceId }}">
