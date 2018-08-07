@@ -3,10 +3,11 @@
  * Querystring
  *
  * Rebuild a querystring or find out the particular pieces
+ *  - compact mode
  *  - topic slug
  *  - page number
  *  - limit
- *  - show paginator
+ *  - hide paginator
  * Encapsulate in a stringable class
  * Encapsulate helpers
  *
