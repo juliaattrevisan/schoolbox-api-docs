@@ -126,9 +126,11 @@ class Controller extends Base
      * @throws \UnderflowException
      * @throws \UnexpectedValueException
      * @throws \DomainException
+     * @throws \Aura\Web\Exception\InvalidComponent
      */
     public function getFeed(User $user, ?Folder\Model $folder)
     {
+
         /* This is only used for paginating the article set but the rss feed has no pagination
          */
         $urlPrefix = '';
@@ -176,11 +178,12 @@ class Controller extends Base
             null
         );
 
-        new \Alaress_Probe($topicData['articles']->getPropertyValues('title'));
-
-        $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsFeed/rss.twig', [
-            'user' => $user,
-            'folder' => $folder
-        ])->setTitle('Example'));
+        $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@commsNewsFeed/rss.twig', [
+            'folder' => $folder,
+            'title' => $this->getConfigLoader()->get('title'),
+            'schoolName' => $this->getConfigLoader()->get('school_name'),
+            'url' => $this->getRequest()->url->get(),
+            'articles' => $topicData['articles']
+        ]));
     }
 }
