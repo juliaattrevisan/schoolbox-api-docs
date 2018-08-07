@@ -40,9 +40,9 @@ interface IArticleResolver
      *              should include articleA                  // as [folder:X ∩ role:Y] is a subset of [folder:X ∪ role:Y]
      *              should include articleB                  // as [folder:X ∩ role:Y] is a subset of [folder:X ∩ role:Y]
      *
-     * @param string          $entityType
-     * @param int|string|null $entityValue     Null is a valid value to match on.
-     * @param string|null     $relationship    Null means don't don't filter by relationship modifier.
+     * @param string                $entityType
+     * @param int|string|null|array $entityValue     Null is a valid value to match on. Arrays are used in complex searches
+     * @param string|null           $relationship    Null means don't don't filter by relationship modifier.
      * @return int[]
      */
     public function findArticlesForAudience(string $entityType, $entityValue, string $relationship = null): array;
