@@ -15,7 +15,7 @@ $token = isset($args[3]) && !empty($args[3]) ? $args[3] : '';
 /* TODO: This should ideally use a routeLookup but we're in Old Town
  * Redirect to new module
  */
-$page->localRedir("/comms/news/{$token}{$catID}");
+$page->localRedir("/comms/news/feed/{$token}{$catID}");
 
 
 //try {
