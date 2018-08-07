@@ -1,5 +1,5 @@
 <?php
-
+/** @var SitePage $this */
 $attendanceController = new Event_Attendance_Controller($this);
 
 $method = $this->arg[0];
@@ -24,6 +24,7 @@ elseif ( $method == 'processRemoveAttendance' && is_numeric($this->arg[1]) && is
     \Schoolbox\Calendar\EventMapper::getInstance()->removeAttendance($eventId, $userId);
 
     header('Location: '."/calendar/attendance/list/".$eventId);
+    exit;
 }
 
 /* Show all upcoming events with the number of attendees
@@ -53,4 +54,6 @@ else if ($method == 'exportRejected') {
 	$data = $attendanceController->executeRejected($this->arg[1]);
 
 	$attendanceController->renderExportCSV($data);
+} else {
+    $this->pageNotFound();
 }
