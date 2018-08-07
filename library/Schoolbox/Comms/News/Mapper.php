@@ -222,6 +222,9 @@ class Mapper extends \Schoolbox\Mapper
 
         $years = [];
 
+        /* Convert 06 into just 6, because I'm taking chunks out of a timestamp 2018-06-01 11:22:33.
+         * The url is an int. To avoid issues with the leading zero I just force int on it.
+         */
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $years[$row['year']][(int)$row['month']] = true;
         }
