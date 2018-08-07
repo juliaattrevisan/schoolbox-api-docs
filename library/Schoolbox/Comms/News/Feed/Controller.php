@@ -114,7 +114,8 @@ class Controller extends Base
 
 
     /**
-     * Generate RSS feed
+     * Generate RSS feed containing articles audienced to $user
+     * and optionally also audienced to $folder
      *
      * @param User              $user
      * @param null|Folder\Model $folder
@@ -128,12 +129,33 @@ class Controller extends Base
      */
     public function getFeed(User $user, ?Folder\Model $folder)
     {
-        new \Alaress_Probe($user, $folder);
+        /* This is only used for paginating the article set but the rss feed has no pagination
+         */
+        $urlPrefix = '';
 
+        /* Manufacture params
+         * Compact Mode, Page Number, Hide Paginator aren't used here
+         */
         $args = [];
+
+        /* Get articles across all topics
+         */
+        $args[News\Querystring::TOPIC_SLUG] = News\Mapper::TOPIC_ALL_SLUG;
+
+        /* No limit to the number of articles
+         */
+        $args[News\Querystring::LIMIT] = 0;
+
+        /* If a folder was specified, get the feed for that folder
+         */
+        if (null !== $folder) {
+            $args[News\Querystring::FOLDER] = $folder->getId();
+        }
 
         $params = new News\Querystring($args);
 
+        /* Get all the articles across all topics
+         */
         $topicData = (new News\Lists(
             $this->getConfigLoader()->get('search_type_limit'),
             $this->newsMapper,
@@ -146,15 +168,15 @@ class Controller extends Base
             $this->externalUser,
             $this->externalClass
         ))->findForTopic(
-            '',
+            $urlPrefix,
             $params,
-            $this->getUser(),
+            $user,
             $this->topicMapper->findAll(),
             null,
             null
         );
 
-        new \Alaress_Probe($topicData);
+        new \Alaress_Probe($topicData['articles']->getPropertyValues('title'));
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsFeed/rss.twig', [
             'user' => $user,
