@@ -123,11 +123,9 @@ class Controller extends Base
         }
 
         //This is fudged using the same audience screen from the record. So to get the saved records to display, it is easiest to attach them to $record
-        $rolePerms = $this->pastoralAudienceMapper->findByColumnList(['type_id' => $typeId, 'subtype_id' => $subtypeId]);
-
         $record = [];
         $record['id'] = "fakeId";
-        $record['access'] = $rolePerms;
+        $record['access'] = $this->getAudienceForType($typeId, $subtypeId);
 
         $this->getResponse()->content->set([
             'template' => '@pastoralManagement/audiences_modify.twig',
@@ -241,6 +239,12 @@ class Controller extends Base
         }
 
         $this->response->redirect->to($this->getRouteIfAuthorized('pastoralManagement.getAudiences'));
+    }
+
+    public function getAudienceForType($typeId, $subtypeId)
+    {
+        $rolePerms = $this->pastoralAudienceMapper->findByColumnList(['type_id' => $typeId, 'subtype_id' => $subtypeId]);
+        return $rolePerms;
     }
 
     /**

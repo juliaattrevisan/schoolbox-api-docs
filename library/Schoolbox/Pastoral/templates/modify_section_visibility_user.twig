@@ -71,7 +71,10 @@
 
             {# Callback when user added from modal #}
 
-            window.modalUserAdded = function (user) {
+            window.modalUserAdded = function (user, permission) {
+
+                console.log('adding user with permission' + permission);
+
 
                 {# Only add if they don't already exist in the table #}
 
@@ -88,6 +91,24 @@
                         .replace(/{NAME}/g, user.first_name + ' ' + user.last_name)
                         .replace(/{ID}/g, user.id)
                         .replace(/{ROLE}/g, user.role);
+
+                    switch(permission) {
+                        case "0":
+                            html = html.replace(/{DENY_CHECKED}/ig, "checked");
+                            html = html.replace(/{GEN_CHECKED}/ig, "");
+                            html = html.replace(/{CON_CHECKED}/ig, "");
+                            break;
+                        case "2":
+                            html = html.replace(/{DENY_CHECKED}/ig, "");
+                            html = html.replace(/{GEN_CHECKED}/ig, "");
+                            html = html.replace(/{CON_CHECKED}/ig, "checked");
+                            break;
+                        default:
+                            html = html.replace(/{DENY_CHECKED}/ig, "");
+                            html = html.replace(/{GEN_CHECKED}/ig, "checked");
+                            html = html.replace(/{CON_CHECKED}/ig, "");
+                    }
+
 
                     var permissionListUsers = $('#permission-users');
                     permissionListUsers.html(permissionListUsers.html() + html);

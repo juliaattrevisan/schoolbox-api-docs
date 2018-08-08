@@ -43,19 +43,3 @@
     </fieldset>
 </section>
 
-<script>
-    $(function () {
-        $("#typeId", "#subtypeId").on('change', function() {
-            var typeId = $("#typeId").val();
-            var subtypeId = $("#subtypeId").val();
-
-            var audience = [];
-
-            {% foreach audience in audiences %}
-                {% if audience.type == typeId and audience.subtype %}
-                {% endif %}
-            {% endfor %}
-
-        });
-    });
-</script>

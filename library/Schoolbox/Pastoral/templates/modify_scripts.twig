@@ -111,5 +111,50 @@
         $('#formPastoralPreloader').addClass('hide');
         $('#formPastoral').removeClass('hide');
         $('#formPastoralDelete').removeClass('hide');
-    });
+
+
+
+
+
+        $("#typeId,#subtypeId").on('change', function() {
+            console.log("changed");
+            loadAudience();
+        });
+
+        function loadAudience() {
+
+            var typeId = $("#typeId").val();
+            var subtypeId = $("#subtypeId").val();
+
+            console.log(typeId);
+            console.log(subtypeId);
+
+            {% for audience in audiences %}
+            if ({{ audience.typeId }} == typeId && {{ audience.subtypeId | default("null") }} == subtypeId) {
+                {% if audience.group_id %}
+                addGroup({{ audience.group_id }});
+
+                {% elseif audience.user.id %}
+                console.log("Access" + "{{ audience.access }}");
+                window.modalUserAdded({
+                    'id' : {{ audience.user.id }},
+                    'first_name': "{{ audience.user.firstname }}",
+                    'last_name': "{{ audience.user.lastname }}",
+                    'role': "{{ audience.user.role.name }}",
+                }, "{{ audience.access}}");
+                {% else %}
+                console.log("ERROR");
+                {% endif %}
+            }
+            {% endfor %}
+
+        }
+
+        loadAudience();
+
+
+
+});
 </script>
+
+{{ dump(audiences) }}

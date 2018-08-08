@@ -158,12 +158,7 @@
 
             {# Add role to table #}
 
-            $('[data-role-add]').click(function (e) {
-                e.preventDefault();
-
-                var roleId = $(this).attr('data-role-add');
-                var roleName = $(this).attr('data-role-name');
-
+            function addRole(roleId, roleName) {
                 if (window.rolesAdded[roleId] !== true) {
                     $('#empty-roles').remove();
 
@@ -182,6 +177,15 @@
                 updateRolePermissionsClick();
                 updateRolesModal();
                 updateVisibility();
+            }
+
+            $('[data-role-add]').click(function (e) {
+                e.preventDefault();
+
+                var roleId = $(this).attr('data-role-add');
+                var roleName = $(this).attr('data-role-name');
+
+                addRole(roleId, roleName);
 
                 var remaining = 0;
 
