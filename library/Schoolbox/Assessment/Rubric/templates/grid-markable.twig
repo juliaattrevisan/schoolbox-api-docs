@@ -152,10 +152,17 @@
                                    value="{{ group.scaledMark }}"/> / {{ group.max }}
 
                         {% elseif markSchemeName == 'LetterGrade' %}
+                            <select data-mark-input
+                                    name="mark"
+                                    tabindex="{{ tabIndex }}"
+                                    title="Select a {{ locale.grades.proper }}"
+                                    class="groupMax"
+                                    id="group-{{ group.id }}-mark">
 
-                            <select id="groupMark">
-                                {# TODO if letter grade: provide dropdown for letters #}
-                            </select>
+                                {% for level, letter in markType.conf %}
+                                    <option>{{ letter }}</option>
+                                {% endfor %}
+                        </select>
 
                         {% elseif markSchemeName == 'Percentage'%}
 
