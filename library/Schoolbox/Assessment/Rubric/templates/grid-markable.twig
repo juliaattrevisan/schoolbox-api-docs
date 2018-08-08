@@ -263,15 +263,15 @@
 
                 if (groupSummary.length) {
                     if (! customisedMark[groupId]) {
+                        groupSummary.attr('data-scaled-mark', scaledGroupMark);
+                        groupSummary.attr('data-mark', unscaledGroupMark);
+
                         if (groupSummary.find(".groupMax").is("select")) {
                             var percentage = groupSummary.attr('data-mark') * (100 / groupSummary.attr('data-row-max-sum'));
                             assignLetterGrade(percentage, groupSummary.find(".groupMax").val(scaledGroupMark));
                         } else {
                             groupSummary.find(".groupMax").val(scaledGroupMark);
                         }
-
-                        groupSummary.attr('data-scaled-mark', scaledGroupMark);
-                        groupSummary.attr('data-mark', unscaledGroupMark);
                     }
                 }
 
@@ -335,9 +335,17 @@
 
             var $descriptorCheckboxes = $groupRows.find('input');
             var scaledGroupMark = getScaledGroupMark($descriptorCheckboxes, groupSummary);
+            var unscaledGroupMark = summateDescriptors($descriptorCheckboxes);
 
-            $gradeInput.val(scaledGroupMark);
             groupSummary.attr('data-scaled-mark', scaledGroupMark);
+            groupSummary.attr('data-mark', unscaledGroupMark);
+
+            if ($gradeInput.is("select")) {
+                var percentage = groupSummary.attr('data-mark') * (100 / groupSummary.attr('data-row-max-sum'));
+                assignLetterGrade(percentage, $gradeInput.val(scaledGroupMark));
+            } else {
+                $gradeInput.val(scaledGroupMark);
+            }
 
             // Up for discussion, but I'd imagine the user would like the marks to update automatically
             // with descriptor changes once they've clicked this button
