@@ -5,8 +5,8 @@
  # @param int componentInstanceId
  # @param Collection|Topic[] topics
  # @param int topicAll
+ # @param string slug
  # @param int compactMode
- # @param int pageNum
  # @param int limit
  #}
 <script src="/javascript/shared/comms/articletabs.js"></script>
@@ -14,10 +14,10 @@
 <script>
 
     {% set querystringParams = [
-        'c=' ~ compactMode,
         'topic=' ~ slug,
+        'c=' ~ compactMode,
         'l=' ~ limit,
-        'sp=0'
+        'hp=1'
     ]|join('&') %}
 
     $(function() {
@@ -47,12 +47,14 @@
 </script>
 
 {% include '@commsNews/tabs.twig' with {
+    url: routeLookup('commsNews.getListByTopic'),
     topicContainerId: 'news-topics-' ~ componentInstanceId,
     topics: topics,
     topicAll: topicAll,
     slug: slug,
     compactMode: compactMode,
-    limit: limit
+    limit: limit,
+    hidePaginator: true
 } %}
 
 <div id="news-container-{{ componentInstanceId }}">

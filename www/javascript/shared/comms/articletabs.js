@@ -44,26 +44,10 @@
                  */
                 selectedUrl: '',
 
-                /* Return in compact mode or normal mode
-                 */
-                compactMode: false,
-
                 /* Update the url upon tab change
                  * The url comes from backend, telling you the url of the topic requested
                  */
                 updateUrl: false,
-
-                /* Show paginator
-                 */
-                showPaginator: false,
-
-                /* The current page number
-                 */
-                pageNum: -1,
-
-                /* The current limit
-                 */
-                limit: null,
 
                 // Callback on tab change
                 onChange: function () {},
@@ -93,7 +77,6 @@
                 url: url,
                 dataType: 'json'
             }).success(function (response) {
-
                 $(config.element).html(response.fragment);
 
                 // Fire onChangeSuccess callback
@@ -113,6 +96,12 @@
          * Set up event listeners
          */
         function initListeners() {
+            if (config.updateUrl) {
+                window.addEventListener('popstate', function () {
+                    window.location = location.href;
+                });
+            }
+
             $(config.topicTabs).on('click', 'a', function(event) {
                 event.preventDefault();
 

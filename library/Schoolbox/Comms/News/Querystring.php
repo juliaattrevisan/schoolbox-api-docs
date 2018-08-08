@@ -3,10 +3,11 @@
  * Querystring
  *
  * Rebuild a querystring or find out the particular pieces
+ *  - compact mode
  *  - topic slug
  *  - page number
  *  - limit
- *  - show paginator
+ *  - hide paginator
  * Encapsulate in a stringable class
  * Encapsulate helpers
  *
@@ -26,27 +27,27 @@ class Querystring
     /**
      * Querystring param for the Compact Mode option
      */
-    public const COMPACT_MODE_PARAM = 'c';
+    public const COMPACT_MODE = 'c';
 
     /**
      * Querystring param for the current Page Number chosen
      */
-    public const PAGE_NUMBER_PARAM = 'page';
+    public const PAGE_NUMBER = 'p';
 
     /**
      * Querystring param for the current Limit chosen
      */
-    public const LIMIT_PARAM = 'l';
+    public const LIMIT = 'l';
 
     /**
      * Querystring param for the current topic chosen
      */
-    public const TOPIC_SLUG_PARAM = 'topic';
+    public const TOPIC_SLUG = 'topic';
 
     /**
-     * Querystring param for the Show Pagination option
+     * Querystring param for the Hide Pagination option
      */
-    public const SHOW_PAGINATOR_PARAM = 'sp';
+    public const HIDE_PAGINATOR = 'hp';
 
     /**
      * An array of key/value pairs corresponding to GET params
@@ -59,23 +60,16 @@ class Querystring
     /**
      * Querystring constructor.
      *
-     * @param int $articlesPerPage
-     * @param     $data
+     * @param $data
      */
-    public function __construct(int $articlesPerPage, $data)
+    public function __construct($data)
     {
-        $compactMode = $data[self::COMPACT_MODE_PARAM];
-        $slug = $data[self::TOPIC_SLUG_PARAM];
-        $pageNum = $this->determinePageNum($data[self::PAGE_NUMBER_PARAM]);
-        $limit = $this->determineLimit($data[self::LIMIT_PARAM]) ?: $articlesPerPage;
-        $showPaginator = $data[self::SHOW_PAGINATOR_PARAM];
-
         $this->querystring = [
-            self::COMPACT_MODE_PARAM => $compactMode,
-            self::TOPIC_SLUG_PARAM => $slug,
-            self::PAGE_NUMBER_PARAM => $pageNum,
-            self::LIMIT_PARAM => $limit,
-            self::SHOW_PAGINATOR_PARAM => $showPaginator
+            self::COMPACT_MODE => $data[self::COMPACT_MODE],
+            self::TOPIC_SLUG => $data[self::TOPIC_SLUG],
+            self::PAGE_NUMBER => $data[self::PAGE_NUMBER],
+            self::LIMIT => $data[self::LIMIT],
+            self::HIDE_PAGINATOR => $data[self::HIDE_PAGINATOR]
         ];
     }
 
@@ -87,7 +81,7 @@ class Querystring
      */
     public function getCompactMode()
     {
-        return $this->querystring[self::COMPACT_MODE_PARAM];
+        return $this->querystring[self::COMPACT_MODE];
     }
 
     /**
@@ -97,7 +91,7 @@ class Querystring
      */
     public function getSlug()
     {
-        return $this->querystring[self::TOPIC_SLUG_PARAM];
+        return $this->querystring[self::TOPIC_SLUG];
     }
 
 
@@ -108,7 +102,7 @@ class Querystring
      */
     public function getPageNum()
     {
-        return $this->querystring[self::PAGE_NUMBER_PARAM];
+        return $this->determinePageNum($this->querystring[self::PAGE_NUMBER]);
     }
 
 
@@ -119,7 +113,7 @@ class Querystring
      */
     public function getLimit()
     {
-        return $this->querystring[self::LIMIT_PARAM];
+        return $this->querystring[self::LIMIT];
     }
 
 
@@ -128,9 +122,9 @@ class Querystring
      *
      * @return bool
      */
-    public function getShowPaginator(): bool
+    public function getHidePaginator(): bool
     {
-        return (bool)$this->querystring[self::SHOW_PAGINATOR_PARAM];
+        return (bool)$this->querystring[self::HIDE_PAGINATOR];
     }
 
 
@@ -144,14 +138,18 @@ class Querystring
         return $this->querystring;
     }
 
+
     /**
-     * String representatin
+     * String representation of the original values provided
+     * Remove keys that have empty values
      *
      * @return string
      */
     public function __toString()
     {
-        return http_build_query($this->querystring);
+        return http_build_query(array_filter($this->querystring, function ($value) {
+            return \strlen($value);
+        }));
     }
 
 
@@ -173,6 +171,7 @@ class Querystring
         return Mapper::TOPIC_ALL_SLUG;
     }
 
+
     /**
      * The page number to obtain; default to 1
      * Otherwise use the page number provided
@@ -183,25 +182,5 @@ class Querystring
     private function determinePageNum(?string $param): int
     {
         return (int)$param ?: 1;
-    }
-
-    /**
-     * $limit can be 'all' or unspecified; this equates to "don't impose a limit"
-     * ("all" could come from a component config option)
-     *
-     * @param null|string $limit
-     * @return int
-     */
-    private function determineLimit(?string $limit): int
-    {
-        /* limit not set at all; don't impose limits
-         */
-        if (('all' === $limit) || (null === $limit) || !(int)$limit) {
-            return 0;
-        }
-
-        /* use whatever was provided
-         */
-        return (int)$limit;
     }
 }

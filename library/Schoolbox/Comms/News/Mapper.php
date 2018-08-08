@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Comms\News;
 
+use Alaress\Database\Predicate\Builder;
 use Schoolbox\News\TopicMapper;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
@@ -172,6 +173,67 @@ class Mapper extends \Schoolbox\Mapper
 
 
     /**
+     * Get a list of years that have article(s) that were audienced to a user
+     *
+     * @param array $articleIdsForUser
+     * @return array
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \UnderflowException
+     */
+    public function findYearsAndMonthsWithArticles(array $articleIdsForUser): array
+    {
+
+        /* If you aren't able to see anything at all, the archive will be empty
+         */
+        if (!\count($articleIdsForUser)) {
+            return [];
+        }
+
+        /* Dates - must be expired, accepted, published and not deleted
+         */
+        $now = \Alaress_Date_Format::now()->getDatabase();
+
+        $pb = $this->getPredicateBuilder()
+            ->lessThan('expires_at', $now)
+            ->lessThan('publish_at', $now)
+            ->notNull('accepted_at')
+            ->isNull('deleted_at');
+
+        /* These are articles that the user could see
+         * Don't provide year/month combinations that contain articles, but the user isn't in their audience lol
+         */
+        $pb->in('id', $articleIdsForUser);
+
+        $where = implode("\nAND ", $pb->getWhere());
+
+        $query = "
+            SELECT 
+                SUBSTRING(publish_at, 1, 4) AS year,
+                SUBSTRING(publish_at, 6, 2) AS month
+            FROM {$this->getTable()}
+            WHERE {$where}
+            GROUP BY year, month
+            ORDER BY year DESC, month DESC
+        ";
+
+        $statement = $this->database->prepare($query);
+
+        $statement->execute($pb->getParams());
+
+        $years = [];
+
+        /* Convert 06 into just 6, because I'm taking chunks out of a timestamp 2018-06-01 11:22:33.
+         * The url is an int. To avoid issues with the leading zero I just force int on it.
+         */
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $years[$row['year']][(int)$row['month']] = true;
+        }
+
+        return $years;
+    }
+
+
+    /**
      * Find just the ids for the articles in a topic
      * We generally use this for pagination counts where we need a count instead of hydrated things
      *
@@ -179,94 +241,127 @@ class Mapper extends \Schoolbox\Mapper
      *
      * Filters to the $availableArticleIds that can be seen
      *
-     * @param array $availableArticleIds
-     * @param int   $topicId
-     * @param int   $limit
-     * @param int   $pageNum
+     * @param array    $availableArticleIds
+     * @param int      $topicId
+     * @param int|null $limit
+     * @param int|null $pageNum
+     * @param int|null $year
+     * @param int|null $month
      * @return array
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \UnderflowException
+     * @throws \DomainException
      */
-    public function findArticleIdsForTopic(array $availableArticleIds, int $topicId, int $limit = 0, int $pageNum = 0): array
+    public function findArticleIdsForTopic(array $availableArticleIds, int $topicId, ?int $limit, ?int $pageNum, ?int $year, ?int $month): array
     {
-
-        /* Filter to articles that I can see
+        /* This user can't see any articles
          */
-        $availableArticleIdsSql = implode(', ', $availableArticleIds);
+        if (!\count($availableArticleIds)) {
+            return [];
+        }
+
+        /* Invalid combination of year/month params
+         */
+        if ($month && !$year) {
+            throw new \DomainException('Invalid year/month combination');
+        }
+
+        /* If either year or month is specified, we're looking in the news archive
+         * Look for expired items matching a certain year/month combination
+         */
+        $now = \Alaress_Date_Format::now()->getDatabase();
+
+        /* Dates - must be accepted, published and not deleted
+         */
+        $pb = $this->getPredicateBuilder()
+            ->lessThan('publish_at', $now)
+            ->notNull('accepted_at')
+            ->isNull('deleted_at')
+            ->in('id', $availableArticleIds);
+
+        if ($year || $month) {
+            $paddedMonth = '';
+
+            if ($month) {
+                $paddedMonth = str_pad((string)$month, 2, '0', STR_PAD_LEFT);
+            }
+
+            $yearMonth = "{$year}-{$paddedMonth}%";
+
+            $pb->lessThan('expires_at', $now);
+            $pb->like('publish_at', $yearMonth);
+        } else {
+            $pb->greaterThan('expires_at', $now);
+        }
 
         /* If $topicId is provided, only get articles for that topic
          * Otherwise get $limit articles from any topic
          */
+        $join = $groupBy = '';
+        if ($topicId !== self::TOPIC_ALL_ID) {
+            $join    = "INNER JOIN comms_news_article_topic cnat ON {$this->table}.id = cnat.article_id ";
+            $groupBy = 'GROUP BY id';
+            $pb->equals('cnat.topic_id', $topicId);
+        }
+
+        $where = implode("\nAND ", $pb->getWhere());
+
+        /* TODO: Sorting algorithm SA-7097
+         */
         $query = "
             SELECT id
             FROM {$this->table}
-            WHERE publish_at IS NOT NULL
-            AND publish_at < NOW()
-            AND accepted_at IS NOT NULL
-            AND expires_at > NOW()
-            AND deleted_at IS NULL
+            {$join}
+            WHERE {$where}
+            {$groupBy}
+            ORDER BY publish_at DESC, created_at DESC
         ";
 
-        if (\count($availableArticleIds)) {
-            $query .= "
-                AND id IN ({$availableArticleIdsSql}) 
-            ";
-        }
-
-        if ($topicId !== self::TOPIC_ALL_ID) {
-            $query = "
-                SELECT id
-                FROM {$this->table}
-                INNER JOIN comms_news_article_topic cnat ON {$this->table}.id = cnat.article_id 
-                WHERE publish_at IS NOT NULL
-                AND publish_at < NOW()
-                AND accepted_at IS NOT NULL
-                AND expires_at > NOW()
-                AND deleted_at IS NULL
-                AND cnat.topic_id = :topicId
-            ";
-
-            if (\count($availableArticleIds)) {
-                $query .= "
-                    AND id IN ({$availableArticleIdsSql}) 
-                ";
-            }
-
-            $query .= '
-                GROUP BY id
-            ';
-        }
-
-        /* TODO: Sorting algorithm
-         */
-        $query .= '
-            ORDER BY publish_at DESC, created_at DESC
-        ';
-
         /* Limits and offsets
+         * Apply either the $limit provided, or use the system default
+         *
+         *     $limit === int:  use the value of the int for the number of items per page
+         *     $limit === null: use system default for number of items per page
+         *     $limit === 0:    explicitly get all the items and disregard pagination ('all' is cast to zero)
          */
-        if ($limit) {
-            $query .= 'LIMIT :limit';
-
-            if ($pageNum) {
+        if ($pageNum) {
+            if ($limit || $limit === null) {
+                $query .= ' LIMIT :limit';
                 $query .= ' OFFSET :offset';
             }
         }
 
         $statement = $this->database->prepare($query);
 
-        /* Because pdo does some micky mouse shenanigans
+        /* Bind the pb params
          */
-        if ($topicId !== self::TOPIC_ALL_ID) {
-            $statement->bindValue('topicId', $topicId, \PDO::PARAM_INT);
+        foreach ($pb->getParams() as $key => $value) {
+            $statement->bindValue($key, $value);
         }
 
-        if ($limit) {
-            $statement->bindValue('limit', $limit, \PDO::PARAM_INT);
+        /* Because pdo does some mickey mouse shenanigans
+         */
+        if ($pageNum) {
+            if ($limit || $limit === null) {
 
-            if ($pageNum) {
-                $statement->bindValue('offset', $limit*($pageNum-1), \PDO::PARAM_INT);
+                /* Apply either the $limit provided, or use the system default
+                 */
+                $derivedLimit = $limit;
+
+                if (!$limit) {
+                    $derivedLimit = (int)$this->getConfigLoader()->get('search_type_limit');
+                }
+
+                $statement->bindValue('limit', $derivedLimit, \PDO::PARAM_INT);
+
+                /* Paginate
+                 */
+                $statement->bindValue('offset', $derivedLimit*($pageNum-1), \PDO::PARAM_INT);
             }
         }
 
+        /* finally
+         */
         $statement->execute();
 
         $articlesInTopic = [];

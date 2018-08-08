@@ -525,6 +525,8 @@ class Controller extends Base
      *
      * @api GET /comms/news/list
      *
+     * @param int|null $year
+     * @param int|null $month
      * @throws InvalidArgumentException
      * @throws RouteNotFound
      * @throws \Alaress\Database\Predicate\InvalidColumnException
@@ -532,27 +534,82 @@ class Controller extends Base
      * @throws \OutOfRangeException
      * @throws \UnderflowException
      * @throws \UnexpectedValueException
+     * @throws \DomainException
      */
-    public function getListByTopic()
+    public function getListByTopic(?int $year, ?int $month)
     {
         if ($this->getRequest()->isXhr()) {
-            $params = new Querystring($this->getConfigLoader()->get('search_type_limit'), $this->getRequest()->query);
+            $params = new Querystring($this->getRequest()->query);
             $topics = $this->topicMapper->findAll();
 
             /* The requested data set to load, given the params provided
              */
-            $outcome = $this->generatePartial($params, $topics, $params->getShowPaginator());
-            $content = $this->buildUnthemedHtmlOutput('@commsNews/list.twig', $outcome)->getAsString();
-            $viewAllLink = $this->getRouteIfAuthorized('commsNews.getIndex') . '?' . $params;
+            if ($year) {
+                $urlPrefix = $this->getRouter()->generate('commsNews.getArchive', [ 'year' => $year, 'month' => $month ]);
+            } else {
+                $urlPrefix = $this->getRouter()->generate('commsNews.getIndex');
+            }
+
+            $partialData = $this->generatePartial($urlPrefix, $params, $topics, $params->getHidePaginator(), $year, $month);
+            $content     = $this->buildUnthemedHtmlOutput('@commsNews/partial.twig', $partialData)->getAsString();
+            $viewAllLink = "{$this->getRouteIfAuthorized('commsNews.getIndex')}?topic={$params->getSlug()}";
 
             $this->getResponse()->content->set($this->buildJsonOutput([
                 'success' => true,
                 'title' => $this->getDi()->get('l10n')->translate('news', false, true),
-                'url' => $outcome['currentUrl'],
+                'url' => $partialData['currentUrl'],
                 'fragment' => $content,
-                'viewAllLink' => $outcome['articles']->count() ? $viewAllLink : null
+                'viewAllLink' => $partialData['articles']->count() ? $viewAllLink : null
             ]));
         }
+    }
+
+
+    /**
+     * News Archive
+     *
+     * @param int|null $year
+     * @param int|null $month
+     * @throws InvalidArgumentException
+     * @throws RouteNotFound
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \OutOfRangeException
+     * @throws \UnderflowException
+     * @throws \UnexpectedValueException
+     * @throws \DomainException
+     */
+    public function getArchive(int $year = null, int $month = null)
+    {
+        $params = new Querystring($this->getRequest()->query);
+        $topics = $this->topicMapper->findAll();
+
+        /* The initial data set to load, given the params provided
+         * Compact Mode is hardcoded to be disabled from this context
+         * HidePaginator is always false in this context
+         */
+        $urlPrefix = $this->getRouter()->generate('commsNews.getArchive', ['year' => $year, 'month' => $month]);
+
+        $partialData = $this->generatePartial($urlPrefix, $params, $topics, false, $year, $month);
+        $content = $this->buildUnthemedHtmlOutput('@commsNews/partial.twig', $partialData)->getAsString();
+
+        /* Merge a whole bunch of other settings too
+         * Specifically applies to the index page which loads slightly differently than component variant
+         */
+        $data = [
+            'initialContent' => $content,
+            'topics' => $topics,
+            'topicAll' => Mapper::TOPIC_ALL_SLUG,
+            'slug' => $params->getSlug(),
+
+            /* Archive-specific vars that don't appear anywhere else
+             */
+            'availableYearsAndMonths' => $this->newsMapper->findYearsAndMonthsWithArticles($partialData['articleIdsForUser']),
+            'year' => $year,
+            'month' => $month,
+        ];
+
+        $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/archive.twig', $data));
     }
 
 
@@ -568,23 +625,21 @@ class Controller extends Base
      * @throws \OutOfRangeException
      * @throws \UnderflowException
      * @throws \UnexpectedValueException
+     * @throws \DomainException
      */
     public function getIndex()
     {
-        /* This is always on in this News Index context
-         * If you visit comms/news, the querystring param is empty so you have to forcibly set it to true
-         */
-        $showPaginator = true;
-
-        $params = new Querystring($this->getConfigLoader()->get('search_type_limit'), $this->getRequest()->query);
+        $params = new Querystring($this->getRequest()->query);
         $topics = $this->topicMapper->findAll();
 
         /* The initial data set to load, given the params provided
          * Compact Mode is hardcoded to be disabled from this context
-         * ShowPaginator is always true in this context
+         * HidePaginator is always false in this context
          */
-        $outcome = $this->generatePartial($params, $topics, $showPaginator);
-        $content = $this->buildUnthemedHtmlOutput('@commsNews/list.twig', $outcome)->getAsString();
+        $urlPrefix = $this->getRouter()->generate('commsNews.getIndex');
+
+        $partialData = $this->generatePartial($urlPrefix, $params, $topics, false, null, null);
+        $content = $this->buildUnthemedHtmlOutput('@commsNews/partial.twig', $partialData)->getAsString();
 
         /* Merge a whole bunch of other settings too
          * Specifically applies to the index page which loads slightly differently than component variant
@@ -593,7 +648,6 @@ class Controller extends Base
             'initialContent' => $content,
             'topics' => $topics,
             'topicAll' => Mapper::TOPIC_ALL_SLUG,
-            'showPaginator' => $showPaginator,
             'slug' => $params->getSlug()
         ];
 
@@ -605,20 +659,24 @@ class Controller extends Base
      * Generate a partial fragment containing articles
      * Used in both synchronous and asynchronous requests
      *
+     * @param string             $urlPrefix
      * @param Querystring        $params
      * @param Collection|Topic[] $topics
-     * @param bool               $showPaginator
+     * @param bool               $hidePaginator
+     * @param int|null           $year
+     * @param int|null           $month
      * @return array
      * @throws InvalidArgumentException
-     * @throws RouteNotFound
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \OutOfRangeException
      * @throws \UnderflowException
      * @throws \UnexpectedValueException
+     * @throws \DomainException
      */
-    private function generatePartial(Querystring $params, Collection $topics, bool $showPaginator): array
+    private function generatePartial(string $urlPrefix, Querystring $params, Collection $topics, bool $hidePaginator, ?int $year, ?int $month): array
     {
-        $outcome = (new Lists(
+        $topicData = (new Lists(
+            $this->getConfigLoader()->get('search_type_limit'),
             $this->newsMapper,
             $this->policyMapper,
             $this->saveForLaterMapper,
@@ -629,20 +687,22 @@ class Controller extends Base
             $this->externalUser,
             $this->externalClass
         ))->findForTopic(
+            $urlPrefix,
+            $params,
             $this->getUser(),
             $topics,
-            $params,
-            $this->getRouter()->generate('commsNews.getIndex')
+            $year,
+            $month
         );
 
         /* Always provide paginator from this context
          */
-        $outcome = array_merge($outcome, [
-            'showPaginator' => $showPaginator,
+        $partialData = array_merge($topicData, [
+            'hidePaginator' => $hidePaginator,
             'compactMode' => $params->getCompactMode(),
             'pageNum' => $params->getPageNum()
         ]);
 
-        return $outcome;
+        return $partialData;
     }
 }

@@ -13,14 +13,14 @@
 namespace Schoolbox\Comms\News;
 
 use Alaress\Database\Connector\IConnector;
-use Alaress\Paginator\Paginator;
-use Alaress\Paginator\UrlPaginator;
+use Alaress\Paginator\Paginator as BasePaginator;
 use External_Class;
 use External_User;
 use Schoolbox\Collection;
 use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Comms\News\Audience\BusinessRules;
 use Schoolbox\Comms\News\Audience\RelationshipFilterer;
+use Schoolbox\IConfigLoader;
 use Schoolbox\News\Topic;
 use Schoolbox\Permission\Access;
 use Schoolbox\Resource\Folder;
@@ -29,6 +29,14 @@ use Schoolbox\UserMapper;
 
 class Lists
 {
+
+    /**
+     * System default for the number of items per page
+     * Typically connects to search_type_limit
+     *
+     * @var int
+     */
+    private $defaultLimit;
 
     /**
      * @var Mapper
@@ -75,9 +83,11 @@ class Lists
      */
     private $externalClass;
 
+
     /**
      * Lists constructor.
      *
+     * @param int                     $defaultLimit
      * @param Mapper                  $newsMapper
      * @param Policy\Mapper           $policyMapper
      * @param SaveForLater\Mapper     $saveForLaterMapper
@@ -89,6 +99,7 @@ class Lists
      * @param External_Class          $externalClass
      */
     public function __construct(
+        int $defaultLimit,
         Mapper $newsMapper,
         Policy\Mapper $policyMapper,
         SaveForLater\Mapper $saveForLaterMapper,
@@ -99,6 +110,7 @@ class Lists
         External_User $externalUser,
         External_Class $externalClass
     ) {
+        $this->defaultLimit = $defaultLimit;
         $this->newsMapper = $newsMapper;
         $this->policyMapper = $policyMapper;
         $this->saveForLaterMapper = $saveForLaterMapper;
@@ -131,18 +143,21 @@ class Lists
      * The n-n relational between articles and topics precludes proper usage of findAll()
      * with a limit - it doesn't count properly
      *
-     * @param User                $user
-     * @param Collection|Topic[]  $topics
-     * @param Querystring         $params
-     * @param string              $urlPrefix
+     * @param string             $urlPrefix
+     * @param Querystring        $params
+     * @param User               $user
+     * @param Collection|Topic[] $topics
+     * @param int|null           $year
+     * @param int|null           $month
      * @return array
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \InvalidArgumentException
      * @throws \OutOfRangeException
      * @throws \UnderflowException
      * @throws \UnexpectedValueException
+     * @throws \DomainException
      */
-    public function findForTopic(User $user, Collection $topics, Querystring $params, string $urlPrefix): array
+    public function findForTopic(string $urlPrefix, Querystring $params, User $user, Collection $topics, ?int $year, ?int $month): array
     {
         $policies = $this->policyMapper->findAll()->indexBy('identifier');
 
@@ -170,11 +185,16 @@ class Lists
             )
         ))->findArticlesForUser($user);
 
-        /* Articles in $topicId that $user can see
+        /* $articleIds:   Articles in $topicId that were audienced to $user
+         * $availableIds: The total available articles that were audienced to user
+         *
          * Component config can set "All" as its limit, filtered to the list of articles that can be seen
-         * Hydrate the objects and hope for the best; reorder them in the order requested
          */
-        $articleIds = $this->newsMapper->findArticleIdsForTopic($articleIdsForUser, $topicId, $params->getLimit(), $params->getPageNum());
+        $articleIds = $this->newsMapper->findArticleIdsForTopic($articleIdsForUser, $topicId, $params->getLimit(), $params->getPageNum(), $year, $month);
+        $availableIds = $this->newsMapper->findArticleIdsForTopic($articleIdsForUser, $topicId, 0, 0, $year, $month);
+
+        /* Hydrate the objects and hope for the best; reorder them in the order requested
+         */
         $records = $this->newsMapper->findByColumn('id', $articleIds)->indexBy('id');
 
         $articles = $this->newsMapper->createCollection();
@@ -190,7 +210,29 @@ class Lists
         /* Get an accompanying paginator
          */
         $url = "{$urlPrefix}?{$params}";
-        $paginator = $this->generatePaginator($url, $params->getLimit(), \count($this->newsMapper->findArticleIdsForTopic($articleIdsForUser, $topicId)));
+
+        /* Limits and offsets
+         * Apply either the $limit provided, or use the system default
+         *
+         *     $limit === int:  use the value of the int for the number of items per page
+         *     $limit === null: use system default for number of items per page
+         *     $limit === 0:    explicitly get all the items and disregard pagination ('all' is cast to zero)
+         */
+        $paginator = null;
+
+        if ($params->getLimit()) {
+            $paginator = $this->generatePaginator(
+                $url,
+                $params->getLimit(),
+                \count($availableIds)
+            );
+        } elseif ($params->getLimit() === null) {
+            $paginator = $this->generatePaginator(
+                $url,
+                $this->defaultLimit,
+                \count($availableIds)
+            );
+        }
 
         /* Figure out the articles that this user has saved for later
          */
@@ -207,6 +249,10 @@ class Lists
             'saveForLater' => $policies->getOffset('save_for_later')->getValue(),
             'savedArticleIds' => $savedArticleIds,
             'unsaved' => SaveForLater\Mapper::UNSAVED,
+
+            /* Because this is really convenient
+             */
+            'articleIdsForUser' => $articleIdsForUser,
 
             /* For the paginator
              */
@@ -265,10 +311,10 @@ class Lists
      * @param string $url
      * @param int    $limit
      * @param int    $total
-     * @return UrlPaginator|null
+     * @return Paginator|null
      * @throws \OutOfRangeException
      */
-    private function generatePaginator(string $url, int $limit, int $total): ?UrlPaginator
+    private function generatePaginator(string $url, int $limit, int $total): ?Paginator
     {
         /* No limit specified; no pagination required
          */
@@ -276,14 +322,14 @@ class Lists
             return null;
         }
 
-        $paginator = (new Paginator())
+        $paginator = (new BasePaginator())
             ->setPageSize($limit)
             ->setTotal($total);
 
-        $urlPaginator = (new UrlPaginator())
+        $urlPaginator = (new Paginator())
             ->setPaginator($paginator)
             ->setUrl($url)
-            ->setParam(Querystring::PAGE_NUMBER_PARAM);
+            ->setParam(Querystring::PAGE_NUMBER);
 
         return $urlPaginator;
     }
