@@ -325,9 +325,10 @@
         copyCkEditorValues.call(self, elem);
 
         // Update textarea inner htmls with the value, for firefox <= 51
-        elem.closest(self.options.submittable).find('textarea').each(function() {
-            $(this).html($(this).val());
-        });
+        // (No longer required as FF <= 51 no longer supported)
+        // elem.closest(self.options.submittable).find('textarea').each(function() {
+        //     $(this).html($(this).val());
+        // });
 
         /**
          * Validate the form
