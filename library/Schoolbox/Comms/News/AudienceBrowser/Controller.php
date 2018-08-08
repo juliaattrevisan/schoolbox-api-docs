@@ -153,38 +153,34 @@ class Controller extends Base
     {
         $data = [];
 
-        $data[Model::RELATIONSHIP_SELF] = [
-            'id' => Segment\Codec::encode($row['entity_type'], $row['id'], Model::RELATIONSHIP_SELF),
+        $baseData = [
             'name' => $row['name'],
             'entityTypeOriginal' => $row['entity_type'],
             'entityType' => $translator->translateEntityType($row['entity_type']),
-            'modifier' => $translator->translateModifier(Model::RELATIONSHIP_SELF),
         ];
+
+        $data[Model::RELATIONSHIP_SELF] = array_merge($baseData, [
+            'id' => Segment\Codec::encode($row['entity_type'], $row['id'], Model::RELATIONSHIP_SELF),
+            'modifier' => $translator->translateModifier(Model::RELATIONSHIP_SELF),
+        ]);
 
         /* Only provide the Parents and Teachers modifiers to strats which support them
          * We exclude Parents and Teachers modifiers from Users due to privacy reasons
          */
         if ($registry->hasModifier($row['entity_type'])) {
-
             /* Parents modifier
              */
-            $data[Model::RELATIONSHIP_PARENTS_OF] = [
+            $data[Model::RELATIONSHIP_PARENTS_OF] = array_merge($baseData, [
                 'id' => Segment\Codec::encode($row['entity_type'], $row['id'], Model::RELATIONSHIP_PARENTS_OF),
-                'name' => $row['name'],
-                'entityTypeOriginal' => $row['entity_type'],
-                'entityType' => $translator->translateEntityType($row['entity_type']),
                 'modifier' => $translator->translateModifier(Model::RELATIONSHIP_PARENTS_OF),
-            ];
+            ]);
 
             /* Teachers modifier
              */
-            $data[Model::RELATIONSHIP_TEACHERS_OF] = [
+            $data[Model::RELATIONSHIP_TEACHERS_OF] = array_merge($baseData, [
                 'id' => Segment\Codec::encode($row['entity_type'], $row['id'], Model::RELATIONSHIP_TEACHERS_OF),
-                'name' => $row['name'],
-                'entityTypeOriginal' => $row['entity_type'],
-                'entityType' => $translator->translateEntityType($row['entity_type']),
                 'modifier' => $translator->translateModifier(Model::RELATIONSHIP_TEACHERS_OF),
-            ];
+            ]);
         }
 
         /* Generate nice html versions of each data point
