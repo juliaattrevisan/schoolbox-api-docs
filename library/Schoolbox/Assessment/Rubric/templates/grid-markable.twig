@@ -159,8 +159,8 @@
                                     class="groupMax"
                                     id="group-{{ group.id }}-mark">
 
-                                {% for level, letter in markType.conf %}
-                                    <option>{{ letter }}</option>
+                                {% for value, letter in markType.conf %}
+                                    <option value="{{ value }}" data-letter="{{ letter }}">{{ letter }}</option>
                                 {% endfor %}
                         </select>
 
@@ -262,7 +262,12 @@
 
                 if (groupSummary.length) {
                     if (! customisedMark[groupId]) {
-                        groupSummary.find(".groupMax").val(scaledGroupMark);
+                        if (groupSummary.find(".groupMax").is("select")) {
+                            assignLetterGrade(scaledGroupMark, groupSummary.find(".groupMax").val(scaledGroupMark));
+                        } else {
+                            groupSummary.find(".groupMax").val(scaledGroupMark);
+                        }
+
                         groupSummary.attr('data-scaled-mark', scaledGroupMark);
                     }
                 }
@@ -343,6 +348,27 @@
 
             parseFraction(rubricSummary, e.namespace);
         })
+
+        function assignLetterGrade(numericMark, dropdown) {
+            // TODO numericMark needs to be a percentage
+
+            var grades = [];
+            dropdown.find("option").each(function(index, option) {
+                grades.push(
+                    {'value' : $(option).prop("value"), 'letter' : $(option).data('letter')}
+                );
+            });
+
+            var markLetterValue = 0;
+            grades.forEach(function(grade, index) {
+                console.log(numericMark);
+                if (numericMark >= grade.value) {
+                    markLetterValue = index;
+                }
+            })
+            
+            dropdown.prop("selectedIndex", markLetterValue);
+        }
 
         function showHideRangeInput($changedCell) {
             var $allCellsInRow = $changedCell.parents("tr").find("[data-rubric], [data-rubric-group]");
