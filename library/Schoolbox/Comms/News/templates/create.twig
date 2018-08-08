@@ -71,7 +71,7 @@
                         <label>Audience</label>
                         <p class="meta">Target your article to a specific audience. Use the input box below to search, or use the 'Browse' button to select from a list of possible options.</p>
 
-                        <ul class="grid small-block-grid-1 medium-block-grid-2 large-block-grid-4" style="margin-bottom:1rem; border-left:1px solid #ededed;">
+                        <ul class="grid small-block-grid-1 medium-block-grid-2 large-block-grid-4" style="margin-bottom:1rem; border-left:1px solid #ededed;" v-show="selectedAudienceItems.length">
                             <li v-for="selectedAudienceItem in selectedAudienceItems" style="min-height:80px;">
                                 <div class="actions-small-1">
                                     <div class="card small-12">
@@ -294,10 +294,16 @@
                         setTimeout(function() {
                             $('#audience-search').data('selectize').positionDropdown();
                         }, 1);
+
+                        // Trigger draft save
+
                     },
                     onItemRemove: function() {
                         // Selectize hides the placeholder once an item is removed- we want to keep it, quite hacky
                         $('#audience-search-selectized').attr('placeholder', '{{ audiencePlaceholder }}').css('width', '100%');
+
+                        // Trigger draft save
+
                     }
                 },
                 {% if audience|length %}
