@@ -370,7 +370,10 @@ $this->setVar(array(
     'CODE' => urlencode(urlencode($folder->getCodeString())),
     'ID' => $folder->getId(),
     'ENCODED_RETURN_URL' => Redirect::encode("/homepage/{$folder->getId()}"),
-    'USER_TOKEN' => $_SESSION['key'],
+
+    /* Homepage rss feed
+     */
+    'RSS' => $this->routeLookup('commsNewsFeed.getFeed', ['key' => $_SESSION['key'], 'folderId' => $folder->getId()]),
 ));
 
 // Colors (original)
