@@ -148,7 +148,7 @@ class Controller extends Base
         $slug = $this->getRequest()->query[News\Querystring::TOPIC_SLUG];
 
         if (\strlen($slug)) {
-            $args[News\Querystring::TOPIC_SLUG] = News\Mapper::TOPIC_ALL_SLUG;
+            $args[News\Querystring::TOPIC_SLUG] = $slug;
         }
 
         /* No limit to the number of articles
