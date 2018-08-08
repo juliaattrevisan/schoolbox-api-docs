@@ -90,8 +90,8 @@
                     });
         });
 
-        var readSelf = $('[name^="accessLevel[{USER_ID}]"][value="1"]');
-        var writeSelf = $('[name^="accessLevel[{USER_ID}]"][value="2"]');
+        var readSelf = $('[name="accessLevel[{USER_ID}]"][value="1"]');
+        var writeSelf = $('[name="accessLevel[{USER_ID}]"][value="2"]');
 
         // Admin? Throw the standard warning before allowing this to happen
         $().add(readSelf).add(writeSelf).on('click', function(e) {
@@ -174,8 +174,8 @@
                             waitingList.empty().append($response.find('#waitingList').children());
                             memberList.empty().append($response.find('#members').children());
 
-                            var readSelf = $('[name^="accessLevel[{USER_ID}]"][value="1"]');
-                            var writeSelf = $('[name^="accessLevel[{USER_ID}]"][value="2"]');
+                            var readSelf = $('[name="accessLevel[{USER_ID}]"][value="1"]');
+                            var writeSelf = $('[name="accessLevel[{USER_ID}]"][value="2"]');
 
                             // Admin? Throw the standard warning before allowing this to happen
                             $().add(readSelf).add(writeSelf).on('click', function(e) {
