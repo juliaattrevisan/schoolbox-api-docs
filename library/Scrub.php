@@ -58,24 +58,6 @@ class Scrub
         return htmlspecialchars($text, ENT_QUOTES);
     }
 
-
-    /**
-     * Scrubs text for CSV output.
-     *
-     * @param string $text
-     * @return string
-     */
-    static public function csv($text)
-    {
-        // fail fast
-        if (strlen($text) == 0) {
-            return $text;
-        }
-
-        // escape quotes for csv
-        return str_replace('"', '\"', trim($text));
-    }
-
     /**
      * Turns html into plaintext.
      * Note: output will be quite unpredictable if used on input that contains tables or copious formatting.
