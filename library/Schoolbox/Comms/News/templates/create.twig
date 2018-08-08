@@ -70,12 +70,9 @@
                     <div class="small-12 columns">
                         <label>Audience</label>
                         <p class="meta">Target your article to a specific audience. Use the input box below to search, or use the 'Browse' button to select from a list of possible options.</p>
-                        <div class="input-group">
-                            <input type="text" id="audience-search" name="audience" placeholder="{{ audiencePlaceholder }}" />
-                            <button class="button icon-drag-drop" @click.prevent="{{ (user.role.staff) ? 'openBrowseModal' : 'openBrowseModalRead' }}">Browse&hellip;</button>
-                        </div>
-                        <ul class="grid small-block-grid-1 medium-block-grid-2 large-block-grid-4">
-                            <li v-for="selectedAudienceItem in selectedAudienceItems">
+
+                        <ul class="grid small-block-grid-1 medium-block-grid-2 large-block-grid-4" style="margin-bottom:1rem; border-left:1px solid #ededed;">
+                            <li v-for="selectedAudienceItem in selectedAudienceItems" style="min-height:80px;">
                                 <div class="actions-small-1">
                                     <div class="card small-12">
                                         <h3>${ selectedAudienceItem.name }</h3>
@@ -88,6 +85,11 @@
                                 </div>
                             </li>
                         </ul>
+
+                        <div class="input-group">
+                            <input type="text" id="audience-search" name="audience" placeholder="{{ audiencePlaceholder }}" />
+                            <button class="button icon-drag-drop" @click.prevent="{{ (user.role.staff) ? 'openBrowseModal' : 'openBrowseModalRead' }}">Browse&hellip;</button>
+                        </div>
                     </div>
 
                     {# the modal #}
@@ -251,28 +253,47 @@
                         // Selectize doesn't give us all the data of the selected item, find the item in the full list -_-
                         var selectedItem = this.options[value];
 
-                        // Get the unique self modifier of the enttity type
-                        // Pretty hacky I know
-                        var modifier;
-                        if (selectedItem.modifier === 'Self') {
-                            modifier = vue.audienceOptions[selectedItem.entityTypeOriginal].selfModifier;
-                        } else {
-                            modifier = selectedItem.modifier;
+                        // Loop through the current audience items and check for an item with the same name and entityType to append to
+                        var justModify = false;
+                        for (var selectedAudienceItem in vue.selectedAudienceItems) {
+                            if (
+                                vue.selectedAudienceItems[selectedAudienceItem].name === selectedItem.name &&
+                                vue.selectedAudienceItems[selectedAudienceItem].entityType === selectedItem.entityType
+                            ) {
+                                if (vue.selectedAudienceItems[selectedAudienceItem].modifier) {
+                                    vue.selectedAudienceItems[selectedAudienceItem].modifier = '(Inc. teachers and parents of students)';
+                                } else {
+                                    vue.selectedAudienceItems[selectedAudienceItem].modifier = '(Inc. ' + selectedItem.modifier.toLowerCase() + ')';
+                                }
+
+                                justModify = true;
+                            }
                         }
 
-                        // Add audience item to custom list in vue
-                        vue.selectedAudienceItems.push({
-                            id: selectedItem.id,
-                            name: selectedItem.name,
-                            entityType: selectedItem.entityType,
-                            modifier: modifier
-                        });
+                        if (!justModify) {
+                            var modifier;
+                            if (selectedItem.modifier !== '') {
+                                var modifier = '(' + selectedItem.modifier + ' only)'
+                            }
+
+                            vue.selectedAudienceItems.push({
+                                id: selectedItem.id,
+                                name: selectedItem.name,
+                                entityType: selectedItem.entityType,
+                                modifier: modifier
+                            });
+                        }
 
                         // Hide this item from the selectize list
                         $item.addClass('hide');
 
                         // Selectize hides the placeholder once an item is added- we want to keep it, quite hacky
                         $('#audience-search-selectized').attr('placeholder', '{{ audiencePlaceholder }}').css('width', '100%');
+
+                        // The selectize dropdown doesn't position correctly for some reason with this setup so force reposition again after a very short timeout
+                        setTimeout(function() {
+                            $('#audience-search').data('selectize').positionDropdown();
+                        }, 1);
                     },
                     onItemRemove: function() {
                         // Selectize hides the placeholder once an item is removed- we want to keep it, quite hacky
@@ -513,8 +534,10 @@
              * Remove an audience item
              */
             removeAudienceItem: function(item) {
-                // Remove from selectize
+                // Remove item + any modifiers for item from selectize
                 $('#audience-search').data('selectize').removeItem(item.id);
+                $('#audience-search').data('selectize').removeItem(item.id + ':parents_of');
+                $('#audience-search').data('selectize').removeItem(item.id + ':teachers_of');
 
                 // Remove from vue list
                 this.selectedAudienceItems.splice(this.selectedAudienceItems.indexOf(item), 1);
