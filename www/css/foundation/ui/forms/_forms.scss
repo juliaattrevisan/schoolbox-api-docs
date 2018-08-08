@@ -246,6 +246,7 @@ th, td{
 }
 %fancy-check{
 	position: absolute;
+	top: 0; // This is to stop the browser from scrolling to a strangely positioned (actual) checkbox when checking the pseudo checkbox, in some circumstances
 	width: 0;
 	height: 0;
 	min-height: 0;
