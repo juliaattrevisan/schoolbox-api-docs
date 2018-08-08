@@ -78,7 +78,7 @@ class Translator
             'Year Level',
             'Service',
             'Pastoral Group',
-            'Folder'
+            'Class/Group'
         ]);
 
         /* Relationship modifiers
