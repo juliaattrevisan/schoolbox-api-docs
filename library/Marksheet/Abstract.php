@@ -165,7 +165,7 @@ abstract class Marksheet_Abstract
      * @param bool $blankZero
      * @return int|string
      */
-    protected function cleanNumber($value, $decimals = 2, $blankZero = true)
+    protected function cleanNumber($value, $decimals, $blankZero = true)
     {
 
         // handle null value and blank string, distinct from zero
