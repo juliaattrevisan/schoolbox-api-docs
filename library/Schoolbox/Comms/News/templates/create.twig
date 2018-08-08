@@ -536,8 +536,8 @@
             removeAudienceItem: function(item) {
                 // Remove item + any modifiers for item from selectize
                 $('#audience-search').data('selectize').removeItem(item.id);
-                $('#audience-search').data('selectize').removeItem(item.id + ':parents_of');
-                $('#audience-search').data('selectize').removeItem(item.id + ':teachers_of');
+                $('#audience-search').data('selectize').removeItem(item.id + '{{ relationshipParentsOf }}');
+                $('#audience-search').data('selectize').removeItem(item.id + '{{ relationshipTeachersOf }}');
 
                 // Remove from vue list
                 this.selectedAudienceItems.splice(this.selectedAudienceItems.indexOf(item), 1);

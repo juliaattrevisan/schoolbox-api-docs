@@ -270,6 +270,8 @@ class Controller extends Base
             'featureImageZone' => $zone->getTwigContext(),
             'audience' => $audiencingHtml,
             'isCommsOfficer' => (new ValidUserIsCommsOfficer())->isSatisfiedBy($this->getUser()),
+            'relationshipParentsOf' => Audience\Segment\Codec::AUDIENCE_SEPARATOR . Audience\Model::RELATIONSHIP_PARENTS_OF,
+            'relationshipTeachersOf' => Audience\Segment\Codec::AUDIENCE_SEPARATOR . Audience\Model::RELATIONSHIP_TEACHERS_OF
         ])->setTitle("Update {$article->getTitle()}"));
     }
 
