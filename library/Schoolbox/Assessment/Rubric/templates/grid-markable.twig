@@ -92,35 +92,39 @@
                                         </span>
                                     {% endif %}
                                 </label>
-                                {# Render a dropdown to select a value from the range #}
                                 {# TODO this select needs a label; technically it should be the one above but that's already in use for the descriptor checkbox #}
-                                <select id="rangeDropdown-{{ descriptor.id }}"
-                                        name="{{ formField }}[descriptors][{{ descriptor.id }}][value]"
-                                        class="{% if not descriptor.selected or descriptorMin == descriptorMax or not useMarkRange %} hide{% endif %}
-                                        {% if useMarkRange and descriptorMin != descriptorMax and not hidePoints %}used{% endif %}"
-                                        data-rubric="{{ rubric.id }}"
-                                        data-rubric-group="{{ group.id }}"
-                                        data-rubric-descriptor="{{ descriptor.id }}"
-                                >
-                                    {% set rangeStart = direction == 'asc' ? descriptorMin : descriptorMax %}
-                                    {% set rangeEnd = direction == 'asc' ? descriptorMax : descriptorMin %}
+                                {% if useMarkRange %}
+                                    {# Render a dropdown to select a value from the range #}
 
-                                    {# Selected value: if not provided, use max #}
-                                    {% set selectedValue = descriptor.selectedValue ?? descriptorMax %}
+                                    <select id="rangeDropdown-{{ descriptor.id }}"
+                                            name="{{ formField }}[descriptors][{{ descriptor.id }}][value]"
+                                            class="{% if not descriptor.selected or descriptorMin == descriptorMax or not useMarkRange %} hide{% endif %}
+                                            {% if useMarkRange and descriptorMin != descriptorMax and not hidePoints %}used{% endif %}"
+                                            data-rubric="{{ rubric.id }}"
+                                            data-rubric-group="{{ group.id }}"
+                                            data-rubric-descriptor="{{ descriptor.id }}"
+                                    >
+                                        {% set rangeStart = direction == 'asc' ? descriptorMin : descriptorMax %}
+                                        {% set rangeEnd = direction == 'asc' ? descriptorMax : descriptorMin %}
 
-                                    {% for i in rangeStart..rangeEnd %}
-                                        <option value={{ i }}
-                                                {% if i == selectedValue %}selected{% endif %}
-                                        >{{ i }}
-                                        </option>
-                                    {% endfor %}
-                                </select>
+                                        {# Selected value: if not provided, use max #}
+                                        {% set selectedValue = descriptor.selectedValue ?? descriptorMax %}
+
+                                        {% for i in rangeStart..rangeEnd %}
+                                            <option value={{ i }}
+                                                    {% if i == selectedValue %}selected{% endif %}
+                                            >{{ i }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                {% endif %}
 
                                 {% if learnerSelected %}
                                     <img class="rb-self-reflection-choice"
                                          src="/portrait.php?userId={{ learner.externalId }}&amp;size=square32"
                                          title="{% if latestSelfReflectedFeedback.normalisedMark != null %}{{ locale.selfAssessment.proper }}{% else %}{{ locale.selfReflection.proper }}{% endif %} choice" />
                                 {% endif %}
+
                             </td>
 
                         {% else %}
