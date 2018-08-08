@@ -27,8 +27,9 @@ interface ICache
 
     /**
      * @param Connector $mq
+     * @param string    $queueName
      * @return bool
      */
-    public function restoreSchedule(Connector $mq);
+    public function restoreSchedule(Connector $mq, string $queueName);
 
 }

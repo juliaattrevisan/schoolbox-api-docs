@@ -66,7 +66,7 @@ $k->run(function ($di, $loop, $log, $opts) {
             $jit = new RedisCache(Alaress\Redis::getClientInstance(), $log, INSTANCE_ID);
 
             // restore data if possible
-            $restored = $jit->restoreSchedule(new Connector());
+            $restored = $jit->restoreSchedule(new Connector(), $q);
 
             if (!$restored) {
                 throw new RuntimeException("Could not read cached data");

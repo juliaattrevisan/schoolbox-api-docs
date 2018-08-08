@@ -47,12 +47,11 @@ class RedisCache implements ICache
 
     /**
      * @param Connector $mq
+     * @param string    $queueName
      * @return bool
      */
-    public function restoreSchedule(Connector $mq)
+    public function restoreSchedule(Connector $mq, string $queueName)
     {
-        $queueName = 'sb.schedule';
-
         $this->log->notice("Restoring $queueName from Redis cache");
 
         // declare the queue
