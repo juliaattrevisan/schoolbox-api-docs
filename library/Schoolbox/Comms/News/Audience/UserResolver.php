@@ -9,9 +9,11 @@ declare(strict_types=1);
 namespace Schoolbox\Comms\News\Audience;
 
 use Alaress\Database;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use External_Class;
 use PDO;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use UnexpectedValueException;
 
 /**
@@ -79,6 +81,61 @@ class UserResolver implements IUserResolver
             $userIds = \array_merge($userIds, $this->findUsersForAudienceSegment($rootAudienceSegment));
         }
         return \array_unique($userIds);
+    }
+
+
+    /**
+     * Returns the ids of users who are capable of moderating this article
+     *
+     * The business rules, as *intended* to be coded below, are:
+     *  - if an article is audienced ONLY to a single homepage, with no modifiers, users with WRITE+ access can moderate
+     *  - in all other cases, only superusers and comms officers can moderate (since sub-moderators don't yet exist)
+     *
+     * @param int $articleId
+     * @throws \Schoolbox\Mapper\Exception
+     * @return array
+     */
+    public function findModeratorsForArticle(int $articleId): array
+    {
+        // start off by finding the audience segments for this article
+        $where = $this->audienceMapper->getPredicateBuilder()->equals(Mapper::FIELD_COMMS_NEWS_ARTICLE_ID, $articleId);
+
+        $segments = $this->audienceMapper->findByPredicates($where);
+
+        if ($segments->count() !== 1) {
+            // non-trivial case, more than one segment
+            return $this->findCommsOfficerIds();
+        }
+
+        /** @var Model $segment */
+        $segment = $segments->first();
+
+        if ($segment->getEntityType() !== Model::ENTITY_TYPE_FOLDER || $segment->getRelationship() !== Model::RELATIONSHIP_SELF) {
+            // not a trivial folder segment; bounce this
+            return $this->findCommsOfficerIds();
+        }
+
+        // TODO factory
+        $folder = (new \Schoolbox\Resource\Folder\Model())
+            ->setId($segment->getEntityValue());
+
+        // TODO DI
+        $writePlusIds = UserAccessMapper::getInstance()->findUsersInCategory($folder, null, UserAccess::ACCESS_WRITE)->getPropertyValues('id');
+
+        return array_unique(array_merge($writePlusIds, $this->findCommsOfficerIds()));
+    }
+
+
+    /**
+     *
+     *
+     * @throws \Schoolbox\Mapper\Exception
+     * @return int[]
+     */
+    private function findCommsOfficerIds(): array
+    {
+        // TODO DI
+        return UserAccessMapper::getInstance()->findUsersForService(UserAccess::SERVICE_COMMS_OFFICER)->getPropertyValues('id');
     }
 
 
