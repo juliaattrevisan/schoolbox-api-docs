@@ -217,6 +217,38 @@ class Notifier extends AbstractModuleNotifier
 
 
     /**
+     * Notify a staff member that an article needs moderation
+     *
+     * @param Model $article
+     * @param User  $effector
+     * @param array $diff
+     * @return Envelope
+     */
+    public function notifyStaffSubmitted($article, $effector, $diff = [])
+    {
+        $envelope  = new Envelope();
+
+        $bob = new Builder();
+
+        $bob->setTitle(':user submitted an article, :title')
+            ->setHref(sprintf(self::PATTERN_POSTED_HREF, $article->getId()))
+            ->setParams([
+                'user' => new UserParam($effector),
+                'title' => new Param($article->getTitle())
+            ])
+            ->setIcon("/portrait.php?userId={$effector->getExternalId()}&size={$this->iconSize}")
+            ->addTopic("news.{$article->getId()}.submitted")
+        ;
+
+        foreach ($this->audienceResolver->findModeratorsForArticle($article->getId()) as $modId) {
+            $envelope->targetToUser($modId, $bob->build());
+        }
+
+        return $envelope;
+    }
+
+
+    /**
      * @param string  $roleType
      * @param Article $article
      * @param User    $effector
