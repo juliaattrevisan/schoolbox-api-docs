@@ -71,6 +71,7 @@
                         <label>Audience</label>
                         <p class="meta">Target your article to a specific audience. Use the input box below to search, or use the 'Browse' button to select from a list of possible options.</p>
 
+                        <div style="border-top:1px solid #ededed;">
                         <ul class="grid small-block-grid-1 medium-block-grid-2 large-block-grid-4" style="margin-bottom:1rem; border-left:1px solid #ededed;" v-show="selectedAudienceItems.length">
                             <li v-for="selectedAudienceItem in selectedAudienceItems" style="min-height:80px;">
                                 <div class="actions-small-1">
@@ -85,6 +86,7 @@
                                 </div>
                             </li>
                         </ul>
+                        </div>
 
                         <div class="input-group">
                             <input type="text" id="audience-search" name="audience" placeholder="{{ audiencePlaceholder }}" />
@@ -261,7 +263,7 @@
                                 vue.selectedAudienceItems[selectedAudienceItem].entityType === selectedItem.entityType
                             ) {
                                 if (vue.selectedAudienceItems[selectedAudienceItem].modifier) {
-                                    vue.selectedAudienceItems[selectedAudienceItem].modifier = '(Inc. teachers and parents of students)';
+                                    vue.selectedAudienceItems[selectedAudienceItem].modifier = '(Inc. teachers & parents of students)';
                                 } else {
                                     vue.selectedAudienceItems[selectedAudienceItem].modifier = '(Inc. ' + selectedItem.modifier.toLowerCase() + ')';
                                 }

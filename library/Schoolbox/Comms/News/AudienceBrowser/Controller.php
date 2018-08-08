@@ -250,39 +250,30 @@ class Controller extends Base
      * @api /comms/news/audiencebrowser/yearlevels
      *
      * @throws \Schoolbox\Mapper\Exception
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     public function getYearLevels()
     {
-        $translator = new Segment\Translator($this->folderMapper->getDatabase(), $this->getUser(), $this->folderMapper);
-        $years = array_filter($this->userMapper->findDistinct('year'));
-
-        sort($years);
-
         $items = [];
 
+        $registry = new Segment\SearchRegistry($this->getUser(), $this->folderMapper);
+        $translator = new Segment\Translator($this->folderMapper->getDatabase(), $this->getUser(), $this->folderMapper);
+        $formatter = new Segment\HtmlFormatter($this->getDi());
+
+        $years = array_filter($this->userMapper->findDistinct('year'));
+        sort($years);
+
         foreach ($years as $year) {
-
-            $name = \is_numeric($year) ? "Year {$year}" : $year;
-
-            $twigData = [
-                'name' => $name,
-                'entityType' => $translator->translateEntityType(Model::ENTITY_TYPE_YEAR)
+            $row = [
+                'id' => $year,
+                'name' => \is_numeric($year) ? "Year {$year}" : $year,
+                'entity_type' => Model::ENTITY_TYPE_YEAR
             ];
-            $twigDataParents = array_merge($twigData, ['modifier' => $translator->translateModifier(Model::RELATIONSHIP_PARENTS_OF)]);
-            $twigDataTeachers = array_merge($twigData, ['modifier' => $translator->translateModifier(Model::RELATIONSHIP_TEACHERS_OF)]);
 
-            /* Encode the value because Year Level is a user-configurable string
-             */
-            $items[] = [
-                'id' => Segment\Codec::encode(Model::ENTITY_TYPE_YEAR, $year, Model::RELATIONSHIP_SELF),
-                'name' => $name,
-                'itemHtml' => $this->getDi()->get('templateEngine')->render('@commsNews/audienceItem.twig', $twigData),
-                'itemHtmlParents' => $this->getDi()->get('templateEngine')->render('@commsNews/audienceItem.twig', $twigDataParents),
-                'itemHtmlTeachers' => $this->getDi()->get('templateEngine')->render('@commsNews/audienceItem.twig', $twigDataTeachers)
-            ];
+            $items[] = $this->generateDecoratedDataTuple($row, $registry, $translator, $formatter);
         }
 
-        $this->getResponse()->content->set($this->buildJsonOutput([
+        return $this->getResponse()->content->set($this->buildJsonOutput([
             'success' => true,
             'data' => $items
         ]));
