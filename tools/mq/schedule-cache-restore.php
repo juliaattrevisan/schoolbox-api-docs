@@ -54,11 +54,13 @@ $k->run(function ($di, $loop, $log, $opts) {
         $mq->declareQueue($q);
 
         // the queue exists. everything is ok. we are to do nothing.
-        $log->notice("Queue already exists. Nothing to do.");
+        $log->notice("Queue '{$q}' already exists. Nothing to do.");
         exit(0);
 
     } catch (RuntimeException $e) {
         // the queue does NOT exist. this means we need to create it, then populate it with whatever is in Redis
+        $log->notice("Queue  '{$q}' does not exist; creating and re-populating from cache.", [ 'char' => '+' ]);
+
         try {
             // get the cache handler
             $jit = new RedisCache(Alaress\Redis::getClientInstance(), $log, INSTANCE_ID);
