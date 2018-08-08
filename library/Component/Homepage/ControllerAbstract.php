@@ -77,6 +77,11 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
 
         $this->setupConfigRendering($targetHandle);
 
+        //Show this many actions in nav bar if user has write access
+        $this->setVar('COMPONENT_ACTION_COUNT', $this->hasWriteAccess() ? 3 : 1);
+
+        $this->getSitePage()->setBlock('configTpl', 'drag_handle', 'drag_handle_block');
+
         /* If you don't have write access, just render the collapse and go away
          */
         if (!$hasWriteAccess) {
@@ -87,6 +92,9 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
             $this->applyCollapsedState();
 
             $this->getSitePage()->parse('settings_collapse_block', 'settings_collapse');
+
+            $this->getSitePage()->setVar('drag_handle_block', '');
+
         }
         else {
             /* If you want to process the config, then do so and display it
@@ -107,6 +115,9 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
                 }
                 $this->getSitePage()->parse('settings_link_block', 'settings_link');
                 $this->getSitePage()->parse('settings_close_block', 'settings_close');
+
+                $this->getSitePage()->parse('drag_handle_block', 'drag_handle');
+
             }
         }
 
