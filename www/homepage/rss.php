@@ -16,4 +16,4 @@ $router = $di->get('router');
 $url = $router->generate('commsNewsFeed.getFeed', ['key' => $token, 'folderId' => $catID]);
 
 $page = new SitePage(false);
-$page->localRedir($url);
+$page->localRedir($url, false, 308);

@@ -38,10 +38,10 @@ if (\strlen($topicId)) {
         error(\Schoolbox\Error\Mapper::ERROR_COMMS_NEWS_INVALID_TOPIC);
     }
 
-    $page->localRedir("{$baseUrl}?topic={$topic->getSlug()}");
+    $page->localRedir("{$baseUrl}?topic={$topic->getSlug()}", false, 308);
 }
 
 /* Redirect to All Topics url
  */
 $topicSlug = \Schoolbox\Comms\News\Mapper::TOPIC_ALL_SLUG;
-$page->localRedir("{$baseUrl}?topic={$topicSlug}");
+$page->localRedir("{$baseUrl}?topic={$topicSlug}", false, 308);

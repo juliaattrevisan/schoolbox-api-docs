@@ -31,5 +31,5 @@ $url = $router->generate('commsNewsFeed.getFeed', ['key' => $userKey, 'folderId'
 
 /* Redirect to new module
  */
-$page->localRedir($url);
+$page->localRedir($url, false, 308);
 
