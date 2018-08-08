@@ -23,6 +23,12 @@
         {% if createRoute %}
             <a href="{{ createRoute }}" class="icon-add" title="Create {{ locale.news }}"></a>
         {% endif %}
+
+        {% set rssRoute = routeLookupIfAuthorized('commsNewsFeed.getFeed', {key: key}) %}
+        {% if rssRoute %}
+            <a href="{{ rssRoute }}?topic={{ slug }}" class='icon-rss' title="Download RSS feed for this topic" id="rss"></a>
+        {% endif %}
+
         {% if moderationRoute or saveForLaterRoute or archiveRoute or authorRoute %}
             <a href="#" class="icon-more" data-dropdown="tab-control" title="Actions"></a>
         {% endif %}
@@ -52,7 +58,10 @@
 
                     $newContainer.articleTabs({
                         'topicTabs': $('#news-topics'),
-                        'updateUrl': true
+                        'updateUrl': true,
+                        onChangeSuccess: function(response) {
+                            $('#rss').attr('href', '{{ rssRoute }}?topic=' + response.slug);
+                        }
                     });
 
                     $newContainer.saveForLater();
