@@ -209,7 +209,7 @@
 
         {# Drafting mechanism #}
         $('#createForm').draft({
-            inputs: ['title', 'publishAt', 'expiresAt'],
+            inputs: ['title', 'publishAt', 'expiresAt', 'audience'],
             textareas: ['body', 'blurb'],
             attachzones: ['attachment']
         });
@@ -294,16 +294,10 @@
                         setTimeout(function() {
                             $('#audience-search').data('selectize').positionDropdown();
                         }, 1);
-
-                        // Trigger draft save
-
                     },
                     onItemRemove: function() {
                         // Selectize hides the placeholder once an item is removed- we want to keep it, quite hacky
                         $('#audience-search-selectized').attr('placeholder', '{{ audiencePlaceholder }}').css('width', '100%');
-
-                        // Trigger draft save
-
                     }
                 },
                 {% if audience|length %}
