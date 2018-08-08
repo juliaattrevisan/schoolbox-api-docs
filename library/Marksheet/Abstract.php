@@ -176,7 +176,9 @@ abstract class Marksheet_Abstract
             return $blankZero ? '' : 0;
         }
 
-        return number_format($value, $decimals, '.', '');
+        $formattedNumber = number_format($value, $decimals, '.', '');
+        // Remove unnecessary trailing decimal places
+        return rtrim($formattedNumber, '.0');
     }
 
     /* Abstract functions for extending classes to implement */
