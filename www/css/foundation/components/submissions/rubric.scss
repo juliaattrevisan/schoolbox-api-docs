@@ -205,6 +205,13 @@ table.rb {
 .rb-group-summary {
     background-color: lighten($input-border-color, 10%) !important;
     color: calc-text-color(lighten($input-border-color, 10%));
+
+    label {
+        font-weight: bold!important;
+    }
+    .groupMax {
+        width: 5rem;
+    }
 }
 .rb-final-summary {
     background-color: $input-border-color !important;
