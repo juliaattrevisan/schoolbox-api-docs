@@ -280,13 +280,15 @@ class Controller extends BaseController
      */
     protected function array2csv(array $array)
     {
-        $rows = [];
-
+        $fp = fopen('php://temp', 'r+b');
         foreach ($array as $row) {
-            $rows[] = '"' . implode('","', $row) . '"';
+            $row = array_map('trim', $row);
+            fputcsv($fp, $row);
         }
-
-        return implode("\n", $rows);
+        rewind($fp);
+        $result = stream_get_contents($fp);
+        fclose($fp);
+        return $result;
     }
 
 

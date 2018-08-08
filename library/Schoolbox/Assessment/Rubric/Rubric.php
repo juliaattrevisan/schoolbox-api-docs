@@ -300,8 +300,8 @@ class Rubric implements Twiggable
             $groupRendered = false;
             foreach ($group->getAllCriteria() as $criterion) {
 
-                $square[$currentDRow][0] = $groupRendered ? '' : Scrub::csv($group->getName());
-                $square[$currentDRow][1] = Scrub::csv($criterion->getName());
+                $square[$currentDRow][0] = $groupRendered ? '' : $group->getName();
+                $square[$currentDRow][1] = $criterion->getName();
 
                 $currentVRow = $currentDRow + 1;
 
@@ -316,8 +316,8 @@ class Rubric implements Twiggable
                     foreach ($level->getAllDescriptors() as $levelD) {
                         foreach ($criterion->getAllDescriptors() as $critD) {
                             if ($levelD === $critD) {
-                                $square[$currentDRow][$currentColumn + 2] = Scrub::csv($critD->getText());
-                                $square[$currentVRow][$currentColumn + 2] = Scrub::csv($critD->getValue());
+                                $square[$currentDRow][$currentColumn + 2] = $critD->getText();
+                                $square[$currentVRow][$currentColumn + 2] = $critD->getValue();
                             }
                         }
                     }
