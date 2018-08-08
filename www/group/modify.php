@@ -300,18 +300,8 @@ if (is_numeric($this->arg[0])) {
     $userAccess = $userAccessMapper->findByColumnList(['uid' => $_SESSION['user']->getId(), 'sid' =>$this->arg[0], 'service' => HOMEPAGE_SERVICE, 'type' => UserAccess::ACCESS_FULL]);
     $admin = $userAccess->count();
 
-    $su = isset($_SESSION['su']) ?? 0;
+    $this->setVar('ADMIN_NOT_SU', $admin && !$_SESSION['user']->isSuperuser());
 
-    if($admin && !$su) {
-        $this->setVar([
-            'ADMIN_NOT_SU' => 1
-        ]);
-    } else {
-        $this->setVar([
-            'ADMIN_NOT_SU' => 0
-        ]);
-    }
-    
     $trail = new \Schoolbox\Breadcrumbs();
     $trail->renderIntoSitePage($this, 'BREADCRUMB', [
         [
