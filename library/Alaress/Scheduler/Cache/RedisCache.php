@@ -56,7 +56,7 @@ class RedisCache implements ICache
         $this->log->notice("Restoring $queueName from Redis cache");
 
         // declare the queue
-        $mq->declareQueue($queueName)->bindQueue($queueName, '*.' . Notif::TOPIC_APPLICATION);;
+        $mq->declareQueue($queueName)->bindQueue($queueName, '*.' . Notif::TOPIC_APPLICATION);
 
         // retrieve keys
         $itemKeys = $this->fetchItemKeys();
