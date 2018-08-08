@@ -259,16 +259,19 @@
                 var $descriptorCheckboxes = $groupRows.find('input');
 
                 var scaledGroupMark = getScaledGroupMark($descriptorCheckboxes, groupSummary);
+                var unscaledGroupMark = summateDescriptors($descriptorCheckboxes);
 
                 if (groupSummary.length) {
                     if (! customisedMark[groupId]) {
                         if (groupSummary.find(".groupMax").is("select")) {
-                            assignLetterGrade(scaledGroupMark, groupSummary.find(".groupMax").val(scaledGroupMark));
+                            var percentage = groupSummary.attr('data-mark') * (100 / groupSummary.attr('data-row-max-sum'));
+                            assignLetterGrade(percentage, groupSummary.find(".groupMax").val(scaledGroupMark));
                         } else {
                             groupSummary.find(".groupMax").val(scaledGroupMark);
                         }
 
                         groupSummary.attr('data-scaled-mark', scaledGroupMark);
+                        groupSummary.attr('data-mark', unscaledGroupMark);
                     }
                 }
 
@@ -350,8 +353,6 @@
         })
 
         function assignLetterGrade(numericMark, dropdown) {
-            // TODO numericMark needs to be a percentage
-
             var grades = [];
             dropdown.find("option").each(function(index, option) {
                 grades.push(
@@ -359,15 +360,16 @@
                 );
             });
 
-            var markLetterValue = 0;
-            grades.forEach(function(grade, index) {
-                console.log(numericMark);
-                if (numericMark >= grade.value) {
-                    markLetterValue = index;
+            var markLetterValue = '';
+            var optionIndex = 0;
+            for (var i = 0; i < grades.length; i++) {
+                if (numericMark >= grades[i].value) {
+                    markLetterValue = grades[i].letter;
+                    optionIndex = i;
+                    break;
                 }
-            })
-            
-            dropdown.prop("selectedIndex", markLetterValue);
+            }
+            dropdown.prop("selectedIndex", optionIndex);
         }
 
         function showHideRangeInput($changedCell) {
