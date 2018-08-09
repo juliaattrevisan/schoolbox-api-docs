@@ -95,7 +95,7 @@
 
         // Admin? Throw the standard warning before allowing this to happen
         $().add(readSelf).add(writeSelf).on('click', function(e) {
-            if({ADMIN_NOT_SU}) {
+            if (Boolean("{ADMIN_NOT_SU}")) {
                 e.preventDefault();
 
 
@@ -179,7 +179,7 @@
 
                             // Admin? Throw the standard warning before allowing this to happen
                             $().add(readSelf).add(writeSelf).on('click', function(e) {
-                                if({ADMIN_NOT_SU}) {
+                                if (Boolean("{ADMIN_NOT_SU}")) {
                                     e.preventDefault();
 
 
