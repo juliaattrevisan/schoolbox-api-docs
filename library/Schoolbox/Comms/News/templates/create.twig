@@ -75,12 +75,12 @@
                             <li v-for="selectedAudienceItem in selectedAudienceItems">
                                 <div class="actions-small-1">
                                     <div class="card small-12">
-                                        <h3>${ selectedAudienceItem.name }</h3>
+                                        <h3 :title="selectedAudienceItem.name">${ selectedAudienceItem.name }</h3>
                                         <p class="meta">${ selectedAudienceItem.entityType }</p>
-                                        <p class="meta">${ selectedAudienceItem.modifier }</p>
+                                        <p class="meta" :title="selectedAudienceItem.modifier">${ selectedAudienceItem.modifier }</p>
                                     </div>
                                     <nav>
-                                        <a class="icon-close size-8" v-bind:title="'Remove ' + selectedAudienceItem.name + ' from audience'" @click="removeAudienceItem(selectedAudienceItem)"></a>
+                                        <a class="icon-close size-8" :title="'Remove ' + selectedAudienceItem.name + ' from audience'" @click="removeAudienceItem(selectedAudienceItem)"></a>
                                     </nav>
                                 </div>
                             </li>
@@ -100,7 +100,7 @@
                         <div v-show="pageShow[0]">
                             <div class="small-12 medium-4 columns" v-for="audienceOption in audienceOptions">
                                 <button class="button-block" @click="changePage(audienceOption)">
-                                    <i v-bind:class="'icon-' + audienceOption.icon"></i>
+                                    <i :class="'icon-' + audienceOption.icon"></i>
                                     ${ audienceOption.namePlural }
                                 </button>
                             </div>
@@ -121,8 +121,8 @@
                             <fieldset class="checklist checklist-container" v-show="!showEmptyState">
                                 <div class="loader" v-show="showLoader"></div>
                                 <template v-for="(audienceListItem, index) in audienceListItems">
-                                    <input type="checkbox" v-bind:id="'audience-list-input' + index" v-bind:value="audienceListItem" v-model="audienceListChecked" />
-                                    <label v-bind:for="'audience-list-input' + index">${ audienceListItem.self.name }</label>
+                                    <input type="checkbox" :id="'audience-list-input' + index" :value="audienceListItem" v-model="audienceListChecked" />
+                                    <label :for="'audience-list-input' + index">${ audienceListItem.self.name }</label>
                                 </template>
                             </fieldset>
 
