@@ -84,7 +84,7 @@ class RedisCache implements ICache
 
         $this->log->debug("Restored $i events");
 
-        return !!$i;
+        return (bool)$i;
     }
 
 
@@ -131,7 +131,7 @@ class RedisCache implements ICache
 
         $this->log->debug("Cached $i events");
 
-        return !!$i;
+        return (bool)$i;
     }
 
 
