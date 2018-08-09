@@ -475,26 +475,26 @@ input[type=checkbox].plain {
 		border: none;
 
 		&:checked + label {
-			background: #eee;
+			background: $smoke;
 		}
 
 		+ label {
-			border-bottom: 1px solid #eee;
+			border-bottom: 1px solid $smoke;
 			margin: 0;
-			padding: 0.5rem 0 0.5rem 2rem;
+			padding: .5rem 0 .5rem 2rem;
 
 			&:after,
 			&:before {
-				padding: 0.5rem 0 0.5rem 0;
+				padding: .5rem 0 .5rem 0;
 				background-color: transparent;
 			}
 
 			&:hover {
-				background: #f0f0f0;
+				background: $snow;
 
 				&:after,
 				&:before {
-					padding: 0.5rem 0 0.5rem 0;
+					padding: .5rem 0 .5rem 0;
 					background-color: transparent;
 				}
 			}
