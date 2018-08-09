@@ -44,14 +44,21 @@
             },
 
             series: [
-{% for type, data in series %}
                 {
-                    name: '{{ type|capitalize }}',
-                    data: {{ data|json_encode|raw }}
-                }{% if not loop.last %},{% endif %}
-
-{% endfor %}
-
+                    color: '#e8bf68',
+                    name: 'Impressions',
+                    data: {{ series['impression']|json_encode|raw }}
+                },
+                {
+                    color: '#9eea8f',
+                    name: 'Conversions',
+                    data: {{ series['conversion']|json_encode|raw }}
+                },
+                {
+                    color: '#80B1D5',
+                    name: 'Non-referred Opens',
+                    data: {{ series['open']|json_encode|raw }}
+                }
             ]
         });
     });
