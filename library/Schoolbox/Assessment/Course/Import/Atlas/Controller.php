@@ -192,12 +192,12 @@ class Controller extends BaseController
             return;
         }
 
-        // TODO pass the right stuff here
         $this->response->content->set(
             $this->buildUnthemedHtmlOutput(
-                '@courseImportAtlas/import/plan.twig',
+                '@courseImportAtlas/import/facultySelector.twig',
                 [
                     'curriculum' => $curriculumPlan,
+                    'isValidFacultyRoot' => $this->courseSpecMapper->isConfiguredFacultyRootValid(),
                 ]
             )
         );
@@ -241,8 +241,6 @@ class Controller extends BaseController
             $this->request->post->get('unit')
         );
 
-        // TODO consider passing something meaningful here
-        // Example: response code, redirect destination, attachment upload status
         $this->response->content->set($this->buildJsonOutput([]));
         // SHUP.
         /** @noinspection PhpUnhandledExceptionInspection */

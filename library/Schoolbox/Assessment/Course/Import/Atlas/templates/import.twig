@@ -101,25 +101,7 @@
                 </fieldset>
                 <fieldset data-mage="part-3" class="content" disabled="disabled">
                     <legend>Choose folder and import</legend>
-                    <div class="small-12 column hide" data-mage-collapsed>
-                        {% include '@course/sub/sourceSelector.twig' with {
-                            courseSpec: null,
-                        } only %}
-
-                        {% if not isValidFacultyRoot %}
-                            <div class="small-12 column">
-                                {% include '@course/sub/invalidFacultyRoot.twig' %}
-                            </div>
-                        {% endif %}
-
-                        <div class="row" data-mage-submitrow>
-                            <div class="small-12 medium-8 column">
-                                <p class="alert alert-box icon-alert" data-mage-error></p>
-                            </div>
-                            <div class="small-12 medium-4 column">
-                                <input type="submit" name="part-3" value="Import" data-mage-next="none" data-mage-working="Importing..." />
-                            </div>
-                        </div>
+                    <div class="small-12 column hide" data-mage-collapsed id="curriculum-import-folder">
                     </div>
                 </fieldset>
             </section>
@@ -132,7 +114,7 @@
 <script type="text/javascript">
     $(function () {
         // the mage plugin is applied to the submit buttons: setup a basic mage on all the buttons
-        $('input[data-mage-next]').mage({
+        $('input[data-mage-next="part-2"]').mage({
             confirmRevert: function (e, revert) {
                 // verify that we aren't trying to go FORWARD
                 if (this.nextAll('.current-stop').length > 0) {
@@ -194,9 +176,23 @@
             }
         });
 
-        // Last step: redirect whence I came
+        $('input[data-mage-next="part-3"]').mage({
+            confirmRevert: function (e, revert) {
+                // verify that we aren't trying to go FORWARD
+                if (this.nextAll('.current-stop').length > 0) {
+                    $('fieldset[data-mage]').find('[data-mage-collapsefinal]').slideDown();
+                    revert();
+                }
+            },
+            onXhrDone: function (data) {
+                var facultySelector = $("#curriculum-import-folder").html(data);
+                facultySelector.find('[data-collapser]').collapsable();
+            }
+        });
+
         $('input[data-mage-next="none"]').mage({
             onXhrDone: function () {
+                // Last step: redirect whence I came
                 location.href = "{{ returnUrl.value.raw }}" || "{{ routeLookup('course.courseList') }}";
             }
         });
