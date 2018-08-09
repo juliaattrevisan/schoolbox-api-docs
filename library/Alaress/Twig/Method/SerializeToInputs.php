@@ -1,0 +1,57 @@
+<?php
+/**
+ * @copyright Copyright 2018, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
+ */
+
+declare(strict_types=1);
+
+namespace Alaress\Twig\Method;
+
+/**
+ * Serializer for array values into form inputs.
+ */
+class SerializeToInputs
+{
+    /**
+     * Serializes `$array` to a set of hidden `<input>` elements, which when
+     * submitted via a form will recreate `$array` in `$_GET` or `$_POST`.
+     *
+     * @param iterable $array
+     * @param array    $prefixes
+     * @return string
+     */
+    public function __invoke(iterable $array, array $prefixes = []): string
+    {
+        $result = [];
+        foreach ($array as $name => $value) {
+            $nameParts   = $prefixes;
+            $nameParts[] = $name;
+            if (is_iterable($value)) {
+                $result[] = $this($value, $nameParts);
+            } else {
+                $result[] = sprintf(
+                    '<input type="hidden" name="%s" value="%s" />',
+                    htmlspecialchars($this->generateInputName($nameParts), ENT_QUOTES),
+                    htmlspecialchars($value, ENT_QUOTES)
+                );
+            }
+        }
+        return implode("\n", $result);
+    }
+
+
+    private function generateInputName($nameParts): string
+    {
+        $name  = [];
+        $first = true;
+        foreach ($nameParts as $namePart) {
+            if (!$first) {
+                $namePart = '[' . $namePart . ']';
+            }
+            $first  = false;
+            $name[] = $namePart;
+        }
+        return implode('', $name);
+    }
+}
