@@ -112,6 +112,8 @@ class Rubric implements Twiggable
         Descriptor         $descriptor
     )
     {
+        // TODO descriptor validation here
+
         // ensure both the group and the level exist
         $this->putGroup($group);
         $this->putLevel($level);
@@ -139,10 +141,6 @@ class Rubric implements Twiggable
      */
     public function putGroup(Criteria\Group $group)
     {
-        if (!$group instanceof Criteria\Group) {
-            throw new InvalidArgumentException("Invalid Group given");
-        }
-
         $this->criteriaGroups->attach($group);
         return $this;
     }
@@ -165,10 +163,6 @@ class Rubric implements Twiggable
      */
     public function putLevel(Competency\Level $level)
     {
-        if (!$level instanceof Competency\Level) {
-            throw new InvalidArgumentException("Invalid Level given");
-        }
-
         $this->levels->attach($level);
         return $this;
     }
