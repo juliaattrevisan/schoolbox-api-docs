@@ -172,7 +172,7 @@ class External_Isams_User implements External_UserInterface
                         ''                      AS StudentEmergencyPhone, 
                         ''                      AS StudentEmergencyPhoneAlt,
                         txtadditionalHealth     AS StudentMedicalAlert,
-                        ''     					AS StudentMobilePhone,
+                        ''                      AS StudentMobilePhone,
                         ''                      AS StudentSpecialNeedsFlag,
                         ''                      AS StudentStudiesCode,
                         ''                      AS StudentBoarder,
