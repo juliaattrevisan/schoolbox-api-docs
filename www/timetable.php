@@ -51,7 +51,12 @@ if ($_SESSION['user']->getRole()->isParent()) {
             // Was a specific child ID requested? show them only, otherwise
             // show everyone.
             if (!$child_id || ($child_id == $child['id'])) {
-                $userList[] = $userMapper->findById($child['id']);
+                try {
+                    $userList[] = $userMapper->findById($child['id']);
+                } catch (Schoolbox\Mapper\Exception $e) {
+                    //noop, we are getting a list
+                }
+
             }
         }
     }
@@ -64,7 +69,11 @@ if ($_SESSION['user']->getRole()->isParent()) {
     if ($child_id) {
         if ($_SESSION['user']->getRole()->isStaff() || $child_id == $_SESSION['id']) {
             //Output a timetable for each campus user is involved in
-            $userList[] = $userMapper->findById($child_id);
+            try {
+                $userList[] = $userMapper->findById($child_id);
+            } catch (Schoolbox\Mapper\Exception $e) {
+                $this->pageNotFound();
+            }
         } else {
             error(19);
         }
