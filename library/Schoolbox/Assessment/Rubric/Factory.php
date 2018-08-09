@@ -107,56 +107,58 @@ class Factory
             $groupCache[$groupId] = new Group($groupId, $groupName, $groupMaxValue);
         }
 
-        foreach ($criteria as $criterionId => $criterion) {
+        try {
 
-            $groupId          = $criterion['groupId'];
-            $criterionEnabled = isset($criterion['on']) && $criterion['on'];
-            $criterionName    = $criterion['name'];
+            foreach ($criteria as $criterionId => $criterion) {
 
-            // spawn
-            $c = new Criterion($criterionId, $criterionName);
+                $groupId          = $criterion['groupId'];
+                $criterionEnabled = isset($criterion['on']) && $criterion['on'];
+                $criterionName    = $criterion['name'];
 
-            // set readonliness
-            $c->setReadOnly(isset($criterion['readonly']) && $criterion['readonly']);
+                // spawn
+                $c = new Criterion($criterionId, $criterionName);
 
-            // retrieve from cache
-            $g = $groupCache[$groupId];
+                // set readonliness
+                $c->setReadOnly(isset($criterion['readonly']) && $criterion['readonly']);
 
-            // cascade readonliness into group
-            if ($c->isReadOnly()) {
-                $g->setReadOnly(true);
-            }
+                // retrieve from cache
+                $g = $groupCache[$groupId];
 
-            if ($includeEmptyCriteria) {
-                $rubric->putCriterion($g, $c);
-            }
+                // cascade readonliness into group
+                if ($c->isReadOnly()) {
+                    $g->setReadOnly(true);
+                }
 
-            if (!$criterionEnabled) {
-                continue;
-            }
+                if ($includeEmptyCriteria) {
+                    $rubric->putCriterion($g, $c);
+                }
 
-            foreach ($levelCache as $levelSequence => $l) {
-
-                if (empty($descriptors[$criterionId][$levelSequence])) {
+                if (!$criterionEnabled) {
                     continue;
                 }
 
-                $descriptor      = $descriptors[$criterionId][$levelSequence];
-                $descriptorId    = isset($descriptor['id']) ?: null;
-                $descriptorText  = $descriptor['text'];
-                $descriptorValue = $descriptor['points'];
+                foreach ($levelCache as $levelSequence => $l) {
 
-                if (strlen($descriptorText) || strlen($descriptorValue)) {
-                    $d = new Descriptor($descriptorText, $descriptorValue, $descriptorId);
-                    try {
-                        $rubric->putDescriptor($g, $c, $l, $d, $usesMarkRange);
-                    } catch (InvalidArgumentException $e) {
-                        echo "Unable to put descriptor: " . $e->getMessage();
+                    if (empty($descriptors[$criterionId][$levelSequence])) {
+                        continue;
                     }
+
+                    $descriptor      = $descriptors[$criterionId][$levelSequence];
+                    $descriptorId    = isset($descriptor['id']) ?: null;
+                    $descriptorText  = $descriptor['text'];
+                    $descriptorValue = $descriptor['points'];
+
+                    if (strlen($descriptorText) || strlen($descriptorValue)) {
+                        $d = new Descriptor($descriptorText, $descriptorValue, $descriptorId);
+                        $rubric->putDescriptor($g, $c, $l, $d, $usesMarkRange);
+                    }
+
                 }
 
             }
 
+        } catch (InvalidArgumentException $e) {
+            echo "Unable to put descriptor: " . $e->getMessage();
         }
 
         return $rubric;
