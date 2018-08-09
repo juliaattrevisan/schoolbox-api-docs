@@ -3,7 +3,7 @@ CREATE TABLE `comms_news_article_statistics` (
   `article_id` INT(11) NOT NULL,
   `user_id` int(11) UNSIGNED NOT NULL,
   `type` ENUM('open', 'impression') NULL,
-  `referrer` ENUM('dashboard', 'homepage', 'email') NULL,
+  `referrer` ENUM('dashboard', 'homepage', 'archive', 'email') NULL,
   `created_at` DATETIME NOT NULL,
   `updated_at` DATETIME NOT NULL,
   `deleted_at` DATETIME NULL,
