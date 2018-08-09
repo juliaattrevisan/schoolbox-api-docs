@@ -1,11 +1,67 @@
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script>
+    $(function() {
+        $('#graph').highcharts({
+
+            /* can use inverted:true to make it horizontal'
+             */
+            chart: {
+                type: 'column',
+                zoomType: 'xy'
+            },
+
+            time: {
+                useUTC: false
+            },
+
+            title: {
+                text: 'Interactions over time'
+            },
+
+            xAxis: {
+                title: {
+                    text: 'Date'
+                },
+                type: 'datetime',
+                dateTimeLabelFormats: {
+                    day: '%H:%i'
+                }
+            },
+
+            yAxis: {
+                min: 0,
+                title: {
+                    text: 'Number of interactions'
+                }
+            },
+
+            tooltip: {
+                useHTML: true
+            },
+
+            plotOptions: {
+                column: {
+                    stacking: 'normal'
+                }
+            },
+
+            series: [
+{% for type, data in series %}
+                {
+                    name: '{{ type|capitalize }}',
+                    data: {{ data|json_encode|raw }}
+                }{% if not loop.last %},{% endif %}
+
+{% endfor %}
+
+            ]
+        });
+    });
+</script>
 <div class="row">
     <div class="small-12 columns">
         <h1>Statistics for {{ article.title }}</h1>
     </div>
 </div>
 
-<div class="row">
-    <div class="small-12 columns">
-
-    </div>
-</div>
+<div id="graph"></div>
