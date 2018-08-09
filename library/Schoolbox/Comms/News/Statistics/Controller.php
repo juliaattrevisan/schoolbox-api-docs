@@ -112,6 +112,35 @@ class Controller extends Base
 
 
     /**
+     * Get all the Opens that didn't originate from anywhere in particular (unknown referrer)
+     *
+     * @param News\Model $article
+     * @return array
+     */
+    private function fetchAnonymousOpens(news\Model $article): array
+    {
+        $opens = [];
+
+        $result = $this->db->query("
+            SELECT 
+				CAST(1000*UNIX_TIMESTAMP(CONCAT(DATE_FORMAT(created_at, '%Y-%m-%d %H:%i'), ':00')) AS UNSIGNED) AS timestamp,
+                COUNT(*) AS num
+            FROM comms_news_article_statistics cnas
+            WHERE article_id = 1
+            AND `type` = 'open' AND referrer IS NULL
+            GROUP BY timestamp
+            ORDER BY timestamp
+        ");
+
+        while ($row = $result->fetch(\PDO::FETCH_ASSOC)) {
+            $opens[] = [(int)$row['timestamp'], (int)$row['num']];
+        }
+
+        return $opens;
+    }
+
+
+    /**
      * Facade for assembling all the little pieces of the graph data
      *
      * @param News\Model $article
@@ -121,7 +150,8 @@ class Controller extends Base
     {
         return [
             'impressions' => $this->fetchImpressions($article),
-            'conversions' => $this->fetchConversions($article)
+            'conversions' => $this->fetchConversions($article),
+            'opens' => $this->fetchAnonymousOpens($article)
         ];
     }
 

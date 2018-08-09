@@ -38,3 +38,10 @@ INSERT INTO comms_news_article_statistics
 (`article_id`, `user_id`, `type`, `referrer`, `created_at`, `updated_at`)
 VALUES
 (1, 24, 'open', 'dashboard', '2018-08-10 15:21:07', '2018-08-10 15:21:07');
+
+-- Two arbitrary opens from an unknown place ie. direct access
+INSERT INTO comms_news_article_statistics
+(`article_id`, `user_id`, `type`, `referrer`, `created_at`, `updated_at`)
+VALUES
+(1, 26, 'open', null, '2018-08-10 20:10:00', '2018-08-10 20:10:00'),
+(1, 27, 'open', null, '2018-08-10 20:20:00', '2018-08-10 20:20:00');
