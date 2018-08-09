@@ -153,7 +153,8 @@ class Controller extends BaseController
             $this->buildUnthemedHtmlOutput(
                 '@courseImportAtlas/import/plan.twig',
                 [
-                    'curriculum' => $curriculumPlan,
+                    'curriculum'   => $curriculumPlan,
+                    'previousPost' => $this->request->post->getArrayCopy(),
                 ]
             )
         );
