@@ -16,7 +16,8 @@ use Predis;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\Notif;
-use Schoolbox\Notif\Notifactory;
+use Schoolbox\Realtime\Schedule\Event\CrudEventInterface;
+use Schoolbox\Realtime\Schedule\Trigger\IPropagator;
 
 class RedisCache implements ICache
 {
@@ -46,11 +47,12 @@ class RedisCache implements ICache
 
 
     /**
-     * @param Connector $mq
-     * @param string    $queueName
+     * @param Connector   $mq
+     * @param IPropagator $propagator
+     * @param string      $queueName
      * @return bool
      */
-    public function restoreSchedule(Connector $mq, string $queueName)
+    public function restoreSchedule(Connector $mq, IPropagator $propagator, string $queueName)
     {
         $this->log->notice("Restoring $queueName from Redis cache");
 
@@ -67,14 +69,18 @@ class RedisCache implements ICache
         }
 
         // setup ready to go
-        $n = Notifactory::create(Notif::TOPIC_APPLICATION);
         $i = 0;
 
         foreach ($itemKeys as $itemKey) {
             try {
                 $this->log->debug("Restoring $itemKey");
 
-                $n->notice(gzuncompress($this->redis->get($itemKey)));
+                /** @var CrudEventInterface $event */
+                $event = unserialize(gzuncompress($this->redis->get($itemKey)), []);
+
+                /** @var IPropagator $propagator */
+                $propagator->propagateEvent($event);
+
                 ++$i;
 
             } catch (ErrorException $e) {

@@ -11,10 +11,17 @@
  */
 
 use Alaress\Scheduler\Cache\RedisCache;
+use Predis\ClientInterface;
+use React\Stomp\Client;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Notif\MQ\Connector;
 use Aura\Di;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
+use Schoolbox\Realtime\Schedule;
+use Schoolbox\Realtime\Schedule\Event\Splitter;
+use Schoolbox\Realtime\Schedule\Trigger\Propagator;
+use Schoolbox\Realtime\Schedule\Trigger\TriggerFactoryFactory;
 
 $fields = array('porcelain', 'mem', 'truemem', 'pid');
 
@@ -34,6 +41,8 @@ $k = new \Schoolbox\Application\Daemon\Kernel('Schedule Reload-from-Cache', [
     'fields'  => array_values($fields),
 ]);
 
+
+try {
 
 $k->run(function ($di, $loop, $log, $opts) {
     /**
@@ -65,8 +74,28 @@ $k->run(function ($di, $loop, $log, $opts) {
             // get the cache handler
             $jit = new RedisCache(Alaress\Redis::getClientInstance(), $log, INSTANCE_ID);
 
+            /** @var IConfigLoader $conf */
+            $conf = $di->get('config');
+
+            $tff = new TriggerFactoryFactory(true);
+
+            $splitter = new Splitter($conf, $di, $tff);
+
+            /** @var Alaress\Async\AMQP\AMQPInterface $amqp */
+            $amqp = $di->get('amqp');
+
+            /** @var ClientInterface $redis */
+            $redis = $di->get('redis');
+
+            /** @var Client $stomp */
+            $stomp = $di->get('stomp');
+
+            $broker = new Schedule\Broker(INSTANCE_ID, $amqp, $redis, $stomp);
+
+            $propagator = new Propagator($splitter, $redis, $broker, INSTANCE_ID);
+
             // restore data if possible
-            $restored = $jit->restoreSchedule(new Connector(), $q);
+            $restored = $jit->restoreSchedule(new Connector(), $propagator, $q);
 
             if (!$restored) {
                 throw new RuntimeException("Could not read cached data");
@@ -81,3 +110,7 @@ $k->run(function ($di, $loop, $log, $opts) {
         }
     }
 });
+
+
+
+} catch (\Exception $e) {}

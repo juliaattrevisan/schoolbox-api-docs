@@ -12,6 +12,8 @@ namespace Alaress\Scheduler\Cache;
 
 use Alaress\Scheduler\Stomp\ResolutionManager;
 use Schoolbox\Notif\MQ\Connector;
+use Schoolbox\Realtime\Schedule\Trigger\IPropagator;
+
 
 interface ICache
 {
@@ -26,10 +28,11 @@ interface ICache
 
 
     /**
-     * @param Connector $mq
-     * @param string    $queueName
+     * @param Connector   $mq
+     * @param IPropagator $propagator
+     * @param string      $queueName
      * @return bool
      */
-    public function restoreSchedule(Connector $mq, string $queueName);
+    public function restoreSchedule(Connector $mq, IPropagator $propagator, string $queueName);
 
 }
