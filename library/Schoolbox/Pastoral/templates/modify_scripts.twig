@@ -112,62 +112,59 @@
         $('#formPastoral').removeClass('hide');
         $('#formPastoralDelete').removeClass('hide');
 
-
-
-
-
         $("#typeId,#subtypeId").on('change', function() {
             loadAudience();
         });
 
+        window.hasChanged = false;
+
         function loadAudience() {
             //Only load the audience defaults if this is a new record
-            {% if record.id is null %}
-                //Remove all other rows
-                $("#permission-roles tr").remove();
-                $("#permission-users tr").remove();
-                $("#permission-groups tr").remove();
+            {% if record.access | length < 1 %}
+                //Only change between defaults if no other changes have been made
+                if(window.hasChanged == false) {
+                    //Remove all other rows
+                    $("#permission-roles tr").remove();
+                    $("#permission-users tr").remove();
+                    $("#permission-groups tr").remove();
 
-                window.rolesAdded = [];
-                window.usersAdded = [];
-                window.groupsAdded = [];
+                    window.rolesAdded = [];
+                    window.usersAdded = [];
+                    window.groupsAdded = [];
 
-                updateVisibility();
+                    var typeId = $("#typeId").val();
+                    var subtypeId = $("#subtypeId").val();
 
-                var typeId = $("#typeId").val();
-                var subtypeId = $("#subtypeId").val();
+                    {% for audience in audiences %}
+                        if ({{ audience.typeId }} == typeId && {{ audience.subtypeId | default("null") }} == subtypeId) {
+                            {% if audience.group_id %}
+                            window.addGroup({{ audience.group_id }});
+                            {% elseif audience.role.id %}
+                            window.addRole("{{ audience.role.id }}", "{{ audience.role.name }}", "{{ audience.access}}");
+                            {% elseif audience.user.id %}
+                            window.modalUserAdded({
+                                'id' : {{ audience.user.id }},
+                                'first_name': "{{ audience.user.firstname }}",
+                                'last_name': "{{ audience.user.lastname }}",
+                                'role': "{{ audience.user.role.name }}",
+                            }, "{{ audience.access}}");
+                            {% else %}
+                            console.log("ERROR");
+                            {% endif %}
+                        }
+                    {% endfor %}
 
-
-
-                console.log(typeId);
-                console.log(subtypeId);
-
-                {% for audience in audiences %}
-                if ({{ audience.typeId }} == typeId && {{ audience.subtypeId | default("null") }} == subtypeId) {
-                    {% if audience.group_id %}
-                        window.addGroup({{ audience.group_id }});
-                    {% elseif audience.role.id %}
-                        window.addRole("{{ audience.role.id }}", "{{ audience.role.name }}");
-                    {% elseif audience.user.id %}
-                        window.modalUserAdded({
-                            'id' : {{ audience.user.id }},
-                            'first_name': "{{ audience.user.firstname }}",
-                            'last_name': "{{ audience.user.lastname }}",
-                            'role': "{{ audience.user.role.name }}",
-                        }, "{{ audience.access}}");
-                    {% else %}
-                        console.log("ERROR");
-                    {% endif %}
+                    updateVisibility();
                 }
-                {% endfor %}
             {% endif %}
-            updateVisibility();
-
         }
 
         loadAudience();
 
-
+        $('[data-delete-visibility], input[name  *= "user"], input[name *= "groups"], input[name *= "role"], [data-button *= "add"]').on('click', function() {
+            window.hasChanged = true;
+        });
 
 });
 </script>
+

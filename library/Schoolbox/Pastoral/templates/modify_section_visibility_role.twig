@@ -158,7 +158,7 @@
 
             {# Add role to table #}
 
-            window.addRole = function(roleId, roleName) {
+            window.addRole = function(roleId, roleName, permission = 1) {
                 if (window.rolesAdded[roleId] !== true) {
                     $('#empty-roles').remove();
 
@@ -170,6 +170,10 @@
 
                     var permissionListRoles = $('#permission-roles');
                     permissionListRoles.html(permissionListRoles.html() + html);
+
+                    //Check the correct box
+                    var selector = 'input[name = "role['+roleId+']"][value ="'+permission+'"]';
+                    $(permissionListRoles).find(selector).attr("checked", "checked");
                 }
 
                 $(this).addClass('hide');

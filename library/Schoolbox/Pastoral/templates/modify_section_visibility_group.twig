@@ -99,7 +99,7 @@
                     $(clickedElement).attr('checked', 'true');
                 });
 
-                $('1y="group"]').click(function (e) {
+                $('[data-delete-visibility="group"]').click(function (e) {
                     e.preventDefault();
 
                     var row = $(this).closest('tr');
@@ -154,12 +154,9 @@
 
             {# Add group to table #}
 
-            $('[data-group-add]').click(function(e) {
-                e.preventDefault();
 
-                var groupId = $(this).attr('data-group-add');
-                var groupName = $(this).attr('data-group-name');
 
+            window.addGroup = function(groupId, groupName, permission = 1) {
                 if (window.groupsAdded[groupId] !== true) {
                     $('#empty-groups').remove();
 
@@ -171,6 +168,10 @@
 
                     var permissionListGroups = $('#permission-groups');
                     permissionListGroups.html(permissionListGroups.html() + html);
+
+                    //Check the correct box
+                    var selector = 'input[name = "group['+groupId+']"][value ="'+permission+'"]';
+                    $(permissionListGroups).find(selector).attr("checked", "checked");
                 }
 
                 $(this).addClass('hide');
@@ -178,6 +179,15 @@
                 updateGroupPermissionsClick();
                 updateGroupsModal();
                 updateVisibility();
+            }
+
+            $('[data-group-add]').click(function(e) {
+                e.preventDefault();
+
+                var groupId = $(this).attr('data-group-add');
+                var groupName = $(this).attr('data-group-name');
+
+                addGroup(groupId, groupName);
 
                 var remaining = 0;
 
