@@ -99,8 +99,16 @@
                                 </li>
                                 <li>
                                     The previous <code>fieldset</code> has now been <code>[disabled]</code>.
-                                    This is the default behaviour, but that's a config setting you can change.
+                                    This is the default behaviour, but that can be changed with the config setting <code>reenablePrevious: true</code>.
                                     There will also eventually be an IE polyfill to disable all the individual form elements too, because IE doesn't support fieldset disablement inheritance. Because IE.
+                                    <ul>
+                                        <li>
+                                            If you want to persist form inputs from previous sections, but don't want to
+                                            re-enable previous sections, consider the <code>generateHiddenInputs</code>
+                                            Twig function: it creates a <code>&lt;input type="hidden" /&gt;</code> for
+                                            each item in the array you pass to it.
+                                        </li>
+                                    </ul>
                                 </li>
                             </ul>
                         </div>
