@@ -48,9 +48,6 @@ class Logger implements LoggerInterface {
     /** @var Monologger */
     protected $log;
 
-    /** @var HandlerInterface[] */
-    protected $handlers;
-
     /** @var bool */
     protected $porcelain;
 
@@ -71,7 +68,6 @@ class Logger implements LoggerInterface {
         $this->err = $errStream;
         $this->porcelain = $porcelain;
 
-        $this->setLevel($threshold);
 
         $processors = array(new MicrotimeProcessor());
 
@@ -90,31 +86,40 @@ class Logger implements LoggerInterface {
         }
 
         $this->log = new Monologger('cli', array(), $processors);
+        $this->setLevel($threshold);
     }
 
 
     /**
      * @param int $level
      */
-    public function setLevel($level) {
-        $this->handlers = array();
+    private function setLevel($level)
+    {
         // attach STDOUT
         if(is_resource($this->out)) {
             $handler = new StreamHandler($this->out, $level);
             $handler->setFormatter(new TtyFormatter($this->out, $this->porcelain));
-            $this->handlers[] = $handler;
+            $this->pushHandler($handler);
         }
 
         // attach STDERR
         if(is_resource($this->err)) {
             $handler = new StreamHandler($this->err, max(Monologger::CRITICAL, $level));
             $handler->setFormatter(new TtyFormatter($this->out, $this->porcelain, true));
-            $this->handlers[] = $handler;
+            $this->pushHandler($handler);
         }
 
         $this->level = $level;
     }
 
+    /**
+     * Push a new handler into log stack
+     * @param HandlerInterface $handler
+     */
+    public function pushHandler(HandlerInterface $handler)
+    {
+        $this->log->pushHandler($handler);
+    }
 
     /**
      * @return int
@@ -130,7 +135,7 @@ class Logger implements LoggerInterface {
      *
      * @param string $message
      * @param array  $context
-     * @return null
+     * @return void
      */
     public function emergency($message, array $context = array())
     {
@@ -146,7 +151,7 @@ class Logger implements LoggerInterface {
      *
      * @param string $message
      * @param array  $context
-     * @return null
+     * @return void
      */
     public function alert($message, array $context = array())
     {
@@ -161,7 +166,7 @@ class Logger implements LoggerInterface {
      *
      * @param string $message
      * @param array  $context
-     * @return null
+     * @return void
      */
     public function critical($message, array $context = array())
     {
@@ -175,7 +180,7 @@ class Logger implements LoggerInterface {
      *
      * @param string $message
      * @param array  $context
-     * @return null
+     * @return void
      */
     public function error($message, array $context = array())
     {
@@ -191,7 +196,7 @@ class Logger implements LoggerInterface {
      *
      * @param string $message
      * @param array  $context
-     * @return null
+     * @return void
      */
     public function warning($message, array $context = array())
     {
@@ -204,7 +209,7 @@ class Logger implements LoggerInterface {
      *
      * @param string $message
      * @param array  $context
-     * @return null
+     * @return void
      */
     public function notice($message, array $context = array())
     {
@@ -219,7 +224,7 @@ class Logger implements LoggerInterface {
      *
      * @param string $message
      * @param array  $context
-     * @return null
+     * @return void
      */
     public function info($message, array $context = array())
     {
@@ -232,7 +237,7 @@ class Logger implements LoggerInterface {
      *
      * @param string $message
      * @param array  $context
-     * @return null
+     * @return void
      */
     public function debug($message, array $context = array())
     {
@@ -246,17 +251,10 @@ class Logger implements LoggerInterface {
      * @param mixed  $level
      * @param string $message
      * @param array  $context
-     * @return null
+     * @return void
      */
     public function log($level, $message, array $context = array())
     {
-        if (count($this->handlers) == 0) {
-            // no handler spec'd - don't try to do anything
-            return;
-        }
-        
-        $this->log->setHandlers($this->handlers);
-
         try {
             $this->log->log($level, $message, $context);
         } catch (\LogicException $e) {

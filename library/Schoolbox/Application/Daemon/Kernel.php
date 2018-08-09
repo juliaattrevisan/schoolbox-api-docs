@@ -19,7 +19,9 @@ use RangeException;
 use React\EventLoop\Factory;
 use React\EventLoop\LoopInterface;
 use RuntimeException;
-
+use Monolog\Handler\RavenHandler;
+use Monolog\Logger as Monologger;
+use Raven_Client;
 
 class Kernel extends \Alaress\Application\Kernel
 {
@@ -395,7 +397,17 @@ EOL;
             $fields    = $this->getOpt('fields') ?: [];
             $porcelain = in_array('porcelain', $fields);
             $this->log = new Logger(STDOUT, STDERR, $level, $fields, $porcelain);
+
+            // Add Sentry handler into logging system if possible
+            if ($this->getDependencyInjector()->has('sentry')) {
+                /** @var Raven_Client $ravenClient */
+                $ravenClient  = $this->getDependencyInjector()->get('sentry');
+                $ravenHandler = new RavenHandler($ravenClient, Monologger::CRITICAL);
+                $this->log->pushHandler($ravenHandler);
+            }
         }
+
+
         return $this->log;
     }
 
