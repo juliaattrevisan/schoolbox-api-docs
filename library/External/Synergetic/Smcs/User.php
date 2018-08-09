@@ -61,6 +61,7 @@ class External_Synergetic_Smcs_User extends External_Synergetic_User
                         uvStudents.StudentEmergency3Phone,
                         uvStudents.StudentEmergency3PhoneAlt,
                         uvStudents.StudentMedicalAlert,
+                        '' AS StudentMobilePhone,
                         uvStudents.StudentSpecialNeedsFlag,
                         uvStudents.StudentStudiesCode,
                         AlertMessage,

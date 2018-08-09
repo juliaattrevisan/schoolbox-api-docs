@@ -89,31 +89,31 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
      */
     public function getStudent($externalUserId)
     {
-        // prepare
-
-        /* FIELDS PRESENT IN SYNERGETIC BUT NOT EDUMATE
-                     vStudents.StudentTutorName
-                 House.HeadOfHouseID
-             vStudents.StudentTutorDescription
-                luForm.ID as TeacherFormID
-               luTutor.ID as TeacherTutorID
-                luForm.Description as FormDescription
-             vStudents.StudentHouseDescription
-             vStudents.StudentYearLevelCoordinator
-           luYearLevel.YearLevelCoordID
-             vStudents.StudentLockerBook
-             vStudents.StudentEmergencyPhoneAlt
-             vStudents.StudentMedicalAlert
-             vStudents.StudentSpecialNeedsFlag
-                       AlertMessage
-             vStudents.StudentBoarder
-        */
+        // Fields present in Synergetic but not Edumate
+        //
+        // StudentTutorName
+        // HeadOfHouseID
+        // StudentTutorDescription
+        // TeacherFormID
+        // TeacherTutorID
+        // FormDescription
+        // StudentHouseDescription
+        // StudentYearLevelCoordinator
+        // YearLevelCoordID
+        // StudentLockerBook
+        // StudentEmergencyPhoneAlt
+        // StudentMedicalAlert
+        // StudentSpecialNeedsFlag
+        // AlertMessage
+        // StudentBoarder
+        // StudentMobilePhone
 
         // use this for mapping DB2INDICES to NormalIndices
+
         $caseSensitiveFields = array(
             'StudentID', 'StudentGiven1', 'StudentSurname', 'StudentBirthDate',
             'StudentHouseDescription', 'StudentYearLevel', 'StudentTutor', 'StudentHeadOfHouse', 'StudentForm',
-            'StudentFormStaffName', 'StudentEmergencyName', 'StudentEmergencyPhone'
+            'StudentFormStaffName', 'StudentEmergencyName', 'StudentEmergencyPhone', 'StudentMobilePhone'
         );
 
         $stmt = $this->getConnection()->prepareQuery("

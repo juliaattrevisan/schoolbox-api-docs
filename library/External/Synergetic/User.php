@@ -366,6 +366,7 @@ class External_Synergetic_User implements External_UserInterface
                         vStudents.StudentEmergency3Phone,
                         vStudents.StudentEmergency3PhoneAlt,
                         vStudents.StudentMedicalAlert,
+                        vStudents.StudentMobilePhone,
                         vStudents.StudentSpecialNeedsFlag,
                         vStudents.StudentStudiesCode,
                         AlertMessage,

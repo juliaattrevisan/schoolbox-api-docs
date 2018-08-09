@@ -178,6 +178,7 @@ class External_Schoolpro_User implements External_UserInterface
                 'StudentEmergencyPhone'   => $currentStudent['EmergencyContactPhone'],
                 'StudentStudiesCode'      => '',
                 'StudentMedicalAlert'     => $medicalNoteStr,
+                'StudentMobilePhone'      => '',
                 'StudentSpecialNeedsFlag' => '',
                 'AlertMessage'            => '',
                 'Comment'                 => '',

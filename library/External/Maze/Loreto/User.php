@@ -67,6 +67,7 @@ class External_Maze_Loreto_User extends External_Maze_User {
 				'' AS StudentEmergency3Phone,
 				'' AS StudentEmergency3PhoneAlt,
 				ST.MEDICAL AS StudentMedicalAlert,
+				'' AS StudentMobilePhone,
 				'' AS StudentStudiesCode,
 				'' AS StudentSpecialNeedsFlag,
 				'' AS AlertMessage,

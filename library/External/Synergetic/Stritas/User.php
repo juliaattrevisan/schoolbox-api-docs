@@ -67,6 +67,7 @@ class External_Synergetic_Stritas_User extends External_Synergetic_User
                 vStudents.StudentEmergency3Phone,
                 vStudents.StudentEmergency3PhoneAlt,
                 vStudents.StudentMedicalAlert,
+                vStudents.StudentMobilePhone,
                 vStudents.StudentSpecialNeedsFlag,
                 vStudents.StudentStudiesCode,
                 AlertMessage,

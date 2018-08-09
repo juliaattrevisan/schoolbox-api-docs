@@ -15,44 +15,46 @@ interface External_UserInterface {
     /**
      * Get student info for $externalUserId
      *
-     * StudentID,
-     * StudentGiven1,
-     * StudentSurname,
-     * StudentBirthDate, (a unix timestamp)
-     * StudentHouseDescription,
-     * StudentHouse,
-     * HeadOfHouseID,
-     * StudentHeadOfHouse,
-     * StudentBoarder,
-     * Comment,
-     * StudentEnrolmentDate,
-     * StudentLeavingDate,
-     * StudentIBFlag,
-     * StudentForm,
-     * FormDescription,
-     * StudentFormStaffName,
-     * StudentTutor,
-     * StudentTutorName,
-     * StudentTutorDescription,
-     * TeacherFormID,
-     * TeacherTutorID,
-     * StudentYearLevel,
-     * YearLevelCoordID,
-     * StudentYearLevelCoordinator,
-     * StudentLockerBook,
-     * StudentEmergencyName,
-     * StudentEmergencyPhone,
-     * StudentEmergencyPhoneAlt,
-     * StudentEmergency2Name,
-     * StudentEmergency2Phone,
-     * StudentEmergency2PhoneAlt,
-     * StudentEmergency3Name,
-     * StudentEmergency3Phone,
-     * StudentEmergency3PhoneAlt,
-     * StudentMedicalAlert,
-     * StudentSpecialNeedsFlag,
-     * StudentStudiesCode,
-     * AlertMessage,
+     * StudentID
+     * StudentGiven1
+     * StudentSurname
+     * StudentBirthDate
+     * StudentTutorName
+     * StudentHeadOfHouse
+     * HeadOfHouseID
+     * StudentFormStaffName
+     * StudentTutorDescription
+     * TeacherFormID
+     * StudentForm
+     * TeacherTutorID
+     * StudentTutor
+     * FormDescription
+     * StudentHouseDescription
+     * StudentHouse
+     * StudentYearLevel
+     * StudentYearLevelCoordinator
+     * YearLevelCoordID
+     * StudentLockerBook
+     * StudentEmergencyName
+     * StudentEmergencyPhone
+     * StudentEmergencyPhoneAlt
+     * StudentEmergency2Name
+     * StudentEmergency2Phone
+     * StudentEmergency2PhoneAlt
+     * StudentEmergency3Name
+     * StudentEmergency3Phone
+     * StudentEmergency3PhoneAlt
+     * StudentMedicalAlert
+     * StudentMobilePhone
+     * StudentSpecialNeedsFlag
+     * StudentStudiesCode
+     * AlertMessage
+     * StudentBoarder
+     * Comment
+     * StudentEnrolmentDate
+     * StudentLeavingDate
+     * StudentIBFlag
+     * countIndividualEducationPlans
      *
      * @importance high - used on student profile page
      *
