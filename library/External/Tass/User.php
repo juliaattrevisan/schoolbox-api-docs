@@ -160,6 +160,7 @@ class External_Tass_User implements External_UserInterface
             '' AS StudentMedicalAlert,
             '' AS StudentMobilePhone,
             '' AS StudentSpecialNeedsFlag,
+            '' AS EnglishSecondFlag,
             '' AS StudentStudiesCode,
             '' AS AlertMessage,
             '' AS CourtOrderType,
