@@ -89,27 +89,27 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
      */
     public function getStudent($externalUserId)
     {
-        // Fields present in Synergetic but not Edumate
-        //
-        // StudentTutorName
-        // HeadOfHouseID
-        // StudentTutorDescription
-        // TeacherFormID
-        // TeacherTutorID
-        // FormDescription
-        // StudentHouseDescription
-        // StudentYearLevelCoordinator
-        // YearLevelCoordID
-        // StudentLockerBook
-        // StudentEmergencyPhoneAlt
-        // StudentMedicalAlert
-        // StudentSpecialNeedsFlag
-        // AlertMessage
-        // StudentBoarder
-        // StudentMobilePhone
+		// Fields present in Synergetic but not Edumate
+		//
+		// StudentTutorName
+		// HeadOfHouseID
+		// StudentTutorDescription
+		// TeacherFormID
+		// TeacherTutorID
+		// FormDescription
+		// StudentHouseDescription
+		// StudentYearLevelCoordinator
+		// YearLevelCoordID
+		// StudentLockerBook
+		// StudentEmergencyPhoneAlt
+		// StudentMedicalAlert
+		// StudentSpecialNeedsFlag
+		// EnglishSecondFlag
+		// AlertMessage
+		// StudentBoarder
+		// StudentMobilePhone
 
         // use this for mapping DB2INDICES to NormalIndices
-
         $caseSensitiveFields = array(
             'StudentID', 'StudentGiven1', 'StudentSurname', 'StudentBirthDate',
             'StudentHouseDescription', 'StudentYearLevel', 'StudentTutor', 'StudentHeadOfHouse', 'StudentForm',
