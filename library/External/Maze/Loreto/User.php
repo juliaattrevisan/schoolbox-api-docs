@@ -70,6 +70,7 @@ class External_Maze_Loreto_User extends External_Maze_User {
 				'' AS StudentMobilePhone,
 				'' AS StudentStudiesCode,
 				'' AS StudentSpecialNeedsFlag,
+				'' AS EnglishSecondFlag,
 				'' AS AlertMessage,
                 '' AS CourtOrderType,
 				'' AS StudentBoarder,

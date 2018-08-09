@@ -47,6 +47,7 @@ interface External_UserInterface {
      * StudentMedicalAlert
      * StudentMobilePhone
      * StudentSpecialNeedsFlag
+     * EnglishSecondFlag
      * StudentStudiesCode
      * CourtOrderType
      * AlertMessage
