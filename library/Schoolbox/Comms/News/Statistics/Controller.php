@@ -49,6 +49,7 @@ class Controller extends Base
                 `referrer`
             FROM comms_news_article_statistics cnas
             WHERE article_id = 1
+            AND deleted_at IS NULL
             GROUP BY timestamp, `type`, referrer
             ORDER BY timestamp
         ");
