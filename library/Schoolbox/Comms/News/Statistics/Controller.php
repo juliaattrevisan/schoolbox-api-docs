@@ -28,9 +28,15 @@ class Controller extends Base
         $this->db = \Schoolbox\Comms\News\Mapper::getInstance()->getDatabase();
     }
 
-    private function buildContainer(News\Model $article)
+
+    /**
+     * Assemble all the Impressions, Conversions and direct Opens for $article
+     *
+     * @param News\Model $article
+     * @return array
+     */
+    private function fetchImpressionsConversionsOpens(News\Model $article): array
     {
-        $data = [];
 
         /* Get all the timestamps that have content - because of the way highcharts stacks its data
          * I need to initialise the container with all the possibilities and stack categorised data in-order
@@ -38,121 +44,30 @@ class Controller extends Base
         $result = $this->db->query("
             SELECT 
 				CAST(1000*UNIX_TIMESTAMP(CONCAT(DATE_FORMAT(created_at, '%Y-%m-%d %H:%i'), ':00')) AS UNSIGNED) AS timestamp,
-                COUNT(*) AS num
+                COUNT(*) AS num,
+                `type`,
+                `referrer`
             FROM comms_news_article_statistics cnas
             WHERE article_id = 1
-            GROUP BY timestamp
+            GROUP BY timestamp, `type`, referrer
             ORDER BY timestamp
         ");
 
+        $data = [];
+
         while ($row = $result->fetch(\PDO::FETCH_ASSOC)) {
-            $data[(int)$row['timestamp']] = null;
+            $type = $row['type'];
+
+            /* A conversion is a specific combination of Type and Referrer
+             */
+            if (($row['type'] === 'open') && (null !== $row['referrer'])) {
+                $type = 'conversion';
+            }
+
+            $data[$type][] = [(int)$row['timestamp'], (int)$row['num']];
         }
 
         return $data;
-    }
-
-
-    /**
-     * Add all the Dashboard Impressions
-     *
-     * @param News\Model $article
-     * @return array
-     */
-    private function fetchImpressions(News\Model $article): array
-    {
-        $impressions = [];
-
-        $result = $this->db->query("
-            SELECT 
-				CAST(1000*UNIX_TIMESTAMP(CONCAT(DATE_FORMAT(created_at, '%Y-%m-%d %H:%i'), ':00')) AS UNSIGNED) AS timestamp,
-                COUNT(*) AS num
-            FROM comms_news_article_statistics cnas
-            WHERE article_id = 1
-            AND `type` = 'impression' AND referrer = 'dashboard'
-            GROUP BY timestamp
-            ORDER BY timestamp
-        ");
-
-        while ($row = $result->fetch(\PDO::FETCH_ASSOC)) {
-            $impressions[] = [(int)$row['timestamp'], (int)$row['num']];
-        }
-
-        return $impressions;
-    }
-
-
-    /**
-     * Get all the Opens that originated from a Dashboard Impression
-     *
-     * @param News\Model $article
-     * @return array
-     */
-    private function fetchConversions(News\Model $article): array
-    {
-        $conversions = [];
-
-        $result = $this->db->query("
-            SELECT 
-				CAST(1000*UNIX_TIMESTAMP(CONCAT(DATE_FORMAT(created_at, '%Y-%m-%d %H:%i'), ':00')) AS UNSIGNED) AS timestamp,
-                COUNT(*) AS num
-            FROM comms_news_article_statistics cnas
-            WHERE article_id = 1
-            AND `type` = 'open' AND referrer = 'dashboard'
-            GROUP BY timestamp
-            ORDER BY timestamp
-        ");
-
-        while ($row = $result->fetch(\PDO::FETCH_ASSOC)) {
-            $conversions[] = [(int)$row['timestamp'], (int)$row['num']];
-        }
-
-        return $conversions;
-    }
-
-
-    /**
-     * Get all the Opens that didn't originate from anywhere in particular (unknown referrer)
-     *
-     * @param News\Model $article
-     * @return array
-     */
-    private function fetchAnonymousOpens(news\Model $article): array
-    {
-        $opens = [];
-
-        $result = $this->db->query("
-            SELECT 
-				CAST(1000*UNIX_TIMESTAMP(CONCAT(DATE_FORMAT(created_at, '%Y-%m-%d %H:%i'), ':00')) AS UNSIGNED) AS timestamp,
-                COUNT(*) AS num
-            FROM comms_news_article_statistics cnas
-            WHERE article_id = 1
-            AND `type` = 'open' AND referrer IS NULL
-            GROUP BY timestamp
-            ORDER BY timestamp
-        ");
-
-        while ($row = $result->fetch(\PDO::FETCH_ASSOC)) {
-            $opens[] = [(int)$row['timestamp'], (int)$row['num']];
-        }
-
-        return $opens;
-    }
-
-
-    /**
-     * Facade for assembling all the little pieces of the graph data
-     *
-     * @param News\Model $article
-     * @return array
-     */
-    private function assembleStatistics(News\Model $article): array
-    {
-        return [
-            'impressions' => $this->fetchImpressions($article),
-            'conversions' => $this->fetchConversions($article),
-            'opens' => $this->fetchAnonymousOpens($article)
-        ];
     }
 
 
@@ -169,7 +84,7 @@ class Controller extends Base
      */
     public function getOverview(News\Model $article)
     {
-        $series = $this->assembleStatistics($article);
+        $series = $this->fetchImpressionsConversionsOpens($article);
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsStatistics/index.twig', [
             'article' => $article,
