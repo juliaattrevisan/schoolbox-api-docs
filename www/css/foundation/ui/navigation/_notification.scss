@@ -104,6 +104,8 @@ $notification-header-background: $navigation-background !default;
     }
     .card a {
         color: inherit;
+        display: block;
+
         &:hover {
             background: inherit;
         }
