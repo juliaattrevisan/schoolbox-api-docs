@@ -1,4 +1,4 @@
-<input name="curriculum-plan" value="{{ curriculum.id }}" type="hidden" />
+{{ generateHiddenInputs(previousPost) }}
 
 {% include '@course/sub/sourceSelector.twig' with {
     courseSpec: null,
@@ -9,12 +9,3 @@
         {% include '@course/sub/invalidFacultyRoot.twig' %}
     </div>
 {% endif %}
-
-<div class="row" data-mage-submitrow>
-    <div class="small-12 medium-8 column">
-        <p class="alert alert-box icon-alert" data-mage-error></p>
-    </div>
-    <div class="small-12 medium-4 column">
-        <input type="submit" name="part-3" value="Import" data-mage-next="none" data-mage-working="Importing..." />
-    </div>
-</div>

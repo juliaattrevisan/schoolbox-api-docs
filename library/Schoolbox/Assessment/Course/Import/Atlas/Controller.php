@@ -192,12 +192,15 @@ class Controller extends BaseController
             return;
         }
 
+        $previousPost = $this->request->post->getArrayCopy();
+        unset($previousPost['part-2']);
         $this->response->content->set(
             $this->buildUnthemedHtmlOutput(
                 '@courseImportAtlas/import/facultySelector.twig',
                 [
                     'curriculum' => $curriculumPlan,
                     'isValidFacultyRoot' => $this->courseSpecMapper->isConfiguredFacultyRootValid(),
+                    'previousPost' => $previousPost,
                 ]
             )
         );
@@ -240,6 +243,7 @@ class Controller extends BaseController
             $baseFolder,
             $this->request->post->get('unit')
         );
+
 
         $this->response->content->set($this->buildJsonOutput([]));
         // SHUP.
