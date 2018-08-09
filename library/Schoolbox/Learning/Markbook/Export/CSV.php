@@ -244,6 +244,7 @@ class CSV implements IExporter
     {
         if ($participants[$assessment->getId()] instanceof Collection
             && $participants[$assessment->getId()][$userId] instanceof Participant
+            && !$participants[$assessment->getId()][$userId]->isExcluded()
         ) {
             $participant = $participants[$assessment->getId()][$userId];
 
