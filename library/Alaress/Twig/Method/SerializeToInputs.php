@@ -41,7 +41,17 @@ class SerializeToInputs
     }
 
 
-    private function generateInputName($nameParts): string
+    /**
+     * Generate the name for a form input.
+     *
+     * @example `generateInputName(['user']) => 'user')
+     * @example `generateInputName(['user', 'firstname']) => 'user[firstname]')
+     * @example `generateInputName(['user', 'name', 'first']) => 'user[name][first]')
+     *
+     * @param iterable|string[] $nameParts The parts of the name.
+     * @return string
+     */
+    private function generateInputName(iterable $nameParts): string
     {
         $name  = [];
         $first = true;
