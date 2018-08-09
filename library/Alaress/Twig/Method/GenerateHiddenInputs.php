@@ -9,13 +9,13 @@ declare(strict_types=1);
 namespace Alaress\Twig\Method;
 
 /**
- * Serializer for array values into form inputs.
+ * Generator for hidden form inputs from array values.
  */
-class SerializeToInputs
+class GenerateHiddenInputs
 {
     /**
-     * Serializes `$array` to a set of hidden `<input>` elements, which when
-     * submitted via a form will recreate `$array` in `$_GET` or `$_POST`.
+     * Generates a set of hidden `<input>` elements from `$array`, such that
+     * when submitted via a form will recreate `$array` in `$_GET` or `$_POST`.
      *
      * @param iterable $array
      * @param array    $prefixes
