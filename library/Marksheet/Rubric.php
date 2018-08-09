@@ -26,7 +26,7 @@ class Marksheet_Rubric extends Marksheet_Abstract
      */
     public function convertRawMark($rawMark, $maxMark = 0, $asText = false, $blankZero = true)
     {
-        $mark = $this->cleanNumber(($rawMark / 100) * $maxMark, 4, $blankZero);
+        $mark = $this->cleanNumber(($rawMark / 100) * $maxMark, $blankZero);
         return $asText ? "$mark / $maxMark" : $mark;
     }
 

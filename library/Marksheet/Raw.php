@@ -8,11 +8,10 @@
  */
 class Marksheet_Raw extends Marksheet_Abstract
 {
-
     public function convertRawMark($rawMark, $maxMark = 0, $asText = false, $blankZero = true)
     {
         // do we trust what's stored in the database?
-        $mark = $this->cleanNumber(($rawMark / 100) * $maxMark, 4, $blankZero);
+        $mark = $this->cleanNumber(($rawMark / 100) * $maxMark, $blankZero);
         return $asText ? "$mark / $maxMark" : $mark;
     }
 
