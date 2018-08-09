@@ -33,6 +33,14 @@ VALUES
 (1, 26, 'impression', 'dashboard', '2018-08-10 15:22:33', '2018-08-10 15:22:33'),
 (1, 27, 'impression', 'dashboard', '2018-08-10 15:22:49', '2018-08-10 15:22:49');
 
+-- Some impressions on the next day as well
+INSERT INTO comms_news_article_statistics
+(`article_id`, `user_id`, `type`, `referrer`, `created_at`, `updated_at`)
+VALUES
+(1, 30, 'impression', 'dashboard', '2018-08-11 09:08:11', '2018-08-11 09:08:11'),
+(1, 31, 'impression', 'dashboard', '2018-08-11 09:15:59', '2018-08-11 09:15:59'),
+(1, 37, 'impression', 'dashboard', '2018-08-11 09:17:16', '2018-08-11 09:17:16');
+
 -- One conversion
 INSERT INTO comms_news_article_statistics
 (`article_id`, `user_id`, `type`, `referrer`, `created_at`, `updated_at`)
