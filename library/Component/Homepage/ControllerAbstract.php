@@ -90,11 +90,8 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
             /* Detroit
              */
             $this->applyCollapsedState();
-
             $this->getSitePage()->parse('settings_collapse_block', 'settings_collapse');
-
             $this->getSitePage()->setVar('drag_handle_block', '');
-
         } else {
             /* If you want to process the config, then do so and display it
              * Also provide a triangle so you can alter them through the ui
@@ -114,9 +111,7 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
                 }
                 $this->getSitePage()->parse('settings_link_block', 'settings_link');
                 $this->getSitePage()->parse('settings_close_block', 'settings_close');
-
                 $this->getSitePage()->parse('drag_handle_block', 'drag_handle');
-
             }
         }
 

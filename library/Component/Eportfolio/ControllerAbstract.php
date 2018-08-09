@@ -86,9 +86,7 @@ abstract class Component_Eportfolio_ControllerAbstract extends Component_Control
         } else {
             $this->getSitePage()->setVar('drag_handle_block', '');
         }
-
     }
-
 
     /**
      * Split this out so in ePortfolio you can determine which config elements get rendered
