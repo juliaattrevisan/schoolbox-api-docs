@@ -31,6 +31,15 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
             // noop;
         }
 
+        if(stristr($this->getThumbnail(), 'icon:')) {
+            try {
+                $iconFile = MimetypeMapper::getInstance()->getByFilename(str_replace('icon:', '', $this->getThumbnail()))->getIconFile();
+                return '/images/mime/' . $iconFile;
+            } catch (FileException $e) {
+                // noop;
+            }
+        }
+
         if ($this->hasThumbnail()) {
             return "/socialstream/image.php?size={$iconSize}&id=" . $this->getPostId();
         }
@@ -67,7 +76,7 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
         if ($context === 'post') {
             $page->setVar(array(
                 'SOCIALSTREAM_POST_URL'            => Scrub::text($this->getUrl()),
-                'SOCIALSTREAM_POST_EXTERNAL_TITLE' => Scrub::text($this->getExternalTitle()),
+                'SOCIALSTREAM_POST_EXTERNAL_TITLE' => Scrub::text($this->getExternalTitle()) ?: Scrub::text($this->getUrl()),
                 'SOCIALSTREAM_POST_EXTERNAL_BODY'  => Scrub::text($this->getExternalBody()),
                 'SOCIALSTREAM_POST_ICON' => $icon,
             ));
@@ -84,7 +93,7 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
         elseif ($context === 'comment') {
             $page->setVar(array(
                 'SOCIALSTREAM_COMMENT_URL'            => Scrub::text($this->getUrl()),
-                'SOCIALSTREAM_COMMENT_EXTERNAL_TITLE' => Scrub::text($this->getExternalTitle()),
+                'SOCIALSTREAM_COMMENT_EXTERNAL_TITLE' => Scrub::text($this->getExternalTitle()) ?: Scrub::text($this->getUrl()),
                 'SOCIALSTREAM_COMMENT_EXTERNAL_BODY'  => Scrub::text($this->getExternalBody()),
                 'SOCIALSTREAM_COMMENT_ICON' => $icon,
             ));
@@ -101,7 +110,7 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
         elseif ($context === 'reply') {
             $page->setVar(array(
                 'SOCIALSTREAM_REPLY_URL'            => Scrub::text($this->getUrl()),
-                'SOCIALSTREAM_REPLY_EXTERNAL_TITLE' => Scrub::text($this->getExternalTitle()),
+                'SOCIALSTREAM_REPLY_EXTERNAL_TITLE' => Scrub::text($this->getExternalTitle()) ?: Scrub::text($this->getUrl()),
                 'SOCIALSTREAM_REPLY_EXTERNAL_BODY'  => Scrub::text($this->getExternalBody()),
                 'SOCIALSTREAM_REPLY_ICON' => $icon,
             ));
