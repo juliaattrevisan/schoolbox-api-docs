@@ -158,7 +158,7 @@
 
             {# Add role to table #}
 
-            function addRole(roleId, roleName) {
+            window.addRole = function(roleId, roleName) {
                 if (window.rolesAdded[roleId] !== true) {
                     $('#empty-roles').remove();
 

@@ -71,9 +71,9 @@
 
             {# Callback when user added from modal #}
 
-            window.modalUserAdded = function (user, permission) {
+            window.modalUserAdded = function (user, permission = 1) {
 
-                console.log('adding user with permission' + permission);
+                console.log('adding user' + user.id + ' with permission' + permission);
 
 
                 {# Only add if they don't already exist in the table #}
@@ -92,26 +92,14 @@
                         .replace(/{ID}/g, user.id)
                         .replace(/{ROLE}/g, user.role);
 
-                    switch(permission) {
-                        case "0":
-                            html = html.replace(/{DENY_CHECKED}/ig, "checked");
-                            html = html.replace(/{GEN_CHECKED}/ig, "");
-                            html = html.replace(/{CON_CHECKED}/ig, "");
-                            break;
-                        case "2":
-                            html = html.replace(/{DENY_CHECKED}/ig, "");
-                            html = html.replace(/{GEN_CHECKED}/ig, "");
-                            html = html.replace(/{CON_CHECKED}/ig, "checked");
-                            break;
-                        default:
-                            html = html.replace(/{DENY_CHECKED}/ig, "");
-                            html = html.replace(/{GEN_CHECKED}/ig, "checked");
-                            html = html.replace(/{CON_CHECKED}/ig, "");
-                    }
 
 
                     var permissionListUsers = $('#permission-users');
                     permissionListUsers.html(permissionListUsers.html() + html);
+
+                    //Check the correct box
+                    var selector = 'input[name = "user['+user.id+']"][value ="'+permission+'"]';
+                    $(permissionListUsers).find(selector).attr("checked", "checked");
                 }
 
                 {# Update visibility table and click events #}
