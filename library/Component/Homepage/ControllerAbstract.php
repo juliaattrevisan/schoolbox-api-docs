@@ -95,8 +95,7 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
 
             $this->getSitePage()->setVar('drag_handle_block', '');
 
-        }
-        else {
+        } else {
             /* If you want to process the config, then do so and display it
              * Also provide a triangle so you can alter them through the ui
              *
@@ -109,7 +108,7 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
                  */
                 $this->applyCollapsedState();
 
-                if(!$is_for_template) {
+                if (!$is_for_template) {
                     // We don't show the collapse option when building templates
                     $this->getSitePage()->parse('settings_collapse_block', 'settings_collapse');
                 }
@@ -175,7 +174,7 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
 
         $this->setVar(
             array(
-                'CONFIG_COLLAPSED_ICON' => $state['icon'],
+                'CONFIG_COLLAPSED_ICON'  => $state['icon'],
                 'CONFIG_COLLAPSED_CLASS' => $state['class'],
                 'CONFIG_COLLAPSED_STATE' => $state['data'],
             )

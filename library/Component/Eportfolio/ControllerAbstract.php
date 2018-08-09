@@ -28,7 +28,7 @@ abstract class Component_Eportfolio_ControllerAbstract extends Component_Control
      * Apply permissions here
      *
      * @param Eportfolio_Page_Instance|null $context Null when used in admin ePortfolio screen
-      */
+     */
     public function setup($context = null)
     {
         parent::setup($context);
@@ -62,6 +62,33 @@ abstract class Component_Eportfolio_ControllerAbstract extends Component_Control
 
         return parent::getTemplate($templateName, $templatePath);
     }
+
+    /**
+     * Parse configuration and settings panels for each component
+     *
+     * Facade method
+     *
+     * @param string $targetHandle
+     * @param bool $is_for_template
+     * @return bool
+     */
+    public function parseConfig($targetHandle = 'CONFIGURATION', $is_for_template = false)
+    {
+        parent::parseConfig($targetHandle, $is_for_template);
+
+        //Show this many actions in nav bar if user has write access
+        $this->setVar('COMPONENT_ACTION_COUNT', $this->hasWriteAccess() ? 2 : 1);
+
+        $this->getSitePage()->setBlock($targetHandle, 'drag_handle', 'drag_handle_block');
+
+        if ($this->hasContextWriteAccess()) {
+            $this->getSitePage()->parse('drag_handle_block', 'drag_handle');
+        } else {
+            $this->getSitePage()->setVar('drag_handle_block', '');
+        }
+
+    }
+
 
     /**
      * Split this out so in ePortfolio you can determine which config elements get rendered
@@ -122,7 +149,8 @@ abstract class Component_Eportfolio_ControllerAbstract extends Component_Control
      *
      * @throws DomainException
      */
-    protected function renderAltSourceDenied(){
+    protected function renderAltSourceDenied()
+    {
         throw new DomainException('Eportfolio components do not currently allow alternative data sources');
     }
 
@@ -131,7 +159,8 @@ abstract class Component_Eportfolio_ControllerAbstract extends Component_Control
      *
      * @throws DomainException
      */
-    protected function renderAltSourceDeleted(){
+    protected function renderAltSourceDeleted()
+    {
         throw new DomainException('Eportfolio components do not currently allow alternative data sources');
     }
 
@@ -170,7 +199,8 @@ abstract class Component_Eportfolio_ControllerAbstract extends Component_Control
      * @param Eportfolio_Page_Instance|null $source
      * @return static
      */
-    public function setSource($source = null) {
+    public function setSource($source = null)
+    {
         parent::setSource($source);
         return $this;
     }
