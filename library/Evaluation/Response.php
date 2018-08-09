@@ -257,6 +257,22 @@ abstract class Evaluation_Response extends DeprecatedModel
     }
 
     /**
+     * Mark as deleted all the responses for a question.
+     *
+     * @param  $question_id
+     *
+     * @return mixed
+     */
+    public function deleteResponsesForQuestion($question_id)
+    {
+        $query = "UPDATE {$this->_table}
+				  SET deleted_at = NOW()
+				  WHERE question_id = " . $this->db->smartQuote($question_id);
+
+        return $this->db->query($query);
+    }
+
+    /**
      * Get a response for a particular attempt/question
      *
      * @param  $attempt_id
