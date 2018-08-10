@@ -171,7 +171,7 @@
 
                         {% endif %}
 
-                        <button class="use-descriptor-values">Assign from Descriptors</button>
+                        {% if group.rowMaxSum > 0 %}<button class="use-descriptor-values">Assign from Descriptors</button>{% endif %}
                     </span>
 
                     {# Self-Assessment #}
