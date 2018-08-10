@@ -332,12 +332,9 @@
                     break;
 
                 case 'LetterGrade':
-                    // We have a letter grade, so scale to the percentage it corresponds to
-                    customMark = groupSummary.data('max') * ($changed.val() / 100);
-                    break;
-
                 case 'Percentage':
-                    // TODO
+                    // Both letter grade and percentage use the numeric mark scaled to a custom percentage
+                    customMark = groupSummary.data('max') * ($changed.val() / 100);
                     break;
 
                 default:
