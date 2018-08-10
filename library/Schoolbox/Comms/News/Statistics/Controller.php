@@ -49,7 +49,7 @@ class Controller extends Base
          *
          * Events that occur within $accuracy seconds of each other are aggregated together.
          */
-        $accuracy = 60;
+        $accuracy = 60*60*24;
 
         /* Get all the timestamps that have content - because of the way highcharts stacks its data
          * I need to initialise the container with all the possibilities and stack categorised data in-order
