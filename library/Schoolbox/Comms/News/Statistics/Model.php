@@ -114,10 +114,10 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @param string $referrer
+     * @param null|string $referrer
      * @return $this
      */
-    public function setReferrer(string $referrer): self
+    public function setReferrer(?string $referrer): self
     {
         $this->referrer = $referrer;
         return $this;

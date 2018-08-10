@@ -85,9 +85,9 @@ class Mapper extends \Schoolbox\Mapper
      * It can be null if someone directly typed in the url, or opened it from some random place
      * that we don't know about
      *
-     * @param int    $articleId
-     * @param int    $userId
-     * @param string $referrer
+     * @param int         $articleId
+     * @param int         $userId
+     * @param null|string $referrer
      * @return bool|int[]
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
