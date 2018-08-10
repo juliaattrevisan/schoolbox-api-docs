@@ -58,14 +58,21 @@ class Controller extends Base
 
         while ($row = $result->fetch(\PDO::FETCH_ASSOC)) {
             $type = $row['type'];
+            $referrer = $row['referrer'];
 
             /* A conversion is a specific combination of Type and Referrer
              */
-            if (($row['type'] === 'open') && (null !== $row['referrer'])) {
+            if (($referrer !== null) && ($row['type'] === Mapper::TYPE_OPEN)) {
                 $type = 'conversion';
             }
 
-            $data[$type][$row['referrer']][] = [(int)$row['timestamp'], (int)$row['num']];
+            /* If referrers are of an unknown type, just throw them into "unknown"
+             */
+            if ($referrer === null) {
+                $referrer = 'unknown';
+            }
+
+            $data[$type][$referrer][] = [(int)$row['timestamp'], (int)$row['num']];
         }
 
         return $data;

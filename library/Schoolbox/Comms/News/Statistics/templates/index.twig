@@ -91,7 +91,7 @@
                 {
                     color: '#80B1D5',
                     name: 'Non-referred Opens',
-                    data: {{ series['open']|json_encode|raw }}
+                    data: {{ series['open']['unknown']|json_encode|raw }}
                 }
             ]
         });
