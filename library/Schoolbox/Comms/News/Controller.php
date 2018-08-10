@@ -704,6 +704,7 @@ class Controller extends Base
             'topics' => $topics,
             'topicAll' => Mapper::TOPIC_ALL_SLUG,
             'slug' => $params->getSlug(),
+            'referrer' => Statistics\Mapper::REFERRER_ARCHIVE,
 
             /* Archive-specific vars that don't appear anywhere else
              */

@@ -1,6 +1,6 @@
 <?php
 /**
- * ValidReferrer
+ * ValidImpressionReferrer
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2018, Alaress Pty Ltd
@@ -9,7 +9,7 @@
 
 namespace Schoolbox\Comms\News\Statistics;
 
-class ValidReferrer
+class ValidImpressionReferrer
 {
     /**
      * These consts are valid ones
@@ -30,10 +30,6 @@ class ValidReferrer
      */
     public function isSatisfiedBy(?string $referrer): bool
     {
-        if (null === $referrer) {
-            return true;
-        }
-
         return \in_array($referrer, self::VALID_REFERRER,true);
     }
 }

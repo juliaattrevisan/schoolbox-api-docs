@@ -68,17 +68,17 @@ class Mapper extends \Schoolbox\Mapper
      *
      * $referrer indicates a place where they saw the impression and can't be null for this use case
      *
-     * @param int    $articleId
-     * @param int    $userId
-     * @param string $referrer
+     * @param int         $articleId
+     * @param int         $userId
+     * @param null|string $referrer
      * @return bool|int[]
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    public function saveImpression(int $articleId, int $userId, string $referrer)
+    public function saveImpression(int $articleId, int $userId, ?string $referrer)
     {
-        if ((new ValidReferrer())->isSatisfiedBy($referrer)) {
+        if ((new ValidImpressionReferrer())->isSatisfiedBy($referrer)) {
             return $this->save($this->createModel()
                 ->setArticleId($articleId)
                 ->setUserId($userId)
@@ -107,7 +107,7 @@ class Mapper extends \Schoolbox\Mapper
      */
     public function saveOpen(int $articleId, int $userId, ?string $referrer)
     {
-        if ((new ValidReferrer())->isSatisfiedBy($referrer)) {
+        if ((new ValidOpenReferrer())->isSatisfiedBy($referrer)) {
             return $this->save($this->createModel()
                 ->setArticleId($articleId)
                 ->setUserId($userId)

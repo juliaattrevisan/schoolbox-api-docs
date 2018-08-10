@@ -16,19 +16,19 @@ class ValidationTest extends TestCase
 {
 
     /**
-     * @dataProvider provider_validReferrer
+     * @dataProvider provider_validOpenReferrer
      * @param null|string $referrer
      * @param bool        $expected
      */
     public function testValidReferrer(?string $referrer, bool $expected)
     {
-        $validation = new Statistics\ValidReferrer();
+        $validation = new Statistics\ValidOpenReferrer();
 
         $this->assertEquals($expected, $validation->isSatisfiedBy($referrer));
     }
 
     /**
-     * Data provider for testValidReferrer
+     * Data provider for testValidOpenReferrer
      *
      * @return array
      */
