@@ -284,7 +284,8 @@
                                 break;
 
                             case 'Percentage':
-                                // TODO
+                                var percentage = groupSummary.attr('data-mark') * (100 / groupSummary.attr('data-row-max-sum'));
+                                $rb.find(".groupMax").attr("value", percentage);
                                 break;
 
                             default:
