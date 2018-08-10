@@ -314,7 +314,7 @@ class External_Denbigh_User implements External_UserInterface
                 FROM      People p
                 LEFT JOIN Staff s ON s.peopleDenbighID = p.denbighID
                 WHERE     p.denbighID = :externalId
-		    ",
+            ",
             ['externalId' => $externalId]
         )->fetch();
 
@@ -369,7 +369,7 @@ class External_Denbigh_User implements External_UserInterface
                 LEFT JOIN     Addresses a ON a.familyDenbighID = s.familyDenbighID
                 WHERE         pe_s.denbighID = :externalId
                 GROUP BY      pe_p.denbighID
-			",
+            ",
             ['externalId' => $externalId]
         );
 
@@ -449,7 +449,7 @@ class External_Denbigh_User implements External_UserInterface
                     WHERE       p.denbighID = :externalId
                     ORDER BY    cl.classCode ASC,
                                 co.subjectName ASC
-			    ",
+                ",
                 ['externalId' => $externalId]
             )->fetchAll();
         } elseif ($user->getRole()->isStudent()) {
