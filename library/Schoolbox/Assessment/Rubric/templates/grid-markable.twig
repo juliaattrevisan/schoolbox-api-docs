@@ -257,6 +257,11 @@
                 var groupSummary = $rb.find(groupSummarySelector);
                 var $descriptorCheckboxes = $groupRows.find('input');
 
+                // Mark types
+                var $isLetterGrade = groupSummary.find(".groupMax").is("select");
+                var $isPercentage;
+                var $isTotalMark;
+
                 var scaledGroupMark = getScaledGroupMark($descriptorCheckboxes, groupSummary);
                 var unscaledGroupMark = summateDescriptors($descriptorCheckboxes);
 
@@ -265,11 +270,16 @@
                         groupSummary.attr('data-scaled-mark', scaledGroupMark);
                         groupSummary.attr('data-mark', unscaledGroupMark);
 
-                        if (groupSummary.find(".groupMax").is("select")) {
+                        if ($isLetterGrade) {
                             var percentage = groupSummary.attr('data-mark') * (100 / groupSummary.attr('data-row-max-sum'));
                             assignLetterGrade(percentage, groupSummary.find(".groupMax").val(scaledGroupMark));
-                        } else {
+                        } else if ($isPercentage) {
+                            // TODO
+                        } else if ($isTotalMark) {
                             groupSummary.find(".groupMax").val(scaledGroupMark);
+                        } else {
+                            // TODO
+                            // We have a "none" mark type
                         }
                     }
                 }
