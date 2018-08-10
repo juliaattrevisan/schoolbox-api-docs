@@ -14,6 +14,10 @@ use InvalidArgumentException;
 
 class Controller extends Web\Controller\Base
 {
+    private const REQUIRED_CSVS = [
+        'user', 'timetable-structure', 'timetable', 'enrolment'
+    ];
+
     /**
      * @api POST /api/admin/csv
      */
@@ -70,5 +74,69 @@ class Controller extends Web\Controller\Base
      */
     public function postProcess()
     {
+        $post = $this->getRequest()->post;
+        $rs   = $this->getResponse();
+
+        $responseJson = [
+            'success' => false
+        ];
+
+        // regrettably we can't do these checks in the module, because we don't have access to the $_POST array
+
+        $key  = $post->get('key');
+
+        try {
+
+            if (!$key) {
+                throw new InvalidArgumentException('No authentication token was supplied.', 401);
+            }
+
+            if ($this->getConfigLoader()->get('api_key') !== $key) {
+                throw new InvalidArgumentException('The given authentication token is invalid.', 403);
+            }
+
+            // key validated; you may proceed
+
+            // check for whether all the necessary files are supplied, and valid
+
+            $files = [];
+
+            foreach (self::REQUIRED_CSVS as $requiredCsv) {
+
+                $hash = $post->get($requiredCsv);
+
+                if (!$hash) {
+                    $errors[] = "No file hash was given for '$requiredCsv'.";
+                    continue;
+                }
+
+                try {
+                    // assign the given hash to its place in the files array
+                    $files[$requiredCsv] = \Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash($hash);
+
+                } catch (\Schoolbox\Mapper\Exception $e) {
+                    $errors[] = "Invalid file hash given for '$requiredCsv'.";
+                    continue;
+                }
+            }
+
+            if (isset($errors)) {
+                $responseJson['error'] = $errors;
+                $rs->status->set(400);
+
+            } else {
+                // valid files found and loaded, we're good to attempt processing
+
+                // TODO process $files given
+
+                $responseJson['success'] = true;
+            }
+
+        } catch (InvalidArgumentException $e) {
+            $responseJson['error'] = $e->getMessage();
+            $rs->status->setCode($e->getCode());
+        }
+
+        $rs->content->set($this->buildJsonOutput($responseJson));
     }
 }
