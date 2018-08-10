@@ -29,15 +29,20 @@ class ImportController extends Base
      * @var string
      */
     protected $basename;
+    /** @var ImporterFactory */
+    private $importerFactory;
+
 
     /**
      * Constructor
      *
-     * @param string $basename
+     * @param string          $basename
+     * @param ImporterFactory $importerFactory
      */
-    public function __construct($basename)
+    public function __construct($basename, ImporterFactory $importerFactory)
     {
         $this->basename = $basename;
+        $this->importerFactory = $importerFactory;
     }
 
     /**
@@ -183,20 +188,7 @@ class ImportController extends Base
      */
     protected function buildReader(Storage\IStorage $upload)
     {
-        $reader = new Reader($upload->readStream());
-        $reader->setLoadFromFirst(true);
-        // User import does not fill down - the others do
-        switch ($this->basename) {
-            case 'adminImportStructure':
-            case 'adminImportTimetable':
-            case 'adminImportEnrolment':
-                $reader->setFillDown(true);
-                break;
-            case 'adminImportUser':
-            default:
-                break;
-        }
-        return $reader;
+        return $this->importerFactory->buildReader($this->basename, $upload);
     }
 
     /**
@@ -228,17 +220,6 @@ class ImportController extends Base
      */
     protected function buildImporter(Reader $reader, LoggerInterface $log, $performUpdate = false)
     {
-        switch ($this->basename) {
-            case 'adminImportUser':
-                return new Importer\User($reader, $log, $performUpdate);
-            case 'adminImportStructure':
-                return new Importer\TimetableStructure($reader, $log, $performUpdate);
-            case 'adminImportTimetable':
-                return new Importer\Timetable($reader, $log, $performUpdate);
-            case 'adminImportEnrolment':
-                return new Importer\Enrolment($reader, $log, $performUpdate);
-            default:
-                throw new \OutOfRangeException(sprintf('No importer matches basename "%s"', $this->basename));
-        }
+        return $this->importerFactory->buildImporter($this->basename, $reader, $log, $performUpdate);
     }
 }
