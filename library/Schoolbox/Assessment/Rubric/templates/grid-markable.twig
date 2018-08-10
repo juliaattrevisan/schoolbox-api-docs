@@ -152,15 +152,20 @@
                                    value="{{ group.scaledMark }}"/> / {{ group.max }}
 
                         {% elseif markSchemeName == 'LetterGrade' %}
+                            {% set percentageMark = group.mark * (100 / group.rowMaxSum) %}
+
                             <select class="groupMax"
                                     id="group-{{ group.id }}-mark">
 
                                 {% for value, letter in markType.conf %}
                                     <option value="{{ value }}"
-                                            {% if group.mark == 0 and value == 0 %}selected{% endif %}
-                                            data-letter="{{ letter }}">{{ letter }}</option>
+                                            {# +1 so we round up #}
+                                            {% if (( (percentageMark+1) - value ) | abs) < 10 %}selected{% endif %}
+                                            data-letter="{{ letter }}">
+                                        {{ letter }}
+                                    </option>
                                 {% endfor %}
-                        </select>
+                            </select>
 
                         {% elseif markSchemeName == 'Percentage'%}
 
@@ -489,7 +494,7 @@
             return descriptorSummation;
         }
 
-        
+
         // Calculate the overall rubric mark from the scaled group marks
         function getTotalMark()
         {
