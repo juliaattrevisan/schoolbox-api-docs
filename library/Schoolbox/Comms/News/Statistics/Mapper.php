@@ -28,15 +28,6 @@ class Mapper extends \Schoolbox\Mapper
     public const REFERRER_ARCHIVE = 'archive';
     public const REFERRER_EMAIL = 'email';
 
-    /**
-     * These consts are valid ones
-     */
-    private const VALID_REFERRER = [
-        self::REFERRER_DASHBOARD,
-        self::REFERRER_HOMEPAGE,
-        self::REFERRER_ARCHIVE,
-        self::REFERRER_EMAIL
-    ];
 
     /**
      * @inheritdoc
@@ -75,7 +66,7 @@ class Mapper extends \Schoolbox\Mapper
      */
     public function saveImpression(int $articleId, int $userId, string $referrer)
     {
-        if (\in_array($referrer, self::VALID_REFERRER,true)) {
+        if ((new ValidReferrer())->isSatisfiedBy($referrer)) {
             return $this->save($this->createModel()
                 ->setArticleId($articleId)
                 ->setUserId($userId)
@@ -104,7 +95,7 @@ class Mapper extends \Schoolbox\Mapper
      */
     public function saveOpen(int $articleId, int $userId, ?string $referrer)
     {
-        if (\in_array($referrer, self::VALID_REFERRER,true)) {
+        if ((new ValidReferrer())->isSatisfiedBy($referrer)) {
             return $this->save($this->createModel()
                 ->setArticleId($articleId)
                 ->setUserId($userId)
