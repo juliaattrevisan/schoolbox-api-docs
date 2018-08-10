@@ -82,10 +82,10 @@ class External_Denbigh_User implements External_UserInterface
         /** @noinspection SqlDialectInspection */
         $house = $this->externalDatabase->executeQuery(
             "
-			    SELECT    Houses.housemaster_id
-			    FROM      Houses
-			    WHERE     Houses.id = :houseId
-		    ",
+                SELECT    Houses.housemaster_id
+                FROM      Houses
+                WHERE     Houses.id = :houseId
+            ",
             ['houseId' => $houseId]
         )->fetch();
 
