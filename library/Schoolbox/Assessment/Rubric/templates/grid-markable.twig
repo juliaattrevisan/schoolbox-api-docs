@@ -234,8 +234,8 @@
     $(function () {
         // Keep track of which groups the user has customised the mark for
         var customisedMark = {};
-        $("[data-group-summary]").each(function(index, groupSummary) {
-            var id = $(groupSummary).data('group-id');
+        $("[data-group-summary]").each(function(index, $groupSummary) {
+            var id = $($groupSummary).data('group-id');
             customisedMark[id] = false;
         })
 
@@ -263,30 +263,30 @@
             if ($groupRows.length) {
 
                 var groupSummarySelector = '[data-group-summary="rb-' + rubricId + '-' + groupId + '"]';
-                var groupSummary = $rb.find(groupSummarySelector);
+                var $groupSummary = $rb.find(groupSummarySelector);
                 var $descriptorCheckboxes = $groupRows.find('input');
 
-                var scaledGroupMark = getScaledGroupMark($descriptorCheckboxes, groupSummary);
+                var scaledGroupMark = getScaledGroupMark($descriptorCheckboxes, $groupSummary);
                 var unscaledGroupMark = summateDescriptors($descriptorCheckboxes);
 
-                if (groupSummary.length) {
+                if ($groupSummary.length) {
                     if (! customisedMark[groupId]) {
-                        groupSummary.attr('data-scaled-mark', scaledGroupMark);
-                        groupSummary.attr('data-mark', unscaledGroupMark);
+                        $groupSummary.attr('data-scaled-mark', scaledGroupMark);
+                        $groupSummary.attr('data-mark', unscaledGroupMark);
 
                         switch(markType) {
                             case 'TotalMarkFractional':
-                                groupSummary.find(".groupMax").val(scaledGroupMark);
+                                $groupSummary.find(".groupMax").val(scaledGroupMark);
                                 break;
 
                             case 'LetterGrade':
-                                var percentage = groupSummary.attr('data-mark') * (100 / groupSummary.attr('data-row-max-sum'));
-                                assignLetterGrade(percentage, groupSummary.find(".groupMax").val(scaledGroupMark));
+                                var percentage = $groupSummary.attr('data-mark') * (100 / $groupSummary.attr('data-row-max-sum'));
+                                assignLetterGrade(percentage, $groupSummary.find(".groupMax").val(scaledGroupMark));
                                 break;
 
                             case 'Percentage':
-                                var percentage = groupSummary.attr('data-mark') * (100 / groupSummary.attr('data-row-max-sum'));
-                                groupSummary.find(".groupMax").attr("value", percentage);
+                                var percentage = $groupSummary.attr('data-mark') * (100 / $groupSummary.attr('data-row-max-sum'));
+                                $groupSummary.find(".groupMax").attr("value", percentage);
                                 break;
 
                             default:
@@ -323,7 +323,7 @@
             var groupId = $changed.closest('[data-group-summary]').data('group-id');
 
             var groupSummarySelector = '[data-group-summary="rb-' + rubricId + '-' + groupId + '"]';
-            var groupSummary = $rb.find(groupSummarySelector);
+            var $groupSummary = $rb.find(groupSummarySelector);
 
             var customMark = 0;
 
@@ -335,7 +335,7 @@
                 case 'LetterGrade':
                 case 'Percentage':
                     // Both letter grade and percentage use the numeric mark scaled to a custom percentage
-                    customMark = groupSummary.data('max') * ($changed.val() / 100);
+                    customMark = $groupSummary.data('max') * ($changed.val() / 100);
                     break;
 
                 default:
@@ -343,10 +343,10 @@
                     // We have a "none" mark type
             }
 
-            if (groupSummary.length) {
-                groupSummary.attr('data-mark', customMark);
+            if ($groupSummary.length) {
+                $groupSummary.attr('data-mark', customMark);
                 // TODO uh not sure about this, scaling doesn't matter if we're using percentages but...?
-                groupSummary.attr('data-scaled-mark', customMark);
+                $groupSummary.attr('data-scaled-mark', customMark);
                 customisedMark[groupId] = true;
             }
 
@@ -371,14 +371,14 @@
             var rowSelector = '[data-group="rb-' + rubricId + '-' + groupId + '"]';
             var $groupRows = $(rowSelector);
             var groupSummarySelector = '[data-group-summary="rb-' + rubricId + '-' + groupId + '"]';
-            var groupSummary = $rb.find(groupSummarySelector);
+            var $groupSummary = $rb.find(groupSummarySelector);
 
             var $descriptorCheckboxes = $groupRows.find('input');
-            var scaledGroupMark = getScaledGroupMark($descriptorCheckboxes, groupSummary);
+            var scaledGroupMark = getScaledGroupMark($descriptorCheckboxes, $groupSummary);
             var unscaledGroupMark = summateDescriptors($descriptorCheckboxes);
 
-            groupSummary.attr('data-scaled-mark', scaledGroupMark);
-            groupSummary.attr('data-mark', unscaledGroupMark);
+            $groupSummary.attr('data-scaled-mark', scaledGroupMark);
+            $groupSummary.attr('data-mark', unscaledGroupMark);
 
             switch(markType) {
                 case 'TotalMarkFractional':
@@ -386,13 +386,13 @@
                     break;
 
                 case 'LetterGrade':
-                    var percentage = groupSummary.attr('data-mark') * (100 / groupSummary.attr('data-row-max-sum'));
+                    var percentage = $groupSummary.attr('data-mark') * (100 / $groupSummary.attr('data-row-max-sum'));
                     assignLetterGrade(percentage, $gradeInput.val(scaledGroupMark));
                     break;
 
                 case 'Percentage':
-                    var percentage = groupSummary.attr('data-mark') * (100 / groupSummary.attr('data-row-max-sum'));
-                    groupSummary.find(".groupMax").val(percentage);
+                    var percentage = $groupSummary.attr('data-mark') * (100 / $groupSummary.attr('data-row-max-sum'));
+                    $groupSummary.find(".groupMax").val(percentage);
                     break;
 
                 default:
@@ -465,10 +465,10 @@
         }
 
         // Scale a capability mark based on the capability max
-        function getScaledGroupMark($descriptorCheckboxes, groupSummary)
+        function getScaledGroupMark($descriptorCheckboxes, $groupSummary)
         {
-            var groupMax = groupSummary.attr('data-max');
-            var groupRowMaxSum = groupSummary.attr('data-row-max-sum');
+            var groupMax = $groupSummary.attr('data-max');
+            var groupRowMaxSum = $groupSummary.attr('data-row-max-sum');
 
             var groupSum = summateDescriptors($descriptorCheckboxes);
 
