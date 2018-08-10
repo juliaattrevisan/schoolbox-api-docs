@@ -239,7 +239,7 @@ class Bootstrap extends AbstractBootstrap {
             // Check against whitelist first
             $whitelist = [
                 '/saml/consume.php*',
-                '/api/register/*',
+                '/api/*',
                 '/loginForm.php*',
                 '/liss/liss.php',
                 '/lti-consumer/*',
