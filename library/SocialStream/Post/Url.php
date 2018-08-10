@@ -21,6 +21,15 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
      */
     public function determineIcon($iconSize = 'square64'): string
     {
+        if(stristr($this->getThumbnail(), 'icon:')) {
+            try {
+                $iconFile = str_replace('icon:', '', $this->getThumbnail());
+                return '/images/mime/' . $iconFile;
+            } catch (FileException $e) {
+                // noop;
+            }
+        }
+
         /* Load the current icon as set by Admin > Allowed Files because sysadmins can choose their own icons
          * If the filetype is indeterminate, return a default icon rather than nothing
          */
@@ -29,15 +38,6 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
             return '/images/mime/' . $iconFile;
         } catch (FileException $e) {
             // noop;
-        }
-
-        if(stristr($this->getThumbnail(), 'icon:')) {
-            try {
-                $iconFile = MimetypeMapper::getInstance()->getByFilename(str_replace('icon:', '', $this->getThumbnail()))->getIconFile();
-                return '/images/mime/' . $iconFile;
-            } catch (FileException $e) {
-                // noop;
-            }
         }
 
         if ($this->hasThumbnail()) {
