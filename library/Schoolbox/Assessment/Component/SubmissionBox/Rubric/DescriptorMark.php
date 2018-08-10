@@ -13,13 +13,13 @@ use Schoolbox\Mapper\Traits\Model\Id;
 
 
 /**
- * Class Mark
+ * Class DescriptorMark
  *
  * Semantically, this class should really be named Selection or similar, but for the sake of matching the db table, mark it is...
  *
  * @package Schoolbox\Assessment\Component\SubmissionBox\Rubric
  */
-class Mark
+class DescriptorMark
 {
     use Id;
 

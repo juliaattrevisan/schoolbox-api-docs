@@ -800,7 +800,7 @@ class RubricMapper
     public function saveForFeedback(array $descriptors, $returnId)
     {
         $descriptorMapper = DescriptorMapper::getInstance();
-        $markMapper       = MarkMapper::getInstance();
+        $markMapper       = DescriptorMarkMapper::getInstance();
 
         $returnedWorkMapper = SubmissionBox\ReturnedWorkMapper::getInstance();
 
@@ -833,6 +833,8 @@ class RubricMapper
             );
         }
 
+        // Save marks for groups as well
+
         $markMapper->save($marksToSave);
     }
 
@@ -849,7 +851,7 @@ class RubricMapper
         if ($sourceReturnId === $destinationReturnId) {
             return;
         }
-        $markMapper        = MarkMapper::getInstance();
+        $markMapper        = DescriptorMarkMapper::getInstance();
         $sourceMarks       = $markMapper->findByColumnList(['return_id' => $sourceReturnId]);
         $destinationMarks  = $markMapper->createCollection();
         $destinationReturn = SubmissionBox\ReturnedWorkMapper::getInstance()->createModel($destinationReturnId);
@@ -1042,7 +1044,7 @@ class RubricMapper
      */
     protected function invalidateDescriptorMarks(Collection $descriptors)
     {
-        $markMapper    = MarkMapper::getInstance();
+        $markMapper    = DescriptorMarkMapper::getInstance();
         $descriptorIds = $descriptors->getColumnValues('id');
         $columnList    = [
             'descriptor_id' => $descriptorIds,

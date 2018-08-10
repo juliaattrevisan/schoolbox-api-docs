@@ -18,14 +18,14 @@ use Schoolbox\Mapper;
 use Schoolbox\User;
 
 /**
- * Class MarkMapper
+ * Class DescriptorMarkMapper
  *
  * @package Schoolbox\Assessment\Component\SubmissionBox\Rubric
- * @method Mark hydrate(array $row, $alias = '', $callback = null)
- * @method Mark createModel($idValue = null)
- * @method GenericCollection|Mark[] findByColumnList($columnList, $options = array())
+ * @method DescriptorMark hydrate(array $row, $alias = '', $callback = null)
+ * @method DescriptorMark createModel($idValue = null)
+ * @method GenericCollection|DescriptorMark[] findByColumnList($columnList, $options = array())
  */
-class MarkMapper extends Mapper
+class DescriptorMarkMapper extends Mapper
 {
 
     /**
@@ -36,7 +36,7 @@ class MarkMapper extends Mapper
     protected function mapping()
     {
         $this->hasTable('rubric_descriptor_mark');
-        $this->hasModel(Mark::class);
+        $this->hasModel(DescriptorMark::class);
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
 
@@ -68,7 +68,7 @@ class MarkMapper extends Mapper
 
     /**
      * @param PDOStatement $statement
-     * @return Collection|Mark[]
+     * @return Collection|DescriptorMark[]
      */
     protected function hydrateSelect(PDOStatement $statement)
     {

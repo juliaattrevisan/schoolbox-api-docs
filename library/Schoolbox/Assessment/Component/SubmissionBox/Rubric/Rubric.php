@@ -94,7 +94,7 @@ class Rubric extends Core\Rubric
      * This contains all rubric marks that have been assigned to a participant
      * for this rubric's box, for a particular descriptor within the rubric.
      *
-     * @var SplObjectStorage|Mark[]
+     * @var SplObjectStorage|DescriptorMark[]
      */
     private $markCache;
 
@@ -438,11 +438,11 @@ class Rubric extends Core\Rubric
     /**
      * @param User $student
      * @param Alaress_Date_Format $timestamp
-     * @return Collection|Mark[]
+     * @return Collection|DescriptorMark[]
      */
     public function getORMMarks($student, $timestamp)
     {
-        $c = MarkMapper::getInstance()->createCollection();
+        $c = DescriptorMarkMapper::getInstance()->createCollection();
 
         foreach ($this->getAllDescriptors() as $descr) {
             if ($descr->isSelected()) {
@@ -458,16 +458,16 @@ class Rubric extends Core\Rubric
      * @param Core\Descriptor         $descriptor
      * @param Alaress_Date_Format     $timestamp
      * @param User                    $student
-     * @return Mark
+     * @return DescriptorMark
      */
     protected function createORMMark(Core\Descriptor $descriptor, Alaress_Date_Format $timestamp, User $student)
     {
         if (!$this->markCache->contains($descriptor)) {
             $this->markCache->attach($descriptor,
-                MarkMapper::getInstance()
-                 ->createModel()
-                 ->setDescriptor($this->createORMDescriptor($descriptor, $descriptor->getLevel(), 0))
-                 ->setValid(true)
+                DescriptorMarkMapper::getInstance()
+                                    ->createModel()
+                                    ->setDescriptor($this->createORMDescriptor($descriptor, $descriptor->getLevel(), 0))
+                                    ->setValid(true)
             );
         }
 
