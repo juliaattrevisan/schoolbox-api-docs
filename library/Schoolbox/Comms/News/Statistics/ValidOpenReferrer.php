@@ -17,6 +17,7 @@ class ValidOpenReferrer
     private const VALID_REFERRER = [
         Mapper::REFERRER_DASHBOARD,
         Mapper::REFERRER_HOMEPAGE,
+        Mapper::REFERRER_INDEX,
         Mapper::REFERRER_ARCHIVE,
         Mapper::REFERRER_EMAIL
     ];
