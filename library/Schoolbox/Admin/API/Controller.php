@@ -8,14 +8,19 @@
 
 namespace Schoolbox\Admin\API;
 
+use Alaress\Lumberjack\Logger;
 use Alaress\Web;
 use InvalidArgumentException;
+use Schoolbox\Import\ImporterFactory;
 
 
 class Controller extends Web\Controller\Base
 {
     private const REQUIRED_CSVS = [
-        'user', 'timetable-structure', 'timetable', 'enrolment'
+        'user'                  => ImporterFactory::IMPORT_USER,
+        'timetable-structure'   => ImporterFactory::IMPORT_STRUCTURE,
+        'timetable'             => ImporterFactory::IMPORT_TIMETABLE,
+        'enrolment'             => ImporterFactory::IMPORT_ENROLMENT,
     ];
 
     /**
@@ -101,7 +106,7 @@ class Controller extends Web\Controller\Base
 
             $files = [];
 
-            foreach (self::REQUIRED_CSVS as $requiredCsv) {
+            foreach (array_keys(self::REQUIRED_CSVS) as $requiredCsv) {
 
                 $hash = $post->get($requiredCsv);
 
@@ -112,7 +117,7 @@ class Controller extends Web\Controller\Base
 
                 try {
                     // assign the given hash to its place in the files array
-                    $files[$requiredCsv] = \Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash($hash);
+                    $files[self::REQUIRED_CSVS[$requiredCsv]] = \Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash($hash);
 
                 } catch (\Schoolbox\Mapper\Exception $e) {
                     $errors[] = "Invalid file hash given for '$requiredCsv'.";
