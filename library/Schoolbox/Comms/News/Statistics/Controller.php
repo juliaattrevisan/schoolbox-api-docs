@@ -48,7 +48,7 @@ class Controller extends Base
                 `type`,
                 `referrer`
             FROM comms_news_article_statistics cnas
-            WHERE article_id = 1
+            WHERE article_id = {$article->getId()}
             AND deleted_at IS NULL
             GROUP BY timestamp, `type`, referrer
             ORDER BY timestamp
@@ -85,10 +85,6 @@ class Controller extends Base
      */
     public function getOverview(News\Model $article)
     {
-
-        Mapper::getInstance()->saveImpression($article->getId(), $this->getUser()->getId(), Mapper::REFERRER_EMAIL);
-
-
         $series = $this->fetchImpressionsConversionsOpens($article);
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsStatistics/index.twig', [
