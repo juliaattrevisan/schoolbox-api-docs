@@ -239,6 +239,8 @@
         // initialise dynamic mark display
         $rb.dynagrade({{ markType | json_encode | raw }});
 
+
+        // Update the per-capability and overall marks when descriptor selection is changed
         $rb.on('change change.preload', '[data-rubric], [data-rubric-group]', function (e) {
 
             var $changed = $(this);
@@ -297,7 +299,7 @@
             rubricSummary.attr('data-scaled-mark', rubricTotalMark);
 
             parseFraction(rubricSummary, e.namespace);
-            
+
             // What cell was actually changed?
             if ($changed.is(':checkbox')) {
                 showHideRangeInput($changed);
@@ -305,6 +307,7 @@
                 showHideRangeInput($changed.siblings(':checkbox'));
             }
         });
+
 
         // Update the overall rubric mark when the user changes the custom capabilty mark
         $rb.on('change change.preload', '.groupMax', function (e) {
@@ -353,6 +356,7 @@
             parseFraction(rubricSummary, e.namespace);
         });
 
+
         // Overwrite any custom mark in the capability mark field with the scaled mark calculated from descriptor values
         $(".use-descriptor-values").click(function(e) {
             var $button = $(e.target);
@@ -393,6 +397,8 @@
             parseFraction(rubricSummary, e.namespace);
         })
 
+
+        // Set the letter grade for a capability dropdown based on a numeric mark
         function assignLetterGrade(numericMark, dropdown) {
             var grades = [];
             dropdown.find("option").each(function(index, option) {
@@ -413,6 +419,7 @@
             dropdown.prop("selectedIndex", optionIndex);
         }
 
+        // Hide or display the descriptor range input depending on whether it's needed or not
         function showHideRangeInput($changedCell) {
             var $allCellsInRow = $changedCell.parents("tr").find("[data-rubric], [data-rubric-group]");
 
@@ -439,6 +446,7 @@
             }
         }
 
+        // Scale a capability mark based on the capability max
         function getScaledGroupMark($descriptorCheckboxes, groupSummary)
         {
             var groupMax = groupSummary.attr('data-max');
@@ -455,6 +463,7 @@
             return scaledGroupSum;
         }
 
+        // Get the raw unscaled sum of selected descriptor values from the collection of descriptors passed in
         function summateDescriptors($descriptorCheckboxes) {
             var descriptorSummation = 0;
 
@@ -480,14 +489,14 @@
             return descriptorSummation;
         }
 
-
+        
+        // Calculate the overall rubric mark from the scaled group marks
         function getTotalMark()
         {
             var totalMark = 0;
             var rubricOverallMax = 0;
 
             var $groupSummary = $rb.find('[data-group-summary]');
-            var $rubricSummary = $rb.find('[rb-final-summary]');
 
             if ($groupSummary.length) {
                 $groupSummary.each(function() {
