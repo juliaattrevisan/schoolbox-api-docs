@@ -13,7 +13,7 @@ CREATE TABLE `rubric_group_mark` (
     KEY `return_id` (`return_id`),
     CONSTRAINT `fk_rubric_group_mark_return_id`
     FOREIGN KEY (`return_id`)
-    REFERENCES `rubric_group` (`id`)
+    REFERENCES `submission_return` (`id`)
         ON DELETE NO ACTION
         ON UPDATE NO ACTION,
     CONSTRAINT `fk_rubric_group_mark_rubric_group_id`
