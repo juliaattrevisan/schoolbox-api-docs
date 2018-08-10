@@ -55,6 +55,11 @@ class Querystring
     public const FOLDER = 'f';
 
     /**
+     * Querystring param for the Referrer (used in stats)
+     */
+    public const REFERRER = 'r';
+
+    /**
      * An array of key/value pairs corresponding to GET params
      *
      * @var array
@@ -76,6 +81,7 @@ class Querystring
             self::LIMIT => $data[self::LIMIT],
             self::HIDE_PAGINATOR => $data[self::HIDE_PAGINATOR],
             self::FOLDER => $data[self::FOLDER],
+            self::REFERRER => $data[self::REFERRER],
         ];
     }
 
@@ -113,7 +119,7 @@ class Querystring
 
 
     /**
-     * Number of articles to obtain and dispaly
+     * Number of articles to obtain and display
      *
      * @return mixed
      */
@@ -142,6 +148,17 @@ class Querystring
     public function getFolderId()
     {
         return $this->querystring[self::FOLDER];
+    }
+
+
+    /**
+     * Get the referrer string if one was specified
+     *
+     * @return mixed
+     */
+    public function getReferrer()
+    {
+        return $this->querystring[self::REFERRER];
     }
 
 

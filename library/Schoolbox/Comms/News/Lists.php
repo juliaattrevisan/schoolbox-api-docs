@@ -229,7 +229,7 @@ class Lists
                  * TODO: Load the referrer value from $params
                  * TODO: Also increment a tally elsewhere
                  */
-                $this->statisticsMapper->saveImpression($articleId, $user->getId(), Statistics\Mapper::REFERRER_DASHBOARD);
+                $this->statisticsMapper->saveImpression($articleId, $user->getId(), $params->getReferrer());
             }
         }
 

@@ -101,7 +101,8 @@ class Controller extends Component_Homepage_ControllerAbstract
             'compactMode' => $this->getConfig('compactMode'),
             'limit' => (int)$this->getConfig('size'),
             'folderId' => $this->getSource()->getId(),
-            'key' => $this->getUser()->getKey()
+            'key' => $this->getUser()->getKey(),
+            'referrer' => News\Statistics\Mapper::REFERRER_HOMEPAGE
         ]);
     }
 }
