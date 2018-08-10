@@ -339,8 +339,8 @@
                     break;
 
                 default:
-                // TODO
-                // We have a "none" mark type
+                    // TODO
+                    // We have a "none" mark type
             }
 
             if (groupSummary.length) {
@@ -380,12 +380,26 @@
             groupSummary.attr('data-scaled-mark', scaledGroupMark);
             groupSummary.attr('data-mark', unscaledGroupMark);
 
-            if ($gradeInput.is("select")) {
-                var percentage = groupSummary.attr('data-mark') * (100 / groupSummary.attr('data-row-max-sum'));
-                assignLetterGrade(percentage, $gradeInput.val(scaledGroupMark));
-            } else {
-                $gradeInput.val(scaledGroupMark);
+            switch(markType) {
+                case 'TotalMarkFractional':
+                    $gradeInput.val(scaledGroupMark);
+                    break;
+
+                case 'LetterGrade':
+                    var percentage = groupSummary.attr('data-mark') * (100 / groupSummary.attr('data-row-max-sum'));
+                    assignLetterGrade(percentage, $gradeInput.val(scaledGroupMark));
+                    break;
+
+                case 'Percentage':
+                    var percentage = groupSummary.attr('data-mark') * (100 / groupSummary.attr('data-row-max-sum'));
+                    groupSummary.find(".groupMax").val(percentage);
+                    break;
+
+                default:
+                    // TODO
+                    // We have a "none" mark type
             }
+
 
             // Up for discussion, but I'd imagine the user would like the marks to update automatically
             // with descriptor changes once they've clicked this button
