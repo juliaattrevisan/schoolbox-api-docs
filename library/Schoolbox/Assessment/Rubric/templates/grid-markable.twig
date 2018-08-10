@@ -273,12 +273,10 @@
                         break;
 
                     default:
-                    // TODO
-                    // We have a "none" mark type
+                        // TODO
+                        // We have a "none" mark type
                 }
 
-                console.log("Displayed Mark: " + displayedMark);
-                console.log("Custom mark: " + customMark);
                 if (displayedMark == customMark) {
                     $(this).find(".use-descriptor-values").prop("disabled", true);
                 } else {
@@ -292,11 +290,8 @@
         // initialise dynamic mark display
         $rb.dynagrade({{ markType | json_encode | raw }});
 
-
         // Update the per-capability and overall marks when descriptor selection is changed
         $rb.on('change change.preload', '[data-rubric], [data-rubric-group]', function (e) {
-            // disableEnableAssignFromDescs();
-
             var $changed = $(this);
 
             var groupId  = $changed.data('rubric-group');
@@ -344,7 +339,6 @@
                                 // TODO
                                 // We have a "none" mark type
                         }
-
                     }
                 }
 
@@ -369,8 +363,6 @@
 
         // Update the overall rubric mark when the user changes the custom capabilty mark
         $rb.on('change change.preload', '.groupMax', function (e) {
-            disableEnableAssignFromDescs();
-
             var $changed = $(this);
             var rubricId = $changed.closest('[data-group-summary]').data('rubric-id');
             var groupId = $changed.closest('[data-group-summary]').data('group-id');
@@ -411,13 +403,13 @@
             rubricSummary.attr('data-scaled-mark', rubricTotalMark);
 
             parseFraction(rubricSummary, e.namespace);
+            disableEnableAssignFromDescs();
+
         });
 
 
         // Overwrite any custom mark in the capability mark field with the scaled mark calculated from descriptor values
         $(".use-descriptor-values").click(function(e) {
-            disableEnableAssignFromDescs();
-
             var $button = $(e.target);
             var $gradeInput = $button.siblings('.groupMax');
             var rubricId = $button.closest('[data-group-summary]').data('rubric-id');
@@ -454,8 +446,7 @@
                     // TODO
                     // We have a "none" mark type
             }
-
-
+            
             // Up for discussion, but I'd imagine the user would like the marks to update automatically
             // with descriptor changes once they've clicked this button
             customisedMark[groupId] = false;
@@ -468,6 +459,7 @@
             rubricSummary.attr('data-scaled-mark', rubricTotalMark);
 
             parseFraction(rubricSummary, e.namespace);
+            disableEnableAssignFromDescs();
         })
 
 
