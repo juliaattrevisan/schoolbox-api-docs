@@ -35,6 +35,7 @@ class Mapper extends \Schoolbox\Mapper
     public const REFERRER_HOMEPAGE = 'homepage';
     public const REFERRER_ARCHIVE = 'archive';
     public const REFERRER_EMAIL = 'email';
+    public const REFERRER_INDEX = 'index';
 
     /**
      * This const represents a string value for an empty referrer so it can be meaningful to humans
