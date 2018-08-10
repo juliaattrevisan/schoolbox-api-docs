@@ -168,11 +168,12 @@
                             </select>
 
                         {% elseif markSchemeName == 'Percentage'%}
+                            {% set percentageMark = group.rowMaxSum > 0 ? group.mark * (100 / group.rowMaxSum) : 0 %}
 
                             <input class="groupMax"
                                    id="group-{{ group.id }}-mark"
                                    type="tel"
-                                   value="{{ group.scaledMark }}"/> %
+                                   value="{{ percentageMark }}"/> %
 
                         {% endif %}
 
