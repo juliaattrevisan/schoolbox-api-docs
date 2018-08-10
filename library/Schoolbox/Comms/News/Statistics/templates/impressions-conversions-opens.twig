@@ -65,6 +65,11 @@
                     data: {{ series['impression']['homepage']|json_encode|raw }}
                 },
                 {
+                    color: '#d6ad56',
+                    name: 'Impressions/Index',
+                    data: {{ series['impression']['index']|json_encode|raw }}
+                },
+                {
                     color: '#c69d46',
                     name: 'Impressions/Archive',
                     data: {{ series['impression']['archive']|json_encode|raw }}
@@ -83,6 +88,11 @@
                     color: '#8dd97e',
                     name: 'Conversions/Homepage',
                     data: {{ series['conversion']['homepage']|json_encode|raw }}
+                },
+                {
+                    color: '#8cd87d',
+                    name: 'Conversions/Index',
+                    data: {{ series['conversion']['index']|json_encode|raw }}
                 },
                 {
                     color: '#7cc86d',
