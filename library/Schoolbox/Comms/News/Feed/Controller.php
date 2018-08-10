@@ -117,6 +117,10 @@ class Controller extends Base
      * Generate RSS feed containing articles audienced to $user
      * and optionally also audienced to $folder
      *
+     * An optional ?topic= can be used to filter this
+     *
+     * @api /comms/news/feed/{key}{/folderId}
+     *
      * @param User              $user
      * @param null|Folder\Model $folder
      * @throws \Alaress\Database\Predicate\InvalidColumnException
