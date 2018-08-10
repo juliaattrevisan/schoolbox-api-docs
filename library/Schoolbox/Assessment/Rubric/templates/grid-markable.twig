@@ -132,6 +132,10 @@
             {% endfor %}
 
         {% if showGroupTotal and markSchemeName != "None" and (config.rubric_show_points or not studentView) %}
+            {% set percentageMark = group.rowMaxSum > 0 ? group.mark * (100 / group.rowMaxSum) : 0 %}
+            {# don't ask... #}
+            {% set letterGradeValue = (((percentageMark / 10) | round(0, 'ceil')) * 10) - 10 %}
+
             <tr>
                 <th class="rb-group-summary" colspan="{{ rubric.levels|length + 1 }}">
                     <span data-group-summary="{{ rubricId }}-{{ group.id }}"
@@ -145,22 +149,18 @@
                         <label for="group-{{ group.id }}-mark">{{ locale.rubricGroup.proper }} mark</label>
 
                         {% if markSchemeName == 'TotalMarkFractional' %}
-
                             <input class="groupMax"
                                    id="group-{{ group.id }}-mark"
                                    type="tel"
                                    value="{{ group.scaledMark }}"/> / {{ group.max }}
 
                         {% elseif markSchemeName == 'LetterGrade' %}
-                            {% set percentageMark = group.rowMaxSum > 0 ? group.mark * (100 / group.rowMaxSum) : 0 %}
-
                             <select class="groupMax"
                                     id="group-{{ group.id }}-mark">
 
                                 {% for value, letter in markType.conf %}
                                     <option value="{{ value }}"
-                                            {# +1 so we round up #}
-                                            {% if (( (percentageMark+1) - value ) | abs) < 10 %}selected{% endif %}
+                                            {% if value == letterGradeValue %}selected{% endif %}
                                             data-letter="{{ letter }}">
                                         {{ letter }}
                                     </option>
@@ -168,8 +168,6 @@
                             </select>
 
                         {% elseif markSchemeName == 'Percentage'%}
-                            {% set percentageMark = group.rowMaxSum > 0 ? group.mark * (100 / group.rowMaxSum) : 0 %}
-
                             <input class="groupMax"
                                    id="group-{{ group.id }}-mark"
                                    type="tel"
@@ -178,7 +176,18 @@
                         {% endif %}
 
                         {% if group.rowMaxSum > 0 %}
-                            <button class="use-descriptor-values">Assign <span class="descriptor-sum">{{ group.scaledMark }}</span> from Descriptors</button>
+                            <button class="use-descriptor-values">Assign <span class="descriptor-sum">
+                                {% if markSchemeName == 'TotalMarkFractional' %}
+                                    {{ group.scaledMark }}
+
+                                {% elseif markSchemeName == 'LetterGrade' %}
+                                    {{ markType.conf[letterGradeValue] }}
+
+                                {% elseif markSchemeName == 'Percentage'%}
+                                    {{ percentageMark }}
+
+                                {% endif %}
+                                </span> from Descriptors</button>
                         {% endif %}
                     </span>
 
@@ -326,7 +335,13 @@
                             case 'LetterGrade':
                                 var percentage = $groupSummary.attr('data-mark') * (100 / $groupSummary.attr('data-row-max-sum'));
                                 assignLetterGrade(percentage, $groupSummary.find(".groupMax").val(scaledGroupMark));
-                                $groupSummary.find(".descriptor-sum").text(getLetterGradeFromNumeric(percentage));
+                                var grades = [];
+                                $groupSummary.find(".groupMax option").each(function(index, option) {
+                                    grades.push(
+                                        {'value' : $(option).prop("value"), 'letter' : $(option).data('letter')}
+                                    );
+                                });
+                                $groupSummary.find(".descriptor-sum").text(getLetterGradeFromNumeric(percentage, grades));
                                 break;
 
                             case 'Percentage':
@@ -446,7 +461,7 @@
                     // TODO
                     // We have a "none" mark type
             }
-            
+
             // Up for discussion, but I'd imagine the user would like the marks to update automatically
             // with descriptor changes once they've clicked this button
             customisedMark[groupId] = false;
