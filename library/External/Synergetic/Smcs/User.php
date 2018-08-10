@@ -71,6 +71,7 @@ class External_Synergetic_Smcs_User extends External_Synergetic_User
                         '' AS StudentEnrolmentDate,
                         '' AS StudentLeavingDate,  
                         '' AS StudentIBFlag,                      
+                        '' AS EnglishSecondFlag,
                         $learningPlanQuery
             FROM        dbo.uvStudents uvStudents
             LEFT JOIN   CommunityAlerts ON 

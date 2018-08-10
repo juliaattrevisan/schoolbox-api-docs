@@ -80,6 +80,7 @@ class External_Synergetic_Stritas_User extends External_Synergetic_User
                 uStudentProgressiveAbsenceCount.AbsenceFullDaysForYear,
                 uStudentProgressiveAbsenceCount.LateStartDaysForYear,
                 uStudentProgressiveAbsenceCount.EarlyLeaveDaysForYear,
+                vStudents.EnglishSecondFlag,
                 $learningPlanQuery
             FROM        dbo.vStudents vStudents
             LEFT JOIN   CommunityAlerts ON 
