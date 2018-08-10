@@ -72,6 +72,7 @@ class Transactor
                         'name' => $translator->translateNameFromEntityType($entityType, $value),
                         'entityType' => $translator->translateEntityType($entityType),
                         'entityTypeOriginal' => $entityType,
+                        'modifierOriginal' => $relationship,
                         'modifier' => $translator->translateModifier($relationship),
                     ];
                 }

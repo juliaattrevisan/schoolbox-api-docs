@@ -161,6 +161,7 @@ class Controller extends Base
 
         $data[Model::RELATIONSHIP_SELF] = array_merge($baseData, [
             'id' => Segment\Codec::encode($row['entity_type'], $row['id'], Model::RELATIONSHIP_SELF),
+            'modifierOriginal' => Model::RELATIONSHIP_SELF,
             'modifier' => $translator->translateModifier(Model::RELATIONSHIP_SELF),
         ]);
 
@@ -172,6 +173,7 @@ class Controller extends Base
              */
             $data[Model::RELATIONSHIP_PARENTS_OF] = array_merge($baseData, [
                 'id' => Segment\Codec::encode($row['entity_type'], $row['id'], Model::RELATIONSHIP_PARENTS_OF),
+                'modifierOriginal' => Model::RELATIONSHIP_PARENTS_OF,
                 'modifier' => $translator->translateModifier(Model::RELATIONSHIP_PARENTS_OF),
             ]);
 
@@ -179,6 +181,7 @@ class Controller extends Base
              */
             $data[Model::RELATIONSHIP_TEACHERS_OF] = array_merge($baseData, [
                 'id' => Segment\Codec::encode($row['entity_type'], $row['id'], Model::RELATIONSHIP_TEACHERS_OF),
+                'modifierOriginal' => Model::RELATIONSHIP_TEACHERS_OF,
                 'modifier' => $translator->translateModifier(Model::RELATIONSHIP_TEACHERS_OF),
             ]);
         }
