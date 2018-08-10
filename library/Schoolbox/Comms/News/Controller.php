@@ -685,6 +685,8 @@ class Controller extends Base
     public function getArchive(int $year = null, int $month = null)
     {
         $params = new Querystring($this->getRequest()->query);
+        $params->setReferrer(Statistics\Mapper::REFERRER_ARCHIVE);
+
         $topics = $this->topicMapper->findAll();
 
         /* The initial data set to load, given the params provided
@@ -704,7 +706,6 @@ class Controller extends Base
             'topics' => $topics,
             'topicAll' => Mapper::TOPIC_ALL_SLUG,
             'slug' => $params->getSlug(),
-            'referrer' => Statistics\Mapper::REFERRER_ARCHIVE,
 
             /* Archive-specific vars that don't appear anywhere else
              */
@@ -736,6 +737,7 @@ class Controller extends Base
     public function getIndex()
     {
         $params = new Querystring($this->getRequest()->query);
+        $params->setReferrer(Statistics\Mapper::REFERRER_INDEX);
         $topics = $this->topicMapper->findAll();
 
         /* The initial data set to load, given the params provided

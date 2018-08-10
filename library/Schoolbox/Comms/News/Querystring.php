@@ -163,6 +163,17 @@ class Querystring
 
 
     /**
+     * @param null|string $referrer
+     * @return $this
+     */
+    public function setReferrer(?string $referrer)
+    {
+        $this->querystring[self::REFERRER] = $referrer;
+        return $this;
+    }
+
+
+    /**
      * Array representation of the params
      *
      * @return array
