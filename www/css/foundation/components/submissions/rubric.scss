@@ -207,6 +207,7 @@ table.rb {
     color: calc-text-color(lighten($input-border-color, 10%));
 
     label {
+        width: 7rem!important;
         font-weight: bold!important;
     }
     .groupMax {
