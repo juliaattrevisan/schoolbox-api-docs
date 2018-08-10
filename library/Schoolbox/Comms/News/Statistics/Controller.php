@@ -41,24 +41,35 @@ class Controller extends Base
      */
     private function fetchImpressionsConversionsOpens(News\Model $article): array
     {
+        /* This controls how timestamps are grouped together, this increasing or decreasing the accuracy
+         * of the dataset in exchange for perhaps more meaningful interpretations.
+         *
+         * For example, 60 seconds (accuracy=60) might be too granular for some people.
+         * Such might prefer collating five minutes worth of data instead (accuracy=300)
+         *
+         * Events that occur within $accuracy seconds of each other are aggregated together.
+         */
+        $accuracy = 60;
 
         /* Get all the timestamps that have content - because of the way highcharts stacks its data
          * I need to initialise the container with all the possibilities and stack categorised data in-order
          */
         $statement = $this->database->prepareQuery("
             SELECT 
-				CAST(1000*UNIX_TIMESTAMP(CONCAT(DATE_FORMAT(created_at, '%Y-%m-%d %H:%i'), ':00')) AS UNSIGNED) AS timestamp,
+                CAST(1000*UNIX_TIMESTAMP(CONCAT(DATE_FORMAT(created_at, '%Y-%m-%d %H:%i'), ':00')) AS UNSIGNED) AS timestamp,
+                1000*(UNIX_TIMESTAMP(created_at) DIV :accuracy) AS accuracy,
                 COUNT(*) AS num,
                 `type`,
                 `referrer`
             FROM comms_news_article_statistics cnas
             WHERE article_id = :articleId
             AND deleted_at IS NULL
-            GROUP BY timestamp, `type`, referrer
+            GROUP BY accuracy, `type`, referrer
             ORDER BY timestamp
         ");
 
         $statement->execute([
+            'accuracy' => $accuracy,
             'articleId' => $article->getId()
         ]);
 
