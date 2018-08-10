@@ -44,7 +44,7 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
             return "/socialstream/image.php?size={$iconSize}&id=" . $this->getPostId();
         }
         // default icon
-        return '/images/mime/application-octet-stream.svg';
+        return '/images/mime/application-document.svg';
     }
 
     /**
