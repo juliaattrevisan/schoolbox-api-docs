@@ -190,9 +190,9 @@ class Lists
          * This limits you to the articles you can see in a given topic, for a specified homepage
          */
         if ($params->getFolderId()) {
-            $homepageArticleIds = $articleResolver->findArticlesForAudience(Audience\Model::ENTITY_TYPE_FOLDER, $params->getFolderId(), Audience\Model::RELATIONSHIP_SELF);
-
-            $articleIdsForUser = array_intersect($articleIdsForUser, $homepageArticleIds);
+//            $homepageArticleIds = $articleResolver->findArticlesForAudience(Audience\Model::ENTITY_TYPE_FOLDER, $params->getFolderId(), Audience\Model::RELATIONSHIP_SELF);
+//
+//            $articleIdsForUser = array_intersect($articleIdsForUser, $homepageArticleIds);
         }
 
         /* $articleIds:   Articles in $topicId that were audienced to $user
