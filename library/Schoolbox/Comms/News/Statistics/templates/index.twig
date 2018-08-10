@@ -96,14 +96,36 @@
                 }
             ]
         });
+
+        {# Accuracy selector #}
+        $('#accuracy').on('change', function(event) {
+            event.preventDefault();
+
+            window.location.href = $(this).val();
+        });
     });
 </script>
 <div class="row">
     <div class="small-12 columns">
         <h1>Statistics for {{ article.title }}</h1>
-
-        <div id="graph"></div>
     </div>
 </div>
 
+<div class="row">
+    <div class="small-12 island">
+        <section class="content">
+            <label for="accuracy">Accuracy</label>
+            <p class="meta">Change the way the graph condenses data.</p>
 
+            {% set route = routeLookupIfAuthorized('commsNewsStatistics.getOverview', {articleId: article.id}) %}
+
+            <select id="accuracy">
+                {% for value, label in accuracies %}
+                    <option value="{{ route }}?accuracy={{ value }}" {% if value == accuracy %}selected="selected"{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+
+            <div id="graph"></div>
+        </section>
+    </div>
+</div>

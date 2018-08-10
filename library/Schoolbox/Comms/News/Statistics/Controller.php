@@ -140,6 +140,8 @@ class Controller extends Base
     {
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsStatistics/index.twig', [
             'article' => $article,
+            'accuracies' => self::ACCURACIES,
+            'accuracy' => $this->getRequest()->query['accuracy'],
             'series' => $this->fetchImpressionsConversionsOpens($article, $this->getRequest()->query['accuracy']),
         ])->setTitle("Statistics for {$article->getTitle()}"));
     }
