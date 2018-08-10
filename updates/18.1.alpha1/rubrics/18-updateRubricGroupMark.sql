@@ -3,7 +3,6 @@
  * criterion used by the due work.
  *
  * Question: how are invalidated marks handled?
- * * "Changng
  */
 INSERT INTO rubric_group_mark
     (rubric_group_id, return_id, value, valid)
