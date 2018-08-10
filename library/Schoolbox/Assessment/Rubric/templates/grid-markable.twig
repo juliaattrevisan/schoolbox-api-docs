@@ -178,7 +178,7 @@
                         {% endif %}
 
                         {% if group.rowMaxSum > 0 %}
-                            <button class="use-descriptor-values">Assign from Descriptors</button>
+                            <button class="use-descriptor-values">Assign <span class="descriptor-sum">{{ group.scaledMark }}</span> from Descriptors</button>
                         {% endif %}
                     </span>
 
@@ -325,16 +325,19 @@
                         switch(markType) {
                             case 'TotalMarkFractional':
                                 $groupSummary.find(".groupMax").val(scaledGroupMark);
+                                $groupSummary.find(".descriptor-sum").text(scaledGroupMark);
                                 break;
 
                             case 'LetterGrade':
                                 var percentage = $groupSummary.attr('data-mark') * (100 / $groupSummary.attr('data-row-max-sum'));
                                 assignLetterGrade(percentage, $groupSummary.find(".groupMax").val(scaledGroupMark));
+                                $groupSummary.find(".descriptor-sum").text(getLetterGradeFromNumeric(percentage));
                                 break;
 
                             case 'Percentage':
                                 var percentage = $groupSummary.attr('data-mark') * (100 / $groupSummary.attr('data-row-max-sum'));
                                 $groupSummary.find(".groupMax").attr("value", percentage);
+                                $groupSummary.find(".descriptor-sum").text(percentage + "%");
                                 break;
 
                             default:
