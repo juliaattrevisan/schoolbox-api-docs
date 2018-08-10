@@ -68,11 +68,11 @@ class ImpressionsConversionsOpens
      * Assemble all the Impressions, Conversions and direct Opens for $article
      *
      * @param News\Model $article
-     * @param int        $accuracy
+     * @param int|null   $accuracy
      * @return array
      * @throws \Alaress\Database\Exception
      */
-    public function fetch(News\Model $article, int $accuracy = self::DEFAULT_ACCURACY): array
+    public function fetch(News\Model $article, ?int $accuracy = self::DEFAULT_ACCURACY): array
     {
 
         /* Determine a sane value
