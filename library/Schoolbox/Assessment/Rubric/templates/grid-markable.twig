@@ -297,10 +297,7 @@
             rubricSummary.attr('data-scaled-mark', rubricTotalMark);
 
             parseFraction(rubricSummary, e.namespace);
-
-            // This seems to be unused
-            // $('[data-role=rubric-scaled-mark]').text(rubricSummary.text());
-
+            
             // What cell was actually changed?
             if ($changed.is(':checkbox')) {
                 showHideRangeInput($changed);
