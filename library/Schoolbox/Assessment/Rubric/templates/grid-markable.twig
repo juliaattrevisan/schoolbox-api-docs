@@ -31,7 +31,7 @@
                  # This is only off when self-reflecting with a grid that doesn't show descriptor points
                  # and groups - here, it never shows the group subtotal, and rowspan calcs are off
                  #}
-                {% set rowspan = group.criteria|length + (showGroupTotal ? 1 : 0) %}
+                {% set rowspan = group.criteria|length + (showGroupTotal and markSchemeName != "None" ? 1 : 0) %}
 
                 {% for critIndex, crit in group.criteria %}
                 <tr data-group="{{ rubricId }}-{{ group.id }}">
