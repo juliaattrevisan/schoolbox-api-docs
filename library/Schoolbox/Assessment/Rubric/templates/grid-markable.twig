@@ -234,7 +234,7 @@
         })
 
         var $rb = $('#{{ rubricId }}');
-        var markType = $rb.find("rb-final-summary").data("mark-type");
+        var markType = $rb.find("[data-final-summary]").data("mark-type");
 
         // initialise dynamic mark display
         $rb.dynagrade({{ markType | json_encode | raw }});
@@ -277,6 +277,7 @@
                                 break;
 
                             case 'Percentage':
+                                // TODO
                                 break;
 
                             default:
@@ -318,12 +319,24 @@
             var groupSummary = $rb.find(groupSummarySelector);
 
             var customMark = 0;
-            if ($changed.is('select')) {
-                // We have a letter grade, so scale to the percentage it corresponds to
-                customMark = groupSummary.data('max') * ($changed.val() / 100);
-            } else {
-                // Use the entered value directly
-                customMark = $changed.val();
+
+            switch(markType) {
+                case 'TotalMarkFractional':
+                    customMark = $changed.val();
+                    break;
+
+                case 'LetterGrade':
+                    // We have a letter grade, so scale to the percentage it corresponds to
+                    customMark = groupSummary.data('max') * ($changed.val() / 100);
+                    break;
+
+                case 'Percentage':
+                    // TODO
+                    break;
+
+                default:
+                // TODO
+                // We have a "none" mark type
             }
 
             if (groupSummary.length) {
