@@ -65,7 +65,7 @@ class Controller extends Base
                 $type = 'conversion';
             }
 
-            $data[$type][] = [(int)$row['timestamp'], (int)$row['num']];
+            $data[$type][$row['referrer']][] = [(int)$row['timestamp'], (int)$row['num']];
         }
 
         return $data;

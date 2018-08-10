@@ -50,13 +50,43 @@
             series: [
                 {
                     color: '#e8bf68',
-                    name: 'Impressions',
-                    data: {{ series['impression']|json_encode|raw }}
+                    name: 'Impressions/Dashboard',
+                    data: {{ series['impression']['dashboard']|json_encode|raw }}
+                },
+                {
+                    color: '#d7ae57',
+                    name: 'Impressions/Homepage',
+                    data: {{ series['impression']['homepage']|json_encode|raw }}
+                },
+                {
+                    color: '#c69d46',
+                    name: 'Impressions/Archive',
+                    data: {{ series['impression']['archive']|json_encode|raw }}
+                },
+                {
+                    color: '#b58c35',
+                    name: 'Impressions/Email',
+                    data: {{ series['impression']['email']|json_encode|raw }}
                 },
                 {
                     color: '#9eea8f',
-                    name: 'Conversions',
-                    data: {{ series['conversion']|json_encode|raw }}
+                    name: 'Conversions/Dashboard',
+                    data: {{ series['conversion']['dashboard']|json_encode|raw }}
+                },
+                {
+                    color: '#9eea8f',
+                    name: 'Conversions/Homepage',
+                    data: {{ series['conversion']['homepage']|json_encode|raw }}
+                },
+                {
+                    color: '#9eea8f',
+                    name: 'Conversions/Archive',
+                    data: {{ series['conversion']['archive']|json_encode|raw }}
+                },
+                {
+                    color: '#9eea8f',
+                    name: 'Conversions/Email',
+                    data: {{ series['conversion']['email']|json_encode|raw }}
                 },
                 {
                     color: '#80B1D5',
