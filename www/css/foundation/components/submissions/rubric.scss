@@ -13,6 +13,17 @@ table.rb {
             padding: 0;
             position: relative;
         }
+
+        .rb-group-summary {
+            label {
+                width: 7rem;
+            }
+            .groupMax {
+                width: 5rem;
+                display: inline-block;
+            }
+        }
+
         input[type=checkbox], input[type=radio] {
             &:checked {
                 + label {
@@ -207,12 +218,7 @@ table.rb {
     color: calc-text-color(lighten($input-border-color, 10%));
 
     label {
-        width: 7rem!important;
         font-weight: bold!important;
-    }
-    .groupMax {
-        width: 5rem;
-        display: inline-block;
     }
 }
 .rb-final-summary {
