@@ -807,7 +807,8 @@ class Controller extends Base
         $partialData = array_merge($topicData, [
             'hidePaginator' => $hidePaginator,
             'compactMode' => $params->getCompactMode(),
-            'pageNum' => $params->getPageNum()
+            'pageNum' => $params->getPageNum(),
+            'referrer' => $params->getReferrer()
         ]);
 
         return $partialData;
