@@ -85,6 +85,10 @@ class Controller extends Base
      */
     public function getOverview(News\Model $article)
     {
+
+        Mapper::getInstance()->saveImpression($article->getId(), $this->getUser()->getId(), Mapper::REFERRER_EMAIL);
+
+
         $series = $this->fetchImpressionsConversionsOpens($article);
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsStatistics/index.twig', [
