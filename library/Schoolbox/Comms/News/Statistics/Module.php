@@ -96,6 +96,9 @@ class Module extends BaseModule
     {
         /** @var Container $injector */
         $injector->params[Controller::class] = [
+            'databaseInternal' => $injector->lazy(function () {
+                return $this->getInjector()->get('databaseInternal');
+            }),
         ];
     }
 

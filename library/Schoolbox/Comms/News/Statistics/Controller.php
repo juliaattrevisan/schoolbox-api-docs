@@ -8,7 +8,7 @@
  */
 namespace Schoolbox\Comms\News\Statistics;
 
-use Alaress\IDatabase;
+use Alaress\Database\Connector\IConnector;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Comms\News;
 
@@ -16,16 +16,19 @@ class Controller extends Base
 {
 
     /**
-     * @var IDatabase
+     * @var IConnector
      */
-    private $db;
+    private $database;
+
 
     /**
      * Controller constructor.
+     *
+     * @param IConnector $databaseInternal
      */
-    public function __construct()
+    public function __construct(IConnector $databaseInternal)
     {
-        $this->db = \Schoolbox\Comms\News\Mapper::getInstance()->getDatabase();
+        $this->database = $databaseInternal;
     }
 
 
@@ -34,6 +37,7 @@ class Controller extends Base
      *
      * @param News\Model $article
      * @return array
+     * @throws \Alaress\Database\Exception
      */
     private function fetchImpressionsConversionsOpens(News\Model $article): array
     {
@@ -41,22 +45,26 @@ class Controller extends Base
         /* Get all the timestamps that have content - because of the way highcharts stacks its data
          * I need to initialise the container with all the possibilities and stack categorised data in-order
          */
-        $result = $this->db->query("
+        $statement = $this->database->prepareQuery("
             SELECT 
 				CAST(1000*UNIX_TIMESTAMP(CONCAT(DATE_FORMAT(created_at, '%Y-%m-%d %H:%i'), ':00')) AS UNSIGNED) AS timestamp,
                 COUNT(*) AS num,
                 `type`,
                 `referrer`
             FROM comms_news_article_statistics cnas
-            WHERE article_id = {$article->getId()}
+            WHERE article_id = :articleId
             AND deleted_at IS NULL
             GROUP BY timestamp, `type`, referrer
             ORDER BY timestamp
         ");
 
+        $statement->execute([
+            'articleId' => $article->getId()
+        ]);
+
         $data = [];
 
-        while ($row = $result->fetch(\PDO::FETCH_ASSOC)) {
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $type = $row['type'];
             $referrer = $row['referrer'];
 
@@ -91,14 +99,13 @@ class Controller extends Base
      *
      * @param News\Model $article
      * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Alaress\Database\Exception
      */
     public function getOverview(News\Model $article)
     {
-        $series = $this->fetchImpressionsConversionsOpens($article);
-
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsStatistics/index.twig', [
             'article' => $article,
-            'series' => $series,
+            'series' => $this->fetchImpressionsConversionsOpens($article),
         ])->setTitle("Statistics for {$article->getTitle()}"));
     }
 }
