@@ -19,6 +19,14 @@ class Mapper extends \Schoolbox\Mapper
 {
 
     /**
+     * This const represents a Conversion
+     *
+     * This is an Open that had a Referrer value, indicating that the Open was a result of clicking on
+     * an Impression url
+     */
+    public const TYPE_CONVERSION = 'conversion';
+
+    /**
      * Consts to match schema enums
      */
     public const TYPE_OPEN = 'open';

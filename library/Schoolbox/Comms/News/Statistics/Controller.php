@@ -63,7 +63,7 @@ class Controller extends Base
             /* A conversion is a specific combination of Type and Referrer
              */
             if (($referrer !== null) && ($row['type'] === Mapper::TYPE_OPEN)) {
-                $type = 'conversion';
+                $type = Mapper::TYPE_CONVERSION;
             }
 
             /* If referrers are of an unknown type, just throw them into "unknown"
