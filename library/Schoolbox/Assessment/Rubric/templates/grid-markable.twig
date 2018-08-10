@@ -152,7 +152,7 @@
                                    value="{{ group.scaledMark }}"/> / {{ group.max }}
 
                         {% elseif markSchemeName == 'LetterGrade' %}
-                            {% set percentageMark = group.mark * (100 / group.rowMaxSum) %}
+                            {% set percentageMark = group.rowMaxSum > 0 ? group.mark * (100 / group.rowMaxSum) : 0 %}
 
                             <select class="groupMax"
                                     id="group-{{ group.id }}-mark">
