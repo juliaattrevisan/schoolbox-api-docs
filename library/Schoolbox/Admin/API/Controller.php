@@ -132,9 +132,30 @@ class Controller extends Web\Controller\Base
             } else {
                 // valid files found and loaded, we're good to attempt processing
 
-                // TODO process $files given
+                $importerFactory = new ImporterFactory();
 
-                $responseJson['success'] = true;
+                $write = fopen('php://memory', 'rb+');
+
+                $log = new Logger($write, $write, \Monolog\Logger::NOTICE, [], true);
+
+                try {
+                    foreach ($files as $keyspace => $file) {
+                        // this is where the action happens
+                        $importerFactory->buildImporter($keyspace, $importerFactory->buildReader($keyspace, $file), $log, true)->save();
+                    }
+
+                    $responseJson['success'] = true;
+
+                    rewind($write);
+
+                    $responseJson['summary'] = array_filter(explode("\n", trim(stream_get_contents($write))));
+
+                } catch (\Exception $e) {
+                    // one of those times where you really need to catch EVERYTHING
+                    $responseJson['error'] = $e->getMessage();
+                    $rs->status->setCode(500);
+                }
+
             }
 
         } catch (InvalidArgumentException $e) {
