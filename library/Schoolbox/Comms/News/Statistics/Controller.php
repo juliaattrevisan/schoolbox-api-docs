@@ -16,6 +16,32 @@ class Controller extends Base
 {
 
     /**
+     * Default accuracy
+     */
+    private const DEFAULT_ACCURACY = 60;
+
+    /**
+     * The allowed accuracies for a user to choose
+     *
+     * This controls how timestamps are grouped together, this increasing or decreasing the accuracy
+     * of the dataset in exchange for perhaps more meaningful interpretations.
+     *
+     * For example, 60 seconds (accuracy=60) might be too granular for some people.
+     * Such might prefer collating five minutes worth of data instead (accuracy=300)
+     *
+     * Events that occur within $accuracy seconds of each other are aggregated together.
+     *
+     * @var array
+     */
+    private const ACCURACIES = [
+        60 => '1 minute',
+        300 => '5 minutes',
+        3600 => '1 hour',
+        43200 => '12 hours',
+        86400 => '1 day'
+    ];
+
+    /**
      * @var IConnector
      */
     private $database;
@@ -36,20 +62,18 @@ class Controller extends Base
      * Assemble all the Impressions, Conversions and direct Opens for $article
      *
      * @param News\Model $article
+     * @param int        $accuracy
      * @return array
      * @throws \Alaress\Database\Exception
      */
-    private function fetchImpressionsConversionsOpens(News\Model $article): array
+    private function fetchImpressionsConversionsOpens(News\Model $article, int $accuracy = self::DEFAULT_ACCURACY): array
     {
-        /* This controls how timestamps are grouped together, this increasing or decreasing the accuracy
-         * of the dataset in exchange for perhaps more meaningful interpretations.
-         *
-         * For example, 60 seconds (accuracy=60) might be too granular for some people.
-         * Such might prefer collating five minutes worth of data instead (accuracy=300)
-         *
-         * Events that occur within $accuracy seconds of each other are aggregated together.
+
+        /* Determine a sane value
          */
-        $accuracy = 60*60*24;
+        if (!\array_key_exists($accuracy, self::ACCURACIES)) {
+            $accuracy = self::DEFAULT_ACCURACY;
+        }
 
         /* Get all the timestamps that have content - because of the way highcharts stacks its data
          * I need to initialise the container with all the possibilities and stack categorised data in-order
@@ -116,7 +140,7 @@ class Controller extends Base
     {
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsStatistics/index.twig', [
             'article' => $article,
-            'series' => $this->fetchImpressionsConversionsOpens($article),
+            'series' => $this->fetchImpressionsConversionsOpens($article, $this->getRequest()->query['accuracy']),
         ])->setTitle("Statistics for {$article->getTitle()}"));
     }
 }
