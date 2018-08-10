@@ -36,6 +36,10 @@ class Mapper extends \Schoolbox\Mapper
     public const REFERRER_ARCHIVE = 'archive';
     public const REFERRER_EMAIL = 'email';
 
+    /**
+     * This const represents a string value for an empty referrer so it can be meaningful to humans
+     */
+    public const REFERRER_EMPTY = 'unknown';
 
     /**
      * @inheritdoc

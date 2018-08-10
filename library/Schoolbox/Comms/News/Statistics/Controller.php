@@ -66,12 +66,14 @@ class Controller extends Base
                 $type = Mapper::TYPE_CONVERSION;
             }
 
-            /* If referrers are of an unknown type, just throw them into "unknown"
+            /* If referrers are of an unknown type, just throw them into an arbitrary "unknown" category
              */
             if ($referrer === null) {
-                $referrer = 'unknown';
+                $referrer = Mapper::REFERRER_EMPTY;
             }
 
+            /* Stack it
+             */
             $data[$type][$referrer][] = [(int)$row['timestamp'], (int)$row['num']];
         }
 
