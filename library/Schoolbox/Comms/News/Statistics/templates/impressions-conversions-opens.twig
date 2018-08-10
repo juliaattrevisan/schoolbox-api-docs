@@ -1,0 +1,131 @@
+{##
+ # @param News\Model $article
+ # @param array series
+ # @param int accuracy
+ #}
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script>
+    $(function() {
+        $('#graph').highcharts({
+
+            /* can use inverted:true to make it horizontal'
+             */
+            chart: {
+                type: 'column',
+                zoomType: 'xy'
+            },
+
+            credits: {
+                enabled: false
+            },
+
+            time: {
+                useUTC: false
+            },
+
+            title: {
+                text: 'Interactions over time'
+            },
+
+            xAxis: {
+                title: {
+                    text: 'Date'
+                },
+                type: 'datetime'
+            },
+
+            yAxis: {
+                allowDecimals: false,
+                min: 0,
+                title: {
+                    text: 'Number of interactions'
+                }
+            },
+
+            tooltip: {
+                useHTML: true
+            },
+
+            plotOptions: {
+                column: {
+                    stacking: 'normal',
+                    maxPointWidth: 10
+                }
+            },
+
+            series: [
+                {
+                    color: '#e8bf68',
+                    name: 'Impressions/Dashboard',
+                    data: {{ series['impression']['dashboard']|json_encode|raw }}
+                },
+                {
+                    color: '#d7ae57',
+                    name: 'Impressions/Homepage',
+                    data: {{ series['impression']['homepage']|json_encode|raw }}
+                },
+                {
+                    color: '#c69d46',
+                    name: 'Impressions/Archive',
+                    data: {{ series['impression']['archive']|json_encode|raw }}
+                },
+                {
+                    color: '#b58c35',
+                    name: 'Impressions/Email',
+                    data: {{ series['impression']['email']|json_encode|raw }}
+                },
+                {
+                    color: '#9eea8f',
+                    name: 'Conversions/Dashboard',
+                    data: {{ series['conversion']['dashboard']|json_encode|raw }}
+                },
+                {
+                    color: '#8dd97e',
+                    name: 'Conversions/Homepage',
+                    data: {{ series['conversion']['homepage']|json_encode|raw }}
+                },
+                {
+                    color: '#7cc86d',
+                    name: 'Conversions/Archive',
+                    data: {{ series['conversion']['archive']|json_encode|raw }}
+                },
+                {
+                    color: '#6bb75c',
+                    name: 'Conversions/Email',
+                    data: {{ series['conversion']['email']|json_encode|raw }}
+                },
+                {
+                    color: '#80B1D5',
+                    name: 'Non-referred Opens',
+                    data: {{ series['open']['unknown']|json_encode|raw }}
+                }
+            ]
+        });
+
+        {# Accuracy selector #}
+        $('#accuracy').on('change', function(event) {
+            event.preventDefault();
+
+            window.location.href = $(this).val();
+        });
+    });
+</script>
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Impressions, Conversions, Opens</h2>
+        <section class="content">
+            <div id="graph"></div>
+
+            <label for="accuracy">Accuracy</label>
+            <p class="meta">Change the way the graph condenses data.</p>
+
+            {% set route = routeLookupIfAuthorized('commsNewsStatistics.getOverview', {articleId: article.id}) %}
+
+            <select id="accuracy">
+                {% for value, label in accuracies %}
+                    <option value="{{ route }}?accuracy={{ value }}" {% if value == accuracy %}selected="selected"{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </section>
+    </div>
+</div>
