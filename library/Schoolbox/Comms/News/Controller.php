@@ -607,6 +607,8 @@ class Controller extends Base
     /**
      * News Archive
      *
+     * @api GET /comms/news/archive{/year,month}
+     *
      * @param int|null $year
      * @param int|null $month
      * @throws InvalidArgumentException
