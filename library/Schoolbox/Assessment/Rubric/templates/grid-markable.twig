@@ -234,6 +234,7 @@
         })
 
         var $rb = $('#{{ rubricId }}');
+        var markType = $rb.find("rb-final-summary").data("mark-type");
 
         // initialise dynamic mark display
         $rb.dynagrade({{ markType | json_encode | raw }});
@@ -257,11 +258,6 @@
                 var groupSummary = $rb.find(groupSummarySelector);
                 var $descriptorCheckboxes = $groupRows.find('input');
 
-                // Mark types
-                var $isLetterGrade = groupSummary.find(".groupMax").is("select");
-                var $isPercentage;
-                var $isTotalMark;
-
                 var scaledGroupMark = getScaledGroupMark($descriptorCheckboxes, groupSummary);
                 var unscaledGroupMark = summateDescriptors($descriptorCheckboxes);
 
@@ -270,17 +266,24 @@
                         groupSummary.attr('data-scaled-mark', scaledGroupMark);
                         groupSummary.attr('data-mark', unscaledGroupMark);
 
-                        if ($isLetterGrade) {
-                            var percentage = groupSummary.attr('data-mark') * (100 / groupSummary.attr('data-row-max-sum'));
-                            assignLetterGrade(percentage, groupSummary.find(".groupMax").val(scaledGroupMark));
-                        } else if ($isPercentage) {
-                            // TODO
-                        } else if ($isTotalMark) {
-                            groupSummary.find(".groupMax").val(scaledGroupMark);
-                        } else {
-                            // TODO
-                            // We have a "none" mark type
+                        switch(markType) {
+                            case 'TotalMarkFractional':
+                                groupSummary.find(".groupMax").val(scaledGroupMark);
+                                break;
+
+                            case 'LetterGrade':
+                                var percentage = groupSummary.attr('data-mark') * (100 / groupSummary.attr('data-row-max-sum'));
+                                assignLetterGrade(percentage, groupSummary.find(".groupMax").val(scaledGroupMark));
+                                break;
+
+                            case 'Percentage':
+                                break;
+
+                            default:
+                                // TODO
+                                // We have a "none" mark type
                         }
+
                     }
                 }
 
