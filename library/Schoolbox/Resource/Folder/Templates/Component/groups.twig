@@ -36,7 +36,7 @@
                             {% if userAccess[group.id].admin %}
                                 <li><a href="/group/modify/{{ group.id }} " class="icon-group">Modify Group</a></li>
                             {% endif %}
-                            {% if (group.group.type != 1 and (userAccess[group.id].write or userAccess[group.id].read)) %}
+                            {% if (not group.group.private and (userAccess[group.id].write or userAccess[group.id].read)) %}
                                 <li><a href="/group/joinForm.php?leave={{ group.id }}&return=true" data-confirm-leave class="icon-logout">Leave Group</a></li>
                             {% endif %}
                         </ul>
