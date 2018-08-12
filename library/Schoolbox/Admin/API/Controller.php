@@ -12,6 +12,8 @@ use Alaress\Lumberjack\Logger;
 use Alaress\Web;
 use InvalidArgumentException;
 use Schoolbox\Import\ImporterFactory;
+use Schoolbox\Resource\Storage;
+use Schoolbox\Mapper;
 
 
 class Controller extends Web\Controller\Base
@@ -22,6 +24,24 @@ class Controller extends Web\Controller\Base
         'timetable'             => ImporterFactory::IMPORT_TIMETABLE,
         'enrolment'             => ImporterFactory::IMPORT_ENROLMENT,
     ];
+
+    /** @var Storage\Mapper */
+    private $storageMapper;
+
+    /** @var ImporterFactory */
+    private $importerFactory;
+
+
+    /**
+     * @param Storage\Mapper  $storageMapper
+     * @param ImporterFactory $importerFactory
+     */
+    public function __construct(Storage\Mapper $storageMapper, ImporterFactory $importerFactory)
+    {
+        $this->storageMapper   = $storageMapper;
+        $this->importerFactory = $importerFactory;
+    }
+
 
     /**
      * @api POST /api/admin/csv
@@ -57,8 +77,8 @@ class Controller extends Web\Controller\Base
             }
 
             try {
-                $storage = \Schoolbox\Resource\Storage\Mapper::getInstance()->accept($file['name'], $file['tmp_name'], false);
-            } catch (\Schoolbox\Mapper\Exception $e) {
+                $storage = $this->storageMapper->accept($file['name'], $file['tmp_name'], false);
+            } catch (Mapper\Exception $e) {
                 throw new InvalidArgumentException('The CSV was rejected by the server.', 400);
             }
 
@@ -117,9 +137,9 @@ class Controller extends Web\Controller\Base
 
                 try {
                     // assign the given hash to its place in the files array
-                    $files[self::REQUIRED_CSVS[$requiredCsv]] = \Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash($hash);
+                    $files[self::REQUIRED_CSVS[$requiredCsv]] = $this->storageMapper->findByHash($hash);
 
-                } catch (\Schoolbox\Mapper\Exception $e) {
+                } catch (Mapper\Exception $e) {
                     $errors[] = "Invalid file hash given for '$requiredCsv'.";
                     continue;
                 }
@@ -132,16 +152,14 @@ class Controller extends Web\Controller\Base
             } else {
                 // valid files found and loaded, we're good to attempt processing
 
-                $importerFactory = new ImporterFactory();
-
                 $write = fopen('php://memory', 'rb+');
 
-                $log = new Logger($write, $write, \Monolog\Logger::NOTICE, [], true);
+                $log = new Logger($write, $write, \Monolog\Logger::WARNING, [], true);
 
                 try {
                     foreach ($files as $keyspace => $file) {
                         // this is where the action happens
-                        $importerFactory->buildImporter($keyspace, $importerFactory->buildReader($keyspace, $file), $log, true)->save();
+                        $this->importerFactory->buildImporter($keyspace, $this->importerFactory->buildReader($keyspace, $file), $log, true)->save();
                     }
 
                     $responseJson['success'] = true;

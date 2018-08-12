@@ -10,7 +10,10 @@
 namespace Schoolbox\Admin\API;
 
 use Alaress\Module\Module as BaseModule;
+use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
+use Schoolbox\Import\ImporterFactory;
+
 
 class Module extends BaseModule {
 
@@ -37,5 +40,24 @@ class Module extends BaseModule {
     {
         $injector->set('controller:'.$this->basename, $injector->lazyNew(Controller::class));
     }
+
+
+    /**
+     * Override with any steps required for a controller and its routes
+     *
+     * You should use this method to initialize any mappers or other objects
+     * which the controller needs, but are too heavy to initialize at module
+     * init time.
+     *
+     * @param Container|ContainerInterface $injector The dependency injection container.
+     */
+    protected function preInitControllerDependencies(ContainerInterface $injector)
+    {
+        $injector->params[Controller::class] = [
+            'storageMapper'   => $injector->get('mapperFactory')->getLazy(\Schoolbox\Resource\Storage\Mapper::class),
+            'importerFactory' => $injector->lazyNew(ImporterFactory::class)
+        ];
+    }
+
 
 }
