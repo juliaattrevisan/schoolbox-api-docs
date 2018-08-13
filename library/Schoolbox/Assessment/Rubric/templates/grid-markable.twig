@@ -304,7 +304,7 @@
 
                 var scaledGroupMark = getScaledGroupMark($descriptorCheckboxes, $groupSummary);
                 var unscaledGroupMark = summateDescriptors($descriptorCheckboxes);
-                var percentage = $groupSummary.attr('data-mark') * (100 / $groupSummary.attr('data-row-max-sum'));
+                var percentage = $groupSummary.attr('data-row-max-sum') > 0 ? $groupSummary.attr('data-mark') * (100 / $groupSummary.attr('data-row-max-sum')) : 0;
 
                 $groupSummary.attr('data-scaled-mark', scaledGroupMark);
                 $groupSummary.attr('data-mark', unscaledGroupMark);
