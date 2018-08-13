@@ -85,9 +85,9 @@ class GridGenerator
                 rdm.value
             FROM rubric_descriptor_mark rdm
             LEFT JOIN rubric_group_mark rgm ON rdm.rubric_group_mark_id = rgm.id
-            LEFT JOIN submission_return sr ON sr.id = rdm.return_id
+            LEFT JOIN submission_return sr ON sr.id = rgm.return_id
             WHERE rdm.valid = TRUE
-            AND rdm.return_id = (
+            AND rgm.return_id = (
               SELECT sr.id
               FROM submission_return sr
               WHERE $whereClause
