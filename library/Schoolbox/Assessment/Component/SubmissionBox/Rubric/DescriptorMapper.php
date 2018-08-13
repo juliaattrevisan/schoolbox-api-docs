@@ -85,10 +85,12 @@ class DescriptorMapper extends Schoolbox\Mapper {
         return "
             SELECT  {$this->getColumnString()},
                     {$this->getJoinColumnString('level', 'l')},
-                    {$this->getJoinColumnString('criterion', 'c')}
+                    {$this->getJoinColumnString('criterion', 'c')},
+                    {$this->getJoinColumnString('criterion.group', 'g')}
             FROM {$this->getTable()}
             INNER JOIN {$this->getJoinSql('level', '', 'l', true)}
             INNER JOIN {$this->getJoinSql('criterion', '', 'c', true)}
+            INNER JOIN {$this->getJoinSql('criterion.group', 'c', 'g', true)}
         ";
     }
 
@@ -101,15 +103,18 @@ class DescriptorMapper extends Schoolbox\Mapper {
     {
         $levelMapper     = $this->getJoinMapper('level');
         $criterionMapper = $this->getJoinMapper('criterion');
+        $groupMapper     = $this->getJoinMapper('criterion.group');
 
         /* All indexed by primary key */
         $descriptors     = $this->createCollection();
         $levels          = $levelMapper->createCollection();
         $criteria        = $criterionMapper->createCollection();
+        $groups          = $groupMapper->createCollection();
 
         // Row keys for de-duplication
         $levelKey        = "l.{$levelMapper->getIdentifierColumn()}";
         $criterionKey    = "c.{$criterionMapper->getIdentifierColumn()}";
+        $groupKey        = "g.{$groupMapper->getIdentifierColumn()}";
 
         /** @var Level $level */
         $level = null;
@@ -117,20 +122,35 @@ class DescriptorMapper extends Schoolbox\Mapper {
         /** @var Criterion $criterion */
         $criterion = null;
 
+        /** @var Group $group */
+        $group = null;
+
         while ($r = $statement->fetch(PDO::FETCH_ASSOC)) {
 
-            $levelId = $r[$levelKey];
+            $levelId     = $r[$levelKey];
             $criterionId = $r[$criterionKey];
+            $groupId     = $r[$groupKey];
 
             // First time we've encountered this Level ?
-            if(!$levels->getOffset($levelId)){
+            if (!$levels->getOffset($levelId)) {
                 $levels->setOffset($levelId, $this->hydrateJoin($r, 'level', 'l'));
             }
             $level = $levels->getOffset($levelId);
 
             // First time we've encountered this Criterion ?
-            if(!$criteria->getOffset($criterionId)){
-                $criteria->setOffset($criterionId, $this->hydrateJoin($r, 'criterion', 'c'));
+            if (!$criteria->getOffset($criterionId)) {
+                // First time we've encountered this group?
+                if (!$groups->getOffset($groupId)) {
+                    $groups->setOffset($groupId, $this->hydrateJoin($r, 'criterion.group', 'g'));
+                }
+
+                // Set the group as well
+                /** @var Group $group */
+                /** @var Criterion $criterion */
+                $group     = $groups->getOffset($groupId);
+                $criterion = $this->hydrateJoin($r, 'criterion', 'c');
+                $criterion->setGroup($group);
+                $criteria->setOffset($criterionId, $criterion);
             }
             $criterion = $criteria->getOffset($criterionId);
 
