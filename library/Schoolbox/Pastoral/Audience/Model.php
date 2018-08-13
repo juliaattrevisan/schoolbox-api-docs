@@ -13,7 +13,7 @@ namespace Schoolbox\Pastoral\Audience;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
-use Schoolbox\Pastoral\Model as Pastoral;
+use Schoolbox\Pastoral\Group\Model as PastoralGroup;
 use Schoolbox\Role;
 use Schoolbox\User;
 
@@ -26,7 +26,7 @@ class Model
     /** @var User $user Schoolbox user whose actions we are tracking */
     private $user;
 
-    /** @var null|\Group $pastoralGroup */
+    /** @var null|PastoralGroup $pastoralGroup */
     private $pastoralGroup;
 
     /** @var null|Role  */
@@ -35,7 +35,7 @@ class Model
     /** @var integer */
     private $typeId;
 
-    /** @var integer */
+    /** @var null|integer */
     private $subtypeId;
 
     /** @var integer */
@@ -43,10 +43,10 @@ class Model
 
 
     /**
-     * @param \Group|null $pastoralGroup
+     * @param PastoralGroup|null $pastoralGroup
      * @return $this
      */
-    public function setPastoralGroup(Pastoral $pastoralGroup): self
+    public function setPastoralGroup(PastoralGroup $pastoralGroup): self
     {
         $this->pastoralGroup = $pastoralGroup;
 
@@ -54,9 +54,9 @@ class Model
     }
 
     /**
-     * @return null|\Group
+     * @return null|PastoralGroup
      */
-    public function getPastoralGroup()
+    public function getPastoralGroup(): ?PastoralGroup
     {
         return $this->pastoralGroup;
     }
@@ -76,7 +76,7 @@ class Model
     /**
      * @return User|null
      */
-    public function getUser()
+    public function getUser(): ?User
     {
         return $this->user;
     }
@@ -85,14 +85,15 @@ class Model
     /**
      * @return Role|null
      */
-    public function getRole()
+    public function getRole(): ?Role
     {
         return $this->role;
     }
 
 
     /**
-     * @param int $role
+     * @param Role $role
+     * @return Model
      */
     public function setRole($role): self
     {
@@ -160,5 +161,6 @@ class Model
         $this->access = $access;
         return $this;
     }
+
 
 }

@@ -109,7 +109,6 @@ class Controller extends Base
     public function getAudiencesModify($typeId, $subtypeId)
     {
         $roles = new Collection();
-        $roleUsers = [];
         $rolesAll = RoleMapper::getInstance()->findAll(['order' => ['name' => 'ASC']]);
 
         //Staff roles only for default audiences
@@ -118,7 +117,6 @@ class Controller extends Base
             // Staff role? Show all users
             if ($roleCurrent->isStaff()) {
                 $roles->add($roleCurrent);
-                $roleUsers[$roleCurrent->getId()] = $this->userMapper->countByColumn('group_id', $roleCurrent->getId());
             }
         }
 
@@ -130,7 +128,6 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@pastoralManagement/audiences_modify.twig',
             'data'     => [
-
                 'record'            => $record,
                 'allowIndividual'   => ConfigMapper::getInstance()->get('pastoral_individual_access'),
                 'allowParents'      => false,
@@ -144,26 +141,22 @@ class Controller extends Base
         ]);
     }
 
-    public function getAudiencesModifyNoSub($typeId) {
+    public function getAudiencesModifyNoSub($typeId)
+    {
         $this->getAudiencesModify($typeId, null);
     }
 
-    public function postAudienceUpdateNoSub($typeId) {
+    public function postAudienceUpdateNoSub($typeId)
+    {
         $this->postAudienceUpdate($typeId, null);
     }
 
-    public function postAudienceUpdate($typeId, $subtypeId) {
+    public function postAudienceUpdate($typeId, $subtypeId)
+    {
         //Delete the old ones
-        $oldPerms = $this->pastoralAudienceMapper->findByColumnList(['type_id' => $typeId, 'subtype_id' => $subtypeId], ['deleted' => true]);
+        $this->pastoralAudienceMapper->hardDeleteByType($typeId, $subtypeId);
 
-        if(count($oldPerms) > 0) {
-            foreach ($oldPerms as $oldie) {
-                $this->pastoralAudienceMapper->hardDelete($oldie);
-            }
-        }
-
-        // Save system role permissions, de-duplicating as we go
-
+        // Save system role permissions, de-duplicating as we go\
         $foundRoles = [];
 
         if (is_array($_POST["role"])) {
@@ -188,7 +181,6 @@ class Controller extends Base
         }
 
         // Save pastoral group permissions, de-duplicating as we go
-
         $foundGroups = [];
 
         if (is_array($_POST["group"])) {
@@ -214,7 +206,6 @@ class Controller extends Base
         }
 
         // Save individual user permissions, de-duplicating as we go
-
         $foundUsers = [];
 
         if (is_array($_POST["user"])) {

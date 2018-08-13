@@ -17,10 +17,12 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Pastoral\Group\Mapper as GroupMapper;
-use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Schoolbox\Pastoral\Group\Model as PastoralGroup;
+use Schoolbox\Role;
+use Schoolbox\Mapper\Exception as MapperException;
 
 /**
  * Class Mapper
@@ -114,7 +116,7 @@ class Mapper extends BaseMapper
             // Hydrate group
 
             if (!empty($row['g.id'])) {
-                $access->setGroup($this->hydrateJoin($row, 'group', 'g'));
+                $access->setPastoralGroup($this->hydrateJoin($row, 'group', 'g'));
             }
 
             $results->add($access);
@@ -122,4 +124,23 @@ class Mapper extends BaseMapper
 
         return $results;
     }
+
+    /**
+     * @param int $typeId
+     * @param int $subtypeId
+     * @throws Exception
+     */
+    public function hardDeleteByType($typeId, $subtypeId): void
+    {
+        $oldPerms = $this->findByColumnList(['type_id' => $typeId, 'subtype_id' => $subtypeId], ['deleted' => true]);
+
+        if (\count($oldPerms) > 0) {
+            foreach ($oldPerms as $oldie) {
+                $this->hardDelete($oldie);
+            }
+        }
+
+    }
+
+
 }
