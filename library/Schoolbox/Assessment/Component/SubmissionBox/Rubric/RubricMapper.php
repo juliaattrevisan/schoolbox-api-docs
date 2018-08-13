@@ -797,23 +797,26 @@ class RubricMapper
      * @param array[] $descriptors key = descriptor.id
      *                             val = [selected: is it selected?, value: what's its value?]
      * @param array[] $groups      key = group.id
-     *                             val = [selected: is it selected?, value: what's its value?]
-     * @param int    $returnId    Feedback
+     *                             val = [value: what's its value? (only if set manually)]
+     * @param int     $returnId    Feedback
      */
     public function saveForFeedback(array $descriptors, array $groups, int $returnId): void
     {
-        $descriptorMapper = DescriptorMapper::getInstance();
-        $markMapper       = DescriptorMarkMapper::getInstance();
-
-        $returnedWorkMapper = SubmissionBox\ReturnedWorkMapper::getInstance();
+        $descriptorMapper     = DescriptorMapper::getInstance();
+        $descriptorMarkMapper = DescriptorMarkMapper::getInstance();
+        $groupMarkMapper      = GroupMarkMapper::getInstance();
+        $returnedWorkMapper   = SubmissionBox\ReturnedWorkMapper::getInstance();
 
         // Blow away any previous descriptor records with the feedback
-        $markMapper->deleteFeedbackMarks($returnId);
+        $descriptorMarkMapper->deleteFeedbackMarks($returnId);
 
-        $marksToSave = $markMapper->createCollection();
+        $marksToSave = $descriptorMarkMapper->createCollection();
 
         // What actually got saved?
-        $selectedGroups      = [];
+        $selectedGroups = [];
+        foreach ($groups as $id => $group) {
+            $selectedGroups[$id] = $group['value'];
+        }
         $selectedDescriptors = [];
         foreach ($descriptors as $id => $descriptor) {
             if (!empty($descriptor['selected'])) {
@@ -827,9 +830,20 @@ class RubricMapper
             // If this isn't set: this is an issue
             $descriptor = $descriptorModels[$descriptorId];
 
+            // Find a record for its group
+            // If it doesn't exist: make a new one
+            $group     = $descriptor->getCriterion()->getGroup();
+            $groupMark = $groupMarkMapper->createModel()
+                ->setSubmissionReturn($returnedWorkMapper->createModel($returnId))
+                ->setGroup($group)
+                ->setValid(true)
+                // Take value from rubric_group_usage.max_value if not present
+                ->setValue($selectedGroups[$group->getId()]);
+
             $marksToSave->add(
-                $markMapper->createModel()
-                           ->setSubmissionReturn($returnedWorkMapper->createModel($returnId))
+                $descriptorMarkMapper->createModel()
+//                           ->setSubmissionReturn($returnedWorkMapper->createModel($returnId))
+                           ->setGroupMark($groupMark)
                            ->setDescriptor($descriptor)
                            ->setValid(true)
                            // Take value from form preferentially, then descriptor
@@ -839,7 +853,7 @@ class RubricMapper
 
         // Save marks for groups as well
 
-        $markMapper->save($marksToSave);
+        $descriptorMarkMapper->save($marksToSave);
     }
 
     /**
