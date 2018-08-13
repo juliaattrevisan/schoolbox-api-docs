@@ -304,7 +304,6 @@
 
                 var scaledGroupMark = getScaledGroupMark($descriptorCheckboxes, $groupSummary);
                 var unscaledGroupMark = summateDescriptors($descriptorCheckboxes);
-                var percentage = $groupSummary.attr('data-row-max-sum') > 0 ? $groupSummary.attr('data-mark') * (100 / $groupSummary.attr('data-row-max-sum')) : 0;
 
                 $groupSummary.attr('data-scaled-mark', scaledGroupMark);
                 $groupSummary.attr('data-mark', unscaledGroupMark);
@@ -317,11 +316,11 @@
 
                     case 'LetterGrade':
                         var grades = getLetterGrades($groupSummary);
-                        $groupSummary.find(".descriptor-sum").text(getLetterGradeFromNumeric(percentage, grades));
+                        $groupSummary.find(".descriptor-sum").text(getLetterGradeFromNumeric(getPercentageForGroup($groupSummary), grades));
                         break;
 
                     case 'Percentage':
-                        $groupSummary.find(".descriptor-sum").text(percentage + "%");
+                        $groupSummary.find(".descriptor-sum").text(getPercentageForGroup($groupSummary) + "%");
                         break;
 
                     default:
@@ -338,11 +337,11 @@
                                 break;
 
                             case 'LetterGrade':
-                                assignLetterGrade(percentage, $groupSummary.find(".groupMax").val(scaledGroupMark));
+                                assignLetterGrade(getPercentageForGroup($groupSummary), $groupSummary.find(".groupMax").val(scaledGroupMark));
                                 break;
 
                             case 'Percentage':
-                                $groupSummary.find(".groupMax").val(percentage);
+                                $groupSummary.find(".groupMax").val(getPercentageForGroup($groupSummary));
                                 break;
 
                             default:
@@ -448,13 +447,11 @@
                     break;
 
                 case 'LetterGrade':
-                    var percentage = $groupSummary.attr('data-mark') * (100 / $groupSummary.attr('data-row-max-sum'));
-                    assignLetterGrade(percentage, $gradeInput.val(scaledGroupMark));
+                    assignLetterGrade(getPercentageForGroup($groupSummary), $gradeInput.val(scaledGroupMark));
                     break;
 
                 case 'Percentage':
-                    var percentage = $groupSummary.attr('data-mark') * (100 / $groupSummary.attr('data-row-max-sum'));
-                    $groupSummary.find(".groupMax").val(percentage);
+                    $groupSummary.find(".groupMax").val(getPercentageForGroup($groupSummary));
                     break;
 
                 default:
@@ -519,6 +516,10 @@
             }
 
             return markLetterValue;
+        }
+
+        function getPercentageForGroup($groupSummary) {
+            return $groupSummary.data('row-max-sum') > 0 ? $groupSummary.attr('data-mark') * (100 / $groupSummary.data('row-max-sum')) : 0;
         }
 
         // Hide or display the descriptor range input depending on whether it's needed or not
