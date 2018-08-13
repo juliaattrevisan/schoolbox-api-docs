@@ -100,6 +100,12 @@ class Model implements ISoftDeletable
 
 
     /**
+     * @var int
+     */
+    private $numOpens;
+
+
+    /**
      * @return null|int
      */
     public function getArticleId(): ?int
@@ -120,9 +126,9 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @return string
+     * @return null|string
      */
-    public function getDate(): string
+    public function getDate(): ?string
     {
         return $this->date;
     }
@@ -140,9 +146,9 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @return string
+     * @return null|string
      */
-    public function getFirstOpen(): string
+    public function getFirstOpen(): ?string
     {
         return $this->firstOpen;
     }
@@ -160,9 +166,9 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @return int
+     * @return null|int
      */
-    public function getNumImpressionsDashboard(): int
+    public function getNumImpressionsDashboard(): ?int
     {
         return $this->numImpressionsDashboard;
     }
@@ -180,9 +186,9 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @return int
+     * @return null|int
      */
-    public function getNumImpressionsHomepage(): int
+    public function getNumImpressionsHomepage(): ?int
     {
         return $this->numImpressionsHomepage;
     }
@@ -200,9 +206,9 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @return int
+     * @return null|int
      */
-    public function getNumImpressionsIndex(): int
+    public function getNumImpressionsIndex(): ?int
     {
         return $this->numImpressionsIndex;
     }
@@ -220,9 +226,9 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @return int
+     * @return null|int
      */
-    public function getNumImpressionsArchive(): int
+    public function getNumImpressionsArchive(): ?int
     {
         return $this->numImpressionsArchive;
     }
@@ -240,9 +246,9 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @return int
+     * @return null|int
      */
-    public function getNumImpressionsEmail(): int
+    public function getNumImpressionsEmail(): ?int
     {
         return $this->numImpressionsEmail;
     }
@@ -260,9 +266,9 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @return int
+     * @return null|int
      */
-    public function getNumConversionsDashboard(): int
+    public function getNumConversionsDashboard(): ?int
     {
         return $this->numConversionsDashboard;
     }
@@ -280,9 +286,9 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @return int
+     * @return null|int
      */
-    public function getNumConversionsHomepage(): int
+    public function getNumConversionsHomepage(): ?int
     {
         return $this->numConversionsHomepage;
     }
@@ -300,9 +306,9 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @return int
+     * @return null|int
      */
-    public function getNumConversionsIndex(): int
+    public function getNumConversionsIndex(): ?int
     {
         return $this->numConversionsIndex;
     }
@@ -320,9 +326,9 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @return int
+     * @return null|int
      */
-    public function getNumConversionsArchive(): int
+    public function getNumConversionsArchive(): ?int
     {
         return $this->numConversionsArchive;
     }
@@ -340,9 +346,9 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @return int
+     * @return null|int
      */
-    public function getNumConversionsEmail(): int
+    public function getNumConversionsEmail(): ?int
     {
         return $this->numConversionsEmail;
     }
@@ -357,4 +363,26 @@ class Model implements ISoftDeletable
         $this->numConversionsEmail = $numConversionsEmail;
         return $this;
     }
+
+
+    /**
+     * @return null|int
+     */
+    public function getNumOpens(): ?int
+    {
+        return $this->numOpens;
+    }
+
+
+    /**
+     * @param int $numOpens
+     * @return Model
+     */
+    public function setNumOpens(int $numOpens): self
+    {
+        $this->numOpens = $numOpens;
+        return $this;
+    }
+
+
 }
