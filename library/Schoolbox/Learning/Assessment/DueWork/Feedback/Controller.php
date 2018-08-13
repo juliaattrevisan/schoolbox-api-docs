@@ -199,10 +199,10 @@ class Controller extends Base
 
         // Did we just give some rubric marks?
         if (\is_array($post['rubric'])) {
-            $this->rubricMapper->saveForFeedback($post['rubric']['descriptors'], $feedback->getId());
+            $this->rubricMapper->saveForFeedback($post['rubric']['descriptors'], [], $feedback->getId());
             return true;
         } else if (array_key_exists('saveEmpty', $post) && $post['saveEmpty']) {
-            $this->rubricMapper->saveForFeedback([], $feedback->getId());
+            $this->rubricMapper->saveForFeedback([], [], $feedback->getId());
             return true;
         }
         return false;

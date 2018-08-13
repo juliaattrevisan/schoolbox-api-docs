@@ -119,6 +119,8 @@ class DescriptorMarkMapper extends Mapper
     /**
      * This will HARD-DELETE all previously given marks with the feedback.
      *
+     * This also hard-deletes all group marks.
+     *
      * @param int  $returnId
      * @return int
      */

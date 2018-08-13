@@ -794,10 +794,13 @@ class RubricMapper
     /**
      * Save rubrics selections for a particular feedback.
      *
-     * @param bool[] $descriptors key = descriptor.id, val = whether it is checked
+     * @param array[] $descriptors key = descriptor.id
+     *                             val = [selected: is it selected?, value: what's its value?]
+     * @param array[] $groups      key = group.id
+     *                             val = [selected: is it selected?, value: what's its value?]
      * @param int    $returnId    Feedback
      */
-    public function saveForFeedback(array $descriptors, $returnId)
+    public function saveForFeedback(array $descriptors, array $groups, int $returnId): void
     {
         $descriptorMapper = DescriptorMapper::getInstance();
         $markMapper       = DescriptorMarkMapper::getInstance();
@@ -810,6 +813,7 @@ class RubricMapper
         $marksToSave = $markMapper->createCollection();
 
         // What actually got saved?
+        $selectedGroups      = [];
         $selectedDescriptors = [];
         foreach ($descriptors as $id => $descriptor) {
             if (!empty($descriptor['selected'])) {
