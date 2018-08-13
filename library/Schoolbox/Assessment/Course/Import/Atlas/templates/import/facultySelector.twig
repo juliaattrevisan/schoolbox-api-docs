@@ -1,0 +1,11 @@
+{{ generateHiddenInputs(previousPost) }}
+
+{% include '@course/sub/sourceSelector.twig' with {
+    courseSpec: null,
+} only %}
+
+{% if not isValidFacultyRoot %}
+    <div class="small-12 column">
+        {% include '@course/sub/invalidFacultyRoot.twig' %}
+    </div>
+{% endif %}

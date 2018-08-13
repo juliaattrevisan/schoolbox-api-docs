@@ -1,0 +1,95 @@
+// UGH had to do this because of faculty selector being wrapped in a div in its twig fragment
+// TODO make fragment not include the div wrapper
+.atlas-labels .small-12.column {
+  padding: 0;
+}
+
+#curriculum-plan-list, #curriculum-plan-units {
+  padding-bottom: 1.5rem;
+
+  label span.title {
+    display: inline-block;
+    margin-left: 2rem;
+    font-size: 1rem;
+  }
+
+  .empty-state {
+    background-color: unset; // Not enough contrast to read otherwise
+  }
+}
+
+#curriculum-plan-list {
+  input[type="radio"]:not(.plain) + label.radio-label {
+    margin: 0!important;
+  }
+
+  .meta {
+    margin-left: 2rem !important;
+  }
+
+  .card {
+    padding: .5rem 0 .5rem 0;
+  }
+}
+
+#curriculum-plan-units {
+  .unit-empty {
+    background: $snow;
+    .title {
+      color: $monsoon;
+    }
+  }
+
+  li.child {
+    margin-left: 1.75rem;
+    padding: 0;
+  }
+
+  .selector {
+    padding: 0;
+  }
+
+  .switch span:last-child {
+    left: 2rem;
+  }
+
+  .switch.round {
+    display: inline-block;
+    margin-bottom: 0;
+    margin-top: 0.25rem;
+  }
+
+  .checkbox-label {
+    display: inline-block;
+    padding-left: .25rem;
+  }
+
+  .card {
+    padding: .5rem 0 .5rem .5rem;
+    margin-bottom: 0;
+  }
+
+  .threaded .child .card {
+    margin-left: .5rem;
+  }
+
+  .threaded .child .card.meta {
+    margin: 0;
+    padding: 0!important;
+  }
+
+  .assessments, .attachments {
+    li .title {
+      font-size: 0.75rem;
+    }
+  }
+
+  label.checkbox-label {
+    font-style: normal; // Otherwise italics affect the tick
+  }
+
+  .card.meta > p:last-child {
+    padding-bottom: 0;
+  }
+
+}

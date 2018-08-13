@@ -8,46 +8,59 @@
         {% set attachmentCount = unit.attachments|length %}
         {% set hasContent      = assessmentCount > 0 or attachmentCount > 0 %}
         <li>
-            <div>
-                {% if hasContent %}
-                    <div class="expander icon-down-arrow" data-collapser="unit-{{ unit.id }}"></div>
-                {% else %}
-                    <div class="expander disabled"></div>
-                {% endif %}
-                <div class="selector">
-                    <input id="unit-{{ unit.id }}"
-                           name="unit[{{ unit.id }}][selected]"
-                           value="1"
-                           type="checkbox"
-                           {% if hasContent %}checked{% endif %}
-                           data-unit="{{ unit.id }}"
-                    >
-                    <label for="unit-{{ unit.id }}" class="checkbox-label"></label>
+            <div {% if not hasContent %}class="unit-empty"{% endif %}>
+                <div class="expander icon-down-arrow" data-collapser="unit-{{ unit.id }}"></div>
+
+                <div class="small-6 card">
+                    <div class="selector">
+                        <input id="unit-{{ unit.id }}"
+                               name="unit[{{ unit.id }}][selected]"
+                               value="1"
+                               type="checkbox"
+                               {% if hasContent %}checked{% endif %}
+                               data-unit="{{ unit.id }}"
+                        >
+                        <label for="unit-{{ unit.id }}" class="checkbox-label">
+                            <span class="title">{{ unit.title }}</span>
+                        </label>
+                    </div>
                 </div>
-                <div class="small-12 card">
-                    <a href="#">
-                        <h3>{{ unit.title }}</h3>
-                        <p class="meta">{{ unit.timeFrame }}</p>
-                        {% if assessmentCount > 0 %}
-                            <p class="meta" data-unit-meta="{{ unit.id }}">
-                                {{ assessmentCount }} {% if assessmentCount == 1 %}assessment{% else %}assessments{% endif %},
-                                <span data-checkbox-group-count="unit-{{ unit.id }}-assessments"
-                                      data-show-count="{{ assessmentCount }}"> selected</span>
-                            </p>
-                        {% endif %}
-                        {% if attachmentCount > 0 %}
-                            <p class="meta" data-unit-meta="{{ unit.id }}">
-                                {{ attachmentCount }} {% if attachmentCount == 1 %}attachment{% else %}attachments{% endif %},
-                                <span data-checkbox-group-count="unit-{{ unit.id }}-attachments"
-                                      data-show-count="{{ attachmentCount }}"> selected</span>
-                            </p>
-                        {% endif %}
-                    </a>
+                {# [data-show-count] gets its value from a css :before in www/css/foundation/ui/_content.scss #}
+                <div class="small-6 card meta">
+                    <p class="meta">{{ unit.timeFrame }}</p>
+                    {% if assessmentCount > 0 %}
+                        <p class="meta" data-unit-meta="{{ unit.id }}">
+                            {{ assessmentCount }} {% if assessmentCount == 1 %}assessment{% else %}assessments{% endif %}
+                            <span data-checkbox-group-count="unit-{{ unit.id }}-assessments"
+                                  data-show-count="- {{ assessmentCount }}"> selected</span>
+                        </p>
+                    {% endif %}
+                    {% if attachmentCount > 0 %}
+                        <p class="meta" data-unit-meta="{{ unit.id }}">
+                            {{ attachmentCount }} {% if attachmentCount == 1 %}attachment{% else %}attachments{% endif %}
+                            <span data-checkbox-group-count="unit-{{ unit.id }}-attachments"
+                                  data-show-count="- {{ attachmentCount }}"> selected</span>
+                        </p>
+                    {% endif %}
+                    {% if not hasContent %}
+                        <p class="meta" data-unit-meta="{{ unit.id }}">
+                            No assessments or attachments
+                        </p>
+                    {% endif %}
                 </div>
             </div>
         </li>
-        {% if assessmentCount %}
+
+        {% if not hasContent %}
             <li class="child hide" data-collapse-state="collapsed" data-collapsable="unit-{{ unit.id }}">
+                <div class="empty-state">
+                    <p>This unit has no assessments or attachments.</p>
+                </div>
+            </li>
+        {% endif %}
+
+        {% if assessmentCount %}
+            <li class="child hide assessments" data-collapse-state="collapsed" data-collapsable="unit-{{ unit.id }}">
                 <div class="small-12 card">
                     <h3>Assessments</h3>
                 </div>
@@ -55,37 +68,30 @@
                     {% for assessment in unit.assessments %}
                         <li>
                             <div>
-                                <div class="selector">
-                                    <input id="assessment-{{ assessment.id }}"
-                                           name="unit[{{ unit.id }}][assessment][{{ assessment.id }}][selected]"
-                                           value="1"
-                                           type="checkbox"
-                                           checked
-                                           data-checkbox-group="unit-{{ unit.id }}-assessments"
-                                    >
-                                    <label for="assessment-{{ assessment.id }}" class="checkbox-label"></label>
+
+                                <div class="small-6 card">
+                                    <div class="selector">
+                                        <input id="assessment-{{ assessment.id }}"
+                                               name="unit[{{ unit.id }}][assessment][{{ assessment.id }}][selected]"
+                                               value="1"
+                                               type="checkbox"
+                                               checked
+                                               data-checkbox-group="unit-{{ unit.id }}-assessments"
+                                        >
+                                        <label for="assessment-{{ assessment.id }}" class="checkbox-label">
+                                            <span class="title">{% if assessment.title %}{{ assessment.title }}{% else %}(no title){% endif %}</span>
+                                        </label>
+                                    </div>
                                 </div>
-                                <div class="small-12 card">
-                                    <a href="#">
-                                        <h3>{{ assessment.title }}</h3>
-                                        {% if assessment.type %}<p class="meta">Type: {{ assessment.type }}</p>{% endif %}
-                                        {% if assessment.method %}<p class="meta">Method: {{ assessment.method }}</p>{% endif %}
-                                    </a>
-                                    {% if assessment.standards|length %}
-                                        <article>
-                                            <h4>Standards</h4>
-                                            <dl>
-                                                {% for standard in assessment.standards %}
-                                                    {% if standard.code %}<dt>({{ standard.code }})</dt>{% endif %}
-                                                    <dd>{{ standard.title }}</dd>
-                                                {% endfor %}
-                                            </dl>
-                                        </article>
-                                    {% endif %}
+
+                                <div class="small-6 card meta">
+                                    {% if assessment.type %}<p class="meta">Type: {{ assessment.type }}</p>{% endif %}
+                                    {% if assessment.method %}<p class="meta">Method: {{ assessment.method }}</p>{% endif %}
                                     {% if assessment.content %}
                                         <article>{{ assessment.content | purify }}</article>
                                     {% endif %}
                                 </div>
+
                             </div>
                         </li>
                     {% endfor %}
@@ -94,7 +100,7 @@
         {% endif %}
 
         {% if attachmentCount %}
-            <li class="child hide" data-collapse-state="collapsed" data-collapsable="unit-{{ unit.id }}">
+            <li class="child hide attachments" data-collapse-state="collapsed" data-collapsable="unit-{{ unit.id }}">
                 <div class="small-12 card">
                     <h3>Attachments</h3>
                 </div>
@@ -102,30 +108,39 @@
                     {% for attachment in unit.attachments %}
                         <li>
                             <div>
-                                <div class="selector">
-                                    <input id="attachment-{{ attachment.id }}"
-                                           name="unit[{{ unit.id }}][attachment][{{ attachment.id }}][selected]"
-                                           value="1"
-                                           type="checkbox"
-                                           checked
-                                           data-checkbox-group="unit-{{ unit.id }}-attachments"
-                                    >
-                                    <label for="attachment-{{ attachment.id }}" class="checkbox-label"></label>
-                                </div>
-                                <div class="small-12 card">
-                                    <a href="#">
-                                        <h3>{{ attachment.title }}</h3>
-                                    </a>
 
-                                    <input id="attachment-{{ attachment.id }}-visible-to-students"
-                                           name="unit[{{ unit.id }}][attachment][{{ attachment.id }}][visibleToStudents]"
-                                           value="1"
-                                           type="checkbox"
-                                    >
+                                <div class="small-6 card">
+                                    <div class="selector">
+                                        <input id="attachment-{{ attachment.id }}"
+                                               name="unit[{{ unit.id }}][attachment][{{ attachment.id }}][selected]"
+                                               value="1"
+                                               type="checkbox"
+                                               checked
+                                               data-checkbox-group="unit-{{ unit.id }}-attachments"
+                                        >
+                                        <label for="attachment-{{ attachment.id }}" class="checkbox-label"><span class="title">{{ attachment.title }}</span></label>
+                                    </div>
+
+                                </div>
+
+                                <div class="small-6 card meta">
+                                    <div class="switch round">
+                                        <input id="attachment-{{ attachment.id }}-visible-to-students"
+                                               name="unit[{{ unit.id }}][attachment][{{ attachment.id }}][visibleToStudents]"
+                                               type="checkbox"
+                                               data-checkbox-group="unit-{{ unit.id }}-attachments"
+                                               class="round-switch"
+                                        >
+                                        <label for="attachment-{{ attachment.id }}-visible-to-students">
+                                            <span class="icon-approve"></span>
+                                            <span class="icon-cancel"></span>
+                                        </label>
+                                    </div>
                                     <label for="attachment-{{ attachment.id }}-visible-to-students" class="checkbox-label">
                                         Visible to students?
                                     </label>
                                 </div>
+
                             </div>
                         </li>
                     {% endfor %}

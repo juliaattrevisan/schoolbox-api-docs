@@ -14,13 +14,13 @@
         $('[data-course-parent-selector]').on('click', function (e) {
             e.preventDefault();
 
-            // $.magnificPopup.open({
-            //     showCloseBtn: false,
-            //     items: {
-            //         src: "<div class='preview loader'></div>",
-            //         type: 'inline'
-            //     }
-            // });
+            $.magnificPopup.open({
+                showCloseBtn: false,
+                items: {
+                    src: "<div class='preview loader'></div>",
+                    type: 'inline'
+                }
+            });
 
             var $selector = $(this),
                 target = $selector.data('source'),
@@ -46,16 +46,16 @@
 
                 modal.foundation('reveal', 'close');
             });
-            // $(document).on('opened.fndtn.reveal', '[data-reveal]', function () {
-            //     $.magnificPopup.close();
-            // });
+            $(document).on('opened.fndtn.reveal', '[data-reveal]', function () {
+                $.magnificPopup.close();
+            });
         });
     })
 </script>
 {% endautoescape %}
 
 <label>
-    {{ locale.faculty.proper }} / {{ locale.subject.proper }}
+    {{ locale.faculty.proper }} / {{ locale.subject.proper }} Folder
 
     <a data-course-parent-selector data-source="parent"
        title="Click to change the {{ locale.faculty }} / {{ locale.subject }} this course belongs to"
