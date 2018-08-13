@@ -52,64 +52,63 @@
 
             plotOptions: {
                 column: {
-                    stacking: 'normal',
-                    maxPointWidth: 8
+                    stacking: 'normal'
                 }
             },
 
             series: [
                 {
-                    color: '#e8bf68',
+                    color: '#cca300',
                     name: 'Impressions/Dashboard',
                     data: {{ series['impression']['dashboard']|json_encode|raw }}
                 },
                 {
-                    color: '#d7ae57',
+                    color: '#c15c17',
                     name: 'Impressions/Homepage',
                     data: {{ series['impression']['homepage']|json_encode|raw }}
                 },
                 {
-                    color: '#d6ad56',
+                    color: '#99440a',
                     name: 'Impressions/Index',
                     data: {{ series['impression']['index']|json_encode|raw }}
                 },
                 {
-                    color: '#c69d46',
+                    color: '#58140c',
                     name: 'Impressions/Archive',
                     data: {{ series['impression']['archive']|json_encode|raw }}
                 },
                 {
-                    color: '#b58c35',
+                    color: '#890f02',
                     name: 'Impressions/Email',
                     data: {{ series['impression']['email']|json_encode|raw }}
                 },
                 {
-                    color: '#9eea8f',
+                    color: '#70dbed',
                     name: 'Conversions/Dashboard',
                     data: {{ series['conversion']['dashboard']|json_encode|raw }}
                 },
                 {
-                    color: '#8dd97e',
+                    color: '#82b5d8',
                     name: 'Conversions/Homepage',
                     data: {{ series['conversion']['homepage']|json_encode|raw }}
                 },
                 {
-                    color: '#8cd87d',
+                    color: '#1f78c1',
                     name: 'Conversions/Index',
                     data: {{ series['conversion']['index']|json_encode|raw }}
                 },
                 {
-                    color: '#7cc86d',
+                    color: '#aea2e0',
                     name: 'Conversions/Archive',
                     data: {{ series['conversion']['archive']|json_encode|raw }}
                 },
                 {
-                    color: '#6bb75c',
+                    color: '#705da0',
                     name: 'Conversions/Email',
                     data: {{ series['conversion']['email']|json_encode|raw }}
                 },
                 {
-                    color: '#80B1D5',
+                    color: '#878787',
                     name: 'Non-referred Opens',
                     data: {{ series['open']['unknown']|json_encode|raw }}
                 }
