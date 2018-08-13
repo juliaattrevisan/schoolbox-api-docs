@@ -41,7 +41,7 @@ class Mapper extends \Schoolbox\Mapper
      */
     protected function mapping()
     {
-        $this->hasTable('comms_news_article_statistics');
+        $this->hasTable('comms_news_article_statistics_cumulative');
         $this->hasModel(Model::class);
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
