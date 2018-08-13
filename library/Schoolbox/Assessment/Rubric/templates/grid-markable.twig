@@ -268,7 +268,7 @@
                     var grades = getLetterGrades($(this));
                     customMark = getLetterGradeFromNumeric($(this).find(".groupMax").val(), grades);
                 }
-                
+
                 if (displayedMark === customMark) {
                     $(this).find(".use-descriptor-values").prop("disabled", true);
                 } else {
@@ -364,6 +364,8 @@
             } else {
                 showHideRangeInput($changed.siblings(':checkbox'));
             }
+
+            disableEnableAssignFromDescs();
         });
 
 
