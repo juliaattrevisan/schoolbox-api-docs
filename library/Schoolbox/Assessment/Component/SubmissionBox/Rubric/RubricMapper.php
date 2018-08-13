@@ -842,12 +842,12 @@ class RubricMapper
 
             $marksToSave->add(
                 $descriptorMarkMapper->createModel()
-//                           ->setSubmissionReturn($returnedWorkMapper->createModel($returnId))
-                           ->setGroupMark($groupMark)
-                           ->setDescriptor($descriptor)
-                           ->setValid(true)
-                           // Take value from form preferentially, then descriptor
-                           ->setValue($value ?? $descriptor->getMaxValue())
+//                    ->setSubmissionReturn($returnedWorkMapper->createModel($returnId))
+                    ->setGroupMark($groupMark)
+                    ->setDescriptor($descriptor)
+                    ->setValid(true)
+                    // Take value from form preferentially, then descriptor
+                    ->setValue($value ?? $descriptor->getMaxValue())
             );
         }
 
