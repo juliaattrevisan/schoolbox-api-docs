@@ -393,8 +393,13 @@
             var rubricId = $changed.closest('[data-group-summary]').data('rubric-id');
             var groupId = $changed.closest('[data-group-summary]').data('group-id');
 
+            var rowSelector = '[data-group="rb-' + rubricId + '-' + groupId + '"]';
+            var $groupRows = $(rowSelector);
             var groupSummarySelector = '[data-group-summary="rb-' + rubricId + '-' + groupId + '"]';
             var $groupSummary = $rb.find(groupSummarySelector);
+            var $descriptorCheckboxes = $groupRows.find('input');
+
+            var unscaledGroupMark = summateDescriptors($descriptorCheckboxes);
 
             var customMark = 0;
 
@@ -415,9 +420,8 @@
             }
 
             if ($groupSummary.length) {
-                $groupSummary.attr('data-mark', customMark);
-                // TODO uh not sure about this, scaling doesn't matter if we're using percentages but...?
                 $groupSummary.attr('data-scaled-mark', customMark);
+                $groupSummary.attr('data-mark', unscaledGroupMark);
                 customisedMark[groupId] = true;
             }
 
