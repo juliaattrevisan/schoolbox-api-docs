@@ -273,12 +273,7 @@
                         // TODO this is not getting updated (total mark is fine)
 
                         var percentage = $(this).data('row-max-sum') > 0 ? $(this).data('mark') * (100 / $(this).data('row-max-sum')) : 0;
-                        var grades = [];
-                        $(this).find(".groupMax option").each(function(index, option) {
-                            grades.push(
-                                {'value' : $(option).prop("value"), 'letter' : $(option).data('letter')}
-                            );
-                        });
+                        var grades = getLetterGrades($(this));
                         displayedMark = getLetterGradeFromNumeric(percentage, grades);
                         customMark = $(this).find(".groupMax select").val();
                         break;
@@ -338,12 +333,7 @@
                         break;
 
                     case 'LetterGrade':
-                        var grades = [];
-                        $groupSummary.find(".groupMax option").each(function(index, option) {
-                            grades.push(
-                                {'value' : $(option).prop("value"), 'letter' : $(option).data('letter')}
-                            );
-                        });
+                        var grades = getLetterGrades($groupSummary);
                         $groupSummary.find(".descriptor-sum").text(getLetterGradeFromNumeric(percentage, grades));
                         break;
 
@@ -497,6 +487,18 @@
             parseFraction(rubricSummary, e.namespace);
             disableEnableAssignFromDescs();
         })
+
+
+        function getLetterGrades($groupSummary) {
+            var grades = [];
+            $groupSummary.find(".groupMax option").each(function(index, option) {
+                grades.push(
+                    {'value' : $(option).prop("value"), 'letter' : $(option).data('letter')}
+                );
+            });
+
+            return grades;
+        }
 
 
         // Set the letter grade for a capability dropdown based on a numeric mark
