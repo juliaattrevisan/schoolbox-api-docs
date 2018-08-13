@@ -501,6 +501,14 @@ abstract class AbstractBootstrap implements BootstrapInterface
 
                     $twig->addFunction(new Twig_SimpleFunction('routeLookupIfAuthorized', $di->get('templateEngine:routeLookupIfAuthorized')));
 
+                    $twig->addFunction(
+                        new Twig_SimpleFunction(
+                            'generateHiddenInputs',
+                            new TwigMethod\GenerateHiddenInputs(),
+                            ['is_safe' => ['html']]
+                        )
+                    );
+
                     // Add extensions after everything else.
                     // According to https://twig.symfony.com/doc/1.x/deprecated.html#globals
                     // globals must be loaded before extensions.

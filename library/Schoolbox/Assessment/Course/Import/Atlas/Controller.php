@@ -149,11 +149,14 @@ class Controller extends BaseController
             return;
         }
 
+        $previousPost = $this->request->post->getArrayCopy();
+        unset($previousPost['part-1']);
         $this->response->content->set(
             $this->buildUnthemedHtmlOutput(
                 '@courseImportAtlas/import/plan.twig',
                 [
-                    'curriculum' => $curriculumPlan,
+                    'curriculum'   => $curriculumPlan,
+                    'previousPost' => $previousPost,
                 ]
             )
         );
