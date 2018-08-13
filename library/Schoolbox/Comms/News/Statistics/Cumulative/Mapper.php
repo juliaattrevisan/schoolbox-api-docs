@@ -67,6 +67,7 @@ class Mapper extends \Schoolbox\Mapper
 
     /**
      * Record an impression for $articleId
+     * Only increment known referrers
      *
      * @param int         $articleId
      * @param null|string $referrer
@@ -78,29 +79,32 @@ class Mapper extends \Schoolbox\Mapper
      */
     public function incrementImpression(int $articleId, ?string $referrer)
     {
-        /* Detect which referrer to increment using a mapper method
-         */
-        $get = $this->getGetMethodName($this->getPropertyFromColumn($this->impressionColumnMap[$referrer]));
-        $set = $this->getSetMethodName($this->getPropertyFromColumn($this->impressionColumnMap[$referrer]));
+        if ((new Statistics\ValidImpressionReferrer())->isSatisfiedBy($referrer)) {
 
-        try {
-            $model = $this->findOneByColumnList([
-                'date' => \Alaress_Date_Format::now()->getDatabaseDate(),
-                'article_id' => $articleId
-            ]);
+            /* Detect which referrer to increment using a mapper method
+             */
+            $get = $this->getGetMethodName($this->getPropertyFromColumn($this->impressionColumnMap[$referrer]));
+            $set = $this->getSetMethodName($this->getPropertyFromColumn($this->impressionColumnMap[$referrer]));
 
-            $model->$set((int)$model->$get() + 1);
-        } catch (\Schoolbox\Mapper\Exception $e) {
-            $now = \Alaress_Date_Format::now();
+            try {
+                $model = $this->findOneByColumnList([
+                    'date' => \Alaress_Date_Format::now()->getDatabaseDate(),
+                    'article_id' => $articleId
+                ]);
 
-            $model = $this->createModel()
-                ->setDate($now->getDateOnly())
-                ->setArticleId($articleId)
-                ->setFirstOpen($now)
-                ->$set(1);
+                $model->$set((int)$model->$get() + 1);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                $now = \Alaress_Date_Format::now();
+
+                $model = $this->createModel()
+                    ->setDate($now->getDateOnly())
+                    ->setArticleId($articleId)
+                    ->setFirstOpen($now)
+                    ->$set(1);
+            }
+
+            return $this->save($model);
         }
-
-        return $this->save($model);
     }
 
 
