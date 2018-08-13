@@ -50,7 +50,10 @@ class DescriptorMarkMapper extends Mapper
             'groupMark',
             'group_mark'
         );
-        $this->joins('return_id', ReturnedWorkMapper::class, 'id', self::TYPE_MODEL, null, 'submissionReturn', 'submission_return');
+
+        // This join is deprecated; join through group_mark.submission_return
+//        $this->joins('return_id', ReturnedWorkMapper::class, 'id', self::TYPE_MODEL, null, 'submissionReturn', 'submission_return');
+
         $this->joins('descriptor_id', DescriptorMapper::class, 'id', null, null, null, 'descriptor');
 
         // This is NOT a soft-delete column. It specifically relates to when a teacher alters a rubric's structure,
@@ -66,10 +69,12 @@ class DescriptorMarkMapper extends Mapper
     {
         return "
             SELECT  {$this->getColumnString()},
-                    {$this->getJoinColumnString('submission_return', 'r')},
+                    {$this->getJoinColumnString('group_mark', 'g')},
+                    {$this->getJoinColumnString('group_mark.submission_return', 'r')},
                     {$this->getJoinColumnString('descriptor', 'd')}
             FROM {$this->getTable()}
-            LEFT JOIN {$this->getJoinSql('submission_return', '', 'r')}
+            LEFT JOIN {$this->getJoinSql('group_mark', '', 'g')}
+            LEFT JOIN {$this->getJoinSql('group_mark.submission_return', 'g', 'r')}
             LEFT JOIN {$this->getJoinSql('descriptor', '', 'd')}
         ";
     }
@@ -81,8 +86,10 @@ class DescriptorMarkMapper extends Mapper
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
+        /** @var GroupMarkMapper $groupMarkMapper */
+        $groupMarkMapper = $this->getJoinMapper('group_mark');
         /** @var ReturnedWorkMapper $submissionReturnMapper */
-        $submissionReturnMapper = $this->getJoinMapper('submission_return');
+        $submissionReturnMapper = $this->getJoinMapper('group_mark.submission_return');
         $marks = $this->createCollection();
         $descriptors = $this->getJoinMapper('descriptor')->createCollection();
 
@@ -97,8 +104,11 @@ class DescriptorMarkMapper extends Mapper
             /** @var Descriptor $descriptor */
             $descriptor = $descriptors->getOffset($descriptorId);
 
+            $groupMark = $groupMarkMapper->hydrate($r, 'g');
+            $groupMark->setSubmissionReturn($submissionReturnMapper->hydrate($r, 'r'));
+
             $mark = $this->hydrate($r);
-            $mark->setSubmissionReturn($submissionReturnMapper->hydrate($r, 'r'));
+            $mark->setGroupMark($groupMark);
             $mark->setDescriptor($descriptor);
             $marks->add($mark);
         }

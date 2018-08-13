@@ -26,12 +26,6 @@ class DescriptorMark
 
 
     /**
-     * @var null|ReturnedWork
-     */
-    private $submissionReturn;
-
-
-    /**
      * @var null|GroupMark
      */
     private $groupMark;
@@ -56,21 +50,33 @@ class DescriptorMark
 
 
     /**
+     * @deprecated use `getGroupMark()->getSubmissionReturn()` instead
      * @return null|ReturnedWork
      */
     public function getSubmissionReturn(): ?ReturnedWork
     {
-        return $this->submissionReturn;
+        trigger_error(
+            'This method is deprecated; use "getGroupMark()->getSubmissionReturn()" instead',
+            E_USER_DEPRECATED
+        );
+//        return $this->submissionReturn;
+        return $this->groupMark->getSubmissionReturn();
     }
 
 
     /**
+     * @deprecated use `getGroupMark()->setSubmissionReturn()` instead
      * @param null|ReturnedWork $submissionReturn
      * @return $this
      */
     public function setSubmissionReturn(?ReturnedWork $submissionReturn): self
     {
-        $this->submissionReturn = $submissionReturn;
+        trigger_error(
+            'This method is deprecated; use "getGroupMark()->setSubmissionReturn()" instead',
+            E_USER_DEPRECATED
+        );
+//        $this->submissionReturn = $submissionReturn;
+        $this->groupMark->setSubmissionReturn($submissionReturn);
         return $this;
     }
 
@@ -144,6 +150,7 @@ class DescriptorMark
         return $this;
     }
 
+
     /**
      * @return null|GroupMark
      */
@@ -151,6 +158,7 @@ class DescriptorMark
     {
         return $this->groupMark;
     }
+
 
     /**
      * @param null|GroupMark $groupMark
