@@ -134,7 +134,7 @@
         {% if showGroupTotal and markSchemeName != "None" and (config.rubric_show_points or not studentView) %}
             {% set percentageMark = group.rowMaxSum > 0 ? group.mark * (100 / group.rowMaxSum) : 0 %}
             {# don't ask... #}
-            {% set letterGradeValue = (((percentageMark / 10) | round(0, 'ceil')) * 10) - 10 %}
+            {% set letterGradeValue = percentageMark == 0 ? 0 : (((percentageMark / 10) | round(0, 'ceil')) * 10) - 10 %}
 
             <tr>
                 <th class="rb-group-summary" colspan="{{ rubric.levels|length + 1 }}">
