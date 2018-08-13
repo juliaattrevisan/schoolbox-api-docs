@@ -7,6 +7,8 @@
 {% set showGroupTotal = showGroupTotal ? true : false %}
 {% set showRubricTotal = showRubricTotal ? true : false %}
 
+{% set hidePoints = not config.rubric_show_points or (studentView and selfReflect) %}
+
 <div class="scrollable">
     <table class="rb markable stack-for-medium-down" id="{{ rubricId }}">
 
@@ -75,7 +77,6 @@
                                     {% set direction = rubric.descriptorMetadata[crit.id].direction %}
                                     {% set descriptorMin = rubric.descriptorMetadata[crit.id][levelIndex].min %}
                                     {% set descriptorMax = rubric.descriptorMetadata[crit.id][levelIndex].max %}
-                                    {% set hidePoints = not config.rubric_show_points or (studentView and selfReflect) %}
 
                                     {# Just show a text value if the descriptor is not selected #}
                                     {% if descriptor.value is not null and showDescriptorValue and not hidePoints %}
@@ -135,7 +136,7 @@
                 </tr>
             {% endfor %}
 
-        {% if showGroupTotal and markSchemeName != "None" and (config.rubric_show_points or not studentView) %}
+        {% if showGroupTotal and markSchemeName != "None" and not hidePoints %}
             {% set percentageMark = group.rowMaxSum > 0 ? group.mark * (100 / group.rowMaxSum) : 0 %}
             {# don't ask... #}
             {% set letterGradeValue = percentageMark == 0 ? 0 : (((percentageMark / 10) | round(0, 'ceil')) * 10) - 10 %}
@@ -179,6 +180,9 @@
 
                         {% endif %}
 
+                        {# TODO why is markSchemeName null when student is self-assessing #}
+                        {{ dump(markSchemeName) }}
+
                         {% if group.rowMaxSum > 0 %}
                             <button class="use-descriptor-values">Assign <span class="descriptor-sum">
                                 {% if markSchemeName == 'TotalMarkFractional' %}
@@ -211,7 +215,7 @@
 
     {% endfor %}
 
-    {% if showRubricTotal and markSchemeName != "None" and (config.rubric_show_points or not studentView) %}
+    {% if showRubricTotal and markSchemeName != "None" and not hidePoints %}
         <tr>
             <th class="rb-final-summary" colspan="{{ rubric.levels|length + 2 }}">
                 <span data-final-summary="{{ rubricId }}"
