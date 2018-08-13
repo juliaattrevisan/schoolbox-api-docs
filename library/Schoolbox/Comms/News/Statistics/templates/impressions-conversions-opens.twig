@@ -137,7 +137,7 @@
 
             <select id="accuracy">
                 {% for value, label in accuracies %}
-                    <option value="{{ route }}?accuracy={{ value }}" {% if value == accuracy %}selected="selected"{% endif %}>{{ label }}</option>
+                    <option value="{{ route }}?accuracy={{ value }}" {% if value == accuracy %}selected="selected"{% endif %}>{{ value }}</option>
                 {% endfor %}
             </select>
         </section>

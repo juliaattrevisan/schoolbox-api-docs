@@ -23,7 +23,7 @@ class ImpressionsConversionsOpens
     /**
      * Default accuracy
      */
-    private const DEFAULT_ACCURACY = 60;
+    private const DEFAULT_ACCURACY = 'minute';
 
     /**
      * The allowed accuracies for a user to choose
@@ -39,11 +39,10 @@ class ImpressionsConversionsOpens
      * @var array
      */
     public const ACCURACIES = [
-        60 => '1 minute',
-        300 => '5 minutes',
-        3600 => '1 hour',
-        43200 => '12 hours',
-        86400 => '1 day'
+        'minute' => 'CONCAT(DATE_FORMAT(created_at, \'%Y-%m-%d %H:%i\'), \':00\')',
+        'hour' => 'CONCAT(DATE_FORMAT(created_at, \'%Y-%m-%d %H\'), \':00:00\')',
+        'day' => 'CONCAT(DATE_FORMAT(created_at, \'%Y-%m-%d\'), \' 00:00:00\')',
+        'month' => 'CONCAT(DATE_FORMAT(created_at, \'%Y-%m\'), \'-01 00:00:00\')',
     ];
 
 
@@ -67,12 +66,12 @@ class ImpressionsConversionsOpens
     /**
      * Assemble all the Impressions, Conversions and direct Opens for $article
      *
-     * @param News\Model $article
-     * @param int|null   $accuracy
+     * @param News\Model  $article
+     * @param string|null $accuracy
      * @return array
      * @throws \Alaress\Database\Exception
      */
-    public function fetch(News\Model $article, ?int $accuracy = self::DEFAULT_ACCURACY): array
+    public function fetch(News\Model $article, ?string $accuracy = self::DEFAULT_ACCURACY): array
     {
 
         /* Determine a sane value
@@ -81,25 +80,25 @@ class ImpressionsConversionsOpens
             $accuracy = self::DEFAULT_ACCURACY;
         }
 
+        $accuracySql = self::ACCURACIES[$accuracy];
+
         /* Get all the timestamps that have content - because of the way highcharts stacks its data
          * I need to initialise the container with all the possibilities and stack categorised data in-order
          */
         $statement = $this->database->prepareQuery("
             SELECT 
-                CAST(1000*UNIX_TIMESTAMP(CONCAT(DATE_FORMAT(created_at, '%Y-%m-%d %H:%i'), ':00')) AS UNSIGNED) AS timestamp,
-                1000*(UNIX_TIMESTAMP(created_at) DIV :accuracy) AS accuracy,
+                CAST(1000*UNIX_TIMESTAMP({$accuracySql}) AS UNSIGNED) AS timestamp,
                 COUNT(*) AS num,
                 `type`,
                 `referrer`
             FROM comms_news_article_statistics cnas
             WHERE article_id = :articleId
             AND deleted_at IS NULL
-            GROUP BY accuracy, `type`, referrer
+            GROUP BY timestamp, `type`, referrer
             ORDER BY timestamp
         ");
 
         $statement->execute([
-            'accuracy' => $accuracy,
             'articleId' => $article->getId()
         ]);
 
