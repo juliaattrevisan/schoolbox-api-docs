@@ -81,12 +81,13 @@ class GridGenerator
         // retrieve marks (descriptor selections for student)
         $query = "
             SELECT
-                rm.descriptor_id,
-                rm.value
-            FROM rubric_descriptor_mark rm
-            LEFT JOIN submission_return sr ON sr.id = rm.return_id
-            WHERE rm.valid = TRUE
-            AND rm.return_id = (
+                rdm.descriptor_id,
+                rdm.value
+            FROM rubric_descriptor_mark rdm
+            LEFT JOIN rubric_group_mark rgm ON rdm.rubric_group_mark_id = rgm.id
+            LEFT JOIN submission_return sr ON sr.id = rdm.return_id
+            WHERE rdm.valid = TRUE
+            AND rdm.return_id = (
               SELECT sr.id
               FROM submission_return sr
               WHERE $whereClause

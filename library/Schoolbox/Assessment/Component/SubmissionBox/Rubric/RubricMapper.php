@@ -1141,8 +1141,8 @@ class RubricMapper
             JOIN rubric_descriptor      rd ON rl.id = rd.level_id
             JOIN rubric_criterion       rc ON rc.id = rd.criterion_id
             JOIN rubric_group           rg ON rg.id = rc.rubric_group_id
-            JOIN rubric_descriptor_mark rm ON rd.id = rm.descriptor_id
-            JOIN submission_return sr ON sr.id = rm.return_id
+            JOIN rubric_group_mark     rgm ON rg.id = rgm.rubric_group_id
+            JOIN submission_return      sr ON sr.id = rgm.return_id
             JOIN (
                 SELECT a.id AS 'a.id', rc.id AS 'rc.id', max(sr.published_at) AS 'sr.max_published_at'
                 FROM rubric_descriptor_mark rm
@@ -1152,7 +1152,8 @@ class RubricMapper
                 JOIN rubric_level           rl ON rl.id = rd.level_id
                 JOIN submission_box         sb ON sb.id = rl.box_id
                 JOIN assessment              a ON  a.id = sb.assessment_id
-                JOIN submission_return      sr ON sr.id = rm.return_id
+                JOIN rubric_group_mark     rgm ON rg.id = rgm.rubric_group_id
+                JOIN submission_return      sr ON sr.id = rgm.return_id
                 WHERE {$where}
                 GROUP BY sb.assessment_id, rd.criterion_id
             ) t ON `a`.`id` = `t`.`a.id` AND `rc`.`id` = `t`.`rc.id` AND `sr`.`published_at` = `t`.`sr.max_published_at`
@@ -1462,7 +1463,8 @@ class RubricMapper
             JOIN rubric_descriptor      rd ON rd.id = rm.descriptor_id AND rd.deleted_at IS NULL
             JOIN rubric_criterion       rc ON rc.id = rd.criterion_id AND rc.deleted_at IS NULL
             JOIN rubric_group           rg ON rg.id = rc.rubric_group_id AND rg.deleted_at IS NULL
-            JOIN submission_return      sr ON sr.id = rm.return_id
+            JOIN rubric_group_mark     rgm ON rg.id = rgm.rubric_group_id
+            JOIN submission_return      sr ON sr.id = rgm.return_id
             JOIN submission_box         sb ON sb.id = sr.box_id
             JOIN assessment              a ON  a.id = sb.assessment_id
             JOIN (
@@ -1477,7 +1479,8 @@ class RubricMapper
                 JOIN rubric_descriptor      rd ON rd.id = rm.descriptor_id AND rd.deleted_at IS NULL
                 JOIN rubric_criterion       rc ON rc.id = rd.criterion_id AND rc.deleted_at IS NULL
                 JOIN rubric_group           rg ON rg.id = rc.rubric_group_id AND rg.deleted_at IS NULL
-                JOIN submission_return      sr ON sr.id = rm.return_id
+                JOIN rubric_group_mark     rgm ON rg.id = rgm.rubric_group_id
+                JOIN submission_return      sr ON sr.id = rgm.return_id
                 JOIN submission_box         sb ON sb.id = sr.box_id
                 JOIN assessment              a ON  a.id = sb.assessment_id
                 WHERE {$whereClauseInner}

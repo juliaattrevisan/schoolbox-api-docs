@@ -106,8 +106,10 @@ class DescriptorMarkMapper extends Mapper
     public function deleteFeedbackMarks($returnId)
     {
         $query = "
-            DELETE FROM rubric_descriptor_mark
-                WHERE return_id = :return_id;
+            DELETE     rdm, rgm
+            FROM       rubric_descriptor_mark rdm
+            INNER JOIN rubric_group_mark rgm on rdm.rubric_group_mark_id = rgm.id
+            WHERE      rgm.return_id = :return_id;
         ";
 
         $statement = $this->database->prepare($query);
