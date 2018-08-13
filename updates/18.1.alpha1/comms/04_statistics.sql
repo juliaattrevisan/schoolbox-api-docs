@@ -43,7 +43,7 @@ CREATE TABLE `comms_news_article_statistics_cumulative` (
   PRIMARY KEY (`id`));
 
 CREATE UNIQUE INDEX `idx_comms_news_article_statistics_cumulative_date_article_id`
-ON `comms_news_article_statistics_cumulative` (date, article_id) COMMENT '' ALGORITHM DEFAULT LOCK DEFAULT;
+ON `comms_news_article_statistics_cumulative` (`date`, `article_id`) COMMENT '' ALGORITHM DEFAULT LOCK DEFAULT;
 
 ALTER TABLE `comms_news_article_statistics_cumulative`
 ADD CONSTRAINT `fk_comms_news_statistics_cumulative_article_id`
