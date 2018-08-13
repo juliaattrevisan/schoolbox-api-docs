@@ -1,0 +1,61 @@
+<?php
+/**
+ * @copyright Copyright 2018, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
+ */
+
+namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
+
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
+use Schoolbox\GenericCollection;
+use Schoolbox\Mapper;
+
+/**
+ * Mapper for marks for a rubric group.
+ *
+ * @method GroupMark hydrate(array $row, $alias = '', $callback = null)
+ * @method GroupMark createModel($idValue = null)
+ * @method GenericCollection|GroupMark[] findByColumnList($columnList, $options = [])
+ */
+class GroupMarkMapper extends Mapper
+{
+    /**
+     * @inheritdoc
+     */
+    protected function mapping()
+    {
+        $this->hasTable('rubric_group_mark');
+        $this->hasModel(GroupMark::class);
+        $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+        $this->uses('value', self::TYPE_DECIMAL);
+        $this->joins(
+            'return_id',
+            ReturnedWorkMapper::class,
+            'id',
+            self::TYPE_MODEL,
+            null,
+            'submissionReturn',
+            'submission_return'
+        );
+        $this->joins('group_id', GroupMapper::class, 'id', null, null, null, 'group');
+
+        // This is NOT a soft-delete column, but effectively has the same
+        // behavior as one, as when it's set (by the teacher altering a rubric
+        // grid's structure) the marks given for that rubric no longer show.
+        $this->uses('valid', self::TYPE_BOOLEAN);
+    }
+
+
+    /**
+     * This mapper does not raise notifications.
+     *
+     * @param object $object
+     * @param string $verb
+     * @param object $previous
+     * @return bool
+     */
+    protected function raiseNotification($object, $verb, $previous = null): bool
+    {
+        return true;
+    }
+}
