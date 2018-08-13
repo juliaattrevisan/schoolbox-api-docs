@@ -714,6 +714,7 @@ class Controller extends Base
             'topics' => $topics,
             'topicAll' => Mapper::TOPIC_ALL_SLUG,
             'slug' => $params->getSlug(),
+            'referrer' => $params->getReferrer(),
 
             /* Archive-specific vars that don't appear anywhere else
              */
@@ -765,6 +766,7 @@ class Controller extends Base
             'topics' => $topics,
             'topicAll' => Mapper::TOPIC_ALL_SLUG,
             'slug' => $params->getSlug(),
+            'referrer' => $params->getReferrer(),
 
             /* For configuring the rss button which changes per topic chosen
              */
