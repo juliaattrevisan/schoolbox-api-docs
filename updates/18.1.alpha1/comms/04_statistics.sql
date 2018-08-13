@@ -1,3 +1,4 @@
+-- Itemised statistics per use
 CREATE TABLE `comms_news_article_statistics` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
   `article_id` INT(11) NOT NULL,
@@ -19,43 +20,32 @@ ADD CONSTRAINT `fk_comms_news_statistics_user_id`
 FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
 ON DELETE NO ACTION ON UPDATE NO ACTION;
 
--- Test data for now
+-- Cumulative statistics per day, over all time
+CREATE TABLE `comms_news_article_statistics_cumulative` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `date` DATE NOT NULL,
+  `article_id` INT(11) NOT NULL,
+  `first_open` DATETIME NULL,
+  `num_impressions_dashboard` INT DEFAULT 0,
+  `num_impressions_homepage` INT DEFAULT 0,
+  `num_impressions_index` INT DEFAULT 0,
+  `num_impressions_archive` INT DEFAULT 0,
+  `num_impressions_email` INT DEFAULT 0,
+  `num_conversions_dashboard` INT DEFAULT 0,
+  `num_conversions_homepage` INT DEFAULT 0,
+  `num_conversions_index` INT DEFAULT 0,
+  `num_conversions_archive` INT DEFAULT 0,
+  `num_conversions_email` INT DEFAULT 0,
+  `num_opens` INT DEFAULT 0,
+  `created_at` DATETIME NOT NULL,
+  `updated_at` DATETIME NOT NULL,
+  `deleted_at` DATETIME NULL,
+  PRIMARY KEY (`id`));
 
--- Seven impressions
-INSERT INTO comms_news_article_statistics
-(`article_id`, `user_id`, `type`, `referrer`, `created_at`, `updated_at`)
-VALUES
-(1, 1, 'impression', 'dashboard', '2018-08-10 14:08:00', '2018-08-10 14:08:00'),
-(1, 6, 'impression', 'dashboard', '2018-08-10 14:08:11', '2018-08-10 14:08:11'),
-(1, 22, 'impression', 'dashboard', '2018-08-10 15:10:46', '2018-08-10 15:10:46'),
-(1, 24, 'impression', 'dashboard', '2018-08-10 15:21:03', '2018-08-10 15:21:03'),
-(1, 25, 'impression', 'dashboard', '2018-08-10 15:21:06', '2018-08-10 15:21:06'),
-(1, 26, 'impression', 'dashboard', '2018-08-10 15:22:33', '2018-08-10 15:22:33'),
-(1, 27, 'impression', 'dashboard', '2018-08-10 15:22:49', '2018-08-10 15:22:49');
+CREATE UNIQUE INDEX `idx_comms_news_article_statistics_cumulative_date_article_id`
+ON `comms_news_article_statistics_cumulative` (date, article_id) COMMENT '' ALGORITHM DEFAULT LOCK DEFAULT;
 
--- Some impressions on the next day as well
-INSERT INTO comms_news_article_statistics
-(`article_id`, `user_id`, `type`, `referrer`, `created_at`, `updated_at`)
-VALUES
-(1, 30, 'impression', 'dashboard', '2018-08-11 09:08:11', '2018-08-11 09:08:11'),
-(1, 31, 'impression', 'dashboard', '2018-08-11 09:15:59', '2018-08-11 09:15:59'),
-(1, 37, 'impression', 'dashboard', '2018-08-11 09:17:16', '2018-08-11 09:17:16');
-
--- An impression much further into the future
-INSERT INTO comms_news_article_statistics
-(`article_id`, `user_id`, `type`, `referrer`, `created_at`, `updated_at`)
-VALUES
-(1, 38, 'impression', 'dashboard', '2018-09-11 11:11:11', '2018-09-11 11:11:11');
-
--- One conversion
-INSERT INTO comms_news_article_statistics
-(`article_id`, `user_id`, `type`, `referrer`, `created_at`, `updated_at`)
-VALUES
-(1, 24, 'open', 'dashboard', '2018-08-10 15:21:07', '2018-08-10 15:21:07');
-
--- Two arbitrary opens from an unknown place ie. direct access
-INSERT INTO comms_news_article_statistics
-(`article_id`, `user_id`, `type`, `referrer`, `created_at`, `updated_at`)
-VALUES
-(1, 26, 'open', null, '2018-08-10 20:10:00', '2018-08-10 20:10:00'),
-(1, 27, 'open', null, '2018-08-10 20:20:00', '2018-08-10 20:20:00');
+ALTER TABLE `comms_news_article_statistics_cumulative`
+ADD CONSTRAINT `fk_comms_news_statistics_cumulative_article_id`
+FOREIGN KEY (`article_id`) REFERENCES `comms_news_article` (`id`)
+ON DELETE NO ACTION ON UPDATE NO ACTION;
