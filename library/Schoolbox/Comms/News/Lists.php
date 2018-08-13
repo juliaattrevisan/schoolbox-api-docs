@@ -20,6 +20,7 @@ use Schoolbox\Collection;
 use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Comms\News\Audience\BusinessRules;
 use Schoolbox\Comms\News\Audience\RelationshipFilterer;
+use Schoolbox\Comms\News\Statistics\ImpressionsConversionsOpens;
 use Schoolbox\News\Topic;
 use Schoolbox\Permission\Access;
 use Schoolbox\Resource\Folder;
@@ -237,8 +238,11 @@ class Lists
                  * Load the referrer value from $params
                  * Also increment a tally elsewhere
                  */
-                $this->statisticsMapper->saveImpression($articleId, $user->getId(), $params->getReferrer());
-                $this->statisticsCumulativeMapper->incrementImpression($articleId, $params->getReferrer());
+                (new ImpressionsConversionsOpens(
+                    $this->databaseInternal,
+                    $this->statisticsMapper,
+                    $this->statisticsCumulativeMapper
+                ))->saveImpression($articleId, $user->getId(), $params->getReferrer());
             }
         }
 

@@ -51,15 +51,97 @@ class ImpressionsConversionsOpens
      */
     private $database;
 
+    /**
+     * @var Mapper
+     */
+    private $statisticsMapper;
+
+    /**
+     * @var Cumulative\Mapper
+     */
+    private $statisticsCumulativeMapper;
+
 
     /**
      * Controller constructor.
      *
-     * @param IConnector $databaseInternal
+     * @param IConnector        $databaseInternal
+     * @param Mapper            $statisticsMapper
+     * @param Cumulative\Mapper $statisticsCumulativeMapper
      */
-    public function __construct(IConnector $databaseInternal)
-    {
+    public function __construct(
+        IConnector $databaseInternal,
+        Mapper $statisticsMapper,
+        Cumulative\Mapper $statisticsCumulativeMapper
+    ) {
         $this->database = $databaseInternal;
+        $this->statisticsMapper = $statisticsMapper;
+        $this->statisticsCumulativeMapper = $statisticsCumulativeMapper;
+    }
+
+
+
+    /**
+     * Record an impression for $articleId
+     * ie. $userId has witnessed $articleId
+     *
+     * $referrer indicates a place where they saw the impression and can't be null for this use case
+     *
+     * @param int         $articleId
+     * @param int         $userId
+     * @param null|string $referrer
+     * @return bool|int[]
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     */
+    public function saveImpression(int $articleId, int $userId, ?string $referrer)
+    {
+        if ((new ValidImpressionReferrer())->isSatisfiedBy($referrer)) {
+
+            /* TODO: Increment tally in a unique manner
+             */
+            $this->statisticsCumulativeMapper->incrementImpression($articleId, $referrer);
+
+            return $this->statisticsMapper->save($this->statisticsMapper->createModel()
+                ->setArticleId($articleId)
+                ->setUserId($userId)
+                ->setType(Mapper::TYPE_IMPRESSION)
+                ->setReferrer($referrer));
+        }
+
+        return false;
+    }
+
+
+    /**
+     * Record an impression for $articleId
+     * ie. $userId has witnessed $articleId
+     *
+     * $referrer indicates a link they clicked to initiate the open
+     *
+     * It can be null if someone directly typed in the url, or opened it from some random place
+     * that we don't know about
+     *
+     * @param int         $articleId
+     * @param int         $userId
+     * @param null|string $referrer
+     * @return bool|int[]
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     */
+    public function saveOpen(int $articleId, int $userId, ?string $referrer)
+    {
+        if ((new ValidOpenReferrer())->isSatisfiedBy($referrer)) {
+            return $this->statisticsMapper->save($this->statisticsMapper->createModel()
+                ->setArticleId($articleId)
+                ->setUserId($userId)
+                ->setType(Mapper::TYPE_OPEN)
+                ->setReferrer($referrer));
+        }
+
+        return false;
     }
 
 

@@ -24,6 +24,7 @@ use Schoolbox\Comms\News\Audience\BusinessRules;
 use Schoolbox\Comms\News\Audience\RelationshipFilterer;
 use Schoolbox\Comms\News\Policy;
 use Schoolbox\Comms\News\SaveForLater;
+use Schoolbox\Comms\News\Statistics\ImpressionsConversionsOpens;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Json\Decorator\LinkDecorator;
 use Schoolbox\Mapper\DefinitionException;
@@ -490,7 +491,8 @@ class Controller extends Base
 
         /* Record this Open
          */
-        $this->statisticsMapper->saveOpen($article->getId(), $this->getUser()->getId(), $this->getRequest()->query[Querystring::REFERRER]);
+        $ico = new ImpressionsConversionsOpens($this->databaseInternal, $this->statisticsMapper, $this->statisticsCumulativeMapper);
+        $ico->saveOpen($article->getId(), $this->getUser()->getId(), $this->getRequest()->query[Querystring::REFERRER]);
 
         // don't supply the extra twig-necessary data if just returning JSON
         if ($this->isJsonRequest()) {

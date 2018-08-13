@@ -19,15 +19,31 @@ class Controller extends Base
      */
     private $database;
 
+    /**
+     * @var Mapper
+     */
+    private $statisticsMapper;
+
+    /**
+     * @var Cumulative\Mapper
+     */
+    private $statisticsCumulativeMapper;
 
     /**
      * Controller constructor.
      *
-     * @param IConnector $databaseInternal
+     * @param IConnector        $databaseInternal
+     * @param Mapper            $statisticsMapper
+     * @param Cumulative\Mapper $statisticsCumulativeMapper
      */
-    public function __construct(IConnector $databaseInternal)
-    {
+    public function __construct(
+        IConnector $databaseInternal,
+        Mapper $statisticsMapper,
+        Cumulative\Mapper $statisticsCumulativeMapper
+    ) {
         $this->database = $databaseInternal;
+        $this->statisticsMapper = $statisticsMapper;
+        $this->statisticsCumulativeMapper = $statisticsCumulativeMapper;
     }
 
     /**
@@ -39,7 +55,7 @@ class Controller extends Base
      */
     public function getOverview(News\Model $article)
     {
-        $impressionsConversionsOpens = new ImpressionsConversionsOpens($this->database);
+        $impressionsConversionsOpens = new ImpressionsConversionsOpens($this->database, $this->statisticsMapper, $this->statisticsCumulativeMapper);
         $accuracy = $this->getRequest()->query['accuracy'];
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsStatistics/index.twig', [
