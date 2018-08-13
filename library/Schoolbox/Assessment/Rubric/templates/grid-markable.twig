@@ -358,7 +358,10 @@
             var rubricSummary = $rb.find(rubricSummarySelector);
             rubricSummary.attr('data-scaled-mark', rubricTotalMark);
 
-            parseFraction(rubricSummary, e.namespace);
+            // Only update the overall mark if we haven't customised the cap mark
+            if (! customisedMark[groupId]) {
+                parseFraction(rubricSummary, e.namespace);
+            }
 
             // What cell was actually changed?
             if ($changed.is(':checkbox')) {
