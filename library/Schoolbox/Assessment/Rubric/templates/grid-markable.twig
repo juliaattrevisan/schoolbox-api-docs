@@ -181,7 +181,6 @@
                         {% endif %}
 
                         {# TODO why is markSchemeName null when student is self-assessing #}
-                        {{ dump(markSchemeName) }}
 
                         {% if group.rowMaxSum > 0 %}
                             <button class="use-descriptor-values">Assign <span class="descriptor-sum">
@@ -343,7 +342,7 @@
                                 break;
 
                             case 'Percentage':
-                                $groupSummary.find(".groupMax").attr("value", percentage);
+                                $groupSummary.find(".groupMax").val(percentage);
                                 break;
 
                             default:
