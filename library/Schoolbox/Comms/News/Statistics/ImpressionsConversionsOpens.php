@@ -80,7 +80,6 @@ class ImpressionsConversionsOpens
     }
 
 
-
     /**
      * Record an impression for $articleId
      * ie. $userId has witnessed $articleId
@@ -94,12 +93,18 @@ class ImpressionsConversionsOpens
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
+     * @throws \InvalidArgumentException
      */
     public function saveImpression(int $articleId, int $userId, ?string $referrer)
     {
         if ((new ValidImpressionReferrer())->isSatisfiedBy($referrer)) {
 
-            /* TODO: Increment tally in a unique manner
+            /* TODO: Record uniques only
+             * If the current (articleId, userId, referrer) tuple exists in the db
+             * don't record a dupe impression, nor increment the cumulative tally
+             *
+             * We can't rely on the INSERT ON DUPLICATE idea because I also need to
+             * increment cumulative total if (and only if) a unique impression was made
              */
             $this->statisticsCumulativeMapper->incrementImpression($articleId, $referrer);
 
