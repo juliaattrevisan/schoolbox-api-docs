@@ -55,6 +55,25 @@ class GroupMarkMapper extends Mapper
 
 
     /**
+     * This will HARD-DELETE all previously given marks with the feedback.
+     *
+     * @param int $returnId
+     * @return int
+     */
+    public function deleteFeedbackMarks($returnId): int
+    {
+        $query = "DELETE FROM rubric_group_mark WHERE return_id = :return_id";
+
+        $statement = $this->database->prepare($query);
+        $statement->execute([
+            'return_id' => $returnId,
+        ]);
+
+        return $statement->rowCount();
+    }
+
+
+    /**
      * This mapper does not raise notifications.
      *
      * @param object $object

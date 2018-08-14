@@ -809,6 +809,7 @@ class RubricMapper
 
         // Blow away any previous descriptor records with the feedback
         $descriptorMarkMapper->deleteFeedbackMarks($returnId);
+        $groupMarkMapper->deleteFeedbackMarks($returnId);
 
         $groupMarksToSave      = $groupMarkMapper->createCollection();
         $descriptorMarksToSave = $descriptorMarkMapper->createCollection();

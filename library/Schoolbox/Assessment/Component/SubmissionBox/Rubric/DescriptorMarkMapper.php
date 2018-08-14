@@ -128,15 +128,13 @@ class DescriptorMarkMapper extends Mapper
     /**
      * This will HARD-DELETE all previously given marks with the feedback.
      *
-     * This also hard-deletes all group marks.
-     *
-     * @param int  $returnId
+     * @param int $returnId
      * @return int
      */
-    public function deleteFeedbackMarks($returnId)
+    public function deleteFeedbackMarks($returnId): int
     {
         $query = "
-            DELETE     rdm, rgm
+            DELETE     rdm
             FROM       rubric_descriptor_mark rdm
             INNER JOIN rubric_group_mark rgm on rdm.rubric_group_mark_id = rgm.id
             WHERE      rgm.return_id = :return_id;
