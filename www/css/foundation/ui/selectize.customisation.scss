@@ -77,7 +77,7 @@ fieldset[disabled] div.selectize-control div.selectize-input.items > div.item > 
 	}
 
 	&.multi .selectize-input.has-items {
-		padding: 1px;
+		padding: $selectize-margin-item-x $selectize-margin-item-y 0;
 	}
 
 	.selectize-input {
