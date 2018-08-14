@@ -26,7 +26,7 @@ class Mapper extends \Schoolbox\Mapper
      *
      * @var array
      */
-    private $impressionColumnMap = [
+    private const IMPRESSION_COLUMN_MAP = [
         Statistics\Mapper::REFERRER_DASHBOARD => 'num_impressions_dashboard',
         Statistics\Mapper::REFERRER_HOMEPAGE => 'num_impressions_homepage',
         Statistics\Mapper::REFERRER_INDEX => 'num_impressions_index',
@@ -40,7 +40,7 @@ class Mapper extends \Schoolbox\Mapper
      *
      * @var array
      */
-    private $conversionColumnMap = [
+    private const CONVERSION_COLUMN_MAP = [
         Statistics\Mapper::REFERRER_DASHBOARD => 'num_conversions_dashboard',
         Statistics\Mapper::REFERRER_HOMEPAGE => 'num_conversions_homepage',
         Statistics\Mapper::REFERRER_INDEX => 'num_conversions_index',
@@ -97,8 +97,8 @@ class Mapper extends \Schoolbox\Mapper
 
             /* Detect which referrer to increment using a mapper method
              */
-            $get = $this->getGetMethodName($this->getPropertyFromColumn($this->impressionColumnMap[$referrer]));
-            $set = $this->getSetMethodName($this->getPropertyFromColumn($this->impressionColumnMap[$referrer]));
+            $get = $this->getGetMethodName($this->getPropertyFromColumn(self::IMPRESSION_COLUMN_MAP[$referrer]));
+            $set = $this->getSetMethodName($this->getPropertyFromColumn(self::IMPRESSION_COLUMN_MAP[$referrer]));
 
             try {
                 $model = $this->findOneByColumnList([
@@ -149,8 +149,8 @@ class Mapper extends \Schoolbox\Mapper
 
         /* Detect which referrer to increment using a mapper method
          */
-        $get = $this->getGetMethodName($this->getPropertyFromColumn($this->conversionColumnMap[$referrer]));
-        $set = $this->getSetMethodName($this->getPropertyFromColumn($this->conversionColumnMap[$referrer]));
+        $get = $this->getGetMethodName($this->getPropertyFromColumn(self::CONVERSION_COLUMN_MAP[$referrer]));
+        $set = $this->getSetMethodName($this->getPropertyFromColumn(self::CONVERSION_COLUMN_MAP[$referrer]));
 
         try {
             $model = $this->findOneByColumnList([
