@@ -37,7 +37,15 @@ class GroupMarkMapper extends Mapper
             'submissionReturn',
             'submission_return'
         );
-        $this->joins('group_id', GroupMapper::class, 'id', null, null, null, 'group');
+        $this->joins(
+            'rubric_group_id',
+            GroupMapper::class,
+            'id',
+            null,
+            null,
+            'group',
+            'group'
+        );
 
         // This is NOT a soft-delete column, but effectively has the same
         // behavior as one, as when it's set (by the teacher altering a rubric

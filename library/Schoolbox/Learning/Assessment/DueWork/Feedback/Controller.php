@@ -201,7 +201,7 @@ class Controller extends Base
         if (\is_array($post['rubric'])) {
             $this->rubricMapper->saveForFeedback(
                 $post['rubric']['descriptors'],
-                $post['rubric']['groups'],
+                $post['rubric']['groups'] ?? [],
                 $feedback->getId()
             );
             return true;

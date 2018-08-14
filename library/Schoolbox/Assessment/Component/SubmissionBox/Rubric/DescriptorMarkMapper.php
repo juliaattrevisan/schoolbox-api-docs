@@ -55,7 +55,15 @@ class DescriptorMarkMapper extends Mapper
         // This join is deprecated; join through group_mark.submission_return
 //        $this->joins('return_id', ReturnedWorkMapper::class, 'id', self::TYPE_MODEL, null, 'submissionReturn', 'submission_return');
 
-        $this->joins('descriptor_id', DescriptorMapper::class, 'id', null, null, null, 'descriptor');
+        $this->joins(
+            'descriptor_id',
+            DescriptorMapper::class,
+            'id',
+            null,
+            null,
+            null,
+            'descriptor'
+        );
 
         // This is NOT a soft-delete column. It specifically relates to when a teacher alters a rubric's structure,
         // hence marks already given are invalid because they take their value from the rubric descriptor.
