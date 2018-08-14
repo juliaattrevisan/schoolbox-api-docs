@@ -7,8 +7,8 @@
         {% set assessmentCount = unit.assessments|length %}
         {% set attachmentCount = unit.attachments|length %}
         {% set hasContent      = assessmentCount > 0 or attachmentCount > 0 %}
-        <li>
-            <div {% if not hasContent %}class="unit-empty"{% endif %}>
+        <li class="actions-small-1">
+            <div class="list-item no-pad {% if not hasContent %}unit-empty{% endif %}">
                 <div class="expander icon-down-arrow" data-collapser="unit-{{ unit.id }}"></div>
 
                 <div class="small-6 card">
@@ -49,6 +49,8 @@
                     {% endif %}
                 </div>
             </div>
+
+            {# TODO: add a link to this unit in Atlas #}
         </li>
 
         {% if not hasContent %}
@@ -66,8 +68,8 @@
                 </div>
                 <ul class="information-list card-selectable">
                     {% for assessment in unit.assessments %}
-                        <li>
-                            <div>
+                        <li class="actions-small-1">
+                            <div class="list-item no-pad">
 
                                 <div class="small-6 card">
                                     <div class="selector">
@@ -93,6 +95,8 @@
                                 </div>
 
                             </div>
+
+                            {# TODO: add a link to this assessment in Atlas #}
                         </li>
                     {% endfor %}
                 </ul>
@@ -155,6 +159,7 @@
                             <nav>
                                 <a href="{{ attachment.url }}"
                                    class="icon-download no-text"
+                                   target="_blank"
                                    title="Preview"></a>
                             </nav>
                         </li>
