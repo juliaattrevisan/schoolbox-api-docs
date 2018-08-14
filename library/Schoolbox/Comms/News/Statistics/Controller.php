@@ -62,7 +62,7 @@ class Controller extends Base
             'article' => $article,
             'accuracies' => ImpressionsConversionsOpens::ACCURACIES,
             'accuracy' => $accuracy,
-            'series' => $impressionsConversionsOpens->fetch($article, $accuracy),
+            'series' => $impressionsConversionsOpens->fetchGranular($article, $accuracy),
         ])->setTitle("Statistics for {$article->getTitle()}"));
     }
 }

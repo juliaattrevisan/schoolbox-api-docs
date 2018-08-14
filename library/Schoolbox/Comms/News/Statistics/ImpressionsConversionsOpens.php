@@ -215,14 +215,14 @@ class ImpressionsConversionsOpens
 
 
     /**
-     * Assemble all the Impressions, Conversions and direct Opens for $article
+     * Assemble all the granular Impressions, Conversions and direct Opens for $article
      *
      * @param News\Model  $article
      * @param string|null $accuracy
      * @return array
      * @throws \Alaress\Database\Exception
      */
-    public function fetch(News\Model $article, ?string $accuracy = self::DEFAULT_ACCURACY): array
+    public function fetchGranular(News\Model $article, ?string $accuracy = self::DEFAULT_ACCURACY): array
     {
 
         /* Determine a sane value
