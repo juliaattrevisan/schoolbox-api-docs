@@ -298,7 +298,7 @@ class ImpressionsConversionsOpens
              * Otherwise, if there were Impressions, assume Conversions occur because of Impressions
              * and calculate a ratio accordingly
              */
-            if ($values['conversion'] > $values['impression']) {
+            if ($values['impression'] && $values['conversion'] > $values['impression']) {
                 $ratio = 100;
             } elseif ($values['impression']) {
                 $ratio = round(100 * (float)$values['conversion'] / (float)$values['impression'], 1);
