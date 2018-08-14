@@ -94,6 +94,7 @@ class UserMapper extends Mapper
         $this->uses('synergy_id', self::TYPE_STRING, null, 'externalId');
         $this->uses('mail_handler', self::TYPE_BOOLEAN, null, 'useInternalMail');
         $this->uses('eportfolio_enabled', self::TYPE_BOOLEAN, null, 'eportfolioEnable');
+        $this->uses('calendar_view', self::TYPE_STRING);
         $this->uses('enabled', self::TYPE_BOOLEAN);
         $this->uses('hide_contacts', self::TYPE_BOOLEAN);
         $this->uses('hide_timetable', self::TYPE_BOOLEAN);
