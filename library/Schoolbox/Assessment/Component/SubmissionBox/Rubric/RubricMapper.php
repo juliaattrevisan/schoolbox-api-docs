@@ -810,7 +810,8 @@ class RubricMapper
         // Blow away any previous descriptor records with the feedback
         $descriptorMarkMapper->deleteFeedbackMarks($returnId);
 
-        $marksToSave = $descriptorMarkMapper->createCollection();
+        $groupMarksToSave      = $groupMarkMapper->createCollection();
+        $descriptorMarksToSave = $descriptorMarkMapper->createCollection();
 
         // What actually got saved?
         $selectedGroups = [];
@@ -832,18 +833,22 @@ class RubricMapper
 
             // Find a record for its group
             // If it doesn't exist: make a new one
-            $group     = $descriptor->getCriterion()->getGroup();
-            $groupMark = $groupMarkMapper->createModel()
-                ->setSubmissionReturn($returnedWorkMapper->createModel($returnId))
-                ->setGroup($group)
-                ->setValid(true)
-                // Take value from rubric_group_usage.max_value if not present
-                ->setValue($selectedGroups[$group->getId()]);
+            $group   = $descriptor->getCriterion()->getGroup();
+            $groupId = $group->getId();
+            if (!$groupMarksToSave[$groupId]) {
+                $groupMarksToSave[$groupId] = $groupMarkMapper->createModel()
+                    ->setSubmissionReturn($returnedWorkMapper->createModel($returnId))
+                    ->setGroup($group)
+                    ->setValid(true)
+                    // Take value from rubric_group_usage.max_value if not present
+                    ->setValue($selectedGroups[$groupId]);
+            }
 
-            $marksToSave->add(
+            // Save the descriptor group
+            $descriptorMarksToSave->add(
                 $descriptorMarkMapper->createModel()
 //                    ->setSubmissionReturn($returnedWorkMapper->createModel($returnId))
-                    ->setGroupMark($groupMark)
+                    ->setGroupMark($groupMarksToSave[$groupId])
                     ->setDescriptor($descriptor)
                     ->setValid(true)
                     // Take value from form preferentially, then descriptor
@@ -852,8 +857,8 @@ class RubricMapper
         }
 
         // Save marks for groups as well
-
-        $descriptorMarkMapper->save($marksToSave);
+        $groupMarkMapper->save($groupMarksToSave);
+        $descriptorMarkMapper->save($descriptorMarksToSave);
     }
 
     /**
