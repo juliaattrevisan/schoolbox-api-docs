@@ -490,10 +490,11 @@ class Controller extends Base
             }
         }
 
-        /* Record this Open
+        /* Record this Conversion/Open
+         * referrer value determines what kind it was
          */
-        $ico = new ImpressionsConversionsOpens($this->databaseInternal, $this->statisticsMapper, $this->statisticsCumulativeMapper);
-        $ico->saveOpen($article->getId(), $this->getUser()->getId(), $this->getRequest()->query[Querystring::REFERRER]);
+        (new ImpressionsConversionsOpens($this->databaseInternal, $this->statisticsMapper, $this->statisticsCumulativeMapper))
+            ->saveConversionOpen($article->getId(), $this->getUser()->getId(), $this->getRequest()->query[Querystring::REFERRER]);
 
         // don't supply the extra twig-necessary data if just returning JSON
         if ($this->isJsonRequest()) {

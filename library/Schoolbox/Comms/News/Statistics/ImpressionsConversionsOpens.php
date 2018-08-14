@@ -154,7 +154,7 @@ class ImpressionsConversionsOpens
      * @throws \UnexpectedValueException
      * @throws \InvalidArgumentException
      */
-    public function saveOpen(int $articleId, int $userId, ?string $referrer): array
+    public function saveConversionOpen(int $articleId, int $userId, ?string $referrer): array
     {
         /* Invalid referrer; ignore recording an Open
          */
