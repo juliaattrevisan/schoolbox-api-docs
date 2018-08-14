@@ -43,6 +43,14 @@ class Model implements ISoftDeletable
      */
     private $referrer;
 
+    /**
+     * A datetime associated with when this interaction occurred that isn't tied to the
+     * mapper behaviours of created_at and updated_at. This allows us to mass produce data
+     * and fudge some of the datetimes to simulate scenarios
+     *
+     * @var \Alaress_Date_Format
+     */
+    private $occursAt;
 
     /**
      * @return null|int
@@ -120,6 +128,26 @@ class Model implements ISoftDeletable
     public function setReferrer(?string $referrer): self
     {
         $this->referrer = $referrer;
+        return $this;
+    }
+
+
+    /**
+     * @return \Alaress_Date_Format
+     */
+    public function getOccursAt(): \Alaress_Date_Format
+    {
+        return $this->occursAt;
+    }
+
+
+    /**
+     * @param \Alaress_Date_Format $occursAt
+     * @return Model
+     */
+    public function setOccursAt(\Alaress_Date_Format $occursAt): self
+    {
+        $this->occursAt = $occursAt;
         return $this;
     }
 }

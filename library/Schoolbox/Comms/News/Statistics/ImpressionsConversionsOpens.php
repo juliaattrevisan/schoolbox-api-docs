@@ -39,10 +39,10 @@ class ImpressionsConversionsOpens
      * @var array
      */
     public const ACCURACIES = [
-        'minute' => 'CONCAT(DATE_FORMAT(created_at, \'%Y-%m-%d %H:%i\'), \':00\')',
-        'hour' => 'CONCAT(DATE_FORMAT(created_at, \'%Y-%m-%d %H\'), \':00:00\')',
-        'day' => 'CONCAT(DATE_FORMAT(created_at, \'%Y-%m-%d\'), \' 00:00:00\')',
-        'month' => 'CONCAT(DATE_FORMAT(created_at, \'%Y-%m\'), \'-01 00:00:00\')',
+        'minute' => 'CONCAT(DATE_FORMAT(occurs_at, \'%Y-%m-%d %H:%i\'), \':00\')',
+        'hour' => 'CONCAT(DATE_FORMAT(occurs_at, \'%Y-%m-%d %H\'), \':00:00\')',
+        'day' => 'CONCAT(DATE_FORMAT(occurs_at, \'%Y-%m-%d\'), \' 00:00:00\')',
+        'month' => 'CONCAT(DATE_FORMAT(occurs_at, \'%Y-%m\'), \'-01 00:00:00\')',
     ];
 
 
@@ -132,7 +132,8 @@ class ImpressionsConversionsOpens
             ->setArticleId($articleId)
             ->setUserId($userId)
             ->setType(Mapper::TYPE_IMPRESSION)
-            ->setReferrer($referrer));
+            ->setReferrer($referrer)
+            ->setOccursAt(\Alaress_Date_Format::now()));
     }
 
 
@@ -190,7 +191,8 @@ class ImpressionsConversionsOpens
         $model = $this->statisticsMapper->createModel()
             ->setArticleId($articleId)
             ->setUserId($userId)
-            ->setReferrer($referrer);
+            ->setReferrer($referrer)
+            ->setOccursAt(\Alaress_Date_Format::now());
 
         if (null !== $referrer) {
 

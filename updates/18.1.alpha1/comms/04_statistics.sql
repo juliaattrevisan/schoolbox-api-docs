@@ -5,6 +5,7 @@ CREATE TABLE `comms_news_article_statistics` (
   `user_id` int(11) UNSIGNED NOT NULL,
   `type` ENUM('impression', 'conversion', 'open') NULL,
   `referrer` ENUM('dashboard', 'homepage', 'index', 'archive', 'email') NULL,
+  `occurs_at` DATETIME NOT NULL,
   `created_at` DATETIME NOT NULL,
   `updated_at` DATETIME NOT NULL,
   `deleted_at` DATETIME NULL,
