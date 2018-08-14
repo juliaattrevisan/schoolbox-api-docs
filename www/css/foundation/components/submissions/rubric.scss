@@ -13,6 +13,17 @@ table.rb {
             padding: 0;
             position: relative;
         }
+
+        .rb-group-summary {
+            label {
+                width: 7rem;
+            }
+            .groupMax {
+                width: 5rem;
+                display: inline-block;
+            }
+        }
+
         input[type=checkbox], input[type=radio] {
             &:checked {
                 + label {
@@ -205,6 +216,10 @@ table.rb {
 .rb-group-summary {
     background-color: lighten($input-border-color, 10%) !important;
     color: calc-text-color(lighten($input-border-color, 10%));
+
+    label {
+        font-weight: bold!important;
+    }
 }
 .rb-final-summary {
     background-color: $input-border-color !important;
@@ -261,6 +276,10 @@ table.rb {
         line-height: 2rem;
         text-align: center;
     }
+}
+
+.descriptor-sum {
+    font-weight: bold;
 }
 
 @media #{$medium-down} {
