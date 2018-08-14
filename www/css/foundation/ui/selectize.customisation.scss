@@ -76,6 +76,12 @@ fieldset[disabled] div.selectize-control div.selectize-input.items > div.item > 
 		}
 	}
 
+	&.single {
+		.selectize-input > div {
+			margin-left: $selectize-margin-item-x;
+		}
+	}
+
 	&.multi .selectize-input.has-items {
 		padding: $selectize-margin-item-x $selectize-margin-item-y 0;
 	}
