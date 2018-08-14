@@ -877,7 +877,7 @@ class RubricMapper
         }
         $groupMarkMapper            = GroupMarkMapper::getInstance();
         $descriptorMarkMapper       = DescriptorMarkMapper::getInstance();
-        $sourceDescriptorMarks      = $descriptorMarkMapper->findByColumn('group_mark.return_id', $sourceReturnId);
+        $sourceDescriptorMarks      = $descriptorMarkMapper->findByColumn('g.return_id', $sourceReturnId);
         $destinationGroupMarks      = $groupMarkMapper->createCollection();
         $destinationDescriptorMarks = $descriptorMarkMapper->createCollection();
         $destinationReturn          = SubmissionBox\ReturnedWorkMapper::getInstance()->createModel($destinationReturnId);
