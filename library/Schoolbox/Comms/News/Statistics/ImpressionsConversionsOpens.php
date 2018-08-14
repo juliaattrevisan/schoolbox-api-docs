@@ -254,6 +254,7 @@ class ImpressionsConversionsOpens
         ]);
 
         $data = [];
+        $conversionRatio = [];
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $type = $row['type'];
@@ -274,6 +275,34 @@ class ImpressionsConversionsOpens
             /* Stack it
              */
             $data[$type][$referrer][] = [(int)$row['timestamp'], (int)$row['num']];
+
+            /* Summate for a conversion ratio
+             */
+            $conversionRatio[(int)$row['timestamp']][$type]++;
+        }
+
+        /* Figure out conversion ratio per timestamp
+         *
+         * If you have a Conversion without an Impression (ie. someone sends you a copy
+         * of their link and you visit it directly) record this as a 0% conversion - you
+         * didn't see the impression to open it, you just did it directly.
+         */
+        foreach ($conversionRatio as $timestamp => $values) {
+            $ratio = 0;
+
+            /* If there were more Conversions than Impressions, max it at 100%
+             * Someone visited a referred url without having been Impressed
+             *
+             * Otherwise, if there were Impressions, assume Conversions occur because of Impressions
+             * and calculate a ratio accordingly
+             */
+            if ($values['conversion'] > $values['impression']) {
+                $ratio = 100;
+            } elseif ($values['impression']) {
+                $ratio = round(100 * (float)$values['conversion'] / (float)$values['impression'], 1);
+            }
+
+            $data['conversionRatio'][] = [(int)$timestamp, $ratio];
         }
 
         return $data;
