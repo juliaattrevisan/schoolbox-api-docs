@@ -805,6 +805,7 @@ class RubricMapper
         $descriptorMapper     = DescriptorMapper::getInstance();
         $descriptorMarkMapper = DescriptorMarkMapper::getInstance();
         $groupMarkMapper      = GroupMarkMapper::getInstance();
+        $groupUsageMapper     = GroupUsageMapper::getInstance();
         $returnedWorkMapper   = SubmissionBox\ReturnedWorkMapper::getInstance();
 
         // Blow away any previous descriptor records with the feedback
@@ -827,6 +828,12 @@ class RubricMapper
         }
 
         $descriptorModels = $descriptorMapper->findByColumn('id', array_keys($selectedDescriptors));
+        $returnedWork     = $returnedWorkMapper->findById($returnId);
+        $groupUsages      = $groupUsageMapper
+            ->findByColumn('submission_box_id', $returnedWork->getSubmissionBox()->getId())
+            ->indexByCallback(function (GroupUsage $groupUsage) {
+                return $groupUsage->getGroup()->getId();
+            });
         foreach ($selectedDescriptors as $descriptorId => $value) {
 
             // If this isn't set: this is an issue
@@ -836,12 +843,16 @@ class RubricMapper
             // If it doesn't exist: make a new one
             $group   = $descriptor->getCriterion()->getGroup();
             $groupId = $group->getId();
+            if (!array_key_exists($groupId, $selectedGroups)) {
+                // Take value from rubric_group_usage.max_value if not present
+                $selectedGroups[$groupId] = $groupUsages[$groupId]->getMaxValue();
+            }
+
             if (!$groupMarksToSave[$groupId]) {
                 $groupMarksToSave[$groupId] = $groupMarkMapper->createModel()
-                    ->setSubmissionReturn($returnedWorkMapper->createModel($returnId))
+                    ->setSubmissionReturn($returnedWork)
                     ->setGroup($group)
                     ->setValid(true)
-                    // Take value from rubric_group_usage.max_value if not present
                     ->setValue($selectedGroups[$groupId]);
             }
 
