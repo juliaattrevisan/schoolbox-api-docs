@@ -50,7 +50,6 @@ class Mapper extends \Schoolbox\Mapper
 
     /**
      * @inheritdoc
-     * @throws \Schoolbox\Mapper\Exception
      * @throws \InvalidArgumentException
      */
     protected function mapping()
@@ -93,34 +92,32 @@ class Mapper extends \Schoolbox\Mapper
      */
     public function incrementImpression(int $articleId, ?string $referrer)
     {
-        if ((new Statistics\ValidImpressionReferrer())->isSatisfiedBy($referrer)) {
-
-            /* Detect which referrer to increment using a mapper method
-             */
-            $get = $this->getGetMethodName($this->getPropertyFromColumn(self::IMPRESSION_COLUMN_MAP[$referrer]));
-            $set = $this->getSetMethodName($this->getPropertyFromColumn(self::IMPRESSION_COLUMN_MAP[$referrer]));
-
-            try {
-                $model = $this->findOneByColumnList([
-                    'date' => \Alaress_Date_Format::now()->getDatabaseDate(),
-                    'article_id' => $articleId
-                ]);
-
-                $model->$set((int)$model->$get() + 1);
-            } catch (\Schoolbox\Mapper\Exception $e) {
-                $now = \Alaress_Date_Format::now();
-
-                $model = $this->createModel()
-                    ->setDate($now->getDateOnly())
-                    ->setArticleId($articleId)
-                    ->setFirstOpen($now)
-                    ->$set(1);
-            }
-
-            return $this->save($model);
+        if (!(new Statistics\ValidImpressionReferrer())->isSatisfiedBy($referrer)) {
+            return false;
         }
 
-        return false;
+        /* Detect which referrer to increment using a mapper method
+         */
+        $get = $this->getGetMethodName($this->getPropertyFromColumn(self::IMPRESSION_COLUMN_MAP[$referrer]));
+        $set = $this->getSetMethodName($this->getPropertyFromColumn(self::IMPRESSION_COLUMN_MAP[$referrer]));
+        $now = \Alaress_Date_Format::now();
+
+        try {
+            $model = $this->findOneByColumnList([
+                'date' => $now->getDatabaseDate(),
+                'article_id' => $articleId
+            ]);
+
+            $model->$set((int)$model->$get() + 1);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            $model = $this->createModel()
+                ->setDate($now->getDateOnly())
+                ->setArticleId($articleId)
+                ->setFirstOpen($now)
+                ->$set(1);
+        }
+
+        return $this->save($model);
     }
 
 
@@ -151,17 +148,16 @@ class Mapper extends \Schoolbox\Mapper
          */
         $get = $this->getGetMethodName($this->getPropertyFromColumn(self::CONVERSION_COLUMN_MAP[$referrer]));
         $set = $this->getSetMethodName($this->getPropertyFromColumn(self::CONVERSION_COLUMN_MAP[$referrer]));
+        $now = \Alaress_Date_Format::now();
 
         try {
             $model = $this->findOneByColumnList([
-                'date' => \Alaress_Date_Format::now()->getDatabaseDate(),
+                'date' => $now->getDatabaseDate(),
                 'article_id' => $articleId
             ]);
 
             $model->$set((int)$model->$get() + 1);
         } catch (\Schoolbox\Mapper\Exception $e) {
-            $now = \Alaress_Date_Format::now();
-
             $model = $this->createModel()
                 ->setDate($now->getDateOnly())
                 ->setArticleId($articleId)
@@ -190,6 +186,8 @@ class Mapper extends \Schoolbox\Mapper
      */
     public function incrementOpen(int $articleId)
     {
+        $now = \Alaress_Date_Format::now();
+
         try {
             $model = $this->findOneByColumnList([
                 'date' => \Alaress_Date_Format::now()->getDatabaseDate(),
@@ -198,8 +196,6 @@ class Mapper extends \Schoolbox\Mapper
 
             $model->setNumOpens((int)$model->getNumOpens() + 1);
         } catch (\Schoolbox\Mapper\Exception $e) {
-            $now = \Alaress_Date_Format::now();
-
             $model = $this->createModel()
                 ->setDate($now->getDateOnly())
                 ->setArticleId($articleId)
