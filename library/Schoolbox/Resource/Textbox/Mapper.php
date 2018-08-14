@@ -18,6 +18,9 @@ use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
+/**
+ * @method Model createModel($idValue = null)
+ */
 class Mapper extends \Schoolbox\Mapper implements Searchable
 {
 

@@ -24,6 +24,7 @@ use Schoolbox\Resource\Folder\Model as FolderModel;
 
 /**
  * @method Link hydrate(array $row, $alias = '', $callback = null)
+ * @method Link createModel($idValue = null)
  */
 class LinkMapper extends Mapper implements ILocator, Searchable
 {

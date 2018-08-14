@@ -7,8 +7,8 @@
         {% set assessmentCount = unit.assessments|length %}
         {% set attachmentCount = unit.attachments|length %}
         {% set hasContent      = assessmentCount > 0 or attachmentCount > 0 %}
-        <li>
-            <div {% if not hasContent %}class="unit-empty"{% endif %}>
+        <li class="actions-small-1">
+            <div class="list-item no-pad {% if not hasContent %}unit-empty{% endif %}">
                 <div class="expander icon-down-arrow" data-collapser="unit-{{ unit.id }}"></div>
 
                 <div class="small-6 card">
@@ -49,6 +49,8 @@
                     {% endif %}
                 </div>
             </div>
+
+            {# TODO: add a link to this unit in Atlas #}
         </li>
 
         {% if not hasContent %}
@@ -62,12 +64,12 @@
         {% if assessmentCount %}
             <li class="child hide assessments" data-collapse-state="collapsed" data-collapsable="unit-{{ unit.id }}">
                 <div class="small-12 card">
-                    <h3>Assessments</h3>
+                    <i class="icon-due-work"></i><h3>Assessments</h3>
                 </div>
                 <ul class="information-list card-selectable">
                     {% for assessment in unit.assessments %}
-                        <li>
-                            <div>
+                        <li class="actions-small-1">
+                            <div class="list-item no-pad">
 
                                 <div class="small-6 card">
                                     <div class="selector">
@@ -93,6 +95,8 @@
                                 </div>
 
                             </div>
+
+                            {# TODO: add a link to this assessment in Atlas #}
                         </li>
                     {% endfor %}
                 </ul>
@@ -102,12 +106,14 @@
         {% if attachmentCount %}
             <li class="child hide attachments" data-collapse-state="collapsed" data-collapsable="unit-{{ unit.id }}">
                 <div class="small-12 card">
-                    <h3>Attachments</h3>
+                    <i class="icon-attach"></i><h3>Attachments</h3>
                 </div>
                 <ul class="information-list card-selectable">
                     {% for attachment in unit.attachments %}
-                        <li>
-                            <div>
+                        {% set enabled = attachmentDefaults[attachment.id].enabled %}
+                        {% set private = attachmentDefaults[attachment.id].private %}
+                        <li class="actions-small-1">
+                            <div class="list-item no-pad">
 
                                 <div class="small-6 card">
                                     <div class="selector">
@@ -115,7 +121,8 @@
                                                name="unit[{{ unit.id }}][attachment][{{ attachment.id }}][selected]"
                                                value="1"
                                                type="checkbox"
-                                               checked
+                                               {% if enabled is null %}disabled{% endif %}
+                                               {% if enabled %}checked{% endif %}
                                                data-checkbox-group="unit-{{ unit.id }}-attachments"
                                         >
                                         <label for="attachment-{{ attachment.id }}" class="checkbox-label"><span class="title">{{ attachment.title }}</span></label>
@@ -124,24 +131,37 @@
                                 </div>
 
                                 <div class="small-6 card meta">
-                                    <div class="switch round">
-                                        <input id="attachment-{{ attachment.id }}-visible-to-students"
-                                               name="unit[{{ unit.id }}][attachment][{{ attachment.id }}][visibleToStudents]"
-                                               type="checkbox"
-                                               data-checkbox-group="unit-{{ unit.id }}-attachments"
-                                               class="round-switch"
-                                        >
-                                        <label for="attachment-{{ attachment.id }}-visible-to-students">
-                                            <span class="icon-approve"></span>
-                                            <span class="icon-cancel"></span>
+                                    {% if enabled is null %}
+                                        This content is not able to be imported.
+                                    {% elseif private is not null %}
+                                        <div class="switch round">
+                                            <input id="attachment-{{ attachment.id }}-visible-to-students"
+                                                   name="unit[{{ unit.id }}][attachment][{{ attachment.id }}][visibleToStudents]"
+                                                   type="checkbox"
+                                                   data-checkbox-group="unit-{{ unit.id }}-attachments"
+                                                   {% if not private %}checked{% endif %}
+                                                   class="round-switch"
+                                            >
+                                            <label for="attachment-{{ attachment.id }}-visible-to-students">
+                                                <span class="icon-approve"></span>
+                                                <span class="icon-cancel"></span>
+                                            </label>
+                                        </div>
+                                        <label for="attachment-{{ attachment.id }}-visible-to-students" class="checkbox-label">
+                                            Visible to students?
                                         </label>
-                                    </div>
-                                    <label for="attachment-{{ attachment.id }}-visible-to-students" class="checkbox-label">
-                                        Visible to students?
-                                    </label>
+                                    {% else %}
+                                        This content will always be visible to students if imported.
+                                    {% endif %}
                                 </div>
 
                             </div>
+                            <nav>
+                                <a href="{{ attachment.url }}"
+                                   class="icon-download no-text"
+                                   target="_blank"
+                                   title="Preview"></a>
+                            </nav>
                         </li>
                     {% endfor %}
                 </ul>

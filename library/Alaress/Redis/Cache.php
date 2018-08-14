@@ -10,6 +10,7 @@ namespace Alaress\Redis;
 
 use Alaress\Cache as BaseCache;
 use Predis\ClientInterface;
+use Predis\Transaction\MultiExec;
 
 /**
  * A cache that uses Redis as its backend.
@@ -71,16 +72,29 @@ class Cache extends BaseCache
      */
     public function get($key, array $fetchArgs = [], $invalidateCache = false)
     {
-        // Is it in redis already?
-        $redisKey = $this->buildRedisKey($key);
-        if ($this->redis->exists($redisKey)) {
-            $result = json_decode($this->redis->get($redisKey), true);
+        // Try to fetch the value from Redis (but not if invalidating)
+        $redisKey     = $this->buildRedisKey($key);
+        $cached       = false;
+        $cachedResult = null;
+        if ($invalidateCache) {
+            $this->invalidate($key);
         } else {
-            $result = parent::get($key, $fetchArgs, $invalidateCache);
+            // Avoid race condition by querying cached status and result in transaction
+            [$exists, $cachedResult] = $this->redis->transaction(function (MultiExec $tx) use ($redisKey) {
+                $tx->exists($redisKey)
+                   ->get($redisKey);
+            });
+            $cached = (bool)$exists;
+        }
+
+        if ($cached) {
+            $result = json_decode($cachedResult, true);
+        } else {
+            $result = $this->fetch($fetchArgs);
             if ($this->expiry > 0) {
-                $this->redis->set($redisKey, json_encode($result));
-            } else {
                 $this->redis->setex($redisKey, $this->expiry, json_encode($result));
+            } else {
+                $this->redis->set($redisKey, json_encode($result));
             }
         }
         return $result;
