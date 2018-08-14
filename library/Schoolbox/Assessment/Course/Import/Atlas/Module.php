@@ -16,6 +16,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper as Rubri
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\GroupMapper as RubricGroupMapper;
 use Schoolbox\Assessment\Course\Import\Atlas\Api\Attachment;
 use Schoolbox\Assessment\Course\Import\Atlas\Api\Bridge as ApiBridge;
+use Schoolbox\Assessment\Course\Import\Atlas\Api\JsonDecoderFactory;
 use Schoolbox\Assessment\Course\Import\Atlas\AttachmentHandler;
 use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
 use Schoolbox\Learning\Course;
@@ -96,16 +97,7 @@ class Module extends \Alaress\Module\Module
                             'redisClient' => $injector->lazyGet('redis'),
                             'decoder'     => $injector->lazy(
                                 function () {
-                                    $decoder = new JsonDecoder(true, true);
-                                    $decoder->register(new Api\CurriculumTransformer());
-                                    $decoder->register(new Api\TeacherTransformer());
-                                    $decoder->register(new Api\UnitTransformer());
-                                    $decoder->register(new Api\AssessmentTransformer());
-                                    $decoder->register(new Api\StandardTransformer(
-                                        new Api\StandardParser\Acara()
-                                    ));
-                                    $decoder->register(new Api\AttachmentTransformer());
-                                    return $decoder;
+                                    return (new JsonDecoderFactory())->build();
                                 }
                             ),
                         ]
