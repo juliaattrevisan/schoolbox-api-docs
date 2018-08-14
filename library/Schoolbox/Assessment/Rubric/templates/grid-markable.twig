@@ -155,6 +155,7 @@
 
                         {% if markSchemeName == 'TotalMarkFractional' %}
                             <input name="{{ formField }}[groups][{{ group.id }}][value]"
+                                   data-group-max-value
                                    class="groupMax"
                                    id="group-{{ group.id }}-mark"
                                    type="tel"
@@ -162,6 +163,7 @@
 
                         {% elseif markSchemeName == 'LetterGrade' %}
                             <select name="{{ formField }}[groups][{{ group.id }}][value]"
+                                    data-group-max-value
                                     class="groupMax"
                                     id="group-{{ group.id }}-mark">
 
@@ -176,6 +178,7 @@
 
                         {% elseif markSchemeName == 'Percentage'%}
                             <input name="{{ formField }}[groups][{{ group.id }}][value]"
+                                   data-group-max-value
                                    class="groupMax"
                                    id="group-{{ group.id }}-mark"
                                    type="tel"
@@ -268,11 +271,11 @@
             var $groups = $rb.find("[data-group-summary]");
             $groups.each(function() {
                 var displayedMark = $(this).find(".descriptor-sum").text().replace(/%/, '').trim();
-                var customMark = $(this).find(".groupMax").val();
+                var customMark = $(this).find("[data-group-max-value]").val();
 
                 if (markType === 'LetterGrade') {
                     var grades = getLetterGrades($(this));
-                    customMark = getLetterGradeFromNumeric($(this).find(".groupMax").val(), grades);
+                    customMark = getLetterGradeFromNumeric($(this).find("[data-group-max-value]").val(), grades);
                 }
 
                 if (displayedMark === customMark) {
@@ -336,15 +339,15 @@
                         // Only update dropdown/input field if the mark has not been customised
                         switch(markType) {
                             case 'TotalMarkFractional':
-                                $groupSummary.find(".groupMax").val(scaledGroupMark);
+                                $groupSummary.find("[data-group-max-value]").val(scaledGroupMark);
                                 break;
 
                             case 'LetterGrade':
-                                assignLetterGrade(getPercentageForGroup($groupSummary), $groupSummary.find(".groupMax").val(scaledGroupMark));
+                                assignLetterGrade(getPercentageForGroup($groupSummary), $groupSummary.find("[data-group-max-value]").val(scaledGroupMark));
                                 break;
 
                             case 'Percentage':
-                                $groupSummary.find(".groupMax").val(getPercentageForGroup($groupSummary));
+                                $groupSummary.find("[data-group-max-value]").val(getPercentageForGroup($groupSummary));
                                 break;
 
                             default:
@@ -378,7 +381,7 @@
 
 
         // Update the overall rubric mark when the user changes the custom capabilty mark
-        $rb.on('change change.preload', '.groupMax', function (e) {
+        $rb.on('change change.preload', '[data-group-max-value]', function (e) {
             var $changed = $(this);
             var rubricId = $changed.closest('[data-group-summary]').data('rubric-id');
             var groupId = $changed.closest('[data-group-summary]').data('group-id');
@@ -431,7 +434,7 @@
         // Overwrite any custom mark in the capability mark field with the scaled mark calculated from descriptor values
         $(".use-descriptor-values").click(function(e) {
             var $button = $(e.target);
-            var $gradeInput = $button.siblings('.groupMax');
+            var $gradeInput = $button.siblings('[data-group-max-value]');
             var rubricId = $button.closest('[data-group-summary]').data('rubric-id');
             var groupId = $button.closest('[data-group-summary]').data('group-id');
 
@@ -457,7 +460,7 @@
                     break;
 
                 case 'Percentage':
-                    $groupSummary.find(".groupMax").val(getPercentageForGroup($groupSummary));
+                    $groupSummary.find("[data-group-max-value]").val(getPercentageForGroup($groupSummary));
                     break;
 
                 default:
@@ -483,7 +486,7 @@
 
         function getLetterGrades($groupSummary) {
             var grades = [];
-            $groupSummary.find(".groupMax option").each(function(index, option) {
+            $groupSummary.find("[data-group-max-value] option").each(function(index, option) {
                 grades.push(
                     {'value' : $(option).prop("value"), 'letter' : $(option).data('letter')}
                 );
