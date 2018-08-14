@@ -123,11 +123,11 @@ fieldset[disabled] div.selectize-control div.selectize-input.items > div.item > 
 .selectize-input {
     line-height: 1.875rem;
 	margin-bottom: 0;
-	padding: 3px 0;
+	padding: $selectize-margin-item-y 0;
 	vertical-align: middle;
 	min-height: 2.5rem;
     input {
-        height: 1.875rem;
+        height: 1.9375rem;
 		font-size: $selectize-font-size;
 
         .remove {
