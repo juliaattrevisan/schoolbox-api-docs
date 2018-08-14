@@ -627,7 +627,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
 
                     html += '<li>';
                     html += '<div>';
-                    html += '<div class="expander icon-down-arrow" data-collapser="collap-' + i + '"></div>';
+                    html += '<div class="expander" data-collapser="collap-' + i + '"></div>';
                     html += '<div class="card compact small-12">';
                     html += '<img src="/portrait.php?userId=' + data.students[i].externalId + '&amp;size=square80">';
                     html += '<h3>' + data.students[i].firstname + ' ' + data.students[i].lastname + '</h3>';
