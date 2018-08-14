@@ -895,6 +895,7 @@ class RubricMapper
                     ->setGroupMark($destinationGroupMarks[$groupId])
                     ->setDescriptor($sourceDescriptor->getDescriptor())
 //                    ->setSubmissionReturn($destinationReturn)
+                    ->setValue($sourceDescriptor->getValue())
                     ->setValid($sourceDescriptor->isValid())
             );
         }
