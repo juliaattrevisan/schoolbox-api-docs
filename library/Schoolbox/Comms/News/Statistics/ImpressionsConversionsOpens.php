@@ -84,7 +84,8 @@ class ImpressionsConversionsOpens
      * Record an impression for $articleId
      * ie. $userId has witnessed $articleId
      *
-     * $referrer indicates a place where they saw the impression and can't be null for this use case
+     * $referrer indicates a place where they saw the Impression and can't be null for this use case
+     * Unknown referrers are disregarded
      *
      * @param int         $articleId
      * @param int         $userId
@@ -97,25 +98,41 @@ class ImpressionsConversionsOpens
      */
     public function saveImpression(int $articleId, int $userId, ?string $referrer)
     {
-        if ((new ValidImpressionReferrer())->isSatisfiedBy($referrer)) {
 
-            /* TODO: Record uniques only
-             * If the current (articleId, userId, referrer) tuple exists in the db
-             * don't record a dupe impression, nor increment the cumulative tally
-             *
-             * We can't rely on the INSERT ON DUPLICATE idea because I also need to
-             * increment cumulative total if (and only if) a unique impression was made
-             */
-            $this->statisticsCumulativeMapper->incrementImpression($articleId, $referrer);
-
-            return $this->statisticsMapper->save($this->statisticsMapper->createModel()
-                ->setArticleId($articleId)
-                ->setUserId($userId)
-                ->setType(Mapper::TYPE_IMPRESSION)
-                ->setReferrer($referrer));
+        /* Invalid referrer; ignore recording an impression
+         */
+        if (!(new ValidImpressionReferrer())->isSatisfiedBy($referrer)) {
+            return false;
         }
 
-        return false;
+        /* Record uniques only
+         * If the current (articleId, userId, referrer) tuple exists in the db
+         * don't record a dupe impression, nor increment the cumulative tally
+         *
+         * We can't rely on the INSERT ON DUPLICATE idea because I also need to
+         * increment cumulative total if (and only if) a unique impression was made
+         */
+        $existing = $this->statisticsMapper->countByColumnList([
+            'article_id' => $articleId,
+            'type' => Mapper::TYPE_IMPRESSION,
+            'user_id' => $userId,
+            'referrer' => $referrer
+        ]);
+
+        if ($existing) {
+            return false;
+        }
+
+        /* It's a valid referrer and $user hasn't been Impressed this period
+         * so add an Impression record and increment the cumulative total
+         */
+        $this->statisticsCumulativeMapper->incrementImpression($articleId, $referrer);
+
+        return $this->statisticsMapper->save($this->statisticsMapper->createModel()
+            ->setArticleId($articleId)
+            ->setUserId($userId)
+            ->setType(Mapper::TYPE_IMPRESSION)
+            ->setReferrer($referrer));
     }
 
 
@@ -126,7 +143,7 @@ class ImpressionsConversionsOpens
      * $referrer indicates a link they clicked to initiate the open
      *
      * It can be null if someone directly typed in the url, or opened it from some random place
-     * that we don't know about
+     * that we don't know about. Unknown referrers are disregarded
      *
      * @param int         $articleId
      * @param int         $userId
