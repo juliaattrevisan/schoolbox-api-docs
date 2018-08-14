@@ -869,20 +869,37 @@ class RubricMapper
         if ($sourceReturnId === $destinationReturnId) {
             return;
         }
-        $markMapper        = DescriptorMarkMapper::getInstance();
-        $sourceMarks       = $markMapper->findByColumnList(['return_id' => $sourceReturnId]);
-        $destinationMarks  = $markMapper->createCollection();
-        $destinationReturn = SubmissionBox\ReturnedWorkMapper::getInstance()->createModel($destinationReturnId);
+        $groupMarkMapper            = GroupMarkMapper::getInstance();
+        $descriptorMarkMapper       = DescriptorMarkMapper::getInstance();
+        $sourceDescriptorMarks      = $descriptorMarkMapper->findByColumn('group_mark.return_id', $sourceReturnId);
+        $destinationGroupMarks      = $groupMarkMapper->createCollection();
+        $destinationDescriptorMarks = $descriptorMarkMapper->createCollection();
+        $destinationReturn          = SubmissionBox\ReturnedWorkMapper::getInstance()->createModel($destinationReturnId);
 
-        foreach ($sourceMarks as $sourceDescriptor) {
-            $destinationMarks->add(
-                $markMapper->createModel()
-                    ->setDescriptor($sourceDescriptor->getDescriptor())
+        foreach ($sourceDescriptorMarks as $sourceDescriptor) {
+
+            // Is this group marks set?
+            $sourceGroupMark = $sourceDescriptor->getGroupMark();
+            $group           = $sourceGroupMark->getGroup();
+            $groupId         = $group->getId();
+            if (!$destinationGroupMarks[$groupId]) {
+                $destinationGroupMarks[$groupId] = $groupMarkMapper->createModel()
+                    ->setGroup($group)
                     ->setSubmissionReturn($destinationReturn)
+                    ->setValue($sourceGroupMark->getValue())
+                    ->setValid($sourceGroupMark->isValid());
+            }
+
+            $destinationDescriptorMarks->add(
+                $descriptorMarkMapper->createModel()
+                    ->setGroupMark($destinationGroupMarks[$groupId])
+                    ->setDescriptor($sourceDescriptor->getDescriptor())
+//                    ->setSubmissionReturn($destinationReturn)
                     ->setValid($sourceDescriptor->isValid())
             );
         }
-        $markMapper->save($destinationMarks);
+        $groupMarkMapper->save($destinationGroupMarks);
+        $descriptorMarkMapper->save($destinationDescriptorMarks);
     }
 
     /**

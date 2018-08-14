@@ -24,6 +24,7 @@ use Schoolbox\User;
  * @method DescriptorMark hydrate(array $row, $alias = '', $callback = null)
  * @method DescriptorMark createModel($idValue = null)
  * @method GenericCollection|DescriptorMark[] findByColumnList($columnList, $options = array())
+ * @method GenericCollection|DescriptorMark[] findByColumn($columnName, $columnValue, $options = [])
  */
 class DescriptorMarkMapper extends Mapper
 {
