@@ -16,6 +16,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper as Rubri
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\GroupMapper as RubricGroupMapper;
 use Schoolbox\Assessment\Course\Import\Atlas\Api\Attachment;
 use Schoolbox\Assessment\Course\Import\Atlas\Api\Bridge as ApiBridge;
+use Schoolbox\Assessment\Course\Import\Atlas\Api\BridgeFactory;
 use Schoolbox\Assessment\Course\Import\Atlas\Api\JsonDecoderFactory;
 use Schoolbox\Assessment\Course\Import\Atlas\AttachmentHandler;
 use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
@@ -79,29 +80,37 @@ class Module extends \Alaress\Module\Module
                 [
                     'folderMapper'     => $this->getMapperFactory()->getLazy(FolderMapper::class),
                     'courseSpecMapper' => $this->getMapperFactory()->getLazy(CourseSpecMapper::class),
-                    'apiBridge'        => $injector->lazyNew(
-                        ApiBridge::class,
-                        [
-                            'httpClient'  => $injector->lazyNew(
-                                Client::class,
-                                [
-                                    'config' => [
-                                        'base_uri' => 'https://api.rubicon.com/api/',
-                                        'headers'  => [
-                                            'Authorization' => 'Bearer ' . $this->getConfig()->get('rubicon_atlas_api_token'),
-                                            'Accept'        => 'application/json',
-                                        ],
-                                    ],
-                                ]
-                            ),
-                            'redisClient' => $injector->lazyGet('redis'),
-                            'decoder'     => $injector->lazy(
-                                function () {
-                                    return (new JsonDecoderFactory())->build();
-                                }
-                            ),
-                        ]
+                    'apiBridge'        => $injector->lazy(
+                        function () use ($injector) {
+                            return (new BridgeFactory(
+                                $this->getConfig()->get('rubicon_atlas_api_token'),
+                                $injector->get('redis')
+                            ))->build();
+                        }
                     ),
+//                    $injector->lazyNew(
+//                        ApiBridge::class,
+//                        [
+//                            'httpClient'  => $injector->lazyNew(
+//                                Client::class,
+//                                [
+//                                    'config' => [
+//                                        'base_uri' => 'https://api.rubicon.com/api/',
+//                                        'headers'  => [
+//                                            'Authorization' => 'Bearer ' . $this->getConfig()->get('rubicon_atlas_api_token'),
+//                                            'Accept'        => 'application/json',
+//                                        ],
+//                                    ],
+//                                ]
+//                            ),
+//                            'redisClient' => $injector->lazyGet('redis'),
+//                            'decoder'     => $injector->lazy(
+//                                function () {
+//                                    return (new JsonDecoderFactory())->build();
+//                                }
+//                            ),
+//                        ]
+//                    ),
                     'importer'         => $injector->lazy(
                         function () use ($injector) {
                             $importer = new Importer(
