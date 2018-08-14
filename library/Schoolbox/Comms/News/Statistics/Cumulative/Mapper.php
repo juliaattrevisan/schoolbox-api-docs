@@ -113,7 +113,6 @@ class Mapper extends \Schoolbox\Mapper
             $model = $this->createModel()
                 ->setDate($now->getDateOnly())
                 ->setArticleId($articleId)
-                ->setFirstOpen($now)
                 ->$set(1);
         }
 
@@ -157,6 +156,12 @@ class Mapper extends \Schoolbox\Mapper
             ]);
 
             $model->$set((int)$model->$get() + 1);
+
+            /* Record the datetime when this was first opened
+             */
+            if (null === $model->getFirstOpen()) {
+                $model->setFirstOpen($now);
+            }
         } catch (\Schoolbox\Mapper\Exception $e) {
             $model = $this->createModel()
                 ->setDate($now->getDateOnly())
@@ -195,6 +200,12 @@ class Mapper extends \Schoolbox\Mapper
             ]);
 
             $model->setNumOpens((int)$model->getNumOpens() + 1);
+
+            /* Record the datetime when this was first opened
+             */
+            if (null === $model->getFirstOpen()) {
+                $model->setFirstOpen($now);
+            }
         } catch (\Schoolbox\Mapper\Exception $e) {
             $model = $this->createModel()
                 ->setDate($now->getDateOnly())
