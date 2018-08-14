@@ -103,16 +103,23 @@ class Mapper extends \Schoolbox\Mapper
         $set = $this->getSetMethodName($this->getPropertyFromColumn(self::IMPRESSION_COLUMN_MAP[$referrer]));
         $now = \Alaress_Date_Format::now();
 
-        try {
-            $model = $this->findOneByColumnList([
-                'date' => $now->getDatabaseDate(),
-                'article_id' => $articleId
-            ]);
+        /* TODO: Random bug in findOneByColumnList()?
+         *
+         * When crafting test data:
+         * This was originally findOneByColumnList() but it was always remembering something and never
+         * found an instance that already existed - it always threw Instance Not Found. I tried using
+         * ['cache'=>false] but it didn't help. Resorting back to this for now
+         */
+        $model = $this->findByColumnList([
+            'date' => $now->getDatabaseDate(),
+            'article_id' => $articleId
+        ], ['cache' => false])->first();
 
+        if ($model) {
             $model->$set((int)$model->$get() + 1);
-        } catch (\Schoolbox\Mapper\Exception $e) {
+        } else {
             $model = $this->createModel()
-                ->setDate($now->getDateOnly())
+                ->setDate($now)
                 ->setArticleId($articleId)
                 ->$set(1);
         }
@@ -150,12 +157,19 @@ class Mapper extends \Schoolbox\Mapper
         $set = $this->getSetMethodName($this->getPropertyFromColumn(self::CONVERSION_COLUMN_MAP[$referrer]));
         $now = \Alaress_Date_Format::now();
 
-        try {
-            $model = $this->findOneByColumnList([
-                'date' => $now->getDatabaseDate(),
-                'article_id' => $articleId
-            ]);
+        /* TODO: Random bug in findOneByColumnList()?
+         *
+         * When crafting test data:
+         * This was originally findOneByColumnList() but it was always remembering something and never
+         * found an instance that already existed - it always threw Instance Not Found. I tried using
+         * ['cache'=>false] but it didn't help. Resorting back to this for now
+         */
+        $model = $this->findByColumnList([
+            'date' => $now->getDatabaseDate(),
+            'article_id' => $articleId
+        ], ['cache' => false])->first();
 
+        if ($model) {
             $model->$set((int)$model->$get() + 1);
 
             /* Record the datetime when this was first opened
@@ -163,9 +177,9 @@ class Mapper extends \Schoolbox\Mapper
             if (null === $model->getFirstOpen()) {
                 $model->setFirstOpen($now);
             }
-        } catch (\Schoolbox\Mapper\Exception $e) {
+        } else {
             $model = $this->createModel()
-                ->setDate($now->getDateOnly())
+                ->setDate($now)
                 ->setArticleId($articleId)
                 ->setFirstOpen($now)
                 ->$set(1);

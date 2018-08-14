@@ -24,7 +24,7 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @var string
+     * @var \Alaress_Date_Format
      */
     private $date;
     
@@ -156,19 +156,19 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @return null|string
+     * @return \Alaress_Date_Format
      */
-    public function getDate(): ?string
+    public function getDate(): \Alaress_Date_Format
     {
         return $this->date;
     }
 
 
     /**
-     * @param null|string $date
+     * @param \Alaress_Date_Format $date
      * @return Model
      */
-    public function setDate(?string $date): self
+    public function setDate(\Alaress_Date_Format $date): self
     {
         $this->date = $date;
         return $this;
