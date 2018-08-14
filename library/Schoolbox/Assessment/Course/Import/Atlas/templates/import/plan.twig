@@ -108,8 +108,8 @@
                     {% for attachment in unit.attachments %}
                         {% set enabled = attachmentDefaults[attachment.id].enabled %}
                         {% set private = attachmentDefaults[attachment.id].private %}
-                        <li>
-                            <div>
+                        <li class="actions-small-1">
+                            <div class="list-item no-pad">
 
                                 <div class="small-6 card">
                                     <div class="selector">
@@ -152,6 +152,11 @@
                                 </div>
 
                             </div>
+                            <nav>
+                                <a href="{{ attachment.url }}"
+                                   class="icon-download no-text"
+                                   title="Preview"></a>
+                            </nav>
                         </li>
                     {% endfor %}
                 </ul>
