@@ -278,4 +278,54 @@ class ImpressionsConversionsOpens
 
         return $data;
     }
+
+
+    /**
+     * Fetch Cumulative data
+     *
+     * @param News\Model $article
+     * @return array
+     */
+    public function fetchCumulative(News\Model $article): array
+    {
+
+        /* First open
+         */
+        $firstOpen = null;
+
+        /* Raw number of Conversions and Impressions
+         */
+        $numImpressions = 0;
+        $numConversions = 0;
+
+        $cumulativeData = $this->statisticsCumulativeMapper->findByColumn('article_id', $article->getId(), [
+            'order' => [
+                'date' => 'asc'
+            ]
+        ]);
+
+        foreach ($cumulativeData as $current) {
+            if (null === $firstOpen) {
+                $firstOpen = $current->getDate();
+            }
+
+            $numImpressions += $current->findTotalImpressions();
+            $numConversions += $current->findTotalConversions();
+        }
+
+        /* Calculate ratio
+         */
+        $conversionRatio = 0.00;
+
+        if ($numImpressions && $numConversions) {
+            $conversionRatio = round(100*$numConversions/$numImpressions, 1);
+        }
+
+        return [
+            'firstOpen' => $firstOpen,
+            'numImpressions' => $numImpressions,
+            'numConversions' => $numConversions,
+            'conversionRatio' => $conversionRatio
+        ];
+    }
 }

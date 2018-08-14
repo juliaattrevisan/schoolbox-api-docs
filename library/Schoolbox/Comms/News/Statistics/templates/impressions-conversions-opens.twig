@@ -1,3 +1,59 @@
+<style type="text/css">
+    .infographic {
+        text-align: center;
+    }
+
+    .infographic .title {
+        clear: both;
+        display: block;
+    }
+
+    .infographic .value {
+        font-size: 2.5rem;
+        font-weight:bold;
+    }
+
+    .infographic .value.percentage span {
+        font-size: 1.25rem;
+    }
+</style>
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Overview</h2>
+        <p class="meta">Overall cumulative statistics from all time.</p>
+
+        <section class="content">
+            <div class="row">
+                <div class="small-12 medium-3 columns">
+                    <p class="infographic">
+                        <span class="title">First Open</span>
+                        <span class="value">{{ cumulative.firstOpen|date('j M') }}</span>
+                    </p>
+                </div>
+                <div class="small-12 medium-3 columns">
+                    <p class="infographic">
+                        <span class="title">Conversion Ratio</span>
+                        <span class="value percentage">{{ cumulative.conversionRatio }}<span>%</span></span>
+                    </p>
+                </div>
+                <div class="small-12 medium-3 columns">
+                    <p class="infographic">
+                        <span class="title">Conversions</span>
+                        <span class="value">{{ cumulative.numConversions }}</span>
+                    </p>
+                </div>
+                <div class="small-12 medium-3 columns">
+                    <p class="infographic">
+                        <span class="title">Impressions</span>
+                        <span class="value">{{ cumulative.numImpressions }}</span>
+                    </p>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+
 {##
  # @param News\Model $article
  # @param array series
@@ -125,8 +181,8 @@
 </script>
 <div class="row">
     <div class="small-12 island">
-        <h2 class="subheader">Impressions, Conversions, Opens</h2>
-        <p class="meta">Click and drag the graph to zoom.</p>
+        <h2 class="subheader">Periodic Outlook</h2>
+        <p class="meta">Statistics from the last 30 days. Click and drag the graph to zoom.</p>
 
         <section class="content">
             <div id="graph"></div>
@@ -144,3 +200,4 @@
         </section>
     </div>
 </div>
+

@@ -63,6 +63,7 @@ class Controller extends Base
             'accuracies' => ImpressionsConversionsOpens::ACCURACIES,
             'accuracy' => $accuracy,
             'series' => $impressionsConversionsOpens->fetchGranular($article, $accuracy),
+            'cumulative' => $impressionsConversionsOpens->fetchCumulative($article)
         ])->setTitle("Statistics for {$article->getTitle()}"));
     }
 }
