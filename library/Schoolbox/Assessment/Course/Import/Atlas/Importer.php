@@ -507,32 +507,6 @@ class Importer
                 $this->currentUser
             );
         }
-
-//        // TODO did I pass the attachment as private?
-//        // How to create the item?
-//        switch ($attachment->getAttachmentType()) {
-//            case Api\Attachment::ATTACHMENT_TYPE_FILE:
-//            case Api\Attachment::ATTACHMENT_TYPE_IMAGE:
-//            case Api\Attachment::ATTACHMENT_TYPE_LESSON:
-//                // upload as a file to the folder
-//                // (Consider creating a files component if there's not one there?)
-//                break;
-//
-//            case Api\Attachment::ATTACHMENT_TYPE_LINK:
-//                // upload as a link to the folder
-//                // (Consider creating a links component if there's not one there?)
-//                break;
-//
-//            case Api\Attachment::ATTACHMENT_TYPE_GOOGLE_DRIVE:
-//            case Api\Attachment::ATTACHMENT_TYPE_ONEDRIVE:
-//                // not sure. Probably save to Links as well?
-//                // Otherwise: consider creating a textbox, which contains drive file?
-//                break;
-//
-//            default:
-//                // Dunno what to do with it
-//                break;
-//        }
     }
 
 
