@@ -154,13 +154,15 @@
                         <label for="group-{{ group.id }}-mark">{{ locale.rubricGroup.proper }} mark</label>
 
                         {% if markSchemeName == 'TotalMarkFractional' %}
-                            <input class="groupMax"
+                            <input name="{{ formField }}[groups][{{ group.id }}][value]"
+                                   class="groupMax"
                                    id="group-{{ group.id }}-mark"
                                    type="tel"
                                    value="{{ group.scaledMark }}"/> / {{ group.max }}
 
                         {% elseif markSchemeName == 'LetterGrade' %}
-                            <select class="groupMax"
+                            <select name="{{ formField }}[groups][{{ group.id }}][value]"
+                                    class="groupMax"
                                     id="group-{{ group.id }}-mark">
 
                                 {% for value, letter in markType.conf %}
@@ -173,7 +175,8 @@
                             </select>
 
                         {% elseif markSchemeName == 'Percentage'%}
-                            <input class="groupMax"
+                            <input name="{{ formField }}[groups][{{ group.id }}][value]"
+                                   class="groupMax"
                                    id="group-{{ group.id }}-mark"
                                    type="tel"
                                    value="{{ percentageMark }}"/> %
