@@ -81,7 +81,7 @@ class ImpressionsConversionsOpens
 
 
     /**
-     * Record an impression for $articleId
+     * Record an Impression for $articleId
      * ie. $userId has witnessed $articleId
      *
      * $referrer indicates a place where they saw the Impression and can't be null for this use case
@@ -90,27 +90,27 @@ class ImpressionsConversionsOpens
      * @param int         $articleId
      * @param int         $userId
      * @param null|string $referrer
-     * @return bool|int[]
+     * @return int[]
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      * @throws \InvalidArgumentException
      */
-    public function saveImpression(int $articleId, int $userId, ?string $referrer)
+    public function saveImpression(int $articleId, int $userId, ?string $referrer): array
     {
 
-        /* Invalid referrer; ignore recording an impression
+        /* Invalid referrer; ignore recording an Impression
          */
         if (!(new ValidImpressionReferrer())->isSatisfiedBy($referrer)) {
-            return false;
+            return [];
         }
 
         /* Record uniques only
          * If the current (articleId, userId, referrer) tuple exists in the db
-         * don't record a dupe impression, nor increment the cumulative tally
+         * don't record a dupe Impression, nor increment the cumulative tally
          *
          * We can't rely on the INSERT ON DUPLICATE idea because I also need to
-         * increment cumulative total if (and only if) a unique impression was made
+         * increment cumulative total if (and only if) a unique Impression was made
          */
         $existing = $this->statisticsMapper->countByColumnList([
             'article_id' => $articleId,
@@ -120,7 +120,7 @@ class ImpressionsConversionsOpens
         ]);
 
         if ($existing) {
-            return false;
+            return [];
         }
 
         /* It's a valid referrer and $user hasn't been Impressed this period
@@ -148,22 +148,69 @@ class ImpressionsConversionsOpens
      * @param int         $articleId
      * @param int         $userId
      * @param null|string $referrer
-     * @return bool|int[]
+     * @return int[]
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
+     * @throws \InvalidArgumentException
      */
-    public function saveOpen(int $articleId, int $userId, ?string $referrer)
+    public function saveOpen(int $articleId, int $userId, ?string $referrer): array
     {
-        if ((new ValidOpenReferrer())->isSatisfiedBy($referrer)) {
-            return $this->statisticsMapper->save($this->statisticsMapper->createModel()
-                ->setArticleId($articleId)
-                ->setUserId($userId)
-                ->setType(Mapper::TYPE_OPEN)
-                ->setReferrer($referrer));
+        /* Invalid referrer; ignore recording an Open
+         */
+        if (!(new ValidOpenReferrer())->isSatisfiedBy($referrer)) {
+            return [];
         }
 
-        return false;
+        /* Record uniques only
+         * If the current (articleId, userId, referrer) tuple exists in the db
+         * don't record a dupe Conversion, nor increment the cumulative tally
+         *
+         * We can't rely on the INSERT ON DUPLICATE idea because I also need to
+         * increment cumulative total if (and only if) a unique Conversion was made
+         */
+        $existing = $this->statisticsMapper->countByColumnList([
+            'article_id' => $articleId,
+            'type' => Mapper::TYPE_CONVERSION,
+            'user_id' => $userId,
+            'referrer' => $referrer
+        ]);
+
+        if ($existing) {
+            return [];
+        }
+
+        /* Opens come in two flavours:
+         *  - with a null referrer (which means they accessed the url directly)
+         *  - with a non-null referrer (which means they came from some other link we provided)
+         *
+         * Null referrers (direct opens) are recorded separately from Conversions which are
+         * opens that occur with a non-null referrer.
+         */
+        $model = $this->statisticsMapper->createModel()
+            ->setArticleId($articleId)
+            ->setUserId($userId)
+            ->setReferrer($referrer);
+
+        if (null !== $referrer) {
+
+            /* It's a valid referrer and $user hasn't been Converted this period
+             * so add a Conversion record and increment the cumulative total
+             */
+            $this->statisticsCumulativeMapper->incrementConversion($articleId, $referrer);
+
+            $model->setType(Mapper::TYPE_CONVERSION);
+        } else {
+
+            /* It's a valid referrer and $user hasn't Opened this period
+             * so add an Open record and increment the cumulative total
+             */
+            $this->statisticsCumulativeMapper->incrementOpen($articleId, $referrer);
+
+            $model->setType(Mapper::TYPE_OPEN);
+        }
+
+        return $this->statisticsMapper->save($model);
     }
 
 

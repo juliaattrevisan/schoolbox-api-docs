@@ -35,6 +35,20 @@ class Mapper extends \Schoolbox\Mapper
     ];
 
     /**
+     * Map a referrer string to its corresponding incrementer column
+     * so I don't risk an sql injection
+     *
+     * @var array
+     */
+    private $conversionColumnMap = [
+        Statistics\Mapper::REFERRER_DASHBOARD => 'num_conversions_dashboard',
+        Statistics\Mapper::REFERRER_HOMEPAGE => 'num_conversions_homepage',
+        Statistics\Mapper::REFERRER_INDEX => 'num_conversions_index',
+        Statistics\Mapper::REFERRER_ARCHIVE => 'num_conversions_archive',
+        Statistics\Mapper::REFERRER_EMAIL => 'num_conversions_email',
+    ];
+
+    /**
      * @inheritdoc
      * @throws \Schoolbox\Mapper\Exception
      * @throws \InvalidArgumentException
@@ -66,7 +80,7 @@ class Mapper extends \Schoolbox\Mapper
 
 
     /**
-     * Record an impression for $articleId
+     * Record an Impression for $articleId
      * Only increment known referrers
      *
      * @param int         $articleId
@@ -105,34 +119,94 @@ class Mapper extends \Schoolbox\Mapper
 
             return $this->save($model);
         }
+
+        return false;
     }
 
 
     /**
-     * Record an impression for $articleId
-     * ie. $userId has witnessed $articleId
+     * Record an Conversion for $articleId
+     * ie. $userId has opened $articleId via an Impression
      *
-     * $referrer indicates a link they clicked to initiate the open
+     * $referrer indicates a link they clicked to initiate the Conversion
      *
-     * It can be null if someone directly typed in the url, or opened it from some random place
-     * that we don't know about
+     * Conversions cannot have a null referrer (despite that being considered valid
+     * for general usage, it's invalid for this particular usage)
      *
      * @param int         $articleId
-     * @param int         $userId
      * @param null|string $referrer
+     * @return bool|int[]
+     * @throws \InvalidArgumentException
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     */
+    public function incrementConversion(int $articleId, string $referrer)
+    {
+        if (!(new Statistics\ValidOpenReferrer())->isSatisfiedBy($referrer)) {
+            return false;
+        }
+
+        /* Detect which referrer to increment using a mapper method
+         */
+        $get = $this->getGetMethodName($this->getPropertyFromColumn($this->conversionColumnMap[$referrer]));
+        $set = $this->getSetMethodName($this->getPropertyFromColumn($this->conversionColumnMap[$referrer]));
+
+        try {
+            $model = $this->findOneByColumnList([
+                'date' => \Alaress_Date_Format::now()->getDatabaseDate(),
+                'article_id' => $articleId
+            ]);
+
+            $model->$set((int)$model->$get() + 1);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            $now = \Alaress_Date_Format::now();
+
+            $model = $this->createModel()
+                ->setDate($now->getDateOnly())
+                ->setArticleId($articleId)
+                ->setFirstOpen($now)
+                ->$set(1);
+        }
+
+        return $this->save($model);
+    }
+
+
+    /**
+     * Record an Conversion for $articleId
+     * ie. $userId has opened $articleId via an Impression
+     *
+     * $referrer indicates a link they clicked to initiate the Conversion
+     *
+     * It can be null if someone directly typed in the url so in this case,
+     * $referrer has no utility.
+     *
+     * @param int $articleId
      * @return bool|int[]
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    public function incrementOpen(int $articleId, int $userId, ?string $referrer)
+    public function incrementOpen(int $articleId)
     {
-        if ((new ValidOpenReferrer())->isSatisfiedBy($referrer)) {
-            return $this->save($this->createModel()
+        try {
+            $model = $this->findOneByColumnList([
+                'date' => \Alaress_Date_Format::now()->getDatabaseDate(),
+                'article_id' => $articleId
+            ]);
+
+            $model->setNumOpens((int)$model->getNumOpens() + 1);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            $now = \Alaress_Date_Format::now();
+
+            $model = $this->createModel()
+                ->setDate($now->getDateOnly())
                 ->setArticleId($articleId)
-                ->setUserId($userId)
-                ->setType(self::TYPE_OPEN)
-                ->setReferrer($referrer));
+                ->setFirstOpen($now)
+                ->setNumOpens(1);
         }
+
+        return $this->save($model);
     }
 }

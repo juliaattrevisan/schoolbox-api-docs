@@ -464,6 +464,7 @@ class Controller extends Base
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \UnexpectedValueException
      * @throws \PDOException
+     * @throws InvalidArgumentException
      */
     public function getDetail(Model $article)
     {
