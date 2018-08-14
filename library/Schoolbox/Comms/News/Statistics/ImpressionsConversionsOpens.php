@@ -90,7 +90,7 @@ class ImpressionsConversionsOpens
      * @param int         $articleId
      * @param int         $userId
      * @param null|string $referrer
-     * @return int[]
+     * @return bool|int[]
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
@@ -102,7 +102,7 @@ class ImpressionsConversionsOpens
         /* Invalid referrer; ignore recording an Impression
          */
         if (!(new ValidImpressionReferrer())->isSatisfiedBy($referrer)) {
-            return [];
+            return false;
         }
 
         /* Record uniques only
@@ -120,7 +120,7 @@ class ImpressionsConversionsOpens
         ]);
 
         if ($existing) {
-            return [];
+            return false;
         }
 
         /* It's a valid referrer and $user hasn't been Impressed this period
@@ -148,7 +148,7 @@ class ImpressionsConversionsOpens
      * @param int         $articleId
      * @param int         $userId
      * @param null|string $referrer
-     * @return int[]
+     * @return bool|int[]
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
@@ -159,7 +159,7 @@ class ImpressionsConversionsOpens
         /* Invalid referrer; ignore recording an Open
          */
         if (!(new ValidOpenReferrer())->isSatisfiedBy($referrer)) {
-            return [];
+            return false;
         }
 
         /* Record uniques only
@@ -177,7 +177,7 @@ class ImpressionsConversionsOpens
         ]);
 
         if ($existing) {
-            return [];
+            return false;
         }
 
         /* Opens come in two flavours:
