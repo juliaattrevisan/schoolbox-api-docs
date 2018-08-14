@@ -15,6 +15,7 @@ $assessHandler = new Assess_Main();
 $questionHandler = new Assess_Question();
 $answerHandler = new Assess_Answer();
 $sectionHandler = new Assess_Section();
+$responseHandler = new Assess_Response();
 $groupHandler = new Group();
 
 /* Soft delete the question
@@ -58,6 +59,8 @@ $answerHandler->update(array(
     'answer_id' => $answer['answer_id'],
     'deleted_at' => 'NOW()',
 ));
+
+$responseHandler->deleteResponsesForQuestion($question['question_id']);
 
 /* Reorder questions because sequence corresponds to question number
  */

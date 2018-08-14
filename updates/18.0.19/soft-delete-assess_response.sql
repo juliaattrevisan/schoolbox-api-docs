@@ -1,0 +1,1 @@
+UPDATE assess_response, assess_question SET assess_response.deleted_at=assess_question.deleted_at WHERE assess_response.question_id=assess_question.question_id AND assess_question.deleted_at IS NOT NULL AND assess_response.deleted_at IS NULL;
