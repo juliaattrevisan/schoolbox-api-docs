@@ -220,7 +220,7 @@
 
     {% endfor %}
 
-    {% if showRubricTotal and markSchemeName != "None" and not hidePoints %}
+    {% if showRubricTotal and markSchemeName != "None" and (config.rubric_show_points or not studentView) %}
         <tr>
             <th class="rb-final-summary" colspan="{{ rubric.levels|length + 2 }}">
                 <span data-final-summary="{{ rubricId }}"
