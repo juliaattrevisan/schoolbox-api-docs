@@ -26,8 +26,7 @@
             var defaults = {
                 element: element,
                 container: '[data-component]',
-                iconExpand: 'icon-down-arrow',
-                iconCollapse: 'icon-up-arrow'
+                iconExpand: 'expanded'
             }
 
             var derived = {
@@ -117,7 +116,7 @@
      * @param icon
      */
     $.fn.executeIconToggle = function(icon) {
-        var classes = this.config ? [ this.config.iconExpand, this.config.iconCollapse ] : [ 'icon-down-arrow', 'icon-up-arrow' ];
-        icon.toggleClass(classes.join(' '));
+        var classes = this.config ? this.config.iconExpand : 'expanded';
+        icon.toggleClass(classes);
     }
 }(jQuery));
