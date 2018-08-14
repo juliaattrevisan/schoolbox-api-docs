@@ -91,12 +91,12 @@ class ImpressionsConversionsOpens
      * @param int         $userId
      * @param null|string $referrer
      * @return bool|int[]
+     * @throws \InvalidArgumentException
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
-     * @throws \InvalidArgumentException
      */
-    public function saveImpression(int $articleId, int $userId, ?string $referrer): array
+    public function saveImpression(int $articleId, int $userId, ?string $referrer)
     {
 
         /* Invalid referrer; ignore recording an Impression
@@ -154,7 +154,7 @@ class ImpressionsConversionsOpens
      * @throws \UnexpectedValueException
      * @throws \InvalidArgumentException
      */
-    public function saveConversionOpen(int $articleId, int $userId, ?string $referrer): array
+    public function saveConversionOpen(int $articleId, int $userId, ?string $referrer)
     {
         /* Invalid referrer; ignore recording an Open
          */
