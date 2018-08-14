@@ -84,6 +84,16 @@
             },
 
             xAxis: {
+
+                {# We don't care about seconds/milliseconds in display
+                 # Our highest granularity is Minutes.
+                 #}
+                dateTimeLabelFormats: {
+                    millisecond: '%l:%M%P',
+                    second: '%l:%M%P',
+                    minute: '%l:%M%P',
+                    hour: '%l:%M%P'
+                },
                 title: {
                     text: 'Date'
                 },
