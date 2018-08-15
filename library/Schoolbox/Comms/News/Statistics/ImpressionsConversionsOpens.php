@@ -87,7 +87,7 @@ class ImpressionsConversionsOpens
      * $referrer indicates a place where they saw the Impression and can't be null for this use case
      * Unknown referrers are disregarded
      *
-     * @param int         $articleId
+     * @param News\Model  $article
      * @param int         $userId
      * @param null|string $referrer
      * @return bool|int[]
@@ -96,8 +96,13 @@ class ImpressionsConversionsOpens
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    public function saveImpression(int $articleId, int $userId, ?string $referrer)
+    public function saveImpression(News\Model $article, int $userId, ?string $referrer)
     {
+        /* Only record Impressions for publicly-accessible articles
+         */
+        if (!$article->isPublished()) {
+            return false;
+        }
 
         /* Invalid referrer; ignore recording an Impression
          */
@@ -113,7 +118,7 @@ class ImpressionsConversionsOpens
          * increment cumulative total if (and only if) a unique Impression was made
          */
         $existing = $this->statisticsMapper->countByColumnList([
-            'article_id' => $articleId,
+            'article_id' => $article->getId(),
             'type' => Mapper::TYPE_IMPRESSION,
             'user_id' => $userId,
             'referrer' => $referrer
@@ -126,15 +131,16 @@ class ImpressionsConversionsOpens
         /* It's a valid referrer and $user hasn't been Impressed this period
          * so add an Impression record and increment the cumulative total
          */
-        $this->statisticsCumulativeMapper->incrementImpression($articleId, $referrer);
+        $this->statisticsCumulativeMapper->incrementImpression($article->getId(), $referrer);
 
         return $this->statisticsMapper->save($this->statisticsMapper->createModel()
-            ->setArticleId($articleId)
+            ->setArticleId($article->getId())
             ->setUserId($userId)
             ->setType(Mapper::TYPE_IMPRESSION)
             ->setReferrer($referrer)
             ->setOccursAt(\Alaress_Date_Format::now()));
     }
+
 
 
     /**
@@ -146,17 +152,23 @@ class ImpressionsConversionsOpens
      * It can be null if someone directly typed in the url, or opened it from some random place
      * that we don't know about. Unknown referrers are disregarded
      *
-     * @param int         $articleId
+     * @param News\Model  $article
      * @param int         $userId
      * @param null|string $referrer
      * @return bool|int[]
+     * @throws \InvalidArgumentException
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
-     * @throws \InvalidArgumentException
      */
-    public function saveConversionOpen(int $articleId, int $userId, ?string $referrer)
+    public function saveConversionOpen(News\Model $article, int $userId, ?string $referrer)
     {
+        /* Only record Conversions for publicly-accessible articles
+         */
+        if (!$article->isPublished()) {
+            return false;
+        }
+
         /* Invalid referrer; ignore recording an Open
          */
         if (!(new ValidOpenReferrer())->isSatisfiedBy($referrer)) {
@@ -171,7 +183,7 @@ class ImpressionsConversionsOpens
          * increment cumulative total if (and only if) a unique Conversion was made
          */
         $existing = $this->statisticsMapper->countByColumnList([
-            'article_id' => $articleId,
+            'article_id' => $article->getId(),
             'type' => Mapper::TYPE_CONVERSION,
             'user_id' => $userId,
             'referrer' => $referrer
@@ -189,7 +201,7 @@ class ImpressionsConversionsOpens
          * opens that occur with a non-null referrer.
          */
         $model = $this->statisticsMapper->createModel()
-            ->setArticleId($articleId)
+            ->setArticleId($article->getId())
             ->setUserId($userId)
             ->setReferrer($referrer)
             ->setOccursAt(\Alaress_Date_Format::now());
@@ -199,7 +211,7 @@ class ImpressionsConversionsOpens
             /* It's a valid referrer and $user hasn't been Converted this period
              * so add a Conversion record and increment the cumulative total
              */
-            $this->statisticsCumulativeMapper->incrementConversion($articleId, $referrer);
+            $this->statisticsCumulativeMapper->incrementConversion($article->getId(), $referrer);
 
             $model->setType(Mapper::TYPE_CONVERSION);
         } else {
@@ -207,7 +219,7 @@ class ImpressionsConversionsOpens
             /* It's a valid referrer and $user hasn't Opened this period
              * so add an Open record and increment the cumulative total
              */
-            $this->statisticsCumulativeMapper->incrementOpen($articleId, $referrer);
+            $this->statisticsCumulativeMapper->incrementOpen($article->getId(), $referrer);
 
             $model->setType(Mapper::TYPE_OPEN);
         }

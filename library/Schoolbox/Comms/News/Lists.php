@@ -242,7 +242,7 @@ class Lists
                     $this->databaseInternal,
                     $this->statisticsMapper,
                     $this->statisticsCumulativeMapper
-                ))->saveImpression($articleId, $user->getId(), $params->getReferrer());
+                ))->saveImpression($record, $user->getId(), $params->getReferrer());
             }
         }
 

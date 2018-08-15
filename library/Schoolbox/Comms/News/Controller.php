@@ -494,7 +494,7 @@ class Controller extends Base
          * referrer value determines what kind it was
          */
         (new ImpressionsConversionsOpens($this->databaseInternal, $this->statisticsMapper, $this->statisticsCumulativeMapper))
-            ->saveConversionOpen($article->getId(), $this->getUser()->getId(), $this->getRequest()->query[Querystring::REFERRER]);
+            ->saveConversionOpen($article, $this->getUser()->getId(), $this->getRequest()->query[Querystring::REFERRER]);
 
         // don't supply the extra twig-necessary data if just returning JSON
         if ($this->isJsonRequest()) {
