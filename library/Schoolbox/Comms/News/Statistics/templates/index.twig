@@ -1,12 +1,33 @@
-
 <div class="row">
     <div class="small-12 columns">
         <h1>Statistics for {{ article.title }}</h1>
     </div>
 </div>
 
-{% include '@commsNewsStatistics/impressions-conversions-opens.twig' with {
-    article: article,
-    accuracy: accuracy,
-    series: series
-} %}
+<script src="https://code.highcharts.com/highcharts.js"></script>
+
+<div class="row">
+    <div class="small-12 island">
+        {% include '@commsNewsStatistics/cumulative-summary.twig' with {
+            cumulative: cumulative
+        } %}
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        {% include '@commsNewsStatistics/referrer-demographic.twig' with {
+            referrerDemographic: referrerDemographic
+        } %}
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        {% include '@commsNewsStatistics/referrer-chronological.twig' with {
+            article: article,
+            accuracy: accuracy,
+            series: series
+        } %}
+    </div>
+</div>

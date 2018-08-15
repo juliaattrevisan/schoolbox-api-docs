@@ -1,0 +1,99 @@
+{##
+ # Referrer Demographics, periodic outlook
+ #
+ # @param array referrerDemographic
+ #}
+<script>
+    $(function() {
+        $('#referrerDemographic').highcharts({
+            chart: {
+                type: 'bar'
+            },
+
+            credits: {
+                enabled: false
+            },
+
+            time: {
+                useUTC: false
+            },
+
+            title: {
+                text: ''
+            },
+
+            xAxis: {
+                categories: ['Impressions', 'Conversions']
+            },
+
+            yAxis: [
+                {
+                    allowDecimals: false,
+                    min: 0,
+                    title: {
+                        text: 'Number of interactions'
+                    }
+                }
+            ],
+
+            tooltip: {
+                useHTML: true
+            },
+
+            plotOptions: {
+                series: {
+                    stacking: 'normal'
+                }
+            },
+
+            series: [
+                {
+                    color: '#f2c96d',
+                    name: 'Dashboard',
+                    data: [
+                        {{ referrerDemographic['impression']['dashboard'] }},
+                        {{ referrerDemographic['conversion']['dashboard'] }}
+                    ]
+                },
+                {
+                    color: '#bf1b00',
+                    name: 'Homepage',
+                    data: [
+                        {{ referrerDemographic['impression']['homepage'] }},
+                        {{ referrerDemographic['conversion']['homepage'] }}
+                    ]
+                },
+                {
+                    color: '#6ed0e0',
+                    name: 'Index',
+                    data: [
+                        {{ referrerDemographic['impression']['index'] }},
+                        {{ referrerDemographic['conversion']['index'] }}
+                    ]
+                },
+                {
+                    color: '#0a437c',
+                    name: 'Archive',
+                    data: [
+                        {{ referrerDemographic['impression']['archive'] }},
+                        {{ referrerDemographic['conversion']['archive'] }}
+                    ]
+                },
+                {
+                    color: '#ba43a9',
+                    name: 'Email',
+                    data: [
+                        {{ referrerDemographic['impression']['email'] }},
+                        {{ referrerDemographic['conversion']['email'] }}
+                    ]
+                }
+            ]
+        });
+    });
+</script>
+<h2 class="subheader">Referrer Demographic</h2>
+<p class="meta">Statistics from the last 30 days.</p>
+
+<section class="content">
+    <div id="referrerDemographic"></div>
+</section>

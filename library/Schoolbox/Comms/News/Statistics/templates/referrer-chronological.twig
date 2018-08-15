@@ -1,0 +1,184 @@
+{##
+ # Referrers Over Time
+ #
+ # @param News\Model $article
+ # @param array series
+ # @param int accuracy
+ #}
+<script>
+    $(function() {
+        $('#graph').highcharts({
+
+            /* can use inverted:true to make it horizontal'
+             */
+            chart: {
+                type: 'column',
+                zoomType: 'xy'
+            },
+
+            credits: {
+                enabled: false
+            },
+
+            time: {
+                useUTC: false
+            },
+
+            title: {
+                text: ''
+            },
+
+            xAxis: {
+
+                {# We don't care about seconds/milliseconds in display
+                 # Our highest granularity is Minutes.
+                 #}
+                dateTimeLabelFormats: {
+                    millisecond: '%l:%M%P',
+                    second: '%l:%M%P',
+                    minute: '%l:%M%P',
+                    hour: '%l:%M%P'
+                },
+                title: {
+                    text: 'Date'
+                },
+                type: 'datetime'
+            },
+
+            yAxis: [
+                {
+                    allowDecimals: false,
+                    min: 0,
+                    title: {
+                        text: 'Number of interactions'
+                    }
+                },
+                {
+                    labels: {
+                        style: {
+                            color: '#629e51'
+                        }
+                    },
+                    lineColor: '#629e51',
+                    lineWidth: 1,
+                    max: 100,
+                    title: {
+                        allowDecimals: true,
+                        style: {
+                            color: '#629e51'
+                        },
+                        text: 'Conversion Ratio (%)'
+                    },
+                    opposite: true
+                }
+            ],
+
+            legend: {
+                itemMarginBottom: 8
+            },
+
+            tooltip: {
+                useHTML: true
+            },
+
+            plotOptions: {
+                column: {
+                    stacking: 'normal'
+                }
+            },
+
+            series: [
+                {
+                    color: '#f9e2d2',
+                    name: 'Impressions/Dashboard',
+                    data: {{ series['impression']['dashboard']|json_encode|raw }}
+                },
+                {
+                    color: '#f2c96d',
+                    name: 'Impressions/Homepage',
+                    data: {{ series['impression']['homepage']|json_encode|raw }}
+                },
+                {
+                    color: '#f9934e',
+                    name: 'Impressions/Index',
+                    data: {{ series['impression']['index']|json_encode|raw }}
+                },
+                {
+                    color: '#bf1b00',
+                    name: 'Impressions/Archive',
+                    data: {{ series['impression']['archive']|json_encode|raw }}
+                },
+                {
+                    color: '#58140c',
+                    name: 'Impressions/Email',
+                    data: {{ series['impression']['email']|json_encode|raw }}
+                },
+                {
+                    color: '#6ed0e0',
+                    name: 'Conversions/Dashboard',
+                    data: {{ series['conversion']['dashboard']|json_encode|raw }}
+                },
+                {
+                    color: '#1f78c1',
+                    name: 'Conversions/Homepage',
+                    data: {{ series['conversion']['homepage']|json_encode|raw }}
+                },
+                {
+                    color: '#0a437c',
+                    name: 'Conversions/Index',
+                    data: {{ series['conversion']['index']|json_encode|raw }}
+                },
+                {
+                    color: '#806eb7',
+                    name: 'Conversions/Archive',
+                    data: {{ series['conversion']['archive']|json_encode|raw }}
+                },
+                {
+                    color: '#ba43a9',
+                    name: 'Conversions/Email',
+                    data: {{ series['conversion']['email']|json_encode|raw }}
+                },
+                {
+                    color: '#878787',
+                    name: 'Non-referred Opens',
+                    data: {{ series['open']['unknown']|json_encode|raw }}
+                },
+                {
+                    color: '#629e51',
+                    lineWidth: 1,
+                    marker: {
+                        radius: 3
+                    },
+                    name: 'Conversion Ratio (%)',
+                    data: {{ series['conversionRatio']|json_encode|raw }},
+                    type: 'line',
+                    yAxis: 1
+                }
+            ]
+        });
+
+        {# Accuracy selector #}
+        $('#accuracy').on('change', function(event) {
+            event.preventDefault();
+
+            window.location.href = $(this).val();
+        });
+    });
+</script>
+<h2 class="subheader">Periodic Outlook</h2>
+<p class="meta">Statistics from the last 30 days. Click and drag the graph to zoom.</p>
+
+<section class="content">
+    <div id="graph"></div>
+
+    <label for="accuracy">Accuracy</label>
+    <p class="meta">Change the way the graph condenses data.</p>
+
+    {% set route = routeLookupIfAuthorized('commsNewsStatistics.getOverview', {articleId: article.id}) %}
+
+    <select id="accuracy">
+        {% for value, label in accuracies %}
+            <option value="{{ route }}?accuracy={{ value }}" {% if value == accuracy %}selected="selected"{% endif %}>{{ value }}</option>
+        {% endfor %}
+    </select>
+</section>
