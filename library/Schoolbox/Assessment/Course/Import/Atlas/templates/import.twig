@@ -198,11 +198,25 @@
         $('input[data-mage-next="part-3"]').mage({
             validateOptions: {
                 invalidHandler: function (event, validator) {
-                    // Any invalid elements: ensure they're expanded
-                    console.log(validator);
+                    // Ensure any units with invalid inputs are expanded
+                    var units       = $('#curriculum-plan-units'),
+                        $collapsers = $();
+
+                    // Find collapsers
                     Object.keys(validator.invalid).forEach(function(v) {
-                        console.log(v);
+                        var $element     = units.find('[name="' + v + '"]'),
+                            $collapsable = $element.closest('[data-collapsable]');
+
+                        if ($collapsable.data('collapse-state') === 'collapsed') {
+                            var $collapser = units.find('[data-collapser="' + $collapsable.data('collapsable') + '"]');
+                            $collapsers = $collapsers.add($collapser);
+                        }
                     });
+
+                    // Click each unique one
+                    $.unique($collapsers).each(function () {
+                        $(this).click();
+                    })
                 }
             },
             confirmRevert: function (e, revert) {
