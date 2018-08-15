@@ -17,12 +17,22 @@
                 enabled: false
             },
 
+            plotOptions: {
+                series: {
+                    stacking: 'normal'
+                }
+            },
+
             time: {
                 useUTC: false
             },
 
             title: {
                 text: 'Referrer Demographic'
+            },
+
+            tooltip: {
+                useHTML: true
             },
 
             xAxis: {
@@ -38,16 +48,6 @@
                     }
                 }
             ],
-
-            tooltip: {
-                useHTML: true
-            },
-
-            plotOptions: {
-                series: {
-                    stacking: 'normal'
-                }
-            },
 
             series: [
                 {

@@ -8,9 +8,6 @@
 <script>
     $(function() {
         $('#conversions-chronological').highcharts({
-
-            /* can use inverted:true to make it horizontal'
-             */
             chart: {
                 height: 500,
                 spacingBottom: 64,
@@ -22,12 +19,22 @@
                 enabled: false
             },
 
+            plotOptions: {
+                column: {
+                    stacking: 'normal'
+                }
+            },
+
             time: {
                 useUTC: false
             },
 
             title: {
                 text: 'Conversions'
+            },
+
+            tooltip: {
+                useHTML: true
             },
 
             xAxis: {
@@ -52,16 +59,6 @@
                 min: 0,
                 title: {
                     text: 'Number of Conversions'
-                }
-            },
-
-            tooltip: {
-                useHTML: true
-            },
-
-            plotOptions: {
-                column: {
-                    stacking: 'normal'
                 }
             },
 

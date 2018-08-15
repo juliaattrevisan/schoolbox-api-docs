@@ -10,9 +10,6 @@
 <script>
     $(function() {
         $('#interaction-referrers').highcharts({
-
-            /* can use inverted:true to make it horizontal'
-             */
             chart: {
                 height: 500,
                 spacingBottom: 64,
@@ -24,12 +21,26 @@
                 enabled: false
             },
 
+            legend: {
+                itemMarginBottom: 8
+            },
+
+            plotOptions: {
+                column: {
+                    stacking: 'normal'
+                }
+            },
+
             time: {
                 useUTC: false
             },
 
             title: {
                 text: 'Interaction Referrers'
+            },
+
+            tooltip: {
+                useHTML: true
             },
 
             xAxis: {
@@ -76,20 +87,6 @@
                     opposite: true
                 }
             ],
-
-            legend: {
-                itemMarginBottom: 8
-            },
-
-            tooltip: {
-                useHTML: true
-            },
-
-            plotOptions: {
-                column: {
-                    stacking: 'normal'
-                }
-            },
 
             series: [
                 {
