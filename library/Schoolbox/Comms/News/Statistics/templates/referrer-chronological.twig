@@ -151,7 +151,7 @@
                         radius: 3
                     },
                     name: 'Conversion Ratio (%)',
-                    data: {{ series['conversionRatio']|json_encode|raw }},
+                    data: {{ conversionRatio|json_encode|raw }},
                     type: 'line',
                     yAxis: 1
                 }

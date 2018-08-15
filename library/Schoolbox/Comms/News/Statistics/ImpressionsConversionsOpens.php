@@ -280,7 +280,6 @@ class ImpressionsConversionsOpens
         ]);
 
         $data = [];
-        $interactions = [];
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $type = $row['type'];
@@ -295,10 +294,53 @@ class ImpressionsConversionsOpens
             /* Stack it
              */
             $data[$type][$referrer][] = [(int)$row['timestamp'], (int)$row['num'], date("Y-m-d H:i:s", $row['timestamp']/1000)];
+        }
 
-            /* Summate for a conversion ratio
-             */
-            $interactions[(int)$row['timestamp']][$type]++;
+        return $data;
+    }
+
+
+    /**
+     * The average conversion ratio over time
+     *
+     * Fetch data set separately from its previous home in fetchInteractionReferrers()
+     *
+     * @param News\Model  $article
+     * @param null|string $accuracy
+     * @return array
+     * @throws \Alaress\Database\Exception
+     */
+    public function fetchConversionRatio(News\Model $article, ?string $accuracy = self::DEFAULT_ACCURACY): array
+    {
+        /* Determine a sane value
+         */
+        $accuracySql = self::ACCURACIES[$this->assertAccuracy($accuracy)];
+
+        /* Get all the timestamps that have content - because of the way highcharts stacks its data
+         * I need to initialise the container with all the possibilities and stack categorised data in-order
+         */
+        $statement = $this->database->prepareQuery("
+            SELECT 
+                CAST(1000*UNIX_TIMESTAMP({$accuracySql}) AS UNSIGNED) AS timestamp,
+                COUNT(*) AS num,
+                `type`,
+                `referrer`
+            FROM {$this->statisticsMapper->getTable()}
+            WHERE article_id = :articleId
+            AND deleted_at IS NULL
+            GROUP BY timestamp, `type`, referrer
+            ORDER BY timestamp
+        ");
+
+        $statement->execute([
+            'articleId' => $article->getId()
+        ]);
+
+        $data = [];
+        $interactions = [];
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $interactions[(int)$row['timestamp']][$row['type']]++;
         }
 
         /* Figure out the average conversion ratio over time
@@ -310,7 +352,7 @@ class ImpressionsConversionsOpens
             $numerator += $current['conversion'];
             $denominator += $current['impression'];
 
-            $data['conversionRatio'][] = [$timestamp, $this->percentage($numerator, $denominator)];
+            $data[] = [$timestamp, $this->percentage($numerator, $denominator)];
         }
 
         return $data;

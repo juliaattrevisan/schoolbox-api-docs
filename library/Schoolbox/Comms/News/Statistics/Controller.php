@@ -81,6 +81,10 @@ class Controller extends Base
             'accuracies' => ImpressionsConversionsOpens::ACCURACIES,
             'accuracy' => $accuracy,
             'series' => $impressionsConversionsOpens->fetchInteractionReferrers($article, $accuracy),
+
+            /* Conversion Ratio Chronological
+             */
+            'conversionRatio' => $impressionsConversionsOpens->fetchConversionRatio($article, $accuracy)
         ])->setTitle("Statistics for {$article->getTitle()}"));
     }
 }
