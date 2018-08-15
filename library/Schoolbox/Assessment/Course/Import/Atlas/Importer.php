@@ -231,6 +231,7 @@ class Importer
                 foreach ($unit->getAttachments() as $attachment) {
                     $attachmentSelection = $unitSelection['attachment'][$attachment->getId()] ?? [];
                     if (!empty($attachmentSelection['selected'])) {
+                        $attachment->setTitle($attachmentSelection['title']);
                         $this->createAttachment(
                             $attachment,
                             $unitSpec->getFolder(),
@@ -247,6 +248,7 @@ class Importer
                 foreach ($unit->getAssessments() as $assessment) {
                     $assessmentSelection = $unitSelection['assessment'][$assessment->getId()] ?? [];
                     if (!empty($assessmentSelection['selected'])) {
+                        $assessment->setTitle($assessmentSelection['title']);
                         $this->createDueWork($assessment, $unitSpec, $unitSpecNode, $standardsNode);
                     } else {
                         // This assessment wasn't selected; delete it
