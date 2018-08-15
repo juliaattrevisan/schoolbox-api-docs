@@ -90,9 +90,12 @@
                                                checked
                                                data-checkbox-group="unit-{{ unit.id }}-assessments"
                                         >
-                                        <label for="assessment-{{ assessment.id }}" class="checkbox-label">
-                                            <span class="title">{% if assessment.title %}{{ assessment.title }}{% else %}(no title){% endif %}</span>
-                                        </label>
+                                        <label for="assessment-{{ assessment.id }}" class="checkbox-label"></label>
+                                        <input type="text"
+                                               name="unit[{{ unit.id }}][assessment][{{ assessment.id }}][title]"
+                                               value="{{ assessment.title }}"
+                                               placeholder="Assessment Title"
+                                        />
                                     </div>
                                 </div>
 
@@ -135,7 +138,12 @@
                                                {% if enabled %}checked{% endif %}
                                                data-checkbox-group="unit-{{ unit.id }}-attachments"
                                         >
-                                        <label for="attachment-{{ attachment.id }}" class="checkbox-label"><span class="title">{{ attachment.title }}</span></label>
+                                        <label for="attachment-{{ attachment.id }}" class="checkbox-label"></label>
+                                        <input type="text"
+                                               name="unit[{{ unit.id }}][attachment][{{ attachment.id }}][title]"
+                                               value="{{ attachment.title }}"
+                                               placeholder="Attachment Title"
+                                        />
                                     </div>
 
                                 </div>
