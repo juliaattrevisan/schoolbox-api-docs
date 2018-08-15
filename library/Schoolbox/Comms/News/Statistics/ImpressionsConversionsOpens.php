@@ -323,12 +323,11 @@ class ImpressionsConversionsOpens
             SELECT 
                 CAST(1000*UNIX_TIMESTAMP({$accuracySql}) AS UNSIGNED) AS timestamp,
                 COUNT(*) AS num,
-                `type`,
-                `referrer`
+                `type`
             FROM {$this->statisticsMapper->getTable()}
             WHERE article_id = :articleId
             AND deleted_at IS NULL
-            GROUP BY timestamp, `type`, referrer
+            GROUP BY timestamp, `type`
             ORDER BY timestamp
         ");
 
@@ -340,7 +339,7 @@ class ImpressionsConversionsOpens
         $interactions = [];
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $interactions[(int)$row['timestamp']][$row['type']]++;
+            $interactions[(int)$row['timestamp']][$row['type']] += $row['num'];
         }
 
         /* Figure out the average conversion ratio over time
