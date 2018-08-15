@@ -294,6 +294,10 @@
             })
         }
 
+        // Calculate the sum of selected descriptors on page load,
+        // so we can render the correct value in the Assign From Descs button text
+        // This cannot come from twig because the twig data only includes the actual mark given,
+        // which may have been customised using mark-per-cap discretion
         function initialiseAssignFromDescs() {
             var $groups = $rb.find("[data-group-summary]");
 
@@ -306,8 +310,28 @@
 
                 var descriptorSum = getScaledGroupMark($descriptorCheckboxes, $(this));
 
-                // TODO customise text formatting for various mark types
-                $(this).find(".descriptor-sum").text(descriptorSum);
+                switch(markType) {
+                    case 'TotalMarkFractional':
+                        // Simply use the number as-is
+                        $(this).find(".descriptor-sum").text(descriptorSum);
+                        break;
+
+                    case 'LetterGrade':
+                        // Turn the numeric value into a letter grade
+                        $(this).find(".descriptor-sum").text(getLetterGradeFromNumeric(descriptorSum, getLetterGrades($(this))));
+                        break;
+
+                    case 'Percentage':
+                        // Turn the numeric value into a percentage and append percent sign
+                        var percentage = $(this).data('row-max-sum') > 0 ? descriptorSum * (100 / $(this).data('row-max-sum')) : 0;
+                        $(this).find(".descriptor-sum").text(percentage + "%");
+                        break;
+
+                    default:
+                        // TODO
+                        // We have a "none" mark type
+                }
+
             })
         }
 
