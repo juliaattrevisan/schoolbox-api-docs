@@ -125,6 +125,7 @@
     $(function () {
         // the mage plugin is applied to the submit buttons: setup a basic mage on all the buttons
         $('input[data-mage-next="part-2"]').mage({
+            validateOptions: {},
             confirmRevert: function (e, revert) {
                 // verify that we aren't trying to go FORWARD
                 if (this.nextAll('.current-stop').length > 0) {
@@ -182,6 +183,15 @@
                     } else {
                         $metaSelected.show();
                     }
+                });
+
+                // Assessment/attachment:
+                // Check/uncheck: enable/disable title input
+                units.find('[data-enables]').on('change', function () {
+                    var $this     = $(this),
+                        enablesId = $this.data('enables'),
+                        $target   = units.find('#'+enablesId);
+                    $target.prop('disabled', !$this.prop('checked'));
                 });
             }
         });

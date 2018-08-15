@@ -89,12 +89,15 @@
                                                type="checkbox"
                                                checked
                                                data-checkbox-group="unit-{{ unit.id }}-assessments"
+                                               data-enables="assessment-{{ assessment.id }}-title"
                                         >
                                         <label for="assessment-{{ assessment.id }}" class="checkbox-label"></label>
-                                        <input type="text"
+                                        <input id="assessment-{{ assessment.id }}-title"
+                                               type="text"
                                                name="unit[{{ unit.id }}][assessment][{{ assessment.id }}][title]"
                                                value="{{ assessment.title }}"
                                                placeholder="Assessment Title"
+                                               required
                                         />
                                     </div>
                                 </div>
@@ -137,12 +140,15 @@
                                                {% if enabled is null %}disabled{% endif %}
                                                {% if enabled %}checked{% endif %}
                                                data-checkbox-group="unit-{{ unit.id }}-attachments"
+                                               data-enables="attachment-{{ attachment.id }}-title"
                                         >
                                         <label for="attachment-{{ attachment.id }}" class="checkbox-label"></label>
-                                        <input type="text"
+                                        <input id="attachment-{{ attachment.id }}-title"
+                                               type="text"
                                                name="unit[{{ unit.id }}][attachment][{{ attachment.id }}][title]"
                                                value="{{ attachment.title }}"
                                                placeholder="Attachment Title"
+                                               required
                                         />
                                     </div>
 
