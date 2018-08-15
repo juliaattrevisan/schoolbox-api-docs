@@ -9,13 +9,20 @@
     }
 
     .infographic .value {
-        font-size: 2.5rem;
+        font-size: 2.25rem;
         font-weight:bold;
     }
 
     .infographic .value.percentage span {
         font-size: 1.25rem;
         margin-left: 0.5rem;
+    }
+
+    .ico-grid span {
+        clear: both;
+        display: block;
+        text-transform: uppercase;
+        font-size: 0.6rem;
     }
 </style>
 
@@ -47,6 +54,83 @@
                 <span class="title">Impressions</span>
                 <span class="value">{{ cumulative.numImpressions }}</span>
             </p>
+        </div>
+    </div>
+
+    <div class="row ico-grid">
+        <div class="small-12 medium-6 large-2 columns text-center">
+            Dashboard
+            <div class="row">
+                <div class="small-6 columns text-center">
+                    <span>Conversions</span>
+                    {{ cumulative.breakdown.conversion.dashboard }}
+                </div>
+                <div class="small-6 columns text-center">
+                    <span>Impressions</span>
+                    {{ cumulative.breakdown.impression.dashboard }}
+                </div>
+            </div>
+        </div>
+        <div class="small-12 medium-6 large-2 columns text-center">
+            Homepage
+            <div class="row">
+                <div class="small-6 columns text-center">
+                    <span>Conversions</span>
+                    {{ cumulative.breakdown.conversion.homepage }}
+                </div>
+                <div class="small-6 columns text-center">
+                    <span>Impressions</span>
+                    {{ cumulative.breakdown.impression.homepage }}
+                </div>
+            </div>
+        </div>
+        <div class="small-12 medium-6 large-2 columns text-center">
+            Index
+            <div class="row">
+                <div class="small-6 columns text-center">
+                    <span>Conversions</span>
+                    {{ cumulative.breakdown.conversion.index }}
+                </div>
+                <div class="small-6 columns text-center">
+                    <span>Impressions</span>
+                    {{ cumulative.breakdown.impression.index }}
+                </div>
+            </div>
+        </div>
+        <div class="small-12 medium-6 large-2 columns text-center">
+            Archive
+            <div class="row">
+                <div class="small-6 columns text-center">
+                    <span>Conversions</span>
+                    {{ cumulative.breakdown.conversion.archive }}
+                </div>
+                <div class="small-6 columns text-center">
+                    <span>Impressions</span>
+                    {{ cumulative.breakdown.impression.archive }}
+                </div>
+            </div>
+        </div>
+        <div class="small-12 medium-6 large-2 columns text-center">
+            Email
+            <div class="row">
+                <div class="small-6 columns text-center">
+                    <span>Conversions</span>
+                    {{ cumulative.breakdown.conversion.email }}
+                </div>
+                <div class="small-6 columns text-center">
+                    <span>Impressions</span>
+                    {{ cumulative.breakdown.impression.email }}
+                </div>
+            </div>
+        </div>
+        <div class="small-12 medium-6 large-2 columns text-center">
+            Opens
+            <div class="row">
+                <div class="small-12 columns text-center">
+                    <span>Non-referred Opens</span>
+                    {{ cumulative.breakdown.open }}
+                </div>
+            </div>
         </div>
     </div>
 </section>

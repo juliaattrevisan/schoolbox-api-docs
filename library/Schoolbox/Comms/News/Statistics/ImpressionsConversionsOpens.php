@@ -359,6 +359,8 @@ class ImpressionsConversionsOpens
             ]
         ]);
 
+        $breakdown = [];
+
         foreach ($cumulativeData as $current) {
             if (null === $firstOpen) {
                 $firstOpen = $current->getDate();
@@ -366,6 +368,20 @@ class ImpressionsConversionsOpens
 
             $numImpressions += $current->findTotalImpressions();
             $numConversions += $current->findTotalConversions();
+
+            $breakdown[Mapper::TYPE_CONVERSION][Mapper::REFERRER_DASHBOARD] += $current->getNumConversionsDashboard();
+            $breakdown[Mapper::TYPE_CONVERSION][Mapper::REFERRER_HOMEPAGE] += $current->getNumConversionsHomepage();
+            $breakdown[Mapper::TYPE_CONVERSION][Mapper::REFERRER_INDEX] += $current->getNumConversionsIndex();
+            $breakdown[Mapper::TYPE_CONVERSION][Mapper::REFERRER_ARCHIVE] += $current->getNumConversionsArchive();
+            $breakdown[Mapper::TYPE_CONVERSION][Mapper::REFERRER_EMAIL] += $current->getNumConversionsEmail();
+
+            $breakdown[Mapper::TYPE_IMPRESSION][Mapper::REFERRER_DASHBOARD] += $current->getNumImpressionsDashboard();
+            $breakdown[Mapper::TYPE_IMPRESSION][Mapper::REFERRER_HOMEPAGE] += $current->getNumImpressionsHomepage();
+            $breakdown[Mapper::TYPE_IMPRESSION][Mapper::REFERRER_INDEX] += $current->getNumImpressionsIndex();
+            $breakdown[Mapper::TYPE_IMPRESSION][Mapper::REFERRER_ARCHIVE] += $current->getNumImpressionsArchive();
+            $breakdown[Mapper::TYPE_IMPRESSION][Mapper::REFERRER_EMAIL] += $current->getNumImpressionsEmail();
+
+            $breakdown[Mapper::TYPE_OPEN] += $current->getNumOpens();
         }
 
         /* Calculate ratio
@@ -378,6 +394,7 @@ class ImpressionsConversionsOpens
 
         return [
             'firstOpen' => $firstOpen,
+            'breakdown' => $breakdown,
             'numImpressions' => $numImpressions,
             'numConversions' => $numConversions,
             'conversionRatio' => $conversionRatio
