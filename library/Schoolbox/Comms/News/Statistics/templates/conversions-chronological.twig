@@ -1,0 +1,88 @@
+{##
+ # Conversions Over Time
+ #
+ # @param array conversions
+ #}
+<script>
+    $(function() {
+        $('#conversions-chronological').highcharts({
+
+            /* can use inverted:true to make it horizontal'
+             */
+            chart: {
+                type: 'column',
+                zoomType: 'xy'
+            },
+
+            credits: {
+                enabled: false
+            },
+
+            time: {
+                useUTC: false
+            },
+
+            title: {
+                text: ''
+            },
+
+            xAxis: {
+
+                {# We don't care about seconds/milliseconds in display
+                 # Our highest granularity is Minutes.
+                 #}
+                dateTimeLabelFormats: {
+                    millisecond: '%l:%M%P',
+                    second: '%l:%M%P',
+                    minute: '%l:%M%P',
+                    hour: '%l:%M%P'
+                },
+                title: {
+                    text: 'Date'
+                },
+                type: 'datetime'
+            },
+
+            yAxis: {
+                allowDecimals: false,
+                min: 0,
+                title: {
+                    text: 'Number of Conversions'
+                }
+            },
+
+            legend: {
+                enabled: false
+            },
+
+            tooltip: {
+                useHTML: true
+            },
+
+            plotOptions: {
+                column: {
+                    stacking: 'normal'
+                }
+            },
+
+            series: [
+                {
+                    color: '#ba43a9',
+                    name: 'Conversions',
+                    data: {{ conversions['conversion']|json_encode|raw }}
+                },
+                {
+                    color: '#878787',
+                    name: 'Non-referred Opens',
+                    data: {{ conversions['open']|json_encode|raw }}
+                }
+            ]
+        });
+    });
+</script>
+<h2 class="subheader">Conversions This Period</h2>
+<p class="meta">Statistics from the last 30 days. Click and drag the graph to zoom.</p>
+
+<section class="content">
+    <div id="conversions-chronological"></div>
+</section>

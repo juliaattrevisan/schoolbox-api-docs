@@ -46,12 +46,15 @@ class Controller extends Base
         $this->statisticsCumulativeMapper = $statisticsCumulativeMapper;
     }
 
+
     /**
      * Statistical overview for $article
      *
      * @param News\Model $article
-     * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \Alaress\Database\Exception
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \UnderflowException
      */
     public function getOverview(News\Model $article)
     {
@@ -59,12 +62,27 @@ class Controller extends Base
         $accuracy = $this->getRequest()->query['accuracy'];
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsStatistics/index.twig', [
+
+            /* Cumulative summary
+             */
+            'cumulative' => $impressionsConversionsOpens->fetchCumulative($article),
+
+            /* Referrer Demographics
+             */
+            'referrerDemographic' => $impressionsConversionsOpens->fetchReferrerDemographic($article),
+
+            /* Conversions Chronological
+             */
+            'conversions' => $impressionsConversionsOpens->fetchConversions($article, $accuracy),
+
+            /* Referrer Chronological
+             */
             'article' => $article,
             'accuracies' => ImpressionsConversionsOpens::ACCURACIES,
             'accuracy' => $accuracy,
             'series' => $impressionsConversionsOpens->fetchGranular($article, $accuracy),
-            'cumulative' => $impressionsConversionsOpens->fetchCumulative($article),
-            'referrerDemographic' => $impressionsConversionsOpens->fetchReferrerDemographic($article)
+
+
         ])->setTitle("Statistics for {$article->getTitle()}"));
     }
 }

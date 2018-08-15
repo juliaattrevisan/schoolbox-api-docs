@@ -16,6 +16,8 @@ namespace Schoolbox\Comms\News\Statistics;
 
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\Comms\News;
+use Schoolbox\Comms\News\Statistics\Mapper;
+
 
 class ImpressionsConversionsOpens
 {
@@ -229,6 +231,20 @@ class ImpressionsConversionsOpens
 
 
     /**
+     * @param null|string $accuracy
+     * @return null|string
+     */
+    private function assertAccuracy(?string $accuracy = self::DEFAULT_ACCURACY): ?string
+    {
+        if (!\array_key_exists($accuracy, self::ACCURACIES)) {
+            $accuracy = self::DEFAULT_ACCURACY;
+        }
+
+        return $accuracy;
+    }
+
+
+    /**
      * Assemble all the granular Impressions, Conversions and direct Opens for $article
      *
      * @param News\Model  $article
@@ -241,11 +257,7 @@ class ImpressionsConversionsOpens
 
         /* Determine a sane value
          */
-        if (!\array_key_exists($accuracy, self::ACCURACIES)) {
-            $accuracy = self::DEFAULT_ACCURACY;
-        }
-
-        $accuracySql = self::ACCURACIES[$accuracy];
+        $accuracySql = self::ACCURACIES[$this->assertAccuracy($accuracy)];
 
         /* Get all the timestamps that have content - because of the way highcharts stacks its data
          * I need to initialise the container with all the possibilities and stack categorised data in-order
@@ -256,7 +268,7 @@ class ImpressionsConversionsOpens
                 COUNT(*) AS num,
                 `type`,
                 `referrer`
-            FROM comms_news_article_statistics cnas
+            FROM {$this->statisticsMapper->getTable()}
             WHERE article_id = :articleId
             AND deleted_at IS NULL
             GROUP BY timestamp, `type`, referrer
@@ -324,34 +336,6 @@ class ImpressionsConversionsOpens
 
 
     /**
-     * @param News\Model $article
-     * @return array
-     * @throws \Alaress\Database\Exception
-     */
-    public function fetchReferrerDemographic(News\Model $article): array
-    {
-        $statement = $this->database->prepareQuery('
-            SELECT `type`, `referrer`, COUNT(*) AS num 
-            FROM comms_news_article_statistics
-            WHERE article_id = :articleId
-            GROUP BY `type`, referrer
-            ORDER BY `type`, referrer
-        ');
-
-        $statement->execute([
-            'articleId' => $article->getId()
-        ]);
-
-        $data = [];
-
-        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $data[$row['type']][$row['referrer']] = $row['num'];
-        }
-
-        return $data;
-    }
-
-    /**
      * Fetch Cumulative data
      *
      * @param News\Model $article
@@ -398,5 +382,76 @@ class ImpressionsConversionsOpens
             'numConversions' => $numConversions,
             'conversionRatio' => $conversionRatio
         ];
+    }
+
+
+    /**
+     * @param News\Model  $article
+     * @param null|string $accuracy
+     * @return array
+     * @throws \Alaress\Database\Exception
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \UnderflowException
+     */
+    public function fetchConversions(News\Model $article, ?string $accuracy = self::DEFAULT_ACCURACY): array
+    {
+        /* Determine a sane value
+         */
+        $accuracySql = self::ACCURACIES[$this->assertAccuracy($accuracy)];
+
+        $where = $this->statisticsMapper->getPredicateBuilder()
+            ->equals('article_id', $article->getId())
+            ->in('type', [Mapper::TYPE_CONVERSION, Mapper::TYPE_OPEN])
+            ->getWhere();
+
+        $statement = $this->database->prepareQuery("
+            SELECT 
+                CAST(1000*UNIX_TIMESTAMP({$accuracySql}) AS UNSIGNED) AS timestamp,
+                `type`,
+                COUNT(*) AS num
+            FROM {$this->statisticsMapper->getTable()}
+            {$where}
+            GROUP BY timestamp, `type`
+            ORDER BY timestamp
+        ");
+
+        $statement->execute();
+
+        $data = [];
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $data[$row['type']][] = [(int)$row['timestamp'], (int)$row['num']];
+        }
+
+        return $data;
+    }
+
+
+    /**
+     * @param News\Model $article
+     * @return array
+     * @throws \Alaress\Database\Exception
+     */
+    public function fetchReferrerDemographic(News\Model $article): array
+    {
+        $statement = $this->database->prepareQuery("
+            SELECT `type`, `referrer`, COUNT(*) AS num 
+            FROM {$this->statisticsMapper->getTable()}
+            WHERE article_id = :articleId
+            GROUP BY `type`, referrer
+            ORDER BY `type`, referrer
+        ");
+
+        $statement->execute([
+            'articleId' => $article->getId()
+        ]);
+
+        $data = [];
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $data[$row['type']][$row['referrer']] = $row['num'];
+        }
+
+        return $data;
     }
 }
