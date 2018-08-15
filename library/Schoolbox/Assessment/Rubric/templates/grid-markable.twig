@@ -553,6 +553,7 @@
         })
 
 
+        // Get an array of letter grade {value : letter} pairs
         function getLetterGrades($groupSummary) {
             var grades = [];
             $groupSummary.find("[data-group-max-value] option").each(function(index, option) {
@@ -565,7 +566,7 @@
         }
 
 
-        // Set the letter grade for a capability dropdown based on a numeric mark
+        // Given a percentage mark, set a capability dropdown to its corresponding letter grade
         function assignLetterGrade(numericMark, dropdown) {
             var grades = [];
             dropdown.find("option").each(function(index, option) {
@@ -584,6 +585,7 @@
             dropdown.prop("selectedIndex", optionIndex);
         }
 
+        // Given a percentage mark, find the letter grade that corresponds to its bracket in the marking scheme
         function getLetterGradeFromNumeric(numericMark, grades) {
             var markLetterValue = '';
             for (var i = 0; i < grades.length; i++) {
@@ -596,6 +598,8 @@
             return markLetterValue;
         }
 
+        // Get a percentage-ified mark from a group's unscaled mark
+        // TODO generalise this so it can be used elsewhere
         function getPercentageForGroup($groupSummary) {
             return $groupSummary.data('row-max-sum') > 0 ? $groupSummary.attr('data-mark') * (100 / $groupSummary.data('row-max-sum')) : 0;
         }
@@ -645,6 +649,7 @@
             return scaledGroupSum;
         }
 
+        // Scale an unscaled mark based on a group's max mark
         function scale($groupSummary, value) {
             var groupMax = $groupSummary.data('max');
             var groupRowMaxSum = $groupSummary.data('row-max-sum');
