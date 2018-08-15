@@ -81,8 +81,10 @@ class GridGenerator
         // retrieve marks (descriptor selections for student)
         $query = "
             SELECT
+                rgm.rubric_group_id AS group_id,
+                rgm.value           AS group_value
                 rdm.descriptor_id,
-                rdm.value
+                rdm.value           AS descriptor_value
             FROM rubric_descriptor_mark rdm
             LEFT JOIN rubric_group_mark rgm ON rdm.rubric_group_mark_id = rgm.id
             LEFT JOIN submission_return sr ON sr.id = rgm.return_id
@@ -98,10 +100,16 @@ class GridGenerator
 
         $statement = $this->rubricMapper->getDatabase()->query($query, $pb->getParams());
 
+        $groupIds      = [];
         $descriptorIds = [];
 
         foreach ($statement as $row) {
-            $descriptorIds[(int)$row['descriptor_id']] = isset($row['value']) ? (float)$row['value'] : null;
+            $groupIds[(int)$row['group_id']] = isset($row['group_value'])
+                ? (float)$row['group_value']
+                : null;
+            $descriptorIds[(int)$row['descriptor_id']] = isset($row['descriptor_value'])
+                ? (float)$row['descriptor_value']
+                : null;
         }
 
         return $this->applyMark($descriptorIds);
