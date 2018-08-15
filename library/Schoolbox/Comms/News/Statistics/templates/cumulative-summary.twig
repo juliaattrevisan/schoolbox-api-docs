@@ -18,119 +18,85 @@
         margin-left: 0.5rem;
     }
 
-    .ico-grid span {
-        clear: both;
-        display: block;
-        text-transform: uppercase;
-        font-size: 0.6rem;
+    .ico td,
+    .ico th {
+        text-align: center;
     }
 </style>
 
 <h2 class="subheader">Cumulative Summary</h2>
 <p class="meta">Overall cumulative statistics from all time.</p>
 
-<section class="content">
-    <div class="row">
-        <div class="small-12 medium-3 columns">
-            <p class="infographic">
-                <span class="title">First Open</span>
-                <span class="value">{{ cumulative.firstOpen|date('j M') }}</span>
-            </p>
-        </div>
-        <div class="small-12 medium-3 columns">
-            <p class="infographic">
-                <span class="title">Conversion Ratio</span>
-                <span class="value percentage">{{ cumulative.conversionRatio }}<span>%</span></span>
-            </p>
-        </div>
-        <div class="small-12 medium-3 columns">
-            <p class="infographic">
-                <span class="title">Conversions</span>
-                <span class="value">{{ cumulative.numConversions }}</span>
-            </p>
-        </div>
-        <div class="small-12 medium-3 columns">
-            <p class="infographic">
-                <span class="title">Impressions</span>
-                <span class="value">{{ cumulative.numImpressions }}</span>
-            </p>
+<section>
+    <div class="content">
+        <div class="row">
+            <div class="small-12 medium-3 columns">
+                <p class="infographic">
+                    <span class="title">First Open</span>
+                    <span class="value">{{ cumulative.firstOpen|date('j M') }}</span>
+                </p>
+            </div>
+            <div class="small-12 medium-3 columns">
+                <p class="infographic">
+                    <span class="title">Conversion Ratio</span>
+                    <span class="value percentage">{{ cumulative.conversionRatio }}<span>%</span></span>
+                </p>
+            </div>
+            <div class="small-12 medium-3 columns">
+                <p class="infographic">
+                    <span class="title">Conversions</span>
+                    <span class="value">{{ cumulative.numConversions }}</span>
+                </p>
+            </div>
+            <div class="small-12 medium-3 columns">
+                <p class="infographic">
+                    <span class="title">Impressions</span>
+                    <span class="value">{{ cumulative.numImpressions }}</span>
+                </p>
+            </div>
         </div>
     </div>
 
-    <div class="row ico-grid">
-        <div class="small-12 medium-6 large-2 columns text-center">
-            Dashboard
-            <div class="row">
-                <div class="small-6 columns text-center">
-                    <span>Conversions</span>
-                    {{ cumulative.breakdown.conversion.dashboard }}
-                </div>
-                <div class="small-6 columns text-center">
-                    <span>Impressions</span>
-                    {{ cumulative.breakdown.impression.dashboard }}
-                </div>
-            </div>
-        </div>
-        <div class="small-12 medium-6 large-2 columns text-center">
-            Homepage
-            <div class="row">
-                <div class="small-6 columns text-center">
-                    <span>Conversions</span>
-                    {{ cumulative.breakdown.conversion.homepage }}
-                </div>
-                <div class="small-6 columns text-center">
-                    <span>Impressions</span>
-                    {{ cumulative.breakdown.impression.homepage }}
-                </div>
-            </div>
-        </div>
-        <div class="small-12 medium-6 large-2 columns text-center">
-            Index
-            <div class="row">
-                <div class="small-6 columns text-center">
-                    <span>Conversions</span>
-                    {{ cumulative.breakdown.conversion.index }}
-                </div>
-                <div class="small-6 columns text-center">
-                    <span>Impressions</span>
-                    {{ cumulative.breakdown.impression.index }}
-                </div>
-            </div>
-        </div>
-        <div class="small-12 medium-6 large-2 columns text-center">
-            Archive
-            <div class="row">
-                <div class="small-6 columns text-center">
-                    <span>Conversions</span>
-                    {{ cumulative.breakdown.conversion.archive }}
-                </div>
-                <div class="small-6 columns text-center">
-                    <span>Impressions</span>
-                    {{ cumulative.breakdown.impression.archive }}
-                </div>
-            </div>
-        </div>
-        <div class="small-12 medium-6 large-2 columns text-center">
-            Email
-            <div class="row">
-                <div class="small-6 columns text-center">
-                    <span>Conversions</span>
-                    {{ cumulative.breakdown.conversion.email }}
-                </div>
-                <div class="small-6 columns text-center">
-                    <span>Impressions</span>
-                    {{ cumulative.breakdown.impression.email }}
-                </div>
-            </div>
-        </div>
-        <div class="small-12 medium-6 large-2 columns text-center">
-            Opens
-            <div class="row">
-                <div class="small-12 columns text-center">
-                    <span>Non-referred Opens</span>
-                    {{ cumulative.breakdown.open }}
-                </div>
-            </div>
-        </div>
-    </div>
+    <table class="ico">
+        <thead>
+        <tr>
+            <th>Referrer</th>
+            <th>Conversions</th>
+            <th>Impressions</th>
+            <th>Ratio</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Dashboard</td>
+            <td>{{ cumulative.breakdown.grid.conversion.dashboard }}</td>
+            <td>{{ cumulative.breakdown.grid.impression.dashboard }}</td>
+            <td>{{ cumulative.breakdown.ratio.dashboard }}%</td>
+        </tr>
+        <tr>
+            <td>Homepage</td>
+            <td>{{ cumulative.breakdown.grid.conversion.homepage }}</td>
+            <td>{{ cumulative.breakdown.grid.impression.homepage }}</td>
+            <td>{{ cumulative.breakdown.ratio.homepage }}%</td>
+        </tr>
+        <tr>
+            <td>Index</td>
+            <td>{{ cumulative.breakdown.grid.conversion.index }}</td>
+            <td>{{ cumulative.breakdown.grid.impression.index }}</td>
+            <td>{{ cumulative.breakdown.ratio.index }}%</td>
+        </tr>
+        <tr>
+            <td>Archive</td>
+            <td>{{ cumulative.breakdown.grid.conversion.archive }}</td>
+            <td>{{ cumulative.breakdown.grid.impression.archive }}</td>
+            <td>{{ cumulative.breakdown.ratio.archive }}%</td>
+        </tr>
+        <tr>
+            <td>Email</td>
+            <td>{{ cumulative.breakdown.grid.conversion.email }}</td>
+            <td>{{ cumulative.breakdown.grid.impression.email }}</td>
+            <td>{{ cumulative.breakdown.ratio.email }}%</td>
+        </tr>
+        </tbody>
+    </table>
 </section>

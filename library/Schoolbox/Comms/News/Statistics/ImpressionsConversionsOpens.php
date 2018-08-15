@@ -384,7 +384,7 @@ class ImpressionsConversionsOpens
             $breakdown[Mapper::TYPE_OPEN] += $current->getNumOpens();
         }
 
-        /* Calculate ratio
+        /* Calculate overall conversion ratio
          */
         $conversionRatio = 0.00;
 
@@ -392,13 +392,45 @@ class ImpressionsConversionsOpens
             $conversionRatio = round(100*$numConversions/$numImpressions, 1);
         }
 
+        /* Calculate Conversion ratios for each referrer type
+        */
+        $referrers = [
+            Mapper::REFERRER_DASHBOARD,
+            Mapper::REFERRER_HOMEPAGE,
+            Mapper::REFERRER_INDEX,
+            Mapper::REFERRER_ARCHIVE,
+            Mapper::REFERRER_EMAIL,
+        ];
+
+        $referrerRatio = [];
+
+        foreach ($referrers as $referrer) {
+            $referrerRatio[$referrer] = $this->percentage($breakdown[Mapper::TYPE_CONVERSION][$referrer], $breakdown[Mapper::TYPE_IMPRESSION][$referrer]);
+        }
+
         return [
             'firstOpen' => $firstOpen,
-            'breakdown' => $breakdown,
+            'breakdown' => [
+                'grid' => $breakdown,
+                'ratio' => $referrerRatio
+            ],
             'numImpressions' => $numImpressions,
             'numConversions' => $numConversions,
             'conversionRatio' => $conversionRatio
         ];
+    }
+
+
+    /**
+     * Calculate a integer percentage
+     *
+     * @param int $numerator
+     * @param int $denominator
+     * @return float
+     */
+    private function percentage(int $numerator, int $denominator): float
+    {
+        return $denominator ? round(100*$numerator/$denominator) : 0;
     }
 
 
