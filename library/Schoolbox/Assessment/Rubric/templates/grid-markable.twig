@@ -320,7 +320,8 @@
                         // Turn the numeric value into a letter grade
                         // Don't use scaled values when working with percentages
                         descriptorSum = summateDescriptors($descriptorCheckboxes);
-                        $(this).find(".descriptor-sum").text(getLetterGradeFromNumeric(descriptorSum, getLetterGrades($(this))));
+                        var percentage = $(this).data('row-max-sum') > 0 ? descriptorSum * (100 / $(this).data('row-max-sum')) : 0;
+                        $(this).find(".descriptor-sum").text(getLetterGradeFromNumeric(percentage, getLetterGrades($(this))));
                         break;
 
                     case 'Percentage':
