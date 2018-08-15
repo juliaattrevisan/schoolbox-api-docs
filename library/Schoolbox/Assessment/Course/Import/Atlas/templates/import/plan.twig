@@ -9,7 +9,7 @@
         {% set hasContent      = assessmentCount > 0 or attachmentCount > 0 %}
         <li class="actions-small-1">
             <div class="list-item no-pad {% if not hasContent %}unit-empty{% endif %}">
-                <div class="expander icon-down-arrow" data-collapser="unit-{{ unit.id }}"></div>
+                <div class="expander" data-collapser="unit-{{ unit.id }}"></div>
 
                 <div class="small-6 card">
                     <div class="selector">

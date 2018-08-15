@@ -781,22 +781,35 @@ $rotate-span-width: 11rem;
 
 // Collapsible content
 .collapsible {
-    //@extend .clearfix;
     .information-list{
         clear: both;
     }
 }
 
-[data-collapser] {
+.expander {
     color: $content-ui-foreground;
-    line-height: inherit;
+    line-height: 1;
+    font-size: 1rem;
     text-decoration: none;
-    font-size: 1rem; // icon size
+
+    &:before {
+        @extend .icon-down-arrow;
+        display: inline-block;
+        transition-duration: .2s;
+    }
     &:hover{
         cursor: pointer;
     }
-    &:hover:before {
-        text-decoration: none !important; // forgive me, for I have sinned
+    &.expanded:before {
+        transform: rotate(180deg);
+    }
+
+    // Alternate .expander using different arrows
+    &.alt:before {
+        @extend .icon-next;
+    }
+    &.alt.expanded:before {
+        transform: rotate(90deg);
     }
 }
 

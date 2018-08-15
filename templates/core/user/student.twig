@@ -383,7 +383,7 @@
 
                                                 <!-- Expander -->
                                                 <div class="list-item">
-                                                    <div class="expander icon-down-arrow" data-collapser="collap-contact-{{ loop.index }}"></div>
+                                                    <div class="expander" data-collapser="collap-contact-{{ loop.index }}"></div>
                                                     <div class="compact card small-12">
                                                         {% if contact.main %}
                                                             <a href="/search/user/{{ contact.main.id }}">
@@ -453,7 +453,7 @@
 
                                                 <!-- Expander -->
                                                 <div class="list-item">
-                                                    <div class="expander icon-down-arrow" data-collapser="collap-spouse-{{ loop.index }}"></div>
+                                                    <div class="expander" data-collapser="collap-spouse-{{ loop.index }}"></div>
                                                     <div class="compact card small-12">
                                                         {# need to know user's schoolbox info here #}
                                                         {% if contact.spouse %}
@@ -549,7 +549,7 @@
                                             <li>
                                                 <!-- Expander -->
                                                 <div>
-                                                    <div class="expander icon-down-arrow" data-collapser="collap-emergency-{{ i }}"></div>
+                                                    <div class="expander" data-collapser="collap-emergency-{{ i }}"></div>
                                                     <div class="content small-12">
                                                         {{ externalUser["StudentEmergency#{index}Name"] }}
                                                     </div>
