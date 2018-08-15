@@ -252,7 +252,7 @@ class ImpressionsConversionsOpens
      * @return array
      * @throws \Alaress\Database\Exception
      */
-    public function fetchGranular(News\Model $article, ?string $accuracy = self::DEFAULT_ACCURACY): array
+    public function fetchInteractionReferrers(News\Model $article, ?string $accuracy = self::DEFAULT_ACCURACY): array
     {
 
         /* Determine a sane value

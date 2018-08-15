@@ -80,7 +80,7 @@ class Controller extends Base
             'article' => $article,
             'accuracies' => ImpressionsConversionsOpens::ACCURACIES,
             'accuracy' => $accuracy,
-            'series' => $impressionsConversionsOpens->fetchGranular($article, $accuracy),
+            'series' => $impressionsConversionsOpens->fetchInteractionReferrers($article, $accuracy),
         ])->setTitle("Statistics for {$article->getTitle()}"));
     }
 }
