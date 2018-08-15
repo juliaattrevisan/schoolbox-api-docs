@@ -320,7 +320,7 @@
 
                 $groupSummary.attr('data-scaled-mark', scaledGroupMark);
                 $groupSummary.attr('data-mark', unscaledGroupMark);
-                $groupSummary.find('data-db-mark').val(unscaledGroupMark);
+                $groupSummary.find('[data-db-mark]').val(unscaledGroupMark);
 
                 // Update button text with mark calculated from descriptors
                 switch(markType) {
@@ -458,7 +458,7 @@
 
             $groupSummary.attr('data-scaled-mark', scaledGroupMark);
             $groupSummary.attr('data-mark', unscaledGroupMark);
-            $groupSummary.find('data-db-mark').val(unscaledGroupMark);
+            $groupSummary.find('[data-db-mark]').val(unscaledGroupMark);
 
             switch(markType) {
                 case 'TotalMarkFractional':
