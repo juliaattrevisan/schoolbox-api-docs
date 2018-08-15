@@ -49,7 +49,7 @@ class GridGenerator
      *
      * @return Rubric
      */
-    private function applyMark(array $selectedDescriptors): Rubric
+    private function applyDescriptorMarks(array $selectedDescriptors): Rubric
     {
         foreach ($this->grid->getAllDescriptors() as $descriptor) {
             $selected = \array_key_exists($descriptor->getId(), $selectedDescriptors);
@@ -112,7 +112,7 @@ class GridGenerator
                 : null;
         }
 
-        return $this->applyMark($descriptorIds);
+        return $this->applyDescriptorMarks($descriptorIds);
     }
 
 
