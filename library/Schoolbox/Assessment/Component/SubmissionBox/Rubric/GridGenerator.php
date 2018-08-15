@@ -46,31 +46,17 @@ class GridGenerator
 
 
     /**
-     * @param array $groupMarks key: group ID, value: group's value
-     *
-     * @return Rubric
-     */
-    private function applyGroupMarks(array $groupMarks): Rubric
-    {
-        foreach ($this->grid->getAllDescriptors() as $descriptor) {
-            $selected = \array_key_exists($descriptor->getId(), $groupMarks);
-            $descriptor->setSelected($selected);
-            if ($selected) {
-                $descriptor->setSelectedValue($groupMarks[$descriptor->getId()]);
-            }
-        }
-
-        return $this->grid;
-    }
-
-
-    /**
+     * @param array $selectedGroups      key: group ID, value: group's value
      * @param array $selectedDescriptors key: descriptor ID, value: descriptor's value
      *
      * @return Rubric
      */
-    private function applyDescriptorMarks(array $selectedDescriptors): Rubric
+    private function applyDescriptorMarks(array $selectedGroups, array $selectedDescriptors): Rubric
     {
+        foreach ($this->grid->getAllGroups() as $group) {
+            $group->setSelectedValue($selectedGroups[$group->getId()]);
+        }
+
         foreach ($this->grid->getAllDescriptors() as $descriptor) {
             $selected = \array_key_exists($descriptor->getId(), $selectedDescriptors);
             $descriptor->setSelected($selected);
@@ -102,7 +88,7 @@ class GridGenerator
         $query = "
             SELECT
                 rgm.rubric_group_id AS group_id,
-                rgm.value           AS group_value
+                rgm.value           AS group_value,
                 rdm.descriptor_id,
                 rdm.value           AS descriptor_value
             FROM rubric_descriptor_mark rdm
@@ -132,7 +118,7 @@ class GridGenerator
                 : null;
         }
 
-        return $this->applyDescriptorMarks($descriptorIds);
+        return $this->applyDescriptorMarks($groupIds, $descriptorIds);
     }
 
 

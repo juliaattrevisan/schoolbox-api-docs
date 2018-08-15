@@ -436,6 +436,15 @@ class Rubric extends Core\Rubric
 
 
     /**
+     * @return Core\CalculableAggregator|Core\Criteria\Group[]
+     */
+    public function getAllGroups()
+    {
+        return $this->criteriaGroups;
+    }
+
+
+    /**
      * @param User $student
      * @param Alaress_Date_Format $timestamp
      * @return Collection|DescriptorMark[]
