@@ -423,7 +423,7 @@
             if ($groupSummary.length) {
                 $groupSummary.attr('data-scaled-mark', customMark);
                 $groupSummary.attr('data-mark', unscaledGroupMark);
-                $groupSummary.find('data-db-mark').val(unscaledGroupMark);
+                $groupSummary.find('[data-db-mark]').val(unscaledGroupMark);
                 customisedMark[groupId] = true;
             }
 
