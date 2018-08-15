@@ -858,16 +858,14 @@ class RubricMapper
 
             $savedValue = $value ?? $descriptor->getMaxValue();
             if (null !== $savedValue) {
-                $groupMarksToSave[$groupId]->setMark(
-                    $groupMarksToSave[$groupId]->getMark() + $savedValue
-                );
+                $groupMarksToSave[$groupId]->setValue($groupMarksToSave[$groupId]->getValue() + $savedValue);
             }
         }
 
         // Pass 1.5: is a custom max mark for the group set?
         foreach ($selectedGroups as $groupId => $value) {
             if (null !== $value) {
-                $groupMarksToSave[$groupId]->setMark($value);
+                $groupMarksToSave[$groupId]->setValue($value);
             }
         }
 

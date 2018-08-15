@@ -15,6 +15,7 @@ use Schoolbox\Mapper;
  *
  * @method GroupMark hydrate(array $row, $alias = '', $callback = null)
  * @method GroupMark createModel($idValue = null)
+ * @method GenericCollection|GroupMark[] createCollection($contents = [])
  * @method GenericCollection|GroupMark[] findByColumnList($columnList, $options = [])
  */
 class GroupMarkMapper extends Mapper
