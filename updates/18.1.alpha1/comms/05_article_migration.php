@@ -253,8 +253,8 @@ function createSchoolNewsCampusRoleAudience(IDatabase $db, int $oldId, int $arti
             /* Assign campus
              */
             $db->query("
-                INSERT INTO `comms_news_audience` (comms_news_article_id, parent_id, entity_type, entity_value, relationship)
-                VALUES ('{$articleId}', '{$compositeSegmentId}', '".Model::ENTITY_TYPE_CAMPUS."', '{$campusId}', '".Model::RELATIONSHIP_SELF."')
+                INSERT INTO `comms_news_audience` (parent_id, entity_type, entity_value, relationship)
+                VALUES ('{$compositeSegmentId}', '".Model::ENTITY_TYPE_CAMPUS."', '{$campusId}', '".Model::RELATIONSHIP_SELF."')
             ");
 
             /* Log it
@@ -264,8 +264,8 @@ function createSchoolNewsCampusRoleAudience(IDatabase $db, int $oldId, int $arti
             /* Assign role
              */
             $db->query("
-                INSERT INTO `comms_news_audience` (comms_news_article_id, parent_id, entity_type, entity_value, relationship)
-                VALUES ('{$articleId}', '{$compositeSegmentId}', '".Model::ENTITY_TYPE_ROLE."', '{$roleId}', '".Model::RELATIONSHIP_SELF."')
+                INSERT INTO `comms_news_audience` (parent_id, entity_type, entity_value, relationship)
+                VALUES ('{$compositeSegmentId}', '".Model::ENTITY_TYPE_ROLE."', '{$roleId}', '".Model::RELATIONSHIP_SELF."')
             ");
 
             /* Log it
