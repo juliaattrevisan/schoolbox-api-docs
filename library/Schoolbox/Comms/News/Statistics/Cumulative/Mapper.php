@@ -165,7 +165,7 @@ class Mapper extends \Schoolbox\Mapper
          * ['cache'=>false] but it didn't help. Resorting back to this for now
          */
         $model = $this->findByColumnList([
-            'date' => $now->getDatabaseDate(),
+            'date' => $now,
             'article_id' => $articleId
         ], ['cache' => false])->first();
 
@@ -210,7 +210,7 @@ class Mapper extends \Schoolbox\Mapper
 
         try {
             $model = $this->findOneByColumnList([
-                'date' => \Alaress_Date_Format::now()->getDatabaseDate(),
+                'date' => \Alaress_Date_Format::now(),
                 'article_id' => $articleId
             ]);
 
@@ -223,7 +223,7 @@ class Mapper extends \Schoolbox\Mapper
             }
         } catch (\Schoolbox\Mapper\Exception $e) {
             $model = $this->createModel()
-                ->setDate($now->getDateOnly())
+                ->setDate($now)
                 ->setArticleId($articleId)
                 ->setFirstOpen($now)
                 ->setNumOpens(1);
