@@ -196,6 +196,7 @@
                         {# TODO why is markSchemeName null when student is self-assessing (note: will be addressed in SA-7242) #}
 
                         {% if group.rowMaxSum > 0 %}
+                            {# TODO these need to be the descriptor sum! #}
                             <button class="use-descriptor-values">Assign <span class="descriptor-sum">
                                 {% if markSchemeName == 'TotalMarkFractional' %}
                                     {{ group.scaledMark }}
