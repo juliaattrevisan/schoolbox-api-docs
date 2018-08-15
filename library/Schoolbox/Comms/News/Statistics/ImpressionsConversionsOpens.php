@@ -280,17 +280,11 @@ class ImpressionsConversionsOpens
         ]);
 
         $data = [];
-        $conversionRatio = [];
+        $interactions = [];
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $type = $row['type'];
             $referrer = $row['referrer'];
-
-            /* A conversion is a specific combination of Type and Referrer
-             */
-            if (($referrer !== null) && ($row['type'] === Mapper::TYPE_OPEN)) {
-                $type = Mapper::TYPE_CONVERSION;
-            }
 
             /* If referrers are of an unknown type, just throw them into an arbitrary "unknown" category
              */
@@ -304,31 +298,19 @@ class ImpressionsConversionsOpens
 
             /* Summate for a conversion ratio
              */
-            $conversionRatio[(int)$row['timestamp']][$type]++;
+            $interactions[(int)$row['timestamp']][$type]++;
         }
 
-        /* Figure out conversion ratio per timestamp
-         *
-         * If you have a Conversion without an Impression (ie. someone sends you a copy
-         * of their link and you visit it directly) record this as a 0% conversion - you
-         * didn't see the impression to open it, you just did it directly.
+        /* Figure out the average conversion ratio over time
          */
-        foreach ($conversionRatio as $timestamp => $values) {
-            $ratio = 0;
+        $numerator = 0;
+        $denominator = 0;
 
-            /* If there were more Conversions than Impressions, max it at 100%
-             * Someone visited a referred url without having been Impressed
-             *
-             * Otherwise, if there were Impressions, assume Conversions occur because of Impressions
-             * and calculate a ratio accordingly
-             */
-            if ($values['impression'] && $values['conversion'] > $values['impression']) {
-                $ratio = 100;
-            } elseif ($values['impression']) {
-                $ratio = round(100 * (float)$values['conversion'] / (float)$values['impression'], 1);
-            }
+        foreach ($interactions as $timestamp => $current) {
+            $numerator += $current['conversion'];
+            $denominator += $current['impression'];
 
-            $data['conversionRatio'][] = [(int)$timestamp, $ratio];
+            $data['conversionRatio'][] = [$timestamp, $this->percentage($numerator, $denominator)];
         }
 
         return $data;
@@ -424,13 +406,15 @@ class ImpressionsConversionsOpens
     /**
      * Calculate a integer percentage
      *
-     * @param int $numerator
-     * @param int $denominator
+     * @param null|int $numerator
+     * @param null|int $denominator
      * @return float
      */
-    private function percentage(int $numerator, int $denominator): float
+    private function percentage(?int $numerator, ?int $denominator): float
     {
-        return $denominator ? round(100*$numerator/$denominator) : 0;
+        $percentage = $denominator ? round(100*$numerator/$denominator) : 0;
+
+        return $percentage > 100 ? 100 : $percentage;
     }
 
 
