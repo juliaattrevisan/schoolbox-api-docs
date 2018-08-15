@@ -17,6 +17,8 @@ use PDO;
 
 /**
  * @method Model createModel($idValue = null)
+ * @method Model hydrate(array $row, $alias = '', $callback = null)
+ * @method GenericCollection|Model[] createCollection($contents = [])
  * @method GenericCollection|Model[] findByPredicates(Builder $pb, array $options = [])
  */
 class Mapper extends \Schoolbox\Mapper

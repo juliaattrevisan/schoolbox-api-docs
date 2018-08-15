@@ -1,7 +1,5 @@
 <?php
 /**
- * Model
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2018, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -24,7 +22,6 @@ use Schoolbox\News\Topic;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 use Alaress_Date_Format;
-use DomainException;
 
 class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
 {
