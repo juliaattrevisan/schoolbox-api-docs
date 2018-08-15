@@ -805,7 +805,6 @@ class RubricMapper
         $descriptorMapper     = DescriptorMapper::getInstance();
         $descriptorMarkMapper = DescriptorMarkMapper::getInstance();
         $groupMarkMapper      = GroupMarkMapper::getInstance();
-        $groupUsageMapper     = GroupUsageMapper::getInstance();
         $returnedWorkMapper   = SubmissionBox\ReturnedWorkMapper::getInstance();
 
         // Blow away any previous descriptor records with the feedback
@@ -829,14 +828,10 @@ class RubricMapper
 
         $descriptorModels = $descriptorMapper->findByColumn('id', array_keys($selectedDescriptors));
         $returnedWork     = $returnedWorkMapper->findById($returnId);
-        $groupUsages      = $groupUsageMapper
-            ->findByColumn('submission_box_id', $returnedWork->getSubmissionBox()->getId())
-            ->indexByCallback(function (GroupUsage $groupUsage) {
-                return $groupUsage->getGroup()->getId();
-            });
 
         // Pass 1: build set of group marks
         foreach ($selectedDescriptors as $descriptorId => $value) {
+
             // If this isn't set: this is an issue
             $descriptor = $descriptorModels[$descriptorId];
 
@@ -844,11 +839,6 @@ class RubricMapper
             // If it doesn't exist: make a new one
             $group   = $descriptor->getCriterion()->getGroup();
             $groupId = $group->getId();
-//            if (!array_key_exists($groupId, $selectedGroups)) {
-//                // Take value from sum(descriptors for group) if not present
-//                $selectedGroups[$groupId] = $groupUsages[$groupId]->getMaxValue();
-//            }
-
             if (!$groupMarksToSave[$groupId]) {
                 $groupMarksToSave[$groupId] = $groupMarkMapper->createModel()
                     ->setSubmissionReturn($returnedWork)
@@ -856,6 +846,7 @@ class RubricMapper
                     ->setValid(true);
             }
 
+            // Now set its value to the sum of the descriptors for this group to date
             $savedValue = $value ?? $descriptor->getMaxValue();
             if (null !== $savedValue) {
                 $groupMarksToSave[$groupId]->setValue($groupMarksToSave[$groupId]->getValue() + $savedValue);
@@ -863,6 +854,7 @@ class RubricMapper
         }
 
         // Pass 1.5: is a custom max mark for the group set?
+        // TODO figure out how to scale this, it's not scaled for % mark
         foreach ($selectedGroups as $groupId => $value) {
             if (null !== $value) {
                 $groupMarksToSave[$groupId]->setValue($value);
@@ -875,30 +867,14 @@ class RubricMapper
             // If this isn't set: this is an issue
             $descriptor = $descriptorModels[$descriptorId];
 
-            // Find a record for its group
-            // If it doesn't exist: make a new one
-            $group   = $descriptor->getCriterion()->getGroup();
-            $groupId = $group->getId();
-
-//            if (!array_key_exists($groupId, $selectedGroups)) {
-//                // Take value from sum(descriptors for group) if not present
-//                $selectedGroups[$groupId] = $groupUsages[$groupId]->getMaxValue();
-//            }
-//
-//            if (!$groupMarksToSave[$groupId]) {
-//                $groupMarksToSave[$groupId] = $groupMarkMapper->createModel()
-//                    ->setSubmissionReturn($returnedWork)
-//                    ->setGroup($group)
-//                    ->setValid(true)
-//                    ->setValue($selectedGroups[$groupId]);
-//            }
+            // Find the record for its group
+            $groupId = $descriptor->getCriterion()->getGroup()->getId();
 
             // Save the descriptor group
             // Take value from form preferentially, then descriptor
             $savedValue = $value ?? $descriptor->getMaxValue();
             $descriptorMarksToSave->add(
                 $descriptorMarkMapper->createModel()
-//                    ->setSubmissionReturn($returnedWorkMapper->createModel($returnId))
                     ->setGroupMark($groupMarksToSave[$groupId])
                     ->setDescriptor($descriptor)
                     ->setValid(true)
