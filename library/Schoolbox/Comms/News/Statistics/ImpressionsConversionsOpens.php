@@ -480,7 +480,22 @@ class ImpressionsConversionsOpens
             'articleId' => $article->getId()
         ]);
 
-        $data = [];
+        $data = [
+            Mapper::TYPE_IMPRESSION => [
+                Mapper::REFERRER_DASHBOARD => 0,
+                Mapper::REFERRER_HOMEPAGE => 0,
+                Mapper::REFERRER_INDEX => 0,
+                Mapper::REFERRER_ARCHIVE => 0,
+                Mapper::REFERRER_EMAIL => 0
+            ],
+            Mapper::TYPE_CONVERSION => [
+                Mapper::REFERRER_DASHBOARD => 0,
+                Mapper::REFERRER_HOMEPAGE => 0,
+                Mapper::REFERRER_INDEX => 0,
+                Mapper::REFERRER_ARCHIVE => 0,
+                Mapper::REFERRER_EMAIL => 0
+            ]
+        ];
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $data[$row['type']][$row['referrer']] = $row['num'];
