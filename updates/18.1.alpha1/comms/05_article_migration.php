@@ -224,25 +224,18 @@ function createSchoolNewsUserAudience(IDatabase $db, int $oldId, int $articleId,
  */
 function createSchoolNewsCampusRoleAudience(IDatabase $db, int $oldId, int $articleId, LoggerInterface $log)
 {
-    $roles = $db->query("
-        SELECT gid AS id
-        FROM news_items ni
-        LEFT JOIN newsGroup ng ON ni.item_id = ng.id
-        WHERE ni.item_id = {$oldId}
-    ");
+    $stmt = $db->prepare("SELECT gid FROM newsGroup WHERE id = :old_id");
+    $stmt->execute(['old_id' => $oldId]);
+    $roleIds = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-    foreach ($roles as $role) {
+    $stmt = $db->prepare("SELECT campus FROM newsCampus WHERE id = :old_id");
+    $stmt->execute(['old_id' => $oldId]);
+    $campusIds = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-        /* The data set doesn't rewind itself lol
-         */
-        $campuses = $db->query("
-            SELECT campus AS id
-            FROM news_items ni
-            LEFT JOIN newsCampus nc ON ni.item_id = nc.id
-            WHERE ni.item_id = {$oldId}
-        ");
 
-        foreach ($campuses as $campus) {
+    foreach ($roleIds as $roleId) {
+
+        foreach ($campusIds as $campusId) {
 
             /* Create composite
              */
@@ -261,23 +254,23 @@ function createSchoolNewsCampusRoleAudience(IDatabase $db, int $oldId, int $arti
              */
             $db->query("
                 INSERT INTO `comms_news_audience` (comms_news_article_id, parent_id, entity_type, entity_value, relationship)
-                VALUES ('{$articleId}', '{$compositeSegmentId}', '".Model::ENTITY_TYPE_CAMPUS."', '{$campus['id']}', '".Model::RELATIONSHIP_SELF."')
+                VALUES ('{$articleId}', '{$compositeSegmentId}', '".Model::ENTITY_TYPE_CAMPUS."', '{$campusId}', '".Model::RELATIONSHIP_SELF."')
             ");
 
             /* Log it
              */
-            $log->info("School News article_id {$articleId} assigned Campus audience {$campus['id']}");
+            $log->info("School News article_id {$articleId} assigned Campus audience {$campusId}");
 
             /* Assign role
              */
             $db->query("
                 INSERT INTO `comms_news_audience` (comms_news_article_id, parent_id, entity_type, entity_value, relationship)
-                VALUES ('{$articleId}', '{$compositeSegmentId}', '".Model::ENTITY_TYPE_ROLE."', '{$role['id']}', '".Model::RELATIONSHIP_SELF."')
+                VALUES ('{$articleId}', '{$compositeSegmentId}', '".Model::ENTITY_TYPE_ROLE."', '{$roleId}', '".Model::RELATIONSHIP_SELF."')
             ");
 
             /* Log it
              */
-            $log->info("School News article_id {$articleId} assigned Role audience {$role['id']}");
+            $log->info("School News article_id {$articleId} assigned Role audience {$roleId}");
         }
     }
 }
