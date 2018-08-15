@@ -442,26 +442,11 @@
             var groupSummarySelector = '[data-group-summary="rb-' + rubricId + '-' + groupId + '"]';
             var $groupSummary = $rb.find(groupSummarySelector);
 
-            var customMark = 0;
-
-            switch(markType) {
-                case 'TotalMarkFractional':
-                    customMark = $changed.val();
-                    break;
-
-                case 'LetterGrade':
-                case 'Percentage':
-                    // Both letter grade and percentage use the numeric mark scaled to a custom percentage
-                    customMark = $groupSummary.data('max') * ($changed.val() / 100);
-                    break;
-
-                default:
-                    // TODO
-                    // We have a "none" mark type
-            }
+            var customMark = $changed.val();
 
             if ($groupSummary.length) {
-                $groupSummary.attr('data-scaled-mark', customMark);
+                console.log("Custom mark inside custom cap listener: " + customMark);
+                $groupSummary.attr('data-scaled-mark', scale($groupSummary, getNormalisedCustomMark($groupRows, customMark, $groupSummary.data('row-max-sum'))));
                 $groupSummary.attr('data-mark', getNormalisedCustomMark($groupRows, customMark, $groupSummary.data('row-max-sum')));
                 $groupSummary.find('[data-db-mark]').val(getNormalisedCustomMark($groupRows, customMark, $groupSummary.data('row-max-sum')));
                 customisedMark[groupId] = true;
@@ -482,6 +467,8 @@
         // Custom marks reach us as either a scaled numeric mark or a percentage. Turn them into an unscaled raw mark for data-mark
         function getNormalisedCustomMark($groupRows, customMark, rowMaxSum) {
             var normalised = 0;
+
+            // console.log(customMark);
 
             if ($groupRows.length) {
                 var rowCount = $groupRows.length;
@@ -634,6 +621,7 @@
             }
         }
 
+        // TODO generalise this so scale() isn't needed
         // Scale a capability mark based on the capability max
         function getScaledGroupMark($descriptorCheckboxes, $groupSummary)
         {
@@ -643,6 +631,19 @@
             var groupSum = summateDescriptors($descriptorCheckboxes);
 
             var scaledGroupSum = groupSum * (groupMax / groupRowMaxSum);
+
+            if(scaledGroupSum % 1 != 0){
+                scaledGroupSum = scaledGroupSum.toFixed(2);
+            }
+
+            return scaledGroupSum;
+        }
+
+        function scale($groupSummary, value) {
+            var groupMax = $groupSummary.data('max');
+            var groupRowMaxSum = $groupSummary.data('row-max-sum');
+
+            var scaledGroupSum = value * (groupMax / groupRowMaxSum);
 
             if(scaledGroupSum % 1 != 0){
                 scaledGroupSum = scaledGroupSum.toFixed(2);
