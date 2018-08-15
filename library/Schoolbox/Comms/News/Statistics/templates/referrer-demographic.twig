@@ -18,6 +18,10 @@
                 enabled: false
             },
 
+            legend: {
+                reversed: true
+            },
+
             plotOptions: {
                 series: {
                     stacking: 'normal'
@@ -52,27 +56,11 @@
 
             series: [
                 {
-                    color: '#6ed0e0',
-                    name: 'Dashboard',
+                    color: '#ba43a9',
+                    name: 'Email',
                     data: [
-                        {{ referrerDemographic['impression']['dashboard'] }},
-                        {{ referrerDemographic['conversion']['dashboard'] }}
-                    ]
-                },
-                {
-                    color: '#1f78c1',
-                    name: 'Homepage',
-                    data: [
-                        {{ referrerDemographic['impression']['homepage'] }},
-                        {{ referrerDemographic['conversion']['homepage'] }}
-                    ]
-                },
-                {
-                    color: '#0a437c',
-                    name: 'Index',
-                    data: [
-                        {{ referrerDemographic['impression']['index'] }},
-                        {{ referrerDemographic['conversion']['index'] }}
+                        {{ referrerDemographic['impression']['email'] }},
+                        {{ referrerDemographic['conversion']['email'] }}
                     ]
                 },
                 {
@@ -84,11 +72,27 @@
                     ]
                 },
                 {
-                    color: '#ba43a9',
-                    name: 'Email',
+                    color: '#0a437c',
+                    name: 'Index',
                     data: [
-                        {{ referrerDemographic['impression']['email'] }},
-                        {{ referrerDemographic['conversion']['email'] }}
+                        {{ referrerDemographic['impression']['index'] }},
+                        {{ referrerDemographic['conversion']['index'] }}
+                    ]
+                },
+                {
+                    color: '#1f78c1',
+                    name: 'Homepage',
+                    data: [
+                        {{ referrerDemographic['impression']['homepage'] }},
+                        {{ referrerDemographic['conversion']['homepage'] }}
+                    ]
+                },
+                {
+                    color: '#6ed0e0',
+                    name: 'Dashboard',
+                    data: [
+                        {{ referrerDemographic['impression']['dashboard'] }},
+                        {{ referrerDemographic['conversion']['dashboard'] }}
                     ]
                 }
             ]
