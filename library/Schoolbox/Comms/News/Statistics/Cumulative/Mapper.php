@@ -165,7 +165,7 @@ class Mapper extends \Schoolbox\Mapper
          * ['cache'=>false] but it didn't help. Resorting back to this for now
          */
         $model = $this->findByColumnList([
-            'date' => $now,
+            'date' => $now->getDatabaseDate(),
             'article_id' => $articleId
         ], ['cache' => false])->first();
 
