@@ -37,6 +37,7 @@
     {% endspaceless %}
 {% endmacro %}
 
+
 <div id="authored-container">
     <div class="row actions-small-1">
         <div class="list-item">
@@ -52,50 +53,23 @@
         </nav>
     </div>
 
-    <ul class="filters">
-        <li>
-            <input type="checkbox" id="filter-incom" checked>
-            <label for="filter-incom">
-                <span class="progress-tick tiny"></span> Drafts
-            </label>
-        </li>
-        <li>
-            <input type="checkbox" id="filter-act" checked>
-            <label for="filter-act">
-                <span class="progress-tick tiny pending"></span> Rejected
-            </label>
-        </li>
-        <li>
-            <input type="checkbox" id="filter-comp" checked>
-            <label for="filter-comp">
-                <span class="progress-tick tiny reviewed"></span> Awaiting Moderation
-            </label>
-        </li>
-        <li>
-            <input type="checkbox" id="filter-comp" checked>
-            <label for="filter-comp">
-                <span class="progress-tick tiny reviewed"></span> Awaiting Publication
-            </label>
-        </li>
-        <li>
-            <input type="checkbox" id="filter-comp" checked>
-            <label for="filter-comp">
-                <span class="progress-tick tiny reviewed"></span> Published
-            </label>
-        </li>
-        <li>
-            <input type="checkbox" id="filter-comp" checked>
-            <label for="filter-comp">
-                <span class="progress-tick tiny reviewed"></span> Expired
-            </label>
-        </li>
-    </ul>
-
     <div class="row">
         <div class="small-12 island">
             <section>
 
-                <ul class="information-list">
+                {# tabs #}
+                <dl class="tabs" data-tab id="{{ topicContainerId }}">
+                    <dd class="active"><a href="#">All</a></dd>
+                    <dd><a href="#">Rejected</a></dd>
+                    <dd><a href="#">Drafts</a></dd>
+                    <dd><a href="#">Awaiting Moderation</a></dd>
+                    <dd><a href="#">Awaiting Publication</a></dd>
+                    <dd><a href="#">Published</a></dd>
+                    <dd><a href="#">Archived</a></dd>
+                </dl>
+
+                <div class="tabs-content">
+                    <ul class="information-list">
                     {% for article in articles %}
                         <li class="actions-small-1">
                             <div class="list-item">
@@ -109,39 +83,29 @@
 
                                     <h3><a href="{{ routeLookup('commsNews.getDetail', {articleId: article.id}) }}">{{ article.title }}</a></h3>
 
-                                    {# TODO: use andy's status stuff from https://github.com/alaress/schoolbox/pull/16893 once it's merged #}
                                     {% if article.isRejected %}
                                         {% set articleStatus = 'Rejected' %}
                                         {% set articleStatusDate = article.rejectedAt %}
-                                        {% set articleStatusLabel = 'alert' %}
                                         {% set articleStatusTitle = article.rejectedReason %}
-                                    {% elseif not article.isSubmitted %}
+                                    {% elseif article.isDraft %}
                                         {% set articleStatus = 'Drafted' %}
                                         {% set articleStatusDate = article.createdAt %}
-                                        {% set articleStatusLabel = 'highlight' %}
-                                        {% set articleStatusTitle = '' %}
-                                    {% elseif article.isAccepted %}
-                                        {% if article.expiresAt < NOW %}
-                                            {% set articleStatus = 'Archived' %}
-                                            {% set articleStatusDate = article.expiresAt %}
-                                            {% set articleStatusLabel = 'neutral' %}
-                                            {% set articleStatusTitle = '' %}
-                                        {% elseif article.publishAt < NOW %}
-                                            {% set articleStatus = 'Published' %}
-                                            {% set articleStatusDate = article.publishAt %}
-                                            {% set articleStatusLabel = 'success' %}
-                                            {% set articleStatusTitle = '' %}
-                                        {% else %}
-                                            {% set articleStatus = 'Awaiting Publication' %}
-                                            {% set articleStatusDate = article.publishAt %}
-                                            {% set articleStatusLabel = 'neutral' %}
-                                            {% set articleStatusTitle = '' %}
-                                        {% endif %}
+                                    {% elseif article.isExpired %}
+                                        {% set articleStatus = 'Archived' %}
+                                        {% set articleStatusDate = article.expiresAt %}
+                                    {% elseif article.isPublished %}
+                                        {% set articleStatus = 'Published' %}
+                                        {% set articleStatusDate = article.publishAt %}
+                                    {% elseif article.isAwaitingPublication %}
+                                        {% set articleStatus = 'Awaiting Publication' %}
+                                        {% set articleStatusDate = article.publishAt %}
+                                    {% elseif article.isAwaitingModeration %}
+                                        {% set articleStatus = 'Awaiting Moderation' %}
+                                        {% set articleStatusDate = article.publishAt %}
                                     {% endif %}
 
                                     <p class="meta">
-                                        {#<span class="label {{ articleStatusLabel }}" title="{{ articleStatusTitle }}">{{ articleStatus }}</span>#}
-                                        <b>{{  articleStatus }}</b>
+                                        <b>{{ articleStatus }}</b>
                                         <time title="{{ articleStatusDate.long }}">{{ articleStatusDate.relativeTime }}</time>
                                     </p>
 
@@ -154,22 +118,42 @@
                                 </nav>
                             {% endif %}
 
-                            {% set blurb = macro.pacify(article, readMore) %}
+                            {#{% set blurb = macro.pacify(article, readMore) %}
                             {% if blurb|length %}
                                 <article>{{ blurb }}</article>
-                            {% endif %}
+                            {% endif %}#}
                         </li>
                     {% endfor %}
                 </ul>
+                </div>
             </section>
         </div>
     </div>
 
     <paginate
             :page-count="10"
-            :container-class="pagination"
+            :container-class="'pagination'"
             :prev-text="prev"
             :next-text="next"
-            :click-handler="clickCallback">
+            :prev-link-class="'arrow'"
+            :next-link-class="'arrow'"
+            :click-handler="clickCallback"
+    >
     </paginate>
+
 </div>
+
+<script>
+    Vue.component('paginate', VuejsPaginate);
+
+    var app = new Vue({
+        el: '#authored-container',
+        delimiters: ['${', '}'],
+        data: {},
+        methods: {
+            clickCallback: function(pageNum) {
+                console.log(pageNum)
+            }
+        }
+    });
+</script>

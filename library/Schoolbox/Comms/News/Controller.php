@@ -825,19 +825,7 @@ class Controller extends Base
         $data = [
             'articles' => $articles
         ];
-        $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/authored_tabs.twig', $data));
-    }
-
-    public function getAuthoredTable($user)
-    {
-        // Get list of articles the user has authored
-        $articles = $this->newsMapper->findByColumn('author_id', $_SESSION['user']->getId())->sortBy('createdAt', 'desc');
-
-        // Twig time
-        $data = [
-            'articles' => $articles
-        ];
-        $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/authored_table.twig', $data));
+        $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/authored.twig', $data));
     }
 
 
