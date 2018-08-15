@@ -125,7 +125,6 @@
     $(function () {
         // the mage plugin is applied to the submit buttons: setup a basic mage on all the buttons
         $('input[data-mage-next="part-2"]').mage({
-            validateOptions: {},
             confirmRevert: function (e, revert) {
                 // verify that we aren't trying to go FORWARD
                 if (this.nextAll('.current-stop').length > 0) {
@@ -197,6 +196,15 @@
         });
 
         $('input[data-mage-next="part-3"]').mage({
+            validateOptions: {
+                invalidHandler: function (event, validator) {
+                    // Any invalid elements: ensure they're expanded
+                    console.log(validator);
+                    Object.keys(validator.invalid).forEach(function(v) {
+                        console.log(v);
+                    });
+                }
+            },
             confirmRevert: function (e, revert) {
                 // verify that we aren't trying to go FORWARD
                 if (this.nextAll('.current-stop').length > 0) {
