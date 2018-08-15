@@ -834,6 +834,44 @@ class RubricMapper
             ->indexByCallback(function (GroupUsage $groupUsage) {
                 return $groupUsage->getGroup()->getId();
             });
+
+        // Pass 1: build set of group marks
+        foreach ($selectedDescriptors as $descriptorId => $value) {
+            // If this isn't set: this is an issue
+            $descriptor = $descriptorModels[$descriptorId];
+
+            // Find a record for its group
+            // If it doesn't exist: make a new one
+            $group   = $descriptor->getCriterion()->getGroup();
+            $groupId = $group->getId();
+//            if (!array_key_exists($groupId, $selectedGroups)) {
+//                // Take value from sum(descriptors for group) if not present
+//                $selectedGroups[$groupId] = $groupUsages[$groupId]->getMaxValue();
+//            }
+
+            if (!$groupMarksToSave[$groupId]) {
+                $groupMarksToSave[$groupId] = $groupMarkMapper->createModel()
+                    ->setSubmissionReturn($returnedWork)
+                    ->setGroup($group)
+                    ->setValid(true);
+            }
+
+            $savedValue = $value ?? $descriptor->getMaxValue();
+            if (null !== $savedValue) {
+                $groupMarksToSave[$groupId]->setMark(
+                    $groupMarksToSave[$groupId]->getMark() + $savedValue
+                );
+            }
+        }
+
+        // Pass 1.5: is a custom max mark for the group set?
+        foreach ($selectedGroups as $groupId => $value) {
+            if (null !== $value) {
+                $groupMarksToSave[$groupId]->setMark($value);
+            }
+        }
+
+        // Pass 2: build set of descriptor marks
         foreach ($selectedDescriptors as $descriptorId => $value) {
 
             // If this isn't set: this is an issue
@@ -843,28 +881,30 @@ class RubricMapper
             // If it doesn't exist: make a new one
             $group   = $descriptor->getCriterion()->getGroup();
             $groupId = $group->getId();
-            if (!array_key_exists($groupId, $selectedGroups)) {
-                // Take value from rubric_group_usage.max_value if not present
-                $selectedGroups[$groupId] = $groupUsages[$groupId]->getMaxValue();
-            }
 
-            if (!$groupMarksToSave[$groupId]) {
-                $groupMarksToSave[$groupId] = $groupMarkMapper->createModel()
-                    ->setSubmissionReturn($returnedWork)
-                    ->setGroup($group)
-                    ->setValid(true)
-                    ->setValue($selectedGroups[$groupId]);
-            }
+//            if (!array_key_exists($groupId, $selectedGroups)) {
+//                // Take value from sum(descriptors for group) if not present
+//                $selectedGroups[$groupId] = $groupUsages[$groupId]->getMaxValue();
+//            }
+//
+//            if (!$groupMarksToSave[$groupId]) {
+//                $groupMarksToSave[$groupId] = $groupMarkMapper->createModel()
+//                    ->setSubmissionReturn($returnedWork)
+//                    ->setGroup($group)
+//                    ->setValid(true)
+//                    ->setValue($selectedGroups[$groupId]);
+//            }
 
             // Save the descriptor group
+            // Take value from form preferentially, then descriptor
+            $savedValue = $value ?? $descriptor->getMaxValue();
             $descriptorMarksToSave->add(
                 $descriptorMarkMapper->createModel()
 //                    ->setSubmissionReturn($returnedWorkMapper->createModel($returnId))
                     ->setGroupMark($groupMarksToSave[$groupId])
                     ->setDescriptor($descriptor)
                     ->setValid(true)
-                    // Take value from form preferentially, then descriptor
-                    ->setValue($value ?? $descriptor->getMaxValue())
+                    ->setValue($savedValue)
             );
         }
 
