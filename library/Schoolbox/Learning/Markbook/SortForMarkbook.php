@@ -99,8 +99,12 @@ class SortForMarkbook implements IAssessableComparator
         if ($leftBaseContext instanceof UnitImplementation\Model) {
             // Right inside unit impl?
             if ($rightBaseContext instanceof UnitImplementation\Model) {
-                // sort by unit impl open date
-                return $leftBaseContext->getOpenDate()->compare($rightBaseContext->getOpenDate());
+                // sort by unit impl open date, then title if both the same
+                $openDateCompare = $leftBaseContext->getOpenDate()->compare($rightBaseContext->getOpenDate());
+                if (0 !== $openDateCompare) {
+                    return $openDateCompare;
+                }
+                return \strnatcasecmp($leftBaseContext->getTitle(), $rightBaseContext->getTitle());
             }
             // Right is directly in folder.
             return -1;
