@@ -151,24 +151,31 @@
                           data-group-id="{{ group.id }}"
                           data-rubric-id="{{ rubric.id }}">
 
+                        {# This is the value we insert into the database. #}
+                        <input type="hidden"
+                               data-db-mark
+                               value="{{ group.mark }}"
+                               name="{{ formField }}[groups][{{ group.id }}][value]">
+
                         <label for="group-{{ group.id }}-mark">{{ locale.rubricGroup.proper }} mark</label>
 
                         {% if markSchemeName == 'TotalMarkFractional' %}
-                            <input name="{{ formField }}[groups][{{ group.id }}][value]"
-                                   data-group-max-value
+                            {# TODO rename this input data attr and class to something more descriptive #}
+                            <input data-group-max-value
                                    class="groupMax"
                                    id="group-{{ group.id }}-mark"
                                    type="tel"
                                    value="{{ group.scaledMark }}"/> / {{ group.max }}
 
                         {% elseif markSchemeName == 'LetterGrade' %}
-                            <select name="{{ formField }}[groups][{{ group.id }}][value]"
-                                    data-group-max-value
+                            {# TODO rename this input data attr and class to something more descriptive #}
+                            <select data-group-max-value
                                     class="groupMax"
                                     id="group-{{ group.id }}-mark">
 
                                 {% for value, letter in markType.conf %}
                                     <option value="{{ value }}"
+
                                             {% if value == letterGradeValue %}selected{% endif %}
                                             data-letter="{{ letter }}">
                                         {{ letter }}
@@ -177,8 +184,8 @@
                             </select>
 
                         {% elseif markSchemeName == 'Percentage'%}
-                            <input name="{{ formField }}[groups][{{ group.id }}][value]"
-                                   data-group-max-value
+                            {# TODO rename this input data attr and class to something more descriptive #}
+                            <input data-group-max-value
                                    class="groupMax"
                                    id="group-{{ group.id }}-mark"
                                    type="tel"
@@ -313,6 +320,7 @@
 
                 $groupSummary.attr('data-scaled-mark', scaledGroupMark);
                 $groupSummary.attr('data-mark', unscaledGroupMark);
+                $groupSummary.find('data-db-mark').val(unscaledGroupMark);
 
                 // Update button text with mark calculated from descriptors
                 switch(markType) {
@@ -415,6 +423,7 @@
             if ($groupSummary.length) {
                 $groupSummary.attr('data-scaled-mark', customMark);
                 $groupSummary.attr('data-mark', unscaledGroupMark);
+                $groupSummary.find('data-db-mark').val(unscaledGroupMark);
                 customisedMark[groupId] = true;
             }
 
@@ -449,6 +458,7 @@
 
             $groupSummary.attr('data-scaled-mark', scaledGroupMark);
             $groupSummary.attr('data-mark', unscaledGroupMark);
+            $groupSummary.find('data-db-mark').val(unscaledGroupMark);
 
             switch(markType) {
                 case 'TotalMarkFractional':
