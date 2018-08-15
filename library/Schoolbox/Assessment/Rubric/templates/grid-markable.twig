@@ -398,9 +398,6 @@
             var $groupRows = $(rowSelector);
             var groupSummarySelector = '[data-group-summary="rb-' + rubricId + '-' + groupId + '"]';
             var $groupSummary = $rb.find(groupSummarySelector);
-            var $descriptorCheckboxes = $groupRows.find('input');
-
-            var unscaledGroupMark = summateDescriptors($descriptorCheckboxes);
 
             var customMark = 0;
 
@@ -422,8 +419,8 @@
 
             if ($groupSummary.length) {
                 $groupSummary.attr('data-scaled-mark', customMark);
-                $groupSummary.attr('data-mark', unscaledGroupMark);
-                $groupSummary.find('[data-db-mark]').val(unscaledGroupMark);
+                $groupSummary.attr('data-mark', getNormalisedCustomMark($groupRows, customMark, $groupSummary.data('row-max-sum')));
+                $groupSummary.find('[data-db-mark]').val(getNormalisedCustomMark($groupRows, customMark, $groupSummary.data('row-max-sum')));
                 customisedMark[groupId] = true;
             }
 
@@ -439,6 +436,32 @@
 
         });
 
+        // Custom marks reach us as either a scaled numeric mark or a percentage. Turn them into an unscaled raw mark for data-mark
+        function getNormalisedCustomMark($groupRows, customMark, rowMaxSum) {
+            var normalised = 0;
+
+            if ($groupRows.length) {
+                var rowCount = $groupRows.length;
+                switch (markType) {
+                    case 'TotalMarkFractional':
+                        // We got a scaled numeric mark. We need to make it unscaled.
+                        normalised = customMark * rowCount;
+                        break;
+
+                    case 'LetterGrade':
+                    case 'Percentage':
+                        // What is x percent of the total possible (unscaled) marks?
+                        normalised = (rowMaxSum / 100) * customMark;
+                        break;
+
+                    default:
+                        // TODO
+                        // We have a "none" mark type
+                }
+            }
+
+            return normalised;
+        }
 
         // Overwrite any custom mark in the capability mark field with the scaled mark calculated from descriptor values
         $(".use-descriptor-values").click(function(e) {
