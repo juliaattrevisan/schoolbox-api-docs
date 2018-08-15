@@ -300,7 +300,7 @@ class ImpressionsConversionsOpens
 
             /* Stack it
              */
-            $data[$type][$referrer][] = [(int)$row['timestamp'], (int)$row['num']];
+            $data[$type][$referrer][] = [(int)$row['timestamp'], (int)$row['num'], date("Y-m-d H:i:s", $row['timestamp']/1000)];
 
             /* Summate for a conversion ratio
              */
@@ -399,10 +399,11 @@ class ImpressionsConversionsOpens
          */
         $accuracySql = self::ACCURACIES[$this->assertAccuracy($accuracy)];
 
-        $where = $this->statisticsMapper->getPredicateBuilder()
+        $pb = $this->statisticsMapper->getPredicateBuilder()
             ->equals('article_id', $article->getId())
-            ->in('type', [Mapper::TYPE_CONVERSION, Mapper::TYPE_OPEN])
-            ->getWhere();
+            ->in('type', [Mapper::TYPE_CONVERSION, Mapper::TYPE_OPEN]);
+
+        $where = implode(' AND ', $pb->getWhere());
 
         $statement = $this->database->prepareQuery("
             SELECT 
@@ -410,17 +411,17 @@ class ImpressionsConversionsOpens
                 `type`,
                 COUNT(*) AS num
             FROM {$this->statisticsMapper->getTable()}
-            {$where}
+            WHERE {$where}
             GROUP BY timestamp, `type`
             ORDER BY timestamp
         ");
 
-        $statement->execute();
+        $statement->execute($pb->getParams());
 
         $data = [];
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $data[$row['type']][] = [(int)$row['timestamp'], (int)$row['num']];
+            $data[$row['type']][] = [(int)$row['timestamp'], (int)$row['num'], date("Y-m-d H:i:s", $row['timestamp']/1000)];
         }
 
         return $data;
