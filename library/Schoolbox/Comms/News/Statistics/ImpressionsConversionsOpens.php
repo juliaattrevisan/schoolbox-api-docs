@@ -324,6 +324,34 @@ class ImpressionsConversionsOpens
 
 
     /**
+     * @param News\Model $article
+     * @return array
+     * @throws \Alaress\Database\Exception
+     */
+    public function fetchReferrerDemographic(News\Model $article): array
+    {
+        $statement = $this->database->prepareQuery('
+            SELECT `type`, `referrer`, COUNT(*) AS num 
+            FROM comms_news_article_statistics
+            WHERE article_id = :articleId
+            GROUP BY `type`, referrer
+            ORDER BY `type`, referrer
+        ');
+
+        $statement->execute([
+            'articleId' => $article->getId()
+        ]);
+
+        $data = [];
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $data[$row['type']][$row['referrer']] = $row['num'];
+        }
+
+        return $data;
+    }
+
+    /**
      * Fetch Cumulative data
      *
      * @param News\Model $article
