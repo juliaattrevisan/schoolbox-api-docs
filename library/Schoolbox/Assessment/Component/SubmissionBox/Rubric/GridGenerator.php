@@ -44,6 +44,26 @@ class GridGenerator
         $this->student = $student;
     }
 
+
+    /**
+     * @param array $groupMarks key: group ID, value: group's value
+     *
+     * @return Rubric
+     */
+    private function applyGroupMarks(array $groupMarks): Rubric
+    {
+        foreach ($this->grid->getAllDescriptors() as $descriptor) {
+            $selected = \array_key_exists($descriptor->getId(), $groupMarks);
+            $descriptor->setSelected($selected);
+            if ($selected) {
+                $descriptor->setSelectedValue($groupMarks[$descriptor->getId()]);
+            }
+        }
+
+        return $this->grid;
+    }
+
+
     /**
      * @param array $selectedDescriptors key: descriptor ID, value: descriptor's value
      *
