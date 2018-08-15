@@ -12,6 +12,8 @@
             /* can use inverted:true to make it horizontal'
              */
             chart: {
+                height: 500,
+                spacingBottom: 64,
                 type: 'column',
                 zoomType: 'xy'
             },
@@ -25,7 +27,7 @@
             },
 
             title: {
-                text: ''
+                text: 'Conversions'
             },
 
             xAxis: {
@@ -78,9 +80,4 @@
         });
     });
 </script>
-<h2 class="subheader">Conversions This Period</h2>
-<p class="meta">Statistics from the last 30 days. Click and drag the graph to zoom.</p>
-
-<section class="content">
-    <div id="conversions-chronological"></div>
-</section>
+<div id="conversions-chronological"></div>

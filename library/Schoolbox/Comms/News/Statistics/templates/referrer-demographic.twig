@@ -9,6 +9,7 @@
     $(function() {
         $('#referrerDemographic').highcharts({
             chart: {
+                spacingBottom: 64,
                 type: 'bar'
             },
 
@@ -21,7 +22,7 @@
             },
 
             title: {
-                text: ''
+                text: 'Referrer Demographic'
             },
 
             xAxis: {
@@ -93,9 +94,4 @@
         });
     });
 </script>
-<h2 class="subheader">Referrer Demographic This Period</h2>
-<p class="meta">Statistics from the last 30 days.</p>
-
-<section class="content">
-    <div id="referrerDemographic"></div>
-</section>
+<div id="referrerDemographic"></div>

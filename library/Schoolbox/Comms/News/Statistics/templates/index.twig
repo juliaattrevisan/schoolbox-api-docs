@@ -14,37 +14,33 @@
     </div>
 </div>
 
-<div class="row">
-    <div class="small-12 island">
-        {% include '@commsNewsStatistics/accuracy.twig' with {
-            article: article,
-            accuracies: accuracies
-        } %}
-    </div>
-</div>
 
 <div class="row">
     <div class="small-12 island">
-        {% include '@commsNewsStatistics/conversions-chronological.twig' with {
-            conversions: conversions
-        } %}
+        <h2 class="subheader">Periodic Data</h2>
+        <p class="meta">Statistics from the last 30 days. Click and drag graphs to zoom.</p>
+
+        <section class="content">
+            {% include '@commsNewsStatistics/accuracy.twig' with {
+                article: article,
+                accuracies: accuracies
+            } %}
+
+            {% include '@commsNewsStatistics/conversions-chronological.twig' with {
+                conversions: conversions
+            } %}
+
+            {% include '@commsNewsStatistics/referrer-demographic.twig' with {
+                referrerDemographic: referrerDemographic
+            } %}
+
+            {% include '@commsNewsStatistics/referrer-chronological.twig' with {
+                article: article,
+                accuracy: accuracy,
+                series: series
+            } %}
+        </section>
     </div>
 </div>
 
-<div class="row">
-    <div class="small-12 island">
-        {% include '@commsNewsStatistics/referrer-demographic.twig' with {
-            referrerDemographic: referrerDemographic
-        } %}
-    </div>
-</div>
 
-<div class="row">
-    <div class="small-12 island">
-        {% include '@commsNewsStatistics/referrer-chronological.twig' with {
-            article: article,
-            accuracy: accuracy,
-            series: series
-        } %}
-    </div>
-</div>
