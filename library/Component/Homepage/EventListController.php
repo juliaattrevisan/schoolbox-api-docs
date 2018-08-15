@@ -129,9 +129,7 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
                     $this->setVar('group_events_block', '');
                 }
 
-                if ($currentEvent->getSeriesId()
-                    || ($currentEvent instanceof \Calendar\Event\Type\ResourceBooking\Event
-                        && $currentEvent->getBooking()->getEvent()->getSeriesId())) {
+                if ($currentEvent->getSeriesId()) {
                     $hasSeries = true;
                 }
 
