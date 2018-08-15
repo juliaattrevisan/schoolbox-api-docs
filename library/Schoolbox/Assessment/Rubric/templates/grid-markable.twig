@@ -294,6 +294,24 @@
             })
         }
 
+        function initialiseAssignFromDescs() {
+            var $groups = $rb.find("[data-group-summary]");
+
+            $groups.each(function() {
+                var groupId  = $(this).data('group-id');
+                var rubricId = $(this).data('rubric-id');
+                var rowSelector = '[data-group="rb-' + rubricId + '-' + groupId + '"]';
+                var $groupRows = $(rowSelector);
+                var $descriptorCheckboxes = $groupRows.find('input');
+
+                var descriptorSum = getScaledGroupMark($descriptorCheckboxes, $(this));
+
+                // TODO customise text formatting for various mark types
+                $(this).find(".descriptor-sum").text(descriptorSum);
+            })
+        }
+
+        initialiseAssignFromDescs();
         disableEnableAssignFromDescs();
 
         // initialise dynamic mark display
@@ -595,8 +613,8 @@
         // Scale a capability mark based on the capability max
         function getScaledGroupMark($descriptorCheckboxes, $groupSummary)
         {
-            var groupMax = $groupSummary.attr('data-max');
-            var groupRowMaxSum = $groupSummary.attr('data-row-max-sum');
+            var groupMax = $groupSummary.data('max');
+            var groupRowMaxSum = $groupSummary.data('row-max-sum');
 
             var groupSum = summateDescriptors($descriptorCheckboxes);
 
