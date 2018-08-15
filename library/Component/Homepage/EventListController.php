@@ -92,6 +92,7 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
             $this->setBlock('event_list', 'import_events', 'import_events_block');
             $this->setBlock('event_list', 'submit_event', 'submit_event_block');
             $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+            $this->setBlock($templateHandle, 'has_series', 'has_series_block');
 
             $this->setVar('empty_state_block', '');
 
@@ -101,12 +102,14 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
                     'USER_TOKEN'      => $_SESSION['key'],
                     'LIST_DATE'       => '',
                     'group_events_block'=> '',
-                    'empty_state_block' => ''
+                    'empty_state_block' => '',
+                    'has_series_block' => ''
                 )
             );
 
             $eventCount = 0;
 
+            $hasSeries = false;
             foreach ($eventRenderer->getAllEvents() as $currentEvent) {
 
                 if ($eventLimit > 0 && $eventCount++ >= $eventLimit) {
@@ -126,6 +129,12 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
                     $this->setVar('group_events_block', '');
                 }
 
+                if ($currentEvent->getSeriesId()
+                    || ($currentEvent instanceof \Calendar\Event\Type\ResourceBooking\Event
+                        && $currentEvent->getBooking()->getEvent()->getSeriesId())) {
+                    $hasSeries = true;
+                }
+
                 $this->setVar('LIST_DATE', $currentDay->getLongDateOnly());
 
                 $htmlEvent = $eventRenderer->renderEvent($currentEvent, 'html');
@@ -139,6 +148,10 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
             $this->parse('event_day_block', 'event_day', true);
 
             $this->parse('event_list_block', 'event_list', true);
+
+            if ($hasSeries) {
+                $this->parse('has_series_block', 'has_series', true);
+            }
 
             //setup block for submission button
             $this->setBlock("event_list", "submit_event", "submit_event_block");
