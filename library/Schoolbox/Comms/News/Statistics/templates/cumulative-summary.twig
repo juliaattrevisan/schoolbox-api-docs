@@ -24,6 +24,15 @@
     }
 </style>
 
+<script>
+    $(function() {
+        $('#ico-cumulative').DataTable({
+            info: false,
+            paging: false,
+            searching: false
+        });
+    });
+</script>
 <h2 class="subheader">Cumulative Summary</h2>
 <p class="meta">Overall cumulative statistics from all time.</p>
 
@@ -57,7 +66,7 @@
         </div>
     </div>
 
-    <table class="ico">
+    <table class="ico" id="ico-cumulative">
         <thead>
         <tr>
             <th>Referrer</th>
