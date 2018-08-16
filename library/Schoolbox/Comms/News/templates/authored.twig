@@ -1,43 +1,3 @@
-{% import _self as macro %}
-
-{##
- # Pacify $text by removing everything except <p> tags
- # Cut to the maximum length specified
- # Provide a "Read More" link if specified
- #
- # @param News\Model article
- # @param string readMore
- #}
-{% macro pacify(article, readMore) %}
-    {% spaceless %}
-        {% set pacified = article.blurb|striptags %}
-
-        {# If the blurb was nonexistent, assume some body content instead #}
-        {% if pacified|length == 0 %}
-            {% set pacified = article.body|striptags %}
-        {% endif %}
-
-        {# Maximum length chars #}
-        {% set max = 300 %}
-
-        {# Split on the nearest word #}
-        {% if pacified|length > max %}
-            {% set detailUrl = routeLookup('commsNews.getDetail', {articleId: article.id}) %}
-            {% set pacified = pacified|slice(0, max+1)|split(' ')|slice(0, -1)|join(' ') ~ '...'%}
-
-            {# If read_mre policy has a value, append a "Read More" style link
-             # Otherwise, don't do anything except the appended  ellipsis
-             #}
-            {% if readMore|length %}
-                {% set pacified = pacified ~ '<a href="' ~ detailUrl ~ '" title="Read more">' ~ readMore ~ '</a>' %}
-            {% endif %}
-        {% endif %}
-
-        {{ pacified|trim|purify }}
-    {% endspaceless %}
-{% endmacro %}
-
-
 <div id="authored-container">
     <div class="row actions-small-1">
         <div class="list-item">
@@ -70,7 +30,32 @@
 
                 <div class="tabs-content">
                     <ul class="information-list">
-                    {% for article in articles %}
+
+                        <div v-if="!currentArticles.length">[content placeholder]</div>
+
+                        <li class="actions-small-1" v-for="article in currentArticles">
+                            <div class="list-item">
+                                <div class="small-12 card">
+
+                                    <a href="#" v-if="article.featureImage">
+                                        <img :src="'/storage/image.php?hash=' + article.featureImage.hash + '&size=square64'">
+                                    </a>
+
+                                    <h3><a href="#">${ article.title }</a></h3>
+
+                                    <p class="meta">
+                                        <b>${ article.status }</b>
+                                        <time :title="article.statusDate.long">${ article.statusDate.relativeTime }</time>
+                                    </p>
+
+                                </div>
+                            </div>
+                            <nav>
+                                <a href="#" class="icon-modify no-text" title="Modify this article"></a>
+                            </nav>
+                        </li>
+
+                    {#{% for article in articles %}
                         <li class="actions-small-1">
                             <div class="list-item">
                                 <div class="small-12 card">
@@ -117,42 +102,75 @@
                                     <a href="{{ modifyRoute }}" class="icon-modify no-text" title="Modify this article"></a>
                                 </nav>
                             {% endif %}
-
-                            {#{% set blurb = macro.pacify(article, readMore) %}
-                            {% if blurb|length %}
-                                <article>{{ blurb }}</article>
-                            {% endif %}#}
                         </li>
-                    {% endfor %}
+                    {% endfor %}#}
                 </ul>
+
+
                 </div>
             </section>
+            <paginate
+                    v-model="page"
+                    :page-count="pageCount"
+                    :container-class="'pagination'"
+                    :prev-text="'‹'"
+                    :next-text="'›'"
+                    :prev-link-class="'arrow'"
+                    :next-link-class="'arrow'"
+                    :disabled-class="'unavailable'"
+                    :click-handler="onPaginate"
+                    v-if="currentArticles.length"
+            >
+            </paginate>
         </div>
     </div>
 
-    <paginate
-            :page-count="10"
-            :container-class="'pagination'"
-            :prev-text="prev"
-            :next-text="next"
-            :prev-link-class="'arrow'"
-            :next-link-class="'arrow'"
-            :click-handler="clickCallback"
-    >
-    </paginate>
+
 
 </div>
 
+<script src="https://unpkg.com/vuejs-paginate@latest"></script>
 <script>
+    'use strict';
+
     Vue.component('paginate', VuejsPaginate);
 
     var app = new Vue({
         el: '#authored-container',
         delimiters: ['${', '}'],
-        data: {},
+        data: {
+            page: 1,
+            allArticles: [], // will async in
+            currentArticles: [] // will async in
+        },
+        mounted: function () {
+            var vue = this;
+
+            // Find some articles
+            axios.get('/comms/news/me/articles').then(function(response) {
+
+                vue.allArticles = response.data;
+                vue.currentArticles = response.data.slice(0, {{ config.search_type_limit }});
+
+            }).catch(function (error) {
+                console.log(error);
+            });
+        },
         methods: {
-            clickCallback: function(pageNum) {
-                console.log(pageNum)
+            onPaginate: function (page) {
+                // Show the next set
+                var limit = {{ config.search_type_limit }};
+                var offset = (page-1) * limit;
+                var total = offset + {{ config.search_type_limit }};
+                this.currentArticles = this.allArticles.slice(offset, total);
+            },
+            onTabChange: function (tab) {
+
+            }
+        },
+        computed: {
+            pageCount: function () {
+                return 2;
             }
         }
     });

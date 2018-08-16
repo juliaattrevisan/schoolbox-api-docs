@@ -19,7 +19,7 @@ use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\News\Topic;
-use Schoolbox\Resource\Storage\IStorage;
+use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 use Alaress_Date_Format;
 
@@ -71,7 +71,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
     private $author;
 
     /**
-     * @var IStorage|null
+     * @var Storage\Model|null
      */
     private $featureImage;
 
@@ -310,6 +310,49 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
     }
 
 
+    /**
+     * @param Alaress_Date_Format|null $now
+     * @return string
+     */
+    public function getStatus(Alaress_Date_Format $now = null): string
+    {
+        $map = [
+            self::STATE_DRAFT                => 'Drafted',
+            self::STATE_AWAITING_MODERATION  => 'Awaiting Moderation',
+            self::STATE_AWAITING_PUBLICATION => 'Awaiting Publication',
+            self::STATE_REJECTED             => 'Rejected',
+            self::STATE_PUBLISHED            => 'Published',
+            self::STATE_EXPIRED              => 'Archived',
+        ];
+
+        return $map[$this->getDiscreteState($now)];
+    }
+
+
+    /**
+     * @param Alaress_Date_Format|null $now
+     * @return Alaress_Date_Format
+     */
+    public function getStatusDate(Alaress_Date_Format $now = null): Alaress_Date_Format
+    {
+        switch ($this->getDiscreteState($now)) {
+            case self::STATE_PUBLISHED:
+            case self::STATE_AWAITING_MODERATION:
+            case self::STATE_AWAITING_PUBLICATION:
+                return $this->getPublishAt();
+
+            case self::STATE_REJECTED:
+                return $this->getRejectedAt();
+
+            case self::STATE_EXPIRED:
+                return $this->getExpiresAt();
+
+            case self::STATE_DRAFT:
+            default:
+                return $this->getCreatedAt();
+        }
+    }
+
     /* Getters/Setters
      */
 
@@ -475,19 +518,19 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
 
 
     /**
-     * @return null|IStorage
+     * @return null|Storage\Model
      */
-    public function getFeatureImage(): ?IStorage
+    public function getFeatureImage(): ?Storage\Model
     {
         return $this->featureImage;
     }
 
 
     /**
-     * @param null|IStorage $featureImage
+     * @param null|Storage\Model $featureImage
      * @return Model
      */
-    public function setFeatureImage(?IStorage $featureImage): self
+    public function setFeatureImage(?Storage\Model $featureImage): self
     {
         $this->featureImage = $featureImage;
         return $this;
@@ -610,7 +653,9 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
             'topics' => [
                 'name',
                 'slug',
-            ]
+            ],
+            'status',
+            'statusDate'
         ];
     }
 
