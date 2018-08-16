@@ -65,7 +65,7 @@ class RowSet
     /**
      * @return Group[]|GenericCollection
      */
-    public function getGroups(): array
+    public function getGroups(): GenericCollection
     {
         return $this->groups;
     }
