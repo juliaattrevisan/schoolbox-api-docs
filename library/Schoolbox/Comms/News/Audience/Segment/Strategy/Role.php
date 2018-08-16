@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
+use Schoolbox\Comms\News\Audience\Model;
 use Schoolbox\Comms\News\Audience\Segment\ISearch;
 use Schoolbox\Comms\News\Audience\Segment\ITranslate;
 
@@ -23,7 +24,7 @@ class Role implements ISearch, ITranslate
     public function getSearchSql(): string
     {
         return "
-            SELECT id, name, 'role' AS entity_type
+            SELECT id, name, '".Model::ENTITY_TYPE_ROLE."' AS entity_type
             FROM groups
             WHERE `name` LIKE :keyword
             AND deleted_at IS NULL
@@ -41,7 +42,7 @@ class Role implements ISearch, ITranslate
         return "
             SELECT cna.*, groups.name AS `name`
             FROM comms_news_audience cna
-            INNER JOIN groups ON entity_type = 'role' AND entity_value = groups.id
+            INNER JOIN groups ON entity_type = '".Model::ENTITY_TYPE_ROLE."' AND entity_value = groups.id
             WHERE comms_news_article_id = :articleId
         ";
     }

@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
+use Schoolbox\Comms\News\Audience\Model;
 use Schoolbox\Comms\News\Audience\Segment\ISearch;
 use Schoolbox\Comms\News\Audience\Segment\ITranslate;
 
@@ -23,7 +24,7 @@ class PastoralGroup implements ISearch, ITranslate
     public function getSearchSql(): string
     {
         return "
-            SELECT id, name COLLATE utf8mb4_general_ci, 'pastoral_group' AS entity_type 
+            SELECT id, name COLLATE utf8mb4_general_ci, '".Model::ENTITY_TYPE_PASTORAL_GROUP."' AS entity_type 
             FROM `pastoral_group`
             WHERE `name` LIKE :keyword
             AND deleted_at IS NULL
@@ -41,7 +42,7 @@ class PastoralGroup implements ISearch, ITranslate
         return "
             SELECT cna.*, pastoral_group.`name` COLLATE utf8mb4_general_ci AS `name`
             FROM comms_news_audience cna
-            INNER JOIN pastoral_group ON entity_type = 'pastoral_group' AND entity_value = pastoral_group.id
+            INNER JOIN pastoral_group ON entity_type = '".Model::ENTITY_TYPE_PASTORAL_GROUP."' AND entity_value = pastoral_group.id
             WHERE comms_news_article_id = :articleId
         ";
     }

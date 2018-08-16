@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
+use Schoolbox\Comms\News\Audience\Model;
 use Schoolbox\Comms\News\Audience\Segment\ISearch;
 use Schoolbox\Comms\News\Audience\Segment\ITranslate;
 
@@ -29,7 +30,7 @@ class Year implements ISearch, ITranslate
                 THEN CONCAT('Year ', `user`.year)
                 ELSE `user`.year
                 END
-            AS name, 'year' AS entity_type
+            AS name, '".Model::ENTITY_TYPE_YEAR."' AS entity_type
             FROM `user`
             WHERE year LIKE :keyword
             AND deleted_at IS NULL
@@ -53,7 +54,7 @@ class Year implements ISearch, ITranslate
                 END
             AS `name`
             FROM comms_news_audience cna
-            INNER JOIN `user` ON entity_type = 'year' AND entity_value = `user`.year
+            INNER JOIN `user` ON entity_type = '".Model::ENTITY_TYPE_YEAR."' AND entity_value = `user`.year
             WHERE comms_news_article_id = :articleId
         ";
     }

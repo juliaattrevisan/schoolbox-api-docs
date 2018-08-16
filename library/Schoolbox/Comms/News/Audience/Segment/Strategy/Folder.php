@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
+use Schoolbox\Comms\News\Audience\Model;
 use Schoolbox\Comms\News\Audience\Segment\ISearch;
 use Schoolbox\Comms\News\Audience\Segment\ITranslate;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -71,7 +72,7 @@ class Folder implements ISearch, ITranslate
                     THEN CONCAT(' (', GROUP_CONCAT(folder_code.code SEPARATOR ', '), ')')
                     ELSE ''
                     END) AS `name`,
-                'folder' AS entity_type
+                '".Model::ENTITY_TYPE_FOLDER."' AS entity_type
             FROM folder
             LEFT JOIN folder_code ON folder.id = folder_code.folder_id AND folder_code.deleted_at IS NULL
             WHERE (
@@ -110,11 +111,11 @@ class Folder implements ISearch, ITranslate
             WHERE folder.id IN 
                 (SELECT DISTINCT entity_value
                 FROM comms_news_audience cna2
-                WHERE entity_type = 'folder'
+                WHERE entity_type = '".Model::ENTITY_TYPE_FOLDER."'
                 AND cna2.comms_news_article_id = :articleId)
             AND folder.deleted_at IS NULL
             GROUP BY folder.id) AS f 
-            INNER JOIN comms_news_audience cna1 ON cna1.entity_value = f.id AND entity_type = 'folder'
+            INNER JOIN comms_news_audience cna1 ON cna1.entity_value = f.id AND entity_type = '".Model::ENTITY_TYPE_FOLDER."'
         ";
     }
 }

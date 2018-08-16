@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
+use Schoolbox\Comms\News\Audience\Model;
 use Schoolbox\Comms\News\Audience\Segment\ISearch;
 use Schoolbox\Comms\News\Audience\Segment\ITranslate;
 
@@ -23,7 +24,7 @@ class User implements ISearch, ITranslate
     public function getSearchSql(): string
     {
         return "
-            SELECT id, CONCAT(firstname, ' ', lastname) AS name, 'user' AS entity_type
+            SELECT id, CONCAT(firstname, ' ', lastname) AS name, '".Model::ENTITY_TYPE_USER."' AS entity_type
             FROM `user`
             WHERE firstname LIKE :keyword OR lastname LIKE :keyword
             AND deleted_at IS NULL
@@ -41,7 +42,7 @@ class User implements ISearch, ITranslate
         return "
             SELECT cna.*, CONCAT(firstname, ' ', lastname) AS `name`
             FROM comms_news_audience cna
-            INNER JOIN `user` ON entity_type = 'user' AND entity_value = `user`.id
+            INNER JOIN `user` ON entity_type = '".Model::ENTITY_TYPE_USER."' AND entity_value = `user`.id
             WHERE comms_news_article_id = :articleId
         ";
     }

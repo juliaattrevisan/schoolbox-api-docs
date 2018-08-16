@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
+use Schoolbox\Comms\News\Audience\Model;
 use Schoolbox\Comms\News\Audience\Segment\ISearch;
 use Schoolbox\Comms\News\Audience\Segment\ITranslate;
 
@@ -23,7 +24,7 @@ class House implements ISearch, ITranslate
     public function getSearchSql(): string
     {
         return "
-            SELECT id, house AS name, 'school_house' AS entity_type
+            SELECT id, house AS name, '".Model::ENTITY_TYPE_SCHOOL_HOUSE."' AS entity_type
             FROM house
             WHERE house LIKE :keyword
         ";
@@ -40,7 +41,7 @@ class House implements ISearch, ITranslate
         return "
             SELECT cna.*, house.house AS `name`
             FROM comms_news_audience cna
-            INNER JOIN house ON entity_type = 'school_house' AND entity_value = house.id
+            INNER JOIN house ON entity_type = '".Model::ENTITY_TYPE_SCHOOL_HOUSE."' AND entity_value = house.id
             WHERE comms_news_article_id = :articleId
         ";
     }
