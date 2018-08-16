@@ -84,7 +84,7 @@ class Controller extends Base
      *
      * @api /comms/news/audiencebrowser/search
      */
-    public function search()
+    public function getSearch()
     {
         $searchResult = [];
 
