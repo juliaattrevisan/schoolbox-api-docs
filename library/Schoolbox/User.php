@@ -10,6 +10,7 @@
 
 namespace Schoolbox;
 
+use Alaress\Json\SerializeTrait;
 use House;
 use HouseResidential;
 use JsonSerializable;
@@ -1263,20 +1264,26 @@ class User implements JsonSerializable, ISoftDeletable
         return $this->emailRecipients;
     }
 
+
+
+
+    use SerializeTrait;
+
     /**
-     * Specify data which should be serialized to JSON
-     *
      * @return array
      */
-    public function jsonSerialize()
+    protected function getDefaultJsonMap(): array
     {
-        return array(
-            'id'        => $this->getId(),
-            'title'     => $this->getTitle(),
-            'firstname' => $this->getFirstname(),
-            'lastname'  => $this->getLastname(),
-        );
+        return [
+            'id',
+            'title',
+            'firstname',
+            'lastname'
+        ];
     }
+
+
+
 
     /**
      * @param Collection|self[] $linkedUser
