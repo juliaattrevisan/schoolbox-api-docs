@@ -124,4 +124,29 @@ class Mapper extends \Schoolbox\Mapper
     {
         return $this->findByColumn(self::FIELD_COMMS_NEWS_ARTICLE_ID, $articleId, $options);
     }
+
+
+    /**
+     * Deletes an article's audience segments.
+     *
+     * Returns whether any records were deleted.
+     *
+     * @param int $articleId
+     * @return bool
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    public function deleteForArticle(int $articleId): bool
+    {
+        $segments  = $this->findForArticle($articleId);
+        $deletions = false;
+        foreach ($segments as $segment) {
+            if ($this->delete($segment->getChildren())) {
+                $deletions = true;
+            }
+            if ($this->delete($segment)) {
+                $deletions = true;
+            }
+        }
+        return $deletions;
+    }
 }
