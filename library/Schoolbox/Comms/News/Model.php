@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Comms\News;
 
+use Alaress\Json\SerializeTrait;
 use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
@@ -20,7 +21,7 @@ use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\User;
 use Alaress_Date_Format;
 
-class Model implements ISoftDeletable
+class Model implements ISoftDeletable, \JsonSerializable
 {
     // The discrete, atomic states this article may be in.
     // It is quite valid for composite states to be composed of 2+ more atomic states. eg isAccepted = [AWAITING_PUBLICATION|PUBLISHED|EXPIRED]
@@ -36,6 +37,29 @@ class Model implements ISoftDeletable
     use CreatedAtDate;
     use UpdatedAtDate;
     use DeletedAtDate;
+
+    use SerializeTrait;
+
+
+    /**
+     * @return array
+     */
+    protected function getDefaultJsonMap(): array
+    {
+        return [
+            'id',
+            'title',
+            'blurb',
+            'body',
+            'author',
+            'featureImage',
+            'publishAt',
+            'topics' => [
+                'name'
+            ]
+        ];
+    }
+
 
     /**
      * Title of the article

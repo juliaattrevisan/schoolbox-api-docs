@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Resource\Storage;
 
+use Alaress\Json\SerializeTrait;
 use Alaress_Date_Format;
 use League\Flysystem\File;
 use League\Flysystem\FileNotFoundException;
@@ -22,9 +23,10 @@ use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
  *
  * @package Schoolbox\Resource\Storage
  */
-class Model extends File implements IStorage
+class Model extends File implements IStorage, \JsonSerializable
 {
     use CreatedAtDate;
+    use SerializeTrait;
 
     /** @var string $filename */
     protected $filename;
@@ -46,6 +48,18 @@ class Model extends File implements IStorage
 
     /** @var string $extension */
     protected $extension;
+
+
+    /**
+     * @return array
+     */
+    protected function getDefaultJsonMap(): array
+    {
+        return [
+            'hash',
+        ];
+    }
+
 
     /**
      * @return string
