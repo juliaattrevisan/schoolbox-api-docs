@@ -164,13 +164,13 @@ class RubricMapper
      * Saves this row set to the database.
      *
      * @param RowSet $rowSet
-     * @param bool   $deleteUsed             Should groups/criteria that are in
-     *                                       use be able to be deleted?
-     * @param bool   $persistCurriculumNodes Should curriculum nodes for groups
-     *                                       and criteria be updated?
+     * @param bool   $allowModifyUsed   Should groups/criteria that are in use
+     *                                  be modifiable or deletable?
+     * @param bool   $persistCurriculum Should curriculum nodes for groups and
+     *                                  criteria be updated?
      * @throws MapperException
      */
-    public function persistRowSet(RowSet $rowSet, bool $deleteUsed, bool $persistCurriculumNodes): void
+    public function persistRowSet(RowSet $rowSet, bool $allowModifyUsed, bool $persistCurriculum): void
     {
         $folder             = $rowSet->getContext()->getBaseContext()->getFolder();
         $groupMapper        = GroupMapper::getInstance();
@@ -192,9 +192,13 @@ class RubricMapper
                     ->setParentType(Group::PARENT_TYPE_CATEGORY);
             }
 
-            // TODO allow groups/criteria to be locked
-            $groupModel->setName($group->getName());
-            if ($persistCurriculumNodes) {
+            // Don't allow name to change, or it to be deleted, if it's in use
+            // TODO figure out stopping delete
+            if ($allowModifyUsed || !$group->isInUse()) {
+                $groupModel->setName($group->getName());
+            }
+
+            if ($persistCurriculum) {
                 $groupModel->setCurriculumNodes($group->getCurriculumNodes());
             }
 
@@ -209,8 +213,11 @@ class RubricMapper
                         ->setGroup($groupModel);
                 }
 
-                $criterionModel->setName($criterion->getName());
-                if ($persistCurriculumNodes) {
+                if ($allowModifyUsed || !$criterion->isInUse()) {
+                    $criterionModel->setName($criterion->getName());
+                }
+
+                if ($persistCurriculum) {
                     $criterionModel->setCurriculumNodes($criterion->getCurriculumNodes());
                 }
 

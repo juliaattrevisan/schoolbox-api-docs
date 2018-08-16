@@ -64,6 +64,22 @@ class Group
 
 
     /**
+     * Are any of the criteria in this group in use?
+     *
+     * @return bool
+     */
+    public function isInUse(): bool
+    {
+        foreach ($this->criteria as $criterion) {
+            if ($criterion->isInUse()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    /**
      * @return string
      */
     public function getName(): string

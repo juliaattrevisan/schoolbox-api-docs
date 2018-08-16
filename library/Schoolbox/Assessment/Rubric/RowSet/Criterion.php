@@ -55,6 +55,17 @@ class Criterion
 
 
     /**
+     * Is this criterion in use on any existing assessment?
+     *
+     * @return bool
+     */
+    public function isInUse(): bool
+    {
+        return \count($this->usage) > 0;
+    }
+
+
+    /**
      * @param string $name
      * @return static
      */
