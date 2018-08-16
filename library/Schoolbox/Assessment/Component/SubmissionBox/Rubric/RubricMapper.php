@@ -154,8 +154,6 @@ class RubricMapper
         }
         $rowSet->setGroups($groups);
 
-        // TODO figure out how to determine if a group/criterion is used
-
         return $rowSet;
     }
 
