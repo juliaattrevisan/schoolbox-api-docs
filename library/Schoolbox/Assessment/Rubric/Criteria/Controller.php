@@ -160,12 +160,16 @@ class Controller extends BaseController
      */
     private function buildTwigDataForForm(RowSet $rowSet): array
     {
-        $folder = $rowSet->getContext()->getBaseContext()->getFolder();
-        $topId  = 0;
+        $folder     = $rowSet->getContext()->getBaseContext()->getFolder();
+        $groupIds   = [];
+        $critIds    = [];
 
         // Group criterion list by each criterion's rubric group
         $groups = [];
         foreach ($rowSet->getGroups() as $group) {
+            $groupIds[] = $group->getId();
+            $critIds    = array_merge($critIds, $group->getCriteria()->getPropertyValues('id'));
+
             $groupId = $group->getId();
             $groups[$groupId] = [
                 'group'    => $group,
@@ -183,8 +187,8 @@ class Controller extends BaseController
         return [
             'folder'                   => $folder,
             'groups'                   => $groups,
-            'maxGroupId'               => \count($groups),
-            'maxCritId'                => $topId + 1,
+            'maxGroupId'               => max($groupIds) + 1,
+            'maxCritId'                => max($critIds) + 1,
             'curriculumTaggingEnabled' => $this->isCurriculumTaggingEnabled(),
             'isSpecFolder'             => $folder->hasCourseSpecification() || $folder->hasUnitSpecification(),
         ];
