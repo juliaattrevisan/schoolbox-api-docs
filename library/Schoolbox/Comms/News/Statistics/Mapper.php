@@ -29,12 +29,22 @@ class Mapper extends \Schoolbox\Mapper
     public const REFERRER_ARCHIVE = 'archive';
     public const REFERRER_EMAIL = 'email';
     public const REFERRER_INDEX = 'index';
-
+    
     /**
      * This const represents a string value for an empty referrer so it can be meaningful to humans
      */
     public const REFERRER_EMPTY = 'unknown';
 
+    /* These are the referrers that we understand in the domain logic
+     */
+    public const REFERRERS = [
+        self::REFERRER_DASHBOARD,
+        self::REFERRER_HOMEPAGE,
+        self::REFERRER_INDEX,
+        self::REFERRER_ARCHIVE,
+        self::REFERRER_EMAIL,
+    ];
+        
     /**
      * @inheritdoc
      * @throws \Schoolbox\Mapper\Exception

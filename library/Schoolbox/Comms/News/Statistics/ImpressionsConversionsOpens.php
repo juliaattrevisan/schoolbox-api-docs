@@ -16,8 +16,6 @@ namespace Schoolbox\Comms\News\Statistics;
 
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\Comms\News;
-use Schoolbox\Comms\News\Statistics\Mapper;
-
 
 class ImpressionsConversionsOpens
 {
@@ -417,13 +415,7 @@ class ImpressionsConversionsOpens
 
         /* Calculate Conversion ratios for each referrer type
         */
-        $referrers = [
-            Mapper::REFERRER_DASHBOARD,
-            Mapper::REFERRER_HOMEPAGE,
-            Mapper::REFERRER_INDEX,
-            Mapper::REFERRER_ARCHIVE,
-            Mapper::REFERRER_EMAIL,
-        ];
+        $referrers = Mapper::REFERRERS;
 
         $referrerRatio = [];
 
@@ -522,20 +514,8 @@ class ImpressionsConversionsOpens
         ]);
 
         $data = [
-            Mapper::TYPE_IMPRESSION => [
-                Mapper::REFERRER_DASHBOARD => 0,
-                Mapper::REFERRER_HOMEPAGE => 0,
-                Mapper::REFERRER_INDEX => 0,
-                Mapper::REFERRER_ARCHIVE => 0,
-                Mapper::REFERRER_EMAIL => 0
-            ],
-            Mapper::TYPE_CONVERSION => [
-                Mapper::REFERRER_DASHBOARD => 0,
-                Mapper::REFERRER_HOMEPAGE => 0,
-                Mapper::REFERRER_INDEX => 0,
-                Mapper::REFERRER_ARCHIVE => 0,
-                Mapper::REFERRER_EMAIL => 0
-            ]
+            Mapper::TYPE_IMPRESSION => array_fill_keys(Mapper::REFERRERS, 0),
+            Mapper::TYPE_CONVERSION => array_fill_keys(Mapper::REFERRERS, 0),
         ];
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
