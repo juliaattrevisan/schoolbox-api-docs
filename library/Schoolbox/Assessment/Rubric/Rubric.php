@@ -309,7 +309,7 @@ class Rubric implements Twiggable
 
                 // Max points per capability (if enabled)
                 if ($includePointsPerCapability && !$groupRendered) {
-                    $square[$currentVRow][0] = $group->getMaxValue();
+                    $square[$currentVRow][0] = $group->calculateMax();
                 }
 
                 $groupRendered = true;
