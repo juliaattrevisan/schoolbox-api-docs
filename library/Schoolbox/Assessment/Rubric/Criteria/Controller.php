@@ -180,25 +180,6 @@ class Controller extends BaseController
             }
         }
 
-//        foreach ($criterionCollection as $criterion) {
-//            $groupId = $criterion->getGroup()->getId();
-//            $topId   = max($topId, $criterion->getId());
-//
-//            // Build group item if it's not there
-//            if (!isset($groups[$groupId])) {
-//                $groups[$groupId] = [
-//                    'group'    => $criterion->getGroup(),
-//                    'usage'    => $this->usageMapper->findGroupUsage($groupId),
-//                    'criteria' => [],
-//                ];
-//            }
-//
-//            $groups[$groupId]['criteria'][] = [
-//                'criterion' => $criterion,
-//                'usage'     => $this->usageMapper->findCriterionUsage($criterion->getId()),
-//            ];
-//        }
-
         return [
             'folder'                   => $folder,
             'groups'                   => $groups,
