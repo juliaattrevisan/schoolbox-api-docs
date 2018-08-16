@@ -16,13 +16,14 @@ use Schoolbox\Learning\Assessment\IFeedback;
 /**
  * A marked rubric grid.
  *
- * This is a representation of the rubric grid as assigned to an assessment.
+ * This is a representation of the rubric grid as marked for a participant's
+ * feedback.
  *
  * It contains:
- * * an feedback to which this is assigned (in practise, always a due work
+ * * a feedback to which this is assigned (in practise, always a due work
  *   feedback as the grid may only exist on a due work)
  * * a grid
- * * a set of marked descriptors
+ * * a set of marked groups, which in turn contain marked descriptors
  */
 class MarkedGrid
 {
@@ -68,33 +69,11 @@ class MarkedGrid
 
 
     /**
-     * @param IFeedback $feedback
-     * @return static
-     */
-    public function setFeedback(IFeedback $feedback): self
-    {
-        $this->feedback = $feedback;
-        return $this;
-    }
-
-
-    /**
      * @return Grid
      */
     public function getGrid(): Grid
     {
         return $this->grid;
-    }
-
-
-    /**
-     * @param Grid $grid
-     * @return static
-     */
-    public function setGrid(Grid $grid): self
-    {
-        $this->grid = $grid;
-        return $this;
     }
 
 
