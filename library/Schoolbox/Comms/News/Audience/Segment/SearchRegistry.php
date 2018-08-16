@@ -16,7 +16,7 @@ class SearchRegistry implements ISearch
 {
 
     /**
-     * @var array
+     * @var array|ISearch[]
      */
     private $registry;
 
@@ -67,6 +67,7 @@ class SearchRegistry implements ISearch
     {
         $pieces = [];
 
+        /** @var ISearch $strategy */
         foreach ($this->registry as $strategy) {
             $pieces[] = "({$strategy->getSearchSql()})";
         }

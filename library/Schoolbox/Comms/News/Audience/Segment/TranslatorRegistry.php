@@ -16,7 +16,7 @@ class TranslatorRegistry implements ITranslate
 {
 
     /**
-     * @var array
+     * @var array|ITranslate[]
      */
     private $registry;
 
@@ -49,6 +49,7 @@ class TranslatorRegistry implements ITranslate
     {
         $pieces = [];
 
+        /** @var ITranslate $strategy */
         foreach ($this->registry as $strategy) {
             $pieces[] = "({$strategy->getTranslateSql()})";
         }
