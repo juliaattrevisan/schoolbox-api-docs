@@ -8,11 +8,16 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\RowSet;
 
+use Schoolbox\Mapper\Traits\Model\Id;
+
 /**
  * A criterion within a rubric rowset.
  */
 class Criterion
 {
+    use Id;
+
+
     /**
      * @var string
      */

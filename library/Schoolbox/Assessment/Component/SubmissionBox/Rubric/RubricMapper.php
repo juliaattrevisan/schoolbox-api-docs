@@ -97,20 +97,23 @@ class RubricMapper
         // Load the groups and criteria for this context
         $folder = $context->getBaseContext()->getFolder();
 
-        // TODO load for the parent as well
+        // TODO load for the parent as well, if a unit-spec
 
         // Criteria contains groups too: inside-out them
         /** @var GenericCollection|\Schoolbox\Assessment\Rubric\RowSet\Group[] $groups */
         $groups          = new GenericCollection(\Schoolbox\Assessment\Rubric\RowSet\Group::class);
         $criterionModels = CriterionMapper::getInstance()->findForFolder($folder->getId());
         foreach ($criterionModels as $criterionModel) {
-            $groupModel = $criterionModel->getGroup();
-            $groupId    = $groupModel->getId();
+            $groupModel  = $criterionModel->getGroup();
+            $groupId     = $groupModel->getId();
+            $criterionId = $criterionModel->getId();
             if (!isset($groups[$groupId])) {
                 $groups[$groupId] = (new \Schoolbox\Assessment\Rubric\RowSet\Group())
+                    ->setId($groupId)
                     ->setName($groupModel->getName());
             }
-            $groups[$groupId]->getCriteria()[$criterionModel->getId()] = (new \Schoolbox\Assessment\Rubric\RowSet\Criterion())
+            $groups[$groupId]->getCriteria()[$criterionId] = (new \Schoolbox\Assessment\Rubric\RowSet\Criterion())
+                ->setId($criterionId)
                 ->setName($criterionModel->getName());
         }
         $rowSet->setGroups($groups);

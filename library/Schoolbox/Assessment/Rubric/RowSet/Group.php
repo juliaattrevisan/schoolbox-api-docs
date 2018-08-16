@@ -9,12 +9,16 @@ declare(strict_types=1);
 namespace Schoolbox\Assessment\Rubric\RowSet;
 
 use Schoolbox\GenericCollection;
+use Schoolbox\Mapper\Traits\Model\Id;
 
 /**
  * A group within a rubric rowset.
  */
 class Group
 {
+    use Id;
+
+
     /**
      * @var string
      */
