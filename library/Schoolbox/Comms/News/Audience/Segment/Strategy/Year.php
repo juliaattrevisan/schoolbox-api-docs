@@ -52,7 +52,7 @@ class Year implements ISearch, ITranslate
                 ELSE `user`.year
                 END
             AS `name`
-            FROM schoolbox.comms_news_audience cna
+            FROM comms_news_audience cna
             INNER JOIN `user` ON entity_type = 'year' AND entity_value = `user`.year
             WHERE comms_news_article_id = :articleId)
         ";

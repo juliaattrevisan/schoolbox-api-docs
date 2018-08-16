@@ -40,7 +40,7 @@ class PastoralGroup implements ISearch, ITranslate
     {
         return "
             (SELECT cna.*, pastoral_group.`name` COLLATE utf8mb4_general_ci AS `name`
-            FROM schoolbox.comms_news_audience cna
+            FROM comms_news_audience cna
             INNER JOIN pastoral_group ON entity_type = 'pastoral_group' AND entity_value = pastoral_group.id
             WHERE comms_news_article_id = :articleId)
         ";

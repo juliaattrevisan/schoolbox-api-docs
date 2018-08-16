@@ -39,7 +39,7 @@ class House implements ISearch, ITranslate
     {
         return "
             (SELECT cna.*, house.house AS `name`
-            FROM schoolbox.comms_news_audience cna
+            FROM comms_news_audience cna
             INNER JOIN house ON entity_type = 'school_house' AND entity_value = house.id
             WHERE comms_news_article_id = :articleId)
         ";

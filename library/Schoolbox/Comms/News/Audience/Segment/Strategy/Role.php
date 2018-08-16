@@ -40,7 +40,7 @@ class Role implements ISearch, ITranslate
     {
         return "
             (SELECT cna.*, groups.name AS `name`
-            FROM schoolbox.comms_news_audience cna
+            FROM comms_news_audience cna
             INNER JOIN groups ON entity_type = 'role' AND entity_value = groups.id
             WHERE comms_news_article_id = :articleId)
         ";
