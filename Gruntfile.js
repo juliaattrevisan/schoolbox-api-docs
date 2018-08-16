@@ -141,8 +141,7 @@ var jsSrc = {
 
         // Death to jQuery!
         'node_modules/vue/dist/vue.js', // TODO: change to .min before major release for production mode, or rewrite all this with webpack :)
-        'node_modules/axios/dist/axios.js',
-        'node_modules/vuejs-paginate/dist/index.js'
+        'node_modules/axios/dist/axios.js'
 
     ],
     masonry: [

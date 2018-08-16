@@ -53,12 +53,16 @@
 	position: relative;
 	padding: 0.5rem 1rem 0 1rem;
 
-	img, [class^="icon-"], [class*=" icon-"] {
+	img,
+	.img, // for placeholder cards
+	[class^="icon-"],
+	[class*=" icon-"] {
 		float: left;
 		margin: -0.5rem 1rem 0 -1rem;
 	}
 
-	img{
+	img,
+	.img {
 		@media #{$medium-down} {
 			width: (3 * rem-calc($base-font-size));
 		}
@@ -277,6 +281,27 @@
 
 		p {
 			margin-left: 1.5rem;
+		}
+	}
+
+	&.placeholder {
+		> .img {
+			height: 4rem;
+			background: #f6f6f6;
+		}
+
+		> h3 {
+			width: 50%;
+			height: 1rem;
+			background: #f6f6f6;
+			margin-bottom: .4rem;
+		}
+
+		p.meta {
+			display: block;
+			width: 20%;
+			height: .8125rem;
+			background: #f6f6f6;
 		}
 	}
 

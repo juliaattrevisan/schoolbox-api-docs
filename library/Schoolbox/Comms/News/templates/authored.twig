@@ -31,7 +31,15 @@
                 <div class="tabs-content">
                     <ul class="information-list">
 
-                        <div v-if="!currentArticles.length">[content placeholder]</div>
+                        <li class="actions-small-1" v-if="!currentArticles.length" v-for="n in 3">
+                            <div class="list-item">
+                                <div class="small-12 card placeholder">
+                                    <div class="img"></div>
+                                    <h3></h3>
+                                    <p class="meta"></p>
+                                </div>
+                            </div>
+                        </li>
 
                         <li class="actions-small-1" v-for="article in currentArticles">
                             <div class="list-item">
@@ -129,15 +137,16 @@
 
 </div>
 
-<script src="https://unpkg.com/vuejs-paginate@latest"></script>
+<script src="//unpkg.com/vuejs-paginate@latest"></script>
 <script>
     'use strict';
-
-    Vue.component('paginate', VuejsPaginate);
 
     var app = new Vue({
         el: '#authored-container',
         delimiters: ['${', '}'],
+        components: {
+            'paginate': VuejsPaginate
+        },
         data: {
             page: 1,
             allArticles: [], // will async in
