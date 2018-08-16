@@ -53,6 +53,17 @@ class Group
 
 
     /**
+     * Retrieve the ID of all criteria in this group.
+     *
+     * @return array|int[]
+     */
+    public function retrieveCriterionIds(): array
+    {
+        return array_filter($this->criteria->getPropertyValues('id'));
+    }
+
+
+    /**
      * @return string
      */
     public function getName(): string

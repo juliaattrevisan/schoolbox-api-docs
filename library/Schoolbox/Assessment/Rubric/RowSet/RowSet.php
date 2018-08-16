@@ -54,6 +54,32 @@ class RowSet
 
 
     /**
+     * Retrieve the ID of all groups in this row set.
+     *
+     * @return array|int[]
+     */
+    public function retrieveGroupIds(): array
+    {
+        return array_filter($this->groups->getPropertyValues('id'));
+    }
+
+
+    /**
+     * Retrieve the ID of all criteria in this row set.
+     *
+     * @return array|int[]
+     */
+    public function retrieveCriterionIds(): array
+    {
+        $criterionIds = [];
+        foreach ($this->groups as $group) {
+            $criterionIds = array_merge($criterionIds, $group->retrieveCriterionIds());
+        }
+        return $criterionIds;
+    }
+
+
+    /**
      * @return AssessmentContext
      */
     public function getContext(): AssessmentContext
