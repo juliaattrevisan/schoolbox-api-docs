@@ -8,9 +8,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\Grid;
 
-use Schoolbox\Assessment\Rubric\Competency\Level;
 use Schoolbox\Assessment\Rubric\Criteria\Criterion;
-use Schoolbox\Assessment\Rubric\Criteria\GroupUsage;
 use Schoolbox\Assessment\Rubric\Descriptor;
 use Schoolbox\Assessment\Rubric\RowSet\RowSet;
 use Schoolbox\GenericCollection;
