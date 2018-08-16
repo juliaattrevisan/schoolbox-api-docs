@@ -164,29 +164,15 @@ class Controller extends BaseController
         $groupIds   = [];
         $critIds    = [];
 
-        // Group criterion list by each criterion's rubric group
-        $groups = [];
+        // Calculate max group/crit ID from the rowset
         foreach ($rowSet->getGroups() as $group) {
             $groupIds[] = $group->getId();
             $critIds    = array_merge($critIds, $group->getCriteria()->getPropertyValues('id'));
-
-            $groupId = $group->getId();
-            $groups[$groupId] = [
-                'group'    => $group,
-                'usage'    => $group->getUsage(),
-                'criteria' => [],
-            ];
-            foreach ($group->getCriteria() as $criterion) {
-                $groups[$groupId]['criteria'][] = [
-                    'criterion' => $criterion,
-                    'usage'     => $criterion->getUsage(),
-                ];
-            }
         }
 
         return [
             'folder'                   => $folder,
-            'groups'                   => $groups,
+            'rowSet'                   => $rowSet,
             'maxGroupId'               => max($groupIds) + 1,
             'maxCritId'                => max($critIds) + 1,
             'curriculumTaggingEnabled' => $this->isCurriculumTaggingEnabled(),

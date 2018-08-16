@@ -1,7 +1,6 @@
 {##
  # Params:
  # * criterion:                If null, this is an input for a new criterion
- # * usage:                    Assessments that use the criterion
  # * groupCount:               The number of the group, used only for array keys.
  #                             If null, no name is output.
  # * isSpecFolder:             Is the folder this criterion is in a course or unit spec?
@@ -10,7 +9,7 @@
  #}
 
 {% set showNames = groupCount is not null and criterion is not null %}
-{% set readonly  = not isSpecFolder and criterion is not null and usage|length > 0 %}
+{% set readonly  = not isSpecFolder and criterion is not null and criterion.usage|length > 0 %}
 {% set new       = criterion is null %}
 <li class="actions-small-1"
     data-rubric-criterion-row="{{ groupCount }}"
@@ -86,7 +85,7 @@
     </nav>
 
     {# Tot for existent criteria #}
-    {% set criterionUsageCount = usage|length %}
+    {% set criterionUsageCount = criterion.usage|length %}
     <ul id="dropdown-i{{ criterion.id }}" class="f-dropdown" data-dropdown-content="">
         {% if criterionUsageCount > 0 %}
             <li>
@@ -111,7 +110,7 @@
                     {{ criterionUsageCount > 1 ? locale.assessment.plural : locale.assessment }};
                 </p>
                 <ul>
-                    {% for assessment in usage %}
+                    {% for assessment in criterion.usage %}
                         <li><a href="{{ routeLookup('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id}) }}">{{ assessment.title }}</a></li>
                     {% endfor %}
                 </ul>

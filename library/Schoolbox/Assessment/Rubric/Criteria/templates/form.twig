@@ -225,16 +225,15 @@ $(function() {
                 </fieldset>
                 #}
 
-                {% for group in groups %}
+                {% for group in rowSet.groups %}
                     {% set groupCount = loop.index0 %}
                     <fieldset class='content' data-rubric-group-row="{{ groupCount }}">
                         <div class="{{ groupColumn }} columns">
                             <h3>{{ locale.rubricGroup.proper }}</h3>
                             <ul class="information-list">
                                 {% include '@rubricCriteria/sub/group.twig' with {
-                                    group:                    group.group,
+                                    group:                    group,
                                     groupCount:               groupCount,
-                                    usage:                    group.usage,
                                     isSpecFolder:             isSpecFolder,
                                     curriculumTaggingEnabled: curriculumTaggingEnabled,
                                 } only %}
@@ -247,9 +246,8 @@ $(function() {
 
                                 {% for criterion in group.criteria %}
                                     {% include '@rubricCriteria/sub/criterion.twig' with {
-                                        criterion:                criterion.criterion,
+                                        criterion:                criterion,
                                         groupCount:               groupCount,
-                                        usage:                    criterion.usage,
                                         isSpecFolder:             isSpecFolder,
                                         curriculumTaggingEnabled: curriculumTaggingEnabled,
                                     } only %}
@@ -259,7 +257,6 @@ $(function() {
                                 {% include '@rubricCriteria/sub/criterion.twig' with {
                                     criterion:                null,
                                     groupCount:               groupCount,
-                                    usage:                    null,
                                     isSpecFolder:             isSpecFolder,
                                     curriculumTaggingEnabled: curriculumTaggingEnabled,
                                 } only %}
@@ -276,7 +273,6 @@ $(function() {
                             {% include '@rubricCriteria/sub/group.twig' with {
                                 group:                    null,
                                 groupCount:               null,
-                                usage:                    null,
                                 isSpecFolder:             isSpecFolder,
                                 curriculumTaggingEnabled: curriculumTaggingEnabled,
                             } only %}

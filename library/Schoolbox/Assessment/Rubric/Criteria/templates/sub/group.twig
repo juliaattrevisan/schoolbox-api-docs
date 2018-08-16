@@ -1,7 +1,6 @@
 {##
  # Params:
  # * group:                    If null, this is an input for a new group
- # * usage:                    Assessments that use the group
  # * groupCount:               The number of the group, used only for array keys.
  #                             If null, no name is output.
  # * isSpecFolder:             Is the folder this group is in a course or unit spec?
@@ -10,7 +9,7 @@
  #}
 
 {% set showNames = groupCount is not null %}
-{% set readonly  = not isSpecFolder and group is not null and usage|length > 0 %}
+{% set readonly  = not isSpecFolder and group is not null and group.usage|length > 0 %}
 {% set new       = group is null %}
 <li class="actions-small-0">
     <div class="list-item">
