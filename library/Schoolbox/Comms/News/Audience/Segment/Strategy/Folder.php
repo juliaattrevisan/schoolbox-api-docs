@@ -13,6 +13,7 @@ use Schoolbox\Comms\News\Audience\Model;
 use Schoolbox\Comms\News\Audience\Segment\ISearch;
 use Schoolbox\Comms\News\Audience\Segment\ITranslate;
 use Schoolbox\Permission\Access\RoleAccess;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\User;
 
@@ -55,7 +56,7 @@ class Folder implements ISearch, ITranslate
 
         $folders = $roleAccessMapper->findByColumnList([
             'gid' => $this->user->getRole()->getId(),
-            'type' => \Schoolbox\Permission\Access\UserAccess::ACCESS_READ
+            'type' => UserAccess::ACCESS_READ
         ]);
 
         $ids = [];
@@ -68,6 +69,32 @@ class Folder implements ISearch, ITranslate
         return $ids;
     }
 
+
+    /**
+     * Check whether $user is a CMS Service Permission holder
+     *
+     * TODO: Check for Comms Officer perm too?
+     * TODO: I guess they're like supers...?
+     *
+     * @return bool
+     */
+    private function hasCMSPermission(): bool
+    {
+        $accessList = $this->user->getAccessList();
+
+        if (!empty($accessList)) {
+            foreach ($accessList as $access) {
+                $hasCMSPermission = $access->getService() === UserAccess::SERVICE_CMS;
+                $isReadAccess     = $access->getAccessLevel() >= UserAccess::ACCESS_READ;
+
+                if ($hasCMSPermission && $isReadAccess) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
 
     /**
      * Gets an sql fragment for the ISearch instance
@@ -95,7 +122,7 @@ class Folder implements ISearch, ITranslate
          *
          * If the resultant list of folders is empty, exit early and don't bother executing query
          */
-        if (!$this->user->isSuperuser()) {
+        if (!$this->user->isSuperuser() && !$this->hasCMSPermission()) {
 
             /* Check to see whether I have read access to any group/class folders
              */
