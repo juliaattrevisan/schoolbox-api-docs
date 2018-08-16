@@ -111,7 +111,7 @@ class Controller extends BaseController
             $this
                 ->buildHtmlOutput(
                     '@rubricCriteria/form.twig',
-                    $this->buildTwigDataForForm($this->rubricMapper->createRowSet($folder))
+                    $this->buildTwigDataForForm($this->rubricMapper->createRowSet($folder, true))
                 )
                 ->setTitle(
                     sprintf(
@@ -169,13 +169,13 @@ class Controller extends BaseController
             $groupId = $group->getId();
             $groups[$groupId] = [
                 'group'    => $group,
-                'usage'    => $this->usageMapper->findGroupUsage($groupId),
+                'usage'    => $group->getUsage(),
                 'criteria' => [],
             ];
             foreach ($group->getCriteria() as $criterion) {
                 $groups[$groupId]['criteria'][] = [
                     'criterion' => $criterion,
-                    'usage'     => $this->usageMapper->findCriterionUsage($criterion->getId()),
+                    'usage'     => $criterion->getUsage(),
                 ];
             }
         }

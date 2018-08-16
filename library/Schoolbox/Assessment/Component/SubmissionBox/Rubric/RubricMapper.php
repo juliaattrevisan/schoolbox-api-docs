@@ -88,9 +88,11 @@ class RubricMapper
      * Creates a rowset for the given context.
      *
      * @param AssessmentContext $context
+     * @param bool              $getUsages
      * @return RowSet
+     * @throws MapperException
      */
-    public function createRowSet(AssessmentContext $context): RowSet
+    public function createRowSet(AssessmentContext $context, bool $getUsages): RowSet
     {
         $rowSet = new RowSet($context);
 
@@ -127,11 +129,28 @@ class RubricMapper
                     ->setId($groupId)
                     ->setName($groupModel->getName())
                     ->setCurriculumNodes($groupModel->getCurriculumNodes());
+
+                if ($getUsages) {
+                    foreach (CriterionUsageMapper::getInstance()->findGroupUsage($groupId) as $groupUsage) {
+                        $groups[$groupId]->getUsage()[$groupUsage['id']] = (new DueWork\Model())
+                            ->setId($groupUsage['id'])
+                            ->setTitle($groupUsage['title']);
+                    }
+                }
             }
             $groups[$groupId]->getCriteria()[$criterionId] = (new \Schoolbox\Assessment\Rubric\RowSet\Criterion())
                 ->setId($criterionId)
                 ->setName($criterionModel->getName())
                 ->setCurriculumNodes($criterionModel->getCurriculumNodes());
+
+            if ($getUsages) {
+                foreach (CriterionUsageMapper::getInstance()->findCriterionUsage($criterionId) as $criterionUsage) {
+                    $groups[$groupId]->getCriteria()[$criterionId]->getUsage()[$criterionUsage['id']]
+                        = (new DueWork\Model())
+                            ->setId($criterionUsage['id'])
+                            ->setTitle($criterionUsage['title']);
+                }
+            }
         }
         $rowSet->setGroups($groups);
 
@@ -145,12 +164,14 @@ class RubricMapper
      * Create a grid for the given assessment.
      *
      * @param IAssessable $assessment
+     * @param bool        $getUsages
      * @return Grid
+     * @throws MapperException
      */
-    public function createGrid(IAssessable $assessment): Grid
+    public function createGrid(IAssessable $assessment, bool $getUsages): Grid
     {
         // Build the rowset first
-        $grid = new Grid($assessment, $this->createRowSet($assessment->getContext()));
+        $grid = new Grid($assessment, $this->createRowSet($assessment->getContext(), $getUsages));
 
         // Load the levels, selected groups/criteria, descriptors for the assessment
 
@@ -163,10 +184,11 @@ class RubricMapper
      *
      * @param IFeedback $feedback
      * @return MarkedGrid
+     * @throws MapperException
      */
     public function createMarkedGrid(IFeedback $feedback): MarkedGrid
     {
-        $markedGrid = new MarkedGrid($feedback, $this->createGrid($feedback->getAssessable()));
+        $markedGrid = new MarkedGrid($feedback, $this->createGrid($feedback->getAssessable(), false));
 
         // Load the marks
 
