@@ -17,10 +17,15 @@ use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Rubric\Competency\Level as CompetencyLevel;
 use Schoolbox\Assessment\Rubric\Criteria;
 use Schoolbox\Assessment\Rubric\Factory;
+use Schoolbox\Assessment\Rubric\Grid\Grid;
+use Schoolbox\Assessment\Rubric\MarkedGrid\MarkedGrid;
+use Schoolbox\Assessment\Rubric\RowSet\RowSet;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\IMapper;
 use Schoolbox\Learning\Assessment\DueWork;
+use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
@@ -77,6 +82,56 @@ class RubricMapper
         $this->database = Database::getInstance();
         $this->factory  = new Factory(new Rubric());
     }
+
+
+    /**
+     * Creates a rowset for the given context.
+     *
+     * @param AssessmentContext $context
+     * @return RowSet
+     */
+    public function createRowSet(AssessmentContext $context): RowSet
+    {
+        $rowSet = new RowSet($context);
+
+        // Load the groups and criteria for this context
+
+        return $rowSet;
+    }
+
+
+    /**
+     * Create a grid for the given assessment.
+     *
+     * @param IAssessable $assessment
+     * @return Grid
+     */
+    public function createGrid(IAssessable $assessment): Grid
+    {
+        // Build the rowset first
+        $grid = new Grid($assessment, $this->createRowSet($assessment->getContext()));
+
+        // Load the levels, selected groups/criteria, descriptors for the assessment
+
+        return $grid;
+    }
+
+
+    /**
+     * Create a marked grid for the given feedback.
+     *
+     * @param IFeedback $feedback
+     * @return MarkedGrid
+     */
+    public function createMarkedGrid(IFeedback $feedback): MarkedGrid
+    {
+        $markedGrid = new MarkedGrid($feedback, $this->createGrid($feedback->getAssessable()));
+
+        // Load the marks
+
+        return $markedGrid;
+    }
+
 
     /**
      * @param AssessmentContext $context
