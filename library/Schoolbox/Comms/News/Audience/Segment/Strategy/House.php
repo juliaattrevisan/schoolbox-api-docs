@@ -23,9 +23,9 @@ class House implements ISearch, ITranslate
     public function getSearchSql(): string
     {
         return "
-            (SELECT id, house AS name, 'school_house' AS entity_type
+            SELECT id, house AS name, 'school_house' AS entity_type
             FROM house
-            WHERE house LIKE :keyword)
+            WHERE house LIKE :keyword
         ";
     }
 
@@ -38,10 +38,10 @@ class House implements ISearch, ITranslate
     public function getTranslateSql(): string
     {
         return "
-            (SELECT cna.*, house.house AS `name`
+            SELECT cna.*, house.house AS `name`
             FROM comms_news_audience cna
             INNER JOIN house ON entity_type = 'school_house' AND entity_value = house.id
-            WHERE comms_news_article_id = :articleId)
+            WHERE comms_news_article_id = :articleId
         ";
     }
 }

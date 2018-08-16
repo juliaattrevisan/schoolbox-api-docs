@@ -50,7 +50,7 @@ class TranslatorRegistry implements ITranslate
         $pieces = [];
 
         foreach ($this->registry as $strategy) {
-            $pieces[] = $strategy->getTranslateSql();
+            $pieces[] = "({$strategy->getTranslateSql()})";
         }
 
         return implode(' UNION ', $pieces);

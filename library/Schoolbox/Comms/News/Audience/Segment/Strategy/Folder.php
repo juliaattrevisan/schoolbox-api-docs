@@ -64,7 +64,7 @@ class Folder implements ISearch, ITranslate
         }
 
         return "
-            (SELECT folder.id, 
+            SELECT folder.id, 
                 CONCAT(folder.name,  
                     CASE
                     WHEN COUNT(folder_code.code) > 0
@@ -83,7 +83,7 @@ class Folder implements ISearch, ITranslate
             AND (folder.name LIKE :keyword OR folder_code.code LIKE :keyword)
             AND folder.deleted_at IS NULL
             GROUP BY folder.id
-            ORDER BY folder.name)
+            ORDER BY folder.name
         ";
     }
 
@@ -96,7 +96,7 @@ class Folder implements ISearch, ITranslate
     public function getTranslateSql(): string
     {
         return "
-            (SELECT cna1.*, f.name 
+            SELECT cna1.*, f.name 
             FROM 
             (SELECT folder.id,
                 CONCAT(name,  
@@ -114,7 +114,7 @@ class Folder implements ISearch, ITranslate
                 AND cna2.comms_news_article_id = :articleId)
             AND folder.deleted_at IS NULL
             GROUP BY folder.id) AS f 
-            INNER JOIN comms_news_audience cna1 ON cna1.entity_value = f.id AND entity_type = 'folder')
+            INNER JOIN comms_news_audience cna1 ON cna1.entity_value = f.id AND entity_type = 'folder'
         ";
     }
 }

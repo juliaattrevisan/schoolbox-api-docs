@@ -23,16 +23,16 @@ class Year implements ISearch, ITranslate
     public function getSearchSql(): string
     {
         return "
-            (SELECT id, 
+            SELECT id, 
                 CASE
                 WHEN CONCAT('', 1*`user`.year) = `user`.year
                 THEN CONCAT('Year ', `user`.year)
                 ELSE `user`.year
                 END
-             AS name, 'year' AS entity_type
+            AS name, 'year' AS entity_type
             FROM `user`
             WHERE year LIKE :keyword
-            AND deleted_at IS NULL)
+            AND deleted_at IS NULL
         ";
     }
 
@@ -45,7 +45,7 @@ class Year implements ISearch, ITranslate
     public function getTranslateSql(): string
     {
         return "
-            (SELECT cna.*,
+            SELECT cna.*,
                 CASE
                 WHEN CONCAT('', 1*`user`.year) = `user`.year
                 THEN CONCAT('Year ', `user`.year)
@@ -54,7 +54,7 @@ class Year implements ISearch, ITranslate
             AS `name`
             FROM comms_news_audience cna
             INNER JOIN `user` ON entity_type = 'year' AND entity_value = `user`.year
-            WHERE comms_news_article_id = :articleId)
+            WHERE comms_news_article_id = :articleId
         ";
     }
 }

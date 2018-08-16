@@ -23,10 +23,10 @@ class PastoralGroup implements ISearch, ITranslate
     public function getSearchSql(): string
     {
         return "
-            (SELECT id, name COLLATE utf8mb4_general_ci, 'pastoral_group' AS entity_type 
+            SELECT id, name COLLATE utf8mb4_general_ci, 'pastoral_group' AS entity_type 
             FROM `pastoral_group`
             WHERE `name` LIKE :keyword
-            AND deleted_at IS NULL)
+            AND deleted_at IS NULL
         ";
     }
 
@@ -39,10 +39,10 @@ class PastoralGroup implements ISearch, ITranslate
     public function getTranslateSql(): string
     {
         return "
-            (SELECT cna.*, pastoral_group.`name` COLLATE utf8mb4_general_ci AS `name`
+            SELECT cna.*, pastoral_group.`name` COLLATE utf8mb4_general_ci AS `name`
             FROM comms_news_audience cna
             INNER JOIN pastoral_group ON entity_type = 'pastoral_group' AND entity_value = pastoral_group.id
-            WHERE comms_news_article_id = :articleId)
+            WHERE comms_news_article_id = :articleId
         ";
     }
 }

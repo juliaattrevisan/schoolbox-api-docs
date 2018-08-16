@@ -23,10 +23,10 @@ class Role implements ISearch, ITranslate
     public function getSearchSql(): string
     {
         return "
-            (SELECT id, name, 'role' AS entity_type
+            SELECT id, name, 'role' AS entity_type
             FROM groups
             WHERE `name` LIKE :keyword
-            AND deleted_at IS NULL)
+            AND deleted_at IS NULL
         ";
     }
 
@@ -39,10 +39,10 @@ class Role implements ISearch, ITranslate
     public function getTranslateSql(): string
     {
         return "
-            (SELECT cna.*, groups.name AS `name`
+            SELECT cna.*, groups.name AS `name`
             FROM comms_news_audience cna
             INNER JOIN groups ON entity_type = 'role' AND entity_value = groups.id
-            WHERE comms_news_article_id = :articleId)
+            WHERE comms_news_article_id = :articleId
         ";
     }
 }

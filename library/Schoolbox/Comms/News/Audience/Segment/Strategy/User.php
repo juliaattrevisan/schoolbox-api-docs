@@ -23,10 +23,10 @@ class User implements ISearch, ITranslate
     public function getSearchSql(): string
     {
         return "
-            (SELECT id, CONCAT(firstname, ' ', lastname) AS name, 'user' AS entity_type
+            SELECT id, CONCAT(firstname, ' ', lastname) AS name, 'user' AS entity_type
             FROM `user`
             WHERE firstname LIKE :keyword OR lastname LIKE :keyword
-            AND deleted_at IS NULL)
+            AND deleted_at IS NULL
         ";
     }
 
@@ -39,10 +39,10 @@ class User implements ISearch, ITranslate
     public function getTranslateSql(): string
     {
         return "
-            (SELECT cna.*, CONCAT(firstname, ' ', lastname) AS `name`
+            SELECT cna.*, CONCAT(firstname, ' ', lastname) AS `name`
             FROM comms_news_audience cna
             INNER JOIN `user` ON entity_type = 'user' AND entity_value = `user`.id
-            WHERE comms_news_article_id = :articleId)
+            WHERE comms_news_article_id = :articleId
         ";
     }
 }

@@ -23,9 +23,9 @@ class Campus implements ISearch, ITranslate
     public function getSearchSql(): string
     {
         return "
-            (SELECT id, name, 'campus' AS entity_type
+            SELECT id, name, 'campus' AS entity_type
             FROM luCampus
-            WHERE `name` LIKE :keyword)
+            WHERE `name` LIKE :keyword
         ";
     }
 
@@ -38,10 +38,10 @@ class Campus implements ISearch, ITranslate
     public function getTranslateSql(): string
     {
         return "
-            (SELECT cna.*, luCampus.`name` AS `name`
+            SELECT cna.*, luCampus.`name` AS `name`
             FROM comms_news_audience cna
             INNER JOIN luCampus ON entity_type = 'campus' AND entity_value = luCampus.id
-            WHERE comms_news_article_id = :articleId)
+            WHERE comms_news_article_id = :articleId
         ";
     }
 }
