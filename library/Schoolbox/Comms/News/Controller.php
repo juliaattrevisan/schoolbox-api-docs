@@ -10,6 +10,7 @@ namespace Schoolbox\Comms\News;
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Web\Controller\Base;
+use Alaress\Web\Output\Html;
 use Aura\Router\Exception\RouteNotFound;
 use External_Class;
 use External_User;
@@ -259,8 +260,12 @@ class Controller extends Base
 
         /* Audiencing decoration
          */
+
+        /** @var Html $outputFormatter */
+        $outputFormatter = $this->getDi()->get('webOutput:nochrome');
+
         $audiencingData = (new Audience\Segment\Transactor($this->getUser(), $this->audienceMapper, $this->folderMapper))->load($article);
-        $audiencingHtml = (new Audience\Segment\HtmlFormatter($this->getDi()))->decorate($audiencingData);
+        $audiencingHtml = (new Audience\Segment\HtmlFormatter($outputFormatter))->decorate($audiencingData);
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/create.twig', [
             'policies' => $policies,
