@@ -274,9 +274,11 @@ class Rubric implements Twiggable
      *
      * @param bool $includePointsPerCapability Does the array include max marks
      *                                         per capability?
+     * @param bool $includeMarkRanges          Does the array include mark
+     *                                         ranges for descriptors?
      * @return array
      */
-    public function toGrid(bool $includePointsPerCapability): array
+    public function toGrid(bool $includePointsPerCapability, bool $includeMarkRanges): array
     {
         // start by generating a rectangle which is (w+2 x 2h+1)
         $width  = $this->levels->count();

@@ -255,7 +255,7 @@ class Controller extends BaseController
         $box      = SubmissionBoxMapper::getInstance()->findById($boxId);
         $grid     = (new Factory())->buildFromPostData($post, false);
         $basename = (new Url($box->getName()))->getSlug();
-        $content  = $this->array2csv($grid->toGrid($box->isMarkedPerRubricGroup()));
+        $content  = $this->array2csv($grid->toGrid($box->isMarkedPerRubricGroup(), $box->isMarkedUsingRange()));
 
         $headers  = $this->getResponse()->headers;
 
