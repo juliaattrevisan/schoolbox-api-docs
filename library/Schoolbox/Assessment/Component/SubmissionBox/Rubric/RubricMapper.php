@@ -164,9 +164,13 @@ class RubricMapper
      * Saves this row set to the database.
      *
      * @param RowSet $rowSet
+     * @param bool   $deleteUsed             Should groups/criteria that are in
+     *                                       use be able to be deleted?
+     * @param bool   $persistCurriculumNodes Should curriculum nodes for groups
+     *                                       and criteria be updated?
      * @throws MapperException
      */
-    public function persistRowSet(RowSet $rowSet): void
+    public function persistRowSet(RowSet $rowSet, bool $deleteUsed, bool $persistCurriculumNodes): void
     {
         $folder             = $rowSet->getContext()->getBaseContext()->getFolder();
         $groupMapper        = GroupMapper::getInstance();
@@ -189,9 +193,10 @@ class RubricMapper
             }
 
             // TODO allow groups/criteria to be locked
-            // TODO handle setting/non-setting of curriculum nodes
-            $groupModel->setName($group->getName())
-                       ->setCurriculumNodes($group->getCurriculumNodes());
+            $groupModel->setName($group->getName());
+            if ($persistCurriculumNodes) {
+                $groupModel->setCurriculumNodes($group->getCurriculumNodes());
+            }
 
 
             foreach ($group->getCriteria() as $criterion) {
@@ -204,8 +209,10 @@ class RubricMapper
                         ->setGroup($groupModel);
                 }
 
-                $criterionModel->setName($criterion->getName())
-                               ->setCurriculumNodes($criterion->getCurriculumNodes());
+                $criterionModel->setName($criterion->getName());
+                if ($persistCurriculumNodes) {
+                    $criterionModel->setCurriculumNodes($criterion->getCurriculumNodes());
+                }
 
                 $newCriterionModels->add($criterionModel);
             }
