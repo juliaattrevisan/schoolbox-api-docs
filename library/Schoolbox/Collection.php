@@ -905,9 +905,21 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
      *
      * @return array
      */
-    public function jsonSerialize()
+    public function jsonSerialize(array $map = null)
     {
-        return $this->getStack();
+        if (null === $map) {
+            return $this->getStack();
+        }
+
+        // if a map is specified, we want to explicitly pass it through to sub-objects where possible
+
+        $json = [];
+
+        foreach ($this as $key => $value) {
+            $json[$key] = $value instanceof JsonSerializable ? $value->jsonSerialize($map) : $value;
+        }
+
+        return $json;
     }
 
 
