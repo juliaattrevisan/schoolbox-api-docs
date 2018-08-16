@@ -239,7 +239,7 @@
             // A blend of Vue and jQuery, what a world
             $('#audience-search').selectizeSelector({
                 ajax: {
-                    url: '{{ routeLookup('commsNewsAudienceBrowser.search') }}',
+                    url: '{{ routeLookup('commsNewsAudienceBrowser.getSearch') }}',
                     type: 'GET',
                     dataType: 'json'
                 },
