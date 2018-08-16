@@ -10,6 +10,9 @@ namespace Schoolbox\Comms\News;
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Web\Controller\Base;
+use Alaress\Web\Output\ThemedHtml;
+use Alaress\Web\Request\IsJson;
+use Alaress\Web\Request\IsXhr;
 use Alaress\Web\Output\Html;
 use Aura\Router\Exception\RouteNotFound;
 use External_Class;
@@ -461,18 +464,35 @@ class Controller extends Base
             }
         }
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/detail.twig', [
-            'policies' => $policies,
-            'article' => $article,
-            'moderationRequired' => $moderationRequired,
-            'isSavedForLater' => $isSavedForLater,
-            'isCommsOfficer' => (new ValidUserIsCommsOfficer())->isSatisfiedBy($this->getUser()),
-            'isAuthor' => (new ValidUserIsAuthor())->isSatisfiedBy($this->getUser(), $article),
-            'isEditable' => (new ValidUserCanEdit())->isSatisfiedBy($this->getUser(), $moderationRequired, $article),
-            'isAcceptable' => (new Moderation\ValidUserCanAccept())->isSatisfiedBy($this->getUser(), $article),
-            'isRejectable' => (new Moderation\ValidUserCanReject())->isSatisfiedBy($this->getUser(), $article),
-            'isDeletable' => (new ValidUserCanDelete())->isSatisfiedBy($this->getUser(), $moderationRequired, $article)
-        ])->setTitle($article->getTitle()));
+        // don't supply the extra twig-necessary data if just returning JSON
+        if ((new IsJson())->isSatisfiedBy($this->getRequest())) {
+            $data = [
+                'article' => $article,
+                'isSavedForLater' => $isSavedForLater,
+            ];
+        } else {
+            $data = [
+                'policies' => $policies,
+                'article' => $article,
+                'moderationRequired' => $moderationRequired,
+                'isSavedForLater' => $isSavedForLater,
+                'isCommsOfficer' => (new ValidUserIsCommsOfficer())->isSatisfiedBy($this->getUser()),
+                'isAuthor' => (new ValidUserIsAuthor())->isSatisfiedBy($this->getUser(), $article),
+                'isEditable' => (new ValidUserCanEdit())->isSatisfiedBy($this->getUser(), $moderationRequired, $article),
+                'isAcceptable' => (new Moderation\ValidUserCanAccept())->isSatisfiedBy($this->getUser(), $article),
+                'isRejectable' => (new Moderation\ValidUserCanReject())->isSatisfiedBy($this->getUser(), $article),
+                'isDeletable' => (new ValidUserCanDelete())->isSatisfiedBy($this->getUser(), $moderationRequired, $article)
+            ];
+        }
+
+        $output = $this->buildContent('@commsNews/detail.twig', $data);
+
+        if ($output instanceof ThemedHtml) {
+            $output->setTitle($article->getTitle())
+                   ->setTab('news');
+        }
+
+        $this->response->content->set($output);
     }
 
 
@@ -577,21 +597,31 @@ class Controller extends Base
      */
     public function getListByTopic(?int $year, ?int $month)
     {
-        if ($this->getRequest()->isXhr()) {
-            $params = new Querystring($this->getRequest()->query);
-            $topics = $this->topicMapper->findAll();
+        $params = new Querystring($this->getRequest()->query);
+        $topics = $this->topicMapper->findAll();
 
-            /* The requested data set to load, given the params provided
-             */
-            if ($year) {
-                $urlPrefix = $this->getRouter()->generate('commsNews.getArchive', [ 'year' => $year, 'month' => $month ]);
-            } else {
-                $urlPrefix = $this->getRouter()->generate('commsNews.getIndex');
-            }
+        /* The requested data set to load, given the params provided
+         */
+        if ($year) {
+            $urlPrefix = $this->getRouter()->generate('commsNews.getArchive', [ 'year' => $year, 'month' => $month ]);
+        } else {
+            $urlPrefix = $this->getRouter()->generate('commsNews.getIndex');
+        }
 
-            $partialData = $this->generatePartial($urlPrefix, $params, $topics, $params->getHidePaginator(), $year, $month);
-            $content     = $this->buildUnthemedHtmlOutput('@commsNews/partial.twig', $partialData)->getAsString();
-            $viewAllLink = "{$this->getRouteIfAuthorized('commsNews.getIndex')}?topic={$params->getSlug()}";
+        $partialData = $this->generatePartial($urlPrefix, $params, $topics, $params->getHidePaginator(), $year, $month);
+
+
+        if (!(new IsXhr())->isSatisfiedBy($this->getRequest())) {
+            // if it's NOT XHR, go for API version
+            $this->response->content->set($this->buildJsonOutput([
+                'articles' => $partialData['articles']
+            ]));
+
+            return;
+        }
+
+        $content     = $this->buildUnthemedHtmlOutput('@commsNews/partial.twig', $partialData)->getAsString();
+        $viewAllLink = "{$this->getRouteIfAuthorized('commsNews.getIndex')}?topic={$params->getSlug()}";
 
             $this->getResponse()->content->set($this->buildJsonOutput([
                 'success' => true,
