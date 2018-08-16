@@ -95,7 +95,7 @@ class Loader
         $urlArgs = [
             'School' => $this->getSchool(),
             'Type' => $this->determineUserType(),
-            'P1' => $this->getUser()->getUsername(),
+            'P1' => $this->getPTOLogin(),
             'P2' => $epoch,
             'P3' => $this->generateHash($epoch)
         ];
@@ -129,7 +129,7 @@ class Loader
     /**
      * @return User
      */
-    private function getUser()
+    protected function getUser()
     {
         return $this->user;
     }
@@ -160,5 +160,14 @@ class Loader
     {
         $this->school = $school;
         return $this;
+    }
+
+
+    /**
+     * @return string
+     */
+    private function getPTOLogin()
+    {
+        return $this->getUser()->getUsername();
     }
 }
