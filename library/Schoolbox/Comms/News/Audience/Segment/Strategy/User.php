@@ -26,7 +26,7 @@ class User implements ISearch, ITranslate
         return "
             SELECT id, CONCAT(firstname, ' ', lastname) AS name, '".Model::ENTITY_TYPE_USER."' AS entity_type
             FROM `user`
-            WHERE firstname LIKE :keyword OR lastname LIKE :keyword
+            WHERE (firstname LIKE :keyword OR lastname LIKE :keyword)
             AND deleted_at IS NULL
         ";
     }
