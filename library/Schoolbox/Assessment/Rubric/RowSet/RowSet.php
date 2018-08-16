@@ -8,7 +8,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\RowSet;
 
-use Schoolbox\Assessment\Rubric\Criteria\Group;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\AssessmentContext;
 

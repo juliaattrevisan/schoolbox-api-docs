@@ -1,0 +1,40 @@
+<?php
+/**
+ * @copyright Copyright 2018, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
+ */
+
+declare(strict_types=1);
+
+namespace Schoolbox\Assessment\Rubric\RowSet;
+
+/**
+ * A criterion within a rubric rowset.
+ */
+class Criterion
+{
+    /**
+     * @var string
+     */
+    private $name;
+
+
+    /**
+     * @return string
+     */
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+
+    /**
+     * @param string $name
+     * @return static
+     */
+    public function setName(string $name): self
+    {
+        $this->name = $name;
+        return $this;
+    }
+}
