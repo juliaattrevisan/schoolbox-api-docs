@@ -10,6 +10,8 @@
 namespace Alaress\Web\Controller;
 
 use Alaress\Web\Output;
+use Alaress\Web\Request\IsJson;
+use Alaress\Web\Request\IsXhr;
 use Aura\Di;
 use Aura\Di\Exception\ServiceNotFound;
 use Aura\Session\SegmentInterface;
@@ -395,18 +397,20 @@ abstract class Base {
      */
     protected function buildContent($template, array $data)
     {
-        if (strpos($this->getRequest()->headers->get('accept'), 'application/json') !== false) {
+        // TODO DI the specifications
+
+        if ((new IsJson())->isSatisfiedBy($this->getRequest())) {
             // prefer JSON if specified... this isn't exactly correct, but it's close enough for now
             return $this->buildJsonOutput($data);
+        }
 
-        } elseif ($this->getRequest()->isXhr()) {
+        if ((new IsXhr())->isSatisfiedBy($this->getRequest())) {
             // if the request is AJAX, don't return the chrome
             return $this->buildUnthemedHtmlOutput($template, $data);
-
-        } else {
-            // full synchronous page
-            return $this->buildHtmlOutput($template, $data);
         }
+
+        // full synchronous page
+        return $this->buildHtmlOutput($template, $data);
     }
 
 
