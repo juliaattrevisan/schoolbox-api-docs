@@ -10,11 +10,11 @@ namespace Schoolbox\Comms\News\AudienceBrowser;
 
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
-use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
 use Schoolbox\CampusMapper;
+use Schoolbox\Comms\News\Audience;
 use Schoolbox\Mapper;
 use Schoolbox\Pastoral;
 use Schoolbox\Resource;
@@ -80,6 +80,7 @@ class Module extends BaseModule
             'houseMapper' => $this->getMapperFactory()->getLazy(\HouseMapper::class),
             'groupMapper' => $this->getMapperFactory()->getLazy(Resource\GroupMapper::class),
             'pastoralGroupMapper' => $this->getMapperFactory()->getLazy(Pastoral\Group\Mapper::class),
+            'audienceMapper' => $this->getMapperFactory()->getLazy(Audience\Mapper::class),
         ];
     }
 

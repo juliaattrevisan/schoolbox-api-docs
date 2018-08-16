@@ -13,8 +13,7 @@ use Alaress\Web\Output\Html;
 use HouseMapper;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
-use Schoolbox\Comms\News\Audience\Model;
-use Schoolbox\Comms\News\Audience\Segment;
+use Schoolbox\Comms\News\Audience;
 use Schoolbox\Pastoral;
 use Schoolbox\RoleMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -54,6 +53,11 @@ class Controller extends Base
     private $userMapper;
 
     /**
+     * @var Audience\Mapper
+     */
+    private $audienceMapper;
+
+    /**
      * Controller constructor.
      * @param CampusMapper          $campusMapper
      * @param RoleMapper            $roleMapper
@@ -61,6 +65,7 @@ class Controller extends Base
      * @param FolderMapper          $folderMapper
      * @param Pastoral\Group\Mapper $pastoralGroupMapper
      * @param UserMapper            $userMapper
+     * @param Audience\Mapper       $audienceMapper
      */
     public function __construct(
         CampusMapper $campusMapper,
@@ -68,7 +73,8 @@ class Controller extends Base
         HouseMapper $houseMapper,
         FolderMapper $folderMapper,
         Pastoral\Group\Mapper $pastoralGroupMapper,
-        UserMapper $userMapper
+        UserMapper $userMapper,
+        Audience\Mapper $audienceMapper
     ) {
         $this->campusMapper = $campusMapper;
         $this->roleMapper = $roleMapper;
@@ -76,6 +82,7 @@ class Controller extends Base
         $this->folderMapper = $folderMapper;
         $this->pastoralGroupMapper = $pastoralGroupMapper;
         $this->userMapper = $userMapper;
+        $this->audienceMapper = $audienceMapper;
     }
 
 
@@ -91,9 +98,9 @@ class Controller extends Base
         /** @var Html $outputFormatter */
         $outputFormatter = $this->getDi()->get('webOutput:nochrome');
 
-        $registry = new Segment\SearchRegistry($this->getUser(), $this->folderMapper);
-        $translator = new Segment\Translator($this->folderMapper->getDatabase(), $this->getUser(), $this->folderMapper);
-        $formatter = new Segment\HtmlFormatter($outputFormatter);
+        $registry = new Audience\Segment\SearchRegistry($this->getUser(), $this->folderMapper);
+        $translator = new Audience\Segment\Translator($this->folderMapper->getDatabase(), $this->getUser(), $this->folderMapper);
+        $formatter = new Audience\Segment\HtmlFormatter($outputFormatter);
 
         $statement = $this->userMapper->getDatabase()->prepare($registry->getSearchSql());
 
@@ -104,7 +111,7 @@ class Controller extends Base
         /* Set up the RELATIONSHIP_SELF variant first then add Parents and Teachers modifiers
          */
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $data = $this->generateDecoratedDataTuple($row, $registry, $translator, $formatter);
+            $data = $this->generateDecoratedDataTuple($row, $translator, $formatter);
 
             /* One-dimensional stack, please
              */
@@ -114,11 +121,15 @@ class Controller extends Base
         $this->getResponse()->content->set($this->buildJsonOutput($searchResult));
     }
 
+
     /**
      * @param Collection $collection
      * @param string     $entityType
      * @return \Alaress\Web\Output\Json
      * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \InvalidArgumentException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\InsufficientHydrationException
      */
     private function generate(Collection $collection, string $entityType): \Alaress\Web\Output\Json
     {
@@ -127,16 +138,15 @@ class Controller extends Base
         /** @var Html $outputFormatter */
         $outputFormatter = $this->getDi()->get('webOutput:nochrome');
 
-        $registry = new Segment\SearchRegistry($this->getUser(), $this->folderMapper);
-        $translator = new Segment\Translator($this->folderMapper->getDatabase(), $this->getUser(), $this->folderMapper);
-        $formatter = new Segment\HtmlFormatter($outputFormatter);
+        $translator = new Audience\Segment\Translator($this->folderMapper->getDatabase(), $this->getUser(), $this->folderMapper);
+        $formatter = new Audience\Segment\HtmlFormatter($outputFormatter);
 
         foreach ($collection as $item) {
             $row = array_combine(['id', 'name'], $item->findValueLabelPair());
 
             $row['entity_type'] = $entityType;
 
-            $items[] = $this->generateDecoratedDataTuple($row, $registry, $translator, $formatter);
+            $items[] = $this->generateDecoratedDataTuple($row, $translator, $formatter);
         }
 
         return $this->buildJsonOutput([
@@ -150,13 +160,15 @@ class Controller extends Base
      * Return an (id, name, entityType, modifier, itemHtml) tuple
      *
      * @param array                  $row
-     * @param Segment\SearchRegistry $registry
-     * @param Segment\Translator     $translator
-     * @param Segment\HtmlFormatter  $formatter
+     * @param Audience\Segment\Translator     $translator
+     * @param Audience\Segment\HtmlFormatter  $formatter
      * @return array
      * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \InvalidArgumentException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\InsufficientHydrationException
      */
-    private function generateDecoratedDataTuple(array $row, Segment\SearchRegistry $registry, Segment\Translator $translator, Segment\HtmlFormatter $formatter): array
+    private function generateDecoratedDataTuple(array $row, Audience\Segment\Translator $translator, Audience\Segment\HtmlFormatter $formatter): array
     {
         $data = [];
 
@@ -166,30 +178,39 @@ class Controller extends Base
             'entityType' => $translator->translateEntityType($row['entity_type']),
         ];
 
-        $data[Model::RELATIONSHIP_SELF] = array_merge($baseData, [
-            'id' => Segment\Codec::encode($row['entity_type'], $row['id'], Model::RELATIONSHIP_SELF),
-            'modifierOriginal' => Model::RELATIONSHIP_SELF,
-            'modifier' => $translator->translateModifier(Model::RELATIONSHIP_SELF),
+        $data[Audience\Model::RELATIONSHIP_SELF] = array_merge($baseData, [
+            'id' => Audience\Segment\Codec::encode($row['entity_type'], $row['id'], Audience\Model::RELATIONSHIP_SELF),
+            'modifierOriginal' => Audience\Model::RELATIONSHIP_SELF,
+            'modifier' => $translator->translateModifier(Audience\Model::RELATIONSHIP_SELF),
         ]);
 
         /* Only provide the Parents and Teachers modifiers to strats which support them
          * We exclude Parents and Teachers modifiers from Users due to privacy reasons
+         *
+         * Decide whether entity_type has the modifiers parents_of and teachers_of
          */
-        if ($registry->hasModifier($row['entity_type'])) {
-            /* Parents modifier
-             */
-            $data[Model::RELATIONSHIP_PARENTS_OF] = array_merge($baseData, [
-                'id' => Segment\Codec::encode($row['entity_type'], $row['id'], Model::RELATIONSHIP_PARENTS_OF),
-                'modifierOriginal' => Model::RELATIONSHIP_PARENTS_OF,
-                'modifier' => $translator->translateModifier(Model::RELATIONSHIP_PARENTS_OF),
-            ]);
+        $businessRules = new Audience\BusinessRules();
 
-            /* Teachers modifier
-             */
-            $data[Model::RELATIONSHIP_TEACHERS_OF] = array_merge($baseData, [
-                'id' => Segment\Codec::encode($row['entity_type'], $row['id'], Model::RELATIONSHIP_TEACHERS_OF),
-                'modifierOriginal' => Model::RELATIONSHIP_TEACHERS_OF,
-                'modifier' => $translator->translateModifier(Model::RELATIONSHIP_TEACHERS_OF),
+        $segment = $this->audienceMapper->createModel()
+            ->setEntityType($row['entity_type']);
+
+        /* Parents modifier
+         */
+        if ($businessRules->isValidRelationship($segment, Audience\Model::RELATIONSHIP_PARENTS_OF)) {
+            $data[Audience\Model::RELATIONSHIP_PARENTS_OF] = array_merge($baseData, [
+                'id' => Audience\Segment\Codec::encode($row['entity_type'], $row['id'], Audience\Model::RELATIONSHIP_PARENTS_OF),
+                'modifierOriginal' => Audience\Model::RELATIONSHIP_PARENTS_OF,
+                'modifier' => $translator->translateModifier(Audience\Model::RELATIONSHIP_PARENTS_OF),
+            ]);
+        }
+
+        /* Teachers modifier
+         */
+        if ($businessRules->isValidRelationship($segment, Audience\Model::RELATIONSHIP_TEACHERS_OF)) {
+            $data[Audience\Model::RELATIONSHIP_TEACHERS_OF] = array_merge($baseData, [
+                'id' => Audience\Segment\Codec::encode($row['entity_type'], $row['id'], Audience\Model::RELATIONSHIP_TEACHERS_OF),
+                'modifierOriginal' => Audience\Model::RELATIONSHIP_TEACHERS_OF,
+                'modifier' => $translator->translateModifier(Audience\Model::RELATIONSHIP_TEACHERS_OF),
             ]);
         }
 
@@ -206,7 +227,7 @@ class Controller extends Base
      */
     public function getCampuses()
     {
-        $this->getResponse()->content->set($this->generate($this->campusMapper->findAll()->sortBy('name', 'asc'), Model::ENTITY_TYPE_CAMPUS));
+        $this->getResponse()->content->set($this->generate($this->campusMapper->findAll()->sortBy('name', 'asc'), Audience\Model::ENTITY_TYPE_CAMPUS));
     }
 
 
@@ -217,7 +238,7 @@ class Controller extends Base
      */
     public function getRoles()
     {
-        $this->getResponse()->content->set($this->generate($this->roleMapper->findAll()->sortBy('name', 'asc'), Model::ENTITY_TYPE_ROLE));
+        $this->getResponse()->content->set($this->generate($this->roleMapper->findAll()->sortBy('name', 'asc'), Audience\Model::ENTITY_TYPE_ROLE));
     }
 
 
@@ -228,7 +249,7 @@ class Controller extends Base
      */
     public function getPastoralGroups()
     {
-        $this->getResponse()->content->set($this->generate($this->pastoralGroupMapper->findAll()->sortBy('name', 'asc'), Model::ENTITY_TYPE_PASTORAL_GROUP));
+        $this->getResponse()->content->set($this->generate($this->pastoralGroupMapper->findAll()->sortBy('name', 'asc'), Audience\Model::ENTITY_TYPE_PASTORAL_GROUP));
     }
 
 
@@ -239,7 +260,7 @@ class Controller extends Base
      */
     public function getHouses()
     {
-        $this->getResponse()->content->set($this->generate($this->houseMapper->findAll()->sortBy('house', 'asc'), Model::ENTITY_TYPE_SCHOOL_HOUSE));
+        $this->getResponse()->content->set($this->generate($this->houseMapper->findAll()->sortBy('house', 'asc'), Audience\Model::ENTITY_TYPE_SCHOOL_HOUSE));
     }
 
 
@@ -250,7 +271,7 @@ class Controller extends Base
      */
     public function getFolders()
     {
-        $this->getResponse()->content->set($this->generate($this->folderMapper->findForUser($this->getUser())->sortBy('title', 'asc'), Model::ENTITY_TYPE_FOLDER));
+        $this->getResponse()->content->set($this->generate($this->folderMapper->findForUser($this->getUser())->sortBy('title', 'asc'), Audience\Model::ENTITY_TYPE_FOLDER));
     }
 
 
@@ -259,8 +280,10 @@ class Controller extends Base
      *
      * @api /comms/news/audiencebrowser/yearlevels
      *
-     * @throws \Schoolbox\Mapper\Exception
      * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \InvalidArgumentException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\InsufficientHydrationException
      */
     public function getYearLevels()
     {
@@ -269,9 +292,8 @@ class Controller extends Base
         /** @var Html $outputFormatter */
         $outputFormatter = $this->getDi()->get('webOutput:nochrome');
 
-        $registry = new Segment\SearchRegistry($this->getUser(), $this->folderMapper);
-        $translator = new Segment\Translator($this->folderMapper->getDatabase(), $this->getUser(), $this->folderMapper);
-        $formatter = new Segment\HtmlFormatter($outputFormatter);
+        $translator = new Audience\Segment\Translator($this->folderMapper->getDatabase(), $this->getUser(), $this->folderMapper);
+        $formatter = new Audience\Segment\HtmlFormatter($outputFormatter);
 
         $years = array_filter($this->userMapper->findDistinct('year'));
         sort($years);
@@ -280,13 +302,13 @@ class Controller extends Base
             $row = [
                 'id' => $year,
                 'name' => \is_numeric($year) ? "Year {$year}" : $year,
-                'entity_type' => Model::ENTITY_TYPE_YEAR
+                'entity_type' => Audience\Model::ENTITY_TYPE_YEAR
             ];
 
-            $items[] = $this->generateDecoratedDataTuple($row, $registry, $translator, $formatter);
+            $items[] = $this->generateDecoratedDataTuple($row, $translator, $formatter);
         }
 
-        return $this->getResponse()->content->set($this->buildJsonOutput([
+        $this->getResponse()->content->set($this->buildJsonOutput([
             'success' => true,
             'data' => $items
         ]));

@@ -22,17 +22,6 @@ class SearchRegistry implements ISearch
 
 
     /**
-     * These entity types can have parents_of and teachers_of modifiers
-     * Users don't have modifiers
-     *
-     * @var array
-     */
-    private $modifierRegistry = [
-        'campus', 'folder', 'school_house', 'year', 'role', 'pastoral_group'
-    ];
-
-
-    /**
      * Registry constructor.
      *
      * @param User          $user
@@ -73,17 +62,5 @@ class SearchRegistry implements ISearch
         }
 
         return implode(' UNION ', $pieces);
-    }
-
-
-    /**
-     * Decide whether $entityType has the modifiers parents_of and teachers_of
-     *
-     * @param string $entityType
-     * @return bool
-     */
-    public function hasModifier(string $entityType): bool
-    {
-        return \in_array($entityType, $this->modifierRegistry, true);
     }
 }
