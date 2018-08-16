@@ -9,6 +9,7 @@
 namespace Schoolbox\Comms\News\AudienceBrowser;
 
 use Alaress\Web\Controller\Base;
+use Alaress\Web\Output\Html;
 use HouseMapper;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
@@ -87,9 +88,12 @@ class Controller extends Base
     {
         $searchResult = [];
 
+        /** @var Html $outputFormatter */
+        $outputFormatter = $this->getDi()->get('webOutput:nochrome');
+
         $registry = new Segment\SearchRegistry($this->getUser(), $this->folderMapper);
         $translator = new Segment\Translator($this->folderMapper->getDatabase(), $this->getUser(), $this->folderMapper);
-        $formatter = new Segment\HtmlFormatter($this->getDi());
+        $formatter = new Segment\HtmlFormatter($outputFormatter);
 
         $statement = $this->userMapper->getDatabase()->prepare($registry->getSearchSql());
 
@@ -120,9 +124,12 @@ class Controller extends Base
     {
         $items = [];
 
+        /** @var Html $outputFormatter */
+        $outputFormatter = $this->getDi()->get('webOutput:nochrome');
+
         $registry = new Segment\SearchRegistry($this->getUser(), $this->folderMapper);
         $translator = new Segment\Translator($this->folderMapper->getDatabase(), $this->getUser(), $this->folderMapper);
-        $formatter = new Segment\HtmlFormatter($this->getDi());
+        $formatter = new Segment\HtmlFormatter($outputFormatter);
 
         foreach ($collection as $item) {
             $row = array_combine(['id', 'name'], $item->findValueLabelPair());
@@ -259,9 +266,12 @@ class Controller extends Base
     {
         $items = [];
 
+        /** @var Html $outputFormatter */
+        $outputFormatter = $this->getDi()->get('webOutput:nochrome');
+
         $registry = new Segment\SearchRegistry($this->getUser(), $this->folderMapper);
         $translator = new Segment\Translator($this->folderMapper->getDatabase(), $this->getUser(), $this->folderMapper);
-        $formatter = new Segment\HtmlFormatter($this->getDi());
+        $formatter = new Segment\HtmlFormatter($outputFormatter);
 
         $years = array_filter($this->userMapper->findDistinct('year'));
         sort($years);

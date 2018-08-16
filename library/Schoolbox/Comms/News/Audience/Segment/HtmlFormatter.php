@@ -9,25 +9,27 @@
 
 namespace Schoolbox\Comms\News\Audience\Segment;
 
+use Alaress\Web\Output\Html;
 use Aura\Di;
 
 class HtmlFormatter
 {
     /**
-     * Dependency Injector
+     * A di-obtained output formatter class
      *
-     * @var Di\Container
+     * @var Html
      */
-    private $di;
+    private $outputter;
+
 
     /**
      * HtmlFormatter constructor.
      *
-     * @param Di\Container $di
+     * @param Html $outputter
      */
-    public function __construct(Di\Container $di)
+    public function __construct(Html $outputter)
     {
-        $this->di = $di;
+        $this->outputter = $outputter;
     }
 
 
@@ -42,10 +44,8 @@ class HtmlFormatter
      */
     public function decorate(array $data): array
     {
-        $output = $this->di->get('webOutput:nochrome');
-
         foreach ($data as $key => &$current) {
-            $current['itemHtml'] = $output->setTemplate('@commsNews/audienceItem.twig')->setData($current)->getAsString();
+            $current['itemHtml'] = $this->outputter->setTemplate('@commsNews/audienceItem.twig')->setData($current)->getAsString();
         }
 
         unset($current);
