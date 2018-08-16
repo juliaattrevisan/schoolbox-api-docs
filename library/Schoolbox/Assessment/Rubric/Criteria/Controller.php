@@ -15,6 +15,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Group;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\GroupMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionUsageMapper;
+use Schoolbox\Assessment\Rubric\RowSet\RowSet;
 use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\L10n\RosettaStone;
@@ -110,7 +111,7 @@ class Controller extends BaseController
             $this
                 ->buildHtmlOutput(
                     '@rubricCriteria/form.twig',
-                    $this->buildTwigDataForForm($folder, $this->criterionMapper->findForFolder($folder->getId()))
+                    $this->buildTwigDataForForm($this->rubricMapper->createRowSet($folder))
                 )
                 ->setTitle(
                     sprintf(
@@ -154,34 +155,49 @@ class Controller extends BaseController
     /**
      * Build Twig data for the form.
      *
-     * @param FolderModel $folder
-     * @param Criterion[] $criterionCollection
+     * @param RowSet $rowSet
      * @return array
      */
-    private function buildTwigDataForForm(FolderModel $folder, $criterionCollection): array
+    private function buildTwigDataForForm(RowSet $rowSet): array
     {
-        $topId = 0;
+        $folder = $rowSet->getContext()->getBaseContext()->getFolder();
+        $topId  = 0;
 
         // Group criterion list by each criterion's rubric group
         $groups = [];
-        foreach ($criterionCollection as $criterion) {
-            $groupId = $criterion->getGroup()->getId();
-            $topId   = max($topId, $criterion->getId());
-
-            // Build group item if it's not there
-            if (!isset($groups[$groupId])) {
-                $groups[$groupId] = [
-                    'group'    => $criterion->getGroup(),
-                    'usage'    => $this->usageMapper->findGroupUsage($groupId),
-                    'criteria' => [],
+        foreach ($rowSet->getGroups() as $group) {
+            $groupId = $group->getId();
+            $groups[$groupId] = [
+                'group'    => $group,
+                'usage'    => $this->usageMapper->findGroupUsage($groupId),
+                'criteria' => [],
+            ];
+            foreach ($group->getCriteria() as $criterion) {
+                $groups[$groupId]['criteria'][] = [
+                    'criterion' => $criterion,
+                    'usage'     => $this->usageMapper->findCriterionUsage($criterion->getId()),
                 ];
             }
-
-            $groups[$groupId]['criteria'][] = [
-                'criterion' => $criterion,
-                'usage'     => $this->usageMapper->findCriterionUsage($criterion->getId()),
-            ];
         }
+
+//        foreach ($criterionCollection as $criterion) {
+//            $groupId = $criterion->getGroup()->getId();
+//            $topId   = max($topId, $criterion->getId());
+//
+//            // Build group item if it's not there
+//            if (!isset($groups[$groupId])) {
+//                $groups[$groupId] = [
+//                    'group'    => $criterion->getGroup(),
+//                    'usage'    => $this->usageMapper->findGroupUsage($groupId),
+//                    'criteria' => [],
+//                ];
+//            }
+//
+//            $groups[$groupId]['criteria'][] = [
+//                'criterion' => $criterion,
+//                'usage'     => $this->usageMapper->findCriterionUsage($criterion->getId()),
+//            ];
+//        }
 
         return [
             'folder'                   => $folder,
