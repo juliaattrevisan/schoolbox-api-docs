@@ -12,6 +12,7 @@ namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 use Schoolbox\Comms\News\Audience\Model;
 use Schoolbox\Comms\News\Audience\Segment\ISearch;
 use Schoolbox\Comms\News\Audience\Segment\ITranslate;
+use Schoolbox\Permission\Access\RoleAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\User;
 
@@ -43,25 +44,82 @@ class Folder implements ISearch, ITranslate
 
 
     /**
+     * Check which folders $user can see based on role permissions
+     *
+     * @return array
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    private function findFolderIdsWithRoleAccess(): array
+    {
+        $roleAccessMapper = \Schoolbox\Permission\Access\RoleAccessMapper::getInstance();
+
+        $folders = $roleAccessMapper->findByColumnList([
+            'gid' => $this->user->getRole()->getId(),
+            'type' => \Schoolbox\Permission\Access\UserAccess::ACCESS_READ
+        ]);
+
+        $ids = [];
+
+        /** @var RoleAccess $current */
+        foreach ($folders as $folder) {
+            $ids[] = $folder->getCategory()->getId();
+        }
+
+        return $ids;
+    }
+
+
+    /**
      * Gets an sql fragment for the ISearch instance
      *
      * To use a Folder as an audiencing target,
      *    - Folders must have a class code or be a Group
-     *    - Current user must have at least READ access to a folder via class membership
+     *    - Current user must have at least READ access to a folder in some way
      *    - Folder can't be deleted
      *
      * Anything else is rolled over or otherwise inaccessible and shouldn't appear as a search result
      *
      * @return string
      * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \Schoolbox\Mapper\Exception
      */
     public function getSearchSql(): string
     {
-        $classMembership = $this->folderMapper->findFolderIdsForUser($this->user);
-        $classMembershipSql = '';
+        $folderMembershipSql = '';
 
-        if (\count($classMembership)) {
-            $classMembershipSql = ' AND folder.id IN (' . implode(', ', $classMembership) . ')';
+        /* Superusers/CMS Perms aren't limited to what they can search and can audience any folder
+         * as described in this method's docblock.
+         *
+         * Restrict non-superusers/non-CMS Perms who have read access to folders as described in this
+         * method's docblock
+         *
+         * If the resultant list of folders is empty, exit early and don't bother executing query
+         */
+        if (!$this->user->isSuperuser()) {
+
+            /* Check to see whether I have read access to any group/class folders
+             */
+            $groupAndClassMembership = $this->folderMapper->findFolderIdsForUser($this->user);
+
+            /* Also check to see whether I have read access in other ways
+             * First, check role permissions on a group
+             */
+            $roleAccess = $this->findFolderIdsWithRoleAccess();
+
+            /* Combine the two
+             */
+            $folderMembership = array_unique(array_merge($groupAndClassMembership, $roleAccess));
+
+            /* If I have zero elements in my folderMembership, boot me out - there's nothing to fetch
+             * I'm restricted from seeing any folders
+             */
+            if (!\count($folderMembership)) {
+                return '';
+            }
+
+            /* Otherwise, restrict my search results to these folders only
+             */
+            $folderMembershipSql = ' AND folder.id IN (' . implode(', ', $folderMembership) . ')';
         }
 
         return "
@@ -80,7 +138,7 @@ class Folder implements ISearch, ITranslate
                 OR
                 folder.id IN (SELECT cid FROM userGroups)
             )
-            {$classMembershipSql}
+            {$folderMembershipSql}
             AND (folder.name LIKE :keyword OR folder_code.code LIKE :keyword)
             AND folder.deleted_at IS NULL
             GROUP BY folder.id
