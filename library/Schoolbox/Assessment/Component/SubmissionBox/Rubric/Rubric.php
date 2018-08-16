@@ -21,6 +21,9 @@ use SplObjectStorage;
 
 /**
  * Composed of domain-level objects. Can be decomposed into ORM mapped-models
+ *
+ * @deprecated use the `\Schoolbox\Assessment\Rubric\{RowSet,Grid,MarkedGrid}`
+ *             classes instead
  */
 class Rubric extends Core\Rubric
 {
