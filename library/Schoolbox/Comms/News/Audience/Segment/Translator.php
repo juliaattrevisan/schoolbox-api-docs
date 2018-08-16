@@ -48,6 +48,38 @@ class Translator
     private $folderMapper;
 
     /**
+     * This array is of the structure:
+     *
+         [
+             entity_type =>
+                 entity_value => [
+                     name => '',
+                     relationships => []
+                 ]
+             ]
+         ]
+
+         $example = [
+            'folder' =>
+                '43' => [
+                    'name' => 'English 344 (EN344, ABC123, DEF456)',
+                    'relationships' => [
+                        'parents_of', 'teachers_of'
+                    ]
+                ],
+                '111' => [
+                    'name' => 'My Class (MC111)',
+                    'relationships' => []
+                ]
+            ],
+            'campus' =>
+                '2' => [
+                    'name' => 'Big Campus',
+                    'relationships' => []
+                ]
+            ]
+        ]
+
      * @var array
      */
     private $cache = [];
