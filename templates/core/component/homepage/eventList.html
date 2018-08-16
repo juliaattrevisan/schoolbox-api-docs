@@ -100,7 +100,6 @@
                         var dialog = $('[data-dialog="bulk-delete"]');
                         var eventId = $(this).attr('data-event-id');
                         var eventName = $(this).attr('data-event-type');
-                        dialog.html(dialog.html().replace(/booking/g, eventName));
                         dialog.foundation('reveal', 'open');
                         dialog.find('[data-action="self"]')
                             .off('click')
@@ -126,13 +125,13 @@
                 });
             </script>
             <div class="reveal-modal" data-reveal data-dialog="bulk-delete">
-                <h2>This booking is part of a series</h2>
+                <h2>This event is part of a series</h2>
                 <p class="icon-alert">
-                    Would you like to delete only this booking, or all in the series?
+                    Would you like to delete only this event, or all in the series?
                 </p>
                 <ul class="flex-list buttons">
-                    <li><a href="#" class="button" data-action="self">Only this booking</a></li>
-                    <li><a href="#" class="button" data-action="series">All bookings in the series</a></li>
+                    <li><a href="#" class="button" data-action="self">Only this event</a></li>
+                    <li><a href="#" class="button" data-action="series">All events in the series</a></li>
                     <li><a href="#" class="button" data-action="cancel">Cancel</a></li>
                 </ul>
             </div>
