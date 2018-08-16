@@ -9,6 +9,8 @@
 
 namespace Schoolbox\Comms\News\Audience\Segment;
 
+use Schoolbox\Comms\News\Audience\BusinessRules;
+use Schoolbox\Comms\News\Audience\Mapper;
 use Schoolbox\Comms\News\Audience\Model;
 
 class Codec
@@ -66,12 +68,14 @@ class Codec
         return $segment;
     }
 
-
     /**
      * Takes a segment string and snaps it into constituent pieces
      *
      * @param string $segment
      * @return array
+     * @throws \InvalidArgumentException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\InsufficientHydrationException
      */
     public static function decode(string $segment): array
     {
@@ -80,25 +84,36 @@ class Codec
         $entityType = $pieces[0];
         $entityValue = self::decodeValue($pieces[1]);
 
-        /* This has a Parents or Teachers modifier if the audiencing segment has 3 pieces
+        /* If there isn't a $pieces[2], there was no relationship detected in $segment
+         * Segments require three pieces - entity type, entity value, relationship
+         *
+         * A null relationship typically infers as RELATIONSHIP_SELF from frontend
          */
-        $modifierCount = 3;
-        $piecesCount   = \count($pieces);
+        $relationship = $pieces[2];
 
-        $relationship = Model::RELATIONSHIP_SELF;
-
-        if ($piecesCount === $modifierCount) {
-            if ($pieces[$piecesCount - 1] === Model::RELATIONSHIP_PARENTS_OF) {
-                $relationship = Model::RELATIONSHIP_PARENTS_OF;
-            } elseif ($pieces[$piecesCount - 1] === Model::RELATIONSHIP_TEACHERS_OF) {
-                $relationship = Model::RELATIONSHIP_TEACHERS_OF;
-            }
+        if (null === $relationship) {
+            $relationship = Model::RELATIONSHIP_SELF;
         }
 
-        return [
-            'entityType' => $entityType,
-            'entityValue' => $entityValue,
-            'relationship' => $relationship
-        ];
+        /* If the entity type isn't recognised, error out
+         * BusinessRules requires a model, so we'll mash one together with the pieces we have
+         */
+        $model = Mapper::getInstance()->createModel()
+            ->setEntityType($entityType)
+            ->setEntityValue($entityValue)
+            ->setRelationship($relationship);
+
+        /* Verify that the constituent pieces are valid; otherwise die loudly because you're trying
+         * to use some kind of illegal configuration somehow
+         */
+        if ((new BusinessRules())->isValidRelationship($model, $relationship)) {
+            return [
+                'entityType' => $entityType,
+                'entityValue' => $entityValue,
+                'relationship' => $relationship
+            ];
+        }
+
+        return [];
     }
 }

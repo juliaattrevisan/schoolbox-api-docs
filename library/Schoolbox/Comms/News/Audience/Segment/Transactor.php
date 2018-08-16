@@ -86,15 +86,16 @@ class Transactor
     /**
      * Save the audiencing segments for a given article
      *
-     * @param News\Model  $article
-     * @param string $segments
+     * @param News\Model $article
+     * @param string     $segments
      * @throws MapperException
+     * @throws MapperException\InsufficientHydrationException
      * @throws PDOException
+     * @throws \InvalidArgumentException
      * @throws \UnexpectedValueException
      */
     public function save(News\Model $article, string $segments): void
     {
-
         /* Purge existing records before resaving the new ones
          */
         $this->audienceMapper->deleteByColumn('comms_news_article_id', $article->getId());
