@@ -87,6 +87,8 @@ class RubricMapper
     /**
      * Creates a rowset for the given context.
      *
+     * @todo consider whether this belongs here
+     *
      * @param AssessmentContext $context
      * @param bool              $getUsages
      * @return RowSet
@@ -155,6 +157,68 @@ class RubricMapper
         $rowSet->setGroups($groups);
 
         return $rowSet;
+    }
+
+
+    /**
+     * Saves this row set to the database.
+     *
+     * @param RowSet $rowSet
+     * @throws MapperException
+     */
+    public function persistRowSet(RowSet $rowSet): void
+    {
+        $folder             = $rowSet->getContext()->getBaseContext()->getFolder();
+        $groupMapper        = GroupMapper::getInstance();
+        $oldGroupModels     = $groupMapper->findByColumn('id', $rowSet->retrieveGroupIds());
+        $newGroupModels     = $groupMapper->createCollection();
+        $criterionMapper    = CriterionMapper::getInstance();
+        $oldCriterionModels = $criterionMapper->findByColumn('id', $rowSet->retrieveCriterionIds());
+        $newCriterionModels = $criterionMapper->createCollection();
+
+
+        foreach ($rowSet->getGroups() as $group) {
+            // Persist group
+            $groupId    = $group->getId();
+            $groupModel = $groupId ? $oldCriterionModels[$groupId] : null;
+
+            if (!$groupModel) {
+                $groupModel = $groupMapper->createModel($groupId)
+                    ->setParentId($folder->getId())
+                    ->setParentType(Group::PARENT_TYPE_CATEGORY);
+            }
+
+            // TODO allow groups/criteria to be locked
+            // TODO handle setting/non-setting of curriculum nodes
+            $groupModel->setName($group->getName())
+                       ->setCurriculumNodes($group->getCurriculumNodes());
+
+
+            foreach ($group->getCriteria() as $criterion) {
+                // Persist criterion
+                $criterionId    = $criterion->getId();
+                $criterionModel = $criterionId ? $oldCriterionModels[$criterionId] : null;
+
+                if (!$criterionModel) {
+                    $criterionModel = $criterionMapper->createModel($criterionId)
+                        ->setGroup($groupModel);
+                }
+
+                $criterionModel->setName($criterion->getName())
+                               ->setCurriculumNodes($criterion->getCurriculumNodes());
+
+                $newCriterionModels->add($criterionModel);
+            }
+            $newGroupModels[$groupId] = $groupModel;
+        }
+
+        // Save the ones which changed
+        $groupMapper->save($newGroupModels);
+        $criterionMapper->save($newCriterionModels);
+
+        // Delete the ones in old models that aren't in new
+        $criterionMapper->delete($oldCriterionModels->diffBy($newCriterionModels, 'id'));
+        $groupMapper->delete($oldGroupModels->diffBy($newGroupModels, 'id'));
     }
 
 
