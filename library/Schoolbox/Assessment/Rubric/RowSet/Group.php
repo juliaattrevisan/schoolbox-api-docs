@@ -10,6 +10,7 @@ namespace Schoolbox\Assessment\Rubric\RowSet;
 
 use Schoolbox\Curriculum\Node\Traits\HasCurriculumNodes;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Mapper\Traits\Model\Id;
 
 /**
@@ -34,11 +35,20 @@ class Group
 
 
     /**
+     * Assessments which are using this group.
+     *
+     * @var GenericCollection|IAssessable[]
+     */
+    private $usage;
+
+
+    /**
      * Constructor
      */
     public function __construct()
     {
         $this->criteria = new GenericCollection(Criterion::class);
+        $this->usage    = new GenericCollection(IAssessable::class);
     }
 
 
@@ -78,6 +88,26 @@ class Group
     public function setCriteria(GenericCollection $criteria): self
     {
         $this->criteria = $criteria;
+        return $this;
+    }
+
+
+    /**
+     * @return GenericCollection|IAssessable[]
+     */
+    public function getUsage(): GenericCollection
+    {
+        return $this->usage;
+    }
+
+
+    /**
+     * @param GenericCollection|IAssessable[] $usage
+     * @return static
+     */
+    public function setUsage(GenericCollection $usage): self
+    {
+        $this->usage = $usage;
         return $this;
     }
 }
