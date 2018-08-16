@@ -96,9 +96,9 @@ class Translator
      * This doesn't assemble a full audiencing segment
      *
      * @param string $entityType
-     * @return mixed
+     * @return string
      */
-    public function translateEntityType(string $entityType)
+    public function translateEntityType(string $entityType): string
     {
         return $this->entityTranslation[$entityType];
     }
@@ -109,9 +109,9 @@ class Translator
      * This doesn't assemble a full audiencing segment
      *
      * @param string $modifier
-     * @return mixed
+     * @return string
      */
-    public function translateModifier(string $modifier)
+    public function translateModifier(string $modifier): string
     {
         if ($modifier === Model::RELATIONSHIP_SELF) {
             return '';
