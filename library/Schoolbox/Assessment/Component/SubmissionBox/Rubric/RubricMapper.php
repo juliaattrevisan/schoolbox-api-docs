@@ -110,11 +110,13 @@ class RubricMapper
             if (!isset($groups[$groupId])) {
                 $groups[$groupId] = (new \Schoolbox\Assessment\Rubric\RowSet\Group())
                     ->setId($groupId)
-                    ->setName($groupModel->getName());
+                    ->setName($groupModel->getName())
+                    ->setCurriculumNodes($groupModel->getCurriculumNodes());
             }
             $groups[$groupId]->getCriteria()[$criterionId] = (new \Schoolbox\Assessment\Rubric\RowSet\Criterion())
                 ->setId($criterionId)
-                ->setName($criterionModel->getName());
+                ->setName($criterionModel->getName())
+                ->setCurriculumNodes($criterionModel->getCurriculumNodes());
         }
         $rowSet->setGroups($groups);
 

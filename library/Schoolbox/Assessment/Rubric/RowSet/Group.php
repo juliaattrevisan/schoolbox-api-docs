@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\RowSet;
 
+use Schoolbox\Curriculum\Node\Traits\HasCurriculumNodes;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Traits\Model\Id;
 
@@ -17,6 +18,7 @@ use Schoolbox\Mapper\Traits\Model\Id;
 class Group
 {
     use Id;
+    use HasCurriculumNodes;
 
 
     /**
@@ -26,7 +28,7 @@ class Group
 
 
     /**
-     * @var GenericCollection
+     * @var GenericCollection|Criterion[]
      */
     private $criteria;
 

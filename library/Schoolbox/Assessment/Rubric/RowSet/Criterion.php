@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\RowSet;
 
+use Schoolbox\Curriculum\Node\Traits\HasCurriculumNodes;
 use Schoolbox\Mapper\Traits\Model\Id;
 
 /**
@@ -16,6 +17,7 @@ use Schoolbox\Mapper\Traits\Model\Id;
 class Criterion
 {
     use Id;
+    use HasCurriculumNodes;
 
 
     /**
