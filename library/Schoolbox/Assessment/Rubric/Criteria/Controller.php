@@ -188,12 +188,24 @@ class Controller extends BaseController
     private function updateRowSet(RowSet $rowSet, array $postData): RowSet
     {
         // Which groups were passed?
-        $postedGroups = array_combine(
-            array_column($postData, 'id'),
-            $postData
-        );
+        $existingGroupIds = $rowSet->retrieveGroupIds();
+        $postedGroupIds   = array_column($postData, 'id');
+        $postedGroups     = array_combine($postedGroupIds, $postData);
 
+
+        // Add newly added groups, remove existing IDs
+        foreach (array_diff($postedGroupIds, $existingGroupIds) as $newGroupId) {
+            $rowSet->getGroups()[$newGroupId] = new \Schoolbox\Assessment\Rubric\RowSet\Group();
+        }
+        foreach (array_diff($existingGroupIds, $postedGroupIds) as $removedGroupId) {
+            unset($rowSet->getGroups()[$removedGroupId]);
+        }
+
+
+        // Process groups
         foreach ($rowSet->getGroups() as $groupId => $group) {
+
+            // If this group was emptied of all criteria: remove it
             $postedGroup = $postedGroups[$groupId] ?? null;
             if (null === $postedGroup || empty($postedGroup['items'])) {
                 // Can I unset whilst looping?
@@ -210,10 +222,22 @@ class Controller extends BaseController
             }
 
 
-            $postedCriteria = array_combine(
-                array_column($postedGroup['items'], 'id'),
-                $postedGroup['items']
-            );
+            // Which criteria were passed?
+            $existingCriterionIds = $group->retrieveCriterionIds();
+            $postedCriterionIds   = array_column($postedGroup['items'], 'id');
+            $postedCriteria       = array_combine($postedCriterionIds, $postedGroup['items']);
+
+
+            // Add newly-added criteria, remove existing criteria
+            foreach (array_diff($postedCriterionIds, $existingCriterionIds) as $newCriterionId) {
+                $group->getCriteria()[$newCriterionId] = new \Schoolbox\Assessment\Rubric\RowSet\Criterion();
+            }
+            foreach (array_diff($existingCriterionIds, $postedCriterionIds) as $removedCriterionId) {
+                unset($group->getCriteria()[$removedCriterionId]);
+            }
+
+
+            // Process criteria
             foreach ($group->getCriteria() as $criterionId => $criterion) {
                 $postedCriterion = $postedCriteria[$criterionId] ?? null;
                 if (null === $postedCriterion) {
@@ -229,9 +253,7 @@ class Controller extends BaseController
                         $this->nodeMapper->findByColumn('id', $postedCriterion['curriculumCode'])
                     );
                 }
-
             }
-
         }
 
         return $rowSet;
