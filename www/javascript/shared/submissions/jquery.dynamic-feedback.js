@@ -294,8 +294,6 @@
                 text: 'Autosaving...'
             });
 
-            console.log($form.serializeArray());
-
             config.onPreDraftCallback($participant.data('participant'), data);
 
             $.ajax($form.attr('action'), data)

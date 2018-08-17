@@ -14,7 +14,6 @@
             $rb                     = $('#rb-{{ rubricContext.rubric.id }}'),
             $finalSummary           = $rb.find('[data-final-summary]');
 
-
         function refreshAssignFromRubricButton() {
             var currentRubricValue = $.trim($finalSummary.text());
             var currentMarkInput   = $markInput.val();
@@ -47,6 +46,8 @@
 
         // do it on pageload anyway
         refreshAssignFromRubricButton();
+
+        // TODO need to also do this the first time we mark the rubric
     });
 </script>
 <p><button id="use-rubric-value" class="full-width">Assign {{ locale.grades.proper }} from Rubric</button></p>
