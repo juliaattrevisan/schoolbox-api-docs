@@ -285,7 +285,7 @@ class ImpressionsConversionsOpens
         $conversionRatio = 0.00;
 
         if ($numImpressions && $numConversions) {
-            $conversionRatio = round(100*$numConversions/$numImpressions, 1);
+            $conversionRatio = $this->percentage($numConversions, $numImpressions);
         }
 
         /* Calculate Conversion ratios for each referrer type
