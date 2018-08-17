@@ -775,8 +775,7 @@ class Controller extends Base
 
         if (\count($userIds)) {
             $users = $this->userMapper->findByColumn('id', $userIds)->sortBy('lastname', 'asc');
-        }
-        else {
+        } else {
             $users = $this->userMapper->createCollection();
         }
 

@@ -59,7 +59,7 @@ class Controller extends Base
     private $audienceMapper;
 
     /**
-     * @var
+     * @var RoleAccessMapper
      */
     private $roleAccessMapper;
 
