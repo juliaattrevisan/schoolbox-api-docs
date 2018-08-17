@@ -9,6 +9,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+/** @var SitePage $this */
 require_once __DIR__ . '/../../../library/Bootstrap.php';
 
 /* Old handler junk
@@ -55,15 +56,15 @@ $count['all'] += $mapper->countTotalResults();
 /* If no result, render error screen
  */
 if (!$count['all']) {
-    $this->getPage()->setFile('no_results', 'resource/search/noResults.html');
+    $this->setFile('no_results', 'resource/search/noResults.html');
 
-    $this->getPage()->setVar(array(
-        'ENCODED_KEYWORD' => $this->getKeyword(),
-        'UNESCAPED_KEYWORD' => $this->getKeyword(),
-        'ENABLED' => AJAX_DISABLED,
+    $this->setVar(array(
+        'ENCODED_KEYWORD'   => $keyword,
+        'UNESCAPED_KEYWORD' => $keyword,
+        'ENABLED'           => AJAX_DISABLED,
     ));
 
-    $this->getPage()->parse('RESULT', 'no_results', true);
+    $this->parse('RESULT', 'no_results', true);
 } else {
     // Render users before all else
     $userRenderer = new \Schoolbox\User\Search\Renderer($page, $result, $count, 0);
