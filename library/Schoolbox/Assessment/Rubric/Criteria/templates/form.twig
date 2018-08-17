@@ -245,8 +245,8 @@ $(function() {
 
                                 {% for criterion in group.criteria %}
                                     {% include '@rubricCriteria/sub/criterion.twig' with {
+                                        group:                    group,
                                         criterion:                criterion,
-                                        groupCount:               groupCount,
                                         isSpecFolder:             isSpecFolder,
                                         curriculumTaggingEnabled: curriculumTaggingEnabled,
                                     } only %}
@@ -254,8 +254,8 @@ $(function() {
 
                                 {# New criterion within group #}
                                 {% include '@rubricCriteria/sub/criterion.twig' with {
+                                    group:                    group,
                                     criterion:                null,
-                                    groupCount:               groupCount,
                                     isSpecFolder:             isSpecFolder,
                                     curriculumTaggingEnabled: curriculumTaggingEnabled,
                                 } only %}
@@ -281,9 +281,8 @@ $(function() {
                         <ul class="information-list">
                             {# New criterion within new group #}
                             {% include '@rubricCriteria/sub/criterion.twig' with {
+                                group:                    null,
                                 criterion:                null,
-                                groupCount:               null,
-                                usage:                    null,
                                 isSpecFolder:             isSpecFolder,
                                 curriculumTaggingEnabled: curriculumTaggingEnabled,
                             } only %}
