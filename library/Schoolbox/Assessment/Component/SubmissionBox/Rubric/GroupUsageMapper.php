@@ -15,6 +15,7 @@ use Schoolbox\Assessment\Component\SubmissionBoxMapper;
  * Mapper for usage of a rubric group on a due work.
  *
  * @method GroupUsage createModel($idValue = null)
+ * @method GroupUsage[]|Schoolbox\GenericCollection findByColumn($columnName, $columnValue, $options = [])
  */
 class GroupUsageMapper extends Schoolbox\Mapper
 {

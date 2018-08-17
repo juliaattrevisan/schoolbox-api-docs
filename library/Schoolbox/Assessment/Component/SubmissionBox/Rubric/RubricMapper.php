@@ -249,7 +249,53 @@ class RubricMapper
         // Build the rowset first
         $grid = new Grid($assessment, $this->createRowSet($assessment->getContext(), $getUsages));
 
+        // Not a due work? This has an empty grid
+        if (!$assessment instanceof DueWork\Model) {
+            return $grid;
+        }
+
         // Load the levels, selected groups/criteria, descriptors for the assessment
+        $groupUsageModels = GroupUsageMapper::getInstance()->findByColumn(
+            'submission_box.assessment_id',
+            $assessment->getId()
+        );
+        $criterionUsageModels = CriterionUsageMapper::getInstance()->findByColumn(
+            'submission_box.assessment_id',
+            $assessment->getId()
+        );
+
+        // Add group/criterion usages
+        foreach ($grid->getRowSet()->getGroups() as $group) {
+            $groupId         = $group->getId();
+            $groupUsageModel = $groupUsageModels[$groupId];
+
+            // Is this group ACTUALLY in use on this grid?
+            if (null === $groupUsageModel) {
+                continue;
+            }
+
+            $groupUsage = (new \Schoolbox\Assessment\Rubric\Grid\GroupUsage($group))
+                ->setMaxValue($groupUsageModel->getMaxValue());
+
+            foreach ($group->getCriteria() as $criterion) {
+                $criterionId         = $criterion->getId();
+                $criterionUsageModel = $criterionUsageModels[$criterionId];
+
+                // Is this criterion ACTUALLY in use on this grid?
+                if (null === $criterionUsageModel) {
+                    continue;
+                }
+
+                $criterionUsage = new \Schoolbox\Assessment\Rubric\Grid\CriterionUsage($criterion);
+
+                $groupUsage->getCriterionUsages()[$criterionId] = $criterionUsage;
+            }
+
+            $grid->getGroupUsages()[$groupId] = $groupUsage;
+        }
+
+        // TODO add descriptors
+        // TODO add levels
 
         return $grid;
     }
