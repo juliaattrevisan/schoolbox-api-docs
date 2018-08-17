@@ -189,8 +189,8 @@ class Controller extends BaseController
     {
         // Which groups were passed?
         $existingGroupIds = $rowSet->retrieveGroupIds();
-        $postedGroupIds   = array_column($postData, 'id');
-        $postedGroups     = array_combine($postedGroupIds, $postData);
+        $postedGroupIds   = array_keys($postData);
+        $postedGroups     = $postData;
 
 
         // Add newly added groups, remove existing IDs
@@ -224,8 +224,8 @@ class Controller extends BaseController
 
             // Which criteria were passed?
             $existingCriterionIds = $group->retrieveCriterionIds();
-            $postedCriterionIds   = array_column($postedGroup['items'], 'id');
-            $postedCriteria       = array_combine($postedCriterionIds, $postedGroup['items']);
+            $postedCriterionIds   = array_keys($postedGroup['items']);
+            $postedCriteria       = $postedGroup['items'];
 
 
             // Add newly-added criteria, remove existing criteria
