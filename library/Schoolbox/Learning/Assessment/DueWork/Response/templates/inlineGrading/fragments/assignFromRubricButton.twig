@@ -41,13 +41,13 @@
         });
 
         // listen for this
-        $rb.on('change', '[data-rubric], [data-rubric-group]', refreshAssignFromRubricButton);
+        // TODO OHHH the problem is that this is only updating the button, not the $markInput val
+        console.log($rb);
+        $rb.on('change', '[data-rubric], [data-rubric-group]', refreshAssignFromRubricButton());
         $markInput.on('change', refreshAssignFromRubricButton);
 
         // do it on pageload anyway
         refreshAssignFromRubricButton();
-
-        // TODO need to also do this the first time we mark the rubric
     });
 </script>
 <p><button id="use-rubric-value" class="full-width">Assign {{ locale.grades.proper }} from Rubric</button></p>
