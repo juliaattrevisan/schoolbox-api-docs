@@ -29,6 +29,12 @@ class Descriptor
     /**
      * @var float|null
      */
+    private $minValue;
+
+
+    /**
+     * @var float|null
+     */
     private $maxValue;
 
 
@@ -48,6 +54,26 @@ class Descriptor
     public function setDescription(?string $description): self
     {
         $this->description = $description;
+        return $this;
+    }
+
+
+    /**
+     * @return float|null
+     */
+    public function getMinValue(): ?float
+    {
+        return $this->minValue;
+    }
+
+
+    /**
+     * @param float|null $minValue
+     * @return static
+     */
+    public function setMinValue(?float $minValue): self
+    {
+        $this->minValue = $minValue;
         return $this;
     }
 

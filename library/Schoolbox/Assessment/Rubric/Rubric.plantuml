@@ -82,6 +82,7 @@ namespace RubricGrid {
 
     class RubricDescriptor {
         description : string
+        minValue : float
         maxValue : float
     }
 
