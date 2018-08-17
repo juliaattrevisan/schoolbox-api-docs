@@ -18,14 +18,14 @@
             <section>
 
                 {# tabs #}
-                <dl class="tabs" data-tab id="{{ topicContainerId }}">
-                    <dd class="active"><a href="#">All</a></dd>
-                    <dd><a href="#">Rejected</a></dd>
-                    <dd><a href="#">Drafts</a></dd>
-                    <dd><a href="#">Awaiting Moderation</a></dd>
-                    <dd><a href="#">Awaiting Publication</a></dd>
-                    <dd><a href="#">Published</a></dd>
-                    <dd><a href="#">Archived</a></dd>
+                <dl class="tabs" id="{{ topicContainerId }}">
+                    <dd :class="{active: tabSelected === 'All'}"><a @click="onTabChange('All')">All</a></dd>
+                    <dd :class="{active: tabSelected === 'Rejected'}"><a @click="onTabChange('Rejected')">Rejected</a></dd>
+                    <dd :class="{active: tabSelected === 'Draft'}"><a @click="onTabChange('Draft')">Drafts</a></dd>
+                    <dd :class="{active: tabSelected === 'Awaiting Moderation'}"><a @click="onTabChange('Awaiting Moderation')">Awaiting Moderation</a></dd>
+                    <dd :class="{active: tabSelected === 'Awaiting Publication'}"><a @click="onTabChange('Awaiting Publication')">Awaiting Publication</a></dd>
+                    <dd :class="{active: tabSelected === 'Published'}"><a @click="onTabChange('Published')">Published</a></dd>
+                    <dd :class="{active: tabSelected === 'Archived'}"><a @click="onTabChange('Archived')">Archived</a></dd>
                 </dl>
 
                 <div class="tabs-content">
@@ -148,9 +148,21 @@
             'paginate': VuejsPaginate
         },
         data: {
+            // The active page on the pagination
             page: 1,
-            allArticles: [], // will async in
-            currentArticles: [] // will async in
+
+            // *All* the author's articles
+            allArticles: [],
+
+            // A container for a filtered list of authored articles
+            // Will be populated as all articles on load
+            filteredArticles: [],
+
+            // The current page of articles
+            currentArticles: [],
+
+            // The selected tab, just used for active styling
+            tabSelected: 'All'
         },
         mounted: function () {
             var vue = this;
@@ -159,6 +171,7 @@
             axios.get('/comms/news/me/articles').then(function(response) {
 
                 vue.allArticles = response.data;
+                vue.filteredArticles = response.data;
                 vue.currentArticles = response.data.slice(0, {{ config.search_type_limit }});
 
             }).catch(function (error) {
@@ -171,15 +184,33 @@
                 var limit = {{ config.search_type_limit }};
                 var offset = (page-1) * limit;
                 var total = offset + {{ config.search_type_limit }};
-                this.currentArticles = this.allArticles.slice(offset, total);
+                this.currentArticles = this.filteredArticles.slice(offset, total);
             },
             onTabChange: function (tab) {
+                var vue = this;
+                var limit = {{ config.search_type_limit }};
 
+                vue.tabSelected = tab;
+                vue.page = 1;
+
+                if (tab === 'All') {
+                    // Reset back to original set
+                    vue.filteredArticles = vue.allArticles;
+                    vue.currentArticles = vue.allArticles.slice(0, limit);
+                } else {
+                    // Filter by tab selected
+                    var filteredArticles = vue.currentArticles = vue.allArticles.filter(function (article) {
+                        return article.status === tab;
+                    });
+
+                    vue.filteredArticles = filteredArticles;
+                    vue.currentArticles = filteredArticles.slice(0, limit);
+                }
             }
         },
         computed: {
             pageCount: function () {
-                return 2;
+                return this.filteredArticles.length / {{ config.search_type_limit }};
             }
         }
     });
