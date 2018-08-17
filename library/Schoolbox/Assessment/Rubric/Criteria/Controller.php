@@ -168,7 +168,7 @@ class Controller extends BaseController
             'maxGroupId'               => max($rowSet->retrieveGroupIds()) + 1,
             'maxCritId'                => max($rowSet->retrieveCriterionIds()) + 1,
             'curriculumTaggingEnabled' => $this->isCurriculumTaggingEnabled(),
-            'isSpecFolder'             => $folder->hasCourseSpecification() || $folder->hasUnitSpecification(),
+            'isSpecFolder'             => $folder->isSpecFolder(),
         ];
     }
 
@@ -219,7 +219,7 @@ class Controller extends BaseController
         $criterionCollection = $this->criterionMapper->findForFolder($folder->getId());
 
         // Criteria that are in use may not be deleted from non-spec folders
-        $isSpecFolder = $folder->hasCourseSpecification() || $folder->hasUnitSpecification();
+        $isSpecFolder = $folder->isSpecFolder();
 
         // Delete criteria not submitted
         foreach ($criterionCollection as $crit) {
@@ -257,7 +257,7 @@ class Controller extends BaseController
         $groupList    = $this->groupMapper->createCollection();
         $parentType   = Group::PARENT_TYPE_CATEGORY;
         $folderId     = $folder->getId();
-        $isSpecFolder = $folder->hasCourseSpecification() || $folder->hasUnitSpecification();
+        $isSpecFolder = $folder->isSpecFolder();
 
         // iterate through list of provided criteria changes
         foreach ($data as $critData) {
