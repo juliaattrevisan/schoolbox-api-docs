@@ -51,6 +51,15 @@ class GroupUsage
 
 
     /**
+     * @return Group
+     */
+    public function getGroup(): Group
+    {
+        return $this->group;
+    }
+
+
+    /**
      * @return GenericCollection|CriterionUsage[]
      */
     public function getCriterionUsages(): GenericCollection
