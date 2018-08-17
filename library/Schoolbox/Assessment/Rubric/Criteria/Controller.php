@@ -133,10 +133,15 @@ class Controller extends BaseController
      */
     public function postForm(FolderModel $folder): void
     {
-        // TODO make this use `\Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper::persistRowSet`
-        $data = $this->preprocessPostData($this->request->post->get('crits', []));
-        $this->deleteUnusedCriteria($folder, $data);
-        $this->persistCriteria($folder, $data);
+        // Retrieve, update and persist the row set
+        $rowSet = $this->rubricMapper->retrieveRowSet($folder, true);
+        $this->updateRowSet($rowSet, $this->request->post->get('crits', []));
+        $this->rubricMapper->persistRowSet($rowSet, $folder->isSpecFolder(), $this->isCurriculumTaggingEnabled());
+
+//        // TODO make this use `\Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper::persistRowSet`
+//        $data = $this->preprocessPostData($this->request->post->get('crits', []));
+//        $this->deleteUnusedCriteria($folder, $data);
+//        $this->persistCriteria($folder, $data);
 
         // Done: redirect back to homepage, or AJAX
         if ($this->request->isXhr()) {
@@ -170,6 +175,66 @@ class Controller extends BaseController
             'curriculumTaggingEnabled' => $this->isCurriculumTaggingEnabled(),
             'isSpecFolder'             => $folder->isSpecFolder(),
         ];
+    }
+
+
+    /**
+     * Update `$rowSet` with the criterion settings from POST.
+     *
+     * @param RowSet $rowSet   The row set, pre-update.
+     * @param array  $postData POST vars for the criteria for the form
+     * @return RowSet
+     */
+    private function updateRowSet(RowSet $rowSet, array $postData): RowSet
+    {
+        // Which groups were passed?
+        $postedGroups = array_combine(
+            array_column($postData, 'id'),
+            $postData
+        );
+
+        foreach ($rowSet->getGroups() as $groupId => $group) {
+            $postedGroup = $postedGroups[$groupId] ?? null;
+            if (null === $postedGroup || empty($postedGroup['items'])) {
+                // Can I unset whilst looping?
+                unset($rowSet->getGroups()[$groupId]);
+                continue;
+            }
+
+            // Can I change the name of the group?
+            $group->setName($postedGroup['name']);
+            if ($this->isCurriculumTaggingEnabled()) {
+                $group->setCurriculumNodes(
+                    $this->nodeMapper->findByColumn('id', $postedGroup['curriculumCode'])
+                );
+            }
+
+
+            $postedCriteria = array_combine(
+                array_column($postedGroup['items'], 'id'),
+                $postedGroup['items']
+            );
+            foreach ($group->getCriteria() as $criterionId => $criterion) {
+                $postedCriterion = $postedCriteria[$criterionId] ?? null;
+                if (null === $postedCriterion) {
+                    // Can I unset whilst looping?
+                    unset($group->getCriteria()[$criterionId]);
+                    continue;
+                }
+
+                // Can I change the name of the criterion?
+                $criterion->setName($postedCriterion['name']);
+                if ($this->isCurriculumTaggingEnabled()) {
+                    $criterion->setCurriculumNodes(
+                        $this->nodeMapper->findByColumn('id', $postedCriterion['curriculumCode'])
+                    );
+                }
+
+            }
+
+        }
+
+        return $rowSet;
     }
 
 
