@@ -9,15 +9,15 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-require_once('../library/Bootstrap.php');
+require_once __DIR__ . '/../../../library/Bootstrap.php';
 
 /* Old handler junk
  */
-require_once('./resource/searchConfig.php');
+require_once __DIR__ . '/../../resource/searchConfig.php';
 
 /* Clean params
  */
-require_once('./resource/searchClean.php');
+require_once __DIR__ . '/../../resource/searchClean.php';
 
 /**
  * Execute searches for all handlers and mappers
