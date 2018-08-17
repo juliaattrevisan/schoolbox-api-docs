@@ -233,7 +233,6 @@ $(function() {
                             <ul class="information-list">
                                 {% include '@rubricCriteria/sub/group.twig' with {
                                     group:                    group,
-                                    groupCount:               groupCount,
                                     isSpecFolder:             isSpecFolder,
                                     curriculumTaggingEnabled: curriculumTaggingEnabled,
                                 } only %}
@@ -272,7 +271,6 @@ $(function() {
                         <ul class="information-list">
                             {% include '@rubricCriteria/sub/group.twig' with {
                                 group:                    null,
-                                groupCount:               null,
                                 isSpecFolder:             isSpecFolder,
                                 curriculumTaggingEnabled: curriculumTaggingEnabled,
                             } only %}
