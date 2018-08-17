@@ -9,14 +9,15 @@
 
 namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 
+use PDOStatement;
 use Schoolbox;
-use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 
 /**
  * Class CriterionUsageMapper
  *
  * @package Schoolbox\Assessment\Component\SubmissionBox\Rubric
+ * @method CriterionUsage hydrate(array $row, $alias = '', $callback = null)
  * @method CriterionUsage createModel($idValue = null)
  * @method CriterionUsage[]|Schoolbox\GenericCollection findByColumn($columnName, $columnValue, $options = [])
  */
@@ -29,6 +30,48 @@ class CriterionUsageMapper extends Schoolbox\Mapper
         $this->uses('sequence', self::TYPE_INTEGER);
         $this->joins('criterion_id', CriterionMapper::class, 'id', null, null, 'criterion', 'criterion');
         $this->joins('submission_box_id', SubmissionBoxMapper::class, 'id', null, null, 'submissionBox', 'submission_box');
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    protected function getSelectString(): string
+    {
+        return "
+            SELECT
+                {$this->getColumnString()},
+                {$this->getJoinColumnString('submission_box', 'sb')}
+        ";
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    protected function getFromString(): string
+    {
+        return "
+            FROM {$this->getTable()}
+            INNER JOIN {$this->getJoinSql('submission_box', '', 'sb', true)}
+        ";
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    protected function hydrateSelect(PDOStatement $statement): Schoolbox\GenericCollection
+    {
+        /** @var SubmissionBoxMapper $boxMapper */
+        $boxMapper  = $this->getJoinMapper('submission_box');
+        $collection = $this->createCollection();
+        foreach ($statement as $row) {
+            $usage = $this->hydrate($row);
+            $usage->setSubmissionBox($boxMapper->hydrate($row, 'sb'));
+            $collection->add($usage);
+        }
+        return $collection;
     }
 
 

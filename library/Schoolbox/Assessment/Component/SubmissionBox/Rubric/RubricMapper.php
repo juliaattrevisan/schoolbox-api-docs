@@ -256,11 +256,11 @@ class RubricMapper
 
         // Load the levels, selected groups/criteria, descriptors for the assessment
         $groupUsageModels = GroupUsageMapper::getInstance()->findByColumn(
-            'submission_box.assessment_id',
+            'sb.assessment_id',
             $assessment->getId()
         );
         $criterionUsageModels = CriterionUsageMapper::getInstance()->findByColumn(
-            'submission_box.assessment_id',
+            'sb.assessment_id',
             $assessment->getId()
         );
 
