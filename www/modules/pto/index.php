@@ -11,10 +11,12 @@ use Schoolbox\PTO\Loader as PTOLoader;
 use Custom\Dcc\PTO\Loader as DccPTOLoader;
 use Schoolbox\Config\Loader as ConfigLoader;
 
-if (\Schoolbox\Config\ConfigMapper::getInstance()->get('site_school_code') === 'dcc') {
-    $ptoLoader = new DccPTOLoader(new ConfigLoader(), $_SESSION["user"]);
+$cfg = new ConfigLoader();
+
+if ($cfg->get('site_school_code') === 'DCC') {
+    $ptoLoader = new DccPTOLoader($cfg, $_SESSION["user"]);
 } else {
-    $ptoLoader = new PTOLoader(new ConfigLoader(), $_SESSION["user"]);
+    $ptoLoader = new PTOLoader($cfg, $_SESSION["user"]);
 }
 
 header('Location: '. $ptoLoader->generateRemoteUrl());

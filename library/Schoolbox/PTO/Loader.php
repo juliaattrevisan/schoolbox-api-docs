@@ -166,7 +166,7 @@ class Loader
     /**
      * @return string
      */
-    private function getPTOLogin()
+    protected function getPTOLogin()
     {
         return $this->getUser()->getUsername();
     }

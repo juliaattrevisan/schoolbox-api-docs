@@ -19,7 +19,7 @@ class Loader extends \Schoolbox\PTO\Loader
     {
         //Map usernames to PTOId
         $username = $this->getUser()->getUsername();
-        $mapFile = '/home/dcc/PTO/parent_map.csv';
+        $mapFile = '/home/Dcc/PTO/parent_map.csv';
 
         if(!file_exists($mapFile) || !is_readable($mapFile)) {
             ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_FILE_OR_URL);
