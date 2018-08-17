@@ -38,21 +38,19 @@
             $assignFromRubricButton.prop('disabled', currentRubricValue === currentMarkInput);
         }
 
-
-        {##
-         # Use the rubric value in the mark input field
-         #
-         # Disabled upon load, since values are the same
-         # at this point in time. Also disables when copying
-         # the rubric mark value in.
-         #}
+        // Update the input val when manually assigning grade from rubric
         $assignFromRubricButton.on('click', function(e) {
             e.preventDefault();
             refreshAssignFromRubricButton();
         });
 
-        // listen for this
-        // TODO needs to change when assign from descs is clicked as well
+        // Update the input val when manually assigning grades from descriptor vals
+        $(".use-descriptor-values").on('click', function(e) {
+            e.preventDefault();
+            refreshAssignFromRubricButton();
+        });
+
+        // Update the input val when any of these inputs change
         $rb.on('change', '[data-rubric], [data-rubric-group], [data-group-max-value]', refreshAssignFromRubricButton);
 
         // do it on pageload anyway
