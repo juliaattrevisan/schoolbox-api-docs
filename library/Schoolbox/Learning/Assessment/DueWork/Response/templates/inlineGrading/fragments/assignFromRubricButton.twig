@@ -9,15 +9,32 @@
 
         // cache this stuff, it doesn't change
         var $status                 = $('#assessment-status'),
-            $markInput              = $status.find('[data-mark-input]'),
+            markInputSelector      = '[data-mark-input]',
             $assignFromRubricButton = $('#use-rubric-value'),
             $rb                     = $('#rb-{{ rubricContext.rubric.id }}'),
-            $finalSummary           = $rb.find('[data-final-summary]');
+            finalSummarySelector    = '[data-final-summary]';
 
         function refreshAssignFromRubricButton() {
-            var currentRubricValue = $.trim($finalSummary.text());
-            var currentMarkInput   = $markInput.val();
+            console.log("Mark input element: ");
+            console.log($status.find(markInputSelector));
 
+            // Current calculated rubric total
+            var currentRubricValue = $.trim($rb.find(finalSummarySelector).text());
+
+            console.log("Current rubric value: " + currentRubricValue);
+
+            // Mark entered in the overall mark field
+            var currentMarkInput   = $status.find(markInputSelector).val();
+
+            console.log("Current mark input val: " + $status.find(markInputSelector).val());
+
+            // Update the mark input field with current rubric total if the total is different from the input val
+            if (currentRubricValue !== currentMarkInput) {
+                console.log("Val differs, updating input val to match rubric total");
+                $status.find(markInputSelector).val(currentRubricValue);
+            }
+
+            // Disable the button if the rubric value is same as input value
             $assignFromRubricButton.prop('disabled', currentRubricValue === currentMarkInput);
         }
 
@@ -30,24 +47,16 @@
          # the rubric mark value in.
          #}
         $assignFromRubricButton.on('click', function(e) {
-
             e.preventDefault();
-            $(this).prop('disabled', true);
-
-            $status
-                .find('[data-mark-input]')
-                .val($.trim($finalSummary.text()))
-                .change();
+            refreshAssignFromRubricButton();
         });
 
         // listen for this
-        // TODO OHHH the problem is that this is only updating the button, not the $markInput val
-        console.log($rb);
-        $rb.on('change', '[data-rubric], [data-rubric-group]', refreshAssignFromRubricButton());
-        $markInput.on('change', refreshAssignFromRubricButton);
+        // TODO needs to change when assign from descs is clicked as well
+        $rb.on('change', '[data-rubric], [data-rubric-group], [data-group-max-value]', refreshAssignFromRubricButton);
 
         // do it on pageload anyway
-        refreshAssignFromRubricButton();
+        // refreshAssignFromRubricButton();
     });
 </script>
 <p><button id="use-rubric-value" class="full-width">Assign {{ locale.grades.proper }} from Rubric</button></p>
