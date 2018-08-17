@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Comms\News\Audience\Segment;
 
+use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\User;
 use Schoolbox\Resource\Folder;
 
@@ -22,16 +23,16 @@ class SearchRegistry implements ISearch
 
 
     /**
-     * Registry constructor.
-     *
-     * @param User          $user
-     * @param Folder\Mapper $folderMapper
+     * SearchRegistry constructor.
+     * @param User             $user
+     * @param Folder\Mapper    $folderMapper
+     * @param RoleAccessMapper $roleAccessMapper
      */
-    public function __construct(User $user, Folder\Mapper $folderMapper)
+    public function __construct(User $user, Folder\Mapper $folderMapper, RoleAccessMapper $roleAccessMapper)
     {
         $this->registry = [
             $campusSql = new Strategy\Campus(),
-            $folderSql = new Strategy\Folder($user, $folderMapper),
+            $folderSql = new Strategy\Folder($user, $folderMapper, $roleAccessMapper),
             $houseSql = new Strategy\House(),
         ];
 

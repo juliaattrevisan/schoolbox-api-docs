@@ -13,6 +13,7 @@ namespace Schoolbox\Comms\News\Audience\Segment;
 
 use Alaress\IDatabase;
 use Schoolbox\Comms\News\Audience\Model;
+use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Resource\Folder;
 use Schoolbox\User;
 
@@ -46,6 +47,11 @@ class Translator
      * @var Folder\Mapper
      */
     private $folderMapper;
+
+    /**
+     * @var RoleAccessMapper
+     */
+    private $roleAccessMapper;
 
     /**
      * This array is of the structure:
@@ -87,15 +93,17 @@ class Translator
 
     /**
      * SegmentTranslator constructor.
-     * @param IDatabase     $db
-     * @param User          $user
-     * @param Folder\Mapper $folderMapper
+     * @param IDatabase        $db
+     * @param User             $user
+     * @param Folder\Mapper    $folderMapper
+     * @param RoleAccessMapper $roleAccessMapper
      */
-    public function __construct(IDatabase $db, User $user, Folder\Mapper $folderMapper)
+    public function __construct(IDatabase $db, User $user, Folder\Mapper $folderMapper, RoleAccessMapper $roleAccessMapper)
     {
         $this->database = $db;
         $this->user = $user;
         $this->folderMapper = $folderMapper;
+        $this->roleAccessMapper = $roleAccessMapper;
 
         /* Entity names
          */
@@ -206,7 +214,7 @@ class Translator
      */
     public function buildCache(int $articleId): self
     {
-        $translator = new TranslatorRegistry($this->user, $this->folderMapper);
+        $translator = new TranslatorRegistry($this->user, $this->folderMapper, $this->roleAccessMapper);
 
         $statement = $this->database->prepare($translator->getTranslateSql());
 

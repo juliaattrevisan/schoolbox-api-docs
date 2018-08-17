@@ -28,6 +28,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\News\Topic;
 use Schoolbox\News\TopicMapper;
 use Schoolbox\Permission\Access;
+use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Folder;
@@ -98,6 +99,12 @@ class Controller extends Base
     private $audienceMapper;
 
     /**
+     * @var RoleAccessMapper
+     */
+    private $roleAccessMapper;
+
+
+    /**
      * Controller constructor.
      *
      * @param ErrorMapper             $errorMapper
@@ -112,6 +119,7 @@ class Controller extends Base
      * @param External_User           $externalUser
      * @param External_Class          $externalClass
      * @param Audience\Mapper         $audienceMapper
+     * @param RoleAccessMapper        $roleAccessMapper
      */
     public function __construct(
         ErrorMapper $errorMapper,
@@ -125,13 +133,16 @@ class Controller extends Base
         UserMapper $userMapper,
         External_User $externalUser,
         External_Class $externalClass,
-        Audience\Mapper $audienceMapper
+        Audience\Mapper $audienceMapper,
+        RoleAccessMapper $roleAccessMapper
     ) {
         $this->errorMapper = $errorMapper;
         $this->newsMapper = $newsMapper;
         $this->policyMapper = $policyMapper;
         $this->topicMapper = $topicMapper;
         $this->saveForLaterMapper = $saveForLaterMapper;
+        $this->audienceMapper = $audienceMapper;
+        $this->roleAccessMapper = $roleAccessMapper;
 
         /* Hyperdrive injection
          */
@@ -141,7 +152,6 @@ class Controller extends Base
         $this->userMapper = $userMapper;
         $this->externalUser = $externalUser;
         $this->externalClass = $externalClass;
-        $this->audienceMapper = $audienceMapper;
     }
 
 
@@ -264,7 +274,7 @@ class Controller extends Base
         /** @var Html $outputFormatter */
         $outputFormatter = $this->getDi()->get('webOutput:nochrome');
 
-        $audiencingData = (new Audience\Segment\Transactor($this->getUser(), $this->audienceMapper, $this->folderMapper))->load($article);
+        $audiencingData = (new Audience\Segment\Transactor($this->getUser(), $this->audienceMapper, $this->folderMapper, $this->roleAccessMapper))->load($article);
         $audiencingHtml = (new Audience\Segment\HtmlFormatter($outputFormatter))->decorate($audiencingData);
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/create.twig', [
@@ -400,7 +410,7 @@ class Controller extends Base
 
         /* Set audiencing options via the hyperdrive
          */
-        (new Audience\Segment\Transactor($this->getUser(), $this->audienceMapper, $this->folderMapper))->save($article, $this->getRequest()->post['audience']);
+        (new Audience\Segment\Transactor($this->getUser(), $this->audienceMapper, $this->folderMapper, $this->roleAccessMapper))->save($article, $this->getRequest()->post['audience']);
     }
 
 

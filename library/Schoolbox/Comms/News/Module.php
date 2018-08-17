@@ -20,7 +20,6 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\News\TopicMapper;
 use Schoolbox\Permission\Access;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Role;
 use Schoolbox\UserMapper;
 
 
@@ -164,6 +163,8 @@ class Module extends BaseModule
             'policyMapper' => $this->getMapperFactory()->getLazy(Policy\Mapper::class),
             'topicMapper' => $this->getMapperFactory()->getLazy(TopicMapper::class),
             'saveForLaterMapper' => $this->getMapperFactory()->getLazy(SaveForLater\Mapper::class),
+            'audienceMapper' => $this->getMapperFactory()->getLazy(Audience\Mapper::class),
+            'roleAccessMapper' => $this->getMapperFactory()->getLazy(Access\RoleAccessMapper::class),
 
             /* Hyperdrive injection
              */
@@ -175,7 +176,6 @@ class Module extends BaseModule
             'userMapper' => $this->getMapperFactory()->getLazy(UserMapper::class),
             'externalUser' => $injector->lazyGet('externalUser'),
             'externalClass' => $injector->lazyGet('externalClass'),
-            'audienceMapper' => $this->getMapperFactory()->getLazy(Audience\Mapper::class),
         ];
     }
 

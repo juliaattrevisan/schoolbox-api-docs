@@ -13,6 +13,7 @@ use PDOException;
 use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Audience\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Resource\Folder;
 use Schoolbox\User;
 
@@ -35,16 +36,23 @@ class Transactor
     private $folderMapper;
 
     /**
-     * Segments constructor.
-     * @param User          $user
-     * @param Mapper        $audienceMapper
-     * @param Folder\Mapper $folderMapper
+     * @var RoleAccessMapper
      */
-    public function __construct(User $user, Mapper $audienceMapper, Folder\Mapper $folderMapper)
+    private $roleAccessMapper;
+
+    /**
+     * Segments constructor.
+     * @param User             $user
+     * @param Mapper           $audienceMapper
+     * @param Folder\Mapper    $folderMapper
+     * @param RoleAccessMapper $roleAccessMapper
+     */
+    public function __construct(User $user, Mapper $audienceMapper, Folder\Mapper $folderMapper, RoleAccessMapper $roleAccessMapper)
     {
         $this->user = $user;
         $this->audienceMapper = $audienceMapper;
         $this->folderMapper = $folderMapper;
+        $this->roleAccessMapper = $roleAccessMapper;
     }
 
 
@@ -58,7 +66,7 @@ class Transactor
     {
         $pieces = [];
 
-        $translator = (new Translator($this->audienceMapper->getDatabase(), $this->user, $this->folderMapper))->buildCache($article->getId());
+        $translator = (new Translator($this->audienceMapper->getDatabase(), $this->user, $this->folderMapper, $this->roleAccessMapper))->buildCache($article->getId());
         $audiencing = $translator->getCache();
 
         foreach ($audiencing as $entityType => $values) {

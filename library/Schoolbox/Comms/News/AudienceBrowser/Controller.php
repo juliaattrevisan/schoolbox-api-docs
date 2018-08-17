@@ -15,6 +15,7 @@ use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
 use Schoolbox\Comms\News\Audience;
 use Schoolbox\Pastoral;
+use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\RoleMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\UserMapper;
@@ -58,6 +59,12 @@ class Controller extends Base
     private $audienceMapper;
 
     /**
+     * @var
+     */
+    private $roleAccessMapper;
+
+
+    /**
      * Controller constructor.
      * @param CampusMapper          $campusMapper
      * @param RoleMapper            $roleMapper
@@ -66,6 +73,7 @@ class Controller extends Base
      * @param Pastoral\Group\Mapper $pastoralGroupMapper
      * @param UserMapper            $userMapper
      * @param Audience\Mapper       $audienceMapper
+     * @param RoleAccessMapper      $roleAccessMapper
      */
     public function __construct(
         CampusMapper $campusMapper,
@@ -74,7 +82,8 @@ class Controller extends Base
         FolderMapper $folderMapper,
         Pastoral\Group\Mapper $pastoralGroupMapper,
         UserMapper $userMapper,
-        Audience\Mapper $audienceMapper
+        Audience\Mapper $audienceMapper,
+        RoleAccessMapper $roleAccessMapper
     ) {
         $this->campusMapper = $campusMapper;
         $this->roleMapper = $roleMapper;
@@ -83,6 +92,7 @@ class Controller extends Base
         $this->pastoralGroupMapper = $pastoralGroupMapper;
         $this->userMapper = $userMapper;
         $this->audienceMapper = $audienceMapper;
+        $this->roleAccessMapper = $roleAccessMapper;
     }
 
 
@@ -98,8 +108,8 @@ class Controller extends Base
         /** @var Html $outputFormatter */
         $outputFormatter = $this->getDi()->get('webOutput:nochrome');
 
-        $registry = new Audience\Segment\SearchRegistry($this->getUser(), $this->folderMapper);
-        $translator = new Audience\Segment\Translator($this->folderMapper->getDatabase(), $this->getUser(), $this->folderMapper);
+        $registry = new Audience\Segment\SearchRegistry($this->getUser(), $this->folderMapper, $this->roleAccessMapper);
+        $translator = new Audience\Segment\Translator($this->folderMapper->getDatabase(), $this->getUser(), $this->folderMapper, $this->roleAccessMapper);
         $formatter = new Audience\Segment\HtmlFormatter($outputFormatter);
 
         $statement = $this->userMapper->getDatabase()->prepare($registry->getSearchSql());
@@ -138,7 +148,7 @@ class Controller extends Base
         /** @var Html $outputFormatter */
         $outputFormatter = $this->getDi()->get('webOutput:nochrome');
 
-        $translator = new Audience\Segment\Translator($this->folderMapper->getDatabase(), $this->getUser(), $this->folderMapper);
+        $translator = new Audience\Segment\Translator($this->folderMapper->getDatabase(), $this->getUser(), $this->folderMapper, $this->roleAccessMapper);
         $formatter = new Audience\Segment\HtmlFormatter($outputFormatter);
 
         foreach ($collection as $item) {
@@ -292,7 +302,7 @@ class Controller extends Base
         /** @var Html $outputFormatter */
         $outputFormatter = $this->getDi()->get('webOutput:nochrome');
 
-        $translator = new Audience\Segment\Translator($this->folderMapper->getDatabase(), $this->getUser(), $this->folderMapper);
+        $translator = new Audience\Segment\Translator($this->folderMapper->getDatabase(), $this->getUser(), $this->folderMapper, $this->roleAccessMapper);
         $formatter = new Audience\Segment\HtmlFormatter($outputFormatter);
 
         $years = array_filter($this->userMapper->findDistinct('year'));

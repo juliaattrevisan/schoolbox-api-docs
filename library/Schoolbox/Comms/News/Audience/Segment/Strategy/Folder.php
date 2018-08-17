@@ -13,6 +13,7 @@ use Schoolbox\Comms\News\Audience\Model;
 use Schoolbox\Comms\News\Audience\Segment\ISearch;
 use Schoolbox\Comms\News\Audience\Segment\ITranslate;
 use Schoolbox\Permission\Access\RoleAccess;
+use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\User;
@@ -33,14 +34,22 @@ class Folder implements ISearch, ITranslate
 
 
     /**
-     * Folder constructor.
-     * @param User         $user
-     * @param FolderMapper $folderMapper
+     * @var RoleAccessMapper
      */
-    public function __construct(User $user, FolderMapper $folderMapper)
+    private $roleAccessMapper;
+
+
+    /**
+     * Folder constructor.
+     * @param User             $user
+     * @param FolderMapper     $folderMapper
+     * @param RoleAccessMapper $roleAccessMapper
+     */
+    public function __construct(User $user, FolderMapper $folderMapper, RoleAccessMapper $roleAccessMapper)
     {
         $this->user = $user;
         $this->folderMapper = $folderMapper;
+        $this->roleAccessMapper = $roleAccessMapper;
     }
 
 
@@ -52,9 +61,7 @@ class Folder implements ISearch, ITranslate
      */
     private function findFolderIdsWithRoleAccess(): array
     {
-        $roleAccessMapper = \Schoolbox\Permission\Access\RoleAccessMapper::getInstance();
-
-        $folders = $roleAccessMapper->findByColumnList([
+        $folders = $this->roleAccessMapper->findByColumnList([
             'gid' => $this->user->getRole()->getId(),
             'type' => UserAccess::ACCESS_READ
         ]);
