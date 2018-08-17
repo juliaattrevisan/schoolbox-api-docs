@@ -52,14 +52,15 @@
 
                                         {% if useMarkRange and descriptorMin != descriptorMax %}
                                             {% if descriptor.selected and markVisibility %}
-                                                {{ descriptor.selectedValue }} / {{ descriptorMax }}
-                                            {% else %}
-                                                {% if direction == 'asc' %}
-                                                    {{- descriptorMin -}} - {{- descriptorMax -}}
-                                                {% else %}
-                                                    {{- descriptorMax -}} - {{- descriptorMin -}}
-                                                {% endif %}
+                                                <span class="range-selection-value">{{ descriptor.selectedValue }}</span>
                                             {% endif %}
+                                            <span class="range {% if descriptor.selected and markVisibility %}selected{% endif %}">
+                                                {% if direction == 'asc' %}
+                                                    {{descriptorMin}} - {{descriptorMax}}
+                                                {% else %}
+                                                    {{descriptorMax}} - {{descriptorMin}}
+                                                {% endif %}
+                                            </span>
                                         {% else %}
                                             {{ descriptor.value }}
                                         {% endif %}
