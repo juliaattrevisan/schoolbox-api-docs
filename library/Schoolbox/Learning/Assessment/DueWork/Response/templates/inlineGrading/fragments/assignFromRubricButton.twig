@@ -14,29 +14,16 @@
             $rb                     = $('#rb-{{ rubricContext.rubric.id }}'),
             finalSummarySelector    = '[data-final-summary]';
 
-        // Keep track of whether the user has customised the overall mark. This should behave in consistence with capability mark inputs.
-        var customised = false;
-
         function refreshAssignFromRubricButton() {
-
-            // console.log("Mark input element: ");
-            // console.log($status.find(markInputSelector));
-
             // Current calculated rubric total
             var currentRubricValue = $.trim($rb.find(finalSummarySelector).text());
-
-            // console.log("Current rubric value: " + currentRubricValue);
 
             // Mark entered in the overall mark field
             var currentMarkInput   = $status.find(markInputSelector).val();
 
-            // console.log("Current mark input val: " + $status.find(markInputSelector).val());
-
             // Update the mark input field with current rubric total if the total is different from the input val
             // but ONLY if we haven't already customised the mark - don't clobber!
-            if (currentRubricValue !== currentMarkInput) {
-                // console.log("Val differs, updating input val to match rubric total");
-                customised = true;
+            if ( currentRubricValue !== currentMarkInput && (!$status.find(markInputSelector).attr('data-customised')) ) {
                 $status.find(markInputSelector).val(currentRubricValue);
             }
 
@@ -46,9 +33,17 @@
 
         // Update the input val when manually assigning grade from rubric
         $assignFromRubricButton.on('click', function(e) {
+            // reset customisation state, like we do for cap inputs
+            $status.find(markInputSelector).removeAttr('data-customised');
+
             e.preventDefault();
             refreshAssignFromRubricButton();
         });
+
+        $status.find(markInputSelector).change(function() {
+            // Did we manually change the overall grade? Record that it's customised
+            $status.find(markInputSelector).attr('data-customised', true);
+        })
 
         // Update the input val when manually assigning grades from descriptor vals
         $(".use-descriptor-values").on('click', function(e) {
