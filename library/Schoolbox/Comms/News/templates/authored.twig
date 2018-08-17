@@ -28,10 +28,10 @@
                     <dd :class="{active: tabSelected === 'Archived'}"><a @click="onTabChange('Archived')">Archived</a></dd>
                 </dl>
 
-                <div class="tabs-content">
+                <div class="tabs-content no-margin">
                     <ul class="information-list">
 
-                        <li class="actions-small-1" v-if="!currentArticles.length" v-for="n in 3">
+                        <li class="actions-small-1" v-if="articlesLoading" v-for="n in 3">
                             <div class="list-item">
                                 <div class="small-12 card placeholder">
                                     <div class="img"></div>
@@ -114,6 +114,11 @@
                     {% endfor %}#}
                 </ul>
 
+                    <div class="empty-state no-margin" v-if="!filteredArticles.length && !articlesLoading">
+                        <i class="icon-news"></i>
+                        <p>You haven't authored any articles.</p>
+                        <p><a href="{{ routeLookupIfAuthorized('commsNews.getCreate') }}">Create {{ locale.news }}</a>.</p>
+                    </div>
 
                 </div>
             </section>
@@ -127,13 +132,11 @@
                     :next-link-class="'arrow'"
                     :disabled-class="'unavailable'"
                     :click-handler="onPaginate"
-                    v-if="currentArticles.length"
+                    v-if="currentArticles.length && pageCount > 1"
             >
             </paginate>
         </div>
     </div>
-
-
 
 </div>
 
@@ -150,6 +153,8 @@
         data: {
             // The active page on the pagination
             page: 1,
+
+            articlesLoading: true,
 
             // *All* the author's articles
             allArticles: [],
@@ -170,6 +175,7 @@
             // Find some articles
             axios.get('/comms/news/me/articles').then(function(response) {
 
+                vue.articlesLoading = false;
                 vue.allArticles = response.data;
                 vue.filteredArticles = response.data;
                 vue.currentArticles = response.data.slice(0, {{ config.search_type_limit }});
