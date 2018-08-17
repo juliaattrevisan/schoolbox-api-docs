@@ -451,7 +451,6 @@
             var customMark = $changed.val();
 
             if ($groupSummary.length) {
-                console.log("Custom mark inside custom cap listener: " + customMark);
                 $groupSummary.attr('data-scaled-mark', scale($groupSummary, getNormalisedCustomMark($groupRows, customMark, $groupSummary.data('row-max-sum'))));
                 $groupSummary.attr('data-mark', getNormalisedCustomMark($groupRows, customMark, $groupSummary.data('row-max-sum')));
                 $groupSummary.find('[data-db-mark]').val(getNormalisedCustomMark($groupRows, customMark, $groupSummary.data('row-max-sum')));
