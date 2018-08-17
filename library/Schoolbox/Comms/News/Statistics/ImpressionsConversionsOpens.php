@@ -45,6 +45,10 @@ class ImpressionsConversionsOpens
         'month' => 'CONCAT(DATE_FORMAT(occurs_at, \'%Y-%m\'), \'-01 00:00:00\')',
     ];
 
+    /**
+     * Number of days in this period
+     */
+    public const PERIOD_LENGTH = 30;
 
     /**
      * @var IConnector
@@ -374,7 +378,6 @@ class ImpressionsConversionsOpens
             'articleId' => $article->getId()
         ]);
 
-        $data = [];
         $interactions = [];
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
@@ -382,9 +385,41 @@ class ImpressionsConversionsOpens
         }
 
         /* Figure out the average conversion ratio over time
+         *
+         * First, find out if there were any data points prior to this period
+         * If there were, average all those and use that as a starting point
+         * Otherwise just start at zero (coalesced in sql)
          */
-        $numerator = 0;
-        $denominator = 0;
+        $statement = $this->database->prepareQuery("
+            SELECT 
+                COALESCE(SUM(num_conversions_dashboard + num_conversions_homepage + num_conversions_index + num_conversions_archive + num_conversions_email), 0) AS conversion,
+                COALESCE(SUM(num_impressions_dashboard + num_impressions_homepage + num_impressions_index + num_impressions_archive + num_impressions_email), 0) AS impression,
+                1000*UNIX_TIMESTAMP(CONCAT(MAX(`date`), ' 00:00:00')) AS start
+            FROM {$this->statisticsCumulativeMapper->getTable()}
+            WHERE article_id = :articleId
+            AND `date` <= CURRENT_DATE - INTERVAL ".self::PERIOD_LENGTH." DAY
+            AND deleted_at IS NULL
+        ");
+
+        $statement->execute([
+            'articleId' => $article->getId()
+        ]);
+
+        $initialConditions = $statement->fetch(\PDO::FETCH_ASSOC);
+
+        $numerator = $initialConditions['conversion'];
+        $denominator = $initialConditions['impression'];
+
+        /* Aggregate by using science
+         * If initialConditions[start] doesn't exist, it's because there was no previous cumulative data
+         * from which to draw initial conditions so the series should just start at the first value of
+         * the current granular data set.
+         */
+        if ($initialConditions['start']) {
+            $data = [
+                [ (int)$initialConditions['start'], $this->percentage($numerator, $denominator) ]
+            ];
+        }
 
         foreach ($interactions as $timestamp => $current) {
             $numerator += $current['conversion'];
