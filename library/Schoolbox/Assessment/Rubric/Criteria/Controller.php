@@ -10,12 +10,10 @@ namespace Schoolbox\Assessment\Rubric\Criteria;
 
 use Alaress\Web\Controller\Base as BaseController;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Criterion;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Group;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionUsageMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\GroupMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionUsageMapper;
 use Schoolbox\Assessment\Rubric\RowSet\RowSet;
 use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -200,185 +198,6 @@ class Controller extends BaseController
 
 
     /**
-     * Pre-process data from POST into a format which the save method can use.
-     *
-     * @param array $criteria
-     * @return array
-     */
-    private function preprocessPostData(array $criteria): array
-    {
-        $data = [];
-        foreach ($criteria as $group) {
-            if (\count($group['items'])) {
-                foreach ($group['items'] as $crit) {
-                    $data[] = [
-                        'groupId'    => (int)$group['id'],
-                        'groupName'  => $group['name'],
-                        'groupCodes' => $group['curriculumCode'],
-                        'id'         => (int)$crit['id'],
-                        'name'       => $crit['name'],
-                        'codes'      => $crit['curriculumCode'],
-                    ];
-                }
-            }
-        }
-        return $data;
-    }
-
-
-    /**
-     * Delete any criteria that were not submitted in POST data.
-     *
-     * @param FolderModel $folder The folder to delete criteria from
-     * @param array       $data   POST data, after having been pre-processed
-     *                            (see `$this->preprocessPostData`)
-     * @throws \Schoolbox\Mapper\Exception if a delete fails?
-     */
-    private function deleteUnusedCriteria(FolderModel $folder, array $data): void
-    {
-        // Which submission boxes have criteria deleted? We will need to ensure we don't leave in an invalid state.
-        $affectedSubmissionBoxes = [];
-
-        // work out the diff and delete unnecessary criteria
-        $found = array_column($data, 'id');
-
-        $criterionCollection = $this->criterionMapper->findForFolder($folder->getId());
-
-        // Criteria that are in use may not be deleted from non-spec folders
-        $isSpecFolder = $folder->isSpecFolder();
-
-        // Delete criteria not submitted
-        foreach ($criterionCollection as $crit) {
-            if (!\in_array($crit->getId(), $found, true)) {
-                // Prevent deletion of criteria in use on a non-spec folder
-                $usages = $this->usageMapper->findCriterionUsage($crit->getId());
-                if (!$isSpecFolder && \count($usages)) {
-                    // TODO figure out a proper error
-                    throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
-                }
-
-                $this->criterionMapper->delete($crit);
-                foreach ($usages as $usage) {
-                    $affectedSubmissionBoxes[] = $usage['submission_box_id'];
-                }
-            }
-        }
-
-        // Ensure that deletion of a criterion, and its descriptors, does not result in empty levels.
-        $this->rubricMapper->deleteEmptyLevels($affectedSubmissionBoxes);
-    }
-
-
-    /**
-     * Persists criteria submitted in POST data.
-     *
-     * @param FolderModel $folder The folder to persist criteria for
-     * @param array       $data   POST data, after having been pre-processed
-     *                            (see `$this->preprocessPostData`)
-     * @throws \Schoolbox\Mapper\Exception
-     */
-    private function persistCriteria(FolderModel $folder, array $data): void
-    {
-        /** @var Group[] $groupList */
-        $groupList    = $this->groupMapper->createCollection();
-        $parentType   = Group::PARENT_TYPE_CATEGORY;
-        $folderId     = $folder->getId();
-        $isSpecFolder = $folder->isSpecFolder();
-
-        // iterate through list of provided criteria changes
-        foreach ($data as $critData) {
-            // Find the group; if it doesn't exist create it
-            $groupId   = $critData['groupId'];
-            $groupName = $critData['groupName'];
-            if (!isset($groupList[$groupName])) {
-                if ($groupId) {
-                    try {
-                        $group = $this->groupMapper->findOneByColumnList([
-                            'id'          => $groupId,
-                            'parent_id'   => $folderId,
-                            'parent_type' => $parentType,
-                        ]);
-
-                        // A group's name is changeable if:
-                        // * Its folder is a course or unit spec
-                        // * Any criteria within it aren't in use on any due works
-                        // (Its curriculum codes are always changeable)
-                        if ($isSpecFolder) {
-                            $isChangeable = true;
-                        } else {
-                            $usage        = $this->usageMapper->findGroupUsage($groupId);
-                            $isChangeable = (\count($usage) === 0);
-                        }
-                        if ($isChangeable) {
-                            $group->setName($groupName);
-                        }
-
-                    } catch (\Exception $e) {
-                        // ID exists, but not in this context; abort
-                        throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
-                    }
-                } else {
-                    $group = $this->groupMapper->findOrCreateOneForFolderByName($folderId, $groupName, false);
-                }
-
-                if ($this->isCurriculumTaggingEnabled()) {
-                    $group->setCurriculumNodes($this->nodeMapper->findByColumn('id', $critData['groupCodes']));
-                }
-                $this->groupMapper->save($group);
-                $groupList[$groupName] = $group;
-            }
-        }
-
-        foreach ($data as $critData) {
-            // Now, find the criterion: if it doesn't exist create it
-            $critId    = $critData['id'];
-            $critName  = $critData['name'];
-            $groupName = $critData['groupName'];
-            $group     = $groupList[$groupName];
-            if ($critId) {
-                try {
-                    $criterion = $this->criterionMapper->findOneByColumnList([
-                        'id'              => $critId,
-                        'rubric_group_id' => $group->getId(),
-                    ]);
-
-                    // A criterion's name is changeable if any of the following are true:
-                    // * Its folder is a course or unit spec
-                    // * Criterion isn't in use on any due works
-                    // (Its curriculum codes are always changeable)
-                    if ($isSpecFolder) {
-                        $isChangeable = true;
-                    } else {
-                        $usage        = $this->usageMapper->findCriterionUsage($critId);
-                        $isChangeable = (\count($usage) === 0);
-                    }
-                    if ($isChangeable) {
-                        $criterion->setName($critName);
-                    }
-
-                } catch (\Exception $e) {
-                    // ID exists, but not in this context; abort
-                    throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
-                }
-            } else {
-                // Create a new one
-                $criterion = $this->criterionMapper->findOrCreateOneForFolderByKey(
-                    $folderId,
-                    $critName,
-                    $groupName,
-                    false
-                );
-            }
-
-            if ($this->isCurriculumTaggingEnabled()) {
-                $criterion->setCurriculumNodes($this->nodeMapper->findByColumn('id', $critData['codes']));
-            }
-            $this->criterionMapper->save($criterion);
-        }
-    }
-
-
-    /**
      * Is curriculum tagging enabled?
      *
      * If not: don't save curriculum nodes, or show them in the form.
@@ -465,8 +284,7 @@ class Controller extends BaseController
         \Schoolbox\Assessment\Rubric\RowSet\Group $group,
         array $postedGroup,
         bool $isSpecFolder
-    ): \Schoolbox\Assessment\Rubric\RowSet\Group
-    {
+    ): \Schoolbox\Assessment\Rubric\RowSet\Group {
         // Which criteria were passed?
         $existingCriterionIds = $group->retrieveCriterionIds();
         $postedCriterionIds   = array_keys($postedGroup['items']);
