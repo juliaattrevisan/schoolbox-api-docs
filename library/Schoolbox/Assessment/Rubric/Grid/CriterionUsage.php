@@ -43,6 +43,15 @@ class CriterionUsage
 
 
     /**
+     * @return Criterion
+     */
+    public function getCriterion(): Criterion
+    {
+        return $this->criterion;
+    }
+
+
+    /**
      * What's the max value for this criterion in the grid?
      *
      * Inferred from its descriptors; the highest value descriptor is the max
