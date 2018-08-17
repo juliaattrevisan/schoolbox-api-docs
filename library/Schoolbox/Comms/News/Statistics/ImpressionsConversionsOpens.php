@@ -523,7 +523,7 @@ class ImpressionsConversionsOpens
         $data = [];
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $data[$row['type']][] = [(int)$row['timestamp'], (int)$row['num'], date("Y-m-d H:i:s", $row['timestamp']/1000)];
+            $data[$row['type']][] = [(int)$row['timestamp'], (int)$row['num']];
         }
 
         return $data;
