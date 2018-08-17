@@ -12,6 +12,7 @@ namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 use Schoolbox\Comms\News\Audience\Model;
 use Schoolbox\Comms\News\Audience\Segment\ISearch;
 use Schoolbox\Comms\News\Audience\Segment\ITranslate;
+use Schoolbox\Comms\News\ValidUserIsCommsOfficer;
 use Schoolbox\Permission\Access\RoleAccess;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccess;
@@ -80,9 +81,6 @@ class Folder implements ISearch, ITranslate
     /**
      * Check whether $user is a CMS Service Permission holder
      *
-     * TODO: Check for Comms Officer perm too?
-     * TODO: I guess they're like supers...?
-     *
      * @return bool
      */
     private function hasCMSPermission(): bool
@@ -103,33 +101,33 @@ class Folder implements ISearch, ITranslate
         return false;
     }
 
+
     /**
      * Gets an sql fragment for the ISearch instance
      *
      * To use a Folder as an audiencing target,
      *    - Folders must have a class code or be a Group
-     *    - Current user must have at least READ access to a folder in some way
      *    - Folder can't be deleted
      *
      * Anything else is rolled over or otherwise inaccessible and shouldn't appear as a search result
+     * The result set is affected by whether $user has READ access to the folder in some way
+     *
+     *    - Superusers/Comms Officers/CMS Perms aren't limited to what they can search and can audience
+     *    - Restrict non-superusers/non-comms-officer/non-CMS Perms people
+     *
+     * If the resultant list of folders is empty, exit early and don't bother executing query
      *
      * @return string
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
      */
     public function getSearchSql(): string
     {
         $folderMembershipSql = '';
 
-        /* Superusers/CMS Perms aren't limited to what they can search and can audience any folder
-         * as described in this method's docblock.
-         *
-         * Restrict non-superusers/non-CMS Perms who have read access to folders as described in this
-         * method's docblock
-         *
-         * If the resultant list of folders is empty, exit early and don't bother executing query
-         */
-        if (!$this->user->isSuperuser() && !$this->hasCMSPermission()) {
+        if (!$this->user->isSuperuser() && !$this->hasCMSPermission() && !(new ValidUserIsCommsOfficer())->isSatisfiedBy($this->user)) {
 
             /* Check to see whether I have read access to any group/class folders
              */
