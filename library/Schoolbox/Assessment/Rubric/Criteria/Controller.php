@@ -138,11 +138,6 @@ class Controller extends BaseController
         $this->updateRowSet($rowSet, $this->request->post->get('crits', []));
         $this->rubricMapper->persistRowSet($rowSet, $folder->isSpecFolder(), $this->isCurriculumTaggingEnabled());
 
-//        // TODO make this use `\Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper::persistRowSet`
-//        $data = $this->preprocessPostData($this->request->post->get('crits', []));
-//        $this->deleteUnusedCriteria($folder, $data);
-//        $this->persistCriteria($folder, $data);
-
         // Done: redirect back to homepage, or AJAX
         if ($this->request->isXhr()) {
             $this->response->content->set(
