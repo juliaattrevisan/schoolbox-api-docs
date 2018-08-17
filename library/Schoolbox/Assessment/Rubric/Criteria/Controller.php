@@ -186,6 +186,7 @@ class Controller extends BaseController
         $existingGroupIds = $rowSet->retrieveGroupIds();
         $postedGroupIds   = array_keys($postData);
         $postedGroups     = $postData;
+        $isSpecFolder     = $rowSet->getContext()->getBaseContext()->getFolder()->isSpecFolder();
 
 
         // Add newly added groups, remove existing IDs
@@ -193,6 +194,11 @@ class Controller extends BaseController
             $rowSet->getGroups()[$newGroupId] = new \Schoolbox\Assessment\Rubric\RowSet\Group();
         }
         foreach (array_diff($existingGroupIds, $postedGroupIds) as $removedGroupId) {
+            // Prevent removal if this group is in use
+            // TODO figure out what the proper error should be at this point
+            if (!$isSpecFolder && $rowSet->getGroups()[$removedGroupId]->isInUse()) {
+                throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
+            }
             unset($rowSet->getGroups()[$removedGroupId]);
         }
 
@@ -203,7 +209,10 @@ class Controller extends BaseController
             // If this group was emptied of all criteria: remove it
             $postedGroup = $postedGroups[$groupId] ?? null;
             if (null === $postedGroup || empty($postedGroup['items'])) {
-                // Can I unset whilst looping?
+                // Prevent removal if this group is in use
+                if (!$isSpecFolder && $group->isInUse()) {
+                    throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
+                }
                 unset($rowSet->getGroups()[$groupId]);
                 continue;
             }
@@ -228,6 +237,9 @@ class Controller extends BaseController
                 $group->getCriteria()[$newCriterionId] = new \Schoolbox\Assessment\Rubric\RowSet\Criterion();
             }
             foreach (array_diff($existingCriterionIds, $postedCriterionIds) as $removedCriterionId) {
+                if (!$isSpecFolder && $group->getCriteria()[$removedCriterionId]->isInUse()) {
+                    throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
+                }
                 unset($group->getCriteria()[$removedCriterionId]);
             }
 
@@ -236,7 +248,9 @@ class Controller extends BaseController
             foreach ($group->getCriteria() as $criterionId => $criterion) {
                 $postedCriterion = $postedCriteria[$criterionId] ?? null;
                 if (null === $postedCriterion) {
-                    // Can I unset whilst looping?
+                    if (!$isSpecFolder && $criterion->isInUse()) {
+                        throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
+                    }
                     unset($group->getCriteria()[$criterionId]);
                     continue;
                 }
