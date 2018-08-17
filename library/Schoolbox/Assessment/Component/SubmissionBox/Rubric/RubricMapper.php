@@ -258,11 +258,15 @@ class RubricMapper
         $groupUsageModels = GroupUsageMapper::getInstance()->findByColumn(
             'sb.assessment_id',
             $assessment->getId()
-        );
+        )->indexByCallback(function (GroupUsage $gu) {
+            return $gu->getGroup()->getId();
+        });
         $criterionUsageModels = CriterionUsageMapper::getInstance()->findByColumn(
             'sb.assessment_id',
             $assessment->getId()
-        );
+        )->indexByCallback(function (CriterionUsage $cu) {
+            return $cu->getCriterion()->getId();
+        });
 
         // Add group/criterion usages
         foreach ($grid->getRowSet()->getGroups() as $group) {
