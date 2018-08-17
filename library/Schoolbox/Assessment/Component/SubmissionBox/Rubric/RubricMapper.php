@@ -257,16 +257,60 @@ class RubricMapper
         // Load the levels, selected groups/criteria, descriptors for the assessment
         $groupUsageModels = GroupUsageMapper::getInstance()->findByColumn(
             'sb.assessment_id',
-            $assessment->getId()
+            $assessment->getId(),
+            ['order' => ['sequence' => 'asc',]]
         )->indexByCallback(function (GroupUsage $gu) {
             return $gu->getGroup()->getId();
         });
         $criterionUsageModels = CriterionUsageMapper::getInstance()->findByColumn(
             'sb.assessment_id',
-            $assessment->getId()
+            $assessment->getId(),
+            ['order' => ['sequence' => 'asc',]]
         )->indexByCallback(function (CriterionUsage $cu) {
             return $cu->getCriterion()->getId();
         });
+        $levelModels = LevelMapper::getInstance()->findByColumn(
+            'b.assessment_id',
+            $assessment->getId(),
+            ['order' => ['sequence' => 'asc',]]
+        )->indexByCallback(function (Level $l) {
+            return $l->getId();
+        });
+        $descriptorModels = DescriptorMapper::getInstance()->findByColumnList([
+            'criterion_id' => $criterionUsageModels->keys(),
+            'level_id'     => $levelModels->keys(),
+        ]);
+
+
+        // Create descriptor models
+        $descriptorsByLevel     = [];
+        $descriptorsByCriterion = [];
+        foreach ($descriptorModels as $descriptorModel) {
+            $levelId     = $descriptorModel->getLevel()->getId();
+            $criterionId = $descriptorModel->getCriterion()->getId();
+            $descriptor  = (new \Schoolbox\Assessment\Rubric\Grid\Descriptor())
+                ->setId($descriptorModel->getId())
+                ->setDescription($descriptorModel->getDescription())
+                ->setMaxValue($descriptorModel->getMaxValue());
+
+            $descriptorsByCriterion[$criterionId][$levelId] = $descriptor;
+            $descriptorsByLevel[$levelId][$criterionId]     = $descriptor;
+        }
+
+
+        // Add levels
+        /** @var Level[] $levelModels */
+        foreach ($levelModels as $levelModel) {
+            $levelId = $levelModel->getId();
+            $level   = (new \Schoolbox\Assessment\Rubric\Grid\Level())
+                ->setId($levelId)
+                ->setName($levelModel->getName());
+
+            foreach ($descriptorsByLevel[$levelId] as $criterionId => $descriptor) {
+                $level->getDescriptors()[$criterionId] = $descriptor;
+            }
+        }
+
 
         // Add group/criterion usages
         foreach ($grid->getRowSet()->getGroups() as $group) {
@@ -291,6 +335,11 @@ class RubricMapper
                 }
 
                 $criterionUsage = new \Schoolbox\Assessment\Rubric\Grid\CriterionUsage($criterion);
+
+                // Add descriptors
+                foreach ($descriptorsByCriterion[$criterionId] as $levelId => $descriptor) {
+                    $criterionUsage->getDescriptors()[$levelId] = $descriptor;
+                }
 
                 $groupUsage->getCriterionUsages()[$criterionId] = $criterionUsage;
             }

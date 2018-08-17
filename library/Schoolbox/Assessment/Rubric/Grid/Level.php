@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Schoolbox\Assessment\Rubric\Grid;
 
 use Schoolbox\GenericCollection;
+use Schoolbox\Mapper\Traits\Model\Id;
 
 /**
  * A level within a rubric grid.
@@ -17,6 +18,9 @@ use Schoolbox\GenericCollection;
  */
 class Level
 {
+    use Id;
+
+
     /**
      * @var GenericCollection|Descriptor[]
      */

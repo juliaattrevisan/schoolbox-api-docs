@@ -8,6 +8,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\Grid;
 
+use Schoolbox\Mapper\Traits\Model\Id;
+
 /**
  * A single descriptor within a rubric grid.
  *
@@ -15,6 +17,9 @@ namespace Schoolbox\Assessment\Rubric\Grid;
  */
 class Descriptor
 {
+    use Id;
+
+
     /**
      * @var string|null
      */
