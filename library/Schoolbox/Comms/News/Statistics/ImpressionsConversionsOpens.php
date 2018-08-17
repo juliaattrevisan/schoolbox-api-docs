@@ -142,7 +142,6 @@ class ImpressionsConversionsOpens
     }
 
 
-
     /**
      * Record an impression for $articleId
      * ie. $userId has witnessed $articleId
@@ -229,134 +228,6 @@ class ImpressionsConversionsOpens
 
 
     /**
-     * @param null|string $accuracy
-     * @return null|string
-     */
-    private function assertAccuracy(?string $accuracy = self::DEFAULT_ACCURACY): ?string
-    {
-        if (!\array_key_exists($accuracy, self::ACCURACIES)) {
-            $accuracy = self::DEFAULT_ACCURACY;
-        }
-
-        return $accuracy;
-    }
-
-
-    /**
-     * Assemble all the granular Impressions, Conversions and direct Opens for $article
-     *
-     * @param News\Model  $article
-     * @param string|null $accuracy
-     * @return array
-     * @throws \Alaress\Database\Exception
-     */
-    public function fetchInteractionReferrers(News\Model $article, ?string $accuracy = self::DEFAULT_ACCURACY): array
-    {
-
-        /* Determine a sane value
-         */
-        $accuracySql = self::ACCURACIES[$this->assertAccuracy($accuracy)];
-
-        /* Get all the timestamps that have content - because of the way highcharts stacks its data
-         * I need to initialise the container with all the possibilities and stack categorised data in-order
-         */
-        $statement = $this->database->prepareQuery("
-            SELECT 
-                CAST(1000*UNIX_TIMESTAMP({$accuracySql}) AS UNSIGNED) AS timestamp,
-                COUNT(*) AS num,
-                `type`,
-                `referrer`
-            FROM {$this->statisticsMapper->getTable()}
-            WHERE article_id = :articleId
-            AND deleted_at IS NULL
-            GROUP BY timestamp, `type`, referrer
-            ORDER BY timestamp
-        ");
-
-        $statement->execute([
-            'articleId' => $article->getId()
-        ]);
-
-        $data = [];
-
-        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $type = $row['type'];
-            $referrer = $row['referrer'];
-
-            /* If referrers are of an unknown type, just throw them into an arbitrary "unknown" category
-             */
-            if ($referrer === null) {
-                $referrer = Mapper::REFERRER_EMPTY;
-            }
-
-            /* Stack it
-             */
-            $data[$type][$referrer][] = [(int)$row['timestamp'], (int)$row['num'], date("Y-m-d H:i:s", $row['timestamp']/1000)];
-        }
-
-        return $data;
-    }
-
-
-    /**
-     * The average conversion ratio over time
-     *
-     * Fetch data set separately from its previous home in fetchInteractionReferrers()
-     *
-     * @param News\Model  $article
-     * @param null|string $accuracy
-     * @return array
-     * @throws \Alaress\Database\Exception
-     */
-    public function fetchConversionRatio(News\Model $article, ?string $accuracy = self::DEFAULT_ACCURACY): array
-    {
-        /* Determine a sane value
-         */
-        $accuracySql = self::ACCURACIES[$this->assertAccuracy($accuracy)];
-
-        /* Get all the timestamps that have content - because of the way highcharts stacks its data
-         * I need to initialise the container with all the possibilities and stack categorised data in-order
-         */
-        $statement = $this->database->prepareQuery("
-            SELECT 
-                CAST(1000*UNIX_TIMESTAMP({$accuracySql}) AS UNSIGNED) AS timestamp,
-                COUNT(*) AS num,
-                `type`
-            FROM {$this->statisticsMapper->getTable()}
-            WHERE article_id = :articleId
-            AND deleted_at IS NULL
-            GROUP BY timestamp, `type`
-            ORDER BY timestamp
-        ");
-
-        $statement->execute([
-            'articleId' => $article->getId()
-        ]);
-
-        $data = [];
-        $interactions = [];
-
-        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $interactions[(int)$row['timestamp']][$row['type']] += $row['num'];
-        }
-
-        /* Figure out the average conversion ratio over time
-         */
-        $numerator = 0;
-        $denominator = 0;
-
-        foreach ($interactions as $timestamp => $current) {
-            $numerator += $current['conversion'];
-            $denominator += $current['impression'];
-
-            $data[] = [$timestamp, $this->percentage($numerator, $denominator)];
-        }
-
-        return $data;
-    }
-
-
-    /**
      * Fetch Cumulative data
      *
      * @param News\Model $article
@@ -437,17 +308,147 @@ class ImpressionsConversionsOpens
 
 
     /**
-     * Calculate a integer percentage
-     *
-     * @param null|int $numerator
-     * @param null|int $denominator
-     * @return float
+     * @param News\Model $article
+     * @return array
+     * @throws \Alaress\Database\Exception
      */
-    private function percentage(?int $numerator, ?int $denominator): float
+    public function fetchReferrerDemographic(News\Model $article): array
     {
-        $percentage = $denominator ? round(100*$numerator/$denominator) : 0;
+        $statement = $this->database->prepareQuery("
+            SELECT `type`, `referrer`, COUNT(*) AS num 
+            FROM {$this->statisticsMapper->getTable()}
+            WHERE article_id = :articleId
+            GROUP BY `type`, referrer
+            ORDER BY `type`, referrer
+        ");
 
-        return $percentage > 100 ? 100 : $percentage;
+        $statement->execute([
+            'articleId' => $article->getId()
+        ]);
+
+        $data = [
+            Mapper::TYPE_IMPRESSION => array_fill_keys(Mapper::REFERRERS, 0),
+            Mapper::TYPE_CONVERSION => array_fill_keys(Mapper::REFERRERS, 0),
+        ];
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $data[$row['type']][$row['referrer']] = $row['num'];
+        }
+
+        return $data;
+    }
+
+
+    /**
+     * The average conversion ratio over time
+     *
+     * Fetch data set separately from its previous home in fetchInteractionReferrers()
+     *
+     * @param News\Model  $article
+     * @param null|string $accuracy
+     * @return array
+     * @throws \Alaress\Database\Exception
+     */
+    public function fetchConversionRatio(News\Model $article, ?string $accuracy = self::DEFAULT_ACCURACY): array
+    {
+        /* Determine a sane value
+         */
+        $accuracySql = self::ACCURACIES[$this->assertAccuracy($accuracy)];
+
+        /* Get all the timestamps that have content - because of the way highcharts stacks its data
+         * I need to initialise the container with all the possibilities and stack categorised data in-order
+         */
+        $statement = $this->database->prepareQuery("
+            SELECT 
+                CAST(1000*UNIX_TIMESTAMP({$accuracySql}) AS UNSIGNED) AS timestamp,
+                COUNT(*) AS num,
+                `type`
+            FROM {$this->statisticsMapper->getTable()}
+            WHERE article_id = :articleId
+            AND deleted_at IS NULL
+            GROUP BY timestamp, `type`
+            ORDER BY timestamp
+        ");
+
+        $statement->execute([
+            'articleId' => $article->getId()
+        ]);
+
+        $data = [];
+        $interactions = [];
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $interactions[(int)$row['timestamp']][$row['type']] += $row['num'];
+        }
+
+        /* Figure out the average conversion ratio over time
+         */
+        $numerator = 0;
+        $denominator = 0;
+
+        foreach ($interactions as $timestamp => $current) {
+            $numerator += $current['conversion'];
+            $denominator += $current['impression'];
+
+            $data[] = [$timestamp, $this->percentage($numerator, $denominator)];
+        }
+
+        return $data;
+    }
+
+
+    /**
+     * Assemble all the granular Impressions, Conversions and direct Opens for $article
+     *
+     * @param News\Model  $article
+     * @param string|null $accuracy
+     * @return array
+     * @throws \Alaress\Database\Exception
+     */
+    public function fetchInteractionReferrers(News\Model $article, ?string $accuracy = self::DEFAULT_ACCURACY): array
+    {
+        /* Determine a sane value
+         */
+        $accuracySql = self::ACCURACIES[$this->assertAccuracy($accuracy)];
+
+        /* Get all the timestamps that have content - because of the way highcharts stacks its data
+         * I need to initialise the container with all the possibilities and stack categorised data in-order
+         */
+        $statement = $this->database->prepareQuery("
+            SELECT 
+                CAST(1000*UNIX_TIMESTAMP({$accuracySql}) AS UNSIGNED) AS timestamp,
+                COUNT(*) AS num,
+                `type`,
+                `referrer`
+            FROM {$this->statisticsMapper->getTable()}
+            WHERE article_id = :articleId
+            AND deleted_at IS NULL
+            GROUP BY timestamp, `type`, referrer
+            ORDER BY timestamp
+        ");
+
+        $statement->execute([
+            'articleId' => $article->getId()
+        ]);
+
+        $data = [];
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $type = $row['type'];
+            $referrer = $row['referrer'];
+
+            /* If referrers are of an unknown type, just throw them into an arbitrary "unknown" category
+             */
+            if ($referrer === null) {
+                $referrer = Mapper::REFERRER_EMPTY;
+            }
+
+            /* Stack it
+             */
+            $data[$type][$referrer][] = [(int)$row['timestamp'], (int)$row['num'], date("Y-m-d H:i:s", $row['timestamp']/1000)];
+        }
+
+        return $data;
     }
 
 
@@ -495,33 +496,30 @@ class ImpressionsConversionsOpens
 
 
     /**
-     * @param News\Model $article
-     * @return array
-     * @throws \Alaress\Database\Exception
+     * Calculate a integer percentage
+     *
+     * @param null|int $numerator
+     * @param null|int $denominator
+     * @return float
      */
-    public function fetchReferrerDemographic(News\Model $article): array
+    private function percentage(?int $numerator, ?int $denominator): float
     {
-        $statement = $this->database->prepareQuery("
-            SELECT `type`, `referrer`, COUNT(*) AS num 
-            FROM {$this->statisticsMapper->getTable()}
-            WHERE article_id = :articleId
-            GROUP BY `type`, referrer
-            ORDER BY `type`, referrer
-        ");
+        $percentage = $denominator ? round(100*$numerator/$denominator) : 0;
 
-        $statement->execute([
-            'articleId' => $article->getId()
-        ]);
+        return $percentage > 100 ? 100 : $percentage;
+    }
 
-        $data = [
-            Mapper::TYPE_IMPRESSION => array_fill_keys(Mapper::REFERRERS, 0),
-            Mapper::TYPE_CONVERSION => array_fill_keys(Mapper::REFERRERS, 0),
-        ];
 
-        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $data[$row['type']][$row['referrer']] = $row['num'];
+    /**
+     * @param null|string $accuracy
+     * @return null|string
+     */
+    private function assertAccuracy(?string $accuracy = self::DEFAULT_ACCURACY): ?string
+    {
+        if (!\array_key_exists($accuracy, self::ACCURACIES)) {
+            $accuracy = self::DEFAULT_ACCURACY;
         }
 
-        return $data;
+        return $accuracy;
     }
 }
