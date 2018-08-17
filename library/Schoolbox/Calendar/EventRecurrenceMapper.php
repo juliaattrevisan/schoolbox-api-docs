@@ -222,9 +222,16 @@ class EventRecurrenceMapper
                 $seriesMetadata = $metadata;
             }
 
-            // Adjust each event's start and end individually
+            // Adjust each event's start, end and publish date individually
             $seriesEvent->getStartDateTime()->getDateTimeObject()->add($startDelta);
             $seriesEvent->getEndDateTime()->getDateTimeObject()->add($endDelta);
+
+            if ($publishDateTime = $event->getPublishDateTime()) {
+                $seriesEvent->setPublishDateTime($publishDateTime->getDateTimeObject());
+            } else {
+                $seriesEvent->setPublishDateTime(null);
+            }
+
             $this->getEventMapper()->save($seriesEvent);
             $this->getEventMapper()->updateMetadata($seriesMetadata, $seriesEvent);
 
