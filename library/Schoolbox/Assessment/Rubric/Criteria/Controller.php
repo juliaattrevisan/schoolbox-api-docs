@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Schoolbox\Assessment\Rubric\Criteria;
 
 use Alaress\Web\Controller\Base as BaseController;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Criterion;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Group;
@@ -182,89 +183,18 @@ class Controller extends BaseController
      */
     private function updateRowSet(RowSet $rowSet, array $postData): RowSet
     {
-        // Which groups were passed?
-        $existingGroupIds = $rowSet->retrieveGroupIds();
-        $postedGroupIds   = array_keys($postData);
-        $postedGroups     = $postData;
-        $isSpecFolder     = $rowSet->getContext()->getBaseContext()->getFolder()->isSpecFolder();
+        $isSpecFolder = $rowSet->getContext()->getBaseContext()->getFolder()->isSpecFolder();
 
 
-        // Add newly added groups, remove existing IDs
-        foreach (array_diff($postedGroupIds, $existingGroupIds) as $newGroupId) {
-            $rowSet->getGroups()[$newGroupId] = new \Schoolbox\Assessment\Rubric\RowSet\Group();
-        }
-        foreach (array_diff($existingGroupIds, $postedGroupIds) as $removedGroupId) {
-            // Prevent removal if this group is in use
-            // TODO figure out what the proper error should be at this point
-            if (!$isSpecFolder && $rowSet->getGroups()[$removedGroupId]->isInUse()) {
-                throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
-            }
-            unset($rowSet->getGroups()[$removedGroupId]);
-        }
-
-
-        // Process groups
+        // Update the whole thing
+        $rowSet = $this->updateRowSetGroups($rowSet, $postData);
         foreach ($rowSet->getGroups() as $groupId => $group) {
-
-            // If this group was emptied of all criteria: remove it
-            $postedGroup = $postedGroups[$groupId] ?? null;
-            if (null === $postedGroup || empty($postedGroup['items'])) {
-                // Prevent removal if this group is in use
-                if (!$isSpecFolder && $group->isInUse()) {
-                    throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
-                }
-                unset($rowSet->getGroups()[$groupId]);
-                continue;
-            }
-
-            // Can I change the name of the group?
-            $group->setName($postedGroup['name']);
-            if ($this->isCurriculumTaggingEnabled()) {
-                $group->setCurriculumNodes(
-                    $this->nodeMapper->findByColumn('id', $postedGroup['curriculumCode'])
-                );
-            }
-
-
-            // Which criteria were passed?
-            $existingCriterionIds = $group->retrieveCriterionIds();
-            $postedCriterionIds   = array_keys($postedGroup['items']);
-            $postedCriteria       = $postedGroup['items'];
-
-
-            // Add newly-added criteria, remove existing criteria
-            foreach (array_diff($postedCriterionIds, $existingCriterionIds) as $newCriterionId) {
-                $group->getCriteria()[$newCriterionId] = new \Schoolbox\Assessment\Rubric\RowSet\Criterion();
-            }
-            foreach (array_diff($existingCriterionIds, $postedCriterionIds) as $removedCriterionId) {
-                if (!$isSpecFolder && $group->getCriteria()[$removedCriterionId]->isInUse()) {
-                    throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
-                }
-                unset($group->getCriteria()[$removedCriterionId]);
-            }
-
-
-            // Process criteria
-            foreach ($group->getCriteria() as $criterionId => $criterion) {
-                $postedCriterion = $postedCriteria[$criterionId] ?? null;
-                if (null === $postedCriterion) {
-                    if (!$isSpecFolder && $criterion->isInUse()) {
-                        throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
-                    }
-                    unset($group->getCriteria()[$criterionId]);
-                    continue;
-                }
-
-                // Can I change the name of the criterion?
-                $criterion->setName($postedCriterion['name']);
-                if ($this->isCurriculumTaggingEnabled()) {
-                    $criterion->setCurriculumNodes(
-                        $this->nodeMapper->findByColumn('id', $postedCriterion['curriculumCode'])
-                    );
-                }
-            }
+            $rowSet->getGroups()[$groupId] = $this->updateRowSetCritieria(
+                $group,
+                $postData[$groupId] ?? null,
+                $isSpecFolder
+            );
         }
-
         return $rowSet;
     }
 
@@ -458,5 +388,122 @@ class Controller extends BaseController
     private function isCurriculumTaggingEnabled(): bool
     {
         return (bool)$this->getConfigLoader()->get('curriculum_tagging_enabled');
+    }
+
+
+    /**
+     * Add newly-added rowset groups, remove newly-removed ones, and update
+     * the name and curriculum codes of any that were changed.
+     *
+     * @param RowSet $rowSet
+     * @param array  $postData
+     * @return RowSet
+     * @throws SchoolboxException if trying to remove something not allowed
+     */
+    private function updateRowSetGroups(RowSet $rowSet, array $postData): RowSet
+    {
+        $existingGroupIds = $rowSet->retrieveGroupIds();
+        $postedGroupIds   = array_keys($postData);
+        $isSpecFolder     = $rowSet->getContext()->getBaseContext()->getFolder()->isSpecFolder();
+
+
+        // Add newly-added rowset groups
+        foreach (array_diff($postedGroupIds, $existingGroupIds) as $newGroupId) {
+            $rowSet->getGroups()[$newGroupId] = new \Schoolbox\Assessment\Rubric\RowSet\Group();
+        }
+
+
+        // Remove newly-removed rowset groups
+        foreach (array_diff($existingGroupIds, $postedGroupIds) as $removedGroupId) {
+            // Prevent removal if this group is in use
+            // TODO figure out what the proper error should be at this point
+            if (!$isSpecFolder && $rowSet->getGroups()[$removedGroupId]->isInUse()) {
+                throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
+            }
+            unset($rowSet->getGroups()[$removedGroupId]);
+        }
+
+
+        // Remove any rowset groups that weren't removed in the previous step,
+        // but have no criteria left.
+        foreach ($rowSet->getGroups() as $groupId => $group) {
+            $postedGroup = $postData[$groupId] ?? null;
+            if (null === $postedGroup || empty($postedGroup['items'])) {
+                // Prevent removal if this group is in use
+                if (!$isSpecFolder && $group->isInUse()) {
+                    throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
+                }
+                unset($rowSet->getGroups()[$groupId]);
+                continue;
+            }
+
+
+            // Can I change the name of the group?
+            $group->setName($postedGroup['name']);
+            if ($this->isCurriculumTaggingEnabled()) {
+                $group->setCurriculumNodes(
+                    $this->nodeMapper->findByColumn('id', $postedGroup['curriculumCode'])
+                );
+            }
+        }
+
+        return $rowSet;
+    }
+
+
+    /**
+     * Add newly-added rowset criteria, remove newly-removed ones, and update
+     * the name and curriculum codes of any that were changed.
+     *
+     * @param \Schoolbox\Assessment\Rubric\RowSet\Group $group
+     * @param array                                     $postedGroup
+     * @param bool                                      $isSpecFolder
+     * @return \Schoolbox\Assessment\Rubric\RowSet\Group
+     * @throws SchoolboxException if trying to remove something not allowed
+     */
+    private function updateRowSetCritieria(
+        \Schoolbox\Assessment\Rubric\RowSet\Group $group,
+        array $postedGroup,
+        bool $isSpecFolder
+    ): \Schoolbox\Assessment\Rubric\RowSet\Group
+    {
+        // Which criteria were passed?
+        $existingCriterionIds = $group->retrieveCriterionIds();
+        $postedCriterionIds   = array_keys($postedGroup['items']);
+        $postedCriteria       = $postedGroup['items'];
+
+
+        // Add newly-added criteria
+        foreach (array_diff($postedCriterionIds, $existingCriterionIds) as $newCriterionId) {
+            $group->getCriteria()[$newCriterionId] = new \Schoolbox\Assessment\Rubric\RowSet\Criterion();
+        }
+
+
+        // Remove existing criteria
+        foreach (array_diff($existingCriterionIds, $postedCriterionIds) as $removedCriterionId) {
+            if (!$isSpecFolder && $group->getCriteria()[$removedCriterionId]->isInUse()) {
+                throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
+            }
+            unset($group->getCriteria()[$removedCriterionId]);
+        }
+
+
+        // Update name of any criteria if I can
+        foreach ($group->getCriteria() as $criterionId => $criterion) {
+            $postedCriterion = $postedCriteria[$criterionId] ?? null;
+            if (null === $postedCriterion) {
+                continue;
+            }
+
+            // Can I change the name of the criterion?
+            $criterion->setName($postedCriterion['name']);
+            if ($this->isCurriculumTaggingEnabled()) {
+                $criterion->setCurriculumNodes(
+                    $this->nodeMapper->findByColumn('id', $postedCriterion['curriculumCode'])
+                );
+            }
+        }
+
+        return $group;
     }
 }
