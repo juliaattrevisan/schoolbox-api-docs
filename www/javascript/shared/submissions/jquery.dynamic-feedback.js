@@ -165,7 +165,6 @@
                     data:  formData,
                     type: 'post'
                 }).done(function (response) {
-
                     // Have we inserted feedback meta message into action bar ?
                     if ($actionBar.find('[data-feedback-attach-info]').length) {
                         $btnPublish.text(config.publishText).addClass('hide');
@@ -294,6 +293,8 @@
             $(config.formSaveLabel).toastActivate({
                 text: 'Autosaving...'
             });
+
+            console.log($form.serializeArray());
 
             config.onPreDraftCallback($participant.data('participant'), data);
 
