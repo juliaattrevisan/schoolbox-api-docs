@@ -12,7 +12,7 @@ namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 use Schoolbox\Comms\News\Audience\Model;
 use Schoolbox\Comms\News\Audience\Segment\ISearch;
 use Schoolbox\Comms\News\Audience\Segment\ITranslate;
-use Schoolbox\Comms\News\ValidUserIsCommsOfficer;
+use Schoolbox\Comms\News\Audience\Segment\ValidRestrictedSearch;
 use Schoolbox\Permission\Access\RoleAccess;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccess;
@@ -79,30 +79,6 @@ class Folder implements ISearch, ITranslate
 
 
     /**
-     * Check whether $user is a CMS Service Permission holder
-     *
-     * @return bool
-     */
-    private function hasCMSPermission(): bool
-    {
-        $accessList = $this->user->getAccessList();
-
-        if (!empty($accessList)) {
-            foreach ($accessList as $access) {
-                $hasCMSPermission = $access->getService() === UserAccess::SERVICE_CMS;
-                $isReadAccess     = $access->getAccessLevel() >= UserAccess::ACCESS_READ;
-
-                if ($hasCMSPermission && $isReadAccess) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-
-    /**
      * Gets an sql fragment for the ISearch instance
      *
      * To use a Folder as an audiencing target,
@@ -127,7 +103,7 @@ class Folder implements ISearch, ITranslate
     {
         $folderMembershipSql = '';
 
-        if (!$this->user->isSuperuser() && !$this->hasCMSPermission() && !(new ValidUserIsCommsOfficer())->isSatisfiedBy($this->user)) {
+        if ((new ValidRestrictedSearch())->isSatisifiedBy($this->user)) {
 
             /* Check to see whether I have read access to any group/class folders
              */
