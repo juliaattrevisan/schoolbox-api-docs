@@ -54,13 +54,33 @@
                 type: 'datetime'
             },
 
-            yAxis: {
-                allowDecimals: false,
-                min: 0,
-                title: {
-                    text: 'Number of Conversions'
+            yAxis: [
+                {
+                    allowDecimals: false,
+                    min: 0,
+                    title: {
+                        text: 'Number of Conversions'
+                    }
+                },
+                {
+                    labels: {
+                        style: {
+                            color: '#629e51'
+                        }
+                    },
+                    lineColor: '#629e51',
+                    lineWidth: 1,
+                    max: 100,
+                    title: {
+                        allowDecimals: true,
+                        style: {
+                            color: '#629e51'
+                        },
+                        text: 'Conversion Ratio (%)'
+                    },
+                    opposite: true
                 }
-            },
+            ],
 
             series: [
                 {
@@ -72,6 +92,17 @@
                     color: '#878787',
                     name: 'Non-referred Opens',
                     data: {{ conversions['open']|json_encode|raw }}
+                },
+                {
+                    color: '#629e51',
+                    lineWidth: 1,
+                    marker: {
+                        radius: 3
+                    },
+                    name: 'Conversion Ratio (%)',
+                    data: {{ conversionRatio|json_encode|raw }},
+                    type: 'line',
+                    yAxis: 1
                 }
             ]
         });
