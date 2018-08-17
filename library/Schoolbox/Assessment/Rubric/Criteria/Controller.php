@@ -111,7 +111,7 @@ class Controller extends BaseController
             $this
                 ->buildHtmlOutput(
                     '@rubricCriteria/form.twig',
-                    $this->buildTwigDataForForm($this->rubricMapper->createRowSet($folder, true))
+                    $this->buildTwigDataForForm($this->rubricMapper->retrieveRowSet($folder, true))
                 )
                 ->setTitle(
                     sprintf(

@@ -85,16 +85,16 @@ class RubricMapper
 
 
     /**
-     * Creates a rowset for the given context.
+     * Retrieves a rowset for the given context.
      *
-     * @todo consider whether this belongs here
+     * @todo consider whether this belongs here, or in some other class
      *
      * @param AssessmentContext $context
      * @param bool              $getUsages
      * @return RowSet
      * @throws MapperException
      */
-    public function createRowSet(AssessmentContext $context, bool $getUsages): RowSet
+    public function retrieveRowSet(AssessmentContext $context, bool $getUsages): RowSet
     {
         $rowSet = new RowSet($context);
 
@@ -237,17 +237,17 @@ class RubricMapper
 
 
     /**
-     * Create a grid for the given assessment.
+     * Retrieve a grid for the given assessment.
      *
      * @param IAssessable $assessment
      * @param bool        $getUsages
      * @return Grid
      * @throws MapperException
      */
-    public function createGrid(IAssessable $assessment, bool $getUsages): Grid
+    public function retrieveGrid(IAssessable $assessment, bool $getUsages): Grid
     {
         // Build the rowset first
-        $grid = new Grid($assessment, $this->createRowSet($assessment->getContext(), $getUsages));
+        $grid = new Grid($assessment, $this->retrieveRowSet($assessment->getContext(), $getUsages));
 
         // Not a due work? This has an empty grid
         if (!$assessment instanceof DueWork\Model) {
@@ -353,15 +353,15 @@ class RubricMapper
 
 
     /**
-     * Create a marked grid for the given feedback.
+     * Retrieve a marked grid for the given feedback.
      *
      * @param IFeedback $feedback
      * @return MarkedGrid
      * @throws MapperException
      */
-    public function createMarkedGrid(IFeedback $feedback): MarkedGrid
+    public function retrieveMarkedGrid(IFeedback $feedback): MarkedGrid
     {
-        $markedGrid = new MarkedGrid($feedback, $this->createGrid($feedback->getAssessable(), false));
+        $markedGrid = new MarkedGrid($feedback, $this->retrieveGrid($feedback->getAssessable(), false));
 
         // Load the marks
 
