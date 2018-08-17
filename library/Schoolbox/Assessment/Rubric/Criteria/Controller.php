@@ -10,9 +10,6 @@ namespace Schoolbox\Assessment\Rubric\Criteria;
 
 use Alaress\Web\Controller\Base as BaseController;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionUsageMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\GroupMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\Rubric\RowSet\RowSet;
 use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
@@ -26,27 +23,9 @@ use Schoolbox\Resource\Folder\Model as FolderModel;
 class Controller extends BaseController
 {
     /**
-     * @var CriterionMapper
-     */
-    private $criterionMapper;
-
-
-    /**
-     * @var GroupMapper
-     */
-    private $groupMapper;
-
-
-    /**
      * @var NodeMapper
      */
     private $nodeMapper;
-
-
-    /**
-     * @var CriterionUsageMapper
-     */
-    private $usageMapper;
 
 
     /**
@@ -70,30 +49,21 @@ class Controller extends BaseController
     /**
      * Constructor
      *
-     * @param CriterionMapper      $criterionMapper
-     * @param GroupMapper          $groupMapper
-     * @param NodeMapper           $nodeMapper
-     * @param CriterionUsageMapper $usageMapper
-     * @param RubricMapper         $rubricMapper
-     * @param ErrorMapper          $errorMapper
-     * @param RosettaStone         $rosettaStone
+     * @param NodeMapper   $nodeMapper
+     * @param RubricMapper $rubricMapper
+     * @param ErrorMapper  $errorMapper
+     * @param RosettaStone $rosettaStone
      */
     public function __construct(
-        CriterionMapper $criterionMapper,
-        GroupMapper $groupMapper,
         NodeMapper $nodeMapper,
-        CriterionUsageMapper $usageMapper,
         RubricMapper $rubricMapper,
         ErrorMapper $errorMapper,
         RosettaStone $rosettaStone
     ) {
-        $this->criterionMapper = $criterionMapper;
-        $this->groupMapper     = $groupMapper;
-        $this->nodeMapper      = $nodeMapper;
-        $this->usageMapper     = $usageMapper;
-        $this->rubricMapper    = $rubricMapper;
-        $this->errorMapper     = $errorMapper;
-        $this->rosettaStone    = $rosettaStone;
+        $this->nodeMapper   = $nodeMapper;
+        $this->rubricMapper = $rubricMapper;
+        $this->errorMapper  = $errorMapper;
+        $this->rosettaStone = $rosettaStone;
     }
 
 
