@@ -168,16 +168,16 @@ class RubricMapper
      *                                  be modifiable or deletable?
      * @param bool   $persistCurriculum Should curriculum nodes for groups and
      *                                  criteria be updated?
-     * @throws MapperException
+     * @throws MapperException if something happens in the mapper
      */
     public function persistRowSet(RowSet $rowSet, bool $allowModifyUsed, bool $persistCurriculum): void
     {
         $folder             = $rowSet->getContext()->getBaseContext()->getFolder();
         $groupMapper        = GroupMapper::getInstance();
-        $oldGroupModels     = $groupMapper->findByColumn('id', $rowSet->retrieveGroupIds());
+        $oldGroupModels     = $groupMapper->findForFolder($folder->getId());
         $newGroupModels     = $groupMapper->createCollection();
         $criterionMapper    = CriterionMapper::getInstance();
-        $oldCriterionModels = $criterionMapper->findByColumn('id', $rowSet->retrieveCriterionIds());
+        $oldCriterionModels = $criterionMapper->findForFolder($folder->getId());
         $newCriterionModels = $criterionMapper->createCollection();
 
 
