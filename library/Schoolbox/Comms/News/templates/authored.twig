@@ -19,13 +19,12 @@
 
                 {# tabs #}
                 <dl class="tabs" id="{{ topicContainerId }}">
-                    <dd :class="{active: tabSelected === 'All'}"><a @click="onTabChange('All')">All</a></dd>
-                    <dd :class="{active: tabSelected === 'Rejected'}"><a @click="onTabChange('Rejected')">Rejected</a></dd>
-                    <dd :class="{active: tabSelected === 'Draft'}"><a @click="onTabChange('Draft')">Drafts</a></dd>
-                    <dd :class="{active: tabSelected === 'Awaiting Moderation'}"><a @click="onTabChange('Awaiting Moderation')">Awaiting Moderation</a></dd>
-                    <dd :class="{active: tabSelected === 'Awaiting Publication'}"><a @click="onTabChange('Awaiting Publication')">Awaiting Publication</a></dd>
-                    <dd :class="{active: tabSelected === 'Published'}"><a @click="onTabChange('Published')">Published</a></dd>
-                    <dd :class="{active: tabSelected === 'Archived'}"><a @click="onTabChange('Archived')">Archived</a></dd>
+                    <dd v-for="status in statuses" :class="{active: tabSelected === status}">
+                        <a @click="onTabChange(status)">${ status }</a>
+                    </dd>
+                    <dd class="placeholder" v-if="articlesLoading" v-for="n in 3">
+                        <a></a>
+                    </dd>
                 </dl>
 
                 <div class="tabs-content no-margin">
@@ -104,7 +103,13 @@
             // The active page on the pagination
             page: 1,
 
+            // Whether the articles are still being loaded or not
+            // Used to show the placeholder loader
             articlesLoading: true,
+
+            // A unique list of statuses returned from the user's articles
+            // Used to display tab options
+            statuses: [],
 
             // *All* the author's articles
             allArticles: [],
@@ -129,6 +134,14 @@
                 vue.allArticles = response.data;
                 vue.filteredArticles = response.data;
                 vue.currentArticles = response.data.slice(0, {{ config.search_type_limit }});
+
+                // Loop the returned articles and populate the 'statuses' array for the status tabs
+                vue.statuses.push('All'); // Add 'all' here so that they're all loaded at the same time
+                response.data.forEach(function (article) {
+                    if (vue.statuses.indexOf(article.status) === -1) {
+                        vue.statuses.push(article.status);
+                    }
+                });
 
             }).catch(function (error) {
                 console.log(error);
