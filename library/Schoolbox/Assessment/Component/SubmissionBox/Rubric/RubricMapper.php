@@ -855,7 +855,6 @@ class RubricMapper
         }
 
         // Pass 1.5: is a custom max mark for the group set?
-        // TODO figure out how to scale this, it's not scaled for % mark
         foreach ($selectedGroups as $groupId => $value) {
             if (null !== $value) {
                 $groupMarksToSave[$groupId]->setValue($value);
