@@ -56,9 +56,9 @@
                                             {% endif %}
                                             <span class="range {% if descriptor.selected and markVisibility %}selected{% endif %}">
                                                 {%- if direction == 'asc' -%}
-                                                    {{descriptorMin}} - {{descriptorMax}}
+                                                    {{descriptorMin}}–{{descriptorMax}}
                                                 {%- else -%}
-                                                    {{descriptorMax}} - {{descriptorMin}}
+                                                    {{descriptorMax}}–{{descriptorMin}}
                                                 {%- endif -%}
                                             </span>
                                         {% else %}
