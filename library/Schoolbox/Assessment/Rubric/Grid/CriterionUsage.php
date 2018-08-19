@@ -46,16 +46,16 @@ class CriterionUsage
      * Given a set of levels, retrieves an iterator for the row.
      *
      * @param GenericCollection|Level[] $levels
-     * @return iterable|?Descriptor[]
+     * @return iterable|?Descriptor[] key:   level ID
+     *                                value: descriptor, or null if there is
+     *                                       none for level
      */
-    public function iterateRow(GenericCollection $levels): iterable
+    public function iterateDescriptors(GenericCollection $levels): iterable
     {
-        $result = [];
         foreach ($levels as $level) {
-            $levelId          = $level->getId();
-            $result[$levelId] = $this->getDescriptors()[$levelId] ?? null;
+            $levelId = $level->getId();
+            yield $levelId => $this->getDescriptors()[$levelId] ?? null;
         }
-        return $result;
     }
 
 

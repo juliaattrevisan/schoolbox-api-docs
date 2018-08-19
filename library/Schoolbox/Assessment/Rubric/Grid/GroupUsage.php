@@ -64,7 +64,7 @@ class GroupUsage
             $criterionId          = $criterionUsage->getCriterion()->getId();
             $result[$criterionId] = [
                 'criterion'   => $criterionUsage,
-                'descriptors' => $criterionUsage->iterateRow($levels),
+                'descriptors' => $criterionUsage->iterateDescriptors($levels),
             ];
         }
         return $result;
