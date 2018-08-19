@@ -43,11 +43,19 @@ class CriterionUsage
 
 
     /**
-     * @return Criterion
+     * Given a set of levels, retrieves an iterator for the row.
+     *
+     * @param GenericCollection|Level[] $levels
+     * @return iterable|?Descriptor[]
      */
-    public function getCriterion(): Criterion
+    public function iterateRow(GenericCollection $levels): iterable
     {
-        return $this->criterion;
+        $result = [];
+        foreach ($levels as $level) {
+            $levelId          = $level->getId();
+            $result[$levelId] = $this->getDescriptors()[$levelId] ?? null;
+        }
+        return $result;
     }
 
 
@@ -69,6 +77,61 @@ class CriterionUsage
             }
         }
         return !empty($values) ? max($values) : null;
+    }
+
+
+    /**
+     * Apply the min values for all the descriptors in this criterion.
+     */
+    public function applyDescriptorMinValues(): void
+    {
+        // The rules for min-max values, from SA-6627:
+        // * The highest possible value for a descriptor is the points value
+        //   supplied for that descriptor at rubric creation time
+        // * If the points values are ascending (the first descriptor has the
+        //   lowest points value of any descriptor in the row):
+        // ** The lowest possible value for the descriptor is the points value
+        //    supplied for the previous descriptor (to the left), plus 1
+        // ** If there is no descriptor to the left, the lowest possible value
+        //    is also the highest possible value
+        // * Otherwise, if the points values are descending (the first
+        //   descriptor has the highest points value of any descriptor in the
+        //   row):
+        // ** The lowest possible value for the descriptor is the points value
+        //    supplied for the next descriptor to the right, plus 1
+        // ** If there is no descriptor to the right, the lowest possible value
+        //    is also the highest possible value
+        // * The user is able to select any integer value between the lowest
+        //   and highest values inclusive
+        //
+        // My own rule:
+        // * If the points values both ascend and descend: the min values are
+        //   undefined
+
+        $keys    = $this->descriptors->keys();
+        $keySets = [];
+        foreach ($keys as $i => $current) {
+            $previous  = $keys[$i-1] ?? null;
+            $next      = $keys[$i+1] ?? null;
+            $keySets[] = [$previous, $current, $next];
+        }
+
+        foreach ($keySets as [$previous, $current, $next]) {
+
+        }
+
+//        foreach ($this->descriptors as $descriptor) {
+//            // Get previous and next descriptor, too
+//        }
+    }
+
+
+    /**
+     * @return Criterion
+     */
+    public function getCriterion(): Criterion
+    {
+        return $this->criterion;
     }
 
 

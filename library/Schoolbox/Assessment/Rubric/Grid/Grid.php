@@ -86,7 +86,7 @@ class Grid
 //     * @param Criterion $criterion
 //     * @return GenericCollection|Descriptor[]
 //     */
-//    public function getRow(Criterion $criterion): GenericCollection
+//    public function retrieveRow(Criterion $criterion): GenericCollection
 //    {
 //        // TODO implement
 //        return new GenericCollection(Descriptor::class);
@@ -99,7 +99,7 @@ class Grid
 //     * @param Level $level
 //     * @return GenericCollection
 //     */
-//    public function getColumn(Level $level): GenericCollection
+//    public function retrieveColumn(Level $level): GenericCollection
 //    {
 //        // TODO implement
 //        return new GenericCollection(Descriptor::class);
@@ -113,11 +113,34 @@ class Grid
 //     * @param Level     $level
 //     * @return null|Descriptor
 //     */
-//    public function getDescriptor(Criterion $criterion, Level $level): ?Descriptor
+//    public function retrieveDescriptor(Criterion $criterion, Level $level): ?Descriptor
 //    {
 //        // TODO implement
 //        return null;
 //    }
+
+
+    /**
+     * Iterate over each group, then each criterion in the group, then each
+     * descriptor in the criterion.
+     *
+     * @return iterable $result[$groupId][group] : group usage
+     */
+    public function iterateTable(): iterable
+    {
+        // Descriptor doesn't know what level or criterion it's in
+        // Both lev and crit know which descriptors they contain, though
+        // However: crit's descriptors are indexed by level
+        $result = [];
+        foreach ($this->groupUsages as $groupUsage) {
+            $groupId          = $groupUsage->getGroup()->getId();
+            $result[$groupId] = [
+                'group'    => $groupUsage,
+                'criteria' => $groupUsage->iterateRows($this->levels),
+            ];
+        }
+        return $result;
+    }
 
 
     /**

@@ -51,6 +51,27 @@ class GroupUsage
 
 
     /**
+     * Given a set of levels, retrieves an iterator for the rows in this group
+     * usage.
+     *
+     * @param GenericCollection|Level[] $levels
+     * @return iterable
+     */
+    public function iterateRows(GenericCollection $levels): iterable
+    {
+        $result = [];
+        foreach ($this->criterionUsages as $criterionUsage) {
+            $criterionId          = $criterionUsage->getCriterion()->getId();
+            $result[$criterionId] = [
+                'criterion'   => $criterionUsage,
+                'descriptors' => $criterionUsage->iterateRow($levels),
+            ];
+        }
+        return $result;
+    }
+
+
+    /**
      * @return Group
      */
     public function getGroup(): Group
