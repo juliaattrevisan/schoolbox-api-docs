@@ -124,22 +124,22 @@ class Grid
      * Iterate over each group, then each criterion in the group, then each
      * descriptor in the criterion.
      *
-     * @return iterable $result[$groupId][group] : group usage
+     * @return iterable key:   group ID
+     *                  value: [
+     *                    group:    the group usage object
+     *                    criteria: the criteria in the group
+     *                              (@see \Schoolbox\Assessment\Rubric\Grid\GroupUsage::iterateCriteria)
+     *                  ]
      */
-    public function iterateTable(): iterable
+    public function iterateGroups(): iterable
     {
-        // Descriptor doesn't know what level or criterion it's in
-        // Both lev and crit know which descriptors they contain, though
-        // However: crit's descriptors are indexed by level
-        $result = [];
         foreach ($this->groupUsages as $groupUsage) {
-            $groupId          = $groupUsage->getGroup()->getId();
-            $result[$groupId] = [
+            $groupId = $groupUsage->getGroup()->getId();
+            yield $groupId => [
                 'group'    => $groupUsage,
-                'criteria' => $groupUsage->iterateRows($this->levels),
+                'criteria' => $groupUsage->iterateCriteria($this->levels),
             ];
         }
-        return $result;
     }
 
 

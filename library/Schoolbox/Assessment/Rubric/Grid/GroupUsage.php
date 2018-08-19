@@ -55,19 +55,22 @@ class GroupUsage
      * usage.
      *
      * @param GenericCollection|Level[] $levels
-     * @return iterable
+     * @return iterable key:   criterion ID
+     *                  value: [
+     *                    criterion:   the criterion usage object
+     *                    descriptors: the descriptors in the criterion, keyed
+     *                                 by descriptor ID
+     *                  ]
      */
-    public function iterateRows(GenericCollection $levels): iterable
+    public function iterateCriteria(GenericCollection $levels): iterable
     {
-        $result = [];
         foreach ($this->criterionUsages as $criterionUsage) {
-            $criterionId          = $criterionUsage->getCriterion()->getId();
-            $result[$criterionId] = [
+            $criterionId = $criterionUsage->getCriterion()->getId();
+            yield $criterionId => [
                 'criterion'   => $criterionUsage,
                 'descriptors' => $criterionUsage->iterateDescriptors($levels),
             ];
         }
-        return $result;
     }
 
 
