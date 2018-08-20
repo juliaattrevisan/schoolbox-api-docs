@@ -137,13 +137,7 @@ var jsSrc = {
 
         // Feature tours
         'www/javascript/components/intro.js/intro.js',
-        'www/javascript/shared/tour/tour.js',
-
-        // Death to jQuery!
-        'node_modules/vue/dist/vue.js', // TODO: change to .min before major release for production mode, or rewrite all this with webpack :)
-        'node_modules/vuejs-paginate/dist/index.js',
-        'node_modules/axios/dist/axios.js'
-
+        'www/javascript/shared/tour/tour.js'
     ],
     masonry: [
         // Colour handling
@@ -157,12 +151,18 @@ var jsSrc = {
         // System for displaying calendars and associated popups
         'www/javascript/components/fullcalendar/dist/fullcalendar.js',
         'www/javascript/shared/calendar/jquery.fullcalendar.js'
+    ],
+    vue: [ // Death to jQuery!
+        'node_modules/vue/dist/vue.js', // TODO: change to .min before major release for production mode, or rewrite all this with webpack :)
+        'node_modules/vuejs-paginate/dist/index.js',
+        'node_modules/axios/dist/axios.js'
     ]
 };
 var jsDest = {
     main: 'www/javascript/components/<%= pkg.name %>.min.js',
     masonry: 'www/javascript/components/<%= pkg.name %>-masonry.min.js',
-    fullcalendar: 'www/javascript/components/<%= pkg.name %>-fullcalendar.min.js'
+    fullcalendar: 'www/javascript/components/<%= pkg.name %>-fullcalendar.min.js',
+    vue: 'www/javascript/components/<%= pkg.name %>-vue.min.js'
 };
 
 module.exports = function(grunt) {
@@ -197,6 +197,10 @@ module.exports = function(grunt) {
             fullcalendar: {
                 src: jsSrc.fullcalendar,
                 dest: jsDest.fullcalendar
+            },
+            vue: {
+                src: jsSrc.vue,
+                dest: jsDest.vue
             }
         },
         uglify: {
@@ -216,6 +220,10 @@ module.exports = function(grunt) {
             fullcalendar: {
                 src: jsSrc.fullcalendar,
                 dest: jsDest.fullcalendar
+            },
+            vue: {
+                src: jsSrc.vue,
+                dest: jsDest.vue
             }
         },
         clean: {
