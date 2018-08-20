@@ -80,6 +80,20 @@ class Grid
     }
 
 
+    /**
+     * Retrieve an identifier for this rubric grid.
+     *
+     * Currently, it's always the assessment's ID; or 0 if it doesn't have an
+     * ID yet.
+     *
+     * @return int
+     */
+    public function getId(): int
+    {
+        return $this->assessment->getId() ?: 0;
+    }
+
+
 //    /**
 //     * Return a set of descriptors for a row.
 //     *
