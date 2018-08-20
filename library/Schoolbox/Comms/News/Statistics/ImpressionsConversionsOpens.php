@@ -286,7 +286,7 @@ class ImpressionsConversionsOpens
         $conversionRatio = 0.00;
 
         if ($numImpressions && $numConversions) {
-            $conversionRatio = $this->percentage($numConversions, $numImpressions);
+            $conversionRatio = $this->percentage($numConversions, $numImpressions, 1);
         }
 
         /* Calculate Conversion ratios for each referrer type
@@ -563,11 +563,12 @@ class ImpressionsConversionsOpens
      *
      * @param null|int $numerator
      * @param null|int $denominator
+     * @param int      $precision
      * @return float
      */
-    private function percentage(?int $numerator, ?int $denominator): float
+    private function percentage(?int $numerator, ?int $denominator, int $precision = 0): float
     {
-        $percentage = $denominator ? round(100*$numerator/$denominator) : 0;
+        $percentage = $denominator ? round(100*$numerator/$denominator, $precision) : 0;
 
         return $percentage > 100 ? 100 : $percentage;
     }
