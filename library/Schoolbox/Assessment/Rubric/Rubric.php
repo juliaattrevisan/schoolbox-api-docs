@@ -115,10 +115,8 @@ class Rubric implements Twiggable
         bool               $usesMarkRange
     )
     {
-        // Is the descriptor a decimal value?
-        $isDecimal = preg_match('/\.\d+$/', $descriptor->getValue()) === 1 ? true : false;
         // Are we using a mark range AND have a decimal descriptor val? Can't do dat!
-        if ($isDecimal && $usesMarkRange) {
+        if (! (new ValidDescriptor($usesMarkRange))->isSatisifedBy($descriptor) ) {
             throw new InvalidArgumentException("Cannot create a descriptor with decimal places when Use Mark Range is enabled");
         }
 

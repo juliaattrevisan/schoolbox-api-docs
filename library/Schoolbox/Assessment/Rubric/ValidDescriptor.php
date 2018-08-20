@@ -13,19 +13,19 @@ class ValidDescriptor
 {
     private $usesMarkRange;
 
-    public function __construct($usesMarkRange)
+    public function __construct(bool $usesMarkRange)
     {
         $this->usesMarkRange = $usesMarkRange;
     }
 
 
-    public function isSatisifedBy($descriptor) : bool
+    public function isSatisifedBy(Descriptor $descriptor) : bool
     {
         return !($this->usesMarkRange && $this->hasDecimals($descriptor));
     }
 
-    private function hasDecimals($descriptor) : bool
+    private function hasDecimals(Descriptor $descriptor) : bool
     {
-        // TODO
+       return preg_match('/\.\d+$/', $descriptor->getValue()) === 1 ? true : false;
     }
 }

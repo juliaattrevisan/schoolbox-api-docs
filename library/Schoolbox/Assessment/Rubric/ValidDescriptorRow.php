@@ -13,24 +13,24 @@ class ValidDescriptorRow
 {
     private $usesMarkRange;
 
-    public function __construct($usesMarkRange)
+    public function __construct(bool $usesMarkRange)
     {
         $this->usesMarkRange = $usesMarkRange;
     }
 
 
-    public function isSatisifedBy($descriptorRow) : bool
+    public function isSatisifedBy(DescriptorList $descriptorRow) : bool
     {
         return $this->isMonotonic($descriptorRow) && $this->validDescriptorValues($descriptorRow);
     }
 
 
-    private function isMonotonic($descriptorRow) : bool
+    private function isMonotonic(DescriptorList $descriptorRow) : bool
     {
         // TODO
     }
 
-    private function validDescriptorValues($descriptorRow) : bool
+    private function validDescriptorValues(DescriptorList $descriptorRow) : bool
     {
         foreach($descriptorRow as $descriptor) {
             if (! (new ValidDescriptor($this->usesMarkRange))->isSatisifedBy($descriptor) ) {
