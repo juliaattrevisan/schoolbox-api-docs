@@ -136,6 +136,55 @@ class CriterionUsage extends TestCase
 
 
     /**
+     * Data provider for `testApplyDescriptorMinValues`.
+     *
+     * @return iterable
+     */
+    public function getTestApplyDescriptorMinValuesData(): iterable
+    {
+        // Examples:
+        // Ascending: [0, 2, 4, 6, 8]  => [0, 1..2, 3..4, 5..6, 7..8]
+        $criterion       = (new RowSet\Criterion())->setId(1)->setName('Criterion');
+        $criterionUsage1 = new RubricGrid\CriterionUsage($criterion);
+
+        $level1 = (new RubricGrid\Level())->setId(1)->setName('Level 1');
+        $level2 = (new RubricGrid\Level())->setId(2)->setName('Level 2');
+        $level3 = (new RubricGrid\Level())->setId(3)->setName('Level 3');
+        $level4 = (new RubricGrid\Level())->setId(4)->setName('Level 4');
+        $level5 = (new RubricGrid\Level())->setId(5)->setName('Level 5');
+
+        $descriptor1 = (new RubricGrid\Descriptor())->setDescription('Descriptor 1.1')->setMaxValue(0);
+        $descriptor2 = (new RubricGrid\Descriptor())->setDescription('Descriptor 1.2')->setMaxValue(2);
+        $descriptor3 = (new RubricGrid\Descriptor())->setDescription('Descriptor 1.3')->setMaxValue(4);
+        $descriptor4 = (new RubricGrid\Descriptor())->setDescription('Descriptor 1.4')->setMaxValue(6);
+        $descriptor5 = (new RubricGrid\Descriptor())->setDescription('Descriptor 1.5')->setMaxValue(8);
+
+        $criterionUsage1->getDescriptors()[$level1->getId()] = $descriptor1;
+        $criterionUsage1->getDescriptors()[$level2->getId()] = $descriptor2;
+        $criterionUsage1->getDescriptors()[$level3->getId()] = $descriptor3;
+        $criterionUsage1->getDescriptors()[$level4->getId()] = $descriptor4;
+        $criterionUsage1->getDescriptors()[$level5->getId()] = $descriptor5;
+
+        yield 'Ascending 0' => [$criterionUsage1, $level1, 0];
+        yield 'Ascending 2' => [$criterionUsage1, $level2, 1];
+        yield 'Ascending 4' => [$criterionUsage1, $level3, 3];
+        yield 'Ascending 6' => [$criterionUsage1, $level4, 5];
+        yield 'Ascending 8' => [$criterionUsage1, $level5, 7];
+
+
+
+        // Descending:              [8, 6, 4, 2, 0]  => [7..8, 5..6, 3..4, 1..2, 0]
+        // Asc, skip null before:   [0, null, 5, 10] => [0, null, 1..5, 6..10]
+        // Asc, skip null after:    [0, 5, null, 10] => [0, 1..5, null, 6..10]
+        // Asc, skip null at start: [null, 5, 10]    => [null, 5, 6..10]
+        // Desc, skip null before:  [0, null, 5, 10] => [0, null, 1..5, 6..10]
+        // Desc, skip null after:   [0, 5, null, 10] => [0, 1..5, null, 6..10]
+        // Asc+Desc:                [0, 4, 8, 3, 0]  => [0, 0..4, 5..8, 0..3, 0] (use highest max below this max)
+    }
+
+
+    /**
+     * @dataProvider getTestApplyDescriptorMinValuesData
      * @covers \Schoolbox\Assessment\Rubric\Grid\CriterionUsage::applyDescriptorMinValues
      *
      * @param RubricGrid\CriterionUsage $criterionUsage
@@ -147,7 +196,7 @@ class CriterionUsage extends TestCase
         RubricGrid\Level $level,
         ?float $expected
     ): void {
-        $criterionUsage->applyDescriptorMinValues();
+        $criterionUsage->applyDescriptorMinValues(true);
         $descriptor = $criterionUsage->retrieveDescriptor($level);
         $this->assertNotNull($descriptor);
         $this->assertSame($expected, $descriptor->getMinValue());
