@@ -13,7 +13,7 @@
         </span>
         {% if group.name %}
             <label>
-                {%- if group.used -%}
+                {%- if group.inUseExcluding(rubricGrid.assessment) -%}
                     {{ groupName }}
                     <span data-tooltip
                           class="hint has-tip tip-right"

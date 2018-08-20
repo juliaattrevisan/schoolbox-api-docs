@@ -13,7 +13,7 @@
     <input type="hidden" name="{{ critInput }}[groupId]" value="{{ group.id }}" />
     <input  id="{{ critInput }}[on]" data-criterion-name="{{ crit.name }}" name="{{ critInput }}[on]" type="checkbox" value="1" {% if checkChecked %}checked="checked"{% endif %} />
 
-    {%- if crit.used -%}
+    {%- if crit.inUseExcluding(rubricGrid.assessment) -%}
 
     <label for="{{ critInput }}[on]" class="checkbox-label rb-criterion rb-readonly">
         {{- crit.name | nl2br -}}
