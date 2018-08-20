@@ -54,7 +54,7 @@ This is to follow the standard packaging process linux distributions use for web
   * [Quickstart](./docs/quickstart.md)
   * [MVC](./docs/mvc/readme.md)
 * Technical Processes:
-  * [Build Process](./docs/build-process.md)
+  * [Build Process](./docs/front-end/build-process.md)
   * [Sanitisation](./docs/scrub.md)
   * [Updates](./updates/README.md)
   * [Packaging](./tools/pkg-build/README.md)
