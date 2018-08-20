@@ -25,6 +25,7 @@
             // but ONLY if we haven't already customised the mark - don't clobber!
             if ( currentRubricValue !== currentMarkInput && (!$status.find(markInputSelector).attr('data-customised')) ) {
                 $status.find(markInputSelector).val(currentRubricValue);
+                $status.find("[data-rubric-sum]").val(currentRubricValue);
                 currentMarkInput = currentRubricValue;
             }
 
@@ -36,8 +37,17 @@
             var rubricTotalText = $.trim($rb.find(finalSummarySelector).text());
 
             // Extract just the first value, remove the trailing space slash and total mark
+            // TODO this needs to account for different mark types e.g. it assumes total mark
             var rubricSum = rubricTotalText.replace(/\/ \d*/, "");
             $("[data-rubric-sum]").text(rubricSum);
+
+            // TODO this needs to account for different mark types e.g. won't work for total mark
+            // Current calculated rubric total
+            var currentRubricValue = $.trim($rb.find(finalSummarySelector).text());
+            // Mark entered in the overall mark field
+            var currentMarkInput   = $status.find(markInputSelector).val();
+            // Disable the button if the rubric value is same as input value
+            $assignFromRubricButton.prop('disabled', currentRubricValue === currentMarkInput);
         }
 
         // Update the input val when manually assigning grade from rubric
@@ -49,6 +59,7 @@
             refreshAssignFromRubricButton();
         });
 
+        // TODO this needs to account for different mark types e.g. it doesn't work with total mark
         $status.find(markInputSelector).change(function() {
             // Did we manually change the overall grade? Record that it's customised
             $status.find(markInputSelector).attr('data-customised', true);
@@ -64,12 +75,12 @@
         // Update the input val when manually assigning grades from descriptor vals
         $(".use-descriptor-values").on('click', function(e) {
             e.preventDefault();
-            refreshAssignFromRubricButton();
+            if (!$status.find(markInputSelector).attr('data-customised')) {
+                refreshAssignFromRubricButton();
+            }
         });
 
-        // Show the current rubric total on the button on page load
         updateButtonMark();
-        refreshAssignFromRubricButton();
 
         // Update the input val when any of these inputs change
         $rb.on('change', '[data-rubric], [data-rubric-group], [data-group-max-value]', refreshAssignFromRubricButton);
