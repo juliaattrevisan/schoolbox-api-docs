@@ -10,6 +10,7 @@ namespace Schoolbox\Assessment\Rubric\RowSet\Test;
 
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Assessment\Rubric\RowSet\Criterion;
+use Schoolbox\Assessment\Rubric\RowSet\Group as RubricGroup;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 
@@ -25,10 +26,10 @@ class Group extends TestCase
      */
     public function getTestRetrieveCriterionIdsData(): iterable
     {
-        $group = new \Schoolbox\Assessment\Rubric\RowSet\Group();
+        $group = new RubricGroup();
         yield 'no criteria' => [$group, []];
 
-        $group = (new \Schoolbox\Assessment\Rubric\RowSet\Group())->setId(3);
+        $group = (new RubricGroup())->setId(3);
         $group->getCriteria()
               ->add(new Criterion())
               ->add((new Criterion())->setId(9))
@@ -44,10 +45,10 @@ class Group extends TestCase
      * @dataProvider getTestRetrieveCriterionIdsData
      * @covers \Schoolbox\Assessment\Rubric\RowSet\Group::retrieveCriterionIds
      *
-     * @param \Schoolbox\Assessment\Rubric\RowSet\Group $group
-     * @param array                                     $expected
+     * @param RubricGroup $group
+     * @param array       $expected
      */
-    public function testRetrieveCriterionIds(\Schoolbox\Assessment\Rubric\RowSet\Group $group, array $expected): void
+    public function testRetrieveCriterionIds(RubricGroup $group, array $expected): void
     {
         $this->assertEquals($expected, $group->retrieveCriterionIds());
     }
@@ -60,29 +61,29 @@ class Group extends TestCase
      */
     public function getTestIsInUseData(): iterable
     {
-        $group = (new \Schoolbox\Assessment\Rubric\RowSet\Group())->setId(3);
+        $group = (new RubricGroup())->setId(3);
         yield 'no criteria' => [$group, false];
 
-        $group = (new \Schoolbox\Assessment\Rubric\RowSet\Group())->setId(3);
+        $group = (new RubricGroup())->setId(3);
         $group->getCriteria()
               ->add((new Criterion())->setId(9));
         yield 'one criterion, none in use' => [$group, false];
 
-        $group = (new \Schoolbox\Assessment\Rubric\RowSet\Group())->setId(3);
+        $group = (new RubricGroup())->setId(3);
         $criterion = (new Criterion())->setId(9);
         $criterion->getUsage()
                   ->add((new Task())->setId(1));
         $group->getCriteria()->add($criterion);
         yield 'one criterion, one in use' => [$group, true];
 
-        $group = (new \Schoolbox\Assessment\Rubric\RowSet\Group())->setId(3);
+        $group = (new RubricGroup())->setId(3);
         $group->getCriteria()
               ->add((new Criterion())->setId(9))
               ->add((new Criterion())->setId(10))
               ->add((new Criterion())->setId(11));
         yield 'three criteria, none in use' => [$group, false];
 
-        $group = (new \Schoolbox\Assessment\Rubric\RowSet\Group())->setId(3);
+        $group = (new RubricGroup())->setId(3);
         $criterion = (new Criterion())->setId(9);
         $criterion->getUsage()
                   ->add((new Task())->setId(1));
@@ -92,7 +93,7 @@ class Group extends TestCase
               ->add((new Criterion())->setId(11));
         yield 'three criteria, one in use' => [$group, true];
 
-        $group = (new \Schoolbox\Assessment\Rubric\RowSet\Group())->setId(3);
+        $group = (new RubricGroup())->setId(3);
         $criterion1 = (new Criterion())->setId(9);
         $criterion1->getUsage()
                    ->add((new Task())->setId(1));
@@ -114,10 +115,10 @@ class Group extends TestCase
      * @dataProvider getTestIsInUseData
      * @covers \Schoolbox\Assessment\Rubric\RowSet\Group::isInUse
      *
-     * @param \Schoolbox\Assessment\Rubric\RowSet\Group $group
-     * @param bool                                      $expected
+     * @param RubricGroup $group
+     * @param bool        $expected
      */
-    public function testIsInUse(\Schoolbox\Assessment\Rubric\RowSet\Group $group, bool $expected): void
+    public function testIsInUse(RubricGroup $group, bool $expected): void
     {
         $this->assertEquals($expected, $group->isInUse());
     }
@@ -135,15 +136,15 @@ class Group extends TestCase
         $task3 = (new Task())->setId(3);
         $task4 = (new Task())->setId(4);
 
-        $group = (new \Schoolbox\Assessment\Rubric\RowSet\Group())->setId(3);
+        $group = (new RubricGroup())->setId(3);
         yield 'no criteria' => [$group, $task1, false];
 
-        $group = (new \Schoolbox\Assessment\Rubric\RowSet\Group())->setId(3);
+        $group = (new RubricGroup())->setId(3);
         $group->getCriteria()
               ->add((new Criterion())->setId(9));
         yield 'one criterion, none in use' => [$group, $task1, false];
 
-        $group = (new \Schoolbox\Assessment\Rubric\RowSet\Group())->setId(3);
+        $group = (new RubricGroup())->setId(3);
         $criterion = (new Criterion())->setId(9);
         $criterion->getUsage()
                   ->add($task1);
@@ -151,14 +152,14 @@ class Group extends TestCase
         yield 'one criterion, one in use, match' => [$group, $task1, false];
         yield 'one criterion, one in use, no match' => [$group, $task2, true];
 
-        $group = (new \Schoolbox\Assessment\Rubric\RowSet\Group())->setId(3);
+        $group = (new RubricGroup())->setId(3);
         $group->getCriteria()
               ->add((new Criterion())->setId(9))
               ->add((new Criterion())->setId(10))
               ->add((new Criterion())->setId(11));
         yield 'three criteria, none in use' => [$group, $task1, false];
 
-        $group = (new \Schoolbox\Assessment\Rubric\RowSet\Group())->setId(3);
+        $group = (new RubricGroup())->setId(3);
         $criterion = (new Criterion())->setId(9);
         $criterion->getUsage()
                   ->add($task1);
@@ -169,7 +170,7 @@ class Group extends TestCase
         yield 'three criteria, one in use, match' => [$group, $task1, false];
         yield 'three criteria, one in use, no match' => [$group, $task2, true];
 
-        $group = (new \Schoolbox\Assessment\Rubric\RowSet\Group())->setId(3);
+        $group = (new RubricGroup())->setId(3);
         $criterion1 = (new Criterion())->setId(9);
         $criterion1->getUsage()
                    ->add($task1);
@@ -192,12 +193,12 @@ class Group extends TestCase
      * @dataProvider getTestIsInUseExcludingData
      * @covers \Schoolbox\Assessment\Rubric\RowSet\Group::isInUseExcluding
      *
-     * @param \Schoolbox\Assessment\Rubric\RowSet\Group $group
-     * @param IAssessable                               $assessment
-     * @param bool                                      $expected
+     * @param RubricGroup $group
+     * @param IAssessable $assessment
+     * @param bool        $expected
      */
     public function testIsInUseExcluding(
-        \Schoolbox\Assessment\Rubric\RowSet\Group $group,
+        RubricGroup $group,
         IAssessable $assessment,
         bool $expected
     ): void

@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Schoolbox\Assessment\Rubric\RowSet\Test;
 
 use PHPUnit\Framework\TestCase;
+use Schoolbox\Assessment\Rubric\RowSet\Criterion as RubricCriterion;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 
@@ -24,10 +25,10 @@ class Criterion extends TestCase
      */
     public function getTestIsInUseData(): iterable
     {
-        $criterion = (new \Schoolbox\Assessment\Rubric\RowSet\Criterion())->setId(3);
+        $criterion = (new RubricCriterion())->setId(3);
         yield 'none in use' => [$criterion, false];
 
-        $criterion = (new \Schoolbox\Assessment\Rubric\RowSet\Criterion())->setId(3);
+        $criterion = (new RubricCriterion())->setId(3);
         $criterion->getUsage()
                   ->add((new Task())->setId(1));
         yield 'one in use' => [$criterion, true];
@@ -38,10 +39,10 @@ class Criterion extends TestCase
      * @dataProvider getTestIsInUseData
      * @covers \Schoolbox\Assessment\Rubric\RowSet\Criterion::isInUse
      *
-     * @param \Schoolbox\Assessment\Rubric\RowSet\Criterion $criterion
-     * @param bool                                          $expected
+     * @param RubricCriterion $criterion
+     * @param bool            $expected
      */
-    public function testIsInUse(\Schoolbox\Assessment\Rubric\RowSet\Criterion $criterion, bool $expected): void
+    public function testIsInUse(RubricCriterion $criterion, bool $expected): void
     {
         $this->assertEquals($expected, $criterion->isInUse());
     }
@@ -59,16 +60,16 @@ class Criterion extends TestCase
         $task3 = (new Task())->setId(3);
         $task4 = (new Task())->setId(4);
 
-        $criterion = (new \Schoolbox\Assessment\Rubric\RowSet\Criterion())->setId(3);
+        $criterion = (new RubricCriterion())->setId(3);
         yield 'none in use' => [$criterion, $task1, false];
 
-        $criterion = (new \Schoolbox\Assessment\Rubric\RowSet\Criterion())->setId(3);
+        $criterion = (new RubricCriterion())->setId(3);
         $criterion->getUsage()
                   ->add($task1);
         yield 'one in use, match' => [$criterion, $task1, false];
         yield 'one in use, no match' => [$criterion, $task2, true];
 
-        $criterion = (new \Schoolbox\Assessment\Rubric\RowSet\Criterion())->setId(3);
+        $criterion = (new RubricCriterion())->setId(3);
         $criterion->getUsage()
                   ->add($task1)
                   ->add($task2)
@@ -82,12 +83,12 @@ class Criterion extends TestCase
      * @dataProvider getTestIsInUseExcludingData
      * @covers \Schoolbox\Assessment\Rubric\RowSet\Criterion::isInUseExcluding
      *
-     * @param \Schoolbox\Assessment\Rubric\RowSet\Criterion $criterion
-     * @param IAssessable                                   $assessment
-     * @param bool                                          $expected
+     * @param RubricCriterion $criterion
+     * @param IAssessable     $assessment
+     * @param bool            $expected
      */
     public function testIsInUseExcluding(
-        \Schoolbox\Assessment\Rubric\RowSet\Criterion $criterion,
+        RubricCriterion $criterion,
         IAssessable $assessment,
         bool $expected
     ): void

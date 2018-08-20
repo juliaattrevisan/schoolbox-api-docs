@@ -11,6 +11,7 @@ namespace Schoolbox\Assessment\Rubric\RowSet\Test;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Assessment\Rubric\RowSet\Criterion;
 use Schoolbox\Assessment\Rubric\RowSet\Group;
+use Schoolbox\Assessment\Rubric\RowSet\RowSet as RubricRowSet;
 use Schoolbox\Resource\Folder\Model as Folder;
 
 /**
@@ -25,10 +26,10 @@ class RowSet extends TestCase
      */
     public function getTestRetrieveGroupIdsData(): iterable
     {
-        $rowSet = new \Schoolbox\Assessment\Rubric\RowSet\RowSet(new Folder());
+        $rowSet = new RubricRowSet(new Folder());
         yield 'no groups' => [$rowSet, []];
 
-        $rowSet = new \Schoolbox\Assessment\Rubric\RowSet\RowSet(new Folder());
+        $rowSet = new RubricRowSet(new Folder());
         $rowSet->getGroups()
                ->add(new Group())
                ->add((new Group())->setId(3))
@@ -44,10 +45,10 @@ class RowSet extends TestCase
      * @dataProvider getTestRetrieveGroupIdsData
      * @covers \Schoolbox\Assessment\Rubric\RowSet\RowSet::retrieveGroupIds
      *
-     * @param \Schoolbox\Assessment\Rubric\RowSet\RowSet $rowSet
-     * @param array                                      $expected
+     * @param RubricRowSet $rowSet
+     * @param array        $expected
      */
-    public function testRetrieveGroupIds(\Schoolbox\Assessment\Rubric\RowSet\RowSet $rowSet, array $expected): void
+    public function testRetrieveGroupIds(RubricRowSet $rowSet, array $expected): void
     {
         $this->assertEquals($expected, $rowSet->retrieveGroupIds());
     }
@@ -60,10 +61,10 @@ class RowSet extends TestCase
      */
     public function getTestRetrieveCriterionIdsData(): iterable
     {
-        $rowSet = new \Schoolbox\Assessment\Rubric\RowSet\RowSet(new Folder());
+        $rowSet = new RubricRowSet(new Folder());
         yield 'no groups' => [$rowSet, []];
 
-        $rowSet = new \Schoolbox\Assessment\Rubric\RowSet\RowSet(new Folder());
+        $rowSet = new RubricRowSet(new Folder());
         $rowSet->getGroups()
                ->add(new Group())
                ->add((new Group())->setId(3))
@@ -73,7 +74,7 @@ class RowSet extends TestCase
                ->add((new Group())->setId(1));
         yield 'multiple groups, no criteria' => [$rowSet, []];
 
-        $rowSet = new \Schoolbox\Assessment\Rubric\RowSet\RowSet(new Folder());
+        $rowSet = new RubricRowSet(new Folder());
 
         $group1 = (new Group())->setId(3);
         $group1->getCriteria()
@@ -87,7 +88,7 @@ class RowSet extends TestCase
                ->add($group1);
         yield 'one group, many criteria' => [$rowSet, [5, 6, 7, 8, 9]];
 
-        $rowSet = new \Schoolbox\Assessment\Rubric\RowSet\RowSet(new Folder());
+        $rowSet = new RubricRowSet(new Folder());
         $group1 = (new Group())->setId(3);
         $group1->getCriteria()
                ->add(new Criterion())
@@ -117,10 +118,10 @@ class RowSet extends TestCase
      * @dataProvider getTestRetrieveCriterionIdsData
      * @covers \Schoolbox\Assessment\Rubric\RowSet\RowSet::retrieveCriterionIds
      *
-     * @param \Schoolbox\Assessment\Rubric\RowSet\RowSet $rowSet
-     * @param array                                      $expected
+     * @param RubricRowSet $rowSet
+     * @param array        $expected
      */
-    public function testRetrieveCriterionIds(\Schoolbox\Assessment\Rubric\RowSet\RowSet $rowSet, array $expected): void
+    public function testRetrieveCriterionIds(RubricRowSet $rowSet, array $expected): void
     {
         $this->assertEquals($expected, $rowSet->retrieveCriterionIds());
     }
