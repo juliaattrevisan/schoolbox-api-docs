@@ -127,6 +127,8 @@ class CriterionUsage
         // * If the points values both ascend and descend: the min values are
         //   undefined
 
+        // Currently, step value is always 1: let this be able to change though
+        $step = 1;
         $keys = $this->descriptors->keys();
         foreach ($keys as $i => $current) {
             // If current is null: min is null too
@@ -188,13 +190,16 @@ class CriterionUsage
             }
 
             // No candidates: use max value
-            if (empty($candidateMinValues)) {
-                $descriptor->setMinValue($maxValue);
-                continue;
+            $minValue = $maxValue;
+            if (!empty($candidateMinValues)) {
+                $floorValue = max($candidateMinValues);
+                if (null !== $floorValue) {
+                    // Don't allow to be greater than max
+                    // (in case validation allowed decimals for ranged)
+                    $minValue = $floorValue + $step;
+                }
             }
-
-            // At least one candidate: use the highest, add 1 to it
-            $descriptor->setMinValue(max($candidateMinValues) + 1);
+            $descriptor->setMinValue($minValue);
         }
     }
 
