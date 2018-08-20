@@ -23,7 +23,7 @@ class ImpressionsConversionsOpens
     /**
      * Default accuracy
      */
-    private const DEFAULT_ACCURACY = 'minute';
+    private const DEFAULT_ACCURACY = '10min';
 
     /**
      * The allowed accuracies for a user to choose
@@ -39,10 +39,11 @@ class ImpressionsConversionsOpens
      * @var array
      */
     public const ACCURACIES = [
-        'minute' => 'CONCAT(DATE_FORMAT(occurs_at, \'%Y-%m-%d %H:%i\'), \':00\')',
-        'hour' => 'CONCAT(DATE_FORMAT(occurs_at, \'%Y-%m-%d %H\'), \':00:00\')',
-        'day' => 'CONCAT(DATE_FORMAT(occurs_at, \'%Y-%m-%d\'), \' 00:00:00\')',
-        'month' => 'CONCAT(DATE_FORMAT(occurs_at, \'%Y-%m\'), \'-01 00:00:00\')',
+        '1min'  => "SUBSTRING(occurs_at FROM 1 FOR 16),         ':00'",
+        '10min' => "SUBSTRING(occurs_at FROM 1 FOR 15),        '0:00'",
+        'hour'  => "SUBSTRING(occurs_at FROM 1 FOR 13),      ':00:00'",
+        'day'   => "SUBSTRING(occurs_at FROM 1 FOR 11),    '00:00:00'",
+        'month' => "SUBSTRING(occurs_at FROM 1 FOR 7), '-01 00:00:00'",
     ];
 
     /**
@@ -392,7 +393,7 @@ class ImpressionsConversionsOpens
          */
         $statement = $this->database->prepareQuery("
             SELECT 
-                CAST(1000*UNIX_TIMESTAMP({$accuracySql}) AS UNSIGNED) AS timestamp,
+                1000*UNIX_TIMESTAMP(CONCAT({$accuracySql})) AS timestamp,
                 COUNT(*) AS num,
                 `type`
             FROM {$this->statisticsMapper->getTable()}
@@ -478,7 +479,7 @@ class ImpressionsConversionsOpens
 
         $statement = $this->database->prepareQuery("
             SELECT 
-                CAST(1000*UNIX_TIMESTAMP({$accuracySql}) AS UNSIGNED) AS timestamp,
+                1000*UNIX_TIMESTAMP(CONCAT({$accuracySql})) AS timestamp,
                 `type`,
                 COUNT(*) AS num
             FROM {$this->statisticsMapper->getTable()}
@@ -521,7 +522,7 @@ class ImpressionsConversionsOpens
          */
         $statement = $this->database->prepareQuery("
             SELECT 
-                CAST(1000*UNIX_TIMESTAMP({$accuracySql}) AS UNSIGNED) AS timestamp,
+                1000*UNIX_TIMESTAMP(CONCAT({$accuracySql})) AS timestamp,
                 COUNT(*) AS num,
                 `type`,
                 `referrer`

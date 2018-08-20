@@ -12,7 +12,7 @@
             chart: {
                 height: 500,
                 spacingBottom: 64,
-                type: 'spline',
+                type: 'line',
                 zoomType: 'xy'
             },
 
@@ -23,6 +23,11 @@
             plotOptions: {
                 column: {
                     stacking: 'normal'
+                },
+                series: {
+                    marker: {
+                        enabled: true
+                    }
                 }
             },
 
