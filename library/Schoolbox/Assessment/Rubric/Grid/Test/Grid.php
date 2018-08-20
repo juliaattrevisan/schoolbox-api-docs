@@ -173,22 +173,4 @@ class Grid extends TestCase
     ): void {
         $this->assertSame($expected, $grid->retrieveCriterionUsage($criterion));
     }
-
-
-    public function testIterateGroups(): void
-    {
-        // TODO implement
-    }
-
-
-    public function testIterateGroupsInUseOnly(): void
-    {
-        // TODO implement
-    }
-
-
-    // Things to consider:
-    // iterator for the entire rowset
-    // iterator for only the groups used by the grid
-    // Both should return in the same format
 }
