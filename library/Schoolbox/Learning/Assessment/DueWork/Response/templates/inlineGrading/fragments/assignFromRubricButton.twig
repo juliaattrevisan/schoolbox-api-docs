@@ -33,15 +33,13 @@
             // Update the mark input field with current rubric total if the total is different from the input val
             // but ONLY if we haven't already customised the mark - don't clobber!
             if ( rubricSum !== currentMarkInput && (!$status.find(markInputSelector).attr('data-customised')) ) {
-                $status.find(markInputSelector).val(rubricSum); // TODO this will need changing for letter grade?
-                $status.find("[data-rubric-sum]").val(rubricSum);
+                $status.find(markInputSelector).val(rubricSum); // Input val
+                $status.find("[data-rubric-sum]").val(rubricSum); // Mark shown on button
                 currentMarkInput = rubricSum;
             }
 
             // Disable the button if the rubric value is same as input value
             $assignFromRubricButton.prop('disabled', rubricSum == currentMarkInput);
-
-            console.log("Rubric sum '" + rubricSum + "', current input: '" + currentMarkInput + "'");
         }
 
         function updateButtonMark() {
