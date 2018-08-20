@@ -19,10 +19,15 @@ use Schoolbox\Learning\Assessment\Task\Model as Task;
 class Group extends TestCase
 {
     /**
-     * @covers \Schoolbox\Assessment\Rubric\RowSet\Group::retrieveCriterionIds
+     * Data provider for `testRetrieveCriterionIds`.
+     *
+     * @return iterable
      */
-    public function testRetrieveCriterionIds(): void
+    public function getTestRetrieveCriterionIdsData(): iterable
     {
+        $group = new \Schoolbox\Assessment\Rubric\RowSet\Group();
+        yield 'no criteria' => [$group, []];
+
         $group = (new \Schoolbox\Assessment\Rubric\RowSet\Group())->setId(3);
         $group->getCriteria()
               ->add(new Criterion())
@@ -31,7 +36,20 @@ class Group extends TestCase
               ->add((new Criterion())->setId(7))
               ->add((new Criterion())->setId(5))
               ->add((new Criterion())->setId(6));
-        $this->assertEquals([5, 6, 7, 8, 9,], $group->retrieveCriterionIds());
+        yield 'multiple criteria' => [$group, [5, 6, 7, 8, 9,]];
+    }
+
+
+    /**
+     * @dataProvider getTestRetrieveCriterionIdsData
+     * @covers \Schoolbox\Assessment\Rubric\RowSet\Group::retrieveCriterionIds
+     *
+     * @param \Schoolbox\Assessment\Rubric\RowSet\Group $group
+     * @param array                                     $expected
+     */
+    public function testRetrieveCriterionIds(\Schoolbox\Assessment\Rubric\RowSet\Group $group, array $expected): void
+    {
+        $this->assertEquals($expected, $group->retrieveCriterionIds());
     }
 
 
