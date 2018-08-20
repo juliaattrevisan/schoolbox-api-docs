@@ -19,26 +19,19 @@ class ValidDescriptorRow
     }
 
 
-    public function isSatisifedBy(DescriptorList $descriptorRow) : bool
+    public function isSatisifedBy($descriptorRow) : bool
     {
-        return $this->isMonotonic($descriptorRow) && $this->validDescriptorValues($descriptorRow);
+        if ($this->usesMarkRange) {
+            return $this->isMonotonic($descriptorRow);
+        }
+        return true;
     }
 
 
-    private function isMonotonic(DescriptorList $descriptorRow) : bool
+    private function isMonotonic($descriptorRow) : bool
     {
         // TODO
-    }
-
-    private function validDescriptorValues(DescriptorList $descriptorRow) : bool
-    {
-        foreach($descriptorRow as $descriptor) {
-            if (! (new ValidDescriptor($this->usesMarkRange))->isSatisifedBy($descriptor) ) {
-                return false;
-            }
-        }
-
-        return true;
+        return false;
     }
 
 }

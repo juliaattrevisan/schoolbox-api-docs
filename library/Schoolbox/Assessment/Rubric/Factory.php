@@ -153,6 +153,10 @@ class Factory
 
             }
 
+            if (! (new ValidDescriptorRow($usesMarkRange))->isSatisifedBy($c->getAllDescriptors()) ) {
+                throw new InvalidArgumentException("Descriptor values must be an ascending or descending sequence");
+            }
+
         }
 
         return $rubric;
