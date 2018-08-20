@@ -264,13 +264,6 @@
 <script type="text/javascript" src="/javascript/shared/submissions/jquery.dynagrade.js"></script>
 <script type="text/javascript">
     $(function () {
-        // Keep track of which groups the user has customised the mark for
-        var customisedMark = {};
-        $("[data-group-summary]").each(function(index, $groupSummary) {
-            var id = $($groupSummary).data('group-id');
-            customisedMark[id] = false;
-        })
-
         var $rb = $('#{{ rubricId }}');
         var markType = $rb.find("[data-final-summary]").data("mark-type");
 
@@ -392,7 +385,7 @@
                 }
 
                 if ($groupSummary.length) {
-                    if (! customisedMark[groupId]) {
+                    if (! $groupSummary.attr('data-customised')) {
                         // Only update dropdown/input field if the mark has not been customised
                         switch(markType) {
                             case 'TotalMarkFractional':
@@ -422,7 +415,7 @@
             rubricSummary.attr('data-scaled-mark', rubricTotalMark);
 
             // Only update the overall mark if we haven't customised the cap mark
-            if (! customisedMark[groupId]) {
+            if (! $groupSummary.attr('data-customised')) {
                 parseFraction(rubricSummary, e.namespace);
             }
 
@@ -454,7 +447,7 @@
                 $groupSummary.attr('data-scaled-mark', scale($groupSummary, getNormalisedCustomMark($groupRows, customMark, $groupSummary.data('row-max-sum'))));
                 $groupSummary.attr('data-mark', getNormalisedCustomMark($groupRows, customMark, $groupSummary.data('row-max-sum')));
                 $groupSummary.find('[data-db-mark]').val(getNormalisedCustomMark($groupRows, customMark, $groupSummary.data('row-max-sum')));
-                customisedMark[groupId] = true;
+                $groupSummary.attr('data-customised', true);
             }
 
             var rubricTotalMark = getTotalMark();
@@ -538,7 +531,7 @@
 
             // Up for discussion, but I'd imagine the user would like the marks to update automatically
             // with descriptor changes once they've clicked this button
-            customisedMark[groupId] = false;
+            $groupSummary.removeAttr('data-customised');
 
             var rubricTotalMark = getTotalMark();
 
