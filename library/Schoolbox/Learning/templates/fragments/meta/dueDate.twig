@@ -1,5 +1,6 @@
 {% import '@learning/macro/dueDate.twig' as dueDate %}
 {% if not assessment.dueAt.isNull %}
+    {% spaceless %}
     <li class="icon-calendar">
         {% if student %}
             {{ dueDate.dueDate(assessment, student) }}
@@ -7,4 +8,5 @@
             {{ dueDate.assessment(assessment) }}
         {% endif %}
     </li>
+    {% endspaceless %}
 {% endif %}
