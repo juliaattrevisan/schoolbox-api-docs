@@ -360,6 +360,11 @@ class RubricMapper
             return $grid;
         }
 
+        // Assessment isn't persisted yet? This has an empty grid
+        if (!$assessment->getId()) {
+            return $grid;
+        }
+
         // Load the levels, selected groups/criteria, descriptors for the assessment
         $groupUsageModels = GroupUsageMapper::getInstance()->findByColumn(
             'sb.assessment_id',
