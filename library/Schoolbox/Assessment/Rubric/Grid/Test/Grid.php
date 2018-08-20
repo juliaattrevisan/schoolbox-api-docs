@@ -9,8 +9,7 @@ declare(strict_types=1);
 namespace Schoolbox\Assessment\Rubric\Grid\Test;
 
 use PHPUnit\Framework\TestCase;
-use Schoolbox\Assessment\Rubric\Grid\CriterionUsage;
-use Schoolbox\Assessment\Rubric\Grid\GroupUsage;
+use Schoolbox\Assessment\Rubric\Grid as RubricGrid;
 use Schoolbox\Assessment\Rubric\RowSet;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Resource\Folder\Model as Folder;
@@ -56,18 +55,18 @@ class Grid extends TestCase
         $group3->getCriteria()[$criterion9->getId()] = $criterion9;
 
         $dueWork = new DueWork();
-        $grid    = new \Schoolbox\Assessment\Rubric\Grid\Grid($dueWork, $rowSet);
+        $grid    = new RubricGrid\Grid($dueWork, $rowSet);
 
         // Group and criterion usage
-        $groupUsage1                                             = (new GroupUsage($group1))->setMaxValue(15);
-        $criterionUsage1                                         = new CriterionUsage($criterion1);
-        $criterionUsage2                                         = new CriterionUsage($criterion2);
+        $groupUsage1                                             = (new RubricGrid\GroupUsage($group1))->setMaxValue(15);
+        $criterionUsage1                                         = new RubricGrid\CriterionUsage($criterion1);
+        $criterionUsage2                                         = new RubricGrid\CriterionUsage($criterion2);
         $groupUsage1->getCriterionUsages()[$criterion1->getId()] = $criterionUsage1;
         $groupUsage1->getCriterionUsages()[$criterion2->getId()] = $criterionUsage2;
         $grid->getGroupUsages()[$group1->getId()]                = $groupUsage1;
 
-        $groupUsage2                                             = (new GroupUsage($group1))->setMaxValue(15);
-        $criterionUsage6                                         = new CriterionUsage($criterion6);
+        $groupUsage2                                             = (new RubricGrid\GroupUsage($group1))->setMaxValue(15);
+        $criterionUsage6                                         = new RubricGrid\CriterionUsage($criterion6);
         $groupUsage2->getCriterionUsages()[$criterion6->getId()] = $criterionUsage6;
         $grid->getGroupUsages()[$group2->getId()]                = $groupUsage2;
 
@@ -81,14 +80,14 @@ class Grid extends TestCase
      * @dataProvider getTestRetrieveGroupUsageData
      * @covers       \Schoolbox\Assessment\Rubric\Grid\Grid::retrieveGroupUsage
      *
-     * @param \Schoolbox\Assessment\Rubric\Grid\Grid $grid
-     * @param RowSet\Group                           $group
-     * @param null|GroupUsage                        $expected
+     * @param RubricGrid\Grid            $grid
+     * @param RowSet\Group               $group
+     * @param null|RubricGrid\GroupUsage $expected
      */
     public function testRetrieveGroupUsage(
-        \Schoolbox\Assessment\Rubric\Grid\Grid $grid,
+        RubricGrid\Grid $grid,
         RowSet\Group $group,
-        ?GroupUsage $expected
+        ?RubricGrid\GroupUsage $expected
     ): void {
         $this->assertSame($expected, $grid->retrieveGroupUsage($group));
     }
@@ -130,18 +129,18 @@ class Grid extends TestCase
         $group3->getCriteria()[$criterion9->getId()] = $criterion9;
 
         $dueWork = new DueWork();
-        $grid    = new \Schoolbox\Assessment\Rubric\Grid\Grid($dueWork, $rowSet);
+        $grid    = new RubricGrid\Grid($dueWork, $rowSet);
 
         // Group and criterion usage
-        $groupUsage1                                             = (new GroupUsage($group1))->setMaxValue(15);
-        $criterionUsage1                                         = new CriterionUsage($criterion1);
-        $criterionUsage2                                         = new CriterionUsage($criterion2);
+        $groupUsage1                                             = (new RubricGrid\GroupUsage($group1))->setMaxValue(15);
+        $criterionUsage1                                         = new RubricGrid\CriterionUsage($criterion1);
+        $criterionUsage2                                         = new RubricGrid\CriterionUsage($criterion2);
         $groupUsage1->getCriterionUsages()[$criterion1->getId()] = $criterionUsage1;
         $groupUsage1->getCriterionUsages()[$criterion2->getId()] = $criterionUsage2;
         $grid->getGroupUsages()[$group1->getId()]                = $groupUsage1;
 
-        $groupUsage2                                             = (new GroupUsage($group1))->setMaxValue(15);
-        $criterionUsage6                                         = new CriterionUsage($criterion6);
+        $groupUsage2                                             = (new RubricGrid\GroupUsage($group1))->setMaxValue(15);
+        $criterionUsage6                                         = new RubricGrid\CriterionUsage($criterion6);
         $groupUsage2->getCriterionUsages()[$criterion6->getId()] = $criterionUsage6;
         $grid->getGroupUsages()[$group2->getId()]                = $groupUsage2;
 
@@ -162,14 +161,14 @@ class Grid extends TestCase
      * @dataProvider getTestRetrieveCriterionUsageData
      * @covers       \Schoolbox\Assessment\Rubric\Grid\Grid::retrieveCriterionUsage
      *
-     * @param \Schoolbox\Assessment\Rubric\Grid\Grid $grid
-     * @param RowSet\Criterion                       $criterion
-     * @param null|CriterionUsage                    $expected
+     * @param RubricGrid\Grid                $grid
+     * @param RowSet\Criterion               $criterion
+     * @param null|RubricGrid\CriterionUsage $expected
      */
     public function testRetrieveCriterionUsage(
-        \Schoolbox\Assessment\Rubric\Grid\Grid $grid,
+        RubricGrid\Grid $grid,
         RowSet\Criterion $criterion,
-        ?CriterionUsage $expected
+        ?RubricGrid\CriterionUsage $expected
     ): void {
         $this->assertSame($expected, $grid->retrieveCriterionUsage($criterion));
     }

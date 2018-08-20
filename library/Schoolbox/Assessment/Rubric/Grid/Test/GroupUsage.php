@@ -9,7 +9,7 @@ declare(strict_types=1);
 namespace Schoolbox\Assessment\Rubric\Grid\Test;
 
 use PHPUnit\Framework\TestCase;
-use Schoolbox\Assessment\Rubric\Grid;
+use Schoolbox\Assessment\Rubric\Grid as RubricGrid;
 use Schoolbox\Assessment\Rubric\RowSet;
 
 /**
@@ -54,14 +54,14 @@ class GroupUsage extends TestCase
 
 
         // Group and criterion usage
-        $groupUsage1                                             = (new Grid\GroupUsage($group1))->setMaxValue(15);
-        $criterionUsage1                                         = new Grid\CriterionUsage($criterion1);
-        $criterionUsage2                                         = new Grid\CriterionUsage($criterion2);
+        $groupUsage1                                             = (new RubricGrid\GroupUsage($group1))->setMaxValue(15);
+        $criterionUsage1                                         = new RubricGrid\CriterionUsage($criterion1);
+        $criterionUsage2                                         = new RubricGrid\CriterionUsage($criterion2);
         $groupUsage1->getCriterionUsages()[$criterion1->getId()] = $criterionUsage1;
         $groupUsage1->getCriterionUsages()[$criterion2->getId()] = $criterionUsage2;
 
-        $groupUsage2                                             = (new Grid\GroupUsage($group1))->setMaxValue(15);
-        $criterionUsage6                                         = new Grid\CriterionUsage($criterion6);
+        $groupUsage2                                             = (new RubricGrid\GroupUsage($group1))->setMaxValue(15);
+        $criterionUsage6                                         = new RubricGrid\CriterionUsage($criterion6);
         $groupUsage2->getCriterionUsages()[$criterion6->getId()] = $criterionUsage6;
 
         yield 'group usage 1, criterion 1: in use'            => [$groupUsage1, $criterion1, $criterionUsage1];
@@ -78,14 +78,14 @@ class GroupUsage extends TestCase
      * @dataProvider getTestRetrieveCriterionUsageData
      * @covers \Schoolbox\Assessment\Rubric\Grid\GroupUsage::retrieveCriterionUsage
      *
-     * @param Grid\GroupUsage          $groupUsage
+     * @param RubricGrid\GroupUsage          $groupUsage
      * @param RowSet\Criterion         $criterion
-     * @param null|Grid\CriterionUsage $expected
+     * @param null|RubricGrid\CriterionUsage $expected
      */
     public function testRetrieveCriterionUsage(
-        Grid\GroupUsage $groupUsage,
+        RubricGrid\GroupUsage $groupUsage,
         RowSet\Criterion $criterion,
-        ?Grid\CriterionUsage $expected
+        ?RubricGrid\CriterionUsage $expected
     ): void
     {
         $this->assertSame($expected, $groupUsage->retrieveCriterionUsage($criterion));
