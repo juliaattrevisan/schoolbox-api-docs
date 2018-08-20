@@ -321,7 +321,7 @@
                         // Don't use scaled values when working with percentages
                         // TODO this is off-by-one..or off-by-two..or something, for some obscure reason
                         descriptorSum = summateDescriptors($descriptorCheckboxes);
-                        var percentage = $(this).data('row-max-sum') > 0 ? descriptorSum * (100 / $(this).data('row-max-sum')) : 0;
+                        var percentage = getPercentage($(this), descriptorSum);
                         $(this).find(".descriptor-sum").text(getLetterGradeFromNumeric(percentage, getLetterGrades($(this))));
                         break;
 
@@ -329,7 +329,7 @@
                         // Turn the numeric value into a percentage and append percent sign]
                         // Don't use scaled values when working with percentages
                         descriptorSum = summateDescriptors($descriptorCheckboxes);
-                        var percentage = $(this).data('row-max-sum') > 0 ? descriptorSum * (100 / $(this).data('row-max-sum')) : 0;
+                        var percentage = getPercentage($(this), descriptorSum);
                         $(this).find(".descriptor-sum").text(percentage + "%");
                         break;
 
@@ -379,11 +379,11 @@
 
                     case 'LetterGrade':
                         var grades = getLetterGrades($groupSummary);
-                        $groupSummary.find(".descriptor-sum").text(getLetterGradeFromNumeric(getPercentageForGroup($groupSummary), grades));
+                        $groupSummary.find(".descriptor-sum").text(getLetterGradeFromNumeric(getPercentage($groupSummary, $groupSummary.data('mark')), grades));
                         break;
 
                     case 'Percentage':
-                        $groupSummary.find(".descriptor-sum").text(getPercentageForGroup($groupSummary) + "%");
+                        $groupSummary.find(".descriptor-sum").text(getPercentage($groupSummary, $groupSummary.data('mark')) + "%");
                         break;
 
                     default:
@@ -400,11 +400,11 @@
                                 break;
 
                             case 'LetterGrade':
-                                assignLetterGrade(getPercentageForGroup($groupSummary), $groupSummary.find("[data-group-max-value]").val(scaledGroupMark));
+                                assignLetterGrade(getPercentage($groupSummary, $groupSummary.data('mark')), $groupSummary.find("[data-group-max-value]").val(scaledGroupMark));
                                 break;
 
                             case 'Percentage':
-                                $groupSummary.find("[data-group-max-value]").val(getPercentageForGroup($groupSummary));
+                                $groupSummary.find("[data-group-max-value]").val(getPercentage($groupSummary, $groupSummary.data('mark')));
                                 break;
 
                             default:
@@ -524,11 +524,11 @@
                     break;
 
                 case 'LetterGrade':
-                    assignLetterGrade(getPercentageForGroup($groupSummary), $gradeInput.val(scaledGroupMark));
+                    assignLetterGrade(getPercentage($groupSummary, $groupSummary.data('mark')), $gradeInput.val(scaledGroupMark));
                     break;
 
                 case 'Percentage':
-                    $groupSummary.find("[data-group-max-value]").val(getPercentageForGroup($groupSummary));
+                    $groupSummary.find("[data-group-max-value]").val(getPercentage($groupSummary, $groupSummary.data('mark')));
                     break;
 
                 default:
@@ -597,11 +597,11 @@
             return markLetterValue;
         }
 
-        // Get a percentage-ified mark from a group's unscaled mark
-        // TODO generalise this so it can be used elsewhere
-        function getPercentageForGroup($groupSummary) {
-            return $groupSummary.data('row-max-sum') > 0 ? $groupSummary.attr('data-mark') * (100 / $groupSummary.data('row-max-sum')) : 0;
+        // Turn a specified value into a percentage of the max marks for a group
+        function getPercentage($groupSummary, value) {
+            return $groupSummary.data('row-max-sum') > 0 ? value * (100 / $groupSummary.data('row-max-sum')) : 0;
         }
+
 
         // Hide or display the descriptor range input depending on whether it's needed or not
         function showHideRangeInput($changedCell) {
