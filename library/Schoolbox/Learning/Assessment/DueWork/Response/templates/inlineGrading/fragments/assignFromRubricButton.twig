@@ -15,33 +15,17 @@
             finalSummarySelector    = '[data-final-summary]',
             markType = $rb.find("[data-final-summary]").data("mark-type");
 
-        // Current calculated rubric total
-        var rubricTotalText = $.trim($rb.find(finalSummarySelector).text());
-        var rubricSum = $.trim(rubricTotalText);
-
-        // Extract the actual mark bit
-        if (markType === 'TotalMarkFractional') {
-            // Total mark is shown as x / y so extract the x
-            rubricSum = rubricTotalText.replace(/\/ \d*/, "");
-        }
 
         // Mark entered in the overall mark field
         var currentMarkInput   = $status.find(markInputSelector).val();
 
         // Disable the button if the rubric value is same as input value
-        $assignFromRubricButton.prop('disabled', rubricSum == currentMarkInput);
+        $assignFromRubricButton.prop('disabled', getRubricSum() == currentMarkInput);
 
 
         function refreshAssignFromRubricButton() {
             // Current calculated rubric total
-            var rubricTotalText = $.trim($rb.find(finalSummarySelector).text());
-            var rubricSum = $.trim(rubricTotalText);
-
-            // Extract the actual mark bit
-            if (markType === 'TotalMarkFractional') {
-                // Total mark is shown as x / y so extract the x
-                rubricSum = rubricTotalText.replace(/\/ \d*/, "");
-            }
+            var rubricSum = getRubricSum();
 
             // Mark entered in the overall mark field
             var currentMarkInput   = $status.find(markInputSelector).val();
@@ -56,18 +40,13 @@
 
             // Disable the button if the rubric value is same as input value
             $assignFromRubricButton.prop('disabled', rubricSum == currentMarkInput);
+
+            console.log("Rubric sum '" + rubricSum + "', current input: '" + currentMarkInput + "'");
         }
 
         function updateButtonMark() {
             // Current calculated rubric total
-            var rubricTotalText = $.trim($rb.find(finalSummarySelector).text());
-            var rubricSum = $.trim(rubricTotalText);
-
-            // Extract the actual mark bit
-            if (markType === 'TotalMarkFractional') {
-                // Total mark is shown as x / y so extract the x
-                rubricSum = rubricTotalText.replace(/\/ \d*/, "");
-            }
+            var rubricSum = getRubricSum();
 
             $("[data-rubric-sum]").text(rubricSum);
 
@@ -75,6 +54,26 @@
             var currentMarkInput   = $status.find(markInputSelector).val();
             // Disable the button if the rubric value is same as input value
             $assignFromRubricButton.prop('disabled', rubricSum == currentMarkInput);
+        }
+
+        function getRubricSum() {
+            // Current calculated rubric total
+            var rubricTotalText = $rb.find(finalSummarySelector).text();
+            var rubricSum = $.trim(rubricTotalText);
+
+            // Extract the actual mark bit
+            switch(markType) {
+                case 'TotalMarkFractional':
+                    // Total mark is shown as x / y so extract the x
+                    rubricSum = rubricTotalText.replace(/\s*\/\s*\d*/, "");
+                    break;
+                case 'Percentage':
+                    // Remove the trailing whitespace and % symbol
+                    rubricSum = rubricTotalText.replace(/\s*%/, "");
+                    break;
+            }
+
+            return $.trim(rubricSum);
         }
 
         // Update the input val when manually assigning grade from rubric
@@ -90,14 +89,7 @@
             // Did we manually change the overall grade? Record that it's customised
             $status.find(markInputSelector).attr('data-customised', true);
 
-            var rubricTotalText = $.trim($rb.find(finalSummarySelector).text());
-            var rubricSum = $.trim(rubricTotalText);
-
-            // Extract the actual mark bit
-            if (markType === 'TotalMarkFractional') {
-                // Total mark is shown as x / y so extract the x
-                rubricSum = rubricTotalText.replace(/\/ \d*/, "");
-            }
+            var rubricSum = getRubricSum();
 
             // Mark entered in the overall mark field
             var currentMarkInput   = $status.find(markInputSelector).val();
