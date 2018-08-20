@@ -516,6 +516,7 @@ class ImpressionsConversionsOpens
                 COUNT(*) AS num
             FROM {$this->statisticsMapper->getTable()}
             WHERE {$where}
+            AND deleted_at IS NULL
             GROUP BY timestamp, `type`
             ORDER BY timestamp
         ");
