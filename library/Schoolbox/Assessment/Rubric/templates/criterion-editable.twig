@@ -1,5 +1,5 @@
-{%- set critInput    = formField ~ '[' ~ rubric.id ~ '][criterion]['  ~ crit.id ~ ']' -%}
-{%- set descInput    = formField ~ '[' ~ rubric.id ~ '][descriptor][' ~ crit.id ~ ']' -%}
+{%- set critInput    = formField ~ '[' ~ rubricGrid.id ~ '][criterion]['  ~ crit.id ~ ']' -%}
+{%- set descInput    = formField ~ '[' ~ rubricGrid.id ~ '][descriptor][' ~ crit.id ~ ']' -%}
 {%- set checkChecked = crit.descriptors|length > 0 -%}
 {%- set cellClass    = checkChecked ? '' : 'hide-v' -%}
 {%- set levelLimit   = levelLimit ?: config.rubric_max_levels -%}
@@ -31,9 +31,7 @@
 
 </th>
 
-{% for levelIndex, level in rubric.levels -%}
-    {%- set descriptor = rubric.descriptors[crit.id][levelIndex] -%}
-
+{% for levelIndex, level in rubricGrid.levels -%}
     <td data-descriptor class="{{ cellClass }}">
         <textarea {% if not checkChecked %} disabled="disabled"{% endif %}
                 data-descriptor-text
@@ -46,13 +44,13 @@
                 data-descriptor-value-original="{{ descriptor.value }}"
                 data-descriptor-criterion="{{ crit.id }}"
                 data-descriptor-level-index="{{ levelIndex }}"
-                {% if checkChecked %}data-descriptor-original{% endif %}
+            {% if checkChecked %}data-descriptor-original{% endif %}
                 class="rb-value"
                 type="tel"
                 {% if usingMarkRange %}data-descriptor-uses-mark-range{% endif %}
                 placeholder={% if usingMarkRange %}"Maximum points"{% else %}"Points"{% endif %}
-                value="{{ descriptor.value }}"
-                name="{{ descInput }}[{{ levelIndex }}][points]" />
+        value="{{ descriptor.value }}"
+        name="{{ descInput }}[{{ levelIndex }}][points]" />
     </td>
 
 {%- endfor %}
