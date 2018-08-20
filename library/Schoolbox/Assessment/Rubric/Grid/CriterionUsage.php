@@ -131,8 +131,6 @@ class CriterionUsage
         $step = 1;
         $keys = $this->descriptors->keys();
         foreach ($keys as $i => $current) {
-            // If current is null: min is null too
-            // If useValueRanges: min = max
             $descriptor = $this->descriptors[$current];
             if (!$descriptor) {
                 // something's wrong
@@ -140,51 +138,29 @@ class CriterionUsage
             }
 
             $maxValue = $descriptor->getMaxValue();
+
+            // Not using value ranges? min = max
             if (!$useValueRanges) {
                 $descriptor->setMinValue($maxValue);
                 continue;
             }
+
+            // If current is null: min is null too
             if (null === $maxValue) {
                 $descriptor->setMinValue(null);
                 continue;
             }
 
-            // What's the nearest non-null max value on either side?
-            $previousNonNullDescriptor = null;
-            $previousKey               = $i - 1;
-            while (null === $previousNonNullDescriptor) {
-                if (!array_key_exists($previousKey, $keys)) {
-                    break;
-                }
-                $previousDescriptor = $this->descriptors[$keys[$previousKey]] ?? null;
-                if ($previousDescriptor && null !== $previousDescriptor->getMaxValue()) {
-                    $previousNonNullDescriptor = $previousDescriptor;
-                    break;
-                }
-                $previousKey--;
-            }
-
-            $nextNonNullDescriptor = null;
-            $nextKey               = $i + 1;
-            while (null === $nextNonNullDescriptor) {
-                if (!array_key_exists($nextKey, $keys)) {
-                    break;
-                }
-                $nextDescriptor = $this->descriptors[$keys[$nextKey]] ?? null;
-                if ($nextDescriptor && null !== $nextDescriptor->getMaxValue()) {
-                    $nextNonNullDescriptor = $nextDescriptor;
-                    break;
-                }
-                $nextKey++;
-            }
-
-
-            // Which one gets used?
-            // (The highest value that's <= the descriptor's max)
             $candidateMinValues = [];
+
+            // What's the nearest non-null value to the left of this?
+            $previousNonNullDescriptor = $this->retrieveAdjacentNonNullDescriptor($i, $keys, -1);
             if ($previousNonNullDescriptor && $previousNonNullDescriptor->getMaxValue() < $maxValue) {
                 $candidateMinValues[] = $previousNonNullDescriptor->getMaxValue();
             }
+
+            // And what's the nearest non-null value to the right?
+            $nextNonNullDescriptor = $this->retrieveAdjacentNonNullDescriptor($i, $keys, 1);
             if ($nextNonNullDescriptor && $nextNonNullDescriptor->getMaxValue() < $maxValue) {
                 $candidateMinValues[] = $nextNonNullDescriptor->getMaxValue();
             }
@@ -196,11 +172,36 @@ class CriterionUsage
                 if (null !== $floorValue) {
                     // Don't allow to be greater than max
                     // (in case validation allowed decimals for ranged)
-                    $minValue = $floorValue + $step;
+                    $minValue = min($floorValue + $step, $maxValue);
                 }
             }
             $descriptor->setMinValue($minValue);
         }
+    }
+
+
+    /**
+     * @param int   $currentKey
+     * @param array $keys
+     * @param int   $increment
+     * @return null|Descriptor
+     */
+    private function retrieveAdjacentNonNullDescriptor(int $currentKey, array $keys, int $increment): ?Descriptor
+    {
+        $adjacentNonNullDescriptor = null;
+        $adjacentKey               = $currentKey + $increment;
+        while (null === $adjacentNonNullDescriptor) {
+            if (!array_key_exists($adjacentKey, $keys)) {
+                break;
+            }
+            $adjacentDescriptor = $this->descriptors[$keys[$adjacentKey]] ?? null;
+            if ($adjacentDescriptor && null !== $adjacentDescriptor->getMaxValue()) {
+                $adjacentNonNullDescriptor = $adjacentDescriptor;
+                break;
+            }
+            $adjacentKey += $increment;
+        }
+        return $adjacentNonNullDescriptor;
     }
 
 
