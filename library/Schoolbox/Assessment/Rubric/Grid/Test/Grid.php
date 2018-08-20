@@ -54,28 +54,27 @@ class Grid extends TestCase
         $grid    = new \Schoolbox\Assessment\Rubric\Grid\Grid($dueWork, $rowSet);
 
         // Group and criterion usage
-        $groupUsage1     = (new GroupUsage($group1))->setMaxValue(15);
-        $criterionUsage1 = new CriterionUsage($criterion1);
-        $criterionUsage2 = new CriterionUsage($criterion2);
+        $groupUsage1                                             = (new GroupUsage($group1))->setMaxValue(15);
+        $criterionUsage1                                         = new CriterionUsage($criterion1);
+        $criterionUsage2                                         = new CriterionUsage($criterion2);
         $groupUsage1->getCriterionUsages()[$criterion1->getId()] = $criterionUsage1;
         $groupUsage1->getCriterionUsages()[$criterion2->getId()] = $criterionUsage2;
-        $grid->getGroupUsages()[$group1->getId()] = $groupUsage1;
+        $grid->getGroupUsages()[$group1->getId()]                = $groupUsage1;
 
-        $groupUsage2     = (new GroupUsage($group1))->setMaxValue(15);
-        $criterionUsage6 = new CriterionUsage($criterion6);
+        $groupUsage2                                             = (new GroupUsage($group1))->setMaxValue(15);
+        $criterionUsage6                                         = new CriterionUsage($criterion6);
         $groupUsage2->getCriterionUsages()[$criterion6->getId()] = $criterionUsage6;
-        $grid->getGroupUsages()[$group2->getId()] = $groupUsage2;
+        $grid->getGroupUsages()[$group2->getId()]                = $groupUsage2;
 
-        yield 'group 1' => [$grid, $group1, $groupUsage1];
-        yield 'group 2' => [$grid, $group2, $groupUsage2];
-        yield 'group 3' => [$grid, $group3, null];
-
+        yield 'group 1: in use' => [$grid, $group1, $groupUsage1];
+        yield 'group 2: in use' => [$grid, $group2, $groupUsage2];
+        yield 'group 3: not in use' => [$grid, $group3, null];
     }
 
 
     /**
      * @dataProvider getTestRetrieveGroupUsageData
-     * @covers \Schoolbox\Assessment\Rubric\Grid\Grid::retrieveGroupUsage
+     * @covers       \Schoolbox\Assessment\Rubric\Grid\Grid::retrieveGroupUsage
      *
      * @param \Schoolbox\Assessment\Rubric\Grid\Grid $grid
      * @param RowSet\Group                           $group
@@ -84,8 +83,32 @@ class Grid extends TestCase
     public function testRetrieveGroupUsage(
         \Schoolbox\Assessment\Rubric\Grid\Grid $grid,
         RowSet\Group $group,
-        ?GroupUsage $expected): void
-    {
+        ?GroupUsage $expected
+    ): void {
         $this->assertEquals($expected, $grid->retrieveGroupUsage($group));
     }
+
+
+    public function testRetrieveCriterionUsage(): void
+    {
+        // TODO implement
+    }
+
+
+    public function testIterateGroups(): void
+    {
+        // TODO implement
+    }
+
+
+    public function testIterateGroupsInUseOnly(): void
+    {
+        // TODO implement
+    }
+
+
+    // Things to consider:
+    // iterator for the entire rowset
+    // iterator for only the groups used by the grid
+    // Both should return in the same format
 }
