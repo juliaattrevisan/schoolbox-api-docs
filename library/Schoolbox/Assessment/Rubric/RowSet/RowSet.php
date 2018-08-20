@@ -90,7 +90,9 @@ class RowSet
      */
     public function retrieveGroupIds(): array
     {
-        return array_filter($this->groups->getPropertyValues('id'));
+        $result = array_unique(array_filter($this->groups->getPropertyValues('id')));
+        sort($result);
+        return $result;
     }
 
 
@@ -105,7 +107,9 @@ class RowSet
         foreach ($this->groups as $group) {
             $criterionIds = array_merge($criterionIds, $group->retrieveCriterionIds());
         }
-        return $criterionIds;
+        $result = array_unique(array_filter($criterionIds));
+        sort($result);
+        return $result;
     }
 
 
