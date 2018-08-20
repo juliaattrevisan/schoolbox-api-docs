@@ -16,7 +16,8 @@ use Predis;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\Notif;
-use Schoolbox\Notif\Notifactory;
+use Schoolbox\Realtime\Schedule\Event\CrudEventInterface;
+use Schoolbox\Realtime\Schedule\Trigger\IPropagator;
 
 class RedisCache implements ICache
 {
@@ -46,17 +47,17 @@ class RedisCache implements ICache
 
 
     /**
-     * @param Connector $mq
+     * @param Connector   $mq
+     * @param IPropagator $propagator
+     * @param string      $queueName
      * @return bool
      */
-    public function restoreSchedule(Connector $mq)
+    public function restoreSchedule(Connector $mq, IPropagator $propagator, string $queueName)
     {
-        $queueName = $this->getNamespacedQueue('sched');
-
         $this->log->notice("Restoring $queueName from Redis cache");
 
         // declare the queue
-        $mq->declareQueue($queueName)->bindQueue($queueName, '*.' . Notif::TOPIC_APPLICATION);;
+        $mq->declareQueue($queueName)->bindQueue($queueName, '*.' . Notif::TOPIC_APPLICATION);
 
         // retrieve keys
         $itemKeys = $this->fetchItemKeys();
@@ -68,14 +69,18 @@ class RedisCache implements ICache
         }
 
         // setup ready to go
-        $n = Notifactory::create(Notif::TOPIC_APPLICATION);
         $i = 0;
 
         foreach ($itemKeys as $itemKey) {
             try {
                 $this->log->debug("Restoring $itemKey");
 
-                $n->notice(gzuncompress($this->redis->get($itemKey)));
+                /** @var CrudEventInterface $event */
+                $event = unserialize(gzuncompress($this->redis->get($itemKey)), []);
+
+                /** @var IPropagator $propagator */
+                $propagator->propagateEvent($event);
+
                 ++$i;
 
             } catch (ErrorException $e) {
@@ -85,7 +90,7 @@ class RedisCache implements ICache
 
         $this->log->debug("Restored $i events");
 
-        return !!$i;
+        return (bool)$i;
     }
 
 
@@ -132,7 +137,7 @@ class RedisCache implements ICache
 
         $this->log->debug("Cached $i events");
 
-        return !!$i;
+        return (bool)$i;
     }
 
 
@@ -212,18 +217,6 @@ class RedisCache implements ICache
     protected function getNamespacedKey($key)
     {
         return $this->implodeFiltered(':', [ 'schedule', $this->instanceId, $key ]);
-    }
-
-
-    /**
-     * Return the given queue with a full RabbitMQ namespace
-     *
-     * @param string $queue
-     * @return string
-     */
-    protected function getNamespacedQueue($queue)
-    {
-        return $this->implodeFiltered('.', [ $this->instanceId, 'sb', $queue ]);
     }
 
 
