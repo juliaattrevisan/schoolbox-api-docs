@@ -197,7 +197,7 @@
 
                         {% if group.rowMaxSum > 0 %}
                             {# TODO these need to be the descriptor sum! #}
-                            <button class="use-descriptor-values">Assign <span class="descriptor-sum">
+                            <button class="use-descriptor-values">Assign <span class="descriptor-sum" data-group-descriptor-sum>
                                 {% if markSchemeName == 'TotalMarkFractional' %}
                                     {{ group.scaledMark }}
 
@@ -271,7 +271,7 @@
         function disableEnableAssignFromDescs() {
             var $groups = $rb.find("[data-group-summary]");
             $groups.each(function() {
-                var displayedMark = $(this).find(".descriptor-sum").text().replace(/%/, '').trim();
+                var displayedMark = $(this).find("[data-group-descriptor-sum]").text().replace(/%/, '').trim();
                 var customMark = $(this).find("[data-group-max-value]").val();
 
                 if (markType === 'LetterGrade') {
@@ -306,7 +306,7 @@
                 switch(markType) {
                     case 'TotalMarkFractional':
                         // Simply use the number as-is
-                        $(this).find(".descriptor-sum").text(descriptorSum);
+                        $(this).find("[data-group-descriptor-sum]").text(descriptorSum);
                         break;
 
                     case 'LetterGrade':
@@ -315,7 +315,7 @@
                         // TODO this is off-by-one..or off-by-two..or something, for some obscure reason
                         descriptorSum = summateDescriptors($descriptorCheckboxes);
                         var percentage = getPercentage($(this), descriptorSum);
-                        $(this).find(".descriptor-sum").text(getLetterGradeFromNumeric(percentage, getLetterGrades($(this))));
+                        $(this).find("[data-group-descriptor-sum]").text(getLetterGradeFromNumeric(percentage, getLetterGrades($(this))));
                         break;
 
                     case 'Percentage':
@@ -323,7 +323,7 @@
                         // Don't use scaled values when working with percentages
                         descriptorSum = summateDescriptors($descriptorCheckboxes);
                         var percentage = getPercentage($(this), descriptorSum);
-                        $(this).find(".descriptor-sum").text(percentage + "%");
+                        $(this).find("[data-group-descriptor-sum]").text(percentage + "%");
                         break;
 
                     default:
@@ -367,16 +367,16 @@
                 // Update button text with mark calculated from descriptors
                 switch(markType) {
                     case 'TotalMarkFractional':
-                        $groupSummary.find(".descriptor-sum").text(scaledGroupMark);
+                        $groupSummary.find("[data-group-descriptor-sum]").text(scaledGroupMark);
                         break;
 
                     case 'LetterGrade':
                         var grades = getLetterGrades($groupSummary);
-                        $groupSummary.find(".descriptor-sum").text(getLetterGradeFromNumeric(getPercentage($groupSummary, $groupSummary.data('mark')), grades));
+                        $groupSummary.find("[data-group-descriptor-sum]").text(getLetterGradeFromNumeric(getPercentage($groupSummary, $groupSummary.data('mark')), grades));
                         break;
 
                     case 'Percentage':
-                        $groupSummary.find(".descriptor-sum").text(getPercentage($groupSummary, $groupSummary.data('mark')) + "%");
+                        $groupSummary.find("[data-group-descriptor-sum]").text(getPercentage($groupSummary, $groupSummary.data('mark')) + "%");
                         break;
 
                     default:
