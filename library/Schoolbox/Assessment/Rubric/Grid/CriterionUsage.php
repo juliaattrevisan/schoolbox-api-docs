@@ -97,8 +97,12 @@ class CriterionUsage
 
     /**
      * Apply the min values for all the descriptors in this criterion.
+     *
+     * @param bool $useValueRanges Does the rubric grid this is a part of even
+     *                             use value ranges?
+     *                             If not,
      */
-    public function applyDescriptorMinValues(): void
+    public function applyDescriptorMinValues(bool $useValueRanges): void
     {
         // The rules for min-max values, from SA-6627:
         // * The highest possible value for a descriptor is the points value
@@ -123,21 +127,75 @@ class CriterionUsage
         // * If the points values both ascend and descend: the min values are
         //   undefined
 
-        $keys    = $this->descriptors->keys();
-        $keySets = [];
+        $keys = $this->descriptors->keys();
         foreach ($keys as $i => $current) {
-            $previous  = $keys[$i-1] ?? null;
-            $next      = $keys[$i+1] ?? null;
-            $keySets[] = [$previous, $current, $next];
+            // If current is null: min is null too
+            // If useValueRanges: min = max
+            $descriptor = $this->descriptors[$current];
+            if (!$descriptor) {
+                // something's wrong
+                continue;
+            }
+
+            $maxValue = $descriptor->getMaxValue();
+            if (!$useValueRanges) {
+                $descriptor->setMinValue($maxValue);
+                continue;
+            }
+            if (null === $maxValue) {
+                $descriptor->setMinValue(null);
+                continue;
+            }
+
+            // What's the nearest non-null max value on either side?
+            $previousNonNullDescriptor = null;
+            $previousKey               = $i - 1;
+            while (null === $previousNonNullDescriptor) {
+                if (!array_key_exists($previousKey, $keys)) {
+                    break;
+                }
+                $previousDescriptor = $this->descriptors[$keys[$previousKey]] ?? null;
+                if ($previousDescriptor && null !== $previousDescriptor->getMaxValue()) {
+                    $previousNonNullDescriptor = $previousDescriptor;
+                    break;
+                }
+                $previousKey--;
+            }
+
+            $nextNonNullDescriptor = null;
+            $nextKey               = $i + 1;
+            while (null === $nextNonNullDescriptor) {
+                if (!array_key_exists($nextKey, $keys)) {
+                    break;
+                }
+                $nextDescriptor = $this->descriptors[$keys[$nextKey]] ?? null;
+                if ($nextDescriptor && null !== $nextDescriptor->getMaxValue()) {
+                    $nextNonNullDescriptor = $nextDescriptor;
+                    break;
+                }
+                $nextKey++;
+            }
+
+
+            // Which one gets used?
+            // (The highest value that's <= the descriptor's max)
+            $candidateMinValues = [];
+            if ($previousNonNullDescriptor && $previousNonNullDescriptor->getMaxValue() < $maxValue) {
+                $candidateMinValues[] = $previousNonNullDescriptor->getMaxValue();
+            }
+            if ($nextNonNullDescriptor && $nextNonNullDescriptor->getMaxValue() < $maxValue) {
+                $candidateMinValues[] = $nextNonNullDescriptor->getMaxValue();
+            }
+
+            // No candidates: use max value
+            if (empty($candidateMinValues)) {
+                $descriptor->setMinValue($maxValue);
+                continue;
+            }
+
+            // At least one candidate: use the highest, add 1 to it
+            $descriptor->setMinValue(max($candidateMinValues) + 1);
         }
-
-        foreach ($keySets as [$previous, $current, $next]) {
-
-        }
-
-//        foreach ($this->descriptors as $descriptor) {
-//            // Get previous and next descriptor, too
-//        }
     }
 
 
