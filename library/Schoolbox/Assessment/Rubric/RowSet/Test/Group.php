@@ -10,6 +10,7 @@ namespace Schoolbox\Assessment\Rubric\RowSet\Test;
 
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Assessment\Rubric\RowSet\Criterion;
+use Schoolbox\Learning\Assessment\Task\Model as Task;
 
 /**
  * @covers \Schoolbox\Assessment\Rubric\RowSet\Group
@@ -23,12 +24,91 @@ class Group extends TestCase
     {
         $group = (new \Schoolbox\Assessment\Rubric\RowSet\Group())->setId(3);
         $group->getCriteria()
-               ->add(new Criterion())
-               ->add((new Criterion())->setId(9))
-               ->add((new Criterion())->setId(8))
-               ->add((new Criterion())->setId(7))
-               ->add((new Criterion())->setId(5))
-               ->add((new Criterion())->setId(6));
+              ->add(new Criterion())
+              ->add((new Criterion())->setId(9))
+              ->add((new Criterion())->setId(8))
+              ->add((new Criterion())->setId(7))
+              ->add((new Criterion())->setId(5))
+              ->add((new Criterion())->setId(6));
         $this->assertEquals([5, 6, 7, 8, 9,], $group->retrieveCriterionIds());
+    }
+
+
+    /**
+     * Data provider for `testIsInUse`.
+     *
+     * @return iterable
+     */
+    public function getTestIsInUseData(): iterable
+    {
+        $group = (new \Schoolbox\Assessment\Rubric\RowSet\Group())->setId(3);
+        yield 'no criteria' => [$group, false];
+
+        $group = (new \Schoolbox\Assessment\Rubric\RowSet\Group())->setId(3);
+        $group->getCriteria()
+              ->add((new Criterion())->setId(9));
+        yield 'one criterion, none in use' => [$group, false];
+
+        $group = (new \Schoolbox\Assessment\Rubric\RowSet\Group())->setId(3);
+        $criterion = (new Criterion())->setId(9);
+        $criterion->getUsage()
+                  ->add((new Task())->setId(1));
+        $group->getCriteria()->add($criterion);
+        yield 'one criterion, one in use' => [$group, true];
+
+        $group = (new \Schoolbox\Assessment\Rubric\RowSet\Group())->setId(3);
+        $group->getCriteria()
+              ->add((new Criterion())->setId(9))
+              ->add((new Criterion())->setId(10))
+              ->add((new Criterion())->setId(11));
+        yield 'three criteria, none in use' => [$group, false];
+
+        $group = (new \Schoolbox\Assessment\Rubric\RowSet\Group())->setId(3);
+        $criterion = (new Criterion())->setId(9);
+        $criterion->getUsage()
+                  ->add((new Task())->setId(1));
+        $group->getCriteria()
+              ->add($criterion)
+              ->add((new Criterion())->setId(10))
+              ->add((new Criterion())->setId(11));
+        yield 'three criteria, one in use' => [$group, true];
+
+        $group = (new \Schoolbox\Assessment\Rubric\RowSet\Group())->setId(3);
+        $criterion1 = (new Criterion())->setId(9);
+        $criterion1->getUsage()
+                   ->add((new Task())->setId(1));
+        $criterion2 = (new Criterion())->setId(10);
+        $criterion2->getUsage()
+                   ->add((new Task())->setId(2));
+        $criterion3 = (new Criterion())->setId(11);
+        $criterion3->getUsage()
+                   ->add((new Task())->setId(3));
+        $group->getCriteria()
+              ->add($criterion1)
+              ->add($criterion2)
+              ->add($criterion3);
+        yield 'three criteria, three in use' => [$group, true];
+    }
+
+
+    /**
+     * @dataProvider getTestIsInUseData
+     * @covers \Schoolbox\Assessment\Rubric\RowSet\Group::isInUse
+     *
+     * @param \Schoolbox\Assessment\Rubric\RowSet\Group $group
+     * @param bool                                      $expected
+     */
+    public function testIsInUse(\Schoolbox\Assessment\Rubric\RowSet\Group $group, bool $expected): void
+    {
+        $this->assertEquals($expected, $group->isInUse());
+    }
+
+
+    /**
+     * @covers \Schoolbox\Assessment\Rubric\RowSet\Group::isInUseExcluding
+     */
+    public function testIsInUseExcluding(): void
+    {
+        //
     }
 }
