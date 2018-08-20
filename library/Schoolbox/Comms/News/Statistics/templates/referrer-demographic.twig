@@ -56,27 +56,11 @@
 
             series: [
                 {
-                    color: '#ba43a9',
-                    name: 'Email',
+                    color: '#82b5d8',
+                    name: 'Dashboard',
                     data: [
-                        {{ referrerDemographic['impression']['email'] }},
-                        {{ referrerDemographic['conversion']['email'] }}
-                    ]
-                },
-                {
-                    color: '#806eb7',
-                    name: 'Archive',
-                    data: [
-                        {{ referrerDemographic['impression']['archive'] }},
-                        {{ referrerDemographic['conversion']['archive'] }}
-                    ]
-                },
-                {
-                    color: '#0a437c',
-                    name: 'Index',
-                    data: [
-                        {{ referrerDemographic['impression']['index'] }},
-                        {{ referrerDemographic['conversion']['index'] }}
+                        {{ referrerDemographic['impression']['dashboard'] }},
+                        {{ referrerDemographic['conversion']['dashboard'] }}
                     ]
                 },
                 {
@@ -88,11 +72,27 @@
                     ]
                 },
                 {
-                    color: '#82b5d8',
-                    name: 'Dashboard',
+                    color: '#0a437c',
+                    name: 'Index',
                     data: [
-                        {{ referrerDemographic['impression']['dashboard'] }},
-                        {{ referrerDemographic['conversion']['dashboard'] }}
+                        {{ referrerDemographic['impression']['index'] }},
+                        {{ referrerDemographic['conversion']['index'] }}
+                    ]
+                },
+                {
+                    color: '#806eb7',
+                    name: 'Archive',
+                    data: [
+                        {{ referrerDemographic['impression']['archive'] }},
+                        {{ referrerDemographic['conversion']['archive'] }}
+                    ]
+                },
+                {
+                    color: '#ba43a9',
+                    name: 'Email',
+                    data: [
+                        {{ referrerDemographic['impression']['email'] }},
+                        {{ referrerDemographic['conversion']['email'] }}
                     ]
                 }
             ]
