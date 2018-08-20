@@ -41,29 +41,18 @@ class ValidDescriptorRow
     {
         // First remove any descriptors from the list that don't have values
         // since value-less descriptors are permitted in amongst valued descriptors
-        $descriptorHasValue = function ($desc) {
+        $descriptorValue = function ($desc) {
             /** @var Descriptor $desc */
             return $desc->getValue();
         };
-        $descriptors = $descriptors->filter($descriptorHasValue);
 
-        // A single descriptor value is a special case - always valid
+        $descriptors = $descriptors->filter($descriptorValue)->map($descriptorValue);
+
+        // A single descriptor (or less) is a special case - always valid
         if (\count($descriptors) < 2) {
             return true;
         }
-
-        // Second descriptor minus first descriptor
-        $initialDiff = $descriptors[1]->getValue() - $descriptors[0]->getValue();
-        for ($i = 0; $i < \count($descriptors); $i++) {
-            // skip first 2 elements cause we already compared them
-            if ($i > 1) {
-                $currentDiff = $descriptors[$i]->getValue() - $descriptors[$i-1]->getValue();
-                // TODO should we allow consecutive values that are the same? probably not...
-                if (! ($currentDiff >= $initialDiff) ) {
-                    return false;
-                }
-            }
-        }
+        // TODO compare descriptor values
 
         return true;
     }
