@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Schoolbox\Assessment\Rubric\Grid;
 
 use Schoolbox\Assessment\Rubric\RowSet\Criterion;
+use Schoolbox\Assessment\Rubric\RowSet\Group;
 use Schoolbox\Assessment\Rubric\RowSet\RowSet;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -94,19 +95,38 @@ class Grid
     }
 
 
-//    /**
-//     * Return a set of descriptors for a row.
-//     *
-//     * @param Criterion $criterion
-//     * @return GenericCollection|Descriptor[]
-//     */
-//    public function retrieveRow(Criterion $criterion): GenericCollection
-//    {
-//        // TODO implement
-//        return new GenericCollection(Descriptor::class);
-//    }
-//
-//
+    /**
+     * Return the group usage for a given group, or null if this grid doesn't
+     * use it.
+     *
+     * @param Group $group
+     * @return null|GroupUsage
+     */
+    public function retrieveGroupUsage(Group $group): ?GroupUsage
+    {
+        return $this->groupUsages[$group->getId()] ?? null;
+    }
+
+
+    /**
+     * Return the criterion usage for a given criterion, or null if this grid
+     * doesn't use it.
+     *
+     * @param Criterion $criterion
+     * @return null|CriterionUsage
+     */
+    public function retrieveCriterionUsage(Criterion $criterion): ?CriterionUsage
+    {
+        foreach ($this->groupUsages as $groupUsage) {
+            $criterionUsage = $groupUsage->retrieveCriterionUsage($criterion);
+            if ($criterionUsage) {
+                return $criterionUsage;
+            }
+        }
+        return null;
+    }
+
+
 //    /**
 //     * Return a set of descriptors for a column.
 //     *

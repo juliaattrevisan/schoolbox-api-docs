@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\Grid;
 
+use Schoolbox\Assessment\Rubric\RowSet\Criterion;
 use Schoolbox\Assessment\Rubric\RowSet\Group;
 use Schoolbox\GenericCollection;
 
@@ -47,6 +48,19 @@ class GroupUsage
     {
         $this->group           = $group;
         $this->criterionUsages = new GenericCollection(CriterionUsage::class);
+    }
+
+
+    /**
+     * Return the criterion usage for a given criterion, or null if this group
+     * doesn't use it.
+     *
+     * @param Criterion $criterion
+     * @return null|CriterionUsage
+     */
+    public function retrieveCriterionUsage(Criterion $criterion): ?CriterionUsage
+    {
+        return $this->criterionUsages[$criterion->getId()] ?? null;
     }
 
 
