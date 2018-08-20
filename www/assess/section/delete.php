@@ -16,7 +16,6 @@ $assessHandler = new Assess_Main();
 $sectionHandler = new Assess_Section();
 $questionHandler = new Assess_Question();
 $answerHandler = new Assess_Answer();
-$responseHandler = new Assess_Response();
 $groupHandler = new Group();
 
 $questionList = $questionHandler->getList($this->arg[0]);
@@ -59,8 +58,6 @@ if ($questionList) {
             'answer_id' => $answer['answer_id'],
             'deleted_at' => 'NOW()',
         ));
-
-        $responseHandler->deleteResponsesForQuestion($question['question_id']);
     }
 }
 
