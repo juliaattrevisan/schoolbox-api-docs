@@ -13,9 +13,9 @@
         <tr>
             <th class="rb-no-cell">{{ locale.translate('rubricGroup', true, true) }}</th>
             <th class="rb-no-cell">{{ locale.translate('rubricCriterion', true, true) }}</th>
-            {% for levelSequence, level in rubric.levels -%}
+            {% for level in rubricGrid.levels -%}
             <th class="rb-level" data-sequencer-group="levels">
-                <input data-level placeholder="{{ locale.translate('rubricLevel', false, true) }} name" type="text" value="{{ level.name }}" name="{{ formField }}[{{ rubricGrid.id }}][level][{{ levelSequence }}][name]" />
+                <input data-level placeholder="{{ locale.translate('rubricLevel', false, true) }} name" type="text" value="{{ level.name }}" name="{{ formField }}[{{ rubricGrid.id }}][level][{{ loop.index0 }}][name]" />
                 <span class="sequencer" data-sequencer-h="levels">
                     <a class="icon-previous" data-sequencer-left title="Move left"></a>
                     <a class="icon-next" data-sequencer-right title="Move right"></a>
