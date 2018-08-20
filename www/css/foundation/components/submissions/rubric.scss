@@ -208,6 +208,19 @@ table.rb {
 .rb-selected {
     background-color: $content-ui-selected!important;
     color: calc-text-color($content-ui-selected);
+
+    .range-selection-value {
+        font-weight: bold;
+    }
+
+    .range.selected {
+        &:before {
+            content: "(";
+        }
+        &:after {
+            content: ")";
+        }
+    }
 }
 .rb-blank {
     background-color: #FFEFEB !important;
