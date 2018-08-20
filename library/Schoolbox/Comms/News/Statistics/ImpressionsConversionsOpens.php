@@ -314,30 +314,58 @@ class ImpressionsConversionsOpens
     /**
      * @param News\Model $article
      * @return array
-     * @throws \Alaress\Database\Exception
      */
     public function fetchReferrerDemographic(News\Model $article): array
     {
-        $statement = $this->database->prepareQuery("
-            SELECT `type`, `referrer`, COUNT(*) AS num 
-            FROM {$this->statisticsMapper->getTable()}
-            WHERE article_id = :articleId
-            GROUP BY `type`, referrer
-            ORDER BY `type`, referrer
-        ");
 
-        $statement->execute([
-            'articleId' => $article->getId()
-        ]);
+        /** @var Cumulative\Model $model */
+        try {
+            $model = $this->statisticsCumulativeMapper->findOneByColumn('article_id', $article->getId());
 
-        $data = [
-            Mapper::TYPE_IMPRESSION => array_fill_keys(Mapper::REFERRERS, 0),
-            Mapper::TYPE_CONVERSION => array_fill_keys(Mapper::REFERRERS, 0),
-        ];
+            $impressionsTotal = $model->findTotalImpressions();
+            $conversionsTotal = $model->findTotalConversions();
 
-        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $data[$row['type']][$row['referrer']] = $row['num'];
+            $data = [
+                Mapper::TYPE_IMPRESSION => [
+                    Mapper::REFERRER_DASHBOARD => $this->percentage($model->getNumImpressionsDashboard(), $impressionsTotal),
+                    Mapper::REFERRER_HOMEPAGE => $this->percentage($model->getNumImpressionsHomepage(), $impressionsTotal),
+                    Mapper::REFERRER_INDEX => $this->percentage($model->getNumImpressionsIndex(), $impressionsTotal),
+                    Mapper::REFERRER_ARCHIVE => $this->percentage($model->getNumImpressionsArchive(), $impressionsTotal),
+                    Mapper::REFERRER_EMAIL => $this->percentage($model->getNumImpressionsEmail(), $impressionsTotal),
+                ],
+                Mapper::TYPE_CONVERSION => [
+                    Mapper::REFERRER_DASHBOARD => $this->percentage($model->getNumConversionsDashboard(), $conversionsTotal),
+                    Mapper::REFERRER_HOMEPAGE => $this->percentage($model->getNumConversionsHomepage(), $conversionsTotal),
+                    Mapper::REFERRER_INDEX => $this->percentage($model->getNumConversionsIndex(), $conversionsTotal),
+                    Mapper::REFERRER_ARCHIVE => $this->percentage($model->getNumConversionsArchive(), $conversionsTotal),
+                    Mapper::REFERRER_EMAIL => $this->percentage($model->getNumConversionsEmail(), $conversionsTotal),
+                ]
+            ];
+
+//            $data = [
+//                Mapper::TYPE_IMPRESSION => [
+//                    Mapper::REFERRER_DASHBOARD => $model->getNumImpressionsDashboard(),
+//                    Mapper::REFERRER_HOMEPAGE => $model->getNumImpressionsHomepage(),
+//                    Mapper::REFERRER_INDEX => $model->getNumImpressionsIndex(),
+//                    Mapper::REFERRER_ARCHIVE => $model->getNumImpressionsArchive(),
+//                    Mapper::REFERRER_EMAIL => $model->getNumImpressionsEmail(),
+//                ],
+//                Mapper::TYPE_CONVERSION => [
+//                    Mapper::REFERRER_DASHBOARD => $model->getNumConversionsDashboard(),
+//                    Mapper::REFERRER_HOMEPAGE => $model->getNumConversionsHomepage(),
+//                    Mapper::REFERRER_INDEX => $model->getNumConversionsIndex(),
+//                    Mapper::REFERRER_ARCHIVE => $model->getNumConversionsArchive(),
+//                    Mapper::REFERRER_EMAIL => $model->getNumConversionsEmail(),
+//                ]
+//            ];
+
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            $data = [
+                Mapper::TYPE_IMPRESSION => array_fill_keys(Mapper::REFERRERS, 0),
+                Mapper::TYPE_CONVERSION => array_fill_keys(Mapper::REFERRERS, 0),
+            ];
         }
+
 
         return $data;
     }

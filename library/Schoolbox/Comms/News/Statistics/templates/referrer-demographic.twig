@@ -9,8 +9,8 @@
     $(function() {
         $('#referrerDemographic').highcharts({
             chart: {
-                spacingBottom: 64,
-                type: 'bar',
+                spacingRight: 48,
+                type: 'column',
                 zoomType: 'xy'
             },
 
@@ -27,9 +27,6 @@
                     dataLabels: {
                         enabled: true
                     }
-                },
-                series: {
-                    stacking: 'normal'
                 }
             },
 
@@ -42,6 +39,7 @@
             },
 
             tooltip: {
+                pointFormat: '<span style="color:{series.color}">{series.name}</span>: {point.y}% ',
                 useHTML: true
             },
 
@@ -49,15 +47,12 @@
                 categories: ['Impressions', 'Conversions']
             },
 
-            yAxis: [
-                {
-                    allowDecimals: false,
-                    min: 0,
-                    title: {
-                        text: 'Number of interactions'
-                    }
-                }
-            ],
+            yAxis: {
+                title: {
+                    text: 'Percentage'
+                },
+                min: 0
+            },
 
             series: [
                 {
