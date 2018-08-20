@@ -43,6 +43,19 @@ class CriterionUsage
 
 
     /**
+     * Return the descriptor for a given level, or null if this criterion
+     * doesn't use it.
+     *
+     * @param Level $level
+     * @return null|Descriptor
+     */
+    public function retrieveDescriptor(Level $level): ?Descriptor
+    {
+        return $this->descriptors[$level->getId()] ?? null;
+    }
+
+
+    /**
      * Given a set of levels, retrieves an iterator for the row.
      *
      * @param GenericCollection|Level[] $levels
