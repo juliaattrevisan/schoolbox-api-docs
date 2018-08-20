@@ -80,7 +80,13 @@ class Controller extends Base
         /* Regurgitate it
          */
 
-        $previewFragment = (new Factory($this->getRouter()))->urlFragment($params['encodedUrl'], $this->getUser());
+        $translator = new \Schoolbox\Cyberhound\Url\Translator(
+            $_SESSION['ip'],
+            $this->getConfigLoader()->get('cyberhound_api_url'),
+            $this->getConfigLoader()->get('cyberhound_api_shared_key')
+        );
+
+        $previewFragment = (new Factory($this->getRouter(), $translator))->urlFragment($params['encodedUrl'], $this->getUser());
 
         if ($previewFragment['type'] === 'inline') {
             $previewFragment['fragment'] = $this->buildUnthemedHtmlOutput($previewFragment['twig']['template'], $previewFragment['twig']['data'])

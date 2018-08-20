@@ -8,6 +8,7 @@
 namespace Schoolbox\Preview;
 
 use Aura\Router\Router;
+use Schoolbox\Cyberhound\Url\Translator;
 use Schoolbox\Preview\Chain\Internal;
 use Schoolbox\Preview\Chain\External;
 use Schoolbox\Preview\Registry\Decoder\LinkRedir;
@@ -21,13 +22,19 @@ class Factory
      */
     private $router;
 
+    /**
+     * @var Translator
+     */
+    private $translator;
 
     /**
      * @param Router $router
+     * @param Translator $translator
      */
-    public function __construct(Router $router)
+    public function __construct(Router $router, Translator $translator)
     {
         $this->router = $router;
+        $this->translator = $translator;
     }
 
 
@@ -76,6 +83,7 @@ class Factory
         else {
             $chain  = new External($url->getUrl());
             $result = $chain->getResult();
+            $result['src'] = $this->translator->translate($result['src']);
         }
 
         /* Set up html fragment

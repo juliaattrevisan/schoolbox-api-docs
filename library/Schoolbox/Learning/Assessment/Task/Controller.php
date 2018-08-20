@@ -128,7 +128,13 @@ class Controller extends Assessment\Controller
          * decide which one it is
          */
         if ($assessment->getUrl()) {
-            $previewFragment = (new PreviewFactory($this->getRouter()))->urlFragment($assessment->getUrl(), $this->getUser());
+            $translator = new \Schoolbox\Cyberhound\Url\Translator(
+                $_SESSION['ip'],
+                $this->getConfigLoader()->get('cyberhound_api_url'),
+                $this->getConfigLoader()->get('cyberhound_api_shared_key')
+            );
+
+            $previewFragment = (new PreviewFactory($this->getRouter(), $translator))->urlFragment($assessment->getUrl(), $this->getUser());
 
             if (($previewFragment['type'] == 'redirect' || $previewFragment['type'] == 'iframe')
                 && !$assessment->getDescription()) {
