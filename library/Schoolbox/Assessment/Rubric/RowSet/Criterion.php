@@ -66,6 +66,26 @@ class Criterion
 
 
     /**
+     * Is this criterion in use on any existing assessment, excluding one
+     * particular assessment?
+     *
+     * @param IAssessable $exclusion Assessment to exclude from usage check
+     * @return bool
+     */
+    public function isInUseExcluding(IAssessable $exclusion): bool
+    {
+        foreach ($this->usage as $assessment) {
+            // Skip the exclusion if it matches
+            if ($exclusion->getId() === $assessment->getId()) {
+                continue;
+            }
+            return true;
+        }
+        return false;
+    }
+
+
+    /**
      * @param string $name
      * @return static
      */

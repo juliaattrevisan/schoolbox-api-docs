@@ -103,6 +103,24 @@ class Group
 
 
     /**
+     * Is this group in use on any existing assessment, excluding one
+     * particular assessment?
+     *
+     * @param IAssessable $exclusion Assessment to exclude from usage check
+     * @return bool
+     */
+    public function isInUseExcluding(IAssessable $exclusion): bool
+    {
+        foreach ($this->criteria as $criterion) {
+            if ($criterion->isInUseExcluding($exclusion)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    /**
      * @return bool
      */
     public function isCourseLevel(): bool
