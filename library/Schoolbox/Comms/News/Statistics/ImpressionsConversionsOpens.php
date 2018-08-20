@@ -415,6 +415,8 @@ class ImpressionsConversionsOpens
          * from which to draw initial conditions so the series should just start at the first value of
          * the current granular data set.
          */
+        $data = [];
+
         if ($initialConditions['start']) {
             $data = [
                 [ (int)$initialConditions['start'], $this->percentage($numerator, $denominator) ]
