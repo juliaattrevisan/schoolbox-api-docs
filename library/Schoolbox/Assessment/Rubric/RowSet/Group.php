@@ -82,7 +82,9 @@ class Group
      */
     public function retrieveCriterionIds(): array
     {
-        return array_filter($this->criteria->getPropertyValues('id'));
+        $result = array_unique(array_filter($this->criteria->getPropertyValues('id')));
+        sort($result);
+        return $result;
     }
 
 
