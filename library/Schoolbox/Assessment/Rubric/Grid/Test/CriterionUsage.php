@@ -71,6 +71,57 @@ class CriterionUsage extends TestCase
 
 
     /**
+     * Data provider for `testRetrieveDescriptor`.
+     *
+     * @return iterable
+     */
+    public function getTestCalculateMaxValueData(): iterable
+    {
+        $criterion1      = (new RowSet\Criterion())->setId(1)->setName('Criterion 1');
+        $criterionUsage1 = new RubricGrid\CriterionUsage($criterion1);
+
+        $level1 = (new RubricGrid\Level())->setId(1)->setName('Level 1');
+        $level2 = (new RubricGrid\Level())->setId(2)->setName('Level 2');
+        $level3 = (new RubricGrid\Level())->setId(3)->setName('Level 3');
+        $level4 = (new RubricGrid\Level())->setId(4)->setName('Level 4');
+        $level5 = (new RubricGrid\Level())->setId(5)->setName('Level 5');
+
+        $descriptor1 = (new RubricGrid\Descriptor())->setDescription('Descriptor 1.1')->setMaxValue(0);
+        $descriptor2 = (new RubricGrid\Descriptor())->setDescription('Descriptor 1.2')->setMaxValue(2);
+        $descriptor3 = (new RubricGrid\Descriptor())->setDescription('Descriptor 1.3')->setMaxValue(4);
+        $descriptor4 = (new RubricGrid\Descriptor())->setDescription('Descriptor 1.4')->setMaxValue(6);
+        $descriptor5 = (new RubricGrid\Descriptor())->setDescription('Descriptor 1.5')->setMaxValue(8);
+
+        $criterionUsage1->getDescriptors()[$level1->getId()] = $descriptor1;
+        $criterionUsage1->getDescriptors()[$level2->getId()] = $descriptor2;
+        $criterionUsage1->getDescriptors()[$level3->getId()] = $descriptor3;
+        $criterionUsage1->getDescriptors()[$level4->getId()] = $descriptor4;
+        $criterionUsage1->getDescriptors()[$level5->getId()] = $descriptor5;
+
+        yield 'criterion 1: descriptors' => [$criterionUsage1, 8];
+
+
+        $criterion2      = (new RowSet\Criterion())->setId(2)->setName('Criterion 2');
+        $criterionUsage2 = new RubricGrid\CriterionUsage($criterion2);
+
+        yield 'criterion 2: no descriptors'          => [$criterionUsage2, null];
+
+
+        $criterion3      = (new RowSet\Criterion())->setId(3)->setName('Criterion 3');
+        $criterionUsage3 = new RubricGrid\CriterionUsage($criterion3);
+
+        $descriptor6 = (new RubricGrid\Descriptor())->setDescription('Descriptor 3.1');
+        $descriptor7 = (new RubricGrid\Descriptor())->setDescription('Descriptor 3.2')->setMaxValue(null);
+
+        $criterionUsage1->getDescriptors()[$level1->getId()] = $descriptor6;
+        $criterionUsage1->getDescriptors()[$level2->getId()] = $descriptor7;
+
+        yield 'criterion 3: no non-null descriptors' => [$criterionUsage3, null];
+    }
+
+
+    /**
+     * @dataProvider getTestCalculateMaxValueData
      * @covers \Schoolbox\Assessment\Rubric\Grid\CriterionUsage::calculateMaxValue
      *
      * @param RubricGrid\CriterionUsage $criterionUsage
