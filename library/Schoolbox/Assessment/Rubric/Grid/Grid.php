@@ -158,6 +158,8 @@ class Grid
      * Iterate over each group, then each criterion in the group, then each
      * descriptor in the criterion.
      *
+     * @todo consider removing, as manual iteration is probably easier
+     *
      * @return iterable|CriterionUsage[][] key: GroupUsage
      */
     public function iterateGroups(): iterable

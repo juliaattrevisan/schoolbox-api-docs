@@ -68,6 +68,8 @@ class GroupUsage
      * Given a set of levels, retrieves an iterator for the rows in this group
      * usage.
      *
+     * @todo consider removing, as manual iteration is probably easier
+     *
      * @param GenericCollection|Level[] $levels
      * @return iterable|?Descriptor[][] key: CriterionUsage
      */

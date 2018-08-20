@@ -58,6 +58,8 @@ class CriterionUsage
     /**
      * Given a set of levels, retrieves an iterator for the row.
      *
+     * @todo consider removing, as manual iteration is probably easier
+     *
      * @param GenericCollection|Level[] $levels
      * @return iterable|?Descriptor[] key:   level ID
      *                                value: descriptor, or null if there is
