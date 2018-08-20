@@ -32,6 +32,14 @@
             $assignFromRubricButton.prop('disabled', currentRubricValue === currentMarkInput);
         }
 
+        function updateButtonMark() {
+            var rubricTotalText = $.trim($rb.find(finalSummarySelector).text());
+
+            // Extract just the first value, remove the trailing space slash and total mark
+            var rubricSum = rubricTotalText.replace(/\/ \d*/, "");
+            $("[data-rubric-sum]").text(rubricSum);
+        }
+
         // Update the input val when manually assigning grade from rubric
         $assignFromRubricButton.on('click', function(e) {
             // reset customisation state, like we do for cap inputs
@@ -59,8 +67,16 @@
             refreshAssignFromRubricButton();
         });
 
+        // Show the current rubric total on the button on page load
+        updateButtonMark();
+        refreshAssignFromRubricButton();
+
         // Update the input val when any of these inputs change
         $rb.on('change', '[data-rubric], [data-rubric-group], [data-group-max-value]', refreshAssignFromRubricButton);
+
+        // Update the value shown on the button
+        $rb.on('change', '[data-rubric], [data-rubric-group], [data-group-max-value]', updateButtonMark);
+
     });
 </script>
-<p><button id="use-rubric-value" class="full-width">Assign {{ locale.grades.proper }} from Rubric</button></p>
+<p><button id="use-rubric-value" class="full-width">Assign <span data-rubric-sum></span> from Rubric</button></p>
