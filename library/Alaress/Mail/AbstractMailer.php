@@ -12,6 +12,7 @@ namespace Alaress\Mail;
 
 use Alaress\Exception\IO\IOException;
 use Alaress\Lumberjack\Logger;
+use phpDocumentor\Reflection\Types\Boolean;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
@@ -352,7 +353,6 @@ abstract class AbstractMailer implements IMailer
         return self::$transport;
     }
 
-
     /**
      * @param bool $reinitialise
      * @return Swift_Transport
@@ -362,25 +362,31 @@ abstract class AbstractMailer implements IMailer
         return static::getConfiguredSwiftTransport(self::getConfig(), $reinitialise);
     }
 
-
     /**
      * @param string $string
+     * @param bool $returnValidEmailsOnly
      * @return array
      */
-    public static function parseAddressString($string)
+    public static function parseAddressString($string, $returnValidEmailsOnly = true): array
     {
-        $address_list = imap_rfc822_parse_adrlist($string, self::getConfig()->get('site_hostname') . '.' . self::getConfig()->get('site_domain'));
-        $return_list  = [];
-        foreach ($address_list as $address) {
-            if ($address->host !== '.SYNTAX-ERROR.') {
-                $to               = $address->mailbox . '@' . $address->host;
-                $alias            = property_exists($address, 'personal') ? $address->personal : null;
-                $return_list[$to] = $alias;
-            }
-        }
-        return $return_list;
-    }
+        $address_list = self::parseAddressList($string);
+        $return_list  = [
+            'valid' => [],
+            'invalid' => []
+        ];
 
+        foreach ($address_list['valid'] as $address) {
+            $to = $address->mailbox . '@' . $address->host;
+            $alias = property_exists($address, 'personal') ? $address->personal : null;
+            $return_list['valid'][$to] = $alias;
+        }
+
+        if (!$returnValidEmailsOnly && !empty($address_list['invalid'])) {
+            $return_list['invalid'] = $address_list['invalid'];
+        }
+
+        return $returnValidEmailsOnly ? $return_list['valid'] : $return_list;
+    }
 
     /**
      * @param string $address
@@ -390,9 +396,9 @@ abstract class AbstractMailer implements IMailer
     public static function buildAddress($address, $name = '')
     {
         list($mailbox, $host) = explode('@', $address, 2);
+
         return imap_rfc822_write_address($mailbox, $host, $name);
     }
-
 
     /**
      * @return IConfigLoader
@@ -403,5 +409,69 @@ abstract class AbstractMailer implements IMailer
             self::$conf = ConfigMapper::getInstance();
         }
         return self::$conf;
+    }
+
+    /**
+     * @param string $emailAddresses
+     * @return array
+     */
+    private static function parseAddressList(string $emailAddresses): array
+    {
+        $emails = [
+            'valid' => [],
+            'invalid' => []
+        ];
+        $validEmailAddresses = [];
+
+        $emailLists = array_map('trim',explode(",", $emailAddresses));
+
+        foreach ($emailLists as $email) {
+            // Check if string is a valid email OR
+            // Check if the email within a string is valid e.g: "9AH French (FREA1)" <alaress@schoolbox.com.au>
+            if (filter_var($email, FILTER_VALIDATE_EMAIL) || self::emailFromStringIsValid($email) !== false) {
+                $emails['valid'][] = $email;
+            } else {
+                $emails['invalid'][] = $email;
+            }
+        }
+
+        if (\count($emails['valid']) > 0) {
+            $validEmailAddresses = imap_rfc822_parse_adrlist(implode(",", $emails['valid']),
+                self::getConfig()->get('site_hostname') . '.' . self::getConfig()->get('site_domain'));
+        }
+
+        return [
+            'valid' => $validEmailAddresses,
+            'invalid' => $emails['invalid'],
+        ];
+    }
+
+    /**
+     * Get an email from a string. E.g: "9AH French (FREA1)" <alaress@schoolbox.com.au>
+     * @param string $string
+     * @return bool
+     */
+    private static function emailFromStringIsValid(string $string): bool
+    {
+        $email = self::getEmailFromString($string);
+
+        if ($email && filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param string $string
+     * @return bool|null
+     */
+    public static function getEmailFromString(string $string)
+    {
+        if (preg_match('~<(.*?)>~', $string, $output) !== 0) {
+            return $output[1];
+        }
+
+        return false;
     }
 } 
