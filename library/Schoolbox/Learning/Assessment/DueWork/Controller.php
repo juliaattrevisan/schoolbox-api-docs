@@ -16,6 +16,7 @@ use DueWork_ErrorMapper;
 use Raven_Client;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
+use Schoolbox\Assessment\Rubric\Grid\Grid;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfAssessable;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
@@ -1111,6 +1112,14 @@ class Controller extends Assessment\Controller
 
 
         $data = array_merge($data, $this->generateRubricTwigData($assessment));
+
+
+        // Ideally, the rubric grid can be used as is without Twig-wrangling
+        $data['rubricGrid'] = $this->rubricMapper->retrieveGrid(
+            $assessment,
+            true
+        );
+
 
         // ...and scene.
         return $data;
