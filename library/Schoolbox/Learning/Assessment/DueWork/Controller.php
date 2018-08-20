@@ -1111,7 +1111,9 @@ class Controller extends Assessment\Controller
         $assessment->setRubric($rubric);
 
 
+        // TODO remove or update this to not use old rubric object
         $data = array_merge($data, $this->generateRubricTwigData($assessment));
+        unset($data['rubric']);
 
 
         // Ideally, the rubric grid can be used as is without Twig-wrangling
