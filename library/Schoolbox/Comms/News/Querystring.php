@@ -57,7 +57,7 @@ class Querystring
     /**
      * Querystring param for the Referrer (used in stats)
      */
-    public const REFERRER = 'r';
+    public const REFERRER = 'ref';
 
     /**
      * An array of key/value pairs corresponding to GET params
