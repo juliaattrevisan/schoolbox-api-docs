@@ -76,7 +76,7 @@ class Criterion
     {
         foreach ($this->usage as $assessment) {
             // Skip the exclusion if it matches
-            if ($exclusion->getId() === $assessment->getId()) {
+            if ((int)$exclusion->getId() === (int)$assessment->getId()) {
                 continue;
             }
             return true;
