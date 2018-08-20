@@ -48,11 +48,27 @@ class ValidDescriptorRow
 
         $descriptors = $descriptors->filter($descriptorValue)->map($descriptorValue);
 
-        // A single descriptor (or less) is a special case - always valid
-        if (\count($descriptors) < 2) {
-            return true;
+        $prevVal   = $prevDiff = null;
+        foreach($descriptors as $val) {
+            // Not the first item?
+            if(null !== $prevVal){
+                $diff = $val - $prevVal;
+
+                // No increase/decrease ?
+                if(0 === $diff){
+                    return false;
+                }
+
+                // Do we have a prev diff to compare against?
+                // Accounts for both ascending and descending possibilities
+                if(null !== $prevDiff && (($prevDiff > 0 && $diff < 0) || ($prevDiff < 0 && $diff > 0))) {
+                    return false;
+                    break;
+                }
+                $prevDiff = $diff;
+            }
+            $prevVal = $val;
         }
-        // TODO compare descriptor values
 
         return true;
     }
