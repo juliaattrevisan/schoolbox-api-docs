@@ -1,6 +1,6 @@
 {%- set critInput    = formField ~ '[' ~ rubricGrid.id ~ '][criterion]['  ~ crit.id ~ ']' -%}
 {%- set descInput    = formField ~ '[' ~ rubricGrid.id ~ '][descriptor][' ~ crit.id ~ ']' -%}
-{%- set checkChecked = crit.descriptors|length > 0 -%}
+{%- set checkChecked = criterionUsage is not null -%}
 {%- set cellClass    = checkChecked ? '' : 'hide-v' -%}
 {%- set levelLimit   = levelLimit ?: config.rubric_max_levels -%}
 
@@ -32,25 +32,26 @@
 </th>
 
 {% for levelIndex, level in rubricGrid.levels -%}
+    {% set descriptor = criterionUsage.retrieveDescriptor(level) %}
     <td data-descriptor class="{{ cellClass }}">
         <textarea {% if not checkChecked %} disabled="disabled"{% endif %}
                 data-descriptor-text
                 placeholder="Descriptor"
                 rows="2"
                 name="{{ descInput }}[{{ levelIndex }}][text]"
-                maxlength="1024" >{{ descriptor.text }}</textarea>
+                maxlength="1024" >{{ descriptor.description }}</textarea>
         <input {% if not checkChecked %} disabled="disabled"{% endif %}
                 data-descriptor-value
-                data-descriptor-value-original="{{ descriptor.value }}"
+                data-descriptor-value-original="{{ descriptor.maxValue }}"
                 data-descriptor-criterion="{{ crit.id }}"
                 data-descriptor-level-index="{{ levelIndex }}"
             {% if checkChecked %}data-descriptor-original{% endif %}
                 class="rb-value"
                 type="tel"
                 {% if usingMarkRange %}data-descriptor-uses-mark-range{% endif %}
-                placeholder={% if usingMarkRange %}"Maximum points"{% else %}"Points"{% endif %}
-        value="{{ descriptor.value }}"
-        name="{{ descInput }}[{{ levelIndex }}][points]" />
+                placeholder="{% if usingMarkRange %}Maximum points{% else %}Points{% endif %}"
+                value="{{ descriptor.maxValue }}"
+                name="{{ descInput }}[{{ levelIndex }}][points]" />
     </td>
 
 {%- endfor %}
