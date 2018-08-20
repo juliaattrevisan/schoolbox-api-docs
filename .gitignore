@@ -42,5 +42,7 @@ post-provision.sh
 .idea/
 browscap.ini
 *.lock
+!composer.lock
+!Gemfile.lock
 version.json
 codeception.yml
