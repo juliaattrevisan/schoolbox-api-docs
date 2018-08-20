@@ -70,6 +70,7 @@
                     }
                 },
                 {
+                    allowDecimals: true,
                     labels: {
                         style: {
                             color: '#629e51'
@@ -78,13 +79,12 @@
                     lineColor: '#629e51',
                     lineWidth: 1,
                     max: 100,
-                    tickInterval: 10,
+                    min: 0,
                     title: {
-                        allowDecimals: true,
                         style: {
                             color: '#629e51'
                         },
-                        text: 'Conversion Ratio (%)'
+                        text: 'Conversion Ratio This Period (%)'
                     },
                     opposite: true
                 }
@@ -150,12 +150,12 @@
                     color: '#629e51',
                     lineWidth: 1,
                     marker: {
-                        radius: 3
+                        enabled: false
                     },
-                    name: 'Conversion Ratio (%)',
-                    data: {{ conversionRatio|json_encode|raw }},
+                    name: 'Conversion Ratio This Period (%)',
                     type: 'line',
-                    yAxis: 1
+                    yAxis: 1,
+                    data: {{ conversionRatio|json_encode|raw }}
                 }
             ]
         });
