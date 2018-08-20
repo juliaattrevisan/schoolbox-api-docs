@@ -463,6 +463,46 @@ class ImpressionsConversionsOpens
 
 
     /**
+     * Get Conversion and Impressions vs Time
+     *
+     * @param News\Model  $article
+     * @param null|string $accuracy
+     * @return array
+     * @throws \Alaress\Database\Exception
+     */
+    public function fetchConversions(News\Model $article, ?string $accuracy = self::DEFAULT_ACCURACY): array
+    {
+        /* Determine a sane value
+         */
+        $accuracySql = self::ACCURACIES[$this->assertAccuracy($accuracy)];
+
+        $statement = $this->database->prepareQuery("
+            SELECT 
+                CAST(1000*UNIX_TIMESTAMP({$accuracySql}) AS UNSIGNED) AS timestamp,
+                `type`,
+                COUNT(*) AS num
+            FROM {$this->statisticsMapper->getTable()}
+            WHERE article_id = :articleId
+            AND deleted_at IS NULL
+            GROUP BY timestamp, `type`
+            ORDER BY timestamp
+        ");
+
+        $statement->execute([
+            'articleId' => $article->getId()
+        ]);
+
+        $data = [];
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $data[$row['type']][] = [(int)$row['timestamp'], (int)$row['num']];
+        }
+
+        return $data;
+    }
+
+
+    /**
      * Assemble all the granular Impressions, Conversions and direct Opens for $article
      *
      * @param News\Model  $article
@@ -511,50 +551,6 @@ class ImpressionsConversionsOpens
             /* Stack it
              */
             $data[$type][$referrer][] = [(int)$row['timestamp'], (int)$row['num'], date("Y-m-d H:i:s", $row['timestamp']/1000)];
-        }
-
-        return $data;
-    }
-
-
-    /**
-     * @param News\Model  $article
-     * @param null|string $accuracy
-     * @return array
-     * @throws \Alaress\Database\Exception
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \UnderflowException
-     */
-    public function fetchConversions(News\Model $article, ?string $accuracy = self::DEFAULT_ACCURACY): array
-    {
-        /* Determine a sane value
-         */
-        $accuracySql = self::ACCURACIES[$this->assertAccuracy($accuracy)];
-
-        $pb = $this->statisticsMapper->getPredicateBuilder()
-            ->equals('article_id', $article->getId())
-            ->in('type', [Mapper::TYPE_CONVERSION, Mapper::TYPE_OPEN]);
-
-        $where = implode(' AND ', $pb->getWhere());
-
-        $statement = $this->database->prepareQuery("
-            SELECT 
-                CAST(1000*UNIX_TIMESTAMP({$accuracySql}) AS UNSIGNED) AS timestamp,
-                `type`,
-                COUNT(*) AS num
-            FROM {$this->statisticsMapper->getTable()}
-            WHERE {$where}
-            AND deleted_at IS NULL
-            GROUP BY timestamp, `type`
-            ORDER BY timestamp
-        ");
-
-        $statement->execute($pb->getParams());
-
-        $data = [];
-
-        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $data[$row['type']][] = [(int)$row['timestamp'], (int)$row['num']];
         }
 
         return $data;

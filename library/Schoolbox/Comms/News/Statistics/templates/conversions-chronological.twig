@@ -12,7 +12,7 @@
             chart: {
                 height: 500,
                 spacingBottom: 64,
-                type: 'column',
+                type: 'spline',
                 zoomType: 'xy'
             },
 
@@ -31,7 +31,7 @@
             },
 
             title: {
-                text: 'Conversions vs Time'
+                text: 'Interactions and Conversions vs Time'
             },
 
             tooltip: {
@@ -86,6 +86,11 @@
 
             series: [
                 {
+                    color: '#f2c96d',
+                    name: 'Impressions',
+                    data: {{ conversions['impression']|json_encode|raw }}
+                },
+                {
                     color: '#82b5d8',
                     name: 'Conversions',
                     data: {{ conversions['conversion']|json_encode|raw }}
@@ -103,7 +108,7 @@
                     },
                     name: 'Conversion Ratio (%)',
                     data: {{ conversionRatio|json_encode|raw }},
-                    type: 'line',
+                    type: 'spline',
                     yAxis: 1
                 }
             ]
