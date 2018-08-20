@@ -26,6 +26,7 @@ class ValidDescriptorRow
      */
     public function isSatisifedBy($descriptorRow) : bool
     {
+        // We only enforce monotonicity if mark range is in use
         if ($this->usesMarkRange) {
             return $this->isMonotonic($descriptorRow);
         }
@@ -39,14 +40,15 @@ class ValidDescriptorRow
     private function isMonotonic($descriptors) : bool
     {
         // First remove any descriptors from the list that don't have values
+        // since value-less descriptors are permitted in amongst valued descriptors
         $descriptorHasValue = function ($desc) {
             /** @var Descriptor $desc */
             return $desc->getValue();
         };
         $descriptors = $descriptors->filter($descriptorHasValue);
 
+        // A single descriptor value is a special case - always valid
         if (\count($descriptors) < 2) {
-            // A single descriptor value is a special case
             return true;
         }
 
@@ -56,6 +58,7 @@ class ValidDescriptorRow
             // skip first 2 elements cause we already compared them
             if ($i > 1) {
                 $currentDiff = $descriptors[$i]->getValue() - $descriptors[$i-1]->getValue();
+                // TODO should we allow consecutive values that are the same? probably not...
                 if (! ($currentDiff >= $initialDiff) ) {
                     return false;
                 }
