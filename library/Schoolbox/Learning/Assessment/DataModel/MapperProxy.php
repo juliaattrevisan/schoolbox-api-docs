@@ -820,9 +820,14 @@ class MapperProxy
             // Save the Rubric
             /** @var DueWorkObject $dueWork */
             $dueWork = $assessable;
-            if ($dueWork->getRubric() && $dueWork->getUseRubric()) {
-                $dueWork->getRubric()->setSubmissionBox($subObject);
-                SubmissionBox\Rubric\RubricMapper::getInstance()->save($dueWork->getRubric(), $subObject);
+            if ($dueWork->getUseRubric()) {
+                $rubricMapper = SubmissionBox\Rubric\RubricMapper::getInstance();
+                if ($dueWork->getRubricGrid()) {
+                    $rubricMapper->persistGrid($dueWork->getRubricGrid());
+                } elseif ($dueWork->getRubric()) {
+                    $dueWork->getRubric()->setSubmissionBox($subObject);
+                    $rubricMapper->save($dueWork->getRubric(), $subObject);
+                }
             }
 
         } elseif ($subObject instanceof Quiz) {
