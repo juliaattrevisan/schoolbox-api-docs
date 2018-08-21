@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Comms\News;
 
+use Alaress\Json\Linkable;
 use Alaress\Json\SerializeTrait;
 use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
@@ -21,7 +22,7 @@ use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\User;
 use Alaress_Date_Format;
 
-class Model implements ISoftDeletable, \Alaress\Json\Serializable
+class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
 {
     // The discrete, atomic states this article may be in.
     // It is quite valid for composite states to be composed of 2+ more atomic states. eg isAccepted = [AWAITING_PUBLICATION|PUBLISHED|EXPIRED]
@@ -57,6 +58,18 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable
             'topics' => [
                 'name'
             ]
+        ];
+    }
+
+
+    /**
+     * @return array
+     */
+    public function getJsonApiLinks(): array
+    {
+        return [
+            'self'   => [ 'commsNews.getDetail', [ 'articleId' => $this->getId() ] ],
+            'update' => [ 'commsNews.getUpdate', [ 'articleId' => $this->getId() ] ],
         ];
     }
 
