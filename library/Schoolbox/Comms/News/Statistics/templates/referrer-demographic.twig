@@ -43,7 +43,7 @@
             },
 
             xAxis: {
-                categories: ['Impressions', 'Conversions']
+                categories: ['Conversions', 'Impressions']
             },
 
             yAxis: {
@@ -59,40 +59,42 @@
                     color: '#82b5d8',
                     name: 'Dashboard',
                     data: [
-                        {{ referrerDemographic['impression']['dashboard'] }},
-                        {{ referrerDemographic['conversion']['dashboard'] }}
+                        {{ referrerDemographic['conversion']['dashboard'] }},
+                        {{ referrerDemographic['impression']['dashboard'] }}
+
                     ]
                 },
                 {
                     color: '#1f78c1',
                     name: 'Homepage',
                     data: [
-                        {{ referrerDemographic['impression']['homepage'] }},
-                        {{ referrerDemographic['conversion']['homepage'] }}
+                        {{ referrerDemographic['conversion']['homepage'] }},
+                        {{ referrerDemographic['impression']['homepage'] }}
                     ]
                 },
                 {
                     color: '#0a437c',
                     name: 'Index',
                     data: [
-                        {{ referrerDemographic['impression']['index'] }},
-                        {{ referrerDemographic['conversion']['index'] }}
+                        {{ referrerDemographic['conversion']['index'] }},
+                        {{ referrerDemographic['impression']['index'] }}
+
                     ]
                 },
                 {
                     color: '#806eb7',
                     name: 'Archive',
                     data: [
-                        {{ referrerDemographic['impression']['archive'] }},
-                        {{ referrerDemographic['conversion']['archive'] }}
+                        {{ referrerDemographic['conversion']['archive'] }},
+                        {{ referrerDemographic['impression']['archive'] }}
                     ]
                 },
                 {
                     color: '#ba43a9',
                     name: 'Email',
                     data: [
-                        {{ referrerDemographic['impression']['email'] }},
-                        {{ referrerDemographic['conversion']['email'] }}
+                        {{ referrerDemographic['conversion']['email'] }},
+                        {{ referrerDemographic['impression']['email'] }}
                     ]
                 }
             ]
