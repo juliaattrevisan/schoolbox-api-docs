@@ -69,6 +69,7 @@
 
                                         <div class="small-12 large-6 columns">
                                             {% if assessment.isFeedbackVisibleToUser(USER) %}
+                                                {% set feedback = participant.findAuthoritativeVisibleFeedback(USER) %}
 
                                                 {% if assessment is task %}
                                                     {% include '@learningAssessment/fragments/progressTick.twig' with {
@@ -80,9 +81,12 @@
                                                         <span>{{ assessment.humanReadableMark(participant, true) }}</span>
                                                     </div>
                                                 {% endif %}
-                                                {% set feedback = participant.findAuthoritativeVisibleFeedback(USER) %}
                                                 {% if feedback %}
                                                     <p class="comment">{{ feedback.comment | nl2br }}</p>
+                                                    {% if assessment.useRubric  %}
+                                                        <a href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: student.id}) }}{{ returnUrlSuffix }}">
+                                                            View more feedback</a>
+                                                    {% endif %}
                                                 {% endif %}
                                             {% endif %}
                                         </div>
