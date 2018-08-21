@@ -240,7 +240,7 @@ class ImpressionsConversionsOpens
      */
     public function fetchCumulative(News\Model $article): array
     {
-        $cumulativeData = $this->statisticsCumulativeMapper->findByColumn('article_id', $article->getId(), [
+        $statistics = $this->statisticsCumulativeMapper->findByColumn('article_id', $article->getId(), [
             'order' => [
                 'date' => 'asc'
             ]
@@ -256,14 +256,14 @@ class ImpressionsConversionsOpens
         $numConversions = 0;
         $breakdown = [];
 
-        foreach ($cumulativeData as $current) {
+        foreach ($statistics as $statistic) {
             if (null === $firstOpen) {
-                $firstOpen = $current->getDate();
+                $firstOpen = $statistic->getDate();
             }
 
             /* Aggregate from daily statistics
              */
-            $daily = $this->summariseDailyStatistics($current);
+            $daily = $this->summariseDailyStatistics($statistic);
 
             $numConversions += $daily['numConversions'];
             $numImpressions += $daily['numImpressions'];
@@ -282,7 +282,7 @@ class ImpressionsConversionsOpens
             $breakdown[Mapper::TYPE_IMPRESSION][Mapper::REFERRER_ARCHIVE] += $index[Mapper::REFERRER_ARCHIVE];
             $breakdown[Mapper::TYPE_IMPRESSION][Mapper::REFERRER_EMAIL] += $index[Mapper::REFERRER_EMAIL];
 
-            $breakdown[Mapper::TYPE_OPEN] += $current->getNumOpens();
+            $breakdown[Mapper::TYPE_OPEN] += $statistic->getNumOpens();
         }
 
         /* Calculate overall conversion ratio
