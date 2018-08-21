@@ -87,14 +87,14 @@
 
             series: [
                 {
-                    color: '#f2c96d',
-                    name: 'Impressions',
-                    data: {{ conversions['impression']|json_encode|raw }}
-                },
-                {
                     color: '#82b5d8',
                     name: 'Conversions',
                     data: {{ conversions['conversion']|json_encode|raw }}
+                },
+                {
+                    color: '#f2c96d',
+                    name: 'Impressions',
+                    data: {{ conversions['impression']|json_encode|raw }}
                 },
                 {
                     color: '#878787',
