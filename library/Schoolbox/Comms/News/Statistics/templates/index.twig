@@ -1,4 +1,13 @@
 <script type="text/javascript" src="/javascript/components/highcharts-release/highcharts.js"></script>
+<script>
+    $(function() {
+        $('[data-cumulative]').DataTable({
+            info: false,
+            paging: false,
+            searching: false
+        });
+    });
+</script>
 
 <div class="row">
     <div class="small-12 columns">
@@ -10,16 +19,6 @@
     <div class="small-12 island" id="cumulatives">
         <h2 class="subheader">Cumulative Summary</h2>
         <p class="meta">Overall cumulative statistics from all time.</p>
-
-        <script>
-            $(function() {
-                $('#cumulatives [data-cumulative]').DataTable({
-                    info: false,
-                    paging: false,
-                    searching: false
-                });
-            });
-        </script>
 
         <section>
             {% include '@commsNewsStatistics/cumulative-summary.twig' with {
