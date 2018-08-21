@@ -319,13 +319,13 @@ class ImpressionsConversionsOpens
             ]
         ]);
 
-        $daily = [];
+        $historic = [];
 
         foreach ($statistics as $statistic) {
-            $daily[] = $this->summariseDailyStatistics($statistic);
+            $historic[] = $this->summariseDailyStatistics($statistic);
         }
 
-        return $daily;
+        return $historic;
     }
 
 

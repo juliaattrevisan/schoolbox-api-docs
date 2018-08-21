@@ -7,9 +7,19 @@
 </div>
 
 <div class="row">
-    <div class="small-12 island">
+    <div class="small-12 island" id="cumulatives">
         <h2 class="subheader">Cumulative Summary</h2>
         <p class="meta">Overall cumulative statistics from all time.</p>
+
+        <script>
+            $(function() {
+                $('#cumulatives [cumulative]').DataTable({
+                    info: false,
+                    paging: false,
+                    searching: false
+                });
+            });
+        </script>
 
         <section>
             {% include '@commsNewsStatistics/cumulative-summary.twig' with {
@@ -28,6 +38,14 @@
 <div class="row">
     <div class="small-12 island">
         <h2 class="subheader">Historical Dailies</h2>
+
+        <section>
+            {% for daily in historic %}
+            {% include '@commsNewsStatistics/cumulative-historic.twig' with {
+                cumulative: daily
+            } %}
+            {% endfor %}
+        </section>
     </div>
 </div>
 
