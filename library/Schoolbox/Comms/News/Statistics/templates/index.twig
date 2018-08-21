@@ -13,7 +13,7 @@
 
         <script>
             $(function() {
-                $('#cumulatives [cumulative]').DataTable({
+                $('#cumulatives [data-cumulative]').DataTable({
                     info: false,
                     paging: false,
                     searching: false
@@ -31,20 +31,6 @@
             {% include '@commsNewsStatistics/referrer-demographic.twig' with {
                 referrerDemographic: referrerDemographic
             } %}
-        </section>
-    </div>
-</div>
-
-<div class="row">
-    <div class="small-12 island">
-        <h2 class="subheader">Historical Dailies</h2>
-
-        <section>
-            {% for daily in historic %}
-            {% include '@commsNewsStatistics/cumulative-historic.twig' with {
-                cumulative: daily
-            } %}
-            {% endfor %}
         </section>
     </div>
 </div>
@@ -73,4 +59,16 @@
     </div>
 </div>
 
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Historical Dailies</h2>
 
+        <section>
+            {% for daily in historic %}
+                {% include '@commsNewsStatistics/cumulative-historic.twig' with {
+                    cumulative: daily
+                } %}
+            {% endfor %}
+        </section>
+    </div>
+</div>
