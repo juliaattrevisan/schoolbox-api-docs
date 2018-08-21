@@ -63,7 +63,6 @@ class ValidDescriptorRow
                 // Accounts for both ascending and descending possibilities
                 if(null !== $prevDiff && (($prevDiff > 0 && $diff < 0) || ($prevDiff < 0 && $diff > 0))) {
                     return false;
-                    break;
                 }
                 $prevDiff = $diff;
             }
