@@ -315,6 +315,7 @@
         function descValues(descriptor) {
             return $(descriptor).attr('value');
         }
+        console.log('Inside descriptorsAreMonotonic');
 
         // Remove any descriptors from the list that don't have values
         // since value-less descriptors are permitted in amongst valued descriptors
@@ -347,7 +348,7 @@
 
     $.validator.addMethod('noDecimalPlacesWithMarkRange', function(value, element) {
         var descHasDecimals = element.match(/\.\d+$/);
-        console.log(descHasDecimals);
+        console.log("Inside noDecimalPlacesWithMarkRange");
         if ($("#useMarkRange").is(":checked") && descHasDecimals) {
             return false;
         }
