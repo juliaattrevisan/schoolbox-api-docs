@@ -44,6 +44,19 @@
 
     $(function () {
 
+
+
+
+        $( "#assessmentForm" ).validate({
+            rules: {
+                "[data-descriptor-value]": {
+                    noDecimalPlacesWithMarkRange: true,
+                    descriptorsAreMonotonic: true
+                }
+            }
+        });
+
+
         $('#{{ rubricId }}').rubricEditable({
             url: '{{ routeLookup("rubric.create") }}',
             rubricId: '{{ rubric.id }}',
