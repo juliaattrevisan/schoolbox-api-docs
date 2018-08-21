@@ -52,9 +52,7 @@ class Controller extends Base
      *
      * @param News\Model $article
      * @throws \Alaress\Database\Exception
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Aura\Di\Exception\ServiceNotFound
-     * @throws \UnderflowException
      */
     public function getOverview(News\Model $article)
     {
@@ -62,33 +60,36 @@ class Controller extends Base
         $accuracy = $this->getRequest()->query['accuracy'];
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsStatistics/index.twig', [
+            'article' => $article,
 
-            /* Cumulative summary
+            /* Overall Cumulative summary
              */
             'cumulative' => $impressionsConversionsOpens->fetchCumulative($article),
 
-            /* Referrer Demographics
+            /* Overall Referrer Demographics
              */
             'referrerDemographic' => $impressionsConversionsOpens->fetchReferrerDemographic($article),
+
+            /* Accuracy selector
+             */
+            'accuracies' => ImpressionsConversionsOpens::ACCURACIES,
+            'accuracy' => $accuracy,
+
+            /* Conversions, Impressions vs TIme
+             */
+            'conversions' => $impressionsConversionsOpens->fetchConversions($article, $accuracy),
+
+            /* Conversion Ratio Chronological
+             */
+            'conversionRatio' => $impressionsConversionsOpens->fetchConversionRatio($article, $accuracy),
+
+            /* Interaction Referrers This Period
+             */
+            'referrersThisPeriod' => $impressionsConversionsOpens->fetchInteractionReferrers($article),
 
             /* Historical Dailies
              */
             'historic' => $impressionsConversionsOpens->fetchHistoric($article),
-
-            /* Conversions Chronological
-             */
-            'conversions' => $impressionsConversionsOpens->fetchConversions($article, $accuracy),
-
-            /* Referrer Chronological
-             */
-            'article' => $article,
-            'accuracies' => ImpressionsConversionsOpens::ACCURACIES,
-            'accuracy' => $accuracy,
-            'series' => $impressionsConversionsOpens->fetchInteractionReferrers($article, $accuracy),
-
-            /* Conversion Ratio Chronological
-             */
-            'conversionRatio' => $impressionsConversionsOpens->fetchConversionRatio($article, $accuracy)
         ])->setTitle("Statistics for {$article->getTitle()}"));
     }
 }

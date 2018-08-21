@@ -566,33 +566,23 @@ class ImpressionsConversionsOpens
 
 
     /**
-     * Assemble all the granular Impressions, Conversions and direct Opens for $article
+     * Fetch the impressions/conversions for each referrer type for all the granular data in this period
      *
      * @param News\Model  $article
-     * @param string|null $accuracy
      * @return array
      * @throws \Alaress\Database\Exception
      */
-    public function fetchInteractionReferrers(News\Model $article, ?string $accuracy = self::DEFAULT_ACCURACY): array
+    public function fetchInteractionReferrers(News\Model $article): array
     {
-        /* Determine a sane value
-         */
-        $accuracySql = self::ACCURACIES[$this->assertAccuracy($accuracy)];
-
-        /* Get all the timestamps that have content - because of the way highcharts stacks its data
-         * I need to initialise the container with all the possibilities and stack categorised data in-order
-         */
         $statement = $this->database->prepareQuery("
             SELECT 
-                1000*UNIX_TIMESTAMP(CONCAT({$accuracySql})) AS timestamp,
                 COUNT(*) AS num,
-                `type`,
+                `type`, 
                 `referrer`
             FROM {$this->statisticsMapper->getTable()}
             WHERE article_id = :articleId
             AND deleted_at IS NULL
-            GROUP BY timestamp, `type`, referrer
-            ORDER BY timestamp
+            GROUP BY `type`, referrer
         ");
 
         $statement->execute([
@@ -613,10 +603,12 @@ class ImpressionsConversionsOpens
 
             /* Stack it
              */
-            $data[$type][$referrer][] = [(int)$row['timestamp'], (int)$row['num'], date("Y-m-d H:i:s", $row['timestamp']/1000)];
+            $data[$type][$referrer] = (int)$row['num'];
         }
 
-        return $data;
+        return array_map(function($values) {
+            return array_values($values);
+        }, $data);
     }
 
 

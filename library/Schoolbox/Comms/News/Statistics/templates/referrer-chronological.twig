@@ -1,12 +1,11 @@
 {##
- # Interaction Referrers vs Time
+ # Interaction Referrers This Period
  #
- # A breakdown of total referrers for Impressions and Conversions, charted over time
+ # A breakdown of total referrers for Impressions and Conversions this period
  #
  # @param News\Model $article
  # @param array series
  # @param array conversionRatio
- # @param int accuracy
  #}
 <script>
     $(function() {
@@ -26,18 +25,8 @@
                 itemMarginBottom: 8
             },
 
-            plotOptions: {
-                column: {
-                    stacking: 'normal'
-                }
-            },
-
-            time: {
-                useUTC: false
-            },
-
             title: {
-                text: 'Interaction Referrers vs Time'
+                text: 'Interaction Referrers This Period'
             },
 
             tooltip: {
@@ -45,114 +34,27 @@
             },
 
             xAxis: {
-
-                {# We don't care about seconds/milliseconds in display
-                 # Our highest granularity is Minutes.
-                 #}
-                dateTimeLabelFormats: {
-                    millisecond: '%l:%M%P',
-                    second: '%l:%M%P',
-                    minute: '%l:%M%P',
-                    hour: '%l:%M%P'
-                },
-                title: {
-                    text: 'Date'
-                },
-                type: 'datetime'
+                categories: ['Dashboard', 'Homepage', 'Index', 'Archive', 'Email']
             },
 
-            yAxis: [
-                {
-                    allowDecimals: false,
-                    min: 0,
-                    title: {
-                        text: 'Number of interactions'
-                    }
-                },
-                {
-                    allowDecimals: true,
-                    labels: {
-                        style: {
-                            color: '#629e51'
-                        }
-                    },
-                    lineColor: '#629e51',
-                    lineWidth: 1,
-                    max: 100,
-                    min: 0,
-                    title: {
-                        style: {
-                            color: '#629e51'
-                        },
-                        text: 'Conversion Ratio This Period (%)'
-                    },
-                    opposite: true
+            yAxis: {
+                allowDecimals: false,
+                min: 0,
+                title: {
+                    text: 'Quantity'
                 }
-            ],
+            },
 
             series: [
                 {
-                    color: '#f9e2d2',
-                    name: 'Impressions/Dashboard',
-                    data: {{ series['impression']['dashboard']|json_encode|raw }}
+                    color: '#82b5d8',
+                    name: 'Conversions',
+                    data: {{ referrersThisPeriod['conversion']|json_encode|raw }}
                 },
                 {
                     color: '#f2c96d',
-                    name: 'Impressions/Homepage',
-                    data: {{ series['impression']['homepage']|json_encode|raw }}
-                },
-                {
-                    color: '#f9934e',
-                    name: 'Impressions/Index',
-                    data: {{ series['impression']['index']|json_encode|raw }}
-                },
-                {
-                    color: '#bf1b00',
-                    name: 'Impressions/Archive',
-                    data: {{ series['impression']['archive']|json_encode|raw }}
-                },
-                {
-                    color: '#58140c',
-                    name: 'Impressions/Email',
-                    data: {{ series['impression']['email']|json_encode|raw }}
-                },
-                {
-                    color: '#82b5d8',
-                    name: 'Conversions/Dashboard',
-                    data: {{ series['conversion']['dashboard']|json_encode|raw }}
-                },
-                {
-                    color: '#1f78c1',
-                    name: 'Conversions/Homepage',
-                    data: {{ series['conversion']['homepage']|json_encode|raw }}
-                },
-                {
-                    color: '#0a437c',
-                    name: 'Conversions/Index',
-                    data: {{ series['conversion']['index']|json_encode|raw }}
-                },
-                {
-                    color: '#806eb7',
-                    name: 'Conversions/Archive',
-                    data: {{ series['conversion']['archive']|json_encode|raw }}
-                },
-                {
-                    color: '#ba43a9',
-                    name: 'Conversions/Email',
-                    data: {{ series['conversion']['email']|json_encode|raw }}
-                },
-                {
-                    color: '#878787',
-                    name: 'Non-referred Opens',
-                    data: {{ series['open']['unknown']|json_encode|raw }}
-                },
-                {
-                    color: '#629e51',
-                    lineWidth: 1,
-                    name: 'Conversion Ratio This Period (%)',
-                    type: 'spline',
-                    yAxis: 1,
-                    data: {{ conversionRatio|json_encode|raw }}
+                    name: 'Impressions',
+                    data: {{ referrersThisPeriod['impression']|json_encode|raw }}
                 }
             ]
         });
