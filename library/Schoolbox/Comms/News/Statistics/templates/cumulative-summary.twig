@@ -14,7 +14,7 @@
         <div class="small-12 medium-3 columns">
             <p class="infographic">
                 <span class="title">{% block cumulativeDateHeading %}First Open{% endblock %}</span>
-                <span class="value">{% block cumulativeDateValue %}{{ cumulative.firstOpen|date('j M') }}{% endblock %}</span>
+                <span class="value">{{ cumulative.date|date('j M') }}</span>
             </p>
         </div>
         <div class="small-12 medium-3 columns">

@@ -293,7 +293,7 @@ class ImpressionsConversionsOpens
         $referrerRatio = $this->calculateReferrerRatios($breakdown);
 
         return [
-            'firstOpen' => $firstOpen,
+            'date' => $firstOpen,
             'breakdown' => [
                 'grid' => $breakdown,
                 'ratio' => $referrerRatio
@@ -362,6 +362,7 @@ class ImpressionsConversionsOpens
         $referrerRatio = $this->calculateReferrerRatios($breakdown);
 
         return [
+            'date' => $statistic->getDate(),
             'breakdown' => [
                 'grid' => $breakdown,
                 'ratio' => $referrerRatio
