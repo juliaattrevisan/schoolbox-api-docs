@@ -64,13 +64,13 @@
         <h2 class="subheader">Historic Dailies</h2>
         <p class="meta">Daily cumulative statistics from all time.</p>
 
+        {% for daily in historic %}
         <section>
-            {% for daily in historic %}
-                {% include '@commsNewsStatistics/cumulative-historic.twig' with {
-                    cumulative: daily
-                } %}
-            {% endfor %}
+            {% include '@commsNewsStatistics/cumulative-historic.twig' with {
+                cumulative: daily
+            } %}
         </section>
+        {% endfor %}
     </div>
 </div>
 {% endif %}
