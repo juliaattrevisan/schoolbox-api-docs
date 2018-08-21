@@ -97,7 +97,7 @@
                         <h2>Browse Audience</h2>
                         <a class="close-reveal-modal" aria-label="Close">×</a>
 
-                        <div v-show="pageShow[0]">
+                        <div v-show="pageShow.index">
                             <div class="small-12 medium-4 columns" v-for="audienceOption in audienceOptions">
                                 <button class="button-block" @click="changePage(audienceOption)">
                                     <i :class="'icon-' + audienceOption.icon"></i>
@@ -106,9 +106,9 @@
                             </div>
                         </div>
 
-                        <div v-show="pageShow[1]">
+                        <div v-show="pageShow.valueSelect">
                             <ul class="breadcrumb" v-show="writeOnly">
-                                <li><a href="#" @click.prevent="showPage(0)">Browse Audience</a></li>
+                                <li><a href="#" @click.prevent="showPage('index')">Browse Audience</a></li>
                                 <li class="active"><a>${ selectedAudienceOption.namePlural }</a></li>
                             </ul>
 
@@ -394,10 +394,10 @@
             },
 
             // Modal sections showing and hiding
-            pageShow: [
-                true,
-                false
-            ],
+            pageShow: {
+                'index': true,
+                'valueSelect': false
+            },
 
             // The option selected by the user from the initial modal screen
             selectedAudienceOption: {},
@@ -434,7 +434,7 @@
              */
             openBrowseModal: function () {
                 // Reset everythang
-                this.showPage(0);
+                this.showPage('index');
                 this.resetModal();
 
                 // Open the modal
@@ -464,7 +464,7 @@
                 self.resetModal();
 
                 // Show the page
-                self.showPage(1);
+                self.showPage('valueSelect');
 
                 // Update the selected option
                 self.selectedAudienceOption = audienceOption;
@@ -542,8 +542,13 @@
              * @param page
              */
             showPage: function (page) {
-                this.$set(this.pageShow, 0, false);
-                this.$set(this.pageShow, 1, false);
+                // Set all pages to false to start
+                var self = this;
+                Object.keys(this.pageShow).forEach(function(page) {
+                    self.pageShow[page] = false;
+                });
+
+                // Set the specified page to true
                 this.$set(this.pageShow, page, true);
             },
 
