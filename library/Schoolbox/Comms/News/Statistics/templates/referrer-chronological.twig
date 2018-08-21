@@ -34,7 +34,7 @@
             },
 
             xAxis: {
-                categories: ['Dashboard', 'Homepage', 'Index', 'Archive', 'Email']
+                categories: ['Dashboard', 'Homepage', 'Index', 'Archive', 'Email', 'Other']
             },
 
             yAxis: {
@@ -55,6 +55,11 @@
                     color: '#f2c96d',
                     name: 'Impressions',
                     data: {{ referrersThisPeriod['impression']|json_encode|raw }}
+                },
+                {
+                    color: '#888888',
+                    name: 'Non-referred Opens',
+                    data: {{ referrersThisPeriod['open']|json_encode|raw }}
                 }
             ]
         });
