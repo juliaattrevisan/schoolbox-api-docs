@@ -465,6 +465,85 @@ class RubricMapper
 
 
     /**
+     * Saves this grid to the database.
+     *
+     * @param Grid $grid
+     * @throws MapperException if something happens in the mapper
+     */
+    public function persistGrid(Grid $grid): void
+    {
+        // The mappers still deal in submission boxes, but we deal in levels
+        // If this exceptioned out, it was never meant to be
+        $submissionBox = SubmissionBoxMapper::getInstance()->findOneByColumn(
+            'assessment_id',
+            $grid->getAssessment()->getId()
+        );
+
+        // juuust in case
+//        $rubric->setSubmissionBox($submissionBox);
+//
+//        // TODO some way to wrap all this in a transaction would be nice... -_-;
+//        $existingLevelIds    = LevelMapper::getInstance()->findIdsByColumn('box_id', $submissionBox->getId());
+//        $existingDescriptors = DescriptorMapper::getInstance()->findByColumn('level_id', $existingLevelIds);
+//        $existingDescriptors = $existingDescriptors->map(function (Descriptor $d) {
+//            return clone $d;
+//        });
+
+        // first, persist the row and column headers (criteria and levels, respectively)
+        // Group and criterion saving doesn't happen here; it should've already
+        // happened when saving the rowset
+//        GroupMapper::getInstance()->save($rubric->getORMGroups());
+//        CriterionMapper::getInstance()->save($criteria = $rubric->getORMCriteria());
+        $levelMapper   = LevelMapper::getInstance();
+        $levelModels   = $levelMapper->createCollection();
+        $levelSequence = 1;
+        foreach ($grid->getLevels() as $level) {
+            $levelModel = $levelMapper->createModel()
+                ->setId($level->getId())
+                ->setName($level->getId())
+                ->setSubmissionBox($submissionBox)
+                ->setSequence($levelSequence++);
+            $levelModels[$level->getId()] = $levelModel;
+            $levelSequence++;
+        }
+        // TODO clear unused levels: use that tidyUp method
+        $levelMapper->save($levelModels);
+
+//        LevelMapper::getInstance()->save($levels = $rubric->getORMLevels());
+
+
+        // usages are a join table with a sequence, not a strict "object" - as such, we can purge the relevant records and simply re-create them
+        // TODO consider removing submission_box_id, associating with group ID instead
+        CriterionUsageMapper::getInstance()->deleteByColumn('submission_box_id', $submissionBox->getId());
+        CriterionUsageMapper::getInstance()->save($usages = $rubric->getORMCriterionUsages());
+
+        // ditto group usages
+        GroupUsageMapper::getInstance()->deleteByColumn('submission_box_id', $submissionBox->getId());
+        GroupUsageMapper::getInstance()->save($rubric->getORMGroupUsages());
+
+        // finally, now that everything else is saved, save the descriptors
+        $descIds = DescriptorMapper::getInstance()->save($descs = $rubric->getORMDescriptors());
+
+        $this->checkDescriptorValueChanges($existingDescriptors, $descs);
+
+        // wash up before dinner, kids
+
+        // remove all levels that have zero descriptors attached - extract from the descriptors
+        $seenLevels = [];
+        foreach ($descs as $desc) {
+            $seenLevels[$desc->getLevel()->getId()] = true;
+        }
+        $seenLevels = array_keys($seenLevels);
+
+        $this->tidyUp(LevelMapper::getInstance(), ['box_id' => $submissionBox->getId()], $seenLevels);
+
+        // remove all descriptors that are on this box, but are not among the descriptors we just saved (it indicates blankness / unused-ness)
+        $levelIds = LevelMapper::getInstance()->findIdsByColumn('box_id', $submissionBox->getId(), ['deleted' => true]);
+        $this->tidyUp(DescriptorMapper::getInstance(), ['level_id' => $levelIds], $descIds);
+    }
+
+
+    /**
      * Retrieve a marked grid for the given feedback.
      *
      * @param IFeedback $feedback
