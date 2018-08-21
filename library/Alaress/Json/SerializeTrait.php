@@ -7,7 +7,7 @@
  */
 
 namespace Alaress\Json;
-use ReflectionObject;
+use Alaress\Json\Decorator\IDecorator;
 
 
 /**
@@ -28,49 +28,15 @@ trait SerializeTrait
      * The map given will be a hydration map, which should be passed to any sub-models to instruct them as to
      * how they ought return their data for the context given
      *
-     * @param array $map
+     * @param IDecorator[] $decorators
      * @return array
      */
-    public function jsonSerialize(array $map = null)
+    public function jsonSerialize(IDecorator... $decorators)
     {
-        if ($map === null) {
-            $map = $this->getDefaultJsonMap();
-        }
-
         $json = [];
 
-        $ro = new ReflectionObject($this);
-
-        foreach ($map as $mapKey => $mapValue) {
-
-            // integer mapKey means treat as scalar / default
-            $field = \is_int($mapKey) ? $mapValue : $mapKey;
-
-            $methodName = "get{$field}";
-
-            if (!$ro->hasMethod($methodName)) {
-                continue;
-            }
-
-            $method = $ro->getMethod($methodName);
-
-            if (!$method->isPublic()) {
-                continue;
-            }
-
-            // obtain the value
-            $result = $method->invoke($this);
-
-            if ($result instanceof \JsonSerializable) {
-                if (\is_array($mapValue)) {
-                    $json[$field] = $result->jsonSerialize($mapValue);
-                } else {
-                    $json[$field] = $result->jsonSerialize();
-                }
-            } else {
-                $json[$field] = $result;
-            }
-
+        foreach ($decorators as $decorator) {
+            $json = $decorator->decorate($json, $this);
         }
 
         return $json;
