@@ -251,12 +251,17 @@ class Controller extends BaseController
      */
     public function download()
     {
-        $post     = $this->getRequest()->post->get('rb');
+        $post     = $this->request->post->get('rb');
         $boxId    = key($post);
         $box      = SubmissionBoxMapper::getInstance()->findById($boxId);
         $grid     = (new Factory())->buildFromPostData($post, false);
         $basename = (new Url($box->getName()))->getSlug();
-        $content  = $this->array2csv($grid->toGrid($box->isMarkedPerRubricGroup(), $box->isMarkedUsingRange()));
+        $content  = $this->array2csv(
+            $grid->toGrid(
+                $this->request->post->getBool('markPerCapability') ?? false,
+                $this->request->post->getBool('useMarkRange') ?? false
+            )
+        );
 
         $headers  = $this->getResponse()->headers;
 
