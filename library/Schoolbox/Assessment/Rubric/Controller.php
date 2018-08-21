@@ -216,7 +216,7 @@ class Controller extends BaseController
 
             // attempt to build the grid
             $maxLevels = $this->getDi()->get('config')->get('rubric_max_levels');
-            [$grid, $hasCustomMaxValue] = $this->getMapper()->buildFromCSV($file, $folderId, $maxLevels);
+            [$grid, $markPerCapability, $useMarkRange] = $this->getMapper()->buildFromCSV($file, $folderId, $maxLevels);
             $grid->setSubmissionBox($box);
 
         } catch (\Exception $e) {
@@ -232,7 +232,8 @@ class Controller extends BaseController
         $context = [
             'formField'              => $post->get('formField', 'rb'),
             'rubric'                 => $grid->toContext(),
-            'usingMarkPerCapability' => $hasCustomMaxValue || $post->getBool('markPerCapability', false),
+            'usingMarkPerCapability' => $markPerCapability || $post->getBool('markPerCapability', false),
+            'usingMarkRange'         => $useMarkRange,
         ];
 
         $this->getResponse()->content->set([

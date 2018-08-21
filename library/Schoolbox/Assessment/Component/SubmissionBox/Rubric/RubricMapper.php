@@ -587,8 +587,9 @@ class RubricMapper
      *               1: bool: does the rubric have customised max mark per group values?
      *                        (required as the rubric object doesn't store this separately
      *                         from their actual value)
+     *               2: bool: does the rubric have mark ranges switched on?
      */
-    public function buildFromCSV(IStorage $file, $folderId, $maxLevels)
+    public function buildFromCSV(IStorage $file, $folderId, $maxLevels): array
     {
         $square = [];
 
@@ -787,7 +788,7 @@ class RubricMapper
         /** @var Rubric $rubric */
         $rubric = $this->factory->buildFromPostData([0 => $postdata], true);
 
-        return [$rubric, $markPerCapability];
+        return [$rubric, $markPerCapability, $useMarkRange];
     }
 
     /**
