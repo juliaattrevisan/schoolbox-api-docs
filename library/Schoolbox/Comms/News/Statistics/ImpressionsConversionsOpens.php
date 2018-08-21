@@ -271,11 +271,9 @@ class ImpressionsConversionsOpens
             $numConversions += $daily['numConversions'];
             $numImpressions += $daily['numImpressions'];
 
-            $index = $daily['breakdown']['grid'][Mapper::TYPE_CONVERSION];
-
             foreach([Mapper::TYPE_CONVERSION, Mapper::TYPE_IMPRESSION] as $currentType) {
                 foreach (Mapper::REFERRERS as $currentReferrer) {
-                    $breakdown[$currentType][$currentReferrer] += $index[$currentReferrer];
+                    $breakdown[$currentType][$currentReferrer] += $daily['breakdown']['grid'][$currentType][$currentReferrer];
                 }
             }
 
