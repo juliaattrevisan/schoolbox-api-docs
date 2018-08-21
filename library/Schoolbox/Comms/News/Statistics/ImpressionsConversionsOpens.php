@@ -233,7 +233,7 @@ class ImpressionsConversionsOpens
 
 
     /**
-     * Fetch Cumulative data
+     * Fetch Cumulative data across the lifetime of an article
      *
      * @param News\Model $article
      * @return array
@@ -261,41 +261,37 @@ class ImpressionsConversionsOpens
                 $firstOpen = $current->getDate();
             }
 
-            $numImpressions += $current->findTotalImpressions();
-            $numConversions += $current->findTotalConversions();
+            /* Aggregate from daily statistics
+             */
+            $daily = $this->summariseDailyStatistics($current);
 
-            $breakdown[Mapper::TYPE_CONVERSION][Mapper::REFERRER_DASHBOARD] += $current->getNumConversionsDashboard();
-            $breakdown[Mapper::TYPE_CONVERSION][Mapper::REFERRER_HOMEPAGE] += $current->getNumConversionsHomepage();
-            $breakdown[Mapper::TYPE_CONVERSION][Mapper::REFERRER_INDEX] += $current->getNumConversionsIndex();
-            $breakdown[Mapper::TYPE_CONVERSION][Mapper::REFERRER_ARCHIVE] += $current->getNumConversionsArchive();
-            $breakdown[Mapper::TYPE_CONVERSION][Mapper::REFERRER_EMAIL] += $current->getNumConversionsEmail();
+            $numConversions += $daily['numConversions'];
+            $numImpressions += $daily['numImpressions'];
 
-            $breakdown[Mapper::TYPE_IMPRESSION][Mapper::REFERRER_DASHBOARD] += $current->getNumImpressionsDashboard();
-            $breakdown[Mapper::TYPE_IMPRESSION][Mapper::REFERRER_HOMEPAGE] += $current->getNumImpressionsHomepage();
-            $breakdown[Mapper::TYPE_IMPRESSION][Mapper::REFERRER_INDEX] += $current->getNumImpressionsIndex();
-            $breakdown[Mapper::TYPE_IMPRESSION][Mapper::REFERRER_ARCHIVE] += $current->getNumImpressionsArchive();
-            $breakdown[Mapper::TYPE_IMPRESSION][Mapper::REFERRER_EMAIL] += $current->getNumImpressionsEmail();
+            $index = $daily['breakdown']['grid'][Mapper::TYPE_CONVERSION];
+            
+            $breakdown[Mapper::TYPE_CONVERSION][Mapper::REFERRER_DASHBOARD] += $index[Mapper::REFERRER_DASHBOARD];
+            $breakdown[Mapper::TYPE_CONVERSION][Mapper::REFERRER_HOMEPAGE] += $index[Mapper::REFERRER_HOMEPAGE];
+            $breakdown[Mapper::TYPE_CONVERSION][Mapper::REFERRER_INDEX] += $index[Mapper::REFERRER_INDEX];
+            $breakdown[Mapper::TYPE_CONVERSION][Mapper::REFERRER_ARCHIVE] += $index[Mapper::REFERRER_ARCHIVE];
+            $breakdown[Mapper::TYPE_CONVERSION][Mapper::REFERRER_EMAIL] += $index[Mapper::REFERRER_EMAIL];
+
+            $breakdown[Mapper::TYPE_IMPRESSION][Mapper::REFERRER_DASHBOARD] += $index[Mapper::REFERRER_DASHBOARD];
+            $breakdown[Mapper::TYPE_IMPRESSION][Mapper::REFERRER_HOMEPAGE] += $index[Mapper::REFERRER_HOMEPAGE];
+            $breakdown[Mapper::TYPE_IMPRESSION][Mapper::REFERRER_INDEX] += $index[Mapper::REFERRER_INDEX];
+            $breakdown[Mapper::TYPE_IMPRESSION][Mapper::REFERRER_ARCHIVE] += $index[Mapper::REFERRER_ARCHIVE];
+            $breakdown[Mapper::TYPE_IMPRESSION][Mapper::REFERRER_EMAIL] += $index[Mapper::REFERRER_EMAIL];
 
             $breakdown[Mapper::TYPE_OPEN] += $current->getNumOpens();
         }
 
         /* Calculate overall conversion ratio
          */
-        $conversionRatio = 0.00;
+        $conversionRatio = $this->calculateConversionRatio($numConversions, $numImpressions);
 
-        if ($numImpressions && $numConversions) {
-            $conversionRatio = $this->percentage($numConversions, $numImpressions, 1);
-        }
-
-        /* Calculate Conversion ratios for each referrer type
-        */
-        $referrers = Mapper::REFERRERS;
-
-        $referrerRatio = [];
-
-        foreach ($referrers as $referrer) {
-            $referrerRatio[$referrer] = $this->percentage($breakdown[Mapper::TYPE_CONVERSION][$referrer], $breakdown[Mapper::TYPE_IMPRESSION][$referrer]);
-        }
+        /* Calculate conversion ratios for each referrer type
+         */
+        $referrerRatio = $this->calculateReferrerRatios($breakdown);
 
         return [
             'firstOpen' => $firstOpen,
@@ -311,6 +307,8 @@ class ImpressionsConversionsOpens
 
 
     /**
+     * Fetch Cumulative data per day during the lifetime of an article
+     *
      * @param News\Model $article
      * @return array
      */
@@ -338,29 +336,23 @@ class ImpressionsConversionsOpens
      */
     private function summariseDailyStatistics(Cumulative\Model $statistic): array
     {
-
-        /* Raw number of Conversions and Impressions
-         */
-        $numImpressions = 0;
-        $numConversions = 0;
+        $numConversions = $statistic->findTotalConversions();
+        $numImpressions = $statistic->findTotalImpressions();
         $breakdown = [];
 
-        $numImpressions += $statistic->findTotalImpressions();
-        $numConversions += $statistic->findTotalConversions();
+        $breakdown[Mapper::TYPE_CONVERSION][Mapper::REFERRER_DASHBOARD] = $statistic->getNumConversionsDashboard();
+        $breakdown[Mapper::TYPE_CONVERSION][Mapper::REFERRER_HOMEPAGE] = $statistic->getNumConversionsHomepage();
+        $breakdown[Mapper::TYPE_CONVERSION][Mapper::REFERRER_INDEX] = $statistic->getNumConversionsIndex();
+        $breakdown[Mapper::TYPE_CONVERSION][Mapper::REFERRER_ARCHIVE] = $statistic->getNumConversionsArchive();
+        $breakdown[Mapper::TYPE_CONVERSION][Mapper::REFERRER_EMAIL] = $statistic->getNumConversionsEmail();
 
-        $breakdown[Mapper::TYPE_CONVERSION][Mapper::REFERRER_DASHBOARD] += $statistic->getNumConversionsDashboard();
-        $breakdown[Mapper::TYPE_CONVERSION][Mapper::REFERRER_HOMEPAGE] += $statistic->getNumConversionsHomepage();
-        $breakdown[Mapper::TYPE_CONVERSION][Mapper::REFERRER_INDEX] += $statistic->getNumConversionsIndex();
-        $breakdown[Mapper::TYPE_CONVERSION][Mapper::REFERRER_ARCHIVE] += $statistic->getNumConversionsArchive();
-        $breakdown[Mapper::TYPE_CONVERSION][Mapper::REFERRER_EMAIL] += $statistic->getNumConversionsEmail();
+        $breakdown[Mapper::TYPE_IMPRESSION][Mapper::REFERRER_DASHBOARD] = $statistic->getNumImpressionsDashboard();
+        $breakdown[Mapper::TYPE_IMPRESSION][Mapper::REFERRER_HOMEPAGE] = $statistic->getNumImpressionsHomepage();
+        $breakdown[Mapper::TYPE_IMPRESSION][Mapper::REFERRER_INDEX] = $statistic->getNumImpressionsIndex();
+        $breakdown[Mapper::TYPE_IMPRESSION][Mapper::REFERRER_ARCHIVE] = $statistic->getNumImpressionsArchive();
+        $breakdown[Mapper::TYPE_IMPRESSION][Mapper::REFERRER_EMAIL] = $statistic->getNumImpressionsEmail();
 
-        $breakdown[Mapper::TYPE_IMPRESSION][Mapper::REFERRER_DASHBOARD] += $statistic->getNumImpressionsDashboard();
-        $breakdown[Mapper::TYPE_IMPRESSION][Mapper::REFERRER_HOMEPAGE] += $statistic->getNumImpressionsHomepage();
-        $breakdown[Mapper::TYPE_IMPRESSION][Mapper::REFERRER_INDEX] += $statistic->getNumImpressionsIndex();
-        $breakdown[Mapper::TYPE_IMPRESSION][Mapper::REFERRER_ARCHIVE] += $statistic->getNumImpressionsArchive();
-        $breakdown[Mapper::TYPE_IMPRESSION][Mapper::REFERRER_EMAIL] += $statistic->getNumImpressionsEmail();
-
-        $breakdown[Mapper::TYPE_OPEN] += $statistic->getNumOpens();
+        $breakdown[Mapper::TYPE_OPEN] = $statistic->getNumOpens();
 
         /* Calculate overall conversion ratio
          */
