@@ -479,12 +479,12 @@ class RubricMapper
             $grid->getAssessment()->getId()
         );
 
-        // juuust in case
-//        $rubric->setSubmissionBox($submissionBox);
-//
-//        // TODO some way to wrap all this in a transaction would be nice... -_-;
-//        $existingLevelIds    = LevelMapper::getInstance()->findIdsByColumn('box_id', $submissionBox->getId());
-//        $existingDescriptors = DescriptorMapper::getInstance()->findByColumn('level_id', $existingLevelIds);
+        // TODO some way to wrap all this in a transaction would be nice... -_-;
+        // (The answer exists: merge SA-6405)
+        $levelMapper         = LevelMapper::getInstance();
+        $descriptorMapper     = DescriptorMapper::getInstance();
+        $existingLevelIds    = $levelMapper->findIdsByColumn('box_id', $submissionBox->getId());
+        $existingDescriptors = DescriptorMapper::getInstance()->findByColumn('level_id', $existingLevelIds);
 //        $existingDescriptors = $existingDescriptors->map(function (Descriptor $d) {
 //            return clone $d;
 //        });
@@ -494,7 +494,6 @@ class RubricMapper
         // happened when saving the rowset
 //        GroupMapper::getInstance()->save($rubric->getORMGroups());
 //        CriterionMapper::getInstance()->save($criteria = $rubric->getORMCriteria());
-        $levelMapper   = LevelMapper::getInstance();
         $levelModels   = $levelMapper->createCollection();
         $levelSequence = 1;
         foreach ($grid->getLevels() as $level) {
@@ -521,7 +520,6 @@ class RubricMapper
         // TODO consider removing submission_box_id, associating with group ID instead
         $criterionUsageMapper = CriterionUsageMapper::getInstance();
         $groupUsageMapper     = GroupUsageMapper::getInstance();
-        $descriptorMapper     = DescriptorMapper::getInstance();
         $criterionMapper      = CriterionMapper::getInstance();
         $groupMapper          = GroupMapper::getInstance();
         $criterionUsageModels = $criterionUsageMapper->createCollection();
@@ -572,22 +570,25 @@ class RubricMapper
 //        // finally, now that everything else is saved, save the descriptors
 //        $descIds = DescriptorMapper::getInstance()->save($descs = $rubric->getORMDescriptors());
 
-        $this->checkDescriptorValueChanges($existingDescriptors, $descs);
+        // Cleanup steps:
+        // * invalidate changed descriptors
+
+        $this->checkDescriptorValueChanges($existingDescriptors, $descriptorModels);
 
         // wash up before dinner, kids
 
         // remove all levels that have zero descriptors attached - extract from the descriptors
         $seenLevels = [];
-        foreach ($descs as $desc) {
+        foreach ($descriptorModels as $desc) {
             $seenLevels[$desc->getLevel()->getId()] = true;
         }
         $seenLevels = array_keys($seenLevels);
 
-        $this->tidyUp(LevelMapper::getInstance(), ['box_id' => $submissionBox->getId()], $seenLevels);
+        $this->tidyUp($levelMapper, ['box_id' => $submissionBox->getId()], $seenLevels);
 
         // remove all descriptors that are on this box, but are not among the descriptors we just saved (it indicates blankness / unused-ness)
-        $levelIds = LevelMapper::getInstance()->findIdsByColumn('box_id', $submissionBox->getId(), ['deleted' => true]);
-        $this->tidyUp(DescriptorMapper::getInstance(), ['level_id' => $levelIds], $descIds);
+        $levelIds = $levelMapper->findIdsByColumn('box_id', $submissionBox->getId(), ['deleted' => true]);
+        $this->tidyUp($descriptorMapper, ['level_id' => $levelIds], $descriptorModels->getPropertyValues('id'));
     }
 
 
