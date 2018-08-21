@@ -66,6 +66,8 @@ class Factory
     /**
      * Construct a Rubric object based on form datum
      *
+     * @deprecated see `\Schoolbox\Assessment\Rubric\Grid\Factory::buildFromPostData`
+     *
      * @param array $formData
      * @param bool  $includeEmptyCriteria
      * @param bool $markPerCap

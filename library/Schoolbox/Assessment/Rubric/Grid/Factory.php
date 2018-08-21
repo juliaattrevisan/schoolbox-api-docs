@@ -8,6 +8,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\Grid;
 
+use Schoolbox\Assessment\Rubric\RowSet\Criterion;
+use Schoolbox\Assessment\Rubric\RowSet\Group;
 use Schoolbox\Learning\Assessment\IAssessable;
 
 /**
@@ -52,39 +54,62 @@ class Factory
             $grid->getLevels()->add($levelCache[$levelSequence]);
         }
 
+
+        // Must assume that all groups in formdata exist
+        // They will because the group was created when sending to the form
+
+
+        // Create cache of group usages
         /** @var Group[] $groupCache */
-        $groupCache = [ 0 => new Group(null, '', null) ];
+//        $groupCache = [
+//            0 => new Group(null, '', null)
+//        ];
 
         // cache groups
         foreach ($groups as $groupId => $groupData) {
             $groupName     = $groupData['name'];
             $groupMaxValue = isset($groupData['maxValue']) ? (float)$groupData['maxValue'] : null;
-            $groupCache[$groupId] = new Group($groupId, $groupName, $groupMaxValue);
+
+            $group = $grid->getRowSet()->getGroups()[$groupId]
+                ->setName($groupName);
+
+            $groupUsage = (new GroupUsage($group))
+                ->setMaxValue($groupMaxValue);
+
+            $grid->getGroupUsages()[$groupId] = $groupUsage;
+
+//            $groupCache[$groupId] = new Group($groupId, $groupName, $groupMaxValue);
         }
 
-        foreach ($criteria as $criterionId => $criterion) {
+        // Cache criteria
 
+
+        foreach ($criteria as $criterionId => $criterion) {
             $groupId          = $criterion['groupId'];
             $criterionEnabled = isset($criterion['on']) && $criterion['on'];
             $criterionName    = $criterion['name'];
 
+
+            $group = $grid->getRowSet()->getGroups()[$groupId];
+
             // spawn
-            $c = new Criterion($criterionId, $criterionName);
+            $criterion = $group->getCriteria()[$criterionId]
+                ->setName($criterionName);
 
-            // set readonliness
-            $c->setReadOnly(isset($criterion['readonly']) && $criterion['readonly']);
-
-            // retrieve from cache
-            $g = $groupCache[$groupId];
-
-            // cascade readonliness into group
-            if ($c->isReadOnly()) {
-                $g->setReadOnly(true);
-            }
-
-            if ($includeEmptyCriteria) {
-                $rubric->putCriterion($g, $c);
-            }
+//            // set readonliness
+//            $criterion->setReadOnly(isset($criterion['readonly']) && $criterion['readonly']);
+//
+//            // retrieve from cache
+//            $group = $grid->getRowSet();
+//
+//            // cascade readonliness into group
+//            if ($criterion->isReadOnly()) {
+//                $group->setReadOnly(true);
+//            }
+//
+//            if ($includeEmptyCriteria) {
+//                $rubric->putCriterion($group, $criterion);
+//            }
 
             if (!$criterionEnabled) {
                 continue;
@@ -104,7 +129,7 @@ class Factory
                 if (strlen($descriptorText) || strlen($descriptorValue)) {
                     $d = new Descriptor($descriptorText, $descriptorValue, $descriptorId);
                     try {
-                        $rubric->putDescriptor($g, $c, $l, $d);
+                        $rubric->putDescriptor($group, $criterion, $l, $d);
                     } catch (InvalidArgumentException $e) {
                         echo "Unable to put descriptor";
                     }
@@ -114,6 +139,6 @@ class Factory
 
         }
 
-        return $rubric;
+        return $grid;
     }
 }
