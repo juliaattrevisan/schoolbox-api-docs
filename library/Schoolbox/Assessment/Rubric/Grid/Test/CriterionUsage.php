@@ -55,7 +55,7 @@ class CriterionUsage extends TestCase
 
     /**
      * @dataProvider getTestRetrieveDescriptorData
-     * @covers \Schoolbox\Assessment\Rubric\Grid\CriterionUsage::retrieveDescriptor
+     * @covers       \Schoolbox\Assessment\Rubric\Grid\CriterionUsage::retrieveDescriptor
      *
      * @param RubricGrid\CriterionUsage  $criterionUsage
      * @param RubricGrid\Level           $level
@@ -104,7 +104,7 @@ class CriterionUsage extends TestCase
         $criterion2      = (new RowSet\Criterion())->setId(2)->setName('Criterion 2');
         $criterionUsage2 = new RubricGrid\CriterionUsage($criterion2);
 
-        yield 'criterion 2: no descriptors'          => [$criterionUsage2, null];
+        yield 'criterion 2: no descriptors' => [$criterionUsage2, null];
 
 
         $criterion3      = (new RowSet\Criterion())->setId(3)->setName('Criterion 3');
@@ -122,7 +122,7 @@ class CriterionUsage extends TestCase
 
     /**
      * @dataProvider getTestCalculateMaxValueData
-     * @covers \Schoolbox\Assessment\Rubric\Grid\CriterionUsage::calculateMaxValue
+     * @covers       \Schoolbox\Assessment\Rubric\Grid\CriterionUsage::calculateMaxValue
      *
      * @param RubricGrid\CriterionUsage $criterionUsage
      * @param float|null                $expected
@@ -368,7 +368,7 @@ class CriterionUsage extends TestCase
 
     /**
      * @dataProvider getTestApplyDescriptorMinValuesData
-     * @covers \Schoolbox\Assessment\Rubric\Grid\CriterionUsage::applyDescriptorMinValues
+     * @covers       \Schoolbox\Assessment\Rubric\Grid\CriterionUsage::applyDescriptorMinValues
      *
      * @param RubricGrid\CriterionUsage $criterionUsage
      * @param RubricGrid\Level          $level
@@ -432,7 +432,7 @@ class CriterionUsage extends TestCase
 
     /**
      * @dataProvider getTestApplyDescriptorMinValuesWithoutValueRange
-     * @covers \Schoolbox\Assessment\Rubric\Grid\CriterionUsage::applyDescriptorMinValues
+     * @covers       \Schoolbox\Assessment\Rubric\Grid\CriterionUsage::applyDescriptorMinValues
      *
      * @param RubricGrid\CriterionUsage $criterionUsage
      * @param RubricGrid\Level          $level
