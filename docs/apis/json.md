@@ -25,21 +25,30 @@ most cases unless your Model needs to serialize in a _very_ specific way.
 To implement, declare your model class as follows:
 
 ```php
-use JsonSerializable;
+use Alaress\Json\Serializable;
 use Alaress\Json\SerializeTrait;
+use Alaress\Json\Linkable;
 
-class MyModel implements JsonSerializable
+class MyModel implements Serializable, Linkable
 {
     use SerializableTrait;
     
-    protected function getDefaultJsonMap(): array
+    public function getDefaultJsonMap(): array
     {
         return [
             'propertyA',
             'propertyB'
         ];
     }
-    
+
+    public function getJsonApiLinks(): array
+    {
+        return [
+            'self' => [ 'example.getEntity', [ 'id' => $this->getId() ] ],
+        ];
+    }
+
+    public function getId() { /**/ }
     public function getPropertyA() { /**/ }
     public function getPropertyB() { /**/ }
 }
@@ -47,7 +56,7 @@ class MyModel implements JsonSerializable
 
 Note: ensure that whatever is declared in the JSON map array has corresponding `public` getters.
 
-You can now serialize this object in 2 ways (pretending this class has a constructor)
+You can now serialize this object in 2 ways
 
 ```php
 // option 1: use the default map
@@ -62,13 +71,22 @@ json_encode($myModel);
 */
 ```
 ```php
-// option 2: use a custom map for the current context
+// option 2: specify custom decorators
 
-json_encode($myModel->jsonSerialize([ 'propertyA' ]));
+json_encode($myModel->jsonSerialize(
+    new \Alaress\Json\Decorator\PropertyDecorator([ 'propertyA' ]),
+    new LinkDecorator($di->get('router'), $di->get('authorizer'))
+));
 
 /* output:
 [
-    'propertyA' => 'valueA'
+    'propertyA' => 'valueA',
+    '_links' => [
+        'self' => [
+            'href' => '/example/models/12',
+            'auth' => false
+        ]
+    ]
 ]
 */
 ```
@@ -90,8 +108,11 @@ $myCustomMap = [
 ];
 ```
 
-Note that if a property is an `array` rather than a `Collection`, mapping won't work and it will be serialized in the
-default manner.
+Yes, this is both a dictionary + list ("dictlist") which is a bit of an anti-pattern, but it makes for the greatest
+readability.
+
+_Note that if a property is an `array` rather than a `Collection`, mapping won't work and it will be serialized in the
+default manner._
 
 Then, in your `Controller`, you can either leave let the defaults do their work, or you can customise the mapping
 for the specific use-case.
@@ -154,7 +175,10 @@ class MyController extends Base
 
         // manually do the check for JSON and pre-compile the JSON output
         if ((new IsJson())->isSatisfiedBy($this->request)) {
-            $data['models'] = $models->jsonSerialize([ 'propertyA' ]);
+            $data['models'] = $models->jsonSerialize(
+                new \Alaress\Json\Decorator\PropertyDecorator([ 'propertyA' ]),
+                new LinkDecorator($this->router, $this->authorizer)
+            );
         } else {
             $data['models'] = $models;
         }
