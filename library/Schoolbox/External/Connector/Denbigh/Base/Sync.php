@@ -70,8 +70,8 @@ class Sync extends Base implements ISync
                 s.firstname      AS student_preferred,
                 s.surname        AS student_surname
             FROM Addresses adr
-            LEFT JOIN Parents par ON par.familyDenbighID = adr.familyDenbighID
-            LEFT JOIN People peo ON peo.denbighID = par.peopleDenbighID
+            JOIN Parents par ON par.familyDenbighID = adr.familyDenbighID
+            JOIN People peo ON peo.denbighID = par.peopleDenbighID
             LEFT JOIN Schoolbox_Students s ON s.familyDenbighID = par.familyDenbighID
             WHERE peo.id IS NOT NULL
             ORDER BY adr.familyDenbighID ASC, peo.denbighID ASC
@@ -109,7 +109,7 @@ class Sync extends Base implements ISync
                 ''               AS staff_year_level_description
 
             FROM Staff s
-            LEFT JOIN People p ON s.peopleDenbighID = p.denbighID
+            JOIN People p ON s.peopleDenbighID = p.denbighID
         ";
 
         return new Iterator\Staff(
