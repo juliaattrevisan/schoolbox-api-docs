@@ -162,11 +162,13 @@ var beforeSubmit = function() {
             }
         });
     }
-    
+
+    // TODO I want this to show up underneath the descriptor el, not on submit at the bottom of the page :(
     descriptors.rules('add', {
         noDecimalPlacesWithMarkRange: true,
         descriptorsAreMonotonic: true,
         messages: {
+            // TODO these are not working; the default error messages are being used instead
             noDecimalPlacesWithMarkRange: "use only descriptor values without decimal places if Mark Range is enabled.",
             descriptorsAreMonotonic: "provide descriptor values that form an ascending or descending sequence."
         }
