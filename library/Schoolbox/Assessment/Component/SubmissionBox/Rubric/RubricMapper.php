@@ -664,13 +664,12 @@ class RubricMapper
 
         // build the square, extracting data as we go
         $groups            = [];
-        $hasCustomMaxValue = false;
         $isLastRowNewGroup = false;
         while ($row = $this->getcsv($fp, $maxLevels + 2)) {
             if ($isLastRowNewGroup) {
                 $isLastRowNewGroup = false;
                 if ($row[0]) {
-                    $hasCustomMaxValue = true;
+                    $markPerCapability = true;
                     $groupMaxValue     = $row[0];
                 }
             } else {
@@ -788,7 +787,7 @@ class RubricMapper
         /** @var Rubric $rubric */
         $rubric = $this->factory->buildFromPostData([0 => $postdata], true);
 
-        return [$rubric, $hasCustomMaxValue];
+        return [$rubric, $markPerCapability];
     }
 
     /**
