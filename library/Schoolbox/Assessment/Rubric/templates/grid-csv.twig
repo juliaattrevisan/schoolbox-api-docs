@@ -92,6 +92,13 @@
                     markPerCapabilityInput.prop('checked', true);
                 }
 
+                // Is use mark range on in the rubric?
+                // (There's no way to infer this other than some attribute on the grid)
+                body.find('#useMarkRange').prop(
+                    'checked',
+                    body.find('input[data-descriptor-uses-mark-range]').length > 0
+                );
+
                 // you're free to leave now
                 submits.prop('disabled', false);
             });
