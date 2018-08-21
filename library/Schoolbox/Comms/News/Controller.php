@@ -9,6 +9,8 @@
 namespace Schoolbox\Comms\News;
 
 use Alaress\Database\Connector\IConnector;
+use Alaress\Json\Decorator\LinkDecorator;
+use Alaress\Json\Decorator\PropertyDecorator;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Output\ThemedHtml;
 use Alaress\Web\Request\IsJson;
@@ -467,7 +469,10 @@ class Controller extends Base
         // don't supply the extra twig-necessary data if just returning JSON
         if ((new IsJson())->isSatisfiedBy($this->getRequest())) {
             $data = [
-                'article' => $article,
+                'article' => $article->jsonSerialize(
+                    new PropertyDecorator(),
+                    new LinkDecorator($this->router, $this->authorizer)
+                ),
                 'isSavedForLater' => $isSavedForLater,
             ];
         } else {
