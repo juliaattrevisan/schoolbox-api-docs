@@ -73,7 +73,7 @@ class Controller extends Base
 
             /* Historical Dailies
              */
-            'historic' => '',
+            'historic' => $impressionsConversionsOpens->fetchHistoric($article),
 
             /* Conversions Chronological
              */
