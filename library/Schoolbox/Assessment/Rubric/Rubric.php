@@ -291,6 +291,12 @@ class Rubric implements Twiggable
         // rows contain columns
         $square = array_fill(0, (2 * $height) + 1, array_fill(0, $width + 2, ''));
 
+        // Mark-per-capability: On/Off
+        // Use Mark Range: On/Off
+        // (Put these in first two cells, default them to OFF on import)
+        // TODO markPerCapability should be localized, as should the input
+        $square[0][0] = 'markPerCapability: ' . ($includePointsPerCapability ? 'On' : 'Off');
+        $square[0][1] = 'useMarkRange: ' . ($includeMarkRanges ? 'On' : 'Off');
 
         // first row is level names
         foreach ($this->levels as $i => $level) {
