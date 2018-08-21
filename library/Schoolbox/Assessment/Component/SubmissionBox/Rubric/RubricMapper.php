@@ -500,13 +500,19 @@ class RubricMapper
         foreach ($grid->getLevels() as $level) {
             $levelModel = $levelMapper->createModel()
                 ->setId($level->getId())
-                ->setName($level->getId())
+                ->setName($level->getName())
                 ->setSubmissionBox($submissionBox)
                 ->setSequence($levelSequence++);
             $levelModels->add($levelModel);
+
+            // Need to save NOW so that I have an ID which can then be assoc'd
+            // with a descriptor
+            $levelMapper->save($levelModel);
+            $level->setId($levelModel->getId());
         }
+
         // TODO clear unused levels: use that tidyUp method
-        $levelMapper->save($levelModels);
+//        $levelMapper->save($levelModels);
 
 //        LevelMapper::getInstance()->save($levels = $rubric->getORMLevels());
 
@@ -515,10 +521,12 @@ class RubricMapper
         // TODO consider removing submission_box_id, associating with group ID instead
         $criterionUsageMapper = CriterionUsageMapper::getInstance();
         $groupUsageMapper     = GroupUsageMapper::getInstance();
+        $descriptorMapper     = DescriptorMapper::getInstance();
         $criterionMapper      = CriterionMapper::getInstance();
         $groupMapper          = GroupMapper::getInstance();
         $criterionUsageModels = $criterionUsageMapper->createCollection();
         $groupUsageModels     = $groupUsageMapper->createCollection();
+        $descriptorModels     = $descriptorMapper->createCollection();
         $criterionUsageMapper->deleteByColumn('submission_box_id', $submissionBox->getId());
         $groupUsageMapper->deleteByColumn('submission_box_id', $submissionBox->getId());
         $groupSequence = 1;
@@ -532,24 +540,37 @@ class RubricMapper
 
             $criterionSequence = 1;
             foreach ($groupUsage->getCriterionUsages() as $criterionUsage) {
+                $criterionModel      = $criterionMapper->createModel($criterionUsage->getCriterion()->getId());
                 $criterionUsageModel = $criterionUsageMapper->createModel()
                     ->setSubmissionBox($submissionBox)
-                    ->setCriterion($criterionMapper->createModel($criterionUsage->getCriterion()->getId()))
+                    ->setCriterion($criterionModel)
                     ->setSequence($criterionSequence++);
                 $criterionUsageModels->add($criterionUsageModel);
 
                 // Descriptors
+                foreach ($grid->getLevels() as $level) {
+                    $descriptor = $criterionUsage->retrieveDescriptor($level);
+                    if ($descriptor) {
+                        $descriptorModel = $descriptorMapper->createModel()
+                            ->setId($descriptor->getId())
+                            ->setCriterion($criterionModel)
+                            ->setLevel($levelMapper->createModel($level->getId()))
+                            // One day: set min value here
+                            ->setMaxValue($descriptor->getMaxValue())
+                            ->setDescription($descriptor->getDescription());
+                        $descriptorModels->add($descriptorModel);
+                    }
+                }
             }
         }
 
         $groupUsageMapper->save($groupUsageModels);
         $criterionUsageMapper->save($criterionUsageModels);
+        $descriptorMapper->save($descriptorModels);
 
 
-
-
-        // finally, now that everything else is saved, save the descriptors
-        $descIds = DescriptorMapper::getInstance()->save($descs = $rubric->getORMDescriptors());
+//        // finally, now that everything else is saved, save the descriptors
+//        $descIds = DescriptorMapper::getInstance()->save($descs = $rubric->getORMDescriptors());
 
         $this->checkDescriptorValueChanges($existingDescriptors, $descs);
 
