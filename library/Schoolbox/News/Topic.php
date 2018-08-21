@@ -12,7 +12,7 @@ namespace Schoolbox\News;
 use Alaress\Json\SerializeTrait;
 use Schoolbox\Mapper\Traits\Model\Id;
 
-class Topic implements \JsonSerializable
+class Topic implements \Alaress\Json\Serializable
 {
     use Id;
     use SerializeTrait;
@@ -52,7 +52,7 @@ class Topic implements \JsonSerializable
      *
      * @return array|mixed
      */
-    public function getDefaultJsonMap()
+    public function getDefaultJsonMap(): array
     {
         return [
             'id',

@@ -12,7 +12,7 @@ namespace Schoolbox\Comms\News\Policy;
 use Alaress\Json\SerializeTrait;
 use Schoolbox\Mapper\Traits\Model\Id;
 
-class Model implements \JsonSerializable
+class Model implements \Alaress\Json\Serializable
 {
     use Id;
     use SerializeTrait;
@@ -21,7 +21,7 @@ class Model implements \JsonSerializable
     /**
      * @return array
      */
-    protected function getDefaultJsonMap(): array
+    public function getDefaultJsonMap(): array
     {
         return [
             'identifier',

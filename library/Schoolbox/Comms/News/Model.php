@@ -21,7 +21,7 @@ use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\User;
 use Alaress_Date_Format;
 
-class Model implements ISoftDeletable, \JsonSerializable
+class Model implements ISoftDeletable, \Alaress\Json\Serializable
 {
     // The discrete, atomic states this article may be in.
     // It is quite valid for composite states to be composed of 2+ more atomic states. eg isAccepted = [AWAITING_PUBLICATION|PUBLISHED|EXPIRED]
@@ -44,7 +44,7 @@ class Model implements ISoftDeletable, \JsonSerializable
     /**
      * @return array
      */
-    protected function getDefaultJsonMap(): array
+    public function getDefaultJsonMap(): array
     {
         return [
             'id',

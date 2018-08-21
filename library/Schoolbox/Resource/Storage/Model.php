@@ -23,7 +23,7 @@ use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
  *
  * @package Schoolbox\Resource\Storage
  */
-class Model extends File implements IStorage, \JsonSerializable
+class Model extends File implements IStorage, \Alaress\Json\Serializable
 {
     use CreatedAtDate;
     use SerializeTrait;
@@ -53,7 +53,7 @@ class Model extends File implements IStorage, \JsonSerializable
     /**
      * @return array
      */
-    protected function getDefaultJsonMap(): array
+    public function getDefaultJsonMap(): array
     {
         return [
             'hash',

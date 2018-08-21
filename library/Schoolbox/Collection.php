@@ -9,13 +9,14 @@
 
 namespace Schoolbox;
 
+use Alaress\Json\Decorator\IDecorator;
 use ArrayAccess;
 use InvalidArgumentException;
 use ArrayIterator;
 use ICollection;
 use JsonSerializable;
 
-class Collection implements ICollection, JsonSerializable, ArrayAccess
+class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
 {
     /** @var array */
     protected $stack = array();
@@ -900,14 +901,24 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
 
 
     /**
+     * @return array
+     */
+    public function getDefaultJsonMap(): array
+    {
+        // this happens to be ignored by this particular implementation
+        return [];
+    }
+
+
+    /**
      * Specify data which should be serialized to JSON. Currently, attempts to
      * serialize all items within the stack.
      *
      * @return array
      */
-    public function jsonSerialize(array $map = null)
+    public function jsonSerialize(IDecorator... $decorators)
     {
-        if (null === $map) {
+        if (\count($decorators) === 0) {
             return $this->getStack();
         }
 
@@ -916,7 +927,10 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
         $json = [];
 
         foreach ($this as $key => $value) {
-            $json[$key] = $value instanceof JsonSerializable ? $value->jsonSerialize($map) : $value;
+            foreach ($decorators as $decorator) {
+                $json[$key] = $decorator->decorate($json[$key] ?: [], $value);
+            }
+
         }
 
         return $json;

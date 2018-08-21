@@ -13,7 +13,6 @@ namespace Schoolbox;
 use Alaress\Json\SerializeTrait;
 use House;
 use HouseResidential;
-use JsonSerializable;
 use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\External\Subject;
 use Schoolbox\External\SubjectCollection;
@@ -24,7 +23,7 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use DomainException;
 
-class User implements JsonSerializable, ISoftDeletable
+class User implements \Alaress\Json\Serializable, ISoftDeletable
 {
     use CreatedAtDate;
     use UpdatedAtDate;
@@ -1272,7 +1271,7 @@ class User implements JsonSerializable, ISoftDeletable
     /**
      * @return array
      */
-    protected function getDefaultJsonMap(): array
+    public function getDefaultJsonMap(): array
     {
         return [
             'id',

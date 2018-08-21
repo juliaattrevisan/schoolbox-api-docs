@@ -16,7 +16,7 @@ use Alaress\Date\IClock;
 use Alaress\Json\SerializeTrait;
 use Jenssegers\Date\Date as LaravelDate;
 
-class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, IComparable, JsonSerializable
+class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, IComparable, \Alaress\Json\Serializable
 {
     use SerializeTrait;
 
@@ -24,7 +24,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     /**
      * @return array
      */
-    protected function getDefaultJsonMap(): array
+    public function getDefaultJsonMap(): array
     {
         return [
             'database',
