@@ -66,6 +66,7 @@ class Factory
 //        ];
 
         // cache groups
+        $groupCache = [];
         foreach ($groups as $groupId => $groupData) {
             $groupName     = $groupData['name'];
             $groupMaxValue = isset($groupData['maxValue']) ? (float)$groupData['maxValue'] : null;
@@ -76,9 +77,10 @@ class Factory
             $groupUsage = (new GroupUsage($group))
                 ->setMaxValue($groupMaxValue);
 
-            $grid->getGroupUsages()[$groupId] = $groupUsage;
+            // This has added ALL groups passed through form
+//            $grid->getGroupUsages()[$groupId] = $groupUsage;
 
-//            $groupCache[$groupId] = new Group($groupId, $groupName, $groupMaxValue);
+            $groupCache[$groupId] = $groupUsage;
         }
 
         // Cache criteria
@@ -89,8 +91,7 @@ class Factory
             $criterionEnabled = isset($criterion['on']) && $criterion['on'];
             $criterionName    = $criterion['name'];
 
-
-            $group = $grid->getRowSet()->getGroups()[$groupId];
+            $group = $groupCache[$groupId];
 
             // spawn
             $criterion = $group->getCriteria()[$criterionId]
@@ -115,24 +116,30 @@ class Factory
                 continue;
             }
 
-            foreach ($levelCache as $levelSequence => $l) {
+            $criterionUsage = new CriterionUsage($criterion);
+
+            foreach ($levelCache as $levelSequence => $level) {
 
                 if (empty($descriptors[$criterionId][$levelSequence])) {
                     continue;
                 }
 
                 $descriptor      = $descriptors[$criterionId][$levelSequence];
-                $descriptorId    = isset($descriptor['id']) ? $descriptor['id'] : null;
+                $descriptorId    = $descriptor['id'] ?? null;
                 $descriptorText  = $descriptor['text'];
                 $descriptorValue = $descriptor['points'];
 
-                if (strlen($descriptorText) || strlen($descriptorValue)) {
-                    $d = new Descriptor($descriptorText, $descriptorValue, $descriptorId);
-                    try {
-                        $rubric->putDescriptor($group, $criterion, $l, $d);
-                    } catch (InvalidArgumentException $e) {
-                        echo "Unable to put descriptor";
-                    }
+                if ('' !== $descriptorText || '' !== $descriptorValue) {
+                    $d = (new Descriptor)
+                        ->setId($descriptorId)
+                        ->setDescription($descriptorText)
+                        ->setMaxValue($descriptorValue);
+                    $grid->retrieveCriterionUsage($criterion)->getDescriptors()[$descriptorId] = $d;
+//                    try {
+//                        $rubric->putDescriptor($group, $criterion, $level, $d);
+//                    } catch (InvalidArgumentException $e) {
+//                        echo "Unable to put descriptor";
+//                    }
                 }
 
             }
