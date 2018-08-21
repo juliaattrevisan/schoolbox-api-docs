@@ -8,6 +8,7 @@
 
 namespace Alaress\Json;
 use Alaress\Json\Decorator\IDecorator;
+use Alaress\Json\Decorator\PropertyDecorator;
 
 
 /**
@@ -30,6 +31,11 @@ trait SerializeTrait
      */
     public function jsonSerialize(IDecorator... $decorators)
     {
+        if (!\count($decorators)) {
+            // to preserve default json_encode behaviour, enforce the property decorator
+            $decorators = [ new PropertyDecorator() ];
+        }
+
         $json = [];
 
         foreach ($decorators as $decorator) {
