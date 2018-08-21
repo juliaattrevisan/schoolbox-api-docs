@@ -142,7 +142,7 @@ class Factory
                 }
 
                 $descriptor      = $descriptors[$criterionId][$levelSequence];
-                $descriptorId    = isset($descriptor['id']) ?: null;
+                $descriptorId    = $descriptor['id'] ?? null;
                 $descriptorText  = $descriptor['text'];
                 $descriptorValue = $descriptor['points'];
 
