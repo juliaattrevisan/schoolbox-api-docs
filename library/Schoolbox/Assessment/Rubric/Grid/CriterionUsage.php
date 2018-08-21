@@ -100,7 +100,7 @@ class CriterionUsage
      *
      * @param bool $useValueRanges Does the rubric grid this is a part of even
      *                             use value ranges?
-     *                             If not,
+     *                             If not, min value is always max value.
      */
     public function applyDescriptorMinValues(bool $useValueRanges): void
     {

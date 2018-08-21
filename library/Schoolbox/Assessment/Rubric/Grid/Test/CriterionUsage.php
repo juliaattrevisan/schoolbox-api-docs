@@ -307,6 +307,7 @@ class CriterionUsage extends TestCase
         yield 'Asc+Desc 3'         => [$criterionUsage8, $level4, 1];
         yield 'Asc+Desc 0 (end)'   => [$criterionUsage8, $level5, 0];
 
+
         // Fibonacci: [1, 1, 2, 3, 5, 8] => [1, 1, 2, 3, 4..5, 6..8]
         $criterionUsage9 = new RubricGrid\CriterionUsage($criterion);
 
@@ -330,6 +331,38 @@ class CriterionUsage extends TestCase
         yield 'Fibonacci 4 (3)' => [$criterionUsage9, $level4, 3];
         yield 'Fibonacci 5 (5)' => [$criterionUsage9, $level5, 4];
         yield 'Fibonacci 6 (8)' => [$criterionUsage9, $level6, 6];
+
+
+        // All null: [null, null, null, null, null] => [null, null, null, null, null]
+        $criterionUsage10 = new RubricGrid\CriterionUsage($criterion);
+
+        $descriptor1 = (new RubricGrid\Descriptor())->setDescription('Descriptor 10.1')->setMaxValue(null);
+        $descriptor2 = (new RubricGrid\Descriptor())->setDescription('Descriptor 10.2')->setMaxValue(null);
+        $descriptor3 = (new RubricGrid\Descriptor())->setDescription('Descriptor 10.3')->setMaxValue(null);
+        $descriptor4 = (new RubricGrid\Descriptor())->setDescription('Descriptor 10.4')->setMaxValue(null);
+        $descriptor5 = (new RubricGrid\Descriptor())->setDescription('Descriptor 10.5')->setMaxValue(null);
+
+        $criterionUsage10->getDescriptors()[$level1->getId()] = $descriptor1;
+        $criterionUsage10->getDescriptors()[$level2->getId()] = $descriptor2;
+        $criterionUsage10->getDescriptors()[$level3->getId()] = $descriptor3;
+        $criterionUsage10->getDescriptors()[$level4->getId()] = $descriptor4;
+        $criterionUsage10->getDescriptors()[$level5->getId()] = $descriptor5;
+
+        yield 'Null 1 (null)' => [$criterionUsage10, $level1, null];
+        yield 'Null 2 (null)' => [$criterionUsage10, $level2, null];
+        yield 'Null 3 (null)' => [$criterionUsage10, $level3, null];
+        yield 'Null 4 (null)' => [$criterionUsage10, $level4, null];
+        yield 'Null 5 (null)' => [$criterionUsage10, $level5, null];
+
+
+        // Only one descriptor: [5] => [5]
+        $criterionUsage11 = new RubricGrid\CriterionUsage($criterion);
+
+        $descriptor1 = (new RubricGrid\Descriptor())->setDescription('Descriptor 10.1')->setMaxValue(5);
+
+        $criterionUsage11->getDescriptors()[$level1->getId()] = $descriptor1;
+
+        yield 'Single Descriptor' => [$criterionUsage11, $level1, 5];
     }
 
 
