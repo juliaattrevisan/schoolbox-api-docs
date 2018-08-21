@@ -43,6 +43,12 @@ table.rb {
                 }
             }
         }
+
+        input[type='tel'] {
+            border-color: $input-border-color;
+            background-color: $container-bg;
+        }
+
     }
 
     label {
