@@ -165,7 +165,11 @@ var beforeSubmit = function() {
     
     descriptors.rules('add', {
         noDecimalPlacesWithMarkRange: true,
-        descriptorsAreMonotonic: true
+        descriptorsAreMonotonic: true,
+        messages: {
+            noDecimalPlacesWithMarkRange: "use only descriptor values without decimal places if Mark Range is enabled.",
+            descriptorsAreMonotonic: "provide descriptor values that form an ascending or descending sequence."
+        }
     });
 
 };
