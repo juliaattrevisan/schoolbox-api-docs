@@ -312,6 +312,8 @@
     }, 'This heading is already in use - please choose another.');
 
     $.validator.addMethod('descriptorsAreMonotonic', function(value, element, descriptorList) {
+        console.log("Inside descriptorAreMonotonic");
+
         descriptorList = $.makeArray(descriptorList);
 
         function descValues(descriptor) {
@@ -348,6 +350,7 @@
     }, "Descriptor values must be an ascending or descending sequence");
 
     $.validator.addMethod('noDecimalPlacesWithMarkRange', function(value, descriptorEl) {
+        console.log("Inside noDecimalPlacesWithMarkRange");
         var descHasDecimals = $(descriptorEl).val().match(/\.\d+$/);
         if ($("#useMarkRange").is(":checked") && descHasDecimals) {
             return false;

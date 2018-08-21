@@ -11,27 +11,15 @@ var validateOptions = {
             number: true,
             min: 0
         },
-        publishDate: {
-            required: true,
-            datepickerDate: true
-        },
-        publishTime: {
-            required: true,
-            timepickerTime: true
-        },
-        dueDate: {
-            required: true,
-            datepickerDate: true
-        },
-        dueTime: {
-            required: true,
-            timepickerTime: true
+        '[data-descriptor-value]': {
+            required: true
         }
     },
     messages: {
-        weight: 'The ' + scriptValidationRules.attr('data-locale-grading-proper') + ' weight should zero or greater'
+        weight: 'The ' + scriptValidationRules.attr('data-locale-grading-proper') + ' weight should zero or greater',
     }
 };
+
 
 /**
  * These rules must be applied right before submit as to take into account things
@@ -47,7 +35,6 @@ var beforeSubmit = function() {
         dueTime = $('input[name="dueTime"]'),
         closeDate = $('input[name="closeDate"]'),
         closeTime = $('input[name="closeTime"]'),
-        descriptors = $('[data-descriptor-value]'),
         maxMark = $('input[name="maxMark"]');
 
     var openVisible = openDate.is(':visible'),
@@ -162,16 +149,5 @@ var beforeSubmit = function() {
             }
         });
     }
-
-    // TODO I want this to show up underneath the descriptor el, not on submit at the bottom of the page :(
-    descriptors.rules('add', {
-        noDecimalPlacesWithMarkRange: true,
-        descriptorsAreMonotonic: true,
-        messages: {
-            // TODO these are not working; the default error messages are being used instead
-            noDecimalPlacesWithMarkRange: "use only descriptor values without decimal places if Mark Range is enabled.",
-            descriptorsAreMonotonic: "provide descriptor values that form an ascending or descending sequence."
-        }
-    });
 
 };
