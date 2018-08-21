@@ -88,34 +88,22 @@
             series: [
                 {
                     color: '#f2c96d',
-                    marker: {
-                        enabled: true
-                    },
                     name: 'Impressions',
                     data: {{ conversions['impression']|json_encode|raw }}
                 },
                 {
                     color: '#82b5d8',
-                    marker: {
-                        enabled: true
-                    },
                     name: 'Conversions',
                     data: {{ conversions['conversion']|json_encode|raw }}
                 },
                 {
                     color: '#878787',
-                    marker: {
-                        enabled: true
-                    },
                     name: 'Non-referred Opens',
                     data: {{ conversions['open']|json_encode|raw }}
                 },
                 {
                     color: '#629e51',
                     lineWidth: 1,
-                    marker: {
-                        enabled: false
-                    },
                     name: 'Conversion Ratio This Period (%)',
                     type: 'spline',
                     yAxis: 1,
