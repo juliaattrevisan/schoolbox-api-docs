@@ -257,6 +257,9 @@ class ImpressionsConversionsOpens
         $breakdown = [];
 
         foreach ($statistics as $statistic) {
+
+            /* Remember first open
+             */
             if (null === $firstOpen) {
                 $firstOpen = $statistic->getDate();
             }
@@ -269,19 +272,15 @@ class ImpressionsConversionsOpens
             $numImpressions += $daily['numImpressions'];
 
             $index = $daily['breakdown']['grid'][Mapper::TYPE_CONVERSION];
-            
-            $breakdown[Mapper::TYPE_CONVERSION][Mapper::REFERRER_DASHBOARD] += $index[Mapper::REFERRER_DASHBOARD];
-            $breakdown[Mapper::TYPE_CONVERSION][Mapper::REFERRER_HOMEPAGE] += $index[Mapper::REFERRER_HOMEPAGE];
-            $breakdown[Mapper::TYPE_CONVERSION][Mapper::REFERRER_INDEX] += $index[Mapper::REFERRER_INDEX];
-            $breakdown[Mapper::TYPE_CONVERSION][Mapper::REFERRER_ARCHIVE] += $index[Mapper::REFERRER_ARCHIVE];
-            $breakdown[Mapper::TYPE_CONVERSION][Mapper::REFERRER_EMAIL] += $index[Mapper::REFERRER_EMAIL];
 
-            $breakdown[Mapper::TYPE_IMPRESSION][Mapper::REFERRER_DASHBOARD] += $index[Mapper::REFERRER_DASHBOARD];
-            $breakdown[Mapper::TYPE_IMPRESSION][Mapper::REFERRER_HOMEPAGE] += $index[Mapper::REFERRER_HOMEPAGE];
-            $breakdown[Mapper::TYPE_IMPRESSION][Mapper::REFERRER_INDEX] += $index[Mapper::REFERRER_INDEX];
-            $breakdown[Mapper::TYPE_IMPRESSION][Mapper::REFERRER_ARCHIVE] += $index[Mapper::REFERRER_ARCHIVE];
-            $breakdown[Mapper::TYPE_IMPRESSION][Mapper::REFERRER_EMAIL] += $index[Mapper::REFERRER_EMAIL];
+            foreach([Mapper::TYPE_CONVERSION, Mapper::TYPE_IMPRESSION] as $currentType) {
+                foreach (Mapper::REFERRERS as $currentReferrer) {
+                    $breakdown[$currentType][$currentReferrer] += $index[$currentReferrer];
+                }
+            }
 
+            /* Special case for direct opens
+             */
             $breakdown[Mapper::TYPE_OPEN] += $statistic->getNumOpens();
         }
 
@@ -299,8 +298,8 @@ class ImpressionsConversionsOpens
                 'grid' => $breakdown,
                 'ratio' => $referrerRatio
             ],
-            'numImpressions' => $numImpressions,
             'numConversions' => $numConversions,
+            'numImpressions' => $numImpressions,
             'conversionRatio' => $conversionRatio
         ];
     }
@@ -367,8 +366,8 @@ class ImpressionsConversionsOpens
                 'grid' => $breakdown,
                 'ratio' => $referrerRatio
             ],
-            'numImpressions' => $numImpressions,
             'numConversions' => $numConversions,
+            'numImpressions' => $numImpressions,
             'conversionRatio' => $conversionRatio
         ];
     }
