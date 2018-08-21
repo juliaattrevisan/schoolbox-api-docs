@@ -503,8 +503,7 @@ class RubricMapper
                 ->setName($level->getId())
                 ->setSubmissionBox($submissionBox)
                 ->setSequence($levelSequence++);
-            $levelModels[$level->getId()] = $levelModel;
-            $levelSequence++;
+            $levelModels->add($levelModel);
         }
         // TODO clear unused levels: use that tidyUp method
         $levelMapper->save($levelModels);
@@ -514,12 +513,40 @@ class RubricMapper
 
         // usages are a join table with a sequence, not a strict "object" - as such, we can purge the relevant records and simply re-create them
         // TODO consider removing submission_box_id, associating with group ID instead
-        CriterionUsageMapper::getInstance()->deleteByColumn('submission_box_id', $submissionBox->getId());
-        CriterionUsageMapper::getInstance()->save($usages = $rubric->getORMCriterionUsages());
+        $criterionUsageMapper = CriterionUsageMapper::getInstance();
+        $groupUsageMapper     = GroupUsageMapper::getInstance();
+        $criterionMapper      = CriterionMapper::getInstance();
+        $groupMapper          = GroupMapper::getInstance();
+        $criterionUsageModels = $criterionUsageMapper->createCollection();
+        $groupUsageModels     = $groupUsageMapper->createCollection();
+        $criterionUsageMapper->deleteByColumn('submission_box_id', $submissionBox->getId());
+        $groupUsageMapper->deleteByColumn('submission_box_id', $submissionBox->getId());
+        $groupSequence = 1;
+        foreach ($grid->getGroupUsages() as $groupUsage) {
+            $groupUsageModel = $groupUsageMapper->createModel()
+                ->setSubmissionBox($submissionBox)
+                ->setGroup($groupMapper->createModel($groupUsage->getGroup()->getId()))
+                ->setMaxValue($groupUsage->getMaxValue())
+                ->setSequence($groupSequence++);
+            $groupUsageModels->add($groupUsageModel);
 
-        // ditto group usages
-        GroupUsageMapper::getInstance()->deleteByColumn('submission_box_id', $submissionBox->getId());
-        GroupUsageMapper::getInstance()->save($rubric->getORMGroupUsages());
+            $criterionSequence = 1;
+            foreach ($groupUsage->getCriterionUsages() as $criterionUsage) {
+                $criterionUsageModel = $criterionUsageMapper->createModel()
+                    ->setSubmissionBox($submissionBox)
+                    ->setCriterion($criterionMapper->createModel($criterionUsage->getCriterion()->getId()))
+                    ->setSequence($criterionSequence++);
+                $criterionUsageModels->add($criterionUsageModel);
+
+                // Descriptors
+            }
+        }
+
+        $groupUsageMapper->save($groupUsageModels);
+        $criterionUsageMapper->save($criterionUsageModels);
+
+
+
 
         // finally, now that everything else is saved, save the descriptors
         $descIds = DescriptorMapper::getInstance()->save($descs = $rubric->getORMDescriptors());
