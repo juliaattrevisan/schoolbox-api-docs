@@ -384,4 +384,68 @@ class CriterionUsage extends TestCase
         $this->assertNotNull($descriptor);
         $this->assertSame($expected, $descriptor->getMinValue());
     }
+
+
+    /**
+     * Data provider for `testApplyDescriptorMinValuesWithoutValueRange`.
+     *
+     * @return iterable
+     */
+    public function getTestApplyDescriptorMinValuesWithoutValueRange(): iterable
+    {
+        // Test using the Fibonacci sequence
+        // Fibonacci: [1, 1, 2, 3, 5, 8] => [1, 1, 2, 3, 4..5, 6..8]
+
+        $criterion = (new RowSet\Criterion())->setId(1)->setName('Criterion');
+
+        $level1 = (new RubricGrid\Level())->setId(1)->setName('Level 1');
+        $level2 = (new RubricGrid\Level())->setId(2)->setName('Level 2');
+        $level3 = (new RubricGrid\Level())->setId(3)->setName('Level 3');
+        $level4 = (new RubricGrid\Level())->setId(4)->setName('Level 4');
+        $level5 = (new RubricGrid\Level())->setId(5)->setName('Level 5');
+        $level6 = (new RubricGrid\Level())->setId(6)->setName('Level 6');
+
+        $criterionUsage = new RubricGrid\CriterionUsage($criterion);
+
+        $descriptor1 = (new RubricGrid\Descriptor())->setDescription('Descriptor 9.1')->setMaxValue(1);
+        $descriptor2 = (new RubricGrid\Descriptor())->setDescription('Descriptor 9.2')->setMaxValue(1);
+        $descriptor3 = (new RubricGrid\Descriptor())->setDescription('Descriptor 9.3')->setMaxValue(2);
+        $descriptor4 = (new RubricGrid\Descriptor())->setDescription('Descriptor 9.4')->setMaxValue(3);
+        $descriptor5 = (new RubricGrid\Descriptor())->setDescription('Descriptor 9.5')->setMaxValue(5);
+        $descriptor6 = (new RubricGrid\Descriptor())->setDescription('Descriptor 9.4')->setMaxValue(8);
+
+        $criterionUsage->getDescriptors()[$level1->getId()] = $descriptor1;
+        $criterionUsage->getDescriptors()[$level2->getId()] = $descriptor2;
+        $criterionUsage->getDescriptors()[$level3->getId()] = $descriptor3;
+        $criterionUsage->getDescriptors()[$level4->getId()] = $descriptor4;
+        $criterionUsage->getDescriptors()[$level5->getId()] = $descriptor5;
+        $criterionUsage->getDescriptors()[$level6->getId()] = $descriptor6;
+
+        yield 'Fibonacci 1 (1)' => [$criterionUsage, $level1, 1];
+        yield 'Fibonacci 2 (1)' => [$criterionUsage, $level2, 1];
+        yield 'Fibonacci 3 (2)' => [$criterionUsage, $level3, 2];
+        yield 'Fibonacci 4 (3)' => [$criterionUsage, $level4, 3];
+        yield 'Fibonacci 5 (5)' => [$criterionUsage, $level5, 5];
+        yield 'Fibonacci 6 (8)' => [$criterionUsage, $level6, 8];
+    }
+
+
+    /**
+     * @dataProvider getTestApplyDescriptorMinValuesWithoutValueRange
+     * @covers \Schoolbox\Assessment\Rubric\Grid\CriterionUsage::applyDescriptorMinValues
+     *
+     * @param RubricGrid\CriterionUsage $criterionUsage
+     * @param RubricGrid\Level          $level
+     * @param float|null                $expected
+     */
+    public function testApplyDescriptorMinValuesWithoutValueRange(
+        RubricGrid\CriterionUsage $criterionUsage,
+        RubricGrid\Level $level,
+        ?float $expected
+    ): void {
+        $criterionUsage->applyDescriptorMinValues(false);
+        $descriptor = $criterionUsage->retrieveDescriptor($level);
+        $this->assertNotNull($descriptor);
+        $this->assertSame($expected, $descriptor->getMinValue());
+    }
 }
