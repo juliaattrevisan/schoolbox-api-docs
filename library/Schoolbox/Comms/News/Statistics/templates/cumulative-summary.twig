@@ -13,8 +13,8 @@
     <div class="row">
         <div class="small-12 medium-3 columns">
             <p class="infographic">
-                <span class="title">First Open</span>
-                <span class="value">{{ cumulative.firstOpen|date('j M') }}</span>
+                <span class="title">{% block cumulativeDateHeading %}First Open{% endblock %}</span>
+                <span class="value">{% block cumulativeDateValue %}{{ cumulative.firstOpen|date('j M') }}{% endblock %}</span>
             </p>
         </div>
         <div class="small-12 medium-3 columns">

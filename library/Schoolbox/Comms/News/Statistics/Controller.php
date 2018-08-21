@@ -71,6 +71,10 @@ class Controller extends Base
              */
             'referrerDemographic' => $impressionsConversionsOpens->fetchReferrerDemographic($article),
 
+            /* Historical Dailies
+             */
+            'historic' => '',
+
             /* Conversions Chronological
              */
             'conversions' => $impressionsConversionsOpens->fetchConversions($article, $accuracy),
