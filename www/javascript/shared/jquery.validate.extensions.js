@@ -312,10 +312,11 @@
     }, 'This heading is already in use - please choose another.');
 
     $.validator.addMethod('descriptorsAreMonotonic', function(value, element, descriptorList) {
+        descriptorList = $.makeArray(descriptorList);
+
         function descValues(descriptor) {
             return $(descriptor).attr('value');
         }
-        console.log('Inside descriptorsAreMonotonic');
 
         // Remove any descriptors from the list that don't have values
         // since value-less descriptors are permitted in amongst valued descriptors
@@ -323,7 +324,7 @@
         var allDescriptorsWithValues = descriptorList.filter(descValues).map(descValues);
 
         var prevVal, prevDiff = null;
-        allDescriptorsWithValues.each(function(currentDescriptorValue) {
+        $(allDescriptorsWithValues).each(function(currentDescriptorValue) {
             // Not the first item?
             if(null !== prevVal){
                 var diff = currentDescriptorValue - prevVal;
@@ -346,9 +347,8 @@
         return true;
     }, "Descriptor values must be an ascending or descending sequence");
 
-    $.validator.addMethod('noDecimalPlacesWithMarkRange', function(value, element) {
-        var descHasDecimals = element.match(/\.\d+$/);
-        console.log("Inside noDecimalPlacesWithMarkRange");
+    $.validator.addMethod('noDecimalPlacesWithMarkRange', function(value, descriptorEl) {
+        var descHasDecimals = $(descriptorEl).val().match(/\.\d+$/);
         if ($("#useMarkRange").is(":checked") && descHasDecimals) {
             return false;
         }

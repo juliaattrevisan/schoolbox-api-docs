@@ -47,6 +47,7 @@ var beforeSubmit = function() {
         dueTime = $('input[name="dueTime"]'),
         closeDate = $('input[name="closeDate"]'),
         closeTime = $('input[name="closeTime"]'),
+        descriptors = $('[data-descriptor-value]'),
         maxMark = $('input[name="maxMark"]');
 
     var openVisible = openDate.is(':visible'),
@@ -159,6 +160,12 @@ var beforeSubmit = function() {
                 number: messageCallback,
                 greaterThanZero: messageCallback
             }
-        })
+        });
     }
+    
+    descriptors.rules('add', {
+        noDecimalPlacesWithMarkRange: true,
+        descriptorsAreMonotonic: true
+    });
+
 };
