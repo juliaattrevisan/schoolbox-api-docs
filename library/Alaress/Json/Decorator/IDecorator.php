@@ -8,14 +8,20 @@
 
 namespace Alaress\Json\Decorator;
 
+/**
+ * Interface for defining a JSON decorator.
+ *
+ * @package Alaress\Json\Decorator
+ */
 interface IDecorator
 {
     /**
-     * Decorate thew given input according
+     * Decorate the given JSON payload according to the model given.
      *
-     * @param mixed  $array
-     * @param object $model
-     * @return array
+     * @param array  $json   - the JSON payload, as it exists so far, to be decorated
+     * @param object $model  - the object with which to decorate the given JSON payload
+     * @return array         - the mutated payload
      */
-    public function decorate(array $array, $model): array;
+    public function decorate(array $json, $model): array;
+
 }

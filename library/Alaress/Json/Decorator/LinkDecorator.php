@@ -14,6 +14,12 @@ use Aura\Router\Exception\RouteNotFound;
 use Aura\Router\Router;
 
 
+/**
+ * Decorates a JSON payload with links. The input model MUST implement \Alaress\Json\Linkable, or no decoration will
+ * be attempted.
+ *
+ * @package Alaress\Json\Decorator
+ */
 class LinkDecorator implements IDecorator
 {
     /** @var Router */
@@ -35,9 +41,7 @@ class LinkDecorator implements IDecorator
 
 
     /**
-     * Decorate thew given input according
-     *
-     * @param mixed  $json
+     * @param array  $json
      * @param object $model
      * @return array
      */

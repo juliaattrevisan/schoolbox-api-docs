@@ -12,6 +12,17 @@ use Alaress\Json\Serializable;
 use ReflectionObject;
 
 
+/**
+ * The base decorator. According to the $map given at construction time, decorate the model given with properties
+ * from the object.
+ *
+ * The map given will be a hydration map, which should be passed to any sub-models to instruct them as to
+ * how they ought return their data for the context given
+ *
+ * Objects expecting to be serialized with this decoration SHOULD implement \Alaress\Json\Serializable.
+ *
+ * @package Alaress\Json\Decorator
+ */
 class PropertyDecorator implements IDecorator
 {
     /** @var array */
@@ -28,8 +39,6 @@ class PropertyDecorator implements IDecorator
 
 
     /**
-     * Decorate thew given input according
-     *
      * @param mixed  $json
      * @param object $model
      * @return array

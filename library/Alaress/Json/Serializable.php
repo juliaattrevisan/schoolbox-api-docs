@@ -11,6 +11,11 @@ namespace Alaress\Json;
 use Alaress\Json\Decorator\IDecorator;
 
 
+/**
+ * Interface that extends the core JsonSerializable interface so that decoration strategies can be specified
+ *
+ * @package Alaress\Json
+ */
 interface Serializable extends \JsonSerializable
 {
     /**

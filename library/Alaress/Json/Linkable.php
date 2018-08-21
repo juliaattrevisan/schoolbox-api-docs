@@ -9,6 +9,8 @@
 namespace Alaress\Json;
 
 /**
+ * Interface that MUST be implemented by a model for \Alaress\Json\Decorator\LinkDecorator to have any effect.
+ *
  * @package Alaress\Json
  */
 interface Linkable

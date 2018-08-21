@@ -25,9 +25,6 @@ trait SerializeTrait
 
 
     /**
-     * The map given will be a hydration map, which should be passed to any sub-models to instruct them as to
-     * how they ought return their data for the context given
-     *
      * @param IDecorator[] $decorators
      * @return array
      */
