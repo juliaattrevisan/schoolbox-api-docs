@@ -13,6 +13,8 @@
 namespace Schoolbox\Learning\Assessment\DueWork\Decorator;
 
 use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Assessment\Rubric\Grid\Factory as GridFactory;
+use Schoolbox\Assessment\Rubric\Grid\Grid;
 use Schoolbox\Collection;
 use \Schoolbox\Learning\Assessment\DecoratorInterface;
 use \Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
@@ -110,7 +112,25 @@ class Decorator implements DecoratorInterface
             $assessment->setSelfReviewability(SubmissionBox::SELF_REVIEWABILITY_NONE);
         } // Otherwise let the existing setting persist
 
-        if($this->getUseRubric()){
+        if ($this->getUseRubric()) {
+
+            // TODO consider a factory for building a rubric from POST data for grid as well
+            $gridFactory = new GridFactory();
+            // Does the assessment exist yet?
+            $existingGrid = new Grid(
+                $assessment,
+                SubmissionBox\Rubric\RubricMapper::getInstance()->retrieveRowSet($assessment->getBaseContext(), true)
+            );
+            $newGrid = $gridFactory->buildFromPostData($existingGrid, $this->getRubricData());
+            exit;
+//            if ($assessment->getId()) {
+//                $existingGrid = new Grid(
+//                    $assessment,
+//                    SubmissionBox\Rubric\RubricMapper::getInstance()->retrieveRowSet()
+//                );
+//            }
+
+
             /** @var DueWorkRubric $rubric */
             $rubric = (new RubricFactory(new DueWorkRubric()))->buildFromPostData($this->getRubricData(), $this->getMarkPerCapability(), $assessment->getUseMarkRange(), false);
             $assessment->setRubric($rubric);
