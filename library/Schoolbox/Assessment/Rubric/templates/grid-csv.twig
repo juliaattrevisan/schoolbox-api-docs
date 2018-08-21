@@ -109,7 +109,12 @@
         $('#dl-csv').on('click', function (e) {
             e.preventDefault();
 
-            var frm = $('<form/>').attr('action', '/rubric/csv').attr('method', 'post').append($('table[data-rubric]').clone());
+            var frm = $('<form/>')
+                .attr('action', '/rubric/csv')
+                .attr('method', 'post')
+                .append($('table[data-rubric]').clone())
+                .append($('#markPerCapability').clone())
+                .append($('#useMarkRange').clone());
 
             frm.on('submit', function () {
                 // “This is what the beginning of the end of the world will look like” ― Guillermo del Toro, The Strain
