@@ -195,7 +195,7 @@ class Model implements ISoftDeletable
      */
     public function isExpired(): bool
     {
-        return self::STATE_PUBLISHED === $this->getDiscreteState();
+        return self::STATE_EXPIRED === $this->getDiscreteState();
     }
 
 

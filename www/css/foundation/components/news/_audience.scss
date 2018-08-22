@@ -1,0 +1,11 @@
+.audience-grid {
+  margin-bottom: 1rem;
+
+  > li {
+    background: $accent-background;
+    min-height: 80px;
+    border: 0;
+    border-right: 2px solid $white;
+    border-bottom: 2px solid $white;
+  }
+}

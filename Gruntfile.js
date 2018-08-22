@@ -140,7 +140,7 @@ var jsSrc = {
         'www/javascript/shared/tour/tour.js',
 
         // Death to jQuery!
-        'node_modules/vue/dist/vue.js', // TODO: change to .min before major release for production mode, or rewrite all this with webpack :)
+        'node_modules/vue/dist/vue.js',
         'node_modules/axios/dist/axios.js'
 
     ],

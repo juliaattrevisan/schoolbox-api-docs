@@ -3,10 +3,9 @@
 $selectize-font-size: rem-calc(($base-font-size - 3));
 $selectize-line-height: 18px !default;
 
-// None of this is being used?
-$selectize-color-text: $content-ui-foreground;
+$selectize-color-text: $body-font-color;
 $selectize-color-border: $input-border-color;
-$selectize-color-highlight: $content-ui-hover;
+$selectize-color-highlight: $highlight-color;
 $selectize-color-input: $white !default;
 $selectize-color-input-full: $selectize-color-input !default;
 $selectize-color-disabled: $content-ui-hover;
@@ -22,7 +21,7 @@ $selectize-color-item-active-text: $selectize-color-text !default;
 $selectize-color-item-active-border: $selectize-color-border;
 
 // Suggestions for what you just typed in
-$selectize-color-dropdown: $content-ui-background;
+$selectize-color-dropdown: $white;
 $selectize-color-dropdown-border: $selectize-color-border !default;
 $selectize-color-dropdown-border-top: $selectize-color-border;
 $selectize-color-dropdown-item-active: tint($tertiary, 87%);
@@ -60,14 +59,15 @@ fieldset[disabled] div.selectize-control div.selectize-input.items > div.item > 
 
 .selectize-control {
 	margin: 0 0 $form-spacing 0;
+	width: 100%;
 
 	&.single, &.multi {
 		.selectize-input > div {
 			background: $content-ui-background;
 			padding: 0 0.5rem 0 0.5rem;
-			margin: 0;
 			font-size: $selectize-font-size;
 			font-weight: $font-weight-normal;
+			border-radius: 3px;
 			a {
 				padding: 0.5rem !important;
 				width: 1.5rem !important;
@@ -76,8 +76,14 @@ fieldset[disabled] div.selectize-control div.selectize-input.items > div.item > 
 		}
 	}
 
+	&.single {
+		.selectize-input > div {
+			margin-left: $selectize-margin-item-x;
+		}
+	}
+
 	&.multi .selectize-input.has-items {
-		padding: 1px;
+		padding: $selectize-margin-item-x $selectize-margin-item-y 0;
 	}
 
 	.selectize-input {
@@ -117,10 +123,11 @@ fieldset[disabled] div.selectize-control div.selectize-input.items > div.item > 
 .selectize-input {
     line-height: 1.875rem;
 	margin-bottom: 0;
-	padding: 3px 0;
+	padding: $selectize-margin-item-y 0;
 	vertical-align: middle;
+	min-height: 2.5rem;
     input {
-        height: 1.875rem;
+        height: 1.9375rem;
 		font-size: $selectize-font-size;
 
         .remove {

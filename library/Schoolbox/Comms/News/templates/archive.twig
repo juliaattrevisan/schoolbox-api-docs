@@ -68,10 +68,14 @@
                 <script src="/javascript/shared/comms/saveforlater.js"></script>
                 <script>
                     $(function() {
-                        $('#news-container').articleTabs({
+                        var $newsContainer = $('#news-container');
+
+                        $newsContainer.articleTabs({
                             'topicTabs': $('#news-topics'),
                             'updateUrl': true
                         });
+
+                        $newsContainer.saveForLater();
                     });
                 </script>
 

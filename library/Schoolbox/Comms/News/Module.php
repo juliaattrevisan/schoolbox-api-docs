@@ -20,7 +20,6 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\News\TopicMapper;
 use Schoolbox\Permission\Access;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Role;
 use Schoolbox\UserMapper;
 
 
@@ -40,6 +39,7 @@ class Module extends BaseModule
      */
     protected function registerRoutes(): void
     {
+        /* Anyone can see the form
         /* For viewing articles you just need to be logged in and controller,
          * I suppose, deals with whether you are in the audience
          */
@@ -50,21 +50,13 @@ class Module extends BaseModule
         /* Any staff can see the form
          */
         $getPerms = new Rule\All(
-            new Rule\IsLoggedIn(),
-            new Rule\Any(
-                new Rule\IsSuperuser(),
-                new Rule\HasRole(Role::STAFF)
-            )
+            new Rule\IsLoggedIn()
         );
 
-        /* Any staff can receive data from the form
+        /* Anyone can receive data from the form
          */
         $postPerms = new Rule\All(
-            new Rule\IsLoggedIn(),
-            new Rule\Any(
-                new Rule\IsSuperuser(),
-                new Rule\HasRole(Role::STAFF)
-            )
+            new Rule\IsLoggedIn()
         );
 
         $preloadArticle = function ($params) {
@@ -100,6 +92,10 @@ class Module extends BaseModule
         /* News Archive
          */
         $this->register('GET', '/archive{/year,month}', 'getArchive', $viewPerms);
+
+        /* Find out who will receive this article
+         */
+        $this->register('GET', '/{articleId:\d+}/recipients', 'getRecipients', $viewPerms, $preloadNews);
 
         /* Index of articles audienced to you
          */
@@ -167,6 +163,8 @@ class Module extends BaseModule
             'policyMapper' => $this->getMapperFactory()->getLazy(Policy\Mapper::class),
             'topicMapper' => $this->getMapperFactory()->getLazy(TopicMapper::class),
             'saveForLaterMapper' => $this->getMapperFactory()->getLazy(SaveForLater\Mapper::class),
+            'audienceMapper' => $this->getMapperFactory()->getLazy(Audience\Mapper::class),
+            'roleAccessMapper' => $this->getMapperFactory()->getLazy(Access\RoleAccessMapper::class),
 
             /* Hyperdrive injection
              */

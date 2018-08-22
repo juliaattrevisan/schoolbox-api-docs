@@ -198,6 +198,7 @@ th, td{
 
 	input,
 	select,
+    .selectize-control,
 	.attachzone {
 		flex: 1 1 auto;
 		& + .button{
@@ -245,6 +246,7 @@ th, td{
 }
 %fancy-check{
 	position: absolute;
+	top: 0; // This is to stop the browser from scrolling to a strangely positioned (actual) checkbox when checking the pseudo checkbox, in some circumstances
 	width: 0;
 	height: 0;
 	min-height: 0;
@@ -321,7 +323,7 @@ th, td{
         + #{$label-selector} {
             &:before, &:after {
                 color: $content-ui-foreground !important;
-                background-color: $content-ui-background !important;
+                background-color: $content-ui-background;
             }
         }
     }
@@ -357,31 +359,36 @@ th, td{
 }
 
 // Radio button blocks
-input[type=radio]{
-	+ .block{
-		background-color: $white;
-		border: $input-border-width solid $content-ui-background;
+.button-block {
+	display: block;
+	background-color: $white;
+	border: $input-border-width solid $content-ui-background;
+	color: $content-ui-foreground;
+	margin: 0 0 1rem 0;
+	padding: ($base-font-size - 4);
+	width: 100%;
+	font-size: $base-font-size;
+	font-weight: $font-weight-normal;
+	line-height: 2;
+	text-align: left;
+	@include transition(all, 0.1s, ease-in);
+	i {
+		@extend .size-32;
 		color: $content-ui-foreground;
-		margin: 0 0 1rem 0;
-		padding: ($base-font-size - 4);
-		width: 100%;
-		font-size: $base-font-size;
-		font-weight: $font-weight-normal;
-		line-height: 2;
-		@include transition(all, 0.1s, ease-in);
-		i{
-			@extend .size-32;
-			color: $content-ui-foreground;
-			padding-right: 0.35rem;
-			float: left;
-			line-height: 1;
-		}
-		&:hover{
-			background-color: $content-ui-background;
-			color: $content-ui-foreground;
-		}
+		padding-right: 0.35rem;
+		float: left;
+		line-height: 1;
 	}
-	&:checked + .block{
+	&:hover {
+		background-color: $content-ui-background;
+		color: $content-ui-foreground;
+	}
+}
+input[type=radio] {
+	+ .block {
+		@extend .button-block;
+	}
+	&:checked + .block {
 		background-color: $content-ui-foreground;
 		border: $input-border-width solid $content-ui-foreground;
 		color: $content-ui-selected;
@@ -446,7 +453,8 @@ input[type=checkbox].plain {
     min-height: inherit;
 }
 
-.checklist, .radiolist {
+.checklist,
+.radiolist {
     input[type=radio]:not(.plain),
     input[type=checkbox]:not(.plain) {
         @include fancy-check();
@@ -456,6 +464,51 @@ input[type=checkbox].plain {
 .checklist .checklist {
 	margin-left: 2rem;
 }
+
+// Checklist Container
+.checklist.checklist-container {
+	padding: 0;
+	max-height: 13rem;
+	border: $fieldset-border-width $fieldset-border-style $fieldset-border-color;
+
+	input[type=checkbox]:not(.plain):not(:disabled) {
+		border: none;
+
+		&:checked + label {
+			background: $smoke;
+		}
+
+		+ label {
+			border-bottom: 1px solid $smoke;
+			margin: 0;
+			padding: .5rem 0 .5rem 2rem;
+
+			&:after,
+			&:before {
+				padding: .5rem 0 .5rem 0;
+				background-color: transparent;
+			}
+
+			&:hover {
+				background: $snow;
+
+				&:after,
+				&:before {
+					padding: .5rem 0 .5rem 0;
+					background-color: transparent;
+				}
+			}
+		}
+
+		&:focus {
+			&:after,
+			&:before {
+				background-color: transparent;
+			}
+		}
+	}
+}
+
 
 .toggle-set {
 	@include flex;

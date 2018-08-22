@@ -1,61 +1,19 @@
 {% import '@commsNews/indicator.twig' as indicator %}
 
-<script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
-<script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
-<script type="text/javascript" src="/javascript/shared/comms/draft.js"></script>
-<script src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
-<script src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
-
-<script>
-    $(function () {
-
-        {# CKEditors #}
-        $.fn.alaressEditor({
-            targetElements: $('#createForm textarea[name=body]')
-        });
-
-        $.fn.alaressEditor({
-            targetElements: $('#createForm textarea[name=blurb]'),
-            removePlugins: 'autoembed,uploadimage,schoolboxresource,schoolboxiframe,link'
-        });
-
-        {# Drafting mechanism #}
-        $('#createForm').draft({
-            inputs: ['title', 'publishAt', 'expiresAt'],
-            textareas: ['body', 'blurb'],
-            attachzones: ['attachment']
-        });
-
-        $('[data-topics]').selectizeSelector({
-            ajax: {
-                url:      '{{ routeLookup('commsNews.getTopics') }}',
-                type:     'GET',
-                dataType: 'json'
-            },
-            selectize: {
-                placeholder: 'Assign Topics'
-            },
-            value: {{ article.topics|json_encode|raw }},
-            multiple: true
-        });
-    });
-</script>
-
 <div class="row">
-    <div class="small-12 columns">
-        <h1>{{ action|capitalize }} {{ locale.news }} {{ indicator.render(article) }}</h1>
-        <ul class="meta">
-            {% if article.acceptedBy.id %}
-                <li class="icon-staff">Last moderated by {{ article.acceptedBy.fullname }}
-                    {% if article.isAccepted %}
-                        on {{ article.acceptedAt.local }}
-                    {% endif %}
-                </li>
-            {% endif %}
-        </ul>
+        <div class="small-12 columns">
+            <h1>{{ action|capitalize }} {{ locale.news }} {{ indicator.render(article) }}</h1>
+            <ul class="meta">
+                {% if article.acceptedBy.id %}
+                    <li class="icon-staff">Last moderated by {{ article.acceptedBy.fullname }}
+                        {% if article.isAccepted %}
+                            on {{ article.acceptedAt.local }}
+                        {% endif %}
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
     </div>
-</div>
-
 
 {# Train Line #}
 {% include '@commsNews/workflow.twig' with {
@@ -101,6 +59,90 @@
                     </div>
                 </fieldset>
 
+                <fieldset class="content" id="audience-select-container">
+
+                    {% if user.role.staff %}
+                        {% set audiencePlaceholder = 'Search for classes, groups, year levels, roles, individual users...' %}
+                    {% else %}
+                        {% set audiencePlaceholder = 'Search for classes or groups...' %}
+                    {% endif %}
+
+                    <div class="small-12 columns">
+                        <label>Audience</label>
+                        <p class="meta">Target your article to a specific audience. Use the input box below to search, or use the 'Browse' button to select from a list of available options.</p>
+
+                        <ul class="grid small-block-grid-1 medium-block-grid-2 large-block-grid-4 audience-grid" v-show="selectedAudienceItems.length">
+                            <li v-for="selectedAudienceItem in selectedAudienceItems">
+                                <div class="actions-small-1">
+                                    <div class="card small-12">
+                                        <h4 :title="selectedAudienceItem.name">${ selectedAudienceItem.name }</h4>
+                                        <p class="meta">${ selectedAudienceItem.entityType }</p>
+                                        <p class="meta" :title="selectedAudienceItem.modifier">${ selectedAudienceItem.modifier }</p>
+                                    </div>
+                                    <nav>
+                                        <a class="icon-close size-8" :title="'Remove ' + selectedAudienceItem.name + ' from audience'" @click="removeAudienceItem(selectedAudienceItem)"></a>
+                                    </nav>
+                                </div>
+                            </li>
+                        </ul>
+
+                        <div class="input-group">
+                            <input type="text" id="audience-search" name="audience" placeholder="{{ audiencePlaceholder }}" />
+                            <button class="button icon-drag-drop" @click.prevent="{{ (user.role.staff) ? 'openBrowseModal' : 'openBrowseModalRead' }}">Browse&hellip;</button>
+                        </div>
+                    </div>
+
+                    {# the modal #}
+                    <div data-reveal id="audience-browse" class="reveal-modal">
+                        <h2>Browse Audience</h2>
+                        <a class="close-reveal-modal" aria-label="Close">×</a>
+
+                        <div v-show="pageShow.index">
+                            <div class="small-12 medium-4 columns" v-for="audienceOption in audienceOptions">
+                                <button class="button-block" @click="changePage(audienceOption)">
+                                    <i :class="'icon-' + audienceOption.icon"></i>
+                                    ${ audienceOption.namePlural }
+                                </button>
+                            </div>
+                        </div>
+
+                        <div v-show="pageShow.valueSelect">
+                            <ul class="breadcrumb" v-show="writeOnly">
+                                <li><a href="#" @click.prevent="showPage('index')">Audience Types</a></li>
+                                <li class="active"><a>${ selectedAudienceOption.namePlural }</a></li>
+                            </ul>
+
+                            <p class="meta">Select ${ selectedAudienceOption.namePlural } below, then choose whether you would like to include the users themselves, the parents of the users, the teachers of the users, or a combination.</p>
+
+                            <div class="empty-state" v-show="showEmptyState">
+                                <p>No ${ selectedAudienceOption.namePlural } found.</p>
+                            </div>
+
+                            <fieldset class="checklist checklist-container" v-show="!showEmptyState">
+                                <div class="loader" v-show="showLoader"></div>
+                                <template v-for="(audienceListItem, index) in audienceListItems">
+                                    <input type="checkbox" :id="'audience-list-input-' + index" :value="audienceListItem" v-model="audienceListChecked" />
+                                    <label :for="'audience-list-input-' + index">${ audienceListItem.self.name }</label>
+                                </template>
+                            </fieldset>
+
+                            <fieldset class="checklist border-none" v-show="writeOnly">
+                                <input type="checkbox" id="audience-select-users" v-model="includeUsers" />
+                                <label for="audience-select-users">${ selectedAudienceOption.selfModifier }</label>
+                                {% if user.role.staff %}
+                                <input type="checkbox" id="audience-select-parents" v-model="includeParents" />
+                                <label for="audience-select-parents">Parents of students</label>
+                                <input type="checkbox" id="audience-select-teachers" v-model="includeTeachers" />
+                                <label for="audience-select-teachers">Teachers of students</label>
+                                {% endif %}
+                            </fieldset>
+
+                            <button class="button submit" @click.prevent="addAudience" :disabled="!submitEnable">Add</button>
+                        </div>
+
+                    </div>
+                </fieldset>
+
                 <fieldset class="content">
                     <div class="small-12 columns">
                         <label>Feature Image</label>
@@ -143,3 +185,406 @@
 </div>
 
 <div class="toast" id="saveDraft"></div>
+
+
+{# le scripts #}
+<script src="/javascript/ckeditor/ckeditor.js"></script>
+<script src="/javascript/shared/editor/jquery.editor.js"></script>
+<script src="/javascript/shared/comms/draft.js"></script>
+<script src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+<script src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
+<script>
+    'use strict';
+
+    $(function () {
+        {# CKEditors #}
+        $.fn.alaressEditor({
+            targetElements: $('#createForm textarea[name=body]')
+        });
+
+        $.fn.alaressEditor({
+            targetElements: $('#createForm textarea[name=blurb]'),
+            removePlugins: 'autoembed,uploadimage,schoolboxresource,schoolboxiframe,link'
+        });
+
+        {# Drafting mechanism #}
+        $('#createForm').draft({
+            inputs: ['title', 'publishAt', 'expiresAt', 'audience'],
+            textareas: ['body', 'blurb'],
+            attachzones: ['attachment']
+        });
+
+        $('[data-topics]').selectizeSelector({
+            ajax: {
+                url:      '{{ routeLookup('commsNews.getTopics') }}',
+                type:     'GET',
+                dataType: 'json'
+            },
+            selectize: {
+                placeholder: 'Assign Topics'
+            },
+            value: {{ article.topics|json_encode|raw }},
+            multiple: true
+        });
+
+    });
+
+    var app = new Vue({
+        el: '#audience-select-container',
+        delimiters: ['${', '}'],
+        mounted: function() {
+            var vue = this;
+
+            // Audience Selectize
+            // A blend of Vue and jQuery, what a world
+            $('#audience-search').selectizeSelector({
+                ajax: {
+                    url: '{{ routeLookup('commsNewsAudienceBrowser.getSearch') }}',
+                    type: 'GET',
+                    dataType: 'json'
+                },
+                selectize: {
+                    render: {
+                        option: function(item, escape) {
+                            return item.itemHtml;
+                        }
+                    },
+                    onItemAdd: function(value, $item) {
+                        // Selectize doesn't give us all the data of the selected item, find the item in the full list -_-
+                        var selectedItem = this.options[value];
+
+                        // Loop through the current audience items and check for an item with the same name and entityType to append to
+                        var baseItemKey;
+                        for (var selectedAudienceItem in vue.selectedAudienceItems) {
+                            if (
+                                vue.selectedAudienceItems[selectedAudienceItem].name === selectedItem.name &&
+                                vue.selectedAudienceItems[selectedAudienceItem].entityType === selectedItem.entityType
+                            ) {
+
+                                baseItemKey = selectedAudienceItem;
+                            }
+                        }
+
+                        if (baseItemKey) {
+                            var baseItem  = vue.selectedAudienceItems[baseItemKey];
+
+                            // Add the modifier to the object
+                            baseItem[selectedItem.modifierOriginal] = true;
+
+                            // Create the new modifier summary based on what modifiers are set
+                            var modifierSummary;
+
+                            if (
+                                baseItem.self &&
+                                baseItem.parents_of &&
+                                baseItem.teachers_of
+                            ) {
+                                modifierSummary = '(Inc. teachers & parents of students)';
+                            } else if (
+                                baseItem.self &&
+                                baseItem.parents_of
+                            ) {
+                                modifierSummary = '(Inc. parents of students)';
+                            } else if (
+                                baseItem.self &&
+                                baseItem.teachers_of
+                            ) {
+                                modifierSummary = '(Inc. teachers of students)';
+                            } else if (
+                                baseItem.parents_of &&
+                                baseItem.teachers_of
+                            ) {
+                                modifierSummary = '(Teachers & parents of students only)'
+                            }
+
+                            vue.$set(vue.selectedAudienceItems[baseItemKey], 'modifier', modifierSummary)
+                        } else {
+                            // Create a new block
+                            var newBlock = {
+                                id: selectedItem.id,
+                                name: selectedItem.name,
+                                entityType: selectedItem.entityType
+                            };
+
+                            if (selectedItem.modifier !== '') {
+                                newBlock['modifier'] = '(' + selectedItem.modifier + ' only)';
+                            }
+
+                            newBlock[selectedItem.modifierOriginal] = true;
+                            vue.selectedAudienceItems.push(newBlock);
+                        }
+
+                        // Hide this item from the selectize list
+                        $item.addClass('hide');
+
+                        // Selectize hides the placeholder once an item is added- we want to keep it, quite hacky
+                        $('#audience-search-selectized').attr('placeholder', '{{ audiencePlaceholder }}').css('width', '100%');
+
+                        // The selectize dropdown doesn't position correctly for some reason with this setup so force reposition again after a very short timeout
+                        setTimeout(function() {
+                            $('#audience-search').data('selectize').positionDropdown();
+                        }, 1);
+                    },
+                    onItemRemove: function() {
+                        // Selectize hides the placeholder once an item is removed- we want to keep it, quite hacky
+                        $('#audience-search-selectized').attr('placeholder', '{{ audiencePlaceholder }}').css('width', '100%');
+                    }
+                },
+                {% if audience|length %}
+                value: {{ audience|json_encode|raw }},
+                {% endif %}
+                multiple: true
+            });
+        },
+        data: {
+            // The set of options on the initial modal screen
+            audienceOptions: {
+                {% if user.role.staff %}
+                'campus': {
+                    id: 'campus',
+                    name: 'Campus',
+                    namePlural: 'Campuses',
+                    icon: 'location',
+                    selfModifier: 'Students in campus',
+                    ajax: '/comms/news/audiencebrowser/campuses'
+                },
+                'role': {
+                    id: 'role',
+                    name: 'Role',
+                    namePlural: 'Roles',
+                    icon: 'staff-students',
+                    selfModifier: 'Users in role',
+                    ajax: '/comms/news/audiencebrowser/roles'
+                },
+                'school_house': {
+                    id: 'school_house',
+                    name: 'House',
+                    namePlural: 'Houses',
+                    icon: 'home',
+                    selfModifier: 'House members',
+                    ajax: '/comms/news/audiencebrowser/houses'
+                },
+                'year': {
+                    id: 'year',
+                    name: 'Year Level',
+                    namePlural: 'Year Levels',
+                    icon: 'teacher',
+                    selfModifier: 'Students in year level/s',
+                    ajax: '/comms/news/audiencebrowser/yearlevels'
+                },
+                {% endif %}
+                'folder': {
+                    id: 'folder',
+                    name: 'Class/Group',
+                    namePlural: 'Classes & Groups',
+                    icon: 'group',
+                    selfModifier: 'Class/group members',
+                    ajax: '/comms/news/audiencebrowser/folders'
+                },
+                {% if user.role.staff %}
+                'pastoral_group': {
+                    id: 'pastoral_group',
+                    name: 'Pastoral Group',
+                    namePlural: 'Pastoral Groups',
+                    icon: 'pastoral',
+                    selfModifier: 'Group members',
+                    ajax: '/comms/news/audiencebrowser/pastoralgroups'
+                }
+                {% endif %}
+            },
+
+            // Modal sections showing and hiding
+            pageShow: {
+                'index': true,
+                'valueSelect': false
+            },
+
+            // The option selected by the user from the initial modal screen
+            selectedAudienceOption: {},
+
+            // The list of options populated by ajax after the user selects an initial option
+            audienceListItems: [],
+
+            // The checked state of the above list items
+            audienceListChecked: [],
+
+            // The list of selected audience groups for this article
+            selectedAudienceItems: [],
+
+            // Ajax responses of the above are stored in here, so that we don't do multiple ajax calls for the same thing
+            cachedOptions: [],
+
+            // Preloader and empty state showing/hiding for the 2nd screen
+            showLoader: true,
+            showEmptyState: false,
+
+            // The checked state of the three checkboxes at the bottom of the 2nd modal screen
+            includeUsers: true,
+            includeParents: false,
+            includeTeachers: false,
+
+            // Whether the user should see the write version of the modal or not.
+            // Read users will not see the write options even if this is set to true (because of twig conditionals), this just makes the experience easier
+            // for read users
+            writeOnly: {{ (user.role.staff) ? 'true' : 'false' }},
+        },
+        methods: {
+            /**
+             * Opening the 'browse...' modal
+             */
+            openBrowseModal: function () {
+                // Reset everythang
+                this.showPage('index');
+                this.resetModal();
+
+                // Open the modal
+                $('#audience-browse').foundation('reveal', 'open');
+            },
+
+            /**
+             * Opening the 'browse...' modal as a read user
+             * You get sent straight to the folder select option
+             */
+            openBrowseModalRead: function () {
+                this.resetModal();
+                this.changePage(this.audienceOptions.folder);
+
+                // Open the modal
+                $('#audience-browse').foundation('reveal', 'open');
+            },
+
+            /**
+             * Selecting one of the initial options
+             * @param audienceOption
+             */
+            changePage: function (audienceOption) {
+                var self = this;
+
+                // Reset everything
+                self.resetModal();
+
+                // Show the page
+                self.showPage('valueSelect');
+
+                // Update the selected option
+                self.selectedAudienceOption = audienceOption;
+
+                // Try for cached list
+                if (self.cachedOptions[audienceOption.id] !== undefined) {
+                    this.populateAudienceList(self.cachedOptions[audienceOption.id]);
+                } else { // Nope, ajax time
+                    // Request a list of options with the uri listed in the object above
+                    axios.get(audienceOption.ajax).then(function(response) {
+                        self.populateAudienceList(response.data.data);
+
+                        // Cache the options
+                        self.cachedOptions[audienceOption.id] = response.data.data;
+
+                    }).catch(function (error) {
+                        console.log(error);
+                    });
+                }
+            },
+
+            /**
+             * Show the list of items, or show the empty state
+             * @param data
+             */
+            populateAudienceList: function (data) {
+                // Hide the loader
+                this.showLoader = false;
+
+                if (data.length) {
+                    // Populate the list with cached version
+                    this.audienceListItems = data;
+                } else {
+                    // Show empty state
+                    this.showEmptyState = true;
+                }
+            },
+
+            /**
+             * Submitting the modal form
+             */
+            addAudience: function () {
+                var self = this;
+
+                // Add to selectize
+                self.audienceListChecked.forEach(function(option) {
+                    var selectizeOptions = [];
+
+                    if (self.includeUsers) {
+                        selectizeOptions.push(option.self);
+                    }
+
+                    if (self.includeParents) {
+                        selectizeOptions.push(option.parents_of);
+                    }
+
+                    if (self.includeTeachers) {
+                        selectizeOptions.push(option.teachers_of);
+                    }
+
+                    selectizeOptions.forEach(function (selectizeOption) {
+                        $('#audience-search').data('selectize').addOption(selectizeOption);
+                        $('#audience-search').data('selectize').addItem(selectizeOption.id);
+                    });
+                });
+
+                $('#audience-search').data('selectize').refreshItems();
+
+                // Close modal
+                $('#audience-browse').foundation('reveal', 'close');
+            },
+
+            /**
+             * Show the page specified, hiding the other
+             * @param page
+             */
+            showPage: function (page) {
+                // Set all pages to false to start
+                var self = this;
+                Object.keys(this.pageShow).forEach(function(page) {
+                    self.pageShow[page] = false;
+                });
+
+                // Set the specified page to true
+                this.pageShow[page] = true;
+            },
+
+            /**
+             * Reset the second modal section back to a default state
+             */
+            resetModal: function () {
+                this.audienceListItems = [];
+                this.audienceListChecked = [];
+                this.includeUsers = true;
+                this.includeParents = false;
+                this.includeTeachers = false;
+                this.showLoader = true;
+                this.showEmptyState = false;
+            },
+
+            /**
+             * Remove an audience item
+             */
+            removeAudienceItem: function(item) {
+                // Remove item + any modifiers for item from selectize
+                $('#audience-search').data('selectize').removeItem(item.id);
+                $('#audience-search').data('selectize').removeItem(item.id + '{{ relationshipParentsOf }}');
+                $('#audience-search').data('selectize').removeItem(item.id + '{{ relationshipTeachersOf }}');
+
+                // Remove from vue list
+                this.selectedAudienceItems.splice(this.selectedAudienceItems.indexOf(item), 1);
+            }
+        },
+        computed: {
+            /**
+             * Disable the modal submit button until each of the checklists has something checked
+             */
+            submitEnable: function () {
+                return !!(this.audienceListChecked.length && (this.includeUsers || this.includeParents || this.includeTeachers));
+            }
+        }
+    });
+</script>

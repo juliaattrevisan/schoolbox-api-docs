@@ -1100,22 +1100,17 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
 
     /**
-     * Port of \Group->involvedInCategoryList() method.
+     * Generates the prepared statement for usage in findFolderIdsForUser() and findForUser()
      *
-     * @param User $user The user to search for.
-     * @param bool $get_subjects If false, subjects aren't retrieved.
-     * @param int $access_level Defaults to UserAccess::ACCESS_READ, but may be
-     *                           any access level.
-     * @param bool $exactAccess If true, $access_level must be exact
-     *
-     * @return \Schoolbox\Collection|Model[]
+     * @param User $user
+     * @param bool $get_subjects
+     * @param int  $access_level
+     * @param bool $exactAccess
+     * @return PDOStatement
+     * @throws DefinitionException
      */
-    public function findForUser(
-        User $user,
-        $get_subjects = true,
-        $access_level = UserAccess::ACCESS_READ,
-        $exactAccess = false
-    ) {
+    private function findForUserQuery(User $user, bool $get_subjects, int $access_level, bool $exactAccess)
+    {
         $query = "
 			SELECT
 				{$this->getColumnString('c')},
@@ -1174,6 +1169,57 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
         $statement = $this->database->prepare($query);
         $statement->execute($params);
+
+        return $statement;
+    }
+
+
+    /**
+     * Synonymous with findForUser() but returns you a scalar list of unique folder ids instead
+     *
+     * @param User $user
+     * @param bool $get_subjects
+     * @param int  $access_level
+     * @param bool $exactAccess
+     * @return array
+     * @throws DefinitionException
+     */
+    public function findFolderIdsForUser(
+        User $user,
+        $get_subjects = true,
+        $access_level = UserAccess::ACCESS_READ,
+        $exactAccess = false
+    ): array {
+        $statement = $this->findForUserQuery($user, $get_subjects, $access_level, $exactAccess);
+
+        $ids = [];
+
+        while($row = $statement->fetch(PDO::FETCH_ASSOC)) {
+            $ids[$row['c.id']] = $row['c.id'];
+        }
+
+        return array_keys($ids);
+    }
+
+
+    /**
+     * Port of \Group->involvedInCategoryList() method.
+     *
+     * @param User $user The user to search for.
+     * @param bool $get_subjects If false, subjects aren't retrieved.
+     * @param int $access_level Defaults to UserAccess::ACCESS_READ, but may be
+     *                           any access level.
+     * @param bool $exactAccess If true, $access_level must be exact
+     *
+     * @return \Schoolbox\Collection|Model[]
+     */
+    public function findForUser(
+        User $user,
+        $get_subjects = true,
+        $access_level = UserAccess::ACCESS_READ,
+        $exactAccess = false
+    ) {
+        $statement = $this->findForUserQuery($user, $get_subjects, $access_level, $exactAccess);
 
         /** @var Collection|Model[] $collection */
         $collection = $this->createCollection();

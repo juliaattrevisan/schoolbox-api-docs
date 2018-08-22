@@ -10,12 +10,16 @@ namespace Schoolbox\Comms\News;
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Web\Controller\Base;
+use Alaress\Web\Output\Html;
 use Aura\Router\Exception\RouteNotFound;
 use External_Class;
 use External_User;
 use InvalidArgumentException;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Collection;
+use Schoolbox\Comms\News\Audience;
+use Schoolbox\Comms\News\Audience\BusinessRules;
+use Schoolbox\Comms\News\Audience\RelationshipFilterer;
 use Schoolbox\Comms\News\Policy;
 use Schoolbox\Comms\News\SaveForLater;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -24,6 +28,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\News\Topic;
 use Schoolbox\News\TopicMapper;
 use Schoolbox\Permission\Access;
+use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Folder;
@@ -31,6 +36,7 @@ use Schoolbox\UserMapper;
 
 class Controller extends Base
 {
+
 
     /**
      * @var ErrorMapper
@@ -88,6 +94,17 @@ class Controller extends Base
     private $externalClass;
 
     /**
+     * @var Audience\Mapper
+     */
+    private $audienceMapper;
+
+    /**
+     * @var RoleAccessMapper
+     */
+    private $roleAccessMapper;
+
+
+    /**
      * Controller constructor.
      *
      * @param ErrorMapper             $errorMapper
@@ -101,6 +118,8 @@ class Controller extends Base
      * @param UserMapper              $userMapper
      * @param External_User           $externalUser
      * @param External_Class          $externalClass
+     * @param Audience\Mapper         $audienceMapper
+     * @param RoleAccessMapper        $roleAccessMapper
      */
     public function __construct(
         ErrorMapper $errorMapper,
@@ -113,13 +132,17 @@ class Controller extends Base
         Access\UserAccessMapper $userAccessMapper,
         UserMapper $userMapper,
         External_User $externalUser,
-        External_Class $externalClass
+        External_Class $externalClass,
+        Audience\Mapper $audienceMapper,
+        RoleAccessMapper $roleAccessMapper
     ) {
         $this->errorMapper = $errorMapper;
         $this->newsMapper = $newsMapper;
         $this->policyMapper = $policyMapper;
         $this->topicMapper = $topicMapper;
         $this->saveForLaterMapper = $saveForLaterMapper;
+        $this->audienceMapper = $audienceMapper;
+        $this->roleAccessMapper = $roleAccessMapper;
 
         /* Hyperdrive injection
          */
@@ -245,13 +268,25 @@ class Controller extends Base
             $zone->attachFiles([$article->getFeatureImage()->getHash()]);
         }
 
+        /* Audiencing decoration
+         */
+
+        /** @var Html $outputFormatter */
+        $outputFormatter = $this->getDi()->get('webOutput:nochrome');
+
+        $audiencingData = (new Audience\Segment\Transactor($this->getUser(), $this->audienceMapper, $this->folderMapper, $this->roleAccessMapper))->load($article);
+        $audiencingHtml = (new Audience\Segment\HtmlFormatter($outputFormatter))->decorate($audiencingData);
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/create.twig', [
             'policies' => $policies,
             'action' => 'Update',
             'user' => $this->getUser(),
             'article' => $article,
             'featureImageZone' => $zone->getTwigContext(),
+            'audience' => $audiencingHtml,
             'isCommsOfficer' => (new ValidUserIsCommsOfficer())->isSatisfiedBy($this->getUser()),
+            'relationshipParentsOf' => Audience\Segment\Codec::AUDIENCE_SEPARATOR . Audience\Model::RELATIONSHIP_PARENTS_OF,
+            'relationshipTeachersOf' => Audience\Segment\Codec::AUDIENCE_SEPARATOR . Audience\Model::RELATIONSHIP_TEACHERS_OF
         ])->setTitle("Update {$article->getTitle()}"));
     }
 
@@ -372,6 +407,10 @@ class Controller extends Base
         }
 
         $this->newsMapper->save($article);
+
+        /* Set audiencing options via the hyperdrive
+         */
+        (new Audience\Segment\Transactor($this->getUser(), $this->audienceMapper, $this->folderMapper, $this->roleAccessMapper))->save($article, $this->getRequest()->post['audience']);
     }
 
 
@@ -704,5 +743,42 @@ class Controller extends Base
         ]);
 
         return $partialData;
+    }
+
+
+    /**
+     * Compute the recipients so author can identify
+     *
+     * @api /comms/news/:articleId/recipients
+     *
+     * @param Model $article
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \UnderflowException
+     * @throws \UnexpectedValueException
+     */
+    public function getRecipients(Model $article)
+    {
+        $userIds = (new Audience\UserResolver(
+            new BusinessRules(),
+            $this->databaseInternal,
+            $this->externalClass,
+            new RelationshipFilterer(
+                $this->databaseInternal,
+                $this->userMapper,
+                $this->externalUser,
+                $this->folderMapper,
+                $this->externalClass,
+                $this->userAccessMapper
+            ),
+            $this->audienceMapper
+        ))->findUsersForArticle($article->getId());
+
+        if (\count($userIds)) {
+            $users = $this->userMapper->findByColumn('id', $userIds)->sortBy('lastname', 'asc');
+        } else {
+            $users = $this->userMapper->createCollection();
+        }
+
+        $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@commsNews/recipients.twig', ['users' => $users]));
     }
 }
