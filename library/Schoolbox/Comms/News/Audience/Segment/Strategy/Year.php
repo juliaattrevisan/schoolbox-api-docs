@@ -23,6 +23,7 @@ class Year implements ISearch, ITranslate
      */
     public function getSearchSql(): string
     {
+        $entityType = Model::ENTITY_TYPE_YEAR;
         return "
             SELECT id, 
                 CASE
@@ -30,7 +31,7 @@ class Year implements ISearch, ITranslate
                 THEN CONCAT('Year ', `user`.year)
                 ELSE `user`.year
                 END
-            AS name, '".Model::ENTITY_TYPE_YEAR."' AS entity_type
+            AS name, '{$entityType}' AS entity_type
             FROM `user`
             WHERE year LIKE :keyword
             AND deleted_at IS NULL
