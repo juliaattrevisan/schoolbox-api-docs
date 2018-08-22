@@ -16,7 +16,7 @@ var validateOptions = {
         }
     },
     messages: {
-        weight: 'The ' + scriptValidationRules.attr('data-locale-grading-proper') + ' weight should zero or greater',
+        weight: 'The ' + scriptValidationRules.attr('data-locale-grading-proper') + ' weight should be zero or greater',
     }
 };
 
