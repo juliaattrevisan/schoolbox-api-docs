@@ -23,6 +23,7 @@ class PastoralGroup implements ISearch, ITranslate
      */
     public function getSearchSql(): string
     {
+        // Note that we need to collate the output so the result set can be UNIONed with other result sets
         return "
             SELECT id, name COLLATE utf8mb4_general_ci, '".Model::ENTITY_TYPE_PASTORAL_GROUP."' AS entity_type 
             FROM `pastoral_group`
