@@ -172,6 +172,127 @@ class RubricMapper
      */
     public function persistRowSet(RowSet $rowSet, bool $allowModifyUsed, bool $persistCurriculum): void
     {
+        $folder               = $rowSet->getContext()->getBaseContext()->getFolder();
+        $existingRowSet       = $this->retrieveRowSet($rowSet->getContext(), true);
+        $existingGroupIds     = $existingRowSet->retrieveGroupIds();
+        $existingCriterionIds = $existingRowSet->retrieveCriterionIds();
+        $newGroupIds          = $rowSet->retrieveGroupIds();
+        $newCriterionIds      = $rowSet->retrieveCriterionIds();
+
+        $groupMapper          = GroupMapper::getInstance();
+        $criterionMapper      = CriterionMapper::getInstance();
+        $existingGroupModels  = $groupMapper->findByColumn('id', $existingGroupIds);
+        $newGroupModels       = $groupMapper->createCollection();
+
+        foreach ($rowSet->getGroups() as $group) {
+            $existingGroup = null;
+            $groupId       = $group->getId();
+            $groupModel    = null;
+            if ($groupId) {
+                $existingGroup = $existingRowSet->retrieveGroup($group->getId());
+                $groupModel    = $existingGroupModels[$groupId] ?? null;
+            }
+
+            // If the group model doesn't exist yet: create it
+            if (!$groupModel) {
+                $groupModel = $groupMapper->createModel()
+                    ->setId($groupId)
+                    ->setParentId($folder->getId())
+                    ->setParentType(Group::PARENT_TYPE_CATEGORY);
+            }
+
+            // Validate whether name can be changed
+            $allowNameChange = true;
+            if ($existingGroup && !$allowModifyUsed && $existingGroup->isInUse()) {
+                $allowNameChange = false;
+            }
+            if ($allowNameChange) {
+                $groupModel->setName($group->getName());
+            }
+
+            // Validate whether curriculum code can be changed
+            if ($persistCurriculum) {
+                $groupModel->setCurriculumNodes($group->getCurriculumNodes());
+            }
+
+
+
+//            foreach ($group->getCriteria() as $criterion) {
+//                // Persist criterion
+//                $criterionId    = $criterion->getId();
+//                $criterionModel = $criterionId ? $oldCriterionModels[$criterionId] : null;
+//
+//                if (!$criterionModel) {
+//                    $criterionModel = $criterionMapper->createModel($criterionId)
+//                                                      ->setGroup($groupModel);
+//                }
+//
+//                if ($allowModifyUsed || !$criterion->isInUse()) {
+//                    $criterionModel->setName($criterion->getName());
+//                }
+//
+//                if ($persistCurriculum) {
+//                    $criterionModel->setCurriculumNodes($criterion->getCurriculumNodes());
+//                }
+//
+//                $newCriterionModels->add($criterionModel);
+//            }
+
+
+
+            // Add group to list
+            $newGroupModels->add($groupModel);
+        }
+
+
+        if (!$allowModifyUsed) {
+            // Validate deleted groups aren't in use
+            foreach (array_diff($existingGroupIds, $newGroupIds) as $deletedGroupId) {
+                // validate this isn't in use
+                $existingGroup = $existingRowSet->retrieveGroup($deletedGroupId);
+                if ($existingGroup && $existingGroup->isInUse()) {
+                    // throw exception
+                }
+            }
+
+            // Validate deleted criteria aren't in use
+            foreach (array_diff($existingCriterionIds, $newCriterionIds) as $deletedCriterionId) {
+                // validate this isn't in use
+                $existingCriterion = $existingRowSet->retrieveCriterion($deletedCriterionId);
+                if ($existingCriterion && $existingCriterion->isInUse()) {
+                    // throw exception
+                }
+            }
+
+        }
+
+
+        // Iterate new rowset
+        // Any which exist in old and not in new: delete
+        // Any which exist in new and not in old: create
+        // Any others: update
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         $folder             = $rowSet->getContext()->getBaseContext()->getFolder();
         $groupMapper        = GroupMapper::getInstance();
         $oldGroupModels     = $groupMapper->findForFolder($folder->getId());
