@@ -24,6 +24,8 @@ class Year implements ISearch, ITranslate
     public function getSearchSql(): string
     {
         $entityType = Model::ENTITY_TYPE_YEAR;
+
+        // If user.year is numeric, prefix 'Year ' to read like 'Year 9'
         return "
             SELECT
               year AS id,
