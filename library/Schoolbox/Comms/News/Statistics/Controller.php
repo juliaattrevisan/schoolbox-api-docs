@@ -62,34 +62,34 @@ class Controller extends Base
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsStatistics/index.twig', [
             'article' => $article,
 
-            /* Overall Cumulative summary
-             */
-            'cumulative' => $impressionsConversionsOpens->fetchCumulative($article),
-
-            /* Overall Referrer Demographics
-             */
-            'referrerDemographic' => $impressionsConversionsOpens->fetchReferrerDemographic($article),
-
-            /* Accuracy selector
-             */
-            'accuracies' => ImpressionsConversionsOpens::ACCURACIES,
-            'accuracy' => $accuracy,
-
+//            /* Overall Cumulative summary
+//             */
+//            'cumulative' => $impressionsConversionsOpens->fetchCumulative($article),
+//
+//            /* Overall Referrer Demographics
+//             */
+//            'referrerDemographic' => $impressionsConversionsOpens->fetchReferrerDemographic($article),
+//
+//            /* Accuracy selector
+//             */
+//            'accuracies' => ImpressionsConversionsOpens::ACCURACIES,
+//            'accuracy' => $accuracy,
+//
             /* Conversions, Impressions vs TIme
              */
             'conversions' => $impressionsConversionsOpens->fetchConversions($article, $accuracy),
-
-            /* Conversion Ratio Chronological
-             */
-            'conversionRatio' => $impressionsConversionsOpens->fetchConversionRatio($article, $accuracy),
-
-            /* Interaction Referrers This Period
-             */
-            'referrersThisPeriod' => $impressionsConversionsOpens->fetchInteractionReferrers($article),
-
-            /* Historical Dailies
-             */
-            'historic' => $impressionsConversionsOpens->fetchHistoric($article),
+//
+//            /* Conversion Ratio Chronological
+//             */
+//            'conversionRatio' => $impressionsConversionsOpens->fetchConversionRatio($article, $accuracy),
+//
+//            /* Interaction Referrers This Period
+//             */
+//            'referrersThisPeriod' => $impressionsConversionsOpens->fetchInteractionReferrers($article),
+//
+//            /* Historical Dailies
+//             */
+//            'historic' => $impressionsConversionsOpens->fetchHistoric($article),
         ])->setTitle("Statistics for {$article->getTitle()}"));
     }
 }

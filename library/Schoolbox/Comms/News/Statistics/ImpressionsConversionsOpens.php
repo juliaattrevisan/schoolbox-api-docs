@@ -39,11 +39,11 @@ class ImpressionsConversionsOpens
      * @var array
      */
     public const ACCURACIES = [
-        '1min'  => "SUBSTRING(occurs_at FROM 1 FOR 16),         ':00'",
-        '10min' => "SUBSTRING(occurs_at FROM 1 FOR 15),        '0:00'",
-        'hour'  => "SUBSTRING(occurs_at FROM 1 FOR 13),      ':00:00'",
-        'day'   => "SUBSTRING(occurs_at FROM 1 FOR 11),    '00:00:00'",
-        'month' => "SUBSTRING(occurs_at FROM 1 FOR 7), '-01 00:00:00'",
+        '5min'  => 5,
+        '10min' => 10,
+        'hour'  => 60,
+        'day'   => 60*24,
+        'month' => 60*24*31,
     ];
 
     /**
@@ -539,16 +539,14 @@ class ImpressionsConversionsOpens
     public function fetchConversions(News\Model $article, ?string $accuracy = self::DEFAULT_ACCURACY): array
     {
 
-        $range = $this->generateDateRange(\Alaress_Date_Format::now(), \Alaress_Date_Format::now(), 5);
-        new \Alaress_Probe($range);
-
         /* Determine a sane value
          */
-        $accuracySql = self::ACCURACIES[$this->assertAccuracy($accuracy)];
+        $accuracySql = $this->assertAccuracy($accuracy);
 
         $statement = $this->database->prepareQuery("
             SELECT 
-                1000*UNIX_TIMESTAMP(CONCAT({$accuracySql})) AS timestamp,
+                FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(occurs_at)/({$accuracySql}*60))*({$accuracySql}*60)) AS datetime,
+                1000*FLOOR(UNIX_TIMESTAMP(occurs_at)/({$accuracySql}*60))*({$accuracySql}*60) AS timestamp,
                 `type`,
                 COUNT(*) AS num
             FROM {$this->statisticsMapper->getTable()}
@@ -562,13 +560,27 @@ class ImpressionsConversionsOpens
             'articleId' => $article->getId()
         ]);
 
-        $data = [];
+        $range = $this->generateDateRange(\Alaress_Date_Format::now()->addDays(-1*self::PERIOD_LENGTH), \Alaress_Date_Format::now(), 5);
+
+        $data = [
+            Mapper::TYPE_CONVERSION => $range,
+            Mapper::TYPE_IMPRESSION => $range,
+            Mapper::TYPE_OPEN => $range
+        ];
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $data[$row['type']][] = [(int)$row['timestamp'], (int)$row['num']];
+            $data[$row['type']][$row['datetime']] = [ (int)$row['timestamp'], (int)$row['num']];
         }
 
-        return $data;
+        /* Put it in a format highcharts understands - remove timestamp array key
+         */
+        $condensed = [];
+
+        foreach ($data as $type => $values) {
+            $condensed[$type] = array_values($values);
+        }
+
+        return $condensed;
     }
 
 
@@ -645,7 +657,7 @@ class ImpressionsConversionsOpens
             $accuracy = self::DEFAULT_ACCURACY;
         }
 
-        return $accuracy;
+        return self::ACCURACIES[$accuracy];
     }
 
     /**
@@ -693,24 +705,24 @@ class ImpressionsConversionsOpens
      *
      * @param \Alaress_Date_Format $start
      * @param \Alaress_Date_Format $end
-     * @param int                  $interval
+     * @param int                  $interval (number of minutes)
      * @return array
      */
     private function generateDateRange(\Alaress_Date_Format $start, \Alaress_Date_Format $end, int $interval): array
     {
         $start->startOfDay();
-        $end->endOfDay();
-
         $endTimestamp = $end->getUnixTimeStamp();
 
         $range = [];
 
+        /* Multiply by 1000 to get milliseconds conversion, because highcharts
+         */
         while ($start->getUnixTimeStamp() < $endTimestamp) {
-            $range[] = $start->getDatabase();
+            $range[$start->getDatabase()] = [1000*$start->getUnixTimeStamp(), 0];
 
             $start->addMinutes($interval);
         }
 
-        return array_fill_keys($range, 0);
+        return $range;
     }
 }
