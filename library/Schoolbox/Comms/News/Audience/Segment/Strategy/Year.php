@@ -23,14 +23,14 @@ class Year implements ISearch, ITranslate
      */
     public function getSearchSql(): string
     {
+        $entityType = Model::ENTITY_TYPE_YEAR;
+
+        // If user.year is numeric, prefix 'Year ' to read like 'Year 9'
         return "
-            SELECT id, 
-                CASE
-                WHEN CONCAT('', 1*`user`.year) = `user`.year
-                THEN CONCAT('Year ', `user`.year)
-                ELSE `user`.year
-                END
-            AS name, '".Model::ENTITY_TYPE_YEAR."' AS entity_type
+            SELECT DISTINCT
+              year AS id,
+              IF(year REGEXP '^[0-9]+$', CONCAT('Year ', year), year) AS name,
+              '{$entityType}' AS entity_type
             FROM `user`
             WHERE year LIKE :keyword
             AND deleted_at IS NULL
