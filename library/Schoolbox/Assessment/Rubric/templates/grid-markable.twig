@@ -372,11 +372,11 @@
 
                     case 'LetterGrade':
                         var grades = getLetterGrades($groupSummary);
-                        $groupSummary.find("[data-group-descriptor-sum]").text(getLetterGradeFromNumeric(getPercentage($groupSummary, $groupSummary.data('mark')), grades));
+                        $groupSummary.find("[data-group-descriptor-sum]").text(getLetterGradeFromNumeric(getPercentage($groupSummary, $groupSummary.attr('data-mark')), grades));
                         break;
 
                     case 'Percentage':
-                        $groupSummary.find("[data-group-descriptor-sum]").text(getPercentage($groupSummary, $groupSummary.data('mark')) + "%");
+                        $groupSummary.find("[data-group-descriptor-sum]").text(getPercentage($groupSummary, $groupSummary.attr('data-mark')) + "%");
                         break;
 
                     default:
@@ -393,11 +393,11 @@
                                 break;
 
                             case 'LetterGrade':
-                                assignLetterGrade(getPercentage($groupSummary, $groupSummary.data('mark')), $groupSummary.find("[data-group-max-value]").val(scaledGroupMark));
+                                assignLetterGrade(getPercentage($groupSummary, $groupSummary.attr('data-mark')), $groupSummary.find("[data-group-max-value]").val(scaledGroupMark));
                                 break;
 
                             case 'Percentage':
-                                $groupSummary.find("[data-group-max-value]").val(getPercentage($groupSummary, $groupSummary.data('mark')));
+                                $groupSummary.find("[data-group-max-value]").val(getPercentage($groupSummary, $groupSummary.attr('data-mark')));
                                 break;
 
                             default:
@@ -517,11 +517,11 @@
                     break;
 
                 case 'LetterGrade':
-                    assignLetterGrade(getPercentage($groupSummary, $groupSummary.data('mark')), $gradeInput.val(scaledGroupMark));
+                    assignLetterGrade(getPercentage($groupSummary, $groupSummary.attr('data-mark')), $gradeInput.val(scaledGroupMark));
                     break;
 
                 case 'Percentage':
-                    $groupSummary.find("[data-group-max-value]").val(getPercentage($groupSummary, $groupSummary.data('mark')));
+                    $groupSummary.find("[data-group-max-value]").val(getPercentage($groupSummary, $groupSummary.attr('data-mark')));
                     break;
 
                 default:
