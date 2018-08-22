@@ -11,9 +11,6 @@ var validateOptions = {
             number: true,
             min: 0
         },
-        '[data-descriptor-value]': {
-            required: true
-        }
     },
     messages: {
         weight: 'The ' + scriptValidationRules.attr('data-locale-grading-proper') + ' weight should be zero or greater',

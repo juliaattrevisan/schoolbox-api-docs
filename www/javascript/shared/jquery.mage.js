@@ -23,6 +23,7 @@
         onRevert: $.noop,
         confirmRevert: $.noop,
         setFormData: $.noop,
+        initValidation: $.noop,
         validateOptions: false,
         defaultErrorMessage: 'Something went wrong when submitting the form. Please try again.'
     };
@@ -83,6 +84,9 @@
         $form
             .off('click', '[name=' + this.thisPart + ']', onclick)
             .on('click',  '[name=' + this.thisPart + ']', onclick);
+
+        $form.alaressValidate(self.options.validateOptions);
+        self.options.initValidation.call();
     }
 
 
