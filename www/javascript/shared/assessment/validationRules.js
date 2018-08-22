@@ -43,7 +43,7 @@ var beforeSubmit = function() {
             {
                 noDecimalPlacesWithMarkRange: true, // have to add this again since its not in validateOptiosn and the plugin overwrites it
                 descriptorsAreMonotonic: true,
-                messages: {
+                messages: { // TODO why this not working
                     descriptorsAreMonotonic: " use only descriptor points with non-decimal values if Use Mark Range is enabled"
                 }
             }
