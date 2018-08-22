@@ -173,22 +173,29 @@ class RubricMapper
      */
     public function persistRowSet(RowSet $rowSet, bool $allowModifyUsed, bool $persistCurriculum): void
     {
+        // Where does this go?
         $folder                  = $rowSet->getContext()->getBaseContext()->getFolder();
+
+        // Required mappers
+        $groupMapper             = GroupMapper::getInstance();
+        $criterionMapper         = CriterionMapper::getInstance();
+        $errorMapper             = ErrorMapper::getInstance();
+
+        // Existing data
         $existingRowSet          = $this->retrieveRowSet($rowSet->getContext(), true);
         $existingGroupIds        = $existingRowSet->retrieveGroupIds();
         $existingCriterionIds    = $existingRowSet->retrieveCriterionIds();
+        $existingGroupModels     = $groupMapper->findByColumn('id', $existingGroupIds);
+        $existingCriterionModels = $criterionMapper->findByColumn('id', $existingCriterionIds);
+
+        // New data
         $newGroupIds             = $rowSet->retrieveGroupIds();
         $newCriterionIds         = $rowSet->retrieveCriterionIds();
-
-        $groupMapper             = GroupMapper::getInstance();
-        $criterionMapper         = CriterionMapper::getInstance();
-        $existingGroupModels     = $groupMapper->findByColumn('id', $existingGroupIds);
         $newGroupModels          = $groupMapper->createCollection();
-        $existingCriterionModels = $criterionMapper->findByColumn('id', $existingCriterionIds);
         $newCriterionModels      = $criterionMapper->createCollection();
 
-        $errorMapper             = ErrorMapper::getInstance();
 
+        // Process groups+criteria into models
         foreach ($rowSet->getGroups() as $group) {
             // Set the group aside to be persisted
             $existingGroup = null;
@@ -261,6 +268,7 @@ class RubricMapper
         }
 
 
+        // Validate whether groups marked for deletion may actually be removed
         $deletedGroupIds     = array_diff($existingGroupIds, $newGroupIds);
         $deletedCriterionIds = array_diff($existingCriterionIds, $newCriterionIds);
         if (!$allowModifyUsed) {
@@ -292,97 +300,8 @@ class RubricMapper
 
 
         // Tidy up unsaved groups+criteria
-        $this->tidyUp($criterionMapper, $deletedCriterionIds, []);
-        $this->tidyUp($groupMapper, $deletedGroupIds, []);
-
-
-        // Iterate new rowset
-        // Any which exist in old and not in new: delete
-        // Any which exist in new and not in old: create
-        // Any others: update
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//        $folder             = $rowSet->getContext()->getBaseContext()->getFolder();
-//        $groupMapper        = GroupMapper::getInstance();
-//        $oldGroupModels     = $groupMapper->findForFolder($folder->getId());
-//        $newGroupModels     = $groupMapper->createCollection();
-//        $criterionMapper    = CriterionMapper::getInstance();
-//        $oldCriterionModels = $criterionMapper->findForFolder($folder->getId());
-//        $newCriterionModels = $criterionMapper->createCollection();
-//
-//
-//        foreach ($rowSet->getGroups() as $group) {
-//            // Persist group
-//            $groupId    = $group->getId();
-//            $groupModel = $groupId ? $oldCriterionModels[$groupId] : null;
-//
-//            if (!$groupModel) {
-//                $groupModel = $groupMapper->createModel($groupId)
-//                    ->setParentId($folder->getId())
-//                    ->setParentType(Group::PARENT_TYPE_CATEGORY);
-//            }
-//
-//            // Don't allow name to change, or it to be deleted, if it's in use
-//            // TODO figure out stopping delete
-//            if ($allowModifyUsed || !$group->isInUse()) {
-//                $groupModel->setName($group->getName());
-//            }
-//
-//            if ($persistCurriculum) {
-//                $groupModel->setCurriculumNodes($group->getCurriculumNodes());
-//            }
-//
-//
-//            foreach ($group->getCriteria() as $criterion) {
-//                // Persist criterion
-//                $criterionId    = $criterion->getId();
-//                $criterionModel = $criterionId ? $oldCriterionModels[$criterionId] : null;
-//
-//                if (!$criterionModel) {
-//                    $criterionModel = $criterionMapper->createModel($criterionId)
-//                        ->setGroup($groupModel);
-//                }
-//
-//                if ($allowModifyUsed || !$criterion->isInUse()) {
-//                    $criterionModel->setName($criterion->getName());
-//                }
-//
-//                if ($persistCurriculum) {
-//                    $criterionModel->setCurriculumNodes($criterion->getCurriculumNodes());
-//                }
-//
-//                $newCriterionModels->add($criterionModel);
-//            }
-//            $newGroupModels[$groupId] = $groupModel;
-//        }
-//
-//        // Save the ones which changed
-//        $groupMapper->save($newGroupModels);
-//        $criterionMapper->save($newCriterionModels);
-//
-//        // Delete the ones in old models that aren't in new
-//        $criterionMapper->delete($oldCriterionModels->diffBy($newCriterionModels, 'id'));
-//        $groupMapper->delete($oldGroupModels->diffBy($newGroupModels, 'id'));
+        $this->tidyUp($criterionMapper, ['id' => $deletedCriterionIds], []);
+        $this->tidyUp($groupMapper, ['id' => $deletedGroupIds], []);
     }
 
 
