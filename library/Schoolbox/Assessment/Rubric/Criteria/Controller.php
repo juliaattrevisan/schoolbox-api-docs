@@ -35,12 +35,6 @@ class Controller extends BaseController
 
 
     /**
-     * @var ErrorMapper
-     */
-    private $errorMapper;
-
-
-    /**
      * @var RosettaStone
      */
     private $rosettaStone;
@@ -51,18 +45,15 @@ class Controller extends BaseController
      *
      * @param NodeMapper   $nodeMapper
      * @param RubricMapper $rubricMapper
-     * @param ErrorMapper  $errorMapper
      * @param RosettaStone $rosettaStone
      */
     public function __construct(
         NodeMapper $nodeMapper,
         RubricMapper $rubricMapper,
-        ErrorMapper $errorMapper,
         RosettaStone $rosettaStone
     ) {
         $this->nodeMapper   = $nodeMapper;
         $this->rubricMapper = $rubricMapper;
-        $this->errorMapper  = $errorMapper;
         $this->rosettaStone = $rosettaStone;
     }
 

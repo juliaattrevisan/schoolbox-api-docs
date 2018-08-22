@@ -73,7 +73,6 @@ class Module extends BaseModule
                 [
                     'nodeMapper'   => $this->getMapperFactory()->getLazy(NodeMapper::class),
                     'rubricMapper' => $this->getMapperFactory()->getLazy(RubricMapper::class),
-                    'errorMapper'  => $this->getMapperFactory()->getLazy(ErrorMapper::class),
                     'rosettaStone' => $injector->lazyGet('l10n'),
                 ]
             )
