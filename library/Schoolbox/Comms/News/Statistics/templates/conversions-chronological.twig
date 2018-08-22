@@ -101,14 +101,14 @@
                     name: 'Non-referred Opens',
                     data: {{ conversions['open']|json_encode|raw }}
                 },
-                {#{#}
-                    {#color: '#629e51',#}
-                    {#lineWidth: 1,#}
-                    {#name: 'Conversion Ratio This Period (%)',#}
-                    {#type: 'spline',#}
-                    {#yAxis: 1,#}
-                    {#data: {{ conversionRatio|json_encode|raw }}#}
-                {#}#}
+                {
+                    color: '#629e51',
+                    lineWidth: 1,
+                    name: 'Conversion Ratio This Period (%)',
+                    type: 'spline',
+                    yAxis: 1,
+                    data: {{ conversionRatio|json_encode|raw }}
+                }
             ]
         });
     });

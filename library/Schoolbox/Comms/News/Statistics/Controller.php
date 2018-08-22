@@ -82,7 +82,7 @@ class Controller extends Base
 
             /* Conversion Ratio Chronological
              */
-//            'conversionRatio' => $impressionsConversionsOpens->fetchConversionRatio($article, $accuracy),
+            'conversionRatio' => $impressionsConversionsOpens->fetchConversionRatio($article, $accuracy),
 
             /* Interaction Referrers This Period
              */

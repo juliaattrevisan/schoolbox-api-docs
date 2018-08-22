@@ -429,14 +429,14 @@ class ImpressionsConversionsOpens
     {
         /* Determine a sane value
          */
-        $accuracySql = self::ACCURACIES[$this->assertAccuracy($accuracy)];
+        $strat = (new Factory())->produce($accuracy);
 
         /* Get all the timestamps that have content - because of the way highcharts stacks its data
          * I need to initialise the container with all the possibilities and stack categorised data in-order
          */
         $statement = $this->database->prepareQuery("
             SELECT 
-                1000*UNIX_TIMESTAMP(CONCAT({$accuracySql})) AS timestamp,
+                {$strat->getSql($accuracy)}
                 COUNT(*) AS num,
                 `type`
             FROM {$this->statisticsMapper->getTable()}
