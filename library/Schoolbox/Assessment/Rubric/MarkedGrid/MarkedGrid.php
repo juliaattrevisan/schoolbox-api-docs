@@ -8,7 +8,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\MarkedGrid;
 
-use Schoolbox\Assessment\Rubric\DescriptorMark;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IFeedback;
