@@ -13,7 +13,6 @@ use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\Rubric\RowSet\Factory;
 use Schoolbox\Assessment\Rubric\RowSet\RowSet;
 use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
-use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 
