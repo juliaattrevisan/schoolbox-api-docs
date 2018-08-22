@@ -154,7 +154,7 @@ class Factory
             }
 
             if (! (new ValidDescriptorRow($usesMarkRange))->isSatisifedBy($c->getAllDescriptors()) ) {
-                throw new InvalidArgumentException("Descriptor values must be an ascending or descending sequence");
+                throw new InvalidArgumentException("only use descriptor values that form an ascending or descending sequence within a row");
             }
 
         }

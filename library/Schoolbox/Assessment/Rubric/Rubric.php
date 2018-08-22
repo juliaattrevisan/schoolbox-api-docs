@@ -117,7 +117,7 @@ class Rubric implements Twiggable
     {
         // Are we using a mark range AND have a decimal descriptor val? Can't do dat!
         if (! (new ValidDescriptor($usesMarkRange))->isSatisifedBy($descriptor) ) {
-            throw new InvalidArgumentException("Cannot create a descriptor with decimal places when Use Mark Range is enabled");
+            throw new InvalidArgumentException("disable Mark Range to use decimal places in descriptor point values");
         }
 
         // ensure both the group and the level exist
