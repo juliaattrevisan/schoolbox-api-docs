@@ -62,6 +62,7 @@ class SearchRegistry implements ISearch
             $pieces[] = "({$strategy->getSearchSql()})";
         }
 
-        return implode(' UNION ', $pieces);
+        // We can UNION ALL and avoid de-duplication logic as each sub-query has a distinct entity type
+        return implode(' UNION ALL ', $pieces);
     }
 }

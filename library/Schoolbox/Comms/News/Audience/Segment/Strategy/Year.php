@@ -27,7 +27,7 @@ class Year implements ISearch, ITranslate
 
         // If user.year is numeric, prefix 'Year ' to read like 'Year 9'
         return "
-            SELECT
+            SELECT DISTINCT
               year AS id,
               IF(year REGEXP '^[0-9]+$', CONCAT('Year ', year), year) AS name,
               '{$entityType}' AS entity_type
