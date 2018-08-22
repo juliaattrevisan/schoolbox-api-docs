@@ -39,11 +39,14 @@ class ImpressionsConversionsOpens
      * @var array
      */
     public const ACCURACIES = [
-        '5min'  => 5,
-        '10min' => 10,
-        'hour'  => 60,
-        'day'   => 60*24,
-        'month' => 60*24*31,
+        '10min'     => 10,
+        '30min'     => 30,
+        'hour'      => 60,
+        '12hour'    => 60*12,
+        'day'       => 60*24,
+        'week'      => 60*24*7,
+        'fortnight' => 60*24*14,
+        'month'     => 60*24*31,
     ];
 
     /**
@@ -560,7 +563,7 @@ class ImpressionsConversionsOpens
             'articleId' => $article->getId()
         ]);
 
-        $range = $this->generateDateRange(\Alaress_Date_Format::now()->addDays(-1*self::PERIOD_LENGTH), \Alaress_Date_Format::now(), 5);
+        $range = $this->generateDateRange(\Alaress_Date_Format::now()->addDays(-1*self::PERIOD_LENGTH), \Alaress_Date_Format::now(), $accuracySql);
 
         $data = [
             Mapper::TYPE_CONVERSION => $range,

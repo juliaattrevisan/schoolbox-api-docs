@@ -70,11 +70,11 @@ class Controller extends Base
 //             */
 //            'referrerDemographic' => $impressionsConversionsOpens->fetchReferrerDemographic($article),
 //
-//            /* Accuracy selector
-//             */
-//            'accuracies' => ImpressionsConversionsOpens::ACCURACIES,
-//            'accuracy' => $accuracy,
-//
+            /* Accuracy selector
+             */
+            'accuracies' => ImpressionsConversionsOpens::ACCURACIES,
+            'accuracy' => $accuracy,
+
             /* Conversions, Impressions vs TIme
              */
             'conversions' => $impressionsConversionsOpens->fetchConversions($article, $accuracy),
