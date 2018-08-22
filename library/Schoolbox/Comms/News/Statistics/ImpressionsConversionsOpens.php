@@ -550,14 +550,24 @@ class ImpressionsConversionsOpens
         }
 
         /* Put it in a format highcharts understands - remove timestamp array key
+         * Sort it, in case the month view is used - there's a case where visual anomalies can be rendered.
+         * The way the strat works is that it takes all the interactions for a month and assumes them all to
+         * have happened in the first day of that month, for the sake of compiling data for highcharts.
+         *
+         * The date range is specified as PERIOD_LENGTH before the current time, so if it's Aug 22 now, the
+         * date range will be Jul 22 - Aug 22. However the month's data is simulated to occur on Jul 1. This
+         * puts a data point in a random place in the array, so we sort it to ensure everything looks like
+         * it occurred chronologically (highcharts doesn't seem to understand this situation)
          */
-        $condensed = [];
+        foreach ([Mapper::TYPE_CONVERSION, Mapper::TYPE_IMPRESSION, Mapper::TYPE_OPEN] as $type) {
+            uksort($data[$type], function($a, $b) {
+                return $a > $b;
+            });
 
-        foreach ($data as $type => $values) {
-            $condensed[$type] = array_values($values);
+            $data[$type] = array_values($data[$type]);
         }
-
-        return $condensed;
+new \Alaress_Probe($data);
+        return $data;
     }
 
 
