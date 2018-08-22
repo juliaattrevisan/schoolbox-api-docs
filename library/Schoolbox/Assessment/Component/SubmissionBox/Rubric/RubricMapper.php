@@ -194,6 +194,9 @@ class RubricMapper
         $newGroupModels          = $groupMapper->createCollection();
         $newCriterionModels      = $criterionMapper->createCollection();
 
+        // Track names used
+        $groupNamesUsed          = [];
+
 
         // Process groups+criteria into models
         foreach ($rowSet->getGroups() as $group) {
@@ -223,6 +226,20 @@ class RubricMapper
                 $groupModel->setName($group->getName());
             }
 
+            // Validate if this name has already been used by a group whose
+            // name can be changed
+            $normalizedName = $this->normaliseForComparison($group->getName());
+            if (isset($groupNamesUsed[$normalizedName])) {
+                $groupNamesUsed[$normalizedName] = $groupNamesUsed[$normalizedName] || $allowNameChange;
+                if ($groupNamesUsed[$normalizedName]) {
+                    // this is used by a group which is allowed to change:
+                    // invalidate
+                    throw $errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
+                }
+            } else {
+                $groupNamesUsed[$normalizedName] = $allowNameChange;
+            }
+
             // Validate whether curriculum code can be changed
             if ($persistCurriculum) {
                 $groupModel->setCurriculumNodes($group->getCurriculumNodes());
@@ -232,6 +249,7 @@ class RubricMapper
             $newGroupModels->add($groupModel);
 
             // Set each criterion in the group aside to be persisted
+            $criterionNamesUsed = [];
             foreach ($group->getCriteria() as $criterion) {
                 $existingCriterion = null;
                 $criterionId       = $criterion->getId();
@@ -255,6 +273,20 @@ class RubricMapper
                 }
                 if ($allowNameChange) {
                     $criterionModel->setName($criterion->getName());
+                }
+
+                // Validate if this name has already been used by a criterion
+                // whose name can be changed
+                $normalizedName = $this->normaliseForComparison($criterion->getName());
+                if (isset($criterionNamesUsed[$normalizedName])) {
+                    $criterionNamesUsed[$normalizedName] = $criterionNamesUsed[$normalizedName] || $allowNameChange;
+                    if ($criterionNamesUsed[$normalizedName]) {
+                        // this is used by a criterion which is allowed to
+                        // change: invalidate
+                        throw $errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
+                    }
+                } else {
+                    $criterionNamesUsed[$normalizedName] = $allowNameChange;
                 }
 
                 // Validate whether curriculum code can be changed
