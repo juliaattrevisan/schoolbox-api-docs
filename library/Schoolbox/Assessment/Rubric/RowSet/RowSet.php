@@ -54,6 +54,41 @@ class RowSet
 
 
     /**
+     * Retrieves a group by its ID.
+     *
+     * @param int $groupId
+     * @return null|Group
+     */
+    public function retrieveGroup(int $groupId): ?Group
+    {
+        foreach ($this->groups as $group) {
+            if ($group->getId() === $groupId) {
+                return $group;
+            }
+        }
+        return null;
+    }
+
+
+    /**
+     * Retrieves a criterion by its ID.
+     *
+     * @param int $criterionId
+     * @return null|Criterion
+     */
+    public function retrieveCriterion(int $criterionId): ?Criterion
+    {
+        foreach ($this->groups as $group) {
+            $criterion = $group->retrieveCriterion($criterionId);
+            if ($criterion) {
+                return $criterion;
+            }
+        }
+        return null;
+    }
+
+
+    /**
      * Retrieve the ID of all groups in this row set.
      *
      * @return array|int[]

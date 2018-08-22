@@ -53,6 +53,23 @@ class Group
 
 
     /**
+     * Retrieves a criterion by its ID.
+     *
+     * @param int $criterionId
+     * @return null|Criterion
+     */
+    public function retrieveCriterion(int $criterionId): ?Criterion
+    {
+        foreach ($this->criteria as $criterion) {
+            if ($criterion->getId() === $criterionId) {
+                return $criterion;
+            }
+        }
+        return null;
+    }
+
+
+    /**
      * Retrieve the ID of all criteria in this group.
      *
      * @return array|int[]
