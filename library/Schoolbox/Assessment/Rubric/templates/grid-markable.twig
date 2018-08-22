@@ -314,7 +314,9 @@
                         // Don't use scaled values when working with percentages
                         descriptorSum = summateDescriptors($descriptorCheckboxes);
                         var percentage = getPercentage($(this), descriptorSum);
-                        $(this).find("[data-group-descriptor-sum]").text(getLetterGradeFromNumeric(percentage, getLetterGrades($(this))));
+                        $(this).find("[data-group-descriptor-sum]").text(
+                            getLetterGradeFromNumeric( percentage, getLetterGrades($(this).find("[data-group-max-value]")) )
+                        );
                         break;
 
                     case 'Percentage':
@@ -370,7 +372,7 @@
                         break;
 
                     case 'LetterGrade':
-                        var grades = getLetterGrades($groupSummary);
+                        var grades = getLetterGrades($groupSummary.find("[data-group-max-value]"));
                         $groupSummary.find("[data-group-descriptor-sum]").text(getLetterGradeFromNumeric(getPercentage($groupSummary, $groupSummary.attr('data-mark')), grades));
                         break;
 
@@ -545,9 +547,9 @@
 
 
         // Get an array of letter grade {value : letter} pairs
-        function getLetterGrades($groupSummary) {
+        function getLetterGrades($dropdown) {
             var grades = [];
-            $groupSummary.find("[data-group-max-value] option").each(function(index, option) {
+            $dropdown.find("option").each(function(index, option) {
                 grades.push(
                     {'value' : $(option).prop("value"), 'letter' : $(option).attr('data-letter')}
                 );
@@ -558,13 +560,8 @@
 
 
         // Given a percentage mark, set a capability dropdown to its corresponding letter grade
-        function assignLetterGrade(numericMark, dropdown) {
-            var grades = [];
-            dropdown.find("option").each(function(index, option) {
-                grades.push(
-                    {'value' : $(option).prop("value"), 'letter' : $(option).attr('data-letter')}
-                );
-            });
+        function assignLetterGrade(numericMark, $dropdown) {
+            var grades = getLetterGrades($dropdown);
 
             var optionIndex = 0;
             for (var i = 0; i < grades.length; i++) {
@@ -573,7 +570,7 @@
                     break;
                 }
             }
-            dropdown.prop("selectedIndex", optionIndex);
+            $dropdown.prop("selectedIndex", optionIndex);
         }
 
         // Given a percentage mark, find the letter grade that corresponds to its bracket in the marking scheme
