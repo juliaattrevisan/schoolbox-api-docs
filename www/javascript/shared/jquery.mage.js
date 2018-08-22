@@ -86,6 +86,7 @@
             .on('click',  '[name=' + this.thisPart + ']', onclick);
 
         $form.alaressValidate(self.options.validateOptions);
+        console.log("A");
         self.options.initValidation.call();
     }
 

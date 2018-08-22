@@ -23,7 +23,7 @@ var validateOptions = {
  * that have been changed via JS.
  */
 var beforeSubmit = function() {
-
+    console.log("C");
     var publishDate = $('input[name="publishDate"]'),
         publishTime = $('input[name="publishTime"]'),
         openDate = $('input[name="openDate"]'),
@@ -36,6 +36,20 @@ var beforeSubmit = function() {
 
     var openVisible = openDate.is(':visible'),
         closeVisible = closeDate.is(':visible');
+
+    // Validate each row of descriptors
+    $("[data-descriptor-value]").each(function() {
+        $(this).rules("add",
+            {
+                noDecimalPlacesWithMarkRange: true, // have to add this again since its not in validateOptiosn and the plugin overwrites it
+                descriptorsAreMonotonic: true,
+                messages: {
+                    descriptorsAreMonotonic: " use only descriptor points with non-decimal values if Use Mark Range is enabled"
+                }
+            }
+        );
+    });
+
 
     if (openVisible && closeVisible) {
 

@@ -61,18 +61,12 @@
 
         function initValidation() {
             function attachValidationRules() {
+                console.log("B");
+
                 // Validate decimal places on each descriptor
                 $("[data-descriptor-value]").each(function() {
                     $(this).rules("add", { noDecimalPlacesWithMarkRange: true });
                 })
-
-                // Validate each row of descriptors
-                $("[data-group]").each(function() {
-                    if (! $(this).attr("data-groupname")) {
-                        // We have an indicator
-                        $(this).rules("add", { descriptorsAreMonotonic: true });
-                    }
-                });
             }
 
 
