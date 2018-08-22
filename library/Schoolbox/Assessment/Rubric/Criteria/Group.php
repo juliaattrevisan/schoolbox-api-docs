@@ -20,7 +20,7 @@ use Schoolbox\GenericCollection;
 /**
  * Object representation of a rubric group.
  *
- * TODO consider extracting max value from this, as it only has meaning when a rubric group is part of a grid
+ * @deprecated use `\Schoolbox\Assessment\Rubric\RowSet\Group` or `\Schoolbox\Assessment\Rubric\Grid\GroupUsage`
  */
 class Group implements Twiggable, Calculable
 {

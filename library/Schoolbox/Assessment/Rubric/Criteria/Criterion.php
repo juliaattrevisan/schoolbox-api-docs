@@ -15,7 +15,7 @@ use Schoolbox\Assessment\Rubric\DescriptorList;
 /**
  * Object representation of a rubric criterion.
  *
- * TODO consider removing descriptors, as they only have meaning when a criterion is part of a grid
+ * @deprecated use `\Schoolbox\Assessment\Rubric\RowSet\Criterion` or `\Schoolbox\Assessment\Rubric\Grid\CriterionUsage`
  */
 class Criterion extends DescriptorList
 {
