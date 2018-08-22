@@ -312,7 +312,6 @@
                     case 'LetterGrade':
                         // Turn the numeric value into a letter grade
                         // Don't use scaled values when working with percentages
-                        // TODO this is off-by-one..or off-by-two..or something, for some obscure reason
                         descriptorSum = summateDescriptors($descriptorCheckboxes);
                         var percentage = getPercentage($(this), descriptorSum);
                         $(this).find("[data-group-descriptor-sum]").text(getLetterGradeFromNumeric(percentage, getLetterGrades($(this))));
