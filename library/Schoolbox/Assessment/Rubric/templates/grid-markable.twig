@@ -138,9 +138,12 @@
 
         {% if showGroupTotal and markSchemeName != "None" and not hidePoints %}
             {% set percentageMark = group.rowMaxSum > 0 ? group.mark * (100 / group.rowMaxSum) : 0 %}
-            {# don't ask... #}
-            {% set letterGradeValue = percentageMark == 0 ? 0 : (((percentageMark / 10) | round(0, 'ceil')) * 10) - 10 %}
+            {% set letterGradeBracket = false %}
 
+            {# TODO assumes values are always descending which might not be the case? #}
+            {% for value, letter in markType.conf if (percentageMark >= value and not letterGradeBracket) %}
+                {% set letterGradeBracket = value %}
+            {% endfor %}
             <tr>
                 <th class="rb-group-summary" colspan="{{ rubric.levels|length + 1 }}">
                     <span data-group-summary="{{ rubricId }}-{{ group.id }}"
@@ -175,8 +178,7 @@
 
                                 {% for value, letter in markType.conf %}
                                     <option value="{{ value }}"
-
-                                            {% if value == letterGradeValue %}selected{% endif %}
+                                            {% if letterGradeBracket == value %}selected{% endif %}
                                             data-letter="{{ letter }}">
                                         {{ letter }}
                                     </option>
@@ -565,6 +567,7 @@
 
             var optionIndex = 0;
             for (var i = 0; i < grades.length; i++) {
+                // TODO assumes values are always descending which might not be the case?
                 if (numericMark >= grades[i].value) {
                     optionIndex = i;
                     break;
@@ -577,6 +580,7 @@
         function getLetterGradeFromNumeric(numericMark, grades) {
             var markLetterValue = '';
             for (var i = 0; i < grades.length; i++) {
+                // TODO assumes values are always descending which might not be the case?
                 if (numericMark >= grades[i].value) {
                     markLetterValue = grades[i].letter;
                     break;
