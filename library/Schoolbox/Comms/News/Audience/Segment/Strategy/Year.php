@@ -25,7 +25,7 @@ class Year implements ISearch, ITranslate
     {
         $entityType = Model::ENTITY_TYPE_YEAR;
         return "
-            SELECT id, 
+            SELECT year AS 'id',
                 CASE
                 WHEN CONCAT('', 1*`user`.year) = `user`.year
                 THEN CONCAT('Year ', `user`.year)
