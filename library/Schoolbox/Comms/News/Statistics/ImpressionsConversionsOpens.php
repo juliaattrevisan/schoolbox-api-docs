@@ -15,39 +15,14 @@
 namespace Schoolbox\Comms\News\Statistics;
 
 use Alaress\Database\Connector\IConnector;
+use DomainException;
 use Schoolbox\Comms\News;
+use Schoolbox\Comms\News\Statistics\Accuracy\Factory;
+use Schoolbox\Comms\News\Statistics\Accuracy\IAccuracy;
+
 
 class ImpressionsConversionsOpens
 {
-
-    /**
-     * Default accuracy
-     */
-    private const DEFAULT_ACCURACY = '10min';
-
-    /**
-     * The allowed accuracies for a user to choose
-     *
-     * This controls how timestamps are grouped together, this increasing or decreasing the accuracy
-     * of the dataset in exchange for perhaps more meaningful interpretations.
-     *
-     * For example, 60 seconds (accuracy=60) might be too granular for some people.
-     * Such might prefer collating five minutes worth of data instead (accuracy=300)
-     *
-     * Events that occur within $accuracy seconds of each other are aggregated together.
-     *
-     * @var array
-     */
-    public const ACCURACIES = [
-        '10min'     => 10,
-        '30min'     => 30,
-        'hour'      => 60,
-        '12hour'    => 60*12,
-        'day'       => 60*24,
-        'week'      => 60*24*7,
-        'fortnight' => 60*24*14,
-        'month'     => 60*24*31,
-    ];
 
     /**
      * Number of days in this period
@@ -539,17 +514,16 @@ class ImpressionsConversionsOpens
      * @return array
      * @throws \Alaress\Database\Exception
      */
-    public function fetchConversions(News\Model $article, ?string $accuracy = self::DEFAULT_ACCURACY): array
+    public function fetchConversions(News\Model $article, ?string $accuracy): array
     {
 
         /* Determine a sane value
          */
-        $accuracySql = $this->assertAccuracy($accuracy);
+        $strat = (new Factory())->produce($accuracy);
 
         $statement = $this->database->prepareQuery("
             SELECT 
-                FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(occurs_at)/({$accuracySql}*60))*({$accuracySql}*60)) AS datetime,
-                1000*FLOOR(UNIX_TIMESTAMP(occurs_at)/({$accuracySql}*60))*({$accuracySql}*60) AS timestamp,
+                {$strat->getSql($accuracy)}
                 `type`,
                 COUNT(*) AS num
             FROM {$this->statisticsMapper->getTable()}
@@ -563,7 +537,7 @@ class ImpressionsConversionsOpens
             'articleId' => $article->getId()
         ]);
 
-        $range = $this->generateDateRange(\Alaress_Date_Format::now()->addDays(-1*self::PERIOD_LENGTH), \Alaress_Date_Format::now(), $accuracySql);
+        $range = $this->generateDateRange(\Alaress_Date_Format::now()->addDays(-1*self::PERIOD_LENGTH), \Alaress_Date_Format::now(), $strat->getInterval());
 
         $data = [
             Mapper::TYPE_CONVERSION => $range,
@@ -572,7 +546,7 @@ class ImpressionsConversionsOpens
         ];
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $data[$row['type']][$row['datetime']] = [ (int)$row['timestamp'], (int)$row['num']];
+            $data[$row['type']][$row['datetime']] = [ (int)$row['timestamp'], (int)$row['num'], $row['datetime']];
         }
 
         /* Put it in a format highcharts understands - remove timestamp array key
@@ -649,19 +623,6 @@ class ImpressionsConversionsOpens
         return $percentage > 100 ? 100 : $percentage;
     }
 
-
-    /**
-     * @param null|string $accuracy
-     * @return null|string
-     */
-    private function assertAccuracy(?string $accuracy = self::DEFAULT_ACCURACY): ?string
-    {
-        if (!\array_key_exists($accuracy, self::ACCURACIES)) {
-            $accuracy = self::DEFAULT_ACCURACY;
-        }
-
-        return self::ACCURACIES[$accuracy];
-    }
 
     /**
      * Calculate overall conversion ratio

@@ -72,7 +72,7 @@ class Controller extends Base
 //
             /* Accuracy selector
              */
-            'accuracies' => ImpressionsConversionsOpens::ACCURACIES,
+            'accuracies' => News\Statistics\Accuracy\Factory::ACCURACIES,
             'accuracy' => $accuracy,
 
             /* Conversions, Impressions vs TIme
