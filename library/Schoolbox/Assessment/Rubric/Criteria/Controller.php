@@ -11,6 +11,7 @@ namespace Schoolbox\Assessment\Rubric\Criteria;
 use Alaress\Web\Controller\Base as BaseController;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
+use Schoolbox\Assessment\Rubric\RowSet\Factory;
 use Schoolbox\Assessment\Rubric\RowSet\RowSet;
 use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -102,6 +103,12 @@ class Controller extends BaseController
      */
     public function postForm(FolderModel $folder): void
     {
+        $rowSet = (new Factory($this->nodeMapper))->buildFromPostData(
+            $folder,
+            $this->request->post->get('crits', [])
+        );
+
+
         // Retrieve, update and persist the row set
         $rowSet = $this->rubricMapper->retrieveRowSet($folder, true);
         $this->updateRowSet($rowSet, $this->request->post->get('crits', []));
