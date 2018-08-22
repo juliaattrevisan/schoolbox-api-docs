@@ -537,7 +537,9 @@ class ImpressionsConversionsOpens
             'articleId' => $article->getId()
         ]);
 
-        $range = $this->generateDateRange(\Alaress_Date_Format::now()->addDays(-1*self::PERIOD_LENGTH), \Alaress_Date_Format::now(), $strat->getInterval());
+        /* Generate placeholder timestamps, superimpose actual data on top of placeholders
+         */
+        $range = $strat->generateDateRange(\Alaress_Date_Format::now()->addDays(-1*self::PERIOD_LENGTH), \Alaress_Date_Format::now());
 
         $data = [
             Mapper::TYPE_CONVERSION => $range,
@@ -549,24 +551,12 @@ class ImpressionsConversionsOpens
             $data[$row['type']][$row['datetime']] = [ (int)$row['timestamp'], (int)$row['num'], $row['datetime']];
         }
 
-        /* Put it in a format highcharts understands - remove timestamp array key
-         * Sort it, in case the month view is used - there's a case where visual anomalies can be rendered.
-         * The way the strat works is that it takes all the interactions for a month and assumes them all to
-         * have happened in the first day of that month, for the sake of compiling data for highcharts.
-         *
-         * The date range is specified as PERIOD_LENGTH before the current time, so if it's Aug 22 now, the
-         * date range will be Jul 22 - Aug 22. However the month's data is simulated to occur on Jul 1. This
-         * puts a data point in a random place in the array, so we sort it to ensure everything looks like
-         * it occurred chronologically (highcharts doesn't seem to understand this situation)
+        /* Format it for highcharts to understand
          */
         foreach ([Mapper::TYPE_CONVERSION, Mapper::TYPE_IMPRESSION, Mapper::TYPE_OPEN] as $type) {
-            uksort($data[$type], function($a, $b) {
-                return $a > $b;
-            });
-
             $data[$type] = array_values($data[$type]);
         }
-new \Alaress_Probe($data);
+
         return $data;
     }
 
@@ -670,33 +660,5 @@ new \Alaress_Probe($data);
         }
 
         return $referrerRatio;
-    }
-
-
-    /**
-     * Generate a range of datetime values, starting at midnight of $start,
-     * ending at midnight of $end, at $interval intervals (a value in minutes)
-     *
-     * @param \Alaress_Date_Format $start
-     * @param \Alaress_Date_Format $end
-     * @param int                  $interval (number of minutes)
-     * @return array
-     */
-    private function generateDateRange(\Alaress_Date_Format $start, \Alaress_Date_Format $end, int $interval): array
-    {
-        $start->startOfDay();
-        $endTimestamp = $end->getUnixTimeStamp();
-
-        $range = [];
-
-        /* Multiply by 1000 to get milliseconds conversion, because highcharts
-         */
-        while ($start->getUnixTimeStamp() < $endTimestamp) {
-            $range[$start->getDatabase()] = [1000*$start->getUnixTimeStamp(), 0];
-
-            $start->addMinutes($interval);
-        }
-
-        return $range;
     }
 }

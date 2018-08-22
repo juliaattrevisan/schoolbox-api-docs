@@ -8,7 +8,7 @@
  */
 namespace Schoolbox\Comms\News\Statistics\Accuracy;
 
-class Day implements IAccuracy
+class Day extends Base
 {
 
     /**

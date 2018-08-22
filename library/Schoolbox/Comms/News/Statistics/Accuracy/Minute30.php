@@ -8,7 +8,7 @@
  */
 namespace Schoolbox\Comms\News\Statistics\Accuracy;
 
-class Minute30 implements IAccuracy
+class Minute30 extends Base
 {
 
     /**

@@ -8,7 +8,7 @@
  */
 namespace Schoolbox\Comms\News\Statistics\Accuracy;
 
-class Month implements IAccuracy
+class Month extends Base
 {
 
     /**
@@ -31,5 +31,31 @@ class Month implements IAccuracy
     public function getInterval(): int
     {
         return 31*24*60;
+    }
+
+
+    /**
+     * @inheritdoc
+     *
+     * @param \Alaress_Date_Format $start
+     * @param \Alaress_Date_Format $end
+     * @return array
+     */
+    public function generateDateRange(\Alaress_Date_Format $start, \Alaress_Date_Format $end): array
+    {
+        $start->startOfMonth()->startOfDay();
+        $endTimestamp = $end->startOfMonth()->startOfDay()->getUnixTimeStamp();
+
+        $range = [];
+
+        /* Multiply by 1000 to get milliseconds conversion, because highcharts
+         */
+        while ($start->getUnixTimeStamp() < $endTimestamp) {
+            $range[$start->getDatabase()] = [1000*$start->getUnixTimeStamp(), 0];
+
+            $start->addMinutes($this->getInterval());
+        }
+
+        return $range;
     }
 }
