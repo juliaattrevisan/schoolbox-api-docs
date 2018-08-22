@@ -538,6 +538,10 @@ class ImpressionsConversionsOpens
      */
     public function fetchConversions(News\Model $article, ?string $accuracy = self::DEFAULT_ACCURACY): array
     {
+
+        $range = $this->generateDateRange(\Alaress_Date_Format::now(), \Alaress_Date_Format::now(), 5);
+        new \Alaress_Probe($range);
+
         /* Determine a sane value
          */
         $accuracySql = self::ACCURACIES[$this->assertAccuracy($accuracy)];
@@ -680,5 +684,33 @@ class ImpressionsConversionsOpens
         }
 
         return $referrerRatio;
+    }
+
+
+    /**
+     * Generate a range of datetime values, starting at midnight of $start,
+     * ending at midnight of $end, at $interval intervals (a value in minutes)
+     *
+     * @param \Alaress_Date_Format $start
+     * @param \Alaress_Date_Format $end
+     * @param int                  $interval
+     * @return array
+     */
+    private function generateDateRange(\Alaress_Date_Format $start, \Alaress_Date_Format $end, int $interval): array
+    {
+        $start->startOfDay();
+        $end->endOfDay();
+
+        $endTimestamp = $end->getUnixTimeStamp();
+
+        $range = [];
+
+        while ($start->getUnixTimeStamp() < $endTimestamp) {
+            $range[] = $start->getDatabase();
+
+            $start->addMinutes($interval);
+        }
+
+        return array_fill_keys($range, 0);
     }
 }
