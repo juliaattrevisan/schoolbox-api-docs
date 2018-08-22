@@ -18,6 +18,28 @@ var validateOptions = {
 };
 
 
+function initDecimalDescsValidation() {
+    function attachValidationRules() {
+        console.log("B");
+
+        // Validate decimal places on each descriptor
+        $("[data-descriptor-value]").each(function() {
+            $(this).rules("add", { noDecimalPlacesWithMarkRange: true });
+        })
+    }
+
+
+    // on load
+    attachValidationRules();
+
+    // TODO on change of number of levels
+
+    // TODO on change of number of checked indicators
+
+    // TODO on change of mark range setting
+}
+
+
 /**
  * These rules must be applied right before submit as to take into account things
  * that have been changed via JS.
@@ -37,11 +59,13 @@ var beforeSubmit = function() {
     var openVisible = openDate.is(':visible'),
         closeVisible = closeDate.is(':visible');
 
+    // have to do this again since its not in validateOptions and the plugin clears+reapplys rules on submit
+    initDecimalDescsValidation();
+
     // Validate each row of descriptors
     $("[data-descriptor-value]").each(function() {
         $(this).rules("add",
             {
-                noDecimalPlacesWithMarkRange: true, // have to add this again since its not in validateOptiosn and the plugin overwrites it
                 descriptorsAreMonotonic: true,
                 messages: { // TODO why this not working
                     descriptorsAreMonotonic: " use only descriptor points with non-decimal values if Use Mark Range is enabled"
