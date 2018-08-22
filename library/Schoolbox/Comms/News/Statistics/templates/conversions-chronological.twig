@@ -8,11 +8,12 @@
  #}
 <script>
     $(function() {
-        $('#conversions-chronological').highcharts({
+        var chart = new Highcharts.Chart({
             chart: {
                 height: 500,
                 panning: true,
                 panKey: 'shift',
+                renderTo: 'conversions-chronological',
                 spacingBottom: 64,
                 type: 'line',
                 zoomType: 'xy'
@@ -113,6 +114,11 @@
                 }
             ]
         });
+
+        {# Zoom into the last seven days to start with #}
+        var d = new Date();
+        chart.xAxis[0].setExtremes(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate() - 7), Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+        chart.showResetZoom();
     });
 </script>
 <div id="conversions-chronological"></div>
