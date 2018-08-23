@@ -22,13 +22,10 @@ function initDecimalDescsValidation() {
     function reValidate() {
         console.log("Revalidating");
         $("[data-descriptor-value]").each(function() {
-            console.log($(this));
             $(this).valid();
         });
     }
     function attachValidationRules() {
-        console.log("B");
-
         // Validate decimal places on each descriptor
         $("[data-descriptor-value]").each(function() {
             $(this).rules("add", { noDecimalPlacesWithMarkRange: true });
@@ -45,10 +42,12 @@ function initDecimalDescsValidation() {
     });
 
     // on change of number of levels
-    // TODO this one not working
-    $("[data-spawn='level']").click(function() {
-        reValidate();
+    var levelObserver = new MutationObserver(attachValidationRules);
+    var config = { attributes: false, childList: true, characterData: false };
+    $("tr[data-group]").each(function() {
+        levelObserver.observe(this, config);
     });
+
 
     // TODO on change of number of checked indicators?
 
@@ -60,7 +59,6 @@ function initDecimalDescsValidation() {
  * that have been changed via JS.
  */
 var beforeSubmit = function() {
-    console.log("C");
     var publishDate = $('input[name="publishDate"]'),
         publishTime = $('input[name="publishTime"]'),
         openDate = $('input[name="openDate"]'),
