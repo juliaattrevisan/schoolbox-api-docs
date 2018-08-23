@@ -65,6 +65,10 @@ class Controller extends Base
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsStatistics/index.twig', [
             'article' => $article,
 
+            /* Length of period to record granular data
+             */
+            'period' => ImpressionsConversionsOpens::PERIOD_LENGTH,
+
             /* Overall Cumulative summary
              */
             'cumulative' => $impressionsConversionsOpens->fetchCumulative($article),
