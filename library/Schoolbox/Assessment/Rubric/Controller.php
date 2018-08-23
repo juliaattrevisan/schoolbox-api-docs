@@ -130,16 +130,26 @@ class Controller extends BaseController
 
         if ($post->get('type') == 'criterion') {
 
-            $group = $post->get('groupName');
-            $name  = $post->get('name');
-            if(!$group){
+            $groupName = $post->get('groupName');
+            $critName  = $post->get('name');
+            if(!$groupName){
                 $this->sendJSONError('Must supply a Group for new Criterion');
                 return;
             }
 
+            $group = (new \Schoolbox\Assessment\Rubric\RowSet\Group())
+                ->setId($post->getInt('groupId'))
+                ->setName($groupName);
+
+            // Don't have to save anything yet
+            $criterion = (new \Schoolbox\Assessment\Rubric\RowSet\Criterion())
+                ->setId(rand(1, PHP_INT_MAX))
+                ->setName($critName);
+
+
             $criteria      = CriterionMapper::getInstance()->findForFolder($folderId);
-            $proposedGroup = $this->mapper->normaliseForComparison($group);
-            $proposedName  = $this->mapper->normaliseForComparison($name);
+            $proposedGroup = $this->mapper->normaliseForComparison($groupName);
+            $proposedName  = $this->mapper->normaliseForComparison($critName);
             foreach ($criteria as $criterion){
                 $normGroup = $this->mapper->normaliseForComparison($criterion->getGroup()->getName());
                 $normName = $this->mapper->normaliseForComparison($criterion->getName());
@@ -151,6 +161,8 @@ class Controller extends BaseController
             }
 
             $context['rowspan'] = null;
+            $context['group']   = $group;
+            $context['crit']    = $criterion;
 //            $context['group'] = [
 //                'id' => $post->get('groupId')
 //            ];
@@ -164,15 +176,16 @@ class Controller extends BaseController
             // Does the list of crits/groups really need to be saved now?
             // For some reason, groups aren't saved whilst criteria are?
             // Probably because groups literally couldn't exist w/o criteria
+            $groupName = $post->get('name');
 
             // Next step: figure out what gets passed in
             $group = (new \Schoolbox\Assessment\Rubric\RowSet\Group())
                 ->setId(rand(1, PHP_INT_MAX))
-                ->setName($post->get('name'));
+                ->setName($groupName);
 
             // Ensure the proposed Group name is not already in use.
             $criteria = CriterionMapper::getInstance()->findForFolder($folderId);
-            $proposed = $this->mapper->normaliseForComparison($post->get('name'));
+            $proposed = $this->mapper->normaliseForComparison($groupName);
             foreach ($criteria as $criterion){
                 $grouping = $this->mapper->normaliseForComparison($criterion->getGroup()->getName());
                 if($proposed == $grouping){
