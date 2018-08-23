@@ -482,7 +482,7 @@ class RubricMapper
         // TODO some way to wrap all this in a transaction would be nice... -_-;
         // (The answer exists: merge SA-6405)
         $levelMapper         = LevelMapper::getInstance();
-        $descriptorMapper     = DescriptorMapper::getInstance();
+        $descriptorMapper    = DescriptorMapper::getInstance();
         $existingLevelIds    = $levelMapper->findIdsByColumn('box_id', $submissionBox->getId());
         $existingDescriptors = DescriptorMapper::getInstance()->findByColumn('level_id', $existingLevelIds);
 //        $existingDescriptors = $existingDescriptors->map(function (Descriptor $d) {
