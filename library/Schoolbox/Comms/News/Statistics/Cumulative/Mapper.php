@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Comms\News\Statistics\Cumulative;
 
+use Schoolbox\Collection;
 use Schoolbox\Comms\News\Statistics;
 
 /**
@@ -16,7 +17,7 @@ use Schoolbox\Comms\News\Statistics;
  * @package Schoolbox\Comms\News\Statistics
  * @method Model createModel($idValue = null)
  * @method Model findById($identifierValue)
- * @method Model[] findByColumn($identifierValue)
+ * @method Collection|Model[] findByColumn($identifierValue)
  */
 class Mapper extends \Schoolbox\Mapper
 {
