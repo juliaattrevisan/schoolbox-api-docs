@@ -23,7 +23,7 @@
                     dataLabels: {
                         enabled: true,
                         formatter: function() {
-                            return '<span style="color:' + this.series.color + '">' + this.y + '%</span>'
+                            return '<span style="color:' + this.series.color + '">' + this.y + '</span>'
                         }
                     }
                 }
@@ -38,7 +38,7 @@
             },
 
             tooltip: {
-                pointFormat: '{point.y}% of all {point.category} came<br />from the <span style="color:{series.color}">{series.name}</span> referrer',
+                pointFormat: '{point.y} {point.category} came<br />from the <span style="color:{series.color}">{series.name}</span> referrer',
                 useHTML: true
             },
 
