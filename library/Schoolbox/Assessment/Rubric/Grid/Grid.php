@@ -100,9 +100,9 @@ class Grid
      *
      * Inferred from the sum of the non-null max values for its group usages.
      *
-     * @return float|null
+     * @return float
      */
-    public function calculateMaxValue(): ?float
+    public function calculateMaxValue(): float
     {
         $maxValues = [];
         foreach ($this->groupUsages as $groupUsage) {
@@ -111,7 +111,7 @@ class Grid
                 $maxValues += $groupUsageMaxValue;
             }
         }
-        return !empty($maxValues) ? array_sum($maxValues) : null;
+        return !empty($maxValues) ? array_sum($maxValues) : 0;
     }
 
 
