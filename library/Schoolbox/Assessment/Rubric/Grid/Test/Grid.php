@@ -65,7 +65,7 @@ class Grid extends TestCase
         $groupUsage1->getCriterionUsages()[$criterion2->getId()] = $criterionUsage2;
         $grid->getGroupUsages()[$group1->getId()]                = $groupUsage1;
 
-        $groupUsage2                                             = (new RubricGrid\GroupUsage($group1))->setMaxValue(15);
+        $groupUsage2                                             = (new RubricGrid\GroupUsage($group2))->setMaxValue(15);
         $criterionUsage6                                         = new RubricGrid\CriterionUsage($criterion6);
         $groupUsage2->getCriterionUsages()[$criterion6->getId()] = $criterionUsage6;
         $grid->getGroupUsages()[$group2->getId()]                = $groupUsage2;
