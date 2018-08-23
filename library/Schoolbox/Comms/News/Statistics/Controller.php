@@ -50,6 +50,8 @@ class Controller extends Base
     /**
      * Statistical overview for $article
      *
+     * @api GET /comms/news/statistics/{articleId}
+     *
      * @param News\Model $article
      * @throws \Alaress\Database\Exception
      * @throws \Aura\Di\Exception\ServiceNotFound
