@@ -2,25 +2,25 @@
     <div class="row">
         <div class="small-12 medium-3 columns">
             <p class="infographic">
-                <span class="title">{% block cumulativeDateHeading %}First Open{% endblock %}</span>
+                <span class="title">{% block cumulativeDateHeading %}First Open <span class='hint has-tip tip-top' data-tooltip title="The date when the {{ locale.news }} was first opened">?</span>{% endblock %}</span>
                 <span class="value">{{ cumulative.date|date('j M') }}</span>
             </p>
         </div>
         <div class="small-12 medium-3 columns">
             <p class="infographic">
-                <span class="title">Conversions</span>
+                <span class="title">Conversions <span class="hint has-tip tip-top" data-tooltip title="The number of people who saw a link with a referrer, and then clicked through to view the {{ locale.news }}">?</span></span>
                 <span class="value">{{ cumulative.numConversions }}</span>
             </p>
         </div>
         <div class="small-12 medium-3 columns">
             <p class="infographic">
-                <span class="title">Impressions</span>
+                <span class="title">Impressions <span class="hint has-tip tip-top" data-tooltip title="The number of times that links with a referrer value were presented to a user">?</span></span>
                 <span class="value">{{ cumulative.numImpressions }}</span>
             </p>
         </div>
         <div class="small-12 medium-3 columns">
             <p class="infographic">
-                <span class="title">Conversion Ratio %</span>
+                <span class="title">Conversion Ratio % <span class="hint has-tip tip-top" data-tooltip title="The percentage of impressions that led to viewing of a {{ locale.news }} expressed as conversions/impressions">?</span></span>
                 <span class="value">{{ cumulative.conversionRatio }}</span>
             </p>
         </div>
