@@ -206,6 +206,10 @@ table.rb {
         top: 15px !important;
     }
 }
+// Prevent validation errors from making cells enormous
+[data-descriptor] label.error {
+    max-width: 11rem;
+}
 .rb-no-cell {
     background-color: $body-bg;
     color: contrast-bg();
