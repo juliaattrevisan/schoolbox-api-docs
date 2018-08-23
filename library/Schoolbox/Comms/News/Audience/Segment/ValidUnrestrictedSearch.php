@@ -1,7 +1,5 @@
 <?php
 /**
- * ValidRestrictedSearch
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2018, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -13,6 +11,14 @@ use Schoolbox\Comms\News\ValidUserIsCommsOfficer;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 
+/**
+ * Specification of a user that is not restricted when targeting audience segments to folders.
+ *
+ * A user is unrestricted if they are/have any of:
+ * * a superuser
+ * * a comms officer
+ * * READ+ CMS perm
+ */
 class ValidUnrestrictedSearch
 {
 
