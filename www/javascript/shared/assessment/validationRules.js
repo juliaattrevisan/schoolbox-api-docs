@@ -56,6 +56,7 @@ function initDecimalDescsValidation() {
     });
 
     // on change of checked indicators
+    // TODO maybe try using depends instead of this?
     $("[data-criterion-name]").change(function() {
         var $indicatorCheckbox = $(this);
        if ($indicatorCheckbox.is(":checked")) {
