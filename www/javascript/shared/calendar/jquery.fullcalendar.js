@@ -50,7 +50,8 @@ function Calendar(id, bubbleId, opts) {
             applyFiltersSelector: '#applyFilters',
             boxSelector: '.filter-drop',
             listSelector: '.filter-list',
-            listViewButton: true
+            listViewButton: true,
+            viewSettingsOptionsSelector: '.fc-month-button, .fc-agendaWeek-button, .fc-agendaDay-button'
         },
         fullCalendar: {
             views: {
@@ -333,6 +334,14 @@ function Calendar(id, bubbleId, opts) {
             if (cal.options.filter.boxSelector) {
                 calendarControls.add(exportControls).on('click', cal.options.filter.boxSelector, function(e) {
                     e.stopPropagation()
+                })
+            }
+
+            if (cal.options.filter.viewSettingsOptionsSelector) {
+                cal.dom.on('click', cal.options.filter.viewSettingsOptionsSelector, function() {
+                    cal.filters.organise(cal, ["campus", "groups", "sources"])
+                    
+                    return false
                 })
             }
 

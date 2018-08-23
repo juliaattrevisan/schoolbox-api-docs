@@ -11,6 +11,8 @@ class Calendar extends DeprecatedModel
      */
     private $groupHandler;
 
+    const VIEW_SETTINGS_NAME = "sbox_calendar_view";
+
     function __construct()
     {
 
@@ -821,12 +823,15 @@ class Calendar extends DeprecatedModel
             $_SESSION['calendarFilter'][$filter[0]] = preg_replace('/^[^0-9]+/', '', $filter[1]);
         }
 
-        // update the user table to hold onto the view that they last used
-        if ($this->db->update('user', 'id', array('id' => $_SESSION['id'], 'calendar_view' => $view))) {
-            // update the session to cache the db change
-            $_SESSION['calendar_view'] = $view;
+        // Update database record only if there are changes
+        if ($view !== $this->getUserSavedCalendarView() &&
+            $this->db->update('user', 'id', array('id' => $_SESSION['id'], 'calendar_view' => $view))) {
+
+            $this->setCalendarViewSettingsToCookie($view);
+
             return true;
         }
+
         return false;
     }
 
@@ -899,5 +904,31 @@ class Calendar extends DeprecatedModel
 
         parent::delete($eventID);
         $this->delPerms($eventID);
+    }
+
+    public function setCalendarViewSettingsToCookie($view)
+    {
+        // Save the calendar view settings in browser's cookie in 10 years
+        setcookie(self::VIEW_SETTINGS_NAME, $view, strtotime("+10 year"), "/");
+    }
+
+    public function getUserSavedCalendarView()
+    {
+        $allowedCalendarViewSettings = array('month', 'agendaWeek', 'agendaDay');
+        $calendarViewSessionName = 'calendar_view';
+
+        if (isset($_COOKIE[self::VIEW_SETTINGS_NAME]) &&
+            in_array($_COOKIE[self::VIEW_SETTINGS_NAME], $allowedCalendarViewSettings)) {
+
+            return $_COOKIE[self::VIEW_SETTINGS_NAME];
+        } else {
+            // The list view is not part of fullcalendar and will cause a JS error, default back to the month view
+            $view = ($_SESSION[$calendarViewSessionName] !== 'list') ? $_SESSION[$calendarViewSessionName] : 'month';
+
+            $calendar = new Calendar();
+            $calendar->setCalendarViewSettingsToCookie($view);
+
+            return $view;
+        }
     }
 }
