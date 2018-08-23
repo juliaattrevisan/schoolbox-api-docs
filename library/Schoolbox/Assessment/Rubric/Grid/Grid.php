@@ -108,7 +108,7 @@ class Grid
         foreach ($this->groupUsages as $groupUsage) {
             $groupUsageMaxValue = $groupUsage->getMaxValue();
             if (null !== $groupUsageMaxValue) {
-                $maxValues += $groupUsageMaxValue;
+                $maxValues[] = $groupUsageMaxValue;
             }
         }
         return !empty($maxValues) ? array_sum($maxValues) : 0;
