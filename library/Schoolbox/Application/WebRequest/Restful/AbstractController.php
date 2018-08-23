@@ -39,7 +39,19 @@ abstract class AbstractController extends \Alaress\Web\Controller\Restful\Abstra
      */
     public function deleteEntity($entity)
     {
-        $this->getMapper()->delete($entity);
+        try {
+            $this->getMapper()->delete($entity);
+            $this->getResponse()->status->setCode(204);
+            $this->getResponse()->content->set(null);
+        } catch (Exception $e) {
+            if ($this->getRequest()->isXhr()) {
+                // Dump out an AJAX error
+                $this->getResponse()->status->setCode(500);
+                $this->getResponse()->content->set($this->buildJsonOutput($e->getMessage()));
+            } else {
+                throw $e;
+            }
+        }
     }
 
     /* Getters/Setters
