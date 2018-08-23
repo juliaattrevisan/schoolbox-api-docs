@@ -42,6 +42,12 @@ class Module extends BaseModule
             return $this->preloadArticle($params);
         };
 
+        /* Json payload for the "Conversions, Impressions vs Time" graph
+         */
+        $this->register('GET', '/{articleId}/interactionsvstime', 'getInteractionsVsTime', $getPerms, $preloadArticle);
+
+        /* Overview
+         */
         $this->register('GET', '/{articleId}', 'getOverview', $getPerms, $preloadArticle);
     }
 

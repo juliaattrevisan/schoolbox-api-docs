@@ -40,13 +40,12 @@
         <p class="meta">Statistics from the last 30 days. Click and drag graphs to zoom; click and drag while holding down <strong>Shift</strong> to pan while zoomed in.</strong></p>
 
         <section class="content">
-            {% include '@commsNewsStatistics/accuracy.twig' with {
+            {% include '@commsNewsStatistics/interactions-chronological.twig' with {
                 article: article,
-                accuracies: accuracies
-            } %}
-
-            {% include '@commsNewsStatistics/conversions-chronological.twig' with {
-                conversions: conversions
+                accuracies: accuracies,
+                accuracy: accuracy,
+                interactions: interactions,
+                conversionRatio: conversionRatio
             } %}
 
             {% include '@commsNewsStatistics/referrer-chronological.twig' with {

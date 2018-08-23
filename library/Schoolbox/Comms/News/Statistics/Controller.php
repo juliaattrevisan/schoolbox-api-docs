@@ -78,14 +78,6 @@ class Controller extends Base
             'accuracies' => News\Statistics\Accuracy\Factory::ACCURACIES,
             'accuracy' => $accuracy,
 
-            /* Conversions, Impressions vs TIme
-             */
-            'conversions' => $impressionsConversionsOpens->fetchConversions($article, $accuracy),
-
-            /* Conversion Ratio Chronological
-             */
-            'conversionRatio' => $impressionsConversionsOpens->fetchConversionRatio($article, $accuracy),
-
             /* Interaction Referrers This Period
              */
             'referrersThisPeriod' => $impressionsConversionsOpens->fetchInteractionReferrers($article),
@@ -94,5 +86,31 @@ class Controller extends Base
              */
             'historic' => $impressionsConversionsOpens->fetchHistoric($article),
         ])->setTitle("Statistics for {$article->getTitle()}"));
+    }
+
+
+    /**
+     * Get the json payload to populate "Conversions, Impressions vs Time" graph so that
+     * when you change accuracy, only the graph updates, instead of the whole page kek
+     *
+     * @api GET /comms/news/statistics/{articleId}/interactions
+     *
+     * @param News\Model $article
+     * @throws \Alaress\Database\Exception
+     */
+    public function getInteractionsVsTime(News\Model $article)
+    {
+        $impressionsConversionsOpens = new ImpressionsConversionsOpens($this->database, $this->statisticsMapper, $this->statisticsCumulativeMapper);
+        $accuracy = News\Statistics\Accuracy\Factory::assertAccuracy($this->getRequest()->query['accuracy']);
+
+        /* Conversions and Impressions vs Time,
+         * Conversion Ratio vs Time
+         */
+        $output = [
+            'interactions' => $impressionsConversionsOpens->fetchConversions($article, $accuracy),
+            'conversionRatio' => $impressionsConversionsOpens->fetchConversionRatio($article, $accuracy),
+        ];
+
+        $this->getResponse()->content->set($this->buildJsonOutput($output));
     }
 }
