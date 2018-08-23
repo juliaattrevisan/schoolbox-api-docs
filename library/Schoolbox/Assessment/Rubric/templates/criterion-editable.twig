@@ -32,7 +32,7 @@
 </th>
 
 {% for levelIndex, level in rubricGrid.levels -%}
-    {% set descriptor = criterionUsage.retrieveDescriptor(level) %}
+    {% set descriptor = criterionUsage.retrieveDescriptor(levelIndex) %}
     <td data-descriptor class="{{ cellClass }}">
         <textarea {% if not checkChecked %} disabled="disabled"{% endif %}
                 data-descriptor-text
