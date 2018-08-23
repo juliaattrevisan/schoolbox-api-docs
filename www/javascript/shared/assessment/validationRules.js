@@ -56,8 +56,7 @@ function initDecimalDescsValidation() {
     });
 
 
-
-    // TODO on change of number of checked indicators?
+    // TODO hide any errors for an indicator that is unchecked
 
 }
 
