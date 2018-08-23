@@ -13,7 +13,6 @@ use Schoolbox\Comms\News\Audience\Model;
 use Schoolbox\Comms\News\Audience\Segment\ISearch;
 use Schoolbox\Comms\News\Audience\Segment\ITranslate;
 use Schoolbox\Comms\News\Audience\Segment\ValidRestrictedSearch;
-use Schoolbox\Permission\Access\RoleAccess;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
