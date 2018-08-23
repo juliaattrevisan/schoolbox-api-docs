@@ -60,7 +60,12 @@ class GroupUsage
      */
     public function retrieveCriterionUsage(Criterion $criterion): ?CriterionUsage
     {
-        return $this->criterionUsages[$criterion->getId()] ?? null;
+        foreach ($this->criterionUsages as $criterionUsage) {
+            if ($criterionUsage->getCriterion()->getId() === $criterion->getId()) {
+                return $criterionUsage;
+            }
+        }
+        return null;
     }
 
 

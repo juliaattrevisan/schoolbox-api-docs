@@ -124,7 +124,12 @@ class Grid
      */
     public function retrieveGroupUsage(Group $group): ?GroupUsage
     {
-        return $this->groupUsages[$group->getId()] ?? null;
+        foreach ($this->groupUsages as $groupUsage) {
+            if ($groupUsage->getGroup()->getId() === $group->getId()) {
+                return $groupUsage;
+            }
+        }
+        return null;
     }
 
 
