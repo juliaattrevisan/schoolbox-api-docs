@@ -358,57 +358,48 @@ class ImpressionsConversionsOpens
      */
     public function fetchReferrerDemographic(News\Model $article): array
     {
+        $statistics = $this->statisticsCumulativeMapper->findByColumn('article_id', $article->getId(), [
+            'order' => [
+                'date' => 'asc'
+            ]
+        ]);
 
-        /** @var Cumulative\Model $model */
-        try {
-            $model = $this->statisticsCumulativeMapper->findOneByColumn('article_id', $article->getId());
+        /* Raw number of Conversions and Impressions
+         */
+        $numImpressions = 0;
+        $numConversions = 0;
+        $breakdown = [];
 
-            $impressionsTotal = $model->findTotalImpressions();
-            $conversionsTotal = $model->findTotalConversions();
+        if ($statistics->count()) {
+            foreach ($statistics as $statistic) {
 
-            $data = [
-                Mapper::TYPE_IMPRESSION => [
-                    Mapper::REFERRER_DASHBOARD => $this->percentage($model->getNumImpressionsDashboard(), $impressionsTotal),
-                    Mapper::REFERRER_HOMEPAGE => $this->percentage($model->getNumImpressionsHomepage(), $impressionsTotal),
-                    Mapper::REFERRER_INDEX => $this->percentage($model->getNumImpressionsIndex(), $impressionsTotal),
-                    Mapper::REFERRER_ARCHIVE => $this->percentage($model->getNumImpressionsArchive(), $impressionsTotal),
-                    Mapper::REFERRER_EMAIL => $this->percentage($model->getNumImpressionsEmail(), $impressionsTotal),
-                ],
-                Mapper::TYPE_CONVERSION => [
-                    Mapper::REFERRER_DASHBOARD => $this->percentage($model->getNumConversionsDashboard(), $conversionsTotal),
-                    Mapper::REFERRER_HOMEPAGE => $this->percentage($model->getNumConversionsHomepage(), $conversionsTotal),
-                    Mapper::REFERRER_INDEX => $this->percentage($model->getNumConversionsIndex(), $conversionsTotal),
-                    Mapper::REFERRER_ARCHIVE => $this->percentage($model->getNumConversionsArchive(), $conversionsTotal),
-                    Mapper::REFERRER_EMAIL => $this->percentage($model->getNumConversionsEmail(), $conversionsTotal),
-                ]
-            ];
+                /* Aggregate from daily statistics
+                 */
+                $daily = $this->summariseDailyStatistics($statistic);
 
-//            $data = [
-//                Mapper::TYPE_IMPRESSION => [
-//                    Mapper::REFERRER_DASHBOARD => $model->getNumImpressionsDashboard(),
-//                    Mapper::REFERRER_HOMEPAGE => $model->getNumImpressionsHomepage(),
-//                    Mapper::REFERRER_INDEX => $model->getNumImpressionsIndex(),
-//                    Mapper::REFERRER_ARCHIVE => $model->getNumImpressionsArchive(),
-//                    Mapper::REFERRER_EMAIL => $model->getNumImpressionsEmail(),
-//                ],
-//                Mapper::TYPE_CONVERSION => [
-//                    Mapper::REFERRER_DASHBOARD => $model->getNumConversionsDashboard(),
-//                    Mapper::REFERRER_HOMEPAGE => $model->getNumConversionsHomepage(),
-//                    Mapper::REFERRER_INDEX => $model->getNumConversionsIndex(),
-//                    Mapper::REFERRER_ARCHIVE => $model->getNumConversionsArchive(),
-//                    Mapper::REFERRER_EMAIL => $model->getNumConversionsEmail(),
-//                ]
-//            ];
+                $numConversions += $daily['numConversions'];
+                $numImpressions += $daily['numImpressions'];
 
-        } catch (\Schoolbox\Mapper\Exception $e) {
-            $data = [
-                Mapper::TYPE_IMPRESSION => array_fill_keys(Mapper::REFERRERS, 0),
+                foreach ([ Mapper::TYPE_CONVERSION, Mapper::TYPE_IMPRESSION ] as $currentType) {
+                    foreach (Mapper::REFERRERS as $currentReferrer) {
+                        $breakdown[$currentType][$currentReferrer] += $daily['breakdown']['grid'][$currentType][$currentReferrer];
+                    }
+                }
+
+                /* Special case for direct opens
+                 */
+                $breakdown[Mapper::TYPE_OPEN] += $statistic->getNumOpens();
+            }
+        }
+        else {
+            $breakdown = [
                 Mapper::TYPE_CONVERSION => array_fill_keys(Mapper::REFERRERS, 0),
+                Mapper::TYPE_IMPRESSION => array_fill_keys(Mapper::REFERRERS, 0),
+                Mapper::TYPE_OPEN => 0,
             ];
         }
 
-
-        return $data;
+        return $breakdown;
     }
 
 
