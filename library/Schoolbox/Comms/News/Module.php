@@ -22,7 +22,6 @@ use Schoolbox\Permission\Access;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\UserMapper;
 
-
 class Module extends BaseModule
 {
     /**
@@ -95,7 +94,7 @@ class Module extends BaseModule
 
         /* Find out who will receive this article
          */
-        $this->register('GET', '/{articleId:\d+}/recipients', 'getRecipients', $viewPerms, $preloadNews);
+        $this->register('GET', '/{articleId:\d+}/recipients', 'getRecipients', $viewPerms, $preloadArticle);
 
         /* Index of articles audienced to you
          */
@@ -163,6 +162,7 @@ class Module extends BaseModule
             'policyMapper' => $this->getMapperFactory()->getLazy(Policy\Mapper::class),
             'topicMapper' => $this->getMapperFactory()->getLazy(TopicMapper::class),
             'saveForLaterMapper' => $this->getMapperFactory()->getLazy(SaveForLater\Mapper::class),
+            'statisticsMapper' => $this->getMapperFactory()->getLazy(Statistics\Mapper::class),
             'audienceMapper' => $this->getMapperFactory()->getLazy(Audience\Mapper::class),
             'roleAccessMapper' => $this->getMapperFactory()->getLazy(Access\RoleAccessMapper::class),
 

@@ -67,6 +67,11 @@ class Controller extends Base
     private $saveForLaterMapper;
 
     /**
+     * @var Statistics\Mapper
+     */
+    private $statisticsMapper;
+
+    /**
      * @var IConnector
      */
     private $databaseInternal;
@@ -115,6 +120,7 @@ class Controller extends Base
      * @param Policy\Mapper           $policyMapper
      * @param TopicMapper             $topicMapper
      * @param SaveForLater\Mapper     $saveForLaterMapper
+     * @param Statistics\Mapper       $statisticsMapper
      * @param IConnector              $databaseInternal
      * @param Folder\Mapper           $folderMapper
      * @param Access\UserAccessMapper $userAccessMapper
@@ -130,6 +136,7 @@ class Controller extends Base
         Policy\Mapper $policyMapper,
         TopicMapper $topicMapper,
         SaveForLater\Mapper $saveForLaterMapper,
+        Statistics\Mapper $statisticsMapper,
         IConnector $databaseInternal,
         Folder\Mapper $folderMapper,
         Access\UserAccessMapper $userAccessMapper,
@@ -144,6 +151,7 @@ class Controller extends Base
         $this->policyMapper = $policyMapper;
         $this->topicMapper = $topicMapper;
         $this->saveForLaterMapper = $saveForLaterMapper;
+        $this->statisticsMapper = $statisticsMapper;
         $this->audienceMapper = $audienceMapper;
         $this->roleAccessMapper = $roleAccessMapper;
 
@@ -217,8 +225,10 @@ class Controller extends Base
      *
      * @api POST /comms/news/create
      *
+     * @throws InvalidArgumentException
      * @throws MapperException
-     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws MapperException\InsufficientHydrationException
+     * @throws RouteNotFound
      * @throws \PDOException
      * @throws \Schoolbox\Resource\Exception
      * @throws \UnexpectedValueException
@@ -300,11 +310,13 @@ class Controller extends Base
      * @api POST /comms/news/{articleId}
      *
      * @param Model $article
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws InvalidArgumentException
+     * @throws MapperException
+     * @throws MapperException\InsufficientHydrationException
+     * @throws RouteNotFound
      * @throws \PDOException
-     * @throws \UnexpectedValueException
      * @throws \Schoolbox\Resource\Exception
+     * @throws \UnexpectedValueException
      */
     public function postUpdate(Model $article)
     {
@@ -368,10 +380,12 @@ class Controller extends Base
      * @param Model                          $article
      * @param array|\Aura\Web\Request\Values $data
      * @return void
+     * @throws InvalidArgumentException
      * @throws MapperException
+     * @throws MapperException\InsufficientHydrationException
      * @throws \PDOException
-     * @throws \UnexpectedValueException
      * @throws \Schoolbox\Resource\Exception
+     * @throws \UnexpectedValueException
      */
     private function persist(Model $article, $data): void
     {
@@ -597,13 +611,15 @@ class Controller extends Base
      * @param int|null $year
      * @param int|null $month
      * @throws InvalidArgumentException
+     * @throws MapperException
      * @throws RouteNotFound
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \DomainException
      * @throws \OutOfRangeException
+     * @throws \PDOException
      * @throws \UnderflowException
      * @throws \UnexpectedValueException
-     * @throws \DomainException
      */
     public function getListByTopic(?int $year, ?int $month)
     {
@@ -651,13 +667,15 @@ class Controller extends Base
      * @param int|null $year
      * @param int|null $month
      * @throws InvalidArgumentException
+     * @throws MapperException
      * @throws RouteNotFound
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \DomainException
      * @throws \OutOfRangeException
+     * @throws \PDOException
      * @throws \UnderflowException
      * @throws \UnexpectedValueException
-     * @throws \DomainException
      */
     public function getArchive(int $year = null, int $month = null)
     {
@@ -699,13 +717,15 @@ class Controller extends Base
      * @api GET /comms/news
      *
      * @throws InvalidArgumentException
+     * @throws MapperException
      * @throws RouteNotFound
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \DomainException
      * @throws \OutOfRangeException
+     * @throws \PDOException
      * @throws \UnderflowException
      * @throws \UnexpectedValueException
-     * @throws \DomainException
      */
     public function getIndex()
     {
@@ -751,11 +771,13 @@ class Controller extends Base
      * @param int|null           $month
      * @return array
      * @throws InvalidArgumentException
+     * @throws MapperException
      * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \DomainException
      * @throws \OutOfRangeException
+     * @throws \PDOException
      * @throws \UnderflowException
      * @throws \UnexpectedValueException
-     * @throws \DomainException
      */
     private function generatePartial(string $urlPrefix, Querystring $params, Collection $topics, bool $hidePaginator, ?int $year, ?int $month): array
     {
@@ -764,6 +786,7 @@ class Controller extends Base
             $this->newsMapper,
             $this->policyMapper,
             $this->saveForLaterMapper,
+            $this->statisticsMapper,
             $this->databaseInternal,
             $this->folderMapper,
             $this->userAccessMapper,

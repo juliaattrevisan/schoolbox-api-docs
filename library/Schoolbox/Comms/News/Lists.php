@@ -53,6 +53,11 @@ class Lists
     private $saveForLaterMapper;
 
     /**
+     * @var Statistics\Mapper
+     */
+    private $statisticsMapper;
+
+    /**
      * @var IConnector
      */
     private $databaseInternal;
@@ -90,6 +95,7 @@ class Lists
      * @param Mapper                  $newsMapper
      * @param Policy\Mapper           $policyMapper
      * @param SaveForLater\Mapper     $saveForLaterMapper
+     * @param Statistics\Mapper       $statisticsMapper
      * @param IConnector              $databaseInternal
      * @param Folder\Mapper           $folderMapper
      * @param Access\UserAccessMapper $userAccessMapper
@@ -102,6 +108,7 @@ class Lists
         Mapper $newsMapper,
         Policy\Mapper $policyMapper,
         SaveForLater\Mapper $saveForLaterMapper,
+        Statistics\Mapper $statisticsMapper,
         IConnector $databaseInternal,
         Folder\Mapper $folderMapper,
         Access\UserAccessMapper $userAccessMapper,
@@ -113,6 +120,7 @@ class Lists
         $this->newsMapper = $newsMapper;
         $this->policyMapper = $policyMapper;
         $this->saveForLaterMapper = $saveForLaterMapper;
+        $this->statisticsMapper = $statisticsMapper;
 
         /* Hyperdrive injection
          */
@@ -150,11 +158,13 @@ class Lists
      * @param int|null           $month
      * @return array
      * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \DomainException
      * @throws \InvalidArgumentException
      * @throws \OutOfRangeException
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
      * @throws \UnderflowException
      * @throws \UnexpectedValueException
-     * @throws \DomainException
      */
     public function findForTopic(string $urlPrefix, Querystring $params, User $user, Collection $topics, ?int $year, ?int $month): array
     {
@@ -214,6 +224,12 @@ class Lists
 
             if (null !== $record) {
                 $articles->add($records->getOffset($articleId));
+
+                /* Statistics: save an impression record
+                 * TODO: Load the referrer value from $params
+                 * TODO: Also increment a tally elsewhere
+                 */
+                $this->statisticsMapper->saveImpression($articleId, $user->getId(), Statistics\Mapper::REFERRER_DASHBOARD);
             }
         }
 
@@ -247,9 +263,6 @@ class Lists
         /* Figure out the articles that this user has saved for later
          */
         $savedArticleIds = $this->findSavedArticles($user, $policies->getOffset('save_for_later'));
-
-        /* TODO: Increment Impressions count for everything in $articles
-         */
 
         /* These pieces are needed to represent an article, due to Save For Later
          */
