@@ -200,7 +200,7 @@ class Model implements ISoftDeletable
      */
     public function getNumImpressionsDashboard(): ?int
     {
-        return $this->numImpressionsDashboard;
+        return $this->numImpressionsDashboard ?: 0;
     }
 
 
@@ -220,7 +220,7 @@ class Model implements ISoftDeletable
      */
     public function getNumImpressionsHomepage(): ?int
     {
-        return $this->numImpressionsHomepage;
+        return $this->numImpressionsHomepage ?: 0;
     }
 
 
@@ -240,7 +240,7 @@ class Model implements ISoftDeletable
      */
     public function getNumImpressionsIndex(): ?int
     {
-        return $this->numImpressionsIndex;
+        return $this->numImpressionsIndex ?: 0;
     }
 
 
@@ -260,7 +260,7 @@ class Model implements ISoftDeletable
      */
     public function getNumImpressionsArchive(): ?int
     {
-        return $this->numImpressionsArchive;
+        return $this->numImpressionsArchive ?: 0;
     }
 
 
@@ -280,7 +280,7 @@ class Model implements ISoftDeletable
      */
     public function getNumImpressionsEmail(): ?int
     {
-        return $this->numImpressionsEmail;
+        return $this->numImpressionsEmail ?: 0;
     }
 
 
@@ -300,7 +300,7 @@ class Model implements ISoftDeletable
      */
     public function getNumConversionsDashboard(): ?int
     {
-        return $this->numConversionsDashboard;
+        return $this->numConversionsDashboard ?: 0;
     }
 
 
@@ -320,7 +320,7 @@ class Model implements ISoftDeletable
      */
     public function getNumConversionsHomepage(): ?int
     {
-        return $this->numConversionsHomepage;
+        return $this->numConversionsHomepage ?: 0;
     }
 
 
@@ -340,7 +340,7 @@ class Model implements ISoftDeletable
      */
     public function getNumConversionsIndex(): ?int
     {
-        return $this->numConversionsIndex;
+        return $this->numConversionsIndex ?: 0;
     }
 
 
@@ -360,7 +360,7 @@ class Model implements ISoftDeletable
      */
     public function getNumConversionsArchive(): ?int
     {
-        return $this->numConversionsArchive;
+        return $this->numConversionsArchive ?: 0;
     }
 
 
@@ -380,7 +380,7 @@ class Model implements ISoftDeletable
      */
     public function getNumConversionsEmail(): ?int
     {
-        return $this->numConversionsEmail;
+        return $this->numConversionsEmail ?: 0;
     }
 
 
@@ -400,7 +400,7 @@ class Model implements ISoftDeletable
      */
     public function getNumOpens(): ?int
     {
-        return $this->numOpens;
+        return $this->numOpens ?: 0;
     }
 
 

@@ -368,7 +368,12 @@ class ImpressionsConversionsOpens
          */
         $numImpressions = 0;
         $numConversions = 0;
-        $breakdown = [];
+
+        $breakdown = [
+            Mapper::TYPE_CONVERSION => array_fill_keys(Mapper::REFERRERS, 0),
+            Mapper::TYPE_IMPRESSION => array_fill_keys(Mapper::REFERRERS, 0),
+            Mapper::TYPE_OPEN => 0,
+        ];
 
         if ($statistics->count()) {
             foreach ($statistics as $statistic) {
@@ -390,13 +395,6 @@ class ImpressionsConversionsOpens
                  */
                 $breakdown[Mapper::TYPE_OPEN] += $statistic->getNumOpens();
             }
-        }
-        else {
-            $breakdown = [
-                Mapper::TYPE_CONVERSION => array_fill_keys(Mapper::REFERRERS, 0),
-                Mapper::TYPE_IMPRESSION => array_fill_keys(Mapper::REFERRERS, 0),
-                Mapper::TYPE_OPEN => 0,
-            ];
         }
 
         return $breakdown;
