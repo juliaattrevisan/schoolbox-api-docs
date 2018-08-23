@@ -41,12 +41,20 @@ function initDecimalDescsValidation() {
         reValidate();
     });
 
+    var moConfig = { attributes: false, childList: true, characterData: false };
+
     // on change of number of levels
     var levelObserver = new MutationObserver(attachValidationRules);
-    var config = { attributes: false, childList: true, characterData: false };
     $("tr[data-group]").each(function() {
-        levelObserver.observe(this, config);
+        levelObserver.observe(this, moConfig);
     });
+
+    // on change of number of indicators/capabilities
+    var indicatorObserver = new MutationObserver(attachValidationRules);
+    $("table[data-rubric] tbody").each(function() {
+        levelObserver.observe(this, moConfig);
+    });
+
 
 
     // TODO on change of number of checked indicators?
