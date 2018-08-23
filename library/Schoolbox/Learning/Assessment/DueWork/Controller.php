@@ -17,6 +17,7 @@ use Raven_Client;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
+use Schoolbox\Assessment\Rubric\Grid\Level;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfAssessable;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
@@ -1117,10 +1118,14 @@ class Controller extends Assessment\Controller
 
 
         // Ideally, the rubric grid can be used as is without Twig-wrangling
-        $data['rubricGrid'] = $this->rubricMapper->retrieveGrid(
-            $assessment,
-            true
-        );
+        $rubricGrid = $this->rubricMapper->retrieveGrid($assessment, true);
+        if (\count($rubricGrid->getLevels()) === 0) {
+            // Two fake levels
+            $rubricGrid->getLevels()
+                       ->add(new Level())
+                       ->add(new Level());
+        }
+        $data['rubricGrid'] = $rubricGrid;
 
 
         // ...and scene.
