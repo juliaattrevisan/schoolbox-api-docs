@@ -108,9 +108,11 @@ class RubricMapper
         $criterionModels = CriterionMapper::getInstance()->findForFolder($folder->getId());
 
         // Unit-specs have their course spec's criteria as well
+        $courseSpecFolderId = null;
         if ($folder->hasUnitSpecification()) {
-            $criterionModels = $criterionModels->merge(
-                CriterionMapper::getInstance()->findForFolder($folder->getParent()->getId())
+            $courseSpecFolderId = $folder->getParent()->getId();
+            $criterionModels    = $criterionModels->merge(
+                CriterionMapper::getInstance()->findForFolder($courseSpecFolderId)
             );
         }
 
@@ -124,13 +126,15 @@ class RubricMapper
 //        }
 
         foreach ($criterionModels as $criterionModel) {
-            $groupModel  = $criterionModel->getGroup();
-            $groupId     = $groupModel->getId();
-            $criterionId = $criterionModel->getId();
+            $groupModel    = $criterionModel->getGroup();
+            $isCourseGroup = $groupModel->getParentId() === $courseSpecFolderId;
+            $groupId       = $groupModel->getId();
+            $criterionId   = $criterionModel->getId();
             if (!isset($groups[$groupId])) {
                 $groups[$groupId] = (new \Schoolbox\Assessment\Rubric\RowSet\Group())
                     ->setId($groupId)
                     ->setName($groupModel->getName())
+                    ->setIsCourseLevel($isCourseGroup)
                     ->setCurriculumNodes($groupModel->getCurriculumNodes());
 
                 if ($getUsages) {
