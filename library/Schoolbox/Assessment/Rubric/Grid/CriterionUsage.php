@@ -67,9 +67,9 @@ class CriterionUsage
      */
     public function iterateDescriptors(GenericCollection $levels): iterable
     {
-        foreach ($levels as $level) {
+        foreach ($levels as $levelIndex => $level) {
             $levelId = $level->getId();
-            yield $levelId => $this->getDescriptors()[$levelId] ?? null;
+            yield $levelId => $this->retrieveDescriptor($levelIndex);
         }
     }
 
