@@ -19,6 +19,13 @@ var validateOptions = {
 
 
 function initDecimalDescsValidation() {
+    function reValidate() {
+        console.log("Revalidating");
+        $("[data-descriptor-value]").each(function() {
+            console.log($(this));
+            $(this).valid();
+        });
+    }
     function attachValidationRules() {
         console.log("B");
 
@@ -32,11 +39,19 @@ function initDecimalDescsValidation() {
     // on load
     attachValidationRules();
 
-    // TODO on change of number of levels
+    // on change of mark range setting
+    $("#useMarkRange").change(function() {
+        reValidate();
+    });
 
-    // TODO on change of number of checked indicators
+    // on change of number of levels
+    // TODO this one not working
+    $("[data-spawn='level']").click(function() {
+        reValidate();
+    });
 
-    // TODO on change of mark range setting
+    // TODO on change of number of checked indicators?
+
 }
 
 
