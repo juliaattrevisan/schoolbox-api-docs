@@ -568,11 +568,15 @@ class Calendar extends DeprecatedModel
             $filter_query = " AND ($filter_query)";
         }
 
+        $attendance_query = "OR (event_attendance.user_id = '{$user->getId()}')";
+
         $access_query = "AND (
             (access = " . EventModel::ACCESS_PERSONAL . " AND owner = '{$user->getId()}')
             $groupQuery
             OR (access = " . EventModel::ACCESS_CAMPUS . " AND $campusQuery $groupChunk OR owner = '{$user->getId()}')
-        )";
+            $attendance_query
+            )";
+        
 
         // Build the date query
         $dateQuery = '';
@@ -619,6 +623,7 @@ class Calendar extends DeprecatedModel
 			LEFT JOIN folder ON event_category.category_id = folder.id AND event_category.category_id IS NOT NULL
 			LEFT JOIN event_group ON event.id = event_group.event_id AND access = ".EventModel::ACCESS_CAMPUS."
 			LEFT JOIN event_campus ON event.id = event_campus.event_id AND access = ".EventModel::ACCESS_CAMPUS."
+			LEFT JOIN event_attendance ON event.id = event_attendance.event_id
 			WHERE
 			    event.deleted_at is NULL AND
 				resource_booking.id IS NULL
