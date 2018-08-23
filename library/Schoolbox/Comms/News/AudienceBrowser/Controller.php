@@ -108,8 +108,12 @@ class Controller extends Base
      * Look for all the audience pieces that might somehow match $keyword
      *
      * @api /comms/news/audiencebrowser/search
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \InvalidArgumentException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\InsufficientHydrationException
      */
-    public function getSearch()
+    public function getSearch(): void
     {
         $searchResult = [];
 
@@ -243,8 +247,12 @@ class Controller extends Base
      * Get (id, name) tuples for every Campus
      *
      * @api /comms/news/audiencebrowser/campuses
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \InvalidArgumentException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\InsufficientHydrationException
      */
-    public function getCampuses()
+    public function getCampuses(): void
     {
         $this->getResponse()->content->set($this->generate($this->campusMapper->findAll()->sortBy('name', 'asc'), Audience\Model::ENTITY_TYPE_CAMPUS));
     }
@@ -254,8 +262,12 @@ class Controller extends Base
      * Get (id, name) tuples for every Role
      *
      * @api /comms/news/audiencebrowser/roles
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \InvalidArgumentException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\InsufficientHydrationException
      */
-    public function getRoles()
+    public function getRoles(): void
     {
         $this->getResponse()->content->set($this->generate($this->roleMapper->findAll()->sortBy('name', 'asc'), Audience\Model::ENTITY_TYPE_ROLE));
     }
@@ -265,8 +277,12 @@ class Controller extends Base
      * Get (id, name) tuples for every Pastoral Group
      *
      * @api /comms/news/audiencebrowser/pastoralgroups
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \InvalidArgumentException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\InsufficientHydrationException
      */
-    public function getPastoralGroups()
+    public function getPastoralGroups(): void
     {
         $this->getResponse()->content->set($this->generate($this->pastoralGroupMapper->findAll()->sortBy('name', 'asc'), Audience\Model::ENTITY_TYPE_PASTORAL_GROUP));
     }
@@ -276,8 +292,12 @@ class Controller extends Base
      * Get (id, name) tuples for every House
      *
      * @api /comms/news/audiencebrowser/houses
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \InvalidArgumentException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\InsufficientHydrationException
      */
-    public function getHouses()
+    public function getHouses(): void
     {
         $this->getResponse()->content->set($this->generate($this->houseMapper->findAll()->sortBy('house', 'asc'), Audience\Model::ENTITY_TYPE_SCHOOL_HOUSE));
     }
@@ -287,8 +307,12 @@ class Controller extends Base
      * Get (id, name) tuples for every folder
      *
      * @api /comms/news/audiencebrowser/folders
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \InvalidArgumentException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\InsufficientHydrationException
      */
-    public function getFolders()
+    public function getFolders(): void
     {
         $this->getResponse()->content->set($this->generate($this->folderMapper->findForUser($this->getUser())->sortBy('title', 'asc'), Audience\Model::ENTITY_TYPE_FOLDER));
     }
@@ -304,7 +328,7 @@ class Controller extends Base
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\InsufficientHydrationException
      */
-    public function getYearLevels()
+    public function getYearLevels(): void
     {
         $items = [];
 
