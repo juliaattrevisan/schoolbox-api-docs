@@ -38,11 +38,7 @@ class ValidUnrestrictedSearch
      */
     public function isSatisfiedBy(User $user): bool
     {
-        $isSuperuser = $user->isSuperuser();
-        $hasCMSPermission = $this->hasCMSPermission($user);
-        $isCommsOfficer = (new ValidUserIsCommsOfficer())->isSatisfiedBy($user);
-
-        return $isSuperuser || $hasCMSPermission || $isCommsOfficer;
+        return $user->isSuperuser() || $this->hasCMSPermission($user) || $this->isCommsOfficer($user);
     }
 
 
@@ -68,5 +64,21 @@ class ValidUnrestrictedSearch
         }
 
         return false;
+    }
+
+
+    /**
+     * Returns whether the specified user is a comms officer
+     *
+     * @param User $user
+     * @return bool
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     */
+    private function isCommsOfficer(User $user): bool
+    {
+        return (new ValidUserIsCommsOfficer())->isSatisfiedBy($user);
     }
 }
