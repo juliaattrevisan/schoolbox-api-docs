@@ -449,8 +449,13 @@ class RubricMapper
                 $criterionUsage = new \Schoolbox\Assessment\Rubric\Grid\CriterionUsage($criterion);
 
                 // Add descriptors, and apply min value
-                foreach ($descriptorsByCriterion[$criterionId] ?? [] as $levelId => $descriptor) {
-                    $criterionUsage->getDescriptors()[$levelId] = $descriptor;
+                $levelIndex = 0;
+                foreach ($levelModels as $levelModel) {
+                    $descriptor = $descriptorsByCriterion[$criterionId][$levelModel->getId()] ?? null;
+                    if (null !== $descriptor) {
+                        $criterionUsage->getDescriptors()[$levelIndex] = $descriptor;
+                    }
+                    $levelIndex++;
                 }
                 $criterionUsage->applyDescriptorMinValues($assessment->getUseMarkRange());
 
