@@ -13,18 +13,18 @@ use Schoolbox\Comms\News\ValidUserIsCommsOfficer;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 
-class ValidRestrictedSearch
+class ValidUnrestrictedSearch
 {
 
     /**
-     * Determine whether $user is one of the restricted types of users
+     * Determine whether $user is one of the unrestricted types of users
      *
      * To use a Folder as an audiencing target,
      *    - Folders must have a class code or be a Group
      *    - Folder can't be deleted
      *
      * Anything else is rolled over or otherwise inaccessible and shouldn't appear as a search result
-     * The result set is affected by whether $user has READ access to the folder in some way
+     * The result set is affected by whether $user has READ+ access to the folder in some way
      *
      *    - Superusers/Comms Officers/CMS Perms aren't limited to what they can search and can audience
      *    - Restrict non-superusers/non-comms-officer/non-CMS Perms people
@@ -42,7 +42,7 @@ class ValidRestrictedSearch
         $hasCMSPermission = $this->hasCMSPermission($user);
         $isCommsOfficer = (new ValidUserIsCommsOfficer())->isSatisfiedBy($user);
 
-        return !$isSuperuser && !$hasCMSPermission && !$isCommsOfficer;
+        return $isSuperuser || $hasCMSPermission || $isCommsOfficer;
     }
 
 

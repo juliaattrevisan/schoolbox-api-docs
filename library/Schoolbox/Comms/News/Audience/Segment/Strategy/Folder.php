@@ -12,7 +12,7 @@ namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 use Schoolbox\Comms\News\Audience\Model;
 use Schoolbox\Comms\News\Audience\Segment\ISearch;
 use Schoolbox\Comms\News\Audience\Segment\ITranslate;
-use Schoolbox\Comms\News\Audience\Segment\ValidRestrictedSearch;
+use Schoolbox\Comms\News\Audience\Segment\ValidUnrestrictedSearch;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -94,7 +94,8 @@ class Folder implements ISearch, ITranslate
     {
         $folderMembershipSql = '';
 
-        if ((new ValidRestrictedSearch())->isSatisifiedBy($this->user)) {
+        // Is user restricted?
+        if (!(new ValidUnrestrictedSearch())->isSatisifiedBy($this->user)) {
 
             /* Check to see whether I have READ+ access to any group/class folders
              */
