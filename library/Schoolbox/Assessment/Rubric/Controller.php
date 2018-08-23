@@ -137,16 +137,6 @@ class Controller extends BaseController
                 return;
             }
 
-            $group = (new \Schoolbox\Assessment\Rubric\RowSet\Group())
-                ->setId($post->getInt('groupId'))
-                ->setName($groupName);
-
-            // Don't have to save anything yet
-            $criterion = (new \Schoolbox\Assessment\Rubric\RowSet\Criterion())
-                ->setId(rand(1, PHP_INT_MAX))
-                ->setName($critName);
-
-
             $criteria      = CriterionMapper::getInstance()->findForFolder($folderId);
             $proposedGroup = $this->mapper->normaliseForComparison($groupName);
             $proposedName  = $this->mapper->normaliseForComparison($critName);
@@ -160,13 +150,24 @@ class Controller extends BaseController
                 }
             }
 
+            $results = $this->saveNewCriterion($folderId, $groupName, $critName);
+
+            $group = (new \Schoolbox\Assessment\Rubric\RowSet\Group())
+                ->setId($post->getInt('groupId'))
+                ->setName($groupName);
+
+            // Don't have to save anything yet
+            $criterion = (new \Schoolbox\Assessment\Rubric\RowSet\Criterion())
+                ->setId($results['id'])
+                ->setName($critName);
+
             $context['rowspan'] = null;
             $context['group']   = $group;
             $context['crit']    = $criterion;
 //            $context['group'] = [
 //                'id' => $post->get('groupId')
 //            ];
-//            $context['crit'] = $this->saveNewCriterion($folderId, $group, $name);
+
 
             $template = 'group-row-editable';
         }
