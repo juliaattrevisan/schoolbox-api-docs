@@ -122,12 +122,14 @@ class Controller extends BaseController
      */
     private function buildTwigDataForForm(RowSet $rowSet): array
     {
-        $folder = $rowSet->getContext()->getBaseContext()->getFolder();
+        $folder   = $rowSet->getContext()->getBaseContext()->getFolder();
+        $groupIds = $rowSet->retrieveGroupIds();
+        $critIds  = $rowSet->retrieveCriterionIds();
         return [
             'folder'                   => $folder,
             'rowSet'                   => $rowSet,
-            'maxGroupId'               => max($rowSet->retrieveGroupIds()) + 1,
-            'maxCritId'                => max($rowSet->retrieveCriterionIds()) + 1,
+            'maxGroupId'               => !empty($groupIds) ? max($groupIds) + 1 : 1,
+            'maxCritId'                => !empty($critIds)  ? max($critIds)  + 1 : 1,
             'curriculumTaggingEnabled' => $this->isCurriculumTaggingEnabled(),
             'isSpecFolder'             => $folder->isSpecFolder(),
         ];
