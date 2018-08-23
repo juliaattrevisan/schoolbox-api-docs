@@ -209,12 +209,13 @@ class Mapper extends \Schoolbox\Mapper
     {
         $now = \Alaress_Date_Format::now();
 
-        try {
-            $model = $this->findOneByColumnList([
-                'date' => \Alaress_Date_Format::now(),
-                'article_id' => $articleId
-            ]);
+        $model = $this->findByColumnList([
+            'date' => $now->getDatabaseDate(),
+            'article_id' => $articleId
+        ], ['cache' => false])->first();
 
+
+        if ($model) {
             $model->setNumOpens((int)$model->getNumOpens() + 1);
 
             /* Record the datetime when this was first opened
@@ -222,7 +223,7 @@ class Mapper extends \Schoolbox\Mapper
             if (null === $model->getFirstOpen()) {
                 $model->setFirstOpen($now);
             }
-        } catch (\Schoolbox\Mapper\Exception $e) {
+        } else {
             $model = $this->createModel()
                 ->setDate($now)
                 ->setArticleId($articleId)
