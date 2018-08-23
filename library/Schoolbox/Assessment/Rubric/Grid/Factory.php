@@ -141,6 +141,7 @@ class Factory
                 }
             }
 
+            $groupUsage = $grid->retrieveGroupUsage($group);
             $groupUsage->getCriterionUsages()[$criterionId] = $criterionUsage;
         }
 
