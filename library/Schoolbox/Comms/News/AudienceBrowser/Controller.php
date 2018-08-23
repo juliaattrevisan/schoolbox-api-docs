@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * Controller
  *
@@ -14,12 +15,15 @@ use HouseMapper;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
 use Schoolbox\Comms\News\Audience;
+use Schoolbox\GenericCollection;
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\Pastoral;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\RoleMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\UserMapper;
+use PDO;
+use Schoolbox\ValueLabelInterface;
 
 class Controller extends Base
 {
@@ -124,15 +128,17 @@ class Controller extends Base
         $translator = new Audience\Segment\Translator($this->folderMapper->getDatabase(), $this->getUser(), $this->folderMapper, $this->roleAccessMapper);
         $formatter = new Audience\Segment\HtmlFormatter($outputFormatter);
 
-        $statement = $this->userMapper->getDatabase()->prepare($registry->getSearchSql());
+        $placeholder = 'keyword';
+        $statement   = $this->userMapper->getDatabase()->prepare($registry->getSearchSql($placeholder));
 
         $escapedKeyword = $this->db->escapeForLike($this->getRequest()->query['query']);
         $statement->execute([
-            'keyword' => "%{$escapedKeyword}%",
+            $placeholder => "%{$escapedKeyword}%",
         ]);
 
         /* Set up the RELATIONSHIP_SELF variant first then add Parents and Teachers modifiers
          */
+        /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $data = $this->generateDecoratedDataTuple($row, $translator, $formatter);
 
@@ -146,7 +152,7 @@ class Controller extends Base
 
 
     /**
-     * @param Collection $collection
+     * @param Collection|ValueLabelInterface[] $collection
      * @param string     $entityType
      * @return \Alaress\Web\Output\Json
      * @throws \Aura\Di\Exception\ServiceNotFound
@@ -307,14 +313,63 @@ class Controller extends Base
      * Get (id, name) tuples for every folder
      *
      * @api /comms/news/audiencebrowser/folders
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \InvalidArgumentException
+     * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\InsufficientHydrationException
+     * @throws \UnexpectedValueException
      */
     public function getFolders(): void
     {
-        $this->getResponse()->content->set($this->generate($this->folderMapper->findForUser($this->getUser())->sortBy('title', 'asc'), Audience\Model::ENTITY_TYPE_FOLDER));
+        $folderStrategy = new Audience\Segment\Strategy\Folder($this->getUser(), $this->folderMapper, $this->roleAccessMapper);
+        $statement      = $this->userMapper->getDatabase()->prepare($folderStrategy->getSearchSql());
+        $statement->execute();
+        $searchResults = new GenericCollection(ValueLabelInterface::class);
+
+        /** @noinspection PhpAssignmentInConditionInspection */
+        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
+            $searchResults[$row['id']] = new class($row['id'], $row['name']) implements ValueLabelInterface
+            {
+
+                /** @var string */
+                private $id;
+                /** @var string */
+                private $name;
+
+
+                /**
+                 * @param string $id
+                 * @param string $name
+                 */
+                public function __construct(string $id, string $name)
+                {
+                    $this->id   = $id;
+                    $this->name = $name;
+                }
+
+
+                /**
+                 * @inheritdoc
+                 */
+                public function findValueLabelPair(): array
+                {
+                    return [
+                        'value' => $this->id,
+                        'label' => $this->name,
+                    ];
+                }
+            };
+        }
+
+        $searchResults->sortByCallback(function (ValueLabelInterface $left, ValueLabelInterface $right) {
+            // compensate for MySQL lack of natural sort for names like [F1, F9, F10]
+            return \strnatcasecmp($left->findValueLabelPair()['label'], $right->findValueLabelPair()['label']);
+        }, true);
+
+
+        $this->getResponse()->content->set($this->generate($searchResults, Audience\Model::ENTITY_TYPE_FOLDER));
     }
 
 
