@@ -19,6 +19,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionUsageMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Resource\Storage\IStorage;
@@ -96,6 +97,7 @@ class Controller extends BaseController
                 'levels' => $post->get('levelCount') ? array_fill(0, $post->get('levelCount'), ':)') : [],
             ],
             'markPerCapability' => $post->getBool('markPerCapability', false),
+            'useMarkRange'      => $post->getBool('useMarkRange', false),
         ];
 
         $folderId = $post->get('folderId');
@@ -103,6 +105,22 @@ class Controller extends BaseController
             $this->sendJSONError('Must supply a folder Id');
             return;
         }
+
+
+        // Finagle a rubric grid
+        // (First, what's the assessment? it will always be rubric ID)
+        // (Second, what's the context?)
+        // Also need to pass the much of the form values to the assessment
+        // Example: mark-per-cap, use mark range
+        $assessmentId = $post->getInt('rubricId', 0);
+        $rubricGrid   = $this->mapper->retrieveGrid(
+            (new DueWork())
+                ->setId($assessmentId)
+                ->setContext((new FolderModel())->setId($folderId)),
+            true
+        );
+        $context['rubricGrid'] = $rubricGrid;
+
 
         if ($post->get('type') == 'criterion') {
 
@@ -127,15 +145,24 @@ class Controller extends BaseController
             }
 
             $context['rowspan'] = null;
-            $context['group'] = [
-                'id' => $post->get('groupId')
-            ];
-            $context['crit'] = $this->saveNewCriterion($folderId, $group, $name);
+//            $context['group'] = [
+//                'id' => $post->get('groupId')
+//            ];
+//            $context['crit'] = $this->saveNewCriterion($folderId, $group, $name);
 
             $template = 'group-row-editable';
         }
 
         elseif ($post->get('type') == 'group') {
+
+            // Does the list of crits/groups really need to be saved now?
+            // For some reason, groups aren't saved whilst criteria are?
+            // Probably because groups literally couldn't exist w/o criteria
+
+            // Next step: figure out what gets passed in
+            $group = (new \Schoolbox\Assessment\Rubric\RowSet\Group())
+                ->setId(rand(1, PHP_INT_MAX))
+                ->setName($post->get('name'));
 
             // Ensure the proposed Group name is not already in use.
             $criteria = CriterionMapper::getInstance()->findForFolder($folderId);
@@ -150,11 +177,12 @@ class Controller extends BaseController
             }
 
             $context['rowspan'] = 1;
-            $context['group'] = [
-                'id'   => rand(1, PHP_INT_MAX), // this is just so the inputs on the page are unique
-                'name' => $post->get('name'),
-                'used' => false,
-            ];
+            $context['group']   = $group;
+//            $context['group'] = [
+//                'id'   => rand(1, PHP_INT_MAX), // this is just so the inputs on the page are unique
+//                'name' => $post->get('name'),
+//                'used' => false,
+//            ];
 
             $template = 'group-editable';
 
