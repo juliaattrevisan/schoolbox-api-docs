@@ -24,12 +24,21 @@ function initDecimalDescsValidation() {
         $("[data-descriptor-value]").each(function() {
             $(this).valid();
         });
+        $("[data-criterion-name]").each(function() {
+            $(this).valid();
+        });
     }
     function attachValidationRules() {
         // Validate decimal places on each descriptor
         $("[data-descriptor-value]").each(function() {
             $(this).rules("add", { noDecimalPlacesWithMarkRange: true });
-        })
+        });
+
+        // Validate an entire indicator row
+        $("[data-criterion-name]").each(function() {
+            console.log($(this));
+            $(this).rules("add", { descriptorsAreMonotonic: true });
+        });
     }
 
 
@@ -92,19 +101,6 @@ var beforeSubmit = function() {
 
     // have to do this again since its not in validateOptions and the plugin clears+reapplys rules on submit
     initDecimalDescsValidation();
-
-    // Validate each row of descriptors
-    $("[data-descriptor-value]").each(function() {
-        $(this).rules("add",
-            {
-                descriptorsAreMonotonic: true,
-                messages: { // TODO why this not working
-                    descriptorsAreMonotonic: " use only descriptor points with non-decimal values if Use Mark Range is enabled"
-                }
-            }
-        );
-    });
-
 
     if (openVisible && closeVisible) {
 
