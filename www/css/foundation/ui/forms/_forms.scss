@@ -130,6 +130,10 @@ form {
 	margin: 0 0 $form-spacing / 2 0;
 }
 
+label {
+	display: initial;
+}
+
 input,
 textarea,
 select {
