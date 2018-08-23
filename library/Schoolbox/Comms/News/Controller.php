@@ -490,11 +490,25 @@ class Controller extends Base
             }
         }
 
-        /* Record this Conversion/Open
-         * referrer value determines what kind it was
+        /* Impression referrer
          */
-        (new ImpressionsConversionsOpens($this->databaseInternal, $this->statisticsMapper, $this->statisticsCumulativeMapper))
-            ->saveConversionOpen($article, $this->getUser()->getId(), $this->getRequest()->query[Querystring::REFERRER]);
+        $referrer = $this->getRequest()->query[Querystring::REFERRER];
+
+        /* If you have an impression referrer but your http referrer is empty/nonexistent
+         * you weren't in the schoolbox domain prior to visiting the news detail screen
+         *
+         * Don't record a conversion in this circumstance
+         *
+         * TODO: Should you check for domain as well? This precludes outsider visits?
+         */
+        if ($referrer && (null !== $this->getRequest()->client->getReferer())) {
+
+            /* Record this Conversion/Open
+             * referrer value determines what kind it was
+             */
+            (new ImpressionsConversionsOpens($this->databaseInternal, $this->statisticsMapper, $this->statisticsCumulativeMapper))
+                ->saveConversionOpen($article, $this->getUser()->getId(), $referrer);
+        }
 
         // don't supply the extra twig-necessary data if just returning JSON
         if ($this->isJsonRequest()) {
