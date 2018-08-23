@@ -1,0 +1,26 @@
+.infographic {
+  text-align: center;
+
+  .title {
+    clear: both;
+    display: block;
+  }
+
+  .value {
+    font-size: 2.25rem;
+    font-weight:bold;
+
+    &.percentage {
+      span {
+        font-size: 1.25rem;
+        margin-left: 0.5rem;
+      }
+    }
+  }
+}
+
+.ico {
+  td, th {
+    text-align: center;
+  }
+}
