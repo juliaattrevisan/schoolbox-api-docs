@@ -15,11 +15,8 @@
 namespace Schoolbox\Comms\News\Statistics;
 
 use Alaress\Database\Connector\IConnector;
-use DomainException;
 use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Statistics\Accuracy\Factory;
-use Schoolbox\Comms\News\Statistics\Accuracy\IAccuracy;
-
 
 class ImpressionsConversionsOpens
 {
@@ -425,7 +422,7 @@ class ImpressionsConversionsOpens
      * @return array
      * @throws \Alaress\Database\Exception
      */
-    public function fetchConversionRatio(News\Model $article, ?string $accuracy = self::DEFAULT_ACCURACY): array
+    public function fetchConversionRatio(News\Model $article, string $accuracy): array
     {
         /* Determine a sane value
          */

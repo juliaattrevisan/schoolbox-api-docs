@@ -58,7 +58,7 @@ class Controller extends Base
     public function getOverview(News\Model $article)
     {
         $impressionsConversionsOpens = new ImpressionsConversionsOpens($this->database, $this->statisticsMapper, $this->statisticsCumulativeMapper);
-        $accuracy = $this->getRequest()->query['accuracy'];
+        $accuracy = News\Statistics\Accuracy\Factory::assertAccuracy($this->getRequest()->query['accuracy']);
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsStatistics/index.twig', [
             'article' => $article,

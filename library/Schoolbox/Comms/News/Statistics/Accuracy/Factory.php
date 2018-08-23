@@ -33,6 +33,19 @@ class Factory
         'month'     => 60*24*31,
     ];
 
+
+    /**
+     * Enforce a default value
+     *
+     * @param $accuracy
+     * @return string
+     */
+    public static function assertAccuracy(?string $accuracy): string
+    {
+        return array_key_exists($accuracy, self::ACCURACIES) ? $accuracy : 'day';
+    }
+
+
     /**
      * @param null|string $accuracy
      * @return IAccuracy
