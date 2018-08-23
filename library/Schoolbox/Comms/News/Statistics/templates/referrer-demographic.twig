@@ -96,6 +96,13 @@
                         {{ referrerDemographic['conversion']['email'] }},
                         {{ referrerDemographic['impression']['email'] }}
                     ]
+                },
+                {
+                    color: '#888888',
+                    name: 'Non-referred Opens',
+                    data: [
+                        {{ referrerDemographic['open'] }}
+                    ]
                 }
             ]
         });
