@@ -96,7 +96,7 @@ class Controller extends Base
         Audience\Mapper $audienceMapper,
         RoleAccessMapper $roleAccessMapper
     ) {
-        $this->db = $db;
+        $this->db           = $db;
         $this->campusMapper = $campusMapper;
         $this->roleMapper = $roleMapper;
         $this->houseMapper = $houseMapper;
@@ -324,8 +324,7 @@ class Controller extends Base
     public function getFolders(): void
     {
         $folderStrategy = new Audience\Segment\Strategy\Folder($this->getUser(), $this->folderMapper, $this->roleAccessMapper);
-        $statement      = $this->userMapper->getDatabase()->prepare($folderStrategy->getSearchSql());
-        $statement->execute();
+        $statement      = $this->db->executeQuery($folderStrategy->getSearchSql());
         $searchResults = new GenericCollection(ValueLabelInterface::class);
 
         /** @noinspection PhpAssignmentInConditionInspection */
