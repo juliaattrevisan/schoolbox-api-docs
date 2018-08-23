@@ -55,26 +55,18 @@ class Folder implements ISearch, ITranslate
 
 
     /**
-     * Check which folders $user can see based on role permissions
+     * Returns the set of folder ids where $user has READ+ access due to role permissions
      *
-     * @return array
-     * @throws \Schoolbox\Mapper\Exception
+     * @return int[]
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
      */
     private function findFolderIdsWithRoleAccess(): array
     {
-        $folders = $this->roleAccessMapper->findByColumnList([
-            'gid' => $this->user->getRole()->getId(),
-            'type' => UserAccess::ACCESS_READ
-        ]);
+        $pb = $this->roleAccessMapper->getPredicateBuilder()
+                                     ->equals('gid', $this->user->getRole()->getId())
+                                     ->greaterThanOrEqualTo('type', UserAccess::ACCESS_READ);
 
-        $ids = [];
-
-        /** @var RoleAccess $current */
-        foreach ($folders as $folder) {
-            $ids[] = $folder->getCategory()->getId();
-        }
-
-        return $ids;
+        return $this->roleAccessMapper->findScalarByPredicates('cid', $pb);
     }
 
 
@@ -105,11 +97,11 @@ class Folder implements ISearch, ITranslate
 
         if ((new ValidRestrictedSearch())->isSatisifiedBy($this->user)) {
 
-            /* Check to see whether I have read access to any group/class folders
+            /* Check to see whether I have READ+ access to any group/class folders
              */
             $groupAndClassMembership = $this->folderMapper->findFolderIdsForUser($this->user);
 
-            /* Also check to see whether I have read access in other ways
+            /* Also check to see whether I have READ+ access in other ways
              * First, check role permissions on a group
              */
             $roleAccess = $this->findFolderIdsWithRoleAccess();
