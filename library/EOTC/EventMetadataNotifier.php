@@ -26,6 +26,7 @@ use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
 use Schoolbox\User;
+use Alaress_Date_Format;
 
 class EventMetadataNotifier extends AbstractModuleNotifier
 {
@@ -237,7 +238,7 @@ class EventMetadataNotifier extends AbstractModuleNotifier
         }
 
         // compensate for timing issues by pushing "now" back a few minutes.
-        $days = $relEventStart->diffInDays((new \Alaress_Date_Format(time(), 'u'))->addMinutes(-10));
+        $days = $relEventStart->diffInDays((new \Alaress_Date_Format(time(), Alaress_Date_Format::TIMESTAMP))->addMinutes(-10));
 
         if ($days == 0) {
             // wut.
