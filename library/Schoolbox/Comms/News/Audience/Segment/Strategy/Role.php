@@ -17,17 +17,18 @@ class Role implements ISearch, ITranslate
 {
 
     /**
-     * Gets an sql fragment for the ISearch instance
-     *
-     * @return string
+     * @inheritdoc
      */
-    public function getSearchSql(): string
+    public function getSearchSql(string $searchPlaceholder = null): string
     {
+        $entityType    = Model::ENTITY_TYPE_ROLE;
+        $keywordFilter = null === $searchPlaceholder ? '' : "AND `name` LIKE :{$searchPlaceholder}";
+
         return "
-            SELECT id, name, '".Model::ENTITY_TYPE_ROLE."' AS entity_type
+            SELECT id, name, '{$entityType}' AS entity_type
             FROM groups
-            WHERE `name` LIKE :keyword
-            AND deleted_at IS NULL
+            WHERE deleted_at IS NULL
+            {$keywordFilter}
         ";
     }
 

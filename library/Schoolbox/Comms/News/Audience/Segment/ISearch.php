@@ -30,7 +30,8 @@ interface ISearch
      * This data is ultimately used to generate a list of (id, name) tuples originally
      * used in selectize's search suggestions list for a given keyword.
      *
+     * @param string $searchPlaceholder If specified, include a WHERE clause to filter by keyword
      * @return string
      */
-    public function getSearchSql(): string;
+    public function getSearchSql(string $searchPlaceholder = null): string;
 }

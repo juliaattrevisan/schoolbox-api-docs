@@ -17,17 +17,18 @@ class User implements ISearch, ITranslate
 {
 
     /**
-     * Gets an sql fragment for the ISearch instance
-     *
-     * @return string
+     * @inheritdoc
      */
-    public function getSearchSql(): string
+    public function getSearchSql(string $searchPlaceholder = null): string
     {
+        $entityType    = Model::ENTITY_TYPE_USER;
+        $keywordFilter = null === $searchPlaceholder ? '' : "AND (firstname LIKE :{$searchPlaceholder} OR lastname LIKE :{$searchPlaceholder})";
+
         return "
-            SELECT id, CONCAT(firstname, ' ', lastname) AS name, '".Model::ENTITY_TYPE_USER."' AS entity_type
+            SELECT id, CONCAT(firstname, ' ', lastname) AS name, '{$entityType}' AS entity_type
             FROM `user`
-            WHERE (firstname LIKE :keyword OR lastname LIKE :keyword)
-            AND deleted_at IS NULL
+            WHERE deleted_at IS NULL
+            {$keywordFilter}
         ";
     }
 

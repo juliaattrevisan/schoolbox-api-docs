@@ -84,13 +84,14 @@ class Folder implements ISearch, ITranslate
      *
      * If the resultant list of folders is empty, exit early and don't bother executing query
      *
+     * @param string $searchPlaceholder
      * @return string
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    public function getSearchSql(): string
+    public function getSearchSql(string $searchPlaceholder = null): string
     {
         $folderMembershipSql = '';
 
@@ -121,7 +122,8 @@ class Folder implements ISearch, ITranslate
             $folderMembershipSql = ' AND folder.id IN (' . implode(', ', $folderMembership) . ')';
         }
 
-        $entityType = Model::ENTITY_TYPE_FOLDER;
+        $entityType    = Model::ENTITY_TYPE_FOLDER;
+        $keywordFilter = null === $searchPlaceholder ? '' : "AND (folder.name LIKE :{$searchPlaceholder} OR folder_code.code LIKE :{$searchPlaceholder})";
 
         return "
             SELECT folder.id, 
@@ -139,8 +141,8 @@ class Folder implements ISearch, ITranslate
                 OR
                 folder.id IN (SELECT cid FROM userGroups)
             )
+            {$keywordFilter}
             {$folderMembershipSql}
-            AND (folder.name LIKE :keyword OR folder_code.code LIKE :keyword)
             AND folder.deleted_at IS NULL
             GROUP BY folder.id
             ORDER BY folder.name

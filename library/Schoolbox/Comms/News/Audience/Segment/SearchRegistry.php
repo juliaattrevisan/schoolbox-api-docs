@@ -49,17 +49,15 @@ class SearchRegistry implements ISearch
     }
 
     /**
-     * Gets an sql fragment for the ISearch instance
-     *
-     * @return string
+     * @inheritdoc
      */
-    public function getSearchSql(): string
+    public function getSearchSql(string $searchPlaceholder = null): string
     {
         $pieces = [];
 
         /** @var ISearch $strategy */
         foreach ($this->registry as $strategy) {
-            $pieces[] = "({$strategy->getSearchSql()})";
+            $pieces[] = "({$strategy->getSearchSql($searchPlaceholder)})";
         }
 
         // We can UNION ALL and avoid de-duplication logic as each sub-query has a distinct entity type
