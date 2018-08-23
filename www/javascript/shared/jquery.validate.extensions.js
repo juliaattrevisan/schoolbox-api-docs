@@ -323,6 +323,8 @@
         // then simplify array to just the desc values
         var allDescriptorsWithValues = descriptorList.filter(descValues).map(descValues);
 
+        // TODO this doesn't contain descriptors values that were added at the point of triggering the function
+        // DOM isn't updating?
         console.log(allDescriptorsWithValues);
 
         var prevVal, prevDiff = null;
