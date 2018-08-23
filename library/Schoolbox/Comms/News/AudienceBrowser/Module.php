@@ -75,6 +75,7 @@ class Module extends BaseModule
     {
         /** @var Container $injector */
         $injector->params[Controller::class] = [
+            'db'           => $injector->lazyGet('databaseInternal'),
             'campusMapper' => $this->getMapperFactory()->getLazy(CampusMapper::class),
             'roleMapper' => $this->getMapperFactory()->getLazy(RoleMapper::class),
             'houseMapper' => $this->getMapperFactory()->getLazy(\HouseMapper::class),
