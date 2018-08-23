@@ -96,6 +96,26 @@ class Grid
 
 
     /**
+     * What's the max value for this grid?
+     *
+     * Inferred from the sum of the non-null max values for its group usages.
+     *
+     * @return float|null
+     */
+    public function calculateMaxValue(): ?float
+    {
+        $maxValues = [];
+        foreach ($this->groupUsages as $groupUsage) {
+            $groupUsageMaxValue = $groupUsage->getMaxValue();
+            if (null !== $groupUsageMaxValue) {
+                $maxValues += $groupUsageMaxValue;
+            }
+        }
+        return !empty($maxValues) ? array_sum($maxValues) : null;
+    }
+
+
+    /**
      * Return the group usage for a given group, or null if this grid doesn't
      * use it.
      *
