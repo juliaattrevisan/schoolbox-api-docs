@@ -571,7 +571,11 @@ class ImpressionsConversionsOpens
             'articleId' => $article->getId()
         ]);
 
-        $data = [];
+        $breakdown = [
+            Mapper::TYPE_CONVERSION => array_fill_keys(Mapper::REFERRERS, 0),
+            Mapper::TYPE_IMPRESSION => array_fill_keys(Mapper::REFERRERS, 0),
+            Mapper::TYPE_OPEN => array_fill_keys(Mapper::REFERRERS, 0),
+        ];
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $type = $row['type'];
@@ -585,12 +589,12 @@ class ImpressionsConversionsOpens
 
             /* Stack it
              */
-            $data[$type][$referrer] = (int)$row['num'];
+            $breakdown[$type][$referrer] = (int)$row['num'];
         }
 
         return array_map(function($values) {
             return array_values($values);
-        }, $data);
+        }, $breakdown);
     }
 
 

@@ -33,7 +33,7 @@ class Mapper extends \Schoolbox\Mapper
     /**
      * This const represents a string value for an empty referrer so it can be meaningful to humans
      */
-    public const REFERRER_EMPTY = 'unknown';
+    public const REFERRER_EMPTY = 'open';
 
     /* These are the referrers that we understand in the domain logic
      */
