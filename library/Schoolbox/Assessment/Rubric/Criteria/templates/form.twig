@@ -228,7 +228,10 @@ $(function() {
                 {% for group in rowSet.groups %}
                     <fieldset class='content' data-rubric-group-row="{{ group.id }}">
                         <div class="{{ groupColumn }} columns">
-                            <h3>{{ locale.rubricGroup.proper }}</h3>
+                            <h3>
+                                {{ locale.rubricGroup.proper }}
+                                {% if group.courseLevel %}(Course-level){% endif %}
+                            </h3>
                             <ul class="information-list">
                                 {% include '@rubricCriteria/sub/group.twig' with {
                                     group:                    group,

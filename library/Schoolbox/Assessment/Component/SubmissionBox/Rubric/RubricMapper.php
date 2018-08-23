@@ -110,7 +110,7 @@ class RubricMapper
         // Unit-specs have their course spec's criteria as well
         $courseSpecFolderId = null;
         if ($folder->hasUnitSpecification()) {
-            $courseSpecFolderId = $folder->getParent()->getId();
+            $courseSpecFolderId = (int)$folder->getParent()->getId();
             $criterionModels    = CriterionMapper::getInstance()->findForFolder($courseSpecFolderId)
                                                                 ->merge($criterionModels);
         }
