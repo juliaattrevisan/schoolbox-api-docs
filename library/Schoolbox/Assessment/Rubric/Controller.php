@@ -216,7 +216,11 @@ class Controller extends BaseController
 
             // attempt to build the grid
             $maxLevels = $this->getDi()->get('config')->get('rubric_max_levels');
-            [$grid, $hasCustomMaxValue] = $this->getMapper()->buildFromCSV($file, $folderId, $maxLevels);
+            [$grid, $usingMarkPerCapability, $usingMarkRange] = $this->getMapper()->buildFromCSV(
+                $file,
+                $folderId,
+                $maxLevels
+            );
             $grid->setSubmissionBox($box);
 
         } catch (\Exception $e) {
@@ -232,7 +236,8 @@ class Controller extends BaseController
         $context = [
             'formField'              => $post->get('formField', 'rb'),
             'rubric'                 => $grid->toContext(),
-            'usingMarkPerCapability' => $hasCustomMaxValue || $post->getBool('markPerCapability', false),
+            'usingMarkPerCapability' => $usingMarkPerCapability,
+            'usingMarkRange'         => $usingMarkRange,
         ];
 
         $this->getResponse()->content->set([
@@ -250,12 +255,17 @@ class Controller extends BaseController
      */
     public function download()
     {
-        $post     = $this->getRequest()->post->get('rb');
+        $post     = $this->request->post->get('rb');
         $boxId    = key($post);
         $box      = SubmissionBoxMapper::getInstance()->findById($boxId);
         $grid     = (new Factory())->buildFromPostData($post, false);
         $basename = (new Url($box->getName()))->getSlug();
-        $content  = $this->array2csv($grid->toGrid($box->isMarkedPerRubricGroup()));
+        $content  = $this->array2csv(
+            $grid->toGrid(
+                $this->request->post->getBool('markPerCapability') ?? false,
+                $this->request->post->getBool('useMarkRange') ?? false
+            )
+        );
 
         $headers  = $this->getResponse()->headers;
 

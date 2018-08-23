@@ -272,11 +272,13 @@ class Rubric implements Twiggable
     /**
      * Return a CSV-compatible (ie. rectangular) array representation of the data structure this rubric contains
      *
-     * @param bool $includePointsPerCapability Does the array include max marks
-     *                                         per capability?
+     * @param bool $usingMarkPerCapability Does the array include max marks per
+     *                                     capability?
+     * @param bool $usingMarkRange         Does the array include mark ranges
+     *                                     for descriptors?
      * @return array
      */
-    public function toGrid(bool $includePointsPerCapability): array
+    public function toGrid(bool $usingMarkPerCapability, bool $usingMarkRange): array
     {
         // start by generating a rectangle which is (w+2 x 2h+1)
         $width  = $this->levels->count();
@@ -289,6 +291,12 @@ class Rubric implements Twiggable
         // rows contain columns
         $square = array_fill(0, (2 * $height) + 1, array_fill(0, $width + 2, ''));
 
+        // Mark-per-capability: On/Off
+        // Use Mark Range: On/Off
+        // (Put these in first two cells, default them to OFF on import)
+        // TODO markPerCapability should be localized, as should the input
+        $square[0][0] = 'markPerCapability: ' . ($usingMarkPerCapability ? 'On' : 'Off');
+        $square[0][1] = 'useMarkRange: ' . ($usingMarkRange ? 'On' : 'Off');
 
         // first row is level names
         foreach ($this->levels as $i => $level) {
@@ -306,8 +314,8 @@ class Rubric implements Twiggable
                 $currentVRow = $currentDRow + 1;
 
                 // Max points per capability (if enabled)
-                if ($includePointsPerCapability && !$groupRendered) {
-                    $square[$currentVRow][0] = $group->getMaxValue();
+                if ($usingMarkPerCapability && !$groupRendered) {
+                    $square[$currentVRow][0] = $group->calculateMax();
                 }
 
                 $groupRendered = true;

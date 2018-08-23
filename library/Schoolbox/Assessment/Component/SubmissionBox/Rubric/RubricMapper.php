@@ -587,8 +587,9 @@ class RubricMapper
      *               1: bool: does the rubric have customised max mark per group values?
      *                        (required as the rubric object doesn't store this separately
      *                         from their actual value)
+     *               2: bool: does the rubric have mark ranges switched on?
      */
-    public function buildFromCSV(IStorage $file, $folderId, $maxLevels)
+    public function buildFromCSV(IStorage $file, $folderId, $maxLevels): array
     {
         $square = [];
 
@@ -610,12 +611,49 @@ class RubricMapper
             throw new \Schoolbox\Resource\Exception("Not a valid rubric CSV file");
         }
 
-        // first 2 "cells" must be blank
-        if ($headerRow[0] || $headerRow[1]) {
-            //Excel was getting rid of levels that are not set so lets try and repair
-            $headerRow = array_fill(0, count($headerRow), '');
-            rewind($fp);
+        // First two cells may be settings:
+        // useMarkRange:      On/Off
+        // markPerCapability: On/Off
+        $useMarkRange      = false;
+        $markPerCapability = false;
+        $settingCells      = [$headerRow[0], $headerRow[1]];
+        foreach ($settingCells as $settingCell) {
+            [$setting, $value] = explode(':', $settingCell);
+            switch (strtolower(trim($value))) {
+                case '1':
+                case 'yes':
+                case 'on':
+                    $boolValue = true;
+                    break;
+
+                case '0':
+                case 'no':
+                case 'off':
+                default:
+                    $boolValue = false;
+                    break;
+            }
+            switch (trim($setting)) {
+                case 'useMarkRange':
+                    $useMarkRange = $boolValue;
+                    break;
+
+                case 'markPerCapability':
+                    $markPerCapability = $boolValue;
+                    break;
+
+                default:
+                    break;
+            }
         }
+
+        // Note: this used to be able to tell if the first row was actually the
+        // first group, instead of the set of levels. (This would happen if
+        // Excel saved a CSV with nothing at all in the first row.)
+        // Because the first two cells are now reserved for settings, they
+        // should never be empty anymore; however, we can't tell anymore if the
+        // spreadsheet used to have an empty first row.
+        // (This was raised in SB-12175)
 
         $square[] = $headerRow;
 
@@ -627,13 +665,12 @@ class RubricMapper
 
         // build the square, extracting data as we go
         $groups            = [];
-        $hasCustomMaxValue = false;
         $isLastRowNewGroup = false;
         while ($row = $this->getcsv($fp, $maxLevels + 2)) {
             if ($isLastRowNewGroup) {
                 $isLastRowNewGroup = false;
                 if ($row[0]) {
-                    $hasCustomMaxValue = true;
+                    $markPerCapability = true;
                     $groupMaxValue     = $row[0];
                 }
             } else {
@@ -751,7 +788,7 @@ class RubricMapper
         /** @var Rubric $rubric */
         $rubric = $this->factory->buildFromPostData([0 => $postdata], true);
 
-        return [$rubric, $hasCustomMaxValue];
+        return [$rubric, $markPerCapability, $useMarkRange];
     }
 
     /**

@@ -50,6 +50,7 @@
                 class="rb-value"
                 type="number"
                 min="0"
+                {% if usingMarkRange %}data-descriptor-uses-mark-range{% endif %}
                 placeholder={% if usingMarkRange %}"Maximum points"{% else %}"Points"{% endif %}
                 value="{{ descriptor.value }}"
                 name="{{ descInput }}[{{ levelIndex }}][points]" />
