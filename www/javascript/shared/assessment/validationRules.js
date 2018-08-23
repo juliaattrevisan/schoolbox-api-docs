@@ -55,9 +55,19 @@ function initDecimalDescsValidation() {
         levelObserver.observe(this, moConfig);
     });
 
-
-    // TODO hide any errors for an indicator that is unchecked
-
+    // on change of checked indicators
+    $("[data-criterion-name]").change(function() {
+        var $indicatorCheckbox = $(this);
+       if ($indicatorCheckbox.is(":checked")) {
+           $("[data-descriptor]").each(function() {
+               $(this).find("label.error").show();
+           });
+       } else {
+           $("[data-descriptor]").each(function() {
+               $(this).find("label.error").hide();
+           });
+       }
+    });
 }
 
 
