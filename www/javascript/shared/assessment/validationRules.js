@@ -14,70 +14,81 @@ var validateOptions = {
     },
     messages: {
         weight: 'The ' + scriptValidationRules.attr('data-locale-grading-proper') + ' weight should be zero or greater',
+    },
+    errorPlacement: function(error, element) {
+        console.log(element);
+        if ($(error).attr("[data-criterion-name]")) {
+            error.insertAfter(element);
+        }
     }
 };
 
-
 function initDecimalDescsValidation() {
-    function reValidate() {
-        console.log("Revalidating");
-        $("[data-descriptor-value]").each(function() {
-            $(this).valid();
-        });
-        $("[data-criterion-name]").each(function() {
-            $(this).valid();
-        });
-    }
+    // function reValidate() {
+    //     console.log("Revalidating");
+    //     $("[data-descriptor-value]").each(function() {
+    //         $(this).valid();
+    //     });
+    //     $("[data-criterion-name]").each(function() {
+    //         $(this).valid();
+    //     });
+    // }
     function attachValidationRules() {
-        // Validate decimal places on each descriptor
-        $("[data-descriptor-value]").each(function() {
-            $(this).rules("add", { noDecimalPlacesWithMarkRange: true });
-        });
+        // // Validate decimal places on each descriptor
+        // $("[data-descriptor-value]").each(function() {
+        //     $(this).rules("add", { noDecimalPlacesWithMarkRange: true });
+        // });
 
         // Validate an entire indicator row
         $("[data-criterion-name]").each(function() {
-            console.log($(this));
             $(this).rules("add", { descriptorsAreMonotonic: true });
         });
     }
+
+    // Run monotonicity validation every time descriptor values change
+    $("[data-descriptor-value]").change(function() {
+        $("[data-criterion-name]").each(function() {
+            $(this).valid();
+        });
+    });
 
 
     // on load
     attachValidationRules();
 
-    // on change of mark range setting
-    $("#useMarkRange").change(function() {
-        reValidate();
-    });
+    // // on change of mark range setting
+    // $("#useMarkRange").change(function() {
+    //     reValidate();
+    // });
 
-    var moConfig = { attributes: false, childList: true, characterData: false };
-
-    // on change of number of levels
-    var levelObserver = new MutationObserver(attachValidationRules);
-    $("tr[data-group]").each(function() {
-        levelObserver.observe(this, moConfig);
-    });
-
-    // on change of number of indicators/capabilities
-    var indicatorObserver = new MutationObserver(attachValidationRules);
-    $("table[data-rubric] tbody").each(function() {
-        levelObserver.observe(this, moConfig);
-    });
-
-    // on change of checked indicators
-    // TODO maybe try using depends instead of this?
-    $("[data-criterion-name]").change(function() {
-        var $indicatorCheckbox = $(this);
-       if ($indicatorCheckbox.is(":checked")) {
-           $("[data-descriptor]").each(function() {
-               $(this).find("label.error").show();
-           });
-       } else {
-           $("[data-descriptor]").each(function() {
-               $(this).find("label.error").hide();
-           });
-       }
-    });
+    // var moConfig = { attributes: false, childList: true, characterData: false };
+    //
+    // // on change of number of levels
+    // var levelObserver = new MutationObserver(attachValidationRules);
+    // $("tr[data-group]").each(function() {
+    //     levelObserver.observe(this, moConfig);
+    // });
+    //
+    // // on change of number of indicators/capabilities
+    // var indicatorObserver = new MutationObserver(attachValidationRules);
+    // $("table[data-rubric] tbody").each(function() {
+    //     levelObserver.observe(this, moConfig);
+    // });
+    //
+    // // on change of checked indicators
+    // // TODO maybe try using depends instead of this?
+    // $("[data-criterion-name]").change(function() {
+    //     var $indicatorCheckbox = $(this);
+    //    if ($indicatorCheckbox.is(":checked")) {
+    //        $("[data-descriptor]").each(function() {
+    //            $(this).find("label.error").show();
+    //        });
+    //    } else {
+    //        $("[data-descriptor]").each(function() {
+    //            $(this).find("label.error").hide();
+    //        });
+    //    }
+    // });
 }
 
 
