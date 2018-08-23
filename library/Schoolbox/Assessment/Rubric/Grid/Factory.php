@@ -132,7 +132,7 @@ class Factory
                         ->setId($descriptorId)
                         ->setDescription($descriptorText)
                         ->setMaxValue(null !== $descriptorValue ? (float)$descriptorValue : null);
-                    $criterionUsage->getDescriptors()[$descriptorId] = $d;
+                    $criterionUsage->getDescriptors()[$levelSequence] = $d;
 //                    try {
 //                        $rubric->putDescriptor($group, $criterion, $level, $d);
 //                    } catch (InvalidArgumentException $e) {
