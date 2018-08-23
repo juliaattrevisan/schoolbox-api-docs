@@ -12,18 +12,18 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 
 /**
- * Specification of a user that is not restricted when targeting audience segments to folders.
+ * Specification of a user that is restricted to only target groups/classes where they have READ+ access
  *
- * A user is unrestricted if they are/have any of:
+ * A user is restricted if they are/have none of:
  * * a superuser
  * * a comms officer
  * * READ+ CMS perm
  */
-class ValidUnrestrictedSearch
+class ValidRestrictedSearch
 {
 
     /**
-     * Determine whether $user is one of the unrestricted types of users
+     * Determine whether $user is one of the restricted types of users
      *
      * To use a Folder as an audiencing target,
      *    - Folders must have a class code or be a Group
@@ -44,7 +44,7 @@ class ValidUnrestrictedSearch
      */
     public function isSatisfiedBy(User $user): bool
     {
-        return $user->isSuperuser() || $this->hasCMSPermission($user) || $this->isCommsOfficer($user);
+        return !$user->isSuperuser() && !$this->hasCMSPermission($user) && !$this->isCommsOfficer($user);
     }
 
 
