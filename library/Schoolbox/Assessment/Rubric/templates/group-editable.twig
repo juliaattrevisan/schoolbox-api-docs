@@ -18,32 +18,31 @@
     {% if criterionUsage %}
         {% set hasSelectedDescriptor = true %}
     {% endif %}
-{%- endfor -%}
 
-{% if not group.criteria %}
-<tr data-group="{{ groupId }}" data-sequencer-group="{{ rubricId }}-groups" data-groupname="{{ groupName }}" class="rb-group-header">
-    {# no criteria specified, meaning this was an empty group (and the above iteration didn't run) #}
-    <th rowspan="2">
+{% else %}
+    <tr data-group="{{ groupId }}" data-sequencer-group="{{ rubricId }}-groups" data-groupname="{{ groupName }}" class="rb-group-header">
+        {# no criteria specified, meaning this was an empty group (and the above iteration didn't run) #}
+        <th rowspan="2">
         <span class="sequencer" data-sequencer-v="{{ rubricId }}-groups">
             <a class="icon-up-arrow" data-sequencer-up title="Move up"></a>
             <a class="icon-down-arrow" data-sequencer-down title="Move down"></a>
         </span>
-        {% if group.name %}
-            <label>
-                {%- if group.inUseExcluding(rubricGrid.assessment) -%}
-                    {{ groupName }}
-                    <span data-tooltip class="hint has-tip tip-right" data-width="200" title="This {{ locale.translate('rubricGroup') }} cannot be modified because it contains one or more {{ locale.translate('rubricCriterion', false, true) }} that are in use elsewhere">?</span>
-                    <input type="hidden" value="{{ groupName }}" name="{{ groupInput }}[name]" />
-                {% else %}
-                    <textarea name="{{ groupInput }}[name]" >{{ groupName }}</textarea>
-                {% endif %}
-            </label>
-        {% else %}
-            <label class="meta">{{ groupName }}</label>
-        {% endif %}
-    </th>
-</tr>
-{% endif %}
+            {% if group.name %}
+                <label>
+                    {%- if group.inUseExcluding(rubricGrid.assessment) -%}
+                        {{ groupName }}
+                        <span data-tooltip class="hint has-tip tip-right" data-width="200" title="This {{ locale.translate('rubricGroup') }} cannot be modified because it contains one or more {{ locale.translate('rubricCriterion', false, true) }} that are in use elsewhere">?</span>
+                        <input type="hidden" value="{{ groupName }}" name="{{ groupInput }}[name]" />
+                    {% else %}
+                        <textarea name="{{ groupInput }}[name]" >{{ groupName }}</textarea>
+                    {% endif %}
+                </label>
+            {% else %}
+                <label class="meta">{{ groupName }}</label>
+            {% endif %}
+        </th>
+    </tr>
+{%- endfor -%}
 
 <tr data-group="{{ groupId }}" class="rb-new-criterion">
     <th colspan="{{ rubricGrid.levels|length + 2 }}">
