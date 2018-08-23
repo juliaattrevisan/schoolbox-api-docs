@@ -98,7 +98,7 @@ class GroupUsage
     {
         $maxValues = [];
         foreach ($this->criterionUsages as $criterionUsage) {
-            $groupUsageMaxValue = $criterionUsage->getMaxValue();
+            $groupUsageMaxValue = $criterionUsage->calculateMaxValue();
             if (null !== $groupUsageMaxValue) {
                 $maxValues[] = $groupUsageMaxValue;
             }
