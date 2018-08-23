@@ -95,7 +95,7 @@ class Folder implements ISearch, ITranslate
         $folderMembershipSql = '';
 
         // Is user restricted?
-        if (!(new ValidUnrestrictedSearch())->isSatisifiedBy($this->user)) {
+        if (!(new ValidUnrestrictedSearch())->isSatisfiedBy($this->user)) {
 
             /* Check to see whether I have READ+ access to any group/class folders
              */

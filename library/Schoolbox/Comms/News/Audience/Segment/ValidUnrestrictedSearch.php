@@ -36,7 +36,7 @@ class ValidUnrestrictedSearch
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    public function isSatisifiedBy(User $user): bool
+    public function isSatisfiedBy(User $user): bool
     {
         $isSuperuser = $user->isSuperuser();
         $hasCMSPermission = $this->hasCMSPermission($user);
