@@ -403,6 +403,7 @@ EOL;
                 /** @var Raven_Client $ravenClient */
                 $ravenClient  = $this->getDependencyInjector()->get('sentry');
                 $ravenHandler = new RavenHandler($ravenClient, Monologger::CRITICAL);
+                $ravenHandler->getFormatter()->includeStackTraces(true);
                 $this->log->pushHandler($ravenHandler);
             }
         }
