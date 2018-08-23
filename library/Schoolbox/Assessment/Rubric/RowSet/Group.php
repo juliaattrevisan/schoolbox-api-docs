@@ -29,6 +29,17 @@ class Group
 
 
     /**
+     * Does this group belong to the course level of its assessment context?
+     *
+     * For rowsets which are part of a unit: it's possible for a group to come
+     * from the unit's course, but still be part of the unit's rowset.
+     *
+     * @var bool
+     */
+    private $isCourseLevel = false;
+
+
+    /**
      * @var GenericCollection|Criterion[]
      */
     private $criteria;
@@ -93,6 +104,26 @@ class Group
             }
         }
         return false;
+    }
+
+
+    /**
+     * @return bool
+     */
+    public function isCourseLevel(): bool
+    {
+        return $this->isCourseLevel;
+    }
+
+
+    /**
+     * @param bool $isCourseLevel
+     * @return static
+     */
+    public function setIsCourseLevel(bool $isCourseLevel): self
+    {
+        $this->isCourseLevel = $isCourseLevel;
+        return $this;
     }
 
 
