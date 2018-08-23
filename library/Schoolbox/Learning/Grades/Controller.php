@@ -631,7 +631,7 @@ class Controller extends Base
         // Fetch assessments & participants
         $user        = $loadOtherParticipantInteractions ? null : $viewee;
         $assessments = $this->assessmentMapperProxy->findAllByIds($assessmentIds);
-        $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessments, $user)
+        $assessments = $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessments, $user)
                                                    ->filter(function (IAssessable $a) use ($viewee) {
                                                        return $a->isParticipant($viewee);
                                                    });
