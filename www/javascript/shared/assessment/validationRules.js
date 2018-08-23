@@ -18,76 +18,86 @@ var validateOptions = {
     errorPlacement: function(error, element) {
         if ($(element).attr("data-criterion-name")) {
             error.insertAfter($(element).next("label.checkbox-label"));
+        } else {
+            error.insertAfter(element);
         }
     }
 };
 
 function initDecimalDescsValidation() {
-    // function reValidate() {
-    //     console.log("Revalidating");
-    //     $("[data-descriptor-value]").each(function() {
-    //         $(this).valid();
-    //     });
-    //     $("[data-criterion-name]").each(function() {
-    //         $(this).valid();
-    //     });
-    // }
-    function attachValidationRules() {
-        // // Validate decimal places on each descriptor
-        // $("[data-descriptor-value]").each(function() {
-        //     $(this).rules("add", { noDecimalPlacesWithMarkRange: true });
-        // });
 
-        // Validate an entire indicator row
+    function attachValidationRules() {
+        // Validate decimal places on each descriptor
+        $("[data-descriptor-value]").each(function() {
+            $(this).rules("add", { noDecimalPlacesWithMarkRange: true });
+        });
+
+        // Validate all rows of descriptors
         $("[data-criterion-name]").each(function() {
             $(this).rules("add", { descriptorsAreMonotonic: true });
         });
     }
 
+    function reValidate() {
+        console.log("Revalidating");
+        $("[data-descriptor-value]").each(function() {
+            $(this).valid();
+        });
+        $("[data-criterion-name]").each(function() {
+            $(this).valid();
+        });
+    }
+
+    // on load
+    attachValidationRules();
+
+    // on change of mark range setting
+    $("#useMarkRange").change(function() {
+        reValidate();
+    });
+
+
     // Run monotonicity validation every time descriptor values change
     $("[data-descriptor-value]").change(function() {
+        $("[data-criterion-name]").each(function() {
+            $(this).rules("add", { descriptorsAreMonotonic: true });
+        });
         $("[data-criterion-name]").each(function() {
             $(this).valid();
         });
     });
 
 
-    // on load
-    attachValidationRules();
+    var moConfig = { attributes: false, childList: true, characterData: false };
 
-    // // on change of mark range setting
-    // $("#useMarkRange").change(function() {
-    //     reValidate();
-    // });
+    // on change of number of levels
+    var levelObserver = new MutationObserver(function() {
+        attachValidationRules();
+    });
+    $("tr[data-group]").each(function() {
+        levelObserver.observe(this, moConfig);
+    });
 
-    // var moConfig = { attributes: false, childList: true, characterData: false };
-    //
-    // // on change of number of levels
-    // var levelObserver = new MutationObserver(attachValidationRules);
-    // $("tr[data-group]").each(function() {
-    //     levelObserver.observe(this, moConfig);
-    // });
-    //
-    // // on change of number of indicators/capabilities
-    // var indicatorObserver = new MutationObserver(attachValidationRules);
-    // $("table[data-rubric] tbody").each(function() {
-    //     levelObserver.observe(this, moConfig);
-    // });
-    //
-    // // on change of checked indicators
-    // // TODO maybe try using depends instead of this?
-    // $("[data-criterion-name]").change(function() {
-    //     var $indicatorCheckbox = $(this);
-    //    if ($indicatorCheckbox.is(":checked")) {
-    //        $("[data-descriptor]").each(function() {
-    //            $(this).find("label.error").show();
-    //        });
-    //    } else {
-    //        $("[data-descriptor]").each(function() {
-    //            $(this).find("label.error").hide();
-    //        });
-    //    }
-    // });
+    // on change of number of indicators/capabilities
+    var indicatorObserver = new MutationObserver(attachValidationRules);
+    $("table[data-rubric] tbody").each(function() {
+        indicatorObserver.observe(this, moConfig);
+    });
+
+    // on change of checked indicators
+    // TODO maybe try using depends instead of this?
+    $("[data-criterion-name]").change(function() {
+        var $indicatorCheckbox = $(this);
+       if ($indicatorCheckbox.is(":checked")) {
+           $("[data-descriptor]").each(function() {
+               $(this).find("label.error").show();
+           });
+       } else {
+           $("[data-descriptor]").each(function() {
+               $(this).find("label.error").hide();
+           });
+       }
+    });
 }
 
 
