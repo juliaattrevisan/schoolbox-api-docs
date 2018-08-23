@@ -624,7 +624,7 @@ class Model extends AbstractAssessment implements ISelfAssessable
      */
     public function getRubric()
     {
-        trigger_error('This method is deprecated; use "getRubricGrid()" instead', E_USER_DEPRECATED);
+//        trigger_error('This method is deprecated; use "getRubricGrid()" instead', E_USER_DEPRECATED);
         return $this->rubric;
     }
 
@@ -636,7 +636,7 @@ class Model extends AbstractAssessment implements ISelfAssessable
      */
     public function setRubric(Rubric $rubric = null)
     {
-        trigger_error('This method is deprecated; use "setRubricGrid()" instead', E_USER_DEPRECATED);
+//        trigger_error('This method is deprecated; use "setRubricGrid()" instead', E_USER_DEPRECATED);
         $this->rubric = $rubric;
         return $this;
     }
