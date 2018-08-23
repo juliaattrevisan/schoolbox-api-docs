@@ -111,9 +111,8 @@ class RubricMapper
         $courseSpecFolderId = null;
         if ($folder->hasUnitSpecification()) {
             $courseSpecFolderId = $folder->getParent()->getId();
-            $criterionModels    = $criterionModels->merge(
-                CriterionMapper::getInstance()->findForFolder($courseSpecFolderId)
-            );
+            $criterionModels    = CriterionMapper::getInstance()->findForFolder($courseSpecFolderId)
+                                                                ->merge($criterionModels);
         }
 
         // This is how it SHOULD work...
