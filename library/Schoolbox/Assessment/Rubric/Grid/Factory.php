@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\Grid;
 
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\GroupMapper;
 use Schoolbox\Assessment\Rubric\RowSet\Criterion;
 use Schoolbox\Assessment\Rubric\RowSet\Group;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -66,36 +67,33 @@ class Factory
 //        ];
 
         // cache groups
-        $groupCache = [];
+//        $groupCache = [];
         foreach ($groups as $groupId => $groupData) {
             $groupName     = $groupData['name'];
             $groupMaxValue = isset($groupData['maxValue']) ? (float)$groupData['maxValue'] : null;
 
-            $group = $grid->getRowSet()->getGroups()[$groupId]
-                ->setName($groupName);
-
+            // Group might not be set
+            // TODO handle group name changes
+            $group      = $grid->getRowSet()->retrieveGroupByName($groupName);
             $groupUsage = (new GroupUsage($group))
                 ->setMaxValue($groupMaxValue);
 
-            // This has added ALL groups passed through form
-//            $grid->getGroupUsages()[$groupId] = $groupUsage;
-
-            $groupCache[$groupId] = $groupUsage;
+            $groupCache[$groupId]             = $group;
+            $grid->getGroupUsages()[$groupId] = $groupUsage;
         }
 
+
+
         // Cache criteria
-
-
-        foreach ($criteria as $criterionId => $criterion) {
-            $groupId          = $criterion['groupId'];
-            $criterionEnabled = isset($criterion['on']) && $criterion['on'];
-            $criterionName    = $criterion['name'];
+        foreach ($criteria as $criterionId => $criterionData) {
+            $groupId          = $criterionData['groupId'];
+            $criterionEnabled = isset($criterionData['on']) && $criterionData['on'];
+            $criterionName    = $criterionData['name'];
 
             $group = $groupCache[$groupId];
 
             // spawn
-            $criterion = $group->getCriteria()[$criterionId]
-                ->setName($criterionName);
+            $criterion = $group->retrieveCriterionByName($criterionName);
 
 //            // set readonliness
 //            $criterion->setReadOnly(isset($criterion['readonly']) && $criterion['readonly']);
@@ -130,20 +128,20 @@ class Factory
                 $descriptorValue = $descriptor['points'];
 
                 if ('' !== $descriptorText || '' !== $descriptorValue) {
-                    $d = (new Descriptor)
+                    $d = (new Descriptor())
                         ->setId($descriptorId)
                         ->setDescription($descriptorText)
-                        ->setMaxValue($descriptorValue);
-                    $grid->retrieveCriterionUsage($criterion)->getDescriptors()[$descriptorId] = $d;
+                        ->setMaxValue(null !== $descriptorValue ? (float)$descriptorValue : null);
+                    $criterionUsage->getDescriptors()[$descriptorId] = $d;
 //                    try {
 //                        $rubric->putDescriptor($group, $criterion, $level, $d);
 //                    } catch (InvalidArgumentException $e) {
 //                        echo "Unable to put descriptor";
 //                    }
                 }
-
             }
 
+            $groupUsage->getCriterionUsages()[$criterionId] = $criterionUsage;
         }
 
         return $grid;

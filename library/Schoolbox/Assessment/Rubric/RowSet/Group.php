@@ -76,6 +76,23 @@ class Group
 
 
     /**
+     * Retrieves a criterion by its name.
+     *
+     * @param string $name
+     * @return null|Criterion
+     */
+    public function retrieveCriterionByName(string $name): ?Criterion
+    {
+        foreach ($this->criteria as $criterion) {
+            if ($criterion->getName() === $name) {
+                return $criterion;
+            }
+        }
+        return null;
+    }
+
+
+    /**
      * Retrieve the ID of all criteria in this group.
      *
      * @return array|int[]

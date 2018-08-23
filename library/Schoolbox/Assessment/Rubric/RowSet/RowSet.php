@@ -66,6 +66,24 @@ class RowSet
 
 
     /**
+     * Retrieves a group by its name.
+     *
+     * @param string $name
+     * @return null|Group
+     */
+    public function retrieveGroupByName(string $name): ?Group
+    {
+        foreach ($this->groups as $group) {
+            // Normalize?
+            if ($group->getName() === $name) {
+                return $group;
+            }
+        }
+        return null;
+    }
+
+
+    /**
      * Retrieves a criterion by its ID.
      *
      * @param int $criterionId
