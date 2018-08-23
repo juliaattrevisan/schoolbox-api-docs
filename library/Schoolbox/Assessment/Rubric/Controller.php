@@ -18,6 +18,8 @@ use Schoolbox\Assessment\Component\SubmissionBox\Rubric\GroupMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionUsageMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use Schoolbox\Assessment\Rubric\Grid\Grid;
+use Schoolbox\Assessment\Rubric\Grid\Level;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Resource\Attachment\Zone;
@@ -113,12 +115,16 @@ class Controller extends BaseController
         // Also need to pass the much of the form values to the assessment
         // Example: mark-per-cap, use mark range
         $assessmentId = $post->getInt('rubricId', 0);
-        $rubricGrid   = $this->mapper->retrieveGrid(
-            (new DueWork())
-                ->setId($assessmentId)
-                ->setContext((new FolderModel())->setId($folderId)),
-            true
-        );
+
+        // Rubric grid needs to reflect state in form, not persisted state
+        $rubricRowSet = $this->mapper->retrieveRowSet((new FolderModel())->setId($folderId), false);
+        $rubricGrid   = new Grid((new DueWork())->setId($assessmentId), $rubricRowSet);
+
+        // Fill in each level
+        $levelCount = $post->getInt('levelCount', 0);
+        for ($i = 0; $i < $levelCount; $i++) {
+            $rubricGrid->getLevels()[$i] = new Level();
+        }
         $context['rubricGrid'] = $rubricGrid;
 
 
