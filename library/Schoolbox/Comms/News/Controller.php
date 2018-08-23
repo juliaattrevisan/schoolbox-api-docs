@@ -72,6 +72,11 @@ class Controller extends Base
     private $statisticsMapper;
 
     /**
+     * @var Statistics\Cumulative\Mapper
+     */
+    private $statisticsCumulativeMapper;
+
+    /**
      * @var IConnector
      */
     private $databaseInternal;
@@ -121,6 +126,7 @@ class Controller extends Base
      * @param TopicMapper             $topicMapper
      * @param SaveForLater\Mapper     $saveForLaterMapper
      * @param Statistics\Mapper       $statisticsMapper
+     * @param Statistics\Cumulative\Mapper $statisticsCumulativeMapper
      * @param IConnector              $databaseInternal
      * @param Folder\Mapper           $folderMapper
      * @param Access\UserAccessMapper $userAccessMapper
@@ -137,6 +143,7 @@ class Controller extends Base
         TopicMapper $topicMapper,
         SaveForLater\Mapper $saveForLaterMapper,
         Statistics\Mapper $statisticsMapper,
+        Statistics\Cumulative\Mapper $statisticsCumulativeMapper,
         IConnector $databaseInternal,
         Folder\Mapper $folderMapper,
         Access\UserAccessMapper $userAccessMapper,
@@ -152,6 +159,7 @@ class Controller extends Base
         $this->topicMapper = $topicMapper;
         $this->saveForLaterMapper = $saveForLaterMapper;
         $this->statisticsMapper = $statisticsMapper;
+        $this->statisticsCumulativeMapper = $statisticsCumulativeMapper;
         $this->audienceMapper = $audienceMapper;
         $this->roleAccessMapper = $roleAccessMapper;
 
@@ -795,6 +803,7 @@ class Controller extends Base
             $this->policyMapper,
             $this->saveForLaterMapper,
             $this->statisticsMapper,
+            $this->statisticsCumulativeMapper,
             $this->databaseInternal,
             $this->folderMapper,
             $this->userAccessMapper,

@@ -78,26 +78,29 @@ class Mapper extends \Schoolbox\Mapper
      */
     public function incrementImpression(int $articleId, ?string $referrer)
     {
-        $existing = $this->findByColumnList([
-            'date' => \Alaress_Date_Format::now()->getDateOnly(),
-            'article_id' => $articleId
-        ]);
-
         /* Detect which referrer to increment using a mapper method
          */
-        if ($existing) {
-            $method = $this->getPropertyFromColumn($this->impressionColumnMap[$referrer]);
+        $get = $this->getGetMethodName($this->getPropertyFromColumn($this->impressionColumnMap[$referrer]));
+        $set = $this->getSetMethodName($this->getPropertyFromColumn($this->impressionColumnMap[$referrer]));
 
-            new \Alaress_Probe($method);die();
+        try {
+            $model = $this->findOneByColumnList([
+                'date' => \Alaress_Date_Format::now()->getDatabaseDate(),
+                'article_id' => $articleId
+            ]);
 
-//
-//            return $this->save($this->createModel()
-//                ->
-//                ->setArticleId($articleId)
-//                ->setUserId($userId)
-//                ->setType(self::TYPE_IMPRESSION)
-//                ->setReferrer($referrer));
+            $model->$set((int)$model->$get() + 1);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            $now = \Alaress_Date_Format::now();
+
+            $model = $this->createModel()
+                ->setDate($now->getDateOnly())
+                ->setArticleId($articleId)
+                ->setFirstOpen($now)
+                ->$set(1);
         }
+
+        return $this->save($model);
     }
 
 

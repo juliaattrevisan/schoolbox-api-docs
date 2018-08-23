@@ -135,10 +135,10 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @param string $date
+     * @param null|string $date
      * @return Model
      */
-    public function setDate(string $date): self
+    public function setDate(?string $date): self
     {
         $this->date = $date;
         return $this;
@@ -155,10 +155,10 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @param string $firstOpen
+     * @param null|string $firstOpen
      * @return Model
      */
-    public function setFirstOpen(string $firstOpen): self
+    public function setFirstOpen(?string $firstOpen): self
     {
         $this->firstOpen = $firstOpen;
         return $this;
@@ -175,10 +175,10 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @param int $numImpressionsDashboard
+     * @param null|int $numImpressionsDashboard
      * @return Model
      */
-    public function setNumImpressionsDashboard(int $numImpressionsDashboard): self
+    public function setNumImpressionsDashboard(?int $numImpressionsDashboard): self
     {
         $this->numImpressionsDashboard = $numImpressionsDashboard;
         return $this;
@@ -195,10 +195,10 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @param int $numImpressionsHomepage
+     * @param null|int $numImpressionsHomepage
      * @return Model
      */
-    public function setNumImpressionsHomepage(int $numImpressionsHomepage): self
+    public function setNumImpressionsHomepage(?int $numImpressionsHomepage): self
     {
         $this->numImpressionsHomepage = $numImpressionsHomepage;
         return $this;
@@ -215,10 +215,10 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @param int $numImpressionsIndex
+     * @param null|int $numImpressionsIndex
      * @return Model
      */
-    public function setNumImpressionsIndex(int $numImpressionsIndex): self
+    public function setNumImpressionsIndex(?int $numImpressionsIndex): self
     {
         $this->numImpressionsIndex = $numImpressionsIndex;
         return $this;
@@ -235,10 +235,10 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @param int $numImpressionsArchive
+     * @param null|int $numImpressionsArchive
      * @return Model
      */
-    public function setNumImpressionsArchive(int $numImpressionsArchive): self
+    public function setNumImpressionsArchive(?int $numImpressionsArchive): self
     {
         $this->numImpressionsArchive = $numImpressionsArchive;
         return $this;
@@ -255,10 +255,10 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @param int $numImpressionsEmail
+     * @param null|int $numImpressionsEmail
      * @return Model
      */
-    public function setNumImpressionsEmail(int $numImpressionsEmail): self
+    public function setNumImpressionsEmail(?int $numImpressionsEmail): self
     {
         $this->numImpressionsEmail = $numImpressionsEmail;
         return $this;
@@ -275,10 +275,10 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @param int $numConversionsDashboard
+     * @param null|int $numConversionsDashboard
      * @return Model
      */
-    public function setNumConversionsDashboard(int $numConversionsDashboard): self
+    public function setNumConversionsDashboard(?int $numConversionsDashboard): self
     {
         $this->numConversionsDashboard = $numConversionsDashboard;
         return $this;
@@ -295,10 +295,10 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @param int $numConversionsHomepage
+     * @param null|int $numConversionsHomepage
      * @return Model
      */
-    public function setNumConversionsHomepage(int $numConversionsHomepage): self
+    public function setNumConversionsHomepage(?int $numConversionsHomepage): self
     {
         $this->numConversionsHomepage = $numConversionsHomepage;
         return $this;
@@ -315,10 +315,10 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @param int $numConversionsIndex
+     * @param null|int $numConversionsIndex
      * @return Model
      */
-    public function setNumConversionsIndex(int $numConversionsIndex): self
+    public function setNumConversionsIndex(?int $numConversionsIndex): self
     {
         $this->numConversionsIndex = $numConversionsIndex;
         return $this;
@@ -335,10 +335,10 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @param int $numConversionsArchive
+     * @param null|int $numConversionsArchive
      * @return Model
      */
-    public function setNumConversionsArchive(int $numConversionsArchive): self
+    public function setNumConversionsArchive(?int $numConversionsArchive): self
     {
         $this->numConversionsArchive = $numConversionsArchive;
         return $this;
@@ -355,10 +355,10 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @param int $numConversionsEmail
+     * @param null|int $numConversionsEmail
      * @return $this
      */
-    public function setNumConversionsEmail(int $numConversionsEmail): self
+    public function setNumConversionsEmail(?int $numConversionsEmail): self
     {
         $this->numConversionsEmail = $numConversionsEmail;
         return $this;
@@ -375,14 +375,12 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @param int $numOpens
+     * @param null|int $numOpens
      * @return Model
      */
-    public function setNumOpens(int $numOpens): self
+    public function setNumOpens(?int $numOpens): self
     {
         $this->numOpens = $numOpens;
         return $this;
     }
-
-
 }

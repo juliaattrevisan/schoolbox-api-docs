@@ -58,6 +58,11 @@ class Lists
     private $statisticsMapper;
 
     /**
+     * @var Statistics\Cumulative\Mapper
+     */
+    private $statisticsCumulativeMapper;
+
+    /**
      * @var IConnector
      */
     private $databaseInternal;
@@ -91,17 +96,18 @@ class Lists
     /**
      * Lists constructor.
      *
-     * @param int                     $defaultLimit
-     * @param Mapper                  $newsMapper
-     * @param Policy\Mapper           $policyMapper
-     * @param SaveForLater\Mapper     $saveForLaterMapper
-     * @param Statistics\Mapper       $statisticsMapper
-     * @param IConnector              $databaseInternal
-     * @param Folder\Mapper           $folderMapper
-     * @param Access\UserAccessMapper $userAccessMapper
-     * @param UserMapper              $userMapper
-     * @param External_User           $externalUser
-     * @param External_Class          $externalClass
+     * @param int                          $defaultLimit
+     * @param Mapper                       $newsMapper
+     * @param Policy\Mapper                $policyMapper
+     * @param SaveForLater\Mapper          $saveForLaterMapper
+     * @param Statistics\Mapper            $statisticsMapper
+     * @param Statistics\Cumulative\Mapper $statisticsCumulativeMapper
+     * @param IConnector                   $databaseInternal
+     * @param Folder\Mapper                $folderMapper
+     * @param Access\UserAccessMapper      $userAccessMapper
+     * @param UserMapper                   $userMapper
+     * @param External_User                $externalUser
+     * @param External_Class               $externalClass
      */
     public function __construct(
         int $defaultLimit,
@@ -109,6 +115,7 @@ class Lists
         Policy\Mapper $policyMapper,
         SaveForLater\Mapper $saveForLaterMapper,
         Statistics\Mapper $statisticsMapper,
+        Statistics\Cumulative\Mapper $statisticsCumulativeMapper,
         IConnector $databaseInternal,
         Folder\Mapper $folderMapper,
         Access\UserAccessMapper $userAccessMapper,
@@ -121,6 +128,7 @@ class Lists
         $this->policyMapper = $policyMapper;
         $this->saveForLaterMapper = $saveForLaterMapper;
         $this->statisticsMapper = $statisticsMapper;
+        $this->statisticsCumulativeMapper = $statisticsCumulativeMapper;
 
         /* Hyperdrive injection
          */
@@ -226,10 +234,11 @@ class Lists
                 $articles->add($records->getOffset($articleId));
 
                 /* Statistics: save an impression record
-                 * TODO: Load the referrer value from $params
-                 * TODO: Also increment a tally elsewhere
+                 * Load the referrer value from $params
+                 * Also increment a tally elsewhere
                  */
                 $this->statisticsMapper->saveImpression($articleId, $user->getId(), $params->getReferrer());
+                $this->statisticsCumulativeMapper->incrementImpression($articleId, $params->getReferrer());
             }
         }
 

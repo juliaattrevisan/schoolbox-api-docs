@@ -163,6 +163,7 @@ class Module extends BaseModule
             'topicMapper' => $this->getMapperFactory()->getLazy(TopicMapper::class),
             'saveForLaterMapper' => $this->getMapperFactory()->getLazy(SaveForLater\Mapper::class),
             'statisticsMapper' => $this->getMapperFactory()->getLazy(Statistics\Mapper::class),
+            'statisticsCumulativeMapper' => $this->getMapperFactory()->getLazy(Statistics\Cumulative\Mapper::class),
             'audienceMapper' => $this->getMapperFactory()->getLazy(Audience\Mapper::class),
             'roleAccessMapper' => $this->getMapperFactory()->getLazy(Access\RoleAccessMapper::class),
 
