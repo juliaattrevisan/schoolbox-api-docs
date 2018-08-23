@@ -122,6 +122,8 @@ class Folder implements ISearch, ITranslate
             $folderMembershipSql = ' AND folder.id IN (' . implode(', ', $folderMembership) . ')';
         }
 
+        $entityType = Model::ENTITY_TYPE_FOLDER;
+
         return "
             SELECT folder.id, 
                 CONCAT(folder.name,  
@@ -130,7 +132,7 @@ class Folder implements ISearch, ITranslate
                     THEN CONCAT(' (', GROUP_CONCAT(folder_code.code SEPARATOR ', '), ')')
                     ELSE ''
                     END) AS `name`,
-                '".Model::ENTITY_TYPE_FOLDER."' AS entity_type
+                '{$entityType}' AS entity_type
             FROM folder
             LEFT JOIN folder_code ON folder.id = folder_code.folder_id AND folder_code.deleted_at IS NULL
             WHERE (
