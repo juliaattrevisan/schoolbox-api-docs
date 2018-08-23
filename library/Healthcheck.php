@@ -580,6 +580,7 @@ class Healthcheck
 
         // Attendance Update Tests
         $this->updateTest(['wkAttendances']);
+        $this->updateTest(['AttendanceMaster']);
 
         // Markbook Tests
         if ($this->configMapper->get('external_markbook')) {

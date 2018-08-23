@@ -181,8 +181,17 @@ class Attendance_Synergetic_AttendanceMaster
         ];
 
         $statement->bindOutputs($outputs);
+        $success = $statement->execute();
 
-        return $statement->execute();
+        /* Stored proc does not update the CreatedById so we do that separately */
+        if($success) {
+            $this->connector->executeQuery(
+                "UPDATE AttendanceMaster SET CreatedById = StaffID, ModifiedById = StaffID WHERE AttendanceMasterSeq = :attendanceMasterSeq",
+                ['attendanceMasterSeq' => $attendanceMasterSeq]
+            );
+        }
+
+        return $success;
     }
 
     /**
