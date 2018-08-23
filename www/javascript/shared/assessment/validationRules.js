@@ -16,8 +16,17 @@ var validateOptions = {
         weight: 'The ' + scriptValidationRules.attr('data-locale-grading-proper') + ' weight should be zero or greater',
     },
     errorPlacement: function(error, element) {
+        console.log("Element being validate: ");
         console.log(element);
-        if ($(error).attr("[data-criterion-name]")) {
+        // console.log("Error label: ");
+        // console.log(error);
+        // console.log("\n");
+        console.log($(element).attr("data-criterion-name"));
+        if ($(element).attr("data-criterion-name")) {
+            // TODO why is this getting inserted BEFORE the element?
+            // I think it's breaking because the element is a label, but the checkbox display is controlled by a label
+            // and this ends up replacing the label
+            // so need to use a custom element as well
             error.insertAfter(element);
         }
     }
