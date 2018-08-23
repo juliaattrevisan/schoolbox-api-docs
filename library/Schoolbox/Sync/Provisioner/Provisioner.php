@@ -156,7 +156,14 @@ class Provisioner
                 // Don't run the provisioner for this role
                 continue;
             }
-            $ruleset = $this->rulesetFactory->produceRuleset($roleType, $this->logger, $this->grammarFactory);
+            try {
+                $ruleset = $this->rulesetFactory->produceRuleset($roleType, $this->logger, $this->grammarFactory);
+            } catch (\Exception $e) {
+                $this->logger->alert("Invalid ruleset detected for '{$roleType}'; skipping.", [ $e ]);
+                $this->logMapper->flush($this->logger);
+                continue;
+            }
+
             if ($ruleset->getConfig()->getEnabled() || $roleType == $forRoleType) {
 
                 $this->logger->warning("Commencing $roleType user provision: " . ($update ? 'updating' : 'dry run only'));
