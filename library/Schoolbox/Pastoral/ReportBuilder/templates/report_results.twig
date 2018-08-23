@@ -29,7 +29,7 @@
                         <li>
                             <div class="small-12 card wrap-down">
                                 {# Theres no need for the all the twig access checks like the list page, if the user got to this screen they can view everything #}
-                                <a href="{{ profile.link(record.owner) }}">
+                                <a href="{{ profile.link(record.student) }}">
                                     {{ profile.imageSquare64(record.student) }}
                                 </a>
                                 <a href="{{ routeLookup('pastoral.getStudentRecord', {'studentId': record.student.id, 'recordId': record.id}) }}">
