@@ -47,10 +47,6 @@
                 postdata.task = 1;
             }
 
-            // Is this mark-per-capability?
-            var markPerCapabilityInput = body.find('#markPerCapability');
-            postdata.markPerCapability = markPerCapabilityInput.is(':checked');
-
             // show/hide appropriate things
             wrap.find('[data-hideable]').addClass('hide');
             wrap.find('[data-waiting-msg]').removeClass('hide');
@@ -87,10 +83,10 @@
                 wrap.find('[data-waiting-msg]').addClass('hide');
 
                 // Is mark-per-capability on in the rubric? switch it on in the main form
-                // (Don't switch it off if it's off in the rubric; allow the user to decide)
-                if ($('#rubric-attachable{{ idSuffix }}').find('input[data-group-max-value]:visible').length) {
-                    markPerCapabilityInput.prop('checked', true);
-                }
+                body.find('#markPerCapability').prop(
+                    'checked',
+                    $('#rubric-attachable{{ idSuffix }}').find('input[data-group-max-value]:visible').length > 0
+                );
 
                 // Is use mark range on in the rubric?
                 // (There's no way to infer this other than some attribute on the grid)
