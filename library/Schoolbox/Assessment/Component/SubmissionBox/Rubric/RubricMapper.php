@@ -213,6 +213,8 @@ class RubricMapper
             }
 
             // If the group model doesn't exist yet: create it
+            // (New groups may never be course-level, they are always created
+            //  on the unit)
             if (!$groupModel) {
                 $groupModel = $groupMapper->createModel()
                     ->setId($groupId)
