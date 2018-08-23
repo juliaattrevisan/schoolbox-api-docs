@@ -123,7 +123,7 @@ class Controller extends BaseController
         // Fill in each level
         $levelCount = $post->getInt('levelCount', 0);
         for ($i = 0; $i < $levelCount; $i++) {
-            $rubricGrid->getLevels()[$i] = new Level();
+            $rubricGrid->getLevels()->add(new Level());
         }
         $context['rubricGrid'] = $rubricGrid;
 

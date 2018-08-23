@@ -46,12 +46,12 @@ class CriterionUsage
      * Return the descriptor for a given level, or null if this criterion
      * doesn't use it.
      *
-     * @param Level $level
+     * @param int $levelIndex
      * @return null|Descriptor
      */
-    public function retrieveDescriptor(Level $level): ?Descriptor
+    public function retrieveDescriptor(int $levelIndex): ?Descriptor
     {
-        return $this->descriptors[$level->getId()] ?? null;
+        return $this->descriptors[$levelIndex] ?? null;
     }
 
 

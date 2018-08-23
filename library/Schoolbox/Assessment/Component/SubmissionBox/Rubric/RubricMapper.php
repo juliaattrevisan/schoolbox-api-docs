@@ -420,7 +420,7 @@ class RubricMapper
             foreach ($descriptorsByLevel[$levelId] as $criterionId => $descriptor) {
                 $level->getDescriptors()[$criterionId] = $descriptor;
             }
-            $grid->getLevels()[$levelId] = $level;
+            $grid->getLevels()->add($level);
         }
 
 
@@ -546,8 +546,8 @@ class RubricMapper
                 $criterionUsageModels->add($criterionUsageModel);
 
                 // Descriptors
-                foreach ($grid->getLevels() as $level) {
-                    $descriptor = $criterionUsage->retrieveDescriptor($level);
+                foreach ($grid->getLevels() as $levelIndex => $level) {
+                    $descriptor = $criterionUsage->retrieveDescriptor($levelIndex);
                     if ($descriptor) {
                         $descriptorModel = $descriptorMapper->createModel()
                             ->setId($descriptor->getId())

@@ -45,11 +45,11 @@ class CriterionUsage extends TestCase
         // level 4: not set
         $criterionUsage->getDescriptors()[$level5->getId()] = $descriptor5;
 
-        yield 'descriptor 1: set'     => [$criterionUsage, $level1, $descriptor1];
-        yield 'descriptor 2: set'     => [$criterionUsage, $level2, $descriptor2];
-        yield 'descriptor 3: set'     => [$criterionUsage, $level3, $descriptor3];
-        yield 'descriptor 4: not set' => [$criterionUsage, $level4, null];
-        yield 'descriptor 5: set'     => [$criterionUsage, $level5, $descriptor5];
+        yield 'descriptor 1: set'     => [$criterionUsage, $level1->getId(), $descriptor1];
+        yield 'descriptor 2: set'     => [$criterionUsage, $level2->getId(), $descriptor2];
+        yield 'descriptor 3: set'     => [$criterionUsage, $level3->getId(), $descriptor3];
+        yield 'descriptor 4: not set' => [$criterionUsage, $level4->getId(), null];
+        yield 'descriptor 5: set'     => [$criterionUsage, $level5->getId(), $descriptor5];
     }
 
 
@@ -58,15 +58,15 @@ class CriterionUsage extends TestCase
      * @covers       \Schoolbox\Assessment\Rubric\Grid\CriterionUsage::retrieveDescriptor
      *
      * @param RubricGrid\CriterionUsage  $criterionUsage
-     * @param RubricGrid\Level           $level
+     * @param int                        $levelIndex
      * @param null|RubricGrid\Descriptor $expected
      */
     public function testRetrieveDescriptor(
         RubricGrid\CriterionUsage $criterionUsage,
-        RubricGrid\Level $level,
+        int $levelIndex,
         ?RubricGrid\Descriptor $expected
     ): void {
-        $this->assertSame($expected, $criterionUsage->retrieveDescriptor($level));
+        $this->assertSame($expected, $criterionUsage->retrieveDescriptor($levelIndex));
     }
 
 
@@ -165,11 +165,11 @@ class CriterionUsage extends TestCase
         $criterionUsage1->getDescriptors()[$level4->getId()] = $descriptor4;
         $criterionUsage1->getDescriptors()[$level5->getId()] = $descriptor5;
 
-        yield 'Ascending 0' => [$criterionUsage1, $level1, 0];
-        yield 'Ascending 2' => [$criterionUsage1, $level2, 1];
-        yield 'Ascending 4' => [$criterionUsage1, $level3, 3];
-        yield 'Ascending 6' => [$criterionUsage1, $level4, 5];
-        yield 'Ascending 8' => [$criterionUsage1, $level5, 7];
+        yield 'Ascending 0' => [$criterionUsage1, $level1->getId(), 0];
+        yield 'Ascending 2' => [$criterionUsage1, $level2->getId(), 1];
+        yield 'Ascending 4' => [$criterionUsage1, $level3->getId(), 3];
+        yield 'Ascending 6' => [$criterionUsage1, $level4->getId(), 5];
+        yield 'Ascending 8' => [$criterionUsage1, $level5->getId(), 7];
 
 
         // Descending: [8, 6, 4, 2, 0] => [7..8, 5..6, 3..4, 1..2, 0]
@@ -187,11 +187,11 @@ class CriterionUsage extends TestCase
         $criterionUsage2->getDescriptors()[$level4->getId()] = $descriptor4;
         $criterionUsage2->getDescriptors()[$level5->getId()] = $descriptor5;
 
-        yield 'Descending 8' => [$criterionUsage2, $level1, 7];
-        yield 'Descending 6' => [$criterionUsage2, $level2, 5];
-        yield 'Descending 4' => [$criterionUsage2, $level3, 3];
-        yield 'Descending 2' => [$criterionUsage2, $level4, 1];
-        yield 'Descending 0' => [$criterionUsage2, $level5, 0];
+        yield 'Descending 8' => [$criterionUsage2, $level1->getId(), 7];
+        yield 'Descending 6' => [$criterionUsage2, $level2->getId(), 5];
+        yield 'Descending 4' => [$criterionUsage2, $level3->getId(), 3];
+        yield 'Descending 2' => [$criterionUsage2, $level4->getId(), 1];
+        yield 'Descending 0' => [$criterionUsage2, $level5->getId(), 0];
 
 
         // Asc, skip null before: [0, null, 5, 10] => [0, null, 1..5, 6..10]
@@ -207,10 +207,10 @@ class CriterionUsage extends TestCase
         $criterionUsage3->getDescriptors()[$level3->getId()] = $descriptor3;
         $criterionUsage3->getDescriptors()[$level4->getId()] = $descriptor4;
 
-        yield 'Ascending skip-null-before 0'    => [$criterionUsage3, $level1, 0];
-        yield 'Ascending skip-null-before 5'    => [$criterionUsage3, $level2, null];
-        yield 'Ascending skip-null-before null' => [$criterionUsage3, $level3, 1];
-        yield 'Ascending skip-null-before 10'   => [$criterionUsage3, $level4, 6];
+        yield 'Ascending skip-null-before 0'    => [$criterionUsage3, $level1->getId(), 0];
+        yield 'Ascending skip-null-before 5'    => [$criterionUsage3, $level2->getId(), null];
+        yield 'Ascending skip-null-before null' => [$criterionUsage3, $level3->getId(), 1];
+        yield 'Ascending skip-null-before 10'   => [$criterionUsage3, $level4->getId(), 6];
 
 
         // Asc, skip null after: [0, 5, null, 10] => [0, 1..5, null, 6..10]
@@ -226,10 +226,10 @@ class CriterionUsage extends TestCase
         $criterionUsage4->getDescriptors()[$level3->getId()] = $descriptor3;
         $criterionUsage4->getDescriptors()[$level4->getId()] = $descriptor4;
 
-        yield 'Ascending skip-null-after 0'    => [$criterionUsage4, $level1, 0];
-        yield 'Ascending skip-null-after 5'    => [$criterionUsage4, $level2, 1];
-        yield 'Ascending skip-null-after null' => [$criterionUsage4, $level3, null];
-        yield 'Ascending skip-null-after 10'   => [$criterionUsage4, $level4, 6];
+        yield 'Ascending skip-null-after 0'    => [$criterionUsage4, $level1->getId(), 0];
+        yield 'Ascending skip-null-after 5'    => [$criterionUsage4, $level2->getId(), 1];
+        yield 'Ascending skip-null-after null' => [$criterionUsage4, $level3->getId(), null];
+        yield 'Ascending skip-null-after 10'   => [$criterionUsage4, $level4->getId(), 6];
 
 
         // Asc, skip null at start: [null, 5, 10] => [null, 5, 6..10]
@@ -243,9 +243,9 @@ class CriterionUsage extends TestCase
         $criterionUsage5->getDescriptors()[$level2->getId()] = $descriptor2;
         $criterionUsage5->getDescriptors()[$level3->getId()] = $descriptor3;
 
-        yield 'Ascending skip-null-start null' => [$criterionUsage5, $level1, null];
-        yield 'Ascending skip-null-start 5'    => [$criterionUsage5, $level2, 5];
-        yield 'Ascending skip-null-start 10'   => [$criterionUsage5, $level3, 6];
+        yield 'Ascending skip-null-start null' => [$criterionUsage5, $level1->getId(), null];
+        yield 'Ascending skip-null-start 5'    => [$criterionUsage5, $level2->getId(), 5];
+        yield 'Ascending skip-null-start 10'   => [$criterionUsage5, $level3->getId(), 6];
 
 
         // Desc, skip null before: [10, null, 5, 0] => [6..10, null, 1..5, 0]
@@ -261,10 +261,10 @@ class CriterionUsage extends TestCase
         $criterionUsage6->getDescriptors()[$level3->getId()] = $descriptor3;
         $criterionUsage6->getDescriptors()[$level4->getId()] = $descriptor4;
 
-        yield 'Descending skip-null-before 0'    => [$criterionUsage6, $level1, 6];
-        yield 'Descending skip-null-before 5'    => [$criterionUsage6, $level2, null];
-        yield 'Descending skip-null-before null' => [$criterionUsage6, $level3, 1];
-        yield 'Descending skip-null-before 10'   => [$criterionUsage6, $level4, 0];
+        yield 'Descending skip-null-before 0'    => [$criterionUsage6, $level1->getId(), 6];
+        yield 'Descending skip-null-before 5'    => [$criterionUsage6, $level2->getId(), null];
+        yield 'Descending skip-null-before null' => [$criterionUsage6, $level3->getId(), 1];
+        yield 'Descending skip-null-before 10'   => [$criterionUsage6, $level4->getId(), 0];
 
 
         // Desc, skip null after: [10, 5, null, 0] => [6..10, 1..5, null, 0]
@@ -280,10 +280,10 @@ class CriterionUsage extends TestCase
         $criterionUsage7->getDescriptors()[$level3->getId()] = $descriptor3;
         $criterionUsage7->getDescriptors()[$level4->getId()] = $descriptor4;
 
-        yield 'Descending skip-null-after 0'    => [$criterionUsage7, $level1, 6];
-        yield 'Descending skip-null-after 5'    => [$criterionUsage7, $level2, 1];
-        yield 'Descending skip-null-after null' => [$criterionUsage7, $level3, null];
-        yield 'Descending skip-null-after 10'   => [$criterionUsage7, $level4, 0];
+        yield 'Descending skip-null-after 0'    => [$criterionUsage7, $level1->getId(), 6];
+        yield 'Descending skip-null-after 5'    => [$criterionUsage7, $level2->getId(), 1];
+        yield 'Descending skip-null-after null' => [$criterionUsage7, $level3->getId(), null];
+        yield 'Descending skip-null-after 10'   => [$criterionUsage7, $level4->getId(), 0];
 
 
         // Asc+Desc: [0, 4, 8, 3, 0]  => [0, 1..4, 5..8, 1..3, 0] (use highest max below this max)
@@ -301,11 +301,11 @@ class CriterionUsage extends TestCase
         $criterionUsage8->getDescriptors()[$level4->getId()] = $descriptor4;
         $criterionUsage8->getDescriptors()[$level5->getId()] = $descriptor5;
 
-        yield 'Asc+Desc 0 (start)' => [$criterionUsage8, $level1, 0];
-        yield 'Asc+Desc 4'         => [$criterionUsage8, $level2, 1];
-        yield 'Asc+Desc 8'         => [$criterionUsage8, $level3, 5];
-        yield 'Asc+Desc 3'         => [$criterionUsage8, $level4, 1];
-        yield 'Asc+Desc 0 (end)'   => [$criterionUsage8, $level5, 0];
+        yield 'Asc+Desc 0 (start)' => [$criterionUsage8, $level1->getId(), 0];
+        yield 'Asc+Desc 4'         => [$criterionUsage8, $level2->getId(), 1];
+        yield 'Asc+Desc 8'         => [$criterionUsage8, $level3->getId(), 5];
+        yield 'Asc+Desc 3'         => [$criterionUsage8, $level4->getId(), 1];
+        yield 'Asc+Desc 0 (end)'   => [$criterionUsage8, $level5->getId(), 0];
 
 
         // Fibonacci: [1, 1, 2, 3, 5, 8] => [1, 1, 2, 3, 4..5, 6..8]
@@ -325,12 +325,12 @@ class CriterionUsage extends TestCase
         $criterionUsage9->getDescriptors()[$level5->getId()] = $descriptor5;
         $criterionUsage9->getDescriptors()[$level6->getId()] = $descriptor6;
 
-        yield 'Fibonacci 1 (1)' => [$criterionUsage9, $level1, 1];
-        yield 'Fibonacci 2 (1)' => [$criterionUsage9, $level2, 1];
-        yield 'Fibonacci 3 (2)' => [$criterionUsage9, $level3, 2];
-        yield 'Fibonacci 4 (3)' => [$criterionUsage9, $level4, 3];
-        yield 'Fibonacci 5 (5)' => [$criterionUsage9, $level5, 4];
-        yield 'Fibonacci 6 (8)' => [$criterionUsage9, $level6, 6];
+        yield 'Fibonacci 1 (1)' => [$criterionUsage9, $level1->getId(), 1];
+        yield 'Fibonacci 2 (1)' => [$criterionUsage9, $level2->getId(), 1];
+        yield 'Fibonacci 3 (2)' => [$criterionUsage9, $level3->getId(), 2];
+        yield 'Fibonacci 4 (3)' => [$criterionUsage9, $level4->getId(), 3];
+        yield 'Fibonacci 5 (5)' => [$criterionUsage9, $level5->getId(), 4];
+        yield 'Fibonacci 6 (8)' => [$criterionUsage9, $level6->getId(), 6];
 
 
         // All null: [null, null, null, null, null] => [null, null, null, null, null]
@@ -348,11 +348,11 @@ class CriterionUsage extends TestCase
         $criterionUsage10->getDescriptors()[$level4->getId()] = $descriptor4;
         $criterionUsage10->getDescriptors()[$level5->getId()] = $descriptor5;
 
-        yield 'Null 1 (null)' => [$criterionUsage10, $level1, null];
-        yield 'Null 2 (null)' => [$criterionUsage10, $level2, null];
-        yield 'Null 3 (null)' => [$criterionUsage10, $level3, null];
-        yield 'Null 4 (null)' => [$criterionUsage10, $level4, null];
-        yield 'Null 5 (null)' => [$criterionUsage10, $level5, null];
+        yield 'Null 1 (null)' => [$criterionUsage10, $level1->getId(), null];
+        yield 'Null 2 (null)' => [$criterionUsage10, $level2->getId(), null];
+        yield 'Null 3 (null)' => [$criterionUsage10, $level3->getId(), null];
+        yield 'Null 4 (null)' => [$criterionUsage10, $level4->getId(), null];
+        yield 'Null 5 (null)' => [$criterionUsage10, $level5->getId(), null];
 
 
         // Only one descriptor: [5] => [5]
@@ -362,7 +362,7 @@ class CriterionUsage extends TestCase
 
         $criterionUsage11->getDescriptors()[$level1->getId()] = $descriptor1;
 
-        yield 'Single Descriptor' => [$criterionUsage11, $level1, 5];
+        yield 'Single Descriptor' => [$criterionUsage11, $level1->getId(), 5];
     }
 
 
@@ -371,16 +371,16 @@ class CriterionUsage extends TestCase
      * @covers       \Schoolbox\Assessment\Rubric\Grid\CriterionUsage::applyDescriptorMinValues
      *
      * @param RubricGrid\CriterionUsage $criterionUsage
-     * @param RubricGrid\Level          $level
+     * @param int                       $levelIndex
      * @param float|null                $expected
      */
     public function testApplyDescriptorMinValues(
         RubricGrid\CriterionUsage $criterionUsage,
-        RubricGrid\Level $level,
+        int $levelIndex,
         ?float $expected
     ): void {
         $criterionUsage->applyDescriptorMinValues(true);
-        $descriptor = $criterionUsage->retrieveDescriptor($level);
+        $descriptor = $criterionUsage->retrieveDescriptor($levelIndex);
         $this->assertNotNull($descriptor);
         $this->assertSame($expected, $descriptor->getMinValue());
     }
@@ -421,12 +421,12 @@ class CriterionUsage extends TestCase
         $criterionUsage->getDescriptors()[$level5->getId()] = $descriptor5;
         $criterionUsage->getDescriptors()[$level6->getId()] = $descriptor6;
 
-        yield 'Fibonacci 1 (1)' => [$criterionUsage, $level1, 1];
-        yield 'Fibonacci 2 (1)' => [$criterionUsage, $level2, 1];
-        yield 'Fibonacci 3 (2)' => [$criterionUsage, $level3, 2];
-        yield 'Fibonacci 4 (3)' => [$criterionUsage, $level4, 3];
-        yield 'Fibonacci 5 (5)' => [$criterionUsage, $level5, 5];
-        yield 'Fibonacci 6 (8)' => [$criterionUsage, $level6, 8];
+        yield 'Fibonacci 1 (1)' => [$criterionUsage, $level1->getId(), 1];
+        yield 'Fibonacci 2 (1)' => [$criterionUsage, $level2->getId(), 1];
+        yield 'Fibonacci 3 (2)' => [$criterionUsage, $level3->getId(), 2];
+        yield 'Fibonacci 4 (3)' => [$criterionUsage, $level4->getId(), 3];
+        yield 'Fibonacci 5 (5)' => [$criterionUsage, $level5->getId(), 5];
+        yield 'Fibonacci 6 (8)' => [$criterionUsage, $level6->getId(), 8];
     }
 
 
@@ -435,16 +435,16 @@ class CriterionUsage extends TestCase
      * @covers       \Schoolbox\Assessment\Rubric\Grid\CriterionUsage::applyDescriptorMinValues
      *
      * @param RubricGrid\CriterionUsage $criterionUsage
-     * @param RubricGrid\Level          $level
+     * @param int                       $levelIndex
      * @param float|null                $expected
      */
     public function testApplyDescriptorMinValuesWithoutValueRange(
         RubricGrid\CriterionUsage $criterionUsage,
-        RubricGrid\Level $level,
+        int $levelIndex,
         ?float $expected
     ): void {
         $criterionUsage->applyDescriptorMinValues(false);
-        $descriptor = $criterionUsage->retrieveDescriptor($level);
+        $descriptor = $criterionUsage->retrieveDescriptor($levelIndex);
         $this->assertNotNull($descriptor);
         $this->assertSame($expected, $descriptor->getMinValue());
     }
