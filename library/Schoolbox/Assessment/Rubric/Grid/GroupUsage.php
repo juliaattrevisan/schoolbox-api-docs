@@ -82,6 +82,27 @@ class GroupUsage
 
 
     /**
+     * What's the inferred max value for this group?
+     *
+     * Differs from `getMaxValue` in that this is the inferred value from the
+     * descriptors, instead of the actually set value.
+     *
+     * @return float
+     */
+    public function calculateMaxValue(): float
+    {
+        $maxValues = [];
+        foreach ($this->criterionUsages as $criterionUsage) {
+            $groupUsageMaxValue = $criterionUsage->getMaxValue();
+            if (null !== $groupUsageMaxValue) {
+                $maxValues[] = $groupUsageMaxValue;
+            }
+        }
+        return !empty($maxValues) ? array_sum($maxValues) : 0;
+    }
+
+
+    /**
      * @return Group
      */
     public function getGroup(): Group

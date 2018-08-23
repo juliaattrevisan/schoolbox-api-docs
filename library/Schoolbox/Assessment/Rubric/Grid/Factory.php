@@ -145,6 +145,15 @@ class Factory
             $groupUsage->getCriterionUsages()[$criterionId] = $criterionUsage;
         }
 
+        // Calculate max values for each group usage.
+        // If no value was passed: use calculated value
+        foreach ($grid->getGroupUsages() as $groupUsage) {
+            $groupMaxValue = $groupUsage->getMaxValue();
+            if (null === $groupMaxValue) {
+                $groupUsage->setMaxValue($groupUsage->calculateMaxValue());
+            }
+        }
+
         return $grid;
     }
 }
