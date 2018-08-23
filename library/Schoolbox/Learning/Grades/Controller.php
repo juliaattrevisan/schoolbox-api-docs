@@ -633,7 +633,7 @@ class Controller extends Base
         $assessments = $this->assessmentMapperProxy->findAllByIds($assessmentIds);
         $assessments = $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessments, $user)
                                                    ->filter(function (IAssessable $a) use ($viewee) {
-                                                       return $a->isParticipant($viewee);
+                                                       return $a->isParticipant($viewee) && $a->isPublished();
                                                    });
         return $assessments;
     }
