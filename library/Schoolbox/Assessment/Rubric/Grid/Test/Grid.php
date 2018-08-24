@@ -140,7 +140,7 @@ class Grid extends TestCase
         $groupUsage1->getCriterionUsages()[$criterion2->getId()] = $criterionUsage2;
         $grid->getGroupUsages()[$group1->getId()]                = $groupUsage1;
 
-        $groupUsage2                                             = (new RubricGrid\GroupUsage($group1))->setMaxValue(15);
+        $groupUsage2                                             = (new RubricGrid\GroupUsage($group2))->setMaxValue(15);
         $criterionUsage6                                         = new RubricGrid\CriterionUsage($criterion6);
         $groupUsage2->getCriterionUsages()[$criterion6->getId()] = $criterionUsage6;
         $grid->getGroupUsages()[$group2->getId()]                = $groupUsage2;
@@ -172,5 +172,82 @@ class Grid extends TestCase
         ?RubricGrid\CriterionUsage $expected
     ): void {
         $this->assertSame($expected, $grid->retrieveCriterionUsage($criterion));
+    }
+
+
+    /**
+     * Data provider for `getTestCalculateMaxValueData`
+     *
+     * @return iterable
+     */
+    public function getTestCalculateMaxValueData(): iterable
+    {
+        $rowSet     = new Rowset\RowSet(new Folder());
+        $group1     = (new RowSet\Group())->setId(1)->setName('Group 1');
+        $group2     = (new RowSet\Group())->setId(2)->setName('Group 2');
+        $group3     = (new RowSet\Group())->setId(3)->setName('Group 3');
+        $criterion1 = (new RowSet\Criterion())->setId(1)->setName('Criterion 1.1');
+        $criterion2 = (new RowSet\Criterion())->setId(2)->setName('Criterion 1.2');
+        $criterion3 = (new RowSet\Criterion())->setId(3)->setName('Criterion 1.3');
+        $criterion4 = (new RowSet\Criterion())->setId(4)->setName('Criterion 2.1');
+        $criterion5 = (new RowSet\Criterion())->setId(5)->setName('Criterion 2.1');
+        $criterion6 = (new RowSet\Criterion())->setId(6)->setName('Criterion 2.2');
+        $criterion7 = (new RowSet\Criterion())->setId(7)->setName('Criterion 3.3');
+        $criterion8 = (new RowSet\Criterion())->setId(8)->setName('Criterion 3.2');
+        $criterion9 = (new RowSet\Criterion())->setId(9)->setName('Criterion 3.3');
+
+        $group1->getCriteria()[$criterion1->getId()] = $criterion1;
+        $group1->getCriteria()[$criterion2->getId()] = $criterion2;
+        $group1->getCriteria()[$criterion3->getId()] = $criterion3;
+
+        $group2->getCriteria()[$criterion4->getId()] = $criterion4;
+        $group2->getCriteria()[$criterion5->getId()] = $criterion5;
+        $group2->getCriteria()[$criterion6->getId()] = $criterion6;
+
+        $group3->getCriteria()[$criterion7->getId()] = $criterion7;
+        $group3->getCriteria()[$criterion8->getId()] = $criterion8;
+        $group3->getCriteria()[$criterion9->getId()] = $criterion9;
+
+        $groupUsage1                                             = (new RubricGrid\GroupUsage($group1))->setMaxValue(15);
+        $criterionUsage1                                         = new RubricGrid\CriterionUsage($criterion1);
+        $criterionUsage2                                         = new RubricGrid\CriterionUsage($criterion2);
+        $groupUsage1->getCriterionUsages()[$criterion1->getId()] = $criterionUsage1;
+        $groupUsage1->getCriterionUsages()[$criterion2->getId()] = $criterionUsage2;
+
+        $groupUsage2                                             = (new RubricGrid\GroupUsage($group2))->setMaxValue(3);
+        $criterionUsage6                                         = new RubricGrid\CriterionUsage($criterion6);
+        $groupUsage2->getCriterionUsages()[$criterion6->getId()] = $criterionUsage6;
+
+        $dueWork = new DueWork();
+        $grid1   = new RubricGrid\Grid($dueWork, $rowSet);
+
+        yield 'empty grid' => [$grid1, 0];
+
+
+        // Add descriptors
+        $grid2 = new RubricGrid\Grid($dueWork, $rowSet);
+        $grid2->getGroupUsages()[$group1->getId()] = $groupUsage1;
+
+        yield 'one group usage' => [$grid2, 15];
+
+
+        $grid3 = new RubricGrid\Grid($dueWork, $rowSet);
+        $grid3->getGroupUsages()[$group1->getId()] = $groupUsage1;
+        $grid3->getGroupUsages()[$group2->getId()] = $groupUsage2;
+
+        yield 'two group usages' => [$grid3, 18];
+    }
+
+
+    /**
+     * @dataProvider getTestCalculateMaxValueData
+     * @covers       \Schoolbox\Assessment\Rubric\Grid\Grid::calculateMaxValue
+     *
+     * @param RubricGrid\Grid $grid
+     * @param float|null      $expected
+     */
+    public function testCalculateMaxValue(RubricGrid\Grid $grid, ?float $expected): void
+    {
+        $this->assertSame($expected, $grid->calculateMaxValue());
     }
 }
