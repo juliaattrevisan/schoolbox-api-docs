@@ -50,6 +50,11 @@ class Querystring
     public const HIDE_PAGINATOR = 'hp';
 
     /**
+     * Querystring param for the Folder option
+     */
+    public const FOLDER = 'f';
+
+    /**
      * An array of key/value pairs corresponding to GET params
      *
      * @var array
@@ -69,7 +74,8 @@ class Querystring
             self::TOPIC_SLUG => $data[self::TOPIC_SLUG],
             self::PAGE_NUMBER => $data[self::PAGE_NUMBER],
             self::LIMIT => $data[self::LIMIT],
-            self::HIDE_PAGINATOR => $data[self::HIDE_PAGINATOR]
+            self::HIDE_PAGINATOR => $data[self::HIDE_PAGINATOR],
+            self::FOLDER => $data[self::FOLDER],
         ];
     }
 
@@ -125,6 +131,17 @@ class Querystring
     public function getHidePaginator(): bool
     {
         return (bool)$this->querystring[self::HIDE_PAGINATOR];
+    }
+
+
+    /**
+     * Get the folder id if one was specified
+     *
+     * @return mixed
+     */
+    public function getFolderId()
+    {
+        return $this->querystring[self::FOLDER];
     }
 
 

@@ -20,7 +20,6 @@ use Schoolbox\Collection;
 use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Comms\News\Audience\BusinessRules;
 use Schoolbox\Comms\News\Audience\RelationshipFilterer;
-use Schoolbox\IConfigLoader;
 use Schoolbox\News\Topic;
 use Schoolbox\Permission\Access;
 use Schoolbox\Resource\Folder;
@@ -167,9 +166,7 @@ class Lists
          */
         $topicId = $this->determineSelectedTopicId($topics, $params->getSlug());
 
-        /* Articles that $user can see
-          */
-        $articleIdsForUser = (new ArticleResolver(
+        $articleResolver = new ArticleResolver(
             new BusinessRules(),
             $this->databaseInternal,
             $this->userAccessMapper,
@@ -183,7 +180,20 @@ class Lists
                 $this->externalClass,
                 $this->userAccessMapper
             )
-        ))->findArticlesForUser($user);
+        );
+
+        /* Articles that were audienced to $user
+         */
+        $articleIdsForUser = $articleResolver->findArticlesForUser($user);
+
+        /* Limit to the $params->getFolderId() value, if one was specified
+         * This limits you to the articles you can see in a given topic, for a specified homepage
+         */
+        if ($params->getFolderId()) {
+            $homepageArticleIds = $articleResolver->findArticlesForAudience(Audience\Model::ENTITY_TYPE_FOLDER, $params->getFolderId(), Audience\Model::RELATIONSHIP_SELF);
+
+            $articleIdsForUser = array_intersect($articleIdsForUser, $homepageArticleIds);
+        }
 
         /* $articleIds:   Articles in $topicId that were audienced to $user
          * $availableIds: The total available articles that were audienced to user
