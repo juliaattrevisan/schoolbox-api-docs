@@ -312,12 +312,23 @@ class ImpressionsConversionsOpens
 
 
     /**
+     * Aggregate values for conversions and impressions for the set of $statistics
+     *
      * @param Collection|Cumulative\Model[] $statistics
      * @return array
      */
     private function summariseDailyStatistics(Collection $statistics): array
     {
-        $breakdown = [];
+
+        /* Prefill array with default values so they don't render as empty strings
+         */
+        $defaultValues = array_fill_keys(Mapper::REFERRERS, 0);
+
+        $breakdown = [
+            Mapper::TYPE_CONVERSION => $defaultValues,
+            Mapper::TYPE_IMPRESSION => $defaultValues,
+            Mapper::TYPE_OPEN => $defaultValues,
+        ];
 
         $numConversions = 0;
         $numImpressions = 0;
