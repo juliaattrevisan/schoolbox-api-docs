@@ -250,4 +250,29 @@ class Grid extends TestCase
     {
         $this->assertSame($expected, $grid->calculateMaxValue());
     }
+
+
+    /**
+     * Data provider for `testIterateGroups`.
+     *
+     * @return iterable
+     */
+    public function getTestIterateGroupsData(): iterable
+    {
+        // rowset has three groups
+        // try grids with: none, one, all
+    }
+
+
+    /**
+     * @dataProvider getTestIterateGroupsData
+     * @covers \Schoolbox\Assessment\Rubric\Grid\Grid::iterateGroups
+     *
+     * @param RubricGrid\Grid $grid
+     * @param iterable        $expected
+     */
+    public function testIterateGroups(RubricGrid\Grid $grid, iterable $expected): void
+    {
+        //
+    }
 }
