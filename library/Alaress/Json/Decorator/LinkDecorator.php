@@ -48,15 +48,36 @@ class LinkDecorator implements IDecorator
     public function decorate(array $json, $model): array
     {
         if ($model instanceof Linkable) {
-            foreach ($model->getJsonApiLinks() as $linkName => [ $routeName, $routeArgs ]) {
-                try {
-                    $json['_links'][$linkName] = [
-                        'href' => $this->router->generate($routeName, $routeArgs),
-                        'auth' => $this->auth->isPathAuthorizedForUser($routeName, $routeArgs, $_SESSION['user'])
-                    ];
-                } catch (RouteNotFound $e) {
-                    // noop; the model incorrectly specifies a route name
+            foreach ($model->getJsonApiLinks() as $linkName => $route) {
+
+                switch (\count($route)) {
+                    case 1:
+                        // flat, old, crappy URI
+                        [ $href ] = $route;
+                        $auth = null; // we have no way of knowing...
+                    break;
+
+                    case 2:
+                        // aura lookup
+                        [ $routeName, $routeArgs ] = $route;
+
+                        try {
+                            $href = $this->router->generate($routeName, $routeArgs);
+                            $auth = $this->auth->isPathAuthorizedForUser($routeName, $routeArgs, $_SESSION['user']);
+                        } catch (RouteNotFound $e) {
+                            // noop; the model incorrectly specifies a route name
+                        }
+
+                        break;
+                    default:
+                        // invalid: silently ignore
+                        continue 2;
                 }
+
+                $json['_links'][$linkName] = [
+                    'href' => $href,
+                    'auth' => $auth
+                ];
             }
         }
 
