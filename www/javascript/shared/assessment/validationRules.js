@@ -11,35 +11,34 @@ $.validator.addMethod('descriptorsAreMonotonic', function(value, indicatorCheckb
     // since value-less descriptors are permitted in amongst valued descriptors
     // then simplify array to just the desc values
     var allDescriptorsWithValues = descriptorList.filter(hasDescValue).map(function (descriptor) {return $(descriptor).val();});
-    console.log(allDescriptorsWithValues);
+
+    var valid = true;
 
     // TODO this will need to either
     // - parse strings to get numeric values out
     // - validate that the entered values are only numeric (need another validation function for this)
     var prevVal, prevDiff = null;
     $(allDescriptorsWithValues).each(function(index, currentDescriptorValue) {
-        console.log(currentDescriptorValue);
         // Not the first item?
         if(null !== prevVal){
             var diff = currentDescriptorValue - prevVal;
 
             // No increase/decrease ?
             if(0 === diff){
-                return false;
+                valid = false;
             }
 
             // Do we have a prev diff to compare against?
             // Accounts for both ascending and descending possibilities
             if(null !== prevDiff && ((prevDiff > 0 && diff < 0) || (prevDiff < 0 && diff > 0))) {
-                return false;
+                valid = false;
             }
             prevDiff = diff;
         }
         prevVal = currentDescriptorValue;
     });
 
-    return true;
-    // return false;
+    return valid;
 }, "Descriptor values must be an ascending or descending sequence");
 
 
