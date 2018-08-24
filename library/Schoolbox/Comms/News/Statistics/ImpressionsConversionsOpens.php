@@ -260,21 +260,52 @@ class ImpressionsConversionsOpens
      */
     public function fetchHistoric(News\Model $article): array
     {
-//        $pb = $this->statisticsCumulativeMapper->getPredicateBuilder()
-//            ->equals('article_id', $article->getId())
-//            ->lessThan('date', \Alaress_Date_Format::now()->getDatabaseDate());
-//
-//        $statistics = $this->statisticsCumulativeMapper->findByPredicates($pb, [
-//            'order' => [
-//                'date' => 'asc'
-//            ]
-//        ]);
+        $pb = $this->statisticsCumulativeMapper->getPredicateBuilder()
+            ->equals('article_id', $article->getId())
+            ->lessThan('date', \Alaress_Date_Format::now()->getDatabaseDate());
 
+        $statistics = $this->statisticsCumulativeMapper->findByPredicates($pb, [
+            'order' => [
+                'date' => 'asc'
+            ]
+        ]);
+
+        /* Group by date
+         */
+        $stack = [];
+
+        /** @var Cumulative\Model $statistic */
+        foreach ($statistics as $statistic) {
+            $stack[$statistic->getDate()->getDatabase()][] = $statistic;
+        }
+
+        /* Process each day's data
+         */
         $historic = [];
 
-//        foreach ($statistics as $statistic) {
-//            $historic[] = $this->summariseDailyStatistics($statistic);
-//        }
+        foreach ($stack as $date => $statistics) {
+            $summary = $this->summariseDailyStatistics(new Collection($statistics));
+
+            /* Calculate overall conversion ratio
+             */
+            $conversionRatio = $this->calculateConversionRatio($summary['numConversions'], $summary['numImpressions']);
+
+            /* Calculate conversion ratios for each referrer type
+             */
+            $referrerRatio = $this->calculateReferrerRatios($summary['breakdown']);
+
+            $daily = [
+                'breakdown' => [
+                    'grid' => $summary['breakdown']['grid'],
+                    'ratio' => $referrerRatio
+                ],
+                'numConversions' => $summary['numConversions'],
+                'numImpressions' => $summary['numImpressions'],
+                'conversionRatio' => $conversionRatio
+            ];
+
+            $historic[] = $daily;
+        }
 
         return $historic;
     }
