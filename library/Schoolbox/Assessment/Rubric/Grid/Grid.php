@@ -152,33 +152,6 @@ class Grid
     }
 
 
-//    /**
-//     * Return a set of descriptors for a column.
-//     *
-//     * @param Level $level
-//     * @return GenericCollection
-//     */
-//    public function retrieveColumn(Level $level): GenericCollection
-//    {
-//        // TODO implement
-//        return new GenericCollection(Descriptor::class);
-//    }
-//
-//
-//    /**
-//     * Return a descriptor for a row and column.
-//     *
-//     * @param Criterion $criterion
-//     * @param Level     $level
-//     * @return null|Descriptor
-//     */
-//    public function retrieveDescriptor(Criterion $criterion, Level $level): ?Descriptor
-//    {
-//        // TODO implement
-//        return null;
-//    }
-
-
     /**
      * Iterates each group in the grid's rowset.
      *
