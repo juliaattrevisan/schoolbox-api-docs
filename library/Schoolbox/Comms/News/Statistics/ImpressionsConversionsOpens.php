@@ -295,6 +295,7 @@ class ImpressionsConversionsOpens
             $referrerRatio = $this->calculateReferrerRatios($summary['breakdown']);
 
             $daily = [
+                'date' => $summary['date'],
                 'breakdown' => [
                     'grid' => $summary['breakdown']['grid'],
                     'ratio' => $referrerRatio
