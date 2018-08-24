@@ -61,7 +61,7 @@ class ValidFiles
      */
     public function isPlagscannable($documentName)
     {
-        $documentExtension = pathinfo($documentName, PATHINFO_EXTENSION);
+        $documentExtension = strtolower(pathinfo($documentName, PATHINFO_EXTENSION));
 
         if (isset($this->validDocuments[$documentExtension])) {
             return true;
