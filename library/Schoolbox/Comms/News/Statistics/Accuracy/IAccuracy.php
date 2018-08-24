@@ -11,7 +11,6 @@ namespace Schoolbox\Comms\News\Statistics\Accuracy;
 
 use Alaress_Date_Format;
 
-
 interface IAccuracy
 {
 

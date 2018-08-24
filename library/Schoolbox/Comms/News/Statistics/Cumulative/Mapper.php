@@ -13,7 +13,6 @@ use Schoolbox\Collection;
 use Schoolbox\Comms\News\Statistics;
 use Schoolbox\Comms\News\Statistics\Mapper as StatisticsMapper;
 
-
 /**
  * Class Mapper
  * @package Schoolbox\Comms\News\Statistics
@@ -120,7 +119,7 @@ class Mapper extends \Schoolbox\Mapper
      * for general usage, it's invalid for this particular usage)
      *
      * @param int         $articleId
-     * @param null|string $referrer
+     * @param string $referrer
      * @return bool|int[]
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception

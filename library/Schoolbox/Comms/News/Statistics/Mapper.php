@@ -47,10 +47,9 @@ class Mapper extends \Schoolbox\Mapper
         
     /**
      * @inheritdoc
-     * @throws \Schoolbox\Mapper\Exception
      * @throws \InvalidArgumentException
      */
-    protected function mapping()
+    protected function mapping(): void
     {
         $this->hasTable('comms_news_article_statistics');
         $this->hasModel(Model::class);

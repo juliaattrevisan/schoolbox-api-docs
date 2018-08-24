@@ -35,6 +35,11 @@ class Factory
 
 
     /**
+     * Default accuracy when the specified one doesn't exist
+     */
+    private const DEFAULT_ACCURACY = 'day';
+
+    /**
      * Enforce a default value
      *
      * @param $accuracy
@@ -42,7 +47,11 @@ class Factory
      */
     public static function assertAccuracy(?string $accuracy): string
     {
-        return array_key_exists($accuracy, self::ACCURACIES) ? $accuracy : 'day';
+        if ((null === $accuracy) || ('' === $accuracy)) {
+            return self::DEFAULT_ACCURACY;
+        }
+
+        return array_key_exists($accuracy, self::ACCURACIES) ? $accuracy : self::DEFAULT_ACCURACY;
     }
 
 
@@ -53,10 +62,14 @@ class Factory
     public function produce(?string $accuracy): IAccuracy
     {
         switch ($accuracy) {
-            case '10min': return new Minute10();
-            case '30min': return new Minute30();
-            case 'hour' : return new Hour();
-            case 'month': return new Month();
+            case '10min':
+                return new Minute10();
+            case '30min':
+                return new Minute30();
+            case 'hour':
+                return new Hour();
+            case 'month':
+                return new Month();
 
             /* Use a daily view by default if an unknown setting was given
              */

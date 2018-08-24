@@ -63,8 +63,7 @@ class Module extends BaseModule
     {
         try {
             $article = $this->getNewsMapper()->findById($params['articleId']);
-        }
-        catch (MapperException $e) {
+        } catch (MapperException $e) {
             throw new NotFound();
         }
 

@@ -35,6 +35,6 @@ class ValidOpenReferrer
             return true;
         }
 
-        return \in_array($referrer, self::VALID_REFERRER,true);
+        return \in_array($referrer, self::VALID_REFERRER, true);
     }
 }

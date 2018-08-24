@@ -72,7 +72,6 @@ class ImpressionsConversionsOpens
      * @param int         $userId
      * @param null|string $referrer
      * @return bool|int[]
-     * @throws \InvalidArgumentException
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
@@ -136,7 +135,6 @@ class ImpressionsConversionsOpens
      * @param int         $userId
      * @param null|string $referrer
      * @return bool|int[]
-     * @throws \InvalidArgumentException
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
@@ -196,10 +194,9 @@ class ImpressionsConversionsOpens
             $model->setType(Mapper::TYPE_CONVERSION);
         } else {
 
-            /* It's a valid referrer and $user hasn't Opened this period
-             * so add an Open record and increment the cumulative total
+            /* When referrer is empty, add an Open record and increment the cumulative total
              */
-            $this->statisticsCumulativeMapper->incrementOpen($article->getId(), $referrer);
+            $this->statisticsCumulativeMapper->incrementOpen($article->getId());
 
             $model->setType(Mapper::TYPE_OPEN);
         }
@@ -224,7 +221,11 @@ class ImpressionsConversionsOpens
 
         /* First open
          */
-        $firstOpen = $statistics->first()->getCreatedAt();;
+        $firstOpen = null;
+
+        if ($statistics->count()) {
+            $firstOpen = $statistics->first()->getCreatedAt();
+        }
 
         /* Aggregate from daily statistics
          */
@@ -396,7 +397,7 @@ class ImpressionsConversionsOpens
      * Fetch data set separately from its previous home in fetchInteractionReferrers()
      *
      * @param News\Model  $article
-     * @param null|string $accuracy
+     * @param string $accuracy
      * @return array
      * @throws \Alaress\Database\Exception
      */
@@ -411,7 +412,7 @@ class ImpressionsConversionsOpens
          */
         $statement = $this->database->prepareQuery("
             SELECT
-                {$strat->getSql($accuracy)}
+                {$strat->getSql()}
                 COUNT(*) AS num,
                 `type`
             FROM {$this->statisticsMapper->getTable()}
@@ -455,7 +456,7 @@ class ImpressionsConversionsOpens
             'articleId' => $article->getId()
         ]);
 
-        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)){
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $initialConditions[$row['type']] = $row['num'];
             $initialConditions['start'] = $row['start'];
         }
@@ -504,7 +505,7 @@ class ImpressionsConversionsOpens
 
         $statement = $this->database->prepareQuery("
             SELECT
-                {$strat->getSql($accuracy)}
+                {$strat->getSql()}
                 `type`,
                 COUNT(*) AS num
             FROM {$this->statisticsMapper->getTable()}
@@ -587,7 +588,7 @@ class ImpressionsConversionsOpens
             $breakdown[$type][$referrer] = (int)$row['num'];
         }
 
-        return array_map(function($values) {
+        return array_map(function ($values) {
             return array_values($values);
         }, $breakdown);
     }

@@ -31,6 +31,6 @@ class ValidImpressionReferrer
      */
     public function isSatisfiedBy(?string $referrer): bool
     {
-        return \in_array($referrer, self::VALID_REFERRER,true);
+        return \in_array($referrer, self::VALID_REFERRER, true);
     }
 }
