@@ -49,36 +49,6 @@ class Model implements ISoftDeletable
 
 
     /**
-     * The total number of Impressions for this model
-     *
-     * @return int
-     */
-    public function findTotalImpressions(): int
-    {
-        return $this->numImpressionsArchive +
-            $this->numImpressionsDashboard +
-            $this->numImpressionsEmail +
-            $this->numImpressionsHomepage +
-            $this->numImpressionsIndex;
-    }
-
-
-    /**
-     * The total number of Conversions for this model
-     *
-     * @return int
-     */
-    public function findTotalConversions(): int
-    {
-        return $this->numConversionsArchive +
-            $this->numConversionsDashboard +
-            $this->numConversionsEmail +
-            $this->numConversionsHomepage +
-            $this->numConversionsIndex;
-    }
-
-
-    /**
      * @return null|int
      */
     public function getArticleId(): ?int

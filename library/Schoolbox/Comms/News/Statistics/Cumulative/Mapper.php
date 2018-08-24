@@ -25,34 +25,6 @@ class Mapper extends \Schoolbox\Mapper
 {
 
     /**
-     * Map a referrer string to its corresponding incrementer column
-     * so I don't risk an sql injection
-     *
-     * @var array
-     */
-    private const IMPRESSION_COLUMN_MAP = [
-        StatisticsMapper::REFERRER_DASHBOARD => 'num_impressions_dashboard',
-        StatisticsMapper::REFERRER_HOMEPAGE => 'num_impressions_homepage',
-        StatisticsMapper::REFERRER_INDEX => 'num_impressions_index',
-        StatisticsMapper::REFERRER_ARCHIVE => 'num_impressions_archive',
-        StatisticsMapper::REFERRER_EMAIL => 'num_impressions_email',
-    ];
-
-    /**
-     * Map a referrer string to its corresponding incrementer column
-     * so I don't risk an sql injection
-     *
-     * @var array
-     */
-    private const CONVERSION_COLUMN_MAP = [
-        StatisticsMapper::REFERRER_DASHBOARD => 'num_conversions_dashboard',
-        StatisticsMapper::REFERRER_HOMEPAGE => 'num_conversions_homepage',
-        StatisticsMapper::REFERRER_INDEX => 'num_conversions_index',
-        StatisticsMapper::REFERRER_ARCHIVE => 'num_conversions_archive',
-        StatisticsMapper::REFERRER_EMAIL => 'num_conversions_email',
-    ];
-
-    /**
      * @inheritdoc
      * @throws \InvalidArgumentException
      */
