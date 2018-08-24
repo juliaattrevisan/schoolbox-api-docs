@@ -3,7 +3,7 @@ CREATE TABLE `comms_news_article_statistics` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
   `article_id` INT(11) NOT NULL,
   `user_id` int(11) UNSIGNED NOT NULL,
-  `type` ENUM('impression', 'conversion', 'open') NULL,
+  `type` ENUM('impression', 'conversion', 'open'),
   `referrer` ENUM('dashboard', 'homepage', 'index', 'archive', 'email') NULL,
   `occurs_at` DATETIME NOT NULL,
   `created_at` DATETIME NOT NULL,
@@ -31,18 +31,9 @@ CREATE TABLE `comms_news_article_statistics_cumulative` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
   `date` DATE NOT NULL,
   `article_id` INT(11) NOT NULL,
-  `first_open` DATETIME NULL,
-  `num_impressions_dashboard` INT DEFAULT 0,
-  `num_impressions_homepage` INT DEFAULT 0,
-  `num_impressions_index` INT DEFAULT 0,
-  `num_impressions_archive` INT DEFAULT 0,
-  `num_impressions_email` INT DEFAULT 0,
-  `num_conversions_dashboard` INT DEFAULT 0,
-  `num_conversions_homepage` INT DEFAULT 0,
-  `num_conversions_index` INT DEFAULT 0,
-  `num_conversions_archive` INT DEFAULT 0,
-  `num_conversions_email` INT DEFAULT 0,
-  `num_opens` INT DEFAULT 0,
+  `type` ENUM('impression', 'conversion', 'open'),
+  `referrer` ENUM('dashboard', 'homepage', 'index', 'archive', 'email') NULL,
+  `num` INT(11) DEFAULT 0 NOT NULL,
   `created_at` DATETIME NOT NULL,
   `updated_at` DATETIME NOT NULL,
   `deleted_at` DATETIME NULL,
@@ -52,7 +43,7 @@ CREATE TABLE `comms_news_article_statistics_cumulative` (
 -- We don't want people spamming this uncontrollably and skewing data
 -- We record cumulative totals per day, forever
 CREATE UNIQUE INDEX `idx_cnasc_date_article_id`
-ON `comms_news_article_statistics_cumulative` (`date`, `article_id`) COMMENT '' ALGORITHM DEFAULT LOCK DEFAULT;
+ON `comms_news_article_statistics_cumulative` (`date`, `article_id`, `type`, `referrer`) COMMENT '' ALGORITHM DEFAULT LOCK DEFAULT;
 
 ALTER TABLE `comms_news_article_statistics_cumulative`
 ADD CONSTRAINT `fk_comms_news_statistics_cumulative_article_id`

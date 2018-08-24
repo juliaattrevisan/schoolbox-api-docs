@@ -22,7 +22,6 @@ class Model implements ISoftDeletable
     use UpdatedAtDate;
     use DeletedAtDate;
 
-
     /**
      * @var \Alaress_Date_Format
      */
@@ -36,73 +35,17 @@ class Model implements ISoftDeletable
     /**
      * @var string
      */
-    private $firstOpen;
+    private $type;
 
+    /**
+     * @var string
+     */
+    private $referrer;
 
     /**
      * @var int
      */
-    private $numImpressionsDashboard;
-
-    
-    /**
-     * @var int
-     */
-    private $numImpressionsHomepage;
-
-    
-    /**
-     * @var int
-     */
-    private $numImpressionsIndex;
-
-    
-    /**
-     * @var int
-     */
-    private $numImpressionsArchive;
-
-    
-    /**
-     * @var int
-     */
-    private $numImpressionsEmail;
-
-
-    /**
-     * @var int
-     */
-    private $numConversionsDashboard;
-
-
-    /**
-     * @var int
-     */
-    private $numConversionsHomepage;
-
-
-    /**
-     * @var int
-     */
-    private $numConversionsIndex;
-
-
-    /**
-     * @var int
-     */
-    private $numConversionsArchive;
-
-
-    /**
-     * @var int
-     */
-    private $numConversionsEmail;
-
-
-    /**
-     * @var int
-     */
-    private $numOpens;
+    private $num;
 
 
     /**
@@ -178,239 +121,59 @@ class Model implements ISoftDeletable
     /**
      * @return null|string
      */
-    public function getFirstOpen(): ?string
+    public function getType(): ?string
     {
-        return $this->firstOpen;
+        return $this->type;
     }
 
 
     /**
-     * @param null|string $firstOpen
-     * @return Model
-     */
-    public function setFirstOpen(?string $firstOpen): self
-    {
-        $this->firstOpen = $firstOpen;
-        return $this;
-    }
-
-
-    /**
-     * @return null|int
-     */
-    public function getNumImpressionsDashboard(): ?int
-    {
-        return $this->numImpressionsDashboard ?: 0;
-    }
-
-
-    /**
-     * @param null|int $numImpressionsDashboard
-     * @return Model
-     */
-    public function setNumImpressionsDashboard(?int $numImpressionsDashboard): self
-    {
-        $this->numImpressionsDashboard = $numImpressionsDashboard;
-        return $this;
-    }
-
-
-    /**
-     * @return null|int
-     */
-    public function getNumImpressionsHomepage(): ?int
-    {
-        return $this->numImpressionsHomepage ?: 0;
-    }
-
-
-    /**
-     * @param null|int $numImpressionsHomepage
-     * @return Model
-     */
-    public function setNumImpressionsHomepage(?int $numImpressionsHomepage): self
-    {
-        $this->numImpressionsHomepage = $numImpressionsHomepage;
-        return $this;
-    }
-
-
-    /**
-     * @return null|int
-     */
-    public function getNumImpressionsIndex(): ?int
-    {
-        return $this->numImpressionsIndex ?: 0;
-    }
-
-
-    /**
-     * @param null|int $numImpressionsIndex
-     * @return Model
-     */
-    public function setNumImpressionsIndex(?int $numImpressionsIndex): self
-    {
-        $this->numImpressionsIndex = $numImpressionsIndex;
-        return $this;
-    }
-
-
-    /**
-     * @return null|int
-     */
-    public function getNumImpressionsArchive(): ?int
-    {
-        return $this->numImpressionsArchive ?: 0;
-    }
-
-
-    /**
-     * @param null|int $numImpressionsArchive
-     * @return Model
-     */
-    public function setNumImpressionsArchive(?int $numImpressionsArchive): self
-    {
-        $this->numImpressionsArchive = $numImpressionsArchive;
-        return $this;
-    }
-
-
-    /**
-     * @return null|int
-     */
-    public function getNumImpressionsEmail(): ?int
-    {
-        return $this->numImpressionsEmail ?: 0;
-    }
-
-
-    /**
-     * @param null|int $numImpressionsEmail
-     * @return Model
-     */
-    public function setNumImpressionsEmail(?int $numImpressionsEmail): self
-    {
-        $this->numImpressionsEmail = $numImpressionsEmail;
-        return $this;
-    }
-
-
-    /**
-     * @return null|int
-     */
-    public function getNumConversionsDashboard(): ?int
-    {
-        return $this->numConversionsDashboard ?: 0;
-    }
-
-
-    /**
-     * @param null|int $numConversionsDashboard
-     * @return Model
-     */
-    public function setNumConversionsDashboard(?int $numConversionsDashboard): self
-    {
-        $this->numConversionsDashboard = $numConversionsDashboard;
-        return $this;
-    }
-
-
-    /**
-     * @return null|int
-     */
-    public function getNumConversionsHomepage(): ?int
-    {
-        return $this->numConversionsHomepage ?: 0;
-    }
-
-
-    /**
-     * @param null|int $numConversionsHomepage
-     * @return Model
-     */
-    public function setNumConversionsHomepage(?int $numConversionsHomepage): self
-    {
-        $this->numConversionsHomepage = $numConversionsHomepage;
-        return $this;
-    }
-
-
-    /**
-     * @return null|int
-     */
-    public function getNumConversionsIndex(): ?int
-    {
-        return $this->numConversionsIndex ?: 0;
-    }
-
-
-    /**
-     * @param null|int $numConversionsIndex
-     * @return Model
-     */
-    public function setNumConversionsIndex(?int $numConversionsIndex): self
-    {
-        $this->numConversionsIndex = $numConversionsIndex;
-        return $this;
-    }
-
-
-    /**
-     * @return null|int
-     */
-    public function getNumConversionsArchive(): ?int
-    {
-        return $this->numConversionsArchive ?: 0;
-    }
-
-
-    /**
-     * @param null|int $numConversionsArchive
-     * @return Model
-     */
-    public function setNumConversionsArchive(?int $numConversionsArchive): self
-    {
-        $this->numConversionsArchive = $numConversionsArchive;
-        return $this;
-    }
-
-
-    /**
-     * @return null|int
-     */
-    public function getNumConversionsEmail(): ?int
-    {
-        return $this->numConversionsEmail ?: 0;
-    }
-
-
-    /**
-     * @param null|int $numConversionsEmail
+     * @param null|string $type
      * @return $this
      */
-    public function setNumConversionsEmail(?int $numConversionsEmail): self
+    public function setType(?string $type): self
     {
-        $this->numConversionsEmail = $numConversionsEmail;
+        $this->type = $type;
         return $this;
     }
 
 
     /**
-     * @return null|int
+     * @return null|string
      */
-    public function getNumOpens(): ?int
+    public function getReferrer(): ?string
     {
-        return $this->numOpens ?: 0;
+        return $this->referrer;
     }
 
 
     /**
-     * @param null|int $numOpens
-     * @return Model
+     * @param null|string $referrer
+     * @return $this
      */
-    public function setNumOpens(?int $numOpens): self
+    public function setReferrer(?string $referrer): self
     {
-        $this->numOpens = $numOpens;
+        $this->referrer = $referrer;
+        return $this;
+    }
+
+
+    /**
+     * @return int
+     */
+    public function getNum(): int
+    {
+        return $this->num;
+    }
+
+
+    /**
+     * @param int $num
+     * @return $this
+     */
+    public function setNum(int $num): self
+    {
+        $this->num = $num;
         return $this;
     }
 }

@@ -215,55 +215,55 @@ class ImpressionsConversionsOpens
      */
     public function fetchCumulative(News\Model $article): array
     {
-        $statistics = $this->statisticsCumulativeMapper->findByColumn('article_id', $article->getId(), [
-            'order' => [
-                'date' => 'asc'
-            ]
-        ]);
-
-        /* First open
-         */
-        $firstOpen = null;
-
-        /* Raw number of Conversions and Impressions
-         */
-        $numImpressions = 0;
-        $numConversions = 0;
-        $breakdown = [];
-
-        foreach ($statistics as $statistic) {
-
-            /* Remember first open
-             */
-            if (null === $firstOpen) {
-                $firstOpen = $statistic->getDate();
-            }
-
-            /* Aggregate from daily statistics
-             */
-            $daily = $this->summariseDailyStatistics($statistic);
-
-            $numConversions += $daily['numConversions'];
-            $numImpressions += $daily['numImpressions'];
-
-            foreach([Mapper::TYPE_CONVERSION, Mapper::TYPE_IMPRESSION] as $currentType) {
-                foreach (Mapper::REFERRERS as $currentReferrer) {
-                    $breakdown[$currentType][$currentReferrer] += $daily['breakdown']['grid'][$currentType][$currentReferrer];
-                }
-            }
-
-            /* Special case for direct opens
-             */
-            $breakdown[Mapper::TYPE_OPEN] += $statistic->getNumOpens();
-        }
-
-        /* Calculate overall conversion ratio
-         */
-        $conversionRatio = $this->calculateConversionRatio($numConversions, $numImpressions);
-
-        /* Calculate conversion ratios for each referrer type
-         */
-        $referrerRatio = $this->calculateReferrerRatios($breakdown);
+//        $statistics = $this->statisticsCumulativeMapper->findByColumn('article_id', $article->getId(), [
+//            'order' => [
+//                'date' => 'asc'
+//            ]
+//        ]);
+//
+//        /* First open
+//         */
+//        $firstOpen = null;
+//
+//        /* Raw number of Conversions and Impressions
+//         */
+//        $numImpressions = 0;
+//        $numConversions = 0;
+//        $breakdown = [];
+//
+//        foreach ($statistics as $statistic) {
+//
+//            /* Remember first open
+//             */
+//            if (null === $firstOpen) {
+//                $firstOpen = $statistic->getDate();
+//            }
+//
+//            /* Aggregate from daily statistics
+//             */
+//            $daily = $this->summariseDailyStatistics($statistic);
+//
+//            $numConversions += $daily['numConversions'];
+//            $numImpressions += $daily['numImpressions'];
+//
+//            foreach([Mapper::TYPE_CONVERSION, Mapper::TYPE_IMPRESSION] as $currentType) {
+//                foreach (Mapper::REFERRERS as $currentReferrer) {
+//                    $breakdown[$currentType][$currentReferrer] += $daily['breakdown']['grid'][$currentType][$currentReferrer];
+//                }
+//            }
+//
+//            /* Special case for direct opens
+//             */
+//            $breakdown[Mapper::TYPE_OPEN] += $statistic->getNumOpens();
+//        }
+//
+//        /* Calculate overall conversion ratio
+//         */
+//        $conversionRatio = $this->calculateConversionRatio($numConversions, $numImpressions);
+//
+//        /* Calculate conversion ratios for each referrer type
+//         */
+//        $referrerRatio = $this->calculateReferrerRatios($breakdown);
 
         return [
             'date' => $firstOpen,
@@ -287,22 +287,22 @@ class ImpressionsConversionsOpens
      */
     public function fetchHistoric(News\Model $article): array
     {
-        $pb = $this->statisticsCumulativeMapper->getPredicateBuilder()
-            ->equals('article_id', $article->getId())
-            ->lessThan('date', \Alaress_Date_Format::now()->getDatabaseDate());
-
-        $statistics = $this->statisticsCumulativeMapper->findByPredicates($pb, [
-            'order' => [
-                'date' => 'asc'
-            ]
-        ]);
-
+//        $pb = $this->statisticsCumulativeMapper->getPredicateBuilder()
+//            ->equals('article_id', $article->getId())
+//            ->lessThan('date', \Alaress_Date_Format::now()->getDatabaseDate());
+//
+//        $statistics = $this->statisticsCumulativeMapper->findByPredicates($pb, [
+//            'order' => [
+//                'date' => 'asc'
+//            ]
+//        ]);
+//
         $historic = [];
-
-        foreach ($statistics as $statistic) {
-            $historic[] = $this->summariseDailyStatistics($statistic);
-        }
-
+//
+//        foreach ($statistics as $statistic) {
+//            $historic[] = $this->summariseDailyStatistics($statistic);
+//        }
+//
         return $historic;
     }
 
@@ -313,31 +313,31 @@ class ImpressionsConversionsOpens
      */
     private function summariseDailyStatistics(Cumulative\Model $statistic): array
     {
-        $numConversions = $statistic->findTotalConversions();
-        $numImpressions = $statistic->findTotalImpressions();
-        $breakdown = [];
-
-        $breakdown[Mapper::TYPE_CONVERSION][Mapper::REFERRER_DASHBOARD] = $statistic->getNumConversionsDashboard();
-        $breakdown[Mapper::TYPE_CONVERSION][Mapper::REFERRER_HOMEPAGE] = $statistic->getNumConversionsHomepage();
-        $breakdown[Mapper::TYPE_CONVERSION][Mapper::REFERRER_INDEX] = $statistic->getNumConversionsIndex();
-        $breakdown[Mapper::TYPE_CONVERSION][Mapper::REFERRER_ARCHIVE] = $statistic->getNumConversionsArchive();
-        $breakdown[Mapper::TYPE_CONVERSION][Mapper::REFERRER_EMAIL] = $statistic->getNumConversionsEmail();
-
-        $breakdown[Mapper::TYPE_IMPRESSION][Mapper::REFERRER_DASHBOARD] = $statistic->getNumImpressionsDashboard();
-        $breakdown[Mapper::TYPE_IMPRESSION][Mapper::REFERRER_HOMEPAGE] = $statistic->getNumImpressionsHomepage();
-        $breakdown[Mapper::TYPE_IMPRESSION][Mapper::REFERRER_INDEX] = $statistic->getNumImpressionsIndex();
-        $breakdown[Mapper::TYPE_IMPRESSION][Mapper::REFERRER_ARCHIVE] = $statistic->getNumImpressionsArchive();
-        $breakdown[Mapper::TYPE_IMPRESSION][Mapper::REFERRER_EMAIL] = $statistic->getNumImpressionsEmail();
-
-        $breakdown[Mapper::TYPE_OPEN] = $statistic->getNumOpens();
-
-        /* Calculate overall conversion ratio
-         */
-        $conversionRatio = $this->calculateConversionRatio($numConversions, $numImpressions);
-
-        /* Calculate conversion ratios for each referrer type
-         */
-        $referrerRatio = $this->calculateReferrerRatios($breakdown);
+//        $numConversions = $statistic->findTotalConversions();
+//        $numImpressions = $statistic->findTotalImpressions();
+//        $breakdown = [];
+//
+//        $breakdown[Mapper::TYPE_CONVERSION][Mapper::REFERRER_DASHBOARD] = $statistic->getNumConversionsDashboard();
+//        $breakdown[Mapper::TYPE_CONVERSION][Mapper::REFERRER_HOMEPAGE] = $statistic->getNumConversionsHomepage();
+//        $breakdown[Mapper::TYPE_CONVERSION][Mapper::REFERRER_INDEX] = $statistic->getNumConversionsIndex();
+//        $breakdown[Mapper::TYPE_CONVERSION][Mapper::REFERRER_ARCHIVE] = $statistic->getNumConversionsArchive();
+//        $breakdown[Mapper::TYPE_CONVERSION][Mapper::REFERRER_EMAIL] = $statistic->getNumConversionsEmail();
+//
+//        $breakdown[Mapper::TYPE_IMPRESSION][Mapper::REFERRER_DASHBOARD] = $statistic->getNumImpressionsDashboard();
+//        $breakdown[Mapper::TYPE_IMPRESSION][Mapper::REFERRER_HOMEPAGE] = $statistic->getNumImpressionsHomepage();
+//        $breakdown[Mapper::TYPE_IMPRESSION][Mapper::REFERRER_INDEX] = $statistic->getNumImpressionsIndex();
+//        $breakdown[Mapper::TYPE_IMPRESSION][Mapper::REFERRER_ARCHIVE] = $statistic->getNumImpressionsArchive();
+//        $breakdown[Mapper::TYPE_IMPRESSION][Mapper::REFERRER_EMAIL] = $statistic->getNumImpressionsEmail();
+//
+//        $breakdown[Mapper::TYPE_OPEN] = $statistic->getNumOpens();
+//
+//        /* Calculate overall conversion ratio
+//         */
+//        $conversionRatio = $this->calculateConversionRatio($numConversions, $numImpressions);
+//
+//        /* Calculate conversion ratios for each referrer type
+//         */
+//        $referrerRatio = $this->calculateReferrerRatios($breakdown);
 
         return [
             'date' => $statistic->getDate(),
@@ -358,44 +358,44 @@ class ImpressionsConversionsOpens
      */
     public function fetchReferrerDemographic(News\Model $article): array
     {
-        $statistics = $this->statisticsCumulativeMapper->findByColumn('article_id', $article->getId(), [
-            'order' => [
-                'date' => 'asc'
-            ]
-        ]);
-
-        /* Raw number of Conversions and Impressions
-         */
-        $numImpressions = 0;
-        $numConversions = 0;
-
+//        $statistics = $this->statisticsCumulativeMapper->findByColumn('article_id', $article->getId(), [
+//            'order' => [
+//                'date' => 'asc'
+//            ]
+//        ]);
+//
+//        /* Raw number of Conversions and Impressions
+//         */
+//        $numImpressions = 0;
+//        $numConversions = 0;
+//
         $breakdown = [
             Mapper::TYPE_CONVERSION => array_fill_keys(Mapper::REFERRERS, 0),
             Mapper::TYPE_IMPRESSION => array_fill_keys(Mapper::REFERRERS, 0),
             Mapper::TYPE_OPEN => 0,
         ];
-
-        if ($statistics->count()) {
-            foreach ($statistics as $statistic) {
-
-                /* Aggregate from daily statistics
-                 */
-                $daily = $this->summariseDailyStatistics($statistic);
-
-                $numConversions += $daily['numConversions'];
-                $numImpressions += $daily['numImpressions'];
-
-                foreach ([ Mapper::TYPE_CONVERSION, Mapper::TYPE_IMPRESSION ] as $currentType) {
-                    foreach (Mapper::REFERRERS as $currentReferrer) {
-                        $breakdown[$currentType][$currentReferrer] += $daily['breakdown']['grid'][$currentType][$currentReferrer];
-                    }
-                }
-
-                /* Special case for direct opens
-                 */
-                $breakdown[Mapper::TYPE_OPEN] += $statistic->getNumOpens();
-            }
-        }
+//
+//        if ($statistics->count()) {
+//            foreach ($statistics as $statistic) {
+//
+//                /* Aggregate from daily statistics
+//                 */
+//                $daily = $this->summariseDailyStatistics($statistic);
+//
+//                $numConversions += $daily['numConversions'];
+//                $numImpressions += $daily['numImpressions'];
+//
+//                foreach ([ Mapper::TYPE_CONVERSION, Mapper::TYPE_IMPRESSION ] as $currentType) {
+//                    foreach (Mapper::REFERRERS as $currentReferrer) {
+//                        $breakdown[$currentType][$currentReferrer] += $daily['breakdown']['grid'][$currentType][$currentReferrer];
+//                    }
+//                }
+//
+//                /* Special case for direct opens
+//                 */
+//                $breakdown[Mapper::TYPE_OPEN] += $statistic->getNumOpens();
+//            }
+//        }
 
         return $breakdown;
     }
@@ -413,80 +413,80 @@ class ImpressionsConversionsOpens
      */
     public function fetchConversionRatio(News\Model $article, string $accuracy): array
     {
-        /* Determine a sane value
-         */
-        $strat = (new Factory())->produce($accuracy);
-
-        /* Get all the timestamps that have content - because of the way highcharts stacks its data
-         * I need to initialise the container with all the possibilities and stack categorised data in-order
-         */
-        $statement = $this->database->prepareQuery("
-            SELECT 
-                {$strat->getSql($accuracy)}
-                COUNT(*) AS num,
-                `type`
-            FROM {$this->statisticsMapper->getTable()}
-            WHERE article_id = :articleId
-            AND deleted_at IS NULL
-            GROUP BY timestamp, `type`
-            ORDER BY timestamp
-        ");
-
-        $statement->execute([
-            'articleId' => $article->getId()
-        ]);
-
-        $interactions = [];
-
-        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $interactions[(int)$row['timestamp']][$row['type']] += $row['num'];
-        }
-
-        /* Figure out the average conversion ratio over time
-         *
-         * First, find out if there were any data points prior to this period
-         * If there were, average all those and use that as a starting point
-         * Otherwise just start at zero (coalesced in sql)
-         */
-        $statement = $this->database->prepareQuery("
-            SELECT 
-                COALESCE(SUM(num_conversions_dashboard + num_conversions_homepage + num_conversions_index + num_conversions_archive + num_conversions_email), 0) AS conversion,
-                COALESCE(SUM(num_impressions_dashboard + num_impressions_homepage + num_impressions_index + num_impressions_archive + num_impressions_email), 0) AS impression,
-                1000*UNIX_TIMESTAMP(CONCAT(MAX(`date`), ' 00:00:00')) AS start
-            FROM {$this->statisticsCumulativeMapper->getTable()}
-            WHERE article_id = :articleId
-            AND `date` <= CURRENT_DATE - INTERVAL ".self::PERIOD_LENGTH." DAY
-            AND deleted_at IS NULL
-        ");
-
-        $statement->execute([
-            'articleId' => $article->getId()
-        ]);
-
-        $initialConditions = $statement->fetch(\PDO::FETCH_ASSOC);
-
-        $numerator = $initialConditions['conversion'];
-        $denominator = $initialConditions['impression'];
-
-        /* Aggregate by using science
-         * If initialConditions[start] doesn't exist, it's because there was no previous cumulative data
-         * from which to draw initial conditions so the series should just start at the first value of
-         * the current granular data set.
-         */
+//        /* Determine a sane value
+//         */
+//        $strat = (new Factory())->produce($accuracy);
+//
+//        /* Get all the timestamps that have content - because of the way highcharts stacks its data
+//         * I need to initialise the container with all the possibilities and stack categorised data in-order
+//         */
+//        $statement = $this->database->prepareQuery("
+//            SELECT
+//                {$strat->getSql($accuracy)}
+//                COUNT(*) AS num,
+//                `type`
+//            FROM {$this->statisticsMapper->getTable()}
+//            WHERE article_id = :articleId
+//            AND deleted_at IS NULL
+//            GROUP BY timestamp, `type`
+//            ORDER BY timestamp
+//        ");
+//
+//        $statement->execute([
+//            'articleId' => $article->getId()
+//        ]);
+//
+//        $interactions = [];
+//
+//        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+//            $interactions[(int)$row['timestamp']][$row['type']] += $row['num'];
+//        }
+//
+//        /* Figure out the average conversion ratio over time
+//         *
+//         * First, find out if there were any data points prior to this period
+//         * If there were, average all those and use that as a starting point
+//         * Otherwise just start at zero (coalesced in sql)
+//         */
+//        $statement = $this->database->prepareQuery("
+//            SELECT
+//                COALESCE(SUM(num_conversions_dashboard + num_conversions_homepage + num_conversions_index + num_conversions_archive + num_conversions_email), 0) AS conversion,
+//                COALESCE(SUM(num_impressions_dashboard + num_impressions_homepage + num_impressions_index + num_impressions_archive + num_impressions_email), 0) AS impression,
+//                1000*UNIX_TIMESTAMP(CONCAT(MAX(`date`), ' 00:00:00')) AS start
+//            FROM {$this->statisticsCumulativeMapper->getTable()}
+//            WHERE article_id = :articleId
+//            AND `date` <= CURRENT_DATE - INTERVAL ".self::PERIOD_LENGTH." DAY
+//            AND deleted_at IS NULL
+//        ");
+//
+//        $statement->execute([
+//            'articleId' => $article->getId()
+//        ]);
+//
+//        $initialConditions = $statement->fetch(\PDO::FETCH_ASSOC);
+//
+//        $numerator = $initialConditions['conversion'];
+//        $denominator = $initialConditions['impression'];
+//
+//        /* Aggregate by using science
+//         * If initialConditions[start] doesn't exist, it's because there was no previous cumulative data
+//         * from which to draw initial conditions so the series should just start at the first value of
+//         * the current granular data set.
+//         */
         $data = [];
-
-        if ($initialConditions['start']) {
-            $data = [
-                [ (int)$initialConditions['start'], $this->percentage($numerator, $denominator) ]
-            ];
-        }
-
-        foreach ($interactions as $timestamp => $current) {
-            $numerator += $current['conversion'];
-            $denominator += $current['impression'];
-
-            $data[] = [$timestamp, $this->percentage($numerator, $denominator)];
-        }
+//
+//        if ($initialConditions['start']) {
+//            $data = [
+//                [ (int)$initialConditions['start'], $this->percentage($numerator, $denominator) ]
+//            ];
+//        }
+//
+//        foreach ($interactions as $timestamp => $current) {
+//            $numerator += $current['conversion'];
+//            $denominator += $current['impression'];
+//
+//            $data[] = [$timestamp, $this->percentage($numerator, $denominator)];
+//        }
 
         return $data;
     }
@@ -503,45 +503,45 @@ class ImpressionsConversionsOpens
     public function fetchConversions(News\Model $article, ?string $accuracy): array
     {
 
-        /* Determine a sane value
-         */
-        $strat = (new Factory())->produce($accuracy);
-
-        $statement = $this->database->prepareQuery("
-            SELECT 
-                {$strat->getSql($accuracy)}
-                `type`,
-                COUNT(*) AS num
-            FROM {$this->statisticsMapper->getTable()}
-            WHERE article_id = :articleId
-            AND deleted_at IS NULL
-            GROUP BY timestamp, `type`
-            ORDER BY timestamp
-        ");
-
-        $statement->execute([
-            'articleId' => $article->getId()
-        ]);
-
-        /* Generate placeholder timestamps, superimpose actual data on top of placeholders
-         */
-        $range = $strat->generateDateRange(\Alaress_Date_Format::now()->addDays(-1*self::PERIOD_LENGTH), \Alaress_Date_Format::now());
-
+//        /* Determine a sane value
+//         */
+//        $strat = (new Factory())->produce($accuracy);
+//
+//        $statement = $this->database->prepareQuery("
+//            SELECT
+//                {$strat->getSql($accuracy)}
+//                `type`,
+//                COUNT(*) AS num
+//            FROM {$this->statisticsMapper->getTable()}
+//            WHERE article_id = :articleId
+//            AND deleted_at IS NULL
+//            GROUP BY timestamp, `type`
+//            ORDER BY timestamp
+//        ");
+//
+//        $statement->execute([
+//            'articleId' => $article->getId()
+//        ]);
+//
+//        /* Generate placeholder timestamps, superimpose actual data on top of placeholders
+//         */
+//        $range = $strat->generateDateRange(\Alaress_Date_Format::now()->addDays(-1*self::PERIOD_LENGTH), \Alaress_Date_Format::now());
+//
         $data = [
             Mapper::TYPE_CONVERSION => $range,
             Mapper::TYPE_IMPRESSION => $range,
             Mapper::TYPE_OPEN => $range
         ];
-
-        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $data[$row['type']][$row['datetime']] = [ (int)$row['timestamp'], (int)$row['num'], $row['datetime']];
-        }
-
-        /* Format it for highcharts to understand
-         */
-        foreach ([Mapper::TYPE_CONVERSION, Mapper::TYPE_IMPRESSION, Mapper::TYPE_OPEN] as $type) {
-            $data[$type] = array_values($data[$type]);
-        }
+//
+//        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+//            $data[$row['type']][$row['datetime']] = [ (int)$row['timestamp'], (int)$row['num'], $row['datetime']];
+//        }
+//
+//        /* Format it for highcharts to understand
+//         */
+//        foreach ([Mapper::TYPE_CONVERSION, Mapper::TYPE_IMPRESSION, Mapper::TYPE_OPEN] as $type) {
+//            $data[$type] = array_values($data[$type]);
+//        }
 
         return $data;
     }
@@ -556,42 +556,42 @@ class ImpressionsConversionsOpens
      */
     public function fetchInteractionReferrers(News\Model $article): array
     {
-        $statement = $this->database->prepareQuery("
-            SELECT 
-                COUNT(*) AS num,
-                `type`, 
-                `referrer`
-            FROM {$this->statisticsMapper->getTable()}
-            WHERE article_id = :articleId
-            AND deleted_at IS NULL
-            GROUP BY `type`, referrer
-        ");
-
-        $statement->execute([
-            'articleId' => $article->getId()
-        ]);
-
+//        $statement = $this->database->prepareQuery("
+//            SELECT
+//                COUNT(*) AS num,
+//                `type`,
+//                `referrer`
+//            FROM {$this->statisticsMapper->getTable()}
+//            WHERE article_id = :articleId
+//            AND deleted_at IS NULL
+//            GROUP BY `type`, referrer
+//        ");
+//
+//        $statement->execute([
+//            'articleId' => $article->getId()
+//        ]);
+//
         $breakdown = [
             Mapper::TYPE_CONVERSION => array_fill_keys(Mapper::REFERRERS, 0),
             Mapper::TYPE_IMPRESSION => array_fill_keys(Mapper::REFERRERS, 0),
             Mapper::TYPE_OPEN => array_fill_keys(Mapper::REFERRERS, 0),
         ];
-
-        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $type = $row['type'];
-            $referrer = $row['referrer'];
-
-            /* If referrers are of an unknown type, just throw them into an arbitrary "unknown" category
-             */
-            if ($referrer === null) {
-                $referrer = Mapper::REFERRER_EMPTY;
-            }
-
-            /* Stack it
-             */
-            $breakdown[$type][$referrer] = (int)$row['num'];
-        }
-
+//
+//        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+//            $type = $row['type'];
+//            $referrer = $row['referrer'];
+//
+//            /* If referrers are of an unknown type, just throw them into an arbitrary "unknown" category
+//             */
+//            if ($referrer === null) {
+//                $referrer = Mapper::REFERRER_EMPTY;
+//            }
+//
+//            /* Stack it
+//             */
+//            $breakdown[$type][$referrer] = (int)$row['num'];
+//        }
+//
         return array_map(function($values) {
             return array_values($values);
         }, $breakdown);
