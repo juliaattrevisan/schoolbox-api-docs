@@ -335,7 +335,13 @@ class ImpressionsConversionsOpens
 
         /** @var Cumulative\Model $statistic */
         foreach ($statistics as $statistic) {
-            $breakdown[$statistic->getType()][$statistic->getReferrer()] = $statistic->getNum();
+            $referrer = $statistic->getReferrer();
+
+            if (null === $statistic->getReferrer()) {
+                $referrer = Mapper::REFERRER_EMPTY;
+            }
+
+            $breakdown[$statistic->getType()][$referrer] = $statistic->getNum();
 
             if ($statistic->getType() === Mapper::TYPE_IMPRESSION) {
                 $numImpressions += $statistic->getNum();
