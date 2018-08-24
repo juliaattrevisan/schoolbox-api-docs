@@ -261,6 +261,77 @@ class Grid extends TestCase
     {
         // rowset has three groups
         // try grids with: none, one, all
+
+
+        $rowSet     = new Rowset\RowSet(new Folder());
+        $group1     = (new RowSet\Group())->setId(1)->setName('Group 1');
+        $group2     = (new RowSet\Group())->setId(2)->setName('Group 2');
+        $group3     = (new RowSet\Group())->setId(3)->setName('Group 3');
+        $criterion1 = (new RowSet\Criterion())->setId(1)->setName('Criterion 1.1');
+        $criterion2 = (new RowSet\Criterion())->setId(2)->setName('Criterion 1.2');
+        $criterion3 = (new RowSet\Criterion())->setId(3)->setName('Criterion 1.3');
+        $criterion4 = (new RowSet\Criterion())->setId(4)->setName('Criterion 2.1');
+        $criterion5 = (new RowSet\Criterion())->setId(5)->setName('Criterion 2.1');
+        $criterion6 = (new RowSet\Criterion())->setId(6)->setName('Criterion 2.2');
+        $criterion7 = (new RowSet\Criterion())->setId(7)->setName('Criterion 3.3');
+        $criterion8 = (new RowSet\Criterion())->setId(8)->setName('Criterion 3.2');
+        $criterion9 = (new RowSet\Criterion())->setId(9)->setName('Criterion 3.3');
+
+        $group1->getCriteria()[$criterion1->getId()] = $criterion1;
+        $group1->getCriteria()[$criterion2->getId()] = $criterion2;
+        $group1->getCriteria()[$criterion3->getId()] = $criterion3;
+
+        $group2->getCriteria()[$criterion4->getId()] = $criterion4;
+        $group2->getCriteria()[$criterion5->getId()] = $criterion5;
+        $group2->getCriteria()[$criterion6->getId()] = $criterion6;
+
+        $group3->getCriteria()[$criterion7->getId()] = $criterion7;
+        $group3->getCriteria()[$criterion8->getId()] = $criterion8;
+        $group3->getCriteria()[$criterion9->getId()] = $criterion9;
+
+        $rowSet->getGroups()[$group1->getId()] = $group1;
+        $rowSet->getGroups()[$group2->getId()] = $group2;
+        $rowSet->getGroups()[$group3->getId()] = $group3;
+
+
+        $groupUsage1 = new RubricGrid\GroupUsage($group1);
+        $groupUsage2 = new RubricGrid\GroupUsage($group2);
+        $groupUsage3 = new RubricGrid\GroupUsage($group3);
+
+        $dueWork = new DueWork();
+        $grid1   = new RubricGrid\Grid($dueWork, $rowSet);
+
+        yield 'No groups used' => [$grid1, [$group1, $group2, $group3]];
+
+
+        $grid2 = new RubricGrid\Grid($dueWork, $rowSet);
+        $grid2->getGroupUsages()[$group2->getId()] = $groupUsage2;
+
+        yield 'Group 2 used' => [$grid2, [$group2, $group1, $group3]];
+
+
+        $grid3 = new RubricGrid\Grid($dueWork, $rowSet);
+        $grid3->getGroupUsages()[$group3->getId()] = $groupUsage3;
+        $grid3->getGroupUsages()[$group2->getId()] = $groupUsage2;
+
+
+        yield 'Group 3, 2 used' => [$grid3, [$group3, $group2, $group1]];
+
+
+        $grid4 = new RubricGrid\Grid($dueWork, $rowSet);
+        $grid4->getGroupUsages()[$group1->getId()] = $groupUsage1;
+        $grid4->getGroupUsages()[$group3->getId()] = $groupUsage3;
+        $grid4->getGroupUsages()[$group2->getId()] = $groupUsage2;
+
+        yield 'Group 1, 3, 2 used' => [$grid4, [$group1, $group3, $group2]];
+
+
+        $grid5 = new RubricGrid\Grid($dueWork, $rowSet);
+        $grid5->getGroupUsages()[$group3->getId()] = $groupUsage3;
+        $grid5->getGroupUsages()[$group2->getId()] = $groupUsage2;
+        $grid5->getGroupUsages()[$group1->getId()] = $groupUsage1;
+
+        yield 'Group 3, 2, 1 used' => [$grid5, [$group3, $group2, $group1]];
     }
 
 
@@ -269,10 +340,14 @@ class Grid extends TestCase
      * @covers \Schoolbox\Assessment\Rubric\Grid\Grid::iterateGroups
      *
      * @param RubricGrid\Grid $grid
-     * @param iterable        $expected
+     * @param array           $expected
      */
-    public function testIterateGroups(RubricGrid\Grid $grid, iterable $expected): void
+    public function testIterateGroups(RubricGrid\Grid $grid, array $expected): void
     {
-        //
+        $actual = [];
+        foreach ($grid->iterateGroups() as $group) {
+            $actual[] = $group;
+        }
+        $this->assertSame($expected, $actual);
     }
 }
