@@ -425,12 +425,13 @@ class RubricMapper
 
 
         // Add group/criterion usages
-        foreach ($grid->getRowSet()->getGroups() as $group) {
-            $groupId         = $group->getId();
-            $groupUsageModel = $groupUsageModels[$groupId];
-
-            // Is this group ACTUALLY in use on this grid?
-            if (null === $groupUsageModel) {
+        // Respect prescribed ordering in usage objects
+        foreach ($groupUsageModels as $groupUsageModel) {
+            /** @var GroupUsage $groupUsageModel */
+            $groupModel = $groupUsageModel->getGroup();
+            $groupId    = $groupModel->getId();
+            $group      = $grid->getRowSet()->retrieveGroup($groupId);
+            if (!$group) {
                 continue;
             }
 
