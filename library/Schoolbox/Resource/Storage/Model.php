@@ -57,6 +57,8 @@ class Model extends File implements IStorage, \Alaress\Json\Serializable
     {
         return [
             'hash',
+            'size',
+            'mime'
         ];
     }
 
