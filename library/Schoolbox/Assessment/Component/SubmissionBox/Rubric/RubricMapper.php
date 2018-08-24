@@ -392,6 +392,12 @@ class RubricMapper
             'level_id'     => $levelModels->keys(),
         ]);
 
+        $groupedCriterionUsageModels = $criterionUsageModels->groupByCallback(
+            function (CriterionUsage $cu) {
+                return $cu->getCriterion()->getGroup()->getId();
+            }
+        );
+
 
         // Create descriptor models
         $descriptorsByLevel     = [];
@@ -438,12 +444,13 @@ class RubricMapper
             $groupUsage = (new \Schoolbox\Assessment\Rubric\Grid\GroupUsage($group))
                 ->setMaxValue($groupUsageModel->getMaxValue());
 
-            foreach ($group->getCriteria() as $criterion) {
-                $criterionId         = $criterion->getId();
-                $criterionUsageModel = $criterionUsageModels[$criterionId];
-
-                // Is this criterion ACTUALLY in use on this grid?
-                if (null === $criterionUsageModel) {
+            $groupCriterionUsageModels = $groupedCriterionUsageModels[$groupId] ?? null;
+            foreach ($groupCriterionUsageModels as $criterionUsageModel) {
+                /** @var CriterionUsage $criterionUsageModel */
+                $criterionModel = $criterionUsageModel->getCriterion();
+                $criterionId    = $criterionModel->getId();
+                $criterion      = $grid->getRowSet()->retrieveCriterion($criterionId);
+                if (!$criterion) {
                     continue;
                 }
 
