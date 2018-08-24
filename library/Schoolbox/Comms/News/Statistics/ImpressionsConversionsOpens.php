@@ -496,42 +496,42 @@ class ImpressionsConversionsOpens
      */
     public function fetchInteractionReferrers(News\Model $article): array
     {
-//        $statement = $this->database->prepareQuery("
-//            SELECT
-//                COUNT(*) AS num,
-//                `type`,
-//                `referrer`
-//            FROM {$this->statisticsMapper->getTable()}
-//            WHERE article_id = :articleId
-//            AND deleted_at IS NULL
-//            GROUP BY `type`, referrer
-//        ");
-//
-//        $statement->execute([
-//            'articleId' => $article->getId()
-//        ]);
-//
+        $statement = $this->database->prepareQuery("
+            SELECT
+                COUNT(*) AS num,
+                `type`,
+                `referrer`
+            FROM {$this->statisticsMapper->getTable()}
+            WHERE article_id = :articleId
+            AND deleted_at IS NULL
+            GROUP BY `type`, referrer
+        ");
+
+        $statement->execute([
+            'articleId' => $article->getId()
+        ]);
+
         $breakdown = [
             Mapper::TYPE_CONVERSION => array_fill_keys(Mapper::REFERRERS, 0),
             Mapper::TYPE_IMPRESSION => array_fill_keys(Mapper::REFERRERS, 0),
             Mapper::TYPE_OPEN => array_fill_keys(Mapper::REFERRERS, 0),
         ];
-//
-//        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-//            $type = $row['type'];
-//            $referrer = $row['referrer'];
-//
-//            /* If referrers are of an unknown type, just throw them into an arbitrary "unknown" category
-//             */
-//            if ($referrer === null) {
-//                $referrer = Mapper::REFERRER_EMPTY;
-//            }
-//
-//            /* Stack it
-//             */
-//            $breakdown[$type][$referrer] = (int)$row['num'];
-//        }
-//
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $type = $row['type'];
+            $referrer = $row['referrer'];
+
+            /* If referrers are of an unknown type, just throw them into an arbitrary "unknown" category
+             */
+            if ($referrer === null) {
+                $referrer = Mapper::REFERRER_EMPTY;
+            }
+
+            /* Stack it
+             */
+            $breakdown[$type][$referrer] = (int)$row['num'];
+        }
+
         return array_map(function($values) {
             return array_values($values);
         }, $breakdown);
