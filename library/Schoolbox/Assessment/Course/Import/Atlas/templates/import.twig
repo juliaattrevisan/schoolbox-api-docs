@@ -207,7 +207,10 @@
 
                     // Click each unique one
                     $.unique($collapsers).each(function () {
-                        $(this).click();
+                        // Don't simulate click if collapser is already expanded
+                        if ($(this).closest("li").prev("[data-collapsable]").attr("data-collapse-state") === "collapsed") {
+                            $(this).click();
+                        }
                     })
                 }
             },
