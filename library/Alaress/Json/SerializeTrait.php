@@ -20,12 +20,6 @@ trait SerializeTrait
 {
 
     /**
-     * @return array
-     */
-    abstract protected function getDefaultJsonMap(): array;
-
-
-    /**
      * @param IDecorator[] $decorators
      * @return array
      */
