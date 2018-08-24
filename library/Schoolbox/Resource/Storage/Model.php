@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Resource\Storage;
 
+use Alaress\Json\Linkable;
 use Alaress\Json\SerializeTrait;
 use Alaress_Date_Format;
 use League\Flysystem\File;
@@ -23,7 +24,7 @@ use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
  *
  * @package Schoolbox\Resource\Storage
  */
-class Model extends File implements IStorage, \Alaress\Json\Serializable
+class Model extends File implements IStorage, \Alaress\Json\Serializable, Linkable
 {
     use CreatedAtDate;
     use SerializeTrait;
@@ -289,6 +290,18 @@ class Model extends File implements IStorage, \Alaress\Json\Serializable
             'hash',
             'size',
             'mime'
+        ];
+    }
+
+
+    /**
+     * @return array
+     */
+    public function getJsonApiLinks(): array
+    {
+        return [
+            'fetch' => [ "/storage/fetch.php?hash={$this->getHash()}" ] ,
+            'image' => [ "/storage/image.php?hash={$this->getHash()}" ] ,
         ];
     }
 

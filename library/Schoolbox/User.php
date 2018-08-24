@@ -10,6 +10,7 @@
 
 namespace Schoolbox;
 
+use Alaress\Json\Linkable;
 use Alaress\Json\SerializeTrait;
 use House;
 use HouseResidential;
@@ -23,7 +24,7 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use DomainException;
 
-class User implements \Alaress\Json\Serializable, ISoftDeletable
+class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
 {
     use CreatedAtDate;
     use UpdatedAtDate;
@@ -1366,6 +1367,17 @@ class User implements \Alaress\Json\Serializable, ISoftDeletable
             'title',
             'firstname',
             'lastname'
+        ];
+    }
+
+
+    /**
+     * @return array
+     */
+    public function getJsonApiLinks(): array
+    {
+        return [
+            'profile' => [ "/search/user/{$this->getId()}" ]
         ];
     }
 
