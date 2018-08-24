@@ -69,8 +69,10 @@ class Controller extends Component_Homepage_ControllerAbstract
 
         /* Figure out the first topic to select by default
          * This initiates an async to load actual articles
+         *
+         * Doctor's note: for now, hp component doesn't provide a config for this, so ALL in all cases
          */
-        $this->slug = (bool)$this->getConfig('default') ? News\Mapper::TOPIC_ALL_SLUG : $this->topics->first()->getSlug();
+        $this->slug = News\Mapper::TOPIC_ALL_SLUG;
 
         /* Only render component if there's potentially content somewhere
          * If there's any non-deleted articles for any of the topics
