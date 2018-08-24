@@ -329,46 +329,15 @@ class ImpressionsConversionsOpens
      */
     public function fetchReferrerDemographic(News\Model $article): array
     {
-//        $statistics = $this->statisticsCumulativeMapper->findByColumn('article_id', $article->getId(), [
-//            'order' => [
-//                'date' => 'asc'
-//            ]
-//        ]);
-//
-//        /* Raw number of Conversions and Impressions
-//         */
-//        $numImpressions = 0;
-//        $numConversions = 0;
-//
-        $breakdown = [
-            Mapper::TYPE_CONVERSION => array_fill_keys(Mapper::REFERRERS, 0),
-            Mapper::TYPE_IMPRESSION => array_fill_keys(Mapper::REFERRERS, 0),
-            Mapper::TYPE_OPEN => 0,
-        ];
-//
-//        if ($statistics->count()) {
-//            foreach ($statistics as $statistic) {
-//
-//                /* Aggregate from daily statistics
-//                 */
-//                $daily = $this->summariseDailyStatistics($statistic);
-//
-//                $numConversions += $daily['numConversions'];
-//                $numImpressions += $daily['numImpressions'];
-//
-//                foreach ([ Mapper::TYPE_CONVERSION, Mapper::TYPE_IMPRESSION ] as $currentType) {
-//                    foreach (Mapper::REFERRERS as $currentReferrer) {
-//                        $breakdown[$currentType][$currentReferrer] += $daily['breakdown']['grid'][$currentType][$currentReferrer];
-//                    }
-//                }
-//
-//                /* Special case for direct opens
-//                 */
-//                $breakdown[Mapper::TYPE_OPEN] += $statistic->getNumOpens();
-//            }
-//        }
+        $statistics = $this->statisticsCumulativeMapper->findByColumn('article_id', $article->getId(), [
+            'order' => [
+                'date' => 'asc'
+            ]
+        ]);
 
-        return $breakdown;
+        $summary = $this->summariseDailyStatistics($statistics);
+
+        return $summary['breakdown']['grid'];
     }
 
 
