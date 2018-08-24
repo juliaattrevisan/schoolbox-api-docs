@@ -16,39 +16,26 @@ if (Cfg::get('mail_enable') == 1) {
 
     // Parse out list of emails passed
     // The name needs to be included in both the ID and value
-    $replyToList = [];
-    $ccList = [];
-    $bccList = [];
     $invalidEmails = [];
+    $addressLists = [
+        'replyto' => [],
+        'cc' => [],
+        'bcc' => []
+    ];
 
-    if ($_REQUEST['replyto']) {
-        $replyTo = Mailer::parseAddressString($_REQUEST['replyto'], false);
-
-        foreach ($replyTo['valid'] as $email => $name) {
-            $replyToList[] = Mailer::buildAddress($email, $name);
+    foreach ($addressLists as $type => $request) {
+        if (null !== $_REQUEST[$type]) {
+            $emailAddresses = Mailer::parseAddressString($_REQUEST[$type], false);
+            foreach ($emailAddresses['valid'] as $email => $name) {
+                $addressLists[$type][] = Mailer::buildAddress($email, $name);
+            }
+        } elseif (null === $_REQUEST[$type] && $type === 'bcc') {
+            $addressLists[$type][] = Mailer::buildAddress(
+                $_SESSION['user']->getEmail(),
+                $_SESSION['user']->getFullName()
+            );
         }
-
-        $invalidEmails[] = $replyTo['invalid'];
-    }
-
-    if ($_REQUEST['cc']) {
-        $cc = Mailer::parseAddressString($_REQUEST['cc'], false);
-        foreach ($cc['valid'] as $email => $name) {
-            $ccList[] = Mailer::buildAddress($email, $name);
-        }
-
-        $invalidEmails[] = $cc['invalid'];
-    }
-
-    if($_REQUEST['bcc']) {
-        $bcc = Mailer::parseAddressString($_REQUEST['bcc'], false);
-        foreach ($bcc['valid'] as $email => $name) {
-            $bccList[] = Mailer::buildAddress($email, $name);
-        }
-
-        $invalidEmails[] = $bcc['invalid'];
-    } else {
-        $bccList[] = Mailer::buildAddress($_SESSION['user']->getEmail(), $_SESSION['user']->getFullName());
+        $invalidEmails[] = $emailAddresses['invalid'];
     }
 
     $page->setFile(TEMPLATE_content, 'mail/send.html');
@@ -67,8 +54,10 @@ if (Cfg::get('mail_enable') == 1) {
                 $email = $emailFromString;
             }
             $username = explode('@', $email);
-            $page->setVar('INVALID_NAME', $username[0]);
-            $page->setVar('INVALID_EMAIL', $email);
+            $page->setVar([
+                'INVALID_NAME' => $username[0],
+                'INVALID_EMAIL' => $email
+            ]);
             $page->parse('invalid_address_block', 'invalid_address', true);
         }
         $page->parse('alert_box_block', 'alert_box', false);
@@ -79,9 +68,9 @@ if (Cfg::get('mail_enable') == 1) {
     $output = array(
         'SUBJECT' => $_REQUEST['subject'] ? Scrub::text($_REQUEST['subject']) : '',
         'BODY'    => '',
-        'REPLYTO' => json_encode($replyToList),
-        'CC'      => json_encode($ccList),
-        'BCC'     => json_encode($bccList),
+        'REPLYTO' => json_encode($addressLists['replyto']),
+        'CC'      => json_encode($addressLists['cc']),
+        'BCC'     => json_encode($addressLists['bcc']),
     );
 
     $zone = new \Schoolbox\Resource\Attachment\Zone('email-attachments');
