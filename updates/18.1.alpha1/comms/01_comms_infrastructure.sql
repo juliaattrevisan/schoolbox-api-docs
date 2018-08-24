@@ -88,3 +88,6 @@ VALUES (222, 'You cannot delete this article.');
 
 INSERT INTO `error` (id, message)
 VALUES (223, 'This article is missing required details that you need to add, but we saved it anyway.');
+
+INSERT INTO `error` (id, message)
+VALUES (224, 'This topic could not be found.');

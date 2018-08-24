@@ -100,7 +100,8 @@ class Controller extends Component_Homepage_ControllerAbstract
             'slug' => $this->slug,
             'compactMode' => $this->getConfig('compactMode'),
             'limit' => (int)$this->getConfig('size'),
-            'folderId' => $this->getSource()->getId()
+            'folderId' => $this->getSource()->getId(),
+            'key' => $this->getUser()->getKey()
         ]);
     }
 }

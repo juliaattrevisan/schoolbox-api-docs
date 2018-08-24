@@ -297,6 +297,21 @@ abstract class Base {
 
 
     /**
+     * Factory method for loading an xml output object
+     *
+     * @param $template
+     * @param $data
+     * @return mixed
+     * @throws ServiceNotFound
+     */
+    protected function buildXmlOutput($template, $data)
+    {
+        /** @var Output\Xml $output */
+        $output = $this->getDi()->get('webOutput:xml');
+        return $output->setTemplate($template)->setData($data);
+    }
+
+    /**
      * Factory method for loading a chromed HTML output object.
      *
      * @param  string $template A Twig template

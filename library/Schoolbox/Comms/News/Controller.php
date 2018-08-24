@@ -598,6 +598,7 @@ class Controller extends Base
                 'title' => $this->getDi()->get('l10n')->translate('news', false, true),
                 'url' => $partialData['currentUrl'],
                 'fragment' => $content,
+                'slug' => $params->getSlug(),
                 'viewAllLink' => $partialData['articles']->count() ? $viewAllLink : null
             ]));
         }
@@ -689,7 +690,11 @@ class Controller extends Base
             'initialContent' => $content,
             'topics' => $topics,
             'topicAll' => Mapper::TOPIC_ALL_SLUG,
-            'slug' => $params->getSlug()
+            'slug' => $params->getSlug(),
+
+            /* For configuring the rss button which changes per topic chosen
+             */
+            'key' => $this->getUser()->getKey(),
         ];
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/index.twig', $data));

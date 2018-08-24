@@ -1,0 +1,22 @@
+<?php
+/**
+ * Output handlnig class that renders xml
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2018, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ */
+
+namespace Alaress\Web\Output;
+
+class Xml extends Html
+{
+
+    /**
+     * Set the content-type
+     */
+    public function preprocessOutput()
+    {
+        $this->getResponse()->headers->set('Content-Type', 'application/rss+xml; charset=UTF-8');
+    }
+}
