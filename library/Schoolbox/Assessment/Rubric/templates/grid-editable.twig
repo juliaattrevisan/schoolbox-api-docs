@@ -22,7 +22,8 @@
         </tr>
         </thead>
         <tbody>
-        {% for group in rubricGrid.rowSet.groups -%}
+        {% for groupUsage in rubricGrid.groupUsages -%}
+            {% set group = groupUsage.group %}
             {%- include '@rubric/group-editable.twig' with { rowspan: rowspan ?: group.criteria|length + 2 } -%}
         {%- endfor %}
         <tr class="rb-group-header rb-new-group">
