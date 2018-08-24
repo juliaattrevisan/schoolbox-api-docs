@@ -470,8 +470,7 @@ class Controller extends Base
         if ((new IsJson())->isSatisfiedBy($this->getRequest())) {
             $data = [
                 'article' => $article->jsonSerialize(
-                    new PropertyDecorator(),
-                    new LinkDecorator($this->router, $this->authorizer)
+                    new PropertyDecorator(null, new LinkDecorator($this->router, $this->authorizer))
                 ),
                 'isSavedForLater' => $isSavedForLater,
             ];
