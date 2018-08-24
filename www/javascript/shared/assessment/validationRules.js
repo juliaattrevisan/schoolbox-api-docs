@@ -13,6 +13,9 @@ $.validator.addMethod('descriptorsAreMonotonic', function(value, indicatorCheckb
     var allDescriptorsWithValues = descriptorList.filter(hasDescValue).map(function (descriptor) {return $(descriptor).val();});
     console.log(allDescriptorsWithValues);
 
+    // TODO this will need to either
+    // - parse strings to get numeric values out
+    // - validate that the entered values are only numeric (need another validation function for this)
     var prevVal, prevDiff = null;
     $(allDescriptorsWithValues).each(function(index, currentDescriptorValue) {
         console.log(currentDescriptorValue);
