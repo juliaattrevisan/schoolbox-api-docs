@@ -15,6 +15,7 @@
 namespace Schoolbox\Comms\News\Statistics;
 
 use Alaress\Database\Connector\IConnector;
+use Schoolbox\Collection;
 use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Statistics\Accuracy\Factory;
 
@@ -215,64 +216,36 @@ class ImpressionsConversionsOpens
      */
     public function fetchCumulative(News\Model $article): array
     {
-//        $statistics = $this->statisticsCumulativeMapper->findByColumn('article_id', $article->getId(), [
-//            'order' => [
-//                'date' => 'asc'
-//            ]
-//        ]);
-//
-//        /* First open
-//         */
-//        $firstOpen = null;
-//
-//        /* Raw number of Conversions and Impressions
-//         */
-//        $numImpressions = 0;
-//        $numConversions = 0;
-//        $breakdown = [];
-//
-//        foreach ($statistics as $statistic) {
-//
-//            /* Remember first open
-//             */
-//            if (null === $firstOpen) {
-//                $firstOpen = $statistic->getDate();
-//            }
-//
-//            /* Aggregate from daily statistics
-//             */
-//            $daily = $this->summariseDailyStatistics($statistic);
-//
-//            $numConversions += $daily['numConversions'];
-//            $numImpressions += $daily['numImpressions'];
-//
-//            foreach([Mapper::TYPE_CONVERSION, Mapper::TYPE_IMPRESSION] as $currentType) {
-//                foreach (Mapper::REFERRERS as $currentReferrer) {
-//                    $breakdown[$currentType][$currentReferrer] += $daily['breakdown']['grid'][$currentType][$currentReferrer];
-//                }
-//            }
-//
-//            /* Special case for direct opens
-//             */
-//            $breakdown[Mapper::TYPE_OPEN] += $statistic->getNumOpens();
-//        }
-//
-//        /* Calculate overall conversion ratio
-//         */
-//        $conversionRatio = $this->calculateConversionRatio($numConversions, $numImpressions);
-//
-//        /* Calculate conversion ratios for each referrer type
-//         */
-//        $referrerRatio = $this->calculateReferrerRatios($breakdown);
+        $statistics = $this->statisticsCumulativeMapper->findByColumn('article_id', $article->getId(), [
+            'order' => [
+                'date' => 'asc'
+            ]
+        ]);
+
+        /* First open
+         */
+        $firstOpen = $statistics->first()->getCreatedAt();;
+
+        /* Aggregate from daily statistics
+         */
+        $summary = $this->summariseDailyStatistics($statistics);
+
+        /* Calculate overall conversion ratio
+         */
+        $conversionRatio = $this->calculateConversionRatio($summary['numConversions'], $summary['numImpressions']);
+
+        /* Calculate conversion ratios for each referrer type
+         */
+        $referrerRatio = $this->calculateReferrerRatios($summary['breakdown']);
 
         return [
             'date' => $firstOpen,
             'breakdown' => [
-                'grid' => $breakdown,
+                'grid' => $summary['breakdown']['grid'],
                 'ratio' => $referrerRatio
             ],
-            'numConversions' => $numConversions,
-            'numImpressions' => $numImpressions,
+            'numConversions' => $summary['numConversions'],
+            'numImpressions' => $summary['numImpressions'],
             'conversionRatio' => $conversionRatio
         ];
     }
@@ -296,48 +269,46 @@ class ImpressionsConversionsOpens
 //                'date' => 'asc'
 //            ]
 //        ]);
-//
+
         $historic = [];
-//
+
 //        foreach ($statistics as $statistic) {
 //            $historic[] = $this->summariseDailyStatistics($statistic);
 //        }
-//
+
         return $historic;
     }
 
 
     /**
-     * @param Cumulative\Model $statistic
+     * @param Collection|Cumulative\Model[] $statistics
      * @return array
      */
-    private function summariseDailyStatistics(Cumulative\Model $statistic): array
+    private function summariseDailyStatistics(Collection $statistics): array
     {
-//        $numConversions = $statistic->findTotalConversions();
-//        $numImpressions = $statistic->findTotalImpressions();
-//        $breakdown = [];
-//
-//        $breakdown[Mapper::TYPE_CONVERSION][Mapper::REFERRER_DASHBOARD] = $statistic->getNumConversionsDashboard();
-//        $breakdown[Mapper::TYPE_CONVERSION][Mapper::REFERRER_HOMEPAGE] = $statistic->getNumConversionsHomepage();
-//        $breakdown[Mapper::TYPE_CONVERSION][Mapper::REFERRER_INDEX] = $statistic->getNumConversionsIndex();
-//        $breakdown[Mapper::TYPE_CONVERSION][Mapper::REFERRER_ARCHIVE] = $statistic->getNumConversionsArchive();
-//        $breakdown[Mapper::TYPE_CONVERSION][Mapper::REFERRER_EMAIL] = $statistic->getNumConversionsEmail();
-//
-//        $breakdown[Mapper::TYPE_IMPRESSION][Mapper::REFERRER_DASHBOARD] = $statistic->getNumImpressionsDashboard();
-//        $breakdown[Mapper::TYPE_IMPRESSION][Mapper::REFERRER_HOMEPAGE] = $statistic->getNumImpressionsHomepage();
-//        $breakdown[Mapper::TYPE_IMPRESSION][Mapper::REFERRER_INDEX] = $statistic->getNumImpressionsIndex();
-//        $breakdown[Mapper::TYPE_IMPRESSION][Mapper::REFERRER_ARCHIVE] = $statistic->getNumImpressionsArchive();
-//        $breakdown[Mapper::TYPE_IMPRESSION][Mapper::REFERRER_EMAIL] = $statistic->getNumImpressionsEmail();
-//
-//        $breakdown[Mapper::TYPE_OPEN] = $statistic->getNumOpens();
-//
-//        /* Calculate overall conversion ratio
-//         */
-//        $conversionRatio = $this->calculateConversionRatio($numConversions, $numImpressions);
-//
-//        /* Calculate conversion ratios for each referrer type
-//         */
-//        $referrerRatio = $this->calculateReferrerRatios($breakdown);
+        $breakdown = [];
+
+        $numConversions = 0;
+        $numImpressions = 0;
+
+        /** @var Cumulative\Model $statistic */
+        foreach ($statistics as $statistic) {
+            $breakdown[$statistic->getType()][$statistic->getReferrer()] = $statistic->getNum();
+
+            if ($statistic->getType() === Mapper::TYPE_IMPRESSION) {
+                $numImpressions += $statistic->getNum();
+            } elseif ($statistic->getType() === Mapper::TYPE_CONVERSION) {
+                $numConversions += $statistic->getNum();
+            }
+        }
+
+        /* Calculate overall conversion ratio
+         */
+        $conversionRatio = $this->calculateConversionRatio($numConversions, $numImpressions);
+
+        /* Calculate conversion ratios for each referrer type
+         */
+        $referrerRatio = $this->calculateReferrerRatios($breakdown);
 
         return [
             'date' => $statistic->getDate(),
