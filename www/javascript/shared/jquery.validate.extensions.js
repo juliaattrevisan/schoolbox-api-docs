@@ -311,46 +311,6 @@
 
     }, 'This heading is already in use - please choose another.');
 
-    $.validator.addMethod('descriptorsAreMonotonic', function(value, indicatorCheckbox) {
-        var descriptorList = $.makeArray($(indicatorCheckbox).closest("tr[data-group]").find("[data-descriptor-value]"));
-
-        function descValues(descriptor) {
-            return $(descriptor).attr('value');
-        }
-
-        // Remove any descriptors from the list that don't have values
-        // since value-less descriptors are permitted in amongst valued descriptors
-        // then simplify array to just the desc values
-        var allDescriptorsWithValues = descriptorList.filter(descValues).map(descValues);
-
-        // TODO this doesn't contain descriptors values that were added at the point of triggering the function
-        // DOM isn't updating?
-        console.log(allDescriptorsWithValues);
-
-        var prevVal, prevDiff = null;
-        $(allDescriptorsWithValues).each(function(currentDescriptorValue) {
-            // Not the first item?
-            if(null !== prevVal){
-                var diff = currentDescriptorValue - prevVal;
-
-                // No increase/decrease ?
-                if(0 === diff){
-                    return false;
-                }
-
-                // Do we have a prev diff to compare against?
-                // Accounts for both ascending and descending possibilities
-                if(null !== prevDiff && ((prevDiff > 0 && diff < 0) || (prevDiff < 0 && diff > 0))) {
-                    return false;
-                }
-                prevDiff = diff;
-            }
-            prevVal = currentDescriptorValue;
-        });
-
-        return true;
-        // return false;
-    }, "Descriptor values must be an ascending or descending sequence");
 
     $.validator.addMethod('noDecimalPlacesWithMarkRange', function(value, descriptorEl) {
         var descHasDecimals = $(descriptorEl).val().match(/\.\d+$/);
