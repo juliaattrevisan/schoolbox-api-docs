@@ -29,7 +29,7 @@ function initDecimalDescsValidation() {
     function attachValidationRules() {
         // Validate decimal places on each descriptor
         $("[data-descriptor-value]").each(function() {
-            $(this).rules("add", { noDecimalPlacesWithMarkRange: true });
+            $(this).rules("add", { noDecimalPlacesWithMarkRange: true, number: true });
         });
 
         // Validate all rows of descriptors
