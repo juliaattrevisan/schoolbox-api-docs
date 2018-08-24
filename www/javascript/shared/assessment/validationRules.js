@@ -2,21 +2,19 @@
 $.validator.addMethod('descriptorsAreMonotonic', function(value, indicatorCheckbox) {
     var descriptorList = $.makeArray($(indicatorCheckbox).closest("tr[data-group]").find("[data-descriptor-value]"));
 
-    function descValues(descriptor) {
-        return $(descriptor).val();
+    function hasDescValue(descriptor) {
+        // Value contains digits
+        return $(descriptor).val().match(/\d/);
     }
 
     // Remove any descriptors from the list that don't have values
     // since value-less descriptors are permitted in amongst valued descriptors
     // then simplify array to just the desc values
-    var allDescriptorsWithValues = descriptorList.filter(descValues).map(descValues);
-
-    // TODO this doesn't contain descriptors values that were added at the point of triggering the function
-    // DOM isn't updating?
-    console.log(allDescriptorsWithValues);
+    var allDescriptorsWithValues = descriptorList.filter(hasDescValue).map(function (descriptor) {return $(descriptor).val();});
 
     var prevVal, prevDiff = null;
-    $(allDescriptorsWithValues).each(function(currentDescriptorValue) {
+    $(allDescriptorsWithValues).each(function(index, currentDescriptorValue) {
+        console.log(currentDescriptorValue);
         // Not the first item?
         if(null !== prevVal){
             var diff = currentDescriptorValue - prevVal;
@@ -101,11 +99,8 @@ function initDecimalDescsValidation() {
     });
 
 
-    // Run monotonicity validation every time descriptor values change
-    $("[data-descriptor-value]").change(function() {
-        $("[data-criterion-name]").each(function() {
-            $(this).rules("add", { descriptorsAreMonotonic: true });
-        });
+    // Attach listener to run monotonicity validation every time descriptor values change
+    $("[data-rubric]").on("change", "[data-descriptor-value]", function() {
         $("[data-criterion-name]").each(function() {
             $(this).valid();
         });
@@ -115,9 +110,7 @@ function initDecimalDescsValidation() {
     var moConfig = { attributes: false, childList: true, characterData: false };
 
     // on change of number of levels
-    var levelObserver = new MutationObserver(function() {
-        attachValidationRules();
-    });
+    var levelObserver = new MutationObserver(attachValidationRules);
     $("tr[data-group]").each(function() {
         levelObserver.observe(this, moConfig);
     });
