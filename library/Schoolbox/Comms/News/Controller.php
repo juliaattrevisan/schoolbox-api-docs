@@ -628,15 +628,14 @@ class Controller extends Base
         $content     = $this->buildUnthemedHtmlOutput('@commsNews/partial.twig', $partialData)->getAsString();
         $viewAllLink = "{$this->getRouteIfAuthorized('commsNews.getIndex')}?topic={$params->getSlug()}";
 
-            $this->getResponse()->content->set($this->buildJsonOutput([
-                'success' => true,
-                'title' => $this->getDi()->get('l10n')->translate('news', false, true),
-                'url' => $partialData['currentUrl'],
-                'fragment' => $content,
-                'slug' => $params->getSlug(),
-                'viewAllLink' => $partialData['articles']->count() ? $viewAllLink : null
-            ]));
-        }
+        $this->getResponse()->content->set($this->buildJsonOutput([
+            'success' => true,
+            'title' => $this->getDi()->get('l10n')->translate('news', false, true),
+            'url' => $partialData['currentUrl'],
+            'fragment' => $content,
+            'slug' => $params->getSlug(),
+            'viewAllLink' => $partialData['articles']->count() ? $viewAllLink : null
+        ]));
     }
 
 
