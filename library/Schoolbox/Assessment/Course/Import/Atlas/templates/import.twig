@@ -195,20 +195,24 @@
                         $collapsers = $();
 
                     // Find collapsers
-                    Object.keys(validator.invalid).forEach(function(v) {
-                        var $element     = units.find('[name="' + v + '"]'),
-                            $collapsable = $element.closest('[data-collapsable]');
+                    // TODO this needs to keep up to date with which fields are currently invalid,
+                    // otherwise we end up unnecessarily expanding valid collapsers
+                    Object.keys(validator.invalid).forEach(function(invalidInputName) {
+                        console.log(invalidInputName);
+                        var $inputElement     = units.find('[name="' + invalidInputName + '"]'),
+                            $collapsable = $inputElement.closest('[data-collapsable]'),
+                            $collapserButton = $collapsable.prevAll(".actions-small-1").find("[data-collapser]");
 
-                        if ($collapsable.data('collapse-state') === 'collapsed') {
-                            var $collapser = units.find('[data-collapser="' + $collapsable.data('collapsable') + '"]');
-                            $collapsers = $collapsers.add($collapser);
-                        }
+                            $collapsers = $collapsers.add($collapserButton);
                     });
+
+                    console.log($collapsers);
 
                     // Click each unique one
                     $.unique($collapsers).each(function () {
                         // Don't simulate click if collapser is already expanded
-                        if ($(this).closest("li").prev("[data-collapsable]").attr("data-collapse-state") === "collapsed") {
+                        var $collapsable = $(this).closest(".actions-small-1").next("[data-collapsable]");
+                        if ($collapsable.attr("data-collapse-state") === "collapsed") {
                             $(this).click();
                         }
                     })
