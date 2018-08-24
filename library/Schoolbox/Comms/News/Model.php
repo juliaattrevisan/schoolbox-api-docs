@@ -38,41 +38,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
     use CreatedAtDate;
     use UpdatedAtDate;
     use DeletedAtDate;
-
     use SerializeTrait;
-
-
-    /**
-     * @return array
-     */
-    public function getDefaultJsonMap(): array
-    {
-        return [
-            'id',
-            'title',
-            'blurb',
-            'body',
-            'author',
-            'featureImage',
-            'publishAt',
-            'topics' => [
-                'name',
-                'slug',
-            ]
-        ];
-    }
-
-
-    /**
-     * @return array
-     */
-    public function getJsonApiLinks(): array
-    {
-        return [
-            'self'   => [ 'commsNews.getDetail', [ 'articleId' => $this->getId() ] ],
-            'update' => [ 'commsNews.getUpdate', [ 'articleId' => $this->getId() ] ],
-        ];
-    }
 
 
     /**
@@ -588,4 +554,38 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
         $this->rejectedReason = $rejectedReason;
         return $this;
     }
+
+
+    /**
+     * @return array
+     */
+    public function getDefaultJsonMap(): array
+    {
+        return [
+            'id',
+            'title',
+            'blurb',
+            'body',
+            'author',
+            'featureImage',
+            'publishAt',
+            'topics' => [
+                'name',
+                'slug',
+            ]
+        ];
+    }
+
+
+    /**
+     * @return array
+     */
+    public function getJsonApiLinks(): array
+    {
+        return [
+            'self'   => [ 'commsNews.getDetail', [ 'articleId' => $this->getId() ] ],
+            'update' => [ 'commsNews.getUpdate', [ 'articleId' => $this->getId() ] ],
+        ];
+    }
+
 }

@@ -20,20 +20,6 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
 {
     use SerializeTrait;
 
-
-    /**
-     * @return array
-     */
-    public function getDefaultJsonMap(): array
-    {
-        return [
-            'database',
-            'unixTimestamp',
-            'local'
-        ];
-    }
-
-
     /**
      * @var static
      */
@@ -1933,6 +1919,19 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
      */
     public function __clone() {
         $this->datetime = clone $this->datetime;
+    }
+
+
+    /**
+     * @return array
+     */
+    public function getDefaultJsonMap(): array
+    {
+        return [
+            'database',
+            'unixTimestamp',
+            'local'
+        ];
     }
 
 }

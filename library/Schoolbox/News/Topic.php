@@ -48,21 +48,6 @@ class Topic implements \Alaress\Json\Serializable
 
 
     /**
-     * Serialized representation
-     *
-     * @return array|mixed
-     */
-    public function getDefaultJsonMap(): array
-    {
-        return [
-            'id',
-            'name',
-            'sequence',
-        ];
-    }
-
-
-    /**
      * @return string
      */
     public function getName()
@@ -108,4 +93,18 @@ class Topic implements \Alaress\Json\Serializable
     {
         return $this->sequence;
     }
+
+
+    /**
+     * @return array
+     */
+    public function getDefaultJsonMap(): array
+    {
+        return [
+            'id',
+            'name',
+            'sequence',
+        ];
+    }
+
 }

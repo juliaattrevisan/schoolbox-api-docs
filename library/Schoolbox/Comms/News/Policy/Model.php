@@ -19,18 +19,6 @@ class Model implements \Alaress\Json\Serializable
 
 
     /**
-     * @return array
-     */
-    public function getDefaultJsonMap(): array
-    {
-        return [
-            'identifier',
-            'value'
-        ];
-    }
-
-
-    /**
      * A unique identifier (not the primary key) that identifies this input element
      *
      * @var string
@@ -85,4 +73,17 @@ class Model implements \Alaress\Json\Serializable
         $this->value = $value;
         return $this;
     }
+
+
+    /**
+     * @return array
+     */
+    public function getDefaultJsonMap(): array
+    {
+        return [
+            'identifier',
+            'value'
+        ];
+    }
+
 }

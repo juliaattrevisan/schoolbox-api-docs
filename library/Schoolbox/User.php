@@ -28,6 +28,7 @@ class User implements \Alaress\Json\Serializable, ISoftDeletable
     use CreatedAtDate;
     use UpdatedAtDate;
     use DeletedAtDate;
+    use SerializeTrait;
 
     /** @var int */
     private $id;
@@ -1264,26 +1265,6 @@ class User implements \Alaress\Json\Serializable, ISoftDeletable
     }
 
 
-
-
-    use SerializeTrait;
-
-    /**
-     * @return array
-     */
-    public function getDefaultJsonMap(): array
-    {
-        return [
-            'id',
-            'title',
-            'firstname',
-            'lastname'
-        ];
-    }
-
-
-
-
     /**
      * @param Collection|self[] $linkedUser
      */
@@ -1373,4 +1354,19 @@ class User implements \Alaress\Json\Serializable, ISoftDeletable
         $this->children->replaceWith($children);
         return $this;
     }
+
+
+    /**
+     * @return array
+     */
+    public function getDefaultJsonMap(): array
+    {
+        return [
+            'id',
+            'title',
+            'firstname',
+            'lastname'
+        ];
+    }
+
 }

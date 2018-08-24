@@ -901,43 +901,6 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
 
 
     /**
-     * @return array
-     */
-    public function getDefaultJsonMap(): array
-    {
-        // this happens to be ignored by this particular implementation
-        return [];
-    }
-
-
-    /**
-     * Specify data which should be serialized to JSON. Currently, attempts to
-     * serialize all items within the stack.
-     *
-     * @return array
-     */
-    public function jsonSerialize(IDecorator... $decorators)
-    {
-        if (\count($decorators) === 0) {
-            return $this->getStack();
-        }
-
-        // if a map is specified, we want to explicitly pass it through to sub-objects where possible
-
-        $json = [];
-
-        foreach ($this as $key => $value) {
-            foreach ($decorators as $decorator) {
-                $json[$key] = $decorator->decorate($json[$key] ?: [], $value);
-            }
-
-        }
-
-        return $json;
-    }
-
-
-    /**
      * Indexes the collection by the given column.
      * Be careful! The property indicated by $column should contain unique values. If not, earlier values will be overwritten.
      *
@@ -1006,6 +969,44 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
             $newCollection->stack[$idx] = $item;
         }
         return $newCollection;
+    }
+
+
+    /**
+     * @return array
+     */
+    public function getDefaultJsonMap(): array
+    {
+        // this happens to be ignored by this particular implementation
+        return [];
+    }
+
+
+    /**
+     * Specify data which should be serialized to JSON. Currently, attempts to
+     * serialize all items within the stack.
+     *
+     * @param IDecorator[] $decorators
+     * @return array
+     */
+    public function jsonSerialize(IDecorator... $decorators)
+    {
+        if (\count($decorators) === 0) {
+            return $this->getStack();
+        }
+
+        // if a map is specified, we want to explicitly pass it through to sub-objects where possible
+
+        $json = [];
+
+        foreach ($this as $key => $value) {
+            foreach ($decorators as $decorator) {
+                $json[$key] = $decorator->decorate($json[$key] ?: [], $value);
+            }
+
+        }
+
+        return $json;
     }
 
 }

@@ -51,19 +51,6 @@ class Model extends File implements IStorage, \Alaress\Json\Serializable
 
 
     /**
-     * @return array
-     */
-    public function getDefaultJsonMap(): array
-    {
-        return [
-            'hash',
-            'size',
-            'mime'
-        ];
-    }
-
-
-    /**
      * @return string
      */
     public function getFilename()
@@ -290,6 +277,19 @@ class Model extends File implements IStorage, \Alaress\Json\Serializable
         }
 
         return $size;
+    }
+
+
+    /**
+     * @return array
+     */
+    public function getDefaultJsonMap(): array
+    {
+        return [
+            'hash',
+            'size',
+            'mime'
+        ];
     }
 
 }
