@@ -93,23 +93,6 @@ class GroupUsage
 
 
     /**
-     * Given a set of levels, retrieves an iterator for the rows in this group
-     * usage.
-     *
-     * @todo consider removing, as manual iteration is probably easier
-     *
-     * @param GenericCollection|Level[] $levels
-     * @return iterable|?Descriptor[][] key: CriterionUsage
-     */
-    public function iterateCriteria(GenericCollection $levels): iterable
-    {
-        foreach ($this->criterionUsages as $criterionUsage) {
-            yield $criterionUsage => $criterionUsage->iterateDescriptors($levels);
-        }
-    }
-
-
-    /**
      * What's the inferred max value for this group?
      *
      * Differs from `getMaxValue` in that this is the inferred value from the
