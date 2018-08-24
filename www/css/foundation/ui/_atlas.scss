@@ -92,4 +92,12 @@
     padding-bottom: 0;
   }
 
+  .assessment-title-input, .attachment-title-input {
+    display: inline-block;
+    width: 80%;
+    margin: 0;
+    position: absolute;
+    left: 3rem;
+  }
+
 }
