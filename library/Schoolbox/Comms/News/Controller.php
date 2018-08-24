@@ -468,12 +468,21 @@ class Controller extends Base
 
         // don't supply the extra twig-necessary data if just returning JSON
         if ((new IsJson())->isSatisfiedBy($this->getRequest())) {
+
+            // mutate the default map slightly
+            $map = $article->getDefaultJsonMap();
+            $map['featureImage'] = [ 'size', 'mime' ];
+
             $data = [
                 'article' => $article->jsonSerialize(
-                    new PropertyDecorator(null, new LinkDecorator($this->router, $this->authorizer))
+                    new PropertyDecorator($map, new LinkDecorator($this->router, $this->authorizer))
                 ),
                 'isSavedForLater' => $isSavedForLater,
             ];
+
+            // wish this were easier to do...
+            unset($data['article']['featureImage']['_links']['fetch']);
+
         } else {
             $data = [
                 'policies' => $policies,
