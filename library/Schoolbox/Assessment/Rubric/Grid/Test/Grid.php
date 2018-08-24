@@ -16,6 +16,7 @@ use Schoolbox\Resource\Folder\Model as Folder;
 
 /**
  * @covers \Schoolbox\Assessment\Rubric\Grid\Grid
+ * @codeCoverageIgnore
  */
 class Grid extends TestCase
 {

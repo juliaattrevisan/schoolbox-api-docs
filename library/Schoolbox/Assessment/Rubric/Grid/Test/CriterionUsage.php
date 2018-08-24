@@ -14,6 +14,7 @@ use Schoolbox\Assessment\Rubric\RowSet;
 
 /**
  * @covers \Schoolbox\Assessment\Rubric\Grid\CriterionUsage
+ * @codeCoverageIgnore
  */
 class CriterionUsage extends TestCase
 {
