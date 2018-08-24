@@ -443,45 +443,45 @@ class ImpressionsConversionsOpens
     public function fetchConversions(News\Model $article, ?string $accuracy): array
     {
 
-//        /* Determine a sane value
-//         */
-//        $strat = (new Factory())->produce($accuracy);
-//
-//        $statement = $this->database->prepareQuery("
-//            SELECT
-//                {$strat->getSql($accuracy)}
-//                `type`,
-//                COUNT(*) AS num
-//            FROM {$this->statisticsMapper->getTable()}
-//            WHERE article_id = :articleId
-//            AND deleted_at IS NULL
-//            GROUP BY timestamp, `type`
-//            ORDER BY timestamp
-//        ");
-//
-//        $statement->execute([
-//            'articleId' => $article->getId()
-//        ]);
-//
-//        /* Generate placeholder timestamps, superimpose actual data on top of placeholders
-//         */
-//        $range = $strat->generateDateRange(\Alaress_Date_Format::now()->addDays(-1*self::PERIOD_LENGTH), \Alaress_Date_Format::now());
-//
+        /* Determine a sane value
+         */
+        $strat = (new Factory())->produce($accuracy);
+
+        $statement = $this->database->prepareQuery("
+            SELECT
+                {$strat->getSql($accuracy)}
+                `type`,
+                COUNT(*) AS num
+            FROM {$this->statisticsMapper->getTable()}
+            WHERE article_id = :articleId
+            AND deleted_at IS NULL
+            GROUP BY timestamp, `type`
+            ORDER BY timestamp
+        ");
+
+        $statement->execute([
+            'articleId' => $article->getId()
+        ]);
+
+        /* Generate placeholder timestamps, superimpose actual data on top of placeholders
+         */
+        $range = $strat->generateDateRange(\Alaress_Date_Format::now()->addDays(-1*self::PERIOD_LENGTH), \Alaress_Date_Format::now());
+
         $data = [
             Mapper::TYPE_CONVERSION => $range,
             Mapper::TYPE_IMPRESSION => $range,
             Mapper::TYPE_OPEN => $range
         ];
-//
-//        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-//            $data[$row['type']][$row['datetime']] = [ (int)$row['timestamp'], (int)$row['num'], $row['datetime']];
-//        }
-//
-//        /* Format it for highcharts to understand
-//         */
-//        foreach ([Mapper::TYPE_CONVERSION, Mapper::TYPE_IMPRESSION, Mapper::TYPE_OPEN] as $type) {
-//            $data[$type] = array_values($data[$type]);
-//        }
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $data[$row['type']][$row['datetime']] = [ (int)$row['timestamp'], (int)$row['num'], $row['datetime']];
+        }
+
+        /* Format it for highcharts to understand
+         */
+        foreach ([Mapper::TYPE_CONVERSION, Mapper::TYPE_IMPRESSION, Mapper::TYPE_OPEN] as $type) {
+            $data[$type] = array_values($data[$type]);
+        }
 
         return $data;
     }
