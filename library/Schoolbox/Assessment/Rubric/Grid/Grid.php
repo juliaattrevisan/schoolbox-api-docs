@@ -153,13 +153,14 @@ class Grid
 
 
     /**
-     * Iterates each group in the grid's rowset.
+     * Iterates each group in the grid's rowset, whether this grid uses them
+     * or not.
      *
      * First iterates all groups in use, then all groups not in use.
      *
      * @return iterable|Group[]
      */
-    public function retrieveGroups(): iterable
+    public function iterateGroups(): iterable
     {
         $seenGroups = [];
         foreach ($this->groupUsages as $groupUsage) {

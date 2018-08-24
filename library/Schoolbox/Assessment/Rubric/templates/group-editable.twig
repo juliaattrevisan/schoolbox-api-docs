@@ -9,7 +9,7 @@
 {% set hasSelectedDescriptor = false %}
 
 {% set groupUsage = rubricGrid.retrieveGroupUsage(group) %}
-{%- for crit in groupUsage.retrieveCriteria -%}
+{%- for crit in groupUsage.iterateCriteria -%}
     {% set criterionUsage = rubricGrid.retrieveCriterionUsage(crit) %}
     {% include '@rubric/group-row-editable.twig' %}
     {# this may seem bizarre, but we only ever want this applied the first time through an interation #}

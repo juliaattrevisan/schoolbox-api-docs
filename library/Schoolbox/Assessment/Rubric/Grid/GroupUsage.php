@@ -52,13 +52,14 @@ class GroupUsage
 
 
     /**
-     * Iterates each criterion in this usage object's group.
+     * Iterates each criterion in this usage object's group, whether in use or
+     * not.
      *
      * First iterates all criteria in use, then all criteria not in use.
      *
      * @return iterable|Criterion[]
      */
-    public function retrieveCriteria(): iterable
+    public function iterateCriteria(): iterable
     {
         $seenCriteria = [];
         foreach ($this->getCriterionUsages() as $criterionUsage) {
