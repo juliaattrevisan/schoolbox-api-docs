@@ -11,6 +11,7 @@ $.validator.addMethod('descriptorsAreMonotonic', function(value, indicatorCheckb
     // since value-less descriptors are permitted in amongst valued descriptors
     // then simplify array to just the desc values
     var allDescriptorsWithValues = descriptorList.filter(hasDescValue).map(function (descriptor) {return $(descriptor).val();});
+    console.log(allDescriptorsWithValues);
 
     var prevVal, prevDiff = null;
     $(allDescriptorsWithValues).each(function(index, currentDescriptorValue) {
@@ -99,11 +100,11 @@ function initDecimalDescsValidation() {
     });
 
 
-    // Attach listener to run monotonicity validation every time descriptor values change
-    $("[data-rubric]").on("change", "[data-descriptor-value]", function() {
-        $("[data-criterion-name]").each(function() {
-            $(this).valid();
-        });
+    // Attach listener to run monotonicity validation on a descriptor row every time one of the contained descriptor values change
+    $("[data-descriptor-value]").change(function() {
+        var $changedDescriptor = $(this);
+        var $closestDescRow = $changedDescriptor.closest("[data-descriptor]").prevAll("th").find("[data-criterion-name]");
+        $closestDescRow.valid();
     });
 
 
