@@ -56,7 +56,8 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
             'featureImage',
             'publishAt',
             'topics' => [
-                'name'
+                'name',
+                'slug',
             ]
         ];
     }
