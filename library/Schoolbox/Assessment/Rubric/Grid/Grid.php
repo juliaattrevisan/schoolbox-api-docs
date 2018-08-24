@@ -180,6 +180,29 @@ class Grid
 
 
     /**
+     * Iterates each group in the grid's rowset.
+     *
+     * First iterates all groups in use, then all groups not in use.
+     *
+     * @return iterable|Group[]
+     */
+    public function retrieveGroups(): iterable
+    {
+        $seenGroups = [];
+        foreach ($this->groupUsages as $groupUsage) {
+            $seenGroups[$groupUsage->getGroup()->getId()] = true;
+            yield $groupUsage->getGroup();
+        }
+
+        foreach ($this->rowSet->getGroups() as $group) {
+            if (!isset($seenGroups[$group->getId()])) {
+                yield $group;
+            }
+        }
+    }
+
+
+    /**
      * Iterate over each group, then each criterion in the group, then each
      * descriptor in the criterion.
      *

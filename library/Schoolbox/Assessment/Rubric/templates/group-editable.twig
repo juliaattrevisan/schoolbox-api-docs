@@ -8,7 +8,8 @@
 {# Don't show the max value if there are no selected criteria in the group #}
 {% set hasSelectedDescriptor = false %}
 
-{%- for critIndex, crit in group.criteria -%}
+{% set groupUsage = rubricGrid.retrieveGroupUsage(group) %}
+{%- for crit in groupUsage.retrieveCriteria -%}
     {% set criterionUsage = rubricGrid.retrieveCriterionUsage(crit) %}
     {% include '@rubric/group-row-editable.twig' %}
     {# this may seem bizarre, but we only ever want this applied the first time through an interation #}

@@ -52,6 +52,29 @@ class GroupUsage
 
 
     /**
+     * Iterates each criterion in this usage object's group.
+     *
+     * First iterates all criteria in use, then all criteria not in use.
+     *
+     * @return iterable|Criterion[]
+     */
+    public function retrieveCriteria(): iterable
+    {
+        $seenCriteria = [];
+        foreach ($this->getCriterionUsages() as $criterionUsage) {
+            $seenCriteria[$criterionUsage->getCriterion()->getId()] = true;
+            yield $criterionUsage->getCriterion();
+        }
+
+        foreach ($this->getGroup()->getCriteria() as $criterion) {
+            if (!isset($seenCriteria[$criterion->getId()])) {
+                yield $criterion;
+            }
+        }
+    }
+
+
+    /**
      * Return the criterion usage for a given criterion, or null if this group
      * doesn't use it.
      *
