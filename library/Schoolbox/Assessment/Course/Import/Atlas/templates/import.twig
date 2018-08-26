@@ -164,14 +164,14 @@
                 // * uncheck: disable assess/attach
                 // * change:  update counts
                 units.find('[data-unit]').on('change', function () {
-                    var $this        = $(this),
-                        unit         = $this.data('unit'),
-                        disable      = !$this.prop('checked'),
-                        $assessments = units.find('[data-checkbox-group="unit-'+unit+'-assessments"]'),
-                        $attachments = units.find('[data-checkbox-group="unit-'+unit+'-attachments"]'),
-                        $metaSelected  = units.find('[data-unit-meta="'+unit+'"] [data-checkbox-group-count]');
-                    $assessments.prop('disabled', disable);
-                    $attachments.prop('disabled', disable);
+                    var $this         = $(this),
+                        unit          = $this.data('unit'),
+                        disable       = !$this.prop('checked'),
+                        $inputs       = units.find(':input[name^="unit['+unit+']"]'),
+                        $assessments  = units.find('[data-checkbox-group="unit-'+unit+'-assessments"]'),
+                        $attachments  = units.find('[data-checkbox-group="unit-'+unit+'-attachments"]'),
+                        $metaSelected = units.find('[data-unit-meta="'+unit+'"] [data-checkbox-group-count]');
+                    $inputs.prop('disabled', disable);
 
                     // Select/deselect all
                     $assessments.prop('checked', !disable);
