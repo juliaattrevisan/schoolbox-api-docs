@@ -158,4 +158,84 @@ class GroupUsage extends TestCase
         }
         $this->assertSame($expected, $actual);
     }
+
+
+    /**
+     * Data provider for `testCalculateMaxValue`.
+     *
+     * @return iterable
+     */
+    public function getTestCalculateMaxValue(): iterable
+    {
+        $group      = (new RowSet\Group())->setId(1)->setName('Group 1');
+        $criterion1 = (new RowSet\Criterion())->setId(1)->setName('Criterion 1.1');
+        $criterion2 = (new RowSet\Criterion())->setId(2)->setName('Criterion 1.2');
+        $criterion3 = (new RowSet\Criterion())->setId(3)->setName('Criterion 1.3');
+        $criterion4 = (new RowSet\Criterion())->setId(4)->setName('Criterion 1.4');
+
+        $group->getCriteria()[$criterion1->getId()] = $criterion1;
+        $group->getCriteria()[$criterion2->getId()] = $criterion2;
+        $group->getCriteria()[$criterion3->getId()] = $criterion3;
+        $group->getCriteria()[$criterion4->getId()] = $criterion4;
+
+        // Criterion usage 1: max is 7
+        $criterionUsage1 = new RubricGrid\CriterionUsage($criterion1);
+        $criterionUsage1->getDescriptors()[0] = new RubricGrid\Descriptor();
+        $criterionUsage1->getDescriptors()[1] = (new RubricGrid\Descriptor())->setMaxValue(3);
+        $criterionUsage1->getDescriptors()[2] = (new RubricGrid\Descriptor())->setMaxValue(5);
+        $criterionUsage1->getDescriptors()[3] = (new RubricGrid\Descriptor())->setMaxValue(7);
+
+        // Criterion usage 2: max is 0 (no descriptors with marks)
+        $criterionUsage2 = new RubricGrid\CriterionUsage($criterion2);
+        $criterionUsage2->getDescriptors()[1] = new RubricGrid\Descriptor();
+        $criterionUsage2->getDescriptors()[2] = new RubricGrid\Descriptor();
+
+        // Criterion usage 2: max is 8
+        $criterionUsage3 = new RubricGrid\CriterionUsage($criterion3);
+        $criterionUsage3->getDescriptors()[1] = (new RubricGrid\Descriptor())->setMaxValue(8);
+        $criterionUsage3->getDescriptors()[2] = (new RubricGrid\Descriptor())->setMaxValue(5);
+        $criterionUsage3->getDescriptors()[3] = (new RubricGrid\Descriptor())->setMaxValue(2);
+
+        // Criterion usage 4: max is 0 (no descriptors)
+        $criterionUsage4 = new RubricGrid\CriterionUsage($criterion4);
+
+
+        $groupUsage1 = new RubricGrid\GroupUsage($group);
+
+        yield 'No criteria' => [$groupUsage1, 0];
+
+
+        $groupUsage2 = new RubricGrid\GroupUsage($group);
+        $groupUsage2->getCriterionUsages()[$criterion4->getId()] = $criterionUsage4;
+
+        yield 'No criteria with descriptors' => [$groupUsage2, 0];
+
+
+        $groupUsage3 = new RubricGrid\GroupUsage($group);
+        $groupUsage3->getCriterionUsages()[$criterion2->getId()] = $criterionUsage2;
+
+        yield 'No criteria with descriptors with marks' => [$groupUsage3, 0];
+
+
+        $groupUsage4 = new RubricGrid\GroupUsage($group);
+        $groupUsage4->getCriterionUsages()[$criterion1->getId()] = $criterionUsage1;
+        $groupUsage4->getCriterionUsages()[$criterion2->getId()] = $criterionUsage2;
+        $groupUsage4->getCriterionUsages()[$criterion3->getId()] = $criterionUsage3;
+        $groupUsage4->getCriterionUsages()[$criterion4->getId()] = $criterionUsage4;
+
+        yield 'Descriptors with marks' => [$groupUsage4, 15];
+    }
+
+
+    /**
+     * @dataProvider getTestCalculateMaxValue
+     * @covers \Schoolbox\Assessment\Rubric\Grid\GroupUsage::calculateMaxValue
+     *
+     * @param RubricGrid\GroupUsage $groupUsage
+     * @param float                 $expected
+     */
+    public function testCalculateMaxValue(RubricGrid\GroupUsage $groupUsage, float $expected): void
+    {
+        $this->assertSame($expected, $groupUsage->calculateMaxValue());
+    }
 }
