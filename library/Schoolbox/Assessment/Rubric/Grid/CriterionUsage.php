@@ -56,25 +56,6 @@ class CriterionUsage
 
 
     /**
-     * Given a set of levels, retrieves an iterator for the row.
-     *
-     * @todo consider removing, as manual iteration is probably easier
-     *
-     * @param GenericCollection|Level[] $levels
-     * @return iterable|?Descriptor[] key:   level ID
-     *                                value: descriptor, or null if there is
-     *                                       none for level
-     */
-    public function iterateDescriptors(GenericCollection $levels): iterable
-    {
-        foreach ($levels as $levelIndex => $level) {
-            $levelId = $level->getId();
-            yield $levelId => $this->retrieveDescriptor($levelIndex);
-        }
-    }
-
-
-    /**
      * What's the max value for this criterion in the grid?
      *
      * Inferred from its descriptors; the highest value descriptor is the max
