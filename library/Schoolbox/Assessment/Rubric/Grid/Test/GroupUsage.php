@@ -18,7 +18,6 @@ use Schoolbox\Assessment\Rubric\RowSet;
  */
 class GroupUsage extends TestCase
 {
-
     /**
      * Data provider for `testRetrieveCriterionUsage`
      *
@@ -90,5 +89,73 @@ class GroupUsage extends TestCase
     ): void
     {
         $this->assertSame($expected, $groupUsage->retrieveCriterionUsage($criterion));
+    }
+
+
+    /**
+     * Data provider for `testIterateCriteria`
+     *
+     * @return iterable
+     */
+    public function getTestIterateCriteriaData(): iterable
+    {
+        // Default rowset
+        $group      = (new RowSet\Group())->setId(1)->setName('Group 1');
+        $criterion1 = (new RowSet\Criterion())->setId(1)->setName('Criterion 1.1');
+        $criterion2 = (new RowSet\Criterion())->setId(2)->setName('Criterion 1.2');
+        $criterion3 = (new RowSet\Criterion())->setId(3)->setName('Criterion 1.3');
+
+        $group->getCriteria()[$criterion1->getId()] = $criterion1;
+        $group->getCriteria()[$criterion2->getId()] = $criterion2;
+        $group->getCriteria()[$criterion3->getId()] = $criterion3;
+
+
+        $groupUsage1 = new RubricGrid\GroupUsage($group);
+
+        yield 'No groups used' => [$groupUsage1, [$criterion1, $criterion2, $criterion3]];
+
+
+        $groupUsage2 = new RubricGrid\GroupUsage($group);
+        $groupUsage2->getCriterionUsages()[$criterion1->getId()] = new RubricGrid\CriterionUsage($criterion1);
+
+        yield 'Group 1 used' => [$groupUsage2, [$criterion1, $criterion2, $criterion3]];
+
+
+        $groupUsage3 = new RubricGrid\GroupUsage($group);
+        $groupUsage3->getCriterionUsages()[$criterion3->getId()] = new RubricGrid\CriterionUsage($criterion3);
+
+        yield 'Group 3 used' => [$groupUsage3, [$criterion3, $criterion1, $criterion2]];
+
+
+        $groupUsage4 = new RubricGrid\GroupUsage($group);
+        $groupUsage4->getCriterionUsages()[$criterion3->getId()] = new RubricGrid\CriterionUsage($criterion3);
+        $groupUsage4->getCriterionUsages()[$criterion2->getId()] = new RubricGrid\CriterionUsage($criterion2);
+
+        yield 'Group 3, 2 used' => [$groupUsage4, [$criterion3, $criterion2, $criterion1]];
+
+
+        $groupUsage5 = new RubricGrid\GroupUsage($group);
+        $groupUsage5->getCriterionUsages()[$criterion1->getId()] = new RubricGrid\CriterionUsage($criterion1);
+        $groupUsage5->getCriterionUsages()[$criterion3->getId()] = new RubricGrid\CriterionUsage($criterion3);
+        $groupUsage5->getCriterionUsages()[$criterion2->getId()] = new RubricGrid\CriterionUsage($criterion2);
+
+        yield 'Group 1, 3, 2 used' => [$groupUsage5, [$criterion1, $criterion3, $criterion2]];
+    }
+
+
+    /**
+     * @dataProvider getTestIterateCriteriaData
+     * @covers \Schoolbox\Assessment\Rubric\Grid\GroupUsage::iterateCriteria
+     *
+     * @param RubricGrid\GroupUsage $groupUsage
+     * @param array                 $expected
+     */
+    public function testIterateCriteria(RubricGrid\GroupUsage $groupUsage, array $expected): void
+    {
+        $actual = [];
+        foreach ($groupUsage->iterateCriteria() as $criterion) {
+            $actual[] = $criterion;
+        }
+        $this->assertSame($expected, $actual);
     }
 }
