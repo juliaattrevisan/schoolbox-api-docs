@@ -28,18 +28,18 @@ namespace Assessment {
 namespace RubricRowset {
 
     class RubricRowset {
-        groups : RubricGroup[]
+        capabilities : RubricCapability[]
         context : AssessmentContext
     }
 
-    class RubricGroup {
-        criteria : RubricCriterion[]
+    class RubricCapability {
+        indicators : RubricIndicator[]
         name : string
         isInUse() : bool
         isInUseExcluding(IAssessable) : bool
     }
 
-    class RubricCriterion {
+    class RubricIndicator {
         name : string
         usage : IAssessable[]
         isInUse() : bool
@@ -47,8 +47,8 @@ namespace RubricRowset {
     }
 
     ' internal relations
-    RubricRowset *-d- RubricGroup
-    RubricGroup *-d- RubricCriterion
+    RubricRowset *-d- RubricCapability
+    RubricCapability *-d- RubricIndicator
 
     ' relation to Assessment
     Assessment.AssessmentContext *-d- RubricRowset
@@ -61,24 +61,24 @@ namespace RubricGrid {
         assessment : IAssessable
         rowset : RubricRowset
         levels : RubricLevel[]
-        groups : RubricGroupUsage[]
-        calculateMaxValueFromGroups() : float
-        iterateGroups() : RubricGroup[]
-        retrieveGroupUsage(RubricGroup) : ?RubricGroupUsage
-        retrieveCriterionUsage(RubricCriterion) : ?RubricCriterionUsage
+        capabilities : RubricCapabilityUsage[]
+        calculateMaxValueFromCapabilities() : float
+        iterateCapabilities() : RubricCapability[]
+        retrieveCapabilityUsage(RubricCapability) : ?RubricCapabilityUsage
+        retrieveIndicatorUsage(RubricIndicator) : ?RubricIndicatorUsage
     }
 
-    class RubricGroupUsage {
-        group : RubricGroup
-        criteria : RubricCriterionUsage[]
+    class RubricCapabilityUsage {
+        capability : RubricCapability
+        indicators : RubricIndicatorUsage[]
         maxValue : float
-        calculateMaxValueFromCriteria() : float
-        iterateCriteria() : RubricCriterion[]
-        retrieveCriterionUsage(RubricCriterion) : ?RubricCriterionUsage
+        calculateMaxValueFromIndicators() : float
+        iterateIndicators() : RubricIndicator[]
+        retrieveIndicatorUsage(RubricIndicator) : ?RubricIndicatorUsage
     }
 
-    class RubricCriterionUsage {
-        criterion : RubricCriterion
+    class RubricIndicatorUsage {
+        indicator : RubricIndicator
         descriptors : RubricDescriptor[]
         calculateMaxValueFromDescriptors() : float
         applyDescriptorMinValues() : void
@@ -95,19 +95,19 @@ namespace RubricGrid {
     }
 
     ' internal relations
-    RubricGrid *-d- RubricGroupUsage
-    RubricGroupUsage *-d- RubricCriterionUsage
-    RubricCriterionUsage *-d- RubricDescriptor
+    RubricGrid *-d- RubricCapabilityUsage
+    RubricCapabilityUsage *-d- RubricIndicatorUsage
+    RubricIndicatorUsage *-d- RubricDescriptor
     RubricGrid *-d- RubricLevel
-    RubricLevel *-[hidden]r- RubricGroupUsage
+    RubricLevel *-[hidden]r- RubricCapabilityUsage
 
     ' relation to Assessment
     Assessment.IAssessable *-d- RubricGrid
 
     ' relation to RubricRowset
     RubricGrid -l-* RubricRowset.RubricRowset
-    RubricGroupUsage -l-* RubricRowset.RubricGroup
-    RubricCriterionUsage -l-* RubricRowset.RubricCriterion
+    RubricCapabilityUsage -l-* RubricRowset.RubricCapability
+    RubricIndicatorUsage -l-* RubricRowset.RubricIndicator
 }
 
 
@@ -116,35 +116,35 @@ namespace RubricMarkedGrid {
     class RubricMarkedGrid {
         grid : RubricGrid
         feedback : IFeedback
-        groups : RubricGroupMark[]
-        calculateMarkFromGroups() : float
+        capabilities : RubricCapabilityMark[]
+        calculateMarkFromCapabilities() : float
     }
 
-    class RubricGroupMark {
-        group : RubricGroupUsage
-        criteria: RubricCriterionMark[]
+    class RubricCapabilityMark {
+        capability : RubricCapabilityUsage
+        indicators: RubricIndicatorMark[]
         value : float
-        calculateMarkFromCriteria() : float
+        calculateMarkFromIndicators() : float
     }
 
-    class RubricCriterionMark {
-        criterion : RubricCriterionUsage
+    class RubricIndicatorMark {
+        indicator : RubricIndicatorUsage
         selectedDescriptor: RubricDescriptor
         value : float
     }
 
     ' internal relations
-    RubricMarkedGrid *-d- RubricGroupMark
-    RubricGroupMark *-d- RubricCriterionMark
+    RubricMarkedGrid *-d- RubricCapabilityMark
+    RubricCapabilityMark *-d- RubricIndicatorMark
 
     ' relation to Assessment
     Assessment.IFeedback *-d- RubricMarkedGrid
 
     ' relation to RubricGrid
     RubricMarkedGrid -l-* RubricGrid.RubricGrid
-    RubricGroupMark -l-* RubricGrid.RubricGroupUsage
-    RubricCriterionMark -l-* RubricGrid.RubricCriterionUsage
-    RubricCriterionMark -l-* RubricGrid.RubricDescriptor
+    RubricCapabilityMark -l-* RubricGrid.RubricCapabilityUsage
+    RubricIndicatorMark -l-* RubricGrid.RubricIndicatorUsage
+    RubricIndicatorMark -l-* RubricGrid.RubricDescriptor
 }
 
 @enduml
