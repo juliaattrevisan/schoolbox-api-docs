@@ -109,11 +109,7 @@ class Controller extends BaseController
         }
 
 
-        // Finagle a rubric grid
-        // (First, what's the assessment? it will always be rubric ID)
-        // (Second, what's the context?)
-        // Also need to pass the much of the form values to the assessment
-        // Example: mark-per-cap, use mark range
+        // Build a rubric grid
         $assessmentId = $post->getInt('rubricId', 0);
 
         // Rubric grid needs to reflect state in form, not persisted state
@@ -164,9 +160,6 @@ class Controller extends BaseController
             $context['rowspan'] = null;
             $context['group']   = $group;
             $context['crit']    = $criterion;
-//            $context['group'] = [
-//                'id' => $post->get('groupId')
-//            ];
 
 
             $template = 'group-row-editable';
@@ -198,11 +191,6 @@ class Controller extends BaseController
 
             $context['rowspan'] = 1;
             $context['group']   = $group;
-//            $context['group'] = [
-//                'id'   => rand(1, PHP_INT_MAX), // this is just so the inputs on the page are unique
-//                'name' => $post->get('name'),
-//                'used' => false,
-//            ];
 
             $template = 'group-editable';
 

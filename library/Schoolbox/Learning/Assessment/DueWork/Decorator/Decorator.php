@@ -112,6 +112,8 @@ class Decorator implements DecoratorInterface
             $assessment->setSelfReviewability(SubmissionBox::SELF_REVIEWABILITY_NONE);
         } // Otherwise let the existing setting persist
 
+
+
         if ($this->getUseRubric()) {
 
             // TODO persist the new rowset before attempting to save it
@@ -123,10 +125,6 @@ class Decorator implements DecoratorInterface
             );
             $newGrid = $gridFactory->buildFromPostData($existingGrid, $this->getRubricData());
             $assessment->setRubricGrid($newGrid);
-
-//            /** @var DueWorkRubric $rubric */
-//            $rubric = (new RubricFactory(new DueWorkRubric()))->buildFromPostData($this->getRubricData(), $this->getMarkPerCapability(), $assessment->getUseMarkRange(), false);
-//            $assessment->setRubric($rubric);
 
             // TODO validate here??
             $markMax = $newGrid->calculateMaxValue();

@@ -30,14 +30,12 @@ class Factory
     {
         // we're only going to take the first one... this could be converted to foreach easily enough
         $rubricData = reset($postData);
-//        $rubricId   = key($postData);
 
         $levels      = $rubricData['level']      ?: [];
         $groups      = $rubricData['group']      ?: [];
         $criteria    = $rubricData['criterion']  ?: [];
         $descriptors = $rubricData['descriptor'] ?: [];
 
-//        $rubric = $this->spawn($rubricId);
 
         /** @var Level[] $levelCache */
         $levelCache = [];
@@ -51,7 +49,6 @@ class Factory
                 ->setId($levelId)
                 ->setName($levelName);
 
-//            $rubric->putLevel($levelCache[$levelSequence]);
             $grid->getLevels()->add($levelCache[$levelSequence]);
         }
 
@@ -60,14 +57,7 @@ class Factory
         // They will because the group was created when sending to the form
 
 
-        // Create cache of group usages
-        /** @var Group[] $groupCache */
-//        $groupCache = [
-//            0 => new Group(null, '', null)
-//        ];
-
         // cache groups
-//        $groupCache = [];
         foreach ($groups as $groupId => $groupData) {
             $groupName     = $groupData['name'];
             $groupMaxValue = isset($groupData['maxValue']) ? (float)$groupData['maxValue'] : null;
@@ -95,21 +85,6 @@ class Factory
             // spawn
             $criterion = $group->retrieveCriterionByName($criterionName);
 
-//            // set readonliness
-//            $criterion->setReadOnly(isset($criterion['readonly']) && $criterion['readonly']);
-//
-//            // retrieve from cache
-//            $group = $grid->getRowSet();
-//
-//            // cascade readonliness into group
-//            if ($criterion->isReadOnly()) {
-//                $group->setReadOnly(true);
-//            }
-//
-//            if ($includeEmptyCriteria) {
-//                $rubric->putCriterion($group, $criterion);
-//            }
-
             if (!$criterionEnabled) {
                 continue;
             }
@@ -133,11 +108,6 @@ class Factory
                         ->setDescription($descriptorText)
                         ->setMaxValue(null !== $descriptorValue ? (float)$descriptorValue : null);
                     $criterionUsage->getDescriptors()[$levelSequence] = $d;
-//                    try {
-//                        $rubric->putDescriptor($group, $criterion, $level, $d);
-//                    } catch (InvalidArgumentException $e) {
-//                        echo "Unable to put descriptor";
-//                    }
                 }
             }
 
