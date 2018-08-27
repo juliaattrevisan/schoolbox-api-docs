@@ -117,30 +117,25 @@ namespace RubricMarkedGrid {
         grid : RubricGrid
         feedback : IFeedback
         groups : RubricGroupMark[]
-        getTotalMark() : float
+        calculateMarkFromGroups() : float
     }
 
     class RubricGroupMark {
         group : RubricGroupUsage
         criteria: RubricCriterionMark[]
         value : float
+        calculateMarkFromCriteria() : float
     }
 
     class RubricCriterionMark {
         criterion : RubricCriterionUsage
-        descriptors: RubricDescriptorMark[]
-        getValue() : float
-    }
-
-    class RubricDescriptorMark {
-        descriptor : RubricDescriptor
+        selectedDescriptor: RubricDescriptor
         value : float
     }
 
     ' internal relations
     RubricMarkedGrid *-d- RubricGroupMark
     RubricGroupMark *-d- RubricCriterionMark
-    RubricCriterionMark *-d- RubricDescriptorMark
 
     ' relation to Assessment
     Assessment.IFeedback *-d- RubricMarkedGrid
@@ -149,7 +144,7 @@ namespace RubricMarkedGrid {
     RubricMarkedGrid -l-* RubricGrid.RubricGrid
     RubricGroupMark -l-* RubricGrid.RubricGroupUsage
     RubricCriterionMark -l-* RubricGrid.RubricCriterionUsage
-    RubricDescriptorMark -l-* RubricGrid.RubricDescriptor
+    RubricCriterionMark -l-* RubricGrid.RubricDescriptor
 }
 
 @enduml
