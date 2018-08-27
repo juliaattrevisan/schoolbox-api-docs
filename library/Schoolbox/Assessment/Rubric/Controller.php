@@ -19,6 +19,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionUsageMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
+use Schoolbox\Assessment\Rubric\Grid\Factory as GridFactory;
 use Schoolbox\Assessment\Rubric\Grid\Level;
 use Schoolbox\Assessment\Rubric\RowSet\RowSet;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -262,11 +263,10 @@ class Controller extends BaseController
                 $maxLevels
             );
 
-            $rubricRowSet = new RowSet($folder);
+            $rubricRowSet = $this->mapper->retrieveRowSet($folder, true);
             $rubricGrid   = new Grid((new DueWork())->setId($box->getAssessmentModel()->getId()), $rubricRowSet);
-
-            $factory    = new \Schoolbox\Assessment\Rubric\Grid\Factory();
-            $rubricGrid = $factory->buildFromPostData($rubricGrid, [$box->getAssessmentModel()->getId() => $postData]);
+            $rubricGrid   = (new GridFactory())
+                ->buildFromPostData($rubricGrid, [$box->getAssessmentModel()->getId() => $postData]);
 
         } catch (\Exception $e) {
 
@@ -278,10 +278,8 @@ class Controller extends BaseController
             return;
         }
 
-        // TODO inject new rubric grid here
         $context = [
             'formField'              => $post->get('formField', 'rb'),
-//            'rubric'                 => $grid->toContext(),
             'rubricGrid'             => $rubricGrid,
             'usingMarkPerCapability' => $usingMarkPerCapability,
             'usingMarkRange'         => $usingMarkRange,
