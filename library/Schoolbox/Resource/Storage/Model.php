@@ -14,6 +14,7 @@ use League\Flysystem\File;
 use League\Flysystem\FileNotFoundException;
 use RuntimeException;
 use Schoolbox\File\Mimetype;
+use Schoolbox\Json\Api\SitePageLink;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 
 /**
@@ -300,8 +301,8 @@ class Model extends File implements IStorage, \Alaress\Json\Serializable, Linkab
     public function getJsonApiLinks(): array
     {
         return [
-            'fetch' => [ "/storage/fetch.php?hash={$this->getHash()}" ] ,
-            'image' => [ "/storage/image.php?hash={$this->getHash()}" ] ,
+            'fetch' => new SitePageLink("/storage/fetch.php?hash={$this->getHash()}"),
+            'image' => new SitePageLink("/storage/image.php?hash={$this->getHash()}"),
         ];
     }
 

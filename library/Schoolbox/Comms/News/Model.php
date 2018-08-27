@@ -13,6 +13,7 @@ use Alaress\Json\Linkable;
 use Alaress\Json\SerializeTrait;
 use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Json\Api\AuraLink;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
@@ -583,8 +584,8 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
     public function getJsonApiLinks(): array
     {
         return [
-            'self'   => [ 'commsNews.getDetail', [ 'articleId' => $this->getId() ] ],
-            'update' => [ 'commsNews.getUpdate', [ 'articleId' => $this->getId() ] ],
+            'self'   => new AuraLink('commsNews.getDetail', [ 'articleId' => $this->getId() ]),
+            'update' => new AuraLink('commsNews.getUpdate', [ 'articleId' => $this->getId() ]),
         ];
     }
 

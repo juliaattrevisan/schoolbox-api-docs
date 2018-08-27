@@ -17,6 +17,7 @@ use HouseResidential;
 use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\External\Subject;
 use Schoolbox\External\SubjectCollection;
+use Schoolbox\Json\Api\SitePageLink;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
@@ -1377,7 +1378,7 @@ class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
     public function getJsonApiLinks(): array
     {
         return [
-            'profile' => [ "/search/user/{$this->getId()}" ]
+            'profile' => new SitePageLink("/search/user/{$this->getId()}"),
         ];
     }
 
