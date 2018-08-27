@@ -444,7 +444,7 @@ class RubricMapper
             $groupUsage = (new \Schoolbox\Assessment\Rubric\Grid\GroupUsage($group))
                 ->setMaxValue($groupUsageModel->getMaxValue());
 
-            $groupCriterionUsageModels = $groupedCriterionUsageModels[$groupId] ?? null;
+            $groupCriterionUsageModels = $groupedCriterionUsageModels[$groupId] ?? [];
             foreach ($groupCriterionUsageModels as $criterionUsageModel) {
                 /** @var CriterionUsage $criterionUsageModel */
                 $criterionModel = $criterionUsageModel->getCriterion();
