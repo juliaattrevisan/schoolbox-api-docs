@@ -355,7 +355,7 @@ class ImpressionsConversionsOpens
                 $referrer = Mapper::REFERRER_EMPTY;
             }
 
-            $breakdown[$statistic->getType()][$referrer] = $statistic->getNum();
+            $breakdown[$statistic->getType()][$referrer] += $statistic->getNum();
 
             if ($statistic->getType() === Mapper::TYPE_IMPRESSION) {
                 $numImpressions += $statistic->getNum();
