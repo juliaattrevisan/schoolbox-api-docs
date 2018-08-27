@@ -53,15 +53,12 @@ class Factory
 
 
         // cache groups
+        $groupCache = [];
         foreach ($groups as $groupId => $groupData) {
-            $groupName     = $groupData['name'];
+            $groupId       = (int)$groupData['id'];
             $groupMaxValue = isset($groupData['maxValue']) ? (float)$groupData['maxValue'] : null;
-
-            // Group might not be set
-            // TODO handle group name changes; pass in group ID as distinct from key
-            $group      = $grid->getRowSet()->retrieveGroupByName($groupName);
-            $groupUsage = (new GroupUsage($group))
-                ->setMaxValue($groupMaxValue);
+            $group         = $grid->getRowSet()->retrieveGroup($groupId);
+            $groupUsage    = (new GroupUsage($group))->setMaxValue($groupMaxValue);
 
             $groupCache[$groupId]             = $group;
             $grid->getGroupUsages()[$groupId] = $groupUsage;
@@ -70,14 +67,13 @@ class Factory
 
         // Cache criteria
         foreach ($criteria as $criterionId => $criterionData) {
-            $groupId          = $criterionData['groupId'];
+            $groupId          = (int)$criterionData['groupId'];
+            $criterionId      = (int)$criterionData['criterionId'];
             $criterionEnabled = isset($criterionData['on']) && $criterionData['on'];
-            $criterionName    = $criterionData['name'];
-
-            $group = $groupCache[$groupId];
+            $group            = $groupCache[$groupId];
 
             // spawn
-            $criterion = $group->retrieveCriterionByName($criterionName);
+            $criterion = $group->retrieveCriterion($criterionId);
 
             if (!$criterionEnabled) {
                 continue;
@@ -97,11 +93,11 @@ class Factory
                 $descriptorValue = $descriptor['points'];
 
                 if ('' !== $descriptorText || '' !== $descriptorValue) {
-                    $d = (new Descriptor())
-                        ->setId($descriptorId)
-                        ->setDescription($descriptorText)
-                        ->setMaxValue(null !== $descriptorValue ? (float)$descriptorValue : null);
-                    $criterionUsage->getDescriptors()[$levelSequence] = $d;
+                    $criterionUsage->getDescriptors()[$levelSequence] =
+                        (new Descriptor())
+                            ->setId($descriptorId)
+                            ->setDescription($descriptorText)
+                            ->setMaxValue(null !== $descriptorValue ? (float)$descriptorValue : null);
                 }
             }
 
