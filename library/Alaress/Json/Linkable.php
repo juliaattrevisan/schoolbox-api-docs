@@ -17,24 +17,14 @@ interface Linkable
 {
 
     /**
-     * Return an array in the following syntax:
-     * [
-     *     KEY => [
-     *         ROUTE_NAME, [
-     *             ARG_NAME => $this->value,
-     *             ...
-     *         ]
-     *     ],
-     *     ...
-     * ]
+     * Return an array of Api\Link objects, indexed by the desired output key
      *
      * eg, [
-     *     'self' => [
-     *         'getEntity' => [ 'entityId' => $this->getId() ]
-     *     ],
+     *     'self' => new AuraLink( ... ),
+     *     'crap' => new SitePageLink( ... ),
      * ]
      *
-     * @return array
+     * @return Api\Link[]
      */
     public function getJsonApiLinks(): array;
 
