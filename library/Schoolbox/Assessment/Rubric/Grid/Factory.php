@@ -8,11 +8,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\Grid;
 
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\GroupMapper;
-use Schoolbox\Assessment\Rubric\RowSet\Criterion;
-use Schoolbox\Assessment\Rubric\RowSet\Group;
-use Schoolbox\Learning\Assessment\IAssessable;
-
 /**
  * Class Factory
  */
@@ -22,7 +17,7 @@ class Factory
      * Port of `\Schoolbox\Assessment\Rubric\Factory::buildFromPostData`,
      * but builds a `Grid` object instead.
      *
-     * @param Grid  $grid     A grid (which already contains an assessment and rowset)
+     * @param Grid  $grid A grid (which already contains an assessment and rowset)
      * @param array $postData
      * @return Grid
      */
@@ -71,7 +66,6 @@ class Factory
             $groupCache[$groupId]             = $group;
             $grid->getGroupUsages()[$groupId] = $groupUsage;
         }
-
 
 
         // Cache criteria
