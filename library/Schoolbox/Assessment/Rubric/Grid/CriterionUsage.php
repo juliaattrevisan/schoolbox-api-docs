@@ -63,7 +63,7 @@ class CriterionUsage
      *
      * @return float|null
      */
-    public function calculateMaxValue(): ?float
+    public function calculateMaxValueFromDescriptors(): ?float
     {
         $values = [];
         foreach ($this->descriptors as $descriptor) {

@@ -176,11 +176,11 @@ class Grid extends TestCase
 
 
     /**
-     * Data provider for `getTestCalculateMaxValueData`
+     * Data provider for `testCalculateMaxValueFromGroups`
      *
      * @return iterable
      */
-    public function getTestCalculateMaxValueData(): iterable
+    public function getTestCalculateMaxValueDataFromGroups(): iterable
     {
         $rowSet     = new Rowset\RowSet(new Folder());
         $group1     = (new RowSet\Group())->setId(1)->setName('Group 1');
@@ -240,15 +240,15 @@ class Grid extends TestCase
 
 
     /**
-     * @dataProvider getTestCalculateMaxValueData
-     * @covers       \Schoolbox\Assessment\Rubric\Grid\Grid::calculateMaxValue
+     * @dataProvider getTestCalculateMaxValueDataFromGroups
+     * @covers       \Schoolbox\Assessment\Rubric\Grid\Grid::calculateMaxValueFromGroups
      *
      * @param RubricGrid\Grid $grid
      * @param float|null      $expected
      */
-    public function testCalculateMaxValue(RubricGrid\Grid $grid, ?float $expected): void
+    public function testCalculateMaxValueFromGroups(RubricGrid\Grid $grid, ?float $expected): void
     {
-        $this->assertSame($expected, $grid->calculateMaxValue());
+        $this->assertSame($expected, $grid->calculateMaxValueFromGroups());
     }
 
 

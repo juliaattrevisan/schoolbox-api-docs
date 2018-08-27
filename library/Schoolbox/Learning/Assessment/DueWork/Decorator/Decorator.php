@@ -127,7 +127,7 @@ class Decorator implements DecoratorInterface
             $assessment->setRubricGrid($newGrid);
 
             // TODO validate here??
-            $markMax = $newGrid->calculateMaxValue();
+            $markMax = $newGrid->calculateMaxValueFromGroups();
             $assessment->setMaxMark($markMax);
         }
 

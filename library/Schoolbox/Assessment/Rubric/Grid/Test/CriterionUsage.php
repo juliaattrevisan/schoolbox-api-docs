@@ -72,11 +72,11 @@ class CriterionUsage extends TestCase
 
 
     /**
-     * Data provider for `testRetrieveDescriptor`.
+     * Data provider for `testCalculateMaxValueFromDescriptors`.
      *
      * @return iterable
      */
-    public function getTestCalculateMaxValueData(): iterable
+    public function getTestCalculateMaxValueDataFromDescriptors(): iterable
     {
         $criterion1      = (new RowSet\Criterion())->setId(1)->setName('Criterion 1');
         $criterionUsage1 = new RubricGrid\CriterionUsage($criterion1);
@@ -122,17 +122,17 @@ class CriterionUsage extends TestCase
 
 
     /**
-     * @dataProvider getTestCalculateMaxValueData
-     * @covers       \Schoolbox\Assessment\Rubric\Grid\CriterionUsage::calculateMaxValue
+     * @dataProvider getTestCalculateMaxValueDataFromDescriptors
+     * @covers       \Schoolbox\Assessment\Rubric\Grid\CriterionUsage::calculateMaxValueFromDescriptors
      *
      * @param RubricGrid\CriterionUsage $criterionUsage
      * @param float|null                $expected
      */
-    public function testCalculateMaxValue(
+    public function testCalculateMaxValueFromDescriptors(
         RubricGrid\CriterionUsage $criterionUsage,
         ?float $expected
     ): void {
-        $this->assertSame($expected, $criterionUsage->calculateMaxValue());
+        $this->assertSame($expected, $criterionUsage->calculateMaxValueFromDescriptors());
     }
 
 

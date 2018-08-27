@@ -102,7 +102,7 @@ class Grid
      *
      * @return float
      */
-    public function calculateMaxValue(): float
+    public function calculateMaxValueFromGroups(): float
     {
         $maxValues = [];
         foreach ($this->groupUsages as $groupUsage) {

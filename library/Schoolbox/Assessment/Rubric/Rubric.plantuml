@@ -62,22 +62,26 @@ namespace RubricGrid {
         rowset : RubricRowset
         levels : RubricLevel[]
         groups : RubricGroupUsage[]
-        getRow(RubricCriterion) : RubricDescriptor[]
-        getColumn(RubricLevel) : RubricDescriptor[]
-        getDescriptor(RubricCriterion, RubricLevel) : RubricDescriptor
+        calculateMaxValueFromGroups() : float
+        iterateGroups() : RubricGroup[]
+        retrieveGroupUsage(RubricGroup) : ?RubricGroupUsage
+        retrieveCriterionUsage(RubricCriterion) : ?RubricCriterionUsage
     }
 
     class RubricGroupUsage {
         group : RubricGroup
         criteria : RubricCriterionUsage[]
         maxValue : float
+        calculateMaxValueFromCriteria() : float
+        iterateCriteria() : RubricCriterion[]
+        retrieveCriterionUsage(RubricCriterion) : ?RubricCriterionUsage
     }
 
     class RubricCriterionUsage {
         criterion : RubricCriterion
         descriptors : RubricDescriptor[]
-        getMaxValue() : float
-        getValueRange(RubricDescriptor) : (float, float)
+        calculateMaxValueFromDescriptors() : float
+        applyDescriptorMinValues() : void
     }
 
     class RubricLevel {
