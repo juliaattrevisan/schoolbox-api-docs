@@ -93,8 +93,6 @@ class Controller extends Base
             /* Historical Dailies
              */
             'historic' => $impressionsConversionsOpens->fetchHistoric($article),
-
-
         ])->setTitle("Statistics for {$article->getTitle()}"));
     }
 

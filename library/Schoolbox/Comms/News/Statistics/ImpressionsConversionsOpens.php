@@ -247,16 +247,9 @@ class ImpressionsConversionsOpens
          */
         $conversionRatio = $this->calculateConversionRatio($summary['numConversions'], $summary['numImpressions']);
 
-        /* Calculate conversion ratios for each referrer type
-         */
-        $referrerRatio = $this->calculateReferrerRatios($summary['breakdown']);
-
         return [
             'date' => $firstOpen,
-            'breakdown' => [
-                'grid' => $summary['breakdown']['grid'],
-                'ratio' => $referrerRatio
-            ],
+            'breakdown' => $summary['breakdown'],
             'numConversions' => $summary['numConversions'],
             'numImpressions' => $summary['numImpressions'],
             'conversionRatio' => $conversionRatio
@@ -303,16 +296,9 @@ class ImpressionsConversionsOpens
              */
             $conversionRatio = $this->calculateConversionRatio($summary['numConversions'], $summary['numImpressions']);
 
-            /* Calculate conversion ratios for each referrer type
-             */
-            $referrerRatio = $this->calculateReferrerRatios($summary['breakdown']);
-
             $daily = [
                 'date' => $summary['date'],
-                'breakdown' => [
-                    'grid' => $summary['breakdown']['grid'],
-                    'ratio' => $referrerRatio
-                ],
+                'breakdown' => $summary['breakdown'],
                 'numConversions' => $summary['numConversions'],
                 'numImpressions' => $summary['numImpressions'],
                 'conversionRatio' => $conversionRatio
