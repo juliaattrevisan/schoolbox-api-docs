@@ -1115,7 +1115,7 @@ class RubricMapper
      * @param int      $maxLevels
      *
      * @throws \Schoolbox\Resource\Exception
-     * @return array 0: Rubric
+     * @return array 0: rubric POST data used to build a rubric grid
      *               1: bool: does the rubric have customised max mark per group values?
      *                        (required as the rubric object doesn't store this separately
      *                         from their actual value)
@@ -1345,10 +1345,10 @@ class RubricMapper
         }
 
 
-        /** @var Rubric $rubric */
-        $rubric = $this->factory->buildFromPostData([0 => $postdata], $markPerCapability, $useMarkRange,true);
+//        /** @var Rubric $rubric */
+//        $rubric = $this->factory->buildFromPostData([0 => $postdata], $markPerCapability, $useMarkRange,true);
 
-        return [$rubric, $markPerCapability, $useMarkRange];
+        return [$postdata, $markPerCapability, $useMarkRange];
     }
 
     /**

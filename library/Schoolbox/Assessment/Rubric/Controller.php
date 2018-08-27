@@ -20,6 +20,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionUsageMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
 use Schoolbox\Assessment\Rubric\Grid\Level;
+use Schoolbox\Assessment\Rubric\RowSet\RowSet;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Resource\Attachment\Zone;
@@ -241,11 +242,12 @@ class Controller extends BaseController
             }
 
             if ($boxId = $post->get('boxId')) {
-                $box = SubmissionBoxMapper::getInstance()->findById($boxId);
-                $folderId = $box->getCategory()->getId();
+                $box    = SubmissionBoxMapper::getInstance()->findById($boxId);
+                $folder = $box->getCategory();
 
             } elseif ($folderId = $post->get('folderId')) {
-                $box = SubmissionBoxMapper::getInstance()->createModel()->setId(0);
+                $box    = SubmissionBoxMapper::getInstance()->createModel()->setId(0);
+                $folder = $box->getCategory()->setId($folderId);
 
             } else {
                 // can't work with that
@@ -254,12 +256,17 @@ class Controller extends BaseController
 
             // attempt to build the grid
             $maxLevels = $this->getDi()->get('config')->get('rubric_max_levels');
-            [$grid, $usingMarkPerCapability, $usingMarkRange] = $this->getMapper()->buildFromCSV(
+            [$postData, $usingMarkPerCapability, $usingMarkRange] = $this->getMapper()->buildFromCSV(
                 $file,
-                $folderId,
+                $folder->getId(),
                 $maxLevels
             );
-            $grid->setSubmissionBox($box);
+
+            $rubricRowSet = new RowSet($folder);
+            $rubricGrid   = new Grid((new DueWork())->setId($box->getAssessmentModel()->getId()), $rubricRowSet);
+
+            $factory    = new \Schoolbox\Assessment\Rubric\Grid\Factory();
+            $rubricGrid = $factory->buildFromPostData($rubricGrid, [$box->getAssessmentModel()->getId() => $postData]);
 
         } catch (\Exception $e) {
 
@@ -274,7 +281,8 @@ class Controller extends BaseController
         // TODO inject new rubric grid here
         $context = [
             'formField'              => $post->get('formField', 'rb'),
-            'rubric'                 => $grid->toContext(),
+//            'rubric'                 => $grid->toContext(),
+            'rubricGrid'             => $rubricGrid,
             'usingMarkPerCapability' => $usingMarkPerCapability,
             'usingMarkRange'         => $usingMarkRange,
         ];
