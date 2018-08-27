@@ -242,7 +242,13 @@ class Lists
                     $this->databaseInternal,
                     $this->statisticsMapper,
                     $this->statisticsCumulativeMapper
-                ))->saveImpression($record, $user->getId(), $user->getRole()->getType(), $params->getReferrer());
+                ))->saveImpression(
+                    $record,
+                    $user->getId(),
+                    $user->getRole()->getType(),
+                    $user->getRole()->getId(),
+                    $params->getReferrer()
+                );
             }
         }
 

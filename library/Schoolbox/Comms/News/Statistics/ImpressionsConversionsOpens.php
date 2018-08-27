@@ -71,13 +71,14 @@ class ImpressionsConversionsOpens
      * @param News\Model  $article
      * @param int         $userId
      * @param string      $roleType
+     * @param int         $roleId
      * @param null|string $referrer
      * @return bool|int[]
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    public function saveImpression(News\Model $article, int $userId, string $roleType, ?string $referrer)
+    public function saveImpression(News\Model $article, int $userId, string $roleType, int $roleId, ?string $referrer)
     {
         /* Only record Impressions for publicly-accessible articles
          */
@@ -103,7 +104,8 @@ class ImpressionsConversionsOpens
             'type' => Mapper::TYPE_IMPRESSION,
             'user_id' => $userId,
             'referrer' => $referrer,
-            'role_type' => $roleType
+            'role_type' => $roleType,
+            'role_id' => $roleId,
         ]);
 
         if ($existing) {
@@ -113,7 +115,7 @@ class ImpressionsConversionsOpens
         /* It's a valid referrer and $user hasn't been Impressed this period
          * so add an Impression record and increment the cumulative total
          */
-        $this->statisticsCumulativeMapper->incrementImpression($article->getId(), $roleType, $referrer);
+        $this->statisticsCumulativeMapper->incrementImpression($article->getId(), $roleType, $roleId, $referrer);
 
         return $this->statisticsMapper->save($this->statisticsMapper->createModel()
             ->setArticleId($article->getId())
@@ -121,6 +123,7 @@ class ImpressionsConversionsOpens
             ->setType(Mapper::TYPE_IMPRESSION)
             ->setReferrer($referrer)
             ->setRoleType($roleType)
+            ->setRoleId($roleId)
             ->setOccursAt(\Alaress_Date_Format::now()));
     }
 
@@ -137,13 +140,14 @@ class ImpressionsConversionsOpens
      * @param News\Model  $article
      * @param int         $userId
      * @param string      $roleType
+     * @param int         $roleId
      * @param null|string $referrer
      * @return bool|int[]
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    public function saveConversionOpen(News\Model $article, int $userId, string $roleType, ?string $referrer)
+    public function saveConversionOpen(News\Model $article, int $userId, string $roleType, int $roleId, ?string $referrer)
     {
         /* Only record Conversions for publicly-accessible articles
          */
@@ -169,7 +173,8 @@ class ImpressionsConversionsOpens
             'type' => Mapper::TYPE_CONVERSION,
             'user_id' => $userId,
             'referrer' => $referrer,
-            'role_type' => $roleType
+            'role_type' => $roleType,
+            'role_id' => $roleId,
         ]);
 
         if ($existing) {
@@ -188,6 +193,7 @@ class ImpressionsConversionsOpens
             ->setUserId($userId)
             ->setReferrer($referrer)
             ->setRoleType($roleType)
+            ->setRoleId($roleId)
             ->setOccursAt(\Alaress_Date_Format::now());
 
         if (null !== $referrer) {
@@ -195,14 +201,14 @@ class ImpressionsConversionsOpens
             /* It's a valid referrer and $user hasn't been Converted this period
              * so add a Conversion record and increment the cumulative total
              */
-            $this->statisticsCumulativeMapper->incrementConversion($article->getId(), $roleType, $referrer);
+            $this->statisticsCumulativeMapper->incrementConversion($article->getId(), $roleType, $roleId, $referrer);
 
             $model->setType(Mapper::TYPE_CONVERSION);
         } else {
 
             /* When referrer is empty, add an Open record and increment the cumulative total
              */
-            $this->statisticsCumulativeMapper->incrementOpen($article->getId(), $roleType);
+            $this->statisticsCumulativeMapper->incrementOpen($article->getId(), $roleType, $roleId);
 
             $model->setType(Mapper::TYPE_OPEN);
         }

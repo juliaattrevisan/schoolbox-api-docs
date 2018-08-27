@@ -507,7 +507,13 @@ class Controller extends Base
              * referrer value determines what kind it was
              */
             (new ImpressionsConversionsOpens($this->databaseInternal, $this->statisticsMapper, $this->statisticsCumulativeMapper))
-                ->saveConversionOpen($article, $this->getUser()->getId(), $this->getUser()->getRole()->getType(), $referrer);
+                ->saveConversionOpen(
+                    $article,
+                    $this->getUser()->getId(),
+                    $this->getUser()->getRole()->getType(),
+                    $this->getUser()->getRole()->getId(),
+                    $referrer
+                );
         }
 
         // don't supply the extra twig-necessary data if just returning JSON

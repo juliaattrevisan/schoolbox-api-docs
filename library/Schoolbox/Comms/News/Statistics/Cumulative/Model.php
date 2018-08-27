@@ -52,6 +52,11 @@ class Model implements ISoftDeletable
     /**
      * @var int
      */
+    private $roleId;
+
+    /**
+     * @var int
+     */
     private $num;
 
 
@@ -171,6 +176,26 @@ class Model implements ISoftDeletable
     public function setRoleType(?string $roleType): self
     {
         $this->roleType = $roleType;
+        return $this;
+    }
+
+
+    /**
+     * @return null|int
+     */
+    public function getRoleId(): ?int
+    {
+        return $this->roleId;
+    }
+
+
+    /**
+     * @param null|int $roleId
+     * @return Model
+     */
+    public function setRoleId(?int $roleId): self
+    {
+        $this->roleId = $roleId;
         return $this;
     }
 }

@@ -50,6 +50,11 @@ class Model implements ISoftDeletable
     private $roleType;
 
     /**
+     * @var int
+     */
+    private $roleId;
+
+    /**
      * A datetime associated with when this interaction occurred that isn't tied to the
      * mapper behaviours of created_at and updated_at. This allows us to mass produce data
      * and fudge some of the datetimes to simulate scenarios
@@ -157,6 +162,7 @@ class Model implements ISoftDeletable
         return $this;
     }
 
+
     /**
      * @return null|string
      */
@@ -173,6 +179,26 @@ class Model implements ISoftDeletable
     public function setRoleType(?string $roleType): self
     {
         $this->roleType = $roleType;
+        return $this;
+    }
+
+
+    /**
+     * @return null|int
+     */
+    public function getRoleId(): ?int
+    {
+        return $this->roleId;
+    }
+
+
+    /**
+     * @param null|int $roleId
+     * @return Model
+     */
+    public function setRoleId(?int $roleId): self
+    {
+        $this->roleId = $roleId;
         return $this;
     }
 }
