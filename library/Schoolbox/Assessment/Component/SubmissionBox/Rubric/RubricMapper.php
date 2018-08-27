@@ -846,8 +846,19 @@ class RubricMapper
                     ->setValid(true);
             }
 
-            // Save the custom mark if provided; otherwise just 0
-            $groupMarksToSave[$groupId]->setValue($customMark ?? 0);
+            // TODO halp why
+            $capabilityMax = $group->calculateMax();
+
+            // Percentage mark types (Letter Grade and Percentage) are always sent to the backend as values between 0-100
+            // TODO we probably DO need to know the descriptor row sums for the default capability max??
+            $max = $markType === "Total Mark" ? $capabilityMax : 100;
+
+            if ((new ValidCapabilityMark())->isValid($customMark, $capabilityMax, $markType)) {
+                // Save the custom mark if provided; otherwise just 0
+                $groupMarksToSave[$groupId]->setValue($customMark ?? 0);
+            } else {
+                throw new \InvalidArgumentException("Capability mark must be between 0 and " . $max);
+            }
         }
 
         // Pass 2: build set of descriptor marks
