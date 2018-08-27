@@ -185,8 +185,9 @@ class Controller extends BaseController
                 }
             }
 
-            $context['rowspan'] = 1;
-            $context['group']   = $group;
+            $context['rowspan']    = 1;
+            $context['group']      = $group;
+            $context['groupIndex'] = 0;
 
             $template = 'group-editable';
 

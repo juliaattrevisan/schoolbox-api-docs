@@ -1,9 +1,9 @@
 {# ensure these are set #}
 {%- set rubricId  = rubricId ?: 'rb-' ~ rubricGrid.id -%}
-{%- set groupId   = rubricId ~ '-' ~ group.id -%}
+{%- set groupId   = rubricId ~ '-' ~ groupIndex -%}
 {%- set groupName = group.name ? group.name : '(no ' ~ locale.translate('rubricGroup') ~ ')' -%}
 {%- set levelLimit = levelLimit ?: config.rubric_max_levels -%}
-{%- set groupInput = groupInput ?: formField ~ '[' ~ rubricGrid.id ~ '][group]['  ~ group.id ~ ']' -%}
+{%- set groupInput = groupInput ?: formField ~ '[' ~ rubricGrid.id ~ '][group]['  ~ groupIndex ~ ']' -%}
 
 {# Don't show the max value if there are no selected criteria in the group #}
 {% set hasSelectedDescriptor = false %}
@@ -27,7 +27,7 @@
                 <a class="icon-up-arrow" data-sequencer-up title="Move up"></a>
                 <a class="icon-down-arrow" data-sequencer-down title="Move down"></a>
             </span>
-            <input type="text" readonly name="{{ groupInput }}[id]" value="{{ group.id }}" />
+            <input type="text" readonly name="{{ groupInput }}[id]" value="{{ groupIndex }}" />
             {% if group.name %}
                 <label>
                     {%- if group.inUseExcluding(rubricGrid.assessment) -%}

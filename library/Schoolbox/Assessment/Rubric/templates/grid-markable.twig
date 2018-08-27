@@ -36,7 +36,7 @@
                 {% set rowspan = group.criteria|length + (showGroupTotal and markSchemeName != "None" ? 1 : 0) %}
 
                 {% for critIndex, crit in group.criteria %}
-                <tr data-group="{{ rubricId }}-{{ group.id }}">
+                <tr data-group="{{ rubricId }}-{{ groupIndex }}">
                     {# yay html tables... -_-; #}
                     {% if rowspan %}
                         <th class="rb-group-name" rowspan="{{ rowspan }}"><span>{{ group.name }}</span></th>
@@ -64,7 +64,7 @@
                                        type="checkbox"
                                        data-value="{{ descriptor.value }}"
                                        data-rubric="{{ rubric.id }}"
-                                       data-rubric-group="{{ group.id }}"
+                                       data-rubric-group="{{ groupIndex }}"
                                        data-rubric-descriptor="{{ descriptor.id }}"
                                        {% if descriptor.selected %}checked="checked"{% endif %}
                                 />
@@ -102,7 +102,7 @@
                                             class="{% if not descriptor.selected or descriptorMin == descriptorMax or not useMarkRange %} hide{% endif %}
                                             {% if useMarkRange and descriptorMin != descriptorMax and not hidePoints %}used{% endif %}"
                                             data-rubric="{{ rubric.id }}"
-                                            data-rubric-group="{{ group.id }}"
+                                            data-rubric-group="{{ groupIndex }}"
                                             data-rubric-descriptor="{{ descriptor.id }}"
                                     >
                                         {% set rangeStart = direction == 'asc' ? descriptorMin : descriptorMax %}
@@ -146,40 +146,40 @@
             {% endfor %}
             <tr>
                 <th class="rb-group-summary" colspan="{{ rubric.levels|length + 1 }}">
-                    <span data-group-summary="{{ rubricId }}-{{ group.id }}"
+                    <span data-group-summary="{{ rubricId }}-{{ groupIndex }}"
                           data-mark="{{ group.mark }}"
                           data-scaled-mark="{{ group.scaledMark }}"
                           data-max="{{ group.max }}"
                           data-row-max-sum="{{ group.rowMaxSum }}"
-                          data-group-id="{{ group.id }}"
+                          data-group-id="{{ groupIndex }}"
                           data-rubric-id="{{ rubric.id }}">
 
                         {# This is the value we insert into the database. #}
                         <input type="hidden"
                                data-db-mark
                                value="{{ group.mark }}"
-                               name="{{ formField }}[groups][{{ group.id }}][unscaledMark]">
+                               name="{{ formField }}[groups][{{ groupIndex }}][unscaledMark]">
 
                         {# This is the maximum capability mark, which wouldn't get POSTed otherwise #}
                         <input type="hidden"
                                value="{{ group.max }}"
-                               name="{{ formField }}[groups][{{ group.id }}][max]">
+                               name="{{ formField }}[groups][{{ groupIndex }}][max]">
 
-                        <label for="group-{{ group.id }}-mark">{{ locale.rubricGroup.proper }} mark</label>
+                        <label for="group-{{ groupIndex }}-mark">{{ locale.rubricGroup.proper }} mark</label>
 
                         {% if markSchemeName == 'TotalMarkFractional' %}
                             <input data-group-mark
                                    class="groupMark"
-                                   id="group-{{ group.id }}-mark"
+                                   id="group-{{ groupIndex }}-mark"
                                    type="tel"
-                                   name="{{ formField }}[groups][{{ group.id }}][customMark]"
+                                   name="{{ formField }}[groups][{{ groupIndex }}][customMark]"
                                    value="{{ group.scaledMark }}"/> / {{ group.max }}
 
                         {% elseif markSchemeName == 'LetterGrade' %}
                             <select data-group-mark
                                     class="groupMark"
-                                    name="{{ formField }}[groups][{{ group.id }}][customMark]"
-                                    id="group-{{ group.id }}-mark">
+                                    name="{{ formField }}[groups][{{ groupIndex }}][customMark]"
+                                    id="group-{{ groupIndex }}-mark">
 
                                 {% for value, letter in markType.conf %}
                                     <option value="{{ value }}"
@@ -193,9 +193,9 @@
                         {% elseif markSchemeName == 'Percentage'%}
                             <input data-group-mark
                                    class="groupMark"
-                                   id="group-{{ group.id }}-mark"
+                                   id="group-{{ groupIndex }}-mark"
                                    type="tel"
-                                   name="{{ formField }}[groups][{{ group.id }}][customMark]"
+                                   name="{{ formField }}[groups][{{ groupIndex }}][customMark]"
                                    value="{{ percentageMark }}"/> %
 
                         {% endif %}
