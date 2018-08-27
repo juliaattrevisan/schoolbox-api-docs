@@ -156,7 +156,7 @@
                         // And apply the group ID from this element to the new one
                         // find data-sequencer-group=something
                         // update its ID to whatever is in this ID
-
+                        $groupIdInput.val($data.find('input[data-group-id]').val());
 
                     } else {
                         cellTypeName = opt.localisedGroupName;
