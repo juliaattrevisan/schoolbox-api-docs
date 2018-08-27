@@ -841,6 +841,7 @@ class RubricMapper
             $group   = $descriptor->getCriterion()->getGroup();
             $groupId = $group->getId();
             if (!$groupMarksToSave[$groupId]) {
+                // TODO for some reason this isn't happening, so it errors out if there's no existing mark
                 $groupMarksToSave[$groupId] = $groupMarkMapper->createModel()
                     ->setSubmissionReturn($returnedWork)
                     ->setGroup($group)
