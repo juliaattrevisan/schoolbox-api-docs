@@ -423,9 +423,6 @@ class RubricMapper
                 ->setId($levelId)
                 ->setName($levelModel->getName());
 
-            foreach ($descriptorsByLevel[$levelId] as $criterionId => $descriptor) {
-                $level->getDescriptors()[$criterionId] = $descriptor;
-            }
             $grid->getLevels()->add($level);
         }
 

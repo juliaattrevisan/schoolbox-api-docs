@@ -22,44 +22,9 @@ class Level
 
 
     /**
-     * @var GenericCollection|Descriptor[]
-     */
-    private $descriptors;
-
-
-    /**
      * @var string|null
      */
     private $name;
-
-
-    /**
-     * Constructor
-     */
-    public function __construct()
-    {
-        $this->descriptors = new GenericCollection(Descriptor::class);
-    }
-
-
-    /**
-     * @return GenericCollection|Descriptor[]
-     */
-    public function getDescriptors(): GenericCollection
-    {
-        return $this->descriptors;
-    }
-
-
-    /**
-     * @param GenericCollection|Descriptor[] $descriptors
-     * @return static
-     */
-    public function setDescriptors(GenericCollection $descriptors): self
-    {
-        $this->descriptors = $descriptors;
-        return $this;
-    }
 
 
     /**
