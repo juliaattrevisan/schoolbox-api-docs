@@ -339,24 +339,4 @@ class Controller extends BaseController
         fclose($fp);
         return $result;
     }
-
-
-    /**
-     * @param int    $folderId
-     * @param string $grouping
-     * @param string $name
-     * @return array
-     */
-    protected function saveNewCriterion($folderId, $grouping, $name)
-    {
-        $model = CriterionMapper::getInstance()->findOrCreateOneForFolderByKey($folderId, $name, $grouping);
-
-        return [
-            'name'        => $model->getName(),
-            'id'          => $model->getId(),
-            'descriptors' => [],
-            'used'        => false,
-        ];
-    }
-
 }
