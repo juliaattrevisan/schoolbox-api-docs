@@ -16,6 +16,8 @@ use Alaress\Module\Loader as ModuleLoader;
 use Alaress\Redis;
 use Alaress\Twig\Loader\ChainLoader;
 use Alaress\Twig\Method as TwigMethod;
+use Alaress\Web\Request\IsJson;
+use Alaress\Web\Request\IsXhr;
 use Calendar\Api\ModuleChecker;
 use Calendar_Api_Factory;
 use Alaress\Session\Factory;
@@ -310,6 +312,8 @@ abstract class AbstractBootstrap implements BootstrapInterface
                     return $di->has('sentry') ? $di->get('sentry') : null;
                 }
             ),
+            'setIsJsonSpec' => $di->lazyNew(IsJson::class),
+            'setIsXhrSpec'  => $di->lazyNew(IsXhr::class)
         );
 
         // inject web params (yep, even Sitepage!)

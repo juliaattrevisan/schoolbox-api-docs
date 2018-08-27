@@ -9,9 +9,8 @@
 
 namespace Alaress\Web\Controller;
 
+use Alaress\Specification\ISpecification;
 use Alaress\Web\Output;
-use Alaress\Web\Request\IsJson;
-use Alaress\Web\Request\IsXhr;
 use Aura\Di;
 use Aura\Di\Exception\ServiceNotFound;
 use Aura\Session\SegmentInterface;
@@ -57,6 +56,12 @@ abstract class Base {
 
     /** @var IExceptionGenerator */
     private $eg;
+
+    /** @var ISpecification */
+    private $isJsonSpec;
+
+    /** @var ISpecification */
+    private $isXhrSpec;
 
     /**
      * Null if the SB instance is not configured to use Sentry, or if unable to instantiate Sentry.
@@ -181,6 +186,47 @@ abstract class Base {
     public function getAuthorizer() {
         return $this->authorizer;
     }
+
+
+    /**
+     * @param ISpecification $isJsonSpec
+     * @return $this
+     */
+    public function setIsJsonSpec(ISpecification $isJsonSpec): Base
+    {
+        $this->isJsonSpec = $isJsonSpec;
+        return $this;
+    }
+
+
+    /**
+     * @return bool
+     */
+    public function isJsonRequest(): bool
+    {
+        return $this->isJsonSpec->isSatisfiedBy($this->request);
+    }
+
+
+    /**
+     * @param ISpecification $isXhrSpec
+     * @return $this
+     */
+    public function setIsXhrSpec(ISpecification $isXhrSpec): Base
+    {
+        $this->isXhrSpec = $isXhrSpec;
+        return $this;
+    }
+
+
+    /**
+     * @return bool
+     */
+    public function isXhrRequest(): bool
+    {
+        return $this->isXhrSpec->isSatisfiedBy($this->request);
+    }
+
 
     /**
      * Gets the current authenticated user out of the session.
@@ -397,14 +443,12 @@ abstract class Base {
      */
     protected function buildContent($template, array $data)
     {
-        // TODO DI the specifications
-
-        if ((new IsJson())->isSatisfiedBy($this->getRequest())) {
+        if ($this->isJsonRequest()) {
             // prefer JSON if specified... this isn't exactly correct, but it's close enough for now
             return $this->buildJsonOutput($data);
         }
 
-        if ((new IsXhr())->isSatisfiedBy($this->getRequest())) {
+        if ($this->isXhrRequest()) {
             // if the request is AJAX, don't return the chrome
             return $this->buildUnthemedHtmlOutput($template, $data);
         }

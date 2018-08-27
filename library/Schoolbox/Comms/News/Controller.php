@@ -13,8 +13,6 @@ use Alaress\Json\Decorator\LinkDecorator;
 use Alaress\Json\Decorator\PropertyDecorator;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Output\ThemedHtml;
-use Alaress\Web\Request\IsJson;
-use Alaress\Web\Request\IsXhr;
 use Alaress\Web\Output\Html;
 use Aura\Router\Exception\RouteNotFound;
 use External_Class;
@@ -467,8 +465,7 @@ class Controller extends Base
         }
 
         // don't supply the extra twig-necessary data if just returning JSON
-        if ((new IsJson())->isSatisfiedBy($this->getRequest())) {
-
+        if ($this->isJsonRequest()) {
             // mutate the default map slightly
             $map = $article->getDefaultJsonMap();
             $map['featureImage'] = [ 'size', 'mime' ];
@@ -623,8 +620,7 @@ class Controller extends Base
 
         $partialData = $this->generatePartial($urlPrefix, $params, $topics, $params->getHidePaginator(), $year, $month);
 
-
-        if (!(new IsXhr())->isSatisfiedBy($this->getRequest())) {
+        if (!$this->isXhrRequest()) {
             // if it's NOT XHR, go for API version
             $this->response->content->set($this->buildJsonOutput([
                 'articles' => $partialData['articles']
