@@ -67,7 +67,12 @@
                 type   = $input.data('spawn'),
                 name   = this.value ? this.value.trim() : '',
                 $toastFeedback = $('[data-relation="create-response"]'),
-                $row, groupId;
+                $row,
+                groupIdentifier,
+                groupIndex,
+                groupId,
+                $groupIdInput;
+
 
             // prevent blank, but also prevent double-fire from keydown to blur
             if (name.length === 0 || $input.prop('disabled')) {
@@ -76,13 +81,17 @@
 
             $row = $input.closest('tr');
 
-            groupId = $row.data('group');
+            groupIdentifier = $row.data('group');
 
-            if (typeof groupId !== 'undefined') {
-                groupId = groupId.split('-')[2];
+            if (typeof groupIdentifier !== 'undefined') {
+                groupIndex = groupIdentifier.split('-')[2];
             } else {
-                groupId = null;
+                groupIndex = null;
             }
+
+            // Find the group row, extract its ID (as opposed to its index)
+            $groupIdInput = $rb.find('[data-group="'+groupIdentifier+'"] input[data-group-id]');
+            groupId       = $groupIdInput.val();
 
             var message = 'Creating "' + name + '"...';
             $toastFeedback.toastActivate({text: message});
@@ -113,6 +122,7 @@
                 type: type,
                 rubricId: opt.rubricId,
                 groupId: groupId,
+                groupIndex: groupIndex,
                 name: name,
                 levelCount: $rb.children('thead').find('input').length,
                 folderId: $('input[name=folderId]').val(),
@@ -120,7 +130,11 @@
             };
 
             if (type === 'criterion') {
-                payload.groupName = $rb.find('[name="' + ( opt.formField + '[' + [ payload.rubricId, 'group', groupId, 'name' ].join('][') + ']' ) + '"]').val();
+                payload.groupName = $rb.find(
+                    '[name="'
+                    + ( opt.formField + '[' + [ payload.rubricId, 'group', groupIndex, 'name' ].join('][') + ']' )
+                    + '"]'
+                ).val();
             }
 
             $.post(opt.url, payload)
