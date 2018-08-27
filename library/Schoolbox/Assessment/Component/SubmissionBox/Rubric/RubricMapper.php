@@ -803,7 +803,9 @@ class RubricMapper
      */
     public function saveForFeedback(array $descriptors, array $groups, int $returnId): void
     {
+        $groupMapper     = GroupMapper::getInstance();
         $descriptorMapper     = DescriptorMapper::getInstance();
+
         $descriptorMarkMapper = DescriptorMarkMapper::getInstance();
         $groupMarkMapper      = GroupMarkMapper::getInstance();
         $returnedWorkMapper   = SubmissionBox\ReturnedWorkMapper::getInstance();
@@ -815,11 +817,14 @@ class RubricMapper
         $groupMarksToSave      = $groupMarkMapper->createCollection();
         $descriptorMarksToSave = $descriptorMarkMapper->createCollection();
 
-        // What actually got saved?
-        $selectedGroups = [];
-        foreach ($groups as $id => $group) {
-            $selectedGroups[$id] = $group['value'];
-        }
+        // What actually got saved? We may have:
+        // - optionally, marks from the custom mark-per-cap input fields (only if mark-per-cap is enabled. may be empty array)
+        // - optionally, selected descriptor values (may be empty array)
+
+        $customGroupMarks = array_map(function($group) {
+            return $group['value'];
+        }, $groups);
+
         $selectedDescriptors = [];
         foreach ($descriptors as $id => $descriptor) {
             if (!empty($descriptor['selected'])) {
@@ -827,46 +832,30 @@ class RubricMapper
             }
         }
 
-        $descriptorModels = $descriptorMapper->findByColumn('id', array_keys($selectedDescriptors));
         $returnedWork     = $returnedWorkMapper->findById($returnId);
 
-        // Pass 1: build set of group marks
-        foreach ($selectedDescriptors as $descriptorId => $value) {
-
-            // If this isn't set: this is an issue
-            $descriptor = $descriptorModels[$descriptorId];
-
+        // Pass 1.5: is a custom max mark for the group set?
+        foreach ($customGroupMarks as $groupId => $customMark) {
             // Find a record for its group
+            $group = $groupMapper->findById($groupId);
+
             // If it doesn't exist: make a new one
-            $group   = $descriptor->getCriterion()->getGroup();
-            $groupId = $group->getId();
             if (!$groupMarksToSave[$groupId]) {
-                // TODO for some reason this isn't happening, so it errors out if there's no existing mark
                 $groupMarksToSave[$groupId] = $groupMarkMapper->createModel()
                     ->setSubmissionReturn($returnedWork)
                     ->setGroup($group)
                     ->setValid(true);
             }
 
-            // Now set its value to the sum of the descriptors for this group to date
-            $savedValue = $value ?? $descriptor->getMaxValue();
-            if (null !== $savedValue) {
-                $groupMarksToSave[$groupId]->setValue($groupMarksToSave[$groupId]->getValue() + $savedValue);
-            }
-        }
-
-        // Pass 1.5: is a custom max mark for the group set?
-        foreach ($selectedGroups as $groupId => $value) {
-            if (null !== $value) {
-                $groupMarksToSave[$groupId]->setValue($value);
-            }
+            // Save the custom mark if provided; otherwise just 0
+            $groupMarksToSave[$groupId]->setValue($customMark ?? 0);
         }
 
         // Pass 2: build set of descriptor marks
         foreach ($selectedDescriptors as $descriptorId => $value) {
 
             // If this isn't set: this is an issue
-            $descriptor = $descriptorModels[$descriptorId];
+            $descriptor = $descriptorMapper->findById($descriptorId);
 
             // Find the record for its group
             $groupId = $descriptor->getCriterion()->getGroup()->getId();
