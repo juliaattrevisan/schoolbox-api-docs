@@ -8,7 +8,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\Grid;
 
-use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Traits\Model\Id;
 
 /**
