@@ -8,6 +8,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\Grid;
 
+use Schoolbox\Assessment\Rubric\RowSet\Group;
+
 /**
  * Class Factory
  */
@@ -53,9 +55,14 @@ class Factory
 
 
         // cache groups
+        /** @var Group[] $groupCache */
         $groupCache = [];
-        foreach ($groups as $groupId => $groupData) {
-            $groupId       = (int)$groupData['id'];
+        foreach ($groups as $groupData) {
+            // This group must exist in order for it to be saved
+            $groupId = (int)$groupData['id'];
+            if (!$groupId) {
+                continue;
+            }
             $groupMaxValue = isset($groupData['maxValue']) ? (float)$groupData['maxValue'] : null;
             $group         = $grid->getRowSet()->retrieveGroup($groupId);
             $groupUsage    = (new GroupUsage($group))->setMaxValue($groupMaxValue);
@@ -66,19 +73,20 @@ class Factory
 
 
         // Cache criteria
-        foreach ($criteria as $criterionId => $criterionData) {
+        foreach ($criteria as $criterionData) {
             $groupId          = (int)$criterionData['groupId'];
-            $criterionId      = (int)$criterionData['criterionId'];
+            $criterionId      = (int)$criterionData['id'];
             $criterionEnabled = isset($criterionData['on']) && $criterionData['on'];
-            $group            = $groupCache[$groupId];
-
-            // spawn
-            $criterion = $group->retrieveCriterion($criterionId);
-
             if (!$criterionEnabled) {
                 continue;
             }
 
+            // spawn
+            $group     = $groupCache[$groupId];
+            $criterion = $group->retrieveCriterion($criterionId);
+
+            // If $criterion is null, then that's a problem; we're trying to
+            // save usage for a criterion which doesn't exist
             $criterionUsage = new CriterionUsage($criterion);
 
             foreach ($levelCache as $levelSequence => $level) {
