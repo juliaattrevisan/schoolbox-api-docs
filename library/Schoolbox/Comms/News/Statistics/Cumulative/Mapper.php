@@ -74,7 +74,8 @@ class Mapper extends \Schoolbox\Mapper
             'date' => $now->getDatabaseDate(),
             'article_id' => $articleId,
             'type' => $type,
-            'referrer' => $referrer
+            'referrer' => $referrer,
+            'role_id' => $roleId,
         ], ['cache' => false])->first();
 
         if ($model) {

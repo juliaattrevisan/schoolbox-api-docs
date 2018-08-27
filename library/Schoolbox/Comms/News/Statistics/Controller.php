@@ -77,6 +77,10 @@ class Controller extends Base
              */
             'referrerDemographic' => $impressionsConversionsOpens->fetchReferrerDemographic($article),
 
+            /* Overall RoleType Demographics
+             */
+            'roleTypeDemographic' => $impressionsConversionsOpens->fetchRoleTypeDemographic($article),
+
             /* Accuracy selector
              */
             'accuracies' => News\Statistics\Accuracy\Factory::ACCURACIES,
@@ -89,6 +93,8 @@ class Controller extends Base
             /* Historical Dailies
              */
             'historic' => $impressionsConversionsOpens->fetchHistoric($article),
+
+
         ])->setTitle("Statistics for {$article->getTitle()}"));
     }
 

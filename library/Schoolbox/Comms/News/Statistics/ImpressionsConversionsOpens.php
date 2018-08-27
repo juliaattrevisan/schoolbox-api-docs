@@ -404,6 +404,48 @@ class ImpressionsConversionsOpens
 
 
     /**
+     * Fetch RoleType demographics across the entire lifetime of an article
+     *
+     * @param News\Model $article
+     * @return array
+     * @throws \Alaress\Database\Exception
+     */
+    public function fetchRoleTypeDemographic(News\Model $article): array
+    {
+        /* Prefill array with default values so they don't render as empty strings
+         */
+        $defaultValues = array_fill_keys(Mapper::ROLETYPES, 0);
+
+        $breakdown = [
+            Mapper::TYPE_CONVERSION => $defaultValues,
+            Mapper::TYPE_IMPRESSION => $defaultValues,
+            Mapper::TYPE_OPEN => $defaultValues,
+        ];
+
+        $statement = $this->database->prepareQuery("
+            SELECT 
+                SUM(num) AS num,
+                `type`, 
+                role_type
+            FROM {$this->statisticsCumulativeMapper->getTable()}
+            WHERE article_id = :articleId
+            GROUP BY `type`, role_type
+            ORDER BY role_type;
+        ");
+
+        $statement->execute([
+            'articleId' => $article->getId()
+        ]);
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $breakdown[$row['type']][$row['role_type']] += $row['num'];
+        }
+
+        return $breakdown;
+    }
+
+
+    /**
      * The average conversion ratio over time
      *
      * Fetch data set separately from its previous home in fetchInteractionReferrers()

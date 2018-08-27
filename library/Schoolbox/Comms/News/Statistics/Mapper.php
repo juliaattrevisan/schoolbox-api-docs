@@ -9,6 +9,9 @@
 
 namespace Schoolbox\Comms\News\Statistics;
 
+use Schoolbox\RoleMapper;
+
+
 /**
  * Class Mapper
  * @package Schoolbox\Comms\News\Statistics
@@ -35,7 +38,8 @@ class Mapper extends \Schoolbox\Mapper
      */
     public const REFERRER_EMPTY = 'unknown';
 
-    /* These are the referrers that we understand in the domain logic
+    /**
+     * These are the referrers that we understand in the domain logic
      */
     public const REFERRERS = [
         self::REFERRER_DASHBOARD,
@@ -43,6 +47,16 @@ class Mapper extends \Schoolbox\Mapper
         self::REFERRER_INDEX,
         self::REFERRER_ARCHIVE,
         self::REFERRER_EMAIL,
+    ];
+
+    /**
+     * Known role types
+     */
+    public const ROLETYPES = [
+        RoleMapper::ROLE_STAFF,
+        RoleMapper::ROLE_PARENT,
+        RoleMapper::ROLE_STUDENT,
+        RoleMapper::ROLE_GUEST
     ];
         
     /**

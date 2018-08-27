@@ -31,6 +31,12 @@
                 referrerDemographic: referrerDemographic
             } %}
         </section>
+
+        <section class="content">
+            {% include '@commsNewsStatistics/roletype-demographic.twig' with {
+                roleTypeDemographic: roleTypeDemographic
+            } %}
+        </section>
     </div>
 </div>
 
@@ -73,3 +79,4 @@
     </div>
 </div>
 {% endif %}
+
