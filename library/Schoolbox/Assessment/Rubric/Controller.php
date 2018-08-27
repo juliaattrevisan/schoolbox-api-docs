@@ -12,6 +12,7 @@ namespace Schoolbox\Assessment\Rubric;
 use Alaress\Web\Controller\Base as BaseController;
 use Alaress\Web\Template\DebugTwig;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\GroupMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Rubric\Grid\Factory as GridFactory;
@@ -121,8 +122,9 @@ class Controller extends BaseController
 
         if ($post->get('type') == 'criterion') {
 
-            $groupName = $post->get('groupName');
-            $critName  = $post->get('name');
+            $groupIndex = $post->get('groupIndex');
+            $groupName  = $post->get('groupName');
+            $critName   = $post->get('name');
             if(!$groupName){
                 $this->sendJSONError('Must supply a Group for new Criterion');
                 return;
@@ -134,7 +136,7 @@ class Controller extends BaseController
             $proposedName    = $this->mapper->normaliseForComparison($critName);
             foreach ($criteria as $criterion){
                 $normGroup = $this->mapper->normaliseForComparison($criterion->getGroup()->getName());
-                $normName = $this->mapper->normaliseForComparison($criterion->getName());
+                $normName  = $this->mapper->normaliseForComparison($criterion->getName());
                 if ($normGroup === $proposedGroup && $normName === $proposedName){
                     // TODO localise!!!!!
                     $this->sendJSONError("Indicator already exists in this Group");
@@ -153,10 +155,10 @@ class Controller extends BaseController
                 ->setId($criterionModel->getId())
                 ->setName($critName);
 
-            $context['rowspan'] = null;
-            $context['group']   = $group;
-            $context['crit']    = $criterion;
-
+            $context['rowspan']    = null;
+            $context['group']      = $group;
+            $context['crit']       = $criterion;
+            $context['groupIndex'] = $groupIndex;
 
             $template = 'group-row-editable';
         }
@@ -174,10 +176,10 @@ class Controller extends BaseController
                 ->setName($groupName);
 
             // Ensure the proposed Group name is not already in use.
-            $criteria = CriterionMapper::getInstance()->findForFolder($folderId);
+            $groups   = GroupMapper::getInstance()->findForFolder($folderId);
             $proposed = $this->mapper->normaliseForComparison($groupName);
-            foreach ($criteria as $criterion){
-                $grouping = $this->mapper->normaliseForComparison($criterion->getGroup()->getName());
+            foreach ($groups as $group){
+                $grouping = $this->mapper->normaliseForComparison($group->getName());
                 if ($proposed === $grouping){
                     // TODO localise
                     $this->sendJSONError("Group name already exists in this context");
@@ -187,7 +189,7 @@ class Controller extends BaseController
 
             $context['rowspan']    = 1;
             $context['group']      = $group;
-            $context['groupIndex'] = 0;
+            $context['groupIndex'] = \count($groups);
 
             $template = 'group-editable';
 

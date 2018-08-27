@@ -7,6 +7,7 @@
 {%- if rowspan is not null -%}
 <tr data-group="{{ groupId }}" data-sequencer-group="{{ rubricId }}-groups" data-groupname="{{ group.name }}" class="rb-group-header">
     <th rowspan="{{ rowspan ? rowspan : 2 }}">
+        <span style="color:red">:{{ groupIndex }}:</span>
         <span class="sequencer" data-sequencer-v="{{ rubricId }}-groups">
             <a class="icon-up-arrow" data-sequencer-up title="Move up"></a>
             <a class="icon-down-arrow" data-sequencer-down title="Move down"></a>
