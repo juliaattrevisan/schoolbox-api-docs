@@ -114,7 +114,7 @@ class Factory
         foreach ($grid->getGroupUsages() as $groupUsage) {
             $groupMaxValue = $groupUsage->getMaxValue();
             if (null === $groupMaxValue) {
-                $groupUsage->setMaxValue($groupUsage->calculateMaxValue());
+                $groupUsage->setMaxValue($groupUsage->calculateMaxValueFromCriteria());
             }
         }
 

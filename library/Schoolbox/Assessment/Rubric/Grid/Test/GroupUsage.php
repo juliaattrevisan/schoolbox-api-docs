@@ -161,11 +161,11 @@ class GroupUsage extends TestCase
 
 
     /**
-     * Data provider for `testCalculateMaxValue`.
+     * Data provider for `testCalculateMaxValueFromCriteria`.
      *
      * @return iterable
      */
-    public function getTestCalculateMaxValue(): iterable
+    public function getTestCalculateMaxValueFromCriteriaData(): iterable
     {
         $group      = (new RowSet\Group())->setId(1)->setName('Group 1');
         $criterion1 = (new RowSet\Criterion())->setId(1)->setName('Criterion 1.1');
@@ -228,14 +228,14 @@ class GroupUsage extends TestCase
 
 
     /**
-     * @dataProvider getTestCalculateMaxValue
-     * @covers \Schoolbox\Assessment\Rubric\Grid\GroupUsage::calculateMaxValue
+     * @dataProvider getTestCalculateMaxValueFromCriteriaData
+     * @covers \Schoolbox\Assessment\Rubric\Grid\GroupUsage::calculateMaxValueFromCriteria
      *
      * @param RubricGrid\GroupUsage $groupUsage
      * @param float                 $expected
      */
-    public function testCalculateMaxValue(RubricGrid\GroupUsage $groupUsage, float $expected): void
+    public function testCalculateMaxValueFromCriteria(RubricGrid\GroupUsage $groupUsage, float $expected): void
     {
-        $this->assertSame($expected, $groupUsage->calculateMaxValue());
+        $this->assertSame($expected, $groupUsage->calculateMaxValueFromCriteria());
     }
 }
