@@ -37,6 +37,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('article_id', self::TYPE_INTEGER);
         $this->uses('type', self::TYPE_STRING);
         $this->uses('referrer', self::TYPE_STRING);
+        $this->uses('role_type', self::TYPE_STRING);
         $this->uses('num', self::TYPE_INTEGER);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
@@ -49,13 +50,14 @@ class Mapper extends \Schoolbox\Mapper
      *
      * @param int         $articleId
      * @param string      $type
+     * @param string      $roleType
      * @param null|string $referrer
      * @return bool|int[]
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function increment(int $articleId, string $type, ?string $referrer)
+    private function increment(int $articleId, string $type, string $roleType, ?string $referrer)
     {
         $now = \Alaress_Date_Format::now();
 
@@ -81,6 +83,7 @@ class Mapper extends \Schoolbox\Mapper
                 ->setArticleId($articleId)
                 ->setType($type)
                 ->setReferrer($referrer)
+                ->setRoleType($roleType)
                 ->setNum(1);
         }
 
@@ -93,19 +96,20 @@ class Mapper extends \Schoolbox\Mapper
      * Only increment known referrers
      *
      * @param int         $articleId
+     * @param string      $roleType
      * @param null|string $referrer
      * @return bool|int[]
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    public function incrementImpression(int $articleId, ?string $referrer)
+    public function incrementImpression(int $articleId, string $roleType, ?string $referrer)
     {
         if (!(new Statistics\ValidImpressionReferrer())->isSatisfiedBy($referrer)) {
             return false;
         }
 
-        return $this->increment($articleId, StatisticsMapper::TYPE_IMPRESSION, $referrer);
+        return $this->increment($articleId, StatisticsMapper::TYPE_IMPRESSION, $roleType, $referrer);
     }
 
 
@@ -118,20 +122,21 @@ class Mapper extends \Schoolbox\Mapper
      * Conversions cannot have a null referrer (despite that being considered valid
      * for general usage, it's invalid for this particular usage)
      *
-     * @param int         $articleId
+     * @param int    $articleId
+     * @param string $roleType
      * @param string $referrer
      * @return bool|int[]
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    public function incrementConversion(int $articleId, string $referrer)
+    public function incrementConversion(int $articleId, string $roleType, string $referrer)
     {
         if (!(new Statistics\ValidOpenReferrer())->isSatisfiedBy($referrer)) {
             return false;
         }
 
-        return $this->increment($articleId, StatisticsMapper::TYPE_CONVERSION, $referrer);
+        return $this->increment($articleId, StatisticsMapper::TYPE_CONVERSION, $roleType, $referrer);
     }
 
 
@@ -144,14 +149,15 @@ class Mapper extends \Schoolbox\Mapper
      * It can be null if someone directly typed in the url so in this case,
      * $referrer has no utility.
      *
-     * @param int $articleId
+     * @param int    $articleId
+     * @param string $roleType
      * @return bool|int[]
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    public function incrementOpen(int $articleId)
+    public function incrementOpen(int $articleId, string $roleType)
     {
-        return $this->increment($articleId, StatisticsMapper::TYPE_OPEN, null);
+        return $this->increment($articleId, StatisticsMapper::TYPE_OPEN, $roleType, null);
     }
 }

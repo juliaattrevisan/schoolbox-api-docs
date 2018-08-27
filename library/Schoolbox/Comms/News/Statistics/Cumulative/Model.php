@@ -43,6 +43,13 @@ class Model implements ISoftDeletable
     private $referrer;
 
     /**
+     * One of the roleTypes specified in RoleMapper consts: staff parent student guest
+     *
+     * @var string
+     */
+    private $roleType;
+
+    /**
      * @var int
      */
     private $num;
@@ -144,6 +151,26 @@ class Model implements ISoftDeletable
     public function setNum(int $num): self
     {
         $this->num = $num;
+        return $this;
+    }
+
+
+    /**
+     * @return null|string
+     */
+    public function getRoleType(): ?string
+    {
+        return $this->roleType;
+    }
+
+
+    /**
+     * @param null|string $roleType
+     * @return $this
+     */
+    public function setRoleType(?string $roleType): self
+    {
+        $this->roleType = $roleType;
         return $this;
     }
 }

@@ -22,7 +22,6 @@ class Model implements ISoftDeletable
     use UpdatedAtDate;
     use DeletedAtDate;
 
-        
     /**
      * @var int
      */
@@ -42,6 +41,13 @@ class Model implements ISoftDeletable
      * @var string
      */
     private $referrer;
+
+    /**
+     * One of the roleTypes specified in RoleMapper consts: staff parent student guest
+     *
+     * @var string
+     */
+    private $roleType;
 
     /**
      * A datetime associated with when this interaction occurred that isn't tied to the
@@ -148,6 +154,25 @@ class Model implements ISoftDeletable
     public function setOccursAt(\Alaress_Date_Format $occursAt): self
     {
         $this->occursAt = $occursAt;
+        return $this;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getRoleType(): ?string
+    {
+        return $this->roleType;
+    }
+
+
+    /**
+     * @param null|string $roleType
+     * @return $this
+     */
+    public function setRoleType(?string $roleType): self
+    {
+        $this->roleType = $roleType;
         return $this;
     }
 }

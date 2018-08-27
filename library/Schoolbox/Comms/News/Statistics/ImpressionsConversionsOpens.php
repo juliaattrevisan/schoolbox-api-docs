@@ -70,13 +70,14 @@ class ImpressionsConversionsOpens
      *
      * @param News\Model  $article
      * @param int         $userId
+     * @param string      $roleType
      * @param null|string $referrer
      * @return bool|int[]
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    public function saveImpression(News\Model $article, int $userId, ?string $referrer)
+    public function saveImpression(News\Model $article, int $userId, string $roleType, ?string $referrer)
     {
         /* Only record Impressions for publicly-accessible articles
          */
@@ -101,7 +102,8 @@ class ImpressionsConversionsOpens
             'article_id' => $article->getId(),
             'type' => Mapper::TYPE_IMPRESSION,
             'user_id' => $userId,
-            'referrer' => $referrer
+            'referrer' => $referrer,
+            'role_type' => $roleType
         ]);
 
         if ($existing) {
@@ -111,13 +113,14 @@ class ImpressionsConversionsOpens
         /* It's a valid referrer and $user hasn't been Impressed this period
          * so add an Impression record and increment the cumulative total
          */
-        $this->statisticsCumulativeMapper->incrementImpression($article->getId(), $referrer);
+        $this->statisticsCumulativeMapper->incrementImpression($article->getId(), $roleType, $referrer);
 
         return $this->statisticsMapper->save($this->statisticsMapper->createModel()
             ->setArticleId($article->getId())
             ->setUserId($userId)
             ->setType(Mapper::TYPE_IMPRESSION)
             ->setReferrer($referrer)
+            ->setRoleType($roleType)
             ->setOccursAt(\Alaress_Date_Format::now()));
     }
 
@@ -133,13 +136,14 @@ class ImpressionsConversionsOpens
      *
      * @param News\Model  $article
      * @param int         $userId
+     * @param string      $roleType
      * @param null|string $referrer
      * @return bool|int[]
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    public function saveConversionOpen(News\Model $article, int $userId, ?string $referrer)
+    public function saveConversionOpen(News\Model $article, int $userId, string $roleType, ?string $referrer)
     {
         /* Only record Conversions for publicly-accessible articles
          */
@@ -164,7 +168,8 @@ class ImpressionsConversionsOpens
             'article_id' => $article->getId(),
             'type' => Mapper::TYPE_CONVERSION,
             'user_id' => $userId,
-            'referrer' => $referrer
+            'referrer' => $referrer,
+            'role_type' => $roleType
         ]);
 
         if ($existing) {
@@ -182,6 +187,7 @@ class ImpressionsConversionsOpens
             ->setArticleId($article->getId())
             ->setUserId($userId)
             ->setReferrer($referrer)
+            ->setRoleType($roleType)
             ->setOccursAt(\Alaress_Date_Format::now());
 
         if (null !== $referrer) {
@@ -189,14 +195,14 @@ class ImpressionsConversionsOpens
             /* It's a valid referrer and $user hasn't been Converted this period
              * so add a Conversion record and increment the cumulative total
              */
-            $this->statisticsCumulativeMapper->incrementConversion($article->getId(), $referrer);
+            $this->statisticsCumulativeMapper->incrementConversion($article->getId(), $roleType, $referrer);
 
             $model->setType(Mapper::TYPE_CONVERSION);
         } else {
 
             /* When referrer is empty, add an Open record and increment the cumulative total
              */
-            $this->statisticsCumulativeMapper->incrementOpen($article->getId());
+            $this->statisticsCumulativeMapper->incrementOpen($article->getId(), $roleType);
 
             $model->setType(Mapper::TYPE_OPEN);
         }

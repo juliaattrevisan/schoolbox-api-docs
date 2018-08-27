@@ -59,6 +59,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('user_id', self::TYPE_INTEGER);
         $this->uses('type', self::TYPE_STRING);
         $this->uses('referrer', self::TYPE_STRING);
+        $this->uses('role_type', self::TYPE_STRING);
         $this->uses('occurs_at', self::TYPE_DATETIME);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
