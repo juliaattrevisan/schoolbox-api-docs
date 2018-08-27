@@ -41,7 +41,6 @@ abstract class AbstractController extends \Alaress\Web\Controller\Restful\Abstra
     {
         $this->getMapper()->delete($entity);
         $this->getResponse()->status->setCode(204);
-        $this->getResponse()->content->set(null);
     }
 
     /* Getters/Setters
