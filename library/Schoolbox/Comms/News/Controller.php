@@ -9,7 +9,6 @@
 namespace Schoolbox\Comms\News;
 
 use Alaress\Database\Connector\IConnector;
-use Alaress\Json\Decorator\LinkDecorator;
 use Alaress\Json\Decorator\PropertyDecorator;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Output\ThemedHtml;
@@ -26,6 +25,7 @@ use Schoolbox\Comms\News\Audience\RelationshipFilterer;
 use Schoolbox\Comms\News\Policy;
 use Schoolbox\Comms\News\SaveForLater;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Json\Decorator\LinkDecorator;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\News\Topic;
@@ -472,7 +472,7 @@ class Controller extends Base
 
             $data = [
                 'article' => $article->jsonSerialize(
-                    new PropertyDecorator($map, new LinkDecorator($this->router, $this->authorizer))
+                    new PropertyDecorator($map, new LinkDecorator($this->router, $this->authorizer, $this->getUser()))
                 ),
                 'isSavedForLater' => $isSavedForLater,
             ];
