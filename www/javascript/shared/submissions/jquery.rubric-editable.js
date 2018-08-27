@@ -90,7 +90,7 @@
             }
 
             // Find the group row, extract its ID (as opposed to its index)
-            $groupIdInput = $rb.find('[data-group="'+groupIdentifier+'"] input[data-group-id]');
+            $groupIdInput = $rb.find('[data-group="'+groupIdentifier+'"][data-groupname] input[data-group-id]');
             groupId       = $groupIdInput.val();
 
             var message = 'Creating "' + name + '"...';
@@ -101,7 +101,7 @@
              * duplicate criterion, but cannot prevent duplicate groups as they are not persisted until a indicator
              * name is entered.
              */
-            if('group' === type){
+            if ('group' === type) {
                 var normalisedNewGroup = normaliseForComparison(name);
                 var $groups =  $('[data-groupname]');
                 for (var i = 0; i < $groups.length; i++) {
@@ -129,7 +129,7 @@
                 markPerCapability: $('#markPerCapability').prop('checked')
             };
 
-            if (type === 'criterion') {
+            if ('criterion' === type) {
                 payload.groupName = $rb.find(
                     '[name="'
                     + ( opt.formField + '[' + [ payload.rubricId, 'group', groupIndex, 'name' ].join('][') + ']' )
@@ -146,7 +146,7 @@
 
                     var cellTypeName = '';
 
-                    if (type === 'criterion') {
+                    if ('criterion' === type) {
                         cellTypeName = opt.localisedCriterionName;
 
                         // just gotta extend that rowspan

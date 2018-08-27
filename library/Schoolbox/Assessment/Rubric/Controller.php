@@ -176,11 +176,11 @@ class Controller extends BaseController
                 ->setName($groupName);
 
             // Ensure the proposed Group name is not already in use.
-            $groups   = GroupMapper::getInstance()->findForFolder($folderId);
-            $proposed = $this->mapper->normaliseForComparison($groupName);
-            foreach ($groups as $group){
-                $grouping = $this->mapper->normaliseForComparison($group->getName());
-                if ($proposed === $grouping){
+            $groupModels = GroupMapper::getInstance()->findForFolder($folderId);
+            $proposed    = $this->mapper->normaliseForComparison($groupName);
+            foreach ($groupModels as $groupModel) {
+                $grouping = $this->mapper->normaliseForComparison($groupModel->getName());
+                if ($proposed === $grouping) {
                     // TODO localise
                     $this->sendJSONError("Group name already exists in this context");
                     return;
@@ -189,7 +189,7 @@ class Controller extends BaseController
 
             $context['rowspan']    = 1;
             $context['group']      = $group;
-            $context['groupIndex'] = \count($groups);
+            $context['groupIndex'] = \count($groupModels);
 
             $template = 'group-editable';
 
