@@ -177,6 +177,19 @@ class Grid
 
 
     /**
+     * Iterates each criterion in the grid for the given group.
+     *
+     * @param Group $group
+     * @return iterable|Criterion[]
+     */
+    public function iterateCriteria(Group $group): iterable
+    {
+        $groupUsage = $this->retrieveGroupUsage($group);
+        return $groupUsage ? $groupUsage->iterateCriteria() : $group->getCriteria();
+    }
+
+
+    /**
      * @return IAssessable
      */
     public function getAssessment(): IAssessable
