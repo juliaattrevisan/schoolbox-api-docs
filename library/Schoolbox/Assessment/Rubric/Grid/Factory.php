@@ -58,7 +58,7 @@ class Factory
             $groupMaxValue = isset($groupData['maxValue']) ? (float)$groupData['maxValue'] : null;
 
             // Group might not be set
-            // TODO handle group name changes
+            // TODO handle group name changes; pass in group ID as distinct from key
             $group      = $grid->getRowSet()->retrieveGroupByName($groupName);
             $groupUsage = (new GroupUsage($group))
                 ->setMaxValue($groupMaxValue);
