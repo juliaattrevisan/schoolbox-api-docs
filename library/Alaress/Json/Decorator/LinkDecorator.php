@@ -9,8 +9,8 @@
 namespace Alaress\Json\Decorator;
 
 use Alaress\Authorizer\Authorizer;
+use Alaress\Json\Api\Link;
 use Alaress\Json\Linkable;
-use Aura\Router\Exception\RouteNotFound;
 use Aura\Router\Router;
 
 
@@ -23,10 +23,10 @@ use Aura\Router\Router;
 class LinkDecorator implements IDecorator
 {
     /** @var Router */
-    private $router;
+    protected $router;
 
     /** @var Authorizer */
-    private $auth;
+    protected $auth;
 
 
     /**
@@ -47,41 +47,32 @@ class LinkDecorator implements IDecorator
      */
     public function decorate(array $json, $model): array
     {
-        if ($model instanceof Linkable) {
-            foreach ($model->getJsonApiLinks() as $linkName => $route) {
+        if (!$model instanceof Linkable) {
+            // only attempt to decorate if the model is the right type
+            return $json;
+        }
 
-                switch (\count($route)) {
-                    case 1:
-                        // flat, old, crappy URI
-                        [ $href ] = $route;
-                        $auth = null; // we have no way of knowing...
-                    break;
-
-                    case 2:
-                        // aura lookup
-                        [ $routeName, $routeArgs ] = $route;
-
-                        try {
-                            $href = $this->router->generate($routeName, $routeArgs);
-                            $auth = $this->auth->isPathAuthorizedForUser($routeName, $routeArgs, $_SESSION['user']);
-                        } catch (RouteNotFound $e) {
-                            // noop; the model incorrectly specifies a route name
-                        }
-
-                        break;
-                    default:
-                        // invalid: silently ignore
-                        continue 2;
-                }
-
-                $json['_links'][$linkName] = [
-                    'href' => $href,
-                    'auth' => $auth
-                ];
-            }
+        // iterate the links provided (if any) and render accordingly
+        foreach ($model->getJsonApiLinks() as $linkName => $link) {
+            $json['_links'][$linkName] = $this->parseLink($link);
         }
 
         return $json;
+    }
+
+
+    /**
+     * Parse the given link object
+     *
+     * @param Link $link
+     * @return array
+     */
+    protected function parseLink(Link $link): array
+    {
+        return [
+            'href' => $link->getHref(),
+            'auth' => $link->getAuth()
+        ];
     }
 
 }
