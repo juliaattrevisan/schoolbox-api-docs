@@ -386,6 +386,8 @@ class ImpressionsConversionsOpens
 
 
     /**
+     * Fetch Referrer demographics across the entire lifetime of an article
+     *
      * @param News\Model $article
      * @return array
      */
