@@ -169,7 +169,7 @@ class Controller extends BaseController
 
             // Next step: figure out what gets passed in
             $group = (new \Schoolbox\Assessment\Rubric\RowSet\Group())
-                ->setId(rand(1, PHP_INT_MAX))
+//                ->setId(rand(1, PHP_INT_MAX))
                 ->setName($groupName);
 
             // Ensure the proposed Group name is not already in use.
