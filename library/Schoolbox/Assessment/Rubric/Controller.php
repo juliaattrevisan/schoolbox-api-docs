@@ -128,28 +128,29 @@ class Controller extends BaseController
                 return;
             }
 
-            $criteria      = CriterionMapper::getInstance()->findForFolder($folderId);
-            $proposedGroup = $this->mapper->normaliseForComparison($groupName);
-            $proposedName  = $this->mapper->normaliseForComparison($critName);
+            $criterionMapper = CriterionMapper::getInstance();
+            $criteria        = $criterionMapper->findForFolder($folderId);
+            $proposedGroup   = $this->mapper->normaliseForComparison($groupName);
+            $proposedName    = $this->mapper->normaliseForComparison($critName);
             foreach ($criteria as $criterion){
                 $normGroup = $this->mapper->normaliseForComparison($criterion->getGroup()->getName());
                 $normName = $this->mapper->normaliseForComparison($criterion->getName());
-                if($normGroup == $proposedGroup && $normName == $proposedName){
+                if ($normGroup === $proposedGroup && $normName === $proposedName){
                     // TODO localise!!!!!
                     $this->sendJSONError("Indicator already exists in this Group");
                     return;
                 }
             }
 
-            $results = $this->saveNewCriterion($folderId, $groupName, $critName);
+            $criterionModel = $criterionMapper->findOrCreateOneForFolderByKey($folderId, $critName, $groupName);
 
             $group = (new \Schoolbox\Assessment\Rubric\RowSet\Group())
-                ->setId($post->getInt('groupId'))
+                ->setId($criterionModel->getGroup()->getId())
                 ->setName($groupName);
 
             // Don't have to save anything yet
             $criterion = (new \Schoolbox\Assessment\Rubric\RowSet\Criterion())
-                ->setId($results['id'])
+                ->setId($criterionModel->getId())
                 ->setName($critName);
 
             $context['rowspan'] = null;
@@ -177,7 +178,7 @@ class Controller extends BaseController
             $proposed = $this->mapper->normaliseForComparison($groupName);
             foreach ($criteria as $criterion){
                 $grouping = $this->mapper->normaliseForComparison($criterion->getGroup()->getName());
-                if($proposed == $grouping){
+                if ($proposed === $grouping){
                     // TODO localise
                     $this->sendJSONError("Group name already exists in this context");
                     return;
