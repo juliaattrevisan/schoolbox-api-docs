@@ -10,8 +10,8 @@
         <a class="icon-down-arrow" data-sequencer-down title="Move down"></a>
     </span>
 
-    <input type="text" readonly name="{{ critInput }}[id]" value="{{ crit.id }}" />
-    <input type="text" readonly name="{{ critInput }}[groupId]" value="{{ group.id }}" data-group-id />
+    <input type="hidden" readonly name="{{ critInput }}[id]" value="{{ crit.id }}" />
+    <input type="hidden" readonly name="{{ critInput }}[groupId]" value="{{ group.id }}" data-group-id />
     <input  id="{{ critInput }}[on]" data-criterion-name="{{ crit.name }}" name="{{ critInput }}[on]" type="checkbox" value="1" {% if checkChecked %}checked="checked"{% endif %} />
 
     {%- if crit.inUseExcluding(rubricGrid.assessment) -%}
