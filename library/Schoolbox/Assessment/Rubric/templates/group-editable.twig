@@ -27,7 +27,7 @@
                 <a class="icon-up-arrow" data-sequencer-up title="Move up"></a>
                 <a class="icon-down-arrow" data-sequencer-down title="Move down"></a>
             </span>
-            <input type="hidden" name="{{ groupInput }}[id]" value="{{ group.id }}" />
+            <input type="text" readonly name="{{ groupInput }}[id]" value="{{ group.id }}" />
             {% if group.name %}
                 <label>
                     {%- if group.inUseExcluding(rubricGrid.assessment) -%}
