@@ -11,7 +11,6 @@ namespace Schoolbox\Comms\News\Statistics;
 
 use Schoolbox\RoleMapper;
 
-
 /**
  * Class Mapper
  * @package Schoolbox\Comms\News\Statistics
