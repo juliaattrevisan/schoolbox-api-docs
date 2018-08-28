@@ -501,13 +501,13 @@ class RubricMapper
         // (The answer exists: merge SA-6405)
         $levelMapper         = LevelMapper::getInstance();
         $descriptorMapper    = DescriptorMapper::getInstance();
+        $criterionMapper     = CriterionMapper::getInstance();
+        $groupMapper         = GroupMapper::getInstance();
         $existingLevelIds    = $levelMapper->findIdsByColumn('box_id', $submissionBox->getId());
         $existingDescriptors = DescriptorMapper::getInstance()->findByColumn('level_id', $existingLevelIds);
 
 
         // first, persist the row and column headers (criteria and levels, respectively)
-        // Group and criterion saving doesn't happen here; it should've already
-        // happened when saving the rowset
         $levelModels   = $levelMapper->createCollection();
         $levelSequence = 1;
         foreach ($grid->getLevels() as $level) {
@@ -525,35 +525,50 @@ class RubricMapper
         }
 
 
+        // Persist groups/criteria
+        $criterionModels = $criterionMapper->createCollection();
+        $groupModels     = $groupMapper->createCollection();
+        foreach ($grid->getRowSet()->getGroups() as $group) {
+            $groupId = $group->getId();
+            if (!$groupId) {
+                continue;
+            }
+            $groupModel = $groupMapper->findById($groupId)
+                ->setName($group->getName());
+            $groupModels[$groupId] = $groupModel;
+
+            foreach ($group->getCriteria() as $criterion) {
+                $criterionId = $criterion->getId();
+                if (!$criterionId) {
+                    continue;
+                }
+                $criterionModel = $criterionMapper->findById($criterionId)
+                    ->setName($criterion->getName());
+                $criterionModels[$criterionId] = $criterionModel;
+            }
+        }
+
+
         // usages are a join table with a sequence, not a strict "object" - as such, we can purge the relevant records and simply re-create them
         $criterionUsageMapper = CriterionUsageMapper::getInstance();
         $groupUsageMapper     = GroupUsageMapper::getInstance();
-        $criterionMapper      = CriterionMapper::getInstance();
-        $groupMapper          = GroupMapper::getInstance();
         $criterionUsageModels = $criterionUsageMapper->createCollection();
         $groupUsageModels     = $groupUsageMapper->createCollection();
-        $criterionModels      = $criterionMapper->createCollection();
-        $groupModels          = $groupMapper->createCollection();
         $descriptorModels     = $descriptorMapper->createCollection();
         $criterionUsageMapper->deleteByColumn('submission_box_id', $submissionBox->getId());
         $groupUsageMapper->deleteByColumn('submission_box_id', $submissionBox->getId());
         $groupSequence = 1;
         foreach ($grid->getGroupUsages() as $groupUsage) {
-            $groupModel = $groupMapper->createModel($groupUsage->getGroup()->getId());
-            $groupModels->add($groupModel);
-
             $groupUsageModel = $groupUsageMapper->createModel()
                 ->setSubmissionBox($submissionBox)
-                ->setGroup($groupModel)
+                ->setGroup($groupModels[$groupUsage->getGroup()->getId()])
                 ->setMaxValue($groupUsage->getMaxValue())
                 ->setSequence($groupSequence++);
             $groupUsageModels->add($groupUsageModel);
 
             $criterionSequence = 1;
             foreach ($groupUsage->getCriterionUsages() as $criterionUsage) {
-                $criterionModel = $criterionMapper->createModel($criterionUsage->getCriterion()->getId());
-                $criterionModels->add($criterionModel);
-
+                $criterionModel      = $criterionModels[$criterionUsage->getCriterion()->getId()];
                 $criterionUsageModel = $criterionUsageMapper->createModel()
                     ->setSubmissionBox($submissionBox)
                     ->setCriterion($criterionModel)
