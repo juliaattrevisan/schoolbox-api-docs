@@ -14,6 +14,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\Rubric\GroupMapper as RubricGro
 use Schoolbox\Assessment\Course\Import\Atlas\Api\Attachment;
 use Schoolbox\Assessment\Course\Import\Atlas\AttachmentHandler;
 use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Course;
@@ -112,7 +113,8 @@ class ImporterFactory
             $this->mapperFactory->get(RubricGroupMapper::class),
             $this->mapperFactory->get(RubricCriterionMapper::class),
             $this->assessmentDataSource,
-            $this->mapperFactory->get(NodeMapper::class)
+            $this->mapperFactory->get(NodeMapper::class),
+            $this->mapperFactory->get(ErrorMapper::class)
         );
         return $importer
             ->registerAttachmentHandler(

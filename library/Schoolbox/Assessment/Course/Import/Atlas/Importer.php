@@ -12,12 +12,15 @@ use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 use Schoolbox\Assessment\Course\Import\Atlas\Api;
 use Schoolbox\Assessment\Course\Import\Atlas\AttachmentHandler\IAttachmentHandler;
+use Schoolbox\Assessment\Course\Import\Atlas\Validator\AssessmentSpecification;
+use Schoolbox\Assessment\Course\Import\Atlas\Validator\AttachmentSpecification;
 use Schoolbox\Assessment\Rubric\Competency\Level;
 use Schoolbox\Assessment\Rubric\Criteria\Criterion;
 use Schoolbox\Assessment\Rubric\Criteria\Group;
 use Schoolbox\Assessment\Rubric\Descriptor;
 use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
 use Schoolbox\Curriculum\Node\Model as Node;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
@@ -115,6 +118,12 @@ class Importer
 
 
     /**
+     * @var ErrorMapper
+     */
+    private $errorMapper;
+
+
+    /**
      * @var IConfigLoader
      */
     private $config;
@@ -152,6 +161,7 @@ class Importer
      * @param Rubric\CriterionMapper $rubricCriterionMapper
      * @param AssessmentDataSource   $assessmentDataSource
      * @param NodeMapper             $nodeMapper
+     * @param ErrorMapper            $errorMapper
      */
     public function __construct(
         User $currentUser,
@@ -166,7 +176,8 @@ class Importer
         Rubric\GroupMapper $rubricGroupMapper,
         Rubric\CriterionMapper $rubricCriterionMapper,
         AssessmentDataSource $assessmentDataSource,
-        NodeMapper $nodeMapper
+        NodeMapper $nodeMapper,
+        ErrorMapper $errorMapper
     ) {
         // TODO: consider passing $currentUser in import()
         $this->currentUser            = $currentUser;
@@ -182,6 +193,7 @@ class Importer
         $this->rubricCriterionMapper  = $rubricCriterionMapper;
         $this->assessmentDataSource   = $assessmentDataSource;
         $this->nodeMapper             = $nodeMapper;
+        $this->errorMapper            = $errorMapper;
     }
 
 
@@ -362,6 +374,12 @@ class Importer
         Node $standardsNode
     ): IAssessable
     {
+        $spec = new AssessmentSpecification();
+        if (!$spec->isSatisfiedBy($assessment)) {
+            // This will do as a generic error
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
+        }
+
         $dueWork = new DueWork();
         $dueWork
             ->setContext($unitSpec)
@@ -500,6 +518,12 @@ class Importer
      */
     private function createAttachment(Api\Attachment $attachment, Folder $folder, bool $visibleToStudents): void
     {
+        $spec = new AttachmentSpecification();
+        if (!$spec->isSatisfiedBy($attachment)) {
+            // This will do as a generic error
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
+        }
+
         $attachmentHandler = $this->retrieveAttachmentHandler($attachment);
         if ($attachmentHandler) {
             $attachmentHandler->attach(
