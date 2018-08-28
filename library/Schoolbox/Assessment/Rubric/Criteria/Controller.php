@@ -97,7 +97,7 @@ class Controller extends BaseController
             $folder,
             $this->request->post->get('crits', [])
         );
-        $this->rubricMapper->persistRowSet($rowSet, $folder->isSpecFolder(), $this->isCurriculumTaggingEnabled());
+        $this->rubricMapper->persistRowSet($rowSet, $this->isCurriculumTaggingEnabled(), $folder->isSpecFolder());
 
         // Done: redirect back to homepage, or AJAX
         if ($this->request->isXhr()) {
