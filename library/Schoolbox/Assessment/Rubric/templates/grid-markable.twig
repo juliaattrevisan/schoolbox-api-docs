@@ -7,6 +7,8 @@
 {% set showGroupTotal = showGroupTotal ? true : false %}
 {% set showRubricTotal = showRubricTotal ? true : false %}
 
+{% set hidePoints = not config.rubric_show_points or (studentView and selfReflect) %}
+
 <div class="scrollable">
     <table class="rb markable stack-for-medium-down" id="{{ rubricId }}">
 
@@ -75,7 +77,6 @@
                                     {% set direction = rubric.descriptorMetadata[crit.id].direction %}
                                     {% set descriptorMin = rubric.descriptorMetadata[crit.id][levelIndex].min %}
                                     {% set descriptorMax = rubric.descriptorMetadata[crit.id][levelIndex].max %}
-                                    {% set hidePoints = not config.rubric_show_points or (studentView and selfReflect) %}
 
                                     {# Just show a text value if the descriptor is not selected #}
                                     {% if descriptor.value is not null and showDescriptorValue and not hidePoints %}
@@ -135,7 +136,7 @@
                 </tr>
             {% endfor %}
 
-        {% if showGroupTotal and markSchemeName != "None" and (config.rubric_show_points or not studentView) %}
+        {% if showGroupTotal and markSchemeName != "None" and not hidePoints %}
             {% set percentageMark = group.rowMaxSum > 0 ? group.mark * (100 / group.rowMaxSum) : 0 %}
             {# don't ask... #}
             {% set letterGradeValue = percentageMark == 0 ? 0 : (((percentageMark / 10) | round(0, 'ceil')) * 10) - 10 %}
@@ -179,6 +180,8 @@
 
                         {% endif %}
 
+                        {# TODO why is markSchemeName null when student is self-assessing (note: will be addressed in SA-7242) #}
+
                         {% if group.rowMaxSum > 0 %}
                             <button class="use-descriptor-values">Assign <span class="descriptor-sum">
                                 {% if markSchemeName == 'TotalMarkFractional' %}
@@ -211,7 +214,7 @@
 
     {% endfor %}
 
-    {% if showRubricTotal and markSchemeName != "None" and (config.rubric_show_points or not studentView) %}
+    {% if showRubricTotal and markSchemeName != "None" and not hidePoints %}
         <tr>
             <th class="rb-final-summary" colspan="{{ rubric.levels|length + 2 }}">
                 <span data-final-summary="{{ rubricId }}"
@@ -261,40 +264,15 @@
         function disableEnableAssignFromDescs() {
             var $groups = $rb.find("[data-group-summary]");
             $groups.each(function() {
-                var displayedMark = 0;
+                var displayedMark = $(this).find(".descriptor-sum").text().replace(/%/, '').trim();
                 var customMark = $(this).find(".groupMax").val();
 
-                switch(markType) {
-                    case 'TotalMarkFractional':
-                        displayedMark = $(this).data('scaled-mark');
-                        break;
-
-                    case 'LetterGrade':
-                        // TODO this is not getting updated (total mark is fine)
-
-                        var percentage = $(this).data('row-max-sum') > 0 ? $(this).data('mark') * (100 / $(this).data('row-max-sum')) : 0;
-                        var grades = [];
-                        $(this).find(".groupMax option").each(function(index, option) {
-                            grades.push(
-                                {'value' : $(option).prop("value"), 'letter' : $(option).data('letter')}
-                            );
-                        });
-                        displayedMark = getLetterGradeFromNumeric(percentage, grades);
-                        customMark = $(this).find(".groupMax select").val();
-                        break;
-
-                    case 'Percentage':
-                        // TODO this is not getting updated (total mark is fine)
-
-                        displayedMark = $(this).data('row-max-sum') > 0 ? $(this).data('mark') * (100 / $(this).data('row-max-sum')) : 0;
-                        break;
-
-                    default:
-                        // TODO
-                        // We have a "none" mark type
+                if (markType === 'LetterGrade') {
+                    var grades = getLetterGrades($(this));
+                    customMark = getLetterGradeFromNumeric($(this).find(".groupMax").val(), grades);
                 }
 
-                if (displayedMark == customMark) {
+                if (displayedMark === customMark) {
                     $(this).find(".use-descriptor-values").prop("disabled", true);
                 } else {
                     $(this).find(".use-descriptor-values").prop("disabled", false);
@@ -326,7 +304,6 @@
 
                 var scaledGroupMark = getScaledGroupMark($descriptorCheckboxes, $groupSummary);
                 var unscaledGroupMark = summateDescriptors($descriptorCheckboxes);
-                var percentage = $groupSummary.attr('data-mark') * (100 / $groupSummary.attr('data-row-max-sum'));
 
                 $groupSummary.attr('data-scaled-mark', scaledGroupMark);
                 $groupSummary.attr('data-mark', unscaledGroupMark);
@@ -338,17 +315,12 @@
                         break;
 
                     case 'LetterGrade':
-                        var grades = [];
-                        $groupSummary.find(".groupMax option").each(function(index, option) {
-                            grades.push(
-                                {'value' : $(option).prop("value"), 'letter' : $(option).data('letter')}
-                            );
-                        });
-                        $groupSummary.find(".descriptor-sum").text(getLetterGradeFromNumeric(percentage, grades));
+                        var grades = getLetterGrades($groupSummary);
+                        $groupSummary.find(".descriptor-sum").text(getLetterGradeFromNumeric(getPercentageForGroup($groupSummary), grades));
                         break;
 
                     case 'Percentage':
-                        $groupSummary.find(".descriptor-sum").text(percentage + "%");
+                        $groupSummary.find(".descriptor-sum").text(getPercentageForGroup($groupSummary) + "%");
                         break;
 
                     default:
@@ -365,11 +337,11 @@
                                 break;
 
                             case 'LetterGrade':
-                                assignLetterGrade(percentage, $groupSummary.find(".groupMax").val(scaledGroupMark));
+                                assignLetterGrade(getPercentageForGroup($groupSummary), $groupSummary.find(".groupMax").val(scaledGroupMark));
                                 break;
 
                             case 'Percentage':
-                                $groupSummary.find(".groupMax").attr("value", percentage);
+                                $groupSummary.find(".groupMax").val(getPercentageForGroup($groupSummary));
                                 break;
 
                             default:
@@ -386,7 +358,10 @@
             var rubricSummary = $rb.find(rubricSummarySelector);
             rubricSummary.attr('data-scaled-mark', rubricTotalMark);
 
-            parseFraction(rubricSummary, e.namespace);
+            // Only update the overall mark if we haven't customised the cap mark
+            if (! customisedMark[groupId]) {
+                parseFraction(rubricSummary, e.namespace);
+            }
 
             // What cell was actually changed?
             if ($changed.is(':checkbox')) {
@@ -394,6 +369,8 @@
             } else {
                 showHideRangeInput($changed.siblings(':checkbox'));
             }
+
+            disableEnableAssignFromDescs();
         });
 
 
@@ -403,8 +380,13 @@
             var rubricId = $changed.closest('[data-group-summary]').data('rubric-id');
             var groupId = $changed.closest('[data-group-summary]').data('group-id');
 
+            var rowSelector = '[data-group="rb-' + rubricId + '-' + groupId + '"]';
+            var $groupRows = $(rowSelector);
             var groupSummarySelector = '[data-group-summary="rb-' + rubricId + '-' + groupId + '"]';
             var $groupSummary = $rb.find(groupSummarySelector);
+            var $descriptorCheckboxes = $groupRows.find('input');
+
+            var unscaledGroupMark = summateDescriptors($descriptorCheckboxes);
 
             var customMark = 0;
 
@@ -425,9 +407,8 @@
             }
 
             if ($groupSummary.length) {
-                $groupSummary.attr('data-mark', customMark);
-                // TODO uh not sure about this, scaling doesn't matter if we're using percentages but...?
                 $groupSummary.attr('data-scaled-mark', customMark);
+                $groupSummary.attr('data-mark', unscaledGroupMark);
                 customisedMark[groupId] = true;
             }
 
@@ -469,13 +450,11 @@
                     break;
 
                 case 'LetterGrade':
-                    var percentage = $groupSummary.attr('data-mark') * (100 / $groupSummary.attr('data-row-max-sum'));
-                    assignLetterGrade(percentage, $gradeInput.val(scaledGroupMark));
+                    assignLetterGrade(getPercentageForGroup($groupSummary), $gradeInput.val(scaledGroupMark));
                     break;
 
                 case 'Percentage':
-                    var percentage = $groupSummary.attr('data-mark') * (100 / $groupSummary.attr('data-row-max-sum'));
-                    $groupSummary.find(".groupMax").val(percentage);
+                    $groupSummary.find(".groupMax").val(getPercentageForGroup($groupSummary));
                     break;
 
                 default:
@@ -497,6 +476,18 @@
             parseFraction(rubricSummary, e.namespace);
             disableEnableAssignFromDescs();
         })
+
+
+        function getLetterGrades($groupSummary) {
+            var grades = [];
+            $groupSummary.find(".groupMax option").each(function(index, option) {
+                grades.push(
+                    {'value' : $(option).prop("value"), 'letter' : $(option).data('letter')}
+                );
+            });
+
+            return grades;
+        }
 
 
         // Set the letter grade for a capability dropdown based on a numeric mark
@@ -528,6 +519,10 @@
             }
 
             return markLetterValue;
+        }
+
+        function getPercentageForGroup($groupSummary) {
+            return $groupSummary.data('row-max-sum') > 0 ? $groupSummary.attr('data-mark') * (100 / $groupSummary.data('row-max-sum')) : 0;
         }
 
         // Hide or display the descriptor range input depending on whether it's needed or not
