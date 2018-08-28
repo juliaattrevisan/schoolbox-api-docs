@@ -71,6 +71,7 @@ class Factory
      * @param bool $markPerCap
      * @param bool  $usesMarkRange
      * @return Rubric
+     * @throws InvalidArgumentException
      */
     public function buildFromPostData(array $formData, bool $markPerCap, bool $usesMarkRange,  bool $includeEmptyCriteria)
     {
@@ -104,12 +105,12 @@ class Factory
         // cache groups
         foreach ($groups as $groupId => $groupData) {
             $groupName     = $groupData['name'];
-            $groupMaxValue = isset($groupData['maxValue']) ? (float)$groupData['maxValue'] : null;
+            $groupMaxValue = isset($groupData['maxValue']) ? $groupData['maxValue'] : null;
 
             if ((new ValidCapabilityMax())->isSatisifedBy($groupMaxValue, $markPerCap)) {
                 $groupCache[$groupId] = new Group($groupId, $groupName, $groupMaxValue);
             } else {
-                throw new InvalidArgumentException("provide capability maximum points greater than or equal to 0");
+                throw new InvalidArgumentException(sprintf('provide capability maximum points that are numeric and greater than or equal to 0'));
             }
 
         }
