@@ -370,15 +370,16 @@ class RubricMapper
             return $grid;
         }
 
-        // Load the levels, selected groups/criteria, descriptors for the assessment
-        $groupUsageModels = GroupUsageMapper::getInstance()->findByColumn(
+        // Load the levels, selected capabilities+indicators, descriptors for
+        // the assessment
+        $capabilityUsageModels = GroupUsageMapper::getInstance()->findByColumn(
             'sb.assessment_id',
             $assessment->getId(),
             ['order' => ['sequence' => 'asc',]]
         )->indexByCallback(function (GroupUsage $gu) {
             return $gu->getGroup()->getId();
         });
-        $criterionUsageModels = CriterionUsageMapper::getInstance()->findByColumn(
+        $indicatorUsageModels = CriterionUsageMapper::getInstance()->findByColumn(
             'sb.assessment_id',
             $assessment->getId(),
             ['order' => ['sequence' => 'asc',]]
@@ -393,11 +394,11 @@ class RubricMapper
             return $l->getId();
         });
         $descriptorModels = DescriptorMapper::getInstance()->findByColumnList([
-            'criterion_id' => $criterionUsageModels->keys(),
+            'criterion_id' => $indicatorUsageModels->keys(),
             'level_id'     => $levelModels->keys(),
         ]);
 
-        $groupedCriterionUsageModels = $criterionUsageModels->groupByCallback(
+        $groupedIndicatorUsageModels = $indicatorUsageModels->groupByCallback(
             function (CriterionUsage $cu) {
                 return $cu->getCriterion()->getGroup()->getId();
             }
@@ -406,17 +407,17 @@ class RubricMapper
 
         // Create descriptor models
         $descriptorsByLevel     = [];
-        $descriptorsByCriterion = [];
+        $descriptorsByIndicator = [];
         foreach ($descriptorModels as $descriptorModel) {
             $levelId     = $descriptorModel->getLevel()->getId();
-            $criterionId = $descriptorModel->getCriterion()->getId();
+            $indicatorId = $descriptorModel->getCriterion()->getId();
             $descriptor  = (new \Schoolbox\Assessment\Rubric\Grid\Descriptor())
                 ->setId($descriptorModel->getId())
                 ->setDescription($descriptorModel->getDescription())
                 ->setMaxValue($descriptorModel->getMaxValue());
 
-            $descriptorsByCriterion[$criterionId][$levelId] = $descriptor;
-            $descriptorsByLevel[$levelId][$criterionId]     = $descriptor;
+            $descriptorsByIndicator[$indicatorId][$levelId] = $descriptor;
+            $descriptorsByLevel[$levelId][$indicatorId]     = $descriptor;
         }
 
 
@@ -432,47 +433,47 @@ class RubricMapper
         }
 
 
-        // Add group/criterion usages
+        // Add capability/indicator usages
         // Respect prescribed ordering in usage objects
-        foreach ($groupUsageModels as $groupUsageModel) {
-            /** @var GroupUsage $groupUsageModel */
-            $groupModel = $groupUsageModel->getGroup();
-            $groupId    = $groupModel->getId();
-            $group      = $grid->getRowSet()->retrieveCapability($groupId);
-            if (!$group) {
+        foreach ($capabilityUsageModels as $capabilityUsageModel) {
+            /** @var GroupUsage $capabilityUsageModel */
+            $capabilityModel = $capabilityUsageModel->getGroup();
+            $capabilityId    = $capabilityModel->getId();
+            $capability      = $grid->getRowSet()->retrieveCapability($capabilityId);
+            if (!$capability) {
                 continue;
             }
 
-            $groupUsage = (new \Schoolbox\Assessment\Rubric\Grid\CapabilityUsage($group))
-                ->setMaxValue($groupUsageModel->getMaxValue());
+            $capabilityUsage = (new \Schoolbox\Assessment\Rubric\Grid\CapabilityUsage($capability))
+                ->setMaxValue($capabilityUsageModel->getMaxValue());
 
-            $groupCriterionUsageModels = $groupedCriterionUsageModels[$groupId] ?? [];
-            foreach ($groupCriterionUsageModels as $criterionUsageModel) {
-                /** @var CriterionUsage $criterionUsageModel */
-                $criterionModel = $criterionUsageModel->getCriterion();
-                $criterionId    = $criterionModel->getId();
-                $criterion      = $grid->getRowSet()->retrieveIndicator($criterionId);
-                if (!$criterion) {
+            $capabilityIndicatorUsageModels = $groupedIndicatorUsageModels[$capabilityId] ?? [];
+            foreach ($capabilityIndicatorUsageModels as $indicatorUsageModel) {
+                /** @var CriterionUsage $indicatorUsageModel */
+                $indicatorModel = $indicatorUsageModel->getCriterion();
+                $indicatorId    = $indicatorModel->getId();
+                $indicator      = $grid->getRowSet()->retrieveIndicator($indicatorId);
+                if (!$indicator) {
                     continue;
                 }
 
-                $criterionUsage = new \Schoolbox\Assessment\Rubric\Grid\IndicatorUsage($criterion);
+                $indicatorUsage = new \Schoolbox\Assessment\Rubric\Grid\IndicatorUsage($indicator);
 
                 // Add descriptors, and apply min value
                 $levelIndex = 0;
                 foreach ($levelModels as $levelModel) {
-                    $descriptor = $descriptorsByCriterion[$criterionId][$levelModel->getId()] ?? null;
+                    $descriptor = $descriptorsByIndicator[$indicatorId][$levelModel->getId()] ?? null;
                     if (null !== $descriptor) {
-                        $criterionUsage->getDescriptors()[$levelIndex] = $descriptor;
+                        $indicatorUsage->getDescriptors()[$levelIndex] = $descriptor;
                     }
                     $levelIndex++;
                 }
-                $criterionUsage->applyDescriptorMinValues($assessment->getUseMarkRange());
+                $indicatorUsage->applyDescriptorMinValues($assessment->getUseMarkRange());
 
-                $groupUsage->getIndicatorUsages()[$criterionId] = $criterionUsage;
+                $capabilityUsage->getIndicatorUsages()[$indicatorId] = $indicatorUsage;
             }
 
-            $grid->getCapabilityUsages()[$groupId] = $groupUsage;
+            $grid->getCapabilityUsages()[$capabilityId] = $capabilityUsage;
         }
 
         return $grid;
