@@ -52,15 +52,14 @@
 {% set showGroupMaxValue = usingMarkPerCapability and hasSelectedDescriptor %}
 <tr data-group="{{ groupId }}" data-group-max-value-row {% if not showGroupMaxValue %}class="hide"{% endif %}>
     <th class="rb-group-summary" data-group-max-value-cell colspan="{{ rubric.levels|length + 3 }}">
-        <label>
-            Maximum points for {{ locale.translate('rubricGroup') }}
-            <input type="tel"
-                   value="{{ group.max }}"
-                   name="{{ groupInput }}[maxValue]"
-                   data-group-max-value
-                   {% if not showGroupMaxValue %}disabled class="hide"{% endif %}
-            />
-        </label>
+        <label for="{{ groupInput }}[maxValue]">Maximum points for {{ locale.translate('rubricGroup') }}</label>
+        <input type="tel"
+               value="{{ group.max }}"
+               name="{{ groupInput }}[maxValue]"
+               title="{{ groupInput }}[maxValue]"
+               data-group-max-value
+               {% if not showGroupMaxValue %}disabled class="hide"{% endif %}
+        />
         <button class="use-criterion-values" disabled="">Calculate from {{ locale.translate('rubricCriterion') }} maximums</button>
     </th>
 </tr>

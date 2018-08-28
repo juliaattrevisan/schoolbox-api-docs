@@ -306,6 +306,17 @@ table.rb {
     font-weight: bold;
 }
 
+.rb-group-summary {
+    label {
+        display: block;
+    }
+}
+
+input[data-group-max-value] {
+    width: 5rem;
+    display: inline-block;
+}
+
 select.letter-grade-select {
     margin-bottom: 0;
 }
