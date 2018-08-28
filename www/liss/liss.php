@@ -11,8 +11,8 @@
 require_once(dirname(__FILE__) . '/../../library/Bootstrap.php');
 
 /** @var Schoolbox\Application\WebRequest\Kernel $kernel */
-$db = $kernel->get('databaseExternal');
-$liss = new External_Liss_Server($db);
+$externalDb = $kernel->get('databaseExternal');
+$liss = new External_Liss_Server($externalDb);
 
 $log = External_Liss_Server::log();
 

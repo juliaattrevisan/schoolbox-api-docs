@@ -60,11 +60,11 @@ use Alaress\Database\Connector\IConnector;
 class External_Liss_Server
 {
     /** @var IConnector */
-    private $db;
+    private $externalDb;
 
-    public function __construct(IConnector $db)
+    public function __construct(IConnector $externalDb)
     {
-        $this->db = $db;
+        $this->externalDb = $externalDb;
     }
     /**
      * Default logging message when attempting to use liss with a non-schoolbox connector
@@ -283,7 +283,7 @@ class External_Liss_Server
                 $fullQuery = 'INSERT INTO class_user (id, class_id, user_id) VALUES ' . implode($queryItems, ',') . ';';
                 try {
                     // Manual bulk insert into the DB of "$fullquery"
-                    $this->db->executeQuery($fullQuery);
+                    $this->externalDb->executeQuery($fullQuery);
                 } catch (Exception $e) {
                     $log->error(sprintf("publishClassMemberships: Failed to save class memberships: %s", $e->getMessage()));
                 }
