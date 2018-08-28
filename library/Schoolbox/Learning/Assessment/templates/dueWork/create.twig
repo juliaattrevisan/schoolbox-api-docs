@@ -239,7 +239,8 @@
                 function () {
 
                     // Calculate total for this descriptor's group
-                    assignGroupTotal($(this).closest('[data-group]').attr('data-group'));
+                    var $groupIdentifier = $(this).closest('[data-group]').attr('data-group');
+                    assignGroupTotal($groupIdentifier);
 
                     // Then calculate the entire grid total
                     calculateGridTotal();
@@ -280,7 +281,10 @@
              */
             function assignGroupTotal(groupIdentifier) {
                 var $inputEl = $("[data-group-max-value-row][data-group='" + groupIdentifier + "']").find("input");
-                $inputEl.val(calculateGroupTotal(groupIdentifier));
+                // Don't automatically update if customised
+                if (! $inputEl.attr("data-customised")) {
+                    $inputEl.val(calculateGroupTotal(groupIdentifier));
+                }
             }
 
 
