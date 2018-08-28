@@ -346,18 +346,31 @@
             }
 
             $("[data-group-max-value]").change(function() {
+                // TODO don't use a class for button (or any of the others)
+                var groupIdentifier = $(this).closest("[data-group]").attr("data-group");
+                var $closestAssignButton = $(this).next(".use-criterion-values");
+                if (! ($(this).val() == calculateGroupTotal(groupIdentifier)) ) {
+                    $closestAssignButton.removeAttr("disabled");
+                } else {
+                    $closestAssignButton.attr("disabled", true);
+                }
                 $(this).attr("data-customised", true);
-                // TODO don't use a class for this (or any of the others)
-                // TODO only reenable if values are not the same...
-                $(this).next(".use-criterion-values").removeAttr("disabled");
             });
 
             $(".use-criterion-values").click(function() {
-                $(this).prev("[data-group-max-value]").removeAttr("data-customised");
+                var $closestMaxMarkInput = $(this).prev("[data-group-max-value]");
                 var groupIdentifier = $(this).closest("[data-group]").attr("data-group");
-                $(this).prev("[data-group-max-value]").val(calculateGroupTotal(groupIdentifier));
-                // TODO only disable if values are the same...
-                $(this).attr("disabled", true);
+                var groupTotal = calculateGroupTotal(groupIdentifier);
+
+                // Only disable if mark is the same (which it always should be in this case, but...be safe)
+                if (groupTotal == $closestMaxMarkInput.val()) {
+                    $(this).attr("disabled", true);
+                } else {
+                    $(this).removeAttr("disabled");
+                }
+
+                $closestMaxMarkInput.removeAttr("data-customised");
+                $(this).prev("[data-group-max-value]").val(groupTotal);
             });
         }
 
