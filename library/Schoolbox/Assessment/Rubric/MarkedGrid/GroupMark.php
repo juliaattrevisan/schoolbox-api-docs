@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\MarkedGrid;
 
-use Schoolbox\Assessment\Rubric\Grid\GroupUsage;
+use Schoolbox\Assessment\Rubric\Grid\CapabilityUsage;
 use Schoolbox\GenericCollection;
 
 /**
@@ -19,7 +19,7 @@ use Schoolbox\GenericCollection;
 class GroupMark
 {
     /**
-     * @var GroupUsage
+     * @var CapabilityUsage
      */
     private $groupUsage;
 
@@ -39,18 +39,18 @@ class GroupMark
     /**
      * Constructor
      *
-     * @param GroupUsage $groupUsage
+     * @param CapabilityUsage $groupUsage
      */
-    public function __construct(GroupUsage $groupUsage)
+    public function __construct(CapabilityUsage $groupUsage)
     {
         $this->groupUsage = $groupUsage;
     }
 
 
     /**
-     * @return GroupUsage
+     * @return CapabilityUsage
      */
-    public function getGroupUsage(): GroupUsage
+    public function getGroupUsage(): CapabilityUsage
     {
         return $this->groupUsage;
     }

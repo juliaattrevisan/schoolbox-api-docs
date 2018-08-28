@@ -446,7 +446,7 @@ class RubricMapper
                 continue;
             }
 
-            $groupUsage = (new \Schoolbox\Assessment\Rubric\Grid\GroupUsage($group))
+            $groupUsage = (new \Schoolbox\Assessment\Rubric\Grid\CapabilityUsage($group))
                 ->setMaxValue($groupUsageModel->getMaxValue());
 
             $groupCriterionUsageModels = $groupedCriterionUsageModels[$groupId] ?? [];
@@ -472,7 +472,7 @@ class RubricMapper
                 }
                 $criterionUsage->applyDescriptorMinValues($assessment->getUseMarkRange());
 
-                $groupUsage->getCriterionUsages()[$criterionId] = $criterionUsage;
+                $groupUsage->getIndicatorUsages()[$criterionId] = $criterionUsage;
             }
 
             $grid->getCapabilityUsages()[$groupId] = $groupUsage;
@@ -561,13 +561,13 @@ class RubricMapper
         foreach ($grid->getCapabilityUsages() as $groupUsage) {
             $groupUsageModel = $groupUsageMapper->createModel()
                 ->setSubmissionBox($submissionBox)
-                ->setGroup($groupModels[$groupUsage->getGroup()->getId()])
+                ->setGroup($groupModels[$groupUsage->getCapability()->getId()])
                 ->setMaxValue($groupUsage->getMaxValue())
                 ->setSequence($groupSequence++);
             $groupUsageModels->add($groupUsageModel);
 
             $criterionSequence = 1;
-            foreach ($groupUsage->getCriterionUsages() as $criterionUsage) {
+            foreach ($groupUsage->getIndicatorUsages() as $criterionUsage) {
                 $criterionModel      = $criterionModels[$criterionUsage->getCriterion()->getId()];
                 $criterionUsageModel = $criterionUsageMapper->createModel()
                     ->setSubmissionBox($submissionBox)

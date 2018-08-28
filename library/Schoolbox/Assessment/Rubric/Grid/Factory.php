@@ -94,7 +94,7 @@ class Factory
             }
 
             if ($spec->isSatisfiedBy($groupMaxValue)) {
-                $groupUsage = (new GroupUsage($group))->setMaxValue($groupMaxValue);
+                $groupUsage = (new CapabilityUsage($group))->setMaxValue($groupMaxValue);
             } else {
                 throw new InvalidArgumentException(sprintf('provide capability maximum points that are numeric and greater than or equal to 0'));
             }
@@ -151,8 +151,8 @@ class Factory
                 }
             }
 
-            $groupUsage = $grid->retrieveCapabilityUsage($group);
-            $groupUsage->getCriterionUsages()[$criterionId] = $criterionUsage;
+            $groupUsage                                     = $grid->retrieveCapabilityUsage($group);
+            $groupUsage->getIndicatorUsages()[$criterionId] = $criterionUsage;
         }
 
         // Calculate max values for each group usage.
@@ -160,7 +160,7 @@ class Factory
         foreach ($grid->getCapabilityUsages() as $groupUsage) {
             $groupMaxValue = $groupUsage->getMaxValue();
             if (null === $groupMaxValue) {
-                $groupUsage->setMaxValue($groupUsage->calculateMaxValueFromCriteria());
+                $groupUsage->setMaxValue($groupUsage->calculateMaxValueFromIndicators());
             }
         }
 

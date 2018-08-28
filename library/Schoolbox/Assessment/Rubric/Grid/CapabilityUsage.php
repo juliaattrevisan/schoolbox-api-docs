@@ -17,18 +17,18 @@ use Schoolbox\GenericCollection;
  *
  * Represented on the rubric grid as a collection of rows.
  */
-class GroupUsage
+class CapabilityUsage
 {
     /**
      * @var Capability
      */
-    private $group;
+    private $capability;
 
 
     /**
      * @var GenericCollection|CriterionUsage[]
      */
-    private $criterionUsages;
+    private $indicatorUsages;
 
 
     /**
@@ -46,8 +46,8 @@ class GroupUsage
      */
     public function __construct(Capability $group)
     {
-        $this->group           = $group;
-        $this->criterionUsages = new GenericCollection(CriterionUsage::class);
+        $this->capability      = $group;
+        $this->indicatorUsages = new GenericCollection(CriterionUsage::class);
     }
 
 
@@ -59,16 +59,16 @@ class GroupUsage
      *
      * @return iterable|Indicator[]
      */
-    public function iterateCriteria(): iterable
+    public function iterateIndicators(): iterable
     {
-        $seenCriteria = [];
-        foreach ($this->getCriterionUsages() as $criterionUsage) {
-            $seenCriteria[$criterionUsage->getCriterion()->getId()] = true;
-            yield $criterionUsage->getCriterion();
+        $seenIndicators = [];
+        foreach ($this->getIndicatorUsages() as $indicatorUsage) {
+            $seenIndicators[$indicatorUsage->getCriterion()->getId()] = true;
+            yield $indicatorUsage->getCriterion();
         }
 
-        foreach ($this->getGroup()->getIndicators() as $criterion) {
-            if (!isset($seenCriteria[$criterion->getId()])) {
+        foreach ($this->getCapability()->getIndicators() as $criterion) {
+            if (!isset($seenIndicators[$criterion->getId()])) {
                 yield $criterion;
             }
         }
@@ -79,14 +79,14 @@ class GroupUsage
      * Return the criterion usage for a given criterion, or null if this group
      * doesn't use it.
      *
-     * @param Indicator $criterion
+     * @param Indicator $indicator
      * @return null|CriterionUsage
      */
-    public function retrieveCriterionUsage(Indicator $criterion): ?CriterionUsage
+    public function retrieveIndicatorUsage(Indicator $indicator): ?CriterionUsage
     {
-        foreach ($this->criterionUsages as $criterionUsage) {
-            if ($criterionUsage->getCriterion()->getId() === $criterion->getId()) {
-                return $criterionUsage;
+        foreach ($this->indicatorUsages as $indicatorUsage) {
+            if ($indicatorUsage->getCriterion()->getId() === $indicator->getId()) {
+                return $indicatorUsage;
             }
         }
         return null;
@@ -101,13 +101,13 @@ class GroupUsage
      *
      * @return float
      */
-    public function calculateMaxValueFromCriteria(): float
+    public function calculateMaxValueFromIndicators(): float
     {
         $maxValues = [];
-        foreach ($this->criterionUsages as $criterionUsage) {
-            $groupUsageMaxValue = $criterionUsage->calculateMaxValueFromDescriptors();
-            if (null !== $groupUsageMaxValue) {
-                $maxValues[] = $groupUsageMaxValue;
+        foreach ($this->indicatorUsages as $indicatorUsage) {
+            $maxValue = $indicatorUsage->calculateMaxValueFromDescriptors();
+            if (null !== $maxValue) {
+                $maxValues[] = $maxValue;
             }
         }
         return !empty($maxValues) ? array_sum($maxValues) : 0;
@@ -117,28 +117,28 @@ class GroupUsage
     /**
      * @return Capability
      */
-    public function getGroup(): Capability
+    public function getCapability(): Capability
     {
-        return $this->group;
+        return $this->capability;
     }
 
 
     /**
      * @return GenericCollection|CriterionUsage[]
      */
-    public function getCriterionUsages(): GenericCollection
+    public function getIndicatorUsages(): GenericCollection
     {
-        return $this->criterionUsages;
+        return $this->indicatorUsages;
     }
 
 
     /**
-     * @param GenericCollection|CriterionUsage[] $criterionUsages
+     * @param GenericCollection|CriterionUsage[] $indicatorUsages
      * @return static
      */
-    public function setCriterionUsages(GenericCollection $criterionUsages): self
+    public function setIndicatorUsages(GenericCollection $indicatorUsages): self
     {
-        $this->criterionUsages = $criterionUsages;
+        $this->indicatorUsages = $indicatorUsages;
         return $this;
     }
 

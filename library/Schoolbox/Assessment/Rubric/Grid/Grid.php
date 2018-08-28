@@ -51,7 +51,7 @@ class Grid
      *
      * Each group's criterion usage is a row on the rubric grid.
      *
-     * @var GroupUsage[]|GenericCollection
+     * @var CapabilityUsage[]|GenericCollection
      */
     private $capabilityUsages;
 
@@ -76,7 +76,7 @@ class Grid
     {
         $this->assessment       = $assessment;
         $this->rowSet           = $rowSet;
-        $this->capabilityUsages = new GenericCollection(GroupUsage::class);
+        $this->capabilityUsages = new GenericCollection(CapabilityUsage::class);
         $this->levels           = new GenericCollection(Level::class);
     }
 
@@ -120,12 +120,12 @@ class Grid
      * use it.
      *
      * @param Capability $capability
-     * @return null|GroupUsage
+     * @return null|CapabilityUsage
      */
-    public function retrieveCapabilityUsage(Capability $capability): ?GroupUsage
+    public function retrieveCapabilityUsage(Capability $capability): ?CapabilityUsage
     {
         foreach ($this->capabilityUsages as $capabilityUsage) {
-            if ($capabilityUsage->getGroup()->getId() === $capability->getId()) {
+            if ($capabilityUsage->getCapability()->getId() === $capability->getId()) {
                 return $capabilityUsage;
             }
         }
@@ -143,7 +143,7 @@ class Grid
     public function retrieveIndicatorUsage(Indicator $indicator): ?CriterionUsage
     {
         foreach ($this->capabilityUsages as $capabilityUsage) {
-            $criterionUsage = $capabilityUsage->retrieveCriterionUsage($indicator);
+            $criterionUsage = $capabilityUsage->retrieveIndicatorUsage($indicator);
             if ($criterionUsage) {
                 return $criterionUsage;
             }
@@ -164,8 +164,8 @@ class Grid
     {
         $seenCapabilities = [];
         foreach ($this->capabilityUsages as $capabilityUsage) {
-            $seenCapabilities[$capabilityUsage->getGroup()->getId()] = true;
-            yield $capabilityUsage->getGroup();
+            $seenCapabilities[$capabilityUsage->getCapability()->getId()] = true;
+            yield $capabilityUsage->getCapability();
         }
 
         foreach ($this->rowSet->getCapabilities() as $capability) {
@@ -185,7 +185,7 @@ class Grid
     public function iterateIndicators(Capability $capability): iterable
     {
         $capabilityUsage = $this->retrieveCapabilityUsage($capability);
-        return $capabilityUsage ? $capabilityUsage->iterateCriteria() : $capability->getIndicators();
+        return $capabilityUsage ? $capabilityUsage->iterateIndicators() : $capability->getIndicators();
     }
 
 
@@ -208,7 +208,7 @@ class Grid
 
 
     /**
-     * @return GroupUsage[]|GenericCollection
+     * @return CapabilityUsage[]|GenericCollection
      */
     public function getCapabilityUsages(): GenericCollection
     {
@@ -217,7 +217,7 @@ class Grid
 
 
     /**
-     * @param GroupUsage[]|GenericCollection $capabilityUsages
+     * @param CapabilityUsage[]|GenericCollection $capabilityUsages
      * @return static
      */
     public function setCapabilityUsages(GenericCollection $capabilityUsages): self
