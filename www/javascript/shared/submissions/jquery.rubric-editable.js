@@ -20,8 +20,9 @@
         },
         afterApplyResultSet: $.noop,
         rubricId: null,
-        formField: 'rb'
-
+        formField: 'rb',
+        localisedGroupName: 'Capability',
+        localisedCriterionName: 'Indicator',
 };
 
     function RubricEditable(element, options) {
@@ -97,7 +98,7 @@
                 for (var i = 0; i < $groups.length; i++) {
                     var existingGroup = $($groups.get(i)).data('groupname').toString();
                     if(normalisedNewGroup === normaliseForComparison(existingGroup)){
-                        $toastFeedback.toastTimeout({text: 'Group name already exists!', css: 'alert'});
+                        $toastFeedback.toastTimeout({text: opt.localisedGroupName + ' name already exists!', css: 'alert'});
                         $input.val('');
                         return false;
                     }
@@ -128,15 +129,18 @@
                     // simple case: prepend the row
                     $row.before($data);
 
+                    var cellTypeName = '';
+
                     if (type === 'criterion') {
+                        cellTypeName = opt.localisedCriterionName;
 
                         // just gotta extend that rowspan
                         var $span = $row.parent().children('[data-group="' + $row.data('group') + '"][data-groupname]').children('[rowspan]');
                         $span.attr('rowspan', parseInt($span.attr('rowspan')) + 1);
-
-//                    $data.find('[type=checkbox]').prop('checked', true).trigger('change');
+                    } else {
+                        cellTypeName = opt.localisedGroupName;
                     }
-                    $toastFeedback.toastTimeout({text: type.charAt(0).toUpperCase() + type.substr(1) + ' created!', css: 'success'});
+                    $toastFeedback.toastTimeout({text: cellTypeName + ' created!', css: 'success'});
 
                     $rb.sequencer('refresh');
                 })
