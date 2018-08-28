@@ -295,16 +295,7 @@ class ImpressionsConversionsOpens
      */
     private function summariseDailyStatistics(Collection $statistics): array
     {
-
-        /* Prefill array with default values so they don't render as empty strings
-         */
-        $defaultValues = array_fill_keys(Mapper::REFERRERS, 0);
-
-        $breakdown = [
-            Mapper::TYPE_CONVERSION => $defaultValues,
-            Mapper::TYPE_IMPRESSION => $defaultValues,
-            Mapper::TYPE_OPEN => $defaultValues,
-        ];
+        $breakdown = $this->generateDefaultBreakdown(Mapper::REFERRERS);
 
         $numConversions = 0;
         $numImpressions = 0;
@@ -376,15 +367,7 @@ class ImpressionsConversionsOpens
      */
     public function fetchRoleTypeDemographic(News\Model $article): array
     {
-        /* Prefill array with default values so they don't render as empty strings
-         */
-        $defaultValues = array_fill_keys(Mapper::ROLETYPES, 0);
-
-        $breakdown = [
-            Mapper::TYPE_CONVERSION => $defaultValues,
-            Mapper::TYPE_IMPRESSION => $defaultValues,
-            Mapper::TYPE_OPEN => $defaultValues,
-        ];
+        $breakdown = $this->generateDefaultBreakdown(Mapper::ROLETYPES);
 
         $statement = $this->database->prepareQuery("
             SELECT 
@@ -593,11 +576,7 @@ class ImpressionsConversionsOpens
             'articleId' => $article->getId()
         ]);
 
-        $breakdown = [
-            Mapper::TYPE_CONVERSION => array_fill_keys(Mapper::REFERRERS, 0),
-            Mapper::TYPE_IMPRESSION => array_fill_keys(Mapper::REFERRERS, 0),
-            Mapper::TYPE_OPEN => array_fill_keys(Mapper::REFERRERS, 0),
-        ];
+        $breakdown = $this->generateDefaultBreakdown(Mapper::REFERRERS);
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $type = $row['type'];
@@ -691,5 +670,24 @@ class ImpressionsConversionsOpens
         }
 
         return $referrerRatio;
+    }
+
+
+    /**
+     * Generate an initialised array for each of the interaction types
+     * Prefill array with default values so they don't render as empty strings
+     *
+     * @param array $keys
+     * @return array
+     */
+    public function generateDefaultBreakdown(array $keys): array
+    {
+        $defaultValues = array_fill_keys($keys, 0);
+
+        return [
+            Mapper::TYPE_CONVERSION => $defaultValues,
+            Mapper::TYPE_IMPRESSION => $defaultValues,
+            Mapper::TYPE_OPEN => $defaultValues,
+        ];
     }
 }
